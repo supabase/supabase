@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import { ChevronsUpDown } from 'lucide-react'
 import React from 'react'
 import { describe, expect, it } from 'vitest'
 
@@ -89,5 +90,28 @@ describe('#Button', () => {
     render(<Button ref={ref}>Button</Button>)
 
     expect(ref.current).toBeInstanceOf(HTMLButtonElement)
+  })
+
+  it('renders combobox triggers with select styling when role is combobox', () => {
+    render(
+      <Button role="combobox" variant="default" iconRight={<ChevronsUpDown />}>
+        Select publication
+      </Button>
+    )
+
+    const trigger = screen.getByRole('combobox')
+    expect(trigger).toHaveTextContent('Select publication')
+    expect(trigger).toHaveClass('bg-control-raised', 'border-strong', 'text-left')
+    expect(trigger).not.toHaveClass('bg-background')
+  })
+
+  it('renders default buttons with ChevronsUpDown as combobox triggers', () => {
+    render(
+      <Button variant="default" iconRight={<ChevronsUpDown className="opacity-50" />}>
+        Choose schema
+      </Button>
+    )
+
+    expect(screen.getByRole('combobox')).toHaveTextContent('Choose schema')
   })
 })

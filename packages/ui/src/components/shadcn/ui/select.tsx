@@ -1,12 +1,12 @@
 'use client'
 
-import { cva, VariantProps } from 'class-variance-authority'
+import { VariantProps } from 'class-variance-authority'
 import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { Select as SelectPrimitive } from 'radix-ui'
 import * as React from 'react'
 
-import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../../lib/constants'
 import { cn } from '../../../lib/utils/cn'
+import { ComboboxTrigger, selectTriggerVariants } from './select-trigger'
 
 const Select = SelectPrimitive.Root
 
@@ -16,8 +16,7 @@ const SelectGroup = SelectPrimitive.Group
 // https://github.com/radix-ui/primitives/issues/2578#issuecomment-1890801041 for more info.
 const SelectValue = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Value>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Value> &
-    VariantProps<typeof SelectTriggerVariants>
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Value>
 >(({ placeholder, ...props }, ref) => (
   <SelectPrimitive.Value
     placeholder={typeof placeholder === 'string' ? <span>{placeholder}</span> : placeholder}
@@ -28,32 +27,17 @@ const SelectValue = React.forwardRef<
 
 SelectValue.displayName = SelectPrimitive.Value.displayName
 
-const SelectTriggerVariants = cva('', {
-  variants: {
-    size: {
-      ...SIZE_VARIANTS,
-    },
-  },
-  defaultVariants: {
-    size: SIZE_VARIANTS_DEFAULT,
-  },
-})
+type SelectTriggerSize = NonNullable<VariantProps<typeof selectTriggerVariants>['size']>
 
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> &
-    VariantProps<typeof SelectTriggerVariants>
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
+    size?: SelectTriggerSize
+  }
 >(({ className, children, size, ...props }, ref) => (
   <SelectPrimitive.Trigger
     ref={ref}
-    className={cn(
-      'flex w-full items-center justify-between rounded-md border border-strong hover:border-control-hover bg-control-raised text-xs data-[placeholder]:text-foreground-lighter ring-border-control focus-ring disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-200',
-      'data-[state=open]:border-control-hover',
-      'gap-2',
-      '[&>span]:truncate text-left', // [kemal] This is to prevent double lines rendering when a string is particularly long.
-      SelectTriggerVariants({ size }),
-      className
-    )}
+    className={cn(selectTriggerVariants({ size }), className)}
     tabIndex={0}
     {...props}
   >
@@ -187,6 +171,7 @@ const SelectSeparator = React.forwardRef<
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName
 
 export {
+  ComboboxTrigger,
   Select,
   SelectContent,
   SelectGroup,
