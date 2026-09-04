@@ -13,14 +13,14 @@ export const telemetryDebugging: ContentListingGroup = {
         'Isolate the failing layer, read logs as evidence, and match symptoms to troubleshooting guides.',
     },
     {
-      title: 'Logging',
+      title: 'Logs',
       href: '/guides/monitoring-and-debugging/logs',
-      description: 'Query events from any Supabase service using the Logs Explorer.',
+      description: 'Inspect project log events in the unified Logs view in Studio.',
     },
     {
-      title: 'Advanced log filtering',
+      title: 'Query and filter logs',
       href: '/guides/monitoring-and-debugging/advanced-log-filtering',
-      description: 'Regex filtering, structured-field queries, and field discovery in ClickHouse.',
+      description: 'Run ClickHouse SQL from Studio, MCP, the API, or a script.',
     },
     {
       title: 'Troubleshooting index',

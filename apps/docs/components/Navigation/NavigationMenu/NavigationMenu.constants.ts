@@ -3034,11 +3034,11 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/monitoring-and-debugging/debugging' as `/${string}`,
         },
         {
-          name: 'Logging',
+          name: 'Logs',
           url: '/guides/monitoring-and-debugging/logs' as `/${string}`,
         },
         {
-          name: 'Advanced log filtering',
+          name: 'Query and filter logs',
           url: '/guides/monitoring-and-debugging/advanced-log-filtering' as `/${string}`,
         },
         {
