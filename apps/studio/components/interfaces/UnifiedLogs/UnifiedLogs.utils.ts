@@ -10,6 +10,24 @@ import type { UnifiedLogInspectionEntry } from '@/data/logs/unified-log-inspecti
 
 export type UnifiedLogType = keyof typeof LOG_TYPES_LABELS
 
+export function getWorkersLogsAvailability({
+  isPlatform,
+  flagsLoaded,
+  workersEnabled,
+}: {
+  isPlatform: boolean
+  flagsLoaded?: boolean
+  workersEnabled: boolean
+}) {
+  const flagsReady = flagsLoaded === true
+
+  return {
+    canQueryWorkers: isPlatform && flagsReady && workersEnabled,
+    preserveWorkersFilter: isPlatform && (!flagsReady || workersEnabled),
+    readyToSyncFilters: !isPlatform || flagsReady,
+  }
+}
+
 export const buildUnifiedLogsUrl = ({
   projectRef,
   logType,

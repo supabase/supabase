@@ -6,6 +6,7 @@ import {
   gateLogTypeOptions,
   getEventMessageDisplay,
   getRawLogData,
+  getWorkersLogsAvailability,
   parseMultigresEventMessage,
 } from './UnifiedLogs.utils'
 
@@ -198,5 +199,64 @@ describe('gateLogTypeFilters', () => {
   it('preserves absent filter values', () => {
     expect(gateLogTypeFilters(undefined, { workers: false })).toBeUndefined()
     expect(gateLogTypeFilters(null, { workers: false })).toBeNull()
+  })
+})
+
+describe('getWorkersLogsAvailability', () => {
+  const workersFilter = ['log_type:eq:workers']
+
+  it('preserves an unresolved platform filter without allowing it into queries or sync', () => {
+    const availability = getWorkersLogsAvailability({
+      isPlatform: true,
+      flagsLoaded: false,
+      workersEnabled: false,
+    })
+
+    expect(gateLogTypeFilters(workersFilter, { workers: availability.preserveWorkersFilter })).toBe(
+      workersFilter
+    )
+    expect(gateLogTypeFilters(workersFilter, { workers: availability.canQueryWorkers })).toEqual([])
+    expect(availability.readyToSyncFilters).toBe(false)
+  })
+
+  it('allows Workers filters and queries when the platform flag is enabled', () => {
+    const availability = getWorkersLogsAvailability({
+      isPlatform: true,
+      flagsLoaded: true,
+      workersEnabled: true,
+    })
+
+    expect(availability).toEqual({
+      canQueryWorkers: true,
+      preserveWorkersFilter: true,
+      readyToSyncFilters: true,
+    })
+  })
+
+  it('removes Workers filters and queries when the platform flag is disabled', () => {
+    const availability = getWorkersLogsAvailability({
+      isPlatform: true,
+      flagsLoaded: true,
+      workersEnabled: false,
+    })
+
+    expect(availability).toEqual({
+      canQueryWorkers: false,
+      preserveWorkersFilter: false,
+      readyToSyncFilters: true,
+    })
+  })
+
+  it('syncs generic filters immediately while keeping Workers unavailable on self-hosted', () => {
+    const availability = getWorkersLogsAvailability({
+      isPlatform: false,
+      workersEnabled: false,
+    })
+
+    expect(availability).toEqual({
+      canQueryWorkers: false,
+      preserveWorkersFilter: false,
+      readyToSyncFilters: true,
+    })
   })
 })

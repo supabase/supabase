@@ -11,8 +11,6 @@ import { analyticsLiteral, safeSql } from '@/data/logs/safe-analytics-sql'
 import { IS_PLATFORM } from '@/lib/constants'
 import { WORKER_LOG_SOURCES } from '@/lib/constants/workers'
 
-export { WORKER_LOG_SOURCES } from '@/lib/constants/workers'
-
 export type WorkerLogStream = keyof typeof WORKER_LOG_SOURCES
 
 export const WORKER_LOG_STREAM_LABEL: Record<WorkerLogStream, string> = {

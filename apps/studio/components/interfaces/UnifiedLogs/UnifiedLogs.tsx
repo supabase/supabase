@@ -13,7 +13,7 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
-import { LOCAL_STORAGE_KEYS, useDebounce, useFlag, useParams } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
 import { Loader2, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -42,7 +42,7 @@ import {
   buildFilterSearchUpdate,
   parseLogsFilterUrlParams,
 } from './UnifiedLogs.filters'
-import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
+import { useFilterSearchSync, useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
 import { isUserFilterUnreachable } from './UnifiedLogs.queries'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
@@ -51,6 +51,7 @@ import {
   gateLogTypeOptions,
   getFacetedUniqueValues,
   getLevelRowClassName,
+  getWorkersLogsAvailability,
 } from './UnifiedLogs.utils'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
@@ -95,10 +96,16 @@ export const UnifiedLogs = () => {
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
   const showMultigresLogs = useShowMultigresLogs()
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const workersEnabled = !!useFlag('workers')
+  const workersAvailability = getWorkersLogsAvailability({
+    isPlatform: IS_PLATFORM,
+    flagsLoaded,
+    workersEnabled,
+  })
   const visibleSearchFilters = gateLogTypeFilters(search.filter, {
     multigres: showMultigresLogs,
-    workers: workersEnabled,
+    workers: workersAvailability.preserveWorkersFilter,
   })
 
   const defaultColumnSorting = search.sort ? [search.sort] : []
@@ -158,11 +165,11 @@ export const UnifiedLogs = () => {
       parameters.filter =
         gateLogTypeFilters(parameters.filter, {
           multigres: showMultigresLogs,
-          workers: workersEnabled,
+          workers: workersAvailability.canQueryWorkers,
         }) ?? null
     }
     return parameters
-  }, [search, showMultigresLogs, workersEnabled])
+  }, [search, showMultigresLogs, workersAvailability.canQueryWorkers])
 
   const {
     data: unifiedLogsData,
@@ -291,7 +298,7 @@ export const UnifiedLogs = () => {
   const filterFields = useMemo(() => {
     const gatedFields = gateLogTypeOptions(defaultFilterFields, {
       multigres: showMultigresLogs,
-      workers: workersEnabled,
+      workers: workersAvailability.canQueryWorkers,
     })
 
     return gatedFields.map((field) => {
@@ -320,24 +327,24 @@ export const UnifiedLogs = () => {
 
       return { ...field, options }
     })
-  }, [facets, showMultigresLogs, workersEnabled])
+  }, [facets, showMultigresLogs, workersAvailability.canQueryWorkers])
 
   const applyFilterSearch = () => {
     const update = buildFilterSearchUpdate(columnFilters, filterFields)
     if (Array.isArray(update.filter)) {
       update.filter = gateLogTypeFilters(update.filter.map(String), {
         multigres: showMultigresLogs,
-        workers: workersEnabled,
+        workers: workersAvailability.canQueryWorkers,
       })
     }
     setSearch(update)
   }
 
-  const debouncedApplyFilterSearch = useDebounce(applyFilterSearch, 250)
-
-  useEffect(() => {
-    debouncedApplyFilterSearch()
-  }, [columnFilters, debouncedApplyFilterSearch])
+  useFilterSearchSync({
+    applyFilterSearch,
+    columnFilters,
+    enabled: workersAvailability.readyToSyncFilters,
+  })
 
   useEffect(() => {
     setSearch({ sort: sorting?.[0] || null })
