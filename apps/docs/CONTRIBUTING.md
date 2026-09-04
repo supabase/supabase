@@ -30,7 +30,7 @@ Ask your agent for a skill by name (`pm-the-docs`, `ask-the-docs`, `write-the-do
 | [`pm-the-docs`](../../.agents/skills/pm-the-docs/SKILL.md) | Frame / Shape | Audience, product-stage, and cross-cutting scope calls (universe when you have Supabase org access, else OSS path) |
 | [`ask-the-docs`](../../.agents/skills/ask-the-docs/SKILL.md) | Frame / Shape | `apps/docs` architecture, IA placement, and where content lives |
 | [`write-the-docs`](../../.agents/skills/write-the-docs/SKILL.md) | Draft | Drafting net-new content grounded in the code |
-| [`edit-the-docs`](../../.agents/skills/edit-the-docs/SKILL.md) | Edit | Restructure and improve existing pages |
+| [`edit-the-docs`](../../.agents/skills/edit-the-docs/SKILL.md) | Edit | Restructure and improve existing pages, as a stack of PRs by change type |
 | [`test-the-docs`](../../.agents/skills/test-the-docs/SKILL.md) | Draft / Self-review | Execute docs snippets in a Docker-isolated local stack; verification report |
 | [`review-the-docs`](../../.agents/skills/review-the-docs/SKILL.md) | Self-review / PR review | Checking a draft and PR triage/verification |
 

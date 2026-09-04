@@ -85,7 +85,9 @@ Re-read [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md) and [`
 
 ## Phase 3 — Handoff
 
-This skill stops at a reviewable draft. It does not open worktrees or PRs itself:
+This skill stops at a reviewable draft. It does not open worktrees or PRs itself.
+
+A net-new page is one change type by construction, so it ships as a single PR. That's why this skill hands off the mechanics while [`edit-the-docs`](../edit-the-docs/SKILL.md) owns them: an existing-page edit stacks style, structure, and technical changes onto the same lines, and splitting those into separate PRs is part of the editing method rather than an afterthought. If a draft here turns into a restructure of the pages around it, switch to `edit-the-docs` and its [stacked-PR workflow](../edit-the-docs/reference/stacked-prs.md).
 
 - **Offer** [`test-the-docs`](../test-the-docs/SKILL.md) when the draft includes runnable procedural snippets. Ask before starting verification. Gate prerequisites **per artifact class** (Docker Compose stack profile for DB/API artifacts; examples profile / Node in-runner for `example-app`). If declined, or a required prerequisite for that class is missing, record `deferred` for those artifacts only and continue. When accepted, attach the verification report to the PR body / self-review note.
 - Then run [`review-the-docs`](../review-the-docs/SKILL.md) local self-review (lint/build/classify).
@@ -99,7 +101,7 @@ This skill stops at a reviewable draft. It does not open worktrees or PRs itself
 - Common pitfalls to avoid: [reference/common-pitfalls.md](reference/common-pitfalls.md)
 - Drafting mechanics: [reference/drafting-mechanics.md](reference/drafting-mechanics.md)
 - Content-type gate detail: [reference/content-type-gate.md](reference/content-type-gate.md)
-- Existing-page restructure/clarity: [`edit-the-docs`](../edit-the-docs/SKILL.md)
+- Existing-page restructure/clarity, and the stacked-PR workflow for edits: [`edit-the-docs`](../edit-the-docs/SKILL.md)
 - "Write the docs" checklist (Draft stage): [`pm-the-docs`](../pm-the-docs/SKILL.md)'s [reference/write-the-docs-checklist.md](../pm-the-docs/reference/write-the-docs-checklist.md)
 - Cross-repo product lookup: [`pm-the-docs`](../pm-the-docs/SKILL.md) → [universe-lookup](../pm-the-docs/reference/universe-lookup.md)
 - Runnable verification: [`test-the-docs`](../test-the-docs/SKILL.md)
