@@ -277,6 +277,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     const IS_BADGE_LIMIT_WRAP = badgeLimit === 'wrap'
     const IS_NUMERIC_LIMIT = typeof badgeLimit === 'number'
     const IS_INLINE_MODE = mode === 'inline-combobox'
+    const isTiny = size === 'tiny'
 
     React.useEffect(() => {
       if (!inputRef?.current || !badgesRef.current) return
@@ -290,8 +291,10 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
       }
     }, [values, badgeLimit])
 
-    const badgeClasses =
-      'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5 normal-case tracking-normal text-xs'
+    const badgeClasses = cn(
+      'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5 normal-case tracking-normal text-xs',
+      isTiny && 'h-full py-0 leading-none'
+    )
 
     const handleTriggerClick: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
       (event) => {
@@ -326,7 +329,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           type="button"
           role="combobox"
           className={cn(
-            'flex w-full min-w-[200px] items-center justify-between rounded-md border',
+            'flex w-full min-w-[200px] justify-between rounded-md border',
+            isTiny ? 'items-stretch' : 'items-center',
             'border-strong',
             // Empty: raised plate. Filled: sunk well for chips.
             values.length > 0 ? 'bg-field' : 'bg-control-raised',
@@ -343,8 +347,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           <div
             ref={badgesRef}
             className={cn(
-              'flex gap-1 overflow-hidden flex-1',
-              size !== 'tiny' && '-ml-1',
+              'flex overflow-hidden flex-1 min-w-0',
+              isTiny ? 'h-full min-h-0 items-center gap-0.5' : 'gap-1 -ml-1',
               IS_BADGE_LIMIT_WRAP && 'flex-wrap',
               !IS_BADGE_LIMIT_WRAP &&
                 'overflow-x-auto scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg'
@@ -378,7 +382,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
             )}
             <span
               className={cn(
-                'text-foreground-muted whitespace-nowrap leading-5.5 ml-1 opacity-0 transition-opacity hidden',
+                'text-foreground-muted whitespace-nowrap opacity-0 transition-opacity hidden',
+                isTiny ? 'leading-none' : 'ml-1 leading-5.5',
                 !IS_INLINE_MODE &&
                   (persistLabel || values.length === 0) &&
                   'opacity-100 visible inline'
@@ -394,10 +399,11 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
                 placeholder={values.length === 0 ? label : undefined}
                 autoFocus={false}
                 wrapperClassName={cn(
-                  'px-0 flex-1 border-none truncate',
+                  'px-0 flex-1 border-none truncate min-w-0',
+                  isTiny && 'h-full',
                   IS_BADGE_LIMIT_WRAP && 'min-w-[85px]'
                 )}
-                className="py-0 px-1 truncate"
+                className={cn('py-0 truncate', isTiny ? 'h-full px-0' : 'px-1')}
               />
             )}
           </div>
@@ -406,7 +412,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
             <ChevronsUpDown
               size={16}
               strokeWidth={1.5}
-              className="text-foreground-lighter shrink-0 ml-1.5"
+              className={cn('text-foreground-lighter shrink-0 ml-1.5', isTiny && 'self-center')}
             />
           )}
         </button>
@@ -494,7 +500,7 @@ const MultiSelectorInput = React.forwardRef<
       wrapperClassName={wrapperClassName}
       className={cn(
         MultiSelectorInputVariants({ size }),
-        'text-sm bg-transparent h-full grow border-none outline-hidden placeholder:text-foreground-muted flex-1',
+        'bg-transparent h-full grow border-none outline-hidden placeholder:text-foreground-muted flex-1',
         activeIndex !== -1 && 'caret-transparent',
         className
       )}
