@@ -23,11 +23,14 @@ export const QueryResultError = ({
   autoLimit,
   sql,
   source,
+  onDebug,
 }: {
   error: NonNullable<QueryResult['error']>
   autoLimit?: QueryResult['autoLimit']
   sql?: string
   source?: SqlSnippetSource
+  /** Receives the "Debug with Assistant" prompt. Defaults to opening a new assistant chat. */
+  onDebug?: (prompt: string) => void
 }) => {
   const { ref } = useParams()
 
@@ -60,8 +63,11 @@ export const QueryResultError = ({
     [canDebug, sql, error.message, source]
   )
 
-  const handleDebug = () =>
-    createChat({ name: 'Debug SQL snippet', initialMessage: buildDebugPrompt() })
+  const handleDebug = () => {
+    const prompt = buildDebugPrompt()
+    if (onDebug) return onDebug(prompt)
+    createChat({ name: 'Debug SQL snippet', initialMessage: prompt })
+  }
 
   const isTimeout =
     error.message?.includes('canceling statement due to statement timeout') ||

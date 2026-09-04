@@ -141,6 +141,8 @@ type QueryEditorProps = {
   onRowLimitChange?: (val: number) => void
   onDisplayChange?: (display: QueryDisplay) => void
   onRun?: () => void
+  /** Receives the "Debug with Assistant" prompt on error. Defaults to opening a new assistant chat. */
+  onDebug?: (prompt: string) => void
 }
 
 /**
@@ -171,6 +173,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     onRowLimitChange,
     onDisplayChange,
     onRun,
+    onDebug,
   }: QueryEditorProps,
   ref
 ) {
@@ -406,6 +409,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
         chart={display?.chart}
         sql={result?.sql}
         source={result?.source}
+        onDebug={onDebug}
       />
     </ExplorerQueryResults>
   )
