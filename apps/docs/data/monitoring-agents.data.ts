@@ -46,6 +46,18 @@ export const monitoringAgents = {
       onDemand: 'Run it on demand after an unexpected traffic change.',
     },
   },
+  all: {
+    id: 'all',
+    name: 'Generalist',
+    promptId: 'monitoring-agent-all' as AiPromptId,
+    schedule: {
+      cadence: 'once per day',
+      intervalMinutes: 1440,
+      scheduled: 'Run it once per day at the start of your day or shift.',
+      onDemand:
+        'Run it on demand after a deployment or whenever you want a full project health check.',
+    },
+  },
 } as const
 
 export type MonitoringAgentId = keyof typeof monitoringAgents

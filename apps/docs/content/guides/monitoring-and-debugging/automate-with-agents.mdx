@@ -1,0 +1,38 @@
+---
+id: 'automate-with-agents'
+title: 'Hire an agent'
+subtitle: 'Run a read-only monitoring routine in your own agent harness.'
+description: 'Choose and set up a Health, Security, Performance, or Capacity monitor in Claude, Codex, or Cursor.'
+---
+
+This guide explains how to run a Supabase monitoring agent in your own harness. Each agent is a prompt plus a schedule. It reads project data and reports findings. It does not change the project.
+
+## Choose a routine
+
+Start with one monitor. Add another only when the project needs a different source or cadence.
+
+| Monitor                                                                                       | What it watches                                                               | Default cadence | Use it when                                                    |
+| --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | --------------- | -------------------------------------------------------------- |
+| [Health monitor](/docs/guides/monitoring-and-debugging/automate-with-agents/health)           | API and Auth server errors, error-rate spikes, connection pressure            | Hourly          | You need incident detection and regular feedback loops         |
+| [Security monitor](/docs/guides/monitoring-and-debugging/automate-with-agents/security)       | Security Advisor findings, authentication and authorization failures          | Daily           | You need a regular access-control and configuration review     |
+| [Performance monitor](/docs/guides/monitoring-and-debugging/automate-with-agents/performance) | Slow queries, lock waits, long-running sessions, Performance Advisor findings | Hourly          | You need query and database performance checks                 |
+| [Capacity monitor](/docs/guides/monitoring-and-debugging/automate-with-agents/usage)          | Request, error, storage, table, and connection growth                         | Daily           | You need to identify growth before it reaches a resource limit |
+
+For a small project, run the most relevant routine daily or weekly and include the other categories in its prompt. Split it into specialized monitors only when you need different owners, schedules, or alert thresholds.
+
+## Run the routine
+
+1. Connect the [Supabase MCP server](/docs/guides/ai-tools/mcp) with `project_ref` and `read_only=true`.
+2. Open the monitor that matches the job from the table above.
+3. Set it up in Claude, Codex, Cursor, or copy the prompt into another harness.
+4. Run it on demand first. Then put the same prompt on a schedule.
+
+Each agent page describes what it will output. Send those findings through the connections your harness already has, such as Linear in Codex.
+
+Scheduled tasks start a fresh context on every run, so the prompt is self-contained. Review the first runs before you rely on the schedule.
+
+<Admonition type="caution">
+
+Logs and query results can contain secrets or personal information. Keep the agent read-only, aggregate evidence, and redact sensitive values.
+
+</Admonition>

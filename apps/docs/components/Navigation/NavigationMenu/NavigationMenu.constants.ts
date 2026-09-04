@@ -3111,6 +3111,32 @@ export const telemetry: NavMenuConstant = {
         },
       ],
     },
+    {
+      name: 'Hire an agent',
+      url: '/guides/monitoring-and-debugging/automate-with-agents' as `/${string}`,
+      items: [
+        {
+          name: 'Generalist',
+          url: '/guides/monitoring-and-debugging/automate-with-agents/all' as `/${string}`,
+        },
+        {
+          name: 'Health monitor',
+          url: '/guides/monitoring-and-debugging/automate-with-agents/health' as `/${string}`,
+        },
+        {
+          name: 'Security monitor',
+          url: '/guides/monitoring-and-debugging/automate-with-agents/security' as `/${string}`,
+        },
+        {
+          name: 'Performance monitor',
+          url: '/guides/monitoring-and-debugging/automate-with-agents/performance' as `/${string}`,
+        },
+        {
+          name: 'Capacity monitor',
+          url: '/guides/monitoring-and-debugging/automate-with-agents/usage' as `/${string}`,
+        },
+      ],
+    },
   ],
 }
 
