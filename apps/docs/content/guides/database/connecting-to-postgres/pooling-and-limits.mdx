@@ -10,7 +10,7 @@ Learn how to choose between connection modes, size a pool, and work out why you'
 
 Connection pooling improves database performance by reusing existing connections between queries. This reduces the overhead of establishing connections and improves scalability.
 
-Postgres connections work like a WebSocket. Once established, a connection is preserved until the client disconnects. A server might make a single 10 ms query but hold its database connection for seconds or longer.
+A Postgres connection is a long-lived session. Once established, it stays open until the client disconnects, or until the server or the network closes it. A server might make a single 10 ms query but hold its database connection for seconds or longer.
 
 A pooler sits between clients and the database and shares a small set of database connections across many clients, so a connection isn't tied up while a client sits idle.
 
@@ -66,12 +66,13 @@ There are two limits to understand when working with poolers.
 Both limits apply independently to Supavisor and PgBouncer. One pooler reaching its client limit doesn't affect the other. When a pooler reaches this limit, it stops accepting new client connections until existing ones close.
 
 ```txt
-Total backend load on Postgres =
- Direct connections +
+Direct connections +
  Supavisor backend connections +
  PgBouncer backend connections
-≤ Postgres max connections for your compute instance
+< Postgres max connections for your compute instance
 ```
+
+Stay below the maximum rather than at it. Supabase services hold their own connections, including Auth, Storage, PostgREST, and the health checker, and those come out of the same total. [Managing connections](/docs/guides/database/connection-management) covers how much headroom to leave.
 
 For the connection counts that come with each compute size, see [compute and disk](/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections). For the terminology, see [Supavisor and connection terminology explained](/docs/guides/troubleshooting/supavisor-and-connection-terminology-explained-9pr_ZO).
 

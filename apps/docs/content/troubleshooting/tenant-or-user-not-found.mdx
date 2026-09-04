@@ -23,7 +23,7 @@ Copy the host from the [Connect](/dashboard/project/_?showConnect=true) dialog r
 
 Shared pooler connections use `postgres.[PROJECT-REF]`, not `postgres`. Direct connections and the dedicated pooler use `postgres`.
 
-If you connect as a custom role through the shared pooler, the username is `[ROLE].[PROJECT-REF]`. Supplying only the role name makes the pooler read it as part of the hostname, which surfaces as a DNS error.
+If you connect as a custom role through the shared pooler, the username is `[ROLE].[PROJECT-REF]`. Supplying only the role name, with no project ref, produces this error rather than an authentication failure.
 
 ## How to fix it
 
