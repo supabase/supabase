@@ -188,6 +188,12 @@ describe('getSecretPrefixWarning', () => {
 })
 
 describe('getElicitationAnnouncement', () => {
+  it('is empty before anything has resolved, so the region mounts silent', () => {
+    // A live region never announces content that was present when it mounted.
+    // Rendering nothing first is what makes the first real state a change.
+    expect(getElicitationAnnouncement(undefined)).toBe('')
+  })
+
   it('says what is happening while the queries resolve', () => {
     expect(getElicitationAnnouncement({ status: 'loading' })).toBe('Loading request details')
   })

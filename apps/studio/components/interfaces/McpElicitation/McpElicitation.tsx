@@ -3,11 +3,14 @@ import { useMemo } from 'react'
 
 import { MCP_ELICITATION_FLAG } from './McpElicitation.constants'
 import { buildElicitationSignInPath, parseElicitationParams } from './McpElicitation.params'
+import { getElicitationAnnouncement } from './McpElicitation.utils'
 import { McpElicitationCard } from './McpElicitationCard'
 import { McpElicitationOutcome } from './McpElicitationOutcome'
 import { McpElicitationSkeleton } from './McpElicitationSkeleton'
 import { useElicitationRequest } from './useElicitationRequest'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
+
+const PAUSED_STATE = { status: 'paused' } as const
 
 export const McpElicitation = () => {
   const searchParams = useParams()
@@ -23,17 +26,27 @@ export const McpElicitation = () => {
     window.location.assign(`${BASE_PATH}${buildElicitationSignInPath(params)}`)
   }
 
-  if (!areFlagsResolved) return <McpElicitationSkeleton />
-
-  if (!isUrlModeEnabled) return <McpElicitationOutcome state={{ status: 'paused' }} />
+  const resolvedState = isUrlModeEnabled ? state : PAUSED_STATE
 
   return (
-    <McpElicitationCard
-      state={state}
-      isSaving={isSaving}
-      onSave={saveSecret}
-      onCancel={cancelRequest}
-      onSwitchAccount={handleSwitchAccount}
-    />
+    <>
+      <p role="status" aria-live="polite" className="sr-only">
+        {getElicitationAnnouncement(areFlagsResolved ? resolvedState : undefined)}
+      </p>
+
+      {!areFlagsResolved && <McpElicitationSkeleton />}
+
+      {areFlagsResolved && !isUrlModeEnabled && <McpElicitationOutcome state={PAUSED_STATE} />}
+
+      {areFlagsResolved && isUrlModeEnabled && (
+        <McpElicitationCard
+          state={state}
+          isSaving={isSaving}
+          onSave={saveSecret}
+          onCancel={cancelRequest}
+          onSwitchAccount={handleSwitchAccount}
+        />
+      )}
+    </>
   )
 }

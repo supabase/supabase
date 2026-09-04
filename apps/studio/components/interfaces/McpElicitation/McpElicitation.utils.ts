@@ -95,7 +95,9 @@ export function getElicitationCopy(state: ElicitationOutcomeState): ElicitationC
   }
 }
 
-export function getElicitationAnnouncement(state: ElicitationState): string {
+export function getElicitationAnnouncement(state: ElicitationState | undefined): string {
+  if (state === undefined) return ''
+
   switch (state.status) {
     case 'loading':
       return 'Loading request details'

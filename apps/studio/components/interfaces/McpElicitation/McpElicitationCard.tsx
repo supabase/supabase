@@ -1,34 +1,22 @@
 import type { ElicitationState } from './McpElicitation.types'
-import { getElicitationAnnouncement } from './McpElicitation.utils'
 import { McpElicitationForm } from './McpElicitationForm'
 import { McpElicitationOutcome } from './McpElicitationOutcome'
 import { McpElicitationSkeleton } from './McpElicitationSkeleton'
 import { McpElicitationWrongAccount } from './McpElicitationWrongAccount'
 
-type McpElicitationCardProps = {
-  state: ElicitationState
-  isSaving: boolean
-  onSave: (secret: string) => void
-  onCancel: () => void
-  onSwitchAccount: () => void
-}
-
-export const McpElicitationCard = (props: McpElicitationCardProps) => (
-  <>
-    <p role="status" aria-live="polite" className="sr-only">
-      {getElicitationAnnouncement(props.state)}
-    </p>
-    <McpElicitationCardContent {...props} />
-  </>
-)
-
-const McpElicitationCardContent = ({
+export const McpElicitationCard = ({
   state,
   isSaving,
   onSave,
   onCancel,
   onSwitchAccount,
-}: McpElicitationCardProps) => {
+}: {
+  state: ElicitationState
+  isSaving: boolean
+  onSave: (secret: string) => void
+  onCancel: () => void
+  onSwitchAccount: () => void
+}) => {
   if (state.status === 'loading') return <McpElicitationSkeleton />
 
   if (state.status === 'form') {

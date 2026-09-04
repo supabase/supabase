@@ -99,6 +99,26 @@ describe('McpElicitationCard', () => {
     expect(secretField().value).toBe('sk-still-being-typed')
   })
 
+  it('blocks an empty submit and explains why, without calling onSave', async () => {
+    const onSave = vi.fn()
+    customRender(
+      <McpElicitationCard
+        state={{ status: 'form', request }}
+        isSaving={false}
+        onSave={onSave}
+        onCancel={noop}
+        onSwitchAccount={noop}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(await screen.findByText('Enter the key value')).toBeInTheDocument()
+    expect(secretField()).toHaveAttribute('aria-invalid', 'true')
+    expect(secretField().getAttribute('aria-describedby')).toContain('form-item-message')
+    expect(onSave).not.toHaveBeenCalled()
+  })
+
   it('submits the value exactly as typed, with no trimming', async () => {
     const onSave = vi.fn()
     const user = userEvent.setup()
