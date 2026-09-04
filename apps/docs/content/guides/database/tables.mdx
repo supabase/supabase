@@ -514,6 +514,15 @@ A custom schema isn't reachable through the Supabase Data API until you expose i
 
 Reference material for choosing a column type.
 
+### Choosing a type
+
+Postgres offers several near-equivalent types for the same job. These defaults are safe:
+
+- **Timestamps:** prefer `timestamptz` over `timestamp`. `timestamptz` records the instant and renders it in the client's time zone. `timestamp` drops the offset, so the same stored value means different moments to clients in different zones.
+- **Text:** prefer `text` over `varchar(n)`. Postgres stores the two identically, and `text` has no declared limit to migrate later. Add a check constraint when you need to bound the length.
+- **Money and other exact decimals:** prefer `numeric` over `real`, `double precision`, or `money`. Floating-point types can't represent values such as `0.10` exactly, so totals drift as they accumulate.
+- **Identifiers:** prefer `bigint` over `integer`. An `integer` primary key runs out at 2,147,483,647 rows.
+
 ### Data types
 
 Every column has a data type. Postgres provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can design your own or use extensions if the default types don't fit your needs. You can use any data type that Postgres supports via the SQL editor. The Table Editor supports a subset of these, which keeps the experience focused for people with less database experience.
