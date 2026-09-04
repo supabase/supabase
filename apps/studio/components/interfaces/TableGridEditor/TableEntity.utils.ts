@@ -37,7 +37,7 @@ export const getTablePoliciesUrl = (
 const quoteIdentifier = (identifier: string): string => `"${identifier.replaceAll('"', '""')}"`
 
 export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
-  if (rows.length === 0) return ''
+  if (rows.length === 0 || table.schema == null) return ''
 
   const columns = table.columns.map((col) => quoteIdentifier(col.name)).join(', ')
 
