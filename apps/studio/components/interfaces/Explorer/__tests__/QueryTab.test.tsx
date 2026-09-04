@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ExplorerQueryTab } from '../ExplorerQueryTab'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import type { ReadReplicasData } from '@/data/read-replicas/replicas-query'
 import { explorerQueryState } from '@/state/explorer-query'
 import { createTabId, createTabsState, TabsStateContext } from '@/state/tabs'
@@ -164,6 +165,39 @@ const createDraft = (
     sql,
     source,
   })
+}
+
+const TABLE_ENTITY = { schema: 'public', name: 'users', type: ENTITY_TYPE.TABLE } as const
+
+const createEntityDraft = (sql: string = 'select * from public.users') => {
+  explorerQueryState.removeDraft({ id: 'query-test', projectRef: 'default' })
+  explorerQueryState.createDraft({
+    id: 'query-test',
+    projectRef: 'default',
+    sql,
+    source: { _tag: 'database' },
+    entity: TABLE_ENTITY,
+  })
+}
+
+/**
+ * Intellisense, event triggers and other background fetches share the pg-meta query endpoint
+ * with executions, each tagged by a `key` search param. A run carries no key.
+ */
+const captureQueryExecutions = () => {
+  const bodies: Array<{ query: string }> = []
+
+  addAPIMock({
+    method: 'post',
+    path: '/platform/pg-meta/:ref/query',
+    response: async ({ request }) => {
+      const key = new URL(request.url).searchParams.get('key')
+      if (!key) bodies.push((await request.json()) as { query: string })
+      return HttpResponse.json([])
+    },
+  })
+
+  return bodies
 }
 
 beforeEach(() => {
@@ -534,5 +568,54 @@ describe('QueryTab execution', () => {
     await waitFor(() => expect(executedQueries).toHaveLength(1))
     expect(executedQueries[0]).toContain('select 1')
     expect(executedQueries[0]).toContain('select 2')
+  })
+})
+
+describe('QueryTab auto-run', () => {
+  it('runs a table query on open without waiting for the user', async () => {
+    createEntityDraft()
+    const executions = captureQueryExecutions()
+
+    renderQueryTab()
+
+    await waitFor(() => expect(executions).toHaveLength(1))
+    expect(executions[0]?.query).toContain('select * from public.users')
+  })
+
+  it('runs only once, even as the editor re-renders', async () => {
+    createEntityDraft()
+    const executions = captureQueryExecutions()
+
+    renderQueryTab()
+
+    await waitFor(() => expect(executions).toHaveLength(1))
+    await userEvent.click(await screen.findByRole('button', { name: 'Show query' }))
+
+    expect(executions).toHaveLength(1)
+  })
+
+  it('waits for Run once the query is no longer the one it generated', async () => {
+    createEntityDraft('select id from public.users')
+    const executions = captureQueryExecutions()
+
+    renderQueryTab()
+
+    const runButton = await screen.findByRole('button', { name: 'Run' })
+    await waitFor(() => expect(runButton).toBeEnabled())
+    expect(executions).toHaveLength(0)
+
+    await userEvent.click(runButton)
+    await waitFor(() => expect(executions).toHaveLength(1))
+  })
+
+  it('leaves an ad-hoc query alone', async () => {
+    createDraft({ _tag: 'database' }, 'select 1')
+    const executions = captureQueryExecutions()
+
+    renderQueryTab()
+
+    const runButton = await screen.findByRole('button', { name: 'Run' })
+    await waitFor(() => expect(runButton).toBeEnabled())
+    expect(executions).toHaveLength(0)
   })
 })

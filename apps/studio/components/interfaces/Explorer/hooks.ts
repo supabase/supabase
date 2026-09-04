@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent, useState } from 'react'
 
+import { buildEntitySelectSql, entityQueryId, type QueryEntityBinding } from './entityQuery.utils'
 import { useNotebookQuery } from '@/data/content/notebooks/notebook-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -8,7 +9,7 @@ import { generateUuid } from '@/lib/api/snippets.browser'
 import { useProfile } from '@/lib/profile'
 import type { AssistantModel } from '@/state/ai-assistant-state'
 import { useAiAssistantState, whenAiAssistantInitialized } from '@/state/ai-assistant-state'
-import { useExplorerQueryStateSnapshot } from '@/state/explorer-query'
+import { explorerQueryState, useExplorerQueryStateSnapshot } from '@/state/explorer-query'
 import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { type Notebook } from '@/state/notebooks/types'
 import { Notebooks } from '@/types'
@@ -160,4 +161,39 @@ export const useCreateQuery = () => {
   }
 
   return { createQuery }
+}
+
+/**
+ * Opens a database entity as an ordinary Explorer query — a `select *` draft keyed by the
+ * entity, landing in the same tab, editor and result surface as any query the user types
+ * themselves. An entity is not a separate kind of thing to open; it is a query with a known
+ * origin, which is all the extra the draft records.
+ */
+export const useOpenEntityQuery = () => {
+  const router = useRouter()
+  const { data: project } = useSelectedProjectQuery()
+
+  const openEntityQuery = (entity: QueryEntityBinding) => {
+    if (!project) return console.error('Project is required')
+
+    const id = entityQueryId(entity)
+
+    // Reuses the draft when one already exists, so reopening a table returns the user to
+    // whatever they had edited there rather than resetting it.
+    if (!explorerQueryState.restoreDraft({ id, projectRef: project.ref })) {
+      explorerQueryState.createDraft({
+        id,
+        projectRef: project.ref,
+        name: `${entity.schema}.${entity.name}`,
+        sql: buildEntitySelectSql(entity),
+        entity,
+      })
+    }
+
+    router.push(`/project/${project.ref}/explorer/query/${id}`)
+
+    return id
+  }
+
+  return { openEntityQuery }
 }

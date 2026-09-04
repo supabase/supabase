@@ -3,6 +3,11 @@ import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { proxy, ref, snapshot, useSnapshot } from 'valtio'
 import { z } from 'zod'
 
+import {
+  buildEntitySelectSql,
+  queryEntityBindingSchema,
+  type QueryEntityBinding,
+} from '@/components/interfaces/Explorer/entityQuery.utils'
 import { DEFAULT_CELL_ROW_LIMIT } from '@/components/interfaces/Explorer/QueryCell/QueryCell.utils'
 import { type QueryDisplay, type QueryResult } from '@/components/interfaces/Explorer/types'
 import { ROWS_PER_PAGE_OPTIONS } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
@@ -41,6 +46,7 @@ export type DatabaseQueryDraft = ExplorerQueryDraftBase &
     uncheckedSql: UntrustedSqlFragment
     rowLimit: number
     role?: ImpersonationRole
+    entity?: QueryEntityBinding
   }
 
 export type LogsQueryDraft = ExplorerQueryDraftBase &
@@ -67,6 +73,7 @@ type PersistedExplorerQueryDraft = {
   updatedAt: number
   rowLimit?: number
   role?: ImpersonationRole
+  entity?: QueryEntityBinding
 } & QueryDisplay
 
 type PersistedExplorerQueryDrafts = Record<string, PersistedExplorerQueryDraft>
@@ -84,6 +91,7 @@ const persistedDraftSchema = z.object({
   source: z.unknown().optional(),
   rowLimit: z.unknown().optional(),
   role: z.unknown().optional(),
+  entity: z.unknown().optional(),
   view: z.unknown().optional(),
   chart: z.unknown().optional(),
 })
@@ -142,6 +150,7 @@ const toDraft = ({
     uncheckedSql: untrustedSql(persisted.sql),
     rowLimit: persisted.rowLimit ?? DEFAULT_CELL_ROW_LIMIT,
     role: persisted.role,
+    entity: persisted.entity,
   }
 }
 
@@ -170,6 +179,8 @@ const readPersistedDrafts = (storage: StorageLike, projectRef: string) => {
         const view = parsedView.success ? parsedView.data : 'table'
         const parsedChart = chartConfigSchema.safeParse(draft.data.chart)
         const chart = parsedChart.success ? parsedChart.data : undefined
+        const parsedEntity = queryEntityBindingSchema.safeParse(draft.data.entity)
+        const entity = parsedEntity.success ? parsedEntity.data : undefined
 
         return [
           [
@@ -183,6 +194,7 @@ const readPersistedDrafts = (storage: StorageLike, projectRef: string) => {
               rowLimit,
               view,
               chart,
+              entity,
             },
           ],
         ]
@@ -209,6 +221,22 @@ const writePersistedDrafts = (
   else storage.setItem(key, JSON.stringify(retainedDrafts))
 }
 
+/**
+ * Whether closing a draft would actually lose something. An entity-backed draft still sitting
+ * on its generated `select *` is reproducible — reopening the table rebuilds it — so only a
+ * draft the user has since edited (or an ad-hoc query with any content at all) is worth a
+ * discard prompt.
+ */
+export const hasDiscardableContent = (draft: ExplorerQueryDraft) => {
+  const sql = draft.uncheckedSql.trim()
+  if (sql.length === 0) return false
+
+  const entity = draft._tag === 'database' ? draft.entity : undefined
+  if (!entity) return true
+
+  return sql !== buildEntitySelectSql(entity).trim()
+}
+
 export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage) => {
   const pendingPersistence = new Map<
     string,
@@ -224,6 +252,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       updatedAt: draft.updatedAt,
       rowLimit: draft._tag === 'database' ? draft.rowLimit : undefined,
       role: draft._tag === 'database' ? draft.role : undefined,
+      entity: draft._tag === 'database' ? draft.entity : undefined,
       view: draft.view,
       chart: draft.chart,
     }
@@ -241,6 +270,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       sql = '',
       source = createDefaultSourceBinding('database'),
       rowLimit = DEFAULT_CELL_ROW_LIMIT,
+      entity,
     }: {
       id: string
       projectRef: string
@@ -248,6 +278,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       sql?: string
       source?: QuerySourceBinding
       rowLimit?: number
+      entity?: QueryEntityBinding
     }) => {
       const draft = toDraft({
         id,
@@ -258,6 +289,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
           sql,
           updatedAt: Date.now(),
           rowLimit,
+          entity,
           view: 'table',
         },
       })
@@ -311,6 +343,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
 
       const currentRowLimit = draft._tag === 'database' ? draft.rowLimit : undefined
       const currentRole = draft._tag === 'database' ? draft.role : undefined
+      const currentEntity = draft._tag === 'database' ? draft.entity : undefined
 
       state.drafts[id] = toDraft({
         id,
@@ -322,6 +355,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
           updatedAt: Date.now(),
           rowLimit: rowLimit ?? currentRowLimit,
           role: currentRole,
+          entity: currentEntity,
           view: draft.view,
           chart: draft.chart,
         },

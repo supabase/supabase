@@ -4,8 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   createExplorerQueryState,
   EXPLORER_QUERY_PERSIST_DELAY,
+  hasDiscardableContent,
   MAX_PERSISTED_EXPLORER_QUERY_DRAFTS,
 } from './explorer-query'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 const createMemoryStorage = () => {
   const values = new Map<string, string>()
@@ -437,5 +439,83 @@ describe('explorer query drafts', () => {
     expect(state.drafts['query-1']).toBeUndefined()
     expect(state.results['query-1']).toBeUndefined()
     expect(storage.getItem(LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'))).toBeNull()
+  })
+
+  it('persists and restores the entity a draft was opened from', () => {
+    const storage = createMemoryStorage()
+    const firstState = createExplorerQueryState(storage)
+
+    firstState.createDraft({
+      id: 'entity-1',
+      projectRef: 'project-a',
+      name: 'public.users',
+      sql: 'select * from public.users',
+      entity: { schema: 'public', name: 'users', type: ENTITY_TYPE.TABLE },
+    })
+    firstState.updateDraft({ id: 'entity-1', sql: 'select id from public.users' })
+    firstState.flushPendingPersistence()
+
+    const secondState = createExplorerQueryState(storage)
+    secondState.restoreDraft({ id: 'entity-1', projectRef: 'project-a' })
+
+    expect(secondState.drafts['entity-1']).toMatchObject({
+      uncheckedSql: 'select id from public.users',
+      entity: { schema: 'public', name: 'users', type: ENTITY_TYPE.TABLE },
+    })
+  })
+
+  it('drops a malformed persisted entity rather than failing to restore the draft', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(
+      LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
+      JSON.stringify({
+        'entity-1': {
+          name: 'public.users',
+          sql: 'select * from public.users',
+          updatedAt: 1,
+          entity: { schema: 'public' },
+        },
+      })
+    )
+
+    const state = createExplorerQueryState(storage)
+
+    expect(state.restoreDraft({ id: 'entity-1', projectRef: 'project-a' })).toBe(true)
+    expect(state.drafts['entity-1']).toMatchObject({ entity: undefined })
+  })
+})
+
+describe('hasDiscardableContent', () => {
+  const entity = { schema: 'public', name: 'users', type: ENTITY_TYPE.TABLE }
+
+  const draftWith = ({ sql, withEntity }: { sql: string; withEntity: boolean }) => {
+    const state = createExplorerQueryState(createMemoryStorage())
+    state.createDraft({
+      id: 'draft',
+      projectRef: 'project-a',
+      sql,
+      entity: withEntity ? entity : undefined,
+    })
+    return state.drafts['draft']!
+  }
+
+  it('treats an empty draft as nothing to discard', () => {
+    expect(hasDiscardableContent(draftWith({ sql: '  ', withEntity: false }))).toBe(false)
+  })
+
+  it('treats any ad-hoc query with content as discardable', () => {
+    expect(hasDiscardableContent(draftWith({ sql: 'select 1', withEntity: false }))).toBe(true)
+  })
+
+  it('treats an unedited entity draft as reproducible, so closing it needs no prompt', () => {
+    expect(
+      hasDiscardableContent(draftWith({ sql: 'select * from public.users', withEntity: true }))
+    ).toBe(false)
+  })
+
+  it('treats an edited entity draft as discardable', () => {
+    expect(
+      hasDiscardableContent(draftWith({ sql: 'select id from public.users', withEntity: true }))
+    ).toBe(true)
   })
 })

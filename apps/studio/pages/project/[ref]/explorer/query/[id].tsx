@@ -22,7 +22,10 @@ const QueryPage: NextPageWithLayout = () => {
         id: createTabId('query', { id }),
         type: 'query',
         label: draft.name,
-        metadata: { queryId: id },
+        metadata: {
+          queryId: id,
+          entityType: draft._tag === 'database' ? draft.entity?.type : undefined,
+        },
         isPreview: true,
       })
     }

@@ -1,31 +1,45 @@
 import { motion } from 'framer-motion'
-import { ChevronLeft, MessageSquare, NotebookText, Plus } from 'lucide-react'
-import { type ComponentType, type PropsWithChildren } from 'react'
+import { ChevronLeft, Database, MessageSquare, NotebookText, Plus } from 'lucide-react'
+import { type ComponentType, type PropsWithChildren, type ReactNode } from 'react'
 import { Button, cn } from 'ui'
 import { InnerSideBarFilters, InnerSideBarFilterSearchInput } from 'ui-patterns/InnerSideMenu'
 
 import { useCreateChat, useCreateNotebook } from '@/components/interfaces/Explorer/hooks'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
+/** Explorer resources the sidebar can both list and create. */
 export type ExplorerResourceType = 'notebook' | 'chat'
+
+/**
+ * A level in the sidebar's drill-down stack. The layout keeps these on a stack, so going
+ * back is a pop and a new level costs one member here plus the panel that renders it.
+ */
+export type ExplorerNavLevel = ExplorerResourceType | 'database' | 'database-tables'
+
+type ExplorerNavIcon = ComponentType<{ size?: number; className?: string }>
+
+/** Icon and filter copy per resource, shared by its panel and the recently updated list. */
+export const EXPLORER_RESOURCES: Record<
+  ExplorerResourceType,
+  { icon: ExplorerNavIcon; searchPlaceholder: string }
+> = {
+  notebook: { icon: NotebookText, searchPlaceholder: 'Search notebooks' },
+  chat: { icon: MessageSquare, searchPlaceholder: 'Search chats' },
+}
+
+/** Top-level sidebar destinations, in display order. */
+export const EXPLORER_SECTIONS: Array<{
+  level: ExplorerNavLevel
+  label: string
+  icon: ExplorerNavIcon
+}> = [
+  { level: 'database', label: 'Database', icon: Database },
+  { level: 'notebook', label: 'Notebooks', icon: EXPLORER_RESOURCES.notebook.icon },
+  { level: 'chat', label: 'Chats', icon: EXPLORER_RESOURCES.chat.icon },
+]
 
 export const LEVEL_OFFSET = 8
 export const LEVEL_TRANSITION = { duration: 0.09, ease: 'easeOut' } as const
-
-export const EXPLORER_SECTIONS: Array<{
-  type: ExplorerResourceType
-  label: string
-  icon: ComponentType<{ size?: number; className?: string }>
-  searchPlaceholder: string
-}> = [
-  {
-    type: 'notebook',
-    label: 'Notebooks',
-    icon: NotebookText,
-    searchPlaceholder: 'Search notebooks',
-  },
-  { type: 'chat', label: 'Chats', icon: MessageSquare, searchPlaceholder: 'Search chats' },
-]
 
 export const rowClassName = (isActive: boolean) =>
   cn(
@@ -35,26 +49,30 @@ export const rowClassName = (isActive: boolean) =>
       : 'text-foreground-light hover:bg-surface-200 hover:text-foreground'
   )
 
-export const ExplorerNavResourceWrapper = ({
-  type,
+/**
+ * One level of the sidebar: the sliding panel, its back control, an optional filter input,
+ * and an optional action. Levels differ only in what they list, so they compose this rather
+ * than each rebuilding the header.
+ */
+export const ExplorerNavPanel = ({
   label,
   className,
   children,
   search,
   setSearch,
+  searchPlaceholder,
+  action,
   onBack,
 }: PropsWithChildren<{
-  type: ExplorerResourceType
-  label?: string
+  label: string
   className?: string
   search?: string
-  setSearch: (value: string) => void
+  /** Renders the filter input when given; otherwise the header shows `label` as a title. */
+  setSearch?: (value: string) => void
+  searchPlaceholder?: string
+  action?: ReactNode
   onBack: () => void
 }>) => {
-  const { createNotebook } = useCreateNotebook()
-  const { createChat } = useCreateChat()
-  const searchPlaceholder = EXPLORER_SECTIONS.find((x) => x.type === type)?.searchPlaceholder
-
   return (
     <motion.div
       role="group"
@@ -74,18 +92,61 @@ export const ExplorerNavResourceWrapper = ({
           className="size-7 shrink-0 px-0"
           icon={<ChevronLeft />}
         />
-        <span id="explorer-sidebar-search-label" className="sr-only">
-          {searchPlaceholder}
-        </span>
-        <InnerSideBarFilters className="w-full gap-0 p-0">
-          <InnerSideBarFilterSearchInput
-            name="explorer-sidebar-search"
-            value={search}
-            placeholder={searchPlaceholder}
-            aria-labelledby="explorer-sidebar-search-label"
-            onChange={(event) => setSearch(event.target.value)}
-          />
-        </InnerSideBarFilters>
+        {setSearch === undefined ? (
+          <span className="flex-1 truncate text-sm text-foreground">{label}</span>
+        ) : (
+          <>
+            <span id="explorer-sidebar-search-label" className="sr-only">
+              {searchPlaceholder}
+            </span>
+            <InnerSideBarFilters className="w-full gap-0 p-0">
+              <InnerSideBarFilterSearchInput
+                name="explorer-sidebar-search"
+                value={search}
+                placeholder={searchPlaceholder}
+                aria-labelledby="explorer-sidebar-search-label"
+                onChange={(event) => setSearch(event.target.value)}
+              />
+            </InnerSideBarFilters>
+          </>
+        )}
+        {action}
+      </div>
+      {children}
+    </motion.div>
+  )
+}
+
+/** An `ExplorerNavPanel` for a creatable resource, adding its "new" action to the header. */
+export const ExplorerNavResourceWrapper = ({
+  type,
+  label,
+  className,
+  children,
+  search,
+  setSearch,
+  onBack,
+}: PropsWithChildren<{
+  type: ExplorerResourceType
+  label?: string
+  className?: string
+  search?: string
+  setSearch: (value: string) => void
+  onBack: () => void
+}>) => {
+  const { createNotebook } = useCreateNotebook()
+  const { createChat } = useCreateChat()
+  const { searchPlaceholder } = EXPLORER_RESOURCES[type]
+
+  return (
+    <ExplorerNavPanel
+      label={label ?? EXPLORER_SECTIONS.find((section) => section.level === type)?.label ?? type}
+      className={className}
+      search={search}
+      setSearch={setSearch}
+      searchPlaceholder={searchPlaceholder}
+      onBack={onBack}
+      action={
         <ButtonTooltip
           size="tiny"
           variant="outline"
@@ -98,8 +159,9 @@ export const ExplorerNavResourceWrapper = ({
             if (type === 'chat') createChat()
           }}
         />
-      </div>
+      }
+    >
       {children}
-    </motion.div>
+    </ExplorerNavPanel>
   )
 }

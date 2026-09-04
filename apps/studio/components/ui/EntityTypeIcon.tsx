@@ -53,6 +53,8 @@ interface EntityTypeIconProps {
   strokeWidth?: number
   isActive?: boolean
   sqlSource?: SqlSnippetSource
+  /** For a `query`, the database object it was opened from, if any. */
+  entityType?: ENTITY_TYPE
 }
 
 export const EntityTypeIcon = ({
@@ -61,7 +63,15 @@ export const EntityTypeIcon = ({
   strokeWidth = 1.5,
   isActive,
   sqlSource,
+  entityType,
 }: EntityTypeIconProps) => {
+  // A query opened from a database object reads as that object, not as a generic query.
+  if (type === 'query' && entityType !== undefined) {
+    return (
+      <EntityTypeIcon type={entityType} size={size} strokeWidth={strokeWidth} isActive={isActive} />
+    )
+  }
+
   if (type === 'sql' && sqlSource === 'logs') {
     return (
       <LogsSnippetIcon

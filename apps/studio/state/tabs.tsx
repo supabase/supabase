@@ -92,6 +92,12 @@ export interface Tab {
      * it never goes stale once set).
      */
     sqlSource?: SqlSnippetSource
+    /**
+     * For query tabs opened from a database object rather than typed from scratch, which
+     * entity backs the query — so the tab shows that object's icon instead of a generic
+     * query one. Absent on ad-hoc queries.
+     */
+    entityType?: ENTITY_TYPE
   }
   isPreview?: boolean
   /**

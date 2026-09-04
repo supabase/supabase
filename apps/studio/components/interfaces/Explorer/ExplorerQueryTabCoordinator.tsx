@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { useContext, useEffect } from 'react'
 
-import { explorerQueryState } from '@/state/explorer-query'
+import { explorerQueryState, hasDiscardableContent } from '@/state/explorer-query'
 import { TabsStateContext } from '@/state/tabs'
 
 /**
@@ -23,7 +23,8 @@ export const ExplorerQueryTabCoordinator = () => {
         const populatedDraftCount = queryTabs.filter((tab) => {
           const queryId = tab.metadata?.queryId
           if (!queryId) return false
-          return explorerQueryState.drafts[queryId]?.uncheckedSql.trim().length > 0
+          const draft = explorerQueryState.drafts[queryId]
+          return draft !== undefined && hasDiscardableContent(draft)
         }).length
 
         if (populatedDraftCount === 0) return null

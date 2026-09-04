@@ -15,10 +15,12 @@ import {
 import { EditorNavigationButton } from '../EditorNavigationButton'
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { EditorTabs } from '../Tabs/Tabs'
-import { type ExplorerResourceType } from './ExplorerLayout.constants'
+import { type ExplorerNavLevel } from './ExplorerLayout.constants'
 import { ExplorerNavChats } from './ExplorerNavChats'
+import { ExplorerNavDatabase } from './ExplorerNavDatabase'
 import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
+import { ExplorerNavTables } from './ExplorerNavTables'
 import { ExplorerGeneratedPageTabCoordinator } from '@/components/interfaces/Explorer/ExplorerGeneratedPageTabCoordinator'
 import { ExplorerNotebookTabCoordinator } from '@/components/interfaces/Explorer/ExplorerNotebookTabCoordinator'
 import { ExplorerQueryTabCoordinator } from '@/components/interfaces/Explorer/ExplorerQueryTabCoordinator'
@@ -46,7 +48,13 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
   const { ref } = useParams()
   const tabs = useTabsStateSnapshot()
 
-  const [section, setSection] = useState<ExplorerResourceType>()
+  // A stack rather than a single value, so drilling in is a push and going back is a pop —
+  // which is what lets Database sit two levels deep without the layout tracking parents.
+  const [navStack, setNavStack] = useState<ExplorerNavLevel[]>([])
+  const level = navStack.at(-1)
+
+  const pushLevel = (next: ExplorerNavLevel) => setNavStack((stack) => [...stack, next])
+  const popLevel = () => setNavStack((stack) => stack.slice(0, -1))
 
   const { setIsTemporary: setIsTemporarySqlEditorVisit } = useIsTemporarySqlEditorVisit(ref)
 
@@ -73,13 +81,15 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
       productMenu={
         <div className="relative h-full overflow-hidden">
           <AnimatePresence mode="wait">
-            {section === undefined && <ExplorerNavHome key="home" onSelectSection={setSection} />}
-            {section === 'notebook' && (
-              <ExplorerNavNotebooks key="notebooks" onBack={() => setSection(undefined)} />
+            {level === undefined && <ExplorerNavHome key="home" onSelectLevel={pushLevel} />}
+            {level === 'database' && (
+              <ExplorerNavDatabase key="database" onBack={popLevel} onSelectLevel={pushLevel} />
             )}
-            {section === 'chat' && (
-              <ExplorerNavChats key="chats" onBack={() => setSection(undefined)} />
+            {level === 'database-tables' && (
+              <ExplorerNavTables key="database-tables" onBack={popLevel} />
             )}
+            {level === 'notebook' && <ExplorerNavNotebooks key="notebooks" onBack={popLevel} />}
+            {level === 'chat' && <ExplorerNavChats key="chats" onBack={popLevel} />}
           </AnimatePresence>
         </div>
       }

@@ -105,7 +105,11 @@ export const SortableTab = ({
           )}
           {...listeners}
         >
-          <EntityTypeIcon type={tab.type} sqlSource={tab.metadata?.sqlSource} />
+          <EntityTypeIcon
+            type={tab.type}
+            sqlSource={tab.metadata?.sqlSource}
+            entityType={tab.metadata?.entityType}
+          />
           <div className="flex items-center gap-0">
             <AnimatePresence mode="popLayout" initial>
               {shouldShowSchema && (

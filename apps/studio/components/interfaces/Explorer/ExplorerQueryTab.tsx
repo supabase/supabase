@@ -94,8 +94,14 @@ export const ExplorerQueryTab = () => {
   useEffect(() => {
     if (!id || !ref) return
 
-    setShowQuery(true)
     explorerQueryState.restoreDraft({ id, projectRef: ref })
+
+    // A table is opened for its rows, so it lands on the results with the query tucked away;
+    // an ad-hoc query opens on the editor the user came to write in.
+    const restored = explorerQueryState.drafts[id]
+    const isEntityQuery = restored?._tag === 'database' && restored.entity !== undefined
+    setShowQuery(!isEntityQuery)
+
     setRestoredQueryKey(`${ref}:${id}`)
   }, [id, ref])
 
@@ -138,6 +144,7 @@ export const ExplorerQueryTab = () => {
           ...toQuerySourceBinding(draft),
           uncheckedSql: draft.uncheckedSql,
           rowLimit: draft.rowLimit,
+          entity: draft.entity,
         }
 
   const persistTab = () => tabs.makeTabPermanent(createTabId('query', { id }))
@@ -183,6 +190,9 @@ export const ExplorerQueryTab = () => {
       title={draft.name}
       query={query}
       result={result}
+      // A table is opened to see its rows, so it runs itself. The editor honors this only
+      // while the query is still the generated one — an edited query waits for Run.
+      autoRun
       display={display}
       showQuery={showQuery}
       onShowQueryChange={setShowQuery}
