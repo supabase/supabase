@@ -40,6 +40,6 @@ export const useOAuthAppsAuthorizeRequestQuery = <TData = OAuthAppsAuthorizeRequ
   useQuery<OAuthAppsAuthorizeRequestData, OAuthAppsAuthorizeRequestError, TData>({
     queryKey: oauthAppsKeys.authorizeRequest(id),
     queryFn: () => getOAuthAppsAuthorizeRequest({ id }),
-    enabled: enabled && USE_MOCKS && typeof id !== 'undefined',
+    enabled: enabled && USE_MOCKS && Boolean(id),
     ...options,
   })

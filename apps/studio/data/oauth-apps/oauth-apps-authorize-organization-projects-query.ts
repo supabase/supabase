@@ -48,6 +48,6 @@ export const useOAuthAppsAuthorizeOrganizationProjectsQuery = <
   >({
     queryKey: oauthAppsKeys.authorizeOrganizationProjects(id, slug),
     queryFn: () => getOAuthAppsAuthorizeOrganizationProjects({ id, slug }),
-    enabled: enabled && USE_MOCKS && typeof id !== 'undefined' && typeof slug !== 'undefined',
+    enabled: enabled && USE_MOCKS && Boolean(id) && Boolean(slug),
     ...options,
   })
