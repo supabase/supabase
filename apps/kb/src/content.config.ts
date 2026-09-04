@@ -15,6 +15,8 @@ const guides = defineCollection({
     // z.enum (not z.string) so a guide referencing a topic outside TOPICS
     // fails content validation instead of silently rendering an orphaned tag.
     topics: z.array(z.enum(TOPIC_NAMES)),
+    // Surfaces the guide in the homepage's "Featured Guides" section.
+    pinned: z.boolean().default(false),
     github_url: z.string().optional(),
   }),
 })
