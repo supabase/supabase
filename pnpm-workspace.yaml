@@ -32,8 +32,8 @@ catalog:
   # https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/
   '@typescript/native': npm:typescript@~7.0.2
   '@vitejs/plugin-react': ^6.0.1
-  '@vitest/coverage-v8': ^4.1.4
-  '@vitest/ui': ^4.1.4
+  '@vitest/coverage-v8': ^5.0.0
+  '@vitest/ui': ^5.0.0
   lodash: ^4.18.1
   lodash-es: ^4.18.1
   monaco-editor: 0.52.2
@@ -49,8 +49,7 @@ catalog:
   typescript: ~6.0.2
   valtio: ^2.3.2
   vite: ^8.0.16
-  vite-tsconfig-paths: ^6.1.1
-  vitest: ^4.1.4
+  vitest: ^5.0.0
   zod: 3.25.76
 
 allowBuilds:
@@ -86,6 +85,10 @@ minimumReleaseAgeExclude:
   - '@supabase-labs/*'
   - typescript
   - '@typescript/*'
+  # Vitest 5.0.0 was published 2026-09-03. Temporary so CI can run on the
+  # upgrade PR; safe to remove once the release is older than minimumReleaseAge.
+  - vitest
+  - '@vitest/*'
   # First-party, published from supabase-community/mdast-jsx.
   - mdast-jsx
   # The following are excluded to fix vulnerablities.

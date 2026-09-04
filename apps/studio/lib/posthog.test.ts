@@ -1,5 +1,5 @@
 import * as common from 'common'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import * as constants from './constants'
 import { trackFeatureFlag } from './posthog'
@@ -18,10 +18,6 @@ vi.mock('./constants', () => ({
 }))
 
 describe('trackFeatureFlag', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('returns undefined if user has not consented', async () => {
     vi.spyOn(common, 'hasConsented').mockReturnValue(false)
     const result = await trackFeatureFlag({ some: 'value' } as any)

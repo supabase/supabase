@@ -1,7 +1,6 @@
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
-import tsconfigPaths from 'vite-tsconfig-paths'
 import { configDefaults, defineConfig } from 'vitest/config'
 
 // Some tools like Vitest VSCode extensions, have trouble with resolving relative paths,
@@ -12,13 +11,9 @@ const dirname = fileURLToPath(new URL('.', import.meta.url))
 const IS_CI = !!process.env.CI
 
 export default defineConfig({
-  plugins: [
-    react(),
-    tsconfigPaths({
-      projects: ['.'],
-    }),
-  ],
+  plugins: [react()],
   resolve: {
+    tsconfigPaths: true,
     alias: {
       '@ui': resolve(__dirname, './../../packages/ui/src'),
     },

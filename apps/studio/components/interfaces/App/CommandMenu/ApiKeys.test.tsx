@@ -80,8 +80,6 @@ async function renderCommandPage() {
 
 describe('useApiKeysCommands', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true })
     mockUseSelectedProjectQuery.mockReturnValue({
       data: { id: 1, ref: 'default', name: 'default' },

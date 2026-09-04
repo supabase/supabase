@@ -35,7 +35,6 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
-    vi.clearAllMocks()
     // These tests exercise the remote transport; pin the migration gate to it.
     process.env.USE_REMOTE_MCP = 'true'
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
@@ -130,7 +129,6 @@ describe('ai/tools/mcp-tools getMcpTools transport selection', () => {
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
-    vi.clearAllMocks()
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     close = vi.fn().mockResolvedValue(undefined)
     tools = vi.fn().mockResolvedValue({ ...FULL_REMOTE_TOOLS })

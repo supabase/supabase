@@ -73,7 +73,6 @@ function renderScreen() {
 
 describe('RedeemCreditsScreen', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     creditRedemptionQueryCode.current = undefined
     routerMock.setCurrentUrl('/redeem')
   })

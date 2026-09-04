@@ -40,7 +40,6 @@ vi.mock('@/components/ui/PartnerManagedResource', () => ({
 
 describe('InvoicesSettings', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
         slug: 'stripe-org',

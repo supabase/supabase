@@ -341,7 +341,6 @@ const generateAndWaitForStrongPassword = async () => {
 
 describe('project creation wizard', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     user = userEvent.setup({ delay: null })
     routerMock.setCurrentUrl(`/new/${ORG_SLUG}`)
   })

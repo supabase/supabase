@@ -10,6 +10,41 @@ vi.mock('@/lib/ai/tools/tool-sanitizer', () => ({
   sanitizeMessagePart: vi.fn((part) => part),
 }))
 
+vi.mock('@/lib/ai/ai-details', () => ({
+  getAIDetails: vi.fn().mockResolvedValue({
+    aiOptInLevel: 'schema_and_log_and_data',
+    hasAccessToAdvanceModel: true,
+    hasHipaaAddon: false,
+    region: 'us-east-1',
+    isSensitive: false,
+  }),
+}))
+
+vi.mock('@/lib/ai/model', () => ({
+  getModel: vi.fn().mockResolvedValue({
+    modelParams: { model: {} },
+    systemProviderOptions: {},
+  }),
+}))
+
+vi.mock('@/data/sql/execute-sql-mutation', () => ({
+  executeSql: vi.fn().mockResolvedValue({ result: [] }),
+}))
+
+vi.mock('@/lib/ai/tools', () => ({
+  getTools: vi.fn().mockResolvedValue({}),
+}))
+
+vi.mock('ai', async () => {
+  const actual = await vi.importActual('ai')
+  return {
+    ...actual,
+    streamText: vi.fn().mockReturnValue({
+      pipeUIMessageStreamToResponse: vi.fn(),
+    }),
+  }
+})
+
 test('generateV4 calls the tool sanitizer', async () => {
   const mockReq = {
     method: 'POST',
@@ -46,41 +81,6 @@ test('generateV4 calls the tool sanitizer', async () => {
     setHeader: vi.fn(() => mockRes),
     on: vi.fn(),
   }
-
-  vi.mock('@/lib/ai/ai-details', () => ({
-    getAIDetails: vi.fn().mockResolvedValue({
-      aiOptInLevel: 'schema_and_log_and_data',
-      hasAccessToAdvanceModel: true,
-      hasHipaaAddon: false,
-      region: 'us-east-1',
-      isSensitive: false,
-    }),
-  }))
-
-  vi.mock('@/lib/ai/model', () => ({
-    getModel: vi.fn().mockResolvedValue({
-      modelParams: { model: {} },
-      systemProviderOptions: {},
-    }),
-  }))
-
-  vi.mock('@/data/sql/execute-sql-mutation', () => ({
-    executeSql: vi.fn().mockResolvedValue({ result: [] }),
-  }))
-
-  vi.mock('@/lib/ai/tools', () => ({
-    getTools: vi.fn().mockResolvedValue({}),
-  }))
-
-  vi.mock('ai', async () => {
-    const actual = await vi.importActual('ai')
-    return {
-      ...actual,
-      streamText: vi.fn().mockReturnValue({
-        pipeUIMessageStreamToResponse: vi.fn(),
-      }),
-    }
-  })
 
   await generateV4(mockReq as any, mockRes as any)
 

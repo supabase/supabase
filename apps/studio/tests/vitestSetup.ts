@@ -25,37 +25,38 @@ dayjs.extend(relativeTime)
 //   },
 // })
 
+// These must stay at module scope: Vitest hoists `vi.mock` above imports.
+vi.mock('next/router', () => require('next-router-mock'))
+vi.mock('next/navigation', async () => {
+  const actual = await vi.importActual('next/navigation')
+  return {
+    ...actual,
+    useRouter: () => {
+      return {
+        push: vi.fn(),
+        replace: vi.fn(),
+      }
+    },
+    usePathname: () => vi.fn(),
+    useSearchParams: () => ({
+      get: vi.fn(),
+    }),
+  }
+})
+
+vi.mock('next/compat/router', () => require('next-router-mock'))
+
+// Mock the useParams hook from common module globally
+vi.mock('common', async (importOriginal: any) => {
+  const actual = await importOriginal()
+  return {
+    ...(typeof actual === 'object' ? actual : {}),
+    useParams: () => ({ ref: 'default' }),
+  }
+})
+
 beforeAll(() => {
   mswServer.listen({ onUnhandledRequest: `error` })
-  vi.mock('next/router', () => require('next-router-mock'))
-  vi.mock('next/navigation', async () => {
-    const actual = await vi.importActual('next/navigation')
-    return {
-      ...actual,
-      useRouter: () => {
-        return {
-          push: vi.fn(),
-          replace: vi.fn(),
-        }
-      },
-      usePathname: () => vi.fn(),
-      useSearchParams: () => ({
-        get: vi.fn(),
-      }),
-    }
-  })
-
-  vi.mock('next/compat/router', () => require('next-router-mock'))
-
-  // Mock the useParams hook from common module globally
-  vi.mock('common', async (importOriginal: any) => {
-    const actual = await importOriginal()
-    return {
-      ...(typeof actual === 'object' ? actual : {}),
-      useParams: () => ({ ref: 'default' }),
-    }
-  })
-
   routerMock.useParser(createDynamicRouteParser(['/projects/[ref]']))
 })
 

@@ -87,8 +87,6 @@ function mockSSLEnforcement(config: SslEnforcementResponse) {
 
 describe('SSLConfiguration', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
     mockUseSelectedProjectQuery.mockReturnValue({ data: { id: 1, ref: 'default' } })
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true })
     mockProjectSettings()

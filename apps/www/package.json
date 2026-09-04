@@ -127,7 +127,7 @@
     "unist-util-visit": "^5.1.0",
     "unist-util-visit-parents": "5.1.3",
     "uuid": "^14.0.0",
-    "vite-tsconfig-paths": "catalog:",
+    "vite": "catalog:",
     "vitest": "catalog:",
     "zod": "catalog:"
   },
