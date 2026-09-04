@@ -96,7 +96,6 @@ const { data, error } = await supabase.auth.admin.customProviders.createProvider
 ```sh
 curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
   -H "apikey: your-supabase-secret-key" \
-  -H "Authorization: Bearer your-supabase-secret-key" \
   -H "Content-Type: application/json" \
   -d '{
     "provider_type": "oauth2",
@@ -147,7 +146,6 @@ const { data, error } = await supabase.auth.admin.customProviders.createProvider
 ```sh
 curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
   -H "apikey: your-supabase-secret-key" \
-  -H "Authorization: Bearer your-supabase-secret-key" \
   -H "Content-Type: application/json" \
   -d '{
     "provider_type": "oidc",
@@ -227,7 +225,6 @@ const { data, error } = await supabase.auth.admin.customProviders.createProvider
 ```sh
 curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
   -H "apikey: your-supabase-secret-key" \
-  -H "Authorization: Bearer your-supabase-secret-key" \
   -H "Content-Type: application/json" \
   -d '{
     "provider_type": "oidc",
@@ -294,14 +291,12 @@ const { data, error } = await supabase.auth.admin.customProviders.listProviders(
 # List all custom providers
 
 curl "http://<your-domain>/auth/v1/admin/custom-providers" \
- -H "apikey: your-supabase-secret-key" \
- -H "Authorization: Bearer your-supabase-secret-key"
+ -H "apikey: your-supabase-secret-key"
 
 # Filter by provider type
 
 curl "http://<your-domain>/auth/v1/admin/custom-providers?type=oidc" \
- -H "apikey: your-supabase-secret-key" \
- -H "Authorization: Bearer your-supabase-secret-key"
+ -H "apikey: your-supabase-secret-key"
 
 ```
 
@@ -338,7 +333,6 @@ const { data, error } = await supabase.auth.admin.customProviders.updateProvider
 ```sh
 curl -X PUT "http://<your-domain>/auth/v1/admin/custom-providers/custom:my-provider" \
   -H "apikey: your-supabase-secret-key" \
-  -H "Authorization: Bearer your-supabase-secret-key" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Updated Provider Name",
@@ -371,8 +365,7 @@ const { data, error } =
 
 ```sh
 curl -X DELETE "http://<your-domain>/auth/v1/admin/custom-providers/custom:my-provider" \
-  -H "apikey: your-supabase-secret-key" \
-  -H "Authorization: Bearer your-supabase-secret-key"
+  -H "apikey: your-supabase-secret-key"
 ```
 
 </TabPanel>
