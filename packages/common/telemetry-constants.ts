@@ -3543,7 +3543,7 @@ export interface AccessTokenCreatedEvent {
 export interface AccessTokenCreationSheetClosedEvent {
   action: 'access_token_creation_sheet_closed'
   properties: {
-    tokenType: 'classic' | 'scoped'
+    tokenType: 'classic' | 'scoped' | 'none'
     step: 'form' | 'success'
   }
   groups: Omit<TelemetryGroups, 'project'>
