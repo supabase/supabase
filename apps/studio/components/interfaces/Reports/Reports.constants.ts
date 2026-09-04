@@ -143,6 +143,86 @@ export function generateRegexpWhereSafe(
   return prepend ? safeLogSql`WHERE ${joined}` : safeLogSql`AND ${joined}`
 }
 
+// Key is used as-is here: log_attributes is keyed by the full dotted path, unlike the BigQuery unnest above.
+export function generateOtelWhereSafe(
+  filters: ReportFilterItem[],
+  prepend = true
+): SafeLogSqlFragment {
+  if (filters.length === 0) return safeLogSql``
+
+  const conditions = filters
+    .map((filter) => {
+      const col = safeLogSql`log_attributes[${analyticsLiteral(filter.key)}]`
+
+      const valueIsNumber = !isNaN(Number(filter.value))
+      const stringLit = analyticsLiteral(String(filter.value))
+
+      switch (filter.compare) {
+        case 'matches':
+          return safeLogSql`match(${col}, ${stringLit})`
+        case 'is':
+          return safeLogSql`${col} = ${stringLit}`
+        case '!=':
+          return safeLogSql`${col} != ${stringLit}`
+        case '>=':
+        case '<=':
+        case '>':
+        case '<': {
+          // Dropped, not coerced: toInt64OrZero(non-numeric) silently becomes 0, which is worse than a no-op.
+          if (!valueIsNumber) return null
+          const num = analyticsLiteral(Number(filter.value))
+          const lhs = safeLogSql`toInt64OrZero(${col})`
+          if (filter.compare === '>=') return safeLogSql`${lhs} >= ${num}`
+          if (filter.compare === '<=') return safeLogSql`${lhs} <= ${num}`
+          if (filter.compare === '>') return safeLogSql`${lhs} > ${num}`
+          return safeLogSql`${lhs} < ${num}`
+        }
+        default:
+          return safeLogSql`${col} = ${stringLit}`
+      }
+    })
+    .filter((c) => c !== null)
+
+  if (conditions.length === 0) return safeLogSql``
+
+  const joined = joinSqlFragments(conditions, ' AND ')
+  return prepend ? safeLogSql`WHERE ${joined}` : safeLogSql`AND ${joined}`
+}
+
+// fillTimeseries/isUnixMicro expects a 16-digit unix-microsecond timestamp, matching BigQuery's timestamp_trunc.
+const OTEL_TIMESTAMP: SafeLogSqlFragment = safeLogSql`toUnixTimestamp(toStartOfHour(timestamp)) * 1000000`
+
+function otelWhere(filters: ReportFilterItem[], extra?: SafeLogSqlFragment): SafeLogSqlFragment {
+  const base = extra
+    ? safeLogSql`where source = 'edge_logs' and ${extra}`
+    : safeLogSql`where source = 'edge_logs'`
+  if (filters.length === 0) return base
+  return safeLogSql`${base} ${generateOtelWhereSafe(filters, false)}`
+}
+
+const OTEL_STATUS_CODE: SafeLogSqlFragment = safeLogSql`toInt32OrZero(log_attributes['response.status_code'])`
+const OTEL_ROUTE_SELECT: SafeLogSqlFragment = safeLogSql`
+  log_attributes['request.path'] as path,
+  log_attributes['request.method'] as method,
+  log_attributes['request.search'] as search,
+  ${OTEL_STATUS_CODE} as status_code`
+const OTEL_ROUTE_GROUP_BY: SafeLogSqlFragment = safeLogSql`log_attributes['request.path'], log_attributes['request.method'], log_attributes['request.search'], ${OTEL_STATUS_CODE}`
+const OTEL_STATUS_IS_ERROR: SafeLogSqlFragment = safeLogSql`${OTEL_STATUS_CODE} >= 400`
+const OTEL_ORIGIN_TIME: SafeLogSqlFragment = safeLogSql`toFloat64OrZero(log_attributes['response.origin_time'])`
+
+function statusInListLiteral(statuses: string[]): SafeLogSqlFragment {
+  return safeLogSql`(${joinSqlFragments(statuses.map(analyticsLiteral), ', ')})`
+}
+
+const STORAGE_CACHE_HIT_STATUSES = statusInListLiteral(['HIT', 'STALE', 'REVALIDATED', 'UPDATING'])
+const STORAGE_CACHE_MISS_STATUSES = statusInListLiteral([
+  'MISS',
+  'NONE/UNKNOWN',
+  'EXPIRED',
+  'BYPASS',
+  'DYNAMIC',
+])
+
 export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
   [Presets.API]: {
     title: 'API',
@@ -164,6 +244,13 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           timestamp
         ORDER BY
           timestamp ASC`,
+        safeSqlOtel: (filters) => safeLogSql`
+        -- reports-api-total-requests (otel)
+        select ${OTEL_TIMESTAMP} as timestamp, count() as count
+        from logs
+        ${otelWhere(filters)}
+        group by timestamp
+        order by timestamp asc`,
       },
       topRoutes: {
         queryType: 'logs',
@@ -187,6 +274,14 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           count desc
         limit 10
         `,
+        safeSqlOtel: (filters) => safeLogSql`
+        -- reports-api-top-routes (otel)
+        select ${OTEL_ROUTE_SELECT}, count() as count
+        from logs
+        ${otelWhere(filters)}
+        group by ${OTEL_ROUTE_GROUP_BY}
+        order by count desc
+        limit 10`,
       },
       errorCounts: {
         queryType: 'logs',
@@ -208,6 +303,13 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         ORDER BY
           timestamp ASC
         `,
+        safeSqlOtel: (filters) => safeLogSql`
+        -- reports-api-error-counts (otel)
+        select ${OTEL_TIMESTAMP} as timestamp, count() as count
+        from logs
+        ${otelWhere(filters, OTEL_STATUS_IS_ERROR)}
+        group by timestamp
+        order by timestamp asc`,
       },
       topErrorRoutes: {
         queryType: 'logs',
@@ -233,6 +335,14 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           count desc
         limit 10
         `,
+        safeSqlOtel: (filters) => safeLogSql`
+        -- reports-api-top-error-routes (otel)
+        select ${OTEL_ROUTE_SELECT}, count() as count
+        from logs
+        ${otelWhere(filters, OTEL_STATUS_IS_ERROR)}
+        group by ${OTEL_ROUTE_GROUP_BY}
+        order by count desc
+        limit 10`,
       },
       responseSpeed: {
         queryType: 'logs',
@@ -253,6 +363,13 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         ORDER BY
           timestamp ASC
       `,
+        safeSqlOtel: (filters) => safeLogSql`
+        -- reports-api-response-speed (otel)
+        select ${OTEL_TIMESTAMP} as timestamp, avg(${OTEL_ORIGIN_TIME}) as avg
+        from logs
+        ${otelWhere(filters)}
+        group by timestamp
+        order by timestamp asc`,
       },
       topSlowRoutes: {
         queryType: 'logs',
@@ -277,6 +394,14 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           avg desc
         limit 10
         `,
+        safeSqlOtel: (filters) => safeLogSql`
+        -- reports-api-top-slow-routes (otel)
+        select ${OTEL_ROUTE_SELECT}, count() as count, avg(${OTEL_ORIGIN_TIME}) as avg
+        from logs
+        ${otelWhere(filters)}
+        group by ${OTEL_ROUTE_GROUP_BY}
+        order by avg desc
+        limit 10`,
       },
       networkTraffic: {
         queryType: 'logs',
@@ -315,6 +440,16 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         ORDER BY
           timestamp ASC
         `,
+        safeSqlOtel: (filters) => safeLogSql`
+        -- reports-api-network-traffic (otel)
+        select
+          ${OTEL_TIMESTAMP} as timestamp,
+          sum(toInt64OrZero(log_attributes['request.headers.content_length'])) / 1000000 as ingress_mb,
+          sum(toInt64OrZero(log_attributes['response.headers.content_length'])) / 1000000 as egress_mb
+        from logs
+        ${otelWhere(filters)}
+        group by timestamp
+        order by timestamp asc`,
       },
       requestsByCountry: {
         queryType: 'logs',
@@ -335,6 +470,15 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         group by
           cf.country
         `,
+        safeSqlOtel: (filters) => safeLogSql`
+        -- reports-api-requests-by-country (otel)
+        select
+          log_attributes['request.cf.country'] as country,
+          count() as count
+        from logs
+        ${otelWhere(filters, safeLogSql`log_attributes['request.cf.country'] != ''`)}
+        group by
+          country`,
       },
     },
   },
@@ -364,6 +508,19 @@ where starts_with(r.path, '/storage/v1/object') and r.method = 'GET'
 group by timestamp
 order by timestamp desc
 `,
+        safeSqlOtel: (filters) => safeLogSql`
+        -- reports-storage-cache-hit-rate (otel)
+select
+  ${OTEL_TIMESTAMP} as timestamp,
+  countIf(log_attributes['response.headers.cf_cache_status'] in ${STORAGE_CACHE_HIT_STATUSES}) as hit_count,
+  countIf(log_attributes['response.headers.cf_cache_status'] in ${STORAGE_CACHE_MISS_STATUSES}) as miss_count
+from logs
+where source = 'edge_logs'
+  and log_attributes['request.path'] like '/storage/v1/object%'
+  and log_attributes['request.method'] = 'GET'
+  ${generateOtelWhereSafe(filters, false)}
+group by timestamp
+order by timestamp desc`,
       },
       topCacheMisses: {
         queryType: 'logs',
@@ -387,6 +544,21 @@ group by path, search
 order by count desc
 limit 12
     `,
+        safeSqlOtel: (filters) => safeLogSql`
+        -- reports-storage-top-cache-misses (otel)
+select
+  log_attributes['request.path'] as path,
+  log_attributes['request.search'] as search,
+  count() as count
+from logs
+where source = 'edge_logs'
+  and log_attributes['request.path'] like '/storage/v1/object%'
+  and log_attributes['request.method'] = 'GET'
+  and log_attributes['response.headers.cf_cache_status'] in ${STORAGE_CACHE_MISS_STATUSES}
+  ${generateOtelWhereSafe(filters, false)}
+group by path, search
+order by count desc
+limit 12`,
       },
     },
   },
