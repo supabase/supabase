@@ -1,7 +1,12 @@
 import { safeSql } from '@supabase/pg-meta'
 import { describe, expect, it, test } from 'vitest'
 
-import { applyAutoLimit, getSqlErrorLines, trimTrailingSemicolons } from '../utils'
+import {
+  applyAutoLimit,
+  getSqlErrorLines,
+  isNonReturningDml,
+  trimTrailingSemicolons,
+} from '../utils'
 
 describe('getSqlErrorLines', () => {
   it('returns formattedError lines when present', () => {
@@ -240,8 +245,6 @@ select * from cities`
   })
 })
 
-import { isNonReturningDml } from '../utils'
-
 describe('isNonReturningDml', () => {
   describe('returns true for DML statements without RETURNING', () => {
     it('detects a plain UPDATE', () => {
@@ -295,9 +298,9 @@ update users set deleted = true where id = 1`)
 
   describe('returns false when a RETURNING clause is present', () => {
     it('UPDATE … RETURNING', () => {
-      expect(
-        isNonReturningDml('update users set name = $1 where id = $2 returning id, name')
-      ).toBe(false)
+      expect(isNonReturningDml('update users set name = $1 where id = $2 returning id, name')).toBe(
+        false
+      )
     })
 
     it('DELETE … RETURNING', () => {
@@ -305,9 +308,45 @@ update users set deleted = true where id = 1`)
     })
 
     it('INSERT … RETURNING', () => {
-      expect(
-        isNonReturningDml("insert into users (name) values ('Alice') returning id")
-      ).toBe(false)
+      expect(isNonReturningDml("insert into users (name) values ('Alice') returning id")).toBe(
+        false
+      )
+    })
+  })
+
+  describe('handles string literals, quoted identifiers, and comments safely', () => {
+    it('preserves RETURNING clause when -- is inside a string literal', () => {
+      expect(isNonReturningDml("UPDATE t SET note = '--' RETURNING id")).toBe(false)
+    })
+
+    it('preserves RETURNING clause when /* */ is inside a string literal', () => {
+      expect(isNonReturningDml("UPDATE t SET note = '/* comment */' RETURNING id")).toBe(false)
+    })
+
+    it('does not treat returning inside a string literal as a RETURNING clause', () => {
+      expect(isNonReturningDml("UPDATE t SET note = 'returning this tomorrow'")).toBe(true)
+    })
+
+    it('does not treat returning inside a quoted identifier as a RETURNING clause', () => {
+      expect(isNonReturningDml('UPDATE "returning" SET id = 1')).toBe(true)
+    })
+
+    it('does not treat returning inside a dollar-quoted body as a RETURNING clause', () => {
+      expect(isNonReturningDml('UPDATE t SET note = $$ returning $$ WHERE id = 1')).toBe(true)
+    })
+
+    it('does not treat returning inside a tagged dollar-quoted body as a RETURNING clause', () => {
+      expect(isNonReturningDml('UPDATE t SET note = $tag$ returning $tag$ WHERE id = 1')).toBe(true)
+    })
+
+    it('handles nested block comments', () => {
+      expect(isNonReturningDml('/* outer /* inner */ */ UPDATE users SET id = 1')).toBe(true)
+    })
+
+    it('respects word boundaries so function names starting with DML keywords do not match', () => {
+      expect(isNonReturningDml('update_stats()')).toBe(false)
+      expect(isNonReturningDml('insert_audit_log()')).toBe(false)
+      expect(isNonReturningDml('delete_old_records()')).toBe(false)
     })
   })
 

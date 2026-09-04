@@ -58,7 +58,8 @@ export const UtilityPanel = ({
   const snippet = snapV2.snippets[id]?.snippet
   const result = sessionSnap.results[id]?.[0]
   const snippetSql = snippet?.type === 'sql' ? (snippet.content?.unchecked_sql ?? '') : ''
-  const isDmlWithoutReturn = isNonReturningDml(snippetSql)
+  const sql = result?.sql ?? snippetSql
+  const isDmlWithoutReturn = isNonReturningDml(sql)
 
   const { mutate: upsertContent } = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,

@@ -45,6 +45,110 @@ export function trimTrailingSemicolons(sql: SafeSqlFragment): SafeSqlFragment {
 // the result, so the only new content this function ever stamps safe is an
 // internally-generated integer literal, never arbitrary concatenated text.
 /**
+ * Strips comments and replaces string literals, dollar-quoted blocks,
+ * and quoted identifiers with whitespace. This allows matching executable
+ * SQL keywords without false positives from comments or text literals.
+ *
+ * @param sql - Raw SQL query text
+ * @returns Sanitized SQL containing only executable tokens and whitespace
+ */
+export function stripSqlCommentsAndLiterals(sql: string): string {
+  let result = ''
+  let i = 0
+  const len = sql.length
+
+  while (i < len) {
+    // Single-line comment: -- ... until newline
+    if (sql[i] === '-' && sql[i + 1] === '-') {
+      i += 2
+      while (i < len && sql[i] !== '\n' && sql[i] !== '\r') {
+        i++
+      }
+      result += ' '
+      continue
+    }
+
+    // Multi-line comment: /* ... */ with support for nested comments in Postgres
+    if (sql[i] === '/' && sql[i + 1] === '*') {
+      i += 2
+      let depth = 1
+      while (i < len && depth > 0) {
+        if (sql[i] === '/' && sql[i + 1] === '*') {
+          depth++
+          i += 2
+        } else if (sql[i] === '*' && sql[i + 1] === '/') {
+          depth--
+          i += 2
+        } else {
+          i++
+        }
+      }
+      result += ' '
+      continue
+    }
+
+    // Dollar-quoted string: $tag$...$tag$ or $$...$$
+    if (sql[i] === '$') {
+      const match = sql.slice(i).match(/^\$([a-zA-Z0-9_]*)\$/)
+      if (match) {
+        const tag = match[0]
+        const closeIndex = sql.indexOf(tag, i + tag.length)
+        if (closeIndex !== -1) {
+          i = closeIndex + tag.length
+          result += ' '
+          continue
+        }
+      }
+    }
+
+    // Single-quoted string literal: '...' (supports '' escape and \' escape)
+    if (sql[i] === "'") {
+      i++
+      while (i < len) {
+        if (sql[i] === "'") {
+          if (sql[i + 1] === "'") {
+            i += 2
+          } else {
+            i++
+            break
+          }
+        } else if (sql[i] === '\\') {
+          i += 2
+        } else {
+          i++
+        }
+      }
+      result += ' '
+      continue
+    }
+
+    // Double-quoted identifier: "..." (supports "" escape)
+    if (sql[i] === '"') {
+      i++
+      while (i < len) {
+        if (sql[i] === '"') {
+          if (sql[i + 1] === '"') {
+            i += 2
+          } else {
+            i++
+            break
+          }
+        } else {
+          i++
+        }
+      }
+      result += ' '
+      continue
+    }
+
+    result += sql[i]
+    i++
+  }
+
+  return result
+}
+
+/**
  * Returns true when the SQL is a DML statement (INSERT/UPDATE/DELETE/MERGE/CALL/DO)
  * that does *not* include a RETURNING clause.
  *
@@ -52,30 +156,21 @@ export function trimTrailingSemicolons(sql: SafeSqlFragment): SafeSqlFragment {
  * modified rows — so the UI should say "Query ran successfully" rather than the
  * misleading "No rows returned".
  *
- * This is intentionally conservative (plain regex, no full parse):
- * - False negatives (DML with RETURNING detected as non-returning) → safe: we just
- *   fall through to the standard "No rows returned" message.
- * - False positives (SELECT detected as DML) → safe: we'd show a slightly odd
- *   "Query ran successfully" for a SELECT that genuinely returned 0 rows. This can't
- *   happen here because we explicitly exclude SELECT-starting queries.
+ * Comments, quoted literals, and identifiers are stripped prior to keyword checking
+ * to prevent false positives (e.g. 'returning' inside a string literal or '--' inside text).
+ *
+ * @param sql - The SQL statement to inspect
+ * @returns True if the statement is DML without a RETURNING clause
  */
 export function isNonReturningDml(sql: string): boolean {
-  const cleaned = sql.trim().replace(/--[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '').trim()
-  const lower = cleaned.toLowerCase()
+  const cleaned = stripSqlCommentsAndLiterals(sql).trim()
 
-  const isDml =
-    lower.startsWith('insert') ||
-    lower.startsWith('update') ||
-    lower.startsWith('delete') ||
-    lower.startsWith('merge') ||
-    lower.startsWith('call') ||
-    lower.startsWith('do')
-
+  const isDml = /^\s*(?:insert|update|delete|merge|call|do)\b/i.test(cleaned)
   if (!isDml) return false
 
   // A RETURNING clause means Postgres will send back rows, so the empty-row
   // result would correctly mean "0 matched", not "statement ran without output".
-  return !lower.includes('returning')
+  return !/\breturning\b/i.test(cleaned)
 }
 
 export function applyAutoLimit(

@@ -37,7 +37,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
     const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
     const result = sessionSnap.results[id]?.[0]
-    const sql = snapV2.snippets[id]?.snippet.content?.unchecked_sql ?? ''
+    const sql = result?.sql ?? snapV2.snippets[id]?.snippet.content?.unchecked_sql ?? ''
     const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
     // Customers on HIPAA plans should not have access to Supabase AI
@@ -183,8 +183,10 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
     } else if (result.rows.length <= 0) {
       return (
         <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
-          <p className="m-0 border-0 px-6 py-4 font-mono text-sm">
-            {isNonReturningDml(sql) ? 'Success. Query ran successfully.' : 'Success. No rows returned'}
+          <p role="status" aria-live="polite" className="m-0 border-0 px-6 py-4 font-mono text-sm">
+            {isNonReturningDml(sql)
+              ? 'Success. Query ran successfully.'
+              : 'Success. No rows returned'}
           </p>
         </div>
       )
