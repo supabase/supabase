@@ -276,27 +276,27 @@ await supabase.From<Movie>().Insert(movies);
 #### Bulk data loading
 
 When inserting large data sets, use Postgres's [COPY](https://www.postgresql.org/docs/current/sql-copy.html) command.
-This loads data directly from a file into a table. Several file formats are available for copying data, including text, CSV, binary, and JSON.
+This loads data directly from a file into a table. `COPY` accepts text, CSV, and binary input.
 
 For example, to load a CSV file into your `movies` table:
 
 ```text ./movies.csv
-"The Empire Strikes Back", "After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda."
-"Return of the Jedi", "After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star."
+"The Empire Strikes Back","After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda."
+"Return of the Jedi","After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star."
 ```
 
-[Connect](/docs/guides/database/connecting-to-postgres#direct-connections) to your database directly and load the file with the `COPY` command:
+[Connect](/docs/guides/database/connecting-to-postgres#direct-connections) to your database directly and load the file with the `COPY` command. Name the columns the file contains, so Postgres doesn't expect a value for `id`:
 
 ```bash
 psql -h DATABASE_URL -p 5432 -d postgres -U postgres \
-  -c "\COPY movies FROM './movies.csv';"
+  -c "\COPY movies (name, description) FROM './movies.csv' WITH (FORMAT csv);"
 ```
 
-You can also use the `DELIMITER`, `HEADER`, and `FORMAT` options as defined in the Postgres [COPY](https://www.postgresql.org/docs/current/sql-copy.html) docs.
+You can also pass options such as `DELIMITER` and `HEADER`, as defined in the Postgres [COPY](https://www.postgresql.org/docs/current/sql-copy.html) docs. `HEADER` skips the first line of the file, so use it only when that line names the columns:
 
 ```bash
 psql -h DATABASE_URL -p 5432 -d postgres -U postgres \
-  -c "\COPY movies FROM './movies.csv' WITH DELIMITER ',' CSV HEADER"
+  -c "\COPY movies (name, description) FROM './movies-with-header.csv' WITH (FORMAT csv, HEADER, DELIMITER ';');"
 ```
 
 If you receive an error `FATAL:  password authentication failed for user "postgres"`, reset your database password in **Database Settings** and try again.
