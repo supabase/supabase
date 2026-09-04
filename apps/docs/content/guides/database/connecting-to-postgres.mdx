@@ -35,12 +35,14 @@ For the host, port, and IP version of each mode, see [Endpoints and IP versions]
 
 ## Get your connection string [#get-your-connection-string]
 
-Every connection string comes from the same place in the Supabase Dashboard:
+Connecting from a frontend application? You don't need a connection string. Skip to [Data APIs and client libraries](#data-apis-and-client-libraries), which uses your project URL and an API key instead.
+
+For every Postgres connection mode, the string comes from the same place:
 
 1. Open your project in the [Supabase Dashboard](/dashboard/project/_).
 2. Click **Connect** at the top of the page.
 3. Choose the connection method you picked above.
-4. Copy the string and replace `[YOUR-PASSWORD]` with your database password.
+4. Copy the string and replace `[YOUR-PASSWORD]` with your database password. [Percent-encode](https://en.wikipedia.org/wiki/Percent-encoding) any reserved characters it contains, such as `&`, `#`, `?`, or a space.
 
 The sections below show what each string looks like and when to use it.
 
