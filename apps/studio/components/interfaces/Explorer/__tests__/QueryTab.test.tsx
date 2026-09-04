@@ -1,7 +1,7 @@
 import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ExplorerQueryTab } from '../ExplorerQueryTab'
@@ -93,6 +93,20 @@ vi.mock('../QueryEditor/QuerySourceMenu', () => ({
     </div>
   ),
 }))
+
+// react-resizable-panels needs real layout to mount panel content, which jsdom can't provide.
+vi.mock('ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('ui')>()
+  const Passthrough = ({ children, ...props }: { children?: ReactNode }) => (
+    <div {...props}>{children}</div>
+  )
+  return {
+    ...actual,
+    ResizableHandle: (props: Record<string, unknown>) => <div {...props} />,
+    ResizablePanel: Passthrough,
+    ResizablePanelGroup: Passthrough,
+  }
+})
 
 vi.mock('../QueryEditor/DisplaySettingsButton', () => ({
   DisplaySettingsButton: ({
@@ -456,7 +470,7 @@ describe('QueryTab execution', () => {
     expect(executedQueries[0]).toContain('select 2')
   })
 
-  it('runs only the selected text from the Run selected menu item', async () => {
+  it('runs only the selected text from the Run selected SQL menu item', async () => {
     createDraft({ _tag: 'database' }, 'select 1;\nselect 2;')
     testContext.selectedText = 'select 2;'
 
@@ -481,14 +495,14 @@ describe('QueryTab execution', () => {
     await waitFor(() => expect(runButton).toBeEnabled())
 
     await userEvent.click(screen.getByRole('button', { name: 'More actions' }))
-    await userEvent.click(await screen.findByRole('menuitem', { name: 'Run selected' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Run selected SQL' }))
 
     await waitFor(() => expect(executedQueries).toHaveLength(1))
     expect(executedQueries[0]).toContain('select 2')
     expect(executedQueries[0]).not.toContain('select 1')
   })
 
-  it('drops the stale "Run selected" state once the query panel is hidden and shown again', async () => {
+  it('drops the stale "Run selected SQL" state once the query panel is hidden and shown again', async () => {
     createDraft({ _tag: 'database' }, 'select 1;\nselect 2;')
     testContext.selectedText = 'select 2;'
 
@@ -507,7 +521,7 @@ describe('QueryTab execution', () => {
 
     renderQueryTab()
     await userEvent.click(await screen.findByRole('button', { name: 'More actions' }))
-    expect(await screen.findByRole('menuitem', { name: 'Run selected' })).toBeEnabled()
+    expect(await screen.findByRole('menuitem', { name: 'Run selected SQL' })).toBeEnabled()
     await userEvent.keyboard('{Escape}')
 
     // Hiding the query panel unmounts CodeEditor entirely. Simulate the selection being
@@ -522,7 +536,7 @@ describe('QueryTab execution', () => {
     await userEvent.click(showQueryButton as HTMLButtonElement)
 
     await userEvent.click(screen.getByRole('button', { name: 'More actions' }))
-    expect(await screen.findByRole('menuitem', { name: 'Run selected' })).toHaveAttribute(
+    expect(await screen.findByRole('menuitem', { name: 'Run selected SQL' })).toHaveAttribute(
       'aria-disabled',
       'true'
     )
