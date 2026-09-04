@@ -25,7 +25,6 @@ export const toProjectHomepageHref = (projectRef: string) => `/project/${project
 const toAuthUrlConfigHref = (projectRef: string) => `/project/${projectRef}/auth/url-configuration`
 const toAuthProvidersHref = (provider?: string) => (projectRef: string) =>
   `/project/${projectRef}/auth/providers${provider ? `/${provider}` : ''}`
-const toApiSettingsHref = (projectRef: string) => `/project/${projectRef}/settings/api`
 const toAuthProtectionHref = (projectRef: string) => `/project/${projectRef}/auth/protection`
 const toDataApiSettingsHref = (projectRef: string) =>
   `/project/${projectRef}/integrations/data_api/settings`
@@ -43,9 +42,7 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   'api.enabled': { settingHref: toDataApiSettingsHref, label: 'API enabled' },
   'api.extra_search_path': { settingHref: toDataApiSettingsHref, label: 'Extra search path' },
   'api.max_rows': { settingHref: toDataApiSettingsHref, label: 'Max rows' },
-  'api.port': { settingHref: toDataApiSettingsHref, label: 'API port' },
   'api.schemas': { settingHref: toDataApiSettingsHref, label: 'Exposed schemas' },
-  'api.tls.enabled': { settingHref: toDataApiSettingsHref, label: 'Enforce TLS' },
   'auth.additional_redirect_urls': { settingHref: toAuthUrlConfigHref, label: 'Redirect URLs' },
   'auth.captcha.enabled': { settingHref: toAuthProtectionHref, label: 'Captcha enabled' },
   'auth.email.double_confirm_changes': {
@@ -642,8 +639,6 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   'auth.web3.solana.enabled': { settingHref: toProjectHref, label: 'Solana Web3 enabled' },
   'db.health_timeout': { settingHref: toProjectHref, label: 'Health check timeout' },
   'db.major_version': { settingHref: toProjectHref, label: 'Postgres major version' },
-  'db.migrations.enabled': { settingHref: toProjectHref, label: 'Migrations enabled' },
-  'db.migrations.schema_paths': { settingHref: toProjectHref, label: 'Migration schema paths' },
   'db.network_restrictions.allowed_cidrs': {
     settingHref: toProjectHref,
     label: 'Allowed CIDRs (IPv4)',
@@ -657,25 +652,10 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     label: 'Network restrictions enabled',
   },
   'db.pooler.default_pool_size': { settingHref: toProjectHref, label: 'Default pool size' },
-  'db.pooler.enabled': { settingHref: toProjectHref, label: 'Connection pooler enabled' },
   'db.pooler.max_client_conn': { settingHref: toProjectHref, label: 'Max client connections' },
   'db.pooler.pool_mode': { settingHref: toProjectHref, label: 'Pool mode' },
-  'db.pooler.port': { settingHref: toProjectHref, label: 'Pooler port' },
-  'db.port': { settingHref: toProjectHref, label: 'Database port' },
-  'db.seed.enabled': { settingHref: toProjectHref, label: 'Seed enabled' },
-  'db.seed.sql_paths': { settingHref: toProjectHref, label: 'Seed file paths' },
-  'db.shadow_port': { settingHref: toProjectHref, label: 'Shadow database port' },
   'db.ssl_enforcement.enabled': { settingHref: toProjectHref, label: 'SSL enforcement enabled' },
-  'experimental.inspect.rules': { settingHref: toProjectHref, label: 'Inspect rules' },
-  'experimental.pgdelta.enabled': { settingHref: toProjectHref, label: 'pgdelta enabled' },
-  'experimental.s3_access_key': { settingHref: toProjectHref, label: 'S3 access key' },
-  'experimental.s3_host': { settingHref: toProjectHref, label: 'S3 host' },
-  'experimental.s3_region': { settingHref: toProjectHref, label: 'S3 region' },
-  'experimental.s3_secret_key': { settingHref: toProjectHref, label: 'S3 secret key' },
   'experimental.webhooks.enabled': { settingHref: toProjectHref, label: 'Webhooks enabled' },
-  'realtime.enabled': { settingHref: toProjectHref, label: 'Realtime enabled' },
-  'realtime.ip_version': { settingHref: toProjectHref, label: 'IP version' },
-  'realtime.max_header_length': { settingHref: toProjectHref, label: 'Max header length' },
   'storage.analytics.enabled': { settingHref: toProjectHref, label: 'Storage analytics enabled' },
   'storage.analytics.max_catalogs': { settingHref: toProjectHref, label: 'Max analytics catalogs' },
   'storage.analytics.max_namespaces': {

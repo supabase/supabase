@@ -1021,8 +1021,8 @@ importers:
         specifier: 'catalog:'
         version: 2.112.4
       '@supabase/config':
-        specifier: ^0.2.0
-        version: 0.2.0(babel-plugin-macros@3.1.0)(effect@4.0.0-rc.112)
+        specifier: ^0.3.1
+        version: 0.3.1(babel-plugin-macros@3.1.0)(effect@4.0.0-rc.112)
       '@supabase/mcp-server-supabase':
         specifier: ^0.11.0
         version: 0.11.0(@modelcontextprotocol/server@2.0.0)(zod@3.25.76)
@@ -8204,8 +8204,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@supabase/config@0.2.0':
-    resolution: {integrity: sha512-rxCQli4ZdHOme7+AbPu/EqhIDb05BaTaut4xIdBGsaTjwhCAGFe4x0X33+6wzfwQWJdx7VusrlWUx24gCu6iEQ==}
+  '@supabase/config@0.3.1':
+    resolution: {integrity: sha512-aFzQAT4S/ckcelVzWrhNPwNov11dgDMTCP72k5sxPHTFoerpcmxCT3VN/PpIZ4wfYD7ydW1C+oCFhAB7WGPwaA==}
     engines: {node: '>=20'}
     peerDependencies:
       '@effect/platform-bun': '>=4.0.0-rc.111 <5'
@@ -25279,7 +25279,7 @@ snapshots:
   '@supabase/cli-windows-x64@2.114.0':
     optional: true
 
-  '@supabase/config@0.2.0(babel-plugin-macros@3.1.0)(effect@4.0.0-rc.112)':
+  '@supabase/config@0.3.1(babel-plugin-macros@3.1.0)(effect@4.0.0-rc.112)':
     dependencies:
       '@standard-schema/spec': 1.1.0
       dedent: 1.7.2(babel-plugin-macros@3.1.0)
