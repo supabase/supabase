@@ -22,8 +22,6 @@ import {
 
 import { BackupsEmpty } from '../BackupsEmpty'
 import { BackupsStorageAlert } from '../BackupsStorageAlert'
-import type { Timezone } from './PITR.types'
-import { getClientTimezone } from './PITR.utils'
 import { PITRForm } from './PITRForm'
 import PITRStatus from './PITRStatus'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
@@ -32,6 +30,8 @@ import { usePitrRestoreMutation } from '@/data/database/pitr-restore-mutation'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { formatTimezoneLabel } from '@/lib/constants/timezones'
+import { useTimezone } from '@/lib/datetime'
 
 export const PITRSelection = () => {
   const router = useRouter()
@@ -43,9 +43,11 @@ export const PITRSelection = () => {
 
   const [showConfiguration, setShowConfiguration] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
-  const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())
+  const { timezone } = useTimezone()
+  const [overriddenTimezone, setOverriddenTimezone] = useState<string>()
+  const selectedTimezone = overriddenTimezone ?? timezone
   const [selectedRecoveryPoint, setSelectedRecoveryPoint] = useState<{
-    selectedTimezone: Timezone
+    selectedTimezone: string
     recoveryTimeTargetUnix: number
     recoveryTimeString: string
     recoveryTimeStringUtc: string
@@ -109,7 +111,7 @@ export const PITRSelection = () => {
           {!showConfiguration ? (
             <PITRStatus
               selectedTimezone={selectedTimezone}
-              onUpdateTimezone={setSelectedTimezone}
+              onUpdateTimezone={setOverriddenTimezone}
               onSetConfiguration={() => setShowConfiguration(true)}
             />
           ) : (
@@ -135,7 +137,9 @@ export const PITRSelection = () => {
                 <div className="py-2 flex flex-col gap-3">
                   <div>
                     <p className="text-sm font-mono text-foreground-lighter">
-                      {selectedRecoveryPoint?.selectedTimezone.text}
+                      {selectedRecoveryPoint
+                        ? formatTimezoneLabel(selectedRecoveryPoint.selectedTimezone)
+                        : null}
                     </p>
                     <p className="text-2xl">{selectedRecoveryPoint?.recoveryTimeString}</p>
                   </div>

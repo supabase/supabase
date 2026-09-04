@@ -34,7 +34,7 @@ export interface PostTypes {
   logo_inverse?: string
   hideAuthor?: boolean
   end_date?: string // for events that span multiple days (not implemented yet)
-  timezone?: string // utc timezone, e.g. 'America/New_York'. Reference: /apps/studio/components/interfaces/Database/Backups/PITR/PITR.constants.ts
+  timezone?: string // utc timezone, e.g. 'America/New_York'. Reference: /apps/studio/lib/constants/timezones.ts
   onDemand?: boolean // events that are on-demand following a registration process
   disable_page_build?: boolean // when true, we don't build the page and require a custom link
   link?: {
