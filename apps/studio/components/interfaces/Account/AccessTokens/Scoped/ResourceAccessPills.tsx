@@ -1,8 +1,9 @@
 import { Box, Boxes } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { cn } from 'ui'
+import { Badge, cn } from 'ui'
 
-import type { ResourceAccessMode } from '../AccessToken.permissions'
+import { OrganizationsData } from '@/data/organizations/organizations-query'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 
 export interface ResourceAccessPillItem {
   key: string
@@ -10,44 +11,56 @@ export interface ResourceAccessPillItem {
   isInaccessible?: boolean
 }
 
-interface ResourceAccessPillsProps {
-  resourceAccess: ResourceAccessMode
-  items: ResourceAccessPillItem[]
-  /** Shown when there are no items — only the caller knows why the list is empty. */
-  emptyText?: string
+export const OrganizationAccessPill = ({
+  slug,
+  organization,
+}: {
+  slug: string
+  organization: OrganizationsData[number] | undefined
+}) => {
+  const isInaccessible = organization == null
+  return (
+    <Badge
+      variant={isInaccessible ? 'destructive' : 'default'}
+      className={cn('normal-case text-xs font-normal tracking-normal pr-2', {
+        'border-destructive-500': isInaccessible,
+        'text-foreground': !isInaccessible,
+      })}
+    >
+      <Boxes
+        size={14}
+        strokeWidth={1.5}
+        className={cn('shrink-0', {
+          'text-foreground-lighter': !isInaccessible,
+        })}
+      />
+      {organization?.name ?? slug}
+      {isInaccessible ? <span role="status"> - revoked</span> : null}
+    </Badge>
+  )
 }
 
-/** The org/project badges in a token summary's "Resource access" row. */
-export const ResourceAccessPills = ({
-  resourceAccess,
-  items,
-  emptyText = '-',
-}: ResourceAccessPillsProps) => {
-  if (items.length === 0) {
-    return <span className="text-xs text-foreground-lighter">{emptyText}</span>
-  }
-
+export const ProjectAccessPill = ({ projectRef }: { projectRef: string }) => {
+  const { data: project, isPending } = useProjectDetailQuery({ ref: projectRef })
+  const isInaccessible = project == null && !isPending
   return (
-    <>
-      {items.map((item) => (
-        <div
-          key={item.key}
-          className={cn(
-            'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border bg-surface-75 text-foreground-light px-3 py-1 text-xs',
-            item.isInaccessible
-              ? 'border-destructive-500 text-destructive'
-              : 'border-strong text-foreground'
-          )}
-        >
-          {resourceAccess === 'organization' ? (
-            <Boxes size={14} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />
-          ) : resourceAccess === 'project' ? (
-            <Box size={14} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />
-          ) : null}
-          {item.label}
-        </div>
-      ))}
-    </>
+    <Badge
+      variant={isInaccessible ? 'destructive' : 'default'}
+      className={cn('normal-case text-xs font-normal tracking-normal pr-2', {
+        'border-destructive-500': isInaccessible,
+        'text-foreground': !isInaccessible,
+      })}
+    >
+      <Box
+        size={14}
+        strokeWidth={1.5}
+        className={cn('shrink-0', {
+          'text-foreground-lighter': !isInaccessible,
+        })}
+      />
+      {project?.name ?? projectRef}
+      {isInaccessible ? <span role="status"> - revoked</span> : null}
+    </Badge>
   )
 }
 

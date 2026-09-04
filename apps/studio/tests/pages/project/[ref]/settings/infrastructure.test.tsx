@@ -44,6 +44,7 @@ const PROJECT: ProjectDetailResponse = {
   cloud_provider: 'AWS',
   connectionString: 'postgresql://postgres:password@db.project-ref.supabase.co:5432/postgres',
   db_host: 'db.project-ref.supabase.co',
+  dbVersion: 'supabase-postgres-15.1.0',
   high_availability: false,
   id: 1,
   infra_compute_size: 'micro',
@@ -338,6 +339,18 @@ describe('/project/[ref]/settings/infrastructure', () => {
     })
   })
 
+  test('focuses the recommended compute option after closing the add replica dialog', async () => {
+    const user = userEvent.setup()
+    renderInfrastructurePage()
+
+    await user.click(await screen.findByRole('button', { name: 'Add read replica' }))
+    await user.click(await screen.findByRole('button', { name: 'Change compute' }))
+
+    const smallCompute = await screen.findByRole('radio', { name: /Small/ })
+    await waitFor(() => expect(smallCompute).toHaveFocus())
+    expect(smallCompute).toBeChecked()
+  })
+
   test('reviews and confirms a compute resize through the add-on API', async () => {
     const user = userEvent.setup()
     let addonRequest: unknown
@@ -369,6 +382,80 @@ describe('/project/[ref]/settings/infrastructure', () => {
         addon_variant: 'ci_small',
       })
     })
+  })
+
+  test('renders compute as read-only for High Availability projects', async () => {
+    const user = userEvent.setup()
+
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: {
+        ...PROJECT,
+        cloud_provider: 'AWS_K8S',
+        high_availability: true,
+        infra_compute_size: 'large',
+      } satisfies ProjectDetailResponse,
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/billing/addons',
+      response: {
+        available_addons: [
+          {
+            name: 'Compute Instance',
+            type: 'compute_instance',
+            variants: COMPUTE_VARIANTS,
+          },
+        ],
+        ref: PROJECT_REF,
+        selected_addons: [
+          {
+            type: 'compute_instance',
+            variant: COMPUTE_VARIANTS[2],
+          },
+        ],
+      },
+    })
+
+    renderInfrastructurePage()
+
+    expect(
+      await screen.findByText("Compute size can't be changed on High Availability projects")
+    ).toBeInTheDocument()
+
+    const largeCompute = await screen.findByRole('radio', { name: /Large/ })
+    await waitFor(() => expect(largeCompute).toBeChecked())
+
+    const microCompute = screen.getByRole('radio', { name: /Micro/ })
+    const smallCompute = screen.getByRole('radio', { name: /Small/ })
+    expect(largeCompute).toBeDisabled()
+    expect(microCompute).toBeDisabled()
+    expect(smallCompute).toBeDisabled()
+
+    // The "Contact Us" card for larger sizes is hidden for High Availability projects
+    expect(screen.queryByText('Contact Us')).not.toBeInTheDocument()
+
+    // Clicking a locked option must not dirty the form or surface the submit flow
+    await user.click(smallCompute)
+    expect(largeCompute).toBeChecked()
+    expect(screen.queryByRole('button', { name: 'Review changes' })).not.toBeInTheDocument()
+  })
+
+  test('keeps compute editable for non High Availability projects', async () => {
+    const user = userEvent.setup()
+    renderInfrastructurePage()
+
+    expect(
+      screen.queryByText("Compute size can't be changed on High Availability projects")
+    ).not.toBeInTheDocument()
+
+    const smallCompute = await screen.findByRole('radio', { name: /Small/ })
+    expect(smallCompute).toBeEnabled()
+    expect(screen.getByText('Contact Us')).toBeInTheDocument()
+
+    await user.click(smallCompute)
+    expect(screen.getByRole('button', { name: 'Review changes' })).toBeEnabled()
   })
 
   test('submits disk and autoscaling changes to both infrastructure APIs', async () => {

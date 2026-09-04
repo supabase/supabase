@@ -1,7 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Database } from 'icons'
-import { MoreVertical, Plus, Search, X } from 'lucide-react'
+import { MessageSquare, MoreVertical, Plus, Search, Workflow, X } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -30,7 +29,7 @@ import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
 import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { EnablePipelinesModal } from './EnablePipelinesCallout'
-import { REPLICA_STATUS } from './Replication.constants'
+import { PIPELINES_FEEDBACK_URL } from './Replication.constants'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
@@ -38,19 +37,17 @@ import {
   useIsETLIcebergPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
 } from './useIsETLPrivateAlpha'
-import { ReadReplicaRow } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicaRow'
+import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { replicationKeys } from '@/data/replication/keys'
 import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
@@ -62,38 +59,35 @@ export const Destinations = () => {
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
 
+  useRedirectLegacyReadReplicaDestination()
+
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
-  const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
-  const newDestinationDefaultType = infrastructureReadReplicas
-    ? 'Read Replica'
-    : etlEnableBigQuery
-      ? 'BigQuery'
-      : etlEnableIceberg
-        ? 'Analytics Bucket'
-        : etlEnableDucklake
-          ? 'DuckLake'
-          : etlEnableSnowflake
-            ? 'Snowflake'
-            : etlEnableClickHouse
-              ? 'ClickHouse'
-              : null
+  const newDestinationDefaultType: DestinationType | null = etlEnableBigQuery
+    ? 'BigQuery'
+    : etlEnableIceberg
+      ? 'Analytics Bucket'
+      : etlEnableDucklake
+        ? 'DuckLake'
+        : etlEnableSnowflake
+          ? 'Snowflake'
+          : etlEnableClickHouse
+            ? 'ClickHouse'
+            : null
 
   const prefetchedRef = useRef(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
-  const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
   const [showEnablePipelinesDialog, setShowEnablePipelinesDialog] = useState(false)
   const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
 
-  const [_, setDestinationType] = useQueryState(
+  const [, setDestinationType] = useQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
-      'Read Replica',
       'BigQuery',
       'Analytics Bucket',
       'DuckLake',
@@ -104,30 +98,6 @@ export const Destinations = () => {
       clearOnDefault: true,
     })
   )
-
-  const {
-    data: databases = [],
-    error: databasesError,
-    isPending: isDatabasesLoading,
-    isError: isDatabasesError,
-    isSuccess: isDatabasesSuccess,
-  } = useReadReplicasQuery({ projectRef }, { refetchInterval: statusRefetchInterval })
-  // Memoise so the array reference is stable across renders. Without this
-  // the polling useEffect below has an unstable dep, runs every render, and
-  // its `setStatusRefetchInterval(false)` churn keeps the parent re-rendering
-  // — which trips a latent ref-instability bug in @radix-ui/react-slot
-  // (`composeRefs` is called per render instead of `useComposedRefs`) and
-  // tanks the page with "Maximum update depth exceeded" via the Tooltip
-  // trigger refs.
-  const readReplicas = useMemo(
-    () => databases.filter((x) => x.identifier !== projectRef),
-    [databases, projectRef]
-  )
-  const hasReplicas = isDatabasesSuccess && readReplicas.length > 0
-  const filteredReplicas =
-    filterString.length === 0
-      ? readReplicas
-      : readReplicas.filter((replica) => replica.identifier.includes(filterString.toLowerCase()))
 
   const {
     data: destinationsData,
@@ -169,10 +139,9 @@ export const Destinations = () => {
     destinations.length === 0 &&
     pipelines.length === 0
 
-  const isLoading = isDestinationsLoading || isDatabasesLoading
-
+  const isLoading = isDestinationsLoading
   const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
-  const hasErrorsFetchingData = (!isLocalETLNotSetUp && isDestinationsError) || isDatabasesError
+  const hasErrorsFetchingData = !isLocalETLNotSetUp && isDestinationsError
 
   const openDestinationPanel = () => {
     if (!newDestinationDefaultType) return
@@ -210,26 +179,6 @@ export const Destinations = () => {
       })
     }
   }, [projectRef, pipelinesData?.pipelines, isPipelinesSuccess, queryClient])
-
-  useEffect(() => {
-    if (!isDatabasesSuccess) return
-
-    const pollReplicas = async () => {
-      const fixedStatuses = [
-        REPLICA_STATUS.ACTIVE_HEALTHY,
-        REPLICA_STATUS.ACTIVE_UNHEALTHY,
-        REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
-      ]
-
-      const replicasInTransition = readReplicas.filter((db) => !fixedStatuses.includes(db.status))
-      const hasTransientStatus = replicasInTransition.length > 0
-
-      // If all replicas are active healthy, stop fetching statuses
-      if (!hasTransientStatus) setStatusRefetchInterval(false)
-    }
-
-    pollReplicas()
-  }, [isDatabasesSuccess, readReplicas])
 
   return (
     <div className="w-full space-y-4">
@@ -295,6 +244,11 @@ export const Destinations = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
+          <Button asChild variant="default" icon={<MessageSquare />}>
+            <a href={PIPELINES_FEEDBACK_URL} target="_blank" rel="noreferrer noopener">
+              Leave feedback
+            </a>
+          </Button>
           <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
 
           <Shortcut
@@ -318,15 +272,12 @@ export const Destinations = () => {
 
       <div className="w-full overflow-hidden overflow-x-auto flex flex-col gap-y-4">
         {hasErrorsFetchingData && (
-          <AlertError
-            error={destinationsError || databasesError}
-            subject="Failed to retrieve destinations"
-          />
+          <AlertError error={destinationsError} subject="Failed to retrieve destinations" />
         )}
 
         {isLoading ? (
           <GenericSkeletonLoader />
-        ) : hasReplicas || hasDestinations ? (
+        ) : hasDestinations ? (
           <Card>
             <CardContent className="p-0">
               <Table>
@@ -347,33 +298,20 @@ export const Destinations = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredReplicas.map((replica) => {
-                    return (
-                      <ReadReplicaRow
-                        key={replica.identifier}
-                        replica={replica}
-                        onUpdateReplica={() => setStatusRefetchInterval(5000)}
-                      />
-                    )
-                  })}
-
                   {filteredDestinations.map((destination) => (
                     <DestinationRow key={destination.id} destinationId={destination.id} />
                   ))}
 
-                  {!isLoading &&
-                    filteredDestinations.length === 0 &&
-                    filteredReplicas.length === 0 &&
-                    (hasReplicas || hasDestinations) && (
-                      <TableRow>
-                        <TableCell colSpan={6}>
-                          <p>No results found</p>
-                          <p className="text-foreground-light">
-                            Your search for "{filterString}" did not return any results.
-                          </p>
-                        </TableCell>
-                      </TableRow>
-                    )}
+                  {!isLoading && filteredDestinations.length === 0 && hasDestinations && (
+                    <TableRow>
+                      <TableCell colSpan={6}>
+                        <p>No results found</p>
+                        <p className="text-foreground-light">
+                          Your search for "{filterString}" did not return any results.
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -382,9 +320,9 @@ export const Destinations = () => {
           !isLoading &&
           !hasErrorsFetchingData && (
             <EmptyStatePresentational
-              icon={Database}
-              title="Add a replication destination"
-              description="Deploy a read replica for lower latency and workload isolation, or connect a Pipelines destination for analytics workloads."
+              icon={Workflow}
+              title="Add a destination"
+              description="Connect an external destination for analytics workloads."
             >
               <Button
                 variant="default"
@@ -399,7 +337,7 @@ export const Destinations = () => {
         )}
       </div>
 
-      <DestinationPanel onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)} />
+      <DestinationPanel />
 
       <EnablePipelinesModal
         open={showEnablePipelinesDialog}

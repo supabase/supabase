@@ -16,7 +16,7 @@ import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 const CHART: ChartConfig = {
   type: 'bar',
   x_column: 'day',
-  y_columns: ['signups'],
+  y_series: ['signups'],
   cumulative: false,
   scale: 'linear',
   show_labels: true,
@@ -24,7 +24,7 @@ const CHART: ChartConfig = {
 
 const DATABASE_CELL: QueryCell = {
   _tag: 'database_cell',
-  id: 'cell-1',
+  _id: 'cell-1',
   title: 'Signups',
   view: 'chart',
   chart: CHART,
@@ -35,7 +35,7 @@ const DATABASE_CELL: QueryCell = {
 
 const LOG_CELL: QueryCell = {
   _tag: 'log_cell',
-  id: 'cell-2',
+  _id: 'cell-2',
   title: 'Edge errors',
   view: 'table',
   chart: CHART,
@@ -66,7 +66,7 @@ describe('changeCellSource', () => {
 
     expect(next).toEqual({
       _tag: 'log_cell',
-      id: 'cell-1',
+      _id: 'cell-1',
       title: 'Signups',
       view: 'chart',
       chart: CHART,
@@ -80,7 +80,7 @@ describe('changeCellSource', () => {
 
     expect(next).toEqual({
       _tag: 'database_cell',
-      id: 'cell-2',
+      _id: 'cell-2',
       title: 'Edge errors',
       view: 'table',
       chart: CHART,
@@ -138,7 +138,7 @@ describe('cloneQueryCell', () => {
     const clone = cloneQueryCell(DATABASE_CELL)
 
     expect(clone).toEqual(DATABASE_CELL)
-    expect(clone.chart?.y_columns).not.toBe(DATABASE_CELL.chart?.y_columns)
+    expect(clone.chart?.y_series).not.toBe(DATABASE_CELL.chart?.y_series)
   })
 })
 

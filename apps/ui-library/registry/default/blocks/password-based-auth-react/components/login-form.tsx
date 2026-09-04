@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import { cn } from '@/lib/utils'
+import { safeNextPath } from '@/registry/default/blocks/safe-next-path/lib/safe-next-path'
 import { createClient } from '@/registry/default/clients/react/lib/supabase/client'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -32,7 +33,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       })
       if (error) throw error
       // Update this route to redirect to an authenticated route. The user already has an active session.
-      location.href = '/protected'
+      const next = new URLSearchParams(window.location.search).get('next')
+      location.href = safeNextPath(next, '/protected')
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {

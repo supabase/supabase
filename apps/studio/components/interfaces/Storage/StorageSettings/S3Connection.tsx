@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AlertTitle } from '@ui/components/shadcn/ui/alert'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -9,6 +8,7 @@ import { toast } from 'sonner'
 import {
   Alert,
   AlertDescription,
+  AlertTitle,
   Button,
   Card,
   CardContent,

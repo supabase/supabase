@@ -502,16 +502,8 @@ export function LogDrainDestinationSheetForm({
                                 onValueChange={field.onChange}
                                 value={field.value}
                               >
-                                <FormItem asChild>
-                                  <FormControl>
-                                    <RadioGroupCardItem value="http1" label="HTTP/1" />
-                                  </FormControl>
-                                </FormItem>
-                                <FormItem asChild>
-                                  <FormControl>
-                                    <RadioGroupCardItem value="http2" label="HTTP/2" />
-                                  </FormControl>
-                                </FormItem>
+                                <RadioGroupCardItem value="http1" label="HTTP/1" />
+                                <RadioGroupCardItem value="http2" label="HTTP/2" />
                               </RadioGroupCard>
                             </FormControl>
                           </FormItemLayout>

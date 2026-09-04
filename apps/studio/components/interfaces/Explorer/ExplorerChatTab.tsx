@@ -25,19 +25,9 @@ export const ExplorerChatTab = () => {
   const tabId = id ? createTabId('chat', { id }) : undefined
   const shortcutsEnabled = activeSidebar?.id !== SIDEBAR_KEYS.AI_ASSISTANT
 
-  const syncChatTab = useEffectEvent(() => {
+  const ensureChatInstance = useEffectEvent(() => {
     if (!id || !chat) return
-
     aiAssistantState.ensureChatInstance(id)
-    const nextTabId = createTabId('chat', { id })
-    tabs.addTab({
-      id: nextTabId,
-      type: 'chat',
-      label: chat.name,
-      metadata: { chatId: id },
-      isPreview: false,
-    })
-    tabs.updateTab(nextTabId, { label: chat.name })
   })
 
   const removeDeletedChatTab = useEffectEvent(() => {
@@ -51,7 +41,7 @@ export const ExplorerChatTab = () => {
     })
   })
 
-  useEffect(() => syncChatTab(), [id, chat?.name])
+  useEffect(() => ensureChatInstance(), [id, chat])
 
   useEffect(() => {
     if (aiAssistant.isInitialized && id && !chat) removeDeletedChatTab()
@@ -95,6 +85,7 @@ export const ExplorerChatTab = () => {
       onNewChat={() => createChat()}
       onSelectChat={openChat}
       onBranchChat={handleBranchChat}
+      onInputChange={() => tabs.makeTabPermanent(createTabId('chat', { id }))}
       renderHeader={(headerProps) => (
         <ExplorerChatToolbar {...headerProps} chatId={id} shortcutsEnabled={shortcutsEnabled} />
       )}

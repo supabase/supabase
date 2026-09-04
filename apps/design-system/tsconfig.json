@@ -6,7 +6,6 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "paths": {
       "@/*": ["./*"],
-      "@ui/*": ["./../../packages/ui/src/*"], // handle ui package paths
       "contentlayer/generated": ["./.contentlayer/generated"],
       "icons/*": ["./../../packages/icons/*"]
     },

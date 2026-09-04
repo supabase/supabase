@@ -136,6 +136,19 @@ export interface CodexMcpConfig {
 }
 
 /**
+ * Configuration format for Grok CLI MCP client.
+ * Grok reads a TOML config (`~/.grok/config.toml`) and, like Codex, keys
+ * servers under a `mcp_servers` table. HTTP transport is inferred from the URL.
+ */
+export interface GrokMcpConfig {
+  mcp_servers: {
+    supabase: {
+      url: string
+    }
+  }
+}
+
+/**
  * Configuration format for Gemini CLI MCP client.
  * Uses httpUrl instead of url to match Gemini CLI's expected format.
  */
@@ -154,6 +167,20 @@ export interface OpenCodeMcpConfig {
       type: 'remote'
       url: string
       enabled?: boolean
+    }
+  }
+}
+
+/**
+ * Configuration format for the fx MCP client.
+ * fx also keys servers under `mcp`, but reads them from its own profile
+ * (`~/.fx/mcp.json`) and names the transport `http` rather than `remote`.
+ */
+export interface FxMcpConfig {
+  mcp: {
+    supabase: {
+      type: 'http'
+      url: string
     }
   }
 }
@@ -197,8 +224,10 @@ export type McpClientConfig =
   | CodexMcpConfig
   | CursorMcpConfig
   | FactoryMcpConfig
+  | FxMcpConfig
   | GeminiMcpConfig
   | GooseMcpConfig
+  | GrokMcpConfig
   | KimiMcpConfig
   | McpClientBaseConfig
   | OpenCodeMcpConfig
@@ -231,6 +260,10 @@ export function isOpenCodeMcpConfig(config: McpClientConfig): config is OpenCode
   return '$schema' in config && 'mcp' in config && 'supabase' in config.mcp
 }
 
+export function isFxMcpConfig(config: McpClientConfig): config is FxMcpConfig {
+  return 'mcp' in config && 'supabase' in config.mcp && config.mcp.supabase.type === 'http'
+}
+
 export function isAntigravityMcpConfig(config: McpClientConfig): config is AntigravityMcpConfig {
   return (
     'mcpServers' in config &&
@@ -260,6 +293,9 @@ export function getMcpUrl(config: McpClientConfig): string {
     return config.mcpServers.supabase.httpUrl
   }
   if (isOpenCodeMcpConfig(config)) {
+    return config.mcp.supabase.url
+  }
+  if (isFxMcpConfig(config)) {
     return config.mcp.supabase.url
   }
   if (isAntigravityMcpConfig(config)) {

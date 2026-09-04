@@ -1,0 +1,96 @@
+---
+import { Header } from '../components/Header'
+import '../styles/globals.css'
+
+interface Props {
+	title: string
+	description?: string
+}
+
+const { title, description } = Astro.props
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="robots" content="noindex, nofollow" />
+		{description && <meta name="description" content={description} />}
+		<script is:inline>
+			// Set data-theme on <html> before first paint, so the page doesn't flash
+			// the wrong theme while this loads. Defaults to dark (no system-preference
+			// check — the toggle in components/ThemeToggle.tsx is light/dark only).
+			;(function () {
+				try {
+					var stored = localStorage.getItem('theme')
+					document.documentElement.setAttribute('data-theme', stored === 'light' ? 'light' : 'dark')
+				} catch (_) {}
+			})()
+		</script>
+		<!-- Same favicon set as apps/docs (packages/common/MetaFavicons/app-router.ts).
+		     Files live in public/, which Astro's `base` config doesn't rewrite on its
+		     own, so the base is prepended by hand here — see
+		     https://docs.astro.build/en/reference/configuration-reference/#base -->
+		<link rel="icon" href={`${import.meta.env.BASE_URL}/favicon/favicon.ico`} type="image/x-icon" />
+		<link rel="shortcut icon" href={`${import.meta.env.BASE_URL}/favicon/favicon.ico`} />
+		<link rel="apple-touch-icon" sizes="57x57" href={`${import.meta.env.BASE_URL}/favicon/apple-icon-57x57.png`} />
+		<link rel="apple-touch-icon" sizes="60x60" href={`${import.meta.env.BASE_URL}/favicon/apple-icon-60x60.png`} />
+		<link rel="apple-touch-icon" sizes="72x72" href={`${import.meta.env.BASE_URL}/favicon/apple-icon-72x72.png`} />
+		<link rel="apple-touch-icon" sizes="76x76" href={`${import.meta.env.BASE_URL}/favicon/apple-icon-76x76.png`} />
+		<link rel="apple-touch-icon" sizes="114x114" href={`${import.meta.env.BASE_URL}/favicon/apple-icon-114x114.png`} />
+		<link rel="apple-touch-icon" sizes="120x120" href={`${import.meta.env.BASE_URL}/favicon/apple-icon-120x120.png`} />
+		<link rel="apple-touch-icon" sizes="144x144" href={`${import.meta.env.BASE_URL}/favicon/apple-icon-144x144.png`} />
+		<link rel="apple-touch-icon" sizes="152x152" href={`${import.meta.env.BASE_URL}/favicon/apple-icon-152x152.png`} />
+		<link rel="icon" type="image/png" sizes="16x16" href={`${import.meta.env.BASE_URL}/favicon/favicon-16x16.png`} />
+		<link rel="icon" type="image/png" sizes="32x32" href={`${import.meta.env.BASE_URL}/favicon/favicon-32x32.png`} />
+		<link rel="icon" type="image/png" sizes="48x48" href={`${import.meta.env.BASE_URL}/favicon/favicon-48x48.png`} />
+		<link rel="icon" type="image/png" sizes="96x96" href={`${import.meta.env.BASE_URL}/favicon/favicon-96x96.png`} />
+		<link rel="icon" type="image/png" sizes="128x128" href={`${import.meta.env.BASE_URL}/favicon/favicon-128.png`} />
+		<link rel="icon" type="image/png" sizes="180x180" href={`${import.meta.env.BASE_URL}/favicon/favicon-180x180.png`} />
+		<link rel="icon" type="image/png" sizes="196x196" href={`${import.meta.env.BASE_URL}/favicon/favicon-196x196.png`} />
+		<meta name="generator" content={Astro.generator} />
+		<!-- Same Inter/Manrope fonts apps/docs loads via next/font, self-hosted there;
+		     loaded from Google Fonts here since kb has no next/font equivalent. -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+		/>
+		<title>{title} | Supabase Knowledge Base</title>
+	</head>
+	<body>
+		<Header client:load />
+		<slot />
+	</body>
+</html>
+
+<style>
+
+:root {
+  --header-height: 50px;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-weight: 500;
+}
+
+html[data-theme*='dark'] {
+  font-weight: 450;
+}
+	html,
+	body {
+		margin: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	body {
+		background-color: var(--background);
+		color: var(--foreground);
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+</style>

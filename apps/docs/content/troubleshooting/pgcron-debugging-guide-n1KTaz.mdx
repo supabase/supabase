@@ -114,7 +114,7 @@ You can view your concurrent peak connection usage throughout the day at the bot
 
 Unfortunately, excessive resource strain can slow down or disrupt jobs.
 
-Go to the [reports page](/dashboard/project/_/observability/database) (or [Supabase Grafana](/docs/guides/monitoring-and-debugging/metrics/grafana-self-hosted) if you have it setup), and check for signs of resource exhaustion. If it's clear your database is under pressure, consider upgrading your compute add-on or following the advice from one of the optimization guides:
+Go to the [reports page](/dashboard/project/_/observability/database) (or [Supabase Grafana](/docs/guides/observability/metrics/grafana-self-hosted) if you have it setup), and check for signs of resource exhaustion. If it's clear your database is under pressure, consider upgrading your compute add-on or following the advice from one of the optimization guides:
 
 - [Connections](https://github.com/orgs/supabase/discussions/27141)
 - [Disk/IO](https://github.com/orgs/supabase/discussions/27003)
@@ -125,34 +125,32 @@ It is important to make sure you are running the latest release of pg_cron (1.6.
 
 <br />
 
-#### Check the log explorer for more information
+#### Check the logs for more information
 
-Although `pg_cron` records errors in the `cron.job_run_details` table, in rare cases, more information can be found in the general Postgres logs. You can check the [Log Explorer](/dashboard/project/_/logs/explorer) for failure events with the following query
+Although `pg_cron` records errors in the `cron.job_run_details` table, in rare cases, more information can be found in the general Postgres logs. You can check the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs), with the query source set to **Logs**, for failure events with the following query
 
 ```sql
 select
-  cast(postgres_logs.timestamp as datetime) as timestamp,
+  timestamp,
   event_message,
-  parsed.error_severity,
-  parsed.user_name,
-  parsed.query,
-  parsed.detail,
-  parsed.hint,
-  parsed.sql_state_code,
-  parsed.backend_type,
-  parsed.application_name
-from
-  postgres_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(metadata.parsed) as parsed
+  log_attributes['parsed.error_severity'] as error_severity,
+  log_attributes['parsed.user_name'] as user_name,
+  log_attributes['parsed.query'] as query,
+  log_attributes['parsed.detail'] as detail,
+  log_attributes['parsed.hint'] as hint,
+  log_attributes['parsed.sql_state_code'] as sql_state_code,
+  log_attributes['parsed.backend_type'] as backend_type,
+  log_attributes['parsed.application_name'] as application_name
+from logs
 where
-  regexp_contains(parsed.error_severity, 'ERROR|FATAL|PANIC')
-  and regexp_contains(parsed.application_name, 'pg_cron')
+  source = 'postgres_logs'
+  and log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
+  and match(log_attributes['parsed.application_name'], 'pg_cron')
 order by timestamp desc
 limit 100;
 ```
 
-If you're interested in modifying the query, there is an advanced [guide](https://github.com/orgs/supabase/discussions/26224) for navigating the Postgres logs and a general-purpose [one](/docs/guides/monitoring-and-debugging/advanced-log-filtering) for applying filters.
+If you're interested in modifying the query, there is an advanced [guide](https://github.com/orgs/supabase/discussions/26224) for navigating the Postgres logs and a general-purpose [one](/docs/guides/observability/advanced-log-filtering) for applying filters.
 
 <br />
 

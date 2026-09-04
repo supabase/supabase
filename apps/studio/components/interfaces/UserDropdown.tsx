@@ -1,3 +1,4 @@
+import { useDevToolbar } from 'dev-tools'
 import { FlaskConical, Loader2, ScrollText, User2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
@@ -19,6 +20,7 @@ import {
 
 import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+import { DevToolbarMenuGroup } from './DevToolbarMenuGroup'
 import { TimezoneDropdown } from './UserDropdown/TimezoneDropdown'
 import { ProfileImage } from '@/components/ui/ProfileImage'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
@@ -44,6 +46,8 @@ export function UserDropdown({
 
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
   const track = useTrack()
+  const { isAvailable: isDevToolbarAvailable } = useDevToolbar()
+  const shouldShowSectionSeparator = IS_PLATFORM || isDevToolbarAvailable
 
   // The upgrade CTA is org-scoped, so only enable it on routes where an org is in scope.
   // Excludes /account/*, /organizations, /new, marketing routes, etc. Gating the hook here
@@ -136,10 +140,13 @@ export function UserDropdown({
                   Changelog
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
             </DropdownMenuGroup>
           </>
         )}
+
+        {shouldShowSectionSeparator && <DropdownMenuSeparator />}
+
+        <DevToolbarMenuGroup />
 
         <DropdownMenuGroup>
           <DropdownMenuLabel>Theme</DropdownMenuLabel>
@@ -193,7 +200,7 @@ export function UserDropdown({
                   router.push('/logout')
                 }}
               >
-                Log out
+                Sign out
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </>

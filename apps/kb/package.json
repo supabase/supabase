@@ -1,0 +1,33 @@
+{
+  "name": "kb",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev --port 3008",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/react": "^6.0.4",
+    "astro": "^7.2.6",
+    "lucide-react": "*",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.2.4",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "config": "workspace:*",
+    "lodash-es": "catalog:",
+    "tailwindcss": "catalog:"
+  },
+  "allowScripts": {
+    "esbuild": true
+  }
+}

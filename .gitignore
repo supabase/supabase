@@ -121,9 +121,8 @@ next-env.d.ts
 .claude/*
 !.claude/settings.json
 !.claude/scripts/
-!.claude/skills/
-.claude/skills/me-*
-!.claude/CLAUDE.md
+!.claude/skills
+.agents/skills/me-*
 CLAUDE.local.md
 
 #include template .env file for docker-compose

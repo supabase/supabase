@@ -12,7 +12,7 @@ import {
   useSqlEditorSnippet,
   useSqlEditorUi,
 } from './SQLEditorControllers'
-import ResizableAIWidget from '@/components/ui/AIEditor/ResizableAIWidget'
+import { ResizableAIWidget } from '@/components/ui/AIEditor/ResizableAIWidget'
 import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
 import { detectOS } from '@/lib/helpers'
 

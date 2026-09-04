@@ -10,12 +10,11 @@ import {
   type TokenAccessEvaluation,
 } from '../../AccessToken.roles'
 import { useCapabilitySummary } from '../../hooks/useCapabilitySummary'
-import { useOrgAndProjectData } from '../../hooks/useOrgAndProjectData'
 import { failingResourceLine } from '../ExceedsRoleBadge'
 import {
-  ResourceAccessPills,
+  OrganizationAccessPill,
+  ProjectAccessPill,
   useResourceAccessWrap,
-  type ResourceAccessPillItem,
 } from '../ResourceAccessPills'
 import { CapabilitiesSection } from '../TokenCapabilities/CapabilitiesSection'
 import { CapabilityLevelToggle } from '../TokenCapabilities/CapabilityLevelToggle'
@@ -26,6 +25,7 @@ import {
   type CapabilityLevelFilter,
 } from '../TokenCapabilities/TokenCapabilities.utils'
 import { EXPIRY_OPTIONS, type TokenFormValues } from './NewScopedTokenForm.utils'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import {
   getEnabledMcpTools,
   PermissionScopeMap,
@@ -46,7 +46,7 @@ export const NewScopedTokenFormReview = ({
   access,
   permissionScopeMap,
 }: ReviewStepProps) => {
-  const { organizations, projects } = useOrgAndProjectData()
+  const { data: organizations = [] } = useOrganizationsQuery()
   const selection = values.permissions
   const grantedScopes = useMemo(() => selectionToScopes(selection), [selection])
 
@@ -69,19 +69,6 @@ export const NewScopedTokenFormReview = ({
       }),
     [access.effectiveSelection, values.resourceAccess, values.organizationSlugs, values.projectRefs]
   )
-
-  // The classic (account) flow skips review entirely, so only org- and project-bound tokens land
-  // here.
-  const resourceItems = useMemo<ResourceAccessPillItem[]>(() => {
-    if (values.resourceAccess === 'organization') {
-      return organizations
-        .filter((org) => values.organizationSlugs.includes(org.slug))
-        .map((org) => ({ key: org.slug, label: org.name }))
-    }
-    return projects
-      .filter((project) => values.projectRefs.includes(project.ref))
-      .map((project) => ({ key: project.ref, label: project.name }))
-  }, [values, projects, organizations])
 
   const expiresSummary = useMemo(() => {
     if (values.expiresAt === 'custom') {
@@ -164,7 +151,20 @@ export const NewScopedTokenFormReview = ({
             <dt className="shrink-0 text-sm text-foreground-lighter">Resource access</dt>
             <dd className="w-full min-w-0 text-sm text-foreground sm:w-auto sm:flex-1">
               <div ref={pillsRef} className="flex flex-wrap justify-start gap-1.5 sm:justify-end">
-                <ResourceAccessPills resourceAccess={values.resourceAccess} items={resourceItems} />
+                {values.resourceAccess === 'organization'
+                  ? values.organizationSlugs.map((orgSlug) => (
+                      <OrganizationAccessPill
+                        key={orgSlug}
+                        slug={orgSlug}
+                        organization={organizations.find((org) => org.slug === orgSlug)}
+                      />
+                    ))
+                  : null}
+                {values.resourceAccess === 'project'
+                  ? values.projectRefs.map((projectRef) => (
+                      <ProjectAccessPill key={projectRef} projectRef={projectRef} />
+                    ))
+                  : null}
               </div>
             </dd>
           </div>

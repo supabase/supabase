@@ -181,7 +181,7 @@ After completing the steps above, you should receive a Slack message whenever an
 
 Migrations are run in sequential order. Each migration builds upon the previous one.
 
-The preview branch has a record of which migrations have been applied, and only applies new migrations for each commit. This can create an issue when rolling back migrations.
+The preview branch inherits the migration history of your base project, so it only applies migrations that haven't been run yet. This can create an issue when rolling back migrations.
 
 ### Using ORM or custom seed scripts
 
@@ -237,7 +237,9 @@ You might want to roll back changes you've made in an earlier migration change. 
 
 To fix this, push the latest changes, then delete the preview branch in Supabase and reopen it.
 
-The new preview branch is reseeded from the `./supabase/seed.sql` file by default. Any additional data changes made on the old preview branch are lost. This is equivalent to running `supabase db reset` locally. All migrations are rerun in sequential order.
+The new preview branch is a fresh clone of your base project and is reseeded from the `./supabase/seed.sql` file by default. Any additional data changes made on the old preview branch are lost.
+
+To rerun migrations that your base project has already applied, reset the branch from the Supabase dashboard instead. A reset reruns all migrations in sequential order and drops existing data on the branch.
 
 ### Seeding behavior
 

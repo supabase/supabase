@@ -1,7 +1,6 @@
 import { useFlag, useParams } from 'common'
 import { Check, ChevronDown } from 'lucide-react'
 import {
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -11,6 +10,7 @@ import {
 
 import { RowLimitSubMenu } from '../../SQLEditor/UtilityPanel/QuerySourceMenu/RowLimitSubMenu'
 import { RunAsSubMenu } from '../../SQLEditor/UtilityPanel/QuerySourceMenu/RunAsSubMenu'
+import { ExplorerToolbarAction } from '../ExplorerToolbar'
 import { DatabaseParametersSubMenu } from '@/components/interfaces/QuerySources/DatabaseParametersSubMenu'
 import { LogsCustomRangeDialog } from '@/components/interfaces/QuerySources/LogsCustomRangeDialog'
 import { LogsTimeRangeSubMenu } from '@/components/interfaces/QuerySources/LogsTimeRangeSubMenu'
@@ -75,16 +75,14 @@ export const QuerySourceMenu = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
+          <ExplorerToolbarAction
             disabled={disabled}
-            variant="text"
-            size="tiny"
             aria-label={`Query source: ${QUERY_SOURCE_LABELS[source._tag]}`}
-            icon={<QuerySourceIcon source={source._tag} className="text-foreground-light" />}
-            iconRight={<ChevronDown className="text-foreground-light" />}
+            icon={<QuerySourceIcon source={source._tag} />}
+            iconRight={<ChevronDown size={16} strokeWidth={2} />}
           >
             {QUERY_SOURCE_LABELS[source._tag]}
-          </Button>
+          </ExplorerToolbarAction>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60">
           {availableSources.map((candidate) => (

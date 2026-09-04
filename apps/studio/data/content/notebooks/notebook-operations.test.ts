@@ -10,9 +10,9 @@ import type { NotebookWire } from './notebook-schema'
 const NOTEBOOK: NotebookWire = {
   schema_version: 1,
   cells: [
-    { _tag: 'markdown_cell', id: 'cell-1', text: '# Intro' },
-    { _tag: 'database_cell', id: 'cell-2', sql: 'select 1', row_limit: 100 },
-    { _tag: 'markdown_cell', id: 'cell-3', text: '# Outro' },
+    { _tag: 'markdown_cell', _id: 'cell-1', text: '# Intro' },
+    { _tag: 'database_cell', _id: 'cell-2', sql: 'select 1', row_limit: 100 },
+    { _tag: 'markdown_cell', _id: 'cell-3', text: '# Outro' },
   ],
 }
 
@@ -29,7 +29,7 @@ describe('applyNotebookOperations', () => {
     expect(result.success).toBe(true)
     if (!result.success) return
     expect(
-      result.notebook.cells.map((cell) => ('id' in cell ? cell.id : 'text' in cell && cell.text))
+      result.notebook.cells.map((cell) => ('_id' in cell ? cell._id : 'text' in cell && cell.text))
     ).toEqual(['cell-1', '# New', 'cell-2', 'cell-3'])
   })
 
@@ -98,7 +98,7 @@ describe('applyNotebookOperations', () => {
 
     expect(result.success).toBe(true)
     if (!result.success) return
-    expect(result.notebook.cells.map((cell) => ('id' in cell ? cell.id : undefined))).toEqual([
+    expect(result.notebook.cells.map((cell) => ('_id' in cell ? cell._id : undefined))).toEqual([
       'cell-2',
       'cell-3',
       'cell-1',
@@ -114,11 +114,46 @@ describe('applyNotebookOperations', () => {
 
     expect(result.success).toBe(true)
     if (!result.success) return
-    expect(result.notebook.cells.map((cell) => ('id' in cell ? cell.id : undefined))).toEqual([
+    expect(result.notebook.cells.map((cell) => ('_id' in cell ? cell._id : undefined))).toEqual([
       'cell-3',
       'cell-1',
       'cell-2',
     ])
+  })
+
+  it('resets the insert offset for an anchor cell once it gets moved', () => {
+    // cell-1 gets an insert right after it, then cell-1 itself moves after cell-3. A later
+    // insert anchored on cell-1 must land right after its *new* position — the first insert
+    // stayed behind at cell-1's old spot, so it shouldn't count toward this offset anymore.
+    const notebook: NotebookWire = {
+      schema_version: 1,
+      cells: [
+        { _tag: 'markdown_cell', _id: 'cell-1', text: '1' },
+        { _tag: 'markdown_cell', _id: 'cell-2', text: '2' },
+        { _tag: 'markdown_cell', _id: 'cell-3', text: '3' },
+        { _tag: 'markdown_cell', _id: 'cell-4', text: '4' },
+      ],
+    }
+    const ops: NotebookOperation[] = [
+      {
+        _tag: 'insert_cell',
+        after_cell_id: 'cell-1',
+        cell: { _tag: 'markdown_cell', text: 'first' },
+      },
+      { _tag: 'move_cell', cell_id: 'cell-1', after_cell_id: 'cell-3' },
+      {
+        _tag: 'insert_cell',
+        after_cell_id: 'cell-1',
+        cell: { _tag: 'markdown_cell', text: 'second' },
+      },
+    ]
+
+    const result = applyNotebookOperations(notebook, ops)
+
+    expect(result.success).toBe(true)
+    if (!result.success) return
+    const texts = result.notebook.cells.map((cell) => ('text' in cell ? cell.text : undefined))
+    expect(texts).toEqual(['first', '2', '3', '1', 'second', '4'])
   })
 
   it('resolves a move anchored on another moved cell using its new position', () => {
@@ -133,7 +168,7 @@ describe('applyNotebookOperations', () => {
 
     expect(result.success).toBe(true)
     if (!result.success) return
-    expect(result.notebook.cells.map((cell) => ('id' in cell ? cell.id : undefined))).toEqual([
+    expect(result.notebook.cells.map((cell) => ('_id' in cell ? cell._id : undefined))).toEqual([
       'cell-3',
       'cell-1',
       'cell-2',
@@ -152,7 +187,7 @@ describe('applyNotebookOperations', () => {
 
     expect(result.success).toBe(true)
     if (!result.success) return
-    expect(result.notebook.cells.map((cell) => ('id' in cell ? cell.id : undefined))).toEqual([
+    expect(result.notebook.cells.map((cell) => ('_id' in cell ? cell._id : undefined))).toEqual([
       'cell-2',
       'cell-3',
       'cell-1',
@@ -169,7 +204,7 @@ describe('applyNotebookOperations', () => {
 
     expect(result.success).toBe(true)
     if (!result.success) return
-    expect(result.notebook.cells.map((cell) => ('id' in cell ? cell.id : undefined))).toEqual([
+    expect(result.notebook.cells.map((cell) => ('_id' in cell ? cell._id : undefined))).toEqual([
       'cell-1',
       'cell-2',
       'cell-3',

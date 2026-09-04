@@ -30,17 +30,17 @@ const Error404 = () => {
             </div>
           </nav>
         </div>
-        <div className="absolute">
-          <h1
-            className={`text-foreground select-none text-[14rem] opacity-5 filter transition duration-200 sm:text-[18rem] lg:text-[28rem] ${
+        <div className="pointer-events-none absolute" aria-hidden="true">
+          <div
+            className={`text-foreground select-none text-[14rem] opacity-5 filter transition duration-200 motion-reduce:transition-none sm:text-[18rem] lg:text-[28rem] ${
               show404 ? 'blur-xs' : 'blur-none'
             }`}
           >
             404
-          </h1>
+          </div>
         </div>
         <div
-          className={`flex flex-col items-center justify-center space-y-6 transition ${
+          className={`flex flex-col items-center justify-center space-y-6 transition motion-reduce:transition-none ${
             show404 ? 'opacity-100' : 'opacity-0'
           }`}
         >
@@ -55,6 +55,19 @@ const Error404 = () => {
               <Link href="/">Head back</Link>
             </Button>
           </div>
+          <p className="text-foreground-lighter text-xs">
+            <a href="/docs" className="hover:text-foreground underline">
+              Documentation
+            </a>
+            {' · '}
+            <a href="/sitemap.xml" className="hover:text-foreground underline">
+              Sitemap
+            </a>
+            {' · '}
+            <a href="/llms.txt" className="hover:text-foreground underline">
+              llms.txt
+            </a>
+          </p>
         </div>
       </div>
     </DefaultLayout>

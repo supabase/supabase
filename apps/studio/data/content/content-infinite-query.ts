@@ -28,10 +28,7 @@ export async function getContent(
     params: {
       path: { ref: projectRef },
       query: {
-        // TODO — Charis 2026-08-06
-        // Cast until the generated query param type picks up 'notebook' (see ContentBase in
-        // content-query.ts)
-        type: type as 'sql' | 'report' | 'log_sql',
+        type,
         name,
         sort_by: sort,
         limit: limit.toString(),

@@ -602,6 +602,19 @@ export default defineConfig(({ command, mode }) => {
     }
   }
 
+  // `MAINTENANCE_MODE` gates the "redirect everything to /maintenance" rule.
+  // It's deliberately unprefixed, and the other two consumers both read it at
+  // BUILD time: `next.config.ts` reads it in `redirects()`, which Next bakes
+  // into `routes-manifest.json` during `next build`, and `vercel.ts` reads it
+  // while emitting `vercel.json`. So flipping maintenance has always meant a
+  // rebuild/redeploy, never just a server restart. Inline it here on the same
+  // terms so the isomorphic `beforeLoad` in `routes/__root.tsx` — which
+  // mirrors those rules for the TanStack runtime — can read it on the client
+  // too, without self-hosters having to set a second, NEXT_PUBLIC_-prefixed
+  // var. Falls back to `''` (not left undefined) so the browser bundle never
+  // ends up with a bare `process.env` reference.
+  publicEnvDefines['process.env.MAINTENANCE_MODE'] = JSON.stringify(env.MAINTENANCE_MODE ?? '')
+
   // Sentry init (lib/sentry-client-options.ts, reached via router.tsx) reads
   // these at runtime in the browser. When a var is unset it gets no define
   // entry above, which would leave a literal `process.env.*` in the built

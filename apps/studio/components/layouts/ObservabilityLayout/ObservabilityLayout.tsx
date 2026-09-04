@@ -56,7 +56,6 @@ const ObservabilityLayoutContent = ({
     })
   }, [
     addBanner,
-    dismissBanner,
     isInitialized,
     isDatabaseConnectionsBannerDismissed,
     previouslyToggled,

@@ -8,8 +8,7 @@ import {
 } from 'common'
 import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
 import { useCallback, useEffect, useRef } from 'react'
-import { Button, cn, CommandGroup, CommandItem, CommandList } from 'ui'
-import { StatusIcon } from 'ui/src/components/StatusIcon'
+import { Button, cn, CommandGroup, CommandItem, CommandList, StatusIcon } from 'ui'
 
 import {
   Breadcrumb,

@@ -33,13 +33,14 @@ import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { type ComponentPropsWithoutRef } from 'react'
-import { Badge, Button } from 'ui'
+import { Badge, Button, Heading } from 'ui'
 import { Admonition, type AdmonitionProps } from 'ui-patterns/Admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
-import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
+import { AgentSetup } from '../ui/AgentSetup'
+import { AgentWatchSchedule } from '../ui/AgentWatchSchedule'
 import { AiPrompt } from '../ui/AiPrompt'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
@@ -70,6 +71,8 @@ const components = {
   AccordionItem,
   Admonition: AdmonitionWithMargin,
   AgentPluginsPanel,
+  AgentSetup,
+  AgentWatchSchedule,
   AiPrompt,
   AiPromptsIndex,
   AiSkillsIndex,

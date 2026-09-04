@@ -107,6 +107,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
                   <Link href="/features" passHref>
                     <Badge className="p-0 h-[22px] w-[22px] rounded-full flex items-center justify-center text-foreground-lighter hover:text-foreground hover:border-foreground-lighter">
                       <ChevronLeft className="w-3.5 h-3.5" />
+                      <span className="sr-only">Back to all features</span>
                     </Badge>
                   </Link>
                   {feature.products.map((product) => (
@@ -114,6 +115,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
                       key={`product-${product}`}
                       href={`/features?products=${product}`}
                       className="inline-flex"
+                      aria-label={`All ${product} features`}
                       passHref
                     >
                       <Badge

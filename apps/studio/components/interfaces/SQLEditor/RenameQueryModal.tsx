@@ -49,12 +49,13 @@ const formSchema = z.object({
   description: z.string().optional(),
 })
 
-export const RenameQueryModal = ({
-  snippet = {} as any,
-  visible,
-  onCancel,
-  onComplete,
-}: RenameQueryModalProps) => {
+interface RenameQueryFormProps {
+  snippet: SqlSnippet | Snippet
+  onCancel: () => void
+  onComplete: () => void
+}
+
+const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps) => {
   const { ref } = useParams()
   const router = useRouter()
 
@@ -145,7 +146,7 @@ export const RenameQueryModal = ({
       }
 
       toast.success('Successfully renamed snippet!')
-      reset({ name, description }, { keepDirtyValues: false })
+      reset({ name, description })
       if (onComplete) onComplete()
     } catch (error: any) {
       // [Joshen] We probably need some rollback cause all the saving is async
@@ -156,98 +157,104 @@ export const RenameQueryModal = ({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { name: name ?? '', description: description ?? '' },
-    values: { name: name ?? '', description: description ?? '' },
-    resetOptions: { keepDirtyValues: true },
   })
   const { reset, formState } = form
   const { isDirty, isSubmitting } = formState
 
-  const handleCancel = () => {
-    onCancel()
-    reset(undefined, { keepDirtyValues: false })
-  }
-
   return (
-    <Dialog open={visible} onOpenChange={handleCancel}>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+        <DialogSection className="space-y-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItemLayout layout="vertical" label="Name">
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+              </FormItemLayout>
+            )}
+          />
+          <div className="flex w-full justify-end mt-2">
+            <ButtonTooltip
+              variant="default"
+              onClick={() => generateTitle()}
+              size="tiny"
+              disabled={
+                isTitleGenerationLoading || !isApiKeySet || isHipaaProjectDisallowed || isAiOptedOut
+              }
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: isHipaaProjectDisallowed
+                    ? 'This feature is not available for HIPAA projects.'
+                    : isAiOptedOut
+                      ? 'Your organization has opted out of AI features.'
+                      : isApiKeySet
+                        ? undefined
+                        : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
+                },
+              }}
+            >
+              <div className="flex items-center gap-1">
+                <div className="scale-75">
+                  <AiIconAnimation loading={isTitleGenerationLoading} />
+                </div>
+                <span>Rename with Supabase AI</span>
+              </div>
+            </ButtonTooltip>
+          </div>
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItemLayout layout="vertical" label="Description">
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    rows={4}
+                    placeholder="Describe query"
+                    className="resize-none"
+                  />
+                </FormControl>
+              </FormItemLayout>
+            )}
+          />
+        </DialogSection>
+        <DialogFooter>
+          <Button type="reset" variant="default" onClick={onCancel} disabled={isSubmitting}>
+            Cancel
+          </Button>
+          <Button type="submit" loading={isSubmitting} disabled={isSubmitting || !isDirty}>
+            Rename query
+          </Button>
+        </DialogFooter>
+      </form>
+    </Form>
+  )
+}
+
+export const RenameQueryModal = ({
+  snippet = {} as any,
+  visible,
+  onCancel,
+  onComplete,
+}: RenameQueryModalProps) => {
+  return (
+    <Dialog open={visible} onOpenChange={onCancel}>
       <DialogContent size="small">
         <DialogHeader>
           <DialogTitle>Rename</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-            <DialogSection className="space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItemLayout name="name" layout="vertical" label="Name">
-                    <FormControl>
-                      <Input {...field} id="name" />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-              <div className="flex w-full justify-end mt-2">
-                <ButtonTooltip
-                  variant="default"
-                  onClick={() => generateTitle()}
-                  size="tiny"
-                  disabled={
-                    isTitleGenerationLoading ||
-                    !isApiKeySet ||
-                    isHipaaProjectDisallowed ||
-                    isAiOptedOut
-                  }
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: isHipaaProjectDisallowed
-                        ? 'This feature is not available for HIPAA projects.'
-                        : isAiOptedOut
-                          ? 'Your organization has opted out of AI features.'
-                          : isApiKeySet
-                            ? undefined
-                            : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
-                    },
-                  }}
-                >
-                  <div className="flex items-center gap-1">
-                    <div className="scale-75">
-                      <AiIconAnimation loading={isTitleGenerationLoading} />
-                    </div>
-                    <span>Rename with Supabase AI</span>
-                  </div>
-                </ButtonTooltip>
-              </div>
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItemLayout name="description" layout="vertical" label="Description">
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        id="description"
-                        rows={4}
-                        placeholder="Describe query"
-                        className="resize-none"
-                      />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            </DialogSection>
-            <DialogFooter>
-              <Button type="reset" variant="default" onClick={handleCancel} disabled={isSubmitting}>
-                Cancel
-              </Button>
-              <Button type="submit" loading={isSubmitting} disabled={isSubmitting || !isDirty}>
-                Rename query
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+        {/* Keyed by snippet so that each snippet gets a fresh form, with no state carried over */}
+        <RenameQueryForm
+          key={snippet.id}
+          snippet={snippet}
+          onCancel={onCancel}
+          onComplete={onComplete}
+        />
       </DialogContent>
     </Dialog>
   )

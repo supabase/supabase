@@ -1,10 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   generateOtherRoutes,
   generateProductRoutes,
   generateSettingsRoutes,
-  generateToolRoutes,
+  useGenerateToolRoutes,
 } from './NavigationBar.utils'
 import type { Project } from '@/data/projects/project-detail-query'
 
@@ -16,25 +17,55 @@ const inactiveProject = { status: 'INACTIVE' } as Project
 
 const keys = (routes: { key: string }[]) => routes.map((r) => r.key)
 
-describe('generateToolRoutes', () => {
+const mockUseParams = vi.fn()
+const mockUseSelectedProjectQuery = vi.fn()
+const mockUseIsExplorerEnabled = vi.fn()
+
+vi.mock('common', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('common')>()),
+  useParams: () => mockUseParams(),
+}))
+
+vi.mock('@/hooks/misc/useSelectedProject', () => ({
+  useSelectedProjectQuery: () => mockUseSelectedProjectQuery(),
+}))
+
+vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+  useIsExplorerEnabled: () => mockUseIsExplorerEnabled(),
+  useUnifiedLogsPreview: () => ({ isEnabled: false }),
+}))
+
+describe('useGenerateToolRoutes', () => {
+  beforeEach(() => {
+    mockUseParams.mockReturnValue({ ref: REF })
+    mockUseSelectedProjectQuery.mockReturnValue({ data: activeProject })
+    mockUseIsExplorerEnabled.mockReturnValue(false)
+  })
+
   it('always returns Table Editor and SQL Editor', () => {
-    const routes = generateToolRoutes(REF, activeProject)
-    expect(keys(routes)).toEqual(['editor', 'sql'])
+    const { result } = renderHook(() => useGenerateToolRoutes())
+    expect(keys(result.current)).toEqual(['editor', 'sql'])
   })
 
   it('marks routes as disabled when project is not active', () => {
-    const routes = generateToolRoutes(REF, inactiveProject)
-    expect(routes.every((r) => r.disabled)).toBe(true)
+    mockUseSelectedProjectQuery.mockReturnValue({ data: inactiveProject })
+
+    const { result } = renderHook(() => useGenerateToolRoutes())
+    expect(result.current.every((r) => r.disabled)).toBe(true)
   })
 
   it('points links to the building URL when project is building', () => {
-    const routes = generateToolRoutes(REF, buildingProject)
-    expect(routes.every((r) => r.link === `/project/${REF}`)).toBe(true)
+    mockUseSelectedProjectQuery.mockReturnValue({ data: buildingProject })
+
+    const { result } = renderHook(() => useGenerateToolRoutes())
+    expect(result.current.every((r) => r.link === `/project/${REF}`)).toBe(true)
   })
 
   it('returns links as false when ref is undefined', () => {
-    const routes = generateToolRoutes(undefined, activeProject)
-    expect(routes.every((r) => r.link === undefined)).toBe(true)
+    mockUseParams.mockReturnValue({ ref: undefined })
+
+    const { result } = renderHook(() => useGenerateToolRoutes())
+    expect(result.current.every((r) => r.link === undefined)).toBe(true)
   })
 })
 
@@ -52,6 +83,11 @@ describe('generateProductRoutes', () => {
   it('includes all product routes by default (features default to true)', () => {
     const routes = generateProductRoutes(REF, activeProject)
     expect(keys(routes)).toEqual(['database', 'auth', 'storage', 'functions', 'realtime'])
+  })
+
+  it('includes workers only when the workers flag is enabled', () => {
+    expect(keys(generateProductRoutes(REF, activeProject))).not.toContain('workers')
+    expect(keys(generateProductRoutes(REF, activeProject, { workers: true }))).toContain('workers')
   })
 
   it('excludes auth when auth feature is disabled', () => {

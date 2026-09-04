@@ -8,9 +8,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  TableCell,
+  TableRow,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { TableCell, TableRow } from 'ui/src/components/shadcn/ui/table'
 
 import {
   ACCESS_TOKEN_SORT_VALUES,

@@ -150,6 +150,26 @@ function PluginInstructions({ client }: { client: PluginClient }) {
     )
   }
 
+  if (client.key === 'grok') {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-foreground-light">
+          Install the Supabase plugin by running the following command in your terminal.
+        </p>
+        <CodeBlock
+          value="grok plugin install supabase-community/supabase-plugin"
+          language="bash"
+          focusable={false}
+          className="block"
+        />
+        <p className="text-xs text-foreground-lighter">
+          Browse and install plugins in a session: run <code>grok</code>, then <code>/plugins</code>{' '}
+          or <code>/marketplace</code>.
+        </p>
+      </div>
+    )
+  }
+
   if (client.key === 'vscode') {
     return (
       <div className="space-y-3">
@@ -240,7 +260,7 @@ export function AgentPluginsPanel() {
               rel="noopener noreferrer"
               className="text-brand-link hover:underline inline-flex items-center"
             >
-              View {selectedClient.label} extensions docs
+              {selectedClient.docsLinkText ?? `View ${selectedClient.label} extensions docs`}
               <ExternalLink className="h-3 w-3 ml-1" />
             </a>
           </div>

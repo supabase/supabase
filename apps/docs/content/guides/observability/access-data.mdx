@@ -1,0 +1,31 @@
+---
+id: 'access-data'
+title: 'Observe the data'
+description: 'Query logs, metrics, database diagnostics, and advisors. Each source page lists Studio, MCP, the API, and the CLI.'
+---
+
+This guide lists the project data you can query. Each source page lists where to read that source. To pick up a signal from this data, see [Detecting](/docs/guides/observability/detecting).
+
+## Logs
+
+Request, database, Auth, Storage, Realtime, and function events in ClickHouse.
+
+Query them with SQL in [Query and filter logs](/docs/guides/observability/advanced-log-filtering) from the [Logs Explorer](/dashboard/project/_/logs/explorer), MCP `query_logs`, or the [Management API](/docs/reference/api/v1-get-project-logs). Filter events without SQL in [Logs](/docs/guides/observability/logs). See the [Logs field reference](/docs/guides/observability/log-field-reference) for sources and fields.
+
+The CLI does not query ClickHouse logs. Call the Management API from a script, or [inspect the database](/docs/guides/observability/inspect) for Postgres diagnostics.
+
+## Metrics [#metrics-api]
+
+Prometheus-compatible CPU, IO, WAL, connections, and query stats. Scrape the [Metrics API](/docs/guides/observability/metrics) for custom dashboards, alerting, or retention beyond Studio. Chart a subset of the same window in [Reports](/docs/guides/observability/reports).
+
+## Database
+
+Live Postgres statistics such as bloat, cache hit rate, blocking sessions, index usage, and slow queries. Run the same checks from the [SQL Editor](/dashboard/project/_/sql), MCP `execute_sql`, or `supabase inspect db`. See [Inspect the database](/docs/guides/observability/inspect).
+
+## Advisors
+
+Deterministic security and performance findings. Pull them from Studio, MCP `get_advisors`, [`supabase db advisors`](/docs/reference/cli/usage#supabase-db-advisors), or the Management API. See [Advisors](/docs/guides/observability/advisors).
+
+## Reports
+
+Studio dashboards for API, Auth, Storage, Realtime, and database signals. Use them to pick a time window or resource, then follow [Detecting](/docs/guides/observability/detecting). See [Reports](/docs/guides/observability/reports).

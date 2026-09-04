@@ -573,18 +573,18 @@ export default function FormPatternsSidePanel() {
                       label="Select (Dropdown)"
                       description="Single selection from a list of options"
                     >
-                      <FormControl className="col-span-6">
-                        <Select value={field.value} onValueChange={field.onChange}>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl className="col-span-6">
                           <SelectTrigger>
                             <SelectValue placeholder="Select an option" />
                           </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
-                            <SelectItem value="us-west-2">US West (Oregon)</SelectItem>
-                            <SelectItem value="eu-west-1">EU West (Ireland)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
+                          <SelectItem value="us-west-2">US West (Oregon)</SelectItem>
+                          <SelectItem value="eu-west-1">EU West (Ireland)</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </FormItemLayout>
                   )}
                 />

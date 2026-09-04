@@ -27,7 +27,7 @@ export const HTTPParameters = ({ form }: HTTPParametersProps) => {
           createEmptyRow={() => ({ id: uuidv4(), name: '', value: '' })}
           keyPlaceholder="Parameter name"
           valuePlaceholder="Parameter value"
-          addLabel="Add a new parameter"
+          addLabel="Add parameter"
           removeLabel="Remove parameter"
         />
       </FormSectionContent>

@@ -14,6 +14,7 @@ describe('TOOL_CATEGORY_MAP', () => {
   it('should categorize tools correctly', () => {
     expect(TOOL_CATEGORY_MAP['execute_sql']).toBe(TOOL_CATEGORIES.UI)
     expect(TOOL_CATEGORY_MAP['list_tables']).toBe(TOOL_CATEGORIES.SCHEMA)
+    expect(TOOL_CATEGORY_MAP['run_notebook']).toBe(TOOL_CATEGORIES.SCHEMA)
   })
 })
 
@@ -222,12 +223,14 @@ describe('createPrivacyMessageTool', () => {
       description: 'Original description',
       inputSchema: z.object({}),
       execute: vitest.fn(),
+      toModelOutput: vitest.fn(),
     }
 
     const privacyTool = createPrivacyMessageTool(originalTool)
 
     expect(privacyTool.description).toContain('Original description')
     expect(privacyTool.description).toContain('Requires opting in')
+    expect(privacyTool.toModelOutput).toBeUndefined()
 
     const result = await privacyTool.execute({}, {})
     expect(result.status).toContain("You don't have permission to use this tool")

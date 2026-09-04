@@ -41,6 +41,19 @@ export function organizationSchema(input: OrganizationSchemaInput = {}) {
       url: ORG_LOGO_URL,
     },
     description: input.description ?? DEFAULT_META_DESCRIPTION,
+    legalName: 'Supabase Pte. Ltd.',
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      url: `${CANONICAL_ORIGIN}/support`,
+    },
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '65 Chulia Street #38-02/03, OCBC Centre',
+      addressLocality: 'Singapore',
+      postalCode: '049513',
+      addressCountry: 'SG',
+    },
     sameAs: ORG_SAMEAS,
   }
 }
@@ -80,6 +93,38 @@ export function softwareApplicationSchema(input: SoftwareApplicationSchemaInput)
     applicationCategory: input.applicationCategory ?? 'DeveloperApplication',
     operatingSystem: 'Cross-platform',
     publisher: { '@id': ORG_ID },
+  }
+}
+
+interface ServiceSchemaInput {
+  name: string
+  description: string
+  url: string
+  serviceType: string
+  offerings: Array<{ name: string; url: string }>
+}
+
+export function serviceSchema(input: ServiceSchemaInput) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: input.name,
+    description: input.description,
+    url: input.url,
+    serviceType: input.serviceType,
+    provider: { '@id': ORG_ID },
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: `${input.name} products`,
+      itemListElement: input.offerings.map((offering) => ({
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: offering.name,
+          url: offering.url,
+        },
+      })),
+    },
   }
 }
 

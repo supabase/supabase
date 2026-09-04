@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useFlag } from 'common'
 import { Trash } from 'lucide-react'
 import { useEffect, useEffectEvent, useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
@@ -103,13 +102,6 @@ export const SSOConfig = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const { hasAccess: hasAccessToSso, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('auth.platform.sso')
-  const enterpriseMcpAuthOrgs = useFlag<string>('enableEnterpriseMcpAuth')
-  const showIdjagSettings =
-    typeof enterpriseMcpAuthOrgs === 'string' &&
-    enterpriseMcpAuthOrgs
-      .split(',')
-      .map((s) => s.trim())
-      .includes(organization?.slug ?? '')
 
   const {
     data: ssoConfig,
@@ -368,11 +360,9 @@ export const SSOConfig = () => {
                         <JoinOrganizationOnSignup form={form} />
                       </CardContent>
 
-                      {showIdjagSettings && (
-                        <CardContent>
-                          <SSOAdvancedSettings form={form} />
-                        </CardContent>
-                      )}
+                      <CardContent>
+                        <SSOAdvancedSettings form={form} />
+                      </CardContent>
                     </>
                   )}
 

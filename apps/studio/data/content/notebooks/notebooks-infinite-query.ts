@@ -1,10 +1,6 @@
-import type { InfiniteData } from '@tanstack/react-query'
+import { type InfiniteData } from '@tanstack/react-query'
 
-import {
-  useContentInfiniteQuery,
-  type ContentData,
-  type ContentError,
-} from '../content-infinite-query'
+import { ContentData, ContentError, useContentInfiniteQuery } from '../content-infinite-query'
 import type { ContentOfType } from '../content-query'
 import type { UseCustomInfiniteQueryOptions } from '@/types'
 

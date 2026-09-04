@@ -28,10 +28,7 @@ const generateMetadata = async (_, parent: ResolvingMetadata): Promise<Metadata>
       ...(parentAlternates && {
         languages: parentAlternates.languages || undefined,
         media: parentAlternates.media || undefined,
-        types: {
-          ...(parentAlternates.types ?? {}),
-          'text/markdown': 'https://supabase.com/llms-full.txt',
-        },
+        types: parentAlternates.types || undefined,
       }),
     },
   }
