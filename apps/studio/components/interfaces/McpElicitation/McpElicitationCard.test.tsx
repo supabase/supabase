@@ -1,0 +1,125 @@
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
+
+import type { ElicitationRequest } from './McpElicitation.types'
+import { McpElicitationCard } from './McpElicitationCard'
+import { customRender } from '@/tests/lib/custom-render'
+
+const request: ElicitationRequest = {
+  tool: 'create_edge_function_secret',
+  ref: 'aaaaaaaaaaaaaaaaaaaa',
+  project: 'acme-production',
+  account: 'ops@example.com',
+  keyName: 'OPENAI_API_KEY',
+}
+
+const noop = () => {}
+
+const renderCard = (state: Parameters<typeof McpElicitationCard>[0]['state']) =>
+  customRender(
+    <McpElicitationCard
+      state={state}
+      isSaving={false}
+      onSave={noop}
+      onCancel={noop}
+      onSwitchAccount={noop}
+    />
+  )
+
+const secretField = () => screen.getByLabelText<HTMLInputElement>('Secret value')
+
+describe('McpElicitationCard', () => {
+  it('does not carry a typed secret across a change of request', async () => {
+    const user = userEvent.setup()
+    const { rerender } = renderCard({ status: 'form', request })
+
+    await user.type(secretField(), 'sk-for-the-first-request')
+    await user.click(screen.getByRole('button', { name: 'Show secret value' }))
+    expect(secretField().value).toBe('sk-for-the-first-request')
+    expect(secretField().type).toBe('text')
+
+    rerender(
+      <McpElicitationCard
+        state={{ status: 'form', request: { ...request, keyName: 'RESEND_API_KEY' } }}
+        isSaving={false}
+        onSave={noop}
+        onCancel={noop}
+        onSwitchAccount={noop}
+      />
+    )
+
+    await waitFor(() => expect(screen.getByDisplayValue('RESEND_API_KEY')).toBeInTheDocument())
+    // Both the value and the reveal toggle reset — the new request starts clean.
+    expect(secretField().value).toBe('')
+    expect(secretField().type).toBe('password')
+  })
+
+  it('resets when only the project changes, since a ref can move under one name', async () => {
+    const user = userEvent.setup()
+    const { rerender } = renderCard({ status: 'form', request })
+
+    await user.type(secretField(), 'sk-for-project-a')
+
+    rerender(
+      <McpElicitationCard
+        state={{
+          status: 'form',
+          request: { ...request, ref: 'bbbbbbbbbbbbbbbbbbbb', project: 'acme-production' },
+        }}
+        isSaving={false}
+        onSave={noop}
+        onCancel={noop}
+        onSwitchAccount={noop}
+      />
+    )
+
+    await waitFor(() => expect(secretField().value).toBe(''))
+  })
+
+  it('keeps what the user typed when the request is unchanged', async () => {
+    const user = userEvent.setup()
+    const { rerender } = renderCard({ status: 'form', request })
+
+    await user.type(secretField(), 'sk-still-being-typed')
+
+    // Same request, different sibling state: the overwrite warning arriving must
+    // not wipe the field.
+    rerender(
+      <McpElicitationCard
+        state={{
+          status: 'form',
+          request: { ...request, existingSecret: { updatedAt: new Date().toISOString() } },
+        }}
+        isSaving={false}
+        onSave={noop}
+        onCancel={noop}
+        onSwitchAccount={noop}
+      />
+    )
+
+    expect(await screen.findByText(/already exists/)).toBeInTheDocument()
+    expect(secretField().value).toBe('sk-still-being-typed')
+  })
+
+  it('submits the value exactly as typed, with no trimming', async () => {
+    const onSave = vi.fn()
+    const user = userEvent.setup()
+    customRender(
+      <McpElicitationCard
+        state={{ status: 'form', request }}
+        isSaving={false}
+        onSave={onSave}
+        onCancel={noop}
+        onSwitchAccount={noop}
+      />
+    )
+
+    await user.type(secretField(), '  sk-padded  ')
+    // fireEvent, not userEvent: the latter's actionability checks don't drive
+    // this submit in jsdom. Matches BillingEmail.test.tsx and friends.
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledWith('  sk-padded  '))
+  })
+})

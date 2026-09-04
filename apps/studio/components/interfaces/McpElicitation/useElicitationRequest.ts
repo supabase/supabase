@@ -50,19 +50,20 @@ export function useElicitationRequest(params: ElicitationParams) {
   })
 
   const request: ElicitationRequest | undefined = useMemo(() => {
-    if (name === undefined || project.data === undefined) return undefined
+    if (ref === undefined || name === undefined || project.data === undefined) return undefined
 
     const existing = secrets.data?.find((secret) => secret.name === name)
 
     return {
       tool: ELICITATION_TOOL_NAME,
+      ref,
       project: project.data.name,
       account,
       keyName: name,
       providerHint: getProviderHint(name),
       existingSecret: existing === undefined ? undefined : { updatedAt: existing.updated_at },
     }
-  }, [account, name, project.data, secrets.data])
+  }, [account, name, project.data, ref, secrets.data])
 
   const state = useMemo<ElicitationState>(() => {
     // Always `undefined` in production — see `parseElicitationParams`. An

@@ -11,6 +11,7 @@ import {
 
 const request: ElicitationRequest = {
   tool: 'create_edge_function_secret',
+  ref: 'abcdefghijklmnopqrst',
   project: 'billing-staging',
   account: 'ops@example.com',
   keyName: 'RESEND_API_KEY',

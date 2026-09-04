@@ -6,6 +6,12 @@ export type ElicitationProviderHint = {
 
 export type ElicitationRequest = {
   tool: string
+  /**
+   * Identity, not display: the project this write is scoped to. `project` is a
+   * name and two projects can share one, so anything keying off "which request
+   * is this" has to use `ref`.
+   */
+  ref: string
   /** Resolved project name, not the ref — the ref means nothing to the reader. */
   project: string
   /** Email of the current browser session, rendered as "Signed in as". */

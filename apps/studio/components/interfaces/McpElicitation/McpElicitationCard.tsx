@@ -42,6 +42,12 @@ const McpElicitationCardContent = ({
   if (state.status === 'form') {
     return (
       <McpElicitationForm
+        // A query-string change swaps the request without unmounting this
+        // subtree, so a typed value could otherwise be submitted under the next
+        // request's name. Keying on the request identity throws away the form
+        // state and the reveal toggle instead. Nothing navigates here
+        // client-side today; this is the guard for when something does.
+        key={`${state.request.ref}:${state.request.keyName}`}
         request={state.request}
         isSaving={isSaving}
         onSave={onSave}
