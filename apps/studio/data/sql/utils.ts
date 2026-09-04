@@ -149,8 +149,92 @@ export function stripSqlCommentsAndLiterals(sql: string): string {
 }
 
 /**
+ * Extracts the top-level main statement from a SQL query, skipping any leading
+ * CTE (Common Table Expression / WITH clause) definitions.
+ *
+ * Assumes the SQL has already been stripped of comments and literals.
+ *
+ * @param sql - Cleaned SQL string
+ * @returns The main top-level statement following the CTEs, or the original SQL if not a CTE
+ */
+export function extractMainStatement(sql: string): string {
+  const withMatch = sql.match(/^\s*with\b(?:\s+recursive\b)?/i)
+  if (!withMatch) return sql
+
+  let i = withMatch[0].length
+  let depth = 0
+  let inCteBody = false
+  let hasClosedCte = false
+  const len = sql.length
+
+  while (i < len) {
+    const ch = sql[i]
+
+    if (ch === '(') {
+      depth++
+    } else if (ch === ')') {
+      depth--
+      if (depth === 0 && inCteBody) {
+        inCteBody = false
+        hasClosedCte = true
+      }
+    } else if (depth === 0) {
+      if (/^\bas\b/i.test(sql.slice(i))) {
+        i += 2
+        // Skip whitespace and optional [NOT] MATERIALIZED
+        const rest = sql.slice(i)
+        const matMatch = rest.match(/^\s*(?:not\s+)?materialized\s*/i)
+        if (matMatch) {
+          i += matMatch[0].length
+        }
+        inCteBody = true
+        continue
+      }
+
+      if (hasClosedCte) {
+        if (ch === ',') {
+          hasClosedCte = false
+        } else if (!/\s/.test(ch)) {
+          return sql.slice(i)
+        }
+      }
+    }
+    i++
+  }
+
+  return sql
+}
+
+/**
+ * Checks if a SQL statement contains a RETURNING clause at the top level
+ * (i.e. not nested inside subquery parentheses).
+ *
+ * @param sql - Cleaned SQL statement
+ * @returns True if a top-level RETURNING clause is present
+ */
+export function hasTopLevelReturning(sql: string): boolean {
+  let depth = 0
+  const len = sql.length
+
+  for (let i = 0; i < len; i++) {
+    const ch = sql[i]
+    if (ch === '(') {
+      depth++
+    } else if (ch === ')') {
+      depth--
+    } else if (depth === 0) {
+      if (/^returning\b/i.test(sql.slice(i))) {
+        return true
+      }
+    }
+  }
+
+  return false
+}
+
+/**
  * Returns true when the SQL is a DML statement (INSERT/UPDATE/DELETE/MERGE/CALL/DO)
- * that does *not* include a RETURNING clause.
+ * that does *not* include a RETURNING clause, even when preceded by a CTE (WITH clause).
  *
  * When this is the case the empty-row result is expected — the query may still have
  * modified rows — so the UI should say "Query ran successfully" rather than the
@@ -164,13 +248,14 @@ export function stripSqlCommentsAndLiterals(sql: string): string {
  */
 export function isNonReturningDml(sql: string): boolean {
   const cleaned = stripSqlCommentsAndLiterals(sql).trim()
+  const main = extractMainStatement(cleaned).trim()
 
-  const isDml = /^\s*(?:insert|update|delete|merge|call|do)\b/i.test(cleaned)
+  const isDml = /^\s*(?:insert|update|delete|merge|call|do)\b/i.test(main)
   if (!isDml) return false
 
-  // A RETURNING clause means Postgres will send back rows, so the empty-row
+  // A top-level RETURNING clause means Postgres will send back rows, so the empty-row
   // result would correctly mean "0 matched", not "statement ran without output".
-  return !/\breturning\b/i.test(cleaned)
+  return !hasTopLevelReturning(main)
 }
 
 export function applyAutoLimit(

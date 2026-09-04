@@ -314,6 +314,139 @@ update users set deleted = true where id = 1`)
     })
   })
 
+  describe('handles CTEs (WITH clauses)', () => {
+    it('classifies WITH ... UPDATE without RETURNING as non-returning DML', () => {
+      expect(
+        isNonReturningDml(`
+          WITH regional_sales AS (
+            SELECT region, SUM(amount) AS total_sales
+            FROM orders
+            GROUP BY region
+          )
+          UPDATE orders
+          SET discount = 0.1
+          WHERE region IN (SELECT region FROM regional_sales WHERE total_sales > 1000)
+        `)
+      ).toBe(true)
+    })
+
+    it('classifies WITH ... UPDATE with RETURNING as returning', () => {
+      expect(
+        isNonReturningDml(`
+          WITH cte AS (SELECT id FROM users)
+          UPDATE profile SET active = true WHERE user_id IN (SELECT id FROM cte)
+          RETURNING user_id
+        `)
+      ).toBe(false)
+    })
+
+    it('classifies WITH ... DELETE without RETURNING as non-returning DML', () => {
+      expect(
+        isNonReturningDml(`
+          WITH old_records AS (
+            SELECT id FROM logs WHERE created_at < NOW() - INTERVAL '30 days'
+          )
+          DELETE FROM logs WHERE id IN (SELECT id FROM old_records)
+        `)
+      ).toBe(true)
+    })
+
+    it('classifies WITH ... DELETE with RETURNING as returning', () => {
+      expect(
+        isNonReturningDml(`
+          WITH old_records AS (
+            SELECT id FROM logs WHERE created_at < NOW() - INTERVAL '30 days'
+          )
+          DELETE FROM logs WHERE id IN (SELECT id FROM old_records)
+          RETURNING id
+        `)
+      ).toBe(false)
+    })
+
+    it('classifies WITH ... INSERT without RETURNING as non-returning DML', () => {
+      expect(
+        isNonReturningDml(`
+          WITH new_data AS (
+            SELECT 1 AS a, 2 AS b
+          )
+          INSERT INTO target (a, b) SELECT a, b FROM new_data
+        `)
+      ).toBe(true)
+    })
+
+    it('classifies WITH ... INSERT with RETURNING as returning', () => {
+      expect(
+        isNonReturningDml(`
+          WITH new_data AS (
+            SELECT 1 AS a, 2 AS b
+          )
+          INSERT INTO target (a, b) SELECT a, b FROM new_data
+          RETURNING *
+        `)
+      ).toBe(false)
+    })
+
+    it('classifies WITH ... SELECT as returning (not non-returning DML)', () => {
+      expect(
+        isNonReturningDml(`
+          WITH data AS (
+            SELECT id, name FROM users
+          )
+          SELECT * FROM data
+        `)
+      ).toBe(false)
+    })
+
+    it('handles WITH RECURSIVE', () => {
+      expect(
+        isNonReturningDml(`
+          WITH RECURSIVE subordinates AS (
+            SELECT employee_id, manager_id FROM employees WHERE employee_id = 1
+            UNION ALL
+            SELECT e.employee_id, e.manager_id FROM employees e
+            JOIN subordinates s ON e.manager_id = s.employee_id
+          )
+          UPDATE employees SET reviewed = true WHERE employee_id IN (SELECT employee_id FROM subordinates)
+        `)
+      ).toBe(true)
+    })
+
+    it('classifies data-modifying CTE followed by non-returning main DML correctly', () => {
+      expect(
+        isNonReturningDml(`
+          WITH archived AS (
+            DELETE FROM logs WHERE created_at < NOW() - INTERVAL '30 days'
+            RETURNING *
+          )
+          INSERT INTO logs_archive SELECT * FROM archived
+        `)
+      ).toBe(true)
+    })
+
+    it('classifies data-modifying CTE followed by SELECT as returning', () => {
+      expect(
+        isNonReturningDml(`
+          WITH deleted AS (
+            DELETE FROM logs WHERE created_at < NOW() - INTERVAL '30 days'
+            RETURNING *
+          )
+          SELECT count(*) FROM deleted
+        `)
+      ).toBe(false)
+    })
+
+    it('handles CTEs with column aliases', () => {
+      expect(
+        isNonReturningDml(`
+          WITH cte(col1, col2) AS (
+            SELECT 1, 2
+          )
+          UPDATE target SET a = 1
+        `)
+      ).toBe(true)
+    })
+  })
+
   describe('handles string literals, quoted identifiers, and comments safely', () => {
     it('preserves RETURNING clause when -- is inside a string literal', () => {
       expect(isNonReturningDml("UPDATE t SET note = '--' RETURNING id")).toBe(false)
