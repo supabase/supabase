@@ -99,6 +99,7 @@ function CrossfadeIcon({
     cn(
       'absolute inset-0 m-auto text-lighter group-hover/btn:text-foreground',
       'transition-[opacity,scale,filter,color] duration-300 [transition-timing-function:cubic-bezier(0.2,0,0,1)]',
+      'motion-reduce:transition-none',
       shown ? 'opacity-100 scale-100 blur-none' : 'opacity-0 scale-[0.25] blur-[4px]'
     )
 
