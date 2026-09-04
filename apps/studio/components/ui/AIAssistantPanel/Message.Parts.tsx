@@ -9,6 +9,7 @@ import { toAssistantQueryResult } from './AssistantQueryCell.utils'
 import { getManualToolApprovalHandlers } from './Confirm.utils'
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { Tool } from './elements/Tool'
+import { GeneratedPageRenderer } from './GeneratedPageRenderer'
 import { useMessageActionsContext, useMessageInfoContext } from './Message.Context'
 import {
   deployEdgeFunctionInputSchema,
@@ -289,6 +290,32 @@ function MessagePartNotebookRun({ toolPart }: { toolPart: ToolUIPart }) {
   )
 }
 
+function MessagePartGeneratedPage({ toolPart }: { toolPart: ToolUIPart }) {
+  const { state, input: submittedInput } = toolPart
+  const input = state === 'output-error' ? (submittedInput ?? toolPart.rawInput) : submittedInput
+  const { addToolApprovalResponse } = useMessageActionsContext()
+
+  if (state === 'input-streaming') return <ToolDisplayExecuteSqlLoading label="Writing page..." />
+
+  const { confirmState, onApprove, onDeny } = getManualToolApprovalHandlers({
+    state,
+    approval: toolPart.approval,
+    addToolApprovalResponse,
+  })
+
+  // `output` is deliberately not forwarded: `render_page` only ever returns
+  // `{ status: 'ready' }`, and the page's own results never travel through the tool part.
+  return (
+    <GeneratedPageRenderer
+      state={state}
+      input={input}
+      confirmState={confirmState}
+      onApprove={onApprove}
+      onDeny={onDeny}
+    />
+  )
+}
+
 const MessagePart = {
   Text: MessagePartText,
   Dynamic: MessagePartDynamicTool,
@@ -299,6 +326,7 @@ const MessagePart = {
   DeployEdgeFunction: MessagePartDeployEdgeFunction,
   NotebookProposal: MessagePartNotebookProposal,
   NotebookRun: MessagePartNotebookRun,
+  GeneratedPage: MessagePartGeneratedPage,
 } as const
 
 function MessagePartContainer({
@@ -317,6 +345,7 @@ const isWideMessagePart = (part: NonNullable<VercelMessage['parts']>[number]) =>
   part.type === 'tool-create_notebook' ||
   part.type === 'tool-update_notebook' ||
   part.type === 'tool-run_notebook' ||
+  part.type === 'tool-render_page' ||
   (part.type === 'dynamic-tool' && part.toolName === 'query_logs') ||
   // Unlabelled code fences resolve to SQL in MessageMarkdown, too.
   (part.type === 'text' && /```(?:sql)?(?:\s|$)/i.test(part.text))
@@ -373,6 +402,9 @@ export function MessagePartSwitcher({
       }
       case 'tool-run_notebook': {
         return <MessagePart.NotebookRun toolPart={part} />
+      }
+      case 'tool-render_page': {
+        return <MessagePart.GeneratedPage toolPart={part} />
       }
 
       case 'source-url':

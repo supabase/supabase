@@ -44,6 +44,7 @@ export const toolSetValidationSchema = z.record(
     'create_notebook',
     'update_notebook',
     'delete_notebook',
+    'render_page',
 
     // Fallback tools for self-hosted
     'getSchemaTables',
@@ -102,6 +103,7 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   create_notebook: TOOL_CATEGORIES.SCHEMA,
   update_notebook: TOOL_CATEGORIES.SCHEMA,
   delete_notebook: TOOL_CATEGORIES.SCHEMA,
+  render_page: TOOL_CATEGORIES.SCHEMA,
   getSchemaTables: TOOL_CATEGORIES.SCHEMA,
   getRlsKnowledge: TOOL_CATEGORIES.SCHEMA,
   getFunctions: TOOL_CATEGORIES.SCHEMA,

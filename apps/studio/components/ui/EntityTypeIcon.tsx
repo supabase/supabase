@@ -1,6 +1,7 @@
 import {
   Eye,
   GitBranch,
+  LayoutDashboard,
   MessageSquare,
   NotebookText,
   ScrollText,
@@ -46,6 +47,7 @@ interface EntityTypeIconProps {
     | 'notebook'
     | 'query'
     | 'chat'
+    | 'generated-page'
     | 'explorer-home'
   size?: number
   strokeWidth?: number
@@ -133,6 +135,10 @@ export const EntityTypeIcon = ({
 
   if (type === 'chat') {
     return <MessageSquare size={size} strokeWidth={strokeWidth} />
+  }
+
+  if (type === 'generated-page') {
+    return <LayoutDashboard size={size} strokeWidth={strokeWidth} />
   }
 
   return (

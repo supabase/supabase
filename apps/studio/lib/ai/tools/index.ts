@@ -3,6 +3,7 @@ import { IS_PLATFORM } from 'common'
 
 import { filterToolsByOptInLevel } from '../tool-filter'
 import { getFallbackTools } from './fallback-tools'
+import { getGeneratedPageTools } from './generated-page-tools'
 import { getIncidentTools } from './incident-tools'
 import { getMcpTools } from './mcp-tools'
 import { getNotebookTools } from './notebook-tools'
@@ -30,9 +31,9 @@ export const getTools = async ({
   accessToken?: string
   baseUrl?: string
   supportMode?: boolean
-  // Notebooks haven't shipped yet — they live behind the Explorer feature flag, so the
-  // assistant must not advertise list_notebooks/get_notebook until the caller confirms the
-  // flag is on for this user.
+  // Notebooks and generated pages haven't shipped yet — they live behind the Explorer
+  // feature flag, so the assistant must not advertise list_notebooks/get_notebook or
+  // render_page until the caller confirms the flag is on for this user.
   isExplorerEnabled?: boolean
   // Required: tools fetched from the remote MCP server hold an HTTP connection
   // that is closed when this signal aborts (i.e. when the request ends).
@@ -79,12 +80,15 @@ export const getTools = async ({
       }),
       ...getReportTools({ projectRef, authorization }),
       ...(isExplorerEnabled
-        ? getNotebookTools({
-            projectRef,
-            connectionString,
-            authorization,
-            aiOptInLevel,
-          })
+        ? {
+            ...getNotebookTools({
+              projectRef,
+              connectionString,
+              authorization,
+              aiOptInLevel,
+            }),
+            ...getGeneratedPageTools(),
+          }
         : {}),
       ...(baseUrl ? getIncidentTools({ baseUrl }) : {}),
     }

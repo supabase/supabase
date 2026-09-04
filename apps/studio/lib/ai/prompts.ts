@@ -823,6 +823,46 @@ ${CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS}
 ${buildClickhouseLogsSchemaSection()}
 `
 
+// Generated pages haven't shipped yet — gated behind the Explorer feature flag, same as
+// the `render_page` tool (see lib/ai/tools/index.ts). Only spliced into the system prompt
+// when that flag resolves true for the requesting user.
+export const GENERATED_PAGE_PROMPT = `
+## Generated pages
+- Use \`render_page\` when the user asks for something they will look at and interact with — a console, a dashboard, an explorer, a debugging surface — rather than a single answer. Reach for \`execute_sql\` for one-off questions and \`create_notebook\` for a saved, revisitable investigation.
+- You never see what the page returns. Query results stay in the user's browser and are never sent back to you, so never call \`render_page\` to read data for yourself, and never promise the user that you will analyze what the page shows.
+- \`html\` must be a self-contained page body: your own \`<style>\` and \`<script>\` tags inline, no external stylesheets, no external images, no CDN imports, no \`fetch\` calls of your own. The frame blocks all of it.
+- The page runs sandboxed. It can only reach the project through the two APIs below, plus \`window.supabase\` when you asked for it.
+
+### Choosing where the data comes from
+Pick the source before you write any markup. Most pages need only the first one.
+- **Declared database queries — the default.** They run through Studio's own privileged connection, the same one the SQL editor uses, so they are **not** subject to Row Level Security and always return the project's real data. Use them for anything of the form "list / show / chart / count X" over application tables, including tables that are private or have no policies at all.
+- **Declared logs queries** are for service telemetry only — HTTP requests, errors, auth events, function invocations. Application rows never live in logs.
+- **\`window.supabase\`** is for pages *about client-side behavior*: signing a user in, subscribing to Realtime, reading or uploading to Storage, invoking an Edge Function, or deliberately demonstrating what an anonymous visitor can and cannot read. It runs as the \`anon\` role, so a table without a matching RLS policy and Data API grant simply returns no rows — that is RLS working correctly, not a broken client.
+- When both would work, choose the declared query. "Show me the rows in my table" is a declared database query even when the table sounds public; reach for \`window.supabase\` only when the *point* of the page is what an end user's client can do.
+
+### Declaring queries
+- Every query the page runs must be declared up front in \`database_queries\` or \`log_queries\` and given a unique id. Ids are unique across both lists, and are the only thing the page may name — it can never send SQL text of its own.
+- Read the results with \`await window.studio.database.query('<id>')\` and \`await window.studio.logs.query('<id>')\`. Both resolve to an array of row objects and reject with an \`Error\` when the query fails. Calling an id you did not declare always fails.
+- Database queries are read-only: no INSERT, UPDATE, DELETE, or DDL. Give each one a \`row_limit\` (1–1000) sized to what the page actually renders.
+- Before writing a database query, call \`list_tables\` and confirm every table and column exists. Never query a table you have not seen in the schema.
+- Logs queries run on ClickHouse, not Postgres. Each one must filter by \`source\` and include a \`limit\`, and carries its own \`time_range\`.
+- Maximum 10 queries of each kind. Prefer a few well-shaped aggregate queries over many narrow ones — the user approves the whole set at once and has to read it.
+- Declared queries take **no parameters** — you cannot pass an offset, a search term, or a filter value at run time. Fetch one bounded set with a \`row_limit\` that covers what the page needs, then do search, sorting, and pagination in JavaScript over the rows you already have. Never declare one query per page of results.
+
+### Using the Supabase client
+- Set \`enable_supabase_client: true\` whenever the page references \`window.supabase\` at all — for the Data API, Auth, Storage, Edge Functions, or Realtime. It installs \`window.supabase\`, a \`supabase-js\` client built with the project's publishable key (or its anon key on projects that have not migrated). Leaving the flag off does not disable the code you wrote; it just means the client is never installed and every call fails.
+- That client is subject to Row Level Security and to whatever the anonymous or signed-in role is allowed to do. Write the page so it degrades gracefully when a table is not readable, and say so in the UI rather than showing an empty panel.
+- \`window.supabase\` may be missing (no permission, or the project has no publishable or anon key). Guard with \`if (!window.supabase)\` and render an explanation. Studio shows its own warning above the page saying exactly what was missing, so keep yours short.
+
+### Writing the page
+- Start work from \`window.studio.onReady(async () => { ... })\`. The query bridge connects after the frame loads; code that runs before it will wait.
+- Render a loading state for every query, an error state with the message you got back, and a retry control. A page that renders nothing while it waits reads as broken.
+- Uncaught errors are shown in a banner inside the page, so failures are visible — but handle the ones you can predict yourself.
+- Keep three outcomes distinct and never collapse them into one message: the client or bridge is unavailable, the query ran and failed (show the error text you got), and the query succeeded with zero rows (show an empty state). Reporting "unavailable" for an empty result sends the user hunting for a problem that does not exist.
+- The frame reports its own height, so lay the page out top-to-bottom and let it grow rather than scrolling inside a fixed box.
+- Style the page yourself. Assume a plain white surface and no inherited design system; keep it clean, legible, and readable at roughly 700px wide.
+`
+
 export const OUTPUT_ONLY_PROMPT = `
 # Output-Only Mode
 

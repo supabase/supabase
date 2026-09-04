@@ -19,6 +19,7 @@ import { prepareMessagesForModel } from '@/lib/ai/generate-assistant-response.ut
 import {
   CHAT_PROMPT,
   GENERAL_PROMPT,
+  GENERATED_PAGE_PROMPT,
   LIMITATIONS_PROMPT,
   NOTEBOOKS_PROMPT,
   SECURITY_PROMPT,
@@ -91,6 +92,7 @@ export async function generateAssistantResponse({
       ${GENERAL_PROMPT}
       ${CHAT_PROMPT}
       ${isExplorerEnabled ? NOTEBOOKS_PROMPT : ''}
+      ${isExplorerEnabled ? GENERATED_PAGE_PROMPT : ''}
       ${SECURITY_PROMPT}
       ${LIMITATIONS_PROMPT}
 

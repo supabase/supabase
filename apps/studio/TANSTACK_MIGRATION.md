@@ -341,6 +341,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/explorer/notebook/$id.tsx` ← `pages/project/[ref]/explorer/notebook/[id].tsx`
 - [x] A `routes/project/$ref/explorer/chat/$id.tsx` ← `pages/project/[ref]/explorer/chat/[id].tsx`
 - [x] A `routes/project/$ref/explorer/query/$id.tsx` ← `pages/project/[ref]/explorer/query/[id].tsx`
+- [x] A `routes/project/$ref/explorer/page/$id.tsx` ← `pages/project/[ref]/explorer/page/[id].tsx`
 
 ### Auth shell — `/sign-in`, `/sign-up`, etc.
 

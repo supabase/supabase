@@ -19,10 +19,26 @@ import type { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p'],
   sql: ['sql'],
-  explorer: ['notebook', 'query', 'chat'],
+  explorer: ['notebook', 'query', 'chat', 'generated-page'],
 }
 
-export type TabType = ENTITY_TYPE | 'sql' | 'notebook' | 'query' | 'chat' | 'explorer-home'
+export type TabType =
+  | ENTITY_TYPE
+  | 'sql'
+  | 'notebook'
+  | 'query'
+  | 'chat'
+  | 'generated-page'
+  | 'explorer-home'
+
+/**
+ * Tab types whose content lives only in memory for the current SPA session. They are left
+ * out of persisted tabs and recent items, because after a reload there would be nothing
+ * behind the entry — see `state/explorer-generated-page.ts`.
+ */
+const EPHEMERAL_TAB_TYPES: ReadonlySet<TabType> = new Set<TabType>(['generated-page'])
+
+export const isEphemeralTabType = (type: TabType) => EPHEMERAL_TAB_TYPES.has(type)
 
 /** Fixed id for Explorer's pinned, non-closable Home tab. */
 export const EXPLORER_HOME_TAB_ID = 'explorer-home'
@@ -46,6 +62,7 @@ type CreateTabIdParams = {
   notebook: { id: string }
   query: { id: string }
   chat: { id: string }
+  'generated-page': { id: string }
   schema: { schema: string }
   view: never
   function: never
@@ -65,6 +82,7 @@ export interface Tab {
     notebookId?: string
     queryId?: string
     chatId?: string
+    generatedPageId?: string
     scrollTop?: number
     /**
      * For SQL tabs, which backend the snippet queries (`'database'` | `'logs'`),
@@ -221,6 +239,10 @@ export function createTabsState(projectRef: string) {
     recentItems,
 
     addRecentItem: (tab: Tab) => {
+      // An ephemeral tab has nothing to reopen once the session ends, so it never becomes
+      // a recent item — the entry would be a dead link.
+      if (isEphemeralTabType(tab.type)) return
+
       // Check if an item with the same ID already exists
       const existingItem = store.recentItems.find((item) => item.id === tab.id)
 
@@ -444,6 +466,9 @@ export function createTabsState(projectRef: string) {
         case 'chat':
           router.push(`/project/${router.query.ref}/explorer/chat/${tab.metadata?.chatId}`)
           break
+        case 'generated-page':
+          router.push(`/project/${router.query.ref}/explorer/page/${tab.metadata?.generatedPageId}`)
+          break
         case 'explorer-home':
           router.push(`/project/${router.query.ref}/explorer`)
           break
@@ -664,12 +689,25 @@ export const TabsStateContextProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     if (typeof window !== 'undefined' && projectRef) {
       return subscribe(state, () => {
+        // Ephemeral tabs are dropped at the persistence boundary rather than never being
+        // added, so they behave like any other tab for as long as the session lasts.
+        const persistedTabIds = state.openTabs.filter(
+          (id) => !isEphemeralTabType(state.tabsMap[id]?.type ?? 'sql')
+        )
+        const persistedTabsMap = Object.fromEntries(
+          Object.entries(state.tabsMap).filter(([, tab]) => !isEphemeralTabType(tab.type))
+        )
+        const persistedActiveTab =
+          state.activeTab !== null && persistedTabIds.includes(state.activeTab)
+            ? state.activeTab
+            : null
+
         safeLocalStorage.setItem(
           getTabsStorageKey(projectRef),
           JSON.stringify({
-            activeTab: state.activeTab,
-            openTabs: state.openTabs,
-            tabsMap: state.tabsMap,
+            activeTab: persistedActiveTab,
+            openTabs: persistedTabIds,
+            tabsMap: persistedTabsMap,
             previewTabId: state.previewTabId,
           })
         )
@@ -711,6 +749,8 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
       return `query-${(params as CreateTabIdParams['query']).id}`
     case 'chat':
       return `chat-${(params as CreateTabIdParams['chat']).id}`
+    case 'generated-page':
+      return `generated-page-${(params as CreateTabIdParams['generated-page']).id}`
     default:
       return ''
   }

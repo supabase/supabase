@@ -428,3 +428,41 @@ describe('explorer query tabs', () => {
     expect(onClose.mock.calls.map(([tab]) => tab.metadata?.queryId)).toEqual(['query-1', 'query-2'])
   })
 })
+
+describe('Explorer generated-page tabs', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
+  it('creates stable ids and navigates to the generated-page route', () => {
+    const store = createTabsState('default')
+    const router = fakeRouter()
+    const id = createTabId('generated-page', { id: 'page-1' })
+
+    store.addTab({
+      id,
+      type: 'generated-page',
+      label: 'Auth console',
+      metadata: { generatedPageId: 'page-1' },
+      isPreview: false,
+    })
+    store.handleTabNavigation(id, router)
+
+    expect(id).toBe('generated-page-page-1')
+    expect(router.push).toHaveBeenCalledWith('/project/default/explorer/page/page-1')
+  })
+
+  it('never becomes a recent item, since nothing survives the session to reopen', () => {
+    const store = createTabsState('default')
+
+    store.addTab({
+      id: createTabId('generated-page', { id: 'page-1' }),
+      type: 'generated-page',
+      label: 'Auth console',
+      metadata: { generatedPageId: 'page-1' },
+      isPreview: false,
+    })
+
+    expect(store.recentItems).toEqual([])
+  })
+})
