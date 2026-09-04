@@ -5,7 +5,7 @@ import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import { analyticsLiteral, safeSql } from './safe-analytics-sql'
-import { isUnifiedLogsQueryRow, mapUnifiedLogRow } from './unified-logs.utils'
+import { mapUnifiedLogRow, parseUnifiedLogsQueryRows } from './unified-logs.utils'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import {
@@ -120,9 +120,8 @@ export async function getUnifiedLogs(
 
   if (data.error) handleError(new Error(data.error as string))
 
-  const resultData = data?.result ?? []
-
-  const result = resultData.filter(isUnifiedLogsQueryRow).map(mapUnifiedLogRow)
+  const resultData = parseUnifiedLogsQueryRows(data?.result)
+  const result = resultData.map(mapUnifiedLogRow)
 
   const firstRow = result.length > 0 ? result[0] : null
   const lastRow = result.length > 0 ? result[result.length - 1] : null

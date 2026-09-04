@@ -1,4 +1,7 @@
+import { z } from 'zod'
+
 import { parseOtelTimestamp } from './otel-inspection.utils'
+import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { tryParseJson } from '@/lib/helpers'
 
 type UnifiedLogMetadataRow = {
@@ -6,25 +9,28 @@ type UnifiedLogMetadataRow = {
   status?: string | number | null
   method?: string | null
   pathname?: string | null
-  url?: string | null
   event_message?: string | null
 }
 
-export type UnifiedLogsQueryRow = UnifiedLogMetadataRow & {
-  id: string
-  timestamp: string | number
-  level?: string | null
-  host?: string | null
-  body?: string | null
-  headers?: string | Record<string, unknown> | null
-  region?: string | null
-  latency?: number | null
-  log_count?: number | null
-  logs?: unknown[] | null
-  auth_user?: string | null
-  metadata?: Record<string, unknown> | null
-  project?: string | null
-}
+const unifiedLogsQueryRowSchema = z.object({
+  id: z.string(),
+  timestamp: z.union([z.string(), z.number()]),
+  log_type: z.string(),
+  status: z.union([z.string(), z.number()]).nullable(),
+  level: z.enum(LEVELS).nullable(),
+  pathname: z.string().nullable(),
+  event_message: z.string().nullable(),
+  method: z.string().nullable(),
+  log_count: z.number().nullable(),
+  logs: z.array(z.unknown()).nullable(),
+  auth_user: z.string().nullish(),
+  metadata: z.record(z.string(), z.unknown()).nullish(),
+})
+
+export type UnifiedLogsQueryRow = z.infer<typeof unifiedLogsQueryRowSchema>
+
+export const parseUnifiedLogsQueryRows = (value: unknown): UnifiedLogsQueryRow[] =>
+  z.array(unifiedLogsQueryRowSchema).parse(value ?? [])
 
 const extractLeadingStatus = (s?: string) => {
   const m = typeof s === 'string' ? s.match(/^(\d{3})\b/) : null
@@ -46,10 +52,7 @@ export const extractLogMetadata = (row: UnifiedLogMetadataRow) => {
         extractLeadingStatus(eventMessage?.error))
       : (row.status ?? 200)
   const method = row.log_type === 'auth' ? eventMessage?.method : row.method
-  const pathname =
-    row.log_type === 'auth'
-      ? eventMessage?.path
-      : (row.url || '').replace(/^https?:\/\/[^\/]+/, '') || row.pathname || ''
+  const pathname = row.log_type === 'auth' ? eventMessage?.path : row.pathname || ''
 
   return { status, method, pathname }
 }
@@ -66,24 +69,13 @@ export const mapUnifiedLogRow = (row: UnifiedLogsQueryRow) => {
     status,
     timestamp: row.timestamp,
     level: isWorkersLog ? null : row.level,
-    host: row.host,
-    event_message: row.event_message || row.body || '',
-    headers: typeof row.headers === 'string' ? JSON.parse(row.headers || '{}') : row.headers || {},
-    regions: row.region ? [row.region] : [],
-    log_type: row.log_type || '',
-    latency: row.latency || 0,
+    event_message: row.event_message ?? '',
+    log_type: row.log_type,
     log_count: row.log_count || null,
-    logs: row.logs || [],
+    logs: row.logs ?? [],
     auth_user: isWorkersLog ? null : row.auth_user || null,
   }
 
   if (isWorkersLog) return { ...mappedRow, metadata: row.metadata ?? null }
   return mappedRow
-}
-
-export const isUnifiedLogsQueryRow = (value: unknown): value is UnifiedLogsQueryRow => {
-  if (typeof value !== 'object' || value === null) return false
-  if (!('id' in value) || typeof value.id !== 'string') return false
-  if (!('timestamp' in value)) return false
-  return typeof value.timestamp === 'string' || typeof value.timestamp === 'number'
 }

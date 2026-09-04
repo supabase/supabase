@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import { getUnifiedLogsISOStartEnd } from './unified-logs-infinite-query'
-import { isUnifiedLogsQueryRow, mapUnifiedLogRow } from './unified-logs.utils'
+import { mapUnifiedLogRow, parseUnifiedLogsQueryRows } from './unified-logs.utils'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
@@ -42,9 +42,8 @@ export async function retrieveUnifiedLogs({
 
   if (error) handleError(error)
 
-  const resultData = data?.result ?? []
-
-  const result = resultData.filter(isUnifiedLogsQueryRow).map(mapUnifiedLogRow)
+  const resultData = parseUnifiedLogsQueryRows(data?.result)
+  const result = resultData.map(mapUnifiedLogRow)
 
   return result
 }

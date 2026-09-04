@@ -44,6 +44,20 @@ interface ServiceFlowPanelProps {
   searchParameters: QuerySearchParamsType
 }
 
+export function getLogDataForMetadataVisibility(data: unknown, metadataVisible: boolean) {
+  if (metadataVisible || typeof data !== 'object' || data === null) return data
+
+  const redactedData = { ...data, metadata: undefined }
+  const rawLogData = 'raw_log_data' in data ? data.raw_log_data : undefined
+
+  if (typeof rawLogData !== 'object' || rawLogData === null) return redactedData
+
+  return {
+    ...redactedData,
+    raw_log_data: { ...rawLogData, metadata: undefined },
+  }
+}
+
 export function ServiceFlowPanel({
   dock,
   setDock,
@@ -106,17 +120,7 @@ export function ServiceFlowPanel({
   const jsonData =
     shouldShowServiceFlow && serviceFlowData?.result?.[0] ? serviceFlowData.result[0] : selectedRow
   const rawLogData = getRawLogData(jsonData)
-
-  const formattedJsonData =
-    !logsMetadata &&
-    'raw_log_data' in rawLogData &&
-    rawLogData.raw_log_data &&
-    'metadata' in rawLogData.raw_log_data
-      ? {
-          ...rawLogData,
-          raw_log_data: { ...rawLogData.raw_log_data, metadata: undefined },
-        }
-      : rawLogData
+  const formattedJsonData = getLogDataForMetadataVisibility(rawLogData, logsMetadata)
 
   return (
     <>
