@@ -19,7 +19,7 @@ const RETURN_TO_CLIENT_STEP = `Go back to ${UNKNOWN_CLIENT_LABEL} and choose "I'
 const CLOSE_TAB_FOOTER = 'You can close this tab.'
 
 const UNVERIFIED_KEY_FOOTER =
-  "Supabase doesn't check that the key works. If a later call fails, update it in project settings."
+  "Supabase doesn't verify keys. You can view or replace this one in Edge Functions secrets."
 
 export function getElicitationCopy(state: ElicitationOutcomeState): ElicitationCopy {
   switch (state.status) {
@@ -79,7 +79,7 @@ export function getElicitationCopy(state: ElicitationOutcomeState): ElicitationC
         title: 'Storing keys is paused',
         subtitle: 'Supabase has turned this off for now. Nothing was stored.',
         calloutTitle: 'Next step',
-        calloutBody: 'Try again later, or set the key in project settings instead.',
+        calloutBody: 'Try again later, or set the key in Edge Functions secrets instead.',
         footer: CLOSE_TAB_FOOTER,
       }
 
@@ -89,7 +89,7 @@ export function getElicitationCopy(state: ElicitationOutcomeState): ElicitationC
         subtitle: 'Nothing was stored.',
         calloutTitle: 'Next step',
         calloutBody:
-          'Ask your agent to run the tool again, or set the key in project settings instead.',
+          'Ask your agent to run the tool again, or set the key in Edge Functions secrets instead.',
         footer: CLOSE_TAB_FOOTER,
       }
   }
@@ -113,7 +113,7 @@ export function getElicitationAnnouncement(state: ElicitationState | undefined):
 }
 
 export function getSecretHelperText(project: string) {
-  return `Stored encrypted for ${project}. Anyone with write access to this project can use it. Remove it any time from project settings.`
+  return `Stored encrypted for ${project}. Anyone with write access to this project can use it. Remove it any time from Edge Functions secrets.`
 }
 
 export function getOverwriteWarning(request: ElicitationRequest) {

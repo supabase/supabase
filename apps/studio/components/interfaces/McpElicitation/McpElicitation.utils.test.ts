@@ -55,7 +55,7 @@ describe('getElicitationCopy', () => {
     expect(copy.title).toBe("Couldn't complete this request")
     expect(copy.subtitle).toBe('Nothing was stored.')
     expect(copy.calloutBody).toBe(
-      'Ask your agent to run the tool again, or set the key in project settings instead.'
+      'Ask your agent to run the tool again, or set the key in Edge Functions secrets instead.'
     )
   })
 
@@ -105,7 +105,7 @@ describe('getElicitationCopy', () => {
 describe('getSecretHelperText', () => {
   it('names the project the secret is scoped to', () => {
     expect(getSecretHelperText('my-project')).toBe(
-      'Stored encrypted for my-project. Anyone with write access to this project can use it. Remove it any time from project settings.'
+      'Stored encrypted for my-project. Anyone with write access to this project can use it. Remove it any time from Edge Functions secrets.'
     )
   })
 })
