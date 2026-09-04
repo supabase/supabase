@@ -1,21 +1,11 @@
 import { PASSWORD_PLACEHOLDER } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
-/**
- * [Unverified] Per explicit product-owner direction, the Warehouse FlightSQL endpoint is assumed
- * to follow `{projectRef}.warehouse.supabase.{tld}`. This pattern could not be confirmed anywhere
- * in the platform repo's application code, infra config, or generated API types
- * (`packages/api-types`) -- no field on any Warehouse response (`WarehouseSetupStatusResponse`,
- * `WarehouseSetupResponse`, `WarehouseCatalogResponse`) carries this domain, and no matching
- * gateway/ingress rule was found. Revisit and replace this client-side construction if the backend
- * ever starts returning the endpoint directly on a Warehouse response.
- */
 const WAREHOUSE_TLD = IS_STAGING_OR_LOCAL ? 'red' : 'io'
 
 /**
- * Name of the singleton replication publication (and destination) the platform manages for
- * Warehouse — `SUPABASE_MANAGED_WAREHOUSE_RESOURCE_NAME` in the platform repo. Its table list is
- * the source of truth for what's currently replicated.
+ * Name of the singleton replication publication (and destination) that Warehouse manages. Its table
+ * list is the source of truth for what's currently replicated.
  */
 export const WAREHOUSE_PUBLICATION_NAME = 'supabase_warehouse'
 

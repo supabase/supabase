@@ -1,14 +1,14 @@
 import { useParams } from 'common'
 import { KeyRound } from 'lucide-react'
 import Link from 'next/link'
-import { Badge, Button, cn } from 'ui'
+import { Badge, Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { maskSecretValue, type WarehouseCatalogCredentials } from './WarehouseModePanel.utils'
+import type { WarehouseCatalogCredentials } from './WarehouseModePanel.utils'
 import { AlertError } from '@/components/ui/AlertError'
-import CopyButton from '@/components/ui/CopyButton'
 import { useUpdateWarehouseCatalogMutation } from '@/data/warehouse/warehouse-catalog-mutation'
 import { useWarehouseCatalogQuery } from '@/data/warehouse/warehouse-catalog-query'
 import {
@@ -37,45 +37,6 @@ function FieldRow({ label, children }: { label: React.ReactNode; children: React
   )
 }
 
-function CopyValueRow({ value, mono = true }: { value: string; mono?: boolean }) {
-  return (
-    <div className="flex min-w-0 items-center gap-2 h-9 px-3 rounded-md border bg-control">
-      <span
-        className={cn('min-w-0 flex-1 truncate text-sm text-foreground', mono && 'font-mono')}
-        title={value}
-      >
-        {value}
-      </span>
-      <CopyButton
-        variant="default"
-        size="tiny"
-        iconOnly
-        text={value}
-        aria-label={`Copy ${value}`}
-        className="shrink-0"
-      />
-    </div>
-  )
-}
-
-function MaskedCopyValueRow({ value }: { value: string }) {
-  return (
-    <div className="flex min-w-0 items-center gap-2 h-9 px-3 rounded-md border bg-control">
-      <span className="min-w-0 flex-1 truncate text-sm font-mono text-foreground-lighter">
-        {maskSecretValue(value)}
-      </span>
-      <CopyButton
-        variant="default"
-        size="tiny"
-        iconOnly
-        asyncText={() => value}
-        aria-label="Copy secret value"
-        className="shrink-0"
-      />
-    </div>
-  )
-}
-
 /**
  * The DuckDB setup script inlines everything except the two passwords, which it reads via
  * `getenv()` — so those are the only credential values surfaced as their own rows here.
@@ -92,7 +53,7 @@ function DuckLakeSetup({ credentials }: { credentials: WarehouseCatalogCredentia
           description="Copy the catalog URL and configure the DuckLake secrets manually."
         />
         <FieldRow label="Catalog URL">
-          <MaskedCopyValueRow value={credentials.catalog_url} />
+          <Input readOnly copy reveal className="font-mono" value={credentials.catalog_url} />
         </FieldRow>
       </div>
     )
@@ -107,12 +68,18 @@ function DuckLakeSetup({ credentials }: { credentials: WarehouseCatalogCredentia
         environment variables — set these before running it:
       </p>
       <FieldRow label={<span className="font-mono text-xs">{DUCKLAKE_S3_SECRET_ENV_VAR}</span>}>
-        <MaskedCopyValueRow value={credentials.s3_secret_access_key} />
+        <Input
+          readOnly
+          copy
+          reveal
+          className="font-mono"
+          value={credentials.s3_secret_access_key}
+        />
       </FieldRow>
       <FieldRow
         label={<span className="font-mono text-xs">{DUCKLAKE_METADATA_PASSWORD_ENV_VAR}</span>}
       >
-        <MaskedCopyValueRow value={connection.password} />
+        <Input readOnly copy reveal className="font-mono" value={connection.password} />
       </FieldRow>
       {/*
         `className` is what switches CodeBlock from its plain <code> fallback to the syntax
@@ -160,16 +127,16 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
         </button>
       </div>
 
-      <p className="text-sm font-medium text-foreground mb-3">External access</p>
+      <h3 className="text-sm font-medium text-foreground mb-3">External access</h3>
       <div className="flex flex-col gap-3">
         <FieldRow label="Endpoint">
-          <CopyValueRow value={endpoint} />
+          <Input readOnly copy className="font-mono" value={endpoint} />
         </FieldRow>
         <FieldRow label="Connection string">
-          <CopyValueRow value={connectionString} />
+          <Input readOnly copy className="font-mono" value={connectionString} />
         </FieldRow>
         <FieldRow label="User">
-          <CopyValueRow value="postgres" />
+          <Input readOnly copy className="font-mono" value="postgres" />
         </FieldRow>
         <FieldRow label="Password">
           <div className="flex items-center gap-3">
@@ -191,7 +158,7 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
 
       <div className="h-px bg-border my-6" />
 
-      <p className="text-sm font-medium text-foreground mb-1">Connect with FlightSQL</p>
+      <h3 className="text-sm font-medium text-foreground mb-1">Connect with FlightSQL</h3>
       <p className="text-sm text-foreground-light max-w-xl mb-3">
         Warehouse speaks the Arrow FlightSQL protocol. Any FlightSQL-compatible client can connect —
         for example, using the <span className="font-mono">usql</span> CLI:
@@ -206,9 +173,9 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
 
       <div className="h-px bg-border my-6" />
 
-      <p className="text-sm font-medium text-foreground mb-1">
+      <h3 className="text-sm font-medium text-foreground mb-1">
         Connect with DuckDB (DuckLake catalog)
-      </p>
+      </h3>
 
       {isCatalogPending && <GenericSkeletonLoader />}
 

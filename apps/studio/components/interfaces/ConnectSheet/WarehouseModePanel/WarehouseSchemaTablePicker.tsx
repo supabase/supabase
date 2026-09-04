@@ -1,8 +1,7 @@
 import { useParams } from 'common'
-import { ArrowLeft, ChevronDown, ChevronRight, Warehouse } from 'lucide-react'
+import { ArrowLeft, ChevronRight, Warehouse } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { toast } from 'sonner'
-import { Button, Checkbox } from 'ui'
+import { Button, Checkbox, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -14,18 +13,19 @@ import {
   isSelectableWarehouseSchema,
   type SchemaTableSelection,
   type SchemaWithTables,
+  type WarehouseSetupTarget,
 } from './WarehouseModePanel.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import { useUpdateWarehouseCatalogMutation } from '@/data/warehouse/warehouse-catalog-mutation'
-import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { WAREHOUSE_PUBLICATION_NAME } from '@/lib/warehouse'
 
 export interface WarehouseSchemaTablePickerProps {
+  onSubmit: (targets: WarehouseSetupTarget[]) => void
+  isSubmitting: boolean
   /**
    * Provided only when the picker was opened to edit an already-enabled Warehouse, which is what
    * gives it something to navigate back to (the connection details).
@@ -33,7 +33,11 @@ export interface WarehouseSchemaTablePickerProps {
   onBack?: () => void
 }
 
-export const WarehouseSchemaTablePicker = ({ onBack }: WarehouseSchemaTablePickerProps) => {
+export const WarehouseSchemaTablePicker = ({
+  onSubmit,
+  isSubmitting,
+  onBack,
+}: WarehouseSchemaTablePickerProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const isEditing = onBack !== undefined
@@ -98,18 +102,6 @@ export const WarehouseSchemaTablePicker = ({ onBack }: WarehouseSchemaTablePicke
       .sort((a, b) => a.schema.localeCompare(b.schema))
   }, [schemas, tables])
 
-  const setupMutation = useWarehouseSetupMutation()
-  // Declared as a hook option rather than passed to `mutate()`: this component unmounts as soon as
-  // setup starts (the panel switches to the progress view), and per-call callbacks are dropped on
-  // unmount, which would swallow the failure entirely.
-  const catalogMutation = useUpdateWarehouseCatalogMutation({
-    onError: (error) => {
-      toast.error(
-        `Warehouse was enabled, but DuckLake catalog access could not be enabled automatically: ${error.message}. You can retry this from the connection details.`
-      )
-    },
-  })
-
   const selectedCount = getSelectedTableCount(selection)
 
   const updateSelection = (updater: (current: SchemaTableSelection) => SchemaTableSelection) => {
@@ -135,26 +127,14 @@ export const WarehouseSchemaTablePicker = ({ onBack }: WarehouseSchemaTablePicke
     })
   }
 
-  const toggleExpanded = (schemaName: string, currentlyOpen: boolean) => {
-    setExpandedOverrides((prev) => ({ ...prev, [schemaName]: !currentlyOpen }))
+  const setExpanded = (schemaName: string, isOpen: boolean) => {
+    setExpandedOverrides((prev) => ({ ...prev, [schemaName]: isOpen }))
   }
 
-  const handleEnableWarehouse = () => {
-    if (!projectRef) return
-
+  const handleSubmit = () => {
     const targets = buildWarehouseSetupTargets(selection, schemasWithTables)
     if (targets.length === 0) return
-
-    setupMutation.mutate(
-      { projectRef, body: { targets } },
-      {
-        onSuccess: () => {
-          // Fire-and-forget: setup itself should proceed even if enabling catalog access fails.
-          // The connection details panel offers a manual "Enable catalog access" fallback.
-          catalogMutation.mutate({ projectRef, body: { enabled: true } })
-        },
-      }
-    )
+    onSubmit(targets)
   }
 
   // Waiting on the publication too, so the pre-checked selection is in place before the user can
@@ -201,17 +181,21 @@ export const WarehouseSchemaTablePicker = ({ onBack }: WarehouseSchemaTablePicke
           const isOpen = expandedOverrides[schema.schema] ?? checkedCount > 0
 
           return (
-            <div key={schema.schema}>
+            <Collapsible
+              key={schema.schema}
+              open={isOpen}
+              onOpenChange={(open) => setExpanded(schema.schema, open)}
+            >
               <div className="flex items-center gap-2 px-3 py-2 bg-surface-75">
-                <button
-                  type="button"
-                  tabIndex={0}
+                <CollapsibleTrigger
                   aria-label={isOpen ? `Collapse ${schema.schema}` : `Expand ${schema.schema}`}
-                  onClick={() => toggleExpanded(schema.schema, isOpen)}
-                  className="text-foreground-lighter"
+                  className="group text-foreground-lighter"
                 >
-                  {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                </button>
+                  <ChevronRight
+                    size={14}
+                    className="transition-transform group-data-[state=open]:rotate-90"
+                  />
+                </CollapsibleTrigger>
                 <Checkbox
                   checked={checkedState}
                   onCheckedChange={() => toggleSchema(schema)}
@@ -227,29 +211,27 @@ export const WarehouseSchemaTablePicker = ({ onBack }: WarehouseSchemaTablePicke
                   {checkedCount}/{keys.length} tables
                 </span>
               </div>
-              {isOpen && (
-                <div>
-                  {schema.tables.map((table) => {
-                    const key = getSchemaTableKey(schema.schema, table)
-                    return (
-                      <div key={key} className="flex items-center gap-2 pl-10 pr-3 py-2">
-                        <Checkbox
-                          checked={!!selection[key]}
-                          onCheckedChange={() => toggleTable(schema.schema, table)}
-                          aria-label={`Select ${schema.schema}.${table}`}
-                        />
-                        <span className="text-sm font-mono text-foreground-light">{table}</span>
-                      </div>
-                    )
-                  })}
-                  {schema.tables.length === 0 && (
-                    <p className="pl-10 pr-3 py-2 text-sm text-foreground-lighter">
-                      No tables in this schema.
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
+              <CollapsibleContent>
+                {schema.tables.map((table) => {
+                  const key = getSchemaTableKey(schema.schema, table)
+                  return (
+                    <div key={key} className="flex items-center gap-2 pl-10 pr-3 py-2">
+                      <Checkbox
+                        checked={!!selection[key]}
+                        onCheckedChange={() => toggleTable(schema.schema, table)}
+                        aria-label={`Select ${schema.schema}.${table}`}
+                      />
+                      <span className="text-sm font-mono text-foreground-light">{table}</span>
+                    </div>
+                  )
+                })}
+                {schema.tables.length === 0 && (
+                  <p className="pl-10 pr-3 py-2 text-sm text-foreground-lighter">
+                    No tables in this schema.
+                  </p>
+                )}
+              </CollapsibleContent>
+            </Collapsible>
           )
         })}
       </div>
@@ -267,8 +249,8 @@ export const WarehouseSchemaTablePicker = ({ onBack }: WarehouseSchemaTablePicke
           <Button
             variant="primary"
             disabled={selectedCount === 0}
-            loading={setupMutation.isPending}
-            onClick={handleEnableWarehouse}
+            loading={isSubmitting}
+            onClick={handleSubmit}
           >
             {isEditing ? 'Update replicated tables' : 'Enable Warehouse'}
           </Button>

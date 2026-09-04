@@ -96,17 +96,6 @@ export function buildWarehouseSetupTargets(
   return targets
 }
 
-// ============================================================================
-// Catalog credential secrecy + display
-// ============================================================================
-
 export type WarehouseCatalogCredentials = NonNullable<
   components['schemas']['WarehouseCatalogResponse']['credentials']
 >
-
-export const MASKED_SECRET_PLACEHOLDER = '••••••••'
-
-export function maskSecretValue(value: string | undefined | null): string {
-  if (!value) return ''
-  return MASKED_SECRET_PLACEHOLDER
-}

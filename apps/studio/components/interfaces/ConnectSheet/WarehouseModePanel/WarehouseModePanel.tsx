@@ -1,27 +1,43 @@
 import { useParams } from 'common'
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { WarehouseConnectionDetails } from './WarehouseConnectionDetails'
 import { WarehouseEnablingProgress } from './WarehouseEnablingProgress'
+import type { WarehouseSetupTarget } from './WarehouseModePanel.utils'
 import { WarehouseSchemaTablePicker } from './WarehouseSchemaTablePicker'
 import { AlertError } from '@/components/ui/AlertError'
+import { useUpdateWarehouseCatalogMutation } from '@/data/warehouse/warehouse-catalog-mutation'
 import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
-import {
-  useWarehouseSetupStatusQuery,
-  type WarehouseSetupStatusResponse,
-} from '@/data/warehouse/warehouse-setup-status-query'
-
-type PickerOverride = 'auto' | 'picker'
-type WarehouseSetupStatus = WarehouseSetupStatusResponse['setup_status']
+import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
 
 const POLLING_SETUP_STATUSES = new Set(['setting_up', 'copying'])
 
+interface WarehouseSetupCompleteProps {
+  onSubmit: (targets: WarehouseSetupTarget[]) => void
+  isSubmitting: boolean
+}
+
+const WarehouseSetupComplete = ({ onSubmit, isSubmitting }: WarehouseSetupCompleteProps) => {
+  const [isEditingTables, setIsEditingTables] = useState(false)
+
+  if (isEditingTables) {
+    return (
+      <WarehouseSchemaTablePicker
+        onSubmit={onSubmit}
+        isSubmitting={isSubmitting}
+        onBack={() => setIsEditingTables(false)}
+      />
+    )
+  }
+
+  return <WarehouseConnectionDetails onEditTables={() => setIsEditingTables(true)} />
+}
+
 export const WarehouseModePanel = () => {
   const { ref: projectRef } = useParams()
-  const [override, setOverride] = useState<PickerOverride>('auto')
-  const [previousStatus, setPreviousStatus] = useState<WarehouseSetupStatus | undefined>(undefined)
 
   const { data, isPending, isError, error } = useWarehouseSetupStatusQuery(
     { projectRef },
@@ -33,29 +49,28 @@ export const WarehouseModePanel = () => {
     }
   )
 
-  // Drop the manual "show me the picker" override once the server reports setup running again,
-  // otherwise re-enabling from the picker lands back on the picker when it completes. Detected on
-  // status transition rather than from a mutation callback: the picker unmounts the moment the
-  // status query invalidates, and callbacks passed to `mutate()` are dropped on unmount.
-  const currentStatus = data?.setup_status
-  if (currentStatus !== previousStatus) {
-    setPreviousStatus(currentStatus)
-    if (currentStatus !== undefined && currentStatus !== 'complete') setOverride('auto')
-  }
-
+  const catalogMutation = useUpdateWarehouseCatalogMutation({
+    onError: (error) => {
+      toast.error(
+        `Warehouse was enabled, but DuckLake catalog access could not be enabled automatically: ${error.message}. You can retry this from the connection details.`
+      )
+    },
+  })
   const setupMutation = useWarehouseSetupMutation()
 
-  // Re-submit the same tables that were already targeted -- the setup-status response tracks them
-  // individually (with state), so we don't need to send the user back through the picker.
-  const retryTargets = (data?.tables ?? []).map((table) => ({
-    type: 'table' as const,
-    schema: table.schema,
-    name: table.name,
-  }))
+  const handleSetup = (targets: WarehouseSetupTarget[]) => {
+    if (!projectRef || targets.length === 0) return
 
-  const handleRetrySetup = () => {
-    if (!projectRef || retryTargets.length === 0) return
-    setupMutation.mutate({ projectRef, body: { targets: retryTargets } })
+    setupMutation.mutate(
+      { projectRef, body: { targets } },
+      {
+        onSuccess: () => {
+          // Fire-and-forget: setup itself should proceed even if enabling catalog access fails.
+          // The connection details panel offers a manual "Enable catalog access" fallback.
+          catalogMutation.mutate({ projectRef, body: { enabled: true } })
+        },
+      }
+    )
   }
 
   if (isPending) return <GenericSkeletonLoader />
@@ -65,7 +80,9 @@ export const WarehouseModePanel = () => {
   const status = data.setup_status
 
   if (status === 'not_started') {
-    return <WarehouseSchemaTablePicker />
+    return (
+      <WarehouseSchemaTablePicker onSubmit={handleSetup} isSubmitting={setupMutation.isPending} />
+    )
   }
 
   if (status === 'setting_up' || status === 'copying') {
@@ -73,7 +90,13 @@ export const WarehouseModePanel = () => {
   }
 
   if (status === 'error') {
+    const retryTargets: WarehouseSetupTarget[] = (data.tables ?? []).map((table) => ({
+      type: 'table' as const,
+      schema: table.schema,
+      name: table.name,
+    }))
     const failingStep = data.steps.find((step) => step.status === 'error')
+
     return (
       <AlertError
         subject="Warehouse setup failed"
@@ -82,7 +105,11 @@ export const WarehouseModePanel = () => {
         }}
         additionalActions={
           retryTargets.length > 0 ? (
-            <Button variant="default" loading={setupMutation.isPending} onClick={handleRetrySetup}>
+            <Button
+              variant="default"
+              loading={setupMutation.isPending}
+              onClick={() => handleSetup(retryTargets)}
+            >
               Retry
             </Button>
           ) : undefined
@@ -92,9 +119,5 @@ export const WarehouseModePanel = () => {
   }
 
   // status === 'complete'
-  if (override === 'picker') {
-    return <WarehouseSchemaTablePicker onBack={() => setOverride('auto')} />
-  }
-
-  return <WarehouseConnectionDetails onEditTables={() => setOverride('picker')} />
+  return <WarehouseSetupComplete onSubmit={handleSetup} isSubmitting={setupMutation.isPending} />
 }

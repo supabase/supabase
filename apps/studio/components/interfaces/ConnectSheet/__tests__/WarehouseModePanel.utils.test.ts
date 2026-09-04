@@ -7,8 +7,6 @@ import {
   getSchemaTableKey,
   getSelectedTableCount,
   isSelectableWarehouseSchema,
-  MASKED_SECRET_PLACEHOLDER,
-  maskSecretValue,
   type SchemaTableSelection,
   type SchemaWithTables,
 } from '../WarehouseModePanel/WarehouseModePanel.utils'
@@ -203,23 +201,5 @@ describe('WarehouseModePanel.utils:buildWarehouseSetupTargets', () => {
       { type: 'schema', schema: 'public' },
       { type: 'table', schema: 'auth', name: 'users' },
     ])
-  })
-})
-
-describe('WarehouseModePanel.utils:maskSecretValue', () => {
-  test('returns an empty string for undefined', () => {
-    expect(maskSecretValue(undefined)).toBe('')
-  })
-
-  test('returns an empty string for null', () => {
-    expect(maskSecretValue(null)).toBe('')
-  })
-
-  test('returns an empty string for an empty string', () => {
-    expect(maskSecretValue('')).toBe('')
-  })
-
-  test('returns the masked placeholder for a non-empty value', () => {
-    expect(maskSecretValue('super-secret-value')).toBe(MASKED_SECRET_PLACEHOLDER)
   })
 })
