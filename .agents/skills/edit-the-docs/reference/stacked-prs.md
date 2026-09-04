@@ -6,12 +6,14 @@ Mechanics for shipping the [`edit-the-docs`](../SKILL.md) phases as a stack. Pha
 
 One branch per change type, bottom to top:
 
-| PR  | Branch                  |
-| --- | ----------------------- |
-| 1   | `docs/<page>-style`     |
-| 2   | `docs/<page>-structure` |
-| 3   | `docs/<page>-technical` |
-| 4   | `docs/<page>-additions` |
+| PR  | Branch                       |
+| --- | ---------------------------- |
+| 1   | `docs/<page>-style`          |
+| 2   | `docs/<page>-structure`      |
+| 3   | `docs/<page>-technical`      |
+| 4+  | `docs/<page>-<what-it-adds>` |
+
+The first three names are fixed, because there's one of each. **Additions get one branch per topic, named for the content it adds:** `docs/tables-rls` and `docs/tables-datatypes`, not `docs/tables-additions-1` and `-2`. Use `docs/<page>-additions` when a single branch carries all of them.
 
 **Create only the branches whose buckets have content.** A two-branch stack is the common case. `gh stack init` takes however many you pass it.
 
@@ -33,7 +35,7 @@ Never chain `gh pr create --base <previous-branch>`. That produces correct base 
 
 ## Merge order
 
-Merge bottom-up: `master`, then PR 1, then PR 2, then PR 3. This is the model [`review-the-docs`](../../review-the-docs/SKILL.md) uses to review a stack, so the authoring and review sides share one vocabulary.
+Merge bottom-up: `master`, then PR 1, then PR 2, then PR 3, then each additions branch in stack order. This is the model [`review-the-docs`](../../review-the-docs/SKILL.md) uses to review a stack, so the authoring and review sides share one vocabulary.
 
 ## PR bodies
 
