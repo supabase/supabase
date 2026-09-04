@@ -7,8 +7,6 @@ links:
   api: https://www.embla-carousel.com/api
 ---
 
-{/* <ComponentPreview name="carousel-demo" peekCode wide /> */}
-
 ## About
 
 The carousel component is built using the [Embla Carousel](https://www.embla-carousel.com/) library.
@@ -82,8 +80,6 @@ import {
 
 To set the size of the items, you can use the `basis` utility class on the `<CarouselItem />`.
 
-{/* <ComponentPreview name="carousel-size" /> */}
-
 ```tsx title="Example" showLineNumbers {4-6}
 // 33% of the carousel width.
 <Carousel>
@@ -120,8 +116,6 @@ You can always adjust this in your own project if you need to.
 
 </Callout>
 
-{/* <ComponentPreview name="carousel-spacing" /> */}
-
 ```tsx title="Example" showLineNumbers /-ml-4/ /pl-4/
 <Carousel>
   <CarouselContent className="-ml-4">
@@ -145,8 +139,6 @@ You can always adjust this in your own project if you need to.
 ### Orientation
 
 Use the `orientation` prop to set the orientation of the carousel.
-
-{/* <ComponentPreview name="carousel-orientation" /> */}
 
 ```tsx showLineNumbers /vertical | horizontal/
 <Carousel orientation="vertical | horizontal">
@@ -180,8 +172,6 @@ You can pass options to the carousel using the `opts` prop. See the [Embla Carou
 ## API
 
 Use a state and the `setApi` props to get an instance of the carousel API.
-
-{/* <ComponentPreview name="carousel-api" /> */}
 
 ```tsx showLineNumbers {1,4,22}
 import { type CarouselApi } from '@/components/ui/carousel'
@@ -271,7 +261,5 @@ export function Example() {
   )
 }
 ```
-
-{/* <ComponentPreview name="carousel-plugin" /> */}
 
 See the [Embla Carousel docs](https://www.embla-carousel.com/api/plugins/) for more information on using plugins.
