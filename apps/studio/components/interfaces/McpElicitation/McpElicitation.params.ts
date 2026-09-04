@@ -1,8 +1,11 @@
 import z from 'zod'
 
-import { IS_ELICITATION_MOCK_MODE_ENABLED, MCP_ELICITATION_ROUTE } from './McpElicitation.constants'
-import { MOCK_ELICITATION_REQUEST_KEYS } from './McpElicitation.mocks'
-import type { MockElicitationRequestKey } from './McpElicitation.mocks'
+import {
+  IS_ELICITATION_MOCK_MODE_ENABLED,
+  MAX_SECRET_NAME_LENGTH,
+  MCP_ELICITATION_ROUTE,
+  RESERVED_SECRET_NAME_PREFIX,
+} from './McpElicitation.constants'
 
 /**
  * The only module that reads the elicitation query string.
@@ -10,10 +13,10 @@ import type { MockElicitationRequestKey } from './McpElicitation.mocks'
  * The server may start minting params we don't know about yet, and a deploy can
  * land mid-flow, so every schema here is additive-safe: unknown keys pass
  * through untouched and a malformed known key degrades to `undefined` instead of
- * failing the whole parse.
+ * failing the whole parse. A missing `ref` or `name` is what the page renders as
+ * expired — there is nothing to resolve without both.
  *
- * Nothing in here may be logged, sent to analytics, or rendered. Today `i` is an
- * opaque handle; treat everything alongside it as equally sensitive.
+ * Nothing in here may be logged, sent to analytics, or rendered verbatim.
  */
 
 export const DEV_ELICITATION_STATES = [
@@ -26,27 +29,56 @@ export const DEV_ELICITATION_STATES = [
   'cancelled',
   'paused',
   'wrong-account',
+  'error',
 ] as const
 
 export type DevElicitationState = (typeof DEV_ELICITATION_STATES)[number]
 
 export type ElicitationParams = {
-  /** Opaque handoff handle. `undefined` when missing or blank. */
-  handle: string | undefined
+  /** Project ref the secret is stored against. `undefined` when missing or malformed. */
+  ref: string | undefined
+  /** Secret name, kept exactly as minted. `undefined` when missing or malformed. */
+  name: string | undefined
   /**
-   * Mock overrides. Always empty outside local/staging — production reads never
-   * populate this, so deleting it when the real API lands is a local change.
+   * Screen overrides for local/staging. Always empty in production, so deleting
+   * this is a local change.
    */
-  dev: {
-    state: DevElicitationState | undefined
-    request: MockElicitationRequestKey | undefined
-  }
+  dev: { state: DevElicitationState | undefined }
 }
 
-const EMPTY_DEV_PARAMS: ElicitationParams['dev'] = { state: undefined, request: undefined }
+const EMPTY_DEV_PARAMS: ElicitationParams['dev'] = { state: undefined }
+
+/**
+ * Project refs are 20 lowercase letters on the platform and `default` locally.
+ * Kept deliberately loose — anything that could not be a ref is what we reject,
+ * rather than asserting today's exact shape.
+ */
+const projectRefSchema = z
+  .string()
+  .regex(/^[a-zA-Z0-9_-]{1,64}$/)
+  .optional()
+  .catch(undefined)
+
+/**
+ * The platform rule, mirrored client-side: at most 256 characters and never the
+ * `SUPABASE_` prefix. Not trimmed — the name we render has to be the name we
+ * write, and the platform is the one that decides what it will accept.
+ */
+const secretNameSchema = z
+  .string()
+  .min(1)
+  .max(MAX_SECRET_NAME_LENGTH)
+  .refine((value) => value.trim().length > 0)
+  .refine((value) => !value.startsWith(RESERVED_SECRET_NAME_PREFIX))
+  .optional()
+  .catch(undefined)
 
 const elicitationParamsSchema = z
   .object({
+    ref: projectRefSchema,
+    name: secretNameSchema,
+    // Reserved for the stateful handoff (AI-1170). Parsed so an older bundle
+    // doesn't choke on a link minted by a newer server; deliberately unused.
     i: z.string().trim().min(1).optional().catch(undefined),
   })
   .passthrough()
@@ -54,7 +86,6 @@ const elicitationParamsSchema = z
 const devElicitationParamsSchema = z
   .object({
     state: z.enum(DEV_ELICITATION_STATES).optional().catch(undefined),
-    request: z.enum(MOCK_ELICITATION_REQUEST_KEYS).optional().catch(undefined),
   })
   .passthrough()
 
@@ -62,28 +93,35 @@ export type ElicitationSearchParams = Record<string, string | undefined>
 
 export function parseElicitationParams(searchParams: ElicitationSearchParams): ElicitationParams {
   const parsed = elicitationParamsSchema.safeParse(searchParams)
-  const handle = parsed.success ? parsed.data.i : undefined
+  const ref = parsed.success ? parsed.data.ref : undefined
+  const name = parsed.success ? parsed.data.name : undefined
 
   if (!IS_ELICITATION_MOCK_MODE_ENABLED) {
-    return { handle, dev: EMPTY_DEV_PARAMS }
+    return { ref, name, dev: EMPTY_DEV_PARAMS }
   }
 
   const parsedDev = devElicitationParamsSchema.safeParse(searchParams)
 
   return {
-    handle,
-    dev: parsedDev.success
-      ? { state: parsedDev.data.state, request: parsedDev.data.request }
-      : EMPTY_DEV_PARAMS,
+    ref,
+    name,
+    dev: parsedDev.success ? { state: parsedDev.data.state } : EMPTY_DEV_PARAMS,
   }
 }
 
 /**
- * Rebuilds this page's URL from validated params rather than echoing the raw
- * query string, so a sign-in round trip carries the handle back and nothing
- * else. Consumed as `returnTo`, which Studio validates as a same-origin path.
+ * Sign-in URL for the wrong-account recovery path.
+ *
+ * `returnTo` carries the bare pathname and the elicitation params ride alongside
+ * it as siblings, because `validateReturnTo` restricts the charset of `returnTo`
+ * itself and would drop an embedded query string. `getReturnToPath` re-appends
+ * the siblings on the way back. This mirrors what `withAuth` does for the
+ * signed-out case, so both routes home land on the same URL.
  */
-export function buildElicitationReturnTo(handle: string | undefined) {
-  if (handle === undefined) return MCP_ELICITATION_ROUTE
-  return `${MCP_ELICITATION_ROUTE}?${new URLSearchParams({ i: handle }).toString()}`
+export function buildElicitationSignInPath(params: Pick<ElicitationParams, 'ref' | 'name'>) {
+  const search = new URLSearchParams({ returnTo: MCP_ELICITATION_ROUTE })
+  if (params.ref !== undefined) search.set('ref', params.ref)
+  if (params.name !== undefined) search.set('name', params.name)
+
+  return `/sign-in?${search.toString()}`
 }

@@ -1,48 +1,118 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { buildElicitationReturnTo, parseElicitationParams } from './McpElicitation.params'
+import { buildElicitationSignInPath, parseElicitationParams } from './McpElicitation.params'
 
 describe('parseElicitationParams', () => {
-  it('reads the handoff handle', () => {
-    expect(parseElicitationParams({ i: 'abc123' }).handle).toBe('abc123')
+  it('reads the project ref and secret name', () => {
+    const params = parseElicitationParams({ ref: 'abcdefghijklmnopqrst', name: 'OPENAI_API_KEY' })
+
+    expect(params.ref).toBe('abcdefghijklmnopqrst')
+    expect(params.name).toBe('OPENAI_API_KEY')
   })
 
   it('ignores params it has never seen rather than rejecting them', () => {
-    const params = parseElicitationParams({ i: 'abc123', somethingMintedLater: 'v2' })
+    const params = parseElicitationParams({
+      ref: 'abcdefghijklmnopqrst',
+      name: 'OPENAI_API_KEY',
+      somethingMintedLater: 'v2',
+    })
 
-    expect(params.handle).toBe('abc123')
+    expect(params.ref).toBe('abcdefghijklmnopqrst')
+    expect(params.name).toBe('OPENAI_API_KEY')
   })
 
-  it('treats a missing handle as absent', () => {
-    expect(parseElicitationParams({}).handle).toBeUndefined()
+  it('treats missing params as absent so the page can render as expired', () => {
+    expect(parseElicitationParams({})).toMatchObject({ ref: undefined, name: undefined })
   })
 
-  it('treats a blank handle as absent', () => {
-    expect(parseElicitationParams({ i: '   ' }).handle).toBeUndefined()
+  it('rejects a ref that could not be a project ref', () => {
+    expect(parseElicitationParams({ ref: '../../etc', name: 'KEY' }).ref).toBeUndefined()
+    expect(parseElicitationParams({ ref: '', name: 'KEY' }).ref).toBeUndefined()
   })
 
-  it('does not let a malformed handle take out the rest of the parse', () => {
-    expect(() => parseElicitationParams({ i: '' })).not.toThrow()
-    expect(parseElicitationParams({ i: '' }).handle).toBeUndefined()
+  it('keeps the secret name exactly as minted', () => {
+    expect(parseElicitationParams({ ref: 'abc', name: 'my.weird-Name_1' }).name).toBe(
+      'my.weird-Name_1'
+    )
+  })
+
+  it('rejects a blank secret name', () => {
+    expect(parseElicitationParams({ ref: 'abc', name: '   ' }).name).toBeUndefined()
+    expect(parseElicitationParams({ ref: 'abc', name: '' }).name).toBeUndefined()
+  })
+
+  it('mirrors the platform length limit', () => {
+    expect(parseElicitationParams({ ref: 'abc', name: 'a'.repeat(256) }).name).toHaveLength(256)
+    expect(parseElicitationParams({ ref: 'abc', name: 'a'.repeat(257) }).name).toBeUndefined()
+  })
+
+  it('mirrors the platform ban on the SUPABASE_ prefix', () => {
+    expect(parseElicitationParams({ ref: 'abc', name: 'SUPABASE_ANON_KEY' }).name).toBeUndefined()
+    expect(parseElicitationParams({ ref: 'abc', name: 'MY_SUPABASE_KEY' }).name).toBe(
+      'MY_SUPABASE_KEY'
+    )
+  })
+
+  it('does not let one malformed param take out the other', () => {
+    const params = parseElicitationParams({ ref: 'abc', name: 'SUPABASE_ANON_KEY' })
+
+    expect(params.ref).toBe('abc')
+    expect(params.name).toBeUndefined()
+  })
+
+  it('never surfaces the reserved handle param', () => {
+    // `i` belongs to the stateful handoff (AI-1170) and must stay unread here.
+    expect(parseElicitationParams({ ref: 'abc', name: 'KEY', i: 'handle' })).not.toHaveProperty('i')
   })
 })
 
-describe('buildElicitationReturnTo', () => {
-  it('carries the handle back so a sign-in round trip resumes the same request', () => {
-    expect(buildElicitationReturnTo('abc123')).toBe('/mcp_callback?i=abc123')
-  })
-
-  it('escapes handles that are not URL-safe', () => {
-    expect(buildElicitationReturnTo('a b&c')).toBe('/mcp_callback?i=a+b%26c')
-  })
-
-  it('returns a bare path when there is no handle to preserve', () => {
-    expect(buildElicitationReturnTo(undefined)).toBe('/mcp_callback')
-  })
-
-  it('only ever emits a same-origin relative path', () => {
-    expect(buildElicitationReturnTo('//evil.example.com')).toBe(
-      '/mcp_callback?i=%2F%2Fevil.example.com'
+describe('buildElicitationSignInPath', () => {
+  it('keeps the elicitation params as siblings of returnTo', () => {
+    // `validateReturnTo` restricts the charset of `returnTo` itself, so an
+    // embedded query string would be dropped on the way back.
+    expect(buildElicitationSignInPath({ ref: 'abc', name: 'OPENAI_API_KEY' })).toBe(
+      '/sign-in?returnTo=%2Fmcp_callback&ref=abc&name=OPENAI_API_KEY'
     )
+  })
+
+  it('percent-encodes names that are not URL-safe', () => {
+    expect(buildElicitationSignInPath({ ref: 'abc', name: 'a b&c' })).toBe(
+      '/sign-in?returnTo=%2Fmcp_callback&ref=abc&name=a+b%26c'
+    )
+  })
+
+  it('omits params it does not have', () => {
+    expect(buildElicitationSignInPath({ ref: undefined, name: undefined })).toBe(
+      '/sign-in?returnTo=%2Fmcp_callback'
+    )
+  })
+})
+
+describe('the ?state= override', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    vi.resetModules()
+  })
+
+  it('is inert unless the build opted in', async () => {
+    // Vitest runs with `NODE_ENV=test` and no `NEXT_PUBLIC_ENVIRONMENT`, which is
+    // the production shape of the gate. A production bundle must ignore `state`.
+    expect(
+      parseElicitationParams({ ref: 'abc', name: 'KEY', state: 'stored' }).dev.state
+    ).toBeUndefined()
+  })
+
+  it('drives the screen in local and staging builds', async () => {
+    vi.stubEnv('NEXT_PUBLIC_ENVIRONMENT', 'staging')
+    vi.resetModules()
+
+    const { parseElicitationParams: parseWithOverrides } = await import('./McpElicitation.params')
+
+    expect(parseWithOverrides({ ref: 'abc', name: 'KEY', state: 'stored' }).dev.state).toBe(
+      'stored'
+    )
+    expect(
+      parseWithOverrides({ ref: 'abc', name: 'KEY', state: 'nonsense' }).dev.state
+    ).toBeUndefined()
   })
 })
