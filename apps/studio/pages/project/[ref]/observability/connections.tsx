@@ -107,7 +107,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
             <Tooltip>
               <TooltipTrigger className="flex items-center">
                 <Badge variant="success">
-                  <span className="h-1.5 w-1.5 bg-brand rounded-full animate-pulse" />
+                  <span className="h-1.5 w-1.5 bg-brand-default rounded-full animate-pulse" />
                   <span>Live</span>
                 </Badge>
               </TooltipTrigger>

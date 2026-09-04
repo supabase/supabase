@@ -97,9 +97,8 @@ function FloatingTableOfContents({
                       href={`#chapter-${chapterIndex + 1}`}
                       onClick={() => setIsTocOpen(false)}
                       className={cn(
-                        'block px-6 py-2 text-xs transition-colors font-mono uppercase tracking-wider text-center text-foreground-light hover:text-brand-link hover:bg-brand-300/25',
-                        chapterIndex + 1 === activeChapter &&
-                          'bg-brand-300/40 text-brand-link dark:text-brand'
+                        'block px-6 py-2 text-xs transition-colors font-mono uppercase tracking-wider text-center text-foreground-light hover:text-brand hover:bg-brand-300/25',
+                        chapterIndex + 1 === activeChapter && 'bg-brand-300/40 text-brand'
                       )}
                     >
                       {chapter.shortTitle}
@@ -227,7 +226,7 @@ export default function StateOfStartups2026Content() {
                 <li key={chapterIndex + 1}>
                   <Link
                     href={`#chapter-${chapterIndex + 1}`}
-                    className="group flex flex-row gap-5 py-3 pl-7 pr-8 font-mono uppercase tracking-wide text-sm transition-all text-foreground-light hover:text-brand-link hover:bg-brand-300/25"
+                    className="group flex flex-row gap-5 py-3 pl-7 pr-8 font-mono uppercase tracking-wide text-sm transition-all text-foreground-light hover:text-brand hover:bg-brand-300/25"
                   >
                     <span className="text-xs rounded-full bg-surface-75 border border-surface-200 group-hover:border-brand-500/40 w-5 h-5 flex items-center justify-center group-hover:bg-brand-600/5">
                       {chapterIndex + 1}

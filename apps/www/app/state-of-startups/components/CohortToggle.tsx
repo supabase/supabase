@@ -29,7 +29,7 @@ export function CohortToggle({ eyebrow, options, value, onValueChange }: CohortT
               onClick={() => onValueChange(option.label)}
               className={`px-3 py-1 text-xs font-mono uppercase tracking-wider border rounded-full transition-colors ${
                 isActive
-                  ? 'border-brand-500/40 bg-brand-300/40 text-brand-link dark:text-brand'
+                  ? 'border-brand-500/40 bg-brand-300/40 text-brand'
                   : 'border-overlay text-foreground-light hover:text-foreground hover:bg-surface-100'
               }`}
             >

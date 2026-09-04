@@ -46,7 +46,7 @@ export const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDel
           <p className="text-xs text-foreground-light">Active custom domain:</p>
           <div className="flex items-center space-x-2">
             <code className="text-lg mx-0 flex items-center space-x-2">
-              <div className="h-2 w-2 rounded-full bg-brand" />
+              <div className="h-2 w-2 rounded-full bg-brand-default" />
               <span>
                 <code className="text-code-inline">{customDomain.hostname}</code>
               </span>

@@ -177,7 +177,9 @@ function DatabaseChangesSkeleton() {
                     key={msg.id}
                     className={cn(
                       'transition-colors duration-500',
-                      tableFlashId === msg.id ? 'bg-brand/15 dark:bg-brand/5' : 'bg-surface-75'
+                      tableFlashId === msg.id
+                        ? 'bg-brand-default/15 dark:bg-brand-default/5'
+                        : 'bg-surface-75'
                     )}
                   >
                     <td className="border-b border-r border-default px-3 py-1.5 text-foreground-muted text-xs truncate max-w-0">
@@ -245,9 +247,9 @@ function DatabaseChangesSkeleton() {
                     className={cn(
                       'max-w-[75%] px-3 py-1.5 rounded-xl text-xs leading-snug transition-colors duration-500',
                       isAlice
-                        ? 'bg-brand/15 text-foreground rounded-br-sm'
+                        ? 'bg-brand-default/15 text-foreground rounded-br-sm'
                         : 'bg-surface-300 text-foreground rounded-bl-sm',
-                      chatFlashId === msg.id && 'ring-1 ring-brand/30'
+                      chatFlashId === msg.id && 'ring-1 ring-brand-default/30'
                     )}
                   >
                     {msg.text}
@@ -626,7 +628,7 @@ function BroadcastSkeleton() {
             key={i}
             className={cn(
               'absolute bottom-6 z-10 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-xl border bg-surface-100 shadow-xs dark:shadow-sm transition-all duration-300',
-              isFlashing ? 'border-brand text-brand' : 'border-border text-foreground-muted'
+              isFlashing ? 'border-brand-default text-brand' : 'border-border text-foreground-muted'
             )}
             style={{ left: `${xPercent}%` }}
           >

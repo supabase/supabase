@@ -332,7 +332,7 @@ export const ServiceStatus = () => {
                         (isProjectNew && service.status !== 'ACTIVE_HEALTHY')
                         ? 'bg-foreground-lighter animate-pulse'
                         : service.status === 'ACTIVE_HEALTHY'
-                          ? 'bg-brand'
+                          ? 'bg-brand-default'
                           : 'bg-selection'
                     )}
                   />

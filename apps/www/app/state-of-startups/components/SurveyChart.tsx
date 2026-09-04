@@ -25,8 +25,8 @@ interface SurveyChartProps {
   maxBars?: number
 }
 
-const accentBarFg = 'bg-brand'
-const accentBarText = 'text-brand-link dark:text-brand'
+const accentBarFg = 'bg-brand-default'
+const accentBarText = 'text-brand'
 
 export function SurveyChart({
   title,

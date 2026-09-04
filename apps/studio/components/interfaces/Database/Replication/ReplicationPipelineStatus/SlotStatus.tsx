@@ -122,7 +122,7 @@ export const SlotConnectionIndicator = ({
           <span
             className={cn(
               'h-1.5 w-1.5 rounded-full shrink-0',
-              isActive ? 'bg-brand' : 'bg-foreground-muted'
+              isActive ? 'bg-brand-default' : 'bg-foreground-muted'
             )}
           />
           {isActive ? 'Connected' : 'Not connected'}

@@ -499,7 +499,7 @@ export const TableList = ({
                             (table) => table.id === x.id
                           ) ? (
                             <div className="flex items-center gap-x-2">
-                              <Check size={16} strokeWidth={2} className="text-brand-link" />
+                              <Check size={16} strokeWidth={2} className="text-brand" />
                               <p className="text-foreground-light">Enabled</p>
                             </div>
                           ) : (

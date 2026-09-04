@@ -138,7 +138,12 @@ export function SupportFormStatusButton() {
             isLoading ? (
               <Loader2 className="animate-spin" />
             ) : (
-              <div className={cn('h-2 w-2 rounded-full', isIncident ? 'bg-warning' : 'bg-brand')} />
+              <div
+                className={cn(
+                  'h-2 w-2 rounded-full',
+                  isIncident ? 'bg-warning' : 'bg-brand-default'
+                )}
+              />
             )
           }
         >

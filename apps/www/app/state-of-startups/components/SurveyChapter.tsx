@@ -56,9 +56,7 @@ export function SurveyChapter({
             {/* Text content */}
             <div className="max-w-240 mx-auto grid gap-y-4 sm:gap-y-8 grid-cols-1 md:grid-cols-3 text-balance pb-12">
               <div className="md:col-span-2 flex flex-col gap-4 px-8">
-                <p
-                  className={`text-sm uppercase font-mono text-balance tracking-wider text-brand-link`}
-                >
+                <p className={`text-sm uppercase font-mono text-balance tracking-wider text-brand`}>
                   {shortTitle}
                 </p>
                 <h2 className="text-4xl md:text-5xl xl:text-6xl text-balance leading-tight tracking-tight">

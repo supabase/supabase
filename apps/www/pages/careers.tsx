@@ -149,9 +149,9 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
               return (
                 <div
                   key={i}
-                  className="border-t mt-6 mx-2 md:mx-2 md:mt-0 md:border-0 border-brand w-[134px] md:max-w-none"
+                  className="border-t mt-6 mx-2 md:mx-2 md:mt-0 md:border-0 border-brand-default w-[134px] md:max-w-none"
                 >
-                  <div className="hidden md:block border-t lg:border-t-2 border-brand w-[60px] lg:w-[100px]"></div>
+                  <div className="hidden md:block border-t lg:border-t-2 border-brand-default w-[60px] lg:w-[100px]"></div>
                   <h2 className="text-3xl lg:text-4xl pt-3 tracking-[-1px]">{company.number}</h2>
 
                   <div className="text-foreground-light text-sm lg:text-base">
@@ -188,7 +188,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   to stay connected to our team, and our community.
                 </p>
                 <div className="max-w-[300px] sm:max-w-md md:max-w-md mt-20">
-                  <div className="border-t-2 border-brand w-4/12"></div>
+                  <div className="border-t-2 border-brand-default w-4/12"></div>
                   <h2 className="text-2xl sm:text-3xl md:text-4xl pt-2 tracking-[-1px]">
                     We deeply believe in the efficacy of collaborative open source
                   </h2>

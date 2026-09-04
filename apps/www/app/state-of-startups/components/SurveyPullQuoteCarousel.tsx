@@ -120,7 +120,7 @@ export function SurveyPullQuoteCarousel({ quotes }: { quotes: CarouselPullQuote[
                 }}
               >
                 <div
-                  className="absolute inset-0 pointer-events-none bg-brand"
+                  className="absolute inset-0 pointer-events-none bg-brand-default"
                   style={{
                     maskImage: 'url("/images/state-of-startups/pattern-checker.svg")',
                     maskSize: '4px',

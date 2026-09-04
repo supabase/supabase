@@ -377,7 +377,7 @@ export function SurveyChart({
                         className={`mb-2 flex flex-row justify-between text-sm font-mono uppercase tracking-widest tabular-nums transition-colors duration-300 ${
                           shouldAnimateBars
                             ? item.value === maxValue
-                              ? 'text-brand-link dark:text-brand'
+                              ? 'text-brand'
                               : 'text-foreground'
                             : 'text-foreground-muted'
                         }`}
@@ -418,7 +418,7 @@ export function SurveyChart({
                         >
                           {/* Foreground pattern for the filled portion */}
                           <div
-                            className={`absolute inset-0 pointer-events-none ${item.value === maxValue ? 'bg-brand' : 'bg-foreground-light'}`}
+                            className={`absolute inset-0 pointer-events-none ${item.value === maxValue ? 'bg-brand-default' : 'bg-foreground-light'}`}
                             style={{
                               maskImage: 'url("/images/state-of-startups/pattern-checker.svg")',
                               maskSize: '4px',

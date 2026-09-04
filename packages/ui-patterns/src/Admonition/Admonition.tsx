@@ -46,7 +46,7 @@ export const Admonition = forwardRef<
           'overflow-hidden',
           layout === 'responsive' && '@container',
           type === 'success' && [
-            'bg-brand-400/15 dark:bg-brand/10',
+            'bg-brand-400/15 dark:bg-brand-default/10',
             'border-brand-400 dark:border-brand-500',
           ],
           className

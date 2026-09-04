@@ -33,7 +33,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
       {isActive && (
         <motion.div
           className={[
-            'absolute inset-0 w-full right-full bg-brand h-full transition-opacity',
+            'absolute inset-0 w-full right-full bg-brand-default h-full transition-opacity',
             progress! > 99.7 ? 'opacity-0' : 'opacity-100',
           ].join(' ')}
           style={{ x: `${progress! - 100}%` }}

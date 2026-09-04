@@ -26,7 +26,7 @@ export const ResourceGroupSection = ({
           ) : (
             group.badge && (
               <Badge variant="success" className="gap-x-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand" />
+                <span className="h-1.5 w-1.5 rounded-full bg-brand-default" />
                 {group.badge}
               </Badge>
             )

@@ -148,7 +148,9 @@ export const UtilityActions = ({
                   size={14}
                   strokeWidth={2}
                   className={
-                    isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
+                    isFavorite
+                      ? 'fill-brand-default stroke-none'
+                      : 'fill-none stroke-foreground-light'
                   }
                 />
                 {isFavorite ? 'Remove from' : 'Add to'} favorites
@@ -207,7 +209,7 @@ export const UtilityActions = ({
                   size="tiny"
                   onClick={removeFavorite}
                   className="px-1"
-                  icon={<Heart className="fill-brand stroke-none" />}
+                  icon={<Heart className="fill-brand-default stroke-none" />}
                   aria-label="Remove from favorites"
                 />
               ) : (

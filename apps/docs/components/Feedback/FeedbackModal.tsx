@@ -94,7 +94,7 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
                     href="https://supabase.com/dashboard/support/new"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-brand-link hover:underline"
+                    className="text-brand hover:underline"
                   >
                     support request
                   </a>

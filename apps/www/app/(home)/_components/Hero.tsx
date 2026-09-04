@@ -18,7 +18,7 @@ export function Hero() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
           <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none">
             <span className="block">Build in a weekend</span>
-            <span className="text-brand block">Scale to millions</span>
+            <span className="text-brand sm:text-brand-display block">Scale to millions</span>
           </h1>
           <p className="text-foreground-lighter text-balance">
             Start your project with a Postgres database. Add Authentication, Data APIs, Edge
