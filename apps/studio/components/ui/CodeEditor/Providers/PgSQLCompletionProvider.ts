@@ -201,7 +201,8 @@ function defaultScenarioSuggestions(monaco: any, pgInfoRef: RefObject<any>) {
       items.push({
         label: x.name,
         kind: monaco.languages.CompletionItemKind.Function,
-        detail: x.return_type,
+        // Procedures have no return type, and monaco expects `string | undefined`.
+        detail: x.return_type ?? undefined,
         insertText: x.name,
       })
     })
