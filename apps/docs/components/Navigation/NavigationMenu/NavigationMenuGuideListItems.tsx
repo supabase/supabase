@@ -1,4 +1,8 @@
-import { ChevronDown } from 'lucide-react'
+import {
+  NavSectionCaret,
+  NavSectionContent,
+  NavSectionList,
+} from '~/components/Navigation/NavSection'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
@@ -43,11 +47,13 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
   const { resolvedTheme } = useTheme()
   const activeItem = props.subItem.url === pathname
   const activeItemRef = useRef<HTMLLIElement>(null)
-  const hasChildren = props.subItem.items && props.subItem.items.length > 0
+  const childItems = props.subItem.items ?? []
+  const enabledChildren = childItems.filter((child) => child.enabled !== false)
+  const hasChildren = enabledChildren.length > 0
 
-  const isChildActive =
-    hasChildren &&
-    props.subItem.items.some((child: NavAccordionItem) => hasActiveDescendant(child, pathname))
+  const isChildActive = enabledChildren.some((child: NavAccordionItem) =>
+    hasActiveDescendant(child, pathname)
+  )
 
   const LinkContainer = (props) => {
     const isExternal = props.url.startsWith('https://')
@@ -73,6 +79,9 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
       }, 0)
     }
   })
+
+  if (!hasChildren && !props.subItem.url) return null
+
   return (
     <li ref={!hasChildren && activeItem ? activeItemRef : null}>
       {hasChildren ? (
@@ -87,9 +96,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               className={[
                 'flex items-center gap-2 w-full',
                 'cursor-pointer transition text-sm',
-                activeItem
-                  ? 'text-brand-link font-medium'
-                  : 'hover:text-foreground text-foreground-lighter',
+                'hover:text-foreground text-foreground-lighter',
               ].join(' ')}
             >
               <span className="flex items-center justify-between w-full">
@@ -104,35 +111,41 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                   )}
                   {props.subItem.name}
                 </div>
-                <ChevronDown className="w-4 h-4 transition-transform data-open-parent:rotate-180" />
+                <NavSectionCaret />
               </span>
             </Accordion.Trigger>
-            <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
-              <ul>
-                {props.subItem.items
-                  .filter((subItem) => subItem.enabled !== false)
-                  .map((subSubItem) => {
-                    if (subSubItem.items && subSubItem.items.length > 0) {
-                      return <ContentAccordionLink key={subSubItem.name} subItem={subSubItem} />
+            <Accordion.Content asChild>
+              <NavSectionContent>
+                <NavSectionList>
+                  {enabledChildren.map((child) => {
+                    if (child.items && child.items.length > 0) {
+                      return <ContentAccordionLink key={child.name} subItem={child} />
                     }
 
                     return (
-                      <li key={`${props.subItem.name}-${subSubItem.url}`}>
+                      <li key={`${props.subItem.name}-${child.url}`}>
                         <Link
-                          href={`${subSubItem.url}`}
+                          href={child.url}
                           className={[
-                            'cursor-pointer transition text-sm',
-                            subSubItem.url === pathname
+                            'relative block py-1.25 cursor-pointer transition text-sm',
+                            child.url === pathname
                               ? 'text-brand-link'
                               : 'hover:text-brand-link text-foreground-lighter',
                           ].join(' ')}
                         >
-                          {subSubItem.name}
+                          {child.url === pathname && (
+                            <span
+                              aria-hidden
+                              className="absolute left-[-13px] top-1/2 h-[1em] w-px -translate-y-1/2 bg-current"
+                            />
+                          )}
+                          {child.name}
                         </Link>
                       </li>
                     )
                   })}
-              </ul>
+                </NavSectionList>
+              </NavSectionContent>
             </Accordion.Content>
           </Accordion.Item>
         </Accordion.Root>
@@ -205,31 +218,33 @@ const Content = (props) => {
       </Link>
 
       <ul data-testid="docs-guide-navigation-list" className="flex flex-col gap-0">
-        {menu.items.map((x) => {
-          if (x.enabled === false) return null
+        {menu.items.map((entry) => {
+          if (entry.enabled === false) return null
 
-          if (x.items && x.items.length > 0) {
-            const enabledItems = x.items.filter((item) => item.enabled !== false)
+          if (entry.items && entry.items.length > 0) {
+            const enabledItems = entry.items.filter((item) => item.enabled !== false)
             if (enabledItems.length === 0) return null
 
             return (
-              <li key={x.name}>
+              <li key={entry.name}>
                 <div className="flex flex-col gap-2.5">
                   <div className="h-px w-full bg-border my-3"></div>
                   <span className="font-mono text-xs uppercase text-foreground font-medium tracking-wider">
-                    {x.name}
+                    {entry.name}
                   </span>
                   <ul className="flex flex-col gap-2.5">
-                    {enabledItems.map((subItem) => {
-                      return <ContentAccordionLink key={subItem.name} subItem={subItem} />
-                    })}
+                    {enabledItems.map((subItem) => (
+                      <ContentAccordionLink key={subItem.name} subItem={subItem} />
+                    ))}
                   </ul>
                 </div>
               </li>
             )
           }
 
-          return x.url ? <ContentLink url={x.url} icon={x.icon} name={x.name} key={x.name} /> : null
+          return entry.url ? (
+            <ContentLink url={entry.url} icon={entry.icon} name={entry.name} key={entry.name} />
+          ) : null
         })}
       </ul>
     </div>
