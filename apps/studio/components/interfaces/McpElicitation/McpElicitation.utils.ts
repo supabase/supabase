@@ -149,5 +149,5 @@ export function getSecretPrefixWarning(
   const prefix = providerHint?.prefix
   if (!prefix || value.length === 0 || value.startsWith(prefix)) return undefined
 
-  return `${providerHint.name} keys usually start with ${prefix}. You can still store this one.`
+  return `${providerHint.name} keys usually start with ${prefix}. You can still save this one.`
 }

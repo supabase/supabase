@@ -180,7 +180,7 @@ describe('getSecretPrefixWarning', () => {
 
   it('softly flags a mismatch without blocking the store', () => {
     expect(getSecretPrefixWarning('sk-abc123', request.providerHint)).toBe(
-      'Resend keys usually start with re_. You can still store this one.'
+      'Resend keys usually start with re_. You can still save this one.'
     )
   })
 })

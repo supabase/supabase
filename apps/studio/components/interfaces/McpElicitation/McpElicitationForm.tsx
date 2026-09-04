@@ -139,14 +139,14 @@ export const McpElicitationForm = ({
             {prefixWarning && <p className="text-xs text-warning-600">{prefixWarning}</p>}
           </div>
 
-          {/* Storing stays enabled: replacing the key is usually the point. */}
+          {/* Saving stays enabled: replacing the key is usually the point. */}
           {overwriteWarning && (
             <Admonition type="warning" description={overwriteWarning} className="mb-0" />
           )}
 
           <div className="flex flex-col gap-2">
             <Button block variant="primary" type="submit" loading={isSaving} disabled={isSaving}>
-              {isSaving ? 'Storing...' : 'Store'}
+              {isSaving ? 'Saving...' : 'Save'}
             </Button>
             <Button block variant="text" type="button" disabled={isSaving} onClick={onCancel}>
               Cancel
