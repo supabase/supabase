@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { toast } from 'sonner'
 
+import { MCP_ELICITATION_ROUTE } from '@/components/interfaces/McpElicitation/McpElicitation.constants'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
@@ -38,6 +39,10 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     // this is used by database.dev, usually as /new/new-project
     '/new/[slug]',
     '/join',
+    // Standalone interstitial that takes `?ref=` for a project it may legitimately
+    // have no access to. It renders its own recovery screen, so a redirect here
+    // would replace an actionable message with a bare toast.
+    MCP_ELICITATION_ROUTE,
   ]
 
   /**
