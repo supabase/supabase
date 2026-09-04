@@ -3,7 +3,7 @@
   "type": "registry:block",
   "title": "Social Auth flow for TanStack and Supabase",
   "description": "Social Auth flow for TanStack and Supabase",
-  "registryDependencies": ["button", "card"],
+  "registryDependencies": ["button", "card", "https://supabase.com/library/r/safe-next-path.json"],
   "dependencies": ["@supabase/ssr@latest"],
   "files": [
     {

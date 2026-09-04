@@ -193,7 +193,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     name="newNamespace"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="newNamespace" label="Name of new namespace">
+                      <FormItemLayout label="Name of new namespace">
                         <FormControl>
                           <Input {...field} placeholder="Provide a name for your new namespace" />
                         </FormControl>
@@ -211,7 +211,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     name="name"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="name" label="Name of table">
+                      <FormItemLayout label="Name of table">
                         <FormControl>
                           <Input {...field} placeholder="Provide a name for your new table" />
                         </FormControl>

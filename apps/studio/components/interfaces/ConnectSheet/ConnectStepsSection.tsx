@@ -210,6 +210,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
   const { ref } = useParams()
   const stepsContainerRef = useRef<HTMLDivElement | null>(null)
   const deploymentMode = useDeploymentMode()
+  const isHighAvailability = useIsHighAvailability()
   const connectionStringPooler = useConnectionStringPooler(deploymentMode)
 
   const { data: ipv4Addon } = useProjectAddonsQuery(
@@ -227,6 +228,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
     connectionMethod: state.connectionMethod,
     useSharedPooler: state.useSharedPooler,
     hasIpv4Addon: !!ipv4Addon,
+    isHighAvailability,
   })
   const showSessionPoolerNotice = shouldShowSessionPoolerNotice({
     isPlatform: deploymentMode.isPlatform,

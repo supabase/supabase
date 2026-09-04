@@ -86,7 +86,11 @@ export function findTrustedPartnerByRedirectUri(
   )
 }
 
-export function findTrustedPartnerByName(name: string): TrustedOAuthPartner | null {
+export function findTrustedPartnerByName(
+  name: string | null | undefined
+): TrustedOAuthPartner | null {
+  if (!name) return null
+
   const searchable = name.toLowerCase()
   return (
     TRUSTED_OAUTH_PARTNERS.find((partner) =>
@@ -154,7 +158,7 @@ export function getOAuthImpersonationWarning({
   name,
   redirectUri,
 }: {
-  name: string
+  name: string | null | undefined
   redirectUri: string | null | undefined
 }): OAuthImpersonationWarning | null {
   const namedPartner = findTrustedPartnerByName(name)
@@ -170,5 +174,24 @@ export function getOAuthImpersonationWarning({
   return {
     brandDisplayName: namedPartner.displayName,
     redirectHost: hostname,
+  }
+}
+
+type SortOrder = 'asc' | 'desc'
+
+export const parseSort = <C extends string>(sort: string): [C, SortOrder] => {
+  return sort.split(':') as [C, SortOrder]
+}
+
+export const toggleSort = <S extends string>(
+  currentSort: S,
+  column: string,
+  setSort: (sort: S) => void
+) => {
+  const [currentColumn, currentOrder] = parseSort(currentSort)
+  if (currentColumn === column) {
+    setSort(`${column}:${currentOrder === 'asc' ? 'desc' : 'asc'}` as S)
+  } else {
+    setSort(`${column}:asc` as S)
   }
 }

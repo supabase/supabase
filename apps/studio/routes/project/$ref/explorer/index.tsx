@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { ExplorerHome } from '@/components/interfaces/Explorer/ExplorerHome'
+import ProjectExplorerPage from '@/pages/project/[ref]/explorer'
 
 export const Route = createFileRoute('/project/$ref/explorer/')({
   component: ProjectExplorerIndexRoute,
 })
 
 function ProjectExplorerIndexRoute() {
-  return <ExplorerHome />
+  return <ProjectExplorerPage dehydratedState={undefined} />
 }

@@ -119,7 +119,7 @@ functions:
     description: |
       Creates a new user.
     notes: |
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
+      - By default, the user needs to verify their email address before signing in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
@@ -138,7 +138,7 @@ functions:
   - id: sign-in-with-password
     title: 'SignIn(email, password)'
     description: |
-      Log in an existing user using email or phone number with password.
+      Sign in an existing user using email or phone number with password.
     notes: |
       - Requires either an email and password or a phone number and password.
     examples:
@@ -215,7 +215,7 @@ functions:
   - id: sign-out
     title: 'SignOut()'
     description: |
-      Signs out the current user, if there is a logged in user.
+      Signs out the current user, if there is a signed-in user.
     notes: |
       - In order to use the `SignOut()` method, the user needs to be signed in first.
     examples:
@@ -254,9 +254,9 @@ functions:
   - id: get-user
     title: 'CurrentUser'
     description: |
-      Returns the user data, if there is a logged in user.
+      Returns the user data, if there is a signed-in user.
     examples:
-      - name: Get the logged in user
+      - name: Get the signed-in user
         isSpotlight: true
         code: |
           ```c#
@@ -265,7 +265,7 @@ functions:
   - id: update-user
     title: 'UpdateUser()'
     description: |
-      Updates user data, if there is a logged in user.
+      Updates user data, if there is a signed-in user.
     notes: |
       - In order to use the `UpdateUser()` method, the user needs to be signed in first.
       - By Default, email updates sends a confirmation link to both the user's current and new email.

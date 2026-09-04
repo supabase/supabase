@@ -16,6 +16,7 @@ import {
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
@@ -65,6 +66,8 @@ export const SignInLayout = ({
   const ongoingIncident = useFlag('ongoingIncident')
 
   const { destination, focusProvider } = useInboundBranding(inboundFlow)
+  const { dashboardAuthLogoLinkUrl } = useCustomContent(['dashboard_auth:logo_link_url'])
+  const marketingSiteUrl = dashboardAuthLogoLinkUrl ?? 'https://supabase.com'
 
   // Addresses hydration issue with `resolvedTheme` as its undefined during SSR and the first (hydrating) client render
   const [mounted, setMounted] = useState(false)
@@ -204,7 +207,7 @@ export const SignInLayout = ({
           <nav className="relative flex items-center justify-between sm:h-10">
             <div className="flex items-center grow shrink-0 lg:grow-0">
               <div className="flex items-center justify-between w-full md:w-auto">
-                <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/organizations'}>
+                <Link href={logoLinkToMarketingSite ? marketingSiteUrl : '/organizations'}>
                   <img
                     src={
                       mounted && resolvedTheme?.includes('dark')
