@@ -141,6 +141,7 @@ type QueryEditorProps = {
   onRowLimitChange?: (val: number) => void
   onDisplayChange?: (display: QueryDisplay) => void
   onRun?: () => void
+  /** Receives the "Debug with Assistant" prompt on error. Defaults to opening a new assistant chat. */
   onDebug?: (prompt: string) => void
 }
 

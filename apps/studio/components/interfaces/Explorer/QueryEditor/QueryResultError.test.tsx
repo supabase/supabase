@@ -105,7 +105,7 @@ describe('QueryResultError', () => {
     )
   })
 
-  it('calls onDebug with the prompt instead of opening a new chat when provided', () => {
+  it('hands the debug prompt to onDebug instead of opening a new chat', () => {
     const onDebug = vi.fn()
 
     customRender(
@@ -120,6 +120,7 @@ describe('QueryResultError', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Debug with Assistant' }))
 
     expect(onDebug).toHaveBeenCalledWith(expect.stringContaining('select * from foo;'))
+    expect(onDebug.mock.calls[0][0]).toContain('relation "foo" does not exist')
     expect(mocks.createChat).not.toHaveBeenCalled()
   })
 

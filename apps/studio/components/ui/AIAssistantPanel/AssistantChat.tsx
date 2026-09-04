@@ -8,6 +8,7 @@ import { Eraser, Pencil, X } from 'lucide-react'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import type { StickToBottomContext } from 'use-stick-to-bottom'
 
 import { AlertError } from '../AlertError'
 import { ButtonTooltip } from '../ButtonTooltip'
@@ -121,6 +122,7 @@ export const AssistantChat = ({
 
   // Add a ref to store the last user message
   const lastUserMessageRef = useRef<MessageType | null>(null)
+  const conversationRef = useRef<StickToBottomContext>(null)
 
   const [value, setValue] = useState<string>(composerContext?.initialInput || '')
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
@@ -388,6 +390,8 @@ export const AssistantChat = ({
       },
     })
     setValue('')
+    // Re-lock stick-to-bottom in case the user sent this from mid-thread (e.g. "Debug with Assistant").
+    conversationRef.current?.scrollToBottom()
 
     if (finalContent.includes('Help me to debug')) {
       track('assistant_debug_submitted', { chatId })
@@ -476,7 +480,7 @@ export const AssistantChat = ({
           aiOptInLevel,
         })}
         {hasMessages ? (
-          <Conversation className={cn('flex-1')}>
+          <Conversation className={cn('flex-1')} contextRef={conversationRef}>
             <ConversationContent className="w-full px-7 py-8 mb-10">
               {renderedMessages}
               <div className="w-full max-w-3xl mx-auto">
@@ -540,7 +544,7 @@ export const AssistantChat = ({
                 )}
 
                 <p className="text-center text-xs text-foreground-muted mt-6">
-                  The Assistant can make mistakes. Double check responses.
+                  Assistant can make mistakes. Double check responses.
                 </p>
               </div>
             </ConversationContent>

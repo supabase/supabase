@@ -12,6 +12,7 @@ import {
 } from './AssistantQueryCell.utils'
 import { Confirm } from './Confirm'
 import { type ConfirmFooterApprovalState } from './Confirm.utils'
+import { useMessageActionsContext } from './Message.Context'
 import { QueryEditor } from '@/components/interfaces/Explorer/QueryEditor'
 import { type QueryDisplay, type QueryResult } from '@/components/interfaces/Explorer/types'
 import {
@@ -19,7 +20,6 @@ import {
   type QuerySourceTag,
 } from '@/data/query-sources/query-source-registry'
 import { useTrack } from '@/lib/telemetry/track'
-import { useAiAssistantState } from '@/state/ai-assistant-state'
 import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state'
 
 interface AssistantQueryCellProps {
@@ -73,7 +73,8 @@ export const AssistantQueryCell = ({
 }: AssistantQueryCellProps) => {
   const track = useTrack()
   const roleImpersonationState = useLocalRoleImpersonationState()
-  const aiAssistantState = useAiAssistantState()
+  // "Debug with Assistant" continues the current thread rather than opening a new chat.
+  const { onSendMessage } = useMessageActionsContext()
 
   const fallbackTitle =
     initialTitle?.trim() ||
@@ -184,7 +185,7 @@ export const AssistantQueryCell = ({
         }
         onDisplayChange={handleDisplayChange}
         onRun={handleRun}
-        onDebug={aiAssistantState.setInitialInput}
+        onDebug={onSendMessage}
       />
     </Confirm>
   )

@@ -218,13 +218,15 @@ export const MarkdownPre = ({
   const cleanContent = rawContent.replace(/(?:--|\/\/)\s*props:\s*\{[^}]+\}/, '').trim()
 
   const toolCallId = String(snippetId ?? id)
+  const isQueryCell = language === 'sql' && !readOnly
 
   if (!codeElement) {
     return <pre className="w-auto overflow-x-auto not-prose my-4">{children}</pre>
   }
 
   return (
-    <div className="w-auto overflow-x-hidden not-prose my-4 ">
+    // `data-wide` lets the parent text part give query cells the full column width.
+    <div className="w-auto overflow-x-hidden not-prose my-4" data-wide={isQueryCell || undefined}>
       {language === 'edge' ? (
         <EdgeFunctionBlock
           label={title}
