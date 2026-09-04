@@ -55,6 +55,7 @@ jobs:
               - 'apps/docs/content/guides/**/*.mdx'
               - 'apps/docs/content/troubleshooting/**/*.mdx'
               - 'apps/docs/content/_partials/**'
+              - 'apps/docs/components/Navigation/NavigationMenu/NavigationMenuGuideListItems.tsx'
               - 'e2e/docs/**'
               - 'e2e/shared/**'
               - 'pnpm-lock.yaml'
