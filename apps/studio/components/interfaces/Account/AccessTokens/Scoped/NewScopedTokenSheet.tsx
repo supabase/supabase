@@ -106,10 +106,12 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
   // as we need to make sure they copied the new token first
   const handleOpenChange = (open: boolean, isSafe = false) => {
     if (open === false && step === 'success' && !isSafe) return
-    track('access_token_creation_sheet_closed', {
-      tokenType: 'scoped',
-      step,
-    })
+    if (open === false) {
+      track('access_token_creation_sheet_closed', {
+        tokenType: 'scoped',
+        step,
+      })
+    }
     setStep('form')
     setIsOpen(open)
   }
