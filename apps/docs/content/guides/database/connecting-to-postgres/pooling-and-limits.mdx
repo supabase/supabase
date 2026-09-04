@@ -1,0 +1,108 @@
+---
+title: 'Connection pooling and limits'
+description: 'How connection pooling works, and the limits that apply to your connections'
+subtitle: 'How Supabase pools database connections, and the limits that apply to them.'
+---
+
+Learn how to choose between connection modes, size a pool, and work out why you're running out of connections. To get connected, see [Connect to your database](/docs/guides/database/connecting-to-postgres).
+
+## How connection pooling works [#how-connection-pooling-works]
+
+Connection pooling improves database performance by reusing existing connections between queries. This reduces the overhead of establishing connections and improves scalability.
+
+A Postgres connection is a long-lived session. Once established, it stays open until the client disconnects, or until the server or the network closes it. A server might make a single 10 ms query but hold its database connection for seconds or longer.
+
+A pooler sits between clients and the database and shares a small set of database connections across many clients, so a connection isn't tied up while a client sits idle.
+
+<Image
+  alt="A direct connection reserves one database connection per client. A connection pooler shares a smaller set of database connections across many clients."
+  src={{
+    dark: '/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works.png',
+    light:
+      '/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works--light.png',
+  }}
+  width={1851}
+  height={907}
+  caption="Connecting to the database directly compared with using a connection pooler"
+/>
+
+### Application-side and server-side poolers [#application-side-poolers]
+
+There are two kinds, and they work together.
+
+**Application-side poolers** are built into connection libraries and API servers, such as Prisma, SQLAlchemy, and Postgres.js. They keep a few connections open and reuse them. On a persistent backend, such as a long-running container or VM, an application-side pooler is enough on its own.
+
+**Server-side poolers**, such as Supavisor in transaction mode, run in front of the database and serve many clients. Use one when connections come from serverless or edge functions, or from anything that scales horizontally. These environments open many short-lived connections, which is the case an application-side pooler can't cover.
+
+For more on when each is needed and how to size them, see the [Supavisor FAQ](/docs/guides/troubleshooting/supavisor-faq-YyP5tI).
+
+### Shared and dedicated poolers [#shared-pooler]
+
+Supabase offers two poolers. The shared pooler, [Supavisor](https://github.com/supabase/supavisor), is multi-tenant, available on every project, and IPv4-only. The dedicated pooler, [PgBouncer](https://www.pgbouncer.org/), is available on paid plans and runs alongside your Postgres instance. Like the direct connection, it is on IPv6, or on IPv4 if the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address).
+
+The dedicated pooler runs on the same machine as your database, so it connects with lower latency than the shared pooler, which runs on a separate server. It also uses more of your project's compute resources. If your network supports IPv6, or you have the IPv4 add-on, use the dedicated pooler instead of the shared pooler. Direct connections have no pooler overhead, but they require IPv6 unless you have the IPv4 add-on.
+
+You can run both poolers at once, but don't do it unless you're trying to increase the total number of concurrent client connections. In most cases, choose either PgBouncer or Supavisor for pooled or transaction-based traffic. Direct connections remain the best choice for long-lived sessions, and shared pooler session mode is the alternative when those sessions need IPv4. Running both poolers at once increases the risk of hitting your database's maximum connection limit on smaller compute sizes.
+
+## Connection limits
+
+### Pool size [#pooler-pool-size]
+
+Pool size sets how many connections a pooler is allowed to open to Postgres. You can adjust it in [Database settings](/dashboard/project/_/database/settings) in the Supabase Dashboard.
+
+Supavisor and PgBouncer read the same setting but apply it independently, so raising it raises the ceiling for both.
+
+For what the setting counts, and how it interacts with the user, database, and mode combinations connecting to your project, see [the Supavisor FAQ](/docs/guides/troubleshooting/supavisor-faq-YyP5tI).
+
+### Client connections and backend connections [#client-connections-and-backend-connections]
+
+There are two limits to understand when working with poolers.
+
+| Limit               | What it counts                                            | What sets it                                                                                                                                  |
+| ------------------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Client connections  | How many clients can connect to a pooler at the same time | Your [compute size's max pooler clients limit](/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections) |
+| Backend connections | How many active connections a pooler opens to Postgres    | The pool size for that pooler                                                                                                                 |
+
+Both limits apply independently to Supavisor and PgBouncer. One pooler reaching its client limit doesn't affect the other. When a pooler reaches this limit, it stops accepting new client connections until existing ones close.
+
+```txt
+Direct connections +
+ Supavisor backend connections +
+ PgBouncer backend connections
+< Postgres max connections for your compute instance
+```
+
+Stay below the maximum rather than at it. Supabase services hold their own connections, including Auth, Storage, PostgREST, and the health checker, and those come out of the same total. [Managing connections](/docs/guides/database/connection-management) covers how much headroom to leave.
+
+For the connection counts that come with each compute size, see [compute and disk](/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections). For the terminology, see [Supavisor and connection terminology explained](/docs/guides/troubleshooting/supavisor-and-connection-terminology-explained-9pr_ZO).
+
+### Monitor connection usage [#monitor-connection-usage]
+
+Track connection usage in the [Observability](/dashboard/project/_/observability/database) section of the Supabase Dashboard. There are three reports:
+
+- **Database Connections:** total active connections by role, including direct and pooled connections.
+- **Dedicated Pooler Client Connections:** active client connections to PgBouncer.
+- **Shared Pooler (Supavisor) Client Connections:** active client connections to Supavisor.
+
+These reports are not real-time. They show the connection count from the last refresh. For up-to-the-second data, query `pg_stat_activity` in the SQL Editor:
+
+```sql
+-- Count connections by application and user name
+select
+  count(usename),
+  count(application_name),
+  application_name,
+  usename
+from
+  pg_stat_ssl
+  join pg_stat_activity on pg_stat_ssl.pid = pg_stat_activity.pid
+group by usename, application_name;
+```
+
+To list every connection with its state and query, and to read which Supabase service each role belongs to, see [Managing connections](/docs/guides/database/connection-management#observing-live-connections).
+
+## Related
+
+- [Connect to your database](/docs/guides/database/connecting-to-postgres)
+- [Managing connections](/docs/guides/database/connection-management)
+- [Supavisor FAQ](/docs/guides/troubleshooting/supavisor-faq-YyP5tI)
