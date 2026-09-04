@@ -107,7 +107,7 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
   const handleOpenChange = (open: boolean, isSafe = false) => {
     if (open === false && step === 'success' && !isSafe) return
     if (open === false) {
-      track('access_token_creation_sheet_closed', {
+      track('access_token_creation_sheet_dismissed', {
         // Can be non when users closes the sheet without completing the token creation
         tokenType: createdToken?.tokenType ?? 'none',
         step,

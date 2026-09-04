@@ -3540,8 +3540,8 @@ export interface AccessTokenCreatedEvent {
  * @source studio
  * @page /account/tokens
  */
-export interface AccessTokenCreationSheetClosedEvent {
-  action: 'access_token_creation_sheet_closed'
+export interface AccessTokenCreationSheetDismissedEvent {
+  action: 'access_token_creation_sheet_dismissed'
   properties: {
     tokenType: 'classic' | 'scoped' | 'none'
     step: 'form' | 'success'
@@ -4075,7 +4075,7 @@ export type TelemetryEvent =
   | UpgradeCtaClickedEvent
   | PricingPanelPlanPresentationExperimentExposedEvent
   | AccessTokenCreatedEvent
-  | AccessTokenCreationSheetClosedEvent
+  | AccessTokenCreationSheetDismissedEvent
   | AccessTokenRemovedEvent
   | AccessTokenCopiedEvent
   | AccessTokenStoredCheckboxClickedEvent
