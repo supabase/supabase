@@ -240,11 +240,12 @@ describe('extractLogMetadata', () => {
         method: 'GET',
         pathname: '/rest/v1',
         event_message: null,
-        log_count: null,
+        log_count: 0,
         logs: null,
       })
 
       expect(mapped).not.toHaveProperty('metadata')
+      expect(mapped.log_count).toBe(0)
     })
   })
 })
