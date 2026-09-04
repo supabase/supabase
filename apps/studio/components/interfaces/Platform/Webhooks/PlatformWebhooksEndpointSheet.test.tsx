@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ComponentProps } from 'react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import type { WebhookEndpoint } from './PlatformWebhooks.types'
 import { PlatformWebhooksEndpointSheet, toEndpointPayload } from './PlatformWebhooksEndpointSheet'
@@ -65,10 +65,6 @@ const findEventTypeCheckbox = (eventType: string) =>
     name: new RegExp(eventType.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')),
   })
 describe('PlatformWebhooksEndpointSheet', () => {
-  afterEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('prefills the name field when creating an endpoint', async () => {
     renderEndpointSheet()
 

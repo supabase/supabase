@@ -180,7 +180,6 @@ vi.mock('@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketS
 
 describe('DestinationForm edit submission', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     pipelineData.config.table_sync_copy.table_ids = [101, 999]
     mocks.submitPipeline.mockResolvedValue(undefined)
     mocks.validateConfiguration.mockResolvedValue({ canContinue: true, warnings: [] })

@@ -45,7 +45,6 @@ vi.mock('@/state/ai-assistant-state', () => ({
 
 describe('useCreateChat', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockWhenInitialized.mockImplementation(() => Promise.resolve())
   })
 
@@ -112,10 +111,6 @@ describe('useCreateChat', () => {
 })
 
 describe('useCreateQuery', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('creates a draft and opens it as an Explorer query tab', () => {
     const { result } = renderHook(() => useCreateQuery())
 

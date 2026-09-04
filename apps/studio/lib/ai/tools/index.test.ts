@@ -25,7 +25,6 @@ const BASE_PARAMS = {
 
 describe('ai/tools getTools', () => {
   beforeEach(async () => {
-    vi.clearAllMocks()
     vi.mocked(getMcpTools).mockResolvedValue({ list_tables: {} } as any)
     // Reset to platform each test; the self-hosted test overrides to false.
     // Done here (not afterEach) so the spy can't leak across tests via order.

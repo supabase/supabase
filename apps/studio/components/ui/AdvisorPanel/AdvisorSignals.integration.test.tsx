@@ -148,7 +148,6 @@ describe('Advisor signals integration', () => {
     advisorState.reset()
     sidebarManagerState.unregisterSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
     sidebarManagerState.clearActiveSidebar()
-    vi.clearAllMocks()
   })
 
   it('renders signal items and dismisses them across the homepage and panel', async () => {

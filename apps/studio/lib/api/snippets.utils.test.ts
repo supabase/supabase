@@ -1,6 +1,6 @@
 import fs from 'fs/promises'
 import path from 'path'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { generateDeterministicUuid } from './snippets.browser'
 import {
@@ -39,10 +39,6 @@ vi.mock('./snippets.constants', () => ({
 
 describe('snippets.utils', () => {
   const MOCK_SNIPPETS_DIR = '/mock/snippets/dir'
-
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
 
   afterEach(() => {
     vi.resetAllMocks()
