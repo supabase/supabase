@@ -3,11 +3,6 @@ import { Button, Separator } from 'ui'
 import { McpElicitationFooter, McpElicitationShell } from './McpElicitationShell'
 import { InterstitialAccountRow } from '@/components/layouts/InterstitialLayout'
 
-/**
- * The request was created by a different account. We never name or hint at that
- * account — the link may have been forwarded to whoever is reading this — so the
- * only identity on screen is the current browser session.
- */
 export const McpElicitationWrongAccount = ({
   signedInAs,
   onSwitchAccount,

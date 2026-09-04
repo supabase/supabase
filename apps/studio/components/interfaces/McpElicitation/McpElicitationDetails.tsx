@@ -21,11 +21,6 @@ const DetailRow = ({
   </div>
 )
 
-/**
- * The link is forgeable in v1, so these rows are load-bearing: the project and
- * the signed-in account are how the user checks the request is the one they
- * asked for. The calling client isn't named because the URL doesn't carry it.
- */
 export const McpElicitationDetails = ({ request }: { request: ElicitationRequest }) => (
   <div className="divide-y rounded-md border bg-surface-75 px-4">
     <DetailRow label="Tool" value={request.tool} isMono />
@@ -34,7 +29,6 @@ export const McpElicitationDetails = ({ request }: { request: ElicitationRequest
   </div>
 )
 
-/** Same row count and paddings as {@link McpElicitationDetails} so nothing shifts on resolve. */
 export const McpElicitationDetailsSkeleton = () => (
   <div className="divide-y rounded-md border bg-surface-75 px-4">
     {Array.from({ length: DETAIL_ROW_COUNT }).map((_, index) => (

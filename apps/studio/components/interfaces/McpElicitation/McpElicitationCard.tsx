@@ -13,14 +13,6 @@ type McpElicitationCardProps = {
   onSwitchAccount: () => void
 }
 
-/**
- * Renders a resolved `ElicitationState`. Knows nothing about the URL, the
- * queries, or where the state came from.
- *
- * The live region is a sibling of the card rather than part of it: each status
- * below replaces the whole card, so a region inside any branch would unmount on
- * the very transition it exists to announce.
- */
 export const McpElicitationCard = (props: McpElicitationCardProps) => (
   <>
     <p role="status" aria-live="polite" className="sr-only">
@@ -42,11 +34,6 @@ const McpElicitationCardContent = ({
   if (state.status === 'form') {
     return (
       <McpElicitationForm
-        // A query-string change swaps the request without unmounting this
-        // subtree, so a typed value could otherwise be submitted under the next
-        // request's name. Keying on the request identity throws away the form
-        // state and the reveal toggle instead. Nothing navigates here
-        // client-side today; this is the guard for when something does.
         key={`${state.request.ref}:${state.request.keyName}`}
         request={state.request}
         isSaving={isSaving}

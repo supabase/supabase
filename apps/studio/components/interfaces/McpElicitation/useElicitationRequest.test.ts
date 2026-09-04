@@ -18,7 +18,6 @@ const paramsFor = (ref: string, name: string): ElicitationParams => ({
   dev: { state: undefined },
 })
 
-/** Slow enough that the test can navigate away before the write settles. */
 const WRITE_DELAY_MS = 120
 
 const PROJECT: components['schemas']['ProjectDetailResponse'] = {
@@ -78,7 +77,6 @@ describe('useElicitationRequest', () => {
 
     await waitFor(() => expect(result.current.state.status).toBe('form'))
 
-    // Kick off A's write, then navigate to B before it lands.
     act(() => result.current.saveSecret('sk-belongs-to-a'))
     params = paramsFor(REF_A, NAME_B)
     rerender()
@@ -88,10 +86,8 @@ describe('useElicitationRequest', () => {
       expect(state.status === 'form' && state.request.keyName).toBe(NAME_B)
     })
 
-    // Give A's write time to settle and push its outcome into state.
     await new Promise((resolve) => setTimeout(resolve, WRITE_DELAY_MS * 3))
 
-    // B was never written, so B must not claim it was stored.
     expect(result.current.state.status).toBe('form')
     expect(writtenNames).toEqual([NAME_A])
   })
@@ -125,7 +121,6 @@ describe('useElicitationRequest', () => {
     params = paramsFor(REF_A, NAME_A)
     rerender()
 
-    // A really was cancelled; returning to it should say so.
     await waitFor(() => expect(result.current.state.status).toBe('cancelled'))
   })
 })

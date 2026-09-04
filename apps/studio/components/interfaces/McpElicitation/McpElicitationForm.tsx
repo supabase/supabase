@@ -54,8 +54,6 @@ export const McpElicitationForm = ({
   const secret = useWatch({ control: form.control, name: 'secret' })
 
   const { providerHint } = request
-  // Stored exactly as typed. Any future paste cleanup has to be visible and
-  // confirmed, so nothing here trims or rewrites the value.
   const prefixWarning = getSecretPrefixWarning(secret, providerHint)
   const overwriteWarning = getOverwriteWarning(request)
 
@@ -110,8 +108,6 @@ export const McpElicitationForm = ({
                       autoCapitalize="off"
                       spellCheck={false}
                       disabled={isSaving}
-                      // Third-party key, not a Supabase password — keep the
-                      // managers from offering to save it as one.
                       data-1p-ignore
                       data-lpignore="true"
                       data-form-type="other"
@@ -139,7 +135,6 @@ export const McpElicitationForm = ({
             {prefixWarning && <p className="text-xs text-warning-600">{prefixWarning}</p>}
           </div>
 
-          {/* Saving stays enabled: replacing the key is usually the point. */}
           {overwriteWarning && (
             <Admonition type="warning" description={overwriteWarning} className="mb-0" />
           )}

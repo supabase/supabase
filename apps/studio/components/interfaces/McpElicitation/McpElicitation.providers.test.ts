@@ -18,7 +18,6 @@ describe('getProviderHint', () => {
   })
 
   it('keeps providers with several valid key shapes prefix-free', () => {
-    // Stripe issues sk_, rk_ and pk_ keys — warning about one would be wrong.
     expect(getProviderHint('STRIPE_SECRET_KEY')?.prefix).toBeUndefined()
     expect(getProviderHint('STRIPE_SECRET_KEY')?.dashboardUrl).toBe(
       'https://dashboard.stripe.com/apikeys'

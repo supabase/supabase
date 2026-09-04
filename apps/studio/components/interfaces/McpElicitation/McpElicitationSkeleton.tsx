@@ -3,10 +3,6 @@ import { Skeleton } from 'ui'
 import { McpElicitationDetailsSkeleton } from './McpElicitationDetails'
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 
-/**
- * Reserves the header, trust line and details table at their resolved heights
- * so the card doesn't jump when the request arrives.
- */
 export const McpElicitationSkeleton = () => (
   <InterstitialLayout
     logo={<SupabaseLogo />}

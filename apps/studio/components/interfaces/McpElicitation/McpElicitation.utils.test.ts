@@ -241,7 +241,6 @@ describe('getElicitationAnnouncement', () => {
   })
 
   it('does not leak the signed-in account into the wrong-account announcement', () => {
-    // The link may have been forwarded; the only identity on screen is the session.
     expect(
       getElicitationAnnouncement({ status: 'wrong-account', signedInAs: 'ops@example.com' })
     ).not.toContain('ops@example.com')

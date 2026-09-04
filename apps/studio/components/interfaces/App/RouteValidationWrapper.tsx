@@ -39,9 +39,6 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     // this is used by database.dev, usually as /new/new-project
     '/new/[slug]',
     '/join',
-    // Standalone interstitial that takes `?ref=` for a project it may legitimately
-    // have no access to. It renders its own recovery screen, so a redirect here
-    // would replace an actionable message with a bare toast.
     MCP_ELICITATION_ROUTE,
   ]
 

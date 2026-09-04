@@ -61,15 +61,12 @@ describe('parseElicitationParams', () => {
   })
 
   it('never surfaces the reserved handle param', () => {
-    // `i` belongs to the stateful handoff (AI-1170) and must stay unread here.
     expect(parseElicitationParams({ ref: 'abc', name: 'KEY', i: 'handle' })).not.toHaveProperty('i')
   })
 })
 
 describe('buildElicitationSignInPath', () => {
   it('keeps the elicitation params as siblings of returnTo', () => {
-    // `validateReturnTo` restricts the charset of `returnTo` itself, so an
-    // embedded query string would be dropped on the way back.
     expect(buildElicitationSignInPath({ ref: 'abc', name: 'OPENAI_API_KEY' })).toBe(
       '/sign-in?returnTo=%2Fmcp_callback&ref=abc&name=OPENAI_API_KEY'
     )
@@ -95,8 +92,6 @@ describe('the ?state= override', () => {
   })
 
   it('is inert unless the build opted in', async () => {
-    // Vitest runs with `NODE_ENV=test` and no `NEXT_PUBLIC_ENVIRONMENT`, which is
-    // the production shape of the gate. A production bundle must ignore `state`.
     expect(
       parseElicitationParams({ ref: 'abc', name: 'KEY', state: 'stored' }).dev.state
     ).toBeUndefined()

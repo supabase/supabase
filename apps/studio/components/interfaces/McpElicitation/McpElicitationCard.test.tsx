@@ -50,7 +50,6 @@ describe('McpElicitationCard', () => {
     )
 
     await waitFor(() => expect(screen.getByDisplayValue('RESEND_API_KEY')).toBeInTheDocument())
-    // Both the value and the reveal toggle reset — the new request starts clean.
     expect(secretField().value).toBe('')
     expect(secretField().type).toBe('password')
   })
@@ -83,8 +82,6 @@ describe('McpElicitationCard', () => {
 
     await user.type(secretField(), 'sk-still-being-typed')
 
-    // Same request, different sibling state: the overwrite warning arriving must
-    // not wipe the field.
     rerender(
       <McpElicitationCard
         state={{
@@ -116,8 +113,6 @@ describe('McpElicitationCard', () => {
     )
 
     await user.type(secretField(), '  sk-padded  ')
-    // fireEvent, not userEvent: the latter's actionability checks don't drive
-    // this submit in jsdom. Matches BillingEmail.test.tsx and friends.
     fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => expect(onSave).toHaveBeenCalledWith('  sk-padded  '))
