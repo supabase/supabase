@@ -1032,5 +1032,13 @@
     "position": "Product Manager",
     "author_url": "https://github.com/nrichers",
     "author_image_url": "https://github.com/nrichers.png"
+  },
+  {
+    "author_id": "guillaume_faas",
+    "author": "Guillaume Faas",
+    "username": "tr00d",
+    "position": "Engineering",
+    "author_url": "https://github.com/tr00d",
+    "author_image_url": "https://github.com/tr00d.png"
   }
 ]
