@@ -145,8 +145,8 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
             'flex flex-col md:flex-row justify-between gap-4 items-start md:items-center border-b'
           )}
         >
-          <p className="truncate" title={`View access for ${token?.name}`}>
-            View access for {token?.name}
+          <p className="truncate" title={`View access for ${token?.name ?? 'Unknown'}`}>
+            View access for {token?.name ?? 'Unknown'}
           </p>
           <TokenDocsButtons />
         </SheetHeader>
