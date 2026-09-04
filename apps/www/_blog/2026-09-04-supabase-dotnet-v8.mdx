@@ -1,0 +1,54 @@
+---
+title: 'Supabase .NET SDK v8.0.0'
+description: 'The Supabase .NET libraries move to a single repo, with a unified version number.'
+author: guillaume_faas
+date: '2026-09-04'
+categories:
+  - engineering
+tags:
+  - dotnet
+  - csharp
+  - sdk
+imgSocial: 'https://zhfonblqamxferhoguzj.supabase.co/functions/v1/generate-og?template=announcement&layout=horizontal&copy=The+%5Bunified%5D+.NET+SDK&icon=1788505885286-dotnet.svg'
+imgThumb: 'https://zhfonblqamxferhoguzj.supabase.co/functions/v1/generate-og?template=announcement&layout=horizontal&copy=The+%5Bunified%5D+.NET+SDK&icon=1788505885286-dotnet.svg'
+toc_depth: 2
+---
+
+The latest version of our .NET SDK, `v8.0.0`, is now available!
+It brings every Supabase .NET package under a single repository with a unified version number, and provides a new extension for dependency injection. 
+
+This is the first release where all the packages ship together, so here is what to expect.
+
+## One version for every package
+Until now, the packages were scattered across multiple repositories, with their own version and lifecycle. 
+Gotrue was on `v6.x.x`, Realtime on `v7.x.x`, while the main package was on `v1.x.x`.
+
+From `v8.0.0`, all packages share the same version number. Gotrue, PostgREST, Realtime, Storage, Functions, and the umbrella `supabase` package all release together. 
+When you see a version, you know which set of libraries it pairs with. 
+We picked `v8.x.x` because it was the highest major version in the group, so it was the only number that worked for lockstep.
+
+## Everything in one repo
+All the packages now live in a single repository: [supabase-community/supabase-csharp](https://github.com/supabase-community/supabase-csharp). 
+It simplifies everything (especially cross-package work), whether it's contributions, maintenance or releases.
+
+## New extension package
+A new package, `Supabase.Extensions.DependencyInjection`, registers the Supabase client with the .NET service container, and lets you inject your own `HttpClient`. 
+If you run ASP.NET Core, this is the way to register Supabase into your app.
+
+## Misc updates
+These did not deserve an entire section, but are worth mentioning:
+- All serialization is handled with `System.Text.Json` instead of `Newtonsoft.Json`.
+- Retry with backoff is built into every service package, and configurable.
+- The client also accepts publishable and secret API keys.
+- All packages target `netstandard2.1`. If you use the umbrella package you were already on it, so nothing changes.
+
+## Upgrading from `v7.x.x`
+`v8.0.0` being a major version, breaking changes are expected.
+We wrote a [migration guide](https://github.com/supabase-community/supabase-csharp/blob/master/docs/migrations/v8.0.0.md) to help you upgrade. 
+It covers all the breaking changes you might encounter, and how to address them. 
+
+## Wrap up
+For the full list of changes, see the [release notes](https://github.com/supabase-community/supabase-csharp/releases/tag/v8.0.0).
+
+Update your packages to v8.0.0, and let us know how it goes on [GitHub](https://github.com/supabase-community/supabase-csharp/issues).
+We're excited to hear your feedbacks.
