@@ -118,9 +118,9 @@ export const ExplorerNotebookTab = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       if (id && content === savedContentRef.current) {
-        snap.markSaved({ id })
+        snap.markSaved({ id, updatedAt: data?.updated_at })
         toast.success('Successfully saved notebook!')
         if (isSaveBeforeAnalyzeOpen) {
           setIsSaveBeforeAnalyzeOpen(false)
@@ -543,7 +543,7 @@ export const ExplorerNotebookTab = () => {
       <ConfirmationModal
         size="small"
         visible={isSaveConflictOpen}
-        title="Assistant changes detected"
+        title="Notebook changed on the server"
         additionalActionLabel="Discard changes"
         confirmLabel={
           id && snap.serverDivergedWhileDirty.get(id) === 'deleted' ? 'Recreate' : 'Save anyway'
@@ -554,8 +554,8 @@ export const ExplorerNotebookTab = () => {
       >
         <p className="text-sm">
           {id && snap.serverDivergedWhileDirty.get(id) === 'deleted'
-            ? 'An assistant deleted this notebook after your local changes. Saving will recreate it.'
-            : "An assistant updated this notebook after your local changes. Saving will overwrite the assistant's update."}
+            ? 'This notebook was deleted on the server after your local changes. Saving will recreate it.'
+            : 'This notebook changed on the server after your local changes. Saving will overwrite those changes.'}
         </p>
       </ConfirmationModal>
 
