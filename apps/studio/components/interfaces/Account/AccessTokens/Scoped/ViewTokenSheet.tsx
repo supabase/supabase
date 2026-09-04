@@ -22,6 +22,7 @@ import {
   type CapabilityLevelFilter,
 } from './TokenCapabilities/TokenCapabilities.utils'
 import { TokenDocsButtons } from './TokenDocsButtons'
+import { AlertError } from '@/components/ui/AlertError'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
 import {
@@ -161,11 +162,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
             )}
 
             {tokenError && (
-              <div className="flex items-center justify-center py-8">
-                <p className="text-destructive">
-                  Error loading token information. Please try again.
-                </p>
-              </div>
+              <AlertError error={tokenError} subject="Error loading token information." />
             )}
 
             {token && (
