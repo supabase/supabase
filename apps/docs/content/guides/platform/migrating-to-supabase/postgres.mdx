@@ -203,11 +203,12 @@ Run `pg_dump --help` for a full list of options.
 export SUPABASE_DB_URL="Postgres://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
 
 # Determine restore parallelization based on your Supabase compute size:
-# Free tier: 2 cores → use -j 2
-# Small compute: 2 cores → use -j 2
-# Medium compute: 4 cores → use -j 4
-# Large compute: 8 cores → use -j 8
-# XL compute: 16 cores → use -j 16
+# Micro–Medium (shared compute): use -j 2
+# Large: 2 vCPUs → use -j 2
+# XL: 4 vCPUs → use -j 4
+# 2XL: 8 vCPUs → use -j 8
+# 4XL: 16 vCPUs → use -j 16
+# (larger sizes: match -j to the vCPU count shown on the pricing page)
 
 RESTORE_JOBS=8  # Adjust based on your Supabase compute size
 
