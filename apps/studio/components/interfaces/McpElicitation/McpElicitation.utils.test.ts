@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { ElicitationRequest } from './McpElicitation.types'
 import {
+  getElicitationAnnouncement,
   getElicitationCopy,
   getOverwriteWarning,
   getSecretHelperText,
@@ -182,5 +183,66 @@ describe('getSecretPrefixWarning', () => {
     expect(getSecretPrefixWarning('sk-abc123', request.providerHint)).toBe(
       'Resend keys usually start with re_. You can still save this one.'
     )
+  })
+})
+
+describe('getElicitationAnnouncement', () => {
+  it('says what is happening while the queries resolve', () => {
+    expect(getElicitationAnnouncement({ status: 'loading' })).toBe('Loading request details')
+  })
+
+  it('names the key and project once the form is ready', () => {
+    expect(getElicitationAnnouncement({ status: 'form', request })).toBe(
+      'Ready to save RESEND_API_KEY for billing-staging'
+    )
+  })
+
+  it('announces the outcome, which the card heading alone never reads out', () => {
+    expect(getElicitationAnnouncement({ status: 'stored', request, timedOut: false })).toBe(
+      'Key stored. RESEND_API_KEY is saved for billing-staging.'
+    )
+    expect(getElicitationAnnouncement({ status: 'error' })).toBe(
+      "Couldn't complete this request. Nothing was stored."
+    )
+  })
+
+  it('never repeats the callout, which Admonition already announces via role="alert"', () => {
+    const states = [
+      { status: 'stored', request, timedOut: false },
+      { status: 'already-stored', request },
+      { status: 'expired' },
+      { status: 'cancelled' },
+      { status: 'paused' },
+      { status: 'error' },
+    ] as const
+
+    for (const state of states) {
+      expect(getElicitationAnnouncement(state)).not.toContain(getElicitationCopy(state).calloutBody)
+    }
+  })
+
+  it('gives every state something to announce', () => {
+    const states = [
+      { status: 'loading' },
+      { status: 'form', request },
+      { status: 'wrong-account', signedInAs: 'ops@example.com' },
+      { status: 'stored', request, timedOut: true },
+      { status: 'already-stored', request },
+      { status: 'expired' },
+      { status: 'cancelled' },
+      { status: 'paused' },
+      { status: 'error' },
+    ] as const
+
+    for (const state of states) {
+      expect(getElicitationAnnouncement(state).length).toBeGreaterThan(0)
+    }
+  })
+
+  it('does not leak the signed-in account into the wrong-account announcement', () => {
+    // The link may have been forwarded; the only identity on screen is the session.
+    expect(
+      getElicitationAnnouncement({ status: 'wrong-account', signedInAs: 'ops@example.com' })
+    ).not.toContain('ops@example.com')
   })
 })

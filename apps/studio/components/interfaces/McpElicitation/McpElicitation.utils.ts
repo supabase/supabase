@@ -8,6 +8,7 @@ import type {
   ElicitationOutcomeState,
   ElicitationProviderHint,
   ElicitationRequest,
+  ElicitationState,
 } from './McpElicitation.types'
 
 dayjs.extend(relativeTime)
@@ -103,6 +104,35 @@ export function getElicitationCopy(state: ElicitationOutcomeState): ElicitationC
           'Ask your agent to run the tool again, or set the key in project settings instead.',
         footer: CLOSE_TAB_FOOTER,
       }
+  }
+}
+
+/**
+ * Status text for the card's live region.
+ *
+ * Every state swaps the whole card, so the transitions that happen without a
+ * click — the queries resolving, the write landing — are otherwise silent for
+ * screen readers. This announces the transition, not the card: the terminal
+ * screens already read their "Next step" callout out via the `role="alert"` on
+ * `Admonition`, so repeating the callout here would double up.
+ *
+ * The `form` and `wrong-account` strings are deliberately not their on-screen
+ * headings. Reusing those would create a drift contract with copy that lives in
+ * the components; the outcome states reuse `getElicitationCopy` because that is
+ * already the single source for them.
+ */
+export function getElicitationAnnouncement(state: ElicitationState): string {
+  switch (state.status) {
+    case 'loading':
+      return 'Loading request details'
+    case 'form':
+      return `Ready to save ${state.request.keyName} for ${state.request.project}`
+    case 'wrong-account':
+      return 'This account cannot access the request'
+    default: {
+      const { title, subtitle } = getElicitationCopy(state)
+      return `${title}. ${subtitle}`
+    }
   }
 }
 
