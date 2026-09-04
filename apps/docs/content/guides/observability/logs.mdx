@@ -6,11 +6,11 @@ description: 'Inspect project log events in the unified Logs view in Studio'
 
 This guide explains how to inspect project logs in Studio. Log retention is based on your [project's pricing plan](/pricing). For details on how Logs usage is billed, see [Manage Logs usage](/docs/guides/platform/manage-your-usage/logs).
 
-Use this page to filter and inspect events in [Logs](#product-logs). To query the same data with SQL from Studio, MCP, the API, or a script, or to record extra Postgres, API, and Realtime events, see [Query and filter logs](/docs/guides/monitoring-and-debugging/advanced-log-filtering).
+Use this page to filter and inspect events in [Logs](#product-logs). To query the same data with SQL from Studio, MCP, the API, or a script, or to record extra Postgres, API, and Realtime events, see [Query and filter logs](/docs/guides/observability/advanced-log-filtering).
 
 <Admonition type="note">
 
-If you already have a specific error, start at [Find the guide for your symptom](/docs/guides/monitoring-and-debugging/debugging#find-the-guide-for-your-symptom). If you are checking whether the project is healthy, start with the [debugging guide](/docs/guides/monitoring-and-debugging/debugging).
+If you already have a specific error, start at [Diagnosing](/docs/guides/troubleshooting). To pick up a signal from these events, see [Detecting](/docs/guides/observability/detecting).
 
 </Admonition>
 
@@ -22,7 +22,7 @@ If you don't select a log type, Logs queries **Postgres** and **API Gateway** ev
 
 <Admonition type="note">
 
-For regular expression filtering, structured-field queries, and field discovery, see [Query and filter logs](/docs/guides/monitoring-and-debugging/advanced-log-filtering).
+For regular expression filtering, structured-field queries, and field discovery, see [Query and filter logs](/docs/guides/observability/advanced-log-filtering).
 
 </Admonition>
 
@@ -38,7 +38,7 @@ Refresh the table, hide columns, download matching rows as CSV or JSON, or turn 
 
 ### Log types
 
-Selecting a log type in Studio queries the matching ClickHouse `source`. For the `source` names to use in SQL, see [Sources](/docs/guides/monitoring-and-debugging/advanced-log-filtering#logs-explorer).
+Selecting a log type in Studio queries the matching ClickHouse `source`. For the `source` names to use in SQL, see [Sources](/docs/guides/observability/advanced-log-filtering#logs-explorer).
 
 | Log type      | Events                                                            |
 | ------------- | ----------------------------------------------------------------- |
@@ -56,9 +56,9 @@ Selecting **API Gateway** is not the same as selecting **Auth**, **Storage**, or
 
 ### Postgres [#postgres]
 
-Postgres logs show queries and activity for your database. Connection lifecycle events appear here when [connection logging](/docs/guides/monitoring-and-debugging/advanced-log-filtering#logging-postgres-connections) is enabled. They are included by default; clear **Connection logs** under the Postgres log type to hide them.
+Postgres logs show queries and activity for your database. Connection lifecycle events appear here when [connection logging](/docs/guides/observability/advanced-log-filtering#logging-postgres-connections) is enabled. They are included by default; clear **Connection logs** under the Postgres log type to hide them.
 
-To record additional statement classes, see [Logging Postgres queries](/docs/guides/monitoring-and-debugging/advanced-log-filtering#logging-postgres-queries).
+To record additional statement classes, see [Logging Postgres queries](/docs/guides/observability/advanced-log-filtering#logging-postgres-queries).
 
 ### Inspect a log
 

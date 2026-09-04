@@ -6,14 +6,18 @@ description: 'Read live Postgres statistics such as bloat, cache hit rate, locks
 
 Database performance is a large topic and many factors can contribute. Common causes of poor performance include inefficient schemas or queries, missing or unused indexes, insufficient memory, lock contention, and table bloat.
 
-Use the live Postgres statistics in this guide to check for those conditions. The same checks run as `supabase inspect db` commands, as SQL in the [SQL Editor](/dashboard/project/_/sql), or as MCP `execute_sql`.
+Use the live Postgres statistics in this guide to check for those conditions. You or an agent can run the same checks from:
+
+- Studio: [SQL Editor](/dashboard/project/_/sql)
+- MCP: `execute_sql`
+- CLI: [`supabase inspect db`](/docs/reference/cli/supabase-inspect-db)
 
 Use this page to:
 
 - Run [CLI inspection commands](#using-the-cli)
 - Copy the matching [SQL](#using-sql)
 
-If you are checking whether something is wrong, start with the [debugging guide](/docs/guides/monitoring-and-debugging/debugging). For project logs, metrics, and advisors, see [Observe the data](/docs/guides/monitoring-and-debugging/access-data).
+To pick up a signal from these checks, see [Detecting](/docs/guides/observability/detecting). For the other sources, see [Observe the data](/docs/guides/observability/access-data).
 
 ## Using the CLI
 
@@ -238,6 +242,6 @@ from pg_statio_user_tables;
 
 This shows the ratio of data blocks fetched from the Postgres [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache against the data blocks that were read from disk or the OS cache.
 
-A ratio below 99% means more than 1% of observed block accesses missed `shared_buffers`. Postgres cannot distinguish whether those reads were served by the operating system cache or physical disk. Treat that as a performance signal in the [debugging guide](/docs/guides/monitoring-and-debugging/debugging), then search [troubleshooting](/docs/guides/troubleshooting).
+A ratio below 99% means more than 1% of observed block accesses missed `shared_buffers`. Postgres cannot distinguish whether those reads were served by the operating system cache or physical disk. Treat that as a [Performance](/docs/guides/observability/detecting#performance) signal, then search [Diagnosing](/docs/guides/troubleshooting).
 
-When a check names a slow statement, get a query plan with [`explain`](/docs/guides/database/query-optimization#analyze-the-query-plan) in SQL, or [`explain()`](/docs/guides/database/debugging-performance) on the Data API. Pair `pg_stat_statements` with the [Metrics API](/docs/guides/monitoring-and-debugging/metrics) to read the same window from Postgres stats and host metrics.
+When a check names a slow statement, get a query plan with [`explain`](/docs/guides/database/query-optimization#analyze-the-query-plan) in SQL, or [`explain()`](/docs/guides/database/debugging-performance) on the Data API. Pair `pg_stat_statements` with the [Metrics API](/docs/guides/observability/metrics) to read the same window from Postgres stats and host metrics.

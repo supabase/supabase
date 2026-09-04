@@ -9,20 +9,18 @@ import { IS_DEV } from '~/lib/constants'
 
 type Params = { slug?: string[] }
 
-const MonitoringTroubleshootingGuidePage = async (props: { params: Promise<Params> }) => {
+const ObservabilityGuidePage = async (props: { params: Promise<Params> }) => {
   const params = await props.params
-  const slug = ['monitoring-and-debugging', ...(params.slug ?? [])]
+  const slug = ['observability', ...(params.slug ?? [])]
   const data = await getGuidesMarkdown(slug)
 
   return <GuideTemplate {...data!} />
 }
 
-const generateStaticParams = !IS_DEV
-  ? genGuidesStaticParams('monitoring-and-debugging')
-  : getEmptyArray
+const generateStaticParams = !IS_DEV ? genGuidesStaticParams('observability') : getEmptyArray
 const generateMetadata = genGuideMeta((params: { slug?: string[] }) =>
-  getGuidesMarkdown(['monitoring-and-debugging', ...(params.slug ?? [])])
+  getGuidesMarkdown(['observability', ...(params.slug ?? [])])
 )
 
-export default MonitoringTroubleshootingGuidePage
+export default ObservabilityGuidePage
 export { generateStaticParams, generateMetadata }

@@ -29,10 +29,10 @@ import {
 import { storageExamples, storageGetStarted, storageResources } from './storage.data'
 import {
   telemetryAccessWhat,
-  telemetryAccessWhere,
-  telemetryDebugging,
+  telemetryDetect,
+  telemetryDiagnose,
+  telemetryExport,
   telemetryHireAgent,
-  telemetryMonitoring,
 } from './telemetry.data'
 
 const ALL_GROUPS: readonly ContentListingGroup[] = [
@@ -67,11 +67,11 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   storageGetStarted,
   storageExamples,
   storageResources,
-  telemetryDebugging,
-  telemetryMonitoring,
   telemetryAccessWhat,
-  telemetryAccessWhere,
+  telemetryDetect,
+  telemetryDiagnose,
   telemetryHireAgent,
+  telemetryExport,
 ]
 
 export const CONTENT_LISTINGS: Readonly<Record<string, ContentListingGroup>> = Object.fromEntries(

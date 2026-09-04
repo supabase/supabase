@@ -2,141 +2,62 @@ import { monitoringAgents } from '~/data/monitoring-agents.data'
 import { getScheduleLabel } from '~/data/monitoring-agents.utils'
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
-export const telemetryDebugging: ContentListingGroup = {
-  id: 'telemetry-debugging',
-  heading: 'Debugging',
-  type: 'grid',
-  columns: 2,
-  items: [
-    {
-      title: 'Debugging guide',
-      href: '/guides/monitoring-and-debugging/debugging',
-      description:
-        'Isolate the failing layer, read logs as evidence, and match symptoms to troubleshooting guides.',
-    },
-    {
-      title: 'Logs',
-      href: '/guides/monitoring-and-debugging/logs',
-      description: 'Inspect project log events in the unified Logs view in Studio.',
-    },
-    {
-      title: 'Query and filter logs',
-      href: '/guides/monitoring-and-debugging/advanced-log-filtering',
-      description: 'Run ClickHouse SQL from Studio, MCP, the API, or a script.',
-    },
-    {
-      title: 'Troubleshooting index',
-      href: '/guides/troubleshooting',
-      description: 'Searchable index of known error codes, symptoms, and fixes.',
-    },
-    {
-      title: 'Diagnosing stuck and blocked queries',
-      href: '/guides/database/connection-management#diagnosing-stuck-and-blocked-queries',
-      description: 'Find sessions blocked by a lock, and cancel or terminate the one responsible.',
-    },
-  ],
-}
-
-export const telemetryMonitoring: ContentListingGroup = {
-  id: 'telemetry-monitoring',
-  heading: 'Monitoring',
-  type: 'grid',
-  columns: 2,
-  items: [
-    {
-      title: 'Log drains',
-      href: '/guides/monitoring-and-debugging/log-drains',
-      description: 'Forward logs to Datadog, Loki, Axiom, S3, or a custom HTTP endpoint.',
-    },
-    {
-      title: 'Reports',
-      href: '/guides/monitoring-and-debugging/reports',
-      description: 'Built-in dashboards for API, Auth, Storage, and Realtime activity.',
-    },
-    {
-      title: 'Metrics',
-      href: '/guides/monitoring-and-debugging/metrics',
-      description: 'Prometheus-compatible database metrics for Grafana and other tools.',
-    },
-    {
-      title: 'Client-side tracing',
-      href: '/guides/monitoring-and-debugging/client-side-tracing',
-      description: 'Correlate browser requests end-to-end using W3C Trace Context.',
-    },
-    {
-      title: 'Query optimization',
-      href: '/guides/database/query-optimization',
-      description: 'Find and fix slow queries using indexes and query plan analysis.',
-    },
-    {
-      title: 'Sentry integration',
-      href: '/guides/monitoring-and-debugging/sentry-monitoring',
-      description: 'Send errors to Sentry for alerting and grouping.',
-    },
-  ],
-}
-
 export const telemetryAccessWhat: ContentListingGroup = {
   id: 'telemetry-access-what',
-  heading: 'What data you can observe',
-  headingLevel: 'h3',
   type: 'grid',
   columns: 2,
   items: [
     {
       title: 'Logs',
-      href: '/guides/monitoring-and-debugging/advanced-log-filtering',
+      href: '/guides/observability/advanced-log-filtering',
       description:
-        'Query project logs and look up sources and fields. Record extra Postgres, API, and Realtime events.',
+        'Query ClickHouse logs from Studio, MCP, or the API. Filter events in the Logs UI.',
     },
     {
       title: 'Metrics API',
-      href: '/guides/monitoring-and-debugging/metrics',
-      description: 'Scrape Prometheus-compatible database metrics for dashboards and alerting.',
+      href: '/guides/observability/metrics',
+      description: 'Scrape Prometheus-compatible database metrics, or chart a subset in Reports.',
     },
     {
       title: 'Database',
-      href: '/guides/monitoring-and-debugging/inspect',
-      description:
-        'Inspect live Postgres stats such as bloat, cache hit rate, locks, and slow queries.',
+      href: '/guides/observability/inspect',
+      description: 'Inspect live Postgres stats from the CLI, the SQL Editor, or MCP.',
     },
     {
       title: 'Advisors',
-      href: '/guides/monitoring-and-debugging/advisors',
-      description:
-        'Pull deterministic security and performance findings as part of ongoing observability.',
+      href: '/guides/observability/advisors',
+      description: 'Pull security and performance findings from Studio, MCP, the CLI, or the API.',
+    },
+    {
+      title: 'Reports',
+      href: '/guides/observability/reports',
+      description: 'Studio dashboards for API, Auth, Storage, Realtime, and database signals.',
     },
   ],
 }
 
-export const telemetryAccessWhere: ContentListingGroup = {
-  id: 'telemetry-access-where',
-  heading: 'Where you can observe it',
-  headingLevel: 'h3',
+export const telemetryDetect: ContentListingGroup = {
+  id: 'telemetry-detect',
   type: 'grid',
-  columns: 2,
   items: [
     {
-      title: 'MCP',
-      href: '/guides/monitoring-and-debugging/access-data#mcp',
+      title: 'Detect issues',
+      href: '/guides/observability/detecting',
       description:
-        'Query logs, run read-only SQL, and fetch advisor findings from an agent harness.',
+        'Run health, security, performance, and usage checks against logs and database statistics to pick up a signal.',
     },
+  ],
+}
+
+export const telemetryDiagnose: ContentListingGroup = {
+  id: 'telemetry-diagnose',
+  type: 'grid',
+  items: [
     {
-      title: 'API',
-      href: '/guides/monitoring-and-debugging/access-data#api',
-      description: 'Read logs, advisors, and usage counts, or scrape the Metrics API.',
-    },
-    {
-      title: 'CLI',
-      href: '/guides/monitoring-and-debugging/access-data#cli',
+      title: 'Diagnose and resolve',
+      href: '/guides/troubleshooting',
       description:
-        'Inspect the database and run security or performance advisors from the terminal.',
-    },
-    {
-      title: 'Studio',
-      href: '/guides/monitoring-and-debugging/access-data#studio',
-      description: 'Open Logs, Reports, and Advisors in the browser.',
+        'Use a concrete finding, symptom, or error code to identify the cause and apply a known solution.',
     },
   ],
 }
@@ -148,34 +69,57 @@ export const telemetryHireAgent: ContentListingGroup = {
   items: [
     {
       title: 'Generalist',
-      href: '/guides/monitoring-and-debugging/automate-with-agents/all',
+      href: '/guides/observability/automate-with-agents/all',
       subtitle: getScheduleLabel(monitoringAgents.all),
       description:
         'Run all four checks — health, security, performance, and usage — in one daily pass.',
     },
     {
       title: monitoringAgents.health.name,
-      href: '/guides/monitoring-and-debugging/automate-with-agents/health',
+      href: '/guides/observability/automate-with-agents/health',
       subtitle: getScheduleLabel(monitoringAgents.health),
       description: 'Watch logs for 5xx spikes and Auth failures.',
     },
     {
       title: monitoringAgents.security.name,
-      href: '/guides/monitoring-and-debugging/automate-with-agents/security',
+      href: '/guides/observability/automate-with-agents/security',
       subtitle: getScheduleLabel(monitoringAgents.security),
       description: 'Review advisor findings and authorization failures.',
     },
     {
       title: monitoringAgents.performance.name,
-      href: '/guides/monitoring-and-debugging/automate-with-agents/performance',
+      href: '/guides/observability/automate-with-agents/performance',
       subtitle: getScheduleLabel(monitoringAgents.performance),
       description: 'Find slow queries, lock waits, and missing indexes.',
     },
     {
       title: monitoringAgents.usage.name,
-      href: '/guides/monitoring-and-debugging/automate-with-agents/usage',
+      href: '/guides/observability/automate-with-agents/usage',
       subtitle: getScheduleLabel(monitoringAgents.usage),
       description: 'Track request growth, error rates, and approaching limits.',
+    },
+  ],
+}
+
+export const telemetryExport: ContentListingGroup = {
+  id: 'telemetry-export',
+  type: 'grid',
+  columns: 3,
+  items: [
+    {
+      title: 'Log drains',
+      href: '/guides/observability/log-drains',
+      description: 'Send project logs to your own destination.',
+    },
+    {
+      title: 'Client-side tracing',
+      href: '/guides/observability/client-side-tracing',
+      description: 'Propagate W3C trace context from the client through Supabase services.',
+    },
+    {
+      title: 'Sentry integration',
+      href: '/guides/observability/sentry-monitoring',
+      description: 'Capture supabase-js errors and spans in Sentry.',
     },
   ],
 }

@@ -194,7 +194,7 @@ const nextConfig = {
       },
       {
         source: '/guides/database/database-advisors',
-        destination: '/guides/monitoring-and-debugging/advisors',
+        destination: '/guides/observability/advisors',
         permanent: true,
       },
     ]

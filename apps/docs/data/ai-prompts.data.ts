@@ -1,3 +1,5 @@
+import { setupCommand } from '~/components/HomePageCover.constants'
+
 /** Embedded AI prompt bodies keyed by `AiPrompt` `id`. */
 export const aiPrompts = {
   astrojs: `Help me add Supabase to my Astro project. Create a Supabase project at
@@ -265,6 +267,11 @@ database.new and run the instruments table SQL. Then:
 
 REFERENCE
 https://supabase.com/docs/guides/getting-started/quickstarts/vue.md`,
+  'monitoring-and-debugging': `Help me monitor and debug my Supabase project. Keep all access read-only. Do the following:
+1. Install the Supabase CLI globally with \`${setupCommand.installCli}\`.
+2. Install the Supabase Plugin with \`${setupCommand.installPlugin}\`. The plugin includes the Supabase MCP server.
+3. Review my project and determine whether Supabase is already initialized. If it is not initialized, run \`${setupCommand.initialize}\`.
+4. Read https://supabase.com/docs/guides/observability.md and follow it.`,
   'monitoring-agent-health': `You are "Health monitor", an on-call health agent for a Supabase project.
 Reach the project only through Supabase MCP in read-only mode.
 
@@ -280,7 +287,7 @@ Run once per hour. On each shift:
 Do not change the project. Be terse. Lead with the suspected cause.
 
 REFERENCE
-https://supabase.com/docs/guides/monitoring-and-debugging/automate-with-agents/health.md`,
+https://supabase.com/docs/guides/observability/detecting.md#health`,
   'monitoring-agent-security': `You are "Security monitor", a security review agent for a Supabase project.
 Reach the project only through Supabase MCP in read-only mode.
 
@@ -295,7 +302,7 @@ Run once per day. On each review:
 Do not change the project. If nothing needs review, stay silent.
 
 REFERENCE
-https://supabase.com/docs/guides/monitoring-and-debugging/automate-with-agents/security.md`,
+https://supabase.com/docs/guides/observability/detecting.md#security`,
   'monitoring-agent-performance': `You are "Performance monitor", a Postgres performance agent for a Supabase project.
 Reach the project only through Supabase MCP in read-only mode.
 
@@ -310,7 +317,7 @@ Run once per hour. On each check:
 Do not change the project, create indexes, or cancel sessions.
 
 REFERENCE
-https://supabase.com/docs/guides/monitoring-and-debugging/automate-with-agents/performance.md`,
+https://supabase.com/docs/guides/observability/detecting.md#performance`,
   'monitoring-agent-usage': `You are "Capacity monitor", a capacity-planning agent for a Supabase project.
 Reach the project only through Supabase MCP in read-only mode.
 
@@ -327,7 +334,7 @@ Run once each morning. On each review:
 Do not change billing, compute, or plan settings.
 
 REFERENCE
-https://supabase.com/docs/guides/monitoring-and-debugging/automate-with-agents/usage.md`,
+https://supabase.com/docs/guides/observability/detecting.md#usage`,
   'monitoring-agent-all': `You are "Generalist", a daily read-only agent for a Supabase project.
 
 TOOLS AVAILABLE
@@ -452,7 +459,7 @@ or improvements beyond fixing what you found. Only report detected problems
 and the specific SQL, CLI command, or Studio step to fix each one.
 
 REFERENCE
-https://supabase.com/docs/guides/monitoring-and-debugging/automate-with-agents/all.md`,
+https://supabase.com/docs/guides/observability/automate-with-agents/all.md`,
 } as const
 
 export type AiPromptId = keyof typeof aiPrompts

@@ -3,7 +3,7 @@ title: 'Query and filter logs'
 description: 'Query project logs from Studio, MCP, the API, or a script. Record extra Postgres, API, and Realtime events.'
 ---
 
-This guide explains how to query project logs and how to record extra events. The same ClickHouse SQL runs in the [Logs Explorer](/dashboard/project/_/logs/explorer), the MCP [`query_logs`](/docs/guides/ai-tools/mcp) tool, and the [Management API](/docs/reference/api/v1-get-project-logs). Filter events without SQL in [Logs](/docs/guides/monitoring-and-debugging/logs) in Studio. From a terminal, call the Management API; the CLI inspects the database rather than ClickHouse logs.
+This guide explains how to query project logs and how to record extra events. The same ClickHouse SQL runs in the [Logs Explorer](/dashboard/project/_/logs/explorer), the MCP [`query_logs`](/docs/guides/ai-tools/mcp) tool, and the [Management API](/docs/reference/api/v1-get-project-logs). Filter events without SQL in [Logs](/docs/guides/observability/logs) in Studio. From a terminal, call the Management API; the CLI inspects the database rather than ClickHouse logs.
 
 Use this page to:
 
@@ -26,11 +26,11 @@ On hosted projects, prefer `query_logs` over `get_logs`. `get_logs` returns a se
 
 ### Studio [#studio]
 
-Open [Logs](/dashboard/project/_/logs) to filter and inspect events. Open the [Logs Explorer](/dashboard/project/_/logs/explorer) to run ClickHouse SQL. See [Logs](/docs/guides/monitoring-and-debugging/logs) for the unified Logs interface.
+Open [Logs](/dashboard/project/_/logs) to filter and inspect events. Open the [Logs Explorer](/dashboard/project/_/logs/explorer) to run ClickHouse SQL. See [Logs](/docs/guides/observability/logs) for the unified Logs interface.
 
 ### MCP [#mcp]
 
-On hosted projects, call [`query_logs`](/docs/guides/ai-tools/mcp) with the same SQL as this guide. Keep the connection project-scoped and read-only. See [Observe the data](/docs/guides/monitoring-and-debugging/access-data#mcp).
+On hosted projects, call [`query_logs`](/docs/guides/ai-tools/mcp) with the same SQL as this guide. Keep the connection project-scoped and read-only.
 
 ### API [#api]
 
@@ -38,7 +38,7 @@ Pass ClickHouse SQL in the `sql` parameter of the [Management API logs endpoint]
 
 ### CLI [#cli]
 
-The Supabase CLI does not query ClickHouse logs. Call the [Management API](/docs/reference/api/v1-get-project-logs) from a script, or use [`supabase inspect db`](/docs/guides/monitoring-and-debugging/inspect) for database diagnostics. See [Observe the data](/docs/guides/monitoring-and-debugging/access-data#cli).
+The Supabase CLI does not query ClickHouse logs. Call the [Management API](/docs/reference/api/v1-get-project-logs) from a script, or use [`supabase inspect db`](/docs/guides/observability/inspect) for database diagnostics.
 
 ## Sources [#logs-explorer]
 
@@ -82,7 +82,7 @@ For `postgres_logs`, statement text and error detail live in `event_message`. `p
 
 For API Load Balancer traffic, the upstream database is `log_attributes['load_balancer_redirect_identifier']`.
 
-See the [Logs field reference](/docs/guides/monitoring-and-debugging/log-field-reference) for the ClickHouse field names on each source.
+See the [Logs field reference](/docs/guides/observability/log-field-reference) for the ClickHouse field names on each source.
 
 ## Working with API logs [#working-with-api-logs]
 
@@ -352,7 +352,7 @@ Identify which service owns the problem from the error or status code first, the
 
 5. **Reference only fields you have confirmed.**
 
-A misspelled or non-existent field name either errors or silently returns nothing, which leaves a working query look empty. Confirm field names in the [Logs field reference](/docs/guides/monitoring-and-debugging/log-field-reference), or select `event_message` and inspect a sample row first.
+A misspelled or non-existent field name either errors or silently returns nothing, which leaves a working query look empty. Confirm field names in the [Logs field reference](/docs/guides/observability/log-field-reference), or select `event_message` and inspect a sample row first.
 
 ## Examples and templates
 

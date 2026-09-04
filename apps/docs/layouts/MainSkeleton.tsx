@@ -59,7 +59,7 @@ const levelsData = {
   },
   telemetry: {
     icon: 'telemetry',
-    name: 'Telemetry',
+    name: 'Observability',
   },
   realtime: {
     icon: 'realtime',

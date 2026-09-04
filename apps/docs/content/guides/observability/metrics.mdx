@@ -6,6 +6,8 @@ description: 'Export Supabase database metrics to any Prometheus-compatible tool
 
 Every Supabase project exposes a [Prometheus](https://prometheus.io/)-compatible **Metrics API** endpoint that surfaces ~200 Postgres performance and health series. You can scrape it into any observability stack to power custom dashboards, alerting rules, or long-term retention that goes beyond what Supabase Studio provides out of the box.
 
+Chart a subset of the same window in Studio [Reports](/docs/guides/observability/reports). Use this page when you want the Prometheus-compatible scrape endpoint.
+
 <Admonition type="note">
 
 The Metrics API is currently in beta. Metric names and labels might evolve as we expand the dataset, and the feature is not available in self-hosted Supabase instances.
@@ -40,5 +42,5 @@ Pick the workflow that best matches your tooling. Cards link to Supabase-authore
 - [Grafana Cloud’s Supabase integration doc](https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-supabase/) (community-maintained, built on this Metrics API).
 - [Datadog’s Supabase integration doc](https://docs.datadoghq.com/integrations/supabase/) (community-maintained, built on this Metrics API).
 - [Elastic’s Supabase integration doc](https://www.elastic.co/docs/reference/integrations/supabase) (community-maintained).
-- [Log Drains ](/docs/guides/monitoring-and-debugging/log-drains) for exporting event-based telemetry alongside metrics.
+- [Log Drains ](/docs/guides/observability/log-drains) for exporting event-based telemetry alongside metrics.
 - [Query Performance report](/dashboard/project/_/observability/query-performance) for built-in visualizations based on the same underlying metrics.

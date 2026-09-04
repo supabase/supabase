@@ -87,7 +87,7 @@ export const LinterPageFooter = ({
           <Markdown
             className="text-xs"
             content={`The Supabase CLI comes with a range of tools to help inspect your Postgres instances for
-            potential issues. [Learn more here](${DOCS_URL}/guides/monitoring-and-debugging/inspect).`}
+            potential issues. [Learn more here](${DOCS_URL}/guides/observability/inspect).`}
           />
         </div>
       )}

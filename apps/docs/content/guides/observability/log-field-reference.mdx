@@ -6,7 +6,7 @@ description: 'Supabase Logs field reference'
 
 Use this reference to find the fields available for each log source. Query `id`, `timestamp`, `event_message`, and `source` as top-level columns. Other structured fields are keys in the `log_attributes` map: drop the `metadata.` prefix shown in the source schema and keep the rest of the dotted path.
 
-For example, the schema path `metadata.request.cf.country` is queried as `log_attributes['request.cf.country']`. See [Query and filter logs](/docs/guides/monitoring-and-debugging/advanced-log-filtering) for complete ClickHouse examples.
+For example, the schema path `metadata.request.cf.country` is queried as `log_attributes['request.cf.country']`. See [Query and filter logs](/docs/guides/observability/advanced-log-filtering) for complete ClickHouse examples.
 
 <SharedData data="logConstants">
   {(logConstants) => (

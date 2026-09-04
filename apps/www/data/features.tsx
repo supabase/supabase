@@ -2343,7 +2343,7 @@ The Logs & Analytics feature in Supabase provides users with comprehensive loggi
 
 OpenTelemetry integration allows you to export logs, metrics, and traces to any OTel-compatible tool—Datadog, Honeycomb, Grafana, or your preferred monitoring platform. The Metrics API exposes ~200 Prometheus-compatible Postgres metrics, including CPU, IO, WAL, connections, and query statistics.
 
-Trace propagation also works inbound. supabase-js, Swift, Flutter, and Python can propagate W3C Trace Context to Supabase, so a client-side trace and the corresponding Supabase logs share the same trace_id. It is opt-in and works with any W3C-compliant tracer, including OTLP, Sentry, Datadog, Honeycomb, and Grafana. See the [client-side tracing guide](https://supabase.com/docs/guides/monitoring-and-debugging/client-side-tracing) for the latest on supported SDKs and target platforms.
+Trace propagation also works inbound. supabase-js, Swift, Flutter, and Python can propagate W3C Trace Context to Supabase, so a client-side trace and the corresponding Supabase logs share the same trace_id. It is opt-in and works with any W3C-compliant tracer, including OTLP, Sentry, Datadog, Honeycomb, and Grafana. See the [client-side tracing guide](https://supabase.com/docs/guides/observability/client-side-tracing) for the latest on supported SDKs and target platforms.
 
 ## Key benefits
 1. Real-Time Monitoring: Access live data on application performance and user interactions to make informed decisions.
@@ -2674,7 +2674,7 @@ $60 per drain per project, plus $0.20 per million events and $0.09 per GB egress
     icon: Activity,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: 'https://www.youtube-nocookie.com/embed/A4GFmvgxS-E',
-    docsUrl: 'https://supabase.com/docs/guides/monitoring-and-debugging/log-drains',
+    docsUrl: 'https://supabase.com/docs/guides/observability/log-drains',
     slug: 'log-drains',
     status: {
       stage: PRODUCT_STAGES.GA,
