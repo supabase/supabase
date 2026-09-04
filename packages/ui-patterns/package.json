@@ -788,7 +788,7 @@
     "lucide-react": "*",
     "mdast": "^3.0.0",
     "mdast-jsx": "^0.1.1",
-    "mermaid": "^11.12.1",
+    "mermaid": "^11.16.1",
     "monaco-editor": "*",
     "next-themes": "catalog:",
     "openai": "^4.75.1",
