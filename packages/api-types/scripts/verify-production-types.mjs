@@ -8,7 +8,6 @@ import { promisify } from 'node:util'
 const run = promisify(execFile)
 const packageDirectory = dirname(dirname(fileURLToPath(import.meta.url)))
 const typesDirectory = process.env.API_TYPES_DIRECTORY ?? join(packageDirectory, 'types')
-const platformApiToken = process.env.PLATFORM_API_OPENAPI_TOKEN || undefined
 const platformApiUrl =
   process.env.PLATFORM_API_OPENAPI_URL ?? 'https://api.supabase.com/platform/v1-json'
 const fetchTimeout = 30_000
@@ -16,7 +15,7 @@ const fetchTimeout = 30_000
 const specifications = [
   { name: 'api-v1', url: 'https://api.supabase.com/api/v1-json' },
   { name: 'api-v2', url: 'https://api.supabase.com/api/v2-json' },
-  { name: 'platform', url: platformApiUrl, token: platformApiToken },
+  { name: 'platform', url: platformApiUrl },
 ]
 
 const temporaryDirectory = await mkdtemp(join(tmpdir(), 'api-types-'))
@@ -26,12 +25,11 @@ try {
   await mkdir(generatedTypesDirectory)
 
   const config = await Promise.all(
-    specifications.map(async ({ name, url, token }) => {
+    specifications.map(async ({ name, url }) => {
       let response
 
       try {
         response = await fetch(url, {
-          headers: token === undefined ? undefined : { authorization: `Bearer ${token}` },
           signal: AbortSignal.timeout(fetchTimeout),
         })
       } catch {
@@ -39,10 +37,8 @@ try {
       }
 
       if (!response.ok) {
-        const credentialHint =
-          name === 'platform' && token === undefined ? ' Set PLATFORM_API_OPENAPI_TOKEN.' : ''
         throw new Error(
-          `Could not fetch ${name} OpenAPI specification from ${url}: ${response.status}.${credentialHint}`
+          `Could not fetch ${name} OpenAPI specification from ${url}: ${response.status}.`
         )
       }
 
