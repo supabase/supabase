@@ -6,12 +6,6 @@ import { Button } from 'ui'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import {
-  NetworkTrafficRenderer,
-  ResponseSpeedChartRenderer,
-  TopApiRoutesRenderer,
-  TotalRequestsChartRenderer,
-} from '@/components/interfaces/Reports/renderers/ApiRenderers'
-import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
 } from '@/components/interfaces/Reports/renderers/StorageRenderers'
@@ -21,6 +15,8 @@ import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
 import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
+import { SharedAPIReport } from '@/components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
+import { useSharedAPIReport } from '@/components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 import {
   DatePickerValue,
   LogsDatePicker,
@@ -31,7 +27,7 @@ import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/Observ
 import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
-import { useStorageReport } from '@/data/reports/storage-report-query'
+import { useStorageCacheReport } from '@/data/reports/storage-report-query'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { DOCS_URL } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -41,20 +37,6 @@ import type { NextPageWithLayout } from '@/types'
 const REPORT_TITLE = 'Storage'
 
 export const StorageReport: NextPageWithLayout = () => {
-  const report = useStorageReport()
-
-  const {
-    data,
-    error,
-    filters,
-    isLoading,
-    params,
-    mergeParams,
-    removeFilters,
-    addFilter,
-    refresh,
-  } = report
-
   const {
     datePickerHelpers,
     datePickerValue,
@@ -64,10 +46,29 @@ export const StorageReport: NextPageWithLayout = () => {
     selectedDateRange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
+  const {
+    data,
+    error,
+    isLoading,
+    isRefetching,
+    refetch,
+    filters,
+    addFilter,
+    removeFilters,
+    isLoadingData,
+    sql,
+  } = useSharedAPIReport({
+    filterBy: 'storage',
+    start: selectedDateRange?.period_start?.date,
+    end: selectedDateRange?.period_end?.date,
+  })
+
+  const cacheReport = useStorageCacheReport()
+
   const handleDatepickerChange = (vals: DatePickerValue) => {
     const promptShown = handleDatePickerChangeFromHook(vals)
     if (!promptShown) {
-      mergeParams({
+      cacheReport.mergeParams({
         iso_timestamp_start: vals.from ?? '',
         iso_timestamp_end: vals.to ?? '',
       })
@@ -78,13 +79,17 @@ export const StorageReport: NextPageWithLayout = () => {
     datePickerValue,
     datePickerHelpers,
     handleDatepickerChange,
-    refresh
+    async () => {
+      await Promise.all([refetch(), cacheReport.refresh()])
+    }
   )
 
   const [showDatePicker, setShowDatePicker] = useState(false)
 
+  const isLoadingReport = isLoadingData || isRefetching || cacheReport.isLoading
+
   useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, onRefreshReport, {
-    enabled: !report.isLoading,
+    enabled: !isLoadingReport,
   })
   useShortcut(SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER, () => {
     setShowDatePicker((open) => !open)
@@ -105,8 +110,8 @@ export const StorageReport: NextPageWithLayout = () => {
               >
                 <Button
                   variant="default"
-                  disabled={report.isLoading}
-                  icon={<RefreshCw className={report.isLoading ? 'animate-spin' : ''} />}
+                  disabled={isLoadingReport}
+                  icon={<RefreshCw className={isLoadingReport ? 'animate-spin' : ''} />}
                   className="w-7"
                   onClick={onRefreshReport}
                 />
@@ -143,10 +148,8 @@ export const StorageReport: NextPageWithLayout = () => {
             <ReportFilterBar
               onRemoveFilters={removeFilters}
               onDatepickerChange={handleDatepickerChange}
-              datepickerFrom={params.totalRequests.iso_timestamp_start}
-              datepickerTo={params.totalRequests.iso_timestamp_end}
               onAddFilter={addFilter}
-              isLoading={isLoading}
+              isLoading={isLoadingReport}
               filters={filters}
               selectedProduct="storage"
               hideDatepicker={true}
@@ -159,40 +162,17 @@ export const StorageReport: NextPageWithLayout = () => {
         }
       >
         <div className="mt-8 flex flex-col gap-4">
-          <ReportWidget
+          <SharedAPIReport
+            data={data}
+            error={error}
             isLoading={isLoading}
-            params={params.totalRequests}
-            title="Total Requests"
-            data={data.totalRequests || []}
-            error={error.totalRequest}
-            renderer={TotalRequestsChartRenderer}
-            append={TopApiRoutesRenderer}
-            appendProps={{ data: data.topRoutes || [], params: params.topRoutes }}
+            isRefetching={isRefetching}
+            hiddenReports={['errorCounts', 'topErrorRoutes']}
+            sql={sql}
           />
           <ReportWidget
-            isLoading={isLoading}
-            params={params.responseSpeed}
-            title="Response Speed"
-            tooltip="Average response speed of a request (in ms)"
-            data={data.responseSpeed || []}
-            error={error.responseSpeed}
-            renderer={ResponseSpeedChartRenderer}
-            appendProps={{ data: data.topSlowRoutes || [], params: params.topSlowRoutes }}
-            append={TopApiRoutesRenderer}
-          />
-          <ReportWidget
-            isLoading={isLoading}
-            params={params.networkTraffic}
-            error={error.networkTraffic}
-            title="Network Traffic"
-            tooltip="Ingress and egress of requests and responses respectively"
-            data={data.networkTraffic || []}
-            renderer={NetworkTrafficRenderer}
-          />
-
-          <ReportWidget
-            isLoading={isLoading}
-            params={params.cacheHitRate}
+            isLoading={cacheReport.isLoading}
+            params={cacheReport.params.cacheHitRate}
             title="Request Caching"
             tooltip={
               <div>
@@ -206,10 +186,11 @@ export const StorageReport: NextPageWithLayout = () => {
                 </span>
               </div>
             }
-            data={data.cacheHitRate || []}
+            data={cacheReport.data.cacheHitRate || []}
+            error={cacheReport.error.cacheHitRate}
             renderer={CacheHitRateChartRenderer}
             append={TopCacheMissesRenderer}
-            appendProps={{ data: data.topCacheMisses || [] }}
+            appendProps={{ data: cacheReport.data.topCacheMisses || [] }}
           />
         </div>
       </ReportStickyNav>

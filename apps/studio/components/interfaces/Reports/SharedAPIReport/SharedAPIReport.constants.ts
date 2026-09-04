@@ -1,13 +1,14 @@
 import * as Sentry from '@sentry/nextjs'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useFeatureFlags, useFlag, useParams } from 'common'
 import { isEqual } from 'lodash'
 import { useState } from 'react'
 
-import { generateRegexpWhereSafe } from '../Reports.constants'
+import { generateOtelWhereSafe, generateRegexpWhereSafe } from '../Reports.constants'
 import { ReportFilterItem } from '../Reports.types'
 import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
-import { safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
+import { analyticsLiteral, safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 
 const SOURCE_TABLE: Record<string, SafeLogSqlFragment> = {
   edge_logs: safeSql`edge_logs`,
@@ -18,6 +19,34 @@ const SOURCE_TABLE: Record<string, SafeLogSqlFragment> = {
 function sourceTable(src: string): SafeLogSqlFragment {
   return SOURCE_TABLE[src] ?? SOURCE_TABLE.edge_logs
 }
+
+const OTEL_SOURCE = new Set(['edge_logs', 'function_edge_logs'])
+const otelSourceName = (src: string): string => (OTEL_SOURCE.has(src) ? src : 'edge_logs')
+
+// fillTimeseries/isUnixMicro expects a 16-digit unix-microsecond timestamp, matching BigQuery's timestamp_trunc.
+const OTEL_TIMESTAMP: SafeLogSqlFragment = safeSql`toUnixTimestamp(toStartOfHour(timestamp)) * 1000000`
+
+function otelWhere(
+  src: string,
+  filters: ReportFilterItem[],
+  extra?: SafeLogSqlFragment
+): SafeLogSqlFragment {
+  const base = extra
+    ? safeSql`where source = ${analyticsLiteral(otelSourceName(src))} and ${extra}`
+    : safeSql`where source = ${analyticsLiteral(otelSourceName(src))}`
+  if (filters.length === 0) return base
+  return safeSql`${base} ${generateOtelWhereSafe(filters, false)}`
+}
+
+const OTEL_STATUS_CODE: SafeLogSqlFragment = safeSql`toInt32OrZero(log_attributes['response.status_code'])`
+const OTEL_ROUTE_SELECT: SafeLogSqlFragment = safeSql`
+  log_attributes['request.path'] as path,
+  log_attributes['request.method'] as method,
+  log_attributes['request.search'] as search,
+  ${OTEL_STATUS_CODE} as status_code`
+const OTEL_ROUTE_GROUP_BY: SafeLogSqlFragment = safeSql`log_attributes['request.path'], log_attributes['request.method'], log_attributes['request.search'], ${OTEL_STATUS_CODE}`
+const OTEL_STATUS_IS_ERROR: SafeLogSqlFragment = safeSql`${OTEL_STATUS_CODE} >= 400`
+const OTEL_ORIGIN_TIME: SafeLogSqlFragment = safeSql`toFloat64OrZero(log_attributes['response.origin_time'])`
 
 export const SHARED_API_REPORT_SQL = {
   totalRequests: {
@@ -38,6 +67,14 @@ export const SHARED_API_REPORT_SQL = {
           timestamp
         ORDER BY
           timestamp ASC`,
+    safeSqlOtel: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+      safeSql`
+        --reports-api-total-requests (otel)
+        select ${OTEL_TIMESTAMP} as timestamp, count() as count
+        from logs
+        ${otelWhere(src, filters)}
+        group by timestamp
+        order by timestamp asc`,
   },
   topRoutes: {
     queryType: 'logs',
@@ -62,6 +99,15 @@ export const SHARED_API_REPORT_SQL = {
           count desc
         limit 10
         `,
+    safeSqlOtel: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+      safeSql`
+        -- reports-api-top-routes (otel)
+        select ${OTEL_ROUTE_SELECT}, count() as count
+        from logs
+        ${otelWhere(src, filters)}
+        group by ${OTEL_ROUTE_GROUP_BY}
+        order by count desc
+        limit 10`,
   },
   errorCounts: {
     queryType: 'logs',
@@ -84,6 +130,14 @@ export const SHARED_API_REPORT_SQL = {
         ORDER BY
           timestamp ASC
         `,
+    safeSqlOtel: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+      safeSql`
+        -- reports-api-error-counts (otel)
+        select ${OTEL_TIMESTAMP} as timestamp, count() as count
+        from logs
+        ${otelWhere(src, filters, OTEL_STATUS_IS_ERROR)}
+        group by timestamp
+        order by timestamp asc`,
   },
   topErrorRoutes: {
     queryType: 'logs',
@@ -110,6 +164,15 @@ export const SHARED_API_REPORT_SQL = {
           count desc
         limit 10
         `,
+    safeSqlOtel: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+      safeSql`
+        -- reports-api-top-error-routes (otel)
+        select ${OTEL_ROUTE_SELECT}, count() as count
+        from logs
+        ${otelWhere(src, filters, OTEL_STATUS_IS_ERROR)}
+        group by ${OTEL_ROUTE_GROUP_BY}
+        order by count desc
+        limit 10`,
   },
   responseSpeed: {
     queryType: 'logs',
@@ -131,6 +194,14 @@ export const SHARED_API_REPORT_SQL = {
         ORDER BY
           timestamp ASC
       `,
+    safeSqlOtel: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+      safeSql`
+        -- reports-api-response-speed (otel)
+        select ${OTEL_TIMESTAMP} as timestamp, avg(${OTEL_ORIGIN_TIME}) as avg
+        from logs
+        ${otelWhere(src, filters)}
+        group by timestamp
+        order by timestamp asc`,
   },
   topSlowRoutes: {
     queryType: 'logs',
@@ -156,6 +227,15 @@ export const SHARED_API_REPORT_SQL = {
           avg desc
         limit 10
         `,
+    safeSqlOtel: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+      safeSql`
+        -- reports-api-top-slow-routes (otel)
+        select ${OTEL_ROUTE_SELECT}, count() as count, avg(${OTEL_ORIGIN_TIME}) as avg
+        from logs
+        ${otelWhere(src, filters)}
+        group by ${OTEL_ROUTE_GROUP_BY}
+        order by avg desc
+        limit 10`,
   },
   networkTraffic: {
     queryType: 'logs',
@@ -195,6 +275,17 @@ export const SHARED_API_REPORT_SQL = {
         ORDER BY
           timestamp ASC
         `,
+    safeSqlOtel: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+      safeSql`
+        -- reports-api-network-traffic (otel)
+        select
+          ${OTEL_TIMESTAMP} as timestamp,
+          sum(toInt64OrZero(log_attributes['request.headers.content_length'])) / 1000000 as ingress_mb,
+          sum(toInt64OrZero(log_attributes['response.headers.content_length'])) / 1000000 as egress_mb
+        from logs
+        ${otelWhere(src, filters)}
+        group by timestamp
+        order by timestamp asc`,
   },
 }
 
@@ -225,6 +316,12 @@ export const useSharedAPIReport = ({
   const { ref } = useParams() as { ref: string }
   const [filters, setFilters] = useState<ReportFilterItem[]>([])
   const queryClient = useQueryClient()
+
+  const useOtel = useFlag('otelReports')
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
+  const buildSql = (entry: (typeof SHARED_API_REPORT_SQL)[SharedAPIReportKey]) =>
+    useOtel ? entry.safeSqlOtel : entry.safeSql
+
   const filterByMapSource = {
     functions: 'function_edge_logs',
     realtime: 'edge_logs',
@@ -262,14 +359,15 @@ export const useSharedAPIReport = ({
         start,
         end,
         ref,
+        { otel: useOtel },
       ],
-      enabled: enabled && !!ref && !!filterBy,
+      enabled: enabled && !!ref && !!filterBy && flagsLoaded,
       queryFn: async () => {
         try {
           const data = await executeAnalyticsSql({
             projectRef: ref,
-            endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
-            sql: value.safeSql(allFilters, filterByMapSource[filterBy]),
+            endpoint: logsAllEndpointUrl(useOtel),
+            sql: buildSql(value)(allFilters, filterByMapSource[filterBy]),
             iso_timestamp_start: start,
             iso_timestamp_end: end,
             method: 'get',
@@ -334,25 +432,28 @@ export const useSharedAPIReport = ({
   const isLoadingData = Object.values(isLoading).some(Boolean)
 
   const SQLMap: Record<SharedAPIReportKey, SafeLogSqlFragment> = {
-    totalRequests: SHARED_API_REPORT_SQL.totalRequests.safeSql(
+    totalRequests: buildSql(SHARED_API_REPORT_SQL.totalRequests)(
       allFilters,
       filterByMapSource[filterBy]
     ),
-    topRoutes: SHARED_API_REPORT_SQL.topRoutes.safeSql(allFilters, filterByMapSource[filterBy]),
-    errorCounts: SHARED_API_REPORT_SQL.errorCounts.safeSql(allFilters, filterByMapSource[filterBy]),
-    topErrorRoutes: SHARED_API_REPORT_SQL.topErrorRoutes.safeSql(
+    topRoutes: buildSql(SHARED_API_REPORT_SQL.topRoutes)(allFilters, filterByMapSource[filterBy]),
+    errorCounts: buildSql(SHARED_API_REPORT_SQL.errorCounts)(
       allFilters,
       filterByMapSource[filterBy]
     ),
-    responseSpeed: SHARED_API_REPORT_SQL.responseSpeed.safeSql(
+    topErrorRoutes: buildSql(SHARED_API_REPORT_SQL.topErrorRoutes)(
       allFilters,
       filterByMapSource[filterBy]
     ),
-    topSlowRoutes: SHARED_API_REPORT_SQL.topSlowRoutes.safeSql(
+    responseSpeed: buildSql(SHARED_API_REPORT_SQL.responseSpeed)(
       allFilters,
       filterByMapSource[filterBy]
     ),
-    networkTraffic: SHARED_API_REPORT_SQL.networkTraffic.safeSql(
+    topSlowRoutes: buildSql(SHARED_API_REPORT_SQL.topSlowRoutes)(
+      allFilters,
+      filterByMapSource[filterBy]
+    ),
+    networkTraffic: buildSql(SHARED_API_REPORT_SQL.networkTraffic)(
       allFilters,
       filterByMapSource[filterBy]
     ),
