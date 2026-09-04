@@ -44,6 +44,40 @@ export function trimTrailingSemicolons(sql: SafeSqlFragment): SafeSqlFragment {
 // rather than gluing raw template-literal text onto the fragment and casting
 // the result, so the only new content this function ever stamps safe is an
 // internally-generated integer literal, never arbitrary concatenated text.
+/**
+ * Returns true when the SQL is a DML statement (INSERT/UPDATE/DELETE/MERGE/CALL/DO)
+ * that does *not* include a RETURNING clause.
+ *
+ * When this is the case the empty-row result is expected — the query may still have
+ * modified rows — so the UI should say "Query ran successfully" rather than the
+ * misleading "No rows returned".
+ *
+ * This is intentionally conservative (plain regex, no full parse):
+ * - False negatives (DML with RETURNING detected as non-returning) → safe: we just
+ *   fall through to the standard "No rows returned" message.
+ * - False positives (SELECT detected as DML) → safe: we'd show a slightly odd
+ *   "Query ran successfully" for a SELECT that genuinely returned 0 rows. This can't
+ *   happen here because we explicitly exclude SELECT-starting queries.
+ */
+export function isNonReturningDml(sql: string): boolean {
+  const cleaned = sql.trim().replace(/--[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '').trim()
+  const lower = cleaned.toLowerCase()
+
+  const isDml =
+    lower.startsWith('insert') ||
+    lower.startsWith('update') ||
+    lower.startsWith('delete') ||
+    lower.startsWith('merge') ||
+    lower.startsWith('call') ||
+    lower.startsWith('do')
+
+  if (!isDml) return false
+
+  // A RETURNING clause means Postgres will send back rows, so the empty-row
+  // result would correctly mean "0 matched", not "statement ran without output".
+  return !lower.includes('returning')
+}
+
 export function applyAutoLimit(
   sql: SafeSqlFragment,
   limit: number = 0

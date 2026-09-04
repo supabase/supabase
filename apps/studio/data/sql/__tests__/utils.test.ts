@@ -239,3 +239,101 @@ select * from cities`
     expect(formattedSql).toBe(sql)
   })
 })
+
+import { isNonReturningDml } from '../utils'
+
+describe('isNonReturningDml', () => {
+  describe('returns true for DML statements without RETURNING', () => {
+    it('detects a plain UPDATE', () => {
+      expect(isNonReturningDml('update users set name = $1 where id = $2')).toBe(true)
+    })
+
+    it('detects a plain DELETE', () => {
+      expect(isNonReturningDml('delete from users where id = 1')).toBe(true)
+    })
+
+    it('detects a plain INSERT', () => {
+      expect(isNonReturningDml("insert into users (name) values ('Alice')")).toBe(true)
+    })
+
+    it('detects MERGE', () => {
+      expect(isNonReturningDml('merge into target using source on target.id = source.id')).toBe(
+        true
+      )
+    })
+
+    it('detects CALL', () => {
+      expect(isNonReturningDml('call my_procedure(1, 2, 3)')).toBe(true)
+    })
+
+    it('detects DO (anonymous block)', () => {
+      expect(isNonReturningDml("do $$ begin raise notice 'hi'; end $$")).toBe(true)
+    })
+
+    it('handles leading whitespace and mixed case', () => {
+      expect(isNonReturningDml('  UPDATE users SET active = false ')).toBe(true)
+    })
+
+    it('handles multi-line SQL', () => {
+      expect(
+        isNonReturningDml(`
+          update
+            position_log
+          set notes = notes
+          where id = (select id from position_log limit 1)
+        `)
+      ).toBe(true)
+    })
+
+    it('strips line comments before checking keyword', () => {
+      expect(
+        isNonReturningDml(`-- delete old rows
+update users set deleted = true where id = 1`)
+      ).toBe(true)
+    })
+  })
+
+  describe('returns false when a RETURNING clause is present', () => {
+    it('UPDATE … RETURNING', () => {
+      expect(
+        isNonReturningDml('update users set name = $1 where id = $2 returning id, name')
+      ).toBe(false)
+    })
+
+    it('DELETE … RETURNING', () => {
+      expect(isNonReturningDml('delete from users where id = 1 returning *')).toBe(false)
+    })
+
+    it('INSERT … RETURNING', () => {
+      expect(
+        isNonReturningDml("insert into users (name) values ('Alice') returning id")
+      ).toBe(false)
+    })
+  })
+
+  describe('returns false for non-DML statements', () => {
+    it('plain SELECT', () => {
+      expect(isNonReturningDml('select * from users')).toBe(false)
+    })
+
+    it('CREATE TABLE', () => {
+      expect(isNonReturningDml('create table foo (id int)')).toBe(false)
+    })
+
+    it('ALTER TABLE', () => {
+      expect(isNonReturningDml('alter table foo add column bar text')).toBe(false)
+    })
+
+    it('DROP TABLE', () => {
+      expect(isNonReturningDml('drop table foo')).toBe(false)
+    })
+
+    it('empty string', () => {
+      expect(isNonReturningDml('')).toBe(false)
+    })
+
+    it('only whitespace', () => {
+      expect(isNonReturningDml('   \n\t  ')).toBe(false)
+    })
+  })
+})
