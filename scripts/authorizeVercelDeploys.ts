@@ -122,7 +122,9 @@ async function main() {
 
   // Process each authorization-required status
   for (const status of authRequiredStatuses) {
-    if (status.context === 'Vercel - studio') {
+    // Vercel's UI renders this context with an en dash ("–"), not a hyphen ("-") —
+    // match both so the Studio exception actually applies.
+    if (status.context === 'Vercel - studio' || status.context === 'Vercel – studio') {
       console.log(`\nSkipping status: ${status.context}`)
       continue
     }
