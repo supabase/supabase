@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRightLeft } from 'lucide-react'
 import type { PropsWithChildren, ReactNode } from 'react'
 import { Card, CardContent, CardHeader, cn } from 'ui'
@@ -41,6 +41,7 @@ export const InterstitialLayout = ({
   descriptionClassName,
   children,
 }: PropsWithChildren<InterstitialLayoutProps>) => {
+  const shouldReduceMotion = useReducedMotion()
   const TitleElement = typeof title === 'string' ? 'h1' : 'div'
   const DescriptionElement = typeof description === 'string' ? 'p' : 'div'
 
@@ -68,7 +69,7 @@ export const InterstitialLayout = ({
 
   const card = (
     <MotionCard
-      layout="size"
+      layout={shouldReduceMotion ? false : 'size'}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
       className={cn('overflow-hidden w-full mx-auto', widthClassName, cardClassName)}
     >
