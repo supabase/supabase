@@ -1,6 +1,8 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
+// TEMPORARY — local design fixture, remove with data/replication/dev-fixtures.ts
+import { getPipelineStatusFixture, USE_REPLICATION_DEV_FIXTURES } from './dev-fixtures'
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -16,6 +18,8 @@ async function fetchReplicationPipelineStatus(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!pipelineId) throw new Error('pipelineId is required')
+
+  if (USE_REPLICATION_DEV_FIXTURES) return getPipelineStatusFixture(pipelineId)
 
   const { data, error } = await get('/platform/replication/{ref}/pipelines/{pipeline_id}/status', {
     params: { path: { ref: projectRef, pipeline_id: pipelineId } },

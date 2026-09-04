@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
+// TEMPORARY — local design fixture, remove with data/replication/dev-fixtures.ts
+import { getCostEstimateFixture, USE_REPLICATION_DEV_FIXTURES } from './dev-fixtures'
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -17,6 +19,9 @@ async function fetchReplicationCostEstimate(
   if (!projectRef) throw new Error('projectRef is required')
   if (!sourceId) throw new Error('sourceId is required')
   if (!publicationName) throw new Error('publicationName is required')
+
+  // TEMPORARY — local design fixture, remove with data/replication/dev-fixtures.ts
+  if (USE_REPLICATION_DEV_FIXTURES) return getCostEstimateFixture()
 
   const { data, error } = await get(
     '/platform/replication/{ref}/sources/{source_id}/publications/{publication_name}/cost-estimate',
