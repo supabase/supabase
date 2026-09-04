@@ -41,7 +41,7 @@ const ProjectHealthLints: NextPageWithLayout = () => {
   const isFlagLoading = IS_PLATFORM && !flagsLoaded
 
   useEffect(() => {
-    if (!isFlagLoading && !isHealthAdvisorEnabled) {
+    if (!isFlagLoading && !isHealthAdvisorEnabled && ref) {
       router.replace(`/project/${ref}/advisors/security`)
     }
   }, [isFlagLoading, isHealthAdvisorEnabled, ref, router])
