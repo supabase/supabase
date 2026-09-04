@@ -15,7 +15,6 @@ export const McpElicitationSkeleton = () => (
     }
   >
     <div className="flex flex-col gap-6 px-6 pb-6">
-      <Skeleton className="h-[38px] w-full" />
       <McpElicitationDetailsSkeleton />
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
@@ -27,6 +26,7 @@ export const McpElicitationSkeleton = () => (
           <Skeleton className="h-[34px] w-full" />
         </div>
       </div>
+      <Skeleton className="h-[75px] w-full" />
     </div>
   </InterstitialLayout>
 )

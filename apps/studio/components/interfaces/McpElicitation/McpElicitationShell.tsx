@@ -1,4 +1,3 @@
-import { ShieldAlert } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn } from 'ui'
 
@@ -37,12 +36,5 @@ export const McpElicitationFooter = ({
     )}
   >
     {children}
-  </p>
-)
-
-export const McpElicitationTrustLine = ({ children }: { children: ReactNode }) => (
-  <p className="flex items-start gap-2.5 rounded-md border border-warning-400 bg-warning-200 px-3 py-2.5 text-xs text-foreground">
-    <ShieldAlert size={14} className="mt-px shrink-0 text-warning-600" aria-hidden />
-    <span className="text-balance">{children}</span>
   </p>
 )

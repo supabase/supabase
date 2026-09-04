@@ -24,7 +24,7 @@ import {
   getSecretPrefixWarning,
 } from './McpElicitation.utils'
 import { McpElicitationDetails } from './McpElicitationDetails'
-import { McpElicitationShell, McpElicitationTrustLine } from './McpElicitationShell'
+import { McpElicitationShell } from './McpElicitationShell'
 
 const FORM_ID = 'mcp-elicitation-form'
 const KEY_NAME_FIELD_ID = 'mcp-elicitation-key-name'
@@ -62,10 +62,6 @@ export const McpElicitationForm = ({
       title="Store an API key"
       subtitle="Supabase is asking for this key on behalf of a tool call. It never passes through your AI client."
     >
-      <McpElicitationTrustLine>
-        Only continue if you asked your AI client to store this secret.
-      </McpElicitationTrustLine>
-
       <McpElicitationDetails request={request} />
 
       <Form {...form}>
@@ -135,9 +131,16 @@ export const McpElicitationForm = ({
             {prefixWarning && <p className="text-xs text-warning-600">{prefixWarning}</p>}
           </div>
 
-          {overwriteWarning && (
-            <Admonition type="warning" description={overwriteWarning} className="mb-0" />
-          )}
+          <div className="flex flex-col gap-4">
+            <Admonition
+              type="default"
+              description="Only continue if you asked your AI client to store this secret."
+              className="mb-0"
+            />
+            {overwriteWarning && (
+              <Admonition type="warning" description={overwriteWarning} className="mb-0" />
+            )}
+          </div>
 
           <div className="flex flex-col gap-2">
             <Button block variant="primary" type="submit" loading={isSaving} disabled={isSaving}>
