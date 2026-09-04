@@ -244,7 +244,7 @@ curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
 
 A few notes on the fields above:
 
-- `identifier`: must be prefixed with `custom:` and follow the [identifier rules](#provider-identifiers) - 2-50 characters, lowercase alphanumeric with hyphens and colons.
+- `identifier`: can be any value as long as it's prefixed with `custom:` and follows the [identifier rules](#provider-identifiers) - 2-50 characters, lowercase alphanumeric with hyphens and colons.
 - `name`: can be any value you want.
 - `email_optional`: must be set to `true`, since Telegram doesn't return an email field.
 
