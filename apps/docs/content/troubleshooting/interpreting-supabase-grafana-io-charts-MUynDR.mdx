@@ -14,11 +14,11 @@ There are two primary values that matter for IO:
 - **Disk Throughput**: how much data can be moved to and from disk per second
 - **IOPS(Input/Output per second)**: how many read/write requests can be performed against your disk per second
 
-Each compute instance has unique IO settings. The current baseline (sustained) and max (burst) limits are listed below.
+Each compute size has its own IO limits. The baseline (sustained) and max (burst) limits below are minimums — depending on the configuration your project runs on, the actual limits can be higher.
 
 <ComputeDiskLimitsTable />
 
-Compute sizes below XL can burst above baseline for short periods before returning back to their baseline behavior.
+Compute sizes up to 2XL can burst above baseline for short periods before returning back to their baseline behavior.
 
 There are other metrics that indicate IO strain.
 
