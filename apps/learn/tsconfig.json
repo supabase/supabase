@@ -5,19 +5,12 @@
     "paths": {
       // @deprecated: Don't import directly without suffix. Use @/ always.
       "*": ["./*"],
-      "@/*": ["./*"],
-      "contentlayer/generated": ["./.contentlayer/generated"]
+      "@/*": ["./*"]
     },
     "plugins": [{ "name": "next" }],
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": false
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".contentlayer/generated"
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".velite"],
   "exclude": ["node_modules", "./scripts/build-registry.mts"]
 }
