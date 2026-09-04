@@ -69,8 +69,8 @@ A missing grant raises a `42501` error before any policy runs. When a request fa
 
 Supabase maps every request to one of the roles:
 
-- `anon`: an unauthenticated request (the user is not logged in)
-- `authenticated`: an authenticated request (the user is logged in)
+- `anon`: an unauthenticated request (the user is not signed in)
+- `authenticated`: an authenticated request (the user is signed in)
 
 These are [Postgres Roles](/docs/guides/database/postgres/roles). You can use these roles within your Policies using the `TO` clause:
 
