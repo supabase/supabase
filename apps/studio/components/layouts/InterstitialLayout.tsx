@@ -191,7 +191,7 @@ export const InterstitialAccountRow = ({
     >
       <ProfileImage
         src={avatarUrl}
-        alt={displayName}
+        alt=""
         className="size-8 flex-shrink-0 rounded-full border border-muted"
       />
       <div className="min-w-0 flex-1">
