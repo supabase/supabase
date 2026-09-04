@@ -473,11 +473,8 @@ Write _lifecycle_, not _life cycle_ or _life-cycle_.
 
 ### login and log in
 
-Use _login_ as a noun or adjective and _log in_ as a verb. Follow the terminology
-in the product UI when it uses _sign in_.
-
-- Recommended: Open the login page, and then log in.
-- Not recommended: Login to the Dashboard.
+Don't use _login_ or _log in_ in prose. Use _sign in_. See
+[sign in and sign-in](#sign-in-and-sign-in).
 
 ## M
 
@@ -654,6 +651,16 @@ Use _setup_ as a noun or adjective and _set up_ as a verb.
 
 - Recommended: Complete the setup to set up authentication.
 - Not recommended: Setup authentication.
+
+### sign in and sign-in
+
+Use _sign in_, _sign out_, and _sign up_ as verbs. Use the hyphenated forms
+_sign-in_, _sign-out_, and _sign-up_ as nouns or adjectives. Match the product UI
+labels **Sign in**, **Sign out**, and **Sign up**.
+
+Keep _login_, _log in_, _logout_, _log out_, and `logOut` when quoting
+third-party UI or when they are part of code, routes, URL slugs, CLI commands, or
+established feature names such as _social login_.
 
 ### singular they
 

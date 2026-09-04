@@ -1,7 +1,8 @@
 import { untrustedSql } from '@supabase/pg-meta'
 import { describe, expect, it } from 'vitest'
 
-import { findMutatingQueryCells, isMutatingSql } from './ExplorerNotebookTab.utils'
+import { findQueryCellsMatchingSql, isMutatingSql } from './ExplorerNotebookTab.utils'
+import { checkDestructiveQuery } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { type Cell } from '@/data/content/notebooks/notebook-schema'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 
@@ -40,6 +41,16 @@ describe('isMutatingSql', () => {
 })
 
 describe('findMutatingQueryCells', () => {
+  const matchMutatingQueries = (
+    cells: readonly Cell[],
+    getLiveSql?: (cellId: string) => string | undefined
+  ) =>
+    findQueryCellsMatchingSql({
+      cells,
+      getLiveSql,
+      matchers: { mutatingQueries: isMutatingSql },
+    }).mutatingQueries
+
   const readOnlyDatabaseCell: Cell = {
     _tag: 'database_cell',
     _id: 'cell-1',
@@ -74,24 +85,24 @@ describe('findMutatingQueryCells', () => {
   }
 
   it('returns an empty array when there are no mutating database cells', () => {
-    expect(findMutatingQueryCells({ cells: [readOnlyDatabaseCell, markdownCell] })).toEqual([])
+    expect(matchMutatingQueries([readOnlyDatabaseCell, markdownCell])).toEqual([])
   })
 
   it('flags mutating database cells with their id and title', () => {
-    expect(findMutatingQueryCells({ cells: [readOnlyDatabaseCell, mutatingDatabaseCell] })).toEqual(
-      [{ id: 'cell-2', title: 'Cleanup' }]
-    )
+    expect(matchMutatingQueries([readOnlyDatabaseCell, mutatingDatabaseCell])).toEqual([
+      { id: 'cell-2', title: 'Cleanup' },
+    ])
   })
 
   it('excludes log cells even when their SQL looks mutating', () => {
-    expect(findMutatingQueryCells({ cells: [mutatingDatabaseCell, mutatingLogCell] })).toEqual([
+    expect(matchMutatingQueries([mutatingDatabaseCell, mutatingLogCell])).toEqual([
       { id: 'cell-2', title: 'Cleanup' },
     ])
   })
 
   it('falls back to "Untitled query" when a mutating cell has no title', () => {
     const untitledCell: Cell = { ...mutatingDatabaseCell, title: undefined }
-    expect(findMutatingQueryCells({ cells: [untitledCell] })).toEqual([
+    expect(matchMutatingQueries([untitledCell])).toEqual([
       { id: 'cell-2', title: 'Untitled query' },
     ])
   })
@@ -100,9 +111,7 @@ describe('findMutatingQueryCells', () => {
     const getLiveSql = (cellId: string) =>
       cellId === 'cell-1' ? 'delete from auth.users' : undefined
 
-    expect(
-      findMutatingQueryCells({ cells: [readOnlyDatabaseCell, mutatingDatabaseCell], getLiveSql })
-    ).toEqual([
+    expect(matchMutatingQueries([readOnlyDatabaseCell, mutatingDatabaseCell], getLiveSql)).toEqual([
       { id: 'cell-1', title: 'Signups' },
       { id: 'cell-2', title: 'Cleanup' },
     ])
@@ -112,16 +121,74 @@ describe('findMutatingQueryCells', () => {
     const getLiveSql = (cellId: string) =>
       cellId === 'cell-2' ? 'select * from auth.users' : undefined
 
-    expect(
-      findMutatingQueryCells({ cells: [readOnlyDatabaseCell, mutatingDatabaseCell], getLiveSql })
-    ).toEqual([{ id: 'cell-2', title: 'Cleanup' }])
+    expect(matchMutatingQueries([readOnlyDatabaseCell, mutatingDatabaseCell], getLiveSql)).toEqual([
+      { id: 'cell-2', title: 'Cleanup' },
+    ])
   })
 
   it('falls back to the stored SQL when the live getter has nothing for a cell', () => {
     const getLiveSql = () => undefined
 
+    expect(matchMutatingQueries([readOnlyDatabaseCell, mutatingDatabaseCell], getLiveSql)).toEqual([
+      { id: 'cell-2', title: 'Cleanup' },
+    ])
+  })
+})
+
+describe('findQueryCellsMatchingSql', () => {
+  const readOnlyCell: Cell = {
+    _tag: 'database_cell',
+    _id: 'cell-1',
+    title: 'Signups',
+    view: 'table',
+    unchecked_sql: untrustedSql('select * from auth.users'),
+    row_limit: 50,
+  }
+  const destructiveCell: Cell = {
+    _tag: 'database_cell',
+    _id: 'cell-2',
+    title: 'Drop users',
+    view: 'table',
+    unchecked_sql: untrustedSql('select 1; drop table users'),
+    row_limit: 50,
+  }
+
+  it('returns only cells containing destructive SQL', () => {
     expect(
-      findMutatingQueryCells({ cells: [readOnlyDatabaseCell, mutatingDatabaseCell], getLiveSql })
-    ).toEqual([{ id: 'cell-2', title: 'Cleanup' }])
+      findQueryCellsMatchingSql({
+        cells: [readOnlyCell, destructiveCell],
+        matchers: {
+          destructiveQueries: checkDestructiveQuery,
+          mutatingQueries: isMutatingSql,
+        },
+      })
+    ).toEqual({
+      destructiveQueries: [{ id: 'cell-2', title: 'Drop users' }],
+      mutatingQueries: [{ id: 'cell-2', title: 'Drop users' }],
+    })
+  })
+
+  it('ignores destructive SQL inside comments', () => {
+    const commentedCell: Cell = {
+      ...readOnlyCell,
+      unchecked_sql: untrustedSql('-- drop table users\nselect 1'),
+    }
+
+    expect(
+      findQueryCellsMatchingSql({
+        cells: [commentedCell],
+        matchers: { destructiveQueries: checkDestructiveQuery },
+      }).destructiveQueries
+    ).toEqual([])
+  })
+
+  it('uses live SQL when it adds a destructive operation', () => {
+    expect(
+      findQueryCellsMatchingSql({
+        cells: [readOnlyCell],
+        getLiveSql: () => 'truncate table users',
+        matchers: { destructiveQueries: checkDestructiveQuery },
+      }).destructiveQueries
+    ).toEqual([{ id: 'cell-1', title: 'Signups' }])
   })
 })

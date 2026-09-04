@@ -1,21 +1,21 @@
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useCreateChat } from '../hooks'
+import { useCreateChat, useCreateQuery } from '../hooks'
 
 const {
   mockCreateChat,
+  mockCreateDraft,
   mockPush,
   mockSelectChat,
   mockSetContext,
-  mockSetModel,
   mockWhenInitialized,
 } = vi.hoisted(() => ({
   mockCreateChat: vi.fn(() => 'chat-2'),
+  mockCreateDraft: vi.fn(),
   mockPush: vi.fn(),
   mockSelectChat: vi.fn(),
   mockSetContext: vi.fn(),
-  mockSetModel: vi.fn(),
   mockWhenInitialized: vi.fn(() => Promise.resolve()),
 }))
 
@@ -28,12 +28,17 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({ data: { slug: 'acme' } }),
 }))
+vi.mock('@/lib/api/snippets.browser', () => ({
+  generateUuid: () => 'query-new',
+}))
+vi.mock('@/state/explorer-query', () => ({
+  useExplorerQueryStateSnapshot: () => ({ createDraft: mockCreateDraft }),
+}))
 vi.mock('@/state/ai-assistant-state', () => ({
   useAiAssistantState: () => ({
     createChat: mockCreateChat,
     selectChat: mockSelectChat,
     setContext: mockSetContext,
-    setModel: mockSetModel,
   }),
   whenAiAssistantInitialized: () => mockWhenInitialized(),
 }))
@@ -51,7 +56,6 @@ describe('useCreateChat', () => {
       await result.current.createChat({
         name: 'Investigate errors',
         initialMessage: 'What happened?',
-        model: 'gpt-5.4-nano',
       })
     })
 
@@ -64,7 +68,6 @@ describe('useCreateChat', () => {
       name: 'Investigate errors',
       initialMessage: 'What happened?',
     })
-    expect(mockSetModel).toHaveBeenCalledWith('gpt-5.4-nano')
     expect(mockPush).toHaveBeenCalledWith('/project/default/explorer/chat/chat-2')
     expect(mockSelectChat).not.toHaveBeenCalled()
 
@@ -74,7 +77,7 @@ describe('useCreateChat', () => {
     expect(mockSelectChat).not.toHaveBeenCalled()
   })
 
-  // Hydration replaces the chat map and the model wholesale, so a chat created mid-load would be
+  // Hydration replaces the chat map wholesale, so a chat created mid-load would be
   // dropped the moment the persisted state lands
   it('waits for the assistant state to hydrate before creating the chat', async () => {
     let resolveHydration = () => {}
@@ -89,11 +92,10 @@ describe('useCreateChat', () => {
 
     let created: Promise<string | undefined> | undefined
     await act(async () => {
-      created = result.current.createChat({ name: 'Investigate errors', model: 'gpt-5.4-nano' })
+      created = result.current.createChat({ name: 'Investigate errors' })
     })
 
     expect(mockCreateChat).not.toHaveBeenCalled()
-    expect(mockSetModel).not.toHaveBeenCalled()
     expect(mockPush).not.toHaveBeenCalled()
 
     await act(async () => {
@@ -105,7 +107,39 @@ describe('useCreateChat', () => {
       name: 'Investigate errors',
       initialMessage: undefined,
     })
-    expect(mockSetModel).toHaveBeenCalledWith('gpt-5.4-nano')
     expect(mockPush).toHaveBeenCalledWith('/project/default/explorer/chat/chat-2')
+  })
+})
+
+describe('useCreateQuery', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('creates a draft and opens it as an Explorer query tab', () => {
+    const { result } = renderHook(() => useCreateQuery())
+
+    expect(result.current.createQuery({ sql: 'select 1', name: 'Untitled query' })).toBe(
+      'query-new'
+    )
+    expect(mockCreateDraft).toHaveBeenCalledWith({
+      id: 'query-new',
+      projectRef: 'default',
+      sql: 'select 1',
+      name: 'Untitled query',
+    })
+    expect(mockPush).toHaveBeenCalledWith('/project/default/explorer/query/query-new')
+  })
+
+  it('creates an empty draft when no sql or name is provided', () => {
+    const { result } = renderHook(() => useCreateQuery())
+
+    expect(result.current.createQuery()).toBe('query-new')
+    expect(mockCreateDraft).toHaveBeenCalledWith({
+      id: 'query-new',
+      projectRef: 'default',
+      sql: undefined,
+      name: undefined,
+    })
   })
 })

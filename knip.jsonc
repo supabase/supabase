@@ -72,6 +72,7 @@
         // read are documentation of the valid values, not dead code. Scoped to
         // this file so `enumMembers` keeps working everywhere else.
         "data/database/constraints-query.ts": ["enumMembers"],
+        "hooks/misc/useTrackExperimentExposure.ts": ["files"],
       },
       // `vercel` is a globally installed CLI used by the `deploy:staging` script
       "ignoreBinaries": ["vercel"],

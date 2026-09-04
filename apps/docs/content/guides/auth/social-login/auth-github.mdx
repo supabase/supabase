@@ -1,6 +1,6 @@
 ---
 id: 'auth-github'
-title: 'Login with GitHub'
+title: 'Sign in with GitHub'
 description: 'Add GitHub OAuth to your Supabase project'
 ---
 
@@ -8,11 +8,11 @@ To enable GitHub Auth for your project, you need to set up a GitHub OAuth applic
 
 ## Overview
 
-Setting up GitHub logins for your application consists of 3 parts:
+Setting up GitHub sign-in for your application consists of 3 parts:
 
 - Create and configure a GitHub OAuth App on [GitHub](https://github.com/settings/applications/new)
 - Add your GitHub OAuth keys to your [Supabase Project](/dashboard)
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+- Add the sign-in code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
 ## Find your callback URL
 
@@ -56,7 +56,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
   }'
 ```
 
-## Add login code to your client app
+## Add sign-in code to your client app
 
 <Tabs
   scrollable

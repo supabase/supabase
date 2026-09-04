@@ -55,16 +55,14 @@ export function FilterSideBar({
       }}
       className={cn('flex flex-col w-full')}
     >
-      <div className="border-b border-border px-4 md:top-0">
-        <div className="flex h-[48px] items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <p className="text-foreground text-lg">Logs</p>
-            <Badge variant="default">Beta</Badge>
-          </div>
-          {table.getState().columnFilters.length || user ? (
-            <DataTableResetButton onReset={() => setUser(null)} />
-          ) : null}
+      <div className="flex shrink-0 items-center justify-between gap-3 px-4 pt-5">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <h4 className="truncate text-lg text-foreground">Logs</h4>
+          <Badge variant="default">Beta</Badge>
         </div>
+        {table.getState().columnFilters.length || user ? (
+          <DataTableResetButton onReset={() => setUser(null)} />
+        ) : null}
       </div>
 
       <UnifiedLogsBanner />

@@ -15,6 +15,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@supabase/shared-types": "0.1.91",
     "zod": "catalog:"
   }
 }

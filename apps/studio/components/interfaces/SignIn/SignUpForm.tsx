@@ -159,10 +159,9 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
               name="email"
               control={form.control}
               render={({ field }) => (
-                <FormItemLayout name="email" label="Email">
+                <FormItemLayout label="Email">
                   <FormControl>
                     <Input
-                      id="email"
                       autoComplete="email"
                       disabled={isSubmitting}
                       {...field}
@@ -178,11 +177,10 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
               name="password"
               control={form.control}
               render={({ field }) => (
-                <FormItemLayout name="password" label="Password">
-                  <FormControl>
-                    <div className="relative">
+                <FormItemLayout label="Password">
+                  <div className="relative">
+                    <FormControl>
                       <Input
-                        id="password"
                         type={passwordHidden ? 'password' : 'text'}
                         autoComplete="new-password"
                         placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
@@ -190,17 +188,17 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                         onFocus={() => setShowConditions(true)}
                         disabled={isSubmitting}
                       />
-                      <Button
-                        variant="default"
-                        title={passwordHidden ? `Show password` : `Hide password`}
-                        aria-label={passwordHidden ? `Show password` : `Hide password`}
-                        className="absolute right-1 top-1 px-1.5"
-                        icon={passwordHidden ? <Eye /> : <EyeOff />}
-                        disabled={isSubmitting}
-                        onClick={() => setPasswordHidden((prev) => !prev)}
-                      />
-                    </div>
-                  </FormControl>
+                    </FormControl>
+                    <Button
+                      variant="default"
+                      title={passwordHidden ? `Show password` : `Hide password`}
+                      aria-label={passwordHidden ? `Show password` : `Hide password`}
+                      className="absolute right-1 top-1 px-1.5"
+                      icon={passwordHidden ? <Eye /> : <EyeOff />}
+                      disabled={isSubmitting}
+                      onClick={() => setPasswordHidden((prev) => !prev)}
+                    />
+                  </div>
                 </FormItemLayout>
               )}
             />

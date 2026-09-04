@@ -200,7 +200,7 @@ export function UserDropdown({
                   router.push('/logout')
                 }}
               >
-                Log out
+                Sign out
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </>

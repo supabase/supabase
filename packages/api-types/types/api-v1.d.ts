@@ -4045,6 +4045,10 @@ export interface components {
             /** @enum {string} */
             type: 'operator_estimator_gate'
           }
+        | {
+            /** @enum {string} */
+            type: 'btree_gist_nan_reindex'
+          }
       )[]
     }
     ProjectUpgradeInitiateResponse: {
@@ -5465,7 +5469,10 @@ export interface components {
           | 'instance_telemetry_lost'
           | 'instance_db_down'
           | 'instance_alert_firing'
-          | 'log_service_error_rate_high'
+          | 'log_data_api_error_rate_high'
+          | 'log_auth_error_rate_high'
+          | 'log_storage_error_rate_high'
+          | 'log_edge_function_error_rate_high'
           | 'project_not_active'
           | 'advisor_check_unavailable'
         /** Format: date-time */

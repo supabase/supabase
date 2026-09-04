@@ -4,6 +4,7 @@ import { clients } from './clients'
 import currentUserAvatar from './default/blocks/current-user-avatar/registry-item.json' with { type: 'json' }
 import dropzone from './default/blocks/dropzone/registry-item.json' with { type: 'json' }
 import infiniteQueryHook from './default/blocks/infinite-query-hook/registry-item.json' with { type: 'json' }
+import mcpServer from './default/blocks/mcp-server/registry-item.json' with { type: 'json' }
 import oauthConsentNextjs from './default/blocks/oauth-consent-nextjs/registry-item.json' with { type: 'json' }
 import oauthConsentReactRouter from './default/blocks/oauth-consent-react-router/registry-item.json' with { type: 'json' }
 import oauthConsentReact from './default/blocks/oauth-consent-react/registry-item.json' with { type: 'json' }
@@ -69,6 +70,10 @@ export const blocks = [
   ...combine(realtimeMonaco as RegistryItem),
   // infinite query hook is intentionally not combined with the clients since it depends on clients having database types.
   infiniteQueryHook as RegistryItem,
+
+  // Backend-only Deno Edge Function block. Every file has an explicit target,
+  // so it can be installed directly into a Supabase project.
+  mcpServer as RegistryItem,
 
   withClientAndDocs(oauthConsentNextjs as RegistryItem, nextjsClient!),
   withClientAndDocs(oauthConsentReact as RegistryItem, reactClient!),

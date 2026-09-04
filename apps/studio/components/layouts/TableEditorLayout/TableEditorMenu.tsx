@@ -161,7 +161,7 @@ export const TableEditorMenu = () => {
 
   return (
     <>
-      <div className="flex flex-col grow gap-5 pt-5 h-full">
+      <div className="flex h-full grow flex-col gap-1.5 pt-2">
         <div className="flex flex-col gap-y-1.5">
           <ShortcutTooltip
             shortcutId={SHORTCUT_IDS.TABLE_EDITOR_FOCUS_SCHEMA}

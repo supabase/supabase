@@ -1,4 +1,3 @@
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
 import { Auth, Realtime, Storage } from 'icons'
 import { ChevronDown, Database, Network, Plus, RefreshCw, X } from 'lucide-react'
@@ -13,6 +12,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Select,
   SelectContent,
   SelectGroup,
