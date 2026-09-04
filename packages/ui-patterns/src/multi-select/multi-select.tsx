@@ -229,14 +229,82 @@ export interface MultiSelectorTriggerProps extends React.HTMLAttributes<HTMLButt
   renderValue?: (value: string) => React.ReactNode
 }
 
+// The tiny control has no vertical padding to spare, so its children stretch to the
+// control height and drop their line-height; the larger sizes center normally.
 const MultiSelectorTriggerVariants = cva('', {
   variants: {
     size: {
-      tiny: 'h-[26px] p-0.5 text-xs',
-      small: 'min-h-[34px] px-3 py-1.5 text-sm',
-      medium: 'min-h-[38px] px-4 py-2 text-sm',
-      large: 'min-h-[42px] px-4 py-2 text-base',
-      xlarge: 'min-h-[50px] px-6 py-3 text-base',
+      tiny: 'h-[26px] p-0.5 text-xs items-stretch',
+      small: 'min-h-[34px] px-3 py-1.5 text-sm items-center',
+      medium: 'min-h-[38px] px-4 py-2 text-sm items-center',
+      large: 'min-h-[42px] px-4 py-2 text-base items-center',
+      xlarge: 'min-h-[50px] px-6 py-3 text-base items-center',
+    },
+  },
+  defaultVariants: {
+    size: SIZE_VARIANTS_DEFAULT,
+  },
+})
+
+const MultiSelectorBadgesVariants = cva('flex overflow-hidden flex-1 min-w-0', {
+  variants: {
+    size: {
+      tiny: 'h-full min-h-0 items-center gap-0.5',
+      small: 'gap-1 -ml-1',
+      medium: 'gap-1 -ml-1',
+      large: 'gap-1 -ml-1',
+      xlarge: 'gap-1 -ml-1',
+    },
+  },
+  defaultVariants: {
+    size: SIZE_VARIANTS_DEFAULT,
+  },
+})
+
+const MultiSelectorBadgeVariants = cva(
+  'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5 normal-case tracking-normal text-xs',
+  {
+    variants: {
+      size: {
+        tiny: 'h-full py-0 leading-none',
+        small: '',
+        medium: '',
+        large: '',
+        xlarge: '',
+      },
+    },
+    defaultVariants: {
+      size: SIZE_VARIANTS_DEFAULT,
+    },
+  }
+)
+
+const MultiSelectorLabelVariants = cva(
+  'text-foreground-muted whitespace-nowrap opacity-0 transition-opacity hidden',
+  {
+    variants: {
+      size: {
+        tiny: 'leading-none',
+        small: 'ml-1 leading-5.5',
+        medium: 'ml-1 leading-5.5',
+        large: 'ml-1 leading-5.5',
+        xlarge: 'ml-1 leading-5.5',
+      },
+    },
+    defaultVariants: {
+      size: SIZE_VARIANTS_DEFAULT,
+    },
+  }
+)
+
+const MultiSelectorInlineInputVariants = cva('py-0 truncate', {
+  variants: {
+    size: {
+      tiny: 'px-0',
+      small: 'px-1',
+      medium: 'px-1',
+      large: 'px-1',
+      xlarge: 'px-1',
     },
   },
   defaultVariants: {
@@ -277,7 +345,6 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     const IS_BADGE_LIMIT_WRAP = badgeLimit === 'wrap'
     const IS_NUMERIC_LIMIT = typeof badgeLimit === 'number'
     const IS_INLINE_MODE = mode === 'inline-combobox'
-    const isTiny = size === 'tiny'
 
     React.useEffect(() => {
       if (!inputRef?.current || !badgesRef.current) return
@@ -291,10 +358,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
       }
     }, [values, badgeLimit])
 
-    const badgeClasses = cn(
-      'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5 normal-case tracking-normal text-xs',
-      isTiny && 'h-full py-0 leading-none'
-    )
+    const badgeClasses = MultiSelectorBadgeVariants({ size })
 
     const handleTriggerClick: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
       (event) => {
@@ -330,7 +394,6 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           role="combobox"
           className={cn(
             'flex w-full min-w-[200px] justify-between rounded-md border',
-            isTiny ? 'items-stretch' : 'items-center',
             'border-strong',
             // Empty: raised plate. Filled: sunk well for chips.
             values.length > 0 ? 'bg-field' : 'bg-control-raised',
@@ -347,8 +410,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           <div
             ref={badgesRef}
             className={cn(
-              'flex overflow-hidden flex-1 min-w-0',
-              isTiny ? 'h-full min-h-0 items-center gap-0.5' : 'gap-1 -ml-1',
+              MultiSelectorBadgesVariants({ size }),
               IS_BADGE_LIMIT_WRAP && 'flex-wrap',
               !IS_BADGE_LIMIT_WRAP &&
                 'overflow-x-auto scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg'
@@ -382,8 +444,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
             )}
             <span
               className={cn(
-                'text-foreground-muted whitespace-nowrap opacity-0 transition-opacity hidden',
-                isTiny ? 'leading-none' : 'ml-1 leading-5.5',
+                MultiSelectorLabelVariants({ size }),
                 !IS_INLINE_MODE &&
                   (persistLabel || values.length === 0) &&
                   'opacity-100 visible inline'
@@ -399,11 +460,10 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
                 placeholder={values.length === 0 ? label : undefined}
                 autoFocus={false}
                 wrapperClassName={cn(
-                  'px-0 flex-1 border-none truncate min-w-0',
-                  isTiny && 'h-full',
+                  'h-full px-0 flex-1 border-none truncate min-w-0',
                   IS_BADGE_LIMIT_WRAP && 'min-w-[85px]'
                 )}
-                className={cn('py-0 truncate', isTiny ? 'h-full px-0' : 'px-1')}
+                className={MultiSelectorInlineInputVariants({ size })}
               />
             )}
           </div>
@@ -412,7 +472,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
             <ChevronsUpDown
               size={16}
               strokeWidth={1.5}
-              className={cn('text-foreground-lighter shrink-0 ml-1.5', isTiny && 'self-center')}
+              className="text-foreground-lighter shrink-0 ml-1.5 self-center"
             />
           )}
         </button>
