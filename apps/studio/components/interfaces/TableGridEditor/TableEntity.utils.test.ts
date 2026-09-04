@@ -49,6 +49,20 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     expect(result).toBe(expected)
   })
 
+  it('should return an empty string when the table schema is missing', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [{ name: 'id', dataType: 'bigint', format: 'int8', position: 0 }],
+      name: 'people',
+      schema: null,
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+
+    expect(formatTableRowsToSQL(table, [{ id: 1 }])).toBe('')
+  })
+
   it('should not stringify null values', () => {
     const table: SupaTable = {
       id: 1,
