@@ -89,6 +89,37 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     expect(result).toBe(expected)
   })
 
+  it('should correctly format JSON/JSONB values with nested quotes, backslashes, and objects', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [
+        { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
+        { name: 'metadata', dataType: 'jsonb', format: 'jsonb', position: 1 },
+      ],
+      name: 'demo',
+      schema: 'public',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    const rows = [
+      { id: 1, metadata: '{"note": "say \\"hi\\""}' },
+      { id: 2, metadata: '{"path": "C:\\\\Users\\\\me"}' },
+      {
+        id: 3,
+        metadata: {
+          note: 'say "hi"',
+          user: "O'Neil",
+          path: 'C:\\Users\\me',
+        },
+      },
+    ]
+
+    const result = formatTableRowsToSQL(table, rows)
+    const expected = `INSERT INTO "public"."demo" ("id", "metadata") VALUES (1, '{"note": "say \\"hi\\""}'), (2, '{"path": "C:\\\\Users\\\\me"}'), (3, '{"note":"say \\"hi\\"","user":"O''Neil","path":"C:\\\\Users\\\\me"}');`
+    expect(result).toBe(expected)
+  })
+
   it('should emit valid Postgres literals for booleans, numbers and text arrays', () => {
     const table: SupaTable = {
       id: 1,
