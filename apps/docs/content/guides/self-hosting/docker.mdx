@@ -492,6 +492,24 @@ The script generates a new password, updates all database roles, and modifies yo
 sh run.sh recreate
 ```
 
+### Rotating API keys
+
+Unlike the managed platform, where you rotate keys from the Dashboard, self-hosted API keys live in your `.env` file. To rotate the publishable and secret keys (`SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY`) without changing the asymmetric signing key pair, run:
+
+```sh
+sh utils/rotate-new-api-keys.sh --update-env
+```
+
+Then restart the services and update your client applications with the new keys:
+
+```sh
+sh run.sh recreate
+```
+
+Rotating these keys does not invalidate existing user sessions tokens. You can also set a custom value by editing `SUPABASE_PUBLISHABLE_KEY` or `SUPABASE_SECRET_KEY` in `.env` directly, then recreating the services.
+
+For rotating versus fully regenerating the asymmetric key pair (which does affect active sessions), see [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys#rotating-the-new-api-keys).
+
 ### Configuring secrets
 
 The `generate-keys.sh` script sets the following secrets automatically. You can also configure them manually in the `.env` file if needed:
