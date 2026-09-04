@@ -178,16 +178,21 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
   })
 
   describe('getLogsCountQuery', () => {
-    const whereOfBranchContaining = (sql: string, needle: string) => {
-      const branch = sql.split(/\bUNION ALL\b/).find((b) => b.includes(needle)) ?? ''
-      return branch.split(/\bWHERE\b/)[1]?.split(/\bGROUP BY\b/)[0] ?? ''
+    // Every facet's per-facet WHERE now lives inline as `if(<guard>, <value>, '')`.
+    // Pull out one facet's guard so we can assert on it in isolation (the value
+    // expressions mention other sources, so a whole-SQL match would be ambiguous).
+    const guardOfFacet = (sql: string, facet: string) => {
+      const afterIf = sql.split(`facet = '${facet}', if(`)[1] ?? ''
+      // The value that follows the guard is wrapped in `(` — for `total` it is
+      // `('all')`, for the rest it is `(<expr>)`. Cut at that boundary.
+      return afterIf.split(facet === 'total' ? `, ('all')` : `, (`)[0]
     }
 
-    it('folds facets into single-pass arrayJoin scans with a total row', () => {
+    it('folds every facet into a single arrayJoin scan plus a dedicated pathname scan', () => {
       const sql = getLogsCountQuery(baseSearch)
       expect(sql).toContain('arrayJoin([')
       expect(sql).toContain('multiIf(')
-      expect(sql).toContain(`facet = 'total', 'all'`)
+      expect(sql).toContain(`facet = 'total', if(`)
       for (const lt of ['postgrest', 'storage', 'postgres', 'edge function', 'auth']) {
         expect(sql).toContain(`'${lt}'`)
       }
@@ -196,23 +201,57 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       }
       expect(sql).toContain(`'pathname'`)
       expect(sql).toContain('LIMIT 20')
-      // log_type + base + pathname = 3 scans
-      expect(sql.match(/FROM logs/g)?.length ?? 0).toBeLessThanOrEqual(4)
+      // The whole point of the collapse: one superset scan + one pathname scan.
+      expect(sql.match(/FROM logs/g)?.length ?? 0).toBe(2)
     })
 
-    it('honours an active log_type filter in the total count scan', () => {
+    it('honours an active log_type filter in the total count guard', () => {
       const sql = getLogsCountQuery(withFilters('log_type:eq:storage'))
-      // Assert on the WHERE only: value expressions mention other sources inline.
-      const totalWhere = whereOfBranchContaining(sql, `'all'`)
-      expect(totalWhere).toContain(`source = 'storage_logs'`)
-      expect(totalWhere).not.toContain(`source = 'edge_logs'`)
-      expect(totalWhere).not.toContain(`source = 'postgres_logs'`)
+      const totalGuard = guardOfFacet(sql, 'total')
+      expect(totalGuard).toContain(`source = 'storage_logs'`)
+      expect(totalGuard).not.toContain(`source = 'edge_logs'`)
+      expect(totalGuard).not.toContain(`source = 'postgres_logs'`)
     })
 
-    it('gives the log_type facet its own scan that excludes the log_type filter', () => {
+    it('excludes the log_type filter from the log_type guard but keeps it on total', () => {
       const sql = getLogsCountQuery(withFilters('log_type:eq:postgrest'))
-      const logTypeWhere = whereOfBranchContaining(sql, `'log_type'`)
-      expect(logTypeWhere).not.toContain(`LIKE '%/rest/%'`)
+      // total still restricts to the filtered source...
+      expect(guardOfFacet(sql, 'total')).toContain(`source = 'postgrest_logs'`)
+      // ...but log_type drops its own filter so its badge shows every source's count.
+      expect(guardOfFacet(sql, 'log_type')).not.toContain(`source = 'postgrest_logs'`)
+    })
+
+    it('excludes the status filter from the status guard but keeps it on total', () => {
+      const sql = getLogsCountQuery(withFilters('status:eq:500'))
+      // total still restricts to the filtered status...
+      expect(guardOfFacet(sql, 'total')).toContain(`IN ('500')`)
+      // ...but status drops its own filter so its badge shows every status's count.
+      expect(guardOfFacet(sql, 'status')).not.toContain(`IN ('500')`)
+    })
+
+    it('drops only a facet own filter, keeping every other facet filter in its guard', () => {
+      const sql = getLogsCountQuery(withFilters('method:eq:GET', 'status:eq:500'))
+      // status guard: own (status) filter dropped, method filter retained.
+      const statusGuard = guardOfFacet(sql, 'status')
+      expect(statusGuard).toContain(`IN ('GET')`)
+      expect(statusGuard).not.toContain(`IN ('500')`)
+      // method guard: own (method) filter dropped, status filter retained.
+      const methodGuard = guardOfFacet(sql, 'method')
+      expect(methodGuard).toContain(`IN ('500')`)
+      expect(methodGuard).not.toContain(`IN ('GET')`)
+    })
+
+    it('scans all sources for log_type but keeps the other facets on default types', () => {
+      const sql = getLogsCountQuery(baseSearch)
+      // log_type's badge must span every source, so its guard carries no
+      // default-types restriction at all (neither postgres nor edge)...
+      expect(guardOfFacet(sql, 'log_type')).not.toContain(`source = 'postgres_logs'`)
+      expect(guardOfFacet(sql, 'log_type')).not.toContain(`source = 'edge_logs'`)
+      // ...while the other shared facets stay scoped to the full postgres + edge default.
+      for (const facet of ['total', 'level', 'method', 'status']) {
+        expect(guardOfFacet(sql, facet)).toContain(`source = 'postgres_logs'`)
+        expect(guardOfFacet(sql, facet)).toContain(`source = 'edge_logs'`)
+      }
     })
 
     it('applies the connection-logs filter to every count scan so badges match the list', () => {
