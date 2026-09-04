@@ -1,5 +1,6 @@
-import { useParams } from 'common'
-import { useMemo, useState } from 'react'
+import { useFeatureFlags, useFlag, useParams } from 'common'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo, useState } from 'react'
 import { LoadingLine } from 'ui'
 
 import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
@@ -18,8 +19,11 @@ import { IS_PLATFORM } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const ProjectHealthLints: NextPageWithLayout = () => {
-  const { preset, id } = useParams()
+  const router = useRouter()
+  const { preset, id, ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor') === true
 
   const [filters, setFilters] = useState<{ level: LINTER_LEVELS; filters: string[] }[]>([
     { level: LINTER_LEVELS.ERROR, filters: [] },
@@ -29,9 +33,20 @@ const ProjectHealthLints: NextPageWithLayout = () => {
   const [currentTab, setCurrentTab] = useState<LINTER_LEVELS>(
     parseLinterLevel(preset) ?? LINTER_LEVELS.ERROR
   )
-  const { data, isPending, isRefetching, refetch } = useProjectHealthLintsQuery({
-    projectRef: project?.ref,
-  })
+  const { data, isPending, isRefetching, refetch } = useProjectHealthLintsQuery(
+    { projectRef: project?.ref },
+    { enabled: isHealthAdvisorEnabled }
+  )
+
+  const isFlagLoading = IS_PLATFORM && !flagsLoaded
+
+  useEffect(() => {
+    if (!isFlagLoading && !isHealthAdvisorEnabled && ref) {
+      router.replace(`/project/${ref}/advisors/security`)
+    }
+  }, [isFlagLoading, isHealthAdvisorEnabled, ref, router])
+
+  if (isFlagLoading || !isHealthAdvisorEnabled) return null
 
   // Health checks are platform-only. If this page is opened self-hosted the query stays
   // disabled, and `isPending` would otherwise spin forever.
