@@ -360,6 +360,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     const IS_BADGE_LIMIT_WRAP = badgeLimit === 'wrap'
     const IS_NUMERIC_LIMIT = typeof badgeLimit === 'number'
     const IS_INLINE_MODE = mode === 'inline-combobox'
+    const HAS_TINY_PLACEHOLDER = size === 'tiny' && values.length === 0
 
     React.useEffect(() => {
       if (!inputRef?.current || !badgesRef.current) return
@@ -460,6 +461,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
             <span
               className={cn(
                 MultiSelectorLabelVariants({ size }),
+                HAS_TINY_PLACEHOLDER && 'ml-2',
                 !IS_INLINE_MODE &&
                   (persistLabel || values.length === 0) &&
                   'opacity-100 visible inline'
@@ -478,7 +480,10 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
                   MultiSelectorInlineInputWrapperVariants({ size }),
                   IS_BADGE_LIMIT_WRAP && 'min-w-[85px]'
                 )}
-                className={MultiSelectorInlineInputVariants({ size })}
+                className={cn(
+                  MultiSelectorInlineInputVariants({ size }),
+                  HAS_TINY_PLACEHOLDER && 'pl-2'
+                )}
               />
             )}
           </div>
