@@ -1,6 +1,6 @@
 import { useMonaco } from '@monaco-editor/react'
 import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
-import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
+import { useFlag } from 'common'
 import { CodeSquare, Eye, EyeOff } from 'lucide-react'
 import type { editor as monacoEditor, Selection } from 'monaco-editor'
 import {
@@ -603,11 +603,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
         </ExplorerToolbar>
 
         {isResizableSplit ? (
-          <ResizablePanelGroup
-            orientation="vertical"
-            className="relative h-0 min-h-0 flex-1"
-            autoSaveId={LOCAL_STORAGE_KEYS.EXPLORER_QUERY_SPLIT_SIZE}
-          >
+          <ResizablePanelGroup orientation="vertical" className="relative h-0 min-h-0 flex-1">
             <ResizablePanel defaultSize="40" maxSize="70">
               <div className="flex h-full min-h-0 flex-col overflow-hidden">{querySql}</div>
             </ResizablePanel>
