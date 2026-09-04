@@ -254,6 +254,27 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
       </>
     ),
   },
+  fx: {
+    alternate: () => (
+      <>
+        <paragraph>
+          fx reads MCP servers only from this profile, so a file inside a repository cannot add one.
+          If a session is already open, apply the change with <inlineCode value="/mcp reload" />.
+        </paragraph>
+        <paragraph>
+          Then authenticate from the fx shell. This opens your browser to complete the OAuth flow:
+        </paragraph>
+        <code lang="bash" value={MCP_CLI_COMMANDS['fx'].authenticate!} />
+        <paragraph>
+          Confirm the server is connected with <inlineCode value="/mcp list" />.
+        </paragraph>
+        <paragraph>
+          For more details, see{' '}
+          <link url="https://fx.sh/docs/capabilities/mcp">MCP configuration</link> in fx.
+        </paragraph>
+      </>
+    ),
+  },
   kiro: {
     deepLinkDescription: (
       <paragraph>

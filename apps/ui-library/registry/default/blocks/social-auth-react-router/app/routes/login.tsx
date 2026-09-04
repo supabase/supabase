@@ -1,5 +1,6 @@
-import { redirect, useFetcher, type ActionFunctionArgs } from 'react-router'
+import { redirect, useFetcher, useSearchParams, type ActionFunctionArgs } from 'react-router'
 
+import { safeNextPath } from '@/registry/default/blocks/safe-next-path/lib/safe-next-path'
 import { createClient } from '@/registry/default/clients/react-router/lib/supabase/server'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -11,18 +12,21 @@ import {
 } from '@/registry/default/components/ui/card'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { supabase } = createClient(request)
+  const { supabase, headers } = createClient(request)
   const origin = new URL(request.url).origin
+
+  const formData = await request.formData()
+  const next = safeNextPath(formData.get('next'), '/protected', origin)
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
     options: {
-      redirectTo: `${origin}/auth/oauth?next=/protected`,
+      redirectTo: `${origin}/auth/oauth?next=${encodeURIComponent(next)}`,
     },
   })
 
   if (data.url) {
-    return redirect(data.url)
+    return redirect(data.url, { headers })
   }
 
   if (error) {
@@ -34,6 +38,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function Login() {
   const fetcher = useFetcher<typeof action>()
+  const [searchParams] = useSearchParams()
 
   const error = fetcher.data?.error
   const loading = fetcher.state === 'submitting'
@@ -49,10 +54,11 @@ export default function Login() {
             </CardHeader>
             <CardContent>
               <fetcher.Form method="post">
+                <input type="hidden" name="next" value={searchParams.get('next') ?? ''} />
                 <div className="flex flex-col gap-6">
                   {error && <p className="text-sm text-destructive-500">{error}</p>}
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'Logging in...' : 'Continue with GitHub'}
+                    {loading ? 'Signing in...' : 'Continue with GitHub'}
                   </Button>
                 </div>
               </fetcher.Form>

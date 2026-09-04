@@ -11,7 +11,6 @@ import {
   StripeAddressElementOptions,
   type SetupIntent,
 } from '@stripe/stripe-js'
-import { Form } from '@ui/components/shadcn/ui/form'
 import { Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -26,6 +25,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  Form,
   FormControl,
   FormField,
   FormItem,

@@ -74,28 +74,26 @@ The difference between the two errors is:
 
 <Admonition type='note'>
 
-Always configure an appropriate time frame when using the log explorer
+Always configure an appropriate time frame when querying the logs
 
         ![image](/docs/img/troubleshooting/edge_function_404_set_timeframe.png)
 
 </Admonition>
 
-You cannot inspect the function dashboard to find platform 404 errors, instead, run the below query in the [log explorer](</dashboard/project/_/logs/explorer?its=&ite=&s=select+distinct%0A++req.pathname+as+function_name,%0A++res.status_code,%0A++CASE+%0A++++WHEN+metadata.execution_id+is+null+THEN+%27FUNCTION_NOT_FOUND%27%0A++++ELSE+%27FUNCTION+RECOGNIZED:+custom+404+message+in+app+logic%27%0A++END+AS+type_of_404%0Afrom%0A++function_edge_logs%0A++cross+join+UNNEST(metadata)+as+metadata%0A++cross+join+UNNEST(metadata.request)+as+req%0A++cross+join+UNNEST(metadata.response)+as+res%0Awhere+status_code+=+404%0Alimit+10;>). The results show all requests that reached Supabase but were rejected as unrecognizable.
+You cannot inspect the function dashboard to find platform 404 errors, instead, run the below query in the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%20distinct%0A%20%20log_attributes%5B%27request.pathname%27%5D%20as%20function_name%2C%0A%20%20log_attributes%5B%27response.status_code%27%5D%20as%20status_code%2C%0A%20%20case%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%3D%20%27%27%20then%20%27FUNCTION_NOT_FOUND%27%0A%20%20%20%20else%20%27FUNCTION%20RECOGNIZED%3A%20custom%20404%20message%20in%20app%20logic%27%0A%20%20end%20as%20type_of_404%0Afrom%20logs%0Awhere%0A%20%20source%20%3D%20%27function_edge_logs%27%0A%20%20and%20toInt32OrZero%28log_attributes%5B%27response.status_code%27%5D%29%20%3D%20404%0Alimit%2010%3B). The results show all requests that reached Supabase but were rejected as unrecognizable.
 
 ```sql
 select distinct
-  req.pathname as function_name,
-  res.status_code,
+  log_attributes['request.pathname'] as function_name,
+  log_attributes['response.status_code'] as status_code,
   case
-    when metadata.execution_id is null then 'FUNCTION_NOT_FOUND'
+    when log_attributes['execution_id'] = '' then 'FUNCTION_NOT_FOUND'
     else 'FUNCTION RECOGNIZED: custom 404 message in app logic'
   end as type_of_404
-from
-  function_edge_logs
-  cross join UNNEST(metadata) as metadata
-  cross join UNNEST(metadata.request) as req
-  cross join UNNEST(metadata.response) as res
-where status_code = 404
+from logs
+where
+  source = 'function_edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) = 404
 limit 10;
 ```
 

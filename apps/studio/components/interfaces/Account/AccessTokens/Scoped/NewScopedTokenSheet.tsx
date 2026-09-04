@@ -15,6 +15,7 @@ import { ExperimentalTokenDropdown } from '../Classic/ExperimentalTokenDropdown'
 import { NewScopedTokenForm } from './Form/NewScopedTokenForm'
 import { getExpiryDate, type TokenFormValues } from './Form/NewScopedTokenForm.utils'
 import { NewScopedTokenSuccess } from './Form/NewScopedTokenSuccess'
+import { TokenDocsButtons } from './TokenDocsButtons'
 import {
   useAccessTokenCreateMutation,
   type NewAccessToken,
@@ -41,12 +42,15 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
 
   const [step, setStep] = useState<'form' | 'success'>('form')
   const [createdToken, setCreatedToken] = useState<
-    NewScopedAccessToken | NewAccessToken | undefined
+    { token: NewScopedAccessToken | NewAccessToken; tokenType: 'classic' | 'scoped' } | undefined
   >()
 
-  const showCreatedToken = (data: NewScopedAccessToken | NewAccessToken) => {
+  const showCreatedToken = (
+    data: NewScopedAccessToken | NewAccessToken,
+    tokenType: 'classic' | 'scoped'
+  ) => {
     toast.success('Access token created successfully')
-    setCreatedToken(data)
+    setCreatedToken({ token: data, tokenType })
     setStep('success')
   }
 
@@ -63,8 +67,9 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
             track('access_token_created', {
               tokenType: 'classic',
               expiryPreset: values.expiresAt,
+              resourceAccess: 'account',
             })
-            showCreatedToken(data)
+            showCreatedToken(data, 'classic')
           },
         }
       )
@@ -92,7 +97,7 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
           resourceAccess: values.resourceAccess,
           permissionCount: permissions.length,
         })
-        showCreatedToken(data)
+        showCreatedToken(data, 'scoped')
       },
     })
   }
@@ -101,6 +106,13 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
   // as we need to make sure they copied the new token first
   const handleOpenChange = (open: boolean, isSafe = false) => {
     if (open === false && step === 'success' && !isSafe) return
+    if (open === false) {
+      track('access_token_creation_sheet_dismissed', {
+        // Can be non when users closes the sheet without completing the token creation
+        tokenType: createdToken?.tokenType ?? 'none',
+        step,
+      })
+    }
     setStep('form')
     setIsOpen(open)
   }
@@ -123,16 +135,18 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
         size="default"
         className="flex h-full flex-col gap-0 sm:w-[656px] lg:w-[800px]"
       >
-        <SheetHeader>
+        <SheetHeader className="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
           <SheetTitle>{step === 'success' ? 'Token created' : 'Generate token'}</SheetTitle>
           <SheetDescription className="sr-only">
             Configure and create a new access token.
           </SheetDescription>
+          {step !== 'success' && <TokenDocsButtons />}
         </SheetHeader>
         {step === 'success' && createdToken ? (
           <NewScopedTokenSuccess
-            tokenName={createdToken.name}
-            tokenValue={createdToken.token}
+            tokenName={createdToken.token.name}
+            tokenValue={createdToken.token.token}
+            tokenType={createdToken.tokenType}
             onClose={() => handleOpenChange(false, true)}
           />
         ) : (

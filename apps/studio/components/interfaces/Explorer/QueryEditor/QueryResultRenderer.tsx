@@ -1,3 +1,4 @@
+import { type SqlSnippetSource } from '../../SQLEditor/querySource'
 import { type QueryResult } from '../types'
 import { QueryResultChart } from './QueryResultChart'
 import { QueryResultError } from './QueryResultError'
@@ -8,9 +9,20 @@ interface QueryResultRendererProps {
   result?: QueryResult
   view?: 'table' | 'chart'
   chart?: ChartConfig
+  /** The query that produced `result`, used to build the "Debug with Assistant" prompt on error. */
+  sql?: string
+  source?: SqlSnippetSource
+  onDebug?: (prompt: string) => void
 }
 
-export const QueryResultRenderer = ({ result, view, chart }: QueryResultRendererProps) => {
+export const QueryResultRenderer = ({
+  result,
+  view,
+  chart,
+  sql,
+  source,
+  onDebug,
+}: QueryResultRendererProps) => {
   const { rows, error, autoLimit } = result ?? {}
 
   if (!result) {
@@ -18,7 +30,15 @@ export const QueryResultRenderer = ({ result, view, chart }: QueryResultRenderer
   }
 
   if (error) {
-    return <QueryResultError error={error} autoLimit={autoLimit} />
+    return (
+      <QueryResultError
+        error={error}
+        autoLimit={autoLimit}
+        sql={sql}
+        source={source}
+        onDebug={onDebug}
+      />
+    )
   }
 
   if ((rows ?? []).length === 0) {

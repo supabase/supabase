@@ -648,18 +648,18 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
 
 ## Key benefits
 1. Initial sync: Copy existing rows from published tables.
-2. Ongoing replication: Apply subsequent INSERT, UPDATE, DELETE, and TRUNCATE operations selected by the publication.
+2. Ongoing replication: Capture and deliver subsequent INSERT, UPDATE, DELETE, and TRUNCATE operations selected by the publication.
 3. Managed operation: Monitor pipeline status, lag, table state, and errors in the Dashboard.
 4. Workload isolation: Keep analytical queries away from the primary database.
 
 ## Destinations
-BigQuery is currently available. [Request early access](/go/supabase-pipelines-new-destinations) to ClickHouse, Snowflake, and DuckLake while destination support expands.
+BigQuery is currently available. ClickHouse, DuckLake, and Snowflake are in Early Access. [Request access](/go/supabase-pipelines-new-destinations) to these destinations.
 
 ## Setup
 Create a Postgres publication for the tables to replicate. In Database > Replication, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
 
 ## Requirements
-Requirements depend on the destination. BigQuery requires source tables to have primary keys and requires the publication to include those columns.
+Requirements depend on the destination. BigQuery and ClickHouse ReplacingMergeTree require source tables to have primary keys and require the publication to include those columns. ClickHouse updates require REPLICA IDENTITY FULL. ClickHouse deletes require primary-key or full identity. DuckLake updates and deletes require a primary-key identity, replica-identity index, or full identity. With a primary-key identity or replica-identity index, include every identity column in the publication. Snowflake updates require REPLICA IDENTITY FULL. Snowflake deletes require a published row identity.
 
 ## Pipelines is valuable for:
 - Near real-time analytics data movement
@@ -667,9 +667,9 @@ Requirements depend on the destination. BigQuery requires source tables to have 
 - Managed replication to supported destination systems
 
 ## Limitations
-Schema change support is currently in beta and limited to supported BigQuery changes. Destination-specific constraints apply.
+Schema change support is destination-specific and limited. Destination-specific constraints apply.
 
-Pipelines keeps the current destination table state synchronized. It does not automatically create a queryable history of every row version.`,
+BigQuery and DuckLake keep current-state tables synchronized. ClickHouse supports current-state ReplacingMergeTree tables or append-only MergeTree CDC history. Snowflake stores append-only CDC history. Source \`TRUNCATE\` operations and table resets erase accumulated destination data. Schema changes can alter retained history in append-only ClickHouse and Snowflake tables.`,
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: 'https://www.youtube-nocookie.com/embed/8o3duiYqppA',
@@ -2343,7 +2343,7 @@ The Logs & Analytics feature in Supabase provides users with comprehensive loggi
 
 OpenTelemetry integration allows you to export logs, metrics, and traces to any OTel-compatible tool—Datadog, Honeycomb, Grafana, or your preferred monitoring platform. The Metrics API exposes ~200 Prometheus-compatible Postgres metrics, including CPU, IO, WAL, connections, and query statistics.
 
-Trace propagation also works inbound. supabase-js, Swift, Flutter, and Python can propagate W3C Trace Context to Supabase, so a client-side trace and the corresponding Supabase logs share the same trace_id. It is opt-in and works with any W3C-compliant tracer, including OTLP, Sentry, Datadog, Honeycomb, and Grafana. See the [client-side tracing guide](https://supabase.com/docs/guides/monitoring-and-debugging/client-side-tracing) for the latest on supported SDKs and target platforms.
+Trace propagation also works inbound. supabase-js, Swift, Flutter, and Python can propagate W3C Trace Context to Supabase, so a client-side trace and the corresponding Supabase logs share the same trace_id. It is opt-in and works with any W3C-compliant tracer, including OTLP, Sentry, Datadog, Honeycomb, and Grafana. See the [client-side tracing guide](https://supabase.com/docs/guides/observability/client-side-tracing) for the latest on supported SDKs and target platforms.
 
 ## Key benefits
 1. Real-Time Monitoring: Access live data on application performance and user interactions to make informed decisions.
@@ -2674,7 +2674,7 @@ $60 per drain per project, plus $0.20 per million events and $0.09 per GB egress
     icon: Activity,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: 'https://www.youtube-nocookie.com/embed/A4GFmvgxS-E',
-    docsUrl: 'https://supabase.com/docs/guides/monitoring-and-debugging/log-drains',
+    docsUrl: 'https://supabase.com/docs/guides/observability/log-drains',
     slug: 'log-drains',
     status: {
       stage: PRODUCT_STAGES.GA,

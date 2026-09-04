@@ -1,4 +1,4 @@
-import { Button } from '@ui/components/shadcn/ui/button'
+import { Button } from 'ui'
 import {
   BadgeExperimental,
   CommandMenu,

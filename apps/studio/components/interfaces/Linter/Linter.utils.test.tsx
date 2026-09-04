@@ -1,6 +1,9 @@
+import { Ruler } from 'lucide-react'
+import { isValidElement } from 'react'
 import { describe, expect, it } from 'vitest'
 
-import { lintInfoMap } from './Linter.utils'
+import { lintInfoMap, parseLinterLevel } from './Linter.utils'
+import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
 import { Lint } from '@/data/lint/lint-query'
 
 const projectRef = 'abc'
@@ -64,5 +67,34 @@ describe('Linter.utils lintInfoMap link encoding', () => {
       } as unknown as Lint['metadata'],
     })
     expect(url).toBe('/project/abc/storage/files/buckets/a%2Fb%20c')
+  })
+})
+
+describe('Linter.utils lintInfoMap pitr_archiving_stale entry', () => {
+  it('registers a security entry linking to the PITR settings page', () => {
+    const info = lintInfoMap.find((entry) => entry.name === 'pitr_archiving_stale')
+    expect(info, 'expected pitr_archiving_stale in lintInfoMap').toBeDefined()
+
+    expect(info!.title).toBe('PITR archiving may be broken')
+    expect(isValidElement(info!.icon) && info!.icon.type).toBe(Ruler)
+    expect(info!.category).toBe('security')
+    expect(info!.linkText).toBe('View settings')
+    // metadata is unused by this entry's link(), and every field on Lint['metadata'] is optional, so {} needs no cast
+    expect(info!.link({ projectRef, metadata: {} })).toBe('/project/abc/database/backups/pitr')
+    expect(info!.docsLink).toContain('/guides/platform/backups#point-in-time-recovery')
+  })
+})
+
+describe('parseLinterLevel', () => {
+  it('returns the matching level', () => {
+    expect(parseLinterLevel('ERROR')).toBe(LINTER_LEVELS.ERROR)
+    expect(parseLinterLevel('WARN')).toBe(LINTER_LEVELS.WARN)
+    expect(parseLinterLevel('INFO')).toBe(LINTER_LEVELS.INFO)
+  })
+
+  it('returns undefined for values that are not a level', () => {
+    expect(parseLinterLevel('error')).toBeUndefined()
+    expect(parseLinterLevel('SOMETHING_ELSE')).toBeUndefined()
+    expect(parseLinterLevel(undefined)).toBeUndefined()
   })
 })

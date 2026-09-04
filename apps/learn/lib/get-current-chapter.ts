@@ -1,5 +1,5 @@
-import { allDocs } from 'contentlayer/generated'
 import { normalizeSlug } from './get-next-page'
+import { allDocs } from '@/.velite'
 
 /**
  * Gets the current chapter number from a doc
@@ -15,7 +15,7 @@ export function getCurrentChapter(
   }
 
   // Get chapterNumber from frontmatter first, then fallback to parsing from title
-  let chapterNumber: number | undefined = (doc as any)?.chapterNumber
+  let chapterNumber: number | undefined = doc?.chapterNumber
   if (!chapterNumber) {
     // Try to extract chapter number from title (e.g., "2: CSS Styling" -> 2)
     const chapterMatch = doc.title.match(/^(\d+):/)

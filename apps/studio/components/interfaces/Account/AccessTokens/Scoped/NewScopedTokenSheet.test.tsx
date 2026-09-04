@@ -2,7 +2,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { HttpResponse } from 'msw'
-import { beforeEach, describe, expect, test } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { NewScopedTokenSheet } from './NewScopedTokenSheet'
 import type { ProfileContextType } from '@/lib/profile'
@@ -12,8 +12,18 @@ import { addAPIMock } from '@/tests/lib/msw'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse']
 type ProjectsResponse = components['schemas']['ListProjectsPaginatedResponse']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
 type CreateTokenResponse = components['schemas']['CreateScopedAccessTokenResponse']
 type CreateClassicTokenResponse = components['schemas']['CreateAccessTokenResponse']
+
+const mockUseReducedMotion = vi.fn(() => false)
+vi.mock('common', async (importOriginal) => {
+  const actual = (await importOriginal()) as typeof import('common')
+  return { ...actual, useReducedMotion: () => mockUseReducedMotion() }
+})
+
+const { mockTrack } = vi.hoisted(() => ({ mockTrack: vi.fn() }))
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
 
 const user = userEvent.setup({
   writeToClipboard: true,
@@ -67,6 +77,29 @@ const mockProjects = () =>
             }),
             organization_slug: 'acme-prod',
             preview_branch_refs: [],
+          },
+        ],
+      }),
+  })
+
+const mockOrgProjects = () =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/organizations/:slug/projects',
+    response: () =>
+      HttpResponse.json<OrganizationProjectsResponse>({
+        pagination: { count: 1, limit: 100, offset: 0 },
+        projects: [
+          {
+            cloud_provider: 'AWS',
+            databases: [],
+            inserted_at: new Date().toISOString(),
+            integration_source: null,
+            is_branch: false,
+            name: 'Project 1',
+            ref: 'project-1',
+            region: 'us-east-1',
+            status: 'ACTIVE_HEALTHY',
           },
         ],
       }),
@@ -132,9 +165,11 @@ describe('NewScopedTokenSheet', () => {
     })
 
   beforeEach(() => {
+    mockTrack.mockReset()
     mockPermissionsMap()
     mockOrganizations()
     mockProjects()
+    mockOrgProjects()
     mockCreateToken()
     mockCreateClassicToken()
   })
@@ -200,8 +235,17 @@ describe('NewScopedTokenSheet', () => {
     await waitFor(async () =>
       expect(await window.navigator.clipboard.readText()).toEqual('a_token_value')
     )
+    expect(mockTrack).toHaveBeenCalledWith('access_token_copied', { tokenType: 'scoped' })
     fireEvent.click(await screen.findByLabelText('I have copied the key and stored it securely'))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_stored_checkbox_clicked', {
+      tokenType: 'scoped',
+      isChecked: true,
+    })
     fireEvent.click(await screen.findByRole('button', { name: 'Done' }))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_done_button_clicked', {
+      tokenType: 'scoped',
+      hasCopiedToken: true,
+    })
     // Dialog has been closed
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   }, 10_000)
@@ -226,6 +270,59 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByRole('option', { name: 'Acme Production' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
     expect(await screen.findByText('No permissions selected', { selector: '[role="alert"] *' }))
+  })
+  test('scrolls the missing permissions warning into view once per attempt', async () => {
+    const scrollIntoView = vi.spyOn(window.HTMLElement.prototype, 'scrollIntoView')
+    renderSheet()
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    await screen.findByRole('dialog')
+    await user.type(await screen.findByLabelText('Name'), 'test')
+    await user.click(await screen.findByRole('radio', { name: /Organization/ }))
+    fireEvent.click(await screen.findByRole('combobox', { name: 'Organizations' }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Acme Production' }))
+    scrollIntoView.mockClear()
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
+    await screen.findByText('No permissions selected', { selector: '[role="alert"] *' })
+    await waitFor(() => expect(scrollIntoView).toHaveBeenCalledTimes(1))
+    expect(scrollIntoView).toHaveBeenLastCalledWith({ behavior: 'smooth', block: 'nearest' })
+
+    // Re-rendering the form while the warning is up must not scroll again
+    await expandPermissionCategory('Database')
+    expect(scrollIntoView).toHaveBeenCalledTimes(1)
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
+    await waitFor(() => expect(scrollIntoView).toHaveBeenCalledTimes(2))
+    scrollIntoView.mockRestore()
+  })
+  test('does not re-scroll when the motion preference changes while the warning is visible', async () => {
+    const scrollIntoView = vi.spyOn(window.HTMLElement.prototype, 'scrollIntoView')
+    try {
+      renderSheet()
+      fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+      await screen.findByRole('dialog')
+      await user.type(await screen.findByLabelText('Name'), 'test')
+      await user.click(await screen.findByRole('radio', { name: /Organization/ }))
+      fireEvent.click(await screen.findByRole('combobox', { name: 'Organizations' }))
+      fireEvent.click(await screen.findByRole('option', { name: 'Acme Production' }))
+
+      fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
+      await screen.findByText('No permissions selected', { selector: '[role="alert"] *' })
+      await waitFor(() => expect(scrollIntoView).toHaveBeenCalledTimes(1))
+
+      mockUseReducedMotion.mockReturnValue(true)
+      // Round-tripping the resource-access scope re-renders the form (resourceAccess is
+      // watched at the top level) without touching missingPermissionsAttempts, so the
+      // warning stays up — this is what would surface a stale effect dependency on the
+      // motion preference.
+      await user.click(await screen.findByRole('radio', { name: /Project/ }))
+      await user.click(await screen.findByRole('radio', { name: /Organization/ }))
+      await screen.findByText('No permissions selected', { selector: '[role="alert"] *' })
+      expect(scrollIntoView).toHaveBeenCalledTimes(1)
+    } finally {
+      mockUseReducedMotion.mockReturnValue(false)
+      scrollIntoView.mockRestore()
+    }
   })
   test('creates the token when scope is Organization', async () => {
     renderSheet()
@@ -255,6 +352,61 @@ describe('NewScopedTokenSheet', () => {
     // Dialog has been closed
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   }, 10_000)
+
+  // Permission preset tests
+  const FULL_ACCESS_WARNING =
+    'Grants the highest access each resource offers, including write access to your database, API keys, and organization members.'
+
+  const getPresetTrigger = async () => screen.findByRole('combobox', { name: 'Permission preset' })
+
+  const openPresetMenu = async () => {
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    await screen.findByRole('dialog')
+    fireEvent.click(await getPresetTrigger())
+  }
+
+  test('applies a preset to every permission row', async () => {
+    renderSheet()
+    await openPresetMenu()
+    fireEvent.click(await screen.findByRole('option', { name: 'Read-only' }))
+
+    expect((await getPresetTrigger()).textContent).toContain('Read-only')
+    // The bulk change is announced rather than left to the user to notice
+    expect((await screen.findByRole('status')).textContent).toBe('All permissions set to read')
+
+    await expandPermissionCategory('Project')
+    const select = await screen.findByLabelText('Project Settings', { exact: false })
+    expect(select.textContent).toBe('Read')
+  })
+
+  test('warns about full access in the menu and inline once applied', async () => {
+    renderSheet()
+    await openPresetMenu()
+
+    const fullAccess = await screen.findByRole('option', { name: /^Full access/ })
+    const describedBy = fullAccess.getAttribute('aria-describedby')
+    expect(describedBy).not.toBeNull()
+    expect(document.getElementById(describedBy!)?.textContent).toBe(FULL_ACCESS_WARNING)
+
+    fireEvent.click(fullAccess)
+    // The warning survives the menu closing
+    await screen.findByText(FULL_ACCESS_WARNING, { selector: '[role="alert"] *' })
+    expect((await getPresetTrigger()).textContent).toContain('Full access')
+  })
+
+  test('falls back to Custom when a row diverges from the preset', async () => {
+    renderSheet()
+    await openPresetMenu()
+    fireEvent.click(await screen.findByRole('option', { name: /^Full access/ }))
+    await screen.findByText(FULL_ACCESS_WARNING, { selector: '[role="alert"] *' })
+
+    await expandPermissionCategory('Project')
+    fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
+    fireEvent.click(await screen.findByRole('option', { name: 'None' }))
+
+    await waitFor(async () => expect((await getPresetTrigger()).textContent).toContain('Custom'))
+    expect(screen.queryByText(FULL_ACCESS_WARNING, { selector: '[role="alert"] *' })).toBeNull()
+  })
 
   test('opens the experimental API dialog from the dropdown', async () => {
     renderSheet()
@@ -302,8 +454,19 @@ describe('NewScopedTokenSheet', () => {
     await waitFor(async () =>
       expect(await window.navigator.clipboard.readText()).toEqual('a_classic_token_value')
     )
+    // resourceAccess must be tracked as 'account' — it is the only path that emits that value
+    expect(mockTrack).toHaveBeenCalledWith('access_token_created', {
+      tokenType: 'classic',
+      expiryPreset: '7d',
+      resourceAccess: 'account',
+    })
+    expect(mockTrack).toHaveBeenCalledWith('access_token_copied', { tokenType: 'classic' })
     fireEvent.click(await screen.findByLabelText('I have copied the key and stored it securely'))
     fireEvent.click(await screen.findByRole('button', { name: 'Done' }))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_done_button_clicked', {
+      tokenType: 'classic',
+      hasCopiedToken: true,
+    })
     // Dialog has been closed
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   })
