@@ -297,6 +297,21 @@ const MultiSelectorLabelVariants = cva(
   }
 )
 
+const MultiSelectorInlineInputWrapperVariants = cva('px-0 flex-1 border-none truncate min-w-0', {
+  variants: {
+    size: {
+      tiny: 'h-full',
+      small: '',
+      medium: '',
+      large: '',
+      xlarge: '',
+    },
+  },
+  defaultVariants: {
+    size: SIZE_VARIANTS_DEFAULT,
+  },
+})
+
 const MultiSelectorInlineInputVariants = cva('py-0 truncate', {
   variants: {
     size: {
@@ -460,7 +475,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
                 placeholder={values.length === 0 ? label : undefined}
                 autoFocus={false}
                 wrapperClassName={cn(
-                  'h-full px-0 flex-1 border-none truncate min-w-0',
+                  MultiSelectorInlineInputWrapperVariants({ size }),
                   IS_BADGE_LIMIT_WRAP && 'min-w-[85px]'
                 )}
                 className={MultiSelectorInlineInputVariants({ size })}
