@@ -69,7 +69,7 @@ export const telemetryHireAgent: ContentListingGroup = {
   items: [
     {
       title: 'Generalist',
-      href: '/guides/monitoring-and-debugging/automate-with-agents/all',
+      href: '/guides/observability/automate-with-agents/all',
       subtitle: getScheduleLabel(monitoringAgents.all),
       description:
         'Run all four checks — health, security, performance, and usage — in one daily pass.',
