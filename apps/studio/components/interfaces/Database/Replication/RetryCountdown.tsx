@@ -1,107 +1,35 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
 
 interface RetryCountdownProps {
-  nextRetryTime: string // RFC3339 formatted date
+  /** RFC 3339 timestamp of the next automatic retry */
+  nextRetryTime: string
 }
 
-interface TimeRemaining {
-  days: number
-  hours: number
-  minutes: number
-  seconds: number
-  isExpired: boolean
-  isInvalid: boolean
+const formatRemaining = (milliseconds: number) => {
+  const duration = dayjs.duration(milliseconds)
+  if (duration.asHours() >= 1) return `${Math.floor(duration.asHours())}h ${duration.minutes()}m`
+  if (duration.asMinutes() >= 1) return `${duration.minutes()}m ${duration.seconds()}s`
+  return `${duration.seconds()}s`
 }
 
 export const RetryCountdown = ({ nextRetryTime }: RetryCountdownProps) => {
-  const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-    isExpired: false,
-    isInvalid: false,
-  })
-
-  const targetTimestamp = useMemo(() => {
-    try {
-      const date = new Date(nextRetryTime)
-      if (isNaN(date.getTime())) {
-        return null
-      }
-      return date.getTime()
-    } catch {
-      return null
-    }
-  }, [nextRetryTime])
-
-  const calculateTimeRemaining = useCallback((targetTime: number): TimeRemaining => {
-    const now = Date.now()
-    const difference = targetTime - now
-
-    if (difference <= 0) {
-      return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true, isInvalid: false }
-    }
-
-    const days = Math.floor(difference / (1000 * 60 * 60 * 24))
-    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
-    const seconds = Math.floor((difference % (1000 * 60)) / 1000)
-
-    return { days, hours, minutes, seconds, isExpired: false, isInvalid: false }
-  }, [])
+  const target = new Date(nextRetryTime).getTime()
+  const [remaining, setRemaining] = useState(() => target - Date.now())
 
   useEffect(() => {
-    if (targetTimestamp === null) return
-
-    const updateTimer = () => {
-      setTimeRemaining(calculateTimeRemaining(targetTimestamp))
-    }
-
-    updateTimer()
-    const interval = setInterval(updateTimer, 1000)
-
+    if (Number.isNaN(target)) return
+    const tick = () => setRemaining(target - Date.now())
+    tick()
+    const interval = setInterval(tick, 1000)
     return () => clearInterval(interval)
-  }, [targetTimestamp, calculateTimeRemaining])
+  }, [target])
 
-  const { timeDisplay, statusMessage } = useMemo(() => {
-    if (targetTimestamp === null) {
-      return {
-        timeDisplay: 'Invalid retry time format',
-        statusMessage: '',
-      }
-    }
-
-    const formatTimeUnit = (value: number, unit: string) => {
-      if (value === 0) return null
-      return `${value}${unit.charAt(0)}`
-    }
-
-    let timeDisplay: string
-    let statusMessage: string
-
-    if (timeRemaining.isExpired) {
-      statusMessage = ''
-      timeDisplay = 'Retrying soon...'
-    } else {
-      const parts = [
-        formatTimeUnit(timeRemaining.days, 'day'),
-        formatTimeUnit(timeRemaining.hours, 'hour'),
-        formatTimeUnit(timeRemaining.minutes, 'minute'),
-        formatTimeUnit(timeRemaining.seconds, 'second'),
-      ].filter(Boolean)
-      statusMessage = parts.length === 0 ? '' : 'Next retry in:'
-      timeDisplay = parts.length === 0 ? 'Retrying soon...' : parts.join(' ')
-    }
-
-    return { timeDisplay, statusMessage }
-  }, [targetTimestamp, timeRemaining])
+  if (Number.isNaN(target)) return <>Retry time is invalid.</>
 
   return (
-    <div role="status" aria-live="polite" aria-label={`${statusMessage} ${timeDisplay}`}>
-      <span className="text-xs font-medium">{statusMessage}</span>{' '}
-      {/* [Joshen] It's a bit hard to debug without doing this locally, but we could use CountdownTimerSpan here perhaps */}
-      <span className="text-xs font-mono">{timeDisplay}</span>
-    </div>
+    <span role="status" aria-live="polite">
+      {remaining <= 0 ? 'Retrying now…' : `Retrying in ${formatRemaining(remaining)}…`}
+    </span>
   )
 }

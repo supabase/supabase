@@ -1,15 +1,6 @@
 import { useParams } from 'common'
 import { toast } from 'sonner'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { PipelineStatusName } from './Replication.constants'
 import { RestartCostEstimate } from './RestartCostEstimate'
@@ -51,7 +42,7 @@ export const RestartTableDialog = ({
   const { mutate: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: () => {
       toast.success(
-        `Restarting replication for "${tableName}". Pipeline will ${pipelineStatusName === PipelineStatusName.STOPPED ? 'start' : 'restart'} automatically.`
+        `Resetting "${tableName}". Pipeline will ${pipelineStatusName === PipelineStatusName.STOPPED ? 'start' : 'restart'} automatically.`
       )
     },
     onSettled: () => {
@@ -59,7 +50,7 @@ export const RestartTableDialog = ({
       onOpenChange(false)
     },
     onError: (error) => {
-      toast.error(`Failed to restart replication: ${error.message}`)
+      toast.error(`Failed to reset table: ${error.message}`)
     },
   })
 
@@ -77,48 +68,24 @@ export const RestartTableDialog = ({
     })
   }
 
+  const consequence = willCopyTable
+    ? 'Destination data for this table will be deleted, existing rows will sync again, and the pipeline will restart automatically.'
+    : 'Destination data for this table will be deleted. Initial sync is skipped for this table, so replication resumes with new changes only. The pipeline will restart automatically.'
+
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>
-            Restart replication for <code className="text-code-inline">{tableName}</code>
-          </AlertDialogTitle>
-          <AlertDialogDescription asChild>
-            <div className="space-y-3 text-sm">
-              <p>
-                This will restart replication for{' '}
-                <code className="text-code-inline">{tableName}</code> from scratch:
-              </p>
-              <ul className="list-disc list-inside space-y-1.5 pl-2">
-                {willCopyTable ? (
-                  <li>
-                    <strong>The table's initial sync will restart.</strong> Existing source rows
-                    will be synced again. Data successfully processed during this initial sync is
-                    billed again.
-                  </li>
-                ) : (
-                  <li>
-                    <strong>The table will skip initial sync.</strong> Replication will resume with
-                    new changes only, without syncing existing source rows. There is no additional
-                    initial sync charge.
-                  </li>
-                )}
-                <li>
-                  <strong>Existing downstream data will be deleted.</strong> Any replicated data for
-                  this table will be removed.
-                </li>
-                <li>
-                  <strong>All other tables remain untouched.</strong> Only this table is affected.
-                </li>
-                <li>
-                  <strong>The pipeline will restart automatically.</strong> This is required to
-                  apply this change.
-                </li>
-              </ul>
-            </div>
-          </AlertDialogDescription>
-        </AlertDialogHeader>
+    <ConfirmationModal
+      size="small"
+      variant="warning"
+      visible={open}
+      title={`Reset ${tableName}`}
+      confirmLabel="Reset table"
+      confirmLabelLoading="Resetting…"
+      loading={isResetting}
+      onCancel={() => onOpenChange(false)}
+      onConfirm={handleReset}
+    >
+      <div className="flex flex-col gap-y-4">
+        <p className="text-sm text-foreground-light">{consequence}</p>
         <RestartCostEstimate
           open={open}
           projectRef={projectRef}
@@ -126,13 +93,7 @@ export const RestartTableDialog = ({
           publicationName={publicationName}
           tables={willCopyTable ? [table] : []}
         />
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
-          <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="warning">
-            {isResetting ? 'Restarting replication...' : 'Restart replication'}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+      </div>
+    </ConfirmationModal>
   )
 }

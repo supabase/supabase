@@ -1,8 +1,8 @@
 import dayjs from 'dayjs'
-import { Badge } from 'ui'
 
 import { getPipelineDisplayState, normalizePipelineStatusName } from '../Pipeline.utils'
 import { PipelineStatusName } from '../Replication.constants'
+import type { StateDotVariant } from '../StateDot'
 import {
   RetryPolicy,
   SlotLagMetrics,
@@ -13,38 +13,31 @@ import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-statu
 import { formatBytes } from '@/lib/helpers'
 import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
 
-export const getStatusConfig = (state: TableState['state']) => {
+export const getStatusConfig = (
+  state: TableState['state']
+): { variant: StateDotVariant; label: string; description: string; isPulsing?: boolean } => {
   switch (state.name) {
     case 'queued':
-      return {
-        badge: <Badge variant="warning">Queued</Badge>,
-        description: 'Waiting for the pipeline to pick it up',
-      }
+      return { variant: 'default', label: 'Queued', description: 'Waiting to copy' }
     case 'copying_table':
       return {
-        badge: <Badge variant="success">Copying</Badge>,
-        description: 'Copying existing rows during the initial sync',
+        variant: 'default',
+        label: 'Copying',
+        description: 'Copying existing rows',
+        isPulsing: true,
       }
     case 'copied_table':
       return {
-        badge: <Badge variant="success">Copied</Badge>,
-        description: 'Initial sync is complete, preparing for ongoing replication',
+        variant: 'default',
+        label: 'Copied',
+        description: 'Copy finished, about to start streaming',
       }
     case 'following_wal':
-      return {
-        badge: <Badge variant="success">Live</Badge>,
-        description: 'Receiving ongoing changes from the WAL',
-      }
+      return { variant: 'success', label: 'Live', description: 'Streaming changes as they happen' }
     case 'error':
-      return {
-        badge: <Badge variant="destructive">Error</Badge>,
-        description: 'Replication is paused after an error',
-      }
+      return { variant: 'destructive', label: 'Error', description: 'Stopped after an error' }
     default:
-      return {
-        badge: <Badge variant="warning">Unknown</Badge>,
-        description: 'Table status is unavailable',
-      }
+      return { variant: 'warning', label: 'Unknown', description: 'Table status is unavailable' }
   }
 }
 
@@ -139,36 +132,33 @@ export const WAL_STATUS_META: Record<SlotWalStatus, WalStatusMeta> = {
     label: 'Reserved',
     variant: 'success',
     severity: 'normal',
-    description:
-      "Healthy. Your database is keeping the WAL files this pipeline's replication slot needs, and they are within the normal WAL size limit.",
+    description: 'Postgres will keep the WAL for every change until this pipeline sends it.',
   },
   extended: {
     label: 'Extended',
     variant: 'warning',
     severity: 'normal',
     description:
-      "Healthy, but growing. This pipeline's replication slot is holding on to more WAL than usual, but your database is still keeping everything it needs.",
+      'The pipeline is behind. Postgres is retaining more WAL than usual, but nothing is discarded yet.',
   },
   unreserved: {
     label: 'Unreserved',
     variant: 'warning',
     severity: 'warning',
-    description:
-      "At risk. Your database is no longer reserving all WAL files this pipeline's replication slot needs. If the pipeline does not catch up soon, those files may be removed.",
+    description: 'Postgres may discard WAL this pipeline has not sent yet.',
   },
   lost: {
     label: 'Lost',
     variant: 'destructive',
     severity: 'critical',
     description:
-      "Broken. Some WAL files this pipeline's replication slot needs have already been removed. The pipeline can no longer continue from this slot. You can recreate a new pipeline, or set the invalidation behavior to recreate and restart the pipeline.",
+      'Postgres already discarded WAL this pipeline needed. Replication cannot continue from here.',
   },
   unknown: {
     label: 'Unknown',
     variant: 'default',
     severity: 'normal',
-    description:
-      "Unknown. Your database reported an unknown state for this pipeline's replication slot.",
+    description: 'Postgres did not report a status for this pipeline’s slot.',
   },
 }
 
@@ -249,20 +239,20 @@ export const getTableStatusEmptyState = ({
   if (statusName === PipelineStatusName.STOPPED) {
     return {
       title: 'Pipeline stopped',
-      description: 'Start the pipeline to begin replication.',
+      description: 'Start the pipeline to begin replication',
     }
   }
 
   if (statusName === PipelineStatusName.FAILED) {
     return {
       title: 'Pipeline failed',
-      description: 'Restart the pipeline or reset your tables to recover.',
+      description: 'Restart the pipeline or reset your tables to recover',
     }
   }
 
   return {
     title: 'No table data yet',
-    description: 'Table status appears here once replication begins.',
+    description: 'Table status appears here once replication begins',
   }
 }
 
@@ -277,9 +267,47 @@ export interface PipelineStateNotice {
 const COPYING_STATES: TableState['state']['name'][] = ['queued', 'copying_table', 'copied_table']
 
 /**
- * The one thing worth saying about a pipeline's current state, above everything else on the page.
- * Returns undefined for a healthy running pipeline, which needs no explanation.
+ * How much of the initial copy is left. A pipeline can be caught up on its ongoing change stream
+ * while tables are still copying, so several surfaces need to know this to stay honest.
  */
+export const getInitialSyncProgress = (
+  tableStatuses: { state: { name: TableState['state']['name'] } }[]
+) => {
+  const count = (name: TableState['state']['name']) =>
+    tableStatuses.filter((table) => table.state.name === name).length
+
+  return {
+    // Everything not yet streaming, whatever stage of the initial sync it is at
+    syncingCount: tableStatuses.filter((table) => COPYING_STATES.includes(table.state.name)).length,
+    copyingCount: count('copying_table'),
+    queuedCount: count('queued'),
+    totalCount: tableStatuses.length,
+  }
+}
+
+const plural = (count: number, singular: string, pluralForm = `${singular}s`) =>
+  `${count} ${count === 1 ? singular : pluralForm}`
+
+/**
+ * One sentence on where an initial sync is up to. Only ever says "copying" about tables that are.
+ */
+export const getInitialSyncSummary = ({
+  copyingCount,
+  queuedCount,
+  totalCount,
+}: ReturnType<typeof getInitialSyncProgress>) => {
+  if (copyingCount > 0 && queuedCount > 0) {
+    return `${copyingCount} of ${plural(totalCount, 'table')} ${copyingCount === 1 ? 'is' : 'are'} copying and ${queuedCount} ${queuedCount === 1 ? 'is' : 'are'} waiting.`
+  }
+  if (copyingCount > 0) {
+    return `${copyingCount} of ${plural(totalCount, 'table')} ${copyingCount === 1 ? 'is' : 'are'} copying.`
+  }
+  if (queuedCount > 0) {
+    return `${plural(queuedCount, 'table')} ${queuedCount === 1 ? 'is' : 'are'} waiting to copy.`
+  }
+  return 'The last tables are finishing their copy.'
+}
+
 export const getPipelineStateNotice = ({
   requestStatus,
   statusName,
@@ -308,7 +336,7 @@ export const getPipelineStateNotice = ({
       type: 'destructive',
       title: displayState.title,
       description:
-        'Replication has stopped. Restart the pipeline to resume from its last checkpoint.',
+        'Replication has stopped. Restart the pipeline to resume from its last checkpoint. Table states below are from before it failed.',
       showLogsLink: true,
     }
   }
@@ -318,7 +346,7 @@ export const getPipelineStateNotice = ({
       type: 'note',
       title: displayState.title,
       description:
-        'Changes to your source tables stay in the Postgres WAL until you start the pipeline again.',
+        'Changes to your source tables wait in Postgres until you start the pipeline again. Table states below are from before it stopped.',
       showLogsLink: false,
     }
   }
@@ -327,45 +355,39 @@ export const getPipelineStateNotice = ({
     return {
       type: 'warning',
       title: displayState.title,
-      description: 'We can’t tell whether replication is running.',
+      description: 'We can’t tell whether replication is running',
       showLogsLink: true,
     }
   }
 
   // Running. The only thing left worth calling out is an initial sync that hasn't finished.
-  const syncingCount = tableStatuses.filter((table) =>
-    COPYING_STATES.includes(table.state.name)
-  ).length
-  if (syncingCount === 0) return undefined
+  const progress = getInitialSyncProgress(tableStatuses)
+  if (progress.syncingCount === 0) return undefined
 
   return {
     type: 'note',
     title: 'Initial sync is running',
-    description: `${syncingCount} of ${tableStatuses.length} ${
-      tableStatuses.length === 1 ? 'table is' : 'tables are'
-    } still copying existing rows. Streaming starts for each table as its copy finishes.`,
+    description: `${getInitialSyncSummary(progress)} Each table starts streaming as its copy finishes.`,
     showLogsLink: false,
   }
 }
 
 /**
  * A table's own replication slot, as a short list of phrases for one table cell. Skips anything
- * that carries no signal — a connected slot, a zero backlog, unlimited WAL retention — so the line
- * only ever says what's worth reading.
+ * that carries no signal, such as a zero backlog or a reserved WAL status, so the line only ever
+ * says what's worth reading. Connection is skipped on purpose: a copying table's slot is inactive
+ * until the copy finishes, so flagging it would look like a fault.
  */
 export const getTableSyncLagLabel = (metrics: SlotLagMetrics): string[] => {
   const parts: string[] = []
-
-  if (metrics.active === false) parts.push('Not connected')
 
   const pendingBytes = metrics.confirmed_flush_lsn_bytes
   if (typeof pendingBytes === 'number' && pendingBytes > 0) {
     parts.push(`${formatBytes(pendingBytes, pendingBytes < 1024 ? 0 : 1)} waiting to sync`)
   }
 
-  if (metrics.wal_status !== undefined && metrics.wal_status !== 'reserved') {
-    parts.push(`WAL ${getWalStatusMeta(metrics.wal_status).label.toLowerCase()}`)
-  }
+  if (metrics.wal_status === 'unreserved') parts.push('Some changes at risk')
+  if (metrics.wal_status === 'lost') parts.push('Some changes lost')
 
   const replyLag = metrics.reply_time_lag
   if (typeof replyLag === 'number' && replyLag > 0) {

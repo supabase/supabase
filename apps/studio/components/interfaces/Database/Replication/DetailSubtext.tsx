@@ -12,7 +12,7 @@ export const DetailSubtext = ({
 }: {
   children: ReactNode
   className?: string
-}) => <p className={cn('text-xs text-foreground-lighter', className)}>{children}</p>
+}) => <p className={cn('text-xs text-foreground-lighter text-balance', className)}>{children}</p>
 
 /**
  * Marks text whose full meaning lives in a tooltip, so it doesn't look like inert copy. Use on the

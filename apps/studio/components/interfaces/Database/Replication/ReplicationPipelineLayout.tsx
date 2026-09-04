@@ -2,10 +2,9 @@ import { useParams } from 'common'
 import {
   ArrowRight,
   ArrowUpCircle,
-  Ban,
+  CircleStop,
   Edit,
   MoreVertical,
-  Pause,
   Play,
   RotateCcw,
   Trash,
@@ -27,8 +26,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  NavMenu,
-  NavMenuItem,
 } from 'ui'
 import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
 import {
@@ -40,7 +37,6 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
-import { PageNav } from 'ui-patterns/PageNav'
 
 import { DeleteDestination } from './DeleteDestination'
 import { DestinationLogo } from './DestinationLogo'
@@ -134,16 +130,15 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
           ? 'Restart'
           : displayState.label
 
+  // No icon while Starting/Stopping/Restarting: the button's loading state carries that.
   const lifecycleIcon =
     statusName === PipelineStatusName.STOPPED ? (
       <Play />
     ) : statusName === PipelineStatusName.STARTED ? (
-      <Pause />
+      <CircleStop />
     ) : statusName === PipelineStatusName.FAILED ? (
       <RotateCcw />
-    ) : (
-      <Ban />
-    )
+    ) : undefined
 
   const primaryAction: LifecycleAction | undefined =
     statusName === PipelineStatusName.STOPPED
@@ -208,7 +203,6 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     updatePipelineStatus(pipelineId, statusName)
   }, [pipelineId, statusName, updatePipelineStatus])
 
-  const overviewUrl = `/project/${projectRef}/database/replication/${pipelineId}`
   const logsUrl = `/project/${projectRef}/logs/replication-logs?f=${encodeURIComponent(
     JSON.stringify({ pipeline_id: pipelineId })
   )}`
@@ -240,7 +234,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
           </BreadcrumbList>
         </PageBreadcrumbs>
 
-        <PageHeader size="full" className="py-4 [&>div]:px-4 [&>div]:xl:px-4">
+        <PageHeader size="full" className="border-b py-4 [&>div]:px-4 [&>div]:xl:px-4">
           <PageHeaderMeta className="px-0 xl:px-0">
             {destinationType !== undefined && (
               <PageHeaderIcon>
@@ -309,7 +303,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="default"
-                      className="px-1.5"
+                      className="px-1.25 hit-area-2"
                       aria-label="Pipeline options"
                       icon={<MoreVertical />}
                     />
@@ -329,7 +323,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                         className="gap-x-2"
                         onClick={() => onLifecycleAction('stop')}
                       >
-                        <Pause size={14} />
+                        <CircleStop size={14} />
                         <span>Stop pipeline</span>
                       </DropdownMenuItem>
                     )}
@@ -358,14 +352,6 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
             </PageHeaderAside>
           </PageHeaderMeta>
         </PageHeader>
-
-        <PageNav>
-          <NavMenu>
-            <NavMenuItem active>
-              <Link href={overviewUrl}>Overview</Link>
-            </NavMenuItem>
-          </NavMenu>
-        </PageNav>
       </div>
 
       {children}

@@ -3,7 +3,7 @@ import { ChevronRight, Minus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
+import { TableCell, TableRow } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteDestination } from './DeleteDestination'
@@ -11,7 +11,10 @@ import { DestinationLogo } from './DestinationLogo'
 import { DetailSubtext } from './DetailSubtext'
 import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
-import { getFormattedLagValue } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
+import {
+  getFormattedLagValue,
+  getInitialSyncProgress,
+} from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
 import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useDestinationInformation } from './useDestinationInformation'
@@ -88,6 +91,10 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   // idle or don't report timed feedback, whereas confirmed_flush_lsn_bytes is always populated.
   const lagBytes = applyLag?.confirmed_flush_lsn_bytes
   const lag = getFormattedLagValue('bytes', lagBytes)
+  // The lag figure only covers ongoing changes, so it reads as "Caught up" while an initial copy
+  // is still running. Say what's actually happening instead.
+  const { syncingCount } = getInitialSyncProgress(tableStatuses)
+  const isInitialSyncRunning = syncingCount > 0
   const isCaughtUp = lagBytes === 0
   // Only show errors when pipeline is running (not when stopped or restarting)
   const isPipelineStopped = statusName === PipelineStatusName.STOPPED
@@ -155,7 +162,9 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
           onKeyDown={handleNavigation}
           tabIndex={0}
         >
-          <TableCell>{type ? <DestinationLogo type={type} /> : null}</TableCell>
+          <TableCell className="!pr-1">
+            {type ? <DestinationLogo type={type} hasErrors={hasTableErrors} /> : null}
+          </TableCell>
 
           <TableCell className="max-w-[180px]">
             {isPipelineLoading ? (
@@ -166,9 +175,17 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                   {destinationName || type}
                 </p>
                 <DetailSubtext className="flex items-center gap-x-1.5">
-                  <span className="font-mono">#{pipeline?.id}</span>
+                  <span>#{pipeline?.id}</span>
                   <span aria-hidden>&middot;</span>
                   <span>{type}</span>
+                  {hasTableErrors && (
+                    <>
+                      <span aria-hidden>&middot;</span>
+                      <span className="text-destructive">
+                        {errorCount} table error{errorCount === 1 ? '' : 's'}
+                      </span>
+                    </>
+                  )}
                 </DetailSubtext>
               </div>
             )}
@@ -198,6 +215,8 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
               <ShimmeringLoader />
             ) : isReplicationStatusError || !applyLag ? (
               <Minus size={18} className="text-foreground-lighter" />
+            ) : isInitialSyncRunning ? (
+              <span className="text-foreground-light whitespace-nowrap">Initial sync</span>
             ) : isCaughtUp ? (
               <span className="text-foreground-light whitespace-nowrap">Caught up</span>
             ) : (
@@ -215,16 +234,6 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
 
           <TableCell>
             <div className="flex items-center justify-end gap-x-2">
-              {hasTableErrors && (
-                <Tooltip>
-                  <TooltipTrigger>
-                    <WarningIcon />
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">
-                    {errorCount} table{errorCount === 1 ? '' : 's'} encountered replication errors.
-                  </TooltipContent>
-                </Tooltip>
-              )}
               <div
                 onClick={(event) => event.stopPropagation()}
                 onKeyDown={(event) => event.stopPropagation()}

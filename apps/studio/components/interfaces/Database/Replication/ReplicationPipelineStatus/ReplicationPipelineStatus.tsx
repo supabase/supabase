@@ -9,6 +9,7 @@ import {
   CardContent,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   Table,
   TableBody,
@@ -45,7 +46,6 @@ import {
 } from './ReplicationPipelineStatus.utils'
 import { TableReplicationRow } from './TableReplicationRow'
 import { AlertError } from '@/components/ui/AlertError'
-import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
 import {
@@ -61,13 +61,15 @@ import {
 type TableSortColumn = 'table' | 'status'
 type TableSort = `${TableSortColumn}:${'asc' | 'desc'}`
 
-// Worst first, so sorting ascending by status surfaces the tables that need attention.
+// Attention first, then by how much is happening: errors, tables mid-copy, tables about to
+// stream, live tables, and finally tables waiting their turn. This is the default sort, so during
+// an initial sync the active work sits at the top and the queue at the bottom.
 const TABLE_STATE_SORT_ORDER: ReplicationPipelineTableStatus['state']['name'][] = [
   'error',
-  'queued',
   'copying_table',
   'copied_table',
   'following_wal',
+  'queued',
 ]
 
 const compareTableStates = (
@@ -148,7 +150,7 @@ export const ReplicationPipelineStatus = () => {
 
   const applyLagMetrics = replicationStatusData?.apply_lag
 
-  const [sort, setSort] = useState<TableSort>('table:asc')
+  const [sort, setSort] = useState<TableSort>('status:asc')
   const [sortColumn, sortDirection] = sort.split(':') as [TableSortColumn, 'asc' | 'desc']
 
   const getAriaSort = (column: TableSortColumn) => {
@@ -195,13 +197,13 @@ export const ReplicationPipelineStatus = () => {
     requestStatus === PipelineStatusRequestStatus.StopRequested ||
     requestStatus === PipelineStatusRequestStatus.RestartRequested
   const showDisabledState = isEnablingDisabling || isAnyRestartInProgress || !isPipelineActionable
-  const lastKnownStateMessage =
-    statusName === PipelineStatusName.STOPPED
-      ? 'Showing the last known table state before the pipeline was stopped.'
-      : statusName === PipelineStatusName.FAILED
-        ? 'Showing the last reported table state before the pipeline failed.'
-        : null
   const stateNotice = getPipelineStateNotice({ requestStatus, statusName, tableStatuses })
+  // Connection used to be a permanent row in the health card, where it restated the header. It
+  // only carries information when it disagrees with the header, so that is the only time it shows.
+  // Skip it when the replication-status query itself failed: that stale active flag is unreliable,
+  // and "Live updates paused" already covers the situation.
+  const isSlotDisconnected =
+    !isStatusError && statusName === PipelineStatusName.STARTED && applyLagMetrics?.active === false
   const logsUrl = `/project/${projectRef}/logs/replication-logs?f=${encodeURIComponent(
     JSON.stringify({ pipeline_id: pipelineId })
   )}`
@@ -217,19 +219,10 @@ export const ReplicationPipelineStatus = () => {
 
   return (
     <PageContainer size="large">
-      {(isPipelineError || isStatusError) && (
+      {isPipelineError && (
         <PageSection>
-          <PageSectionContent className="flex flex-col gap-y-4">
-            {isPipelineError && (
-              <AlertError error={pipelineError} subject="Failed to retrieve pipeline information" />
-            )}
-            {isStatusError && (
-              <Admonition
-                type="warning"
-                title="Live updates paused"
-                description="We can't reach this pipeline right now. Retrying automatically."
-              />
-            )}
+          <PageSectionContent>
+            <AlertError error={pipelineError} subject="Failed to retrieve pipeline information" />
           </PageSectionContent>
         </PageSection>
       )}
@@ -242,9 +235,9 @@ export const ReplicationPipelineStatus = () => {
         </PageSection>
       )}
 
-      {stateNotice !== undefined && (
-        <PageSection>
-          <PageSectionContent>
+      {!isPipelineLoading && !isStatusLoading && (
+        <PipelineHealthSection metrics={applyLagMetrics}>
+          {stateNotice !== undefined && (
             <Admonition
               type={stateNotice.type}
               layout="responsive"
@@ -258,19 +251,59 @@ export const ReplicationPipelineStatus = () => {
                 ) : undefined
               }
             />
-          </PageSectionContent>
-        </PageSection>
+          )}
+
+          {hasErroredTables && !showDisabledState && (
+            <Admonition
+              type="destructive"
+              layout="responsive"
+              title={
+                erroredTables.length === 1
+                  ? '1 table stopped replicating'
+                  : `${erroredTables.length} tables stopped replicating`
+              }
+              description="The rest of the pipeline keeps running. Open a table’s error to see what went wrong, then reset it to resume."
+              actions={
+                <Button
+                  variant="default"
+                  icon={<RotateCcw />}
+                  disabled={isAnyRestartInProgress || isPipelineError}
+                  loading={isAnyRestartInProgress}
+                  onClick={() => {
+                    setBatchRestartMode('errored')
+                    setShowBatchRestartDialog(true)
+                  }}
+                >
+                  Reset failed tables
+                </Button>
+              }
+            />
+          )}
+
+          {isSlotDisconnected && (
+            <Admonition
+              type="warning"
+              title="Pipeline disconnected"
+              description="The pipeline is running but isn’t connected to your database right now. It reconnects on its own; if this persists, check the logs."
+            />
+          )}
+
+          {isStatusError && (
+            <Admonition
+              type="warning"
+              title="Live updates paused"
+              description="We can’t reach this pipeline right now. Health below is the last we received, and we’re retrying automatically."
+            />
+          )}
+        </PipelineHealthSection>
       )}
 
       {pipeline !== undefined && (
         <PipelineConfigurationSection pipeline={pipeline} destination={destination} />
       )}
 
-      {applyLagMetrics && (
-        <PipelineHealthSection metrics={applyLagMetrics} isStale={isStatusError} />
-      )}
-
-      {!isPipelineLoading && !isStatusLoading && (
+      {/* Nothing to list and no way to know why: the Live updates paused notice already says it */}
+      {!isPipelineLoading && !isStatusLoading && !(isStatusError && !hasTableData) && (
         <PageSection>
           <PageSectionMeta>
             <PageSectionSummary>
@@ -292,7 +325,7 @@ export const ReplicationPipelineStatus = () => {
                     icon={<Search />}
                     size="tiny"
                     className="text-xs w-52"
-                    placeholder="Search for tables"
+                    placeholder="Search tables"
                     value={searchString}
                     disabled={isPipelineError}
                     onChange={(e) => setSearchString(e.target.value)}
@@ -321,20 +354,21 @@ export const ReplicationPipelineStatus = () => {
                         setShowBatchRestartDialog(true)
                       }}
                     >
-                      Restart all tables
+                      Reset all tables
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="default"
-                          aria-label="More restart options"
+                          aria-label="More reset options"
                           icon={<ChevronDown />}
                           className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                           disabled={showDisabledState || isPipelineError}
                         />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-44">
-                        <DropdownMenuItemTooltip
+                      <DropdownMenuContent align="end" className="w-52">
+                        <DropdownMenuItem
+                          className="data-disabled:pointer-events-auto data-disabled:cursor-not-allowed"
                           disabled={
                             !hasErroredTables || isAnyRestartInProgress || showDisabledState
                           }
@@ -342,50 +376,18 @@ export const ReplicationPipelineStatus = () => {
                             setBatchRestartMode('errored')
                             setShowBatchRestartDialog(true)
                           }}
-                          tooltip={{
-                            content: {
-                              side: 'left',
-                              text: !hasErroredTables ? 'No failed tables' : undefined,
-                            },
-                          }}
                         >
-                          Restart failed tables only
-                        </DropdownMenuItemTooltip>
+                          <div className="flex flex-col gap-y-0.5">
+                            <p>Reset failed tables only</p>
+                            {!hasErroredTables && (
+                              <p className="text-foreground-lighter">No failed tables</p>
+                            )}
+                          </div>
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
                 </div>
-
-                {hasErroredTables && !showDisabledState && (
-                  <Admonition
-                    type="destructive"
-                    layout="responsive"
-                    title={
-                      erroredTables.length === 1
-                        ? '1 table stopped replicating'
-                        : `${erroredTables.length} tables stopped replicating`
-                    }
-                    description="The rest of the pipeline keeps running. Open a table’s error to see what went wrong, then reset it to resume."
-                    actions={
-                      <Button
-                        variant="default"
-                        icon={<RotateCcw />}
-                        disabled={isAnyRestartInProgress || isPipelineError}
-                        loading={isAnyRestartInProgress}
-                        onClick={() => {
-                          setBatchRestartMode('errored')
-                          setShowBatchRestartDialog(true)
-                        }}
-                      >
-                        Reset failed tables
-                      </Button>
-                    }
-                  />
-                )}
-
-                {lastKnownStateMessage !== null && !showDisabledState && (
-                  <Admonition type="note" description={lastKnownStateMessage} />
-                )}
 
                 <Card>
                   <CardContent className="p-0">

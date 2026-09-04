@@ -1,6 +1,8 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  getInitialSyncProgress,
+  getInitialSyncSummary,
   getPipelineStateNotice,
   getTableStatusEmptyState,
   getTableSyncLagLabel,
@@ -49,7 +51,7 @@ describe('getTableStatusEmptyState', () => {
       })
     ).toEqual({
       title: 'No table data yet',
-      description: 'Table status appears here once replication begins.',
+      description: 'Table status appears here once replication begins',
     })
   })
 })
@@ -100,7 +102,7 @@ describe('getPipelineStateNotice', () => {
     expect(notice?.title).toBe('Starting pipeline')
   })
 
-  test('counts the tables still copying during an initial sync', () => {
+  test('describes an initial sync without calling queued tables copying', () => {
     const notice = getPipelineStateNotice({
       requestStatus: PipelineStatusRequestStatus.None,
       statusName: 'started',
@@ -112,7 +114,7 @@ describe('getPipelineStateNotice', () => {
     })
 
     expect(notice?.title).toBe('Initial sync is running')
-    expect(notice?.description).toContain('2 of 4 tables')
+    expect(notice?.description).toContain('1 of 4 tables is copying and 1 is waiting.')
   })
 })
 
@@ -142,7 +144,8 @@ describe('getTableSyncLagLabel', () => {
     ).toEqual(['2 KB waiting to sync', 'Last check-in 4.80 s'])
   })
 
-  test('surfaces a disconnected slot and an at-risk WAL status', () => {
+  test('says what an at-risk slot means, and skips the expected inactive connection', () => {
+    // A copying table's slot is inactive by design, so that is not worth flagging per row
     expect(
       getTableSyncLagLabel({
         active: false,
@@ -151,6 +154,71 @@ describe('getTableSyncLagLabel', () => {
         confirmed_flush_lsn_bytes: 0,
         safe_wal_size_bytes: null,
       })
-    ).toEqual(['Not connected', 'WAL unreserved'])
+    ).toEqual(['Some changes at risk'])
+  })
+})
+
+describe('getInitialSyncProgress', () => {
+  test('counts queued, copying and copied tables as still syncing, and splits the first two', () => {
+    expect(
+      getInitialSyncProgress([
+        { state: { name: 'following_wal' } },
+        { state: { name: 'queued' } },
+        { state: { name: 'copying_table' } },
+        { state: { name: 'copied_table' } },
+      ])
+    ).toEqual({ syncingCount: 3, copyingCount: 1, queuedCount: 1, totalCount: 4 })
+  })
+
+  test('reports nothing syncing once every table is streaming', () => {
+    expect(getInitialSyncProgress(liveTables(3))).toEqual({
+      syncingCount: 0,
+      copyingCount: 0,
+      queuedCount: 0,
+      totalCount: 3,
+    })
+  })
+
+  test('does not count an errored table as still syncing', () => {
+    expect(getInitialSyncProgress([...liveTables(1), { state: { name: 'error' } }])).toEqual({
+      syncingCount: 0,
+      copyingCount: 0,
+      queuedCount: 0,
+      totalCount: 2,
+    })
+  })
+})
+
+describe('getInitialSyncSummary', () => {
+  const summarise = (copyingCount: number, queuedCount: number, totalCount: number) =>
+    getInitialSyncSummary({
+      syncingCount: copyingCount + queuedCount,
+      copyingCount,
+      queuedCount,
+      totalCount,
+    })
+
+  test('separates copying from waiting', () => {
+    expect(summarise(4, 3, 8)).toBe('4 of 8 tables are copying and 3 are waiting.')
+  })
+
+  test('uses singular verbs when only one table is copying or waiting', () => {
+    expect(summarise(1, 1, 4)).toBe('1 of 4 tables is copying and 1 is waiting.')
+  })
+
+  test('drops the waiting clause when nothing is queued', () => {
+    expect(summarise(2, 0, 8)).toBe('2 of 8 tables are copying.')
+  })
+
+  test('handles the moment before any worker has picked a table up', () => {
+    expect(summarise(0, 3, 3)).toBe('3 tables are waiting to copy.')
+  })
+
+  test('handles a single table grammatically', () => {
+    expect(summarise(1, 0, 1)).toBe('1 of 1 table is copying.')
+  })
+
+  test('covers tables that have copied but not started streaming yet', () => {
+    expect(summarise(0, 0, 2)).toBe('The last tables are finishing their copy.')
   })
 })

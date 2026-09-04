@@ -41,7 +41,6 @@ import {
 } from './useIsETLPrivateAlpha'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
 import { AlertError } from '@/components/ui/AlertError'
-import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { replicationKeys } from '@/data/replication/keys'
@@ -292,10 +291,10 @@ export const Destinations = () => {
                 aria-label="More actions"
                 variant="default"
                 icon={<MoreVertical />}
-                className="px-1"
+                className="px-1.25"
               />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52">
+            <DropdownMenuContent align="end" className="w-64">
               <DropdownMenuItem asChild>
                 <Link href={`/org/${organization?.slug}/usage#pipeline-initial-sync-data`}>
                   View Pipelines usage
@@ -307,18 +306,18 @@ export const Destinations = () => {
                   Enable Pipelines
                 </DropdownMenuItem>
               ) : (
-                <DropdownMenuItemTooltip
+                <DropdownMenuItem
+                  className="data-disabled:pointer-events-auto data-disabled:cursor-not-allowed"
                   disabled={!canDisablePipelines}
-                  tooltip={{
-                    content: {
-                      side: 'left',
-                      text: 'Delete all pipelines before disabling Pipelines',
-                    },
-                  }}
                   onClick={() => setShowDisablePipelinesDialog(true)}
                 >
-                  Disable Pipelines
-                </DropdownMenuItemTooltip>
+                  <div className="flex flex-col gap-y-0.5">
+                    <p>Disable Pipelines</p>
+                    {!canDisablePipelines && (
+                      <p className="text-foreground-lighter">Delete all pipelines first</p>
+                    )}
+                  </div>
+                </DropdownMenuItem>
               )}
             </DropdownMenuContent>
           </DropdownMenu>

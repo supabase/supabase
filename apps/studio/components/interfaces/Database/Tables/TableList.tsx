@@ -1,19 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
+import { TableEditor } from 'icons'
 import { noop } from 'lodash'
-import {
-  Check,
-  ChevronDown,
-  Copy,
-  Edit,
-  Eye,
-  MoreVertical,
-  Plus,
-  Search,
-  Trash,
-  X,
-} from 'lucide-react'
+import { Check, ChevronDown, Copy, Edit, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
@@ -550,7 +540,7 @@ export const TableList = ({
                                       })
                                     }
                                   >
-                                    <Eye size={12} />
+                                    <TableEditor size={12} />
                                     <p>View in Table Editor</p>
                                   </DropdownMenuItem>
 

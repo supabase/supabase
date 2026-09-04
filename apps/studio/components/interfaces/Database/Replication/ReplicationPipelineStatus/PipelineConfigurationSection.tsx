@@ -7,6 +7,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
+import { DEFAULT_MAX_TABLE_SYNC_WORKERS } from '../DestinationPanel/DestinationForm/DestinationForm.constants'
 import { PIPELINE_REGION } from '../Replication.constants'
 import { getReplicationDestinationTarget } from '../ReplicationDiagram/Nodes.utils'
 import { PIPELINE_DETAIL_GRID_CLASS_NAME, PipelineDetailItem } from './PipelineDetailItem'
@@ -54,13 +55,19 @@ export const PipelineConfigurationSection = ({
               </PipelineDetailItem>
               <PipelineDetailItem
                 label="Publication"
-                tooltip="The Postgres publication this pipeline reads from. It decides which tables are replicated."
+                tooltip="The Postgres publication this pipeline reads from, which determines which tables are replicated"
               >
                 {pipeline.config.publication_name}
               </PipelineDetailItem>
               <PipelineDetailItem
+                label="Table sync workers"
+                tooltip="How many tables copy at the same time during an initial sync"
+              >
+                {pipeline.config.max_table_sync_workers ?? DEFAULT_MAX_TABLE_SYNC_WORKERS}
+              </PipelineDetailItem>
+              <PipelineDetailItem
                 label="Pipeline region"
-                tooltip="Every pipeline runs from this region, regardless of where your project is."
+                tooltip="Every pipeline runs from this region, regardless of where your project is"
                 description={PIPELINE_REGION.code}
               >
                 <span className="flex items-center gap-x-2">

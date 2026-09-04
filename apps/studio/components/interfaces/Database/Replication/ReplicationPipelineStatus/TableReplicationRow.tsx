@@ -1,8 +1,8 @@
 import { useParams } from 'common'
-import { ExternalLink, MoreVertical, RotateCcw } from 'lucide-react'
+import { TableEditor } from 'icons'
+import { MoreVertical, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
 import {
-  Badge,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -12,8 +12,8 @@ import {
   TableRow,
 } from 'ui'
 
-import { DetailSubtext } from '../DetailSubtext'
 import { ErroredTableDetails } from '../ErroredTableDetails'
+import { StateDot } from '../StateDot'
 import { SlotLagMetrics as SlotLagMetricsType, TableState } from './ReplicationPipelineStatus.types'
 import { getStatusConfig, getTableSyncLagLabel } from './ReplicationPipelineStatus.utils'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
@@ -46,7 +46,7 @@ export const TableReplicationRow = ({
   const canRestart = !showDisabledState && !isRestarting && !isAnyRestartInProgress
   const restartLabel = isPipelineStopped
     ? 'Reset table and start pipeline'
-    : 'Reset and restart pipeline'
+    : 'Reset table and restart pipeline'
 
   const isErrorState = table.state.name === 'error'
   const canShowError =
@@ -55,38 +55,54 @@ export const TableReplicationRow = ({
   // than a grid, so the detail survives without a table cell turning into a dashboard.
   const syncLag = table.table_sync_lag as SlotLagMetricsType | undefined
   const syncLagLabel = syncLag === undefined ? undefined : getTableSyncLagLabel(syncLag).join(' · ')
+  // Status column already names the state (Copying, Queued, …). Prefer the sync line when we have
+  // one; keep the description only when it adds something the status label doesn't say.
+  const detailsLine =
+    syncLagLabel !== undefined ? syncLagLabel : isErrorState ? undefined : statusConfig.description
 
   return (
     <TableRow>
-      <TableCell className="align-top">{tableName}</TableCell>
+      <TableCell>{tableName}</TableCell>
 
-      <TableCell className="align-top">
+      <TableCell>
         {isRestarting ? (
-          <Badge variant="default">Restarting</Badge>
+          <StateDot variant="warning" isPulsing>
+            Restarting
+          </StateDot>
         ) : showDisabledState ? (
-          <Badge variant="default">Not Available</Badge>
+          <StateDot variant="default">Not available</StateDot>
         ) : (
-          statusConfig.badge
+          <StateDot
+            variant={statusConfig.variant}
+            isPulsing={statusConfig.isPulsing}
+            pulseDelayMs={statusConfig.isPulsing ? (table.id % 8) * 55 : undefined}
+          >
+            {statusConfig.label}
+          </StateDot>
         )}
       </TableCell>
 
-      <TableCell className="align-top">
+      <TableCell>
         {isRestarting ? (
           <p className="text-sm text-foreground-lighter">
-            Replication is being restarted for this table. The pipeline will restart automatically.
+            Being reset. The pipeline will restart itself…
           </p>
         ) : showDisabledState ? (
           <p className="text-sm text-foreground-lighter">{disabledStateMessage}</p>
         ) : (
-          <div className="flex flex-col gap-y-1">
-            <p className="text-sm text-foreground-lighter">{statusConfig.description}</p>
-            {syncLagLabel !== undefined && <DetailSubtext>{syncLagLabel}</DetailSubtext>}
-            {isErrorState && <ErroredTableDetails table={table} />}
-          </div>
+          <p className="text-sm text-foreground-lighter">
+            {isErrorState ? (
+              <>
+                {statusConfig.description}. <ErroredTableDetails table={table} />
+              </>
+            ) : (
+              detailsLine
+            )}
+          </p>
         )}
       </TableCell>
 
-      <TableCell className="align-top">
+      <TableCell>
         <div className="flex items-center justify-end gap-x-2">
           {canShowError && (
             <Button variant="default" onClick={onSelectShowError}>
@@ -97,12 +113,12 @@ export const TableReplicationRow = ({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="default"
-                className="w-7 hit-area-2"
+                className="px-1.25 hit-area-2"
                 aria-label={`Options for ${tableName}`}
                 icon={<MoreVertical />}
               />
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom" align="end" className="w-56">
+            <DropdownMenuContent side="bottom" align="end" className="w-64">
               <DropdownMenuItemTooltip
                 className="gap-x-2"
                 disabled={!canRestart}
@@ -123,8 +139,8 @@ export const TableReplicationRow = ({
                   rel="noopener noreferrer"
                   href={`/project/${ref}/editor/${table.id}`}
                 >
-                  <ExternalLink size={14} />
-                  <span>Open in Table Editor</span>
+                  <TableEditor size={14} />
+                  <span>View in Table Editor</span>
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>

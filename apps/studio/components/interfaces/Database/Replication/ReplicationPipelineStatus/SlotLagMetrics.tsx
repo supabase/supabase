@@ -20,9 +20,12 @@ export interface SlotLagField {
 export const SLOT_LAG_FIELDS: SlotLagField[] = [
   {
     key: 'confirmed_flush_lsn_bytes',
-    label: 'Waiting to sync',
+    // Same label as the list column. Scoped to the main slot's ongoing change stream, so "Caught
+    // up" stays true while tables are still doing their initial copy.
+    label: 'Lag',
     type: 'bytes',
-    description: "Changes in your database the pipeline hasn't synced yet.",
+    description:
+      'Changes still on their way to the destination, measured on the pipeline’s main slot. Tables in their initial sync use their own slots and aren’t counted.',
     zeroLabel: 'Caught up',
   },
   {
@@ -41,7 +44,7 @@ export const SLOT_LAG_FIELDS: SlotLagField[] = [
     key: 'reply_time_lag',
     label: 'Last check-in',
     type: 'duration',
-    description: 'Time since the pipeline last reported back to your database.',
+    description: 'Time since the pipeline last reported back to your database',
     zeroLabel: 'Just now',
     // reply_time_lag is "milliseconds ago", so the absolute time is now minus that, in local time.
     getValueTooltip: (ms) => dayjs().subtract(ms, 'millisecond').format('MMM D, YYYY, h:mm:ss A'),

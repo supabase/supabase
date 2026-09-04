@@ -141,15 +141,12 @@ describe('ReplicationPipelineLayout', () => {
     expect(screen.getByText('Overview content')).toBeVisible()
   })
 
-  test('renders Overview as the only navigation tab', async () => {
+  test('does not render an Overview tab until Settings exists', async () => {
     mockStatus('started')
     renderLayout()
 
     await screen.findByRole('heading', { name: 'Analytics warehouse' })
-    expect(screen.getByRole('link', { name: 'Overview' })).toHaveAttribute(
-      'href',
-      '/project/default/database/replication/42'
-    )
+    expect(screen.queryByRole('link', { name: 'Overview' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Settings' })).not.toBeInTheDocument()
   })
 
@@ -158,6 +155,19 @@ describe('ReplicationPipelineLayout', () => {
     renderLayout()
 
     expect(await screen.findByText('Stopped')).toBeVisible()
+  })
+
+  test('explains the state in a tooltip when the dot is hovered', async () => {
+    // The dotted underline promises a tooltip; this guards the asChild ref binding that makes it work
+    mockStatus('failed')
+    renderLayout()
+
+    await userEvent.hover(await screen.findByText('Failed'))
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'Replication has encountered an error. Check the logs for more information.'
+    )
+    expect(screen.queryByRole('link', { name: 'logs' })).not.toBeInTheDocument()
   })
 
   test('shows where the pipeline sends data', async () => {
@@ -203,7 +213,8 @@ describe('ReplicationPipelineLayout', () => {
     const updateButton = await screen.findByRole('button', { name: 'Update available' })
     expect(updateButton).toHaveClass('bg-brand-400')
     await userEvent.click(updateButton)
-    expect(await screen.findByText('Update pipeline image')).toBeVisible()
+    // The trigger button shares this name, so match the dialog's heading specifically
+    expect(await screen.findByRole('heading', { name: 'Update available' })).toBeVisible()
   })
 
   test.each([

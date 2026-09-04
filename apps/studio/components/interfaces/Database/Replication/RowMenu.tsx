@@ -1,5 +1,14 @@
 import { useParams } from 'common'
-import { ArrowUpCircle, Edit, Eye, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
+import {
+  ArrowUpCircle,
+  CircleStop,
+  Edit,
+  Eye,
+  MoreVertical,
+  Play,
+  RotateCcw,
+  Trash,
+} from 'lucide-react'
 import Link from 'next/link'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { toast } from 'sonner'
@@ -156,7 +165,7 @@ export const RowMenu = ({
           <div className="relative">
             <Button
               variant="default"
-              className="px-1.5 hit-area-2"
+              className="px-1.25 hit-area-2"
               aria-label="Pipeline options"
               icon={<MoreVertical />}
             />
@@ -199,7 +208,7 @@ export const RowMenu = ({
                 <p>Restart pipeline</p>
               </DropdownMenuItem>
               <DropdownMenuItem className="space-x-2" onClick={onDisablePipeline}>
-                <Pause size={14} />
+                <CircleStop size={14} />
                 <p>Stop pipeline</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
