@@ -73,8 +73,35 @@ h6:not(.font-mono),
   border-color: var(--border-default, currentColor);
 }
 
-/* TEMPORARY UNTIL WE IMPLEMENT OUR OWN CODE COMPONENT */
-.prose pre code {
-  padding: 1rem;
-  display: inline-block;
+/* Code block theme colors for use with Supabase Theme */
+[data-theme='dark'] {
+  --code-token-keyword: #bda4ff;
+  --code-foreground: #ffffff;
+  --code-token-constant: #3ecf8e;
+  --code-token-string: #ffcda1;
+  --code-token-comment: #949494;
+  --code-token-parameter: #ffffff;
+  --code-token-function: #3ecf8e;
+  --code-token-string-expression: #ffcda1;
+  --code-token-punctuation: #ffffff;
+  --code-token-link: #ffffff;
+  --code-token-number: #ffffff;
+  --code-token-property: #3ecf8e;
+  --code-highlight-color: #232323;
+}
+
+[data-theme='light'] {
+  --code-token-keyword: #5f2fc4;
+  --code-foreground: oklch(from var(--foreground-light) l c h / 1);
+  --code-token-constant: #15593b;
+  --code-token-string: #9a5200;
+  --code-token-comment: #6a6a6a;
+  --code-token-parameter: oklch(from var(--foreground-light) l c h / 1);
+  --code-token-function: #15593b;
+  --code-token-string-expression: #9a5200;
+  --code-token-punctuation: oklch(from var(--foreground-light) l c h / 1);
+  --code-token-link: oklch(from var(--foreground-light) l c h / 1);
+  --code-token-number: oklch(from var(--foreground-light) l c h / 1);
+  --code-token-property: #15593b;
+  --code-highlight-color: #1c1c1c;
 }
