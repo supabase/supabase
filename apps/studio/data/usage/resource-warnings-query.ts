@@ -46,6 +46,6 @@ export const useResourceWarningsQuery = <TData = ResourceWarningsData>(
     queryFn: ({ signal }) => getResourceWarnings(variables, signal),
     enabled:
       IS_PLATFORM && enabled && (variables.ref !== undefined || variables.slug !== undefined),
-    staleTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 5,
     ...options,
   })
