@@ -5,8 +5,8 @@ import { McpElicitationSkeleton } from './McpElicitationSkeleton'
 import { McpElicitationWrongAccount } from './McpElicitationWrongAccount'
 
 /**
- * Renders a resolved `ElicitationState`. Knows nothing about the URL or where
- * the state came from — swapping the mock for the real API doesn't touch this.
+ * Renders a resolved `ElicitationState`. Knows nothing about the URL, the
+ * queries, or where the state came from.
  */
 export const McpElicitationCard = ({
   state,

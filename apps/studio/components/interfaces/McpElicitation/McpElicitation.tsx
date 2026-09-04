@@ -2,7 +2,7 @@ import { useFeatureFlags, useFlag, useParams } from 'common'
 import { useMemo } from 'react'
 
 import { MCP_ELICITATION_FLAG } from './McpElicitation.constants'
-import { buildElicitationReturnTo, parseElicitationParams } from './McpElicitation.params'
+import { buildElicitationSignInPath, parseElicitationParams } from './McpElicitation.params'
 import { McpElicitationCard } from './McpElicitationCard'
 import { McpElicitationOutcome } from './McpElicitationOutcome'
 import { McpElicitationSkeleton } from './McpElicitationSkeleton'
@@ -15,10 +15,9 @@ import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
  * page cannot talk back to the client, so every state ends in an instruction the
  * user can act on themselves.
  *
- * Auth seam: this pass assumes a session exists. When auth lands, an
- * unauthenticated visitor should be sent to `/sign-in` with
- * `returnTo={buildElicitationReturnTo(params.handle)}` so the handle survives
- * the round trip.
+ * A session is guaranteed by `withAuth` on the page, which sends a signed-out
+ * visitor to `/sign-in` with `returnTo` set to this pathname and `ref`/`name`
+ * kept as sibling params.
  */
 export const McpElicitation = () => {
   const searchParams = useParams()
@@ -33,8 +32,7 @@ export const McpElicitation = () => {
   const { state, isSaving, saveSecret, cancelRequest } = useElicitationRequest(params)
 
   const handleSwitchAccount = () => {
-    const returnTo = encodeURIComponent(buildElicitationReturnTo(params.handle))
-    window.location.assign(`${BASE_PATH}/sign-in?returnTo=${returnTo}`)
+    window.location.assign(`${BASE_PATH}${buildElicitationSignInPath(params)}`)
   }
 
   if (!areFlagsResolved) return <McpElicitationSkeleton />
