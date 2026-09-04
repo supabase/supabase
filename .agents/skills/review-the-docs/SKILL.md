@@ -69,7 +69,8 @@ pnpm build:reference-markdown   # when reference pipeline changed
 ```
 
 4. Spot-check frontmatter, internal links, and nav wiring for content changes.
-5. Write a short **self-review note** (blockers vs nits) suitable to paste into the future PR body under a "Self-review" heading.
+5. **Offer runnable verification** — for content/tutorial PRs with new or changed procedural fenced blocks, ask whether to run [`test-the-docs`](../test-the-docs/SKILL.md). Prerequisites are class-specific (Docker Compose stack profile for DB/API; examples profile for `example-app`). If accepted, include the verification report; if declined or a required prerequisite for that class is missing, record credible `deferred` reasons for those artifacts only. Do not reimplement sandbox execution here.
+6. Write a short **self-review note** (blockers vs nits) suitable to paste into the future PR body under a "Self-review" heading.
 
 Then open the PR and continue with open-PR review if a second pass is needed.
 
@@ -216,6 +217,7 @@ Checklist:
 - [ ] `$CodeSample` paths match existing example directories
 - [ ] Admonitions, tabs, and partial includes render sensibly in PR preview
 - [ ] No accidental whitespace-only or empty sections where components were removed
+- [ ] Offered [`test-the-docs`](../test-the-docs/SKILL.md) for new/changed procedural snippets; verification report present or credible `deferred` reasons recorded
 
 Compare PR preview URL (from Vercel/deployment comment) against production for visual regressions when layout components are involved.
 
@@ -239,6 +241,7 @@ Checklist:
 - [ ] MDX steps match example code after `pnpm codegen:examples` (if `$CodeSample` used)
 - [ ] Env var names and Supabase client setup match current `@supabase/ssr` patterns
 - [ ] Example pins catalog versions — no `"latest"` for in-repo packages
+- [ ] Offered [`test-the-docs`](../test-the-docs/SKILL.md) for procedural tutorial steps (or `deferred` with reason)
 - [ ] **Platform E2E** (when auth involved): SQL migration applied, auth flow walked, profiles verified — see `work-linear-issue` Phase 3
 
 ---

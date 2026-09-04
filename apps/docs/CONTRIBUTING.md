@@ -23,14 +23,15 @@ To make docs as clear as possible:
 
 If you're using an AI coding agent (Claude Code, Codex, or anything else that reads `.agents/skills/`), this repo ships skills that back the [Write the docs](../../.agents/skills/pm-the-docs/reference/write-the-docs-checklist.md) authoring checklist.
 
-Ask your agent for a skill by name (`write-the-docs`, `edit-the-docs`, `ask-the-docs`, `pm-the-docs`, `review-the-docs`); in Claude Code these are also available as `/name` slash commands.
+Ask your agent for a skill by name (`pm-the-docs`, `ask-the-docs`, `write-the-docs`, `edit-the-docs`, `test-the-docs`, `review-the-docs`); in Claude Code these are also available as `/name` slash commands.
 
 | Skill | Checklist stage | Use for |
 | --- | --- | --- |
-| [`pm-the-docs`](../../.agents/skills/pm-the-docs/SKILL.md) | Frame / Shape | Audience, product-stage, and cross-cutting scope calls |
+| [`pm-the-docs`](../../.agents/skills/pm-the-docs/SKILL.md) | Frame / Shape | Audience, product-stage, and cross-cutting scope calls (universe when you have Supabase org access, else OSS path) |
 | [`ask-the-docs`](../../.agents/skills/ask-the-docs/SKILL.md) | Frame / Shape | `apps/docs` architecture, IA placement, and where content lives |
 | [`write-the-docs`](../../.agents/skills/write-the-docs/SKILL.md) | Draft | Drafting net-new content grounded in the code |
 | [`edit-the-docs`](../../.agents/skills/edit-the-docs/SKILL.md) | Edit | Restructure and improve existing pages |
+| [`test-the-docs`](../../.agents/skills/test-the-docs/SKILL.md) | Draft / Self-review | Execute docs snippets in a Docker-isolated local stack; verification report |
 | [`review-the-docs`](../../.agents/skills/review-the-docs/SKILL.md) | Self-review / PR review | Checking a draft and PR triage/verification |
 
 The canonical files live in `.agents/skills/`; `.claude/skills` is a Git symlink to that directory so Claude Code discovers them too.

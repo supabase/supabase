@@ -19,6 +19,7 @@ import {
   type QuerySourceTag,
 } from '@/data/query-sources/query-source-registry'
 import { useTrack } from '@/lib/telemetry/track'
+import { useAiAssistantState } from '@/state/ai-assistant-state'
 import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state'
 
 interface AssistantQueryCellProps {
@@ -72,6 +73,7 @@ export const AssistantQueryCell = ({
 }: AssistantQueryCellProps) => {
   const track = useTrack()
   const roleImpersonationState = useLocalRoleImpersonationState()
+  const aiAssistantState = useAiAssistantState()
 
   const fallbackTitle =
     initialTitle?.trim() ||
@@ -180,6 +182,7 @@ export const AssistantQueryCell = ({
         }
         onDisplayChange={handleDisplayChange}
         onRun={handleRun}
+        onDebug={aiAssistantState.setInitialInput}
       />
     </Confirm>
   )
