@@ -76,11 +76,7 @@ export function describeDbHost(connectionString: string): string {
   }
 }
 
-/**
- * `SUPABASE_*_KEYS` is a JSON object of key name → API key. `@supabase/server`
- * reads it natively; our own `createClient` calls need one string, so pick
- * `default`, or the only entry when there is exactly one.
- */
+/** Parse the plural key dictionary format supplied by Supabase runtimes. */
 export function parseApiKeysDictionary(
   raw: string | undefined,
   name: string
@@ -101,13 +97,7 @@ export function parseApiKeysDictionary(
   return entries.length > 0 ? Object.fromEntries(entries) : undefined
 }
 
-function defaultApiKey(keys: Record<string, string> | undefined): string | undefined {
-  if (!keys) return undefined
-  if (keys.default) return keys.default
-  const values = Object.values(keys)
-  return values.length === 1 ? values[0] : undefined
-}
-
+/** Normalize singular local/hosted keys to the dictionaries `@supabase/server` expects. */
 function resolveApiKeys(
   singularNames: string[],
   dictionaryName: string
@@ -115,16 +105,6 @@ function resolveApiKeys(
   const singular = first(...singularNames)
   if (singular) return { default: singular }
   return parseApiKeysDictionary(readEnv(dictionaryName), dictionaryName)
-}
-
-function requiredApiKey(singularNames: string[], dictionaryName: string): string {
-  const key = defaultApiKey(resolveApiKeys(singularNames, dictionaryName))
-  if (!key) {
-    throw new Error(
-      `Missing required environment variable ${singularNames.join(' or ')} (or a "default" entry in ${dictionaryName})`
-    )
-  }
-  return key
 }
 
 /**
@@ -203,24 +183,8 @@ export function resolveMcpUrl({
  * actually read, so importing this module in tests does not require a full env.
  */
 export const env = {
-  get supabaseUrl() {
-    return required(...SUPABASE_URL_NAMES)
-  },
-  get supabasePublishableKey() {
-    return requiredApiKey(PUBLISHABLE_KEY_NAMES, PUBLISHABLE_KEYS_JSON_NAME)
-  },
-  get supabaseSecretKey() {
-    return requiredApiKey(SECRET_KEY_NAMES, SECRET_KEYS_JSON_NAME)
-  },
   get supabaseDbUrl() {
     return required(...DB_URL_NAMES)
-  },
-  get supabaseJwks() {
-    return resolveAssistantJwks({
-      inlineJwks: first(...JWKS_NAMES),
-      jwksUrl: first(...JWKS_URL_NAMES),
-      supabaseUrl: first(...SUPABASE_URL_NAMES),
-    })
   },
   get platformJwksUrl() {
     return required('PLATFORM_JWKS_URL')
@@ -281,7 +245,11 @@ export function supabaseServerEnv() {
   const url = first(...SUPABASE_URL_NAMES)
   const publishableKeys = resolveApiKeys(PUBLISHABLE_KEY_NAMES, PUBLISHABLE_KEYS_JSON_NAME)
   const secretKeys = resolveApiKeys(SECRET_KEY_NAMES, SECRET_KEYS_JSON_NAME)
-  const jwks = env.supabaseJwks
+  const jwks = resolveAssistantJwks({
+    inlineJwks: first(...JWKS_NAMES),
+    jwksUrl: first(...JWKS_URL_NAMES),
+    supabaseUrl: first(...SUPABASE_URL_NAMES),
+  })
   return {
     ...(url ? { url } : {}),
     ...(publishableKeys ? { publishableKeys } : {}),

@@ -54,13 +54,7 @@ export type ManagementApi = {
   deployFunction: (input: { slug: string; code: string; name: string }) => Promise<any>
 }
 
-export function getProjectTools({
-  managementApi,
-}: {
-  projectRef: string
-  oauthToken: string
-  managementApi: ManagementApi
-}) {
+export function getProjectTools({ managementApi }: { managementApi: ManagementApi }) {
   return {
     execute_sql: tool({
       description:

@@ -198,23 +198,7 @@ export async function upsertMessage(
     message: UIMessage
   }
 ): Promise<void> {
-  const { error } = await supabase
-    .from('messages')
-    .upsert(messageRow(input.conversationId, input.userId, input.message), {
-      onConflict: 'conversation_id,id',
-    })
-  if (error) {
-    throw new Error(`Failed to upsert message: ${error.message}`)
-  }
-
-  const { error: touchError } = await supabase
-    .from('conversations')
-    .update({ updated_at: new Date().toISOString() })
-    .eq('id', input.conversationId)
-
-  if (touchError) {
-    throw new Error(`Failed to touch conversation: ${touchError.message}`)
-  }
+  await upsertMessages(supabase, input.conversationId, input.userId, [input.message])
 }
 
 export async function upsertMessages(

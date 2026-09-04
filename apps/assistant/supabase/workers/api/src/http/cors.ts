@@ -1,3 +1,5 @@
+import { cors } from 'hono/cors'
+
 /**
  * Local Studio (8082), supabase.com / supabase.green, and Vercel previews on
  * the supabase team (`*-supabase.vercel.app`, e.g. studio-staging-git-…-supabase.vercel.app).
@@ -9,24 +11,16 @@ export function isAllowedOrigin(origin: string): boolean {
   return ALLOWED_ORIGIN.test(origin)
 }
 
-export function corsHeaders(request: Request): Record<string, string> {
-  const origin = request.headers.get('Origin')
-  const headers: Record<string, string> = {
-    'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers':
-      'authorization, content-type, apikey, x-client-info, x-supabase-api-version',
-    'Access-Control-Allow-Credentials': 'true',
-    'Access-Control-Max-Age': '86400',
-    Vary: 'Origin',
-  }
-
-  if (origin && isAllowedOrigin(origin)) {
-    headers['Access-Control-Allow-Origin'] = origin
-  }
-
-  return headers
-}
-
-export function corsForRequest(request: Request): { headers: Record<string, string> } {
-  return { headers: corsHeaders(request) }
-}
+export const assistantCors = cors({
+  origin: (origin) => (isAllowedOrigin(origin) ? origin : undefined),
+  allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowHeaders: [
+    'authorization',
+    'content-type',
+    'apikey',
+    'x-client-info',
+    'x-supabase-api-version',
+  ],
+  credentials: true,
+  maxAge: 86400,
+})

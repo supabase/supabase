@@ -41,7 +41,7 @@ export const getTools = async ({
 
   const tools: ToolSet = {
     ...mcpTools,
-    ...getProjectTools({ projectRef, oauthToken, managementApi }),
+    ...getProjectTools({ managementApi }),
     ...getSchemaTools({ managementApi }),
     ...getIncidentTools(),
   }

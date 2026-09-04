@@ -214,6 +214,9 @@ importers:
       common-tags:
         specifier: ^1.8.2
         version: 1.8.2
+      hono:
+        specifier: ^4.13.1
+        version: 4.13.1
       jose:
         specifier: ^6.0.11
         version: 6.2.9

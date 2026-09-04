@@ -124,9 +124,6 @@ describe('supabaseServerEnv', () => {
     expect(resolved.jwks).toEqual(
       new URL('https://example.supabase.co/auth/v1/.well-known/jwks.json')
     )
-    expect(env.supabaseUrl).toBe('https://example.supabase.co')
-    expect(env.supabasePublishableKey).toBe('sb_publishable_hosted')
-    expect(env.supabaseSecretKey).toBe('sb_secret_hosted')
     expect(env.supabaseDbUrl).toBe('postgresql://hosted')
   })
 
@@ -146,8 +143,6 @@ describe('supabaseServerEnv', () => {
       other: 'sb_publishable_2',
     })
     expect(resolved.secretKeys).toEqual({ only: 'sb_secret_dict' })
-    expect(env.supabasePublishableKey).toBe('sb_publishable_dict')
-    expect(env.supabaseSecretKey).toBe('sb_secret_dict')
   })
 
   it('lets an explicit ASSISTANT_* value override a platform-provided SUPABASE_* one', () => {
@@ -160,7 +155,6 @@ describe('supabaseServerEnv', () => {
       'postgresql://postgres.ref:x@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres'
     )
 
-    expect(env.supabaseUrl).toBe('https://explicit.supabase.co')
     expect(supabaseServerEnv().url).toBe('https://explicit.supabase.co')
     expect(describeDbHost(env.supabaseDbUrl)).toBe('aws-1-ap-southeast-1.pooler.supabase.com:5432')
   })
@@ -170,7 +164,6 @@ describe('supabaseServerEnv', () => {
     vi.stubEnv('SUPABASE_SECRET_KEY', 'sb_secret_singular')
     vi.stubEnv('SUPABASE_SECRET_KEYS', '{"default":"sb_secret_dict"}')
 
-    expect(env.supabaseSecretKey).toBe('sb_secret_singular')
     expect(supabaseServerEnv().secretKeys).toEqual({ default: 'sb_secret_singular' })
   })
 

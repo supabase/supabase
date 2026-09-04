@@ -1,6 +1,7 @@
+import { Hono } from 'hono'
 import { describe, expect, it } from 'vitest'
 
-import { corsHeaders, isAllowedOrigin } from './cors'
+import { assistantCors, isAllowedOrigin } from './cors'
 
 describe('isAllowedOrigin', () => {
   it.each([
@@ -28,18 +29,22 @@ describe('isAllowedOrigin', () => {
   })
 })
 
-describe('corsHeaders', () => {
-  it('reflects an allowed staging Studio origin', () => {
-    const headers = corsHeaders(new Request('https://worker.example/v1/me', {
+describe('assistantCors', () => {
+  const app = new Hono()
+  app.use('*', assistantCors)
+  app.get('/v1/me', (c) => c.json({ ok: true }))
+
+  it('reflects an allowed staging Studio origin', async () => {
+    const response = await app.request('/v1/me', {
       headers: { Origin: 'https://supabase.green' },
-    }))
-    expect(headers['Access-Control-Allow-Origin']).toBe('https://supabase.green')
+    })
+    expect(response.headers.get('Access-Control-Allow-Origin')).toBe('https://supabase.green')
   })
 
-  it('omits Allow-Origin for a disallowed origin', () => {
-    const headers = corsHeaders(new Request('https://worker.example/v1/me', {
+  it('omits Allow-Origin for a disallowed origin', async () => {
+    const response = await app.request('/v1/me', {
       headers: { Origin: 'https://example.com' },
-    }))
-    expect(headers['Access-Control-Allow-Origin']).toBeUndefined()
+    })
+    expect(response.headers.get('Access-Control-Allow-Origin')).toBeNull()
   })
 })

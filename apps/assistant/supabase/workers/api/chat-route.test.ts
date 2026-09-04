@@ -1,37 +1,32 @@
+import type { Context, Next } from 'hono'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { z } from 'zod'
 
 import worker from './index.ts'
+import type { HandlerContext } from './src/http/auth.ts'
 import { chatBodySchema } from './src/http/chat-body.ts'
 import { jsonError } from './src/http/errors.ts'
 
-const { generateAssistantResponse, getTools, getModel } = vi.hoisted(() => ({
+const { generateAssistantResponse, getTools, getAssistantModel } = vi.hoisted(() => ({
   generateAssistantResponse: vi.fn(),
   getTools: vi.fn(),
-  getModel: vi.fn(),
+  getAssistantModel: vi.fn(),
 }))
 
-vi.mock('@supabase/server', () => ({
+type TestEnv = { Variables: { supabaseContext: HandlerContext } }
+
+vi.mock('@supabase/server/adapters/hono', () => ({
   withSupabase:
-    (
-      config: { auth: 'user' | 'none' },
-      handler: (req: Request, ctx: unknown) => Response | Promise<Response>
-    ) =>
-    async (request: Request) => {
-      if (request.method === 'OPTIONS') {
-        return new Response(null, { status: 204 })
+    (config: { auth: 'user' | 'none' }) => async (ctx: Context<TestEnv>, next: Next) => {
+      if (config.auth === 'user' && !ctx.req.header('authorization')) {
+        return ctx.json({ code: 'unauthorized', message: 'Sign in to continue.' }, 401)
       }
-      if (config.auth === 'user' && !request.headers.get('authorization')) {
-        return Response.json(
-          { code: 'unauthorized', message: 'Sign in to continue.' },
-          { status: 401 }
-        )
-      }
-      return handler(request, {
+      ctx.set('supabaseContext', {
         supabase: {},
         supabaseAdmin: {},
         userClaims: config.auth === 'user' ? { id: 'user-1', email: 'user@test.com' } : null,
-      })
+      } as HandlerContext)
+      await next()
     },
 }))
 
@@ -44,15 +39,7 @@ vi.mock('./src/ai/tools/index.ts', () => ({
 }))
 
 vi.mock('./src/ai/model.ts', () => ({
-  getModel,
-}))
-
-vi.mock('./src/ai/model.utils.ts', () => ({
-  DEFAULT_ASSISTANT_BASE_MODEL_ID: 'gpt-5.6-luna',
-  getAssistantModelEntry: (id: string) => ({ id }),
-  isKnownAssistantModelId: (id: string) =>
-    id === 'gpt-5.6-luna' || id === 'gpt-5.4-nano' || id === 'gpt-5.3-codex',
-  isAssistantBaseModelId: (id: string) => id === 'gpt-5.6-luna' || id === 'gpt-5.4-nano',
+  getAssistantModel,
 }))
 
 vi.mock('./src/ai/assistant-message-metadata.ts', async () => {
@@ -109,7 +96,7 @@ describe('api worker router', () => {
   beforeEach(() => {
     generateAssistantResponse.mockReset()
     getTools.mockReset()
-    getModel.mockReset()
+    getAssistantModel.mockReset()
   })
 
   test('GET /health returns 200', async () => {

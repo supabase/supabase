@@ -1,3 +1,4 @@
+import { extractCredentials } from '@supabase/server/core'
 import { safeValidateUIMessages, type UIMessage } from 'ai'
 import { z } from 'zod'
 
@@ -7,13 +8,7 @@ import {
   messagesIncludeLogsSnippets,
 } from '../ai/assistant-message-metadata.ts'
 import { generateAssistantResponse } from '../ai/generate-assistant-response.ts'
-import { getModel } from '../ai/model.ts'
-import {
-  DEFAULT_ASSISTANT_BASE_MODEL_ID,
-  getAssistantModelEntry,
-  isKnownAssistantModelId,
-  type AssistantModelId,
-} from '../ai/model.utils.ts'
+import { getAssistantModel } from '../ai/model.ts'
 import { pgMeta } from '../ai/pg-meta.ts'
 import { getTools } from '../ai/tools/index.ts'
 import { McpUnauthorizedError } from '../ai/tools/mcp-tools.ts'
@@ -47,13 +42,23 @@ import {
   type OrganizationMismatch,
 } from '../platform/oauth'
 import { verifyPlatformJwt } from '../platform/platform-jwt'
-import { bearerToken, createPublishableClient, requireUserId, resolveAdmin } from './auth'
+import { requireUserId, type HandlerContext } from './auth'
 import { chatBodySchema } from './chat-body'
 import { toChatResponse } from './chat-stream'
 import { isAllowedOrigin } from './cors'
 import { HttpError, jsonError } from './errors'
 import { buildOAuthCallbackHtml, buildOAuthMismatchHtml } from './oauth-callback-page'
-import type { Route } from './route-types'
+
+export type Route = {
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE'
+  pattern: string
+  auth: 'user' | 'none'
+  handler: (
+    req: Request,
+    ctx: HandlerContext,
+    params: Record<string, string>
+  ) => Response | Promise<Response>
+}
 
 const LIST_SCHEMAS_SQL = pgMeta.schemas.list().sql
 
@@ -79,12 +84,24 @@ const feedbackBodySchema = z.object({
   braintrust_span_id: z.string().optional(),
 })
 
-async function readJson(request: Request): Promise<unknown> {
+async function parseBody<Schema extends z.ZodTypeAny>(
+  request: Request,
+  schema: Schema
+): Promise<z.output<Schema>> {
+  let body: unknown
   try {
-    return await request.json()
+    body = await request.json()
   } catch {
     throw new HttpError(400, 'invalid_request', 'Request body must be JSON.')
   }
+
+  const parsed = schema.safeParse(body)
+  if (!parsed.success) {
+    throw new HttpError(400, 'invalid_request', 'Invalid request body', {
+      issues: parsed.error.issues,
+    })
+  }
+  return parsed.data
 }
 
 function safeReturnTo(value: string | null): string | null {
@@ -165,13 +182,13 @@ export const routes: Route[] = [
     pattern: '/auth/exchange',
     auth: 'none',
     handler: async (request, ctx) => {
-      const token = bearerToken(request)
+      const token = extractCredentials(request).token
       if (!token) {
         throw new HttpError(401, 'unauthorized', 'Missing platform bearer token.')
       }
 
       const identity = await verifyPlatformJwt(token)
-      const admin = resolveAdmin(ctx)
+      const admin = ctx.supabaseAdmin
       const email = identity.email ?? `${identity.sub}@platform.invalid`
 
       const { data: existing, error: existingError } = await admin
@@ -228,8 +245,7 @@ export const routes: Route[] = [
         throw new Error(`Failed to mint session: ${linkError?.message ?? 'missing hashed_token'}`)
       }
 
-      const publishable = createPublishableClient()
-      const { data: sessionData, error: verifyError } = await publishable.auth.verifyOtp({
+      const { data: sessionData, error: verifyError } = await ctx.supabase.auth.verifyOtp({
         type: 'email',
         token_hash: linkData.properties.hashed_token,
       })
@@ -261,7 +277,7 @@ export const routes: Route[] = [
       const returnTo = safeReturnTo(url.searchParams.get('return_to'))
       const state = generateOAuthState()
       const { codeVerifier, codeChallenge } = generatePkce()
-      const admin = resolveAdmin(ctx)
+      const admin = ctx.supabaseAdmin
 
       const { error } = await admin.from('oauth_states').insert({
         state,
@@ -292,7 +308,7 @@ export const routes: Route[] = [
         throw new HttpError(400, 'invalid_request', 'code and state are required.')
       }
 
-      const admin = resolveAdmin(ctx)
+      const admin = ctx.supabaseAdmin
       const { data: stored, error: lookupError } = await admin
         .from('oauth_states')
         .select('user_id, org_slug, code_verifier, return_to, expires_at')
@@ -388,19 +404,14 @@ export const routes: Route[] = [
     auth: 'user',
     handler: async (request, ctx, params) => {
       const userId = requireUserId(ctx)
-      const parsed = createConversationBodySchema.safeParse(await readJson(request))
-      if (!parsed.success) {
-        return jsonError(400, 'invalid_request', 'Invalid request body', {
-          issues: parsed.error.issues,
-        })
-      }
+      const body = await parseBody(request, createConversationBodySchema)
       const conversation = await createConversation(ctx.supabase, userId, {
-        id: parsed.data.id,
+        id: body.id,
         projectRef: params.ref,
-        orgSlug: parsed.data.org_slug,
-        name: parsed.data.name,
-        model: parsed.data.model,
-        branchedFrom: parsed.data.branched_from,
+        orgSlug: body.org_slug,
+        name: body.name,
+        model: body.model,
+        branchedFrom: body.branched_from,
       })
       return Response.json({ conversation }, { status: 201 })
     },
@@ -437,14 +448,9 @@ export const routes: Route[] = [
     auth: 'user',
     handler: async (request, ctx, params) => {
       requireUserId(ctx)
-      const parsed = updateConversationBodySchema.safeParse(await readJson(request))
-      if (!parsed.success) {
-        return jsonError(400, 'invalid_request', 'Invalid request body', {
-          issues: parsed.error.issues,
-        })
-      }
+      const body = await parseBody(request, updateConversationBodySchema)
       try {
-        const conversation = await updateConversation(ctx.supabase, params.id, parsed.data)
+        const conversation = await updateConversation(ctx.supabase, params.id, body)
         return Response.json({ conversation })
       } catch {
         throw new HttpError(404, 'not_found', 'Conversation not found.')
@@ -471,17 +477,9 @@ export const routes: Route[] = [
     auth: 'user',
     handler: async (request, ctx, params) => {
       const userId = requireUserId(ctx)
-      const parsed = chatBodySchema.safeParse(await readJson(request))
-      if (!parsed.success) {
-        return jsonError(400, 'invalid_request', 'Invalid request body', {
-          issues: parsed.error.issues,
-        })
-      }
+      const body = await parseBody(request, chatBodySchema)
 
-      const incomingRaw =
-        parsed.data.messages && parsed.data.messages.length > 0
-          ? parsed.data.messages
-          : [parsed.data.message]
+      const incomingRaw = body.messages && body.messages.length > 0 ? body.messages : [body.message]
       const incoming = await parseUIMessages(incomingRaw)
       const latest = incoming[incoming.length - 1]
       if (!latest) {
@@ -493,7 +491,7 @@ export const routes: Route[] = [
         throw new HttpError(404, 'not_found', 'Conversation not found.')
       }
 
-      if (parsed.data.messages && parsed.data.messages.length > 0) {
+      if (body.messages && body.messages.length > 0) {
         await upsertMessages(ctx.supabase, conversation.id, userId, incoming)
       } else {
         await upsertMessage(ctx.supabase, {
@@ -516,32 +514,11 @@ export const routes: Route[] = [
         })
       }
 
-      const requestedModel = parsed.data.model
-      const effectiveModel: AssistantModelId =
-        requestedModel && isKnownAssistantModelId(requestedModel)
-          ? requestedModel
-          : DEFAULT_ASSISTANT_BASE_MODEL_ID
-
-      const {
-        modelParams,
-        error: modelError,
-        systemProviderOptions,
-      } = await getModel({
-        provider: 'openai',
-        modelEntry: getAssistantModelEntry(effectiveModel),
-      })
-
-      if (modelError || !modelParams) {
-        throw new HttpError(
-          500,
-          'internal',
-          modelError instanceof Error ? modelError.message : 'Failed to load the assistant model.'
-        )
-      }
+      const modelParams = getAssistantModel(body.model)
 
       const managementApi = createManagementApi(oauthToken)
       const projectRef = conversation.project_ref
-      const supportMode = parsed.data.supportMode
+      const supportMode = body.supportMode
 
       let tools: Awaited<ReturnType<typeof getTools>>
       try {
@@ -591,7 +568,6 @@ export const routes: Route[] = [
         chatName: conversation.name,
         supportMode,
         includesLogsSnippets: messagesIncludeLogsSnippets(messages),
-        systemProviderOptions,
         abortSignal: request.signal,
       })
 
@@ -627,19 +603,14 @@ export const routes: Route[] = [
     auth: 'user',
     handler: async (request, ctx, params) => {
       const userId = requireUserId(ctx)
-      const parsed = feedbackBodySchema.safeParse(await readJson(request))
-      if (!parsed.success) {
-        return jsonError(400, 'invalid_request', 'Invalid request body', {
-          issues: parsed.error.issues,
-        })
-      }
+      const body = await parseBody(request, feedbackBodySchema)
       await insertFeedback(ctx.supabase, {
-        conversationId: parsed.data.conversation_id,
+        conversationId: body.conversation_id,
         messageId: params.id,
         userId,
-        rating: parsed.data.rating,
-        reason: parsed.data.reason,
-        braintrustSpanId: parsed.data.braintrust_span_id,
+        rating: body.rating,
+        reason: body.reason,
+        braintrustSpanId: body.braintrust_span_id,
       })
       return Response.json({ ok: true })
     },

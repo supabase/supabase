@@ -4,7 +4,6 @@ import {
   isStepCount,
   type LanguageModel,
   type ModelMessage,
-  type SystemModelMessage,
   type ToolSet,
   type UIMessage,
 } from 'ai'
@@ -25,7 +24,7 @@ export async function generateAssistantResponse({
   chatName,
   supportMode,
   includesLogsSnippets,
-  systemProviderOptions,
+  reasoning,
   providerOptions,
   abortSignal,
 }: {
@@ -39,8 +38,8 @@ export async function generateAssistantResponse({
   supportMode?: boolean
   /** Whether any user message in the conversation attached a logs (ClickHouse) query. */
   includesLogsSnippets?: boolean
-  systemProviderOptions?: Record<string, any>
-  providerOptions?: Record<string, any>
+  reasoning?: Parameters<typeof ai.streamText>[0]['reasoning']
+  providerOptions?: Parameters<typeof ai.streamText>[0]['providerOptions']
   abortSignal?: AbortSignal
 }) {
   const messages = prepareMessagesForModel(rawMessages, aiOptInLevel)
@@ -64,12 +63,6 @@ export async function generateAssistantResponse({
     - \`realtime\` — Supabase Realtime
   `
 
-  const systemMessage: SystemModelMessage = {
-    role: 'system',
-    content: system,
-    ...(systemProviderOptions && { providerOptions: systemProviderOptions }),
-  }
-
   const coreMessages: ModelMessage[] = [
     ...buildAssistantContextMessages({
       projectRef,
@@ -83,9 +76,10 @@ export async function generateAssistantResponse({
 
   return ai.streamText({
     model,
-    instructions: systemMessage,
+    instructions: system,
     stopWhen: isStepCount(10),
     messages: coreMessages,
+    ...(reasoning && { reasoning }),
     ...(providerOptions && { providerOptions }),
     tools,
     ...(abortSignal && { abortSignal }),
