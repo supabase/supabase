@@ -62,7 +62,7 @@ The IPv4 add-on is not dual-stack: enabling it swaps the project's IPv6 (AAAA) D
 
 ## Data APIs and client libraries
 
-The Data APIs let you interact with your database using REST or GraphQL requests. You can use these APIs to fetch and insert data from the frontend, as long as you have [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) enabled.
+The Data APIs let you interact with your database using REST or GraphQL requests. You can use these APIs to fetch and insert data from the frontend, as long as your tables have [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) enabled and policies that allow the access. RLS with no policies denies every request.
 
 - [REST](/docs/guides/api)
 - [GraphQL](/docs/guides/graphql/api)
@@ -154,7 +154,7 @@ Application-side poolers are built into connection libraries and API servers, su
 
 ### Server-side poolers
 
-Postgres connections work like a WebSocket. Once established, a connection is preserved until the client disconnects. A server might make a single 10 ms query but hold its database connection for seconds or longer.
+A Postgres connection is a long-lived session. Once established, it stays open until the client disconnects, or until the server or the network closes it. A server might make a single 10 ms query but hold its database connection for seconds or longer.
 
 Server-side poolers, such as Supabase's [Supavisor](https://github.com/supabase/supavisor) in transaction mode, sit between clients and the database. Think of them as load balancers for Postgres connections.
 
