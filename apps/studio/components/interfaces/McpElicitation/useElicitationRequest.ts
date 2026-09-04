@@ -6,7 +6,10 @@ import type { DevElicitationState, ElicitationParams } from './McpElicitation.pa
 import { getProviderHint } from './McpElicitation.providers'
 import type { ElicitationRequest, ElicitationState } from './McpElicitation.types'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
-import { useSecretsCreateMutation } from '@/data/secrets/secrets-create-mutation'
+import {
+  useSecretsCreateMutation,
+  type SecretsCreateVariables,
+} from '@/data/secrets/secrets-create-mutation'
 import { useSecretsQuery } from '@/data/secrets/secrets-query'
 
 /**
@@ -21,8 +24,28 @@ import { useSecretsQuery } from '@/data/secrets/secrets-query'
  * state, logged, or attached to an error.
  */
 
-/** Outcomes the user drove. They win over whatever the queries say afterwards. */
-type ElicitationOutcome = 'stored' | 'cancelled' | 'error'
+/**
+ * An outcome the user drove, recorded against the request it belongs to. These
+ * win over whatever the queries say afterwards — but only for their own request.
+ */
+type RecordedOutcome = {
+  ref: string | undefined
+  name: string | undefined
+  status: 'stored' | 'cancelled' | 'error'
+}
+
+/**
+ * Identity comes from the mutation's own variables rather than the render
+ * closure: by the time a write settles the URL may describe a different
+ * request, and attributing this result to that one would tell the user a key
+ * was stored when it never was.
+ */
+function recordOutcome(
+  variables: SecretsCreateVariables,
+  status: RecordedOutcome['status']
+): RecordedOutcome {
+  return { ref: variables.projectRef, name: variables.secrets[0]?.name, status }
+}
 
 export function useElicitationRequest(params: ElicitationParams) {
   const { ref, name } = params
@@ -31,7 +54,7 @@ export function useElicitationRequest(params: ElicitationParams) {
   const session = useSession()
   const account = session?.user?.email ?? ''
 
-  const [outcome, setOutcome] = useState<ElicitationOutcome | undefined>(undefined)
+  const [outcome, setOutcome] = useState<RecordedOutcome | undefined>(undefined)
 
   // Both params are needed to resolve anything, and we can't tell a link that
   // was never valid from one whose project has gone away — both read as expired.
@@ -43,10 +66,10 @@ export function useElicitationRequest(params: ElicitationParams) {
   const secrets = useSecretsQuery({ projectRef: ref }, { enabled: isLinkResolvable })
 
   const { mutate, isPending: isSaving } = useSecretsCreateMutation({
-    onSuccess: () => setOutcome('stored'),
+    onSuccess: (_data, variables) => setOutcome(recordOutcome(variables, 'stored')),
     // Owned deliberately: the default handler toasts the API message, and this
     // page shows one reason-free screen instead.
-    onError: () => setOutcome('error'),
+    onError: (_error, variables) => setOutcome(recordOutcome(variables, 'error')),
   })
 
   const request: ElicitationRequest | undefined = useMemo(() => {
@@ -75,9 +98,13 @@ export function useElicitationRequest(params: ElicitationParams) {
 
     if (!isLinkResolvable) return { status: 'expired' }
 
-    if (outcome === 'cancelled') return { status: 'cancelled' }
-    if (outcome === 'error') return { status: 'error' }
-    if (outcome === 'stored' && request !== undefined) {
+    // An outcome recorded for a different request is not this request's news.
+    const activeOutcome =
+      outcome?.ref === ref && outcome?.name === name ? outcome.status : undefined
+
+    if (activeOutcome === 'cancelled') return { status: 'cancelled' }
+    if (activeOutcome === 'error') return { status: 'error' }
+    if (activeOutcome === 'stored' && request !== undefined) {
       return { status: 'stored', request, timedOut: false }
     }
 
@@ -94,8 +121,10 @@ export function useElicitationRequest(params: ElicitationParams) {
     account,
     devState,
     isLinkResolvable,
+    name,
     outcome,
     project.isError,
+    ref,
     project.isPending,
     request,
     secrets.isPending,
@@ -113,7 +142,10 @@ export function useElicitationRequest(params: ElicitationParams) {
 
   // Nothing to cancel server-side in v1 — this is a local dead end the user
   // chose, and the copy tells them how to start over.
-  const cancelRequest = useCallback(() => setOutcome('cancelled'), [])
+  const cancelRequest = useCallback(
+    () => setOutcome({ ref, name, status: 'cancelled' }),
+    [name, ref]
+  )
 
   return { state, isSaving, saveSecret, cancelRequest }
 }
