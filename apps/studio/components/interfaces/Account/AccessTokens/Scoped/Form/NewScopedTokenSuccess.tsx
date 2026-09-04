@@ -9,33 +9,27 @@ import { useTrack } from '@/lib/telemetry/track'
 interface TokenSuccessProps {
   tokenName: string
   tokenValue: string
-  tokenType: 'classic' | 'scoped'
   onClose: () => void
 }
 
-export const NewScopedTokenSuccess = ({
-  tokenName,
-  tokenValue,
-  tokenType,
-  onClose,
-}: TokenSuccessProps) => {
+export const NewScopedTokenSuccess = ({ tokenName, tokenValue, onClose }: TokenSuccessProps) => {
   const track = useTrack()
   const [keyCopied, setKeyCopied] = useState(false)
   const [hasCopiedToken, setHasCopiedToken] = useState(false)
 
   const handleCopy = () => {
     setHasCopiedToken(true)
-    track('access_token_copied', { tokenType })
+    track('access_token_copied', { tokenType: 'scoped' })
     toast.success('Token copied to clipboard')
   }
 
   const handleAcknowledge = (isChecked: boolean) => {
     setKeyCopied(isChecked)
-    track('access_token_stored_checkbox_clicked', { tokenType, isChecked })
+    track('access_token_stored_checkbox_clicked', { tokenType: 'scoped', isChecked })
   }
 
   const handleDone = () => {
-    track('access_token_done_button_clicked', { tokenType, hasCopiedToken })
+    track('access_token_done_button_clicked', { tokenType: 'scoped', hasCopiedToken })
     onClose()
   }
 

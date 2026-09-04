@@ -3534,6 +3534,22 @@ export interface AccessTokenCreatedEvent {
 }
 
 /**
+ * Triggered when an access token creation sheet is closed.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens
+ */
+export interface AccessTokenCreationSheetClosedEvent {
+  action: 'access_token_creation_sheet_closed'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+    step: 'form' | 'success'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * Triggered when an access token is successfully deleted.
  *
  * @group Events
@@ -4059,6 +4075,7 @@ export type TelemetryEvent =
   | UpgradeCtaClickedEvent
   | PricingPanelPlanPresentationExperimentExposedEvent
   | AccessTokenCreatedEvent
+  | AccessTokenCreationSheetClosedEvent
   | AccessTokenRemovedEvent
   | AccessTokenCopiedEvent
   | AccessTokenStoredCheckboxClickedEvent
