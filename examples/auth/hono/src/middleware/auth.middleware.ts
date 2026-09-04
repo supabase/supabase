@@ -25,9 +25,9 @@ type SupabaseEnv = {
 export const supabaseMiddleware = (): MiddlewareHandler => {
   return async (c, next) => {
     const supabaseEnv = env<SupabaseEnv>(c)
-    const supabaseUrl = supabaseEnv.VITE_SUPABASE_URL ?? import.meta.env.VITE_SUPABASE_URL
+    const supabaseUrl = supabaseEnv.VITE_SUPABASE_URL ?? import.meta.env?.VITE_SUPABASE_URL
     const supabasePublishableKey =
-      supabaseEnv.VITE_SUPABASE_PUBLISHABLE_KEY ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+      supabaseEnv.VITE_SUPABASE_PUBLISHABLE_KEY ?? import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY
 
     if (!supabaseUrl) {
       throw new Error('VITE_SUPABASE_URL missing!')
