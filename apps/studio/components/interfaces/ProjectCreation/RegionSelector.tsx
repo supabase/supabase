@@ -221,7 +221,7 @@ export const RegionSelector = ({
                           </ul>
                           {isLocalEnvironment && (
                             <p className="mt-1">
-                              Use Central EU (Frankfurt) unless you're on a personal dev stack.
+                              Use East US (North Virginia) unless you're on a personal dev stack.
                             </p>
                           )}
                         </div>
