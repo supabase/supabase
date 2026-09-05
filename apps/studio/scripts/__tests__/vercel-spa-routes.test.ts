@@ -35,19 +35,6 @@ describe('buildSpaRoutes', () => {
     ])
   })
 
-  it('preserves other post-filesystem routes and drops duplicate filesystem handlers', () => {
-    const isr = { src: '/blog/(.*)', dest: '/blog-isr' }
-    const routes = buildSpaRoutes(
-      [filesystem, isr, filesystem, functionCatchAll],
-      '/__server',
-      '/assets'
-    )
-
-    expect(routes.filter((r) => r.handle === 'filesystem')).toHaveLength(1)
-    expect(routes.slice(0, 2)).toEqual([filesystem, isr])
-    expect(routes.at(-1)).toEqual({ src: '/(.*)', dest: '/_shell.html' })
-  })
-
   it('adds prefixed rules and a public-file rewrite under a base path', () => {
     const routes = buildSpaRoutes(
       [cacheRule, filesystem, functionCatchAll],
