@@ -74,32 +74,10 @@ function buildPlanTiersSection(): string {
 function buildComputeSection(): string {
   const rows = addOnTable.database.rows
 
-  const headers = [
-    'Size',
-    '$/month',
-    'CPU',
-    'Dedicated',
-    'RAM',
-    'Direct Connections',
-    'Pooler Connections',
-  ]
-  const keys = [
-    'plan',
-    'pricing',
-    'cpu',
-    'dedicated',
-    'memory',
-    'directConnections',
-    'poolerConnections',
-  ]
+  const headers = ['Size', '$/month', 'Compute', 'RAM', 'Direct Connections', 'Pooler Connections']
+  const keys = ['plan', 'pricing', 'cpu', 'memory', 'directConnections', 'poolerConnections']
 
-  const dataRows = rows.map((row) =>
-    keys.map((key) => {
-      const val = getColumnValue(row, key)
-      if (key === 'dedicated') return val ? 'Yes' : 'No'
-      return String(val)
-    })
-  )
+  const dataRows = rows.map((row) => keys.map((key) => String(getColumnValue(row, key))))
 
   const widths = headers.map((h, i) => Math.max(h.length, ...dataRows.map((r) => r[i].length)))
 

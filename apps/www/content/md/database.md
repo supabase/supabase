@@ -25,7 +25,7 @@ Supabase Database gives you a full Postgres database with no compromises. It is 
 - Connection: direct Postgres connections (connection string), connection pooling via PgBouncer (Supavisor)
 - Client libraries: JavaScript, Python, Dart (Flutter), Swift, Kotlin, C#
 - Backups: automatic daily backups, Point-in-Time Recovery available as add-on
-- Compute: configurable from Micro (2-core ARM) to 16XL+ (64-core ARM and above), with autoscaling options
+- Compute: configurable from Micro to 16XL+, with autoscaling options
 
 ## Links
 
