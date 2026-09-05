@@ -77,10 +77,7 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
 }))
 
 vi.mock('@/components/interfaces/Organization/TeamSettings/TeamSettings.utils', () => ({
-  useGetRolesManagementPermissions: () => ({
-    rolesAddable: [1, 2, 3, 4],
-    rolesRemovable: [1, 2, 3, 4],
-  }),
+  useGetRolesManagementPermissions: (...args: unknown[]) => mockRolesPermissions(...(args as [])),
 }))
 
 const mockInvite = vi.fn().mockResolvedValue({ succeeded: [], failed: [] })
@@ -89,6 +86,11 @@ vi.mock('@/data/organization-members/organization-invitation-create-mutation', (
     mutateAsync: mockInvite,
     isPending: false,
   }),
+}))
+
+const mockRolesPermissions = vi.fn(() => ({
+  rolesAddable: [1, 2, 3, 4] as unknown as number[],
+  rolesRemovable: [1, 2, 3, 4] as unknown as number[],
 }))
 
 vi.mock('@/hooks/ui/useConfirmOnClose', () => ({
@@ -120,6 +122,10 @@ describe('InviteMemberButton', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockInvite.mockResolvedValue({ succeeded: [], failed: [] })
+    mockRolesPermissions.mockReturnValue({
+      rolesAddable: [1, 2, 3, 4] as unknown as number[],
+      rolesRemovable: [1, 2, 3, 4] as unknown as number[],
+    })
   })
 
   it('renders an enabled Invite members button', () => {
@@ -288,6 +294,44 @@ describe('InviteMemberButton', () => {
       expect(toast.error).toHaveBeenCalledWith(
         'Failed to invite bob@example.com: Domain not allowed'
       )
+    })
+  })
+
+  describe('tooltips (#49859)', () => {
+    it('shows only the warning tooltip when the user cannot invite (no shortcut tooltip overlap)', () => {
+      mockRolesPermissions.mockReturnValue({
+        rolesAddable: [] as unknown as number[],
+        rolesRemovable: [] as unknown as number[],
+      })
+      customRender(<InviteMemberButton />)
+
+      const button = screen.getByRole('button', { name: /invite members/i })
+      expect(button).toBeDisabled()
+
+      fireEvent.mouseEnter(button)
+      fireEvent.focus(button)
+
+      // The warning tooltip must be present (Radix renders the text in the
+      // visible bubble and again in a screen-reader-only span)...
+      expect(screen.getAllByText(/you need additional permissions/i).length).toBeGreaterThan(0)
+      // ...and the keyboard-shortcut tooltip must not render alongside it.
+      // ShortcutTooltip renders "<label> <pills>"; the button label is also
+      // "Invite members", so assert on the Shift+N pill instead.
+      expect(screen.queryByText('⇧N')).not.toBeInTheDocument()
+    })
+
+    it('shows the shortcut tooltip when the user can invite (normal path intact)', () => {
+      customRender(<InviteMemberButton />)
+
+      const button = screen.getByRole('button', { name: /invite members/i })
+      expect(button).toBeEnabled()
+
+      fireEvent.mouseEnter(button)
+      fireEvent.focus(button)
+
+      // With no warning to show, the shortcut tooltip renders its pills.
+      expect(screen.getAllByText('⇧N').length).toBeGreaterThan(0)
+      expect(screen.queryByText(/you need additional permissions/i)).not.toBeInTheDocument()
     })
   })
 })
