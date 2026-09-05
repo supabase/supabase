@@ -30,9 +30,9 @@ import {
   getAddons,
   subscriptionHasHipaaAddon,
 } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
-import { ProjectUpdateDisabledTooltip } from '@/components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { AlertError } from '@/components/ui/AlertError'
+import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
@@ -44,6 +44,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   useIsAwsCloudProvider,
+  useIsHighAvailability,
   useIsOrioleDbInAws,
   useIsProjectActive,
   useSelectedProjectQuery,
@@ -59,6 +60,7 @@ export const Addons = () => {
   const isAws = useIsAwsCloudProvider()
   const isProjectActive = useIsProjectActive()
   const isOrioleDbInAws = useIsOrioleDbInAws() === true
+  const isHighAvailability = useIsHighAvailability()
 
   const { projectSettingsCustomDomains, projectAddonsDedicatedIpv4Address } = useIsFeatureEnabled([
     'project_settings:custom_domains',
@@ -100,14 +102,19 @@ export const Addons = () => {
   const customDomainEnabled = customDomain !== undefined
 
   const canOpenIPv4 =
-    isAws && isProjectActive && !projectUpdateDisabled && (canUpdateIPv4 || ipv4Enabled)
+    isAws &&
+    isProjectActive &&
+    !projectUpdateDisabled &&
+    (canUpdateIPv4 || ipv4Enabled) &&
+    !isHighAvailability
   const canOpenPITR =
     isProjectActive &&
     !projectUpdateDisabled &&
     sufficientPgVersion &&
     !hasHipaaAddon &&
-    !isOrioleDbInAws
-  const canOpenCustomDomain = isProjectActive && !projectUpdateDisabled
+    !isOrioleDbInAws &&
+    !isHighAvailability
+  const canOpenCustomDomain = isProjectActive && !projectUpdateDisabled && !isHighAvailability
 
   const ipv4DisabledReason = getIPv4DisabledReason({
     isAws,
@@ -115,6 +122,7 @@ export const Addons = () => {
     projectUpdateDisabled,
     canUpdateIPv4,
     ipv4Enabled,
+    isHighAvailability,
   })
 
   const pitrDisabledReason = getPitrDisabledReason({
@@ -123,11 +131,13 @@ export const Addons = () => {
     hasHipaaAddon,
     sufficientPgVersion,
     isOrioleDbInAws,
+    isHighAvailability,
   })
 
   const customDomainDisabledReason = getCustomDomainDisabledReason({
     isProjectActive,
     projectUpdateDisabled,
+    isHighAvailability,
   })
   const pitrAlertState = getPitrAlertState({
     hasHipaaAddon,
@@ -190,6 +200,11 @@ export const Addons = () => {
   return (
     <PageContainer size="default">
       <PageSection className="last:pb-0 gap-0">
+        <HighAvailabilityDisabledSectionNotice
+          className="mb-4"
+          title="Add-ons unavailable on High Availability projects"
+          description="We're working to bring add-ons to High Availability projects. Contact support if this is blocking your work."
+        />
         {isBranch && (
           <Admonition
             type="default"
@@ -246,17 +261,19 @@ export const Addons = () => {
                 }
                 meta={
                   <div className="flex items-center gap-4">
-                    <ProjectUpdateDisabledTooltip
-                      projectUpdateDisabled={projectUpdateDisabled}
-                      projectNotActive={!isProjectActive}
-                      tooltip={ipv4DisabledReason}
-                    >
-                      {ipv4Enabled ? (
-                        <Badge variant="success">Enabled</Badge>
-                      ) : (
-                        <Badge variant="default">Disabled</Badge>
-                      )}
-                    </ProjectUpdateDisabledTooltip>
+                    {ipv4Enabled ? (
+                      <Badge variant="success">Enabled</Badge>
+                    ) : (
+                      <Badge variant="default">Disabled</Badge>
+                    )}
+                    {!canOpenIPv4 && ipv4DisabledReason && (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Lock strokeWidth={1.5} className="text-foreground-light" size={16} />
+                        </TooltipTrigger>
+                        <TooltipContent>{ipv4DisabledReason}</TooltipContent>
+                      </Tooltip>
+                    )}
                   </div>
                 }
               >
@@ -384,9 +401,13 @@ export const Addons = () => {
           </ResourceList>
         )}
 
-        <PITRSidePanel />
-        <CustomDomainSidePanel />
-        <IPv4SidePanel />
+        {!isHighAvailability && (
+          <>
+            <PITRSidePanel />
+            <CustomDomainSidePanel />
+            <IPv4SidePanel />
+          </>
+        )}
       </PageSection>
     </PageContainer>
   )
