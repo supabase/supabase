@@ -161,7 +161,7 @@ export const TableEditorMenu = () => {
 
   return (
     <>
-      <div className="flex flex-col grow gap-5 pt-5 h-full">
+      <div className="flex h-full grow flex-col gap-1.5 pt-2">
         <div className="flex flex-col gap-y-1.5">
           <ShortcutTooltip
             shortcutId={SHORTCUT_IDS.TABLE_EDITOR_FOCUS_SCHEMA}
@@ -214,7 +214,7 @@ export const TableEditorMenu = () => {
             )}
           </div>
         </div>
-        <div className="grow min-h-0 flex flex-col gap-2 pb-4">
+        <div className="grow min-h-0 flex flex-col gap-5 pb-4">
           <InnerSideBarFilters className="mx-2">
             <InnerSideBarFilterSearchInput
               name="search-tables"
@@ -323,7 +323,7 @@ export const TableEditorMenu = () => {
                 />
               )}
               {(entityTypes?.length ?? 0) > 0 && (
-                <div className="flex flex-1 min-h-0 w-full" data-testid="tables-list">
+                <div className="flex min-h-0 w-full flex-1 px-4" data-testid="tables-list">
                   <InfiniteListDefault
                     className="h-full w-full"
                     items={entityTypes!}

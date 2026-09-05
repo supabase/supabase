@@ -191,7 +191,7 @@ export const EntityListItem = ({
           isSelected: isActive && !isPreview,
           isPreview,
         }),
-        'pl-4 pr-1'
+        'rounded-md pl-2 pr-1'
       )}
       onDoubleClick={(e) => {
         e.preventDefault()

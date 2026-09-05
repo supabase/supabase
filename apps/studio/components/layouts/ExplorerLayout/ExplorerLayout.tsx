@@ -1,9 +1,10 @@
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Home, MessageCirclePlus, NotebookText, Plus, SquareCode } from 'lucide-react'
+import { ChevronLeft, Home, MessageCirclePlus, NotebookText, Plus, SquareCode } from 'lucide-react'
 import Link from 'next/link'
 import { ComponentProps, ReactNode, useEffect, useEffectEvent, useState } from 'react'
 import {
+  Button,
   cn,
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +16,7 @@ import {
 import { EditorNavigationButton } from '../EditorNavigationButton'
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { EditorTabs } from '../Tabs/Tabs'
-import { type ExplorerResourceType } from './ExplorerLayout.constants'
+import { EXPLORER_SECTIONS, type ExplorerResourceType } from './ExplorerLayout.constants'
 import { ExplorerNavChats } from './ExplorerNavChats'
 import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
@@ -26,6 +27,7 @@ import {
   useCreateNotebook,
   useCreateQuery,
 } from '@/components/interfaces/Explorer/hooks'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useIsTemporarySqlEditorVisit } from '@/hooks/misc/useIsTemporarySqlEditorVisit'
 import { useTrack } from '@/lib/telemetry/track'
 import {
@@ -68,16 +70,32 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
     <ProjectLayoutWithAuth
       product="Explorer"
       browserTitle={mergedBrowserTitle}
-      productMenuBadge={<BackToSqlEditorButton />}
+      productMenuHeader={null}
       productMenu={
         <div className="relative h-full overflow-hidden">
           <AnimatePresence mode="wait">
-            {section === undefined && <ExplorerNavHome key="home" onSelectSection={setSection} />}
+            {section === undefined && (
+              <ExplorerNavHome
+                key="home"
+                header={<ExplorerSidebarHeader />}
+                onSelectSection={setSection}
+              />
+            )}
             {section === 'notebook' && (
-              <ExplorerNavNotebooks key="notebooks" onBack={() => setSection(undefined)} />
+              <ExplorerNavNotebooks
+                key="notebooks"
+                header={
+                  <ExplorerSidebarHeader section="notebook" onBack={() => setSection(undefined)} />
+                }
+              />
             )}
             {section === 'chat' && (
-              <ExplorerNavChats key="chats" onBack={() => setSection(undefined)} />
+              <ExplorerNavChats
+                key="chats"
+                header={
+                  <ExplorerSidebarHeader section="chat" onBack={() => setSection(undefined)} />
+                }
+              />
             )}
           </AnimatePresence>
         </div>
@@ -88,7 +106,7 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
       <ExplorerNotebookTabCoordinator />
 
       <div className="flex flex-col h-full">
-        <div className={cn('h-10 md:min-h-(--header-height) flex items-center bg-surface-100')}>
+        <div className="flex h-10 items-center bg-surface-100">
           <EditorTabs
             isCollapseButtonHidden
             customTabs={<HomeTabButton />}
@@ -98,6 +116,61 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
         <div className="flex-grow min-h-0">{children}</div>
       </div>
     </ProjectLayoutWithAuth>
+  )
+}
+
+type ExplorerSidebarHeaderProps =
+  | { section?: undefined; onBack?: undefined }
+  | { section: ExplorerResourceType; onBack: () => void }
+
+const ExplorerSidebarHeader = (props: ExplorerSidebarHeaderProps) => {
+  const { createNotebook } = useCreateNotebook()
+  const { createChat } = useCreateChat()
+
+  const section = props.section
+  const sectionConfig = EXPLORER_SECTIONS.find(({ type }) => type === section)
+  const title = sectionConfig?.label ?? 'Explorer'
+
+  const handleCreate = () => {
+    if (section === 'notebook') createNotebook()
+    if (section === 'chat') createChat()
+  }
+
+  return (
+    <div
+      className={cn(
+        'shrink-0 items-center justify-between gap-2 px-4 pt-5',
+        section === undefined ? 'hidden md:flex' : 'flex'
+      )}
+    >
+      {section !== undefined && (
+        <Button
+          size="tiny"
+          variant="text"
+          aria-label="Back"
+          onClick={props.onBack}
+          className="size-7 shrink-0 px-0"
+          icon={<ChevronLeft />}
+        />
+      )}
+      <h4 className={cn('min-w-0 flex-1 truncate text-lg', section === undefined && 'pl-2')}>
+        {title}
+      </h4>
+      <div className="flex shrink-0 items-center gap-2">
+        {section === undefined && <BackToSqlEditorButton />}
+        {section !== undefined && (
+          <ButtonTooltip
+            size="tiny"
+            variant="outline"
+            aria-label={`New ${section}`}
+            className="size-7 shrink-0 px-0"
+            icon={<Plus />}
+            tooltip={{ content: { side: 'bottom', text: `New ${section}` } }}
+            onClick={handleCreate}
+          />
+        )}
+      </div>
+    </div>
   )
 }
 
@@ -126,7 +199,7 @@ const BackToSqlEditorButton = () => {
 }
 
 const TabClassName =
-  'flex items-center justify-center min-w-(--header-height) min-h-(--header-height) hover:bg-surface-100 shrink-0'
+  'flex items-center justify-center min-w-10 min-h-10 hover:bg-surface-100 shrink-0'
 
 const HomeTabButton = () => {
   const tabs = useTabsStateSnapshot()
