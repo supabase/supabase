@@ -14,8 +14,14 @@ export type FeaturePreview = {
   isDefaultOptIn: boolean
   /** Visibility in the feature preview modal (For feature flagging a feature preview) */
   enabled: boolean
+  /**
+   * Forces the preview on for this user, whatever they previously chose — for a
+   * preview that has become the default behavior. Overrides both `isDefaultOptIn`
+   * and a stored opt-out, and takes away the ability to turn the preview back off.
+   */
+  isForced?: boolean
   /** Optional category that the feature preview falls under, defaults to "Others" in the UI otherwise */
-  category?: 'observability' | 'database'
+  category?: 'observability' | 'database' | 'editors'
   /**
    * Where to send the user after enabling, to try the feature out. Omit if the
    * feature has no single destination (e.g. a global layout change).
@@ -28,13 +34,24 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const isPlatformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
-  const isSqlEditorManualSaveEnabled = useFlag('sqlEditorManualSave')
   const isDatabaseConnectionsEnabled = useFlag('topForPostgres')
+  const isExplorerEnabled = useFlag('explorer')
 
-  const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
+  const isSqlEditorManualSaveForced = useFlag('sqlEditorManualSaveForced')
 
   return useMemo(() => {
     const previews: FeaturePreview[] = [
+      {
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER,
+        name: 'Explorer & Notebooks',
+        category: 'editors',
+        discussionsUrl: 'https://github.com/orgs/supabase/discussions/49916',
+        enabled: isExplorerEnabled,
+        isNew: true,
+        isPlatformOnly: true,
+        isDefaultOptIn: false,
+        getRoute: (ref?: string) => `/project/${ref}/explorer`,
+      },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
         name: 'Updated Logs interface',
@@ -43,7 +60,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         enabled: true,
         isNew: true,
         isPlatformOnly: true,
-        isDefaultOptIn: unifiedLogsDefaultOptIn,
+        isDefaultOptIn: true,
         getRoute: (ref?: string) => `/project/${ref}/logs`,
       },
       {
@@ -109,12 +126,17 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE,
+        category: 'editors',
         name: 'Disable snippet auto-saving',
         discussionsUrl: undefined,
         isNew: true,
         isPlatformOnly: true,
         isDefaultOptIn: false,
-        enabled: isSqlEditorManualSaveEnabled,
+        enabled: true,
+        // Manual saving is becoming the default for the SQL Editor. The preview
+        // stays listed so users who lose their local storage can opt back in
+        // before the rollout reaches them.
+        isForced: isSqlEditorManualSaveForced,
       },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS,
@@ -123,8 +145,8 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         discussionsUrl: 'https://github.com/orgs/supabase/discussions/48639',
         isNew: true,
         isPlatformOnly: false,
-        isDefaultOptIn: false,
-        enabled: isDatabaseConnectionsEnabled,
+        isDefaultOptIn: isDatabaseConnectionsEnabled,
+        enabled: true,
         getRoute: (ref?: string) => `/project/${ref}/observability/connections`,
         bannerId: 'database-connections-banner',
       },
@@ -132,11 +154,11 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
 
     return previews.sort((a, b) => Number(b.isNew) - Number(a.isNew))
   }, [
-    unifiedLogsDefaultOptIn,
+    isSqlEditorManualSaveForced,
     isPlatformWebhooksEnabled,
     jitDbAccessEnabled,
     isMarketplaceEnabled,
-    isSqlEditorManualSaveEnabled,
     isDatabaseConnectionsEnabled,
+    isExplorerEnabled,
   ])
 }

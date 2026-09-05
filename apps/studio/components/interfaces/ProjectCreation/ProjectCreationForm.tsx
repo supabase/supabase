@@ -33,6 +33,7 @@ import {
   getHighAvailabilityRegionCode,
   instanceLabel,
   monthlyInstancePrice,
+  resolveDefaultDbRegion,
   smartRegionToExactRegion,
 } from './ProjectCreation.utils'
 import { ProjectCreationFooter } from './ProjectCreationFooter'
@@ -150,6 +151,7 @@ export const ProjectCreationForm = ({
   const [allProjects, setAllProjects] = useState<OrgProject[] | undefined>(undefined)
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
+  const [projectCreationError, setProjectCreationError] = useState<string>()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -283,12 +285,16 @@ export const ProjectCreationForm = ({
 
   const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
-  const defaultRegion =
-    highAvailability && highAvailabilityRegionCode !== undefined
-      ? highAvailabilityRegion?.name
-      : smartRegionEnabled
-        ? recommendedSmartRegion
-        : (autoDefaultRegion ?? fixedDefaultRegion)
+  const defaultRegion = resolveDefaultDbRegion({
+    cloudProvider: selectedCloudProvider,
+    isHighAvailabilityRestricted:
+      highAvailability === true && highAvailabilityRegionCode !== undefined,
+    highAvailabilityRegionName: highAvailabilityRegion?.name,
+    isSmartRegionEnabled: smartRegionEnabled,
+    recommendedSmartRegion,
+    autoDefaultRegion,
+    fixedDefaultRegion,
+  })
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
   const canConfigureGitHubOnCreate =
@@ -327,6 +333,7 @@ export const ProjectCreationForm = ({
     isSuccess: isSuccessNewProject,
   } = useProjectCreateMutation({
     onSuccess: (res) => {
+      setProjectCreationError(undefined)
       track(
         'project_creation_simple_version_submitted',
         {
@@ -349,6 +356,11 @@ export const ProjectCreationForm = ({
       if (surface === 'main') router.push(`/project/${res.ref}`)
     },
     onError: (error) => {
+      if (isVercelIntegrationFlow) {
+        setProjectCreationError(`Failed to create new project: ${error.message}`)
+        trackFunnelError('project_creation', classifyApiError('project_creation', error), 'form')
+        return
+      }
       const toastId = toast.error(`Failed to create new project: ${error.message}`)
       trackFunnelError(
         'project_creation',
@@ -364,7 +376,14 @@ export const ProjectCreationForm = ({
       values.instanceSize &&
       !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
 
-    if (additionalMonthlySpend > 0 && (hasOAuthApps || launchingLargerInstance)) {
+    // High availability projects are free during Alpha, so the forced large compute
+    // doesn't incur the usual compute costs.
+    const requiresCostConfirmation =
+      !values.highAvailability &&
+      additionalMonthlySpend > 0 &&
+      (hasOAuthApps || launchingLargerInstance)
+
+    if (requiresCostConfirmation) {
       track('project_creation_simple_version_confirm_modal_opened', {
         instanceSize: values.instanceSize,
       })
@@ -376,6 +395,7 @@ export const ProjectCreationForm = ({
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     if (!currentOrg) return console.error('Unable to retrieve current organization')
+    setProjectCreationError(undefined)
 
     const {
       cloudProvider,
@@ -401,13 +421,27 @@ export const ProjectCreationForm = ({
     const customPostgresVersion = highAvailability ? undefined : postgresVersion
 
     if (customPostgresVersion && !customPostgresVersion.match(/1[2-9]\..*/)) {
-      return toast.error(
-        `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
-      )
+      const message =
+        'Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3'
+      if (isVercelIntegrationFlow) {
+        setProjectCreationError(message)
+        return
+      }
+      return toast.error(message)
     }
 
     if (useOrioleDb && !availableOrioleVersion) {
-      const toastId = toast.error('No available OrioleDB image found, only Postgres is available')
+      const message = 'No available OrioleDB image found, only Postgres is available'
+      if (isVercelIntegrationFlow) {
+        setProjectCreationError(message)
+        trackFunnelError(
+          'project_creation',
+          { errorCategory: 'validation', errorReason: 'oriole_unavailable' },
+          'form'
+        )
+        return
+      }
+      const toastId = toast.error(message)
       trackFunnelError(
         'project_creation',
         { errorCategory: 'validation', errorReason: 'oriole_unavailable' },
@@ -421,13 +455,9 @@ export const ProjectCreationForm = ({
       extractPostgresVersionDetails(postgresVersionSelection)
 
     const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
-    const selectedRegion =
-      highAvailability && highAvailabilityRegionCode !== undefined
-        ? specific.find((region) => region.code === highAvailabilityRegionCode)
-        : smartRegionEnabled
-          ? (smartGroup.find((x) => x.name === dbRegion) ??
-            specific.find((x) => x.name === dbRegion))
-          : undefined
+    const selectedRegion = smartRegionEnabled
+      ? (smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion))
+      : undefined
 
     if (highAvailability && highAvailabilityRegionCode !== undefined && !selectedRegion) {
       return toast.error(
@@ -629,6 +659,7 @@ export const ProjectCreationForm = ({
               form={form}
               canCreateProject={canCreateProject}
               instanceSize={instanceSize}
+              highAvailability={highAvailability}
               organizationProjects={organizationProjects}
               isCreatingNewProject={isCreatingNewProject}
               isSuccessNewProject={isSuccessNewProject}
@@ -658,8 +689,8 @@ export const ProjectCreationForm = ({
                           label="GitHub (optional)"
                           description={
                             <>
-                              Ideal for agent-first workflows: update your schema in code, push it
-                              to GitHub, and Supabase deploys the changes automatically.{' '}
+                              Ideal for agent-first workflows. Update your schema in code and push
+                              it to GitHub. Supabase deploys the changes.{' '}
                               <a
                                 href="https://supabase.com/docs/guides/deployment/branching/github-integration"
                                 target="_blank"
@@ -753,6 +784,13 @@ export const ProjectCreationForm = ({
                   </Panel.Content>
                 ) : null}
               </div>
+            )}
+            {projectCreationError && (
+              <Panel.Content>
+                <p role="alert" className="text-sm text-destructive">
+                  {projectCreationError}
+                </p>
+              </Panel.Content>
             )}
           </>
         </Panel>

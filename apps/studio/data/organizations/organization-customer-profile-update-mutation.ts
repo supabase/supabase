@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { organizationKeys } from './keys'
+import type { OrganizationsData } from './organizations-query'
 import type { CustomerAddress, CustomerTaxId } from './types'
 import { handleError, put } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -9,9 +10,12 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 export type OrganizationCustomerProfileUpdateVariables = {
   slug?: string
   address?: CustomerAddress
-  billing_name: string
+  billing_name?: string
   /** Pass a tax ID object to set/update, `null` to clear, or `undefined` to leave unchanged */
   tax_id?: CustomerTaxId | null
+  email?: string
+  additional_emails?: string[]
+  indirect_tax_registration_declaration?: 'yes' | 'no'
   /** When true, validates the request without persisting changes */
   dry_run?: boolean
 }
@@ -21,6 +25,9 @@ export async function updateOrganizationCustomerProfile({
   address,
   billing_name,
   tax_id,
+  email,
+  additional_emails,
+  indirect_tax_registration_declaration,
   dry_run,
 }: OrganizationCustomerProfileUpdateVariables) {
   if (!slug) return console.error('Slug is required')
@@ -39,6 +46,9 @@ export async function updateOrganizationCustomerProfile({
         : tax_id !== undefined
           ? { tax_id }
           : {}),
+      email,
+      additional_emails,
+      indirect_tax_registration_declaration,
       ...(dry_run ? { dry_run } : {}),
     },
   })
@@ -71,28 +81,52 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
   >({
     mutationFn: (vars) => updateOrganizationCustomerProfile(vars),
     async onSuccess(data, variables, context) {
-      const { address, slug, billing_name, tax_id, dry_run } = variables
+      const {
+        address,
+        slug,
+        billing_name,
+        tax_id,
+        email,
+        additional_emails,
+        indirect_tax_registration_declaration,
+        dry_run,
+      } = variables
 
       if (dry_run) {
         await onSuccess?.(data, variables, context)
         return
       }
 
-      // Optimistically update the cache for immediate UI consistency
+      // Optimistically update the cache for immediate UI consistency. Only patch the fields
+      // that were actually part of this mutation's variables - each caller (e.g. BillingEmail,
+      // BillingCustomerData) only sends the subset it owns, so an unconditional overwrite here
+      // would wipe out the other fields in the shared cache entry.
       queryClient.setQueriesData(
         { queryKey: organizationKeys.customerProfile(slug) },
         (prev: any) => {
           if (!prev) return prev
           return {
             ...prev,
-            billing_name,
+            ...(billing_name !== undefined ? { billing_name } : {}),
             ...(address !== undefined ? { address } : {}),
+            ...(email !== undefined ? { email } : {}),
+            ...(additional_emails !== undefined ? { additional_emails: additional_emails } : {}),
           }
         }
       )
 
       if (tax_id !== undefined) {
         queryClient.setQueryData(organizationKeys.taxId(slug), tax_id)
+      }
+
+      if (indirect_tax_registration_declaration !== undefined) {
+        queryClient.setQueryData<OrganizationsData>(organizationKeys.list(), (previous) =>
+          previous?.map((organization) =>
+            organization.slug === slug
+              ? { ...organization, requires_indirect_tax_declaration: false }
+              : organization
+          )
+        )
       }
 
       // Refetch after a delay to pick up server-canonical values (e.g. normalized tax IDs).

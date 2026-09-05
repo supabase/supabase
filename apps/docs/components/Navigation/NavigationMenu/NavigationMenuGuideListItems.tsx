@@ -8,6 +8,16 @@ import React, { useEffect, useRef } from 'react'
 
 import MenuIconPicker from './MenuIconPicker'
 
+type NavAccordionItem = {
+  url?: string
+  items?: NavAccordionItem[]
+}
+
+function hasActiveDescendant(item: NavAccordionItem, pathname: string): boolean {
+  if (item.url === pathname) return true
+  return item.items?.some((child) => hasActiveDescendant(child, pathname)) ?? false
+}
+
 const HeaderLink = React.memo(function HeaderLink(props: {
   title: string
   id: string
@@ -35,7 +45,8 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
   const activeItemRef = useRef<HTMLLIElement>(null)
 
   const isChildActive =
-    props.subItem.items && props.subItem.items.some((child: any) => child.url === pathname)
+    props.subItem.items &&
+    props.subItem.items.some((child: NavAccordionItem) => hasActiveDescendant(child, pathname))
 
   const LinkContainer = (props) => {
     const isExternal = props.url.startsWith('https://')
@@ -107,6 +118,17 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               {props.subItem.items
                 .filter((subItem) => subItem.enabled !== false)
                 .map((subSubItem) => {
+                  if (subSubItem.items && subSubItem.items.length > 0) {
+                    return (
+                      <ContentAccordionLink
+                        key={subSubItem.name}
+                        subItem={subSubItem}
+                        subItemIndex={-1}
+                        parent={props.subItem}
+                      />
+                    )
+                  }
+
                   return (
                     <li key={`${props.subItem.name}-${subSubItem.url}`}>
                       <Link

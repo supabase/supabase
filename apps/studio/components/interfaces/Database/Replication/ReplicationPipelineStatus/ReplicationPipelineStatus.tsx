@@ -55,7 +55,7 @@ import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-
 import { useReplicationPipelineReplicationStatusQuery } from '@/data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-version-query'
-import { useRestartPipelineHelper } from '@/data/replication/restart-pipeline-helper'
+import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-mutation'
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
 import {
@@ -137,7 +137,7 @@ export const ReplicationPipelineStatus = () => {
 
   const { mutateAsync: startPipeline, isPending: isStartingPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline, isPending: isStoppingPipeline } = useStopPipelineMutation()
-  const { restartPipeline } = useRestartPipelineHelper()
+  const { mutateAsync: restartPipeline } = useRestartPipelineMutation()
 
   const destinationName = pipeline?.destination_name
   const statusName = getStatusName(pipelineStatusData?.status)
@@ -419,7 +419,7 @@ export const ReplicationPipelineStatus = () => {
                 <Button
                   size="tiny"
                   variant="default"
-                  className="rounded-r-none hover:z-2"
+                  className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
                   icon={<RotateCcw />}
                   disabled={isAnyRestartInProgress || showDisabledState || isPipelineError}
                   loading={isAnyRestartInProgress}
@@ -434,8 +434,9 @@ export const ReplicationPipelineStatus = () => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="default"
+                      aria-label="More restart options"
                       icon={<ChevronDown />}
-                      className="w-7 rounded-l-none -ml-px"
+                      className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                       disabled={showDisabledState || isPipelineError}
                     />
                   </DropdownMenuTrigger>

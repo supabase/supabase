@@ -20,20 +20,19 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   ScrollArea,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-} from 'ui/src/components/shadcn/ui/select'
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
 import { CLSPreview } from './CLSPreview'
 import { DatabaseConnectionsPreview } from './DatabaseConnectionsPreview'
+import { ExplorerPreview } from './ExplorerPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
 import { IntegrationsLayoutPreview } from './IntegrationsLayoutPreview'
 import { JitDbAccessPreview } from './JitDbAccessPreview'
@@ -43,6 +42,7 @@ import { SqlEditorManualSavePreview } from './SqlEditorManualSavePreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -58,6 +58,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]: <SqlEditorManualSavePreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]: <IntegrationsLayoutPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS]: <DatabaseConnectionsPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]: <ExplorerPreview />,
 }
 
 export const FeaturePreviewModal = () => {
@@ -83,6 +84,7 @@ export const FeaturePreviewModal = () => {
     allFeaturePreviews.find((preview) => preview.key === selectedFeatureKey) ??
     allFeaturePreviews[0]
   const isSelectedFeatureEnabled = flags[selectedFeature?.key]
+  const canDisableSelectedFeature = selectedFeature?.isForced !== true
 
   const selectedFeatureRoute = selectedFeature?.getRoute?.(ref)
   const hasRoute = selectedFeatureRoute !== undefined && ref !== undefined
@@ -146,12 +148,8 @@ export const FeaturePreviewModal = () => {
                           ? allFeaturePreviews.filter((x) => x.category === undefined)
                           : allFeaturePreviews.filter((x) => x.category === category)
                       return (
-                        <AccordionItem
-                          key={category}
-                          value={category}
-                          className="data-[state=open]:border-b-0"
-                        >
-                          <AccordionTrigger className="text-xs font-mono uppercase tracking-tight px-4 text-foreground-lighter py-2">
+                        <AccordionItem key={category} value={category}>
+                          <AccordionTrigger className="text-xs font-mono uppercase tracking-tight px-4 text-foreground-lighter py-2 bg-tertiary dark:bg-transparent">
                             {category}
                           </AccordionTrigger>
                           <AccordionContent className="[&>div]:pb-0">
@@ -229,11 +227,25 @@ export const FeaturePreviewModal = () => {
                         </Link>
                       </Button>
                     )}
-                    {isSelectedFeatureEnabled ? (
-                      <Button variant="default" onClick={() => toggleFeature()}>
+                    {isSelectedFeatureEnabled && (
+                      <ButtonTooltip
+                        variant="default"
+                        disabled={!canDisableSelectedFeature}
+                        onClick={() => toggleFeature()}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            className: 'max-w-64 text-center',
+                            text: canDisableSelectedFeature
+                              ? undefined
+                              : 'This feature is now the default and can no longer be turned off',
+                          },
+                        }}
+                      >
                         Disable feature
-                      </Button>
-                    ) : (
+                      </ButtonTooltip>
+                    )}
+                    {!isSelectedFeatureEnabled && (
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button variant="default" onClick={() => toggleFeature()}>
@@ -302,8 +314,10 @@ const FeaturePreviewItem = ({
       key={feature.key}
       onClick={() => selectFeaturePreview(feature.key)}
       className={cn(
-        'w-full! flex-1 flex items-center justify-between p-4 border-b cursor-pointer bg transition',
-        selectedFeature?.key === feature.key ? 'bg-accent' : 'bg-card',
+        'w-full! flex-1 flex items-center justify-between p-4 cursor-pointer bg transition',
+        selectedFeature?.key === feature.key
+          ? 'bg-muted dark:bg-accent text-foreground'
+          : 'bg-card text-foreground-light',
         className
       )}
     >

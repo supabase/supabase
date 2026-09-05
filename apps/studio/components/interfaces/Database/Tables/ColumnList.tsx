@@ -24,6 +24,7 @@ import {
   cn,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   Table,
   TableBody,
@@ -50,7 +51,6 @@ import { ConstraintToken } from './ConstraintToken'
 import { displayColumnType } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
@@ -143,9 +143,6 @@ export const ColumnList = ({
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'columns'
   )
-  const deleteColumnTooltipText = !canUpdateColumns
-    ? 'Additional permissions required to delete column'
-    : undefined
 
   return (
     <div className="space-y-4">
@@ -379,28 +376,34 @@ export const ColumnList = ({
                               Edit
                             </ButtonTooltip>
                             <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="default"
-                                  className="px-1"
-                                  icon={<MoreVertical />}
-                                />
-                              </DropdownMenuTrigger>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      aria-label={`Delete ${column.name} column`}
+                                      // Tooltip repeats the label; the description would read the name twice
+                                      aria-describedby={undefined}
+                                      variant="default"
+                                      className="px-1"
+                                      icon={<MoreVertical />}
+                                    />
+                                  </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                  {!canUpdateColumns
+                                    ? 'Additional permissions required to delete column'
+                                    : `Delete ${column.name} column`}
+                                </TooltipContent>
+                              </Tooltip>
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
-                                <DropdownMenuItemTooltip
+                                <DropdownMenuItem
                                   disabled={!canUpdateColumns}
                                   onClick={() => onDeleteColumn(column)}
                                   className="gap-x-2"
-                                  tooltip={{
-                                    content: {
-                                      side: 'left',
-                                      text: deleteColumnTooltipText,
-                                    },
-                                  }}
                                 >
                                   <Trash size={12} />
                                   <p>Delete column</p>
-                                </DropdownMenuItemTooltip>
+                                </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>

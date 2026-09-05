@@ -55,7 +55,7 @@ export const tabsListVariants = cva(cn('flex'), {
 
 export const tabsTriggerListVariants = cva(
   cn(
-    'relative cursor-pointer flex items-center space-x-2 text-center transition-colors focus-ring'
+    'relative cursor-pointer flex items-center space-x-2 text-center transition-colors focus-ring [&_img]:m-0 [&_img]:size-3.5 [&_svg]:size-3.5'
   ),
   {
     variants: {
@@ -218,7 +218,7 @@ export const Tabs = ({
           type,
           scrollable,
           wrappable,
-          className: cn({ 'bg-background': stickyTabList != null }, listClassNames),
+          className: cn('not-prose', { 'bg-background': stickyTabList != null }, listClassNames),
         })}
         ref={stickyRef}
       >
