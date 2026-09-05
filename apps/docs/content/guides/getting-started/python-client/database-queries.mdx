@@ -1,0 +1,195 @@
+---
+title: "Database Queries"
+subtitle: "A fluent query builder for all CRUD operations via PostgREST — select, insert, update, upsert, delete, filters, RPC, and more."
+breadcrumb: "Python Client Guide"
+---
+
+The Supabase Python client provides a fluent query builder for all CRUD operations via PostgREST. Every query follows the same pattern: choose a table, add filters, call `.execute()`.
+
+## Table access
+
+**Select a table:**
+
+```python
+# Both are equivalent:
+supabase.table("countries")
+supabase.from_("countries")
+```
+
+Python reserves `from` as a keyword, so `table()` is the preferred method. `from_()` is provided for compatibility with the JavaScript SDK.
+
+**Select a schema:**
+
+```python
+supabase.schema("custom_schema").from_("countries")
+```
+
+The schema must be on the list of exposed schemas in your Supabase project.
+
+## Select (read)
+
+```python
+# Select all columns
+result = supabase.table("countries").select("*").execute()
+
+# Select specific columns
+result = supabase.table("countries").select("name, capital").execute()
+
+# With filters
+result = (
+    supabase.table("countries")
+    .select("*")
+    .eq("continent", "Europe")
+    .order("name", desc=False)
+    .limit(10)
+    .execute()
+)
+```
+
+The result is an `APIResponse` with `.data` (a list of dicts) and `.count` (when requested).
+
+## Insert (create)
+
+```python
+result = (
+    supabase.table("countries")
+    .insert({"name": "Germany", "capital": "Berlin"})
+    .execute()
+)
+```
+
+Insert multiple rows at once:
+
+```python
+result = (
+    supabase.table("countries")
+    .insert([
+        {"name": "France", "capital": "Paris"},
+        {"name": "Spain", "capital": "Madrid"},
+    ])
+    .execute()
+)
+```
+
+## Update
+
+```python
+result = (
+    supabase.table("countries")
+    .update({"capital": "Jakarta"})
+    .eq("name", "Indonesia")
+    .execute()
+)
+```
+
+## Upsert
+
+Insert or update rows based on a conflict key. If the table has a primary key on `id`, include it in the row. Otherwise, use `on_conflict` to specify the unique column:
+
+```python
+# With primary key included
+result = (
+    supabase.table("countries")
+    .upsert({"id": 1, "name": "Indonesia", "capital": "Jakarta"})
+    .execute()
+)
+
+# Or with an explicit conflict target
+result = (
+    supabase.table("countries")
+    .upsert({"name": "Indonesia", "capital": "Jakarta"}, on_conflict="name")
+    .execute()
+)
+```
+
+## Delete
+
+```python
+result = (
+    supabase.table("countries")
+    .delete()
+    .eq("name", "Testland")
+    .execute()
+)
+```
+
+## Filters
+
+| Filter                            | Description                         |
+| --------------------------------- | ----------------------------------- |
+| `.eq("col", value)`               | Equal to                            |
+| `.neq("col", value)`              | Not equal to                        |
+| `.gt("col", value)`               | Greater than                        |
+| `.gte("col", value)`              | Greater than or equal               |
+| `.lt("col", value)`               | Less than                           |
+| `.lte("col", value)`              | Less than or equal                  |
+| `.like("col", pattern)`           | SQL LIKE pattern (`%` wildcard)     |
+| `.ilike("col", pattern)`          | Case-insensitive LIKE               |
+| `.is_("col", value)`              | IS check (for `NULL` / booleans)    |
+| `.in_("col", [values])`           | IN a list of values                 |
+| `.contains("col", value)`         | JSONB / array contains              |
+| `.order("col", desc=False)`       | Order results                       |
+| `.limit(n)`                       | Limit rows                          |
+| `.range(start, end)`              | Offset pagination; both indexes are 0-based and inclusive |
+| `.or_("col.eq.val, col2.gt.val")` | Logical OR across fields            |
+
+## Stored procedures (RPC)
+
+```python
+result = supabase.rpc("add_numbers", {"a": 3, "b": 5}).execute()
+
+# Read-only function
+result = supabase.rpc("get_stats", get=True).execute()
+
+# Return count only (no data)
+result = supabase.rpc("process_batch", {"ids": [1,2,3]}, head=True).execute()
+```
+
+All parameters are passed as a dictionary. The `get` flag calls the function in read-only mode, and `head` suppresses the data payload.
+
+## Counting results
+
+```python
+result = (
+    supabase.table("countries")
+    .select("*", count="exact")
+    .eq("continent", "Europe")
+    .execute()
+)
+print(result.count)  # number of matching rows
+```
+
+## Single row
+
+```python
+result = (
+    supabase.table("countries")
+    .select("*")
+    .eq("name", "Germany")
+    .single()
+    .execute()
+)
+# result.data is a dict, not a list
+```
+
+Use `.maybe_single()` if the row might not exist — it returns `None` instead of raising.
+
+## Return types
+
+Every `.execute()` call returns an `APIResponse`. The shape of `.data` depends on the modifiers used:
+
+```python
+# Default: list of dicts
+result = supabase.table("countries").select("*").execute()
+result.data     # list[dict] — the rows
+
+# With .single(): a single dict
+result = supabase.table("countries").select("*").eq("name", "Germany").single().execute()
+result.data     # dict — a single row
+
+# RPC calls return whatever JSON the function produces
+result = supabase.rpc("add_numbers", {"a": 3, "b": 5}).execute()
+result.data     # could be int, list, dict, etc.
+
+result.count    # int | None — row count (if `count=` was used)
+```
