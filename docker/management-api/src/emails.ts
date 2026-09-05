@@ -25,6 +25,7 @@ export type GoTrueTemplateProps = Record<keyof typeof GOTRUE_TEMPLATE_PROPS, str
 const WORKER_PATH = fileURLToPath(new URL('./render-email-worker.js', import.meta.url))
 const PACKAGE_ROOT = dirname(dirname(WORKER_PATH))
 const WORKER_ARGV = [
+  '--max-old-space-size=256',
   '--permission',
   `--allow-fs-read=${PACKAGE_ROOT}`,
   '--disallow-code-generation-from-strings',
@@ -33,6 +34,7 @@ const WORKER_ARGV = [
 const RENDER_TIMEOUT_MS = 15_000
 const MAX_SOURCE_BYTES = 512 * 1024
 const MAX_OUTPUT_BYTES = 4 * 1024 * 1024
+const MAX_STDERR_BYTES = 64 * 1024
 
 async function compileReactEmail(source: string): Promise<string> {
   const { code } = await transform(source, {
@@ -44,7 +46,15 @@ async function compileReactEmail(source: string): Promise<string> {
   return code
 }
 
-export async function renderReactEmail(source: string): Promise<string> {
+let renderQueue: Promise<unknown> = Promise.resolve()
+
+export function renderReactEmail(source: string): Promise<string> {
+  const run = renderQueue.then(() => renderReactEmailNow(source))
+  renderQueue = run.catch(() => undefined)
+  return run
+}
+
+async function renderReactEmailNow(source: string): Promise<string> {
   if (Buffer.byteLength(source, 'utf8') > MAX_SOURCE_BYTES) {
     throw new Error('template source is too large')
   }
@@ -60,6 +70,7 @@ export async function renderReactEmail(source: string): Promise<string> {
   const stdout: Buffer[] = []
   let stdoutBytes = 0
   const stderr: Buffer[] = []
+  let stderrBytes = 0
 
   const finished = new Promise<void>((resolve, reject) => {
     const timer = setTimeout(() => {
@@ -75,7 +86,14 @@ export async function renderReactEmail(source: string): Promise<string> {
       }
       stdout.push(chunk)
     })
-    child.stderr.on('data', (chunk: Buffer) => stderr.push(chunk))
+    child.stderr.on('data', (chunk: Buffer) => {
+      stderrBytes += chunk.length
+      if (stderrBytes > MAX_STDERR_BYTES) {
+        child.kill('SIGKILL')
+        return
+      }
+      stderr.push(chunk)
+    })
     child.on('error', (err) => {
       clearTimeout(timer)
       reject(err)
@@ -95,6 +113,7 @@ export async function renderReactEmail(source: string): Promise<string> {
   await finished
 
   if (stdoutBytes > MAX_OUTPUT_BYTES) throw new Error('rendered template is too large')
+  if (stderrBytes > MAX_STDERR_BYTES) throw new Error('template logged too much output')
 
   const raw = Buffer.concat(stdout).toString('utf8')
   let result: { html?: unknown; error?: unknown }

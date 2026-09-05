@@ -86,3 +86,32 @@ test('renders without any inherited environment', async () => {
   `)
   assert.ok(html.includes('ok'))
 })
+
+test('stops templates that flood the renderer log', async () => {
+  const source = `
+    import * as React from 'react'
+    const line = 'x'.repeat(65536)
+    for (let i = 0; i < 1000; i++) console.log(line)
+    export default function Email() { return React.createElement('p', null, 'ok') }
+  `
+  await assert.rejects(() => renderReactEmail(source), /too much output|renderer failed/)
+})
+
+test('stops templates that exhaust renderer memory', async () => {
+  const source = `
+    import * as React from 'react'
+    const chunks = []
+    for (let i = 0; i < 100000; i++) chunks.push('m'.repeat(1024 * 1024).split(''))
+    export default function Email() { return React.createElement('p', null, String(chunks.length)) }
+  `
+  await assert.rejects(() => renderReactEmail(source))
+})
+
+test('serializes concurrent renders', async () => {
+  const source = (label: string) => `
+    import * as React from 'react'
+    export default function Email() { return React.createElement('p', null, '${label}') }
+  `
+  const [a, b] = await Promise.all([renderReactEmail(source('first')), renderReactEmail(source('second'))])
+  assert.ok(a.includes('first') && b.includes('second'))
+})
