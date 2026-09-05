@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  buildBigQueryApiConfig,
+  buildBigQueryUpdateApiConfig,
   buildDucklakeApiConfig,
+  buildDucklakeUpdateApiConfig,
   buildPipelineApiConfig,
 } from './create-destination-pipeline-mutation'
 
@@ -24,6 +27,33 @@ describe('buildPipelineApiConfig', () => {
       invalidated_slot_behavior: 'recreate',
       table_sync_copy: { type: 'skip_tables', table_ids: [101, 202] },
     })
+  })
+})
+
+describe('buildBigQueryApiConfig', () => {
+  const baseConfig = {
+    projectId: 'my-project',
+    datasetId: 'analytics',
+    serviceAccountKey: '{}',
+  }
+
+  it('maps the destination config to the API shape', () => {
+    expect(buildBigQueryApiConfig(baseConfig)).toEqual({
+      big_query: {
+        project_id: 'my-project',
+        dataset_id: 'analytics',
+        service_account_key: '{}',
+        connection_pool_size: undefined,
+        max_staleness_mins: undefined,
+      },
+    })
+  })
+
+  it('omits blank service_account_key on update, but not on create', () => {
+    const config = { ...baseConfig, serviceAccountKey: '' }
+
+    expect(buildBigQueryApiConfig(config).big_query.service_account_key).toBe('')
+    expect(buildBigQueryUpdateApiConfig(config).big_query.service_account_key).toBeUndefined()
   })
 })
 
@@ -106,21 +136,18 @@ describe('buildDucklakeApiConfig', () => {
 
   it('omits blank custom secret fields when requested', () => {
     expect(
-      buildDucklakeApiConfig(
-        {
-          catalogUrl: '  ',
-          dataPath: 's3://bucket/path',
-          poolSize: 4,
-          s3AccessKeyId: '',
-          s3SecretAccessKey: '\n',
-          s3Region: 'eu-west-1',
-          s3Endpoint: 's3.example.com',
-          s3UrlStyle: 'path',
-          s3UseSsl: true,
-          metadataSchema: 'ducklake',
-        },
-        { omitBlankSecrets: true }
-      )
+      buildDucklakeUpdateApiConfig({
+        catalogUrl: '  ',
+        dataPath: 's3://bucket/path',
+        poolSize: 4,
+        s3AccessKeyId: '',
+        s3SecretAccessKey: '\n',
+        s3Region: 'eu-west-1',
+        s3Endpoint: 's3.example.com',
+        s3UrlStyle: 'path',
+        s3UseSsl: true,
+        metadataSchema: 'ducklake',
+      })
     ).toEqual({
       ducklake: {
         catalog_url: undefined,

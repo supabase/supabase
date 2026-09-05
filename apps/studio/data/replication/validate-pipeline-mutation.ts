@@ -1,7 +1,10 @@
 import { useMutation } from '@tanstack/react-query'
 import { components } from 'api-types'
 
-import type { TableSyncCopyConfig } from './create-destination-pipeline-mutation'
+import {
+  buildPipelineApiConfig,
+  type TableSyncCopyConfig,
+} from './create-destination-pipeline-mutation'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -33,28 +36,24 @@ async function validatePipeline(
   if (!projectRef) throw new Error('projectRef is required')
   if (!sourceId) throw new Error('sourceId is required')
 
-  const batchConfig = maxFillMs !== undefined ? { max_fill_ms: maxFillMs } : undefined
-
-  const config = {
-    publication_name: publicationName,
-    max_table_sync_workers: maxTableSyncWorkers,
-    max_copy_connections_per_table: maxCopyConnectionsPerTable,
-    invalidated_slot_behavior: invalidatedSlotBehavior,
-    table_sync_copy: tableSyncCopy,
-    batch: batchConfig,
-  }
-
   const { data, error } = await post('/platform/replication/{ref}/pipelines/validate', {
     params: { path: { ref: projectRef } },
     body: {
       source_id: sourceId,
-      config: config as components['schemas']['ValidateReplicationPipelineBody']['config'],
+      config: buildPipelineApiConfig({
+        publicationName,
+        maxTableSyncWorkers,
+        maxCopyConnectionsPerTable,
+        invalidatedSlotBehavior,
+        tableSyncCopy,
+        batch: maxFillMs === undefined ? undefined : { maxFillMs },
+      }),
     },
     signal,
   })
 
   if (error) handleError(error)
-  return data as ValidatePipelineResponse
+  return data
 }
 
 type ValidatePipelineData = Awaited<ReturnType<typeof validatePipeline>>
