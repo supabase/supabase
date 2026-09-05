@@ -71,11 +71,11 @@ export const getTableRowsCountSql = ({
 with approximation as (
     select
       reltuples as estimate,
-      // Whole-tree heap size. A partitioned PARENT (relkind 'p') has no storage
-      // of its own, so its size is the sum over pg_partition_tree; every other
-      // relkind uses its own heap directly (pg_partition_tree returns NO rows
-      // for a plain non-partitioned table, so it cannot be used unconditionally).
-      // Views/foreign tables yield 0 (-> exact count, unchanged behavior).
+      -- Whole-tree heap size. A partitioned PARENT (relkind 'p') has no storage
+      -- of its own, so its size is the sum over pg_partition_tree; every other
+      -- relkind uses its own heap directly (pg_partition_tree returns NO rows
+      -- for a plain non-partitioned table, so it cannot be used unconditionally).
+      -- Views/foreign tables yield 0 (-> exact count, unchanged behavior).
       case when relkind = 'p'
         then (select coalesce(sum(pg_relation_size(relid)), 0) from pg_partition_tree(oid))
         else pg_relation_size(oid)
@@ -126,11 +126,11 @@ ${COUNT_ESTIMATE_SQL}
 with approximation as (
     select
       reltuples as estimate,
-      // Whole-tree heap size. A partitioned PARENT (relkind 'p') has no storage
-      // of its own, so its size is the sum over pg_partition_tree; every other
-      // relkind uses its own heap directly (pg_partition_tree returns NO rows
+      -- Whole-tree heap size. A partitioned PARENT (relkind 'p') has no storage
+      -- of its own, so its size is the sum over pg_partition_tree; every other
+      -- relkind uses its own heap directly (pg_partition_tree returns NO rows
       // for a plain non-partitioned table, so it cannot be used unconditionally).
-      // Views/foreign tables yield 0 (-> exact count, unchanged behavior).
+      -- Views/foreign tables yield 0 (-> exact count, unchanged behavior).
       case when relkind = 'p'
         then (select coalesce(sum(pg_relation_size(relid)), 0) from pg_partition_tree(oid))
         else pg_relation_size(oid)
