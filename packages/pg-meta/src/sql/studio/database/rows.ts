@@ -2,6 +2,8 @@ import { literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
 import { Filter, Query } from '../../../query'
 import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT, THRESHOLD_ESTIMATE_BYTES } from './get-count-estimate'
 
+const hasFilterValue = ({ value }: Filter) => value !== undefined && value !== null && value !== ''
+
 /**
  * Row-count for a table. reltuples = -1 (never analyzed) covers BOTH an
  * empty/small new table and a freshly bulk-loaded huge one, so the opt-in
@@ -30,11 +32,9 @@ export const getTableRowsCountSql = ({
   if (enforceExactCount) {
     const query = new Query()
     let queryChains = query.from(table.name, table.schema ?? undefined).count()
-    filters
-      .filter((x) => x.value && x.value !== '')
-      .forEach((x) => {
-        queryChains = queryChains.filter(x.column, x.operator, x.value)
-      })
+    filters.filter(hasFilterValue).forEach((x) => {
+      queryChains = queryChains.filter(x.column, x.operator, x.value)
+    })
     const queryChainsSql = queryChains.toSql()
     const queryChainsSqlWithoutSemicolon = queryChainsSql.endsWith(';')
       ? (queryChainsSql.slice(0, -1) as SafeSqlFragment)
@@ -43,11 +43,9 @@ export const getTableRowsCountSql = ({
   } else {
     const selectQuery = new Query()
     let selectQueryChains = selectQuery.from(table.name, table.schema ?? undefined).select()
-    filters
-      .filter((x) => x.value && x.value != '')
-      .forEach((x) => {
-        selectQueryChains = selectQueryChains.filter(x.column, x.operator, x.value)
-      })
+    filters.filter(hasFilterValue).forEach((x) => {
+      selectQueryChains = selectQueryChains.filter(x.column, x.operator, x.value)
+    })
     const selectBaseSql = selectQueryChains.toSql()
     const selectBaseSqlWithoutSemicolon = selectBaseSql.endsWith(';')
       ? (selectBaseSql.slice(0, -1) as SafeSqlFragment)
@@ -55,11 +53,9 @@ export const getTableRowsCountSql = ({
 
     const countQuery = new Query()
     let countQueryChains = countQuery.from(table.name, table.schema ?? undefined).count()
-    filters
-      .filter((x) => x.value && x.value != '')
-      .forEach((x) => {
-        countQueryChains = countQueryChains.filter(x.column, x.operator, x.value)
-      })
+    filters.filter(hasFilterValue).forEach((x) => {
+      countQueryChains = countQueryChains.filter(x.column, x.operator, x.value)
+    })
     const countBaseSql = countQueryChains.toSql()
     const countBaseSqlWithoutSemicolon = countBaseSql.endsWith(';')
       ? (countBaseSql.slice(0, -1) as SafeSqlFragment)
@@ -75,11 +71,11 @@ export const getTableRowsCountSql = ({
 with approximation as (
     select
       reltuples as estimate,
-      -- Whole-tree heap size. A partitioned PARENT (relkind 'p') has no storage
-      -- of its own, so its size is the sum over pg_partition_tree; every other
-      -- relkind uses its own heap directly (pg_partition_tree returns NO rows
-      -- for a plain non-partitioned table, so it cannot be used unconditionally).
-      -- Views/foreign tables yield 0 (-> exact count, unchanged behavior).
+      // Whole-tree heap size. A partitioned PARENT (relkind 'p') has no storage
+      // of its own, so its size is the sum over pg_partition_tree; every other
+      // relkind uses its own heap directly (pg_partition_tree returns NO rows
+      // for a plain non-partitioned table, so it cannot be used unconditionally).
+      // Views/foreign tables yield 0 (-> exact count, unchanged behavior).
       case when relkind = 'p'
         then (select coalesce(sum(pg_relation_size(relid)), 0) from pg_partition_tree(oid))
         else pg_relation_size(oid)
@@ -130,11 +126,11 @@ ${COUNT_ESTIMATE_SQL}
 with approximation as (
     select
       reltuples as estimate,
-      -- Whole-tree heap size. A partitioned PARENT (relkind 'p') has no storage
-      -- of its own, so its size is the sum over pg_partition_tree; every other
-      -- relkind uses its own heap directly (pg_partition_tree returns NO rows
-      -- for a plain non-partitioned table, so it cannot be used unconditionally).
-      -- Views/foreign tables yield 0 (-> exact count, unchanged behavior).
+      // Whole-tree heap size. A partitioned PARENT (relkind 'p') has no storage
+      // of its own, so its size is the sum over pg_partition_tree; every other
+      // relkind uses its own heap directly (pg_partition_tree returns NO rows
+      // for a plain non-partitioned table, so it cannot be used unconditionally).
+      // Views/foreign tables yield 0 (-> exact count, unchanged behavior).
       case when relkind = 'p'
         then (select coalesce(sum(pg_relation_size(relid)), 0) from pg_partition_tree(oid))
         else pg_relation_size(oid)
