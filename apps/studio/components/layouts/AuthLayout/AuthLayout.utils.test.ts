@@ -5,6 +5,7 @@ import { generateAuthMenu, GenerateAuthMenuOptions } from './AuthLayout.utils'
 const allFeaturesEnabled: GenerateAuthMenuOptions = {
   ref: 'test-ref',
   isPlatform: true,
+  showAuthConfig: true,
   showOverview: true,
   features: {
     signInProviders: true,
@@ -20,6 +21,7 @@ const allFeaturesEnabled: GenerateAuthMenuOptions = {
 const allFeaturesDisabled: GenerateAuthMenuOptions = {
   ref: 'test-ref',
   isPlatform: true,
+  showAuthConfig: true,
   showOverview: false,
   features: {
     signInProviders: false,
@@ -93,6 +95,7 @@ describe('generateAuthMenu', () => {
     const menu = generateAuthMenu({
       ...allFeaturesEnabled,
       isPlatform: false,
+      showAuthConfig: false,
     })
     const names = flatItemNames(menu)
     const groupTitles = menu.map((g) => g.title)
@@ -104,6 +107,30 @@ describe('generateAuthMenu', () => {
     const configGroup = menu.find((g) => g.title === 'Configuration')!
     expect(configGroup.items).toHaveLength(1)
     expect(configGroup.items[0].name).toBe('Policies')
+  })
+
+  it('self-hosted with management API shows Auth config items but not platform-only items', () => {
+    const menu = generateAuthMenu({
+      ...allFeaturesEnabled,
+      isPlatform: false,
+      showAuthConfig: true,
+    })
+    const names = flatItemNames(menu)
+
+    expect(names).toContain('Emails')
+    expect(names).toContain('Sign In / Providers')
+    expect(names).toContain('Sessions')
+    expect(names).toContain('Rate Limits')
+    expect(names).toContain('Multi-Factor')
+    expect(names).toContain('URL Configuration')
+    expect(names).toContain('Attack Protection')
+    expect(names).toContain('Auth Hooks')
+
+    expect(names).not.toContain('OAuth Apps')
+    expect(names).not.toContain('OAuth Server')
+    expect(names).not.toContain('Passkeys')
+    expect(names).not.toContain('Audit Logs')
+    expect(names).not.toContain('Performance')
   })
 
   it('shows Overview when showOverview is true', () => {

@@ -48,6 +48,7 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useOAuthCustomProviderUpdateMutation } from '@/data/oauth-custom-providers/oauth-custom-provider-update-mutation'
 import { useOAuthCustomProvidersQuery } from '@/data/oauth-custom-providers/oauth-custom-providers-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -99,7 +100,8 @@ export const CustomAuthProvidersList = () => {
   const { hostEndpoint: clientEndpoint } = useProjectApiUrl({ projectRef })
   const nextPlan = getNextPlanForCustomProviders(organization?.plan?.id)
   const isCustomProvidersEnabled = !!authConfig?.CUSTOM_OAUTH_ENABLED
-  const providerLimit = authConfig?.CUSTOM_OAUTH_MAX_PROVIDERS || 0
+  const maxProviders = authConfig?.CUSTOM_OAUTH_MAX_PROVIDERS ?? 0
+  const providerLimit = maxProviders > 0 ? maxProviders : Infinity
 
   const queryClient = useQueryClient()
   const { mutate: updateAuthConfig, isPending: isEnabling } = useAuthConfigUpdateMutation({
@@ -378,11 +380,13 @@ export const CustomAuthProvidersList = () => {
                     </div>
                   ) : (
                     <>
-                      <p>You've reached the limit of {providerLimit} providers for your plan.</p>
-                      <UpgradePlanButton
-                        source={`customAuthProviders-${organization?.plan.id}`}
-                        plan={nextPlan ?? 'Pro'}
-                      />
+                      <p>You've reached the limit of {providerLimit} providers.</p>
+                      {IS_PLATFORM && (
+                        <UpgradePlanButton
+                          source={`customAuthProviders-${organization?.plan.id}`}
+                          plan={nextPlan ?? 'Pro'}
+                        />
+                      )}
                     </>
                   )}
                 </HoverCardContent>
