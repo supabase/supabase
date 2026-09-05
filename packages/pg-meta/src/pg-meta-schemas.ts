@@ -97,7 +97,7 @@ function update(
   const sql = safeSql`
 do $$
 declare
-  id oid := ${id === undefined ? safeSql`${literal(name)}::regnamespace` : literal(id)};
+  id oid := ${id === undefined ? safeSql`quote_ident(${literal(name)})::regnamespace` : literal(id)};
   old record;
   new_name text := ${newName === undefined ? literal(null) : literal(newName)};
   new_owner text := ${owner === undefined ? literal(null) : literal(owner)};
@@ -139,7 +139,7 @@ function remove(
   const sql = safeSql`
 do $$
 declare
-  id oid := ${id === undefined ? safeSql`${literal(name)}::regnamespace` : literal(id)};
+  id oid := ${id === undefined ? safeSql`quote_ident(${literal(name)})::regnamespace` : literal(id)};
   old record;
   cascade bool := ${literal(cascade)};
 begin
