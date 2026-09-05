@@ -52,6 +52,7 @@ Inline changes only. Nothing in this PR moves a line from one place to another.
 - Put procedures in procedure format, per the Procedures section of CONTRIBUTING.md. Start each step with an imperative verb, keep one action or a closely related set per step, present 7 ± 2 steps per chunk, and group anything longer into named phases or smaller procedures.
 - Apply the inline rules in CONTRIBUTING.md for admonitions, emphasis, links, lists, and the "Styling, formatting, and grammar" section.
 - Keep code samples executable in their stated context, and mark intentionally omitted code. Prefer partials under `apps/docs/content/_partials/` over copied blocks.
+- **Check the alt text on every image, and open the image to do it.** Alt text on an existing page usually names the topic rather than describing the picture, and a topic name is what the nearby heading already says. Describe what a reader who can't see it would need: the labeled parts, the relationships between them, and any values the diagram carries. This is a rewrite of existing text, so it belongs in this PR.
 
 **Cut:**
 
@@ -129,6 +130,7 @@ Run this before submitting each branch, not once at the end of the stack:
 - [ ] Intro navigation is present only when the page needs it, and links resolve
 - [ ] Connective text is selective, not link spam
 - [ ] Voice matches CONTRIBUTING.md and WORD_LIST.md
+- [ ] Every image has alt text that describes the image, checked against the image itself
 - [ ] No invented behavior or positioning
 - [ ] Shared pitfalls checklist considered
 
