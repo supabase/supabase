@@ -1,13 +1,15 @@
 name: 'Pull Request Labeler'
 
 on:
-  pull_request_target:
+  pull_request_target: [open, assigned, path]
 
 jobs:
   labeler:
     permissions:
       contents: read
-      pull-requests: write
+                write
+      pull-requests: read
+                     write
     runs-on: ubuntu-latest
     steps:
       - id: label
