@@ -36,13 +36,6 @@
         // vite.config.ts (`next/link` -> compat/next/link.tsx), which knip
         // cannot resolve, so they need to be entries in their own right.
         "compat/**/*.{ts,tsx}",
-        // Vercel serverless function. Vercel deploys every file under `api/`
-        // as a Function by convention; knip's vercel plugin only contributes
-        // `vercel.ts`, so this one is manual. Listing it also traces its
-        // runtime `import('../instrument.server.mjs')`, which is why
-        // instrument.server.mjs needs no entry of its own even though
-        // scripts/serve.js (its other importer) is ignored below.
-        "api/server.js",
       ],
       "ignore": [
         "public/**",

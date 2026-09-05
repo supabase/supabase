@@ -1,12 +1,10 @@
-// Shared .env parsing for the studio build/serve scripts (dispatch.js,
-// serve.js). We parse the small subset of the dotenv format we actually rely
+// .env parsing for scripts/dispatch.js. We parse the small subset of the dotenv format we actually rely
 // on — `KEY=value`, an optional `export` prefix, and surrounding single/double
 // quotes — rather than taking on the `dotenv` dependency for a couple of build
 // scripts. Crucially, nothing here touches `process.env`: callers decide what
 // to do with the parsed values, which is what lets dispatch.js read a single
 // key without leaking the whole file into the child process.
 //
-// dispatch.js and serve.js must agree on this format, so it lives here once.
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 

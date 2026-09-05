@@ -93,6 +93,30 @@ minimumReleaseAgeExclude:
   - react-use
   - '@astrojs/markdown-satteri@0.3.8'
   - astro@7.2.6
+  # Temporary (2026-09-05): nitro's dated beta and the transitive versions it
+  # pulled in are younger than the gate. Remove from 2026-09-07.
+  - nitro@3.0.260903-beta
+  - h3@2.0.1-rc.31
+  - db0@0.4.1
+  - env-runner@0.2.1
+  - rolldown@1.2.7
+  - srvx@1.0.3
+  - unstorage@2.0.0-alpha.10
+  - '@rolldown/binding-android-arm-eabi@1.2.7'
+  - '@rolldown/binding-android-arm64@1.2.7'
+  - '@rolldown/binding-darwin-arm64@1.2.7'
+  - '@rolldown/binding-darwin-x64@1.2.7'
+  - '@rolldown/binding-freebsd-x64@1.2.7'
+  - '@rolldown/binding-linux-arm-gnueabihf@1.2.7'
+  - '@rolldown/binding-linux-arm64-gnu@1.2.7'
+  - '@rolldown/binding-linux-arm64-musl@1.2.7'
+  - '@rolldown/binding-linux-ppc64-gnu@1.2.7'
+  - '@rolldown/binding-linux-s390x-gnu@1.2.7'
+  - '@rolldown/binding-linux-x64-gnu@1.2.7'
+  - '@rolldown/binding-linux-x64-musl@1.2.7'
+  - '@rolldown/binding-openharmony-arm64@1.2.7'
+  - '@rolldown/binding-win32-arm64-msvc@1.2.7'
+  - '@rolldown/binding-win32-x64-msvc@1.2.7'
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3

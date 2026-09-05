@@ -33,6 +33,10 @@
         "SUPABASE_URL",
         "VERCEL",
         "VERCEL_ENV",
+        // Project-level Vercel settings Nitro's vercel preset reads at build
+        // time; they change the emitted routes and asset paths.
+        "VERCEL_SKEW_PROTECTION_ENABLED",
+        "VERCEL_IMMUTABLE_STATIC_FILES_ENABLED",
         "MAINTENANCE_MODE",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
@@ -109,12 +113,11 @@
         // cache when it changes — without this, switching between test and
         // production builds reuses a stale cached output.
         "MODE",
-        // Read by scripts/serve.js (the Node host for `pnpm start`).
-        // Declared here so the studio-package turbo env lint rule passes
-        // even though turbo doesn't directly drive `start`.
+        // Read by the Nitro server behind `pnpm start`. Declared so the turbo
+        // env lint rule passes even though turbo doesn't drive `start`.
         "PORT",
-        // Gates the TanStack vs Next path in api/server.js, vercel.ts,
-        // and scripts/dispatch.js (the dev/build/start dispatcher).
+        // Gates the TanStack vs Next path in vercel.ts and
+        // scripts/dispatch.js (the dev/build/start dispatcher).
         "STUDIO_FRAMEWORK",
         // Vite's built-in `import.meta.env.SSR` flag (used in ConnectStepsSection
         // to gate Vite-only `import.meta.glob`). Not a real process env var
@@ -122,6 +125,13 @@
         "SSR",
       ],
       "passThroughEnv": [
+        // Deployment-specific values Nitro's vercel preset bakes into the skew
+        // cookie route and immutable asset path. Passed through rather than
+        // hashed so Next's same-commit redeploys keep hitting the turbo cache
+        // as before; a TanStack cache hit reuses the earlier deployment's
+        // cookie id, which is the same code and falls back to latest if gone.
+        "VERCEL_DEPLOYMENT_ID",
+        "VERCEL_HASH_SALT",
         "CURRENT_CLI_VERSION",
         "VERCEL_GIT_COMMIT_REF",
         "VERCEL_GIT_COMMIT_SHA",
@@ -134,7 +144,9 @@
         ".next/**",
         "!.next/cache/**",
         "!.next/dev/**/*",
-        "dist/**",
+        // TanStack Start via Nitro: node server and Vercel Build Output.
+        ".output/**",
+        ".vercel/output/**",
       ],
     },
   },
