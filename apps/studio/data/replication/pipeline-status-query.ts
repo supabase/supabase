@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { replicationKeys } from './keys'
@@ -31,6 +31,20 @@ async function fetchReplicationPipelineStatus(
 export type ReplicationPipelineStatusData = Awaited<
   ReturnType<typeof fetchReplicationPipelineStatus>
 >
+
+/**
+ * Shared definition so callers that need many pipeline statuses at once (`useQueries`) hit the
+ * same cache entries as the per-pipeline hook below, rather than fetching each status twice.
+ */
+export const replicationPipelineStatusQueryOptions = ({
+  projectRef,
+  pipelineId,
+}: ReplicationPipelinesStatusParams) =>
+  queryOptions<ReplicationPipelineStatusData, ResponseError>({
+    queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
+    queryFn: ({ signal }) => fetchReplicationPipelineStatus({ projectRef, pipelineId }, signal),
+    enabled: typeof projectRef !== 'undefined' && typeof pipelineId !== 'undefined',
+  })
 
 export const useReplicationPipelineStatusQuery = <TData = ReplicationPipelineStatusData>(
   { projectRef, pipelineId }: ReplicationPipelinesStatusParams,

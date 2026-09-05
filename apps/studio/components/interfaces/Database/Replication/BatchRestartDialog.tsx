@@ -1,16 +1,7 @@
 import { useParams } from 'common'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { PipelineStatusName } from './Replication.constants'
 import { RestartCostEstimate } from './RestartCostEstimate'
@@ -59,37 +50,11 @@ export const BatchRestartDialog = ({
     [affectedTables, tableSyncCopy]
   )
 
-  const initialSyncDescription =
-    copiedTables.length === 0 ? (
-      <li>
-        <strong>No table will run an initial sync.</strong> Replication will resume with new changes
-        only, without syncing existing source rows. There is no additional initial sync charge.
-      </li>
-    ) : copiedTables.length === affectedTables.length ? (
-      <li>
-        <strong>
-          {copiedTables.length === 1
-            ? 'The table will run its initial sync again.'
-            : `All ${copiedTables.length} tables will run initial sync again.`}
-        </strong>{' '}
-        Existing source rows will be synced again. Data successfully processed during this initial
-        sync is billed again.
-      </li>
-    ) : (
-      <li>
-        <strong>
-          {copiedTables.length} of {affectedTables.length} tables will run initial sync again.
-        </strong>{' '}
-        Existing source rows for those tables will be synced again and billed again. The remaining
-        tables will resume replication with new changes only.
-      </li>
-    )
-
   const { mutateAsync: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: (data) => {
       const count = data.tables.length
       toast.success(
-        `Restarting replication for ${count} table${count > 1 ? 's' : ''}. Pipeline will restart automatically.`
+        `Resetting ${count} table${count > 1 ? 's' : ''}. Pipeline will restart automatically.`
       )
     },
     onSettled: () => {
@@ -97,7 +62,7 @@ export const BatchRestartDialog = ({
       onOpenChange(false)
     },
     onError: (error) => {
-      toast.error(`Failed to restart replication: ${error.message}`)
+      toast.error(`Failed to reset tables: ${error.message}`)
     },
   })
 
@@ -117,66 +82,42 @@ export const BatchRestartDialog = ({
     } catch (error) {}
   }
 
+  const count = affectedTables.length
+  const tableWord = count === 1 ? 'table' : 'tables'
+
   const dialogContent =
     mode === 'all'
       ? {
-          title: 'Restart all tables',
-          description: (
-            <div className="space-y-3 text-sm">
-              <p>
-                This will restart replication for all {affectedTables.length} table
-                {affectedTables.length === 1 ? '' : 's'} in this pipeline from scratch:
-              </p>
-              <ul className="list-disc list-inside space-y-1.5 pl-2">
-                {initialSyncDescription}
-                <li>
-                  <strong>All downstream data will be deleted.</strong> All replicated data will be
-                  removed.
-                </li>
-                <li>
-                  <strong>The pipeline will restart automatically.</strong> This is required to
-                  apply this change.
-                </li>
-              </ul>
-            </div>
-          ),
-          action: 'Restart all tables',
+          title: 'Reset all tables',
+          description:
+            copiedTables.length === 0
+              ? `This resets all ${count} ${tableWord}. Destination data will be deleted, initial sync is skipped, and the pipeline will restart automatically.`
+              : `This resets all ${count} ${tableWord}. Destination data will be deleted, existing rows will sync again, and the pipeline will restart automatically.`,
+          action: 'Reset all tables',
         }
       : {
-          title: 'Restart failed tables',
-          description: (
-            <div className="space-y-3 text-sm">
-              <p>
-                This will restart replication for all{' '}
-                <strong>{affectedTables.length} currently failed tables</strong> from scratch:
-              </p>
-              <ul className="list-disc list-inside space-y-1.5 pl-2">
-                {initialSyncDescription}
-                <li>
-                  <strong>Existing downstream data will be deleted.</strong> Replicated data for
-                  these tables will be removed.
-                </li>
-                <li>
-                  <strong>Tables that are not failed remain untouched.</strong> The request resets
-                  every table that is failed when it runs.
-                </li>
-                <li>
-                  <strong>The pipeline will restart automatically.</strong> This is required to
-                  apply this change.
-                </li>
-              </ul>
-            </div>
-          ),
-          action: 'Restart failed tables',
+          title: 'Reset failed tables',
+          description:
+            copiedTables.length === 0
+              ? `This resets ${count} failed ${tableWord}. Destination data for those tables will be deleted, initial sync is skipped, and the pipeline will restart automatically. Other tables stay as they are.`
+              : `This resets ${count} failed ${tableWord}. Destination data for those tables will be deleted, existing rows will sync again, and the pipeline will restart automatically. Other tables stay as they are.`,
+          action: 'Reset failed tables',
         }
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{dialogContent.title}</AlertDialogTitle>
-          <AlertDialogDescription asChild>{dialogContent.description}</AlertDialogDescription>
-        </AlertDialogHeader>
+    <ConfirmationModal
+      size="small"
+      variant="warning"
+      visible={open}
+      title={dialogContent.title}
+      confirmLabel={dialogContent.action}
+      confirmLabelLoading="Resetting…"
+      loading={isResetting}
+      onCancel={() => onOpenChange(false)}
+      onConfirm={handleReset}
+    >
+      <div className="flex flex-col gap-y-4">
+        <p className="text-sm text-foreground-light">{dialogContent.description}</p>
         <RestartCostEstimate
           open={open}
           projectRef={projectRef}
@@ -184,13 +125,7 @@ export const BatchRestartDialog = ({
           publicationName={publicationName}
           tables={copiedTables}
         />
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
-          <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="warning">
-            {isResetting ? 'Restarting replication...' : dialogContent.action}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+      </div>
+    </ConfirmationModal>
   )
 }

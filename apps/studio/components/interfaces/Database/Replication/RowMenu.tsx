@@ -1,5 +1,15 @@
 import { useParams } from 'common'
-import { ArrowUpCircle, Edit, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
+import {
+  ArrowUpCircle,
+  CircleStop,
+  Edit,
+  Eye,
+  MoreVertical,
+  Play,
+  RotateCcw,
+  Trash,
+} from 'lucide-react'
+import Link from 'next/link'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { toast } from 'sonner'
 import {
@@ -153,14 +163,29 @@ export const RowMenu = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="relative">
-            <Button variant="default" className="px-1.5" icon={<MoreVertical />} />
+            <Button
+              variant="default"
+              className="px-1.25 hit-area-2"
+              aria-label={hasUpdate ? 'Pipeline options, update available' : 'Pipeline options'}
+              icon={<MoreVertical />}
+            />
             {hasUpdate && (
-              <span className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-brand rounded-full" />
+              <span
+                className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-brand rounded-full"
+                aria-hidden
+              />
             )}
           </div>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent side="bottom" align="end" className="w-52">
+          <DropdownMenuItem className="space-x-2" asChild disabled={!pipeline}>
+            <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
+              <Eye size={14} />
+              <p>View details</p>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           {hasUpdate && (
             <>
               <DropdownMenuItem className="space-x-2" onClick={() => onUpdateClick?.()}>
@@ -186,7 +211,7 @@ export const RowMenu = ({
                 <p>Restart pipeline</p>
               </DropdownMenuItem>
               <DropdownMenuItem className="space-x-2" onClick={onDisablePipeline}>
-                <Pause size={14} />
+                <CircleStop size={14} />
                 <p>Stop pipeline</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -195,11 +220,11 @@ export const RowMenu = ({
 
           <DropdownMenuItem className="space-x-2" onClick={() => setEdit(destinationId)}>
             <Edit size={14} />
-            <p>Edit destination</p>
+            <p>Edit pipeline</p>
           </DropdownMenuItem>
           <DropdownMenuItem className="space-x-2" onClick={onDeleteClick}>
             <Trash size={14} />
-            <p>Delete destination</p>
+            <p>Delete pipeline</p>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -1,16 +1,9 @@
-import { AWS_REGIONS } from 'shared-data'
 import { cn } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { PIPELINE_REGION } from '../../Replication.constants'
 import type { DestinationType } from '../DestinationPanel.types'
 import { RegionFlag } from '@/components/ui/RegionFlag'
-import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
-
-// Pipelines always run from a single fixed region per environment, regardless of the source
-// project's region.
-export const PIPELINE_REGION = IS_STAGING_OR_LOCAL
-  ? AWS_REGIONS.SOUTHEAST_ASIA
-  : AWS_REGIONS.CENTRAL_EU
 
 const DESTINATION_REGION_HINT: Record<DestinationType, string> = {
   BigQuery: 'Choose a nearby BigQuery dataset where possible.',
