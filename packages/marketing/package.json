@@ -10,7 +10,8 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf .turbo tsconfig.tsbuildinfo"
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo",
+    "test": "vitest run"
   },
   "dependencies": {
     "@types/react": "catalog:",
@@ -23,10 +24,16 @@
   },
   "devDependencies": {
     "config": "workspace:*",
+    "react-dom": "catalog:",
     "tailwindcss": "^4.2.4",
     "tsconfig": "workspace:",
     "@typescript/native": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "jsdom": "^28.1.0",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/jest-dom": "^6.6.0"
   },
   "license": "MIT"
 }
