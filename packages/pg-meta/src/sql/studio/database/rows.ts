@@ -129,7 +129,7 @@ with approximation as (
       -- Whole-tree heap size. A partitioned PARENT (relkind 'p') has no storage
       -- of its own, so its size is the sum over pg_partition_tree; every other
       -- relkind uses its own heap directly (pg_partition_tree returns NO rows
-      // for a plain non-partitioned table, so it cannot be used unconditionally).
+      -- for a plain non-partitioned table, so it cannot be used unconditionally).
       -- Views/foreign tables yield 0 (-> exact count, unchanged behavior).
       case when relkind = 'p'
         then (select coalesce(sum(pg_relation_size(relid)), 0) from pg_partition_tree(oid))
