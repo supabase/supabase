@@ -27,6 +27,7 @@ export async function CodeBlock({
   children,
   skipTypeGeneration,
   hideControls = false,
+  compact = false,
 }: PropsWithChildren<{
   className?: string
   lang?: string
@@ -34,6 +35,7 @@ export async function CodeBlock({
   contents?: string
   skipTypeGeneration?: boolean
   hideControls?: boolean
+  compact?: boolean
 }>) {
   let code = (contents || extractCode(children)).trim()
   const lang = tryToBundledLanguage(langSetting || '') || extractLang(children)
@@ -63,8 +65,8 @@ export async function CodeBlock({
         'relative',
         'not-prose',
         'w-full',
-        'border border-default rounded-lg',
-        'bg-200 shadow-codeblock',
+        compact ? 'border-0 my-0!' : 'border border-default rounded-lg shadow-codeblock',
+        'bg-200',
         'text-sm',
         className
       )}
@@ -72,7 +74,8 @@ export async function CodeBlock({
       <div
         className={cn(
           'code-scroll',
-          'w-full overflow-x-auto overscroll-x-none rounded-lg',
+          'w-full overflow-x-auto overscroll-x-none',
+          !compact && 'rounded-lg',
           'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring'
         )}
         role="group"
