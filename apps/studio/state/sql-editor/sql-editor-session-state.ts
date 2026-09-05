@@ -19,6 +19,7 @@ export const sqlEditorSessionState = proxy({
       rows: any[]
       error?: any
       autoLimit?: number
+      sql?: string
     }[]
   },
 
@@ -43,19 +44,40 @@ export const sqlEditorSessionState = proxy({
     sqlEditorSessionState.logRange[id] = range
   },
 
-  addResult: (id: string, results: any[], autoLimit?: number) => {
+  /**
+   * Stores successful execution results for a SQL snippet.
+   *
+   * @param id - The snippet identifier
+   * @param results - Array of result row objects
+   * @param autoLimit - Optional auto-limit applied to the query
+   * @param sql - Optional executed SQL string
+   */
+  addResult: (id: string, results: any[], autoLimit?: number, sql?: string) => {
     // Use ref() to prevent Valtio from creating proxies for each row object.
     // This is critical for large result sets - without ref(), Valtio wraps every
     // row and nested property in a Proxy, causing massive memory overhead.
     // Alright to use ref() in this case as the data is meant to be read-only and we
     // don't need to track changes to the underlying data
-    sqlEditorSessionState.results[id] = [{ rows: ref(results), autoLimit }]
+    sqlEditorSessionState.results[id] = [{ rows: ref(results), autoLimit, sql }]
   },
 
-  addResultError: (id: string, error: any, autoLimit?: number) => {
-    sqlEditorSessionState.results[id] = [{ rows: ref([]), error, autoLimit }]
+  /**
+   * Stores execution error state for a SQL snippet.
+   *
+   * @param id - The snippet identifier
+   * @param error - The execution error object
+   * @param autoLimit - Optional auto-limit applied to the query
+   * @param sql - Optional executed SQL string
+   */
+  addResultError: (id: string, error: any, autoLimit?: number, sql?: string) => {
+    sqlEditorSessionState.results[id] = [{ rows: ref([]), error, autoLimit, sql }]
   },
 
+  /**
+   * Clears the current results for a SQL snippet.
+   *
+   * @param id - The snippet identifier
+   */
   resetResult: (id: string) => {
     sqlEditorSessionState.results[id] = []
   },

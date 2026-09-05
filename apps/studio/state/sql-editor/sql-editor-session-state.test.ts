@@ -12,22 +12,24 @@ beforeEach(() => {
 
 describe('sqlEditorSessionState', () => {
   describe('results', () => {
-    it('addResult stores rows (and optional autoLimit) keyed by snippet id', () => {
-      sqlEditorSessionState.addResult('a', [{ x: 1 }], 50)
+    it('addResult stores rows (and optional autoLimit and sql) keyed by snippet id', () => {
+      sqlEditorSessionState.addResult('a', [{ x: 1 }], 50, 'UPDATE users SET x = 1')
 
       const result = sqlEditorSessionState.results['a']?.[0]
       expect(result?.rows).toEqual([{ x: 1 }])
       expect(result?.autoLimit).toBe(50)
+      expect(result?.sql).toBe('UPDATE users SET x = 1')
       expect(result?.error).toBeUndefined()
     })
 
-    it('addResultError stores the error with empty rows', () => {
-      sqlEditorSessionState.addResultError('a', { message: 'boom' }, 25)
+    it('addResultError stores the error with empty rows and optional sql', () => {
+      sqlEditorSessionState.addResultError('a', { message: 'boom' }, 25, 'SELECT * FROM invalid')
 
       const result = sqlEditorSessionState.results['a']?.[0]
       expect(result?.rows).toEqual([])
       expect(result?.error).toEqual({ message: 'boom' })
       expect(result?.autoLimit).toBe(25)
+      expect(result?.sql).toBe('SELECT * FROM invalid')
     })
 
     it('resetResult clears the rows for a snippet', () => {

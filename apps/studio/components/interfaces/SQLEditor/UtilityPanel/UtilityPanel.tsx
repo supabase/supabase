@@ -15,6 +15,7 @@ import { UtilityTabResults } from './UtilityTabResults'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
+import { isNonReturningDml } from '@/data/sql/utils'
 import { useTrack } from '@/lib/telemetry/track'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
@@ -56,6 +57,9 @@ export const UtilityPanel = ({
 
   const snippet = snapV2.snippets[id]?.snippet
   const result = sessionSnap.results[id]?.[0]
+  const snippetSql = snippet?.type === 'sql' ? (snippet.content?.unchecked_sql ?? '') : ''
+  const sql = result?.sql ?? snippetSql
+  const isDmlWithoutReturn = isNonReturningDml(sql)
 
   const { mutate: upsertContent } = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,
@@ -132,7 +136,7 @@ export const UtilityPanel = ({
         </div>
 
         <div className="flex items-center gap-4">
-          {result?.rows !== undefined && !isExecuting && (
+          {result?.rows !== undefined && !isExecuting && !isDmlWithoutReturn && (
             <Tooltip>
               <TooltipTrigger>
                 <p className="text-xs">
