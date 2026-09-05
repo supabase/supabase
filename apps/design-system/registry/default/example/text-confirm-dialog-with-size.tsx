@@ -29,14 +29,14 @@ const TextConfirmModalWithSize = () => {
       </Button>
       <TextConfirmModal
         key="withSize"
-        confirmString="project name"
+        confirmAction="delete"
+        confirmSubject="this project"
         visible={visible}
         size="xlarge"
         variant="destructive"
         title="Are you sure you want to delete?"
         onCancel={onVisibleChange}
         loading={loading}
-        confirmPlaceholder='Type "project name" to confirm'
         onConfirm={onSubmit}
       />
     </>

@@ -198,9 +198,9 @@ const ToggleApiKeysModal = ({
       onCancel={() => onClose()}
       onConfirm={onToggleLegacyAPIKeysEnabled}
       title={isLegacyKeysEnabled ? 'Disable JWT-based keys' : 'Re-enable JWT-based keys'}
-      confirmString={isLegacyKeysEnabled ? 'disable' : 're-enable'}
+      confirmAction={isLegacyKeysEnabled ? 'disable' : 're-enable'}
+      confirmSubject="legacy API keys"
       confirmLabel={`Confirm to ${isLegacyKeysEnabled ? 'disable' : 're-enable'} anon and service_role`}
-      confirmPlaceholder={isLegacyKeysEnabled ? 'disable' : 're-enable'}
       loading={isTogglingLegacyAPIKey}
       variant={isLegacyKeysEnabled ? 'destructive' : 'default'}
       alert={

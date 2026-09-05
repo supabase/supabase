@@ -43,8 +43,8 @@ export const PurgeQueue = ({ queueName, visible, onClose }: PurgeQueueProps) => 
       title="Purge this queue"
       loading={isPending}
       confirmLabel={`Purge queue ${queueName}`}
-      confirmPlaceholder="Type in name of queue"
-      confirmString={queueName ?? 'Unknown'}
+      confirmAction="purge"
+      confirmSubject="this queue"
       text={
         <>
           <span>This will purge the queue</span>{' '}

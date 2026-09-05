@@ -118,10 +118,10 @@ describe(`DeleteBucketModal`, () => {
     await userEvent.click(openButton)
     await screen.findByRole(`dialog`)
 
-    const input = screen.getByPlaceholderText(`Type bucket name`)
-    await userEvent.type(input, `test`)
+    const input = screen.getByPlaceholderText(`delete ${bucket.id}`)
+    await userEvent.type(input, `delete ${bucket.id}`)
 
-    const confirmButton = screen.getByRole(`button`, { name: `Delete bucket` })
+    const confirmButton = screen.getByRole(`button`, { name: `Delete bucket and all contents` })
     fireEvent.click(confirmButton)
 
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())

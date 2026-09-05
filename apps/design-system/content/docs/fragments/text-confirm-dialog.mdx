@@ -8,6 +8,8 @@ Text Confirm Dialog adds a deliberate “speed bump” before a highly destructi
 
 Use Text Confirm Dialog for irreversible operations such as deleting buckets, projects, or other critical resources where an explicit signal of user intent is required beyond a button click.
 
+Use an action-and-target string such as `delete profile-pictures` when confirming an irreversible, high-impact resource deletion. Preset action strings such as `DELETE` or `PURGE` are suitable when the exact resource is already unmistakable and the impact is narrower.
+
 For non-destructive or less critical confirmations, use [Alert Dialog](../components/alert-dialog) or [Confirmation Modal](../fragments/confirmation-modal) instead. See [Modality](../ui-patterns/modality) for guidance on choosing the appropriate dialog pattern.
 
 <ComponentPreview name="text-confirm-dialog-demo" peekCode showDottedGrid wide />
@@ -38,13 +40,16 @@ export default function TextConfirmDialogDemo() {
         size="small"
         variant="destructive"
         title="Delete bucket"
-        confirmPlaceholder={bucketName}
-        confirmString={bucketName}
-        confirmLabel="Delete bucket"
+        confirmString={`delete ${bucketName}`}
+        confirmPlaceholder={`delete ${bucketName}`}
+        confirmLabel="Delete bucket and all contents"
         onConfirm={() => setVisible(false)}
         onCancel={() => setVisible(false)}
       >
-        {/* Optional body content */}
+        <p className="text-sm">
+          Your bucket <span className="font-medium text-foreground">{bucketName}</span> and all of
+          its contents will be permanently deleted. This action cannot be undone.
+        </p>
       </TextConfirmModal>
     </>
   )
@@ -53,8 +58,10 @@ export default function TextConfirmDialogDemo() {
 
 ## Props
 
-- `confirmString`: The exact string the user must type to enable the confirm action (leading/trailing whitespace is trimmed)
-- `confirmPlaceholder`: Placeholder text shown in the confirmation input
+- `confirmAction`: Preset action verb (`delete`, `purge`, `revoke`, `disable`, `re-enable`, `proceed`) that sets the required confirmation string and label copy. Use `custom` (default when using `confirmString`) for identity verification, action-and-target confirmation, or other bespoke strings.
+- `confirmSubject`: Full noun phrase for preset label copy, e.g. `"this organization"` → “Type DELETE to delete this organization.”
+- `confirmString`: The exact string the user must type when using `confirmAction="custom"` (leading/trailing whitespace is trimmed)
+- `confirmPlaceholder`: Placeholder text shown in the confirmation input when using custom confirmation
 - `variant`: Visual intent of the dialog (`default`, `destructive`, or `warning`)
 - Other standard modal props inherited from the underlying [Dialog](../components/dialog) component
 

@@ -355,8 +355,8 @@ execute function function_name();`
         title="Delete this trigger"
         loading={isDeletingTrigger}
         confirmLabel={`Delete trigger ${triggerToDelete?.name}`}
-        confirmPlaceholder="Type in name of trigger"
-        confirmString={triggerToDelete?.name ?? ''}
+        confirmAction="delete"
+        confirmSubject="this trigger"
         text={
           <>
             This will delete your trigger called{' '}

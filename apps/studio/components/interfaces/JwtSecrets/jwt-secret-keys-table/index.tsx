@@ -461,16 +461,21 @@ export const JWTSecretKeysTable = () => {
             onConfirm={() => handleRevokeKey(selectedKey.id)}
             onCancel={resetDialog}
             title={`Revoke ${selectedKey.id}`}
-            confirmString={selectedKey.id}
+            confirmAction="revoke"
+            confirmSubject="this signing key"
             confirmLabel="Yes, revoke this signing key"
-            confirmPlaceholder="Type the ID of the key to confirm"
             variant="destructive"
             alert={{
               title: 'This key will no longer be trusted!',
               description:
                 'By revoking a signing key, all applications trusting it will no longer do so. If there are JWTs (access tokens) that are valid at the time of revocation, they will no longer be trusted, causing users with such JWTs to be signed out.',
             }}
-          />
+          >
+            <p className="text-sm">
+              This will revoke the signing key{' '}
+              <code className="text-code-inline">{selectedKey.id}</code>.
+            </p>
+          </TextConfirmModal>
         )}
 
       {selectedKey &&
@@ -501,16 +506,21 @@ export const JWTSecretKeysTable = () => {
           onConfirm={() => handleDeleteKey(selectedKey.id)}
           onCancel={resetDialog}
           title={`Permanently delete ${selectedKey.id}`}
-          confirmString={selectedKey.id}
+          confirmAction="delete"
+          confirmSubject="this signing key"
           confirmLabel="Yes, permanently delete this key"
-          confirmPlaceholder="Type the ID of the key to confirm"
           variant="destructive"
           alert={{
             title: 'This key will be permanently deleted.',
             description:
               'The private key and all information about this key will be permanently deleted from our records. This action cannot be undone.',
           }}
-        />
+        >
+          <p className="text-sm">
+            This will permanently delete the signing key{' '}
+            <code className="text-code-inline">{selectedKey.id}</code>.
+          </p>
+        </TextConfirmModal>
       )}
     </>
   )
