@@ -2,24 +2,17 @@ import { readFile, writeFile } from 'node:fs/promises'
 import { basename, resolve } from 'node:path'
 import type { NitroModule } from 'nitro/types'
 
-// Nitro module that turns the Vercel Build Output config Nitro generates into
-// a static-first SPA: every document request is served from the prerendered
-// shell on the CDN, and only server functions and API routes invoke the
-// function. Nitro's own config sends every non-static path to the function,
-// which for a SPA means a function invocation per page view.
+// Nitro module that makes the Vercel Build Output a static-first SPA: documents
+// are served from the prerendered shell on the CDN and only server functions
+// and API routes invoke the function. Nitro's own config sends every
+// non-static path to the function.
 //
-// Why a module instead of the obvious knobs:
-// - `nitro({ hooks: { compiled } })` REPLACES the vercel preset's `compiled`
-//   hook (config layers are merged with defu), so `config.json` and
-//   `.vc-config.json` are never written. Modules register with
-//   `nitro.hooks.hook`, which appends after the preset's hook.
-// - `vercel.config.routes` is merged with defu too: user routes land at the
-//   top of the array (ahead of Nitro's asset headers and its
-//   `handle: filesystem`), Nitro still appends its function catch-all, and
-//   the result has a duplicate `handle: filesystem`.
+// A module rather than config because `nitro({ hooks: { compiled } })`
+// REPLACES the vercel preset's `compiled` hook (config.json is never written),
+// and `vercel.config.routes` is defu-merged: user routes land above Nitro's
+// `handle: filesystem` while its function catch-all is still appended last.
 //
-// Note: this hook runs before TanStack Start writes `_shell.html`, so the
-// shell's existence is asserted afterwards in scripts/verify-build.mjs.
+// Runs before TanStack Start writes `_shell.html`.
 
 /** Must match `spa.prerender.outputPath` in tanstackStart() (default `/_shell`). */
 export const SHELL_PATH = '/_shell.html'
@@ -35,18 +28,16 @@ type Route = Record<string, unknown> & {
 }
 
 /**
- * Rewrites Nitro's generated `routes` so that, after `handle: filesystem`,
- * only `/_serverFn/*` and `/api/*` reach the function, a missing hashed chunk
- * 404s (instead of coming back as the HTML shell, which the browser reports
- * as a MIME error), and everything else is served from the shell.
+ * After `handle: filesystem`: only `/_serverFn/*` and `/api/*` reach the
+ * function, a missing hashed chunk 404s instead of becoming the HTML shell,
+ * and everything else is the shell.
  *
- * @param assetsPrefix URL prefix of the hashed client chunks (`/assets`, or
- * `/_vercel/immutable/<salt>/nitro` with `vercel.immutableStaticFiles`).
- * @param basePath Router base path (`NEXT_PUBLIC_BASE_PATH`, e.g. `/dashboard`).
- * Pages, API routes and server functions live under it, while the static
- * output stays at the root (Vite `base` is `/` so chunks can use the
- * immutable store), so prefixed rules come first and `public/` files
- * requested under the prefix are rewritten to the root.
+ * @param assetsPrefix `/assets`, or `/_vercel/immutable/<salt>/nitro` with
+ * `vercel.immutableStaticFiles`.
+ * @param basePath `NEXT_PUBLIC_BASE_PATH` (e.g. `/dashboard`). Pages, API
+ * routes and server functions live under it while static files stay at the
+ * root, so prefixed rules come first and `public/` files requested under the
+ * prefix are rewritten to the root.
  */
 export function buildSpaRoutes(
   generated: Route[],

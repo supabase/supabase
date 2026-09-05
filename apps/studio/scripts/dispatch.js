@@ -3,7 +3,7 @@
 // tanstack-flavoured variant based on STUDIO_FRAMEWORK. We parse the env files
 // (via the shared scripts/lib/env.js parser) and pull out only
 // STUDIO_FRAMEWORK — we deliberately don't load the whole file into the
-// child's process.env, because scripts/start.mjs / vite do their own .env
+// child's process.env, because vite and the start script do their own .env
 // loading and would otherwise refuse to override the dispatcher-set values,
 // including NEXT_PUBLIC_IS_PLATFORM which the e2e `.env.test` needs to flip to
 // `false`.
@@ -29,7 +29,7 @@ if (!target) {
 const studioRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 // Shell env wins, then `.env.local`, then `.env` — the same precedence
-// scripts/start.mjs and vite use, so STUDIO_FRAMEWORK set in either file is
+// vite and the start script use, so STUDIO_FRAMEWORK set in either file is
 // picked up (not just `.env.local`).
 const fileEnv = readEnvFiles(studioRoot, ['.env', '.env.local'])
 const studioFramework = process.env.STUDIO_FRAMEWORK ?? fileEnv.STUDIO_FRAMEWORK

@@ -8,13 +8,11 @@ import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 import { isHostedSupportedApiPath } from '@/lib/hosted-api-allowlist'
 
 // Self-hosted-only API routes must 404 in platform (hosted) mode. Under the
-// Next pages router this lives in middleware (proxy.ts), but TanStack Start
-// has no middleware runtime, so the guard is migrated here as a global
-// request middleware sharing the same allowlist (lib/hosted-api-allowlist.ts).
-// On Vercel only `/api/*` and `/_serverFn/*` reach the Nitro function (see
-// scripts/vercel-spa-routes.ts) while pages are served as a static SPA shell,
-// so this request middleware still runs server-side for every API request and
-// covers all API routes from a single place.
+// Next pages router this lives in middleware (proxy.ts); TanStack Start has no
+// middleware runtime, so it's a global request middleware sharing the same
+// allowlist (lib/hosted-api-allowlist.ts). On Vercel every `/api/*` request
+// still reaches the function (pages are a static shell), so this covers all
+// API routes from one place.
 
 const platformApiGuard = createMiddleware({ type: 'request' }).server(({ request, next }) => {
   const { pathname } = new URL(request.url)

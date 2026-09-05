@@ -271,10 +271,8 @@ function ssrStubGraphiql(): Plugin {
 // back, ES module live-bindings can be undefined at the point the
 // chunk that evaluates first tries to use them.
 //
-// Cycles are matched by chunk basename prefix (stripping the directory
-// — `assets/`, or Nitro's `_vercel/immutable/<salt>/nitro/` on Vercel —
-// and the `-<hash>.js` suffix), so the allowlist stays stable across
-// builds even as Rolldown reassigns hashes.
+// Cycles are matched by chunk basename prefix (directory and `-<hash>.js`
+// suffix stripped), so the allowlist stays stable across builds.
 const KNOWN_CHUNK_CYCLES: ReadonlyArray<ReadonlyArray<string>> = [
   // `ui` ↔ `TreeView` chunk cycle. `cva` lives in the `ui` chunk
   // (Rolldown pools it there because many ui files use it), TreeView
@@ -372,13 +370,10 @@ function assertNoChunkCycles(): Plugin {
   }
 }
 
-// Vite bundles `?worker` modules (Monaco's editor / json / graphql workers,
-// pulled in via graphiql's Vite worker setup) in a separate build that names
-// its output from the ROOT `build.assetsDir`, not the client environment's.
-// Nitro only rewrites the environment's `assetsDir` — to
-// `_vercel/immutable/<salt>/nitro` with `vercel.immutableStaticFiles` — so
-// without this the workers would be the one set of hashed files left under
-// `/assets`, outside the immutable store and the routes that cover it.
+// Vite bundles `?worker` modules (Monaco's workers via graphiql) with the ROOT
+// `build.assetsDir`, while Nitro only rewrites the client environment's (to
+// `_vercel/immutable/<salt>/nitro` on Vercel). Keep the workers in the same
+// directory so they land in the immutable store too.
 function workersFollowClientAssetsDir(): Plugin {
   return {
     name: 'studio-workers-follow-client-assets-dir',
@@ -497,24 +492,18 @@ export default defineConfig(({ command, mode }) => {
     publicEnvDefines[`process.env.${key}`] ??= 'undefined'
   }
 
-  // Mirror Next's `basePath` via NEXT_PUBLIC_BASE_PATH (the platform serves
-  // Studio under `/dashboard`). Only the ROUTER gets the prefix:
-  //   - tanstackStart router.basepath — build-time; pages, API routes and
-  //     server functions (`<basePath>/_serverFn/*`) all live under it.
-  //   - createRouter({ basepath }) — runtime navigation prefix; configured
-  //     in router.tsx off the same env var (inlined via `define` above).
-  // Vite `base` deliberately stays `/`: hashed chunks must be served from the
-  // root so Nitro can place them in Vercel's immutable store
-  // (`/_vercel/immutable/*`), which Vercel only recognises at the root. Files
-  // from public/ are referenced as `${BASE_PATH}/img/...` and rewritten to
-  // the root by scripts/vercel-spa-routes.ts. Leaving the var empty keeps the
-  // app at `/`.
+  // NEXT_PUBLIC_BASE_PATH (the platform serves Studio under `/dashboard`)
+  // only sets the ROUTER basepath, here and in router.tsx: pages, API routes
+  // and server functions (`<basePath>/_serverFn/*`) live under it. Vite `base`
+  // stays `/` so hashed chunks are served from the root, which Vercel's
+  // immutable store requires; `public/` files requested under the prefix are
+  // rewritten to the root by scripts/vercel-spa-routes.ts.
   const basePath = env.NEXT_PUBLIC_BASE_PATH || undefined
 
-  // Self-hosted responses get the same security headers next.config.ts sends,
-  // via Nitro route rules. On Vercel they come from vercel.ts instead: a `/**`
-  // header rule in the Build Output routes would stop route matching before
-  // Nitro's own asset cache and skew-cookie rules.
+  // Self-hosted responses get next.config.ts's security headers via Nitro
+  // route rules. On Vercel they come from vercel.ts: a `/**` header route in
+  // the Build Output config would stop matching before Nitro's asset and
+  // skew-cookie rules.
   const securityHeaders = Object.fromEntries(
     getSecurityHeaders().map(({ key, value }) => [key, value])
   )
@@ -712,12 +701,9 @@ export default defineConfig(({ command, mode }) => {
       // above rewrites it to the `@sentry/react`-backed shim before SSR
       // resolution ever sees the id, and `@sentry/react` ships real ESM
       // ("import" condition → build/esm), so plain externalization works.
-      //
-      // `tslib` is inlined for the BUILD only. In dev, Nitro's env runner
-      // evaluates inlined deps itself and tslib's `modules/index.js` wrapper
-      // destructures a default import of the CJS `tslib.js`, which the runner
-      // has no interop for — every SSR request 500s with "Cannot destructure
-      // property '__extends'". Left external in dev, Node loads it natively.
+      // `tslib` is inlined for the BUILD only: Nitro's dev runner has no CJS
+      // interop for the `tslib.js` that its ESM wrapper default-imports, and
+      // every SSR request would 500. Left external in dev, Node loads it.
       noExternal: [
         'lodash',
         /^next(\/|$)/,
@@ -738,29 +724,27 @@ export default defineConfig(({ command, mode }) => {
       devtools(),
       tailwindcss(),
       // Nitro builds and hosts the server for every target: the Vercel
-      // function (`.vercel/output`; preset auto-detected from `VERCEL`) and
-      // the self-hosted node server (`.output`, booted by scripts/start.mjs).
+      // function (`.vercel/output`, preset auto-detected from `VERCEL`) and
+      // the self-hosted node server (`.output`).
       nitro({
-        // `server.ts` is TanStack Start's server entry (the Vite SSR entry
-        // Nitro renders through), not a Nitro server entry; without this
-        // Nitro's convention-based scan picks it up as both and warns.
+        // `server.ts` is TanStack Start's SSR entry, not a Nitro entry;
+        // without this Nitro's scan picks it up as both and warns.
         serverEntry: false,
-        // Nitro bundles dependencies into the server. libpg-query's emscripten
-        // glue reads `__dirname` and loads its `.wasm` from disk, so it has to
-        // stay an external, fully copied package (the `*` suffix).
+        // Nitro bundles dependencies. libpg-query's emscripten glue reads
+        // `__dirname` and loads its `.wasm` from disk, so keep it external
+        // and fully copied (`*`).
         traceDeps: ['libpg-query*'],
         vercel: {
           // Content-addressed chunks under `/_vercel/immutable/`, shared
           // across deployments, so a tab opened before a redeploy keeps
-          // loading its own lazy chunks. Server-function pinning is Nitro's
-          // `__vdpl` cookie route, emitted when the project has Skew
-          // Protection enabled at build time.
+          // loading its lazy chunks. Server-function pinning is Nitro's
+          // `__vdpl` cookie route, emitted when Skew Protection is enabled.
           immutableStaticFiles: true,
-          // One function serves every API route and server function, so its
-          // timeout must cover the longest one (integrations/stripe-sync).
+          // One function serves every API route, so the timeout must cover
+          // the longest one (integrations/stripe-sync).
           functions: { maxDuration: 300 },
         },
-        // Documents come from the static shell; only /api/* and /_serverFn/*
+        // Documents from the static shell; only /api/* and /_serverFn/*
         // invoke the function.
         modules: [vercelSpaRoutes({ basePath })],
         ...(!process.env.VERCEL && { routeRules: { '/**': { headers: securityHeaders } } }),

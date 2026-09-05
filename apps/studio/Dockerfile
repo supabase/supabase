@@ -73,23 +73,18 @@ RUN mkdir -p /srv && \
 
 # Compile TanStack Start (Vite + Nitro)
 FROM dev AS build-tanstack
-# build:tanstack = vite build --mode production, then scripts/verify-build.mjs
-# boots the server bundle so module-scope crashes fail the image build.
 RUN NODE_OPTIONS=--max-old-space-size=4096 pnpm --filter studio run build:tanstack
 
 # Assemble the runtime tree at /srv. Nitro's node-server output is
-# self-contained: `.output/server` bundles the app and copies the traced
-# dependencies alongside it, `.output/public` holds the client assets, so no
-# node_modules install is needed. `scripts/start.mjs` boots it after loading
-# the `.env` cascade (container env vars always win over file values), and
-# the server.js shim gives the production stage a single CMD that works for
-# both frameworks.
-RUN mkdir -p /srv/apps/studio/scripts/lib && \
+# self-contained (`.output/server` bundles the app with its traced
+# dependencies, `.output/public` holds the client assets), so no node_modules
+# install is needed. The server.js shim loads `.env` (container env vars win)
+# and gives the production stage one CMD for both frameworks; package.json is
+# copied so the shim runs as ESM.
+RUN mkdir -p /srv/apps/studio && \
   cp -a apps/studio/.output /srv/apps/studio/.output && \
   cp apps/studio/package.json apps/studio/.env /srv/apps/studio/ && \
-  cp apps/studio/scripts/start.mjs /srv/apps/studio/scripts/ && \
-  cp apps/studio/scripts/lib/env.js /srv/apps/studio/scripts/lib/ && \
-  printf "import('./scripts/start.mjs')\n" > /srv/apps/studio/server.js
+  printf "process.loadEnvFile(new URL('.env', import.meta.url))\nawait import('./.output/server/index.mjs')\n" > /srv/apps/studio/server.js
 
 # Alias whichever framework build was selected so the production stage can
 # COPY from a single stage name. BuildKit only builds the selected branch.
@@ -98,9 +93,8 @@ FROM build-${STUDIO_FRAMEWORK} AS build
 # Copy only compiled code and dependencies
 FROM base AS production
 COPY --from=build /srv ./
-# The TanStack server (scripts/start.mjs) defaults to port 8082; pin both
-# servers to the port the healthcheck and compose files expect. Next's
-# server.js reads PORT too.
+# Both servers read PORT (the TanStack `start` script defaults it to 8082);
+# pin it to the port the healthcheck and compose files expect.
 ENV PORT=3000
 EXPOSE 3000
 ENTRYPOINT ["docker-entrypoint.sh"]

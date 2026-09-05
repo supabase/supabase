@@ -20,13 +20,10 @@ import { getSecurityHeaders } from './security-headers'
 // `STUDIO_FRAMEWORK=tanstack` on the TanStack Vercel project to opt in.
 const isTanstack = process.env.STUDIO_FRAMEWORK === 'tanstack'
 
-// Routing is NOT configured here. Nitro's vercel preset emits the Build Output
-// API config (`.vercel/output/config.json`) and scripts/vercel-spa-routes.ts
-// rewrites its routes so documents are served from the static shell and only
-// `/api/*` + `/_serverFn/*` invoke the function. Vercel still applies the
-// `redirects`/`headers` in this file, ahead of that config — which is exactly
-// why no `rewrites` belong here: a catch-all rewrite at this layer swallows
-// the API routes before Nitro's routing ever runs.
+// Routing lives in Nitro's Build Output config (`.vercel/output/config.json`,
+// shaped by scripts/vercel-spa-routes.ts). Vercel applies this file's
+// `redirects`/`headers` ahead of it, which is also why no `rewrites` belong
+// here: a catch-all rewrite at this layer swallows the API routes.
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
 // Headers for a given prefix ('' for root, or a base path like '/dashboard').
@@ -95,8 +92,8 @@ function buildTanstackConfig(): VercelConfig {
   const wellKnownFlags = '/.well-known/vercel/flags'
 
   return {
-    // The Build Output API directory Nitro writes is what gets deployed; no
-    // framework preset should try to build or route on top of it.
+    // Nitro's Build Output directory is what gets deployed; no framework
+    // preset should route on top of it.
     framework: null,
     redirects: buildRedirects(),
     rewrites: [routes.rewrite(wellKnownFlags, `https://supabase.com${wellKnownFlags}`)],

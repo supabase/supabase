@@ -93,9 +93,8 @@ minimumReleaseAgeExclude:
   - react-use
   - '@astrojs/markdown-satteri@0.3.8'
   - astro@7.2.6
-  # Temporary (added 2026-09-05): nitro ships as dated beta tags and its current
-  # release, plus the transitive deps it pulled in, are younger than the gate.
-  # Remove once the entries are older than minimumReleaseAge (from 2026-09-07).
+  # Temporary (2026-09-05): nitro's dated beta and the transitive versions it
+  # pulled in are younger than the gate. Remove from 2026-09-07.
   - nitro@3.0.260903-beta
   - h3@2.0.1-rc.31
   - db0@0.4.1

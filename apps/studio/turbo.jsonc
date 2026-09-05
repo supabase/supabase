@@ -33,9 +33,8 @@
         "SUPABASE_URL",
         "VERCEL",
         "VERCEL_ENV",
-        // Read by Nitro's vercel preset at build time: the deployment id goes
-        // into the skew-protection cookie route and the salt into the
-        // immutable asset path, so a build must never be reused across deploys.
+        // Read by Nitro's vercel preset at build time (skew cookie, immutable
+        // asset path); a build must never be reused across deploys.
         "VERCEL_DEPLOYMENT_ID",
         "VERCEL_SKEW_PROTECTION_ENABLED",
         "VERCEL_IMMUTABLE_STATIC_FILES_ENABLED",
@@ -116,9 +115,8 @@
         // cache when it changes — without this, switching between test and
         // production builds reuses a stale cached output.
         "MODE",
-        // Read by scripts/start.mjs (boots the Nitro server for `pnpm start`).
-        // Declared here so the studio-package turbo env lint rule passes
-        // even though turbo doesn't directly drive `start`.
+        // Read by the Nitro server behind `pnpm start`. Declared so the turbo
+        // env lint rule passes even though turbo doesn't drive `start`.
         "PORT",
         // Gates the TanStack vs Next path in vercel.ts and
         // scripts/dispatch.js (the dev/build/start dispatcher).
@@ -141,8 +139,7 @@
         ".next/**",
         "!.next/cache/**",
         "!.next/dev/**/*",
-        // TanStack Start via Nitro: node server (self-hosted) and the Vercel
-        // Build Output directory.
+        // TanStack Start via Nitro: node server and Vercel Build Output.
         ".output/**",
         ".vercel/output/**",
       ],
