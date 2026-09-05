@@ -82,4 +82,49 @@ describe('OAuthAppsAuthorizeScreen', () => {
     // Let the mock mutation's artificial delay settle before the test exits
     await new Promise((resolve) => setTimeout(resolve, 350))
   })
+
+  test('renders the success screen after the approve mutation resolves', async () => {
+    customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
+
+    await screen.findByRole('combobox')
+    selectProject('production')
+    fireEvent.click(screen.getByRole('button', { name: /Authorize Vercel/ }))
+
+    expect(await screen.findByText('Vercel is connected')).toBeInTheDocument()
+    expect(screen.getByText('You can return to Vercel to continue')).toBeInTheDocument()
+  })
+
+  test('success screen shows exactly the submitted projects and scopes', async () => {
+    customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
+
+    await screen.findByRole('combobox')
+    selectProject('staging')
+    fireEvent.click(screen.getByRole('button', { name: /Authorize Vercel/ }))
+
+    await screen.findByText('Vercel is connected')
+
+    expect(screen.getByText('staging')).toBeInTheDocument()
+    expect(screen.queryByText('production, staging')).not.toBeInTheDocument()
+    expect(screen.queryByText('production')).not.toBeInTheDocument()
+
+    expect(screen.getByText('Permissions granted')).toBeInTheDocument()
+    expect(screen.queryByText('Permissions requested')).not.toBeInTheDocument()
+    expect(
+      screen.getByText('project_settings, action_runs, logs, sql_snippets')
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText('database_webhooks, development_branches, production_branches')
+    ).toBeInTheDocument()
+  })
+
+  test('unverified fixture shows a letter avatar on the success screen', async () => {
+    customRender(<OAuthAppsAuthorizeScreen mockState="unverified" navigate={vi.fn()} />)
+
+    await screen.findByRole('combobox')
+    selectProject('production')
+    fireEvent.click(screen.getByRole('button', { name: /Authorize kemal-bot/ }))
+
+    expect(await screen.findByText('kemal-bot is connected')).toBeInTheDocument()
+    expect(screen.getByText('K')).toBeInTheDocument()
+  })
 })
