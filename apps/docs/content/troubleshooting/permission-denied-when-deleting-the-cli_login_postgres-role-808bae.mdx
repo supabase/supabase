@@ -1,0 +1,59 @@
+---
+title = "'Permission denied' when deleting the 'cli_login_postgres' role"
+date_created = "2026-07-20T05:22:16+00:00"
+topics = [ "cli", "database", "platform" ]
+keywords = []
+---
+
+### **What are CLI Login Roles?**
+
+In the Supabase ecosystem, specific database roles are generated to facilitate communication between your local development environment and your remote database. Understanding these roles is key to managing your database's security posture.
+
+**Key Technical Terms:**
+
+- **cli_login_postgres:** A temporary role automatically created by the Supabase CLI to allow administrative access for tasks like migrations or queries when a database password is not explicitly provided.
+- **supabase_admin:** An internal system-level role that manages core database infrastructure. It "owns" certain system-generated roles, meaning standard users cannot modify or delete them.
+- **rolvaliduntil:** A PostgreSQL attribute that sets an expiration timestamp for a role's password. In this context, these roles are typically set to expire within a few hundred seconds of creation.
+- **NOLOGIN:** A role attribute that prevents a role from being used to establish a new connection to the database, effectively disabling it while keeping the record in the system catalog.
+
+---
+
+### **Understanding the Problem: "Permission Denied"**
+
+If you attempt to execute `DROP ROLE cli_login_postgres` via the SQL Editor or a standard database connection, you will encounter a "permission denied" error. Even when logged in as the `postgres` user, you lack the administrative authority to remove this specific role because it is managed by the internal `supabase_admin` system.
+
+**Why the role persists:**
+The role is part of a managed lifecycle. While you can mitigate risk by setting the role to `NOLOGIN`, the record remains in the `pg_roles` table. Furthermore, because the Supabase CLI depends on this role for passwordless authentication, it will automatically recreate the role the next time a CLI command is run without a password.
+
+---
+
+### **How to Resolve: Permanently Removing the Role**
+
+Standard SQL commands are insufficient for roles administered by the platform. To remove the role from the catalog entirely, you must use the Supabase Management API.
+
+1.  **Generate an Access Token:** Obtain a Personal Access Token from your Supabase Dashboard account settings.
+2.  **Execute the API Delete Request:** Use a `DELETE` request to the CLI login-role endpoint. This informs the management system to drop the `cli_login_postgres` role (and its read-only counterparts) using its elevated system permissions.
+    ```bash
+    curl -X DELETE "https://api.supabase.com/v1/projects/your_project/cli/login-role" \
+    -H "Authorization: Bearer <your-personal-access-token>"
+    ```
+3.  **Verify the Removal:** Run the following query in your SQL Editor to confirm the role has been cleared:
+    ```sql
+    select rolname from pg_roles where rolname = 'cli_login_postgres';
+    ```
+
+---
+
+### **Prevention: Avoiding Role Recreation**
+
+To ensure the role is not recreated in the future, you must change how you interact with the Supabase CLI. The role is only generated when the CLI runs a command against a linked project without a database password.
+
+To prevent recreation, always provide your database password using one of these methods:
+
+- **Environment Variables:** Set the `SUPABASE_DB_PASSWORD` variable in your local shell or `.env` file.
+- **Command Flags:** Use the password flag (typically `-p` or `--password`) when executing commands:
+  ```bash
+  supabase db query --linked -p 'your_database_password' "SELECT 1;"
+  ```
+
+By providing the password, the CLI authenticates directly as the `postgres` user rather than provisioning a temporary `cli_login_postgres` role.
