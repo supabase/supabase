@@ -101,7 +101,88 @@ When naming tables, use lowercase and underscores instead of spaces. For example
 
 </Admonition>
 
-You now have a table with its columns defined. To put rows in it, continue to [Loading data](#loading-data).
+You now have a table with its columns defined. Before you put rows in it, protect it.
+
+### Securing your tables
+
+A table in the `public` schema is reachable through the Data API. Until you enable row level security and write a policy, anyone holding your project's publishable key can read and write every row in it.
+
+The Table Editor enables row level security for you when you create a table in the Dashboard. When you create a table with SQL, enable it yourself.
+
+#### Enabling row level security
+
+1. Enable row level security on the table:
+
+   ```sql
+   alter table movies enable row level security;
+   ```
+
+2. Add a policy that describes who can read the table. Enabling row level security without a policy blocks every request, so a table in that state returns no rows to anyone:
+
+   ```sql
+   create policy "Anyone can read movies"
+   on movies for select
+   to anon, authenticated
+   using ( true );
+   ```
+
+For insert, update, and delete policies, and for how policies are evaluated, see [Row Level Security](/docs/guides/database/postgres/row-level-security).
+
+#### Tables with different readers
+
+Most applications mix two kinds of table: shared data that everyone reads, and per-person data that only its owner reads. Each kind needs its own policy, and the shared one is the easiest to forget.
+
+`movies` is the shared kind. The policy above lets anyone browse it, signed in or not.
+
+The `watchlists` table is the other kind. Each row belongs to the person who created it, and only that person can read it:
+
+```sql
+create table watchlists (
+  id bigint generated always as identity primary key,
+  user_id uuid not null references auth.users default auth.uid(),
+  movie_id bigint not null references movies
+);
+
+alter table watchlists enable row level security;
+
+create policy "Users can read their own watchlist"
+on watchlists for select
+to authenticated
+using ( (select auth.uid()) = user_id );
+
+create policy "Users can add to their own watchlist"
+on watchlists for insert
+to authenticated
+with check ( (select auth.uid()) = user_id );
+```
+
+Give both tables a policy, even when one of them is `using ( true )`. A shared table with row level security enabled and no policy is as unreachable as a private one.
+
+#### Verifying your tables
+
+Confirm that every table exists and is protected before you build against it.
+
+1. List the tables in the `public` schema and whether row level security is enabled on each one:
+
+   ```sql
+   select tablename, rowsecurity
+   from pg_tables
+   where schemaname = 'public'
+   order by tablename;
+   ```
+
+2. Check that every table you meant to create appears in the results, and that `rowsecurity` is `true` for each one.
+
+3. List the policies on those tables:
+
+   ```sql
+   select tablename, policyname, cmd, roles
+   from pg_policies
+   where schemaname = 'public'
+   order by tablename, policyname;
+   ```
+
+4. Check that every table has at least one policy, and that any table meant to be readable by signed-out visitors lists `anon` among its roles.
 
 ### Loading data
 
