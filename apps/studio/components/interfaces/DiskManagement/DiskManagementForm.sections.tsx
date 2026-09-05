@@ -1,6 +1,7 @@
+import Link from 'next/link'
 import { type RefObject } from 'react'
 import { type UseFormReturn } from 'react-hook-form'
-import { Button, Card, CardContent } from 'ui'
+import { Button, buttonVariants, Card, CardContent, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import {
   PageSection,
@@ -13,6 +14,7 @@ import {
 } from 'ui-patterns/PageSection'
 
 import { DiskStorageSchemaType } from './DiskManagement.schema'
+import { DiskConfigEditability } from './DiskManagement.types'
 import { AutoScaleFields } from './fields/AutoScaleFields'
 import {
   ComputeSectionBillingBadge,
@@ -25,12 +27,14 @@ import { StorageTypeField } from './fields/StorageTypeField'
 import { ThroughputField } from './fields/ThroughputField'
 import { BillingChangeBadge } from './ui/BillingChangeBadge'
 import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
+import { DiskType, SUPPORTED_DISK_CONFIG_UNDER_COST_GUARDRAIL } from './ui/DiskManagement.constants'
 import { DiskSpaceBar } from './ui/DiskSpaceBar'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'
 import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToBillingOwners'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
 
 interface ComputeSectionProps {
@@ -216,12 +220,13 @@ interface AdvancedSectionProps {
   showBillingBadge: boolean
   beforePrice: number
   afterPrice: number
-  disableIopsThroughputConfig?: boolean
   canUpdateDiskConfiguration: boolean
-  isDiskTooSmallForCustomIops: boolean
+  isDiskTooSmallForIopsOrThroughput: boolean
   disableDiskInputs: boolean
   disableDiskSizeInput: boolean
   suggestedDiskSizeForCustomIops: number
+  diskConfigEditability: DiskConfigEditability
+  provisionedStorageType?: DiskType
 }
 
 export function AdvancedSection({
@@ -231,13 +236,22 @@ export function AdvancedSection({
   showBillingBadge,
   beforePrice,
   afterPrice,
-  disableIopsThroughputConfig,
   canUpdateDiskConfiguration,
-  isDiskTooSmallForCustomIops,
+  isDiskTooSmallForIopsOrThroughput,
   disableDiskInputs,
   disableDiskSizeInput,
   suggestedDiskSizeForCustomIops,
+  diskConfigEditability,
+  provisionedStorageType,
 }: AdvancedSectionProps) {
+  const { data: org } = useSelectedOrganizationQuery()
+  const canEditDiskConfig = diskConfigEditability.status !== 'locked'
+  const isDownsizeOnly = diskConfigEditability.status === 'downsizeOnly'
+  const activeGuardrails =
+    diskConfigEditability.status === 'editable' ? [] : diskConfigEditability.guardrails
+  const isLockedByComputeSize =
+    diskConfigEditability.status === 'locked' && activeGuardrails.includes('computeSize')
+
   return (
     <PageSection>
       <PageSectionMeta>
@@ -266,8 +280,8 @@ export function AdvancedSection({
           <CardContent className="flex flex-col gap-y-8">
             <NoticeBar
               type="default"
-              visible={!!disableIopsThroughputConfig}
-              title="Adjusting disk configuration requires LARGE Compute size or above"
+              visible={isLockedByComputeSize}
+              title="Adjusting disk configuration requires Large compute size or above"
               description={`Increase your compute size to adjust your disk's storage type, ${form.getValues('storageType') === 'gp3' ? 'IOPS, ' : ''} and throughput`}
               actions={
                 canUpdateDiskConfiguration ? (
@@ -282,7 +296,7 @@ export function AdvancedSection({
                       form.trigger('throughput')
                     }}
                   >
-                    Change to LARGE Compute
+                    Change to Large compute
                   </Button>
                 ) : (
                   <RequestUpgradeToBillingOwners
@@ -294,9 +308,62 @@ export function AdvancedSection({
             />
             <NoticeBar
               type="default"
-              visible={
-                isDiskTooSmallForCustomIops && !disableIopsThroughputConfig && !disableDiskInputs
+              visible={isDownsizeOnly}
+              title="Storage type, IOPS, or throughput exceeds what's currently supported"
+              description="These settings are provisioned above what your current compute size or spend cap allows. You can lower storage type, IOPS, and throughput. To raise them, disable spend cap and upgrade to Large compute as necessary."
+              actions={
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    variant="default"
+                    onClick={() => {
+                      form.setValue(
+                        'storageType',
+                        SUPPORTED_DISK_CONFIG_UNDER_COST_GUARDRAIL.storageType,
+                        { shouldDirty: true, shouldValidate: true }
+                      )
+                      form.setValue(
+                        'provisionedIOPS',
+                        SUPPORTED_DISK_CONFIG_UNDER_COST_GUARDRAIL.provisionedIOPS,
+                        { shouldDirty: true, shouldValidate: true }
+                      )
+                      form.setValue(
+                        'throughput',
+                        SUPPORTED_DISK_CONFIG_UNDER_COST_GUARDRAIL.throughput,
+                        { shouldDirty: true, shouldValidate: true }
+                      )
+                    }}
+                  >
+                    Reset to supported configuration
+                  </Button>
+                  {activeGuardrails.includes('computeSize') && canUpdateDiskConfiguration && (
+                    <Button
+                      variant="default"
+                      onClick={() => {
+                        form.setValue('computeSize', 'ci_large', {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                        form.trigger('provisionedIOPS')
+                        form.trigger('throughput')
+                      }}
+                    >
+                      Change to Large compute
+                    </Button>
+                  )}
+                  {activeGuardrails.includes('spendCap') && (
+                    <Link
+                      href={`/org/${org?.slug}/billing?panel=costControl`}
+                      className={cn(buttonVariants({ variant: 'default', size: 'tiny' }))}
+                    >
+                      Disable spend cap
+                    </Link>
+                  )}
+                </div>
               }
+            />
+            <NoticeBar
+              type="default"
+              visible={isDiskTooSmallForIopsOrThroughput && canEditDiskConfig}
               title="Increase disk size to adjust IOPS or throughput"
               description={`This disk is too small to update IOPS or throughput, since gp3 volumes are capped at 500 IOPS per GB with a 3,000 IOPS minimum. Resizing to ${suggestedDiskSizeForCustomIops} GB unlocks custom IOPS and throughput, and leaves headroom for further adjustments (disk config changes are limited to 4 within a rolling 24-hour window).`}
               actions={
@@ -317,19 +384,17 @@ export function AdvancedSection({
             />
             <StorageTypeField
               form={form}
-              disableInput={!!disableIopsThroughputConfig || disableDiskInputs}
+              disableInput={!canEditDiskConfig}
+              downsizeOnly={isDownsizeOnly}
+              provisionedStorageType={provisionedStorageType}
             />
             <IOPSField
               form={form}
-              disableInput={
-                !!disableIopsThroughputConfig || disableDiskInputs || isDiskTooSmallForCustomIops
-              }
+              disableInput={!canEditDiskConfig || isDiskTooSmallForIopsOrThroughput}
             />
             <ThroughputField
               form={form}
-              disableInput={
-                !!disableIopsThroughputConfig || disableDiskInputs || isDiskTooSmallForCustomIops
-              }
+              disableInput={!canEditDiskConfig || isDiskTooSmallForIopsOrThroughput}
             />
           </CardContent>
         </Card>
