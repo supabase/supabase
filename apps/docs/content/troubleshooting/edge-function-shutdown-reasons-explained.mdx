@@ -135,7 +135,7 @@ Make your functions safe to run multiple times with the same input. Use executio
 
 ```typescript
 // Store execution_id to detect retries
-const executionId = Deno.env.get('SB_EXECUTION_ID')
+const executionId = Deno.env.get('EXECUTION_ID')
 const alreadyProcessed = await checkIfProcessed(executionId)
 
 if (alreadyProcessed) {
