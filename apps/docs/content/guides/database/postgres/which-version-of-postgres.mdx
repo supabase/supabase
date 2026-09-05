@@ -9,14 +9,13 @@ It's important to know which version of Postgres you are running as each major v
 Run the following query using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard:
 
 ```sql
-select
-  version();
+show server_version;
 ```
 
 Which should return something like:
 
-```sql
-PostgreSQL 15.1 on aarch64-unknown-linux-gnu, compiled by gcc (Ubuntu 10.3.0-1ubuntu1~20.04) 10.3.0, 64-bit
+```
+15.1
 ```
 
 This query can also be executed via `psql` or any other query editor if you prefer to [connect directly to the database](/docs/guides/database/connecting-to-postgres#direct-connections).
