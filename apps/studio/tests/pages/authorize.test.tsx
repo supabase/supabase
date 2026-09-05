@@ -10,13 +10,14 @@ vi.mock('@/hooks/misc/withAuth', () => ({
 }))
 
 const routerPushMock = vi.fn()
+const useRouterMock = vi.fn(() => ({
+  isReady: false,
+  push: routerPushMock,
+  query: {},
+}))
 
 vi.mock('next/router', () => ({
-  useRouter: () => ({
-    isReady: false,
-    push: routerPushMock,
-    query: {},
-  }),
+  useRouter: () => useRouterMock(),
 }))
 
 const DEFAULT_PROFILE_CONTEXT: ProfileContextType = {
@@ -46,5 +47,15 @@ describe('APIAuthorizationPage', () => {
       profileContext: DEFAULT_PROFILE_CONTEXT,
     })
     expect(screen.getByText('Loading...')).toBeInTheDocument()
+  })
+
+  test('renders the legacy component when the OauthAppScopedGrants flag is off', () => {
+    useRouterMock.mockReturnValue({ isReady: true, push: routerPushMock, query: {} })
+
+    customRender(<APIAuthorizationPage dehydratedState={{}} />, {
+      profileContext: DEFAULT_PROFILE_CONTEXT,
+    })
+
+    expect(screen.getByText('Missing authorization link')).toBeInTheDocument()
   })
 })

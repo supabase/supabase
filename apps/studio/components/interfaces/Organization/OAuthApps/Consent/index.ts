@@ -1,5 +1,7 @@
 export { AuthorizingAsCard } from './AuthorizingAsCard'
 export type { AuthorizingAsCardProps } from './AuthorizingAsCard'
+export { OAuthAppsAuthorizeScreen } from './OAuthAppsAuthorizeScreen'
+export type { OAuthAppsAuthorizeScreenProps } from './OAuthAppsAuthorizeScreen'
 export { NoProjectsNotice } from './NoProjectsNotice'
 export type { NoProjectsNoticeProps } from './NoProjectsNotice'
 export { OverRoleAnnotation } from './OverRoleAnnotation'

@@ -17,6 +17,7 @@ export async function approveOAuthAppsAuthorize({ id, slug }: OAuthAppsAuthorize
   if (!slug) throw new Error('Organization slug is required')
   if (!USE_MOCKS) throw new Error('OAuth app authorization approval is not yet implemented')
 
+  await new Promise((resolve) => setTimeout(resolve, 300))
   return getMockOAuthAppsAuthorizeRedirect(id, { approved: true })
 }
 
