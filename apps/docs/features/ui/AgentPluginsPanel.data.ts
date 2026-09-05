@@ -3,6 +3,7 @@ import type { McpClient } from 'ui-patterns/McpUrlBuilder'
 export interface PluginClient extends McpClient {
   repoUrl?: string
   docsUrl?: string
+  docsLinkText?: string
 }
 
 export const PLUGIN_CLIENTS: PluginClient[] = [
@@ -25,6 +26,7 @@ export const PLUGIN_CLIENTS: PluginClient[] = [
     key: 'cursor',
     label: 'Cursor',
     icon: 'cursor',
+    hasDistinctDarkIcon: true,
     repoUrl: 'https://github.com/supabase-community/cursor-plugin',
     docsUrl: 'https://cursor.com/docs/plugins',
   },
@@ -43,6 +45,15 @@ export const PLUGIN_CLIENTS: PluginClient[] = [
     repoUrl: 'https://github.com/supabase-community/supabase-plugin',
     docsUrl:
       'https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing',
+  },
+  {
+    key: 'grok',
+    label: 'Grok',
+    icon: 'grok',
+    hasDistinctDarkIcon: true,
+    repoUrl: 'https://github.com/supabase-community/supabase-plugin',
+    docsUrl: 'https://docs.x.ai/build/features/skills-plugins-marketplaces#plugins',
+    docsLinkText: 'View Grok plugins docs',
   },
   {
     key: 'kimi',

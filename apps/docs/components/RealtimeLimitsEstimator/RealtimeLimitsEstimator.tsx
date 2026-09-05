@@ -2,7 +2,7 @@ import throughputTable from '~/data/realtime/throughput.json'
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import {
-  Button,
+  cn,
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
@@ -57,7 +57,9 @@ export default function RealtimeLimitsEstimater({}) {
 
   return (
     <div>
-      <h4>Set your expected parameters</h4>
+      <span className="block font-heading font-semibold text-lg mt-9 mb-[18px] text-foreground">
+        Set your expected parameters
+      </span>
       <div className="grid mb-8 gap-y-8 gap-x-8 grid-cols-2 xl:grid-cols-4">
         <div>
           <Label htmlFor="computeAddOn">Compute:</Label>
@@ -107,7 +109,9 @@ export default function RealtimeLimitsEstimater({}) {
 
       {limits && (
         <div className="mt-8">
-          <h4>Current maximum possible throughput</h4>
+          <span className="block font-heading font-semibold text-lg mt-9 mb-[18px] text-foreground">
+            Current maximum possible throughput
+          </span>
 
           <table className="table-auto">
             <thead>
@@ -134,22 +138,17 @@ export default function RealtimeLimitsEstimater({}) {
       )}
 
       <Collapsible open={expandPreview} onOpenChange={setExpandPreview}>
-        <CollapsibleTrigger asChild>
-          <div className="py-1 flex items-center">
-            <p className="text-sm">View raw throughput table</p>
-            <Button
-              variant="text"
-              icon={
-                <ChevronDown
-                  size={18}
-                  strokeWidth={2}
-                  className={expandPreview ? 'rotate-180' : undefined}
-                />
-              }
-              className="px-1"
-              onClick={() => setExpandPreview(!expandPreview)}
-            />
-          </div>
+        <CollapsibleTrigger className="group text-base py-1 flex items-center gap-1 cursor-pointer select-none mb-10 text-foreground-light hover:text-foreground transition-colors">
+          View raw throughput table
+          <ChevronDown
+            size={14}
+            strokeWidth={2}
+            aria-hidden
+            className={cn(
+              'text-foreground-lighter group-hover:text-foreground transition-colors',
+              expandPreview && 'rotate-180'
+            )}
+          />
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div>
@@ -158,7 +157,9 @@ export default function RealtimeLimitsEstimater({}) {
               .filter((v, i, a) => a.indexOf(v) === i)
               .map((computeAddOn) => (
                 <div>
-                  <h4>{COMPUTE_LABELS[computeAddOn]}</h4>
+                  <span className="block font-heading font-semibold text-lg mt-9 mb-[18px] text-foreground">
+                    {COMPUTE_LABELS[computeAddOn]}
+                  </span>
                   <table className="table-auto">
                     <thead>
                       <tr>

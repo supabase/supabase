@@ -13,6 +13,7 @@ import {
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
 import { EMPTY_OBJ } from '@/lib/void'
 
@@ -47,6 +48,14 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
         // Platform-only previews can never be enabled outside the hosted platform
         if (!IS_PLATFORM && b.isPlatformOnly) {
           return { ...a, [b.key]: false }
+        }
+
+        // A forced preview has become the default behavior, so it's on whatever
+        // the user stored previously — including an explicit opt-out. Applied
+        // here rather than in the individual `useIsXEnabled` helpers so that the
+        // feature preview modal reflects it too.
+        if (b.isForced) {
+          return { ...a, [b.key]: true }
         }
 
         const defaultOptIn = b.isDefaultOptIn
@@ -89,15 +98,13 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
 }
 
 export const useUnifiedLogsPreview = () => {
-  const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
   const { flags, isInitialized, onUpdateFlag } = useFeaturePreviewContext()
 
   const isLoading = !isInitialized
   const isEnabled = IS_PLATFORM && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const hasToggledPreview = !!safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
-  const isDefaultOptIn =
-    IS_PLATFORM && isInitialized && unifiedLogsDefaultOptIn && !hasToggledPreview
+  const isDefaultOptIn = IS_PLATFORM && !hasToggledPreview
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
@@ -127,10 +134,14 @@ export const useIsJitDbAccessEnabled = () => {
   return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
 }
 
+/**
+ * Whether the SQL Editor saves snippets only on request. True when the user
+ * opted into the preview themselves *or* the `sqlEditorManualSaveForced` rollout
+ * has reached them — the preview's `isForced` flag folds the latter into `flags`.
+ */
 export const useIsSqlEditorManualSaveEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const sqlEditorManualSaveEnabled = useFlag('sqlEditorManualSave')
-  return sqlEditorManualSaveEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]
 }
 
 export const useIsMarketplaceEnabled = () => {
@@ -140,9 +151,24 @@ export const useIsMarketplaceEnabled = () => {
 }
 
 export const useIsDatabaseConnectionsEnabled = () => {
+  const { flags, isInitialized } = useFeaturePreviewContext()
+  const [localStorageFlag] = useLocalStorageQuery<boolean | null>(
+    LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS,
+    null
+  )
+  const previouslyToggled = localStorageFlag !== null
+
+  return {
+    enabled: flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS],
+    isInitialized,
+    previouslyToggled,
+  }
+}
+
+export const useIsExplorerEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const isDatabaseConnectionsEnabled = useFlag('topForPostgres')
-  return isDatabaseConnectionsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS]
+  const isExplorerEnabled = useFlag('explorer')
+  return isExplorerEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]
 }
 
 export const useFeaturePreviewModal = () => {

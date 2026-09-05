@@ -75,6 +75,7 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
       restriction_status: null,
       restriction_data: null,
       organization_missing_address: false,
+      requires_indirect_tax_declaration: false,
     },
   }),
 }))

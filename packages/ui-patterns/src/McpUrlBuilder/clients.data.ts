@@ -4,8 +4,10 @@ import type {
   CodexMcpConfig,
   CopilotMcpConfig,
   FactoryMcpConfig,
+  FxMcpConfig,
   GeminiMcpConfig,
   GooseMcpConfig,
+  GrokMcpConfig,
   KimiMcpConfig,
   McpClientBaseConfig,
   McpClientConfig,
@@ -154,6 +156,23 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     },
   },
   {
+    key: 'grok',
+    label: 'Grok',
+    icon: 'grok',
+    hasDistinctDarkIcon: true,
+    configFile: '~/.grok/config.toml',
+    externalDocsUrl: 'https://docs.x.ai/build/features/mcp-servers',
+    transformConfig: (config): GrokMcpConfig => {
+      return {
+        mcp_servers: {
+          supabase: {
+            url: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+  },
+  {
     key: 'kimi',
     label: 'Kimi Code',
     icon: 'kimi',
@@ -224,10 +243,10 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
   },
   {
     key: 'windsurf',
-    label: 'Windsurf',
-    icon: 'windsurf',
+    label: 'Devin Desktop',
+    icon: 'devin',
     hasDistinctDarkIcon: true,
-    configFile: '~/.codeium/windsurf/mcp_config.json',
+    configFile: '~/.config/devin/mcp_config.json',
     externalDocsUrl: '',
     transformConfig: (config): WindsurfMcpConfig => {
       return {
@@ -239,6 +258,17 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
         },
       }
     },
+  },
+  {
+    key: 'warp',
+    label: 'Warp',
+    icon: 'warp',
+    hasDistinctDarkIcon: true,
+    configFile: '~/.warp/.mcp.json',
+    externalDocsUrl: 'https://docs.warp.dev/agents/capabilities/mcp',
+    // No transformConfig: Warp natively supports remote MCP servers and accepts
+    // the standard `mcpServers` config, so the base `{ mcpServers: { supabase: { url } } }`
+    // shape works both in `~/.warp/.mcp.json` and when pasted into Warp's "+ Add" input.
   },
   {
     key: 'goose',
@@ -313,6 +343,24 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     },
   },
   {
+    key: 'fx',
+    label: 'fx',
+    icon: 'fx',
+    hasDistinctDarkIcon: true,
+    configFile: '~/.fx/mcp.json',
+    externalDocsUrl: 'https://fx.sh/docs/capabilities/mcp',
+    transformConfig: (config): FxMcpConfig => {
+      return {
+        mcp: {
+          supabase: {
+            type: 'http',
+            url: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+  },
+  {
     key: 'kiro',
     label: 'Kiro',
     icon: 'kiro',
@@ -364,6 +412,9 @@ export const MCP_CLI_COMMANDS: Record<string, McpCliCommands> = {
     install: (url) => `codex mcp add supabase --url "${url}"`,
     authenticate: 'codex mcp login supabase',
   },
+  grok: {
+    install: (url) => `grok mcp add supabase "${url}" --transport http`,
+  },
   'gemini-cli': {
     install: (url) => `gemini mcp add -t http supabase "${url}"`,
     authenticate: '/mcp auth supabase',
@@ -381,12 +432,24 @@ export const MCP_CLI_COMMANDS: Record<string, McpCliCommands> = {
   opencode: {
     authenticate: 'opencode mcp auth supabase',
   },
+  fx: {
+    authenticate: '/mcp auth supabase --open',
+  },
 }
 
 export const MCP_CLIENT_GROUPS = [
   {
     heading: 'AI Agent CLI',
-    keys: ['claude-code', 'codex', 'gemini-cli', 'copilot-cli', 'opencode', 'factory'],
+    keys: [
+      'claude-code',
+      'codex',
+      'grok',
+      'gemini-cli',
+      'copilot-cli',
+      'opencode',
+      'factory',
+      'fx',
+    ],
   },
   {
     heading: 'Web Clients',
@@ -394,7 +457,7 @@ export const MCP_CLIENT_GROUPS = [
   },
   {
     heading: 'IDE',
-    keys: ['cursor', 'vscode', 'antigravity', 'kiro', 'windsurf', 'kimi'],
+    keys: ['cursor', 'vscode', 'antigravity', 'kiro', 'windsurf', 'kimi', 'warp'],
   },
 ] as const
 
@@ -407,3 +470,12 @@ export const DEFAULT_MCP_URL_NON_PLATFORM = 'http://localhost:54321/mcp'
  * docs document (and what to fall back to in production).
  */
 export const HOSTED_MCP_URL = 'https://mcp.supabase.com/mcp'
+
+/**
+ * Hosted MCP authentication note. Shared by the docs HTML callout and the
+ * markdown export so the two pipelines cannot drift.
+ */
+export const MCP_HOSTED_AUTH_NOTE = {
+  title: 'Authentication',
+  body: "Some MCP clients automatically prompt you to log in during setup. Others require manual authentication steps. Either method opens a browser window where you log in to your Supabase account and grant the MCP client access to your organization. You don't need a personal access token (PAT).",
+} as const

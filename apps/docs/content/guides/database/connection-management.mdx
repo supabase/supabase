@@ -47,11 +47,11 @@ For Teams and Enterprise plans, Supabase provides Advanced Telemetry charts dire
 
 This chart helps you monitor connection pool usage, identify connection leaks, and plan capacity. It also shows a reference line for your compute size's maximum connection limit.
 
-For more details on using these monitoring charts, see the [Reports guide](/docs/guides/monitoring-and-debugging/reports#advanced-telemetry).
+For more details on using these monitoring charts, see the [Reports guide](/docs/guides/observability/reports#advanced-telemetry).
 
 #### Grafana Dashboard
 
-Supabase offers a Grafana Dashboard that records and visualizes over 200 project metrics, including connections. For setup instructions, check the [metrics docs](/docs/guides/monitoring-and-debugging/metrics).
+Supabase offers a Grafana Dashboard that records and visualizes over 200 project metrics, including connections. For setup instructions, check the [metrics docs](/docs/guides/observability/metrics).
 
 Its "Client Connections" graph displays connections for both Supavisor and Postgres
 ![client connection graph](/docs/img/database/grafana-connections.png)
@@ -81,18 +81,18 @@ ON pg_stat_ssl.pid = pg_stat_activity.pid;
 
 Interpreting the query:
 
-| Column             | Description                                         |
-| ------------------ | --------------------------------------------------- |
-| `connection_id`    | connection id                                       |
-| `ssl`              | Indicates if SSL is in use                          |
-| `database`         | Name of the connected database (usually `postgres`) |
-| `usename`          | Role of the connected user                          |
-| `application_name` | Name of the connecting application                  |
-| `client_addr`      | IP address of the connecting server                 |
-| `query`            | Last query executed by the connection               |
-| `query_start`      | Time when the last query was executed               |
-| `state`            | Querying state: active or idle                      |
-| `backend_start`    | Timestamp of the connection's establishment         |
+| Column             | Description                                                                                                |
+| ------------------ | ---------------------------------------------------------------------------------------------------------- |
+| `connection_id`    | connection id                                                                                              |
+| `ssl`              | Indicates if SSL is in use                                                                                 |
+| `database`         | Name of the connected database (usually `postgres`)                                                        |
+| `usename`          | Role of the connected user                                                                                 |
+| `application_name` | Name of the connecting application                                                                         |
+| `client_addr`      | IP address of the connecting server                                                                        |
+| `query`            | Last query executed by the connection                                                                      |
+| `query_start`      | Time when the last query was executed                                                                      |
+| `state`            | Querying state. See [Session states](#session-states) for the full list of values and what each one means. |
+| `backend_start`    | Timestamp of the connection's establishment                                                                |
 
 The username can be used to identify the source:
 
@@ -105,3 +105,73 @@ The username can be used to identify the source:
 | `supabase_replication_admin` | Synchronizes Read Replicas                                                |
 | `postgres`                   | Supabase Dashboard and External Tools (e.g., Prisma, SQLAlchemy, PSQL...) |
 | Custom roles defined by user | External Tools (e.g., Prisma, SQLAlchemy, PSQL...)                        |
+
+## Diagnosing stuck and blocked queries
+
+If your application is slow or hanging, the cause is usually visible right now in `pg_stat_activity` - a query that's stuck, one session blocking others, or a transaction left open by mistake. This section covers how to read a session's state, find out what's blocking a query, and stop the session responsible.
+
+### Session states
+
+The `state` column on `pg_stat_activity` can be one of six values:
+
+| State                           | Meaning                                                                                                                                                                                                                                                                                                                                                                                                |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `active`                        | The session is currently executing a query. A query running longer than expected is worth investigating, but a nonzero count of active sessions is normal on its own.                                                                                                                                                                                                                                  |
+| `idle`                          | The session is connected and waiting for the client to send a new command. Normal for pooled or long-lived connections.                                                                                                                                                                                                                                                                                |
+| `idle in transaction`           | The session has an open transaction but isn't currently running a query. This holds locks and blocks table cleanup for as long as it stays open, and almost always means the application forgot to commit or roll back.                                                                                                                                                                                |
+| `idle in transaction (aborted)` | The last statement in the transaction failed. Postgres releases the transaction's ordinary locks as part of the abort - the exception is session-level advisory locks (`pg_advisory_lock`, not `pg_advisory_xact_lock`), which are held until explicitly unlocked or the session ends. The client still needs to send `rollback` to close the transaction before the session will accept new commands. |
+| `fastpath function call`        | The session is executing a function through Postgres's low-level fastpath protocol, most commonly for large object reads or writes. Rare, and normally brief.                                                                                                                                                                                                                                          |
+| `disabled`                      | Activity tracking (`track_activities`) is turned off for this session, so Postgres isn't recording its state or query.                                                                                                                                                                                                                                                                                 |
+
+`idle in transaction` is the state most worth watching. Unlike a slow `active` query, which is at least making progress, an idle-in-transaction session is holding its locks indefinitely while doing nothing.
+
+### Finding blocked queries
+
+Postgres tracks which sessions are waiting on a lock held by another session. Query `pg_stat_activity` and `pg_blocking_pids()` together to see this directly:
+
+```sql
+select
+  a.pid,
+  a.usename as role_name,
+  a.application_name,
+  a.state,
+  a.query,
+  a.wait_event_type,
+  a.wait_event,
+  a.xact_start as transaction_start,
+  a.query_start,
+  a.state_change,
+  pg_blocking_pids(a.pid) as blocked_by
+from pg_stat_activity as a
+where
+  a.datname = current_database()
+  and a.pid != pg_backend_pid()
+  and a.backend_type = 'client backend'
+order by a.query_start asc nulls last;
+```
+
+The `where` clause excludes the query's own session and Postgres's internal background workers (autovacuum, the WAL writer, extensions like `pg_cron`), so the results only show sessions a client opened.
+
+`blocked_by` is an array, not a single value, for two reasons:
+
+- A session can be waiting on more than one session at once, if several sessions hold a lock that all conflict with what it's requesting.
+- Blocking can chain: session A holds a lock, session B waits on A, session C waits on B. `blocked_by` only ever lists the _direct_ blocker, so tracing a long queue back to its root cause may mean following the chain through more than one session.
+
+### Cancelling or terminating a session
+
+Postgres gives you two ways to stop a session, and they behave differently:
+
+- `select pg_cancel_backend(pid);` cancels the session's _currently running query_ but leaves the connection open. The application gets one failed query back and can continue using that connection.
+- `select pg_terminate_backend(pid);` ends the session's connection entirely.
+
+Which one to use depends on the session's state:
+
+- For an `active` session that's stuck waiting on a lock or running longer than expected, cancel it first. It's the less disruptive option, and it's usually enough to unstick the wait or stop the runaway query.
+- For a session that's `idle in transaction`, cancelling does nothing - there's no running query to cancel, and the open transaction stays open regardless. Terminating the session is the only way to force the transaction closed and release its locks.
+- For a session that's `idle in transaction (aborted)`, its ordinary locks were already released when the transaction aborted. The correct fix is for the client to issue `rollback`, which closes the transaction cleanly. Reserve `pg_terminate_backend` for a client that's unresponsive or a connection that needs to close regardless - it won't release anything further in this case, aside from a session-level advisory lock, which persists until the session ends.
+
+Both functions require you to either be a superuser, hold the `pg_signal_backend` role, or be signalling your own session - and even `pg_signal_backend` can't be used to stop a session belonging to an actual superuser role. If you hit a permission error while terminating a session, see [this troubleshooting guide](/docs/guides/troubleshooting/high-cpu-and-slow-queries-with-error-must-be-a-superuser-to-terminate-superuser-process).
+
+---
+
+If you're on Supabase, you can see all of this - session states, blocking chains, and a way to terminate a stuck session - on your project's [Database Connections](/dashboard/project/_/observability/connections) page in the dashboard, without writing any SQL.

@@ -256,6 +256,132 @@ describe('DevToolbar', () => {
     })
   })
 
+  describe('enableToolbar', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+    })
+
+    it('enables toolbar and exposes isAvailable in local development', async () => {
+      vi.resetModules()
+      const { DevToolbarProvider, useDevToolbar } = await import('./DevToolbarContext')
+      const { DevToolbarTrigger } = await import('./DevToolbarTrigger')
+      const { TooltipProvider } = await import('ui')
+
+      function ToolbarLauncher() {
+        const { isAvailable, enableToolbar } = useDevToolbar()
+        return (
+          <button type="button" onClick={enableToolbar}>
+            {isAvailable ? 'Launch toolbar' : 'Unavailable'}
+          </button>
+        )
+      }
+
+      render(
+        <TooltipProvider>
+          <DevToolbarProvider apiUrl="http://localhost:3000">
+            <ToolbarLauncher />
+            <DevToolbarTrigger />
+          </DevToolbarProvider>
+        </TooltipProvider>
+      )
+
+      expect(screen.getByRole('button', { name: 'Launch toolbar' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Open dev toolbar' })).not.toBeInTheDocument()
+
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Launch toolbar' }))
+
+      expect(localStorage.getItem('dev-telemetry-toolbar-enabled')).toBe('true')
+      expect(screen.getByRole('button', { name: 'Open dev toolbar' })).toBeInTheDocument()
+    })
+
+    it('returns isAvailable false in production', async () => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'prod'
+
+      vi.resetModules()
+      const { DevToolbarProvider, useDevToolbar } = await import('./DevToolbarContext')
+
+      function ToolbarAvailability() {
+        const { isAvailable } = useDevToolbar()
+        return <span>{isAvailable ? 'available' : 'unavailable'}</span>
+      }
+
+      render(
+        <DevToolbarProvider apiUrl="http://localhost:3000">
+          <ToolbarAvailability />
+        </DevToolbarProvider>
+      )
+
+      expect(screen.getByText('unavailable')).toBeInTheDocument()
+    })
+  })
+
+  describe('dismissToolbar', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+    })
+
+    async function renderDismissHarness() {
+      const { DevToolbarProvider, useDevToolbar } = await import('./DevToolbarContext')
+      const { DevToolbarTrigger } = await import('./DevToolbarTrigger')
+      const { TooltipProvider } = await import('ui')
+
+      function ToolbarDismisser() {
+        const { dismissToolbar } = useDevToolbar()
+        return (
+          <button type="button" onClick={dismissToolbar}>
+            Dismiss toolbar
+          </button>
+        )
+      }
+
+      return render(
+        <TooltipProvider>
+          <DevToolbarProvider apiUrl="http://localhost:3000">
+            <ToolbarDismisser />
+            <DevToolbarTrigger />
+          </DevToolbarProvider>
+        </TooltipProvider>
+      )
+    }
+
+    it('persists the opt-out so it survives a remount', async () => {
+      localStorage.setItem('dev-telemetry-toolbar-enabled', 'true')
+
+      vi.resetModules()
+      const { unmount } = await renderDismissHarness()
+
+      expect(screen.getByRole('button', { name: 'Open dev toolbar' })).toBeInTheDocument()
+
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Dismiss toolbar' }))
+
+      expect(localStorage.getItem('dev-telemetry-toolbar-enabled')).toBe('false')
+      expect(screen.queryByRole('button', { name: 'Open dev toolbar' })).not.toBeInTheDocument()
+
+      unmount()
+      await renderDismissHarness()
+
+      expect(screen.queryByRole('button', { name: 'Open dev toolbar' })).not.toBeInTheDocument()
+    })
+
+    it('takes precedence over the devToolbarDefaultOn flag', async () => {
+      flags.devToolbarDefaultOn = true
+
+      vi.resetModules()
+      const { unmount } = await renderDismissHarness()
+
+      expect(screen.getByRole('button', { name: 'Open dev toolbar' })).toBeInTheDocument()
+
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Dismiss toolbar' }))
+
+      expect(screen.queryByRole('button', { name: 'Open dev toolbar' })).not.toBeInTheDocument()
+
+      unmount()
+      await renderDismissHarness()
+
+      expect(screen.queryByRole('button', { name: 'Open dev toolbar' })).not.toBeInTheDocument()
+    })
+  })
+
   describe('window.devToolbar function', () => {
     beforeEach(() => {
       process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
@@ -459,6 +585,40 @@ describe('DevToolbar utils', () => {
       expect(valuesAreEqual(null, null)).toBe(true)
       expect(valuesAreEqual(null, 'value')).toBe(false)
       expect(valuesAreEqual('value', null)).toBe(false)
+    })
+  })
+
+  describe('getEventCountBadge', () => {
+    it('returns null for zero or negative counts', async () => {
+      vi.resetModules()
+      const { getEventCountBadge } = await import('./utils')
+
+      expect(getEventCountBadge(0)).toBeNull()
+      expect(getEventCountBadge(-1)).toBeNull()
+    })
+
+    it('returns a compact circle for single-digit counts', async () => {
+      vi.resetModules()
+      const { getEventCountBadge } = await import('./utils')
+
+      expect(getEventCountBadge(7)).toEqual({ label: '7', sizeClass: 'size-3.5' })
+    })
+
+    it('returns a larger circle for double-digit counts', async () => {
+      vi.resetModules()
+      const { getEventCountBadge } = await import('./utils')
+
+      expect(getEventCountBadge(42)).toEqual({ label: '42', sizeClass: 'size-4' })
+    })
+
+    it('returns a capped pill for large counts', async () => {
+      vi.resetModules()
+      const { getEventCountBadge } = await import('./utils')
+
+      expect(getEventCountBadge(150)).toEqual({
+        label: '99+',
+        sizeClass: 'h-3.5 min-w-3.5 px-1',
+      })
     })
   })
 })

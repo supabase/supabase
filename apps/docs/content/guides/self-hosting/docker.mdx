@@ -80,6 +80,7 @@ The script supports Linux only (Debian/Ubuntu and RHEL/CentOS/Fedora) and will:
 - Install prerequisites (`git`, `openssl`, `jq`) and Docker Engine if not already present
 - Sparse-clone the `docker/` directory from the main Supabase [repository](https://github.com/supabase/supabase/)
 - Create a project directory (`supabase-project` by default) and copy the configuration files into it
+- Record the installed release version in `.supabase-version` for future `update.sh` upgrades
 - Prompt for the main URLs (`SUPABASE_PUBLIC_URL`, `API_EXTERNAL_URL`, `SITE_URL`, `PROXY_DOMAIN`) and write them to `.env`
 - Generate all secrets, including a random `DASHBOARD_PASSWORD`, and the asymmetric JWT signing key pair (runs `generate-keys.sh` and `add-new-auth-keys.sh`, and enables the matching entries in `docker-compose.yml`)
 - Pull the Docker images
@@ -105,7 +106,7 @@ Not on Linux, or want to do it manually? See [Manual installation](#manual-insta
 
 ### Manual installation
 
-This path gets the Docker Compose configuration onto your server; you'll configure secrets, keys, and URLs in the [next section](#configuring-and-securing-supabase).
+This path gets the Docker Compose configuration onto your server, pinned to a specific tag. You'll set up secrets, keys, and URLs in the [next section](#configuring-and-securing-supabase). For a newer release, use the [latest tag](https://github.com/supabase/supabase/tags).
 
 <Tabs
 scrollable
@@ -121,7 +122,7 @@ A shallow clone of the full Supabase repository. Works on any OS with `git` inst
 
 ```sh
 # Get the code
-git clone --depth 1 https://github.com/supabase/supabase
+git clone --depth 1 --branch self-hosted/v0.8.0 https://github.com/supabase/supabase
 
 # Make your new supabase project directory
 mkdir supabase-project
@@ -137,6 +138,9 @@ cp -rf supabase/docker/. supabase-project
 # Switch to the project directory and create a .env from the example
 cd supabase-project && cp .env.example .env
 
+# Record the base version so update.sh can upgrade this install later
+printf 'ref=self-hosted/v0.8.0\n' > .supabase-version
+
 # Pull the latest images
 docker compose pull
 ```
@@ -149,7 +153,7 @@ Only downloads the `docker/` directory from the repository, saving bandwidth and
 
 ```sh
 # Get the code using git sparse checkout
-git clone --filter=blob:none --no-checkout --depth=1 --quiet https://github.com/supabase/supabase
+git clone --filter=blob:none --no-checkout --depth=1 --quiet --branch self-hosted/v0.8.0 https://github.com/supabase/supabase
 cd supabase
 git sparse-checkout init --cone
 git sparse-checkout set docker
@@ -169,6 +173,9 @@ cp -rf supabase/docker/. supabase-project
 
 # Switch to the project directory and create a .env from the example
 cd supabase-project && cp .env.example .env
+
+# Record the base version so update.sh can upgrade this install later
+printf 'ref=self-hosted/v0.8.0\n' > .supabase-version
 
 # Pull the latest images
 docker compose pull
@@ -230,7 +237,7 @@ Review and change URL configuration variables:
 
   Throughout the self-hosting guides, `<your-domain>` stands for the host where your Supabase instance is reachable: your domain name, your server's IP, or `localhost`, depending on your setup.
 
-  - **Default setup:** The API gateway (Kong) listens on port `8000`, so the full URL is `http://<your-domain>:8000`.
+  - **Default setup:** The API gateway (Envoy by default) listens on port `8000`, so the full URL is `http://<your-domain>:8000`.
   - **Behind a [reverse proxy](/docs/guides/self-hosting/self-hosted-proxy-https):** the proxy terminates TLS on port `443`, so the URL becomes `https://<your-domain>`.
 
 </Admonition>
@@ -298,7 +305,7 @@ sh run.sh stop
 
 <Admonition type="caution" title="Windows: CRLF line endings">
 
-  If the API gateway (Kong) fails to start with an entrypoint error, your local files may have been checked out with CRLF line endings instead of LF. Re-clone the repository, or normalize everything in the `docker/` directory to LF, then restart Supabase. Fresh clones should already use LF because of `.gitattributes`.
+  If the API gateway fails to start with an entrypoint error, your local files may have been checked out with CRLF line endings instead of LF. Re-clone the repository, or normalize everything in the `docker/` directory to LF, then restart Supabase. Fresh clones should already use LF because of `.gitattributes`.
 
 </Admonition>
 
@@ -312,27 +319,7 @@ You will be prompted for a username and password. See the [Studio authentication
 
 ## Accessing Postgres
 
-The self-hosted Supabase stack provides the [Supavisor](https://supabase.github.io/supavisor/development/docs/) connection pooler for accessing Postgres and managing database connections.
-
-You can connect to the Postgres database via Supavisor using the methods described below. Use your domain name, your server IP, or `localhost` depending on whether you are running self-hosted Supabase on a VPS, or locally.
-
-The default `POOLER_TENANT_ID` is `your-tenant-id` (can be later changed in `.env`), and the password is the value of `POSTGRES_PASSWORD` from the `.env` file.
-
-For session-mode connections (equivalent to a direct Postgres connection):
-
-```sh
-psql 'postgres://postgres.[POOLER_TENANT_ID]:[POSTGRES_PASSWORD]@[your-domain]:5432/postgres'
-```
-
-For transaction-mode connections:
-
-```sh
-psql 'postgres://postgres.[POOLER_TENANT_ID]:[POSTGRES_PASSWORD]@[your-domain]:6543/postgres'
-```
-
-When using `psql` with command-line parameters instead of a connection string to connect to Supavisor, the `-U` parameter should also be `postgres.[POOLER_TENANT_ID]`.
-
-If you need to configure Postgres to be directly accessible from the Internet, read [Exposing your Postgres database](#exposing-your-postgres-database).
+Self-hosted Supabase pools Postgres connections through Supavisor by default, with an optional PgBouncer pooler and a direct-connection option. For connection strings, pooler configuration, switching poolers, and exposing Postgres directly, see [Accessing Postgres](/docs/guides/self-hosting/accessing-postgres).
 
 To change the database password, read [Changing database password](#changing-database-password).
 
@@ -456,10 +443,10 @@ Supabase is built from open source tools, each chosen or developed for productio
 If the tools and communities already exist, with an MIT, Apache 2, PostgreSQL, or equivalent open source license, we will use and support that tool. If the tool doesn't exist, we build and open source it ourselves.
 
 <Image
-  alt="Diagram showing the architecture of Supabase. The API gateway (Kong) sits in front of 7 services: GoTrue, PostgREST, Realtime, Storage, pg_meta, Functions, and pg_graphql. All the services talk to a single Postgres instance."
+  alt="Diagram showing the architecture of self-hosted Supabase. The API gateway (Envoy) sits in front of 7 services: Auth, PostgREST, Realtime, Storage, Edge Runtime, postgres-meta, and Studio. The services connect to a single Postgres instance, with Studio reaching it through pg-meta. Supavisor pools connections to the same Postgres instance."
   src={{
-    dark: "/docs/img/supabase-architecture.svg",
-    light: "/docs/img/supabase-architecture--light.svg",
+    dark: "/docs/img/supabase-self-hosted-architecture.svg",
+    light: "/docs/img/supabase-self-hosted-architecture--light.svg",
   }}
 
   width={1600}
@@ -467,7 +454,7 @@ If the tools and communities already exist, with an MIT, Apache 2, PostgreSQL, o
 />
 
 - **[Studio](https://github.com/supabase/supabase/tree/master/apps/studio)** - A dashboard for managing your self-hosted Supabase project
-- **[Kong](https://github.com/Kong/kong)** - Kong API gateway
+- **[Envoy](https://www.envoyproxy.io/)** - API gateway (default; Kong available as an optional override)
 - **[Auth](https://github.com/supabase/auth)** - JWT-based authentication API for user sign-ups, logins, and session management
 - **[PostgREST](https://github.com/PostgREST/postgrest)** - Web server that turns your Postgres database directly into a RESTful API
 - **[Realtime](https://github.com/supabase/realtime)** - Elixir server that listens to Postgres database changes and broadcasts them to subscribed clients
@@ -504,6 +491,24 @@ The script generates a new password, updates all database roles, and modifies yo
 ```sh
 sh run.sh recreate
 ```
+
+### Rotating API keys
+
+Unlike the managed platform, where you rotate keys from the Dashboard, self-hosted API keys live in your `.env` file. To rotate the publishable and secret keys (`SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY`) without changing the asymmetric signing key pair, run:
+
+```sh
+sh utils/rotate-new-api-keys.sh --update-env
+```
+
+Then restart the services and update your applications with the new keys:
+
+```sh
+sh run.sh recreate
+```
+
+Use the publishable key in client apps and the secret key only in trusted server-side environments. Rotating these keys does not invalidate existing user session tokens. You can also set a custom value by editing `SUPABASE_PUBLISHABLE_KEY` or `SUPABASE_SECRET_KEY` in `.env` directly, then recreating the services.
+
+For rotating versus fully regenerating the asymmetric key pair (which does affect active sessions), see [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys#regenerating-asymmetric-key-pair).
 
 ### Configuring secrets
 
@@ -547,11 +552,11 @@ JWT_SECRET=${JWT_SECRET}
 
 ### Configuring social login (OAuth) providers
 
-See the [Configure Social Login (OAuth) Providers](/docs/guides/self-hosting/self-hosted-oauth) guide for setup instructions.
+See the [Configure social login (OAuth) Providers](/docs/guides/self-hosting/self-hosted-oauth) guide for setup instructions.
 
-### Configuring phone login, SMS, and MFA
+### Configuring phone sign-in, SMS, and MFA
 
-See the [Configure Phone Login & MFA](/docs/guides/self-hosting/self-hosted-phone-mfa) guide for SMS provider setup, OTP settings, and multi-factor authentication configuration.
+See the [Configure Phone sign-in & MFA](/docs/guides/self-hosting/self-hosted-phone-mfa) guide for SMS provider setup, OTP settings, and multi-factor authentication configuration.
 
 ### Configuring an email server
 
@@ -582,43 +587,6 @@ By default, the Storage backend uses local files via a bind mount. On macOS, Doc
 ### Configuring Supabase AI Assistant
 
 Configuring the Supabase AI Assistant is optional. By adding **your own** `OPENAI_API_KEY` to `.env` you can enable AI services, which help with writing SQL queries, statements, and policies.
-
-### Accessing Postgres through Supavisor
-
-By default, Postgres connections go through the Supavisor connection pooler for efficient connection management. Two ports are available:
-
-- `POSTGRES_PORT` (default: 5432) - Session mode, behaves like a direct Postgres connection
-- `POOLER_PROXY_PORT_TRANSACTION` (default: 6543) - Transaction mode, uses connection pooling
-
-For more information on configuring and using Supavisor, see the [Supavisor documentation](https://supabase.github.io/supavisor/).
-
-### Exposing your Postgres database
-
-By default, Postgres is only accessible through Supavisor. If you need direct access to the database (bypassing the connection pooler), you need to disable Supavisor and expose the Postgres port.
-
-<Admonition type="danger">
-
-  Exposing Postgres directly bypasses connection pooling and exposes your database to the network. Configure firewall rules or network policies to restrict access to trusted IPs only.
-
-</Admonition>
-
-Edit `docker-compose.yml`:
-
-1. **Disable Supavisor** - Comment out or remove the entire `supavisor` service section
-2. **Expose Postgres port** - Add the port mapping to the `db` service, it should look like the example below:
-
-```yaml name=docker-compose.yml
-db:
-  ports:
-    - ${POSTGRES_PORT}:${POSTGRES_PORT}
-  container_name: supabase-db
-```
-
-After restarting, you can connect to the database directly using a standard Postgres connection string:
-
-```sh
-postgres://postgres:[POSTGRES_PASSWORD]@[your-server-ip]:5432/[POSTGRES_DB]
-```
 
 ### Setting log_min_messages in Postgres
 

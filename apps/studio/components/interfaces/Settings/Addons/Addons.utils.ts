@@ -4,6 +4,7 @@ export interface IPv4DisabledReasonOptions {
   projectUpdateDisabled: boolean
   canUpdateIPv4: boolean
   ipv4Enabled: boolean
+  isHighAvailability: boolean
 }
 
 export const getIPv4DisabledReason = ({
@@ -12,7 +13,12 @@ export const getIPv4DisabledReason = ({
   projectUpdateDisabled,
   canUpdateIPv4,
   ipv4Enabled,
+  isHighAvailability,
 }: IPv4DisabledReasonOptions) => {
+  if (isHighAvailability) {
+    return 'Dedicated IPv4 address is unavailable on High Availability projects'
+  }
+
   if (!isAws) {
     return 'Dedicated IPv4 address is only available for AWS projects'
   }
@@ -38,6 +44,7 @@ export interface PitrDisabledReasonOptions {
   hasHipaaAddon: boolean
   sufficientPgVersion: boolean
   isOrioleDbInAws: boolean
+  isHighAvailability: boolean
 }
 
 export const getPitrDisabledReason = ({
@@ -46,7 +53,12 @@ export const getPitrDisabledReason = ({
   hasHipaaAddon,
   sufficientPgVersion,
   isOrioleDbInAws,
+  isHighAvailability,
 }: PitrDisabledReasonOptions) => {
+  if (isHighAvailability) {
+    return 'Point in time recovery is unavailable on High Availability projects'
+  }
+
   if (!isProjectActive) {
     return 'Project must be active to update PITR'
   }
@@ -73,12 +85,18 @@ export const getPitrDisabledReason = ({
 export interface CustomDomainDisabledReasonOptions {
   isProjectActive: boolean
   projectUpdateDisabled: boolean
+  isHighAvailability: boolean
 }
 
 export const getCustomDomainDisabledReason = ({
   isProjectActive,
   projectUpdateDisabled,
+  isHighAvailability,
 }: CustomDomainDisabledReasonOptions) => {
+  if (isHighAvailability) {
+    return 'Custom domain is unavailable on High Availability projects'
+  }
+
   if (!isProjectActive) {
     return 'Project must be active to update custom domain'
   }

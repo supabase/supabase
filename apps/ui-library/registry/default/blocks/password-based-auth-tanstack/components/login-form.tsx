@@ -1,7 +1,8 @@
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { cn } from '@/lib/utils'
+import { safeNextPath } from '@/registry/default/blocks/safe-next-path/lib/safe-next-path'
 import { createClient } from '@/registry/default/clients/tanstack/lib/supabase/client'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -19,7 +20,6 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const navigate = useNavigate()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,8 +33,11 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
         password,
       })
       if (error) throw error
-      // Update this route to redirect to an authenticated route. The user already has an active session.
-      await navigate({ to: '/protected' })
+      // Follow the `next` query parameter if it is a same-origin relative path, e.g. when
+      // the OAuth consent screen sent the user here to sign in first. It may point outside
+      // the typed route tree, so it needs a full navigation.
+      const next = new URLSearchParams(window.location.search).get('next')
+      window.location.assign(safeNextPath(next, '/protected'))
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
@@ -46,8 +49,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>Enter your email below to login to your account</CardDescription>
+          <CardTitle className="text-2xl">Sign in</CardTitle>
+          <CardDescription>Enter your email below to sign in to your account</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin}>
@@ -83,7 +86,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Logging in...' : 'Login'}
+                {isLoading ? 'Signing in...' : 'Sign in'}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">

@@ -8,12 +8,12 @@ const page: GoPageInput = {
   metadata: {
     title: "You're confirmed | Supabase VIP Dinner",
     description:
-      'Your RSVP for the Supabase VIP dinner at Flour + Water in San Francisco on October 1, 2026 has been confirmed. Cocktails begin at 7:00 PM and dinner starts at 7:30 PM.',
+      'Your RSVP for the Supabase VIP dinner at Penny Roma in San Francisco on October 1, 2026 has been confirmed. Cocktails begin at 7:00 PM and dinner starts at 7:30 PM.',
   },
   hero: {
     title: "You're confirmed",
     description:
-      "We'll see you at Flour + Water in San Francisco on October 1, 2026. Cocktails begin at 7:00 PM and dinner starts at 7:30 PM. We look forward to seeing you.",
+      "We'll see you at Penny Roma in San Francisco on October 1, 2026. Cocktails begin at 7:00 PM and dinner starts at 7:30 PM. We look forward to seeing you.",
   },
   sections: [
     {

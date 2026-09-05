@@ -95,6 +95,7 @@ const GuideTemplate = ({
           <article
             // Used to get headings for the table of contents
             id="sb-docs-guide-main-article"
+            data-testid="sb-docs-guide-main-article"
             className="prose max-w-none"
           >
             <header className="mb-8">
@@ -142,10 +143,9 @@ const GuideTemplate = ({
             'sticky',
             /**
              * --header-height: height of nav
-             * 1px: height of nav border
              * 3rem: content padding
              */
-            'top-[calc(var(--header-height)+1px+3rem)]',
+            'top-[calc(var(--header-height)+3rem)]',
             // 4rem accounts for 3rem of top padding + 1rem of extra breathing room
             'max-h-[calc(100vh-var(--header-height)-4rem)]'
           )}
