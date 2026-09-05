@@ -25,7 +25,7 @@ The traditional challenge with multiple SAML apps is domain conflicts. With SP-i
 
 Configure each environment as IdP-initiated only (no domains). Users access each environment through different app tiles in your identity provider.
 
-For technical details, see [the Understanding SSO Login Flows guide](/docs/guides/platform/sso/login-flows#multiple-saml-apps-per-domain).
+For technical details, see [the Understanding SSO Sign-in Flows guide](/docs/guides/platform/sso/login-flows#multiple-saml-apps-per-domain).
 
 </Admonition>
 
@@ -122,7 +122,7 @@ Assign appropriate users to each app. Users only see the tiles they're assigned 
 Configure both organizations with SP-initiated enabled using the same domain:
 
 - Both organizations add `company.com` as a domain
-- Users can log in via SP-initiated at supabase.com
+- Users can sign in via SP-initiated at supabase.com
 - System routes based on org membership (first match wins)
 - Also provide IDP tiles for explicit routing
 
@@ -190,7 +190,7 @@ All authenticate through the same central IDP but use different email domains.
 1. Enable SSO with SP-initiated flow
 2. Add all domains: `parent.com`, `subsidiary1.com`, `subsidiary2.com`
 3. Configure single IDP metadata
-4. Users with any matching domain can log in via supabase.com
+4. Users with any matching domain can sign in via supabase.com
 
 #### Option B: Separate providers per subsidiary (IDP-initiated)
 
@@ -542,5 +542,5 @@ If you currently have a single SSO provider and need to add more:
 
 - **Configure your IDP:** Follow your [provider-specific guide](/docs/guides/platform/sso#supported-providers)
 - **Test thoroughly:** Review [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices)
-- **Understand login flows:** Read [Understanding SSO Login Flows](/docs/guides/platform/sso/login-flows)
-- **Choose the right flow:** See [Choosing the Right Login Flow](/docs/guides/platform/sso/choosing-login-flow)
+- **Understand sign-in flows:** Read [Understanding SSO Sign-in Flows](/docs/guides/platform/sso/login-flows)
+- **Choose the right flow:** See [Choosing the Right Sign-in Flow](/docs/guides/platform/sso/choosing-login-flow)
