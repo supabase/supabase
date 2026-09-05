@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as RedeemRouteImport } from './routes/redeem'
+import { Route as Mcp_callbackRouteImport } from './routes/mcp_callback'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as LogoutRouteImport } from './routes/logout'
 import { Route as JoinRouteImport } from './routes/join'
@@ -337,6 +338,11 @@ const VerifyEmailRoute = VerifyEmailRouteImport.update({
 const RedeemRoute = RedeemRouteImport.update({
   id: '/redeem',
   path: '/redeem',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Mcp_callbackRoute = Mcp_callbackRouteImport.update({
+  id: '/mcp_callback',
+  path: '/mcp_callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MaintenanceRoute = MaintenanceRouteImport.update({
@@ -2122,6 +2128,7 @@ export interface FileRoutesByFullPath {
   '/join': typeof JoinRoute
   '/logout': typeof LogoutRoute
   '/maintenance': typeof MaintenanceRoute
+  '/mcp_callback': typeof Mcp_callbackRoute
   '/redeem': typeof RedeemRoute
   '/verify-email': typeof VerifyEmailRoute
   '/account': typeof AppAccountRouteWithChildren
@@ -2441,6 +2448,7 @@ export interface FileRoutesByTo {
   '/join': typeof JoinRoute
   '/logout': typeof LogoutRoute
   '/maintenance': typeof MaintenanceRoute
+  '/mcp_callback': typeof Mcp_callbackRoute
   '/redeem': typeof RedeemRoute
   '/verify-email': typeof VerifyEmailRoute
   '/account': typeof AppAccountRouteWithChildren
@@ -2749,6 +2757,7 @@ export interface FileRoutesById {
   '/join': typeof JoinRoute
   '/logout': typeof LogoutRoute
   '/maintenance': typeof MaintenanceRoute
+  '/mcp_callback': typeof Mcp_callbackRoute
   '/redeem': typeof RedeemRoute
   '/verify-email': typeof VerifyEmailRoute
   '/_app/account': typeof AppAccountRouteWithChildren
@@ -3070,6 +3079,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/logout'
     | '/maintenance'
+    | '/mcp_callback'
     | '/redeem'
     | '/verify-email'
     | '/account'
@@ -3389,6 +3399,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/logout'
     | '/maintenance'
+    | '/mcp_callback'
     | '/redeem'
     | '/verify-email'
     | '/account'
@@ -3696,6 +3707,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/logout'
     | '/maintenance'
+    | '/mcp_callback'
     | '/redeem'
     | '/verify-email'
     | '/_app/account'
@@ -4018,6 +4030,7 @@ export interface RootRouteChildren {
   JoinRoute: typeof JoinRoute
   LogoutRoute: typeof LogoutRoute
   MaintenanceRoute: typeof MaintenanceRoute
+  Mcp_callbackRoute: typeof Mcp_callbackRoute
   RedeemRoute: typeof RedeemRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   ApiCheckCnameRoute: typeof ApiCheckCnameRoute
@@ -4145,6 +4158,13 @@ declare module '@tanstack/react-router' {
       path: '/redeem'
       fullPath: '/redeem'
       preLoaderRoute: typeof RedeemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp_callback': {
+      id: '/mcp_callback'
+      path: '/mcp_callback'
+      fullPath: '/mcp_callback'
+      preLoaderRoute: typeof Mcp_callbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/maintenance': {
@@ -7099,6 +7119,7 @@ const rootRouteChildren: RootRouteChildren = {
   JoinRoute: JoinRoute,
   LogoutRoute: LogoutRoute,
   MaintenanceRoute: MaintenanceRoute,
+  Mcp_callbackRoute: Mcp_callbackRoute,
   RedeemRoute: RedeemRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   ApiCheckCnameRoute: ApiCheckCnameRoute,

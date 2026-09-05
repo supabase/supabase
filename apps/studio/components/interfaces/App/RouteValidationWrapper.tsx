@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { toast } from 'sonner'
 
+import { MCP_ELICITATION_ROUTE } from '@/components/interfaces/McpElicitation/McpElicitation.constants'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
@@ -38,6 +39,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     // this is used by database.dev, usually as /new/new-project
     '/new/[slug]',
     '/join',
+    MCP_ELICITATION_ROUTE,
   ]
 
   /**
