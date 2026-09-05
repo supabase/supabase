@@ -518,10 +518,10 @@ Reference material for choosing a column type.
 
 Postgres offers several near-equivalent types for the same job. These defaults are safe:
 
-- **Timestamps:** prefer `timestamptz` over `timestamp`. `timestamptz` records the instant and renders it in the client's time zone. `timestamp` drops the offset, so the same stored value means different moments to clients in different zones.
+- **Timestamps:** prefer `timestamptz` over `timestamp`. `timestamptz` records the instant and renders it in the session's time zone. `timestamp` drops the offset, so the same stored value means different moments to clients in different zones.
 - **Text:** prefer `text` over `varchar(n)`. Postgres stores the two identically, and `text` has no declared limit to migrate later. Add a check constraint when you need to bound the length.
-- **Money and other exact decimals:** prefer `numeric` over `real`, `double precision`, or `money`. Floating-point types can't represent values such as `0.10` exactly, so totals drift as they accumulate.
-- **Identifiers:** prefer `bigint` over `integer`. An `integer` primary key runs out at 2,147,483,647 rows.
+- **Money and other exact decimals:** prefer `numeric`. `real` and `double precision` can't represent values such as `0.10` exactly, so totals drift as they accumulate. `money` is exact, but its fractional precision and formatting follow the server's `lc_monetary` setting, so the same value reads differently on another server.
+- **Identifiers:** prefer `bigint` over `integer`. An `integer` tops out at 2,147,483,647, and an identity column doesn't reuse the values it skips, so a table reaches that ceiling before it holds that many rows.
 
 ### Data types
 
