@@ -185,9 +185,11 @@ Revoke automatic grants when you want new objects in `public` to remain inaccess
    alter default privileges for role postgres in schema public
      revoke usage, select on sequences from anon, authenticated, service_role;
 
-   alter default privileges for role postgres in schema public
+   alter default privileges for role postgres
      revoke execute on functions from public;
    ```
+
+The last statement leaves out `in schema public` on purpose. Postgres merges a schema-scoped default privilege with its built-in default instead of replacing it. Such an entry can undo a matching schema-scoped grant, which is what the first three statements do, but it never reaches the `EXECUTE` that Postgres grants to `PUBLIC`. Only the schema-less form replaces that default. It covers every function `postgres` creates, in any schema, so an extension you enable after this step needs an explicit `grant execute` before `anon` or `authenticated` can call its functions.
 
 New tables, functions, and sequences now require explicit grants before Data API roles can access them.
 
