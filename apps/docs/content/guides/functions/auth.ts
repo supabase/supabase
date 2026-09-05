@@ -5,7 +5,7 @@ description: 'Authentication patterns for Supabase Edge Functions.'
 subtitle: 'Authentication patterns for Edge Functions'
 ---
 
-The `withSupabase` wrapper from [`@supabase/server`](https://github.com/supabase/server) verifies the caller's credentials against a declared `auth` mode and hands you a pre-configured Supabase client on `ctx`. The sections below show how to use it for each common auth scenario.
+The "withSupabase' wrapper from [`@supabase/server`](https://github.com/supabase/server) verifies the caller's credentials against a declared `auth` mode and hands you a pre-configured Supabase client on `ctx`. The sections below show how to use it for each common auth scenario.
 
 For how authorization headers and the `verify_jwt` platform check work under the hood, see [Authorization headers](/docs/guides/functions/auth-headers).
 
@@ -93,27 +93,14 @@ import Stripe from 'npm:stripe'
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!)
 
-// Deno has no synchronous Node crypto, so signature verification must go through
-// Stripe's SubtleCryptoProvider. The synchronous `constructEvent()` throws
-// "SubtleCryptoProvider cannot be used in a synchronous context" on this runtime.
-const cryptoProvider = Stripe.createSubtleCryptoProvider()
-
 export default {
   fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
     const signature = req.headers.get('stripe-signature') ?? ''
     const body = await req.text()
 
     try {
-      await stripe.webhooks.constructEventAsync(
-        body,
-        signature,
-        Deno.env.get('STRIPE_WEBHOOK_SECRET')!,
-        undefined,
-        cryptoProvider
-      )
-    } catch (err) {
-      // Log the reason so a configuration error isn't mistaken for a forged payload.
-      console.error('Stripe signature verification failed:', err)
+      stripe.webhooks.constructEvent(body, signature, Deno.env.get('STRIPE_WEBHOOK_SECRET')!)
+    } catch {
       return new Response('bad signature', { status: 400 })
     }
 
