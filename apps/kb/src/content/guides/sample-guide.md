@@ -1,7 +1,7 @@
 ---
 title: 'Markdown elements sample'
 description: 'A lorem ipsum sample guide exercising every base Markdown element supported by the guide layout.'
-topics: ['example', 'markdown']
+topics: ['Tutorial', 'Database']
 github_url: 'https://github.com/supabase/supabase/discussions/0000000'
 ---
 
