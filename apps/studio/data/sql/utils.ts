@@ -178,6 +178,9 @@ export function extractMainStatement(sql: string): string {
   let hasClosedCte = false
   const len = sql.length
 
+  const asRe = /\bas\b/iy
+  const matRe = /\s*(?:not\s+)?materialized\s*/iy
+
   while (i < len) {
     const ch = sql[i]
 
@@ -190,11 +193,12 @@ export function extractMainStatement(sql: string): string {
         hasClosedCte = true
       }
     } else if (depth === 0) {
-      if (/^\bas\b/i.test(sql.slice(i))) {
+      asRe.lastIndex = i
+      if (asRe.test(sql)) {
         i += 2
         // Skip whitespace and optional [NOT] MATERIALIZED
-        const rest = sql.slice(i)
-        const matMatch = rest.match(/^\s*(?:not\s+)?materialized\s*/i)
+        matRe.lastIndex = i
+        const matMatch = matRe.exec(sql)
         if (matMatch) {
           i += matMatch[0].length
         }
@@ -226,6 +230,7 @@ export function extractMainStatement(sql: string): string {
 export function hasTopLevelReturning(sql: string): boolean {
   let depth = 0
   const len = sql.length
+  const returningRe = /returning\b/iy
 
   for (let i = 0; i < len; i++) {
     const ch = sql[i]
@@ -236,8 +241,11 @@ export function hasTopLevelReturning(sql: string): boolean {
     } else if (depth === 0) {
       // Must have a valid left token boundary to prevent matching identifiers like "nonreturning"
       const hasLeftBoundary = i === 0 || !/[a-zA-Z0-9_]/.test(sql[i - 1])
-      if (hasLeftBoundary && /^returning\b/i.test(sql.slice(i))) {
-        return true
+      if (hasLeftBoundary) {
+        returningRe.lastIndex = i
+        if (returningRe.test(sql)) {
+          return true
+        }
       }
     }
   }

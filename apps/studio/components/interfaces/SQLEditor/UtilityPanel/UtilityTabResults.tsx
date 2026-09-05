@@ -60,15 +60,19 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
 
     const isNetWorkError = result?.error?.message?.includes('EHOSTUNREACH')
 
+    const successMessage = isNonReturningDml(sql)
+      ? 'Success. Query ran successfully.'
+      : 'Success. No rows returned'
+
     const statusMessage = isExecuting
       ? 'Running query...'
       : result?.error
         ? `Error: ${result.error.message}`
         : result && result.rows.length <= 0
-          ? isNonReturningDml(sql)
-            ? 'Success. Query ran successfully.'
-            : 'Success. No rows returned'
-          : ''
+          ? successMessage
+          : result
+            ? `Success. ${result.rows.length} row${result.rows.length === 1 ? '' : 's'} returned`
+            : ''
 
     const renderContent = () => {
       if (isExecuting) {
@@ -206,11 +210,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
       } else if (result.rows.length <= 0) {
         return (
           <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
-            <p className="m-0 border-0 px-6 py-4 font-mono text-sm">
-              {isNonReturningDml(sql)
-                ? 'Success. Query ran successfully.'
-                : 'Success. No rows returned'}
-            </p>
+            <p className="m-0 border-0 px-6 py-4 font-mono text-sm">{successMessage}</p>
           </div>
         )
       }
