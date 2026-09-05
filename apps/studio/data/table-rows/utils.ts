@@ -17,6 +17,12 @@ export function formatFilterValue(
 ) {
   const column = table.columns.find((x) => x.name == filter.column)
   if (column && isNumericalColumn(column.format)) {
+    // Keep blanks as blanks. Number('') === 0 would otherwise turn an empty
+    // filter into a real `= 0` after the count path stops treating 0 as absent.
+    if (filter.value === '' || filter.value === null || filter.value === undefined) {
+      return filter.value
+    }
+
     const numberValue = Number(filter.value)
     if (Number.isNaN(numberValue) || Math.abs(numberValue) > Number.MAX_SAFE_INTEGER)
       return filter.value
