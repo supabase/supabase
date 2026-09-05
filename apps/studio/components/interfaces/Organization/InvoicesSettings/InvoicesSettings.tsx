@@ -35,6 +35,16 @@ import { Organization } from '@/types/base'
 
 const PAGE_LIMIT = 5
 
+const openPdfUrl = (url: string, previewWindow: Window | null) => {
+  if (previewWindow && !previewWindow.closed) {
+    previewWindow.location.href = url
+    return
+  }
+
+  // Fallback if the browser blocked the initial window.open
+  window.location.assign(url)
+}
+
 const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
   if (selectedOrganization.managed_by === MANAGED_BY.VERCEL_MARKETPLACE) {
     return {
@@ -88,10 +98,26 @@ export const InvoicesSettings = () => {
   }, [slug])
 
   const fetchInvoice = async (id: string) => {
+    // Open synchronously so the tab is tied to the click gesture.
+    // Calling window.open after `await` is treated as a popup and often
+    // results in a blank tab (see #49885).
+    const previewWindow = window.open('about:blank', '_blank')
+
     try {
       const invoice = await getInvoice({ invoiceId: id, slug })
-      if (invoice?.invoice_pdf) window.open(invoice.invoice_pdf, '_blank')
+      const pdfUrl =
+        invoice?.invoice_pdf ||
+        (invoice as { hosted_invoice_url?: string } | undefined)?.hosted_invoice_url
+
+      if (pdfUrl) {
+        openPdfUrl(pdfUrl, previewWindow)
+        return
+      }
+
+      previewWindow?.close()
+      toast.error('Invoice PDF is not available yet. Try again in a moment.')
     } catch (error: any) {
+      previewWindow?.close()
       toast.error(`Failed to fetch the selected invoice: ${error.message}`)
     }
   }
@@ -99,10 +125,19 @@ export const InvoicesSettings = () => {
   const fetchReceipt = async (invoiceId: string) => {
     if (!slug) return
 
+    const previewWindow = window.open('about:blank', '_blank')
+
     try {
       const receipt = await getInvoiceReceipt({ invoiceId, slug })
-      if (receipt?.receipt_pdf) window.open(receipt.receipt_pdf, '_blank')
+      if (receipt?.receipt_pdf) {
+        openPdfUrl(receipt.receipt_pdf, previewWindow)
+        return
+      }
+
+      previewWindow?.close()
+      toast.error('Receipt PDF is not available yet. Try again in a moment.')
     } catch (error: any) {
+      previewWindow?.close()
       toast.error(`Failed to fetch receipt: ${error.message}`)
     }
   }
