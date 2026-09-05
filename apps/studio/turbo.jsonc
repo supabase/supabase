@@ -33,12 +33,10 @@
         "SUPABASE_URL",
         "VERCEL",
         "VERCEL_ENV",
-        // Read by Nitro's vercel preset at build time (skew cookie, immutable
-        // asset path); a build must never be reused across deploys.
-        "VERCEL_DEPLOYMENT_ID",
+        // Project-level Vercel settings Nitro's vercel preset reads at build
+        // time; they change the emitted routes and asset paths.
         "VERCEL_SKEW_PROTECTION_ENABLED",
         "VERCEL_IMMUTABLE_STATIC_FILES_ENABLED",
-        "VERCEL_HASH_SALT",
         "MAINTENANCE_MODE",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
@@ -127,6 +125,13 @@
         "SSR",
       ],
       "passThroughEnv": [
+        // Deployment-specific values Nitro's vercel preset bakes into the skew
+        // cookie route and immutable asset path. Passed through rather than
+        // hashed so Next's same-commit redeploys keep hitting the turbo cache
+        // as before; a TanStack cache hit reuses the earlier deployment's
+        // cookie id, which is the same code and falls back to latest if gone.
+        "VERCEL_DEPLOYMENT_ID",
+        "VERCEL_HASH_SALT",
         "CURRENT_CLI_VERSION",
         "VERCEL_GIT_COMMIT_REF",
         "VERCEL_GIT_COMMIT_SHA",
