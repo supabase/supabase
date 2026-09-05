@@ -209,14 +209,16 @@ const FormField = ({
                   }
                 >
                   <FormControl className="col-span-6">
-                    <Textarea
-                      {...field}
-                      id={name}
-                      rows={4}
-                      placeholder="Enter multi-line text"
-                      className="resize-none"
-                      readOnly={readOnly}
-                    />
+                   <Textarea
+                    {...field}
+                    id={name}
+                    rows={4}
+                    placeholder="Enter multi-line text"
+                    className="resize-none font-mono text-sm"
+                    readOnly={readOnly}
+                    value={field.value ? field.value.replace(/\\n/g, '\n') : ''}
+                    onChange={(e) => field.onChange(e.target.value.replace(/\n/g, '\\n'))}
+                  />
                   </FormControl>
                 </FormItemLayout>
               )}
