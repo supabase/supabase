@@ -19,6 +19,23 @@ To make docs as clear as possible:
 - Avoid using idioms and colloquialisms, such as `piece of cake`. These phrases are often specific to a region or culture.
 - Refer to the reader as `you`. Don't use `we` to refer to the reader. Use `we` only to refer to the Supabase team.
 
+## AI agent skills for docs authoring
+
+If you're using an AI coding agent (Claude Code, Codex, or anything else that reads `.agents/skills/`), this repo ships skills that back the [Write the docs](../../.agents/skills/pm-the-docs/reference/write-the-docs-checklist.md) authoring checklist.
+
+Ask your agent for a skill by name (`pm-the-docs`, `ask-the-docs`, `write-the-docs`, `edit-the-docs`, `test-the-docs`, `review-the-docs`); in Claude Code these are also available as `/name` slash commands.
+
+| Skill | Checklist stage | Use for |
+| --- | --- | --- |
+| [`pm-the-docs`](../../.agents/skills/pm-the-docs/SKILL.md) | Frame / Shape | Audience, product-stage, and cross-cutting scope calls (universe when you have Supabase org access, else OSS path) |
+| [`ask-the-docs`](../../.agents/skills/ask-the-docs/SKILL.md) | Frame / Shape | `apps/docs` architecture, IA placement, and where content lives |
+| [`write-the-docs`](../../.agents/skills/write-the-docs/SKILL.md) | Draft | Drafting net-new content grounded in the code |
+| [`edit-the-docs`](../../.agents/skills/edit-the-docs/SKILL.md) | Edit | Restructure and improve existing pages |
+| [`test-the-docs`](../../.agents/skills/test-the-docs/SKILL.md) | Draft / Self-review | Execute docs snippets in a Docker-isolated local stack; verification report |
+| [`review-the-docs`](../../.agents/skills/review-the-docs/SKILL.md) | Self-review / PR review | Checking a draft and PR triage/verification |
+
+The canonical files live in `.agents/skills/`; `.claude/skills` is a Git symlink to that directory so Claude Code discovers them too.
+
 ## Document types
 
 Supabase docs contain 4 types of documents. Before you start writing, think about what type of doc you need.
@@ -193,8 +210,18 @@ Choose the appropriate `type` for your admonition:
 - `caution`: Warn about behavior that could cause bugs, failed operations, unexpected results, or serious inconvenience but doesn't rise to the severity of `danger`.
 - `note`: Highlight an important prerequisite, constraint, clarification, or optional shortcut that doesn't represent a risk. If the information is essential to completing a step, include it in the procedure instead.
 
-```
-<Admonition type="note" title="Optional title">
+Structure an admonition with these props and content:
+
+- `title` (optional): Add a short callout title. Don't put Markdown or HTML headings inside an admonition. If the content needs a heading to structure the page, move the heading and its section outside the admonition.
+- `children`: Add rich body content such as paragraphs, lists, links, and code.
+- `actions` (optional): Add standalone calls to action so they remain separate from the body content. Keep contextual links and interactive examples in the body when they are part of the explanation.
+
+```mdx
+<Admonition
+  type="note"
+  title="Optional title"
+  actions={<Button>Continue</Button>}
+>
 
 Your content here
 

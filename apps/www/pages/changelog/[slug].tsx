@@ -5,6 +5,7 @@ import { NextSeo } from 'next-seo'
 import Head from 'next/head'
 import Link from 'next/link'
 
+import { CHANGELOG_PAGES } from '@/app/api-v2/md/content.generated'
 import { ChangelogDetailSidebar } from '@/components/Changelog/ChangelogDetailSidebar'
 import { ChangelogInlineMarkdown } from '@/components/Changelog/ChangelogInlineMarkdown'
 import CTABanner from '@/components/CTABanner'
@@ -20,15 +21,25 @@ type PageProps = {
   slug: string
   frontmatter: ChangelogEntryFrontmatter
   source: MDXRemoteSerializeResult
+  hasMarkdownVariant: boolean
 }
 
-const ChangelogDetailPage = ({ title, created_at, slug, frontmatter, source }: PageProps) => {
+const ChangelogDetailPage = ({
+  title,
+  created_at,
+  slug,
+  frontmatter,
+  source,
+  hasMarkdownVariant,
+}: PageProps) => {
   const plainTitle = stripTitleMarkdown(title)
   return (
     <>
-      <Head>
-        <link rel="alternate" type="text/markdown" href={`/changelog/${slug}.md`} />
-      </Head>
+      {hasMarkdownVariant && (
+        <Head>
+          <link rel="alternate" type="text/markdown" href={`/changelog/${slug}.md`} />
+        </Head>
+      )}
       <NextSeo
         title={`${plainTitle} · Changelog`}
         description={plainTitle}
@@ -106,6 +117,7 @@ export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
       slug: entry.slug,
       frontmatter: entry.frontmatter,
       source,
+      hasMarkdownVariant: CHANGELOG_PAGES.has(`changelog/${entry.slug}`),
     },
     revalidate: 900,
   }

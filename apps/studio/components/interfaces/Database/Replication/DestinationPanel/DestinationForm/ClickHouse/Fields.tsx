@@ -19,10 +19,10 @@ import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 
 export const ClickHouseFields = ({
   form,
-  hasStoredPassword,
+  editMode,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
-  hasStoredPassword: boolean
+  editMode: boolean
 }) => {
   const [showPassword, setShowPassword] = useState(false)
 
@@ -75,7 +75,7 @@ export const ClickHouseFields = ({
               layout="horizontal"
               label="Password"
               description={
-                hasStoredPassword
+                editMode
                   ? 'Stored password is hidden. Enter a new password to replace it.'
                   : 'Omit for passwordless access'
               }
@@ -84,7 +84,7 @@ export const ClickHouseFields = ({
                 <PasswordInput
                   value={field.value ?? ''}
                   type={showPassword ? 'text' : 'password'}
-                  placeholder={hasStoredPassword ? STORED_SECRET_PLACEHOLDER : 'Optional'}
+                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : 'Optional'}
                   onChange={(event) => field.onChange(event.target.value)}
                   actions={
                     <div className="flex items-center justify-center">

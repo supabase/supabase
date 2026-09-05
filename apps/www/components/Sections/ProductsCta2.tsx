@@ -5,6 +5,8 @@ import Link from 'next/link'
 import React from 'react'
 import { Button, cn } from 'ui'
 
+import { StartYourProjectButton } from '@/components/StartYourProjectButton'
+
 export type Products = PRODUCT_SHORTNAMES
 
 interface Props {
@@ -26,9 +28,9 @@ function ProductsCta(props: Props) {
       <div className="flex flex-col col-span-1 text-center xl:text-left xl:justify-center items-center xl:items-start">
         <h2 className="h2 w-max">Ready to start building?</h2>
         <div className="flex gap-2 py-2">
-          <Button asChild variant="primary" size="small" className="h-full">
-            <Link href="https://supabase.com/dashboard">Start for free</Link>
-          </Button>
+          <StartYourProjectButton size="small" className="h-full" variant="primary">
+            Start for free
+          </StartYourProjectButton>
           <Button asChild variant="default" size="small">
             <Link href="https://forms.supabase.com/enterprise">Contact Enterprise</Link>
           </Button>

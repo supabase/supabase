@@ -2,7 +2,7 @@ import { SHORTCUT_REFERENCE_GROUPS } from '../referenceGroups'
 import { RegistryDefinations } from '../types'
 
 /**
- * Shortcuts scoped to the Security and Performance Advisor pages — tab digit
+ * Shortcuts scoped to the Health, Security, and Performance Advisor pages — tab digit
  * shortcuts, refresh, and detail panel close. The tab digits mirror the
  * functions-detail-nav pattern (`ignoreInputs: true` so they don't fire from
  * inputs), and `Escape` follows the auth-users close-panel pattern with
