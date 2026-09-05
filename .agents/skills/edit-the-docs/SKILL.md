@@ -64,7 +64,29 @@ Inline changes only. Nothing in this PR moves a line from one place to another.
 
 Apply the **Mixed information types**, **Navigation**, and **Cross-references and glue** guidance in the Guides section of [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md), summarized here:
 
-1. Classify substantial sections as contextual, procedural, or reference content. In a mixed page, group sections by information type so that context doesn't interrupt the procedural path.
+1. Classify substantial sections as contextual, procedural, or reference content, then give each class its own top-level group. Order them procedures, context, reference, so the action path runs uninterrupted and the background sits after it.
+
+   A guide about database tables came out like this:
+
+   ```
+   ## What is a table?                    <- short conceptual opener
+   ## Creating and managing tables        <- procedures
+   ### Creating tables
+   ### Securing your tables
+   ### Loading data
+   ### Joining tables with foreign keys
+   ## How tables are organized            <- context
+   ### Primary keys
+   ### Relationships between tables
+   ### Schemas
+   ## Reference
+   ### Data types
+   ```
+
+   **A section that mixes two classes gets split, not filed under one of them.** "Joining tables with foreign keys" held both the idea of a relational database and the steps to build a join table. The steps kept the heading and stayed in the procedures group; the idea moved to "Relationships between tables" in the context group. The two cross-reference each other. Splitting is what keeps the group honest, and one cross-reference is cheaper than a reader hunting for the half they need.
+
+   **Keep the heading text of the half that stays.** Renaming is what breaks anchors; moving and re-leveling don't.
+
 2. Put sections covering the same topic under a shared heading.
 3. For a long or mixed page, add a short introduction that links to its major section groups and tells readers when to use each one. Skip this navigation when a short page is already easy to scan.
 4. Connect contextual sections to their corresponding procedures when useful. Add introductions to section groups, transitions between information types, and outcomes after procedures. Don't link every adjacent section.
