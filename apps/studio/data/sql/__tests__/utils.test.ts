@@ -481,6 +481,20 @@ update users set deleted = true where id = 1`)
       expect(isNonReturningDml('insert_audit_log()')).toBe(false)
       expect(isNonReturningDml('delete_old_records()')).toBe(false)
     })
+
+    it('does not treat an identifier suffix like nonreturning as a RETURNING clause', () => {
+      expect(isNonReturningDml('UPDATE jobs SET nonreturning = true')).toBe(true)
+    })
+
+    it('treats backslashes as literal in standard-conforming ordinary strings', () => {
+      expect(isNonReturningDml("UPDATE files SET path = 'C:\\' RETURNING id")).toBe(false)
+      expect(isNonReturningDml("UPDATE files SET path = 'C:\\'")).toBe(true)
+    })
+
+    it('handles escaped quotes in E-prefixed escape strings', () => {
+      expect(isNonReturningDml("UPDATE t SET x = E'a\\'b' RETURNING id")).toBe(false)
+      expect(isNonReturningDml("UPDATE t SET x = E'a\\'b'")).toBe(true)
+    })
   })
 
   describe('returns false for non-DML statements', () => {

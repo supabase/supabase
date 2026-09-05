@@ -27,6 +27,12 @@ export type UtilityTabResultsProps = {
   isDebugging?: boolean
 } & React.HTMLAttributes<HTMLDivElement>
 
+/**
+ * Renders the Results tab in the SQL Editor Utility Panel.
+ *
+ * Displays query execution states (running, error, empty/successful DML,
+ * and table results grid) with an accessible live region for screen readers.
+ */
 export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
   (
     { id, isExecuting, isDisabled, isDebugging, onDebug, buildDebugPrompt, className, ...props },

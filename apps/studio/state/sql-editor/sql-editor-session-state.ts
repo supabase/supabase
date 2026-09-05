@@ -44,6 +44,14 @@ export const sqlEditorSessionState = proxy({
     sqlEditorSessionState.logRange[id] = range
   },
 
+  /**
+   * Stores successful execution results for a SQL snippet.
+   *
+   * @param id - The snippet identifier
+   * @param results - Array of result row objects
+   * @param autoLimit - Optional auto-limit applied to the query
+   * @param sql - Optional executed SQL string
+   */
   addResult: (id: string, results: any[], autoLimit?: number, sql?: string) => {
     // Use ref() to prevent Valtio from creating proxies for each row object.
     // This is critical for large result sets - without ref(), Valtio wraps every
@@ -53,10 +61,23 @@ export const sqlEditorSessionState = proxy({
     sqlEditorSessionState.results[id] = [{ rows: ref(results), autoLimit, sql }]
   },
 
+  /**
+   * Stores execution error state for a SQL snippet.
+   *
+   * @param id - The snippet identifier
+   * @param error - The execution error object
+   * @param autoLimit - Optional auto-limit applied to the query
+   * @param sql - Optional executed SQL string
+   */
   addResultError: (id: string, error: any, autoLimit?: number, sql?: string) => {
     sqlEditorSessionState.results[id] = [{ rows: ref([]), error, autoLimit, sql }]
   },
 
+  /**
+   * Clears the current results for a SQL snippet.
+   *
+   * @param id - The snippet identifier
+   */
   resetResult: (id: string) => {
     sqlEditorSessionState.results[id] = []
   },

@@ -101,9 +101,20 @@ export function stripSqlCommentsAndLiterals(sql: string): string {
       }
     }
 
-    // Single-quoted string literal: '...' (supports '' escape and \' escape)
-    if (sql[i] === "'") {
-      i++
+    // String literal: ordinary '...' (standard conforming: '' escape only)
+    // or E-prefixed escape string E'...' / e'...' (supports \' and \\ escapes)
+    const isEscapeStringPrefix =
+      (sql[i] === 'E' || sql[i] === 'e') &&
+      sql[i + 1] === "'" &&
+      (i === 0 || !/[a-zA-Z0-9_]/.test(sql[i - 1]))
+
+    if (isEscapeStringPrefix || sql[i] === "'") {
+      const isEscapeString = isEscapeStringPrefix
+      if (isEscapeString) {
+        i++ // advance past 'E' / 'e'
+      }
+      i++ // advance past opening quote "'"
+
       while (i < len) {
         if (sql[i] === "'") {
           if (sql[i + 1] === "'") {
@@ -112,7 +123,7 @@ export function stripSqlCommentsAndLiterals(sql: string): string {
             i++
             break
           }
-        } else if (sql[i] === '\\') {
+        } else if (isEscapeString && sql[i] === '\\') {
           i += 2
         } else {
           i++
@@ -223,7 +234,9 @@ export function hasTopLevelReturning(sql: string): boolean {
     } else if (ch === ')') {
       depth--
     } else if (depth === 0) {
-      if (/^returning\b/i.test(sql.slice(i))) {
+      // Must have a valid left token boundary to prevent matching identifiers like "nonreturning"
+      const hasLeftBoundary = i === 0 || !/[a-zA-Z0-9_]/.test(sql[i - 1])
+      if (hasLeftBoundary && /^returning\b/i.test(sql.slice(i))) {
         return true
       }
     }
