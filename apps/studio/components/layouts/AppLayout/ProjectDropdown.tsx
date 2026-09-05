@@ -11,6 +11,7 @@ import { AppLayoutDropdownTriggerButton } from './AppLayoutDropdown'
 import { sanitizeRoute } from './ProjectDropdown.utils'
 import { ProjectRowLink } from './ProjectRowLink'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
+import { usePreviewNavManagedBy } from '@/components/interfaces/Settings/Integrations/AWSPrivateLink/preview'
 import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
 import PartnerIcon from '@/components/ui/PartnerIcon'
@@ -142,11 +143,13 @@ export const ProjectDropdown = ({
 
   const [open, setOpen] = useState(false)
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
-  const selectedProjectManagedBy = selectedProject?.integration_source
-    ? getManagedByFromOrganizationPartner(undefined, selectedProject.integration_source)
-    : selectedOrganization?.billing_partner
-      ? selectedOrganization.managed_by
-      : undefined
+  const selectedProjectManagedBy = usePreviewNavManagedBy(
+    selectedProject?.integration_source
+      ? getManagedByFromOrganizationPartner(undefined, selectedProject.integration_source)
+      : selectedOrganization?.billing_partner
+        ? selectedOrganization.managed_by
+        : undefined
+  )
 
   if (isLoadingProject || (isBranch && isLoadingParentProject) || !selectedProject) {
     if (!embedded) return <ShimmeringLoader className="p-2 md:mr-2 md:w-[90px]" />

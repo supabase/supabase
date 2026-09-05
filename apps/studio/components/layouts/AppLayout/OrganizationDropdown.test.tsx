@@ -29,6 +29,10 @@ vi.mock('@/components/ui/PartnerIcon', () => ({
     organization.managed_by === MANAGED_BY.SUPABASE ? null : <div data-testid="partner-icon" />,
 }))
 
+vi.mock('@/components/interfaces/Settings/Integrations/AWSPrivateLink/preview', () => ({
+  usePreviewNavManagedBy: (managedBy: string | undefined) => managedBy,
+}))
+
 describe('OrganizationDropdown', () => {
   beforeEach(() => {
     vi.clearAllMocks()

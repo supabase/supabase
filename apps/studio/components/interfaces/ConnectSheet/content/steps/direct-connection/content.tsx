@@ -1,7 +1,9 @@
 import { Check, KeyRound } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { cn } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { Input as CopyableInput } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -28,6 +30,10 @@ import {
 import { PasswordEncodingNote } from '@/components/interfaces/ConnectSheet/PasswordEncodingNote'
 import { useConnectionStringDatabases } from '@/components/interfaces/ConnectSheet/useConnectionStringDatabases'
 import { ResetDbPasswordDialog } from '@/components/interfaces/Settings/Database/DatabaseSettings/ResetDbPasswordDialog'
+import {
+  PRIVATE_LINK_PREVIEW_HOSTNAME,
+  usePrivateLinkPreview,
+} from '@/components/interfaces/Settings/Integrations/AWSPrivateLink/preview'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
@@ -51,6 +57,7 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
   const track = useTrack()
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
   const isHighAvailability = useIsHighAvailability()
+  const { showPrivateHostname } = usePrivateLinkPreview()
   const [temporaryDatabasePassword, setTemporaryDatabasePassword] = useState('')
 
   const connectionSource = state.connectionSource
@@ -147,6 +154,15 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
 
   return (
     <div className="flex flex-col gap-3">
+      {showPrivateHostname && (
+        <Admonition
+          type="note"
+          title="Private hostname"
+          description="Use this hostname on the PrivateLink path. Vercel may inject it for you; this is the Studio-owned variant."
+        >
+          <CopyableInput readOnly copy value={PRIVATE_LINK_PREVIEW_HOSTNAME} />
+        </Admonition>
+      )}
       <div className="overflow-hidden rounded-lg border bg-surface-75">
         {showStringTitleRow && (
           <div className="flex items-center justify-between gap-2 border-b bg-surface-100 py-2 pl-4 pr-2">
