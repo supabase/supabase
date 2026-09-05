@@ -29,7 +29,7 @@
         ".next/**",
         "!.next/cache/**",
         "!.next/dev/**/*",
-        ".contentlayer/**",
+        ".velite/**",
         "public/markdown/**",
       ],
     },

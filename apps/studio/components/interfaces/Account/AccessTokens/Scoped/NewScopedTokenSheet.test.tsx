@@ -235,8 +235,17 @@ describe('NewScopedTokenSheet', () => {
     await waitFor(async () =>
       expect(await window.navigator.clipboard.readText()).toEqual('a_token_value')
     )
+    expect(mockTrack).toHaveBeenCalledWith('access_token_copied', { tokenType: 'scoped' })
     fireEvent.click(await screen.findByLabelText('I have copied the key and stored it securely'))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_stored_checkbox_clicked', {
+      tokenType: 'scoped',
+      isChecked: true,
+    })
     fireEvent.click(await screen.findByRole('button', { name: 'Done' }))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_done_button_clicked', {
+      tokenType: 'scoped',
+      hasCopiedToken: true,
+    })
     // Dialog has been closed
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   }, 10_000)
@@ -451,8 +460,13 @@ describe('NewScopedTokenSheet', () => {
       expiryPreset: '7d',
       resourceAccess: 'account',
     })
+    expect(mockTrack).toHaveBeenCalledWith('access_token_copied', { tokenType: 'classic' })
     fireEvent.click(await screen.findByLabelText('I have copied the key and stored it securely'))
     fireEvent.click(await screen.findByRole('button', { name: 'Done' }))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_done_button_clicked', {
+      tokenType: 'classic',
+      hasCopiedToken: true,
+    })
     // Dialog has been closed
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   })
