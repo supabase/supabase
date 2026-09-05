@@ -53,7 +53,7 @@ export function buildSpaRoutes(
   functionDest: string,
   assetsPrefix: string,
   basePath = ''
-) {
+): Route[] {
   const fsIndex = generated.findIndex((r) => r.handle === 'filesystem')
   if (fsIndex === -1) {
     throw new Error('[vercel-spa-routes] generated config has no { handle: "filesystem" }')
