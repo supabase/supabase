@@ -35,6 +35,13 @@ const RENDER_TIMEOUT_MS = 15_000
 const MAX_SOURCE_BYTES = 512 * 1024
 const MAX_OUTPUT_BYTES = 4 * 1024 * 1024
 const MAX_STDERR_BYTES = 64 * 1024
+const MAX_PENDING_RENDERS = 4
+
+export class RenderQueueFullError extends Error {
+  constructor() {
+    super('too many templates are being rendered right now, try again shortly')
+  }
+}
 
 async function compileReactEmail(source: string): Promise<string> {
   const { code } = await transform(source, {
@@ -47,18 +54,25 @@ async function compileReactEmail(source: string): Promise<string> {
 }
 
 let renderQueue: Promise<unknown> = Promise.resolve()
+let pendingRenders = 0
 
 export function renderReactEmail(source: string): Promise<string> {
-  const run = renderQueue.then(() => renderReactEmailNow(source))
+  if (Buffer.byteLength(source, 'utf8') > MAX_SOURCE_BYTES) {
+    return Promise.reject(new Error('template source is too large'))
+  }
+  if (pendingRenders >= MAX_PENDING_RENDERS) {
+    return Promise.reject(new RenderQueueFullError())
+  }
+
+  pendingRenders++
+  const run = renderQueue.then(() => renderReactEmailNow(source)).finally(() => {
+    pendingRenders--
+  })
   renderQueue = run.catch(() => undefined)
   return run
 }
 
 async function renderReactEmailNow(source: string): Promise<string> {
-  if (Buffer.byteLength(source, 'utf8') > MAX_SOURCE_BYTES) {
-    throw new Error('template source is too large')
-  }
-
   const code = await compileReactEmail(source)
 
   const child = spawn(process.execPath, WORKER_ARGV, {

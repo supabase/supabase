@@ -6,7 +6,7 @@ import { timingSafeEqual } from 'node:crypto'
 
 import { AUTH_CONFIG_KEYS } from './auth-config-keys.js'
 import { baselineConfig } from './baseline.js'
-import { renderReactEmail } from './emails.js'
+import { RenderQueueFullError, renderReactEmail } from './emails.js'
 import { env } from './env.js'
 import { syncEnvFile, templateTypeFromConfigKey } from './envfile.js'
 import { defaultAuthConfig } from './gotrue-defaults.js'
@@ -208,6 +208,7 @@ app.put('/platform/auth/:ref/templates/:template/react', async (c) => {
     renderedHtml = await renderReactEmail(source)
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
+    if (err instanceof RenderQueueFullError) return c.json({ message }, 429)
     return c.json({ message: `failed to render template: ${message}` }, 400)
   }
 

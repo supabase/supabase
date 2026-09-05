@@ -6,7 +6,7 @@ process.env.DATABASE_URL ??= 'postgres://test'
 process.env.MANAGEMENT_API_TOKEN ??= 'test-token'
 process.env.VAULT_ENC_KEY ??= 'test-encryption-key'
 
-const { renderReactEmail } = await import('../src/emails.js')
+const { RenderQueueFullError, renderReactEmail } = await import('../src/emails.js')
 
 test('renders the example react-email template preserving GoTrue tokens', async () => {
   const source = await readFile(new URL('../emails/confirmation-example.tsx', import.meta.url), 'utf8')
@@ -114,4 +114,21 @@ test('serializes concurrent renders', async () => {
   `
   const [a, b] = await Promise.all([renderReactEmail(source('first')), renderReactEmail(source('second'))])
   assert.ok(a.includes('first') && b.includes('second'))
+})
+
+test('rejects renders beyond the pending limit without queueing them', async () => {
+  const source = `
+    import * as React from 'react'
+    export default function Email() { return React.createElement('p', null, 'queued') }
+  `
+  const admitted = Array.from({ length: 4 }, () => renderReactEmail(source))
+  await assert.rejects(() => renderReactEmail(source), RenderQueueFullError)
+  const results = await Promise.all(admitted)
+  assert.ok(results.every((html) => html.includes('queued')))
+  assert.ok((await renderReactEmail(source)).includes('queued'))
+})
+
+test('rejects oversized sources before they enter the queue', async () => {
+  const source = `export default () => null; // ${'x'.repeat(512 * 1024)}`
+  await assert.rejects(() => renderReactEmail(source), /too large/)
 })
