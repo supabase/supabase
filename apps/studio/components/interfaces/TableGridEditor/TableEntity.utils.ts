@@ -34,10 +34,12 @@ export const getTablePoliciesUrl = (
   )}&schema=${encodeURIComponent(schema ?? '')}`
 }
 
-export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
-  if (rows.length === 0) return ''
+const quoteIdentifier = (identifier: string): string => `"${identifier.replaceAll('"', '""')}"`
 
-  const columns = table.columns.map((col) => `"${col.name}"`).join(', ')
+export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
+  if (rows.length === 0 || table.schema == null) return ''
+
+  const columns = table.columns.map((col) => quoteIdentifier(col.name)).join(', ')
 
   const valuesSets = rows
     .map((row) => {
@@ -78,7 +80,7 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
     })
     .join(', ')
 
-  return `INSERT INTO "${table.schema}"."${table.name}" (${columns}) VALUES ${valuesSets};`
+  return `INSERT INTO ${quoteIdentifier(table.schema)}.${quoteIdentifier(table.name)} (${columns}) VALUES ${valuesSets};`
 }
 
 /**

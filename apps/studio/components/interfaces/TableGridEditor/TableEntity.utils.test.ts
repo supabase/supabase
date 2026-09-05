@@ -29,6 +29,40 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     expect(result).toBe(expected)
   })
 
+  it('should quote embedded double quotes in SQL identifiers', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [
+        { name: 'customer"id', dataType: 'text', format: 'text', position: 0 },
+        { name: 'display"name', dataType: 'text', format: 'text', position: 1 },
+      ],
+      name: 'customer"profile',
+      schema: 'public"data',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    const rows = [{ 'customer"id': 'cus_1', 'display"name': 'Customer 1' }]
+
+    const result = formatTableRowsToSQL(table, rows)
+    const expected = `INSERT INTO "public""data"."customer""profile" ("customer""id", "display""name") VALUES ('cus_1', 'Customer 1');`
+    expect(result).toBe(expected)
+  })
+
+  it('should return an empty string when the table schema is missing', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [{ name: 'id', dataType: 'bigint', format: 'int8', position: 0 }],
+      name: 'people',
+      schema: null,
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+
+    expect(formatTableRowsToSQL(table, [{ id: 1 }])).toBe('')
+  })
+
   it('should not stringify null values', () => {
     const table: SupaTable = {
       id: 1,
