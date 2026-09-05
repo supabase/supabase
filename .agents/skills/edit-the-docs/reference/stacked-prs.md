@@ -31,9 +31,25 @@ Never chain `gh pr create --base <previous-branch>`. That produces correct base 
 
 **Check the titles after submitting.** `submit` can title a PR from its branch name rather than its commit subject. Fix any that came out wrong with `gh pr edit <pr> --title`.
 
-**Safe to re-run on PRs that already exist.** `submit` reports each one "up to date" and reuses it, so PR numbers, descriptions, draft state, and creation timestamps survive. Verify that by diffing the bodies afterward rather than assuming it.
+**Safe to re-run on PRs that already exist.** `submit` reports each one "up to date" and reuses it, so PR numbers, descriptions, and creation timestamps survive.
+
+**Draft state doesn't reliably survive.** `--open` marks existing PRs ready for review, not just new ones, and a resubmit has been observed taking drafts out of draft without it. Check the draft state of every PR after submitting, and set it back with `gh pr ready --undo` if it moved.
 
 **Other commands.** `gh stack link <pr> <pr> <pr>` registers the GitHub stack without local tracking. `gh stack unstack` removes a stack. The extension is `github/gh-stack`.
+
+## Restacking after a change low in the stack
+
+`gh stack rebase` replays every branch above the one you changed. Where a lower branch moved content that an upper branch also edited, git raises a conflict whose two sides are "the new structure" and "the old content being re-added". Resolving toward the new structure is usually right, and it silently drops the upper branch's edit along with the stale copy.
+
+**Assume that happened. Audit rather than read the diff.** Before pushing, grep each branch for a marker of every change it is supposed to carry:
+
+```bash
+git show <branch>:<path> | grep -c '<marker>'
+```
+
+One marker per change, checked against the count you expect. A restructure large enough to conflict is large enough that reading the diff will not catch a missing paragraph.
+
+Restore anything missing as a new commit on the branch that owns it, then rebase again. Don't fold it into a neighbouring branch to avoid a second rebase; that breaks the one-change-type-per-PR rule the stack exists for.
 
 ## Merge order
 

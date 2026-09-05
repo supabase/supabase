@@ -62,37 +62,70 @@ Inline changes only. Nothing in this PR moves a line from one place to another.
 
 ## PR 2: Structure
 
-Apply the **Mixed information types**, **Navigation**, and **Cross-references and glue** guidance in the Guides section of [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md), summarized here:
+Apply the **Mixed information types**, **Navigation**, and **Cross-references and glue** guidance in the Guides section of [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md).
 
-1. Classify substantial sections as contextual, procedural, or reference content, then give each class its own top-level group. Order them procedures, context, reference, so the action path runs uninterrupted and the background sits after it.
+**Work in this order, and settle the outline before you move a line.** A restructure invalidates every branch above it in the stack, so each revision costs a full restack, and a restack is where content gets dropped in conflict resolution. Reworking the shape twice costs far more than getting it right once.
 
-   A guide about database tables came out like this:
+### 1. Lock the headings other code links to
 
-   ```
-   ## What is a table?                    <- short conceptual opener
-   ## Creating and managing tables        <- procedures
-   ### Creating tables
-   ### Securing your tables
-   ### Loading data
-   ### Joining tables with foreign keys
-   ## How tables are organized            <- context
-   ### Primary keys
-   ### Relationships between tables
-   ### Schemas
-   ## Reference
-   ### Data types
-   ```
+Grep the whole repo for `#<slug>` against every heading on the page, not just `apps/docs/content`. Studio renders Docs buttons that deep-link into guide anchors, and `apps/www` links into them too. Those are the matches that break a button in the product rather than a link between two pages.
 
-   **A section that mixes two classes gets split, not filed under one of them.** "Joining tables with foreign keys" held both the idea of a relational database and the steps to build a join table. The steps kept the heading and stayed in the procedures group; the idea moved to "Relationships between tables" in the context group. The two cross-reference each other. Splitting is what keeps the group honest, and one cross-reference is cheaper than a reader hunting for the half they need.
+Write the matched heading texts down. For the rest of this PR they are immutable. **Moving a section preserves its slug, and so does changing its level. Only renaming breaks it.** That is what makes an aggressive regroup safe.
 
-   **Keep the heading text of the half that stays.** Renaming is what breaks anchors; moving and re-leveling don't.
+### 2. Classify every substantial section
 
-2. Put sections covering the same topic under a shared heading.
-3. For a long or mixed page, add a short introduction that links to its major section groups and tells readers when to use each one. Skip this navigation when a short page is already easy to scan.
-4. Connect contextual sections to their corresponding procedures when useful. Add introductions to section groups, transitions between information types, and outcomes after procedures. Don't link every adjacent section.
-5. When a topic outgrows one page, split it into multiple pages by information type. Navigation that overflows the sidebar is the signal. Update the navigation and cross-reference the new pages. Confirm the nav-registration mechanism through [`ask-the-docs`](../ask-the-docs/SKILL.md) rather than assuming it.
-6. Move and regroup first, and preserve meaning. Don't silently rewrite facts while restructuring. A pure set of moves is what makes this PR reviewable.
-7. **A move that only reads correctly once new content exists isn't a PR 2 move.** It belongs to the branch that adds the content. Leave the section where it is, and say in the PR body which move you deferred and what it's waiting on. Otherwise PR 2 stops standing on its own, and a stack merged partway leaves the page reading worse than before.
+Each one is **procedural** (the reader performs actions), **contextual** (the reader needs to understand something before acting), or **reference** (the reader looks something up).
+
+**Classify by what the reader is doing, not by what the section is about.** Subject matter is the trap: on a page about tables every section is "about tables", so grouping by topic produces one task-named bucket that quietly collects the background as well. A reader opens a section on schemas to understand something, not to do something, so it is context no matter how much it is about tables.
+
+**A section serving two classes gets split, not filed under the larger half.** Give the new half a heading, keep the heading text of the half that stays, and cross-reference the two. One cross-reference costs less than a reader hunting for the half they need.
+
+### 3. Write the target outline before touching the file
+
+Produce the whole heading tree, with levels, and check it against the locked list from step 1. Put it in front of the requester along with the Phase 0 diagnosis. The outline is the artifact that gets revised, not the page.
+
+Order the groups: a short conceptual opener when the page serves newcomers, then procedures, then context, then reference. The action path runs uninterrupted and the background sits after it.
+
+A guide about database tables settled here:
+
+```
+## What is a table?                    <- short conceptual opener
+## Creating and managing tables        <- procedures
+### Creating tables
+### Securing your tables
+### Loading data
+### Joining tables with foreign keys
+## How tables are organized            <- context
+### Primary keys
+### Relationships between tables
+### Schemas
+## Reference
+### Data types
+```
+
+"Joining tables with foreign keys" held both classes. The steps kept the heading and stayed in the procedures group; the idea of a relational database moved to "Relationships between tables" in the context group.
+
+### 4. Move, then add the glue the new shape needs
+
+Move and regroup, and preserve meaning. Don't silently rewrite facts while restructuring. A pure set of moves is what makes this PR reviewable, so call out in the PR body any deletion that isn't a move.
+
+Then:
+
+- Add a short introduction linking each major group and saying when to use it. Skip it when a short page is already easy to scan.
+- Add a group introduction, a transition where the information type changes, and an outcome after a procedure. Don't link every adjacent section.
+- Put sections covering the same topic under a shared heading.
+
+### 5. When the page itself should split
+
+When a topic outgrows the page, give it its own page rather than its own group. Navigation that overflows the sidebar is one signal. A section carrying its own subsections several levels deep, sharing nothing with the rest of the page but a single word, is another.
+
+Update every navigation entry, repoint every inbound anchor, and cross-reference the new page. Confirm the nav-registration mechanism through [`ask-the-docs`](../ask-the-docs/SKILL.md) rather than assuming it.
+
+### 6. Before you submit
+
+Re-run the step 1 grep. Every locked heading text is still present, at whatever level it ended up.
+
+**A move that only reads correctly once new content exists isn't a PR 2 move.** It belongs to the branch that adds the content. Leave the section where it is, and say in the PR body which move you deferred and what it is waiting on. Otherwise PR 2 stops standing on its own, and a stack merged partway leaves the page reading worse than before.
 
 If nothing needs to move, PR 2 doesn't exist. A page can be well organized and still need a style pass. Drop the branch and say the structure held up.
 
@@ -156,7 +189,7 @@ Run this before submitting each branch, not once at the end of the stack:
 - [ ] No invented behavior or positioning
 - [ ] Shared pitfalls checklist considered
 
-**Anchors.** Before renaming or rewording a heading, grep for `#<old-anchor-slug>` **across the repo, not just `apps/docs/content`.** Studio renders Docs buttons that deep-link into guide anchors, and `apps/www` links into them too. Those are the matches that break a button in the product rather than a link between two pages. Moving a section is safe; changing the heading text is what breaks the slug. This is a PR 2 gate, since that's the branch where headings move.
+**Anchors.** PR 2 step 1 builds the locked-heading list and step 6 re-checks it. Any branch that renames or rewords a heading clears the same gate.
 
 **Frontmatter `title`.** It follows the same sentence-case rule as a heading. Renaming it moves a navigation label and a search entry, not just a line of prose, so it clears this same gate and lands in PR 2 rather than PR 1.
 
