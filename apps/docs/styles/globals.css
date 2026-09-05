@@ -433,6 +433,8 @@ th code {
   --code-token-number: #ffffff;
   --code-token-property: #3ecf8e;
   --code-highlight-color: #232323;
+  --shadow-codeblock:
+    0 0 0 0 var(--border-default), 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 0 rgba(0, 0, 0, 0.3);
 }
 [data-theme='light'],
 .light {
@@ -459,4 +461,8 @@ th code {
 .shiki[data-wrapped='true'] .code-content {
   white-space: pre-wrap !important;
   word-break: break-word !important;
+}
+
+.shadow-codeblock {
+  box-shadow: var(--shadow-codeblock, none);
 }
