@@ -33,6 +33,13 @@
         "SUPABASE_URL",
         "VERCEL",
         "VERCEL_ENV",
+        // Read by Nitro's vercel preset at build time: the deployment id goes
+        // into the skew-protection cookie route and the salt into the
+        // immutable asset path, so a build must never be reused across deploys.
+        "VERCEL_DEPLOYMENT_ID",
+        "VERCEL_SKEW_PROTECTION_ENABLED",
+        "VERCEL_IMMUTABLE_STATIC_FILES_ENABLED",
+        "VERCEL_HASH_SALT",
         "MAINTENANCE_MODE",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
@@ -109,12 +116,12 @@
         // cache when it changes — without this, switching between test and
         // production builds reuses a stale cached output.
         "MODE",
-        // Read by scripts/serve.js (the Node host for `pnpm start`).
+        // Read by scripts/start.mjs (boots the Nitro server for `pnpm start`).
         // Declared here so the studio-package turbo env lint rule passes
         // even though turbo doesn't directly drive `start`.
         "PORT",
-        // Gates the TanStack vs Next path in api/server.js, vercel.ts,
-        // and scripts/dispatch.js (the dev/build/start dispatcher).
+        // Gates the TanStack vs Next path in vercel.ts and
+        // scripts/dispatch.js (the dev/build/start dispatcher).
         "STUDIO_FRAMEWORK",
         // Vite's built-in `import.meta.env.SSR` flag (used in ConnectStepsSection
         // to gate Vite-only `import.meta.glob`). Not a real process env var
@@ -134,7 +141,10 @@
         ".next/**",
         "!.next/cache/**",
         "!.next/dev/**/*",
-        "dist/**",
+        // TanStack Start via Nitro: node server (self-hosted) and the Vercel
+        // Build Output directory.
+        ".output/**",
+        ".vercel/output/**",
       ],
     },
   },

@@ -11,11 +11,10 @@ import { isHostedSupportedApiPath } from '@/lib/hosted-api-allowlist'
 // Next pages router this lives in middleware (proxy.ts), but TanStack Start
 // has no middleware runtime, so the guard is migrated here as a global
 // request middleware sharing the same allowlist (lib/hosted-api-allowlist.ts).
-// On Vercel our `/api/*` (and `/_serverFn/*`) requests are rewritten to the
-// api/server.js function which runs the Start handler, so createStartHandler
-// runs this server-side for every API request — even though pages are served
-// as a static SPA shell. The guard therefore covers all API routes from a
-// single place.
+// On Vercel only `/api/*` and `/_serverFn/*` reach the Nitro function (see
+// scripts/vercel-spa-routes.ts) while pages are served as a static SPA shell,
+// so this request middleware still runs server-side for every API request and
+// covers all API routes from a single place.
 
 const platformApiGuard = createMiddleware({ type: 'request' }).server(({ request, next }) => {
   const { pathname } = new URL(request.url)
