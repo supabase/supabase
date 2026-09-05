@@ -497,36 +497,19 @@ export default defineConfig(({ command, mode }) => {
     publicEnvDefines[`process.env.${key}`] ??= 'undefined'
   }
 
-  // Mirror Next's `basePath` via NEXT_PUBLIC_BASE_PATH. Unlike Next, TanStack
-  // Start has no single knob — the prefix has to be declared in three places
-  // (see BASE_PATH_REDIRECT_GUIDE.md):
-  //   - Vite `base`               — bakes the prefix into asset URLs in the
-  //                                  built bundle.
-  //   - tanstackStart router.basepath — must be passed explicitly. If
-  //                                  omitted, the plugin's internal
-  //                                  `deriveRouterBasepath` derives a value
-  //                                  from `publicBase` and strips both
-  //                                  leading and trailing slashes
-  //                                  (`/dashboard` → `dashboard`), which then
-  //                                  surfaces in `useRouter().basePath`
-  //                                  consumers as relative URLs (e.g.
-  //                                  `${BASE_PATH}/img/...` becomes
-  //                                  `dashboard/img/...` and the browser
-  //                                  resolves it against the current path).
-  //                                  See planning.js:14 in
-  //                                  @tanstack/start-plugin-core.
+  // Mirror Next's `basePath` via NEXT_PUBLIC_BASE_PATH (the platform serves
+  // Studio under `/dashboard`). Only the ROUTER gets the prefix:
+  //   - tanstackStart router.basepath — build-time; pages, API routes and
+  //     server functions (`<basePath>/_serverFn/*`) all live under it.
   //   - createRouter({ basepath }) — runtime navigation prefix; configured
-  //                                  in router.tsx off the same env var
-  //                                  (inlined via `define` above).
-  // Leaving the var empty keeps the app at `/` as today.
+  //     in router.tsx off the same env var (inlined via `define` above).
+  // Vite `base` deliberately stays `/`: hashed chunks must be served from the
+  // root so Nitro can place them in Vercel's immutable store
+  // (`/_vercel/immutable/*`), which Vercel only recognises at the root. Files
+  // from public/ are referenced as `${BASE_PATH}/img/...` and rewritten to
+  // the root by scripts/vercel-spa-routes.ts. Leaving the var empty keeps the
+  // app at `/`.
   const basePath = env.NEXT_PUBLIC_BASE_PATH || undefined
-  // scripts/vercel-spa-routes.ts writes root-relative routes and Nitro's
-  // immutable assets need a root baseURL, so a base path is self-hosted only.
-  if (basePath && process.env.VERCEL) {
-    throw new Error(
-      'NEXT_PUBLIC_BASE_PATH is not supported on Vercel (see scripts/vercel-spa-routes.ts)'
-    )
-  }
 
   // Self-hosted responses get the same security headers next.config.ts sends,
   // via Nitro route rules. On Vercel they come from vercel.ts instead: a `/**`
@@ -588,7 +571,6 @@ export default defineConfig(({ command, mode }) => {
         },
       ],
     },
-    ...(basePath && { base: basePath }),
     optimizeDeps: {
       // graphiql's Vite worker setup (swapped in for the webpack one by the
       // `graphiqlViteWorkers` plugin above) imports Monaco's workers with
@@ -780,7 +762,7 @@ export default defineConfig(({ command, mode }) => {
         },
         // Documents come from the static shell; only /api/* and /_serverFn/*
         // invoke the function.
-        modules: [vercelSpaRoutes],
+        modules: [vercelSpaRoutes({ basePath })],
         ...(!process.env.VERCEL && { routeRules: { '/**': { headers: securityHeaders } } }),
       }),
       tanstackStart({

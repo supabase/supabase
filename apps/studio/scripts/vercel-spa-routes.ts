@@ -42,8 +42,18 @@ type Route = Record<string, unknown> & {
  *
  * @param assetsPrefix URL prefix of the hashed client chunks (`/assets`, or
  * `/_vercel/immutable/<salt>/nitro` with `vercel.immutableStaticFiles`).
+ * @param basePath Router base path (`NEXT_PUBLIC_BASE_PATH`, e.g. `/dashboard`).
+ * Pages, API routes and server functions live under it, while the static
+ * output stays at the root (Vite `base` is `/` so chunks can use the
+ * immutable store), so prefixed rules come first and `public/` files
+ * requested under the prefix are rewritten to the root.
  */
-export function buildSpaRoutes(generated: Route[], functionDest: string, assetsPrefix: string) {
+export function buildSpaRoutes(
+  generated: Route[],
+  functionDest: string,
+  assetsPrefix: string,
+  basePath = ''
+) {
   const fsIndex = generated.findIndex((r) => r.handle === 'filesystem')
   if (fsIndex === -1) {
     throw new Error('[vercel-spa-routes] generated config has no { handle: "filesystem" }')
@@ -58,32 +68,39 @@ export function buildSpaRoutes(generated: Route[], functionDest: string, assetsP
     )
   }
   const kept = after.filter((r) => !isFunctionCatchAll(r) && r.handle !== 'filesystem')
+  const prefixes = basePath ? [basePath, ''] : ['']
 
   return [
     ...before,
     { handle: 'filesystem' },
     ...kept,
-    { src: `${SERVER_FN_BASE}/(.*)`, dest: functionDest },
-    { src: `${API_PREFIX}/(.*)`, dest: functionDest },
+    ...prefixes.flatMap((prefix) => [
+      { src: `${prefix}${SERVER_FN_BASE}/(.*)`, dest: functionDest },
+      { src: `${prefix}${API_PREFIX}/(.*)`, dest: functionDest },
+    ]),
     { src: `${assetsPrefix}/(.*)`, status: 404 },
+    ...(basePath ? [{ src: `${basePath}/(.*\\.\\w+)`, dest: '/$1' }] : []),
     { src: '/(.*)', dest: SHELL_PATH },
   ]
 }
 
-export const vercelSpaRoutes: NitroModule = {
-  name: 'vercel-spa-routes',
-  setup(nitro) {
-    if (nitro.options.preset !== 'vercel') return
-    nitro.hooks.hook('compiled', async () => {
-      const configPath = resolve(nitro.options.output.dir, 'config.json')
-      const functionDest = `/${basename(nitro.options.output.serverDir).replace(/\.func$/, '')}`
-      const assetsPrefix = '/' + (nitro.options.buildAssetsDir || 'assets').replace(/^\/|\/$/g, '')
-      const config = JSON.parse(await readFile(configPath, 'utf8'))
-      config.routes = buildSpaRoutes(config.routes, functionDest, assetsPrefix)
-      await writeFile(configPath, JSON.stringify(config, null, 2))
-      nitro.logger.success(
-        `[vercel-spa-routes] documents -> ${SHELL_PATH}, ${SERVER_FN_BASE}/* and ${API_PREFIX}/* -> ${functionDest}, missing ${assetsPrefix}/* -> 404`
-      )
-    })
-  },
+export function vercelSpaRoutes({ basePath = '' }: { basePath?: string } = {}): NitroModule {
+  return {
+    name: 'vercel-spa-routes',
+    setup(nitro) {
+      if (nitro.options.preset !== 'vercel') return
+      nitro.hooks.hook('compiled', async () => {
+        const configPath = resolve(nitro.options.output.dir, 'config.json')
+        const functionDest = `/${basename(nitro.options.output.serverDir).replace(/\.func$/, '')}`
+        const assetsPrefix =
+          '/' + (nitro.options.buildAssetsDir || 'assets').replace(/^\/|\/$/g, '')
+        const config = JSON.parse(await readFile(configPath, 'utf8'))
+        config.routes = buildSpaRoutes(config.routes, functionDest, assetsPrefix, basePath)
+        await writeFile(configPath, JSON.stringify(config, null, 2))
+        nitro.logger.success(
+          `[vercel-spa-routes] documents -> ${SHELL_PATH}, ${basePath}${SERVER_FN_BASE}/* and ${basePath}${API_PREFIX}/* -> ${functionDest}, missing ${assetsPrefix}/* -> 404`
+        )
+      })
+    },
+  }
 }

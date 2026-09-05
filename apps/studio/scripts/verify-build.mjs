@@ -42,9 +42,11 @@ process.on('unhandledRejection', (reason) => {
   fail(`unhandled rejection while booting the server:\n${reason?.stack ?? reason}`)
 })
 
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
 // A request to any route forces the full route tree to load, so one cheap,
 // dependency-free endpoint is enough to exercise the boot.
-const SMOKE_ROUTE = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/api/get-utc-time`
+const SMOKE_ROUTE = `${BASE_PATH}/api/get-utc-time`
 
 function checkVercelOutput() {
   const functionsDir = path.join(vercelOut, 'functions')
@@ -89,9 +91,12 @@ function checkVercelOutput() {
   }
 
   const expectedTail = [
-    { src: `${SERVER_FN_BASE}/(.*)`, dest: functionDest },
-    { src: `${API_PREFIX}/(.*)`, dest: functionDest },
+    ...(BASE_PATH ? [BASE_PATH, ''] : ['']).flatMap((prefix) => [
+      { src: `${prefix}${SERVER_FN_BASE}/(.*)`, dest: functionDest },
+      { src: `${prefix}${API_PREFIX}/(.*)`, dest: functionDest },
+    ]),
     { src: `${assetsPrefix}/(.*)`, status: 404 },
+    ...(BASE_PATH ? [{ src: `${BASE_PATH}/(.*\\.\\w+)`, dest: '/$1' }] : []),
     { src: '/(.*)', dest: SHELL_PATH },
   ]
   const tail = routes.slice(-expectedTail.length)

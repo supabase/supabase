@@ -48,6 +48,25 @@ describe('buildSpaRoutes', () => {
     expect(routes.at(-1)).toEqual({ src: '/(.*)', dest: '/_shell.html' })
   })
 
+  it('adds prefixed rules and a public-file rewrite under a base path', () => {
+    const routes = buildSpaRoutes(
+      [cacheRule, filesystem, functionCatchAll],
+      '/__server',
+      IMMUTABLE,
+      '/dashboard'
+    )
+
+    expect(routes.slice(2)).toEqual([
+      { src: '/dashboard/_serverFn/(.*)', dest: '/__server' },
+      { src: '/dashboard/api/(.*)', dest: '/__server' },
+      { src: '/_serverFn/(.*)', dest: '/__server' },
+      { src: '/api/(.*)', dest: '/__server' },
+      { src: `${IMMUTABLE}/(.*)`, status: 404 },
+      { src: '/dashboard/(.*\\.\\w+)', dest: '/$1' },
+      { src: '/(.*)', dest: '/_shell.html' },
+    ])
+  })
+
   it('fails loudly when Nitro output changes shape', () => {
     expect(() => buildSpaRoutes([functionCatchAll], '/__server', '/assets')).toThrow(
       /no \{ handle: "filesystem" \}/
