@@ -391,18 +391,18 @@ services:
 
     environment:
       ANON_KEY: ${ANON_KEY}
-
+	  
       SERVICE_KEY: ${SERVICE_ROLE_KEY}
 
       POSTGREST_URL: http://rest:3000
-
-      AUTH_JWT_SECRET: ${JWT_SECRET}
-	
-      JWT_JWKS: ${JWT_JWKS:-{"keys":[]}}
-
-      DATABASE_URL: >-
+	   
+	  AUTH_JWT_SECRET: ${JWT_SECRET}
+	  
+	  JWT_JWKS: ${JWT_JWKS:-{"keys":[]}}
+	  
+	  DATABASE_URL: >-
         postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-
+		
       STORAGE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
 
       REQUEST_ALLOW_X_FORWARDED_PATH: "true"
