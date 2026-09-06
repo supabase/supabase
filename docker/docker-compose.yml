@@ -67,9 +67,7 @@ services:
 
   # =====================================================
   # API GATEWAY / ENVOY
-  #
-  # ÚNICO SERVICIO CONECTADO A LA RED EXTERNA "proxy".
-  # Traefik ya existe en el VPS y llega aquí por puerto 8000.
+  # Traefik ya existe en el VPS.
   # =====================================================
 
   api-gw:
@@ -82,8 +80,7 @@ services:
         aliases:
           - envoy
           - kong
-
-      proxy:
+      proxy: {}
 
     expose:
       - "8000"
@@ -125,24 +122,12 @@ services:
 
     labels:
       - "traefik.enable=true"
-
-      # Dominio
       - "traefik.http.routers.supabase.rule=Host(`supabase.mobilvendor.com`)"
-
-      # HTTPS
       - "traefik.http.routers.supabase.entrypoints=websecure"
       - "traefik.http.routers.supabase.tls=true"
-
-      # Certificado TLS
       - "traefik.http.routers.supabase.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
-
-      # Servicio Traefik
       - "traefik.http.routers.supabase.service=supabase"
-
-      # Envoy escucha internamente en 8000
       - "traefik.http.services.supabase.loadbalancer.server.port=8000"
-
-      # Obliga a Traefik a utilizar nuestra red proxy existente
       - "traefik.docker.network=proxy"
 
     entrypoint:
@@ -205,9 +190,9 @@ services:
       GOTRUE_JWT_EXP: ${JWT_EXPIRY}
 
       GOTRUE_JWT_SECRET: ${JWT_SECRET}
- 
+
       GOTRUE_JWT_KEYS: ${JWT_KEYS:-[]}
- 
+
       GOTRUE_JWT_ISSUER: ${API_EXTERNAL_URL}
 
       GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP}
@@ -391,18 +376,18 @@ services:
 
     environment:
       ANON_KEY: ${ANON_KEY}
-	  
+
       SERVICE_KEY: ${SERVICE_ROLE_KEY}
 
       POSTGREST_URL: http://rest:3000
-	   
-	  AUTH_JWT_SECRET: ${JWT_SECRET}
-	  
-	  JWT_JWKS: ${JWT_JWKS:-{"keys":[]}}
-	  
-	  DATABASE_URL: >-
+
+      AUTH_JWT_SECRET: ${JWT_SECRET}
+
+      JWT_JWKS: ${JWT_JWKS:-{"keys":[]}}
+
+      DATABASE_URL: >-
         postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-		
+
       STORAGE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
 
       REQUEST_ALLOW_X_FORWARDED_PATH: "true"
@@ -503,12 +488,6 @@ services:
 
   # =====================================================
   # EDGE FUNCTIONS
-  #
-  # Se mantiene TEMPORALMENTE porque la configuración Envoy
-  # oficial puede contener rutas hacia este servicio.
-  #
-  # Cuando Supabase esté estable podemos eliminarlo junto
-  # con sus rutas Envoy.
   # =====================================================
 
   functions:
@@ -571,8 +550,6 @@ services:
 
   # =====================================================
   # POSTGRESQL
-  #
-  # NO SE PUBLICA 5432 EN EL HOST.
   # =====================================================
 
   db:
@@ -585,20 +562,14 @@ services:
 
     volumes:
       - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
-
       - ./volumes/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z
-
       - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
-
       - ./volumes/db/jwt.sql:/docker-entrypoint-initdb.d/init-scripts/99-jwt.sql:Z
 
-      # Datos PostgreSQL persistentes
       - supabase_db_data:/var/lib/postgresql/data
 
       - ./volumes/db/_supabase.sql:/docker-entrypoint-initdb.d/migrations/97-_supabase.sql:Z
-
       - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
-
       - ./volumes/db/pooler.sql:/docker-entrypoint-initdb.d/migrations/99-pooler.sql:Z
 
       - db-config:/etc/postgresql-custom
@@ -648,12 +619,6 @@ services:
 
   # =====================================================
   # SUPAVISOR
-  #
-  # NO SE PUBLICA:
-  # 5432
-  # 6543
-  #
-  # Solo accesible dentro de supabase_internal.
   # =====================================================
 
   supavisor:
@@ -758,13 +723,10 @@ volumes:
 
 networks:
 
-  # Esta red YA EXISTE.
-  # La utilizan Traefik y n8n.
   proxy:
     external: true
     name: proxy
 
-  # Red privada exclusiva de Supabase
   supabase_internal:
     name: supabase_internal
     driver: bridge
