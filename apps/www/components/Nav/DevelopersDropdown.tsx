@@ -2,6 +2,7 @@ import staticContent from '.generated/staticContent/_index.json'
 import { data as DevelopersData } from 'data/Developers'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import { isCrossAppLink } from 'lib/crossAppLink'
 
 type LinkProps = {
   text: string
@@ -27,6 +28,7 @@ export const DevelopersDropdown = () => {
                 <li key={link.text}>
                   <Link
                     href={link.url!}
+                    prefetch={isCrossAppLink(link.url!) ? false : undefined}
                     className="flex group items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-ring rounded-sm"
                   >
                     {Icon && <Icon size={16} strokeWidth={1.3} />}

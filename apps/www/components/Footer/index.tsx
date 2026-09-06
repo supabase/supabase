@@ -4,6 +4,7 @@ import { CheckIcon } from '@heroicons/react/outline'
 import { REALTIME_CHANNEL_STATES } from '@supabase/supabase-js'
 import SupabaseWordmark from '~/components/Nav/SupabaseWordmark'
 import supabase from '~/lib/supabase'
+import { isCrossAppLink } from '~/lib/crossAppLink'
 import footerData from 'data/Footer'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -234,7 +235,12 @@ const Footer = (props: Props) => {
                               link.url.startsWith('https') ? (
                                 <a href={link.url}>{children}</a>
                               ) : (
-                                <Link href={link.url}>{children}</Link>
+                                <Link
+                                  href={link.url}
+                                  prefetch={isCrossAppLink(link.url) ? false : undefined}
+                                >
+                                  {children}
+                                </Link>
                               )
                             ) : (
                               Component && <Component>{children}</Component>

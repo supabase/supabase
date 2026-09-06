@@ -4,6 +4,33 @@ import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from 'ui'
 
+// Paths owned by a different Next.js app on the same origin
+const CROSS_APP_PREFIXES = ['/docs', '/dashboard']
+function isCrossAppLink(href?: string): boolean {
+  if (!href) return false
+
+  let path = href
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    try {
+      const url = new URL(path)
+      if (
+        url.hostname === 'supabase.com' ||
+        url.hostname.endsWith('.supabase.com') ||
+        url.hostname === 'localhost' ||
+        url.hostname === '127.0.0.1'
+      ) {
+        path = url.pathname
+      } else {
+        return false
+      }
+    } catch {
+      return false
+    }
+  }
+
+  return CROSS_APP_PREFIXES.some((prefix) => path === prefix || path.startsWith(prefix + '/'))
+}
+
 interface Props {
   label: string
   url?: string
@@ -28,6 +55,7 @@ export function TextLink({
   return (
     <Link
       href={url}
+      prefetch={isCrossAppLink(url) ? false : undefined}
       className={cn(
         'group/text-link text-foreground-light hover:text-foreground mt-3 block cursor-pointer text-sm focus-ring focus-visible:rounded-xs focus-visible:text-foreground',
         className

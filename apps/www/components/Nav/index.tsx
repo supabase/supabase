@@ -4,6 +4,7 @@ import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import ScrollProgress from 'components/ScrollProgress'
 import { getMenu } from 'data/nav'
 import { DevToolbarTrigger } from 'dev-tools'
+import { isCrossAppLink } from 'lib/crossAppLink'
 import { useSendTelemetryEvent } from 'lib/telemetry'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -161,7 +162,9 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                   {isLoggedIn ? (
                     <>
                       <Button className="hidden lg:block" asChild>
-                        <Link href="/dashboard/projects">Dashboard</Link>
+                        <Link href="/dashboard/projects" prefetch={false}>
+                          Dashboard
+                        </Link>
                       </Button>
                       <AuthenticatedDropdownMenu menu={userMenu} user={user} site="www" />
                     </>
@@ -170,6 +173,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                       <Button className="hidden lg:block" asChild>
                         <Link
                           href="https://supabase.com/dashboard"
+                          prefetch={false}
                           onClick={() =>
                             sendTelemetryEvent({
                               action: 'sign_in_button_clicked',
@@ -183,6 +187,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                       <Button variant="primary" className="hidden lg:block" asChild>
                         <Link
                           href="https://supabase.com/dashboard/sign-up"
+                          prefetch={false}
                           onClick={() =>
                             sendTelemetryEvent({
                               action: 'start_project_button_clicked',

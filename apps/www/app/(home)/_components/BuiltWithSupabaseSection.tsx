@@ -1,6 +1,7 @@
 import Examples from 'data/Examples'
 import Link from 'next/link'
 import { cn } from 'ui'
+import { isCrossAppLink } from '~/lib/crossAppLink'
 
 import SectionContainer from '@/components/Layouts/SectionContainer'
 
@@ -110,6 +111,7 @@ export function BuiltWithSupabaseSection() {
         </h3>
         <Link
           href="/docs/guides/examples"
+          prefetch={isCrossAppLink('/docs/guides/examples') ? false : undefined}
           className="text-sm text-foreground-light hover:text-foreground underline"
         >
           View all examples

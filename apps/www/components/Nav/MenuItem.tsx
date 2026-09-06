@@ -2,6 +2,7 @@ import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 import { cn } from 'ui'
+import { isCrossAppLink } from 'lib/crossAppLink'
 
 const MenuItem = React.forwardRef<
   React.ElementRef<'a'>,
@@ -30,6 +31,7 @@ const MenuItem = React.forwardRef<
       <Link
         href={href}
         ref={ref}
+        prefetch={isCrossAppLink(href) ? false : undefined}
         className={cn(
           'group/menu-item flex items-center text-foreground-light text-sm hover:text-foreground select-none gap-3 rounded-md p-2 leading-none no-underline focus-ring focus-visible:text-foreground',
           description && 'items-center',

@@ -16,6 +16,7 @@ import staticContent from '@/.generated/staticContent/_index.json'
 import ProductModulesData from '@/data/ProductModules'
 import { DEFAULT_EASE } from '@/lib/animations'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
+import { isCrossAppLink } from '@/lib/crossAppLink'
 
 interface Props {
   open: boolean
@@ -193,6 +194,7 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
             ) : (
               <Link
                 href={menuItem.url ?? '/'}
+                prefetch={isCrossAppLink(menuItem.url ?? '/') ? false : undefined}
                 className={cn(className, 'block focus-ring rounded-sm')}
                 onClick={() => setOpen(false)}
               >
@@ -255,7 +257,7 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
               {!isUserLoading && (
                 <>
                   {isLoggedIn ? (
-                    <Link href="/dashboard/projects" passHref legacyBehavior>
+                    <Link href="/dashboard/projects" prefetch={false} passHref legacyBehavior>
                       <Button block asChild>
                         <a type={undefined} className="h-10 py-4">
                           Dashboard
@@ -266,6 +268,7 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
                     <>
                       <Link
                         href="https://supabase.com/dashboard"
+                        prefetch={false}
                         passHref
                         legacyBehavior
                         onClick={() =>
@@ -283,6 +286,7 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
                       </Link>
                       <Link
                         href="https://supabase.com/dashboard/sign-up"
+                        prefetch={false}
                         passHref
                         legacyBehavior
                         onClick={() =>
