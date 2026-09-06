@@ -28,6 +28,7 @@ import {
 } from 'ui'
 
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
+import { ResizableInspectorLayout } from '../../ui/ResizableInspectorLayout'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsFilterBar } from './components/LogsFilterBar'
@@ -452,65 +453,71 @@ export const UnifiedLogs = () => {
 
             <RowSelectionHeader />
 
-            <ResizablePanelGroup
-              key="main-logs"
+            <ResizableInspectorLayout
               className="flex-1 border-t"
               orientation={dock === 'bottom' ? 'vertical' : 'horizontal'}
-            >
-              <ResizablePanel
-                defaultSize="100"
-                minSize="10"
-                className={cn(
-                  'bg',
-                  isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
-                )}
-              >
-                <div
-                  className={cn(
-                    'h-full [&>div]:h-full',
-                    '[&_thead_th]:[border-top:none]! [&_thead_th]:[border-bottom:none]!',
-                    '[&_thead_th]:[box-shadow:inset_0_-1px_0_var(--border-default)]!',
-                    '[&_thead_th]:text-foreground-lighter! [&_thead_tr:hover]:bg-surface-75',
-                    '[&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0!'
-                  )}
-                >
-                  <DataTableInfinite
-                    columns={UNIFIED_LOGS_COLUMNS}
-                    totalRows={totalDBRowCount}
-                    filterRows={filterDBRowCount}
-                    totalRowsFetched={totalFetched}
-                    fetchNextPage={fetchNextPage}
-                    hasNextPage={hasNextPage}
-                    setColumnOrder={setColumnOrder}
-                    setColumnVisibility={setColumnVisibility}
-                    searchParamsParser={SEARCH_PARAMS_PARSER}
-                    emptyStateMessage={
-                      isUserFilterUnreachable(search) ? (
-                        <div className="text-sm flex flex-col gap-y-1">
-                          <p className="text-foreground-light">No results found</p>
-                          <p className="text-foreground-lighter">
-                            Filtering by user is only supported for Auth and Postgres log types
-                          </p>
-                        </div>
-                      ) : undefined
-                    }
-                  />
-                </div>
-              </ResizablePanel>
-
-              {!!openRowId && !!selectedRow && (
-                <>
-                  <LogsListPanel selectedRow={selectedRow} />
+              mainPanelId="logs-table"
+              inspectorPanelId="log-sidepanel"
+              inspectorLabel="Log details"
+              mainMinSize={dock === 'bottom' ? '20%' : 280}
+              inspectorDefaultSize={400}
+              inspectorMinSize={dock === 'bottom' ? 300 : 320}
+              inspectorMaxSize={dock === 'bottom' ? '70%' : '60%'}
+              snapThreshold={600}
+              mainPanelClassName={cn(
+                'bg',
+                isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
+              )}
+              inspectorPanelClassName="bg-dash-sidebar"
+              inspector={
+                openRowId && selectedRow ? (
                   <ServiceFlowPanel
                     dock={dock}
                     setDock={setDock}
-                    selectedRow={selectedRow?.original}
+                    selectedRow={selectedRow.original}
                     selectedRowKey={openRowId}
                     searchParameters={searchParameters}
                   />
-                </>
-              )}
-            </ResizablePanelGroup>
+                ) : undefined
+              }
+            >
+              <ResizablePanelGroup orientation="vertical" className="h-full">
+                <ResizablePanel defaultSize="100" minSize="10">
+                  <div
+                    className={cn(
+                      'h-full [&>div]:h-full',
+                      '[&_thead_th]:[border-top:none]! [&_thead_th]:[border-bottom:none]!',
+                      '[&_thead_th]:[box-shadow:inset_0_-1px_0_var(--border-default)]!',
+                      '[&_thead_th]:text-foreground-lighter! [&_thead_tr:hover]:bg-surface-75',
+                      '[&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0!'
+                    )}
+                  >
+                    <DataTableInfinite
+                      columns={UNIFIED_LOGS_COLUMNS}
+                      totalRows={totalDBRowCount}
+                      filterRows={filterDBRowCount}
+                      totalRowsFetched={totalFetched}
+                      fetchNextPage={fetchNextPage}
+                      hasNextPage={hasNextPage}
+                      setColumnOrder={setColumnOrder}
+                      setColumnVisibility={setColumnVisibility}
+                      searchParamsParser={SEARCH_PARAMS_PARSER}
+                      emptyStateMessage={
+                        isUserFilterUnreachable(search) ? (
+                          <div className="text-sm flex flex-col gap-y-1">
+                            <p className="text-foreground-light">No results found</p>
+                            <p className="text-foreground-lighter">
+                              Filtering by user is only supported for Auth and Postgres log types
+                            </p>
+                          </div>
+                        ) : undefined
+                      }
+                    />
+                  </div>
+                </ResizablePanel>
+                {!!openRowId && !!selectedRow && <LogsListPanel selectedRow={selectedRow} />}
+              </ResizablePanelGroup>
+            </ResizableInspectorLayout>
           </ResizablePanel>
         </ResizablePanelGroup>
       </DataTableSideBarLayout>

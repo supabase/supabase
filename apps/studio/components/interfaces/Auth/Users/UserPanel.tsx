@@ -1,17 +1,7 @@
 import { X } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
-import {
-  Button,
-  cn,
-  Input,
-  ResizableHandle,
-  ResizablePanel,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from 'ui'
+import { Button, cn, Input, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
@@ -57,99 +47,95 @@ export const UserPanel = () => {
     : {}
 
   return (
-    <>
-      <ResizableHandle withHandle />
-      <ResizablePanel defaultSize="35" maxSize="45" minSize="35" className="bg-studio border-t">
-        <Button
-          variant="text"
-          className="absolute top-3 right-3 px-1"
-          icon={<X />}
-          onClick={() => setSelectedId(null)}
-        />
-        <Tabs
-          value={view}
-          className="flex flex-col h-full"
-          onValueChange={(value) => setView(value as 'overview' | 'raw' | 'logs')}
-        >
-          {isPending ? (
-            <div>
-              <div className="min-h-[46px] border-b" />
-              <div className="p-5">
-                <GenericSkeletonLoader />
-              </div>
+    <div className="relative h-full bg-studio">
+      <Button
+        variant="text"
+        className="absolute top-3 right-3 z-10 px-1"
+        icon={<X />}
+        aria-label="Close user details"
+        onClick={() => setSelectedId(null)}
+      />
+      <Tabs
+        value={view}
+        className="flex h-full flex-col"
+        onValueChange={(value) => setView(value as 'overview' | 'raw' | 'logs')}
+      >
+        {isPending ? (
+          <div>
+            <div className="min-h-[46px] border-b" />
+            <div className="p-5">
+              <GenericSkeletonLoader />
             </div>
-          ) : !!selectedUser ? (
-            <>
-              <TabsList className="px-5 flex gap-x-4 min-h-[46px]">
-                <TabsTrigger
-                  value="overview"
-                  className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent shadow-none!"
-                >
-                  Overview
-                </TabsTrigger>
-                {showLogs && (
-                  <TabsTrigger
-                    value="logs"
-                    className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
-                  >
-                    Logs
-                  </TabsTrigger>
-                )}
-                <TabsTrigger
-                  value="raw"
-                  className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
-                >
-                  Raw JSON
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="overview" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
-                {selectedUser && (
-                  <UserOverview user={selectedUser} onDeleteSuccess={() => setSelectedId(null)} />
-                )}
-              </TabsContent>
-              {showLogs && (
-                <TabsContent value="logs" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
-                  {selectedUser && <UserLogs user={selectedUser} />}
-                </TabsContent>
-              )}
-              <TabsContent
-                value="raw"
-                className={cn('mt-0 grow min-h-0 overflow-y-auto', PANEL_PADDING)}
+          </div>
+        ) : selectedUser ? (
+          <>
+            <TabsList className="flex min-h-[46px] gap-x-4 px-5 pr-12">
+              <TabsTrigger
+                value="overview"
+                className="h-full px-0 pb-0 text-xs shadow-none! data-[state=active]:bg-transparent"
               >
-                <div className="flex items-center mb-2">
-                  <Input
-                    autoFocus
-                    type="text"
-                    placeholder="Filter..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="mr-2"
-                  />
-                  <Button
-                    variant="text"
-                    disabled={!searchQuery}
-                    onClick={() => setSearchQuery('')}
-                    className="text-xs"
-                  >
-                    Clear
-                  </Button>
-                </div>
-                <SimpleCodeBlock className="javascript" parentClassName="[&>*>span]:text-xs">
-                  {JSON.stringify(filteredProperties, null, 2)}
-                </SimpleCodeBlock>
+                Overview
+              </TabsTrigger>
+              {showLogs && (
+                <TabsTrigger
+                  value="logs"
+                  className="h-full px-0 pb-0 text-xs shadow-none! data-[state=active]:bg-transparent"
+                >
+                  Logs
+                </TabsTrigger>
+              )}
+              <TabsTrigger
+                value="raw"
+                className="h-full px-0 pb-0 text-xs shadow-none! data-[state=active]:bg-transparent"
+              >
+                Raw JSON
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview" className="mt-0 grow min-h-0 overflow-y-auto">
+              <UserOverview user={selectedUser} onDeleteSuccess={() => setSelectedId(null)} />
+            </TabsContent>
+            {showLogs && (
+              <TabsContent value="logs" className="mt-0 grow min-h-0 overflow-y-auto">
+                <UserLogs user={selectedUser} />
               </TabsContent>
-            </>
-          ) : (
-            <div className="flex items-center justify-center w-full h-full flex-col gap-y-2">
-              <p className="text-foreground-light text-sm">
-                Unable to find user with the following ID in project
-              </p>
-              <p className="text-foreground-lighter text-xs">ID: {selectedId}</p>
-            </div>
-          )}
-        </Tabs>
-      </ResizablePanel>
-    </>
+            )}
+            <TabsContent
+              value="raw"
+              className={cn('mt-0 grow min-h-0 overflow-y-auto', PANEL_PADDING)}
+            >
+              <div className="mb-2 flex items-center">
+                <Input
+                  autoFocus
+                  type="text"
+                  placeholder="Filter..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="mr-2"
+                />
+                <Button
+                  variant="text"
+                  disabled={!searchQuery}
+                  onClick={() => setSearchQuery('')}
+                  className="text-xs"
+                >
+                  Clear
+                </Button>
+              </div>
+              <SimpleCodeBlock className="javascript" parentClassName="[&>*>span]:text-xs">
+                {JSON.stringify(filteredProperties, null, 2)}
+              </SimpleCodeBlock>
+            </TabsContent>
+          </>
+        ) : (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-y-2 px-5 text-center">
+            <p className="text-foreground-light text-sm">
+              Unable to find user with the following ID in project
+            </p>
+            <p className="text-foreground-lighter break-all text-xs">ID: {selectedId}</p>
+          </div>
+        )}
+      </Tabs>
+    </div>
   )
 }

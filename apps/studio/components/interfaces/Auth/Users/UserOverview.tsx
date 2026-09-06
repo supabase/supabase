@@ -31,8 +31,9 @@ import { timeout } from '@/lib/helpers'
 
 const DATE_FORMAT = 'DD MMM, YYYY HH:mm'
 const CONTAINER_CLASS = cn(
-  'bg-surface-100 border-default text-foreground flex items-center justify-between',
-  'gap-x-4 border px-5 py-4 text-sm first:rounded-tr first:rounded-tl last:rounded-br last:rounded-bl'
+  'bg-surface-100 border-default text-foreground flex flex-col items-stretch justify-between',
+  'gap-y-3 border px-5 py-4 text-sm sm:flex-row sm:items-center sm:gap-x-4 sm:gap-y-0',
+  'first:rounded-tr first:rounded-tl last:rounded-br last:rounded-bl'
 )
 
 interface UserOverviewProps {
@@ -485,10 +486,10 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
 export const RowData = ({ property, value }: { property: string; value?: string | boolean }) => {
   return (
     <>
-      <div className="flex items-center gap-x-2 group justify-between">
-        <p className=" text-foreground-lighter text-xs">{property}</p>
+      <div className="group flex items-start justify-between gap-x-2">
+        <p className="text-foreground-lighter shrink-0 py-1.5 text-xs">{property}</p>
         {typeof value === 'boolean' ? (
-          <div className="h-[26px] flex items-center justify-center min-w-[70px]">
+          <div className="flex min-h-[26px] min-w-[70px] items-center justify-center">
             {value ? (
               <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
                 <Check size={10} className="text-contrast" strokeWidth={4} />
@@ -500,14 +501,16 @@ export const RowData = ({ property, value }: { property: string; value?: string 
             )}
           </div>
         ) : (
-          <div className="flex items-center gap-x-2 h-[26px] font-mono min-w-[40px]">
-            <p className="text-xs">{!value ? '-' : value}</p>
+          <div className="flex min-h-[26px] min-w-0 items-start justify-end gap-x-2 py-1.5 font-mono">
+            <p className="min-w-0 text-right text-xs [overflow-wrap:anywhere]">
+              {!value ? '-' : value}
+            </p>
             {!!value && (
               <CopyButton
                 iconOnly
                 variant="text"
                 icon={<Copy />}
-                className="transition opacity-0 group-hover:opacity-100 px-1"
+                className="shrink-0 px-1 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100"
                 text={value}
               />
             )}

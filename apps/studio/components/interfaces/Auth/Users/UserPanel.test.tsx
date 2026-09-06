@@ -1,6 +1,5 @@
 import { screen } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
-import { ResizablePanelGroup } from 'ui'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { UserPanel } from './UserPanel'
@@ -53,19 +52,14 @@ const renderPanel = (disabledFeatures: string[] = []) => {
     )
   )
 
-  return customRender(
-    <ResizablePanelGroup orientation="horizontal">
-      <UserPanel />
-    </ResizablePanelGroup>,
-    {
-      nuqs: { searchParams: `?show=${mockUser.id}` },
-      profileContext: createMockProfileContext({
-        profile: {
-          disabled_features: disabledFeatures as any,
-        } as any,
-      }),
-    }
-  )
+  return customRender(<UserPanel />, {
+    nuqs: { searchParams: `?show=${mockUser.id}` },
+    profileContext: createMockProfileContext({
+      profile: {
+        disabled_features: disabledFeatures as any,
+      } as any,
+    }),
+  })
 }
 
 describe('UserPanel', () => {
@@ -87,5 +81,11 @@ describe('UserPanel', () => {
     expect(await screen.findByRole('tab', { name: 'Overview' })).toBeInTheDocument()
     expect(screen.queryByRole('tab', { name: 'Logs' })).not.toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Raw JSON' })).toBeInTheDocument()
+  })
+
+  it('provides an accessible close button', async () => {
+    renderPanel([])
+
+    expect(await screen.findByRole('button', { name: 'Close user details' })).toBeInTheDocument()
   })
 })
