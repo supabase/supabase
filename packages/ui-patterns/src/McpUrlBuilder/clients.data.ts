@@ -104,7 +104,7 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     icon: 'cursor',
     hasDistinctDarkIcon: true,
     configFile: '.cursor/mcp.json',
-    externalDocsUrl: 'https://docs.cursor.com/context/mcp',
+    externalDocsUrl: 'https://cursor.com/docs/mcp',
     generateDeepLink: (config) => {
       const name = 'supabase'
       const mcpUrl = getMcpUrl(config)
@@ -434,6 +434,9 @@ export const MCP_CLI_COMMANDS: Record<string, McpCliCommands> = {
   },
   fx: {
     authenticate: '/mcp auth supabase --open',
+  },
+  cursor: {
+    authenticate: 'agent mcp login supabase',
   },
 }
 
