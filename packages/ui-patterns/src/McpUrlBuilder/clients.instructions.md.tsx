@@ -282,6 +282,7 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
           To make the server available across all projects, place the configuration in{' '}
           <inlineCode value="~/.cursor/mcp.json" /> instead.
         </paragraph>
+        <heading depth={4}>Using Cursor CLI</heading>
         <paragraph>
           Cursor IDE and the Cursor CLI (<inlineCode value="agent" />) use the same MCP
           configuration. After you add the configuration above or install with the one-click button,
