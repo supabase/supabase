@@ -85,11 +85,14 @@ select
   public.get_full_content_url(page.type, page.path, null) as href,
   case when include_full_content then page.content else null end as content,
   page.meta as metadata,
-  array_agg(json_build_object(
-    'title', matched_section.heading,
-    'href', public.get_full_content_url(page.type, page.path, matched_section.slug),
-    'content', matched_section.content
-  )) filter (where matched_section.id is not null) as subsections
+  coalesce(
+    array_agg(json_build_object(
+      'title', matched_section.heading,
+      'href', public.get_full_content_url(page.type, page.path, matched_section.slug),
+      'content', matched_section.content
+    )) filter (where matched_section.id is not null),
+    array[]::json[]
+  ) as subsections
 from ranked_page
 join public.page on page.id = ranked_page.id
 left join matched_section on matched_section.page_id = page.id
@@ -182,11 +185,14 @@ select
   public.get_full_content_url(page_nimbus.type, page_nimbus.path, null) as href,
   case when include_full_content then page_nimbus.content else null end as content,
   page_nimbus.meta as metadata,
-  array_agg(json_build_object(
-    'title', matched_section.heading,
-    'href', public.get_full_content_url(page_nimbus.type, page_nimbus.path, matched_section.slug),
-    'content', matched_section.content
-  )) filter (where matched_section.id is not null) as subsections
+  coalesce(
+    array_agg(json_build_object(
+      'title', matched_section.heading,
+      'href', public.get_full_content_url(page_nimbus.type, page_nimbus.path, matched_section.slug),
+      'content', matched_section.content
+    )) filter (where matched_section.id is not null),
+    array[]::json[]
+  ) as subsections
 from ranked_page
 join public.page_nimbus on page_nimbus.id = ranked_page.id
 left join matched_section on matched_section.page_id = page_nimbus.id

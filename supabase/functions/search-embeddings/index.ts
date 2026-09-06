@@ -22,7 +22,14 @@ Deno.serve(async (req) => {
     }
 
     if (req.method !== 'POST') {
-      throw new UserError('Method not allowed')
+      return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+        status: 405,
+        headers: {
+          ...corsHeaders,
+          Allow: 'POST, OPTIONS',
+          'Content-Type': 'application/json',
+        },
+      })
     }
 
     if (!openAiKey) {
