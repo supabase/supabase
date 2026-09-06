@@ -83,6 +83,28 @@ export function getRowFromSidePanel(
   }
 }
 
+/**
+ * Restricts a foreign-row-selector value down to the single column that was actually
+ * double-clicked to open it. The selector resolves a value for every source column in the
+ * composite FK (so it can find the row being referenced), but saving all of them would let a
+ * single-cell edit silently change sibling columns the user never touched - e.g. moving a row
+ * across a tenant_id boundary just by picking a new role_id. Restricting the payload to the
+ * edited column means the database's FK constraint is the one that decides whether the edit is
+ * valid, matching how a direct edit on any other column already behaves.
+ *
+ * When no edited column is known (e.g. FK selection from the full Row Editor panel, where the
+ * user reviews every field before saving), the value is passed through unchanged.
+ *
+ * See: https://github.com/supabase/supabase/issues/41085
+ */
+export function filterForeignRowValue(
+  value: Record<string, unknown> | undefined,
+  editedColumnName: string | undefined
+): Record<string, unknown> | undefined {
+  if (!value || !editedColumnName) return value
+  return { [editedColumnName]: value[editedColumnName] }
+}
+
 const addPrimaryKey = async (
   projectRef: string,
   connectionString: string | undefined | null,
