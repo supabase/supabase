@@ -3,10 +3,6 @@ import { cn, Skeleton } from 'ui'
 
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 
-/**
- * The standalone card every `/mcp/*` interstitial renders inside: no dashboard
- * chrome, centered 400px card, Supabase logo header, title and subtitle slots.
- */
 export const InterstitialShell = ({
   title,
   subtitle,
@@ -26,12 +22,6 @@ export const InterstitialShell = ({
   </InterstitialLayout>
 )
 
-/**
- * Header-shaped placeholder for the window between mount and the point an
- * interstitial knows which state it is in. Each interstitial passes its own
- * body skeleton as `children` so the card doesn't resize when the real
- * content lands.
- */
 export const InterstitialShellSkeleton = ({ children }: { children: ReactNode }) => (
   <InterstitialShell
     title={<Skeleton className="h-[18px] w-40" />}

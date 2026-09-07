@@ -107,8 +107,6 @@ describe('buildSignUpReturnPath', () => {
 
 describe('getReturnToPath', () => {
   it('rebuilds a nested returnTo path with the params that rode alongside it', () => {
-    // The MCP secrets interstitial sends users to
-    // /sign-in?ref=…&name=…&returnTo=%2Fmcp%2Fsecrets and needs all three back.
     // @ts-ignore
     delete window.location
     // @ts-ignore

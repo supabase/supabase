@@ -363,7 +363,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/logout.tsx` ← `pages/logout.tsx`
 - [x] A `routes/maintenance.tsx` ← `pages/maintenance.tsx`
 - [x] A `routes/verify-email.tsx` ← `pages/verify-email.tsx`
-- [x] A `routes/mcp/secrets.tsx` ← `pages/mcp/secrets.tsx` (MCP elicitation URL-mode handoff; page brings its own `InterstitialLayout`, so it stays outside `_app/`. `/mcp/*` is the namespace for MCP interstitials — see `components/interfaces/MCP/README.md`. The legacy `/mcp_callback` path is a `redirects.shared.ts` rule, not a route.)
+- [x] A `routes/mcp/secrets.tsx` ← `pages/mcp/secrets.tsx` (MCP elicitation URL-mode handoff; page brings its own `InterstitialLayout`, so it stays outside `_app/`. The legacy `/mcp_callback` path is a `redirects.shared.ts` rule, not a route.)
 
 ### Error pages (handled at root)
 
