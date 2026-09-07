@@ -340,8 +340,6 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
     destination: '/project/:ref/integrations/data_api/docs',
     permanent: false,
   },
-  // TODO: remove one release after the MCP server's elicitation URL constant points at `/mcp/secrets`.
-  { source: '/mcp_callback', destination: '/mcp/secrets', permanent: false },
 ]
 
 // The two maintenance-mode rules are mutually exclusive; pick by env at
