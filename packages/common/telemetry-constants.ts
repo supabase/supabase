@@ -2375,7 +2375,7 @@ export interface HomeConnectActionClickedEvent {
     /**
      * The connect action/tile that was clicked
      */
-    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'server' | 'api_keys'
+    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'server' | 'warehouse' | 'api_keys'
   }
   groups: TelemetryGroups
 }
@@ -3534,7 +3534,10 @@ export interface AccessTokenCreatedEvent {
 }
 
 /**
- * Triggered when an access token creation sheet is closed.
+ * Triggered when the access token creation sheet is closed before a token was created, either by
+ * the user (Escape, outside click, or Cancel) or because the permissions map failed to load and
+ * forced the sheet shut. The token created step blocks non-safe closes, so this event never fires
+ * for a completed creation.
  *
  * @group Events
  * @source studio
@@ -3543,8 +3546,10 @@ export interface AccessTokenCreatedEvent {
 export interface AccessTokenCreationSheetDismissedEvent {
   action: 'access_token_creation_sheet_dismissed'
   properties: {
-    tokenType: 'classic' | 'scoped' | 'none'
-    step: 'form' | 'success'
+    resourceAccess: 'project' | 'organization' | 'account'
+    formStep: 'form' | 'review'
+    isFormTouched: boolean
+    trigger: 'user' | 'permissions_load_error'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }

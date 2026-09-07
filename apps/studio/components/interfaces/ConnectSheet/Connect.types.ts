@@ -57,7 +57,7 @@ export type ConditionalValue<T> =
 // Schema Types - Modes
 // ============================================================================
 
-export const CONNECT_MODES = ['framework', 'direct', 'orm', 'mcp', 'server'] as const
+export const CONNECT_MODES = ['framework', 'direct', 'orm', 'mcp', 'server', 'warehouse'] as const
 export type ConnectMode = (typeof CONNECT_MODES)[number]
 
 export interface ModeDefinition {

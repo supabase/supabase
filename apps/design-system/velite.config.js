@@ -1,169 +1,74 @@
 import path from 'path'
 import { getHighlighter, loadTheme } from '@shikijs/compat'
-import { defineDocumentType, defineNestedType, makeSource } from 'contentlayer2/source-files'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypePrettyCode from 'rehype-pretty-code'
 import rehypeSlug from 'rehype-slug'
 import { codeImport } from 'remark-code-import'
 import remarkGfm from 'remark-gfm'
 import { visit } from 'unist-util-visit'
+import { defineConfig, s } from 'velite'
 
-/** @type {import('contentlayer2/source-files').ComputedFields} */
-const computedFields = {
-  slug: {
-    type: 'string',
-    resolve: (doc) => `/${doc._raw.flattenedPath}`,
-  },
-  slugAsParams: {
-    type: 'string',
-    resolve: (doc) => doc._raw.flattenedPath,
-  },
-}
+import { rehypeComponent } from './lib/rehype-component'
 
-const LinksProperties = defineNestedType(() => ({
-  name: 'LinksProperties',
-  fields: {
-    doc: {
-      type: 'string',
-    },
-    api: {
-      type: 'string',
-    },
-  },
-}))
+const LinksProperties = s.object({
+  doc: s.string().optional(),
+  api: s.string().optional(),
+})
 
-const ExploreItem = defineNestedType(() => ({
-  name: 'ExploreItem',
-  fields: {
-    title: {
-      type: 'string',
-      required: true,
-    },
-    link: {
-      type: 'string',
-      required: true,
-    },
-    itemType: {
-      type: 'string',
-      required: false,
-    },
-    description: {
-      type: 'string',
-      required: false,
-    },
-  },
-}))
+const NestedProperties = s.object({
+  radix: s.boolean().optional(),
+  shadcn: s.boolean().optional(),
+  vaul: s.boolean().optional(),
+  inputOtp: s.boolean().optional(),
+  reactAccessibleTreeview: s.boolean().optional(),
+  recharts: s.boolean().optional(),
+})
 
-const CourseHero = defineNestedType(() => ({
-  name: 'CourseHero',
-  fields: {
-    title: {
-      type: 'string',
-      required: true,
-    },
-    subtitle: {
-      type: 'string',
-      required: true,
-    },
-    description: {
-      type: 'string',
-      required: true,
+const docs = s
+  .object({
+    title: s.string(),
+    description: s.string(),
+    published: s.boolean().default(true),
+    links: LinksProperties.optional(),
+    featured: s.boolean().default(false),
+    component: s.boolean().default(false),
+    fragment: s.boolean().default(false),
+    toc: s.boolean().default(true),
+    source: NestedProperties.optional(),
+    // mirrors contentlayer2's `_raw.flattenedPath`: file path relative to the
+    // content dir, extension stripped, trailing `/index` dropped.
+    path: s.path(),
+    raw: s.raw(),
+    // internal doc cross-links (e.g. `[Button](components/button)`) aren't
+    // real files on disk — disable Velite's default asset-copying behavior,
+    // which otherwise treats every relative link as a local file to copy.
+    // Minification is also disabled: it's pure CPU-bound Terser work with no
+    // real benefit for a dev-only content cache, and dominates build time.
+    code: s.mdx({ copyLinkedFiles: false, minify: false }),
+  })
+  .transform(({ path: flattenedPath, ...data }) => ({
+    ...data,
+    slug: `/${flattenedPath}`,
+    slugAsParams: flattenedPath.split('/').slice(1).join('/'),
+  }))
+
+export default defineConfig({
+  root: './content',
+  output: {
+    clean: true,
+  },
+  collections: {
+    allDocs: {
+      name: 'Doc',
+      pattern: 'docs/**/*.mdx',
+      schema: docs,
     },
   },
-}))
-
-const NestedProperties = defineNestedType(() => ({
-  name: 'NestedProperties',
-  fields: {
-    radix: {
-      type: 'boolean',
-    },
-    shadcn: {
-      type: 'boolean',
-    },
-    vaul: {
-      type: 'boolean',
-    },
-    inputOtp: {
-      type: 'boolean',
-    },
-    reactAccessibleTreeview: {
-      type: 'boolean',
-    },
-  },
-}))
-
-export const Doc = defineDocumentType(() => ({
-  name: 'Doc',
-  filePathPattern: `**/*.mdx`,
-  contentType: 'mdx',
-  fields: {
-    title: {
-      type: 'string',
-      required: true,
-    },
-    description: {
-      type: 'string',
-      required: true,
-    },
-    published: {
-      type: 'boolean',
-      default: true,
-    },
-    links: {
-      type: 'nested',
-      of: LinksProperties,
-    },
-    featured: {
-      type: 'boolean',
-      default: false,
-      required: false,
-    },
-    component: {
-      type: 'boolean',
-      default: false,
-      required: false,
-    },
-    fragment: {
-      type: 'boolean',
-      default: false,
-      required: false,
-    },
-    toc: {
-      type: 'boolean',
-      default: true,
-      required: false,
-    },
-    chapterNumber: {
-      type: 'number',
-      required: false,
-    },
-    explore: {
-      type: 'list',
-      of: ExploreItem,
-      required: false,
-    },
-    courseHero: {
-      type: 'nested',
-      of: CourseHero,
-      required: false,
-    },
-    source: {
-      type: 'nested',
-      of: NestedProperties,
-    },
-  },
-  computedFields,
-}))
-
-export default makeSource({
-  disableImportAliasWarning: true,
-  contentDirPath: './content',
-  documentTypes: [Doc],
   mdx: {
     remarkPlugins: [remarkGfm, codeImport],
     rehypePlugins: [
       rehypeSlug,
+      rehypeComponent,
       () => (tree) => {
         visit(tree, (node) => {
           if (node?.type === 'element' && node?.tagName === 'pre') {
@@ -190,12 +95,19 @@ export default makeSource({
       },
       [
         rehypePrettyCode,
-        // rehypePrettyCodeOptions,
         {
-          getHighlighter: async () => {
-            const theme = await loadTheme(path.join(process.cwd(), '/lib/themes/supabase-2.json'))
-            return await getHighlighter({ theme })
-          },
+          // Memoized so the (expensive) theme parse + oniguruma WASM init runs once
+          // for the whole build, instead of once per file — velite compiles every
+          // file concurrently, so without this every doc pays that cost redundantly.
+          getHighlighter: (() => {
+            let highlighterPromise
+            return () => {
+              highlighterPromise ??= loadTheme(
+                path.join(process.cwd(), '/lib/themes/supabase-2.json')
+              ).then((theme) => getHighlighter({ theme }))
+              return highlighterPromise
+            }
+          })(),
           onVisitLine(node) {
             // Prevent lines from collapsing in `display: grid` mode, and allow empty
             // lines to be copy/pasted
@@ -240,7 +152,6 @@ export default makeSource({
           }
         })
       },
-      // rehypeNpmCommand,
       [
         rehypeAutolinkHeadings,
         {
