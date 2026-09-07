@@ -111,6 +111,7 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
       const abandonmentContext = formRef.current?.getAbandonmentContext()
       track('access_token_creation_sheet_dismissed', {
         resourceAccess: abandonmentContext?.resourceAccess ?? 'project',
+        formStep: abandonmentContext?.formStep ?? 'form',
         isFormTouched: abandonmentContext?.isFormTouched ?? false,
       })
     }

@@ -263,6 +263,7 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Cancel' }))
     expect(mockTrack).toHaveBeenCalledWith('access_token_creation_sheet_dismissed', {
       resourceAccess: 'organization',
+      formStep: 'form',
       isFormTouched: true,
     })
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
@@ -275,10 +276,34 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.keyDown(dialog, { key: 'Escape', code: 'Escape' })
     expect(mockTrack).toHaveBeenCalledWith('access_token_creation_sheet_dismissed', {
       resourceAccess: 'project',
+      formStep: 'form',
       isFormTouched: false,
     })
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   })
+
+  test('tracks the review step when the sheet is dismissed from the review screen', async () => {
+    renderSheet()
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    await screen.findByRole('dialog')
+    await user.type(await screen.findByLabelText('Name'), 'test')
+    fireEvent.click(await screen.findByRole('combobox', { name: 'Organization' }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Acme Production' }))
+    fireEvent.click(await screen.findByRole('combobox', { name: 'Projects' }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Project 1' }))
+    await expandPermissionCategory('Project')
+    fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Read' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
+    await screen.findByText('Medium risk')
+    fireEvent.click(await screen.findByRole('button', { name: 'Cancel' }))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_creation_sheet_dismissed', {
+      resourceAccess: 'project',
+      formStep: 'review',
+      isFormTouched: true,
+    })
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  }, 10_000)
 
   // Organization scope tests
   test('requires an organization when scope is Organization', async () => {

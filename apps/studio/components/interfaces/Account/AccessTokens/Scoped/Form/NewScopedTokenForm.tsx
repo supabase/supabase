@@ -46,6 +46,7 @@ const DEFAULT_VALUES: TokenFormValues = {
 export interface NewScopedTokenFormHandle {
   getAbandonmentContext: () => {
     resourceAccess: TokenFormValues['resourceAccess']
+    formStep: 'form' | 'review'
     isFormTouched: boolean
   }
 }
@@ -63,14 +64,15 @@ export const NewScopedTokenForm = forwardRef<
     defaultValues: DEFAULT_VALUES,
     mode: 'onChange',
   })
+  const [step, setStep] = useState<'form' | 'review'>('form')
   const { isDirty } = form.formState
   useImperativeHandle(ref, () => ({
     getAbandonmentContext: () => ({
       resourceAccess: form.getValues('resourceAccess'),
+      formStep: step,
       isFormTouched: isDirty,
     }),
   }))
-  const [step, setStep] = useState<'form' | 'review'>('form')
   const [formValues, setFormValues] = useState<TokenFormValues>(DEFAULT_VALUES)
   const [isCreateHintDismissed, setIsCreateHintDismissed] = useState(false)
   const [missingPermissionsAttempts, setMissingPermissionsAttempts] = useState(0)

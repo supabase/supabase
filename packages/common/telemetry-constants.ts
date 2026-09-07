@@ -3546,6 +3546,8 @@ export interface AccessTokenCreationSheetDismissedEvent {
   action: 'access_token_creation_sheet_dismissed'
   properties: {
     resourceAccess: 'project' | 'organization' | 'account'
+    /** Which screen the user was on: the configuration form or the permissions review */
+    formStep: 'form' | 'review'
     /** Whether the user changed any field from its default before abandoning */
     isFormTouched: boolean
   }
