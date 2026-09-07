@@ -2,8 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
+import { restartPipeline } from './restart-pipeline-mutation'
 import { startPipeline } from './start-pipeline-mutation'
-import { stopPipeline } from './stop-pipeline-mutation'
 import { PipelineStatusName } from '@/components/interfaces/Database/Replication/Replication.constants'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -69,8 +69,7 @@ async function rollbackTables(
         pipelineStatusName === PipelineStatusName.STARTED ||
         pipelineStatusName === PipelineStatusName.FAILED
       ) {
-        await stopPipeline({ projectRef, pipelineId })
-        await startPipeline({ projectRef, pipelineId })
+        await restartPipeline({ projectRef, pipelineId })
       } else {
         // [Joshen] This error sounds misleading as though the rollback failed?
         throw new Error(
