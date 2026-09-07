@@ -1,3 +1,12 @@
+const isDev = process.env.NODE_ENV === 'development'
+const isBuild = process.env.NODE_ENV === 'production'
+
+if (!process.env.VELITE_STARTED && (isDev || isBuild)) {
+  process.env.VELITE_STARTED = '1'
+  const { build } = await import('velite')
+  await build({ watch: isDev, clean: !isDev })
+}
+
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '/design-system'
 
 /** @type {import('next').NextConfig} */

@@ -21,37 +21,46 @@ pnpm i
 pnpm dev
 ```
 
-The `dev` command builds the registry and Velite content, then runs the Next.js dev server and Velite watcher in parallel. That is the recommended workflow.
+The `dev` command builds the registry once, then runs the Next.js dev server (which starts Velite in watch mode) and a registry file watcher in parallel. That is the recommended workflow.
 
 Open [http://localhost:3003/design-system](http://localhost:3003/design-system) in your browser to see the result.
 
+### Hot reload
+
+There are two content pipelines:
+
+| What you edit | Watcher | Notes |
+| --- | --- | --- |
+| `content/docs/**/*.mdx` | Velite (via `next.config.mjs`) | Rebuilds on save; refresh the browser if the page does not update automatically |
+| `registry/**` (examples, `examples.ts`, etc.) | `dev:registry` (`tsx watch`) | Rebuilds `__registry__` on save |
+
+Velite runs inside the Next.js dev server because Turbopack does not support the old Contentlayer webpack plugin. Registry output is separate and must be watched explicitly.
+
 ### Alternative commands
 
-You can also run the development server and content watcher separately. Build the registry and content first, because `dev:next` and `dev:content` do not:
+You can also run the development server and registry watcher separately. Build the registry first, because `dev:next` and `dev:registry` do not:
 
 ```bash
 pnpm build:registry
-pnpm build:content
 
-# Run only the Next.js development server
+# Run only the Next.js development server (includes Velite watch)
 pnpm dev:next
 
-# Run only the Velite content watcher (in a separate terminal shell)
-pnpm dev:content
+# Run only the registry watcher (in a separate terminal shell)
+pnpm dev:registry
 ```
 
 From the repo root, `pnpm dev:design-system` runs the same `dev` script. If you split the watchers from the root, build first:
 
 ```bash
 pnpm --filter=design-system build:registry
-pnpm --filter=design-system build:content
 pnpm --filter=design-system dev:next
-pnpm --filter=design-system dev:content
+pnpm --filter=design-system dev:registry
 ```
 
 ### Watching for MDX changes
 
-The `dev` command watches MDX files and hot-reloads them. If you are running `pnpm dev:next` on its own, also run `pnpm dev:content` in another terminal.
+Velite watches `content/docs` while `dev:next` is running. If you run `pnpm dev:next` on its own, Velite still starts via `next.config.mjs`. You do not need a separate `velite dev` process.
 
 ### Adding components
 
