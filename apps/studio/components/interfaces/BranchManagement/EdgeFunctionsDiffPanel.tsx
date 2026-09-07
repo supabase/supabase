@@ -1,17 +1,18 @@
+import { IS_PLATFORM } from 'common'
 import { Circle, Code, Minus, Plus, Wind } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-
-import DiffViewer from 'components/ui/DiffViewer'
-import type { EdgeFunctionBodyData } from 'data/edge-functions/edge-function-body-query'
-import type {
-  EdgeFunctionsDiffResult,
-  FileInfo,
-  FileStatus,
-} from 'hooks/branches/useEdgeFunctionsDiff'
-import { EMPTY_ARR } from 'lib/void'
-import { basename } from 'path'
 import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
+
+import { DiffEditor } from '@/components/ui/DiffEditor'
+import type { EdgeFunctionBodyData } from '@/data/edge-functions/edge-function-body-query'
+import {
+  fileKey,
+  type EdgeFunctionsDiffResult,
+  type FileInfo,
+  type FileStatus,
+} from '@/hooks/branches/useEdgeFunctionsDiff'
+import { EMPTY_ARR } from '@/lib/void'
 
 const EMPTY_FUNCTION_BODY: EdgeFunctionBodyData = {
   files: EMPTY_ARR,
@@ -20,7 +21,6 @@ const EMPTY_FUNCTION_BODY: EdgeFunctionBodyData = {
 interface EdgeFunctionsDiffPanelProps {
   diffResults: EdgeFunctionsDiffResult
   currentBranchRef?: string
-  mainBranchRef?: string
 }
 
 interface FunctionDiffProps {
@@ -30,9 +30,6 @@ interface FunctionDiffProps {
   currentBranchRef?: string
   fileInfos: FileInfo[]
 }
-
-// Helper to canonicalize file identifiers to prevent mismatch due to differing root paths
-const fileKey = (fullPath: string) => basename(fullPath)
 
 // Helper to get the status color for file indicators
 const getStatusColor = (status: FileStatus): string => {
@@ -112,7 +109,7 @@ const FunctionDiff = ({
       <CardHeader>
         <CardTitle>
           <Link
-            href={`/project/${currentBranchRef}/functions/${functionSlug}`}
+            href={`/project/${currentBranchRef}/functions/${functionSlug}${IS_PLATFORM ? '' : '/details'}`}
             className="flex items-center gap-2"
           >
             <Code strokeWidth={1.5} size={16} className="text-foreground-muted" />
@@ -131,6 +128,7 @@ const FunctionDiff = ({
                   <li key={fileInfo.key} className="flex">
                     <button
                       type="button"
+                      tabIndex={0}
                       onClick={() => setActiveFileKey(fileInfo.key)}
                       className={cn(
                         'flex-1 text-left text-xs px-4 py-2 flex items-center gap-2',
@@ -140,7 +138,7 @@ const FunctionDiff = ({
                       )}
                     >
                       <Icon
-                        className={cn('flex-shrink-0', getStatusColor(fileInfo.status))}
+                        className={cn('shrink-0', getStatusColor(fileInfo.status))}
                         size={12}
                         strokeWidth={1}
                       />
@@ -152,10 +150,11 @@ const FunctionDiff = ({
             </ul>
           </div>
           <div className="flex-1 min-h-0">
-            <DiffViewer
+            <DiffEditor
               language={language}
               original={mainFile?.content || ''}
               modified={currentFile?.content || ''}
+              options={{ readOnly: true }}
             />
           </div>
         </div>
@@ -164,10 +163,9 @@ const FunctionDiff = ({
   )
 }
 
-const EdgeFunctionsDiffPanel = ({
+export const EdgeFunctionsDiffPanel = ({
   diffResults,
   currentBranchRef,
-  mainBranchRef,
 }: EdgeFunctionsDiffPanelProps) => {
   if (diffResults.isLoading) {
     return <Skeleton className="h-64" />
@@ -240,5 +238,3 @@ const EdgeFunctionsDiffPanel = ({
     </div>
   )
 }
-
-export default EdgeFunctionsDiffPanel

@@ -1,3 +1,13 @@
+import '@/styles/code-block-variables.css'
+import '@/styles/mdx.css'
+
+import { ChevronRight } from 'lucide-react'
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import Balancer from 'react-wrap-balancer'
+import { ScrollArea } from 'ui'
+
+import { allDocs } from '@/.velite'
 import { metadata as mainMetadata } from '@/app/layout'
 import { FrameworkSelector } from '@/components/framework-selector'
 import { Mdx } from '@/components/mdx-components'
@@ -5,14 +15,6 @@ import { SourcePanel } from '@/components/source-panel'
 import { DashboardTableOfContents } from '@/components/toc'
 import { getTableOfContents } from '@/lib/toc'
 import { absoluteUrl, cn } from '@/lib/utils'
-import '@/styles/code-block-variables.css'
-import '@/styles/mdx.css'
-import { allDocs } from 'contentlayer/generated'
-import { ChevronRight } from 'lucide-react'
-import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import Balancer from 'react-wrap-balancer'
-import { ScrollArea } from 'ui'
 
 interface DocPageProps {
   params: Promise<{
@@ -39,10 +41,17 @@ export async function generateMetadata(props: DocPageProps): Promise<Metadata> {
     return {}
   }
 
+  const markdownPath = `${process.env.NEXT_PUBLIC_BASE_PATH ?? '/library'}/docs/${doc.slugAsParams}.md`
+
   const metadata: Metadata = {
     ...mainMetadata,
     title: doc.title,
     description: doc.description,
+    alternates: {
+      types: {
+        'text/markdown': `https://supabase.com${markdownPath}`,
+      },
+    },
     openGraph: {
       ...mainMetadata.openGraph,
       title: doc.title,
@@ -68,7 +77,7 @@ export default async function DocPage(props: DocPageProps) {
     notFound()
   }
 
-  const toc = await getTableOfContents(doc.body.raw)
+  const toc = await getTableOfContents(doc.raw)
 
   return (
     <main className="relative lg:gap-10 xl:grid xl:grid-cols-[1fr_200px] px-8 md:px-16 py-20">
@@ -91,7 +100,7 @@ export default async function DocPage(props: DocPageProps) {
         </div>
         <SourcePanel doc={doc} />
         <div className="pb-12">
-          <Mdx code={doc.body.code} />
+          <Mdx code={doc.code} />
         </div>
       </div>
       {doc.toc && (

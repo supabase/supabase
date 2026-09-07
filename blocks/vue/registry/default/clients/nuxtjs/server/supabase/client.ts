@@ -1,10 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
-import { getCookie, setCookie, deleteCookie, H3Event, EventHandlerRequest } from 'h3'
+import { deleteCookie, EventHandlerRequest, getCookie, H3Event, setCookie } from 'h3'
 
 export const createSupabaseServerClient = (event: H3Event<EventHandlerRequest> | undefined) => {
   return createServerClient(
     process.env.NUXT_PUBLIC_SUPABASE_URL!,
-    process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
+    process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         get: (key) => getCookie(event!, key),

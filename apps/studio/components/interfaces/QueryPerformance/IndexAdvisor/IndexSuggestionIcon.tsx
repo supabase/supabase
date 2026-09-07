@@ -1,22 +1,22 @@
 import { Loader2 } from 'lucide-react'
 import { MouseEvent, useState } from 'react'
-
-import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advisor-result-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   cn,
-  CodeBlock,
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
   Separator,
   WarningIcon,
 } from 'ui'
-import { IndexImprovementText } from './IndexImprovementText'
-import { QueryPanelScoreSection } from '../QueryPanel'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+
 import { useIndexInvalidation } from '../hooks/useIndexInvalidation'
+import { QueryPanelScoreSection } from '../QueryPanel'
 import { createIndexes } from './index-advisor.utils'
+import { IndexImprovementText } from './IndexImprovementText'
+import { GetIndexAdvisorResultResponse } from '@/data/database/retrieve-index-advisor-result-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface IndexSuggestionIconProps {
   indexAdvisorResult: GetIndexAdvisorResultResponse
@@ -104,7 +104,7 @@ export const IndexSuggestionIcon = ({
             className={cn(
               'border-none rounded-none',
               'max-w-full',
-              '!py-0.5 !px-3.5 prose dark:prose-dark transition',
+              'py-0.5! px-3.5! prose dark:prose-dark transition',
               '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
             )}
           />
@@ -126,7 +126,7 @@ export const IndexSuggestionIcon = ({
         />
         <div className="p-3 flex gap-2 items-center border-t justify-end">
           <Button
-            type="text"
+            variant="text"
             onClick={(e) => {
               e.stopPropagation()
               if (onClickIcon && !isCreatingIndex) onClickIcon()

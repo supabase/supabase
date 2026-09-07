@@ -1,7 +1,7 @@
 import { type NavMenuConstant } from '~/components/Navigation/Navigation.types'
 import {
-  GLOBAL_MENU_ITEMS,
   ai,
+  ai_tools,
   api,
   auth,
   cron,
@@ -9,6 +9,7 @@ import {
   deployment,
   functions,
   gettingstarted,
+  GLOBAL_MENU_ITEMS,
   graphql,
   integrations,
   local_development,
@@ -33,6 +34,7 @@ const SECTION_NAV_MAPS: Record<string, NavMenuConstant> = {
   'getting-started': gettingstarted,
   graphql,
   integrations,
+  'ai-tools': ai_tools,
   'local-development': local_development,
   platform,
   queues,

@@ -12,18 +12,18 @@
   "files": [
     {
       "path": "registry/default/clients/react-router/lib/supabase/client.ts",
-      "content": "/// <reference types=\"vite/types/importMeta.d.ts\" />\nimport { createBrowserClient } from '@supabase/ssr'\n\nexport function createClient() {\n  return createBrowserClient(\n    import.meta.env.VITE_SUPABASE_URL!,\n    import.meta.env.VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY!\n  )\n}\n",
+      "content": "/// <reference types=\"vite/types/importMeta.d.ts\" />\nimport { createBrowserClient } from '@supabase/ssr'\n\nexport function createClient() {\n  return createBrowserClient(\n    import.meta.env.VITE_SUPABASE_URL!,\n    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY!\n  )\n}\n",
       "type": "registry:lib"
     },
     {
       "path": "registry/default/clients/react-router/lib/supabase/server.ts",
-      "content": "import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'\n\nexport function createClient(request: Request) {\n  const headers = new Headers()\n\n  const supabase = createServerClient(\n    process.env.VITE_SUPABASE_URL!,\n    process.env.VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,\n    {\n      cookies: {\n        getAll() {\n          return parseCookieHeader(request.headers.get('Cookie') ?? '') as {\n            name: string\n            value: string\n          }[]\n        },\n        setAll(cookiesToSet) {\n          cookiesToSet.forEach(({ name, value, options }) =>\n            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))\n          )\n        },\n      },\n    }\n  )\n\n  return { supabase, headers }\n}\n",
+      "content": "import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'\n\nexport function createClient(request: Request) {\n  const headers = new Headers()\n\n  const supabase = createServerClient(\n    process.env.VITE_SUPABASE_URL!,\n    process.env.VITE_SUPABASE_PUBLISHABLE_KEY!,\n    {\n      cookies: {\n        getAll() {\n          return parseCookieHeader(request.headers.get('Cookie') ?? '') as {\n            name: string\n            value: string\n          }[]\n        },\n        setAll(cookiesToSet) {\n          cookiesToSet.forEach(({ name, value, options }) =>\n            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))\n          )\n        },\n      },\n    }\n  )\n\n  return { supabase, headers }\n}\n",
       "type": "registry:lib"
     }
   ],
   "envVars": {
     "VITE_SUPABASE_URL": "",
-    "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+    "VITE_SUPABASE_PUBLISHABLE_KEY": ""
   },
-  "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`."
+  "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`."
 }

@@ -1,14 +1,13 @@
-export interface CommonChartProps<D>
-  extends Pick<
-    HeaderType<D>,
-    | 'highlightedValue'
-    | 'highlightedLabel'
-    | 'customDateFormat'
-    | 'data'
-    | 'format'
-    | 'minimalHeader'
-    | 'displayDateInUtc'
-  > {
+export interface CommonChartProps<D> extends Pick<
+  HeaderType<D>,
+  | 'highlightedValue'
+  | 'highlightedLabel'
+  | 'customDateFormat'
+  | 'data'
+  | 'format'
+  | 'minimalHeader'
+  | 'displayDateInUtc'
+> {
   title?: string
   className?: string
   valuePrecision?: number

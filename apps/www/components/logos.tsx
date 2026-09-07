@@ -1,11 +1,11 @@
-import { cn } from 'ui'
 import { range } from 'lib/helpers'
+import { cn } from 'ui'
 
 interface Props {
   showHeading?: boolean
   className?: string
   align?: 'left' | 'center'
-  maskBackgroundColor?: 'hsl(var(--background-default)' | 'hsl(var(--background-alternative)'
+  maskBackgroundColor?: 'var(--background-default)' | 'var(--background-alternative)'
 }
 
 const Logos: React.FC<Props> = ({ className, showHeading = true, align = 'center' }) => {
@@ -18,7 +18,7 @@ const Logos: React.FC<Props> = ({ className, showHeading = true, align = 'center
           className={cn(
             'relative w-full mx-auto max-w-4xl opacity-90 dark:opacity-70',
             'overflow-hidden',
-            "before:content[''] before:absolute before:inset-0 before:w-full before:bg-[linear-gradient(to_right,hsl(var(--background-default))_0%,transparent_10%,transparent_90%,hsl(var(--background-default))_100%)] before:z-10",
+            "before:content[''] before:absolute before:inset-0 before:w-full before:bg-[linear-gradient(to_right,var(--background-default)_0%,transparent_10%,transparent_90%,var(--background-default)_100%)] before:z-10",
             'flex flex-nowrap justify-center',
             'px-5 lg:px-12',
             align === 'left' ? 'justify-start ml-0' : 'justify-center',
@@ -128,11 +128,11 @@ const logos = [
 const LogosRow: React.FC<{ className?: string }> = ({ className }) => (
   <div className={cn(className)} suppressHydrationWarning>
     {logos.map((logo) => (
-      <div key={`logos-group-${logo.name}`} className="h-12 lg:h-12 w-max !inline-block">
+      <div key={`logos-group-${logo.name}`} className="h-12 lg:h-12 w-max inline-block!">
         <img
           src={logo.image}
           alt={logo.alt}
-          className={'h-12 lg:h-12 !min-h-12 lg:!min-h-12 w-auto block'}
+          className={'h-12 lg:h-12 min-h-12! lg:min-h-12! w-auto block'}
           draggable={false}
         />
       </div>

@@ -42,9 +42,10 @@ It is happening because some Google Suite requires the explicit request of email
 
 ```js
 const { data, error } = await supabase.auth.signInWithOAuth({
-  provider: 'google'
+  provider: 'google',
   options: {
-    scopes: 'https://www.googleapis.com/auth/userinfo.email'
+    scopes: 'https://www.googleapis.com/auth/userinfo.email',
+  },
   }
 })
 ```

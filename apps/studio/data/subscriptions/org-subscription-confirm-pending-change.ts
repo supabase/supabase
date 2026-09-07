@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import type { components } from 'api-types'
 import { toast } from 'sonner'
 
-import type { components } from 'api-types'
-import { handleError, post } from 'data/fetchers'
-import { invoicesKeys } from 'data/invoices/keys'
-import { organizationKeys } from 'data/organizations/keys'
-import { usageKeys } from 'data/usage/keys'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { subscriptionKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import { invoicesKeys } from '@/data/invoices/keys'
+import { organizationKeys } from '@/data/organizations/keys'
+import { usageKeys } from '@/data/usage/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type PendingSubscriptionChangeVariables = {
   payment_intent_id: string
@@ -82,6 +82,7 @@ export const useConfirmPendingSubscriptionChangeMutation = ({
 
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) }),
+        queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgBalance(slug) }),
         queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgPlans(slug) }),
         queryClient.invalidateQueries({ queryKey: usageKeys.orgUsage(slug) }),
         queryClient.invalidateQueries({ queryKey: invoicesKeys.orgUpcomingPreview(slug) }),

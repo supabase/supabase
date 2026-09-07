@@ -1,11 +1,10 @@
 import Link from 'next/link'
-
 import { Button } from 'ui'
 
 export default function ButtonAsChild() {
   return (
     <Button asChild>
-      <Link href="/login">Login</Link>
+      <Link href="/login">Sign in</Link>
     </Button>
   )
 }

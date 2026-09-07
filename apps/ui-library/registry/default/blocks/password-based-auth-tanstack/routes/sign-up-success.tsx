@@ -1,3 +1,5 @@
+import { createFileRoute } from '@tanstack/react-router'
+
 import {
   Card,
   CardContent,
@@ -5,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/registry/default/components/ui/card'
-import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/sign-up-success')({
   component: SignUpSuccess,
@@ -23,7 +24,7 @@ function SignUpSuccess() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                You've successfully signed up. Please check your email to confirm your account
+                You&apos;ve successfully signed up. Please check your email to confirm your account
                 before signing in.
               </p>
             </CardContent>

@@ -1,11 +1,14 @@
 import { usePrevious } from '@uidotdev/usehooks'
 import { AlertCircle, Check, Loader2, RefreshCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
-import { useProfile } from 'lib/profile'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import ReadOnlyBadge from './ReadOnlyBadge'
+import { useProfile } from '@/lib/profile'
+import { isSaveFailed, isSaving } from '@/state/sql-editor/sql-editor-lifecycle'
+import { isSnippetOwner } from '@/state/sql-editor/sql-editor-rules'
+import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export type SavingIndicatorProps = { id: string }
 
@@ -13,17 +16,20 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
   const { profile } = useProfile()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const savingState = snapV2.savingStates[id]
-  const previousState = usePrevious(savingState)
+  const snippet = snapV2.snippets[id]
+  const status = snippet?.snippet.status
+  const saving = isSaving(status)
+  const saveFailed = isSaveFailed(status)
+  const previousSaving = usePrevious(saving)
   const [showSavedText, setShowSavedText] = useState(false)
 
-  const snippet = snapV2.snippets[id]
-  const isSnippetOwner = profile?.id === snippet?.snippet.owner_id
+  const snippetIsOwned = !!snippet && isSnippetOwner(snippet.snippet, profile?.id)
+  const { requestSave } = useSqlEditorSaveCoordinator()
 
   useEffect(() => {
     let cancel = false
 
-    if (previousState === 'UPDATING' && savingState === 'IDLE') {
+    if (previousSaving && status === 'saved') {
       setShowSavedText(true)
       setTimeout(() => {
         if (!cancel) setShowSavedText(false)
@@ -33,16 +39,16 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
     return () => {
       cancel = true
     }
-  }, [savingState])
+  }, [status, previousSaving])
 
-  const retry = () => snapV2.addNeedsSaving(id)
+  const retry = () => requestSave(id)
 
   return (
     <>
       <div className="mx-2 flex items-center gap-2">
-        {isSnippetOwner && savingState === 'UPDATING_FAILED' && (
+        {snippetIsOwned && saveFailed && (
           <Button
-            type="text"
+            variant="text"
             size="tiny"
             icon={<RefreshCcw className="text-gray-1100" strokeWidth={2} />}
             onClick={retry}
@@ -57,15 +63,15 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
             </TooltipTrigger>
             <TooltipContent side="bottom">All changes saved</TooltipContent>
           </Tooltip>
-        ) : savingState === 'UPDATING' ? (
+        ) : saving ? (
           <Tooltip>
             <TooltipTrigger>
               <Loader2 className="animate-spin" size={14} strokeWidth={2} />
             </TooltipTrigger>
             <TooltipContent>Saving changes...</TooltipContent>
           </Tooltip>
-        ) : savingState === 'UPDATING_FAILED' ? (
-          isSnippetOwner ? (
+        ) : saveFailed ? (
+          snippetIsOwned ? (
             <Tooltip>
               <TooltipTrigger>
                 <AlertCircle className="text-red-900" size={14} strokeWidth={2} />

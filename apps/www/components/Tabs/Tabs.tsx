@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, TabsContent_Shadcn_ } from 'ui'
+import { useEffect, useState } from 'react'
+import { cn, TabsContent, TabsList, TabsTrigger, Tabs as UITabs } from 'ui'
 
 export interface TabsProps {
   children: React.ReactNode
@@ -39,28 +39,24 @@ function Tabs({ children, className, defaultActiveId, listClassNames }: TabsProp
 
   return (
     <div className={cn('not-prose', className)}>
-      <Tabs_Shadcn_
+      <UITabs
         value={currentActiveTab}
         onValueChange={setActiveTab}
-        className="w-full flex flex-col gap-4 [&_.ch-codeblock]:!mt-0"
+        className="w-full flex flex-col gap-4 [&_.ch-codeblock]:mt-0!"
       >
-        <TabsList_Shadcn_ className={cn('shiki-wrapper flex', listClassNames)}>
+        <TabsList className={cn('shiki-wrapper flex', listClassNames)}>
           {validTabPanels.map((panel) => (
-            <TabsTrigger_Shadcn_
-              key={panel.props.id}
-              value={panel.props.id}
-              className="text-xs px-2.5"
-            >
+            <TabsTrigger key={panel.props.id} value={panel.props.id} className="text-xs px-2.5">
               {panel.props.label}
-            </TabsTrigger_Shadcn_>
+            </TabsTrigger>
           ))}
-        </TabsList_Shadcn_>
+        </TabsList>
         {validTabPanels.map((panel) => (
-          <TabsContent_Shadcn_ key={panel.props.id} value={panel.props.id} className="mt-0">
+          <TabsContent key={panel.props.id} value={panel.props.id} className="mt-0">
             {panel.props.children}
-          </TabsContent_Shadcn_>
+          </TabsContent>
         ))}
-      </Tabs_Shadcn_>
+      </UITabs>
     </div>
   )
 }

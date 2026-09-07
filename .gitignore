@@ -112,13 +112,18 @@ next-env.d.ts
 # DynamoDB Local files
 .dynamodb/
 
-.vscode
+.vscode/*
+!.vscode/content-listing.code-snippets
 .idea
 .vercel
 
 # AI assistant local files
-.claude/
-CLAUDE.md
+.claude/*
+!.claude/settings.json
+!.claude/scripts/
+!.claude/skills
+.agents/skills/me-*
+CLAUDE.local.md
 
 #include template .env file for docker-compose
 !docker/.env
@@ -150,3 +155,14 @@ gcloud.json
 **/.sentryclirc
 
 keys.json
+
+# Playwright MCP
+.playwright-mcp/*
+
+# Application
+**/.superset/**
+
+# examples
+examples/**/package-lock.json
+examples/**/yarn.lock
+examples/**/pnpm-lock.yaml

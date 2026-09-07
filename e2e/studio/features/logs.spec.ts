@@ -1,6 +1,8 @@
 import { expect } from '@playwright/test'
+
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
+
 const LOGS_PAGES = [
   { label: 'API Gateway', route: 'edge-logs' },
   { label: 'Postgres', route: 'postgres-logs' },
@@ -48,8 +50,8 @@ test.describe('Logs', () => {
        */
       await page.goto(toUrl(`/project/${ref}/logs/${logPage.route}`))
 
-      await expect(page.getByRole('heading', { name: 'Logs & Analytics' }), {
-        message: 'Logs & Analytics heading should be visible',
+      await expect(page.getByRole('heading', { name: 'Logs', exact: true }), {
+        message: 'Logs heading should be visible',
       }).toBeVisible()
 
       /**
@@ -60,7 +62,7 @@ test.describe('Logs', () => {
 
       await expect(logsTable, {
         message: 'Logs table should be visible',
-      }).toBeVisible({ timeout: 20000 })
+      }).toBeVisible()
 
       /**
        * Shows the logs data without errors
@@ -73,10 +75,15 @@ test.describe('Logs', () => {
        * Can select and view log details
        */
       const gridcells = page.getByText('Random event message')
+      await expect(gridcells, {
+        message: 'Grid cell should be visible before clicking',
+      }).toBeVisible()
       await gridcells.click()
 
       const tabPanel = page.getByTestId('log-selection')
-      await expect(tabPanel).toBeVisible()
+      await expect(tabPanel, {
+        message: 'Log selection panel should be visible after clicking a log',
+      }).toBeVisible()
 
       // Assert known fixed values instead of extracting text
       await expect(tabPanel, {

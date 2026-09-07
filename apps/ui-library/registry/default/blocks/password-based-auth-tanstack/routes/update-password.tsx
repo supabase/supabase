@@ -1,5 +1,6 @@
-import { UpdatePasswordForm } from '@/registry/default/blocks/password-based-auth-tanstack/components/update-password-form'
 import { createFileRoute } from '@tanstack/react-router'
+
+import { UpdatePasswordForm } from '@/registry/default/blocks/password-based-auth-tanstack/components/update-password-form'
 
 export const Route = createFileRoute('/update-password')({
   component: UpdatePassword,

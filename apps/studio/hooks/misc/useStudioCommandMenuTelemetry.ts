@@ -1,39 +1,43 @@
-import { useCallback } from 'react'
-
-import { useParams } from 'common'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { sendTelemetryEvent, useParams } from 'common'
 import type {
-  CommandMenuOpenedEvent,
+  CommandMenuClosedEvent,
   CommandMenuCommandClickedEvent,
+  CommandMenuOpenedEvent,
   CommandMenuSearchSubmittedEvent,
 } from 'common/telemetry-constants'
+import { useRouter } from 'next/router'
+import { useCallback } from 'react'
+
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { API_URL } from '@/lib/constants'
 
 export function useStudioCommandMenuTelemetry() {
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const router = useRouter()
 
   const onTelemetry = useCallback(
     (
       event:
         | CommandMenuOpenedEvent
+        | CommandMenuClosedEvent
         | CommandMenuCommandClickedEvent
         | CommandMenuSearchSubmittedEvent
     ) => {
-      // Add studio-specific groups (project and organization)
-      const eventWithGroups = {
-        ...event,
-        groups: {
-          ...event.groups,
-          ...(projectRef && { project: projectRef }),
-          ...(organization?.slug && { organization: organization.slug }),
+      sendTelemetryEvent(
+        API_URL,
+        {
+          ...event,
+          groups: {
+            ...event.groups,
+            ...(projectRef && { project: projectRef }),
+            ...(organization?.slug && { organization: organization.slug }),
+          },
         },
-      }
-
-      sendEvent(eventWithGroups)
+        router.pathname
+      )
     },
-    [projectRef, organization?.slug, sendEvent]
+    [projectRef, organization?.slug, router.pathname]
   )
 
   return { onTelemetry }

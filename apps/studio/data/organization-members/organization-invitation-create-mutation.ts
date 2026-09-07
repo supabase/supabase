@@ -1,27 +1,30 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { toast } from 'sonner'
 
-import { components } from 'api-types'
-import { handleError, post } from 'data/fetchers'
-import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { organizationKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import { organizationKeys as organizationKeysV1 } from '@/data/organizations/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OrganizationCreateInvitationVariables = {
   slug: string
-  email: string
+  emails: string[]
   roleId: number
   projects?: string[]
+  requireSso?: boolean
 }
 
 export async function createOrganizationInvitation({
   slug,
-  email,
+  emails,
   roleId,
   projects,
+  requireSso,
 }: OrganizationCreateInvitationVariables) {
-  const payload: components['schemas']['CreateInvitationBody'] = { email, role_id: roleId }
+  const payload: components['schemas']['CreateInvitationBody'] = { emails, role_id: roleId }
   if (projects !== undefined) payload.role_scoped_projects = projects
+  if (requireSso !== undefined) payload.require_sso = requireSso
 
   const { data, error } = await post('/platform/organizations/{slug}/members/invitations', {
     params: { path: { slug } },
@@ -66,7 +69,7 @@ export const useOrganizationCreateInvitationMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to update member role: ${data.message}`)
+        toast.error(`Failed to send invitation${data.message ? ': ' + data.message : ''}`)
       } else {
         onError(data, variables, context)
       }

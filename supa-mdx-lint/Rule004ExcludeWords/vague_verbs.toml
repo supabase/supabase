@@ -1,0 +1,7 @@
+description = "Use '%r' instead of '%s'."
+level = "WARNING"
+words = [
+    ["handle errors", "view and resolve errors"],
+    ["manage tables", "create, edit, or delete tables"],
+    ["work with data", "query and update data"],
+]

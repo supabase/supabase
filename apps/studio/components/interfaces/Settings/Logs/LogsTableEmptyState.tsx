@@ -2,7 +2,7 @@ import { Search } from 'lucide-react'
 
 const EmptyStateRow = () => {
   return (
-    <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
+    <div className="relative flex h-4 w-32 items-center rounded-sm border border-dashed border-stronger px-2" />
   )
 }
 

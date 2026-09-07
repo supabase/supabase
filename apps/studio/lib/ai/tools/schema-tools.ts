@@ -1,15 +1,14 @@
 import { tool } from 'ai'
-import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
 import { z } from 'zod'
+
+import { getDatabasePolicies } from '@/data/database-policies/database-policies-query'
 
 export const getSchemaTools = ({
   projectRef,
   connectionString,
-  authorization,
 }: {
   projectRef: string
   connectionString: string
-  authorization?: string
 }) => ({
   list_policies: tool({
     description: 'Get existing RLS policies for a given schema',
@@ -21,13 +20,9 @@ export const getSchemaTools = ({
         {
           projectRef,
           connectionString,
-          schema: schemas?.join(','),
+          schemas,
         },
-        undefined,
-        {
-          'Content-Type': 'application/json',
-          ...(authorization && { Authorization: authorization }),
-        }
+        undefined
       )
 
       const formattedPolicies = data

@@ -21,7 +21,7 @@ async function getCommitTime(commitSha: string) {
 }
 
 export default async function handler(
-  req: NextApiRequest,
+  _req: NextApiRequest,
   res: NextApiResponse<{ commitSha: string; commitTime: string }>
 ) {
   // Set cache control headers for 10 minutes so that we don't get banned by GitHub API

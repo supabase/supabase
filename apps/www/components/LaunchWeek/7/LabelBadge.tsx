@@ -7,7 +7,7 @@ interface Props {
 
 export default function LabelBadge({ text, gradientText = false }: Props) {
   return (
-    <span className="bg-[#32313F] rounded px-1 py-[2px] text-xs">
+    <span className="bg-[#32313F] rounded-sm px-1 py-[2px] text-xs">
       <span className={!gradientText ? 'text-[#D87BF5]' : 'gradient-text-purple-500'}>{text}</span>
     </span>
   )

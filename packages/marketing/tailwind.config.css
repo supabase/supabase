@@ -1,0 +1,4 @@
+/* Placeholder so the VS Code Tailwind extension picks up IntelliSense in this
+ * package. Apps own their actual entry CSS file; this file just anchors the
+ * shared config for editor tooling. */
+@import 'config/tailwind.config.css';

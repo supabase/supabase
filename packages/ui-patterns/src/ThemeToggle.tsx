@@ -4,15 +4,14 @@ import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import {
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-  Theme,
-  cn,
-  themes,
+  singleThemes,
 } from 'ui'
 
 interface ThemeToggleProps {
@@ -65,9 +64,9 @@ export const ThemeToggle = ({
               setTheme(value)
             }}
           >
-            {themes
+            {singleThemes
               .filter((x) => x.value === 'dark' || x.value === 'light' || x.value === 'system')
-              .map((theme: Theme) => (
+              .map((theme) => (
                 <DropdownMenuRadioItem key={theme.value} value={theme.value}>
                   {theme.name}
                 </DropdownMenuRadioItem>

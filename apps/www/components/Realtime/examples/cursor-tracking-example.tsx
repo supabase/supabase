@@ -251,7 +251,7 @@ export default function App() {
               
               {/* Username label */}
               <div
-                className="mt-2 px-2 py-1 rounded text-xs whitespace-nowrap"
+                className="mt-2 px-2 py-1 rounded-sm text-xs whitespace-nowrap"
                 style={{ 
                   backgroundColor: color,
                   color: '#fff',

@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type BucketEmptyVariables = {
   projectRef: string
@@ -12,7 +12,7 @@ export type BucketEmptyVariables = {
 
 export async function emptyBucket({ projectRef, id }: BucketEmptyVariables) {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!id) throw new Error('Bucket name is requried')
+  if (!id) throw new Error('Bucket name is required')
 
   const { data, error } = await post('/platform/storage/{ref}/buckets/{id}/empty', {
     params: { path: { id, ref: projectRef } },

@@ -1,0 +1,6 @@
+<div class="avatar_wrapper" (click)="uploadAvatar()">
+  <img *ngIf="_avatarUrl; else noAvatar" [src]="_avatarUrl" />
+  <ng-template #noAvatar>
+    <ion-icon name="person" class="no-avatar"></ion-icon>
+  </ng-template>
+</div>

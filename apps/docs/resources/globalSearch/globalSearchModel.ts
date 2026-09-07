@@ -128,7 +128,7 @@ function createModelFromMatch({
       } else {
         return null
       }
-    case 'github-discussions':
+    case 'troubleshooting':
       return new TroubleshootingModel({
         title: page_title,
         href,

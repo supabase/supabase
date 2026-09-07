@@ -1,18 +1,18 @@
+import { Query } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { Query } from '@supabase/pg-meta/src/query'
-import type { SupaRow } from 'components/grid/types'
-import { Markdown } from 'components/interfaces/Markdown'
-import { DocsButton } from 'components/ui/DocsButton'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { Entity } from 'data/table-editor/table-editor-types'
-import { DOCS_URL } from 'lib/constants'
-import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { tableRowKeys } from './keys'
 import { getPrimaryKeys } from './utils'
+import type { SupaRow } from '@/components/grid/types'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { Entity } from '@/data/table-editor/table-editor-types'
+import { DOCS_URL } from '@/lib/constants'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type TableRowDeleteVariables = {
   projectRef: string
@@ -103,9 +103,9 @@ export const useTableRowDeleteMutation = ({
           toast(initialMessage, {
             description: <Markdown content={resolutionCTA} className="[&>p]:m-0" />,
             action: (
-              <div className="w-full flex gap-x-2 !mx-0 mt-3">
+              <div className="w-full flex gap-x-2 mx-0! mt-3">
                 {/* [Joshen] Ideally we also are able to add this CTA but we can't guarantee this info without an on-demand fetch */}
-                {/* <Button asChild key="cta-1" type="default">
+                {/* <Button asChild key="cta-1" variant="default">
                     <Link href={`/project/${projectRef}/editor`}>
                       View "{referencingTable}" table
                     </Link>

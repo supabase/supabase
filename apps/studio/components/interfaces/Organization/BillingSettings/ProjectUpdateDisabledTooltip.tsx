@@ -7,29 +7,28 @@ export interface ProjectUpdateDisabledTooltipProps {
   tooltip?: string
 }
 
-const ProjectUpdateDisabledTooltip = ({
+export const ProjectUpdateDisabledTooltip = ({
   projectUpdateDisabled,
   projectNotActive = false,
   children,
   tooltip,
 }: PropsWithChildren<ProjectUpdateDisabledTooltipProps>) => {
-  const showTooltip = projectUpdateDisabled || projectNotActive
+  const tooltipMessage =
+    tooltip ||
+    (projectUpdateDisabled
+      ? 'Subscription changes are currently disabled. Our engineers are working on a fix.'
+      : projectNotActive
+        ? 'Unable to update subscription as project is currently not active'
+        : undefined)
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      {showTooltip && (
-        <TooltipContent side="bottom" className="w-72 text-center">
-          {projectUpdateDisabled
-            ? tooltip ||
-              'Subscription changes are currently disabled. Our engineers are working on a fix.'
-            : projectNotActive
-              ? 'Unable to update subscription as project is currently not active'
-              : ''}
+      {tooltipMessage !== undefined && (
+        <TooltipContent side="bottom" className="w-64 text-center">
+          {tooltipMessage}
         </TooltipContent>
       )}
     </Tooltip>
   )
 }
-
-export default ProjectUpdateDisabledTooltip

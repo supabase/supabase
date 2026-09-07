@@ -1,13 +1,13 @@
+import CTABanner from '~/components/CTABanner'
+import DefaultLayout from '~/components/Layouts/Default'
+import { getAbsoluteBlogSocialImage } from '~/lib/blog-images'
+import { generateReadingTime } from '~/lib/helpers'
 import authors from 'lib/authors.json'
+import { MDXClient } from 'next-mdx-remote-client/csr'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import React from 'react'
-import CTABanner from '~/components/CTABanner'
-import DefaultLayout from '~/components/Layouts/Default'
-import { generateReadingTime } from '~/lib/helpers'
-import { MDXRemote } from 'next-mdx-remote'
 
 interface Props {
   components: React.ReactNode
@@ -31,14 +31,12 @@ const LayoutComparison = ({ components, props }: Props) => {
     )
   }
 
-  const { basePath } = useRouter()
-
   const NextCard = (props: any) => {
     const { post, label, className } = props
     return (
       <Link href={`${post.url}`} as={`${post.url}`}>
         <div className={className}>
-          <div className="border-default hover:bg-surface-100 cursor-pointer rounded border p-6 transition">
+          <div className="border-default hover:bg-surface-100 cursor-pointer rounded-sm border p-6 transition">
             <div className="space-y-4">
               <div>
                 <p className="text-muted text-sm">{label}</p>
@@ -76,13 +74,11 @@ const LayoutComparison = ({ components, props }: Props) => {
               return cat
             }),
           },
-          images: [
-            {
-              url: `https://supabase.com${basePath}/images/blog/${
-                props.blog.image ? props.blog.image : props.blog.thumb
-              }`,
-            },
-          ],
+          images: (() => {
+            const url = getAbsoluteBlogSocialImage(props.blog, 'https://supabase.com')
+            if (!url) return []
+            return [{ url }]
+          })(),
         }}
       />
       <DefaultLayout>
@@ -129,7 +125,7 @@ const LayoutComparison = ({ components, props }: Props) => {
           <div>
             {/* Content */}
             <div className="prose prose-docs max-w-none">
-              <MDXRemote {...content} components={components} />
+              <MDXClient {...content} components={components} />
             </div>
             <div className="py-16">
               <div className="text-foreground-lighter text-sm">Share this article</div>

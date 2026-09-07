@@ -1,18 +1,18 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import { permissionKeys } from 'data/permissions/keys'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { organizationKeys } from './keys'
 import { castOrganizationResponseToOrganization } from './organizations-query'
 import type { CustomerAddress, CustomerTaxId } from './types'
+import { handleError, post } from '@/data/fetchers'
+import { permissionKeys } from '@/data/permissions/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OrganizationCreateVariables = {
   name: string
   kind?: string
   size?: string
-  tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
+  tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise' | 'tier_platform'
   payment_method?: string
   billing_name?: string | null
   address?: CustomerAddress | null

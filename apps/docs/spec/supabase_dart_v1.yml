@@ -56,7 +56,7 @@ functions:
     description: |
       Creates a new user.
     notes: |
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
+      - By default, the user needs to verify their email address before signing in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
@@ -107,7 +107,7 @@ functions:
   - id: sign-in-with-password
     title: 'signInWithPassword()'
     description: |
-      Log in an existing user using email or phone number with password.
+      Sign in an existing user using email or phone number with password.
     notes: |
       - Requires either an email and password or a phone number and password.
     examples:
@@ -239,7 +239,7 @@ functions:
   - id: sign-out
     title: 'signOut()'
     description: |
-      Signs out the current user, if there is a logged in user.
+      Signs out the current user, if there is a signed-in user.
     notes: |
       - In order to use the `signOut()` method, the user needs to be signed in first.
     examples:
@@ -297,9 +297,9 @@ functions:
   - id: get-user
     title: 'currentUser'
     description: |
-      Returns the user data, if there is a logged in user.
+      Returns the user data, if there is a signed-in user.
     examples:
-      - name: Get the logged in user
+      - name: Get the signed-in user
         isSpotlight: true
         code: |
           ```dart
@@ -308,7 +308,7 @@ functions:
   - id: update-user
     title: 'updateUser()'
     description: |
-      Updates user data for a logged in user.
+      Updates user data for a signed-in user.
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
       - By Default, email updates sends a confirmation link to both the user's current and new email.
@@ -750,7 +750,7 @@ functions:
       - id: parsing-custom-headers
         name: Parsing custom headers.
         description: |
-          Any `headers` will be passed through to the function. A common pattern is to pass a logged-in user's JWT token as an Authorization header.
+          Any `headers` will be passed through to the function. A common pattern is to pass a signed-in user's JWT token as an Authorization header.
         isSpotlight: true
         code: |
           ```dart
@@ -1049,17 +1049,17 @@ functions:
           ```
 
   - id: rpc
-    title: 'Stored Procedures: rpc()'
+    title: 'Database Functions: rpc()'
     description: |
-      You can call stored procedures as a "Remote Procedure Call".
+      You can call functions as a "Remote Procedure Call".
 
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
       It's especially useful when the logic rarely changes - like password resets and updates.
     examples:
-      - id: call-a-stored-procedure
-        name: Call a stored procedure
+      - id: call-a-database-function
+        name: Call a database function
         isSpotlight: true
-        description: This is an example invoking a stored procedure.
+        description: This is an example invoking a database function.
         code: |
           ```dart
           final data = await supabase
@@ -1994,9 +1994,9 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
-            .rpc('echo_all_instruments)
+            .rpc('echo_all_instruments')
             .not('name', 'eq', 'violin');
           ```
 
@@ -2037,7 +2037,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_instruments')
             .match({'name': 'violin', 'country_id': 3});
@@ -2080,7 +2080,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_instruments')
             .eq('name', 'guqin');
@@ -2123,7 +2123,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_instruments')
             .neq('name', 'violin');
@@ -2166,7 +2166,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .gt('country_id', 250);
@@ -2209,7 +2209,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .gte('country_id', 250);
@@ -2252,7 +2252,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .lt('country_id', 250);
@@ -2296,7 +2296,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .lte('country_id', 250);
@@ -2340,7 +2340,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .like('name', '%la%');
@@ -2383,7 +2383,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .ilike('name', '%la%');
@@ -2428,7 +2428,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .is_('name', null);
@@ -2473,7 +2473,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .in_('name', ['Minas Tirith', 'Minas Morgul']);
@@ -2514,7 +2514,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .contains('main_exports', ['oil']);
@@ -2555,7 +2555,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .containedBy('main_exports', ['cars', 'food', 'machine']);
@@ -2596,7 +2596,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .rangeLt('population_range_millions', '[150, 250]');
@@ -2637,7 +2637,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .rangeGt('population_range_millions', '[150, 250]');
@@ -2678,7 +2678,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .rangeGte('population_range_millions', '[150, 250]');
@@ -2720,7 +2720,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .rangeLte('population_range_millions', [150, 250]);
@@ -2761,7 +2761,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .rangeAdjacent('population_range_millions', '[70, 185]');
@@ -2802,7 +2802,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .overlaps('main_exports', ['computers', 'minerals']);
@@ -2918,7 +2918,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .filter('name', 'in', '("Minas Tirith","Minas Morgul")');

@@ -1,8 +1,9 @@
-import React, { FC } from 'react'
+import React, { type FC, type ReactNode } from 'react'
+import { cn } from 'ui'
+import { TextLink } from 'ui-patterns/TextLink'
 
-import { cn, TextLink } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import CodeWindow from '~/components/CodeWindow'
+import CodeWindow from '@/components/CodeWindow'
+import SectionContainer from '@/components/Layouts/SectionContainer'
 
 const codeSnippet = `
 select pgmq.create('my_special_queue');
@@ -16,9 +17,9 @@ select * from pgmq.pop('my_special_queue');
 `
 interface Props {
   id: string
-  label: string | JSX.Element
-  heading: string | JSX.Element
-  subheading: string | JSX.Element
+  label: ReactNode
+  heading: ReactNode
+  subheading: ReactNode
   className?: string
   cta?: {
     label: string
@@ -35,14 +36,14 @@ const QueuesSQLSection: FC<Props> = (props) => {
         props.className
       )}
     >
-      <ul className="w-full flex-grow rounded-lg max-w-md">
+      <ul className="w-full grow rounded-lg max-w-md">
         <div className="w-full h-full relative">
           <CodeWindow
             code={codeSnippet}
             lang="sql"
             className="
-              h-full xl:!text-lg
-              [&_.synthax-highlighter]:!pb-8
+              h-full xl:text-lg!
+              [&_.synthax-highlighter]:pb-8!
               [&_.synthax-highlighter]:xl:min-h-[240px]
             "
           />
@@ -50,8 +51,8 @@ const QueuesSQLSection: FC<Props> = (props) => {
       </ul>
       <div className="flex order-first md:order-last flex-col gap-2 max-w-md">
         <span className="label">{props.label}</span>
-        <h2 className="h2 !m-0">{props.heading}</h2>
-        <p className="p !text-foreground-lighter">{props.subheading}</p>
+        <h2 className="h2 m-0!">{props.heading}</h2>
+        <p className="p text-foreground-lighter!">{props.subheading}</p>
         {props.cta && (
           <TextLink hasChevron label={props.cta.label} url={props.cta.url} className="mt-2" />
         )}

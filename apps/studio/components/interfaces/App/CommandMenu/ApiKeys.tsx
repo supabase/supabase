@@ -1,39 +1,52 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Key } from 'lucide-react'
 import { useMemo } from 'react'
-
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { toast } from 'sonner'
 import { Badge, copyToClipboard } from 'ui'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
   PageType,
   useRegisterCommands,
   useRegisterPage,
+  useResetCommandMenu,
   useSetCommandMenuOpen,
   useSetPage,
 } from 'ui-patterns/CommandMenu'
+
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const API_KEYS_PAGE_NAME = 'API Keys'
 
 export function useApiKeysCommands() {
   const setIsOpen = useSetCommandMenuOpen()
+  const resetCommandMenu = useResetCommandMenu()
   const setPage = useSetPage()
 
   const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref || '_'
 
-  const { canReadAPIKeys } = useApiKeysVisibility()
-  const { data: apiKeys } = useAPIKeysQuery(
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { isHighAvailability } = useHighAvailability()
+
+  const { data: apiKeysData } = useAPIKeys(
     { projectRef: project?.ref, reveal: true },
     { enabled: canReadAPIKeys }
   )
   const commands = useMemo(() => {
-    const { anonKey, serviceKey, publishableKey, allSecretKeys } = canReadAPIKeys
-      ? getKeys(apiKeys)
-      : {}
+    const {
+      anonKey: legacyAnonKey,
+      serviceKey: legacyServiceKey,
+      publishableKey,
+      allSecretKeys,
+    } = canReadAPIKeys ? (apiKeysData ?? {}) : {}
+
+    const anonKey = isHighAvailability ? undefined : legacyAnonKey
+    const serviceKey = isHighAvailability ? undefined : legacyServiceKey
 
     return [
       project &&
@@ -41,13 +54,16 @@ export function useApiKeysCommands() {
           id: 'publishable-key',
           name: `Copy publishable key`,
           action: () => {
-            copyToClipboard(publishableKey.api_key ?? '')
+            copyToClipboard(publishableKey.api_key ?? '', () => {
+              toast.success('Publishable key copied to clipboard')
+            })
             setIsOpen(false)
+            resetCommandMenu()
           },
           badge: () => (
             <span className="flex items-center gap-x-1">
               <Badge>Project: {project?.name}</Badge>
-              <Badge className="capitalize">{publishableKey.type}</Badge>
+              <Badge>{publishableKey.type}</Badge>
             </span>
           ),
           icon: () => <Key />,
@@ -57,13 +73,16 @@ export function useApiKeysCommands() {
             id: key.id,
             name: `Copy secret key (${key.name})`,
             action: () => {
-              copyToClipboard(key.api_key ?? '')
+              copyToClipboard(key.api_key ?? '', () => {
+                toast.success('Secret key copied to clipboard')
+              })
               setIsOpen(false)
+              resetCommandMenu()
             },
             badge: () => (
               <span className="flex items-center gap-x-1">
                 <Badge>Project: {project?.name}</Badge>
-                <Badge className="capitalize">{key.type}</Badge>
+                <Badge>{key.type}</Badge>
               </span>
             ),
             icon: () => <Key />,
@@ -74,14 +93,17 @@ export function useApiKeysCommands() {
           id: 'anon-key',
           name: `Copy anonymous API key`,
           action: () => {
-            copyToClipboard(anonKey.api_key ?? '')
+            copyToClipboard(anonKey.api_key ?? '', () => {
+              toast.success('Anonymous API key copied to clipboard')
+            })
             setIsOpen(false)
+            resetCommandMenu()
           },
           badge: () => (
             <span className="flex items-center gap-x-1">
               <Badge>Project: {project?.name}</Badge>
               <Badge>Public</Badge>
-              <Badge className="capitalize">{anonKey.type}</Badge>
+              <Badge>{anonKey.type}</Badge>
             </span>
           ),
           icon: () => <Key />,
@@ -91,14 +113,17 @@ export function useApiKeysCommands() {
           id: 'service-key',
           name: `Copy service API key`,
           action: () => {
-            copyToClipboard(serviceKey.api_key ?? '')
+            copyToClipboard(serviceKey.api_key ?? '', () => {
+              toast.success('Service key copied to clipboard')
+            })
             setIsOpen(false)
+            resetCommandMenu()
           },
           badge: () => (
             <span className="flex items-center gap-x-1">
               <Badge>Project: {project?.name}</Badge>
               <Badge variant="destructive">Secret</Badge>
-              <Badge className="capitalize">{serviceKey.type}</Badge>
+              <Badge>{serviceKey.type}</Badge>
             </span>
           ),
           icon: () => <Key />,
@@ -110,7 +135,7 @@ export function useApiKeysCommands() {
         icon: () => <Key />,
       },
     ].filter(Boolean) as ICommand[]
-  }, [apiKeys, canReadAPIKeys, project, ref, setIsOpen])
+  }, [canReadAPIKeys, apiKeysData, isHighAvailability, project, ref, resetCommandMenu, setIsOpen])
 
   useRegisterPage(
     API_KEYS_PAGE_NAME,
@@ -132,7 +157,7 @@ export function useApiKeysCommands() {
     [
       {
         id: 'api-keys',
-        name: 'Get API keys',
+        name: 'Get API keys...',
         action: () => setPage(API_KEYS_PAGE_NAME),
         icon: () => <Key />,
       },
@@ -142,5 +167,18 @@ export function useApiKeysCommands() {
       orderSection: orderCommandSectionsByPriority,
       sectionMeta: { priority: 3 },
     }
+  )
+
+  useRegisterCommands(
+    COMMAND_MENU_SECTIONS.NAVIGATE,
+    [
+      {
+        id: 'nav-api-keys',
+        name: 'Go to API Keys',
+        route: `/project/${ref}/settings/api-keys`,
+        icon: () => <Key />,
+      },
+    ],
+    { enabled: !!project }
   )
 }

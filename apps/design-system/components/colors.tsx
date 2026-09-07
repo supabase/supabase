@@ -1,7 +1,9 @@
-import { cn } from 'ui/src/lib/utils/cn'
-import color from 'ui/src/lib/tailwind-demo-classes'
-import { Grid, GridItem } from './grid'
 import { useState } from 'react'
+import { cn, colors } from 'ui'
+
+import { Grid, GridItem } from './grid'
+
+const color = colors['default']
 
 const Colors = ({
   definition,
@@ -69,7 +71,7 @@ const Colors = ({
               onClick={() => handleCopy(x, i)}
             >
               <Example x={x} />
-              <span className="bg-surface-100 rounded-full border px-2 font-mono text-xs text-foreground-lighter group-data-[state=open]:text-foreground text-center">
+              <span className="bg-surface-100 rounded-full border px-2 font-mono text-xs text-foreground-lighter group-data-open:text-foreground text-center">
                 {copiedIndex === i ? 'Copied!' : x}
               </span>
             </GridItem>

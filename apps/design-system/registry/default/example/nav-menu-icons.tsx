@@ -1,5 +1,5 @@
+import { ArchiveIcon, SettingsIcon, ShieldIcon } from 'lucide-react'
 import Link from 'next/link'
-import { ArchiveIcon, ShieldIcon, SettingsIcon } from 'lucide-react'
 import { Badge, NavMenu, NavMenuItem } from 'ui'
 
 export default function NavMenuWithIcons() {

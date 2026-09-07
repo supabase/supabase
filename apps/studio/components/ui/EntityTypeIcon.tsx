@@ -1,12 +1,56 @@
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { Eye, GitBranch, Table2 } from 'lucide-react'
+import {
+  Eye,
+  GitBranch,
+  MessageSquare,
+  NotebookText,
+  ScrollText,
+  SquareCode,
+  Table2,
+} from 'lucide-react'
 import { cn, SQL_ICON } from 'ui'
 
+import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+
+/**
+ * The single icon representing a logs (`log_sql`) snippet — reused by the tabs
+ * (via EntityTypeIcon) and the nav tree so the two can't drift. Callers pass the
+ * context-appropriate size/className; the icon and stroke stay the same.
+ */
+export const LogsSnippetIcon = ({
+  size = 15,
+  strokeWidth = 1.5,
+  className,
+}: {
+  size?: number
+  strokeWidth?: number
+  className?: string
+}) => (
+  <ScrollText
+    size={size}
+    strokeWidth={strokeWidth}
+    className={cn('transition-colors', className)}
+  />
+)
+
 interface EntityTypeIconProps {
-  type: 'sql' | 'schema' | 'new' | 'r' | 'v' | 'm' | 'f' | 'p'
+  type:
+    | 'sql'
+    | 'schema'
+    | 'new'
+    | 'r'
+    | 'v'
+    | 'm'
+    | 'f'
+    | 'p'
+    | 'notebook'
+    | 'query'
+    | 'chat'
+    | 'explorer-home'
   size?: number
   strokeWidth?: number
   isActive?: boolean
+  sqlSource?: SqlSnippetSource
 }
 
 export const EntityTypeIcon = ({
@@ -14,7 +58,23 @@ export const EntityTypeIcon = ({
   size = 15,
   strokeWidth = 1.5,
   isActive,
+  sqlSource,
 }: EntityTypeIconProps) => {
+  if (type === 'sql' && sqlSource === 'logs') {
+    return (
+      <LogsSnippetIcon
+        size={size}
+        strokeWidth={strokeWidth}
+        className={cn(
+          'text-foreground-muted',
+          'group-aria-selected:text-foreground',
+          'w-4 h-4',
+          '-ml-0.5'
+        )}
+      />
+    )
+  }
+
   if (type === 'sql') {
     return (
       <SQL_ICON
@@ -61,6 +121,18 @@ export const EntityTypeIcon = ({
         )}
       />
     )
+  }
+
+  if (type === 'notebook') {
+    return <NotebookText size={size} strokeWidth={strokeWidth} className={''} />
+  }
+
+  if (type === 'query') {
+    return <SquareCode size={size} strokeWidth={strokeWidth} />
+  }
+
+  if (type === 'chat') {
+    return <MessageSquare size={size} strokeWidth={strokeWidth} />
   }
 
   return (

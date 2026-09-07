@@ -1,7 +1,8 @@
 'use client'
 
-import React, { FC, useEffect, useRef } from 'react'
-import { motion, useMotionValue, useTransform, animate, useInView } from 'framer-motion'
+import { animate, motion, useInView, useMotionValue, useTransform } from 'framer-motion'
+import { FC, useEffect, useRef } from 'react'
+
 import { cn } from '../../lib/utils/cn'
 
 export interface AnimatedCounterProps {

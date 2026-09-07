@@ -1,0 +1,70 @@
+---
+title: Keyboard Shortcut
+description: Displays a platform-aware keyboard shortcut label for buttons, menus, tooltips, and helper text.
+component: true
+---
+
+<ComponentPreview name="keyboard-shortcut-demo" align="start" peekCode wide />
+
+`KeyboardShortcut` renders a compact, platform-aware shortcut label from logical key names.
+
+Use it for button accessories, menu shortcuts, tooltips, and helper copy. Avoid placing it directly inside button label text; render it in a right-side accessory slot such as `iconRight` instead.
+
+## Usage
+
+```tsx
+import { KeyboardShortcut } from 'ui'
+```
+
+```tsx
+<KeyboardShortcut keys={['Meta', 'S']} />
+```
+
+## Props
+
+### `keys`
+
+An ordered array of logical key names.
+
+```tsx
+<KeyboardShortcut keys={['Meta', 'Enter']} />
+```
+
+Supported special keys currently include:
+
+- `Meta`
+- `Alt`
+- `Shift`
+- `Enter`
+- `Esc` / `Escape`
+- `Tab`
+
+Single-character keys are uppercased automatically.
+
+## Variants
+
+### Pill (default)
+
+Use the default pill variant for menus, tooltips, and standalone shortcut chips.
+
+```tsx
+<KeyboardShortcut keys={['Shift', 'Meta', 'M']} />
+```
+
+### Inline
+
+Use the inline variant when the shortcut needs to sit on the same line as surrounding text or inside a button accessory slot.
+
+```tsx
+<Button iconRight={<KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />}>Apply</Button>
+```
+
+## Examples
+
+### Pill
+
+<ComponentPreview name="keyboard-shortcut-pill" align="start" />
+
+### Inline
+
+<ComponentPreview name="keyboard-shortcut-inline" align="start" />

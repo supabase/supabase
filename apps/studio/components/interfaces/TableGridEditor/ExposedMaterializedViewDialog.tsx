@@ -1,4 +1,3 @@
-import { Entity } from 'data/table-editor/table-editor-types'
 import {
   Button,
   Dialog,
@@ -10,8 +9,10 @@ import {
   DialogTitle,
   DialogTrigger,
   ScrollArea,
-  SimpleCodeBlock,
 } from 'ui'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
+
+import { Entity } from '@/data/table-editor/table-editor-types'
 
 interface ExposedMaterializedViewDialogProps {
   table: Entity
@@ -19,7 +20,7 @@ interface ExposedMaterializedViewDialogProps {
   setIsExposedMaterializedViewDialogOpen: (isExposedMaterializedViewDialogOpen: boolean) => void
 }
 
-export default function ExposedMaterializedViewDialog({
+export function ExposedMaterializedViewDialog({
   table,
   isExposedMaterializedViewDialogOpen,
   setIsExposedMaterializedViewDialogOpen,
@@ -31,7 +32,7 @@ export default function ExposedMaterializedViewDialog({
     >
       <DialogTrigger asChild>
         <Button
-          type="secondary"
+          variant="secondary"
           size="tiny"
           onClick={() => setIsExposedMaterializedViewDialogOpen(true)}
         >
@@ -103,7 +104,7 @@ export default function ExposedMaterializedViewDialog({
 
         <DialogFooter>
           <div className="flex items-center justify-end space-x-2">
-            <Button type="default" onClick={() => setIsExposedMaterializedViewDialogOpen(false)}>
+            <Button variant="default" onClick={() => setIsExposedMaterializedViewDialogOpen(false)}>
               Understood
             </Button>
           </div>

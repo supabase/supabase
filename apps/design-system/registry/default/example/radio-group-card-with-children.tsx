@@ -1,5 +1,5 @@
-import { RadioGroupCard, RadioGroupCardItem } from 'ui'
 import SVG from 'react-inlinesvg'
+import { RadioGroupCard, RadioGroupCardItem } from 'ui'
 
 export default function RadioGroupDemo() {
   const singleThemes = [
@@ -10,7 +10,7 @@ export default function RadioGroupDemo() {
   ] as const
 
   return (
-    <RadioGroupCard defaultValue="comfortable" className="flex flex-wrap gap-3">
+    <RadioGroupCard defaultValue="dark" className="flex flex-wrap gap-3" aria-label="Theme">
       {singleThemes.map((theme) => (
         <RadioGroupCardItem key={theme.value} value={theme.value} label={theme.name}>
           <SVG src={`${process.env.NEXT_PUBLIC_BASE_PATH}/img/themes/${theme.value}.svg`} />

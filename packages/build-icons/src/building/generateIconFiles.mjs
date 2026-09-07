@@ -49,15 +49,24 @@ export const Index: Record<string, any> = [`
 
     const componentName = toPascalCase(iconName)
 
-    let { children } = iconNodes[iconName]
+    let { children, attributes: rootAttributes } = iconNodes[iconName]
     children = children.map(({ name, attributes }) => [name, attributes])
+
+    const STYLE_ATTRS = ['fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin']
+    const svgAttributes = {}
+    for (const attr of STYLE_ATTRS) {
+      if (attr in rootAttributes) {
+        const camelKey = attr.replace(/-([a-z])/g, (_, l) => l.toUpperCase())
+        svgAttributes[camelKey] = rootAttributes[attr]
+      }
+    }
 
     const svgContent = readSvg(`${iconName}.svg`, iconsDir)
     const getSvg = () => svgContent
     // const { deprecated = false } = iconMetaData[iconName]
     const deprecated = false
 
-    const elementTemplate = template({ componentName, iconName, children, getSvg, deprecated })
+    const elementTemplate = template({ componentName, iconName, children, getSvg, deprecated, svgAttributes })
     const output = pretty
       ? await prettier.format(elementTemplate, {
         singleQuote: true,

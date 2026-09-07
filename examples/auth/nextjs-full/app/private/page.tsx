@@ -1,6 +1,6 @@
 import DeployButton from '@/components/DeployButton'
 import AuthButton from '@/components/AuthButton'
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import FetchDataSteps from '@/components/tutorial/FetchDataSteps'
 import Header from '@/components/Header'
 import { redirect } from 'next/navigation'
@@ -8,11 +8,10 @@ import { redirect } from 'next/navigation'
 export default async function ProtectedPage() {
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data } = await supabase.auth.getClaims()
+  const claims = data?.claims
 
-  if (!user) {
+  if (!claims) {
     return redirect('/login')
   }
 

@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { pollUntilBucketEmpty } from './bucket-util'
 import { storageKeys } from './keys'
+import { del, handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type BucketDeleteVariables = {
   projectRef: string
@@ -12,12 +13,14 @@ type BucketDeleteVariables = {
 
 async function deleteBucket({ projectRef, id }: BucketDeleteVariables) {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!id) throw new Error('Bucket name is requried')
+  if (!id) throw new Error('Bucket name is required')
 
   const { error: emptyBucketError } = await post('/platform/storage/{ref}/buckets/{id}/empty', {
     params: { path: { ref: projectRef, id } },
   })
   if (emptyBucketError) handleError(emptyBucketError)
+
+  await pollUntilBucketEmpty({ projectRef, bucketId: id })
 
   const { data, error: deleteBucketError } = await del('/platform/storage/{ref}/buckets/{id}', {
     params: { path: { ref: projectRef, id } },
@@ -42,9 +45,17 @@ export const useBucketDeleteMutation = ({
   return useMutation<BucketDeleteData, ResponseError, BucketDeleteVariables>({
     mutationFn: (vars) => deleteBucket(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef } = variables
-      await queryClient.invalidateQueries({ queryKey: storageKeys.buckets(projectRef) })
+      const { projectRef, id } = variables
+
+      const deletedBucketQueryKey = storageKeys.bucket(projectRef, id)
+      await queryClient.cancelQueries({ queryKey: deletedBucketQueryKey })
+      queryClient.removeQueries({ queryKey: deletedBucketQueryKey })
+
       await onSuccess?.(data, variables, context)
+
+      // Fire-and-forget: only the bucket list needs refreshing, and it shouldn't block
+      // onSuccess (modal close/navigation) above.
+      void queryClient.invalidateQueries({ queryKey: storageKeys.bucketsList(projectRef) })
     },
     async onError(data, variables, context) {
       if (onError === undefined) {

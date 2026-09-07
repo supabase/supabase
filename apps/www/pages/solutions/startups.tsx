@@ -38,7 +38,7 @@ const BeginnersPage: NextPage = () => {
         <SolutionsStickyNav activeItem={Solutions.startups} type="use-case" />
         <ProductHeader
           {...content.heroSection}
-          className="[&_h1]:2xl:!text-5xl bg-default border-0 lg:pb-8 [&_.ph-footer]:mt-0 [&_.ph-footer]:lg:mt-16 [&_.ph-footer]:xl:mt-32"
+          className="[&_h1]:2xl:text-5xl! bg-default border-0 lg:pb-8 [&_.ph-footer]:mt-0 [&_.ph-footer]:lg:mt-16 [&_.ph-footer]:xl:mt-32"
           sectionContainerClassName="lg:gap-4"
         />
         <WhySupabase {...content.why} />
@@ -67,7 +67,7 @@ const BeginnersPage: NextPage = () => {
         />
         <SingleQuote
           id="quote"
-          className="!pb-8 md:!pb-12 [&_q]:max-w-2xl"
+          className="pb-8! md:pb-12! [&_q]:max-w-2xl"
           quote={{
             text: 'Supabase enabled us to focus on building the best email infrastructure for developers — without worrying about backend complexity. Their authentication, database, and support have been game-changers for our rapid growth.',
             author: 'Zeno Rocha',

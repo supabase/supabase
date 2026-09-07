@@ -1,21 +1,84 @@
 'use client'
 
-import * as Collapsible from '@radix-ui/react-collapsible'
-
+import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
+import { isElementInViewport } from '~/features/ui/helpers.dom'
+import { BASE_PATH } from '~/lib/constants'
 import { debounce } from 'lodash-es'
 import { ChevronUp } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Collapsible } from 'radix-ui'
 import type { HTMLAttributes, MouseEvent, PropsWithChildren } from 'react'
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react'
 import { cn } from 'ui'
 
-import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
-import { isElementInViewport } from '~/features/ui/helpers.dom'
-import { BASE_PATH } from '~/lib/constants'
-
 export const ReferenceContentInitiallyScrolledContext = createContext<boolean>(false)
+
+let patchCount = 0
+let originalPushState: typeof history.pushState | null = null
+let originalReplaceState: typeof history.replaceState | null = null
+const pathnameListeners = new Set<() => void>()
+
+function notifyPathnameListeners() {
+  pathnameListeners.forEach((callback) => callback())
+}
+
+function subscribeToPathname(callback: () => void) {
+  pathnameListeners.add(callback)
+
+  if (patchCount === 0) {
+    window.addEventListener('popstate', notifyPathnameListeners)
+
+    originalPushState = history.pushState.bind(history)
+    history.pushState = (...args) => {
+      originalPushState!(...args)
+      notifyPathnameListeners()
+    }
+
+    originalReplaceState = history.replaceState.bind(history)
+    history.replaceState = (...args) => {
+      originalReplaceState!(...args)
+      notifyPathnameListeners()
+    }
+  }
+  patchCount++
+
+  return () => {
+    pathnameListeners.delete(callback)
+    patchCount--
+
+    if (patchCount === 0) {
+      window.removeEventListener('popstate', notifyPathnameListeners)
+      history.pushState = originalPushState!
+      history.replaceState = originalReplaceState!
+      originalPushState = null
+      originalReplaceState = null
+    }
+  }
+}
+
+function getPathname() {
+  if (typeof window === 'undefined') return ''
+  const pathname = window.location.pathname
+  return pathname.startsWith(BASE_PATH) ? pathname.slice(BASE_PATH.length) : pathname
+}
+
+function getServerPathname() {
+  return ''
+}
+
+function useCurrentPathname() {
+  return useSyncExternalStore(subscribeToPathname, getPathname, getServerPathname)
+}
 
 export function ReferenceContentScrollHandler({
   libPath,
@@ -60,8 +123,8 @@ export function ReferenceNavigationScrollHandler({
   children,
   ...rest
 }: PropsWithChildren & HTMLAttributes<HTMLDivElement>) {
-  const parentRef = useRef<HTMLElement>()
-  const ref = useRef<HTMLDivElement>(null)
+  const parentRef = useRef<HTMLElement | null>(null)
+  const ref = useRef<HTMLDivElement | null>(null)
   const initialScrollHappened = useContext(ReferenceContentInitiallyScrolledContext)
 
   useEffect(() => {
@@ -176,15 +239,20 @@ export function RefLink({
   section,
   skipChildren = false,
   className,
+  realNavigation,
 }: {
   basePath: string
   section: AbbrevApiReferenceSection
   skipChildren?: boolean
   className?: string
+  // Spike (DOCS-1268): when true, this link does a real navigation instead of
+  // the scroll-hijack below — used only by the API reference, whose endpoints
+  // are now real pages. Undefined everywhere else preserves current behavior.
+  realNavigation?: boolean
 }) {
   const ref = useRef<HTMLAnchorElement>(null)
 
-  const pathname = usePathname()
+  const pathname = useCurrentPathname()
   const href = deriveHref(basePath, section)
   const isActive =
     pathname === href || (pathname === basePath && href.replace(basePath, '') === '/introduction')
@@ -197,8 +265,11 @@ export function RefLink({
   }, [isActive, className])
 
   const onClick = useCallback(
-    (evt: MouseEvent) => createReferenceSubsectionNavigator(href, section.slug)(evt),
-    [href, section.slug]
+    (evt: MouseEvent) => {
+      if (realNavigation) return
+      createReferenceSubsectionNavigator(href, section.slug)(evt)
+    },
+    [href, section.slug, realNavigation]
   )
 
   if (!('title' in section)) return null
@@ -209,13 +280,13 @@ export function RefLink({
   return (
     <>
       {isCompoundSection ? (
-        <CompoundRefLink basePath={basePath} section={section} />
+        <CompoundRefLink basePath={basePath} section={section} realNavigation={realNavigation} />
       ) : (
         <Link
           ref={ref}
-          // We don't use these links because we never do real navigation, so
-          // prefetching just wastes egress
-          prefetch={false}
+          // Scroll-hijack links never navigate, so disable prefetch. Real API
+          // pages omit the prop and keep Next.js's default prefetch behavior.
+          {...(!realNavigation ? { prefetch: false } : {})}
           href={href}
           className={getLinkStyles(isActive, className)}
           onClick={onClick}
@@ -230,7 +301,7 @@ export function RefLink({
 function useCompoundRefLinkActive(basePath: string, section: AbbrevApiReferenceSection) {
   const [open, _setOpen] = useState(false)
 
-  const pathname = usePathname()
+  const pathname = useCurrentPathname()
   const parentHref = deriveHref(basePath, section)
   const isParentActive = pathname === parentHref
 
@@ -258,9 +329,11 @@ function useCompoundRefLinkActive(basePath: string, section: AbbrevApiReferenceS
 function CompoundRefLink({
   basePath,
   section,
+  realNavigation,
 }: {
   basePath: string
   section: AbbrevApiReferenceSection
+  realNavigation?: boolean
 }) {
   const { open, setOpen, isActive } = useCompoundRefLinkActive(basePath, section)
 
@@ -268,6 +341,7 @@ function CompoundRefLink({
     <Collapsible.Root open={open} onOpenChange={setOpen}>
       <Collapsible.Trigger asChild disabled={isActive}>
         <button
+          tabIndex={0}
           className={cn(
             'group',
             'cursor-pointer',
@@ -290,11 +364,10 @@ function CompoundRefLink({
         className={cn('border-l border-control pl-3 ml-1 data-open:mt-2 grid gap-2.5')}
       >
         <ul className="space-y-2">
-          <RefLink basePath={basePath} section={section} skipChildren />
           {(section.items || []).map((item, idx) => {
             return (
               <li key={`${section.id}-${idx}`}>
-                <RefLink basePath={basePath} section={item} />
+                <RefLink basePath={basePath} section={item} realNavigation={realNavigation} />
               </li>
             )
           })}

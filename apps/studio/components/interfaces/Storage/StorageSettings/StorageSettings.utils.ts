@@ -2,6 +2,10 @@ import { StorageSizeUnits } from './StorageSettings.constants'
 
 const k = 1024
 
+export const BUCKET_LIMIT_ERROR_PREFIX = 'bucketLimit:'
+
+type BucketLimitErrorBucket = { name: string; limit: number }
+
 export const convertFromBytes = (bytes: number, unit?: StorageSizeUnits) => {
   // Up to GB since that's our storage upload limit
   if (bytes <= 0) return { value: 0, unit: StorageSizeUnits.BYTES }
@@ -49,4 +53,45 @@ export function getVectorURI(projectRef: string, protocol: string, endpoint?: st
   const url = getStorageURL(projectRef, protocol, endpoint)
   url.pathname = '/storage/v1/vector'
   return url.toString()
+}
+
+export const formatBytesForDisplay = (bytes: number) => {
+  const { value, unit } = convertFromBytes(bytes)
+  return `${value.toLocaleString(undefined, { maximumFractionDigits: 2 })} ${unit}`
+}
+
+export const encodeBucketLimitErrorMessage = (buckets: BucketLimitErrorBucket[]) => {
+  const encodedBuckets = buckets
+    .map(({ name, limit }) => `${encodeURIComponent(name)}|${limit}`)
+    .join(',')
+  return `${BUCKET_LIMIT_ERROR_PREFIX}${encodedBuckets}`
+}
+
+export const isBucketLimitErrorMessage = (message?: string) => {
+  return message?.startsWith(BUCKET_LIMIT_ERROR_PREFIX)
+}
+
+export const decodeBucketLimitErrorMessage = (message?: string): BucketLimitErrorBucket[] => {
+  if (!isBucketLimitErrorMessage(message)) return []
+
+  const payload = message?.slice(BUCKET_LIMIT_ERROR_PREFIX.length) ?? ''
+  if (payload.length === 0) return []
+
+  return payload
+    .split(',')
+    .filter(Boolean)
+    .map((entry) => {
+      const parts = entry.split('|')
+      if (parts.length !== 2) return undefined
+
+      const name = decodeURIComponent(parts[0])
+      if (!name) return undefined
+
+      const limitString = parts[1]
+      const limit = Number(limitString ?? 0)
+      if (Number.isNaN(limit)) return undefined
+
+      return { name, limit }
+    })
+    .filter((entry) => entry !== undefined)
 }

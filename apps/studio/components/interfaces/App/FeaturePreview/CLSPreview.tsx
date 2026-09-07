@@ -1,11 +1,11 @@
-import Image from 'next/image'
-
 import { useParams } from 'common'
-import { Markdown } from 'components/interfaces/Markdown'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
+import Image from 'next/image'
+import { Alert, AlertDescription, AlertTitle, WarningIcon } from 'ui'
+
+import { Markdown } from '@/components/interfaces/Markdown'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 
 export const CLSPreview = () => {
   const { ref } = useParams()
@@ -23,27 +23,27 @@ export const CLSPreview = () => {
           className="text-foreground-light max-w-full"
           content={`This is an advanced feature and should be used with caution. Unless you have a very specific use case, we recommend just using [Row-Level Security](${DOCS_URL}${docsRowLevelSecurityGuidePath}).`}
         />
-        <Alert_Shadcn_ variant="warning" className="mt-2">
+        <Alert variant="warning" className="mt-2">
           <WarningIcon />
-          <AlertTitle_Shadcn_>
+          <AlertTitle>
             Changes to column privileges will not be reflected in migrations when running{' '}
             <code className="text-code-inline">supabase db diff</code>.
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          </AlertTitle>
+          <AlertDescription>
             Column privileges are not supported in the current version of the Supabase CLI.
             <br />
             You will need to manually apply these changes to your database.
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       </div>
       <Image
         src={`${BASE_PATH}/img/previews/cls-preview.png`}
         width={1860}
         height={970}
         alt="api-docs-side-panel-preview"
-        className="rounded border"
+        className="rounded-sm border"
       />
-      <div className="space-y-2 !mt-4">
+      <div className="space-y-2 mt-4!">
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>

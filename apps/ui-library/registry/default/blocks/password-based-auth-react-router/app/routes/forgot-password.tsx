@@ -1,3 +1,12 @@
+import {
+  data,
+  Link,
+  redirect,
+  useFetcher,
+  useSearchParams,
+  type ActionFunctionArgs,
+} from 'react-router'
+
 import { createClient } from '@/registry/default/clients/react-router/lib/supabase/server'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -9,14 +18,6 @@ import {
 } from '@/registry/default/components/ui/card'
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
-import {
-  type ActionFunctionArgs,
-  Link,
-  data,
-  redirect,
-  useFetcher,
-  useSearchParams,
-} from 'react-router'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
@@ -97,7 +98,7 @@ export default function ForgotPassword() {
                   <div className="mt-4 text-center text-sm">
                     Already have an account?{' '}
                     <Link to="/login" className="underline underline-offset-4">
-                      Login
+                      Sign in
                     </Link>
                   </div>
                 </fetcher.Form>

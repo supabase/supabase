@@ -1,12 +1,10 @@
-import { Lock } from 'lucide-react'
-
 import { useParams } from 'common'
-import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 import { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
+
+import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export function useAuthGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -19,7 +17,7 @@ export function useAuthGotoCommands(options?: CommandOptions) {
     authenticationEmails,
     authenticationMultiFactor,
     authenticationAttackProtection,
-    authenticationAdvanced,
+    authenticationPerformance,
   } = useIsFeatureEnabled([
     'authentication:sign_in_providers',
     'authentication:third_party_auth',
@@ -27,28 +25,8 @@ export function useAuthGotoCommands(options?: CommandOptions) {
     'authentication:emails',
     'authentication:multi_factor',
     'authentication:attack_protection',
-    'authentication:advanced',
+    'authentication:performance',
   ])
-
-  useRegisterCommands(
-    'Actions',
-    [
-      {
-        id: 'create-rls-policy',
-        name: 'Create RLS policy',
-        value: 'Create RLS (Row Level Security) policy',
-        route: `/project/${ref}/auth/policies`,
-        icon: () => <Lock />,
-      },
-    ],
-    {
-      ...options,
-      deps: [ref],
-      enabled: (options?.enabled ?? true) && ref !== '_',
-      orderSection: orderCommandSectionsByPriority,
-      sectionMeta: { priority: 3 },
-    }
-  )
 
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.NAVIGATE,
@@ -58,13 +36,6 @@ export function useAuthGotoCommands(options?: CommandOptions) {
         name: 'Users',
         value: 'Auth: Users',
         route: `/project/${ref}/auth/users`,
-        defaultHidden: true,
-      },
-      {
-        id: 'nav-auth-policies',
-        name: 'Policies',
-        value: 'Auth: Policies (RLS)',
-        route: `/project/${ref}/auth/policies`,
         defaultHidden: true,
       },
       ...(authenticationSignInProviders
@@ -81,7 +52,7 @@ export function useAuthGotoCommands(options?: CommandOptions) {
       ...(authenticationThirdPartyAuth
         ? [
             {
-              id: 'nav-auth-providers',
+              id: 'nav-auth-providers-third-party',
               name: 'Providers (Third Party)',
               value: 'Auth: Providers (Third Party)',
               route: `/project/${ref}/auth/third-party`,
@@ -161,13 +132,13 @@ export function useAuthGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/auth/hooks`,
         defaultHidden: true,
       },
-      ...(authenticationAdvanced
+      ...(authenticationPerformance
         ? [
             {
-              id: 'nav-auth-advanced-settings',
-              name: 'Auth Advanced Settings',
-              value: 'Auth: Advanced Settings',
-              route: `/project/${ref}/auth/advanced`,
+              id: 'nav-auth-performance-settings',
+              name: 'Auth Performance Settings',
+              value: 'Auth: Performance Settings',
+              route: `/project/${ref}/auth/performance`,
               defaultHidden: true,
             } as IRouteCommand,
           ]

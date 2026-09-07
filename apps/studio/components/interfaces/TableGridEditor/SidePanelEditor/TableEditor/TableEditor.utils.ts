@@ -1,14 +1,14 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { some } from 'lodash'
 
-import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import {
   generateColumnField,
-  generateColumnFieldFromPostgresColumn,
+  generateColumnFieldFromPGColumn,
 } from '../ColumnEditor/ColumnEditor.utils'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import type { ImportContent, TableField } from './TableEditor.types'
+import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
+import type { SafePostgresTable } from '@/lib/postgres-types'
 
 type ValidateFieldsReturn = {
   name?: string
@@ -40,8 +40,8 @@ export const generateTableField = (): TableField => {
   }
 }
 
-export const generateTableFieldFromPostgresTable = (
-  table: PostgresTable,
+export const generateTableFieldFromPGTable = (
+  table: SafePostgresTable,
   foreignKeys: ForeignKeyConstraint[],
   isDuplicating = false,
   isRealtimeEnabled = false
@@ -51,10 +51,28 @@ export const generateTableFieldFromPostgresTable = (
     name: isDuplicating ? `${table.name}_duplicate` : table.name,
     comment: isDuplicating ? `This is a duplicate of ${table.name}` : table?.comment,
     columns: (table.columns ?? []).map((column) => {
-      return generateColumnFieldFromPostgresColumn(column, table, foreignKeys)
+      return generateColumnFieldFromPGColumn(column, table, foreignKeys)
     }),
     isRLSEnabled: table.rls_enabled,
     isRealtimeEnabled,
+  }
+}
+
+// Merges only foreign-key metadata from a freshly server-derived TableField into
+// the existing (possibly user-edited) one. Preserves user-added columns and any
+// edits to existing columns; only injects `foreignKey` onto matching server-
+// originated columns. Used when foreignKeyMeta resolves after the user has
+// already started editing the panel.
+export const mergeForeignKeyMeta = (existing: TableField, fromServer: TableField): TableField => {
+  const serverColumnsById = new Map(fromServer.columns.map((col) => [col.id, col]))
+  return {
+    ...existing,
+    columns: existing.columns.map((col) => {
+      if (col.isNewColumn) return col
+      const serverCol = serverColumnsById.get(col.id)
+      if (!serverCol) return col
+      return { ...col, foreignKey: serverCol.foreignKey }
+    }),
   }
 }
 

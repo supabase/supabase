@@ -1,8 +1,8 @@
-import { TextDecoder, TextEncoder } from 'node:util'
 import { ReadableStream, TransformStream } from 'node:stream/web'
-import { vi } from 'vitest'
-import { configMocks } from 'jsdom-testing-mocks'
+import { TextDecoder, TextEncoder } from 'node:util'
 import { act } from '@testing-library/react'
+import { configMocks } from 'jsdom-testing-mocks'
+import { vi } from 'vitest'
 
 configMocks({ act })
 
@@ -35,5 +35,35 @@ Object.defineProperties(globalThis, {
   ReadableStream: { value: ReadableStream },
   TransformStream: { value: TransformStream },
 })
+
+if (typeof window.localStorage?.getItem !== 'function') {
+  const storage = new Map<string, string>()
+  const localStoragePolyfill = {
+    getItem: vi.fn((key: string) => storage.get(key) ?? null),
+    setItem: vi.fn((key: string, value: string) => {
+      storage.set(key, value)
+    }),
+    removeItem: vi.fn((key: string) => {
+      storage.delete(key)
+    }),
+    clear: vi.fn(() => {
+      storage.clear()
+    }),
+    key: vi.fn((index: number) => Array.from(storage.keys())[index] ?? null),
+    get length() {
+      return storage.size
+    },
+  }
+
+  Object.defineProperty(window, 'localStorage', {
+    configurable: true,
+    value: localStoragePolyfill,
+  })
+
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    value: localStoragePolyfill,
+  })
+}
 
 window.HTMLElement.prototype.hasPointerCapture = vi.fn()

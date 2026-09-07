@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { head } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { invoicesKeys } from './keys'
+import { head } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type InvoicesCountVariables = {
   slug?: string

@@ -1,25 +1,26 @@
 'use client'
 
-import { DynamicForm } from '@/registry/default/platform/platform-kit-nextjs/components/dynamic-form'
-import {
-  useGetAuthConfig,
-  useUpdateAuthConfig,
-} from '@/registry/default/platform/platform-kit-nextjs/hooks/use-auth'
+import { AlertTriangle, ChevronRight, Mail, Phone, User } from 'lucide-react'
+import { useCallback, useMemo } from 'react'
+import { z } from 'zod'
+
 import {
   authEmailProviderSchema,
   authFieldLabels,
   authGeneralSettingsSchema,
-  type AuthGeneralSettingsSchema,
   authGoogleProviderSchema,
   authPhoneProviderSchema,
+  type AuthGeneralSettingsSchema,
 } from '../../lib/schemas/auth'
-import { AlertTriangle, ChevronRight, Mail, Phone, User } from 'lucide-react'
-import { useCallback, useMemo } from 'react'
-import { z } from 'zod'
-import { useSheetNavigation } from '@/registry/default/platform/platform-kit-nextjs/contexts/SheetNavigationContext'
-import { Skeleton } from '@/registry/default/components/ui/skeleton'
-import { Button } from '@/registry/default/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
+import { Button } from '@/registry/default/components/ui/button'
+import { Skeleton } from '@/registry/default/components/ui/skeleton'
+import { DynamicForm } from '@/registry/default/platform/platform-kit-nextjs/components/dynamic-form'
+import { useSheetNavigation } from '@/registry/default/platform/platform-kit-nextjs/contexts/SheetNavigationContext'
+import {
+  useGetAuthConfig,
+  useUpdateAuthConfig,
+} from '@/registry/default/platform/platform-kit-nextjs/hooks/use-auth'
 
 function ProviderSettingsView({
   projectRef,

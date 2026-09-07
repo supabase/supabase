@@ -1,13 +1,13 @@
+import { useParams } from 'common'
 import { EyeOffIcon } from 'lucide-react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { getContentById } from 'data/content/content-id-query'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { Snippet } from 'data/content/sql-folders-query'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import type { SqlSnippets } from 'types'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { getContentById } from '@/data/content/content-id-query'
+import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
+import { Snippet } from '@/data/content/sql-folders-query'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
+import type { SqlSnippets } from '@/types'
 
 export const UnshareSnippetModal = ({
   snippet,
@@ -21,7 +21,7 @@ export const UnshareSnippetModal = ({
   const { ref: projectRef } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const { mutate: upsertContent, isPending: isUpserting } = useContentUpsertMutation({
+  const { mutate: upsertContent } = useContentUpsertMutation({
     onError: (error) => {
       toast.error(`Failed to update query: ${error.message}`)
     },

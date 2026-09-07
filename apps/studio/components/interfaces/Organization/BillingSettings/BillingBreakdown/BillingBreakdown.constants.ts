@@ -1,5 +1,5 @@
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import { DOCS_URL } from 'lib/constants'
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import { DOCS_URL } from '@/lib/constants'
 
 export const USAGE_APPROACHING_THRESHOLD = 0.8
 
@@ -149,5 +149,49 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
     name: 'Log Drain Events',
     units: 'absolute',
     category: 'Database',
+  },
+  {
+    key: PricingMetric.LOG_INGESTION,
+    name: 'Log Ingestion',
+    units: 'bytes',
+    category: 'Logs',
+    anchor: 'logIngestion',
+  },
+  {
+    key: PricingMetric.LOG_QUERYING,
+    name: 'Log Query',
+    units: 'bytes',
+    category: 'Logs',
+    anchor: 'logQuery',
+  },
+  {
+    key: PricingMetric.LOG_STORAGE,
+    name: 'Log Storage',
+    units: 'bytes',
+    category: 'Logs',
+    anchor: 'logStorage',
+  },
+  {
+    key: PricingMetric.ACTIVE_COMPUTE_HOURS,
+    name: 'Active Compute Hours',
+    units: 'absolute',
+    category: 'compute',
+    anchor: 'active-compute',
+  },
+  {
+    key: PricingMetric.ETL_COPY_BACKFILL_DATA,
+    name: 'Initial Sync Data Processed',
+    units: 'bytes',
+    unitName: 'GB',
+    category: 'Pipelines',
+    anchor: 'pipeline-initial-sync-data',
+  },
+  {
+    key: PricingMetric.ETL_REPLICATED_DATA,
+    name: 'Ongoing Replication Data Processed',
+    units: 'bytes',
+    unitName: 'GB',
+    category: 'Pipelines',
+    anchor: 'pipeline-ongoing-replication-data',
   },
 ]

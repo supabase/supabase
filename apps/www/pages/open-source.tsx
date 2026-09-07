@@ -38,14 +38,14 @@ const OpenSource = () => {
         }}
       />
       <DefaultLayout className="relative">
-        <SectionContainer className="overflow-hidden relative mx-auto !py-0 sm:!py-0 md:!py-4 lg:!pt-16 lg:!pb-12">
+        <SectionContainer className="overflow-hidden relative mx-auto py-0! sm:py-0! md:py-4! lg:pt-16! lg:pb-12!">
           <ProductHeaderCentered {...pageData.heroSection} />
         </SectionContainer>
         <OSSHero />
-        <SectionContainer className="!pt-0">
+        <SectionContainer className="pt-0!">
           <Repos tabs={pageData.repo_tabs} />
         </SectionContainer>
-        <SectionContainer className="!py-0">
+        <SectionContainer className="py-0!">
           <div className="w-full border-b" />
         </SectionContainer>
         <SectionContainer>

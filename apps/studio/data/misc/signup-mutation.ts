@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import { captureCriticalError } from 'lib/error-reporting'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { handleError, post } from '@/data/fetchers'
+import { captureCriticalError } from '@/lib/error-reporting'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type SignUpVariables = {
   email: string

@@ -81,7 +81,7 @@ functions:
   - id: sign-up
     title: 'signUp()'
     notes: |
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](/dashboard/project/_/auth/providers).
+      - By default, the user needs to verify their email address before signing in. To turn this off, disable **Confirm email** in [your project](/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
@@ -89,7 +89,7 @@ functions:
       - If signUp() is called for an existing confirmed user:
           - If **Confirm email** is enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
           - If **Confirm email** is disabled, the error message, `User already registered` is returned.
-      - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/swift/get-user).
+      - To fetch the currently signed-in user, refer to [`getUser()`](/docs/reference/swift/get-user).
     examples:
       - id: sign-up
         name: Sign up
@@ -120,7 +120,7 @@ functions:
       - id: sign-up-with-redirect
         name: Sign up with a redirect URL
         description: |
-          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
         code: |
           ```swift
           try await supabase.auth.signUp(
@@ -165,14 +165,14 @@ functions:
     title: 'signInWithOTP()'
     notes: |
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
-      - If the user doesn't exist, `signInWithOTP()` will signup the user instead. To restrict this behavior, you can set `shouldCreateUser` to `false`.
+      - If the user doesn't exist, `signInWithOTP()` will sign up the user instead. To restrict this behavior, you can set `shouldCreateUser` to `false`.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
-      - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
       - When using magic links, specify a `redirectTo` that matches a configured url scheme in your iOS app, so Supabase can correctly redirect back to your app.
-      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login/twilio) for details about configuring WhatsApp sign in.
+      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login?showSmsProvider=Twilio) for details about configuring WhatsApp sign in.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -228,7 +228,7 @@ functions:
         isSpotlight: false
         description: |
           - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/redirect-urls). It does not redirect the user immediately after invoking this method.
-          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
           - getOAuthSignInURL() provides the URL which needs to be opened in a SFSafariViewController instance.
           - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs.
         code: |
@@ -327,14 +327,14 @@ functions:
       - Should be used only when you require the most current user data. For faster results, `session.user` is recommended.
     examples:
       - id: get-the-logged-in-user-with-the-current-existing-session
-        name: Get the logged in user with the current existing session
+        name: Get the signed-in user with the current existing session
         isSpotlight: true
         code: |
           ```swift
           let user = try await supabase.auth.user()
           ```
       - id: get-the-logged-in-user-with-a-custom-access-token-jwt
-        name: Get the logged in user with a custom access token jwt
+        name: Get the signed-in user with a custom access token jwt
         isSpotlight: false
         code: |
           ```swift
@@ -2070,7 +2070,7 @@ functions:
               (2, 'viola'),
               (3, 'cello');
             ```
-        reponse: |
+        response: |
           ```json
           {
             "data": [
@@ -2731,7 +2731,7 @@ functions:
       - id: passing-custom-headers
         name: Passing custom headers
         description: |
-          You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
+          You can pass custom headers to your function. Note: supabase-swift automatically passes the `Authorization` header with the signed-in user's JWT.
         isSpotlight: true
         code: |
           ```swift

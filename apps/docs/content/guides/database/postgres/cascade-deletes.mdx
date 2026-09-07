@@ -32,13 +32,13 @@ When a foreign key constraint is defined with the option `RESTRICT`, it means th
 
 When a foreign key constraint is defined with the option `NO ACTION`, it means that if a row in the parent table is deleted, the database will also raise an error and prevent the deletion of the row in the parent table. However unlike `RESTRICT`, `NO ACTION` has the option to defer the check using `INITIALLY DEFERRED`. This will only raise the above error _if_ the referenced rows still exist at the end of the transaction.
 
-The difference from `RESTRICT` is that a constraint marked as `NO ACTION INITIALLY DEFERRED` is deferred until the end of the transaction, rather than running immediately. If, for example there is another foreign key constraint between the same tables marked as `CASCADE`, the cascade will occur first and delete the referenced rows, and no error will be thrown by the deferred constraint. Otherwise if there are still rows referencing the parent row by the end of the transaction, an error will be raised just like before. Just like `RESTRICT`, the database will not delete, update or set to NULL any rows in the referenced tables.
+The difference from `RESTRICT` is that a constraint marked as `NO ACTION INITIALLY DEFERRED` is deferred until the end of the transaction, rather than running immediately. If, for example there is another foreign key constraint between the same tables marked as `CASCADE`, the cascade will occur first and delete the referenced rows, and no error will be thrown by the deferred constraint. Otherwise if there are still rows referencing the parent row by the end of the transaction, an error will be raised as before. Like `RESTRICT`, the database will not delete, update or set to NULL any rows in the referenced tables.
 
 In practice, you can use either `NO ACTION` or `RESTRICT` depending on your needs. `NO ACTION` is the default behavior if you do not specify anything. If you prefer to defer the check until the end of the transaction, use `NO ACTION INITIALLY DEFERRED`.
 
 ## Example
 
-Let's further illustrate the difference with an example. We'll use the following data:
+To illustrate the difference, use the following example. We'll use the following data:
 
 `grandparent`
 
@@ -117,7 +117,7 @@ Even though the foreign key constraint between parent and grandparent is `CASCAD
 
 ### `NO ACTION`
 
-Let's change the child-father relationship to `NO ACTION`:
+Change the child-father relationship to `NO ACTION`:
 
 ```sql
 alter table child
@@ -157,7 +157,7 @@ ERROR: update or delete on table "parent" violates foreign key constraint "child
 DETAIL: Key (id)=(1) is still referenced from table "child".
 ```
 
-But, when we combine it with _other_ constraints, then any other constraints take precedence. For example, let's run the same but add a `mother` column that has a `CASCADE` delete:
+But, when we combine it with _other_ constraints, then any other constraints take precedence. For example, run the same scenario but add a `mother` column that has a `CASCADE` delete:
 
 ```sql
 alter table child
@@ -169,7 +169,7 @@ set mother = 2
 where id = 1;
 ```
 
-Then let's run a delete on the `grandparent` table:
+Then run a delete on the `grandparent` table:
 
 ```shell
 postgres=# delete from grandparent;

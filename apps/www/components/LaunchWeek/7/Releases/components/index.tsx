@@ -92,7 +92,7 @@ export const SmallCard = ({
 }) => (
   <div
     className={[
-      'relative p-[1px] bg-gradient-to-b from-[#48484880] to-[#1C1C1C60] rounded-2xl overflow-hidden shadow-lg',
+      'relative p-px bg-linear-to-b from-[#48484880] to-[#1C1C1C60] rounded-2xl overflow-hidden shadow-lg',
       className,
     ].join(' ')}
   >
@@ -119,8 +119,8 @@ export const StyledArticleBadge = ({
       ' '
     )}
   >
-    <div className="!bg-transparent rounded-full !py-1 !px-4 w-full inset-[1px] text-sm border-none">
-      <span className="text-sm text-[#F4FFFA80] bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#7E7AAD]">
+    <div className="bg-transparent! rounded-full py-1! px-4! w-full inset-px text-sm border-none">
+      <span className="text-sm text-[#F4FFFA80] bg-clip-text bg-linear-to-r from-[#F4FFFA] to-[#7E7AAD]">
         {children}
       </span>
       <div className="absolute inset-0 w-full h-full bg-[#1C1C1C] rounded-full blur-2xl" />
@@ -133,13 +133,13 @@ export const AccordionHeader = ({ date, day, title, shipped }: any) => {
     <div className="flex flex-1 flex-col sm:flex-row">
       <div className="flex gap-4 w-full sm:w-auto sm:min-w-[240px] md:min-w-[380px] items-center">
         <Badge
-          className={`relative inset-0 !bg-transparent !py-1 !px-4 h-fit backdrop-blur-md ${
+          className={`relative inset-0 bg-transparent! py-1! px-4! h-fit backdrop-blur-md ${
             shipped
-              ? 'bg-gradient-to-br from-[#2A1E6C] to-[#2A1E6C00] !border-[#6044FF40]'
-              : '!border-[#FFFFFF20]'
+              ? 'bg-linear-to-br from-[#2A1E6C] to-[#2A1E6C00] border-[#6044FF40]!'
+              : 'border-[#FFFFFF20]!'
           }`}
         >
-          <span className="text-[#F4FFFA40] text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
+          <span className="text-[#F4FFFA40] text-sm font-normal bg-clip-text bg-linear-to-r from-[#F4FFFA] to-[#675FA7]">
             {shipped ? 'Shipped' : 'Coming Soon'}
           </span>
         </Badge>
@@ -163,7 +163,7 @@ export const MultistepSectionHeader = ({ title, blog }: any) => {
       <div className="flex gap-4 w-full items-center justify-between md:justify-start">
         {title && <span className="text-foreground text-lg mt-3 sm:mt-0">{title}</span>}
         {!!blog && (
-          <ChipLink href={blog} className="!w-auto !text-left !justify-between !flex-none">
+          <ChipLink href={blog} className="w-auto! text-left! justify-between! flex-none!">
             Blog post
             <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
               <PencilSvg />
@@ -191,7 +191,7 @@ export const ChipLink = ({
   uiOnly ? (
     <span
       className={[
-        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444490] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191980] backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
+        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-linear-to-r text-white from-[#46444490] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191980] backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
         className,
       ].join(' ')}
     >
@@ -203,7 +203,7 @@ export const ChipLink = ({
       target={target ?? '_self'}
       rel="noopener"
       className={[
-        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444490] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191980] backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
+        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-linear-to-r text-white from-[#46444490] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191980] backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
         className,
       ].join(' ')}
     >
@@ -288,7 +288,7 @@ export const SectionButtons = ({
 }
 
 export const CartTitle = ({ children }: { children: any }) => (
-  <span className="z-0 relative text-[#F4FFFA90] bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
+  <span className="z-0 relative text-[#F4FFFA90] bg-clip-text bg-linear-to-r from-[#F4FFFA] to-[#675FA7]">
     {children}
     <div className="absolute -z-10 inset-0 w-full h-full bg-[#1C1C1C90] rounded-full blur-xl" />
   </span>

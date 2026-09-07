@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   createTemporaryApiKey,
   isTemporaryApiKeyValid,
@@ -86,7 +87,7 @@ describe('isTemporaryUploadKeyValid', () => {
     expect(result).toBe(false)
   })
 
-  it('should return true for a key with more than 20 seconds remaining', () => {
+  it('should return true for a key with more than 30 seconds remaining', () => {
     const now = Date.now()
     vi.setSystemTime(now)
 
@@ -100,13 +101,13 @@ describe('isTemporaryUploadKeyValid', () => {
     expect(result).toBe(true)
   })
 
-  it('should return false for a key with exactly 20 seconds remaining', () => {
+  it('should return false for a key with exactly 30 seconds remaining', () => {
     const now = Date.now()
     vi.setSystemTime(now)
 
     const key: TemporaryApiKey = {
       apiKey: 'test-key',
-      expiryTimeMs: now + 20000, // Exactly 20 seconds
+      expiryTimeMs: now + 30000, // Exactly 30 seconds
     }
 
     const result = isTemporaryApiKeyValid(key)
@@ -114,7 +115,7 @@ describe('isTemporaryUploadKeyValid', () => {
     expect(result).toBe(false)
   })
 
-  it('should return false for a key with less than 20 seconds remaining', () => {
+  it('should return false for a key with less than 30 seconds remaining', () => {
     const now = Date.now()
     vi.setSystemTime(now)
 
@@ -156,13 +157,13 @@ describe('isTemporaryUploadKeyValid', () => {
     expect(result).toBe(false)
   })
 
-  it('should return true for a key with exactly 21 seconds remaining', () => {
+  it('should return true for a key with exactly 31 seconds remaining', () => {
     const now = Date.now()
     vi.setSystemTime(now)
 
     const key: TemporaryApiKey = {
       apiKey: 'test-key',
-      expiryTimeMs: now + 21000, // 21 seconds from now
+      expiryTimeMs: now + 31000, // 31 seconds from now
     }
 
     const result = isTemporaryApiKeyValid(key)
@@ -182,11 +183,11 @@ describe('isTemporaryUploadKeyValid', () => {
     // Initially valid
     expect(isTemporaryApiKeyValid(key)).toBe(true)
 
-    // Advance time by 99 seconds (should still be valid - 21 seconds remaining)
-    vi.advanceTimersByTime(99000)
+    // Advance time by 89 seconds (should still be valid - 31 seconds remaining)
+    vi.advanceTimersByTime(89000)
     expect(isTemporaryApiKeyValid(key)).toBe(true)
 
-    // Advance time by 2 more seconds (should be invalid - 19 seconds remaining)
+    // Advance time by 2 more seconds (should be invalid - 29 seconds remaining)
     vi.advanceTimersByTime(2000)
     expect(isTemporaryApiKeyValid(key)).toBe(false)
   })
@@ -238,7 +239,7 @@ describe('integration: createTemporaryUploadKey and isTemporaryUploadKeyValid', 
     expect(isTemporaryApiKeyValid(key)).toBe(true)
   })
 
-  it('should create a key that becomes invalid after expiry time minus 20 seconds', () => {
+  it('should create a key that becomes invalid after expiry time minus 30 seconds', () => {
     const now = Date.now()
     vi.setSystemTime(now)
 
@@ -248,11 +249,11 @@ describe('integration: createTemporaryUploadKey and isTemporaryUploadKeyValid', 
     // Initially valid
     expect(isTemporaryApiKeyValid(key)).toBe(true)
 
-    // Advance to 19 seconds before expiry (should still be valid - 21 seconds remaining)
-    vi.advanceTimersByTime((expiryInSeconds - 21) * 1000)
+    // Advance to 29 seconds before expiry (should still be valid - 31 seconds remaining)
+    vi.advanceTimersByTime((expiryInSeconds - 31) * 1000)
     expect(isTemporaryApiKeyValid(key)).toBe(true)
 
-    // Advance to 20 seconds before expiry (should be invalid - 20 seconds remaining)
+    // Advance to 20 seconds before expiry (should be invalid - 29 seconds remaining)
     vi.advanceTimersByTime(1000)
     expect(isTemporaryApiKeyValid(key)).toBe(false)
   })
@@ -261,38 +262,38 @@ describe('integration: createTemporaryUploadKey and isTemporaryUploadKeyValid', 
     const now = Date.now()
     vi.setSystemTime(now)
 
-    // Create a key that expires in 10 seconds (less than the 20 second buffer)
+    // Create a key that expires in 10 seconds (less than the 30 second buffer)
     const key = createTemporaryApiKey('test-api-key', 10)
 
-    // Should be invalid immediately because it will expire in less than 20 seconds
+    // Should be invalid immediately because it will expire in less than 30 seconds
     expect(isTemporaryApiKeyValid(key)).toBe(false)
   })
 
-  it('should handle expiry duration of exactly 20 seconds', () => {
+  it('should handle expiry duration of exactly 30 seconds', () => {
     const now = Date.now()
     vi.setSystemTime(now)
 
-    // Create a key that expires in exactly 20 seconds
-    const key = createTemporaryApiKey('test-api-key', 20)
+    // Create a key that expires in exactly 30 seconds
+    const key = createTemporaryApiKey('test-api-key', 30)
 
-    // Should be invalid because it has exactly 20 seconds remaining (not more than 20)
+    // Should be invalid because it has exactly 30 seconds remaining (not more than 30)
     expect(isTemporaryApiKeyValid(key)).toBe(false)
   })
 
-  it('should handle expiry duration of 21 seconds', () => {
+  it('should handle expiry duration of 31 seconds', () => {
     const now = Date.now()
     vi.setSystemTime(now)
 
-    // Create a key that expires in 21 seconds
-    const key = createTemporaryApiKey('test-api-key', 21)
+    // Create a key that expires in 31 seconds
+    const key = createTemporaryApiKey('test-api-key', 31)
 
-    // Should be valid because it has 21 seconds remaining (more than 20)
+    // Should be valid because it has 31 seconds remaining (more than 30)
     expect(isTemporaryApiKeyValid(key)).toBe(true)
 
     // Advance by 1 second
     vi.advanceTimersByTime(1000)
 
-    // Should now be invalid because it has exactly 20 seconds remaining
+    // Should now be invalid because it has exactly 30 seconds remaining
     expect(isTemporaryApiKeyValid(key)).toBe(false)
   })
 })

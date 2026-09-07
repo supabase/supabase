@@ -1,17 +1,17 @@
-import type { PostgresPublication, PostgresTable } from '@supabase/postgres-meta'
+import type { PGPublication, PGTable } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { Badge, Switch, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+
 interface PublicationsTableItemProps {
-  table: PostgresTable
-  selectedPublication: PostgresPublication
+  table: PGTable
+  selectedPublication: PGPublication
 }
 
 export const PublicationsTableItem = ({
@@ -25,7 +25,7 @@ export const PublicationsTableItem = ({
   const isProtected = protectedSchemas.map((x) => x.name).includes(table.schema)
 
   const [checked, setChecked] = useState(
-    selectedPublication.tables?.find((x: any) => x.id == table.id) != undefined
+    selectedPublication.tables?.find((x) => x.id == table.id) != undefined
   )
 
   const { can: canUpdatePublications } = useAsyncCheckPermissions(
@@ -35,24 +35,19 @@ export const PublicationsTableItem = ({
 
   const { mutate: updatePublications, isPending } = useDatabasePublicationUpdateMutation()
 
-  const toggleReplicationForTable = async (
-    table: PostgresTable,
-    publication: PostgresPublication
-  ) => {
+  const toggleReplicationForTable = async (table: PGTable, publication: PGPublication) => {
     if (project === undefined) return console.error('Project is required')
 
     const originalChecked = checked
     setChecked(!checked)
 
     const publicationTables = publication?.tables ?? []
-    const exists = publicationTables.some((x: any) => x.id == table.id)
+    const exists = publicationTables.some((x) => x.id == table.id)
     const tables = !exists
       ? [`${table.schema}.${table.name}`].concat(
-          publicationTables.map((t: any) => `${t.schema}.${t.name}`)
+          publicationTables.map((t) => `${t.schema}.${t.name}`)
         )
-      : publicationTables
-          .filter((x: any) => x.id != table.id)
-          .map((x: any) => `${x.schema}.${x.name}`)
+      : publicationTables.filter((x) => x.id != table.id).map((x) => `${x.schema}.${x.name}`)
 
     updatePublications(
       {
@@ -78,7 +73,6 @@ export const PublicationsTableItem = ({
   return (
     <TableRow key={table.id}>
       <TableCell className="py-3 whitespace-nowrap">{table.name}</TableCell>
-      <TableCell className="py-3 whitespace-nowrap text-foreground-light">{table.schema}</TableCell>
       <TableCell className="py-3 whitespace-nowrap hidden lg:table-cell max-w-sm truncate text-foreground-light">
         {table.comment}
       </TableCell>
@@ -91,13 +85,16 @@ export const PublicationsTableItem = ({
             </Badge>
           ) : (
             <Tooltip>
-              <TooltipTrigger>
-                <Switch
-                  size="small"
-                  disabled={!canUpdatePublications || isPending || isProtected}
-                  checked={checked}
-                  onClick={() => toggleReplicationForTable(table, selectedPublication)}
-                />
+              <TooltipTrigger asChild>
+                <div>
+                  <Switch
+                    size="small"
+                    aria-label={`Toggle replication for ${table.name}`}
+                    disabled={!canUpdatePublications || isPending || isProtected}
+                    checked={checked}
+                    onClick={() => toggleReplicationForTable(table, selectedPublication)}
+                  />
+                </div>
               </TooltipTrigger>
               {isProtected && (
                 <TooltipContent side="bottom" className="w-64 text-center">

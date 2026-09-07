@@ -1,19 +1,46 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Mail } from 'lucide-react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import { useUserInviteMutation } from 'data/auth/user-invite-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button, Form, Input, Modal } from 'ui'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { useUserInviteMutation } from '@/data/auth/user-invite-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export type InviteUserModalProps = {
   visible: boolean
   setVisible: (visible: boolean) => void
 }
 
+const formSchema = z.object({
+  email: z.string().min(1, 'Please enter a valid email').email('Please enter a valid email'),
+})
+const formId = 'invite-user-form'
+
 const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
   const { ref: projectRef } = useParams()
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: '',
+    },
+  })
 
   const handleToggle = () => setVisible(!visible)
   const { mutate: inviteUser, isPending: isInviting } = useUserInviteMutation({
@@ -27,69 +54,58 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
     'invite_user'
   )
 
-  const validate = (values: any) => {
-    const errors: any = {}
-    const emailValidateRegex =
-      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
-
-    if (values.email.length === 0) {
-      errors.email = 'Please enter a valid email'
-    } else if (!emailValidateRegex.test(values.email)) {
-      errors.email = `${values.email} is an invalid email`
-    }
-
-    return errors
-  }
-
-  const onInviteUser = async (values: any) => {
+  const onInviteUser: SubmitHandler<z.infer<typeof formSchema>> = async (values) => {
     if (!projectRef) return console.error('Project ref is required')
-    inviteUser({ projectRef, email: values.email })
+    inviteUser(
+      { projectRef, email: values.email },
+      {
+        onSuccess: () => {
+          form.reset()
+        },
+      }
+    )
   }
 
   return (
-    <Modal
-      hideFooter
-      size="small"
-      key="invite-user-modal"
-      visible={visible}
-      header="Invite a new user"
-      onCancel={handleToggle}
-    >
-      <Form
-        validateOnBlur={false}
-        initialValues={{ email: '' }}
-        validate={validate}
-        onSubmit={onInviteUser}
-      >
-        {() => (
-          <>
-            <Modal.Content>
-              <Input
-                id="email"
-                className="w-full"
-                label="User email"
-                icon={<Mail />}
-                type="email"
+    <Dialog key="invite-user-modal" open={visible} onOpenChange={handleToggle}>
+      <DialogContent size="small">
+        <DialogHeader>
+          <DialogTitle>Invite a new user</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <DialogSection>
+            <form id={formId} onSubmit={form.handleSubmit(onInviteUser)} noValidate>
+              <FormField
+                control={form.control}
                 name="email"
-                placeholder="User email"
+                render={({ field }) => (
+                  <FormItemLayout layout="vertical" label="User email">
+                    <FormControl className="relative col-span-6">
+                      <Input {...field} />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
               />
-            </Modal.Content>
+            </form>
+          </DialogSection>
 
-            <Modal.Content>
-              <Button
-                block
-                size="small"
-                htmlType="submit"
-                loading={isInviting}
-                disabled={!canInviteUsers || isInviting}
-              >
-                Invite user
-              </Button>
-            </Modal.Content>
-          </>
-        )}
-      </Form>
-    </Modal>
+          <DialogFooter>
+            <Button variant="default" onClick={handleToggle}>
+              Cancel
+            </Button>
+            <Button
+              form={formId}
+              type="submit"
+              loading={isInviting}
+              disabled={!canInviteUsers || isInviting}
+            >
+              Invite user
+            </Button>
+          </DialogFooter>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }
 

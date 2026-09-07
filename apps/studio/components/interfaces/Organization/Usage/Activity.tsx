@@ -1,8 +1,8 @@
-import { DataPoint } from 'data/analytics/constants'
-import { PricingMetric, type OrgDailyUsageResponse } from 'data/analytics/org-daily-stats-query'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import UsageSection from './UsageSection/UsageSection'
 import { dailyUsageToDataPoints } from './Usage.utils'
+import UsageSection from './UsageSection/UsageSection'
+import { DataPoint } from '@/data/analytics/constants'
+import { PricingMetric, type OrgDailyUsageResponse } from '@/data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
 
 export interface ActivityProps {
   orgSlug: string
@@ -19,8 +19,6 @@ const Activity = ({
   orgSlug,
   projectRef,
   subscription,
-  startDate,
-  endDate,
   currentBillingCycleSelected,
   orgDailyStats,
   isLoadingOrgDailyStats,

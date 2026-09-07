@@ -1,35 +1,63 @@
-import { useParams } from 'common'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import IntegrationsLayout from 'components/layouts/Integrations/layout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useRouter } from 'next/compat/router'
+import { useFlag, useParams } from 'common'
+import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { ProjectIntegrationsLayoutDispatch } from '@/components/layouts/ProjectIntegrationsLayoutDispatch'
+import type { NextPageWithLayout } from '@/types'
+
+const INTEGRATION_FLAGS: Record<string, string> = {
+  grafana: 'grafanaDashboardIntegrationEnabled',
+  resend: 'resendDashboardIntegrationEnabled',
+  aikido: 'aikidoDashboardIntegrationEnabled',
+  doppler: 'dopplerDashboardIntegrationEnabled',
+}
 
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref, id } = useParams()
 
+  const grafanaEnabled = useFlag('grafanaDashboardIntegrationEnabled')
+  const resendEnabled = useFlag('resendDashboardIntegrationEnabled')
+  const aikidoEnabled = useFlag('aikidoDashboardIntegrationEnabled')
+  const dopplerEnabled = useFlag('dopplerDashboardIntegrationEnabled')
+
+  const integrationFlagValues: Record<string, boolean> = {
+    grafana: grafanaEnabled,
+    resend: resendEnabled,
+    aikido: aikidoEnabled,
+    doppler: dopplerEnabled,
+  }
+
   useEffect(() => {
-    // Always redirect to the overview page since this route should not render content
-    if (router?.isReady) {
-      router.replace(`/project/${ref}/integrations/${id}/overview`)
+    if (!router?.isReady) return
+
+    const flagName = id ? INTEGRATION_FLAGS[id] : undefined
+    if (flagName !== undefined && integrationFlagValues[id!] === false) {
+      router.replace(`/project/${ref}/integrations`)
+      return
     }
-  }, [router, ref, id])
+
+    router.replace(`/project/${ref}/integrations/${id}/overview`)
+  }, [router, ref, id, grafanaEnabled, resendEnabled, aikidoEnabled, dopplerEnabled])
 
   return (
-    <ScaffoldContainer size="full">
-      <ScaffoldSection isFullWidth>
-        <GenericSkeletonLoader />
-      </ScaffoldSection>
-    </ScaffoldContainer>
+    <PageContainer size="full">
+      <PageSection>
+        <PageSectionContent>
+          <GenericSkeletonLoader />
+        </PageSectionContent>
+      </PageSection>
+    </PageContainer>
   )
 }
 
 IntegrationPage.getLayout = (page) => (
   <DefaultLayout>
-    <IntegrationsLayout>{page}</IntegrationsLayout>
+    <ProjectIntegrationsLayoutDispatch>{page}</ProjectIntegrationsLayoutDispatch>
   </DefaultLayout>
 )
 

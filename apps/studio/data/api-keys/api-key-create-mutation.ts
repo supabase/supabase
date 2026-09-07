@@ -1,25 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { apiKeysKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type APIKeyCreateVariables = {
   projectRef?: string
   name: string
   description?: string
-} & (
-  | {
-      type: 'publishable'
-    }
-  | {
-      type: 'secret'
-      // secret_jwt_template?: { // @mildtomato (Jonny) removed this field to reduce scope
-      //   role: string
-      // } | null
-    }
-)
+} & ({ type: 'publishable' } | { type: 'secret' })
 
 export async function createAPIKey(payload: APIKeyCreateVariables) {
   if (!payload.projectRef) throw new Error('projectRef is required')
@@ -28,7 +18,7 @@ export async function createAPIKey(payload: APIKeyCreateVariables) {
     params: {
       path: { ref: payload.projectRef },
       query: {
-        reveal: false,
+        reveal: 'false',
       },
     },
     body: {
@@ -39,7 +29,7 @@ export async function createAPIKey(payload: APIKeyCreateVariables) {
               role: 'service_role',
             },
           }
-        : name),
+        : {}),
 
       type: payload.type,
       name: payload.name,

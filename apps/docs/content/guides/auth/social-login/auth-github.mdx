@@ -1,6 +1,6 @@
 ---
 id: 'auth-github'
-title: 'Login with GitHub'
+title: 'Sign in with GitHub'
 description: 'Add GitHub OAuth to your Supabase project'
 ---
 
@@ -8,11 +8,11 @@ To enable GitHub Auth for your project, you need to set up a GitHub OAuth applic
 
 ## Overview
 
-Setting up GitHub logins for your application consists of 3 parts:
+Setting up GitHub sign-in for your application consists of 3 parts:
 
 - Create and configure a GitHub OAuth App on [GitHub](https://github.com/settings/applications/new)
 - Add your GitHub OAuth keys to your [Supabase Project](/dashboard)
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+- Add the sign-in code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
 ## Find your callback URL
 
@@ -56,7 +56,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
   }'
 ```
 
-## Add login code to your client app
+## Add sign-in code to your client app
 
 <Tabs
   scrollable
@@ -73,10 +73,8 @@ When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/a
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(
-  'https://your-project-id.supabase.co',
-  'sb_publishable_... or anon key'
-)
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 async function signInWithGithub() {
@@ -132,6 +130,18 @@ suspend fun signInWithGithub() {
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.Github` as the provider:
+
+```c#
+var state = await supabase.Auth.SignIn(Provider.Github);
+var signInUrl = state.Uri;
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 <$Partial path="oauth_pkce_flow.mdx" />
@@ -149,10 +159,8 @@ When your user signs out, call [signOut()](/docs/reference/javascript/auth-signo
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(
-  'https://your-project-id.supabase.co',
-  'sb_publishable_... or anon key'
-)
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 async function signOut() {
@@ -181,6 +189,17 @@ When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) 
 suspend fun signOut() {
 	supabase.auth.signOut()
 }
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs out, call [SignOut()](/docs/reference/csharp/sign-out) to remove them from the browser session and any objects from local storage:
+
+```c#
+await supabase.Auth.SignOut();
 ```
 
 </TabPanel>

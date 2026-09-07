@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 const bucketId = 'user_avatars'
 
@@ -13,11 +13,11 @@ export default function EmptyStateMissingRoute() {
         title="Unable to find bucket"
         description={`${bucketId ? `The bucket “${bucketId}”` : 'This bucket'} doesn’t seem to exist.`}
       >
-        <Button asChild type="default" className="mt-2">
+        <Button asChild variant="default" className="mt-2">
           <Link
             href="/"
             onClick={(e) => {
-              e.preventDefault()
+              e.preventDefault() // Just for demo purposes
             }}
           >
             Head back

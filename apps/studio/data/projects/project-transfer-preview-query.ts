@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { handleError, post } from 'data/fetchers'
-import { UseCustomQueryOptions } from 'types'
 import { projectKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import { UseCustomQueryOptions } from '@/types'
 
 export type ProjectTransferPreviewVariables = {
   projectRef?: string

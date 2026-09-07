@@ -1,7 +1,8 @@
 import { remark } from 'remark'
-import { remarkHeading } from '../mdx-plugins/remark-heading'
 import type { PluggableList } from 'unified'
 import type { Compatible } from 'vfile'
+
+import { remarkHeading } from '../mdx-plugins/remark-heading'
 import type { TableOfContents } from '../types'
 
 /**

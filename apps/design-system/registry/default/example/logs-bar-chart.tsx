@@ -16,7 +16,7 @@ export default function LogsBarChartDemo() {
   }).reverse()
 
   return (
-    <div className="w-full h-64">
+    <div className="w-full h-24">
       <LogsBarChart data={data} />
     </div>
   )

@@ -1,5 +1,5 @@
-import type { Profile } from 'data/profile/types'
-import type { ProfileContextType } from 'lib/profile'
+import type { Profile } from '@/data/profile/types'
+import type { ProfileContextType } from '@/lib/profile'
 
 export const createMockProfile = (overrides: Partial<Profile> = {}): Profile => {
   const baseProfile: Profile = {

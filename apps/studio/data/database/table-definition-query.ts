@@ -1,37 +1,15 @@
+import { getTableDefinitionSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { UseCustomQueryOptions } from 'types'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
-import { CREATE_PG_GET_TABLEDEF_SQL } from './database-table-definition'
+import { useFlag } from 'common'
+
 import { databaseKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { PG_META_SCOPED_INTROSPECTION_FLAG } from '@/data/table-editor/table-editor-query'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type GetTableDefinitionArgs = {
   id?: number
-}
-
-// [Joshen] Eventually move this into entity-definition-query
-const getTableDefinitionSql = ({ id }: GetTableDefinitionArgs) => {
-  const sql = /* SQL */ `
-    ${CREATE_PG_GET_TABLEDEF_SQL}
-
-    with table_info as (
-      select 
-        n.nspname::text as schema,
-        c.relname::text as name
-      from pg_class c
-      join pg_namespace n on n.oid = c.relnamespace
-      where c.oid = ${id}
-    )
-    select pg_temp.pg_get_tabledef (
-      t.schema,
-      t.name,
-      false,
-      'FKEYS_INTERNAL',
-      'INCLUDE_TRIGGERS'
-    ) as definition
-    from table_info t;
-  `.trim()
-
-  return sql
+  scoped?: boolean
 }
 
 export type TableDefinitionVariables = GetTableDefinitionArgs & {
@@ -40,14 +18,12 @@ export type TableDefinitionVariables = GetTableDefinitionArgs & {
 }
 
 export async function getTableDefinition(
-  { projectRef, connectionString, id }: TableDefinitionVariables,
+  { projectRef, connectionString, id, scoped }: TableDefinitionVariables,
   signal?: AbortSignal
 ) {
-  if (!id) {
-    throw new Error('id is required')
-  }
+  if (!id) throw new Error('id is required')
 
-  const sql = getTableDefinitionSql({ id })
+  const sql = getTableDefinitionSql({ id, scoped })
   const { result } = await executeSql(
     {
       projectRef,
@@ -62,7 +38,7 @@ export async function getTableDefinition(
 }
 
 export type TableDefinitionData = string
-export type TableDefinitionError = ExecuteSqlError
+export type TableDefinitionError = ResponseError
 
 export const useTableDefinitionQuery = <TData = TableDefinitionData>(
   { projectRef, connectionString, id }: TableDefinitionVariables,
@@ -70,11 +46,15 @@ export const useTableDefinitionQuery = <TData = TableDefinitionData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<TableDefinitionData, TableDefinitionError, TData> = {}
-) =>
-  useQuery<TableDefinitionData, TableDefinitionError, TData>({
-    queryKey: databaseKeys.tableDefinition(projectRef, id),
-    queryFn: ({ signal }) => getTableDefinition({ projectRef, connectionString, id }, signal),
+) => {
+  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
+
+  return useQuery<TableDefinitionData, TableDefinitionError, TData>({
+    queryKey: [...databaseKeys.tableDefinition(projectRef, id), { scoped }],
+    queryFn: ({ signal }) =>
+      getTableDefinition({ projectRef, connectionString, id, scoped }, signal),
     enabled:
       enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
     ...options,
   })
+}

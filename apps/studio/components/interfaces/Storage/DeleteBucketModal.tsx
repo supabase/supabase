@@ -1,15 +1,14 @@
-import { get as _get, find } from 'lodash'
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
-import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutation'
-import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { TextConfirmModal } from 'ui-patterns/Dialogs/TextConfirmModal'
-import { formatPoliciesForStorage } from './Storage.utils'
+import { extractBucketNameFromDefinition } from './Storage.utils'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/database-policy-delete-mutation'
+import { useBucketDeleteMutation } from '@/data/storage/bucket-delete-mutation'
+import { Bucket } from '@/data/storage/buckets-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export interface DeleteBucketModalProps {
   visible: boolean
@@ -22,48 +21,45 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
   const { ref: projectRef, bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { data } = useBucketsQuery({ projectRef })
-  const buckets = data ?? []
-
   const { data: policies } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: 'storage',
+    schemas: ['storage'],
   })
 
-  const { mutateAsync: deletePolicy, isPending: isDeletingPolicies } =
-    useDatabasePolicyDeleteMutation()
+  const { mutateAsync: deletePolicy } = useDatabasePolicyDeleteMutation()
 
   const { mutate: deleteBucket, isPending: isDeletingBucket } = useBucketDeleteMutation({
     onSuccess: async () => {
+      // Close the modal and navigate away as soon as the bucket itself is deleted, so
+      // policy cleanup below (which can be slow) doesn't hold the loading state or block
+      // the success feedback.
+      toast.success(`Successfully deleted bucket ${bucket.id}`)
+      onClose()
+      if (bucketId) router.push(`/project/${projectRef}/storage/files`)
+
       if (!project) return console.error('Project is required')
 
       // Clean up policies from the corresponding bucket that was deleted
-      const storageObjectsPolicies = (policies ?? []).filter((policy) => policy.table === 'objects')
-      const formattedStorageObjectPolicies = formatPoliciesForStorage(
-        buckets,
-        storageObjectsPolicies
-      )
-      const bucketPolicies = _get(
-        find(formattedStorageObjectPolicies, { name: bucket.id }),
-        ['policies'],
-        []
-      )
+      const bucketPolicies = (policies ?? []).filter((policy) => {
+        if (policy.table !== 'objects') return false
+
+        const policyBucket = extractBucketNameFromDefinition(policy.definition ?? policy.check)
+        return policyBucket === bucket.name
+      })
+
+      if (bucketPolicies.length === 0) return
 
       try {
         await Promise.all(
-          bucketPolicies.map((policy: any) =>
+          bucketPolicies.map((policy) =>
             deletePolicy({
-              projectRef: project?.ref,
-              connectionString: project?.connectionString,
+              projectRef: project.ref,
+              connectionString: project.connectionString,
               originalPolicy: policy,
             })
           )
         )
-
-        toast.success(`Successfully deleted bucket ${bucket.id}`)
-        if (!!bucketId) router.push(`/project/${projectRef}/storage/files`)
-        onClose()
       } catch (error) {
         toast.success(
           `Successfully deleted bucket ${bucket.id}. However, there was a problem deleting the policies tied to the bucket. Please review them in the storage policies section`
@@ -84,7 +80,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
       size="medium"
       variant="destructive"
       title={`Delete bucket “${bucket.id}”`}
-      loading={isDeletingBucket || isDeletingPolicies}
+      loading={isDeletingBucket}
       confirmPlaceholder="Type bucket name"
       confirmString={bucket.id}
       confirmLabel="Delete bucket"

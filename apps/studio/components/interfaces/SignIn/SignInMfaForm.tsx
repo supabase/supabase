@@ -1,30 +1,37 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
+import { useAuthError, useParams } from 'common'
 import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
+import { Button, Form, FormControl, FormField, Input } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
-import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { useAuthError } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
-import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
-import { useSignOut } from 'lib/auth'
-import { getReturnToPath } from 'lib/gotrue'
-import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { SupportLink } from '../Support/SupportLink'
+import { AlertError } from '@/components/ui/AlertError'
+import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
+import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
+import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
+import { useSignOut } from '@/lib/auth'
+import { getReturnToPath } from '@/lib/gotrue'
+import { useTrack } from '@/lib/telemetry/track'
 
 const schema = z.object({
   code: z.string().min(1, 'MFA Code is required'),
 })
 
 const formId = 'sign-in-mfa-form'
+
+const SUPPORT_EMAIL_HREF = `mailto:support@supabase.com?subject=${encodeURIComponent('Unable to sign in via MFA')}`
+
+function getFactorDisplayName(factor: Pick<Factor, 'friendly_name'> | null | undefined): string {
+  const name = factor?.friendly_name?.trim()
+  return name && name.length > 0 ? name : 'your authenticator app'
+}
 
 interface SignInMfaFormProps {
   context?: 'forgot-password' | 'sign-in'
@@ -34,18 +41,25 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   const router = useRouter()
   const signOut = useSignOut()
   const queryClient = useQueryClient()
+  const { method: signInMethod = 'unknown' } = useParams()
+
+  const track = useTrack()
+  const { mutate: addLoginEvent } = useAddLoginEvent()
+
   const [selectedFactor, setSelectedFactor] = useState<Factor | null>(null)
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: { code: '' },
   })
 
+  const code = useWatch({ control: form.control, name: 'code' })
+
   const {
     data: factors,
     error: factorsError,
     isError: isErrorFactors,
     isSuccess: isSuccessFactors,
-    isLoading: isLoadingFactors,
+    isPending: isLoadingFactors,
   } = useMfaListFactorsQuery()
   const {
     mutate: mfaChallengeAndVerify,
@@ -53,6 +67,11 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
     isSuccess,
   } = useMfaChallengeAndVerifyMutation({
     onSuccess: async () => {
+      if (context === 'sign-in') {
+        track('sign_in', { category: 'account', method: signInMethod })
+        addLoginEvent({})
+      }
+
       await queryClient.resetQueries()
 
       if (context === 'forgot-password') {
@@ -89,6 +108,10 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
     }
   }, [factors?.totp, isSuccessFactors, router, queryClient])
 
+  useEffect(() => {
+    if (code.length === 6) form.handleSubmit(onSubmit)()
+  }, [code])
+
   const error = useAuthError()
 
   if (error) {
@@ -96,10 +119,16 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
       <AlertError
         error={error}
         subject="Error while signing in"
+        hideContactSupport
         additionalActions={
-          <Button asChild type="warning" className="w-min">
-            <Link href="/sign-in">Back to sign in</Link>
-          </Button>
+          <>
+            <Button asChild variant="default">
+              <Link href="/sign-in">Back to sign in</Link>
+            </Button>
+            <Button asChild variant="default">
+              <a href={SUPPORT_EMAIL_HREF}>Email support</a>
+            </Button>
+          </>
         }
       />
     )
@@ -109,12 +138,24 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
     <>
       {isLoadingFactors && <GenericSkeletonLoader />}
 
-      {isErrorFactors && <AlertError error={factorsError} subject="Failed to retrieve factors" />}
+      {isErrorFactors && (
+        <AlertError
+          error={factorsError}
+          subject="Failed to retrieve factors"
+          description="Try refreshing your browser. If the issue persists, email support@supabase.com."
+          hideContactSupport
+        />
+      )}
 
       {isSuccessFactors && (
-        <Form_Shadcn_ {...form}>
-          <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField_Shadcn_
+        <Form {...form}>
+          <form
+            id={formId}
+            method="POST"
+            className="flex flex-col gap-4"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
+            <FormField
               key="code"
               name="code"
               control={form.control}
@@ -122,19 +163,24 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                 <FormItemLayout
                   name="code"
                   label={
-                    selectedFactor && factors?.totp.length === 2
-                      ? `Code generated by ${selectedFactor.friendly_name}`
-                      : null
+                    selectedFactor ? (
+                      <>
+                        Code generated by{' '}
+                        <strong className="text-foreground">
+                          {getFactorDisplayName(selectedFactor)}
+                        </strong>
+                      </>
+                    ) : null
                   }
                 >
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-foreground-light [&_svg]:stroke-[1.5] [&_svg]:h-[20px] [&_svg]:w-[20px]">
                         <Lock />
                       </div>
-                      <Input_Shadcn_
+                      <Input
                         id="code"
-                        className="pl-10"
+                        className="pl-10 font-mono"
                         {...field}
                         autoFocus
                         autoComplete="off"
@@ -145,15 +191,15 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                         disabled={isVerifying}
                       />
                     </div>
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
 
-            <div className="flex items-center justify-between space-x-2">
+            <div className="flex items-center justify-between gap-x-2">
               <Button
                 block
-                type="outline"
+                variant="outline"
                 size="large"
                 disabled={isVerifying || isSuccess}
                 onClick={onClickLogout}
@@ -164,7 +210,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
               <Button
                 block
                 form={formId}
-                htmlType="submit"
+                type="submit"
                 size="large"
                 disabled={isVerifying || isSuccess}
                 loading={isVerifying || isSuccess}
@@ -173,7 +219,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
               </Button>
             </div>
           </form>
-        </Form_Shadcn_>
+        </Form>
       )}
 
       <div className="my-8">
@@ -188,9 +234,13 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                 onClick={() =>
                   setSelectedFactor(factors.totp.find((f) => f.id !== selectedFactor?.id)!)
                 }
-              >{`Authenticate using ${
-                factors.totp.find((f) => f.id !== selectedFactor?.id)?.friendly_name
-              }?`}</a>
+              >
+                Authenticate using{' '}
+                <strong className="text-foreground">
+                  {getFactorDisplayName(factors.totp.find((f) => f.id !== selectedFactor?.id))}
+                </strong>
+                ?
+              </a>
             </li>
           )}
           <li>
@@ -200,17 +250,6 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
             >
               Force sign out and clear cookies
             </Link>
-          </li>
-          <li>
-            <SupportLink
-              className="text-sm transition text-foreground-light hover:text-foreground"
-              queryParams={{
-                subject: 'Unable to sign in via MFA',
-                category: SupportCategories.LOGIN_ISSUES,
-              }}
-            >
-              Reach out to us via support
-            </SupportLink>
           </li>
         </ul>
       </div>

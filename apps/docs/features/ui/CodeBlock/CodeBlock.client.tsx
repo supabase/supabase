@@ -1,10 +1,12 @@
 'use client'
 
-import { Check, Copy } from 'lucide-react'
-import { type MouseEvent, useCallback, useEffect, useState } from 'react'
+import { ArrowRightFromLine, Check, Copy, WrapText } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react'
 import { type ThemedToken } from 'shiki'
 import { type NodeHover } from 'twoslash'
 import { cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
+import { getFontStyle } from './CodeBlock.utils'
 
 export function AnnotatedSpan({
   token,
@@ -44,10 +46,11 @@ export function AnnotatedSpan({
     <Tooltip open={open} onOpenChange={onOpenChange}>
       <TooltipTrigger asChild onClick={handleClick}>
         <button
+          tabIndex={0}
           style={token.htmlStyle}
           className={cn(
             isTouchDevice &&
-              'underline underline-offset-4 decoration-dashed [text-decoration-color:rgba(from_currentColor_r_g_b_/_0.5)]'
+              'underline underline-offset-4 decoration-dashed decoration-[rgba(from_currentColor_r_g_b/0.5)]'
           )}
         >
           {token.content}
@@ -91,25 +94,96 @@ export function CodeCopyButton({ className, content }: { className?: string; con
   const handleCopy = async () => {
     copyToClipboard(content, () => {
       setCopied(true)
-      setTimeout(() => setCopied(false), 1000)
     })
   }
 
+  const resetStatus = () => {
+    setCopied(false)
+  }
+
   return (
-    <button
-      onClick={handleCopy}
-      className={cn(
-        'border rounded-md p-1',
-        copied && 'bg-selection',
-        'hover:bg-selection transition',
-        className
-      )}
+    <>
+      <span className="sr-only" aria-live="polite">
+        {copied ? 'Code copied' : ''}
+      </span>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            tabIndex={0}
+            onClick={handleCopy}
+            onBlur={resetStatus}
+            className={cn(
+              'cursor-pointer border rounded-md p-1',
+              copied && 'bg-selection',
+              'hover:bg-selection transition',
+              className
+            )}
+            aria-label="Copy code"
+            // Tooltip repeats the label; the description would read the name twice
+            aria-describedby={undefined}
+          >
+            {copied ? (
+              <Check size={14} className="text-lighter" />
+            ) : (
+              <Copy size={14} className="text-lighter" />
+            )}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>Copy code</TooltipContent>
+      </Tooltip>
+    </>
+  )
+}
+
+export function CodeBlockControls({ content }: { content: string }) {
+  const [isWrapped, setIsWrapped] = useState(false)
+  // Empty until the first toggle, so nothing is announced on mount
+  const [wrapStatus, setWrapStatus] = useState('')
+  const wrapperRef = useRef<HTMLDivElement>(null)
+
+  const toggleWrap = useCallback(() => {
+    const newValue = !isWrapped
+    setIsWrapped(newValue)
+    setWrapStatus(newValue ? 'Word wrap enabled' : 'Word wrap disabled')
+
+    const codeBlock = wrapperRef.current?.closest('.shiki')
+    if (codeBlock) {
+      if (newValue) {
+        codeBlock.setAttribute('data-wrapped', 'true')
+      } else {
+        codeBlock.removeAttribute('data-wrapped')
+      }
+    }
+  }, [isWrapped])
+
+  return (
+    <div
+      ref={wrapperRef}
+      className="opacity-0 flex group-hover:opacity-100 group-focus-within:opacity-100 absolute top-2 right-2 gap-1"
     >
-      {copied ? (
-        <Check size={14} className="text-lighter" />
-      ) : (
-        <Copy size={14} className="text-lighter" />
-      )}
-    </button>
+      <span className="sr-only" aria-live="polite">
+        {wrapStatus}
+      </span>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            tabIndex={0}
+            onClick={toggleWrap}
+            className={cn('cursor-pointer border rounded-md p-1', 'hover:bg-selection transition')}
+            aria-label={isWrapped ? 'Disable word wrap' : 'Enable word wrap'}
+            // Tooltip repeats the label; the description would read the name twice
+            aria-describedby={undefined}
+          >
+            {isWrapped ? (
+              <ArrowRightFromLine size={14} className="text-lighter" />
+            ) : (
+              <WrapText size={14} className="text-lighter" />
+            )}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>{isWrapped ? 'Disable word wrap' : 'Enable word wrap'}</TooltipContent>
+      </Tooltip>
+      <CodeCopyButton content={content} />
+    </div>
   )
 }

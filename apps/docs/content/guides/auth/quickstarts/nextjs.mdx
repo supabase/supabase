@@ -5,6 +5,8 @@ breadcrumb: 'Auth Quickstarts'
 hideToc: true
 ---
 
+## Quickstart
+
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
@@ -52,9 +54,11 @@ hideToc: true
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Declare Supabase Environment Variables">
 
-    Rename `.env.example` to `.env.local` and populate with [your project's URL and Key](/dashboard/project/_/settings/api).
+        Rename `.env.example` to `.env.local` and populate with your Supabase connection variables:
 
-    <$Partial path="api_settings_steps.mdx" />
+        <ProjectConfigVariables variable="url" />
+        <ProjectConfigVariables variable="publishable" />
+
 
     </StepHikeCompact.Details>
 
@@ -62,8 +66,10 @@ hideToc: true
 
       ```text name=.env.local
       NEXT_PUBLIC_SUPABASE_URL=your-project-url
-      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_... or anon key
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_... key
       ```
+
+      <$Partial path="api_settings.mdx" variables={{ "framework": "nextjs", "tab": "frameworks" }} />
 
     </StepHikeCompact.Code>
 
@@ -74,7 +80,7 @@ hideToc: true
 
     Start the development server, go to http://localhost:3000 in a browser, and you should see the contents of `app/page.tsx`.
 
-    To sign up a new user, navigate to http://localhost:3000/sign-up, and click `Sign up`. *NOTE: .env.example must be renamed to .env.local before this route becomes available*
+    To sign up a new user, navigate to http://localhost:3000/auth/sign-up, and click `Sign up`.
 
     </StepHikeCompact.Details>
 
@@ -91,5 +97,5 @@ hideToc: true
 
 ## Learn more
 
-- [Setting up Server-Side Auth for Next.js](/docs/guides/auth/server-side/nextjs) for a Next.js deep dive
+- [Setting up Server-Side Auth for Next.js](/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=nextjs) for a Next.js deep dive
 - [Supabase Auth docs](/docs/guides/auth#authentication) for more Supabase authentication methods

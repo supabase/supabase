@@ -21,6 +21,25 @@ function processJsonFile(filePath: string) {
       // Replace the file origin path to exclude the monorepo structure
       .replaceAll('node_modules/@supabase/vue-blocks/', '')
 
+    // Blocks that combine() across all client variants hard-code the nextjs
+    // client path in their source. Rewrite that import per-variant so each
+    // generated artifact points at the client file it actually bundles.
+    const variantClientMap: Record<string, string> = {
+      react: 'react',
+      'react-router': 'react-router',
+      tanstack: 'tanstack',
+    }
+    const baseName = path.basename(filePath, '.json')
+    for (const [suffix, clientDir] of Object.entries(variantClientMap)) {
+      if (baseName.endsWith(`-${suffix}`)) {
+        stringified = stringified.replaceAll(
+          '@/registry/default/clients/nextjs/lib/supabase/client',
+          `@/registry/default/clients/${clientDir}/lib/supabase/client`
+        )
+        break
+      }
+    }
+
     // Write back to file
     fs.writeFileSync(filePath, stringified)
     console.log(`✓ Updated ${filePath}`)

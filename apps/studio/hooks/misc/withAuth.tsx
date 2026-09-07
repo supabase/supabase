@@ -1,14 +1,14 @@
+import { useAuth } from 'common'
 import { useRouter } from 'next/router'
 import { ComponentType, useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useAuth } from 'common'
-import { SessionTimeoutModal } from 'components/interfaces/SignIn/SessionTimeoutModal'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useAuthenticatorAssuranceLevelQuery } from 'data/profile/mfa-authenticator-assurance-level-query'
-import { useSignOut } from 'lib/auth'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { isNextPageWithLayout, type NextPageWithLayout } from 'types'
+import { SessionTimeoutModal } from '@/components/interfaces/SignIn/SessionTimeoutModal'
+import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { useAuthenticatorAssuranceLevelQuery } from '@/data/profile/mfa-authenticator-assurance-level-query'
+import { useSignOut } from '@/lib/auth'
+import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
+import { isNextPageWithLayout, type NextPageWithLayout } from '@/types'
 
 const MAX_TIMEOUT = 10000 // 10 seconds
 
@@ -17,10 +17,9 @@ export function withAuth<T>(
   options: {
     /**
      * The auth level used to check the user credentials. In most cases, if the user has MFA enabled
-     * we want the highest level (which is 2) for all pages. For certain pages, the user should be
-     * able to access them even if he didn't finished his login (typed in his MFA code), for example
-     * the support page: We want the user to be able to submit a ticket even if he's not fully
-     * signed in.
+     * we want the highest level (which is 2) for all pages, as the platform API rejects sessions
+     * that haven't completed the MFA challenge. Only opt out for pages that don't read from the
+     * platform API and are meant to be reachable before the user has finished signing in.
      * @default true
      */
     useHighestAAL: boolean
@@ -40,11 +39,14 @@ export function withAuth<T>(
     const [isSessionTimeoutModalOpen, setIsSessionTimeoutModalOpen] = useState(false)
 
     const {
-      isLoading: isAALLoading,
+      isPending: isAALLoading,
       data: aalData,
       isError: isErrorAAL,
+      isSuccess: isSuccessAAL,
       error: errorAAL,
     } = useAuthenticatorAssuranceLevelQuery()
+
+    const isAtHighestAAL = isSuccessAAL && aalData.currentLevel === aalData.nextLevel
 
     useEffect(() => {
       if (isErrorAAL) {
@@ -57,15 +59,18 @@ export function withAuth<T>(
     const { isError: isErrorPermissions, error: errorPermissions } = usePermissionsQuery()
 
     useEffect(() => {
-      if (isErrorPermissions) {
+      if (isErrorPermissions && isAtHighestAAL) {
         toast.error(
           `Failed to fetch permissions: ${errorPermissions?.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
         )
       }
-    }, [isErrorPermissions, errorPermissions])
+    }, [isErrorPermissions, errorPermissions, isAtHighestAAL])
 
     const isLoggedIn = Boolean(session)
     const isFinishedLoading = !isLoading && !isAALLoading
+
+    const isCorrectLevel = options.useHighestAAL ? isAtHighestAAL : true
+    const needsMfaElevation = isLoggedIn && !isCorrectLevel
 
     const redirectToSignIn = useCallback(() => {
       let pathname = location.pathname
@@ -73,7 +78,7 @@ export function withAuth<T>(
         pathname = pathname.replace(BASE_PATH, '')
       }
 
-      if (pathname === '/sign-in') {
+      if (pathname === '/sign-in' || pathname === '/sign-in-mfa') {
         // If the user is already on the sign in page, we don't need to redirect them
         return
       }
@@ -81,11 +86,19 @@ export function withAuth<T>(
       const searchParams = new URLSearchParams(location.search)
       searchParams.set('returnTo', pathname)
 
+      if (needsMfaElevation) {
+        // Session is valid at AAL1 but needs to be elevated to AAL2. Preserve the session
+        // and send the user to the MFA challenge — typically the IdP-initiated SSO path,
+        // where the user lands directly on /dashboard without going through /sign-in-mfa.
+        router.push(`/sign-in-mfa?${searchParams.toString()}`)
+        return
+      }
+
       // Sign out before redirecting to sign in page incase the user is stuck in a loading state
       signOut().finally(() => {
         router.push(`/sign-in?${searchParams.toString()}`)
       })
-    }, [router, signOut])
+    }, [router, signOut, needsMfaElevation])
 
     useEffect(() => {
       if (!isFinishedLoading) {
@@ -106,10 +119,6 @@ export function withAuth<T>(
       }
     }, [isFinishedLoading, router, redirectToSignIn])
 
-    const isCorrectLevel = options.useHighestAAL
-      ? aalData?.currentLevel === aalData?.nextLevel
-      : true
-
     const shouldRedirect = isFinishedLoading && (!isLoggedIn || !isCorrectLevel)
 
     useEffect(() => {
@@ -125,12 +134,23 @@ export function withAuth<T>(
 
     const InnerComponent = WrappedComponent as any
 
+    const supportContext =
+      typeof router.query.ref === 'string' && router.pathname.startsWith('/project/')
+        ? {
+            projectRef: router.query.ref,
+            ...(typeof router.query.organizationSlug === 'string' && {
+              orgSlug: router.query.organizationSlug,
+            }),
+          }
+        : undefined
+
     return (
       <>
         <SessionTimeoutModal
           visible={isSessionTimeoutModalOpen}
           onClose={() => setIsSessionTimeoutModalOpen(false)}
           redirectToSignIn={redirectToSignIn}
+          supportContext={supportContext}
         />
         <InnerComponent {...props} />
       </>

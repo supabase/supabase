@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { Button, Checkbox_Shadcn_, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
+import { Button, Checkbox, Form, FormControl, FormField } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -51,9 +51,9 @@ export default function FormItemLayoutDemo() {
     // action('form form.handleSubmit(onSubmit)')(values)
   }
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form className="w-96 flex flex-col gap-3" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="items"
           render={() => (
@@ -63,7 +63,7 @@ export default function FormItemLayoutDemo() {
               layout="horizontal"
             >
               {items.map((item) => (
-                <FormField_Shadcn_
+                <FormField
                   key={item.id}
                   control={form.control}
                   name="items"
@@ -76,8 +76,8 @@ export default function FormItemLayoutDemo() {
                         layout="flex"
                         hideMessage
                       >
-                        <FormControl_Shadcn_>
-                          <Checkbox_Shadcn_
+                        <FormControl>
+                          <Checkbox
                             checked={field.value?.includes(item.id)}
                             onCheckedChange={(checked) => {
                               return checked
@@ -85,7 +85,7 @@ export default function FormItemLayoutDemo() {
                                 : field.onChange(field.value?.filter((value) => value !== item.id))
                             }}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )
                   }}
@@ -95,10 +95,10 @@ export default function FormItemLayoutDemo() {
             </FormItemLayout>
           )}
         />
-        <Button size="small" type="secondary" htmlType="submit">
+        <Button size="small" variant="secondary" type="submit">
           Submit
         </Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

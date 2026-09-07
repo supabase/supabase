@@ -14,4 +14,4 @@ export interface AnalyticsData {
   hasNoData?: boolean
 }
 
-export type AnalyticsInterval = '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
+export type AnalyticsInterval = '1m' | '2m' | '5m' | '10m' | '30m' | '1h' | '1d'
