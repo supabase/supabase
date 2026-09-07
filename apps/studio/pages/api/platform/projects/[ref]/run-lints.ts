@@ -4,6 +4,7 @@ import { constructHeaders } from '@/lib/api/apiHelpers'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { DEFAULT_EXPOSED_SCHEMAS } from '@/lib/api/self-hosted/constants'
 import { getLints } from '@/lib/api/self-hosted/lints'
+import { getPgMetaConnectionHeaders } from '@/lib/api/self-hosted/pg-meta-headers'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -12,8 +13,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (method) {
     case 'GET':
+      const { ref } = req.query as { ref: string }
+      const headers = constructHeaders(req.headers)
+      const pgMetaHeaders = getPgMetaConnectionHeaders(ref, headers)
+
       const { data, error } = await getLints({
-        headers: constructHeaders(req.headers),
+        headers: pgMetaHeaders,
         exposedSchemas: DEFAULT_EXPOSED_SCHEMAS,
       })
 
