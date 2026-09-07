@@ -9,7 +9,7 @@ const run = promisify(execFile)
 const packageDirectory = dirname(dirname(fileURLToPath(import.meta.url)))
 const typesDirectory = process.env.API_TYPES_DIRECTORY ?? join(packageDirectory, 'types')
 const platformApiUrl =
-  process.env.PLATFORM_API_OPENAPI_URL ?? 'https://api.supabase.com/platform/v1-json'
+  process.env.PLATFORM_API_OPENAPI_URL ?? 'https://api.supabase.com/api/platform-json'
 const fetchTimeout = 30_000
 
 const specifications = [
