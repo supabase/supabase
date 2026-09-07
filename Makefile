@@ -14,7 +14,7 @@ github.contributors.%:
 	| sort_by(.username)' \
 	> $(REPO_DIR)/web/src/data/contributors/$*.json
 
-.PHONY: github.rcontributorsepos
+.PHONY: github.contributors
 github.contributors: \
 	github.contributors.supabase \
 	github.contributors.supabase-js \
