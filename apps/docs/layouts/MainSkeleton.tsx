@@ -214,6 +214,8 @@ const MobileHeader = memo(function MobileHeader(props: MobileHeaderProps) {
           mobileMenuOpen && 'mt-0.5'
         )}
         onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
+        aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+        aria-expanded={mobileMenuOpen}
       >
         <div
           className={cn(
