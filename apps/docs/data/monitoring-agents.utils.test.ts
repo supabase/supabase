@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { getMonitoringAgent, getScheduleMarks } from './monitoring-agents.utils'
+import { monitoringAgents } from './monitoring-agents.data'
+import {
+  getCronExpression,
+  getMonitoringAgent,
+  getMonitoringAgentHarnesses,
+  getScheduleMarks,
+} from './monitoring-agents.utils'
 
 describe('getMonitoringAgent', () => {
   it('returns a registered agent', () => {
@@ -45,5 +51,33 @@ describe('getScheduleMarks', () => {
       'Sat',
       'Sun',
     ])
+  })
+})
+
+describe('getCronExpression', () => {
+  it('maps supported intervals', () => {
+    expect(getCronExpression(15)).toBe('*/15 * * * *')
+    expect(getCronExpression(60)).toBe('0 * * * *')
+    expect(getCronExpression(1440)).toBe('0 9 * * *')
+  })
+})
+
+describe('getMonitoringAgentHarnesses', () => {
+  it('uses a Claude routine for hourly health checks', () => {
+    const claude = getMonitoringAgentHarnesses(monitoringAgents.health).find(
+      (harness) => harness.key === 'claude'
+    )
+
+    expect(claude?.intro).toContain('Create a Claude routine')
+    expect(claude?.note).toBeUndefined()
+  })
+
+  it('omits the Desktop-task note when the cadence is hourly or slower', () => {
+    const claude = getMonitoringAgentHarnesses(monitoringAgents.performance).find(
+      (harness) => harness.key === 'claude'
+    )
+
+    expect(claude?.intro).toContain('Create a Claude routine')
+    expect(claude?.note).toBeUndefined()
   })
 })

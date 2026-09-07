@@ -1,17 +1,41 @@
 ---
 id: 'automate-with-agents-health'
 title: 'Health monitor'
-description: 'API and Auth server-error rates, plus current Postgres connection pressure.'
+subtitle: 'A read-only agent that checks API and Auth errors and Postgres connection pressure once per hour.'
+description: 'Hourly monitoring for server errors and connection pressure'
 ---
 
-Health monitor reads project data and reports findings from these checks: API and Auth server-error rates, plus current Postgres connection pressure.
+```mermaid
+flowchart TD
+  Schedule([Every hour]) --> Inspect[query_logs and execute_sql]
+  Inspect --> Signals["Server errors and connection pressure"]
+  Signals --> Review{Anything new to report?}
+  Review -->|Yes| Report[Finding and next step]
+  Review -->|No| Silent[Stay silent]
+  Inspect -->|Missing data or access| Gap[Report new or changed gaps]
+```
 
-Use the [canonical checks](/docs/guides/observability/detecting#health) for queries, thresholds, prerequisites, and interpretation. It records **finding**, **clear**, or **unable to assess** for each check. Missing history or failed access never becomes a healthy result. New findings and changed assessment failures are reported; unchanged repeats and clear runs stay quiet.
+## What it watches
 
-## Schedule
+- API and Auth server-error rates in the last complete hour, compared with the preceding hour
+- Current Postgres connection pressure
+
+It uses `query_logs` and read-only `execute_sql` on project-scoped [Supabase MCP](/docs/guides/ai-tools/mcp).
+
+## When it watches
 
 <AgentWatchSchedule id="health" />
 
-## Prompt
+## What it will output
+
+Health monitor reports new or changed problems with the affected service, measured error rate or connection usage, and a next investigation step. See [what triggers a health report](/docs/guides/observability/detecting#health).
+
+If a check cannot run, the agent tells you what is missing. Clear checks and unchanged findings stay quiet.
+
+<$Partial path="monitoring_agent_output.mdx" />
+
+## Set up the agent
+
+Allow the agent to read the documentation linked in its prompt. Save its alert state between runs so it can avoid repeat reports.
 
 <AgentSetup id="health" />

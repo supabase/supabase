@@ -4,7 +4,7 @@ title: 'Detection checks'
 description: 'Repeatable health, security, performance, and capacity checks with explicit inputs and outcomes'
 ---
 
-Use these checks to identify evidence worth investigating. A finding does not establish a cause. The [monitoring routines](/docs/guides/observability/automate-with-agents) use these same checks.
+Use these checks to identify evidence worth investigating. A finding does not establish a cause. The specialist [monitoring agents](/docs/guides/observability/automate-with-agents) use these same checks.
 
 ## Before running checks
 
@@ -19,7 +19,7 @@ Each check returns **finding**, **clear** (completed, no threshold crossed), or 
 
 ### Measure API and Auth server errors
 
-**Input:** the last complete UTC hour and preceding complete hour, queried separately. Generalist compares each of the last 24 complete hours with its preceding hour. Evaluate each source separately; API Gateway and Auth events are different observations, not unique requests to add together.
+**Input:** the last complete UTC hour and preceding complete hour, queried separately. Evaluate each source separately; API Gateway and Auth events are different observations, not unique requests to add together.
 
 ```sql
 select source,
@@ -108,7 +108,7 @@ limit 20;
 
 ### Compare query execution time
 
-**Input:** enabled [pg_stat_statements](/docs/guides/database/extensions/pg_stat_statements), query-identifier visibility, and three saved snapshots spaced one hour apart. They define the preceding and current hour. Daily routines use three snapshots spaced one day apart instead.
+**Input:** enabled [pg_stat_statements](/docs/guides/database/extensions/pg_stat_statements), query-identifier visibility, and three saved snapshots spaced one hour apart. They define the preceding and current hour.
 
 ```sql
 select
