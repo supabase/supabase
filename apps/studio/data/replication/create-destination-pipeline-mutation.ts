@@ -3,43 +3,22 @@ import type { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
-import type { DucklakeDestinationConfig } from './types'
-import { isDucklakeSupabaseConfig } from './utils'
+import type {
+  BigQueryDestinationConfig,
+  DestinationConfig,
+  DucklakeDestinationConfig,
+  PipelineConfig,
+} from './types'
+import { buildPipelineApiConfig, isDucklakeSupabaseConfig } from './utils'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type CreateDestinationPipelineBody =
   components['schemas']['CreateReplicationDestinationPipelineBody']
 type CreateDestinationApiConfig = CreateDestinationPipelineBody['destination_config']
-type CreatePipelineApiConfig = CreateDestinationPipelineBody['pipeline_config']
 
 type CreateBigQueryApiConfig = Extract<CreateDestinationApiConfig, { big_query: unknown }>
 type CreateDucklakeApiConfig = Extract<CreateDestinationApiConfig, { ducklake: unknown }>
-
-export type DestinationConfig =
-  | { bigQuery: BigQueryDestinationConfig }
-  | { iceberg: IcebergDestinationConfig }
-  | { ducklake: DucklakeDestinationConfig }
-  | { snowflake: SnowflakeDestinationConfig }
-  | { clickHouse: ClickHouseDestinationConfig }
-
-export type BigQueryDestinationConfig = {
-  projectId: string
-  datasetId: string
-  serviceAccountKey: string
-  connectionPoolSize?: number
-  maxStalenessMins?: number
-}
-
-export type IcebergDestinationConfig = {
-  projectRef: string
-  warehouseName: string
-  namespace?: string
-  catalogToken: string
-  s3AccessKeyId: string
-  s3SecretAccessKey: string
-  s3Region: string
-}
 
 // Maps the studio-side BigQuery config to the snake_case `{ big_query: ... }` payload accepted
 // by the platform API. Shared by the create and validate mutations.
@@ -94,63 +73,6 @@ export function buildDucklakeApiConfig(config: DucklakeDestinationConfig): Creat
     },
   }
 }
-
-export type SnowflakeDestinationConfig = {
-  accountId: string
-  user: string
-  privateKey: string
-  privateKeyPassphrase?: string
-  database: string
-  schema: string
-  role?: string
-}
-
-export type ClickHouseDestinationConfig = {
-  url: string
-  user: string
-  password?: string
-  database: string
-  engine?: 'merge_tree' | 'replacing_merge_tree'
-}
-
-export type BatchConfig = {
-  maxFillMs?: number
-  maxBytes?: number
-  memoryBudgetRatio?: number
-}
-
-export type TableSyncCopyConfig = NonNullable<CreatePipelineApiConfig['table_sync_copy']>
-
-export type PipelineConfig = {
-  publicationName: string
-  batch?: BatchConfig
-  maxTableSyncWorkers?: number
-  maxCopyConnectionsPerTable?: number
-  invalidatedSlotBehavior?: 'error' | 'recreate'
-  tableSyncCopy: TableSyncCopyConfig
-}
-
-export const buildPipelineApiConfig = ({
-  publicationName,
-  batch,
-  maxTableSyncWorkers,
-  maxCopyConnectionsPerTable,
-  invalidatedSlotBehavior,
-  tableSyncCopy,
-}: PipelineConfig): CreatePipelineApiConfig => ({
-  publication_name: publicationName,
-  max_table_sync_workers: maxTableSyncWorkers,
-  max_copy_connections_per_table: maxCopyConnectionsPerTable,
-  invalidated_slot_behavior: invalidatedSlotBehavior,
-  table_sync_copy: tableSyncCopy,
-  batch: batch
-    ? {
-        max_fill_ms: batch.maxFillMs,
-        max_bytes: batch.maxBytes,
-        memory_budget_ratio: batch.memoryBudgetRatio,
-      }
-    : undefined,
-})
 
 export const buildCreateDestinationApiConfig = (
   destinationConfig: DestinationConfig

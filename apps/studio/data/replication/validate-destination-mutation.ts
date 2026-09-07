@@ -1,12 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
 import type { components } from 'api-types'
 
-import {
-  buildCreateDestinationApiConfig,
-  buildPipelineApiConfig,
-  DestinationConfig,
-  TableSyncCopyConfig,
-} from './create-destination-pipeline-mutation'
+import { buildCreateDestinationApiConfig } from './create-destination-pipeline-mutation'
+import type { DestinationConfig, TableSyncCopyConfig } from './types'
+import { buildPipelineApiConfig } from './utils'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 

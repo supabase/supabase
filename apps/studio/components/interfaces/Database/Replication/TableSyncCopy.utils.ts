@@ -1,4 +1,4 @@
-import type { TableSyncCopyConfig } from '@/data/replication/create-destination-pipeline-mutation'
+import type { TableSyncCopyConfig } from '@/data/replication/types'
 
 export type ReplicationTableIdentity = {
   id: number

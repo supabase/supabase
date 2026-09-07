@@ -24,22 +24,20 @@ import {
 } from './DuckLake/DuckLake.constants'
 import { type DucklakeApiConfig } from './DuckLake/DuckLake.utils'
 import { type SnowflakeApiConfig } from './Snowflake/Snowflake.utils'
-import {
-  BatchConfig,
-  BigQueryDestinationConfig,
-  ClickHouseDestinationConfig,
-  DestinationConfig,
-  IcebergDestinationConfig,
-  SnowflakeDestinationConfig,
-  TableSyncCopyConfig,
-} from '@/data/replication/create-destination-pipeline-mutation'
 import { type ReplicationDestinationByIdData } from '@/data/replication/destination-by-id-query'
 import { type ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
 import { type ReplicationPublication } from '@/data/replication/publications-query'
 import type {
+  BatchConfig,
+  BigQueryDestinationConfig,
+  ClickHouseDestinationConfig,
+  DestinationConfig,
   DucklakeDestinationConfig,
   DucklakeManualDestinationConfig,
   DucklakeSupabaseDestinationConfig,
+  IcebergDestinationConfig,
+  SnowflakeDestinationConfig,
+  TableSyncCopyConfig,
 } from '@/data/replication/types'
 import { type ValidationFailure } from '@/data/replication/validate-destination-mutation'
 import {

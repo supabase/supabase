@@ -3,12 +3,12 @@ import { describe, expect, it } from 'vitest'
 import {
   buildBigQueryApiConfig,
   buildDucklakeApiConfig,
-  buildPipelineApiConfig,
 } from './create-destination-pipeline-mutation'
 import {
   buildBigQueryUpdateApiConfig,
   buildDucklakeUpdateApiConfig,
 } from './update-destination-pipeline-mutation'
+import { buildPipelineApiConfig } from './utils'
 
 describe('buildPipelineApiConfig', () => {
   it('maps selective initial-copy configuration to the ETL API shape', () => {

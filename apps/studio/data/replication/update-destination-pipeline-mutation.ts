@@ -2,16 +2,15 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { components } from 'api-types'
 import { toast } from 'sonner'
 
-import {
-  buildPipelineApiConfig,
-  DestinationConfig,
-  PipelineConfig,
-  type BigQueryDestinationConfig,
-} from './create-destination-pipeline-mutation'
 import { optionalSecret } from './destination-secret-utils'
 import { replicationKeys } from './keys'
-import type { DucklakeDestinationConfig } from './types'
-import { isDucklakeSupabaseConfig } from './utils'
+import type {
+  BigQueryDestinationConfig,
+  DestinationConfig,
+  DucklakeDestinationConfig,
+  PipelineConfig,
+} from './types'
+import { buildPipelineApiConfig, isDucklakeSupabaseConfig } from './utils'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
