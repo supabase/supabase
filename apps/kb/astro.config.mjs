@@ -2,10 +2,13 @@
 import { createRequire } from 'node:module'
 import path from 'node:path'
 
+import { unified } from '@astrojs/markdown-remark'
+import mdx from '@astrojs/mdx'
 import react from '@astrojs/react'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'astro/config'
 
+import rehypeAdmonitions from './src/lib/mdx/rehype-admonitions.js'
 import supabaseTheme from '../learn/lib/themes/supabase-2.json' with { type: 'json' }
 
 // Absolute dir of lodash-es, for the SSR-only lodash alias below (same fix
@@ -40,7 +43,21 @@ const ssrLodashEs = {
 export default defineConfig({
   base: '/kb',
   trailingSlash: 'ignore',
-  integrations: [react()],
+  integrations: [
+    react(),
+    // GFM alert blockquotes (`> [!NOTE] ...`) in .mdx guides render through
+    // the real Admonition component — see src/lib/mdx/rehype-admonitions.ts.
+    // Scoped to MDX's own processor (not the site-wide `markdown.processor`,
+    // which stays on Astro's default satteri pipeline for plain .md content
+    // — the shikiConfig below still applies to .mdx too, it's inherited
+    // regardless of processor) since rehype-admonitions is a standard
+    // rehype plugin, not a satteri-native one.
+    mdx({
+      processor: unified({
+        rehypePlugins: [rehypeAdmonitions],
+      }),
+    }),
+  ],
   vite: {
     ssr: {
       noExternal: ['lodash'],
