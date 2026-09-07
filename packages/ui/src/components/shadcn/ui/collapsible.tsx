@@ -17,7 +17,11 @@ const CollapsibleTrigger = React.forwardRef<
   return (
     <CollapsiblePrimitive.CollapsibleTrigger
       ref={ref}
-      className={cn('rounded-md', className, 'relative focus-inset')}
+      className={cn(
+        'rounded-md',
+        className,
+        'relative focus-inset !outline-solid focus-visible:!ring-0 focus-visible:!ring-offset-0'
+      )}
       {...props}
       disabled={disabled}
       tabIndex={computedTabIndex}
