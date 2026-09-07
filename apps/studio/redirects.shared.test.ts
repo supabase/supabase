@@ -151,6 +151,25 @@ describe('matchRedirect query/hash preservation', () => {
     })
   })
 
+  it('sends the legacy MCP callback path to /mcp/secrets with its params intact', () => {
+    expect(
+      matchRedirect({
+        pathname: '/mcp_callback',
+        search: { ref: 'abc', name: 'OPENAI_API_KEY' },
+        isPlatform: true,
+      })
+    ).toEqual({
+      destination: '/mcp/secrets?ref=abc&name=OPENAI_API_KEY',
+      permanent: false,
+    })
+  })
+
+  it('keeps the legacy MCP callback redirect temporary, so it is not cached', () => {
+    expect(
+      matchRedirect({ pathname: '/mcp_callback', search: {}, isPlatform: false })
+    ).toMatchObject({ destination: '/mcp/secrets', permanent: false })
+  })
+
   it('still returns null for non-matching paths', () => {
     expect(
       matchRedirect({ pathname: '/project/abc/editor', search: { a: '1' }, isPlatform: true })

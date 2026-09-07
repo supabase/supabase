@@ -340,6 +340,14 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
     destination: '/project/:ref/integrations/data_api/docs',
     permanent: false,
   },
+  // Legacy path for the MCP secrets interstitial, kept because the hosted MCP
+  // server still mints `/mcp_callback` links and a link already handed to a
+  // user (open terminal, pending consent dialog) has to keep working.
+  // Deliberately temporary (307/302, not 308/301): the old path shouldn't get
+  // pinned in browser caches while the namespace is still settling.
+  // TODO: remove one release after the hosted MCP server's elicitation URL
+  // constant points at `/mcp/secrets` (separate repo).
+  { source: '/mcp_callback', destination: '/mcp/secrets', permanent: false },
 ]
 
 // The two maintenance-mode rules are mutually exclusive; pick by env at
