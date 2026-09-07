@@ -7,15 +7,15 @@ import { customRender } from '@/tests/lib/custom-render'
 describe('NoProjectsNotice', () => {
   test('interpolates the organization into the title', () => {
     customRender(
-      <NoProjectsNotice appName="Vercel" organizationSlug="some-other-org" onSwitchOrg={vi.fn()} />
+      <NoProjectsNotice appName="Vercel" organizationSlug="contoso-labs" onSwitchOrg={vi.fn()} />
     )
 
-    expect(screen.getByText('No projects in some-other-org')).toBeInTheDocument()
+    expect(screen.getByText('No projects in contoso-labs')).toBeInTheDocument()
   })
 
   test('interpolates the app name into the body', () => {
     customRender(
-      <NoProjectsNotice appName="Vercel" organizationSlug="some-other-org" onSwitchOrg={vi.fn()} />
+      <NoProjectsNotice appName="Vercel" organizationSlug="contoso-labs" onSwitchOrg={vi.fn()} />
     )
 
     expect(
@@ -30,7 +30,7 @@ describe('NoProjectsNotice', () => {
     customRender(
       <NoProjectsNotice
         appName="Vercel"
-        organizationSlug="some-other-org"
+        organizationSlug="contoso-labs"
         onSwitchOrg={onSwitchOrg}
       />
     )
