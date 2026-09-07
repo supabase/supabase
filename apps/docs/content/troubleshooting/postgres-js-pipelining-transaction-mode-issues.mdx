@@ -1,0 +1,40 @@
+---
+title = "Postgres.js hangs, returns mismatched rows, or triggers 'invalid frontend message type XX' on Supavisor transaction mode"
+topics = [ "database", "supavisor" ]
+keywords = [ "postgres.js", "pipelining", "pipeline", "max_pipeline", "transaction mode", "unsafe_transaction", "hang", "wrong rows", "invalid frontend message type", "invalid message format", "08P01" ]
+---
+
+Postgres.js pipelines queries by default. Whenever more than one query is outstanding on the same pooled connection at once, it writes the next one onto the wire without waiting for the previous query's reply. This isn't limited to a single caller forgetting to await between its own calls: any two queries that land on the same connection while both are still outstanding can pipeline this way, including queries from unrelated concurrent requests that share the same pool. Supavisor's transaction mode returns a connection to its pool as soon as it sees one reply finish, without checking whether more of that connection's queries are still waiting on a reply. Combine the two and a query's reply can arrive after Supavisor already handed that connection to a different client.
+
+## Symptoms
+
+- A query never resolves and postgres.js reports no error, because it has no query timeout of its own. Its [connection options](https://github.com/porsager/postgres#all-postgres-options) only cover `idle_timeout`, `connect_timeout`, and `max_lifetime`, all at the connection level, not the query level.
+- A query resolves with rows that don't match what it selected.
+- `sql.begin()` throws `UNSAFE_TRANSACTION`, or leaves an open transaction on a backend that another client's query then runs inside.
+- Postgres logs `FATAL 08P01 invalid frontend message type` and the connection is dropped. This happens when a second client's bytes land on the same backend while a still-in-flight reply from the first client's pipelined query is arriving, so Postgres reads a stray byte where a message-type byte belongs.
+
+These only affect transaction mode (port 6543). Session mode (port 5432) holds one backend for the whole client connection and never checks it back in mid-batch, so it isn't affected.
+
+Only queries with no bound parameters pipeline this way. A query with at least one bound parameter forces postgres.js to wait for a parameter description before running it, which serializes it and blocks pipelining entirely.
+
+## Fix it
+
+Bind at least one parameter into every query, with `prepare: false`:
+
+```js
+// pipelines, can hit this bug
+await sql`select * from widgets where archived = false`
+
+// forces a synchronous round trip, doesn't pipeline
+await sql`select * from widgets where archived = ${false}`
+```
+
+Don't turn on `prepare: true` to go further. That enables named, server-side prepared statements, which transaction mode doesn't support at all. See [disabling prepared statements](/docs/guides/troubleshooting/disabling-prepared-statements-qL8lEL).
+
+Or connect over session mode instead of transaction mode for this traffic. See [connecting to your database](/docs/guides/database/connecting-to-postgres). Session mode holds a backend for the whole connection, so it costs one backend per client connection rather than pooling them.
+
+`max_pipeline: 0` looks like a way to force one-at-a-time behavior, but it breaks `sql.begin()` transactions instead: the reservation postgres.js needs to hold a connection for a transaction gets skipped by the same logic, and a `BEGIN` can go out on the wire alongside unrelated queries. Avoid it if any part of your connection pool uses `sql.begin()` or `sql.reserve()`. This is tracked upstream as [porsager/postgres#1189](https://github.com/porsager/postgres/issues/1189).
+
+## Prevent it from becoming an outage
+
+Add a query timeout on the client. Postgres.js has no timeout of its own, so a query that never gets a reply blocks that connection forever rather than failing. Without a timeout, enough of these can drain your whole application pool and force a restart. With one, the same event is a handful of failed or retried queries.

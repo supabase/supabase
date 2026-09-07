@@ -124,6 +124,7 @@ allow_list = [
     "[Pp]arams?",
     "[Pp]asskeys?",
     "[Pp]assthrough",
+    "[Pp]ipelin(e|es|ed|ing)?",
     "[Pp]laintext",
     "[Pp]olyfill(s|ed)?",
     "[Pp]oolers?",
