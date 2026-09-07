@@ -47,7 +47,8 @@ describe('oauth-apps mocks', () => {
     const organization = identity.organizations.find((org) => org.slug === NORTHWIND_SLUG)
     const projects = getMockOAuthAppsAuthorizeOrganizationProjects(NORTHWIND_SLUG)
 
-    expect(projects.some((project) => project.role !== organization?.default_role)).toBe(true)
+    expect(organization).toBeDefined()
+    expect(projects.some((project) => project.role !== organization!.default_role)).toBe(true)
   })
 
   test('the default scenario has no existing grant', () => {
