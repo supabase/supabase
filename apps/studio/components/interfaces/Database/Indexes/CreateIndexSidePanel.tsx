@@ -201,16 +201,15 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 control={form.control}
                 name="schema"
                 render={({ field }) => (
-                  <FormItemLayout layout="horizontal" label="Select a schema" id="schema">
-                    <FormControl className="col-span-6">
-                      <Popover
-                        modal={false}
-                        open={schemaDropdownOpen}
-                        onOpenChange={setSchemaDropdownOpen}
-                      >
+                  <FormItemLayout layout="horizontal" label="Select a schema">
+                    <Popover
+                      modal={false}
+                      open={schemaDropdownOpen}
+                      onOpenChange={setSchemaDropdownOpen}
+                    >
+                      <FormControl className="col-span-6">
                         <PopoverTrigger asChild>
                           <Button
-                            id="schema"
                             variant="default"
                             size={'medium'}
                             className={`w-full [&>span]:w-full text-left`}
@@ -225,56 +224,56 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                             {field.value || 'Choose a schema'}
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent
-                          className="p-0"
-                          side="bottom"
-                          align="start"
-                          sameWidthAsTrigger
-                        >
-                          <Command>
-                            <CommandInput
-                              placeholder="Find schema..."
-                              value={schemaSearchTerm}
-                              onValueChange={setSchemaSearchTerm}
-                            />
-                            <CommandList
-                              className={cn(
-                                (schemas ?? []).length > 7 && 'max-h-[210px]! overflow-y-auto'
-                              )}
-                              onWheel={(event) => event.stopPropagation()}
-                            >
-                              <CommandEmpty>No schemas found</CommandEmpty>
-                              <CommandGroup>
-                                {(schemas ?? []).map((schema) => (
-                                  <CommandItem
-                                    key={schema.name}
-                                    value={schema.name}
-                                    className="cursor-pointer flex items-center space-x-2 w-full"
-                                    onSelect={() => {
-                                      field.onChange(schema.name)
-                                      form.setValue('table', '')
-                                      form.setValue('columns', [])
-                                      form.setValue('type', INDEX_TYPES[0].value)
-                                      setSearchTerm('')
-                                    }}
-                                  >
-                                    <Check
-                                      className={cn(
-                                        'text-brand',
-                                        schema.name === field.value ? 'opacity-100' : 'opacity-0'
-                                      )}
-                                      strokeWidth={2}
-                                      size={16}
-                                    />
-                                    <span>{schema.name}</span>
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                    </FormControl>
+                      </FormControl>
+                      <PopoverContent
+                        className="p-0"
+                        side="bottom"
+                        align="start"
+                        sameWidthAsTrigger
+                      >
+                        <Command>
+                          <CommandInput
+                            placeholder="Find schema..."
+                            value={schemaSearchTerm}
+                            onValueChange={setSchemaSearchTerm}
+                          />
+                          <CommandList
+                            className={cn(
+                              (schemas ?? []).length > 7 && 'max-h-[210px]! overflow-y-auto'
+                            )}
+                            onWheel={(event) => event.stopPropagation()}
+                          >
+                            <CommandEmpty>No schemas found</CommandEmpty>
+                            <CommandGroup>
+                              {(schemas ?? []).map((schema) => (
+                                <CommandItem
+                                  key={schema.name}
+                                  value={schema.name}
+                                  className="cursor-pointer flex items-center space-x-2 w-full"
+                                  onSelect={() => {
+                                    field.onChange(schema.name)
+                                    form.setValue('table', '')
+                                    form.setValue('columns', [])
+                                    form.setValue('type', INDEX_TYPES[0].value)
+                                    setSearchTerm('')
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      'text-brand',
+                                      schema.name === field.value ? 'opacity-100' : 'opacity-0'
+                                    )}
+                                    strokeWidth={2}
+                                    size={16}
+                                  />
+                                  <span>{schema.name}</span>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </FormItemLayout>
                 )}
               />
@@ -290,25 +289,23 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                   <FormItemLayout
                     layout="horizontal"
                     label="Select a table"
-                    id="table"
                     description={
                       isSelectEntityDisabled &&
                       !isLoadingEntities &&
                       'Create a table in this schema via the Table or SQL editor first'
                     }
                   >
-                    <FormControl className="col-span-6">
-                      <Popover
-                        modal={false}
-                        open={tableDropdownOpen}
-                        onOpenChange={setTableDropdownOpen}
-                      >
+                    <Popover
+                      modal={false}
+                      open={tableDropdownOpen}
+                      onOpenChange={setTableDropdownOpen}
+                    >
+                      <FormControl className="col-span-6">
                         <PopoverTrigger
                           asChild
                           disabled={isSelectEntityDisabled || isLoadingEntities}
                         >
                           <Button
-                            id="table"
                             variant="default"
                             size="medium"
                             className={cn(
@@ -330,65 +327,65 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                                 : 'Choose a table'}
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent
-                          className="p-0"
-                          side="bottom"
-                          align="start"
-                          sameWidthAsTrigger
-                        >
-                          {/* [Terry] shouldFilter context:
+                      </FormControl>
+                      <PopoverContent
+                        className="p-0"
+                        side="bottom"
+                        align="start"
+                        sameWidthAsTrigger
+                      >
+                        {/* [Terry] shouldFilter context:
                           https://github.com/pacocoursey/cmdk/issues/267#issuecomment-2252717107 */}
-                          <Command shouldFilter={false}>
-                            <CommandInput
-                              placeholder="Find table..."
-                              value={searchTerm}
-                              onValueChange={handleSearchChange}
-                            />
-                            <CommandList
-                              className={cn(
-                                entityTypes.length > 7 && 'max-h-[210px]! overflow-y-auto'
+                        <Command shouldFilter={false}>
+                          <CommandInput
+                            placeholder="Find table..."
+                            value={searchTerm}
+                            onValueChange={handleSearchChange}
+                          />
+                          <CommandList
+                            className={cn(
+                              entityTypes.length > 7 && 'max-h-[210px]! overflow-y-auto'
+                            )}
+                            onWheel={(event) => event.stopPropagation()}
+                          >
+                            <CommandEmpty>
+                              {isLoadingEntities ? (
+                                <div className="flex items-center gap-2 text-center justify-center">
+                                  <Loader2 size={12} className="animate-spin" />
+                                  Loading...
+                                </div>
+                              ) : (
+                                'No tables found'
                               )}
-                              onWheel={(event) => event.stopPropagation()}
-                            >
-                              <CommandEmpty>
-                                {isLoadingEntities ? (
-                                  <div className="flex items-center gap-2 text-center justify-center">
-                                    <Loader2 size={12} className="animate-spin" />
-                                    Loading...
-                                  </div>
-                                ) : (
-                                  'No tables found'
-                                )}
-                              </CommandEmpty>
-                              <CommandGroup>
-                                {entityTypes.map((entity) => (
-                                  <CommandItem
-                                    key={entity.name}
-                                    className="cursor-pointer flex items-center space-x-2 w-full"
-                                    onSelect={() => {
-                                      field.onChange(entity.name)
-                                      setTableDropdownOpen(false)
-                                      form.setValue('columns', [])
-                                      form.setValue('type', INDEX_TYPES[0].value)
-                                    }}
-                                  >
-                                    <Check
-                                      className={cn(
-                                        'text-brand',
-                                        entity.name === field.value ? 'opacity-100' : 'opacity-0'
-                                      )}
-                                      strokeWidth={2}
-                                      size={16}
-                                    />
-                                    <span>{entity.name}</span>
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                    </FormControl>
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {entityTypes.map((entity) => (
+                                <CommandItem
+                                  key={entity.name}
+                                  className="cursor-pointer flex items-center space-x-2 w-full"
+                                  onSelect={() => {
+                                    field.onChange(entity.name)
+                                    setTableDropdownOpen(false)
+                                    form.setValue('columns', [])
+                                    form.setValue('type', INDEX_TYPES[0].value)
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      'text-brand',
+                                      entity.name === field.value ? 'opacity-100' : 'opacity-0'
+                                    )}
+                                    strokeWidth={2}
+                                    size={16}
+                                  />
+                                  <span>{entity.name}</span>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </FormItemLayout>
                 )}
               />
