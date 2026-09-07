@@ -19,3 +19,6 @@ create policy "own connections (metadata only)"
   for select
   to authenticated
   using (user_id = (select auth.uid()));
+
+revoke all on public.oauth_connections from anon, authenticated;
+grant select on public.oauth_connections to authenticated;

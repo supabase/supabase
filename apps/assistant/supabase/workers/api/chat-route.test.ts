@@ -73,6 +73,8 @@ describe('jsonError', () => {
 describe('chat body schema', () => {
   test('accepts a single message', () => {
     const parsed = chatBodySchema.safeParse({
+      revision: 0,
+      requestId: '11111111-1111-4111-8111-111111111111',
       message: { id: 'm1', role: 'user', parts: [] },
       trigger: 'submit-message',
     })
@@ -81,6 +83,8 @@ describe('chat body schema', () => {
 
   test('accepts Studio DefaultChatTransport messages array', () => {
     const parsed = chatBodySchema.safeParse({
+      revision: 0,
+      requestId: '11111111-1111-4111-8111-111111111111',
       messages: [{ id: 'm1', role: 'user', parts: [] }],
     })
     expect(parsed.success).toBe(true)

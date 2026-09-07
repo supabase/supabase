@@ -129,6 +129,7 @@ export async function syncSupportChatToFront(
     }
   } finally {
     supportMetadata.isSyncing = false
+    state.persistSupportMetadata(chatId)
   }
 }
 
@@ -172,5 +173,6 @@ export async function syncSupportLifecycleToFront(
     }
   } finally {
     supportMetadata.isLifecycleSyncing = false
+    state.persistSupportMetadata(chatId)
   }
 }

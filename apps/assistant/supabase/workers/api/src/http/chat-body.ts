@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { assistantSupportMetadataSchema } from './contracts'
+
 export const chatTriggerSchema = z.enum([
   'submit-message',
   'regenerate-message',
@@ -12,8 +14,11 @@ export const chatTriggerSchema = z.enum([
  */
 export const chatBodySchema = z
   .object({
-    message: z.any().optional(),
-    messages: z.array(z.any()).optional(),
+    revision: z.number().int().nonnegative(),
+    requestId: z.string().uuid(),
+    supportMetadata: assistantSupportMetadataSchema.optional(),
+    message: z.unknown().optional(),
+    messages: z.array(z.unknown()).max(100).optional(),
     trigger: chatTriggerSchema.optional(),
     messageId: z.string().optional(),
     model: z.string().optional(),

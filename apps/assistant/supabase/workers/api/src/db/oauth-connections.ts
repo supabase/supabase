@@ -1,8 +1,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
-import { adminQuery } from './postgres.ts'
 import { HttpError } from '../http/errors'
 import { refreshToken, tokenExpiresAt, tokenScopes } from '../platform/oauth'
+import type { Database } from './database.types'
+import { adminQuery, withAdvisoryLock } from './postgres.ts'
 
 /**
  * Vault-backed OAuth tokens live behind SECURITY DEFINER RPCs in `private`.
@@ -88,7 +89,13 @@ export async function storeOAuthTokens(input: {
   }
 }
 
-export async function getValidAccessToken(userId: string, orgSlug: string): Promise<string | null> {
+export function getValidAccessToken(userId: string, orgSlug: string): Promise<string | null> {
+  return withAdvisoryLock(`oauth:${userId}:${orgSlug}`, () =>
+    refreshAccessTokenIfNeeded(userId, orgSlug)
+  )
+}
+
+async function refreshAccessTokenIfNeeded(userId: string, orgSlug: string): Promise<string | null> {
   const stored = await readOAuthTokens(userId, orgSlug)
   if (!stored) return null
 
@@ -127,7 +134,7 @@ export async function getValidAccessToken(userId: string, orgSlug: string): Prom
 }
 
 export async function listOAuthConnections(
-  supabase: SupabaseClient
+  supabase: SupabaseClient<Database>
 ): Promise<OAuthConnectionPublic[]> {
   const { data, error } = await supabase
     .from('oauth_connections')

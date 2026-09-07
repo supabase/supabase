@@ -1,3 +1,5 @@
+import { once } from 'node:events'
+import { Writable } from 'node:stream'
 import { safeSql } from '@supabase/pg-meta'
 import { UIMessage } from 'ai'
 import { expect, test, vi } from 'vitest'
@@ -40,12 +42,23 @@ test('generateV4 calls the tool sanitizer', async () => {
     on: vi.fn(),
   }
 
-  const mockRes = {
-    status: vi.fn(() => mockRes),
-    json: vi.fn(() => mockRes),
-    setHeader: vi.fn(() => mockRes),
-    on: vi.fn(),
-  }
+  let output = ''
+  const mockRes = Object.assign(
+    new Writable({
+      write(chunk, _encoding, callback) {
+        output += chunk.toString()
+        callback()
+      },
+    }),
+    {
+      status: vi.fn(() => mockRes),
+      json: vi.fn(() => mockRes),
+      setHeader: vi.fn(() => mockRes),
+      writeHead: vi.fn(() => mockRes),
+    }
+  )
+  const onSpy = vi.spyOn(mockRes, 'on')
+  const finished = once(mockRes, 'finish')
 
   vi.mock('@/lib/ai/ai-details', () => ({
     getAIDetails: vi.fn().mockResolvedValue({
@@ -77,13 +90,29 @@ test('generateV4 calls the tool sanitizer', async () => {
     return {
       ...actual,
       streamText: vi.fn().mockReturnValue({
-        pipeUIMessageStreamToResponse: vi.fn(),
+        stream: new ReadableStream({
+          start(controller) {
+            for (const part of [
+              { type: 'start' },
+              { type: 'text-start', id: 'text' },
+              { type: 'text-delta', id: 'text', text: 'Hello' },
+              { type: 'text-end', id: 'text' },
+              { type: 'finish', finishReason: 'stop' },
+            ])
+              controller.enqueue(part)
+            controller.close()
+          },
+        }),
       }),
     }
   })
 
   await generateV4(mockReq as any, mockRes as any)
 
+  await finished
+  expect(output).toContain('Hello')
+  expect(output).toContain('data: [DONE]')
+  expect(mockRes.status).not.toHaveBeenCalledWith(500)
   expect(sanitizeMessagePart).toHaveBeenCalled()
   expect(getTools).toHaveBeenCalledWith(
     expect.objectContaining({
@@ -92,5 +121,5 @@ test('generateV4 calls the tool sanitizer', async () => {
   )
   // The response 'close' event must be wired up so the remote MCP connection
   // opened in getTools is torn down when the stream finishes or the client drops
-  expect(mockRes.on).toHaveBeenCalledWith('close', expect.any(Function))
+  expect(onSpy).toHaveBeenCalledWith('close', expect.any(Function))
 })

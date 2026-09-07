@@ -5,6 +5,7 @@ import { adminQuery } from './postgres'
 
 vi.mock('./postgres', () => ({
   adminQuery: vi.fn(),
+  withAdvisoryLock: (_key: string, work: () => Promise<unknown>) => work(),
 }))
 
 vi.mock('../platform/oauth', () => ({
@@ -46,7 +47,9 @@ describe('oauth-connections vault RPCs', () => {
 
   it('returns null when no token row exists', async () => {
     adminQueryMock.mockResolvedValueOnce([])
-    await expect(readOAuthTokens('11111111-1111-1111-1111-111111111111', 'acme')).resolves.toBeNull()
+    await expect(
+      readOAuthTokens('11111111-1111-1111-1111-111111111111', 'acme')
+    ).resolves.toBeNull()
   })
 
   it('stores tokens via private.store_oauth_tokens', async () => {
@@ -84,9 +87,9 @@ describe('oauth-connections vault RPCs', () => {
       },
     ])
 
-    await expect(
-      getValidAccessToken('11111111-1111-1111-1111-111111111111', 'acme')
-    ).resolves.toBe('access')
+    await expect(getValidAccessToken('11111111-1111-1111-1111-111111111111', 'acme')).resolves.toBe(
+      'access'
+    )
     expect(adminQueryMock).toHaveBeenCalledTimes(1)
   })
 })

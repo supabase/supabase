@@ -36,7 +36,8 @@ tool set as:
 
 1. **MCP base** — `getMcpTools` connects to the MCP server with the user's
    OAuth token, `project_ref` bound from the conversation and `read_only=true`,
-   and pulls the `createToolSchemas({ projectScoped, readOnly })` subset.
+   and discovers dynamic tools. An Assistant-owned capability and consent allowlist filters
+   the result; MCP write tools cannot override harness approval checks.
 2. **Harness overrides** — `project-tools.ts` re-implements `execute_sql` and
    `deploy_edge_function` with `needsApproval` (Studio's approval UI) via the
    Management API, and wins over the MCP copies (`UI_EXECUTED_TOOLS`).
@@ -51,17 +52,18 @@ server must therefore all belong to the **same platform Studio is pointed at**
 (`NEXT_PUBLIC_API_URL` in `apps/studio/.env.local`). Mixing them produces
 `MCP error -32600: You do not have permission to perform this action` on every
 tool call, because the token is valid but the org it is scoped to does not own
-the project. `/oauth/callback` now refuses to store a token whose organization
-does not match the Studio org and explains why.
+the project. The authenticated `/oauth/complete` endpoint verifies the
+organization before storing tokens. The callback only returns a code to the initiating
+Studio window; that window retains the PKCE verifier.
 
 `MCP_URL` is derived from `MANAGEMENT_API_URL` (`api.supabase.com` →
 `mcp.supabase.com/mcp`, anything else → `<origin>/mcp`); set it only to
 override.
 
-| Studio talks to                                   | Assistant `.env`                                                                                                                |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| Local platform (`http://localhost:8080/platform`) | `MANAGEMENT_API_URL=http://localhost:8080`, OAuth app registered in a **local** org (local Studio → org → Integrations → OAuth) |
-| Production (`https://api.supabase.com/platform`)  | leave `MANAGEMENT_API_URL` unset, OAuth app registered in a production org, `PLATFORM_JWKS_URL` = production GoTrue JWKS        |
+| Studio talks to                                   | Assistant `.env`                                                                                                                         |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Local platform (`http://localhost:8080/platform`) | `MANAGEMENT_API_URL=http://localhost:8080`, OAuth app registered in a **local** org (local Studio → org → Integrations → OAuth)          |
+| Production (`https://api.supabase.com/platform`)  | leave `MANAGEMENT_API_URL` unset, OAuth app registered in a production org, `ASSISTANT_POLICY_URL` = Studio’s `/api/ai/assistant-policy` |
 
 `supabase status` in this folder also lists `MCP  http://127.0.0.1:55321/mcp`.
 That is the CLI's unauthenticated MCP endpoint for the **assistant's own local
@@ -92,10 +94,10 @@ uses):
 | `ASSISTANT_SUPABASE_URL`    | `https://<assistant-ref>.supabase.co` (`.red` on staging)  |
 | `ASSISTANT_PUBLISHABLE_KEY` | the project's `sb_publishable_…` key                       |
 | `ASSISTANT_SECRET_KEY`      | the project's `sb_secret_…` key                            |
-| `ASSISTANT_DB_URL`          | direct Postgres URL (used for `private.read_oauth_tokens`) |
+| `ASSISTANT_DB_URL`          | Postgres connection URL for privileged worker transactions |
 | `ASSISTANT_JWKS_URL`        | optional; derived from `ASSISTANT_SUPABASE_URL` when unset |
 
-Plus `PLATFORM_JWKS_URL`, `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`,
+Plus `ASSISTANT_POLICY_URL`, `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`,
 `OAUTH_REDIRECT_URI`, `OPENAI_API_KEY`, and `MANAGEMENT_API_URL` when Studio is
 not on production.
 
@@ -122,3 +124,96 @@ pnpm --filter assistant workers:push   # builds index.mjs then pushes
 ```
 
 See `PLAN.md` for architecture.
+
+## Studio integration and consent
+
+The feature flag `assistantSupabaseBackend` selects this integration. With the flag
+false, undefined, incomplete configuration, or self-hosted Studio, the existing
+`generate-v4` backend and organization permissions remain unchanged. The environment
+override `NEXT_PUBLIC_ASSISTANT_BACKEND=true` only works in local development.
+
+Set `ASSISTANT_POLICY_URL` to the trusted Studio `/api/ai/assistant-policy` endpoint
+(for example, `http://localhost:8082/api/ai/assistant-policy` locally). Hosted URLs
+must use HTTPS. Exchange and authenticated worker requests require current platform
+admission; authenticated requests additionally bind the Assistant identity to that
+platform user. The endpoint checks project membership, privacy restrictions, and
+model entitlement. It does not transfer legacy organization consent.
+
+Users explicitly consent again in the new Assistant. Grants belong to a user and
+project, with four choices: no project data, schema, schema and logs, or schema,
+logs and query results. Missing or obsolete grants require consent before chatting.
+Project restrictions can reduce the effective grant. OAuth authorization remains a
+separate prerequisite for project access.
+
+Public conversation tables are owner-readable and worker-write-only. Mutations use
+revisions and canonical stored history. Approved SQL/deployment operations are
+claimed durably before execution; an uncertain attempt is never replayed automatically.
+The browser reloads after persistence conflicts and never falls back to the old
+backend to retry an operation.
+
+## Validation
+
+```bash
+pnpm --filter assistant test
+pnpm --filter assistant typecheck
+pnpm --filter assistant lint
+pnpm --filter assistant build
+# Use a disposable local database with the committed migrations applied:
+ASSISTANT_TEST_DB_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres pnpm --filter assistant test:db
+```
+
+The database suite creates synthetic users and removes their rows. It covers RLS,
+worker ownership, revision conflicts, OAuth binding, and duplicate approved writes.
+CI starts its own disposable Supabase stack and checks declarative schema drift.
+Generate database types with `supabase gen types typescript --local --schema public`
+from this app and write the output to `supabase/workers/api/src/db/database.types.ts`.
+
+Hosted Workers ingress, real OAuth popup completion, and deployment rollback still
+need the bounded dogfood verification in phase 4 of `REVIEW_PLAN.md`.
+
+## Implementation status (2026-09-07)
+
+Phases 1–3 of the review are implemented. The consent design supersedes the review's
+legacy-policy assumption: existing organization permissions belong exclusively to
+`generate-v4`; the new integration requires fresh per-user, per-project consent.
+
+Validation includes real authentication middleware and AI SDK chat streaming,
+independently maintained Studio wire fixtures, backend/account/project transitions, and a migrated
+local test database. The migration preserves conversations and messages. Pending
+OAuth transactions from before the upgrade have no browser challenge and must be
+restarted. The CLI generated a separate grant correction; both migrations are required.
+
+The worker contract covers SQL chat, approved SQL/deployment tools, MCP read tools,
+conversation history, branches, feedback, and support lifecycle metadata. Reports,
+notebooks, Braintrust tracing, and rating categorization remain outside that contract.
+Keep users who need those capabilities on the legacy backend during dogfood.
+No hosted configuration or deployment has been changed, and PR stacking is deferred.
+
+Final local checks: 134 worker tests, 15 database tests, and 109 selected Studio
+tests passed. Both apps typecheck; Studio was checked with `--incremental false`
+after its cached check reported an unlocated TS2589. Worker lint and build pass;
+modified Studio files retain six pre-existing lint warnings and add none.
+Declarative schema drift is clean. The disposable test database was removed;
+the original local Assistant database was not migrated or reset.
+
+## Separate product boundary
+
+Assistant owns its per-user/project grants, consent version, permission choices,
+capability calculations, MCP allowlist, and data redaction in the worker's
+`src/permissions.ts`. No permission code is shared with Studio or `generate-v4`.
+
+Studio's `lib/assistant/` and `data/ai-assistant/` are the integration adapter.
+Its local response schemas validate the v1 HTTP shape. Permission selections are
+opaque strings; choices, disabled states, consent version, and context-sharing
+capabilities come from Assistant. Changing those choices does not require changing
+Studio's legacy permission enum or organization opt-in model. Each application owns
+its wire compatibility fixtures, so server changes cannot silently update client
+expectations through a shared import.
+
+The Studio admission endpoint verifies platform identity, rollout eligibility,
+project membership, privacy restrictions, and billing entitlement. It does not
+call the legacy AI-policy resolver or interpret organization opt-in tags.
+
+For Studio review, start with the feature switch and the isolated integration
+folders, then inspect the state/composer hooks that connect them to the existing
+interface. The legacy SQL endpoint, consent hook, and settings modal are unchanged.

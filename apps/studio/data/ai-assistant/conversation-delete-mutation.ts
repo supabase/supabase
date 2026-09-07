@@ -6,14 +6,18 @@ import { aiAssistantKeys } from './keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type ConversationDeleteVariables = {
+  revision: number
   id: string
   projectRef?: string
 }
 
-export async function deleteConversation({ id }: ConversationDeleteVariables) {
+export async function deleteConversation({ id, revision }: ConversationDeleteVariables) {
   if (!id) throw new Error('id is required')
 
-  await assistantFetch<void>(`/v1/conversations/${id}`, { method: 'DELETE' })
+  await assistantFetch<void>(`/v1/conversations/${id}`, {
+    method: 'DELETE',
+    body: JSON.stringify({ revision }),
+  })
 }
 
 type ConversationDeleteData = Awaited<ReturnType<typeof deleteConversation>>

@@ -28,10 +28,10 @@ additional_redirect_urls = [
   "http://127.0.0.1:8787",
 ]
 jwt_expiry = 3600
-enable_signup = true
+enable_signup = false
 
 [auth.email]
-enable_signup = true
+enable_signup = false
 enable_confirmations = false
 
 [realtime]

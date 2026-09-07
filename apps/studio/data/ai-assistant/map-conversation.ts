@@ -1,60 +1,49 @@
-import type { UIMessage } from '@ai-sdk/react'
+import { safeValidateUIMessages, type UIMessage } from 'ai'
 
-import type { ChatSession, SupportChatMetadata } from '@/state/ai-assistant-state'
+import {
+  assistantConversationListSchema,
+  assistantConversationResponseSchema,
+} from '@/data/ai-assistant/contracts'
+import type { ChatSession } from '@/state/ai-assistant-state'
 
-export type AssistantConversationApi = {
-  id: string
-  name: string
-  project_ref?: string
-  created_at: string
-  updated_at: string
-  support_metadata?: SupportChatMetadata | null
-  branched_from?: {
-    chat_id?: string
-    chatId?: string
-    message_id?: string
-    messageId?: string
-  } | null
-  messages?: UIMessage[]
-}
-
-export function mapConversation(row: AssistantConversationApi): ChatSession {
-  const branched = row.branched_from
-  const chatId = branched?.chatId ?? branched?.chat_id
-  const messageId = branched?.messageId ?? branched?.message_id
-
+export async function parseConversation(payload: unknown): Promise<ChatSession> {
+  const {
+    conversation: row,
+    messages,
+    nextCursor,
+  } = assistantConversationResponseSchema.parse(payload)
+  let parsedMessages: UIMessage[] = []
+  if (messages?.length) {
+    const validated = await safeValidateUIMessages({ messages })
+    if (!validated.success) throw new Error('Invalid conversation messages')
+    parsedMessages = validated.data
+  }
   return {
     id: row.id,
     name: row.name,
-    messages: row.messages ?? [],
-    createdAt: new Date(row.created_at ?? Date.now()),
-    updatedAt: new Date(row.updated_at ?? Date.now()),
-    ...(row.support_metadata ? { supportMetadata: row.support_metadata } : {}),
-    ...(chatId && messageId ? { branchedFrom: { chatId, messageId } } : {}),
+    revision: row.revision,
+    messagesLoaded: messages !== undefined,
+    messages: parsedMessages,
+    nextCursor: nextCursor ?? undefined,
+    createdAt: new Date(row.created_at),
+    updatedAt: new Date(row.updated_at),
+    ...(row.support_metadata
+      ? {
+          supportMetadata: { ...row.support_metadata, isSyncing: false, isLifecycleSyncing: false },
+        }
+      : {}),
+    ...(row.branched_from
+      ? {
+          branchedFrom: {
+            chatId: row.branched_from.chat_id,
+            messageId: row.branched_from.message_id,
+          },
+        }
+      : {}),
   }
 }
 
-export function unwrapConversation(
-  payload:
-    | AssistantConversationApi
-    | { conversation?: AssistantConversationApi; messages?: AssistantConversationApi['messages'] }
-    | undefined
-): AssistantConversationApi | undefined {
-  if (!payload) return undefined
-  if ('conversation' in payload && payload.conversation) {
-    return {
-      ...payload.conversation,
-      messages: payload.messages ?? payload.conversation.messages,
-    }
-  }
-  if ('id' in payload && typeof payload.id === 'string') return payload
-  return undefined
-}
-
-export function unwrapConversationList(
-  payload: AssistantConversationApi[] | { conversations?: AssistantConversationApi[] } | undefined
-): AssistantConversationApi[] {
-  if (Array.isArray(payload)) return payload
-  if (payload?.conversations && Array.isArray(payload.conversations)) return payload.conversations
-  return []
+export async function parseConversationList(payload: unknown): Promise<ChatSession[]> {
+  const { conversations } = assistantConversationListSchema.parse(payload)
+  return Promise.all(conversations.map((conversation) => parseConversation({ conversation })))
 }

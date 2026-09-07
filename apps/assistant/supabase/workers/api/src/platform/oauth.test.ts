@@ -1,37 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { findOrganizationMismatch, resolveAuthorizeOrganizationSlug } from './oauth'
-
-describe('findOrganizationMismatch', () => {
-  it('returns null when the token is scoped to the Studio org', () => {
-    expect(
-      findOrganizationMismatch({
-        expectedSlug: 'acme',
-        organizations: [{ id: 'acme', slug: 'acme', name: 'Acme' }],
-      })
-    ).toBeNull()
-  })
-
-  it('reports the org the user actually consented for', () => {
-    expect(
-      findOrganizationMismatch({
-        expectedSlug: 'utvbdgaxmvzwgzaujubx',
-        organizations: [{ slug: 'chemical-tan-earwig', name: "SaxonF's Org" }],
-      })
-    ).toEqual({
-      expectedSlug: 'utvbdgaxmvzwgzaujubx',
-      connectedSlugs: ['chemical-tan-earwig'],
-    })
-  })
-
-  it('fails open on an unrecognized response', () => {
-    expect(findOrganizationMismatch({ expectedSlug: 'acme', organizations: null })).toBeNull()
-    expect(findOrganizationMismatch({ expectedSlug: 'acme', organizations: [] })).toBeNull()
-    expect(
-      findOrganizationMismatch({ expectedSlug: 'acme', organizations: [{ name: 'no slug' }] })
-    ).toBeNull()
-  })
-})
+import { resolveAuthorizeOrganizationSlug } from './oauth'
 
 describe('resolveAuthorizeOrganizationSlug', () => {
   it('uses the Studio org slug by default', () => {

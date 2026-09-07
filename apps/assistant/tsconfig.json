@@ -17,6 +17,8 @@
   },
   "include": [
     "supabase/workers/**/*.ts",
+    "supabase/tests/**/*.ts",
+    "vitest.db.config.ts",
     "vitest.config.ts",
     "esbuild.config.mjs"
   ],

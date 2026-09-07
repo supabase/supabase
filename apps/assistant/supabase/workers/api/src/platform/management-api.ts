@@ -1,3 +1,5 @@
+import type { SafeSqlFragment } from '@supabase/pg-meta'
+
 import { env } from '../env'
 
 export type RunQueryOptions = {
@@ -11,7 +13,11 @@ export type DeployFunctionInput = {
 }
 
 export type ManagementApi = {
-  runQuery: (projectRef: string, sql: string, options?: RunQueryOptions) => Promise<unknown>
+  runQuery: (
+    projectRef: string,
+    sql: SafeSqlFragment,
+    options?: RunQueryOptions
+  ) => Promise<unknown>
   deployFunction: (projectRef: string, input: DeployFunctionInput) => Promise<unknown>
   getProject: (ref: string) => Promise<unknown>
   listOrganizations: () => Promise<unknown>
@@ -20,7 +26,8 @@ export type ManagementApi = {
 async function managementFetch(
   accessToken: string,
   path: string,
-  init: RequestInit = {}
+  init: RequestInit = {},
+  signal?: AbortSignal
 ): Promise<unknown> {
   const headers = new Headers(init.headers)
   headers.set('Authorization', `Bearer ${accessToken}`)
@@ -31,6 +38,7 @@ async function managementFetch(
   const response = await fetch(`${env.managementApiUrl}${path}`, {
     ...init,
     headers,
+    signal: AbortSignal.any([AbortSignal.timeout(30_000), ...(signal ? [signal] : [])]),
   })
 
   if (!response.ok) {
@@ -47,7 +55,7 @@ async function managementFetch(
   return text.length > 0 ? text : null
 }
 
-export function createManagementApi(accessToken: string): ManagementApi {
+export function createManagementApi(accessToken: string, signal?: AbortSignal): ManagementApi {
   return {
     runQuery(projectRef, sql, options) {
       return managementFetch(
@@ -59,7 +67,8 @@ export function createManagementApi(accessToken: string): ManagementApi {
             query: sql,
             read_only: options?.readOnly === true,
           }),
-        }
+        },
+        signal
       )
     },
 
@@ -76,18 +85,23 @@ export function createManagementApi(accessToken: string): ManagementApi {
       form.append('file', new Blob([code], { type: 'text/plain' }), 'index.ts')
 
       const path = `/v1/projects/${encodeURIComponent(projectRef)}/functions/deploy?slug=${encodeURIComponent(slug)}`
-      return managementFetch(accessToken, path, {
-        method: 'POST',
-        body: form,
-      })
+      return managementFetch(
+        accessToken,
+        path,
+        {
+          method: 'POST',
+          body: form,
+        },
+        signal
+      )
     },
 
     getProject(ref) {
-      return managementFetch(accessToken, `/v1/projects/${encodeURIComponent(ref)}`)
+      return managementFetch(accessToken, `/v1/projects/${encodeURIComponent(ref)}`, {}, signal)
     },
 
     listOrganizations() {
-      return managementFetch(accessToken, '/v1/organizations')
+      return managementFetch(accessToken, '/v1/organizations', {}, signal)
     },
   }
 }

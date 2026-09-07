@@ -2,26 +2,24 @@ import { queryOptions } from '@tanstack/react-query'
 
 import { assistantFetch } from './fetcher'
 import { aiAssistantKeys } from './keys'
-import {
-  mapConversation,
-  unwrapConversation,
-  type AssistantConversationApi,
-} from './map-conversation'
+import { parseConversation } from './map-conversation'
 import { IS_PLATFORM } from '@/lib/constants'
 
-export type ConversationDetailVariables = { id?: string }
+export type ConversationDetailVariables = { id?: string; before?: number }
 
-async function getConversation({ id }: ConversationDetailVariables, signal?: AbortSignal) {
+export async function getConversation(
+  { id, before }: ConversationDetailVariables,
+  signal?: AbortSignal
+) {
   if (!id) throw new Error('id is required')
 
-  const payload = await assistantFetch<
-    | AssistantConversationApi
-    | { conversation?: AssistantConversationApi; messages?: AssistantConversationApi['messages'] }
-  >(`/v1/conversations/${id}`, { method: 'GET' }, signal)
+  const payload = await assistantFetch<unknown>(
+    `/v1/conversations/${id}${before ? `?before=${before}` : ''}`,
+    { method: 'GET' },
+    signal
+  )
 
-  const conversation = unwrapConversation(payload)
-  if (!conversation) throw new Error('Conversation not found')
-  return mapConversation(conversation)
+  return parseConversation(payload)
 }
 
 export const conversationDetailQueryOptions = ({ id }: ConversationDetailVariables) =>

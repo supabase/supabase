@@ -1,5 +1,7 @@
 import type { ToolSet } from 'ai'
 
+import { executeOnce } from '../../db/tool-executions'
+import type { ProjectPermissionLevel } from '../../permissions'
 import { getIncidentTools } from './incident-tools'
 import { getMcpTools, McpUnauthorizedError } from './mcp-tools'
 import { getProjectTools, type ManagementApi } from './project-tools'
@@ -8,43 +10,42 @@ import { getSupportLifecycleTools } from './support-tools'
 
 export type { ManagementApi }
 
-export const getTools = async ({
+export async function getTools({
   projectRef,
   oauthToken,
   managementApi,
   supportMode,
   signal,
+  aiOptInLevel,
+  conversationId,
 }: {
   projectRef: string
   oauthToken: string
   managementApi: ManagementApi
   supportMode?: boolean
   signal: AbortSignal
-}) => {
-  // The Supabase MCP server is the base tool surface, exactly as it is for any
-  // other agent harness. Harness-owned tools are spread after it so they
-  // override same-named MCP tools (approval-gated `execute_sql`, ...) and add
-  // what MCP does not offer (`rename_chat`, `load_knowledge`, `list_policies`).
-  let mcpTools: ToolSet = {}
+  aiOptInLevel: ProjectPermissionLevel
+  conversationId: string
+}) {
+  let mcp = { tools: {} as ToolSet, close: async () => {} }
   try {
-    mcpTools = await getMcpTools({
-      oauthToken,
-      projectRef,
-      signal,
-    })
+    mcp = await getMcpTools({ oauthToken, projectRef, signal, aiOptInLevel })
   } catch (error) {
-    // A rejected token is not something to degrade around: without MCP the
-    // assistant is blind, and the user needs to reconnect. Let the route map it.
     if (error instanceof McpUnauthorizedError) throw error
-    console.error('Failed to fetch MCP tools; continuing with harness tools only.', error)
+    signal.throwIfAborted()
+    console.error('MCP tools unavailable', error)
   }
-
   const tools: ToolSet = {
-    ...mcpTools,
-    ...getProjectTools({ managementApi }),
-    ...getSchemaTools({ managementApi }),
+    ...mcp.tools,
+    ...getProjectTools({
+      managementApi,
+      aiOptInLevel,
+      executeOperation: (id, name, input, execute) =>
+        executeOnce(conversationId, id, name, input, execute),
+    }),
+    ...(aiOptInLevel !== 'disabled' ? getSchemaTools({ managementApi }) : {}),
     ...getIncidentTools(),
+    ...(supportMode ? getSupportLifecycleTools() : {}),
   }
-
-  return supportMode ? { ...tools, ...getSupportLifecycleTools() } : tools
+  return { tools, close: mcp.close }
 }

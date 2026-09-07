@@ -29,14 +29,16 @@ export function isAssistantSupabaseBackendEnabled({
   envEnabled,
   flag,
   isConfigured,
+  isLocal = false,
 }: {
+  isLocal?: boolean
   isPlatform: boolean
   envEnabled: boolean
   flag: unknown
   isConfigured: boolean
 }): boolean {
   if (!isConfigured) return false
-  return isPlatform && (envEnabled || flag === true)
+  return isPlatform && ((isLocal && envEnabled) || flag === true)
 }
 
 export function useAssistantSupabaseBackend() {
@@ -45,6 +47,7 @@ export function useAssistantSupabaseBackend() {
   const env = process.env.NEXT_PUBLIC_ASSISTANT_BACKEND === 'true'
   return isAssistantSupabaseBackendEnabled({
     isPlatform: IS_PLATFORM,
+    isLocal: process.env.NEXT_PUBLIC_ENVIRONMENT === 'local',
     envEnabled: env,
     flag,
     isConfigured: isAssistantBackendConfigured(),

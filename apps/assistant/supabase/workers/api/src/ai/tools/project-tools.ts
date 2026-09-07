@@ -1,7 +1,8 @@
-import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
+import { acceptUntrustedSql, untrustedSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { tool } from 'ai'
 import { z } from 'zod'
 
+import { assistantSqlModelOutput, type ProjectPermissionLevel } from '../../permissions'
 import {
   EDGE_FUNCTION_PROMPT,
   LOGS_PROMPT,
@@ -50,24 +51,40 @@ export const loadKnowledgeInputSchema = z.object({
 })
 
 export type ManagementApi = {
-  runQuery: (sql: string, opts?: { readOnly?: boolean }) => Promise<any>
-  deployFunction: (input: { slug: string; code: string; name: string }) => Promise<any>
+  runQuery: (sql: SafeSqlFragment, opts?: { readOnly?: boolean }) => Promise<unknown>
+  deployFunction: (input: { slug: string; code: string; name: string }) => Promise<unknown>
 }
 
-export function getProjectTools({ managementApi }: { managementApi: ManagementApi }) {
+export function getProjectTools({
+  managementApi,
+  aiOptInLevel,
+  executeOperation,
+}: {
+  managementApi: ManagementApi
+  aiOptInLevel: ProjectPermissionLevel
+  executeOperation: (
+    id: string,
+    name: string,
+    input: unknown,
+    execute: () => Promise<unknown>
+  ) => Promise<unknown>
+}) {
   return {
     execute_sql: tool({
       description:
         'Asks the user to execute a SQL statement and return the results. Requires user approval before executing.',
       inputSchema: executeSqlInputSchema,
       needsApproval: true,
-      execute: async ({ sql }) => {
-        // needsApproval: true is the user gesture that promotes LLM SQL to executable.
-        return managementApi.runQuery(acceptUntrustedSql(untrustedSql(sql)))
-      },
-      toModelOutput: ({ output }: { output: any }) => {
-        return { type: 'json' as const, value: output }
-      },
+      execute: async (input, { toolCallId }) =>
+        executeOperation(toolCallId, 'execute_sql', input, () =>
+          managementApi.runQuery(acceptUntrustedSql(untrustedSql(input.sql)), {
+            readOnly: !input.isWriteQuery,
+          })
+        ),
+      toModelOutput: ({ output }) => ({
+        type: 'text' as const,
+        value: JSON.stringify(assistantSqlModelOutput(output, aiOptInLevel)),
+      }),
     }),
     deploy_edge_function: tool({
       description:
@@ -77,10 +94,15 @@ export function getProjectTools({ managementApi }: { managementApi: ManagementAp
         code: z.string().describe('The TypeScript code for the Edge Function.'),
       }),
       needsApproval: true,
-      execute: async ({ name, code }) => {
-        await managementApi.deployFunction({ slug: name, code, name })
-        return { success: true }
-      },
+      execute: async (input, { toolCallId }) =>
+        executeOperation(toolCallId, 'deploy_edge_function', input, async () => {
+          await managementApi.deployFunction({
+            slug: input.name,
+            code: input.code,
+            name: input.name,
+          })
+          return { success: true }
+        }),
     }),
     rename_chat: tool({
       description: `Rename the current chat session when the current chat name doesn't describe the conversation topic.`,

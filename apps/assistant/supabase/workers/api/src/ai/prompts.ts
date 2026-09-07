@@ -349,8 +349,7 @@ export const PG_BEST_PRACTICES = `
 - Ensure all generated SQL is valid for Postgres.
 - Always escape single quotes within strings using double apostrophes (e.g., \`'Night''s watch'\`).
 - Always quote identifiers (table names, column names) with double quotes when they contain uppercase letters (e.g., \`SELECT "locationType" FROM "Locations"\`), are PostgreSQL reserved words (e.g., \`"order"\`, \`"select"\`, \`"table"\`), or have special characters like dashes or spaces (e.g., \`"user-name"\`, \`"created at"\`). PostgreSQL normalizes unquoted identifiers to lowercase and reserves certain keywords.
-- Terminate each SQL statement with a semicolon (`
-;`).
+- Terminate each SQL statement with a semicolon (\`;\`).
 - For embeddings or vector queries, use \`vector(384)\`.
 - Prefer \`text\` over \`varchar\`.
 - Prefer \`timestamp with time zone\` instead of the \`date\` type.

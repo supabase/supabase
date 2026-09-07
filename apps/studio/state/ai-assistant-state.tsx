@@ -1,6 +1,6 @@
 import { Chat, type UIMessage as MessageType } from '@ai-sdk/react'
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
-import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage, useUser } from 'common'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
 import {
@@ -11,30 +11,19 @@ import {
   useReducer,
   useState,
 } from 'react'
+import { toast } from 'sonner'
 import { v4 as uuidv4 } from 'uuid'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
-import {
-  createConversation,
-  useConversationCreateMutation,
-} from '@/data/ai-assistant/conversation-create-mutation'
-import {
-  deleteConversation,
-  useConversationDeleteMutation,
-} from '@/data/ai-assistant/conversation-delete-mutation'
-import { conversationDetailQueryOptions } from '@/data/ai-assistant/conversation-detail-query'
-import {
-  updateConversation,
-  useConversationUpdateMutation,
-} from '@/data/ai-assistant/conversation-update-mutation'
-import { conversationsQueryOptions } from '@/data/ai-assistant/conversations-query'
+import { deleteConversation } from '@/data/ai-assistant/conversation-delete-mutation'
+import { getConversation } from '@/data/ai-assistant/conversation-detail-query'
+import { updateConversation } from '@/data/ai-assistant/conversation-update-mutation'
 import type { AiSupportStatus } from '@/data/feedback/ai-chat-front-sync'
 import { constructHeaders } from '@/data/fetchers'
 import { getQueryClient } from '@/data/query-client'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { getAssistantApiUrl, useAssistantSupabaseBackend } from '@/lib/ai/assistant-backend'
-import { getAssistantAccessToken } from '@/lib/ai/assistant-client'
 import { prepareMessagesForAPI } from '@/lib/ai/message-utils'
 import { isKnownAssistantModelId } from '@/lib/ai/model.utils'
 import type { AssistantModelId } from '@/lib/ai/model.utils'
@@ -42,6 +31,14 @@ import {
   applyNotebookCacheEffects,
   collectNotebookCacheEffects,
 } from '@/lib/ai/notebook-cache-invalidation'
+import { getAssistantApiUrl, useAssistantSupabaseBackend } from '@/lib/assistant/backend'
+import { getAssistantRequestHeaders } from '@/lib/assistant/client'
+import { ConversationPersistence } from '@/lib/assistant/conversation-persistence'
+import {
+  loadConversationsFromBackend,
+  persistConversationIfEnabled,
+  persistTruncation,
+} from '@/lib/assistant/conversations'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 
 type SuggestionsType = {
@@ -89,6 +86,9 @@ export type SupportChatMetadata = {
 }
 
 export type ChatSession = {
+  revision?: number
+  messagesLoaded?: boolean
+  nextCursor?: number
   id: string
   name: string
   messages: AssistantMessageType[]
@@ -294,72 +294,6 @@ function ensureActiveChatOrInitialize(state: AiAssistantState) {
   }
 }
 
-const assistantConversationApi = {
-  create: createConversation,
-  update: updateConversation,
-  delete: deleteConversation,
-}
-
-const pendingConversationCreates = new Map<string, Promise<void>>()
-
-function persistConversationIfEnabled(state: AiAssistantState, chat: ChatSession): Promise<void> {
-  if (!state.useAssistantBackend) return Promise.resolve()
-
-  const projectRef = state.context.projectRef
-  const orgSlug = state.context.orgSlug
-  if (!projectRef || !orgSlug) return Promise.resolve()
-
-  const pending = assistantConversationApi
-    .create({
-      projectRef,
-      payload: {
-        id: chat.id,
-        name: chat.name,
-        org_slug: orgSlug,
-        model: state.model,
-        ...(chat.branchedFrom
-          ? {
-              branched_from: {
-                chat_id: chat.branchedFrom.chatId,
-                message_id: chat.branchedFrom.messageId,
-              },
-            }
-          : {}),
-      },
-    })
-    .then(() => undefined)
-    .catch((error) => {
-      console.error('Failed to create assistant conversation:', error)
-    })
-    .finally(() => {
-      pendingConversationCreates.delete(chat.id)
-    })
-
-  pendingConversationCreates.set(chat.id, pending)
-  return pending
-}
-
-async function loadConversationsFromBackend(
-  projectRef: string
-): Promise<Record<string, ChatSession>> {
-  const queryClient = getQueryClient()
-  const conversations = await queryClient.fetchQuery(conversationsQueryOptions({ projectRef }))
-
-  const chatsWithMessages = await Promise.all(
-    conversations.map(async (chat) => {
-      if (chat.messages.length > 0) return chat
-      try {
-        return await queryClient.fetchQuery(conversationDetailQueryOptions({ id: chat.id }))
-      } catch (error) {
-        console.error('Failed to load assistant conversation detail:', error)
-        return chat
-      }
-    })
-  )
-
-  return Object.fromEntries(chatsWithMessages.map((chat) => [chat.id, chat]))
-}
-
 function createChatInstance(
   state: AiAssistantState,
   options: { id: string; initialMessages: MessageType[]; useAssistantBackend: boolean }
@@ -377,6 +311,7 @@ function createChatInstance(
   // can switch projects while the request is still in flight.
   let requestProjectRef: string | undefined
 
+  const persistence = state.persistence
   const useAssistantBackend = options.useAssistantBackend
   const assistantApiUrl = getAssistantApiUrl()
   const api =
@@ -400,7 +335,7 @@ function createChatInstance(
         if (useAssistantBackend && response.status === 409) {
           try {
             const body = await response.clone().json()
-            if (body?.code === 'oauth_required') {
+            if (body?.code === 'oauth_required' || body?.code === 'oauth_expired') {
               state.oauthRequiredOrgSlug = body.org_slug ?? state.context.orgSlug
             }
           } catch {
@@ -408,6 +343,9 @@ function createChatInstance(
           }
         } else if (useAssistantBackend && response.ok) {
           state.oauthRequiredOrgSlug = undefined
+          const revision = response.headers.get('x-assistant-revision')
+          const chat = state.chats[options.id]
+          if (chat && revision !== null) chat.revision = Number(revision)
         }
 
         return response
@@ -418,11 +356,19 @@ function createChatInstance(
         requestProjectRef = state.context.projectRef
 
         if (useAssistantBackend) {
-          await pendingConversationCreates.get(options.id)
-          const assistantToken = await getAssistantAccessToken()
+          await persistence.ready(options.id)
+          if (chat?.revision === undefined)
+            throw new Error('Conversation was not saved. Reload the assistant to try again.')
+          const headers = await getAssistantRequestHeaders()
+          persistence.assertActive()
           return {
             ...opts,
             body: {
+              ...opts.body,
+              requestId: uuidv4(),
+              revision: chat.revision,
+              supportMetadata: chat.supportMetadata,
+              trigger: opts.trigger,
               messages: cleanedMessages,
               projectRef: state.context.projectRef,
               chatId: options.id,
@@ -430,9 +376,8 @@ function createChatInstance(
               supportMode: chat?.supportMetadata?.isSupportChat ?? false,
               orgSlug: state.context.orgSlug,
               model: state.model,
-              ...opts.body,
             },
-            headers: { Authorization: `Bearer ${assistantToken}` },
+            headers,
           }
         }
 
@@ -476,7 +421,10 @@ function createChatInstance(
         const { newName } = toolCall.input as { newName: string }
 
         if (options.id && newName?.trim()) {
-          state.renameChat(options.id, newName.trim())
+          if (useAssistantBackend) {
+            const chat = state.chats[options.id]
+            if (chat) chat.name = newName.trim()
+          } else state.renameChat(options.id, newName.trim())
         }
       }
     },
@@ -504,6 +452,7 @@ function createChatInstance(
 
         // Sync support chat messages to Front (fire-and-forget, dynamic import to avoid SSR issues)
         if (chat?.supportMetadata) {
+          state.persistSupportMetadata(options.id)
           import('@/state/ai-chat-front-sync')
             .then(({ syncSupportChatToFront }) => syncSupportChatToFront(options.id, state))
             .catch(() => {})
@@ -526,12 +475,29 @@ export const createAiAssistantState = (): AiAssistantState => {
   // Initialize with defaults, loading happens asynchronously in the provider
   const initialState = createInitialAiAssistantData()
 
+  const makePersistence = () =>
+    ref(
+      new ConversationPersistence((error) => {
+        state.initializationError =
+          error instanceof Error
+            ? error.message
+            : 'Could not save the conversation. Reload to try again.'
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : 'Could not save the conversation. Reload to try again.'
+        )
+      })
+    )
   const state: AiAssistantState = proxy({
     ...initialState, // Spread initial values directly
     chatInstances: {},
     pendingSpanIds: {},
     messageSpanIds: {},
     isInitialized: false,
+    initializationError: undefined,
+    reloadVersion: 0,
+    persistence: makePersistence(),
     useAssistantBackend: false,
     oauthRequiredOrgSlug: undefined,
 
@@ -540,6 +506,15 @@ export const createAiAssistantState = (): AiAssistantState => {
     },
 
     resetAiAssistantPanel: () => {
+      state.persistence.dispose()
+      state.persistence = makePersistence()
+      Object.values(state.chatInstances).forEach((chat) => {
+        void chat.stop()
+      })
+      state.chatInstances = {}
+      state.pendingSpanIds = {}
+      state.messageSpanIds = {}
+      state.initializationError = undefined
       Object.assign(state, createInitialAiAssistantData())
       state.isInitialized = false
       state.oauthRequiredOrgSlug = undefined
@@ -579,15 +554,16 @@ export const createAiAssistantState = (): AiAssistantState => {
         useAssistantBackend: state.useAssistantBackend,
       })
       state.chatInstances[chatId] = ref(chatInstance)
-      persistConversationIfEnabled(state, newChat)
+      void persistConversationIfEnabled(state, state.chats[chatId]).catch(() => {})
 
       if (options?.initialMessage) {
         const send = () => {
           chatInstance.sendMessage({ text: options.initialMessage! })
         }
-        const pending = pendingConversationCreates.get(chatId)
-        if (pending) void pending.then(send)
-        else send()
+        void state.persistence
+          .ready(chatId)
+          .then(send)
+          .catch(() => {})
       }
 
       return chatId
@@ -613,9 +589,15 @@ export const createAiAssistantState = (): AiAssistantState => {
       const messageIndex = sourceChat.messages.findIndex((msg) => msg.id === messageId)
       if (messageIndex === -1) return
 
-      const branchedMessages = sourceChat.messages
-        .slice(0, messageIndex + 1)
-        .map((message) => sanitizeForCloning(message))
+      const branchedMessages = sourceChat.messages.slice(0, messageIndex + 1).map((message) => ({
+        ...sanitizeForCloning(message),
+        parts: message.parts.filter(
+          (part) =>
+            !state.useAssistantBackend ||
+            !('state' in part) ||
+            !['approval-requested', 'approval-responded'].includes(part.state ?? '')
+        ),
+      }))
 
       const chatId = uuidv4()
       const newChat: ChatSession = {
@@ -639,7 +621,7 @@ export const createAiAssistantState = (): AiAssistantState => {
           useAssistantBackend: state.useAssistantBackend,
         })
       )
-      persistConversationIfEnabled(state, newChat)
+      void persistConversationIfEnabled(state, state.chats[chatId]).catch(() => {})
 
       return chatId
     },
@@ -686,6 +668,17 @@ export const createAiAssistantState = (): AiAssistantState => {
     ensureChatInstance: (id: string) => {
       const chat = state.chats[id]
       if (chat && !state.chatInstances[id]) {
+        if (state.useAssistantBackend && chat.messagesLoaded === false) {
+          const persistence = state.persistence
+          void persistence.enqueue(id, async () => {
+            if (chat.messagesLoaded) return
+            const loaded = await getConversation({ id })
+            persistence.assertActive()
+            Object.assign(chat, loaded)
+            state.ensureChatInstance(id)
+          })
+          return
+        }
         state.chatInstances[id] = ref(
           createChatInstance(state, {
             id,
@@ -704,26 +697,26 @@ export const createAiAssistantState = (): AiAssistantState => {
     },
 
     deleteChat: (id: string) => {
-      const { [id]: _, ...remainingChats } = state.chats
-      state.chats = remainingChats
-      delete state.chatInstances[id]
-
-      if (state.useAssistantBackend) {
-        void assistantConversationApi
-          .delete({ id, projectRef: state.context.projectRef })
-          .catch((error) => {
-            console.error('Failed to delete assistant conversation:', error)
-          })
-      }
-
-      if (id === state.activeChatId) {
-        const remainingChatIds = Object.keys(remainingChats)
-        state.activeChatId = remainingChatIds.length > 0 ? remainingChatIds[0] : undefined
-
-        if (state.activeChatId) {
-          state.ensureChatInstance(state.activeChatId)
+      const remove = () => {
+        void state.chatInstances[id]?.stop()
+        const { [id]: _, ...remainingChats } = state.chats
+        state.chats = remainingChats
+        delete state.chatInstances[id]
+        if (id === state.activeChatId) {
+          state.activeChatId = Object.keys(remainingChats)[0]
+          if (state.activeChatId) state.ensureChatInstance(state.activeChatId)
         }
       }
+      if (!state.useAssistantBackend) {
+        remove()
+        return
+      }
+      const persistence = state.persistence
+      void persistence.enqueue(id, async () => {
+        await deleteConversation({ id, revision: state.chats[id].revision ?? 0 })
+        persistence.assertActive()
+        remove()
+      })
     },
 
     renameChat: (id: string, name: string) => {
@@ -732,15 +725,15 @@ export const createAiAssistantState = (): AiAssistantState => {
         chat.name = name
         chat.updatedAt = new Date()
         if (state.useAssistantBackend) {
-          void assistantConversationApi
-            .update({
+          const persistence = state.persistence
+          void persistence.enqueue(id, async () => {
+            const updated = await updateConversation({
               id,
-              projectRef: state.context.projectRef,
-              payload: { name },
+              payload: { name, revision: chat.revision ?? 0 },
             })
-            .catch((error) => {
-              console.error('Failed to rename assistant conversation:', error)
-            })
+            persistence.assertActive()
+            chat.revision = updated.revision
+          })
         }
       }
     },
@@ -750,6 +743,7 @@ export const createAiAssistantState = (): AiAssistantState => {
 
       const chat = state.chats[chatId]
       if (chat) {
+        persistTruncation(state, chat)
         chat.messages = []
         const chatInstance = state.chatInstances[chatId]
         if (chatInstance) chatInstance.messages = []
@@ -773,6 +767,8 @@ export const createAiAssistantState = (): AiAssistantState => {
 
       // Delete all messages from the target message (optionally including) to the end
       const startIndex = includeSelf ? messageIndex : messageIndex + 1
+      const firstRemoved = chat.messages[startIndex]
+      if (firstRemoved) persistTruncation(state, chat, firstRemoved.id)
       chat.messages.splice(startIndex)
       const chatInstance = state.chatInstances[chatId]
       const instanceMessageIndex = chatInstance?.messages.findIndex((message) => message.id === id)
@@ -862,6 +858,43 @@ export const createAiAssistantState = (): AiAssistantState => {
       if (state.activeChatId) state.ensureChatInstance(state.activeChatId)
     },
 
+    reload: () => {
+      state.reloadVersion += 1
+    },
+    persistSupportMetadata: (id: string) => {
+      const chat = state.chats[id]
+      if (!state.useAssistantBackend || !chat?.supportMetadata) return
+      // Wait until the response header has supplied the revision claimed by this turn.
+      if (state.chatInstances[id]?.status === 'submitted') return
+      const persistence = state.persistence
+      void persistence.enqueue(id, async () => {
+        const updated = await updateConversation({
+          id,
+          payload: { revision: chat.revision ?? 0, support_metadata: chat.supportMetadata },
+        })
+        persistence.assertActive()
+        chat.revision = updated.revision
+      })
+    },
+    loadEarlierMessages: async (id: string) => {
+      const chat = state.chats[id]
+      if (!state.useAssistantBackend || !chat?.nextCursor) return
+      const persistence = state.persistence
+      await persistence.enqueue(id, async () => {
+        const loaded = await getConversation({ id, before: chat.nextCursor })
+        persistence.assertActive()
+        if (loaded.revision !== chat.revision)
+          throw new Error('Conversation changed. Reload before loading earlier messages.')
+        const ids = new Set(chat.messages.map((message) => message.id))
+        chat.messages = [
+          ...loaded.messages.filter((message) => !ids.has(message.id)),
+          ...chat.messages,
+        ]
+        chat.nextCursor = loaded.nextCursor
+        const instance = state.chatInstances[id]
+        if (instance) instance.messages = chat.messages.map(sanitizeForCloning)
+      })
+    },
     clearStorage: async () => {
       await clearStorage()
     },
@@ -871,6 +904,12 @@ export const createAiAssistantState = (): AiAssistantState => {
 }
 
 export type AiAssistantState = AiAssistantData & {
+  persistence: ConversationPersistence
+  initializationError?: string
+  reloadVersion: number
+  reload: () => void
+  persistSupportMetadata: (id: string) => void
+  loadEarlierMessages: (id: string) => Promise<void>
   resetAiAssistantPanel: () => void
   activeChat: ChatSession | undefined
   chatInstances: Record<string, ReturnType<typeof ref<Chat<MessageType>>>>
@@ -905,43 +944,25 @@ export const AiAssistantStateContext = createContext<AiAssistantState>(createAiA
 export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren) => {
   const { data: project } = useSelectedProjectQuery()
   const useAssistantBackend = useAssistantSupabaseBackend()
-  const { mutateAsync: createConversationMutate } = useConversationCreateMutation({
-    onError: (error) => {
-      console.error('Failed to create assistant conversation:', error)
-    },
-  })
-  const { mutateAsync: updateConversationMutate } = useConversationUpdateMutation({
-    onError: (error) => {
-      console.error('Failed to rename assistant conversation:', error)
-    },
-  })
-  const { mutateAsync: deleteConversationMutate } = useConversationDeleteMutation({
-    onError: (error) => {
-      console.error('Failed to delete assistant conversation:', error)
-    },
-  })
-  // Initialize state. createAiAssistantState now just sets defaults.
+  const user = useUser()
+  const { data: organization } = useSelectedOrganizationQuery({ enabled: useAssistantBackend })
+  const backendOrgSlug = useAssistantBackend ? organization?.slug : undefined
+  const backendUserId = useAssistantBackend ? user?.id : undefined
   const [state] = useState(() => createAiAssistantState())
-
-  useEffect(() => {
-    assistantConversationApi.create = (variables) => createConversationMutate(variables)
-    assistantConversationApi.update = (variables) => updateConversationMutate(variables)
-    assistantConversationApi.delete = (variables) => deleteConversationMutate(variables)
-    return () => {
-      assistantConversationApi.create = createConversation
-      assistantConversationApi.update = updateConversation
-      assistantConversationApi.delete = deleteConversation
-    }
-  }, [createConversationMutate, updateConversationMutate, deleteConversationMutate])
-
-  useEffect(() => {
-    state.useAssistantBackend = useAssistantBackend
-  }, [state, useAssistantBackend])
+  const { reloadVersion } = useSnapshot(state)
 
   // Effect to load state from IndexedDB on mount or projectRef change
   useEffect(() => {
     let isMounted = true
-    state.isInitialized = false
+    // Page effects may already have supplied the legacy context before this provider effect.
+    const context = state.context.projectRef === project?.ref ? state.context : {}
+    state.resetAiAssistantPanel()
+    state.context = {
+      ...context,
+      projectRef: project?.ref,
+      ...(useAssistantBackend ? { orgSlug: backendOrgSlug } : {}),
+    }
+    getQueryClient().removeQueries({ queryKey: ['assistant'] })
 
     async function loadAndInitializeState() {
       state.useAssistantBackend = useAssistantBackend
@@ -954,6 +975,7 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
       }
 
       if (useAssistantBackend) {
+        if (!backendOrgSlug) return
         try {
           const chats = await loadConversationsFromBackend(project.ref)
           if (!isMounted) return
@@ -964,8 +986,10 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
             model: state.model,
           })
         } catch (error) {
-          console.error('Failed to load assistant conversations:', error)
           if (!isMounted) return
+          state.initializationError =
+            error instanceof Error ? error.message : 'Could not load conversations.'
+          return
         }
 
         ensureActiveChatOrInitialize(state)
@@ -999,8 +1023,16 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 
     return () => {
       isMounted = false
+      state.persistence.dispose()
+      Object.values(state.chatInstances).forEach((chat) => {
+        void chat.stop()
+      })
     }
-  }, [project?.ref, state, useAssistantBackend])
+  }, [project?.ref, backendOrgSlug, backendUserId, state, useAssistantBackend, reloadVersion])
+
+  useEffect(() => {
+    state.setContext({ connectionString: project?.connectionString ?? undefined })
+  }, [project?.connectionString, state, useAssistantBackend, reloadVersion])
 
   // Effect to save state to IndexedDB on changes
   useEffect(() => {
@@ -1012,6 +1044,7 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 
       const unsubscribe = subscribe(state, () => {
         const snap = snapshot(state)
+        if (!snap.isInitialized || snap.useAssistantBackend) return
 
         // Prepare state for IndexedDB
         const stateToSave: StoredAiAssistantState = {
@@ -1072,8 +1105,14 @@ export const useAiAssistantChatList = (): ChatSession[] => {
 export const whenAiAssistantInitialized = (state: AiAssistantState): Promise<void> => {
   if (state.isInitialized) return Promise.resolve()
 
-  return new Promise((resolve) => {
+  if (state.initializationError) return Promise.reject(new Error(state.initializationError))
+  return new Promise((resolve, reject) => {
     const unsubscribe = subscribe(state, () => {
+      if (state.initializationError) {
+        unsubscribe()
+        reject(new Error(state.initializationError))
+        return
+      }
       if (!state.isInitialized) return
       unsubscribe()
       resolve()

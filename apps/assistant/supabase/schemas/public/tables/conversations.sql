@@ -10,6 +10,9 @@ create table public.conversations (
   surface text not null default 'studio',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
+  revision bigint not null default 0,
+  active_request_id uuid,
+  active_since timestamptz,
   deleted_at timestamptz
 );
 
@@ -18,8 +21,8 @@ create index on public.conversations (user_id, project_ref, updated_at desc);
 alter table public.conversations enable row level security;
 
 create policy "own conversations"
-  on public.conversations
-  for all
-  to authenticated
-  using (user_id = (select auth.uid()))
-  with check (user_id = (select auth.uid()));
+  on public.conversations for select to authenticated
+  using (user_id = (select auth.uid()) and deleted_at is null);
+
+revoke all on public.conversations from anon, authenticated;
+grant select on public.conversations to authenticated;

@@ -18,11 +18,16 @@ function isAssistantModelId(id: string): id is AssistantModelId {
 }
 
 /** Resolve Studio's requested model and return options that spread into `streamText`. */
-export function getAssistantModel(requested?: string) {
+export function getAssistantModel(requested?: string, hasAccessToAdvanceModel = false) {
   const apiKey = env.openaiApiKey
   if (!apiKey) throw new Error('OPENAI_API_KEY not available')
 
-  const id = requested && isAssistantModelId(requested) ? requested : DEFAULT_ASSISTANT_MODEL_ID
+  const id =
+    requested &&
+    isAssistantModelId(requested) &&
+    (requested !== 'gpt-5.3-codex' || hasAccessToAdvanceModel)
+      ? requested
+      : DEFAULT_ASSISTANT_MODEL_ID
   return {
     model: createOpenAI({ apiKey })(id),
     reasoning: ASSISTANT_MODELS[id],

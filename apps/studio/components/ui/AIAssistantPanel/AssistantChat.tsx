@@ -31,6 +31,7 @@ import {
 import { Message } from './Message'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { useMessageFeedbackMutation } from '@/data/ai-assistant/message-feedback-mutation'
+import { useAssistantProjectPermissions } from '@/data/ai-assistant/project-permissions-query'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useRateMessageMutation } from '@/data/ai/rate-message-mutation'
 import { useTablesQuery } from '@/data/tables/tables-query'
@@ -38,14 +39,10 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useAssistantSupabaseBackend } from '@/lib/ai/assistant-backend'
-import { startAssistantOAuth } from '@/lib/ai/assistant-client'
-import {
-  assistantApiOrigin,
-  readAssistantOAuthCompleteMessage,
-} from '@/lib/ai/assistant-oauth'
 import type { AssistantMessageMetadata } from '@/lib/ai/assistant-message-metadata'
 import { getParallelApprovalIdsToReject } from '@/lib/ai/message-utils'
+import { useAssistantSupabaseBackend } from '@/lib/assistant/backend'
+import { connectAssistantOrganization } from '@/lib/assistant/connect'
 import { IS_PLATFORM } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
@@ -118,12 +115,20 @@ export const AssistantChat = ({
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  const legacyPermissions = useOrgAiOptInLevel()
+  const assistantPermissions = useAssistantProjectPermissions(
+    project?.ref,
+    selectedOrganization?.slug ?? undefined
+  )
+  const { aiOptInLevel, isHipaaProjectDisallowed } = legacyPermissions
   // Whether attached queries are sent at all. One definition, shared by the chat form
   // (which folds them into the message text) and the message metadata (which states
   // whether any of them was a logs query), so the two can't disagree.
-  const includeSnippetsInMessage = aiOptInLevel !== 'disabled'
+  const includeSnippetsInMessage = useAssistantBackend
+    ? (assistantPermissions.data?.capabilities.includeContext ?? false)
+    : aiOptInLevel !== 'disabled'
   const showMetadataWarning =
+    !useAssistantBackend &&
     IS_PLATFORM &&
     !!selectedOrganization &&
     (aiOptInLevel === 'disabled' || aiOptInLevel === 'schema')
@@ -319,32 +324,24 @@ export const AssistantChat = ({
   const isOAuthRequired =
     !!snap.oauthRequiredOrgSlug || (!!error?.message && error.message.includes('oauth_required'))
 
-  useEffect(() => {
-    if (!useAssistantBackend) return
-
-    const expectedOrigin = assistantApiOrigin()
-    const onMessage = (event: MessageEvent) => {
-      const payload = readAssistantOAuthCompleteMessage(event, expectedOrigin)
-      if (!payload) return
-      const requiredOrg = state.oauthRequiredOrgSlug ?? state.context.orgSlug
-      if (requiredOrg && payload.org_slug !== requiredOrg) return
-      state.oauthRequiredOrgSlug = undefined
-      chatInstance?.clearError()
-    }
-
-    window.addEventListener('message', onMessage)
-    return () => window.removeEventListener('message', onMessage)
-  }, [useAssistantBackend, state, chatInstance])
+  const connectionAbort = useRef<AbortController | null>(null)
+  useEffect(
+    () => () => {
+      connectionAbort.current?.abort()
+    },
+    [useAssistantBackend, snap.context.orgSlug]
+  )
 
   const handleConnectOrganization = async () => {
     const orgSlug = snap.oauthRequiredOrgSlug ?? snap.context.orgSlug
     if (!orgSlug) return
     try {
-      const url = await startAssistantOAuth(orgSlug, window.location.href)
-      const popup = window.open(url, 'Connect organization', 'popup,width=600,height=800')
-      if (!popup) {
-        toast.error("Couldn't open the connection window. Allow popups and try again.")
-      }
+      connectionAbort.current?.abort()
+      const controller = new AbortController()
+      connectionAbort.current = controller
+      await connectAssistantOrganization(orgSlug, window.location.href, controller.signal)
+      state.oauthRequiredOrgSlug = undefined
+      chatInstance?.clearError()
     } catch (connectError) {
       toast.error(
         connectError instanceof Error
@@ -520,6 +517,20 @@ export const AssistantChat = ({
     placeholder = 'Chat to Postgres...'
   }
 
+  if (snap.initializationError) {
+    return (
+      <div className="p-7 space-y-4">
+        <AlertError
+          subject="Could not load conversations"
+          error={{ message: snap.initializationError }}
+        />
+        <Button variant="default" onClick={() => state.reload()}>
+          Try again
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <ErrorBoundary
       message="Something went wrong with the AI Assistant"
@@ -550,6 +561,16 @@ export const AssistantChat = ({
         {hasMessages ? (
           <Conversation className={cn('flex-1')}>
             <ConversationContent className="w-full px-7 py-8 mb-10">
+              {snap.chats[chatId ?? '']?.nextCursor && (
+                <Button
+                  variant="default"
+                  onClick={() => {
+                    if (chatId) void state.loadEarlierMessages(chatId).catch(() => {})
+                  }}
+                >
+                  Load earlier messages
+                </Button>
+              )}
               {renderedMessages}
               <div className="w-full max-w-3xl mx-auto">
                 {error && (

@@ -12,3 +12,6 @@ create policy "own identity"
   for select
   to authenticated
   using (user_id = (select auth.uid()));
+
+revoke all on public.platform_identities from anon, authenticated;
+grant select on public.platform_identities to authenticated;

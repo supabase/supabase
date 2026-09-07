@@ -1,11 +1,21 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  isAssistantBackendConfigured,
-  isAssistantSupabaseBackendEnabled,
-} from './assistant-backend'
+import { isAssistantBackendConfigured, isAssistantSupabaseBackendEnabled } from './backend'
 
 describe('isAssistantSupabaseBackendEnabled', () => {
+  it.each([false, undefined, 'true'])(
+    'keeps a hosted flag %s off despite the environment override',
+    (flag) => {
+      expect(
+        isAssistantSupabaseBackendEnabled({
+          isPlatform: true,
+          envEnabled: true,
+          isConfigured: true,
+          flag,
+        })
+      ).toBe(false)
+    }
+  )
   it('returns false when not on platform', () => {
     expect(
       isAssistantSupabaseBackendEnabled({
@@ -28,12 +38,13 @@ describe('isAssistantSupabaseBackendEnabled', () => {
     ).toBe(false)
   })
 
-  it('returns true when the env override is on', () => {
+  it('returns true when the local env override is on', () => {
     expect(
       isAssistantSupabaseBackendEnabled({
         isPlatform: true,
         envEnabled: true,
         flag: false,
+        isLocal: true,
         isConfigured: true,
       })
     ).toBe(true)

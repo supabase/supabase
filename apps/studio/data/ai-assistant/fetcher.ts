@@ -1,5 +1,5 @@
-import { getAssistantApiUrl } from '@/lib/ai/assistant-backend'
-import { getAssistantAccessToken } from '@/lib/ai/assistant-client'
+import { getAssistantApiUrl } from '@/lib/assistant/backend'
+import { getAssistantRequestHeaders } from '@/lib/assistant/client'
 import { ResponseError } from '@/types'
 
 export async function assistantFetch<T>(
@@ -10,10 +10,10 @@ export async function assistantFetch<T>(
   const apiUrl = getAssistantApiUrl()
   if (!apiUrl) throw new Error('Assistant API URL is not configured')
 
-  const token = await getAssistantAccessToken()
+  const authHeaders = await getAssistantRequestHeaders()
   const headers = new Headers(init.headers)
   headers.set('Accept', 'application/json')
-  headers.set('Authorization', `Bearer ${token}`)
+  Object.entries(authHeaders).forEach(([key, value]) => headers.set(key, value))
   if (init.body && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json')
   }

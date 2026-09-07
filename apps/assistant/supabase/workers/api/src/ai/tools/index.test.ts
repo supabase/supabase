@@ -1,3 +1,4 @@
+import { jsonSchema } from 'ai'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getTools } from './index'
@@ -15,6 +16,8 @@ vi.mock('./support-tools', () => ({
 }))
 
 const BASE_PARAMS = {
+  conversationId: 'conversation',
+  aiOptInLevel: 'schema' as const,
   projectRef: 'abcdefghijklmnopqrst',
   oauthToken: 'oauth-token',
   managementApi: {
@@ -27,16 +30,20 @@ const BASE_PARAMS = {
 describe('ai/tools getTools', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(getMcpTools).mockResolvedValue({ list_tables: {} } as any)
+    vi.mocked(getMcpTools).mockResolvedValue({
+      tools: { list_tables: { inputSchema: jsonSchema({ type: 'object' }) } },
+      close: vi.fn(),
+    })
   })
 
   it('includes project, MCP, schema and incident tools', async () => {
-    const tools = await getTools(BASE_PARAMS)
+    const { tools } = await getTools(BASE_PARAMS)
 
     expect(getMcpTools).toHaveBeenCalledWith({
       oauthToken: BASE_PARAMS.oauthToken,
       projectRef: BASE_PARAMS.projectRef,
       signal: BASE_PARAMS.signal,
+      aiOptInLevel: BASE_PARAMS.aiOptInLevel,
     })
     expect(tools).toHaveProperty('studio_tool')
     expect(tools).toHaveProperty('list_tables')
@@ -46,11 +53,14 @@ describe('ai/tools getTools', () => {
 
   it('lets harness tools override same-named MCP tools', async () => {
     vi.mocked(getMcpTools).mockResolvedValue({
-      list_tables: {},
-      studio_tool: { source: 'mcp' },
-    } as any)
+      tools: {
+        list_tables: { inputSchema: jsonSchema({ type: 'object' }) },
+        studio_tool: { inputSchema: jsonSchema({ type: 'object' }) },
+      },
+      close: vi.fn(),
+    })
 
-    const tools: Record<string, unknown> = await getTools(BASE_PARAMS)
+    const { tools } = await getTools(BASE_PARAMS)
 
     expect(tools.studio_tool).toEqual({})
     expect(tools).toHaveProperty('list_tables')
@@ -60,7 +70,7 @@ describe('ai/tools getTools', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     vi.mocked(getMcpTools).mockRejectedValueOnce(new Error('remote MCP unreachable'))
 
-    const tools = await getTools(BASE_PARAMS)
+    const { tools } = await getTools(BASE_PARAMS)
 
     expect(tools).toHaveProperty('studio_tool')
     expect(tools).toHaveProperty('schema_tool')
@@ -78,7 +88,7 @@ describe('ai/tools getTools', () => {
   })
 
   it('includes support tools when supportMode is true', async () => {
-    const tools = await getTools({ ...BASE_PARAMS, supportMode: true })
+    const { tools } = await getTools({ ...BASE_PARAMS, supportMode: true })
 
     expect(tools).toHaveProperty('escalate_to_human')
   })

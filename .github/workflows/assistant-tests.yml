@@ -1,0 +1,56 @@
+name: Assistant checks
+
+on:
+  pull_request:
+    paths:
+      - 'apps/assistant/**'
+      - 'packages/eslint-config-supabase/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/assistant-tests.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'apps/assistant/**'
+      - 'pnpm-lock.yaml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: assistant-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter assistant typecheck
+      - run: pnpm --filter assistant lint
+      - run: pnpm --filter assistant test
+      - run: pnpm --filter assistant build
+      - uses: supabase/setup-cli@b60b5899c73b63a2d2d651b1e90db8d4c9392f51 # v1.6.0
+        with:
+          version: 2.116.0
+      - name: Start disposable database and apply migrations
+        run: supabase start --workdir apps/assistant -x studio,imgproxy,edge-runtime,logflare,vector,supavisor
+      - name: Database ownership, OAuth state, revision, and replay tests
+        env:
+          ASSISTANT_TEST_DB_URL: postgresql://postgres:postgres@127.0.0.1:55322/postgres
+        run: pnpm --filter assistant test:db
+      - name: Check declarative schema drift
+        run: |
+          supabase db schema declarative sync --no-apply --workdir apps/assistant -f ci_drift
+          test -z "$(git status --porcelain apps/assistant/supabase/migrations apps/assistant/supabase/schemas)"
+      - name: Stop disposable database
+        if: always()
+        run: supabase stop --workdir apps/assistant --no-backup

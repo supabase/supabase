@@ -1,8 +1,12 @@
 import { createMCPClient } from '@ai-sdk/mcp'
-import { createToolSchemas } from '@supabase/mcp-server-supabase'
 import type { Tool, ToolSet } from 'ai'
 
 import { env } from '../../env.ts'
+import {
+  ASSISTANT_MCP_TOOLS,
+  canShareAssistantData,
+  type ProjectPermissionLevel,
+} from '../../permissions'
 import { annotateMcpToolError, type McpToolResult } from './mcp-tools.utils.ts'
 
 const SOURCE_NAME = 'supabase-assistant'
@@ -39,9 +43,11 @@ export function getRemoteMcpUrl(projectRef: string) {
 async function createSupabaseMCPClient({
   oauthToken,
   projectRef,
+  signal,
 }: {
   oauthToken: string
   projectRef: string
+  signal: AbortSignal
 }) {
   const url = getRemoteMcpUrl(projectRef)
   try {
@@ -49,6 +55,15 @@ async function createSupabaseMCPClient({
       name: SOURCE_NAME,
       transport: {
         type: 'http',
+        fetch: (input, init) =>
+          fetch(input, {
+            ...init,
+            signal: AbortSignal.any([
+              signal,
+              AbortSignal.timeout(30000),
+              ...(init?.signal ? [init.signal] : []),
+            ]),
+          }),
         url,
         headers: {
           Authorization: `Bearer ${oauthToken}`,
@@ -105,46 +120,58 @@ export const getMcpTools = async ({
   oauthToken,
   projectRef,
   signal,
+  aiOptInLevel,
 }: {
   oauthToken: string
   projectRef: string
   signal: AbortSignal
+  aiOptInLevel: ProjectPermissionLevel
 }) => {
   const mcpClient = await createSupabaseMCPClient({
     oauthToken,
     projectRef,
+    signal,
   })
 
-  let closed = false
+  let closing: Promise<void> | undefined
   const closeClient = () => {
-    if (closed) return
-    closed = true
-    void mcpClient.close().catch(() => {})
+    signal.removeEventListener('abort', onAbort)
+    return (closing ??= mcpClient.close().catch(() => {}))
   }
-
+  const onAbort = () => {
+    void closeClient()
+  }
   if (signal.aborted) {
-    closeClient()
-    return {} as ToolSet
+    await closeClient()
+    signal.throwIfAborted()
   }
-  signal.addEventListener('abort', closeClient, { once: true })
-
+  signal.addEventListener('abort', onAbort, { once: true })
   try {
-    // Same helper Codex/Claude-style AI SDK clients use: bind project_ref from
-    // the URL and drop mutating tools. list_tables stays the MCP tool.
-    const mcpTools = (await mcpClient.tools({
-      schemas: createToolSchemas({
-        projectScoped: true,
-        readOnly: true,
-      }),
-    })) as ToolSet
-
-    for (const toolName of UI_EXECUTED_TOOLS) {
-      delete mcpTools[toolName]
+    // The MCP SDK's result union includes provider tools; this transport returns dynamic function tools.
+    const available = (await mcpClient.tools()) as ToolSet
+    const tools: ToolSet = {}
+    for (const [name, minimum] of Object.entries(ASSISTANT_MCP_TOOLS)) {
+      const tool = available[name]
+      if (!tool) {
+        console.error(`MCP capability unavailable: ${name}`)
+        continue
+      }
+      tools[name] = canShareAssistantData(aiOptInLevel, minimum)
+        ? tool
+        : {
+            ...tool,
+            execute: async () => ({
+              message: 'This tool requires additional Assistant project data sharing permission.',
+            }),
+            toModelOutput: undefined,
+          }
     }
-
-    return withAnnotatedErrors(mcpTools, { projectRef, mcpUrl: env.mcpUrl })
+    return {
+      tools: withAnnotatedErrors(tools, { projectRef, mcpUrl: env.mcpUrl }),
+      close: closeClient,
+    }
   } catch (error) {
-    closeClient()
+    await closeClient()
     throw error
   }
 }

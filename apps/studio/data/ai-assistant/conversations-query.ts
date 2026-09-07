@@ -2,11 +2,7 @@ import { queryOptions } from '@tanstack/react-query'
 
 import { assistantFetch } from './fetcher'
 import { aiAssistantKeys } from './keys'
-import {
-  mapConversation,
-  unwrapConversationList,
-  type AssistantConversationApi,
-} from './map-conversation'
+import { parseConversationList } from './map-conversation'
 import { IS_PLATFORM } from '@/lib/constants'
 
 export type ConversationsVariables = { projectRef?: string }
@@ -14,11 +10,13 @@ export type ConversationsVariables = { projectRef?: string }
 async function getConversations({ projectRef }: ConversationsVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const payload = await assistantFetch<
-    AssistantConversationApi[] | { conversations?: AssistantConversationApi[] }
-  >(`/v1/projects/${projectRef}/conversations`, { method: 'GET' }, signal)
+  const payload = await assistantFetch<unknown>(
+    `/v1/projects/${projectRef}/conversations`,
+    { method: 'GET' },
+    signal
+  )
 
-  return unwrapConversationList(payload).map(mapConversation)
+  return parseConversationList(payload)
 }
 
 export const conversationsQueryOptions = ({ projectRef }: ConversationsVariables) =>

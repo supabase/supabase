@@ -430,6 +430,7 @@ per-file items only when a subtree has special cases.
       `cli-release-version`, `enabled-features-overrides`, `generate-attachment-url`,
       `get-deployment-commit`, `get-utc-time`, `status-override`)
 - [x] `routes/api/ai/**` — AI endpoints (`docs.ts` direct-ported as Web-native)
+- [x] `/api/ai/assistant-policy`: verified worker admission and project policy (Next + TanStack).
 - [x] `routes/api/connect/**`
 - [x] `routes/api/content/**`
 - [x] `routes/api/edge-functions/**`

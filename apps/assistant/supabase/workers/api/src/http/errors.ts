@@ -1,11 +1,13 @@
 export type ErrorCode =
   | 'unauthorized'
+  | 'consent_required'
   | 'oauth_required'
   | 'oauth_expired'
   | 'not_found'
   | 'invalid_request'
   | 'rate_limited'
   | 'internal'
+  | 'conflict'
 
 export function jsonError(
   status: number,
@@ -40,9 +42,5 @@ export function toErrorResponse(error: unknown): Response {
   }
 
   console.error(error)
-  return jsonError(
-    500,
-    'internal',
-    error instanceof Error ? error.message : 'Something went wrong. Try again.'
-  )
+  return jsonError(500, 'internal', 'Unable to complete the request. Try again.')
 }

@@ -79,6 +79,7 @@ import { Route as ApiIntegrationsStripeSyncRouteImport } from './routes/api/inte
 import { Route as ApiEdgeFunctionsTestRouteImport } from './routes/api/edge-functions/test'
 import { Route as ApiContentGraphqlRouteImport } from './routes/api/content/graphql'
 import { Route as ApiAiDocsRouteImport } from './routes/api/ai/docs'
+import { Route as ApiAiAssistantPolicyRouteImport } from './routes/api/ai/assistant-policy'
 import { Route as AuthCliLoginRouteImport } from './routes/_auth/cli/login'
 import { Route as AppSupportNewRouteImport } from './routes/_app/support/new'
 import { Route as AppSupportLinkRouteImport } from './routes/_app/support/link'
@@ -684,6 +685,11 @@ const ApiContentGraphqlRoute = ApiContentGraphqlRouteImport.update({
 const ApiAiDocsRoute = ApiAiDocsRouteImport.update({
   id: '/api/ai/docs',
   path: '/api/ai/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiAssistantPolicyRoute = ApiAiAssistantPolicyRouteImport.update({
+  id: '/api/ai/assistant-policy',
+  path: '/api/ai/assistant-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthCliLoginRoute = AuthCliLoginRouteImport.update({
@@ -2159,6 +2165,7 @@ export interface FileRoutesByFullPath {
   '/support/link': typeof AppSupportLinkRoute
   '/support/new': typeof AppSupportNewRoute
   '/cli/login': typeof AuthCliLoginRoute
+  '/api/ai/assistant-policy': typeof ApiAiAssistantPolicyRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
@@ -2476,6 +2483,7 @@ export interface FileRoutesByTo {
   '/support/link': typeof AppSupportLinkRoute
   '/support/new': typeof AppSupportNewRoute
   '/cli/login': typeof AuthCliLoginRoute
+  '/api/ai/assistant-policy': typeof ApiAiAssistantPolicyRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
@@ -2786,6 +2794,7 @@ export interface FileRoutesById {
   '/_app/support/link': typeof AppSupportLinkRoute
   '/_app/support/new': typeof AppSupportNewRoute
   '/_auth/cli/login': typeof AuthCliLoginRoute
+  '/api/ai/assistant-policy': typeof ApiAiAssistantPolicyRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
@@ -3107,6 +3116,7 @@ export interface FileRouteTypes {
     | '/support/link'
     | '/support/new'
     | '/cli/login'
+    | '/api/ai/assistant-policy'
     | '/api/ai/docs'
     | '/api/content/graphql'
     | '/api/edge-functions/test'
@@ -3424,6 +3434,7 @@ export interface FileRouteTypes {
     | '/support/link'
     | '/support/new'
     | '/cli/login'
+    | '/api/ai/assistant-policy'
     | '/api/ai/docs'
     | '/api/content/graphql'
     | '/api/edge-functions/test'
@@ -3733,6 +3744,7 @@ export interface FileRouteTypes {
     | '/_app/support/link'
     | '/_app/support/new'
     | '/_auth/cli/login'
+    | '/api/ai/assistant-policy'
     | '/api/ai/docs'
     | '/api/content/graphql'
     | '/api/edge-functions/test'
@@ -4038,6 +4050,7 @@ export interface RootRouteChildren {
   OrgChar91_Char93Route: typeof OrgChar91_Char93RouteWithChildren
   ProjectRefRoute: typeof ProjectRefRouteWithChildren
   ProjectChar91_Char93Route: typeof ProjectChar91_Char93RouteWithChildren
+  ApiAiAssistantPolicyRoute: typeof ApiAiAssistantPolicyRoute
   ApiAiDocsRoute: typeof ApiAiDocsRoute
   ApiContentGraphqlRoute: typeof ApiContentGraphqlRoute
   ApiEdgeFunctionsTestRoute: typeof ApiEdgeFunctionsTestRoute
@@ -4621,6 +4634,13 @@ declare module '@tanstack/react-router' {
       path: '/api/ai/docs'
       fullPath: '/api/ai/docs'
       preLoaderRoute: typeof ApiAiDocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai/assistant-policy': {
+      id: '/api/ai/assistant-policy'
+      path: '/api/ai/assistant-policy'
+      fullPath: '/api/ai/assistant-policy'
+      preLoaderRoute: typeof ApiAiAssistantPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth/cli/login': {
@@ -7119,6 +7139,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrgChar91_Char93Route: OrgChar91_Char93RouteWithChildren,
   ProjectRefRoute: ProjectRefRouteWithChildren,
   ProjectChar91_Char93Route: ProjectChar91_Char93RouteWithChildren,
+  ApiAiAssistantPolicyRoute: ApiAiAssistantPolicyRoute,
   ApiAiDocsRoute: ApiAiDocsRoute,
   ApiContentGraphqlRoute: ApiContentGraphqlRoute,
   ApiEdgeFunctionsTestRoute: ApiEdgeFunctionsTestRoute,
@@ -7255,11 +7276,15 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
+
 import type { startInstance } from './start.ts'
+
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
+
     router: Awaited<ReturnType<typeof getRouter>>
+
     config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }

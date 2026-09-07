@@ -1,12 +1,7 @@
 import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js'
-import { getAccessToken } from 'common'
+import { gotrueClient } from 'common'
 
-import {
-  getAssistantApiUrl,
-  getAssistantOAuthStartUrl,
-  getAssistantPublishableKey,
-  getAssistantSupabaseUrl,
-} from './assistant-backend'
+import { getAssistantApiUrl, getAssistantPublishableKey, getAssistantSupabaseUrl } from './backend'
 
 const ASSISTANT_AUTH_STORAGE_KEY = 'assistant-auth'
 const SESSION_EXPIRY_BUFFER_MS = 30_000
@@ -31,10 +26,19 @@ function getAssistantBrowserClient(): SupabaseClient | null {
   assistantClient = createClient(url, publishableKey, {
     auth: {
       persistSession: true,
-      autoRefreshToken: true,
+      // getSession refreshes on an enabled request; no background traffic after flag rollback.
+      autoRefreshToken: false,
       detectSessionInUrl: false,
       storageKey: ASSISTANT_AUTH_STORAGE_KEY,
     },
+  })
+  gotrueClient.onAuthStateChange((_event, session) => {
+    if (activeSubject && session?.user.id !== activeSubject) {
+      activeSubject = undefined
+      setTimeout(() => {
+        void clearAssistantSession()
+      }, 0)
+    }
   })
   return assistantClient
 }
@@ -113,73 +117,69 @@ async function exchangePlatformToken(platformAccessToken: string): Promise<Assis
   return session
 }
 
-export async function getAssistantAccessToken(): Promise<string> {
-  if (typeof window === 'undefined') {
-    throw new Error('Assistant auth is only available in the browser')
-  }
+let exchange: { subject: string; promise: Promise<string> } | undefined
+let activeSubject: string | undefined
 
+async function platformSession() {
+  const {
+    data: { session },
+  } = await gotrueClient.getSession()
+  if (!session) {
+    await clearAssistantSession()
+    throw new Error('Not signed in')
+  }
+  return session
+}
+
+export async function clearAssistantSession() {
+  activeSubject = undefined
+  // Do not instantiate an assistant client or make worker calls when unused.
+  if (assistantClient) await assistantClient.auth.signOut({ scope: 'local' })
+}
+
+export async function getAssistantRequestHeaders(): Promise<Record<string, string>> {
+  const platform = await platformSession()
+  const subject = platform.user.id
   const supabase = getAssistantBrowserClient()
   if (!supabase) throw new Error('Assistant backend is not configured')
-
+  activeSubject = subject
   const {
     data: { session },
   } = await supabase.auth.getSession()
-
-  if (isSessionValid(session)) {
-    return session!.access_token
+  let token: string
+  if (session?.user.app_metadata.platform_user_id === subject && isSessionValid(session)) {
+    token = session.access_token
+  } else {
+    // A previous account's exchange must settle before another can change storage.
+    if (exchange && exchange.subject !== subject) await exchange.promise.catch(() => {})
+    if (!exchange) {
+      const promise = (async () => {
+        await supabase.auth.signOut({ scope: 'local' })
+        const exchanged = await exchangePlatformToken(platform.access_token)
+        if ((await platformSession()).user.id !== subject || activeSubject !== subject) {
+          throw new Error('Your account changed. Reopen the assistant.')
+        }
+        const { data, error } = await supabase.auth.setSession(exchanged)
+        if (error) throw error
+        if (data.user?.app_metadata.platform_user_id !== subject) {
+          await clearAssistantSession()
+          throw new Error('Assistant identity does not match the current account')
+        }
+        return exchanged.access_token
+      })()
+      exchange = { subject, promise }
+      void promise
+        .finally(() => {
+          if (exchange?.promise === promise) exchange = undefined
+        })
+        .catch(() => {})
+    }
+    token = await exchange.promise
   }
-
-  const platformAccessToken = await getAccessToken()
-  if (!platformAccessToken) throw new Error('Not signed in')
-
-  const exchanged = await exchangePlatformToken(platformAccessToken)
-  const { error } = await supabase.auth.setSession({
-    access_token: exchanged.access_token,
-    refresh_token: exchanged.refresh_token,
-  })
-  if (error) throw error
-
-  return exchanged.access_token
-}
-
-export async function startAssistantOAuth(orgSlug: string, returnTo: string): Promise<string> {
-  const url = getAssistantOAuthStartUrl(orgSlug, returnTo)
-  if (!url) throw new Error('Assistant API URL is not configured')
-
-  const token = await getAssistantAccessToken()
-  const response = await fetch(url, {
-    headers: {
-      Accept: 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  })
-
-  let payload: unknown
-  try {
-    payload = await response.json()
-  } catch {
-    payload = undefined
+  const current = await platformSession()
+  if (current.user.id !== subject) throw new Error('Your account changed. Reopen the assistant.')
+  return {
+    Authorization: `Bearer ${token}`,
+    'x-platform-authorization': `Bearer ${current.access_token}`,
   }
-
-  if (!response.ok) {
-    const message =
-      payload &&
-      typeof payload === 'object' &&
-      'message' in payload &&
-      typeof payload.message === 'string'
-        ? payload.message
-        : `Failed to start OAuth (${response.status})`
-    throw new Error(message)
-  }
-
-  if (
-    !payload ||
-    typeof payload !== 'object' ||
-    !('authorize_url' in payload) ||
-    typeof payload.authorize_url !== 'string'
-  ) {
-    throw new Error('Assistant OAuth start did not return an authorize URL')
-  }
-
-  return payload.authorize_url
 }

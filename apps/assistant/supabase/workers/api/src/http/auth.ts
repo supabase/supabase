@@ -1,11 +1,11 @@
 import type { SupabaseContext } from '@supabase/server'
-import type { SupabaseClient } from '@supabase/supabase-js'
 
+import type { Database } from '../db/database.types'
 import { HttpError } from './errors'
 
-export type HandlerContext = Omit<SupabaseContext, 'supabase' | 'supabaseAdmin'> & {
-  supabase: SupabaseClient
-  supabaseAdmin: SupabaseClient
+export type HandlerContext = SupabaseContext<Database> & {
+  platformUserId?: string
+  platformToken?: string
 }
 
 export function requireUserId(ctx: HandlerContext): string {

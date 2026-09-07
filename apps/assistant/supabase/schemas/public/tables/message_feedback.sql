@@ -15,9 +15,17 @@ create index on public.message_feedback (user_id);
 
 alter table public.message_feedback enable row level security;
 
-create policy "own feedback"
-  on public.message_feedback
-  for all
-  to authenticated
-  using (user_id = (select auth.uid()))
-  with check (user_id = (select auth.uid()));
+create policy "own message_feedback"
+  on public.message_feedback for select to authenticated
+  using (
+    user_id = (select auth.uid())
+    and exists (
+      select 1 from public.conversations c
+      where c.id = conversation_id and c.user_id = (select auth.uid()) and c.deleted_at is null
+    )
+  );
+
+-- Writes go through the worker's ownership-checked transactions so browser clients
+-- cannot forge assistant tool approvals, revisions, or cross-user child records.
+revoke all on public.message_feedback from anon, authenticated;
+grant select on public.message_feedback to authenticated;

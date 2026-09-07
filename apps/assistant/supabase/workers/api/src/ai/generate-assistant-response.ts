@@ -9,16 +9,16 @@ import {
 } from 'ai'
 import { source } from 'common-tags'
 
+import type { ProjectPermissionLevel as AiOptInLevel } from '../permissions'
 import { buildAssistantContextMessages, NO_SCHEMA_ACCESS_MESSAGE } from './assistant-context'
 import { prepareMessagesForModel } from './generate-assistant-response.utils'
-import type { AiOptInLevel } from './opt-in'
 import { CHAT_PROMPT, GENERAL_PROMPT, LIMITATIONS_PROMPT, SECURITY_PROMPT } from './prompts'
 
 export async function generateAssistantResponse({
   messages: rawMessages,
   model,
   tools,
-  aiOptInLevel = 'schema_and_log_and_data',
+  aiOptInLevel = 'disabled',
   getSchemas,
   projectRef,
   chatName,

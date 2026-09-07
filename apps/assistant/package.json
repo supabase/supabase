@@ -13,7 +13,8 @@
     "workers:new": "npx --yes supabase@beta experimental workers new",
     "workers:push": "node esbuild.config.mjs && npx --yes supabase@beta experimental workers push",
     "workers:list": "npx --yes supabase@beta experimental workers list",
-    "workers:status": "npx --yes supabase@beta experimental workers status"
+    "workers:status": "npx --yes supabase@beta experimental workers status",
+    "test:db": "vitest --run --config vitest.db.config.ts"
   },
   "dependencies": {
     "@ai-sdk/mcp": "2.0.31",

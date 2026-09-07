@@ -3,13 +3,15 @@ import { toast } from 'sonner'
 
 import { assistantFetch } from './fetcher'
 import { aiAssistantKeys } from './keys'
-import { mapConversation, type AssistantConversationApi } from './map-conversation'
+import { parseConversation } from './map-conversation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type ConversationUpdateVariables = {
   id: string
   projectRef?: string
   payload: {
+    revision: number
+    support_metadata?: import('@/state/ai-assistant-state').SupportChatMetadata
     name?: string
     model?: string
   }
@@ -18,12 +20,12 @@ export type ConversationUpdateVariables = {
 export async function updateConversation({ id, payload }: ConversationUpdateVariables) {
   if (!id) throw new Error('id is required')
 
-  const data = await assistantFetch<AssistantConversationApi>(`/v1/conversations/${id}`, {
+  const data = await assistantFetch<unknown>(`/v1/conversations/${id}`, {
     method: 'PATCH',
     body: JSON.stringify(payload),
   })
 
-  return mapConversation(data)
+  return parseConversation(data)
 }
 
 type ConversationUpdateData = Awaited<ReturnType<typeof updateConversation>>

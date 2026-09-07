@@ -183,14 +183,18 @@ export function resolveMcpUrl({
  * actually read, so importing this module in tests does not require a full env.
  */
 export const env = {
+  get policyUrl() {
+    const url = new URL(required('ASSISTANT_POLICY_URL'))
+    if (
+      url.protocol !== 'https:' &&
+      !(url.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(url.hostname))
+    ) {
+      throw new Error('ASSISTANT_POLICY_URL must use HTTPS outside localhost')
+    }
+    return url.toString()
+  },
   get supabaseDbUrl() {
     return required(...DB_URL_NAMES)
-  },
-  get platformJwksUrl() {
-    return required('PLATFORM_JWKS_URL')
-  },
-  get platformJwtIssuer() {
-    return readEnv('PLATFORM_JWT_ISSUER')
   },
   get supabaseOauthClientId() {
     return required('OAUTH_CLIENT_ID')
