@@ -1,29 +1,18 @@
+import { monitoringAgents } from '~/data/monitoring-agents.data'
+import { getMonitoringAgentPrompt } from '~/data/monitoring-agents.utils'
 import { describe, expect, it } from 'vitest'
 
 import { AgentSetup } from './AgentSetup'
 
+const agents = Object.values(monitoringAgents)
+
 describe('AgentSetup markdown schema', () => {
-  it('serializes the prompt and harness setup for a registered agent', () => {
-    const markdown = AgentSetup({ props: { id: 'health' } })
+  it.each(agents)('exports the same complete prompt as the UI for $id', (agent) => {
+    const markdown = AgentSetup({ props: { id: agent.id } })
+    const prompt = markdown.match(/```text\n([\s\S]*?)\n```/)?.[1]
 
-    expect(markdown).toContain('**Prompt**')
-    expect(markdown).toContain('You are "Health monitor"')
-    expect(markdown).toContain('```text')
-    expect(markdown).toContain('**Claude**')
-    expect(markdown).toContain('**Codex**')
-    expect(markdown).toContain('**Cursor**')
-    expect(markdown).toContain('claude.ai/code/routines')
-    expect(markdown).toContain('`0 * * * *`')
-    expect(markdown).toContain('[Claude docs](https://code.claude.com/docs/en/routines)')
-    expect(markdown).toContain('[Codex docs](https://developers.openai.com/codex/app/automations)')
-    expect(markdown).toContain('[Cursor docs](https://cursor.com/docs/cloud-agent/automations)')
-  })
-
-  it('points hourly agents at Claude cloud routines', () => {
-    const markdown = AgentSetup({ props: { id: 'performance' } })
-
-    expect(markdown).toContain('claude.ai/code/routines')
-    expect(markdown).not.toContain('Desktop scheduled task')
+    expect(prompt).toBe(getMonitoringAgentPrompt(agent))
+    expect(markdown).toContain('/docs/guides/observability/automate-with-agents#run-the-routine')
   })
 
   it('fails clearly for an unknown agent', () => {

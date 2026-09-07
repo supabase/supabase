@@ -1,37 +1,17 @@
 ---
 id: 'automate-with-agents-performance'
 title: 'Performance monitor'
-subtitle: 'Performance monitor is a read-only agent. It inspects query statistics, blocking sessions, and Performance Advisor findings, then proposes the next change for a person to apply.'
-description: 'A query health agent that looks for slow queries, lock waits, and performance advisor findings.'
+description: 'Long-running and blocked sessions, query execution-time regressions, and Performance Advisor warnings and errors.'
 ---
 
-```mermaid
-flowchart TD
-  Schedule([Once per hour]) --> Inspect[get_advisors and execute_sql]
-  Inspect --> Signals["Slow queries, lock waits, advisor findings"]
-  Signals --> Review{Needs a change?}
-  Review -->|Yes| Report[Finding and verification plan]
-  Review -->|No| Silent[Stay silent]
-```
+Performance monitor reads project data and reports findings from these checks: long-running and blocked sessions, query execution-time regressions, and Performance Advisor warnings and errors.
 
-## What it watches
+Use the [canonical checks](/docs/guides/observability/detecting#performance) for queries, thresholds, prerequisites, and interpretation. It records **finding**, **clear**, or **unable to assess** for each check. Missing history or failed access never becomes a healthy result. New findings and changed assessment failures are reported; unchanged repeats and clear runs stay quiet.
 
-- Slow or regressing queries
-- Lock waits and long-running sessions
-- Unindexed foreign keys and other Performance Advisor findings
-
-It uses `get_advisors` and read-only `execute_sql` on project-scoped [Supabase MCP](/docs/guides/ai-tools/mcp). It does not create indexes, rewrite queries, or cancel sessions.
-
-## When it watches
+## Schedule
 
 <AgentWatchSchedule id="performance" />
 
-## What it will output
-
-Performance monitor reports slow or regressing queries, lock waits, and Performance Advisor findings, with a verification plan. It can recommend that a person cancel a session. It does not cancel the session or create indexes.
-
-<$Partial path="monitoring_agent_output.mdx" />
-
-## Set up the agent
+## Prompt
 
 <AgentSetup id="performance" />

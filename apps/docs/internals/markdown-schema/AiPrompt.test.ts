@@ -1,3 +1,4 @@
+import { aiPrompts } from '~/data/ai-prompts.data'
 import { describe, expect, it } from 'vitest'
 
 import { AiPrompt } from './AiPrompt'
@@ -17,35 +18,15 @@ describe('AiPrompt markdown schema', () => {
     expect(markdown).toContain('```text')
   })
 
-  it.each([
-    ['monitoring-agent-health', 'Health monitor', 'health'],
-    ['monitoring-agent-security', 'Security monitor', 'security'],
-    ['monitoring-agent-performance', 'Performance monitor', 'performance'],
-    ['monitoring-agent-usage', 'Capacity monitor', 'usage'],
-  ])('serializes the %s agent prompt', (id, persona, detectionSection) => {
-    const markdown = AiPrompt({ props: { id, includeInMarkdown: true } })
-
-    expect(markdown).toContain('**AI Prompt**')
-    expect(markdown).toContain(persona)
-    expect(markdown).toContain('read-only')
-    expect(markdown).toContain(
-      `https://supabase.com/docs/guides/observability/detecting.md#${detectionSection}`
-    )
-    expect(markdown).toContain('```text')
-  })
-
-  it('serializes the monitoring overview prompt', () => {
-    const markdown = AiPrompt({
-      props: { id: 'monitoring-and-debugging', includeInMarkdown: true },
-    })
-
-    expect(markdown).toContain('Help me monitor and debug my Supabase project.')
-    expect(markdown).toContain('npm install -g supabase')
-    expect(markdown).toContain('npx plugins add supabase-community/supabase-plugin')
-    expect(markdown).toContain('read-only')
-    expect(markdown).toContain('https://supabase.com/docs/guides/observability.md')
-    expect(markdown).toContain('```text')
-  })
+  it.each(Object.keys(aiPrompts).filter((id) => id.startsWith('monitoring-')))(
+    'exports the complete shared %s prompt when opted in',
+    (id) => {
+      const markdown = AiPrompt({ props: { id, includeInMarkdown: true } })
+      expect(markdown.match(/```text\n([\s\S]*?)\n```/)?.[1]).toBe(
+        aiPrompts[id as keyof typeof aiPrompts]
+      )
+    }
+  )
 
   it('fails clearly for an unknown opted-in prompt', () => {
     expect(() => AiPrompt({ props: { id: 'missing-prompt', includeInMarkdown: true } })).toThrow(

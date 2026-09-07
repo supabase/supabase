@@ -1,37 +1,17 @@
 ---
 id: 'automate-with-agents-usage'
 title: 'Capacity monitor'
-subtitle: 'Capacity monitor is a read-only agent. It trends API request volume and error rates, then warns before traffic or errors look like a capacity problem.'
-description: 'A capacity agent that tracks API request growth, error rates, and approaching resource ceilings.'
+description: 'Database and table sizes, connection snapshots, request growth, and resource forecasts supported by saved history and confirmed limits.'
 ---
 
-```mermaid
-flowchart TD
-  Schedule([Once each morning]) --> Inspect[query_logs and usage APIs]
-  Inspect --> Signals["Request growth, error rates, resource trends"]
-  Signals --> Limit{Likely to hit a limit?}
-  Limit -->|Yes| Report["Trend, projected date, scaling guide"]
-  Limit -->|No| Silent[Stay silent]
-```
+Capacity monitor reads project data and reports findings from these checks: database and table sizes, connection snapshots, request growth, and resource forecasts supported by saved history and confirmed limits.
 
-## What it watches
+Use the [canonical checks](/docs/guides/observability/detecting#usage) for queries, thresholds, prerequisites, and interpretation. It records **finding**, **clear**, or **unable to assess** for each check. Missing history or failed access never becomes a healthy result. New findings and changed assessment failures are reported; unchanged repeats and clear runs stay quiet.
 
-- API request growth against a recent baseline
-- Server-error rate increases
-- Disk, connection, or table growth when database inspection is available
-
-It uses `query_logs` on project-scoped, read-only [Supabase MCP](/docs/guides/ai-tools/mcp) and the [Management API usage endpoints](/docs/reference/api/v1-get-project-usage-api-count) when those are already authorized. It does not change billing, compute, or plan settings. MCP does not expose organization billing totals.
-
-## When it watches
+## Schedule
 
 <AgentWatchSchedule id="usage" />
 
-## What it will output
-
-Capacity monitor reports request growth, error-rate changes, and resource trends. If a metric looks likely to hit a limit within 14 days, it flags the date and the relevant scaling guide.
-
-<$Partial path="monitoring_agent_output.mdx" />
-
-## Set up the agent
+## Prompt
 
 <AgentSetup id="usage" />
