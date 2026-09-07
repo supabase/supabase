@@ -1,19 +1,9 @@
-/* eslint-disable turbo/no-undeclared-env-vars */
-const isDev = process.env.NODE_ENV === 'development'
-
-if (!process.env.VELITE_STARTED && isDev) {
-  process.env.VELITE_STARTED = '1'
-  const { build } = await import('velite')
-  await build({ watch: true, clean: false })
-}
-
-const rawBasePath = process.env.NEXT_PUBLIC_BASE_PATH || 'design-system'
-const BASE_PATH = rawBasePath.startsWith('/') ? rawBasePath : `/${rawBasePath}`
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '/design-system'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ['ui', 'common', 'shared-data', 'icons', 'tsconfig'],
-  basePath: BASE_PATH,
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/design-system',
   images: {
     remotePatterns: [
       {

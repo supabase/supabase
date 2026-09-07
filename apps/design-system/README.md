@@ -13,7 +13,7 @@ cp apps/design-system/.env.local.example apps/design-system/.env.local
 cd apps/design-system
 # Install dependencies
 pnpm i
-# Build the registry, then start Next.js (with Velite watch) and the registry watcher
+# Build the registry and Velite content, then start the dev servers
 pnpm dev
 ```
 
@@ -24,52 +24,43 @@ Or from `apps/design-system`:
 cp .env.local.example .env.local
 # Install dependencies
 pnpm i
-# Build the registry, then start Next.js (with Velite watch) and the registry watcher
+# Build the registry and Velite content, then start the dev servers
 pnpm dev
 ```
 
-The `dev` command builds the registry once, then runs the Next.js dev server (which starts Velite in watch mode) and a registry file watcher in parallel. That is the recommended workflow.
+The `dev` command builds the registry and Velite content, then runs the Next.js dev server and Velite watcher in parallel.
 
 Open [http://localhost:3003/design-system](http://localhost:3003/design-system) in your browser to see the result.
-
-### Hot reload
-
-There are two content pipelines:
-
-| What you edit                                 | Watcher                        | Notes                                                                           |
-| --------------------------------------------- | ------------------------------ | ------------------------------------------------------------------------------- |
-| `content/docs/**/*.mdx`                       | Velite (via `next.config.mjs`) | Rebuilds on save; wait for `[VELITE] rebuild finished` before expecting updates |
-| `registry/**` (examples, `examples.ts`, etc.) | `dev:registry` (`tsx watch`)   | Rebuilds `__registry__` on save                                                 |
-
-Velite runs inside the Next.js dev server because Turbopack does not support the old Contentlayer webpack plugin. Registry output is separate and must be watched explicitly.
 
 Doc pages load compiled MDX from `.velite/codes/*.json` per document. Metadata lives in the smaller `allDocs.json` index (~367KB instead of ~27MB), so content edits only reload the changed doc's code.
 
 ### Alternative commands
 
-You can also run the development server and registry watcher separately. Build the registry first, because `dev:next` and `dev:registry` do not:
+You can also run the development server and content watcher separately. Build the registry and content first, because `dev:next` and `dev:content` do not:
 
 ```bash
 pnpm build:registry
+pnpm build:content
 
-# Run only the Next.js development server (includes Velite watch)
+# Run only the Next.js development server
 pnpm dev:next
 
-# Run only the registry watcher (in a separate terminal shell)
-pnpm dev:registry
+# Run only the Velite content watcher (in a separate terminal shell)
+pnpm dev:content
 ```
 
 From the repo root, `pnpm dev:design-system` runs the same `dev` script. If you split the watchers from the root, build first:
 
 ```bash
 pnpm --filter=design-system build:registry
+pnpm --filter=design-system build:content
 pnpm --filter=design-system dev:next
-pnpm --filter=design-system dev:registry
+pnpm --filter=design-system dev:content
 ```
 
 ### Watching for MDX changes
 
-Velite watches `content/docs` while `dev:next` is running. If you run `pnpm dev:next` on its own, Velite still starts via `next.config.mjs`. You do not need a separate `velite dev` process.
+The `dev` command watches MDX files and hot-reloads them. If you are running `pnpm dev:next` on its own, also run `pnpm dev:content` in another terminal.
 
 ### Adding components
 
