@@ -24,16 +24,25 @@ Until now, the packages were scattered across multiple repositories, with their 
 Gotrue was on `v6.x.x`, Realtime on `v7.x.x`, while the main package was on `v1.x.x`.
 
 From `v8.0.0`, all packages share the same version number. Gotrue, PostgREST, Realtime, Storage, Functions, and the umbrella `supabase` package all release together. 
-When you see a version, you know which set of libraries it pairs with. 
-We picked `v8.x.x` because it was the highest major version in the group, so it was the only number that worked for lockstep.
+When you see a version, you know exactly which packages and dependencies it pairs with.
+On your side, it makes upgrades much easier.
+
+Moving from `v1.x.x` to `v8.0.0`, in one go, is quite a bump and unusual. 
+It was our only option to guarantee lockstep-versioning: `v8.0.0` was the first major bump available with Realtime already on `v7.x.x`. 
+It's a price we only have to pay once.
 
 ## Everything in one repo
 All the packages now live in a single repository: [supabase-community/supabase-csharp](https://github.com/supabase-community/supabase-csharp). 
 It simplifies everything (especially cross-package work), whether it's contributions, maintenance or releases.
 
+Previous repositories are still available but have been archived, and are now read-only. 
+They also have been removed from our [Community page](https://github.com/supabase-community/).
+
 ## New extension package
-A new package, `Supabase.Extensions.DependencyInjection`, registers the Supabase client with the .NET service container, and lets you inject your own `HttpClient`. 
+A new package, `Supabase.Extensions.DependencyInjection` (available on [NuGet](https://www.nuget.org/packages/Supabase.Extensions.DependencyInjection/), registers the Supabase client with the .NET service container, and lets you inject your own `HttpClient`. 
 If you run ASP.NET Core, this is the way to register Supabase into your app.
+
+This package also follows lockstep-versioning, and therefore start at `v8.0.0` as well.
 
 ## Misc updates
 These did not deserve an entire section, but are worth mentioning:
