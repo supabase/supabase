@@ -1,0 +1,325 @@
+#!/usr/bin/env bash
+# supa — Supabase multi-database CLI
+#
+# Usage (run from repo root):
+#   ./scripts/supa db list
+#   ./scripts/supa db add  --ref X --name "My App" --password secret [--host H] [--dry-run]
+#   ./scripts/supa db remove --ref X [--dry-run]
+#   ./scripts/supa db status [--ref X]
+#
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+REGISTRY="${DATABASE_REGISTRY_PATH:-$REPO_ROOT/docker/volumes/registry/databases.json}"
+REGISTRY_PY="$SCRIPT_DIR/lib/registry.py"
+
+# ── colour helpers ──────────────────────────────────────────────────────────
+bold()  { printf '\033[1m%s\033[0m' "$*"; }
+green() { printf '\033[32m%s\033[0m' "$*"; }
+red()   { printf '\033[31m%s\033[0m' "$*"; }
+dim()   { printf '\033[2m%s\033[0m' "$*"; }
+
+die() { echo "$(red "error:") $*" >&2; exit 1; }
+info() { echo "  $(dim "→") $*"; }
+
+# ── db list ──────────────────────────────────────────────────────────────────
+cmd_db_list() {
+  python3 - "$REGISTRY" << 'PYEOF'
+import sys, json, subprocess, os
+
+reg_path = sys.argv[1]
+if not os.path.exists(reg_path):
+    print("No registry found at", reg_path)
+    sys.exit(0)
+
+reg = json.load(open(reg_path))
+dbs = reg.get("databases", [])
+if not dbs:
+    print("No databases registered.")
+    sys.exit(0)
+
+col = [12, 22, 20, 6]
+header = f"{'REF':<{col[0]}}  {'NAME':<{col[1]}}  {'HOST':<{col[2]}}  {'PORT':<{col[3]}}  STATUS"
+print("\033[1m" + header + "\033[0m")
+print("─" * (sum(col) + 8 + 10))
+
+for db in dbs:
+    ref = db["ref"]
+    container = f"db-{ref}" if ref != "default" else "db"
+    try:
+        out = subprocess.run(
+            ["docker", "inspect", "--format", "{{.State.Status}}", container],
+            capture_output=True, text=True, timeout=3
+        )
+        status = out.stdout.strip() if out.returncode == 0 else "not found"
+        if status == "running":
+            status = "\033[32m" + status + "\033[0m"
+        elif status in ("exited", "dead"):
+            status = "\033[31m" + status + "\033[0m"
+        else:
+            status = "\033[2m" + status + "\033[0m"
+    except Exception:
+        status = "\033[2munknown\033[0m"
+    print(f"{db['ref']:<{col[0]}}  {db['name']:<{col[1]}}  {db['host']:<{col[2]}}  {db['port']:<{col[3]}}  {status}")
+PYEOF
+}
+
+# ── db status ────────────────────────────────────────────────────────────────
+cmd_db_status() {
+  local REF=""
+  while [[ "$#" -gt 0 ]]; do
+    case $1 in
+      --ref) REF="$2"; shift ;;
+      *) die "Unknown argument: $1" ;;
+    esac
+    shift
+  done
+
+  python3 - "$REGISTRY" "$REF" << 'PYEOF'
+import sys, json, subprocess, os
+
+reg_path, target_ref = sys.argv[1], sys.argv[2]
+if not os.path.exists(reg_path):
+    print("No registry found.")
+    sys.exit(1)
+
+reg = json.load(open(reg_path))
+dbs = reg.get("databases", [])
+if target_ref:
+    dbs = [d for d in dbs if d["ref"] == target_ref]
+    if not dbs:
+        print(f"No database with ref '{target_ref}' found.")
+        sys.exit(1)
+
+for db in dbs:
+    ref = db["ref"]
+    container = f"db-{ref}" if ref != "default" else "db"
+    print(f"\033[1m{ref}\033[0m  ({db['name']})")
+    print(f"  host:      {db['host']}:{db['port']}")
+    print(f"  container: {container}")
+    try:
+        out = subprocess.run(
+            ["docker", "inspect", "--format",
+             "{{.State.Status}} (health: {{if .State.Health}}{{.State.Health.Status}}{{else}}n/a{{end}})",
+             container],
+            capture_output=True, text=True, timeout=3
+        )
+        if out.returncode == 0:
+            print(f"  status:    {out.stdout.strip()}")
+        else:
+            print(f"  status:    \033[2mnot found\033[0m")
+    except Exception:
+        print(f"  status:    \033[2munknown (docker not available)\033[0m")
+    print()
+PYEOF
+}
+
+# ── db add ────────────────────────────────────────────────────────────────────
+cmd_db_add() {
+  local REF="" NAME="" HOST="" PORT=5432 DATABASE="postgres" PASSWORD="" DRY_RUN=false
+
+  while [[ "$#" -gt 0 ]]; do
+    case $1 in
+      --ref)      REF="$2";      shift ;;
+      --name)     NAME="$2";     shift ;;
+      --host)     HOST="$2";     shift ;;
+      --port)     PORT="$2";     shift ;;
+      --database) DATABASE="$2"; shift ;;
+      --password) PASSWORD="$2"; shift ;;
+      --dry-run)  DRY_RUN=true ;;
+      *) die "Unknown argument: $1" ;;
+    esac
+    shift
+  done
+
+  [[ -z "$REF" ]]      && die "--ref is required"
+  [[ -z "$NAME" ]]     && die "--name is required"
+  [[ -z "$PASSWORD" ]] && die "--password is required"
+  [[ -z "$HOST" ]] && HOST="db-$REF"
+
+  if $DRY_RUN; then
+    echo "$(bold "Dry run — no changes will be made")"
+    echo ""
+    echo "Would add to registry:"
+    local _SLUG="${REF^^}"; _SLUG="${_SLUG//-/_}"
+    echo "  ref:           $REF"
+    echo "  name:          $NAME"
+    echo "  host:          $HOST"
+    echo "  port:          $PORT"
+    echo "  database:      $DATABASE"
+    echo "  password_env:  DB_${_SLUG}_PASSWORD"
+    echo "  jwt_secret_env: DB_${_SLUG}_JWT_SECRET"
+    echo ""
+    echo "Would run:"
+    echo "  1. Add entry to databases.json"
+    echo "  2. Append env vars to docker/.env"
+    echo "  3. Regenerate docker-compose.multi.yml"
+    echo "  4. docker compose up -d db-$REF"
+    return
+  fi
+
+  echo "$(bold "Adding database '$REF'...")"
+
+  # Step 1 — add to registry
+  info "Updating databases.json"
+  DATABASE_REGISTRY_PATH="$REGISTRY" python3 "$REGISTRY_PY" add \
+    "$REF" "$NAME" "$HOST" "$PORT" "$DATABASE"
+
+  # Step 2 — append env vars to docker/.env
+  info "Appending env vars to docker/.env"
+  local ENV_FILE="$REPO_ROOT/docker/.env"
+  local SLUG="${REF^^}"; SLUG="${SLUG//-/_}"
+  local JWT_SECRET
+  JWT_SECRET=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+
+  {
+    echo ""
+    echo "# Database: $REF"
+    echo "DB_${SLUG}_PASSWORD=$PASSWORD"
+    echo "DB_${SLUG}_JWT_SECRET=$JWT_SECRET"
+    echo "DB_${SLUG}_ANON_KEY="
+    echo "DB_${SLUG}_SERVICE_KEY="
+  } >> "$ENV_FILE"
+
+  # Step 3 — regenerate compose
+  info "Regenerating docker-compose.multi.yml"
+  (cd "$REPO_ROOT/docker" && python3 generate-multi.py 2>&1 | tail -3)
+
+  # Step 4 — start the database container
+  info "Starting container db-$REF"
+  (cd "$REPO_ROOT/docker" && docker compose -f docker-compose.yml -f docker-compose.multi.yml \
+    up -d "db-$REF" 2>&1 | tail -5) || echo "  (container will start on next: docker compose up -d)"
+
+  echo ""
+  echo "$(green "✓") Database '$REF' added."
+  echo ""
+  echo "  Connection: postgresql://postgres:$PASSWORD@$HOST:$PORT/$DATABASE"
+  echo "  JWT secret: $JWT_SECRET"
+  echo ""
+  echo "  Run '$(bold "./scripts/supa db list")' to verify."
+  echo "  Run '$(bold "docker compose -f docker/docker-compose.yml -f docker/docker-compose.multi.yml up -d")' to start all services."
+}
+
+# ── db remove ─────────────────────────────────────────────────────────────────
+cmd_db_remove() {
+  local REF="" DRY_RUN=false
+
+  while [[ "$#" -gt 0 ]]; do
+    case $1 in
+      --ref)     REF="$2"; shift ;;
+      --dry-run) DRY_RUN=true ;;
+      *) die "Unknown argument: $1" ;;
+    esac
+    shift
+  done
+
+  [[ -z "$REF" ]] && die "--ref is required"
+  [[ "$REF" == "default" ]] && die "Cannot remove the 'default' database."
+
+  if $DRY_RUN; then
+    echo "$(bold "Dry run — no changes will be made")"
+    echo ""
+    echo "Would remove database '$REF':"
+    echo "  1. Stop and remove container db-$REF"
+    echo "  2. Remove entry from databases.json"
+    echo "  3. Remove env var lines from docker/.env"
+    echo "  4. Regenerate docker-compose.multi.yml"
+    return
+  fi
+
+  echo "$(bold "Removing database '$REF'...")"
+
+  # Step 1 — stop container
+  info "Stopping container db-$REF"
+  (cd "$REPO_ROOT/docker" && \
+    docker compose -f docker-compose.yml -f docker-compose.multi.yml \
+      stop "db-$REF" 2>/dev/null && \
+    docker compose -f docker-compose.yml -f docker-compose.multi.yml \
+      rm -f "db-$REF" 2>/dev/null) || \
+  echo "  (container not running — skipped)"
+
+  # Step 2 — remove from registry
+  info "Removing from databases.json"
+  DATABASE_REGISTRY_PATH="$REGISTRY" python3 "$REGISTRY_PY" remove "$REF"
+
+  # Step 3 — remove env var lines from docker/.env
+  info "Cleaning up docker/.env"
+  local ENV_FILE="$REPO_ROOT/docker/.env"
+  local SLUG="${REF^^}"; SLUG="${SLUG//-/_}"
+  if [[ -f "$ENV_FILE" ]]; then
+    python3 - "$ENV_FILE" "$SLUG" "$REF" << 'PYEOF'
+import sys, re
+env_file, slug, ref = sys.argv[1], sys.argv[2], sys.argv[3]
+lines = open(env_file).readlines()
+filtered = []
+i = 0
+while i < len(lines):
+    line = lines[i]
+    if line.strip() == f"# Database: {ref}":
+        i += 1  # skip comment
+        while i < len(lines) and (re.match(rf"^DB_{slug}_", lines[i]) or lines[i].strip() == ""):
+            i += 1
+        continue
+    if re.match(rf"^DB_{slug}_", line):
+        i += 1
+        continue
+    filtered.append(line)
+    i += 1
+with open(env_file, "w") as f:
+    f.writelines(filtered)
+print("ok")
+PYEOF
+  fi
+
+  # Step 4 — regenerate compose
+  info "Regenerating docker-compose.multi.yml"
+  (cd "$REPO_ROOT/docker" && python3 generate-multi.py 2>&1 | tail -3)
+
+  echo ""
+  echo "$(green "✓") Database '$REF' removed."
+}
+
+# ── router ────────────────────────────────────────────────────────────────────
+usage() {
+  cat << 'EOF'
+supa — Supabase multi-database CLI
+
+Usage:
+  supa db list
+  supa db add  --ref <ref> --name <name> --password <pass> [--host <host>] [--dry-run]
+  supa db remove --ref <ref> [--dry-run]
+  supa db status [--ref <ref>]
+
+Options:
+  --dry-run   Print what would happen without making changes.
+
+Examples:
+  supa db add --ref analytics --name "Analytics" --password hunter2
+  supa db list
+  supa db status --ref analytics
+  supa db remove --ref analytics
+EOF
+}
+
+main() {
+  [[ "$#" -eq 0 ]] && usage && exit 0
+  local group="$1"; shift
+  case "$group" in
+    db)
+      [[ "$#" -eq 0 ]] && usage && exit 0
+      local sub="$1"; shift
+      case "$sub" in
+        list)   cmd_db_list "$@" ;;
+        add)    cmd_db_add "$@" ;;
+        remove) cmd_db_remove "$@" ;;
+        status) cmd_db_status "$@" ;;
+        *)      die "Unknown subcommand: db $sub. Try: list, add, remove, status" ;;
+      esac
+      ;;
+    --help|-h|help) usage ;;
+    *) die "Unknown command: $group. Try 'supa db'" ;;
+  esac
+}
+
+main "$@"
