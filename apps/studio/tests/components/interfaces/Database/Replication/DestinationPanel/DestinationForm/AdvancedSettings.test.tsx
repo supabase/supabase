@@ -5,11 +5,11 @@ import { useForm } from 'react-hook-form'
 import { Form } from 'ui'
 import { describe, expect, it } from 'vitest'
 
-import { AdvancedSettings } from './AdvancedSettings'
+import { AdvancedSettings } from '@/components/interfaces/Database/Replication/DestinationPanel/DestinationForm/AdvancedSettings'
 import {
   DestinationPanelFormSchema,
   type DestinationPanelSchemaType,
-} from './DestinationForm.schema'
+} from '@/components/interfaces/Database/Replication/DestinationPanel/DestinationForm/DestinationForm.schema'
 import { customRender } from '@/tests/lib/custom-render'
 
 const numericFields = [
