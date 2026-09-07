@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev:registry": "tsx watch --clear-screen=false --include \"registry/**/*\" ./scripts/build-registry.mts",
+    "dev:content": "velite dev",
     "dev:next": "next dev --turbopack --port 3003",
-    "dev": "pnpm build:registry && run-p --race dev:next dev:registry",
+    "dev": "run-p build:registry build:content && run-p --race dev:*",
     "build:content": "velite build --strict",
     "build:registry": "tsx ./scripts/build-registry.mts && prettier --log-level silent --write \"registry/**/*.{ts,tsx,mdx}\" --cache",
     "build:next": "next build --turbopack",
