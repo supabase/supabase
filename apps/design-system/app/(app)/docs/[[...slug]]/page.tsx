@@ -71,7 +71,7 @@ export async function generateStaticParams(): Promise<{ slug: string[] }[]> {
 
   const allDocs = await getAllDocs()
   return allDocs.map((doc) => ({
-    slug: doc.slugAsParams.split('/'),
+    slug: doc.slugAsParams ? doc.slugAsParams.split('/') : [],
   }))
 }
 

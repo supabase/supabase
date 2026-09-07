@@ -1,5 +1,5 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, rename, writeFile } from 'node:fs/promises'
 import path from 'path'
 import { getHighlighter, loadTheme } from '@shikijs/compat'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
@@ -15,7 +15,8 @@ import { rehypeComponent } from './lib/rehype-component'
 const CODE_OUTPUT_DIR = '.velite/codes'
 
 function toCodeId(slugAsParams) {
-  return slugAsParams.replace(/\//g, '__') || 'index'
+  if (!slugAsParams) return 'index'
+  return Buffer.from(slugAsParams, 'utf8').toString('base64url')
 }
 
 const LinksProperties = s.object({
@@ -60,7 +61,10 @@ const docs = s
     const codesDir = path.join(process.cwd(), CODE_OUTPUT_DIR)
 
     await mkdir(codesDir, { recursive: true })
-    await writeFile(path.join(codesDir, `${codeId}.json`), JSON.stringify(code), 'utf8')
+    const codePath = path.join(codesDir, `${codeId}.json`)
+    const tmpPath = `${codePath}.tmp`
+    await writeFile(tmpPath, JSON.stringify(code), 'utf8')
+    await rename(tmpPath, codePath)
 
     return {
       ...data,
