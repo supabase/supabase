@@ -4,7 +4,7 @@ topics = [ "database", "supavisor" ]
 keywords = [ "postgres.js", "pipelining", "pipeline", "max_pipeline", "transaction mode", "unsafe_transaction", "hang", "wrong rows", "invalid frontend message type", "invalid message format", "08P01" ]
 ---
 
-Postgres.js pipelines queries by default. Whenever more than one query is outstanding on the same pooled connection at once, it writes the next one onto the wire without waiting for the previous query's reply. This isn't limited to a single caller forgetting to await between its own calls: any two queries that land on the same connection while both are still outstanding can pipeline this way, including queries from unrelated concurrent requests that share the same pool. Supavisor's transaction mode returns a connection to its pool as soon as it sees one reply finish, without checking whether more of that connection's queries are still waiting on a reply. Combine the two and a query's reply can arrive after Supavisor already handed that connection to a different client.
+Postgres.js [pipelines](https://www.postgresql.org/docs/current/libpq-pipeline-mode.html) queries by default. Whenever more than one query is outstanding on the same pooled connection at once, it writes the next one onto the wire without waiting for the previous query's reply. This isn't limited to a single caller forgetting to await between its own calls: any two queries that land on the same connection while both are still outstanding can pipeline this way, including queries from unrelated concurrent requests that share the same pool. Supavisor's transaction mode returns a connection to its pool as soon as it sees one reply finish, without checking whether more of that connection's queries are still waiting on a reply. Combine the two and a query's reply can arrive after Supavisor already handed that connection to a different client.
 
 ## Symptoms
 
@@ -22,6 +22,8 @@ Only queries with no bound parameters pipeline this way. A query with at least o
 Bind at least one parameter into every query, with `prepare: false`:
 
 ```js
+const sql = postgres(connectionString, { prepare: false })
+
 // pipelines, can hit this bug
 await sql`select * from widgets where archived = false`
 
