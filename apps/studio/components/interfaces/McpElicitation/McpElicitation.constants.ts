@@ -1,4 +1,4 @@
-export const MCP_ELICITATION_ROUTE = '/mcp_callback'
+export const MCP_ELICITATION_ROUTE = '/mcp/secrets'
 
 export const MCP_ELICITATION_FLAG = 'McpElicitURLMode'
 

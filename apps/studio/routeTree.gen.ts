@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as RedeemRouteImport } from './routes/redeem'
-import { Route as Mcp_callbackRouteImport } from './routes/mcp_callback'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as LogoutRouteImport } from './routes/logout'
 import { Route as JoinRouteImport } from './routes/join'
@@ -25,6 +24,7 @@ import { Route as ProjectChar91_Char93RouteImport } from './routes/project.[_]'
 import { Route as ProjectRefRouteImport } from './routes/project/$ref'
 import { Route as OrgChar91_Char93RouteImport } from './routes/org.[_]'
 import { Route as NewSlugRouteImport } from './routes/new/$slug'
+import { Route as McpSecretsRouteImport } from './routes/mcp/secrets'
 import { Route as IntegrationsVercelRouteImport } from './routes/integrations/vercel'
 import { Route as ApiStatusOverrideRouteImport } from './routes/api/status-override'
 import { Route as ApiScopedAccessTokenPermissionsRouteImport } from './routes/api/scoped-access-token-permissions'
@@ -340,11 +340,6 @@ const RedeemRoute = RedeemRouteImport.update({
   path: '/redeem',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Mcp_callbackRoute = Mcp_callbackRouteImport.update({
-  id: '/mcp_callback',
-  path: '/mcp_callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const MaintenanceRoute = MaintenanceRouteImport.update({
   id: '/maintenance',
   path: '/maintenance',
@@ -407,6 +402,11 @@ const OrgChar91_Char93Route = OrgChar91_Char93RouteImport.update({
 const NewSlugRoute = NewSlugRouteImport.update({
   id: '/new/$slug',
   path: '/new/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpSecretsRoute = McpSecretsRouteImport.update({
+  id: '/mcp/secrets',
+  path: '/mcp/secrets',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IntegrationsVercelRoute = IntegrationsVercelRouteImport.update({
@@ -2128,7 +2128,6 @@ export interface FileRoutesByFullPath {
   '/join': typeof JoinRoute
   '/logout': typeof LogoutRoute
   '/maintenance': typeof MaintenanceRoute
-  '/mcp_callback': typeof Mcp_callbackRoute
   '/redeem': typeof RedeemRoute
   '/verify-email': typeof VerifyEmailRoute
   '/account': typeof AppAccountRouteWithChildren
@@ -2156,6 +2155,7 @@ export interface FileRoutesByFullPath {
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
+  '/mcp/secrets': typeof McpSecretsRoute
   '/new/$slug': typeof NewSlugRoute
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/$ref': typeof ProjectRefRouteWithChildren
@@ -2448,7 +2448,6 @@ export interface FileRoutesByTo {
   '/join': typeof JoinRoute
   '/logout': typeof LogoutRoute
   '/maintenance': typeof MaintenanceRoute
-  '/mcp_callback': typeof Mcp_callbackRoute
   '/redeem': typeof RedeemRoute
   '/verify-email': typeof VerifyEmailRoute
   '/account': typeof AppAccountRouteWithChildren
@@ -2475,6 +2474,7 @@ export interface FileRoutesByTo {
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
+  '/mcp/secrets': typeof McpSecretsRoute
   '/new/$slug': typeof NewSlugRoute
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/_': typeof ProjectChar91_Char93RouteWithChildren
@@ -2757,7 +2757,6 @@ export interface FileRoutesById {
   '/join': typeof JoinRoute
   '/logout': typeof LogoutRoute
   '/maintenance': typeof MaintenanceRoute
-  '/mcp_callback': typeof Mcp_callbackRoute
   '/redeem': typeof RedeemRoute
   '/verify-email': typeof VerifyEmailRoute
   '/_app/account': typeof AppAccountRouteWithChildren
@@ -2785,6 +2784,7 @@ export interface FileRoutesById {
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
+  '/mcp/secrets': typeof McpSecretsRoute
   '/new/$slug': typeof NewSlugRoute
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/$ref': typeof ProjectRefRouteWithChildren
@@ -3079,7 +3079,6 @@ export interface FileRouteTypes {
     | '/join'
     | '/logout'
     | '/maintenance'
-    | '/mcp_callback'
     | '/redeem'
     | '/verify-email'
     | '/account'
@@ -3107,6 +3106,7 @@ export interface FileRouteTypes {
     | '/api/scoped-access-token-permissions'
     | '/api/status-override'
     | '/integrations/vercel'
+    | '/mcp/secrets'
     | '/new/$slug'
     | '/org/_'
     | '/project/$ref'
@@ -3399,7 +3399,6 @@ export interface FileRouteTypes {
     | '/join'
     | '/logout'
     | '/maintenance'
-    | '/mcp_callback'
     | '/redeem'
     | '/verify-email'
     | '/account'
@@ -3426,6 +3425,7 @@ export interface FileRouteTypes {
     | '/api/scoped-access-token-permissions'
     | '/api/status-override'
     | '/integrations/vercel'
+    | '/mcp/secrets'
     | '/new/$slug'
     | '/org/_'
     | '/project/_'
@@ -3707,7 +3707,6 @@ export interface FileRouteTypes {
     | '/join'
     | '/logout'
     | '/maintenance'
-    | '/mcp_callback'
     | '/redeem'
     | '/verify-email'
     | '/_app/account'
@@ -3735,6 +3734,7 @@ export interface FileRouteTypes {
     | '/api/scoped-access-token-permissions'
     | '/api/status-override'
     | '/integrations/vercel'
+    | '/mcp/secrets'
     | '/new/$slug'
     | '/org/_'
     | '/project/$ref'
@@ -4030,7 +4030,6 @@ export interface RootRouteChildren {
   JoinRoute: typeof JoinRoute
   LogoutRoute: typeof LogoutRoute
   MaintenanceRoute: typeof MaintenanceRoute
-  Mcp_callbackRoute: typeof Mcp_callbackRoute
   RedeemRoute: typeof RedeemRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   ApiCheckCnameRoute: typeof ApiCheckCnameRoute
@@ -4047,6 +4046,7 @@ export interface RootRouteChildren {
   ApiScopedAccessTokenPermissionsRoute: typeof ApiScopedAccessTokenPermissionsRoute
   ApiStatusOverrideRoute: typeof ApiStatusOverrideRoute
   IntegrationsVercelRoute: typeof IntegrationsVercelRouteWithChildren
+  McpSecretsRoute: typeof McpSecretsRoute
   NewSlugRoute: typeof NewSlugRoute
   OrgChar91_Char93Route: typeof OrgChar91_Char93RouteWithChildren
   ProjectRefRoute: typeof ProjectRefRouteWithChildren
@@ -4160,13 +4160,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RedeemRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/mcp_callback': {
-      id: '/mcp_callback'
-      path: '/mcp_callback'
-      fullPath: '/mcp_callback'
-      preLoaderRoute: typeof Mcp_callbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/maintenance': {
       id: '/maintenance'
       path: '/maintenance'
@@ -4256,6 +4249,13 @@ declare module '@tanstack/react-router' {
       path: '/new/$slug'
       fullPath: '/new/$slug'
       preLoaderRoute: typeof NewSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp/secrets': {
+      id: '/mcp/secrets'
+      path: '/mcp/secrets'
+      fullPath: '/mcp/secrets'
+      preLoaderRoute: typeof McpSecretsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/integrations/vercel': {
@@ -7119,7 +7119,6 @@ const rootRouteChildren: RootRouteChildren = {
   JoinRoute: JoinRoute,
   LogoutRoute: LogoutRoute,
   MaintenanceRoute: MaintenanceRoute,
-  Mcp_callbackRoute: Mcp_callbackRoute,
   RedeemRoute: RedeemRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   ApiCheckCnameRoute: ApiCheckCnameRoute,
@@ -7136,6 +7135,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiScopedAccessTokenPermissionsRoute: ApiScopedAccessTokenPermissionsRoute,
   ApiStatusOverrideRoute: ApiStatusOverrideRoute,
   IntegrationsVercelRoute: IntegrationsVercelRouteWithChildren,
+  McpSecretsRoute: McpSecretsRoute,
   NewSlugRoute: NewSlugRoute,
   OrgChar91_Char93Route: OrgChar91_Char93RouteWithChildren,
   ProjectRefRoute: ProjectRefRouteWithChildren,

@@ -7,7 +7,7 @@ import type { NextPageWithLayout } from '@/types'
 
 const PAGE_TITLE = buildStudioPageTitle({ section: 'Store an API key', brand: 'Supabase' })
 
-const McpCallbackPage: NextPageWithLayout = () => {
+const McpSecretsPage: NextPageWithLayout = () => {
   return (
     <>
       <Head>
@@ -18,4 +18,4 @@ const McpCallbackPage: NextPageWithLayout = () => {
   )
 }
 
-export default withAuth(McpCallbackPage)
+export default withAuth(McpSecretsPage)

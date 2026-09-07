@@ -68,19 +68,19 @@ describe('parseElicitationParams', () => {
 describe('buildElicitationSignInPath', () => {
   it('keeps the elicitation params as siblings of returnTo', () => {
     expect(buildElicitationSignInPath({ ref: 'abc', name: 'OPENAI_API_KEY' })).toBe(
-      '/sign-in?returnTo=%2Fmcp_callback&ref=abc&name=OPENAI_API_KEY'
+      '/sign-in?returnTo=%2Fmcp%2Fsecrets&ref=abc&name=OPENAI_API_KEY'
     )
   })
 
   it('percent-encodes names that are not URL-safe', () => {
     expect(buildElicitationSignInPath({ ref: 'abc', name: 'a b&c' })).toBe(
-      '/sign-in?returnTo=%2Fmcp_callback&ref=abc&name=a+b%26c'
+      '/sign-in?returnTo=%2Fmcp%2Fsecrets&ref=abc&name=a+b%26c'
     )
   })
 
   it('omits params it does not have', () => {
     expect(buildElicitationSignInPath({ ref: undefined, name: undefined })).toBe(
-      '/sign-in?returnTo=%2Fmcp_callback'
+      '/sign-in?returnTo=%2Fmcp%2Fsecrets'
     )
   })
 })
