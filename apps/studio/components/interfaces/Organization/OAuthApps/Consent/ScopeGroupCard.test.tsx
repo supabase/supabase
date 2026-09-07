@@ -20,9 +20,7 @@ const SCOPE_GROUPS: OAuthScopeGroup[] = [
 
 describe('ScopeGroupCard', () => {
   test('interpolates the app name into the intro line', () => {
-    customRender(
-      <ScopeGroupCard appName="Vercel" scopeGroups={SCOPE_GROUPS} memberRole="Developer" />
-    )
+    customRender(<ScopeGroupCard appName="Vercel" scopeGroups={SCOPE_GROUPS} />)
 
     expect(
       screen.getByText(
@@ -31,28 +29,28 @@ describe('ScopeGroupCard', () => {
     ).toBeInTheDocument()
   })
 
-  test('renders READ and READ + WRITE badge labels', () => {
-    customRender(
-      <ScopeGroupCard appName="Vercel" scopeGroups={SCOPE_GROUPS} memberRole="Developer" />
-    )
+  test('renders READ and READ-WRITE badge labels', () => {
+    customRender(<ScopeGroupCard appName="Vercel" scopeGroups={SCOPE_GROUPS} />)
 
-    expect(screen.getByText('READ + WRITE')).toBeInTheDocument()
+    expect(screen.getByText('READ-WRITE')).toBeInTheDocument()
     expect(screen.getByText('READ')).toBeInTheDocument()
   })
 
-  test('shows the over-role annotation only for groups that exceed a Read-only role', () => {
+  test('renders a WRITE badge for a write-only group', () => {
     customRender(
-      <ScopeGroupCard appName="Vercel" scopeGroups={SCOPE_GROUPS} memberRole="Read-only" />
+      <ScopeGroupCard
+        appName="Vercel"
+        scopeGroups={[{ name: 'Logs', level: 'write', scopes: ['logs'] }]}
+      />
     )
 
-    expect(screen.getAllByText('Read-only for your role')).toHaveLength(1)
+    expect(screen.getByText('WRITE')).toBeInTheDocument()
   })
 
-  test('shows no over-role annotation for a role that can write', () => {
-    customRender(
-      <ScopeGroupCard appName="Vercel" scopeGroups={SCOPE_GROUPS} memberRole="Developer" />
-    )
+  test('renders no over-role annotation', () => {
+    customRender(<ScopeGroupCard appName="Vercel" scopeGroups={SCOPE_GROUPS} />)
 
     expect(screen.queryByText('Read-only for your role')).not.toBeInTheDocument()
+    expect(screen.queryByText('READ + WRITE')).not.toBeInTheDocument()
   })
 })
