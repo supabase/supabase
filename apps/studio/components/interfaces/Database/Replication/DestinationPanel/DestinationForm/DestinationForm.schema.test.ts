@@ -7,25 +7,37 @@ const requiredFields = {
   publicationName: 'analytics_publication',
   tableSyncCopyMode: 'include_all_tables' as const,
   tableSyncCopyTableIds: [],
+  maxFillMs: 10_000,
+  maxTableSyncWorkers: 4,
+  maxCopyConnectionsPerTable: 4,
+  connectionPoolSize: 4,
 }
 
-const optionalNumberFields = [
+const requiredNumberFields = [
   'maxFillMs',
   'maxTableSyncWorkers',
   'maxCopyConnectionsPerTable',
   'connectionPoolSize',
-  'maxStalenessMins',
 ] as const
 
 describe('DestinationPanelFormSchema', () => {
-  it.each(optionalNumberFields)('normalizes an empty %s field to undefined', (field) => {
+  it.each(requiredNumberFields)('rejects an empty %s field', (field) => {
     const result = DestinationPanelFormSchema.safeParse({
       ...requiredFields,
       [field]: '',
     })
 
+    expect(result.success).toBe(false)
+  })
+
+  it('normalizes an empty maximum staleness to undefined', () => {
+    const result = DestinationPanelFormSchema.safeParse({
+      ...requiredFields,
+      maxStalenessMins: '',
+    })
+
     expect(result.success).toBe(true)
-    if (result.success) expect(result.data[field]).toBeUndefined()
+    if (result.success) expect(result.data.maxStalenessMins).toBeUndefined()
   })
 
   it.each([0, 1])('accepts a batch wait time of %i milliseconds', (value) => {

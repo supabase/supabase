@@ -184,7 +184,7 @@ export const DestinationForm = ({
   )
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onChange',
+    mode: 'onSubmit',
     reValidateMode: 'onChange',
     resolver: zodResolver(
       FormSchema.superRefine((data, ctx) => {

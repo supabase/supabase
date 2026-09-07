@@ -3,7 +3,6 @@ import * as z from 'zod'
 import { AnalyticsBucketFormSchema } from './AnalyticsBucket/AnalyticsBucket.schema'
 import { BigQueryFormSchema } from './BigQuery/BigQuery.schema'
 import { ClickHouseFormSchema } from './ClickHouse/ClickHouse.schema'
-import { optionalNumberInputSchema } from './DestinationForm.schema.utils'
 import { DuckLakeFormSchema } from './DuckLake/DuckLake.schema'
 import { SnowflakeFormSchema } from './Snowflake/Snowflake.schema'
 
@@ -17,21 +16,18 @@ const CommonFormSchema = z.object({
     'skip_tables',
   ]),
   tableSyncCopyTableIds: z.array(z.string()),
-  maxFillMs: optionalNumberInputSchema(
-    z
-      .number()
-      .int('Batch wait time must be a whole number of milliseconds.')
-      .min(0, 'Batch wait time must be 0 or greater.')
-  ),
-  maxTableSyncWorkers: optionalNumberInputSchema(
-    z
-      .number()
-      .min(1, 'Max table sync workers must be greater than 0.')
-      .int('Max table sync workers must be a whole number.')
-  ),
-  maxCopyConnectionsPerTable: optionalNumberInputSchema(
-    z.number().int().min(1, 'Max copy connections per table must be greater than 0.')
-  ),
+  maxFillMs: z
+    .number()
+    .int('Batch wait time must be a whole number of milliseconds.')
+    .min(0, 'Batch wait time must be 0 or greater.'),
+  maxTableSyncWorkers: z
+    .number()
+    .min(1, 'Max table sync workers must be greater than 0.')
+    .int('Max table sync workers must be a whole number.'),
+  maxCopyConnectionsPerTable: z
+    .number()
+    .int()
+    .min(1, 'Max copy connections per table must be greater than 0.'),
   invalidatedSlotBehavior: z.enum(['error', 'recreate']).optional(),
 })
 
