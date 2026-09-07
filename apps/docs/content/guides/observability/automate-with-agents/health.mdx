@@ -1,26 +1,26 @@
 ---
 id: 'automate-with-agents-health'
 title: 'Health monitor'
-subtitle: 'Health monitor is a read-only agent. It polls logs on a short interval, clusters errors, and reports only when a threshold is crossed.'
-description: 'An on-call triage agent that watches logs for 5xx spikes, Auth failures, and availability issues.'
+subtitle: 'A read-only agent that checks API and Auth errors and Postgres connection pressure once per hour.'
+description: 'Hourly monitoring for server errors and connection pressure'
 ---
 
 ```mermaid
 flowchart TD
-  Schedule([Every hour]) --> Inspect[query_logs]
-  Inspect --> Signals["5xx, Auth failures, error-rate spikes"]
-  Signals --> Threshold{Threshold crossed?}
-  Threshold -->|Yes| Report[Incident report]
-  Threshold -->|No| Silent[Stay silent]
+  Schedule([Every hour]) --> Inspect[query_logs and execute_sql]
+  Inspect --> Signals["Server errors and connection pressure"]
+  Signals --> Review{Anything new to report?}
+  Review -->|Yes| Report[Finding and next step]
+  Review -->|No| Silent[Stay silent]
+  Inspect -->|Missing data or access| Gap[Report new or changed gaps]
 ```
 
 ## What it watches
 
-- API and Auth responses with status `>= 500`
-- Error-rate spikes against a recent baseline
-- Connection pressure when database inspection is available
+- API and Auth server-error rates in the last complete hour, compared with the preceding hour
+- Current Postgres connection pressure
 
-It uses `query_logs` on project-scoped, read-only [Supabase MCP](/docs/guides/ai-tools/mcp). It can use `get_advisors` for extra context. It does not change the project.
+It uses `query_logs` and read-only `execute_sql` on project-scoped [Supabase MCP](/docs/guides/ai-tools/mcp).
 
 ## When it watches
 
@@ -28,10 +28,14 @@ It uses `query_logs` on project-scoped, read-only [Supabase MCP](/docs/guides/ai
 
 ## What it will output
 
-When a threshold is crossed, Health monitor reports an incident: grouped errors, a few request IDs, a likely cause, and a troubleshooting link. If nothing crosses the threshold, it stays silent.
+Health monitor reports new or changed problems with the affected service, measured error rate or connection usage, and a next investigation step. See [what triggers a health report](/docs/guides/observability/detecting#health).
+
+If a check cannot run, the agent tells you what is missing. Clear checks and unchanged findings stay quiet.
 
 <$Partial path="monitoring_agent_output.mdx" />
 
 ## Set up the agent
+
+Allow the agent to read the documentation linked in its prompt. Save its alert state between runs so it can avoid repeat reports.
 
 <AgentSetup id="health" />

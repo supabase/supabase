@@ -1,26 +1,27 @@
 ---
 id: 'automate-with-agents-security'
 title: 'Security monitor'
-subtitle: 'Security monitor is a read-only agent. It reviews Security Advisor findings and bounded authentication or authorization failure counts, then proposes changes for a person to apply.'
-description: 'A security review agent that reports advisor findings and authentication or authorization spikes.'
+subtitle: 'A read-only agent that reviews Security Advisor findings and authentication and authorization failures each day.'
+description: 'Daily review of security findings and access failures'
 ---
 
 ```mermaid
 flowchart TD
   Schedule([Once per day]) --> Inspect[get_advisors and query_logs]
-  Inspect --> Signals[Advisor warnings and auth failures]
-  Signals --> Review{Needs review?}
-  Review -->|Yes| Report[Findings and proposed fix]
+  Inspect --> Signals["Advisor findings and access failures"]
+  Signals --> Review{Anything new to report?}
+  Review -->|Yes| Report[Finding and next step]
   Review -->|No| Silent[Stay silent]
+  Inspect -->|Missing data or access| Gap[Report new or changed gaps]
 ```
 
 ## What it watches
 
 - Security Advisor findings at warning and error level
-- Authentication and authorization failure spikes
-- RLS or privilege issues that advisors already name
+- API and Auth authentication and authorization failure rates, compared across the last two complete UTC days
+- RLS and privilege issues identified by advisors
 
-It uses `get_advisors` and `query_logs` on project-scoped, read-only [Supabase MCP](/docs/guides/ai-tools/mcp). It does not change policies, grants, API keys, or Auth settings.
+It uses `get_advisors` and `query_logs` on project-scoped, read-only [Supabase MCP](/docs/guides/ai-tools/mcp).
 
 ## When it watches
 
@@ -28,10 +29,14 @@ It uses `get_advisors` and `query_logs` on project-scoped, read-only [Supabase M
 
 ## What it will output
 
-Security monitor reports warning and error advisor findings, grouped authentication or authorization failures, and the least invasive fix for a person to apply. If nothing needs review, it stays silent.
+Security monitor reports new or changed advisor findings and access-failure spikes, with the affected object or service and a next investigation step. A spike is a review signal, not proof of an attack. See [what triggers a security report](/docs/guides/observability/detecting#security).
+
+If a check cannot run, the agent tells you what is missing. Clear checks and unchanged findings stay quiet.
 
 <$Partial path="monitoring_agent_output.mdx" />
 
 ## Set up the agent
+
+Allow the agent to read the documentation linked in its prompt. Save its alert state between runs so it can avoid repeat reports.
 
 <AgentSetup id="security" />
