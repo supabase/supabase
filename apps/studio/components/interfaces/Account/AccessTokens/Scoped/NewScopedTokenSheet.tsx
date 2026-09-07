@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -12,7 +12,7 @@ import {
 
 import { selectionToScopes } from '../AccessToken.permissions'
 import { ExperimentalTokenDropdown } from '../Classic/ExperimentalTokenDropdown'
-import { NewScopedTokenForm } from './Form/NewScopedTokenForm'
+import { NewScopedTokenForm, type NewScopedTokenFormHandle } from './Form/NewScopedTokenForm'
 import { getExpiryDate, type TokenFormValues } from './Form/NewScopedTokenForm.utils'
 import { NewScopedTokenSuccess } from './Form/NewScopedTokenSuccess'
 import { TokenDocsButtons } from './TokenDocsButtons'
@@ -35,6 +35,7 @@ interface NewScopedTokenSheetProps {
 export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedTokenSheetProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const track = useTrack()
+  const formRef = useRef<NewScopedTokenFormHandle>(null)
   const { mutate: createToken, isPending: isCreatingScopedToken } =
     useScopedAccessTokenCreateMutation()
   const { mutate: createClassicToken, isPending: isCreatingClassicToken } =
@@ -106,11 +107,11 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
   // as we need to make sure they copied the new token first
   const handleOpenChange = (open: boolean, isSafe = false) => {
     if (open === false && step === 'success' && !isSafe) return
-    if (open === false) {
+    if (open === false && !isSafe) {
+      const abandonmentContext = formRef.current?.getAbandonmentContext()
       track('access_token_creation_sheet_dismissed', {
-        // Can be non when users closes the sheet without completing the token creation
-        tokenType: createdToken?.tokenType ?? 'none',
-        step,
+        resourceAccess: abandonmentContext?.resourceAccess ?? 'project',
+        isFormTouched: abandonmentContext?.isFormTouched ?? false,
       })
     }
     setStep('form')
@@ -151,6 +152,7 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
           />
         ) : (
           <NewScopedTokenForm
+            ref={formRef}
             isPending={isCreatingScopedToken || isCreatingClassicToken}
             onCreateToken={handleCreate}
             onCancel={() => handleOpenChange(false, true)}

@@ -3534,7 +3534,9 @@ export interface AccessTokenCreatedEvent {
 }
 
 /**
- * Triggered when an access token creation sheet is closed.
+ * Triggered when the access token creation sheet is closed before a token was created (Escape,
+ * outside click, or Cancel on the form step). The token created step blocks non-safe closes, so
+ * this event only ever reflects abandonment of the in-progress form.
  *
  * @group Events
  * @source studio
@@ -3543,8 +3545,9 @@ export interface AccessTokenCreatedEvent {
 export interface AccessTokenCreationSheetDismissedEvent {
   action: 'access_token_creation_sheet_dismissed'
   properties: {
-    tokenType: 'classic' | 'scoped' | 'none'
-    step: 'form' | 'success'
+    resourceAccess: 'project' | 'organization' | 'account'
+    /** Whether the user changed any field from its default before abandoning */
+    isFormTouched: boolean
   }
   groups: Omit<TelemetryGroups, 'project'>
 }

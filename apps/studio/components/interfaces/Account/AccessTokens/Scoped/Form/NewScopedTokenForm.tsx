@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useReducedMotion } from 'common'
 import { ChevronRight, X } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -43,20 +43,33 @@ const DEFAULT_VALUES: TokenFormValues = {
   permissions: {},
 }
 
-export const NewScopedTokenForm = ({
-  isPending,
-  onCreateToken,
-  onCancel,
-}: {
-  isPending: boolean
-  onCreateToken: (values: TokenFormValues) => void
-  onCancel: () => void
-}) => {
+export interface NewScopedTokenFormHandle {
+  getAbandonmentContext: () => {
+    resourceAccess: TokenFormValues['resourceAccess']
+    isFormTouched: boolean
+  }
+}
+
+export const NewScopedTokenForm = forwardRef<
+  NewScopedTokenFormHandle,
+  {
+    isPending: boolean
+    onCreateToken: (values: TokenFormValues) => void
+    onCancel: () => void
+  }
+>(({ isPending, onCreateToken, onCancel }, ref) => {
   const form = useForm<TokenFormValues>({
     resolver: zodResolver(TokenFormSchema),
     defaultValues: DEFAULT_VALUES,
     mode: 'onChange',
   })
+  const { isDirty } = form.formState
+  useImperativeHandle(ref, () => ({
+    getAbandonmentContext: () => ({
+      resourceAccess: form.getValues('resourceAccess'),
+      isFormTouched: isDirty,
+    }),
+  }))
   const [step, setStep] = useState<'form' | 'review'>('form')
   const [formValues, setFormValues] = useState<TokenFormValues>(DEFAULT_VALUES)
   const [isCreateHintDismissed, setIsCreateHintDismissed] = useState(false)
@@ -267,4 +280,6 @@ export const NewScopedTokenForm = ({
       </SheetFooter>
     </>
   )
-}
+})
+
+NewScopedTokenForm.displayName = 'NewScopedTokenForm'

@@ -248,7 +248,37 @@ describe('NewScopedTokenSheet', () => {
     })
     // Dialog has been closed
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    // Completing the flow via Done must not also emit a dismissed event
+    expect(mockTrack).not.toHaveBeenCalledWith(
+      'access_token_creation_sheet_dismissed',
+      expect.anything()
+    )
   }, 10_000)
+
+  test('tracks dismissal with the in-progress resourceAccess and touched state on Cancel', async () => {
+    renderSheet()
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    await screen.findByRole('dialog')
+    await user.click(await screen.findByRole('radio', { name: /Organization/ }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Cancel' }))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_creation_sheet_dismissed', {
+      resourceAccess: 'organization',
+      isFormTouched: true,
+    })
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  })
+
+  test('tracks dismissal with the untouched default resourceAccess on Escape', async () => {
+    renderSheet()
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.keyDown(dialog, { key: 'Escape', code: 'Escape' })
+    expect(mockTrack).toHaveBeenCalledWith('access_token_creation_sheet_dismissed', {
+      resourceAccess: 'project',
+      isFormTouched: false,
+    })
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  })
 
   // Organization scope tests
   test('requires an organization when scope is Organization', async () => {
