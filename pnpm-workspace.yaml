@@ -49,6 +49,7 @@ catalog:
   typescript: ~6.0.2
   valtio: ^2.3.2
   vite: ^8.0.16
+  velite: ^0.4.0
   vitest: ^5.0.0
   zod: 3.25.76
 
@@ -85,10 +86,6 @@ minimumReleaseAgeExclude:
   - '@supabase-labs/*'
   - typescript
   - '@typescript/*'
-  # Vitest 5.0.0 was published 2026-09-03. Temporary so CI can run on the
-  # upgrade PR; safe to remove once the release is older than minimumReleaseAge.
-  - vitest
-  - '@vitest/*'
   # First-party, published from supabase-community/mdast-jsx.
   - mdast-jsx
   # The following are excluded to fix vulnerablities.
