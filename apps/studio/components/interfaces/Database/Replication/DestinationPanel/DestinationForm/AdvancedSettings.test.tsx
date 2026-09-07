@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useForm } from 'react-hook-form'
 import { Button, Form } from 'ui'
@@ -23,7 +23,7 @@ const numericFields = [
 const TestForm = () => {
   const form = useForm<DestinationPanelSchemaType>({
     resolver: zodResolver(DestinationPanelFormSchema),
-    mode: 'onSubmit',
+    mode: 'onTouched',
     reValidateMode: 'onChange',
     defaultValues: {
       name: 'Warehouse',
@@ -72,7 +72,7 @@ describe('AdvancedSettings', () => {
     }
   )
 
-  it('validates an empty required number on submit, then revalidates on change', async () => {
+  it('validates an empty required number on blur, then revalidates on change', async () => {
     const user = userEvent.setup()
     customRender(<TestForm />)
 
@@ -82,7 +82,7 @@ describe('AdvancedSettings', () => {
     await user.clear(input)
     expect(screen.getByTestId('table-sync-workers-validity')).toHaveTextContent('valid')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    await user.tab()
     expect(await screen.findByText('invalid', { selector: 'output' })).toBeInTheDocument()
 
     await user.type(input, '5')
