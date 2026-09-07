@@ -20,6 +20,7 @@ import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import { SelfHostedProjectSwitcher } from './SelfHostedProjectSwitcher'
 
 export function ProjectBranchSelector() {
   const router = useRouter()
@@ -62,15 +63,7 @@ export function ProjectBranchSelector() {
     return <ShimmeringLoader className="w-[120px] ml-1 md:py-3" />
 
   if (!IS_PLATFORM) {
-    return (
-      <SidebarMenu>
-        <SidebarMenuItem>
-          <SidebarMenuButton className="grid flex-1 text-left text-sm leading-tight text-foreground">
-            <span className="truncate">{displayProject.name}</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      </SidebarMenu>
-    )
+    return <SelfHostedProjectSwitcher />
   }
 
   const triggerProps = {
