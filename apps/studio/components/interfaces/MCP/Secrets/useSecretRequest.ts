@@ -1,10 +1,10 @@
 import { useSession } from 'common'
 import { useCallback, useMemo, useState } from 'react'
 
-import { ELICITATION_TOOL_NAME } from './McpElicitation.constants'
-import type { DevElicitationState, ElicitationParams } from './McpElicitation.params'
-import { getProviderHint } from './McpElicitation.providers'
-import type { ElicitationRequest, ElicitationState } from './McpElicitation.types'
+import { SECRETS_TOOL_NAME } from './McpSecrets.constants'
+import type { DevSecretsState, SecretsParams } from './McpSecrets.params'
+import { getProviderHint } from './McpSecrets.providers'
+import type { SecretRequest, SecretsState } from './McpSecrets.types'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import {
   useSecretsCreateMutation,
@@ -25,7 +25,7 @@ function recordOutcome(
   return { ref: variables.projectRef, name: variables.secrets[0]?.name, status }
 }
 
-export function useElicitationRequest(params: ElicitationParams) {
+export function useSecretRequest(params: SecretsParams) {
   const { ref, name } = params
   const devState = params.dev.state
 
@@ -44,13 +44,13 @@ export function useElicitationRequest(params: ElicitationParams) {
     onError: (_error, variables) => setOutcome(recordOutcome(variables, 'error')),
   })
 
-  const request: ElicitationRequest | undefined = useMemo(() => {
+  const request: SecretRequest | undefined = useMemo(() => {
     if (ref === undefined || name === undefined || project.data === undefined) return undefined
 
     const existing = secrets.data?.find((secret) => secret.name === name)
 
     return {
-      tool: ELICITATION_TOOL_NAME,
+      tool: SECRETS_TOOL_NAME,
       ref,
       project: project.data.name,
       account,
@@ -60,7 +60,7 @@ export function useElicitationRequest(params: ElicitationParams) {
     }
   }, [account, name, project.data, ref, secrets.data])
 
-  const state = useMemo<ElicitationState>(() => {
+  const state = useMemo<SecretsState>(() => {
     const overridden =
       devState === undefined ? undefined : resolveDevState(devState, request, account)
     if (overridden !== undefined) return overridden
@@ -114,10 +114,10 @@ export function useElicitationRequest(params: ElicitationParams) {
 }
 
 function resolveDevState(
-  devState: DevElicitationState,
-  request: ElicitationRequest | undefined,
+  devState: DevSecretsState,
+  request: SecretRequest | undefined,
   account: string
-): ElicitationState | undefined {
+): SecretsState | undefined {
   switch (devState) {
     case 'loading':
       return { status: 'loading' }

@@ -1,6 +1,6 @@
 import { cn, Skeleton } from 'ui'
 
-import type { ElicitationRequest } from './McpElicitation.types'
+import type { SecretRequest } from './McpSecrets.types'
 
 const DETAIL_ROW_COUNT = 3
 
@@ -21,7 +21,7 @@ const DetailRow = ({
   </div>
 )
 
-export const McpElicitationDetails = ({ request }: { request: ElicitationRequest }) => (
+export const McpSecretsDetails = ({ request }: { request: SecretRequest }) => (
   <div className="divide-y rounded-md border bg-surface-75 px-4">
     <DetailRow label="Tool" value={request.tool} isMono />
     <DetailRow label="Project" value={request.project} />
@@ -29,7 +29,7 @@ export const McpElicitationDetails = ({ request }: { request: ElicitationRequest
   </div>
 )
 
-export const McpElicitationDetailsSkeleton = () => (
+export const McpSecretsDetailsSkeleton = () => (
   <div className="divide-y rounded-md border bg-surface-75 px-4">
     {Array.from({ length: DETAIL_ROW_COUNT }).map((_, index) => (
       <div key={index} className="flex items-center justify-between gap-4 py-2.5 text-xs">

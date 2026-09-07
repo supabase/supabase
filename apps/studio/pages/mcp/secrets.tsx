@@ -1,6 +1,6 @@
 import Head from 'next/head'
 
-import { McpElicitation } from '@/components/interfaces/McpElicitation/McpElicitation'
+import { McpSecrets } from '@/components/interfaces/MCP/Secrets/McpSecrets'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import type { NextPageWithLayout } from '@/types'
@@ -13,7 +13,7 @@ const McpSecretsPage: NextPageWithLayout = () => {
       <Head>
         <title>{PAGE_TITLE}</title>
       </Head>
-      <McpElicitation />
+      <McpSecrets />
     </>
   )
 }

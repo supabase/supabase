@@ -2,8 +2,8 @@ import { act, waitFor } from '@testing-library/react'
 import { delay, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import type { ElicitationParams } from './McpElicitation.params'
-import { useElicitationRequest } from './useElicitationRequest'
+import type { SecretsParams } from './McpSecrets.params'
+import { useSecretRequest } from './useSecretRequest'
 import type { components } from '@/data/api'
 import { customRenderHook } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -12,7 +12,7 @@ const REF_A = 'aaaaaaaaaaaaaaaaaaaa'
 const NAME_A = 'OPENAI_API_KEY'
 const NAME_B = 'RESEND_API_KEY'
 
-const paramsFor = (ref: string, name: string): ElicitationParams => ({
+const paramsFor = (ref: string, name: string): SecretsParams => ({
   ref,
   name,
   dev: { state: undefined },
@@ -59,9 +59,9 @@ beforeEach(() => {
   })
 })
 
-describe('useElicitationRequest', () => {
+describe('useSecretRequest', () => {
   it('reports a stored outcome for the request that was actually written', async () => {
-    const { result } = customRenderHook(() => useElicitationRequest(paramsFor(REF_A, NAME_A)))
+    const { result } = customRenderHook(() => useSecretRequest(paramsFor(REF_A, NAME_A)))
 
     await waitFor(() => expect(result.current.state.status).toBe('form'))
 
@@ -73,7 +73,7 @@ describe('useElicitationRequest', () => {
 
   it('does not attribute request A’s settled write to request B', async () => {
     let params = paramsFor(REF_A, NAME_A)
-    const { result, rerender } = customRenderHook(() => useElicitationRequest(params))
+    const { result, rerender } = customRenderHook(() => useSecretRequest(params))
 
     await waitFor(() => expect(result.current.state.status).toBe('form'))
 
@@ -94,7 +94,7 @@ describe('useElicitationRequest', () => {
 
   it('does not carry a cancellation from request A onto request B', async () => {
     let params = paramsFor(REF_A, NAME_A)
-    const { result, rerender } = customRenderHook(() => useElicitationRequest(params))
+    const { result, rerender } = customRenderHook(() => useSecretRequest(params))
 
     await waitFor(() => expect(result.current.state.status).toBe('form'))
 
@@ -109,7 +109,7 @@ describe('useElicitationRequest', () => {
 
   it('still shows A’s outcome if the user navigates back to A', async () => {
     let params = paramsFor(REF_A, NAME_A)
-    const { result, rerender } = customRenderHook(() => useElicitationRequest(params))
+    const { result, rerender } = customRenderHook(() => useSecretRequest(params))
 
     await waitFor(() => expect(result.current.state.status).toBe('form'))
 

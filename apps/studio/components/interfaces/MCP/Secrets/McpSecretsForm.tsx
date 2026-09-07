@@ -17,17 +17,17 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import type { ElicitationRequest } from './McpElicitation.types'
+import type { SecretRequest } from './McpSecrets.types'
 import {
   getOverwriteWarning,
   getSecretHelperText,
   getSecretPrefixWarning,
-} from './McpElicitation.utils'
-import { McpElicitationDetails } from './McpElicitationDetails'
-import { McpElicitationShell } from './McpElicitationShell'
+} from './McpSecrets.utils'
+import { McpSecretsDetails } from './McpSecretsDetails'
+import { McpSecretsShell } from './McpSecretsShell'
 
-const FORM_ID = 'mcp-elicitation-form'
-const KEY_NAME_FIELD_ID = 'mcp-elicitation-key-name'
+const FORM_ID = 'mcp-secrets-form'
+const KEY_NAME_FIELD_ID = 'mcp-secrets-key-name'
 
 const FormSchema = z.object({
   secret: z.string().min(1, 'Enter the key value'),
@@ -37,13 +37,13 @@ type FormValues = z.infer<typeof FormSchema>
 
 const defaultValues: FormValues = { secret: '' }
 
-export const McpElicitationForm = ({
+export const McpSecretsForm = ({
   request,
   isSaving,
   onSave,
   onCancel,
 }: {
-  request: ElicitationRequest
+  request: SecretRequest
   isSaving: boolean
   onSave: (secret: string) => void
   onCancel: () => void
@@ -58,11 +58,11 @@ export const McpElicitationForm = ({
   const overwriteWarning = getOverwriteWarning(request)
 
   return (
-    <McpElicitationShell
+    <McpSecretsShell
       title="Store an API key"
       subtitle="Supabase is asking for this key on behalf of a tool call. It never passes through your AI client."
     >
-      <McpElicitationDetails request={request} />
+      <McpSecretsDetails request={request} />
 
       <Form {...form}>
         <form
@@ -174,6 +174,6 @@ export const McpElicitationForm = ({
           </p>
         </>
       )}
-    </McpElicitationShell>
+    </McpSecretsShell>
   )
 }

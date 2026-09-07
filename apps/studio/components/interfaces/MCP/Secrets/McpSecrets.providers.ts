@@ -1,6 +1,6 @@
-import type { ElicitationProviderHint } from './McpElicitation.types'
+import type { SecretProviderHint } from './McpSecrets.types'
 
-const PROVIDER_HINTS: ReadonlyArray<{ match: string; hint: ElicitationProviderHint }> = [
+const PROVIDER_HINTS: ReadonlyArray<{ match: string; hint: SecretProviderHint }> = [
   {
     match: 'openai',
     hint: {
@@ -34,7 +34,7 @@ const PROVIDER_HINTS: ReadonlyArray<{ match: string; hint: ElicitationProviderHi
   },
 ]
 
-export function getProviderHint(keyName: string): ElicitationProviderHint | undefined {
+export function getProviderHint(keyName: string): SecretProviderHint | undefined {
   const needle = keyName.toLowerCase()
   return PROVIDER_HINTS.find(({ match }) => needle.includes(match))?.hint
 }

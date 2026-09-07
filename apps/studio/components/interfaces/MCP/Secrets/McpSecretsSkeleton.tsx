@@ -1,9 +1,9 @@
 import { Skeleton } from 'ui'
 
-import { McpElicitationDetailsSkeleton } from './McpElicitationDetails'
+import { McpSecretsDetailsSkeleton } from './McpSecretsDetails'
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 
-export const McpElicitationSkeleton = () => (
+export const McpSecretsSkeleton = () => (
   <InterstitialLayout
     logo={<SupabaseLogo />}
     title={<Skeleton className="h-[18px] w-40" />}
@@ -15,7 +15,7 @@ export const McpElicitationSkeleton = () => (
     }
   >
     <div className="flex flex-col gap-6 px-6 pb-6">
-      <McpElicitationDetailsSkeleton />
+      <McpSecretsDetailsSkeleton />
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <Skeleton className="h-4 w-16" />

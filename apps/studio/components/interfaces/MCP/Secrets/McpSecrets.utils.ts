@@ -2,14 +2,14 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
 
-import { UNKNOWN_CLIENT_LABEL } from './McpElicitation.constants'
+import { UNKNOWN_CLIENT_LABEL } from './McpSecrets.constants'
 import type {
-  ElicitationCopy,
-  ElicitationOutcomeState,
-  ElicitationProviderHint,
-  ElicitationRequest,
-  ElicitationState,
-} from './McpElicitation.types'
+  SecretProviderHint,
+  SecretRequest,
+  SecretsCopy,
+  SecretsOutcomeState,
+  SecretsState,
+} from './McpSecrets.types'
 
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
@@ -21,7 +21,7 @@ const CLOSE_TAB_FOOTER = 'You can close this tab.'
 const UNVERIFIED_KEY_FOOTER =
   "Supabase doesn't verify keys. You can view or replace this one in Edge Functions secrets."
 
-export function getElicitationCopy(state: ElicitationOutcomeState): ElicitationCopy {
+export function getSecretsCopy(state: SecretsOutcomeState): SecretsCopy {
   switch (state.status) {
     case 'stored': {
       const { keyName, project } = state.request
@@ -95,7 +95,7 @@ export function getElicitationCopy(state: ElicitationOutcomeState): ElicitationC
   }
 }
 
-export function getElicitationAnnouncement(state: ElicitationState | undefined): string {
+export function getSecretsAnnouncement(state: SecretsState | undefined): string {
   if (state === undefined) return ''
 
   switch (state.status) {
@@ -106,7 +106,7 @@ export function getElicitationAnnouncement(state: ElicitationState | undefined):
     case 'wrong-account':
       return 'This account cannot access the request'
     default: {
-      const { title, subtitle } = getElicitationCopy(state)
+      const { title, subtitle } = getSecretsCopy(state)
       return `${title}. ${subtitle}`
     }
   }
@@ -116,7 +116,7 @@ export function getSecretHelperText(project: string) {
   return `Stored encrypted for ${project}. Anyone with write access to this project can use it. Remove it any time from Edge Functions secrets.`
 }
 
-export function getOverwriteWarning(request: ElicitationRequest) {
+export function getOverwriteWarning(request: SecretRequest) {
   const { existingSecret, keyName } = request
   if (existingSecret === undefined) return undefined
 
@@ -137,7 +137,7 @@ function formatSecretAge(updatedAt: string) {
 
 export function getSecretPrefixWarning(
   value: string,
-  providerHint: ElicitationProviderHint | undefined
+  providerHint: SecretProviderHint | undefined
 ) {
   const prefix = providerHint?.prefix
   if (!prefix || value.length === 0 || value.startsWith(prefix)) return undefined

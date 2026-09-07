@@ -3,7 +3,7 @@ import { cn } from 'ui'
 
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 
-export const McpElicitationShell = ({
+export const McpSecretsShell = ({
   title,
   subtitle,
   children,
@@ -22,7 +22,7 @@ export const McpElicitationShell = ({
   </InterstitialLayout>
 )
 
-export const McpElicitationFooter = ({
+export const McpSecretsFooter = ({
   children,
   align = 'center',
 }: {

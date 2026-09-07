@@ -1,15 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { ElicitationRequest } from './McpElicitation.types'
+import type { SecretRequest } from './McpSecrets.types'
 import {
-  getElicitationAnnouncement,
-  getElicitationCopy,
   getOverwriteWarning,
   getSecretHelperText,
   getSecretPrefixWarning,
-} from './McpElicitation.utils'
+  getSecretsAnnouncement,
+  getSecretsCopy,
+} from './McpSecrets.utils'
 
-const request: ElicitationRequest = {
+const request: SecretRequest = {
   tool: 'create_edge_function_secret',
   ref: 'abcdefghijklmnopqrst',
   project: 'billing-staging',
@@ -18,22 +18,22 @@ const request: ElicitationRequest = {
   providerHint: { name: 'Resend', prefix: 're_', dashboardUrl: 'https://resend.com/api-keys' },
 }
 
-const unrecognizedRequest: ElicitationRequest = {
+const unrecognizedRequest: SecretRequest = {
   ...request,
   keyName: 'MY_WEBHOOK_TOKEN',
   providerHint: undefined,
 }
 
-describe('getElicitationCopy', () => {
+describe('getSecretsCopy', () => {
   it('interpolates the key name and project into the stored state', () => {
-    const copy = getElicitationCopy({ status: 'stored', request, timedOut: false })
+    const copy = getSecretsCopy({ status: 'stored', request, timedOut: false })
 
     expect(copy.title).toBe('Key stored')
     expect(copy.subtitle).toBe('RESEND_API_KEY is saved for billing-staging.')
   })
 
   it('names the generic client, because v1 never learns which one sent the user', () => {
-    const copy = getElicitationCopy({ status: 'stored', request, timedOut: false })
+    const copy = getSecretsCopy({ status: 'stored', request, timedOut: false })
 
     expect(copy.calloutBody).toBe(
       `Go back to your AI client and choose "I've completed it" to finish the tool call.`
@@ -41,7 +41,7 @@ describe('getElicitationCopy', () => {
   })
 
   it('sends the user back to the agent instead of the client on timeout', () => {
-    const copy = getElicitationCopy({ status: 'stored', request, timedOut: true })
+    const copy = getSecretsCopy({ status: 'stored', request, timedOut: true })
 
     expect(copy.subtitle).toContain('so it may have stopped listening')
     expect(copy.calloutBody).toBe(
@@ -50,7 +50,7 @@ describe('getElicitationCopy', () => {
   })
 
   it('says nothing was stored on the generic error, and offers both ways out', () => {
-    const copy = getElicitationCopy({ status: 'error' })
+    const copy = getSecretsCopy({ status: 'error' })
 
     expect(copy.title).toBe("Couldn't complete this request")
     expect(copy.subtitle).toBe('Nothing was stored.')
@@ -60,7 +60,7 @@ describe('getElicitationCopy', () => {
   })
 
   it('never leaks a failure reason the user cannot act on', () => {
-    const copy = getElicitationCopy({ status: 'error' })
+    const copy = getSecretsCopy({ status: 'error' })
 
     expect(Object.values(copy).join(' ')).not.toMatch(/403|forbidden|permission|error code/i)
   })
@@ -77,7 +77,7 @@ describe('getElicitationCopy', () => {
     ] as const
 
     for (const state of states) {
-      const copy = getElicitationCopy(state)
+      const copy = getSecretsCopy(state)
 
       expect(copy.calloutTitle).toBe('Next step')
       expect(copy.calloutBody.length).toBeGreaterThan(0)
@@ -88,12 +88,12 @@ describe('getElicitationCopy', () => {
 
   it('never leaks a provider into a request that does not name one', () => {
     const rendered = [
-      getElicitationCopy({ status: 'stored', request: unrecognizedRequest, timedOut: false }),
-      getElicitationCopy({ status: 'already-stored', request: unrecognizedRequest }),
-      getElicitationCopy({ status: 'expired' }),
-      getElicitationCopy({ status: 'cancelled' }),
-      getElicitationCopy({ status: 'paused' }),
-      getElicitationCopy({ status: 'error' }),
+      getSecretsCopy({ status: 'stored', request: unrecognizedRequest, timedOut: false }),
+      getSecretsCopy({ status: 'already-stored', request: unrecognizedRequest }),
+      getSecretsCopy({ status: 'expired' }),
+      getSecretsCopy({ status: 'cancelled' }),
+      getSecretsCopy({ status: 'paused' }),
+      getSecretsCopy({ status: 'error' }),
     ]
       .flatMap((copy) => Object.values(copy))
       .join(' ')
@@ -187,28 +187,28 @@ describe('getSecretPrefixWarning', () => {
   })
 })
 
-describe('getElicitationAnnouncement', () => {
+describe('getSecretsAnnouncement', () => {
   it('is empty before anything has resolved, so the region mounts silent', () => {
     // A live region never announces content that was present when it mounted.
     // Rendering nothing first is what makes the first real state a change.
-    expect(getElicitationAnnouncement(undefined)).toBe('')
+    expect(getSecretsAnnouncement(undefined)).toBe('')
   })
 
   it('says what is happening while the queries resolve', () => {
-    expect(getElicitationAnnouncement({ status: 'loading' })).toBe('Loading request details')
+    expect(getSecretsAnnouncement({ status: 'loading' })).toBe('Loading request details')
   })
 
   it('names the key and project once the form is ready', () => {
-    expect(getElicitationAnnouncement({ status: 'form', request })).toBe(
+    expect(getSecretsAnnouncement({ status: 'form', request })).toBe(
       'Ready to save RESEND_API_KEY for billing-staging'
     )
   })
 
   it('announces the outcome, which the card heading alone never reads out', () => {
-    expect(getElicitationAnnouncement({ status: 'stored', request, timedOut: false })).toBe(
+    expect(getSecretsAnnouncement({ status: 'stored', request, timedOut: false })).toBe(
       'Key stored. RESEND_API_KEY is saved for billing-staging.'
     )
-    expect(getElicitationAnnouncement({ status: 'error' })).toBe(
+    expect(getSecretsAnnouncement({ status: 'error' })).toBe(
       "Couldn't complete this request. Nothing was stored."
     )
   })
@@ -224,7 +224,7 @@ describe('getElicitationAnnouncement', () => {
     ] as const
 
     for (const state of states) {
-      expect(getElicitationAnnouncement(state)).not.toContain(getElicitationCopy(state).calloutBody)
+      expect(getSecretsAnnouncement(state)).not.toContain(getSecretsCopy(state).calloutBody)
     }
   })
 
@@ -242,13 +242,13 @@ describe('getElicitationAnnouncement', () => {
     ] as const
 
     for (const state of states) {
-      expect(getElicitationAnnouncement(state).length).toBeGreaterThan(0)
+      expect(getSecretsAnnouncement(state).length).toBeGreaterThan(0)
     }
   })
 
   it('does not leak the signed-in account into the wrong-account announcement', () => {
     expect(
-      getElicitationAnnouncement({ status: 'wrong-account', signedInAs: 'ops@example.com' })
+      getSecretsAnnouncement({ status: 'wrong-account', signedInAs: 'ops@example.com' })
     ).not.toContain('ops@example.com')
   })
 })

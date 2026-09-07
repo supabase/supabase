@@ -2,11 +2,11 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { ElicitationRequest } from './McpElicitation.types'
-import { McpElicitationCard } from './McpElicitationCard'
+import type { SecretRequest } from './McpSecrets.types'
+import { McpSecretsCard } from './McpSecretsCard'
 import { customRender } from '@/tests/lib/custom-render'
 
-const request: ElicitationRequest = {
+const request: SecretRequest = {
   tool: 'create_edge_function_secret',
   ref: 'aaaaaaaaaaaaaaaaaaaa',
   project: 'acme-production',
@@ -16,9 +16,9 @@ const request: ElicitationRequest = {
 
 const noop = () => {}
 
-const renderCard = (state: Parameters<typeof McpElicitationCard>[0]['state']) =>
+const renderCard = (state: Parameters<typeof McpSecretsCard>[0]['state']) =>
   customRender(
-    <McpElicitationCard
+    <McpSecretsCard
       state={state}
       isSaving={false}
       onSave={noop}
@@ -29,7 +29,7 @@ const renderCard = (state: Parameters<typeof McpElicitationCard>[0]['state']) =>
 
 const secretField = () => screen.getByLabelText<HTMLInputElement>('Secret value')
 
-describe('McpElicitationCard', () => {
+describe('McpSecretsCard', () => {
   it('does not carry a typed secret across a change of request', async () => {
     const user = userEvent.setup()
     const { rerender } = renderCard({ status: 'form', request })
@@ -40,7 +40,7 @@ describe('McpElicitationCard', () => {
     expect(secretField().type).toBe('text')
 
     rerender(
-      <McpElicitationCard
+      <McpSecretsCard
         state={{ status: 'form', request: { ...request, keyName: 'RESEND_API_KEY' } }}
         isSaving={false}
         onSave={noop}
@@ -61,7 +61,7 @@ describe('McpElicitationCard', () => {
     await user.type(secretField(), 'sk-for-project-a')
 
     rerender(
-      <McpElicitationCard
+      <McpSecretsCard
         state={{
           status: 'form',
           request: { ...request, ref: 'bbbbbbbbbbbbbbbbbbbb', project: 'acme-production' },
@@ -83,7 +83,7 @@ describe('McpElicitationCard', () => {
     await user.type(secretField(), 'sk-still-being-typed')
 
     rerender(
-      <McpElicitationCard
+      <McpSecretsCard
         state={{
           status: 'form',
           request: { ...request, existingSecret: { updatedAt: new Date().toISOString() } },
@@ -102,7 +102,7 @@ describe('McpElicitationCard', () => {
   it('blocks an empty submit and explains why, without calling onSave', async () => {
     const onSave = vi.fn()
     customRender(
-      <McpElicitationCard
+      <McpSecretsCard
         state={{ status: 'form', request }}
         isSaving={false}
         onSave={onSave}
@@ -123,7 +123,7 @@ describe('McpElicitationCard', () => {
     const onSave = vi.fn()
     const user = userEvent.setup()
     customRender(
-      <McpElicitationCard
+      <McpSecretsCard
         state={{ status: 'form', request }}
         isSaving={false}
         onSave={onSave}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getProviderHint } from './McpElicitation.providers'
+import { getProviderHint } from './McpSecrets.providers'
 
 describe('getProviderHint', () => {
   it('matches the provider anywhere in the name, case-insensitively', () => {
