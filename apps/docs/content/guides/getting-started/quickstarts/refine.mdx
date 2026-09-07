@@ -107,15 +107,15 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 
 import './App.css'
 
-import authProvider from './providers/auth'
-import { dataProvider } from './providers/data'
-import { supabaseClient } from './providers/supabase-client'
 import {
   InstrumentsCreate,
   InstrumentsEdit,
   InstrumentsList,
   InstrumentsShow,
 } from './pages/instruments'
+import authProvider from './providers/auth'
+import { dataProvider } from './providers/data'
+import { supabaseClient } from './providers/supabase-client'
 
 function App() {
   return (

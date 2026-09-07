@@ -36,6 +36,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
   const isDatabaseConnectionsEnabled = useFlag('topForPostgres')
   const isExplorerEnabled = useFlag('explorer')
+  const isStorageVersioningEnabled = useFlag('storageVersioningPrivateAlpha')
 
   const isSqlEditorManualSaveForced = useFlag('sqlEditorManualSaveForced')
 
@@ -45,8 +46,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER,
         name: 'Explorer & Notebooks',
         category: 'editors',
-        // [Joshen TODO] Update with proper URL once discussion is up
-        discussionsUrl: undefined,
+        discussionsUrl: 'https://github.com/orgs/supabase/discussions/49916',
         enabled: isExplorerEnabled,
         isNew: true,
         isPlatformOnly: true,
@@ -151,6 +151,16 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         getRoute: (ref?: string) => `/project/${ref}/observability/connections`,
         bannerId: 'database-connections-banner',
       },
+      {
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING,
+        name: 'Storage versioning',
+        discussionsUrl: undefined,
+        isNew: true,
+        isPlatformOnly: true,
+        isDefaultOptIn: true,
+        enabled: isStorageVersioningEnabled,
+        getRoute: (ref?: string) => `/project/${ref}/storage/files`,
+      },
     ]
 
     return previews.sort((a, b) => Number(b.isNew) - Number(a.isNew))
@@ -161,5 +171,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
     isMarketplaceEnabled,
     isDatabaseConnectionsEnabled,
     isExplorerEnabled,
+    isStorageVersioningEnabled,
   ])
 }
