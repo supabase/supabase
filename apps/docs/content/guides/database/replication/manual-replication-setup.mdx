@@ -63,7 +63,7 @@ You can follow those steps with the following modifications:
 
 1. In Step 2, choose `logical replication` as the sync mechanism
 2. In Step 3, do not create a user and use the existing `postgres` user for replication
-3. In Step 5, no need to modify any WAL settings as this has been configured
+3. In Step 5, don't copy generic WAL settings without sizing them for your database. Supabase supports logical replication, but you still need to size `max_slot_wal_keep_size` for your write rate and expected replication lag, then [monitor the slot](/docs/guides/database/replication/manual-replication-monitoring#replication-slot-status).
 
 </TabPanel>
 
