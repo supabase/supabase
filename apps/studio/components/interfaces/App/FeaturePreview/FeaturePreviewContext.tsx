@@ -82,8 +82,7 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
     isInitialized,
     onUpdateFlag: (key: string, value: boolean) => {
       safeLocalStorage.setItem(key, value ? 'true' : 'false')
-      const updatedFlags = { ...flags, [key]: value }
-      setFlags(updatedFlags)
+      setFlags((prevFlags) => ({ ...prevFlags, [key]: value }))
     },
   }
 

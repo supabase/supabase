@@ -2,6 +2,7 @@ import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useMemo } from 'react'
 
 import { type BannerId } from '@/components/ui/BannerStack/BannerStackProvider'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export type FeaturePreview = {
   key: string
@@ -173,4 +174,31 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
     isExplorerEnabled,
     isStorageVersioningEnabled,
   ])
+}
+
+export type FeaturePreviewCategoryGroup = {
+  category: FeaturePreview['category']
+  previews: FeaturePreview[]
+}
+
+/**
+ * The visible feature previews (respecting platform-only/enabled gating),
+ * grouped by category in first-seen order, uncategorized previews last as a
+ * final `category: undefined` group. Shared by the feature preview modal and
+ * the Cmd+K "Feature previews" page so both list the exact same previews.
+ */
+export const useVisibleFeaturePreviewsByCategory = (): FeaturePreviewCategoryGroup[] => {
+  const featurePreviews = useFeaturePreviews()
+
+  return useMemo(() => {
+    const previews = (
+      IS_PLATFORM ? featurePreviews : featurePreviews.filter((preview) => !preview.isPlatformOnly)
+    ).filter((preview) => preview.enabled)
+    const categories = [...new Set(previews.map((preview) => preview.category).filter(Boolean))]
+
+    return categories.concat(undefined).map((category) => ({
+      category,
+      previews: previews.filter((preview) => preview.category === category),
+    }))
+  }, [featurePreviews])
 }
