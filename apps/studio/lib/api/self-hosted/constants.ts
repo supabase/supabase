@@ -18,3 +18,8 @@ export const POSTGRES_USER_READ_ONLY =
 // shipped by the supabase/cli — keep them in sync.
 export const DEFAULT_AUTH_JWT_SECRET = 'super-secret-jwt-token-with-at-least-32-characters-long'
 export const AUTH_JWT_SECRET = process.env.AUTH_JWT_SECRET || DEFAULT_AUTH_JWT_SECRET
+
+// Docker-internal hostname/port for pg-meta's x-connection-encrypted header.
+// pg-meta runs inside Docker so it must use the internal service name, not localhost.
+export const POSTGRES_DOCKER_HOST = process.env.POSTGRES_DOCKER_HOST || POSTGRES_HOST
+export const POSTGRES_DOCKER_PORT = parseInt(process.env.POSTGRES_DOCKER_PORT || String(POSTGRES_PORT), 10)

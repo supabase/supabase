@@ -25,8 +25,12 @@ export async function executeQuery<T = unknown>({
 }: QueryOptions): Promise<WrappedResult<T[]>> {
   assertSelfHosted()
 
-  const connectionString = getConnectionString({ readOnly })
-  const connectionStringEncrypted = encryptString(connectionString)
+  // If the caller already computed the encrypted connection string (e.g. from the
+  // registry via getPgMetaConnectionHeaders), respect it so multi-database routing works.
+  // Otherwise fall back to the single-database env-var connection string.
+  const callerHeaders = headers ? new Headers(headers as HeadersInit) : new Headers()
+  const connectionStringEncrypted =
+    callerHeaders.get('x-connection-encrypted') ?? encryptString(getConnectionString({ readOnly }))
 
   const requestBody: { query: string; parameters?: unknown[] } = { query }
   if (parameters !== undefined) {
