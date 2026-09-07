@@ -20,6 +20,8 @@ export type OAuthAppsAuthorizeRequest = {
 
 export async function getOAuthAppsAuthorizeRequest({ id }: OAuthAppsAuthorizeRequestVariables) {
   if (!id) throw new Error('Authorization request id is required')
+  if (!USE_MOCKS) throw new Error('OAuth app authorization request is not yet implemented')
+
   return getMockOAuthAppsAuthorizeRequest(id)
 }
 
