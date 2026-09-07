@@ -25,28 +25,44 @@ Each event is a row in the ClickHouse `logs` table. Filter the `source` column t
           <p>
             Source: <code>{schema.reference}</code>
           </p>
-          <table>
-            <thead>
-              <tr>
-                <th className="font-bold">Schema path</th>
-                <th className="font-bold">ClickHouse query field</th>
-                <th className="font-bold">Source type</th>
-                <th className="font-bold">Query value type</th>
-              </tr>
-            </thead>
-            <tbody>
-              {schema.fields
-                .sort((a, b) => a.path.localeCompare(b.path))
-                .map((field) => (
-                  <tr key={field.path}>
-                    <td className="font-mono">{field.path}</td>
-                    <td className="font-mono">{field.queryField}</td>
-                    <td className="font-mono">{field.type}</td>
-                    <td className="font-mono">{field.queryType}</td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+          <div className="border rounded-md divide-y overflow-hidden">
+            {schema.fields
+              .sort((a, b) => a.path.localeCompare(b.path))
+              .map((field) => {
+                const shortName = field.path.replace(/^metadata\./, '')
+                const isTopLevel = field.queryField === field.path
+                return (
+                  <div key={field.path} className="px-4 py-3">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <code className="text-sm">{shortName}</code>
+                      <span className="text-xs font-mono text-foreground-lighter bg-surface-200 px-1.5 py-0.5 rounded">
+                        {field.type}
+                      </span>
+                    </div>
+                    {!isTopLevel && (
+                      <div className="mt-2 flex flex-col gap-1">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-[10px] font-medium uppercase tracking-wide text-foreground-lighter border rounded px-1.5 py-px shrink-0">
+                            schema
+                          </span>
+                          <code className="text-xs text-foreground-lighter break-all">
+                            {field.path}
+                          </code>
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-[10px] font-medium uppercase tracking-wide text-foreground-lighter border rounded px-1.5 py-px shrink-0">
+                            clickhouse
+                          </span>
+                          <code className="text-xs text-foreground-lighter break-all">
+                            {field.queryField}
+                          </code>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+          </div>
         </TabPanel>
       ))}
     </Tabs>
