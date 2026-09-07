@@ -9,10 +9,7 @@ export type OAuthAppsAuthorizeOrganizationProjectsVariables = {
   slug?: string
 }
 
-export type OAuthAppsAuthorizeOrganizationProject = {
-  ref: string
-  name: string
-}
+export type { OAuthAppsAuthorizeOrganizationProject } from './types'
 
 export async function getOAuthAppsAuthorizeOrganizationProjects({
   id,
