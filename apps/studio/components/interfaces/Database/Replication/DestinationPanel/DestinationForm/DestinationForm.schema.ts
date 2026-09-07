@@ -3,6 +3,7 @@ import * as z from 'zod'
 import { AnalyticsBucketFormSchema } from './AnalyticsBucket/AnalyticsBucket.schema'
 import { BigQueryFormSchema } from './BigQuery/BigQuery.schema'
 import { ClickHouseFormSchema } from './ClickHouse/ClickHouse.schema'
+import { requiredNumberInputSchema } from './DestinationForm.schema.utils'
 import { DuckLakeFormSchema } from './DuckLake/DuckLake.schema'
 import { SnowflakeFormSchema } from './Snowflake/Snowflake.schema'
 
@@ -20,27 +21,33 @@ const CommonFormSchema = z.object({
     'skip_tables',
   ]),
   tableSyncCopyTableIds: z.array(z.string()),
-  maxFillMs: z
-    .number({
-      required_error: BATCH_WAIT_TIME_MIN_ERROR,
-      invalid_type_error: BATCH_WAIT_TIME_MIN_ERROR,
-    })
-    .int('Batch wait time must be a whole number of milliseconds.')
-    .min(0, BATCH_WAIT_TIME_MIN_ERROR),
-  maxTableSyncWorkers: z
-    .number({
-      required_error: MAX_TABLE_SYNC_WORKERS_MIN_ERROR,
-      invalid_type_error: MAX_TABLE_SYNC_WORKERS_MIN_ERROR,
-    })
-    .min(1, MAX_TABLE_SYNC_WORKERS_MIN_ERROR)
-    .int('Max table sync workers must be a whole number.'),
-  maxCopyConnectionsPerTable: z
-    .number({
-      required_error: MAX_COPY_CONNECTIONS_MIN_ERROR,
-      invalid_type_error: MAX_COPY_CONNECTIONS_MIN_ERROR,
-    })
-    .int()
-    .min(1, MAX_COPY_CONNECTIONS_MIN_ERROR),
+  maxFillMs: requiredNumberInputSchema(
+    z
+      .number({
+        required_error: BATCH_WAIT_TIME_MIN_ERROR,
+        invalid_type_error: BATCH_WAIT_TIME_MIN_ERROR,
+      })
+      .int('Batch wait time must be a whole number of milliseconds.')
+      .min(0, BATCH_WAIT_TIME_MIN_ERROR)
+  ),
+  maxTableSyncWorkers: requiredNumberInputSchema(
+    z
+      .number({
+        required_error: MAX_TABLE_SYNC_WORKERS_MIN_ERROR,
+        invalid_type_error: MAX_TABLE_SYNC_WORKERS_MIN_ERROR,
+      })
+      .min(1, MAX_TABLE_SYNC_WORKERS_MIN_ERROR)
+      .int('Max table sync workers must be a whole number.')
+  ),
+  maxCopyConnectionsPerTable: requiredNumberInputSchema(
+    z
+      .number({
+        required_error: MAX_COPY_CONNECTIONS_MIN_ERROR,
+        invalid_type_error: MAX_COPY_CONNECTIONS_MIN_ERROR,
+      })
+      .int()
+      .min(1, MAX_COPY_CONNECTIONS_MIN_ERROR)
+  ),
   invalidatedSlotBehavior: z.enum(['error', 'recreate']).optional(),
 })
 
