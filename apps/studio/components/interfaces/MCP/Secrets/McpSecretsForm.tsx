@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import {
   Button,
+  cn,
   Form,
   FormField,
   FormInputGroupInput,
@@ -128,7 +129,13 @@ export const McpSecretsForm = ({
                 </FormItemLayout>
               )}
             />
-            {prefixWarning && <p className="text-xs text-warning-600">{prefixWarning}</p>}
+            <p
+              role="status"
+              aria-live="polite"
+              className={cn('text-xs text-warning-600', !prefixWarning && 'sr-only')}
+            >
+              {prefixWarning}
+            </p>
           </div>
 
           <div className="flex flex-col gap-4">

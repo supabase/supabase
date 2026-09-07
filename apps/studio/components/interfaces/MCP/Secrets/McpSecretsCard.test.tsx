@@ -99,6 +99,23 @@ describe('McpSecretsCard', () => {
     expect(secretField().value).toBe('sk-still-being-typed')
   })
 
+  it('keeps the prefix-warning live region mounted before there is a warning to announce', async () => {
+    const user = userEvent.setup()
+    renderCard({
+      status: 'form',
+      request: { ...request, providerHint: { name: 'OpenAI', prefix: 'sk-' } },
+    })
+
+    const liveRegion = screen.getByRole('status')
+    expect(liveRegion).toHaveAttribute('aria-live', 'polite')
+    expect(liveRegion).toBeEmptyDOMElement()
+
+    await user.type(secretField(), 'not-a-real-prefix')
+
+    await waitFor(() => expect(liveRegion).toHaveTextContent(/usually start with sk-/))
+    expect(screen.getByRole('status')).toBe(liveRegion)
+  })
+
   it('blocks an empty submit and explains why, without calling onSave', async () => {
     const onSave = vi.fn()
     customRender(
