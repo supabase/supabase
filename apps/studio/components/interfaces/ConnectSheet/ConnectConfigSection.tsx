@@ -1,5 +1,5 @@
 import { Check, ChevronsUpDown } from 'lucide-react'
-import { useId, useState } from 'react'
+import { useState } from 'react'
 import {
   Button,
   cn,
@@ -274,11 +274,27 @@ interface ConnectComboboxProps {
 
 function ConnectCombobox({ id, options, value, onValueChange }: ConnectComboboxProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const listboxId = useId()
+  const [search, setSearch] = useState('')
+  const [listboxElementId, setListboxElementId] = useState<string>()
   const selectedOption = options.find((option) => option.value === value)
+  const normalizedSearch = search.trim().toLowerCase()
+  const showEmptyStatus =
+    normalizedSearch.length > 0 &&
+    !options.some(
+      (option) =>
+        option.label.toLowerCase().includes(normalizedSearch) ||
+        option.value.toLowerCase().includes(normalizedSearch)
+    )
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen} modal={false}>
+    <Popover
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open)
+        if (!open) setSearch('')
+      }}
+      modal={false}
+    >
       <PopoverTrigger asChild>
         <Button
           id={id}
@@ -286,7 +302,7 @@ function ConnectCombobox({ id, options, value, onValueChange }: ConnectComboboxP
           size="small"
           role="combobox"
           aria-expanded={isOpen}
-          aria-controls={listboxId}
+          aria-controls={listboxElementId}
           className={cn('w-full justify-between', !selectedOption && 'text-foreground-muted')}
           iconRight={<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" strokeWidth={1} />}
         >
@@ -300,10 +316,21 @@ function ConnectCombobox({ id, options, value, onValueChange }: ConnectComboboxP
           </span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent id={listboxId} align="start" className="p-0" sameWidthAsTrigger>
+      <PopoverContent align="start" className="p-0" sameWidthAsTrigger>
         <Command>
-          <CommandInput placeholder="Search frameworks..." />
-          <CommandList>
+          <CommandInput
+            placeholder="Search frameworks..."
+            value={search}
+            onValueChange={setSearch}
+          />
+          <p className="sr-only" role="status" aria-live="polite">
+            {showEmptyStatus ? 'No frameworks found.' : ''}
+          </p>
+          <CommandList
+            ref={(node) => {
+              if (node?.id) setListboxElementId(node.id)
+            }}
+          >
             <CommandEmpty>No frameworks found.</CommandEmpty>
             <CommandGroup>
               <ScrollArea className="h-72" onWheel={(event) => event.stopPropagation()}>

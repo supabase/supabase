@@ -69,10 +69,10 @@ describe('ConnectConfigSection', () => {
 
     await user.click(combobox!)
 
-    const listbox = document.getElementById(combobox!.getAttribute('aria-controls')!)
-    expect(listbox).toBeTruthy()
+    const listbox = screen.getByRole('listbox')
+    expect(combobox!.getAttribute('aria-controls')).toBe(listbox.id)
 
-    const scrollArea = listbox!.querySelector('.h-72')
+    const scrollArea = listbox.querySelector('.h-72')
     expect(scrollArea).toBeTruthy()
     expect(screen.getAllByRole('option')).toHaveLength(20)
   })
@@ -94,8 +94,8 @@ describe('ConnectConfigSection', () => {
 
     await user.click(combobox!)
 
-    const listbox = document.getElementById(combobox!.getAttribute('aria-controls')!)
-    const scrollArea = listbox!.querySelector('.h-72') as HTMLElement
+    const listbox = screen.getByRole('listbox')
+    const scrollArea = listbox.querySelector('.h-72') as HTMLElement
     expect(scrollArea).toBeTruthy()
 
     const stopPropagation = vi.spyOn(WheelEvent.prototype, 'stopPropagation')
