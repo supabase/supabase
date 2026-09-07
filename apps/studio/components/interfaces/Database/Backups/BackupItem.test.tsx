@@ -53,8 +53,7 @@ describe('BackupItem', () => {
     )
 
     const button = screen.getByRole('button', { name: 'Restore' })
-    expect(button).toHaveAttribute('aria-disabled', 'true')
-    expect(button).not.toBeDisabled()
+    expect(button).toBeDisabled()
 
     // Radix opens the tooltip on pointermove; unavailable buttons stay focusable
     fireEvent.pointerMove(button)

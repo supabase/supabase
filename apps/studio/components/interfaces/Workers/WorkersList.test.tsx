@@ -75,20 +75,12 @@ describe('WorkersList', () => {
 
     expect(rowNames()).toHaveLength(10)
     expect(screen.getByText('Page 1 of 2')).toBeVisible()
-    expect(screen.getByRole('button', { name: 'Previous page' })).toHaveAttribute(
-      'aria-disabled',
-      'true'
-    )
-    expect(screen.getByRole('button', { name: 'Previous page' })).not.toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Previous page' })).toBeDisabled()
 
     await userEvent.click(screen.getByRole('button', { name: 'Next page' }))
 
     expect(rowNames()).toEqual(['worker-10', 'worker-11'])
-    expect(screen.getByRole('button', { name: 'Next page' })).toHaveAttribute(
-      'aria-disabled',
-      'true'
-    )
-    expect(screen.getByRole('button', { name: 'Next page' })).not.toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled()
   })
 
   it('returns to the first page when a search shrinks the results', async () => {
