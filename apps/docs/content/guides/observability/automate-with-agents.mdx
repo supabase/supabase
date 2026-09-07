@@ -1,38 +1,25 @@
 ---
 id: 'automate-with-agents'
 title: 'Hire an agent'
-subtitle: 'Run a read-only monitoring routine in your own agent harness.'
-description: 'Choose and set up a Health, Security, Performance, or Capacity monitor in Claude, Codex, or Cursor.'
+description: 'Choose an agent to monitor your project and report findings on a schedule'
 ---
 
-This guide explains how to run a Supabase monitoring agent in your own harness. Each agent is a prompt plus a schedule. It reads project data and reports findings. It does not change the project.
+Hire an agent to run recurring checks on your Supabase project. Each agent combines a prompt and a schedule. It reads project data and reports findings without changing your project.
 
-## Choose a routine
+## Choose an agent [#choose-a-routine]
 
-Start with one monitor. Add another only when the project needs a different source or cadence.
+Use Generalist for one daily pass, or a specialist for a particular job or cadence.
 
-| Monitor                                                                            | What it watches                                                               | Default cadence | Use it when                                                    |
-| ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | --------------- | -------------------------------------------------------------- |
-| [Health monitor](/docs/guides/observability/automate-with-agents/health)           | API and Auth server errors, error-rate spikes, connection pressure            | Hourly          | You need incident detection and regular feedback loops         |
-| [Security monitor](/docs/guides/observability/automate-with-agents/security)       | Security Advisor findings, authentication and authorization failures          | Daily           | You need a regular access-control and configuration review     |
-| [Performance monitor](/docs/guides/observability/automate-with-agents/performance) | Slow queries, lock waits, long-running sessions, Performance Advisor findings | Hourly          | You need query and database performance checks                 |
-| [Capacity monitor](/docs/guides/observability/automate-with-agents/usage)          | Request, error, storage, table, and connection growth                         | Daily           | You need to identify growth before it reaches a resource limit |
+<ContentListings id="telemetry-hire-agent" />
 
-For a small project, run the most relevant routine daily or weekly and include the other categories in its prompt. Split it into specialized monitors only when you need different owners, schedules, or alert thresholds.
+## Set up your agent [#run-the-routine]
 
-## Run the routine
+1. Connect [Supabase MCP](/docs/guides/ai-tools/mcp) with `project_ref` and `read_only=true`.
+2. Copy the agent's prompt into your harness. Allow it to fetch the linked [detection checks](/docs/guides/observability/detecting), and set any threshold overrides for your workload.
+3. Configure the harness to save and reload measurements and previous alert outcomes between runs, outside the project database. Comparisons need saved history; forecasts also need a confirmed resource limit. Without those inputs, the agent reports **unable to assess**.
+4. Run manually first. Confirm that it can read the intended project and return useful results. Review any missing inputs before scheduling.
+5. Set the agent's schedule and timezone, prevent overlapping runs, and choose where reports go. Reports stay in the harness unless you authorize an external destination or ticket creation.
 
-1. Connect the [Supabase MCP server](/docs/guides/ai-tools/mcp) with `project_ref` and `read_only=true`.
-2. Open the monitor that matches the job from the table above.
-3. Set it up in Claude, Codex, Cursor, or copy the prompt into another harness.
-4. Run it on demand first. Then put the same prompt on a schedule.
+## What to expect [#outcomes-and-notifications]
 
-Each agent page describes what it will output. Send those findings through the connections your harness already has, such as Linear in Codex.
-
-Scheduled tasks start a fresh context on every run, so the prompt is self-contained. Review the first runs before you rely on the schedule.
-
-<Admonition type="caution">
-
-Logs and query results can contain secrets or personal information. Keep the agent read-only, aggregate evidence, and redact sensitive values.
-
-</Admonition>
+Each check records **finding**, **clear**, or **unable to assess**. Clear runs and unchanged repeats stay quiet. New findings or changed assessment failures produce a report with evidence and a next step. Failed access or missing history never counts as a healthy result.
