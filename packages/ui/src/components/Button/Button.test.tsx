@@ -89,6 +89,24 @@ describe('#Button', () => {
     expect(buttonOnClick).not.toHaveBeenCalled()
   })
 
+  it('should not call Button onClick when asChild child calls preventDefault', () => {
+    const childOnClick = vi.fn((e: React.MouseEvent) => e.preventDefault())
+    const buttonOnClick = vi.fn()
+
+    render(
+      <Button asChild onClick={buttonOnClick}>
+        <a href="/foo" onClick={childOnClick}>
+          Link
+        </a>
+      </Button>
+    )
+
+    fireEvent.click(screen.getByRole('link'))
+
+    expect(childOnClick).toHaveBeenCalled()
+    expect(buttonOnClick).not.toHaveBeenCalled()
+  })
+
   it('should ignore events when disabled', () => {
     const WrapperButton = () => {
       const [state, setState] = React.useState('state1')

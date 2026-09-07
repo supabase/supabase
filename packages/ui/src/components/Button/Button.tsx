@@ -239,7 +239,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       }
 
       childOnClick?.(e)
-      onClick?.(e as React.MouseEvent<HTMLButtonElement>)
+      if (!e.defaultPrevented) {
+        onClick?.(e as React.MouseEvent<HTMLButtonElement>)
+      }
     }
 
     return (
