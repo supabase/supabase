@@ -1,4 +1,6 @@
+import type { LOG_TYPES } from '../UnifiedLogs.constants'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
+import { LogTypeIcon } from './LogTypeIcon'
 import CopyButton from '@/components/ui/CopyButton'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
@@ -7,7 +9,10 @@ interface LogEntry {
   timestamp: string
   event_message: string
   level: string
-  event_type: string
+  event_type?: string
+  /** Which service this line came from — set for cross-service bundles (e.g. traced logs),
+   * omitted for single-service lists (e.g. edge function console output) where it'd be redundant. */
+  log_type?: (typeof LOG_TYPES)[number]
 }
 
 interface LogsListProps {
@@ -18,7 +23,7 @@ export const LogsList = ({ logs = [] }: LogsListProps) => {
   if (!logs || logs.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-6">
-        <p className="text-sm text-muted-foreground">No function logs found</p>
+        <p className="text-sm text-muted-foreground">No logs found</p>
       </div>
     )
   }
@@ -35,6 +40,9 @@ export const LogsList = ({ logs = [] }: LogsListProps) => {
               <div className="flex items-start gap-5">
                 <div className="flex flex-row items-center gap-5 shrink-0">
                   <HoverCardTimestamp date={date} className="shrink-0" />
+                  {log.log_type && (
+                    <LogTypeIcon type={log.log_type} className="text-foreground-lighter shrink-0" />
+                  )}
                   <DataTableColumnStatusCode
                     value={log.level}
                     level={log.level}

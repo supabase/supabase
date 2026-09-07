@@ -64,4 +64,6 @@ export const logsKeys = {
       logId,
       ...(searchParams ? [searchParams].filter(Boolean) : []),
     ] as const,
+  tracedLogBundle: (projectRef: string | undefined, requestId: string | undefined) =>
+    ['projects', projectRef, 'unified-logs', 'traced-log-bundle', requestId] as const,
 }

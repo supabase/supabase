@@ -9,6 +9,7 @@ import { analyticsLiteral, safeSql } from './safe-analytics-sql'
 import { extractLogMetadata } from './unified-logs.utils'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
+import { getTracedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.traced'
 import {
   PageParam,
   QuerySearchParamsType,
@@ -86,7 +87,13 @@ export async function getUnifiedLogs(
    */
 
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
-  const buildQuery = pickLogsQueryBuilder(useOtel, getUnifiedLogsQuery, getUnifiedLogsQueryBq)
+  // Traced mode has no BigQuery equivalent — it always runs against the OTEL
+  // endpoint (request_id lookups are ClickHouse-only), regardless of the
+  // otelUnifiedLogs flag.
+  const isTraced = !!search.traced
+  const buildQuery = isTraced
+    ? getTracedLogsQuery
+    : pickLogsQueryBuilder(useOtel, getUnifiedLogsQuery, getUnifiedLogsQueryBq)
   const sql = safeSql`${buildQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${analyticsLiteral(LOGS_PAGE_LIMIT)}`
 
   const cursorValue = pageParam?.cursor
@@ -109,7 +116,7 @@ export async function getUnifiedLogs(
     timestampEnd = isoTimestampEnd
   }
 
-  const endpoint = logsAllEndpointUrl(useOtel)
+  const endpoint = logsAllEndpointUrl(useOtel || isTraced)
   const data = await executeAnalyticsSql({
     projectRef,
     endpoint,
