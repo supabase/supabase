@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, test } from 'vitest'
 
-import { ident, keyword, literal, safeSql } from '../src/pg-format'
+import { ident, keyword, literal, safeSql, string } from '../src/pg-format'
 
 describe('pg-format', () => {
   describe('ident', () => {
@@ -129,6 +129,16 @@ describe('pg-format', () => {
       expect(literal(['a', 'b', 'c'])).toBe("'a','b','c'")
     })
 
+    test('should handle nested arrays without leading space on first emitted nested array', () => {
+      expect(
+        literal([
+          [1, 2],
+          [3, 4],
+        ])
+      ).toBe('(1, 2), (3, 4)')
+      expect(literal([null, [1, 2]])).toBe('NULL, (1, 2)')
+    })
+
     test('should handle objects as JSON', () => {
       expect(literal({ name: 'test' })).toBe('\'{"name":"test"}\'::jsonb')
       expect(literal({ id: 1, name: 'test' })).toBe('\'{"id":1,"name":"test"}\'::jsonb')
@@ -137,6 +147,23 @@ describe('pg-format', () => {
     test('should handle strings with backslashes', () => {
       expect(literal('path\\to\\file')).toBe("E'path\\\\to\\\\file'")
       expect(literal('C:\\Users\\test')).toBe("E'C:\\\\Users\\\\test'")
+    })
+  })
+
+  describe('string', () => {
+    test('should handle nested arrays and skip null/undefined', () => {
+      expect(string([1, null, undefined, 2])).toBe('1, 2')
+    })
+
+    test('should handle nested arrays without leading space on first emitted nested array', () => {
+      expect(
+        string([
+          [1, 2],
+          [3, 4],
+        ])
+      ).toBe('(1, 2), (3, 4)')
+      expect(string([null, [1, 2]])).toBe('(1, 2)')
+      expect(string([undefined, [1, 2]])).toBe('(1, 2)')
     })
   })
 
