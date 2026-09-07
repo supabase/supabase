@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useForm } from 'react-hook-form'
-import { Button, Form } from 'ui'
+import { Form } from 'ui'
 import { describe, expect, it } from 'vitest'
 
 import { AdvancedSettings } from './AdvancedSettings'
@@ -23,7 +23,7 @@ const numericFields = [
 const TestForm = () => {
   const form = useForm<DestinationPanelSchemaType>({
     resolver: zodResolver(DestinationPanelFormSchema),
-    mode: 'onTouched',
+    mode: 'onChange',
     reValidateMode: 'onChange',
     defaultValues: {
       name: 'Warehouse',
@@ -37,17 +37,9 @@ const TestForm = () => {
       maxStalenessMins: 10,
     },
   })
-  const { errors } = form.formState
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(() => undefined)}>
-        <AdvancedSettings type="BigQuery" form={form} />
-        <Button type="submit">Save</Button>
-        <output data-testid="table-sync-workers-validity">
-          {errors.maxTableSyncWorkers === undefined ? 'valid' : 'invalid'}
-        </output>
-      </form>
+      <AdvancedSettings type="BigQuery" form={form} />
     </Form>
   )
 }
@@ -72,7 +64,7 @@ describe('AdvancedSettings', () => {
     }
   )
 
-  it('validates an empty required number on blur, then revalidates on change', async () => {
+  it('uses the existing error while an empty required number is being edited', async () => {
     const user = userEvent.setup()
     customRender(<TestForm />)
 
@@ -80,12 +72,15 @@ describe('AdvancedSettings', () => {
     const input = screen.getByRole('spinbutton', { name: 'Table sync workers' })
 
     await user.clear(input)
-    expect(screen.getByTestId('table-sync-workers-validity')).toHaveTextContent('valid')
-
-    await user.tab()
-    expect(await screen.findByText('invalid', { selector: 'output' })).toBeInTheDocument()
+    expect(
+      await screen.findByText('Max table sync workers must be greater than 0.')
+    ).toBeInTheDocument()
 
     await user.type(input, '5')
-    expect(await screen.findByText('valid', { selector: 'output' })).toBeInTheDocument()
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Max table sync workers must be greater than 0.')
+      ).not.toBeInTheDocument()
+    })
   })
 })

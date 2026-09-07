@@ -14,20 +14,24 @@ const requiredFields = {
 }
 
 const requiredNumberFields = [
-  'maxFillMs',
-  'maxTableSyncWorkers',
-  'maxCopyConnectionsPerTable',
-  'connectionPoolSize',
+  { field: 'maxFillMs', message: 'Batch wait time must be 0 or greater.' },
+  { field: 'maxTableSyncWorkers', message: 'Max table sync workers must be greater than 0.' },
+  {
+    field: 'maxCopyConnectionsPerTable',
+    message: 'Max copy connections per table must be greater than 0.',
+  },
+  { field: 'connectionPoolSize', message: 'Connection pool size must be greater than 0.' },
 ] as const
 
 describe('DestinationPanelFormSchema', () => {
-  it.each(requiredNumberFields)('rejects an empty %s field', (field) => {
+  it.each(requiredNumberFields)('uses the existing error for an empty $field field', (testCase) => {
     const result = DestinationPanelFormSchema.safeParse({
       ...requiredFields,
-      [field]: '',
+      [testCase.field]: '',
     })
 
     expect(result.success).toBe(false)
+    if (!result.success) expect(result.error.issues[0]?.message).toBe(testCase.message)
   })
 
   it('normalizes an empty maximum staleness to undefined', () => {
