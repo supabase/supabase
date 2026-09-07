@@ -4,39 +4,50 @@ Design resources for building consistent user experiences at Supabase.
 
 ## Getting started
 
-First, make a copy of _.env.local.example_ and name it _env.local_. Then install any required packages and start the development server:
+From the repo root:
 
 ```bash
+cp apps/design-system/.env.local.example apps/design-system/.env.local
 cd apps/design-system
 pnpm i
 pnpm dev
 ```
 
-The `dev` command generates `__registry__`, then runs the Next.js development server and Contentlayer together. That is the recommended workflow.
+Or from `apps/design-system`:
+
+```bash
+cp .env.local.example .env.local
+pnpm i
+pnpm dev
+```
+
+The `dev` command builds the registry and Velite content, then runs the Next.js dev server and Velite watcher in parallel. That is the recommended workflow.
+
+Open [http://localhost:3003/design-system](http://localhost:3003/design-system) in your browser to see the result.
 
 ### Alternative commands
 
-You can also run the development server and content watcher separately. Generate the registry first, because `dev:next` and `dev:content` do not:
+You can also run the development server and content watcher separately. Build the registry and content first, because `dev:next` and `dev:content` do not:
 
 ```bash
-pnpm generate:registry
+pnpm build:registry
+pnpm build:content
 
 # Run only the Next.js development server
 pnpm dev:next
 
-# Run only the content watcher (in a separate terminal shell)
+# Run only the Velite content watcher (in a separate terminal shell)
 pnpm dev:content
 ```
 
-From the repo root, `pnpm dev:design-system` runs the same `dev` script, so it also generates `__registry__`. If you split the watchers from the root, generate first:
+From the repo root, `pnpm dev:design-system` runs the same `dev` script. If you split the watchers from the root, build first:
 
 ```bash
-pnpm --filter=design-system generate:registry
+pnpm --filter=design-system build:registry
+pnpm --filter=design-system build:content
 pnpm --filter=design-system dev:next
 pnpm --filter=design-system dev:content
 ```
-
-Open [http://localhost:3003](http://localhost:3003) in your browser to see the result.
 
 ### Watching for MDX changes
 
@@ -64,5 +75,5 @@ Do not edit `__registry__`. `pnpm dev`, `pnpm typecheck`, and `pnpm build` gener
 
 ```bash
 cd apps/design-system
-pnpm generate:registry
+pnpm build:registry
 ```
