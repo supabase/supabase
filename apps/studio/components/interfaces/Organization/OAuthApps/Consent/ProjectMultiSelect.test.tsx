@@ -30,7 +30,7 @@ describe('ProjectMultiSelect', () => {
     expect(screen.getByRole('combobox')).toHaveTextContent('Select projects...')
   })
 
-  test('renders the selection count in the trigger', () => {
+  test('renders the selected projects by name in the trigger', () => {
     customRender(
       <ProjectMultiSelect
         projects={PROJECTS}
@@ -39,7 +39,10 @@ describe('ProjectMultiSelect', () => {
       />
     )
 
-    expect(screen.getByRole('combobox')).toHaveTextContent('2 projects')
+    const trigger = screen.getByRole('combobox')
+    expect(trigger).toHaveTextContent('production')
+    expect(trigger).toHaveTextContent('staging')
+    expect(trigger).not.toHaveTextContent('project-1')
   })
 
   test('fires onChange with the toggled id added', () => {
@@ -59,7 +62,7 @@ describe('ProjectMultiSelect', () => {
     )
 
     fireEvent.click(screen.getByRole('combobox'))
-    fireEvent.click(screen.getByText('production'))
+    fireEvent.click(screen.getByRole('option', { name: 'production' }))
 
     expect(onChange).toHaveBeenCalledWith([])
   })
@@ -184,7 +187,7 @@ describe('ProjectMultiSelect', () => {
     )
 
     fireEvent.click(screen.getByRole('combobox'))
-    fireEvent.click(screen.getByText('project 1'))
+    fireEvent.click(screen.getByRole('option', { name: 'project 1' }))
 
     expect(onChange).toHaveBeenCalledWith(refsUpTo(10).slice(1))
 

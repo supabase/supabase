@@ -149,7 +149,7 @@ export const OAuthAppsAuthorizeScreen = ({
   const footerMessage = isSubmitting
     ? "Don't close this window."
     : hasProjects
-      ? `Authorizing will redirect you to ${request.redirect_uri}.`
+      ? null
       : `Cancelling will redirect you to ${request.redirect_uri} with access denied.`
 
   return (
@@ -167,7 +167,7 @@ export const OAuthAppsAuthorizeScreen = ({
       }
       description="This application wants to access your Supabase Account"
     >
-      <div className="flex flex-col gap-4 px-6 pb-6">
+      <div className="flex flex-col gap-6 px-6 pb-6">
         {!request.is_verified && (
           <Admonition
             type="warning"
@@ -178,7 +178,6 @@ export const OAuthAppsAuthorizeScreen = ({
         <fieldset disabled={isSubmitting} className="contents">
           <AuthorizingAsCard
             email={identity.email}
-            memberRole={memberOrg.default_role}
             organizationSlug={memberOrg.slug}
             onSignOut={handleSignOut}
             showSwitcher={identity.organizations.length > 1}
@@ -232,9 +231,14 @@ export const OAuthAppsAuthorizeScreen = ({
           )}
         </div>
 
-        <div className="mt-3 border-t border-muted pt-5">
-          <p className="text-center text-xs text-foreground-lighter text-balance">
-            {footerMessage}
+        <div className="border-t pt-6">
+          <p className="text-xs text-foreground-light">
+            {footerMessage ?? (
+              <>
+                Authorizing will redirect you to{' '}
+                <span className="text-foreground">{request.redirect_uri}</span>.
+              </>
+            )}
           </p>
         </div>
       </div>

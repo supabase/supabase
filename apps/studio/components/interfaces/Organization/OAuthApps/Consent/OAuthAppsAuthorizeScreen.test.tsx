@@ -90,10 +90,10 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.getByText('Permissions granted')).toBeInTheDocument()
     expect(screen.queryByText('Permissions requested')).not.toBeInTheDocument()
     expect(
-      screen.getByText('project_settings, action_runs, logs, sql_snippets')
+      screen.getByText('Project Settings, Action Runs, Logs, SQL Snippets')
     ).toBeInTheDocument()
     expect(
-      screen.getByText('database_webhooks, development_branches, production_branches')
+      screen.getByText('Database Webhooks, Development Branches, Production Branches')
     ).toBeInTheDocument()
   })
 

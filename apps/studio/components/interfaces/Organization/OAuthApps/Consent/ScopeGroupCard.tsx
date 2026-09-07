@@ -1,5 +1,3 @@
-import { Badge, Card, CardContent, cn } from 'ui'
-
 import type { OAuthScopeGroup, OAuthScopeLevel } from '@/data/oauth-apps/types'
 
 export interface ScopeGroupCardProps {
@@ -15,38 +13,27 @@ export const ScopeGroupCard = ({
   showHeading = true,
 }: ScopeGroupCardProps) => {
   return (
-    <section className="flex flex-col">
+    <section className="flex flex-col gap-5">
       {showHeading && (
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-foreground-light">
-            Permissions requested
-          </p>
-          <p className="mt-1 text-xs text-foreground-lighter">
+        <div className="flex flex-col gap-1">
+          <p className="text-xs text-foreground">Permissions requested</p>
+          <p className="text-xs text-foreground-light">
             Authorizing {appName} grants it the following access permissions to the selected
             projects.
           </p>
         </div>
       )}
 
-      <Card
-        className={cn(
-          'overflow-hidden shadow-none bg-surface-200/60 border-muted',
-          showHeading && 'mt-3'
-        )}
-      >
-        <CardContent className="border-none p-0">
-          <div className="divide-y divide-muted px-4">
-            {scopeGroups.map((scopeGroup) => (
-              <div key={scopeGroup.name} className="py-3">
-                <Badge variant={getScopeLevelBadgeVariant(scopeGroup.level)}>
-                  {getScopeLevelLabel(scopeGroup.level)}
-                </Badge>
-                <p className="mt-1 text-sm text-foreground-light">{scopeGroup.scopes.join(', ')}</p>
-              </div>
-            ))}
+      <div className="divide-y rounded-md border bg-surface-75 px-4">
+        {scopeGroups.map((scopeGroup) => (
+          <div key={scopeGroup.name} className="flex flex-col gap-2 py-3">
+            <p className="font-mono text-[11px] uppercase tracking-wider text-foreground-light">
+              {getScopeLevelLabel(scopeGroup.level)}
+            </p>
+            <p className="text-xs font-medium text-foreground">{scopeGroup.name}</p>
           </div>
-        </CardContent>
-      </Card>
+        ))}
+      </div>
     </section>
   )
 }
@@ -55,8 +42,4 @@ function getScopeLevelLabel(level: OAuthScopeLevel) {
   if (level === 'read') return 'READ'
   if (level === 'write') return 'WRITE'
   return 'READ-WRITE'
-}
-
-function getScopeLevelBadgeVariant(level: OAuthScopeLevel) {
-  return level === 'read' ? 'default' : 'warning'
 }
