@@ -53,7 +53,8 @@ export async function apiWrapper(
 
     return await handler(req, res, claims)
   } catch (error) {
+    console.error("[apiWrapper] caught:", error)
     Sentry.captureException(error)
-    return res.status(500).json({ error })
+    return res.status(500).json({ error: error instanceof Error ? { message: error.message, stack: error.stack } : error })
   }
 }

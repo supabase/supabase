@@ -54,12 +54,15 @@ RUN pnpm install --frozen-lockfile
 # dev contains dependencies and source code not compiled
 FROM deps AS dev
 COPY --from=turbo /app/out/full ./
+COPY apps/studio/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 8082
 CMD ["pnpm", "dev:studio"]
 
 # Compile Next.js
 FROM dev AS build-next
+ARG BUILD_MEMORY=4096
+ENV NODE_OPTIONS="--max-old-space-size=$BUILD_MEMORY"
 RUN pnpm --filter studio exec next build
 
 # Assemble the runtime tree at /srv in the layout the production stage
