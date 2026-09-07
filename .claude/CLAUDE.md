@@ -68,3 +68,75 @@ The skills in `.claude/skills/` are the source of truth for conventions — load
 ## Studio
 
 Before working on anything in `apps/studio`, read `apps/studio/CLAUDE.md` if it isn't already in context — it maps Studio tasks to required skills and covers the TanStack Start migration rules.
+
+---
+
+## Custom Work: Multi-Database Self-Hosted Support
+
+This fork adds the ability to run **multiple independent Postgres databases** (each a full Supabase project) from a single self-hosted deployment. The upstream code assumes exactly one database; these changes extend every layer to support N databases.
+
+### Why
+
+The upstream self-hosted stack hard-codes a single `DEFAULT_PROJECT` and a single set of `POSTGRES_*` env vars. This feature allows operators to register multiple databases in a central registry so Studio can manage all of them, each with isolated auth (GoTrue), REST (PostgREST), pooler (Supavisor), and Realtime tenants.
+
+### Architecture
+
+#### Registry — single source of truth
+
+`docker/volumes/registry/databases.json` — a JSON file listing all databases with their `ref` (unique slug), `host`, `port`, `database`, and env-var names for secrets. Mounted into the Studio container.
+
+`apps/studio/lib/api/self-hosted/registry.ts` — TypeScript reader. Exports `getAllDatabases()` and `getDatabaseByRef(ref)`. All self-hosted routing logic reads from here instead of hardcoded env vars.
+
+#### Studio changes
+
+| File | What changed |
+|---|---|
+| `lib/api/self-hosted/util.ts` | `getConnectionString()` now accepts an optional `ref`; looks up the registry before falling back to single-DB env vars |
+| `lib/api/self-hosted/pg-meta-headers.ts` | New helper — builds `x-connection-encrypted` header per ref so each pg-meta call hits the right DB |
+| `lib/api/self-hosted/settings.ts` | Settings resolver now resolves JWT/anon/service keys per ref from the registry |
+| `lib/api/self-hosted/query.ts` | All pg-meta proxy routes now pass `getPgMetaConnectionHeaders(ref, ...)` |
+| `pages/api/platform/projects/index.ts` | Returns all registry databases as project objects instead of a single `DEFAULT_PROJECT` |
+| `pages/api/platform/projects/[ref]/index.ts` | Per-ref project detail resolved from registry |
+| `pages/api/platform/pg-meta/[ref]/*` | All pg-meta routes forward the per-ref encrypted connection header |
+| `components/interfaces/MultiDatabaseBanner.tsx` | UI banner shown in multi-DB mode |
+| `hooks/useMultiDatabaseProjects.ts` | Hook that fetches the project list and detects multi-DB mode |
+
+#### Docker changes
+
+| File | Purpose |
+|---|---|
+| `docker/docker-compose.multi.yml` | Auto-generated overlay (via `generate-multi.py`) that adds per-DB containers (db, auth, rest, pooler) |
+| `docker/generate-multi.py` | Python script — reads `databases.json`, writes `docker-compose.multi.yml` |
+| `docker/scripts/` | Helper shell scripts for adding databases and applying Envoy config |
+| `docker/volumes/api/envoy/cds.multi.yaml` | Envoy CDS config for multi-DB cluster routing |
+| `docker/volumes/api/envoy/lds.multi.patch.yaml` | Envoy LDS patch for per-ref path routing |
+| `scripts/add-database.sh` | Interactive script to add a new database entry to the registry and regenerate compose |
+
+#### Key invariant — backward compatibility
+
+When `databases.json` contains only `"ref": "default"` (or the registry file is absent), every function falls back to the original single-database env-var path. No existing single-DB deployments break.
+
+### Running multi-DB mode
+
+```bash
+# 1. Edit docker/volumes/registry/databases.json — add your databases
+# 2. Regenerate the multi compose overlay
+python3 docker/generate-multi.py
+
+# 3. Start everything
+docker compose -f docker/docker-compose.yml -f docker/docker-compose.multi.yml up -d
+
+# 4. Or use the helper
+bash scripts/add-database.sh
+```
+
+See `docker/MULTI_DATABASE.md` for the full setup guide.
+
+### Testing
+
+```bash
+# Unit tests for the custom self-hosted layer
+pnpm --filter studio vitest run apps/studio/lib/api/self-hosted
+pnpm --filter studio vitest run apps/studio/hooks/useMultiDatabaseProjects
+pnpm --filter studio vitest run apps/studio/pages/api/platform/projects
+```

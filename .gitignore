@@ -167,3 +167,11 @@ keys.json
 examples/**/package-lock.json
 examples/**/yarn.lock
 examples/**/pnpm-lock.yaml
+# Local secrets — never commit
+apps/studio/.env.local
+apps/studio/.env.local.*
+apps/studio/.env.local.host-backup
+docker/volumes/registry/databases.json
+
+__pycache__/
+*.pyc
