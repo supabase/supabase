@@ -1,10 +1,10 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 const isDev = process.env.NODE_ENV === 'development'
-const isBuild = process.env.NODE_ENV === 'production'
 
-if (!process.env.VELITE_STARTED && (isDev || isBuild)) {
+if (!process.env.VELITE_STARTED && isDev) {
   process.env.VELITE_STARTED = '1'
   const { build } = await import('velite')
-  await build({ watch: isDev, clean: !isDev })
+  await build({ watch: true, clean: false })
 }
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '/design-system'

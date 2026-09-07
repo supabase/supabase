@@ -218,9 +218,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const showIcon = loading || icon
     // decrecating 'showIcon' for rightIcon
     const _iconLeft: React.ReactNode = icon ?? iconLeft
-    const unavailable = unavailableProp === true
+    const isLoading = loading === true
+    const unavailable = unavailableProp === true && !isLoading
     // if loading, button is disabled
-    const disabled = !unavailable && (loading === true || disabledProp)
+    const disabled = isLoading || (disabledProp === true && !unavailable)
 
     const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
 
@@ -245,8 +246,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         onClick={(e) => {
           // [Joshen] Prevents redirecting if Button is used with a link-based child element
-          if (disabled || unavailable) return e.preventDefault()
-          else rest?.onClick?.(e)
+          if (disabled || unavailable) {
+            e.preventDefault()
+            e.stopPropagation()
+            return
+          }
+          rest?.onClick?.(e)
         }}
       >
         {asChild ? (

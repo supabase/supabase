@@ -268,7 +268,8 @@ describe('QueryTab execution', () => {
 
     renderQueryTab()
     const runButton = await screen.findByRole('button', { name: 'Run' })
-    expect(runButton).toBeDisabled()
+    expect(runButton).toHaveAttribute('aria-disabled', 'true')
+    expect(runButton).not.toBeDisabled()
 
     act(() => releaseReplicas())
     await waitFor(() => expect(runButton).toBeEnabled())

@@ -22,7 +22,7 @@ About to push some code? At a minimum, check your work against this list:
 
 ## Focus management
 
-All interactive page elements should be reachable by keyboard. Given the below inconsistency between devices and browsers, add `tabIndex={0}` to all buttons, links, and non-text inputs, ideally at the component level. For controls using native `disabled`, tie `tabIndex` to that state (disabled controls default to `tabIndex={-1}`). Controls that use `aria-disabled` to stay discoverable should remain at `tabIndex={0}`. See [Disabled controls](#disabled-controls).
+All interactive page elements should be reachable by keyboard. Native buttons, links with `href`, and form inputs are keyboard accessible by default. Add `tabIndex={0}` only to bespoke interactive elements. For controls using native `disabled`, tie `tabIndex` to that state (disabled controls default to `tabIndex={-1}`). Controls that use `aria-disabled` to stay discoverable should remain at `tabIndex={0}`. See [Disabled controls](#disabled-controls).
 
 Chromium-based browsers and Firefox handle this automatically via the Tab key. Safari, by default, requires the Option key to also be held down. Enabling _Keyboard navigation_ on macOS Settings [removes this requirement](https://mayank.co/blog/safari-focus/#keyboard-navigation) but makes links non-tabbable as a result.
 

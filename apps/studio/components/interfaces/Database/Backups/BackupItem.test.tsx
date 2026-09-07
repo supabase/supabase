@@ -53,10 +53,10 @@ describe('BackupItem', () => {
     )
 
     const button = screen.getByRole('button', { name: 'Restore' })
-    expect(button).toBeDisabled()
+    expect(button).toHaveAttribute('aria-disabled', 'true')
+    expect(button).not.toBeDisabled()
 
-    // Radix opens the tooltip on pointermove; userEvent does not synthesize
-    // pointer events on disabled buttons
+    // Radix opens the tooltip on pointermove; unavailable buttons stay focusable
     fireEvent.pointerMove(button)
     expect(
       await screen.findAllByText(

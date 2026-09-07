@@ -36,6 +36,18 @@ describe('#Button', () => {
     expect(screen.getByText('按钮')).toBeInTheDocument()
   })
 
+  it('should use native disabled when loading even if unavailable is true', () => {
+    render(
+      <Button unavailable loading>
+        Button
+      </Button>
+    )
+
+    const button = screen.getByRole('button')
+    expect(button).toBeDisabled()
+    expect(button).not.toHaveAttribute('aria-disabled', 'true')
+  })
+
   it('should ignore events when unavailable', () => {
     const WrapperButton = () => {
       const [state, setState] = React.useState('state1')

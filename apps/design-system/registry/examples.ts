@@ -566,7 +566,7 @@ export const examples: Registry = [
   {
     name: 'disabled-unavailable-with-notice',
     type: 'components:example',
-    registryDependencies: ['button', 'card', 'tooltip'],
+    registryDependencies: ['admonition', 'button', 'card', 'tooltip'],
     files: ['example/disabled-unavailable-with-notice.tsx'],
   },
   {
