@@ -20,6 +20,9 @@ export async function getOAuthAppsAuthorizeOrganizationProjects({
 }: OAuthAppsAuthorizeOrganizationProjectsVariables) {
   if (!id) throw new Error('Authorization request id is required')
   if (!slug) throw new Error('Organization slug is required')
+  if (!USE_MOCKS)
+    throw new Error('OAuth app authorization organization projects are not yet implemented')
+
   return getMockOAuthAppsAuthorizeOrganizationProjects(slug)
 }
 

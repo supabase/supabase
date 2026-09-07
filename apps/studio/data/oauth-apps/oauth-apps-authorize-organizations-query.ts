@@ -18,6 +18,8 @@ export async function getOAuthAppsAuthorizeIdentity({
   id,
 }: OAuthAppsAuthorizeOrganizationsVariables) {
   if (!id) throw new Error('Authorization request id is required')
+  if (!USE_MOCKS) throw new Error('OAuth app authorization identity is not yet implemented')
+
   return getMockOAuthAppsAuthorizeIdentity(id)
 }
 
