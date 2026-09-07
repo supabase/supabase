@@ -1,8 +1,23 @@
+import { getMonitoringAgent, getMonitoringAgentPrompt } from '~/data/monitoring-agents.utils'
+import { fromMarkdown } from 'mdast-util-from-markdown'
 import { describe, expect, it } from 'vitest'
 
 import { AgentSetup } from './AgentSetup'
 
 describe('AgentSetup markdown schema', () => {
+  it.each(['health', 'security', 'performance', 'usage', 'all'])(
+    'preserves the complete %s prompt in one code block',
+    (id) => {
+      const markdown = AgentSetup({ props: { id } })
+      const codeBlocks = fromMarkdown(markdown).children.filter((node) => node.type === 'code')
+      expect(codeBlocks).toHaveLength(1)
+      expect(codeBlocks[0]).toMatchObject({
+        lang: 'text',
+        value: getMonitoringAgentPrompt(getMonitoringAgent(id)),
+      })
+    }
+  )
+
   it('serializes the prompt and harness setup for a registered agent', () => {
     const markdown = AgentSetup({ props: { id: 'health' } })
 
