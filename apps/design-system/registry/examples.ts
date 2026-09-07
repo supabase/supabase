@@ -552,6 +552,24 @@ export const examples: Registry = [
     files: ['example/dialog-centered-off.tsx'],
   },
   {
+    name: 'disabled-comparison',
+    type: 'components:example',
+    registryDependencies: ['button', 'tooltip'],
+    files: ['example/disabled-comparison.tsx'],
+  },
+  {
+    name: 'disabled-native-form',
+    type: 'components:example',
+    registryDependencies: ['button', 'input', 'label'],
+    files: ['example/disabled-native-form.tsx'],
+  },
+  {
+    name: 'disabled-unavailable-with-notice',
+    type: 'components:example',
+    registryDependencies: ['button', 'card', 'tooltip'],
+    files: ['example/disabled-unavailable-with-notice.tsx'],
+  },
+  {
     name: 'drawer-demo',
     type: 'components:example',
     registryDependencies: ['drawer'],

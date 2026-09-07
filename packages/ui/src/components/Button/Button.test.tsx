@@ -36,6 +36,29 @@ describe('#Button', () => {
     expect(screen.getByText('按钮')).toBeInTheDocument()
   })
 
+  it('should ignore events when unavailable', () => {
+    const WrapperButton = () => {
+      const [state, setState] = React.useState('state1')
+      return (
+        <Button unavailable onClick={() => setState('state2')}>
+          {state}
+        </Button>
+      )
+    }
+
+    render(<WrapperButton />)
+    const button = screen.getByRole('button', { name: 'state1' })
+
+    expect(button).toHaveAttribute('aria-disabled', 'true')
+    expect(button).not.toBeDisabled()
+    expect(button).toHaveAttribute('tabIndex', '0')
+
+    fireEvent.click(button)
+
+    expect(screen.getByText('state1')).toBeInTheDocument()
+    expect(screen.queryByText('state2')).not.toBeInTheDocument()
+  })
+
   it('should ignore events when disabled', () => {
     const WrapperButton = () => {
       const [state, setState] = React.useState('state1')

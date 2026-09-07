@@ -107,6 +107,9 @@ const buttonVariants = cva(
       disabled: {
         true: 'opacity-50 cursor-not-allowed pointer-events-none',
       },
+      unavailable: {
+        true: 'opacity-50 cursor-not-allowed',
+      },
       rounded: {
         true: 'rounded-full',
       },
@@ -183,6 +186,12 @@ export interface ButtonProps
   iconLeft?: React.ReactNode
   iconRight?: React.ReactNode
   rounded?: boolean
+  /**
+   * Marks the button as unavailable while keeping it keyboard-focusable.
+   * Uses `aria-disabled` instead of native `disabled`. Prefer this over
+   * `disabled` when the control needs a tooltip or other explanation.
+   */
+  unavailable?: boolean
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -199,17 +208,19 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       iconLeft,
       type = 'button',
       rounded,
+      unavailable: unavailableProp,
       ...props
     },
     ref
   ) => {
     const Comp = asChild ? Slot.Slot : 'button'
-    const { className, tabIndex } = props
+    const { className, tabIndex, disabled: disabledProp, ...rest } = props
     const showIcon = loading || icon
     // decrecating 'showIcon' for rightIcon
     const _iconLeft: React.ReactNode = icon ?? iconLeft
+    const unavailable = unavailableProp === true
     // if loading, button is disabled
-    const disabled = loading === true || props.disabled
+    const disabled = !unavailable && (loading === true || disabledProp)
 
     const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
 
@@ -224,14 +235,18 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         data-size={size}
         type={type}
-        {...props}
+        {...rest}
+        aria-disabled={unavailable || undefined}
         disabled={disabled}
         tabIndex={computedTabIndex}
-        className={cn(buttonVariants({ variant, size, disabled, block, rounded }), className)}
+        className={cn(
+          buttonVariants({ variant, size, disabled, unavailable, block, rounded }),
+          className
+        )}
         onClick={(e) => {
           // [Joshen] Prevents redirecting if Button is used with a link-based child element
-          if (disabled) return e.preventDefault()
-          else props?.onClick?.(e)
+          if (disabled || unavailable) return e.preventDefault()
+          else rest?.onClick?.(e)
         }}
       >
         {asChild ? (

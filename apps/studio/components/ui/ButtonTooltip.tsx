@@ -1,5 +1,5 @@
 import { ComponentProps, ComponentPropsWithoutRef, ElementRef, forwardRef, ReactNode } from 'react'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export const ButtonTooltip = forwardRef<
   ElementRef<typeof Button>,
@@ -10,11 +10,20 @@ export const ButtonTooltip = forwardRef<
       }
     }
   }
->(({ tooltip, className, ...props }, ref) => {
+>(({ tooltip, className, disabled, unavailable, ...props }, ref) => {
+  const hasTooltip = tooltip.content.text !== undefined
+  const isUnavailable = unavailable ?? (disabled === true && hasTooltip)
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button ref={ref} {...props} className={cn(className, 'pointer-events-auto')}>
+        <Button
+          ref={ref}
+          {...props}
+          unavailable={isUnavailable}
+          disabled={isUnavailable ? false : disabled}
+          className={className}
+        >
           {props.children}
         </Button>
       </TooltipTrigger>

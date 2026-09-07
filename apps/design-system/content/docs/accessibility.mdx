@@ -15,13 +15,14 @@ Accessibility is about making an interface work for as many people as possible a
 About to push some code? At a minimum, check your work against this list:
 
 - Are interactive page elements [keyboard-focusable](#focus-management)?
+- Are unavailable actions [discoverable and explained](#disabled-controls) for keyboard users?
 - Are all elements announcable by a [screen reader](#screen-reader-support)?
 - Are textual elements legible and scalable?
 - Can I use this on a smaller and/or older device?
 
 ## Focus management
 
-All interactive page elements should be reachable by keyboard. Given the below inconsistency between devices and browsers, add `tabIndex={0}` to all buttons, links, and non-text inputs, ideally at the component level. Consider tying the state of `tabIndex` to the `disabled` state of a component, if applicable.
+All interactive page elements should be reachable by keyboard. Given the below inconsistency between devices and browsers, add `tabIndex={0}` to all buttons, links, and non-text inputs, ideally at the component level. For controls using native `disabled`, tie `tabIndex` to that state (disabled controls default to `tabIndex={-1}`). Controls that use `aria-disabled` to stay discoverable should remain at `tabIndex={0}`. See [Disabled controls](#disabled-controls).
 
 Chromium-based browsers and Firefox handle this automatically via the Tab key. Safari, by default, requires the Option key to also be held down. Enabling _Keyboard navigation_ on macOS Settings [removes this requirement](https://mayank.co/blog/safari-focus/#keyboard-navigation) but makes links non-tabbable as a result.
 
@@ -123,6 +124,61 @@ Some keyboard-navigable content may contain hundreds or thousands of items. Help
 - Skip links and “jump to” shortcuts
 
 Apps with persistent header and sidebar chrome should expose a skip link as the first focusable element. Use the shared [Skip to Content](fragments/skip-to-content) fragment which owns the component API, usage sample, and target landmark contract.
+
+## Disabled controls
+
+Not every unavailable control should use the same disabled pattern. Choose based on whether the user needs to discover why an action is blocked.
+
+### Native `disabled`
+
+Use native `disabled` when the control should be fully inert and the reason is obvious from context:
+
+- Submit buttons until a form is valid
+- Loading states
+- Pagination at the first or last page
+
+Native `disabled` removes the control from the tab order, suppresses interaction, and applies browser styling. That is appropriate when no extra explanation is needed. Screen readers can still discover native `disabled` controls via browse or virtual cursor navigation and will announce their name and disabled state. Only Tab navigation skips these `disabled` controls.
+
+<ComponentPreview name="disabled-native-form" />
+
+### `unavailable`
+
+Use the `unavailable` prop when an action is unavailable for a reason that is not obvious, especially when you show a tooltip explaining why:
+
+- Permission gates
+- Plan or infrastructure restrictions
+- Business rules that block an otherwise visible action
+
+`unavailable` sets `aria-disabled="true"`, keeps the control in the tab order, and applies disabled styling without `pointer-events-none`. Guard handlers are built into [Button](components/button). See also [MDN: aria-disabled](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-disabled).
+
+Tab through the comparison below with the keyboard. Only the `unavailable` button stays focusable and exposes its tooltip.
+
+<ComponentPreview name="disabled-comparison" />
+
+Implementation checklist for `unavailable`:
+
+- Prefer `unavailable` over native `disabled` when the reason is not obvious
+- Pair with a tooltip when you need to explain why
+- Guard `onClick` and keyboard activation (`Enter` / `Space`) (`Button` does this automatically)
+- Keep `tabIndex={0}` (`Button` does this automatically)
+- Do **not** use `pointer-events-none` on the control (it blocks hover and tooltips)
+
+```tsx showLineNumbers
+<Tooltip>
+  <TooltipTrigger asChild>
+    <Button unavailable={unavailable}>Pause project</Button>
+  </TooltipTrigger>
+  {unavailable && <TooltipContent>{reason}</TooltipContent>}
+</Tooltip>
+```
+
+In Studio, `ButtonTooltip` maps `disabled` + tooltip text to `unavailable` automatically.
+
+### Page-level context
+
+Tooltips alone are not enough for significant restrictions. Pair `unavailable` controls with visible page context (for example: an [Admonition](fragments/admonition), empty state, or inline copy) so the reason is available even without hover or focus.
+
+<ComponentPreview name="disabled-unavailable-with-notice" />
 
 ## Screen readers
 
