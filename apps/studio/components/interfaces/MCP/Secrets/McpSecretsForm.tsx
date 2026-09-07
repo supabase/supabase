@@ -81,7 +81,7 @@ export const McpSecretsForm = ({
                 aria-readonly
               />
               <InputGroupAddon align="inline-end" className="pr-2">
-                <Lock size={16} className="text-foreground-muted" aria-hidden />
+                <Lock size={14} className="text-foreground-muted" aria-hidden />
               </InputGroupAddon>
             </InputGroup>
           </FormItemLayout>

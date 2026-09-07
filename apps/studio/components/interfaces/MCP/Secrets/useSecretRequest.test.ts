@@ -6,7 +6,7 @@ import type { SecretsParams } from './McpSecrets.params'
 import { useSecretRequest } from './useSecretRequest'
 import type { components } from '@/data/api'
 import { customRenderHook } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 const REF_A = 'aaaaaaaaaaaaaaaaaaaa'
 const NAME_A = 'OPENAI_API_KEY'
@@ -69,6 +69,21 @@ describe('useSecretRequest', () => {
 
     await waitFor(() => expect(result.current.state.status).toBe('stored'))
     expect(writtenNames).toEqual([NAME_A])
+  })
+
+  it('does not offer the form when the existing secrets cannot be read', async () => {
+    // Without the secrets list there is no way to know an overwrite is about to
+    // happen, so the form would be missing its warning.
+    addAPIMock({
+      method: 'get',
+      path: '/v1/projects/:ref/secrets',
+      response: () => HttpResponse.json<APIErrorBody>({ message: 'nope' }, { status: 500 }),
+    })
+
+    const { result } = customRenderHook(() => useSecretRequest(paramsFor(REF_A, NAME_A)))
+
+    await waitFor(() => expect(result.current.state.status).toBe('error'))
+    expect(writtenNames).toEqual([])
   })
 
   it('does not attribute request A’s settled write to request B', async () => {

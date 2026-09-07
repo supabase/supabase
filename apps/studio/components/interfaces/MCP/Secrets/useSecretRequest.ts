@@ -76,7 +76,7 @@ export function useSecretRequest(params: SecretsParams) {
       return { status: 'stored', request, timedOut: false }
     }
 
-    if (project.isError) return { status: 'error' }
+    if (project.isError || secrets.isError) return { status: 'error' }
 
     if (project.isPending || secrets.isPending || request === undefined) {
       return { status: 'loading' }
@@ -93,6 +93,7 @@ export function useSecretRequest(params: SecretsParams) {
     ref,
     project.isPending,
     request,
+    secrets.isError,
     secrets.isPending,
   ])
 
