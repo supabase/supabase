@@ -3,7 +3,7 @@ import { DocsPager, getBreadcrumbSegments } from '@/components/pager'
 import { SourcePanel } from '@/components/source-panel'
 import { DashboardTableOfContents } from '@/components/toc'
 import { siteConfig } from '@/config/site'
-import { getAllDocs, getDocBySlug } from '@/lib/docs'
+import { getAllDocs, getDocBySlug, getDocMetaBySlug } from '@/lib/docs'
 import { getTableOfContents } from '@/lib/toc'
 import { absoluteUrl } from '@/lib/utils'
 
@@ -25,7 +25,7 @@ interface DocPageProps {
 
 async function getDocFromParams({ params }: { params: { slug: string[] } }) {
   const slug = params.slug?.join('/') || ''
-  return getDocBySlug(slug)
+  return getDocMetaBySlug(slug)
 }
 
 export async function generateMetadata(props: DocPageProps): Promise<Metadata> {
@@ -76,7 +76,8 @@ export async function generateStaticParams(): Promise<{ slug: string[] }[]> {
 
 export default async function DocPage(props: DocPageProps) {
   const params = await props.params
-  const doc = await getDocFromParams({ params })
+  const slug = params.slug?.join('/') || ''
+  const doc = await getDocBySlug(slug)
 
   if (!doc) {
     notFound()

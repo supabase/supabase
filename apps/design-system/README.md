@@ -29,14 +29,14 @@ Open [http://localhost:3003/design-system](http://localhost:3003/design-system) 
 
 There are two content pipelines:
 
-| What you edit | Watcher | Notes |
-| --- | --- | --- |
-| `content/docs/**/*.mdx` | Velite (via `next.config.mjs`) | Rebuilds on save; wait for `[VELITE] rebuild finished` before expecting updates |
-| `registry/**` (examples, `examples.ts`, etc.) | `dev:registry` (`tsx watch`) | Rebuilds `__registry__` on save |
+| What you edit                                 | Watcher                        | Notes                                                                           |
+| --------------------------------------------- | ------------------------------ | ------------------------------------------------------------------------------- |
+| `content/docs/**/*.mdx`                       | Velite (via `next.config.mjs`) | Rebuilds on save; wait for `[VELITE] rebuild finished` before expecting updates |
+| `registry/**` (examples, `examples.ts`, etc.) | `dev:registry` (`tsx watch`)   | Rebuilds `__registry__` on save                                                 |
 
 Velite runs inside the Next.js dev server because Turbopack does not support the old Contentlayer webpack plugin. Registry output is separate and must be watched explicitly.
 
-Doc pages load compiled content from `.velite/allDocs.json` (~27MB for all 105 docs). Velite rebuilds are fast; the remaining cost is Next re-parsing that bundle on each content change. Splitting per-doc output is the next step if dev still feels slow.
+Doc pages load compiled MDX from `.velite/codes/*.json` per document. Metadata lives in the smaller `allDocs.json` index (~1MB instead of ~27MB), so content edits only reload the changed doc's code.
 
 ### Alternative commands
 

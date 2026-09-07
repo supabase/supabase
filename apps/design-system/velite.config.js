@@ -1,3 +1,4 @@
+import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'path'
 import { getHighlighter, loadTheme } from '@shikijs/compat'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
@@ -9,6 +10,12 @@ import { visit } from 'unist-util-visit'
 import { defineConfig, s } from 'velite'
 
 import { rehypeComponent } from './lib/rehype-component'
+
+const CODE_OUTPUT_DIR = '.velite/codes'
+
+function toCodeId(slugAsParams) {
+  return slugAsParams.replace(/\//g, '__') || 'index'
+}
 
 const LinksProperties = s.object({
   doc: s.string().optional(),
@@ -46,11 +53,21 @@ const docs = s
     // real benefit for a dev-only content cache, and dominates build time.
     code: s.mdx({ copyLinkedFiles: false, minify: false }),
   })
-  .transform(({ path: flattenedPath, ...data }) => ({
-    ...data,
-    slug: `/${flattenedPath}`,
-    slugAsParams: flattenedPath.split('/').slice(1).join('/'),
-  }))
+  .transform(async ({ path: flattenedPath, code, ...data }) => {
+    const slugAsParams = flattenedPath.split('/').slice(1).join('/')
+    const codeId = toCodeId(slugAsParams)
+    const codesDir = path.join(process.cwd(), CODE_OUTPUT_DIR)
+
+    await mkdir(codesDir, { recursive: true })
+    await writeFile(path.join(codesDir, `${codeId}.json`), JSON.stringify(code), 'utf8')
+
+    return {
+      ...data,
+      slug: `/${flattenedPath}`,
+      slugAsParams,
+      codeId,
+    }
+  })
 
 export default defineConfig({
   root: './content',
