@@ -106,6 +106,6 @@ h6:not(.font-mono),
   --code-highlight-color: #1c1c1c;
 }
 
-.prose [role="alert"] {
+.prose [role='alert'] {
   margin: 1.25rem 0;
 }
