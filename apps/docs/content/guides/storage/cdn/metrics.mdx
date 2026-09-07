@@ -5,7 +5,7 @@ description: 'Learn how Supabase Storage caches objects with a CDN.'
 sidebar_label: 'CDN'
 ---
 
-Cache hits can be determined via the `log_attributes['response.headers.cf_cache_status']` key in [Query and filter logs](/docs/guides/observability/advanced-log-filtering#logs-explorer). Any value that corresponds to either `HIT`, `STALE`, `REVALIDATED`, or `UPDATING` is categorized as a cache hit.
+Cache hits can be determined via the `log_attributes['response.headers.cf_cache_status']` key in [Query logs with SQL](/docs/guides/observability/advanced-log-filtering#logs-explorer). Any value that corresponds to either `HIT`, `STALE`, `REVALIDATED`, or `UPDATING` is categorized as a cache hit.
 The following example query will show the top cache misses from the `edge_logs`:
 
 ```sql
@@ -23,7 +23,7 @@ order by count desc
 limit 50;
 ```
 
-Try out [this query](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%0A%20%20log_attributes%5B%27request.path%27%5D%20as%20path%2C%0A%20%20log_attributes%5B%27request.search%27%5D%20as%20search%2C%0A%20%20count%28%29%20as%20count%0Afrom%20logs%0Awhere%20source%20%3D%20%27edge_logs%27%0A%20%20and%20startsWith%28log_attributes%5B%27request.path%27%5D%2C%20%27/storage/v1/object%27%29%0A%20%20and%20log_attributes%5B%27request.method%27%5D%20%3D%20%27GET%27%0A%20%20and%20log_attributes%5B%27response.headers.cf_cache_status%27%5D%20in%20%28%27MISS%27%2C%20%27NONE/UNKNOWN%27%2C%20%27EXPIRED%27%2C%20%27BYPASS%27%2C%20%27DYNAMIC%27%29%0Agroup%20by%20path%2C%20search%0Aorder%20by%20count%20desc%0Alimit%2050%3B) in the SQL Editor.
+Run this query in [Explorer](/dashboard/project/_/explorer): select **Run SQL**, choose query source **Logs**, and set a time range.
 
 Your cache hit ratio over time can then be determined using the following query:
 
@@ -40,4 +40,4 @@ order by timestamp desc
 limit 100;
 ```
 
-Try out [this query](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%0A%20%20toStartOfHour%28timestamp%29%20as%20timestamp%2C%0A%20%20countIf%28log_attributes%5B%27response.headers.cf_cache_status%27%5D%20in%20%28%27HIT%27%2C%20%27STALE%27%2C%20%27REVALIDATED%27%2C%20%27UPDATING%27%29%29%20/%20count%28%29%20as%20ratio%0Afrom%20logs%0Awhere%20source%20%3D%20%27edge_logs%27%0A%20%20and%20startsWith%28log_attributes%5B%27request.path%27%5D%2C%20%27/storage/v1/object%27%29%0A%20%20and%20log_attributes%5B%27request.method%27%5D%20%3D%20%27GET%27%0Agroup%20by%20timestamp%0Aorder%20by%20timestamp%20desc%0Alimit%20100%3B) in the SQL Editor.
+Run this query in [Explorer](/dashboard/project/_/explorer): select **Run SQL**, choose query source **Logs**, and set a time range.

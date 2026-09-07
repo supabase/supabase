@@ -1,0 +1,47 @@
+---
+title: 'Configure logging'
+description: 'Record additional Postgres and Realtime events for an investigation'
+---
+
+This guide explains how to record events that are not logged by default. Logging changes affect future events; they cannot recover past activity. Keep the scope limited to the investigation, because recorded statements and messages can contain sensitive values.
+
+## Postgres connections
+
+To record connection and authentication events, follow [Postgres connection logging](/docs/guides/platform/postgres-connection-logging). Note the current setting before changing it.
+
+After enabling logging, open a new database connection and find its event in [Logs](/dashboard/project/_/logs) with **Log Type** set to **Postgres** and **Connection logs** enabled. Restore the previous setting when the investigation is complete, unless continued logging is required.
+
+## Postgres statements
+
+1. Enable [pgAudit](/docs/guides/database/extensions/pgaudit#enable-the-extension).
+2. Select the statement classes and session or role scope in [pgAudit configuration](/docs/guides/database/extensions/pgaudit#configure-the-extension). Record the previous setting first. API traffic through PostgREST uses the `authenticator` role.
+3. Run an authorized operation in the configured scope, then find its audit event in [Logs](/dashboard/project/_/logs) with **Log Type** set to **Postgres**.
+4. Restore the previous logging configuration when finished.
+
+Session settings apply only to that database connection. Studio queries do not maintain a persistent session. For persistent logging, follow the role-scoped instructions in the pgAudit guide.
+
+### Messages from database functions
+
+Whether a `RAISE` message reaches Postgres logs depends on `log_min_messages`. Read the current value from a database connection:
+
+```sql
+show log_min_messages;
+```
+
+Allow a few minutes for messages to appear. See [Postgres message levels](https://www.postgresql.org/docs/current/runtime-config-logging.html#GUC-LOG-MIN-MESSAGES) before changing the threshold; their ordering differs from client message levels.
+
+## Realtime connections
+
+Realtime does not log new WebSocket connections or channel joins by default. Enable connection logging for the client under investigation:
+
+```javascript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_...', {
+  realtime: { params: { log_level: 'info' } },
+})
+```
+
+Reconnect that client and join a channel, then inspect **Realtime** events in [Logs](/dashboard/project/_/logs). Remove `log_level: 'info'` and recreate the client to restore the default behavior.
+
+For truncation and capture constraints, see [Log sources and fields](/docs/guides/observability/log-field-reference#capture-limits).

@@ -137,6 +137,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/observability/access-data',
+    destination: '/docs/guides/observability',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/observability/access-data.md',
+    destination: '/docs/guides/observability.md',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/reports/:match*',
     destination: '/docs/guides/observability/:match*',
   },

@@ -1,38 +1,30 @@
 ---
 title: Observability
-description: 'Access project data, detect issues, diagnose findings, and automate repeatable checks with an agent.'
+description: 'Find project evidence, diagnose issues, and automate monitoring'
 ---
 
-<AiPrompt id="monitoring-and-debugging" />
+Choose the task you need to complete. You can inspect data directly, investigate a known error, or run repeatable checks with an agent.
 
-Monitor your Supabase project with the tools you already use, as a person or an agent.
+| Task                                             | Start here                                                               |
+| ------------------------------------------------ | ------------------------------------------------------------------------ |
+| Diagnose a known error or symptom                | [Troubleshooting](/docs/guides/troubleshooting)                          |
+| Query log events with an agent or script         | [Query logs with SQL](/docs/guides/observability/advanced-log-filtering) |
+| Find and inspect an event in Studio              | [Logs in Studio](/docs/guides/observability/logs)                        |
+| Check health, security, performance, or capacity | [Detection checks](/docs/guides/observability/detecting)                 |
+| Schedule repeatable checks                       | [Automate monitoring](/docs/guides/observability/automate-with-agents)   |
 
-## 1. Observe the data
+## Read project data [#metrics-api]
 
-The sources you can query, and where to read them.
+Logs record events, database statistics describe live or cumulative activity, and advisors return configuration findings. Reports visualize project signals; the Metrics API exports Prometheus-compatible database metrics.
 
 <ContentListings id="telemetry-access-what" />
 
-## 2. Detect issues
+## From evidence to action
 
-Use queries and checks against those sources to pick up health, security, performance, and usage signals.
+Observe the relevant data, detect a signal, and use its time window, error code, or affected object to diagnose the cause. After an authorized fix, rerun the check. Automate checks only after their results and thresholds are useful for your project.
 
-<ContentListings id="telemetry-detect" />
+## Configure and export
 
-## 3. Diagnose and resolve
-
-Use a concrete finding, symptom, or error code to identify the cause and apply a known solution.
-
-<ContentListings id="telemetry-diagnose" />
-
-## 4. Hire an agent
-
-Turn the checks you trust into a read-only routine in your agent harness and run it on a schedule.
-
-<ContentListings id="telemetry-hire-agent" />
-
-## Export your data
-
-Send logs and traces to the tools you already run.
+Record additional events or send telemetry to your monitoring tools.
 
 <ContentListings id="telemetry-export" />
