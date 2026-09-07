@@ -34,6 +34,14 @@ describe('DestinationPanelFormSchema', () => {
     if (!result.success) expect(result.error.issues[0]?.message).toBe(testCase.message)
   })
 
+  it.each(requiredNumberFields)('rejects a missing $field field', (testCase) => {
+    const { [testCase.field]: _omitted, ...rest } = requiredFields
+
+    const result = DestinationPanelFormSchema.safeParse(rest)
+
+    expect(result.success).toBe(false)
+  })
+
   it('normalizes an empty maximum staleness to undefined', () => {
     const result = DestinationPanelFormSchema.safeParse({
       ...requiredFields,
