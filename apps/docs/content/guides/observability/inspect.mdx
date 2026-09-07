@@ -1,23 +1,23 @@
 ---
 id: 'inspect'
 title: 'Inspect the database'
-description: 'Read live Postgres statistics such as bloat, cache hit rate, locks, and slow queries from the CLI, SQL Editor, or MCP.'
+description: 'Read live Postgres statistics such as bloat, cache hit rate, locks, and slow queries from the CLI, Explorer, or MCP.'
 ---
 
-Database performance is a large topic and many factors can contribute. Common causes of poor performance include inefficient schemas or queries, missing or unused indexes, insufficient memory, lock contention, and table bloat.
+This guide explains how to read live database statistics using the CLI, MCP, or Explorer.
 
-Use the live Postgres statistics in this guide to check for those conditions. You or an agent can run the same checks from:
+Read database statistics from:
 
-- Studio: [SQL Editor](/dashboard/project/_/sql)
+- Studio: [Explorer](/dashboard/project/_/explorer) with query source **Database**
 - MCP: `execute_sql`
 - CLI: [`supabase inspect db`](/docs/reference/cli/supabase-inspect-db)
 
 Use this page to:
 
 - Run [CLI inspection commands](#using-the-cli)
-- Copy the matching [SQL](#using-sql)
+- Run [SQL checks](#using-sql)
 
-To pick up a signal from these checks, see [Detecting](/docs/guides/observability/detecting). For the other sources, see [Observe the data](/docs/guides/observability/access-data).
+To pick up a signal from these checks, see [Detecting](/docs/guides/observability/detecting). For the other sources, see [Observability](/docs/guides/observability).
 
 ## Using the CLI
 
@@ -104,144 +104,12 @@ The commands below are useful if your Postgres database consumes a lot of resour
 - [role-connections](/docs/reference/cli/supabase-inspect-db-role-connections) - shows number of active connections for all database roles (Supabase-specific command)
 - [replication-slots](/docs/reference/cli/supabase-inspect-db-replication-slots) - shows information about replication slots on the database
 
-### Notes on `pg_stat_statements`
-
-Following commands require `pg_stat_statements` to be enabled: calls, locks, cache-hit, blocking, unused-indexes, index-usage, bloat, outliers, table-record-counts, replication-slots, seq-scans, vacuum-stats, long-running-queries.
-
-When using `pg_stat_statements` also take note that it only stores the latest 5,000 statements. Moreover, consider resetting the analysis after optimizing any queries by running `select pg_stat_statements_reset();`
-
-Learn more about [`pg_stat_statements`](/docs/guides/database/extensions/pg_stat_statements).
-
 ## Using SQL
 
-<Admonition type="note">
+Open [Explorer](/dashboard/project/_/explorer), select **Run SQL**, and choose **Database** as the query source. You can also run read-only diagnostics through MCP `execute_sql`.
 
-If you're seeing an `insufficient privilege` error when viewing the Query Performance page from the dashboard, run this command:
+Use [Performance checks](/docs/guides/observability/detecting#performance) for active sessions, blockers, expensive statements, and cache hit rates. Use [Capacity checks](/docs/guides/observability/detecting#usage) for relation sizes and connection counts.
 
-```shell
-$ grant pg_read_all_stats to postgres;
-```
+`pg_stat_activity` is a live snapshot. `pg_stat_statements` and cache counters are cumulative since their last reset; they do not describe an arbitrary historical window. Compare saved snapshots with the same reset interval when measuring changes. Check the [pg_stat_statements guide](/docs/guides/database/extensions/pg_stat_statements) for extension requirements.
 
-</Admonition>
-
-### Postgres cumulative statistics system
-
-Postgres collects data about its own operations using the [cumulative statistics system](https://www.postgresql.org/docs/current/monitoring-stats.html). In addition to this, every Supabase project has the [pg_stat_statements extension](/docs/guides/database/extensions/pg_stat_statements) enabled by default. This extension records query execution performance details.
-
-Here are some example queries to get you started.
-
-### Most frequently called queries
-
-```sql
-select
-  auth.rolname,
-  statements.query,
-  statements.calls,
-  -- -- Postgres 13, 14, 15
-  statements.total_exec_time + statements.total_plan_time as total_time,
-  statements.min_exec_time + statements.min_plan_time as min_time,
-  statements.max_exec_time + statements.max_plan_time as max_time,
-  statements.mean_exec_time + statements.mean_plan_time as mean_time,
-  -- -- Postgres <= 12
-  -- total_time,
-  -- min_time,
-  -- max_time,
-  -- mean_time,
-  statements.rows / statements.calls as avg_rows
-from
-  pg_stat_statements as statements
-  inner join pg_authid as auth on statements.userid = auth.oid
-order by statements.calls desc
-limit 100;
-```
-
-This query shows:
-
-- query statistics, ordered by the number of times each query has been executed
-- the role that ran the query
-- the number of times it has been called
-- the average number of rows returned
-- the cumulative total time the query has spent running
-- the min, max and mean query times.
-
-This provides useful information about the queries you run most frequently. Queries that have high `max_time` or `mean_time` times and are being called often can be good candidates for optimization.
-
-### Slowest queries by execution time
-
-```sql
-select
-  auth.rolname,
-  statements.query,
-  statements.calls,
-  -- -- Postgres 13, 14, 15
-  statements.total_exec_time + statements.total_plan_time as total_time,
-  statements.min_exec_time + statements.min_plan_time as min_time,
-  statements.max_exec_time + statements.max_plan_time as max_time,
-  statements.mean_exec_time + statements.mean_plan_time as mean_time,
-  -- -- Postgres <= 12
-  -- total_time,
-  -- min_time,
-  -- max_time,
-  -- mean_time,
-  statements.rows / statements.calls as avg_rows
-from
-  pg_stat_statements as statements
-  inner join pg_authid as auth on statements.userid = auth.oid
-order by max_time desc
-limit 100;
-```
-
-This query will show you statistics about queries ordered by the maximum execution time. It is similar to the query above ordered by calls, but this one highlights outliers that may have high executions times. Queries which have high or mean execution times are good candidates for optimization.
-
-### Most time consuming queries
-
-```sql
-select
-  auth.rolname,
-  statements.query,
-  statements.calls,
-  statements.total_exec_time + statements.total_plan_time as total_time,
-  to_char(
-    (
-      (statements.total_exec_time + statements.total_plan_time) / sum(
-        statements.total_exec_time + statements.total_plan_time
-      ) over ()
-    ) * 100,
-    'FM90D0'
-  ) || '%' as prop_total_time
-from
-  pg_stat_statements as statements
-  inner join pg_authid as auth on statements.userid = auth.oid
-order by total_time desc
-limit 100;
-```
-
-This query will show you statistics about queries ordered by the cumulative total execution time. It shows the total time the query has spent running as well as the proportion of total execution time the query has taken up.
-
-Queries which are the most time consuming are not necessarily bad, you may have a very efficient and frequently ran queries that end up taking a large total % time, but it can be useful to help spot queries that are taking up more time than they should.
-
-### Hit rate
-
-Generally for most applications a small percentage of data is accessed more regularly than the rest. To make sure that your regularly accessed data is available, Postgres tracks your data access patterns and keeps this in its [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache.
-
-Applications with lower cache hit rates generally perform more poorly since they have to hit the disk to get results rather than serving them from memory. Very poor hit rates can also cause you to burst past your [Disk IO limits](/docs/guides/platform/compute-and-disk#disk) causing significant performance issues.
-
-You can view your cache and index hit rate by executing the following query:
-
-```sql
-select
-  'index hit rate' as name,
-  (sum(idx_blks_hit)) / nullif(sum(idx_blks_hit + idx_blks_read), 0) * 100 as ratio
-from pg_statio_user_indexes
-union all
-select
-  'table hit rate' as name,
-  sum(heap_blks_hit) / nullif(sum(heap_blks_hit) + sum(heap_blks_read), 0) * 100 as ratio
-from pg_statio_user_tables;
-```
-
-This shows the ratio of data blocks fetched from the Postgres [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache against the data blocks that were read from disk or the OS cache.
-
-A ratio below 99% means more than 1% of observed block accesses missed `shared_buffers`. Postgres cannot distinguish whether those reads were served by the operating system cache or physical disk. Treat that as a [Performance](/docs/guides/observability/detecting#performance) signal, then search [Diagnosing](/docs/guides/troubleshooting).
-
-When a check names a slow statement, get a query plan with [`explain`](/docs/guides/database/query-optimization#analyze-the-query-plan) in SQL, or [`explain()`](/docs/guides/database/debugging-performance) on the Data API. Pair `pg_stat_statements` with the [Metrics API](/docs/guides/observability/metrics) to read the same window from Postgres stats and host metrics.
+When a check identifies a statement, inspect its [query plan](/docs/guides/database/query-optimization#analyze-the-query-plan). A long-running session or high cumulative query time is evidence to investigate, not a reason by itself to cancel a query or reset statistics.
