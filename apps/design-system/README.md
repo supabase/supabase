@@ -29,10 +29,10 @@ Open [http://localhost:3003/design-system](http://localhost:3003/design-system) 
 
 There are two content pipelines:
 
-| What you edit | Watcher | Notes |
-| --- | --- | --- |
-| `content/docs/**/*.mdx` | Velite (via `next.config.mjs`) | Rebuilds on save; refresh the browser if the page does not update automatically |
-| `registry/**` (examples, `examples.ts`, etc.) | `dev:registry` (`tsx watch`) | Rebuilds `__registry__` on save |
+| What you edit                                 | Watcher                        | Notes                                                                           |
+| --------------------------------------------- | ------------------------------ | ------------------------------------------------------------------------------- |
+| `content/docs/**/*.mdx`                       | Velite (via `next.config.mjs`) | Rebuilds on save; refresh the browser if the page does not update automatically |
+| `registry/**` (examples, `examples.ts`, etc.) | `dev:registry` (`tsx watch`)   | Rebuilds `__registry__` on save                                                 |
 
 Velite runs inside the Next.js dev server because Turbopack does not support the old Contentlayer webpack plugin. Registry output is separate and must be watched explicitly.
 
