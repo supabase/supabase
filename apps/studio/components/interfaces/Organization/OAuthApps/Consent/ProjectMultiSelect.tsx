@@ -16,6 +16,7 @@ import {
 import type { OAuthAppsAuthorizeOrganizationProject } from '@/data/oauth-apps/oauth-apps-authorize-organization-projects-query'
 
 const MAX_SELECTED_PROJECTS = 10
+const SHOW_COUNTER_FROM = 8
 
 export interface ProjectMultiSelectProps {
   projects: OAuthAppsAuthorizeOrganizationProject[]
@@ -34,6 +35,7 @@ export const ProjectMultiSelect = ({
   const listId = useId()
 
   const atCap = selectedRefs.length >= MAX_SELECTED_PROJECTS
+  const showCounter = selectedRefs.length >= SHOW_COUNTER_FROM
 
   const toggleProject = (ref: string) => {
     const isSelected = selectedRefs.includes(ref)
@@ -55,7 +57,7 @@ export const ProjectMultiSelect = ({
     <div className="flex flex-col gap-2 w-full">
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs text-foreground">Projects</p>
-        {selectedRefs.length > 0 && (
+        {showCounter && (
           <p className="text-xs text-foreground-lighter">
             {selectedRefs.length}/{MAX_SELECTED_PROJECTS}
           </p>

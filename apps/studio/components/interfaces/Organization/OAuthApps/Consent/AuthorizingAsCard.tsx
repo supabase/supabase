@@ -5,7 +5,7 @@ import type { OAuthOrganizationRole } from '@/data/oauth-apps/types'
 
 export interface AuthorizingAsCardProps {
   email: string
-  memberRole: OAuthOrganizationRole['role']
+  memberRole: OAuthOrganizationRole['default_role']
   organizationSlug: string
   onSignOut: () => void
   showSwitcher?: boolean

@@ -2,11 +2,23 @@ import { Box, Boxes } from 'lucide-react'
 import { Button, Card, CardContent } from 'ui'
 
 import { ScopeGroupCard } from './ScopeGroupCard'
-import type { OAuthAppsAuthorizeGrant } from '@/data/oauth-apps/oauth-apps-authorize-approve-mutation'
+import type {
+  OAuthAppsAuthorizeOrganizationProject,
+  OAuthOrganizationRole,
+  OAuthScopeGroup,
+} from '@/data/oauth-apps/types'
+
+export type AuthorizeSuccessGrant = {
+  email: string
+  role: OAuthOrganizationRole['default_role']
+  organization_slug: string
+  projects: OAuthAppsAuthorizeOrganizationProject[]
+  scope_groups: OAuthScopeGroup[]
+}
 
 export interface AuthorizeSuccessScreenProps {
   appName: string
-  grant: OAuthAppsAuthorizeGrant
+  grant: AuthorizeSuccessGrant
   onReturn: () => void
 }
 
