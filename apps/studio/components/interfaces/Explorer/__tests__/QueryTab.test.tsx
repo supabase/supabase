@@ -268,7 +268,7 @@ describe('QueryTab execution', () => {
 
     renderQueryTab()
     const runButton = await screen.findByRole('button', { name: 'Run' })
-    expect(runButton).toBeDisabled()
+    expect(runButton).toBeUnavailable()
 
     act(() => releaseReplicas())
     await waitFor(() => expect(runButton).toBeEnabled())

@@ -59,7 +59,7 @@ describe('PauseProjectButton', () => {
     customRender(<PauseProjectButton />)
 
     const button = screen.getByRole('button', { name: 'Pause project' })
-    expect(button).toBeDisabled()
+    expect(button).toBeUnavailable()
 
     // Radix opens the tooltip on pointermove; unavailable buttons stay focusable
     fireEvent.pointerMove(button)

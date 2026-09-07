@@ -214,7 +214,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const Comp = asChild ? Slot.Slot : 'button'
-    const { className, tabIndex, disabled: disabledProp, ...rest } = props
+    const { className, tabIndex, disabled: disabledProp, onClick, ...rest } = props
     const showIcon = loading || icon
     // decrecating 'showIcon' for rightIcon
     const _iconLeft: React.ReactNode = icon ?? iconLeft
@@ -231,6 +231,20 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       </div>
     )
 
+    const handleActivation = (
+      e: React.MouseEvent<HTMLElement>,
+      childOnClick?: React.MouseEventHandler<HTMLElement>
+    ) => {
+      if (disabled || unavailable) {
+        e.preventDefault()
+        e.stopPropagation()
+        return
+      }
+
+      childOnClick?.(e)
+      onClick?.(e)
+    }
+
     return (
       <Comp
         ref={ref}
@@ -244,21 +258,17 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           buttonVariants({ variant, size, disabled, unavailable, block, rounded }),
           className
         )}
-        onClick={(e) => {
-          // [Joshen] Prevents redirecting if Button is used with a link-based child element
-          if (disabled || unavailable) {
-            e.preventDefault()
-            e.stopPropagation()
-            return
-          }
-          rest?.onClick?.(e)
-        }}
+        onClick={asChild ? undefined : (e) => handleActivation(e)}
       >
         {asChild ? (
-          isValidElement<{ children: ReactNode }>(children) ? (
+          isValidElement<{ children: ReactNode; onClick?: React.MouseEventHandler<HTMLElement> }>(
+            children
+          ) ? (
             cloneElement(
               children,
-              undefined,
+              {
+                onClick: (e) => handleActivation(e, children.props.onClick),
+              },
               showIcon &&
                 (loading
                   ? renderIconContainer(

@@ -11,7 +11,8 @@ export const ButtonTooltip = forwardRef<
     }
   }
 >(({ tooltip, className, disabled, unavailable, ...props }, ref) => {
-  const hasTooltip = tooltip.content.text !== undefined
+  const { text, ...tooltipContentProps } = tooltip.content
+  const hasTooltip = text !== undefined
   const isUnavailable = unavailable ?? (disabled === true && hasTooltip)
 
   return (
@@ -27,9 +28,7 @@ export const ButtonTooltip = forwardRef<
           {props.children}
         </Button>
       </TooltipTrigger>
-      {tooltip.content.text !== undefined && (
-        <TooltipContent {...tooltip.content}>{tooltip.content.text}</TooltipContent>
-      )}
+      {text !== undefined && <TooltipContent {...tooltipContentProps}>{text}</TooltipContent>}
     </Tooltip>
   )
 })

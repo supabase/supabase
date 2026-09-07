@@ -7,12 +7,13 @@ if (!process.env.VELITE_STARTED && isDev) {
   await build({ watch: true, clean: false })
 }
 
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '/design-system'
+const rawBasePath = process.env.NEXT_PUBLIC_BASE_PATH || 'design-system'
+const BASE_PATH = rawBasePath.startsWith('/') ? rawBasePath : `/${rawBasePath}`
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ['ui', 'common', 'shared-data', 'icons', 'tsconfig'],
-  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/design-system',
+  basePath: BASE_PATH,
   images: {
     remotePatterns: [
       {

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { Button } from './Button'
 
@@ -69,6 +69,24 @@ describe('#Button', () => {
 
     expect(screen.getByText('state1')).toBeInTheDocument()
     expect(screen.queryByText('state2')).not.toBeInTheDocument()
+  })
+
+  it('should ignore child onClick when unavailable with asChild', () => {
+    const childOnClick = vi.fn()
+    const buttonOnClick = vi.fn()
+
+    render(
+      <Button asChild unavailable onClick={buttonOnClick}>
+        <a href="/foo" onClick={childOnClick}>
+          Link
+        </a>
+      </Button>
+    )
+
+    fireEvent.click(screen.getByRole('link'))
+
+    expect(childOnClick).not.toHaveBeenCalled()
+    expect(buttonOnClick).not.toHaveBeenCalled()
   })
 
   it('should ignore events when disabled', () => {
