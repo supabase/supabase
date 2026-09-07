@@ -73,7 +73,7 @@ export interface ModeDefinition {
 // Schema Types - Fields
 // ============================================================================
 
-type FieldType = 'select' | 'radio-grid' | 'radio-list' | 'switch' | 'multi-select'
+type FieldType = 'select' | 'combobox' | 'radio-grid' | 'radio-list' | 'switch' | 'multi-select'
 
 export interface FieldOption {
   value: string
