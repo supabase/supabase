@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { describe, expect, test, vi } from 'vitest'
 
-import { ConnectConfigSection } from './ConnectConfigSection'
 import type { ResolvedField } from './Connect.types'
+import { ConnectConfigSection } from './ConnectConfigSection'
 import { customRender } from '@/tests/lib/custom-render'
 
 mockAnimationsApi()
