@@ -1685,8 +1685,12 @@ from
                 on p.pronamespace = n.oid
             join pg_catalog.pg_language l
                 on p.prolang = l.oid
+            left join pg_catalog.pg_depend dep
+                on p.oid = dep.objid
+                and dep.deptype = 'e'
         where
             p.prosecdef = true
+            and dep.objid is null -- exclude functions owned by extensions
             and pg_catalog.has_function_privilege('anon', p.oid, 'EXECUTE')
             and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
             and n.nspname not in (
@@ -1740,8 +1744,12 @@ from
                 on p.pronamespace = n.oid
             join pg_catalog.pg_language l
                 on p.prolang = l.oid
+            left join pg_catalog.pg_depend dep
+                on p.oid = dep.objid
+                and dep.deptype = 'e'
         where
             p.prosecdef = true
+            and dep.objid is null -- exclude functions owned by extensions
             and pg_catalog.has_function_privilege('authenticated', p.oid, 'EXECUTE')
             and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
             and n.nspname not in (
