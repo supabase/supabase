@@ -38,7 +38,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
   test('renders the empty-org notice, hides permissions, and shows the cancel footer', async () => {
     customRender(<OAuthAppsAuthorizeScreen mockState="empty_org" navigate={vi.fn()} />)
 
-    expect(await screen.findByText('No projects in some-other-org')).toBeInTheDocument()
+    expect(await screen.findByText('No projects in contoso-labs')).toBeInTheDocument()
     expect(screen.queryByText('Permissions requested')).not.toBeInTheDocument()
     expect(
       screen.getByText(
