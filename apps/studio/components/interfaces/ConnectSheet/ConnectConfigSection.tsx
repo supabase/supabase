@@ -1,21 +1,7 @@
-import { Check, ChevronsUpDown } from 'lucide-react'
-import { useId, useState } from 'react'
-
 import {
-  Button,
   cn,
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
   RadioGroupStacked,
   RadioGroupStackedItem,
-  ScrollArea,
   Select,
   SelectContent,
   SelectItem,
@@ -69,25 +55,6 @@ export function ConnectConfigSection({
         }
 
         switch (field.type) {
-          case 'combobox':
-            return (
-              <FormItemLayout
-                key={field.id}
-                isReactForm={false}
-                layout="horizontal"
-                label={field.label}
-                description={field.description}
-                name={`connect-${field.id}`}
-              >
-                <ConnectCombobox
-                  id={`connect-${field.id}`}
-                  options={options}
-                  value={String(value ?? '')}
-                  onValueChange={(v) => onFieldChange(field.id, v)}
-                />
-              </FormItemLayout>
-            )
-
           case 'radio-grid':
             return (
               <FormItemLayout
@@ -263,76 +230,6 @@ export function ConnectConfigSection({
         }
       })}
     </div>
-  )
-}
-
-interface ConnectComboboxProps {
-  id: string
-  options: FieldOption[]
-  value: string
-  onValueChange: (value: string) => void
-}
-
-function ConnectCombobox({ id, options, value, onValueChange }: ConnectComboboxProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const listboxId = useId()
-  const selectedOption = options.find((option) => option.value === value)
-
-  return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          id={id}
-          variant="default"
-          size="small"
-          role="combobox"
-          aria-expanded={isOpen}
-          aria-controls={listboxId}
-          className={cn(
-            'w-full justify-between',
-            !selectedOption && 'text-foreground-muted',
-            '[&>span:first-child]:flex [&>span:first-child]:min-w-0 [&>span:first-child]:items-center [&>span:first-child]:gap-x-2'
-          )}
-          iconRight={<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" strokeWidth={1} />}
-        >
-          {selectedOption?.icon && <ConnectionIcon icon={selectedOption.icon} />}
-          <span className="truncate">{selectedOption?.label ?? 'Select framework'}</span>
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent id={listboxId} align="start" className="p-0" sameWidthAsTrigger>
-        <Command>
-          <CommandInput placeholder="Search frameworks..." />
-          <CommandList>
-            <CommandEmpty>No frameworks found.</CommandEmpty>
-            <CommandGroup>
-              <ScrollArea className="h-72">
-                {options.map((option) => (
-                  <CommandItem
-                    key={option.value}
-                    value={option.label}
-                    keywords={[option.value]}
-                    onSelect={() => {
-                      onValueChange(option.value)
-                      setIsOpen(false)
-                    }}
-                    className="[&>span:last-child]:flex [&>span:last-child]:min-w-0 [&>span:last-child]:items-center [&>span:last-child]:gap-x-2"
-                  >
-                    <Check
-                      className={cn(
-                        'h-4 w-4 shrink-0',
-                        option.value === value ? 'opacity-100' : 'opacity-0'
-                      )}
-                    />
-                    {option.icon && <ConnectionIcon icon={option.icon} />}
-                    <span className="truncate">{option.label}</span>
-                  </CommandItem>
-                ))}
-              </ScrollArea>
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
   )
 }
 

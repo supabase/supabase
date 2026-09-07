@@ -298,7 +298,7 @@ export const connectSchema: ConnectSchema = {
     // Framework fields
     framework: {
       id: 'framework',
-      type: 'combobox',
+      type: 'select',
       label: 'Framework',
       options: { source: 'frameworks' },
       defaultValue: 'nextjs',
