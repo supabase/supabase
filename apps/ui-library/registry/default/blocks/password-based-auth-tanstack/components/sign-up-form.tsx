@@ -103,7 +103,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
             <div className="mt-4 text-center text-sm">
               Already have an account?{' '}
               <Link to="/login" className="underline underline-offset-4">
-                Login
+                Sign in
               </Link>
             </div>
           </form>

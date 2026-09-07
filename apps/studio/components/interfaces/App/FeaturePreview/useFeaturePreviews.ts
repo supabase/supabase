@@ -45,8 +45,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER,
         name: 'Explorer & Notebooks',
         category: 'editors',
-        // [Joshen TODO] Update with proper URL once discussion is up
-        discussionsUrl: undefined,
+        discussionsUrl: 'https://github.com/orgs/supabase/discussions/49916',
         enabled: isExplorerEnabled,
         isNew: true,
         isPlatformOnly: true,

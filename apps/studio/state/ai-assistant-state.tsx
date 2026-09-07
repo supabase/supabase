@@ -549,6 +549,10 @@ export const createAiAssistantState = (): AiAssistantState => {
       state.model = model
     },
 
+    setInitialInput: (text: string) => {
+      state.initialInput = text
+    },
+
     // Chat management
     get activeChat(): ChatSession | undefined {
       return state.activeChatId ? state.chats[state.activeChatId] : undefined
@@ -877,6 +881,7 @@ export type AiAssistantState = AiAssistantData & {
   oauthRequiredOrgSlug?: string
   setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
+  setInitialInput: (text: string) => void
   createChat: (options?: CreateChatOptions) => string
   newChat: (options?: NewChatOptions) => string
   createBranch: (sourceChatId: string, messageId: string) => string | undefined

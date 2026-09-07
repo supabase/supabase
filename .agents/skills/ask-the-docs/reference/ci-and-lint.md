@@ -81,9 +81,9 @@ Production deployment is handled by **Vercel**. Supabase employees branch the
 repo directly rather than fork it, so CI checks auto-run and Vercel deploys
 can be authorized without the external PR security gate.
 
-Key deployment detail: the project generates markdown files for each page
-under `/docs/guides/..` as a **prebuild task**. This lets Vercel bundle these
-files with middleware and functions at build time.
+Markdown for every guide is generated as a **prebuild task** so Vercel can
+bundle it with middleware and functions — see
+[`build-pipeline.md`](./build-pipeline.md) for the lifecycle.
 
 The **Authorize Vercel Deploys** workflow is the glue between GitHub Actions
 and Vercel: it runs first to approve the deploy, then Vercel picks it up and

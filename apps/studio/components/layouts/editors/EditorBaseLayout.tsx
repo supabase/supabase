@@ -9,6 +9,7 @@ import { CollapseButton } from '../Tabs/CollapseButton'
 import { EditorTabs } from '../Tabs/Tabs'
 import { useEditorType } from './EditorsLayout.hooks'
 import { useIsTemporarySqlEditorVisit } from '@/hooks/misc/useIsTemporarySqlEditorVisit'
+import { useTrack } from '@/lib/telemetry/track'
 import { useTabsStateSnapshot } from '@/state/tabs'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
@@ -86,6 +87,7 @@ export const EditorBaseLayout = ({
 const BackToExplorerButton = () => {
   const { ref } = useParams()
   const router = useRouter()
+  const track = useTrack()
   const { isTemporary, setIsTemporary } = useIsTemporarySqlEditorVisit(ref)
 
   if (!ref || !isTemporary) return null
@@ -95,6 +97,7 @@ const BackToExplorerButton = () => {
       tooltip="Back to Explorer"
       onClick={() => {
         setIsTemporary(false)
+        track('sql_editor_back_explorer_clicked')
         router.push(`/project/${ref}/explorer`)
       }}
     />

@@ -23,11 +23,16 @@ export const QueryResultError = ({
   autoLimit,
   sql,
   source,
+  onDebug,
 }: {
   error: NonNullable<QueryResult['error']>
   autoLimit?: QueryResult['autoLimit']
   sql?: string
   source?: SqlSnippetSource
+  /** Overrides the default "open a new debug chat" behavior — used when this query block
+   * is already rendered inside an open assistant conversation, so debugging should write
+   * into that conversation's composer instead of abandoning it for a new chat. */
+  onDebug?: (prompt: string) => void
 }) => {
   const { ref } = useParams()
 
@@ -61,7 +66,9 @@ export const QueryResultError = ({
   )
 
   const handleDebug = () =>
-    createChat({ name: 'Debug SQL snippet', initialMessage: buildDebugPrompt() })
+    onDebug
+      ? onDebug(buildDebugPrompt())
+      : createChat({ name: 'Debug SQL snippet', initialMessage: buildDebugPrompt() })
 
   const isTimeout =
     error.message?.includes('canceling statement due to statement timeout') ||
