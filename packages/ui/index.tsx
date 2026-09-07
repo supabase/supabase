@@ -160,3 +160,7 @@ export * from './src/lib/Hooks'
 export * from './src/components/hooks/use-mobile'
 
 export * from './src/components/KeyboardShortcut/KeyboardShortcut'
+
+// Re-export ConfirmationModal so imports from 'ui' also work
+export { ConfirmationModal } from '../ui-patterns/src/Dialogs/ConfirmationModal'
+export type { ConfirmationModalProps } from '../ui-patterns/src/Dialogs/ConfirmationModal'
