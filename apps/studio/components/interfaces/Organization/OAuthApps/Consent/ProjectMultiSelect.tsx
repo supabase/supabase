@@ -15,6 +15,8 @@ import {
 
 import type { OAuthAppsAuthorizeOrganizationProject } from '@/data/oauth-apps/oauth-apps-authorize-organization-projects-query'
 
+const MAX_SELECTED_PROJECTS = 10
+
 export interface ProjectMultiSelectProps {
   projects: OAuthAppsAuthorizeOrganizationProject[]
   selectedRefs: string[]
@@ -31,9 +33,14 @@ export const ProjectMultiSelect = ({
   const [open, setOpen] = useState(false)
   const listId = useId()
 
+  const atCap = selectedRefs.length >= MAX_SELECTED_PROJECTS
+
   const toggleProject = (ref: string) => {
+    const isSelected = selectedRefs.includes(ref)
+    if (!isSelected && atCap) return
+
     onChange(
-      selectedRefs.includes(ref)
+      isSelected
         ? selectedRefs.filter((selectedRef) => selectedRef !== ref)
         : [...selectedRefs, ref]
     )
@@ -46,7 +53,14 @@ export const ProjectMultiSelect = ({
 
   return (
     <div className="flex flex-col gap-2 w-full">
-      <p className="text-xs text-foreground">Projects</p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs text-foreground">Projects</p>
+        {selectedRefs.length > 0 && (
+          <p className="text-xs text-foreground-lighter">
+            {selectedRefs.length}/{MAX_SELECTED_PROJECTS}
+          </p>
+        )}
+      </div>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverAnchor asChild>
           <button
@@ -75,24 +89,36 @@ export const ProjectMultiSelect = ({
             <CommandInput placeholder="Search projects" />
             <CommandList id={listId}>
               <CommandEmpty>No projects found</CommandEmpty>
-              {projects.map((project) => (
-                <CommandItem
-                  key={project.ref}
-                  value={project.name}
-                  onSelect={() => toggleProject(project.ref)}
-                  className="flex items-center gap-2"
-                >
-                  <Checkbox
-                    checked={selectedRefs.includes(project.ref)}
-                    onCheckedChange={() => toggleProject(project.ref)}
-                  />
-                  <span className="truncate">{project.name}</span>
-                </CommandItem>
-              ))}
+              {projects.map((project) => {
+                const isSelected = selectedRefs.includes(project.ref)
+                const isDisabled = atCap && !isSelected
+
+                return (
+                  <CommandItem
+                    key={project.ref}
+                    value={project.name}
+                    disabled={isDisabled}
+                    onSelect={() => toggleProject(project.ref)}
+                    className="flex items-center gap-2"
+                  >
+                    <Checkbox
+                      checked={isSelected}
+                      disabled={isDisabled}
+                      onCheckedChange={() => toggleProject(project.ref)}
+                    />
+                    <span className="truncate">{project.name}</span>
+                  </CommandItem>
+                )
+              })}
             </CommandList>
           </Command>
         </PopoverContent>
       </Popover>
+      {atCap && (
+        <p className="text-xs text-foreground-lighter">
+          Maximum reached. Deselect a project to choose a different one.
+        </p>
+      )}
       {error && <p className="text-xs text-foreground-light">{error}</p>}
     </div>
   )

@@ -39,4 +39,29 @@ describe('NoProjectsNotice', () => {
 
     expect(onSwitchOrg).toHaveBeenCalledTimes(1)
   })
+
+  test('interpolates a different app name, so the copy is not hardcoded', () => {
+    customRender(
+      <NoProjectsNotice appName="Fabrikam" organizationSlug="contoso-labs" onSwitchOrg={vi.fn()} />
+    )
+
+    expect(
+      screen.getByText(
+        "Fabrikam needs access to at least one project, and this organization doesn't have any yet."
+      )
+    ).toBeInTheDocument()
+  })
+
+  test('shows the same organization slug it was given', () => {
+    customRender(
+      <NoProjectsNotice
+        appName="Vercel"
+        organizationSlug="northwind-traders"
+        onSwitchOrg={vi.fn()}
+      />
+    )
+
+    expect(screen.getByText('No projects in northwind-traders')).toBeInTheDocument()
+    expect(screen.queryByText('No projects in contoso-labs')).not.toBeInTheDocument()
+  })
 })
