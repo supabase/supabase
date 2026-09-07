@@ -19,20 +19,14 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.getByText('Must select at least one project to authorize.')).toBeInTheDocument()
   })
 
-  test('shows the over-role warning only for the read-only fixture', async () => {
-    const { unmount } = customRender(
-      <OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />
-    )
+  test('shows no upfront over-role warning, even for the read-only fixture', async () => {
+    customRender(<OAuthAppsAuthorizeScreen mockState="over_role" navigate={vi.fn()} />)
+
     await screen.findByText('Permissions requested')
     expect(
       screen.queryByText('Some requested permissions exceed your role')
     ).not.toBeInTheDocument()
-    unmount()
-
-    customRender(<OAuthAppsAuthorizeScreen mockState="over_role" navigate={vi.fn()} />)
-    expect(
-      await screen.findByText('Some requested permissions exceed your role')
-    ).toBeInTheDocument()
+    expect(screen.queryByText('Read-only for your role')).not.toBeInTheDocument()
   })
 
   test('renders the empty-org notice, hides permissions, and shows the cancel footer', async () => {
