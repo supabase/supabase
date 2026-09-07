@@ -8,7 +8,6 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  ScrollArea,
 } from 'ui'
 import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
@@ -49,57 +48,26 @@ export function ExposedMaterializedViewDialog({
             Revoking <code>select</code> access from API roles <code>anon</code> and{' '}
             <code>authenticated</code> mitigates the risk of exposing sensitive data to all users.
           </p>
+          <SimpleCodeBlock>
+            {`REVOKE SELECT on "${table.schema}"."${table.name}"
+FROM public, anon, authenticated;`}
+          </SimpleCodeBlock>
           <p>
-            To protect your materialized view from unwanted access to its data, you can pick one of
-            three options:
+            Note that this is a breaking change if you have code that depends on accessing the
+            materialized view using the Data API. To reexpose the materialized view in a safe way,
+            you can put a function in front of it and apply a security rule equivalent to RLS:
           </p>
-
-          <ul>
-            <li>
-              <p>
-                Revoke <code>select</code> access from API roles <code>anon</code> and{' '}
-                <code>authenticated</code>
-              </p>
-              <div className="border rounded-md">
-                <ScrollArea className="px-4 py-2">
-                  <SimpleCodeBlock>
-                    {`REVOKE SELECT on "${table.schema}"."${table.name}" FROM public, anon, authenticated;`}
-                  </SimpleCodeBlock>
-                </ScrollArea>
-              </div>
-            </li>
-
-            <li>
-              <p>
-                Put a function in front of it and apply a security rule equivalent to RLS in front
-                of the function
-              </p>
-              <div className="border rounded-md">
-                <ScrollArea className="px-4 py-2">
-                  <SimpleCodeBlock>
-                    {`CREATE OR REPLACE FUNCTION get_${table.name}_secure() RETURNS SETOF ${table.schema}.${table.name} LANGUAGE sql AS $$ SELECT * FROM ${table.schema}.${table.name} WHERE user_id = auth.uid();$$;`}
-                  </SimpleCodeBlock>
-                </ScrollArea>
-              </div>
-            </li>
-
-            <li>
-              <p>
-                Put a view in front of the materialized view and apply a rule like
-                <code>where uid = auth.uid()</code> directly in the view
-              </p>
-
-              <div className="border rounded-md">
-                <ScrollArea className="px-4 py-2">
-                  <SimpleCodeBlock>
-                    {`CREATE VIEW ${table.schema}.${table.name}_secure AS SELECT * FROM ${table.schema}.${table.name} WHERE user_id = auth.uid();`}
-                  </SimpleCodeBlock>
-                </ScrollArea>
-              </div>
-            </li>
-          </ul>
-
-          <p>Feel free to adjust the queries according to your project's needs.</p>
+          <SimpleCodeBlock>
+            {`CREATE OR REPLACE FUNCTION get_${table.name}_secure()
+RETURNS SETOF "${table.schema}"."${table.name}"
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  SELECT * FROM "${table.schema}"."${table.name}"
+  WHERE user_id = (SELECT auth.uid());
+$$;`}
+          </SimpleCodeBlock>
         </DialogSection>
 
         <DialogFooter>
