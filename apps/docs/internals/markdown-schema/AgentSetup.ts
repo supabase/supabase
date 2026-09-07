@@ -1,31 +1,14 @@
-import {
-  getMonitoringAgent,
-  getMonitoringAgentHarnesses,
-  getMonitoringAgentPrompt,
-} from '~/data/monitoring-agents.utils'
+import { getMonitoringAgent, getMonitoringAgentPrompt } from '~/data/monitoring-agents.utils'
+
+import { withDocsBasePath } from '../internal-links'
 
 type HandlerContext = {
   props: Record<string, unknown>
 }
 
-function renderMarkdownSteps(steps: string[]): string {
-  return steps.map((step, index) => `${index + 1}. ${step}`).join('\n')
-}
-
 export function AgentSetup({ props }: HandlerContext): string {
   const agent = getMonitoringAgent(String(props.id ?? ''))
   const prompt = getMonitoringAgentPrompt(agent)
-  const harnesses = getMonitoringAgentHarnesses(agent)
-
-  const sections = [
-    `**Prompt**\n\n\`\`\`text\n${prompt}\n\`\`\``,
-    ...harnesses.map((harness) => {
-      const parts = [`**${harness.label}**`, harness.intro, renderMarkdownSteps(harness.steps)]
-      if (harness.note) parts.push(harness.note)
-      parts.push(`[${harness.label} docs](${harness.docsUrl})`)
-      return parts.join('\n\n')
-    }),
-  ]
-
-  return sections.join('\n\n')
+  const setupUrl = withDocsBasePath('/guides/observability/automate-with-agents#run-the-routine')
+  return `**Prompt**\n\n\`\`\`text\n${prompt}\n\`\`\`\n\nFollow [the shared setup steps](${setupUrl}) to configure access, saved state, scheduling, and report routing.`
 }
