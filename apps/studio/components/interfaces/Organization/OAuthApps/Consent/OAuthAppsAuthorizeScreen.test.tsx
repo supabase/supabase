@@ -41,7 +41,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     ).toBeInTheDocument()
   })
 
-  test('renders the publisher warning and no verified tick for the unverified fixture', async () => {
+  test('renders the publisher warning for the unverified fixture', async () => {
     customRender(<OAuthAppsAuthorizeScreen mockState="unverified" navigate={vi.fn()} />)
 
     expect(
@@ -49,18 +49,18 @@ describe('OAuthAppsAuthorizeScreen', () => {
         "This publisher isn't verified by Supabase. Only continue if you trust it."
       )
     ).toBeInTheDocument()
-    expect(screen.queryByRole('img', { name: 'Verified' })).not.toBeInTheDocument()
   })
 
-  test('shows the verified tick and no publisher warning for a verified fixture', async () => {
+  test('shows no publisher warning and no verified tick for a verified fixture', async () => {
     customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
 
-    expect(await screen.findByRole('img', { name: 'Verified' })).toBeInTheDocument()
+    await screen.findByText('Permissions requested')
     expect(
       screen.queryByText(
         "This publisher isn't verified by Supabase. Only continue if you trust it."
       )
     ).not.toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: 'Verified' })).not.toBeInTheDocument()
   })
 
   test('renders the success screen after the approve mutation resolves', async () => {
