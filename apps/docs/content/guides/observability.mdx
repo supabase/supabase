@@ -1,27 +1,25 @@
 ---
 title: Observability
-description: 'Find project evidence, diagnose issues, and automate monitoring'
+description: 'Read project data, diagnose issues, and hire an agent to monitor your project'
 ---
 
-Choose the task you need to complete. You can inspect data directly, investigate a known error, or run repeatable checks with an agent.
-
-| Task                                             | Start here                                                               |
-| ------------------------------------------------ | ------------------------------------------------------------------------ |
-| Diagnose a known error or symptom                | [Troubleshooting](/docs/guides/troubleshooting)                          |
-| Query log events with an agent or script         | [Query logs with SQL](/docs/guides/observability/advanced-log-filtering) |
-| Find and inspect an event in Studio              | [Logs in Studio](/docs/guides/observability/logs)                        |
-| Check health, security, performance, or capacity | [Detection checks](/docs/guides/observability/detecting)                 |
-| Schedule repeatable checks                       | [Automate monitoring](/docs/guides/observability/automate-with-agents)   |
+Use project data to understand what is happening, investigate issues, and give an agent repeatable checks to run.
 
 ## Read project data [#metrics-api]
 
-Logs record events, database statistics describe live or cumulative activity, and advisors return configuration findings. Reports visualize project signals; the Metrics API exports Prometheus-compatible database metrics.
+Query logs for events, inspect database statistics, or review advisor findings. Use Reports to visualize signals and the Metrics API to export them.
 
 <ContentListings id="telemetry-access-what" />
 
-## From evidence to action
+## Detect and diagnose
 
-Observe the relevant data, detect a signal, and use its time window, error code, or affected object to diagnose the cause. After an authorized fix, rerun the check. Automate checks only after their results and thresholds are useful for your project.
+Run [detection checks](/docs/guides/observability/detecting) to identify health, security, performance, or capacity issues. Take the resulting error code, time window, or affected object to the [troubleshooting guides](/docs/guides/troubleshooting), then rerun the check after a fix.
+
+## Hire an agent
+
+Give an agent recurring checks to run and findings to report. [Set up an agent](/docs/guides/observability/automate-with-agents) with read-only access to your project.
+
+<ContentListings id="telemetry-hire-agent" />
 
 ## Configure and export
 
