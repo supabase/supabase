@@ -231,10 +231,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       </div>
     )
 
-    const handleActivation = (
-      e: React.MouseEvent<HTMLElement>,
-      childOnClick?: React.MouseEventHandler<HTMLElement>
-    ) => {
+    const handleActivation = (e: React.MouseEvent, childOnClick?: React.MouseEventHandler) => {
       if (disabled || unavailable) {
         e.preventDefault()
         e.stopPropagation()
@@ -242,7 +239,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       }
 
       childOnClick?.(e)
-      onClick?.(e)
+      onClick?.(e as React.MouseEvent<HTMLButtonElement>)
     }
 
     return (
@@ -261,9 +258,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         onClick={asChild ? undefined : (e) => handleActivation(e)}
       >
         {asChild ? (
-          isValidElement<{ children: ReactNode; onClick?: React.MouseEventHandler<HTMLElement> }>(
-            children
-          ) ? (
+          isValidElement<{ children: ReactNode; onClick?: React.MouseEventHandler }>(children) ? (
             cloneElement(
               children,
               {
