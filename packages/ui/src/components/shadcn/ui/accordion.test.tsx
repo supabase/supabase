@@ -14,7 +14,8 @@ describe('AccordionTrigger', () => {
     )
 
     const trigger = screen.getByRole('button', { name: 'Advanced settings' })
-    expect(trigger).toHaveClass('rounded-md', 'px-2', 'relative', 'focus-inset')
+    expect(trigger).toHaveClass('px-2', 'relative', 'focus-inset')
+    expect(trigger).not.toHaveClass('rounded-md')
     expect(trigger).not.toHaveClass('focus-ring')
     expect(trigger).not.toHaveClass('transition-colors')
     expect(trigger).not.toHaveClass('transition-all')
@@ -30,7 +31,7 @@ describe('AccordionTrigger', () => {
     )
 
     const trigger = screen.getByRole('button', { name: 'Advanced settings' })
-    expect(trigger).toHaveClass('focus-ring')
+    expect(trigger).toHaveClass('rounded-md', 'focus-ring')
     expect(trigger).not.toHaveClass('focus-inset')
   })
 })

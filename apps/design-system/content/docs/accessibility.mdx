@@ -61,11 +61,11 @@ Uses `outline` (not `ring`) so it paints reliably on interactive `<tr>`s. Tailwi
 ```txt
 outline: 2px solid transparent
 outline-offset: -2px
-border-radius: var(--radius-md)
 transition-property: color, background-color, border-color, ...
 
 &:focus-visible {
   outline-color: var(--ring)
+  border-radius: var(--radius-md)
 }
 ```
 

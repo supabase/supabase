@@ -36,9 +36,10 @@ const AccordionTrigger = React.forwardRef<
           <AccordionPrimitive.Trigger
             ref={ref}
             className={cn(
-              'cursor-pointer flex flex-1 gap-2 items-center justify-between rounded-md px-2 py-4 text-left',
+              'cursor-pointer flex flex-1 gap-2 items-center justify-between px-2 py-4 text-left',
               'font-medium hover:underline',
               '[&[data-state=open]>svg]:rotate-180',
+              focusVariant === 'ring' && 'rounded-md',
               className,
               focusVariant === 'ring' ? 'focus-ring' : 'relative focus-inset'
             )}
