@@ -1,0 +1,18 @@
+{
+  "version": "1",
+  "databases": [
+    {
+      "ref": "default",
+      "name": "Default Project",
+      "host": "db-default",
+      "port": 5432,
+      "database": "postgres",
+      "password_env": "POSTGRES_PASSWORD",
+      "jwt_secret_env": "JWT_SECRET",
+      "anon_key_env": "ANON_KEY",
+      "service_key_env": "SERVICE_ROLE_KEY",
+      "realtime_tenant_id": "realtime-dev",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  ]
+}
