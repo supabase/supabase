@@ -11,10 +11,9 @@ beforeEach(() => {
 })
 describe('Assistant-owned project consent', () => {
   it('defaults to no consent and no data sharing without importing legacy settings', async () => {
-    expect(await getProjectPermissions('user', 'project', 'org', true)).toEqual({
+    expect(await getProjectPermissions('user', 'project', 'org')).toEqual({
       level: 'disabled',
       hasConsented: false,
-      canShareProjectData: true,
       consentVersion: ASSISTANT_CONSENT_VERSION,
     })
     expect(adminQuery).toHaveBeenCalledWith(
@@ -28,25 +27,19 @@ describe('Assistant-owned project consent', () => {
       vi.mocked(adminQuery).mockResolvedValue([
         { level, consent_version: ASSISTANT_CONSENT_VERSION },
       ])
-      expect(await getProjectPermissions('user', 'project', 'org', true)).toMatchObject({
+      expect(await getProjectPermissions('user', 'project', 'org')).toMatchObject({
         level,
         hasConsented: true,
       })
     }
   )
-  it('fails closed on an obsolete grant or a newly restricted project', async () => {
+  it('requires fresh consent when the grant version changes', async () => {
     vi.mocked(adminQuery).mockResolvedValueOnce([
       { level: 'schema_and_log_and_data', consent_version: 0 },
     ])
-    expect(await getProjectPermissions('user', 'project', 'org', true)).toMatchObject({
+    expect(await getProjectPermissions('user', 'project', 'org')).toMatchObject({
       level: 'disabled',
       hasConsented: false,
-    })
-    vi.mocked(adminQuery).mockResolvedValueOnce([
-      { level: 'schema_and_log_and_data', consent_version: ASSISTANT_CONSENT_VERSION },
-    ])
-    expect(await getProjectPermissions('user', 'project', 'org', false)).toMatchObject({
-      level: 'disabled',
     })
   })
   it('writes only the selected user/project grant and current consent version', async () => {

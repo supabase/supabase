@@ -15,11 +15,11 @@ vi.mock('@/lib/assistant/backend', async (importOriginal) => ({
 vi.mock('@/lib/assistant/client', () => ({
   getAssistantRequestHeaders: async () => ({
     Authorization: 'Bearer assistant',
-    'x-platform-authorization': 'Bearer platform',
   }),
 }))
 vi.mock('@/state/ai-assistant-state', () => ({
   useAiAssistantStateSnapshot: () => ({ context: { projectRef: 'project', orgSlug: 'org' } }),
+  useAiAssistantState: () => ({ reload: vi.fn() }),
 }))
 const url = 'https://assistant.example/v1/projects/project/permissions'
 let writes: unknown[]

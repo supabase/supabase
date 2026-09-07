@@ -16,7 +16,6 @@ export const assistantCors = cors({
   allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   allowHeaders: [
     'authorization',
-    'x-platform-authorization',
     'content-type',
     'apikey',
     'x-client-info',

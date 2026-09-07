@@ -6,7 +6,6 @@ import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Eraser, Pencil, X } from 'lucide-react'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { toast } from 'sonner'
 import { Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
@@ -23,6 +22,7 @@ import {
 } from './AIAssistant.utils'
 import { AIOnboarding } from './AIOnboarding'
 import { AssistantChatForm } from './AssistantChatForm'
+import { AssistantConnectOrganization } from './AssistantConnectOrganization'
 import {
   Conversation,
   ConversationContent,
@@ -42,7 +42,6 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import type { AssistantMessageMetadata } from '@/lib/ai/assistant-message-metadata'
 import { getParallelApprovalIdsToReject } from '@/lib/ai/message-utils'
 import { useAssistantSupabaseBackend } from '@/lib/assistant/backend'
-import { connectAssistantOrganization } from '@/lib/assistant/connect'
 import { IS_PLATFORM } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
@@ -118,7 +117,14 @@ export const AssistantChat = ({
   const legacyPermissions = useOrgAiOptInLevel()
   const assistantPermissions = useAssistantProjectPermissions(
     project?.ref,
-    selectedOrganization?.slug ?? undefined
+    selectedOrganization?.slug ?? undefined,
+    {
+      enabled:
+        snap.useAssistantBackend &&
+        snap.isInitialized &&
+        snap.context.projectRef === project?.ref &&
+        snap.context.orgSlug === selectedOrganization?.slug,
+    }
   )
   const { aiOptInLevel, isHipaaProjectDisallowed } = legacyPermissions
   // Whether attached queries are sent at all. One definition, shared by the chat form
@@ -141,8 +147,8 @@ export const AssistantChat = ({
   const [isResubmitting, setIsResubmitting] = useState(false)
   const [messageRatings, setMessageRatings] = useState<Record<string, 'positive' | 'negative'>>({})
 
-  const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
-  const isApiKeySet = !!check?.hasKey
+  const { data: check, isSuccess } = useCheckOpenAIKeyQuery({ enabled: !useAssistantBackend })
+  const isApiKeySet = useAssistantBackend || !!check?.hasKey
 
   const { mutateAsync: rateMessage } = useRateMessageMutation()
   const { mutateAsync: submitAssistantFeedback } = useMessageFeedbackMutation({
@@ -157,7 +163,7 @@ export const AssistantChat = ({
       connectionString: project?.connectionString,
       schema: 'public',
     },
-    { enabled: isApiKeySet }
+    { enabled: !useAssistantBackend && isApiKeySet }
   )
 
   const currentTable = tables?.find((t) => t.id.toString() === entityId)
@@ -203,7 +209,12 @@ export const AssistantChat = ({
   const isSupportChatClosed = isSupportChat && supportMetadata.lifecycleStatus !== 'bot_active'
   const supportConversationId = supportMetadata?.frontConversationId
   const isChatInputDisabled =
-    !isApiKeySet || disablePrompts || isLoadingOrganization || isSupportChatClosed
+    !isApiKeySet ||
+    disablePrompts ||
+    isLoadingOrganization ||
+    isSupportChatClosed ||
+    (useAssistantBackend &&
+      (!assistantPermissions.data?.hasConsented || !!snap.oauthRequiredOrgSlug))
 
   const branchedFrom = currentChat?.branchedFrom
   const branchedConversation = branchedFrom ? snap.chats[branchedFrom.chatId] : undefined
@@ -322,34 +333,11 @@ export const AssistantChat = ({
       error.message?.includes('exceeds the context window'))
 
   const isOAuthRequired =
-    !!snap.oauthRequiredOrgSlug || (!!error?.message && error.message.includes('oauth_required'))
-
-  const connectionAbort = useRef<AbortController | null>(null)
-  useEffect(
-    () => () => {
-      connectionAbort.current?.abort()
-    },
-    [useAssistantBackend, snap.context.orgSlug]
-  )
-
-  const handleConnectOrganization = async () => {
-    const orgSlug = snap.oauthRequiredOrgSlug ?? snap.context.orgSlug
-    if (!orgSlug) return
-    try {
-      connectionAbort.current?.abort()
-      const controller = new AbortController()
-      connectionAbort.current = controller
-      await connectAssistantOrganization(orgSlug, window.location.href, controller.signal)
-      state.oauthRequiredOrgSlug = undefined
-      chatInstance?.clearError()
-    } catch (connectError) {
-      toast.error(
-        connectError instanceof Error
-          ? connectError.message
-          : "Couldn't start the connection. Try again."
-      )
-    }
-  }
+    useAssistantBackend &&
+    (!!snap.oauthRequiredOrgSlug ||
+      (!!error?.message &&
+        (error.message.includes('oauth_required') || error.message.includes('oauth_expired'))))
+  const connectionOrgSlug = snap.oauthRequiredOrgSlug ?? snap.context.orgSlug
 
   const renderedMessages = useMemo(
     () =>
@@ -417,6 +405,7 @@ export const AssistantChat = ({
   const hasMessages = chatMessages.length > 0
 
   const sendMessageToAssistant = (finalContent: string) => {
+    if (useAssistantBackend && (isChatInputDisabled || isOAuthRequired)) return
     if (editingMessageId) {
       // Handling when the user is in edit mode
       // delete the message(s) from the chat just like the delete button
@@ -727,7 +716,7 @@ export const AssistantChat = ({
               />
             )}
 
-            {isSuccess && !isApiKeySet && (
+            {!useAssistantBackend && isSuccess && !isApiKeySet && (
               <Admonition
                 type="default"
                 title="OpenAI API key not set"
@@ -741,15 +730,13 @@ export const AssistantChat = ({
               />
             )}
 
-            {isOAuthRequired && (
-              <Admonition
-                type="caution"
-                title="Connect this organization so the assistant can query the project."
-                actions={
-                  <Button size="tiny" onClick={handleConnectOrganization}>
-                    Connect organization
-                  </Button>
-                }
+            {isOAuthRequired && connectionOrgSlug && (
+              <AssistantConnectOrganization
+                orgSlug={connectionOrgSlug}
+                onConnected={() => {
+                  chatInstance?.clearError()
+                  state.reload()
+                }}
               />
             )}
 
@@ -758,7 +745,7 @@ export const AssistantChat = ({
               className="z-20"
               loading={isChatLoading}
               isEditing={!!editingMessageId}
-              disabled={isChatInputDisabled}
+              disabled={isChatInputDisabled || isOAuthRequired}
               placeholder={placeholder}
               value={value}
               onValueChange={(e) => {

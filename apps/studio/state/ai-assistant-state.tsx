@@ -8,6 +8,7 @@ import {
   PropsWithChildren,
   useContext,
   useEffect,
+  useLayoutEffect,
   useReducer,
   useState,
 } from 'react'
@@ -19,6 +20,9 @@ import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySo
 import { deleteConversation } from '@/data/ai-assistant/conversation-delete-mutation'
 import { getConversation } from '@/data/ai-assistant/conversation-detail-query'
 import { updateConversation } from '@/data/ai-assistant/conversation-update-mutation'
+import { isAssistantOAuthRequiredError } from '@/data/ai-assistant/fetcher'
+import { assistantMeQueryOptions } from '@/data/ai-assistant/me-query'
+import { projectPermissionsQueryOptions } from '@/data/ai-assistant/project-permissions-query'
 import type { AiSupportStatus } from '@/data/feedback/ai-chat-front-sync'
 import { constructHeaders } from '@/data/fetchers'
 import { getQueryClient } from '@/data/query-client'
@@ -478,6 +482,10 @@ export const createAiAssistantState = (): AiAssistantState => {
   const makePersistence = () =>
     ref(
       new ConversationPersistence((error) => {
+        if (isAssistantOAuthRequiredError(error)) {
+          state.oauthRequiredOrgSlug = error.orgSlug ?? state.context.orgSlug
+          return
+        }
         state.initializationError =
           error instanceof Error
             ? error.message
@@ -500,6 +508,7 @@ export const createAiAssistantState = (): AiAssistantState => {
     persistence: makePersistence(),
     useAssistantBackend: false,
     oauthRequiredOrgSlug: undefined,
+    isProjectConsentRequired: false,
 
     setContext: (context: Partial<AiAssistantContext>) => {
       state.context = { ...state.context, ...context }
@@ -518,6 +527,7 @@ export const createAiAssistantState = (): AiAssistantState => {
       Object.assign(state, createInitialAiAssistantData())
       state.isInitialized = false
       state.oauthRequiredOrgSlug = undefined
+      state.isProjectConsentRequired = false
     },
 
     setModel: (model: AssistantModel) => {
@@ -918,6 +928,7 @@ export type AiAssistantState = AiAssistantData & {
   isInitialized: boolean
   useAssistantBackend: boolean
   oauthRequiredOrgSlug?: string
+  isProjectConsentRequired: boolean
   setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
   setInitialInput: (text: string) => void
@@ -951,8 +962,8 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
   const [state] = useState(() => createAiAssistantState())
   const { reloadVersion } = useSnapshot(state)
 
-  // Effect to load state from IndexedDB on mount or projectRef change
-  useEffect(() => {
+  // Clear the previous scope before child effects can submit a handoff or render its history.
+  useLayoutEffect(() => {
     let isMounted = true
     // Page effects may already have supplied the legacy context before this provider effect.
     const context = state.context.projectRef === project?.ref ? state.context : {}
@@ -975,8 +986,26 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
       }
 
       if (useAssistantBackend) {
-        if (!backendOrgSlug) return
+        if (!backendOrgSlug || !backendUserId) return
         try {
+          const me = await getQueryClient().fetchQuery({
+            ...assistantMeQueryOptions({ userId: backendUserId }),
+            staleTime: 0,
+          })
+          if (!isMounted) return
+          if (!me.connections.some((connection) => connection.org_slug === backendOrgSlug)) {
+            state.oauthRequiredOrgSlug = backendOrgSlug
+            return
+          }
+          const permissions = await getQueryClient().fetchQuery({
+            ...projectPermissionsQueryOptions(project.ref, backendOrgSlug),
+            staleTime: 0,
+          })
+          if (!isMounted) return
+          if (!permissions.hasConsented) {
+            state.isProjectConsentRequired = true
+            return
+          }
           const chats = await loadConversationsFromBackend(project.ref)
           if (!isMounted) return
           state.chatInstances = {}
@@ -987,6 +1016,10 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
           })
         } catch (error) {
           if (!isMounted) return
+          if (isAssistantOAuthRequiredError(error)) {
+            state.oauthRequiredOrgSlug = error.orgSlug ?? backendOrgSlug
+            return
+          }
           state.initializationError =
             error instanceof Error ? error.message : 'Could not load conversations.'
           return

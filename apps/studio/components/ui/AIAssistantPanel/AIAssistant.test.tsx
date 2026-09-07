@@ -58,6 +58,7 @@ vi.mock('@/state/ai-assistant-state', () => ({
     suggestions: undefined,
   }),
   useAiAssistantState: () => ({
+    isInitialized: true,
     chats,
     newChat: mockNewChat,
     selectChat: mockSelectChat,

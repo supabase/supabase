@@ -21,11 +21,15 @@ export const projectPermissionsQueryOptions = (projectRef?: string, orgSlug?: st
     },
   })
 
-export function useAssistantProjectPermissions(projectRef?: string, orgSlug?: string) {
+export function useAssistantProjectPermissions(
+  projectRef?: string,
+  orgSlug?: string,
+  { enabled = true }: { enabled?: boolean } = {}
+) {
   const isEnabled = useAssistantSupabaseBackend()
   return useQuery({
     ...projectPermissionsQueryOptions(projectRef, orgSlug),
-    enabled: isEnabled && !!projectRef && !!orgSlug,
+    enabled: enabled && isEnabled && !!projectRef && !!orgSlug,
   })
 }
 

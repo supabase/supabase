@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 
 import { AIAssistantHeader } from './AIAssistantHeader'
 import { AssistantChat } from './AssistantChat'
+import { AssistantSetup } from './AssistantSetup'
 import { resolveSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import {
   ASSISTANT_HANDOFF_QUERY_PARAM,
@@ -13,6 +14,7 @@ import {
   consumeAssistantHandoff,
 } from '@/components/interfaces/Support/SupportAssistant.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useAssistantSupabaseBackend } from '@/lib/assistant/backend'
 import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import type { SqlSnippet } from '@/state/ai-assistant-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -38,14 +40,21 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { id: entityId, source: sourceParam, ref: routeRef } = useParams()
   const snap = useAiAssistantStateSnapshot()
   const state = useAiAssistantState()
+  const useAssistantBackend = useAssistantSupabaseBackend()
+  const isAssistantReady =
+    !useAssistantBackend ||
+    (snap.useAssistantBackend && snap.isInitialized && snap.context.projectRef === routeRef)
   const { snippets } = useSqlEditorV2StateSnapshot()
   const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
   const shortcutsEnabled = activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT
 
-  const handleNewChat = () => state.newChat()
+  const handleNewChat = () => {
+    if (!isAssistantReady) return
+    state.newChat()
+  }
 
   useShortcut(SHORTCUT_IDS.AI_ASSISTANT_NEW_CHAT, handleNewChat, {
-    enabled: shortcutsEnabled,
+    enabled: shortcutsEnabled && isAssistantReady,
   })
 
   const isInSQLEditor = router.pathname.includes('/sql/[id]')
@@ -111,14 +120,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   // `isInitialized` since the assistant state's IndexedDB restore overwrites
   // `state.chats`/`activeChatId` wholesale once it resolves, which would wipe out a chat
   // created here if this ran first.
+  const handoffToken = router.query[ASSISTANT_HANDOFF_QUERY_PARAM]
   useEffect(() => {
-    if (!snap.isInitialized) return
+    if (!snap.isInitialized || !state.isInitialized || !isAssistantReady) return
 
-    const handoffToken = router.query[ASSISTANT_HANDOFF_QUERY_PARAM]
     if (typeof handoffToken !== 'string') return
 
     processAssistantHandoff(handoffToken)
-  }, [snap.isInitialized, router.query[ASSISTANT_HANDOFF_QUERY_PARAM]])
+  }, [snap.isInitialized, state, isAssistantReady, handoffToken])
 
   useEffect(() => {
     if (!shortcutsEnabled || !isInSQLEditor || !snippetContent) return
@@ -141,6 +150,15 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       }
     }
   }, [shortcutsEnabled, isInSQLEditor, snippetContent, openSnippetSource, state])
+
+  if (!isAssistantReady) {
+    return (
+      <AssistantSetup
+        className={className}
+        onClose={() => closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)}
+      />
+    )
+  }
 
   if (!snap.activeChatId) return null
 

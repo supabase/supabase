@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { MessageSquarePlus, NotebookText, SquareCode } from 'lucide-react'
 import { useState } from 'react'
 
@@ -5,11 +6,20 @@ import { useCreateChat, useCreateNotebook, useCreateQuery } from './hooks'
 import { CHAT_TEMPLATES, NOTEBOOK_TEMPLATES } from './templates'
 import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
 import { AssistantChatForm } from '@/components/ui/AIAssistantPanel/AssistantChatForm'
+import { AssistantSetup } from '@/components/ui/AIAssistantPanel/AssistantSetup'
+import { useAssistantSupabaseBackend } from '@/lib/assistant/backend'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 
 export const ExplorerHomeTab = () => {
+  const { ref } = useParams()
   const { createNotebook } = useCreateNotebook()
   const { createQuery } = useCreateQuery()
   const { createChat } = useCreateChat()
+  const useAssistantBackend = useAssistantSupabaseBackend()
+  const snap = useAiAssistantStateSnapshot()
+  const canUseAssistant =
+    !useAssistantBackend ||
+    (snap.useAssistantBackend && snap.isInitialized && snap.context.projectRef === ref)
 
   const [value, setValue] = useState<string>('')
 
@@ -23,14 +33,17 @@ export const ExplorerHomeTab = () => {
           </p>
         </div>
 
-        <AssistantChatForm
-          loading={false}
-          className="bg"
-          placeholder="Ask anything about your project"
-          value={value}
-          onValueChange={(e) => setValue(e.target.value)}
-          onSubmit={(message) => createChat({ initialMessage: message })}
-        />
+        {!canUseAssistant && <AssistantSetup />}
+        {canUseAssistant && (
+          <AssistantChatForm
+            loading={false}
+            className="bg"
+            placeholder="Ask anything about your project"
+            value={value}
+            onValueChange={(e) => setValue(e.target.value)}
+            onSubmit={(message) => createChat({ initialMessage: message })}
+          />
+        )}
 
         <section className="mt-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -67,18 +80,19 @@ export const ExplorerHomeTab = () => {
                 }
               />
             ))}
-            {CHAT_TEMPLATES.map((template) => (
-              <ActionCard
-                key={template.title}
-                icon={<MessageSquarePlus className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
-                title={template.title}
-                description={template.description}
-                bgColor="bg-blue-500"
-                onClick={() =>
-                  createChat({ name: template.title, initialMessage: template.initialMessage })
-                }
-              />
-            ))}
+            {canUseAssistant &&
+              CHAT_TEMPLATES.map((template) => (
+                <ActionCard
+                  key={template.title}
+                  icon={<MessageSquarePlus className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                  title={template.title}
+                  description={template.description}
+                  bgColor="bg-blue-500"
+                  onClick={() =>
+                    createChat({ name: template.title, initialMessage: template.initialMessage })
+                  }
+                />
+              ))}
           </div>
         </section>
       </div>

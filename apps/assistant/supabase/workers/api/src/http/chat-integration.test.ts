@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
   query: vi.fn(),
   model: vi.fn(),
   executeOnce: vi.fn(),
+  network: vi.fn(),
 }))
 vi.mock('../db/conversations', async (original) => ({
   ...(await original<typeof import('../db/conversations')>()),
@@ -44,7 +45,6 @@ vi.mock('../platform/management-api', () => ({
 }))
 
 const userId = '11111111-1111-4111-8111-111111111111'
-const platformId = '22222222-2222-4222-8222-222222222222'
 const requestId = '33333333-3333-4333-8333-333333333333'
 const messages = [{ id: 'user', role: 'user', parts: [{ type: 'text', text: 'Help with SQL' }] }]
 let app: typeof App
@@ -55,7 +55,7 @@ beforeAll(async () => {
   vi.stubEnv('ASSISTANT_SUPABASE_URL', 'https://assistant.example')
   vi.stubEnv('ASSISTANT_PUBLISHABLE_KEY', 'sb_publishable_test')
   vi.stubEnv('ASSISTANT_SECRET_KEY', 'sb_secret_test')
-  vi.stubEnv('ASSISTANT_POLICY_URL', 'https://studio.example/policy')
+  vi.stubEnv('MANAGEMENT_API_URL', 'https://platform.example')
   vi.stubEnv(
     'ASSISTANT_JWKS',
     JSON.stringify({ keys: [{ ...(await exportJWK(keys.publicKey)), kid: 'test', alg: 'ES256' }] })
@@ -67,24 +67,20 @@ beforeAll(async () => {
     .setIssuedAt()
     .setExpirationTime('5m')
     .sign(keys.privateKey)
-  vi.stubGlobal('fetch', async (input: string | URL | Request) => {
-    const url = input instanceof Request ? input.url : String(input)
-    if (url === 'https://studio.example/policy')
-      return Response.json({
-        userId: platformId,
-        projectRef: 'project',
-        orgSlug: 'org',
-        canShareProjectData: true,
-        hasAccessToAdvanceModel: false,
-      })
-    if (url.includes('/rest/v1/platform_identities'))
-      return Response.json({ platform_user_id: platformId })
-    throw new Error(`Unexpected request: ${url}`)
-  })
+  vi.stubGlobal('fetch', mocks.network)
   ;({ app } = await import('./app'))
 })
 beforeEach(() => {
   vi.resetAllMocks()
+  mocks.network.mockImplementation(async (input: string | URL | Request, init?: RequestInit) => {
+    const url = input instanceof Request ? input.url : String(input)
+    expect(new Headers(init?.headers).get('authorization')).toBe('Bearer oauth')
+    if (url === 'https://platform.example/v1/projects/project')
+      return Response.json({ ref: 'project', organization_slug: 'org' })
+    if (url === 'https://platform.example/v1/organizations/org/entitlements')
+      return Response.json({ entitlements: [] })
+    throw new Error(`Unexpected request: ${url}`)
+  })
   mocks.consent.mockResolvedValue({ level: 'disabled', hasConsented: true })
   mocks.oauth.mockResolvedValue('oauth')
   mocks.begin.mockResolvedValue({ revision: 1, messages })
@@ -121,7 +117,6 @@ function request() {
     method: 'POST',
     headers: {
       authorization: `Bearer ${jwt}`,
-      'x-platform-authorization': 'Bearer platform',
       'content-type': 'application/json',
     },
     body: JSON.stringify({ messages, revision: 0, requestId }),
@@ -178,7 +173,7 @@ describe('authenticated worker chat through the AI SDK', () => {
     expect(mocks.finish).toHaveBeenCalledOnce()
   })
 
-  it('streams a response, persists it, and avoids schema queries with no project data consent', async () => {
+  it('streams with an Assistant session alone and avoids schema queries with no project data consent', async () => {
     const response = await request()
     expect(response.status).toBe(200)
     expect(response.headers.get('x-assistant-revision')).toBe('1')
@@ -198,12 +193,13 @@ describe('authenticated worker chat through the AI SDK', () => {
     expect(mocks.query).not.toHaveBeenCalled()
     expect(mocks.close).toHaveBeenCalled()
     expect(model.doStreamCalls).toHaveLength(1)
+    expect(mocks.network).toHaveBeenCalledTimes(2)
   })
   it('replays events using the verified identity and rejects invalid cursors', async () => {
     mocks.events.mockResolvedValue({ events: [], nextCursor: '10', hasMore: false })
     const read = (query: string) =>
       app.request(`https://assistant.example/v1/conversations/${requestId}/events${query}`, {
-        headers: { authorization: `Bearer ${jwt}`, 'x-platform-authorization': 'Bearer platform' },
+        headers: { authorization: `Bearer ${jwt}` },
       })
     const response = await read('?after=10&limit=20&userId=forged')
     expect(response.status).toBe(200)
@@ -221,14 +217,36 @@ describe('authenticated worker chat through the AI SDK', () => {
     mocks.events.mockRejectedValue(new HttpError(404, 'not_found', 'Session not found.'))
     expect((await read('?after=0')).status).toBe(404)
   })
-  it('requires new consent before OAuth, tool discovery, or model calls', async () => {
+  it('requires OAuth before project consent, tool discovery, or model calls', async () => {
+    mocks.oauth.mockResolvedValue(null)
+    const response = await request()
+    expect(response.status).toBe(409)
+    expect(await response.json()).toMatchObject({ code: 'oauth_required', org_slug: 'org' })
+    expect(mocks.network).not.toHaveBeenCalled()
+    expect(mocks.consent).not.toHaveBeenCalled()
+    expect(mocks.tools).not.toHaveBeenCalled()
+    expect(mocks.begin).not.toHaveBeenCalled()
+  })
+  it('requires project consent after OAuth and before tool discovery or model calls', async () => {
     mocks.consent.mockResolvedValue({ level: 'disabled', hasConsented: false })
     const response = await request()
     expect(response.status).toBe(409)
     expect(await response.json()).toMatchObject({ code: 'consent_required' })
-    expect(mocks.oauth).not.toHaveBeenCalled()
+    expect(mocks.oauth).toHaveBeenCalledExactlyOnceWith(userId, 'org')
     expect(mocks.tools).not.toHaveBeenCalled()
     expect(mocks.begin).not.toHaveBeenCalled()
+  })
+  it('rejects inaccessible projects and revoked connections before reading grants or running tools', async () => {
+    mocks.network.mockResolvedValueOnce(new Response(null, { status: 403 }))
+    expect((await request()).status).toBe(403)
+    expect(mocks.consent).not.toHaveBeenCalled()
+    mocks.network.mockResolvedValueOnce(new Response(null, { status: 401 }))
+    const response = await request()
+    expect(response.status).toBe(409)
+    expect(await response.json()).toMatchObject({ code: 'oauth_required', org_slug: 'org' })
+    expect(mocks.consent).not.toHaveBeenCalled()
+    expect(mocks.tools).not.toHaveBeenCalled()
+    expect(mocks.model).not.toHaveBeenCalled()
   })
   it('fetches schema context only with the new schema grant', async () => {
     mocks.consent.mockResolvedValue({ level: 'schema', hasConsented: true })

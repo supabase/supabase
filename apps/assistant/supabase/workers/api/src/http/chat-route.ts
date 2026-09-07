@@ -10,15 +10,14 @@ import { pgMeta } from '../ai/pg-meta'
 import { asQueryRows } from '../ai/tools/schema-tools.utils'
 import { assistantPersistence } from '../db/agent-persistence'
 import { getConversation } from '../db/conversations'
-import { getValidAccessToken } from '../db/oauth-connections'
 import { getProjectPermissions } from '../db/project-permissions'
 import { checkRateLimit } from '../db/rate-limit'
 import { createManagementApi } from '../platform/management-api'
-import { getPlatformPolicy } from '../platform/policy'
 import { requireUserId } from './auth'
 import { chatBodySchema } from './chat-body'
 import { toChatResponse } from './chat-stream'
 import { HttpError } from './errors'
+import { requireProjectAccess } from './project-access'
 import { parseBody } from './request'
 import type { Route } from './routes'
 
@@ -38,16 +37,16 @@ export const chatRoute: Route = {
     const conversation = await getConversation(ctx.supabase, params.id)
     if (!conversation) throw new HttpError(404, 'not_found', 'Conversation not found.')
     const signal = AbortSignal.any([request.signal, AbortSignal.timeout(120_000)])
-    const policy = await getPlatformPolicy(
-      ctx.platformToken!,
-      { projectRef: conversation.project_ref, orgSlug: conversation.org_slug },
+    const policy = await requireProjectAccess(
+      userId,
+      conversation.project_ref,
+      conversation.org_slug,
       signal
     )
     const permissions = await getProjectPermissions(
       userId,
       conversation.project_ref,
-      conversation.org_slug,
-      policy.canShareProjectData
+      conversation.org_slug
     )
     if (!permissions.hasConsented)
       throw new HttpError(
@@ -56,11 +55,7 @@ export const chatRoute: Route = {
         'Choose your project permissions before using the new Assistant.'
       )
     const aiOptInLevel = permissions.level
-    const oauthToken = await getValidAccessToken(userId, conversation.org_slug)
-    if (!oauthToken)
-      throw new HttpError(409, 'oauth_required', 'Connect this organization to continue.', {
-        org_slug: conversation.org_slug,
-      })
+    const { oauthToken } = policy
     await checkRateLimit(`chat:${userId}`, 30)
     const api = createManagementApi(oauthToken, signal)
     let resources: Awaited<ReturnType<typeof assistantAgent.prepare>> | undefined

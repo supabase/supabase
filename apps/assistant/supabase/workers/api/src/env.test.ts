@@ -9,6 +9,32 @@ import {
   supabaseServerEnv,
 } from './env'
 
+describe('Studio sign-in integration environment', () => {
+  afterEach(() => vi.unstubAllEnvs())
+
+  it('defaults to the production platform Auth server without a Studio policy endpoint', () => {
+    vi.stubEnv('PLATFORM_AUTH_URL', '')
+    vi.stubEnv('platform_auth_url', '')
+    expect(env.platformAuthUrl).toBe('https://alt.supabase.io/auth/v1')
+  })
+
+  it('supports a local platform Auth server and lowercase Worker secret names', () => {
+    vi.stubEnv('PLATFORM_AUTH_URL', '')
+    vi.stubEnv('platform_auth_url', 'http://localhost:8000/auth/v1/')
+    expect(env.platformAuthUrl).toBe('http://localhost:8000/auth/v1')
+  })
+
+  it.each([
+    'http://remote.example/auth/v1',
+    'https://user:password@auth.example/auth/v1',
+    'https://auth.example/auth/v1?redirect=elsewhere',
+    'https://auth.example/auth/v1#fragment',
+  ])('rejects an unsafe platform Auth URL: %s', (url) => {
+    vi.stubEnv('PLATFORM_AUTH_URL', url)
+    expect(() => env.platformAuthUrl).toThrow('PLATFORM_AUTH_URL')
+  })
+})
+
 describe('resolveMcpUrl', () => {
   it('prefers an explicit MCP_URL', () => {
     expect(

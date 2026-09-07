@@ -16,16 +16,16 @@ import { listOAuthConnections } from '../db/oauth-connections'
 import { checkRateLimit } from '../db/rate-limit'
 import { readRunEvents } from '../db/session-store'
 import { env } from '../env'
-import { getPlatformPolicy } from '../platform/policy'
 import { requireUserId } from './auth'
 import { authRoutes } from './auth-routes'
 import { chatRoute } from './chat-route'
 import { assistantSupportMetadataSchema } from './contracts'
 import { HttpError } from './errors'
 import { permissionRoutes } from './permission-routes'
+import { requireProjectAccess } from './project-access'
 import { parseBody } from './request'
 
-export type Route = AgentWorkerRoute<Database, { platformUserId?: string; platformToken?: string }>
+export type Route = AgentWorkerRoute<Database>
 const revision = z.number().int().nonnegative()
 
 export const routes: Route[] = [
@@ -74,11 +74,7 @@ export const routes: Route[] = [
             .optional(),
         })
       )
-      await getPlatformPolicy(
-        ctx.platformToken!,
-        { projectRef: params.ref, orgSlug: body.org_slug },
-        req.signal
-      )
+      await requireProjectAccess(userId, params.ref, body.org_slug, req.signal)
       await checkRateLimit(`create:${userId}`, 30)
       const conversation = await createConversation(userId, {
         id: body.id,

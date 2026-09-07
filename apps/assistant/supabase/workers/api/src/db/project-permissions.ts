@@ -5,12 +5,7 @@ import {
 } from '../permissions'
 import { adminQuery } from './postgres'
 
-export async function getProjectPermissions(
-  userId: string,
-  projectRef: string,
-  orgSlug: string,
-  canShareProjectData: boolean
-) {
+export async function getProjectPermissions(userId: string, projectRef: string, orgSlug: string) {
   const [row] = await adminQuery<{ level: string; consent_version: number }>(
     'select level, consent_version from public.project_permissions where user_id=$1 and project_ref=$2 and org_slug=$3',
     [userId, projectRef, orgSlug]
@@ -18,9 +13,8 @@ export async function getProjectPermissions(
   const level = projectPermissionLevelSchema.safeParse(row?.level)
   const hasConsented = row?.consent_version === ASSISTANT_CONSENT_VERSION && level.success
   return {
-    level: hasConsented && canShareProjectData ? level.data : ('disabled' as const),
+    level: hasConsented ? level.data : ('disabled' as const),
     hasConsented,
-    canShareProjectData,
     consentVersion: ASSISTANT_CONSENT_VERSION,
   }
 }

@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useId } from 'react'
+import { useId } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
@@ -19,12 +19,16 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
+import { AssistantConnectOrganization } from './AssistantConnectOrganization'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { AlertError } from '@/components/ui/AlertError'
+import { isAssistantOAuthRequiredError } from '@/data/ai-assistant/fetcher'
 import {
   useAssistantProjectPermissions,
   useUpdateAssistantProjectPermissions,
 } from '@/data/ai-assistant/project-permissions-query'
-import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 
 const formSchema = z.object({ selection: z.string().min(1) })
 const defaultValues: z.infer<typeof formSchema> = { selection: '' }
@@ -32,19 +36,35 @@ const defaultValues: z.infer<typeof formSchema> = { selection: '' }
 export function AssistantProjectPermissions({
   visible,
   onVisibleChange,
+  onPermissionsSaved,
 }: {
   visible: boolean
   onVisibleChange: (visible: boolean) => void
+  onPermissionsSaved?: () => void
 }) {
   const { context } = useAiAssistantStateSnapshot()
+  const state = useAiAssistantState()
   const permissions = useAssistantProjectPermissions(context.projectRef, context.orgSlug)
   const update = useUpdateAssistantProjectPermissions(context.projectRef, context.orgSlug)
-  const form = useForm({ resolver: zodResolver(formSchema), defaultValues })
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues,
+    values: { selection: permissions.data?.selection ?? '' },
+    resetOptions: { keepDirtyValues: true },
+  })
   const { isDirty } = form.formState
   const formId = useId()
-  useEffect(() => {
-    if (visible) form.reset({ selection: permissions.data?.selection ?? '' })
-  }, [visible, permissions.data?.selection, form])
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
+    checkIsDirty: () => isDirty,
+    onClose: () => {
+      form.reset({ selection: permissions.data?.selection ?? '' })
+      onVisibleChange(false)
+    },
+  })
+  const error = permissions.error ?? update.error
+  if (isAssistantOAuthRequiredError(error) && context.orgSlug) {
+    return <AssistantConnectOrganization orgSlug={context.orgSlug} onConnected={state.reload} />
+  }
   return (
     <>
       {permissions.isError && (
@@ -62,7 +82,7 @@ export function AssistantProjectPermissions({
           </Button>
         </Admonition>
       )}
-      <Dialog open={visible} onOpenChange={onVisibleChange}>
+      <Dialog open={visible} onOpenChange={handleOpenChange}>
         <DialogContent aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>Assistant project permissions</DialogTitle>
@@ -83,7 +103,13 @@ export function AssistantProjectPermissions({
                   if (!permissions.data) return
                   update.mutate(
                     { selection, consentVersion: permissions.data.consentVersion },
-                    { onSuccess: () => onVisibleChange(false) }
+                    {
+                      onSuccess: (data) => {
+                        form.reset({ selection: data.selection })
+                        onVisibleChange(false)
+                        onPermissionsSaved?.()
+                      },
+                    }
                   )
                 })}
               >
@@ -123,11 +149,7 @@ export function AssistantProjectPermissions({
             </Form>
           </DialogSection>
           <DialogFooter>
-            <Button
-              variant="default"
-              disabled={update.isPending}
-              onClick={() => onVisibleChange(false)}
-            >
+            <Button variant="default" disabled={update.isPending} onClick={confirmOnClose}>
               Cancel
             </Button>
             <Button
@@ -141,6 +163,7 @@ export function AssistantProjectPermissions({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )
 }

@@ -22,7 +22,80 @@ It is not published to npm. Its peer dependencies include AI SDK, Supabase serve
 and client libraries, Hono, and Zod; use the compatible versions in
 [`package.json`](./package.json). Choose an AI SDK model provider in your application.
 
-Start with [the complete Worker example](./examples/worker.ts), which combines
+### Minimal Worker
+
+`supabase/workers/agent/index.ts` can expose a single authenticated, stateless chat
+route. This example accepts `{ "message": "Hello" }` and streams an AI SDK UI message
+response:
+
+```ts
+import { openai } from '@ai-sdk/openai'
+import { createAgentStreamResponse, defineAgent } from '@supabase/agent-runtime'
+import { createAgentWorker } from '@supabase/agent-runtime/workers'
+import type { UIMessage } from 'ai'
+import { z } from 'zod'
+
+const agent = defineAgent<{ userId: string }>({
+  name: 'helper',
+  instructions: 'Help the user with their question.',
+})
+const body = z.object({ message: z.string().trim().min(1).max(4000) })
+const url = process.env.AGENT_SUPABASE_URL!
+
+export default createAgentWorker({
+  env: {
+    url,
+    publishableKeys: { default: process.env.AGENT_PUBLISHABLE_KEY! },
+    secretKeys: { default: process.env.AGENT_SECRET_KEY! },
+    jwks: new URL('/auth/v1/.well-known/jwks.json', url),
+  },
+  routes: [
+    {
+      method: 'POST',
+      pattern: '/chat',
+      auth: 'user',
+      handler: async (request, context) => {
+        const input = body.safeParse(await request.json().catch(() => null))
+        if (!input.success)
+          return Response.json(
+            { message: 'Provide a message of 1–4,000 characters.' },
+            { status: 400 }
+          )
+
+        const messages: UIMessage[] = [
+          {
+            id: crypto.randomUUID(),
+            role: 'user',
+            parts: [{ type: 'text', text: input.data.message }],
+          },
+        ]
+        const session = await agent.prepare({
+          context: { userId: context.userClaims!.id },
+          abortSignal: request.signal,
+        })
+        try {
+          const result = await session.stream({ model: openai('gpt-5.4-nano'), messages })
+          return await createAgentStreamResponse(result, {
+            originalMessages: messages,
+            onFinish: () => {},
+            onSettled: session.close,
+          })
+        } catch (error) {
+          await session.close()
+          throw error
+        }
+      },
+    },
+  ],
+})
+```
+
+Add `@ai-sdk/openai` to the application and set Worker secrets
+`AGENT_SUPABASE_URL`, `AGENT_PUBLISHABLE_KEY`, `AGENT_SECRET_KEY`, and `OPENAI_API_KEY`.
+Call `/chat` with the user's Supabase access token in `Authorization: Bearer <token>`
+and `Content-Type: application/json`. Configure `[workers.agent]` as described below.
+
+For more features, see [the complete Worker example](./examples/worker.ts), which combines
 Supabase authentication, an agent, a tool, a skill, result-sharing permissions,
 and an HTTP streaming response. For persistent conversations and approval
 continuations, implement the persistence callbacks described below and follow
@@ -118,15 +191,15 @@ or `auth: 'none'`; there is no implicit public route. User routes use
 the user-scoped `supabase` client. RLS applies when that client accesses the database.
 The optional `authorize` hook adds application authorization after authentication.
 
-Export the worker from `supabase/workers/api/index.ts` and configure the project:
+Export the worker from `supabase/workers/agent/index.ts` and configure the project:
 
 ```toml
-[workers.api]
+[workers.agent]
 runtime = "node"
 size = "2gb"
 ```
 
-Bundle workspace imports into `supabase/workers/api/index.mjs` for deployment.
+Bundle workspace imports into `supabase/workers/agent/index.mjs` for deployment.
 Assistant's [build configuration](../../apps/assistant/esbuild.config.mjs) and
 [`supabase/config.toml`](../../apps/assistant/supabase/config.toml) are the working
 deployment example. Its local Node HTTP adapter propagates client disconnects as

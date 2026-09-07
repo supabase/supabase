@@ -8,18 +8,6 @@ export const projectPermissionLevelSchema = z.enum([
 ])
 export type ProjectPermissionLevel = z.infer<typeof projectPermissionLevelSchema>
 
-export const assistantPolicySchema = z.object({
-  userId: z.string().uuid(),
-  projectRef: z.string().optional(),
-  orgSlug: z.string().optional(),
-  canShareProjectData: z.boolean(),
-  hasAccessToAdvanceModel: z.boolean(),
-})
-
-// Only the Studio policy server may supply this response. Browsers carry credentials,
-// not policy decisions; the worker fetches this from its configured trusted URL.
-export type AssistantPolicy = z.infer<typeof assistantPolicySchema>
-
 export const ASSISTANT_NO_DATA_PERMISSIONS =
   'The query was executed and the user has viewed the results but decided not to share in the conversation due to permission levels. Continue with your plan unless instructed to interpret the result.'
 
@@ -77,7 +65,6 @@ const permissionChoices = [
 export function presentProjectPermissions(permissions: {
   level: ProjectPermissionLevel
   hasConsented: boolean
-  canShareProjectData: boolean
   consentVersion: number
 }) {
   return {
@@ -86,11 +73,8 @@ export function presentProjectPermissions(permissions: {
     consentVersion: permissions.consentVersion,
     options: permissionChoices.map((choice) => ({
       ...choice,
-      disabled: choice.value !== 'disabled' && !permissions.canShareProjectData,
+      disabled: false,
     })),
     capabilities: { includeContext: permissions.hasConsented && permissions.level !== 'disabled' },
-    ...(!permissions.canShareProjectData
-      ? { notice: 'Project restrictions currently prevent sharing project data.' }
-      : {}),
   }
 }

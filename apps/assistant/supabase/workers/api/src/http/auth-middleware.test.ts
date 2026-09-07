@@ -15,11 +15,8 @@ vi.mock('./routes', () => ({
   ],
 }))
 const userId = '11111111-1111-4111-8111-111111111111'
-const platformId = '22222222-2222-4222-8222-222222222222'
 let app: typeof App
 let key: CryptoKey
-let admitted = true
-let mappedId = platformId
 let network = vi.fn()
 
 beforeAll(async () => {
@@ -28,20 +25,12 @@ beforeAll(async () => {
   vi.stubEnv('ASSISTANT_SUPABASE_URL', 'https://assistant.example')
   vi.stubEnv('ASSISTANT_PUBLISHABLE_KEY', 'sb_publishable_test')
   vi.stubEnv('ASSISTANT_SECRET_KEY', 'sb_secret_test')
-  vi.stubEnv('ASSISTANT_POLICY_URL', 'https://studio.example/policy')
   vi.stubEnv(
     'ASSISTANT_JWKS',
     JSON.stringify({ keys: [{ ...(await exportJWK(keys.publicKey)), kid: 'test', alg: 'ES256' }] })
   )
   network = vi.fn(async (input: string | URL | Request) => {
     const url = String(input instanceof Request ? input.url : input)
-    if (url.startsWith('https://studio.example/policy'))
-      return Response.json(
-        { userId: platformId, canShareProjectData: false, hasAccessToAdvanceModel: false },
-        { status: admitted ? 200 : 403 }
-      )
-    if (url.includes('/rest/v1/platform_identities'))
-      return Response.json({ platform_user_id: mappedId })
     throw new Error(`Unexpected network request: ${url}`)
   })
   vi.stubGlobal('fetch', network)
@@ -60,19 +49,21 @@ async function token(options: { expiry?: number; role?: string; aud?: string } =
     .setExpirationTime(options.expiry ?? '5m')
     .sign(key)
 }
-function request(jwt?: string, platform = true) {
+function request(jwt?: string, platform?: string) {
   return app.request('https://assistant.example/protected', {
     headers: {
       ...(jwt ? { authorization: `Bearer ${jwt}` } : {}),
-      ...(platform ? { 'x-platform-authorization': 'Bearer platform' } : {}),
+      ...(platform ? { 'x-platform-authorization': `Bearer ${platform}` } : {}),
     },
   })
 }
-describe('real Supabase auth middleware and rollout admission', () => {
-  it('accepts a signed user JWT only when its platform identity is admitted', async () => {
+describe('real Supabase auth middleware', () => {
+  it('accepts an Assistant user JWT independently of Studio or a platform identity mapping', async () => {
+    network.mockClear()
     expect((await request(await token())).status).toBe(200)
+    expect(network).not.toHaveBeenCalled()
   })
-  it('rejects absent, malformed, and expired tokens before policy or database calls', async () => {
+  it('rejects absent, malformed, and expired tokens before database calls', async () => {
     for (const jwt of [undefined, 'malformed', await token({ expiry: 1 })]) {
       network.mockClear()
       expect((await request(jwt)).status).toBe(401)
@@ -83,15 +74,10 @@ describe('real Supabase auth middleware and rollout admission', () => {
     expect((await request(await token({ aud: 'another' }))).status).toBe(401)
     expect((await request(await token({ role: 'service_role' }))).status).toBe(401)
   })
-  it('rejects a missing or mismatched platform identity', async () => {
-    expect((await request(await token(), false)).status).toBe(401)
-    mappedId = userId
-    expect((await request(await token())).status).toBe(403)
-    mappedId = platformId
-  })
-  it('enforces the kill switch for direct worker requests', async () => {
-    admitted = false
-    expect((await request(await token())).status).toBe(403)
-    admitted = true
+  it('does not use a platform header to authenticate or override the Assistant identity', async () => {
+    network.mockClear()
+    expect((await request(undefined, 'platform-token')).status).toBe(401)
+    expect((await request(await token(), 'unrelated-platform-token')).status).toBe(200)
+    expect(network).not.toHaveBeenCalled()
   })
 })

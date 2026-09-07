@@ -3,10 +3,7 @@ import type { SupabaseContext } from '@supabase/server'
 import type { Database } from '../db/database.types'
 import { HttpError } from './errors'
 
-export type HandlerContext = SupabaseContext<Database> & {
-  platformUserId?: string
-  platformToken?: string
-}
+export type HandlerContext = SupabaseContext<Database>
 
 export function requireUserId(ctx: HandlerContext): string {
   const id = ctx.userClaims?.id

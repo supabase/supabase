@@ -183,15 +183,19 @@ export function resolveMcpUrl({
  * actually read, so importing this module in tests does not require a full env.
  */
 export const env = {
-  get policyUrl() {
-    const url = new URL(required('ASSISTANT_POLICY_URL'))
+  /** Trusted Auth server used only to exchange a Studio session for an Assistant session. */
+  get platformAuthUrl() {
+    const url = new URL(readEnv('PLATFORM_AUTH_URL') ?? 'https://alt.supabase.io/auth/v1')
     if (
       url.protocol !== 'https:' &&
       !(url.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(url.hostname))
     ) {
-      throw new Error('ASSISTANT_POLICY_URL must use HTTPS outside localhost')
+      throw new Error('PLATFORM_AUTH_URL must use HTTPS outside localhost')
     }
-    return url.toString()
+    if (url.username || url.password || url.search || url.hash) {
+      throw new Error('PLATFORM_AUTH_URL must not include credentials, a query, or a fragment')
+    }
+    return stripTrailingSlash(url.toString())
   },
   get supabaseDbUrl() {
     return required(...DB_URL_NAMES)

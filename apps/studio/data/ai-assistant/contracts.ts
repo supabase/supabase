@@ -1,5 +1,10 @@
 import { z } from 'zod'
 
+export const assistantMeSchema = z.object({
+  user_id: z.string(),
+  connections: z.array(z.object({ org_slug: z.string() })),
+})
+
 // Studio's v1 integration response validation. Permission values are opaque to this client.
 const supportStatus = z.enum(['bot_active', 'escalated', 'user_resolved', 'bot_resolved'])
 export const assistantSupportMetadataSchema = z.object({

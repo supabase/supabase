@@ -8,6 +8,8 @@ import { ExplorerChatToolbar } from './ExplorerChatToolbar'
 import { useCreateChat } from './hooks'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AssistantChat } from '@/components/ui/AIAssistantPanel/AssistantChat'
+import { AssistantSetup } from '@/components/ui/AIAssistantPanel/AssistantSetup'
+import { useAssistantSupabaseBackend } from '@/lib/assistant/backend'
 import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
@@ -18,6 +20,7 @@ export const ExplorerChatTab = () => {
   const tabs = useTabsStateSnapshot()
   const aiAssistant = useAiAssistantStateSnapshot()
   const aiAssistantState = useAiAssistantState()
+  const useAssistantBackend = useAssistantSupabaseBackend()
   const { createChat, openChat } = useCreateChat()
   const { activeSidebar } = useSidebarManagerSnapshot()
   const chat = id ? aiAssistant.chats[id] : undefined
@@ -46,6 +49,15 @@ export const ExplorerChatTab = () => {
   useEffect(() => {
     if (aiAssistant.isInitialized && id && !chat) removeDeletedChatTab()
   }, [aiAssistant.isInitialized, id, chat])
+
+  if (
+    useAssistantBackend &&
+    (!aiAssistant.useAssistantBackend ||
+      !aiAssistant.isInitialized ||
+      aiAssistant.context.projectRef !== ref)
+  ) {
+    return <AssistantSetup />
+  }
 
   if (!aiAssistant.isInitialized || (chat && !chatInstance)) {
     return (

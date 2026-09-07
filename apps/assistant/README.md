@@ -23,7 +23,9 @@ Start with these application definitions:
 - `src/db/session-store.ts`: database driver, table configuration, and HTTP error mapping.
 - `src/ai/skills.ts`: the skill catalog and lazy `load_knowledge` content.
 - `src/ai/tools/tool-policies.ts`: execution permissions, approvals, and model-output projections.
-- `src/http/app.ts`: Supabase Worker routes and additional Studio identity authorization.
+- `src/http/app.ts`: Supabase Worker routes authenticated with Assistant sessions.
+- `src/platform/identity.ts`: one-time sign-in adapter for Studio's existing session.
+- `src/platform/policy.ts`: project access and model entitlement verified through OAuth.
 - `src/http/chat-route.ts`: canonical history, consent, streaming, and durable turn settlement.
 
 Paths above are relative to `supabase/workers/api/`. Applications can define their
@@ -101,10 +103,15 @@ Studio window; that window retains the PKCE verifier.
 `mcp.supabase.com/mcp`, anything else → `<origin>/mcp`); set it only to
 override.
 
-| Studio talks to                                   | Assistant `.env`                                                                                                                         |
-| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Local platform (`http://localhost:8080/platform`) | `MANAGEMENT_API_URL=http://localhost:8080`, OAuth app registered in a **local** org (local Studio → org → Integrations → OAuth)          |
-| Production (`https://api.supabase.com/platform`)  | leave `MANAGEMENT_API_URL` unset, OAuth app registered in a production org, `ASSISTANT_POLICY_URL` = Studio’s `/api/ai/assistant-policy` |
+| Studio talks to                                   | Assistant `.env`                                                                                                                                    |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Local platform (`http://localhost:8080/platform`) | `MANAGEMENT_API_URL=http://localhost:8080`, `PLATFORM_AUTH_URL` matching Studio's `NEXT_PUBLIC_GOTRUE_URL`, OAuth app registered in a **local** org |
+| Production (`https://api.supabase.com/platform`)  | Leave `MANAGEMENT_API_URL` and `PLATFORM_AUTH_URL` unset; register the OAuth app in a production org                                                |
+
+The OAuth app needs **Projects Read** (`projects:read`) and **Organizations Read**
+(`organizations:read`) to verify project access and model entitlement, in addition
+to the scopes needed by its tools. After changing the OAuth app's scopes, reconnect
+existing grants if they do not include those scopes.
 
 `supabase status` in this folder also lists `MCP  http://127.0.0.1:55321/mcp`.
 That is the CLI's unauthenticated MCP endpoint for the **assistant's own local
@@ -138,9 +145,13 @@ uses):
 | `ASSISTANT_DB_URL`          | Postgres connection URL for privileged worker transactions |
 | `ASSISTANT_JWKS_URL`        | optional; derived from `ASSISTANT_SUPABASE_URL` when unset |
 
-Plus `ASSISTANT_POLICY_URL`, `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`,
-`OAUTH_REDIRECT_URI`, `OPENAI_API_KEY`, and `MANAGEMENT_API_URL` when Studio is
-not on production.
+Plus `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `OAUTH_REDIRECT_URI`, and
+`OPENAI_API_KEY`. Set `MANAGEMENT_API_URL` for a platform other than production.
+
+`PLATFORM_AUTH_URL` is only used by the Studio sign-in adapter. It defaults to
+`https://alt.supabase.io/auth/v1`; for local development or staging, set it to
+Studio's `NEXT_PUBLIC_GOTRUE_URL`. It must use HTTPS except on localhost.
+`ASSISTANT_POLICY_URL` is no longer read and can be removed from existing deployments.
 
 `ASSISTANT_DB_URL` must be the **Session pooler** string
 (`postgres.<ref>@aws-0-<region>.pooler.…:5432`). The direct `db.<ref>.…` host
@@ -164,7 +175,8 @@ npx --yes supabase@beta experimental workers new api --runtime node --size 2gb
 pnpm --filter assistant workers:push   # builds index.mjs then pushes
 ```
 
-See `PLAN.md` for architecture.
+See the [framework README](../../packages/agent-runtime/README.md) for the current
+architecture. `PLAN.md` and `REVIEW_PLAN.md` record earlier design and review work.
 
 ## Studio integration and consent
 
@@ -173,18 +185,30 @@ false, undefined, incomplete configuration, or self-hosted Studio, the existing
 `generate-v4` backend and organization permissions remain unchanged. The environment
 override `NEXT_PUBLIC_ASSISTANT_BACKEND=true` only works in local development.
 
-Set `ASSISTANT_POLICY_URL` to the trusted Studio `/api/ai/assistant-policy` endpoint
-(for example, `http://localhost:8082/api/ai/assistant-policy` locally). Hosted URLs
-must use HTTPS. Exchange and authenticated worker requests require current platform
-admission; authenticated requests additionally bind the Assistant identity to that
-platform user. The endpoint checks project membership, privacy restrictions, and
-model entitlement. It does not transfer legacy organization consent.
+Studio initializes the integration in this order:
 
-Users explicitly consent again in the new Assistant. Grants belong to a user and
-project, with four choices: no project data, schema, schema and logs, or schema,
-logs and query results. Missing or obsolete grants require consent before chatting.
-Project restrictions can reduce the effective grant. OAuth authorization remains a
-separate prerequisite for project access.
+1. Reuse the signed-in Studio user's session to obtain an Assistant session through
+   `POST /auth/exchange`. Assistant validates the session directly with platform Auth,
+   including MFA requirements. This happens silently and requires no extra sign-in.
+2. Read `GET /v1/me`. If the organization has no OAuth connection, show a consent
+   button that opens the authorization popup. The initiating window retains the
+   PKCE verifier and completes the connection.
+3. After connecting, ask the user to choose their permission level for the project.
+4. Load the conversation and enable chat after project consent is saved.
+
+Grants belong to an Assistant user and project, with four choices: no project data,
+schema, schema and logs, or schema, logs and query results. Missing or obsolete
+grants require a fresh selection. Assistant's project consent controls data sharing;
+it does not inherit Studio's organization opt-in, HIPAA/sensitivity gate, or rollout
+policy. Project access and advanced model entitlement are checked directly through
+the OAuth connection before project operations. Expired or revoked connections
+return the interface to the connection step.
+
+Authenticated API requests carry only an Assistant access token. They do not need
+a Studio session or call a Studio endpoint. Other surfaces can use the same API
+with an Assistant session; a future Slack integration would supply its own trusted
+identity-linking adapter. The Studio feature flag controls its interface, while
+Assistant's API enforces authentication, OAuth access, and its own permissions.
 
 Public conversation tables are owner-readable and worker-write-only. Mutations use
 revisions and canonical stored history. Approved SQL/deployment operations are
@@ -210,32 +234,20 @@ Generate database types with `supabase gen types typescript --local --schema pub
 from this app and write the output to `supabase/workers/api/src/db/database.types.ts`.
 
 Hosted Workers ingress, real OAuth popup completion, and deployment rollback still
-need the bounded dogfood verification in phase 4 of `REVIEW_PLAN.md`.
+require verification against the deployed application.
 
-## Implementation status (2026-09-07)
+## Compatibility
 
-Phases 1–3 of the review are implemented. The consent design supersedes the review's
-legacy-policy assumption: existing organization permissions belong exclusively to
-`generate-v4`; the new integration requires fresh per-user, per-project consent.
-
-Validation includes real authentication middleware and AI SDK chat streaming,
-independently maintained Studio wire fixtures, backend/account/project transitions, and a migrated
-local test database. The migration preserves conversations and messages. Pending
-OAuth transactions from before the upgrade have no browser challenge and must be
-restarted. The CLI generated a separate grant correction; both migrations are required.
+Existing organization permissions belong to `generate-v4`; the new integration
+requires fresh per-user, per-project consent after OAuth authorization. Existing
+Assistant identities, OAuth connections, and project grants continue to work.
+This authorization change requires no new database migration; apply all committed
+migrations when setting up an Assistant database.
 
 The worker contract covers SQL chat, approved SQL/deployment tools, MCP read tools,
 conversation history, branches, feedback, and support lifecycle metadata. Reports,
 notebooks, Braintrust tracing, and rating categorization remain outside that contract.
 Keep users who need those capabilities on the legacy backend during dogfood.
-No hosted configuration or deployment has been changed, and PR stacking is deferred.
-
-Final local checks: 134 worker tests, 15 database tests, and 109 selected Studio
-tests passed. Both apps typecheck; Studio was checked with `--incremental false`
-after its cached check reported an unlocated TS2589. Worker lint and build pass;
-modified Studio files retain six pre-existing lint warnings and add none.
-Declarative schema drift is clean. The disposable test database was removed;
-the original local Assistant database was not migrated or reset.
 
 ## Separate product boundary
 
@@ -251,9 +263,10 @@ Studio's legacy permission enum or organization opt-in model. Each application o
 its wire compatibility fixtures, so server changes cannot silently update client
 expectations through a shared import.
 
-The Studio admission endpoint verifies platform identity, rollout eligibility,
-project membership, privacy restrictions, and billing entitlement. It does not
-call the legacy AI-policy resolver or interpret organization opt-in tags.
+The optional Studio sign-in adapter verifies platform identity once when establishing
+an Assistant session. Normal Worker requests verify that Assistant session directly.
+Project authorization uses the user's stored OAuth connection and public Management
+API endpoints, independently of which surface sends the request.
 
 For Studio review, start with the feature switch and the isolated integration
 folders, then inspect the state/composer hooks that connect them to the existing

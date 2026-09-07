@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ASSISTANT_CONSENT_VERSION } from '../permissions'
 import type { HandlerContext } from './auth'
+import { HttpError } from './errors'
 import { permissionRoutes } from './permission-routes'
 
 const mocks = vi.hoisted(() => ({ get: vi.fn(), set: vi.fn(), policy: vi.fn() }))
@@ -9,19 +10,18 @@ vi.mock('../db/project-permissions', () => ({
   getProjectPermissions: mocks.get,
   setProjectPermissions: mocks.set,
 }))
-vi.mock('../platform/policy', () => ({ getPlatformPolicy: mocks.policy }))
-const context = { userClaims: { id: 'user' }, platformToken: 'platform' } as HandlerContext
+vi.mock('./project-access', () => ({ requireProjectAccess: mocks.policy }))
+const context = { userClaims: { id: 'user' } } as HandlerContext
 const read = permissionRoutes.find((route) => route.method === 'GET')!
 const write = permissionRoutes.find((route) => route.method === 'POST')!
 const state = {
   level: 'schema',
   hasConsented: true,
-  canShareProjectData: true,
   consentVersion: ASSISTANT_CONSENT_VERSION,
 }
 beforeEach(() => {
   vi.resetAllMocks()
-  mocks.policy.mockResolvedValue({ canShareProjectData: true })
+  mocks.policy.mockResolvedValue({ oauthToken: 'oauth' })
   mocks.get.mockResolvedValue(state)
 })
 function request(selection: string, consentVersion = ASSISTANT_CONSENT_VERSION) {
@@ -46,7 +46,7 @@ describe('Assistant-owned permissions API', () => {
         expect.objectContaining({ value: 'schema', label: 'Schema', disabled: false }),
       ]),
     })
-    expect(mocks.get).toHaveBeenCalledWith('user', 'project', 'org', true)
+    expect(mocks.get).toHaveBeenCalledWith('user', 'project', 'org')
   })
   it('keeps validation and enforcement in the service', async () => {
     await expect(
@@ -55,7 +55,7 @@ describe('Assistant-owned permissions API', () => {
     await expect(
       write.handler(request('schema', ASSISTANT_CONSENT_VERSION + 1), context, { ref: 'project' })
     ).rejects.toMatchObject({ status: 400 })
-    mocks.policy.mockResolvedValue({ canShareProjectData: false })
+    mocks.policy.mockRejectedValue(new HttpError(403, 'unauthorized', 'Project access denied.'))
     await expect(
       write.handler(request('schema'), context, { ref: 'project' })
     ).rejects.toMatchObject({ status: 403 })
@@ -65,12 +65,33 @@ describe('Assistant-owned permissions API', () => {
     expect((await write.handler(request('schema'), context, { ref: 'project' })).status).toBe(200)
     expect(mocks.set).toHaveBeenCalledWith('user', 'project', 'org', 'schema')
   })
-  it('disables project context and choices for an unconsented or restricted project', async () => {
+  it('requires an OAuth connection before reading or saving permissions', async () => {
+    mocks.policy.mockRejectedValue(
+      new HttpError(409, 'oauth_required', 'Connect this organization to continue.', {
+        org_slug: 'org',
+      })
+    )
+    await expect(
+      read.handler(
+        new Request('https://assistant.example/v1/projects/project/permissions?org_slug=org'),
+        context,
+        { ref: 'project' }
+      )
+    ).rejects.toMatchObject({ status: 409, code: 'oauth_required' })
+    await expect(
+      write.handler(request('schema'), context, { ref: 'project' })
+    ).rejects.toMatchObject({
+      status: 409,
+      code: 'oauth_required',
+    })
+    expect(mocks.get).not.toHaveBeenCalled()
+    expect(mocks.set).not.toHaveBeenCalled()
+  })
+  it('offers permission choices but disables project context until the user consents', async () => {
     mocks.get.mockResolvedValue({
       ...state,
       level: 'disabled',
       hasConsented: false,
-      canShareProjectData: false,
     })
     const response = await read.handler(
       new Request('https://assistant.example/v1/projects/project/permissions?org_slug=org'),
@@ -79,9 +100,8 @@ describe('Assistant-owned permissions API', () => {
     )
     expect(await response.json()).toMatchObject({
       capabilities: { includeContext: false },
-      notice: expect.any(String),
       options: expect.arrayContaining([
-        expect.objectContaining({ value: 'schema', disabled: true }),
+        expect.objectContaining({ value: 'schema', disabled: false }),
       ]),
     })
   })

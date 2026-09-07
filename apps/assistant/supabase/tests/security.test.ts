@@ -161,20 +161,20 @@ describe('database isolation and durable conversation operations', () => {
     ).toBe(1101)
   })
   it('requires fresh per-user, per-project consent and denies direct grant escalation', async () => {
-    expect(await getProjectPermissions(alice, 'test', 'test', true)).toMatchObject({
+    expect(await getProjectPermissions(alice, 'test', 'test')).toMatchObject({
       level: 'disabled',
       hasConsented: false,
     })
     await setProjectPermissions(alice, 'test', 'test', 'schema_and_log_and_data')
-    expect(await getProjectPermissions(alice, 'test', 'test', true)).toMatchObject({
+    expect(await getProjectPermissions(alice, 'test', 'test')).toMatchObject({
       level: 'schema_and_log_and_data',
       hasConsented: true,
     })
-    expect(await getProjectPermissions(bob, 'test', 'test', true)).toMatchObject({
+    expect(await getProjectPermissions(bob, 'test', 'test')).toMatchObject({
       level: 'disabled',
       hasConsented: false,
     })
-    expect(await getProjectPermissions(alice, 'another', 'test', true)).toMatchObject({
+    expect(await getProjectPermissions(alice, 'another', 'test')).toMatchObject({
       level: 'disabled',
       hasConsented: false,
     })

@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { storeOAuthTokens } from '../db/oauth-connections'
 import { adminQuery, withAdvisoryLock } from '../db/postgres'
 import { checkRateLimit } from '../db/rate-limit'
+import { verifyPlatformIdentity } from '../platform/identity'
 import { createManagementApi } from '../platform/management-api'
 import {
   buildAuthorizeUrl,
@@ -12,7 +13,6 @@ import {
   tokenExpiresAt,
   tokenScopes,
 } from '../platform/oauth'
-import { getPlatformPolicy } from '../platform/policy'
 import { requireUserId } from './auth'
 import { isAllowedOrigin } from './cors'
 import { HttpError } from './errors'
@@ -26,22 +26,21 @@ export const authRoutes: Route[] = [
     pattern: '/auth/exchange',
     auth: 'none',
     handler: async (request, ctx) => {
-      const policy = await getPlatformPolicy(
+      const identity = await verifyPlatformIdentity(
         bearer(request.headers.get('authorization')),
-        {},
         request.signal
       )
-      await checkRateLimit(`exchange:${policy.userId}`, 30)
-      return withAdvisoryLock(`identity:${policy.userId}`, async () => {
+      await checkRateLimit(`exchange:${identity.userId}`, 30)
+      return withAdvisoryLock(`identity:${identity.userId}`, async () => {
         const admin = ctx.supabaseAdmin
         const { data: existing, error } = await admin
           .from('platform_identities')
           .select('user_id')
-          .eq('platform_user_id', policy.userId)
+          .eq('platform_user_id', identity.userId)
           .maybeSingle()
         if (error) throw error
         let userId: string | undefined = existing?.user_id
-        let email = `${policy.userId}@platform.invalid`
+        let email = `${identity.userId}@platform.invalid`
         if (userId) {
           const { data, error: userError } = await admin.auth.admin.getUserById(userId)
           if (userError || !data.user?.email) throw new Error('Unable to load assistant identity')
@@ -51,7 +50,7 @@ export const authRoutes: Route[] = [
           await admin.auth.admin.createUser({
             email,
             email_confirm: true,
-            app_metadata: { platform_user_id: policy.userId },
+            app_metadata: { platform_user_id: identity.userId },
           })
         }
         const { data: link, error: linkError } = await admin.auth.admin.generateLink({
@@ -62,7 +61,7 @@ export const authRoutes: Route[] = [
           linkError ||
           !link.properties?.hashed_token ||
           !link.user ||
-          link.user.app_metadata.platform_user_id !== policy.userId ||
+          link.user.app_metadata.platform_user_id !== identity.userId ||
           (userId && link.user.id !== userId)
         ) {
           throw new Error('Unable to establish assistant identity')
@@ -71,7 +70,7 @@ export const authRoutes: Route[] = [
         const { error: identityError } = await admin
           .from('platform_identities')
           .upsert(
-            { platform_user_id: policy.userId, user_id: userId },
+            { platform_user_id: identity.userId, user_id: userId },
             { onConflict: 'platform_user_id' }
           )
         if (identityError) throw identityError
@@ -87,7 +86,7 @@ export const authRoutes: Route[] = [
             refresh_token: data.session.refresh_token,
             expires_at: data.session.expires_at,
             user_id: userId,
-            platform_user_id: policy.userId,
+            platform_user_id: identity.userId,
           },
           { headers: { 'cache-control': 'no-store' } }
         )
@@ -147,7 +146,7 @@ export const authRoutes: Route[] = [
       )
       if (!stored || !isAllowedOrigin(new URL(stored.return_to).origin))
         throw new HttpError(400, 'invalid_request', 'Connection request expired. Start again.')
-      // No token exchange here. Only the initiating Studio window holds the verifier
+      // No token exchange here. Only the initiating window holds the verifier
       // and can complete this flow with its authenticated assistant identity.
       return new Response(buildOAuthCodeHtml({ code, state, returnTo: stored.return_to }), {
         headers: {
@@ -189,7 +188,7 @@ export const authRoutes: Route[] = [
         .array(z.object({ slug: z.string() }))
         .parse(await createManagementApi(tokens.access_token).listOrganizations())
       if (!organizations.some((org) => org.slug === stored.org_slug))
-        throw new HttpError(403, 'unauthorized', 'Connect the organization selected in Studio.')
+        throw new HttpError(403, 'unauthorized', 'Connect the organization selected for Assistant.')
       await withAdvisoryLock(`oauth:${userId}:${stored.org_slug}`, () =>
         storeOAuthTokens({
           userId,

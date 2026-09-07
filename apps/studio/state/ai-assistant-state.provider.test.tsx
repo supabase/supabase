@@ -1,4 +1,5 @@
-import { act, waitFor } from '@testing-library/react'
+import { webcrypto } from 'node:crypto'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { useEffect } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -6,8 +7,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   AiAssistantStateContextProvider,
   useAiAssistantState,
+  useAiAssistantStateSnapshot,
   type AiAssistantState,
 } from './ai-assistant-state'
+import { AssistantSetup } from '@/components/ui/AIAssistantPanel/AssistantSetup'
 import { organizationKeys } from '@/data/organizations/keys'
 import { projectKeys } from '@/data/projects/keys'
 import { getQueryClient } from '@/data/query-client'
@@ -29,6 +32,11 @@ vi.mock('common', async (importOriginal) => ({
   useUser: () => ({ id: controls.userId }),
   useIsLoggedIn: () => true,
   useParams: () => ({ ref: controls.project }),
+  gotrueClient: {
+    getSession: async () => ({
+      data: { session: { access_token: 'studio-token', user: { id: controls.userId } } },
+    }),
+  },
 }))
 vi.mock('@/lib/constants', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/constants')>()),
@@ -49,6 +57,13 @@ const row = {
   created_at: '2026-01-01T00:00:00Z',
   updated_at: '2026-01-01T00:00:00Z',
 }
+const permissions = {
+  selection: 'general',
+  hasConsented: true,
+  consentVersion: 1,
+  options: [{ value: 'general', label: 'General', description: 'General help', disabled: false }],
+  capabilities: { includeContext: false },
+}
 let state: AiAssistantState
 let calls: string[]
 function Probe() {
@@ -56,7 +71,10 @@ function Probe() {
   state = currentState
   const projectRef = controls.project
   useEffect(() => {
-    currentState.setContext({ projectRef, orgSlug: 'org' })
+    currentState.setContext({
+      projectRef,
+      ...(!currentState.useAssistantBackend ? { orgSlug: 'org' } : {}),
+    })
   }, [currentState, projectRef])
   return null
 }
@@ -67,6 +85,20 @@ function Tree() {
     </AiAssistantStateContextProvider>
   )
 }
+function Onboarding() {
+  const snap = useAiAssistantStateSnapshot()
+  if (snap.isInitialized) return <p>Chat ready</p>
+  return <AssistantSetup />
+}
+function AutomaticMessage({ onSend }: { onSend: (subject: string) => void }) {
+  const currentState = useAiAssistantState()
+  const snap = useAiAssistantStateSnapshot()
+  const subject = controls.userId
+  useEffect(() => {
+    if (snap.isInitialized && currentState.isInitialized) onSend(subject)
+  }, [currentState, snap.isInitialized, subject, onSend])
+  return null
+}
 beforeEach(() => {
   controls.platform = true
   controls.flag = undefined
@@ -76,7 +108,6 @@ beforeEach(() => {
   controls.put.mockReset()
   controls.auth.mockReset().mockResolvedValue({
     Authorization: 'Bearer assistant',
-    'x-platform-authorization': 'Bearer platform',
   })
   vi.stubEnv('NEXT_PUBLIC_ASSISTANT_SUPABASE_URL', 'https://assistant.example')
   vi.stubEnv('NEXT_PUBLIC_ASSISTANT_PUBLISHABLE_KEY', 'key')
@@ -90,6 +121,14 @@ beforeEach(() => {
   client.setQueryData(organizationKeys.list(), [{ id: 1, slug: 'org' }])
   calls = []
   mswServer.use(
+    http.get('https://assistant.example/v1/me', ({ request }) => {
+      calls.push(request.url)
+      return HttpResponse.json({ user_id: 'assistant-user', connections: [{ org_slug: 'org' }] })
+    }),
+    http.get('https://assistant.example/v1/projects/:ref/permissions', ({ request }) => {
+      calls.push(request.url)
+      return HttpResponse.json(permissions)
+    }),
     http.get('https://assistant.example/v1/projects/:ref/conversations', ({ request }) => {
       calls.push(request.url)
       return HttpResponse.json({ conversations: [row] })
@@ -106,9 +145,211 @@ beforeEach(() => {
 })
 afterEach(() => {
   vi.unstubAllEnvs()
+  vi.unstubAllGlobals()
+  vi.restoreAllMocks()
   getQueryClient().clear()
 })
 describe('assistant provider rollout containment', () => {
+  it('clears the previous scope before automatic messages can run for a different account, organization, and project', async () => {
+    controls.flag = true
+    getQueryClient().setQueryData(projectKeys.detail('project-b'), {
+      ref: 'project-b',
+      organization_id: 2,
+      connectionString: '',
+    })
+    getQueryClient().setQueryData(organizationKeys.list(), [
+      { id: 1, slug: 'org' },
+      { id: 2, slug: 'other-org' },
+    ])
+    const onSend = vi.fn()
+    let releaseIdentity: (() => void) | undefined
+    const identityReady = new Promise<void>((resolve) => {
+      releaseIdentity = resolve
+    })
+    mswServer.use(
+      http.get('https://assistant.example/v1/me', async () => {
+        if (controls.userId === 'user-b') await identityReady
+        return HttpResponse.json({
+          user_id: controls.userId,
+          connections: [{ org_slug: controls.userId === 'user-b' ? 'other-org' : 'org' }],
+        })
+      }),
+      http.get('https://assistant.example/v1/projects/project-b/permissions', () =>
+        HttpResponse.json({ ...permissions, hasConsented: false })
+      )
+    )
+    const tree = () => (
+      <AiAssistantStateContextProvider>
+        <Probe />
+        <AutomaticMessage onSend={onSend} />
+      </AiAssistantStateContextProvider>
+    )
+    const view = customRender(tree(), { queryClient: getQueryClient() })
+    await waitFor(() => expect(onSend).toHaveBeenCalledWith('user-a'))
+    controls.userId = 'user-b'
+    controls.project = 'project-b'
+    view.rerender(tree())
+    expect(state.isInitialized).toBe(false)
+    expect(state.chats).toEqual({})
+    expect(onSend).not.toHaveBeenCalledWith('user-b')
+    await act(async () => releaseIdentity?.())
+    await waitFor(() => expect(state.isProjectConsentRequired).toBe(true))
+    expect(state.context.orgSlug).toBe('other-org')
+    expect(onSend).not.toHaveBeenCalledWith('user-b')
+    expect(calls.some((url) => url.includes('project-b/conversations'))).toBe(false)
+    view.unmount()
+  })
+
+  it('opens OAuth consent using the current session, then asks for project permissions before chat', async () => {
+    controls.flag = true
+    vi.stubGlobal('crypto', webcrypto)
+    const openPopup = vi.spyOn(window, 'open').mockReturnValue(window)
+    vi.spyOn(window, 'close').mockImplementation(() => {})
+    let isConnected = false
+    let hasConsented = false
+    let consentWindowOpened = false
+    const completeRequests: unknown[] = []
+    mswServer.use(
+      http.get('https://assistant.example/v1/me', () =>
+        HttpResponse.json({
+          user_id: 'assistant-user',
+          connections: isConnected ? [{ org_slug: 'org' }] : [],
+        })
+      ),
+      http.get('https://assistant.example/oauth/start', ({ request }) => {
+        expect(request.headers.get('authorization')).toBe('Bearer assistant')
+        expect(request.headers.has('x-platform-authorization')).toBe(false)
+        const url = new URL(request.url)
+        expect(url.searchParams.get('org_slug')).toBe('org')
+        expect(url.searchParams.get('code_challenge')).toMatch(/^[\w-]{43}$/)
+        consentWindowOpened = true
+        return HttpResponse.json({
+          state: 'oauth-state',
+          authorize_url: `${window.location.origin}/#oauth-consent`,
+        })
+      }),
+      http.post('https://assistant.example/oauth/complete', async ({ request }) => {
+        completeRequests.push(await request.json())
+        isConnected = true
+        return HttpResponse.json({ connected: true })
+      }),
+      http.get('https://assistant.example/v1/projects/:ref/permissions', () =>
+        HttpResponse.json({ ...permissions, hasConsented })
+      ),
+      http.post('https://assistant.example/v1/projects/:ref/permissions', async ({ request }) => {
+        expect(await request.json()).toEqual({
+          org_slug: 'org',
+          selection: 'general',
+          consentVersion: 1,
+        })
+        hasConsented = true
+        return HttpResponse.json({ ...permissions, hasConsented })
+      })
+    )
+    const view = customRender(
+      <AiAssistantStateContextProvider>
+        <Probe />
+        <Onboarding />
+      </AiAssistantStateContextProvider>,
+      { queryClient: getQueryClient() }
+    )
+    fireEvent.click(await screen.findByRole('button', { name: 'Connect Assistant' }))
+    expect(openPopup).toHaveBeenCalledOnce()
+    expect(screen.queryByText('Chat ready')).not.toBeInTheDocument()
+    await waitFor(() => expect(consentWindowOpened).toBe(true))
+    await waitFor(() => expect(window.location.hash).toBe('#oauth-consent'))
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          origin: 'https://assistant.example',
+          source: window,
+          data: { type: 'assistant-oauth-code', state: 'oauth-state', code: 'oauth-code' },
+        })
+      )
+    })
+    fireEvent.click(await screen.findByRole('button', { name: 'Choose permissions' }))
+    expect(screen.queryByText('Chat ready')).not.toBeInTheDocument()
+    expect(calls.some((url) => url.includes('conversations'))).toBe(false)
+    fireEvent.submit(screen.getByRole('dialog').querySelector('form')!)
+    await screen.findByText('Chat ready')
+    expect(completeRequests).toEqual([
+      {
+        state: 'oauth-state',
+        code: 'oauth-code',
+        code_verifier: expect.stringMatching(/^[\w-]{43}$/),
+      },
+    ])
+    expect(state.chatInstances[cloudId]).toBeDefined()
+    view.unmount()
+  })
+
+  it('requests OAuth consent before fetching permissions or creating a conversation', async () => {
+    controls.flag = true
+    mswServer.use(
+      http.get('https://assistant.example/v1/me', ({ request }) => {
+        calls.push(request.url)
+        return HttpResponse.json({ user_id: 'assistant-user', connections: [] })
+      })
+    )
+    const view = customRender(<Tree />, { queryClient: getQueryClient() })
+    await waitFor(() => expect(state.oauthRequiredOrgSlug).toBe('org'))
+    expect(state.isInitialized).toBe(false)
+    expect(state.chats).toEqual({})
+    expect(state.isProjectConsentRequired).toBe(false)
+    expect(calls).toEqual(['https://assistant.example/v1/me'])
+    view.unmount()
+  })
+
+  it('requires consent for the selected organization even when another one is connected', async () => {
+    controls.flag = true
+    mswServer.use(
+      http.get('https://assistant.example/v1/me', () =>
+        HttpResponse.json({ user_id: 'assistant-user', connections: [{ org_slug: 'other-org' }] })
+      )
+    )
+    const view = customRender(<Tree />, { queryClient: getQueryClient() })
+    await waitFor(() => expect(state.oauthRequiredOrgSlug).toBe('org'))
+    expect(calls).toEqual([])
+    view.unmount()
+  })
+
+  it('requires project permissions after OAuth consent and before conversation hydration', async () => {
+    controls.flag = true
+    mswServer.use(
+      http.get('https://assistant.example/v1/projects/:ref/permissions', ({ request }) => {
+        calls.push(request.url)
+        return HttpResponse.json({ ...permissions, hasConsented: false })
+      })
+    )
+    const view = customRender(<Tree />, { queryClient: getQueryClient() })
+    await waitFor(() => expect(state.isProjectConsentRequired).toBe(true))
+    expect(state.oauthRequiredOrgSlug).toBeUndefined()
+    expect(state.isInitialized).toBe(false)
+    expect(state.chats).toEqual({})
+    expect(calls).toEqual([
+      'https://assistant.example/v1/me',
+      'https://assistant.example/v1/projects/project-a/permissions?org_slug=org',
+    ])
+    view.unmount()
+  })
+
+  it('offers reconnect when an existing OAuth grant fails during permission discovery', async () => {
+    controls.flag = true
+    mswServer.use(
+      http.get('https://assistant.example/v1/projects/:ref/permissions', () =>
+        HttpResponse.json(
+          { message: 'Reconnect Assistant', code: 'oauth_expired', org_slug: 'org' },
+          { status: 409 }
+        )
+      )
+    )
+    const view = customRender(<Tree />, { queryClient: getQueryClient() })
+    await waitFor(() => expect(state.oauthRequiredOrgSlug).toBe('org'))
+    expect(state.initializationError).toBeUndefined()
+    expect(state.chats).toEqual({})
+    view.unmount()
+  })
+
   it('offers a reload after detail hydration fails instead of opening an empty conversation', async () => {
     controls.flag = true
     mswServer.use(

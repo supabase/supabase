@@ -55,15 +55,20 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 describe('assistant account binding', () => {
-  it('shares concurrent exchanges and includes the current platform authorization', async () => {
+  it('shares concurrent exchanges and sends only Assistant authorization to its API', async () => {
     const { getAssistantRequestHeaders } = await import('./client')
     const results = await Promise.all(Array.from({ length: 5 }, () => getAssistantRequestHeaders()))
     expect(fetch).toHaveBeenCalledOnce()
     expect(mocks.set).toHaveBeenCalledOnce()
     expect(results[0]).toEqual({
       Authorization: 'Bearer exchanged',
-      'x-platform-authorization': 'Bearer platform-token',
     })
+    expect(fetch).toHaveBeenCalledWith(
+      'https://assistant.example/auth/exchange',
+      expect.objectContaining({
+        headers: expect.objectContaining({ Authorization: 'Bearer platform-token' }),
+      })
+    )
   })
   it('uses only a cache belonging to the active platform account', async () => {
     const { getAssistantRequestHeaders } = await import('./client')

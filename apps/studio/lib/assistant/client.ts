@@ -180,6 +180,5 @@ export async function getAssistantRequestHeaders(): Promise<Record<string, strin
   if (current.user.id !== subject) throw new Error('Your account changed. Reopen the assistant.')
   return {
     Authorization: `Bearer ${token}`,
-    'x-platform-authorization': `Bearer ${current.access_token}`,
   }
 }

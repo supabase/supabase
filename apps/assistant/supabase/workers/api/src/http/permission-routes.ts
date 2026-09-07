@@ -6,9 +6,9 @@ import {
   presentProjectPermissions,
   projectPermissionLevelSchema,
 } from '../permissions'
-import { getPlatformPolicy } from '../platform/policy'
 import { requireUserId } from './auth'
 import { HttpError } from './errors'
+import { requireProjectAccess } from './project-access'
 import { parseBody } from './request'
 import type { Route } from './routes'
 
@@ -20,19 +20,10 @@ export const permissionRoutes: Route[] = [
     handler: async (req, ctx, params) => {
       const orgSlug = new URL(req.url).searchParams.get('org_slug')
       if (!orgSlug) throw new HttpError(400, 'invalid_request', 'Organization is required.')
-      const policy = await getPlatformPolicy(
-        ctx.platformToken!,
-        { projectRef: params.ref, orgSlug },
-        req.signal
-      )
+      await requireProjectAccess(requireUserId(ctx), params.ref, orgSlug, req.signal)
       return Response.json(
         presentProjectPermissions(
-          await getProjectPermissions(
-            requireUserId(ctx),
-            params.ref,
-            orgSlug,
-            policy.canShareProjectData
-          )
+          await getProjectPermissions(requireUserId(ctx), params.ref, orgSlug)
         )
       )
     },
@@ -50,22 +41,11 @@ export const permissionRoutes: Route[] = [
           consentVersion: z.literal(ASSISTANT_CONSENT_VERSION),
         })
       )
-      const policy = await getPlatformPolicy(
-        ctx.platformToken!,
-        { projectRef: params.ref, orgSlug: body.org_slug },
-        req.signal
-      )
-      if (!policy.canShareProjectData && body.selection !== 'disabled')
-        throw new HttpError(403, 'unauthorized', 'Data sharing is unavailable for this project.')
+      await requireProjectAccess(requireUserId(ctx), params.ref, body.org_slug, req.signal)
       await setProjectPermissions(requireUserId(ctx), params.ref, body.org_slug, body.selection)
       return Response.json(
         presentProjectPermissions(
-          await getProjectPermissions(
-            requireUserId(ctx),
-            params.ref,
-            body.org_slug,
-            policy.canShareProjectData
-          )
+          await getProjectPermissions(requireUserId(ctx), params.ref, body.org_slug)
         )
       )
     },
