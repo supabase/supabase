@@ -69,24 +69,24 @@ const NORTHWIND_TRADERS_READ_ONLY: OAuthOrganizationRole = {
   role: 'Read-only',
 }
 
-const SOME_OTHER_ORG: OAuthOrganizationRole = {
-  slug: 'some-other-org',
-  name: 'some-other-org',
+const CONTOSO_LABS: OAuthOrganizationRole = {
+  slug: 'contoso-labs',
+  name: 'Contoso Labs',
   role: 'Owner',
 }
 
 const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
   [OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper]: {
-    email: 'kemal@supabase.io',
-    organizations: [NORTHWIND_TRADERS_DEVELOPER, SOME_OTHER_ORG],
+    email: 'admin@example.com',
+    organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
   },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelReadOnly]: {
-    email: 'kemal@supabase.io',
-    organizations: [NORTHWIND_TRADERS_READ_ONLY, SOME_OTHER_ORG],
+    email: 'admin@example.com',
+    organizations: [NORTHWIND_TRADERS_READ_ONLY, CONTOSO_LABS],
   },
   [OAUTH_APPS_MOCK_SCENARIOS.kemalBot]: {
-    email: 'kemal@supabase.io',
-    organizations: [NORTHWIND_TRADERS_DEVELOPER, SOME_OTHER_ORG],
+    email: 'admin@example.com',
+    organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
   },
 }
 
@@ -95,7 +95,7 @@ const MOCK_ORGANIZATION_PROJECTS: Record<string, OAuthAppsAuthorizeOrganizationP
     { ref: 'northwindtradersprod1', name: 'production' },
     { ref: 'northwindtradersstag1', name: 'staging' },
   ],
-  'some-other-org': [],
+  'contoso-labs': [],
 }
 
 export function getMockOAuthAppsAuthorizeRequest(id: string): OAuthAppsAuthorizeRequest {
