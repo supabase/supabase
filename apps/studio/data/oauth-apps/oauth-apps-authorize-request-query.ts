@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { oauthAppsKeys } from './keys'
 import { getMockOAuthAppsAuthorizeRequest, USE_MOCKS } from './mocks'
-import type { OAuthScopeGroup } from './types'
+import type { OAuthExistingGrant, OAuthScopeGroup } from './types'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OAuthAppsAuthorizeRequestVariables = {
@@ -16,6 +16,8 @@ export type OAuthAppsAuthorizeRequest = {
   is_verified: boolean
   redirect_uri: string
   scope_groups: OAuthScopeGroup[]
+  /** Populated when the user has authorized this app before. See {@link OAuthExistingGrant}. */
+  existing_grant: OAuthExistingGrant | null
 }
 
 export async function getOAuthAppsAuthorizeRequest({ id }: OAuthAppsAuthorizeRequestVariables) {
