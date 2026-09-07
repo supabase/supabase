@@ -1,9 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
+import { getPgMetaRedirectUrl } from './tables'
 import { fetchGet } from '@/data/fetchers'
 import { constructHeaders } from '@/lib/api/apiHelpers'
 import { apiWrapper } from '@/lib/api/apiWrapper'
-import { PG_META_URL } from '@/lib/constants'
+import { getPgMetaConnectionHeaders } from '@/lib/api/self-hosted/pg-meta-headers'
 
 export default (req: NextApiRequest, res: NextApiResponse) =>
   apiWrapper(req, res, handler, { withAuth: true })
@@ -21,8 +22,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
+  const { ref } = req.query as { ref: string }
   const headers = constructHeaders(req.headers)
-  const response = await fetchGet(`${PG_META_URL}/policies`, { headers })
+  const pgMetaHeaders = getPgMetaConnectionHeaders(ref, headers)
+  const response = await fetchGet(getPgMetaRedirectUrl(req, 'policies'), {
+    headers: pgMetaHeaders,
+  })
 
   if (response.error) {
     const { code, message } = response.error

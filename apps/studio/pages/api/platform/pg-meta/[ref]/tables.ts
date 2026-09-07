@@ -3,10 +3,10 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { fetchGet } from '@/data/fetchers'
 import { constructHeaders } from '@/lib/api/apiHelpers'
 import { apiWrapper } from '@/lib/api/apiWrapper'
+import { getPgMetaConnectionHeaders } from '@/lib/api/self-hosted/pg-meta-headers'
 import { PG_META_URL } from '@/lib/constants'
 
-export default (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
+export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -16,15 +16,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return handleGetAll(req, res)
     default:
       res.setHeader('Allow', ['GET'])
-      res.status(405).json({ error: { message: `Method ${method} Not Allowed` } })
+      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
 
-/**
- * Construct the pgMeta redirection url passing along the filtering query params
- * @param req
- * @param endpoint
- */
 export function getPgMetaRedirectUrl(req: NextApiRequest, endpoint: string) {
   const query = Object.entries(req.query).reduce((query, entry) => {
     const [key, value] = entry
@@ -42,16 +37,19 @@ export function getPgMetaRedirectUrl(req: NextApiRequest, endpoint: string) {
   if (Object.keys(req.query).length > 0) {
     url += `?${query}`
   }
+
   return url
 }
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
+  const { ref } = req.query as { ref: string }
   const headers = constructHeaders(req.headers)
-  const response = await fetchGet(getPgMetaRedirectUrl(req, 'tables'), { headers })
+  const pgMetaHeaders = getPgMetaConnectionHeaders(ref, headers)
+  const response = await fetchGet(getPgMetaRedirectUrl(req, 'tables'), { headers: pgMetaHeaders })
 
-  if (response.error) {
-    const { code, message } = response.error
-    return res.status(code).json({ message })
+  if ((response as any).error) {
+    const { code, message } = (response as any).error
+    return res.status(typeof code === 'number' ? code : 500).json({ message })
   } else {
     return res.status(200).json(response)
   }

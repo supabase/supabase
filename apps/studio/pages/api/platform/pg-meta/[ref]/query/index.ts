@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import { constructHeaders } from '@/lib/api/apiHelpers'
 import { apiWrapper } from '@/lib/api/apiWrapper'
+import { getPgMetaConnectionHeaders } from '@/lib/api/self-hosted/pg-meta-headers'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 import { PgMetaDatabaseError } from '@/lib/api/self-hosted/types'
 
@@ -22,8 +23,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { query } = req.body
+  const { ref } = req.query as { ref: string }
   const headers = constructHeaders(req.headers)
-  const { data, error } = await executeQuery({ query, headers })
+  const pgMetaHeaders = getPgMetaConnectionHeaders(ref, headers)
+  const { data, error } = await executeQuery({ query, headers: pgMetaHeaders })
 
   if (error) {
     if (error instanceof PgMetaDatabaseError) {
