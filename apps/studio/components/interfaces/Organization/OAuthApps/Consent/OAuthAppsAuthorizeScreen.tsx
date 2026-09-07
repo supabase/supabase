@@ -1,12 +1,11 @@
 import { BadgeCheck } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { AuthorizingAsCard } from './AuthorizingAsCard'
 import { NoProjectsNotice } from './NoProjectsNotice'
 import { EMPTY_ORG_MOCK_SLUG, getMockScenarioId } from './OAuthAppsAuthorizeScreen.utils'
-import { isScopeGroupOverRole } from './OverRoleAnnotation.utils'
 import { ProjectMultiSelect } from './ProjectMultiSelect'
 import { ScopeGroupCard } from './ScopeGroupCard'
 import {
@@ -69,14 +68,6 @@ export const OAuthAppsAuthorizeScreen = ({
 
   const isSubmitting = approveMutation.isPending
   const hasProjects = (projects?.length ?? 0) > 0
-
-  const overRoleGroups = useMemo(
-    () =>
-      (request?.scope_groups ?? []).filter((group) =>
-        isScopeGroupOverRole(group.level, memberOrg?.role ?? '')
-      ),
-    [request?.scope_groups, memberOrg?.role]
-  )
 
   if (!request || !identity || !orgSlug || !memberOrg) return null
 
@@ -172,19 +163,7 @@ export const OAuthAppsAuthorizeScreen = ({
 
           {hasProjects && (
             <>
-              <ScopeGroupCard
-                appName={request.app_name}
-                scopeGroups={request.scope_groups}
-                memberRole={memberOrg.role}
-              />
-
-              {overRoleGroups.length > 0 && (
-                <Admonition
-                  type="default"
-                  title="Some requested permissions exceed your role"
-                  description={`You can still authorize, ${request.app_name} will work within what your role allows.`}
-                />
-              )}
+              <ScopeGroupCard appName={request.app_name} scopeGroups={request.scope_groups} />
 
               <Admonition
                 type="default"
