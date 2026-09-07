@@ -1,23 +1,22 @@
 import { useMutation } from '@tanstack/react-query'
 
 import { getMockOAuthAppsAuthorizeRedirect, USE_MOCKS } from './mocks'
+import type { OAuthAppsAuthorizeRedirect } from './types'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OAuthAppsAuthorizeDenyVariables = {
-  id: string
   slug: string
+  auth_id: string
 }
 
-export type OAuthAppsAuthorizeDenyResponse = {
-  url: string
-}
+export type OAuthAppsAuthorizeDenyResponse = OAuthAppsAuthorizeRedirect
 
-export async function denyOAuthAppsAuthorize({ id, slug }: OAuthAppsAuthorizeDenyVariables) {
-  if (!id) throw new Error('Authorization request id is required')
+export async function denyOAuthAppsAuthorize({ slug, auth_id }: OAuthAppsAuthorizeDenyVariables) {
+  if (!auth_id) throw new Error('Authorization request id is required')
   if (!slug) throw new Error('Organization slug is required')
   if (!USE_MOCKS) throw new Error('OAuth app authorization denial is not yet implemented')
 
-  return getMockOAuthAppsAuthorizeRedirect(id, { approved: false })
+  return getMockOAuthAppsAuthorizeRedirect(auth_id, { approved: false })
 }
 
 type OAuthAppsAuthorizeDenyData = Awaited<ReturnType<typeof denyOAuthAppsAuthorize>>
