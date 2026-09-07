@@ -228,6 +228,83 @@ function PluginInstructions({ client }: { client: PluginClient }) {
     )
   }
 
+  if (client.key === 'microsoft-365') {
+    return (
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium">Install the Microsoft 365 Agents Toolkit CLI</h4>
+          <p className="text-xs text-foreground-lighter">
+            Requires Node.js 18+ and the{' '}
+            <a
+              href="https://learn.microsoft.com/en-us/microsoft-365/copilot/cowork/cowork-plugin-development#import-an-existing-plugin"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand-link hover:underline"
+            >
+              Microsoft 365 Agents Toolkit CLI
+            </a>{' '}
+            (v1.1.12 or later).
+          </p>
+          <CodeBlock
+            value={`npm install -g @microsoft/m365agentstoolkit-cli`}
+            language="bash"
+            focusable={false}
+            className="block"
+          />
+        </div>
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium">Assemble the app package</h4>
+          <p className="text-xs text-foreground-lighter">
+            The Supabase plugin ships a Microsoft 365 App Package manifest in the{' '}
+            <a
+              href="https://github.com/supabase-community/supabase-plugin"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand-link hover:underline"
+            >
+              GitHub repository
+            </a>
+            . Clone it, then stage the manifest, icons, tool descriptions, and the{' '}
+            <code>supabase</code> skill into a package and validate it:
+          </p>
+          <CodeBlock
+            value={`git clone https://github.com/supabase-community/supabase-plugin\ncd supabase-plugin\nrm -rf build && mkdir -p build/tools build/skills\ncp m365/manifest.json m365/color.png m365/outline.png build/\ncp m365/tools/supabase-tools.json build/tools/\ncp -R skills/supabase build/skills/\nfind build/skills -name CHANGELOG.md -delete\n(cd build && zip -r ../supabase-m365-plugin.zip .) && rm -rf build\natk validate --manifest-file ./m365/manifest.json`}
+            language="bash"
+            focusable={false}
+            className="block"
+          />
+        </div>
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium">Install into your tenant</h4>
+          <p className="text-xs text-foreground-lighter">
+            Sign in with your Microsoft 365 work account and install the package at personal scope
+            for testing:
+          </p>
+          <CodeBlock
+            value={`atk auth login\natk install --file-path ./supabase-m365-plugin.zip --scope Personal`}
+            language="bash"
+            focusable={false}
+            className="block"
+          />
+        </div>
+        <p className="text-xs text-foreground-lighter">
+          The connector uses Dynamic Client Registration, so no OAuth app setup is needed. For
+          tenant-wide deployments, upload the ZIP at{' '}
+          <strong>M365 admin center → Manage apps → Upload custom app</strong> instead. See the{' '}
+          <a
+            href="https://github.com/supabase-community/supabase-plugin/blob/main/m365/README.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-link hover:underline"
+          >
+            m365 README
+          </a>{' '}
+          for full instructions.
+        </p>
+      </div>
+    )
+  }
+
   return null
 }
 

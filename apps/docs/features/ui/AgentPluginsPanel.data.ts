@@ -56,6 +56,14 @@ export const PLUGIN_CLIENTS: PluginClient[] = [
     docsLinkText: 'View Grok plugins docs',
   },
   {
+    key: 'microsoft-365',
+    label: 'Microsoft 365 Copilot',
+    icon: 'microsoft-365',
+    repoUrl: 'https://github.com/supabase-community/supabase-plugin',
+    docsUrl: 'https://learn.microsoft.com/en-us/microsoft-365/copilot/cowork/cowork-plugin-development',
+    docsLinkText: 'View Microsoft 365 Copilot plugin docs',
+  },
+  {
     key: 'kimi',
     label: 'Kimi Code',
     icon: 'kimi',
