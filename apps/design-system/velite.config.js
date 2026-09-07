@@ -55,7 +55,7 @@ const docs = s
 export default defineConfig({
   root: './content',
   output: {
-    clean: true,
+    clean: process.env.NODE_ENV === 'production',
   },
   collections: {
     allDocs: {
