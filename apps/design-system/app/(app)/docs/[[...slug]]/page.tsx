@@ -6,6 +6,7 @@ import { siteConfig } from '@/config/site'
 import { getAllDocs, getDocBySlug, getDocMetaBySlug } from '@/lib/docs'
 import { getTableOfContents } from '@/lib/toc'
 import { absoluteUrl } from '@/lib/utils'
+/* eslint-disable turbo/no-undeclared-env-vars */
 
 import '@/styles/code-block-variables.css'
 import '@/styles/mdx.css'

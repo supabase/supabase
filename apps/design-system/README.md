@@ -7,17 +7,24 @@ Design resources for building consistent user experiences at Supabase.
 From the repo root:
 
 ```bash
+# Copy local env vars (sets NEXT_PUBLIC_BASE_PATH for asset URLs)
 cp apps/design-system/.env.local.example apps/design-system/.env.local
+# Move into the design-system app
 cd apps/design-system
+# Install dependencies
 pnpm i
+# Build the registry, then start Next.js (with Velite watch) and the registry watcher
 pnpm dev
 ```
 
 Or from `apps/design-system`:
 
 ```bash
+# Copy local env vars (sets NEXT_PUBLIC_BASE_PATH for asset URLs)
 cp .env.local.example .env.local
+# Install dependencies
 pnpm i
+# Build the registry, then start Next.js (with Velite watch) and the registry watcher
 pnpm dev
 ```
 
@@ -36,7 +43,7 @@ There are two content pipelines:
 
 Velite runs inside the Next.js dev server because Turbopack does not support the old Contentlayer webpack plugin. Registry output is separate and must be watched explicitly.
 
-Doc pages load compiled MDX from `.velite/codes/*.json` per document. Metadata lives in the smaller `allDocs.json` index (~1MB instead of ~27MB), so content edits only reload the changed doc's code.
+Doc pages load compiled MDX from `.velite/codes/*.json` per document. Metadata lives in the smaller `allDocs.json` index (~367KB instead of ~27MB), so content edits only reload the changed doc's code.
 
 ### Alternative commands
 

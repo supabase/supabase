@@ -1,5 +1,6 @@
 import 'server-only'
 
+/* eslint-disable turbo/no-undeclared-env-vars */
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { connection } from 'next/server'

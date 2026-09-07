@@ -1,3 +1,4 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'path'
 import { getHighlighter, loadTheme } from '@shikijs/compat'
