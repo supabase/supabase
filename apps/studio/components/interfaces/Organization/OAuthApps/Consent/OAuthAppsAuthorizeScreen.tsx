@@ -77,22 +77,14 @@ export const OAuthAppsAuthorizeScreen = ({
   // mock_state=success lets a design review load straight into the receipt screen without
   // clicking through the flow first - it's a preview only, never a substitute for the real
   // approve mutation's result.
-  const approvedResult: OAuthAppsAuthorizeApproveResponse | null =
-    approveResult ??
-    (mockState === 'success'
-      ? {
-          url: request.redirect_uri,
-          grant: {
-            email: identity.email,
-            role: memberOrg.role,
-            organization_slug: memberOrg.slug,
-            projects: projects ?? [],
-            scope_groups: request.scope_groups,
-          },
-        }
-      : null)
+  const approvedUrl = approveResult?.url ?? (mockState === 'success' ? request.redirect_uri : null)
 
-  if (approvedResult) {
+  const grantedProjects =
+    selectedProjectRefs.length > 0
+      ? (projects ?? []).filter((project) => selectedProjectRefs.includes(project.ref))
+      : (projects ?? [])
+
+  if (approvedUrl) {
     return (
       <InterstitialLayout
         logo={<DestinationLogo name={request.app_name} />}
@@ -102,9 +94,15 @@ export const OAuthAppsAuthorizeScreen = ({
       >
         <AuthorizeSuccessScreen
           appName={request.app_name}
-          grant={approvedResult.grant}
+          grant={{
+            email: identity.email,
+            role: memberOrg.default_role,
+            organization_slug: memberOrg.slug,
+            projects: grantedProjects,
+            scope_groups: request.scope_groups,
+          }}
           onReturn={() => {
-            window.location.href = approvedResult.url
+            window.location.href = approvedUrl
           }}
         />
       </InterstitialLayout>
@@ -137,11 +135,15 @@ export const OAuthAppsAuthorizeScreen = ({
       return
     }
     setProjectError(undefined)
-    approveMutation.mutate({ id: scenarioId, slug: orgSlug, projectRefs: selectedProjectRefs })
+    approveMutation.mutate({
+      auth_id: scenarioId,
+      slug: orgSlug,
+      project_refs: selectedProjectRefs,
+    })
   }
 
   const handleDeny = () => {
-    denyMutation.mutate({ id: scenarioId, slug: orgSlug })
+    denyMutation.mutate({ auth_id: scenarioId, slug: orgSlug })
   }
 
   const footerMessage = isSubmitting
@@ -176,7 +178,7 @@ export const OAuthAppsAuthorizeScreen = ({
         <fieldset disabled={isSubmitting} className="contents">
           <AuthorizingAsCard
             email={identity.email}
-            memberRole={memberOrg.role}
+            memberRole={memberOrg.default_role}
             organizationSlug={memberOrg.slug}
             onSignOut={handleSignOut}
             showSwitcher={identity.organizations.length > 1}

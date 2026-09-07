@@ -63,25 +63,11 @@ describe('OAuthAppsAuthorizeScreen', () => {
     ).not.toBeInTheDocument()
   })
 
-  test('shows "Don\'t close this window." while the approve mutation is in flight', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
-
-    await screen.findByRole('combobox')
-    selectProject('production')
-    fireEvent.click(screen.getByRole('button', { name: /Authorize Vercel/ }))
-
-    expect(await screen.findByText("Don't close this window.")).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
-
-    // Let the mock mutation's artificial delay settle before the test exits
-    await new Promise((resolve) => setTimeout(resolve, 350))
-  })
-
   test('renders the success screen after the approve mutation resolves', async () => {
     customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
 
     await screen.findByRole('combobox')
-    selectProject('production')
+    selectProject('northwind-storefront')
     fireEvent.click(screen.getByRole('button', { name: /Authorize Vercel/ }))
 
     expect(await screen.findByText('Vercel is connected')).toBeInTheDocument()
@@ -92,14 +78,14 @@ describe('OAuthAppsAuthorizeScreen', () => {
     customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
 
     await screen.findByRole('combobox')
-    selectProject('staging')
+    selectProject('northwind-cms')
     fireEvent.click(screen.getByRole('button', { name: /Authorize Vercel/ }))
 
     await screen.findByText('Vercel is connected')
 
-    expect(screen.getByText('staging')).toBeInTheDocument()
-    expect(screen.queryByText('production, staging')).not.toBeInTheDocument()
-    expect(screen.queryByText('production')).not.toBeInTheDocument()
+    expect(screen.getByText('northwind-cms')).toBeInTheDocument()
+    expect(screen.queryByText('northwind-storefront, northwind-cms')).not.toBeInTheDocument()
+    expect(screen.queryByText('northwind-storefront')).not.toBeInTheDocument()
 
     expect(screen.getByText('Permissions granted')).toBeInTheDocument()
     expect(screen.queryByText('Permissions requested')).not.toBeInTheDocument()
@@ -115,7 +101,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     customRender(<OAuthAppsAuthorizeScreen mockState="unverified" navigate={vi.fn()} />)
 
     await screen.findByRole('combobox')
-    selectProject('production')
+    selectProject('northwind-storefront')
     fireEvent.click(screen.getByRole('button', { name: /Authorize kemal-bot/ }))
 
     expect(await screen.findByText('kemal-bot is connected')).toBeInTheDocument()

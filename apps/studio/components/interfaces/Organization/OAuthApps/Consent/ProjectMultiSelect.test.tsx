@@ -6,13 +6,17 @@ import type { OAuthAppsAuthorizeOrganizationProject } from '@/data/oauth-apps/oa
 import { customRender } from '@/tests/lib/custom-render'
 
 const PROJECTS: OAuthAppsAuthorizeOrganizationProject[] = [
-  { ref: 'project-1', name: 'production' },
-  { ref: 'project-2', name: 'staging' },
+  { ref: 'project-1', name: 'production', role: 'administrator' },
+  { ref: 'project-2', name: 'staging', role: 'developer' },
 ]
 
 const MANY_PROJECTS: OAuthAppsAuthorizeOrganizationProject[] = Array.from(
   { length: 12 },
-  (_, index) => ({ ref: `project-${index + 1}`, name: `project ${index + 1}` })
+  (_, index) => ({
+    ref: `project-${index + 1}`,
+    name: `project ${index + 1}`,
+    role: 'developer' as const,
+  })
 )
 
 const refsUpTo = (count: number) => MANY_PROJECTS.slice(0, count).map((project) => project.ref)
@@ -110,16 +114,20 @@ describe('ProjectMultiSelect', () => {
     expect(screen.queryByText('0/10')).not.toBeInTheDocument()
   })
 
-  test('shows the selection counter once a project is selected', () => {
+  test('hides the counter below eight selected', () => {
     customRender(
-      <ProjectMultiSelect
-        projects={PROJECTS}
-        selectedRefs={['project-1', 'project-2']}
-        onChange={vi.fn()}
-      />
+      <ProjectMultiSelect projects={MANY_PROJECTS} selectedRefs={refsUpTo(7)} onChange={vi.fn()} />
     )
 
-    expect(screen.getByText('2/10')).toBeInTheDocument()
+    expect(screen.queryByText('7/10')).not.toBeInTheDocument()
+  })
+
+  test('shows the counter from eight selected onward', () => {
+    customRender(
+      <ProjectMultiSelect projects={MANY_PROJECTS} selectedRefs={refsUpTo(8)} onChange={vi.fn()} />
+    )
+
+    expect(screen.getByText('8/10')).toBeInTheDocument()
   })
 
   test('at nine selected the cap is not yet reached and a tenth can be added', () => {
