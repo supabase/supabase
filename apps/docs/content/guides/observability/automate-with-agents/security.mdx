@@ -1,17 +1,42 @@
 ---
 id: 'automate-with-agents-security'
 title: 'Security monitor'
-description: 'Security Advisor warnings and errors, plus authentication and authorization failure rates.'
+subtitle: 'A read-only agent that reviews Security Advisor findings and authentication and authorization failures each day.'
+description: 'Daily review of security findings and access failures'
 ---
 
-Security monitor reads project data and reports findings from these checks: security Advisor warnings and errors, plus authentication and authorization failure rates.
+```mermaid
+flowchart TD
+  Schedule([Once per day]) --> Inspect[get_advisors and query_logs]
+  Inspect --> Signals["Advisor findings and access failures"]
+  Signals --> Review{Anything new to report?}
+  Review -->|Yes| Report[Finding and next step]
+  Review -->|No| Silent[Stay silent]
+  Inspect -->|Missing data or access| Gap[Report new or changed gaps]
+```
 
-Use the [canonical checks](/docs/guides/observability/detecting#security) for queries, thresholds, prerequisites, and interpretation. It records **finding**, **clear**, or **unable to assess** for each check. Missing history or failed access never becomes a healthy result. New findings and changed assessment failures are reported; unchanged repeats and clear runs stay quiet.
+## What it watches
 
-## Schedule
+- Security Advisor findings at warning and error level
+- API and Auth authentication and authorization failure rates, compared across the last two complete UTC days
+- RLS and privilege issues identified by advisors
+
+It uses `get_advisors` and `query_logs` on project-scoped, read-only [Supabase MCP](/docs/guides/ai-tools/mcp).
+
+## When it watches
 
 <AgentWatchSchedule id="security" />
 
-## Prompt
+## What it will output
+
+Security monitor reports new or changed advisor findings and access-failure spikes, with the affected object or service and a next investigation step. A spike is a review signal, not proof of an attack. See [what triggers a security report](/docs/guides/observability/detecting#security).
+
+If a check cannot run, the agent tells you what is missing. Clear checks and unchanged findings stay quiet.
+
+<$Partial path="monitoring_agent_output.mdx" />
+
+## Set up the agent
+
+Allow the agent to read the documentation linked in its prompt. Save its alert state between runs so it can avoid repeat reports.
 
 <AgentSetup id="security" />
