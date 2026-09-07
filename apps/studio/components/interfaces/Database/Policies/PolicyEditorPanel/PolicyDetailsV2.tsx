@@ -19,9 +19,6 @@ import {
   CommandList,
   FormControl,
   FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
   Input,
   Popover,
   PopoverContent,
@@ -34,7 +31,9 @@ import {
   SelectGroup,
   SelectItem,
   SelectTrigger,
+  SheetSection,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -121,249 +120,253 @@ export const PolicyDetailsV2 = ({
   }, [isEditing, form, searchString, tables, isSuccessTables, selectedTable])
 
   return (
-    <>
-      <div className="px-5 py-5 flex flex-col gap-y-4 border-b">
-        <div className="items-start justify-between gap-4 grid grid-cols-12">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem className="col-span-6 flex flex-col gap-y-1">
-                <FormLabel>Policy Name</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    disabled={!canUpdatePolicies}
-                    className="bg-control border-control"
-                    placeholder="Provide a name for your policy"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <SheetSection className="flex flex-col gap-y-6 border-b">
+      <FormField
+        control={form.control}
+        name="name"
+        render={({ field }) => (
+          <FormItemLayout id="policy-name" layout="horizontal" label="Policy Name">
+            <FormControl>
+              <Input
+                id="policy-name"
+                {...field}
+                disabled={!canUpdatePolicies}
+                className="bg-control border-control"
+                placeholder="Provide a name for your policy"
+              />
+            </FormControl>
+          </FormItemLayout>
+        )}
+      />
 
-          <FormField
-            control={form.control}
-            name="table"
-            render={({ field }) => (
-              <FormItem className="col-span-6 flex flex-col gap-y-1">
-                <FormLabel>
-                  Table
-                  <code className="text-code-inline">on</code> clause
-                </FormLabel>
-                {authContext === 'database' && (
-                  <FormControl>
-                    <Popover open={open} onOpenChange={setOpen} modal={false}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="default"
-                          disabled={!canUpdatePolicies}
-                          className="w-full [&>span]:w-full h-[38px] text-sm"
-                          iconRight={
-                            <ChevronsUpDown
-                              className="text-foreground-muted"
-                              strokeWidth={2}
-                              size={14}
-                            />
-                          }
-                        >
-                          <div className="w-full flex gap-1">
-                            <span className="text-foreground">
-                              {schema}.{field.value}
-                            </span>
-                          </div>
-                        </Button>
-                      </PopoverTrigger>
-
-                      <PopoverContent
-                        className="p-0"
-                        side="bottom"
-                        align="start"
-                        sameWidthAsTrigger
-                      >
-                        <Command>
-                          <CommandInput placeholder="Find a table..." />
-                          <CommandList onWheel={(event) => event.stopPropagation()}>
-                            <CommandEmpty>No tables found</CommandEmpty>
-                            <CommandGroup>
-                              <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
-                                {(tables ?? []).map((table) => (
-                                  <CommandItem
-                                    key={table.id}
-                                    className="cursor-pointer flex items-center justify-between space-x-2 w-full"
-                                    onSelect={() => {
-                                      form.setValue('table', table.name)
-                                      setOpen(false)
-                                    }}
-                                    onClick={() => {
-                                      form.setValue('table', table.name)
-                                      setOpen(false)
-                                    }}
-                                  >
-                                    <span className="flex items-center gap-1.5">
-                                      {field.value === table.name ? <Check size={13} /> : ''}
-                                      {table.name}
-                                    </span>
-                                  </CommandItem>
-                                ))}
-                              </ScrollArea>
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                  </FormControl>
-                )}
-                {authContext === 'realtime' && (
-                  <FormControl>
-                    <Input
-                      disabled
-                      value="messages.realtime"
-                      className="bg-control border-control"
-                    />
-                  </FormControl>
-                )}
-
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="behavior"
-            render={({ field }) => (
-              <FormItem className="col-span-6 flex flex-col gap-y-1">
-                <FormLabel>
-                  Policy Behavior <code className="text-code-inline">as</code> clause
-                </FormLabel>
-                <FormControl>
-                  <Select
-                    disabled={isEditing}
-                    value={field.value}
-                    onValueChange={(value) => form.setValue('behavior', value)}
-                  >
-                    <SelectTrigger className="text-sm h-10 capitalize">{field.value}</SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="permissive" className="text-sm">
-                          <p>Permissive</p>
-                          <p className="text-foreground-light text-xs">
-                            Policies are combined using the "OR" Boolean operator
-                          </p>
-                        </SelectItem>
-                        <SelectItem value="restrictive" className="text-sm">
-                          <p>Restrictive</p>
-                          <p className="text-foreground-light text-xs">
-                            Policies are combined using the "AND" Boolean operator
-                          </p>
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="command"
-            render={({ field }) => (
-              <FormItem className="col-span-12 flex flex-col gap-y-1">
-                <FormLabel>
-                  Policy Command <code className="text-code-inline">for</code> clause
-                </FormLabel>
-                <FormControl>
-                  <RadioGroup
-                    disabled={isEditing}
-                    value={field.value}
-                    defaultValue={field.value}
-                    onValueChange={(value) => {
-                      form.setValue('command', value)
-                      onUpdateCommand(value)
-                    }}
-                    className={cn('flex flex-wrap gap-3', isEditing && 'opacity-50')}
-                  >
-                    {[
-                      'select',
-                      'insert',
-                      ...(authContext === 'database' ? ['update', 'delete', 'all'] : []),
-                    ].map((x) => (
-                      <RadioGroupLargeItem
-                        key={x}
-                        value={x}
-                        disabled={isEditing}
-                        label={x.toLocaleUpperCase()}
-                        className={cn('w-auto', isEditing && 'cursor-not-allowed')}
-                      />
-                    ))}
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="roles"
-            render={({ field }) => (
-              <FormItem className="col-span-12 flex flex-col gap-y-1">
-                <FormLabel htmlFor="roles">
-                  Target Roles <code className="text-code-inline">to</code> clause
-                </FormLabel>
-                <FormControl>
-                  <MultiSelector
-                    onValuesChange={(roles) => {
-                      field.onChange(roles.join(', '))
-                      onRolesChange?.(
-                        roles.length === 0
-                          ? safeSql`public`
-                          : joinSqlFragments(
-                              roles.map((r) => ident(r)),
-                              ', '
-                            )
-                      )
-                    }}
-                    disabled={!canUpdatePolicies}
-                    values={field.value.length === 0 ? [] : field.value?.split(', ')}
-                    size="small"
-                  >
-                    <MultiSelectorTrigger
-                      id="roles"
-                      mode="inline-combobox"
-                      label={
-                        field.value.length === 0
-                          ? 'Defaults to all (public) roles if none selected'
-                          : 'Search for a role'
+      <FormField
+        control={form.control}
+        name="table"
+        render={({ field }) => (
+          <FormItemLayout
+            id="policy-table"
+            layout="horizontal"
+            label={
+              <>
+                Table
+                <code className="text-code-inline">on</code> clause
+              </>
+            }
+          >
+            {authContext === 'database' && (
+              <FormControl>
+                <Popover open={open} onOpenChange={setOpen} modal={false}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="policy-table"
+                      variant="default"
+                      disabled={!canUpdatePolicies}
+                      className="w-full [&>span]:w-full h-[38px] text-sm"
+                      iconRight={
+                        <ChevronsUpDown
+                          className="text-foreground-muted"
+                          strokeWidth={2}
+                          size={14}
+                        />
                       }
-                      badgeLimit="wrap"
-                      showIcon={false}
-                      deletableBadge
-                      className="w-full"
-                    />
-                    <MultiSelectorContent>
-                      <MultiSelectorList>
-                        {formattedRoles.map((role) => (
-                          <MultiSelectorItem
-                            key={role.id}
-                            value={role.value}
-                            disabled={role.disabled}
-                          >
-                            {role.name}
-                          </MultiSelectorItem>
-                        ))}
-                      </MultiSelectorList>
-                    </MultiSelectorContent>
-                  </MultiSelector>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+                    >
+                      <div className="w-full flex gap-1">
+                        <span className="text-foreground">
+                          {schema}.{field.value}
+                        </span>
+                      </div>
+                    </Button>
+                  </PopoverTrigger>
+
+                  <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
+                    <Command>
+                      <CommandInput placeholder="Find a table..." />
+                      <CommandList onWheel={(event) => event.stopPropagation()}>
+                        <CommandEmpty>No tables found</CommandEmpty>
+                        <CommandGroup>
+                          <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
+                            {(tables ?? []).map((table) => (
+                              <CommandItem
+                                key={table.id}
+                                className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                                onSelect={() => {
+                                  form.setValue('table', table.name)
+                                  setOpen(false)
+                                }}
+                                onClick={() => {
+                                  form.setValue('table', table.name)
+                                  setOpen(false)
+                                }}
+                              >
+                                <span className="flex items-center gap-1.5">
+                                  {field.value === table.name ? <Check size={13} /> : ''}
+                                  {table.name}
+                                </span>
+                              </CommandItem>
+                            ))}
+                          </ScrollArea>
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </FormControl>
             )}
-          />
-        </div>
-      </div>
-    </>
+            {authContext === 'realtime' && (
+              <FormControl>
+                <Input
+                  id="policy-table"
+                  disabled
+                  value="messages.realtime"
+                  className="bg-control border-control"
+                />
+              </FormControl>
+            )}
+          </FormItemLayout>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="behavior"
+        render={({ field }) => (
+          <FormItemLayout
+            id="policy-behavior"
+            layout="horizontal"
+            label={
+              <>
+                Policy Behavior <code className="text-code-inline">as</code> clause
+              </>
+            }
+          >
+            <FormControl>
+              <Select
+                disabled={isEditing}
+                value={field.value}
+                onValueChange={(value) => form.setValue('behavior', value)}
+              >
+                <SelectTrigger id="policy-behavior" className="text-sm h-10 capitalize">
+                  {field.value}
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="permissive" className="text-sm">
+                      <p>Permissive</p>
+                      <p className="text-foreground-light text-xs">
+                        Policies are combined using the "OR" Boolean operator
+                      </p>
+                    </SelectItem>
+                    <SelectItem value="restrictive" className="text-sm">
+                      <p>Restrictive</p>
+                      <p className="text-foreground-light text-xs">
+                        Policies are combined using the "AND" Boolean operator
+                      </p>
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </FormControl>
+          </FormItemLayout>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="command"
+        render={({ field }) => (
+          <FormItemLayout
+            layout="horizontal"
+            label={
+              <>
+                Policy Command <code className="text-code-inline">for</code> clause
+              </>
+            }
+          >
+            <FormControl>
+              <RadioGroup
+                disabled={isEditing}
+                value={field.value}
+                defaultValue={field.value}
+                onValueChange={(value) => {
+                  form.setValue('command', value)
+                  onUpdateCommand(value)
+                }}
+                className={cn('flex flex-wrap gap-3', isEditing && 'opacity-50')}
+              >
+                {[
+                  'select',
+                  'insert',
+                  ...(authContext === 'database' ? ['update', 'delete', 'all'] : []),
+                ].map((x) => (
+                  <RadioGroupLargeItem
+                    key={x}
+                    value={x}
+                    disabled={isEditing}
+                    label={x.toLocaleUpperCase()}
+                    className={cn('w-auto', isEditing && 'cursor-not-allowed')}
+                  />
+                ))}
+              </RadioGroup>
+            </FormControl>
+          </FormItemLayout>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="roles"
+        render={({ field }) => (
+          <FormItemLayout
+            id="roles"
+            layout="horizontal"
+            label={
+              <>
+                Target Roles <code className="text-code-inline">to</code> clause
+              </>
+            }
+          >
+            <FormControl>
+              <MultiSelector
+                onValuesChange={(roles) => {
+                  field.onChange(roles.join(', '))
+                  onRolesChange?.(
+                    roles.length === 0
+                      ? safeSql`public`
+                      : joinSqlFragments(
+                          roles.map((r) => ident(r)),
+                          ', '
+                        )
+                  )
+                }}
+                disabled={!canUpdatePolicies}
+                values={field.value.length === 0 ? [] : field.value?.split(', ')}
+                size="small"
+              >
+                <MultiSelectorTrigger
+                  id="roles"
+                  mode="inline-combobox"
+                  label={
+                    field.value.length === 0
+                      ? 'Defaults to all (public) roles if none selected'
+                      : 'Search for a role'
+                  }
+                  badgeLimit="wrap"
+                  showIcon={false}
+                  deletableBadge
+                  className="w-full"
+                />
+                <MultiSelectorContent>
+                  <MultiSelectorList>
+                    {formattedRoles.map((role) => (
+                      <MultiSelectorItem key={role.id} value={role.value} disabled={role.disabled}>
+                        {role.name}
+                      </MultiSelectorItem>
+                    ))}
+                  </MultiSelectorList>
+                </MultiSelectorContent>
+              </MultiSelector>
+            </FormControl>
+          </FormItemLayout>
+        )}
+      />
+    </SheetSection>
   )
 }
