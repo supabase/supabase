@@ -104,13 +104,15 @@ export const NewScopedTokenForm = forwardRef<
   const isReducedMotionPreferred = useReducedMotion()
   const isReducedMotionPreferredRef = useRef(isReducedMotionPreferred)
   isReducedMotionPreferredRef.current = isReducedMotionPreferred
+  const onCancelRef = useRef(onCancel)
+  onCancelRef.current = onCancel
 
   useEffect(() => {
     if (isError) {
       toast.error('Something went wrong, try again')
-      onCancel()
+      onCancelRef.current()
     }
-  }, [onCancel, isError])
+  }, [isError])
 
   useEffect(() => {
     if (missingPermissionsAttempts === 0) return

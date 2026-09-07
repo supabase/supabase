@@ -103,20 +103,28 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
     })
   }
 
+  const trackDismissed = (trigger: 'user' | 'permissions_load_error') => {
+    const abandonmentContext = formRef.current?.getAbandonmentContext()
+    track('access_token_creation_sheet_dismissed', {
+      resourceAccess: abandonmentContext?.resourceAccess ?? 'project',
+      formStep: abandonmentContext?.formStep ?? 'form',
+      isFormTouched: abandonmentContext?.isFormTouched ?? false,
+      trigger,
+    })
+  }
+
   // By default, if users created a token successfully, they can't click outside the sheet to close it
   // as we need to make sure they copied the new token first
   const handleOpenChange = (open: boolean, isSafe = false) => {
     if (open === false && step === 'success' && !isSafe) return
-    if (open === false && !isSafe) {
-      const abandonmentContext = formRef.current?.getAbandonmentContext()
-      track('access_token_creation_sheet_dismissed', {
-        resourceAccess: abandonmentContext?.resourceAccess ?? 'project',
-        formStep: abandonmentContext?.formStep ?? 'form',
-        isFormTouched: abandonmentContext?.isFormTouched ?? false,
-      })
-    }
+    if (open === false && !isSafe) trackDismissed('user')
     setStep('form')
     setIsOpen(open)
+  }
+
+  const handlePermissionsLoadError = () => {
+    trackDismissed('permissions_load_error')
+    handleOpenChange(false, true)
   }
 
   return (
@@ -156,7 +164,7 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
             ref={formRef}
             isPending={isCreatingScopedToken || isCreatingClassicToken}
             onCreateToken={handleCreate}
-            onCancel={() => handleOpenChange(false, true)}
+            onCancel={handlePermissionsLoadError}
           />
         )}
       </SheetContent>
