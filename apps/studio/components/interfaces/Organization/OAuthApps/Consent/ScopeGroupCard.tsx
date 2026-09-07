@@ -1,19 +1,13 @@
 import { Badge, Card, CardContent } from 'ui'
 
-import { OverRoleAnnotation } from './OverRoleAnnotation'
-import type {
-  OAuthOrganizationRole,
-  OAuthScopeGroup,
-  OAuthScopeLevel,
-} from '@/data/oauth-apps/types'
+import type { OAuthScopeGroup, OAuthScopeLevel } from '@/data/oauth-apps/types'
 
 export interface ScopeGroupCardProps {
   appName: string
   scopeGroups: OAuthScopeGroup[]
-  memberRole: OAuthOrganizationRole['role']
 }
 
-export const ScopeGroupCard = ({ appName, scopeGroups, memberRole }: ScopeGroupCardProps) => {
+export const ScopeGroupCard = ({ appName, scopeGroups }: ScopeGroupCardProps) => {
   return (
     <section className="flex flex-col">
       <div>
@@ -30,12 +24,9 @@ export const ScopeGroupCard = ({ appName, scopeGroups, memberRole }: ScopeGroupC
           <div className="divide-y divide-muted px-4">
             {scopeGroups.map((scopeGroup) => (
               <div key={scopeGroup.name} className="py-3">
-                <div className="flex items-center justify-between gap-3">
-                  <Badge variant={getScopeLevelBadgeVariant(scopeGroup.level)}>
-                    {getScopeLevelLabel(scopeGroup.level)}
-                  </Badge>
-                  <OverRoleAnnotation level={scopeGroup.level} memberRole={memberRole} />
-                </div>
+                <Badge variant={getScopeLevelBadgeVariant(scopeGroup.level)}>
+                  {getScopeLevelLabel(scopeGroup.level)}
+                </Badge>
                 <p className="mt-1 text-sm text-foreground-light">{scopeGroup.scopes.join(', ')}</p>
               </div>
             ))}
@@ -49,7 +40,7 @@ export const ScopeGroupCard = ({ appName, scopeGroups, memberRole }: ScopeGroupC
 function getScopeLevelLabel(level: OAuthScopeLevel) {
   if (level === 'read') return 'READ'
   if (level === 'write') return 'WRITE'
-  return 'READ + WRITE'
+  return 'READ-WRITE'
 }
 
 function getScopeLevelBadgeVariant(level: OAuthScopeLevel) {
