@@ -9,7 +9,25 @@ const requiredFields = {
   tableSyncCopyTableIds: [],
 }
 
+const optionalNumberFields = [
+  'maxFillMs',
+  'maxTableSyncWorkers',
+  'maxCopyConnectionsPerTable',
+  'connectionPoolSize',
+  'maxStalenessMins',
+] as const
+
 describe('DestinationPanelFormSchema', () => {
+  it.each(optionalNumberFields)('normalizes an empty %s field to undefined', (field) => {
+    const result = DestinationPanelFormSchema.safeParse({
+      ...requiredFields,
+      [field]: '',
+    })
+
+    expect(result.success).toBe(true)
+    if (result.success) expect(result.data[field]).toBeUndefined()
+  })
+
   it.each([0, 1])('accepts a batch wait time of %i milliseconds', (value) => {
     const result = DestinationPanelFormSchema.safeParse({
       ...requiredFields,
