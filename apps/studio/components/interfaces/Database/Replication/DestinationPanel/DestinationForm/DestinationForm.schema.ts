@@ -7,8 +7,8 @@ import { DuckLakeFormSchema } from './DuckLake/DuckLake.schema'
 import { SnowflakeFormSchema } from './Snowflake/Snowflake.schema'
 
 const CommonFormSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  publicationName: z.string().min(1, 'Publication is required'),
+  name: z.string().min(1, 'Name is required.'),
+  publicationName: z.string().min(1, 'Publication is required.'),
   tableSyncCopyMode: z.enum([
     'include_all_tables',
     'skip_all_tables',
@@ -18,18 +18,18 @@ const CommonFormSchema = z.object({
   tableSyncCopyTableIds: z.array(z.string()),
   maxFillMs: z
     .number()
-    .int('Batch wait time must be a whole number of milliseconds')
-    .min(0, 'Batch wait time must be 0 or greater')
+    .int('Batch wait time must be a whole number of milliseconds.')
+    .min(0, 'Batch wait time must be 0 or greater.')
     .optional(),
   maxTableSyncWorkers: z
     .number()
-    .min(1, 'Max table sync workers must be greater than 0')
-    .int('Max table sync workers must be a whole number')
+    .min(1, 'Max table sync workers must be greater than 0.')
+    .int('Max table sync workers must be a whole number.')
     .optional(),
   maxCopyConnectionsPerTable: z
     .number()
     .int()
-    .min(1, 'Max copy connections per table must be greater than 0')
+    .min(1, 'Max copy connections per table must be greater than 0.')
     .optional(),
   invalidatedSlotBehavior: z.enum(['error', 'recreate']).optional(),
 })

@@ -50,6 +50,19 @@ export const oauthBlocks: SidebarNavGroup = {
   ],
 }
 
+export const mcpBlocks: SidebarNavGroup = {
+  title: 'MCP',
+  items: [
+    {
+      title: 'MCP Server',
+      href: '/docs/headless/mcp-server',
+      items: [],
+      new: true,
+      commandItemLabel: 'MCP Server',
+    },
+  ],
+}
+
 // Component definitions with supported frameworks
 export const componentPages: SidebarNavGroup = {
   title: 'Components',
@@ -148,6 +161,10 @@ export const COMMAND_ITEMS = [
     href: item.href,
   })),
   ...oauthBlocks.items.map((item) => ({
+    label: item.commandItemLabel,
+    href: item.href,
+  })),
+  ...mcpBlocks.items.map((item) => ({
     label: item.commandItemLabel,
     href: item.href,
   })),

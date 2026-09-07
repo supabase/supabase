@@ -28,4 +28,5 @@ export const workersQueryOptions = ({ projectRef }: WorkersVariables) =>
     queryKey: workersKeys.list(projectRef),
     queryFn: ({ signal }) => getWorkers({ projectRef }, signal),
     enabled: IS_PLATFORM && typeof projectRef !== 'undefined',
+    refetchOnWindowFocus: 'always',
   })

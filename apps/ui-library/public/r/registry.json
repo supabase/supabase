@@ -1747,6 +1747,50 @@
       ]
     },
     {
+      "name": "mcp-server",
+      "type": "registry:item",
+      "title": "MCP Server",
+      "description": "Add a user-scoped MCP server to your product.",
+      "docs": "Disable gateway JWT verification, then deploy the Edge Function. A trusted product backend can call it with the signed-in user's access token. For external clients, install the [OAuth Consent block](https://supabase.com/library/docs/nextjs/oauth-consent), enable OAuth and dynamic registration, and set the Auth Site URL to the consent app. Every call runs through the user's RLS-scoped client. OAuth tokens include `client_id`; product sessions do not, so define policies for both paths. See [MCP authentication](https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication) and [token security](https://supabase.com/docs/guides/auth/oauth-server/token-security).",
+      "files": [
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/index.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/index.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/deno.json",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/deno.json"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/.env.example",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/.env.example"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/types.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/types.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/result.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/result.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/whoami.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/whoami.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/index.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/index.ts"
+        }
+      ]
+    },
+    {
       "name": "oauth-consent-nextjs",
       "type": "registry:block",
       "title": "OAuth Consent for Next.js",

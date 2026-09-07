@@ -30,10 +30,10 @@ import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { usePermissionsQuery } from '@/data/permissions/permissions-query'
 import {
-  ProjectInfoInfinite,
-  ProjectsInfiniteData,
-  useProjectsInfiniteQuery,
-} from '@/data/projects/projects-infinite-query'
+  OrgProject,
+  OrgProjectsResponse,
+  useOrgProjectsInfiniteQuery,
+} from '@/data/projects/org-projects-infinite-query'
 import { Organization } from '@/types'
 
 interface ResourceAccessStepProps {
@@ -69,15 +69,21 @@ export const ResourceAccessStep = ({
   onSelectLegacyToken,
 }: ResourceAccessStepProps) => {
   const { data: organizations = [] } = useOrganizationsQuery()
+
+  const resourceAccess = useWatch({ control, name: 'resourceAccess' })
+  const organizationSlugs = useWatch({ control, name: 'organizationSlugs', defaultValue: [] })
+  const selectedOrgSlug = organizationSlugs[0]
+
   const {
     data: projectsData,
     hasNextPage,
     fetchNextPage,
-  } = useProjectsInfiniteQuery({
+  } = useOrgProjectsInfiniteQuery({
+    slug: selectedOrgSlug,
     limit: 100,
   })
 
-  const projects = useMemo(
+  const projectsForOrg = useMemo(
     () => projectsData?.pages.flatMap((page) => page.projects) ?? [],
     [projectsData]
   )
@@ -94,23 +100,20 @@ export const ResourceAccessStep = ({
   )
   const projectsByRef = useMemo(
     () =>
-      projects.reduce(
+      projectsForOrg.reduce(
         (acc, project) => {
           acc[project.ref] = project
           return acc
         },
-        {} as Record<string, ProjectInfoInfinite>
+        {} as Record<string, OrgProject>
       ),
-    [projects]
+    [projectsForOrg]
   )
-
-  const resourceAccess = useWatch({ control, name: 'resourceAccess' })
-  const organizationSlugs = useWatch({ control, name: 'organizationSlugs', defaultValue: [] })
 
   // Users invited to specific projects (rather than the whole org) can't select that org for an
   // org-wide token. Skipped while permissions are still loading so nothing gets disabled by
-  // mistake. The project list itself needs no permission filter — /platform/projects is already
-  // scoped server-side to what the user can access.
+  // mistake. The project list itself needs no permission filter — the org projects endpoint is
+  // already scoped server-side to what the user can access.
   const { data: permissions } = usePermissionsQuery()
   const projectScopedOrgSlugs = useMemo(() => {
     if (permissions === undefined) return new Set<string>()
@@ -120,11 +123,6 @@ export const ResourceAccessStep = ({
         .filter((slug) => getIsProjectScopedOnly(permissions, slug))
     )
   }, [permissions, organizations])
-
-  const projectsForOrg = useMemo(
-    () => projects.filter((project) => organizationSlugs.includes(project.organization_slug)),
-    [projects, organizationSlugs]
-  )
 
   return (
     <section className="space-y-4 px-5 sm:px-6 py-6">
@@ -323,7 +321,7 @@ const ProjectMultiSelectList = ({
   hasNextPage,
   fetchNextPage,
 }: {
-  projects: ProjectsInfiniteData['projects']
+  projects: OrgProjectsResponse['projects']
   hasNextPage: boolean
   fetchNextPage: () => void
 }) => {
@@ -339,7 +337,7 @@ const ProjectMultiSelectList = ({
   return (
     <MultiSelectorList onScroll={handleScroll}>
       {projects.map((project) => (
-        <MultiSelectorItem key={project.ref} value={project.ref}>
+        <MultiSelectorItem key={project.ref} value={project.ref} keywords={[project.name]}>
           {project.name}
         </MultiSelectorItem>
       ))}

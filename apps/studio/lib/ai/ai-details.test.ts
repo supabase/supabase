@@ -91,6 +91,7 @@ describe('getAIDetails', () => {
       hasAccessToAdvanceModel: false,
       hasHipaaAddon: false,
       orgId: 1,
+      orgSlug: ORG_SLUG,
       planId: 'pro',
       region: 'us-east-1',
       isSensitive: false,
@@ -189,6 +190,7 @@ describe('getAIDetails', () => {
       expect(result.aiOptInLevel).toBe('disabled')
       expect(result.hasAccessToAdvanceModel).toBe(false)
       expect(result.orgId).toBeUndefined()
+      expect(result.orgSlug).toBeUndefined()
       expect(result.planId).toBeUndefined()
     })
 
@@ -216,6 +218,7 @@ describe('getAIDetails', () => {
 
     expect(result.aiOptInLevel).toBe('disabled')
     expect(result.orgId).toBeUndefined()
+    expect(result.orgSlug).toBeUndefined()
   })
 
   it('falls back to the most restrictive posture when project detail is unavailable', async () => {

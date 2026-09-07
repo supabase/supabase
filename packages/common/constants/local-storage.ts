@@ -51,6 +51,9 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_SECTION_STATE: (ref: string) => `sql-editor-section-state-${ref}`,
   SQL_EDITOR_SORT: (ref: string) => `sql-editor-sort-${ref}`,
   SQL_EDITOR_MANUAL_SAVE_NOTICE_DISMISSED: 'sql-editor-manual-save-notice-dismissed',
+  // Set when a user follows the "temporarily switch to SQL Editor" link from Explorer;
+  // shows a way back and is cleared once they return to Explorer
+  SQL_EDITOR_TEMPORARY_FROM_EXPLORER: (ref: string) => `sql-editor-temporary-from-explorer-${ref}`,
 
   EXPLORER_QUERY_DRAFTS: (ref: string) => `explorer-query-drafts-${ref}`,
 

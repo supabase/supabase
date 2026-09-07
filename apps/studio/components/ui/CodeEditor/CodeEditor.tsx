@@ -6,7 +6,11 @@ import { RefObject, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
-import { alignEditor, BASE_MONACO_EDITOR_OPTIONS } from './CodeEditor.utils'
+import {
+  alignEditor,
+  BASE_MONACO_EDITOR_OPTIONS,
+  getEditorValueOrSelection,
+} from './CodeEditor.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -162,13 +166,8 @@ export const CodeEditor = ({
         contextMenuGroupId: 'operation',
         contextMenuOrder: 0,
         run: () => {
-          const selection = editorRef?.current?.getSelection()
-          if (!selection) return
-
-          const selectedValue = editorRef?.current?.getModel()?.getValueInRange(selection)
-          const editorValue = editorRef?.current?.getValue()
-
-          runQueryCallbackRef.current(selectedValue || editorValue)
+          if (!editorRef.current) return
+          runQueryCallbackRef.current(getEditorValueOrSelection(editorRef.current))
         },
       })
     }

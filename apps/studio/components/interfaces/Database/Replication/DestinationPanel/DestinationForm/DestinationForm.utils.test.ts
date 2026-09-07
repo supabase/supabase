@@ -306,12 +306,12 @@ describe('DestinationForm.utils DuckLake', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'ducklakeCatalogUrl', message: 'Catalog URL is required' },
-      { path: 'ducklakeDataPath', message: 'Data path is required' },
-      { path: 'ducklakeS3AccessKeyId', message: 'S3 access key ID is required' },
-      { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required' },
-      { path: 'ducklakeS3Region', message: 'S3 region is required' },
-      { path: 'ducklakeS3Endpoint', message: 'S3 endpoint is required' },
+      { path: 'ducklakeCatalogUrl', message: 'Catalog URL is required.' },
+      { path: 'ducklakeDataPath', message: 'Data path is required.' },
+      { path: 'ducklakeS3AccessKeyId', message: 'S3 access key ID is required.' },
+      { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required.' },
+      { path: 'ducklakeS3Region', message: 'S3 region is required.' },
+      { path: 'ducklakeS3Endpoint', message: 'S3 endpoint is required.' },
     ])
   })
 
@@ -347,7 +347,7 @@ describe('DestinationForm.utils DuckLake', () => {
     )
 
     expect(issues).toEqual([
-      { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required' },
+      { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required.' },
     ])
   })
 
@@ -363,12 +363,12 @@ describe('DestinationForm.utils DuckLake', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'ducklakeCatalogUrl', message: 'Catalog URL is required' },
-      { path: 'ducklakeDataPath', message: 'Data path is required' },
-      { path: 'ducklakeS3AccessKeyId', message: 'S3 access key ID is required' },
-      { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required' },
-      { path: 'ducklakeS3Region', message: 'S3 region is required' },
-      { path: 'ducklakeS3Endpoint', message: 'S3 endpoint is required' },
+      { path: 'ducklakeCatalogUrl', message: 'Catalog URL is required.' },
+      { path: 'ducklakeDataPath', message: 'Data path is required.' },
+      { path: 'ducklakeS3AccessKeyId', message: 'S3 access key ID is required.' },
+      { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required.' },
+      { path: 'ducklakeS3Region', message: 'S3 region is required.' },
+      { path: 'ducklakeS3Endpoint', message: 'S3 endpoint is required.' },
     ])
   })
 
@@ -386,19 +386,19 @@ describe('DestinationForm.utils DuckLake', () => {
     expect(issues).toEqual([
       {
         path: 'ducklakeCatalogUrl',
-        message: 'DuckLake catalog URL must be a PostgreSQL-compatible URL',
+        message: 'DuckLake catalog URL must be a PostgreSQL-compatible URL.',
       },
       {
         path: 'ducklakeDataPath',
-        message: 'DuckLake data path must start with s3:// and cannot contain file://',
+        message: 'DuckLake data path must start with s3:// and cannot contain file://.',
       },
       {
         path: 'ducklakeS3Endpoint',
-        message: 'S3 endpoint must not contain the protocol scheme',
+        message: 'S3 endpoint must not contain the protocol scheme.',
       },
       {
         path: 'ducklakeMetadataSchema',
-        message: 'DuckLake metadata schema must contain only letters, numbers, and underscores',
+        message: 'DuckLake metadata schema must contain only letters, numbers, and underscores.',
       },
     ])
   })
@@ -487,9 +487,9 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'ducklakeCatalogProjectRef', message: 'Catalog project is required' },
-      { path: 'ducklakeStorageProjectRef', message: 'Storage project is required' },
-      { path: 'ducklakeStorageBucket', message: 'Bucket is required' },
+      { path: 'ducklakeCatalogProjectRef', message: 'Catalog project is required.' },
+      { path: 'ducklakeStorageProjectRef', message: 'Storage project is required.' },
+      { path: 'ducklakeStorageBucket', message: 'Bucket is required.' },
     ])
   })
 
@@ -574,11 +574,11 @@ describe('DestinationForm.utils Snowflake', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'snowflakeAccountId', message: 'Account ID is required' },
-      { path: 'snowflakeUser', message: 'User is required' },
-      { path: 'snowflakePrivateKey', message: 'Private key is required' },
-      { path: 'snowflakeDatabase', message: 'Database is required' },
-      { path: 'snowflakeSchema', message: 'Schema is required' },
+      { path: 'snowflakeAccountId', message: 'Account ID is required.' },
+      { path: 'snowflakeUser', message: 'User is required.' },
+      { path: 'snowflakePrivateKey', message: 'Private key is required.' },
+      { path: 'snowflakeDatabase', message: 'Database is required.' },
+      { path: 'snowflakeSchema', message: 'Schema is required.' },
     ])
   })
 
@@ -653,9 +653,9 @@ describe('DestinationForm.utils ClickHouse', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'clickhouseUrl', message: 'URL is required' },
-      { path: 'clickhouseUser', message: 'User is required' },
-      { path: 'clickhouseDatabase', message: 'Database is required' },
+      { path: 'clickhouseUrl', message: 'URL is required.' },
+      { path: 'clickhouseUser', message: 'User is required.' },
+      { path: 'clickhouseDatabase', message: 'Database is required.' },
     ])
   })
 
@@ -666,7 +666,7 @@ describe('DestinationForm.utils ClickHouse', () => {
         clickhouseUser: 'default',
         clickhouseDatabase: 'analytics',
       })
-    ).toEqual([{ path: 'clickhouseUrl', message: 'ClickHouse URL must use https://' }])
+    ).toEqual([{ path: 'clickhouseUrl', message: 'ClickHouse URL must use HTTPS.' }])
 
     expect(
       getClickHouseValidationIssues({
@@ -675,7 +675,7 @@ describe('DestinationForm.utils ClickHouse', () => {
         clickhouseDatabase: 'analytics',
       })
     ).toEqual([
-      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
+      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address.' },
     ])
   })
 
@@ -711,7 +711,7 @@ describe('DestinationForm.utils ClickHouse', () => {
         clickhouseDatabase: 'analytics',
       })
     ).toEqual([
-      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
+      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address.' },
     ])
   })
 
@@ -739,9 +739,9 @@ describe('DestinationForm.utils BigQuery', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'projectId', message: 'Project ID is required' },
-      { path: 'datasetId', message: 'Dataset ID is required' },
-      { path: 'serviceAccountKey', message: 'Service account key is required' },
+      { path: 'projectId', message: 'Project ID is required.' },
+      { path: 'datasetId', message: 'Dataset ID is required.' },
+      { path: 'serviceAccountKey', message: 'Service account key is required.' },
     ])
   })
 
@@ -753,9 +753,9 @@ describe('DestinationForm.utils BigQuery', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'projectId', message: 'Project ID is required' },
-      { path: 'datasetId', message: 'Dataset ID is required' },
-      { path: 'serviceAccountKey', message: 'Service account key is required' },
+      { path: 'projectId', message: 'Project ID is required.' },
+      { path: 'datasetId', message: 'Dataset ID is required.' },
+      { path: 'serviceAccountKey', message: 'Service account key is required.' },
     ])
   })
 
@@ -777,7 +777,7 @@ describe('DestinationForm.utils BigQuery', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON' },
+      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON.' },
     ])
   })
 
@@ -802,7 +802,7 @@ describe('DestinationForm.utils BigQuery', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON' },
+      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON.' },
     ])
   })
 
@@ -817,7 +817,7 @@ describe('DestinationForm.utils BigQuery', () => {
     )
 
     expect(issues).toEqual([
-      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON' },
+      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON.' },
     ])
   })
 
@@ -847,11 +847,11 @@ describe('DestinationForm.utils Analytics Bucket', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'warehouseName', message: 'Bucket is required' },
-      { path: 's3Region', message: 'S3 region is required' },
-      { path: 's3AccessKeyId', message: 'S3 access key ID is required' },
-      { path: 'namespace', message: 'Namespace is required' },
-      { path: 's3SecretAccessKey', message: 'S3 secret access key is required' },
+      { path: 'warehouseName', message: 'Bucket is required.' },
+      { path: 's3Region', message: 'S3 region is required.' },
+      { path: 's3AccessKeyId', message: 'S3 access key ID is required.' },
+      { path: 'namespace', message: 'Namespace is required.' },
+      { path: 's3SecretAccessKey', message: 'S3 secret access key is required.' },
     ])
   })
 
@@ -866,11 +866,11 @@ describe('DestinationForm.utils Analytics Bucket', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'warehouseName', message: 'Bucket is required' },
-      { path: 's3Region', message: 'S3 region is required' },
-      { path: 's3AccessKeyId', message: 'S3 access key ID is required' },
-      { path: 'namespace', message: 'Namespace is required' },
-      { path: 's3SecretAccessKey', message: 'S3 secret access key is required' },
+      { path: 'warehouseName', message: 'Bucket is required.' },
+      { path: 's3Region', message: 'S3 region is required.' },
+      { path: 's3AccessKeyId', message: 'S3 access key ID is required.' },
+      { path: 'namespace', message: 'Namespace is required.' },
+      { path: 's3SecretAccessKey', message: 'S3 secret access key is required.' },
     ])
   })
 
@@ -884,7 +884,7 @@ describe('DestinationForm.utils Analytics Bucket', () => {
       s3SecretAccessKey: 'secret',
     })
 
-    expect(issues).toEqual([{ path: 'newNamespaceName', message: 'Namespace name is required' }])
+    expect(issues).toEqual([{ path: 'newNamespaceName', message: 'Namespace name is required.' }])
   })
 
   it('skips the S3 secret when creating a new access key', () => {
@@ -946,7 +946,7 @@ describe('DestinationForm.utils Analytics Bucket', () => {
     )
 
     expect(issues).toEqual([
-      { path: 's3SecretAccessKey', message: 'S3 secret access key is required' },
+      { path: 's3SecretAccessKey', message: 'S3 secret access key is required.' },
     ])
   })
 

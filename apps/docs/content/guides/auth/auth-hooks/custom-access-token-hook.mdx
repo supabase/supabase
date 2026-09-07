@@ -326,7 +326,7 @@ revoke all
 
 </TabPanel>
 <TabPanel id="restrict-access-to-sso-users" label="Restrict access to SSO users">
-You can restrict access to internal applications with a hook. For example, you can require that employees log in via [SAML Single Sign On (SSO)](/docs/guides/auth/enterprise-sso/auth-sso-saml). You can exempt select employees from the policy via an allowlist.
+You can restrict access to internal applications with a hook. For example, you can require that employees sign in via [SAML Single Sign On (SSO)](/docs/guides/auth/enterprise-sso/auth-sso-saml). You can exempt select employees from the policy via an allowlist.
 
 ```sql
 create or replace function public.restrict_application_access(event jsonb)
@@ -383,9 +383,9 @@ revoke execute
 Your company wishes to add assign permissions via the role claim on the `app_metadata` field. Add the role claim to the token via a Hook.
 
 ```javascript
-import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { readAll } from 'https://deno.land/std/io/read_all.ts'
 import * as base64 from 'https://denopkg.com/chiefbiiko/base64/mod.ts'
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 
 Deno.serve(async (req) => {
   const payload = await req.text()
@@ -426,12 +426,12 @@ Deno.serve(async (req) => {
 
 </TabPanel>
 <TabPanel id="http-restrict-access-to-sso-users" label="Restrict access to SSO users">
-You can restrict access to internal applications with a hook. For example, you can require that employees log in via [SAML Single Sign On (SSO)](/docs/guides/auth/enterprise-sso/auth-sso-saml). You can exempt select employees from the policy via an allowlist.
+You can restrict access to internal applications with a hook. For example, you can require that employees sign in via [SAML Single Sign On (SSO)](/docs/guides/auth/enterprise-sso/auth-sso-saml). You can exempt select employees from the policy via an allowlist.
 
 ```javascript
-import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { readAll } from 'https://deno.land/std/io/read_all.ts'
 import * as base64 from 'https://denopkg.com/chiefbiiko/base64/mod.ts'
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 
 Deno.serve(async (req) => {
   const payload = await req.text()

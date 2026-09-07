@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useWatch } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
@@ -21,6 +20,7 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
+  useWatch,
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'

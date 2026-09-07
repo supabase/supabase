@@ -29,10 +29,11 @@ import {
   Trash,
 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   AiIconAnimation,
+  Badge,
   Button,
   Checkbox,
   DropdownMenu,
@@ -45,7 +46,11 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { findMutatingQueryCells } from './ExplorerNotebookTab.utils'
+import {
+  findQueryCellsMatchingSql,
+  isMutatingSql,
+  type QueryCellSummary,
+} from './ExplorerNotebookTab.utils'
 import {
   ExplorerToolbar,
   ExplorerToolbarAction,
@@ -58,6 +63,7 @@ import { MarkdownCell } from './MarkdownCell'
 import { QueryCell } from './QueryCell'
 import { type QueryEditorHandle } from './QueryEditor'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
+import { checkDestructiveQuery } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
 import {
@@ -102,12 +108,14 @@ export const ExplorerNotebookTab = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isSaveBeforeAnalyzeOpen, setIsSaveBeforeAnalyzeOpen] = useState(false)
   const [isSaveConflictOpen, setIsSaveConflictOpen] = useState(false)
-  const [pendingMutationCells, setPendingMutationCells] = useState<
-    { id: string; title: string }[] | null
-  >(null)
+  const [pendingQueryMatches, setPendingQueryMatches] = useState<{
+    destructiveQueries: QueryCellSummary[]
+    mutatingQueries: QueryCellSummary[]
+  } | null>(null)
   const [skipMutatingCells, setSkipMutatingCells] = useState(false)
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
   const savedContentRef = useRef<typeof content>(undefined)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
     onSuccess: () => {
@@ -183,25 +191,33 @@ export const ExplorerNotebookTab = () => {
 
   const handleRunNotebook = () => {
     const freshCells = getFreshCells()
-    const mutatingCells = findMutatingQueryCells({
+    const { destructiveQueries, mutatingQueries } = findQueryCellsMatchingSql({
       cells: freshCells,
       getLiveSql: (cellId) => queryCellRefs.current.get(cellId)?.getSql(),
+      matchers: {
+        destructiveQueries: checkDestructiveQuery,
+        mutatingQueries: isMutatingSql,
+      },
     })
-    if (mutatingCells.length === 0) {
+    if (mutatingQueries.length === 0) {
       runNotebook({ cellIdsToRun: freshCells.filter(isQueryCell).map((cell) => cell._id) })
     } else {
       setSkipMutatingCells(false)
-      setPendingMutationCells(mutatingCells)
+      setPendingQueryMatches({ destructiveQueries, mutatingQueries })
     }
   }
 
   const handleConfirmRunNotebook = () => {
-    const mutatingCellIds = new Set((pendingMutationCells ?? []).map((cell) => cell.id))
+    const mutatingCellIds = new Set(
+      (pendingQueryMatches?.mutatingQueries ?? []).map((cell) => cell.id)
+    )
+    const freshCells = getFreshCells()
+    const freshQueryCellIds = freshCells.filter(isQueryCell).map((cell) => cell._id)
     const cellIdsToRun = skipMutatingCells
-      ? queryCellIds.filter((id) => !mutatingCellIds.has(id))
-      : queryCellIds
+      ? freshQueryCellIds.filter((id) => !mutatingCellIds.has(id))
+      : freshQueryCellIds
 
-    setPendingMutationCells(null)
+    setPendingQueryMatches(null)
     runNotebook({ cellIdsToRun, force: true })
   }
 
@@ -322,6 +338,17 @@ export const ExplorerNotebookTab = () => {
     snap.insertCellAfter({ id: notebookId, cellId: lastCellId, cell })
   }
 
+  const scrollToBottomIfPending = useEffectEvent(() => {
+    if (!id || snap.pendingScrollToBottom !== id || !scrollContainerRef.current) return
+
+    scrollContainerRef.current.scrollTo({
+      top: scrollContainerRef.current.scrollHeight,
+    })
+    snap.clearPendingScrollToBottom()
+  })
+
+  useEffect(() => scrollToBottomIfPending(), [id, snap.pendingScrollToBottom, content])
+
   if (isNotFound) {
     return (
       <div className="p-4 h-full bg-surface-100">
@@ -347,28 +374,28 @@ export const ExplorerNotebookTab = () => {
     <div className="flex flex-col h-full bg-surface-100">
       <ExplorerToolbar className="px-4">
         <ExplorerToolbarIcon>
-          <NotebookText size={14} className="text-foreground-light" />
+          <NotebookText size={16} strokeWidth={2} />
         </ExplorerToolbarIcon>
         <ExplorerToolbarTitle onSaveTitle={handleSaveTitle}>{name ?? ''}</ExplorerToolbarTitle>
         <ExplorerToolbarActions>
           <ExplorerToolbarAction
-            icon={<AiIconAnimation size={16} />}
+            className="group"
+            icon={
+              <AiIconAnimation
+                size={16}
+                className="text-tertiary-foreground group-hover:text-brand"
+              />
+            }
             loading={isCreating}
+            disabled={cells.length === 0}
+            tooltip={cells.length === 0 ? 'Add a cell to the notebook to analyze it' : undefined}
             onClick={handleClickAnalyze}
           >
             Analyze
           </ExplorerToolbarAction>
           <ExplorerToolbarAction
-            aria-label="Run notebook"
-            icon={<Play />}
-            tooltip="Run notebook"
-            loading={isRunningNotebook}
-            disabled={queryCellIds.length === 0}
-            onClick={handleRunNotebook}
-          />
-          <ExplorerToolbarAction
             aria-label="Save changes"
-            icon={<Save />}
+            icon={<Save size={16} strokeWidth={2} />}
             tooltip="Save changes"
             loading={isUpdating}
             onClick={handleSaveNotebook}
@@ -376,7 +403,10 @@ export const ExplorerNotebookTab = () => {
           <ExplorerToolbarActions>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <ExplorerToolbarAction aria-label="More options" icon={<MoreVertical />} />
+                <ExplorerToolbarAction
+                  aria-label="More options"
+                  icon={<MoreVertical size={16} strokeWidth={2} />}
+                />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem
@@ -397,10 +427,20 @@ export const ExplorerNotebookTab = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </ExplorerToolbarActions>
+          <ExplorerToolbarAction
+            aria-label="Run notebook"
+            icon={<Play size={16} strokeWidth={2} />}
+            tooltip="Run notebook"
+            loading={isRunningNotebook}
+            disabled={queryCellIds.length === 0}
+            onClick={handleRunNotebook}
+          >
+            Run
+          </ExplorerToolbarAction>
         </ExplorerToolbarActions>
       </ExplorerToolbar>
 
-      <div className="w-full mx-auto flex-grow min-h-0 overflow-y-auto">
+      <div ref={scrollContainerRef} className="w-full mx-auto flex-grow min-h-0 overflow-y-auto">
         <div className="p-4 pb-10">
           {cells.length === 0 && (
             <EmptyStatePresentational
@@ -433,6 +473,7 @@ export const ExplorerNotebookTab = () => {
                           key={cell._id}
                           cell={cell}
                           onEdit={persistNotebookTab}
+                          onPrettifyQuery={() => queryCellRefs.current.get(cell._id)?.prettify()}
                           ref={(instance) => {
                             if (instance) queryCellRefs.current.set(cell._id, instance)
                             else queryCellRefs.current.delete(cell._id)
@@ -520,22 +561,27 @@ export const ExplorerNotebookTab = () => {
 
       <ConfirmationModal
         size="small"
-        visible={pendingMutationCells !== null}
+        visible={pendingQueryMatches !== null}
         title="Confirm to run notebook"
         confirmLabel={skipMutatingCells ? 'Run read-only cells' : 'Run all cells'}
         variant="warning"
-        onCancel={() => setPendingMutationCells(null)}
+        onCancel={() => setPendingQueryMatches(null)}
         onConfirm={handleConfirmRunNotebook}
       >
         <p className="text-sm">
-          This notebook has {pendingMutationCells?.length ?? 0}{' '}
-          {pendingMutationCells?.length === 1 ? 'query' : 'queries'} that{' '}
-          {pendingMutationCells?.length === 1 ? 'modifies' : 'modify'} data or schema and cannot be
-          undone once run:
+          This notebook has {pendingQueryMatches?.mutatingQueries.length ?? 0}{' '}
+          {pendingQueryMatches?.mutatingQueries.length === 1 ? 'query' : 'queries'} that{' '}
+          {pendingQueryMatches?.mutatingQueries.length === 1 ? 'modifies' : 'modify'} data or schema
+          and cannot be undone once run:
         </p>
         <ul className="text-sm list-disc pl-4 mt-2">
-          {pendingMutationCells?.map((cell) => (
-            <li key={cell.id}>{cell.title}</li>
+          {pendingQueryMatches?.mutatingQueries.map((cell) => (
+            <li key={cell.id} className="flex items-center gap-2">
+              {cell.title}
+              {pendingQueryMatches.destructiveQueries.some(({ id }) => id === cell.id) && (
+                <Badge variant="destructive">Destructive</Badge>
+              )}
+            </li>
           ))}
         </ul>
         <FormItemLayout

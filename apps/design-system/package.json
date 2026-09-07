@@ -5,23 +5,22 @@
   "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev": "pnpm run generate:registry && run-p --race dev:*",
+    "dev:content": "velite dev",
     "dev:next": "next dev --turbopack --port 3003",
-    "dev:content": "contentlayer2 dev",
-    "build": "pnpm run build:registry && pnpm run content:build && next build --turbopack",
-    "generate:registry": "tsx ./scripts/build-registry.mts",
-    "build:registry": "pnpm run generate:registry && prettier --log-level silent --write \"registry/**/*.{ts,tsx,mdx}\" --cache",
+    "dev": "run-p build:registry build:content && run-p --race dev:*",
+    "build:content": "velite build --strict",
+    "build:registry": "tsx ./scripts/build-registry.mts && prettier --log-level silent --write \"registry/**/*.{ts,tsx,mdx}\" --cache",
+    "build:next": "next build --turbopack",
+    "build": "run-p build:registry build:content && pnpm build:next",
     "start": "next start",
     "lint": "eslint .",
-    "content:build": "contentlayer2 build",
-    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo __registry__",
-    "typecheck": "pnpm run generate:registry && contentlayer2 build && tsc --noEmit -p tsconfig.json"
+    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo .contentlayer .velite __registry__",
+    "typecheck": "run-p build:registry build:content && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
     "@tanstack/react-table": "catalog:",
     "common": "workspace:*",
-    "contentlayer2": "0.4.6",
     "date-fns": "^2.30.0",
     "dayjs": "1.11.13",
     "eslint-config-supabase": "workspace:*",
@@ -30,7 +29,6 @@
     "lucide-react": "*",
     "markdown-wasm": "^1.2.0",
     "next": "catalog:",
-    "next-contentlayer2": "0.4.6",
     "next-themes": "catalog:",
     "react": "catalog:",
     "react-data-grid": "7.0.0-beta.47",
@@ -51,6 +49,7 @@
     "ui": "workspace:*",
     "ui-patterns": "workspace:*",
     "unist-util-visit": "^5.0.0",
+    "velite": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {

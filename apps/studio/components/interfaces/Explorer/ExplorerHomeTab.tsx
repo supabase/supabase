@@ -5,7 +5,6 @@ import { useCreateChat, useCreateNotebook, useCreateQuery } from './hooks'
 import { CHAT_TEMPLATES, NOTEBOOK_TEMPLATES } from './templates'
 import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
 import { AssistantChatForm } from '@/components/ui/AIAssistantPanel/AssistantChatForm'
-import type { AssistantModel } from '@/state/ai-assistant-state'
 
 export const ExplorerHomeTab = () => {
   const { createNotebook } = useCreateNotebook()
@@ -13,7 +12,6 @@ export const ExplorerHomeTab = () => {
   const { createChat } = useCreateChat()
 
   const [value, setValue] = useState<string>('')
-  const [selectedModel, setSelectedModal] = useState<AssistantModel>('gpt-5.4-nano')
 
   return (
     <div className="bg-surface-100 h-full flex flex-col items-center justify-center">
@@ -31,26 +29,24 @@ export const ExplorerHomeTab = () => {
           placeholder="Ask anything about your project"
           value={value}
           onValueChange={(e) => setValue(e.target.value)}
-          selectedModel={selectedModel}
-          onSelectModel={setSelectedModal}
-          onSubmit={(message) => createChat({ initialMessage: message, model: selectedModel })}
+          onSubmit={(message) => createChat({ initialMessage: message })}
         />
 
         <section className="mt-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <ActionCard
+              icon={<SquareCode className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+              title="Run SQL"
+              description="Write and run an ad-hoc query"
+              bgColor="bg-blue-500"
+              onClick={() => createQuery()}
+            />
             <ActionCard
               icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
               title="Create a notebook"
               description="Combine notes, queries, and results"
               bgColor="bg-blue-500"
               onClick={() => createNotebook()}
-            />
-            <ActionCard
-              icon={<SquareCode className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
-              title="Run SQL"
-              description="Write and run an ad-hoc query"
-              bgColor="bg-blue-500"
-              onClick={createQuery}
             />
           </div>
         </section>
