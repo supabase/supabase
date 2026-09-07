@@ -1,4 +1,5 @@
 import { aiPrompts } from '~/data/ai-prompts.data'
+import { fromMarkdown } from 'mdast-util-from-markdown'
 import { describe, expect, it } from 'vitest'
 
 import { AiPrompt } from './AiPrompt'
@@ -22,9 +23,12 @@ describe('AiPrompt markdown schema', () => {
     'exports the complete shared %s prompt when opted in',
     (id) => {
       const markdown = AiPrompt({ props: { id, includeInMarkdown: true } })
-      expect(markdown.match(/```text\n([\s\S]*?)\n```/)?.[1]).toBe(
-        aiPrompts[id as keyof typeof aiPrompts]
-      )
+      const codeBlocks = fromMarkdown(markdown).children.filter((node) => node.type === 'code')
+      expect(codeBlocks).toHaveLength(1)
+      expect(codeBlocks[0]).toMatchObject({
+        lang: 'text',
+        value: aiPrompts[id as keyof typeof aiPrompts],
+      })
     }
   )
 
