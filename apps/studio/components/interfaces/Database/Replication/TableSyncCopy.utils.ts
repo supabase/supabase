@@ -1,7 +1,5 @@
 import type { TableSyncCopyConfig } from '@/data/replication/create-destination-pipeline-mutation'
 
-export type { TableSyncCopyConfig }
-
 export type ReplicationTableIdentity = {
   id: number
   schema: string
