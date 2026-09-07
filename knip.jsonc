@@ -72,6 +72,10 @@
         // read are documentation of the valid values, not dead code. Scoped to
         // this file so `enumMembers` keeps working everywhere else.
         "data/database/constraints-query.ts": ["enumMembers"],
+        // Presentational components for the OAuth authorization interstitial,
+        // landed ahead of the screen that assembles them. Drop this entry once
+        // authorize.tsx imports the Consent barrel.
+        "components/interfaces/Organization/OAuthApps/Consent/**": ["files"],
         // Data contracts and mock hooks for the OAuth authorization
         // interstitial, landed ahead of the UI that consumes them. `exports`
         // and `types` cover the contract types that only gain consumers in the
