@@ -3546,13 +3546,9 @@ export interface AccessTokenCreatedEvent {
 export interface AccessTokenCreationSheetDismissedEvent {
   action: 'access_token_creation_sheet_dismissed'
   properties: {
-    /** Scope selected when the sheet closed; still the default `project` when isFormTouched is false */
     resourceAccess: 'project' | 'organization' | 'account'
-    /** Which screen the user was on: the configuration form or the permissions review */
     formStep: 'form' | 'review'
-    /** Whether the user changed any field from its default before abandoning */
     isFormTouched: boolean
-    /** What closed the sheet: the user, or a failed permissions load that forces it shut */
     trigger: 'user' | 'permissions_load_error'
   }
   groups: Omit<TelemetryGroups, 'project'>
