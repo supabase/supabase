@@ -1,15 +1,151 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { toast } from 'sonner'
 
 import {
   buildPipelineApiConfig,
-  buildUpdateDestinationApiConfig,
   DestinationConfig,
   PipelineConfig,
+  type BigQueryDestinationConfig,
 } from './create-destination-pipeline-mutation'
+import { optionalSecret } from './destination-secret-utils'
 import { replicationKeys } from './keys'
+import type { DucklakeDestinationConfig } from './types'
+import { isDucklakeSupabaseConfig } from './utils'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+type UpdateDestinationPipelineBody =
+  components['schemas']['UpdateReplicationDestinationPipelineBody']
+type UpdateDestinationApiConfig = UpdateDestinationPipelineBody['destination_config']
+
+type UpdateBigQueryApiConfig = Extract<UpdateDestinationApiConfig, { big_query: unknown }>
+type UpdateDucklakeApiConfig = Extract<UpdateDestinationApiConfig, { ducklake: unknown }>
+
+export function buildBigQueryUpdateApiConfig(
+  config: BigQueryDestinationConfig
+): UpdateBigQueryApiConfig {
+  return {
+    big_query: {
+      project_id: config.projectId,
+      dataset_id: config.datasetId,
+      service_account_key: optionalSecret(config.serviceAccountKey),
+      connection_pool_size: config.connectionPoolSize,
+      max_staleness_mins: config.maxStalenessMins,
+    },
+  }
+}
+
+export function buildDucklakeUpdateApiConfig(
+  config: DucklakeDestinationConfig
+): UpdateDucklakeApiConfig {
+  if (isDucklakeSupabaseConfig(config)) {
+    return {
+      ducklake: {
+        catalog: {
+          type: 'supabase_project',
+          project_ref: config.catalogProjectRef,
+          pool_size: config.poolSize,
+          metadata_schema: config.metadataSchema,
+        },
+        storage: {
+          type: 'supabase_storage',
+          project_ref: config.storageProjectRef,
+          bucket: config.bucket,
+          ...(config.path ? { path: config.path } : {}),
+        },
+      },
+    }
+  }
+
+  return {
+    ducklake: {
+      catalog_url: optionalSecret(config.catalogUrl),
+      data_path: config.dataPath,
+      pool_size: config.poolSize,
+      s3_access_key_id: optionalSecret(config.s3AccessKeyId),
+      s3_secret_access_key: optionalSecret(config.s3SecretAccessKey),
+      s3_region: config.s3Region,
+      s3_endpoint: config.s3Endpoint,
+      s3_url_style: config.s3UrlStyle,
+      s3_use_ssl: config.s3UseSsl,
+      metadata_schema: config.metadataSchema,
+    },
+  }
+}
+
+export const buildUpdateDestinationApiConfig = (
+  destinationConfig: DestinationConfig
+): UpdateDestinationApiConfig => {
+  if ('bigQuery' in destinationConfig) {
+    return buildBigQueryUpdateApiConfig(destinationConfig.bigQuery)
+  }
+
+  if ('iceberg' in destinationConfig) {
+    const {
+      projectRef,
+      warehouseName,
+      namespace,
+      catalogToken,
+      s3AccessKeyId,
+      s3SecretAccessKey,
+      s3Region,
+    } = destinationConfig.iceberg
+
+    return {
+      iceberg: {
+        supabase: {
+          project_ref: projectRef,
+          warehouse_name: warehouseName,
+          namespace,
+          catalog_token: optionalSecret(catalogToken),
+          s3_access_key_id: optionalSecret(s3AccessKeyId),
+          s3_secret_access_key: optionalSecret(s3SecretAccessKey),
+          s3_region: s3Region,
+        },
+      },
+    }
+  }
+
+  if ('ducklake' in destinationConfig) {
+    return buildDucklakeUpdateApiConfig(destinationConfig.ducklake)
+  }
+
+  if ('snowflake' in destinationConfig) {
+    const { accountId, user, privateKey, privateKeyPassphrase, database, schema, role } =
+      destinationConfig.snowflake
+
+    return {
+      snowflake: {
+        account_id: accountId,
+        user,
+        private_key: optionalSecret(privateKey),
+        private_key_passphrase: optionalSecret(privateKeyPassphrase),
+        database,
+        schema,
+        role,
+      },
+    }
+  }
+
+  if ('clickHouse' in destinationConfig) {
+    const { url, user, password, database, engine } = destinationConfig.clickHouse
+
+    return {
+      clickhouse: {
+        url,
+        user,
+        password: optionalSecret(password),
+        database,
+        engine,
+      },
+    }
+  }
+
+  throw new Error(
+    'Invalid destination config: must specify bigQuery, iceberg, ducklake, snowflake, or clickHouse'
+  )
+}
 
 export type UpdateDestinationPipelineParams = {
   destinationId: number

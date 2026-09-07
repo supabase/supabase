@@ -29,9 +29,6 @@ import {
   BigQueryDestinationConfig,
   ClickHouseDestinationConfig,
   DestinationConfig,
-  DucklakeDestinationConfig,
-  DucklakeManualDestinationConfig,
-  DucklakeSupabaseDestinationConfig,
   IcebergDestinationConfig,
   SnowflakeDestinationConfig,
   TableSyncCopyConfig,
@@ -39,6 +36,11 @@ import {
 import { type ReplicationDestinationByIdData } from '@/data/replication/destination-by-id-query'
 import { type ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
 import { type ReplicationPublication } from '@/data/replication/publications-query'
+import type {
+  DucklakeDestinationConfig,
+  DucklakeManualDestinationConfig,
+  DucklakeSupabaseDestinationConfig,
+} from '@/data/replication/types'
 import { type ValidationFailure } from '@/data/replication/validate-destination-mutation'
 import {
   type CreateS3AccessKeyCredentialVariables,
