@@ -17,6 +17,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
+import { InterstitialShell } from '../InterstitialShell'
 import type { SecretRequest } from './McpSecrets.types'
 import {
   getOverwriteWarning,
@@ -24,7 +25,6 @@ import {
   getSecretPrefixWarning,
 } from './McpSecrets.utils'
 import { McpSecretsDetails } from './McpSecretsDetails'
-import { McpSecretsShell } from './McpSecretsShell'
 
 const FORM_ID = 'mcp-secrets-form'
 const KEY_NAME_FIELD_ID = 'mcp-secrets-key-name'
@@ -58,7 +58,7 @@ export const McpSecretsForm = ({
   const overwriteWarning = getOverwriteWarning(request)
 
   return (
-    <McpSecretsShell
+    <InterstitialShell
       title="Store an API key"
       subtitle="Supabase is asking for this key on behalf of a tool call. It never passes through your AI client."
     >
@@ -174,6 +174,6 @@ export const McpSecretsForm = ({
           </p>
         </>
       )}
-    </McpSecretsShell>
+    </InterstitialShell>
   )
 }

@@ -29,11 +29,3 @@ export type SecretsOutcomeState = Extract<
   SecretsState,
   { status: 'stored' | 'already-stored' | 'expired' | 'cancelled' | 'paused' | 'error' }
 >
-
-export type SecretsCopy = {
-  title: string
-  subtitle: string
-  calloutTitle: string
-  calloutBody: string
-  footer: string
-}

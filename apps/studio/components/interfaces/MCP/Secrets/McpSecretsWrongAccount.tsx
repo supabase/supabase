@@ -1,6 +1,6 @@
 import { Button, Separator } from 'ui'
 
-import { McpSecretsFooter, McpSecretsShell } from './McpSecretsShell'
+import { InterstitialFooter, InterstitialShell } from '../InterstitialShell'
 import { InterstitialAccountRow } from '@/components/layouts/InterstitialLayout'
 
 export const McpSecretsWrongAccount = ({
@@ -10,7 +10,7 @@ export const McpSecretsWrongAccount = ({
   signedInAs: string
   onSwitchAccount: () => void
 }) => (
-  <McpSecretsShell
+  <InterstitialShell
     title="This account has no access"
     subtitle="It was created by a different Supabase account."
   >
@@ -27,8 +27,8 @@ export const McpSecretsWrongAccount = ({
 
     <Separator />
 
-    <McpSecretsFooter align="start">
+    <InterstitialFooter align="start">
       After switching, ask your agent to run the tool again. Nothing has been stored.
-    </McpSecretsFooter>
-  </McpSecretsShell>
+    </InterstitialFooter>
+  </InterstitialShell>
 )

@@ -2,11 +2,11 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
 
+import type { InterstitialTerminalCopy } from '../InterstitialTerminalScreen'
 import { UNKNOWN_CLIENT_LABEL } from './McpSecrets.constants'
 import type {
   SecretProviderHint,
   SecretRequest,
-  SecretsCopy,
   SecretsOutcomeState,
   SecretsState,
 } from './McpSecrets.types'
@@ -21,7 +21,7 @@ const CLOSE_TAB_FOOTER = 'You can close this tab.'
 const UNVERIFIED_KEY_FOOTER =
   "Supabase doesn't verify keys. You can view or replace this one in Edge Functions secrets."
 
-export function getSecretsCopy(state: SecretsOutcomeState): SecretsCopy {
+export function getSecretsCopy(state: SecretsOutcomeState): InterstitialTerminalCopy {
   switch (state.status) {
     case 'stored': {
       const { keyName, project } = state.request

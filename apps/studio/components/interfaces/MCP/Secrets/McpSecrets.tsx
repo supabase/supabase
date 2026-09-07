@@ -1,11 +1,11 @@
 import { useFeatureFlags, useFlag, useParams } from 'common'
 import { useMemo } from 'react'
 
+import { InterstitialTerminalScreen } from '../InterstitialTerminalScreen'
 import { MCP_SECRETS_FLAG } from './McpSecrets.constants'
 import { buildSecretsSignInPath, parseSecretsParams } from './McpSecrets.params'
-import { getSecretsAnnouncement } from './McpSecrets.utils'
+import { getSecretsAnnouncement, getSecretsCopy } from './McpSecrets.utils'
 import { McpSecretsCard } from './McpSecretsCard'
-import { McpSecretsOutcome } from './McpSecretsOutcome'
 import { McpSecretsSkeleton } from './McpSecretsSkeleton'
 import { useSecretRequest } from './useSecretRequest'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
@@ -36,7 +36,9 @@ export const McpSecrets = () => {
 
       {!areFlagsResolved && <McpSecretsSkeleton />}
 
-      {areFlagsResolved && !isUrlModeEnabled && <McpSecretsOutcome state={PAUSED_STATE} />}
+      {areFlagsResolved && !isUrlModeEnabled && (
+        <InterstitialTerminalScreen {...getSecretsCopy(PAUSED_STATE)} />
+      )}
 
       {areFlagsResolved && isUrlModeEnabled && (
         <McpSecretsCard

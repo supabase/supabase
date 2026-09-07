@@ -1,6 +1,7 @@
+import { InterstitialTerminalScreen } from '../InterstitialTerminalScreen'
 import type { SecretsState } from './McpSecrets.types'
+import { getSecretsCopy } from './McpSecrets.utils'
 import { McpSecretsForm } from './McpSecretsForm'
-import { McpSecretsOutcome } from './McpSecretsOutcome'
 import { McpSecretsSkeleton } from './McpSecretsSkeleton'
 import { McpSecretsWrongAccount } from './McpSecretsWrongAccount'
 
@@ -37,5 +38,5 @@ export const McpSecretsCard = ({
     )
   }
 
-  return <McpSecretsOutcome state={state} />
+  return <InterstitialTerminalScreen {...getSecretsCopy(state)} />
 }
