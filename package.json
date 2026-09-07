@@ -80,6 +80,18 @@
     "pnpm": "11.13",
     "node": ">=22.13"
   },
-  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "pnpm@11.13.1"
+  "keywords": [
+    "postgres",
+    "firebase",
+    "storage",
+    "functions",
+    "database",
+    "auth"
+  ],
+  "packageManager": "pnpm@11.13.1",
+  "pnpm": {
+    "overrides": {
+      "@opentelemetry/propagator-jaeger": "2.9.0"
+    }
+  }
 }
