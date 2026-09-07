@@ -1,0 +1,72 @@
+# Dokploy production overlay
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# In Dokploy UI: set both files as the compose configuration, and set all
+# variables from .env.production via the Dokploy environment manager.
+
+networks:
+  supabase-net:
+    driver: bridge
+  # Dokploy's Traefik proxy network — must exist on the host before deploying
+  traefik-public:
+    external: true
+
+services:
+
+  # ── Envoy API gateway ─────────────────────────────────────────────────────
+  envoy:
+    ports: !reset []          # remove local port bindings — Traefik handles ingress
+    networks:
+      - supabase-net
+      - traefik-public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-public"
+      # API routes: https://api.YOURDOMAIN.com  → envoy:8000
+      - "traefik.http.routers.supabase-api.rule=Host(`${API_DOMAIN}`)"
+      - "traefik.http.routers.supabase-api.entrypoints=websecure"
+      - "traefik.http.routers.supabase-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.supabase-api.loadbalancer.server.port=8000"
+
+  # ── Studio dashboard ──────────────────────────────────────────────────────
+  studio:
+    build:
+      context: ..
+      dockerfile: apps/studio/Dockerfile
+      target: production          # full Next.js production build
+      args:
+        - NODE_OPTIONS=--max-old-space-size=4096
+    ports: !reset []
+    environment:
+      PORT: "3000"
+    networks:
+      - supabase-net
+      - traefik-public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-public"
+      # Studio: https://studio.YOURDOMAIN.com → studio:3000
+      - "traefik.http.routers.supabase-studio.rule=Host(`${STUDIO_DOMAIN}`)"
+      - "traefik.http.routers.supabase-studio.entrypoints=websecure"
+      - "traefik.http.routers.supabase-studio.tls.certresolver=letsencrypt"
+      - "traefik.http.services.supabase-studio.loadbalancer.server.port=3000"
+
+  # ── Remove public port exposure from internal services ────────────────────
+  db-default:
+    ports: !reset []
+
+  db-project-alpha:
+    ports: !reset []
+
+  db-project-beta:
+    ports: !reset []
+
+  supabase-meta:
+    ports: !reset []
+
+  pooler:
+    # Keep pooler ports only if you need external Postgres access
+    # Remove these lines to close Postgres access from the internet
+    ports:
+      - "${POOLER_PORT_SESSION:-6543}:5432"
+      - "${POOLER_PORT_TRANSACTION:-5432}:6543"
