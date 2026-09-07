@@ -1,11 +1,8 @@
-import { Boxes, LogOut, RefreshCcw } from 'lucide-react'
-import { Button, Card, CardContent } from 'ui'
-
-import type { OAuthOrganizationRole } from '@/data/oauth-apps/types'
+import { LogOut, RefreshCcw } from 'lucide-react'
+import { Button } from 'ui'
 
 export interface AuthorizingAsCardProps {
   email: string
-  memberRole: OAuthOrganizationRole['default_role']
   organizationSlug: string
   onSignOut: () => void
   showSwitcher?: boolean
@@ -14,7 +11,6 @@ export interface AuthorizingAsCardProps {
 
 export const AuthorizingAsCard = ({
   email,
-  memberRole,
   organizationSlug,
   onSignOut,
   showSwitcher = false,
@@ -22,50 +18,39 @@ export const AuthorizingAsCard = ({
 }: AuthorizingAsCardProps) => {
   return (
     <section className="flex flex-col gap-2">
-      <Card className="relative overflow-hidden shadow-none bg-surface-200/60 border-muted">
-        <CardContent className="border-none p-0 divide-y divide-muted">
-          <div className="flex items-center gap-3 p-4">
-            <div className="w-[30px] h-[30px] shrink-0 rounded-full border border-control flex items-center justify-center text-xs">
-              {email.charAt(0).toUpperCase()}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs text-foreground-light">Authorizing as</p>
-              <p className="truncate text-sm text-foreground">
-                {email} <span className="text-foreground-lighter">· {memberRole}</span>
-              </p>
-            </div>
+      <div className="divide-y rounded-md border bg-surface-75 px-4">
+        <div className="flex items-center justify-between gap-4 py-2.5 text-xs">
+          <span className="shrink-0 text-foreground-light">Authorizing as</span>
+          <span className="flex min-w-0 items-center gap-2">
+            <span className="min-w-0 truncate text-right text-foreground">{email}</span>
             <Button
-              variant="default"
-              icon={<LogOut size={16} />}
-              className="px-1"
+              variant="text"
+              size="tiny"
+              icon={<LogOut size={14} />}
+              className="shrink-0 size-6 px-0 text-foreground-light hover:text-foreground"
               aria-label="Sign out"
               onClick={onSignOut}
             />
-          </div>
-          <div className="flex items-center gap-3 p-4">
-            <div className="w-[30px] h-[30px] shrink-0 rounded-full border border-control flex items-center justify-center">
-              <Boxes size={18} className="text-foreground-light" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs text-foreground-light">Organization</p>
-              <p className="truncate text-sm text-foreground">{organizationSlug}</p>
-            </div>
+          </span>
+        </div>
+        <div className="flex items-center justify-between gap-4 py-2.5 text-xs">
+          <span className="shrink-0 text-foreground-light">Organization</span>
+          <span className="flex min-w-0 items-center gap-2">
+            <span className="min-w-0 truncate text-right text-foreground">{organizationSlug}</span>
             {showSwitcher && (
               <Button
-                variant="default"
-                icon={<RefreshCcw size={16} />}
-                className="px-1"
+                variant="text"
+                size="tiny"
+                icon={<RefreshCcw size={14} />}
+                className="shrink-0 size-6 px-0 text-foreground-light hover:text-foreground"
                 aria-label="Switch organization"
                 onClick={onSwitchOrg}
               />
             )}
-          </div>
-        </CardContent>
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-muted bg-surface-200 px-2 py-0.5">
-          <span className="text-[11px] uppercase tracking-wide text-foreground-lighter">For</span>
+          </span>
         </div>
-      </Card>
-      <p className="text-xs text-foreground-lighter">
+      </div>
+      <p className="text-xs text-foreground-light">
         This grant acts as you, it can never do more than your role in this organization allows.
       </p>
     </section>
