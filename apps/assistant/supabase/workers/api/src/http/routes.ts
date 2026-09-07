@@ -1,3 +1,4 @@
+import type { AgentWorkerRoute } from '@supabase/agent-runtime/workers'
 import { z } from 'zod'
 
 import {
@@ -10,11 +11,13 @@ import {
   truncateMessages,
   updateConversation,
 } from '../db/conversations'
+import type { Database } from '../db/database.types'
 import { listOAuthConnections } from '../db/oauth-connections'
 import { checkRateLimit } from '../db/rate-limit'
+import { readRunEvents } from '../db/session-store'
 import { env } from '../env'
 import { getPlatformPolicy } from '../platform/policy'
-import { requireUserId, type HandlerContext } from './auth'
+import { requireUserId } from './auth'
 import { authRoutes } from './auth-routes'
 import { chatRoute } from './chat-route'
 import { assistantSupportMetadataSchema } from './contracts'
@@ -22,16 +25,7 @@ import { HttpError } from './errors'
 import { permissionRoutes } from './permission-routes'
 import { parseBody } from './request'
 
-export type Route = {
-  method: 'GET' | 'POST' | 'PATCH' | 'DELETE'
-  pattern: string
-  auth: 'user' | 'none'
-  handler: (
-    req: Request,
-    ctx: HandlerContext,
-    params: Record<string, string>
-  ) => Response | Promise<Response>
-}
+export type Route = AgentWorkerRoute<Database, { platformUserId?: string; platformToken?: string }>
 const revision = z.number().int().nonnegative()
 
 export const routes: Route[] = [
@@ -137,6 +131,32 @@ export const routes: Route[] = [
       return Response.json({
         conversation: await updateConversation(requireUserId(ctx), params.id, body),
       })
+    },
+  },
+  {
+    method: 'GET',
+    pattern: '/v1/conversations/:id/events',
+    auth: 'user',
+    handler: async (req, ctx, params) => {
+      const query = new URL(req.url).searchParams
+      const cursor = z
+        .object({
+          id: z.string().uuid(),
+          after: z
+            .string()
+            .regex(/^(0|[1-9]\d*)$/)
+            .max(19)
+            .optional(),
+          limit: z.coerce.number().int().min(1).max(100).optional(),
+        })
+        .safeParse({
+          id: params.id,
+          after: query.get('after') ?? undefined,
+          limit: query.get('limit') ?? undefined,
+        })
+      if (!cursor.success) throw new HttpError(400, 'invalid_request', 'Invalid event cursor.')
+      const events = await readRunEvents(requireUserId(ctx), cursor.data.id, cursor.data)
+      return Response.json(events, { headers: { 'Cache-Control': 'no-store' } })
     },
   },
   {

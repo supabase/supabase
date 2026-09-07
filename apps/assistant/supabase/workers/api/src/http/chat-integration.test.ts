@@ -2,11 +2,13 @@ import { MockLanguageModelV4, simulateReadableStream } from 'ai/test'
 import { exportJWK, generateKeyPair, SignJWT } from 'jose'
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { getProjectToolDefinitions } from '../ai/tools/project-tools'
 import type { app as App } from './app'
 import { HttpError } from './errors'
 
 const mocks = vi.hoisted(() => ({
   consent: vi.fn(),
+  events: vi.fn(),
   begin: vi.fn(),
   finish: vi.fn(),
   oauth: vi.fn(),
@@ -14,6 +16,7 @@ const mocks = vi.hoisted(() => ({
   close: vi.fn(),
   query: vi.fn(),
   model: vi.fn(),
+  executeOnce: vi.fn(),
 }))
 vi.mock('../db/conversations', async (original) => ({
   ...(await original<typeof import('../db/conversations')>()),
@@ -26,9 +29,14 @@ vi.mock('../db/conversations', async (original) => ({
   beginTurn: mocks.begin,
   finishTurn: mocks.finish,
 }))
+vi.mock('../db/session-store', async (original) => ({
+  ...(await original<typeof import('../db/session-store')>()),
+  readRunEvents: mocks.events,
+}))
 vi.mock('../db/project-permissions', () => ({ getProjectPermissions: mocks.consent }))
 vi.mock('../db/oauth-connections', () => ({ getValidAccessToken: mocks.oauth }))
 vi.mock('../db/rate-limit', () => ({ checkRateLimit: vi.fn() }))
+vi.mock('../db/tool-executions', () => ({ executeOnce: mocks.executeOnce }))
 vi.mock('../ai/tools', () => ({ getTools: mocks.tools }))
 vi.mock('../ai/model', () => ({ getAssistantModel: mocks.model }))
 vi.mock('../platform/management-api', () => ({
@@ -120,6 +128,56 @@ function request() {
   })
 }
 describe('authenticated worker chat through the AI SDK', () => {
+  it('routes an approved tool through application persistence and uses its cached result', async () => {
+    const input = {
+      sql: 'select 1',
+      label: 'Test',
+      chartConfig: { view: 'table' },
+      isWriteQuery: false,
+    }
+    mocks.begin.mockResolvedValue({
+      revision: 2,
+      messages: [
+        ...messages,
+        {
+          id: 'approval',
+          role: 'assistant',
+          parts: [
+            {
+              type: 'tool-execute_sql',
+              toolCallId: 'stored-call',
+              state: 'approval-responded',
+              input,
+              approval: { id: 'approval-id', approved: true },
+            },
+          ],
+        },
+      ],
+    })
+    mocks.tools.mockImplementation(async (context) => ({
+      tools: getProjectToolDefinitions(context),
+      close: mocks.close,
+    }))
+    mocks.executeOnce.mockResolvedValue([{ value: 'cached-private-result' }])
+    const response = await request()
+    expect(response.status).toBe(200)
+    expect(response.headers.get('x-assistant-revision')).toBe('2')
+    const body = await response.text()
+    expect(body).toContain('cached-private-result')
+    expect(mocks.executeOnce).toHaveBeenCalledExactlyOnceWith({
+      sessionId: 'conversation',
+      userId,
+      runId: requestId,
+      toolCallId: 'stored-call',
+      toolName: 'execute_sql',
+      input,
+      execute: expect.any(Function),
+    })
+    expect(mocks.query).not.toHaveBeenCalled()
+    expect(JSON.stringify(model.doStreamCalls)).not.toContain('cached-private-result')
+    expect(mocks.finish).toHaveBeenCalledOnce()
+  })
+
   it('streams a response, persists it, and avoids schema queries with no project data consent', async () => {
     const response = await request()
     expect(response.status).toBe(200)
@@ -134,11 +192,34 @@ describe('authenticated worker chat through the AI SDK', () => {
       expect.objectContaining({
         role: 'assistant',
         parts: expect.arrayContaining([expect.objectContaining({ text: 'Hello from the worker' })]),
-      })
+      }),
+      'completed'
     )
     expect(mocks.query).not.toHaveBeenCalled()
     expect(mocks.close).toHaveBeenCalled()
     expect(model.doStreamCalls).toHaveLength(1)
+  })
+  it('replays events using the verified identity and rejects invalid cursors', async () => {
+    mocks.events.mockResolvedValue({ events: [], nextCursor: '10', hasMore: false })
+    const read = (query: string) =>
+      app.request(`https://assistant.example/v1/conversations/${requestId}/events${query}`, {
+        headers: { authorization: `Bearer ${jwt}`, 'x-platform-authorization': 'Bearer platform' },
+      })
+    const response = await read('?after=10&limit=20&userId=forged')
+    expect(response.status).toBe(200)
+    expect(response.headers.get('cache-control')).toBe('no-store')
+    expect(await response.json()).toEqual({ events: [], nextCursor: '10', hasMore: false })
+    expect(mocks.events).toHaveBeenCalledWith(
+      userId,
+      requestId,
+      expect.objectContaining({ after: '10', limit: 20 })
+    )
+    mocks.events.mockClear()
+    expect((await read('?after=-1')).status).toBe(400)
+    expect((await read('?limit=501')).status).toBe(400)
+    expect(mocks.events).not.toHaveBeenCalled()
+    mocks.events.mockRejectedValue(new HttpError(404, 'not_found', 'Session not found.'))
+    expect((await read('?after=0')).status).toBe(404)
   })
   it('requires new consent before OAuth, tool discovery, or model calls', async () => {
     mocks.consent.mockResolvedValue({ level: 'disabled', hasConsented: false })

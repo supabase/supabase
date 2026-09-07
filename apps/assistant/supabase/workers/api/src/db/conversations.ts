@@ -4,8 +4,9 @@ import type { PoolClient } from 'pg'
 
 import { HttpError } from '../http/errors'
 import type { Database } from './database.types'
-import { reconcileMessages } from './history'
+import { canRespondToAssistantApproval, reconcileMessages } from './history'
 import { adminQuery, adminTransaction } from './postgres'
+import { assistantSessionStore, withSessionStoreErrors } from './session-store'
 
 export type ConversationRow = Database['public']['Tables']['conversations']['Row']
 export type MessageRow = {
@@ -262,48 +263,28 @@ export async function beginTurn(
   trigger?: string,
   supportMetadata?: unknown
 ) {
-  return adminTransaction(async (client) => {
-    const conversation = await lockConversation(client, id, userId, revision)
-    const { rows } = await client.query<MessageRow>(
-      'select * from public.messages where conversation_id=$1 and user_id=$2 order by seq desc limit 100',
-      [id, userId]
-    )
-    const previous = rows.reverse().map(messageToUIMessage)
-    const messages = reconcileMessages(previous, incoming, trigger)
-    const claimed = await client.query(
-      `insert into private.conversation_runs(id,conversation_id,user_id)
-      values ($1,$2,$3) on conflict do nothing returning id`,
-      [requestId, id, userId]
-    )
-    if (!claimed.rows.length)
-      throw new HttpError(
-        409,
-        'conflict',
-        'This request was already attempted. Reload the conversation.'
-      )
-    // Remove only the edited/regenerated tail; earlier paginated history is retained.
-    const firstRemoved = previous.find(
-      (message) => !messages.some((next) => next.id === message.id)
-    )
-    if (firstRemoved) {
-      await client.query(
-        `delete from public.messages where conversation_id=$1 and seq >=
-        (select seq from public.messages where conversation_id=$1 and id=$2)`,
-        [id, firstRemoved.id]
-      )
-    }
-    await writeMessages(client, id, userId, messages)
-    await client.query(
-      `update public.conversations set revision=revision+1, active_request_id=$3, active_since=now(),
-      support_metadata=coalesce($4::jsonb,support_metadata), updated_at=now() where id=$1 and user_id=$2`,
-      [
-        id,
-        userId,
-        requestId,
-        supportMetadata === undefined ? null : JSON.stringify(supportMetadata),
-      ]
-    )
-    return { conversation, messages, revision: revision + 1 }
+  return withSessionStoreErrors(async () => {
+    const result = await assistantSessionStore.startRun<ConversationRow>({
+      userId,
+      sessionId: id,
+      runId: requestId,
+      revision,
+      incoming,
+      reconcile: (previous, next) =>
+        reconcileMessages(previous, next, trigger, {
+          context: { userId, ownerId: userId },
+          canRespondToApproval: canRespondToAssistantApproval,
+        }),
+      onClaim: async (database) => {
+        if (supportMetadata !== undefined) {
+          await database.query(
+            'update public.conversations set support_metadata=$3::jsonb where id=$1 and user_id=$2',
+            [id, userId, JSON.stringify(supportMetadata)]
+          )
+        }
+      },
+    })
+    return { conversation: result.session, messages: result.messages, revision: result.revision }
   })
 }
 
@@ -311,38 +292,36 @@ export async function finishTurn(
   userId: string,
   id: string,
   requestId: string,
-  responseMessage?: UIMessage
+  responseMessage?: UIMessage,
+  status?: 'completed' | 'failed' | 'cancelled'
 ) {
-  await adminTransaction(async (client) => {
-    const { rows } = await client.query(
-      'select id from public.conversations where id=$1 and user_id=$2 and active_request_id=$3 for update',
-      [id, userId, requestId]
-    )
-    if (!rows.length) return
-    if (responseMessage) {
-      await writeMessages(client, id, userId, [responseMessage])
-      const rename = responseMessage.parts.find(
-        (part) => part.type === 'tool-rename_chat' && 'input' in part
-      )
-      if (
-        rename &&
-        'input' in rename &&
-        rename.input &&
-        typeof rename.input === 'object' &&
-        'newName' in rename.input &&
-        typeof rename.input.newName === 'string'
-      ) {
-        await client.query('update public.conversations set name=$2 where id=$1', [
-          id,
-          rename.input.newName.slice(0, 200),
-        ])
-      }
-    }
-    await client.query(
-      'update public.conversations set active_request_id=null, active_since=null, updated_at=now() where id=$1',
-      [id]
-    )
-  })
+  await withSessionStoreErrors(() =>
+    assistantSessionStore.finishRun({
+      userId,
+      sessionId: id,
+      runId: requestId,
+      responseMessage,
+      status,
+      onFinish: async (database) => {
+        const rename = responseMessage?.parts.find(
+          (part) => part.type === 'tool-rename_chat' && 'input' in part
+        )
+        if (
+          rename &&
+          'input' in rename &&
+          rename.input &&
+          typeof rename.input === 'object' &&
+          'newName' in rename.input &&
+          typeof rename.input.newName === 'string'
+        ) {
+          await database.query(
+            'update public.conversations set name=$3 where id=$1 and user_id=$2',
+            [id, userId, rename.input.newName.slice(0, 200)]
+          )
+        }
+      },
+    })
+  )
 }
 
 export async function insertFeedback(

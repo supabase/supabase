@@ -1,0 +1,44 @@
+{
+  "name": "@supabase/agent-runtime",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./workers": "./src/workers.ts",
+    "./mcp": "./src/mcp.ts",
+    "./persistence": "./src/persistence.ts"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@ai-sdk/mcp": "2.0.31"
+  },
+  "peerDependencies": {
+    "@supabase/server": "1.5.3",
+    "@supabase/supabase-js": "^2.0.0",
+    "ai": "7.0.59",
+    "hono": "^4.13.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@supabase/server": "1.5.3",
+    "@supabase/supabase-js": "catalog:",
+    "@types/node": "catalog:",
+    "ai": "7.0.59",
+    "eslint": "^9.0.0",
+    "eslint-config-supabase": "workspace:*",
+    "hono": "^4.13.1",
+    "jose": "^6.0.11",
+    "tsconfig": "workspace:*",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "zod": "catalog:"
+  }
+}

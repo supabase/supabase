@@ -1,7 +1,33 @@
 # Assistant
 
-Supabase-hosted backend for the Studio AI Assistant. The project is expressed in
-`supabase/`: `config.toml`, declarative schemas, and workers.
+The first application built with [`@supabase/agent-runtime`](../../packages/agent-runtime/README.md),
+a framework for agents on Supabase Workers and AI SDK 7. Studio embeds Assistant
+through its HTTP integration. The project is expressed in `supabase/`:
+`config.toml`, declarative schemas, and workers.
+
+## Framework and application
+
+The framework owns agent execution, tool composition, configurable permission
+enforcement, lazy skills, MCP connections, persistence lifecycle callbacks,
+authenticated Workers routes, and AI SDK streaming.
+Assistant supplies the Supabase product tools and prompts, consent policy, model
+selection, OAuth, and the complete Postgres schema and storage implementation. Studio owns its integration adapter and
+UI. The legacy `generate-v4` backend remains separate.
+
+Start with these application definitions:
+
+- `src/ai/agent.ts`: agent instructions, context, skills, and request-scoped tool resources.
+- `src/ai/tools/mcp-tools.ts`: named MCP transport, credential binding, and Studio tool aliases.
+- `src/db/agent-persistence.ts`: framework callbacks for canonical run startup, completion, and tool execution.
+- `src/db/postgres-session-store.ts`: application-owned SQL, transactions, history, and run events.
+- `src/db/session-store.ts`: database driver, table configuration, and HTTP error mapping.
+- `src/ai/skills.ts`: the skill catalog and lazy `load_knowledge` content.
+- `src/ai/tools/tool-policies.ts`: execution permissions, approvals, and model-output projections.
+- `src/http/app.ts`: Supabase Worker routes and additional Studio identity authorization.
+- `src/http/chat-route.ts`: canonical history, consent, streaming, and durable turn settlement.
+
+Paths above are relative to `supabase/workers/api/`. Applications can define their
+own permission model; Assistant's concrete consent levels remain in `src/permissions.ts`.
 
 ## Layout
 
@@ -40,9 +66,24 @@ tool set as:
    the result; MCP write tools cannot override harness approval checks.
 2. **Harness overrides** — `project-tools.ts` re-implements `execute_sql` and
    `deploy_edge_function` with `needsApproval` (Studio's approval UI) via the
-   Management API, and wins over the MCP copies (`UI_EXECUTED_TOOLS`).
-3. **Harness additions** — `rename_chat`, `load_knowledge`, `list_policies`,
-   incident and support tools that MCP does not offer.
+   Management API, and cannot be replaced by remote capabilities.
+3. **Harness additions** — `rename_chat`, `list_policies`, incident and support
+   tools that MCP does not offer. The agent's skill catalog supplies `load_knowledge`.
+
+The framework composes these sources with explicit overrides, checks execution
+permissions, and projects sensitive results before model conversion. Assistant uses
+the same projections to redact historical output after consent changes.
+
+The MCP runtime owns discovery, aliases, connection cleanup, cancellation, and typed
+authorization errors. The agent's permission map enforces consent for both local
+and remote tools. Assistant owns turn claims, approval decisions, execution deduplication, and ordered
+lifecycle events in its Postgres adapter. It uses the framework history validator
+and plugs that adapter into `AgentPersistence` callbacks. The framework awaits
+these callbacks and manages the run lifetime without prescribing a database schema.
+`GET /v1/conversations/:id/events?after=0&limit=100` returns owner-scoped event replay;
+it does not contain raw inputs or tool results. Events start with new runs after
+applying the migration; outcomes are not reconstructed for older request claims. Studio continues to use the existing
+chat stream and conversation endpoints.
 
 ## One platform for OAuth, Management API, and MCP
 

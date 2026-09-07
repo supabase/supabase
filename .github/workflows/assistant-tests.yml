@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'apps/assistant/**'
+      - 'packages/agent-runtime/**'
       - 'packages/eslint-config-supabase/**'
       - 'pnpm-lock.yaml'
       - '.github/workflows/assistant-tests.yml'
@@ -11,6 +12,7 @@ on:
     branches: [master]
     paths:
       - 'apps/assistant/**'
+      - 'packages/agent-runtime/**'
       - 'pnpm-lock.yaml'
 
 permissions:
@@ -34,6 +36,9 @@ jobs:
           node-version-file: '.nvmrc'
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @supabase/agent-runtime typecheck
+      - run: pnpm --filter @supabase/agent-runtime lint
+      - run: pnpm --filter @supabase/agent-runtime test
       - run: pnpm --filter assistant typecheck
       - run: pnpm --filter assistant lint
       - run: pnpm --filter assistant test

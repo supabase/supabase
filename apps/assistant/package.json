@@ -17,6 +17,7 @@
     "test:db": "vitest --run --config vitest.db.config.ts"
   },
   "dependencies": {
+    "@supabase/agent-runtime": "workspace:*",
     "@ai-sdk/mcp": "2.0.31",
     "@ai-sdk/openai": "4.0.41",
     "@supabase/mcp-server-supabase": "^0.11.0",

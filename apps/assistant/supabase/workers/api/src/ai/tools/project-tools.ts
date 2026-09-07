@@ -1,28 +1,11 @@
+import { withToolPolicy } from '@supabase/agent-runtime'
 import { acceptUntrustedSql, untrustedSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { tool } from 'ai'
 import { z } from 'zod'
 
-import { assistantSqlModelOutput, type ProjectPermissionLevel } from '../../permissions'
-import {
-  EDGE_FUNCTION_PROMPT,
-  LOGS_PROMPT,
-  PG_BEST_PRACTICES,
-  REALTIME_PROMPT,
-  RLS_PROMPT,
-  STORAGE_PROMPT,
-} from '../prompts'
+import type { ProjectPermissionLevel } from '../../permissions'
 import { fixSqlBackslashEscapes } from '../util'
-
-const KNOWLEDGE = {
-  pg_best_practices: PG_BEST_PRACTICES,
-  rls: RLS_PROMPT,
-  storage: STORAGE_PROMPT,
-  edge_functions: EDGE_FUNCTION_PROMPT,
-  realtime: REALTIME_PROMPT,
-  logs: LOGS_PROMPT,
-} as const
-
-type KnowledgeName = keyof typeof KNOWLEDGE
+import { assistantToolPolicies } from './tool-policies'
 
 export const executeSqlInputSchema = z.object({
   // Transform at parse time so the corrected SQL is what gets stored in
@@ -44,24 +27,16 @@ export const executeSqlInputSchema = z.object({
     ),
 })
 
-export const loadKnowledgeInputSchema = z.object({
-  name: z
-    .enum(Object.keys(KNOWLEDGE) as [KnowledgeName, ...KnowledgeName[]])
-    .describe('The knowledge to load'),
-})
-
 export type ManagementApi = {
   runQuery: (sql: SafeSqlFragment, opts?: { readOnly?: boolean }) => Promise<unknown>
   deployFunction: (input: { slug: string; code: string; name: string }) => Promise<unknown>
 }
 
-export function getProjectTools({
+export function getProjectToolDefinitions({
   managementApi,
-  aiOptInLevel,
   executeOperation,
 }: {
   managementApi: ManagementApi
-  aiOptInLevel: ProjectPermissionLevel
   executeOperation: (
     id: string,
     name: string,
@@ -81,10 +56,6 @@ export function getProjectTools({
             readOnly: !input.isWriteQuery,
           })
         ),
-      toModelOutput: ({ output }) => ({
-        type: 'text' as const,
-        value: JSON.stringify(assistantSqlModelOutput(output, aiOptInLevel)),
-      }),
     }),
     deploy_edge_function: tool({
       description:
@@ -113,11 +84,18 @@ export function getProjectTools({
         return { status: 'Chat request sent to client' }
       },
     }),
-    load_knowledge: tool({
-      description:
-        'Load detailed knowledge about a Supabase topic before answering questions about it.',
-      inputSchema: loadKnowledgeInputSchema,
-      execute: ({ name }) => KNOWLEDGE[name],
-    }),
   }
+}
+
+/** Apply the same application policy when using these tools outside the full agent. */
+export function getProjectTools({
+  aiOptInLevel,
+  ...options
+}: Parameters<typeof getProjectToolDefinitions>[0] & {
+  aiOptInLevel: ProjectPermissionLevel
+}) {
+  return withToolPolicy(getProjectToolDefinitions(options), {
+    context: aiOptInLevel,
+    policies: assistantToolPolicies,
+  })
 }

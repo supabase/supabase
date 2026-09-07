@@ -7,8 +7,7 @@ import type { HandlerContext } from './src/http/auth.ts'
 import { chatBodySchema } from './src/http/chat-body.ts'
 import { jsonError } from './src/http/errors.ts'
 
-const { generateAssistantResponse, getTools, getAssistantModel } = vi.hoisted(() => ({
-  generateAssistantResponse: vi.fn(),
+const { getTools, getAssistantModel } = vi.hoisted(() => ({
   getTools: vi.fn(),
   getAssistantModel: vi.fn(),
 }))
@@ -28,10 +27,6 @@ vi.mock('@supabase/server/adapters/hono', () => ({
       } as HandlerContext)
       await next()
     },
-}))
-
-vi.mock('./src/ai/generate-assistant-response.ts', () => ({
-  generateAssistantResponse,
 }))
 
 vi.mock('./src/ai/tools/index.ts', () => ({
@@ -98,7 +93,6 @@ describe('chat body schema', () => {
 
 describe('api worker router', () => {
   beforeEach(() => {
-    generateAssistantResponse.mockReset()
     getTools.mockReset()
     getAssistantModel.mockReset()
   })

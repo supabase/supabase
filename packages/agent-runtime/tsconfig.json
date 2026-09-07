@@ -1,0 +1,12 @@
+{
+  "extends": "tsconfig/base.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ES2022",
+    "noEmit": true
+  },
+  "include": ["src/**/*.ts", "examples/**/*.ts", "vitest.config.ts"],
+  "exclude": ["node_modules"]
+}

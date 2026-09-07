@@ -199,6 +199,9 @@ importers:
       '@ai-sdk/openai':
         specifier: 4.0.41
         version: 4.0.41(zod@3.25.76)
+      '@supabase/agent-runtime':
+        specifier: workspace:*
+        version: link:../../packages/agent-runtime
       '@supabase/mcp-server-supabase':
         specifier: ^0.11.0
         version: 0.11.0(@modelcontextprotocol/server@2.0.0)(zod@3.25.76)
@@ -2247,6 +2250,49 @@ importers:
       axe-core:
         specifier: ^4.12.1
         version: 4.12.1
+
+  packages/agent-runtime:
+    dependencies:
+      '@ai-sdk/mcp':
+        specifier: 2.0.31
+        version: 2.0.31(zod@3.25.76)
+    devDependencies:
+      '@supabase/server':
+        specifier: 1.5.3
+        version: 1.5.3(@supabase/supabase-js@2.112.4(@opentelemetry/api@1.9.1))(hono@4.13.1)(pg@8.16.3)(typescript@6.0.2)
+      '@supabase/supabase-js':
+        specifier: 'catalog:'
+        version: 2.112.4(@opentelemetry/api@1.9.1)
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.13.14
+      ai:
+        specifier: 7.0.59
+        version: 7.0.59(zod@3.25.76)
+      eslint:
+        specifier: ^9.0.0
+        version: 9.37.0(jiti@2.7.0)(supports-color@8.1.1)
+      eslint-config-supabase:
+        specifier: workspace:*
+        version: link:../eslint-config-supabase
+      hono:
+        specifier: ^4.13.1
+        version: 4.13.1
+      jose:
+        specifier: ^6.0.11
+        version: 6.2.9
+      tsconfig:
+        specifier: workspace:*
+        version: link:../tsconfig
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.2
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.4(@opentelemetry/api@1.9.1)(@types/node@22.13.14)(@vitest/coverage-v8@4.1.4)(@vitest/ui@4.1.4)(jsdom@28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1))(msw@2.11.3(@types/node@22.13.14)(typescript@6.0.2))(vite@8.2.1(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+      zod:
+        specifier: 'catalog:'
+        version: 3.25.76
 
   packages/ai-commands:
     dependencies:

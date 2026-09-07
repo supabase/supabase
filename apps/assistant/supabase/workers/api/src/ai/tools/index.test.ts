@@ -2,13 +2,14 @@ import { jsonSchema } from 'ai'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getTools } from './index'
-import { getMcpTools, McpUnauthorizedError } from './mcp-tools'
+import { getMcpTools } from './mcp-tools'
 
 vi.mock('./mcp-tools', () => ({
   getMcpTools: vi.fn(),
-  McpUnauthorizedError: class McpUnauthorizedError extends Error {},
 }))
-vi.mock('./project-tools', () => ({ getProjectTools: vi.fn(() => ({ studio_tool: {} })) }))
+vi.mock('./project-tools', () => ({
+  getProjectToolDefinitions: vi.fn(() => ({ studio_tool: {} })),
+}))
 vi.mock('./schema-tools', () => ({ getSchemaTools: vi.fn(() => ({ schema_tool: {} })) }))
 vi.mock('./incident-tools', () => ({ getIncidentTools: vi.fn(() => ({ incident_tool: {} })) }))
 vi.mock('./support-tools', () => ({
@@ -16,10 +17,10 @@ vi.mock('./support-tools', () => ({
 }))
 
 const BASE_PARAMS = {
-  conversationId: 'conversation',
   aiOptInLevel: 'schema' as const,
   projectRef: 'abcdefghijklmnopqrst',
   oauthToken: 'oauth-token',
+  executeOperation: vi.fn(),
   managementApi: {
     runQuery: vi.fn(),
     deployFunction: vi.fn(),
@@ -43,7 +44,6 @@ describe('ai/tools getTools', () => {
       oauthToken: BASE_PARAMS.oauthToken,
       projectRef: BASE_PARAMS.projectRef,
       signal: BASE_PARAMS.signal,
-      aiOptInLevel: BASE_PARAMS.aiOptInLevel,
     })
     expect(tools).toHaveProperty('studio_tool')
     expect(tools).toHaveProperty('list_tables')
@@ -66,25 +66,10 @@ describe('ai/tools getTools', () => {
     expect(tools).toHaveProperty('list_tables')
   })
 
-  it('degrades gracefully to the remaining tools when remote MCP fetch fails', async () => {
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-    vi.mocked(getMcpTools).mockRejectedValueOnce(new Error('remote MCP unreachable'))
-
-    const { tools } = await getTools(BASE_PARAMS)
-
-    expect(tools).toHaveProperty('studio_tool')
-    expect(tools).toHaveProperty('schema_tool')
-    expect(tools).toHaveProperty('incident_tool')
-    expect(tools).not.toHaveProperty('list_tables')
-    expect(consoleSpy).toHaveBeenCalled()
-
-    consoleSpy.mockRestore()
-  })
-
-  it('rethrows a rejected OAuth token instead of degrading', async () => {
-    vi.mocked(getMcpTools).mockRejectedValueOnce(new McpUnauthorizedError('401'))
-
-    await expect(getTools(BASE_PARAMS)).rejects.toBeInstanceOf(McpUnauthorizedError)
+  it('propagates connection setup failures before constructing tools', async () => {
+    const error = new Error('Connection setup failed')
+    vi.mocked(getMcpTools).mockRejectedValueOnce(error)
+    await expect(getTools(BASE_PARAMS)).rejects.toBe(error)
   })
 
   it('includes support tools when supportMode is true', async () => {

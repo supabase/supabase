@@ -1,7 +1,9 @@
+import { withToolPolicy } from '@supabase/agent-runtime'
 import { jsonSchema } from 'ai'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getMcpTools } from './mcp-tools'
+import { assistantMcpToolPolicies } from './tool-policies'
 
 const { close, tools, execute, create } = vi.hoisted(() => ({
   close: vi.fn(),
@@ -9,7 +11,10 @@ const { close, tools, execute, create } = vi.hoisted(() => ({
   execute: vi.fn(),
   create: vi.fn(),
 }))
-vi.mock('@ai-sdk/mcp', () => ({ createMCPClient: create }))
+vi.mock('@ai-sdk/mcp', async (original) => ({
+  ...(await original<typeof import('@ai-sdk/mcp')>()),
+  createMCPClient: create,
+}))
 beforeEach(() => {
   vi.resetAllMocks()
   close.mockResolvedValue(undefined)
@@ -31,21 +36,18 @@ describe('MCP frontend contract and lifecycle', () => {
       projectRef: 'project',
       oauthToken: 'token',
       signal: controller.signal,
-      aiOptInLevel: 'schema',
     })
     expect(tools).toHaveBeenCalledWith()
     expect(result.tools.list_tables.type).toBe('dynamic')
     expect(result.tools.execute_sql).toBeUndefined()
     expect(result.tools.newly_added_write).toBeUndefined()
-    await result.tools.query_logs.execute!(
-      {},
-      { toolCallId: 't', messages: [], context: undefined }
-    )
+    const permitted = withToolPolicy(result.tools, {
+      context: 'schema',
+      policies: assistantMcpToolPolicies,
+    })
+    await permitted.query_logs.execute!({}, { toolCallId: 't', messages: [], context: undefined })
     expect(execute).not.toHaveBeenCalled()
-    await result.tools.list_tables.execute!(
-      {},
-      { toolCallId: 't', messages: [], context: undefined }
-    )
+    await permitted.list_tables.execute!({}, { toolCallId: 't', messages: [], context: undefined })
     expect(execute).toHaveBeenCalledOnce()
     await result.close()
     controller.abort()
@@ -54,14 +56,12 @@ describe('MCP frontend contract and lifecycle', () => {
   })
   it('closes when setup fails or the request is aborted', async () => {
     tools.mockRejectedValueOnce(new Error('tools failed'))
-    await expect(
-      getMcpTools({
-        projectRef: 'project',
-        oauthToken: 'token',
-        signal: new AbortController().signal,
-        aiOptInLevel: 'disabled',
-      })
-    ).rejects.toThrow('tools failed')
+    const unavailable = await getMcpTools({
+      projectRef: 'project',
+      oauthToken: 'token',
+      signal: new AbortController().signal,
+    })
+    expect(unavailable.tools).toEqual({})
     expect(close).toHaveBeenCalledOnce()
     close.mockClear()
     const controller = new AbortController()
@@ -69,7 +69,6 @@ describe('MCP frontend contract and lifecycle', () => {
       projectRef: 'project',
       oauthToken: 'token',
       signal: controller.signal,
-      aiOptInLevel: 'disabled',
     })
     controller.abort()
     await result.close()

@@ -1,10 +1,9 @@
-import type { ToolSet } from 'ai'
+import { composeTools } from '@supabase/agent-runtime'
 
-import { executeOnce } from '../../db/tool-executions'
 import type { ProjectPermissionLevel } from '../../permissions'
 import { getIncidentTools } from './incident-tools'
-import { getMcpTools, McpUnauthorizedError } from './mcp-tools'
-import { getProjectTools, type ManagementApi } from './project-tools'
+import { getMcpTools } from './mcp-tools'
+import { getProjectToolDefinitions, type ManagementApi } from './project-tools'
 import { getSchemaTools } from './schema-tools'
 import { getSupportLifecycleTools } from './support-tools'
 
@@ -17,7 +16,7 @@ export async function getTools({
   supportMode,
   signal,
   aiOptInLevel,
-  conversationId,
+  executeOperation,
 }: {
   projectRef: string
   oauthToken: string
@@ -25,27 +24,25 @@ export async function getTools({
   supportMode?: boolean
   signal: AbortSignal
   aiOptInLevel: ProjectPermissionLevel
-  conversationId: string
+  executeOperation: Parameters<typeof getProjectToolDefinitions>[0]['executeOperation']
 }) {
-  let mcp = { tools: {} as ToolSet, close: async () => {} }
+  const mcp = await getMcpTools({ oauthToken, projectRef, signal })
   try {
-    mcp = await getMcpTools({ oauthToken, projectRef, signal, aiOptInLevel })
+    const tools = composeTools({
+      base: mcp.tools,
+      overrides: getProjectToolDefinitions({
+        managementApi,
+        executeOperation,
+      }),
+      extensions: [
+        ...(aiOptInLevel !== 'disabled' ? [getSchemaTools({ managementApi })] : []),
+        getIncidentTools(),
+        ...(supportMode ? [getSupportLifecycleTools()] : []),
+      ],
+    })
+    return { tools, close: mcp.close }
   } catch (error) {
-    if (error instanceof McpUnauthorizedError) throw error
-    signal.throwIfAborted()
-    console.error('MCP tools unavailable', error)
+    await mcp.close()
+    throw error
   }
-  const tools: ToolSet = {
-    ...mcp.tools,
-    ...getProjectTools({
-      managementApi,
-      aiOptInLevel,
-      executeOperation: (id, name, input, execute) =>
-        executeOnce(conversationId, id, name, input, execute),
-    }),
-    ...(aiOptInLevel !== 'disabled' ? getSchemaTools({ managementApi }) : {}),
-    ...getIncidentTools(),
-    ...(supportMode ? getSupportLifecycleTools() : {}),
-  }
-  return { tools, close: mcp.close }
 }

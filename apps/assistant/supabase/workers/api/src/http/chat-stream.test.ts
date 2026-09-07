@@ -1,3 +1,4 @@
+import { McpConnectionError } from '@supabase/agent-runtime/mcp'
 import { describe, expect, test, vi } from 'vitest'
 
 import { toChatResponse } from './chat-stream'
@@ -15,6 +16,37 @@ function modelStream(parts: Array<{ type: string; [key: string]: unknown }>): Re
 }
 
 describe('toChatResponse', () => {
+  test('turns MCP authorization failures into Studio reconnect errors and settles the run', async () => {
+    const onFinish = vi.fn()
+    const onSettled = vi.fn()
+    const response = await toChatResponse(
+      {
+        stream: modelStream([
+          { type: 'start' },
+          { type: 'tool-call', toolCallId: 'docs', toolName: 'search_docs', input: {} },
+          {
+            type: 'tool-error',
+            toolCallId: 'docs',
+            toolName: 'search_docs',
+            input: {},
+            error: new McpConnectionError('authorization_required', 'supabase-assistant'),
+          },
+          { type: 'text-start', id: 'late' },
+          { type: 'text-delta', id: 'late', text: 'Should not continue' },
+          { type: 'text-end', id: 'late' },
+          { type: 'finish', finishReason: 'stop' },
+        ]),
+      },
+      { originalMessages: [], onFinish, onSettled }
+    )
+    const body = await response.text()
+    expect(body).toContain('"type":"error"')
+    expect(body).toContain('oauth_required')
+    expect(body).not.toContain('Should not continue')
+    expect(onFinish).toHaveBeenCalledWith(expect.objectContaining({ status: 'failed' }))
+    expect(onSettled).toHaveBeenCalledExactlyOnceWith({ status: 'failed' })
+  })
+
   test('streams UI message SSE events, not only [DONE]', async () => {
     const onFinish = vi.fn()
     const response = await toChatResponse(
