@@ -14,6 +14,7 @@ import {
   PopoverTrigger,
   RadioGroupStacked,
   RadioGroupStackedItem,
+  ScrollArea,
   Select,
   SelectContent,
   SelectItem,
@@ -277,7 +278,7 @@ function ConnectCombobox({ id, options, value, onValueChange }: ConnectComboboxP
   const selectedOption = options.find((option) => option.value === value)
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
+    <Popover open={isOpen} onOpenChange={setIsOpen} modal={false}>
       <PopoverTrigger asChild>
         <Button
           id={id}
@@ -302,34 +303,36 @@ function ConnectCombobox({ id, options, value, onValueChange }: ConnectComboboxP
       <PopoverContent id={listboxId} align="start" className="p-0" sameWidthAsTrigger>
         <Command>
           <CommandInput placeholder="Search frameworks..." />
-          <CommandList className="h-72">
+          <CommandList>
             <CommandEmpty>No frameworks found.</CommandEmpty>
             <CommandGroup>
-              {options.map((option) => (
-                <CommandItem
-                  key={option.value}
-                  value={option.label}
-                  keywords={[option.value]}
-                  onSelect={() => {
-                    onValueChange(option.value)
-                    setIsOpen(false)
-                  }}
-                  className="gap-x-2"
-                >
-                  <Check
-                    className={cn(
-                      'h-4 w-4 shrink-0',
-                      option.value === value ? 'opacity-100' : 'opacity-0'
+              <ScrollArea className="h-72" onWheel={(event) => event.stopPropagation()}>
+                {options.map((option) => (
+                  <CommandItem
+                    key={option.value}
+                    value={option.label}
+                    keywords={[option.value]}
+                    onSelect={() => {
+                      onValueChange(option.value)
+                      setIsOpen(false)
+                    }}
+                    className="gap-x-2"
+                  >
+                    <Check
+                      className={cn(
+                        'h-4 w-4 shrink-0',
+                        option.value === value ? 'opacity-100' : 'opacity-0'
+                      )}
+                    />
+                    {option.icon && (
+                      <span aria-hidden="true" className="flex shrink-0">
+                        <ConnectionIcon icon={option.icon} />
+                      </span>
                     )}
-                  />
-                  {option.icon && (
-                    <span aria-hidden="true" className="flex shrink-0">
-                      <ConnectionIcon icon={option.icon} />
-                    </span>
-                  )}
-                  <span className="truncate">{option.label}</span>
-                </CommandItem>
-              ))}
+                    <span className="truncate">{option.label}</span>
+                  </CommandItem>
+                ))}
+              </ScrollArea>
             </CommandGroup>
           </CommandList>
         </Command>
