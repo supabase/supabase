@@ -1,4 +1,3 @@
-import { BadgeCheck } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -157,14 +156,7 @@ export const OAuthAppsAuthorizeScreen = ({
       logo={
         <LogoPair left={<DestinationLogo name={request.app_name} />} right={<SupabaseLogo />} />
       }
-      title={
-        <span className="inline-flex items-center gap-1.5">
-          Authorize {request.app_name}
-          {request.is_verified && (
-            <BadgeCheck role="img" aria-label="Verified" className="size-4 text-brand" />
-          )}
-        </span>
-      }
+      title={`Authorize ${request.app_name}`}
       description="This application wants to access your Supabase Account"
     >
       <div className="flex flex-col gap-6 px-6 pb-6">
