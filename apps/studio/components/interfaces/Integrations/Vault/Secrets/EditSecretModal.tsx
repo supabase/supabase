@@ -144,7 +144,7 @@ export const EditSecretModal = () => {
                     name="name"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="name" label="Name">
+                      <FormItemLayout label="Name">
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -156,11 +156,7 @@ export const EditSecretModal = () => {
                     name="description"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout
-                        name="description"
-                        label="Description"
-                        labelOptional="Optional"
-                      >
+                      <FormItemLayout label="Description" labelOptional="Optional">
                         <FormControl>
                           <Input {...field} data-lpignore="true" />
                         </FormControl>
@@ -172,7 +168,7 @@ export const EditSecretModal = () => {
                     name="secret"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="secret" label="Secret value">
+                      <FormItemLayout label="Secret value">
                         <div className="relative">
                           <FormControl>
                             <Textarea

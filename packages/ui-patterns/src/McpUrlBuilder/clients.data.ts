@@ -13,6 +13,7 @@ import type {
   McpClientConfig,
   McpClientDeepLinkOptions,
   McpFeatureGroup,
+  OmpMcpConfig,
   OpenCodeMcpConfig,
   VSCodeMcpConfig,
   WindsurfMcpConfig,
@@ -361,6 +362,23 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     },
   },
   {
+    key: 'omp',
+    label: 'omp',
+    icon: 'omp',
+    configFile: '.omp/mcp.json',
+    externalDocsUrl: 'https://github.com/can1357/oh-my-pi/blob/main/docs/mcp-config.md',
+    transformConfig: (config): OmpMcpConfig => {
+      return {
+        mcpServers: {
+          supabase: {
+            type: 'http',
+            url: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+  },
+  {
     key: 'kiro',
     label: 'Kiro',
     icon: 'kiro',
@@ -449,6 +467,7 @@ export const MCP_CLIENT_GROUPS = [
       'opencode',
       'factory',
       'fx',
+      'omp',
     ],
   },
   {

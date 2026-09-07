@@ -730,7 +730,7 @@ commands:
     title: supabase sso remove
     summary: Remove an existing SSO identity provider
     description: |
-      Remove a connection to an already added SSO identity provider. Removing the provider will prevent existing users from logging in. Please treat this command with care.
+      Remove a connection to an already added SSO identity provider. Removing the provider will prevent existing users from signing in. Please treat this command with care.
     examples:
       - id: basic-usage
         name: Remove a provider
@@ -1085,7 +1085,7 @@ commands:
   - id: supabase-projects-list
     title: supabase projects list
     summary: List all Supabase projects
-    description: List all Supabase projects the logged-in user can access.
+    description: List all Supabase projects the signed-in user can access.
     tags: []
     links: []
     usage: supabase projects list
@@ -1346,7 +1346,7 @@ commands:
   - id: supabase-orgs-list
     title: supabase orgs list
     summary: List all organizations
-    description: List all organizations the logged-in user belongs.
+    description: List all organizations the signed-in user belongs to.
     tags: []
     links: []
     usage: supabase orgs list
@@ -1355,7 +1355,7 @@ commands:
   - id: supabase-orgs-create
     title: supabase orgs create
     summary: Create an organization
-    description: Create an organization for the logged-in user.
+    description: Create an organization for the signed-in user.
     tags: []
     links: []
     usage: supabase orgs create
@@ -1794,7 +1794,7 @@ commands:
     summary: Authenticate using an access token
     description: |2
 
-      Connect the Supabase CLI to your Supabase account by logging in with your [personal access token](https://supabase.com/dashboard/account/tokens).
+      Connect the Supabase CLI to your Supabase account by signing in with your [personal access token](https://supabase.com/dashboard/account/tokens).
 
       Your access token is stored securely in [native credentials storage](https://github.com/zalando/go-keyring#dependencies). If native credentials storage is unavailable, it will be written to a plain text file at `~/.supabase/access-token`.
 

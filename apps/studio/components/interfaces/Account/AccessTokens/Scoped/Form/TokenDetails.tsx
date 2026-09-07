@@ -59,7 +59,7 @@ export const TokenDetails = ({ control, setValue }: TokenDetailsProps) => {
         name="tokenName"
         control={control}
         render={({ field }) => (
-          <FormItemLayout name="tokenName" label="Name" layout="flex-row-reverse">
+          <FormItemLayout label="Name" layout="flex-row-reverse">
             <FormControl>
               <Input {...field} placeholder="e.g. CI deploy token" />
             </FormControl>

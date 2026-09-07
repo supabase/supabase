@@ -12,6 +12,7 @@ import { addAPIMock } from '@/tests/lib/msw'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse']
 type ProjectsResponse = components['schemas']['ListProjectsPaginatedResponse']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
 type CreateTokenResponse = components['schemas']['CreateScopedAccessTokenResponse']
 type CreateClassicTokenResponse = components['schemas']['CreateAccessTokenResponse']
 
@@ -81,6 +82,29 @@ const mockProjects = () =>
       }),
   })
 
+const mockOrgProjects = () =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/organizations/:slug/projects',
+    response: () =>
+      HttpResponse.json<OrganizationProjectsResponse>({
+        pagination: { count: 1, limit: 100, offset: 0 },
+        projects: [
+          {
+            cloud_provider: 'AWS',
+            databases: [],
+            inserted_at: new Date().toISOString(),
+            integration_source: null,
+            is_branch: false,
+            name: 'Project 1',
+            ref: 'project-1',
+            region: 'us-east-1',
+            status: 'ACTIVE_HEALTHY',
+          },
+        ],
+      }),
+  })
+
 const mockPermissionsMap = () =>
   addAPIMock({
     method: 'get',
@@ -145,6 +169,7 @@ describe('NewScopedTokenSheet', () => {
     mockPermissionsMap()
     mockOrganizations()
     mockProjects()
+    mockOrgProjects()
     mockCreateToken()
     mockCreateClassicToken()
   })
@@ -210,11 +235,102 @@ describe('NewScopedTokenSheet', () => {
     await waitFor(async () =>
       expect(await window.navigator.clipboard.readText()).toEqual('a_token_value')
     )
+    expect(mockTrack).toHaveBeenCalledWith('access_token_copied', { tokenType: 'scoped' })
     fireEvent.click(await screen.findByLabelText('I have copied the key and stored it securely'))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_stored_checkbox_clicked', {
+      tokenType: 'scoped',
+      isChecked: true,
+    })
     fireEvent.click(await screen.findByRole('button', { name: 'Done' }))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_done_button_clicked', {
+      tokenType: 'scoped',
+      hasCopiedToken: true,
+    })
     // Dialog has been closed
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    // Completing the flow via Done must not also emit a dismissed event
+    expect(mockTrack).not.toHaveBeenCalledWith(
+      'access_token_creation_sheet_dismissed',
+      expect.anything()
+    )
   }, 10_000)
+
+  test('tracks dismissal with the in-progress resourceAccess and touched state on Cancel', async () => {
+    renderSheet()
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    await screen.findByRole('dialog')
+    await user.click(await screen.findByRole('radio', { name: /Organization/ }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Cancel' }))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_creation_sheet_dismissed', {
+      resourceAccess: 'organization',
+      formStep: 'form',
+      isFormTouched: true,
+      trigger: 'user',
+    })
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  })
+
+  test('tracks dismissal with the untouched default resourceAccess on Escape', async () => {
+    renderSheet()
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.keyDown(dialog, { key: 'Escape', code: 'Escape' })
+    expect(mockTrack).toHaveBeenCalledWith('access_token_creation_sheet_dismissed', {
+      resourceAccess: 'project',
+      formStep: 'form',
+      isFormTouched: false,
+      trigger: 'user',
+    })
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  })
+
+  test('tracks the review step when the sheet is dismissed from the review screen', async () => {
+    renderSheet()
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    await screen.findByRole('dialog')
+    await user.type(await screen.findByLabelText('Name'), 'test')
+    fireEvent.click(await screen.findByRole('combobox', { name: 'Organization' }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Acme Production' }))
+    fireEvent.click(await screen.findByRole('combobox', { name: 'Projects' }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Project 1' }))
+    await expandPermissionCategory('Project')
+    fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Read' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
+    await screen.findByText('Medium risk')
+    fireEvent.click(await screen.findByRole('button', { name: 'Cancel' }))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_creation_sheet_dismissed', {
+      resourceAccess: 'project',
+      formStep: 'review',
+      isFormTouched: true,
+      trigger: 'user',
+    })
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  }, 10_000)
+
+  test('tracks a permissions load error as the dismissal trigger and closes the sheet', async () => {
+    addAPIMock({
+      method: 'get',
+      // @ts-expect-error Studio API is missing from types
+      path: '/scoped-access-token-permissions',
+      response: () => HttpResponse.json({ message: 'unavailable' }, { status: 500 }),
+    })
+    renderSheet()
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    await waitFor(() =>
+      expect(mockTrack).toHaveBeenCalledWith('access_token_creation_sheet_dismissed', {
+        resourceAccess: 'project',
+        formStep: 'form',
+        isFormTouched: false,
+        trigger: 'permissions_load_error',
+      })
+    )
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    const dismissedCalls = mockTrack.mock.calls.filter(
+      ([event]) => event === 'access_token_creation_sheet_dismissed'
+    )
+    expect(dismissedCalls).toHaveLength(1)
+  })
 
   // Organization scope tests
   test('requires an organization when scope is Organization', async () => {
@@ -426,8 +542,13 @@ describe('NewScopedTokenSheet', () => {
       expiryPreset: '7d',
       resourceAccess: 'account',
     })
+    expect(mockTrack).toHaveBeenCalledWith('access_token_copied', { tokenType: 'classic' })
     fireEvent.click(await screen.findByLabelText('I have copied the key and stored it securely'))
     fireEvent.click(await screen.findByRole('button', { name: 'Done' }))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_done_button_clicked', {
+      tokenType: 'classic',
+      hasCopiedToken: true,
+    })
     // Dialog has been closed
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   })
