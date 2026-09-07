@@ -195,14 +195,7 @@ export const OAuthAppsAuthorizeScreen = ({
           )}
 
           {hasProjects && (
-            <>
-              <ScopeGroupCard appName={request.app_name} scopeGroups={request.scope_groups} />
-
-              <Admonition
-                type="default"
-                description="Some clients may reuse one authorization across workspaces. Check your client's workspace or account settings if project access does not behave as expected."
-              />
-            </>
+            <ScopeGroupCard appName={request.app_name} scopeGroups={request.scope_groups} />
           )}
         </fieldset>
 
