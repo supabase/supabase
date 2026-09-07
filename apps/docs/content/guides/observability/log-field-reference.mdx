@@ -1,24 +1,37 @@
 ---
 id: 'logs-field-reference'
 title: 'Logs field reference'
-description: 'Supabase Logs field reference'
+description: 'Log sources, ClickHouse fields, and event capture limits'
 ---
 
-Use this reference to find the fields available for each log source. Query `id`, `timestamp`, `event_message`, and `source` as top-level columns. Other structured fields are keys in the `log_attributes` map: drop the `metadata.` prefix shown in the source schema and keep the rest of the dotted path.
+Each event is a row in the ClickHouse `logs` table. Filter the `source` column to select a service. The tables below list its fields; a field is not necessarily populated on every event.
 
-For example, the schema path `metadata.request.cf.country` is queried as `log_attributes['request.cf.country']`. See [Query and filter logs](/docs/guides/observability/advanced-log-filtering) for complete ClickHouse examples.
+`id`, `timestamp`, `event_message`, `severity_text`, and `source` are top-level columns. Service fields are string values in `log_attributes`, even when the original event contains a number or boolean. Use the **ClickHouse query field** column directly. See [Query logs with SQL](/docs/guides/observability/advanced-log-filtering) for casting and field discovery.
+
+## Capture limits
+
+- Hosted Postgres events longer than 100,000 characters and Edge Function log messages longer than 10,000 characters are truncated.
+- Internal Supabase service connection events are not recorded in hosted Postgres logs.
+- An Edge Function invocation uses `function_edge_logs`; its console output uses `function_logs`.
+- For [API Load Balancer](/docs/guides/platform/read-replicas#api-load-balancer) traffic, `log_attributes['load_balancer_redirect_identifier']` identifies the upstream database.
+
+## Fields by source
 
 <SharedData data="logConstants">
   {(logConstants) => (
     <Tabs scrollable size="small" type="underlined" defaultActiveId="edge_logs" queryGroup="source">
       {logConstants.schemas.map((schema) => (
         <TabPanel id={schema.reference} key={schema.reference} label={schema.name}>
+          <p>
+            Source: <code>{schema.reference}</code>
+          </p>
           <table>
             <thead>
               <tr>
                 <th className="font-bold">Schema path</th>
                 <th className="font-bold">ClickHouse query field</th>
-                <th className="font-bold">Type</th>
+                <th className="font-bold">Source type</th>
+                <th className="font-bold">Query value type</th>
               </tr>
             </thead>
             <tbody>
@@ -27,12 +40,9 @@ For example, the schema path `metadata.request.cf.country` is queried as `log_at
                 .map((field) => (
                   <tr key={field.path}>
                     <td className="font-mono">{field.path}</td>
-                    <td className="font-mono">
-                      {field.path.startsWith('metadata.')
-                        ? `log_attributes['${field.path.slice('metadata.'.length)}']`
-                        : field.path}
-                    </td>
+                    <td className="font-mono">{field.queryField}</td>
                     <td className="font-mono">{field.type}</td>
+                    <td className="font-mono">{field.queryType}</td>
                   </tr>
                 ))}
             </tbody>
