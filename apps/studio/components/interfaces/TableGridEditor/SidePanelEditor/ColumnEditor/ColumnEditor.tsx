@@ -60,6 +60,7 @@ import {
   ForeignKeyConstraint,
   useForeignKeyConstraintsQuery,
 } from '@/data/database/foreign-key-constraints-query'
+import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
 import type { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -108,10 +109,18 @@ export const ColumnEditor = ({
     getPlaceholderText(columnFields?.format, columnFields?.name)
   )
 
-  const { data: types } = useEnumeratedTypesQuery({
+  const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const schemaNames = (schemas ?? []).map((s) => s.name)
+
+  const { data: types } = useEnumeratedTypesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schemas: schemaNames,
+  })
+
   const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
   const enumTypes = (types ?? []).filter(
     (type) => !protectedSchemas.find((s) => s.name === type.schema)
