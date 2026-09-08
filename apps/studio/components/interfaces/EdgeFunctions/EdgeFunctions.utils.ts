@@ -1,10 +1,176 @@
-import path from 'path'
-
 import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
 import { EdgeFunctionBodyData } from '@/data/edge-functions/edge-function-body-query'
 
+// This file is bundled for both the browser (Next.js/webpack) and the TanStack Start (Vite) client,
+// which handle Node.js builtins differently — Vite stubs `path` out entirely for the browser, so
+// `path.posix` is undefined at runtime there even though it type-checks and builds fine under webpack.
+// These are self-contained posix path helpers (no `path` import) so behavior is identical everywhere.
+// Ported from the POSIX implementations in @std/path (JSR), which this file used to depend on directly.
+
+function isPosixSeparator(code: number | undefined): boolean {
+  return code === 47 /* '/' */
+}
+
+function stripTrailingSeparators(segment: string): string {
+  if (segment.length <= 1) return segment
+  let end = segment.length
+  for (let i = segment.length - 1; i > 0; i--) {
+    if (isPosixSeparator(segment.charCodeAt(i))) end = i
+    else break
+  }
+  return segment.slice(0, end)
+}
+
+// Resolves "." and ".." segments in a posix path.
+function normalizeString(path: string, allowAboveRoot: boolean): string {
+  let res = ''
+  let lastSegmentLength = 0
+  let lastSlash = -1
+  let dots = 0
+  let code: number | undefined
+
+  for (let i = 0; i <= path.length; ++i) {
+    if (i < path.length) code = path.charCodeAt(i)
+    else if (isPosixSeparator(code)) break
+    else code = 47
+
+    if (isPosixSeparator(code)) {
+      if (lastSlash === i - 1 || dots === 1) {
+        // noop
+      } else if (lastSlash !== i - 1 && dots === 2) {
+        if (
+          res.length < 2 ||
+          lastSegmentLength !== 2 ||
+          res.charCodeAt(res.length - 1) !== 46 /* '.' */ ||
+          res.charCodeAt(res.length - 2) !== 46 /* '.' */
+        ) {
+          if (res.length > 2) {
+            const lastSlashIndex = res.lastIndexOf('/')
+            if (lastSlashIndex === -1) {
+              res = ''
+              lastSegmentLength = 0
+            } else {
+              res = res.slice(0, lastSlashIndex)
+              lastSegmentLength = res.length - 1 - res.lastIndexOf('/')
+            }
+            lastSlash = i
+            dots = 0
+            continue
+          } else if (res.length === 2 || res.length === 1) {
+            res = ''
+            lastSegmentLength = 0
+            lastSlash = i
+            dots = 0
+            continue
+          }
+        }
+        if (allowAboveRoot) {
+          res += res.length > 0 ? '/..' : '..'
+          lastSegmentLength = 2
+        }
+      } else {
+        res += res.length > 0 ? '/' + path.slice(lastSlash + 1, i) : path.slice(lastSlash + 1, i)
+        lastSegmentLength = i - lastSlash - 1
+      }
+      lastSlash = i
+      dots = 0
+    } else if (code === 46 /* '.' */ && dots !== -1) {
+      ++dots
+    } else {
+      dots = -1
+    }
+  }
+
+  return res
+}
+
+// Normalizes an absolute posix path (resolves "." / ".."). Assumes `path` starts with "/".
+function resolveAbsolute(path: string): string {
+  const normalized = normalizeString(path, false)
+  return normalized.length > 0 ? '/' + normalized : '/'
+}
+
+function dirname(path: string): string {
+  if (path.length === 0) return '.'
+
+  let end = -1
+  let matchedNonSeparator = false
+  for (let i = path.length - 1; i >= 1; --i) {
+    if (isPosixSeparator(path.charCodeAt(i))) {
+      if (matchedNonSeparator) {
+        end = i
+        break
+      }
+    } else {
+      matchedNonSeparator = true
+    }
+  }
+
+  if (end === -1) return isPosixSeparator(path.charCodeAt(0)) ? '/' : '.'
+  return stripTrailingSeparators(path.slice(0, end))
+}
+
+// `from`/`to` must be absolute (leading "/"). Returns the relative path from `from` to `to`.
+function relative(from: string, to: string): string {
+  from = resolveAbsolute(from)
+  to = resolveAbsolute(to)
+  if (from === to) return ''
+
+  let fromStart = 1
+  const fromEnd = from.length
+  for (; fromStart < fromEnd; ++fromStart) {
+    if (!isPosixSeparator(from.charCodeAt(fromStart))) break
+  }
+  const fromLen = fromEnd - fromStart
+
+  let toStart = 1
+  const toEnd = to.length
+  for (; toStart < toEnd; ++toStart) {
+    if (!isPosixSeparator(to.charCodeAt(toStart))) break
+  }
+  const toLen = toEnd - toStart
+
+  const length = fromLen < toLen ? fromLen : toLen
+  let lastCommonSep = -1
+  let i = 0
+  for (; i <= length; ++i) {
+    if (i === length) {
+      if (toLen > length) {
+        if (isPosixSeparator(to.charCodeAt(toStart + i))) {
+          return to.slice(toStart + i + 1)
+        } else if (i === 0) {
+          return to.slice(toStart + i)
+        }
+      } else if (fromLen > length) {
+        if (isPosixSeparator(from.charCodeAt(fromStart + i))) {
+          lastCommonSep = i
+        } else if (i === 0) {
+          lastCommonSep = 0
+        }
+      }
+      break
+    }
+    const fromCode = from.charCodeAt(fromStart + i)
+    const toCode = to.charCodeAt(toStart + i)
+    if (fromCode !== toCode) break
+    else if (isPosixSeparator(fromCode)) lastCommonSep = i
+  }
+
+  let out = ''
+  for (i = fromStart + lastCommonSep + 1; i <= fromEnd; ++i) {
+    if (i === fromEnd || isPosixSeparator(from.charCodeAt(i))) {
+      out += out.length === 0 ? '..' : '/..'
+    }
+  }
+
+  if (out.length > 0) return out + to.slice(toStart + lastCommonSep)
+
+  let start = toStart + lastCommonSep
+  if (isPosixSeparator(to.charCodeAt(start))) ++start
+  return to.slice(start)
+}
+
 // Longest common path prefix across `paths`, comparing "/"-separated segments.
-// No Node.js built-in for this; mirrors the semantics of the JSR `@std/path` `common()` we used to depend on.
 function commonPath(paths: string[]): string {
   const [first = '', ...rest] = paths
   const parts = first.split('/')
@@ -71,10 +237,10 @@ function getBasePath(entrypoint: string | undefined, fileNames: string[]): strin
   let candidate = fileNames.find((name) => entrypoint.endsWith(name))
 
   if (candidate) {
-    return path.posix.dirname(candidate)
+    return dirname(candidate)
   } else {
     try {
-      return path.posix.dirname(new URL(entrypoint).pathname)
+      return dirname(new URL(entrypoint).pathname)
     } catch (e) {
       console.error('Failed to parse entrypoint', entrypoint)
       return '/'
@@ -109,7 +275,7 @@ export const formatFunctionBodyToFiles = ({
           }
 
           // prepend "/" to turn relative paths to absolute
-          file.name = path.posix.relative('/' + base_path, '/' + file.name)
+          file.name = relative('/' + base_path, '/' + file.name)
           return file
         } catch (e) {
           console.error(e)
