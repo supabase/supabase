@@ -73,7 +73,7 @@ describe('ConnectConfigSection', () => {
     await user.type(screen.getByPlaceholderText('Search frameworks...'), 'nextjs')
 
     expect(screen.getByRole('option', { name: 'Next.js' })).toBeInTheDocument()
-    expect(screen.getByRole('status')).toHaveTextContent('')
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
   })
 
   test('announces when no frameworks match the search', async () => {
