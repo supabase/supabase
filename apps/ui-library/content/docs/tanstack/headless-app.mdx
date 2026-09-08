@@ -3,166 +3,296 @@ title: Headless App
 description: A backend your customers can use through their agents
 ---
 
-A headless app exposes its product features through MCP tools. Your customers
-sign in, authorize their agent, and use it to interact with your backend on
-their behalf. This block combines sign-in, OAuth consent, an MCP server, and a
-page to connect agents and revoke their access.
+Let customers authorize their own MCP clients to use your product on their
+behalf. This block provides the account and consent pages, an authenticated MCP
+endpoint, and a page for customers to view and revoke authorizations. An example
+tasks schema and four task tools show how to add your product's behavior.
 
-Postgres carries the rules. Write them once as RLS policies, triggers, and
-constraints, and every agent call inherits them. The MCP server passes the
-user's own access token through to the database, so an agent acts as that user
-and cannot reach past what they are allowed to see.
+An agent calls a tool with the customer's access token. The MCP server verifies
+that token and gives the tool a user-scoped Supabase client. Database grants and
+Row Level Security (RLS) determine which rows that client can access.
 
 <BlockPreview name="headless-app" />
 
-## Installation
+## What you get
+
+| Part                                                              | Included behavior                                                               |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| [Password-Based Auth](/library/docs/tanstack/password-based-auth) | Sign-up, sign-in, password recovery, and protected routes                       |
+| [OAuth Consent](/library/docs/tanstack/oauth-consent)             | Approve or deny an external client's authorization request                      |
+| [MCP Server](/library/docs/headless/mcp-server)                   | An Edge Function with OAuth discovery, token verification, and a `whoami` tool  |
+| `/agents`                                                         | Copy the server URL, refresh the list of authorized clients, and revoke grants  |
+| `supabase/schemas/public/tables/tasks.sql`                        | A declarative example table with per-user RLS, API grants, and title validation |
+| `supabase/functions/mcp-server/tools/tasks.ts`                    | List, create, update, and delete the signed-in customer's tasks                 |
+
+`whoami` verifies the connection without reading the database. The task tools
+exercise database access and RLS. This is a block for an existing TanStack Start app, not a
+standalone app template or a general-purpose SQL endpoint.
+
+## Install
+
+You need a TanStack Start app with [shadcn/ui configured](https://ui.shadcn.com/docs/installation/tanstack),
+a running Docker-compatible container runtime, the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started),
+and Deno 2.7 or later. The local signing-key commands below were checked with
+Supabase CLI 2.116.
 
 <BlockItem name="headless-app-tanstack" showOpenInV0={false} />
 
-It installs the [Password-Based Auth](/library/docs/tanstack/password-based-auth),
-[OAuth Consent](/library/docs/tanstack/oauth-consent), and
-[MCP Server](/library/docs/headless/mcp-server) blocks, along with a complete
-`supabase/config.toml`.
-
-Start with a TanStack Start app configured for the library. If you already have
-a Supabase project, merge the supplied config with your existing settings.
-
-## Folder structure
+The auth, consent, and Supabase client blocks install as dependencies. The
+shared MCP runtime is included with the task tools already registered.
+Keep the installed routes in your app's configured TanStack routes directory.
+If you already have `supabase/config.toml`, merge the block's settings with it
+rather than replacing your project configuration.
 
 <RegistryBlock itemName="headless-app-tanstack" />
 
-## Set up
+## Run locally
 
-1. Set `site_url` and `additional_redirect_urls` in `supabase/config.toml` to
-   the origin serving your app. The included settings use `http://localhost:3000`.
-   Start the local stack and create the initial migration:
+Run these commands from your app's project root unless a step changes directory.
+This path uses a local Supabase stack and an MCP client running on your computer.
+For a remote client that cannot reach your computer, use the deployed endpoints
+in [Deploy](#deploy).
 
-   ```bash
-   supabase start
-   supabase db diff -f create_tasks
-   supabase migration up
-   ```
+### 1. Configure Auth before starting the stack
 
-   Review the generated migration before applying it. Starting the stack alone
-   does not apply the declarative schema files.
+The supplied config enables password sign-up, OAuth, dynamic client registration,
+and MCP token verification inside the function (`verify_jwt = false` at the
+gateway). Its app origin is `http://localhost:3000`. Update `auth.site_url` and
+`auth.additional_redirect_urls` if your app uses another origin.
 
-2. Add your project's URL and publishable key to `.env.local`:
+The MCP server requires asymmetric JWTs. The supplied `[auth]` section points
+to a local key file. Include this setting if you are merging into an existing
+config:
 
-   ```env
-   VITE_SUPABASE_URL=
-   VITE_SUPABASE_PUBLISHABLE_KEY=
-   ```
+```toml
+signing_keys_path = "./signing_keys.json"
+```
 
-   Find them in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=react&using=vite&with=supabasejs),
-   or run `supabase status` against a local stack.
+For a new local project, create the key file and generate a signing key once:
 
-3. Name your product. Set `PRODUCT_NAME` in `routes/_protected/agents.tsx` and
-   the `productName` prop in `routes/oauth/consent.tsx`.
+```bash
+echo '[]' > supabase/signing_keys.json
+supabase gen signing-key --algorithm ES256 --append
+```
 
-4. Use asymmetric JWT signing keys (ES256 or RS256). The MCP server verifies
-   tokens through the project's JWKS endpoint, so legacy HS256 tokens cannot
-   authenticate. For a hosted project, configure this in
-   [JWT Keys](https://supabase.com/dashboard/project/_/settings/jwt). For a local
-   stack, generate a key with the [CLI signing key command](https://supabase.com/docs/reference/cli/supabase-gen-signing-key)
-   and configure `auth.signing_keys_path` before restarting the stack.
+The CLI appends a private key to the JSON array in that file. If you already have
+local signing keys configured, keep them and skip generation. Add
+`supabase/signing_keys.json` and `supabase/functions/.env` to `.gitignore`.
 
-5. Copy the MCP server's environment template and check the function:
+### 2. Create the example database
 
-   ```bash
-   cp supabase/functions/mcp-server/.env.example supabase/functions/.env
-   cd supabase/functions/mcp-server
-   deno task check
-   cd ../../..
-   ```
+```bash
+supabase start
+supabase db diff -f create_tasks
+```
 
-   Set `MCP_SERVER_NAME` and `MCP_SERVER_DESCRIPTION` in `supabase/functions/.env`
-   to describe your product. Serve the function:
+Review the generated file in `supabase/migrations/`, then apply it:
 
-   ```bash
-   supabase functions serve mcp-server --env-file supabase/functions/.env
-   ```
+```bash
+supabase migration up
+supabase status
+```
 
-   In a separate terminal, start the app:
+Starting the stack does not apply declarative schema files directly. The
+migration creates `public.tasks`, its grants, and its RLS policies.
 
-   ```bash
-   npm run dev
-   ```
+### 3. Configure the app and function
 
-6. Sign up, open `/agents`, and connect an MCP client using the displayed URL
-   or prompt. Clients that support dynamic registration can register themselves
-   and send you to `/oauth/consent`. Approve the request, then call `whoami` to
-   verify the connected user's identity. Refresh `/agents` to see the grant.
+Use the local API URL and **publishable key** from `supabase status` in
+`.env.local`. These must point to the same Supabase project as the MCP function:
 
-   A client running on your computer can use the local endpoint. Remote clients
-   need publicly reachable HTTPS URLs for the MCP server, Supabase Auth, and
-   consent page; use the deployed app for those clients.
+```env
+VITE_SUPABASE_URL=http://127.0.0.1:54321
+VITE_SUPABASE_PUBLISHABLE_KEY=<local-publishable-key>
+VITE_PRODUCT_NAME="Your product"
+```
 
-## Shape the backend
+`VITE_PRODUCT_NAME` labels both the agents page and consent screen. Restart the
+app after changing environment variables.
 
-`supabase/schemas/` holds the database as declarative SQL. Edit these files to
-define whatever you want agents working within: tables, policies, triggers,
-functions. Then generate and apply the migration.
+Copy the function's environment template:
+
+```bash
+cp supabase/functions/mcp-server/.env.example supabase/functions/.env
+```
+
+In that file, set `MCP_SERVER_NAME` to a short identifier for your product and
+`MCP_SERVER_DESCRIPTION` to describe what it does. These are the name and
+instructions MCP clients receive; they do not change the app's branding.
+
+### 4. Check and serve the function
+
+```bash
+cd supabase/functions/mcp-server
+deno task check
+cd ../../..
+supabase functions serve mcp-server --env-file supabase/functions/.env
+```
+
+Leave that process running. In a separate terminal, start your TanStack app:
+
+```bash
+npm run dev
+```
+
+### 5. Authorize a client and verify the connection
+
+1. Sign up or sign in to the app, then open `/agents`.
+2. Copy the server URL into your MCP client's server settings. Choose Streamable HTTP
+   transport and OAuth if the client asks. A client may also support adding a
+   server through chat; **Copy prompt** provides instructions for that case.
+3. Start the client's authorization flow. Supabase sends the browser to
+   `/oauth/consent?authorization_id=...`; sign in if prompted, then approve.
+4. Call `whoami`. Its `id` should match the customer who approved access, and
+   `client_id` should identify the OAuth client. `email` can be null.
+5. Call `create_task` with `{"title":"Try my agent-compatible app"}`, then
+   `list_tasks` with `{}`. The new task should appear. Use its returned `id` to
+   call `update_task` with `{"id":"<task-id>","closed":true}`.
+6. Return to `/agents`. The list refreshes when the page regains focus. Use
+   **Refresh** to retry or check again.
+
+Use the MCP URL, not the consent page URL, when configuring a client:
+
+```text
+http://127.0.0.1:54321/functions/v1/mcp-server
+```
+
+Clients must support remote MCP over HTTP and OAuth authorization. Dynamic
+registration lets compatible clients register themselves. If you turn off
+`auth.oauth_server.allow_dynamic_registration`, register each client yourself
+and configure it with that client ID.
+
+The list shows OAuth authorizations, not whether an agent is currently online.
+Revoking a grant prevents token refresh. The MCP server verifies JWTs without
+checking each grant, so an already-issued access token can continue to work until
+it expires. See [OAuth grant management](https://supabase.com/docs/guides/auth/oauth-server/oauth-flows#managing-user-grants).
+
+## Add your product's behavior
+
+### Example tools
+
+All four tools are registered in `supabase/functions/mcp-server/tools/index.ts`.
+They use the caller's Supabase client and return structured JSON with a text
+fallback for MCP clients.
+
+| Tool          | Input                                                                    | Result                                 |
+| ------------- | ------------------------------------------------------------------------ | -------------------------------------- |
+| `list_tasks`  | Optional `closed`, `limit` (1–100, default 20), and `offset` (default 0) | `{ tasks, next_offset }`, newest first |
+| `create_task` | `title` (1–200 characters after trimming)                                | `{ task }` with `closed: false`        |
+| `update_task` | Task `id` and at least one of `title` or `closed`                        | `{ task }` with the changes applied    |
+| `delete_task` | Task `id`                                                                | `{ deleted: true, id }`                |
+
+Each returned task has `id`, `title`, `closed`, and `created_at`. Task IDs must be
+UUIDs. Inputs reject unknown fields, including `user_id`: the database assigns
+ownership from the caller's token. A missing or inaccessible task produces the
+same error, so the tools do not reveal whether another user's task exists.
+
+For another page, pass `next_offset` as `offset` with the same filter and limit;
+`null` means the end. Pagination is not a snapshot: changes between calls can
+shift rows, so start again at offset 0 to refresh the list.
+
+`delete_task` permanently removes a row. Close completed tasks with `update_task`
+when you want to retain them. `create_task` creates a new row on every successful
+call; it has no idempotency key. The tool annotations describe these side effects
+to clients but do not enforce approval or authorization.
+
+### Database rules
+
+The schema follows pg-delta's per-object layout:
+
+```text
+supabase/schemas/
+└── public/
+    └── tables/
+        └── tasks.sql  # Table, index, grants, and RLS policies
+```
+
+`supabase/config.toml` includes this path through
+`db.migrations.schema_paths`. The SQL declares the desired schema; it is not a
+seed file or a migration. Create sample data through `create_task` after signing
+in so it belongs to a real customer account.
+
+Edit `supabase/schemas/`, then generate, review, and apply a migration:
 
 ```bash
 supabase db diff -f add_task_due_date
+# Review the new file in supabase/migrations/ before continuing.
 supabase migration up
 ```
 
-The included `public/tables/tasks.sql` declares a `tasks` table with Row Level
-Security, so each user reaches only their own rows. Add new objects beside it,
-one file per object. Make every change here rather than in Studio or the SQL
-editor, since the diff reads these files and not the live database.
+For this declarative setup, the schema files are the source of truth. Changes
+made only in Studio or the SQL editor are not captured by the schema diff.
+Include both role grants and RLS policies when adding tables: a policy does not
+itself grant Data API access.
 
-The schema grants task operations to `authenticated` explicitly. Include the
-required role grants when adding tables; RLS policies alone do not expose them
-through the Data API.
+The supplied policies restrict `tasks` to rows whose `user_id` matches the
+caller. They also prevent a user from assigning a task to someone else. The
+table rejects blank titles and titles longer than 200 characters, including
+writes made directly through the Data API.
 
-## Add tools
+### MCP tools
 
-Out of the box the server exposes one tool, `whoami`. Add the rest in
-`supabase/functions/mcp-server/tools/`. Each tool runs as the signed-in user, so
-the policies in your schema decide what an agent can reach. See the
-[MCP Server block](/library/docs/headless/mcp-server) for the tool template.
+Use `tools/tasks.ts` as the starting point for your own tools. Add modules in
+`supabase/functions/mcp-server/tools/` and register each one in `tools/index.ts`.
+For a new database field, update both the declarative schema and the tool's
+input validation and query. Generate and apply the migration before calling
+the updated tool.
 
-The sample `tasks` table is a starting schema; it is not exposed as an MCP tool
-until you register tools for it. OAuth scopes control identity information,
-not access to tables or tools. Enforce product permissions in RLS and in each
-tool's business logic. The server also accepts ordinary product session tokens,
-which do not carry an OAuth `client_id`.
+Use the `supabase` client provided in `ToolContext` for database calls. Define
+product-specific checks in your tool and database policies. OAuth identity
+scopes such as `openid`, `email`, and `profile` do not restrict which tools or
+rows a client can use.
+
+The server also accepts ordinary Supabase product session tokens, which do not
+have an OAuth `client_id`. If you add client-specific policies, decide how those
+product sessions should behave. See [Token security and RLS](https://supabase.com/docs/guides/auth/oauth-server/token-security).
+
+After adding tools, run `deno task check` from the function directory, restart or
+redeploy the function, and refresh the client's tool list. Test with two users
+to confirm that each can access only their own data.
 
 ## Deploy
 
-There are two things to deploy. First, update `site_url` and
-`additional_redirect_urls` in `supabase/config.toml` for your production domain,
-and enable email confirmations under `[auth.email]`. The supplied settings are
-for local development. Then deploy the Supabase project:
+Remote clients need reachable HTTPS endpoints for the app, Supabase Auth, and
+MCP server. Deploy the TanStack Start app with your host's supported server
+runtime, then configure the hosted Supabase project:
 
-```bash
-supabase link
-supabase db push
-supabase config push
-supabase functions deploy mcp-server
-```
+1. Set the app's `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` to the
+   hosted project's values and set `VITE_PRODUCT_NAME`. Rebuild the app with
+   those values.
+2. In `supabase/config.toml`, set the Auth Site URL and redirect allowlist to
+   your deployed app and enable `auth.email.enable_confirmations`. Complete the
+   [auth block's email-template setup](/library/docs/tanstack/password-based-auth).
+3. Configure ES256 or RS256 signing keys in the hosted project's
+   [JWT Keys](https://supabase.com/dashboard/project/_/settings/jwt).
+   Local `signing_keys.json` is not your hosted signing-key configuration.
+4. Link and deploy the database, Auth configuration, and function:
 
-Set `MCP_SERVER_NAME` and `MCP_SERVER_DESCRIPTION` as Edge Function secrets if
-you customized them locally. The local `.env` file is not deployed.
+   ```bash
+   supabase link
+   supabase db push
+   supabase config push
+   supabase functions deploy mcp-server
+   ```
 
-Then the app. Push it to Git and import the repository into
-[Vercel](https://vercel.com/new), which detects TanStack Start without extra
-build configuration, and add `VITE_SUPABASE_URL` and
-`VITE_SUPABASE_PUBLISHABLE_KEY` as environment variables. See
-[Vercel's TanStack Start guide](https://vercel.com/docs/frameworks/full-stack/tanstack-start)
-for the Nitro plugin your `vite.config.ts` needs.
+Set `MCP_SERVER_NAME` and `MCP_SERVER_DESCRIPTION` as hosted Edge Function
+secrets if you customized them; the local `.env` file is not deployed. Repeat
+the authorization and `whoami` check using the hosted URL from `/agents`.
 
-Finish by setting the Auth **Site URL** to your deployed domain, so agents land
-on the deployed consent screen.
+## Troubleshooting
 
-Confirm the hosted project also uses asymmetric signing keys before connecting
-an agent.
+| Symptom                                               | Check                                                                                                                                                        |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A remote client cannot reach the server               | A remote service cannot use your `localhost` URL. Deploy the app and function and use their HTTPS URLs.                                                      |
+| Consent opens on the wrong app                        | Auth Site URL must point to the app serving `/oauth/consent`, not the Supabase API URL.                                                                      |
+| `/oauth/consent` reports a missing `authorization_id` | Start authorization from the MCP client. Opening the consent route directly does not create an authorization request.                                        |
+| Calls return `401` after authorization                | Confirm the app and function use the same Supabase project, the project uses asymmetric signing keys, and `[functions.mcp-server]` has `verify_jwt = false`. |
+| `whoami` works but task tools are missing             | Check that `tools/index.ts` calls `registerTaskTools`. Restart or redeploy the headless app's function and refresh the client's tool list.                   |
+| Task tools report that `tasks` does not exist         | Generate and apply the migration from `supabase/schemas/`. `whoami` does not check database setup.                                                           |
+| A tool returns a table permission error               | Apply the generated migration and check the `authenticated` role's grants as well as the RLS policies.                                                       |
 
 ## Further reading
 
 - [MCP Server block](/library/docs/headless/mcp-server)
 - [OAuth Consent block](/library/docs/tanstack/oauth-consent)
 - [MCP authentication](https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication)
-- [Token security and RLS](https://supabase.com/docs/guides/auth/oauth-server/token-security)

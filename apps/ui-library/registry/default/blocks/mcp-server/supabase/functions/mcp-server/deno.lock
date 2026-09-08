@@ -6,7 +6,8 @@
     "npm:@supabase/server@1.5.0-rc.114": "1.5.0-rc.114_@supabase+supabase-js@2.108.2",
     "npm:@supabase/server@1.5.1": "1.5.1_@supabase+supabase-js@2.108.2",
     "npm:@supabase/supabase-js@2.108.2": "2.108.2",
-    "npm:openai@^4.52.5": "4.104.0"
+    "npm:openai@^4.52.5": "4.104.0_zod@4.4.3",
+    "npm:zod@4.4.3": "4.4.3"
   },
   "jsr": {
     "@supabase/functions-js@2.108.2": {
@@ -279,7 +280,7 @@
         "whatwg-url"
       ]
     },
-    "openai@4.104.0": {
+    "openai@4.104.0_zod@4.4.3": {
       "integrity": "sha512-p99EFNsA/yX6UhVO93f5kJsDRLAg+CTA2RBqdHK4RtK8u5IJw32Hyb2dTGKbnnFmnuoBv5r7Z2CURI9sGZpSuA==",
       "dependencies": [
         "@types/node",
@@ -288,7 +289,11 @@
         "agentkeepalive",
         "form-data-encoder",
         "formdata-node",
-        "node-fetch"
+        "node-fetch",
+        "zod"
+      ],
+      "optionalPeers": [
+        "zod"
       ],
       "bin": true
     },

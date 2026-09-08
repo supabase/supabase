@@ -3,14 +3,26 @@
   "type": "registry:block",
   "title": "Headless App for TanStack Start",
   "description": "A backend your customers can use through their agents: sign-in, OAuth consent, an MCP server, and connected agent management.",
-  "docs": "Set `site_url` and `additional_redirect_urls` in `supabase/config.toml` to your app origin, and use asymmetric JWT signing keys (ES256 or RS256). Set `PRODUCT_NAME` in `routes/_protected/agents.tsx` and `productName` in `routes/oauth/consent.tsx`. Start the local stack, generate the initial migration with `supabase db diff -f create_tasks`, review it, and apply it with `supabase migration up`. Copy `supabase/functions/mcp-server/.env.example` to `supabase/functions/.env` and run `deno task check` from the function directory before serving it. Add tools in `supabase/functions/mcp-server/tools/`, then sign in and open `/agents` to connect an agent. Before deploying, configure your production Auth URLs and email confirmations; see https://supabase.com/library/docs/tanstack/headless-app for the full setup.",
+  "docs": "Follow https://supabase.com/library/docs/tanstack/headless-app to configure local JWT signing keys, apply the declarative tasks schema, and serve the MCP function. Set `VITE_PRODUCT_NAME`, `VITE_SUPABASE_URL`, and `VITE_SUPABASE_PUBLISHABLE_KEY` in `.env.local`. Open `/agents` to copy the MCP URL, authorize a client, and verify the connection with `whoami`. The server includes list_tasks, create_task, update_task, and delete_task, scoped to the signed-in user through RLS. Merge `supabase/config.toml` with existing project settings before applying it.",
+  "envVars": {
+    "VITE_PRODUCT_NAME": "Your product"
+  },
   "registryDependencies": [
     "button",
     "https://supabase.com/library/r/password-based-auth-tanstack.json",
-    "https://supabase.com/library/r/oauth-consent-tanstack.json",
-    "https://supabase.com/library/r/mcp-server.json"
+    "https://supabase.com/library/r/oauth-consent-tanstack.json"
   ],
   "files": [
+    {
+      "path": "registry/default/blocks/headless-app-tanstack/supabase/functions/mcp-server/tools/index.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/index.ts"
+    },
+    {
+      "path": "registry/default/blocks/headless-app-tanstack/supabase/functions/mcp-server/tools/tasks.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/tasks.ts"
+    },
     {
       "path": "registry/default/blocks/headless-app-tanstack/routes/_protected/agents.tsx",
       "type": "registry:file",

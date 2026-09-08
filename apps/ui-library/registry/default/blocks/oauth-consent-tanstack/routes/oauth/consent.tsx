@@ -1,3 +1,4 @@
+/// <reference types="vite/types/importMeta.d.ts" />
 import { createFileRoute } from '@tanstack/react-router'
 
 import { OAuthConsent } from '@/registry/default/blocks/oauth-consent/components/oauth-consent'
@@ -21,6 +22,7 @@ function ConsentPage() {
         className="w-full max-w-lg"
         authorizationId={authorization_id}
         signInPath="/login"
+        productName={import.meta.env.VITE_PRODUCT_NAME?.trim() || 'Your product'}
       />
     </main>
   )

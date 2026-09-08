@@ -35,7 +35,10 @@ if (next?.startsWith('/') && !next.startsWith('//')) {
 }
 ```
 
-Set the `productName` prop to replace the `Your product` placeholder in the consent header.
+Set `VITE_PRODUCT_NAME` in `.env.local` to replace the `Your product` placeholder
+in the consent header. The [Headless App](/library/docs/tanstack/headless-app) uses
+the same value for its agents page. For a custom value in code, change the
+`productName` prop in `routes/oauth/consent.tsx`.
 
 ### Getting started
 

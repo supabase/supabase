@@ -1,5 +1,5 @@
 import { Check, Copy } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { cn } from '@/lib/utils'
 import {
@@ -9,42 +9,86 @@ import {
 import { Button } from '@/registry/default/components/ui/button'
 
 const buildPrompt = (productName: string, mcpServerUrl: string) =>
-  `Connect to ${productName} using this MCP server:\n\n${mcpServerUrl}\n\nThen list the tools it gives you.`
+  `Connect to ${productName} using this MCP server:\n\n${mcpServerUrl}\n\nUse your MCP connection setup to authorize access in my browser. Then call whoami to verify the connection and list the available tools.`
 
 const formatDate = (value: string) =>
   new Date(value).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
 
-function ConnectPrompt({ prompt }: { prompt: string }) {
-  const [copied, setCopied] = useState(false)
+function ConnectAgent({
+  productName,
+  mcpServerUrl,
+}: {
+  productName: string
+  mcpServerUrl: string
+}) {
+  const [copied, setCopied] = useState<'url' | 'prompt' | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  const copy = async () => {
-    await navigator.clipboard.writeText(prompt)
-    setCopied(true)
-    window.setTimeout(() => setCopied(false), 2000)
+  useEffect(() => {
+    if (!copied) return
+    const timeout = window.setTimeout(() => setCopied(null), 2000)
+    return () => window.clearTimeout(timeout)
+  }, [copied])
+
+  const copy = async (type: 'url' | 'prompt') => {
+    setError(null)
+    try {
+      await navigator.clipboard.writeText(
+        type === 'url' ? mcpServerUrl : buildPrompt(productName, mcpServerUrl)
+      )
+      setCopied(type)
+    } catch {
+      setCopied(null)
+      setError('Unable to copy. Select and copy the server URL above.')
+    }
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border bg-muted">
-      <pre className="overflow-x-auto whitespace-pre-wrap p-4 font-mono text-sm leading-relaxed">
-        {prompt}
-      </pre>
-      <div className="flex justify-end border-t p-2">
-        <Button type="button" size="sm" variant="outline" onClick={() => void copy()}>
-          {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
-          {copied ? 'Copied' : 'Copy prompt'}
-        </Button>
+    <section className="flex flex-col gap-3" aria-label="Connect an agent">
+      <h2 className="font-medium">Connect an agent</h2>
+      <p className="text-sm text-muted-foreground">
+        Add this server URL in your agent’s MCP settings, then sign in and approve access.
+      </p>
+      <div className="overflow-hidden rounded-lg border bg-muted">
+        <pre className="overflow-x-auto whitespace-pre-wrap break-all p-4 font-mono text-sm">
+          {mcpServerUrl}
+        </pre>
+        <div className="flex flex-wrap justify-end gap-2 border-t p-2">
+          <Button type="button" size="sm" variant="outline" onClick={() => void copy('prompt')}>
+            {copied === 'prompt' ? 'Prompt copied' : 'Copy prompt'}
+          </Button>
+          <Button type="button" size="sm" variant="outline" onClick={() => void copy('url')}>
+            {copied === 'url' ? <Check className="size-4" /> : <Copy className="size-4" />}
+            {copied === 'url' ? 'URL copied' : 'Copy URL'}
+          </Button>
+        </div>
       </div>
-    </div>
+      <p className="text-xs text-muted-foreground">
+        Use the prompt if your agent supports adding MCP servers through chat.
+      </p>
+      {copied && (
+        <span role="status" className="sr-only">
+          Copied to clipboard
+        </span>
+      )}
+      {error && (
+        <p role="alert" className="text-sm text-destructive">
+          {error}
+        </p>
+      )}
+    </section>
   )
 }
 
 function GrantRow({
   grant,
   isRevoking,
+  disabled,
   onRevoke,
 }: {
   grant: OAuthGrant
   isRevoking: boolean
+  disabled: boolean
   onRevoke: () => void
 }) {
   return (
@@ -52,11 +96,11 @@ function GrantRow({
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="truncate font-medium">{grant.client.name}</span>
         <span className="truncate text-muted-foreground">
-          Connected {formatDate(grant.granted_at)}
+          Authorized {formatDate(grant.granted_at)}
           {grant.scopes.length > 0 && ` · ${grant.scopes.join(', ')}`}
         </span>
       </div>
-      <Button type="button" size="sm" variant="outline" disabled={isRevoking} onClick={onRevoke}>
+      <Button type="button" size="sm" variant="outline" disabled={disabled} onClick={onRevoke}>
         {isRevoking ? 'Revoking access...' : 'Revoke access'}
       </Button>
     </li>
@@ -70,10 +114,10 @@ export interface ConnectedAgentsViewProps extends React.ComponentPropsWithoutRef
   isLoading?: boolean
   error?: string | null
   revokingClientId?: string | null
+  onRefresh?: () => void
   onRevoke?: (clientId: string) => void
 }
 
-// The presentational half, so a preview can render either state with fixed data.
 export function ConnectedAgentsView({
   mcpServerUrl,
   productName = 'this app',
@@ -81,51 +125,72 @@ export function ConnectedAgentsView({
   isLoading = false,
   error = null,
   revokingClientId = null,
+  onRefresh,
   onRevoke,
   className,
   ...props
 }: ConnectedAgentsViewProps) {
-  const hasGrants = grants !== null && grants.length > 0
-
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
-      {/* Typography matches CardTitle and CardDescription, without a card around it. */}
       <div className="flex flex-col space-y-1.5">
         <h1 className="text-2xl font-semibold leading-none tracking-tight">Connected agents</h1>
         <p className="text-sm text-muted-foreground">
-          {hasGrants
-            ? `Agents you authorized to use ${productName} on your behalf.`
-            : 'No agents yet. Paste this prompt into an agent to connect it.'}
+          Authorize agents to use {productName} on your behalf.
         </p>
       </div>
 
-      {isLoading && (
-        <p role="status" className="text-sm text-muted-foreground">
-          Loading connected agents...
-        </p>
-      )}
+      <ConnectAgent productName={productName} mcpServerUrl={mcpServerUrl} />
 
-      {grants &&
-        (hasGrants ? (
+      <section className="flex flex-col gap-3" aria-label="Authorized agents">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="font-medium">Authorized agents</h2>
+          {onRefresh && (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={isLoading || revokingClientId !== null}
+              onClick={onRefresh}
+            >
+              {isLoading ? 'Refreshing...' : 'Refresh'}
+            </Button>
+          )}
+        </div>
+        {isLoading && (
+          <p role="status" className="text-sm text-muted-foreground">
+            Loading connected agents...
+          </p>
+        )}
+        {grants && grants.length > 0 && (
           <ul className="divide-y rounded-lg border bg-muted text-sm">
             {grants.map((grant) => (
               <GrantRow
                 key={grant.client.id}
                 grant={grant}
                 isRevoking={revokingClientId === grant.client.id}
+                disabled={isLoading || revokingClientId !== null || !onRevoke}
                 onRevoke={() => onRevoke?.(grant.client.id)}
               />
             ))}
           </ul>
-        ) : (
-          <ConnectPrompt prompt={buildPrompt(productName, mcpServerUrl)} />
-        ))}
-
-      {error && (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
-      )}
+        )}
+        {!isLoading && !error && grants?.length === 0 && (
+          <p className="text-sm text-muted-foreground">
+            No agents authorized yet. Connect an agent using the server URL above.
+          </p>
+        )}
+        {error && (
+          <p role="alert" className="text-sm text-destructive">
+            {error}
+          </p>
+        )}
+        {grants && grants.length > 0 && (
+          <p className="text-xs text-muted-foreground">
+            Revoking access prevents an agent from renewing its session. Its current access token
+            may work until it expires.
+          </p>
+        )}
+      </section>
     </div>
   )
 }
@@ -136,7 +201,7 @@ interface ConnectedAgentsProps extends React.ComponentPropsWithoutRef<'div'> {
 }
 
 export function ConnectedAgents(props: ConnectedAgentsProps) {
-  const { grants, error, isLoading, revokingClientId, revoke } = useOAuthGrants()
+  const { grants, error, isLoading, revokingClientId, refresh, revoke } = useOAuthGrants()
 
   return (
     <ConnectedAgentsView
@@ -144,6 +209,7 @@ export function ConnectedAgents(props: ConnectedAgentsProps) {
       error={error}
       isLoading={isLoading}
       revokingClientId={revokingClientId}
+      onRefresh={() => void refresh()}
       onRevoke={(clientId) => void revoke(clientId)}
       {...props}
     />

@@ -49,6 +49,18 @@ const reactClient = clients.find((client) => client.name === 'supabase-client-re
 const tanstackClient = clients.find((client) => client.name === 'supabase-client-tanstack')
 const reactRouterClient = clients.find((client) => client.name === 'supabase-client-react-router')
 
+// Reuse the MCP runtime at build time so installing the headless app writes
+// exactly one tool entrypoint, already wired to its example tools.
+const headlessApp = {
+  ...headlessAppTanstack,
+  files: [
+    ...headlessAppTanstack.files,
+    ...mcpServer.files.filter(
+      (file) => !headlessAppTanstack.files.some((ownFile) => ownFile.target === file.target)
+    ),
+  ],
+} as RegistryItem
+
 export const blocks = [
   safeNextPath as RegistryItem,
 
@@ -77,7 +89,7 @@ export const blocks = [
   mcpServer as RegistryItem,
 
   // Composes the auth, OAuth consent and MCP server blocks into one app.
-  withClientAndDocs(headlessAppTanstack as RegistryItem, tanstackClient!),
+  withClientAndDocs(headlessApp, tanstackClient!),
 
   withClientAndDocs(oauthConsentNextjs as RegistryItem, nextjsClient!),
   withClientAndDocs(oauthConsentReact as RegistryItem, reactClient!),
