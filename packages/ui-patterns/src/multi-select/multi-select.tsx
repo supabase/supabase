@@ -669,11 +669,6 @@ const MultiSelectorList = React.forwardRef<
         style={{
           maxHeight: `min(${dropdownMaxHeight}px, calc(var(--radix-popover-content-available-height) - ${DROPDOWN_BORDER_HEIGHT}px))`,
         }}
-        // A dialog or sheet locks scrolling by cancelling wheel and touch events that land
-        // outside it, and this dropdown portals to the body. Keeping both off the document is
-        // what lets the list scroll with a trackpad and with a finger.
-        onWheel={(e) => e.stopPropagation()}
-        onTouchMove={(e) => e.stopPropagation()}
         {...props}
       >
         <SelectionListState
