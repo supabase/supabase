@@ -1,12 +1,10 @@
 'use client'
 
-import { ArrowRightFromLine, Check, Copy, WrapText } from 'lucide-react'
+import { ArrowRightFromLine, Check, Copy, WrapText, type LucideIcon } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react'
 import { type ThemedToken } from 'shiki'
 import { type NodeHover } from 'twoslash'
-import { cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-
-import { getFontStyle } from './CodeBlock.utils'
+import { Button, cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export function AnnotatedSpan({
   token,
@@ -88,8 +86,40 @@ function Annotation({ annotation }: { annotation: NodeHover }) {
   )
 }
 
+function CrossfadeIcon({
+  active,
+  activeIcon: ActiveIcon,
+  inactiveIcon: InactiveIcon,
+}: {
+  active: boolean
+  activeIcon: LucideIcon
+  inactiveIcon: LucideIcon
+}) {
+  const iconClass = (shown: boolean) =>
+    cn(
+      'absolute inset-0 m-auto text-lighter group-hover/btn:text-foreground',
+      'transition-[opacity,scale,filter,color] duration-300 [transition-timing-function:cubic-bezier(0.2,0,0,1)]',
+      'motion-reduce:transition-none',
+      shown ? 'opacity-100 scale-100 blur-none' : 'opacity-0 scale-[0.25] blur-[4px]'
+    )
+
+  return (
+    <span className="relative block size-3.5">
+      <ActiveIcon size={14} aria-hidden="true" className={iconClass(active)} />
+      <InactiveIcon size={14} aria-hidden="true" className={iconClass(!active)} />
+    </span>
+  )
+}
+
 export function CodeCopyButton({ className, content }: { className?: string; content: string }) {
   const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    if (!copied) return
+
+    const timeout = window.setTimeout(() => setCopied(false), 2000)
+    return () => window.clearTimeout(timeout)
+  }, [copied])
 
   const handleCopy = async () => {
     copyToClipboard(content, () => {
@@ -108,26 +138,23 @@ export function CodeCopyButton({ className, content }: { className?: string; con
       </span>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button
+          <Button
+            variant="outline"
             tabIndex={0}
             onClick={handleCopy}
             onBlur={resetStatus}
             className={cn(
-              'cursor-pointer border rounded-md p-1',
-              copied && 'bg-selection',
-              'hover:bg-selection transition',
+              'group/btn size-6 p-1 cursor-pointer bg-200 hover:border-strong',
+              copied && 'bg-[var(--btn-active)]',
+              'hover:bg-[var(--btn-active)]',
               className
             )}
             aria-label="Copy code"
             // Tooltip repeats the label; the description would read the name twice
             aria-describedby={undefined}
           >
-            {copied ? (
-              <Check size={14} className="text-lighter" />
-            ) : (
-              <Copy size={14} className="text-lighter" />
-            )}
-          </button>
+            <CrossfadeIcon active={copied} activeIcon={Check} inactiveIcon={Copy} />
+          </Button>
         </TooltipTrigger>
         <TooltipContent>Copy code</TooltipContent>
       </Tooltip>
@@ -159,27 +186,34 @@ export function CodeBlockControls({ content }: { content: string }) {
   return (
     <div
       ref={wrapperRef}
-      className="opacity-0 flex group-hover:opacity-100 group-focus-within:opacity-100 absolute top-2 right-2 gap-1"
+      className={cn(
+        'opacity-0 flex group-hover:opacity-100 group-focus-within:opacity-100 absolute top-[9.5px] right-[9.5px] gap-1',
+        '[--btn-active:color-mix(in_srgb,var(--foreground)_4%,var(--background-200))]'
+      )}
     >
       <span className="sr-only" aria-live="polite">
         {wrapStatus}
       </span>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button
+          <Button
+            variant="outline"
             tabIndex={0}
             onClick={toggleWrap}
-            className={cn('cursor-pointer border rounded-md p-1', 'hover:bg-selection transition')}
+            className={cn(
+              'group/btn size-6 p-1 cursor-pointer bg-200 hover:border-strong',
+              'hover:bg-[var(--btn-active)]'
+            )}
             aria-label={isWrapped ? 'Disable word wrap' : 'Enable word wrap'}
             // Tooltip repeats the label; the description would read the name twice
             aria-describedby={undefined}
           >
-            {isWrapped ? (
-              <ArrowRightFromLine size={14} className="text-lighter" />
-            ) : (
-              <WrapText size={14} className="text-lighter" />
-            )}
-          </button>
+            <CrossfadeIcon
+              active={isWrapped}
+              activeIcon={ArrowRightFromLine}
+              inactiveIcon={WrapText}
+            />
+          </Button>
         </TooltipTrigger>
         <TooltipContent>{isWrapped ? 'Disable word wrap' : 'Enable word wrap'}</TooltipContent>
       </Tooltip>

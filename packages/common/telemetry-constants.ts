@@ -50,8 +50,7 @@ export interface SignUpEvent {
  *
  * Some unintuitive behavior:
  *   - If signing up with GitHub the SignInEvent gets triggered first before the SignUpEvent.
- *   - Captured server-side; the distinct_id often resolves to the anonymous cookie because
- *     the event races identify, so don't use it as a funnel join key across the auth boundary.
+ *   - distinct_id often resolves to the anonymous cookie (races identify); not a person-level join key.
  *
  * @group Events
  * @source studio
@@ -63,6 +62,26 @@ export interface SignInEvent {
     category: 'account'
     /**
      * The method used to sign in, e.g. email, github, sso
+     */
+    method: string
+  }
+}
+
+/**
+ * Triggered when a user initiates a sign-in (form submit including client-side validation
+ * failures, OAuth or custom-provider click, partner token exchange), before auth resolves.
+ * Pre-auth, so distinct_id is the anonymous cookie: not a person-level join key.
+ *
+ * @group Events
+ * @source studio
+ * @page /sign-in, /sign-in-sso, /sign-in-partner
+ */
+export interface SignInSubmittedEvent {
+  action: 'sign_in_submitted'
+  properties: {
+    category: 'account'
+    /**
+     * Matches the sign_in event's method vocabulary, e.g. email (password path), github, sso
      */
     method: string
   }
@@ -1507,33 +1526,6 @@ export interface DatabaseConnectionsLiveModeClickedEvent {
 }
 
 /**
- * User clicked the dismiss button on the Database Connections banner in studio project pages.
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/observability/connections
- */
-export interface DatabaseConnectionsBannerDismissButtonClickedEvent {
-  action: 'database_connections_banner_dismiss_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked the CTA button on the Database Connections banner in studio project pages.
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/observability/connections
- */
-export interface DatabaseConnectionsBannerCtaButtonClickedEvent {
-  action: 'database_connections_banner_cta_button_clicked'
-  properties: {
-    isEnabled: boolean
-  }
-  groups: TelemetryGroups
-}
-
-/**
  * The Explorer feature preview banner was rendered in studio project pages, fired at most once
  * per page load. Acts as the denominator for the banner's dismiss and CTA rates; dedupe per
  * session or per user at query time.
@@ -1565,6 +1557,32 @@ export interface ExplorerBannerDismissButtonClickedEvent {
  */
 export interface ExplorerBannerCtaButtonClickedEvent {
   action: 'explorer_banner_cta_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the button in the Explorer sidebar title bar to temporarily switch to the SQL
+ * Editor for snippet access.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerTempAccessSqlEditorClickedEvent {
+  action: 'explorer_temp_access_sql_editor_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the "Back to Explorer" button in the SQL Editor title bar, shown only when the
+ * visit originated from the Explorer's temporary switch button.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/sql
+ */
+export interface SqlEditorBackExplorerClickedEvent {
+  action: 'sql_editor_back_explorer_clicked'
   groups: TelemetryGroups
 }
 
@@ -2330,7 +2348,7 @@ export interface HomeConnectActionClickedEvent {
     /**
      * The connect action/tile that was clicked
      */
-    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'server' | 'api_keys'
+    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'server' | 'warehouse' | 'api_keys'
   }
   groups: TelemetryGroups
 }
@@ -3176,7 +3194,7 @@ export interface DashboardErrorCreatedEvent {
     /**
      * Funnel the error occurred in (set only for instrumented funnel errors)
      */
-    origin?: 'signup' | 'project_creation' | 'org_creation'
+    origin?: 'signup' | 'signin' | 'project_creation' | 'org_creation'
     /**
      * Coarse classification of the funnel error
      */
@@ -3489,6 +3507,27 @@ export interface AccessTokenCreatedEvent {
 }
 
 /**
+ * Triggered when the access token creation sheet is closed before a token was created, either by
+ * the user (Escape, outside click, or Cancel) or because the permissions map failed to load and
+ * forced the sheet shut. The token created step blocks non-safe closes, so this event never fires
+ * for a completed creation.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens
+ */
+export interface AccessTokenCreationSheetDismissedEvent {
+  action: 'access_token_creation_sheet_dismissed'
+  properties: {
+    resourceAccess: 'project' | 'organization' | 'account'
+    formStep: 'form' | 'review'
+    isFormTouched: boolean
+    trigger: 'user' | 'permissions_load_error'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * Triggered when an access token is successfully deleted.
  *
  * @group Events
@@ -3499,6 +3538,57 @@ export interface AccessTokenRemovedEvent {
   action: 'access_token_removed'
   properties: {
     tokenType: 'classic' | 'scoped'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when the copy button is used on the token value shown after creation. The value is
+ * only ever displayed once, so this measures how many users leave with a usable token.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens (token created step of the generate token sheet)
+ */
+export interface AccessTokenCopiedEvent {
+  action: 'access_token_copied'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when the "I have copied the key and stored it securely" checkbox is toggled on the
+ * token created step. `isChecked` is the resulting state, so unticking is tracked too.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens (token created step of the generate token sheet)
+ */
+export interface AccessTokenStoredCheckboxClickedEvent {
+  action: 'access_token_stored_checkbox_clicked'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+    /** The state the checkbox was toggled into */
+    isChecked: boolean
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when the "Done" button dismisses the token created step, completing the creation flow.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens (token created step of the generate token sheet)
+ */
+export interface AccessTokenDoneButtonClickedEvent {
+  action: 'access_token_done_button_clicked'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+    /** Whether the copy button was used before finishing, as opposed to copying the value manually */
+    hasCopiedToken: boolean
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -3591,6 +3681,7 @@ export interface UnifiedLogsRowClickedEvent {
       | 'supavisor'
       | 'pgbouncer'
       | 'multigres'
+      | 'workers'
   }
   groups: TelemetryGroups
 }
@@ -3772,6 +3863,7 @@ export interface HeaderLocalVersionPopoverOpenedEvent {
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
+  | SignInSubmittedEvent
   | ConnectionStringCopiedEvent
   | McpInstallButtonClickedEvent
   | ApiDocsOpenedEvent
@@ -3866,11 +3958,11 @@ export type TelemetryEvent =
   | DatabaseConnectionsOverviewMetricCardClickedEvent
   | DatabaseConnectionsFilterUpdatedEvent
   | DatabaseConnectionsBlockerViewClickedEvent
-  | DatabaseConnectionsBannerDismissButtonClickedEvent
-  | DatabaseConnectionsBannerCtaButtonClickedEvent
   | ExplorerBannerExposedEvent
   | ExplorerBannerDismissButtonClickedEvent
   | ExplorerBannerCtaButtonClickedEvent
+  | ExplorerTempAccessSqlEditorClickedEvent
+  | SqlEditorBackExplorerClickedEvent
   | SessionTerminateButtonClickedEvent
   | SessionTerminateSubmittedEvent
   | QueryCancelButtonClickedEvent
@@ -3960,7 +4052,11 @@ export type TelemetryEvent =
   | UpgradeCtaClickedEvent
   | PricingPanelPlanPresentationExperimentExposedEvent
   | AccessTokenCreatedEvent
+  | AccessTokenCreationSheetDismissedEvent
   | AccessTokenRemovedEvent
+  | AccessTokenCopiedEvent
+  | AccessTokenStoredCheckboxClickedEvent
+  | AccessTokenDoneButtonClickedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
   | ResourceExhaustionBannerAiAssistantClickedEvent
   | UnifiedLogsRowClickedEvent

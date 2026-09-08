@@ -1,9 +1,30 @@
+import type { ColumnFiltersState } from '@tanstack/react-table'
+import { useDebounce } from 'common'
 import { useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
 
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+
+export const useFilterSearchSync = ({
+  applyFilterSearch,
+  columnFilters,
+  enabled,
+}: {
+  applyFilterSearch: () => void
+  columnFilters: ColumnFiltersState
+  enabled: boolean
+}) => {
+  const debouncedApplyFilterSearch = useDebounce(applyFilterSearch, 250)
+
+  useEffect(() => {
+    if (!enabled) return
+
+    debouncedApplyFilterSearch()
+    return () => debouncedApplyFilterSearch.cancel()
+  }, [columnFilters, debouncedApplyFilterSearch, enabled])
+}
 
 export const useResetFocus = () => {
   useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_RESET_FOCUS, () => {

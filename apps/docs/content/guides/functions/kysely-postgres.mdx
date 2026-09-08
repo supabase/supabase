@@ -191,6 +191,7 @@ Create an `index.ts` file to execute a query on incoming requests:
 
 ```ts index.ts
 import { Pool } from 'jsr:@db/postgres@^0'
+import { withSupabase } from 'npm:@supabase/server@^1'
 import {
   Generated,
   Kysely,
@@ -198,7 +199,6 @@ import {
   PostgresIntrospector,
   PostgresQueryCompiler,
 } from 'npm:kysely@^0'
-import { withSupabase } from 'npm:@supabase/server@^1'
 
 import { PostgresDriver } from './DenoPostgresDriver.ts'
 

@@ -4,14 +4,40 @@ import { Button, Checkbox, ScrollArea, SheetFooter } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
+import { useTrack } from '@/lib/telemetry/track'
+
 interface TokenSuccessProps {
   tokenName: string
   tokenValue: string
+  tokenType: 'classic' | 'scoped'
   onClose: () => void
 }
 
-export const NewScopedTokenSuccess = ({ tokenName, tokenValue, onClose }: TokenSuccessProps) => {
+export const NewScopedTokenSuccess = ({
+  tokenName,
+  tokenValue,
+  tokenType,
+  onClose,
+}: TokenSuccessProps) => {
+  const track = useTrack()
   const [keyCopied, setKeyCopied] = useState(false)
+  const [hasCopiedToken, setHasCopiedToken] = useState(false)
+
+  const handleCopy = () => {
+    setHasCopiedToken(true)
+    track('access_token_copied', { tokenType })
+    toast.success('Token copied to clipboard')
+  }
+
+  const handleAcknowledge = (isChecked: boolean) => {
+    setKeyCopied(isChecked)
+    track('access_token_stored_checkbox_clicked', { tokenType, isChecked })
+  }
+
+  const handleDone = () => {
+    track('access_token_done_button_clicked', { tokenType, hasCopiedToken })
+    onClose()
+  }
 
   return (
     <>
@@ -33,7 +59,7 @@ export const NewScopedTokenSuccess = ({ tokenName, tokenValue, onClose }: TokenS
             value={tokenValue}
             onChange={() => {}}
             aria-label={`${tokenName} token`}
-            onCopy={() => toast.success('Token copied to clipboard')}
+            onCopy={handleCopy}
           />
 
           <Admonition
@@ -46,7 +72,7 @@ export const NewScopedTokenSuccess = ({ tokenName, tokenValue, onClose }: TokenS
               <Checkbox
                 id="key-copied"
                 checked={keyCopied}
-                onCheckedChange={(v) => setKeyCopied(Boolean(v))}
+                onCheckedChange={(v) => handleAcknowledge(Boolean(v))}
               />
               <span className="text-sm text-warning cursor-pointer select-none">
                 I have copied the key and stored it securely
@@ -56,7 +82,7 @@ export const NewScopedTokenSuccess = ({ tokenName, tokenValue, onClose }: TokenS
         </div>
       </ScrollArea>
       <SheetFooter className="mt-auto flex w-full items-center justify-between! border-t py-4">
-        <Button className="ml-auto" disabled={!keyCopied} onClick={onClose}>
+        <Button className="ml-auto" disabled={!keyCopied} onClick={handleDone}>
           Done
         </Button>
       </SheetFooter>

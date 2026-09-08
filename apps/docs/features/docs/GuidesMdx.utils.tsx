@@ -34,7 +34,7 @@ const PUBLISHED_SECTIONS = [
   'graphql',
   'integrations',
   'local-development',
-  'monitoring-and-debugging',
+  'observability',
   'platform',
   'queues',
   'realtime',
