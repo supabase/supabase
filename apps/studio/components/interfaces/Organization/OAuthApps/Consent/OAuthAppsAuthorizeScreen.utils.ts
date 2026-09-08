@@ -9,6 +9,7 @@ const MOCK_STATE_SCENARIOS: Record<string, string> = {
   cross_workspace: OAUTH_APPS_MOCK_SCENARIOS.vercelCrossWorkspace,
   admin_warning: OAUTH_APPS_MOCK_SCENARIOS.vercelOrgAdmin,
   max_projects: OAUTH_APPS_MOCK_SCENARIOS.vercelManyProjects,
+  role_validation: OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation,
 }
 
 export const EMPTY_ORG_MOCK_SLUG = 'contoso-labs'

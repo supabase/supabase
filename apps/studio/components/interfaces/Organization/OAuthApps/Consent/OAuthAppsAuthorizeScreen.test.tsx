@@ -10,13 +10,46 @@ function selectProject(projectName: string) {
   fireEvent.click(screen.getByText(projectName))
 }
 
+// The list stays open after a selection, and the project name then matches both an option row
+// and the trigger badge - so target the row explicitly to toggle the same project twice.
+function toggleProjectOption(projectName: string) {
+  const option = screen
+    .getAllByText(projectName)
+    .map((element) => element.closest('[role="option"]'))
+    .find((element): element is HTMLElement => element instanceof HTMLElement)
+
+  if (!option) throw new Error(`No option row found for "${projectName}"`)
+  fireEvent.click(option)
+}
+
 describe('OAuthAppsAuthorizeScreen', () => {
-  test('blocks authorize with zero projects selected and shows the error', async () => {
+  test('disables authorize and states the constraint while nothing is selected', async () => {
     customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
 
-    const authorizeButton = await screen.findByRole('button', { name: /Authorize Vercel/ })
-    fireEvent.click(authorizeButton)
+    expect(await screen.findByRole('button', { name: /Authorize Vercel/ })).toBeDisabled()
+    expect(screen.getByText('Must select at least one project to authorize.')).toBeInTheDocument()
+  })
 
+  test('enables authorize and drops the constraint once a project is selected', async () => {
+    customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
+
+    await screen.findByRole('combobox')
+    selectProject('northwind-storefront')
+
+    expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
+    expect(
+      screen.queryByText('Must select at least one project to authorize.')
+    ).not.toBeInTheDocument()
+  })
+
+  test('re-disables authorize when the last project is deselected', async () => {
+    customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
+
+    fireEvent.click(await screen.findByRole('combobox'))
+    toggleProjectOption('northwind-storefront')
+    toggleProjectOption('northwind-storefront')
+
+    expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeDisabled()
     expect(screen.getByText('Must select at least one project to authorize.')).toBeInTheDocument()
   })
 
