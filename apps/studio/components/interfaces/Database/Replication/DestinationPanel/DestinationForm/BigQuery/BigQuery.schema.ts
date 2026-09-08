@@ -3,7 +3,7 @@ import * as z from 'zod'
 import {
   optionalNumberInputSchema,
   requiredNumberInputSchema,
-} from '../DestinationForm.schema.utils'
+} from '@/lib/forms/zod-number-input'
 
 const CONNECTION_POOL_SIZE_MIN_ERROR = 'Connection pool size must be greater than 0.'
 
