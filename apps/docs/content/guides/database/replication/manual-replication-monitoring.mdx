@@ -31,24 +31,33 @@ from pg_stat_replication;
 
 ### Replication slot status
 
-A replication slot can be in one of three states:
+A replication slot has separate connection and WAL availability fields:
 
-- `active` - The slot is active and is receiving data
-- `inactive` - The slot is not active and is not receiving data
-- `lost` - The slot is lost and is not receiving data
+- `active` is `true` when a consumer is connected to the slot.
+- `wal_status` is `reserved` or `extended` while required WAL is available, `unreserved` when the slot is at risk of losing required WAL, and `lost` after required WAL has been removed.
+- `safe_wal_size` estimates how many more bytes can be written before the slot is at risk. It is `NULL` when `max_slot_wal_keep_size` is unlimited or the slot is already lost.
 
-The state can be checked using the `pg_replication_slots` table:
+Check these fields and the amount of WAL retained from the slot's `restart_lsn`:
 
 ```sql
-select slot_name, active, state from pg_replication_slots;
+select
+  slot_name,
+  active,
+  wal_status,
+  pg_size_pretty(safe_wal_size) as wal_retention_remaining,
+  pg_size_pretty(pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn)) as retained_wal
+from pg_replication_slots;
 ```
+
+An inactive slot can still retain WAL. Investigate a slot whose retained WAL keeps growing, whose remaining retention keeps shrinking, or whose `wal_status` becomes `unreserved`. A `lost` slot can't continue from its previous position and usually requires a new initial sync.
 
 ### WAL size
 
 The WAL size can be checked using the `pg_ls_waldir()` function:
 
 ```sql
-select * from pg_ls_waldir();
+select pg_size_pretty(sum(size)) as wal_directory_size
+from pg_ls_waldir();
 ```
 
 ### Check the LSN
@@ -66,29 +75,26 @@ The `pg_subscription` table shows the status of any subscriptions on a replica a
 The `srsubstate` column in `pg_subscription_rel` can be one of the following:
 
 - `i` - Initializing - The subscription is being initialized
-- `d` - Data Synchronizing - The subscription is synchronizing data for the first time (i.e. doing the initial copy)
+- `d` - Data Synchronizing - The subscription is synchronizing data for the first time, which is the initial copy
 - `s` - Synchronized - The subscription is synchronized
 - `r` - Replicating - The subscription is replicating data
 
 ```sql
-SELECT
-    sub.subname AS subscription_name,
-    relid::regclass AS table_name,
-    srel.srsubstate AS replication_state,
-    CASE srel.srsubstate
-        WHEN 'i' THEN 'Initializing'
-        WHEN 'd' THEN 'Data Synchronizing'
-        WHEN 's' THEN 'Synchronized'
-        WHEN 'r' THEN 'Replicating'
-        ELSE 'Unknown'
-    END AS state_description,
-    srel.srsyncedlsn AS last_synced_lsn
-FROM
-    pg_subscription sub
-JOIN
-    pg_subscription_rel srel ON sub.oid = srel.srsubid
-ORDER BY
-    table_name;
+select
+  sub.subname as subscription_name,
+  relid::regclass as table_name,
+  srel.srsubstate as replication_state,
+  case srel.srsubstate
+    when 'i' then 'Initializing'
+    when 'd' then 'Data Synchronizing'
+    when 's' then 'Synchronized'
+    when 'r' then 'Replicating'
+    else 'Unknown'
+  end as state_description,
+  srel.srsyncedlsn as last_synced_lsn
+from pg_subscription sub
+join pg_subscription_rel srel on sub.oid = srel.srsubid
+order by table_name;
 ```
 
 ### Check the LSN

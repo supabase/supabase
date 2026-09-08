@@ -217,7 +217,7 @@ export const AdvancedSettings = ({
                     <FormItemLayout
                       label="Maximum staleness"
                       layout="horizontal"
-                      description="Set the maximum age of query results while BigQuery applies ongoing changes, or leave blank for the freshest results."
+                      description="Maximum age of BigQuery query results for newly created or recreated tables; leave blank for the freshest results."
                     >
                       <FormControl>
                         <InputGroup>
