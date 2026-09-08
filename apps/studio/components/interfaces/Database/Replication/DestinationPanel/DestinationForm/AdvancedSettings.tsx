@@ -40,9 +40,9 @@ export const AdvancedSettings = ({
   form: UseFormReturn<DestinationPanelSchemaType>
 }) => {
   const handleNumberChange =
-    (field: { onChange: (value?: number) => void }) => (e: ChangeEvent<HTMLInputElement>) => {
+    (field: { onChange: (value: number | '') => void }) => (e: ChangeEvent<HTMLInputElement>) => {
       const parsed = e.target.valueAsNumber
-      field.onChange(e.target.value === '' || Number.isNaN(parsed) ? undefined : parsed)
+      field.onChange(e.target.value === '' || Number.isNaN(parsed) ? '' : parsed)
     }
 
   return (

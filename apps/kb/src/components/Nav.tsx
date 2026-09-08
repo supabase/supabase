@@ -9,15 +9,16 @@ import {
   navigationMenuTriggerStyle,
 } from 'ui'
 
+import { TOPICS, topicToSlug } from '../lib/topics'
+
+const topics = TOPICS.map((topic) => ({
+  label: topic.name,
+  href: `${import.meta.env.BASE_URL}/topics/${topicToSlug(topic.name)}`,
+}))
+
 /**
  * Hard-codding links in here for now until we have actual content. Might be worth putting these arrays in their on data file too.
  */
-const topics = [
-  { label: 'Troubleshooting', href: '#' },
-  { label: 'Migrations', href: '#' },
-  { label: 'Comparisons', href: '#' },
-]
-
 const resources = [
   { label: 'Status', href: 'https://status.supabase.com' },
   { label: 'Changelog', href: 'https://supabase.com/changelog' },

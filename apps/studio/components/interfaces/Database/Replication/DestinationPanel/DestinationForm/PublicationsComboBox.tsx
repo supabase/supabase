@@ -1,9 +1,8 @@
 import { useParams } from 'common'
-import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { useState } from 'react'
 import { ControllerRenderProps } from 'react-hook-form'
 import {
-  Badge,
   Button,
   cn,
   Command,
@@ -18,10 +17,15 @@ import {
   PopoverTrigger,
   ScrollArea,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { SelectionListState } from 'ui-patterns/SelectionListState'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
-import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
+import {
+  isMetadataListErrorVisible,
+  isMetadataListLoading,
+  useRefreshOnOpen,
+} from './useRefreshOnOpen'
+import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 
 interface PublicationsComboBoxProps {
   sourceId?: number
@@ -37,41 +41,38 @@ export const PublicationsComboBox = ({
   const { ref: projectRef } = useParams()
 
   const [searchTerm, setSearchTerm] = useState('')
-  const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [selectedPublication, setSelectedPublication] = useState<string>(field?.value || '')
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const selectedPublication = field.value || ''
 
   const {
     data: publications = [],
     isPending,
     isFetching,
+    isError,
     refetch: refetchPublications,
-  } = useReplicationPublicationsQuery({ projectRef, sourceId })
-  const isLoadingPublications = isPending || isFetching
-  const showLoadingState = isLoadingPublications && publications.length === 0
+  } = useReplicationPublicationNamesQuery({ projectRef, sourceId })
+  const isLoadingStateVisible = isMetadataListLoading(isPending || isFetching, publications.length)
+  const isErrorStateVisible = isMetadataListErrorVisible(isError, publications.length)
+  const { handleOpenChange: handleRefreshPublicationsOnOpen } = useRefreshOnOpen({
+    isEnabled: projectRef !== undefined && sourceId !== undefined,
+    refetch: refetchPublications,
+  })
 
   function handlePublicationSelect(pub: string) {
-    setSelectedPublication(pub)
-    setDropdownOpen(false)
+    setIsDropdownOpen(false)
     field.onChange(pub)
   }
-
-  useEffect(() => {
-    setSelectedPublication(field?.value || '')
-  }, [field?.value])
 
   return (
     <Popover
       modal={false}
-      open={dropdownOpen}
+      open={isDropdownOpen}
       onOpenChange={(open) => {
-        setDropdownOpen(open)
-        if (open) {
-          if (typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined') {
-            refetchPublications()
-          }
-        }
+        setIsDropdownOpen(open)
+        handleRefreshPublicationsOnOpen(open)
 
         if (!open && field?.onBlur) {
+          setSearchTerm('')
           field.onBlur()
         }
       }}
@@ -79,19 +80,25 @@ export const PublicationsComboBox = ({
       <PopoverTrigger asChild>
         <Button
           variant="default"
-          size="medium"
+          size="small"
           className={cn(
             'w-full [&>span]:w-full text-left',
             !selectedPublication && 'text-foreground-muted'
           )}
-          iconRight={showLoadingState ? <Loader2 className="animate-spin" /> : <ChevronsUpDown />}
+          iconRight={<ChevronsUpDown />}
           name={field.name}
           onBlur={field.onBlur}
         >
           {selectedPublication || 'Select publication'}
         </Button>
       </PopoverTrigger>
-      <PopoverContent sameWidthAsTrigger className="p-0" align="start">
+      <PopoverContent
+        sameWidthAsTrigger
+        className="p-0"
+        align="start"
+        side="bottom"
+        collisionPadding={16}
+      >
         <Command>
           <CommandInput
             placeholder="Find publication..."
@@ -100,52 +107,41 @@ export const PublicationsComboBox = ({
             onValueChange={setSearchTerm}
           />
           <CommandList>
-            <CommandEmpty>No publications found</CommandEmpty>
-
-            {showLoadingState && (
-              <div className="flex items-center gap-2 p-2 pb-0 text-center justify-center">
-                <GenericSkeletonLoader className="w-full" />
-              </div>
+            {!isLoadingStateVisible && !isErrorStateVisible && publications.length > 0 && (
+              <CommandEmpty>No publications found</CommandEmpty>
             )}
 
-            <CommandGroup>
-              {publications.length === 0 && !showLoadingState && (
-                <div className="text-foreground-lighter text-xs py-3 px-2 space-y-0.5">
-                  <p>No publications available</p>
-                  <p className="text-foreground-muted">Publications with no tables are hidden</p>
-                </div>
-              )}
-              <ScrollArea
-                className={publications.length > 7 ? 'h-[210px]' : ''}
-                onWheel={(e) => e.stopPropagation()}
-              >
-                {publications.map((pub) => (
-                  <CommandItem
-                    key={pub.name}
-                    className="cursor-pointer flex items-center justify-between space-x-2 w-full"
-                    onSelect={() => {
-                      handlePublicationSelect(pub.name)
-                    }}
-                    onClick={() => {
-                      handlePublicationSelect(pub.name)
-                    }}
-                  >
-                    <span>{pub.name}</span>
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant="default"
-                        className="rounded-full px-2 py-0.5 text-[10px] font-normal border border-border bg-surface-100"
-                      >
-                        {pub.tables.length} {pub.tables.length === 1 ? 'table' : 'tables'}
-                      </Badge>
+            <SelectionListState
+              isLoading={isLoadingStateVisible}
+              isError={isErrorStateVisible}
+              isEmpty={!isLoadingStateVisible && !isErrorStateVisible && publications.length === 0}
+              emptyLabel="No publications available"
+              errorLabel="Unable to load publications"
+              skeletonVariant="command"
+            />
+
+            {publications.length > 0 && (
+              <CommandGroup>
+                <ScrollArea
+                  className={publications.length > 7 ? 'h-[210px]' : ''}
+                  onWheel={(e) => e.stopPropagation()}
+                >
+                  {publications.map((pub) => (
+                    <CommandItem
+                      key={pub.name}
+                      className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                      onSelect={() => handlePublicationSelect(pub.name)}
+                      onClick={() => handlePublicationSelect(pub.name)}
+                    >
+                      <span>{pub.name}</span>
                       {selectedPublication === pub.name && (
                         <Check className="text-brand" strokeWidth={2} size={13} />
                       )}
-                    </div>
-                  </CommandItem>
-                ))}
-              </ScrollArea>
-            </CommandGroup>
+                    </CommandItem>
+                  ))}
+                </ScrollArea>
+              </CommandGroup>
+            )}
 
             <CommandSeparator />
 
