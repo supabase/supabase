@@ -3,8 +3,8 @@
   "redirects": [
     { "source": "/", "destination": "/kb", "permanent": false },
     {
-      "source": "/kb/:path+.md",
-      "destination": "/kb/markdown/:path+.md",
+      "source": "/kb/guides/:path.md",
+      "destination": "/kb/markdown/guides/:path.md",
       "permanent": true
     }
   ],
