@@ -3,7 +3,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 
 import { POSTGRES_DATA_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField } from '../SidePanelEditor.types'
-import { typeExpressionSuggestions } from './ColumnEditor.constants'
+import { nullSuggestion, typeExpressionSuggestions } from './ColumnEditor.constants'
 import type { Suggestion } from './ColumnEditor.types'
 import InputWithSuggestions from './InputWithSuggestions'
 import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
@@ -14,20 +14,23 @@ interface ColumnDefaultValueProps {
   onUpdateField: (changes: Partial<ColumnField>) => void
 }
 
-const ColumnDefaultValue = ({
+export const ColumnDefaultValue = ({
   columnFields,
   enumTypes = [],
   onUpdateField = noop,
 }: ColumnDefaultValueProps) => {
-  const suggestions: Suggestion[] = typeExpressionSuggestions?.[columnFields.format] ?? []
+  const { format, isNullable } = columnFields
+  const defaultSuggestion: Suggestion[] = isNullable ? [nullSuggestion] : []
+  const suggestions: Suggestion[] = defaultSuggestion.concat(
+    typeExpressionSuggestions?.[format] ?? []
+  )
 
   // If selected column type is a user-defined enum, show a dropdown list of options
   const isEnum: boolean =
-    !POSTGRES_DATA_TYPES.includes(columnFields.format) &&
-    enumTypes.some((type) => type.name === columnFields.format)
+    !POSTGRES_DATA_TYPES.includes(format) && enumTypes.some((type) => type.name === format)
 
   if (isEnum) {
-    const enumType = enumTypes.find((type) => type.name === columnFields.format)
+    const enumType = enumTypes.find((type) => type.name === format)
     const enumValues = enumType?.enums ?? []
     const originalDefaultValue = columnFields?.defaultValue ?? ''
     const formattedValue = originalDefaultValue.includes('::')
@@ -37,7 +40,9 @@ const ColumnDefaultValue = ({
     if (enumType !== undefined) {
       return (
         <>
-          <label className="block text-foreground-light">Default Value</label>
+          <label htmlFor="select-editor" className="block text-foreground-light">
+            Default Value
+          </label>
           <Select
             name="select-editor"
             value={formattedValue}
@@ -48,7 +53,8 @@ const ColumnDefaultValue = ({
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectItem value={null as any}>NULL</SelectItem>
+                {/* @ts-ignore: Valid in this context */}
+                <SelectItem value={null}>NULL</SelectItem>
                 {enumValues.map((value) => (
                   <SelectItem key={value} value={value}>
                     {value}
@@ -76,12 +82,10 @@ const ColumnDefaultValue = ({
       suggestions={suggestions}
       suggestionsHeader="Suggested expressions"
       suggestionsTooltip="Suggested expressions"
-      onChange={(event: any) => onUpdateField({ defaultValue: event.target.value })}
+      onChange={(event) => onUpdateField({ defaultValue: event.target.value })}
       onSelectSuggestion={(suggestion: Suggestion) =>
         onUpdateField({ defaultValue: suggestion.value })
       }
     />
   )
 }
-
-export default ColumnDefaultValue
