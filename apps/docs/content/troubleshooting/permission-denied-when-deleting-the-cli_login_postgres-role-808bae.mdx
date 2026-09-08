@@ -13,7 +13,7 @@ In the Supabase ecosystem, specific database roles are generated to facilitate c
 
 - **cli_login_postgres:** A temporary role automatically created by the Supabase CLI to allow administrative access for tasks like migrations or queries when a database password is not explicitly provided.
 - **supabase_admin:** An internal system-level role that manages core database infrastructure. It "owns" certain system-generated roles, meaning standard users cannot modify or delete them.
-- **rolvaliduntil:** A PostgreSQL attribute that sets an expiration timestamp for a role's password. In this context, these roles are typically set to expire within a few hundred seconds of creation.
+- **`rolvaliduntil`:** A PostgreSQL attribute that sets an expiration timestamp for a role's password. In this context, these roles are typically set to expire within a few hundred seconds of creation.
 - **`NOLOGIN`:** A role attribute that prevents a role from being used to establish a new connection to the database, effectively disabling it while keeping the record in the system catalog.
 
 ---
