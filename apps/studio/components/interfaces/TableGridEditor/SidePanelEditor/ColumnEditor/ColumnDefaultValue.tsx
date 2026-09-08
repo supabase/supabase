@@ -3,24 +3,43 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 
 import { POSTGRES_DATA_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField } from '../SidePanelEditor.types'
-import { getDefaultValueSuggestions } from './ColumnEditor.utils'
+import { nullSuggestion, typeExpressionSuggestions } from './ColumnEditor.constants'
 import type { Suggestion } from './ColumnEditor.types'
 import InputWithSuggestions from './InputWithSuggestions'
 import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
 
+const getDefaultValueSuggestions = (format: string, isNullable: boolean): Suggestion[] => {
+  const nullableSuggestion: Suggestion[] = isNullable ? [nullSuggestion] : []
+  return nullableSuggestion.concat(typeExpressionSuggestions?.[format] ?? [])
+}
+
 interface ColumnDefaultValueProps {
   columnFields: ColumnField
   enumTypes: EnumeratedType[]
+  className?: string
+  size?: 'small' | 'tiny' | 'medium' | 'large'
+  showLabel?: boolean
+  layout?: 'horizontal' | 'vertical'
+  'data-testid'?: string
+  'aria-label'?: string
   onUpdateField: (changes: Partial<ColumnField>) => void
 }
 
 export const ColumnDefaultValue = ({
   columnFields,
   enumTypes = [],
+  className,
+  size,
+  showLabel = true,
+  layout = 'vertical',
+  'data-testid': dataTestId,
+  'aria-label': ariaLabel,
   onUpdateField = noop,
 }: ColumnDefaultValueProps) => {
-  const { format, isNullable } = columnFields
+  const { format, isNullable, isIdentity } = columnFields
   const suggestions: Suggestion[] = getDefaultValueSuggestions(format, isNullable)
+  // Identity columns have their default value assigned by Postgres, so it isn't user-editable
+  const disabled = format.includes('int') && isIdentity
 
   // If selected column type is a user-defined enum, show a dropdown list of options
   const isEnum: boolean =
@@ -37,15 +56,22 @@ export const ColumnDefaultValue = ({
     if (enumType !== undefined) {
       return (
         <>
-          <label htmlFor="select-editor" className="block text-foreground-light">
-            Default Value
-          </label>
+          {showLabel && (
+            <label htmlFor="select-editor" className="block text-foreground-light">
+              Default Value
+            </label>
+          )}
           <Select
             name="select-editor"
             value={formattedValue}
             onValueChange={(value) => onUpdateField({ defaultValue: value })}
           >
-            <SelectTrigger>
+            <SelectTrigger
+              size={size}
+              className={className}
+              data-testid={dataTestId}
+              aria-label={ariaLabel}
+            >
               <SelectValue id="select-editor" placeholder="NULL" />
             </SelectTrigger>
             <SelectContent>
@@ -67,14 +93,23 @@ export const ColumnDefaultValue = ({
 
   return (
     <InputWithSuggestions
-      label="Default Value"
-      layout="vertical"
-      description="Can either be a literal or an expression. When using an expression wrap your expression in brackets, e.g. (gen_random_uuid())"
+      label={showLabel ? 'Default Value' : undefined}
+      layout={layout}
+      description={
+        showLabel
+          ? 'Can either be a literal or an expression. When using an expression wrap your expression in brackets, e.g. (gen_random_uuid())'
+          : undefined
+      }
       placeholder={
         typeof columnFields.defaultValue === 'string' && columnFields.defaultValue.length === 0
           ? 'EMPTY'
           : 'NULL'
       }
+      size={size}
+      disabled={disabled}
+      className={className}
+      data-testid={dataTestId}
+      aria-label={ariaLabel}
       value={columnFields?.defaultValue ?? ''}
       suggestions={suggestions}
       suggestionsHeader="Suggested expressions"
