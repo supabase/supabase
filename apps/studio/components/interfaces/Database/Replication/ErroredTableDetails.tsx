@@ -35,15 +35,16 @@ export const ErroredTableDetails = ({ table }: ErroredTableDetailsProps) => {
       {retryPolicy === 'no_retry' ? (
         <div className="flex flex-col gap-y-3">
           <p className="text-xs text-foreground-lighter">
-            This error requires manual intervention from our{' '}
+            Resolve the reported error before restarting replication from scratch. If you need help,
+            contact{' '}
             <InlineLink
               className="text-foreground-lighter hover:text-foreground"
               href={`/support?projectRef=${projectRef}&category=dashboard_bug&subject=Database%20replication%20error&error=${encodeURIComponent(state.reason ?? '')}`}
             >
               support
             </InlineLink>
-            . Alternatively, you may also recreate the pipeline. Use the table actions menu on the
-            right to view the full error details.
+            . Use the table actions menu to view the error details or restart replication from
+            scratch.
           </p>
         </div>
       ) : retryPolicy === 'manual_retry' ? (
@@ -58,8 +59,9 @@ export const ErroredTableDetails = ({ table }: ErroredTableDetailsProps) => {
                   {state.solution && !/[.!?]$/.test(state.solution.trim()) && '.'}
                 </p>
                 <p className="text-foreground-light mt-2">
-                  Restart table replication from the table actions menu on the right. The pipeline
-                  will restart automatically.
+                  Restart table replication from scratch using the table actions menu on the right.
+                  An active pipeline restarts automatically. A stopped pipeline requires a manual
+                  start.
                 </p>
               </div>
             </div>
@@ -67,9 +69,7 @@ export const ErroredTableDetails = ({ table }: ErroredTableDetailsProps) => {
         </div>
       ) : retryPolicy === 'timed_retry' ? (
         <div className="flex flex-col text-foreground-lighter gap-y-3">
-          <p className="text-xs">
-            Replication will retry automatically. The pipeline will restart to apply the retry.
-          </p>
+          <p className="text-xs">Replication will retry automatically.</p>
           <RetryCountdown nextRetryTime={state.retry_policy.next_retry} />
         </div>
       ) : null}

@@ -12,7 +12,6 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
-import { PipelineStatusName } from './Replication.constants'
 import { RestartCostEstimate } from './RestartCostEstimate'
 import { getTableCopyTargets } from './TableSyncCopy.utils'
 import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
@@ -27,7 +26,6 @@ interface BatchRestartDialogProps {
   sourceId?: number
   publicationName?: string
   tableSyncCopy?: TableSyncCopyConfig
-  pipelineStatusName?: PipelineStatusName
   onRestartStart?: (tableIds: number[]) => void
   onRestartComplete?: (tableIds: number[]) => void
 }
@@ -40,7 +38,6 @@ export const BatchRestartDialog = ({
   sourceId,
   publicationName,
   tableSyncCopy,
-  pipelineStatusName,
   onRestartStart,
   onRestartComplete,
 }: BatchRestartDialogProps) => {
@@ -64,7 +61,8 @@ export const BatchRestartDialog = ({
     copiedTables.length === 0 ? (
       <li>
         <strong>No table will run an initial sync.</strong> Replication will resume with new changes
-        only, without syncing existing source rows. There is no additional initial sync charge.
+        only, without syncing existing rows in your database. There is no additional initial sync
+        charge.
       </li>
     ) : copiedTables.length === affectedTables.length ? (
       <li>
@@ -73,25 +71,23 @@ export const BatchRestartDialog = ({
             ? 'The table will run its initial sync again.'
             : `All ${copiedTables.length} tables will run initial sync again.`}
         </strong>{' '}
-        Existing source rows will be synced again. Data successfully processed during this initial
-        sync is billed again.
+        Existing rows in your database will be synced again. Data successfully processed during this
+        initial sync is billed again.
       </li>
     ) : (
       <li>
         <strong>
           {copiedTables.length} of {affectedTables.length} tables will run initial sync again.
         </strong>{' '}
-        Existing source rows for those tables will be synced again and billed again. The remaining
-        tables will resume replication with new changes only.
+        Existing rows in your database for those tables will be synced again and billed again. The
+        remaining tables will resume replication with new changes only.
       </li>
     )
 
   const { mutateAsync: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: (data) => {
       const count = data.tables.length
-      toast.success(
-        `Restarting replication for ${count} table${count > 1 ? 's' : ''}. Pipeline will restart automatically.`
-      )
+      toast.success(`${count} table${count > 1 ? 's' : ''} will replicate from scratch.`)
     },
     onSettled: () => {
       onRestartComplete?.(affectedTableIds)
@@ -112,8 +108,6 @@ export const BatchRestartDialog = ({
         projectRef,
         pipelineId,
         target: mode === 'all' ? { type: 'all_tables' } : { type: 'all_errored_tables' },
-        rollbackType: 'full',
-        pipelineStatusName,
       })
     } catch (error) {}
   }
@@ -121,7 +115,7 @@ export const BatchRestartDialog = ({
   const dialogContent =
     mode === 'all'
       ? {
-          title: 'Restart all tables',
+          title: 'Restart all tables from scratch',
           description: (
             <div className="space-y-3 text-sm">
               <p>
@@ -135,16 +129,16 @@ export const BatchRestartDialog = ({
                   removed.
                 </li>
                 <li>
-                  <strong>The pipeline will restart automatically.</strong> This is required to
-                  apply this change.
+                  <strong>Running pipelines restart automatically.</strong> Stopped pipelines remain
+                  stopped and must be started to resume replication.
                 </li>
               </ul>
             </div>
           ),
-          action: 'Restart all tables',
+          action: 'Restart from scratch',
         }
       : {
-          title: 'Restart failed tables',
+          title: 'Restart failed tables from scratch',
           description: (
             <div className="space-y-3 text-sm">
               <p>
@@ -158,17 +152,17 @@ export const BatchRestartDialog = ({
                   these tables will be removed.
                 </li>
                 <li>
-                  <strong>Tables that are not failed remain untouched.</strong> The request resets
-                  every table that is failed when it runs.
+                  <strong>Tables that are not failed remain untouched.</strong> Replication restarts
+                  for every table that is failed when the request runs.
                 </li>
                 <li>
-                  <strong>The pipeline will restart automatically.</strong> This is required to
-                  apply this change.
+                  <strong>Running pipelines restart automatically.</strong> Stopped pipelines remain
+                  stopped and must be started to resume replication.
                 </li>
               </ul>
             </div>
           ),
-          action: 'Restart failed tables',
+          action: 'Restart from scratch',
         }
 
   return (
@@ -188,7 +182,7 @@ export const BatchRestartDialog = ({
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
           <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="warning">
-            {isResetting ? 'Restarting replication...' : dialogContent.action}
+            {isResetting ? 'Preparing to replicate from scratch...' : dialogContent.action}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

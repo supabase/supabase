@@ -66,7 +66,7 @@ describe('BatchRestartDialog', () => {
     expect(screen.getByTestId('copy-targets')).toHaveTextContent('public.table_1,public.table_2')
 
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: 'Restart failed tables' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Restart from scratch' }))
     })
 
     expect(onRestartStart).toHaveBeenCalledWith([1, 2, 3])
@@ -74,7 +74,6 @@ describe('BatchRestartDialog', () => {
       expect.objectContaining({
         pipelineId: 9,
         target: { type: 'all_errored_tables' },
-        rollbackType: 'full',
       })
     )
   })

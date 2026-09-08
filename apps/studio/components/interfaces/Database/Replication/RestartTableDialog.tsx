@@ -11,7 +11,6 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
-import { PipelineStatusName } from './Replication.constants'
 import { RestartCostEstimate } from './RestartCostEstimate'
 import { shouldCopyTable, type ReplicationTableIdentity } from './TableSyncCopy.utils'
 import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
@@ -24,7 +23,6 @@ interface RestartTableDialogProps {
   tableSyncCopy?: TableSyncCopyConfig
   sourceId?: number
   publicationName?: string
-  pipelineStatusName?: PipelineStatusName
   onRestartStart?: () => void
   onRestartComplete?: () => void
 }
@@ -36,7 +34,6 @@ export const RestartTableDialog = ({
   tableSyncCopy,
   sourceId,
   publicationName,
-  pipelineStatusName,
   onRestartStart,
   onRestartComplete,
 }: RestartTableDialogProps) => {
@@ -47,9 +44,7 @@ export const RestartTableDialog = ({
 
   const { mutate: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: () => {
-      toast.success(
-        `Restarting replication for "${tableName}". Pipeline will ${pipelineStatusName === PipelineStatusName.STOPPED ? 'start' : 'restart'} automatically.`
-      )
+      toast.success(`"${tableName}" will replicate from scratch.`)
     },
     onSettled: () => {
       onRestartComplete?.()
@@ -69,8 +64,6 @@ export const RestartTableDialog = ({
       projectRef,
       pipelineId,
       target: { type: 'single_table', table_id: table.id },
-      rollbackType: 'full',
-      pipelineStatusName,
     })
   }
 
@@ -79,7 +72,8 @@ export const RestartTableDialog = ({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Restart replication for <code className="text-code-inline">{tableName}</code>
+            Restart replication from scratch for{' '}
+            <code className="text-code-inline">{tableName}</code>
           </AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div className="space-y-3 text-sm">
@@ -90,15 +84,14 @@ export const RestartTableDialog = ({
               <ul className="list-disc list-inside space-y-1.5 pl-2">
                 {willCopyTable ? (
                   <li>
-                    <strong>The table's initial sync will restart.</strong> Existing source rows
-                    will be synced again. Data successfully processed during this initial sync is
-                    billed again.
+                    <strong>All existing rows will be copied again.</strong> Data successfully
+                    processed during this initial sync is billed again.
                   </li>
                 ) : (
                   <li>
                     <strong>The table will skip initial sync.</strong> Replication will resume with
-                    new changes only, without syncing existing source rows. There is no additional
-                    initial sync charge.
+                    new changes only, without syncing existing rows in your database. There is no
+                    additional initial sync charge.
                   </li>
                 )}
                 <li>
@@ -106,11 +99,12 @@ export const RestartTableDialog = ({
                   this table will be removed.
                 </li>
                 <li>
-                  <strong>All other tables remain untouched.</strong> Only this table is affected.
+                  <strong>Other tables keep their replication progress.</strong> Only this table
+                  restarts from scratch.
                 </li>
                 <li>
-                  <strong>The pipeline will restart automatically.</strong> This is required to
-                  apply this change.
+                  <strong>Running pipelines restart automatically.</strong> Stopped pipelines remain
+                  stopped and must be started to resume replication.
                 </li>
               </ul>
             </div>
@@ -126,7 +120,7 @@ export const RestartTableDialog = ({
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
           <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="warning">
-            {isResetting ? 'Restarting replication...' : 'Restart replication'}
+            {isResetting ? 'Preparing to replicate from scratch...' : 'Restart from scratch'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
