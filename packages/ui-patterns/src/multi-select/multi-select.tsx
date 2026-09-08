@@ -78,6 +78,13 @@ type MultiSelectorProps = {
   onValuesChange: (value: string[]) => void
   onOpenChange?: (open: boolean) => void
   disabled?: boolean
+  /**
+   * Set this when the multi-select lives inside a dialog or sheet. Those lock scrolling and
+   * cancel wheel and touch events outside themselves, which leaves the dropdown unscrollable
+   * because it portals to the body. A modal dropdown traps focus, so leave it off for
+   * `mode="inline-combobox"`, where the search input sits in the trigger.
+   */
+  modal?: boolean
 } & React.ComponentPropsWithoutRef<typeof Command> &
   VariantProps<typeof MultiSelectorVariants>
 
@@ -91,6 +98,7 @@ function MultiSelector({
   className,
   children,
   id: idProp,
+  modal = false,
   ...props
 }: MultiSelectorProps) {
   const ref = React.useRef(null)
@@ -202,7 +210,7 @@ function MultiSelector({
         dropdownMaxHeight,
       }}
     >
-      <Popover open={open} onOpenChange={handleOpenChange}>
+      <Popover open={open} onOpenChange={handleOpenChange} modal={modal}>
         <Command
           id={id}
           ref={ref}
