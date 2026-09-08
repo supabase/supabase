@@ -2,6 +2,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 import { OAuthAppsAuthorizeScreen } from './OAuthAppsAuthorizeScreen'
+import { MAX_SELECTED_PROJECTS } from './ProjectMultiSelect'
 import { customRender } from '@/tests/lib/custom-render'
 
 function selectProject(projectName: string) {
@@ -124,5 +125,58 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     await screen.findByText('Permissions requested')
     expect(screen.queryByText(/reuse one authorization across workspaces/)).not.toBeInTheDocument()
+  })
+
+  test('warns an org admin that the grant carries their full access', async () => {
+    customRender(<OAuthAppsAuthorizeScreen mockState="admin_warning" navigate={vi.fn()} />)
+
+    expect(await screen.findByText('Want this scoped to one member?')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Have them authorize Vercel from their own account. Authorizing here gives it your full admin access.'
+      )
+    ).toBeInTheDocument()
+  })
+
+  test('names the owner role rather than admin when the member is an owner', async () => {
+    customRender(
+      <OAuthAppsAuthorizeScreen
+        mockState="admin_warning"
+        organizationSlug="fabrikam-industries"
+        navigate={vi.fn()}
+      />
+    )
+
+    expect(await screen.findByText('Want this scoped to one member?')).toBeInTheDocument()
+    expect(screen.getByText(/your full owner access\./)).toBeInTheDocument()
+    expect(screen.queryByText(/your full admin access/)).not.toBeInTheDocument()
+  })
+
+  test('shows no admin warning for a member below admin', async () => {
+    customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
+
+    await screen.findByText('Permissions requested')
+    expect(screen.queryByText('Want this scoped to one member?')).not.toBeInTheDocument()
+  })
+
+  test('the max-projects state offers enough projects to reach the selection cap', async () => {
+    customRender(<OAuthAppsAuthorizeScreen mockState="max_projects" navigate={vi.fn()} />)
+
+    fireEvent.click(await screen.findByRole('combobox'))
+
+    expect(screen.getAllByRole('option').length).toBeGreaterThan(MAX_SELECTED_PROJECTS)
+  })
+
+  test('stacks the cross-workspace notice and the admin warning when both apply', async () => {
+    customRender(
+      <OAuthAppsAuthorizeScreen
+        mockState="cross_workspace"
+        organizationSlug="tailspin-toys"
+        navigate={vi.fn()}
+      />
+    )
+
+    expect(await screen.findByText(/reuse one authorization across workspaces/)).toBeInTheDocument()
+    expect(screen.getByText('Want this scoped to one member?')).toBeInTheDocument()
   })
 })

@@ -10,7 +10,7 @@ import {
 
 import type { OAuthAppsAuthorizeOrganizationProject } from '@/data/oauth-apps/oauth-apps-authorize-organization-projects-query'
 
-const MAX_SELECTED_PROJECTS = 10
+export const MAX_SELECTED_PROJECTS = 10
 const SHOW_COUNTER_FROM = 8
 
 export interface ProjectMultiSelectProps {
