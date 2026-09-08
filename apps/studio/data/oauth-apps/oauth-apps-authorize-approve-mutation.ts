@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 
-import { getMockOAuthAppsAuthorizeRedirect, USE_MOCKS } from './mocks'
-import type { OAuthAppsAuthorizeRedirect } from './types'
+import { getMockOAuthAppsAuthorizeApproveResult, USE_MOCKS } from './mocks'
+import type { OAuthAppsAuthorizeApproveResult } from './types'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OAuthAppsAuthorizeApproveVariables = {
@@ -10,7 +10,7 @@ export type OAuthAppsAuthorizeApproveVariables = {
   project_refs: string[]
 }
 
-export type OAuthAppsAuthorizeApproveResponse = OAuthAppsAuthorizeRedirect
+export type OAuthAppsAuthorizeApproveResponse = OAuthAppsAuthorizeApproveResult
 
 export async function approveOAuthAppsAuthorize({
   slug,
@@ -22,7 +22,7 @@ export async function approveOAuthAppsAuthorize({
   if (!project_refs?.length) throw new Error('At least one project is required')
   if (!USE_MOCKS) throw new Error('OAuth app authorization approval is not yet implemented')
 
-  return getMockOAuthAppsAuthorizeRedirect(auth_id, { approved: true })
+  return getMockOAuthAppsAuthorizeApproveResult(auth_id, { slug, projectRefs: project_refs })
 }
 
 type OAuthAppsAuthorizeApproveData = Awaited<ReturnType<typeof approveOAuthAppsAuthorize>>

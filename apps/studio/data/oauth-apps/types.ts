@@ -70,8 +70,7 @@ export type OAuthAppsAuthorizeRedirect = {
 
 /**
  * PROVISIONAL — mirror of the agreed Slack contract (exact JSON still to be published);
- * revisit before wiring the real API. No mock scenario returns this yet; the fixtures belong
- * to the post-submit role-validation branch.
+ * revisit before wiring the real API. The `mock-vercel-role-validation` scenario returns this.
  */
 export type OAuthAppsAuthorizeRoleValidationFailure = {
   error_code: 'role_validation_failed'
@@ -87,3 +86,9 @@ export type OAuthAppsAuthorizeRoleValidationFailure = {
 export type OAuthAppsAuthorizeApproveResult =
   | OAuthAppsAuthorizeRedirect
   | OAuthAppsAuthorizeRoleValidationFailure
+
+export function isRoleValidationFailure(
+  result: OAuthAppsAuthorizeApproveResult
+): result is OAuthAppsAuthorizeRoleValidationFailure {
+  return 'error_code' in result && result.error_code === 'role_validation_failed'
+}
