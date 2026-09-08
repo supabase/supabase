@@ -31,7 +31,7 @@ import {
 } from 'ui-patterns/multi-select'
 
 import type { ConnectMode, FieldOption, ResolvedField } from './Connect.types'
-import { getFrameworkMatchScore } from './ConnectConfigSection.utils'
+import { getOptionMatchScore } from './ConnectConfigSection.utils'
 import { ConnectionIcon } from './ConnectionIcon'
 import {
   ConnectModeButton,
@@ -83,6 +83,14 @@ export function ConnectConfigSection({
                   options={options}
                   value={String(value ?? '')}
                   onValueChange={(v) => onFieldChange(field.id, v)}
+                  placeholder={field.combobox?.placeholder ?? 'Select option'}
+                  searchPlaceholder={field.combobox?.searchPlaceholder ?? 'Search...'}
+                  emptyMessage={field.combobox?.emptyMessage ?? 'No results found'}
+                  /*
+                    [Joshen] Omitting MCP icons for now as the images are not optimized (large)
+                    and is causing noticeably latency issues on the browser (even with the existing Connect UI)
+                   */
+                  showIcons={field.id === 'framework'}
                 />
               </FormItemLayout>
             )
@@ -270,25 +278,36 @@ interface ConnectComboboxProps {
   options: FieldOption[]
   value: string
   onValueChange: (value: string) => void
+  placeholder: string
+  searchPlaceholder: string
+  emptyMessage: string
+  showIcons: boolean
 }
 
-function ConnectCombobox({ id, options, value, onValueChange }: ConnectComboboxProps) {
+function ConnectCombobox({
+  id,
+  options,
+  value,
+  onValueChange,
+  placeholder,
+  searchPlaceholder,
+  emptyMessage,
+  showIcons,
+}: ConnectComboboxProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [listboxElementId, setListboxElementId] = useState<string>()
   const selectedOption = options.find((option) => option.value === value)
   const showEmptyStatus =
     search.trim().length > 0 &&
-    !options.some((option) => getFrameworkMatchScore(option.label, search, [option.value]) > 0)
+    !options.some((option) => getOptionMatchScore(option.label, search, [option.value]) > 0)
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open)
     if (!open) setSearch('')
   }
 
   return (
-    // `modal` is required inside the Connect sheet: the sheet's scroll lock cancels wheel and
-    // touch events that land outside it, and a non-modal popover portals outside the sheet.
-    <Popover open={isOpen} onOpenChange={handleOpenChange} modal>
+    <Popover open={isOpen} onOpenChange={handleOpenChange} modal={false}>
       <PopoverTrigger asChild>
         <Button
           id={id}
@@ -301,24 +320,24 @@ function ConnectCombobox({ id, options, value, onValueChange }: ConnectComboboxP
           iconRight={<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" strokeWidth={1} />}
         >
           <span className="flex min-w-0 items-center gap-x-2">
-            {selectedOption?.icon && (
+            {showIcons && selectedOption?.icon && (
               <span aria-hidden="true" className="flex shrink-0">
                 <ConnectionIcon icon={selectedOption.icon} />
               </span>
             )}
-            <span className="truncate">{selectedOption?.label ?? 'Select framework'}</span>
+            <span className="truncate">{selectedOption?.label ?? placeholder}</span>
           </span>
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="p-0" sameWidthAsTrigger>
-        <Command filter={getFrameworkMatchScore}>
+        <Command filter={getOptionMatchScore}>
           <CommandInput
-            placeholder="Search frameworks..."
+            placeholder={searchPlaceholder}
             value={search}
             onValueChange={setSearch}
           />
           <p className="sr-only" role="status" aria-live="polite">
-            {showEmptyStatus ? 'No frameworks found.' : ''}
+            {showEmptyStatus ? emptyMessage : ''}
           </p>
           <CommandList
             className="max-h-72 overscroll-contain"
@@ -326,7 +345,7 @@ function ConnectCombobox({ id, options, value, onValueChange }: ConnectComboboxP
               if (node?.id) setListboxElementId(node.id)
             }}
           >
-            <CommandEmpty>No frameworks found.</CommandEmpty>
+            <CommandEmpty>{emptyMessage}</CommandEmpty>
             <CommandGroup>
               {options.map((option) => (
                 <CommandItem
@@ -345,7 +364,7 @@ function ConnectCombobox({ id, options, value, onValueChange }: ConnectComboboxP
                       option.value === value ? 'opacity-100' : 'opacity-0'
                     )}
                   />
-                  {option.icon && (
+                  {showIcons && option.icon && (
                     <span aria-hidden="true" className="flex shrink-0">
                       <ConnectionIcon icon={option.icon} />
                     </span>

@@ -87,6 +87,12 @@ interface FieldDefinition {
   type: FieldType
   label: string
   description?: string
+  // Copy for `combobox` fields, which need their own trigger, search and empty-state text
+  combobox?: {
+    placeholder: string
+    searchPlaceholder: string
+    emptyMessage: string
+  }
   // Options can be static, or reference a data source, or be conditional
   options?: FieldOption[] | { source: string } | ConditionalValue<FieldOption[]>
   // Only show this field when these state conditions are met

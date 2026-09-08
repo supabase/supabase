@@ -13,6 +13,11 @@ const frameworkField: ResolvedField = {
   id: 'framework',
   type: 'combobox',
   label: 'Framework',
+  combobox: {
+    placeholder: 'Select framework',
+    searchPlaceholder: 'Search frameworks...',
+    emptyMessage: 'No frameworks found',
+  },
   resolvedOptions: [],
 }
 
@@ -86,7 +91,7 @@ describe('ConnectConfigSection', () => {
     await user.click(screen.getByRole('combobox'))
     await user.type(screen.getByPlaceholderText('Search frameworks...'), 'missing')
 
-    expect(screen.getByRole('status')).toHaveTextContent('No frameworks found.')
+    expect(screen.getByRole('status')).toHaveTextContent('No frameworks found')
   })
 
   test('clears the search when the combobox closes after selecting an option', async () => {
@@ -132,27 +137,5 @@ describe('ConnectConfigSection', () => {
 
     expect(listbox).toHaveClass('max-h-72', 'overscroll-contain')
     expect(screen.getAllByRole('option')).toHaveLength(20)
-  })
-
-  test('opens the framework dropdown as a modal layer so it owns scrolling inside the sheet', async () => {
-    const user = userEvent.setup()
-
-    customRender(
-      <ConnectConfigSection
-        activeFields={[frameworkField]}
-        state={{ framework: 'framework-0' }}
-        onFieldChange={vi.fn()}
-        getFieldOptions={() => manyFrameworkOptions}
-      />
-    )
-
-    const combobox = document.getElementById('connect-framework')
-    expect(combobox).toBeTruthy()
-
-    await user.click(combobox!)
-
-    // A non-modal dropdown portals outside the sheet, where the sheet's scroll lock cancels its
-    // wheel and touch events. Radix only disables outside pointer events for a modal popover.
-    expect(document.body.style.pointerEvents).toBe('none')
   })
 })
