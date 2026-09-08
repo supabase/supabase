@@ -17,7 +17,7 @@ import {
 } from './WarehouseModePanel.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
+import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -71,23 +71,25 @@ export const WarehouseSchemaTablePicker = ({
   const sourceId = sourcesData?.sources.find((source) => source.name === projectRef)?.id
 
   const {
-    data: publications,
+    data: publication,
     isError: isPublicationsError,
     error: publicationsError,
-  } = useReplicationPublicationsQuery({ projectRef, sourceId })
+  } = useReplicationPublicationQuery({
+    projectRef,
+    sourceId,
+    publicationName: WAREHOUSE_PUBLICATION_NAME,
+  })
 
   // Derived from data presence rather than fetch status, so there's no render gap between the
-  // publications query becoming enabled and it actually starting to fetch.
+  // publication query becoming enabled and it actually starting to fetch.
   const isSelectionPending =
     isSourcesLoading ||
-    (sourceId !== undefined && publications === undefined && !isPublicationsError)
+    (sourceId !== undefined && publication === undefined && !isPublicationsError)
 
-  const initialSelection = useMemo(() => {
-    const warehousePublication = publications?.find(
-      (publication) => publication.name === WAREHOUSE_PUBLICATION_NAME
-    )
-    return buildSelectionFromPublicationTables(warehousePublication?.tables ?? [])
-  }, [publications])
+  const initialSelection = useMemo(
+    () => buildSelectionFromPublicationTables(publication?.tables ?? []),
+    [publication]
+  )
 
   const selection = selectionOverride ?? initialSelection
 
