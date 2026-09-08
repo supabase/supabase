@@ -16,6 +16,13 @@ import type { SafePostgresColumn } from '@/lib/postgres-types'
 import { trimSafeSqlFragment } from '@/lib/sql'
 import type { DeepReadonly } from '@/lib/type-helpers'
 import type { Dictionary } from '@/types'
+import { nullSuggestion, typeExpressionSuggestions } from './ColumnEditor.constants'
+import type { Suggestion } from './ColumnEditor.types'
+
+export const getDefaultValueSuggestions = (format: string, isNullable: boolean): Suggestion[] => {
+  const nullableSuggestion: Suggestion[] = isNullable ? [nullSuggestion] : []
+  return nullableSuggestion.concat(typeExpressionSuggestions?.[format] ?? [])
+}
 
 // Schemas where types are considered "unqualified" — matches the ColumnType dropdown convention,
 // which omits formatSchema for built-in (pg_catalog) and public types.

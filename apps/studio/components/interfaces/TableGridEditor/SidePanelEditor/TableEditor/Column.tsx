@@ -22,8 +22,8 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
 import type { Suggestion } from '../ColumnEditor/ColumnEditor.types'
+import { getDefaultValueSuggestions } from '../ColumnEditor/ColumnEditor.utils'
 import ColumnType from '../ColumnEditor/ColumnType'
 import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
 import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
@@ -79,7 +79,7 @@ export const Column = ({
 }: ColumnProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
-  const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
+  const suggestions: Suggestion[] = getDefaultValueSuggestions(column.format, column.isNullable)
 
   const settingsCount = [
     column.isNullable ? 1 : 0,

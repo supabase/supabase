@@ -3,7 +3,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 
 import { POSTGRES_DATA_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField } from '../SidePanelEditor.types'
-import { nullSuggestion, typeExpressionSuggestions } from './ColumnEditor.constants'
+import { getDefaultValueSuggestions } from './ColumnEditor.utils'
 import type { Suggestion } from './ColumnEditor.types'
 import InputWithSuggestions from './InputWithSuggestions'
 import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
@@ -20,10 +20,7 @@ export const ColumnDefaultValue = ({
   onUpdateField = noop,
 }: ColumnDefaultValueProps) => {
   const { format, isNullable } = columnFields
-  const defaultSuggestion: Suggestion[] = isNullable ? [nullSuggestion] : []
-  const suggestions: Suggestion[] = defaultSuggestion.concat(
-    typeExpressionSuggestions?.[format] ?? []
-  )
+  const suggestions: Suggestion[] = getDefaultValueSuggestions(format, isNullable)
 
   // If selected column type is a user-defined enum, show a dropdown list of options
   const isEnum: boolean =
