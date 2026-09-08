@@ -18,7 +18,7 @@ In the Supabase ecosystem, specific database roles are generated to facilitate c
 
 ---
 
-### **Understanding the Problem: "Permission Denied"**
+## **Understanding the problem: "Permission denied"**
 
 If you attempt to execute `DROP ROLE cli_login_postgres` via the SQL Editor or a standard database connection, you will encounter a "permission denied" error. Even when logged in as the `postgres` user, you lack the administrative authority to remove this specific role because it is managed by the internal `supabase_admin` system.
 
