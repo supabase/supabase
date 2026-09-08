@@ -486,7 +486,9 @@ export const ReplicationPipelineStatus = () => {
                       const errorReason =
                         isErrorState && 'reason' in table.state ? table.state.reason : undefined
                       const errorSolution =
-                        isErrorState && 'solution' in table.state ? table.state.solution : undefined
+                        isErrorState && 'solution' in table.state
+                          ? (table.state.solution ?? undefined)
+                          : undefined
                       return (
                         <TableReplicationRow
                           key={table.id}
