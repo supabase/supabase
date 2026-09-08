@@ -1,12 +1,14 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  getMockOAuthAppsAuthorizeApproveResult,
   getMockOAuthAppsAuthorizeIdentity,
   getMockOAuthAppsAuthorizeOrganizationProjects,
   getMockOAuthAppsAuthorizeRequest,
   OAUTH_APPS_MOCK_SCENARIOS,
   USE_MOCKS,
 } from './mocks'
+import { isRoleValidationFailure } from './types'
 
 const NORTHWIND_SLUG = 'northwind-traders'
 
@@ -90,6 +92,70 @@ describe('oauth-apps mocks', () => {
 
     projects.forEach((project) => {
       expect(project.name).not.toMatch(/branch/i)
+    })
+  })
+
+  describe('post-submit role validation', () => {
+    const approve = (authId: string, projectRefs: string[]) =>
+      getMockOAuthAppsAuthorizeApproveResult(authId, { slug: NORTHWIND_SLUG, projectRefs })
+
+    const readOnlyRefs = () =>
+      getMockOAuthAppsAuthorizeOrganizationProjects(NORTHWIND_SLUG)
+        .filter((project) => project.role === 'read_only')
+        .map((project) => project.ref)
+
+    const writableRefs = () =>
+      getMockOAuthAppsAuthorizeOrganizationProjects(NORTHWIND_SLUG)
+        .filter((project) => project.role !== 'read_only')
+        .map((project) => project.ref)
+
+    test('the fixture has both read-only and writable projects to validate against', () => {
+      expect(readOnlyRefs().length).toBeGreaterThan(0)
+      expect(writableRefs().length).toBeGreaterThan(0)
+    })
+
+    test('rejects read-only projects when write scopes are requested', () => {
+      const result = approve(OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation, readOnlyRefs())
+
+      expect(isRoleValidationFailure(result)).toBe(true)
+    })
+
+    test('reports every rejected project with its ref, name and role', () => {
+      const result = approve(OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation, readOnlyRefs())
+
+      if (!isRoleValidationFailure(result)) throw new Error('expected a role validation failure')
+
+      expect(result.projects).toHaveLength(readOnlyRefs().length)
+      result.projects.forEach((project) => {
+        expect(project.ref).toBeTruthy()
+        expect(project.name).toBeTruthy()
+        expect(project.role).toBe('read_only')
+      })
+      expect(result.roles).toEqual(['read_only'])
+      expect(result.failed_scopes.length).toBeGreaterThan(0)
+    })
+
+    test('rejects only the read-only refs out of a mixed selection', () => {
+      const result = approve(OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation, [
+        ...readOnlyRefs(),
+        ...writableRefs(),
+      ])
+
+      if (!isRoleValidationFailure(result)) throw new Error('expected a role validation failure')
+
+      expect(result.projects.map((project) => project.ref).sort()).toEqual(readOnlyRefs().sort())
+    })
+
+    test('approves a selection of writable projects', () => {
+      const result = approve(OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation, writableRefs())
+
+      expect(isRoleValidationFailure(result)).toBe(false)
+    })
+
+    test('scenarios outside the role-validated set approve read-only projects', () => {
+      const result = approve(OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper, readOnlyRefs())
+
+      expect(isRoleValidationFailure(result)).toBe(false)
     })
   })
 })
