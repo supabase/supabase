@@ -11,10 +11,24 @@ export type AuthHooksUpdateVariables = {
   config: components['schemas']['UpdateGoTrueConfigHooksBody']
 }
 
+/**
+ * Updates project Auth Hook configuration via the partial-update config endpoint.
+ *
+ * Routes through the general `/platform/auth/{ref}/config` endpoint instead of `/config/hooks`
+ * to avoid overwriting unrelated custom SMTP settings and rate limits.
+ *
+ * @param variables - The project reference and hook configuration payload.
+ * @returns The updated GoTrue configuration response.
+ */
 export async function updateAuthHooks({ projectRef, config }: AuthHooksUpdateVariables) {
-  const { data, error } = await patch('/platform/auth/{ref}/config/hooks', {
+  // Route through the general /config endpoint instead of /config/hooks.
+  // The hooks-specific endpoint has a backend bug that overwrites the entire
+  // GoTrue config, silently wiping custom SMTP settings and resetting
+  // RATE_LIMIT_EMAIL_SENT. The general endpoint handles partial updates
+  // correctly. See https://github.com/supabase/supabase/issues/49873
+  const { data, error } = await patch('/platform/auth/{ref}/config', {
     params: { path: { ref: projectRef } },
-    body: config,
+    body: config as components['schemas']['UpdateGoTrueConfigBody'],
   })
 
   if (error) handleError(error)
