@@ -146,7 +146,6 @@ describe('whenAiAssistantInitialized', () => {
     state.loadPersistedState({
       projectRef: 'default',
       activeChatId: 'persisted-chat',
-      model: state.model,
       chats: {
         'persisted-chat': {
           id: 'persisted-chat',

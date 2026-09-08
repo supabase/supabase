@@ -410,7 +410,6 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                           <SchemaSelector
                             size="small"
                             showError={false}
-                            stopScrollPropagation
                             selectedSchemaName={field.value}
                             onSelectSchema={(name) => field.onChange(name)}
                             disabled={field.disabled}
@@ -435,7 +434,6 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                             size="small"
                             schema={postgresValues.schema}
                             value={field.value}
-                            stopScrollPropagation
                             onChange={field.onChange}
                             disabled={field.disabled}
                             filterFunction={(func) => {

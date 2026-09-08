@@ -1,7 +1,11 @@
 # Style guide fallback
 
 There is no separate published style guide yet beyond what already lives in
-this repo. Use the public sources below, in order:
+this repo. Use the public sources below, in order.
+
+This fallback governs voice, formatting, and terminology only. It's not a
+source of truth for behavior or product framing (that's the Gather phase's
+Linear + code read, per SKILL.md rule 3).
 
 1. Read [`apps/docs/CONTRIBUTING.md`](../../../../apps/docs/CONTRIBUTING.md)
    for authoring conventions (voice, structure, document types).

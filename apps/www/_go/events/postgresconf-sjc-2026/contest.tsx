@@ -39,7 +39,6 @@ const page: GoPageInput = {
     {
       type: 'single-column',
       title: 'Multigres: One stop PostgreSQL Management and Scaling',
-      description: 'Conference Talk: Thursday, April 23, 2026 2:30pm PDT',
       children: (
         <div className="flex flex-col items-center gap-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-2xl">
@@ -86,8 +85,12 @@ const page: GoPageInput = {
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Button asChild variant="primary" size="medium">
-              <Link href="https://www.multigres.com" target="_blank" rel="noopener noreferrer">
-                Learn about Multigres
+              <Link
+                href="https://www.youtube.com/watch?v=ahhQ0n1SHiQ"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Watch the webinar
               </Link>
             </Button>
             <Button asChild variant="default" size="medium">
@@ -113,7 +116,7 @@ const page: GoPageInput = {
             <li>Create a Supabase account and note the email address you used</li>
             <li>Load data into a Supabase database</li>
             <li>Fill out the entry form below</li>
-            <li>Complete these steps by Monday, May 4, 2026 at 12:00 PM PST</li>
+            <li>Complete these steps by Monday, September 14, 2026 at 12:00 PM PST</li>
           </ol>
           <Button asChild variant="default" size="medium">
             <Link href="https://supabase.com/dashboard">Create your account</Link>

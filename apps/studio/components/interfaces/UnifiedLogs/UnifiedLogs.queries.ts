@@ -13,6 +13,7 @@ import {
   safeSql,
   type SafeLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
+import { WORKER_LOG_SOURCES } from '@/lib/constants/workers'
 
 // Operator fragments for SQL emission. `safeSql` rejects plain strings, so we
 // pre-brand the keywords we want to switch between.
@@ -54,12 +55,21 @@ const HTTP_STATUS_EXPR: SafeLogSqlFragment = safeSql`if(source = 'auth_logs', lo
  * logs from postgREST / storage-api and are intentionally not part of unified
  * logs; the UI surfaces gateway HTTP traffic for those buckets.
  */
-const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = Object.fromEntries(
-  Object.entries(LOG_TYPE_TO_SOURCE).map(([type, source]) => [
-    type,
-    safeSql`source = ${lit(source)}`,
-  ])
-)
+const WORKER_LOG_SOURCE_VALUES = Object.values(WORKER_LOG_SOURCES)
+const WORKER_LOG_SOURCE_CONDITION = safeSql`log_attributes['source'] IN (${joinSqlFragments(
+  WORKER_LOG_SOURCE_VALUES.map((source) => lit(source)),
+  ','
+)})`
+
+const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = {
+  ...Object.fromEntries(
+    Object.entries(LOG_TYPE_TO_SOURCE).map(([type, source]) => [
+      type,
+      safeSql`source = ${lit(source)}`,
+    ])
+  ),
+  workers: WORKER_LOG_SOURCE_CONDITION,
+}
 
 // Derived `log_type` column for SELECT / GROUP BY / countIf use.
 // WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%' THEN 'postgrest'
@@ -75,6 +85,7 @@ const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN source = 'supavisor_logs' THEN 'supavisor'
       WHEN source = 'pgbouncer_logs' THEN 'pgbouncer'
       WHEN source = 'multigres_logs' THEN 'multigres'
+      WHEN ${WORKER_LOG_SOURCE_CONDITION} THEN 'workers'
       ELSE source
     END`
 
@@ -82,9 +93,14 @@ const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
 // auth-service `status` attribute for auth rows, and the Postgres
 // `parsed.sql_state_code` (e.g. `42P01`) for postgres rows.
 const STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
+      WHEN ${WORKER_LOG_SOURCE_CONDITION} THEN null
       WHEN source = 'postgres_logs' THEN toString(log_attributes['parsed.sql_state_code'])
       ELSE toString((${HTTP_STATUS_EXPR}))
     END`
+
+const METHOD_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, null, ${ATTR.method})`
+const PATHNAME_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, null, ${ATTR.path})`
+const METADATA_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, log_attributes, map())`
 
 // SQL expression for derived `level`. Used inline (not as alias reference)
 // because the OTEL endpoint can't resolve aliases inside countIf when the
@@ -95,6 +111,7 @@ const STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
 // success/warning/error by status. Postgres-style severity is the
 // fallback for rows without a status code.
 const LEVEL_EXPR: SafeLogSqlFragment = safeSql`CASE
+      WHEN ${WORKER_LOG_SOURCE_CONDITION} THEN null
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) >= 500 THEN 'error'
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 400 AND 499 THEN 'warning'
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 200 AND 299 THEN 'success'
@@ -262,10 +279,11 @@ const ROW_PROJECTION: SafeLogSqlFragment = safeSql`
     ${LOG_TYPE_EXPR} AS log_type,
     ${STATUS_EXPR} AS status,
     ${LEVEL_EXPR} AS level,
-    ${ATTR.path} AS pathname,
+    ${PATHNAME_EXPR} AS pathname,
     event_message,
-    ${ATTR.method} AS method,
+    ${METHOD_EXPR} AS method,
     ${AUTH_USER_EXPR} AS auth_user,
+    ${METADATA_EXPR} AS metadata,
     null AS log_count,
     null AS logs
 `
@@ -446,11 +464,11 @@ export const getFacetCountQuery = ({
       : facet === 'level'
         ? LEVEL_EXPR
         : facet === 'method'
-          ? ATTR.method
+          ? METHOD_EXPR
           : facet === 'status'
             ? STATUS_EXPR
             : facet === 'pathname'
-              ? ATTR.path
+              ? PATHNAME_EXPR
               : safeSql`log_attributes[${lit(facet)}]`
 
   const conditions: SafeLogSqlFragment[] = [
@@ -488,7 +506,7 @@ export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
     total: safeSql`'all'`,
     log_type: LOG_TYPE_EXPR,
     level: LEVEL_EXPR,
-    method: ATTR.method,
+    method: METHOD_EXPR,
     status: STATUS_EXPR,
   }
 

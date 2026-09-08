@@ -386,6 +386,8 @@ export const PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT =
   'Purchase IPv4 add-on or use Shared Pooler if on a IPv4 network'
 export const IPV4_ADDON_TEXT = 'Connections are IPv4 proxied with IPv4 add-on'
 
+export const CONNECTION_SOURCE_LOAD_BALANCER = 'load-balancer'
+
 export type ConnectionStringMethod = 'direct' | 'transaction' | 'session'
 
 export const connectionStringMethodOptions: Record<

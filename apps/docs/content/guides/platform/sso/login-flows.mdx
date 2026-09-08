@@ -1,29 +1,29 @@
 ---
-title: 'Understanding SSO Login Flows'
-description: 'Learn about IdP-initiated and SP-initiated SSO login flows and when to use each approach.'
+title: 'Understanding SSO Sign-in Flows'
+description: 'Learn about IdP-initiated and SP-initiated SSO sign-in flows and when to use each approach.'
 ---
 
-When configuring SSO for your organization, you can choose between two different login flows: **identity provider (IdP)-initiated** and **service provider (SP)-initiated**. Understanding the difference helps you provide the best experience for your users.
+When configuring SSO for your organization, you can choose between two different sign-in flows: **identity provider (IdP)-initiated** and **service provider (SP)-initiated**. Understanding the difference helps you provide the best experience for your users.
 
 <Admonition type="note" title="Quick decision guide">
 
-Most enterprises use IdP-initiated flow for its simplicity and better user experience. Enable SP-initiated only if you need users to start their login journey at supabase.com.
+Most enterprises use IdP-initiated flow for its simplicity and better user experience. Enable SP-initiated only if you need users to start their sign-in journey at supabase.com.
 
-See our [Choosing the Right Login Flow guide](/docs/guides/platform/sso/choosing-login-flow) for use case examples.
+See our [Choosing the Right Sign-in Flow guide](/docs/guides/platform/sso/choosing-login-flow) for use case examples.
 
 </Admonition>
 
-## Overview of login flows
+## Overview of sign-in flows
 
 ### IdP-initiated (Identity Provider Initiated)
 
-With IdP-initiated flow, users start their login journey from your identity provider (Okta, Azure AD, Google Workspace, etc.) and are directly authenticated into Supabase.
+With IdP-initiated flow, users start their sign-in journey from your identity provider (Okta, Azure AD, Google Workspace, etc.) and are directly authenticated into Supabase.
 
 **User experience:**
 
 1. User opens their identity provider dashboard (e.g., Okta homepage, Azure MyApps)
 2. User clicks the Supabase app tile or bookmark
-3. User is immediately logged into Supabase (if already authenticated with IdP)
+3. User is immediately signed in to Supabase (if already authenticated with IdP)
 
 **Key characteristics:**
 
@@ -49,7 +49,7 @@ With SP-initiated flow, users start at supabase.com, enter their email address, 
 - ✅ Familiar flow for users who bookmark supabase.com
 - ✅ Supports domain-based automatic IdP routing
 - ⚠️ Requires configuring email domains
-- ⚠️ More steps in the login process
+- ⚠️ More steps in the sign-in process
 
 ## Choosing between flows
 
@@ -65,7 +65,7 @@ With SP-initiated flow, users start at supabase.com, enter their email address, 
 **Common scenarios:**
 
 - "Our team accesses all tools through Okta tiles"
-- "We want the simplest possible login experience"
+- "We want the simplest possible sign-in experience"
 - "We need separate Dev and Prod SAML apps under the same domain"
 - "Users should never need to remember supabase.com"
 
@@ -81,7 +81,7 @@ With SP-initiated flow, users start at supabase.com, enter their email address, 
 
 - "Some users bookmark supabase.com and expect to start there"
 - "We're transitioning from password auth to SSO"
-- "Users need a consistent login page across all tools"
+- "Users need a consistent sign-in page across all tools"
 - "We want domain-based automatic IdP selection"
 
 ### When to enable both flows
@@ -94,7 +94,7 @@ You can enable both flows simultaneously to support different user preferences.
 - Gradual SSO migration with mixed authentication
 - Supporting both technical and non-technical users
 
-## Configuring login flows
+## Configuring sign-in flows
 
 ### Enabling IdP-initiated flow (default)
 
@@ -133,13 +133,13 @@ To enable SP-initiated flow, you need to configure email domains:
 
 <Admonition type="caution" title="Domain restrictions apply">
 
-Only users with email addresses matching your configured domains can use SP-initiated login. Users with other domains cannot sign in via SSO at supabase.com (but can still use IdP-initiated flow if you configure it in your IdP).
+Only users with email addresses matching your configured domains can use SP-initiated sign-in. Users with other domains cannot sign in via SSO at supabase.com (but can still use IdP-initiated flow if you configure it in your IdP).
 
 </Admonition>
 
 ### Switching between flows
 
-You can change login flow configuration at any time:
+You can change sign-in flow configuration at any time:
 
 #### To switch from SP-initiated to IdP-only
 
@@ -224,11 +224,11 @@ This is the recommended approach for enterprises with multiple environments. Con
 
 ### Can you use both flows simultaneously?
 
-Yes! Enable SP-initiated login and configure domains. IdP-initiated flow continues to work automatically.
+Yes! Enable SP-initiated sign-in and configure domains. IdP-initiated flow continues to work automatically.
 
 ### What happens when you don't configure domains?
 
-Without domains, only IdP-initiated flow is available. Users cannot start their login at supabase.com.
+Without domains, only IdP-initiated flow is available. Users cannot start their sign-in at supabase.com.
 
 ### Does the IdP require configuration?
 
@@ -261,7 +261,7 @@ See our [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-
 
 ## Next steps
 
-- **Choose your login flow:** See [Choosing the Right Login Flow](/docs/guides/platform/sso/choosing-login-flow)
+- **Choose your sign-in flow:** See [Choosing the Right Sign-in Flow](/docs/guides/platform/sso/choosing-login-flow)
 - **Configure your provider:** Follow our [provider-specific guides](/docs/guides/platform/sso#supported-providers)
 - **Test thoroughly:** Review [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices)
 - **Enable auto-join:** Configure [auto-join settings](/docs/guides/platform/sso#key-configuration-options) for seamless onboarding
