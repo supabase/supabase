@@ -39,7 +39,6 @@ export default {
         'postgrest-js',
         'postgres-meta',
         'postgres-wasm',
-        'stripe-sync-engine',
         'supa_audit',
         'supabase',
         'supabase-dart',
