@@ -97,7 +97,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     ).toBeInTheDocument()
   })
 
-  test('unverified fixture shows a letter avatar on the success screen', async () => {
+  test('unverified fixture reaches the success screen with the authorizing identity', async () => {
     customRender(<OAuthAppsAuthorizeScreen mockState="unverified" navigate={vi.fn()} />)
 
     await screen.findByRole('combobox')
@@ -105,6 +105,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: /Authorize kemal-bot/ }))
 
     expect(await screen.findByText('kemal-bot is connected')).toBeInTheDocument()
-    expect(screen.getByText('A')).toBeInTheDocument()
+    expect(screen.getByText('Authorized by')).toBeInTheDocument()
+    expect(screen.getByText(/admin@example\.com/)).toBeInTheDocument()
   })
 })
