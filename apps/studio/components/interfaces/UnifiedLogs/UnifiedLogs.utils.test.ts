@@ -52,6 +52,22 @@ describe('buildUnifiedLogsUrl', () => {
     )
     expect(params.has('date')).toBe(false)
   })
+
+  it('appends extraFilters alongside the log_type filter', () => {
+    const { params } = parse(
+      buildUnifiedLogsUrl({
+        projectRef: 'abc',
+        logType: 'workers',
+        extraFilters: ['worker:eq:fran-worker'],
+      })
+    )
+    expect(params.getAll('filter')).toEqual(['log_type:eq:workers', 'worker:eq:fran-worker'])
+  })
+
+  it('sets the id param to pre-select a row', () => {
+    const { params } = parse(buildUnifiedLogsUrl({ projectRef: 'abc', id: 'row-123' }))
+    expect(params.get('id')).toBe('row-123')
+  })
 })
 
 describe('parseMultigresEventMessage', () => {

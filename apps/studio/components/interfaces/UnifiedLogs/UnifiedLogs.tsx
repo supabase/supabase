@@ -32,9 +32,9 @@ import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Colum
 import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
-import { TooltipLabel } from './components/TooltipLabel'
 import { RowSelectionHeader } from './RowSelectionHeader'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
+import { CHART_CONFIG } from './UnifiedLogs.chart-config'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import {
@@ -73,21 +73,6 @@ import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
-
-export const CHART_CONFIG = {
-  success: {
-    label: <TooltipLabel level="success" />,
-    color: 'var(--chart-success)',
-  },
-  warning: {
-    label: <TooltipLabel level="warning" />,
-    color: 'var(--chart-warning)',
-  },
-  error: {
-    label: <TooltipLabel level="error" />,
-    color: 'hsl(var(--destructive-default))',
-  },
-} satisfies ChartConfig
 
 export const UnifiedLogs = () => {
   useResetFocus()

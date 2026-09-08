@@ -34,6 +34,8 @@ export const buildUnifiedLogsUrl = ({
   user,
   start,
   end,
+  extraFilters,
+  id,
 }: {
   projectRef: string
   logType?: UnifiedLogType
@@ -41,13 +43,19 @@ export const buildUnifiedLogsUrl = ({
   user?: string
   start?: string | Date
   end?: string | Date
+  /** Additional raw `column:opAbbrev:value` filter strings, appended alongside `logType`. */
+  extraFilters?: string[]
+  /** Pre-selects this row so its detail panel opens as soon as the page loads. */
+  id?: string
 }) => {
   const params = new URLSearchParams()
   if (logType) params.append('filter', `log_type:eq:${logType}`)
+  extraFilters?.forEach((filter) => params.append('filter', filter))
   if (user) params.set('user', user)
   if (start && end) {
     params.set('date', `${new Date(start).valueOf()}-${new Date(end).valueOf()}`)
   }
+  if (id) params.set('id', id)
   return `/project/${projectRef}/logs?${params.toString()}`
 }
 

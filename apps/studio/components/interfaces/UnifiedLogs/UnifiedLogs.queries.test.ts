@@ -181,6 +181,28 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).not.toContain("log_attributes['request.path'] NOT LIKE '%/rest/%'")
     })
 
+    it.each([
+      ['worker_requests', 'worker_ingress_logs'],
+      ['worker_output', 'worker_guest_logs'],
+      ['worker_builds', 'worker_api_logs'],
+    ] as const)('excludes the %s stream from the Workers log type when %s=false', (key, source) => {
+      const sql = getUnifiedLogsQuery({ ...baseSearch, [key]: false } as any)
+      expect(sql).toContain(`log_attributes['source'] != '${source}'`)
+    })
+
+    it('does not filter worker streams by default (all worker_* toggles true)', () => {
+      const sql = getUnifiedLogsQuery(baseSearch)
+      expect(sql).not.toContain("log_attributes['source'] != 'worker_ingress_logs'")
+      expect(sql).not.toContain("log_attributes['source'] != 'worker_guest_logs'")
+      expect(sql).not.toContain("log_attributes['source'] != 'worker_api_logs'")
+    })
+
+    it('scopes to a single worker via the generic log_attributes fallback', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:workers', 'worker:eq:fran-worker'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`log_attributes['worker'] IN ('fran-worker')`)
+    })
+
     it('leaves dedicated auth_logs/storage_logs/postgrest_logs rows untouched by the edge_* toggles', () => {
       // These toggles only hide traffic nested inside the `edge_logs` (API
       // Gateway) source — the dedicated sources are separate log types now

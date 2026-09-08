@@ -36,7 +36,13 @@ export const filterFields = [
             ]
           : value === 'postgres'
             ? [{ label: 'Connection logs', value: 'show_connection_logs' }]
-            : [],
+            : value === 'workers'
+              ? [
+                  { label: 'Invocations', value: 'worker_requests' },
+                  { label: 'Logs', value: 'worker_output' },
+                  { label: 'Activity', value: 'worker_builds' },
+                ]
+              : [],
     })),
     component: (props: Option) => {
       return (

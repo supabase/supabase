@@ -31,24 +31,15 @@ import { WorkerStatePill } from '../WorkerStatePill'
 import { WorkerLogsTab } from './WorkerLogsTab'
 import { WorkerOverviewTab } from './WorkerOverviewTab'
 import { AlertError } from '@/components/ui/AlertError'
-import type { WorkerLogStream } from '@/data/workers/worker-logs-query'
 import { workerQueryOptions } from '@/data/workers/worker-query'
 import { PRODUCT_NAME } from '@/lib/constants/workers'
 
-type WorkerTab = 'overview' | 'invocations' | 'logs' | 'activity'
-const WORKER_TABS: WorkerTab[] = ['overview', 'invocations', 'logs', 'activity']
+type WorkerTab = 'overview' | 'logs'
+const WORKER_TABS: WorkerTab[] = ['overview', 'logs']
 
 const TAB_LABEL: Record<WorkerTab, string> = {
   overview: 'Overview',
-  invocations: 'Invocations',
   logs: 'Logs',
-  activity: 'Activity',
-}
-
-const TAB_STREAM: Partial<Record<WorkerTab, WorkerLogStream>> = {
-  invocations: 'requests',
-  logs: 'output',
-  activity: 'builds',
 }
 
 export const WorkerDetail = () => {
@@ -84,8 +75,6 @@ export const WorkerDetail = () => {
       </div>
     )
   }
-
-  const stream = TAB_STREAM[tab]
 
   return (
     <div className="w-full min-h-full flex flex-col items-stretch">
@@ -138,9 +127,9 @@ export const WorkerDetail = () => {
       </PageNav>
 
       {tab === 'overview' && <WorkerOverviewTab worker={worker} />}
-      {stream !== undefined && (
+      {tab === 'logs' && (
         <div className="flex flex-1 flex-col min-h-0">
-          <WorkerLogsTab key={stream} workerName={worker.name} stream={stream} />
+          <WorkerLogsTab workerName={worker.name} />
         </div>
       )}
     </div>

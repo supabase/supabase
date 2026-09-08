@@ -335,6 +335,18 @@ const EDGE_SERVICE_PATH_FILTER: Record<'edge_auth' | 'edge_storage' | 'edge_post
   edge_postgrest: '%/rest/%',
 }
 
+// Maps each worker stream's view-option toggle to the OTEL `log_attributes['source']`
+// value it hides. Mirrors EDGE_SERVICE_PATH_FILTER above, but for the three streams
+// (Invocations/Logs/Activity) nested under the `workers` log type.
+const WORKER_STREAM_VIEW_OPTION: Record<
+  'worker_requests' | 'worker_output' | 'worker_builds',
+  string
+> = {
+  worker_requests: WORKER_LOG_SOURCES.requests,
+  worker_output: WORKER_LOG_SOURCES.output,
+  worker_builds: WORKER_LOG_SOURCES.builds,
+}
+
 /**
  * Returns view-option WHERE conditions — toggles from the filter sidebar that
  * hide a subset of rows without being a `filter` URL param (Postgres
@@ -421,6 +433,14 @@ const applySearchParamsFilter = (search: QuerySearchParamsType): SafeLogSqlFragm
       conditions.push(
         safeSql`(source != 'edge_logs' OR ${ATTR.path} NOT LIKE ${lit(EDGE_SERVICE_PATH_FILTER[key])})`
       )
+    }
+  }
+
+  // Visible by default — only an explicit `false` hides that stream within
+  // the Workers log type (Invocations/Logs/Activity).
+  for (const key of ['worker_requests', 'worker_output', 'worker_builds'] as const) {
+    if (search[key] === false) {
+      conditions.push(safeSql`log_attributes['source'] != ${lit(WORKER_STREAM_VIEW_OPTION[key])}`)
     }
   }
 
