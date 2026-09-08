@@ -35,17 +35,20 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
     setIsLoading(true)
 
     try {
+      const next = safeNextPath(
+        new URLSearchParams(window.location.search).get('next'),
+        '/protected'
+      )
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/protected`,
+          emailRedirectTo: `${window.location.origin}${next}`,
         },
       })
       if (error) throw error
       if (data.session) {
-        const next = new URLSearchParams(window.location.search).get('next')
-        window.location.assign(safeNextPath(next, '/protected'))
+        window.location.assign(next)
       } else {
         await navigate({ to: '/sign-up-success' })
       }

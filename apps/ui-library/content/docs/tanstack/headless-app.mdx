@@ -3,105 +3,80 @@ title: Headless App
 description: A backend with an agent as the primary interface
 ---
 
-Give your agent a backend to operate against. Users work through their agent;
-the app provides the pages to sign in, approve access, and revoke it.
-
-This block combines [Password-Based Auth](/library/docs/tanstack/password-based-auth),
-[OAuth Consent](/library/docs/tanstack/oauth-consent), and an
-[MCP Server](/library/docs/headless/mcp-server). An example tasks table and tools
-let the agent create, list, update, and delete tasks on the user's behalf.
-Row Level Security (RLS) limits each user to their own data.
+A headless app uses an AI agent as its primary interface. Users sign in and
+approve access in the browser, then work through their agent using MCP tools.
+This starter includes task tools and a database with Row Level Security (RLS)
+that limits each user to their own data.
 
 <BlockPreview name="headless-app" />
 
 ## Installation
 
-Install into a [TanStack Start app with shadcn/ui configured](https://ui.shadcn.com/docs/installation/tanstack).
-Local development also requires [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started) 2.71.1 or later,
-a Docker-compatible runtime, and Deno 2.7 or later.
+Create a TanStack Start app:
 
-Run the install command from your app directory, where `components.json` is located.
-If you created the app with `shadcn init --name my-app`, run `cd my-app` first.
+```bash
+pnpm dlx shadcn@latest init --template start --name my-app
+cd my-app
+```
+
+Install the headless app:
 
 <BlockItem name="headless-app-tanstack" showOpenInV0={false} />
 
-Auth and consent install as dependencies. The shared MCP server is included
-with the task tools already registered. Merge `supabase/config.toml` with any
-existing project configuration. Add `"supabase/functions/**"` to your app's
-`tsconfig.json` exclusions; the function is checked separately with Deno.
+Merge `supabase/config.toml` if you already have project settings. Add
+`"supabase/functions/**"` to your app's `tsconfig.json` exclusions.
 
-<RegistryBlock itemName="headless-app-tanstack" />
+## Customize
 
-## Run locally
-
-### 1. Start the backend
-
-The supplied config enables OAuth and points to the app at `http://localhost:3000`.
-Use `localhost` for the app throughout sign-in and OAuth so both flows share the same session.
-Update `auth.site_url` and `auth.additional_redirect_urls` if your app uses another hostname or port.
-
-```bash
-supabase start
-supabase db diff -f create_tasks
-```
-
-Review the generated migration, then apply it to create the example table and RLS policies:
-
-```bash
-supabase migration up
-supabase status
-```
-
-### 2. Start the app and MCP server
-
-Set `.env.local` using the URL and publishable key from `supabase status`:
-
-```env
-VITE_SUPABASE_URL=http://127.0.0.1:54321
-VITE_SUPABASE_PUBLISHABLE_KEY=<local-publishable-key>
-VITE_PRODUCT_NAME="Your app"
-```
-
-Follow the MCP block's [environment setup](/library/docs/headless/mcp-server#environment)
-to name your server, then check and serve it:
-
-```bash
-cd supabase/functions/mcp-server
-deno task check
-cd ../../..
-supabase functions serve mcp-server --env-file supabase/functions/.env
-```
-
-In a separate terminal, start the app with `npm run dev`.
-
-### 3. Connect your agent
-
-Open `http://localhost:3000/agents`, sign in, and copy the server URL into your agent's MCP settings.
-Use a client that supports HTTP and OAuth, then follow its browser flow to approve access.
-Ask your agent to create a task and list your tasks to try the backend.
-
-The `/agents` page also lets you revoke access. Revocation stops token renewal;
-an existing access token can work until it expires. Remote clients that cannot
-reach your local machine need the deployed endpoints below.
-
-## Make it your own
-
-- Define your data in `supabase/schemas/`, including grants and RLS policies.
-  Run `supabase db diff -f <name>`, review the migration, and apply it with `supabase migration up`.
-- Replace the example tools in `supabase/functions/mcp-server/tools/tasks.ts`
-  with your app's operations and register them in `tools/index.ts`.
-  Use the supplied user-scoped `supabase` client for data access.
-- Run `deno task check` from the function directory, restart the function, and
-  refresh your agent's tool list. See [Add tools](/library/docs/headless/mcp-server#add-tools)
-  for the shared API.
+- Set `VITE_PRODUCT_NAME` in `.env.local` and edit the generated pages and components.
+- Define your tables, grants, and RLS policies in `supabase/schemas/`.
+- Replace `supabase/functions/mcp-server/tools/tasks.ts` with your app's operations
+  and register them in `tools/index.ts`. Use the supplied user-scoped `supabase` client.
+- Set `MCP_SERVER_NAME` and `MCP_SERVER_DESCRIPTION` with `supabase secrets set`.
 
 ## Deploy
 
-Deploy the TanStack app and set its environment variables to your hosted Supabase
-project. Update the Auth URLs in `supabase/config.toml` to the deployed app, enable
-email confirmations, and complete the [auth email setup](/library/docs/tanstack/password-based-auth).
+Deploy the frontend using a [TanStack Start hosting adapter](https://tanstack.com/start/latest/docs/framework/react/guide/hosting).
+Set these environment variables in your hosting provider before building:
 
-Run `supabase link` and `supabase db push`, then follow the MCP server's
-[project configuration](/library/docs/headless/mcp-server#configure-the-project) and
-[deployment steps](/library/docs/headless/mcp-server#deploy). Connect your agent
-using the hosted URL from `/agents`.
+```env
+VITE_SUPABASE_URL=https://<project-ref>.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=<publishable-key>
+VITE_PRODUCT_NAME="Your app"
+```
+
+In `supabase/config.toml`, set `auth.site_url` to your deployed HTTPS origin,
+update `auth.additional_redirect_urls` for your app's destinations, and set
+`auth.email.enable_confirmations = true`. Keep the supplied OAuth and function settings.
+Use an ES256 or RS256 signing key in your project's
+[JWT Keys](https://supabase.com/dashboard/project/_/settings/jwt).
+
+In [Email Templates](https://supabase.com/dashboard/project/_/auth/templates),
+use this confirmation link for sign-up and change `type=email` to `type=recovery`
+for password reset:
+
+```html
+<a
+  href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next={{ .RedirectTo | urlquery }}"
+  >Confirm email</a
+>
+```
+
+With the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started)
+and Docker installed, generate a migration:
+
+```bash
+supabase db diff -f create_tasks
+```
+
+Review the migration, including grants and RLS policies, then deploy:
+
+```bash
+supabase link --project-ref <project-ref>
+supabase db push
+supabase config push
+supabase functions deploy mcp-server
+```
+
+Open `/agents` on your deployed app, sign in, and copy the server URL into an
+MCP client that supports HTTP and OAuth. Approve access to start using your tools.
