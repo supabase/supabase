@@ -12,6 +12,7 @@ interface QueryResultRendererProps {
   /** The query that produced `result`, used to build the "Debug with Assistant" prompt on error. */
   sql?: string
   source?: SqlSnippetSource
+  onDebug?: (prompt: string) => void
 }
 
 export const QueryResultRenderer = ({
@@ -20,6 +21,7 @@ export const QueryResultRenderer = ({
   chart,
   sql,
   source,
+  onDebug,
 }: QueryResultRendererProps) => {
   const { rows, error, autoLimit } = result ?? {}
 
@@ -28,7 +30,15 @@ export const QueryResultRenderer = ({
   }
 
   if (error) {
-    return <QueryResultError error={error} autoLimit={autoLimit} sql={sql} source={source} />
+    return (
+      <QueryResultError
+        error={error}
+        autoLimit={autoLimit}
+        sql={sql}
+        source={source}
+        onDebug={onDebug}
+      />
+    )
   }
 
   if ((rows ?? []).length === 0) {

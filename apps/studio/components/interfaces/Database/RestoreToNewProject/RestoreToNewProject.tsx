@@ -28,6 +28,7 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   useIsAwsK8sCloudProvider,
+  useIsHighAvailability,
   useIsOrioleDb,
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
@@ -41,6 +42,7 @@ export const RestoreToNewProject = () => {
     useCheckEntitlements('backup.restore_to_new_project')
   const isOrioleDb = useIsOrioleDb()
   const isAwsK8s = useIsAwsK8sCloudProvider()
+  const isHighAvailability = useIsHighAvailability()
 
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const [selectedBackupId, setSelectedBackupId] = useState<number | null>(null)
@@ -129,6 +131,16 @@ export const RestoreToNewProject = () => {
         type="default"
         title="Restoring to new projects are not available for OrioleDB"
         description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
+      />
+    )
+  }
+
+  if (isHighAvailability) {
+    return (
+      <Admonition
+        type="default"
+        title="Restoring to a new project is unavailable on High Availability projects"
+        description="We're working to bring restores to High Availability projects. Contact support if this is blocking your work."
       />
     )
   }
