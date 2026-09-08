@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { cn } from 'ui'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -18,6 +19,17 @@ export interface ProjectMultiSelectProps {
   selectedRefs: string[]
   onChange: (selectedRefs: string[]) => void
   error?: string
+  /**
+   * Selected refs a post-submit role validation rejected — a subset of {@link selectedRefs}, so
+   * it empties as they are deselected. Drives the count beneath the picker.
+   */
+  flaggedRefs?: string[]
+  /**
+   * Every ref the last validation rejected, whether or not it is still selected. Outlives
+   * {@link flaggedRefs} on purpose: the dropdown has to keep marking these, or deselecting them
+   * would leave nothing to stop the user picking the same projects straight back.
+   */
+  unavailableRefs?: string[]
 }
 
 export const ProjectMultiSelect = ({
@@ -25,8 +37,11 @@ export const ProjectMultiSelect = ({
   selectedRefs,
   onChange,
   error,
+  flaggedRefs = [],
+  unavailableRefs = [],
 }: ProjectMultiSelectProps) => {
   const labelId = useId()
+  const hasFlagged = flaggedRefs.length > 0
   const atCap = selectedRefs.length >= MAX_SELECTED_PROJECTS
   const showCounter = selectedRefs.length >= SHOW_COUNTER_FROM
 
@@ -38,7 +53,10 @@ export const ProjectMultiSelect = ({
   return (
     <div className="flex w-full flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <p id={labelId} className="text-xs text-foreground">
+        <p
+          id={labelId}
+          className={cn('text-xs', hasFlagged ? 'text-destructive' : 'text-foreground')}
+        >
           Projects
         </p>
         {showCounter && (
@@ -66,12 +84,21 @@ export const ProjectMultiSelect = ({
                 disabled={atCap && !selectedRefs.includes(project.ref)}
               >
                 {project.name}
+                {unavailableRefs.includes(project.ref) && (
+                  <span className="text-foreground-lighter"> - Unavailable</span>
+                )}
               </MultiSelectorItem>
             ))}
           </MultiSelectorList>
         </MultiSelectorContent>
       </MultiSelector>
 
+      {hasFlagged && (
+        <p className="text-xs text-destructive">
+          {flaggedRefs.length} of {selectedRefs.length}{' '}
+          {selectedRefs.length === 1 ? 'project' : 'projects'} unavailable
+        </p>
+      )}
       {atCap && (
         <p className="text-xs text-foreground-lighter">
           Maximum reached. Deselect a project to choose a different one.
