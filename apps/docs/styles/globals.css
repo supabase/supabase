@@ -160,11 +160,16 @@ h6:not(.font-mono),
   @apply font-heading font-semibold;
 }
 
+/* Alert set its own type scale to prevent drift in docs */
 .prose
   :where(p, li, a, figcaption):not(:where([class~='not-prose'], [class~='not-prose'] *)):not(
     :where(h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6) *
-  ) {
+  ):not(:where([data-slot='alert'] *)) {
   @apply text-base leading-7;
+}
+
+.prose :where([data-slot='alert'] ol > li)::before {
+  top: 0;
 }
 
 .prose :where(h1, .h1):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
@@ -276,10 +281,6 @@ pre[class*='language-'] {
   }
 }
 
-.admonition-content > p {
-  @apply m-0;
-}
-
 /* format <code> inside <p> */
 h2 code,
 h3 code,
@@ -294,13 +295,6 @@ h4 code {
   &::after {
     display: none;
   }
-}
-
-/* code inside admonitions */
-.admonition-content p code {
-  @apply bg-control;
-  word-break: keep-all !important;
-  white-space: nowrap !important;
 }
 
 article p strong {
