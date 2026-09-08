@@ -123,6 +123,13 @@ export const InviteMemberButton = () => {
       )
     )
 
+  // When the button is disabled because inviting is unavailable, the
+  // ButtonTooltip below renders the reason. The keyboard-shortcut tooltip from
+  // <Shortcut> attaches to the same trigger, so both would open at once and
+  // overlap (#49859) — and advertising the shortcut while it cannot fire is
+  // misleading. Suppress the shortcut tooltip whenever the warning is shown.
+  const showInviteDisabledWarning = !organizationMembersCreationEnabled || !canInviteMembers
+
   const { mutateAsync: inviteMemberAsync, isPending: isInviting } =
     useOrganizationCreateInvitationMutation()
 
@@ -260,7 +267,7 @@ export const InviteMemberButton = () => {
             if (canInviteMembers) setIsOpen(true)
           }}
           side="bottom"
-          tooltipOpen={isOpen ? false : undefined}
+          tooltipOpen={isOpen || showInviteDisabledWarning ? false : undefined}
         >
           <ButtonTooltip
             variant="primary"
@@ -271,11 +278,11 @@ export const InviteMemberButton = () => {
             tooltip={{
               content: {
                 side: 'bottom',
-                text: !organizationMembersCreationEnabled
-                  ? 'Inviting members is currently disabled'
-                  : !canInviteMembers
-                    ? 'You need additional permissions to invite members to this organization'
-                    : undefined,
+                text: showInviteDisabledWarning
+                  ? !organizationMembersCreationEnabled
+                    ? 'Inviting members is currently disabled'
+                    : 'You need additional permissions to invite members to this organization'
+                  : undefined,
               },
             }}
           >
