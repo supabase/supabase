@@ -18,18 +18,16 @@ const specifications = [
   { name: 'platform', url: platformApiUrl },
 ]
 
-const temporaryDirectory = await mkdtemp(join(tmpdir(), 'api-types-'))
-const generatedTypesDirectory = join(temporaryDirectory, 'types')
-
-try {
-  await mkdir(generatedTypesDirectory)
-
-  const config = await Promise.all(
+export async function fetchOpenApiSpecifications(
+  specifications,
+  { fetchImpl = fetch, writeFileImpl = writeFile, temporaryDirectory, generatedTypesDirectory }
+) {
+  return Promise.all(
     specifications.map(async ({ name, url }) => {
       let response
 
       try {
-        response = await fetch(url, {
+        response = await fetchImpl(url, {
           signal: AbortSignal.timeout(fetchTimeout),
         })
       } catch {
@@ -42,54 +40,82 @@ try {
         )
       }
 
-      await writeFile(join(temporaryDirectory, `${name}.json`), await response.text())
+      await writeFileImpl(join(temporaryDirectory, `${name}.json`), await response.text())
 
       return `  ${name}:\n    root: ${join(temporaryDirectory, `${name}.json`)}\n    x-openapi-ts:\n      output: ${join(generatedTypesDirectory, `${name}.d.ts`)}`
     })
   )
+}
 
-  await writeFile(join(temporaryDirectory, 'redocly.yaml'), `apis:\n${config.join('\n')}`)
-  await run(
-    'pnpm',
-    [
-      'exec',
-      'openapi-typescript',
-      '--redocly',
-      join(temporaryDirectory, 'redocly.yaml'),
-      '--alphabetize',
-      '--default-non-nullable=false',
-    ],
-    { cwd: packageDirectory }
-  )
-
-  await run(
-    'pnpm',
-    [
-      'exec',
-      'prettier',
-      '--write',
-      ...specifications.map(({ name }) => join(generatedTypesDirectory, `${name}.d.ts`)),
-    ],
-    { cwd: packageDirectory }
-  )
-
+export async function findMismatchedTypes(
+  specifications,
+  { readFileImpl = readFile, generatedTypesDirectory, typesDirectory }
+) {
   const mismatches = await Promise.all(
     specifications.map(async ({ name }) => {
       const filename = `${name}.d.ts`
       const [generated, committed] = await Promise.all([
-        readFile(join(generatedTypesDirectory, filename), 'utf8'),
-        readFile(join(typesDirectory, filename), 'utf8'),
+        readFileImpl(join(generatedTypesDirectory, filename), 'utf8'),
+        readFileImpl(join(typesDirectory, filename), 'utf8'),
       ])
 
       return generated === committed ? undefined : filename
     })
   )
 
-  const changedTypes = mismatches.filter((filename) => filename !== undefined)
+  return mismatches.filter((filename) => filename !== undefined)
+}
 
-  if (changedTypes.length > 0) {
-    throw new Error(`Committed API types do not match production: ${changedTypes.join(', ')}`)
+export async function verifyProductionTypes() {
+  const temporaryDirectory = await mkdtemp(join(tmpdir(), 'api-types-'))
+  const generatedTypesDirectory = join(temporaryDirectory, 'types')
+
+  try {
+    await mkdir(generatedTypesDirectory)
+
+    const config = await fetchOpenApiSpecifications(specifications, {
+      temporaryDirectory,
+      generatedTypesDirectory,
+    })
+
+    await writeFile(join(temporaryDirectory, 'redocly.yaml'), `apis:\n${config.join('\n')}`)
+    await run(
+      'pnpm',
+      [
+        'exec',
+        'openapi-typescript',
+        '--redocly',
+        join(temporaryDirectory, 'redocly.yaml'),
+        '--alphabetize',
+        '--default-non-nullable=false',
+      ],
+      { cwd: packageDirectory }
+    )
+
+    await run(
+      'pnpm',
+      [
+        'exec',
+        'prettier',
+        '--write',
+        ...specifications.map(({ name }) => join(generatedTypesDirectory, `${name}.d.ts`)),
+      ],
+      { cwd: packageDirectory }
+    )
+
+    const changedTypes = await findMismatchedTypes(specifications, {
+      generatedTypesDirectory,
+      typesDirectory,
+    })
+
+    if (changedTypes.length > 0) {
+      throw new Error(`Committed API types do not match production: ${changedTypes.join(', ')}`)
+    }
+  } finally {
+    await rm(temporaryDirectory, { force: true, recursive: true })
   }
-} finally {
-  await rm(temporaryDirectory, { force: true, recursive: true })
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  await verifyProductionTypes()
 }
