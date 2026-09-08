@@ -53,8 +53,8 @@ export const ColumnDefaultValue = ({
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                {/* @ts-ignore: Valid in this context */}
-                <SelectItem value={null}>NULL</SelectItem>
+                {/* @ts-ignore: value being null is valid in this context */}
+                {isNullable && <SelectItem value={null}>NULL</SelectItem>}
                 {enumValues.map((value) => (
                   <SelectItem key={value} value={value}>
                     {value}
