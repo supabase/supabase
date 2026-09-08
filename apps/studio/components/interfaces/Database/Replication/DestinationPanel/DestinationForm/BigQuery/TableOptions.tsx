@@ -102,6 +102,7 @@ export const TableOptions = ({ control }: TableOptionsProps) => {
   )
 
   const { fields, append, remove } = useFieldArray({ control, name: 'tableOptions' })
+  const fieldIndexByTableId = new Map(fields.map((field, index) => [field.tableId, index]))
   const { errors } = useFormState({ control, name: 'tableOptions' })
   const publicationTableIds = new Set(publicationTables.map(({ id }) => id))
   const publicationTablesById = new Map(publicationTables.map((table) => [table.id, table]))
@@ -180,14 +181,14 @@ export const TableOptions = ({ control }: TableOptionsProps) => {
           onValueChange={(value) => setExpandedTableId(value === '' ? undefined : Number(value))}
         >
           {publicationTables.map((table) => {
-            const index = fields.findIndex((field) => field.tableId === table.id)
-            const isConfigured = index !== -1
-            const summary = tableOptionSummary(isConfigured ? tableOptions[index] : undefined)
+            const index = fieldIndexByTableId.get(table.id)
+            const summary = tableOptionSummary(
+              index === undefined ? undefined : tableOptions[index]
+            )
             // Errors live inside the collapsed row, so the trigger has to carry them or a
             // blocked save looks like nothing happened at all.
-            const rowError = isConfigured
-              ? findFirstErrorMessage(errors.tableOptions?.[index])
-              : undefined
+            const rowError =
+              index === undefined ? undefined : findFirstErrorMessage(errors.tableOptions?.[index])
             const summaryLabel = rowError ?? summary ?? 'Not configured'
             const publishedColumnNames =
               selectedPublication?.config.type === 'tables'
@@ -239,7 +240,7 @@ export const TableOptions = ({ control }: TableOptionsProps) => {
                 {/* Radix unmounts closed content after its exit animation, so this must not be
                     gated on the expanded state as well or the row collapses as an empty box. */}
                 <AccordionContent className="[&>div]:p-0">
-                  {isConfigured ? (
+                  {index !== undefined ? (
                     <TableOptionRow
                       control={control}
                       index={index}
