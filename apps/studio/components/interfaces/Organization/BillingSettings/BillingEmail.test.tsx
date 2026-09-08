@@ -72,7 +72,13 @@ const mockUpdateCustomerProfile = () => {
 }
 
 const addRecipient = async (email: string) => {
-  const input = screen.getByPlaceholderText('Add additional recipients')
+  const input = screen
+    .getAllByRole('combobox')
+    .find((element): element is HTMLInputElement => element instanceof HTMLInputElement)
+
+  expect(input).toBeDefined()
+  if (!input) return
+
   await userEvent.click(input)
   await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'))
   // fireEvent.change (rather than userEvent.type) avoids racing the popover's open-state

@@ -275,6 +275,32 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
       </>
     ),
   },
+  omp: {
+    primary: () => (
+      <>
+        <paragraph>
+          Start <inlineCode value="omp" /> and add the Supabase MCP server with the guided setup:
+        </paragraph>
+        <code lang="bash" value="/mcp add" />
+      </>
+    ),
+    alternate: () => (
+      <>
+        <paragraph>
+          That path is project-scoped. To use the server in every project, add the same entry to{' '}
+          <inlineCode value="~/.omp/agent/mcp.json" /> instead.
+        </paragraph>
+        <paragraph>
+          If a session is already open, pick up the change with <inlineCode value="/mcp reload" />.
+          omp opens your browser to complete the Supabase OAuth flow the first time it connects.
+        </paragraph>
+        <paragraph>
+          Confirm the server is connected with <inlineCode value="/mcp list" />, or authorize again
+          with a different account using <inlineCode value="/mcp reauth supabase" />.
+        </paragraph>
+      </>
+    ),
+  },
   kiro: {
     deepLinkDescription: (
       <paragraph>

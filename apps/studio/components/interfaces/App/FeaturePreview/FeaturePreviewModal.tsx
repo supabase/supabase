@@ -20,16 +20,14 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   ScrollArea,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-} from 'ui/src/components/shadcn/ui/select'
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
 import { CLSPreview } from './CLSPreview'
@@ -41,6 +39,7 @@ import { JitDbAccessPreview } from './JitDbAccessPreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { SqlEditorManualSavePreview } from './SqlEditorManualSavePreview'
+import { StorageVersioningPreview } from './StorageVersioningPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
@@ -61,6 +60,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]: <IntegrationsLayoutPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS]: <DatabaseConnectionsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]: <ExplorerPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING]: <StorageVersioningPreview />,
 }
 
 export const FeaturePreviewModal = () => {

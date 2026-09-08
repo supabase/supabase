@@ -1,3 +1,9 @@
+import type {
+  CreatePipelineApiConfig,
+  DucklakeDestinationConfig,
+  DucklakeSupabaseDestinationConfig,
+  PipelineConfig,
+} from './types'
 import { MAX_RETRY_FAILURE_COUNT } from '@/data/query-client'
 import { ResponseError } from '@/types'
 
@@ -36,3 +42,31 @@ export const checkReplicationFeatureFlagRetry = (
 
   return false
 }
+
+export function isDucklakeSupabaseConfig(
+  config: DucklakeDestinationConfig
+): config is DucklakeSupabaseDestinationConfig {
+  return 'catalogProjectRef' in config
+}
+
+export const buildPipelineApiConfig = ({
+  publicationName,
+  batch,
+  maxTableSyncWorkers,
+  maxCopyConnectionsPerTable,
+  invalidatedSlotBehavior,
+  tableSyncCopy,
+}: PipelineConfig): CreatePipelineApiConfig => ({
+  publication_name: publicationName,
+  max_table_sync_workers: maxTableSyncWorkers,
+  max_copy_connections_per_table: maxCopyConnectionsPerTable,
+  invalidated_slot_behavior: invalidatedSlotBehavior,
+  table_sync_copy: tableSyncCopy,
+  batch: batch
+    ? {
+        max_fill_ms: batch.maxFillMs,
+        max_bytes: batch.maxBytes,
+        memory_budget_ratio: batch.memoryBudgetRatio,
+      }
+    : undefined,
+})

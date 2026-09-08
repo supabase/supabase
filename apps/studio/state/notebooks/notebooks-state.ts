@@ -25,6 +25,13 @@ export const notebooksState = proxy({
   cellLocalState: proxyMap<string, NotebookCellLocalState>([]),
   /** Session-only conflicts where an assistant changed the server while local edits remain. */
   serverDivergedWhileDirty: proxyMap<string, 'updated' | 'deleted'>([]),
+  /**
+   * Id of the notebook the tab should scroll to the bottom of once rendered —
+   * set by a surface that adds a cell to a notebook it's about to navigate to
+   * (e.g. "Add to existing notebook" from a query tab), so the newly added
+   * cell lands in view.
+   */
+  pendingScrollToBottom: undefined as string | undefined,
 
   /**
    * Load notebook into the Valtio store. No-ops if already present.
@@ -242,6 +249,14 @@ export const notebooksState = proxy({
   },
 
   addNeedsSaving: (id: string) => notebooksState.needsSaving.set(id, true),
+
+  requestScrollToBottom: (id: string) => {
+    notebooksState.pendingScrollToBottom = id
+  },
+
+  clearPendingScrollToBottom: () => {
+    notebooksState.pendingScrollToBottom = undefined
+  },
 })
 
 export const getNotebooksStateSnapshot = () => snapshot(notebooksState)

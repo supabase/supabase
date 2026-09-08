@@ -169,9 +169,9 @@ const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItemLayout name="name" layout="vertical" label="Name">
+              <FormItemLayout layout="vertical" label="Name">
                 <FormControl>
-                  <Input {...field} id="name" />
+                  <Input {...field} />
                 </FormControl>
               </FormItemLayout>
             )}
@@ -209,11 +209,10 @@ const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps
             control={form.control}
             name="description"
             render={({ field }) => (
-              <FormItemLayout name="description" layout="vertical" label="Description">
+              <FormItemLayout layout="vertical" label="Description">
                 <FormControl>
                   <Textarea
                     {...field}
-                    id="description"
                     rows={4}
                     placeholder="Describe query"
                     className="resize-none"
