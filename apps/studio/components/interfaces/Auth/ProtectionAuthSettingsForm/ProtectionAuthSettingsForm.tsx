@@ -41,6 +41,7 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { DOCS_URL } from '@/lib/constants'
+import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
 
 const CAPTCHA_PROVIDERS = [
   { key: 'hcaptcha', label: 'hCaptcha' },
@@ -54,17 +55,14 @@ const baseSchema = z.object({
   EXTERNAL_ANONYMOUS_USERS_ENABLED: z.boolean(),
   SECURITY_MANUAL_LINKING_ENABLED: z.boolean(),
   SITE_URL: z.string().min(1, 'Must have a Site URL'),
-  PASSWORD_MIN_LENGTH: z
-    .preprocess(
-      (val) => (val === '' || val == null ? undefined : val),
-      z.coerce
-        .number({
-          required_error: 'Must have a password min length',
-          invalid_type_error: 'Must have a password min length',
-        })
-        .min(6, 'Must be greater or equal to 6.')
-    )
-    .optional(),
+  PASSWORD_MIN_LENGTH: preprocessEmptyNumberInput(
+    z.coerce
+      .number({
+        required_error: 'Must have a password min length',
+        invalid_type_error: 'Must have a password min length',
+      })
+      .min(6, 'Must be greater or equal to 6.')
+  ).optional(),
   PASSWORD_REQUIRED_CHARACTERS: z.string().optional(),
   PASSWORD_HIBP_ENABLED: z.boolean().optional(),
 })
