@@ -67,7 +67,12 @@ export async function getTableRowsCount(
 
   const table = parseSupaTable(entity)
 
-  const formattedFilters = filters?.map((x) => ({ ...x, value: formatFilterValue(table, x) }))
+  // Drop blanks BEFORE formatting: formatFilterValue would otherwise coerce
+  // '' to Number('') === 0 on numeric columns. Rows and delete-all already
+  // guard in this order; only the count path used to format first.
+  const formattedFilters = filters
+    ?.filter((x) => x.value !== undefined && x.value !== null && x.value !== '')
+    .map((x) => ({ ...x, value: formatFilterValue(table, x) }))
   const sql = wrapWithRoleImpersonation(
     getTableRowsCountSql({
       table,
