@@ -20,6 +20,9 @@ Install into a [TanStack Start app with shadcn/ui configured](https://ui.shadcn.
 Local development also requires [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started) 2.71.1 or later,
 a Docker-compatible runtime, and Deno 2.7 or later.
 
+Run the install command from your app directory, where `components.json` is located.
+If you created the app with `shadcn init --name my-app`, run `cd my-app` first.
+
 <BlockItem name="headless-app-tanstack" showOpenInV0={false} />
 
 Auth and consent install as dependencies. The shared MCP server is included
@@ -34,7 +37,8 @@ existing project configuration. Add `"supabase/functions/**"` to your app's
 ### 1. Start the backend
 
 The supplied config enables OAuth and points to the app at `http://localhost:3000`.
-Update the Auth URLs if your app uses another port.
+Use `localhost` for the app throughout sign-in and OAuth so both flows share the same session.
+Update `auth.site_url` and `auth.additional_redirect_urls` if your app uses another hostname or port.
 
 ```bash
 supabase start
@@ -72,7 +76,7 @@ In a separate terminal, start the app with `npm run dev`.
 
 ### 3. Connect your agent
 
-Open `/agents`, sign in, and copy the server URL into your agent's MCP settings.
+Open `http://localhost:3000/agents`, sign in, and copy the server URL into your agent's MCP settings.
 Use a client that supports HTTP and OAuth, then follow its browser flow to approve access.
 Ask your agent to create a task and list your tasks to try the backend.
 
