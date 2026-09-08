@@ -198,6 +198,8 @@ A “Connection refused” error typically means your database isn’t reachable
 
 This error occurs when your credentials are incorrect. Double-check your username and password from the Supabase dashboard. If the problem persists, reset your database password from the project settings.
 
+If this started immediately after rotating your database password, it's likely a transient pooler-side caching delay rather than a wrong password — see [this troubleshooting guide](/docs/guides/troubleshooting/supavisor-error-password-authentication-failed-after-password-rotation) for how to confirm and resolve it.
+
 ### How do you connect using IPv4?
 
 You have two options. The Shared Pooler (Supavisor) is IPv4-only on every project tier - use it in either session or transaction mode. Alternatively, add the [IPv4 add-on](/docs/guides/platform/ipv4-address) to your project, which makes the direct connection and Dedicated Pooler reachable over IPv4 instead of IPv6.
