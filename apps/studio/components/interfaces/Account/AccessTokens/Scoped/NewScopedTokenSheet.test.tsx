@@ -248,7 +248,89 @@ describe('NewScopedTokenSheet', () => {
     })
     // Dialog has been closed
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    // Completing the flow via Done must not also emit a dismissed event
+    expect(mockTrack).not.toHaveBeenCalledWith(
+      'access_token_creation_sheet_dismissed',
+      expect.anything()
+    )
   }, 10_000)
+
+  test('tracks dismissal with the in-progress resourceAccess and touched state on Cancel', async () => {
+    renderSheet()
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    await screen.findByRole('dialog')
+    await user.click(await screen.findByRole('radio', { name: /Organization/ }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Cancel' }))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_creation_sheet_dismissed', {
+      resourceAccess: 'organization',
+      formStep: 'form',
+      isFormTouched: true,
+      trigger: 'user',
+    })
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  })
+
+  test('tracks dismissal with the untouched default resourceAccess on Escape', async () => {
+    renderSheet()
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.keyDown(dialog, { key: 'Escape', code: 'Escape' })
+    expect(mockTrack).toHaveBeenCalledWith('access_token_creation_sheet_dismissed', {
+      resourceAccess: 'project',
+      formStep: 'form',
+      isFormTouched: false,
+      trigger: 'user',
+    })
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  })
+
+  test('tracks the review step when the sheet is dismissed from the review screen', async () => {
+    renderSheet()
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    await screen.findByRole('dialog')
+    await user.type(await screen.findByLabelText('Name'), 'test')
+    fireEvent.click(await screen.findByRole('combobox', { name: 'Organization' }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Acme Production' }))
+    fireEvent.click(await screen.findByRole('combobox', { name: 'Projects' }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Project 1' }))
+    await expandPermissionCategory('Project')
+    fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Read' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
+    await screen.findByText('Medium risk')
+    fireEvent.click(await screen.findByRole('button', { name: 'Cancel' }))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_creation_sheet_dismissed', {
+      resourceAccess: 'project',
+      formStep: 'review',
+      isFormTouched: true,
+      trigger: 'user',
+    })
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  }, 10_000)
+
+  test('tracks a permissions load error as the dismissal trigger and closes the sheet', async () => {
+    addAPIMock({
+      method: 'get',
+      // @ts-expect-error Studio API is missing from types
+      path: '/scoped-access-token-permissions',
+      response: () => HttpResponse.json({ message: 'unavailable' }, { status: 500 }),
+    })
+    renderSheet()
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    await waitFor(() =>
+      expect(mockTrack).toHaveBeenCalledWith('access_token_creation_sheet_dismissed', {
+        resourceAccess: 'project',
+        formStep: 'form',
+        isFormTouched: false,
+        trigger: 'permissions_load_error',
+      })
+    )
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    const dismissedCalls = mockTrack.mock.calls.filter(
+      ([event]) => event === 'access_token_creation_sheet_dismissed'
+    )
+    expect(dismissedCalls).toHaveLength(1)
+  })
 
   // Organization scope tests
   test('requires an organization when scope is Organization', async () => {
