@@ -14,11 +14,12 @@ import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks
 
 interface MarkdownCellProps {
   cell: MarkdownCellSchema
+  onEdit?: () => void
 }
 
 // [Joshen] handleUpdateMarkdown could be shifted into notebook-state as a updateCell action
 
-export const MarkdownCell = ({ cell }: MarkdownCellProps) => {
+export const MarkdownCell = ({ cell, onEdit }: MarkdownCellProps) => {
   const snap = useNotebooksStateSnapshot()
   const currentNotebook = useCurrentNotebook()
   const cells = currentNotebook?.notebook.content?.cells ?? []
@@ -41,6 +42,7 @@ export const MarkdownCell = ({ cell }: MarkdownCellProps) => {
     const notebookId = currentNotebook?.notebook.id
     if (!notebookId) return
 
+    onEdit?.()
     const nextCells = cells.map((c) => (c._id === cellId ? { ...c, text } : c))
     snap.updateCells({ id: notebookId, cells: nextCells })
     setIsEditing(false)

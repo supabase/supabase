@@ -1,11 +1,11 @@
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
 import {
-  Badge,
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
   SelectLabel,
+  SelectSeparator,
   SelectTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -21,7 +21,6 @@ import {
 } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
 import { ReadReplicasMovedCallout } from './ReadReplicasMovedCallout'
-import { InlineLink } from '@/components/ui/InlineLink'
 
 interface DestinationTypeOption {
   value: DestinationType
@@ -31,13 +30,9 @@ interface DestinationTypeOption {
   enabled: boolean
 }
 
-const STAGE_BADGE_VARIANT: Record<
-  NonNullable<DestinationTypeOption['stage']>,
-  'warning' | 'destructive' | 'default'
-> = {
-  'Early Access': 'warning',
-  Deprecated: 'destructive',
-  'Public Alpha': 'default',
+interface DestinationTypeGroup {
+  label: NonNullable<DestinationTypeOption['stage']>
+  options: DestinationTypeOption[]
 }
 
 export const DestinationTypeSelection = () => {
@@ -73,67 +68,74 @@ export const DestinationTypeSelection = () => {
   const isOptionVisible = (value: DestinationType, hasAccess: boolean) =>
     editMode ? destinationType === value : hasAccess
 
-  const options: DestinationTypeOption[] = (
-    [
-      {
-        value: 'Analytics Bucket',
-        label: 'Analytics Bucket',
-        description: 'Write Apache Iceberg tables to Supabase Storage for analytics workflows',
-        stage: 'Deprecated',
-        enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
-      },
-      {
-        value: 'BigQuery',
-        label: 'BigQuery',
-        description: "Replicate changes to Google Cloud's data warehouse for analytics and BI",
-        stage: 'Public Alpha',
-        enabled: isOptionVisible('BigQuery', etlEnableBigQuery),
-      },
-      {
-        value: 'DuckLake',
-        label: 'DuckLake',
-        description: 'Replicate changes to a DuckLake catalog backed by S3-compatible storage',
-        stage: 'Early Access',
-        enabled: isOptionVisible('DuckLake', etlEnableDucklake),
-      },
-      {
-        value: 'Snowflake',
-        label: 'Snowflake',
-        description:
-          'Replicate changes to Snowflake for warehouse analytics and downstream data workflows',
-        stage: 'Early Access',
-        enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
-      },
-      {
-        value: 'ClickHouse',
-        label: 'ClickHouse',
-        description: 'Stream changes to a ClickHouse cluster for fast columnar analytics',
-        stage: 'Early Access',
-        enabled: isOptionVisible('ClickHouse', etlEnableClickHouse),
-      },
-    ] satisfies DestinationTypeOption[]
-  ).filter((option) => option.enabled)
+  const groups: DestinationTypeGroup[] = [
+    {
+      label: 'Public Alpha',
+      options: [
+        {
+          value: 'BigQuery',
+          label: 'BigQuery',
+          description: "Replicate changes to Google Cloud's data warehouse for analytics and BI",
+          stage: 'Public Alpha',
+          enabled: isOptionVisible('BigQuery', etlEnableBigQuery),
+        },
+      ],
+    },
+    {
+      label: 'Early Access',
+      options: [
+        {
+          value: 'DuckLake',
+          label: 'DuckLake',
+          description: 'Replicate changes to a DuckLake catalog backed by S3-compatible storage',
+          stage: 'Early Access',
+          enabled: isOptionVisible('DuckLake', etlEnableDucklake),
+        },
+        {
+          value: 'Snowflake',
+          label: 'Snowflake',
+          description:
+            'Replicate changes to Snowflake for warehouse analytics and downstream data workflows',
+          stage: 'Early Access',
+          enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
+        },
+        {
+          value: 'ClickHouse',
+          label: 'ClickHouse',
+          description: 'Stream changes to a ClickHouse cluster for fast columnar analytics',
+          stage: 'Early Access',
+          enabled: isOptionVisible('ClickHouse', etlEnableClickHouse),
+        },
+      ],
+    },
+    {
+      label: 'Deprecated',
+      options: [
+        {
+          value: 'Analytics Bucket',
+          label: 'Analytics Bucket',
+          description: 'Write Apache Iceberg tables to Supabase Storage for analytics workflows',
+          stage: 'Deprecated',
+          enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
+        },
+      ],
+    },
+  ]
+
+  const visibleGroups = groups
+    .map((group) => ({ ...group, options: group.options.filter((option) => option.enabled) }))
+    .filter((group) => group.options.length > 0)
+  const options = visibleGroups.flatMap((group) => group.options)
 
   const selectedOption = options.find((option) => option.value === destinationType)
 
-  const stageDescription =
-    selectedOption?.stage === 'Public Alpha' ? (
-      <>
-        In public alpha and may change.{' '}
-        <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
-          Leave feedback
-        </InlineLink>
-      </>
-    ) : selectedOption?.stage === 'Early Access' ? (
-      <>
-        In early access and may change.{' '}
-        <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
-          Leave feedback
-        </InlineLink>
-      </>
-    ) : selectedOption?.stage === 'Deprecated' ? (
-      'This destination type is deprecated.'
-    ) : null
+  const STAGE_DESCRIPTIONS: Record<NonNullable<DestinationTypeOption['stage']>, string> = {
+    'Public Alpha': 'In public alpha and may change.',
+    'Early Access': 'In early access and may change.',
+    Deprecated: 'This destination type is deprecated.',
+  }
+
+  const stageDescription = selectedOption?.stage ? STAGE_DESCRIPTIONS[selectedOption.stage] : null
 
   const typeDescription =
     !editMode || stageDescription ? (
@@ -166,24 +168,18 @@ export const DestinationTypeSelection = () => {
                   size={20}
                   className="shrink-0 text-foreground-light"
                 />
-                <div className="flex items-center gap-x-2">
-                  <span className="text-sm text-foreground">{selectedOption.label}</span>
-                  {selectedOption.stage && (
-                    <Badge variant={STAGE_BADGE_VARIANT[selectedOption.stage]}>
-                      {selectedOption.stage}
-                    </Badge>
-                  )}
-                </div>
+                <span className="text-sm text-foreground">{selectedOption.label}</span>
               </div>
             ) : (
               <span className="text-foreground-lighter">Select a destination type</span>
             )}
           </SelectTrigger>
           <SelectContent align="end">
-            {options.length > 0 && (
-              <SelectGroup>
-                <SelectLabel>Pipelines</SelectLabel>
-                {options.map((option) => (
+            {visibleGroups.map((group, index) => (
+              <SelectGroup key={group.label}>
+                {index > 0 && <SelectSeparator />}
+                <SelectLabel>{group.label}</SelectLabel>
+                {group.options.map((option) => (
                   <SelectItem key={option.value} value={option.value} className="py-2">
                     <div className="flex items-center gap-x-3">
                       <DestinationIcon
@@ -192,14 +188,7 @@ export const DestinationTypeSelection = () => {
                         className="shrink-0 text-foreground-light"
                       />
                       <div className="flex flex-col gap-y-0.5">
-                        <div className="flex items-center gap-x-2">
-                          <span className="text-foreground">{option.label}</span>
-                          {option.stage && (
-                            <Badge variant={STAGE_BADGE_VARIANT[option.stage]}>
-                              {option.stage}
-                            </Badge>
-                          )}
-                        </div>
+                        <span className="text-foreground">{option.label}</span>
                         <span className="text-xs text-foreground-lighter">
                           {option.description}
                         </span>
@@ -208,7 +197,7 @@ export const DestinationTypeSelection = () => {
                   </SelectItem>
                 ))}
               </SelectGroup>
-            )}
+            ))}
           </SelectContent>
         </Select>
       </FormItemLayout>

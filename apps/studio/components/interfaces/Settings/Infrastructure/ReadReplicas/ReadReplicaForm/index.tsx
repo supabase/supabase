@@ -1,65 +1,54 @@
 import { useParams } from 'common'
-import { RefObject, useEffect, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'shared-data'
 import { toast } from 'sonner'
 import {
   Button,
-  InfoIcon,
+  DialogFooter,
+  DialogSection,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  SheetFooter,
-  SheetSection,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ReadReplicaEligibilityWarnings } from './ReadReplicaEligibilityWarnings'
 import { ReadReplicaPricingDialog } from './ReadReplicaPricingDialog'
 import { useCheckEligibilityDeployReplica } from './useCheckEligibilityDeployReplica'
+import { useGetReplicaCost } from './useGetReplicaCost'
 import { AVAILABLE_REPLICA_REGIONS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import type { RecommendedComputeForReadReplicas } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/recommendCompute'
+import { RegionFlag } from '@/components/ui/RegionFlag'
 import { Region, useReadReplicaSetUpMutation } from '@/data/read-replicas/replica-setup-mutation'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { AWS_REGIONS_DEFAULT, BASE_PATH } from '@/lib/constants'
+import { AWS_REGIONS_DEFAULT } from '@/lib/constants'
 
 interface ReadReplicaFormProps {
   typeSelection?: ReactNode
-  checkIsDirtyRef?: RefObject<() => boolean>
   onSuccess: () => void
   onClose: () => void
-  onCancel?: () => void
   onRecommendCompute: (size: RecommendedComputeForReadReplicas) => void
 }
 
 export const ReadReplicaForm = ({
   typeSelection,
-  checkIsDirtyRef,
   onSuccess,
   onClose,
-  onCancel = onClose,
   onRecommendCompute,
 }: ReadReplicaFormProps) => {
   const { ref: projectRef } = useParams()
   const { data } = useReadReplicasQuery({ projectRef })
+  const eligibility = useCheckEligibilityDeployReplica()
+  const replicaCost = useGetReplicaCost()
 
   const [defaultRegion] = Object.entries(AWS_REGIONS).find(
     ([_, name]) => name === AWS_REGIONS_DEFAULT
   ) ?? ['SOUTHEAST_ASIA']
-  const { can: canDeployReplica } = useCheckEligibilityDeployReplica()
+  const { can: canDeployReplica } = eligibility
 
   const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
-  const isDirty = selectedRegion !== defaultRegion
-
-  useEffect(() => {
-    if (!checkIsDirtyRef) return
-
-    checkIsDirtyRef.current = () => isDirty
-    return () => {
-      checkIsDirtyRef.current = () => false
-    }
-  }, [checkIsDirtyRef, isDirty])
 
   const { mutate: setUpReplica, isPending: isSettingUp } = useReadReplicaSetUpMutation({
     onSuccess: () => {
@@ -76,6 +65,7 @@ export const ReadReplicaForm = ({
           ['SOUTHEAST_ASIA', 'CENTRAL_EU', 'EAST_US'].includes(x.key)
         )
       : AVAILABLE_REPLICA_REGIONS
+  const selectedRegionDetails = availableRegions.find((region) => region.key === selectedRegion)
 
   const onSubmit = async () => {
     if (!projectRef) return console.error('Project is required')
@@ -89,19 +79,21 @@ export const ReadReplicaForm = ({
 
   return (
     <>
-      <SheetSection className="grow overflow-auto px-0 py-0">
+      <DialogSection className="flex flex-col p-0!">
         {typeSelection}
-        {!canDeployReplica && (
-          <SheetSection>
-            <ReadReplicaEligibilityWarnings onRecommendCompute={onRecommendCompute} />
-          </SheetSection>
-        )}
         <FormItemLayout
           isReactForm={false}
-          layout="horizontal"
+          layout="vertical"
           className="p-5 [&>div]:gap-y-1 [&>div>span]:text-foreground-lighter"
           label="Region"
-          labelOptional="Select a region to deploy your replica in"
+          description={
+            canDeployReplica ? (
+              <span>
+                This replica will be deployed in{' '}
+                <span translate="no">{selectedRegionDetails?.region}</span>.
+              </span>
+            ) : undefined
+          }
         >
           <Select
             value={selectedRegion}
@@ -109,17 +101,20 @@ export const ReadReplicaForm = ({
             disabled={!canDeployReplica}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select a region" />
+              <SelectValue placeholder="Select a region">
+                <span className="flex min-w-0 items-center gap-x-2">
+                  {selectedRegionDetails !== undefined && (
+                    <RegionFlag className="w-5 shrink-0" region={selectedRegionDetails.region} />
+                  )}
+                  <span className="truncate">{selectedRegionDetails?.name}</span>
+                </span>
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {availableRegions.map((region) => (
                 <SelectItem key={region.key} value={region.key}>
                   <div className="flex gap-x-3 items-center">
-                    <img
-                      alt="region icon"
-                      className="w-5 rounded-xs"
-                      src={`${BASE_PATH}/img/regions/${region.region}.svg`}
-                    />
+                    <RegionFlag className="w-5" region={region.region} />
                     <p className="flex items-center gap-x-2">
                       <span>{region.name}</span>
                       <span className="text-xs text-foreground-lighter font-mono">
@@ -132,22 +127,26 @@ export const ReadReplicaForm = ({
             </SelectContent>
           </Select>
         </FormItemLayout>
-      </SheetSection>
-      <SheetFooter className="justify-between! gap-x-6">
-        <div className="flex items-center gap-x-3">
-          <InfoIcon className="h-5 w-5" />
-          <ReadReplicaPricingDialog />
+      </DialogSection>
+      {canDeployReplica ? (
+        <ReadReplicaPricingDialog replicaCost={replicaCost} />
+      ) : (
+        <div className="[&>[role=alert]]:mb-0 [&>[role=alert]]:rounded-none [&>[role=alert]]:border-x-0">
+          <ReadReplicaEligibilityWarnings
+            eligibility={eligibility}
+            onRecommendCompute={onRecommendCompute}
+          />
         </div>
+      )}
 
-        <div className="flex items-center gap-x-2">
-          <Button disabled={isSettingUp} variant="default" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button disabled={!canDeployReplica} loading={isSettingUp} onClick={onSubmit}>
-            Deploy replica
-          </Button>
-        </div>
-      </SheetFooter>
+      <DialogFooter className="border-t-0">
+        <Button disabled={isSettingUp} variant="default" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button disabled={!canDeployReplica} loading={isSettingUp} onClick={onSubmit}>
+          Add replica
+        </Button>
+      </DialogFooter>
     </>
   )
 }

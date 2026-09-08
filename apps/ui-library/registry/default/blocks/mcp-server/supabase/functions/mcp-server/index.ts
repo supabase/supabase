@@ -5,7 +5,7 @@ import {
   withOAuthProtectedResource,
   withSupabase,
   type SupabaseContext,
-} from 'npm:@supabase/server@1.5.0-rc.114'
+} from 'npm:@supabase/server@1.5.1'
 
 import { registerTools, type ToolContext } from './tools/index.ts'
 
@@ -36,7 +36,7 @@ const CORS_HEADERS: Record<string, string> = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
   'Access-Control-Allow-Headers':
-    'Authorization, Content-Type, Accept, Mcp-Protocol-Version, Mcp-Session-Id',
+    'Authorization, Content-Type, Accept, Mcp-Protocol-Version, Mcp-Session-Id, Mcp-Method, Mcp-Name',
   'Access-Control-Expose-Headers': 'WWW-Authenticate, Mcp-Session-Id',
 }
 

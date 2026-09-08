@@ -3,7 +3,15 @@
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
-import { Badge, Collapsible, CollapsibleContent, CollapsibleTrigger, FormField, Switch } from 'ui'
+import {
+  Badge,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  FormControl,
+  FormField,
+  Switch,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { SupportFormValues } from './SupportForm.schema'
@@ -23,7 +31,6 @@ export function SupportAccessToggle({ form, align = 'left', className }: Support
         return (
           <FormItemLayout
             hideMessage
-            name="allowSupportAccess"
             className={className}
             layout="flex"
             align={align}
@@ -75,12 +82,9 @@ export function SupportAccessToggle({ form, align = 'left', className }: Support
               </div>
             }
           >
-            <Switch
-              size="large"
-              id="allowSupportAccess"
-              checked={field.value}
-              onCheckedChange={field.onChange}
-            />
+            <FormControl>
+              <Switch size="large" checked={field.value} onCheckedChange={field.onChange} />
+            </FormControl>
           </FormItemLayout>
         )
       }}

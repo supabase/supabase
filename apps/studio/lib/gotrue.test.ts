@@ -1,6 +1,108 @@
 import { describe, expect, it } from 'vitest'
 
-import { DEFAULT_FALLBACK_PATH, validateReturnTo } from './gotrue'
+import {
+  buildSignUpReturnPath,
+  DEFAULT_FALLBACK_PATH,
+  DEFAULT_SIGNUP_RETURN_PATH,
+  getSignUpReturnTo,
+  validateReturnTo,
+} from './gotrue'
+
+describe('getSignUpReturnTo', () => {
+  it('defaults to /new when returnTo is missing', () => {
+    expect(getSignUpReturnTo(undefined)).toBe(DEFAULT_SIGNUP_RETURN_PATH)
+    expect(getSignUpReturnTo('')).toBe(DEFAULT_SIGNUP_RETURN_PATH)
+  })
+
+  it('rewrites /org and /organizations to /new', () => {
+    expect(getSignUpReturnTo('/org')).toBe(DEFAULT_SIGNUP_RETURN_PATH)
+    expect(getSignUpReturnTo('/organizations')).toBe(DEFAULT_SIGNUP_RETURN_PATH)
+  })
+
+  it('rewrites org list paths while preserving query params', () => {
+    expect(getSignUpReturnTo('/org?foo=bar')).toBe('/new?foo=bar')
+    expect(getSignUpReturnTo('/organizations?foo=bar')).toBe('/new?foo=bar')
+  })
+
+  it('preserves explicit destinations including invite paths', () => {
+    expect(getSignUpReturnTo('/join?token=abc')).toBe('/join?token=abc')
+    expect(getSignUpReturnTo('/project/ref')).toBe('/project/ref')
+  })
+
+  it('uses the first value when returnTo is an array', () => {
+    expect(getSignUpReturnTo(['/join?token=abc', '/other'])).toBe('/join?token=abc')
+    expect(getSignUpReturnTo(['/org'])).toBe(DEFAULT_SIGNUP_RETURN_PATH)
+    expect(getSignUpReturnTo(['/organizations'])).toBe(DEFAULT_SIGNUP_RETURN_PATH)
+  })
+})
+
+describe('buildSignUpReturnPath', () => {
+  it('defaults to /new when returnTo is missing', () => {
+    // @ts-ignore
+    delete window.location
+    // @ts-ignore
+    window.location = { search: '' }
+
+    expect(buildSignUpReturnPath(undefined)).toBe(DEFAULT_SIGNUP_RETURN_PATH)
+  })
+
+  it('rewrites /org and /organizations to /new', () => {
+    // @ts-ignore
+    delete window.location
+    // @ts-ignore
+    window.location = { search: '' }
+
+    expect(buildSignUpReturnPath('/org')).toBe(DEFAULT_SIGNUP_RETURN_PATH)
+    expect(buildSignUpReturnPath('/organizations')).toBe(DEFAULT_SIGNUP_RETURN_PATH)
+  })
+
+  it('rewrites org list paths while preserving query params', () => {
+    // @ts-ignore
+    delete window.location
+    // @ts-ignore
+    window.location = { search: '' }
+
+    expect(buildSignUpReturnPath('/org?foo=bar')).toBe('/new?foo=bar')
+    expect(buildSignUpReturnPath('/organizations?foo=bar')).toBe('/new?foo=bar')
+  })
+
+  it('preserves invite returnTo paths', () => {
+    // @ts-ignore
+    delete window.location
+    // @ts-ignore
+    window.location = { search: '' }
+
+    expect(buildSignUpReturnPath('/join?token=abc')).toBe('/join?token=abc')
+  })
+
+  it('falls back to /new for invalid returnTo values', () => {
+    // @ts-ignore
+    delete window.location
+    // @ts-ignore
+    window.location = { search: '' }
+
+    expect(buildSignUpReturnPath('https://evil.com')).toBe(DEFAULT_SIGNUP_RETURN_PATH)
+    expect(buildSignUpReturnPath('//evil.com')).toBe(DEFAULT_SIGNUP_RETURN_PATH)
+  })
+
+  it('strips returnTo from the current location search params', () => {
+    // @ts-ignore
+    delete window.location
+    // @ts-ignore
+    window.location = { search: '?returnTo=/org&foo=bar' }
+
+    expect(buildSignUpReturnPath('/new')).toBe('/new?foo=bar')
+  })
+
+  it('uses the first value when returnTo is an array', () => {
+    // @ts-ignore
+    delete window.location
+    // @ts-ignore
+    window.location = { search: '' }
+
+    expect(buildSignUpReturnPath(['/join?token=abc', '/other'])).toBe('/join?token=abc')
+  })
+})
 
 describe('validateReturnTo', () => {
   const fallback = DEFAULT_FALLBACK_PATH

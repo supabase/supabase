@@ -7,6 +7,15 @@ import { AlertCircle } from 'lucide-react'
 import { FC, memo, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
+  Alert,
+  AlertDescription,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   Button,
   Form,
   FormControl,
@@ -26,16 +35,6 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
-import { Alert, AlertDescription } from 'ui/src/components/shadcn/ui/alert'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from 'ui/src/components/shadcn/ui/alert-dialog'
 
 import { CountrySelector } from '../Supasquad/CountrySelector'
 

@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { template } from 'lodash'
 import { Download, Loader2 } from 'lucide-react'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -26,21 +26,30 @@ import { useSSLEnforcementQuery } from '@/data/ssl-enforcement/ssl-enforcement-q
 import { useSSLEnforcementUpdateMutation } from '@/data/ssl-enforcement/ssl-enforcement-update-mutation'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 export const SSLConfiguration = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
+
+  // High Availability projects always enforce SSL and the API rejects any
+  // attempt to read or change the setting, so skip the query for them and
+  // show the setting as always on.
+  const { isHighAvailability, isPending: isHighAvailabilityPending } = useHighAvailability()
+  const canLoadSSLEnforcement = !isHighAvailability && !isHighAvailabilityPending
   const {
     data: sslEnforcementConfiguration,
-    isPending: isLoading,
-    isSuccess,
-  } = useSSLEnforcementQuery({
-    projectRef: ref,
-  })
+    isPending: isSSLEnforcementPending,
+    isSuccess: isSSLEnforcementSuccess,
+  } = useSSLEnforcementQuery({ projectRef: ref }, { enabled: canLoadSSLEnforcement })
+
+  const isLoading = isHighAvailabilityPending || (!isHighAvailability && isSSLEnforcementPending)
+  const isSuccess = isHighAvailability || isSSLEnforcementSuccess
   const { data: jitDbAccessConfiguration } = useJitDbAccessQuery({ projectRef: ref })
   const { mutateAsync: updateSSLEnforcement, isPending: isSubmitting } =
     useSSLEnforcementUpdateMutation({
@@ -67,9 +76,10 @@ export const SSLConfiguration = () => {
   // reflected here too, instead of relying on a mirrored local state that
   // would only resync on the initial load.
   const isEnforced =
-    isSuccess &&
-    sslEnforcementConfiguration.appliedSuccessfully &&
-    sslEnforcementConfiguration.currentConfig.database
+    isHighAvailability ||
+    (isSSLEnforcementSuccess &&
+      sslEnforcementConfiguration.appliedSuccessfully &&
+      sslEnforcementConfiguration.currentConfig.database)
 
   const hasAccessToSSLEnforcement = !(
     sslEnforcementConfiguration !== undefined &&
@@ -85,12 +95,15 @@ export const SSLConfiguration = () => {
   const isSwitchDisabled =
     isLoading ||
     isSubmitting ||
+    isHighAvailability ||
     !canUpdateSSLEnforcement ||
     !hasAccessToSSLEnforcement ||
     isTemporaryAccessEnabled
 
   let switchTooltipMessage: string | undefined
-  if (!canUpdateSSLEnforcement) {
+  if (isHighAvailability) {
+    switchTooltipMessage = 'SSL is always enforced on High Availability projects'
+  } else if (!canUpdateSSLEnforcement) {
     switchTooltipMessage =
       'You need additional permissions to update SSL enforcement for your project'
   } else if (!hasAccessToSSLEnforcement) {
@@ -98,6 +111,13 @@ export const SSLConfiguration = () => {
   } else if (isTemporaryAccessEnabled) {
     switchTooltipMessage =
       'Temporary access must first be disabled before SSL enforcement can be disabled'
+  }
+
+  let loadingAnnouncement = ''
+  if (isSubmitting) {
+    loadingAnnouncement = 'Updating SSL enforcement'
+  } else if (isLoading) {
+    loadingAnnouncement = 'Loading SSL configuration'
   }
 
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
@@ -131,34 +151,53 @@ export const SSLConfiguration = () => {
               label="Enforce SSL on incoming connections"
               description="Reject non-SSL connections to your database"
             >
+              <div className="flex items-center justify-end mt-2.5 space-x-2">
+                {(isLoading || isSubmitting) && (
+                  <Loader2
+                    aria-hidden="true"
+                    className="animate-spin motion-reduce:animate-none"
+                    strokeWidth={1.5}
+                    size={16}
+                  />
+                )}
+                {isSuccess && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
+                      {/* A disabled switch can't take focus, so the wrapper becomes the focus
+                          target to keep the tooltip reachable by keyboard */}
+                      <div tabIndex={isSwitchDisabled ? 0 : undefined}>
+                        {/* The dialog is opened from the switch itself rather than a wrapping
+                            trigger, so a disabled switch can never open it. */}
+                        <Switch
+                          size="large"
+                          checked={isEnforced}
+                          disabled={isSwitchDisabled}
+                          onCheckedChange={() => setIsConfirmDialogOpen(true)}
+                        />
+                      </div>
+                    </TooltipTrigger>
+                    {switchTooltipMessage && (
+                      <TooltipContent side="bottom" className="w-64 text-center">
+                        {switchTooltipMessage}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                )}
+                {/* Kept mounted so screen readers announce loading state changes */}
+                <span className="sr-only" role="status">
+                  {loadingAnnouncement}
+                </span>
+              </div>
               <SSLEnforcementConfirmDialog
+                open={isConfirmDialogOpen}
+                onOpenChange={setIsConfirmDialogOpen}
                 isTargetEnforced={!isEnforced}
                 isSubmitting={isSubmitting}
                 onConfirm={toggleSSLEnforcement}
-              >
-                <div className="flex items-center justify-end mt-2.5 space-x-2">
-                  {(isLoading || isSubmitting) && (
-                    <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
-                  )}
-                  {isSuccess && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
-                        <div>
-                          <Switch size="large" checked={isEnforced} disabled={isSwitchDisabled} />
-                        </div>
-                      </TooltipTrigger>
-                      {switchTooltipMessage && (
-                        <TooltipContent side="bottom" className="w-64 text-center">
-                          {switchTooltipMessage}
-                        </TooltipContent>
-                      )}
-                    </Tooltip>
-                  )}
-                </div>
-              </SSLEnforcementConfirmDialog>
+              />
             </FormLayout>
-            {isSuccess && !sslEnforcementConfiguration?.appliedSuccessfully && (
+            {isSSLEnforcementSuccess && !sslEnforcementConfiguration.appliedSuccessfully && (
               <Admonition
                 type="warning"
                 layout="horizontal"

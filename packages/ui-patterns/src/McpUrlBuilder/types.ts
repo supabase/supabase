@@ -171,6 +171,20 @@ export interface OpenCodeMcpConfig {
   }
 }
 
+/**
+ * Configuration format for the fx MCP client.
+ * fx also keys servers under `mcp`, but reads them from its own profile
+ * (`~/.fx/mcp.json`) and names the transport `http` rather than `remote`.
+ */
+export interface FxMcpConfig {
+  mcp: {
+    supabase: {
+      type: 'http'
+      url: string
+    }
+  }
+}
+
 export interface AntigravityMcpConfig {
   mcpServers: {
     supabase: {
@@ -210,6 +224,7 @@ export type McpClientConfig =
   | CodexMcpConfig
   | CursorMcpConfig
   | FactoryMcpConfig
+  | FxMcpConfig
   | GeminiMcpConfig
   | GooseMcpConfig
   | GrokMcpConfig
@@ -245,6 +260,10 @@ export function isOpenCodeMcpConfig(config: McpClientConfig): config is OpenCode
   return '$schema' in config && 'mcp' in config && 'supabase' in config.mcp
 }
 
+export function isFxMcpConfig(config: McpClientConfig): config is FxMcpConfig {
+  return 'mcp' in config && 'supabase' in config.mcp && config.mcp.supabase.type === 'http'
+}
+
 export function isAntigravityMcpConfig(config: McpClientConfig): config is AntigravityMcpConfig {
   return (
     'mcpServers' in config &&
@@ -274,6 +293,9 @@ export function getMcpUrl(config: McpClientConfig): string {
     return config.mcpServers.supabase.httpUrl
   }
   if (isOpenCodeMcpConfig(config)) {
+    return config.mcp.supabase.url
+  }
+  if (isFxMcpConfig(config)) {
     return config.mcp.supabase.url
   }
   if (isAntigravityMcpConfig(config)) {

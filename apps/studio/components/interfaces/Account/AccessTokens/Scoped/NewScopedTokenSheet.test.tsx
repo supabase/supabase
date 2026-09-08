@@ -12,6 +12,7 @@ import { addAPIMock } from '@/tests/lib/msw'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse']
 type ProjectsResponse = components['schemas']['ListProjectsPaginatedResponse']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
 type CreateTokenResponse = components['schemas']['CreateScopedAccessTokenResponse']
 type CreateClassicTokenResponse = components['schemas']['CreateAccessTokenResponse']
 
@@ -20,6 +21,9 @@ vi.mock('common', async (importOriginal) => {
   const actual = (await importOriginal()) as typeof import('common')
   return { ...actual, useReducedMotion: () => mockUseReducedMotion() }
 })
+
+const { mockTrack } = vi.hoisted(() => ({ mockTrack: vi.fn() }))
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
 
 const user = userEvent.setup({
   writeToClipboard: true,
@@ -73,6 +77,29 @@ const mockProjects = () =>
             }),
             organization_slug: 'acme-prod',
             preview_branch_refs: [],
+          },
+        ],
+      }),
+  })
+
+const mockOrgProjects = () =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/organizations/:slug/projects',
+    response: () =>
+      HttpResponse.json<OrganizationProjectsResponse>({
+        pagination: { count: 1, limit: 100, offset: 0 },
+        projects: [
+          {
+            cloud_provider: 'AWS',
+            databases: [],
+            inserted_at: new Date().toISOString(),
+            integration_source: null,
+            is_branch: false,
+            name: 'Project 1',
+            ref: 'project-1',
+            region: 'us-east-1',
+            status: 'ACTIVE_HEALTHY',
           },
         ],
       }),
@@ -138,9 +165,11 @@ describe('NewScopedTokenSheet', () => {
     })
 
   beforeEach(() => {
+    mockTrack.mockReset()
     mockPermissionsMap()
     mockOrganizations()
     mockProjects()
+    mockOrgProjects()
     mockCreateToken()
     mockCreateClassicToken()
   })
@@ -206,8 +235,17 @@ describe('NewScopedTokenSheet', () => {
     await waitFor(async () =>
       expect(await window.navigator.clipboard.readText()).toEqual('a_token_value')
     )
+    expect(mockTrack).toHaveBeenCalledWith('access_token_copied', { tokenType: 'scoped' })
     fireEvent.click(await screen.findByLabelText('I have copied the key and stored it securely'))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_stored_checkbox_clicked', {
+      tokenType: 'scoped',
+      isChecked: true,
+    })
     fireEvent.click(await screen.findByRole('button', { name: 'Done' }))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_done_button_clicked', {
+      tokenType: 'scoped',
+      hasCopiedToken: true,
+    })
     // Dialog has been closed
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   }, 10_000)
@@ -416,8 +454,19 @@ describe('NewScopedTokenSheet', () => {
     await waitFor(async () =>
       expect(await window.navigator.clipboard.readText()).toEqual('a_classic_token_value')
     )
+    // resourceAccess must be tracked as 'account' — it is the only path that emits that value
+    expect(mockTrack).toHaveBeenCalledWith('access_token_created', {
+      tokenType: 'classic',
+      expiryPreset: '7d',
+      resourceAccess: 'account',
+    })
+    expect(mockTrack).toHaveBeenCalledWith('access_token_copied', { tokenType: 'classic' })
     fireEvent.click(await screen.findByLabelText('I have copied the key and stored it securely'))
     fireEvent.click(await screen.findByRole('button', { name: 'Done' }))
+    expect(mockTrack).toHaveBeenCalledWith('access_token_done_button_clicked', {
+      tokenType: 'classic',
+      hasCopiedToken: true,
+    })
     // Dialog has been closed
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   })

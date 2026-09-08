@@ -1,7 +1,7 @@
 # Supabase configuration for a headless app: password auth for the product
 # session, an OAuth 2.1 server for external agents, and the MCP server that both
-# call. Values below are for local development — run `supabase config push` to
-# apply the same settings to a linked project.
+# call. Values below are for local development. Set production Auth URLs and
+# enable email confirmations before running `supabase config push`.
 
 project_id = "headless-app"
 

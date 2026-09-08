@@ -10,7 +10,7 @@ import { middleware } from './middleware'
 // are actually exercised below.
 vi.mock('./app/api-v2/md/content.generated', () => ({
   MD_CONTENT: new Map<string, string>(),
-  MD_PAGES: new Set<string>(['homepage', 'auth', 'pricing']),
+  MD_PAGES: new Set<string>(['index', 'auth', 'pricing']),
   CHANGELOG_PAGES: new Set<string>(['changelog', 'changelog/100', 'changelog/pipelines']),
 }))
 
@@ -116,6 +116,20 @@ describe('www middleware', () => {
       expect(res.headers.get('x-middleware-rewrite')).toBeNull()
     })
 
+    it('rewrites /index.md to the homepage markdown', () => {
+      const req = makeRequest('/index.md')
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/index')
+    })
+
+    it('falls back to serving /.md as homepage markdown if the config 308 is ever removed', () => {
+      const req = makeRequest('/.md')
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/index')
+    })
+
     it('rewrites changelog entry .md requests without doubling the suffix', () => {
       const req = makeRequest('/changelog/100.md', { accept: 'text/markdown' })
       const res = middleware(req)
@@ -154,13 +168,11 @@ describe('www middleware', () => {
   })
 
   describe('Accept: text/markdown content negotiation', () => {
-    it('rewrites / to homepage when Accept: text/markdown', () => {
+    it('rewrites / to the homepage index slug when Accept: text/markdown', () => {
       const req = makeRequest('/', { accept: 'text/markdown' })
       const res = middleware(req)
 
-      expect(res.headers.get('x-middleware-rewrite')).toBe(
-        'https://supabase.com/api-v2/md/homepage'
-      )
+      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/index')
     })
 
     it('rewrites /<slug> when Accept: text/markdown matches the allowlist', () => {

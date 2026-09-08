@@ -16,7 +16,11 @@ Edge Functions care about two request headers. Sending the wrong credential in t
 | `Authorization` | `Bearer <user-jwt>`                     | A user signed in through Supabase Auth |
 | `apikey`        | `sb_publishable_...` or `sb_secret_...` | Calls from clients or services         |
 
-A common mistake is sending a publishable or secret key as a bearer token: `Authorization: Bearer sb_publishable_...`. The new API keys are not JWTs. The platform check can't validate them, and your handler can't verify them as JWTs either. Instead, put API keys in the `apikey` header.
+<Admonition type="note" title="Don't send API keys as bearer tokens">
+
+A common mistake is sending a publishable or secret key as a bearer token: `Authorization: Bearer sb_publishable_...`. The new API keys are not JWTs. The platform check still accepts them, but your handler can't verify them as JWTs. Instead, put API keys in the `apikey` header.
+
+</Admonition>
 
 You can send both headers together. A signed-in user calling your function through `supabase-js`, for example, sends their session JWT in `Authorization` and the project's publishable key in `apikey`.
 
@@ -26,7 +30,13 @@ When `verify_jwt` is enabled (the default), the platform inspects the `Authoriza
 
 The check validates legacy HS256 JWTs and JWTs signed with the new asymmetric [signing keys](/docs/guides/auth/signing-keys).
 
-The check does not accept an API key. Publishable and secret keys are not JWTs, so callers that send one in the `Authorization` header fail the check before their request reaches your handler.
+Publishable and secret keys are not JWTs, but the check still accepts them in the `Authorization` header, so callers that send one there reach your handler.
+
+<Admonition type="caution" title="API keys and the verify_jwt check">
+
+For migration compatibility, `verify_jwt` accepts publishable and secret keys on either header, so a key on `apikey` passes the check too. The check alone doesn't authenticate a caller that sends only an API key. Reserve `Authorization` for user tokens, and send API keys on `apikey`. To move off legacy keys entirely, migrate to the `@supabase/server` SDK as shown in [Securing Edge Functions](/docs/guides/functions/auth).
+
+</Admonition>
 
 Use the `verify_jwt` flag to match how the function is called:
 

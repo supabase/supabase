@@ -328,7 +328,9 @@ export function deriveSnippetIdentity({
 }): { id: string; isLoading: boolean } {
   const id = !urlId || urlId === 'new' ? generatedId : urlId
 
-  const snippetIsLoading = !(id in snippets && snippets[id].snippet.content !== undefined)
+  // `snippets` is typed as always present, but has been seen arriving `undefined` at runtime, and
+  // an entry can be missing its `snippet`. Either case means the content isn't there yet.
+  const snippetIsLoading = snippets?.[id]?.snippet?.content === undefined
   const isLoading = urlId === 'new' ? false : snippetIsLoading
 
   return { id, isLoading }

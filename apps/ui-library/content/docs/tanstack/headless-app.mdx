@@ -1,13 +1,12 @@
 ---
 title: Headless App
-description: Give your agents a backend
+description: A backend your customers can use through their agents
 ---
 
-A headless app has no interface of its own. Users sign in once, connect their
-agent, and everything after that happens through MCP tool calls from whatever
-harness they use, like Claude Code, Codex, or ChatGPT. This block is the whole
-app: sign-in, the consent screen agents are sent to, the MCP server they call,
-and a page to connect and revoke them.
+A headless app exposes its product features through MCP tools. Your customers
+sign in, authorize their agent, and use it to interact with your backend on
+their behalf. This block combines sign-in, OAuth consent, an MCP server, and a
+page to connect agents and revoke their access.
 
 Postgres carries the rules. Write them once as RLS policies, triggers, and
 constraints, and every agent call inherits them. The MCP server passes the
@@ -25,13 +24,29 @@ It installs the [Password-Based Auth](/library/docs/tanstack/password-based-auth
 [MCP Server](/library/docs/headless/mcp-server) blocks, along with a complete
 `supabase/config.toml`.
 
+Start with a TanStack Start app configured for the library. If you already have
+a Supabase project, merge the supplied config with your existing settings.
+
 ## Folder structure
 
 <RegistryBlock itemName="headless-app-tanstack" />
 
 ## Set up
 
-1. Add your project's URL and key to `.env.local`:
+1. Set `site_url` and `additional_redirect_urls` in `supabase/config.toml` to
+   the origin serving your app. The included settings use `http://localhost:3000`.
+   Start the local stack and create the initial migration:
+
+   ```bash
+   supabase start
+   supabase db diff -f create_tasks
+   supabase migration up
+   ```
+
+   Review the generated migration before applying it. Starting the stack alone
+   does not apply the declarative schema files.
+
+2. Add your project's URL and publishable key to `.env.local`:
 
    ```env
    VITE_SUPABASE_URL=
@@ -41,22 +56,46 @@ It installs the [Password-Based Auth](/library/docs/tanstack/password-based-auth
    Find them in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=react&using=vite&with=supabasejs),
    or run `supabase status` against a local stack.
 
-2. Name your product. Set `PRODUCT_NAME` in `routes/_protected/agents.tsx` and
+3. Name your product. Set `PRODUCT_NAME` in `routes/_protected/agents.tsx` and
    the `productName` prop in `routes/oauth/consent.tsx`.
 
-3. Set `site_url` in `supabase/config.toml` to the origin serving your app. Auth
-   sends users there to approve an agent, so it has to match.
+4. Use asymmetric JWT signing keys (ES256 or RS256). The MCP server verifies
+   tokens through the project's JWKS endpoint, so legacy HS256 tokens cannot
+   authenticate. For a hosted project, configure this in
+   [JWT Keys](https://supabase.com/dashboard/project/_/settings/jwt). For a local
+   stack, generate a key with the [CLI signing key command](https://supabase.com/docs/reference/cli/supabase-gen-signing-key)
+   and configure `auth.signing_keys_path` before restarting the stack.
 
-4. Start everything:
+5. Copy the MCP server's environment template and check the function:
 
    ```bash
-   supabase start
+   cp supabase/functions/mcp-server/.env.example supabase/functions/.env
+   cd supabase/functions/mcp-server
+   deno task check
+   cd ../../..
+   ```
+
+   Set `MCP_SERVER_NAME` and `MCP_SERVER_DESCRIPTION` in `supabase/functions/.env`
+   to describe your product. Serve the function:
+
+   ```bash
    supabase functions serve mcp-server --env-file supabase/functions/.env
+   ```
+
+   In a separate terminal, start the app:
+
+   ```bash
    npm run dev
    ```
 
-5. Sign up, open `/agents`, and paste the prompt into an agent. It registers
-   itself, sends you to `/oauth/consent`, and appears in the list once approved.
+6. Sign up, open `/agents`, and connect an MCP client using the displayed URL
+   or prompt. Clients that support dynamic registration can register themselves
+   and send you to `/oauth/consent`. Approve the request, then call `whoami` to
+   verify the connected user's identity. Refresh `/agents` to see the grant.
+
+   A client running on your computer can use the local endpoint. Remote clients
+   need publicly reachable HTTPS URLs for the MCP server, Supabase Auth, and
+   consent page; use the deployed app for those clients.
 
 ## Shape the backend
 
@@ -66,13 +105,17 @@ functions. Then generate and apply the migration.
 
 ```bash
 supabase db diff -f add_task_due_date
-supabase db reset
+supabase migration up
 ```
 
 The included `public/tables/tasks.sql` declares a `tasks` table with Row Level
 Security, so each user reaches only their own rows. Add new objects beside it,
 one file per object. Make every change here rather than in Studio or the SQL
 editor, since the diff reads these files and not the live database.
+
+The schema grants task operations to `authenticated` explicitly. Include the
+required role grants when adding tables; RLS policies alone do not expose them
+through the Data API.
 
 ## Add tools
 
@@ -81,9 +124,18 @@ Out of the box the server exposes one tool, `whoami`. Add the rest in
 the policies in your schema decide what an agent can reach. See the
 [MCP Server block](/library/docs/headless/mcp-server) for the tool template.
 
+The sample `tasks` table is a starting schema; it is not exposed as an MCP tool
+until you register tools for it. OAuth scopes control identity information,
+not access to tables or tools. Enforce product permissions in RLS and in each
+tool's business logic. The server also accepts ordinary product session tokens,
+which do not carry an OAuth `client_id`.
+
 ## Deploy
 
-There are two things to deploy. First the Supabase project:
+There are two things to deploy. First, update `site_url` and
+`additional_redirect_urls` in `supabase/config.toml` for your production domain,
+and enable email confirmations under `[auth.email]`. The supplied settings are
+for local development. Then deploy the Supabase project:
 
 ```bash
 supabase link
@@ -91,6 +143,9 @@ supabase db push
 supabase config push
 supabase functions deploy mcp-server
 ```
+
+Set `MCP_SERVER_NAME` and `MCP_SERVER_DESCRIPTION` as Edge Function secrets if
+you customized them locally. The local `.env` file is not deployed.
 
 Then the app. Push it to Git and import the repository into
 [Vercel](https://vercel.com/new), which detects TanStack Start without extra
@@ -102,9 +157,8 @@ for the Nitro plugin your `vite.config.ts` needs.
 Finish by setting the Auth **Site URL** to your deployed domain, so agents land
 on the deployed consent screen.
 
-Your project must sign JWTs with an asymmetric key. On the legacy HS256 secret,
-clients that request the `openid` scope fail. Switch to ES256 or RS256 in
-[JWT Keys](https://supabase.com/dashboard/project/_/settings/jwt).
+Confirm the hosted project also uses asymmetric signing keys before connecting
+an agent.
 
 ## Further reading
 

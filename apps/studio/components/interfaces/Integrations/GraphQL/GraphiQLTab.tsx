@@ -31,7 +31,7 @@ import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
 const ROLE_IMPERSONATION_PLUGIN: GraphiQLPlugin = {
   title: 'Role Impersonation',
   icon: () => <IconUser />,
-  content: () => <RoleImpersonationSelector orientation="vertical" />,
+  content: () => <RoleImpersonationSelector />,
 }
 
 /**

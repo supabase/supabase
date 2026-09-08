@@ -24,7 +24,7 @@ const NotebookPage: NextPageWithLayout = () => {
       type: 'notebook',
       label: name ?? 'New Notebook',
       metadata: { notebookId: id },
-      isPreview: false,
+      isPreview: true,
     })
   })
 

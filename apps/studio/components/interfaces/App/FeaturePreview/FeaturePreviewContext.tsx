@@ -165,6 +165,12 @@ export const useIsDatabaseConnectionsEnabled = () => {
   }
 }
 
+export const useIsExplorerEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const isExplorerEnabled = useFlag('explorer')
+  return isExplorerEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]
+}
+
 export const useFeaturePreviewModal = () => {
   const featurePreviews = useFeaturePreviews()
   const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')

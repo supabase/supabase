@@ -27,19 +27,19 @@ import { NamedCodeBlock } from '~/features/directives/CodeTabs.components'
 import { MdxAnchor } from '~/features/docs/MdxAnchor'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
-import InfoTooltip from '~/features/ui/InfoTooltip'
 import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { type ComponentPropsWithoutRef } from 'react'
-import { Badge, Button } from 'ui'
+import { Badge, Button, Heading } from 'ui'
 import { Admonition, type AdmonitionProps } from 'ui-patterns/Admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
-import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
+import { AgentSetup } from '../ui/AgentSetup'
+import { AgentWatchSchedule } from '../ui/AgentWatchSchedule'
 import { AiPrompt } from '../ui/AiPrompt'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
@@ -70,6 +70,8 @@ const components = {
   AccordionItem,
   Admonition: AdmonitionWithMargin,
   AgentPluginsPanel,
+  AgentSetup,
+  AgentWatchSchedule,
   AiPrompt,
   AiPromptsIndex,
   AiSkillsIndex,
@@ -111,7 +113,6 @@ const components = {
   TabPanel,
   TerraformProviderSchema,
   WrapperDashboardIntegration,
-  InfoTooltip,
   a: MdxAnchor,
   h2: (props: ComponentPropsWithoutRef<'h2'>) => (
     <Heading tag="h2" {...props}>

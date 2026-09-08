@@ -1,4 +1,4 @@
-import type { SupabaseContext } from 'npm:@supabase/server@1.5.0-rc.114'
+import type { SupabaseContext } from 'npm:@supabase/server@1.5.1'
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2.108.2'
 
 // Only expose the user-scoped client and verified identity to tools. Keeping

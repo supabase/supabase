@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
@@ -11,7 +11,7 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
 
-type ListWorkersResponse = components['schemas']['V2ListWorkersResponse']
+type ListWorkersResponse = components['schemas']['V2ListWorkersResponse_Output']
 type WorkerDatum = ListWorkersResponse['data'][number]
 
 // `tests/vitestSetup.ts` mocks `common`'s useParams to always answer with this ref, so the page
@@ -86,8 +86,19 @@ describe('/project/[ref]/workers', () => {
 
     await renderWorkersPage()
 
-    expect(screen.getByText(/No workers yet/)).toBeVisible()
+    expect(screen.getByText('Deploy your first worker')).toBeVisible()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
+  })
+
+  it('refreshes the workers list on request', async () => {
+    mockWorkersList([workerDatum('existing')])
+
+    await renderWorkersPage()
+
+    mockWorkersList([workerDatum('embed')])
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh' }))
+
+    expect(await screen.findByRole('link', { name: 'embed' })).toBeVisible()
   })
 
   it('explains that a project outside the alpha is not enrolled', async () => {
@@ -105,10 +116,29 @@ describe('/project/[ref]/workers', () => {
     await renderWorkersPage()
 
     expect(
-      screen.getByText(
-        `You need additional permissions to view this project's ${PRODUCT_NAME} workers`
-      )
+      screen.getByText("You need additional permissions to view this project's workers")
     ).toBeVisible()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
+  })
+
+  it('allows retrying an unexpected error', async () => {
+    let requestCount = 0
+    addAPIMock({
+      method: 'get',
+      path: '/v2/projects/:ref/workers',
+      response: (): HttpResponse<APIErrorBody> | HttpResponse<ListWorkersResponse> => {
+        if (requestCount++ === 0) {
+          return HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 500 })
+        }
+
+        return HttpResponse.json<ListWorkersResponse>({ data: [workerDatum('embed')] })
+      },
+    })
+
+    await renderWorkersPage()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh' }))
+
+    expect(await screen.findByRole('link', { name: 'embed' })).toBeVisible()
   })
 })

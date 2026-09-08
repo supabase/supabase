@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { Check, Plus } from 'lucide-react'
 import Link from 'next/link'
 import {
@@ -13,6 +13,7 @@ import { getAddReadReplicaPath } from '@/components/interfaces/Settings/Infrastr
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 
 /** The label a database row/summary shows: the primary, or a replica by region + id. */
 function databaseLabel(identifier: string, region: string, projectRef: string | undefined) {
@@ -28,6 +29,7 @@ export const DatabaseParametersSubMenu = ({
   onIdentifierChange: (identifier: string) => void
 }) => {
   const { ref: projectRef } = useParams()
+  const isHighAvailability = useIsHighAvailability()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const { data } = useReadReplicasQuery({ projectRef })
@@ -68,7 +70,7 @@ export const DatabaseParametersSubMenu = ({
             </DropdownMenuItem>
           )
         })}
-        {infrastructureReadReplicas && (
+        {IS_PLATFORM && infrastructureReadReplicas && !isHighAvailability && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild className="gap-x-2">

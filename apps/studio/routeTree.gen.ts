@@ -100,6 +100,8 @@ import { Route as ApiPlatformProfileIndexRouteImport } from './routes/api/platfo
 import { Route as ApiPlatformOrganizationsIndexRouteImport } from './routes/api/platform/organizations/index'
 import { Route as AppOrgSlugIndexRouteImport } from './routes/_app/org/$slug/index'
 import { Route as AppAccountTokensIndexRouteImport } from './routes/_app/account/tokens/index'
+import { Route as ProjectRefWorkersSecretsRouteImport } from './routes/project/$ref/workers/secrets'
+import { Route as ProjectRefWorkersNameRouteImport } from './routes/project/$ref/workers/$name'
 import { Route as ProjectRefStorageS3RouteImport } from './routes/project/$ref/storage/s3'
 import { Route as ProjectRefSqlTemplatesRouteImport } from './routes/project/$ref/sql/templates'
 import { Route as ProjectRefSqlExamplesRouteImport } from './routes/project/$ref/sql/examples'
@@ -108,6 +110,7 @@ import { Route as ProjectRefSettingsLogDrainsRouteImport } from './routes/projec
 import { Route as ProjectRefSettingsIntegrationsRouteImport } from './routes/project/$ref/settings/integrations'
 import { Route as ProjectRefSettingsGeneralRouteImport } from './routes/project/$ref/settings/general'
 import { Route as ProjectRefSettingsDashboardRouteImport } from './routes/project/$ref/settings/dashboard'
+import { Route as ProjectRefSettingsCodeConfigurationRouteImport } from './routes/project/$ref/settings/code-configuration'
 import { Route as ProjectRefSettingsApiKeysRouteImport } from './routes/project/$ref/settings/api-keys'
 import { Route as ProjectRefSettingsApiRouteImport } from './routes/project/$ref/settings/api'
 import { Route as ProjectRefSettingsAddonsRouteImport } from './routes/project/$ref/settings/addons'
@@ -175,6 +178,7 @@ import { Route as ProjectRefAuthAuditLogsRouteImport } from './routes/project/$r
 import { Route as ProjectRefAdvisorsSecurityRouteImport } from './routes/project/$ref/advisors/security'
 import { Route as ProjectRefAdvisorsRulesRouteImport } from './routes/project/$ref/advisors/rules'
 import { Route as ProjectRefAdvisorsPerformanceRouteImport } from './routes/project/$ref/advisors/performance'
+import { Route as ProjectRefAdvisorsHealthRouteImport } from './routes/project/$ref/advisors/health'
 import { Route as ApiPlatformTelemetryEventRouteImport } from './routes/api/platform/telemetry/event'
 import { Route as ApiPlatformIntegrationsSlugRouteImport } from './routes/api/platform/integrations/$slug'
 import { Route as ApiAiSqlTitleV2RouteImport } from './routes/api/ai/sql/title-v2'
@@ -792,6 +796,17 @@ const AppAccountTokensIndexRoute = AppAccountTokensIndexRouteImport.update({
   path: '/tokens/',
   getParentRoute: () => AppAccountRoute,
 } as any)
+const ProjectRefWorkersSecretsRoute =
+  ProjectRefWorkersSecretsRouteImport.update({
+    id: '/secrets',
+    path: '/secrets',
+    getParentRoute: () => ProjectRefWorkersRoute,
+  } as any)
+const ProjectRefWorkersNameRoute = ProjectRefWorkersNameRouteImport.update({
+  id: '/$name',
+  path: '/$name',
+  getParentRoute: () => ProjectRefWorkersRoute,
+} as any)
 const ProjectRefStorageS3Route = ProjectRefStorageS3RouteImport.update({
   id: '/s3',
   path: '/s3',
@@ -834,6 +849,12 @@ const ProjectRefSettingsDashboardRoute =
   ProjectRefSettingsDashboardRouteImport.update({
     id: '/dashboard',
     path: '/dashboard',
+    getParentRoute: () => ProjectRefSettingsRoute,
+  } as any)
+const ProjectRefSettingsCodeConfigurationRoute =
+  ProjectRefSettingsCodeConfigurationRouteImport.update({
+    id: '/code-configuration',
+    path: '/code-configuration',
     getParentRoute: () => ProjectRefSettingsRoute,
   } as any)
 const ProjectRefSettingsApiKeysRoute =
@@ -1216,6 +1237,12 @@ const ProjectRefAdvisorsPerformanceRoute =
   ProjectRefAdvisorsPerformanceRouteImport.update({
     id: '/performance',
     path: '/performance',
+    getParentRoute: () => ProjectRefAdvisorsRoute,
+  } as any)
+const ProjectRefAdvisorsHealthRoute =
+  ProjectRefAdvisorsHealthRouteImport.update({
+    id: '/health',
+    path: '/health',
     getParentRoute: () => ProjectRefAdvisorsRoute,
   } as any)
 const ApiPlatformTelemetryEventRoute =
@@ -2187,6 +2214,7 @@ export interface FileRoutesByFullPath {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/advisors/health': typeof ProjectRefAdvisorsHealthRoute
   '/project/$ref/advisors/performance': typeof ProjectRefAdvisorsPerformanceRoute
   '/project/$ref/advisors/rules': typeof ProjectRefAdvisorsRulesRouteWithChildren
   '/project/$ref/advisors/security': typeof ProjectRefAdvisorsSecurityRoute
@@ -2254,6 +2282,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
   '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
   '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysRouteWithChildren
+  '/project/$ref/settings/code-configuration': typeof ProjectRefSettingsCodeConfigurationRoute
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
   '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
@@ -2262,6 +2291,8 @@ export interface FileRoutesByFullPath {
   '/project/$ref/sql/examples': typeof ProjectRefSqlExamplesRoute
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
+  '/project/$ref/workers/$name': typeof ProjectRefWorkersNameRoute
+  '/project/$ref/workers/secrets': typeof ProjectRefWorkersSecretsRoute
   '/account/tokens/': typeof AppAccountTokensIndexRoute
   '/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
@@ -2491,6 +2522,7 @@ export interface FileRoutesByTo {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/advisors/health': typeof ProjectRefAdvisorsHealthRoute
   '/project/$ref/advisors/performance': typeof ProjectRefAdvisorsPerformanceRoute
   '/project/$ref/advisors/rules': typeof ProjectRefAdvisorsRulesRouteWithChildren
   '/project/$ref/advisors/security': typeof ProjectRefAdvisorsSecurityRoute
@@ -2555,6 +2587,7 @@ export interface FileRoutesByTo {
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
   '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
   '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
+  '/project/$ref/settings/code-configuration': typeof ProjectRefSettingsCodeConfigurationRoute
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
   '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
@@ -2563,6 +2596,8 @@ export interface FileRoutesByTo {
   '/project/$ref/sql/examples': typeof ProjectRefSqlExamplesRoute
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
+  '/project/$ref/workers/$name': typeof ProjectRefWorkersNameRoute
+  '/project/$ref/workers/secrets': typeof ProjectRefWorkersSecretsRoute
   '/account/tokens': typeof AppAccountTokensIndexRoute
   '/org/$slug': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations': typeof ApiPlatformOrganizationsIndexRoute
@@ -2806,6 +2841,7 @@ export interface FileRoutesById {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/advisors/health': typeof ProjectRefAdvisorsHealthRoute
   '/project/$ref/advisors/performance': typeof ProjectRefAdvisorsPerformanceRoute
   '/project/$ref/advisors/rules': typeof ProjectRefAdvisorsRulesRouteWithChildren
   '/project/$ref/advisors/security': typeof ProjectRefAdvisorsSecurityRoute
@@ -2873,6 +2909,7 @@ export interface FileRoutesById {
   '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
   '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
   '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysRouteWithChildren
+  '/project/$ref/settings/code-configuration': typeof ProjectRefSettingsCodeConfigurationRoute
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
   '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
@@ -2881,6 +2918,8 @@ export interface FileRoutesById {
   '/project/$ref/sql/examples': typeof ProjectRefSqlExamplesRoute
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
+  '/project/$ref/workers/$name': typeof ProjectRefWorkersNameRoute
+  '/project/$ref/workers/secrets': typeof ProjectRefWorkersSecretsRoute
   '/_app/account/tokens/': typeof AppAccountTokensIndexRoute
   '/_app/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
@@ -3123,6 +3162,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/advisors/health'
     | '/project/$ref/advisors/performance'
     | '/project/$ref/advisors/rules'
     | '/project/$ref/advisors/security'
@@ -3190,6 +3230,7 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/addons'
     | '/project/$ref/settings/api'
     | '/project/$ref/settings/api-keys'
+    | '/project/$ref/settings/code-configuration'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
     | '/project/$ref/settings/integrations'
@@ -3198,6 +3239,8 @@ export interface FileRouteTypes {
     | '/project/$ref/sql/examples'
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
+    | '/project/$ref/workers/$name'
+    | '/project/$ref/workers/secrets'
     | '/account/tokens/'
     | '/org/$slug/'
     | '/api/platform/organizations/'
@@ -3427,6 +3470,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/advisors/health'
     | '/project/$ref/advisors/performance'
     | '/project/$ref/advisors/rules'
     | '/project/$ref/advisors/security'
@@ -3491,6 +3535,7 @@ export interface FileRouteTypes {
     | '/project/$ref/realtime/settings'
     | '/project/$ref/settings/addons'
     | '/project/$ref/settings/api'
+    | '/project/$ref/settings/code-configuration'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
     | '/project/$ref/settings/integrations'
@@ -3499,6 +3544,8 @@ export interface FileRouteTypes {
     | '/project/$ref/sql/examples'
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
+    | '/project/$ref/workers/$name'
+    | '/project/$ref/workers/secrets'
     | '/account/tokens'
     | '/org/$slug'
     | '/api/platform/organizations'
@@ -3741,6 +3788,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/advisors/health'
     | '/project/$ref/advisors/performance'
     | '/project/$ref/advisors/rules'
     | '/project/$ref/advisors/security'
@@ -3808,6 +3856,7 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/addons'
     | '/project/$ref/settings/api'
     | '/project/$ref/settings/api-keys'
+    | '/project/$ref/settings/code-configuration'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
     | '/project/$ref/settings/integrations'
@@ -3816,6 +3865,8 @@ export interface FileRouteTypes {
     | '/project/$ref/sql/examples'
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
+    | '/project/$ref/workers/$name'
+    | '/project/$ref/workers/secrets'
     | '/_app/account/tokens/'
     | '/_app/org/$slug/'
     | '/api/platform/organizations/'
@@ -4719,6 +4770,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAccountTokensIndexRouteImport
       parentRoute: typeof AppAccountRoute
     }
+    '/project/$ref/workers/secrets': {
+      id: '/project/$ref/workers/secrets'
+      path: '/secrets'
+      fullPath: '/project/$ref/workers/secrets'
+      preLoaderRoute: typeof ProjectRefWorkersSecretsRouteImport
+      parentRoute: typeof ProjectRefWorkersRoute
+    }
+    '/project/$ref/workers/$name': {
+      id: '/project/$ref/workers/$name'
+      path: '/$name'
+      fullPath: '/project/$ref/workers/$name'
+      preLoaderRoute: typeof ProjectRefWorkersNameRouteImport
+      parentRoute: typeof ProjectRefWorkersRoute
+    }
     '/project/$ref/storage/s3': {
       id: '/project/$ref/storage/s3'
       path: '/s3'
@@ -4773,6 +4838,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/project/$ref/settings/dashboard'
       preLoaderRoute: typeof ProjectRefSettingsDashboardRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
+    }
+    '/project/$ref/settings/code-configuration': {
+      id: '/project/$ref/settings/code-configuration'
+      path: '/code-configuration'
+      fullPath: '/project/$ref/settings/code-configuration'
+      preLoaderRoute: typeof ProjectRefSettingsCodeConfigurationRouteImport
       parentRoute: typeof ProjectRefSettingsRoute
     }
     '/project/$ref/settings/api-keys': {
@@ -5242,6 +5314,13 @@ declare module '@tanstack/react-router' {
       path: '/performance'
       fullPath: '/project/$ref/advisors/performance'
       preLoaderRoute: typeof ProjectRefAdvisorsPerformanceRouteImport
+      parentRoute: typeof ProjectRefAdvisorsRoute
+    }
+    '/project/$ref/advisors/health': {
+      id: '/project/$ref/advisors/health'
+      path: '/health'
+      fullPath: '/project/$ref/advisors/health'
+      preLoaderRoute: typeof ProjectRefAdvisorsHealthRouteImport
       parentRoute: typeof ProjectRefAdvisorsRoute
     }
     '/api/platform/telemetry/event': {
@@ -6445,12 +6524,14 @@ const ProjectRefAdvisorsRulesRouteWithChildren =
   )
 
 interface ProjectRefAdvisorsRouteChildren {
+  ProjectRefAdvisorsHealthRoute: typeof ProjectRefAdvisorsHealthRoute
   ProjectRefAdvisorsPerformanceRoute: typeof ProjectRefAdvisorsPerformanceRoute
   ProjectRefAdvisorsRulesRoute: typeof ProjectRefAdvisorsRulesRouteWithChildren
   ProjectRefAdvisorsSecurityRoute: typeof ProjectRefAdvisorsSecurityRoute
 }
 
 const ProjectRefAdvisorsRouteChildren: ProjectRefAdvisorsRouteChildren = {
+  ProjectRefAdvisorsHealthRoute: ProjectRefAdvisorsHealthRoute,
   ProjectRefAdvisorsPerformanceRoute: ProjectRefAdvisorsPerformanceRoute,
   ProjectRefAdvisorsRulesRoute: ProjectRefAdvisorsRulesRouteWithChildren,
   ProjectRefAdvisorsSecurityRoute: ProjectRefAdvisorsSecurityRoute,
@@ -6820,6 +6901,7 @@ interface ProjectRefSettingsRouteChildren {
   ProjectRefSettingsAddonsRoute: typeof ProjectRefSettingsAddonsRoute
   ProjectRefSettingsApiRoute: typeof ProjectRefSettingsApiRoute
   ProjectRefSettingsApiKeysRoute: typeof ProjectRefSettingsApiKeysRouteWithChildren
+  ProjectRefSettingsCodeConfigurationRoute: typeof ProjectRefSettingsCodeConfigurationRoute
   ProjectRefSettingsDashboardRoute: typeof ProjectRefSettingsDashboardRoute
   ProjectRefSettingsGeneralRoute: typeof ProjectRefSettingsGeneralRoute
   ProjectRefSettingsIntegrationsRoute: typeof ProjectRefSettingsIntegrationsRoute
@@ -6837,6 +6919,8 @@ const ProjectRefSettingsRouteChildren: ProjectRefSettingsRouteChildren = {
   ProjectRefSettingsAddonsRoute: ProjectRefSettingsAddonsRoute,
   ProjectRefSettingsApiRoute: ProjectRefSettingsApiRoute,
   ProjectRefSettingsApiKeysRoute: ProjectRefSettingsApiKeysRouteWithChildren,
+  ProjectRefSettingsCodeConfigurationRoute:
+    ProjectRefSettingsCodeConfigurationRoute,
   ProjectRefSettingsDashboardRoute: ProjectRefSettingsDashboardRoute,
   ProjectRefSettingsGeneralRoute: ProjectRefSettingsGeneralRoute,
   ProjectRefSettingsIntegrationsRoute: ProjectRefSettingsIntegrationsRoute,
@@ -6905,10 +6989,14 @@ const ProjectRefStorageRouteWithChildren =
   ProjectRefStorageRoute._addFileChildren(ProjectRefStorageRouteChildren)
 
 interface ProjectRefWorkersRouteChildren {
+  ProjectRefWorkersNameRoute: typeof ProjectRefWorkersNameRoute
+  ProjectRefWorkersSecretsRoute: typeof ProjectRefWorkersSecretsRoute
   ProjectRefWorkersIndexRoute: typeof ProjectRefWorkersIndexRoute
 }
 
 const ProjectRefWorkersRouteChildren: ProjectRefWorkersRouteChildren = {
+  ProjectRefWorkersNameRoute: ProjectRefWorkersNameRoute,
+  ProjectRefWorkersSecretsRoute: ProjectRefWorkersSecretsRoute,
   ProjectRefWorkersIndexRoute: ProjectRefWorkersIndexRoute,
 }
 

@@ -1,4 +1,5 @@
 import { useBreakpoint } from 'common'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import {
   Activity,
   Blocks,
@@ -90,7 +91,7 @@ const data: () => {
       ctas: [
         {
           label: 'Start your project',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
           onClick: () =>
             sendTelemetryEvent({

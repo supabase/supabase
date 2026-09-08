@@ -17,6 +17,9 @@ create index tasks_user_id_idx on tasks (user_id);
 -- under these policies. A tool cannot reach another user's rows.
 alter table tasks enable row level security;
 
+-- Expose task operations to signed-in users even when automatic API grants are disabled.
+grant select, insert, update, delete on table public.tasks to authenticated;
+
 create policy "Users can view their own tasks"
 on tasks
 for select

@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { CloudProvider } from 'shared-data'
 import {
+  cn,
   FormField,
   Select,
   SelectContent,
@@ -90,12 +91,25 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
                             </span>
                             <p
                               translate="no"
-                              className="text-xs text-foreground-light"
+                              className={cn(
+                                'text-xs',
+                                highAvailability
+                                  ? 'line-through text-foreground-lighter'
+                                  : 'text-foreground-light'
+                              )}
                               data-field="instance-details"
                             >
                               ${instanceSizeSpecs[option].priceHourly}/hour (~$
                               {instanceSizeSpecs[option].priceMonthly}/month)
                             </p>
+                            {highAvailability && (
+                              <p
+                                className="text-xs text-foreground-light"
+                                data-field="instance-details"
+                              >
+                                Free during Alpha
+                              </p>
+                            )}
                           </div>
                         </div>
                       </SelectItem>
