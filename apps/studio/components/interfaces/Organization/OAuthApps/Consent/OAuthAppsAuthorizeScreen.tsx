@@ -95,7 +95,6 @@ export const OAuthAppsAuthorizeScreen = ({
           appName={request.app_name}
           grant={{
             email: identity.email,
-            role: memberOrg.default_role,
             organization_slug: memberOrg.slug,
             projects: grantedProjects,
             scope_groups: request.scope_groups,
