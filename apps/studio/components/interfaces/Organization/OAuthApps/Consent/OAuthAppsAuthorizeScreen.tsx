@@ -81,6 +81,10 @@ export const OAuthAppsAuthorizeScreen = ({
       ? (projects ?? []).filter((project) => selectedProjectRefs.includes(project.ref))
       : (projects ?? [])
 
+  const isOrgAdminOrOwner =
+    memberOrg.default_role === 'owner' || memberOrg.default_role === 'administrator'
+  const orgRoleNoun = memberOrg.default_role === 'owner' ? 'owner' : 'admin'
+
   if (approvedUrl) {
     return (
       <InterstitialLayout
@@ -184,6 +188,14 @@ export const OAuthAppsAuthorizeScreen = ({
                 <Admonition
                   type="default"
                   description="Some clients may reuse one authorization across workspaces. Check your client's workspace or account settings if project access does not behave as expected."
+                />
+              )}
+
+              {isOrgAdminOrOwner && (
+                <Admonition
+                  type="default"
+                  title="Want this scoped to one member?"
+                  description={`Have them authorize ${request.app_name} from their own account. Authorizing here gives it your full ${orgRoleNoun} access.`}
                 />
               )}
             </>
