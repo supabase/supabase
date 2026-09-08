@@ -27,6 +27,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { AlertError } from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ToggleSpendCapButton } from '@/components/ui/ToggleSpendCapButton'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
@@ -38,8 +39,10 @@ import {
 } from '@/data/realtime/realtime-config-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 
 const formId = 'realtime-configuration-form'
 
@@ -53,6 +56,7 @@ const REALTIME_SOFT_LIMITS = {
 const MAX_POSTGRES_CHANGES_POOL = 20
 
 export const RealtimeSettings = () => {
+  const { isCli, isSelfHosted } = useDeploymentMode()
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization, isSuccess: isSuccessOrganization } = useSelectedOrganizationQuery()
@@ -311,6 +315,36 @@ export const RealtimeSettings = () => {
       ),
       suspend: values.suspend,
     })
+  }
+
+  if (!IS_PLATFORM) {
+    return (
+      <Admonition
+        type="default"
+        title="Realtime settings are not available for self-hosted projects"
+        description={
+          isCli ? (
+            <p>
+              Realtime settings are configured in{' '}
+              <code className="text-code-inline">supabase/config.toml</code> under{' '}
+              <code className="text-code-inline">[realtime]</code>.
+            </p>
+          ) : (
+            <p>
+              Realtime settings are configured via environment variables in your deployment
+              configuration.
+            </p>
+          )
+        }
+        actions={
+          <DocsButton
+            href={
+              isCli ? `${DOCS_URL}/guides/local-development` : `${DOCS_URL}/guides/self-hosting`
+            }
+          />
+        }
+      />
+    )
   }
 
   if (isLoading) {

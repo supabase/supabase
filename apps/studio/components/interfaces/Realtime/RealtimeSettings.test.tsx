@@ -20,12 +20,20 @@ const {
   mockUseSelectedOrganizationQuery,
   mockUseSelectedProjectQuery,
   mockUseDatabasePoliciesQuery,
+  mockIsPlatform,
+  mockUseDeploymentMode,
 } = vi.hoisted(() => ({
   mockUseAsyncCheckPermissions: vi.fn(),
   mockUseMaxConnectionsQuery: vi.fn(),
   mockUseSelectedOrganizationQuery: vi.fn(),
   mockUseSelectedProjectQuery: vi.fn(),
   mockUseDatabasePoliciesQuery: vi.fn(),
+  mockIsPlatform: { value: true },
+  mockUseDeploymentMode: vi.fn(),
+}))
+
+vi.mock('@/hooks/misc/useDeploymentMode', () => ({
+  useDeploymentMode: mockUseDeploymentMode,
 }))
 
 vi.mock('@/hooks/misc/useCheckPermissions', () => ({
@@ -50,7 +58,12 @@ vi.mock('@/data/database-policies/database-policies-query', () => ({
 
 vi.mock('@/lib/constants', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
-  return { ...actual, IS_PLATFORM: true }
+  return {
+    ...actual,
+    get IS_PLATFORM() {
+      return mockIsPlatform.value
+    },
+  }
 })
 
 const REALTIME_CONFIG = {
@@ -85,6 +98,13 @@ const REALTIME_ENTITLEMENTS: Entitlement[] = (
 describe('RealtimeSettings', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+
+    mockIsPlatform.value = true
+    mockUseDeploymentMode.mockReturnValue({
+      isPlatform: true,
+      isCli: false,
+      isSelfHosted: false,
+    })
 
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true, isSuccess: true })
     mockUseSelectedProjectQuery.mockReturnValue({
@@ -200,5 +220,33 @@ describe('RealtimeSettings', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
       expect(requests).toHaveLength(0)
     }
+  })
+
+  test('renders admonition for self-hosted projects when off-platform', async () => {
+    mockIsPlatform.value = false
+    mockUseDeploymentMode.mockReturnValue({ isPlatform: false, isCli: false, isSelfHosted: true })
+
+    customRender(<RealtimeSettings />)
+
+    expect(
+      screen.getByText('Realtime settings are not available for self-hosted projects')
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(/Realtime settings are configured via environment variables/)
+    ).toBeInTheDocument()
+    expect(screen.queryByLabelText('Postgres Changes connection pool size')).not.toBeInTheDocument()
+  })
+
+  test('renders admonition for CLI projects when off-platform', async () => {
+    mockIsPlatform.value = false
+    mockUseDeploymentMode.mockReturnValue({ isPlatform: false, isCli: true, isSelfHosted: false })
+
+    customRender(<RealtimeSettings />)
+
+    expect(
+      screen.getByText('Realtime settings are not available for self-hosted projects')
+    ).toBeInTheDocument()
+    expect(screen.getByText(/Realtime settings are configured in/)).toBeInTheDocument()
+    expect(screen.queryByLabelText('Postgres Changes connection pool size')).not.toBeInTheDocument()
   })
 })
