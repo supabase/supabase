@@ -513,7 +513,6 @@ export const ReplicationPipelineStatus = () => {
           tableSyncCopy={pipeline?.config.table_sync_copy}
           sourceId={pipeline?.source_id}
           publicationName={pipeline?.config.publication_name}
-          pipelineStatusName={statusName}
           onRestartStart={() => {
             setTableResetting(pipelineId, true)
             setRestartingTableIds((prev) => new Set(prev).add(selectedTableForRestart.id))
@@ -550,7 +549,6 @@ export const ReplicationPipelineStatus = () => {
           sourceId={pipeline?.source_id}
           publicationName={pipeline?.config.publication_name}
           tableSyncCopy={pipeline?.config.table_sync_copy}
-          pipelineStatusName={statusName}
           onRestartStart={(tableIds) => {
             setTableResetting(pipelineId, true)
             setRestartingTableIds((prev) => new Set([...prev, ...tableIds]))

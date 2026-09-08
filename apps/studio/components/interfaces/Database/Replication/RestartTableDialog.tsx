@@ -11,7 +11,6 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
-import { PipelineStatusName } from './Replication.constants'
 import { RestartCostEstimate } from './RestartCostEstimate'
 import { shouldCopyTable, type ReplicationTableIdentity } from './TableSyncCopy.utils'
 import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
@@ -24,7 +23,6 @@ interface RestartTableDialogProps {
   tableSyncCopy?: TableSyncCopyConfig | null
   sourceId?: number
   publicationName?: string
-  pipelineStatusName?: PipelineStatusName
   onRestartStart?: () => void
   onRestartComplete?: () => void
 }
@@ -36,7 +34,6 @@ export const RestartTableDialog = ({
   tableSyncCopy,
   sourceId,
   publicationName,
-  pipelineStatusName,
   onRestartStart,
   onRestartComplete,
 }: RestartTableDialogProps) => {
@@ -44,11 +41,9 @@ export const RestartTableDialog = ({
   const pipelineId = Number(_pipelineId)
   const tableName = `${table.schema}.${table.name}`
   const willCopyTable = shouldCopyTable(tableSyncCopy, table.id)
-  const pipelineAction = pipelineStatusName === PipelineStatusName.STOPPED ? 'start' : 'restart'
-
   const { mutate: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: () => {
-      toast.success(`Resetting "${tableName}". Pipeline will ${pipelineAction} automatically.`)
+      toast.success(`Resetting "${tableName}"`)
     },
     onSettled: () => {
       onRestartComplete?.()
@@ -68,14 +63,12 @@ export const RestartTableDialog = ({
       projectRef,
       pipelineId,
       target: { type: 'single_table', table_id: table.id },
-      rollbackType: 'full',
-      pipelineStatusName,
     })
   }
 
   const consequence = willCopyTable
-    ? `Destination data for this table will be deleted, existing rows will sync again, and the pipeline will ${pipelineAction} automatically.`
-    : `Destination data for this table will be deleted. Initial sync is skipped for this table, so replication resumes with new changes only. The pipeline will ${pipelineAction} automatically.`
+    ? 'Destination data for this table will be deleted and existing rows will sync again. Running pipelines restart automatically. Stopped pipelines remain stopped.'
+    : 'Destination data for this table will be deleted. Initial sync is skipped for this table, so replication resumes with new changes only. Running pipelines restart automatically. Stopped pipelines remain stopped.'
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>

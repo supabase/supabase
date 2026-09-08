@@ -12320,12 +12320,6 @@ export interface components {
       website: string
     }
     RollbackTablesBody: {
-      /**
-       * @description Rollback type
-       * @example individual
-       * @enum {string}
-       */
-      rollback_type: 'individual' | 'full'
       /** @description Rollback target */
       target:
         | {
@@ -30744,8 +30738,8 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Pipeline stopped. */
-      200: {
+      /** @description Pipeline shutdown accepted. Resources may still be terminating. */
+      202: {
         headers: {
           [name: string]: unknown
         }

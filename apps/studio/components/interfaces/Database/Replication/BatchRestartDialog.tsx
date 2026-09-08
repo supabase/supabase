@@ -12,7 +12,6 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
-import { PipelineStatusName } from './Replication.constants'
 import { RestartCostEstimate } from './RestartCostEstimate'
 import { getTableCopyTargets } from './TableSyncCopy.utils'
 import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
@@ -27,7 +26,6 @@ interface BatchRestartDialogProps {
   sourceId?: number
   publicationName?: string
   tableSyncCopy?: TableSyncCopyConfig | null
-  pipelineStatusName?: PipelineStatusName
   onRestartStart?: (tableIds: number[]) => void
   onRestartComplete?: (tableIds: number[]) => void
 }
@@ -40,7 +38,6 @@ export const BatchRestartDialog = ({
   sourceId,
   publicationName,
   tableSyncCopy,
-  pipelineStatusName,
   onRestartStart,
   onRestartComplete,
 }: BatchRestartDialogProps) => {
@@ -54,20 +51,14 @@ export const BatchRestartDialog = ({
     }
   }, [mode, tables])
   const affectedTableIds = useMemo(() => affectedTables.map((table) => table.id), [affectedTables])
-  const isPipelineStatusUnavailable = pipelineStatusName === undefined
-
   const copiedTables = useMemo(
     () => getTableCopyTargets(affectedTables, tableSyncCopy),
     [affectedTables, tableSyncCopy]
   )
-  const pipelineAction = pipelineStatusName === PipelineStatusName.STOPPED ? 'start' : 'restart'
-
   const { mutateAsync: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: (data) => {
       const count = data.tables.length
-      toast.success(
-        `Resetting ${count} table${count > 1 ? 's' : ''}. Pipeline will ${pipelineAction} automatically.`
-      )
+      toast.success(`Resetting ${count} table${count > 1 ? 's' : ''}`)
     },
     onSettled: () => {
       onRestartComplete?.(affectedTableIds)
@@ -80,8 +71,6 @@ export const BatchRestartDialog = ({
 
   const handleReset = async () => {
     if (!projectRef) return toast.error('Project ref is required')
-    if (isPipelineStatusUnavailable) return
-
     onRestartStart?.(affectedTableIds)
 
     try {
@@ -89,8 +78,6 @@ export const BatchRestartDialog = ({
         projectRef,
         pipelineId,
         target: mode === 'all' ? { type: 'all_tables' } : { type: 'all_errored_tables' },
-        rollbackType: 'full',
-        pipelineStatusName,
       })
     } catch (error) {}
   }
@@ -110,12 +97,12 @@ export const BatchRestartDialog = ({
     mode === 'all'
       ? {
           title: 'Reset all tables',
-          description: `This resets all ${count} ${tableWord}. Destination data will be deleted. ${initialSyncDescription} The pipeline will ${pipelineAction} automatically.`,
+          description: `This resets all ${count} ${tableWord}. Destination data will be deleted. ${initialSyncDescription} Running pipelines restart automatically. Stopped pipelines remain stopped.`,
           action: 'Reset all tables',
         }
       : {
           title: 'Reset failed tables',
-          description: `This resets ${count} failed ${tableWord}. Destination data for those tables will be deleted. ${initialSyncDescription} The pipeline will ${pipelineAction} automatically. Other tables stay as they are.`,
+          description: `This resets ${count} failed ${tableWord}. Destination data for those tables will be deleted. ${initialSyncDescription} Running pipelines restart automatically. Stopped pipelines remain stopped. Other tables stay as they are.`,
           action: 'Reset failed tables',
         }
 
@@ -135,11 +122,7 @@ export const BatchRestartDialog = ({
         />
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            disabled={isResetting || isPipelineStatusUnavailable}
-            onClick={handleReset}
-            variant="warning"
-          >
+          <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="warning">
             {isResetting ? 'Resetting…' : dialogContent.action}
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -263,7 +263,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
           { onSuccess }
         )
 
-        // Set request status only right before starting, then fire and close
+        // Track the restart already requested by the update endpoint.
         const snapshot =
           existingDestination.statusName ?? (existingDestination.enabled ? 'started' : 'stopped')
         if (existingDestination.enabled) {
@@ -275,13 +275,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
           )
           toast.success('Settings applied. Restarting the pipeline...')
         } else {
-          setRequestStatus(
-            existingDestination.pipelineId,
-            PipelineStatusRequestStatus.StartRequested,
-            snapshot
-          )
-          toast.success('Settings applied. Starting the pipeline...')
-          startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
+          toast.success('Settings applied. The pipeline remains stopped.')
         }
         onClose()
       } else {
@@ -305,7 +299,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
       const action = editMode
         ? existingDestination?.enabled
           ? 'apply changes and restart pipeline'
-          : 'apply changes and start pipeline'
+          : 'apply changes'
         : 'create and start pipeline'
       toast.error(`Failed to ${action}: ${(error as ResponseError).message}`)
     }
