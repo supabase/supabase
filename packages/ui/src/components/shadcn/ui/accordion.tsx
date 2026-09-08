@@ -32,11 +32,11 @@ const AccordionTrigger = React.forwardRef<
 
     return (
       <AccordionPrimitive.Header asChild>
-        <div className="flex">
+        <div className="flex w-full">
           <AccordionPrimitive.Trigger
             ref={ref}
             className={cn(
-              'cursor-pointer flex flex-1 gap-2 items-center justify-between px-2 py-4 text-left',
+              'cursor-pointer flex flex-1 gap-2 items-center justify-between py-4 text-left',
               'font-medium hover:underline',
               '[&[data-state=open]>svg]:rotate-180',
               focusVariant === 'ring' && 'rounded-md',
