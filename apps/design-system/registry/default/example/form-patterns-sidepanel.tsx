@@ -265,7 +265,7 @@ export default function FormPatternsSidePanel() {
                         <InputGroup>
                           <FormInputGroupInput {...field} type="number" min={5} max={30} />
                           <InputGroupAddon align="inline-end">
-                            <InputGroupText>milliseconds</InputGroupText>
+                            <InputGroupText>ms</InputGroupText>
                           </InputGroupAddon>
                         </InputGroup>
                       </FormControl>

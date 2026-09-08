@@ -1,57 +1,30 @@
-import { ChevronsUpDown } from 'lucide-react'
+import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { isChevronsUpDownIcon, shouldUseComboboxTrigger } from './select-trigger'
+import { ComboboxTrigger } from './select-trigger'
 
-describe('select-trigger helpers', () => {
-  it('detects ChevronsUpDown icons', () => {
-    expect(isChevronsUpDownIcon(<ChevronsUpDown />)).toBe(true)
-    expect(isChevronsUpDownIcon(<ChevronsUpDown className="opacity-50" />)).toBe(true)
-    expect(isChevronsUpDownIcon(null)).toBe(false)
+describe('ComboboxTrigger', () => {
+  it('matches the raised select trigger styling', () => {
+    render(<ComboboxTrigger aria-expanded={false}>Select publication</ComboboxTrigger>)
+
+    const trigger = screen.getByRole('combobox')
+    expect(trigger).toHaveTextContent('Select publication')
+    expect(trigger).toHaveClass(
+      'bg-control-raised',
+      'border-strong',
+      'cursor-pointer',
+      'focus-ring',
+      'text-left'
+    )
+    expect(trigger).not.toHaveClass('bg-background')
+    expect(trigger.querySelector('svg')?.parentElement).toHaveAttribute('aria-hidden', 'true')
   })
 
-  it('delegates when role is combobox', () => {
-    expect(
-      shouldUseComboboxTrigger({
-        role: 'combobox',
-        variant: 'default',
-      })
-    ).toBe(true)
-  })
+  it('hides a custom decorative icon from assistive technology', () => {
+    render(
+      <ComboboxTrigger icon={<svg data-testid="custom-icon" />}>Select publication</ComboboxTrigger>
+    )
 
-  it('does not delegate danger combobox buttons', () => {
-    expect(
-      shouldUseComboboxTrigger({
-        role: 'combobox',
-        variant: 'danger',
-      })
-    ).toBe(false)
-  })
-
-  it('delegates default buttons with ChevronsUpDown', () => {
-    expect(
-      shouldUseComboboxTrigger({
-        variant: 'default',
-        iconRight: <ChevronsUpDown />,
-      })
-    ).toBe(true)
-  })
-
-  it('does not delegate text buttons with ChevronsUpDown', () => {
-    expect(
-      shouldUseComboboxTrigger({
-        variant: 'text',
-        iconRight: <ChevronsUpDown />,
-      })
-    ).toBe(false)
-  })
-
-  it('does not delegate asChild buttons', () => {
-    expect(
-      shouldUseComboboxTrigger({
-        asChild: true,
-        role: 'combobox',
-      })
-    ).toBe(false)
+    expect(screen.getByTestId('custom-icon').parentElement).toHaveAttribute('aria-hidden', 'true')
   })
 })

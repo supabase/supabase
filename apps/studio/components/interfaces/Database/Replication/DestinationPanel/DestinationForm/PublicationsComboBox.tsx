@@ -1,11 +1,11 @@
 import { useParams } from 'common'
-import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react'
+import { Check, Loader2, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { ControllerRenderProps } from 'react-hook-form'
 import {
   Badge,
-  Button,
   cn,
+  ComboboxTrigger,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -77,19 +77,17 @@ export const PublicationsComboBox = ({
       }}
     >
       <PopoverTrigger asChild>
-        <Button
-          variant="default"
+        <ComboboxTrigger
+          aria-expanded={dropdownOpen}
+          data-state={dropdownOpen ? 'open' : 'closed'}
           size="medium"
-          className={cn(
-            'w-full [&>span]:w-full text-left',
-            !selectedPublication && 'text-foreground-muted'
-          )}
-          iconRight={showLoadingState ? <Loader2 className="animate-spin" /> : <ChevronsUpDown />}
+          className={cn(!selectedPublication && 'text-foreground-muted')}
+          icon={showLoadingState ? <Loader2 className="h-4 w-4 animate-spin" /> : undefined}
           name={field.name}
           onBlur={field.onBlur}
         >
           {selectedPublication || 'Select publication'}
-        </Button>
+        </ComboboxTrigger>
       </PopoverTrigger>
       <PopoverContent sameWidthAsTrigger className="p-0" align="start">
         <Command>

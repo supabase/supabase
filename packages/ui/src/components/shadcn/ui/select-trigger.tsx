@@ -1,8 +1,7 @@
 'use client'
 
 import { cva, type VariantProps } from 'class-variance-authority'
-import { ChevronDown, ChevronsUpDown } from 'lucide-react'
-import { isValidElement, type ReactNode } from 'react'
+import { ChevronDown } from 'lucide-react'
 import * as React from 'react'
 
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../../lib/constants'
@@ -25,28 +24,6 @@ export const selectTriggerVariants = cva(
 
 export type SelectTriggerVariantProps = VariantProps<typeof selectTriggerVariants>
 
-export function isChevronsUpDownIcon(icon: ReactNode): boolean {
-  if (!isValidElement(icon)) return false
-  return icon.type === ChevronsUpDown
-}
-
-export function shouldUseComboboxTrigger({
-  asChild,
-  role,
-  variant,
-  iconRight,
-}: {
-  asChild?: boolean
-  role?: string
-  variant?: string | null
-  iconRight?: ReactNode
-}): boolean {
-  if (asChild) return false
-  if (variant !== 'default') return false
-  if (role === 'combobox') return true
-  return isChevronsUpDownIcon(iconRight)
-}
-
 const ComboboxTrigger = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement> &
@@ -67,11 +44,15 @@ const ComboboxTrigger = React.forwardRef<
       tabIndex={computedTabIndex}
       {...props}
     >
-      {leadingIcon ? <span className="shrink-0 text-foreground-lighter">{leadingIcon}</span> : null}
+      {leadingIcon ? (
+        <span aria-hidden="true" className="shrink-0 text-foreground-lighter">
+          {leadingIcon}
+        </span>
+      ) : null}
       <span className="min-w-0 flex-1 truncate text-left">{children}</span>
-      {icon ?? (
-        <ChevronDown className="h-4 w-4 text-foreground-lighter shrink-0" strokeWidth={1.5} />
-      )}
+      <span aria-hidden="true" className="shrink-0 text-foreground-lighter">
+        {icon ?? <ChevronDown className="h-4 w-4" strokeWidth={1.5} />}
+      </span>
     </button>
   )
 })
