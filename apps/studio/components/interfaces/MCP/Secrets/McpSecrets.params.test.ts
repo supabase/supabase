@@ -34,6 +34,11 @@ describe('parseSecretsParams', () => {
     expect(parseSecretsParams({ ref: 'abc', name: 'my.weird-Name_1' }).name).toBe('my.weird-Name_1')
   })
 
+  it('receives the params already decoded and does not decode them again', () => {
+    expect(parseSecretsParams({ ref: 'abc', name: 'MY KEY' }).name).toBe('MY KEY')
+    expect(parseSecretsParams({ ref: 'abc', name: 'MY%20KEY' }).name).toBe('MY%20KEY')
+  })
+
   it('rejects a blank secret name', () => {
     expect(parseSecretsParams({ ref: 'abc', name: '   ' }).name).toBeUndefined()
     expect(parseSecretsParams({ ref: 'abc', name: '' }).name).toBeUndefined()
