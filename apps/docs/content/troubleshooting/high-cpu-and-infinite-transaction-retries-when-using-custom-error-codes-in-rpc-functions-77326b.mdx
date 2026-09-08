@@ -12,7 +12,7 @@ A custom `raise exception` using SQLSTATE `40001` (`serialization_failure`) in y
 
 This [bug](https://github.com/PostgREST/postgrest/pull/4222) is present in PostgREST 14 and is fixed in PostgREST 16. Follow the [Supabase changelog](/changelog) to get notified when PostgREST 16 is released.
 
-### How to resolve
+## How to resolve
 
 To resolve this, update your Postgres function to use standard exception handling or SQLSTATE codes that map correctly to HTTP status codes.
 
