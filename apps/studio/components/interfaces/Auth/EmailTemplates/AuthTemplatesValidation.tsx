@@ -16,7 +16,8 @@ const TemplateVariables: Record<TemplateVariableName, TemplateVariable> = {
   TokenHash: {
     name: 'TokenHash',
     value: '{{ .TokenHash }}',
-    description: 'Hashed token used in the URL, useful for constructing your own email link',
+    description:
+      'Hashed token for building your own link, e.g. {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery',
   },
   SiteURL: {
     name: 'SiteURL',
