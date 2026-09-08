@@ -62,7 +62,8 @@ const baseSchema = z.object({
         invalid_type_error: 'Must have a password min length',
       })
       .min(6, 'Must be greater or equal to 6.')
-  ).optional(),
+      .optional()
+  ),
   PASSWORD_REQUIRED_CHARACTERS: z.string().optional(),
   PASSWORD_HIBP_ENABLED: z.boolean().optional(),
 })

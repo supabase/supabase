@@ -7,7 +7,7 @@ export const isEmptyNumberInput = (value: unknown) => value === '' || value == n
  * schema's `invalid_type_error` instead of snapping back to the previous value.
  */
 export const requiredNumberInputSchema = (schema: z.ZodNumber) =>
-  z.preprocess((value) => (isEmptyNumberInput(value) ? Number.NaN : value), schema)
+  z.preprocess((value) => (value === '' ? Number.NaN : value), schema)
 
 /**
  * Wraps a zod number schema so an empty controlled input (`''` or `null`) normalizes to

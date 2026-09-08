@@ -26,8 +26,8 @@ describe('requiredNumberInputSchema', () => {
     if (!result.success) expect(result.error.issues[0]?.message).toBe(REQUIRED_ERROR)
   })
 
-  it('rejects null with the schema error message', () => {
-    const result = schema.safeParse(null)
+  it('leaves undefined to the inner schema', () => {
+    const result = schema.safeParse(undefined)
 
     expect(result.success).toBe(false)
     if (!result.success) expect(result.error.issues[0]?.message).toBe(REQUIRED_ERROR)
@@ -77,5 +77,19 @@ describe('preprocessEmptyNumberInput', () => {
 
     expect(result.success).toBe(true)
     if (result.success) expect(result.data).toBe(12)
+  })
+
+  it('accepts an empty string when the inner schema is optional', () => {
+    const optionalSchema = preprocessEmptyNumberInput(
+      z.coerce
+        .number({ required_error: REQUIRED_ERROR, invalid_type_error: REQUIRED_ERROR })
+        .min(0, 'Must be 0 or larger')
+        .optional()
+    )
+
+    const result = optionalSchema.safeParse('')
+
+    expect(result.success).toBe(true)
+    if (result.success) expect(result.data).toBeUndefined()
   })
 })
