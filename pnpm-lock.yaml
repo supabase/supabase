@@ -756,6 +756,9 @@ importers:
       ui-patterns:
         specifier: workspace:*
         version: link:../../packages/ui-patterns
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
     devDependencies:
       '@tailwindcss/vite':
         specifier: 4.2.4

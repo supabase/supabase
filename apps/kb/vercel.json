@@ -1,6 +1,13 @@
 {
   "buildCommand": "pnpm build",
-  "redirects": [{ "source": "/", "destination": "/kb", "permanent": false }],
+  "redirects": [
+    { "source": "/", "destination": "/kb", "permanent": false },
+    {
+      "source": "/kb/:path+.md",
+      "destination": "/kb/markdown/:path+.md",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     { "source": "/kb", "destination": "/index.html" },
     { "source": "/kb/:path*", "destination": "/:path*" }

@@ -7,7 +7,9 @@
   },
   "scripts": {
     "dev": "astro dev --port 3008",
+    "prebuild": "pnpm run generate:markdown",
     "build": "astro build",
+    "generate:markdown": "node ./scripts/generate-markdown.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "test": "vitest --run"
@@ -21,7 +23,8 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "ui": "workspace:*",
-    "ui-patterns": "workspace:*"
+    "ui-patterns": "workspace:*",
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.2.4",
