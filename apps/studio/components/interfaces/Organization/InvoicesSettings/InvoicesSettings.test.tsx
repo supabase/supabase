@@ -141,6 +141,8 @@ describe('InvoicesSettings', () => {
     render(<InvoicesSettings />)
     await userEvent.click(screen.getByRole('button', { name: 'Download invoice' }))
 
-    expect(toast.error).toHaveBeenCalledWith('Invoice PDF is not available')
+    expect(toast.error).toHaveBeenCalledWith(
+      'Invoice PDF is not available yet. Please try again later.'
+    )
   })
 })
