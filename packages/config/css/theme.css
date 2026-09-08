@@ -41,6 +41,7 @@
   --color-foreground-light: var(--muted-foreground);
   --color-foreground-lighter: var(--tertiary-foreground);
   --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-subtle: var(--foreground-subtle);
   --color-foreground-contrast: var(--foreground-contrast);
   --color-background-200: var(--background-200);
   --color-background-alternative-200: var(--background-alternative-200);
@@ -374,4 +375,6 @@
   --spacing-card: var(--card-padding-x);
   --transform-origin-dropdown: var(--radix-dropdown-menu-content-transform-origin);
   --transform-origin-popover: var(--radix-popover-menu-content-transform-origin);
+  --text-underline-offset-fluid: clamp(2px, 0.17em, 4px);
+  --text-decoration-thickness-fluid: clamp(1px, 0.0684em, 3px);
 }
