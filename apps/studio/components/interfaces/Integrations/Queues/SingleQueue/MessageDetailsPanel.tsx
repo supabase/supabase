@@ -4,7 +4,18 @@ import dayjs from 'dayjs'
 import { isNil } from 'lodash'
 import { Archive, Clock12, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
-import { Button, ResizablePanel, Separator, Tabs, TabsContent, TabsList, TabsTrigger, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Button,
+  ResizablePanel,
+  Separator,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import { RowAction, RowData } from '@/components/interfaces/Auth/Users/UserOverview'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
