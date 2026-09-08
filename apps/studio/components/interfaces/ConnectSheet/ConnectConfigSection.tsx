@@ -331,11 +331,7 @@ function ConnectCombobox({
       </PopoverTrigger>
       <PopoverContent align="start" className="p-0" sameWidthAsTrigger>
         <Command filter={getOptionMatchScore}>
-          <CommandInput
-            placeholder={searchPlaceholder}
-            value={search}
-            onValueChange={setSearch}
-          />
+          <CommandInput placeholder={searchPlaceholder} value={search} onValueChange={setSearch} />
           <p className="sr-only" role="status" aria-live="polite">
             {showEmptyStatus ? emptyMessage : ''}
           </p>
