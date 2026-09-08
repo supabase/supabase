@@ -1,12 +1,12 @@
 ---
-title: 'Configure Phone Login & MFA'
-description: 'Set up phone login SMS providers, OTP settings, and multi-factor authentication for self-hosted Supabase with Docker.'
-subtitle: 'Set up phone login SMS providers, OTP settings, and multi-factor authentication for self-hosted Supabase with Docker.'
+title: 'Configure Phone sign-in & MFA'
+description: 'Set up phone sign-in SMS providers, OTP settings, and multi-factor authentication for self-hosted Supabase with Docker.'
+subtitle: 'Set up phone sign-in SMS providers, OTP settings, and multi-factor authentication for self-hosted Supabase with Docker.'
 ---
 
-This guide covers the **server-side configuration** for phone login and multi-factor authentication (MFA) on a self-hosted Supabase instance running with Docker Compose.
+This guide covers the **server-side configuration** for phone sign-in and multi-factor authentication (MFA) on a self-hosted Supabase instance running with Docker Compose.
 
-For client-side implementation, see [Phone Login](/docs/guides/auth/phone-login) and [Multi-Factor Authentication](/docs/guides/auth/auth-mfa).
+For client-side implementation, see [Phone sign-in](/docs/guides/auth/phone-login) and [Multi-Factor Authentication](/docs/guides/auth/auth-mfa).
 
 ## Before you begin
 
@@ -76,7 +76,9 @@ Confirm your provider and credentials appear in the output.
 
 <Admonition type="note">
 
-For providers other than Twilio, add the provider-specific `GOTRUE_SMS_*` lines manually to `docker-compose.yml`.
+Auth includes built-in integrations for Twilio, Twilio Verify, MessageBird, TextLocal, and Vonage. For providers other than Twilio, add the provider-specific `GOTRUE_SMS_*` lines manually to `docker-compose.yml`.
+
+If you want to use a regional SMS Provider, you can implement the [Send SMS Hook](/docs/guides/self-hosting/self-hosted-auth-hooks#step-by-step-http-endpoint-hook).
 
 </Admonition>
 
@@ -151,7 +153,7 @@ MFA_TOTP_VERIFY_ENABLED=false
 
 ### Phone MFA
 
-Phone MFA is **disabled by default** (opt-in). It uses the same SMS provider configuration as phone login.
+Phone MFA is **disabled by default** (opt-in). It uses the same SMS provider configuration as phone sign-in.
 
 To enable:
 
@@ -226,4 +228,5 @@ If users see "rate limit exceeded" errors, check `SMS_MAX_FREQUENCY` (minimum in
 
 - [Multi-Factor Authentication (Phone)](/docs/guides/auth/auth-mfa/phone)
 - [Multi-Factor Authentication (TOTP)](/docs/guides/auth/auth-mfa/totp)
+- [Self-hosted Auth hooks](/docs/guides/self-hosting/self-hosted-auth-hooks)
 - [Auth server on GitHub](https://github.com/supabase/auth) (check README and `example.env`)

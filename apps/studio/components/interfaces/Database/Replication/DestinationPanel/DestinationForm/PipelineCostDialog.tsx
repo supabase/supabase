@@ -25,11 +25,11 @@ import {
   getTableCopyTargets,
   summarizeTableCopyEstimate,
   type ReplicationTableIdentity,
-  type TableSyncCopyConfig,
 } from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useReplicationCostEstimateQuery } from '@/data/replication/cost-estimate-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
+import type { TableSyncCopyConfig } from '@/data/replication/types'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes, formatCurrency } from '@/lib/helpers'

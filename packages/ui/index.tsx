@@ -13,7 +13,6 @@ export * from './src/components/NavMenu'
 export * from './src/components/SidePanel'
 
 // HTML
-
 export {
   Heading,
   getAnchor,

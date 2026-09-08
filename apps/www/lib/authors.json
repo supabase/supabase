@@ -1016,5 +1016,21 @@
     "position": "Growth",
     "author_url": "https://github.com/ekhar",
     "author_image_url": "/images/blog/avatars/eric-kharitonashvili.png"
+  },
+  {
+    "author_id": "miranda_limonczenko",
+    "author": "Miranda Limonczenko",
+    "username": "czenko",
+    "position": "Docs Engineer",
+    "author_url": "https://github.com/czenko",
+    "author_image_url": "https://github.com/czenko.png"
+  },
+  {
+    "author_id": "nik_richers",
+    "author": "Nik Richers",
+    "username": "nrichers",
+    "position": "Product Manager",
+    "author_url": "https://github.com/nrichers",
+    "author_image_url": "https://github.com/nrichers.png"
   }
 ]
