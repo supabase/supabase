@@ -105,6 +105,24 @@ describe('QueryResultError', () => {
     )
   })
 
+  it('calls onDebug with the prompt instead of opening a new chat when provided', () => {
+    const onDebug = vi.fn()
+
+    customRender(
+      <QueryResultError
+        error={{ message: 'relation "foo" does not exist' }}
+        sql="select * from foo;"
+        source="database"
+        onDebug={onDebug}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Debug with Assistant' }))
+
+    expect(onDebug).toHaveBeenCalledWith(expect.stringContaining('select * from foo;'))
+    expect(mocks.createChat).not.toHaveBeenCalled()
+  })
+
   it('copies the same debug prompt text via the dropdown', async () => {
     const user = userEvent.setup()
     customRender(

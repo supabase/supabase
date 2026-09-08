@@ -90,10 +90,21 @@ CommandInput.displayName = CommandPrimitive.Input.displayName
 const CommandList = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
->(({ className, ...props }, ref) => (
+>(({ className, onWheel, onTouchMove, ...props }, ref) => (
   <CommandPrimitive.List
     ref={ref}
     className={cn('max-h-full overflow-y-auto overflow-x-hidden', className)}
+    // A dialog or sheet locks scrolling by cancelling wheel and touch events that land outside
+    // it, and a dropdown portals to the body. Keeping both off the document is what lets the
+    // list scroll with a trackpad and with a finger while an overlay is open.
+    onWheel={(event) => {
+      event.stopPropagation()
+      onWheel?.(event)
+    }}
+    onTouchMove={(event) => {
+      event.stopPropagation()
+      onTouchMove?.(event)
+    }}
     {...props}
   />
 ))

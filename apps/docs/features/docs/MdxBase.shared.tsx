@@ -27,7 +27,6 @@ import { NamedCodeBlock } from '~/features/directives/CodeTabs.components'
 import { MdxAnchor } from '~/features/docs/MdxAnchor'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
-import InfoTooltip from '~/features/ui/InfoTooltip'
 import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import { ArrowDown, Check, X } from 'lucide-react'
@@ -39,12 +38,14 @@ import { GlassPanel } from 'ui-patterns/GlassPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
 
 import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
+import { AgentSetup } from '../ui/AgentSetup'
+import { AgentWatchSchedule } from '../ui/AgentWatchSchedule'
 import { AiPrompt } from '../ui/AiPrompt'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
 
-// Wrap Admonition for Docs-specific styling (within MDX prose, requires a margin-bottom)
-const AdmonitionWithMargin = (props: AdmonitionProps) => {
+// Admonition as it appears in docs pages: sits in MDX prose, so it needs a margin-bottom.
+const DocsAdmonition = (props: AdmonitionProps) => {
   return <Admonition {...props} className="mb-8" />
 }
 
@@ -67,8 +68,10 @@ const Pre = (props: any) => {
 const components = {
   Accordion,
   AccordionItem,
-  Admonition: AdmonitionWithMargin,
+  Admonition: DocsAdmonition,
   AgentPluginsPanel,
+  AgentSetup,
+  AgentWatchSchedule,
   AiPrompt,
   AiPromptsIndex,
   AiSkillsIndex,
@@ -110,7 +113,6 @@ const components = {
   TabPanel,
   TerraformProviderSchema,
   WrapperDashboardIntegration,
-  InfoTooltip,
   a: MdxAnchor,
   h2: (props: ComponentPropsWithoutRef<'h2'>) => (
     <Heading tag="h2" {...props}>

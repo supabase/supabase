@@ -12,38 +12,29 @@ Content that renders on the HTML page is **not** automatically present
 in the `.md` export. Both pipelines must implement the same semantics.
 
 Example: framework quickstart **AI prompt blocks** (see
-supabase/supabase#47543). Each quickstart includes a bare partial:
+supabase/supabase#47543). Each quickstart embeds one by ID:
 
 ```mdx
-<$Partial path="ai/quickstart_prompt_nextjs.mdx" />
+<AiPrompt id="flask" />
 ```
 
-The partial is a self-closing `<AiPrompt>` with the prompt as a **prop**
-(not children — expression children are skipped by the guides markdown
-pipeline):
+The prompt text lives in `data/ai-prompts.data.ts` (`aiPrompts`, keyed by
+`id`); the MDX carries only the ID, following the registry pattern in
+[`app-map.md`](./app-map.md). An unknown ID throws at render time.
 
-```mdx
-<AiPrompt
-  prompt={
-    'Help me add Supabase to my Next.js project. Create a Supabase project at\ndatabase.new and run the instruments table SQL. Then:\n1. …'
-  }
-/>
-```
+| Pipeline     | Path                                                                                                                                    |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **HTML**     | `features/ui/AiPrompt.tsx` looks up the prompt and renders `PromptPanel` (copy + expand)                                                |
+| **Markdown** | `internals/markdown-schema/PromptPanel.ts` — handlers for the `PromptPanel` compound parts, registered in `generate-guides-markdown.ts` |
 
-| Pipeline     | Path                                                         |
-| ------------ | ------------------------------------------------------------ |
-| **HTML**     | `features/ui/AiPrompt.tsx` → `PromptPanel` (copy + expand)   |
-| **Markdown** | `internals/markdown-schema/AiPrompt.ts` reads `props.prompt` |
-
-`propsFrom()` stores the raw JS expression source. Prettier formats the
-prop as a multiline **single-quoted** string; the schema handler must
-decode that literal (trim + escapes), not only `JSON.parse` double-quoted
-JSON. Symptom if decoding is wrong: generated `.md` keeps surrounding
-quotes and literal `\n`.
+The markdown handlers keep `PromptTitle` (bold) and `PromptContent`, and
+drop `PromptCopy` (clipboard-only duplicate). `AiPrompt` itself has no
+markdown handler: the HTML wrapper composes the compound children on the
+client, so the `.md` export intentionally omits the copy panel.
 
 `$Partial` variable substitution (`lib/partials.utils.ts`, wired in both
-`partialsRemark` and `inlinePartials`) remains required for other nested
-partials — it is no longer the AI-prompt path.
+`partialsRemark` and `inlinePartials`) is still required for nested
+partials; it is not involved in the AI-prompt path.
 
 When adding content aimed at both humans and agents, always verify:
 

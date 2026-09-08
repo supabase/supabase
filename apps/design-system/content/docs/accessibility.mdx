@@ -59,16 +59,17 @@ focus-visible:ring-offset-background
 Uses `outline` (not `ring`) so it paints reliably on interactive `<tr>`s. Tailwind `ring` is `box-shadow`, which browsers often skip on `display: table-row` (notably Safari). Do not put `focus-ring` or raw `ring-*` on a `<tr>`, and do not add `outline-hidden` alongside `focus-inset`. `outline-hidden` sets `outline-style: none` and will hide the indicator.
 
 ```txt
+outline: 2px solid transparent
+outline-offset: -2px
+transition-property: color, background-color, border-color, ...
+
 &:focus-visible {
-  outline-style: solid
-  outline-width: 2px
-  outline-offset: -2px
   outline-color: var(--ring)
   border-radius: var(--radius-md)
 }
 ```
 
-`outline-hidden` is always on (not `focus-visible:`-prefixed) so mouse click does not show the browser’s default outline; the focus indicator replaces it for keyboard focus only.
+`focus-ring` keeps `outline-hidden` always on so mouse clicks do not show the browser’s default outline. `focus-inset` reserves a transparent outline instead. Its transition property list deliberately excludes outline properties so the keyboard focus indicator appears immediately, even when a call site uses `transition-all`.
 
 Rules:
 

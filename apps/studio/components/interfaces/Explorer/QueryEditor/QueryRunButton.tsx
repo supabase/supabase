@@ -3,12 +3,12 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   KeyboardShortcut,
 } from 'ui'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 
 interface QueryRunButtonProps {
   isExecuting: boolean
@@ -63,20 +63,9 @@ export const QueryRunButton = ({
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItemTooltip
-            disabled={!hasSelection}
-            onClick={onRunSelected}
-            tooltip={{
-              content: {
-                side: 'left',
-                text: !hasSelection
-                  ? 'Select SQL in the editor to run part of the query'
-                  : undefined,
-              },
-            }}
-          >
-            Run selected
-          </DropdownMenuItemTooltip>
+          <DropdownMenuItem disabled={!hasSelection} onClick={onRunSelected}>
+            Run selected SQL
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
