@@ -1219,3 +1219,27 @@ export const TIMEZONES_BY_IANA: Timezone[] = (() => {
 /** Look up the catalog entry that owns the given IANA name (any of `utc[]`). */
 export const findTimezoneByIana = (iana: string): Timezone | undefined =>
   ALL_TIMEZONES.find((entry) => entry.utc.includes(iana))
+
+/**
+ * Current UTC offset of an IANA zone, e.g. `UTC-05:00`. The catalog's own
+ * `offset`/`text` fields are standard-time only, so they read an hour off for
+ * every zone that is currently observing daylight saving time.
+ */
+export const getTimezoneOffsetLabel = (iana: string) => {
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: iana,
+      timeZoneName: 'longOffset',
+    }).formatToParts(new Date())
+    const offset = parts.find((part) => part.type === 'timeZoneName')?.value ?? 'GMT'
+    return offset === 'GMT' ? 'UTC+00:00' : offset.replace('GMT', 'UTC')
+  } catch {
+    return 'UTC+00:00'
+  }
+}
+
+/** Catalog label for an IANA zone, with its offset resolved for today's date. */
+export const formatTimezoneLabel = (iana: string) => {
+  const region = findTimezoneByIana(iana)?.text.replace(/^\(UTC[^)]*\)\s*/, '') ?? iana
+  return `(${getTimezoneOffsetLabel(iana)}) ${region}`
+}

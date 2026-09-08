@@ -1,6 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { ALL_TIMEZONES, findTimezoneByIana, TIMEZONES_BY_IANA } from '@/lib/constants/timezones'
+import {
+  ALL_TIMEZONES,
+  findTimezoneByIana,
+  formatTimezoneLabel,
+  TIMEZONES_BY_IANA,
+} from '@/lib/constants/timezones'
 
 describe('TIMEZONES_BY_IANA', () => {
   it('produces one row per primary IANA name', () => {
@@ -44,5 +49,39 @@ describe('findTimezoneByIana', () => {
 
   it('returns undefined for an unknown IANA name', () => {
     expect(findTimezoneByIana('Not/A/Real_Zone')).toBeUndefined()
+  })
+})
+
+describe('formatTimezoneLabel', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  const atSystemTime = (iso: string, iana: string) => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(iso))
+    return formatTimezoneLabel(iana)
+  }
+
+  it('reports the offset in effect today rather than the standard-time offset', () => {
+    // The catalog labels Central Time as UTC-06:00 all year round
+    expect(atSystemTime('2026-08-10T12:00:00Z', 'America/Chicago')).toBe(
+      '(UTC-05:00) Central Time (US & Canada)'
+    )
+    expect(atSystemTime('2026-01-10T12:00:00Z', 'America/Chicago')).toBe(
+      '(UTC-06:00) Central Time (US & Canada)'
+    )
+  })
+
+  it('handles zones with a half hour offset', () => {
+    expect(atSystemTime('2026-08-10T12:00:00Z', 'Asia/Kolkata')).toBe(
+      '(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi'
+    )
+  })
+
+  it('falls back to the IANA name for zones missing from the catalog', () => {
+    expect(atSystemTime('2026-08-10T12:00:00Z', 'Not/A/Real_Zone')).toBe(
+      '(UTC+00:00) Not/A/Real_Zone'
+    )
   })
 })

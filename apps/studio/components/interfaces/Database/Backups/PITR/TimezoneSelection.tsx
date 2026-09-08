@@ -1,5 +1,5 @@
 import { CheckIcon, ChevronsUpDown, Globe } from 'lucide-react'
-import { useId, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import {
   Button,
   cn,
@@ -15,12 +15,11 @@ import {
   ScrollArea,
 } from 'ui'
 
-import { ALL_TIMEZONES } from './PITR.constants'
-import type { Timezone } from './PITR.types'
+import { formatTimezoneLabel, TIMEZONES_BY_IANA } from '@/lib/constants/timezones'
 
 interface TimezoneSelectionProps {
-  selectedTimezone: Timezone
-  onSelectTimezone: (timezone: Timezone) => void
+  selectedTimezone: string
+  onSelectTimezone: (timezone: string) => void
 }
 
 export const TimezoneSelection = ({
@@ -30,7 +29,17 @@ export const TimezoneSelection = ({
   const [open, setOpen] = useState(false)
   const listboxId = useId()
 
-  const timezoneOptions = ALL_TIMEZONES.map((option) => option.text)
+  const options = useMemo(() => {
+    const catalogNames = TIMEZONES_BY_IANA.map((entry) => entry.utc[0])
+    // The selected zone is often an alias of a catalog entry rather than its
+    // primary name, so it needs adding explicitly to stay selectable
+    const ianaNames = catalogNames.includes(selectedTimezone)
+      ? catalogNames
+      : [selectedTimezone, ...catalogNames]
+    return ianaNames.map((iana) => ({ iana, label: formatTimezoneLabel(iana) }))
+  }, [selectedTimezone])
+
+  const selectedLabel = formatTimezoneLabel(selectedTimezone)
 
   return (
     <div className="w-full">
@@ -46,9 +55,7 @@ export const TimezoneSelection = ({
             icon={<Globe />}
             iconRight={<ChevronsUpDown size={14} strokeWidth={1.5} className="ml-auto" />}
           >
-            {selectedTimezone
-              ? timezoneOptions.find((option) => option === selectedTimezone.text)
-              : 'Select timezone...'}
+            {selectedLabel}
           </Button>
         </PopoverTrigger>
         <PopoverContent id={listboxId} className="w-[350px] p-0">
@@ -58,25 +65,21 @@ export const TimezoneSelection = ({
               <CommandEmpty>No timezones found...</CommandEmpty>
               <CommandGroup>
                 <ScrollArea className="h-72">
-                  {timezoneOptions.map((option) => (
+                  {options.map(({ iana, label }) => (
                     <CommandItem
-                      key={option}
-                      value={option}
-                      onSelect={(text) => {
-                        const selectedTimezone = ALL_TIMEZONES.find(
-                          (option) => option.text === text
-                        )
-                        if (selectedTimezone) {
-                          onSelectTimezone(selectedTimezone)
-                          setOpen(false)
-                        }
+                      key={iana}
+                      // CommandItem filters on `value`, so include the IANA name to make it searchable
+                      value={`${label} ${iana}`}
+                      onSelect={() => {
+                        onSelectTimezone(iana)
+                        setOpen(false)
                       }}
                     >
-                      {option}
+                      {label}
                       <CheckIcon
                         className={cn(
                           'ml-auto h-4 w-4',
-                          selectedTimezone.text === option ? 'opacity-100' : 'opacity-0'
+                          selectedTimezone === iana ? 'opacity-100' : 'opacity-0'
                         )}
                       />
                     </CommandItem>
