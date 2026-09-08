@@ -17,7 +17,7 @@ import {
 } from './WarehouseModePanel.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
+import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -71,23 +71,30 @@ export const WarehouseSchemaTablePicker = ({
   const sourceId = sourcesData?.sources.find((source) => source.name === projectRef)?.id
 
   const {
-    data: publications,
-    isError: isPublicationsError,
-    error: publicationsError,
-  } = useReplicationPublicationsQuery({ projectRef, sourceId })
+    data: warehousePublication,
+    isError: isPublicationError,
+    error: publicationError,
+    isPending: isPublicationPending,
+    isFetching: isPublicationFetching,
+  } = useReplicationPublicationQuery(
+    { projectRef, sourceId, publicationName: WAREHOUSE_PUBLICATION_NAME },
+    { enabled: isEditing && sourceId !== undefined }
+  )
 
   // Derived from data presence rather than fetch status, so there's no render gap between the
-  // publications query becoming enabled and it actually starting to fetch.
+  // publication query becoming enabled and it actually starting to fetch.
   const isSelectionPending =
     isSourcesLoading ||
-    (sourceId !== undefined && publications === undefined && !isPublicationsError)
+    (isEditing &&
+      sourceId !== undefined &&
+      (isPublicationPending || isPublicationFetching) &&
+      warehousePublication === undefined &&
+      !isPublicationError)
 
-  const initialSelection = useMemo(() => {
-    const warehousePublication = publications?.find(
-      (publication) => publication.name === WAREHOUSE_PUBLICATION_NAME
-    )
-    return buildSelectionFromPublicationTables(warehousePublication?.tables ?? [])
-  }, [publications])
+  const initialSelection = useMemo(
+    () => buildSelectionFromPublicationTables(warehousePublication?.tables ?? []),
+    [warehousePublication]
+  )
 
   const selection = selectionOverride ?? initialSelection
 
@@ -144,8 +151,8 @@ export const WarehouseSchemaTablePicker = ({
   if (isTablesError) return <AlertError subject="Failed to load tables" error={tablesError} />
   // Only blocking when editing: a first-time setup starts from an empty selection anyway, so a
   // failed publication lookup shouldn't stop the user from enabling Warehouse at all.
-  if (isEditing && isPublicationsError) {
-    return <AlertError subject="Failed to load replicated tables" error={publicationsError} />
+  if (isEditing && isPublicationError) {
+    return <AlertError subject="Failed to load replicated tables" error={publicationError} />
   }
 
   return (
