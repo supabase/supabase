@@ -30,7 +30,17 @@ describe('ProjectMultiSelect', () => {
     expect(screen.getByRole('combobox')).toHaveTextContent('Select projects...')
   })
 
-  test('renders the selected projects by name in the trigger', () => {
+  test('renders a single selected project by name in the trigger', () => {
+    customRender(
+      <ProjectMultiSelect projects={PROJECTS} selectedRefs={['project-1']} onChange={vi.fn()} />
+    )
+
+    const trigger = screen.getByRole('combobox')
+    expect(trigger).toHaveTextContent('production')
+    expect(trigger).not.toHaveTextContent('project-1')
+  })
+
+  test('collapses the projects past the badge limit into a counter', () => {
     customRender(
       <ProjectMultiSelect
         projects={PROJECTS}
@@ -41,7 +51,8 @@ describe('ProjectMultiSelect', () => {
 
     const trigger = screen.getByRole('combobox')
     expect(trigger).toHaveTextContent('production')
-    expect(trigger).toHaveTextContent('staging')
+    expect(trigger).toHaveTextContent('+1')
+    expect(trigger).not.toHaveTextContent('staging')
     expect(trigger).not.toHaveTextContent('project-1')
   })
 

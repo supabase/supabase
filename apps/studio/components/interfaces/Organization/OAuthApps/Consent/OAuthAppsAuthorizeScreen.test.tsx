@@ -108,4 +108,21 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.getByText('Authorized by')).toBeInTheDocument()
     expect(screen.getByText(/admin@example\.com/)).toBeInTheDocument()
   })
+
+  test('renders the cross-workspace notice for a client that reuses one grant', async () => {
+    customRender(<OAuthAppsAuthorizeScreen mockState="cross_workspace" navigate={vi.fn()} />)
+
+    expect(
+      await screen.findByText(
+        "Some clients may reuse one authorization across workspaces. Check your client's workspace or account settings if project access does not behave as expected."
+      )
+    ).toBeInTheDocument()
+  })
+
+  test('hides the cross-workspace notice for a client that does not reuse a grant', async () => {
+    customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
+
+    await screen.findByText('Permissions requested')
+    expect(screen.queryByText(/reuse one authorization across workspaces/)).not.toBeInTheDocument()
+  })
 })
