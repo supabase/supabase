@@ -193,7 +193,6 @@ export function ConnectConfigSection({
                 <MultiSelector
                   values={Array.isArray(value) ? value : []}
                   onValuesChange={(v) => onFieldChange(field.id, v)}
-                  modal
                 >
                   <MultiSelectorTrigger
                     id={`connect-${field.id}`}
