@@ -31,6 +31,7 @@ import {
 } from 'ui-patterns/multi-select'
 
 import type { ConnectMode, FieldOption, ResolvedField } from './Connect.types'
+import { getFrameworkMatchScore } from './ConnectConfigSection.utils'
 import { ConnectionIcon } from './ConnectionIcon'
 import {
   ConnectModeButton,
@@ -269,15 +270,6 @@ interface ConnectComboboxProps {
   options: FieldOption[]
   value: string
   onValueChange: (value: string) => void
-}
-
-function getFrameworkMatchScore(value: string, search: string, keywords?: string[]) {
-  const normalizedSearch = search.trim().toLowerCase()
-  if (normalizedSearch.length === 0) return 1
-
-  const searchableValues = [value, ...(keywords ?? [])]
-
-  return searchableValues.some((item) => item.toLowerCase().includes(normalizedSearch)) ? 1 : 0
 }
 
 function ConnectCombobox({ id, options, value, onValueChange }: ConnectComboboxProps) {
