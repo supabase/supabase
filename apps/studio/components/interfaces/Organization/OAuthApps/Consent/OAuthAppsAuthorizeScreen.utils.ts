@@ -6,6 +6,7 @@ const MOCK_STATE_SCENARIOS: Record<string, string> = {
   unverified: OAUTH_APPS_MOCK_SCENARIOS.kemalBot,
   empty_org: OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper,
   success: OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper,
+  cross_workspace: OAUTH_APPS_MOCK_SCENARIOS.vercelCrossWorkspace,
 }
 
 export const EMPTY_ORG_MOCK_SLUG = 'contoso-labs'
