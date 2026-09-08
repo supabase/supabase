@@ -51,7 +51,7 @@ export const QueueTab = () => {
   const { data: policies } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: 'pgmq',
+    schemas: ['pgmq'],
   })
   const queuePolicies = (policies ?? []).filter((policy) => policy.table === queueRelname)
 
@@ -110,7 +110,7 @@ export const QueueTab = () => {
           <QueueSettings />
 
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="px-1.5"
             onClick={() => setPurgeQueueModalShown(true)}
             icon={<Paintbrush />}
@@ -120,7 +120,7 @@ export const QueueTab = () => {
           />
 
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="px-1.5"
             onClick={() => setDeleteQueueModalShown(true)}
             icon={<Trash2 />}
@@ -138,7 +138,7 @@ export const QueueTab = () => {
               {queuePolicies.length === 0 ? (
                 <ButtonTooltip
                   asChild
-                  type="default"
+                  variant="default"
                   className="group"
                   icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
                   tooltip={{
@@ -151,7 +151,7 @@ export const QueueTab = () => {
                 >
                   <Link
                     passHref
-                    href={`/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
+                    href={`/project/${ref}/database/policies?search=${queueTable?.id}&schema=pgmq`}
                   >
                     Add RLS policy
                   </Link>
@@ -159,7 +159,7 @@ export const QueueTab = () => {
               ) : (
                 <Button
                   asChild
-                  type="default"
+                  variant="default"
                   className="group"
                   icon={
                     <div
@@ -176,7 +176,7 @@ export const QueueTab = () => {
                 >
                   <Link
                     passHref
-                    href={`/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
+                    href={`/project/${ref}/database/policies?search=${queueTable?.id}&schema=pgmq`}
                   >
                     Auth {queuePolicies.length > 1 ? 'policies' : 'policy'}
                   </Link>
@@ -190,7 +190,10 @@ export const QueueTab = () => {
               onOpenChange={() => setOpenRlsPopover(!openRlsPopover)}
             >
               <PopoverTrigger asChild>
-                <Button type={isExposed ? 'warning' : 'default'} icon={<Lock strokeWidth={1.5} />}>
+                <Button
+                  variant={isExposed ? 'warning' : 'default'}
+                  icon={<Lock strokeWidth={1.5} />}
+                >
                   RLS disabled
                 </Button>
               </PopoverTrigger>
@@ -207,7 +210,7 @@ export const QueueTab = () => {
                       </p>
                       <p>With RLS enabled, anonymous users will not have access to this queue.</p>
                       <Button
-                        type="default"
+                        variant="default"
                         className="w-min"
                         onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
                       >
@@ -224,7 +227,7 @@ RLS for queues is only relevant if exposure through PostgREST has been enabled, 
 You may opt to manage your queues via any Supabase client libraries or PostgREST endpoints by enabling this in the [queues settings](/project/${project?.ref}/integrations/queues/settings).`}
                       />
                       <Button
-                        type="default"
+                        variant="default"
                         className="w-min"
                         onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
                       >
@@ -237,7 +240,7 @@ You may opt to manage your queues via any Supabase client libraries or PostgREST
             </Popover>
           )}
 
-          <Button type="primary" onClick={() => setSendMessageModalShown(true)}>
+          <Button variant="primary" onClick={() => setSendMessageModalShown(true)}>
             Add message
           </Button>
 

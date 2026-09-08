@@ -7,6 +7,15 @@ import { AlertCircle } from 'lucide-react'
 import { FC, memo, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
+  Alert,
+  AlertDescription,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   Button,
   Form,
   FormControl,
@@ -26,16 +35,6 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
-import { Alert, AlertDescription } from 'ui/src/components/shadcn/ui/alert'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from 'ui/src/components/shadcn/ui/alert-dialog'
 
 import { CountrySelector } from '../Supasquad/CountrySelector'
 
@@ -544,15 +543,15 @@ const FormContent = memo(function FormContent({
             <div className="flex flex-row gap-3">
               <Button
                 size="small"
-                htmlType="button"
-                type="outline"
+                type="button"
+                variant="outline"
                 onClick={handleCancel}
                 disabled={isSubmitting}
                 className="border-border text-foreground hover:bg-muted flex-1"
               >
                 Cancel
               </Button>
-              <Button size="small" htmlType="submit" disabled={isSubmitting} className="flex-1">
+              <Button size="small" type="submit" disabled={isSubmitting} className="flex-1">
                 {isSubmitting ? <>Submitting...</> : <>Submit Application</>}
               </Button>
             </div>

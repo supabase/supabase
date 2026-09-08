@@ -13,7 +13,7 @@ import {
 } from 'react'
 import { usePreviousDistinct } from 'react-use'
 import { Button, Switch } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { getApiEndpoint } from '@/components/interfaces/Integrations/DataApi/DataApi.utils'
@@ -164,7 +164,6 @@ const useTableApiAccessHandler = (
   })
   useEffect(() => {
     resetState()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [params.type, selectedSchema, permissionsTemplateSchema, permissionsTemplateTable])
 
   const syncDefaultPrivileges = useEffectEvent(() => {
@@ -174,7 +173,6 @@ const useTableApiAccessHandler = (
   })
   useEffect(() => {
     syncDefaultPrivileges()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [defaultPrivilegesQuery.status])
 
   const syncApiPrivileges = useEffectEvent(() => {
@@ -195,7 +193,6 @@ const useTableApiAccessHandler = (
   })
   useEffect(() => {
     syncApiPrivileges()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [apiAccessStatus.status])
 
   const isPending =
@@ -320,7 +317,7 @@ export const ApiAccessToggle = ({
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h5>Data API Access</h5>
+            <h5>Data API access</h5>
             <p className="text-sm text-foreground-lighter">
               Allow this table to be queried via Supabase client libraries or the API directly
             </p>
@@ -332,7 +329,7 @@ export const ApiAccessToggle = ({
               disabled={isDisabled}
             />
           ) : (
-            <Button asChild type="default" icon={<ExternalLink />}>
+            <Button asChild variant="default" icon={<ExternalLink />}>
               <Link
                 target="_blank"
                 rel="noopener noreferrer"

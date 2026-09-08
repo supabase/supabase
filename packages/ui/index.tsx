@@ -3,10 +3,6 @@
 export * from './src/components/Button'
 export * from './src/components/Icon/IconBackground'
 
-// DISPLAYS
-
-export * from './src/components/Tabs'
-
 // NAV
 
 export * from './src/components/Menu'
@@ -17,8 +13,12 @@ export * from './src/components/NavMenu'
 export * from './src/components/SidePanel'
 
 // HTML
-
-export { Heading } from './src/components/CustomHTMLElements'
+export {
+  Heading,
+  getAnchor,
+  removeAnchor,
+  highlightSelectedNavItem,
+} from './src/components/CustomHTMLElements'
 
 // UTILITIES
 
@@ -35,9 +35,9 @@ export * from './src/components/LoadingLine'
 
 // ai icon
 export * from './src/layout/ai-icon-animation'
+export { default as aiIconAnimationStyles } from './src/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 
 // theme switcher
-export * from './src/components/ThemeProvider/themes'
 export * from './src/components/ThemeProvider/singleThemes'
 
 // shadcn
@@ -112,12 +112,7 @@ export * from './src/components/ShadowScrollArea'
 
 export * from './src/components/shadcn/ui/collapsible'
 
-export {
-  Tabs as Tabs_Shadcn_,
-  TabsContent as TabsContent_Shadcn_,
-  TabsList as TabsList_Shadcn_,
-  TabsTrigger as TabsTrigger_Shadcn_,
-} from './src/components/shadcn/ui/tabs'
+export * from './src/components/shadcn/ui/tabs'
 
 export * from './src/components/shadcn/ui/tooltip'
 
@@ -141,6 +136,7 @@ export * from './src/components/shadcn/ui/sidebar'
 
 // ICONS
 export * from './src/components/StatusIcon'
+export * from './src/components/SuccessCheck'
 
 // export icons
 export * from './src/components/Icon/icons/IconBriefcase2'
@@ -169,3 +165,6 @@ export * from './src/lib/Hooks'
 export * from './src/components/hooks/use-mobile'
 
 export * from './src/components/KeyboardShortcut/KeyboardShortcut'
+
+export * as colors from './src/lib/tailwind-demo-classes'
+export * from './src/lib/constants'

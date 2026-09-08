@@ -80,7 +80,7 @@ const nextConfig = {
    */
   outputFileTracingIncludes: {
     '/llms.txt': ['../docs/content/guides/*'],
-    '/llms-full.txt': ['../docs/public/markdown/guides/**/*.md' ],
+    '/llms-full.txt': ['../docs/public/markdown/guides/**/*.md'],
   },
   reactStrictMode: true,
   images: {
@@ -194,7 +194,20 @@ const nextConfig = {
     ]
   },
   async rewrites() {
-    return rewrites
+    return {
+      afterFiles: rewrites,
+      fallback: [
+        {
+          source: '/:path(.*\\.md)',
+          destination: '/api-v2/md-404/:path',
+        },
+        {
+          source: '/:path*',
+          has: [{ type: 'header', key: 'accept', value: '.*text/(markdown|\\*).*' }],
+          destination: '/api-v2/md-404/:path*',
+        },
+      ],
+    }
   },
   async redirects() {
     // For /docs/guides/ redirects, auto-generate .md variants so renamed/deleted pages

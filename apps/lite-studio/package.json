@@ -7,7 +7,7 @@
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
-    "clean": "rimraf node_modules tsconfig.tsbuildinfo build .react-router .turbo"
+    "clean": "rimraf build .react-router .turbo tsconfig.tsbuildinfo"
   },
   "dependencies": {
     "@react-router/fs-routes": "^7.17.0",

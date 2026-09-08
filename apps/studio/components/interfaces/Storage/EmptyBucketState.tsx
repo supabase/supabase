@@ -1,5 +1,5 @@
 import { BucketPlus } from 'icons'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { CreateBucketButton } from './NewBucketButton'
 import { BUCKET_TYPES } from './Storage.constants'

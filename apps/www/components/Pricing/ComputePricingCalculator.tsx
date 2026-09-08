@@ -2,10 +2,9 @@ import pricingAddOn from '~/data/PricingAddOnTable.json'
 import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { plans as allPlans } from 'shared-data/plans'
-import { Button, cn, Slider } from 'ui'
+import { Button, cn, Slider, ToggleGroup, ToggleGroupItem } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { ToggleGroup, ToggleGroupItem } from 'ui/src/components/shadcn/ui/toggle-group'
 
 const STANDALONE_PLANS = allPlans
   .filter((plan) => plan.planId === 'pro' || plan.planId === 'team')
@@ -153,7 +152,7 @@ const ComputePricingCalculator = ({
           <div className="flex items-center gap-1 w-full justify-between">
             <span>Total</span>
             <span className="text-foreground font-mono flex items-center gap-1">
-              <InfoTooltip side="top" className="max-w-[250px]">
+              <InfoTooltip side="top" className="max-w-[250px]" label="About this estimate">
                 This estimate only includes Plan and Compute add-on monthly costs. Other resources
                 might incur additional costs in the final invoice.
               </InfoTooltip>
@@ -218,6 +217,7 @@ const ComputePricingCalculator = ({
                 <div className="flex items-center gap-2">
                   {activeInstances.length > 1 && (
                     <button
+                      tabIndex={0}
                       aria-label="Remove item"
                       title="Remove item"
                       className="p-1 text-lighter hover:text-foreground rounded-sm opacity-0 group-hover:opacity-100 transition-opacity"
@@ -234,7 +234,7 @@ const ComputePricingCalculator = ({
         <div className="text-right w-full">
           <Button
             size="tiny"
-            type="primary"
+            variant="primary"
             icon={<Plus />}
             onClick={() => {
               if (disableInteractivity) return

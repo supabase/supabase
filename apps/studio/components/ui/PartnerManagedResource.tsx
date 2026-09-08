@@ -86,7 +86,7 @@ function PartnerManagedResource({
       {details && <div className="text-sm text-foreground-light text-center">{details}</div>}
 
       {showCta && (
-        <Button asChild type="default" iconRight={<ExternalLink />}>
+        <Button asChild variant="default" iconRight={<ExternalLink />}>
           <a href={ctaUrl} target="_blank" rel="noopener noreferrer">
             {cta?.message || `View ${resource} on ${PARTNER_TO_NAME[managedBy]}`}
           </a>

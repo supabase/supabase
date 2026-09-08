@@ -41,7 +41,7 @@ export const BlockViewConfiguration = ({
       <PopoverTrigger asChild>
         <ButtonTooltip
           id="help-popover-button"
-          type="text"
+          variant="text"
           className="px-1"
           icon={<Settings2 size={14} strokeWidth={1.5} />}
           tooltip={{ content: { side: 'bottom', text: 'View data' } }}
@@ -51,6 +51,7 @@ export const BlockViewConfiguration = ({
         <form className="grid gap-2">
           <ToggleGroup
             type="single"
+            variant="outline"
             value={view}
             className="w-full"
             onValueChange={(view: 'chart' | 'table') => {

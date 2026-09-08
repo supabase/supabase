@@ -539,6 +539,39 @@ describe('upsertOperation', () => {
     expect(result.operations[0]).toEqual(otherOp)
   })
 
+  test('should remove primary key edit when reverted using original row identifiers', () => {
+    const existingOp: QueuedOperation = {
+      id: 'edit_cell_content:1:id:id:1',
+      type: QueuedOperationType.EDIT_CELL_CONTENT,
+      tableId: 1,
+      timestamp: Date.now() - 1000,
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'id',
+        oldValue: 1,
+        newValue: 3,
+        table: mockTable,
+      },
+    }
+
+    const operations = [existingOp]
+    const newOperation: NewEditCellContentOperation = {
+      type: QueuedOperationType.EDIT_CELL_CONTENT,
+      tableId: 1,
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'id',
+        oldValue: 3,
+        newValue: 1,
+        table: mockTable,
+      },
+    }
+
+    const result = upsertOperation(operations, newOperation)
+
+    expect(result.operations).toHaveLength(0)
+  })
+
   test('should remove operation when number oldValue matches string newValue', () => {
     const existingOp: QueuedOperation = {
       id: 'edit_cell_content:1:age:id:1',

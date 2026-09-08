@@ -23,7 +23,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { useDatabaseQueueMessageSendMutation } from '@/data/database-queues/database-queue-messages-send-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -145,12 +145,12 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
           </Form>
         </DialogSection>
         <DialogFooter>
-          <Button type="default" onClick={onClose} disabled={isPending}>
+          <Button variant="default" onClick={onClose} disabled={isPending}>
             Cancel
           </Button>
           <Button
-            type="primary"
-            htmlType="submit"
+            variant="primary"
+            type="submit"
             form={FORM_ID}
             disabled={isPending}
             loading={isPending}

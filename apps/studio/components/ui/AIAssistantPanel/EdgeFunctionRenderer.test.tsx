@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { type ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
@@ -58,22 +59,35 @@ vi.mock('../EdgeFunctionBlock/EdgeFunctionBlock', () => ({
       {showReplaceWarning && (
         <div>
           <p>An edge function with this name already exists.</p>
-          <button onClick={onCancelReplace}>Cancel</button>
-          <button onClick={onConfirmReplace}>Replace function</button>
+          <button tabIndex={0} onClick={onCancelReplace}>
+            Cancel
+          </button>
+          <button tabIndex={0} onClick={onConfirmReplace}>
+            Replace function
+          </button>
         </div>
       )}
     </div>
   ),
 }))
 
-vi.mock('./ConfirmFooter', () => ({
-  ConfirmFooter: ({
+vi.mock('./Confirm', () => ({
+  Confirm: ({
+    children,
     confirmLabel,
     onConfirm,
   }: {
+    children?: ReactNode
     confirmLabel?: string
     onConfirm?: () => void
-  }) => <button onClick={onConfirm}>{confirmLabel ?? 'Confirm'}</button>,
+  }) => (
+    <div>
+      {children}
+      <button tabIndex={0} onClick={onConfirm}>
+        {confirmLabel ?? 'Confirm'}
+      </button>
+    </div>
+  ),
 }))
 
 describe('EdgeFunctionRenderer', () => {
@@ -96,6 +110,7 @@ describe('EdgeFunctionRenderer', () => {
         label="Deploy Edge Function"
         code="Deno.serve(() => new Response('ok'))"
         functionName="hello-world"
+        confirmState="approval-requested"
         onApprove={onApprove}
       />
     )
@@ -124,6 +139,7 @@ describe('EdgeFunctionRenderer', () => {
         label="Deploy Edge Function"
         code="Deno.serve(() => new Response('ok'))"
         functionName="hello-world"
+        confirmState="approval-requested"
         onApprove={onApprove}
       />
     )

@@ -299,7 +299,7 @@ const NewFunctionPage = () => {
             <PopoverTrigger asChild>
               <Button
                 size="tiny"
-                type="default"
+                variant="default"
                 role="combobox"
                 aria-expanded={open}
                 aria-controls={templatesListboxId}
@@ -348,7 +348,7 @@ const NewFunctionPage = () => {
           </Popover>
           <Button
             size="tiny"
-            type="default"
+            variant="default"
             onClick={handleChat}
             icon={<AiIconAnimation size={16} />}
           >

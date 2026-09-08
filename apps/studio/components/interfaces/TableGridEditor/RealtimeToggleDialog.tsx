@@ -108,10 +108,10 @@ export const RealtimeToggleDialog = ({
           </div>
         </DialogSection>
         <DialogFooter>
-          <Button type="default" disabled={isTogglingRealtime} onClick={() => setOpen(false)}>
+          <Button variant="default" disabled={isTogglingRealtime} onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button type="primary" loading={isTogglingRealtime} onClick={toggleRealtime}>
+          <Button variant="primary" loading={isTogglingRealtime} onClick={toggleRealtime}>
             {isRealtimeEnabled ? 'Disable' : 'Enable'} realtime
           </Button>
         </DialogFooter>

@@ -9,6 +9,7 @@ export type CustomOptionProps = {
 export type FilterOptionObject = {
   label: string
   value: string
+  count?: number
 }
 
 export type CustomOptionObject = {
@@ -89,6 +90,7 @@ export type FilterBarAction = {
 export type MenuItem = {
   value: string
   label: string
+  count?: number
   icon?: React.ReactNode
   isCustom?: boolean
   customOption?: (props: CustomOptionProps) => React.ReactElement

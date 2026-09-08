@@ -22,6 +22,7 @@ export const Announcement = (props: AnnouncementType) => {
   }
   return (
     <button
+      tabIndex={0}
       className={[
         'flex items-start gap-6 rounded-full border p-3 px-6 pr-8',
         containerClasses,

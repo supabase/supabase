@@ -1,4 +1,4 @@
-import { type Dispatch, type SetStateAction } from 'react'
+import { useMemo, type Dispatch, type SetStateAction } from 'react'
 import {
   Accordion,
   AccordionContent,
@@ -21,6 +21,7 @@ import { type ExtensionsSchema, type InstallIntegrationSheetProps } from './Inst
 import { extensionsWithRecommendedSchemas } from '@/components/interfaces/Database/Extensions/Extensions.constants'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 
@@ -48,18 +49,24 @@ export const AdvancedSettings = ({
     { projectRef: project?.ref, connectionString: project?.connectionString },
     { enabled: involvesExtensions }
   )
-  const availableSchemas = schemas.filter(
-    (schema) => !protectedSchemas.some((protectedSchema) => protectedSchema.name === schema.name)
+  const visibleSchemas = useSchemasFilteredForHighAvailability(schemas)
+  const availableSchemas = useMemo(
+    () =>
+      visibleSchemas.filter(
+        (schema) =>
+          !protectedSchemas.some((protectedSchema) => protectedSchema.name === schema.name)
+      ),
+    [visibleSchemas, protectedSchemas]
   )
 
   return (
-    <SheetSection>
+    <SheetSection className="px-0">
       <Accordion type="single" collapsible>
         <AccordionItem value="advanced-settings" className="border-none">
-          <AccordionTrigger className="font-normal gap-2 py-0 justify-between text-sm hover:no-underline">
+          <AccordionTrigger className="font-normal gap-2 px-5 py-0 justify-between text-sm hover:no-underline">
             Advanced settings
           </AccordionTrigger>
-          <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
+          <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4 [&>div]:px-5">
             <p className="text-foreground-light">
               Select which schemas to install the database extensions under
             </p>

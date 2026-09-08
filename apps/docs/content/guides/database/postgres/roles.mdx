@@ -88,7 +88,7 @@ The default Postgres role. This has admin privileges.
 
 ### `anon`
 
-For unauthenticated, public access. This is the role which the API (PostgREST) will use when a user _is not_ logged in.
+For unauthenticated, public access. This is the role which the API (PostgREST) will use when a user _is not_ signed in.
 
 ### `authenticator`
 
@@ -97,7 +97,7 @@ A special role for the API (PostgREST). It has very limited access, and is used 
 
 ### `authenticated`
 
-For "authenticated access." This is the role which the API (PostgREST) will use when a user _is_ logged in.
+For "authenticated access." This is the role which the API (PostgREST) will use when a user _is_ signed in.
 
 ### `service_role`
 
@@ -113,7 +113,7 @@ Used by the Auth middleware to connect to the database and run migration. Access
 
 ### `supabase_etl_admin`
 
-`supabase_etl_admin` is used by [Database replication](/docs/guides/database/replication) through Supabase ETL.
+`supabase_etl_admin` is used by Supabase Pipelines for [Database replication](/docs/guides/database/replication).
 
 This role:
 

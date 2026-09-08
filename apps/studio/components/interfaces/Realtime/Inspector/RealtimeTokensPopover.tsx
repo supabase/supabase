@@ -49,7 +49,6 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
       onRoleUpdated()
     }
     isMounted.current = true
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap.role])
 
   useEffect(() => {

@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from 'react'
 import { Button, Card, CardContent } from 'ui'
-import { Admonition, ShimmeringLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   InterstitialAccountRow,
@@ -166,7 +167,6 @@ export const CliLoginScreen = ({
     return () => {
       isActive = false
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [deviceCode, isLoggedIn, publicKey, routerReady, sessionId, tokenName])
 
   if (status._tag === 'loading') {
@@ -206,7 +206,7 @@ export const CliLoginScreen = ({
               isPlural ? 's' : ''
             }: ${status.missingParameters.join(', ')}.`}
           />
-          <Button type="default" block asChild>
+          <Button variant="default" block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
@@ -234,7 +234,7 @@ export const CliLoginScreen = ({
               </>
             }
           />
-          <Button type="default" block asChild>
+          <Button variant="default" block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
@@ -270,7 +270,7 @@ export const CliLoginScreen = ({
             text={status.deviceCode}
             copyLabel="Copy code"
             copiedLabel="Copied"
-            type="primary"
+            variant="primary"
             size="tiny"
             className="w-full"
           />

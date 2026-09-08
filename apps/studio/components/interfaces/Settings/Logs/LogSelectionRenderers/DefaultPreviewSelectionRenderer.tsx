@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
   Separator,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { ErrorCodeDialog } from '../ErrorCodeDialog'
 import type { LogSearchCallback, PreviewLogData } from '../Logs.types'
@@ -116,7 +116,7 @@ const PropertyRow = ({
               <Button
                 className="mt-1 w-full"
                 size="tiny"
-                type="outline"
+                variant="outline"
                 onClick={() => setIsExpanded(!isExpanded)}
               >
                 {isExpanded ? 'Collapse' : 'Expand'}

@@ -196,7 +196,7 @@ export const JWTSecretKeysTable = () => {
                 onClick={() => setShownDialog('rotate')}
                 loading={isUpdatingJWTSigningKey}
                 icon={<RotateCw className="size-4" />}
-                type="primary"
+                variant="primary"
               />
             ) : (
               <ActionPanel
@@ -205,7 +205,7 @@ export const JWTSecretKeysTable = () => {
                 buttonLabel="Create Standby Key"
                 onClick={() => setShownDialog('create')}
                 loading={isPendingMutation}
-                type="primary"
+                variant="primary"
                 icon={<Timer className="size-4" />}
                 shortcutId={SHORTCUT_IDS.JWT_KEYS_CREATE_STANDBY}
               />

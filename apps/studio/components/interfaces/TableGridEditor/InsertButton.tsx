@@ -54,7 +54,7 @@ export const InsertButton = () => {
       <DropdownMenuTrigger asChild>
         <Button
           data-testid="table-editor-insert-new-row"
-          type="primary"
+          variant="primary"
           size="tiny"
           icon={<ChevronDown strokeWidth={1.5} />}
         >

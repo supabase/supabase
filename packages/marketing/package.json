@@ -10,7 +10,7 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf node_modules"
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo"
   },
   "dependencies": {
     "@types/react": "catalog:",
@@ -25,6 +25,7 @@
     "config": "workspace:*",
     "tailwindcss": "^4.2.4",
     "tsconfig": "workspace:",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:"
   },
   "license": "MIT"

@@ -10,7 +10,7 @@ import {
 
 import { ResetDbPasswordDialog } from './ResetDbPasswordDialog'
 
-const ResetDbPassword = ({ disabled = false }) => {
+export const ResetDbPassword = ({ disabled = false }) => {
   return (
     <PageSection id="database-password">
       <PageSectionMeta>
@@ -37,5 +37,3 @@ const ResetDbPassword = ({ disabled = false }) => {
     </PageSection>
   )
 }
-
-export default ResetDbPassword

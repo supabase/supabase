@@ -165,6 +165,7 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
     <Card className={cn('relative')}>
       <CardHeader className={cn('p-0', !isExpanded && 'border-b-0')}>
         <button
+          tabIndex={0}
           type="button"
           onClick={() => setIsExpanded((prev) => !prev)}
           className="flex w-full items-center gap-1.5 px-(--card-padding-x) py-4 text-left text-xs font-mono uppercase text-card-foreground"
@@ -200,6 +201,7 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
+                        tabIndex={0}
                         type="button"
                         onClick={() => handleThumbClick('positive')}
                         disabled={isSubmitting}
@@ -214,6 +216,7 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
+                        tabIndex={0}
                         type="button"
                         onClick={() => handleThumbClick('negative')}
                         disabled={isSubmitting}

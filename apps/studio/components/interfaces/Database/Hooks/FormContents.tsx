@@ -22,22 +22,23 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { isEdgeFunction } from './EditHookPanel'
 import { WebhookFormValues } from './EditHookPanel.constants'
 import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
 import { HTTPHeaders } from './HTTPHeaders'
 import { HTTPParameters } from './HTTPParameters'
 import { HTTPRequestConfig } from './HTTPRequestConfig'
+import { ensureEdgeFunctionAuthorizationHeader } from '@/components/interfaces/Functions/httpHeaderAddActions'
 import {
   FormSection,
   FormSectionContent,
   FormSectionLabel,
 } from '@/components/ui/Forms/FormSection'
-import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { useTableNamesQuery } from '@/data/tables/table-names-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { buildDatabaseEdgeFunctionUrl, isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 import { uuidv4 } from '@/lib/helpers'
 
 export interface FormContentsProps {
@@ -50,7 +51,6 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
   const { data: project } = useSelectedProjectQuery()
 
   const restUrl = project?.restUrl
-  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: keys = [] } = useAPIKeysQuery(
@@ -61,7 +61,8 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
     projectRef: ref,
   })
 
-  const legacyServiceRole = keys.find((x) => x.name === 'service_role')?.api_key ?? '[YOUR API KEY]'
+  const { serviceKey } = getKeys(keys)
+  const serviceRoleKey = serviceKey?.api_key
 
   const httpUrl = useWatch({ control: form.control, name: 'http_url' })
   const httpHeaders = useWatch({ control: form.control, name: 'httpHeaders' })
@@ -75,31 +76,23 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
   useEffect(() => {
     if (!isSuccessEdgeFunctions) return
 
-    const isEdgeFunctionSelected = isEdgeFunction({ ref, restUrlTld, url: httpUrl })
+    const isEdgeFunctionSelected = isEdgeFunctionUrl(httpUrl, ref ?? '', restUrl)
 
     if (httpUrl && isEdgeFunctionSelected) {
       const fnSlug = httpUrl.split('/').at(-1)
       const fn = functions.find((x) => x.slug === fnSlug)
-      const authorizationHeader = httpHeaders.find((x) => x.name === 'Authorization')
-      const edgeFunctionAuthHeaderVal = `Bearer ${legacyServiceRole}`
+      const updatedHttpHeaders = ensureEdgeFunctionAuthorizationHeader({
+        headers: httpHeaders,
+        serviceRoleKey,
+        verifyJwt: fn?.verify_jwt,
+        createRow: (name, value) => ({ id: uuidv4(), name, value }),
+      })
 
-      if (fn?.verify_jwt && authorizationHeader == null) {
-        const newAuthHeader = {
-          id: uuidv4(),
-          name: 'Authorization',
-          value: edgeFunctionAuthHeaderVal,
-        }
-        form.setValue('httpHeaders', [...httpHeaders, newAuthHeader])
-      } else if (fn?.verify_jwt && authorizationHeader?.value !== edgeFunctionAuthHeaderVal) {
-        const updatedHttpHeaders = httpHeaders.map((x) => {
-          if (x.name === 'Authorization') return { ...x, value: edgeFunctionAuthHeaderVal }
-          else return x
-        })
+      if (updatedHttpHeaders !== httpHeaders) {
         form.setValue('httpHeaders', updatedHttpHeaders)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [httpUrl, isSuccessEdgeFunctions])
+  }, [form, functions, httpHeaders, httpUrl, isSuccessEdgeFunctions, serviceRoleKey, ref, restUrl])
 
   return (
     <div>
@@ -235,9 +228,13 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                       } else if (functionType === 'supabase_function') {
                         // Default to first edge function in the list
                         const fnSlug = functions[0]?.slug
-                        const defaultFunctionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${fnSlug}`
+                        const defaultFunctionUrl = buildDatabaseEdgeFunctionUrl(
+                          fnSlug ?? '',
+                          ref ?? '',
+                          restUrl
+                        )
                         const currentUrl = form.getValues('http_url')
-                        if (!isEdgeFunction({ ref, restUrlTld, url: currentUrl })) {
+                        if (!isEdgeFunctionUrl(currentUrl, ref ?? '', restUrl)) {
                           form.setValue('http_url', defaultFunctionUrl, { shouldDirty: false })
                         }
                       }

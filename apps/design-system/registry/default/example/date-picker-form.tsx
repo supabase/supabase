@@ -2,7 +2,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
-import { CalendarIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -15,13 +14,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
 } from 'ui'
+import {
+  DatePicker,
+  DatePickerButton,
+  DatePickerContent,
+  DatePickerTrigger,
+} from 'ui-patterns/DatePicker'
 import { z } from 'zod'
-
-import { cn } from '@/lib/utils'
 
 const FormSchema = z.object({
   dob: z.date({
@@ -50,25 +50,18 @@ export default function DatePickerForm() {
         <FormField
           control={form.control}
           name="dob"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Date of birth</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      type={'outline'}
-                      className={cn(
-                        'w-[240px] pl-3 text-left font-normal',
-                        !field.value && 'text-muted-foreground'
-                      )}
-                      icon={<CalendarIcon className="h-4 w-4 opacity-50" />}
-                    >
-                      {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+              <DatePicker>
+                <FormControl>
+                  <DatePickerTrigger asChild>
+                    <DatePickerButton isInvalid={fieldState.invalid}>
+                      {field.value ? format(field.value, 'PPP') : 'Pick a date'}
+                    </DatePickerButton>
+                  </DatePickerTrigger>
+                </FormControl>
+                <DatePickerContent>
                   <Calendar
                     mode="single"
                     selected={field.value}
@@ -76,14 +69,14 @@ export default function DatePickerForm() {
                     disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
                     initialFocus
                   />
-                </PopoverContent>
-              </Popover>
+                </DatePickerContent>
+              </DatePicker>
               <FormDescription>Your date of birth is used to calculate your age.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button htmlType="submit">Submit</Button>
+        <Button type="submit">Submit</Button>
       </form>
     </Form>
   )

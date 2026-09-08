@@ -52,9 +52,7 @@ First of all we need a new Supabase project. If you don't have a Supabase accoun
 
 In your dashboard, click "New Project" and leave it to the default settings, but make sure you keep a copy o your Database password!
 
-The only thing we will change manually for now is disabling the email confirmation step. By doing this, users will be directly able to sign in when using the magic link, so go to the **Authentication** tab of your project, select **Settings** and scroll down to your **Auth Providers** where you can disable it.
-
-![Disable Email confirm](/images/blog/simon-grimm-angular-realtime/disable-email-confirm.png)
+The only thing we will change manually for now is disabling the email confirmation step. By doing this, users will be directly able to sign in when using the magic link, so go to [**Authentication → Sign In / Providers**](https://supabase.com/dashboard/project/_/auth/providers) in your project and turn off the **Confirm email** toggle under **User Signups**.
 
 Everything else regarding authentication[https://supabase.com/docs/guides/auth] is handled by Supabase and we don't need to worry about it at the moment!
 

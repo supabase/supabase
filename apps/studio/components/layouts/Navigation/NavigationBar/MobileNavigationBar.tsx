@@ -3,7 +3,7 @@ import { ChevronLeft, Menu } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button, cn } from 'ui'
-import { MobileSheetNav } from 'ui-patterns'
+import { MobileSheetNav } from 'ui-patterns/MobileSheetNav'
 
 import { HomeIcon } from '../LayoutHeader/HomeIcon'
 import { useMobileSheet } from './MobileSheetContext'
@@ -21,7 +21,7 @@ import { IS_PLATFORM } from '@/lib/constants'
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
 
-const MobileNavigationBar = ({
+export const MobileNavigationBar = ({
   hideMobileMenu,
   backToDashboardURL,
 }: {
@@ -73,8 +73,9 @@ const MobileNavigationBar = ({
           {IS_PLATFORM ? <UserDropdown /> : <LocalDropdown />}
           {!hideMobileMenu && (
             <Button
+              aria-label="Open menu"
               title="Menu dropdown button"
-              type="default"
+              variant="default"
               className="flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30"
               icon={<Menu />}
               onClick={() => openMenu()}
@@ -89,5 +90,3 @@ const MobileNavigationBar = ({
     </div>
   )
 }
-
-export default MobileNavigationBar

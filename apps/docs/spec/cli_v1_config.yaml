@@ -467,7 +467,7 @@ parameters:
       An array of files or glob patterns to find seeds in.
     links:
       - name: 'Seeding your database'
-        link: 'https://supabase.com/docs/guides/cli/seeding-your-database'
+        link: 'https://supabase.com/docs/guides/local-development/seeding-your-database'
 
   - id: 'realtime.enabled'
     title: 'realtime.enabled'
@@ -1489,7 +1489,7 @@ parameters:
     required: false
     default: ''
     description: |
-      Force log out after the specified duration. Sample values include: '50m', '20h'.
+      Force sign out after the specified duration. Sample values include: '50m', '20h'.
     links:
       - name: 'Auth Sessions'
         link: 'https://supabase.com/docs/guides/auth/sessions'
@@ -1500,7 +1500,7 @@ parameters:
     required: false
     default: ''
     description: |
-      Force log out if the user has been inactive longer than the specified duration. Sample values include: '50m', '20h'.
+      Force sign out if the user has been inactive longer than the specified duration. Sample values include: '50m', '20h'.
     links:
       - name: 'Auth Sessions'
         link: 'https://supabase.com/docs/guides/auth/sessions'

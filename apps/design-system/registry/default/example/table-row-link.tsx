@@ -54,7 +54,7 @@ export default function TableRowLink() {
           {buckets.map((bucket) => (
             <TableRow
               key={bucket.id}
-              className="relative cursor-pointer inset-focus"
+              className="relative cursor-pointer focus-inset"
               onClick={(event) => {
                 if (event.currentTarget !== event.target) return
                 handleBucketNavigation(bucket.id, event)

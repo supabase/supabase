@@ -4,6 +4,7 @@ import { RowField } from '@/components/interfaces/TableGridEditor/SidePanelEdito
 import {
   convertByteaToHex,
   generateRowObjectFromFields,
+  generateUpdateRowPayload,
   isValueTruncated,
   parseValue,
   validateFields,
@@ -116,6 +117,7 @@ describe('generateRowObjectFromFields', () => {
         enums: [],
         isNullable: false,
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
       {
@@ -128,6 +130,7 @@ describe('generateRowObjectFromFields', () => {
         isNullable: false,
         enums: [],
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
       {
@@ -140,6 +143,7 @@ describe('generateRowObjectFromFields', () => {
         isNullable: true,
         enums: [],
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
     ]
@@ -158,6 +162,7 @@ describe('generateRowObjectFromFields', () => {
         enums: [],
         isNullable: false,
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
       {
@@ -170,6 +175,7 @@ describe('generateRowObjectFromFields', () => {
         enums: [],
         isNullable: false,
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
     ]
@@ -188,6 +194,7 @@ describe('generateRowObjectFromFields', () => {
         enums: [],
         isNullable: false,
         isIdentity: true,
+        isGenerated: false,
         isPrimaryKey: true,
       },
       {
@@ -200,6 +207,7 @@ describe('generateRowObjectFromFields', () => {
         enums: [],
         isNullable: false,
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
       {
@@ -212,6 +220,7 @@ describe('generateRowObjectFromFields', () => {
         enums: [],
         isNullable: false,
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
     ]
@@ -233,6 +242,7 @@ describe('generateRowObjectFromFields', () => {
         enums: [],
         isNullable: false,
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
       {
@@ -245,6 +255,7 @@ describe('generateRowObjectFromFields', () => {
         enums: [],
         isNullable: false,
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
     ]
@@ -263,6 +274,7 @@ describe('generateRowObjectFromFields', () => {
         enums: [],
         isNullable: false,
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
       {
@@ -275,6 +287,7 @@ describe('generateRowObjectFromFields', () => {
         enums: [],
         isNullable: false,
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
     ]
@@ -419,6 +432,7 @@ describe('validateFields', () => {
     defaultValue: null,
     isNullable: true,
     isIdentity: false,
+    isGenerated: false,
     isPrimaryKey: false,
     ...overrides,
   })
@@ -531,6 +545,18 @@ describe('validateFields', () => {
     expect(validateFields(fields)).toEqual({})
   })
 
+  it('should skip validation for generated columns', () => {
+    const fields: RowField[] = [
+      createField({
+        name: 'gen_tags',
+        format: '_text',
+        value: '[invalid array',
+        isGenerated: true,
+      }),
+    ]
+    expect(validateFields(fields)).toEqual({})
+  })
+
   it('should validate multiple fields and return all errors', () => {
     const fields: RowField[] = [
       createField({
@@ -567,6 +593,7 @@ describe('generateRowObjectFromFields - additional cases', () => {
     defaultValue: null,
     isNullable: true,
     isIdentity: false,
+    isGenerated: false,
     isPrimaryKey: false,
     ...overrides,
   })
@@ -792,5 +819,70 @@ describe('generateRowObjectFromFields - additional cases', () => {
     ]
     const result = generateRowObjectFromFields({ fields })
     expect(result).toEqual({})
+  })
+
+  it('should omit generated columns even when they hold a value', () => {
+    const fields: RowField[] = [
+      createField({
+        name: 'price',
+        format: 'int4',
+        value: '100',
+      }),
+      createField({
+        name: 'is_discounted',
+        format: 'bool',
+        value: 'false',
+        // pg-meta populates default_value with the generation expression for generated columns
+        defaultValue: '(price < 100)',
+        isGenerated: true,
+      }),
+    ]
+    const result = generateRowObjectFromFields({ fields, useDefaultForEmptyValues: true })
+    expect(result).toEqual({ price: '100' })
+  })
+
+  it('should omit generated columns when includeUndefinedValues is true', () => {
+    const fields: RowField[] = [
+      createField({
+        name: 'price',
+        format: 'int4',
+        value: '100',
+      }),
+      createField({
+        name: 'is_discounted',
+        format: 'bool',
+        value: 'true',
+        isGenerated: true,
+      }),
+    ]
+    const result = generateRowObjectFromFields({ fields, includeUndefinedValues: true })
+    expect(result).toEqual({ price: '100' })
+  })
+})
+
+describe('generateUpdateRowPayload', () => {
+  const createField = (overrides: Partial<RowField>): RowField => ({
+    id: '1',
+    name: 'test_field',
+    comment: '',
+    format: 'text',
+    enums: [],
+    value: '',
+    defaultValue: null,
+    isNullable: true,
+    isIdentity: false,
+    isGenerated: false,
+    isPrimaryKey: false,
+    ...overrides,
+  })
+
+  it('should not include generated columns in update payloads', () => {
+    const fields: RowField[] = [
+      createField({ name: 'id', format: 'int8', value: '1', isPrimaryKey: true }),
+      createField({ name: 'price', format: 'int4', value: '90' }),
+      createField({ name: 'is_discounted', format: 'bool', value: 'true', isGenerated: true }),
+    ]
+    const payload = generateUpdateRowPayload({ id: '1', price: '100', is_discounted: true }, fields)
+    expect(payload).toEqual({ price: '90' })
   })
 })

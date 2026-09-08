@@ -87,7 +87,7 @@ export const INVOCATION_CHART_CONFIG = {
   },
   warning_count: {
     label: 'Warnings',
-    color: 'hsl(var(--warning-default))',
+    color: 'var(--chart-warning)',
   },
   error_count: {
     label: 'Errors',
@@ -105,7 +105,7 @@ export const CPU_TIME_CHART_CONFIG = {
 export const EXECUTION_TIME_CHART_CONFIG = {
   avg_execution_time: {
     label: 'Average Execution Time',
-    color: 'hsl(var(--foreground-default))',
+    color: 'var(--foreground-default)',
   },
   max_execution_time: {
     label: 'Max Execution Time',

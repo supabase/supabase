@@ -60,7 +60,7 @@ export const ForeignKeyRow = ({
             </p>
             <Button
               asChild
-              type="default"
+              variant="default"
               title={`${foreignKey.schema}.${foreignKey.table}`}
               className="py-0.5 px-1.5 font-mono"
               icon={
@@ -105,15 +105,15 @@ export const ForeignKeyRow = ({
       </div>
       {!disabled && (
         <div className="flex items-center gap-x-2">
-          <Button type="default" onClick={onSelectEdit}>
+          <Button variant="default" onClick={onSelectEdit}>
             Edit
           </Button>
           {foreignKey.toRemove ? (
-            <Button type="default" onClick={onSelectUndoRemove}>
+            <Button variant="default" onClick={onSelectUndoRemove}>
               Cancel remove
             </Button>
           ) : (
-            <Button type="default" onClick={onSelectRemove}>
+            <Button variant="default" onClick={onSelectRemove}>
               Remove
             </Button>
           )}

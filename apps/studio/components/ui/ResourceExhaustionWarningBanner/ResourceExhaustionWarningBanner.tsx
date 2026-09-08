@@ -16,7 +16,11 @@ import {
 } from 'ui'
 
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
-import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
+import {
+  getResourceWarningCorrectionUrl,
+  getWarningContent,
+  isComputeUpgradeWarning,
+} from './ResourceExhaustionWarningBanner.utils'
 import { mapComputeSizeNameToAddonVariantId } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
@@ -25,13 +29,6 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-
-const COMPUTE_UPGRADE_METRICS = ['disk_io', 'cpu', 'ram']
-const COMPUTE_UPGRADE_WARNING_TYPES = [
-  'disk_io_exhaustion',
-  'cpu_exhaustion',
-  'memory_and_swap_exhaustion',
-]
 
 export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
@@ -112,46 +109,18 @@ export const ResourceExhaustionWarningBanner = () => {
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.metric
 
-  const correctionUrlVariants = {
-    undefined: undefined,
-    null: '/project/[ref]/settings/[infra-path]',
-    disk_space: '/project/[ref]/settings/compute-and-disk',
-    read_only: '/project/[ref]/settings/compute-and-disk',
-    disk_io: '/project/[ref]/settings/compute-and-disk',
-    cpu: '/project/[ref]/settings/compute-and-disk',
-    ram: '/project/[ref]/settings/compute-and-disk',
-    auth_email_rate_limit: '/project/[ref]/auth/rate-limits',
-    auth_restricted_email_sending: '/project/[ref]/auth/smtp',
-    default: (metric: string) => `/project/[ref]/settings/[infra-path]#${metric}`,
-  }
-
-  const getCorrectionUrl = (metric: string | undefined | null) => {
-    const variant = metric === undefined ? 'undefined' : metric === null ? 'null' : metric
-    const url =
-      correctionUrlVariants[variant as keyof typeof correctionUrlVariants] ||
-      correctionUrlVariants.default(metric as string)
-    return typeof url === 'function' ? url(metric as string) : url
-  }
-
   const isFreePlan = organization?.plan?.id === 'free'
 
   // True for a single compute warning, or when all active warnings are compute-related
-  const isComputeUpgradeMetric =
-    (metric !== null && metric !== undefined && COMPUTE_UPGRADE_METRICS.includes(metric)) ||
-    (activeWarnings.length > 1 &&
-      activeWarnings.every((w) => COMPUTE_UPGRADE_WARNING_TYPES.includes(w)))
+  const isComputeUpgradeMetric = isComputeUpgradeWarning(metric, activeWarnings)
 
-  const correctionUrl = (() => {
-    if (isComputeUpgradeMetric && isFreePlan) {
-      return `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan&source=resource_exhaustion_banner`
-    }
-    if (isComputeUpgradeMetric && activeWarnings.length > 1) {
-      return `/project/${ref ?? 'default'}/settings/compute-and-disk`
-    }
-    return getCorrectionUrl(metric)
-      ?.replace('[ref]', ref ?? 'default')
-      ?.replace('[infra-path]', 'infrastructure')
-  })()
+  const correctionUrl = getResourceWarningCorrectionUrl({
+    metric,
+    activeWarnings,
+    projectRef: ref,
+    isFreePlan,
+    organizationSlug: organization?.slug,
+  })
 
   const buttonText = (() => {
     if (isComputeUpgradeMetric) return 'Upgrade compute'
@@ -182,15 +151,15 @@ export const ResourceExhaustionWarningBanner = () => {
     warningContent === undefined || (!warningContent?.title && !warningContent?.description)
   const isUsageOrInfraPage =
     router.pathname.endsWith('/usage') || router.pathname.endsWith('/infrastructure')
-  // Compute warnings now link to compute-and-disk, so they should remain visible on infrastructure
+  // Compute warnings now link to infrastructure, so they should remain visible on usage.
   const onUsageOrInfraAndNotInReadOnlyMode =
     isUsageOrInfraPage &&
     !activeWarnings.includes('is_readonly_mode_enabled') &&
     !isComputeUpgradeMetric
   // Suppress when already on the target page (no-op CTA). Paid-plan compute warnings link to
-  // compute-and-disk; free-plan links to billing instead, so we keep the banner visible for them.
-  const onDatabaseSettingsAndInReadOnlyMode =
-    router.pathname.endsWith('settings/compute-and-disk') &&
+  // infrastructure; free-plan links to billing instead, so we keep the banner visible for them.
+  const shouldSuppressOnInfrastructurePage =
+    router.pathname.endsWith('settings/infrastructure') &&
     (activeWarnings.includes('is_readonly_mode_enabled') || (isComputeUpgradeMetric && !isFreePlan))
 
   // these take precedence over each other, so there's only one active warning to check
@@ -217,7 +186,7 @@ export const ResourceExhaustionWarningBanner = () => {
     hasNoWarnings ||
     hasNoWarningContent ||
     onUsageOrInfraAndNotInReadOnlyMode ||
-    onDatabaseSettingsAndInReadOnlyMode ||
+    shouldSuppressOnInfrastructurePage ||
     !isVisible
   ) {
     return null
@@ -241,7 +210,7 @@ export const ResourceExhaustionWarningBanner = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="default"
+                variant="default"
                 icon={<Wrench size={14} />}
                 iconRight={<ChevronDown size={14} />}
               >
@@ -278,20 +247,20 @@ export const ResourceExhaustionWarningBanner = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : learnMoreUrl !== undefined ? (
-          <Button asChild type="default" icon={<BookOpen size={14} />}>
+          <Button asChild variant="default" icon={<BookOpen size={14} />}>
             <a href={learnMoreUrl} target="_blank" rel="noreferrer">
               Learn more
             </a>
           </Button>
         ) : aiPrompt !== undefined ? (
-          <Button type="default" onClick={handleAskAI}>
+          <Button variant="default" onClick={handleAskAI}>
             Ask AI Assistant
           </Button>
         ) : null}
         {correctionUrl !== undefined && (
           <Button
             asChild
-            type="primary"
+            variant="primary"
             disabled={isComputeUpgradeMetric && isOrgLoading}
             onClick={() =>
               track('resource_exhaustion_banner_upgrade_clicked', {

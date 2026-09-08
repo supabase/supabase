@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { FC } from 'react'
 import { Button, cn } from 'ui'
+
 import CostControlAnimation from './CostControlAnimation'
 
 const addons = [
@@ -98,7 +99,7 @@ const AddonCard = ({ addon }: any) => {
           <Button
             asChild
             size="tiny"
-            type="default"
+            variant="default"
             iconRight={<ArrowUpRight className="w-4 h-4" />}
           >
             <Link href={addon.ctaLink} target={addon.ctaTarget}>

@@ -20,7 +20,7 @@ export default function PageLayoutFullWidth() {
       <PageBreadcrumbs
         actions={
           <PageBreadcrumbsActions>
-            <Button type="default" size="tiny">
+            <Button variant="default" size="tiny">
               Docs
             </Button>
           </PageBreadcrumbsActions>

@@ -42,6 +42,7 @@ export const getTablesPaginatedSql = ({
         : safeSql`and (
             c.relname ilike ${literal(`%${escapeIlikeLiteral(nameFilter)}%`)}
             or nc.nspname ilike ${literal(`%${escapeIlikeLiteral(nameFilter)}%`)}
+            or (nc.nspname || '.' || c.relname) ilike ${literal(`%${escapeIlikeLiteral(nameFilter)}%`)}
           )`
       : safeSql``
 

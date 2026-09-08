@@ -32,7 +32,7 @@ export const NoSearchResults = ({
         </p>
       </div>
       {onResetFilter !== undefined && (
-        <Button type="default" onClick={() => onResetFilter()}>
+        <Button variant="default" onClick={() => onResetFilter()}>
           Reset filter
         </Button>
       )}

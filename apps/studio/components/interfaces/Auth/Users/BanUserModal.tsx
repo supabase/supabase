@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -61,7 +61,7 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
     defaultValues,
   })
 
-  const { value, unit } = form.watch()
+  const [value, unit] = useWatch({ control: form.control, name: ['value', 'unit'] })
   const bannedUntil = dayjs().add(Number(value), unit).format('DD MMM YYYY HH:mm (ZZ)')
 
   const onSubmit = (data: FormType) => {
@@ -146,10 +146,10 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
               </div>
             </DialogSection>
             <DialogFooter>
-              <Button type="default" disabled={isBanningUser} onClick={() => onClose()}>
+              <Button variant="default" disabled={isBanningUser} onClick={() => onClose()}>
                 Cancel
               </Button>
-              <Button type="warning" htmlType="submit" loading={isBanningUser}>
+              <Button variant="warning" type="submit" loading={isBanningUser}>
                 Confirm ban
               </Button>
             </DialogFooter>

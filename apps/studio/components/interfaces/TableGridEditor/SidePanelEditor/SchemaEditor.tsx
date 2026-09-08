@@ -97,7 +97,7 @@ export const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorPro
         </DialogSection>
         <DialogFooter>
           <Button
-            type="default"
+            variant="default"
             onClick={() => {
               form.reset()
               closePanel()
@@ -107,9 +107,9 @@ export const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorPro
             Cancel
           </Button>
           <Button
-            type="primary"
+            variant="primary"
             form={formId}
-            htmlType="submit"
+            type="submit"
             loading={isPending}
             disabled={isPending}
           >

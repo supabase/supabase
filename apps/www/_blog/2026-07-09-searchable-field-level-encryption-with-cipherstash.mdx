@@ -1,0 +1,59 @@
+---
+title: 'Searchable field-level encryption on Supabase with CipherStash'
+description: 'Add field-level encryption to your Supabase project with CipherStash. Searchable ciphertext, zero-knowledge key management, and no schema changes required.'
+author: bilharmer
+imgSocial: searchable-field-level-encryption-with-cipherstash/og.png
+imgThumb: searchable-field-level-encryption-with-cipherstash/thumb.png
+categories:
+  - product
+tags:
+  - postgres
+  - security
+  - encryption
+  - integrations
+date: '2026-07-09T10:00:00'
+toc_depth: 2
+---
+
+The [CipherStash integration](https://supabase.com/partners/integrations/cipherstash?utm_source=supabase_announcement_post&utm_medium=blog&utm_campaign=launch) for Supabase is now available.
+
+[CipherStash](https://cipherstash.com/?utm_source=supabase_announcement_post&utm_medium=blog&utm_campaign=launch) is a Data Level Access Control (DLAC) platform for applications built on Postgres. DLAC extends traditional access control, which typically operates at the row or table level, down to individual encrypted values, so policies are enforced at decryption rather than at the query layer.
+
+With CipherStash, teams can encrypt sensitive fields at the application layer with a unique key per value, run searches and joins against encrypted data without decrypting it, and keep keys under their own control through ZeroKMS, CipherStash's zero-knowledge key management service. Because keys never leave your control, neither CipherStash nor Supabase can access your plaintext data.
+
+The Supabase integration enables teams to add field-level encryption to any Supabase project using the encrypted Supabase SDK wrapper without changing the schema. Setup is one CLI command: `npx stash init --supabase`.
+
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/SHa7XTeHYK8"
+    title="Searchable field-level encryption on Supabase with CipherStash"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+  />
+</div>
+
+## Why this matters for regulated workloads
+
+Most teams that handle regulated data end up choosing between two bad options:
+
+1. **Use traditional field-level encryption:** Encrypted values are random bytes as far as Postgres is concerned. `WHERE email = ?` matches nothing, indexes stop working, and joins fail. The only way to search is to pull every row, decrypt it in your app, and filter in memory. Teams end up building expensive workarounds or dropping the feature entirely.
+2. **Skip encryption:** The application stays fast, but when a breach happens, plaintext sensitive data is the first thing auditors ask about.
+
+CipherStash gives you a third option.
+
+DLAC extends access control down to individual encrypted values. Encryption happens inside your application before data reaches the database. Each value is stored as a single JSON payload containing the ciphertext alongside Searchable Encrypted Metadata (SEM). That is enough for Postgres to filter, sort, and join, but not enough to recover the original value. Queries are converted to SEM on the way in, Postgres matches against the stored SEM, and only the ciphertexts your application is authorized to decrypt come back. Every encrypted value carries a policy stating who can read it and under what condition. That policy is enforced at decryption, not at the query layer.
+
+For teams under HIPAA, GDPR, or SOC 2, you keep Postgres, Supabase, and search, with a shorter compliance review and a smaller breach surface.
+
+## How the integration works
+
+Add DLAC to your existing TypeScript application with CipherStash Stack. It works natively with Supabase.js, Drizzle, and Prisma Next. Encryption and decryption happen transparently in your application. Columns you mark as encrypted flow through the SDK and everything else behaves as it always has: `WHERE` clauses, fuzzy text matching, `ORDER BY`, and even JSON queries all continue to work over encrypted data.
+
+Encryption keys are managed through ZeroKMS. Each encrypted value gets its own key, derived on demand, and keys can be split across regions to meet data residency requirements including frameworks like FedRAMP and IL4.
+
+For cases where the SDK isn't a fit, such as analytics jobs, admin tooling, background workers in other languages, or anywhere you need direct database access outside your application, CipherStash Proxy provides a secure escape hatch. The proxy speaks the Postgres wire protocol and handles encryption and decryption transparently, so existing tools and SQL clients can work with encrypted data without code changes.
+
+## Get started
+
+→ [Add CipherStash to your Supabase project](https://supabase.com/partners/integrations/cipherstash?utm_source=supabase_announcement_post&utm_medium=blog&utm_campaign=launch)

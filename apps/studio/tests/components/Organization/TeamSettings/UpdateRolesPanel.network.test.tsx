@@ -83,6 +83,7 @@ const buildPermission = (resource: string): AccessControlPermission => ({
 
 const MEMBER: OrganizationMember = {
   gotrue_id: 'gotrue-member',
+  avatar_url: null,
   is_sso_user: false,
   metadata: {},
   mfa_enabled: false,

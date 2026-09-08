@@ -46,7 +46,7 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
 
       <div className="flex items-center space-x-2">
         <Button
-          type="default"
+          variant="default"
           onClick={onAccept}
           size={isMobile ? 'small' : 'tiny'}
           block={isMobile}
@@ -54,14 +54,14 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
           Accept
         </Button>
         <Button
-          type={isMobile ? 'outline' : 'text'}
+          variant={isMobile ? 'outline' : 'text'}
           onClick={onOptOut}
           size={isMobile ? 'small' : 'tiny'}
           block={isMobile}
         >
           Opt out
         </Button>
-        <Button asChild type="text" className="hidden sm:block text-light hover:text-foreground">
+        <Button asChild variant="text" className="hidden sm:block text-light hover:text-foreground">
           <PrivacySettings>Privacy settings</PrivacySettings>
         </Button>
       </div>

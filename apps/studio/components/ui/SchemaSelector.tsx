@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
-import { ComponentPropsWithoutRef, forwardRef, useState } from 'react'
+import { ComponentPropsWithoutRef, forwardRef, useMemo, useState } from 'react'
 import {
   Alert,
   AlertDescription,
@@ -20,8 +20,10 @@ import {
   Skeleton,
 } from 'ui'
 
+import { RestartProjectDialog } from '@/components/interfaces/ErrorHandling/RestartProjectDialog'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 type SchemaSelectorProps = Omit<ComponentPropsWithoutRef<'div'>, 'onSelect'> & {
@@ -32,13 +34,14 @@ type SchemaSelectorProps = Omit<ComponentPropsWithoutRef<'div'>, 'onSelect'> & {
   placeholderLabel?: string
   supportSelectAll?: boolean
   excludedSchemas?: string[]
-  stopScrollPropagation?: boolean
   onSelectSchema: (name: string) => void
   onSelectCreateSchema?: () => void
   align?: 'start' | 'end'
   open?: boolean
   onOpenChange?: (open: boolean) => void
 }
+
+const DEFAULT_EXCLUDED_SCHEMAS: string[] = []
 
 export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
   (
@@ -50,8 +53,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
       selectedSchemaName,
       placeholderLabel = 'Choose a schema...',
       supportSelectAll = false,
-      excludedSchemas = [],
-      stopScrollPropagation = false,
+      excludedSchemas = DEFAULT_EXCLUDED_SCHEMAS,
       onSelectSchema,
       onSelectCreateSchema,
       align = 'start',
@@ -62,6 +64,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
     ref
   ) => {
     const [internalOpen, setInternalOpen] = useState(false)
+    const [isRestartDialogVisible, setIsRestartDialogVisible] = useState(false)
     const isControlled = openProp !== undefined
     const open = isControlled ? openProp : internalOpen
     const setOpen = (next: boolean) => {
@@ -86,15 +89,21 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
       connectionString: project?.connectionString,
     })
 
-    const schemas = (data || [])
-      .filter((schema) => !excludedSchemas.includes(schema.name))
-      .sort((a, b) => a.name.localeCompare(b.name))
+    const visibleSchemas = useSchemasFilteredForHighAvailability(data)
+
+    const schemas = useMemo(
+      () =>
+        visibleSchemas
+          .filter((schema) => !excludedSchemas.includes(schema.name))
+          .sort((a, b) => a.name.localeCompare(b.name)),
+      [visibleSchemas, excludedSchemas]
+    )
 
     return (
       <div ref={ref} className={className} {...rest}>
         {isSchemasLoading && (
           <Button
-            type="default"
+            variant="default"
             key="schema-selector-skeleton"
             className="w-full [&>span]:w-full"
             size={size}
@@ -110,9 +119,19 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
             <AlertDescription className="text-xs mb-2 wrap-break-word">
               Error: {(schemasError as any)?.message}
             </AlertDescription>
-            <Button type="default" size="tiny" onClick={() => refetchSchemas()}>
-              Reload schemas
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="default" size="tiny" onClick={() => refetchSchemas()}>
+                Reload schemas
+              </Button>
+              <Button variant="default" size="tiny" onClick={() => setIsRestartDialogVisible(true)}>
+                Restart database
+              </Button>
+            </div>
+            <RestartProjectDialog
+              visible={isRestartDialogVisible}
+              onClose={() => setIsRestartDialogVisible(false)}
+              restartType="database"
+            />
           </Alert>
         )}
 
@@ -122,7 +141,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
               <Button
                 size={size}
                 disabled={disabled}
-                type="default"
+                variant="default"
                 data-testid="schema-selector"
                 className={`w-full [&>span]:w-full pr-1! space-x-1`}
                 iconRight={
@@ -151,9 +170,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
             >
               <Command>
                 <CommandInput className="text-xs" placeholder="Find schema..." />
-                <CommandList
-                  onWheel={stopScrollPropagation ? (event) => event.stopPropagation() : undefined}
-                >
+                <CommandList>
                   <CommandEmpty>No schemas found</CommandEmpty>
                   <CommandGroup>
                     <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>
@@ -229,5 +246,3 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
 )
 
 SchemaSelector.displayName = 'SchemaSelector'
-
-export default SchemaSelector

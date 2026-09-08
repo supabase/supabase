@@ -196,7 +196,7 @@ export const LinterDataGrid = ({
                 <LintCategoryBadge category={selectedLint.categories[0]} />
               </div>
               <ShortcutTooltip shortcutId={SHORTCUT_IDS.ADVISORS_CLOSE_DETAIL} side="left">
-                <Button type="text" icon={<X />} onClick={handleSidepanelClose} />
+                <Button variant="text" icon={<X />} onClick={handleSidepanelClose} />
               </ShortcutTooltip>
             </div>
             <div className="p-6 flex-grow min-h-0 overflow-y-auto">

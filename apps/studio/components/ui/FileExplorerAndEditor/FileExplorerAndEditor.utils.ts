@@ -38,7 +38,17 @@ export const isBinaryFile = (fileName: string): boolean => {
   return binaryExtensions.includes(extension || '')
 }
 
-export const getLanguageFromFileName = (fileName: string): string => {
+type EditorLanguage =
+  | 'typescript'
+  | 'javascript'
+  | 'json'
+  | 'html'
+  | 'css'
+  | 'markdown'
+  | 'csv'
+  | 'plaintext'
+
+export const getLanguageFromFileName = (fileName: string): EditorLanguage => {
   const extension = fileName.split('.').pop()?.toLowerCase()
   switch (extension) {
     case 'ts':

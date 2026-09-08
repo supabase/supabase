@@ -1,52 +1,34 @@
 import { useParams } from 'common'
-import { ArrowUpRight } from 'lucide-react'
 
-import {
-  useIsColumnLevelPrivilegesEnabled,
-  useIsMarketplaceEnabled,
-} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsColumnLevelPrivilegesEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import type {
   ProductMenuGroup,
   ProductMenuGroupItem,
 } from '@/components/ui/ProductMenu/ProductMenu.types'
-import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
-const ExternalLinkIcon = <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
-
 export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const {
-    databaseReplication: showPgReplicate,
-    databaseRoles: showRoles,
-    integrationsWrappers: showWrappers,
-  } = useIsFeatureEnabled(['database:replication', 'database:roles', 'integrations:wrappers'])
+  const { databaseReplication: showPgReplicate, databaseRoles: showRoles } = useIsFeatureEnabled([
+    'database:replication',
+    'database:roles',
+    'integrations:wrappers',
+  ])
 
-  const { data } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
   const { data: addons } = useProjectAddonsQuery({ projectRef: project?.ref })
 
-  const pgNetExtensionExists = (data ?? []).some((ext) => ext.name === 'pg_net')
   const pitrEnabled = addons?.selected_addons.some((addon) => addon.type === 'pitr') ?? false
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
   const enablePgReplicate = useIsETLPrivateAlpha()
 
   const getDatabaseURL = (path: string) => `/project/${ref}/database/${path}`
-
-  // In the new marketplace revamped page the `category=wrapper` query param has
-  // changed to `type=wrapper`. So fix this link below based on which version is
-  // the user viewing.
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
-  const wrappersLinkParamName = isMarketplaceEnabled ? 'type' : 'category'
 
   return [
     {
@@ -103,8 +85,14 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
       ],
     },
     {
-      title: 'Configuration',
+      title: 'Access Control',
       items: [
+        {
+          name: 'Policies',
+          key: 'policies',
+          url: getDatabaseURL('policies'),
+          shortcutId: SHORTCUT_IDS.NAV_DATABASE_POLICIES,
+        },
         showRoles && {
           name: 'Roles',
           key: 'roles',
@@ -117,12 +105,11 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
           url: getDatabaseURL('column-privileges'),
           shortcutId: SHORTCUT_IDS.NAV_DATABASE_COLUMN_PRIVILEGES,
         },
-        {
-          name: 'Policies',
-          key: 'policies',
-          url: `/project/${ref}/auth/policies`,
-          rightIcon: ExternalLinkIcon,
-        },
+      ].filter(Boolean) as ProductMenuGroupItem[],
+    },
+    {
+      title: 'Configuration',
+      items: [
         {
           name: 'Settings',
           key: 'settings',
@@ -154,42 +141,7 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
           url: getDatabaseURL('migrations'),
           shortcutId: SHORTCUT_IDS.NAV_DATABASE_MIGRATIONS,
         },
-        showWrappers && {
-          name: 'Wrappers',
-          key: 'wrappers',
-          url: `/project/${ref}/integrations?${wrappersLinkParamName}=wrapper`,
-          rightIcon: ExternalLinkIcon,
-        },
-        pgNetExtensionExists && {
-          name: 'Database Webhooks',
-          key: 'hooks',
-          url: `/project/${ref}/integrations/webhooks/overview`,
-          rightIcon: ExternalLinkIcon,
-        },
       ].filter(Boolean) as ProductMenuGroupItem[],
-    },
-    {
-      title: 'Tools',
-      items: [
-        {
-          name: 'Security Advisor',
-          key: 'security-advisor',
-          url: `/project/${ref}/advisors/security`,
-          rightIcon: ExternalLinkIcon,
-        },
-        {
-          name: 'Performance Advisor',
-          key: 'performance-advisor',
-          url: `/project/${ref}/advisors/performance`,
-          rightIcon: ExternalLinkIcon,
-        },
-        {
-          name: 'Query Performance',
-          key: 'query-performance',
-          url: `/project/${ref}/observability/query-performance`,
-          rightIcon: ExternalLinkIcon,
-        },
-      ],
     },
   ]
 }

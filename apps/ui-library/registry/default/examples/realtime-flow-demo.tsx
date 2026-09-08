@@ -11,7 +11,9 @@ import {
   type Node,
   type NodeProps,
 } from '@xyflow/react'
+
 import '@xyflow/react/dist/style.css'
+
 import { memo, useMemo, useRef } from 'react'
 
 import { RealtimeFlowOverlay } from '../blocks/realtime-flow/components/realtime-flow-overlay'
@@ -21,9 +23,9 @@ import { Button } from '../components/ui/button'
 const NODE_Y_BASE = 80
 const NODE_X_BASE = 80
 const FLOW_NODE_STYLE = {
-  backgroundColor: 'hsl(var(--card))',
-  borderColor: 'hsl(var(--border))',
-  color: 'hsl(var(--card-foreground))',
+  backgroundColor: 'var(--card)',
+  borderColor: 'var(--border)',
+  color: 'var(--card-foreground)',
 }
 
 type EditableNodeData = {

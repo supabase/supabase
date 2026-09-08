@@ -72,22 +72,58 @@ const Step: FC<PropsWithChildren<IStep>> = ({ children, title, step }) => {
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-12 lg:gap-10 lg:ml-12">{children}</div>
+      <div
+        className={cn(
+          'ml-12 flex min-w-0 flex-col',
+          '[&_[data-step-hike=details]+[data-step-hike=code]]:mt-6',
+          '[&_[data-step-hike=details]:not(:has(+[data-step-hike=code]))]:mb-6',
+          '[&_[data-step-hike=code]]:mb-6',
+          '[&_[data-step-hike=code]:last-child]:mb-0'
+        )}
+      >
+        {children}
+      </div>
     </div>
   )
 }
 
 const Details: FC<PropsWithChildren<IDetails>> = ({ children, title, fullWidth = false }) => {
   return (
-    <div className={cn(fullWidth ? 'col-span-12' : 'col-span-5', 'ml-12', 'lg:ml-0')}>
-      <h3 className="mt-0 text-foreground text-base">{title}</h3>
+    <div
+      data-step-hike="details"
+      className={cn(
+        'min-w-0',
+        '[&_p:last-child]:mb-0 [&_ul:last-child]:mb-0 [&_ol:last-child]:mb-0',
+        fullWidth && 'w-full'
+      )}
+    >
+      {title && (
+        <span className="block mt-0 mb-[18px] text-foreground text-base font-heading font-semibold">
+          {title}
+        </span>
+      )}
       {children}
     </div>
   )
 }
 
 const Code: FC<PropsWithChildren<ICode>> = ({ children }) => {
-  return <div className="col-span-7 not-prose">{children}</div>
+  // Not `not-prose`: steps interleave labels and admonitions with their code samples, and
+  // stripping prose leaves that text unstyled and flush against the samples.
+  return (
+    <div
+      data-step-hike="code"
+      className={cn(
+        'min-w-0 w-full',
+        // `Step` spaces the block as a whole, so samples don't carry margins of their own...
+        '[&_.shiki]:!my-0 [&_.shiki-wrapper]:!my-0',
+        // ...but back-to-back samples have no prose between them to separate them.
+        '[&_.shiki+.shiki]:!mt-6'
+      )}
+    >
+      {children}
+    </div>
+  )
 }
 
 StepHikeCompact.Step = Step

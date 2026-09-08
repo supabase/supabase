@@ -1,7 +1,7 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { PropsWithChildren } from 'react'
 
-import DefaultLayout from '../DefaultLayout'
+import { DefaultLayout } from '../DefaultLayout'
 import { PageLayout } from '../PageLayout/PageLayout'
 import AdvisorsLayout from './AdvisorsLayout'
 import { useIsAdvisorRulesEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'

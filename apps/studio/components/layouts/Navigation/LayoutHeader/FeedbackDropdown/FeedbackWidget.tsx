@@ -17,7 +17,7 @@ import {
   PopoverSeparator,
   TextArea,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import {
   convertB64toBlob,
@@ -180,10 +180,10 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
       </div>
       <PopoverSeparator />
       <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
-        <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
+        <Button variant="default" size="tiny" onClick={onSwitchToIssueOptions}>
           Get help
         </Button>
-        <Button type="default" size="tiny" onClick={onClose}>
+        <Button variant="default" size="tiny" onClick={onClose}>
           Close
         </Button>
       </div>
@@ -237,7 +237,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
       <PopoverSeparator />
 
       <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
-        <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
+        <Button variant="default" size="tiny" onClick={onSwitchToIssueOptions}>
           Get help instead
         </Button>
         <div className="flex items-center gap-2 flex-row">
@@ -252,6 +252,9 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
               className="cursor-pointer rounded-sm h-[26px] w-[26px] border border-control relative bg-cover bg-center bg-no-repeat"
             >
               <button
+                type="button"
+                tabIndex={0}
+                aria-label="Remove screenshot"
                 className={[
                   'cursor-pointer rounded-full bg-red-900 h-3 w-3',
                   'flex items-center justify-center absolute -top-1 -right-1',
@@ -268,7 +271,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="default"
+                  variant="default"
                   disabled={isSavingScreenshot}
                   loading={isSavingScreenshot}
                   className="w-7"

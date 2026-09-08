@@ -60,7 +60,7 @@ export const ErrorDetailsDialog = ({
         </DialogSection>
         <DialogFooter>
           <DialogClose>
-            <Button type="default">Close</Button>
+            <Button variant="default">Close</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

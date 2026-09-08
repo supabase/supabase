@@ -1,11 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useFlag } from 'common'
 import { Trash } from 'lucide-react'
 import { useEffect, useEffectEvent, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
@@ -16,7 +15,7 @@ import { SSOAdvancedSettings } from './SSOAdvancedSettings'
 import { SSODomains } from './SSODomains'
 import { SSOMetadata } from './SSOMetadata'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
@@ -103,13 +102,6 @@ export const SSOConfig = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const { hasAccess: hasAccessToSso, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('auth.platform.sso')
-  const enterpriseMcpAuthOrgs = useFlag<string>('enableEnterpriseMcpAuth')
-  const showIdjagSettings =
-    typeof enterpriseMcpAuthOrgs === 'string' &&
-    enterpriseMcpAuthOrgs
-      .split(',')
-      .map((s) => s.trim())
-      .includes(organization?.slug ?? '')
 
   const {
     data: ssoConfig,
@@ -129,8 +121,8 @@ export const SSOConfig = () => {
     defaultValues,
   })
 
-  const isSSOEnabled = form.watch('enabled')
-  const enableSpInitiated = form.watch('enableSpInitiated')
+  const isSSOEnabled = useWatch({ control: form.control, name: 'enabled' })
+  const enableSpInitiated = useWatch({ control: form.control, name: 'enableSpInitiated' })
 
   const { mutate: createSSOConfig, isPending: isCreating } = useSSOConfigCreateMutation({
     onSuccess: () => {
@@ -226,7 +218,6 @@ export const SSOConfig = () => {
 
   useEffect(() => {
     syncFormFromConfig()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [ssoConfig, organization?.slug])
 
   // Automatically add an empty domain field when SP-initiated is enabled
@@ -239,7 +230,6 @@ export const SSOConfig = () => {
 
   useEffect(() => {
     ensureDomainField()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [enableSpInitiated])
 
   return (
@@ -314,7 +304,7 @@ export const SSOConfig = () => {
                           )}
                         />
 
-                        {form.watch('enableSpInitiated') && (
+                        {enableSpInitiated && (
                           <Admonition
                             type="note"
                             title="Understanding SSO login flows"
@@ -346,7 +336,7 @@ export const SSOConfig = () => {
                         )}
                       </CardContent>
 
-                      {form.watch('enableSpInitiated') && (
+                      {enableSpInitiated && (
                         <CardContent>
                           <SSODomains form={form} />
                         </CardContent>
@@ -370,11 +360,9 @@ export const SSOConfig = () => {
                         <JoinOrganizationOnSignup form={form} />
                       </CardContent>
 
-                      {showIdjagSettings && (
-                        <CardContent>
-                          <SSOAdvancedSettings form={form} />
-                        </CardContent>
-                      )}
+                      <CardContent>
+                        <SSOAdvancedSettings form={form} />
+                      </CardContent>
                     </>
                   )}
 
@@ -382,7 +370,7 @@ export const SSOConfig = () => {
                     <div>
                       {!!ssoConfig && (
                         <Button
-                          type="danger"
+                          variant="danger"
                           icon={<Trash />}
                           onClick={() => setIsDeleteModalVisible(true)}
                           disabled={isCreating || isUpdating || isDeleting}
@@ -394,7 +382,7 @@ export const SSOConfig = () => {
                     <div className="flex space-x-2">
                       {form.formState.isDirty && (
                         <Button
-                          type="default"
+                          variant="default"
                           disabled={isCreating || isUpdating}
                           onClick={() => form.reset()}
                         >
@@ -402,8 +390,8 @@ export const SSOConfig = () => {
                         </Button>
                       )}
                       <Button
-                        type="primary"
-                        htmlType="submit"
+                        variant="primary"
+                        type="submit"
                         loading={isCreating || isUpdating}
                         disabled={!form.formState.isDirty || isCreating || isUpdating}
                       >

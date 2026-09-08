@@ -114,7 +114,7 @@ export function generateRegexpWhereSafe(
       const valueIsNumber = !isNaN(Number(filter.value))
       const lit = valueIsNumber
         ? analyticsLiteral(Number(filter.value))
-        : analyticsLiteral(String(filter.value).toLowerCase())
+        : analyticsLiteral(String(filter.value))
 
       switch (filter.compare) {
         case 'matches':

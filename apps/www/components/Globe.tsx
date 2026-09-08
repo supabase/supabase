@@ -1,23 +1,27 @@
 import createGlobe from 'cobe'
-import { debounce } from 'lib/helpers'
 import { useTheme } from 'next-themes'
-import { useCallback, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 const Globe = () => {
   const { resolvedTheme } = useTheme()
   const canvasRef = useRef<any | null>(null)
 
-  let rotation: number = 0
-  let width: number = 0
-  const onResize = useCallback(
-    () => canvasRef.current && (width = canvasRef.current.offsetWidth),
-    [resolvedTheme]
-  )
-
   useEffect(() => {
-    const debouncedResize = debounce(onResize, 10)
-    window.addEventListener('resize', debouncedResize)
-    onResize()
+    let rotation = 0
+    let width = 0
+    let previousWidth = 0
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        width = Math.round(entry.contentRect.width)
+      }
+    })
+
+    if (canvasRef.current) {
+      resizeObserver.observe(canvasRef.current)
+      width = Math.round(canvasRef.current.getBoundingClientRect().width)
+    }
+
     const cobe = createGlobe(canvasRef.current, {
       devicePixelRatio: 2,
       width: width * 2,
@@ -52,11 +56,23 @@ const Globe = () => {
       onRender: (state) => {
         state.phi = rotation
         rotation += 0.0025
+        if (width !== previousWidth) {
+          state.width = width * 2
+          state.height = width * 2
+          previousWidth = width
+        }
       },
     })
-    setTimeout(() => (canvasRef.current.style.opacity = '0.8'), 10)
+
+    const timeoutId = setTimeout(() => {
+      if (canvasRef.current) {
+        canvasRef.current.style.opacity = '0.8'
+      }
+    }, 10)
+
     return () => {
-      window.removeEventListener('resize', onResize)
+      resizeObserver.disconnect()
+      clearTimeout(timeoutId)
       cobe.destroy()
     }
   }, [resolvedTheme])

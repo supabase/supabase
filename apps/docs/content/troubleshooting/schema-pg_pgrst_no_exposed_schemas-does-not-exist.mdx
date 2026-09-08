@@ -19,3 +19,40 @@ PostgREST logs showing the error:
 - Currently, we don't really shutdown PostgREST when the Data API is disabled. You will see a schema called `pg_pgrst_no_exposed_schemas` added in the exposed schemas.
 - This should not adversely affect the project, although it may result in additional entries in your logs.
 - We're aware of this issue and are working on it.
+
+## Workaround
+
+To stop the missing-schema log entries:
+
+1. Open the SQL Editor.
+2. Run the following statements:
+
+   ```sql
+   -- Create a schema with nothing inside
+   create schema pgrst_no_exposed_schemas;
+
+   -- Set the db-schemas configuration
+   alter role authenticator set pgrst.db_schemas = 'pgrst_no_exposed_schemas';
+
+   -- Reload PostgREST's schema cache and configuration
+   notify pgrst;
+   ```
+
+PostgREST now exposes an empty schema, which stops the missing-schema errors.
+
+## Re-enabling the Data API in the future
+
+You may decide that you wish to re-enable the Data API in the future.
+
+If you do so, to reverse the workaround, you can run the following statements before re-enabling the Data API:
+
+1. Open the SQL Editor.
+2. Run the following statements:
+
+   ```sql
+   -- Reset the db-schemas configuration
+   alter role authenticator reset pgrst.db_schemas;
+
+   -- Reload PostgREST's schema cache and configuration
+   notify pgrst;
+   ```

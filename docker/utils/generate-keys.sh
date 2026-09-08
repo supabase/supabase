@@ -61,6 +61,7 @@ anon_key=$(gen_token "$anon_payload")
 service_role_key=$(gen_token "$service_role_payload")
 
 secret_key_base=$(gen_base64 48)
+realtime_db_enc_key=$(gen_hex 8)
 vault_enc_key=$(gen_hex 16)
 pg_meta_crypto_key=$(gen_base64 24)
 
@@ -81,6 +82,7 @@ echo "ANON_KEY=${anon_key}"
 echo "SERVICE_ROLE_KEY=${service_role_key}"
 echo ""
 echo "SECRET_KEY_BASE=${secret_key_base}"
+echo "REALTIME_DB_ENC_KEY=${realtime_db_enc_key}"
 echo "VAULT_ENC_KEY=${vault_enc_key}"
 echo "PG_META_CRYPTO_KEY=${pg_meta_crypto_key}"
 echo "LOGFLARE_PUBLIC_ACCESS_TOKEN=${logflare_public_access_token}"
@@ -123,6 +125,7 @@ sed \
     -e "s|^ANON_KEY=.*$|ANON_KEY=${anon_key}|" \
     -e "s|^SERVICE_ROLE_KEY=.*$|SERVICE_ROLE_KEY=${service_role_key}|" \
     -e "s|^SECRET_KEY_BASE=.*$|SECRET_KEY_BASE=${secret_key_base}|" \
+    -e "s|^REALTIME_DB_ENC_KEY=.*$|REALTIME_DB_ENC_KEY=${realtime_db_enc_key}|" \
     -e "s|^VAULT_ENC_KEY=.*$|VAULT_ENC_KEY=${vault_enc_key}|" \
     -e "s|^PG_META_CRYPTO_KEY=.*$|PG_META_CRYPTO_KEY=${pg_meta_crypto_key}|" \
     -e "s|^LOGFLARE_PUBLIC_ACCESS_TOKEN=.*$|LOGFLARE_PUBLIC_ACCESS_TOKEN=${logflare_public_access_token}|" \

@@ -102,14 +102,14 @@ const DeveloperGrowthChart = () => {
           </defs>
           <XAxis
             dataKey="month"
-            tick={{ fontSize: 12, fill: 'hsl(var(--foreground-lighter))' }}
+            tick={{ fontSize: 12, fill: 'var(--foreground-lighter)' }}
             tickLine={false}
-            axisLine={{ stroke: 'hsl(var(--border-default))' }}
+            axisLine={{ stroke: 'var(--border-default)' }}
             tickFormatter={(value) => value.substring(0, 4)}
             ticks={data.filter((d, i) => isYearBoundary(d.month, i)).map((d) => d.month)}
           />
           <YAxis
-            tick={{ fontSize: 12, fill: 'hsl(var(--foreground-lighter))' }}
+            tick={{ fontSize: 12, fill: 'var(--foreground-lighter)' }}
             tickLine={false}
             axisLine={false}
             tickFormatter={formatYAxis}

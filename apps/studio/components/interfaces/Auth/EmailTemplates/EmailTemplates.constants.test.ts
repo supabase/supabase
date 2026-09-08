@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { EMAIL_TEMPLATE_DOCS_ANCHORS } from './EmailTemplates.constants'
+import {
+  AUTH_EMAIL_TEMPLATES_TERMINOLOGY_ANCHOR,
+  EMAIL_TEMPLATE_DOCS_ANCHORS,
+} from './EmailTemplates.constants'
 import { AUTH_TEMPLATE_TYPES, type AuthTemplateType } from './EmailTemplates.types'
 
 /** Docs section headings from customizing-email-templates.mdx */
@@ -31,6 +34,12 @@ function docsHeadingToAnchor(heading: string) {
     .replace(/[^a-z0-9- ]/g, '')
     .replace(/[ ]/g, '-')
 }
+
+describe('EmailTemplates.constants: AUTH_EMAIL_TEMPLATES_TERMINOLOGY_ANCHOR', () => {
+  it('matches auth-email-templates.mdx heading slug', () => {
+    expect(AUTH_EMAIL_TEMPLATES_TERMINOLOGY_ANCHOR).toBe(docsHeadingToAnchor('Terminology'))
+  })
+})
 
 describe('EmailTemplates.constants: EMAIL_TEMPLATE_DOCS_ANCHORS', () => {
   it('covers every auth template type', () => {

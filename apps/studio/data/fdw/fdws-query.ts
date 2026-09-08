@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { fdwKeys } from './keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { EMPTY_ARR } from '@/lib/void'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type FDWColumn = {
@@ -43,7 +44,7 @@ export async function getFDWs(
     signal
   )
 
-  return result as FDW[]
+  return (Array.isArray(result) ? result : EMPTY_ARR) as FDW[]
 }
 
 export type FDWsData = Awaited<ReturnType<typeof getFDWs>>

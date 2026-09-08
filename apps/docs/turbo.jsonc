@@ -10,14 +10,37 @@
       "inputs": ["spec/**"],
       "outputs": ["features/docs/generated/**"],
     },
+    // Fetches remote (GitHub) content and the JSON artifacts the markdown generator reads.
+    // Not cached: the inputs are remote, so a cache restore could resurrect stale content.
+    "build:federated-content": {
+      "cache": false,
+      "env": [
+        "DOCS_GITHUB_APP_ID",
+        "DOCS_GITHUB_APP_INSTALLATION_ID",
+        "DOCS_GITHUB_APP_PRIVATE_KEY",
+      ],
+    },
+    // Generates the guide/reference .md files and manifest.json under public/markdown/.
+    // Declaring outputs lets Turbo restore these artifacts on a cache hit; without it a
+    // cached run would skip the script and leave the generated markdown missing for `next build`.
+    "build:markdown": {
+      "dependsOn": ["build:federated-content"],
+      "outputs": ["public/markdown/**", "public/markdown/manifest.json"],
+    },
+    "test": {
+      // Lets the smoke tests target a preview deploy or localhost instead of production.
+      "env": ["DOCS_SMOKE_URL"],
+    },
     "build": {
-      "dependsOn": ["^build", "codegen:examples", "codegen:references"],
+      "dependsOn": ["^build", "codegen:examples", "codegen:references", "build:markdown"],
       "env": [
         "ANALYZE",
         "NEXT_PUBLIC_SUPABASE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
         "NEXT_PUBLIC_MISC_URL",
         "NEXT_PUBLIC_MISC_ANON_KEY",
+        "NEXT_PUBLIC_MARKETPLACE_API_URL",
+        "NEXT_PUBLIC_MARKETPLACE_PUBLISHABLE_KEY",
         "NODE_ENV",
         "NEXT_PUBLIC_API_URL",
         "NEXT_PUBLIC_BASE_PATH",
@@ -52,7 +75,9 @@
         "DOCS_REVALIDATION_KEYS",
         "DOCS_REVALIDATION_OVERRIDE_KEYS",
         "ENABLED_FEATURES_OVERRIDE_DISABLE_ALL",
+        "GH_TOKEN",
         "GITHUB_ACTIONS",
+        "GITHUB_TOKEN",
         "FORCE_ASSET_CDN",
         "LOGFLARE_INGESTION_API_KEY",
         "LOGFLARE_SOURCE_TOKEN",

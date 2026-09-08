@@ -17,7 +17,7 @@
     'postgres            mgmt-api'
     'pricing             branching'
     'claim-flow  platform-kit'
-    'pico-instances      pico-instances';
+    'nano-instances      nano-instances';
 }
 
 @media (min-width: 1280px) {
@@ -25,6 +25,6 @@
     grid-template-areas:
       'postgres     mgmt-api            mgmt-api'
       'pricing      branching           claim-flow'
-      'platform-kit pico-instances      pico-instances';
+      'platform-kit nano-instances      nano-instances';
   }
 }

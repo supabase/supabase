@@ -1,8 +1,8 @@
 import { useParams } from 'common'
-import { BarChart, Shield } from 'lucide-react'
+import { Shield } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
 import { AiIconAnimation, Badge, Button, Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
-import { Row } from 'ui-patterns'
+import { Row } from 'ui-patterns/Row'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Markdown } from '../Markdown'
@@ -11,8 +11,10 @@ import { createLintSummaryPrompt } from '@/components/interfaces/Linter/Linter.u
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import type { AdvisorItem } from '@/components/ui/AdvisorPanel/AdvisorPanel.types'
 import {
+  advisorCategoryIcons,
   createAdvisorLintItems,
   getAdvisorItemDisplayTitle,
+  getAdvisorItemTelemetryCategory,
   MAX_HOMEPAGE_ADVISOR_ITEMS,
   severityBadgeVariants,
   severityColorClasses,
@@ -20,6 +22,7 @@ import {
 } from '@/components/ui/AdvisorPanel/AdvisorPanel.utils'
 import { useAdvisorSignals } from '@/components/ui/AdvisorPanel/useAdvisorSignals'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import { useProjectHealthLintsQuery } from '@/data/lint/health-lints-query'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAdvisorStateSnapshot } from '@/state/advisor-state'
@@ -38,15 +41,21 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
     { enabled: !showEmptyState }
   )
 
+  const { data: healthLints } = useProjectHealthLintsQuery(
+    { projectRef },
+    { enabled: !showEmptyState }
+  )
+
   const { data: signalItems } = useAdvisorSignals({ projectRef, enabled: !showEmptyState })
 
   const advisorItems = useMemo<AdvisorItem[]>(() => {
-    const criticalLintItems = createAdvisorLintItems(lints).filter(
-      (item) => item.source === 'lint' && item.original.level === LINTER_LEVELS.ERROR
-    )
+    const criticalLintItems = createAdvisorLintItems([
+      ...(lints ?? []),
+      ...(healthLints ?? []),
+    ]).filter((item) => item.source === 'lint' && item.original.level === LINTER_LEVELS.ERROR)
 
     return sortAdvisorItems([...criticalLintItems, ...signalItems])
-  }, [lints, signalItems])
+  }, [lints, healthLints, signalItems])
 
   const visibleAdvisorItems = useMemo(
     () => advisorItems.slice(0, MAX_HOMEPAGE_ADVISOR_ITEMS),
@@ -80,16 +89,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
       setSelectedItem(item.id, item.source)
       openSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
 
-      const advisorCategory =
-        item.source === 'lint'
-          ? item.original.categories.includes('SECURITY')
-            ? 'SECURITY'
-            : item.original.categories.includes('PERFORMANCE')
-              ? 'PERFORMANCE'
-              : undefined
-          : item.source === 'signal'
-            ? 'SECURITY'
-            : undefined
+      const advisorCategory = getAdvisorItemTelemetryCategory(item)
       const advisorType =
         item.source === 'signal'
           ? item.type
@@ -123,7 +123,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
       ) : (
         <div className="flex justify-between items-center mb-6">
           {titleContent}
-          <Button type="default" icon={<AiIconAnimation />} onClick={handleAskAssistant}>
+          <Button variant="default" icon={<AiIconAnimation />} onClick={handleAskAssistant}>
             Ask Assistant
           </Button>
         </div>
@@ -140,7 +140,9 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
           <Row maxColumns={4} minWidth={280}>
             {visibleAdvisorItems.map((item) => {
               const isLint = item.source === 'lint'
-              const categoryLabel = item.tab === 'performance' ? 'PERFORMANCE' : 'SECURITY'
+              // Only security, performance and health items reach the homepage row
+              const categoryLabel = item.category.toUpperCase()
+              const CategoryIcon = advisorCategoryIcons[item.category]
               const title = getAdvisorItemDisplayTitle(item)
               const description =
                 item.source === 'signal' ? item.summary : isLint ? item.original.detail : ''
@@ -164,19 +166,11 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
                 >
                   <CardHeader className="border-b-0 shrink-0 flex flex-row gap-2 space-y-0 justify-between items-center">
                     <div className="flex flex-row items-center gap-3">
-                      {item.tab === 'security' ? (
-                        <Shield
-                          size={16}
-                          strokeWidth={1.5}
-                          className={severityColorClasses[item.severity]}
-                        />
-                      ) : (
-                        <BarChart
-                          size={16}
-                          strokeWidth={1.5}
-                          className={severityColorClasses[item.severity]}
-                        />
-                      )}
+                      <CategoryIcon
+                        size={16}
+                        strokeWidth={1.5}
+                        className={severityColorClasses[item.severity]}
+                      />
                       <CardTitle className="text-foreground-light">{categoryLabel}</CardTitle>
                     </div>
                     <div className="flex items-center gap-2">
@@ -203,13 +197,13 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
                               })
                               track('advisor_assistant_button_clicked', {
                                 origin: 'homepage',
-                                advisorCategory: item.original.categories[0],
+                                advisorCategory: getAdvisorItemTelemetryCategory(item),
                                 advisorType: item.original.name,
                                 advisorLevel: item.original.level,
                               })
                             }}
                             telemetrySource="advisor_section"
-                            type="text"
+                            variant="text"
                             className="w-7 h-7"
                           />
                         </div>
@@ -228,7 +222,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
           </Row>
           {hiddenIssuesCount > 0 && (
             <div className="mt-4 flex justify-end">
-              <Button type="text" onClick={() => openSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)}>
+              <Button variant="text" onClick={() => openSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)}>
                 View {hiddenIssuesCount} more issue{hiddenIssuesCount !== 1 ? 's' : ''} in Advisor
               </Button>
             </div>
@@ -247,7 +241,7 @@ function EmptyState() {
       <CardContent className="flex flex-col items-center justify-center gap-2 p-16 h-full">
         <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
         <p className="text-sm text-foreground-light text-center">
-          No security or performance issues found
+          No security, performance or health issues found
         </p>
       </CardContent>
     </Card>

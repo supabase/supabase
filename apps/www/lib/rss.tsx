@@ -39,8 +39,9 @@ const generateRssItem = (post: any): string => {
 
 export type ChangelogRssItemInput = {
   title: string
-  url: string
+  slug: string
   sortDate: string
+  affectedProducts?: string[]
 }
 
 /** Implemented in `./changelog-rss.mjs` (used by `scripts/generateStaticContent.mjs`). */

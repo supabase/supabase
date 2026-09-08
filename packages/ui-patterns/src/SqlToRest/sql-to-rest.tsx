@@ -28,7 +28,17 @@ import {
 } from 'react'
 import Markdown from 'react-markdown'
 import { format } from 'sql-formatter'
-import { Alert, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, Tabs } from 'ui'
+import {
+  Alert,
+  cn,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { assumptions } from './assumptions'
@@ -355,8 +365,13 @@ export default function SqlToRest({
         )}
       >
         <div className="font-medium">Choose language to translate to</div>
-        <Tabs activeId={currentLanguage} onChange={(id: string) => setCurrentLanguage(id)}>
-          <Tabs.Panel id="curl" label="cURL" className="flex flex-col gap-4">
+        <Tabs value={currentLanguage} onValueChange={(id: string) => setCurrentLanguage(id)}>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="curl">cURL</TabsTrigger>
+            <TabsTrigger value="http">HTTP</TabsTrigger>
+            <TabsTrigger value="js">JavaScript</TabsTrigger>
+          </TabsList>
+          <TabsContent value="curl" className="flex flex-col gap-4">
             {httpRenderError && <Alert className="text-red-900">{httpRenderError.message}</Alert>}
             <CodeBlock
               language="curl"
@@ -369,8 +384,8 @@ export default function SqlToRest({
             >
               {curlCommand}
             </CodeBlock>
-          </Tabs.Panel>
-          <Tabs.Panel id="http" label="HTTP" className="flex flex-col gap-4">
+          </TabsContent>
+          <TabsContent value="http" className="flex flex-col gap-4">
             {httpRenderError && <Alert className="text-red-900">{httpRenderError.message}</Alert>}
             <CodeBlock
               language="http"
@@ -383,8 +398,8 @@ export default function SqlToRest({
             >
               {rawHttp}
             </CodeBlock>
-          </Tabs.Panel>
-          <Tabs.Panel id="js" label="JavaScript" className="flex flex-col gap-4">
+          </TabsContent>
+          <TabsContent value="js" className="flex flex-col gap-4">
             {supabaseJsRenderError && (
               <Alert className="text-red-900">{supabaseJsRenderError.message}</Alert>
             )}
@@ -399,7 +414,7 @@ export default function SqlToRest({
             >
               {jsCommand}
             </CodeBlock>
-          </Tabs.Panel>
+          </TabsContent>
         </Tabs>
         <div
           className={cn(
@@ -412,10 +427,12 @@ export default function SqlToRest({
         >
           {relevantAssumptions.length > 0 && (
             <div>
-              <h3 className="my-1 text-base text-inherit">Assumptions</h3>
+              <span className="block my-1 text-base text-inherit font-heading font-semibold">
+                Assumptions
+              </span>
               <ol className="my-0 text-foreground">
                 {relevantAssumptions.map((assumption) => (
-                  <li className="text-sm">
+                  <li key={assumption} className="text-sm">
                     <Markdown>{assumption}</Markdown>
                   </li>
                 ))}
@@ -425,7 +442,9 @@ export default function SqlToRest({
 
           {relevantFaqs.length > 0 && (
             <>
-              <h3 className="my-1 text-base text-inherit">FAQs</h3>
+              <span className="block my-1 text-base text-inherit font-heading font-semibold">
+                FAQs
+              </span>
               {relevantFaqs.map((faq) => (
                 <Collapsible
                   key={faq.id}
@@ -447,7 +466,7 @@ export default function SqlToRest({
                     </button>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
-                    <div className="text-foreground flex flex-col justify-start items-center px-3 pb-4 text-sm">
+                    <div className="text-foreground flex flex-col justify-start items-start px-3 pb-4 text-sm">
                       <Markdown
                         components={{
                           code: (props: any) => <CodeBlock hideLineNumbers {...props} />,

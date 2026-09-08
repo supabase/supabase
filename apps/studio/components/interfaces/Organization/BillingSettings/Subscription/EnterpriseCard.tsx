@@ -1,3 +1,4 @@
+import { motion, type Variants } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { PricingInformation } from 'shared-data'
 import { Button, cn } from 'ui'
@@ -8,9 +9,10 @@ import { useTrack } from '@/lib/telemetry/track'
 export interface EnterpriseCardProps {
   plan: PricingInformation
   isCurrentPlan: boolean
+  variants?: Variants
 }
 
-export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => {
+export const EnterpriseCard = ({ plan, isCurrentPlan, variants }: EnterpriseCardProps) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const features = plan.features
@@ -19,8 +21,9 @@ export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => 
   const track = useTrack()
 
   return (
-    <div
+    <motion.div
       key={plan.id}
+      variants={variants}
       className={cn(
         'grid grid-cols-1 md:grid-cols-3 border rounded-md bg-studio',
         'py-4 col-span-12 justify-between gap-x-8'
@@ -45,7 +48,7 @@ export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => 
         <Button
           block
           asChild
-          type="default"
+          variant="default"
           size="tiny"
           onClick={() =>
             track('studio_pricing_plan_cta_clicked', {
@@ -81,7 +84,7 @@ export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => 
         <Button
           block
           asChild
-          type="default"
+          variant="default"
           size="tiny"
           onClick={() =>
             track('studio_pricing_plan_cta_clicked', {
@@ -95,6 +98,6 @@ export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => 
           </a>
         </Button>
       </div>
-    </div>
+    </motion.div>
   )
 }

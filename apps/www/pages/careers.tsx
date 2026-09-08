@@ -4,7 +4,12 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import career from '~/data/career.json'
 import { breadcrumbs } from '~/lib/breadcrumbs'
-import { filterGenericJob, groupJobsByTeam, JobItemProps, PLACEHOLDER_JOB_ID } from '~/lib/careers'
+import {
+  filterGenericJob,
+  groupJobsByDepartment,
+  JobItemProps,
+  PLACEHOLDER_JOB_ID,
+} from '~/lib/careers'
 import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import Styles from '~/styles/career.module.css'
 import { GetServerSideProps } from 'next'
@@ -32,7 +37,7 @@ export const getServerSideProps: GetServerSideProps = (async ({ res }) => {
   const job_res = await fetch('https://api.ashbyhq.com/posting-api/job-board/supabase')
   const job_data = (await job_res.json()) as { jobs: JobItemProps[] }
 
-  const jobs = groupJobsByTeam(job_data.jobs.filter((job) => !filterGenericJob(job)))
+  const jobs = groupJobsByDepartment(job_data.jobs.filter((job) => !filterGenericJob(job)))
   const placeholderJob = job_data.jobs.find(filterGenericJob)
 
   const contributorResponse = await fetch(
@@ -121,19 +126,21 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
         />
       </Head>
       <DefaultLayout>
-        <header className="container relative mx-auto px-6 pt-12 pb-8 lg:pt-24 lg:px-16 xl:px-20 text-center space-y-4">
-          <h1 className="text-sm text-brand md:text-base">
-            <span className="sr-only">Supabase </span>Careers
-          </h1>
-          <h2 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1px]">
-            We're on a mission to build the best developer platform
-          </h2>
-          <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
-            Explore remote opportunities and join our team to help us achieve it.
-          </p>
-          <Button asChild type="primary" className="mt-4">
-            <Link href="#positions">Open positions</Link>
-          </Button>
+        <header>
+          <SectionContainer className="pt-12 pb-8! lg:pt-24 py-0 text-center space-y-4">
+            <h1 className="text-sm text-brand md:text-base">
+              <span className="sr-only">Supabase </span>Careers
+            </h1>
+            <h2 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1px]">
+              We're on a mission to build the best developer platform
+            </h2>
+            <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
+              Explore remote opportunities and join our team to help us achieve it.
+            </p>
+            <Button asChild variant="primary" className="mt-4">
+              <Link href="#positions">Open positions</Link>
+            </Button>
+          </SectionContainer>
         </header>
 
         <SectionContainer className="pt-8!">
@@ -418,11 +425,11 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
               <br /> We’d love to talk to you.
             </p>
             <div className="mt-10 flex flex-col gap-4">
-              {Object.entries(jobs).map(([team, teamJobs]) => (
-                <div key={team}>
-                  <h3 className="text-foreground-lighter text-sm">{team}</h3>
+              {Object.entries(jobs).map(([department, departmentJobs]) => (
+                <div key={department}>
+                  <h3 className="text-foreground-lighter text-sm">{department}</h3>
                   <div className="mt-2 -space-y-px">
-                    {teamJobs
+                    {departmentJobs
                       .filter((job) => !filterGenericJob(job))
                       .map((job) => (
                         <JobItem job={job} key={job.id} />
@@ -443,7 +450,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   Join our talent community to stay updated on future opportunities.
                 </p>
               </div>
-              <Button asChild type="primary">
+              <Button asChild variant="primary">
                 <Link
                   href="https://jobs.ashbyhq.com/supabase/form/talent-community-form"
                   target="_blank"
@@ -478,15 +485,15 @@ const JobItem = ({ job }: { job: JobItemProps }) => {
       <h4 className="text-base min-w-[240px] lg:min-w-[316px] grow sm:truncate mr-6">
         {job.title}
       </h4>
-      <div className="flex justify-between justify-[normal] pt-2 md:pt-0 lg:w-1/3 items-center">
-        <div className="flex items-center gap-4">
+      <div className="flex justify-between justify-[normal] pt-2 md:pt-0 items-center">
+        <div className="flex items-center gap-4 min-w-0">
           <Badge>
-            <GlobeAltIcon className="w-3 h-3" />
-            <span>{job.location}</span>
+            <GlobeAltIcon className="w-3 h-3 shrink-0" />
+            <span className="truncate">{job.location}</span>
           </Badge>
           <span className="hidden md:block">{job.employment}</span>
         </div>
-        <div className={cn(buttonVariants({ type: 'default', size: 'tiny' }), 'rounded-full')}>
+        <div className={cn(buttonVariants({ variant: 'default', size: 'tiny' }), 'rounded-full')}>
           {isPlaceholderJob ? 'Submit resume' : 'Apply for position'}
         </div>
       </div>

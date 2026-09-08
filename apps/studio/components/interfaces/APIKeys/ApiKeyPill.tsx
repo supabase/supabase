@@ -1,10 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, cn, InputVariants, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { useRevealedSecret } from './useRevealedSecret'
 import CopyButton from '@/components/ui/CopyButton'
@@ -111,7 +110,7 @@ export function ApiKeyPill({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              type="outline"
+              variant="outline"
               aria-label={show ? 'Hide API key' : 'Reveal API key'}
               className="rounded-full px-2 pointer-events-auto"
               loading={show && isLoading}
@@ -135,7 +134,7 @@ export function ApiKeyPill({
       <Tooltip>
         <TooltipTrigger asChild>
           <CopyButton
-            type="default"
+            variant="default"
             aria-label="Copy API key"
             asyncText={onCopy}
             iconOnly

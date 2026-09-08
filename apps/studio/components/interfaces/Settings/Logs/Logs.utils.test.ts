@@ -4,10 +4,13 @@ import { LogsTableName } from './Logs.constants'
 import type { Filters, LogData } from './Logs.types'
 import {
   buildLogsPrompt,
+  checkForLimitClause,
+  ensureNoTimestampConflict,
   extractEdgeFunctionName,
   formatLogsAsCsv,
   formatLogsAsJson,
   formatLogsAsMarkdown,
+  genChartQuery,
   genDefaultQuery,
   getAuthLogSeverity,
   parseMultigresEventMessage,
@@ -293,6 +296,59 @@ describe('Logs.utils', () => {
     test('info severity filter excludes error and warning rows', () => {
       const sql = queryFor({ info: true })
       expect(sql).toContain('NOT (')
+    })
+  })
+
+  describe('checkForLimitClause', () => {
+    test('detects a limit clause regardless of casing', () => {
+      expect(checkForLimitClause('select event_message from edge_logs limit 100')).toBe(true)
+      expect(checkForLimitClause('SELECT event_message FROM edge_logs LIMIT 5')).toBe(true)
+    })
+
+    test('detects a limit clause across newlines', () => {
+      expect(checkForLimitClause('select event_message\nfrom edge_logs\nlimit 50')).toBe(true)
+    })
+
+    test('returns false when no limit clause is present', () => {
+      expect(checkForLimitClause('select event_message from edge_logs')).toBe(false)
+    })
+
+    test('returns false for a bare limit keyword without a row count', () => {
+      expect(checkForLimitClause('select event_message from edge_logs limit')).toBe(false)
+    })
+
+    test('ignores a column named like limit', () => {
+      expect(checkForLimitClause('select limit_reached from edge_logs')).toBe(false)
+    })
+
+    test('ignores the word limit inside a string literal', () => {
+      expect(checkForLimitClause("select event_message from edge_logs where s = 'limit 10'")).toBe(
+        false
+      )
+    })
+
+    test('ignores a limit clause that is commented out', () => {
+      expect(checkForLimitClause('select event_message from edge_logs -- limit 10')).toBe(false)
+    })
+  })
+
+  describe('genChartQuery', () => {
+    // Regression: an unparseable iso_timestamp_start used to reach
+    // startOffset.toISOString() as an Invalid Date and throw RangeError.
+    test('falls back to minute buckets for an unparseable time range without throwing', () => {
+      const params = { iso_timestamp_start: 'not-a-date', iso_timestamp_end: 'also-bad' }
+      expect(() => genChartQuery(LogsTableName.AUTH, params as any, {})).not.toThrow()
+      expect(genChartQuery(LogsTableName.AUTH, params as any, {})).toContain(
+        'timestamp_trunc(t.timestamp, minute)'
+      )
+    })
+  })
+
+  describe('ensureNoTimestampConflict', () => {
+    test('does not throw for unparseable initial timestamps', () => {
+      expect(() =>
+        ensureNoTimestampConflict(['not-a-date', 'also-bad'], ['', '2024-01-01T00:00:00.000Z'])
+      ).not.toThrow()
     })
   })
 })

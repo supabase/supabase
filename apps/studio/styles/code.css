@@ -108,20 +108,6 @@
       padding: 4px 8px;
     }
   }
-
-  &.codeBlockWrapper .sbui-btn-container {
-    position: absolute;
-    top: 2px;
-    right: 3px;
-
-    visibility: hidden;
-    opacity: 0;
-  }
-
-  &.codeBlockWrapper:hover .sbui-btn-container {
-    visibility: visible;
-    opacity: 1;
-  }
 }
 
 .CustomCodeBlock {

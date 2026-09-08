@@ -2,7 +2,7 @@
 
 import { useEvents } from '~/app/events/context'
 import { formatHosts } from '~/lib/eventsUtils'
-import { Rows3Icon } from 'lucide-react'
+import { MapPinIcon, Rows3Icon, VideoIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Badge, Button, cn } from 'ui'
 
@@ -106,7 +106,12 @@ export function EventList() {
                     )}
                   </div>
 
-                  {event.hosts.length > 0 && (
+                  {event.categories?.includes('webinar') ? (
+                    <div className="flex gap-2 items-center text-sm text-foreground-light">
+                      <VideoIcon className="size-4 shrink-0" strokeWidth={1.5} />
+                      Supabase Live
+                    </div>
+                  ) : event.hosts.length > 0 ? (
                     <div className="flex gap-2 items-center text-sm text-foreground-light">
                       <div className="size-5 rounded-full border bg-linear-to-br from-background-surface-100 to-background-surface-200 relative">
                         {event.hosts[0]?.avatar_url && (
@@ -119,12 +124,17 @@ export function EventList() {
                       </div>
                       Hosted by {formatHosts(event.hosts).displayText}
                     </div>
-                  )}
+                  ) : event.source === 'notion' && event.location ? (
+                    <div className="flex gap-2 items-center text-sm text-foreground-light">
+                      <MapPinIcon className="size-4 shrink-0" strokeWidth={1.5} />
+                      {event.location}
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="flex flex-wrap items-center justify-end gap-2 shrink-0 relative z-10">
                   {event.meetingLink && (
-                    <Button size="tiny" type="secondary" asChild>
+                    <Button size="tiny" variant="secondary" asChild>
                       <Link href={event.meetingLink} target="_blank" rel="noopener noreferrer">
                         Meet with us
                       </Link>

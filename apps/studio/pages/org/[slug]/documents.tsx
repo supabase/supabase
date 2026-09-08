@@ -5,7 +5,7 @@ import {
   PageHeaderMeta,
   PageHeaderSummary,
   PageHeaderTitle,
-} from 'ui-patterns'
+} from 'ui-patterns/PageHeader'
 
 import { Documents } from '@/components/interfaces/Organization/Documents/Documents'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'

@@ -7,10 +7,10 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type AuthorizedAppRevokeVariables = {
   id: string
-  slug: string
+  orgSlug: string
 }
 
-export async function revokeAuthorizedApp({ id, slug }: AuthorizedAppRevokeVariables) {
+export async function revokeAuthorizedApp({ id, orgSlug: slug }: AuthorizedAppRevokeVariables) {
   if (!id) throw new Error('App ID is required')
   if (!slug) throw new Error('Organization slug is required')
 
@@ -37,7 +37,7 @@ export const useAuthorizedAppRevokeMutation = ({
   return useMutation<AuthorizedAppRevokeData, ResponseError, AuthorizedAppRevokeVariables>({
     mutationFn: (vars) => revokeAuthorizedApp(vars),
     async onSuccess(data, variables, context) {
-      const { slug } = variables
+      const { orgSlug: slug } = variables
       await queryClient.invalidateQueries({ queryKey: oauthAppKeys.authorizedApps(slug) })
       await onSuccess?.(data, variables, context)
     },

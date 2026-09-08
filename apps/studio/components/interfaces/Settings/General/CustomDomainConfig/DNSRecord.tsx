@@ -18,5 +18,3 @@ export const DNSRecord = ({ type, name, value }: DNSRecordProps) => {
     </div>
   )
 }
-
-export default DNSRecord

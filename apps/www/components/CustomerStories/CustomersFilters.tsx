@@ -124,7 +124,7 @@ function CustomerFilters({ allCustomers, setCustomers, industries, products }: P
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="outline"
+                variant="outline"
                 size="medium"
                 iconRight={<ChevronDown />}
                 className="w-full min-w-[150px] flex [&_span]:flex [&_span]:items-center [&_span]:gap-2 justify-between items-center py-2"
@@ -153,7 +153,7 @@ function CustomerFilters({ allCustomers, setCustomers, industries, products }: P
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="outline"
+                variant="outline"
                 size="medium"
                 iconRight={<ChevronDown />}
                 className="w-full min-w-[200px] flex [&_span]:flex [&_span]:items-center [&_span]:gap-2 justify-between items-center py-2"
@@ -187,7 +187,7 @@ function CustomerFilters({ allCustomers, setCustomers, industries, products }: P
                 ? 'opacity-100 visible'
                 : 'opacity-0 invisible'
             )}
-            type={isMobile ? 'default' : 'text'}
+            variant={isMobile ? 'default' : 'text'}
             block={isMobile}
             iconRight={<CloseIcon />}
           >

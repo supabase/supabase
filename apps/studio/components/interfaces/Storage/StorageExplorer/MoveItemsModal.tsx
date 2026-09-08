@@ -85,14 +85,14 @@ export const MoveItemsModal = ({
               />
             </FormItemLayout>
 
-            <button className="hidden" type="submit" onClick={onConfirmMove} />
+            <button tabIndex={-1} className="hidden" type="submit" onClick={onConfirmMove} />
           </form>
         </DialogSection>
         <DialogFooter>
-          <Button type="default" onClick={onSelectCancel}>
+          <Button variant="default" onClick={onSelectCancel}>
             Cancel
           </Button>
-          <Button type="primary" loading={moving} onClick={onConfirmMove}>
+          <Button variant="primary" loading={moving} onClick={onConfirmMove}>
             {moving ? 'Moving files' : 'Move files'}
           </Button>
         </DialogFooter>

@@ -1,10 +1,12 @@
 import { NewspaperIcon } from '@heroicons/react/outline'
+
 import { Article } from '../../types'
 
 const ArticleButton = (props: Article) => {
   return (
     <div className="mr-2 mb-2 inline-block">
       <button
+        tabIndex={0}
         className="
             bg-background text-foreground 
             hover:bg-background-overlay 

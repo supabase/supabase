@@ -21,6 +21,7 @@ import { formatRowsForCSV, hydrateTruncatedRows } from './Header.utils'
 import { SortPopover } from './sort/SortPopover'
 import { useTableRowOperations } from '@/components/grid/hooks/useTableRowOperations'
 import { useTableSort } from '@/components/grid/hooks/useTableSort'
+import type { SupaRow } from '@/components/grid/types'
 import { GridHeaderActions } from '@/components/interfaces/TableGridEditor/GridHeaderActions'
 import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { formatTableRowsToSQL } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
@@ -46,10 +47,16 @@ import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 export type HeaderProps = {
   customHeader: ReactNode
   isRefetching: boolean
+  rows?: SupaRow[]
   tableQueriesEnabled?: boolean
 }
 
-export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true }: HeaderProps) => {
+export const Header = ({
+  customHeader,
+  isRefetching,
+  rows,
+  tableQueriesEnabled = true,
+}: HeaderProps) => {
   useInitializeFiltersFromUrl()
   useSyncFiltersToUrl()
 
@@ -80,7 +87,7 @@ export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true 
         <div className="flex-1 px-1.5">{customHeader}</div>
       ) : snap.selectedRows.size > 0 ? (
         <div className="flex-1 px-1.5">
-          <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
+          <RowHeader rows={rows} tableQueriesEnabled={tableQueriesEnabled} />
         </div>
       ) : (
         <div
@@ -128,10 +135,11 @@ export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true 
 }
 
 type RowHeaderProps = {
+  rows?: SupaRow[]
   tableQueriesEnabled?: boolean
 }
 
-const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
+const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderProps) => {
   const { id: _id } = useParams()
   const tableId = _id ? Number(_id) : undefined
 
@@ -194,7 +202,7 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
 
   const onRowsDelete = () => {
     const rowIdxs = Array.from(snap.selectedRows) as number[]
-    const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
+    const rows = (visibleRows ?? allRows).filter((x) => rowIdxs.includes(x.idx))
 
     deleteRows({
       rows,
@@ -343,7 +351,12 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
           {!snap.allRowsSelected ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="default" size="tiny" iconRight={<ChevronDown />} loading={isCopying}>
+                <Button
+                  variant="default"
+                  size="tiny"
+                  iconRight={<ChevronDown />}
+                  loading={isCopying}
+                >
                   Copy
                 </Button>
               </DropdownMenuTrigger>
@@ -356,7 +369,7 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
           ) : (
             <ButtonTooltip
               disabled
-              type="default"
+              variant="default"
               tooltip={{
                 content: {
                   side: 'bottom',
@@ -371,7 +384,12 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="default" size="tiny" iconRight={<ChevronDown />} loading={isExporting}>
+              <Button
+                variant="default"
+                size="tiny"
+                iconRight={<ChevronDown />}
+                loading={isExporting}
+              >
                 Export
               </Button>
             </DropdownMenuTrigger>
@@ -402,7 +420,7 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
                 options={{ registerInCommandMenu: true }}
                 side="bottom"
               >
-                <Button type="text" onClick={onToggleSelectAllInTable}>
+                <Button variant="text" onClick={onToggleSelectAllInTable}>
                   {snap.allRowsSelected ? 'Deselect all rows in table' : 'Select all rows in table'}
                 </Button>
               </Shortcut>
@@ -421,7 +439,7 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
             }}
           >
             <ButtonTooltip
-              type="danger"
+              variant="danger"
               size="tiny"
               icon={<Trash />}
               onClick={onRowsDelete}

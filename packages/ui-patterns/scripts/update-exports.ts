@@ -1,4 +1,5 @@
 import * as fs from 'node:fs'
+import { EOL } from 'node:os'
 import * as path from 'node:path'
 
 const SRC_DIR = path.resolve(__dirname, '..', 'src')
@@ -19,7 +20,7 @@ function getAllSourceFiles(dir: string): ExportMap {
 
     if (entry.isDirectory()) {
       Object.assign(exportsMap, getAllSourceFiles(fullPath))
-    } else if (entry.isFile() && /\.(ts|tsx|css)$/.test(entry.name)) {
+    } else if (entry.isFile() && /\.(ts|tsx|css)$/.test(entry.name) && !/\.test/.test(entry.name)) {
       const relativePath = path.relative(SRC_DIR, fullPath)
       const noExtension = relativePath.replace(/\.(ts|tsx)$/, '')
       const segments = noExtension.split(path.sep)
@@ -48,14 +49,11 @@ function updatePackageJson(exportsMap: ExportMap): void {
 
   packageJson.exports = {
     './package.json': './package.json',
-    '.': {
-      import: './index.tsx',
-      types: './index.tsx',
-    },
     ...exportsMap,
   }
 
   fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
+  fs.appendFileSync(packageJsonPath, EOL, 'utf8')
   console.log('✅ package.json exports updated (with clean index paths).')
 }
 

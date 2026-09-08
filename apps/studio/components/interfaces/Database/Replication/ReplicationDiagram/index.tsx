@@ -3,15 +3,15 @@ import { useParams } from 'common'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo } from 'react'
 
-import { PrimaryDatabaseNode, ReadReplicaNode, ReplicationNode } from './Nodes'
+import { PrimaryDatabaseNode, ReplicationNode } from './Nodes'
 import { getDagreGraphLayout } from './ReplicationDiagram.utils'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { timeout } from '@/lib/helpers'
 
 import '@xyflow/react/dist/style.css'
 
 import { SmoothstepEdge } from './Edges'
+import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 
 export const ReplicationDiagram = () => {
   return (
@@ -24,7 +24,6 @@ export const ReplicationDiagram = () => {
 const nodeTypes = {
   primary: PrimaryDatabaseNode,
   replication: ReplicationNode,
-  readReplica: ReadReplicaNode,
 }
 
 const edgeTypes = { smoothstep: SmoothstepEdge }
@@ -34,28 +33,21 @@ const ReplicationDiagramContent = () => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef = 'default' } = useParams()
 
-  const { data: databases = [], isSuccess: isSuccessReplicas } = useReadReplicasQuery({
-    projectRef,
-  })
-  const readReplicas = useMemo(
-    () => databases.filter((x) => x.identifier !== projectRef),
-    [databases, projectRef]
-  )
-
-  const { data, isSuccess: isSuccessDestinations } = useReplicationDestinationsQuery({
+  const {
+    data,
+    error: destinationsError,
+    isSuccess: isSuccessDestinations,
+    isError: isErrorDestinations,
+  } = useReplicationDestinationsQuery({
     projectRef,
   })
   const destinations = useMemo(() => data?.destinations ?? [], [data])
+  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
+  const skipRenderingDestinations = isErrorDestinations && isLocalETLNotSetUp
 
   const nodes = useMemo(() => {
     return [
       { id: projectRef, type: 'primary', data: {}, position: { x: 0, y: 5 } },
-      ...readReplicas.map((x) => ({
-        id: x.identifier,
-        type: 'readReplica',
-        data: {},
-        position: { x: 0, y: 0 },
-      })),
       ...destinations.map((x) => ({
         id: x.id.toString(),
         type: 'replication',
@@ -63,31 +55,20 @@ const ReplicationDiagramContent = () => {
         position: { x: 0, y: 0 },
       })),
     ]
-  }, [destinations, projectRef, readReplicas])
+  }, [destinations, projectRef])
 
   const edges = useMemo(() => {
-    const shiftEdgeEnd = readReplicas.length + destinations.length > 1
+    const shiftEdgeEnd = destinations.length > 1
 
-    return [
-      ...readReplicas.map((x) => ({
-        id: `${projectRef}-${x.identifier}`,
-        source: projectRef,
-        target: x.identifier,
-        type: 'smoothstep',
-        className: 'cursor-default!',
-        // The edge subscribes to live status itself (see Edges.tsx) so it stays in sync with nodes.
-        data: { type: 'replica', identifier: x.identifier, shiftEdgeEnd },
-      })),
-      ...destinations.map((x) => ({
-        id: `${projectRef}-${x.id}`,
-        source: projectRef,
-        target: x.id.toString(),
-        type: 'smoothstep',
-        className: 'cursor-default!',
-        data: { type: 'etl', identifier: x.id.toString(), shiftEdgeEnd },
-      })),
-    ]
-  }, [destinations, projectRef, readReplicas])
+    return destinations.map((x) => ({
+      id: `${projectRef}-${x.id}`,
+      source: projectRef,
+      target: x.id.toString(),
+      type: 'smoothstep',
+      className: 'cursor-default!',
+      data: { type: 'etl', identifier: x.id.toString(), shiftEdgeEnd },
+    }))
+  }, [destinations, projectRef])
 
   const backgroundPatternColor =
     resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
@@ -103,13 +84,13 @@ const ReplicationDiagramContent = () => {
   }
 
   useEffect(() => {
-    if (nodes.length > 0 && isSuccessDestinations && isSuccessReplicas) {
+    if (nodes.length > 0 && (isSuccessDestinations || skipRenderingDestinations)) {
       setReactFlow()
     }
-  }, [nodes, isSuccessDestinations, isSuccessReplicas])
+  }, [nodes, isSuccessDestinations, skipRenderingDestinations])
 
   return (
-    <div className="nowheel relative min-h-[350px]">
+    <div className="nowheel relative h-[350px] w-full border border-muted rounded-md overflow-hidden">
       <ReactFlow
         // FIXME: https://github.com/xyflow/xyflow/issues/4876
         colorMode={'' as unknown as ColorMode}

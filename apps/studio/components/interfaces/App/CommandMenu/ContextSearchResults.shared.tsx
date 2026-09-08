@@ -1,9 +1,9 @@
 import { cn, CommandList } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
 import { TextHighlighter } from 'ui-patterns/CommandMenu'
 import { CommandMenuGroup } from 'ui-patterns/CommandMenu/internal/CommandMenuGroup'
 import { CommandMenuItem } from 'ui-patterns/CommandMenu/internal/CommandMenuItem'
 import type { IActionCommand, IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export interface SearchResult {
   id: string

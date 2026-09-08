@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 import {
   applyRevealToApiKey,
   getNonPlatformApiKeys,

@@ -201,7 +201,7 @@ export const IntegrationCard = ({
           <div>
             {/* TODO: this should be a configure integration where it would show the sheet and the user can disable or delete the integration
               but there's no "edit integration" endpoing for now. */}
-            <Button type="danger" disabled={!canUpdateConfig} onClick={() => onDelete()}>
+            <Button variant="danger" disabled={!canUpdateConfig} onClick={() => onDelete()}>
               Delete integration
             </Button>
           </div>

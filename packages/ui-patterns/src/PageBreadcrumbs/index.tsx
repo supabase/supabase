@@ -1,8 +1,7 @@
 'use client'
 
 import React from 'react'
-import { cn } from 'ui'
-import { Breadcrumb } from 'ui/src/components/shadcn/ui/breadcrumb'
+import { Breadcrumb, cn } from 'ui'
 
 import { PageContainer } from '../PageContainer'
 

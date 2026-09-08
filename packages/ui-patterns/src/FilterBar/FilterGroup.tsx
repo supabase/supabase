@@ -206,7 +206,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                 onFocus={() => handleGroupFreeformFocus(path)}
                 onBlur={handleFreeformBlur}
                 onKeyDown={handleFreeformKeyDown}
-                className="border-none bg-transparent text-xs focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full flex-1 h-auto min-w-0 px-2 py-1"
+                className="border-none bg-transparent text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full flex-1 h-auto min-w-0 px-2 py-1"
                 placeholder={
                   group.conditions.length === 0 ? emptyPlaceholder : 'Add more filters...'
                 }
@@ -226,7 +226,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                   onFocus={() => handleGroupFreeformFocus(path)}
                   onBlur={handleFreeformBlur}
                   onKeyDown={handleFreeformKeyDown}
-                  className="h-full border-none bg-transparent py-0 text-xs md:text-xs focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0 px-2"
+                  className="h-full border-none bg-transparent py-0 text-xs md:text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0 px-2"
                   placeholder="+ Add filter"
                   autoComplete="off"
                   data-1p-ignore

@@ -1,8 +1,8 @@
 import { ArrowUpRight, BookOpen, Gauge, Settings } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
-import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { MarketplaceDetailBreadrumbs } from './MarketplaceDetailBreadcrumbs'
 import { MarketplaceDetailHero } from './MarketplaceDetailHero'
@@ -36,6 +36,7 @@ export const MarketplaceDetail = () => {
     isAvailableLoading,
     isInstalledLoading,
     isIntegrationStatusLoading,
+    oauthIntegrationData,
     Component,
   } = useIntegrationDetail()
 
@@ -75,11 +76,17 @@ export const MarketplaceDetail = () => {
   const renderInstallAction = () => {
     switch (installActionType) {
       case 'oauth':
-        return <InstallOAuthIntegrationButton integration={integration} />
+        return (
+          <InstallOAuthIntegrationButton
+            integration={integration}
+            data={oauthIntegrationData}
+            isLoading={isIntegrationStatusLoading}
+          />
+        )
       case 'add-wrapper':
         return (
           <AddWrapperButton
-            type="primary"
+            variant="primary"
             onClick={() => {
               if (wrappersTabHref) router.push(`${wrappersTabHref}?new=true`)
             }}
@@ -87,7 +94,7 @@ export const MarketplaceDetail = () => {
         )
       case 'installed':
         return (
-          <Button type="outline" disabled>
+          <Button variant="outline" disabled>
             Installed
           </Button>
         )
@@ -110,7 +117,7 @@ export const MarketplaceDetail = () => {
           <>
             {isInstalled && integrationStatus?.partner_links?.dashboard && (
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
                 icon={<Gauge size={13} />}
                 iconRight={<ArrowUpRight size={13} />}
@@ -127,7 +134,7 @@ export const MarketplaceDetail = () => {
             )}
             {isInstalled && integrationStatus?.partner_links?.manage && (
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
                 icon={<Settings size={13} />}
                 iconRight={<ArrowUpRight size={13} />}
@@ -140,7 +147,7 @@ export const MarketplaceDetail = () => {
             )}
             {integration.docsUrl && (
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
                 icon={<BookOpen size={13} />}
                 iconRight={<ArrowUpRight size={13} />}
@@ -175,7 +182,9 @@ export const MarketplaceDetail = () => {
             <CustomPageComponent />
           </div>
         ) : (
-          <CustomPageComponent />
+          <div className="flex-1 min-h-0">
+            <CustomPageComponent />
+          </div>
         )
       ) : null}
     </>

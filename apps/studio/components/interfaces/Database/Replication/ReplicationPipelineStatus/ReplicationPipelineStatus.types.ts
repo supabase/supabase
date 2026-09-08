@@ -9,15 +9,15 @@ export type SlotWalStatus = 'reserved' | 'extended' | 'unreserved' | 'lost' | 'u
 
 export type SlotLagMetrics = {
   active: boolean
-  wal_status?: SlotWalStatus
+  wal_status?: SlotWalStatus | null
   restart_lsn_bytes: number
   confirmed_flush_lsn_bytes: number
   // null means Postgres reports unlimited slot WAL retention.
-  safe_wal_size_bytes: number | null
-  write_lag?: number
-  flush_lag?: number
+  safe_wal_size_bytes?: number | null
+  write_lag?: number | null
+  flush_lag?: number | null
   // Milliseconds since the destination last sent feedback. Present even when write/flush lag are not.
-  reply_time_lag?: number
+  reply_time_lag?: number | null
 }
 
 // Numeric metrics rendered as value tiles (kept separate from the non-numeric slot fields above).
@@ -28,6 +28,12 @@ export type SlotLagMetricKey =
   | 'reply_time_lag'
 
 export type TableState = {
+  id: number
+  schema: string
+  name: string
+  // Deprecated compatibility aliases for `id` and `schema`.`name`. Prefer the
+  // structured fields above; the API keeps these only until platform and
+  // etl-api remove them in a follow-up release.
   table_id: number
   table_name: string
   state:
@@ -35,6 +41,6 @@ export type TableState = {
     | { name: 'copying_table' }
     | { name: 'copied_table' }
     | { name: 'following_wal'; lag: number }
-    | { name: 'error'; reason: string; solution?: string; retry_policy: RetryPolicy }
-  table_sync_lag?: SlotLagMetrics
+    | { name: 'error'; reason: string; solution?: string | null; retry_policy: RetryPolicy }
+  table_sync_lag?: SlotLagMetrics | null
 }

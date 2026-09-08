@@ -99,7 +99,7 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
         } ${animateCss}`}
       >
         <Button
-          type="default"
+          variant="default"
           disabled={!hasChanged}
           onClick={() => {
             setValue(contentText)

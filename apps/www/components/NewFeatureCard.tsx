@@ -13,7 +13,7 @@ export interface CardProps {
     label: string
     href: string
     target: HTMLAnchorElement['target']
-    type: ButtonProps['type']
+    type: ButtonProps['variant']
   }[]
   image: {
     dark: string

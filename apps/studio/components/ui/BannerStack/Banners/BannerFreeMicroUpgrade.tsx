@@ -6,6 +6,7 @@ import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 
 import { BannerCard } from '../BannerCard'
 import { BANNER_ID, useBannerStack } from '../BannerStackProvider'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { ChevronsUpAnimated } from '@/components/ui/ComputeBadgeWrapper'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useTrack } from '@/lib/telemetry/track'
@@ -49,7 +50,7 @@ export const BannerFreeMicroUpgrade = () => {
         </div>
         <div className="flex gap-2">
           <Button
-            type="primary"
+            variant="primary"
             size="tiny"
             asChild
             onClick={() => {
@@ -58,9 +59,7 @@ export const BannerFreeMicroUpgrade = () => {
               track('free_micro_upgrade_banner_cta_clicked')
             }}
           >
-            <Link href={`/project/${ref}/settings/compute-and-disk?upgrade=micro`}>
-              Upgrade for free
-            </Link>
+            <Link href={`${getInfrastructurePath(ref)}?upgrade=micro`}>Upgrade for free</Link>
           </Button>
         </div>
       </div>

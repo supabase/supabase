@@ -60,7 +60,6 @@ export const IntegrationCard = ({
                 src={image}
                 alt={`${name} integration`}
                 className="w-full h-full object-cover"
-                objectFit="cover"
               />
             ) : (
               <div className="w-12 h-12 text-foreground relative">

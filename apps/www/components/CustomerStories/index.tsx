@@ -31,7 +31,7 @@ const CustomerStories = () => (
         <Button asChild>
           <Link href="/customers">View all stories</Link>
         </Button>
-        <Button asChild type="default">
+        <Button asChild variant="default">
           <Link href="/events">View events</Link>
         </Button>
       </div>
@@ -62,8 +62,8 @@ const compositionCols: CompositionColType[] = [
     type: 'narrow',
     cards: [
       {
-        logo: '/images/customers/logos/1password.png',
-        logo_inverse: '/images/customers/logos/light/1password.png',
+        logo: '/images/customers/logos/on-light/1password.png',
+        logo_inverse: '/images/customers/logos/on-dark/1password.png',
         organization: '1Password',
       },
       getCustomer('Next Door Lending', true),
@@ -78,8 +78,8 @@ const compositionCols: CompositionColType[] = [
     cards: [
       getCustomer('Shotgun', true),
       {
-        logo: '/images/customers/logos/mozilla.png',
-        logo_inverse: '/images/customers/logos/light/mozilla.png',
+        logo: '/images/customers/logos/on-light/mozilla.png',
+        logo_inverse: '/images/customers/logos/on-dark/mozilla.png',
         organization: 'Mozilla',
         linked: false,
       },

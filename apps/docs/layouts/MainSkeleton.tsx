@@ -59,7 +59,7 @@ const levelsData = {
   },
   telemetry: {
     icon: 'telemetry',
-    name: 'Telemetry',
+    name: 'Observability',
   },
   realtime: {
     icon: 'realtime',
@@ -104,6 +104,14 @@ const levelsData = {
   integrations: {
     icon: 'integrations',
     name: 'Integrations',
+  },
+  reference_server_v1: {
+    icon: 'reference-javascript',
+    name: 'Server Reference v1.0',
+  },
+  reference_middleware_v1: {
+    icon: 'reference-javascript',
+    name: 'Middleware Reference v1.0',
   },
   reference_javascript_v1: {
     icon: 'reference-javascript',
@@ -200,11 +208,14 @@ const MobileHeader = memo(function MobileHeader(props: MobileHeaderProps) {
       )}
     >
       <button
+        tabIndex={0}
         className={cn(
           'h-8 w-8 flex group items-center justify-center mr-1',
           mobileMenuOpen && 'mt-0.5'
         )}
         onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
+        aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+        aria-expanded={mobileMenuOpen}
       >
         <div
           className={cn(
@@ -283,8 +294,9 @@ const Container = memo(function Container({
     <main
       // used by layout to scroll to top
       id={DOCS_CONTENT_CONTAINER_ID}
+      tabIndex={-1}
       className={cn(
-        'w-full transition-all ease-out relative',
+        'w-full transition-all ease-out relative scroll-mt-(--header-height) outline-hidden',
         // desktop override any margin styles
         'lg:ml-0',
         className
@@ -318,11 +330,11 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
     >
       <div
         className={cn(
-          'top-0 lg:top-(--header-height)',
+          'top-0',
           'h-full',
-          'relative lg:sticky',
+          'relative',
           'w-full lg:w-auto',
-          'h-fit lg:h-screen overflow-y-scroll lg:overflow-auto',
+          'h-fit lg:h-full overflow-y-scroll lg:overflow-auto',
           'overscroll-contain',
           'backdrop-blur-sm backdrop-filter bg-background',
           'flex flex-col grow'

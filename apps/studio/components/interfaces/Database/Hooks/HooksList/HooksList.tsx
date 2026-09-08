@@ -8,7 +8,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { HooksListEmpty } from './HooksListEmpty'
 import { SchemaTable } from './SchemaTable'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'

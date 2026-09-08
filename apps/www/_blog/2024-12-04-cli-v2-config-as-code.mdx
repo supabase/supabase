@@ -41,7 +41,7 @@ You can make deployments consistent and repeatable by promoting Edge Functions, 
 
 To demonstrate this workflow, let’s use the `supabase.com` website as an example. It’s hosted on Vercel with [Supabase Branching](/docs/guides/deployment/branching) enabled for development. If you are not using Branching, a similar setup can be achieved using GitHub Actions.
 
-<Admonition type="tip" title="Detecting config drift">
+<Admonition type="note" title="Detecting config drift">
 
 Before changing any project configuration, it’s a good idea to verify that your remote config has not drifted.
 
@@ -75,7 +75,7 @@ verify_jwt = false
 
 If you are using a monorepo (like the [@supabase/supabase](https://github.com/supabase/supabase) GitHub repository), you may also want to customize the paths to your function’s entrypoint and import map files. This is especially useful for code sharing between your frontend application and Edge Functions.
 
-<Admonition type="tip" title="Setting Edge Function secrets">
+<Admonition type="note" title="Setting Edge Function secrets">
 
 Edge Function secrets must be manually added to branches as of this release. We plan to support setting Function secrets at deploy time in the near future.
 

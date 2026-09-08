@@ -1,30 +1,29 @@
 import { useIsMFAEnabled } from 'common'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { ProjectList } from '@/components/interfaces/Home/ProjectList/ProjectList'
 import { HomePageActions } from '@/components/interfaces/HomePageActions'
 import { PlanUsageCard } from '@/components/interfaces/ProjectHome/PlanUsageCard'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import OrganizationLayout from '@/components/layouts/OrganizationLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useUpgradeCtaExperiment } from '@/hooks/misc/useUpgradeCtaExperiment'
+import { useShowUpgradeCta } from '@/hooks/misc/useShowUpgradeCta'
 import type { NextPageWithLayout } from '@/types'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const isUserMFAEnabled = useIsMFAEnabled()
   const { data: org } = useSelectedOrganizationQuery()
-  const { variant: upgradeCtaVariant } = useUpgradeCtaExperiment()
+  const { showUpgradeCta: showOrgProjectsListUsageCard } = useShowUpgradeCta()
 
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
-  const showOrgProjectsListUsageCard = upgradeCtaVariant === 'org_projects_list'
 
   return (
     <ScaffoldContainer className="grow flex">
-      <ScaffoldSection isFullWidth className="pb-0">
+      <ScaffoldSection isFullWidth className="pb-12">
         {disableAccessMfa ? (
           <Admonition
             type="note"
@@ -37,7 +36,7 @@ const ProjectsPage: NextPageWithLayout = () => {
               </>
             }
             actions={
-              <Button asChild type="default">
+              <Button asChild variant="default">
                 <Link href="/account/security">Set up MFA</Link>
               </Button>
             }

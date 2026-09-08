@@ -6,16 +6,16 @@ import {
   Button_Shadcn_ as Button,
   cn,
   Command,
-  CommandGroup as CommandGroup,
+  CommandGroup,
   CommandInput,
-  CommandItem as CommandItem,
-  CommandList as CommandList,
+  CommandItem,
+  CommandList,
   Popover,
   PopoverContent,
   PopoverTrigger,
   ScrollArea,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export interface ComboBoxOption {
   id: string
@@ -86,6 +86,7 @@ export function ComboBox<Opt extends ComboBoxOption>({
           role="combobox"
           disabled={disabled}
           aria-expanded={open}
+          aria-label={`Select your ${name}`}
           className={cn(
             'overflow-hidden',
             'h-auto min-h-10',

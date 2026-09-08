@@ -24,19 +24,6 @@ export const gettingStarted: SidebarNavGroup = {
   ],
 }
 
-export const aiEditorsRules: SidebarNavGroup = {
-  title: 'AI Skills',
-  items: [
-    {
-      title: 'Skills',
-      href: '/docs/ai-editors-rules/skills',
-      items: [],
-      new: true,
-      commandItemLabel: 'AI Skills',
-    },
-  ],
-}
-
 export const platformBlocks: SidebarNavGroup = {
   title: 'Platform',
   items: [
@@ -45,6 +32,33 @@ export const platformBlocks: SidebarNavGroup = {
       href: '/docs/platform/platform-kit',
       items: [],
       commandItemLabel: 'Platform Kit',
+    },
+  ],
+}
+
+export const oauthBlocks: SidebarNavGroup = {
+  title: 'OAuth',
+  items: [
+    {
+      title: 'OAuth Consent',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/oauth-consent',
+      items: [],
+      new: true,
+      commandItemLabel: 'OAuth Consent',
+    },
+  ],
+}
+
+export const mcpBlocks: SidebarNavGroup = {
+  title: 'MCP',
+  items: [
+    {
+      title: 'MCP Server',
+      href: '/docs/headless/mcp-server',
+      items: [],
+      new: true,
+      commandItemLabel: 'MCP Server',
     },
   ],
 }
@@ -142,11 +156,15 @@ export const COMMAND_ITEMS = [
     label: item.commandItemLabel,
     href: item.href,
   })),
-  ...aiEditorsRules.items.map((item) => ({
+  ...componentPages.items.map((item) => ({
     label: item.commandItemLabel,
     href: item.href,
   })),
-  ...componentPages.items.map((item) => ({
+  ...oauthBlocks.items.map((item) => ({
+    label: item.commandItemLabel,
+    href: item.href,
+  })),
+  ...mcpBlocks.items.map((item) => ({
     label: item.commandItemLabel,
     href: item.href,
   })),

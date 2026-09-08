@@ -2,12 +2,8 @@
 
 import React from 'react'
 
-import styleHandler from '../../lib/theme/styleHandler'
 import { cn } from '../../lib/utils/cn'
 import { IconContext } from './IconContext'
-
-// @ts-ignore
-// import IconStyles from './Icon.module.css'
 
 interface Props {
   className?: string
@@ -40,8 +36,6 @@ function IconBase({
   icon,
   ...props
 }: Props) {
-  const __styles = styleHandler('icon')
-
   return (
     <IconContext.Consumer>
       {({ contextSize, className: contextClassName }) => {
@@ -122,7 +116,11 @@ function IconBase({
           IconComponent()
         )
 
-        return background ? <div className={__styles.container}>{Icon}</div> : Icon
+        return background ? (
+          <div className="shrink-0 flex items-center justify-center rounded-full p-3">{Icon}</div>
+        ) : (
+          Icon
+        )
       }}
     </IconContext.Consumer>
   )

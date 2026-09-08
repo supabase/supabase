@@ -32,12 +32,7 @@ export const instanceSizeSpecs: Record<
     cpu: '2-core',
     priceHourly: 0.01344,
     priceMonthly: 10,
-    cloud_providers: [
-      PROVIDERS.AWS.id,
-      PROVIDERS.AWS_K8S.id,
-      PROVIDERS.AWS_NIMBUS.id,
-      PROVIDERS.FLY.id,
-    ],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
   },
   small: {
     label: 'Small',
@@ -45,12 +40,7 @@ export const instanceSizeSpecs: Record<
     cpu: '2-core',
     priceHourly: 0.0206,
     priceMonthly: 15,
-    cloud_providers: [
-      PROVIDERS.AWS.id,
-      PROVIDERS.AWS_K8S.id,
-      PROVIDERS.AWS_NIMBUS.id,
-      PROVIDERS.FLY.id,
-    ],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
   },
   medium: {
     label: 'Medium',
@@ -58,12 +48,7 @@ export const instanceSizeSpecs: Record<
     cpu: '2-core',
     priceHourly: 0.0822,
     priceMonthly: 60,
-    cloud_providers: [
-      PROVIDERS.AWS.id,
-      PROVIDERS.AWS_K8S.id,
-      PROVIDERS.AWS_NIMBUS.id,
-      PROVIDERS.FLY.id,
-    ],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
   },
   large: {
     label: 'Large',
@@ -71,12 +56,7 @@ export const instanceSizeSpecs: Record<
     cpu: '2-core',
     priceHourly: 0.1517,
     priceMonthly: 110,
-    cloud_providers: [
-      PROVIDERS.AWS.id,
-      PROVIDERS.AWS_K8S.id,
-      PROVIDERS.AWS_NIMBUS.id,
-      PROVIDERS.FLY.id,
-    ],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
   },
   xlarge: {
     label: 'XL',
@@ -84,12 +64,7 @@ export const instanceSizeSpecs: Record<
     cpu: '4-core',
     priceHourly: 0.2877,
     priceMonthly: 210,
-    cloud_providers: [
-      PROVIDERS.AWS.id,
-      PROVIDERS.AWS_K8S.id,
-      PROVIDERS.AWS_NIMBUS.id,
-      PROVIDERS.FLY.id,
-    ],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
   },
   '2xlarge': {
     label: '2XL',
@@ -97,12 +72,7 @@ export const instanceSizeSpecs: Record<
     cpu: '8-core',
     priceHourly: 0.562,
     priceMonthly: 410,
-    cloud_providers: [
-      PROVIDERS.AWS.id,
-      PROVIDERS.AWS_K8S.id,
-      PROVIDERS.AWS_NIMBUS.id,
-      PROVIDERS.FLY.id,
-    ],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
   },
   '4xlarge': {
     label: '4XL',
@@ -110,12 +80,7 @@ export const instanceSizeSpecs: Record<
     cpu: '16-core',
     priceHourly: 1.32,
     priceMonthly: 960,
-    cloud_providers: [
-      PROVIDERS.AWS.id,
-      PROVIDERS.AWS_K8S.id,
-      PROVIDERS.AWS_NIMBUS.id,
-      PROVIDERS.FLY.id,
-    ],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
   },
   '8xlarge': {
     label: '8XL',

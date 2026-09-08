@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 
 export default function updateStatus(req: NextApiRequest, res: NextApiResponse) {
   return apiWrapper(req, res, handler)

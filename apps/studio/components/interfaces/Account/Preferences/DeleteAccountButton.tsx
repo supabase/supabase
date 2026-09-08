@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -63,7 +63,7 @@ export const DeleteAccountButton = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: { account: '' },
   })
-  const { account } = form.watch()
+  const account = useWatch({ control: form.control, name: 'account' })
 
   const { mutate: submitSupportTicket, isPending } = useSendSupportTicketMutation({
     onSuccess: () => {
@@ -106,7 +106,7 @@ export const DeleteAccountButton = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button type="danger" loading={!accountEmail}>
+        <Button variant="danger" loading={!accountEmail}>
           Request to delete account
         </Button>
       </DialogTrigger>
@@ -144,7 +144,7 @@ export const DeleteAccountButton = () => {
                   </span>
                 </DialogSection>
                 <DialogFooter>
-                  <Button block type="primary" size="medium" onClick={() => setIsOpen(false)}>
+                  <Button block variant="primary" size="medium" onClick={() => setIsOpen(false)}>
                     Understood
                   </Button>
                 </DialogFooter>
@@ -184,8 +184,8 @@ export const DeleteAccountButton = () => {
                     <Button
                       block
                       size="small"
-                      type="danger"
-                      htmlType="submit"
+                      variant="danger"
+                      type="submit"
                       loading={isPending}
                       disabled={account !== accountEmail || isPending}
                     >

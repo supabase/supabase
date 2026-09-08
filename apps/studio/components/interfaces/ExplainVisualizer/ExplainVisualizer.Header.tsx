@@ -7,7 +7,7 @@ import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/L
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export interface ExplainSummary {
   totalTime: number
@@ -129,11 +129,11 @@ export function ExplainHeader({ mode, onToggleMode, summary, id, rows }: Explain
               onOpenAssistant={handleExplainWithAI}
               telemetrySource="explain_visualizer"
               size="tiny"
-              type="default"
+              variant="default"
             />
           )}
           <Button
-            type="default"
+            variant="default"
             size="tiny"
             icon={isVisual ? <Code size={14} /> : <Eye size={14} />}
             onClick={onToggleMode}

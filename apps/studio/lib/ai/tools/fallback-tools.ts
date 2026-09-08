@@ -1,6 +1,5 @@
 import { getEntityDefinitionsSql } from '@supabase/pg-meta'
 import { tool } from 'ai'
-// import { processSql, renderSupabaseJs } from '@supabase/sql-to-rest'
 import { IS_PLATFORM } from 'common'
 import { stripIndent } from 'common-tags'
 import { z } from 'zod'
@@ -91,10 +90,9 @@ export const getFallbackTools = ({
               {
                 projectRef,
                 connectionString,
-                schema: schemas?.join(','),
+                schemas,
               },
-              undefined,
-              headers
+              undefined
             )
           : []
 

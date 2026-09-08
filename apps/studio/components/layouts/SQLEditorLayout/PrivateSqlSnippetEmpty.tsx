@@ -1,6 +1,6 @@
 import { Pointer } from 'lucide-react'
 import { TreeViewItem } from 'ui'
-import { InnerSideBarEmptyPanel } from 'ui-patterns'
+import { InnerSideBarEmptyPanel } from 'ui-patterns/InnerSideMenu'
 
 export const EmptyPrivateQueriesPanel = () => (
   <InnerSideBarEmptyPanel

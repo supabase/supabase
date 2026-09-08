@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { useMemo } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -22,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
@@ -32,6 +33,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
 import { type DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
@@ -72,10 +74,15 @@ export const EnableExtensionModal = ({
     },
     { enabled: visible }
   )
-  const availableSchemas = schemas.filter(
-    (schema) =>
-      schema.name === recommendedSchema ||
-      !protectedSchemas.some((protectedSchema) => protectedSchema.name === schema.name)
+  const visibleSchemas = useSchemasFilteredForHighAvailability(schemas)
+  const availableSchemas = useMemo(
+    () =>
+      visibleSchemas.filter(
+        (schema) =>
+          schema.name === recommendedSchema ||
+          !protectedSchemas.some((protectedSchema) => protectedSchema.name === schema.name)
+      ),
+    [visibleSchemas, recommendedSchema, protectedSchemas]
   )
 
   // [Joshen] Hard-coding pg_cron here as this is enforced on our end (Not via pg_available_extension_versions)
@@ -99,7 +106,7 @@ export const EnableExtensionModal = ({
     resolver: zodResolver(FormSchema),
     defaultValues,
   })
-  const { schema } = form.watch()
+  const schema = useWatch({ control: form.control, name: 'schema' })
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     if (project === undefined) return console.error('Project is required')
@@ -147,23 +154,6 @@ export const EnableExtensionModal = ({
               OrioleDB access method
             </span>
             <DocsButton abbrev={false} className="mt-2" href={`${DOCS_URL}`} />
-          </Admonition>
-        )}
-
-        {extension.name === 'pg_cron' && project?.cloud_provider === 'FLY' && (
-          <Admonition
-            type="warning"
-            title="The pg_cron extension is not fully supported for Fly projects"
-            className="border-x-0 border-t-0 rounded-none"
-          >
-            <p>
-              You can still enable the extension, but pg_cron jobs may not run due to the behavior
-              of Fly projects.
-            </p>
-            <DocsButton
-              className="mt-2"
-              href={`${DOCS_URL}/guides/platform/fly-postgres#limitations`}
-            />
           </Admonition>
         )}
 
@@ -249,7 +239,7 @@ export const EnableExtensionModal = ({
                       name="name"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItemLayout name="name" label="Schema name">
+                        <FormItemLayout label="Schema name">
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -264,11 +254,11 @@ export const EnableExtensionModal = ({
         </DialogSection>
 
         <DialogFooter>
-          <Button type="default" disabled={isEnabling} onClick={() => onCancel()}>
+          <Button variant="default" disabled={isEnabling} onClick={() => onCancel()}>
             Cancel
           </Button>
           <Button
-            htmlType="submit"
+            type="submit"
             form="enable-extensions-form"
             loading={isEnabling}
             disabled={isLoading || isEnabling}

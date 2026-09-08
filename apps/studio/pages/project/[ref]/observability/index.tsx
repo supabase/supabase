@@ -7,7 +7,7 @@ import { LogoLoader } from 'ui'
 
 import { ObservabilityOverview } from '@/components/interfaces/Observability/ObservabilityOverview'
 import { CreateReportModal } from '@/components/interfaces/Reports/CreateReportModal'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
 import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
 import { useContentQuery } from '@/data/content/content-query'

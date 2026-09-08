@@ -43,7 +43,11 @@ export function ClientLibraryInfo({ form, category, library }: ClientLibraryInfo
           <FormItemLayout layout="vertical" label="Which library are you having issues with">
             <FormControl>
               <Select {...field} defaultValue={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="w-full" aria-label="Select a library">
+                <SelectTrigger
+                  data-support-field="library"
+                  className="w-full"
+                  aria-label="Select a library"
+                >
                   <SelectValue placeholder="Select a library" />
                 </SelectTrigger>
                 <SelectContent>
@@ -96,7 +100,11 @@ const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
                 </p>
               </div>
               <div>
-                <Button asChild type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
+                <Button
+                  asChild
+                  variant="default"
+                  icon={<ExternalLink size={14} strokeWidth={1.5} />}
+                >
                   <Link href={lib.url} target="_blank" rel="noreferrer">
                     View GitHub issues
                   </Link>
@@ -116,7 +124,7 @@ const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
             <p className="text-sm text-foreground-light">For any issues about our API</p>
           </div>
           <div>
-            <Button asChild type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
+            <Button asChild variant="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
               <Link href="https://github.com/supabase/supabase" target="_blank" rel="noreferrer">
                 View GitHub issues
               </Link>

@@ -1,13 +1,17 @@
 import { getTableEditorSql } from '@supabase/pg-meta'
 import { QueryClient, queryOptions, useQuery } from '@tanstack/react-query'
+import { useFlag } from 'common'
 
 import { tableEditorKeys } from './keys'
 import { Entity } from './table-editor-types'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
+export const PG_META_SCOPED_INTROSPECTION_FLAG = 'pgMetaScopedIntrospection'
+
 type TableEditorArgs = {
   id?: number
+  scoped?: boolean
 }
 
 export type TableEditorVariables = TableEditorArgs & {
@@ -16,14 +20,14 @@ export type TableEditorVariables = TableEditorArgs & {
 }
 
 export async function getTableEditor(
-  { projectRef, connectionString, id }: TableEditorVariables,
+  { projectRef, connectionString, id, scoped = false }: TableEditorVariables,
   signal?: AbortSignal
 ) {
   if (!id) {
     throw new Error('id is required')
   }
 
-  const sql = getTableEditorSql({ id })
+  const sql = getTableEditorSql({ id, scoped })
   const { result } = await executeSql(
     {
       projectRef,
@@ -46,9 +50,11 @@ export const useTableEditorQuery = <TData = TableEditorData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<TableEditorData, TableEditorError, TData> = {}
-) =>
-  useQuery<TableEditorData, TableEditorError, TData>({
-    ...tableEditorQueryOptions({ projectRef, connectionString, id }),
+) => {
+  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
+
+  return useQuery<TableEditorData, TableEditorError, TData>({
+    ...tableEditorQueryOptions({ projectRef, connectionString, id, scoped }),
     enabled:
       enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
     refetchOnWindowFocus: false,
@@ -56,21 +62,23 @@ export const useTableEditorQuery = <TData = TableEditorData>(
     staleTime: 5 * 60 * 1000,
     ...options,
   })
+}
 
 export function prefetchTableEditor(
   client: QueryClient,
-  { projectRef, connectionString, id }: TableEditorVariables
+  { projectRef, connectionString, id, scoped }: TableEditorVariables
 ) {
-  return client.fetchQuery(tableEditorQueryOptions({ projectRef, connectionString, id }))
+  return client.fetchQuery(tableEditorQueryOptions({ projectRef, connectionString, id, scoped }))
 }
 
 export const tableEditorQueryOptions = <TData = TableEditorData>({
   projectRef,
   connectionString,
   id,
+  scoped,
 }: TableEditorVariables) => {
   return queryOptions<TableEditorData, TableEditorError, TData>({
-    queryKey: tableEditorKeys.tableEditor(projectRef, id),
-    queryFn: ({ signal }) => getTableEditor({ projectRef, connectionString, id }, signal),
+    queryKey: [...tableEditorKeys.tableEditor(projectRef, id), { scoped: !!scoped }],
+    queryFn: ({ signal }) => getTableEditor({ projectRef, connectionString, id, scoped }, signal),
   })
 }

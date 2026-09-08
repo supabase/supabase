@@ -9,11 +9,11 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 const WRAPPER_REQUIRED_EXTENSION_NAMES = ['wrappers', 'supabase_vault']
 
 interface AddWrapperButtonProps {
-  type?: 'default' | 'primary' | 'outline'
+  variant?: 'default' | 'primary' | 'outline'
   onClick: () => void
 }
 
-export const AddWrapperButton = ({ type = 'default', onClick }: AddWrapperButtonProps) => {
+export const AddWrapperButton = ({ variant = 'default', onClick }: AddWrapperButtonProps) => {
   const { can: canCreateWrapper } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'wrappers'
@@ -35,7 +35,7 @@ export const AddWrapperButton = ({ type = 'default', onClick }: AddWrapperButton
 
   return (
     <ButtonTooltip
-      type={type}
+      variant={variant}
       onClick={onClick}
       disabled={!canCreateWrapper}
       tooltip={{

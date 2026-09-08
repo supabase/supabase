@@ -83,7 +83,7 @@ export const WorkflowLogsCard = ({
             {overrideAction}
             {onClose && (
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
                 icon={<X size={12} strokeWidth={1.5} />}
                 onClick={onClose}

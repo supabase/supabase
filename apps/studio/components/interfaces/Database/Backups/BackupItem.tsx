@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Download } from 'lucide-react'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -13,11 +13,18 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 interface BackupItemProps {
   index: number
   isHealthy: boolean
+  isHighAvailability: boolean
   backup: DatabaseBackup
   onSelectBackup: () => void
 }
 
-export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupItemProps) => {
+export const BackupItem = ({
+  index,
+  isHealthy,
+  isHighAvailability,
+  backup,
+  onSelectBackup,
+}: BackupItemProps) => {
   const { ref: projectRef } = useParams()
   const { can: canTriggerScheduledBackups } = useAsyncCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
@@ -37,22 +44,30 @@ export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupI
     },
   })
 
+  function getTooltipText() {
+    if (isHighAvailability) {
+      return 'Restoring from a backup is unavailable on High Availability projects'
+    } else if (!isHealthy) {
+      return 'Cannot be restored as project is not active'
+    } else if (!canTriggerScheduledBackups) {
+      return 'You need additional permissions to trigger a restore'
+    } else {
+      return undefined
+    }
+  }
+
   const generateSideButtons = (backup: DatabaseBackup) => {
     if (backup.status === 'COMPLETED')
       return (
         <div className="flex space-x-4">
           <ButtonTooltip
-            type="default"
-            disabled={!isHealthy || !canTriggerScheduledBackups}
+            variant="default"
+            disabled={!isHealthy || !canTriggerScheduledBackups || isHighAvailability}
             onClick={onSelectBackup}
             tooltip={{
               content: {
                 side: 'bottom',
-                text: !isHealthy
-                  ? 'Cannot be restored as project is not active'
-                  : !canTriggerScheduledBackups
-                    ? 'You need additional permissions to trigger a restore'
-                    : undefined,
+                text: getTooltipText(),
               },
             }}
           >
@@ -61,7 +76,7 @@ export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupI
 
           {!backup.isPhysicalBackup && (
             <ButtonTooltip
-              type="default"
+              variant="default"
               icon={<Download />}
               loading={isDownloading}
               disabled={!canTriggerScheduledBackups || isDownloading}

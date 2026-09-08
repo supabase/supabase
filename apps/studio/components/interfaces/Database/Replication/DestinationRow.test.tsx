@@ -8,14 +8,13 @@ import { DestinationRow } from './DestinationRow'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type ReplicationPipelinesResponse = components['schemas']['ReplicationPipelinesResponse']
-type ReplicationDestinationResponse = components['schemas']['ReplicationDestinationResponse']
-type ReplicationSourcesResponse = components['schemas']['ReplicationSourcesResponse']
-type ReplicationPipelineStatusResponse = components['schemas']['ReplicationPipelineStatusResponse']
+type ReplicationPipelinesResponse = components['schemas']['PipelinesResponse_Output']
+type ReplicationDestinationResponse = components['schemas']['DestinationResponse_Output']
+type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
+type ReplicationPipelineStatusResponse = components['schemas']['PipelineStatusResponse_Output']
 type ReplicationPipelineReplicationStatusResponse =
-  components['schemas']['ReplicationPipelineReplicationStatusResponse']
-type ReplicationPipelineVersionResponse =
-  components['schemas']['ReplicationPipelineVersionResponse']
+  components['schemas']['PipelineReplicationStatusResponse_Output']
+type ReplicationPipelineVersionResponse = components['schemas']['PipelineVersionResponse_Output']
 
 // Tooltip/Popover descendants use Web Animations
 mockAnimationsApi()
@@ -72,7 +71,11 @@ const addDestinationMock = () =>
         id: DESTINATION_ID,
         name: 'My BigQuery Destination',
         config: {
-          big_query: { project_id: 'gcp-proj', dataset_id: 'analytics', service_account_key: '{}' },
+          big_query: {
+            project_id: 'gcp-proj',
+            dataset_id: 'analytics',
+            connection_pool_size: 5,
+          },
         },
       }),
   })
@@ -92,7 +95,10 @@ const addPipelinesMock = () =>
             destination_id: DESTINATION_ID,
             destination_name: 'My BigQuery Destination',
             replicator_id: 9001,
-            config: { publication_name: 'supabase_realtime' },
+            config: {
+              publication_name: 'supabase_realtime',
+              table_sync_copy: { type: 'include_all_tables' },
+            },
           },
         ],
       }),
@@ -227,6 +233,9 @@ describe('DestinationRow', () => {
     addPipelineStatusMock('started')
     addReplicationStatusMock(0, [
       {
+        id: 1,
+        schema: 'public',
+        name: 'orders',
         table_id: 1,
         table_name: 'public.orders',
         state: { name: 'error', reason: 'table not found', retry_policy: { policy: 'no_retry' } },
@@ -249,6 +258,9 @@ describe('DestinationRow', () => {
     addPipelineStatusMock('stopped')
     addReplicationStatusMock(0, [
       {
+        id: 1,
+        schema: 'public',
+        name: 'orders',
         table_id: 1,
         table_name: 'public.orders',
         state: { name: 'error', reason: 'table not found', retry_policy: { policy: 'no_retry' } },

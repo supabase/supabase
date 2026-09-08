@@ -45,7 +45,7 @@ const MaintenancePage: NextPageWithLayout = () => {
           <p className="text-sm text-foreground-lighter">
             Reload the page to check if the maintenance window has ended
           </p>
-          <Button onClick={() => window.location.reload()} type="primary" icon={<RefreshCw />}>
+          <Button onClick={() => window.location.reload()} variant="primary" icon={<RefreshCw />}>
             Reload
           </Button>
         </div>

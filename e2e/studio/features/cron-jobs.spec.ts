@@ -70,6 +70,27 @@ const unscheduleJobByIdViaAPI = async (page: Page, ref: string, jobId: number) =
   })
 }
 
+// Mirrors CRON_CLEANUP_JOB_NAME in @supabase/pg-meta (not a dependency of this package).
+// The name is hardcoded in the product, so tests touching the cleanup feature contend on
+// this single global name.
+const CLEANUP_JOB_NAME = 'delete-job-run-details'
+
+// Runs in the page context (supabase_admin) because cron.unschedule by name only finds jobs
+// the calling role can manage, and the UI schedules the job as supabase_admin. Deletes
+// tolerantly since the job may or may not exist.
+const unscheduleCleanupJobIfExists = async (page: Page, ref: string) => {
+  await page.request.post(toUrl(`/api/platform/pg-meta/${ref}/query`), {
+    failOnStatusCode: true,
+    data: {
+      query: `do $$ begin
+        if exists (select 1 from cron.job where jobname = '${CLEANUP_JOB_NAME}') then
+          perform cron.unschedule('${CLEANUP_JOB_NAME}');
+        end if;
+      end $$;`,
+    },
+  })
+}
+
 test.describe('Cron Jobs', () => {
   test.beforeAll(async () => {
     await withFileOnceSetup(import.meta.url, async () => {
@@ -341,205 +362,298 @@ test.describe('Cron Jobs', () => {
     })
   })
 
-  test.describe('High Query Cost Banner', () => {
-    test('shows banner and still displays cron jobs when query cost exceeds threshold', async ({
-      page,
-      ref,
-    }) => {
-      const testJobName = 'pw_high_cost_test_job'
-      await navigateToCronJobsPage(page, ref)
-      await using _ = await withSetupCleanup(
-        async () => {
-          await createJobViaAPI(page, ref, testJobName)
-        },
-        async () => {
-          await deleteJobViaAPI(page, ref, testJobName)
-        }
-      )
+  // Both groups below schedule the product-wide delete-job-run-details job, so they contend
+  // on a single global job name. Opt out of fullyParallel for them (sequential, same worker)
+  // to avoid cross-worker races on that name.
+  test.describe('Cleanup Job Scheduling', () => {
+    test.describe.configure({ mode: 'default' })
 
-      // Now set up the mock for the EXPLAIN query (preflight check) to return high cost
-      // This simulates the scenario where cron.job_run_details is too large
-      await page.route('**/pg-meta/*/query**', async (route) => {
-        const request = route.request()
-        const postData = request.postDataJSON()
+    // Regression test for FE-3724: the "Enable cleanup" header button schedules the daily
+    // job_run_details cleanup job without waiting for the high-query-cost banner. Covers the
+    // full cycle in one scenario because the states are causally chained: schedule via the
+    // dialog (button hides), then delete the job and verify the button reappears without a
+    // reload (the cache-invalidation regression).
+    test.describe('Enable Cleanup Button', () => {
+      test('schedules the cleanup job and reappears after the job is deleted', async ({
+        page,
+        ref,
+      }) => {
+        await using _ = await withSetupCleanup(
+          async () => {
+            await unscheduleCleanupJobIfExists(page, ref)
+          },
+          async () => {
+            await unscheduleCleanupJobIfExists(page, ref)
+          }
+        )
+        await navigateToCronJobsPage(page, ref)
 
-        // Intercept EXPLAIN queries for the cron jobs query (the preflight check)
-        if (
-          postData?.query?.toLowerCase().startsWith('explain') &&
-          postData?.query?.includes('cron.job')
-        ) {
-          // Return a mock EXPLAIN result with very high cost (over 100,000 threshold)
-          await route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify([
-              {
-                'QUERY PLAN':
-                  'Nested Loop Left Join  (cost=0.00..500000.00 rows=1000000 width=100)',
-              },
-            ]),
-          })
-        } else {
-          await route.continue()
-        }
+        const enableCleanupButton = page.getByRole('button', { name: 'Enable cleanup' })
+        await expect(
+          enableCleanupButton,
+          'Enable cleanup button should be visible when the cleanup job does not exist'
+        ).toBeVisible({ timeout: 30000 })
+
+        await enableCleanupButton.click()
+
+        const dialog = page.getByRole('dialog')
+        await expect(
+          dialog.getByRole('heading', { name: 'Enable automatic cleanup' }),
+          'Dialog should open with the enable cleanup title'
+        ).toBeVisible()
+        await expect(
+          dialog.getByRole('combobox'),
+          'Retention select should default to 7 days'
+        ).toContainText('Older than 7 days')
+        await expect(
+          dialog.getByText(/cron\.schedule/),
+          'Dialog should preview the SQL that will run'
+        ).toBeVisible()
+
+        await dialog.getByRole('button', { name: 'Enable cleanup' }).click()
+
+        await expect(
+          page.getByText('Scheduled daily cleanup job.'),
+          'Success toast should appear after scheduling'
+        ).toBeVisible({ timeout: 15000 })
+
+        // The scheduled job shows up in the grid and the header button hides, both without a reload
+        const jobRow = page.getByRole('row', { name: new RegExp(CLEANUP_JOB_NAME) })
+        await expect(jobRow, 'Scheduled cleanup job should appear in the grid').toBeVisible({
+          timeout: 10000,
+        })
+        await expect(
+          enableCleanupButton,
+          'Enable cleanup button should hide once the cleanup job exists'
+        ).toHaveCount(0)
+
+        // Delete the job from the grid and verify the button comes back without a reload
+        await jobRow.click({ button: 'right' })
+        await page.getByRole('menuitem', { name: 'Delete job' }).click()
+        await expect(page.getByRole('heading', { name: 'Delete this cron job' })).toBeVisible()
+        await page.getByPlaceholder('Type in name of cron job').fill(CLEANUP_JOB_NAME)
+        await page.getByRole('button', { name: `Delete cron job ${CLEANUP_JOB_NAME}` }).click()
+
+        await expect(page.getByText(/Successfully removed cron job/)).toBeVisible({
+          timeout: 10000,
+        })
+        await expect(jobRow).not.toBeVisible({ timeout: 10000 })
+        await expect(
+          enableCleanupButton,
+          'Enable cleanup button should reappear after the cleanup job is deleted'
+        ).toBeVisible({ timeout: 10000 })
       })
-
-      // Navigate to the cron jobs page - this will trigger the mocked preflight check
-      await page.goto(toUrl(`/project/${ref}/integrations/cron/jobs`))
-
-      // Wait for the grid to load - this verifies cron jobs are still visible in minimal mode
-      await expect(page.getByRole('grid')).toBeVisible({ timeout: 30000 })
-
-      // Should show the overflow banner (minimal mode indicator)
-      await expect(
-        page.getByText('Last run for each cron job omitted due to high query cost')
-      ).toBeVisible({
-        timeout: 15000,
-      })
-
-      // The test job should still be visible in the grid (minimal mode shows jobs without last run)
-      await expect(page.getByRole('row', { name: new RegExp(testJobName) })).toBeVisible()
-
-      // An alert about high query costs should be visible and contain a "Learn more" button
-      await expect(
-        page.getByRole('alert').getByRole('button', { name: 'Learn more' })
-      ).toBeVisible()
-
-      // Remove the route mock for subsequent tests
-      await page.unroute('**/pg-meta/*/query**')
     })
 
-    test('Learn more dialog shows cleanup options', async ({ page, ref }) => {
-      // Set up the mock again for this test
-      await page.route('**/pg-meta/*/query**', async (route) => {
-        const request = route.request()
-        const postData = request.postDataJSON()
+    test.describe('High Query Cost Banner', () => {
+      test('shows banner and still displays cron jobs when query cost exceeds threshold', async ({
+        page,
+        ref,
+      }) => {
+        const testJobName = 'pw_high_cost_test_job'
+        await navigateToCronJobsPage(page, ref)
+        await using _ = await withSetupCleanup(
+          async () => {
+            await createJobViaAPI(page, ref, testJobName)
+          },
+          async () => {
+            await deleteJobViaAPI(page, ref, testJobName)
+          }
+        )
 
-        if (
-          postData?.query?.toLowerCase().startsWith('explain') &&
-          postData?.query?.includes('cron.job')
-        ) {
-          await route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify([
-              {
-                'QUERY PLAN':
-                  'Nested Loop Left Join  (cost=0.00..500000.00 rows=1000000 width=100)',
-              },
-            ]),
-          })
-        } else {
-          await route.continue()
-        }
+        // Now set up the mock for the EXPLAIN query (preflight check) to return high cost
+        // This simulates the scenario where cron.job_run_details is too large
+        await page.route('**/pg-meta/*/query**', async (route) => {
+          const request = route.request()
+          const postData = request.postDataJSON()
+
+          // Intercept EXPLAIN queries for the cron jobs query (the preflight check)
+          if (
+            postData?.query?.toLowerCase().startsWith('explain') &&
+            postData?.query?.includes('cron.job')
+          ) {
+            // Return a mock EXPLAIN result with very high cost (over 100,000 threshold)
+            await route.fulfill({
+              status: 200,
+              contentType: 'application/json',
+              body: JSON.stringify([
+                {
+                  'QUERY PLAN':
+                    'Nested Loop Left Join  (cost=0.00..500000.00 rows=1000000 width=100)',
+                },
+              ]),
+            })
+          } else {
+            await route.continue()
+          }
+        })
+
+        // Navigate to the cron jobs page - this will trigger the mocked preflight check
+        await page.goto(toUrl(`/project/${ref}/integrations/cron/jobs`))
+
+        // Wait for the grid to load - this verifies cron jobs are still visible in minimal mode
+        await expect(page.getByRole('grid')).toBeVisible({ timeout: 30000 })
+
+        // Should show the overflow banner (minimal mode indicator)
+        await expect(
+          page.getByText('Last run for each cron job omitted due to high query cost')
+        ).toBeVisible({
+          timeout: 15000,
+        })
+
+        // The test job should still be visible in the grid (minimal mode shows jobs without last run)
+        await expect(page.getByRole('row', { name: new RegExp(testJobName) })).toBeVisible()
+
+        // An alert about high query costs should be visible and contain a "Learn more" button
+        await expect(
+          page.getByRole('alert').getByRole('button', { name: 'Learn more' })
+        ).toBeVisible()
+
+        // Remove the route mock for subsequent tests
+        await page.unroute('**/pg-meta/*/query**')
       })
 
-      await page.goto(toUrl(`/project/${ref}/integrations/cron/jobs`))
+      test('Learn more dialog shows cleanup options', async ({ page, ref }) => {
+        // Set up the mock again for this test
+        await page.route('**/pg-meta/*/query**', async (route) => {
+          const request = route.request()
+          const postData = request.postDataJSON()
 
-      // Wait for the banner to appear
-      await expect(
-        page.getByText('Last run for each cron job omitted due to high query cost')
-      ).toBeVisible({
-        timeout: 15000,
+          if (
+            postData?.query?.toLowerCase().startsWith('explain') &&
+            postData?.query?.includes('cron.job')
+          ) {
+            await route.fulfill({
+              status: 200,
+              contentType: 'application/json',
+              body: JSON.stringify([
+                {
+                  'QUERY PLAN':
+                    'Nested Loop Left Join  (cost=0.00..500000.00 rows=1000000 width=100)',
+                },
+              ]),
+            })
+          } else {
+            await route.continue()
+          }
+        })
+
+        await page.goto(toUrl(`/project/${ref}/integrations/cron/jobs`))
+
+        // Wait for the banner to appear
+        await expect(
+          page.getByText('Last run for each cron job omitted due to high query cost')
+        ).toBeVisible({
+          timeout: 15000,
+        })
+
+        // Click the "Learn more" button in the alert to open the dialog
+        await page.getByRole('alert').getByRole('button', { name: 'Learn more' }).click()
+
+        // The dialog should open with the explanation
+        await expect(
+          page.getByRole('heading', { name: 'Last run for cron jobs omitted for overview' })
+        ).toBeVisible()
+
+        // Should explain the issue
+        await expect(
+          page.getByText(/the estimated query cost exceeds safety thresholds/)
+        ).toBeVisible()
+
+        // Should show Step 1 with cleanup options
+        await expect(page.getByText('Step 1: Delete older entries')).toBeVisible()
+        await expect(page.getByRole('button', { name: 'Delete rows now' })).toBeVisible()
+
+        // Should show the interval selector
+        await expect(page.getByRole('combobox')).toBeVisible()
+
+        // Should show Step 2 (disabled until step 1 is complete)
+        await expect(page.getByText('Step 2: Schedule an automated cleanup')).toBeVisible()
+        await expect(
+          page.getByText('Complete step 1 to enable scheduling a daily cleanup job')
+        ).toBeVisible()
+
+        // Remove the route mock
+        await page.unroute('**/pg-meta/*/query**')
       })
 
-      // Click the "Learn more" button in the alert to open the dialog
-      await page.getByRole('alert').getByRole('button', { name: 'Learn more' }).click()
+      test('cleanup workflow: delete rows and schedule cleanup job', async ({ page, ref }) => {
+        // This flow schedules the delete-job-run-details job; remove it afterwards so tests
+        // that depend on the job's absence (Enable Cleanup Button) start clean. Deleting via
+        // the UI here causes pointer events issues with Radix dialogs, hence via SQL.
+        await using _ = await withSetupCleanup(
+          async () => {},
+          async () => {
+            await unscheduleCleanupJobIfExists(page, ref)
+          }
+        )
 
-      // The dialog should open with the explanation
-      await expect(
-        page.getByRole('heading', { name: 'Last run for cron jobs omitted for overview' })
-      ).toBeVisible()
+        // Set up the mock for the high cost scenario
+        await page.route('**/pg-meta/*/query**', async (route) => {
+          const request = route.request()
+          const postData = request.postDataJSON()
 
-      // Should explain the issue
-      await expect(
-        page.getByText(/the estimated query cost exceeds safety thresholds/)
-      ).toBeVisible()
+          if (
+            postData?.query?.toLowerCase().startsWith('explain') &&
+            postData?.query?.includes('cron.job')
+          ) {
+            await route.fulfill({
+              status: 200,
+              contentType: 'application/json',
+              body: JSON.stringify([
+                {
+                  'QUERY PLAN':
+                    'Nested Loop Left Join  (cost=0.00..500000.00 rows=1000000 width=100)',
+                },
+              ]),
+            })
+          } else {
+            await route.continue()
+          }
+        })
 
-      // Should show Step 1 with cleanup options
-      await expect(page.getByText('Step 1: Delete older entries')).toBeVisible()
-      await expect(page.getByRole('button', { name: 'Delete rows now' })).toBeVisible()
+        await page.goto(toUrl(`/project/${ref}/integrations/cron/jobs`))
 
-      // Should show the interval selector
-      await expect(page.getByRole('combobox')).toBeVisible()
+        // Wait for the banner and click Learn more
+        await expect(
+          page.getByText('Last run for each cron job omitted due to high query cost')
+        ).toBeVisible({
+          timeout: 15000,
+        })
+        await page.getByRole('alert').getByRole('button', { name: 'Learn more' }).click()
 
-      // Should show Step 2 (disabled until step 1 is complete)
-      await expect(page.getByText('Step 2: Schedule an automated cleanup')).toBeVisible()
-      await expect(
-        page.getByText('Complete step 1 to enable scheduling a daily cleanup job')
-      ).toBeVisible()
+        // Wait for dialog to open
+        await expect(
+          page.getByRole('heading', { name: 'Last run for cron jobs omitted for overview' })
+        ).toBeVisible()
 
-      // Remove the route mock
-      await page.unroute('**/pg-meta/*/query**')
-    })
+        // Step 1: Click "Delete rows now" to run the cleanup
+        await page.getByRole('button', { name: 'Delete rows now' }).click()
 
-    test('cleanup workflow: delete rows and schedule cleanup job', async ({ page, ref }) => {
-      // Set up the mock for the high cost scenario
-      await page.route('**/pg-meta/*/query**', async (route) => {
-        const request = route.request()
-        const postData = request.postDataJSON()
+        // Wait for Step 1 to complete - should show success message
+        // Note: In a fresh DB, there might be 0 rows deleted, which is still success
+        await expect(page.getByText(/Successfully deleted \d+ rows/)).toBeVisible({
+          timeout: 30000,
+        })
 
-        if (
-          postData?.query?.toLowerCase().startsWith('explain') &&
-          postData?.query?.includes('cron.job')
-        ) {
-          await route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify([
-              {
-                'QUERY PLAN':
-                  'Nested Loop Left Join  (cost=0.00..500000.00 rows=1000000 width=100)',
-              },
-            ]),
-          })
-        } else {
-          await route.continue()
-        }
+        // Step 2 should now be enabled - the "Schedule cleanup job" button should be visible
+        await expect(page.getByRole('button', { name: 'Schedule cleanup job' })).toBeVisible()
+
+        // Should show the SQL preview for the cleanup job
+        await expect(page.getByText(/cron\.schedule/)).toBeVisible()
+
+        // Click "Schedule cleanup job"
+        await page.getByRole('button', { name: 'Schedule cleanup job' }).click()
+
+        // Wait for Step 2 to complete - should show success message
+        await expect(page.getByText('Daily cleanup job scheduled successfully')).toBeVisible({
+          timeout: 15000,
+        })
+
+        // Clean up: remove the route mock; the scheduled delete-job-run-details job is
+        // removed by the withSetupCleanup teardown at the top of this test.
+        await page.unroute('**/pg-meta/*/query**')
       })
-
-      await page.goto(toUrl(`/project/${ref}/integrations/cron/jobs`))
-
-      // Wait for the banner and click Learn more
-      await expect(
-        page.getByText('Last run for each cron job omitted due to high query cost')
-      ).toBeVisible({
-        timeout: 15000,
-      })
-      await page.getByRole('alert').getByRole('button', { name: 'Learn more' }).click()
-
-      // Wait for dialog to open
-      await expect(
-        page.getByRole('heading', { name: 'Last run for cron jobs omitted for overview' })
-      ).toBeVisible()
-
-      // Step 1: Click "Delete rows now" to run the cleanup
-      await page.getByRole('button', { name: 'Delete rows now' }).click()
-
-      // Wait for Step 1 to complete - should show success message
-      // Note: In a fresh DB, there might be 0 rows deleted, which is still success
-      await expect(page.getByText(/Successfully deleted \d+ rows/)).toBeVisible({ timeout: 30000 })
-
-      // Step 2 should now be enabled - the "Schedule cleanup job" button should be visible
-      await expect(page.getByRole('button', { name: 'Schedule cleanup job' })).toBeVisible()
-
-      // Should show the SQL preview for the cleanup job
-      await expect(page.getByText(/cron\.schedule/)).toBeVisible()
-
-      // Click "Schedule cleanup job"
-      await page.getByRole('button', { name: 'Schedule cleanup job' }).click()
-
-      // Wait for Step 2 to complete - should show success message
-      await expect(page.getByText('Daily cleanup job scheduled successfully')).toBeVisible({
-        timeout: 15000,
-      })
-
-      // Clean up: remove the route mock
-      await page.unroute('**/pg-meta/*/query**')
-
-      // Note: Test jobs (pw_high_cost_test_job, delete-job-run-details) will be cleaned up
-      // in the next test run by the CRUD tests' beforeAll cleanup, or manually.
-      // Attempting to delete here causes pointer events issues with Radix dialogs.
     })
   })
 })

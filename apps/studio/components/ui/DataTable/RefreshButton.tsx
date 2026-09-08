@@ -33,7 +33,7 @@ export const RefreshButton = ({ isLoading, onRefresh, shortcutId }: RefreshButto
       >
         <Button
           size="tiny"
-          type="default"
+          variant="default"
           disabled={isLoading}
           onClick={onRefresh}
           className="w-[26px]"
@@ -47,7 +47,7 @@ export const RefreshButton = ({ isLoading, onRefresh, shortcutId }: RefreshButto
   return (
     <ButtonTooltip
       size="tiny"
-      type="default"
+      variant="default"
       disabled={isLoading}
       onClick={onRefresh}
       className="w-[26px]"

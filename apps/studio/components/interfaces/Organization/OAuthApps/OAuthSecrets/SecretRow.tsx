@@ -66,7 +66,7 @@ export const SecretRow = ({ secret, appId }: SecretRowProps) => {
                   {isNew ? secret.client_secret : `${secret.client_secret_alias}${'*'.repeat(36)}`}
                 </p>
                 {isNew && secret.client_secret && (
-                  <CopyButton text={secret.client_secret} type="default" iconOnly />
+                  <CopyButton text={secret.client_secret} variant="default" iconOnly />
                 )}
               </div>
             </div>
@@ -87,7 +87,7 @@ export const SecretRow = ({ secret, appId }: SecretRowProps) => {
         </div>
         <div className="flex items-center gap-2">
           <ButtonTooltip
-            type="default"
+            variant="default"
             className="w-7"
             icon={<Trash />}
             disabled={!appId || !canManageSecrets || isLast}

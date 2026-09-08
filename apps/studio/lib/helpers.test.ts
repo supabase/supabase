@@ -8,6 +8,7 @@ import {
   extractUrls,
   formatBytes,
   formatCurrency,
+  formatRestoreWindow,
   getDatabaseMajorVersion,
   getDistanceLatLonKM,
   getSemanticVersion,
@@ -700,5 +701,17 @@ describe('tablesToSQL', () => {
 
     expect(result).toContain('-- WARNING: This schema is for context only')
     expect(result).not.toContain('CREATE TABLE')
+  })
+})
+
+describe('formatRestoreWindow', () => {
+  it('renders windows under a year in days', () => {
+    expect(formatRestoreWindow(90)).toBe('90 days')
+    expect(formatRestoreWindow(364)).toBe('364 days')
+  })
+
+  it('renders windows of a year or more as 1 year', () => {
+    expect(formatRestoreWindow(365)).toBe('1 year')
+    expect(formatRestoreWindow(400)).toBe('1 year')
   })
 })

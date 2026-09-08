@@ -1,9 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
-import { Button, cn } from 'ui'
+import { cn } from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -23,7 +22,7 @@ import {
   IntegrationInstallation,
 } from '@/components/interfaces/Integrations/VercelGithub/IntegrationPanels'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrgIntegrationsQuery } from '@/data/integrations/integrations-query-org-only'
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from '@/data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
@@ -139,6 +138,9 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
     connections.length,
     'connection'
   )} `
+  const description = isProjectScoped
+    ? 'Connect Vercel projects to this Supabase project. Supabase keeps environment variables up to date in each connected Vercel project.'
+    : 'Connect your Vercel teams to this Supabase organization. Supabase keeps environment variables up to date in each connected project. You can also link multiple Vercel projects to the same Supabase project.'
 
   return (
     <PageSection>
@@ -146,12 +148,8 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
         <div className="flex flex-1 items-start gap-6">
           <IntegrationSectionIcon title="vercel" />
           <PageSectionSummary>
-            <PageSectionTitle>Vercel Integration</PageSectionTitle>
-            <PageSectionDescription>
-              Connect your Vercel teams to your Supabase organization. Supabase keeps environment
-              variables up to date in each assigned project. You can also link multiple Vercel
-              projects to the same Supabase project.
-            </PageSectionDescription>
+            <PageSectionTitle>Vercel</PageSectionTitle>
+            <PageSectionDescription>{description}</PageSectionDescription>
           </PageSectionSummary>
         </div>
       </PageSectionMeta>
@@ -165,49 +163,42 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
             <div>
               {vercelIntegration ? (
                 <div key={vercelIntegration.id}>
-                  <IntegrationInstallation title={'Vercel'} integration={vercelIntegration} />
-                  {connections.length > 0 ? (
-                    <>
-                      <IntegrationConnectionHeader
-                        title={ConnectionHeaderTitle}
-                        markdown={`Repository connections for Vercel`}
-                      />
-                      <ul className="flex flex-col">
-                        {connections.map((connection) => (
-                          <div
-                            key={connection.id}
-                            className={cn(
-                              isProjectScoped && 'relative flex flex-col -gap-[1px] [&>li]:pb-0'
-                            )}
-                          >
-                            <IntegrationConnectionItem
-                              connection={connection}
-                              disabled={isBranch || !canUpdateVercelConnection}
-                              type={'Vercel' as IntegrationName}
-                              onDeleteConnection={onDeleteVercelConnection}
-                              className={cn(isProjectScoped && 'rounded-b-none! mb-0!')}
-                            />
-                            {isProjectScoped ? (
-                              <div className="relative pl-8 ml-6 border-l border-muted pb-6">
-                                <div className="border-b border-l border-r rounded-b-lg">
-                                  <VercelIntegrationConnectionForm
-                                    connection={connection}
-                                    integration={vercelIntegration}
-                                    disabled={isBranch || !canUpdateVercelConnection}
-                                  />
-                                </div>
+                  <IntegrationInstallation title="Vercel" integration={vercelIntegration} />
+                  <IntegrationConnectionHeader
+                    title={ConnectionHeaderTitle}
+                    className={connections.length === 0 ? 'pb-0' : undefined}
+                    markdown="Project connections for Vercel"
+                  />
+                  {connections.length > 0 && (
+                    <ul className="flex flex-col gap-y-2">
+                      {connections.map((connection) => (
+                        <div
+                          key={connection.id}
+                          className={cn(
+                            isProjectScoped && 'relative flex flex-col -gap-[1px] [&>li]:pb-0'
+                          )}
+                        >
+                          <IntegrationConnectionItem
+                            connection={connection}
+                            disabled={isBranch || !canUpdateVercelConnection}
+                            type={'Vercel' as IntegrationName}
+                            onDeleteConnection={onDeleteVercelConnection}
+                            className={cn(isProjectScoped && 'rounded-b-none! mb-0!')}
+                          />
+                          {isProjectScoped ? (
+                            <div className="relative pl-8 ml-6 border-l border-muted pb-6">
+                              <div className="border-b border-l border-r rounded-b-lg">
+                                <VercelIntegrationConnectionForm
+                                  connection={connection}
+                                  integration={vercelIntegration}
+                                  disabled={isBranch || !canUpdateVercelConnection}
+                                />
                               </div>
-                            ) : null}
-                          </div>
-                        ))}
-                      </ul>
-                    </>
-                  ) : (
-                    <IntegrationConnectionHeader
-                      title={ConnectionHeaderTitle}
-                      className="pb-0"
-                      markdown={`Repository connections for Vercel`}
-                    />
+                            </div>
+                          ) : null}
+                        </div>
+                      ))}
+                    </ul>
                   )}
                   <EmptyIntegrationConnection
                     disabled={isBranch || !canCreateVercelConnection}
@@ -217,22 +208,15 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
                   </EmptyIntegrationConnection>
                 </div>
               ) : (
-                <div>
-                  <Button
-                    icon={<ExternalLink />}
-                    asChild={!isBranch}
-                    type="default"
-                    disabled={isBranch}
-                  >
-                    {isBranch ? (
-                      <p>Install Vercel Integration</p>
-                    ) : (
-                      <Link href={integrationUrl} target="_blank" rel="noreferrer">
-                        Install Vercel Integration
-                      </Link>
-                    )}
-                  </Button>
-                </div>
+                <EmptyIntegrationConnection
+                  showNode={false}
+                  disabled={isBranch}
+                  href={integrationUrl}
+                  icon={<ExternalLink />}
+                  disabledTooltip="Install the Vercel integration on your project's main branch"
+                >
+                  Install Vercel integration
+                </EmptyIntegrationConnection>
               )}
             </div>
             {vercelProjectCount > 0 && vercelIntegration !== undefined && (

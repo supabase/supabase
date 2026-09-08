@@ -8,8 +8,7 @@ import {
 } from 'common'
 import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
 import { useCallback, useEffect, useRef } from 'react'
-import { Button, cn, CommandGroup, CommandItem, CommandList } from 'ui'
-import { StatusIcon } from 'ui/src/components/StatusIcon'
+import { Button, cn, CommandGroup, CommandItem, CommandList, StatusIcon } from 'ui'
 
 import {
   Breadcrumb,
@@ -302,7 +301,7 @@ const DocsSearchPage = () => {
           <div className="p-6 flex flex-col items-center gap-6 mt-4 text-foreground-light">
             <StatusIcon variant="default" />
             <p className="text-sm text-foreground-light text-center">No results found.</p>
-            <Button size="tiny" type="default" onClick={handleResetPrompt}>
+            <Button size="tiny" variant="default" onClick={handleResetPrompt}>
               Try again?
             </Button>
           </div>
@@ -314,7 +313,7 @@ const DocsSearchPage = () => {
               Sorry, looks like we&apos;re having some issues with search!
             </p>
             <p className="text-sm text-foreground-lighter">Please try again in a bit.</p>
-            <Button size="tiny" type="default" onClick={handleResetPrompt}>
+            <Button size="tiny" variant="default" onClick={handleResetPrompt}>
               Try again?
             </Button>
           </div>

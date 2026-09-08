@@ -67,6 +67,23 @@ export function hasValidTimestamp<T extends Datum>(data: T[], timestampKey: stri
 export const useFillTimeseriesSorted = <T extends Datum = Datum>(
   options: FillTimeseriesOptions<T>
 ): FillTimeseriesResult<T> => {
+  return useMemo(() => {
+    return fillTimeseriesSorted(options)
+  }, [
+    JSON.stringify(options.data),
+    options.timestampKey,
+    JSON.stringify(options.valueKey),
+    options.defaultValue,
+    options.startDate,
+    options.endDate,
+    options.minPointsToFill,
+    options.interval,
+  ])
+}
+
+export const fillTimeseriesSorted = <T extends Datum = Datum>(
+  options: FillTimeseriesOptions<T>
+): FillTimeseriesResult<T> => {
   const {
     data,
     timestampKey,
@@ -78,50 +95,39 @@ export const useFillTimeseriesSorted = <T extends Datum = Datum>(
     interval,
   } = options
 
-  return useMemo(() => {
-    // Early return if no valid timestamp
-    if (!hasValidTimestamp(data, timestampKey)) {
-      return {
-        data,
-        error: null,
-        isError: false,
-      }
+  // Early return if no valid timestamp
+  if (!hasValidTimestamp(data, timestampKey)) {
+    return {
+      data,
+      error: null,
+      isError: false,
     }
+  }
 
-    try {
-      const filled = fillTimeseries(
-        data,
-        timestampKey,
-        valueKey,
-        defaultValue,
-        startDate,
-        endDate,
-        minPointsToFill,
-        interval
-      ) as T[]
+  try {
+    const filled = fillTimeseries(
+      data,
+      timestampKey,
+      valueKey,
+      defaultValue,
+      startDate,
+      endDate,
+      minPointsToFill,
+      interval
+    ) as T[]
 
-      const sorted = sortByTimestamp(filled, timestampKey)
+    const sorted = sortByTimestamp(filled, timestampKey)
 
-      return {
-        data: sorted,
-        error: null,
-        isError: false,
-      }
-    } catch (error: unknown) {
-      return {
-        data: [],
-        error: error instanceof Error ? error : new Error(String(error)),
-        isError: true,
-      }
+    return {
+      data: sorted,
+      error: null,
+      isError: false,
     }
-  }, [
-    JSON.stringify(data),
-    timestampKey,
-    JSON.stringify(valueKey),
-    defaultValue,
-    startDate,
-    endDate,
-    minPointsToFill,
-    interval,
-  ])
+  } catch (error: unknown) {
+    return {
+      data: [],
+      error: error instanceof Error ? error : new Error(String(error)),
+      isError: true,
+    }
+  }
 }

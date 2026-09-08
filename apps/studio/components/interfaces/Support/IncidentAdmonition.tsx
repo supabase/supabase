@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import { processIncidentData } from '@/data/platform/incident-status-utils'
@@ -88,7 +88,7 @@ export function IncidentAdmonition({ isActive, className }: IncidentAdmonitionPr
             title={statusTitle}
             description={getStatusDescription(overallStatus, hasMultipleIncidents, allSameStatus)}
             actions={
-              <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+              <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
                 <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
                   Status page
                 </Link>

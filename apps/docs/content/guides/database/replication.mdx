@@ -1,12 +1,12 @@
 ---
 id: 'replication'
 title: 'Database replication'
-description: 'Compare read replicas, external replication (ETL), and manual replication.'
+description: 'Compare read replicas, Supabase Pipelines, and manual replication.'
 subtitle: 'An introduction to database replication and change data capture.'
 sidebar_label: 'Overview'
 ---
 
-Replication is the process of copying changes from your database to another location. It's also referred to as change data capture (CDC): capturing all the changes that occur to your data.
+Replication keeps data synchronized with another location. Logical replication products such as Supabase Pipelines use change data capture (CDC) to read database changes and apply them to a destination.
 
 ## Use cases
 
@@ -14,11 +14,11 @@ You might use database replication for:
 
 - **Analytics and data warehousing**: Replicate your operational database to analytics platforms for complex analysis without impacting your application's performance.
 - **Data integration**: Keep your data synchronized across different systems and services in your tech stack.
-- **Backup and disaster recovery**: Maintain up-to-date copies of your data in different locations.
+- **Operational reporting**: Maintain a copy of selected application data that you can query in another system.
 
 ## Replication methods
 
-Supabase supports three replication methods. Choose based on whether you need another Supabase Postgres database, a managed pipeline to a destination system, or full control over your own logical replication setup.
+Supabase supports three replication methods. Choose based on whether you need another Supabase Postgres database, a managed replication pipeline to a destination system, or full control over your own logical replication setup.
 
 ### Read replicas
 
@@ -26,29 +26,33 @@ Read replicas are additional Supabase Postgres databases kept in sync with your 
 
 - [Set up read replicas](/docs/guides/platform/read-replicas)
 
-### External replication (ETL) [#external-replication]
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
-<Admonition type="caution" title="Private Alpha">
+### Pipelines
 
-External replication (ETL) is currently in private alpha. Managed pipelines run through Supabase ETL. Access is limited and features may change.
+<$Partial path="pipelines-public-alpha.mdx" />
 
-</Admonition>
+Supabase Pipelines is a managed CDC product for moving data from Supabase Postgres to supported destination systems. It uses Postgres logical replication with the open-source [Supabase ETL engine](https://github.com/supabase/etl). A destination is where your replicated data is stored; a pipeline first performs an initial sync of existing rows, then uses ongoing replication (CDC) to send subsequent database changes to that destination.
 
-External replication (ETL) is powered by [Supabase ETL](https://github.com/supabase/etl). It uses Postgres logical replication under the hood and provides a managed Dashboard workflow for replicating data from Supabase Postgres to destination systems. In this context, "external" means outside the source database. Destinations can be Supabase-managed or third-party systems as support expands.
-
-- [Set up external replication (ETL)](/docs/guides/database/replication/external-replication-setup)
+- [Set up Pipelines](/docs/guides/database/replication/pipelines)
 
 #### Supported destinations
 
-External replication (ETL) currently supports BigQuery as the managed destination. We are working on new destinations, and this table will be updated as support expands.
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+BigQuery is currently available as a managed destination. ClickHouse, DuckLake, and Snowflake are in Early Access. [Request access](/go/supabase-pipelines-new-destinations) to these destinations.
 
-| Destination                                            | Insert       | Update       | Delete       | Truncate     | Schema change | Description                                                         |
-| ------------------------------------------------------ | ------------ | ------------ | ------------ | ------------ | ------------- | ------------------------------------------------------------------- |
-| [BigQuery](/docs/guides/database/replication/bigquery) | ✅ Supported | ✅ Supported | ✅ Supported | ✅ Supported | ✅ Supported  | Managed replication to Google BigQuery for analytics and reporting. |
+Managed Pipelines run in **AWS `eu-central-1` (Frankfurt)**. Choose destination resources as close as possible to Frankfurt to reduce network latency and replication lag.
+
+| Destination                                                | Insert       | Update                  | Delete                       | Truncate     | Schema change          | Data model                                                                       |
+| ---------------------------------------------------------- | ------------ | ----------------------- | ---------------------------- | ------------ | ---------------------- | -------------------------------------------------------------------------------- |
+| [BigQuery](/docs/guides/database/replication/bigquery)     | ✅ Supported | ✅ Supported            | ✅ Supported                 | ✅ Supported | Beta (limited)         | Current-state tables.                                                            |
+| [ClickHouse](/docs/guides/database/replication/clickhouse) | ✅ Supported | `REPLICA IDENTITY FULL` | Primary-key or full identity | ✅ Supported | Early Access (limited) | Current-state tables (default) or append-only CDC history.                       |
+| [DuckLake](/docs/guides/database/replication/ducklake)     | ✅ Supported | Row identity required   | Row identity required        | ✅ Supported | Early Access (limited) | Current-state lakehouse tables backed by a SQL catalog and object storage.       |
+| [Snowflake](/docs/guides/database/replication/snowflake)   | ✅ Supported | `REPLICA IDENTITY FULL` | Row identity required        | ✅ Supported | Early Access (limited) | Append-only CDC history. Source `TRUNCATE` operations and table resets erase it. |
 
 ### Manual replication
 
-Manual replication uses the same underlying Postgres logical replication features as external replication (ETL), but you configure and operate the pieces yourself. Use this path when you want to connect tools such as Airbyte, Estuary, Fivetran, Materialize, Stitch, AWS DMS, or another system that supports Postgres logical replication.
+Manual replication uses the same underlying Postgres logical replication features as Pipelines, but you configure and operate the pieces yourself. Use this path when you want to connect tools such as Airbyte, Estuary, Fivetran, Materialize, Stitch, AWS DMS, or another system that supports Postgres logical replication.
 
 - [Set up manual replication](/docs/guides/database/replication/manual-replication-setup)
 
@@ -78,7 +82,7 @@ When setting up logical replication, three key components are involved:
 
 - `publication` - A set of tables on your primary database that will be `published`
 - `replication slot` - A slot used for replicating the data from a single publication. The slot, when created, will specify the output format of the changes
-- `subscription` - A subscription is created from an external system (i.e. another Postgres database) and must specify the name of the `publication`. If you do not specify a replication slot, one is automatically created
+- `subscription` - A subscription is created from an external system (that is, another Postgres database) and must specify the name of the `publication`. If you do not specify a replication slot, one is automatically created
 
 ## Logical replication output format
 
@@ -86,7 +90,7 @@ Logical replication is typically output in two forms, `pgoutput` and `wal2json`.
 
 ## Logical replication configuration
 
-When using logical replication, Postgres keeps WAL files around for longer than it otherwise needs them. If the files are removed too quickly, then your `replication slot` can become inactive or lost if the database receives a large number of changes in a short time.
+When using logical replication, Postgres keeps WAL files around for longer than it otherwise needs them. If the files are removed too soon, then your `replication slot` can become inactive or lost if the database receives a large number of changes in a short time.
 
 In order to mitigate this, Postgres has many options and settings that can be [tweaked](/docs/guides/database/custom-postgres-config) to manage the WAL usage effectively. Not all of these settings are user configurable as they can impact the stability of your database. For those that are, these should be considered as advanced configuration and not changed without understanding that they can cause additional disk space and resources to be used, as well as incur additional costs.
 

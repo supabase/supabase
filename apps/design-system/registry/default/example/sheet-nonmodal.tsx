@@ -14,7 +14,7 @@ export default function SheetNonmodal() {
   return (
     <Sheet modal={false}>
       <SheetTrigger asChild>
-        <Button type="outline">Show Sheet</Button>
+        <Button variant="outline">Show Sheet</Button>
       </SheetTrigger>
       <SheetContent className="flex flex-col gap-0">
         <SheetHeader>
@@ -29,7 +29,7 @@ export default function SheetNonmodal() {
         </div>
         <SheetFooter>
           <SheetClose asChild>
-            <Button type="outline">Close</Button>
+            <Button variant="outline">Close</Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>

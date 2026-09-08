@@ -82,7 +82,7 @@ export default function PageLayoutDetail() {
                     <p className="text-sm">March 15, 2024</p>
                   </div>
                   <div className="pt-2">
-                    <Button type="default" size="small">
+                    <Button variant="default" size="small">
                       Change Plan
                     </Button>
                   </div>
@@ -114,7 +114,7 @@ export default function PageLayoutDetail() {
                     <p className="text-sm">$234.50</p>
                   </div>
                   <div className="pt-2">
-                    <Button type="default" size="small">
+                    <Button variant="default" size="small">
                       Configure Limits
                     </Button>
                   </div>
@@ -146,7 +146,7 @@ export default function PageLayoutDetail() {
                     <p className="text-sm">12/2025</p>
                   </div>
                   <div className="pt-2">
-                    <Button type="default" size="small">
+                    <Button variant="default" size="small">
                       Update Payment Method
                     </Button>
                   </div>

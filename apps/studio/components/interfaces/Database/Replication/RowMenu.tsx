@@ -24,7 +24,7 @@ import {
 import { PipelineStatusName } from './Replication.constants'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { Pipeline } from '@/data/replication/pipelines-query'
-import { useRestartPipelineHelper } from '@/data/replication/restart-pipeline-helper'
+import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-mutation'
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
 import {
@@ -66,7 +66,7 @@ export const RowMenu = ({
 
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
-  const { restartPipeline } = useRestartPipelineHelper()
+  const { mutateAsync: restartPipeline } = useRestartPipelineMutation()
   const { getRequestStatus, setRequestStatus: setGlobalRequestStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
@@ -153,7 +153,7 @@ export const RowMenu = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="relative">
-            <Button type="default" className="px-1.5" icon={<MoreVertical />} />
+            <Button variant="default" className="px-1.5" icon={<MoreVertical />} />
             {hasUpdate && (
               <span className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-brand rounded-full" />
             )}

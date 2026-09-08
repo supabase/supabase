@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
-import { useMemo, useState, type ComponentPropsWithoutRef } from 'react'
+import { useMemo, useRef, useState, type ComponentPropsWithoutRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
@@ -41,7 +41,7 @@ const FormSchema = z.object({
 
 type ResumeProjectButtonProps = Pick<
   ComponentPropsWithoutRef<typeof ButtonTooltip>,
-  'className' | 'size' | 'type'
+  'className' | 'size' | 'variant'
 > & {
   label?: string
 }
@@ -50,7 +50,7 @@ export const ResumeProjectButton = ({
   className,
   label = 'Resume project',
   size,
-  type = 'default',
+  variant = 'default',
 }: ResumeProjectButtonProps) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -99,6 +99,7 @@ export const ResumeProjectButton = ({
     mode: 'onChange',
     defaultValues: { postgresVersionSelection: '' },
   })
+  const lastValidPostgresVersionSelection = useRef('')
 
   const onSelectRestore = () => {
     if (project?.status !== PROJECT_STATUS.INACTIVE) {
@@ -161,7 +162,7 @@ export const ResumeProjectButton = ({
       <ButtonTooltip
         className={className}
         size={size}
-        type={type}
+        variant={variant}
         disabled={buttonDisabled}
         loading={isRestoring}
         onClick={onSelectRestore}
@@ -209,6 +210,7 @@ export const ResumeProjectButton = ({
                         dbRegion={region?.displayName ?? ''}
                         cloudProvider={(project?.cloud_provider ?? 'AWS') as CloudProvider}
                         organizationSlug={selectedOrganization?.slug}
+                        lastValidSelectionRef={lastValidPostgresVersionSelection}
                       />
                     )}
                   />
@@ -249,8 +251,8 @@ export const ResumeProjectButton = ({
           </DialogSection>
           <DialogFooter>
             <Button
-              htmlType="button"
-              type="default"
+              type="button"
+              variant="default"
               onClick={() => setShowFreeProjectLimitWarning(false)}
             >
               Understood

@@ -90,7 +90,7 @@ export const InitializeForeignSchemaDialog = ({ namespace }: { namespace: string
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button type="default">Query from Postgres</Button>
+        <Button variant="default">Query from Postgres</Button>
       </DialogTrigger>
       <DialogContent size="medium" aria-describedby={undefined}>
         <Form {...form}>
@@ -118,10 +118,10 @@ export const InitializeForeignSchemaDialog = ({ namespace }: { namespace: string
             <DialogFooter className="justify-between!">
               <DocsButton href={`${DOCS_URL}/guides/storage/analytics/query-with-postgres`} />
               <div className="flex items-center gap-x-2">
-                <Button type="default" disabled={isCreating} onClick={() => setIsOpen(false)}>
+                <Button variant="default" disabled={isCreating} onClick={() => setIsOpen(false)}>
                   Cancel
                 </Button>
-                <Button htmlType="submit" type="primary" loading={isCreating}>
+                <Button type="submit" variant="primary" loading={isCreating}>
                   Create schema
                 </Button>
               </div>

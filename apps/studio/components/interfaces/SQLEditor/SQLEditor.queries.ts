@@ -1600,4 +1600,37 @@ grant execute on function public.custom_access_token_hook to supabase_auth_admin
 revoke execute on function public.custom_access_token_hook from authenticated, anon, public;
     `,
   },
+  {
+    id: 30,
+    type: 'quickstart',
+    title: 'Instruments',
+    description:
+      'Create an instruments table with sample data and Row Level Security, as used in the framework quickstarts.',
+    sql: `
+-- Create the table
+create table instruments (
+  id bigint primary key generated always as identity,
+  name text not null
+);
+
+-- Insert sample data into the table
+insert into instruments (name)
+values
+  ('violin'),
+  ('viola'),
+  ('cello');
+
+-- Grant the privileges the role needs, which is read access
+grant select on public.instruments to anon;
+
+-- Enable row level security for the table
+alter table instruments enable row level security;
+
+-- Create a policy to allow the anon role to read from the instruments table
+create policy "public can read instruments"
+on public.instruments
+for select to anon
+using (true);
+`.trim(),
+  },
 ]

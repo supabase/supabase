@@ -36,7 +36,7 @@ export const AddUserDropdown = () => {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="primary" iconRight={<ChevronDown size={14} strokeWidth={1.5} />}>
+          <Button variant="primary" iconRight={<ChevronDown size={14} strokeWidth={1.5} />}>
             Add user
           </Button>
         </DropdownMenuTrigger>

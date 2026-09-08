@@ -189,7 +189,7 @@ const ColumnType = ({
       <Popover modal open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
-            type={error ? 'danger' : 'default'}
+            variant={error ? 'danger' : 'default'}
             role="combobox"
             size={'small'}
             aria-expanded={open}
@@ -314,13 +314,13 @@ const ColumnType = ({
               specific use case.
             </p>
             <div className="flex items-center space-x-2 mt-3">
-              <Button asChild type="default" icon={<ExternalLink />}>
+              <Button asChild variant="default" icon={<ExternalLink />}>
                 <Link href={recommendation.reference} target="_blank" rel="noreferrer">
                   Read more
                 </Link>
               </Button>
               <Button
-                type="primary"
+                variant="primary"
                 onClick={() => onOptionSelect({ format: recommendation.alternative })}
               >
                 Use {recommendation.alternative}

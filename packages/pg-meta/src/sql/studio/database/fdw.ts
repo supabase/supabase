@@ -156,15 +156,14 @@ export function getCreateFDWSql({
   const encryptedOptionsSqlArray = encryptedOptions
     .filter((option) => formState[option.name])
     .map((option) => safeSql`${ident(option.name)} ''%s''`)
-  const unencryptedOptionsSqlArray = unencryptedOptions
-    .filter((option) => formState[option.name])
-    .map((option) => {
-      // literal() returns 'value' with single quotes. Escape those quotes for
-      // the surrounding E'...' string context ('' represents one ')
-      const escapedValue = literal(formState[option.name]).replace(/'/g, "''") as SafeSqlFragment
-
-      return safeSql`${ident(option.name)} ${escapedValue}`
-    })
+  // Unencrypted option values are passed as format() %L arguments (below) so
+  // Postgres escapes them once for the inner create-server literal. Pre-escaping
+  // here and embedding in the outer E'...' string would decode backslashes twice,
+  // which aborts creation (invalid Unicode escape) or silently corrupts the value.
+  const unencryptedOptionsFilter = unencryptedOptions.filter((option) => formState[option.name])
+  const unencryptedOptionsSqlArray = unencryptedOptionsFilter.map(
+    (option) => safeSql`${ident(option.name)} %L`
+  )
   const optionsSqlArray = joinSqlFragments(
     [...encryptedOptionsSqlArray, ...unencryptedOptionsSqlArray],
     ','
@@ -225,9 +224,12 @@ export function getCreateFDWSql({
       execute format(
         E'create server ${ident(formState.server_name)} foreign data wrapper ${ident(formState.wrapper_name)} options (${optionsSqlArray});',
         ${joinSqlFragments(
-          encryptedOptions
-            .filter((option) => formState[option.name])
-            .map((option) => ident(`v_${option.name}`)),
+          [
+            ...encryptedOptions
+              .filter((option) => formState[option.name])
+              .map((option) => ident(`v_${option.name}`)),
+            ...unencryptedOptionsFilter.map((option) => literal(formState[option.name])),
+          ],
           ','
         )}
       );

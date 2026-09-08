@@ -61,6 +61,13 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         defaultHidden: true,
       },
       {
+        id: 'nav-database-policies',
+        name: 'Policies',
+        value: 'Database: Policies (RLS)',
+        route: `/project/${ref}/database/policies`,
+        defaultHidden: true,
+      },
+      {
         id: 'nav-database-extensions',
         name: 'Extensions',
         value: 'Database: Extensions',
@@ -155,6 +162,12 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         id: 'run-view-database-indexes',
         name: 'View and create indexes',
         route: `/project/${ref}/database/indexes`,
+        icon: () => <Database />,
+      },
+      {
+        id: 'run-view-database-policies',
+        name: 'View and create RLS policies',
+        route: `/project/${ref}/database/policies`,
         icon: () => <Database />,
       },
       ...(databaseRoles

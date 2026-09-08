@@ -296,3 +296,12 @@
     height: 0;
   }
 }
+
+@keyframes tw-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}

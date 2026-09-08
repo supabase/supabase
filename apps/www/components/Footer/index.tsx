@@ -188,9 +188,9 @@ const Footer = (props: Props) => {
                     className="flex-1 md:max-w-72 xl:max-w-[80%] h-6! text-xs px-2"
                   />
                   <Button
-                    type="primary"
+                    variant="primary"
                     size="tiny"
-                    htmlType="submit"
+                    type="submit"
                     loading={newsletterStatus === 'loading'}
                     className="w-fit"
                   >

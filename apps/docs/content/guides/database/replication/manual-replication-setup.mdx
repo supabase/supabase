@@ -6,7 +6,7 @@ subtitle: 'Set up replication with Airbyte, Estuary, Fivetran, and other tools.'
 sidebar_label: 'Setting up'
 ---
 
-This guide covers setting up **manual logical replication** using your own tools. If you prefer a managed solution through Supabase ETL, read the [external replication (ETL) setup guide](/docs/guides/database/replication/external-replication-setup) instead.
+This guide covers setting up **manual logical replication** using your own tools. If you prefer a managed solution, read [Set up Pipelines](/docs/guides/database/replication/pipelines) instead.
 
 <Admonition type="note">
 
@@ -14,7 +14,7 @@ This guide is for replicating data to destination systems using your own tools. 
 
 </Admonition>
 
-### Prerequisites
+## Prerequisites
 
 To set up replication, the following is recommended:
 
@@ -47,10 +47,6 @@ You can follow those steps with the following modifications:
 
 1. Use the `postgres` user
 2. Select `logical replication` as the replication method (`xmin` is possible, but not recommended)
-
-### Troubleshooting
-
-Airbyte has a known [issue](https://discuss.airbyte.io/t/postgres-source-replication-slot-safe-wal-size-only-reset-when-a-change-occurs/3263/7) where it does not clear WAL files on each successful sync. The recommended workaround is to have a `heartbeat` table that you write changes to once an hour.>
 
 </TabPanel>
 
@@ -103,7 +99,7 @@ You can follow those steps with the following modifications:
 1. Use the `postgres` user for replication (or create a new user with replication permissions: `ALTER USER <user> WITH REPLICATION;`)
 2. Set `pluginname` to `test-decoding`
 3. Depending on your databases the pre-assessment may fail. It is not required.
-4. Increase `wal_sender_timeout` and other settings (`max_wal_size`) using the [Supabase CLI](/docs/guides/platform/custom-postgres-config)
+4. Increase `wal_sender_timeout` and other settings (`max_wal_size`) using the [Supabase CLI](/docs/guides/database/custom-postgres-config)
 
 </TabPanel>
 

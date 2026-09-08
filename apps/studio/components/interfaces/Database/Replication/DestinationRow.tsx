@@ -1,6 +1,5 @@
 import { useParams } from 'common'
-import { AnalyticsBucket, BigQuery, Database } from 'icons'
-import { Minus, Snowflake } from 'lucide-react'
+import { Minus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -16,6 +15,7 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteDestination } from './DeleteDestination'
+import { DestinationIcon } from './DestinationIcon'
 import { PipelineStatus } from './PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { getFormattedLagValue } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
@@ -150,28 +150,24 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       {isPipelineSuccess && (
         <TableRow>
           <TableCell>
-            {type === 'BigQuery' ? (
-              <BigQuery size={18} className="text-foreground-light" />
-            ) : type === 'Analytics Bucket' ? (
-              <AnalyticsBucket size={18} className="text-foreground-light" />
-            ) : type === 'DuckLake' ? (
-              <Database size={18} className="text-foreground-light" />
-            ) : type === 'Snowflake' ? (
-              <Snowflake size={18} className="text-foreground-light" />
-            ) : (
-              <Database size={18} className="text-foreground-light" />
-            )}
+            {type ? (
+              <DestinationIcon type={type} size={18} className="text-foreground-light" />
+            ) : null}
           </TableCell>
 
           <TableCell className="max-w-[180px]">
             {isPipelineLoading ? (
               <ShimmeringLoader />
             ) : (
-              <div>
-                <p>
-                  {type} (ID: {pipeline?.id})
+              <div className="flex flex-col gap-y-0.5">
+                <p className="text-sm font-medium text-foreground truncate">
+                  {destinationName || type}
                 </p>
-                <p className="text-foreground-lighter">{destinationName}</p>
+                <div className="flex items-center gap-x-1.5 text-xs text-foreground-lighter">
+                  <span className="font-mono">#{pipeline?.id}</span>
+                  <span aria-hidden>&middot;</span>
+                  <span>{type}</span>
+                </div>
               </div>
             )}
           </TableCell>
@@ -226,9 +222,9 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                   </TooltipContent>
                 </Tooltip>
               )}
-              <Button asChild type="default" className="relative">
+              <Button asChild variant="default" className="relative">
                 <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
-                  View replication
+                  View pipeline
                 </Link>
               </Button>
               <RowMenu

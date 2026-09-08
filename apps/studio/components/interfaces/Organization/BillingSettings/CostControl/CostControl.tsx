@@ -5,7 +5,7 @@ import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Alert, AlertTitle, Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
@@ -15,9 +15,9 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { PARTNER_TO_NAME } from '@/components/ui/PartnerManagedResource'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
@@ -184,7 +184,7 @@ const CostControl = ({}: CostControlProps) => {
                       </p>
                       <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
                         <Button
-                          type="default"
+                          variant="default"
                           className="mt-4 pointer-events-auto"
                           disabled={!canChangeTier}
                           onClick={() => snap.setPanelKey('costControl')}

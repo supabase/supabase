@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { AlertCircle } from 'lucide-react'
 import { Alert, AlertTitle, cn } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { DataApiEnableSwitch } from '@/components/interfaces/Settings/API/DataApiEnableSwitch'
 import { DataApiProjectUrlCard } from '@/components/interfaces/Settings/API/DataApiProjectUrlCard'

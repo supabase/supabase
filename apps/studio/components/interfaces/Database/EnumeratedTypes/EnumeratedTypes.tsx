@@ -15,6 +15,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -23,9 +26,9 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import CreateEnumeratedTypeSidePanel from './CreateEnumeratedTypeSidePanel'
 import EditEnumeratedTypeSidePanel from './EditEnumeratedTypeSidePanel'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useEnumeratedTypeDeleteMutation } from '@/data/enumerated-types/enumerated-type-delete-mutation'
 import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
@@ -170,7 +173,7 @@ export const EnumeratedTypes = () => {
             >
               <Button
                 className="ml-auto flex-1"
-                type="primary"
+                variant="primary"
                 onClick={() => setShowCreateTypePanel(true)}
               >
                 Create type
@@ -235,9 +238,19 @@ export const EnumeratedTypes = () => {
                         {!isSchemaLocked && (
                           <div className="flex justify-end items-center space-x-2">
                             <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button type="default" className="px-1" icon={<MoreVertical />} />
-                              </DropdownMenuTrigger>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="default"
+                                      className="px-1"
+                                      icon={<MoreVertical />}
+                                      aria-label={`${type.name} actions`}
+                                    />
+                                  </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">More options</TooltipContent>
+                              </Tooltip>
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
                                 <DropdownMenuItem
                                   className="space-x-2"

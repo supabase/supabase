@@ -26,26 +26,45 @@ This is why the log line is a warning and not an error.
 
 The most common cause is a missing daily partition on `realtime.messages`. The table is partitioned by day, and `realtime.send` or `realtime.send_binary` does not create partitions itself. If no partition exists for the current day, the insert fails with a message like `no partition of relation "messages" found for row`, and you get the `WarnSendingBroadcastMessage` warning.
 
-Partitions are created in three occasions:
+Partitions are created on these occasions:
 
-| Where                            | When it runs                                                                                                                                                                                     |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| A client connects over WebSocket | The first time a client joins a channel for the project, after database migrations run                                                                                                           |
-| The tenant health check endpoint | When the health endpoint is called and the project either has an active database connection or has connected clients. Opening the Realtime section of your project dashboard calls this endpoint |
-| The scheduled janitor            | Periodically (roughly every 4 hours), when it deletes old messages and recreates the partition window. It only runs for projects that have had a connection established at least once            |
+| Where                            | When it runs                                                                                                                                                                                                                    |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A client connects over WebSocket | The first time a client joins a channel for the project, after database migrations run                                                                                                                                          |
+| The scheduled janitor            | Periodically (roughly every 3~4 hours depending on env config), when it deletes old messages and recreates the partition window. It only covers projects that are currently connected, or that connected since its previous run |
 
 Each of these creates a rolling window of partitions: yesterday, today, and the next three days.
 
+These occasions depend on a client connecting: the connection creates the partitions, and it also makes the project visible to the janitor on its next run. Janitor coverage is not permanent, so a project that stops connecting successfully drops out of it.
+
 <Admonition type="note" title="What's not included">
 
-Calling `realtime.send` / `realtime.send_binary`, the broadcast REST endpoint, and subscribe or replication operations do not create partitions. So a project that has never had a WebSocket client connect, and whose health check and janitor have not yet run for the day, has no partition to insert into. Broadcasting from the database before that point produces the warning.
+A project that has never had a WebSocket client connect has no partition to insert into, so broadcasting from the database before that point produces the warning.
+
+Calling `realtime.send` or `realtime.send_binary`, the broadcast REST endpoint, and subscribe or replication operations do not create partitions. The tenant health check endpoint does not create them either, so opening the Realtime section in the Supabase Dashboard has no effect on them.
 
 </Admonition>
 
 ## How to avoid it
 
-- Connect a client before broadcasting from the database. A live WebSocket connection both creates the partitions and starts the consumer that actually receives the message.
+- Connect a client before broadcasting from the database. A live WebSocket connection both creates the partitions and starts the consumer that receives the message.
 - If you broadcast from the database on a schedule, make sure at least one subscriber is connected when you send. Otherwise the messages have no destination.
+
+## If no client can connect
+
+Because both mechanisms require a client to connect, a project whose clients cannot connect never gets new partitions. The warning keeps firing, and it looks like partition maintenance stopped on its own.
+
+The usual cause is authentication. When every connection attempt is rejected, no partition is created, and old ones are never cleaned up. The newest partition stays at the last day a client connected.
+
+### Check whether your clients are connecting
+
+Work through these checks before treating the warning as a partition problem:
+
+1. Look for connection errors in your project's Realtime logs, such as failures to validate a JWT signature.
+2. Join a channel with the [Realtime Inspector](/dashboard/project/_/realtime/inspector), which connects using your project's own keys. If the Inspector connects and your app does not, your app is sending a different key or a stale user session.
+3. If you rotated your JWT secret or migrated to asymmetric JWT signing keys, sessions issued before the change no longer validate. Existing clients need to sign out and re-authenticate to get a token signed with the current key.
+
+Once a client connects, the partitions are created and maintained again.
 
 ## When it is a real problem
 

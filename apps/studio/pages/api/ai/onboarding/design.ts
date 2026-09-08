@@ -1,11 +1,11 @@
-import { streamText, tool } from 'ai'
+import { pipeUIMessageStreamToResponse, streamText, tool, toUIMessageStream } from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 
 export const maxDuration = 60
 
@@ -78,7 +78,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const result = streamText({
     ...modelParams,
-    system: source`
+    instructions: source`
       You are a Supabase expert who helps people set up their Supabase project. You specializes in database schema design. You are to help the user design a database schema for their application but also suggest Supabase services they should use. 
       
       When designing database schemas, follow these rules:
@@ -103,5 +103,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     tools: getTools(),
   })
 
-  result.pipeUIMessageStreamToResponse(res, { headers: { 'Content-Encoding': 'none' } })
+  const stream = toUIMessageStream({ stream: result.stream })
+  pipeUIMessageStreamToResponse({
+    response: res,
+    stream,
+    headers: { 'Content-Encoding': 'none' },
+  })
 }

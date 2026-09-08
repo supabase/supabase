@@ -57,7 +57,7 @@ const page: GoPageInput = {
             </p>
             <p className="text-foreground-lighter text-sm">Supabase</p>
           </div>
-          <Button asChild type="default" size="medium">
+          <Button asChild variant="default" size="medium">
             <Link
               href="https://supabase.link/dash-2026-slides"
               target="_blank"
@@ -84,7 +84,7 @@ const page: GoPageInput = {
             <li>Load data into a Supabase database</li>
             <li>Complete these steps by the deadline in your post-event note</li>
           </ol>
-          <Button asChild type="default" size="medium">
+          <Button asChild variant="default" size="medium">
             <Link href="https://supabase.com/dashboard">Create your account</Link>
           </Button>
           <p className="text-xs text-foreground-lighter mt-4">

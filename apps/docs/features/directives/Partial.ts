@@ -40,6 +40,7 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { PARTIALS_DIRECTORY } from '~/lib/docs'
+import { parsePartialVariables, substitutePartialVars } from '~/lib/partials.utils'
 import { type Root } from 'mdast'
 import type { MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import { type Parent } from 'unist'
@@ -77,40 +78,8 @@ function toFilePath(node: MdxJsxFlowElement) {
   return filePath
 }
 
-/**
- * Substitutes provided variables into the partial content. Variable
- * substitution is optional: any variable referenced in the content but not
- * provided is replaced with an empty string, and any variable provided but not
- * referenced is ignored. The leading `\` escape (`\{{ .var }}`) opts a
- * placeholder out of substitution.
- */
-function substituteVars(content: string, vars: Record<string, string> | undefined) {
-  for (const [key, value] of Object.entries(vars ?? {})) {
-    content = content.replace(new RegExp(`(?<!\\\\)\\{\\{\\s*\\.${key}\\s*\\}\\}`, 'g'), value)
-  }
-
-  // Clear any remaining (unprovided) placeholders.
-  content = content.replace(/(?<!\\)\{\{\s*\.[\w-]+\s*\}\}/g, '')
-  return content
-}
-
 function getVariables(node: MdxJsxFlowElement): undefined | Record<string, string> {
-  const variables = getAttributeValueExpression(getAttributeValue(node, 'variables'))
-  if (variables === undefined) {
-    return
-  }
-
-  try {
-    const parsed = JSON.parse(variables)
-    for (const value of Object.values(parsed)) {
-      if (typeof value !== 'string') {
-        throw new Error('Only string values are allowed')
-      }
-    }
-    return parsed
-  } catch {
-    throw new Error('Invalid $Partial variables: must be valid JSON containing only string values')
-  }
+  return parsePartialVariables(getAttributeValueExpression(getAttributeValue(node, 'variables')))
 }
 
 async function fetchPartialsContent(tree: Root) {
@@ -146,7 +115,7 @@ function rewriteNodes(
   contentMap: Map<MdxJsxFlowElement, [Parent, string, undefined | Record<string, string>]>
 ) {
   for (const [node, [parent, rawContent, vars]] of contentMap) {
-    const content = substituteVars(rawContent.trim(), vars)
+    const content = substitutePartialVars(rawContent.trim(), vars)
     const replacementContent = fromDocsMarkdown(content)
     parent.children.splice(parent.children.indexOf(node), 1, replacementContent)
   }

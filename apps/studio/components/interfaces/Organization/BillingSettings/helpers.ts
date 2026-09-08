@@ -7,6 +7,8 @@ const pricingMetricBytes = [
   PricingMetric.STORAGE_SIZE,
   PricingMetric.LOG_INGESTION,
   PricingMetric.LOG_QUERYING,
+  PricingMetric.ETL_COPY_BACKFILL_DATA,
+  PricingMetric.ETL_REPLICATED_DATA,
 ]
 
 const pricingMetricNotHrs = [

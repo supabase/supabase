@@ -44,17 +44,30 @@ export const RowContextMenuContent = ({
 
     const value = row[column.key]
     const text = formatClipboardValue(value)
+    const isSensitive = snap.sensitiveDataColumns.has(column.key as string)
 
     void copyToClipboard(text, () => {
-      toast.success('Copied cell value to clipboard')
+      if (isSensitive) {
+        toast.warning('Copied sensitive data to clipboard')
+      } else {
+        toast.success('Copied cell value to clipboard')
+      }
     })
-  }, [activeCellPosition, row, snap.gridColumns])
+  }, [activeCellPosition, row, snap.gridColumns, snap.sensitiveDataColumns])
 
   const onCopyRowContent = useCallback(() => {
+    const hasSensitiveColumns = snap.gridColumns.some((col) =>
+      snap.sensitiveDataColumns.has(col.key as string)
+    )
+
     void copyToClipboard(JSON.stringify(row), () => {
-      toast.success('Copied row to clipboard')
+      if (hasSensitiveColumns) {
+        toast.warning('Copied row containing sensitive data to clipboard')
+      } else {
+        toast.success('Copied row to clipboard')
+      }
     })
-  }, [row])
+  }, [row, snap.gridColumns, snap.sensitiveDataColumns])
 
   const getRowAndColumn = useCallback(() => {
     if (!activeCellPosition) return null

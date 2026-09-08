@@ -2,10 +2,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { QUEUES_SCHEMA } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Form, FormControl, FormField, FormItem, Switch } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
@@ -48,7 +48,7 @@ export const QueuesSettings = () => {
     defaultValues: { enable: false },
   })
   const { formState } = form
-  const { enable } = form.watch()
+  const enable = useWatch({ control: form.control, name: 'enable' })
 
   const { data: queueTables } = useTablesQuery({
     projectRef: project?.ref,
@@ -282,7 +282,7 @@ export const QueuesSettings = () => {
                           </ul>
 
                           <Button
-                            type="default"
+                            variant="default"
                             className="mt-3"
                             onClick={() => setRlsConfirmModalOpen(true)}
                           >
@@ -333,15 +333,15 @@ export const QueuesSettings = () => {
                 />
                 <div className="flex items-center gap-x-2">
                   <Button
-                    type="default"
+                    variant="default"
                     disabled={Object.keys(formState.dirtyFields).length === 0 || isToggling}
                     onClick={() => form.reset({ enable: false })}
                   >
                     Cancel
                   </Button>
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={Object.keys(formState.dirtyFields).length === 0}
                     loading={isToggling}
                   >

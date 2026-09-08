@@ -82,7 +82,7 @@ export const FilterPopoverPrimitive = ({
   return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger asChild>
-        <Button type={filters.length > 0 ? 'link' : 'text'} icon={<FilterIcon />}>
+        <Button variant={filters.length > 0 ? 'link' : 'text'} icon={<FilterIcon />}>
           {displayButtonText}
         </Button>
       </PopoverTrigger>
@@ -110,12 +110,12 @@ export const FilterPopoverPrimitive = ({
           </div>
           <PopoverSeparator />
           <div className="px-3 flex flex-row justify-between">
-            <Button icon={<Plus />} type="dashed" onClick={onAddFilter}>
+            <Button icon={<Plus />} variant="dashed" onClick={onAddFilter}>
               Add filter
             </Button>
             <Button
               disabled={isEqual(localFilters, filters)}
-              type="default"
+              variant="default"
               onClick={() => onSelectApplyFilters()}
             >
               Apply filter

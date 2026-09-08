@@ -193,7 +193,7 @@ const CreateEnumeratedTypeSidePanel = ({
                   </p>
                   <Button
                     asChild
-                    type="default"
+                    variant="default"
                     icon={<ExternalLink strokeWidth={1.5} />}
                     className="mt-2"
                   >
@@ -229,14 +229,14 @@ const CreateEnumeratedTypeSidePanel = ({
             </div>
 
             <Button
-              type="default"
+              variant="default"
               icon={<Plus strokeWidth={1.5} />}
               onClick={() => append({ value: '' })}
             >
               Add value
             </Button>
 
-            <Button ref={submitRef} htmlType="submit" type="default" className="hidden">
+            <Button ref={submitRef} type="submit" variant="default" className="hidden">
               Update
             </Button>
           </form>

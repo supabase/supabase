@@ -303,7 +303,7 @@ const DeleteConfirmationDialogs = ({
                 recursively.
               </AlertTitle>
               <AlertDescription>
-                <Button asChild size="tiny" type="default" icon={<ExternalLink />}>
+                <Button asChild size="tiny" variant="default" icon={<ExternalLink />}>
                   <Link
                     href="https://www.postgresql.org/docs/current/ddl-depend.html"
                     target="_blank"
@@ -364,7 +364,7 @@ const DeleteConfirmationDialogs = ({
                 recursively.
               </AlertDescription>
               <AlertDescription className="mt-4">
-                <Button asChild size="tiny" type="default" icon={<ExternalLink />}>
+                <Button asChild size="tiny" variant="default" icon={<ExternalLink />}>
                   <Link
                     href="https://www.postgresql.org/docs/current/ddl-depend.html"
                     target="_blank"
@@ -497,7 +497,7 @@ const DropEntityConfirmationModal = ({
               recursively.
             </AlertDescription>
             <AlertDescription className="mt-4">
-              <Button asChild size="tiny" type="default" icon={<ExternalLink />}>
+              <Button asChild size="tiny" variant="default" icon={<ExternalLink />}>
                 <Link
                   href="https://www.postgresql.org/docs/current/ddl-depend.html"
                   target="_blank"

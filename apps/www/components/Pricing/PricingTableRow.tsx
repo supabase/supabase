@@ -40,7 +40,7 @@ export const pricingTooltips: PricingTooltips = {
     main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor, Log Drains) in GB throughout your billing period. Excludes cache hits.',
   },
   'database.replication': {
-    main: 'External Replication (ETL) is available as an add-on for paid plans. ETL provides change-data-capture pipelines that replicate your Postgres tables to analytical destinations in near real time.\nYou are billed for each active pipeline, the replicated bytes and for initial copies/backfills. Initial copies/backfills are billed at a lower rate.',
+    main: 'Supabase Pipelines replicates Postgres tables to analytical destinations.\nBilling is based on configured pipeline hours and Postgres row data processed during initial sync and ongoing replication. Pipeline-hour billing ends when the pipeline is deleted.',
   },
   'storage.cachedEgress': {
     main: 'Billing is based on the total sum of outgoing Storage traffic in GB throughout your billing period that is served from our CDN cache.',
@@ -166,8 +166,10 @@ export const PricingTableRowDesktop = (props: any) => {
         style={{ borderTop: 'none' }}
         id={`${props.sectionId}-desktop`}
       >
+        {/* 108px/84px are pre-hydration fallbacks only; after mount PricingComparisonTable
+            measures the sticky thead into --pricing-category-top and that value wins */}
         <th
-          className="bg-background text-foreground sticky top-[108px] xl:top-[84px] z-10 py-3 pl-6 text-left text-sm font-medium"
+          className="bg-background text-foreground sticky top-[var(--pricing-category-top,108px)] xl:top-[var(--pricing-category-top,84px)] z-10 py-3 pl-6 text-left text-sm font-medium"
           scope="colgroup"
         >
           <div className="flex items-center gap-4">
@@ -193,7 +195,7 @@ export const PricingTableRowDesktop = (props: any) => {
               >
                 <span className="mr-1">{feat.title}</span>
                 {tooltips?.main && (
-                  <InfoTooltip side="top" className="max-w-[250px]">
+                  <InfoTooltip side="top" className="max-w-[250px]" label={`About ${feat.title}`}>
                     {tooltips.main}
                   </InfoTooltip>
                 )}
@@ -207,7 +209,7 @@ export const PricingTableRowDesktop = (props: any) => {
                   <td
                     key={i}
                     className={[
-                      `pl-6 pr-2 tier-${planName}`,
+                      `pl-6 pr-2 py-5 tier-${planName}`,
                       typeof planValue === 'boolean' ? 'text-center' : '',
                     ].join(' ')}
                   >
@@ -218,10 +220,14 @@ export const PricingTableRowDesktop = (props: any) => {
                         <IconPricingMinus plan={planValue} />
                       </div>
                     ) : (
-                      <div className="text-foreground text-xs flex flex-col justify-center">
+                      <div className="text-foreground text-xs flex flex-col justify-center gap-2">
                         <span className="flex items-center gap-2">
                           {tooltips?.[planName] && (
-                            <InfoTooltip side="top" className="max-w-[250px]">
+                            <InfoTooltip
+                              side="top"
+                              className="max-w-[250px]"
+                              label={`About ${feat.title} on the ${planName} plan`}
+                            >
                               {tooltips[planName]}
                             </InfoTooltip>
                           )}

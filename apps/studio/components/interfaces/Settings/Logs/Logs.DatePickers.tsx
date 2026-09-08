@@ -1,5 +1,3 @@
-import { Label } from '@ui/components/shadcn/ui/label'
-import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
 import dayjs from 'dayjs'
 import { Clock, HistoryIcon, Lock } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
@@ -11,12 +9,16 @@ import {
   cn,
   copyToClipboard,
   Input,
+  Label,
   Popover,
   PopoverContent,
   PopoverTrigger,
+  RadioGroup,
+  RadioGroupItem,
 } from 'ui'
 
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
+import { generateHelpersFromInput } from './Logs.datePickerHelpers'
 import type { DatetimeHelper } from './Logs.types'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { TimeSplitInput } from '@/components/ui/DatePicker/TimeSplitInput'
@@ -24,70 +26,17 @@ import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import type { ShortcutId } from '@/state/shortcuts/registry'
 
-type Unit = 'minute' | 'hour' | 'day'
-
-export type ParsedCustomInput =
-  | { type: 'number'; value: number }
-  | { type: 'unit'; value: number; unit: Unit }
-  | { type: 'invalid' }
-
-export const parseCustomInput = (input: string): ParsedCustomInput => {
-  const trimmed = input.trim().toLowerCase()
-  if (!trimmed) return { type: 'invalid' }
-
-  // Try to match "number + optional space + unit prefix"
-  const match = trimmed.match(/^(\d+)\s*([a-z]*)$/)
-  if (!match) return { type: 'invalid' }
-
-  const [, numStr, unitStr] = match
-  const value = parseInt(numStr, 10)
-
-  if (isNaN(value) || value <= 0) return { type: 'invalid' }
-
-  if (!unitStr) {
-    return { type: 'number', value }
-  }
-
-  // Match if unitStr is a prefix of any unit name or its first letter
-  const units: Unit[] = ['minute', 'hour', 'day']
-  const matchedUnit = units.find((u) => u.startsWith(unitStr) || u[0] === unitStr)
-
-  if (!matchedUnit) return { type: 'invalid' }
-
-  return { type: 'unit', value, unit: matchedUnit }
-}
-
-export const generateDynamicHelper = (value: number, unit: Unit): DatetimeHelper => {
-  return {
-    text: `Last ${value} ${unit}${value === 1 ? '' : 's'}`,
-    calcFrom: () => dayjs().subtract(value, unit).toISOString(),
-    calcTo: () => dayjs().toISOString(),
-  }
-}
-
-export const generateDynamicHelpers = (value: number): DatetimeHelper[] => {
-  const units: Unit[] = ['minute', 'hour', 'day']
-  return units.map((unit) => generateDynamicHelper(value, unit))
-}
-
-export const generateHelpersFromInput = (input: string): DatetimeHelper[] | null => {
-  const parsed = parseCustomInput(input)
-
-  switch (parsed.type) {
-    case 'number':
-      return generateDynamicHelpers(parsed.value)
-    case 'unit':
-      return [generateDynamicHelper(parsed.value, parsed.unit)]
-    case 'invalid':
-      return null
-  }
-}
-
 export type DatePickerValue = {
   to: string
   from: string
   isHelper?: boolean
   text?: string
+}
+
+const toValidDate = (value?: string): Date | null => {
+  if (!value) return null
+  const date = new Date(value)
+  return isNaN(date.getTime()) ? null : date
 }
 
 interface LogsDatePickerProps {
@@ -139,13 +88,13 @@ export const LogsDatePicker = ({
   useEffect(() => {
     if (!open) {
       setCustomValue('')
-      setStartDate(value.from ? new Date(value.from) : null)
-      const defaultEndDate = value.to ? new Date(value.to) : new Date()
+      setStartDate(toValidDate(value.from))
+      const defaultEndDate = toValidDate(value.to) ?? new Date()
       setEndDate(defaultEndDate)
       setCurrentMonth(new Date(defaultEndDate))
 
-      const fromDate = value.from ? new Date(value.from) : null
-      const toDate = value.to ? new Date(value.to) : null
+      const fromDate = toValidDate(value.from)
+      const toDate = toValidDate(value.to)
 
       setStartTime({
         HH: fromDate?.getHours().toString().padStart(2, '0') || '00',
@@ -180,11 +129,9 @@ export const LogsDatePicker = ({
     setOpen(false)
   }
 
-  const [startDate, setStartDate] = useState<Date | null>(value.from ? new Date(value.from) : null)
-  const [endDate, setEndDate] = useState<Date | null>(value.to ? new Date(value.to) : new Date())
-  const [currentMonth, setCurrentMonth] = useState<Date>(() =>
-    value.to ? new Date(value.to) : new Date()
-  )
+  const [startDate, setStartDate] = useState<Date | null>(toValidDate(value.from))
+  const [endDate, setEndDate] = useState<Date | null>(toValidDate(value.to) ?? new Date())
+  const [currentMonth, setCurrentMonth] = useState<Date>(() => toValidDate(value.to) ?? new Date())
 
   const [startTime, setStartTime] = useState({
     HH: startDate?.getHours().toString() || '00',
@@ -337,7 +284,7 @@ export const LogsDatePicker = ({
 
   const triggerButton = (
     <PopoverTrigger asChild>
-      <Button type="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
+      <Button variant="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
         {value.isHelper
           ? value.text
           : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
@@ -399,7 +346,7 @@ export const LogsDatePicker = ({
           </RadioGroup>
         </div>
 
-        <div>
+        <div className="w-fit max-w-full">
           <div className="flex p-2 gap-2 items-center">
             <div className="flex grow *:grow gap-2 font-mono">
               <TimeSplitInput
@@ -433,7 +380,7 @@ export const LogsDatePicker = ({
                   },
                 }}
                 icon={<HistoryIcon size={14} />}
-                type="text"
+                variant="text"
                 size="tiny"
                 className="px-1.5"
                 onClick={() => {
@@ -443,7 +390,7 @@ export const LogsDatePicker = ({
               ></ButtonTooltip>
             </div>
           </div>
-          <div className="p-2 border-t">
+          <div className="border-t">
             <Calendar
               mode="range"
               month={currentMonth}
@@ -455,18 +402,18 @@ export const LogsDatePicker = ({
             />
           </div>
           {isLargeRange && !hideWarnings && (
-            <div className="text-xs px-3 py-1.5 border-y bg-warning-300 text-warning-foreground border-warning-500 text-warning">
-              Large ranges may result in memory errors for <br /> big projects.
-            </div>
+            <p className="w-0 min-w-full px-3 pt-1 pb-4 text-xs text-warning">
+              Large ranges may result in memory errors for big projects.
+            </p>
           )}
           <div className="flex items-center justify-end gap-2 p-2 border-t">
             {startDate && endDate ? (
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
                 onClick={handleCopy}
                 className={cn({
-                  'text-brand-600': copied || pasted,
+                  'text-brand-link': copied || pasted,
                 })}
               >
                 {copied ? 'Copied!' : pasted ? 'Pasted!' : 'Copy range'}
@@ -474,7 +421,7 @@ export const LogsDatePicker = ({
             ) : null}
 
             <Button
-              type="default"
+              variant="default"
               onClick={() => {
                 const today = new Date()
                 setCurrentMonth(today)

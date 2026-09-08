@@ -1,17 +1,17 @@
-import { UseFormReturn } from 'react-hook-form'
+import { UseFormReturn, useWatch } from 'react-hook-form'
 import { FormField, SheetSection } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 import FunctionSelector from '@/components/ui/FunctionSelector'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 
 interface SqlFunctionSectionProps {
   form: UseFormReturn<CreateCronJobForm>
 }
 
 export const SqlFunctionSection = ({ form }: SqlFunctionSectionProps) => {
-  const schema = form.watch('values.schema')
+  const schema = useWatch({ control: form.control, name: 'values.schema' })
 
   return (
     <SheetSection className="flex flex-col gap-3 2xl:flex-row 2xl:[&>div]:w-full">
@@ -24,7 +24,6 @@ export const SqlFunctionSection = ({ form }: SqlFunctionSectionProps) => {
               size="small"
               className="w-56 2xl:w-full"
               selectedSchemaName={field.value}
-              stopScrollPropagation
               onSelectSchema={(name) => {
                 field.onChange(name)
                 // deselect the selected function when the schema is changed
@@ -45,7 +44,6 @@ export const SqlFunctionSection = ({ form }: SqlFunctionSectionProps) => {
               className="w-56 2xl:w-full"
               schema={schema}
               value={field.value}
-              stopScrollPropagation
               onChange={(name) => field.onChange(name)}
             />
           </FormItemLayout>

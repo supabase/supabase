@@ -88,14 +88,14 @@ export const AdvisorSignalDetail = ({ item }: AdvisorSignalDetailProps) => {
           telemetrySource="advisor_signal_detail"
         />
         {item.actions.map((action) => (
-          <Button key={`${item.dismissalKey}-${action.href}`} type="default" asChild>
+          <Button key={`${item.dismissalKey}-${action.href}`} variant="default" asChild>
             <Link href={action.href}>
               <span className="flex items-center gap-2">{action.label}</span>
             </Link>
           </Button>
         ))}
         <Button
-          type="default"
+          variant="default"
           icon={<EyeOff size={14} strokeWidth={1.5} />}
           onClick={onDismissSignal}
         >

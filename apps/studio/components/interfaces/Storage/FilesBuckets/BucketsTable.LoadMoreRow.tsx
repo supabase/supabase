@@ -1,7 +1,7 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { useEffect, type ReactNode } from 'react'
 import { TableCell, TableRow } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { BucketsTablePaginationProps } from './BucketsTable.types'
 import { VirtualizedTableCell, VirtualizedTableRow } from '@/components/ui/VirtualizedTable'

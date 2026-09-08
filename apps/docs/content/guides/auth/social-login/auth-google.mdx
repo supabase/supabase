@@ -1,6 +1,6 @@
 ---
 id: 'auth-google'
-title: 'Login with Google'
+title: 'Sign in with Google'
 description: 'Use Sign in with Google on the web, in native apps or with Chrome extensions'
 ---
 
@@ -257,7 +257,7 @@ After a successful code exchange, the user's session will be saved to cookies.
 
 The tokens saved by your application are the Supabase Auth tokens. Your app might additionally need the Google OAuth 2.0 tokens to access Google services on the user's behalf.
 
-On initial login, you can extract the `provider_token` from the session and store it in a secure storage medium. The session is available in the returned data from `signInWithOAuth` (implicit flow) and `exchangeCodeForSession` (PKCE flow).
+On initial sign-in, you can extract the `provider_token` from the session and store it in a secure storage medium. The session is available in the returned data from `signInWithOAuth` (implicit flow) and `exchangeCodeForSession` (PKCE flow).
 
 Google does not send out a refresh token by default, so you will need to pass parameters like these to `signInWithOAuth()` in order to extract the `provider_refresh_token`:
 
@@ -280,7 +280,7 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 
 ### Google pre-built [#google-pre-built]
 
-Most web apps and websites can utilize Google's [personalized sign-in buttons](https://developers.google.com/identity/gsi/web/guides/personalized-button), [One Tap](https://developers.google.com/identity/gsi/web/guides/features) or [automatic sign-in](https://developers.google.com/identity/gsi/web/guides/automatic-sign-in-sign-out) for the best user experience.
+Most web apps and websites can use Google's [personalized sign-in buttons](https://developers.google.com/identity/gsi/web/guides/personalized-button), [One Tap](https://developers.google.com/identity/gsi/web/guides/features) or [automatic sign-in](https://developers.google.com/identity/gsi/web/guides/automatic-sign-in-sign-out) for the best user experience.
 
 1. Load the Google client library in your app by including the third-party script:
 

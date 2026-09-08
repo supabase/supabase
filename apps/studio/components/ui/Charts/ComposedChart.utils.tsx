@@ -128,6 +128,26 @@ interface TooltipProps {
 const isMaxAttribute = (attributes?: MultiAttribute[]) => attributes?.find((a) => a.isMaxValue)
 
 /**
+ * Resolve the recharts `stackId` for a series.
+ *
+ * Series that share a `stackId` are stacked additively, so overlaid series
+ * (e.g. min/max/avg of the same metric) must each get a distinct id. Bar
+ * charts pass `'1'` as the fallback to stack together; area charts pass the
+ * attribute name so each series overlays independently. An explicit per-
+ * attribute `stackId` always wins.
+ */
+export const getStackId = (
+  attributes: (MultiAttribute | false | null | undefined)[] | null | undefined,
+  name: string | null | undefined,
+  fallback: string
+): string => {
+  const configured = Array.isArray(attributes)
+    ? attributes.find((a): a is MultiAttribute => !!a && a.attribute === name)?.stackId
+    : undefined
+  return configured ?? fallback
+}
+
+/**
  * Calculate the total aggregate of the chart values
  * by summing the values of the attributes
  * that are not in the `ignoreAttributes` array
@@ -368,6 +388,7 @@ export const CustomLabel = ({
     return (
       <button
         key={entry.name}
+        tabIndex={0}
         className="flex md:flex-col gap-1 md:gap-0 w-fit text-foreground rounded-lg  hover:bg-background-overlay-hover"
         onMouseOver={() => handleMouseEnter(entry.name)}
         onMouseOutCapture={handleMouseLeave}

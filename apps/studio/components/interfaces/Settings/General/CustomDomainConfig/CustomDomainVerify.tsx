@@ -3,7 +3,7 @@ import { AlertCircle, RefreshCw } from 'lucide-react'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle, Button, WarningIcon } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { DNSRecord } from './DNSRecord'
 import { DNSTableHeaders } from './DNSTableHeaders'
@@ -176,7 +176,7 @@ export const CustomDomainVerify = () => {
           <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
           <div className="flex items-center space-x-2">
             <Button
-              type="default"
+              variant="default"
               onClick={onCancelCustomDomain}
               loading={isDeleting}
               className="self-end"

@@ -155,7 +155,7 @@ const CreditCard = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="outline"
+                  variant="outline"
                   className="hover:border-muted px-1"
                   icon={<MoreHorizontal />}
                   aria-label="More options"

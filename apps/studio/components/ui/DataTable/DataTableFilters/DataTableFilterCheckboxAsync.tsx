@@ -66,7 +66,7 @@ export function DataTableFilterCheckboxAsync<TData>({
         onChange={(e) => setInputValue(e.target.value)}
       />
 
-      <div className="max-h-[200px] overflow-y-auto rounded-sm border border-border empty:border-none">
+      <div className="max-h-[215px] overflow-y-auto rounded-sm border border-border empty:border-none">
         {filterOptions.length === 0 ? (
           <div className="flex items-center justify-center px-2 py-3 text-center">
             <div className="space-y-0.5">
@@ -107,7 +107,7 @@ export function DataTableFilterCheckboxAsync<TData>({
                       <span className="truncate font-normal block">{option.label}</span>
                     )}
                   </div>
-                  <span className="shrink-0 flex items-center justify-center font-mono text-xs">
+                  <span className="shrink-0 flex items-center justify-center font-mono text-xs group-hover:opacity-0">
                     {isLoadingCounts ? (
                       <Skeleton className="h-4 w-4" />
                     ) : facetedValue?.has(option.value) ? (
@@ -118,13 +118,15 @@ export function DataTableFilterCheckboxAsync<TData>({
                   </span>
                   <button
                     type="button"
+                    tabIndex={0}
                     onClick={() => column?.setFilterValue([option.value])}
                     className={cn(
-                      'absolute inset-y-0 right-0 hidden font-normal text-muted-foreground backdrop-blur-xs hover:text-foreground group-hover:block',
-                      'rounded-md ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                      'text-xs text-muted-foreground hover:text-foreground',
+                      'absolute inset-y-0 right-0 hidden bg-surface-100 group-hover:flex group-focus-within:flex items-center cursor-pointer',
+                      'focus-ring'
                     )}
                   >
-                    <span className="px-2">only</span>
+                    <span className="px-2">Only</span>
                   </button>
                 </Label>
               </div>

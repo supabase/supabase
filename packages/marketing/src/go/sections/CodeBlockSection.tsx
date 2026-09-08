@@ -13,7 +13,7 @@ const lineNumberStyles = `
     width: 2ch;
     margin-right: 1.5ch;
     text-align: right;
-    color: hsl(var(--foreground-light));
+    color: var(--foreground-light);
     opacity: 0.35;
   }
 `

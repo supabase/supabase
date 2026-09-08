@@ -5,11 +5,11 @@ import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getAvailableComputeOptions } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { ProjectDetail } from '@/data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { ResourceWarning } from '@/data/usage/resource-warnings-query'
-import { getCloudProviderArchitecture } from '@/lib/cloudprovider-utils'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const ChevronsUpAnimated = () => (
@@ -65,9 +65,6 @@ export const ComputeBadgeWrapper = ({
   // handles the state of the hover card
   // once open it will fetch the addons
   const [open, setOpenState] = useState(false)
-
-  // returns hardcoded values for infra
-  const cpuArchitecture = getCloudProviderArchitecture(cloudProvider)
 
   // fetches addons
   const { data: addons, isPending: isLoadingAddons } = useProjectAddonsQuery(
@@ -159,7 +156,7 @@ export const ComputeBadgeWrapper = ({
                     <>
                       <Row
                         label="CPU"
-                        stat={`${meta.cpu_cores ?? '?'}-core ${cpuArchitecture} ${meta.cpu_dedicated ? '(Dedicated)' : '(Shared)'}`}
+                        stat={`${meta.cpu_cores ?? '?'}-core ${meta.cpu_dedicated ? '(Dedicated)' : '(Shared)'}`}
                       />
                       <Row label="Memory" stat={`${meta.memory_gb ?? '-'} GB`} />
                     </>
@@ -188,9 +185,7 @@ export const ComputeBadgeWrapper = ({
               <div>
                 <Button
                   asChild
-                  type="default"
-                  htmlType="button"
-                  role="button"
+                  variant="default"
                   onClick={() => {
                     track('compute_badge_upgrade_clicked', {
                       computeSize: computeSize ?? 'unknown',
@@ -201,9 +196,7 @@ export const ComputeBadgeWrapper = ({
                     })
                   }}
                 >
-                  <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
-                    Upgrade compute
-                  </Link>
+                  <Link href={getInfrastructurePath(projectRef)}>Upgrade compute</Link>
                 </Button>
               </div>
             </div>

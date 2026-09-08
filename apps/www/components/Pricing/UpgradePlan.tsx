@@ -1,10 +1,10 @@
 'use client'
 
+import { Organization } from '~/data/organizations'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { PlanId } from 'shared-data/plans'
-
 import {
   Button,
   ButtonProps,
@@ -29,7 +29,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from 'ui'
-import { Organization } from '~/data/organizations'
 
 interface UpgradePlanProps {
   organizations?: Organization[]
@@ -45,7 +44,7 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large', planId }: Up
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button block size={size} type="primary" onClick={onClick}>
+        <Button block size={size} variant="primary" onClick={onClick}>
           Upgrade now
         </Button>
       </DialogTrigger>
@@ -61,7 +60,7 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large', planId }: Up
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
-                type="default"
+                variant="default"
                 role="combobox"
                 size={'small'}
                 aria-expanded={open}
@@ -140,7 +139,7 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large', planId }: Up
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="outline">Cancel</Button>
+            <Button variant="outline">Cancel</Button>
           </DialogClose>
           <Button disabled={!value} asChild>
             <Link

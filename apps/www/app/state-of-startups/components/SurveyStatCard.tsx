@@ -1,75 +1,42 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-import { useAccent } from './accent-context'
-import { useSurveyDataCache } from './survey-data-context'
+import type { DistributionQuery, SurveyFilters } from '../lib/survey-key'
+import { useDistributionPercent } from './use-distribution'
 import { useYear } from './year-context'
 
 const ANIMATION_DURATION = 600
 
-// Stats are written against the 2026 narrative. If a stat declares a
-// `source` ({ column, aggregation, target }), the card looks up the live
-// percent for the active year in the preloaded stat cache. Otherwise it
-// falls back to the static `percent` for 2026 and "—" for other years.
-const NARRATIVE_YEAR = 2026
-
-export interface SurveyStatSource {
-  column: string
-  /**
-   * 'single' | 'multi' | 'boolean'. Kept as `string` here so narrative
-   * literals don't need `as const` casts; preload-survey-data.ts dispatches
-   * on the literal value when calling the matching generic RPC.
-   */
-  aggregation: string
-  /** Bucket label(s) to match in the cached stat rows. Sums when multiple. */
-  target: string | string[]
+export interface StatQuery extends DistributionQuery {
+  newIn2026?: boolean
 }
 
 interface SurveyStatCardProps {
   label: string
-  percent: number
-  source?: SurveyStatSource
+  /** Data-driven percent. Omit when `value` is provided. */
+  query?: StatQuery
+  /** Static percent to display as-is (for derived/combined figures that don't
+   *  map to a single column). Overrides `query`. */
+  value?: number
+  /** Section-level cohort toggle filter, merged on top of the query filters. */
+  cohortFilter?: SurveyFilters
 }
 
-export function SurveyStatCard({ label, percent, source }: SurveyStatCardProps) {
+export function SurveyStatCard({ label, query, value, cohortFilter }: SurveyStatCardProps) {
   const cardRef = useRef<HTMLDivElement>(null)
-  const accent = useAccent()
   const { year } = useYear()
-  const { getStat } = useSurveyDataCache()
 
   const accentBg = 'bg-brand'
   const accentText = 'text-brand'
 
-  // Resolve the percent to display: live value when a source is declared and
-  // present in the cache, otherwise fall back to the static 2026 baseline
-  // (with "—" on prior years).
-  const resolvedPercent: number | null = useMemo(() => {
-    if (source) {
-      const data = getStat(year, source.column)
-      if (data && data.respondentCount > 0) {
-        const targets = Array.isArray(source.target) ? source.target : [source.target]
-        let count = 0
-        let matched = 0
-        for (const row of data.rows) {
-          if (targets.includes(row.label)) {
-            count += row.count
-            matched += 1
-          }
-        }
-        if (matched > 0) {
-          return Math.round((count / data.respondentCount) * 100)
-        }
-        // Cache present but target not in this year's rows → option didn't
-        // exist that year. Render "—".
-        return null
-      }
-      // No cache entry for this (year, column) — column likely didn't exist
-      // that year, or the preload errored. Fall through to the static
-      // fallback so the 2026 page still shows something pre-deploy.
-    }
-    return year === NARRATIVE_YEAR ? percent : null
-  }, [source, year, getStat, percent])
+  // A static `value` wins; otherwise resolve from the embedded dataset for the
+  // active year. Returns null when the option/column has no data that year
+  // (e.g. a new-in-2026 question viewed at 2025), which renders an em dash.
+  const queried = useDistributionPercent(query, cohortFilter)
+  const resolvedPercent = value ?? queried
+
+  const isNewThisYear = resolvedPercent === null && query?.newIn2026 && year < 2026
 
   const [displayValue, setDisplayValue] = useState(0)
   const [hasAnimated, setHasAnimated] = useState(false)
@@ -115,7 +82,7 @@ export function SurveyStatCard({ label, percent, source }: SurveyStatCardProps) 
   }, [resolvedPercent, hasAnimated])
 
   // After the initial animation, snap to the latest resolved value when the
-  // year toggle (or live data) changes.
+  // year toggle (or cohort toggle) changes.
   useEffect(() => {
     if (!hasAnimated) return
     if (resolvedPercent === null) {
@@ -186,9 +153,13 @@ export function SurveyStatCard({ label, percent, source }: SurveyStatCardProps) 
         ) : (
           <p
             className="md:-ml-1 md:mt-8 text-2xl md:text-6xl font-mono tracking-tight inline-block flex flex-row items-baseline text-foreground-muted"
-            aria-label={`No ${year} baseline for this stat`}
+            aria-label={isNewThisYear ? 'New in 2026' : `No ${year} baseline for this stat`}
           >
-            —
+            {isNewThisYear ? (
+              <span className="text-base md:text-2xl self-center">New in 2026</span>
+            ) : (
+              '—'
+            )}
           </p>
         )}
         <p className="text-foreground-light text-sm text-balance md:mr-6">{label}</p>

@@ -3,7 +3,7 @@ import React from 'react'
 
 import type { Datum } from '@/components/ui/Charts/Charts.types'
 
-interface Metadata {
+export interface Metadata {
   [key: string]: string | number | Object | Object[] | any
 }
 

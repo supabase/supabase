@@ -3,7 +3,7 @@ import { TelemetryEvent, TelemetryGroups } from 'common/telemetry-constants'
 import { useRouter } from 'next/router'
 import { useCallback } from 'react'
 
-import useLatest from '@/hooks/misc/useLatest'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { API_URL } from '@/lib/constants'

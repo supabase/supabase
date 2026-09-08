@@ -195,7 +195,7 @@ export const ChartHeader = ({
             <TooltipTrigger asChild>
               <InfoIcon className="w-4 h-4 text-foreground-lighter" />
             </TooltipTrigger>
-            <TooltipContent side="top" className="max-w-xs">
+            <TooltipContent side="bottom" className="max-w-xs">
               {titleTooltip}
               {docsUrl && (
                 <>
@@ -215,7 +215,7 @@ export const ChartHeader = ({
       </div>
       {!titleTooltip && docsUrl && (
         <ButtonTooltip
-          type="text"
+          variant="text"
           className="px-1"
           asChild
           tooltip={{
@@ -279,7 +279,7 @@ export const ChartHeader = ({
       <div className="flex items-center gap-2">
         {sql ? (
           <ButtonTooltip
-            type="default"
+            variant="default"
             className="px-1.5"
             asChild
             tooltip={{
@@ -297,7 +297,7 @@ export const ChartHeader = ({
 
         {!hideChartType && onChartStyleChange && (
           <ButtonTooltip
-            type="default"
+            variant="default"
             className="px-1.5"
             icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
             onClick={() => onChartStyleChange(chartStyle === 'bar' ? 'line' : 'bar')}
@@ -311,7 +311,7 @@ export const ChartHeader = ({
         )}
         {setShowMaxValue && (
           <ButtonTooltip
-            type={showMaxValue ? 'default' : 'dashed'}
+            variant={showMaxValue ? 'default' : 'dashed'}
             className="px-1.5"
             icon={
               <GitCommitHorizontalIcon

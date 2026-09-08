@@ -1,6 +1,6 @@
 import type Usercentrics from '@usercentrics/cmp-browser-sdk'
 import type { BaseCategory, UserDecision } from '@usercentrics/cmp-browser-sdk'
-import { proxy, snapshot, useSnapshot } from 'valtio'
+import { proxy, ref, snapshot, useSnapshot } from 'valtio'
 
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from './constants'
 
@@ -192,7 +192,9 @@ export function applyPriorDecisionToSDK(
   initialUIValues: { initialLayer: number },
   priorDecision: PriorConsentDecision
 ): void {
-  consentState.UC = UC
+  // ref() prevents valtio from recursively proxying the SDK instance's internals in place,
+  // which would corrupt them the same way it once corrupted the AI Assistant's message array
+  consentState.UC = ref(UC)
   const hasConsented = UC.areAllConsentsAccepted()
 
   // If the SDK wants to show the banner but the user previously made a

@@ -42,6 +42,7 @@ export const FormSchema = z
     enableRlsEventTrigger: z.boolean(),
     postgresVersionSelection: z.string(),
     useOrioleDb: z.boolean(),
+    shouldRunMigrations: z.boolean(),
   })
   .superRefine(
     (

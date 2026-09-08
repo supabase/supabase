@@ -31,6 +31,7 @@ const Command = ({ item }: any) => {
             <span>{item.jsx ? item.jsx() : null} </span>
             <button
               type="button"
+              tabIndex={0}
               className="text-foreground-lighter hover:text-foreground"
               onClick={() => {
                 function onCopy(value: any) {

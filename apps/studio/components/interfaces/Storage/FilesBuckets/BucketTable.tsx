@@ -107,7 +107,7 @@ export const BucketTableRow = ({
     <BucketTableRow
       key={bucket.id}
       data-bucket-id={bucket.id}
-      className="relative cursor-pointer h-16 group inset-focus"
+      className="relative cursor-pointer h-16 group focus-inset"
       onClick={handleBucketNavigation}
       onAuxClick={handleBucketNavigation}
       onKeyDown={handleBucketNavigation}

@@ -1,3 +1,4 @@
+import { DEFAULT_EXPOSED_SCHEMAS } from './constants'
 import { assertSelfHosted } from './util'
 import { fetchGet } from '@/data/fetchers'
 import { PG_META_URL } from '@/lib/constants'
@@ -21,26 +22,12 @@ export async function generateTypescriptTypes({
 }: GenerateTypescriptTypesOptions): Promise<GenerateTypescriptTypesResult | ResponseError> {
   assertSelfHosted()
 
-  const includedSchema = ['public', 'graphql_public', 'storage'].join(',')
-
-  const excludedSchema = [
-    'auth',
-    'cron',
-    'extensions',
-    'graphql',
-    'net',
-    'pgsodium',
-    'pgsodium_masks',
-    'realtime',
-    'supabase_functions',
-    'supabase_migrations',
-    'vault',
-    '_analytics',
-    '_realtime',
-  ].join(',')
-
+  // Use the schemas actually exposed via PostgREST (PGRST_DB_SCHEMAS) so generated
+  // types match the Data API surface, instead of a hardcoded include/exclude list.
+  // Note the param is `included_schemas` (plural) — pg-meta treats a non-empty list
+  // as a strict allowlist; the singular spelling is silently ignored (includes all).
   const response = await fetchGet<GenerateTypescriptTypesResult>(
-    `${PG_META_URL}/generators/typescript?included_schema=${includedSchema}&excluded_schemas=${excludedSchema}`,
+    `${PG_META_URL}/generators/typescript?included_schemas=${DEFAULT_EXPOSED_SCHEMAS}`,
     { headers }
   )
 

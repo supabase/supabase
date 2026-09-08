@@ -25,12 +25,12 @@ export function RegisterContent() {
   return (
     <main
       className="relative w-full overflow-hidden flex flex-col"
-      style={{ background: 'hsl(var(--background-alternative-default))' }}
+      style={{ background: 'var(--background-alternative-default)' }}
     >
       <div>
         <header
           className="relative w-full overflow-hidden"
-          style={{ minHeight: '60vh', background: 'hsl(var(--background-alternative-default))' }}
+          style={{ minHeight: '60vh', background: 'var(--background-alternative-default)' }}
         >
           {/* Aurora shader scene — hidden when user prefers reduced motion */}
           {!prefersReducedMotion && (
@@ -53,7 +53,7 @@ export function RegisterContent() {
             className="absolute inset-0 pointer-events-none transition-opacity [transition-duration:1200ms]"
             style={{
               opacity: shaderLoaded ? 0 : 1,
-              background: 'hsl(var(--background-alternative-default))',
+              background: 'var(--background-alternative-default)',
             }}
           />
 
@@ -62,7 +62,7 @@ export function RegisterContent() {
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                'linear-gradient(to top, hsl(var(--background-alternative-default)) 0%, hsl(var(--background-alternative-default) / 0.9) 15%, transparent 90%)',
+                'linear-gradient(to top, var(--background-alternative-default) 0%, oklch(from var(--background-alternative-default) l c h / 0.9) 15%, transparent 90%)',
             }}
           />
 

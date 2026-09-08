@@ -63,7 +63,7 @@ export const AwsRegionSelector = ({
       <PopoverTrigger asChild>
         <FormControl>
           <Button
-            type="default"
+            variant="default"
             role="combobox"
             aria-expanded={open}
             aria-controls={listboxId}

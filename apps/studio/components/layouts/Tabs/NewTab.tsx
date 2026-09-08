@@ -50,7 +50,7 @@ export function NewTab() {
             <CardHeader className="py-2 px-3 flex-row items-center justify-between w-full space-y-0">
               <CardTitle className="text-foreground-light">Currently impersonating as</CardTitle>
               <Button
-                type="default"
+                variant="default"
                 className="font-sans"
                 onClick={() => roleState.setRole(undefined)}
               >

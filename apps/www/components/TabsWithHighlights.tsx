@@ -4,6 +4,7 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import React, { useRef, useState } from 'react'
 import { cn } from 'ui'
+
 import BrowserFrame from './BrowserFrame'
 
 export type Tab = {
@@ -97,6 +98,7 @@ interface TabProps {
 
 const Tab = ({ label, isActive, onClick }: TabProps) => (
   <button
+    tabIndex={0}
     onClick={onClick}
     aria-selected={isActive}
     role="tab"

@@ -28,8 +28,8 @@ Depending on your evaluation, you may choose to go with one of the following str
 
 | Strategy | Advantages                                                                                     | Disadvantages                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | -------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Rolling  | <ul><li>0 downtime</li><li>Users may need to log in again</li></ul>                            | <ul><li>Need to maintain 2 different Auth services, which may be more costly in the short-term</li><li>Need to maintain separate codepaths for the period of the migration</li><li>Some existing users may be inactive and have not signed in with the new provider. This means that you eventually need to backfill these users. However, this is a much smaller-scale one-off migration with lower risks since these users are inactive.</li></ul> |
-| One-off  | <ul><li>No need to maintain 2 different auth services for an extended period of time</li></ul> | <ul><li>Some downtime</li><li>Users will need to log in again. Risky for active users.</li></ul>                                                                                                                                                                                                                                                                                                                                                     |
+| Rolling  | <ul><li>0 downtime</li><li>Users may need to sign in again</li></ul>                           | <ul><li>Need to maintain 2 different Auth services, which may be more costly in the short-term</li><li>Need to maintain separate codepaths for the period of the migration</li><li>Some existing users may be inactive and have not signed in with the new provider. This means that you eventually need to backfill these users. However, this is a much smaller-scale one-off migration with lower risks since these users are inactive.</li></ul> |
+| One-off  | <ul><li>No need to maintain 2 different auth services for an extended period of time</li></ul> | <ul><li>Some downtime</li><li>Users will need to sign in again. Risky for active users.</li></ul>                                                                                                                                                                                                                                                                                                                                                    |
 
 ## Migration steps
 
@@ -49,12 +49,12 @@ To export password hashes and MFA factors, contact Auth0 support.
 
 ### Step 2: Import your users into Supabase Auth
 
-The steps for importing your users depends on the login methods that you support.
+The steps for importing your users depends on the sign-in methods that you support.
 
 See the following sections for how to import users with:
 
-- [Password-based login](#password-based-methods)
-- [Passwordless login](#passwordless-methods)
+- [Password-based sign-in](#password-based-methods)
+- [Passwordless sign-in](#passwordless-methods)
 - [OAuth](#oauth)
 
 #### Password-based methods
@@ -73,13 +73,14 @@ Sign up new users using Supabase Auth's [signin methods](/docs/guides/auth/passw
 Migrate existing users to Supabase Auth. This requires two main steps: first, check which users need to be migrated, then create their accounts using the Supabase admin endpoints.
 
 1.  Get your Auth 0 user export and password hash export lists.
-1.  Filter for users who use password login.
+1.  Filter for users who use password sign-in.
     - Under the `identities` field in the user object, these users will have `auth0` as a provider. In the same identity object, you can find their Auth0 `user_id`.
     - Check that the user has a corresponding password hash by comparing their Auth0 `user_id` to the `oid` field in the password hash export.
 1.  Use Supabase Auth's [admin create user](/docs/reference/javascript/auth-admin-createuser) method to recreate the user in Supabase Auth. If the user has a confirmed email address or phone number, set `email_confirm` or `phone_confirm` to `true`.
 
     ```ts
     import { createClient } from '@supabase/supabase-js'
+
     const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
     // ---cut---
@@ -100,6 +101,7 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
 
     ```ts
     import { createClient } from '@supabase/supabase-js'
+
     const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
     // ---cut---
@@ -122,6 +124,7 @@ For passwordless signin via email or phone, check for users with verified email 
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
@@ -162,6 +165,7 @@ Both columns are accessible from the admin user methods. To create a user with c
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
@@ -198,7 +202,6 @@ create table private.user_metadata (
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="medium"
@@ -206,7 +209,7 @@ create table private.user_metadata (
 >
 
 <AccordionItem
-header={<span className="text-foreground">I have IDs assigned to existing users in my database, how can I maintain these IDs?</span>}
+header="I have IDs assigned to existing users in my database, how can I maintain these IDs?"
 id="custom-user-id"
 >
 
@@ -229,7 +232,7 @@ const { data, error } = await supabase.auth.admin.createUser({
 </AccordionItem>
 
 <AccordionItem
-header={<span className="text-foreground">How can I allow my users to retain their existing password?</span>}
+header="How can I allow my users to retain their existing password?"
 id="existing-password"
 >
 
@@ -238,7 +241,7 @@ Supabase Auth never stores passwords as plaintext. Since Supabase Auth supports 
 </AccordionItem>
 
 <AccordionItem
-header={<span className="text-foreground">My users have multi-factor authentication (MFA) enabled, how do I make sure they don't have to set up MFA again?</span>}
+header="My users have multi-factor authentication (MFA) enabled, how do I make sure they don't have to set up MFA again?"
 id="mfa"
 >
 
@@ -247,16 +250,16 @@ You can obtain an export of your users' MFA secrets by opening a support ticket 
 </AccordionItem>
 
 <AccordionItem
-header={<span className="text-foreground">How do I migrate existing SAML Single Sign-On (SSO) connections?</span>}
+header="How do I migrate existing SAML Single Sign-On (SSO) connections?"
 id="saml"
 >
 
-Customers may need to link their identity provider with Supabase Auth separately, but their users should still be able to sign-in as per-normal after authenticating with their identity provider. For more information about SSO with SAML 2.0, you can check out [this guide](/docs/guides/auth/enterprise-sso/auth-sso-saml). If you want to migrate your existing SAML SSO connections from Auth0 to Supabase Auth, reach out to us via support.
+Customers may need to link their identity provider with Supabase Auth separately, but their users should still be able to sign in as per normal after authenticating with their identity provider. For more information about SSO with SAML 2.0, you can check out [this guide](/docs/guides/auth/enterprise-sso/auth-sso-saml). If you want to migrate your existing SAML SSO connections from Auth0 to Supabase Auth, reach out to us via support.
 
 </AccordionItem>
 
 <AccordionItem
-header={<span className="text-foreground">How do I migrate my Auth0 organizations to Supabase?</span>}
+header="How do I migrate my Auth0 organizations to Supabase?"
 id="migrate-org"
 >
 

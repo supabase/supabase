@@ -38,7 +38,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { SidePanelEditor } from '../../TableGridEditor/SidePanelEditor/SidePanelEditor'
 import { DefaultEdge } from './DefaultEdge'
@@ -47,17 +47,21 @@ import { SchemaGraphContextProvider, SchemaGraphContextType } from './SchemaGrap
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { EdgeData, TableNodeData } from './Schemas.constants'
 import {
+  getEnumsAsMarkdown,
   getGraphDataFromTables,
   getLayoutedElementsViaDagre,
+  getPoliciesAsMarkdown,
   getSchemaAsMarkdown,
 } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
 import { useExportSchemaToImage } from './useExportSchemaToImage'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
 import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
@@ -136,6 +140,20 @@ export const SchemaGraph = () => {
   })
   const tables = useMemo(() => tablesData?.pages.flat() ?? [], [tablesData])
   const hasNoTables = isSuccessTables && isSuccessSchemas && tables.length === 0 && !hasNextPage
+
+  const { data: enumeratedTypes = [], isPending: isLoadingEnumeratedTypes } =
+    useEnumeratedTypesQuery({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    })
+
+  const { data: policies = [], isPending: isLoadingPolicies } = useDatabasePoliciesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schemas: [selectedSchema],
+  })
+
+  const isMarkdownDataLoading = isLoadingEnumeratedTypes || isLoadingPolicies
 
   const schema = (schemas ?? []).find((s) => s.name === selectedSchema)
   const [, setStoredPositions] = useLocalStorage(
@@ -224,11 +242,37 @@ export const SchemaGraph = () => {
   }
 
   const copyAsMarkdown = () => {
+    if (isMarkdownDataLoading) return
+
     const tableNodes = reactFlowInstance
       .getNodes()
       .filter((node) => node.type === 'table')
       .map((node) => node.data as TableNodeData)
-    copyToClipboard(getSchemaAsMarkdown(selectedSchema, tableNodes))
+
+    let markdown = getSchemaAsMarkdown(selectedSchema, tableNodes)
+
+    const enumsMarkdown = getEnumsAsMarkdown(
+      selectedSchema,
+      enumeratedTypes.map((e) => ({ name: e.name, schema: e.schema, enums: e.enums }))
+    )
+    if (enumsMarkdown) markdown += enumsMarkdown
+
+    const policiesMarkdown = getPoliciesAsMarkdown(
+      selectedSchema,
+      policies.map((p) => ({
+        name: p.name,
+        schema: p.schema,
+        table: p.table,
+        command: p.command,
+        roles: p.roles,
+        action: p.action,
+        definition: p.definition ? String(p.definition) : null,
+        check: p.check ? String(p.check) : null,
+      }))
+    )
+    if (policiesMarkdown) markdown += policiesMarkdown
+
+    copyToClipboard(markdown)
     setCopied(true)
     toast.success('Successfully copied as Markdown')
   }
@@ -246,7 +290,7 @@ export const SchemaGraph = () => {
 
   useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_COPY_SQL, copyAsSQL, { enabled: shortcutsEnabled })
   useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_COPY_MARKDOWN, copyAsMarkdown, {
-    enabled: shortcutsEnabled,
+    enabled: shortcutsEnabled && !isMarkdownDataLoading,
   })
   useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_DOWNLOAD_PNG, () => downloadImage('png'), {
     enabled: shortcutsEnabled,
@@ -388,8 +432,8 @@ export const SchemaGraph = () => {
               <div className="flex items-center gap-x-2">
                 <div className="flex items-center gap-0">
                   <ButtonTooltip
-                    type="default"
-                    className="rounded-r-none border-r-0"
+                    variant="default"
+                    className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
                     icon={copied ? <Check data-testid="copy-sql-ready" /> : <Copy />}
                     onClick={copyAsSQL}
                     tooltip={{
@@ -412,23 +456,27 @@ export const SchemaGraph = () => {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
-                        type="default"
+                        variant="default"
                         size="tiny"
-                        className="rounded-l-none pl-1 pr-0"
+                        aria-label="Export options"
+                        className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                         icon={<ChevronDown size={12} />}
-                      >
-                        <span className="sr-only">Export options</span>
-                      </Button>
+                      />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-44">
                       <DropdownMenuItem
                         className="flex items-center space-x-2 whitespace-nowrap"
+                        disabled={isMarkdownDataLoading}
                         onClick={(e) => {
                           e.stopPropagation()
                           copyAsMarkdown()
                         }}
                       >
-                        <Copy size={12} />
+                        {isMarkdownDataLoading ? (
+                          <Loader2 size={12} className="animate-spin" />
+                        ) : (
+                          <Copy size={12} />
+                        )}
                         <span>Copy as Markdown</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
@@ -463,7 +511,7 @@ export const SchemaGraph = () => {
                     tooltipOpen={autoLayoutDialogOpen ? false : undefined}
                   >
                     <AlertDialogTrigger asChild>
-                      <Button type="default">Auto layout</Button>
+                      <Button variant="default">Auto layout</Button>
                     </AlertDialogTrigger>
                   </Shortcut>
                   <AlertDialogContent>
@@ -513,7 +561,7 @@ export const SchemaGraph = () => {
                 }
               >
                 {canAddTables && (
-                  <Button asChild className="mt-2" type="default" icon={<Plus />}>
+                  <Button asChild className="mt-2 w-min" variant="default" icon={<Plus />}>
                     <Link href={`/project/${ref}/editor?create=table`}>New table</Link>
                   </Button>
                 )}
@@ -553,13 +601,13 @@ export const SchemaGraph = () => {
                     zoomable
                     nodeColor={miniMapNodeColor}
                     maskColor={miniMapMaskColor}
-                    className="border rounded-md shadow-xs"
+                    className="border rounded-md shadow-xs mb-11!"
                   />
                   <SchemaGraphLegend />
                   {hasNextPage && (
                     <Panel position="bottom-center" className="mb-11!">
                       <Button
-                        type="default"
+                        variant="default"
                         size="tiny"
                         loading={isFetchingNextPage}
                         onClick={() => {

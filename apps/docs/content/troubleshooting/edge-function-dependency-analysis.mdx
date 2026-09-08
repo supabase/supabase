@@ -26,7 +26,7 @@ Review the output for:
 - **Large dependencies:** Packages that contribute significantly to bundle size
 - **Redundant imports:** Multiple packages providing similar functionality
 - **Outdated versions:** Dependencies that can be updated to more efficient versions
-- **Unused imports:** Dependencies imported but not actually used in your code
+- **Unused imports:** Dependencies imported but not used in your code
 
 ## Optimizing NPM dependencies
 
@@ -39,18 +39,17 @@ Import specific submodules to minimize overhead:
 ```tsx
 // Good: Import specific submodules
 import { Sheets } from 'npm:@googleapis/sheets'
+import * as googleAuth from 'npm:google-auth-library'
 import { JWT } from 'npm:google-auth-library/build/src/auth/jwtclient'
-
 // Avoid: Import entire package
 import * as googleapis from 'npm:googleapis'
-import * as googleAuth from 'npm:google-auth-library'
 ```
 
 ## Best practices
 
 ### Tree-shake aggressively
 
-Only import what you actually use. Avoid wildcard imports (`import *`) when possible.
+Only import what you use. Avoid wildcard imports (`import *`) when possible.
 
 ### Choose lightweight alternatives
 

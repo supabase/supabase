@@ -1,7 +1,7 @@
 import { paths } from 'api-types'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 import { POSTGRES_PORT } from '@/lib/api/self-hosted/constants'
 import { PROJECT_DB_HOST, PROJECT_REST_URL } from '@/lib/constants/api'
 

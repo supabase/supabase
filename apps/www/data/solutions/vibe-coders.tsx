@@ -1,4 +1,5 @@
 import { useBreakpoint } from 'common'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import { Check, CheckCircle, Sparkles, Timer, Zap } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
@@ -62,7 +63,7 @@ const useVibeCodersContent: () => {
       ctas: [
         {
           label: 'Start Your Project',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
         },
       ],
@@ -217,7 +218,7 @@ const useVibeCodersContent: () => {
                 absolute pointer-events-none
                 w-full h-full
                 inset-0 top-auto
-                bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background-default))_100%)]
+                bg-[linear-gradient(to_bottom,transparent_0%,var(--background-default)_100%)]
               "
               />
             </div>
@@ -264,7 +265,7 @@ const useVibeCodersContent: () => {
           ),
           className: 'border-l-0!',
           image: (
-            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]" />
+            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]" />
           ),
         },
         {

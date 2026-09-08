@@ -11,17 +11,17 @@ interface ActionPanelProps extends Omit<React.ComponentProps<typeof Card>, 'onCl
   onClick: () => void
   loading: ComponentProps<typeof Button>['loading']
   icon?: ComponentProps<typeof Button>['icon']
-  type?: ComponentProps<typeof Button>['type']
+  variant?: ComponentProps<typeof Button>['variant']
   shortcutId?: ShortcutId
 }
 
 export const ActionPanel = forwardRef<HTMLDivElement, ActionPanelProps>(
   (
-    { title, description, buttonLabel, onClick, loading, icon, type, shortcutId, ...props },
+    { title, description, buttonLabel, onClick, loading, icon, variant, shortcutId, ...props },
     ref
   ) => {
     const button = (
-      <Button onClick={onClick} loading={loading} icon={icon} type={type}>
+      <Button onClick={onClick} loading={loading} icon={icon} variant={variant}>
         {buttonLabel}
       </Button>
     )

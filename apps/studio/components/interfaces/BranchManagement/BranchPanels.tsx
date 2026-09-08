@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, ReactNode } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { WorkflowLogs } from './WorkflowLogs'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -96,7 +96,7 @@ export const BranchRow = ({
         {branch.git_branch && isGithubConnected && (
           <ButtonTooltip
             asChild
-            type="default"
+            variant="default"
             className="px-1.5"
             tooltip={{ content: { side: 'bottom', text: 'View branch on GitHub' } }}
           >

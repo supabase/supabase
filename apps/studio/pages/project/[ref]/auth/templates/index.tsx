@@ -1,12 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { EmailTemplates } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates'
 import { AuthEmailsLayout } from '@/components/layouts/AuthLayout/AuthEmailsLayout'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
-import NoPermission from '@/components/ui/NoPermission'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from '@/types'
 

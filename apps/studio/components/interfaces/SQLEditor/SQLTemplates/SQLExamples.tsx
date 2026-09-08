@@ -12,7 +12,7 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 const SQLExamples = () => {
   const router = useRouter()

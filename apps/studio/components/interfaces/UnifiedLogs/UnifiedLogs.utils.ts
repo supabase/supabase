@@ -1,8 +1,55 @@
 import { type Table as TTable } from '@tanstack/react-table'
 import { cn } from 'ui'
 
-import { FacetMetadataSchema } from './UnifiedLogs.schema'
+import { LOG_TYPES_LABELS } from './UnifiedLogs.constants'
+import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
+import { ColumnSchema, FacetMetadataSchema } from './UnifiedLogs.schema'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
+import { Option } from '@/components/ui/DataTable/DataTable.types'
+import type { UnifiedLogInspectionEntry } from '@/data/logs/unified-log-inspection-query'
+
+export type UnifiedLogType = keyof typeof LOG_TYPES_LABELS
+
+export function getWorkersLogsAvailability({
+  isPlatform,
+  flagsLoaded,
+  workersEnabled,
+}: {
+  isPlatform: boolean
+  flagsLoaded?: boolean
+  workersEnabled: boolean
+}) {
+  const flagsReady = flagsLoaded === true
+
+  return {
+    canQueryWorkers: isPlatform && flagsReady && workersEnabled,
+    preserveWorkersFilter: isPlatform && (!flagsReady || workersEnabled),
+    readyToSyncFilters: !isPlatform || flagsReady,
+  }
+}
+
+export const buildUnifiedLogsUrl = ({
+  projectRef,
+  logType,
+  user,
+  start,
+  end,
+}: {
+  projectRef: string
+  logType?: UnifiedLogType
+  /** Pre-applies the cross-cutting "filter by user" (?user=) — an id or email. */
+  user?: string
+  start?: string | Date
+  end?: string | Date
+}) => {
+  const params = new URLSearchParams()
+  if (logType) params.append('filter', `log_type:eq:${logType}`)
+  if (user) params.set('user', user)
+  if (start && end) {
+    params.set('date', `${new Date(start).valueOf()}-${new Date(end).valueOf()}`)
+  }
+  return `/project/${projectRef}/logs?${params.toString()}`
+}
 
 export const getFacetedUniqueValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {
   return (_table: TTable<TData>, columnId: string) => {
@@ -36,6 +83,21 @@ export function getRowTimestampMs(
   return null
 }
 
+type WorkersRawLogData = Pick<ColumnSchema, 'id' | 'timestamp' | 'event_message' | 'metadata'>
+
+export function getRawLogData(
+  row: ColumnSchema | UnifiedLogInspectionEntry
+): ColumnSchema | UnifiedLogInspectionEntry | WorkersRawLogData {
+  if (!('log_type' in row) || row.log_type !== 'workers') return row
+
+  return {
+    id: row.id,
+    timestamp: row.timestamp,
+    event_message: row.event_message,
+    metadata: row.metadata,
+  }
+}
+
 export const getLevelLabel = (value: (typeof LEVELS)[number]): string => {
   switch (value) {
     case 'success':
@@ -59,7 +121,7 @@ export const getStatusLevel = (status?: number | string): string => {
   return 'success'
 }
 
-export function getLevelRowClassName(value: (typeof LEVELS)[number]): string {
+export function getLevelRowClassName(value: (typeof LEVELS)[number] | null | undefined): string {
   switch (value) {
     case 'success':
       return ''
@@ -98,6 +160,7 @@ export function formatServiceTypeForDisplay(serviceType: string): string {
     realtime: 'Realtime',
     supavisor: 'Supavisor',
     pgbouncer: 'PgBouncer',
+    multigres: 'Multigres',
   }
 
   return specialCases[serviceType.toLowerCase()] || serviceType
@@ -133,4 +196,87 @@ export function parseAuthLogEventMessage(value: string | undefined): string | un
   } catch (error) {
     return value
   }
+}
+
+/**
+ * Parses a Multigres log event_message, which is a stringified JSON object
+ * (e.g. {"time":"...","level":"INFO","msg":"user pool capacity updated",...}).
+ * Extracts the human-readable msg field, falling back to the raw string so
+ * unexpected formats still render.
+ */
+export function parseMultigresEventMessage(value: string | undefined): string | undefined {
+  if (!value) return value
+
+  try {
+    const parsed = JSON.parse(value)
+
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      typeof parsed.msg === 'string' &&
+      parsed.msg.trim()
+    ) {
+      return parsed.msg
+    }
+
+    return value
+  } catch (error) {
+    return value
+  }
+}
+
+/**
+ * Returns the display text for a log row's event_message alongside whether it
+ * should be rendered as a capitalized sentence. Keeps the per-service parsing
+ * and its capitalization rule in one place so callers don't re-derive the list.
+ */
+export function getEventMessageDisplay(
+  logType: string,
+  value: string | undefined
+): { message: string | undefined; capitalize: boolean } {
+  if (logType === 'auth') return { message: parseAuthLogEventMessage(value), capitalize: true }
+  if (logType === 'multigres')
+    return { message: parseMultigresEventMessage(value), capitalize: true }
+  return { message: value, capitalize: false }
+}
+
+export function gateLogTypeOptions<T extends { value: string; options?: Option[] }>(
+  fields: T[],
+  visibility: Partial<Record<UnifiedLogType, boolean>>
+): T[] {
+  const hiddenLogTypes = new Set(
+    Object.entries(visibility)
+      .filter(([, visible]) => !visible)
+      .map(([logType]) => logType)
+  )
+
+  if (hiddenLogTypes.size === 0) return fields
+
+  return fields.map((field) => {
+    if (field.value !== 'log_type' || !field.options) return field
+    return {
+      ...field,
+      options: field.options.filter((option) => !hiddenLogTypes.has(option.value)),
+    }
+  })
+}
+
+export function gateLogTypeFilters(
+  filters: string[] | null | undefined,
+  visibility: Partial<Record<UnifiedLogType, boolean>>
+): string[] | null | undefined {
+  if (!filters) return filters
+
+  const hiddenLogTypes = new Set(
+    Object.entries(visibility)
+      .filter(([, visible]) => !visible)
+      .map(([logType]) => logType)
+  )
+
+  if (hiddenLogTypes.size === 0) return filters
+
+  return filters.filter((filter) => {
+    const parsed = parseLogsFilterUrlParams([filter])[0]
+    return parsed?.column !== 'log_type' || !hiddenLogTypes.has(parsed.value)
+  })
 }

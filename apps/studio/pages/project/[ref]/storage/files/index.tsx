@@ -1,5 +1,5 @@
 import { FilesBuckets } from '@/components/interfaces/Storage/FilesBuckets'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { StorageBucketsLayout } from '@/components/layouts/StorageLayout/StorageBucketsLayout'
 import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
 import type { NextPageWithLayout } from '@/types'

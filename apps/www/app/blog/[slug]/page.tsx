@@ -12,6 +12,7 @@ import {
 import { breadcrumbs } from '@/lib/breadcrumbs'
 import { SITE_ORIGIN } from '@/lib/constants'
 import { blogPostingSchema, breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
+import { mdAlternates } from '@/lib/md-alternates'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '@/lib/posts'
 import type { Blog, BlogData, PostReturnType } from '@/types/post'
 
@@ -71,11 +72,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     return {
       title: blogPost.title,
       description: blogPost.description,
-      alternates: {
-        types: {
-          'text/markdown': `/blog/${slug}.md`,
-        },
-      },
+      alternates: mdAlternates(`blog/${slug}`),
       openGraph: {
         title: blogPost.title,
         description: blogPost.description,

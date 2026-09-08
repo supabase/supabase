@@ -264,10 +264,10 @@ const AddRestrictionModal = ({
             </DialogSection>
           )}
           <DialogFooter>
-            <Button type="default" disabled={isApplying} onClick={() => onClose()}>
+            <Button variant="default" disabled={isApplying} onClick={() => onClose()}>
               Cancel
             </Button>
-            <Button form={formId} htmlType="submit" loading={isApplying} disabled={isApplying}>
+            <Button form={formId} type="submit" loading={isApplying} disabled={isApplying}>
               Save restriction
             </Button>
           </DialogFooter>

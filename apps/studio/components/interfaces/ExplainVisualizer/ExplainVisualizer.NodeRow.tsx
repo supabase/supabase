@@ -49,6 +49,7 @@ export function ExplainNodeRow({ node, depth, maxDuration }: ExplainNodeRowProps
             {/* Expand/collapse button */}
             <button
               type="button"
+              tabIndex={canExpand ? 0 : -1}
               onClick={() => canExpand && setIsExpanded(!isExpanded)}
               disabled={!canExpand}
               className={cn(

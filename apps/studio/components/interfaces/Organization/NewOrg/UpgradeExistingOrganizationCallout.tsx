@@ -1,4 +1,4 @@
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'

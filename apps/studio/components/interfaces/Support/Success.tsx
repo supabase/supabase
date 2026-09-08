@@ -32,18 +32,18 @@ export const Success = ({
 
   const finishAction = showFinishAction ? (
     onFinish ? (
-      <Button type="default" onClick={onFinish}>
+      <Button variant="default" onClick={onFinish}>
         {finishLabel}
       </Button>
     ) : (
-      <Button asChild type="default">
+      <Button asChild variant="default">
         <Link href="/">{finishLabel}</Link>
       </Button>
     )
   ) : null
 
   return (
-    <div className="flex w-full flex-col items-center gap-4 px-4 pt-4 text-center">
+    <div className="flex w-full flex-col items-center gap-4 px-4 py-4 text-center">
       <Check strokeWidth={1.5} size={24} className="text-brand" />
 
       <div className="flex max-w-[620px] flex-col items-center gap-2">
@@ -64,8 +64,8 @@ export const Success = ({
         {finishAction}
         <Button
           asChild
-          type="default"
-          icon={<IconDiscord size={16} fill="hsl(var(--background-default))" />}
+          variant="default"
+          icon={<IconDiscord size={16} fill="var(--background-default)" />}
         >
           <Link href="https://discord.supabase.com/" target="_blank">
             Join Discord

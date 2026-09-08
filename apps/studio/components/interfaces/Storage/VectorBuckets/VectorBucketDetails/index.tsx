@@ -44,7 +44,7 @@ import {
   ScaffoldSectionDescription,
   ScaffoldSectionTitle,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useVectorBucketQuery } from '@/data/storage/vector-bucket-query'
 import { useVectorBucketsIndexesQuery } from '@/data/storage/vector-buckets-indexes-query'
 
@@ -225,7 +225,7 @@ export const VectorBucketDetails = () => {
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
-                                      type="default"
+                                      variant="default"
                                       className="w-7"
                                       icon={<MoreVertical />}
                                       onClick={(e) => e.stopPropagation()}
@@ -305,7 +305,7 @@ export const VectorBucketDetails = () => {
                   </p>
                 </div>
                 <Button
-                  type="danger"
+                  variant="danger"
                   disabled={!isSuccessBucket}
                   onClick={() => setShowDeleteModal(true)}
                 >

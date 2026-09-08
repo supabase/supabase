@@ -69,35 +69,46 @@ export type FilesystemEntry = {
   createdAt: Date
 }
 
+/**
+ * Snippet without its SQL body — the shape returned for listings, matching the Management API
+ * contract (`GetUserContentFolderResponse.data.contents[]` has no `content`). The body is loaded
+ * on demand via the item endpoint (`getSnippet`).
+ */
+export type SnippetMetadata = Omit<Snippet, 'content'>
+
+const buildSnippetMetadata = (
+  filename: string,
+  folderId: string | null,
+  createdAt: Date
+): SnippetMetadata => ({
+  id: generateDeterministicUuid([folderId, `${filename}.sql`]),
+  inserted_at: createdAt.toISOString(),
+  updated_at: createdAt.toISOString(),
+  type: 'sql',
+  name: filename.replace('.sql', ''),
+  description: '',
+  favorite: false,
+  visibility: 'user',
+  project_id: 1,
+  folder_id: folderId,
+  owner_id: 1,
+  owner: { id: 1, username: 'johndoe' },
+  updated_by: { id: 1, username: 'johndoe' },
+})
+
 const buildSnippet = (
   filename: string,
   content: string,
   folderId: string | null,
   createdAt: Date
-) => {
-  const snippet: Snippet = {
-    id: generateDeterministicUuid([folderId, `${filename}.sql`]),
-    inserted_at: createdAt.toISOString(),
-    updated_at: createdAt.toISOString(),
-    type: 'sql',
-    name: filename.replace('.sql', ''),
-    description: '',
-    favorite: false,
-    content: {
-      sql: content,
-      content_id: uuidv4(),
-      schema_version: '1.0',
-    },
-    visibility: 'user',
-    project_id: 1,
-    folder_id: folderId,
-    owner_id: 1,
-    owner: { id: 1, username: 'johndoe' },
-    updated_by: { id: 1, username: 'johndoe' },
-  }
-
-  return snippet
-}
+): Snippet => ({
+  ...buildSnippetMetadata(filename, folderId, createdAt),
+  content: {
+    sql: content,
+    content_id: uuidv4(),
+    schema_version: '1.0',
+  },
+})
 
 const buildFolder = (name: string) => {
   const folder: Folder = {
@@ -121,10 +132,14 @@ const sanitizeName = (name: string): string => {
 }
 
 /**
- * Gets a complete snapshot of the filesystem structure including files and folders
+ * Gets a snapshot of the filesystem structure including files and folders.
+ * Pass `includeContent: false` for listings (sidebar/folder tree), which only need metadata —
+ * this skips reading every `.sql` file off disk.
  * @returns An array of files and folders with their metadata
  */
-export async function getFilesystemEntries(): Promise<FilesystemEntry[]> {
+export async function getFilesystemEntries({
+  includeContent = true,
+}: { includeContent?: boolean } = {}): Promise<FilesystemEntry[]> {
   if (SNIPPETS_DIR === '') {
     throw new Error(
       'SNIPPETS_MANAGEMENT_FOLDER env var is not set. Please set it to use snippets properly.'
@@ -171,7 +186,7 @@ export async function getFilesystemEntries(): Promise<FilesystemEntry[]> {
         await readEntriesRecursively(itemPath, item.name)
       } else if (item.isFile() && item.name.endsWith('.sql')) {
         const [content, stats] = await Promise.all([
-          fs.readFile(itemPath, 'utf-8'),
+          includeContent ? fs.readFile(itemPath, 'utf-8') : Promise.resolve(undefined),
           fs.stat(itemPath),
         ])
         const snippetName = item.name.replace('.sql', '')
@@ -181,7 +196,7 @@ export async function getFilesystemEntries(): Promise<FilesystemEntry[]> {
           name: snippetName,
           type: 'file',
           folderId: folderId,
-          content: content,
+          content,
           createdAt: stats.birthtime,
         })
       }
@@ -208,24 +223,42 @@ export const getSnippet = async (snippetId: string) => {
   )
 }
 
-/**
- * Gets a filtered paginated list of snippets based on the provided criteria
- */
-export const getSnippets = async ({
-  searchTerm,
-  limit,
-  cursor,
-  sort,
-  sortOrder,
-  folderId,
-}: {
+interface GetSnippetsParams {
   searchTerm?: string
   limit?: number
   cursor?: string
   sortOrder?: 'asc' | 'desc'
   sort?: 'name' | 'inserted_at'
   folderId?: string | null
-}): Promise<{ cursor: string | undefined; snippets: Snippet[] }> => {
+  /**
+   * Listings (sidebar/folder tree) only need metadata; the SQL body is loaded on demand via the
+   * item endpoint. Pass `false` to omit `content` and skip reading files off disk. Defaults to
+   * `true` for the flat `/content` endpoint, which the contract returns with content.
+   */
+  includeContent?: boolean
+}
+
+/**
+ * Gets a filtered paginated list of snippets based on the provided criteria
+ */
+export function getSnippets(
+  params: GetSnippetsParams & { includeContent: false }
+): Promise<{ cursor: string | undefined; snippets: SnippetMetadata[] }>
+export function getSnippets(
+  params?: GetSnippetsParams & { includeContent?: true }
+): Promise<{ cursor: string | undefined; snippets: Snippet[] }>
+export async function getSnippets({
+  searchTerm,
+  limit,
+  cursor,
+  sort,
+  sortOrder,
+  folderId,
+  includeContent = true,
+}: GetSnippetsParams = {}): Promise<{
+  cursor: string | undefined
+  snippets: Snippet[] | SnippetMetadata[]
+}> {
   // Normalize and set default values
   const normalizedSearchTerm = searchTerm?.trim() ?? ''
   const normalizedLimit = limit ?? 100
@@ -242,10 +275,9 @@ export const getSnippets = async ({
     throw new Error('Limit cannot exceed 1000')
   }
 
-  const entries = await getFilesystemEntries()
+  const entries = await getFilesystemEntries({ includeContent })
   const files = entries.filter(
-    (entry): entry is FilesystemEntry & { type: 'file'; content: string } =>
-      entry.type === 'file' && entry.content !== undefined && entry.content !== null
+    (entry): entry is FilesystemEntry & { type: 'file' } => entry.type === 'file'
   )
 
   // Filter snippets based on search term or folder
@@ -294,7 +326,9 @@ export const getSnippets = async ({
   return {
     cursor: nextCursor,
     snippets: finalSnippets.map((file) =>
-      buildSnippet(file.name, file.content, file.folderId, file.createdAt)
+      includeContent
+        ? buildSnippet(file.name, file.content ?? '', file.folderId, file.createdAt)
+        : buildSnippetMetadata(file.name, file.folderId, file.createdAt)
     ),
   }
 }
@@ -410,7 +444,7 @@ export async function updateSnippet(id: string, updates: DeepPartial<Snippet>): 
 }
 
 export const getFolders = async (folderId: string | null = null): Promise<Folder[]> => {
-  const entries = await getFilesystemEntries()
+  const entries = await getFilesystemEntries({ includeContent: false })
   const folders = entries
     .filter(
       (entry): entry is FilesystemEntry & { type: 'folder' } =>

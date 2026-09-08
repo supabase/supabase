@@ -83,7 +83,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                     <Button
                       block
                       size="large"
-                      type={plan.name === 'Enterprise' ? 'default' : 'primary'}
+                      variant={plan.name === 'Enterprise' ? 'default' : 'primary'}
                       asChild
                     >
                       <Link href={plan.href} onClick={sendPricingEvent}>

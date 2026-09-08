@@ -5,26 +5,27 @@
 </template>
 
 <script setup lang="ts">
-import { IonApp, IonRouterOutlet, useIonRouter } from '@ionic/vue';
+import { IonApp, IonRouterOutlet } from '@ionic/vue';
 import { onUnmounted } from 'vue';
-import { store } from './store';
+import router from './router';
 import { supabase } from './supabase';
 
-const router = useIonRouter();
+async function syncAuthRedirect() {
+  const { data } = await supabase.auth.getClaims();
+  const claims = data?.claims;
+  const path = router.currentRoute.value.path;
 
-supabase.auth.getClaims().then(({ data: { claims } }) => {
-  store.user = claims;
-});
+  if (claims && path === '/') {
+    router.replace('/account');
+  } else if (!claims && path === '/account') {
+    router.replace('/');
+  }
+}
 
 const {
   data: { subscription },
-} = supabase.auth.onAuthStateChange((_event, session) => {
-  store.user = session?.user ?? null;
-  if (session?.user) {
-    router.replace('/account');
-  } else {
-    router.replace('/');
-  }
+} = supabase.auth.onAuthStateChange(() => {
+  syncAuthRedirect();
 });
 
 onUnmounted(() => {

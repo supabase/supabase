@@ -1,5 +1,6 @@
 import { isPendingAddRow, PendingAddRow, SupaRow } from '../types'
 import { isTableLike, type Entity } from '@/data/table-editor/table-editor-types'
+import { isObject } from '@/lib/helpers'
 import {
   EditCellContentOperation,
   NewQueuedOperation,
@@ -7,6 +8,24 @@ import {
   QueuedOperationType,
 } from '@/state/table-editor-operation-queue.types'
 import type { Dictionary } from '@/types'
+
+// Client-only marker that preserves the original SQL WHERE identifiers after PK edits.
+const ORIGINAL_ROW_IDENTIFIERS_KEY = '__originalRowIdentifiers'
+
+export function getStableRowIdentifiers(
+  row: Dictionary<unknown>,
+  fallbackIdentifiers: Dictionary<unknown>
+): Dictionary<unknown> {
+  const identifiers = row[ORIGINAL_ROW_IDENTIFIERS_KEY]
+  return { ...(isObject(identifiers) ? identifiers : fallbackIdentifiers) }
+}
+
+function withOriginalRowIdentifiers<T extends SupaRow>(
+  row: T,
+  rowIdentifiers: Dictionary<unknown>
+): T {
+  return { ...row, [ORIGINAL_ROW_IDENTIFIERS_KEY]: { ...rowIdentifiers } }
+}
 
 interface EditCellKeyOperation extends Omit<
   EditCellContentOperation,
@@ -59,6 +78,14 @@ export function rowMatchesIdentifiers(
   return identifierEntries.every(([key, value]) => row[key] === value)
 }
 
+function rowMatchesOperationIdentifiers(
+  row: Dictionary<unknown>,
+  rowIdentifiers: Dictionary<unknown>
+): boolean {
+  const identifiers = row[ORIGINAL_ROW_IDENTIFIERS_KEY]
+  return rowMatchesIdentifiers(isObject(identifiers) ? identifiers : row, rowIdentifiers)
+}
+
 export function removeRow(rows: SupaRow[], rowIdentifiers: Dictionary<unknown>): SupaRow[] {
   return rows.filter((row) => !rowMatchesIdentifiers(row, rowIdentifiers))
 }
@@ -86,8 +113,8 @@ export function queueCellEditWithOptimisticUpdate({
   newValue,
   enumArrayColumns,
 }: QueueCellEditParams) {
-  // Updated row identifiers to include __tempId for pending add rows so edits merge into ADD_ROW operation
-  const rowIdentifiers: Dictionary<unknown> = { ...callerRowIdentifiers }
+  // Pending add rows use __tempId so edits merge into the ADD_ROW operation.
+  const rowIdentifiers = getStableRowIdentifiers(row, callerRowIdentifiers)
   if (isPendingAddRow(row)) {
     rowIdentifiers.__tempId = row.__tempId
   }
@@ -151,9 +178,14 @@ export const formatGridDataWithOperationValues = ({
   operations.forEach((op) => {
     if (op.type === QueuedOperationType.EDIT_CELL_CONTENT) {
       const { rowIdentifiers, columnName, newValue } = op.payload
-      const rowIdx = formattedRows.findIndex((row) => rowMatchesIdentifiers(row, rowIdentifiers))
+      const rowIdx = formattedRows.findIndex((row) =>
+        rowMatchesOperationIdentifiers(row, rowIdentifiers)
+      )
       if (rowIdx !== -1) {
-        formattedRows[rowIdx] = { ...formattedRows[rowIdx], [columnName]: newValue }
+        formattedRows[rowIdx] = withOriginalRowIdentifiers(
+          { ...formattedRows[rowIdx], [columnName]: newValue },
+          rowIdentifiers
+        )
       }
     } else if (op.type === QueuedOperationType.ADD_ROW) {
       const { tempId, rowData } = op.payload
@@ -176,9 +208,14 @@ export const formatGridDataWithOperationValues = ({
       }
     } else if (op.type === QueuedOperationType.DELETE_ROW) {
       const { rowIdentifiers } = op.payload
-      const rowIdx = formattedRows.findIndex((row) => rowMatchesIdentifiers(row, rowIdentifiers))
+      const rowIdx = formattedRows.findIndex((row) =>
+        rowMatchesOperationIdentifiers(row, rowIdentifiers)
+      )
       if (rowIdx !== -1) {
-        formattedRows[rowIdx] = { ...formattedRows[rowIdx], __isDeleted: true }
+        formattedRows[rowIdx] = withOriginalRowIdentifiers(
+          { ...formattedRows[rowIdx], __isDeleted: true },
+          rowIdentifiers
+        )
       }
     }
   })
@@ -225,12 +262,16 @@ export function queueRowDeletesWithOptimisticUpdate({
     table.primary_keys.forEach((pk) => {
       rowIdentifiers[pk.name] = row[pk.name]
     })
+    const stableRowIdentifiers = getStableRowIdentifiers(row, rowIdentifiers)
+    if (isPendingAddRow(row)) {
+      stableRowIdentifiers.__tempId = row.__tempId
+    }
 
     queueOperation({
       type: QueuedOperationType.DELETE_ROW,
       tableId: table.id,
       payload: {
-        rowIdentifiers,
+        rowIdentifiers: stableRowIdentifiers,
         originalRow: row,
         table,
       },

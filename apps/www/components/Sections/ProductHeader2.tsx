@@ -1,10 +1,14 @@
-import { CTA } from '~/types/common'
+'use client'
+
+import type { CTA } from '~/types/common'
+import { useIsLoggedIn } from 'common'
 import Link from 'next/link'
 import React, { Children, type ReactNode } from 'react'
 import { Button, cn } from 'ui'
 
-import SectionContainer from '../Layouts/SectionContainer'
+import SectionContainerWithCn from '../Layouts/SectionContainerWithCn'
 import ProductIcon from '../ProductIcon'
+import { resolveDashboardCtaHref } from '@/lib/dashboard-links'
 
 // to do: move types to be global
 // then solutions.types.ts should extend this
@@ -22,79 +26,90 @@ interface Props {
   sectionContainerClassName?: string
 }
 
-const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => (
-  <div
-    className={cn(
-      'w-full max-w-full relative mx-auto py-16 lg:py-24 border-b bg-alternative overflow-hidden',
-      props.className
-    )}
-  >
-    <SectionContainer className={cn('py-0! grid grid-cols-12', props.sectionContainerClassName)}>
-      <div
-        className={cn(
-          'relative z-10 col-span-12 lg:col-span-5',
-          // if not image is present, center the content
-          !props.image && 'lg:col-start-4 lg:col-end-10 text-center flex flex-col items-center'
-        )}
+const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => {
+  const isLoggedIn = useIsLoggedIn()
+
+  return (
+    <div
+      className={cn(
+        'w-full max-w-full relative mx-auto py-16 lg:py-24 border-b bg-alternative overflow-hidden',
+        props.className
+      )}
+    >
+      <SectionContainerWithCn
+        height="none"
+        className={cn('grid grid-cols-12', props.sectionContainerClassName)}
       >
-        {(props.icon || props.title) && (
-          <div className="mb-4 flex items-center gap-3">
-            {props.icon && <ProductIcon icon={props.icon} />}
-            {props.title && (
-              <span
-                className="text-brand-600 dark:text-brand font-mono uppercase"
-                key={`product-name-${props.title}`}
-              >
-                {props.title}
-              </span>
-            )}
-          </div>
-        )}
-        <h1 className="h1 text-3xl md:text-4xl! lg:text-4xl! 2xl:text-6xl! tracking-[-.15px]">
-          {props.h1}
-        </h1>
-        {props.subheader && (
-          <div className="">
-            {Children.map(props.subheader, (subheader, i) => {
+        <div
+          className={cn(
+            'relative z-10 col-span-12 lg:col-span-5',
+            // if not image is present, center the content
+            !props.image &&
+              'lg:col-span-12 lg:mx-auto lg:max-w-2xl text-center flex flex-col items-center'
+          )}
+        >
+          {(props.icon || props.title) && (
+            <div className="mb-4 flex items-center gap-3">
+              {props.icon && <ProductIcon icon={props.icon} />}
+              {props.title && (
+                <span
+                  className="text-brand-600 dark:text-brand font-mono uppercase"
+                  key={`product-name-${props.title}`}
+                >
+                  {props.title}
+                </span>
+              )}
+            </div>
+          )}
+          <h1 className="h1 text-3xl md:text-4xl! lg:text-4xl! 2xl:text-6xl! tracking-[-.15px] text-balance">
+            {props.h1}
+          </h1>
+          {props.subheader && (
+            <div className="">
+              {Children.map(props.subheader, (subheader, i) => {
+                return (
+                  <p className="p lg:text-lg max-w-lg lg:max-w-none text-pretty" key={i}>
+                    {subheader}
+                  </p>
+                )
+              })}
+            </div>
+          )}
+          <div className="flex flex-row md:flex-row md:items-center gap-2 mt-4">
+            {props.ctas?.map((cta) => {
+              const href = resolveDashboardCtaHref(cta.href, isLoggedIn)
               return (
-                <p className="p lg:text-lg max-w-lg lg:max-w-none" key={i}>
-                  {subheader}
-                </p>
+                <Button
+                  key={cta.href}
+                  size="medium"
+                  variant={cta.type ?? 'default'}
+                  onClick={cta.onClick}
+                  asChild
+                >
+                  <Link href={href}>{cta.label ?? 'Start for free'}</Link>
+                </Button>
               )
             })}
           </div>
-        )}
-        <div className="flex flex-row md:flex-row md:items-center gap-2 mt-4">
-          {props.ctas?.map((cta) => (
-            <Button
-              key={cta.href}
-              size="medium"
-              type={cta.type ?? 'default'}
-              onClick={cta.onClick}
-              asChild
-            >
-              <Link href={cta.href}>{cta.label ?? 'Start for free'}</Link>
-            </Button>
-          ))}
+          {props.footer && footerPosition === 'left' && (
+            <div className="ph-footer relative z-10 mt-4 md:mt-8 lg:mt-20 xl:mt-32 col-span-12">
+              {props.footer}
+            </div>
+          )}
         </div>
-        {props.footer && footerPosition === 'left' && (
-          <div className="ph-footer relative z-10 mt-4 md:mt-8 lg:mt-20 xl:mt-32 col-span-12">
+        {props.image && (
+          <div className="image-container relative min-h-[300px] col-span-12 mt-8 lg:col-span-7 lg:mt-0 xl:col-span-6 xl:col-start-7">
+            {props.image}
+          </div>
+        )}
+        {props.footer && footerPosition !== 'left' && (
+          <div className="relative z-10 mt-4 md:mt-8 lg:mt-20 xl:mt-32 col-span-12">
             {props.footer}
           </div>
         )}
-      </div>
-      {props.image && (
-        <div className="image-container relative min-h-[300px] col-span-12 mt-8 lg:col-span-7 lg:mt-0 xl:col-span-6 xl:col-start-7">
-          {props.image}
-        </div>
-      )}
-      {props.footer && footerPosition !== 'left' && (
-        <div className="relative z-10 mt-4 md:mt-8 lg:mt-20 xl:mt-32 col-span-12">
-          {props.footer}
-        </div>
-      )}
-    </SectionContainer>
-  </div>
-)
+      </SectionContainerWithCn>
+    </div>
+  )
+}
 
 export default ProductHeader

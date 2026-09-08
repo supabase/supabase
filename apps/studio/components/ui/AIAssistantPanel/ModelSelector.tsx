@@ -56,7 +56,7 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          type="default"
+          variant="default"
           className="text-foreground-light"
           iconRight={<ChevronsUpDown strokeWidth={1} size={12} />}
         >
@@ -82,9 +82,7 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <div>
-                          <Badge role="button" variant="warning">
-                            Upgrade
-                          </Badge>
+                          <Badge variant="warning">Upgrade</Badge>
                         </div>
                       </TooltipTrigger>
                       <TooltipContent side="right">

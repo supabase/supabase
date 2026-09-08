@@ -71,7 +71,7 @@ export default function InputOTPForm() {
           )}
         />
 
-        <Button htmlType="submit">Submit</Button>
+        <Button type="submit">Submit</Button>
       </form>
     </Form>
   )

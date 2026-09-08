@@ -2,7 +2,7 @@
 
 import { useEvents } from '~/app/events/context'
 import { formatHosts } from '~/lib/eventsUtils'
-import { ArrowRightIcon, CalendarIcon, MapPinIcon } from 'lucide-react'
+import { ArrowRightIcon, CalendarIcon, MapPinIcon, VideoIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Badge, Button } from 'ui'
 
@@ -46,12 +46,15 @@ export function EventBanner() {
         <div className="flex flex-col justify-between gap-8">
           <div className="flex flex-row gap-6">
             <DateWidget date={featuredEvent.date} endDate={featuredEvent.end_date} />
-            <LocationWidget location={featuredEvent.location} />
+            <LocationWidget
+              location={featuredEvent.location}
+              categories={featuredEvent.categories}
+            />
           </div>
 
           <div className="flex items-center md:justify-end gap-2">
             {featuredEvent.meetingLink && (
-              <Button type="secondary" size="medium" asChild>
+              <Button variant="secondary" size="medium" asChild>
                 <Link href={featuredEvent.meetingLink} target="_blank" rel="noopener noreferrer">
                   Meet with us
                 </Link>
@@ -130,7 +133,22 @@ const DateWidget = ({ date, endDate }: { date: string; endDate?: string }) => {
   )
 }
 
-const LocationWidget = ({ location }: { location?: string }) => {
+const LocationWidget = ({ location, categories }: { location?: string; categories?: string[] }) => {
+  // Webinars have no physical location; show a camera icon and the format instead.
+  if (categories?.includes('webinar')) {
+    return (
+      <div className="flex items-center gap-4">
+        <div className="bg-surface-100 w-10 h-10 flex items-center justify-center border rounded-md">
+          <VideoIcon className="size-5" strokeWidth={1.5} />
+        </div>
+
+        <div className="flex flex-col gap-0">
+          <p>Supabase Live</p>
+        </div>
+      </div>
+    )
+  }
+
   const hasLocation = location && location.length > 0
   const locationText = hasLocation ? location : 'Unknown'
 

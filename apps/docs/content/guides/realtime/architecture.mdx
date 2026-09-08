@@ -7,7 +7,7 @@ sidebar_label: 'Architecture'
 
 Realtime is a globally distributed Elixir cluster. Clients can connect to any node in the cluster via WebSockets and send messages to any other client connected to the cluster.
 
-Realtime is written in [Elixir](https://elixir-lang.org/), which compiles to [Erlang](https://www.erlang.org/), and utilizes many tools the [Phoenix Framework](https://www.phoenixframework.org/) provides out of the box.
+Realtime is written in [Elixir](https://elixir-lang.org/), which compiles to [Erlang](https://www.erlang.org/), and uses many tools the [Phoenix Framework](https://www.phoenixframework.org/) provides out of the box.
 
 <Image
   alt="Architecture"
@@ -34,7 +34,7 @@ Client-facing WebSocket servers need to handle many concurrent connections. Elix
 
 Channels are implemented using [Phoenix Channels](https://hexdocs.pm/phoenix/channels.html) which uses [Phoenix.PubSub](https://hexdocs.pm/phoenix_pubsub/Phoenix.PubSub.html) with the default `Phoenix.PubSub.PG2` adapter.
 
-The PG2 adapter utilizes Erlang [process groups](https://www.erlang.org/docs/18/man/pg2.html) to implement the PubSub model where a publisher can send messages to many subscribers.
+The PG2 adapter uses Erlang [process groups](https://www.erlang.org/docs/18/man/pg2.html) to implement the PubSub model where a publisher can send messages to many subscribers.
 
 ## Global cluster
 
@@ -44,7 +44,7 @@ Broadcast lets you send a message from any connected client to a Channel. Any ot
 
 This works globally. A client connected to a Realtime node in the United States can send a message to another client connected to a node in Singapore. Connect two clients to the same Realtime Channel and they'll all receive the same messages.
 
-Broadcast is useful for getting messages to users in the same location very quickly. If a group of clients are connected to a node in Singapore, the message only needs to go to that Realtime node in Singapore and back down. If users are close to a Realtime node they'll get Broadcast messages in the time it takes to ping the cluster.
+Broadcast is useful for getting messages to users in the same location rapidly. If a group of clients are connected to a node in Singapore, the message only needs to go to that Realtime node in Singapore and back down. If users are close to a Realtime node they'll get Broadcast messages in the time it takes to ping the cluster.
 
 Thanks to the Realtime cluster, you (an amazing Supabase user) don't have to think about which regions your clients are connected to.
 

@@ -44,12 +44,12 @@ const ProductEmptyState = ({
             {hasAction && (
               <div className="flex items-center space-x-2">
                 {ctaButtonLabel && !!ctaUrl ? (
-                  <Button asChild type="primary">
+                  <Button asChild variant="primary">
                     <Link href={ctaUrl}>{ctaButtonLabel}</Link>
                   </Button>
                 ) : ctaButtonLabel && !!onClickCta ? (
                   <ButtonTooltip
-                    type="primary"
+                    variant="primary"
                     onClick={onClickCta}
                     loading={loading}
                     disabled={loading || disabled}
@@ -64,7 +64,7 @@ const ProductEmptyState = ({
                   </ButtonTooltip>
                 ) : null}
                 {infoButtonUrl && infoButtonLabel ? (
-                  <Button type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                  <Button variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
                     <a target="_blank" rel="noreferrer" href={infoButtonUrl}>
                       {infoButtonLabel}
                     </a>

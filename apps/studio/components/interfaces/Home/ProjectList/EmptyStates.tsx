@@ -1,7 +1,6 @@
 import { BoxPlus } from 'icons'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
-import { ReactNode } from 'react'
 import {
   Button,
   Card,
@@ -13,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { ShimmeringCard } from './ShimmeringCard'
 import { HomeIcon } from '@/components/layouts/Navigation/LayoutHeader/HomeIcon'
@@ -66,10 +65,9 @@ export const LoadingTableView = () => {
   )
 }
 
-export const LoadingCardView = ({ prependCard }: { prependCard?: ReactNode }) => {
+export const LoadingCardView = () => {
   return (
     <ul className="w-full mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-      {prependCard}
       <ShimmeringCard />
       <ShimmeringCard />
     </ul>
@@ -86,7 +84,7 @@ export const NoProjectsState = ({ slug }: { slug: string }) => {
       description="Launch a complete backend built on Postgres."
     >
       {projectCreationEnabled && (
-        <Button size="tiny" type="default" asChild icon={<Plus />}>
+        <Button size="tiny" variant="default" asChild icon={<Plus />}>
           <Link href={`/new/${slug}`}>New project</Link>
         </Button>
       )}
@@ -100,7 +98,7 @@ export const NoOrganizationsState = () => {
       title="Create an organization"
       description="Manage your team and projects in one place."
     >
-      <Button size="tiny" type="primary" asChild icon={<Plus />}>
+      <Button size="tiny" variant="primary" asChild icon={<Plus />}>
         <Link href="/new">New organization</Link>
       </Button>
     </EmptyStatePresentational>

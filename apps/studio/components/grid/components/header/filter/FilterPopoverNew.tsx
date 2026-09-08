@@ -12,7 +12,7 @@ import {
   isGroup,
   SerializableFilterProperty,
   updateGroupAtPath,
-} from 'ui-patterns'
+} from 'ui-patterns/FilterBar'
 
 import { columnToFilterProperty } from './FilterPopoverNew.utils'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
@@ -77,10 +77,10 @@ function DatePickerOption({ onChange, onCancel, search }: CustomOptionProps) {
         className="w-full"
       />
       <div className="flex justify-end gap-2 py-3 px-4 border-t">
-        <Button type="default" onClick={onCancel}>
+        <Button variant="default" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="primary" onClick={() => onChange(date ? format(date, 'yyyy-MM-dd') : '')}>
+        <Button variant="primary" onClick={() => onChange(date ? format(date, 'yyyy-MM-dd') : '')}>
           Apply
         </Button>
       </div>
@@ -143,7 +143,6 @@ export const FilterPopoverNew = ({
 
   useEffect(() => {
     syncFromFilters()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [filters])
 
   const columns = useMemo(() => snap.table?.columns ?? [], [snap.table?.columns])

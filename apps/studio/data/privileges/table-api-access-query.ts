@@ -150,7 +150,7 @@ export const useTableApiAccessQuery = (
 
   const enablePrivilegesQuery = enabled && hasTables
   const privilegeStatus = useTablePrivilegesQuery(
-    { projectRef, connectionString },
+    { projectRef, connectionString, includedSchemas: [schemaName] },
     { enabled: enablePrivilegesQuery, ...options }
   )
 

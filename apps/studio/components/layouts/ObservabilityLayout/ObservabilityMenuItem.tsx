@@ -55,16 +55,17 @@ export const ObservabilityMenuItem = ({
   )
 
   const menuItem = (
-    <Menu.Item active={item.key === pageKey}>
+    <Menu.Item active={item.key === pageKey} className="pr-2.5">
       <div className="flex w-full items-center justify-between gap-1">
-        <span className="truncate">{item.name}</span>
+        <p className="truncate w-full">{item.name}</p>
 
         {canUpdateCustomReport && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="text"
-                className="px-1 opacity-50 hover:opacity-100"
+                aria-label="More actions"
+                variant="text"
+                className="px-0.5 h-[20px] opacity-50 hover:opacity-100"
                 icon={<MoreVertical size={12} strokeWidth={2} />}
                 onClick={(e) => {
                   e.preventDefault()
@@ -72,7 +73,7 @@ export const ObservabilityMenuItem = ({
                 }}
               />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-32 *:gap-x-2">
+            <DropdownMenuContent align="start" className="w-44 *:gap-x-2">
               <DropdownMenuItem
                 onClick={(e) => {
                   e.preventDefault()

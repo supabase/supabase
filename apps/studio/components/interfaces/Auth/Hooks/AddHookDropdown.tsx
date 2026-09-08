@@ -24,7 +24,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 interface AddHookDropdownProps {
   buttonText?: string
   align?: 'end' | 'center'
-  type?: 'primary' | 'default'
+  variant?: 'primary' | 'default'
   open?: boolean
   onOpenChange?: (open: boolean) => void
   onSelectHook: (hook: HOOK_DEFINITION_TITLE) => void
@@ -33,7 +33,7 @@ interface AddHookDropdownProps {
 export const AddHookDropdown = ({
   buttonText = 'Add hook',
   align = 'end',
-  type = 'primary',
+  variant = 'primary',
   open,
   onOpenChange,
   onSelectHook,
@@ -71,7 +71,7 @@ export const AddHookDropdown = ({
     return (
       <ButtonTooltip
         disabled
-        type={type}
+        variant={variant}
         tooltip={{
           content: { side: 'bottom', text: 'You need additional permissions to add auth hooks' },
         }}
@@ -84,7 +84,7 @@ export const AddHookDropdown = ({
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button type={type} iconRight={<ChevronDown />}>
+        <Button variant={variant} iconRight={<ChevronDown />}>
           {buttonText}
         </Button>
       </DropdownMenuTrigger>
