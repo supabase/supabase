@@ -14,12 +14,16 @@ import {
   LogoPair,
   SupabaseLogo,
 } from '@/components/layouts/InterstitialLayout'
-import type { OAuthAppsAuthorizeApproveResponse } from '@/data/oauth-apps/oauth-apps-authorize-approve-mutation'
 import { useOAuthAppsAuthorizeApproveMutation } from '@/data/oauth-apps/oauth-apps-authorize-approve-mutation'
 import { useOAuthAppsAuthorizeDenyMutation } from '@/data/oauth-apps/oauth-apps-authorize-deny-mutation'
 import { useOAuthAppsAuthorizeOrganizationProjectsQuery } from '@/data/oauth-apps/oauth-apps-authorize-organization-projects-query'
 import { useOAuthAppsAuthorizeOrganizationsQuery } from '@/data/oauth-apps/oauth-apps-authorize-organizations-query'
 import { useOAuthAppsAuthorizeRequestQuery } from '@/data/oauth-apps/oauth-apps-authorize-request-query'
+import type {
+  OAuthAppsAuthorizeRedirect,
+  OAuthAppsAuthorizeRoleValidationFailure,
+} from '@/data/oauth-apps/types'
+import { isRoleValidationFailure } from '@/data/oauth-apps/types'
 import { useSignOut } from '@/lib/auth'
 
 export interface OAuthAppsAuthorizeScreenProps {
@@ -42,8 +46,10 @@ export const OAuthAppsAuthorizeScreen = ({
   const selectedOrgSlug =
     organizationSlug ?? (mockState === 'empty_org' ? EMPTY_ORG_MOCK_SLUG : undefined)
   const [selectedProjectRefs, setSelectedProjectRefs] = useState<string[]>([])
-  const [projectError, setProjectError] = useState<string>()
-  const [approveResult, setApproveResult] = useState<OAuthAppsAuthorizeApproveResponse | null>(null)
+  const [approveRedirect, setApproveRedirect] = useState<OAuthAppsAuthorizeRedirect | null>(null)
+  const [roleFailure, setRoleFailure] = useState<OAuthAppsAuthorizeRoleValidationFailure | null>(
+    null
+  )
 
   const orgSlug = selectedOrgSlug ?? identity?.organizations[0]?.slug
   const memberOrg = identity?.organizations.find((org) => org.slug === orgSlug)
@@ -57,7 +63,12 @@ export const OAuthAppsAuthorizeScreen = ({
 
   const approveMutation = useOAuthAppsAuthorizeApproveMutation({
     onSuccess: (data) => {
-      setApproveResult(data)
+      if (isRoleValidationFailure(data)) {
+        setRoleFailure(data)
+        return
+      }
+      setRoleFailure(null)
+      setApproveRedirect(data)
     },
   })
   const denyMutation = useOAuthAppsAuthorizeDenyMutation({
@@ -74,7 +85,8 @@ export const OAuthAppsAuthorizeScreen = ({
   // mock_state=success lets a design review load straight into the receipt screen without
   // clicking through the flow first - it's a preview only, never a substitute for the real
   // approve mutation's result.
-  const approvedUrl = approveResult?.url ?? (mockState === 'success' ? request.redirect_uri : null)
+  const approvedUrl =
+    approveRedirect?.url ?? (mockState === 'success' ? request.redirect_uri : null)
 
   const grantedProjects =
     selectedProjectRefs.length > 0
@@ -84,6 +96,20 @@ export const OAuthAppsAuthorizeScreen = ({
   const isOrgAdminOrOwner =
     memberOrg.default_role === 'owner' || memberOrg.default_role === 'administrator'
   const orgRoleNoun = memberOrg.default_role === 'owner' ? 'owner' : 'admin'
+
+  // Only the rejected projects still in the selection matter, so deselecting them clears the
+  // failure treatment without another round trip.
+  const flaggedRefs = (roleFailure?.projects ?? [])
+    .map((project) => project.ref)
+    .filter((ref) => selectedProjectRefs.includes(ref))
+  const hasRoleFailure = flaggedRefs.length > 0
+  const primaryActionLabel = hasRoleFailure
+    ? `Deselect ${flaggedRefs.length} ${flaggedRefs.length === 1 ? 'project' : 'projects'}`
+    : `Authorize ${request.app_name}`
+  const primaryActionVariant = hasRoleFailure || isSubmitting ? 'default' : 'primary'
+  // Derived, not stored: the primary action is disabled while this holds, so a post-click
+  // validation error would never be reachable.
+  const hasNoSelection = selectedProjectRefs.length === 0
 
   if (approvedUrl) {
     return (
@@ -116,12 +142,11 @@ export const OAuthAppsAuthorizeScreen = ({
 
   const handleSwitchOrg = () => navigate('/organizations')
 
+  const handleDeselectFlagged = () =>
+    setSelectedProjectRefs((refs) => refs.filter((ref) => !flaggedRefs.includes(ref)))
+
   const handleApprove = () => {
-    if (selectedProjectRefs.length === 0) {
-      setProjectError('Must select at least one project to authorize.')
-      return
-    }
-    setProjectError(undefined)
+    if (hasNoSelection) return
     approveMutation.mutate({
       auth_id: scenarioId,
       slug: orgSlug,
@@ -155,6 +180,18 @@ export const OAuthAppsAuthorizeScreen = ({
           />
         )}
 
+        {hasRoleFailure && (
+          <Admonition
+            type="destructive"
+            title={
+              flaggedRefs.length === 1
+                ? "Couldn't authorize 1 project"
+                : `Couldn't authorize ${flaggedRefs.length} projects`
+            }
+            description={`${request.app_name} needs write access but your role is read-only on the projects highlighted. Deselect them to continue.`}
+          />
+        )}
+
         <fieldset disabled={isSubmitting} className="contents">
           <AuthorizingAsCard
             email={identity.email}
@@ -166,11 +203,10 @@ export const OAuthAppsAuthorizeScreen = ({
             <ProjectMultiSelect
               projects={projects ?? []}
               selectedRefs={selectedProjectRefs}
-              onChange={(refs) => {
-                setSelectedProjectRefs(refs)
-                if (refs.length > 0) setProjectError(undefined)
-              }}
-              error={projectError}
+              onChange={setSelectedProjectRefs}
+              error={hasNoSelection ? 'Must select at least one project to authorize.' : undefined}
+              flaggedRefs={flaggedRefs}
+              unavailableRefs={roleFailure?.projects.map((project) => project.ref)}
             />
           ) : (
             <NoProjectsNotice
@@ -206,12 +242,13 @@ export const OAuthAppsAuthorizeScreen = ({
           {hasProjects ? (
             <Button
               block
-              variant={isSubmitting ? 'default' : 'primary'}
+              variant={primaryActionVariant}
               loading={isSubmitting}
-              aria-label={`Authorize ${request.app_name}`}
-              onClick={handleApprove}
+              disabled={hasNoSelection}
+              aria-label={primaryActionLabel}
+              onClick={hasRoleFailure ? handleDeselectFlagged : handleApprove}
             >
-              {isSubmitting ? 'Authorizing...' : `Authorize ${request.app_name}`}
+              {isSubmitting ? 'Authorizing...' : primaryActionLabel}
             </Button>
           ) : (
             <Button block variant="primary" onClick={handleSwitchOrg}>
