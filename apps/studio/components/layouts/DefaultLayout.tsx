@@ -6,7 +6,7 @@ import { SkipToContent } from 'ui-patterns/SkipToContent'
 
 import { BannerStack } from '../ui/BannerStack/BannerStack'
 import { LayoutHeader } from './Navigation/LayoutHeader/LayoutHeader'
-import MobileNavigationBar from './Navigation/NavigationBar/MobileNavigationBar'
+import { MobileNavigationBar } from './Navigation/NavigationBar/MobileNavigationBar'
 import { MobileSheetProvider } from './Navigation/NavigationBar/MobileSheetContext'
 import { StudioMobileSheetNav } from './Navigation/NavigationBar/StudioMobileSheetNav'
 import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
