@@ -81,6 +81,9 @@ export default function BlogClient({ initialBlogs, totalPosts, initialView }: Bl
         limit: limit.toString(),
       })
 
+      if (filterParams.category && filterParams.category !== 'all') {
+        params.set('category', filterParams.category)
+      }
       if (filterParams.search) {
         params.set('q', filterParams.search)
       }
