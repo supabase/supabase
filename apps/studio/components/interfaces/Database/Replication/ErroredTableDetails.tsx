@@ -43,8 +43,7 @@ export const ErroredTableDetails = ({ table }: ErroredTableDetailsProps) => {
             >
               support
             </InlineLink>
-            . Use the table actions menu to view the error details or restart replication from
-            scratch.
+            . Use the row controls to view the error details or restart replication from scratch.
           </p>
         </div>
       ) : retryPolicy === 'manual_retry' ? (
@@ -59,8 +58,8 @@ export const ErroredTableDetails = ({ table }: ErroredTableDetailsProps) => {
                   {state.solution && !/[.!?]$/.test(state.solution.trim()) && '.'}
                 </p>
                 <p className="text-foreground-light mt-2">
-                  Restart table replication from scratch using the table actions menu on the right.
-                  An active pipeline restarts automatically. A stopped pipeline requires a manual
+                  Restart table replication from scratch using the restart button on the right. An
+                  active pipeline restarts automatically. A stopped pipeline requires a manual
                   start.
                 </p>
               </div>

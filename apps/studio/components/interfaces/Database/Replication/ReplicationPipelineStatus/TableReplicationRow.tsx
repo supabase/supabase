@@ -72,14 +72,15 @@ export const TableReplicationRow = ({
       </TableCell>
 
       <TableCell className="align-top">
-        {isRestarting ? (
-          <p className="text-sm text-foreground-lighter">
-            Preparing this table to replicate from scratch. Running pipelines restart automatically;
-            stopped pipelines remain stopped.
-          </p>
-        ) : showDisabledState ? (
+        <p role="status" className="text-sm text-foreground-lighter">
+          {isRestarting
+            ? 'Preparing this table to replicate from scratch. Running pipelines restart automatically; stopped pipelines remain stopped.'
+            : ''}
+        </p>
+        {!isRestarting && showDisabledState && (
           <p className="text-sm text-foreground-lighter">{disabledStateMessage}</p>
-        ) : (
+        )}
+        {!isRestarting && !showDisabledState && (
           <div className="flex flex-col gap-y-3">
             <div className="text-sm text-foreground">
               {statusConfig.description}{' '}

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { useDestinationForm } from './useDestinationForm'
+import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
 
 const mocks = vi.hoisted(() => ({
   validateDestination: vi.fn(),
@@ -174,6 +175,15 @@ describe('useDestinationForm validation', () => {
       )
       expect(mocks.createDestinationPipeline).not.toHaveBeenCalled()
       expect(mocks.startPipeline).not.toHaveBeenCalled()
+      if (enabled) {
+        expect(mocks.setRequestStatus).toHaveBeenCalledWith(
+          8,
+          PipelineStatusRequestStatus.RestartRequested,
+          'started'
+        )
+      } else {
+        expect(mocks.setRequestStatus).not.toHaveBeenCalled()
+      }
     }
   )
 
