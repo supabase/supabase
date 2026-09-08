@@ -30,7 +30,6 @@ export interface OAuthAppsAuthorizeScreenProps {
 }
 
 export const OAuthAppsAuthorizeScreen = ({
-  authId,
   organizationSlug,
   mockState,
   navigate,
@@ -40,9 +39,8 @@ export const OAuthAppsAuthorizeScreen = ({
   const { data: request } = useOAuthAppsAuthorizeRequestQuery({ id: scenarioId })
   const { data: identity } = useOAuthAppsAuthorizeOrganizationsQuery({ id: scenarioId })
 
-  const [selectedOrgSlug, setSelectedOrgSlug] = useState(
-    () => organizationSlug ?? (mockState === 'empty_org' ? EMPTY_ORG_MOCK_SLUG : undefined)
-  )
+  const selectedOrgSlug =
+    organizationSlug ?? (mockState === 'empty_org' ? EMPTY_ORG_MOCK_SLUG : undefined)
   const [selectedProjectRefs, setSelectedProjectRefs] = useState<string[]>([])
   const [projectError, setProjectError] = useState<string>()
   const [approveResult, setApproveResult] = useState<OAuthAppsAuthorizeApproveResponse | null>(null)
@@ -112,20 +110,7 @@ export const OAuthAppsAuthorizeScreen = ({
     window.location.reload()
   }
 
-  const handleSwitchOrg = () => {
-    const otherOrg = identity.organizations.find((org) => org.slug !== orgSlug)
-    if (!otherOrg) return
-
-    setSelectedOrgSlug(otherOrg.slug)
-    setSelectedProjectRefs([])
-    setProjectError(undefined)
-
-    const params = new URLSearchParams()
-    if (authId) params.set('auth_id', authId)
-    params.set('organization_slug', otherOrg.slug)
-    if (mockState) params.set('mock_state', mockState)
-    navigate(`/authorize?${params.toString()}`)
-  }
+  const handleSwitchOrg = () => navigate('/organizations')
 
   const handleApprove = () => {
     if (selectedProjectRefs.length === 0) {
@@ -197,15 +182,21 @@ export const OAuthAppsAuthorizeScreen = ({
         </fieldset>
 
         <div className="flex flex-col gap-2">
-          <Button
-            block
-            variant={isSubmitting ? 'default' : 'primary'}
-            loading={isSubmitting}
-            aria-label={`Authorize ${request.app_name}`}
-            onClick={handleApprove}
-          >
-            {isSubmitting ? 'Authorizing...' : `Authorize ${request.app_name}`}
-          </Button>
+          {hasProjects ? (
+            <Button
+              block
+              variant={isSubmitting ? 'default' : 'primary'}
+              loading={isSubmitting}
+              aria-label={`Authorize ${request.app_name}`}
+              onClick={handleApprove}
+            >
+              {isSubmitting ? 'Authorizing...' : `Authorize ${request.app_name}`}
+            </Button>
+          ) : (
+            <Button block variant="primary" onClick={handleSwitchOrg}>
+              Switch organization
+            </Button>
+          )}
           {!isSubmitting && (
             <Button variant="text" block onClick={handleDeny}>
               Cancel
