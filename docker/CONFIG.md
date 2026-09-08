@@ -1236,7 +1236,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 ## Analytics
 
-> The `analytics` container runs [logflare/logflare](github.com/Logflare/logflare), an Elixir/Phoenix application. Almost all runtime env reads live in [config/runtime.exs](https://github.com/Logflare/logflare/blob/main/config/runtime.exs). Self-hosted Supabase runs it in single-tenant Supabase mode with the Postgres backend; BigQuery support is available but commented out in `docker-compose.yml`. The container is the consumer of `LOGFLARE_PUBLIC_ACCESS_TOKEN`/`LOGFLARE_PRIVATE_ACCESS_TOKEN`.
+> The `analytics` container runs [logflare/logflare](https://github.com/Logflare/logflare), an Elixir/Phoenix application. Almost all runtime env reads live in [config/runtime.exs](https://github.com/Logflare/logflare/blob/main/config/runtime.exs). Self-hosted Supabase runs it in single-tenant Supabase mode with the Postgres backend; BigQuery support is available but commented out in `docker-compose.yml`. The container is the consumer of `LOGFLARE_PUBLIC_ACCESS_TOKEN`/`LOGFLARE_PRIVATE_ACCESS_TOKEN`.
 
 > **Heads-up - always-on admin UI:** Logflare's admin pages under `/admin/*` (sources, accounts, cluster view) **are reachable by default**. `LOGFLARE_SUPABASE_MODE=true` provisions an auto-admin user, and the `/admin/*` routes are gated by an auth pipeline rather than an env var - there is no flag to disable them.
 >
