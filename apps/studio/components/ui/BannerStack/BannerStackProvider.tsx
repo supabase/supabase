@@ -1,7 +1,6 @@
 import { createContext, useCallback, useContext, useState } from 'react'
 
 export const BANNER_ID = {
-  DATABASE_CONNECTIONS: 'database-connections-banner',
   INDEX_ADVISOR: 'index-advisor-banner',
   TABLE_EDITOR_QUEUE_OPERATIONS: 'table-editor-queue-operations-banner',
   RLS_EVENT_TRIGGER: 'rls-event-trigger-banner',

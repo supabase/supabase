@@ -1,13 +1,10 @@
 import * as z from 'zod'
 
 import {
-  optionalNumberInputSchema,
-  requiredNumberInputSchema,
-} from '../DestinationForm.schema.utils'
-import {
   BIGQUERY_MAX_CLUSTERING_COLUMNS,
   BIGQUERY_TIME_PARTITION_GRANULARITIES,
 } from '@/data/replication/types'
+import { optionalNumberInputSchema, requiredNumberInputSchema } from '@/lib/forms/zod-number-input'
 
 const CONNECTION_POOL_SIZE_MIN_ERROR = 'Connection pool size must be greater than 0.'
 

@@ -669,7 +669,6 @@ const MultiSelectorList = React.forwardRef<
         style={{
           maxHeight: `min(${dropdownMaxHeight}px, calc(var(--radix-popover-content-available-height) - ${DROPDOWN_BORDER_HEIGHT}px))`,
         }}
-        onWheel={(e) => e.stopPropagation()}
         {...props}
       >
         <SelectionListState
