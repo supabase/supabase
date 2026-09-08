@@ -26,12 +26,8 @@ export type SelectTriggerVariantProps = VariantProps<typeof selectTriggerVariant
 
 const ComboboxTrigger = React.forwardRef<
   HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement> &
-    SelectTriggerVariantProps & {
-      icon?: React.ReactNode
-      leadingIcon?: React.ReactNode
-    }
->(({ className, children, disabled, icon, leadingIcon, size, tabIndex, ...props }, ref) => {
+  React.ButtonHTMLAttributes<HTMLButtonElement> & SelectTriggerVariantProps
+>(({ className, children, disabled, size, tabIndex, ...props }, ref) => {
   const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
 
   return (
@@ -44,15 +40,12 @@ const ComboboxTrigger = React.forwardRef<
       tabIndex={computedTabIndex}
       {...props}
     >
-      {leadingIcon ? (
-        <span aria-hidden="true" className="shrink-0 text-foreground-lighter">
-          {leadingIcon}
-        </span>
-      ) : null}
       <span className="min-w-0 flex-1 truncate text-left">{children}</span>
-      <span aria-hidden="true" className="shrink-0 text-foreground-lighter">
-        {icon ?? <ChevronDown className="h-4 w-4" strokeWidth={1.5} />}
-      </span>
+      <ChevronDown
+        aria-hidden="true"
+        className="h-4 w-4 shrink-0 text-foreground-lighter"
+        strokeWidth={1.5}
+      />
     </button>
   )
 })

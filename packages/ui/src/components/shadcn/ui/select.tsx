@@ -1,6 +1,6 @@
 'use client'
 
-import { VariantProps } from 'class-variance-authority'
+import { type VariantProps } from 'class-variance-authority'
 import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { Select as SelectPrimitive } from 'radix-ui'
 import * as React from 'react'
