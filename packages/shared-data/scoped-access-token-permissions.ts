@@ -619,7 +619,6 @@ const buildCatalog = (): PermissionCatalogEntry[] => {
       writeScopes: writeScopes as FgaScopeId[],
     })
   }
-  console.log({ catalog })
   return catalog
 }
 
