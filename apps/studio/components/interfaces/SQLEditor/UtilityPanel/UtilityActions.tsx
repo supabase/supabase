@@ -135,10 +135,7 @@ export const UtilityActions = ({
           {IS_PLATFORM && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="gap-x-2"
-                onClick={() => saveFavorite(id, !isFavorite)}
-              >
+              <DropdownMenuItem className="gap-x-2" onClick={() => saveFavorite(id, !isFavorite)}>
                 <Heart
                   size={14}
                   strokeWidth={2}
