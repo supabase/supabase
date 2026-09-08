@@ -364,6 +364,14 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
     allowsRead: ['Read project API keys'],
     allowsWrite: ['Create and revoke API keys'],
   },
+  'project:api_gateway_keys_secret': {
+    category: 'appsvc',
+    name: 'JWT secret',
+    description: 'Project JWT secret.',
+    risk: 'high',
+    riskReason: 'Read exposes project JWT secret.',
+    allowsRead: ['Read project JWT secret'],
+  },
   'project:edge_functions': {
     category: 'appsvc',
     name: 'Edge Functions',
@@ -417,6 +425,14 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
     riskReason: 'Read-write can change how the auto-generated Data API behaves.',
     allowsRead: ['Read Data API configuration'],
     allowsWrite: ['Update Data API configuration'],
+  },
+  'project:data_api_config_secret': {
+    category: 'appsvc',
+    name: 'Data API Config Secret',
+    description: 'PostgREST behavior and settings.',
+    risk: 'high',
+    riskReason: 'Read exposes Data API secrets.',
+    allowsRead: ['Read Data API Secret'],
   },
 
   // --- Infrastructure and delivery ---
@@ -603,6 +619,7 @@ const buildCatalog = (): PermissionCatalogEntry[] => {
       writeScopes: writeScopes as FgaScopeId[],
     })
   }
+  console.log({ catalog })
   return catalog
 }
 
