@@ -84,9 +84,13 @@ export const REFERENCES = {
     name: 'C#',
     library: 'supabase-csharp',
     libPath: 'csharp',
-    versions: ['v1', 'v0'],
+    versions: ['v8', 'v1', 'v0'],
     icon: 'reference-csharp',
     meta: {
+      v8: {
+        libId: 'reference_csharp_v8',
+        specFile: 'supabase_csharp_v8',
+      },
       v1: {
         libId: 'reference_csharp_v1',
         specFile: 'supabase_csharp_v1',
