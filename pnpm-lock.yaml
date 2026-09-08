@@ -1008,9 +1008,6 @@ importers:
       '@smithy/property-provider':
         specifier: ^4.0.4
         version: 4.0.4
-      '@std/path':
-        specifier: npm:@jsr/std__path@^1.0.8
-        version: '@jsr/std__path@1.0.8'
       '@stripe/react-stripe-js':
         specifier: 6.1.0
         version: 6.1.0(@stripe/stripe-js@9.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -5174,9 +5171,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
-
-  '@jsr/std__path@1.0.8':
-    resolution: {integrity: sha512-eNBGlh/8ZVkMxtFH4bwIzlAeKoHYk5in4wrBZhi20zMdOiuX4QozP4+19mIXBT2lzHDjhuVLyECbhFeR304iDg==, tarball: https://npm.jsr.io/~/11/@jsr/std__path/1.0.8.tgz}
 
   '@kwsites/file-exists@1.1.1':
     resolution: {integrity: sha512-m9/5YGR18lIwxSFDwfE3oA7bWuq9kdau6ugN4H2rJeyhFQZcG9AgSHkQtSD15a8WvTgfz9aikZMrKPHvbpqFiw==}
@@ -21294,8 +21288,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
-
-  '@jsr/std__path@1.0.8': {}
 
   '@kwsites/file-exists@1.1.1(supports-color@8.1.1)':
     dependencies:

@@ -1,7 +1,33 @@
-import { common, dirname, relative } from '@std/path/posix'
+import path from 'path'
 
 import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
 import { EdgeFunctionBodyData } from '@/data/edge-functions/edge-function-body-query'
+
+// Longest common path prefix across `paths`, comparing "/"-separated segments.
+// No Node.js built-in for this; mirrors the semantics of the JSR `@std/path` `common()` we used to depend on.
+function commonPath(paths: string[]): string {
+  const [first = '', ...rest] = paths
+  const parts = first.split('/')
+  let endOfPrefix = parts.length
+  let append = ''
+
+  for (const p of rest) {
+    const compare = p.split('/')
+    if (compare.length <= endOfPrefix) {
+      endOfPrefix = compare.length
+      append = ''
+    }
+    for (let i = 0; i < endOfPrefix; i++) {
+      if (compare[i] !== parts[i]) {
+        endOfPrefix = i
+        append = i === 0 ? '' : '/'
+        break
+      }
+    }
+  }
+
+  return parts.slice(0, endOfPrefix).join('/') + append
+}
 
 export const getFallbackImportMapPath = (files: Omit<FileData, 'id' | 'content' | 'state'>[]) => {
   // try to find a deno.json or import_map.json file
@@ -45,10 +71,10 @@ function getBasePath(entrypoint: string | undefined, fileNames: string[]): strin
   let candidate = fileNames.find((name) => entrypoint.endsWith(name))
 
   if (candidate) {
-    return dirname(candidate)
+    return path.posix.dirname(candidate)
   } else {
     try {
-      return dirname(new URL(entrypoint).pathname)
+      return path.posix.dirname(new URL(entrypoint).pathname)
     } catch (e) {
       console.error('Failed to parse entrypoint', entrypoint)
       return '/'
@@ -77,13 +103,13 @@ export const formatFunctionBodyToFiles = ({
         try {
           // if the current file and base path doesn't share a common path,
           // return unmodified file
-          const common_path = common([base_path, file.name])
+          const common_path = commonPath([base_path, file.name])
           if (common_path === '' || common_path === '/tmp/') {
             return file
           }
 
           // prepend "/" to turn relative paths to absolute
-          file.name = relative('/' + base_path, '/' + file.name)
+          file.name = path.posix.relative('/' + base_path, '/' + file.name)
           return file
         } catch (e) {
           console.error(e)
