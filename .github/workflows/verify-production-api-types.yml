@@ -16,7 +16,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" --paginate --jq '.[].filename' | rg -q '^packages/api-types/types/'; then
+          if gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" --paginate --jq '.[].filename' | grep -q '^packages/api-types/types/'; then
             echo "api_types_changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "api_types_changed=false" >> "$GITHUB_OUTPUT"
