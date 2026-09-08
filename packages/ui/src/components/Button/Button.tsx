@@ -23,6 +23,7 @@ const buttonVariants = cva(
   transition-colors
   focus-ring
   border
+  not-prose no-underline
   `,
   {
     variants: {
