@@ -53,7 +53,7 @@ If you scan more log data than your allowance covers in a given month, the follo
 - Queries are rate limited to 10 per minute.
 - Log retention shrinks to 24 hours (Pro, Team, and Enterprise) or 1 hour (Free).
 
-If you exceed your allowance again the next month, while still in that degraded state, logs access is cut off entirely for the month after. Access returns to normal at your next billing cycle.
+If you exceed your allowance again the next month, while still in that degraded state, logs access in the API and Studio UI will be cut off entirely for the month after. Access returns to normal at your next billing cycle.
 
 ### A concrete walkthrough
 
@@ -61,9 +61,3 @@ If you exceed your allowance again the next month, while still in that degraded 
 - February: Degraded — 10 queries/min, retention shrunk to 24 hours on paid tiers, 1 hour on the Free Plan.
 - March: If February also went over, that's two consecutive months, so this month is a full cutoff.
 - April: Billing cycle resets, access returns to normal. This allows you to make continued efforts to optimize your log query usage.
-
-## Migrate from the logs.all endpoint
-
-Supabase's `logs.all` Management API endpoint is being retired on September 23, 2026, in favor of the `logs` endpoint. If you have scripts or integrations that call `logs.all` directly, update them to use the new endpoint — see the [migration changelog](/changelog/48235-migration-of-supabase-management-api-logs-all-analytics-endpoint-to-logs-endpoint) for the syntax changes.
-
-While you're updating those queries, check whether they filter on structured fields such as source or service. Filtered queries scan less data than broad searches, so this is a good checkpoint to review whether an existing query scans more than it needs to.
