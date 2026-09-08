@@ -3,14 +3,24 @@ import { describe, expect, test } from 'vitest'
 import { OAUTH_APPS_MOCK_SCENARIOS } from './mocks'
 import { approveOAuthAppsAuthorize } from './oauth-apps-authorize-approve-mutation'
 import { denyOAuthAppsAuthorize } from './oauth-apps-authorize-deny-mutation'
+import { isRoleValidationFailure } from './types'
 
 const AUTH_ID = OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper
 const SLUG = 'northwind-traders'
 const PROJECT_REFS = ['northwindstorefront1']
 
+// approve now returns a redirect-or-role-failure union, so narrow before reading the url.
+async function approveExpectingRedirect(
+  variables: Parameters<typeof approveOAuthAppsAuthorize>[0]
+) {
+  const result = await approveOAuthAppsAuthorize(variables)
+  if (isRoleValidationFailure(result)) throw new Error('expected a redirect, got a role failure')
+  return result
+}
+
 describe('approveOAuthAppsAuthorize', () => {
   test('returns a redirect url carrying both code and state', async () => {
-    const { url } = await approveOAuthAppsAuthorize({
+    const { url } = await approveExpectingRedirect({
       slug: SLUG,
       auth_id: AUTH_ID,
       project_refs: PROJECT_REFS,
@@ -43,7 +53,7 @@ describe('approveOAuthAppsAuthorize', () => {
   test('does not enforce a selection cap', async () => {
     const manyRefs = Array.from({ length: 25 }, (_, index) => `ref-${index}`)
 
-    const { url } = await approveOAuthAppsAuthorize({
+    const { url } = await approveExpectingRedirect({
       slug: SLUG,
       auth_id: AUTH_ID,
       project_refs: manyRefs,
