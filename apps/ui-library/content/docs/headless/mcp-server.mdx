@@ -16,7 +16,7 @@ Installs Deno Edge Function files into a Supabase project or empty directory. No
 `components.json` is required. Backend files stay in `supabase/` at the project
 root even when the frontend uses `src/`.
 
-In a frontend app, add `"supabase/functions/**"` to the app tsconfig's `exclude`
+In a frontend app, add `"supabase/functions/**"` to the app's `tsconfig.json` `exclude`
 list, preserving existing entries. Check the function separately with Deno.
 
 ## Folder structure
@@ -37,6 +37,9 @@ legacy HS256 secret do not expose signing keys from the JWKS endpoint, so the
 function cannot authenticate embedded product sessions or external MCP clients.
 Switch to an ES256 or RS256 key in
 [JWT Keys](https://supabase.com/dashboard/project/_/settings/jwt).
+
+For local development, Supabase CLI 2.71.1 and later supplies asymmetric signing
+keys automatically.
 
 ## Choose how agents authenticate
 

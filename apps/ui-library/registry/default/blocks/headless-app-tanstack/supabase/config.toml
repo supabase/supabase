@@ -40,8 +40,6 @@ enabled = true
 site_url = "http://localhost:3000"
 additional_redirect_urls = ["http://localhost:3000/**"]
 jwt_expiry = 3600
-# Generate local signing keys before starting the stack. Do not commit the key file.
-signing_keys_path = "./signing_keys.json"
 enable_signup = true
 
 [auth.email]

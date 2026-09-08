@@ -2,8 +2,8 @@
   "name": "headless-app-tanstack",
   "type": "registry:block",
   "title": "Headless App for TanStack Start",
-  "description": "A backend your customers can use through their agents: sign-in, OAuth consent, an MCP server, and connected agent management.",
-  "docs": "Follow https://supabase.com/library/docs/tanstack/headless-app to configure local JWT signing keys, apply the declarative tasks schema, and serve the MCP function. Set `VITE_PRODUCT_NAME`, `VITE_SUPABASE_URL`, and `VITE_SUPABASE_PUBLISHABLE_KEY` in `.env.local`. Open `/agents` to copy the MCP URL, authorize a client, and verify the connection with `whoami`. The server includes list_tasks, create_task, update_task, and delete_task, scoped to the signed-in user through RLS. Merge `supabase/config.toml` with existing project settings before applying it.",
+  "description": "A backend with an agent as the primary interface, combining auth, OAuth consent, and an MCP server.",
+  "docs": "Follow https://supabase.com/library/docs/tanstack/headless-app for setup. Merge `supabase/config.toml` with existing project settings. Open `/agents` to connect your agent and approve access, then try the example task tools.",
   "envVars": {
     "VITE_PRODUCT_NAME": "Your product"
   },
