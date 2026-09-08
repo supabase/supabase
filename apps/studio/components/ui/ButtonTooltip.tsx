@@ -10,10 +10,10 @@ export const ButtonTooltip = forwardRef<
       }
     }
   }
->(({ tooltip, className, disabled, unavailable, ...props }, ref) => {
+>(({ tooltip, className, disabled, focusableWhenDisabled, ...props }, ref) => {
   const { text, ...tooltipContentProps } = tooltip.content
   const hasTooltip = text !== undefined
-  const isUnavailable = unavailable ?? (disabled === true && hasTooltip)
+  const shouldRemainFocusable = focusableWhenDisabled ?? (disabled === true && hasTooltip)
 
   return (
     <Tooltip>
@@ -21,8 +21,8 @@ export const ButtonTooltip = forwardRef<
         <Button
           ref={ref}
           {...props}
-          unavailable={isUnavailable}
-          disabled={isUnavailable ? false : disabled}
+          disabled={disabled}
+          focusableWhenDisabled={shouldRemainFocusable}
           className={className}
         >
           {props.children}

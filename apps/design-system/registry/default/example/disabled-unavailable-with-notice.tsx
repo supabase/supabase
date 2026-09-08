@@ -33,7 +33,12 @@ export default function DisabledUnavailableWithNotice() {
       <CardContent className="flex justify-end pt-4">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="default" icon={<CirclePause />} unavailable={unavailable}>
+            <Button
+              variant="default"
+              icon={<CirclePause />}
+              disabled={unavailable}
+              focusableWhenDisabled
+            >
               Pause project
             </Button>
           </TooltipTrigger>

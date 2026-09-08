@@ -149,14 +149,16 @@ Inside [Admonition](../fragments/admonition#split-button-with-dropdown) actions 
 
 You therefore don't need to manually set `tabIndex` for buttons using native `disabled`.
 
-When an action is unavailable for a non-obvious reason and needs a tooltip, use `unavailable` instead of native `disabled` so keyboard users can still focus the control. See [Disabled controls](../accessibility#disabled-controls).
+When a disabled action has a non-obvious reason and needs a tooltip, add `focusableWhenDisabled` so keyboard users can still focus the control. See [Disabled controls](../accessibility#disabled-controls).
 
-### Unavailable
+### Focusable when disabled
 
-Use `unavailable` when the action is blocked for a non-obvious reason and you need a tooltip or other explanation. The control stays in the tab order and uses `aria-disabled` instead of native `disabled`.
+Use `focusableWhenDisabled` with `disabled` when the action is blocked for a non-obvious reason and you need a tooltip or other explanation. The control stays in the tab order and uses `aria-disabled` instead of native `disabled`.
 
 ```tsx
-<Button unavailable>Pause project</Button>
+<Button disabled focusableWhenDisabled>
+  Pause project
+</Button>
 ```
 
-In Studio, `ButtonTooltip` maps `disabled` + tooltip text to `unavailable` automatically.
+In Studio, `ButtonTooltip` adds `focusableWhenDisabled` to disabled buttons with tooltip text automatically.

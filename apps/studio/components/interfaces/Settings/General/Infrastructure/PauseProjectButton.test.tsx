@@ -59,9 +59,9 @@ describe('PauseProjectButton', () => {
     customRender(<PauseProjectButton />)
 
     const button = screen.getByRole('button', { name: 'Pause project' })
-    expect(button).toBeUnavailable()
+    expect(button).toBeAriaDisabled()
 
-    // Radix opens the tooltip on pointermove; unavailable buttons stay focusable
+    // Radix opens the tooltip on pointermove; focusable disabled buttons support this
     fireEvent.pointerMove(button)
     expect(
       await screen.findAllByText(

@@ -36,23 +36,19 @@ describe('#Button', () => {
     expect(screen.getByText('按钮')).toBeInTheDocument()
   })
 
-  it('should use native disabled when loading even if unavailable is true', () => {
-    render(
-      <Button unavailable loading>
-        Button
-      </Button>
-    )
+  it('should use native disabled when loading by default', () => {
+    render(<Button loading>Button</Button>)
 
     const button = screen.getByRole('button')
     expect(button).toBeDisabled()
     expect(button).not.toHaveAttribute('aria-disabled', 'true')
   })
 
-  it('should ignore events when unavailable', () => {
+  it('should remain focusable and ignore events when disabled with focusableWhenDisabled', () => {
     const WrapperButton = () => {
       const [state, setState] = React.useState('state1')
       return (
-        <Button unavailable onClick={() => setState('state2')}>
+        <Button disabled focusableWhenDisabled onClick={() => setState('state2')}>
           {state}
         </Button>
       )
@@ -71,12 +67,12 @@ describe('#Button', () => {
     expect(screen.queryByText('state2')).not.toBeInTheDocument()
   })
 
-  it('should ignore child onClick when unavailable with asChild', () => {
+  it('should ignore child onClick when focusably disabled with asChild', () => {
     const childOnClick = vi.fn()
     const buttonOnClick = vi.fn()
 
     render(
-      <Button asChild unavailable onClick={buttonOnClick}>
+      <Button asChild disabled focusableWhenDisabled onClick={buttonOnClick}>
         <a href="/foo" onClick={childOnClick}>
           Link
         </a>

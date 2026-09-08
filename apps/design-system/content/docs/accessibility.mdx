@@ -141,23 +141,23 @@ Native `disabled` removes the control from the tab order, suppresses interaction
 
 <ComponentPreview name="disabled-native-form" />
 
-### `unavailable`
+### Focusable when disabled
 
-Use the `unavailable` prop when an action is unavailable for a reason that is not obvious, especially when you show a tooltip explaining why:
+Use `disabled` with `focusableWhenDisabled` when an action is unavailable for a reason that is not obvious, especially when you show a tooltip explaining why:
 
 - Permission gates
 - Plan or infrastructure restrictions
 - Business rules that block an otherwise visible action
 
-`unavailable` sets `aria-disabled="true"`, keeps the control in the tab order, and applies disabled styling without `pointer-events-none`. Guard handlers are built into [Button](components/button). See also [MDN: aria-disabled](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-disabled).
+`focusableWhenDisabled` changes how the disabled state is implemented. It sets `aria-disabled="true"`, keeps the control in the tab order, and applies disabled styling without `pointer-events-none`. Guard handlers are built into [Button](components/button). See also [MDN: aria-disabled](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-disabled).
 
-Tab through the comparison below with the keyboard. Only the `unavailable` button stays focusable and exposes its tooltip.
+Tab through the comparison below with the keyboard. Only the focusable disabled button stays focusable and exposes its tooltip.
 
 <ComponentPreview name="disabled-comparison" />
 
-Implementation checklist for `unavailable`:
+Implementation checklist for focusable disabled buttons:
 
-- Prefer `unavailable` over native `disabled` when the reason is not obvious
+- Add `focusableWhenDisabled` when the reason for disabling the control is not obvious
 - Pair with a tooltip when you need to explain why
 - Guard `onClick` and keyboard activation (`Enter` / `Space`) (`Button` does this automatically)
 - Keep `tabIndex={0}` (`Button` does this automatically)
@@ -166,17 +166,19 @@ Implementation checklist for `unavailable`:
 ```tsx showLineNumbers
 <Tooltip>
   <TooltipTrigger asChild>
-    <Button unavailable={unavailable}>Pause project</Button>
+    <Button disabled={unavailable} focusableWhenDisabled>
+      Pause project
+    </Button>
   </TooltipTrigger>
   {unavailable && <TooltipContent>{reason}</TooltipContent>}
 </Tooltip>
 ```
 
-In Studio, `ButtonTooltip` maps `disabled` + tooltip text to `unavailable` automatically.
+In Studio, `ButtonTooltip` adds `focusableWhenDisabled` to disabled buttons with tooltip text automatically.
 
 ### Page-level context
 
-Tooltips alone are not enough for significant restrictions. Pair `unavailable` controls with visible page context (for example: an [Admonition](fragments/admonition), empty state, or inline copy) so the reason is available even without hover or focus.
+Tooltips alone are not enough for significant restrictions. Pair focusable disabled controls with visible page context (for example: an [Admonition](fragments/admonition), empty state, or inline copy) so the reason is available even without hover or focus.
 
 <ComponentPreview name="disabled-unavailable-with-notice" />
 

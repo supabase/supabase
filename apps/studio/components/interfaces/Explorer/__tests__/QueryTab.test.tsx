@@ -268,7 +268,7 @@ describe('QueryTab execution', () => {
 
     renderQueryTab()
     const runButton = await screen.findByRole('button', { name: 'Run' })
-    expect(runButton).toBeUnavailable()
+    expect(runButton).toBeAriaDisabled()
 
     act(() => releaseReplicas())
     await waitFor(() => expect(runButton).toBeEnabled())

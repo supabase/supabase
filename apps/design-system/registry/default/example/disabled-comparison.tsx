@@ -20,13 +20,18 @@ function NativeDisabledButton() {
   )
 }
 
-function UnavailableButton() {
+function FocusableDisabledButton() {
   const unavailable = true
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="default" icon={<CirclePause />} unavailable={unavailable}>
+        <Button
+          variant="default"
+          icon={<CirclePause />}
+          disabled={unavailable}
+          focusableWhenDisabled
+        >
           Pause project
         </Button>
       </TooltipTrigger>
@@ -46,11 +51,11 @@ export default function DisabledComparison() {
         <NativeDisabledButton />
       </div>
       <div className="space-y-2">
-        <p className="text-sm font-medium">unavailable</p>
+        <p className="text-sm font-medium">Focusable when disabled</p>
         <p className="text-sm text-foreground-light">
           Stays in the tab order. Keyboard users can focus the button and read the tooltip on focus.
         </p>
-        <UnavailableButton />
+        <FocusableDisabledButton />
       </div>
     </div>
   )

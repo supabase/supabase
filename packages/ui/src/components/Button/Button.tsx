@@ -107,7 +107,7 @@ const buttonVariants = cva(
       disabled: {
         true: 'opacity-50 cursor-not-allowed pointer-events-none',
       },
-      unavailable: {
+      focusableWhenDisabled: {
         true: 'opacity-50 cursor-not-allowed',
       },
       rounded: {
@@ -187,11 +187,11 @@ export interface ButtonProps
   iconRight?: React.ReactNode
   rounded?: boolean
   /**
-   * Marks the button as unavailable while keeping it keyboard-focusable.
-   * Uses `aria-disabled` instead of native `disabled`. Prefer this over
-   * `disabled` when the control needs a tooltip or other explanation.
+   * Keeps a disabled button keyboard-focusable by using `aria-disabled`
+   * instead of native `disabled`. Use this when the control needs a tooltip
+   * or other explanation.
    */
-  unavailable?: boolean
+  focusableWhenDisabled?: boolean
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -208,7 +208,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       iconLeft,
       type = 'button',
       rounded,
-      unavailable: unavailableProp,
+      focusableWhenDisabled: focusableWhenDisabledProp,
       ...props
     },
     ref
@@ -219,11 +219,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // decrecating 'showIcon' for rightIcon
     const _iconLeft: React.ReactNode = icon ?? iconLeft
     const isLoading = loading === true
-    const unavailable = unavailableProp === true && !isLoading
     // if loading, button is disabled
-    const disabled = isLoading || (disabledProp === true && !unavailable)
+    const disabled = isLoading || disabledProp === true
+    const focusableWhenDisabled = disabled && focusableWhenDisabledProp === true
+    const nativeDisabled = disabled && !focusableWhenDisabled
 
-    const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
+    const computedTabIndex = getExplicitTabIndex(tabIndex, nativeDisabled)
 
     const renderIconContainer = (content: ReactNode) => (
       <div aria-hidden className={cn(IconContainerVariants({ size, variant }))}>
@@ -232,7 +233,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     )
 
     const handleActivation = (e: React.MouseEvent, childOnClick?: React.MouseEventHandler) => {
-      if (disabled || unavailable) {
+      if (disabled) {
         e.preventDefault()
         e.stopPropagation()
         return
@@ -250,11 +251,18 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         data-size={size}
         type={type}
         {...rest}
-        aria-disabled={unavailable || undefined}
-        disabled={disabled}
+        aria-disabled={focusableWhenDisabled || undefined}
+        disabled={nativeDisabled}
         tabIndex={computedTabIndex}
         className={cn(
-          buttonVariants({ variant, size, disabled, unavailable, block, rounded }),
+          buttonVariants({
+            variant,
+            size,
+            disabled: nativeDisabled,
+            focusableWhenDisabled,
+            block,
+            rounded,
+          }),
           className
         )}
         onClick={asChild ? undefined : (e) => handleActivation(e)}

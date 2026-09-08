@@ -1,28 +1,28 @@
 import { expect } from 'vitest'
 
-function isUnavailable(element: Element) {
+function isAriaDisabled(element: Element) {
   if (!(element instanceof HTMLElement)) return false
 
   return element.getAttribute('aria-disabled') === 'true'
 }
 
 expect.extend({
-  toBeUnavailable(received: Element) {
-    const pass = isUnavailable(received)
+  toBeAriaDisabled(received: Element) {
+    const pass = isAriaDisabled(received)
 
     return {
       pass,
       message: () =>
-        pass ? `expected element not to be unavailable` : `expected element to be unavailable`,
+        pass ? `expected element not to be aria-disabled` : `expected element to be aria-disabled`,
     }
   },
 })
 
 declare module 'vitest' {
   interface Assertion<T = any> {
-    toBeUnavailable(): T
+    toBeAriaDisabled(): T
   }
   interface AsymmetricMatchersContaining {
-    toBeUnavailable(): void
+    toBeAriaDisabled(): void
   }
 }
