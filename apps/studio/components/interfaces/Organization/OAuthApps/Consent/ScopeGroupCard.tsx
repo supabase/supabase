@@ -13,11 +13,11 @@ export const ScopeGroupCard = ({
   showHeading = true,
 }: ScopeGroupCardProps) => {
   return (
-    <section className="flex flex-col gap-5">
+    <section className="flex flex-col gap-3">
       {showHeading && (
         <div className="flex flex-col gap-1">
           <p className="text-xs text-foreground">Permissions requested</p>
-          <p className="text-xs text-foreground-light">
+          <p className="text-xs text-foreground-lighter">
             Authorizing {appName} grants it the following access permissions to the selected
             projects.
           </p>

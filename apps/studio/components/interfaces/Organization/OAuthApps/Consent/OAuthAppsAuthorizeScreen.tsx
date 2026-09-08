@@ -171,8 +171,6 @@ export const OAuthAppsAuthorizeScreen = ({
             email={identity.email}
             organizationSlug={memberOrg.slug}
             onSignOut={handleSignOut}
-            showSwitcher={identity.organizations.length > 1}
-            onSwitchOrg={handleSwitchOrg}
           />
 
           {hasProjects ? (
@@ -198,7 +196,7 @@ export const OAuthAppsAuthorizeScreen = ({
           )}
         </fieldset>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2">
           <Button
             block
             variant={isSubmitting ? 'default' : 'primary'}
@@ -215,15 +213,21 @@ export const OAuthAppsAuthorizeScreen = ({
           )}
         </div>
 
-        <div className="border-t pt-6">
-          <p className="text-xs text-foreground-light">
-            {footerMessage ?? (
-              <>
+        <div className="flex flex-col gap-4 border-t pt-6 text-xs text-foreground-lighter">
+          {footerMessage ? (
+            <p>{footerMessage}</p>
+          ) : (
+            <>
+              <p>
+                No admin approval is needed if your role permits this access. This authorization
+                will appear in Authorized apps.
+              </p>
+              <p>
                 Authorizing will redirect you to{' '}
-                <span className="text-foreground">{request.redirect_uri}</span>.
-              </>
-            )}
-          </p>
+                <span className="text-foreground">{request.redirect_uri}</span>
+              </p>
+            </>
+          )}
         </div>
       </div>
     </InterstitialLayout>
