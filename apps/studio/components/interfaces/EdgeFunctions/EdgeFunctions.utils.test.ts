@@ -35,9 +35,14 @@ describe('formatFunctionBodyToFiles', () => {
     ]
     const result = formatFunctionBodyToFiles({
       functionBody: { files, metadata: {} },
-      entrypointPath: 'https://edge.supabase.com/functions/hello/index.ts',
+      entrypointPath: 'https://edge.supabase.com/deploy/abc123/main.ts',
     })
-    expect(result.map((f) => f.name)).toEqual(['index.ts', 'utils/helper.ts'])
+    // the URL's parsed base path ('/deploy/abc123') shares no common prefix with
+    // the relative file names, so they're left unmodified (per commonPath)
+    expect(result.map((f) => f.name)).toEqual([
+      'functions/hello/index.ts',
+      'functions/hello/utils/helper.ts',
+    ])
   })
 
   it('leaves a file unmodified when it shares no common path with the base path', () => {
