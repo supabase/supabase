@@ -14,7 +14,6 @@ import {
   PopoverTrigger,
   RadioGroupStacked,
   RadioGroupStackedItem,
-  ScrollArea,
   Select,
   SelectContent,
   SelectItem,
@@ -272,29 +271,32 @@ interface ConnectComboboxProps {
   onValueChange: (value: string) => void
 }
 
+function getFrameworkMatchScore(value: string, search: string, keywords?: string[]) {
+  const normalizedSearch = search.trim().toLowerCase()
+  if (normalizedSearch.length === 0) return 1
+
+  const searchableValues = [value, ...(keywords ?? [])]
+
+  return searchableValues.some((item) => item.toLowerCase().includes(normalizedSearch)) ? 1 : 0
+}
+
 function ConnectCombobox({ id, options, value, onValueChange }: ConnectComboboxProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [listboxElementId, setListboxElementId] = useState<string>()
   const selectedOption = options.find((option) => option.value === value)
-  const normalizedSearch = search.trim().toLowerCase()
   const showEmptyStatus =
-    normalizedSearch.length > 0 &&
-    !options.some(
-      (option) =>
-        option.label.toLowerCase().includes(normalizedSearch) ||
-        option.value.toLowerCase().includes(normalizedSearch)
-    )
+    search.trim().length > 0 &&
+    !options.some((option) => getFrameworkMatchScore(option.label, search, [option.value]) > 0)
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
+    if (!open) setSearch('')
+  }
 
   return (
-    <Popover
-      open={isOpen}
-      onOpenChange={(open) => {
-        setIsOpen(open)
-        if (!open) setSearch('')
-      }}
-      modal={false}
-    >
+    // `modal` is required inside the Connect sheet: the sheet's scroll lock cancels wheel and
+    // touch events that land outside it, and a non-modal popover portals outside the sheet.
+    <Popover open={isOpen} onOpenChange={handleOpenChange} modal>
       <PopoverTrigger asChild>
         <Button
           id={id}
@@ -317,7 +319,7 @@ function ConnectCombobox({ id, options, value, onValueChange }: ConnectComboboxP
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="p-0" sameWidthAsTrigger>
-        <Command>
+        <Command filter={getFrameworkMatchScore}>
           <CommandInput
             placeholder="Search frameworks..."
             value={search}
@@ -327,39 +329,38 @@ function ConnectCombobox({ id, options, value, onValueChange }: ConnectComboboxP
             {showEmptyStatus ? 'No frameworks found.' : ''}
           </p>
           <CommandList
+            className="max-h-72 overscroll-contain"
             ref={(node) => {
               if (node?.id) setListboxElementId(node.id)
             }}
           >
             <CommandEmpty>No frameworks found.</CommandEmpty>
             <CommandGroup>
-              <ScrollArea className="h-72" onWheel={(event) => event.stopPropagation()}>
-                {options.map((option) => (
-                  <CommandItem
-                    key={option.value}
-                    value={option.label}
-                    keywords={[option.value]}
-                    onSelect={() => {
-                      onValueChange(option.value)
-                      setIsOpen(false)
-                    }}
-                    className="gap-x-2"
-                  >
-                    <Check
-                      className={cn(
-                        'h-4 w-4 shrink-0',
-                        option.value === value ? 'opacity-100' : 'opacity-0'
-                      )}
-                    />
-                    {option.icon && (
-                      <span aria-hidden="true" className="flex shrink-0">
-                        <ConnectionIcon icon={option.icon} />
-                      </span>
+              {options.map((option) => (
+                <CommandItem
+                  key={option.value}
+                  value={option.label}
+                  keywords={[option.value]}
+                  onSelect={() => {
+                    onValueChange(option.value)
+                    handleOpenChange(false)
+                  }}
+                  className="gap-x-2"
+                >
+                  <Check
+                    className={cn(
+                      'h-4 w-4 shrink-0',
+                      option.value === value ? 'opacity-100' : 'opacity-0'
                     )}
-                    <span className="truncate">{option.label}</span>
-                  </CommandItem>
-                ))}
-              </ScrollArea>
+                  />
+                  {option.icon && (
+                    <span aria-hidden="true" className="flex shrink-0">
+                      <ConnectionIcon icon={option.icon} />
+                    </span>
+                  )}
+                  <span className="truncate">{option.label}</span>
+                </CommandItem>
+              ))}
             </CommandGroup>
           </CommandList>
         </Command>

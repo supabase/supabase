@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { describe, expect, test, vi } from 'vitest'
@@ -52,6 +52,64 @@ describe('ConnectConfigSection', () => {
     expect(onFieldChange).toHaveBeenCalledWith('framework', 'react-native')
   })
 
+  test('matches frameworks by key without announcing the empty state', async () => {
+    const user = userEvent.setup()
+
+    customRender(
+      <ConnectConfigSection
+        activeFields={[frameworkField]}
+        state={{ framework: 'nextjs' }}
+        onFieldChange={vi.fn()}
+        getFieldOptions={() => frameworkOptions}
+      />
+    )
+
+    await user.click(screen.getByRole('combobox'))
+    await user.type(screen.getByPlaceholderText('Search frameworks...'), 'nextjs')
+
+    expect(screen.getByRole('option', { name: 'Next.js' })).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('')
+  })
+
+  test('announces when no frameworks match the search', async () => {
+    const user = userEvent.setup()
+
+    customRender(
+      <ConnectConfigSection
+        activeFields={[frameworkField]}
+        state={{ framework: 'nextjs' }}
+        onFieldChange={vi.fn()}
+        getFieldOptions={() => frameworkOptions}
+      />
+    )
+
+    await user.click(screen.getByRole('combobox'))
+    await user.type(screen.getByPlaceholderText('Search frameworks...'), 'missing')
+
+    expect(screen.getByRole('status')).toHaveTextContent('No frameworks found.')
+  })
+
+  test('clears the search when the combobox closes after selecting an option', async () => {
+    const user = userEvent.setup()
+
+    customRender(
+      <ConnectConfigSection
+        activeFields={[frameworkField]}
+        state={{ framework: 'nextjs' }}
+        onFieldChange={vi.fn()}
+        getFieldOptions={() => frameworkOptions}
+      />
+    )
+
+    await user.click(screen.getByRole('combobox'))
+    const searchInput = screen.getByPlaceholderText('Search frameworks...')
+    await user.type(searchInput, 'native')
+    await user.click(screen.getByRole('option', { name: 'React Native' }))
+    await user.click(screen.getByRole('combobox'))
+
+    expect(screen.getByPlaceholderText('Search frameworks...')).toHaveValue('')
+  })
+
   test('uses a bounded scroll area for long framework lists', async () => {
     const user = userEvent.setup()
 
@@ -72,12 +130,11 @@ describe('ConnectConfigSection', () => {
     const listbox = screen.getByRole('listbox')
     expect(combobox!.getAttribute('aria-controls')).toBe(listbox.id)
 
-    const scrollArea = listbox.querySelector('.h-72')
-    expect(scrollArea).toBeTruthy()
+    expect(listbox).toHaveClass('max-h-72', 'overscroll-contain')
     expect(screen.getAllByRole('option')).toHaveLength(20)
   })
 
-  test('stops wheel events from bubbling out of the framework dropdown', async () => {
+  test('opens the framework dropdown as a modal layer so it owns scrolling inside the sheet', async () => {
     const user = userEvent.setup()
 
     customRender(
@@ -94,15 +151,8 @@ describe('ConnectConfigSection', () => {
 
     await user.click(combobox!)
 
-    const listbox = screen.getByRole('listbox')
-    const scrollArea = listbox.querySelector('.h-72') as HTMLElement
-    expect(scrollArea).toBeTruthy()
-
-    const stopPropagation = vi.spyOn(WheelEvent.prototype, 'stopPropagation')
-
-    fireEvent.wheel(scrollArea, { deltaY: 120 })
-
-    expect(stopPropagation).toHaveBeenCalled()
-    stopPropagation.mockRestore()
+    // A non-modal dropdown portals outside the sheet, where the sheet's scroll lock cancels its
+    // wheel and touch events. Radix only disables outside pointer events for a modal popover.
+    expect(document.body.style.pointerEvents).toBe('none')
   })
 })
