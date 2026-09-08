@@ -217,6 +217,7 @@ export const BucketFilePickerHeader = () => {
             {breadcrumbs.length > 0 && (
               <>
                 <Button
+                  aria-label="Go to parent folder"
                   icon={<ArrowLeft size={16} strokeWidth={2} />}
                   size="tiny"
                   variant="text"
@@ -314,7 +315,13 @@ export const BucketFilePickerHeader = () => {
             <div className="h-6 shrink-0 border-r border-control" />
             <div className="flex shrink-0 items-center space-x-1 px-2">
               <div className="hidden">
-                <input ref={uploadButtonRef} type="file" multiple onChange={handleFilesUpload} />
+                <input
+                  ref={uploadButtonRef}
+                  aria-label="Upload files"
+                  type="file"
+                  multiple
+                  onChange={handleFilesUpload}
+                />
               </div>
               <ButtonTooltip
                 icon={<Upload size={16} strokeWidth={2} />}
@@ -346,6 +353,7 @@ export const BucketFilePickerHeader = () => {
                   actions={[
                     <Button
                       key="cancel"
+                      aria-label="Clear search"
                       size="tiny"
                       variant="text"
                       icon={<X />}
@@ -360,6 +368,7 @@ export const BucketFilePickerHeader = () => {
                 />
               ) : (
                 <Button
+                  aria-label="Search for a file or folder"
                   icon={<Search />}
                   size="tiny"
                   variant="text"
