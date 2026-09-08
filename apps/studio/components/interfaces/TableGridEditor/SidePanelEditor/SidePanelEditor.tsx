@@ -311,7 +311,17 @@ export const SidePanelEditor = ({
     if (snap.sidePanel?.type === 'json') {
       const selectedValueForJsonEdit = snap.sidePanel.jsonValue
       const { row, column } = selectedValueForJsonEdit
-      payload = { [column]: value === null ? null : JSON.parse(value as any) }
+      let parsed
+      if (value !== null) {
+        try {
+          parsed = JSON.parse(value as any)
+        } catch {
+          // Falling through would send { [column]: undefined }, which saveRow writes to the row
+          toast.error('Failed to save: the value is not valid JSON')
+          return resolve()
+        }
+      }
+      payload = { [column]: value === null ? null : parsed }
       selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
       configuration = { identifiers: getStableRowIdentifiers(row!, identifiers), rowIdx: row.idx }
     } else if (snap.sidePanel?.type === 'cell') {

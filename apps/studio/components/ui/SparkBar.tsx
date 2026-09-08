@@ -26,7 +26,8 @@ export const SparkBar = ({
   labelTopClass = '',
 }: SparkBarProps) => {
   if (type === 'horizontal') {
-    const width = Number((value / max) * 100)
+    const safeMax = max > 0 ? max : 100
+    const width = Number((value / safeMax) * 100)
     const widthCss = `${width}%`
     const hasLabels = labelBottom || labelTop
 
@@ -60,7 +61,8 @@ export const SparkBar = ({
     )
   } else {
     const totalHeight = 35
-    let height = Number((value / max) * totalHeight)
+    const safeMax = max > 0 ? max : 100
+    let height = Number((value / safeMax) * totalHeight)
     if (height < 2) height = 2
 
     return (
