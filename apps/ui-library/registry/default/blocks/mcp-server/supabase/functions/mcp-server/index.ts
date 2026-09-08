@@ -7,6 +7,7 @@ import {
   type SupabaseContext,
 } from 'npm:@supabase/server@1.5.1'
 
+import { getPublicProjectUrl } from './oauth.ts'
 import { registerTools, type ToolContext } from './tools/index.ts'
 
 // An MCP server as a single Supabase Edge Function. withSupabase accepts any
@@ -68,6 +69,12 @@ async function handleMcp(request: Request, ctx: SupabaseContext): Promise<Respon
 
 Deno.serve(
   withOAuthProtectedResource(
+    {
+      // Local Edge Runtime can be detected as "edge-light" rather than "deno".
+      // Explicit URL resolvers avoid relying on middleware runtime detection.
+      resourceServer: (request) => `${getPublicProjectUrl(request)}/functions/v1/mcp-server`,
+      authorizationServer: (request) => `${getPublicProjectUrl(request)}/auth/v1`,
+    },
     withSupabase({ auth: 'user', cors: { headers: CORS_HEADERS } }, handleMcp)
   )
 )

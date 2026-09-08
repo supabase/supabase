@@ -40,7 +40,8 @@ Supabase CLI 2.116.
 
 The auth, consent, and Supabase client blocks install as dependencies. The
 shared MCP runtime is included with the task tools already registered.
-Keep the installed routes in your app's configured TanStack routes directory.
+Backend files install in `supabase/` at the project root, including in apps that
+use `src/`. Routes install in your app's configured TanStack routes directory.
 If you already have `supabase/config.toml`, merge the block's settings with it
 rather than replacing your project configuration.
 
@@ -53,12 +54,20 @@ This path uses a local Supabase stack and an MCP client running on your computer
 For a remote client that cannot reach your computer, use the deployed endpoints
 in [Deploy](#deploy).
 
+Keep the Deno function out of your app's TypeScript check. Add
+`"supabase/functions/**"` to your `tsconfig.json` `exclude` list, preserving any
+existing entries. The function has its own `deno task check` command below.
+
 ### 1. Configure Auth before starting the stack
 
 The supplied config enables password sign-up, OAuth, dynamic client registration,
 and MCP token verification inside the function (`verify_jwt = false` at the
 gateway). Its app origin is `http://localhost:3000`. Update `auth.site_url` and
 `auth.additional_redirect_urls` if your app uses another origin.
+
+Email confirmation is controlled by `auth.email.enable_confirmations`. It is
+`false` locally, so successful signup signs the customer in immediately. With
+confirmations enabled, the auth block shows the email confirmation page instead.
 
 The MCP server requires asymmetric JWTs. The supplied `[auth]` section points
 to a local key file. Include this setting if you are merging into an existing
@@ -272,11 +281,12 @@ runtime, then configure the hosted Supabase project:
    supabase link
    supabase db push
    supabase config push
+   supabase secrets set --env-file supabase/functions/.env
    supabase functions deploy mcp-server
    ```
 
-Set `MCP_SERVER_NAME` and `MCP_SERVER_DESCRIPTION` as hosted Edge Function
-secrets if you customized them; the local `.env` file is not deployed. Repeat
+The `secrets set` command applies the function's name and description to the hosted
+project; `functions deploy` does not upload the local `.env` file. Repeat
 the authorization and `whoami` check using the hosted URL from `/agents`.
 
 ## Troubleshooting

@@ -13,7 +13,11 @@ and gives every tool an RLS-scoped client.
 <BlockItem name="mcp-server" showOpenInV0={false} />
 
 Installs Deno Edge Function files into a Supabase project or empty directory. No
-`components.json` is required.
+`components.json` is required. Backend files stay in `supabase/` at the project
+root even when the frontend uses `src/`.
+
+In a frontend app, add `"supabase/functions/**"` to the app tsconfig's `exclude`
+list, preserving existing entries. Check the function separately with Deno.
 
 ## Folder structure
 
@@ -158,6 +162,17 @@ the `SupabaseClient` in `tools/types.ts` a `SupabaseClient<Database>`.
 | `MCP_SERVER_NAME`        | `supabase-mcp`   | Server name shown to MCP clients |
 | `MCP_SERVER_DESCRIPTION` | Generic sentence | Instructions shown to clients    |
 
+The block includes `supabase/functions/mcp-server/.env.example`. Copy it before
+serving locally, then customize the name and description:
+
+```bash
+cp supabase/functions/mcp-server/.env.example supabase/functions/.env
+```
+
+Add `supabase/functions/.env` to `.gitignore`. Supabase supplies the project URL
+and API keys to Edge Functions automatically. OAuth discovery uses the public
+project URL forwarded by the Edge Functions gateway.
+
 ## Deploy
 
 Check the function before serving or deploying it:
@@ -173,6 +188,7 @@ Then deploy:
 
 ```bash
 supabase config push
+supabase secrets set --env-file supabase/functions/.env
 supabase functions deploy mcp-server
 ```
 

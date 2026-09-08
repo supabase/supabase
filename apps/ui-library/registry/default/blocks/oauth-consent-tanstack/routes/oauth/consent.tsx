@@ -9,7 +9,8 @@ import { OAuthConsent } from '@/registry/default/blocks/oauth-consent/components
 export const Route = createFileRoute('/oauth/consent')({
   component: ConsentPage,
   validateSearch: (search) => ({
-    authorization_id: typeof search.authorization_id === 'string' ? search.authorization_id : null,
+    authorization_id:
+      typeof search.authorization_id === 'string' ? search.authorization_id : undefined,
   }),
 })
 

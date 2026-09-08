@@ -12,13 +12,13 @@ const installRoot = await mkdtemp(join(tmpdir(), 'headless-tools-'))
 
 try {
   const block = blocks.find((item) => item.name === 'headless-app-tanstack')!
-  const files = block.files!.filter((file) => file.target?.startsWith('supabase/'))
+  const files = block.files!.filter((file) => file.target?.startsWith('~/supabase/'))
   const targets = files.map((file) => file.target!)
   assert.equal(new Set(targets).size, targets.length, 'Install targets must be unique')
   assert(!block.registryDependencies?.some((dependency) => dependency.endsWith('/mcp-server.json')))
 
   for (const file of files) {
-    const destination = join(installRoot, file.target!)
+    const destination = join(installRoot, file.target!.replace(/^~\//, ''))
     await mkdir(dirname(destination), { recursive: true })
     await copyFile(join(appRoot, file.path), destination)
   }
@@ -31,7 +31,7 @@ try {
 
   for (const args of [
     ['check', '--frozen', 'index.ts'],
-    ['test', '--frozen', 'tasks.test.ts'],
+    ['test', '--frozen', '--allow-env=SUPABASE_PUBLIC_URL', 'tasks.test.ts'],
   ]) {
     const result = spawnSync('deno', args, { cwd: functionRoot, stdio: 'inherit' })
     if (result.error) throw result.error
