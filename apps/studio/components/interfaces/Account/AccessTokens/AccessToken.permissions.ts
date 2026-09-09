@@ -629,72 +629,10 @@ export const PERMISSION_MODE_LABEL: Record<PermissionMode, string> = {
   readwrite: 'Read-write',
 }
 
-export const RISK_DOT_CLASS: Record<RiskLevel, string> = {
-  low: 'bg-brand-600',
-  medium: 'bg-warning-600',
-  high: 'bg-destructive-600',
-}
-
 export type ResourceAccessMode = 'project' | 'organization' | 'account'
 
-export interface OverallRisk {
-  /** Minimal | Low | Medium | Elevated | High */
-  level: string
-  text: string
-  tone: 'default' | 'low' | 'medium' | 'high'
-}
-
-export const RISK_TONE_VARIANT: Record<
-  OverallRisk['tone'],
-  'default' | 'success' | 'warning' | 'destructive'
-> = {
-  default: 'default',
+export const RISK_TONE_VARIANT: Record<RiskLevel, 'success' | 'warning' | 'destructive'> = {
   low: 'success',
   medium: 'warning',
   high: 'destructive',
-}
-
-/**
- * Computes the overall token risk from the selected capabilities and the resource-access breadth.
- * Account-level tokens are never below "Elevated", even when read-only.
- */
-export const computeOverallRisk = (
-  selection: PermissionSelection,
-  resourceAccess: ResourceAccessMode
-): OverallRisk => {
-  const active = Object.entries(selection).filter(([, mode]) => mode !== 'none')
-  if (active.length === 0) {
-    return { level: 'Minimal', text: 'Minimal — No capabilities', tone: 'default' }
-  }
-
-  const anyWrite = active.some(([, mode]) => mode === 'readwrite')
-  const anyHighWrite = active.some(
-    ([key, mode]) => mode === 'readwrite' && CATALOG_BY_KEY.get(key)?.risk === 'high'
-  )
-
-  const scopeWord =
-    resourceAccess === 'account'
-      ? 'Account-wide'
-      : resourceAccess === 'organization'
-        ? 'Organization-wide'
-        : 'Single-project'
-  const accessWord = anyWrite ? 'read-write' : 'read-only'
-
-  let level: string
-  let tone: OverallRisk['tone']
-  if (resourceAccess === 'account') {
-    level = anyWrite ? 'High' : 'Elevated'
-    tone = anyWrite ? 'high' : 'medium'
-  } else if (anyHighWrite) {
-    level = 'High'
-    tone = 'high'
-  } else if (anyWrite) {
-    level = 'Medium'
-    tone = 'medium'
-  } else {
-    level = 'Low'
-    tone = 'low'
-  }
-
-  return { level, text: `${level} — ${scopeWord} ${accessWord} access`, tone }
 }

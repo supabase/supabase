@@ -4,18 +4,16 @@ import { Button } from 'ui'
 
 import { BASE_PATH } from '@/lib/constants'
 import { captureCriticalError } from '@/lib/error-reporting'
+import { getProviderDisplay } from '@/lib/external-identity-providers'
 import { auth, buildPathWithParams } from '@/lib/gotrue'
 
 interface SignInWithCustomProps {
   providerName: string
 }
 
-const formatProviderName = (name: string) => {
-  return name.replace('custom:', '')
-}
-
 export const SignInWithCustom = ({ providerName }: SignInWithCustomProps) => {
   const [loading, setLoading] = useState(false)
+  const displayName = getProviderDisplay(providerName).displayName
 
   async function handleCustomSignIn() {
     setLoading(true)
@@ -38,7 +36,7 @@ export const SignInWithCustom = ({ providerName }: SignInWithCustomProps) => {
 
       if (error) throw error
     } catch (error: any) {
-      toast.error(`Failed to sign in via ${providerName}: ${error.message}`)
+      toast.error(`Failed to sign in via ${displayName}: ${error.message}`)
       captureCriticalError(error, `sign in via ${providerName}`)
       setLoading(false)
     }
@@ -46,7 +44,7 @@ export const SignInWithCustom = ({ providerName }: SignInWithCustomProps) => {
 
   return (
     <Button block onClick={handleCustomSignIn} size="large" variant="default" loading={loading}>
-      Continue with <span className="capitalize">{formatProviderName(providerName)}</span>
+      Continue with {displayName}
     </Button>
   )
 }

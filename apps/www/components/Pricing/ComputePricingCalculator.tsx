@@ -153,7 +153,7 @@ const ComputePricingCalculator = ({
           <div className="flex items-center gap-1 w-full justify-between">
             <span>Total</span>
             <span className="text-foreground font-mono flex items-center gap-1">
-              <InfoTooltip side="top" className="max-w-[250px]">
+              <InfoTooltip side="top" className="max-w-[250px]" label="About this estimate">
                 This estimate only includes Plan and Compute add-on monthly costs. Other resources
                 might incur additional costs in the final invoice.
               </InfoTooltip>

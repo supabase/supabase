@@ -1757,6 +1757,62 @@ functions:
           )
           ```
 
+  - id: generate-link
+    title: 'generateLink()'
+    description: |
+      Generates an email link for a specific action without sending it. This is useful for custom admin functionality where you want to build the email or OTP flow yourself.
+    notes: |
+      - `GenerateLinkParams` exposes a static factory for each link type: `.signUp(email:password:redirectTo:)`, `.invite(email:redirectTo:)`, `.magicLink(email:redirectTo:)`, `.recovery(email:redirectTo:)`, `.emailChangeCurrent(email:newEmail:redirectTo:)`, and `.emailChangeNew(email:newEmail:redirectTo:)`.
+      - `generateLink()` creates the user for `.signUp` and `.invite` if one doesn't already exist.
+    examples:
+      - id: generate-a-signup-link
+        name: Generate a signup link
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.auth.admin.generateLink(
+            params: .signUp(
+              email: "email@example.com",
+              password: "secret"
+            )
+          )
+
+          let actionLink = response.properties.actionLink
+          ```
+      - id: generate-a-recovery-link
+        name: Generate a recovery link
+        code: |
+          ```swift
+          let response = try await supabase.auth.admin.generateLink(
+            params: .recovery(
+              email: "email@example.com",
+              redirectTo: URL(string: "https://example.com/reset-password")
+            )
+          )
+          ```
+
+  - id: auth-js-gotrueadminapi-signout
+    title: 'signOut()'
+    description: |
+      Signs out a specific user by revoking their session(s), using that user's access token (JWT).
+    notes: |
+      - Unlike `supabase.auth.signOut()`, this method takes the target user's access token (JWT), not a user ID.
+      - By default, `signOut()` uses the `.global` scope, which revokes every session for the user. Pass `.local` to revoke only the session tied to the given JWT, or `.others` to keep that session and revoke all the rest.
+    examples:
+      - id: sign-out-a-user
+        name: Sign out a user
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.admin.signOut(jwt: jwt)
+          ```
+      - id: sign-out-a-user-with-scope
+        name: Sign out a user with a scope
+        code: |
+          ```swift
+          try await supabase.auth.admin.signOut(jwt: jwt, scope: .others)
+          ```
+
   - id: admin-oauth-list-clients
     title: 'admin.oauth.listClients()'
     description: |
@@ -4607,6 +4663,7 @@ functions:
       - Requires an Authorization header.
       - When you pass in a body to your function, we automatically attach the Content-Type header for `String`, and `Data`. If it doesn't match any of these types we assume the payload is `json`, serialize it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
       - When a region is specified, both the `x-region` header and `forceFunctionRegion` query parameter are set to ensure proper function routing.
+      - By default, function invocations use a 150-second idle timeout. You can override this per-call by passing `timeoutInterval` to `FunctionInvokeOptions`. This only controls the client's request timeout — it cannot extend function execution beyond the platform's [150-second gateway idle timeout](/docs/guides/functions/limits), after which a 504 Gateway Timeout is returned regardless of the value passed.
     examples:
       - id: invocation-with-decodable
         name: Invocation with `Decodable` response
@@ -4781,6 +4838,23 @@ functions:
               )
             )
           ```
+      - id: invocation-with-timeout-override
+        name: Invocation with a custom timeout
+        description: |
+          Override the default 150-second idle timeout for a single invocation by passing `timeoutInterval`.
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.functions
+            .invoke(
+              "hello",
+              options: FunctionInvokeOptions(
+                body: ["foo": "bar"],
+                timeoutInterval: 30
+              )
+            )
+          ```
+
   - id: subscribe
     title: on().subscribe()
     notes: |

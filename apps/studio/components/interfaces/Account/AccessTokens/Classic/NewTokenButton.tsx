@@ -15,7 +15,10 @@ export const NewTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => 
   return (
     <>
       <div className="flex items-center">
-        <Button className="rounded-r-none px-3" onClick={() => setVisible(true)}>
+        <Button
+          className="rounded-r-none px-3 hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
+          onClick={() => setVisible(true)}
+        >
           Generate new token
         </Button>
         <ExperimentalTokenDropdown onCreateToken={onCreateToken} />

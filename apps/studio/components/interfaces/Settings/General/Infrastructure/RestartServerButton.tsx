@@ -109,8 +109,8 @@ export const RestartServerButton = () => {
           <ButtonTooltip
             variant="default"
             className={cn(
-              'flex-1 px-3 hover:z-10 @lg:flex-none',
-              canRestartProject && canRestart ? 'rounded-r-none' : ''
+              'flex-1 px-3 hover:z-10 focus-visible:z-10 @lg:flex-none',
+              canRestartProject && canRestart ? 'rounded-r-none focus-visible:rounded-r-sm' : ''
             )}
             disabled={
               project === undefined ||
@@ -143,7 +143,7 @@ export const RestartServerButton = () => {
                 <Button
                   variant="default"
                   aria-label={`Restart ${entityLabel}`}
-                  className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px"
+                  className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                   icon={<ChevronDown />}
                   disabled={!canRestartProject}
                 />

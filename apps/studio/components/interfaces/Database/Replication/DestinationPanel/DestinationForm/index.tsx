@@ -63,6 +63,7 @@ import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
@@ -70,7 +71,7 @@ import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { BASE_PATH, IS_STAGING_OR_LOCAL } from '@/lib/constants'
+import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
 const formId = 'destination-editor'
 
@@ -492,11 +493,7 @@ export const DestinationForm = ({
                         <SelectContent>
                           <SelectItem value={PIPELINE_REGION.code}>
                             <div className="flex gap-x-3 items-center">
-                              <img
-                                alt="region icon"
-                                className="w-5 rounded-xs"
-                                src={`${BASE_PATH}/img/regions/${PIPELINE_REGION.code}.svg`}
-                              />
+                              <RegionFlag className="w-5" region={PIPELINE_REGION.code} />
                               <p className="flex items-center gap-x-2">
                                 <span>{PIPELINE_REGION.displayName}</span>
                                 <span className="text-xs text-foreground-lighter font-mono">

@@ -67,6 +67,7 @@ const buildRole = (id: number, name: string): OrganizationRoleResponse['org_scop
 
 const buildMember = (overrides: Partial<Member>): Member => ({
   gotrue_id: 'gotrue-test',
+  avatar_url: null,
   is_sso_user: false,
   metadata: {},
   mfa_enabled: false,

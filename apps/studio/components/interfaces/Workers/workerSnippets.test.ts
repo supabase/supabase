@@ -1,0 +1,81 @@
+import { describe, expect, it } from 'vitest'
+
+import { WORKERS_REGION } from './Workers.constants'
+import { buildWorkerCliCommands, buildWorkerSnippets, EXAMPLE_WORKER } from './workerSnippets'
+
+const input = (overrides: Partial<Parameters<typeof buildWorkerSnippets>[0]> = {}) => ({
+  ...EXAMPLE_WORKER,
+  endpoint: 'abcdefgh.supabase.co',
+  ...overrides,
+})
+
+describe('buildWorkerSnippets', () => {
+  it('points every call snippet at the worker URL', () => {
+    const { curl, javascript, python } = buildWorkerSnippets(input({ name: 'embed' }))
+    const url = 'https://abcdefgh.supabase.co/workers/v1/embed'
+
+    expect(curl).toContain(`'${url}'`)
+    expect(javascript).toContain(`'${url}'`)
+    expect(python).toContain(`"${url}"`)
+  })
+
+  it('leaves a placeholder URL until the project settings resolve', () => {
+    const { curl } = buildWorkerSnippets(input({ endpoint: undefined }))
+    expect(curl).toContain('[YOUR WORKER URL]')
+  })
+
+  it('asks for the anon key on a public worker and the service role key on a private one', () => {
+    expect(buildWorkerSnippets(input({ access: 'public' })).curl).toContain('[YOUR ANON KEY]')
+    expect(buildWorkerSnippets(input({ access: 'private' })).curl).toContain(
+      '[YOUR SERVICE ROLE KEY]'
+    )
+    expect(buildWorkerSnippets(input({ access: 'private' })).javascript).toContain(
+      '[YOUR SERVICE ROLE KEY]'
+    )
+  })
+
+  it('falls back to a placeholder name when the worker has none', () => {
+    expect(buildWorkerSnippets(input({ name: '   ' })).cli).toContain('my-worker')
+  })
+
+  it('trims the name before interpolating it', () => {
+    expect(buildWorkerSnippets(input({ name: '  embed  ' })).cli).toContain('new embed --runtime')
+  })
+
+  it('defaults the runtime when the API omits it', () => {
+    expect(buildWorkerSnippets(input({ runtime: undefined })).cli).toContain('--runtime node')
+  })
+
+  it('writes the worker spec into the config.toml block', () => {
+    const { configToml } = buildWorkerSnippets(
+      input({
+        name: 'embed',
+        runtime: 'python',
+        size: '4gb-2vcpu',
+        access: 'private',
+        instances: 3,
+      })
+    )
+
+    expect(configToml).toContain('[workers.embed]')
+    expect(configToml).toContain('runtime   = "python"')
+    expect(configToml).toContain('size      = "4gb-2vcpu"    # 4 GB · 2 vCPU')
+    expect(configToml).toContain('access    = "private"')
+    expect(configToml).toContain('instances = 3')
+    expect(configToml).toContain(WORKERS_REGION)
+  })
+})
+
+describe('buildWorkerCliCommands', () => {
+  it('names the worker in every command', () => {
+    const commands = buildWorkerCliCommands('embed')
+    expect(commands).not.toHaveLength(0)
+    for (const { command } of commands) {
+      expect(command).toContain('embed')
+    }
+  })
+
+  it('falls back to a placeholder name when the worker has none', () => {
+    expect(buildWorkerCliCommands('  ')[0].command).toContain('my-worker')
+  })
+})

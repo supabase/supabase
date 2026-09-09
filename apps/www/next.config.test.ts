@@ -61,6 +61,29 @@ describe('next.config.mjs', () => {
     ).toBeLessThan(redirects.findIndex((redirect) => redirect.source === '/ui/:path*'))
   })
 
+  it('permanently redirects the legacy root markdown aliases to /index.md', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const redirects = (await config.redirects?.()) || []
+
+    for (const source of ['/.md', '/homepage.md', '/llms/homepage.txt']) {
+      expect(redirects).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ source, destination: '/index.md', permanent: true }),
+        ])
+      )
+    }
+
+    expect(getPathMatch('/.md')('/.md')).toBeTruthy()
+    expect(getPathMatch('/.md')('/foo.md')).toBe(false)
+
+    expect(redirects).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ source: '/index', destination: '/', permanent: true }),
+      ])
+    )
+    expect(getPathMatch('/index')('/index.md')).toBe(false)
+  })
+
   it('preserves the filename when redirecting legacy customer logos', async () => {
     const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
     const redirects = (await config.redirects?.()) || []

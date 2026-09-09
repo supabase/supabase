@@ -13,6 +13,7 @@ import {
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
 import { EMPTY_OBJ } from '@/lib/void'
 
@@ -97,15 +98,13 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
 }
 
 export const useUnifiedLogsPreview = () => {
-  const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
   const { flags, isInitialized, onUpdateFlag } = useFeaturePreviewContext()
 
   const isLoading = !isInitialized
   const isEnabled = IS_PLATFORM && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const hasToggledPreview = !!safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
-  const isDefaultOptIn =
-    IS_PLATFORM && isInitialized && unifiedLogsDefaultOptIn && !hasToggledPreview
+  const isDefaultOptIn = IS_PLATFORM && !hasToggledPreview
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
@@ -152,9 +151,24 @@ export const useIsMarketplaceEnabled = () => {
 }
 
 export const useIsDatabaseConnectionsEnabled = () => {
+  const { flags, isInitialized } = useFeaturePreviewContext()
+  const [localStorageFlag] = useLocalStorageQuery<boolean | null>(
+    LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS,
+    null
+  )
+  const previouslyToggled = localStorageFlag !== null
+
+  return {
+    enabled: flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS],
+    isInitialized,
+    previouslyToggled,
+  }
+}
+
+export const useIsExplorerEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const isDatabaseConnectionsEnabled = useFlag('topForPostgres')
-  return isDatabaseConnectionsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS]
+  const isExplorerEnabled = useFlag('explorer')
+  return isExplorerEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]
 }
 
 export const useFeaturePreviewModal = () => {

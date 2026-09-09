@@ -120,7 +120,7 @@ export const RestoreFailedState = () => {
               </ButtonTooltip>
 
               <DropdownMenu>
-                <DropdownMenuTrigger>
+                <DropdownMenuTrigger asChild>
                   <Button variant="default" className="w-7" icon={<MoreVertical />} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-72" align="end">

@@ -150,11 +150,9 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       {isPipelineSuccess && (
         <TableRow>
           <TableCell>
-            <DestinationIcon
-              type={type ?? 'Read Replica'}
-              size={18}
-              className="text-foreground-light"
-            />
+            {type ? (
+              <DestinationIcon type={type} size={18} className="text-foreground-light" />
+            ) : null}
           </TableCell>
 
           <TableCell className="max-w-[180px]">

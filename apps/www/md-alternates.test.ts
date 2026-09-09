@@ -36,7 +36,7 @@ async function collectAppRouterPages(
       const nested = await collectAppRouterPages(path.join(dir, dirent.name), nextSegments)
       nested.forEach((filePath, slug) => pages.set(slug, filePath))
     } else if (dirent.name === 'page.tsx') {
-      pages.set(segments.join('/') || 'homepage', path.join(dir, dirent.name))
+      pages.set(segments.join('/') || 'index', path.join(dir, dirent.name))
     }
   }
   return pages
@@ -65,9 +65,10 @@ describe('markdown alternate drift', () => {
       const appPagePath = appPages.get(slug)
       if (appPagePath) {
         const source = await fs.readFile(appPagePath, 'utf-8')
+        const wiringShapes = [`alternates: mdAlternates('${slug}')`, `...mdAlternates('${slug}')`]
         expect(
-          source.includes(`alternates: mdAlternates('${slug}')`),
-          `${path.relative(process.cwd(), appPagePath)} must contain "alternates: mdAlternates('${slug}')" in its metadata export`
+          wiringShapes.some((shape) => source.includes(shape)),
+          `${path.relative(process.cwd(), appPagePath)} must wire mdAlternates('${slug}') into its metadata export, either as "alternates: mdAlternates('${slug}')" or spread into a wider alternates object as "...mdAlternates('${slug}')"`
         ).toBe(true)
       } else {
         expect(

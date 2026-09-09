@@ -24,6 +24,7 @@ export function getLegacySigningKey(): SigningKeyResponse {
   return {
     id: LEGACY_KEY_ID,
     algorithm: 'HS256',
+    public_jwk: '',
     status: 'in_use',
     created_at: LEGACY_KEY_CREATED_AT,
     updated_at: LEGACY_KEY_CREATED_AT,

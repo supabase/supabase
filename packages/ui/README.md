@@ -24,9 +24,12 @@ import { clipboard, cn, mergeDeep } from 'ui' // clsx + tailwind-merge
 ## Styling conventions
 
 - Tailwind only — no inline styles or CSS modules.
-- Use shadcn semantic pairs (`bg-card text-card-foreground`, `bg-muted text-muted-foreground`,
-  `bg-tertiary text-tertiary-foreground`) rather than hardcoded colors. Legacy utilities such as
+- Prefer shadcn semantic pairs (`bg-card text-card-foreground`, `bg-muted text-muted-foreground`,
+  `bg-tertiary text-tertiary-foreground`) over hardcoded colors. Legacy utilities such as
   `text-foreground-light` and `border-default` are compatibility aliases only.
+- Control surface roles (`bg-field`, `bg-control-raised`, `border-control-hover`; CSS
+  `--control` aliases raised) live in [`build/css/source/semantic.css`](./build/css/source/semantic.css).
+  Prefer those over inventing fills. Legacy `bg-control` is still the accent wash alias.
 - Themes set the core `--hue` (or the split `--surface-hue` / `--primary-hue`), `--chroma`,
   `--surface`, `--foreground-lightness`, and `--contrast` inputs, plus their
   `--muted-foreground-level` and `--tertiary-foreground-level` hierarchy.

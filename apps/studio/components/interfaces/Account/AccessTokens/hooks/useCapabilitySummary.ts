@@ -2,15 +2,15 @@ import { useMemo } from 'react'
 
 import {
   getEntryScopes,
-  PERMISSION_CATALOG_BY_CATEGORY,
+  PERMISSION_CATALOG,
   type PermissionCatalogEntry,
   type PermissionMode,
   type PermissionSelection,
 } from '../AccessToken.permissions'
 import {
   getEnabledEndpointsForCapability,
-  getEnabledMcpTools,
-  PermissionScopeMap,
+  type EnabledEndpoint,
+  type PermissionScopeMap,
 } from '@/data/scoped-access-tokens/permission-scope-map-query'
 
 interface UseCapabilitySummaryArgs {
@@ -19,49 +19,37 @@ interface UseCapabilitySummaryArgs {
   permissionScopeMap: PermissionScopeMap | undefined
 }
 
+export interface CapabilitySummaryEntry {
+  entry: PermissionCatalogEntry
+  mode: PermissionMode
+  endpoints: EnabledEndpoint[]
+}
+
 /**
- * Selection-derived summary data for the token view sheet: selected entries grouped by catalog
- * category, the Management API endpoints each capability enables, and the enabled MCP tools.
+ * Selection-derived summary data for the token view sheet: every granted catalog entry paired with
+ * the Management API endpoints it enables.
  */
 export const useCapabilitySummary = ({
   selection,
   grantedScopes,
   permissionScopeMap,
 }: UseCapabilitySummaryArgs) => {
-  const activeByCategory = useMemo(
-    () =>
-      PERMISSION_CATALOG_BY_CATEGORY.map((category) => ({
-        ...category,
-        entries: category.entries
-          .map((entry) => ({ entry, mode: selection[entry.key] ?? 'none' }))
-          .filter(({ mode }) => mode !== 'none'),
-      })).filter((category) => category.entries.length > 0),
-    [selection]
-  )
+  const capabilities = useMemo(() => {
+    const result: CapabilitySummaryEntry[] = []
+    for (const entry of PERMISSION_CATALOG) {
+      const mode = selection[entry.key] ?? 'none'
+      if (mode === 'none') continue
 
-  const mcpTools = useMemo(
-    () => getEnabledMcpTools({ grantedScopes, permissionScopeMap }),
-    [grantedScopes, permissionScopeMap]
-  )
-
-  const capabilityGroups = useMemo(() => {
-    const groups: { entry: PermissionCatalogEntry; mode: PermissionMode; endpoints: string[][] }[] =
-      []
-    for (const category of activeByCategory) {
-      for (const { entry, mode } of category.entries) {
-        const capabilityScopes = getEntryScopes(entry, mode)
-        const endpoints = getEnabledEndpointsForCapability({
-          capabilityScopes,
-          allGrantedScopes: grantedScopes,
-          permissionScopeMap,
-        })
-        if (endpoints.length > 0) {
-          groups.push({ entry, mode, endpoints: endpoints.map((e) => [e.method, e.path]) })
-        }
-      }
+      const capabilityScopes = getEntryScopes(entry, mode)
+      const endpoints = getEnabledEndpointsForCapability({
+        capabilityScopes,
+        allGrantedScopes: grantedScopes,
+        permissionScopeMap,
+      })
+      result.push({ entry, mode, endpoints })
     }
-    return groups
-  }, [activeByCategory, grantedScopes, permissionScopeMap])
+    return result
+  }, [selection, grantedScopes, permissionScopeMap])
 
-  return { activeByCategory, mcpTools, capabilityGroups }
+  return { capabilities }
 }

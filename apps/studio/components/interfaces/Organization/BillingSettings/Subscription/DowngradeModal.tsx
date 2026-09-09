@@ -170,12 +170,6 @@ export const DowngradeModal = ({
               </div>
             </li>
           </ul>
-
-          {subscription?.billing_via_partner === true && subscription.billing_partner === 'fly' && (
-            <p className="mt-4 text-sm">
-              Your organization will be downgraded at the end of your current billing cycle.
-            </p>
-          )}
         </div>
         <DialogFooter>
           <Button variant={'default'} onClick={onClose}>

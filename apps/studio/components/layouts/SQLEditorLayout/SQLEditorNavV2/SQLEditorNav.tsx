@@ -84,7 +84,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
   const [showMoveModal, setShowMoveModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [showRenameModal, setShowRenameModal] = useState(false)
 
   const [expandedFolderIds, setExpandedFolderIds] = useState<string[]>([])
   const [selectedSnippets, setSelectedSnippets] = useState<Snippet[]>([])
@@ -564,7 +563,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                           setSelectedSnippets([element.metadata as unknown as Snippet])
                         }}
                         onSelectRename={() => {
-                          setShowRenameModal(true)
                           setSelectedSnippetToRename(element.metadata as Snippet)
                         }}
                         onSelectDownload={() => {
@@ -646,7 +644,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                           setSelectedSnippets([element.metadata as unknown as Snippet])
                         }}
                         onSelectRename={() => {
-                          setShowRenameModal(true)
                           setSelectedSnippetToRename(element.metadata as Snippet)
                         }}
                         onSelectDownload={() => {
@@ -754,7 +751,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                       if (props.isBranch) {
                         snapV2.editFolder(element.id as string)
                       } else {
-                        setShowRenameModal(true)
                         setSelectedSnippetToRename(element.metadata as Snippet)
                       }
                     }}
@@ -817,7 +813,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
               setSelectedSnippets([snippet])
             }}
             onSelectRename={(snippet) => {
-              setShowRenameModal(true)
               setSelectedSnippetToRename(snippet)
             }}
           />
@@ -832,9 +827,9 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
       <RenameQueryModal
         snippet={selectedSnippetToRename}
-        visible={showRenameModal}
-        onCancel={() => setShowRenameModal(false)}
-        onComplete={() => setShowRenameModal(false)}
+        visible={!!selectedSnippetToRename}
+        onCancel={() => setSelectedSnippetToRename(undefined)}
+        onComplete={() => setSelectedSnippetToRename(undefined)}
       />
 
       <MoveQueryModal

@@ -1,8 +1,6 @@
 import { useParams } from 'common'
 import { uniqBy } from 'lodash'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
   Alert,
@@ -22,6 +20,7 @@ import {
   ScrollArea,
 } from 'ui'
 
+import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import {
   DatabaseFunctionsData,
   useDatabaseFunctionsQuery,
@@ -56,7 +55,6 @@ const FunctionSelector = ({
   filterFunction = () => true,
   noResultsLabel = <span>No functions found in this schema.</span>,
 }: FunctionSelectorProps) => {
-  const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
@@ -164,25 +162,14 @@ const FunctionSelector = ({
                 </CommandGroup>
                 <CommandSeparator />
                 <CommandGroup>
-                  <CommandItem
-                    className="cursor-pointer w-full"
-                    onSelect={() => {
-                      setOpen(false)
-                      router.push(`/project/${ref}/database/functions`)
-                    }}
-                    onClick={() => setOpen(false)}
+                  <CommandItemLink
+                    href={`/project/${ref}/database/functions`}
+                    className="cursor-pointer w-full gap-2"
+                    onSelect={() => setOpen(false)}
                   >
-                    <Link
-                      href={`/project/${ref}/database/functions`}
-                      onClick={() => {
-                        setOpen(false)
-                      }}
-                      className="w-full flex items-center gap-2"
-                    >
-                      <Plus size={14} strokeWidth={1.5} />
-                      <p>New function</p>
-                    </Link>
-                  </CommandItem>
+                    <Plus size={14} strokeWidth={1.5} />
+                    <p>New function</p>
+                  </CommandItemLink>
                 </CommandGroup>
               </CommandList>
             </Command>

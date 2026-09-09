@@ -27,6 +27,8 @@ import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-muta
 
 const MAX_URLS_LENGTH = 2 * 1024
 
+const URL_PASTE_SEPARATOR = /[\s,]+/
+
 interface AddNewURLModalProps {
   visible: boolean
   allowList: string[]
@@ -141,7 +143,12 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogSection className="flex flex-col gap-y-2 px-0">
-              <Label className="px-5">URL</Label>
+              <div className="flex flex-col gap-y-1">
+                <Label>URL</Label>
+                <p className="text-sm text-foreground-light">
+                  Paste multiple URLs at once — one per line
+                </p>
+              </div>
               <ScrollArea className={cn(urls.length > 4 ? 'h-[220px]' : '')}>
                 <div className="px-5 py-1">
                   <FormItemLayout className="[&>div>div]:mt-0">
@@ -150,6 +157,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
                       name="urls"
                       valueFieldName="value"
                       createEmptyRow={() => ({ value: '' })}
+                      pasteSeparator={URL_PASTE_SEPARATOR}
                       placeholder="https://mydomain.com"
                       addLabel="Add URL"
                       removeLabel="Remove URL"

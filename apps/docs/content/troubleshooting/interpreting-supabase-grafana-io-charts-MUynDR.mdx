@@ -42,7 +42,7 @@ Excessive IO usage is highly problematic as it clarifies that your database is e
 
 - **Excessive and needless sequential scans:** poorly indexed tables force requests to scan disk ([guide to resolve](https://github.com/orgs/supabase/discussions/22449))
 - **Too little cache**: There is not enough memory, so instead of reading data from the memory cache, it is accessed from disk ([guide to inspect](https://github.com/orgs/supabase/discussions/22449))
-- **Poorly optimized RLS policies**: RLS that rely heavily on joins are more likely to hit disk. If possible, they should optimized ([RLS best practice guide](/docs/guides/database/postgres/row-level-security#rls-performance-recommendations))
+- **Poorly optimized RLS policies**: RLS that rely heavily on joins are more likely to hit disk. If possible, they should be optimized ([RLS performance guide](/docs/guides/database/postgres/row-level-security-performance))
 - **Excessive bloat**: This is the least likely to cause major issues, but bloat can take up space, preventing data on disk from being placed in the same locality. This can force the database to scan more pages than necessary. ([explainer guide](/blog/postgres-bloat))
 - **Uploading high amounts of data:** temporarily increase compute add-on size for the duration of the uploads
 - **Insufficient memory**: Sometimes an inadequate amount of memory forces queries to hit disk instead of the memory cache. Address memory issues ([guide](https://github.com/orgs/supabase/discussions/27021)) can reduce disk strain.
