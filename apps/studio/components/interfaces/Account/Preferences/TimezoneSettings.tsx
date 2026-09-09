@@ -35,11 +35,10 @@ import { useTrack } from '@/lib/telemetry/track'
 const AUTO_OPTION_VALUE = '__auto__'
 
 export const TimezoneSettings = () => {
-  const timezonePickerEnabled = useFlag('timezonePicker')
-  const { timezone, storedTimezone, setTimezone, isAutoDetected } = useTimezone()
   const track = useTrack()
-  const [open, setOpen] = useState(false)
   const listboxId = useId()
+  const [open, setOpen] = useState(false)
+  const { timezone, storedTimezone, setTimezone, isAutoDetected } = useTimezone()
 
   // Browser timezone is captured once and stays stable even when the user has
   // overridden the dashboard timezone — that's the value the "Auto detect"
@@ -47,8 +46,6 @@ export const TimezoneSettings = () => {
   const browserTimezone = useMemo(() => guessLocalTimezone(), [])
 
   const triggerLabel = useMemo(() => findTimezoneByIana(timezone)?.text ?? timezone, [timezone])
-
-  if (!timezonePickerEnabled) return null
 
   const handleSelect = (nextStored: string) => {
     setTimezone(nextStored)
