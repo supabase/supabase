@@ -226,9 +226,7 @@ export const DeployWorkerDialog = ({ open, onOpenChange }: DeployWorkerDialogPro
         </DialogSection>
 
         <DialogFooter>
-          <Button variant="default" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
+          <Button onClick={() => onOpenChange(false)}>Cancel</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

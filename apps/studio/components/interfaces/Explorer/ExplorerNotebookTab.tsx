@@ -450,12 +450,8 @@ export const ExplorerNotebookTab = () => {
               contentClassName="[&>h3]:text-sm [&>p]:text-xs"
             >
               <div className="flex items-center gap-x-2">
-                <Button variant="default" onClick={() => onSelectAddCell('query')}>
-                  Add query cell
-                </Button>
-                <Button variant="default" onClick={() => onSelectAddCell('markdown')}>
-                  Add markdown cell
-                </Button>
+                <Button onClick={() => onSelectAddCell('query')}>Add query cell</Button>
+                <Button onClick={() => onSelectAddCell('markdown')}>Add markdown cell</Button>
               </div>
             </EmptyStatePresentational>
           )}

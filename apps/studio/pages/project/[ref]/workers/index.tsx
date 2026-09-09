@@ -83,12 +83,7 @@ const WorkersPage: NextPageWithLayout = () => {
                 error={error}
                 subject="Failed to retrieve workers"
                 additionalActions={
-                  <Button
-                    variant="default"
-                    icon={<RefreshCw />}
-                    loading={isFetching}
-                    onClick={() => refetch()}
-                  >
+                  <Button icon={<RefreshCw />} loading={isFetching} onClick={() => refetch()}>
                     Refresh
                   </Button>
                 }

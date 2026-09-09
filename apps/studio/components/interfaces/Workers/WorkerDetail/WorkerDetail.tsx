@@ -78,7 +78,7 @@ export const WorkerDetail = () => {
         <p className="text-sm text-foreground-light">
           Worker "{workerName}" does not exist in this project
         </p>
-        <Button asChild variant="default">
+        <Button asChild>
           <Link href={`/project/${projectRef}/workers`}>Back to {PRODUCT_NAME}</Link>
         </Button>
       </div>

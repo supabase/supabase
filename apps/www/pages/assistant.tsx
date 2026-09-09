@@ -688,7 +688,7 @@ function Assistant() {
                       </Link>
                     </Button>
                   )}
-                  <Button variant="default" size="medium" asChild>
+                  <Button size="medium" asChild>
                     <Link
                       target="_blank"
                       rel="noreferrer noopener"
@@ -726,7 +726,6 @@ function Assistant() {
                       >
                         <Button
                           className="rounded-full"
-                          variant="default"
                           onClick={() => handleNewMessage(query.messages)}
                         >
                           {query.label}

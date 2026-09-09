@@ -89,12 +89,7 @@ export const WorkerLogsTab = ({ workerName, stream }: WorkerLogsTabProps) => {
             </InputGroupAddon>
           </InputGroup>
         </div>
-        <Button
-          variant="default"
-          icon={<RefreshCw />}
-          loading={isFetching}
-          onClick={() => refetch()}
-        >
+        <Button icon={<RefreshCw />} loading={isFetching} onClick={() => refetch()}>
           Refresh
         </Button>
       </div>

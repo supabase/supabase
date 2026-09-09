@@ -163,7 +163,6 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     <>
       <div className="flex items-center justify-end gap-x-2">
         <ButtonTooltip
-          variant="default"
           disabled={isPendingInviteAcceptance || !canRemoveMember}
           onClick={() => setShowAccessModal(true)}
           tooltip={{

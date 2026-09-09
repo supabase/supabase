@@ -133,13 +133,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
             </Form>
           </div>
           <SheetFooter>
-            <Button
-              size="tiny"
-              variant="default"
-              type="button"
-              onClick={confirmOnClose}
-              disabled={isPending}
-            >
+            <Button size="tiny" type="button" onClick={confirmOnClose} disabled={isPending}>
               Cancel
             </Button>
             <Button

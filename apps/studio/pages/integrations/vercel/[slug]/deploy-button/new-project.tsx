@@ -215,7 +215,7 @@ export function VercelConnectionError({
         />
       </div>
       <div className="flex h-12 items-center justify-end gap-x-2 border-t border-default bg-surface-100 px-card">
-        <Button asChild variant="default">
+        <Button asChild>
           <Link href={`/project/${projectRef}`}>Open project</Link>
         </Button>
         <Button variant="primary" onClick={onRetry}>

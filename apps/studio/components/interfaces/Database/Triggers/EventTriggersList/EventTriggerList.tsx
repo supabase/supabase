@@ -166,12 +166,7 @@ export const EventTriggerList = ({
               {canEditTrigger ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                      aria-label="More options"
-                      variant="default"
-                      className="px-1"
-                      icon={<MoreVertical />}
-                    />
+                    <Button aria-label="More options" className="px-1" icon={<MoreVertical />} />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent side="bottom" align="end" className="w-52">
                     <DropdownMenuItem className="space-x-2" onClick={() => onEditTrigger(trigger)}>
@@ -205,7 +200,6 @@ export const EventTriggerList = ({
               ) : (
                 <ButtonTooltip
                   disabled
-                  variant="default"
                   className="px-1"
                   icon={<MoreVertical />}
                   tooltip={{

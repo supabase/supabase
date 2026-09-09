@@ -75,7 +75,6 @@ export const MobileNavigationBar = ({
             <Button
               aria-label="Open menu"
               title="Menu dropdown button"
-              variant="default"
               className="flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30"
               icon={<Menu />}
               onClick={() => openMenu()}
