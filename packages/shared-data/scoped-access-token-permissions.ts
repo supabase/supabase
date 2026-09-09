@@ -420,7 +420,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   'project:data_api_config': {
     category: 'appsvc',
     name: 'Data API Config',
-    description: 'PostgREST behavior and settings.',
+    description: 'Data API behavior and settings.',
     risk: 'medium',
     riskReason: 'Read-write can change how the auto-generated Data API behaves.',
     allowsRead: ['Read Data API configuration'],
@@ -428,11 +428,11 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:data_api_config_secret': {
     category: 'appsvc',
-    name: 'Data API Config Secret',
-    description: 'PostgREST behavior and settings.',
+    name: 'Data API Config - JWT Secret',
+    description: 'Data API Config JWT secret.',
     risk: 'high',
-    riskReason: 'Read exposes Data API secrets.',
-    allowsRead: ['Read Data API Secret'],
+    riskReason: 'Read exposes Data API JWT secret.',
+    allowsRead: ['Read Data API JWT secret'],
   },
 
   // --- Infrastructure and delivery ---
