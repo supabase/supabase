@@ -1532,6 +1532,11 @@ export const examples: Registry = [
     files: ['example/multi-select-disabled.tsx'],
   },
   {
+    name: 'multi-select-without-icon',
+    type: 'components:example',
+    files: ['example/multi-select-without-icon.tsx'],
+  },
+  {
     name: 'multi-select-badge-limit-wrap',
     type: 'components:example',
     files: ['example/multi-select-badge-limit-wrap.tsx'],
