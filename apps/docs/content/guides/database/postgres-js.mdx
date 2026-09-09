@@ -38,6 +38,12 @@ hideToc: true
 
     To get your connection details, go to the [**Connect** panel](/dashboard/project/_?showConnect=true). Choose [**Transaction pooler**](/dashboard/project/_?showConnect=true&method=transaction) if you're on a platform with transient connections, such as a serverless function, and [**Session pooler**](/dashboard/project/_?showConnect=true&method=session) if you have a long-lived connection. Copy the URI and save it as the environment variable `DATABASE_URL`.
 
+    <Admonition type="caution">
+
+    `postgres.js` pipelines queries by default. Combined with transaction mode, this can hang queries or return mismatched rows. Bind at least one parameter in every query, or use session mode instead. See [postgres.js pipelining issues](/docs/guides/troubleshooting/postgres-js-pipelining-transaction-mode-issues).
+
+    </Admonition>
+
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -47,7 +53,7 @@ hideToc: true
     import postgres from 'postgres'
 
     const connectionString = process.env.DATABASE_URL
-    const sql = postgres(connectionString)
+    const sql = postgres(connectionString, { prepare: false })
 
     export default sql
     ```

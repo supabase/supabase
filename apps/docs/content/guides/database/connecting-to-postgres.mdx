@@ -120,6 +120,12 @@ Transaction mode does not support [prepared statements](https://postgresql.org/d
 
 </Admonition>
 
+<Admonition type="caution">
+
+Transaction mode doesn't support pipelining yet: it checks a connection back into its pool as soon as it sees one reply finish, even if the client already pipelined more queries onto that same connection. `postgres.js` pipelines queries by default, so this combination can hang queries, return mismatched rows, or leave an open transaction. See [postgres.js pipelining issues](/docs/guides/troubleshooting/postgres-js-pipelining-transaction-mode-issues) for how to fix it.
+
+</Admonition>
+
 The connection string looks like this:
 
 ```
