@@ -8,7 +8,7 @@ import {
   OAUTH_APPS_MOCK_SCENARIOS,
   USE_MOCKS,
 } from './mocks'
-import { isRoleValidationFailure } from './types'
+import { getFailedProjects, isRoleValidationFailure } from './types'
 
 const NORTHWIND_SLUG = 'northwind-traders'
 
@@ -68,6 +68,39 @@ describe('oauth-apps mocks', () => {
     expect(request.existing_grant?.updated_at).toBeTruthy()
   })
 
+  test('the existing grant declares what it is bound to', () => {
+    const request = getMockOAuthAppsAuthorizeRequest(OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent)
+
+    expect(request.existing_grant?.kind).toBe('user_bound')
+  })
+
+  test('every request carries the grant config the consent flow reads', () => {
+    Object.values(OAUTH_APPS_MOCK_SCENARIOS).forEach((scenario) => {
+      const { grant_config: grantConfig } = getMockOAuthAppsAuthorizeRequest(scenario)
+
+      expect(['user_bound', 'organization_bound']).toContain(grantConfig.grant_kind)
+      expect(typeof grantConfig.allow_project_scoping).toBe('boolean')
+    })
+  })
+
+  test('both grant kinds have a fixture', () => {
+    const kinds = new Set(
+      Object.values(OAUTH_APPS_MOCK_SCENARIOS).map(
+        (scenario) => getMockOAuthAppsAuthorizeRequest(scenario).grant_config.grant_kind
+      )
+    )
+
+    expect(kinds).toEqual(new Set(['user_bound', 'organization_bound']))
+  })
+
+  test('every fixture allows project scoping while nothing suppresses the picker', () => {
+    Object.values(OAUTH_APPS_MOCK_SCENARIOS).forEach((scenario) => {
+      expect(getMockOAuthAppsAuthorizeRequest(scenario).grant_config.allow_project_scoping).toBe(
+        true
+      )
+    })
+  })
+
   test('the existing grant holds a stale ref that does not resolve against live projects', () => {
     const request = getMockOAuthAppsAuthorizeRequest(OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent)
     const liveRefs = getMockOAuthAppsAuthorizeOrganizationProjects(NORTHWIND_SLUG).map(
@@ -125,14 +158,48 @@ describe('oauth-apps mocks', () => {
 
       if (!isRoleValidationFailure(result)) throw new Error('expected a role validation failure')
 
-      expect(result.projects).toHaveLength(readOnlyRefs().length)
-      result.projects.forEach((project) => {
+      const failures = getFailedProjects(result)
+
+      expect(failures).toHaveLength(readOnlyRefs().length)
+      failures.forEach((project) => {
         expect(project.ref).toBeTruthy()
         expect(project.name).toBeTruthy()
         expect(project.role).toBe('read_only')
+        expect(project.failed_scopes.length).toBeGreaterThan(0)
       })
-      expect(result.roles).toEqual(['read_only'])
-      expect(result.failed_scopes.length).toBeGreaterThan(0)
+    })
+
+    test('targets the projects branch, not the organization branch', () => {
+      const result = approve(OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation, readOnlyRefs())
+
+      if (!isRoleValidationFailure(result)) throw new Error('expected a role validation failure')
+
+      expect(result.validation.scope_target).toBe('projects')
+    })
+
+    test('every failed scope is one the app actually requested', () => {
+      const result = approve(OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation, readOnlyRefs())
+      const requestedScopes = getMockOAuthAppsAuthorizeRequest(
+        OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation
+      ).scope_groups.flatMap((group) => group.scopes)
+
+      if (!isRoleValidationFailure(result)) throw new Error('expected a role validation failure')
+
+      getFailedProjects(result).forEach((project) => {
+        project.failed_scopes.forEach((scope) => {
+          expect(requestedScopes).toContain(scope)
+        })
+      })
+    })
+
+    test('getFailedProjects is empty for an organization-level failure', () => {
+      expect(
+        getFailedProjects({
+          error_code: 'role_validation_failed',
+          message: 'Your organization role cannot grant write access.',
+          validation: { scope_target: 'organization', role: 'read_only', failed_scopes: ['logs'] },
+        })
+      ).toEqual([])
     })
 
     test('rejects only the read-only refs out of a mixed selection', () => {
@@ -143,7 +210,11 @@ describe('oauth-apps mocks', () => {
 
       if (!isRoleValidationFailure(result)) throw new Error('expected a role validation failure')
 
-      expect(result.projects.map((project) => project.ref).sort()).toEqual(readOnlyRefs().sort())
+      expect(
+        getFailedProjects(result)
+          .map((project) => project.ref)
+          .sort()
+      ).toEqual(readOnlyRefs().sort())
     })
 
     test('approves a selection of writable projects', () => {
