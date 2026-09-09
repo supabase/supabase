@@ -22,18 +22,17 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
 import {
+  CLASSIC_TOKEN_WARNING,
   CUSTOM_EXPIRY_VALUE,
   EXPIRES_AT_OPTIONS,
-  NON_EXPIRING_TOKEN_VALUE,
 } from '../AccessToken.constants'
-import { getExpirationDate } from '../AccessToken.utils'
+import { getExpirationDate, getMaxCustomExpiryDate } from '../AccessToken.utils'
 import { DatePicker } from '@/components/ui/DatePicker'
 import {
   useAccessTokenCreateMutation,
@@ -45,15 +44,12 @@ const formId = 'new-access-token-form'
 
 const TokenSchema = z.object({
   tokenName: z.string().min(1, 'Please enter a name for the token'),
-  expiresAt: z.preprocess(
-    (val) => (val === NON_EXPIRING_TOKEN_VALUE ? undefined : val),
-    z.string().optional()
-  ),
+  expiresAt: z.string().min(1, 'Please select an expiry'),
 })
 
 export interface NewAccessTokenDialogProps {
   open: boolean
-  tokenScope: 'V0' | undefined
+  tokenScope?: 'V0' | undefined
   onOpenChange: (open: boolean) => void
   onCreateToken: (token: NewAccessToken) => void
 }
@@ -81,7 +77,7 @@ export const NewTokenDialog = ({
     if (isCustomExpiry && customExpiryDate) {
       expiresAt = customExpiryDate.date
     } else {
-      expiresAt = getExpirationDate(values.expiresAt || '')
+      expiresAt = getExpirationDate(values.expiresAt)
     }
 
     createAccessToken(
@@ -90,7 +86,7 @@ export const NewTokenDialog = ({
         onSuccess: (data) => {
           track('access_token_created', {
             tokenType: 'classic',
-            expiryPreset: values.expiresAt || 'never',
+            expiryPreset: values.expiresAt,
           })
           toast.success('Access token created successfully')
           onCreateToken(data)
@@ -101,7 +97,7 @@ export const NewTokenDialog = ({
   }
 
   const handleClose = () => {
-    form.reset({ tokenName: '' })
+    form.reset()
     setCustomExpiryDate(undefined)
     setIsCustomExpiry(false)
     onOpenChange(false)
@@ -171,8 +167,8 @@ export const NewTokenDialog = ({
           <Admonition
             type="warning"
             className="rounded-none border-t-0 border-x-0"
-            title="Access tokens can be used to control your whole account"
-            description="Be careful when sharing your tokens"
+            title={CLASSIC_TOKEN_WARNING.title}
+            description={CLASSIC_TOKEN_WARNING.description}
           />
         )}
         <DialogSection className="flex flex-col gap-4">
@@ -187,13 +183,9 @@ export const NewTokenDialog = ({
                 name="tokenName"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItemLayout name="tokenName" label="Name">
+                  <FormItemLayout label="Name">
                     <FormControl>
-                      <Input
-                        id="tokenName"
-                        {...field}
-                        placeholder="Provide a name for your token"
-                      />
+                      <Input {...field} placeholder="Provide a name for your token" />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -203,24 +195,24 @@ export const NewTokenDialog = ({
                 name="expiresAt"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItemLayout name="expiresAt" label="Expires in">
+                  <FormItemLayout label="Expires in">
                     <div className="flex gap-2">
-                      <FormControl className="grow">
-                        <Select value={field.value} onValueChange={handleExpiryChange}>
+                      <Select value={field.value} onValueChange={handleExpiryChange}>
+                        <FormControl className="grow">
                           <SelectTrigger>
                             <SelectValue placeholder="Expires at" />
                           </SelectTrigger>
-                          <SelectContent>
-                            {Object.values(EXPIRES_AT_OPTIONS).map(
-                              (option: { value: string; label: string }) => (
-                                <SelectItem key={option.value} value={option.value}>
-                                  {option.label}
-                                </SelectItem>
-                              )
-                            )}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
+                        </FormControl>
+                        <SelectContent>
+                          {Object.values(EXPIRES_AT_OPTIONS).map(
+                            (option: { value: string; label: string }) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            )
+                          )}
+                        </SelectContent>
+                      </Select>
                       {isCustomExpiry && (
                         <DatePicker
                           selectsRange={false}
@@ -228,21 +220,13 @@ export const NewTokenDialog = ({
                           contentSide="top"
                           to={customExpiryDate?.date}
                           minDate={new Date()}
-                          maxDate={dayjs().add(1, 'year').toDate()}
+                          maxDate={getMaxCustomExpiryDate().toDate()}
                           onChange={(date) => {
                             if (date.to) handleCustomDateChange({ date: date.to })
                           }}
                         />
                       )}
                     </div>
-                    {field.value === NON_EXPIRING_TOKEN_VALUE && (
-                      <div className="w-full flex gap-x-2 items-center mt-3 mx-0.5">
-                        <WarningIcon />
-                        <span className="text-xs text-left text-foreground-lighter">
-                          Make sure to keep your non-expiring token safe and secure.
-                        </span>
-                      </div>
-                    )}
                   </FormItemLayout>
                 )}
               />

@@ -9,16 +9,19 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
-import { Button, buttonVariants, cn } from 'ui'
-import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
 import {
+  Button,
+  buttonVariants,
+  cn,
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from 'ui/src/components/shadcn/ui/navigation-menu'
+} from 'ui'
+import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
+import { AnnouncementBanner } from 'ui-patterns/Banners/AnnouncementBanner'
 
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
@@ -43,19 +46,10 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
   const userMenu = useDropdownMenu(user)
 
-  const isLaunchWeekXPage = pathname === '/launch-week/x'
-  const isLaunchWeek12Page = pathname === '/launch-week/12'
-  const isLaunchWeek13Page = pathname === '/launch-week/13'
   const isGAWeekSection = pathname?.startsWith('/ga-week')
   const isStateOfStartupsPage = pathname?.startsWith('/state-of-startups')
-  const disableStickyNav =
-    isLaunchWeekXPage ||
-    isGAWeekSection ||
-    isLaunchWeekXPage ||
-    isLaunchWeek12Page ||
-    isLaunchWeek13Page ||
-    !stickyNavbar
-  const showLaunchWeekNavMode = (isGAWeekSection || isLaunchWeekXPage) && !open
+  const disableStickyNav = isGAWeekSection || !stickyNavbar
+  const showLaunchWeekNavMode = isGAWeekSection && !open
 
   const [scrolled, setScrolled] = React.useState(false)
   React.useEffect(() => {
@@ -87,6 +81,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
 
   return (
     <>
+      {!isStateOfStartupsPage && <AnnouncementBanner />}
       <div
         className={cn(
           'sticky top-0 z-40 transform',
@@ -96,6 +91,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
         style={{ transform: 'translate3d(0,0,999px)' }}
         data-nav-transparent={isTransparent ? '' : undefined}
       >
+        {isStateOfStartupsPage && <AnnouncementBanner />}
         <div
           className={cn(
             'absolute inset-0 h-full w-full bg-background/90 dark:bg-background/95 transition-all duration-300',

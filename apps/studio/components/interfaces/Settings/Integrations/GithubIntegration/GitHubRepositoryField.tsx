@@ -139,7 +139,7 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
               <Button
                 id={name}
                 variant="default"
-                size="small"
+                size="tiny"
                 type="button"
                 disabled={disabled}
                 onClick={() => {

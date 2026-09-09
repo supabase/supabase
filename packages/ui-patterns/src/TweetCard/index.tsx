@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { cn } from 'ui/src/lib/utils'
+import { cn } from 'ui'
 
 interface TweetCard {
   handle: string

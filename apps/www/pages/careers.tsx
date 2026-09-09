@@ -485,11 +485,11 @@ const JobItem = ({ job }: { job: JobItemProps }) => {
       <h4 className="text-base min-w-[240px] lg:min-w-[316px] grow sm:truncate mr-6">
         {job.title}
       </h4>
-      <div className="flex justify-between justify-[normal] pt-2 md:pt-0 lg:w-1/3 items-center">
-        <div className="flex items-center gap-4">
+      <div className="flex justify-between justify-[normal] pt-2 md:pt-0 items-center">
+        <div className="flex items-center gap-4 min-w-0">
           <Badge>
-            <GlobeAltIcon className="w-3 h-3" />
-            <span>{job.location}</span>
+            <GlobeAltIcon className="w-3 h-3 shrink-0" />
+            <span className="truncate">{job.location}</span>
           </Badge>
           <span className="hidden md:block">{job.employment}</span>
         </div>

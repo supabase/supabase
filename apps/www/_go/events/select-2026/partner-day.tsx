@@ -153,8 +153,8 @@ const page: GoPageInput = {
         {
           type: 'select',
           name: 'attending',
-          label:
-            'Are you attending Supabase Select on October 2? (your Partner Day invite covers it)',
+          label: 'Would you like to attend Supabase Select on October 2?',
+          hint: 'Your Partner Day invite covers it',
           placeholder: 'Select an option',
           required: true,
           options: [

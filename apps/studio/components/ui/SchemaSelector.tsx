@@ -34,7 +34,6 @@ type SchemaSelectorProps = Omit<ComponentPropsWithoutRef<'div'>, 'onSelect'> & {
   placeholderLabel?: string
   supportSelectAll?: boolean
   excludedSchemas?: string[]
-  stopScrollPropagation?: boolean
   onSelectSchema: (name: string) => void
   onSelectCreateSchema?: () => void
   align?: 'start' | 'end'
@@ -55,7 +54,6 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
       placeholderLabel = 'Choose a schema...',
       supportSelectAll = false,
       excludedSchemas = DEFAULT_EXCLUDED_SCHEMAS,
-      stopScrollPropagation = false,
       onSelectSchema,
       onSelectCreateSchema,
       align = 'start',
@@ -172,9 +170,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
             >
               <Command>
                 <CommandInput className="text-xs" placeholder="Find schema..." />
-                <CommandList
-                  onWheel={stopScrollPropagation ? (event) => event.stopPropagation() : undefined}
-                >
+                <CommandList>
                   <CommandEmpty>No schemas found</CommandEmpty>
                   <CommandGroup>
                     <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>

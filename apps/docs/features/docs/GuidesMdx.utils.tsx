@@ -9,6 +9,7 @@ import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { BASE_PATH } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
+import { mdAlternate } from '~/lib/md-alternates'
 import { GuideModelLoader } from '~/resources/guide/guideModelLoader'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { gfmFromMarkdown } from 'mdast-util-gfm'
@@ -33,7 +34,7 @@ const PUBLISHED_SECTIONS = [
   'graphql',
   'integrations',
   'local-development',
-  'monitoring-and-debugging',
+  'observability',
   'platform',
   'queues',
   'realtime',
@@ -182,7 +183,7 @@ const genGuideMeta =
         canonical: meta.canonical || `${BASE_PATH}${pathname}`,
         types: {
           ...(parentAlternates?.types ?? {}),
-          'text/markdown': `${BASE_PATH}${pathname}.md`,
+          ...mdAlternate(pathname.replace(/^\/guides\//, '')),
         },
       },
       openGraph: {

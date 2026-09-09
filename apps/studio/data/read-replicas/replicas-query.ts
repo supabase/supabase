@@ -33,11 +33,16 @@ export type ReadReplicasVariables = {
 
 export type Database = components['schemas']['DatabaseDetailResponse']
 
-export async function getReadReplicas({ projectRef }: ReadReplicasVariables, signal?: AbortSignal) {
+export async function getReadReplicas(
+  { projectRef }: ReadReplicasVariables,
+  signal?: AbortSignal,
+  headers?: HeadersInit
+) {
   if (!projectRef) throw new Error('Project ref is required')
 
   const { data, error } = await get(`/platform/projects/{ref}/databases`, {
     params: { path: { ref: projectRef } },
+    headers,
     signal,
   })
 

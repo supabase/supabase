@@ -1,19 +1,18 @@
 import { isEqual } from 'lodash'
 import { Search, X } from 'lucide-react'
-import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ReportsSelectFilter } from '../../Reports/v2/ReportsSelectFilter'
 import { GroupedActivityRow } from './ActivityRow'
+import { filterActivities } from './DatabaseConnections.utils'
+import { DEFAULT_ROLES_FILTER, useActivityFilters } from './useActivityFilters'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useDatabaseActivityQuery } from '@/data/database/activity-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
-
-const DEFAULT_ROLES_FILTER = ['anon', 'authenticated', 'postgres']
 
 interface ActivityProps {
   live?: boolean
@@ -23,22 +22,16 @@ export const Activity = ({ live }: ActivityProps) => {
   const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
 
-  const [
-    {
+  const {
+    filters: {
       search: searchFilter,
       states: statesFilter,
       applications: applicationsFilter,
       roles: rolesFilter,
       view: viewFilter,
     },
-    setQueryStates,
-  ] = useQueryStates({
-    search: parseAsString.withDefault(''),
-    states: parseAsArrayOf(parseAsString, ',').withDefault([]),
-    applications: parseAsArrayOf(parseAsString, ',').withDefault([]),
-    roles: parseAsArrayOf(parseAsString, ',').withDefault(DEFAULT_ROLES_FILTER),
-    view: parseAsString.withDefault(''),
-  })
+    setFilters: setQueryStates,
+  } = useActivityFilters()
 
   const hasNoFiltersApplied =
     searchFilter.length === 0 &&
@@ -66,23 +59,15 @@ export const Activity = ({ live }: ActivityProps) => {
   // Pids referenced in some other activity's blocked_by - i.e. they are blocking something
   const blockingPids = new Set((data ?? []).flatMap((x) => x.blocked_by))
 
-  const activities = data?.filter((activity) => {
-    const matchesState =
-      !statesFilter ||
-      statesFilter.length === 0 ||
-      (activity.state !== null && statesFilter.includes(activity.state))
-    const matchesRole = rolesFilter.length === 0 || rolesFilter.includes(activity.role_name)
-    const matchesApplication =
-      applicationsFilter.length === 0 || applicationsFilter.includes(activity.application_name)
-    // In the blocked view, only show root blockers - activities blocking others while not
-    // themselves blocked. Everything they block is shown nested under them instead.
-    const matchesView =
-      viewFilter !== 'blockers' ||
-      (activity.blocked_by.length === 0 && blockingPids.has(activity.pid))
-    return (
-      matchesState && matchesRole && matchesApplication && matchesView && matchesSearch(activity)
-    )
-  })
+  const activities = data
+    ? filterActivities(data, {
+        search: searchFilter,
+        states: statesFilter,
+        applications: applicationsFilter,
+        roles: rolesFilter,
+        view: viewFilter,
+      })
+    : undefined
   const rootBlockers = (data ?? []).filter(
     (x) =>
       x.blocked_by.length === 0 &&

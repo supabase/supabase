@@ -39,11 +39,11 @@ export default function Home() {
                 <div className="flex flex-col gap-8 justify-start pt-16 md:pt-32">
                   <div className="max-w-2xl">
                     <h1 className="text-4xl text-foreground mb-3 font-medium tracking-tight">
-                      UI Blocks for Supabase Projects
+                      Blocks for Supabase Projects
                     </h1>
                     <h2 className="text-lg text-foreground-light mb-4">
-                      A collection of React components and blocks built on the shadcn/ui library
-                      that connect your front-end to your Supabase back-end via a single command.
+                      A collection of components, blocks, and developer tools that connect your
+                      project to Supabase via a single command.
                     </h2>
                     <div className="flex gap-3 mt-4">
                       <Button_Shadcn_ variant="secondary" size="lg">

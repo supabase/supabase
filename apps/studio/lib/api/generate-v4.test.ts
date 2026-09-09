@@ -48,11 +48,10 @@ test('generateV4 calls the tool sanitizer', async () => {
   }
 
   vi.mock('@/lib/ai/ai-details', () => ({
-    getOrgAIDetails: vi.fn().mockResolvedValue({
+    getAIDetails: vi.fn().mockResolvedValue({
       aiOptInLevel: 'schema_and_log_and_data',
       hasAccessToAdvanceModel: true,
-    }),
-    getProjectAIDetails: vi.fn().mockResolvedValue({
+      hasHipaaAddon: false,
       region: 'us-east-1',
       isSensitive: false,
     }),

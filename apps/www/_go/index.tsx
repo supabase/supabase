@@ -8,6 +8,8 @@ import datadogDinner from './events/dash-2026/exec-dinner'
 import datadogContestThankYou from './events/dash-2026/exec-dinner-thank-you'
 import pgconfDev2026Contest from './events/pgconf-dev-2026/contest'
 import pgconfDev2026ContestThankYou from './events/pgconf-dev-2026/contest-thank-you'
+import postgresSummit2026Contest from './events/postgres-summit-2026/contest'
+import postgresSummit2026ContestThankYou from './events/postgres-summit-2026/contest-thank-you'
 import postgresconfContest from './events/postgresconf-sjc-2026/contest'
 import postgresconfContestThankYou from './events/postgresconf-sjc-2026/contest-thank-you'
 import selectPartnerDay from './events/select-2026/partner-day'
@@ -53,6 +55,8 @@ const pages: GoPageInput[] = [
   postgresconfContestThankYou, // remove after May 31, 2026
   pgconfDev2026Contest, // remove after May 31, 2026
   pgconfDev2026ContestThankYou, // remove after May 31, 2026
+  postgresSummit2026Contest, // remove after October 31, 2026
+  postgresSummit2026ContestThankYou, // remove after October 31, 2026
   datadogContest, // remove after June 30, 2026
   datadogContestThankYou, // remove after June 30, 2026
   datadogDinner, // remove after June 30, 2026

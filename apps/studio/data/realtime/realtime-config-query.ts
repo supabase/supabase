@@ -1,9 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
+import type { components } from 'api-types'
 
 import { realtimeKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
+
+type RealtimeConfigResponse = components['schemas']['RealtimeConfigResponse']
 
 export type RealtimeConfigurationVariables = {
   projectRef?: string
@@ -12,6 +15,7 @@ export type RealtimeConfigurationVariables = {
 export const REALTIME_DEFAULT_CONFIG = {
   private_only: false,
   connection_pool: 2,
+  postgres_changes_pool: 2,
   max_concurrent_users: 200,
   max_events_per_second: 100,
   max_bytes_per_second: 100000,
@@ -20,7 +24,8 @@ export const REALTIME_DEFAULT_CONFIG = {
   max_presence_events_per_second: 100,
   max_payload_size_in_kb: 100,
   suspend: false,
-}
+  presence_enabled: true,
+} as const satisfies RealtimeConfigResponse
 
 export async function getRealtimeConfiguration(
   { projectRef }: RealtimeConfigurationVariables,

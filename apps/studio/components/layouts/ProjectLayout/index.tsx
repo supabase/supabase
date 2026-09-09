@@ -1,4 +1,4 @@
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, mergeRefs, useFlag, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { XIcon } from 'lucide-react'
 import Head from 'next/head'
@@ -42,8 +42,8 @@ import { UnhealthyState } from './UnhealthyState'
 import { UpgradingState } from './UpgradingState'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
+import { BannerExplorer } from '@/components/ui/BannerStack/Banners/BannerExplorer'
 import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
-import { BannerUnifiedLogs } from '@/components/ui/BannerStack/Banners/BannerUnifiedLogs'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerIcon from '@/components/ui/PartnerIcon'
@@ -106,6 +106,7 @@ export interface ProjectLayoutProps {
   isLoading?: boolean
   isBlocking?: boolean
   product?: string
+  productMenuBadge?: ReactNode
   productMenu?: ReactNode
   browserTitle?: {
     entity?: string
@@ -124,6 +125,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       isLoading = false,
       isBlocking = true,
       product = '',
+      productMenuBadge,
       productMenu,
       browserTitle,
       children,
@@ -151,12 +153,11 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       !!projectResourceWarnings?.disk_io_exhaustion
     const isNanoCompute = selectedProject?.infra_compute_size === 'nano'
     const showUpgradeBanner = isNanoCompute && isComputeNearExhaustion
+
+    const isExplorerEnabled = useFlag('explorer')
+
     const [isFreeMicroUpgradeBannerDismissed] = useLocalStorageQuery(
       LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED(selectedProject?.ref ?? ''),
-      false
-    )
-    const [isUnifiedLogsBannerDismissed] = useLocalStorageQuery(
-      LOCAL_STORAGE_KEYS.UNIFIED_LOGS_BANNER_DISMISSED,
       false
     )
     const [isProjectIntegrationBannerDismissed, setIsProjectIntegrationBannerDismissed] =
@@ -167,6 +168,11 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
         }),
         false
       )
+    const [isExplorerBannerDismissed, , { isSuccess: isLocalStorageReady }] = useLocalStorageQuery(
+      LOCAL_STORAGE_KEYS.EXPLORER_BANNER_DISMISSED,
+      false
+    )
+
     const { showSidebar } = useAppStateSnapshot()
     const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
 
@@ -237,18 +243,15 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     ])
 
     useEffect(() => {
-      if (!selectedProject?.ref) return
-      if (IS_PLATFORM && !isUnifiedLogsBannerDismissed) {
-        addBanner({
-          id: BANNER_ID.UNIFIED_LOGS,
-          isDismissed: false,
-          content: <BannerUnifiedLogs />,
-          priority: 1,
-        })
-      } else {
-        dismissBanner(BANNER_ID.UNIFIED_LOGS)
-      }
-    }, [selectedProject?.ref, isUnifiedLogsBannerDismissed, addBanner, dismissBanner])
+      if (!isExplorerEnabled || !isLocalStorageReady || isExplorerBannerDismissed) return
+
+      addBanner({
+        id: 'explorer-banner',
+        priority: 2,
+        isDismissed: false,
+        content: <BannerExplorer />,
+      })
+    }, [addBanner, isExplorerEnabled, isExplorerBannerDismissed, isLocalStorageReady])
 
     useLayoutEffect(() => {
       const unregister = registerOpenMenu(() => {
@@ -298,7 +301,11 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                       isBlocking={isBlocking}
                       productMenu={productMenu}
                     >
-                      <ProductMenuBar title={product} className={productMenuClassName}>
+                      <ProductMenuBar
+                        title={product}
+                        titleBadge={productMenuBadge}
+                        className={productMenuClassName}
+                      >
                         {productMenu}
                       </ProductMenuBar>
                     </MenuBarWrapper>

@@ -419,7 +419,7 @@ export const ReplicationPipelineStatus = () => {
                 <Button
                   size="tiny"
                   variant="default"
-                  className="rounded-r-none hover:z-2"
+                  className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
                   icon={<RotateCcw />}
                   disabled={isAnyRestartInProgress || showDisabledState || isPipelineError}
                   loading={isAnyRestartInProgress}
@@ -434,8 +434,9 @@ export const ReplicationPipelineStatus = () => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="default"
+                      aria-label="More restart options"
                       icon={<ChevronDown />}
-                      className="w-7 rounded-l-none -ml-px"
+                      className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                       disabled={showDisabledState || isPipelineError}
                     />
                   </DropdownMenuTrigger>
@@ -485,7 +486,9 @@ export const ReplicationPipelineStatus = () => {
                       const errorReason =
                         isErrorState && 'reason' in table.state ? table.state.reason : undefined
                       const errorSolution =
-                        isErrorState && 'solution' in table.state ? table.state.solution : undefined
+                        isErrorState && 'solution' in table.state
+                          ? (table.state.solution ?? undefined)
+                          : undefined
                       return (
                         <TableReplicationRow
                           key={table.id}

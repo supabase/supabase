@@ -40,17 +40,16 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
 import { AIEditor } from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
+import { DataGridResults } from '../DataGridResults'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { formatSqlError } from './EditorPanel.utils'
 import { SaveSnippetDialog } from './SaveSnippetDialog'
+import { useIsExplorerEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { isExplainQuery } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import { useCreateQuery } from '@/components/interfaces/Explorer/hooks'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
-import {
-  applyAutoLimit,
-  createSqlSnippetSkeletonV2,
-} from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefinitions'
-import { Results } from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
 import { SqlRunButton } from '@/components/interfaces/SQLEditor/UtilityPanel/RunButton'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useContentIdQuery } from '@/data/content/content-id-query'
@@ -58,6 +57,7 @@ import { useContentQuery, type Content } from '@/data/content/content-query'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { contentKeys } from '@/data/content/keys'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
+import { applyAutoLimit } from '@/data/sql/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
@@ -86,6 +86,8 @@ export const EditorPanel = () => {
   const { profile } = useProfile()
   const { closeSidebar } = useSidebarManagerSnapshot()
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
+  const isExplorerEnabled = useIsExplorerEnabled()
+  const { createQuery } = useCreateQuery()
   const queryClient = useQueryClient()
 
   const [activeSnippet, setActiveSnippet] = useState<Extract<Content, { type: 'sql' }> | null>(null)
@@ -273,6 +275,38 @@ export const EditorPanel = () => {
     editorPanelState.setActiveSnippetId(null)
   }
 
+  const handleExpand = () => {
+    if (isExplorerEnabled) {
+      const id = createQuery({ sql: currentValue, name: generateSnippetTitle() })
+      if (id) handleClosePanel()
+      return
+    }
+
+    if (!ref) return console.error('Project ref is required')
+
+    if (!project) {
+      console.error('Project is required')
+      return
+    }
+    if (!profile) {
+      console.error('Profile is required')
+      return
+    }
+
+    const snippet = createSqlSnippetSkeletonV2({
+      name: generateSnippetTitle(),
+      sql: currentValue,
+      owner_id: profile.id,
+      project_id: project.id,
+    })
+
+    sqlEditorSnap.addSnippet({ projectRef: ref, snippet })
+    sqlEditorSnap.addNeedsSaving(snippet.id)
+
+    router.push(`/project/${ref}/sql/${snippet.id}`)
+    handleClosePanel()
+  }
+
   return (
     <div className="flex h-full flex-col bg-card">
       <div className="border-b border-b-muted flex items-center justify-between gap-x-4 pl-4 pr-3 h-(--header-height)">
@@ -428,37 +462,14 @@ export const EditorPanel = () => {
             variant="text"
             className="w-7 h-7 p-0"
             icon={<Maximize2 strokeWidth={1.5} />}
+            aria-label={isExplorerEnabled ? 'Open in Explorer' : 'Expand to SQL editor'}
             tooltip={{
               content: {
                 side: 'bottom',
-                text: 'Expand to SQL editor',
+                text: isExplorerEnabled ? 'Open in Explorer' : 'Expand to SQL editor',
               },
             }}
-            onClick={() => {
-              if (!ref) return console.error('Project ref is required')
-
-              if (!project) {
-                console.error('Project is required')
-                return
-              }
-              if (!profile) {
-                console.error('Profile is required')
-                return
-              }
-
-              const snippet = createSqlSnippetSkeletonV2({
-                name: generateSnippetTitle(),
-                sql: currentValue,
-                owner_id: profile.id,
-                project_id: project.id,
-              })
-
-              sqlEditorSnap.addSnippet({ projectRef: ref, snippet })
-              sqlEditorSnap.addNeedsSaving(snippet.id)
-
-              router.push(`/project/${ref}/sql/${snippet.id}`)
-              handleClosePanel()
-            }}
+            onClick={handleExpand}
           />
 
           <ButtonTooltip
@@ -565,7 +576,7 @@ export const EditorPanel = () => {
           >
             {showResults && (
               <div className="border-t flex-1 overflow-hidden">
-                <Results rows={results} />
+                <DataGridResults rows={results} />
               </div>
             )}
             <div className="text-xs text-foreground-light border-t py-2 px-5 flex items-center justify-between">

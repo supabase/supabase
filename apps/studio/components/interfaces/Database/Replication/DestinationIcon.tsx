@@ -7,7 +7,6 @@ import type { DestinationType } from './DestinationPanel/DestinationPanel.types'
 type DestinationIconComponent = ComponentType<SVGProps<SVGSVGElement> & { size?: string | number }>
 
 const destinationIconByType: Record<DestinationType, DestinationIconComponent> = {
-  'Read Replica': Database,
   BigQuery,
   'Analytics Bucket': AnalyticsBucket,
   DuckLake: Database,

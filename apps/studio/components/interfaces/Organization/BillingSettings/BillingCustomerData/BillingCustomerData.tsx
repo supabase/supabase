@@ -57,7 +57,10 @@ export const BillingCustomerData = () => {
     isSuccess,
   } = useOrganizationCustomerProfileQuery(
     { slug },
-    { enabled: canReadBillingCustomerData && inView }
+    {
+      enabled: canReadBillingCustomerData && inView,
+      select: (data) => (data ? { address: data.address, billing_name: data.billing_name } : data),
+    }
   )
 
   const {

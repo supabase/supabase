@@ -5,14 +5,17 @@ import handler from '../../../../pages/api/edge-functions/test'
 
 vi.mock('common', () => ({ IS_PLATFORM: true }))
 
-const createRequest = (url = 'https://abcdefghijklmnopqrst.supabase.co/functions/v1/test') =>
+const createRequest = (
+  url = 'https://abcdefghijklmnopqrst.supabase.co/functions/v1/test',
+  headers: Record<string, string> = {}
+) =>
   createMocks({
     method: 'POST',
     body: {
       url,
       method: 'POST',
       body: '{}',
-      headers: {},
+      headers,
     },
   })
 
@@ -123,6 +126,47 @@ describe('/api/edge-functions/test', () => {
     expect(JSON.parse(res._getData())).toEqual({
       status: 400,
       error: { message: 'Provided URL is not a valid Supabase edge function URL' },
+    })
+  })
+
+  it('forwards the supplied headers without rewriting Authorization', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null))
+    vi.stubGlobal('fetch', fetchMock)
+    const { req, res } = createRequest(undefined, {
+      apikey: 'sb_publishable_test_key',
+      Authorization: 'Bearer user-token',
+    })
+
+    await handler(req, res)
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(fetchMock.mock.calls[0][1].headers).toEqual({
+      'Content-Type': 'application/json',
+      apikey: 'sb_publishable_test_key',
+      Authorization: 'Bearer user-token',
+    })
+  })
+
+  it('lets a supplied header replace the default whatever its casing', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null))
+    vi.stubGlobal('fetch', fetchMock)
+    const { req, res } = createRequest(undefined, { 'content-type': 'text/plain' })
+
+    await handler(req, res)
+
+    expect(fetchMock.mock.calls[0][1].headers).toEqual({ 'content-type': 'text/plain' })
+  })
+
+  it('drops empty header values', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null))
+    vi.stubGlobal('fetch', fetchMock)
+    const { req, res } = createRequest(undefined, { apikey: '', 'x-kept': 'value' })
+
+    await handler(req, res)
+
+    expect(fetchMock.mock.calls[0][1].headers).toEqual({
+      'Content-Type': 'application/json',
+      'x-kept': 'value',
     })
   })
 

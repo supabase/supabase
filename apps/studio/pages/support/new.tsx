@@ -14,4 +14,4 @@ SupportPage.getLayout = (page) => (
   </AppLayout>
 )
 
-export default withAuth(SupportPage, { useHighestAAL: false })
+export default withAuth(SupportPage)

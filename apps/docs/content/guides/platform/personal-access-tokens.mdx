@@ -1,0 +1,61 @@
+---
+title: 'Personal Access Tokens'
+description: 'Scope personal access tokens to specific organizations, projects, and permissions'
+---
+
+<Admonition type="caution">
+
+Scoped personal access tokens are in **public alpha** and rolling out gradually. If you don't see the option to choose permissions when creating a token, your account doesn't have access yet. File a [support ticket](https://supabase.help) to get early access.
+
+</Admonition>
+
+Personal access tokens (PATs) authenticate you to the [Management API](/docs/reference/api/introduction) and the tools built on it, like the Supabase CLI and the [MCP server](/docs/guides/ai-tools/mcp). They come in two flavors:
+
+- **Classic tokens** carry your account's full access. That means every permission, on every organization and every project you belong to today, and on every one you create or join in the future. A classic token created a year ago can touch a project you created today.
+- **Scoped tokens** carry only the organizations, projects, and permissions you choose. For example: read one project's database and view its logs, with no access to billing or organization settings.
+
+<Admonition type="note">
+
+We recommend scoped tokens for everything, especially AI agents, automation scripts, and CI environments. If a token leaks, the blast radius stays small.
+
+</Admonition>
+
+To use scoped personal access tokens you need a Supabase account with a role on the organization or project you want the token to reach. A scoped personal access token's permissions only ever narrow what your account can already do. They never grant more. If your role doesn't include a permission (see [Access Control](/docs/guides/platform/access-control)), granting that permission to a token has no effect: the token still can't do it.
+
+You create scoped tokens the same way as classic tokens, from your [access tokens](/dashboard/account/tokens) settings. Choose which permissions to grant during creation instead of leaving the token with full access.
+
+## Create and use a scoped personal access token
+
+This example creates a token that can only read one project's settings, then calls an endpoint outside that scope. Both calls are reads available to every organization role, including Read-Only, so anyone can run it.
+
+1. Go to your [access tokens](/dashboard/account/tokens) settings and generate a new token.
+2. While creating it, scope the token to one project and grant only the **Project Settings** permission with **Read** access.
+3. Copy the token (scoped personal access tokens start with `sbp_fc`) and use it against the Management API, replacing `your-project-ref` with the project's ref:
+
+```bash
+export SUPABASE_ACCESS_TOKEN="sbp_fc..."
+
+# Allowed: Project Settings Read unlocks this endpoint
+curl "https://api.supabase.com/v1/projects/your-project-ref" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+# Returns the project's details
+
+# Denied: this endpoint needs the Database permission, which the token lacks
+curl -i "https://api.supabase.com/v1/projects/your-project-ref/types/typescript" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+# Returns HTTP 403
+```
+
+The tables below list which permission unlocks which endpoints, and which permission each [MCP tool](#mcp-tools) requires, so you can grant exactly what a workflow needs.
+
+## Permission scopes
+
+Each permission controls read or read-write access to one resource, for example **Database**, **Edge Functions**, or **Production Branches**. The permissions and names below match those shown when creating a scoped personal access token. Permissions that currently unlock neither a public Management API endpoint nor an MCP tool are omitted. A few endpoints need more than one permission. The footnotes call these out.
+
+<$Partial path="access-control/scoped_pat_permissions.mdx" />
+
+## MCP tools
+
+A scoped personal access token used to authenticate the [MCP server](/docs/guides/ai-tools/mcp) can only call the tools its granted permissions unlock. See [Available tools](/docs/guides/ai-tools/mcp#available-tools) for what each tool does.
+
+<$Partial path="access-control/scoped_pat_mcp_tools.mdx" />

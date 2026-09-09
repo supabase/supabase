@@ -95,8 +95,8 @@ const frameworkReactFilesStep: StepDefinition = {
 
 const frameworkShadcnStep: StepDefinition = {
   id: 'shadcn-add',
-  title: 'Add Supabase UI components',
-  description: 'Install Supabase UI components via the shadcn registry.',
+  title: 'Add Supabase Library blocks',
+  description: 'Install Supabase Library blocks via the shadcn registry.',
   content: 'steps/shadcn/command',
 }
 
@@ -289,6 +289,12 @@ export const connectSchema: ConnectSchema = {
       description: 'Connect your agent',
       fields: ['mcpClient', 'mcpReadonly', 'mcpFeatures'],
     },
+    {
+      id: 'warehouse',
+      label: 'Warehouse',
+      description: 'Connect to Warehouse',
+      fields: [],
+    },
   ],
 
   // -------------------------------------------------------------------------
@@ -322,7 +328,7 @@ export const connectSchema: ConnectSchema = {
       id: 'frameworkUi',
       type: 'switch',
       label: 'Shadcn',
-      description: 'Install Supabase UI components with shadcn.',
+      description: 'Install Supabase Library blocks with shadcn.',
       defaultValue: false,
       dependsOn: { framework: ['nextjs', 'react'] },
     },
@@ -467,6 +473,9 @@ export const connectSchema: ConnectSchema = {
         },
       },
       server: [serverInstallStep, serverEnvStep, serverSkillsInstallStep],
+      // Warehouse renders its own fully custom panel (WarehouseModePanel) instead of the
+      // generic field/step abstraction, so it has no steps of its own here.
+      warehouse: [],
       DEFAULT: [skillsInstallStep],
     },
   },
