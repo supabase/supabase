@@ -12,7 +12,13 @@ Start with [Connection problems](#connection-problems) if your channel never sub
 
 ## Connection problems
 
-Look for `CHANNEL_ERROR`, `TIMED_OUT`, or `CLOSED` right after you call `.subscribe()`.
+Look for `CHANNEL_ERROR`, `TIMED_OUT`, or `CLOSED` right after you call `.subscribe()`:
+
+```javascript
+channel.subscribe((status, err) => {
+  console.log(status, err)
+})
+```
 
 1. Check your project isn't paused and Realtime is enabled for it. That toggle ("Enable Realtime service") lives under **Realtime → Settings**. See [Realtime Settings](/docs/guides/realtime/settings).
 2. On a private channel, you need an RLS policy that allows the join for your role. Check **Realtime → Policies** on `realtime.messages` — see [Realtime Authorization](/docs/guides/realtime/authorization) for how the policies work.
