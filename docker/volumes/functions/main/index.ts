@@ -148,8 +148,13 @@ Deno.serve(async (req: Request) => {
   const memoryLimitMb = 150
   const workerTimeoutMs = 1 * 60 * 1000
   const noModuleCache = false
-  const importMapPath = null
-  const envVarsObj = Deno.env.toObject()
+  // Using a common Import Map for all functions 
+  // to use a scope 'deno.json' it must be dinamically resolved base on the 'service_name'
+  const importMapPath = `/home/deno/functions/deno.jsonc`
+  // SUPABASE_FUNCTION_SLUG is listed after the container env snapshot so
+  // nothing in it can shadow the value, and it is per-request because only this
+  // worker knows which function the request resolved to.
+  const envVarsObj = { ...Deno.env.toObject(), SUPABASE_FUNCTION_SLUG: service_name }
   const envVars = Object.keys(envVarsObj).map((k) => [k, envVarsObj[k]])
 
   try {

@@ -3,7 +3,7 @@ import { formatRelative } from 'date-fns'
 import { BadgeCheck, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
   PageSection,
   PageSectionContent,

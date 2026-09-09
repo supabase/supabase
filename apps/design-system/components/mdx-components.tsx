@@ -1,6 +1,5 @@
 'use client'
 
-import { useMDXComponent } from 'next-contentlayer2/hooks'
 import Image from 'next/image'
 import Link from 'next/link'
 import * as React from 'react'
@@ -21,7 +20,7 @@ import {
   TabsList,
   TabsTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { ComponentProps } from './component-props'
 import { SonnerExpandConfig } from './sonner-expand-config'
@@ -43,6 +42,7 @@ import {
 import { Icons } from '@/components/icons'
 import { ThemeSettings } from '@/components/theme-settings'
 import { useConfig } from '@/hooks/use-config'
+import { useMDXComponent } from '@/lib/use-mdx-component'
 import { Style } from '@/registry/styles'
 
 const components = {

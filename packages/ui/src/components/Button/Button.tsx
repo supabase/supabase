@@ -20,7 +20,8 @@ const buttonVariants = cva(
   ease-out
   duration-200
   rounded-md
-  transition-colors
+  transition-[background-color,border-color,color,scale]
+  motion-safe:active:scale-[0.97]
   focus-ring
   border
   `,
@@ -37,10 +38,10 @@ const buttonVariants = cva(
           `,
         default: `
           text-foreground
-          bg-alternative dark:bg-muted  hover:bg-selection
-          border-strong hover:border-stronger
-          data-[state=open]:bg-selection
-          data-[state=open]:border-button-hover
+          bg-background dark:bg-card hover:bg-popover
+          border-strong hover:border-control-hover
+          data-[state=open]:bg-popover
+          data-[state=open]:border-control-hover
           `,
         secondary: `
           bg-foreground
@@ -58,9 +59,9 @@ const buttonVariants = cva(
           text-foreground
           border
           border-dashed
-          border-strong hover:border-stronger
+          border-strong hover:border-control-hover
           bg-transparent
-          data-[state=open]:border-stronger
+          data-[state=open]:border-control-hover
         `,
         link: `
           text-brand-600

@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -22,7 +22,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -161,7 +161,7 @@ export function JitDbAccessRuleSheet({
     defaultValues,
     resolver: zodResolver(FormSchema),
   })
-  const grants = form.watch('grants')
+  const grants = useWatch({ control: form.control, name: 'grants' })
 
   const onCloseSheet = () => {
     setIsNewRule(false)

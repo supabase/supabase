@@ -10,9 +10,69 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## Unreleased
+## [0.8.0](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.8.0) - 2026-08-11
 
-Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted) for updates.
+⚠️ **Note:** This update contains **breaking changes**. Make sure to read the **important** details below:
+- Envoy is now the default API gateway, replacing Kong. Kong stays available as an opt-in override with `sh run.sh config add kong`. See the [heads-up discussion](https://github.com/orgs/supabase/discussions/48048) and [Update Your Self-Hosted Deployment](https://supabase.com/docs/guides/self-hosting/updating) - PR [#48153](https://github.com/supabase/supabase/pull/48153)
+
+### Configuration
+- ⚠️ Added `API_GW_HTTP_PORT` (falls back to `KONG_HTTP_PORT`; requires `.env` and `docker-compose.yml` update) - PR [#48153](https://github.com/supabase/supabase/pull/48153)
+
+### Documentation
+- Updated several self-hosting how-to guides to reflect the current configuration - PR [#48153](https://github.com/supabase/supabase/pull/48153)
+- Updated architecture diagram for self-hosted Supabase - PR [#48763](https://github.com/supabase/supabase/pull/48763)
+
+### Utils and tests
+- Updated `tests/` to match the API gateway switch to Envoy - PR [#48153](https://github.com/supabase/supabase/pull/48153)
+
+### API gateway
+- ⚠️ Changed the default API gateway from Kong to Envoy; the `kong` service is now `api-gw` (requires `docker-compose.yml` update) - PR [#48153](https://github.com/supabase/supabase/pull/48153)
+- Changed `docker-compose.envoy.yml` to a no-op shim now that Envoy is the default (requires `docker-compose.envoy.yml` update) - PR [#48153](https://github.com/supabase/supabase/pull/48153)
+- Added an optional override for Kong (requires new `docker-compose.kong.yml`) - PR [#48153](https://github.com/supabase/supabase/pull/48153)
+- Updated the Caddy and nginx reverse proxies to forward to `api-gw` (requires `docker-compose.caddy.yml`, `docker-compose.nginx.yml`, `volumes/proxy/caddy/Caddyfile`, and `volumes/proxy/nginx/supabase-nginx.conf.tpl` update) - PR [#48153](https://github.com/supabase/supabase/pull/48153)
+
+---
+
+## [0.7.2](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.7.2) - 2026-08-04
+
+### Utils and tests
+- Fixed `update.sh` overwriting itself during an update; the new `update.sh` is now staged as `update.sh.new` for review instead of replacing the running script - PR [#48690](https://github.com/supabase/supabase/pull/48690)
+- `update.sh` now fetches only the `docker/` directory (partial clone), making updates substantially faster and lighter - PR [#48690](https://github.com/supabase/supabase/pull/48690)
+
+---
+
+## [0.7.1](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.7.1) - 2026-08-03
+
+### Configuration
+- Added `SUPABASE_JWKS` configuration for Edge Functions to `docker-compose.yml` - PR [#45635](https://github.com/supabase/supabase/pull/45635)
+- Added `upgrades.json` - a version-keyed manifest to gate breaking changes (required for `update.sh`) - PR [#47851](https://github.com/supabase/supabase/pull/47851)
+- Updated `.gitignore` (required for `update.sh`)
+
+### Documentation
+- Added new how-to guides ([Custom Postgres Extensions](https://supabase.com/docs/guides/self-hosting/custom-postgres-extensions) and [Update Your Self-Hosted Deployment](https://supabase.com/docs/guides/self-hosting/updating)) - PR [#48203](https://github.com/supabase/supabase/pull/48203), PR [#48535](https://github.com/supabase/supabase/pull/48535)
+
+### Utils and tests
+- Added base version stamp to `setup.sh` (saved in `.supabase-version`, required for `update.sh`) - PR [#47848](https://github.com/supabase/supabase/pull/47848)
+- Added `update.sh`. Refer to [Update Your Self-Hosted Deployment](https://supabase.com/docs/guides/self-hosting/updating) - PR [#47851](https://github.com/supabase/supabase/pull/47851)
+- Added `SUPABASE_JWKS` configuration for Edge Functions to `utils/add-new-auth-keys.sh` - PR [#45635](https://github.com/supabase/supabase/pull/45635)
+- Updated `tests/test-s3.sh` and `test-s3-backend.sh` - PR [#48500](https://github.com/supabase/supabase/pull/48500)
+
+### API gateway
+- Updated Kong to `3.9.3`
+- Added `KONG_DNS_VALID_TTL` configuration environment variable (requires `docker-compose.yml` update) - PR [#47846](https://github.com/supabase/supabase/pull/47846)
+- Updated Envoy to `1.39.0` (requires `docker-compose.envoy.yml` update)
+- Updated [nginx-certbot](https://github.com/JonasAlfredsson/docker-nginx-certbot) to `6.2.0-nginx1.31.3` (requires `docker-compose.nginx.yml` update)
+
+### Studio
+- Updated to `2026.08.03-sha-022b374`
+- Fixed URL generation for Edge Functions - PR [#47861](https://github.com/supabase/supabase/pull/47861) (via [@7ttp](https://github.com/7ttp))
+- Fixed the Logs tab visibility in **Auth > Users** - PR [#48122](https://github.com/supabase/supabase/pull/48122) (via [@luizfelmach](https://github.com/luizfelmach/))
+
+### Storage
+- Changed RustFS image to `1.0.0-beta.11` temporarily (requires `docker-compose.rustfs.yml` update) - PR [#48500](https://github.com/supabase/supabase/pull/48500)
+
+### Edge Runtime
+- Changed JWKS configuration mechanism for main worker (requires `docker-compose.yml` and `volumes/functions/main/index.ts` update) - PR [#45635](https://github.com/supabase/supabase/pull/45635)
 
 ---
 
@@ -42,8 +102,8 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 ### Studio
 - Updated to `2026.07.07-sha-a6a04f2`
 - Fixed the local SQL snippets not being shown in the SQL Editor - PR [#47403](https://github.com/supabase/supabase/pull/47403), PR [#47409](https://github.com/supabase/supabase/pull/47409)
-- Fixed the exposed schemas and tables UI to properly reflect non-platform configuration (Data API > Settings) - PR [#47511](https://github.com/supabase/supabase/pull/47511)
-- Fixed the behavior of the type generator (Data API > Docs) - PR [#47577](https://github.com/supabase/supabase/pull/47577)
+- Fixed the exposed schemas and tables UI to properly reflect non-platform configuration (**Data API > Settings**) - PR [#47511](https://github.com/supabase/supabase/pull/47511)
+- Fixed the behavior of the type generator (**Data API > Docs**) - PR [#47577](https://github.com/supabase/supabase/pull/47577)
 
 ### Auth
 - ⚠️ Changed Auth configuration placeholders to match the new default `API_EXTERNAL_URL` (requires `docker-compose.yml` update) - PR [#47640](https://github.com/supabase/supabase/pull/47640)

@@ -2,6 +2,9 @@
   "TopicNameRequired": {
     "description": "You are trying to use Realtime without a topic name set."
   },
+  "InvalidJoinPayload": {
+    "description": "The payload provided to Realtime on connect is invalid."
+  },
   "RealtimeDisabledForConfiguration": {
     "description": "The configuration provided to Realtime on connect will not be able to provide you any Postgres Changes.",
     "resolution": "Verify your configuration on channel startup as you might not have your tables properly registered."
@@ -10,17 +13,12 @@
     "description": "The tenant you are trying to connect to does not exist.",
     "resolution": "Verify the tenant name you are trying to connect to exists in the realtime.tenants table."
   },
+  "MissingAPIKey": {
+    "description": "No API key was provided in the `x-api-key` header or `apikey` query parameter."
+  },
   "ErrorConnectingToWebsocket": {
     "description": "Error when trying to connect to the WebSocket server.",
     "resolution": "Verify user information on connect."
-  },
-  "ErrorAuthorizingWebsocket": {
-    "description": "Error when trying to authorize the WebSocket connection.",
-    "resolution": "Verify user information on connect."
-  },
-  "TableHasSpacesInName": {
-    "description": "The table you are trying to listen to has spaces in its name which we are unable to support.",
-    "resolution": "Change the table name to not have spaces in it."
   },
   "UnableToDeleteTenant": {
     "description": "Error when trying to delete a tenant."
@@ -46,12 +44,18 @@
   "ClientJoinRateLimitReached": {
     "description": "The rate of joins per second from your clients has reached the channel limits."
   },
+  "DatabaseConnectionRateLimitReached": {
+    "description": "The rate of attempts to connect to the database has reached the limit."
+  },
+  "MessagePerSecondRateLimitReached": {
+    "description": "The rate of messages per second from your clients has reached the channel limits."
+  },
   "RealtimeDisabledForTenant": {
     "description": "Realtime has been disabled for the tenant.",
     "resolution": "Your project may have been suspended for exceeding usage quotas. Contact support with your project reference ID and a description of your Realtime use case.",
     "references": [
       {
-        "href": "https://supabase.com/docs/guides/troubleshooting/realtime-project-suspended-for-exceeding-quotas",
+        "href": "/docs/guides/troubleshooting/realtime-project-suspended-for-exceeding-quotas",
         "description": "Troubleshooting guide for suspended projects"
       }
     ]
@@ -64,7 +68,7 @@
     "resolution": "Verify your database connection limits.",
     "references": [
       {
-        "href": "https://supabase.com/docs/guides/database/connection-management",
+        "href": "/docs/guides/database/connection-management",
         "description": "Connection management guide"
       }
     ]
@@ -75,29 +79,32 @@
   "MigrationsFailedToRun": {
     "description": "Error when running the migrations against the Tenant database that are required by Realtime."
   },
-  "StartListenAndReplicationFailed": {
+  "StartReplicationFailed": {
     "description": "Error when starting the replication and listening of errors for database broadcasting."
+  },
+  "ReplicationConnectionTimeout": {
+    "description": "Replication connection timed out during initialization."
+  },
+  "ReplicationConnectionDown": {
+    "description": "The replication connection was terminated and a recovery window has been opened."
+  },
+  "ReplicationConnectionRecoveryFailed": {
+    "description": "The database check failed while trying to recover the replication connection."
   },
   "ReplicationMaxWalSendersReached": {
     "description": "Maximum number of WAL senders reached in tenant database.",
     "references": [
       {
-        "href": "https://supabase.com/docs/guides/database/custom-postgres-config#cli-configurable-settings",
+        "href": "/docs/guides/database/custom-postgres-config#cli-configurable-settings",
         "description": "Configuring max WAL senders"
       }
     ]
   },
-  "MigrationCheckFailed": {
-    "description": "Check to see if we require to run migrations fails."
-  },
   "PartitionCreationFailed": {
     "description": "Error when creating partitions for realtime.messages."
   },
-  "ErrorStartingPostgresCDCStream": {
-    "description": "Error when starting the Postgres CDC stream which is used for Postgres Changes."
-  },
-  "UnknownDataProcessed": {
-    "description": "An unknown data type was processed by the Realtime system."
+  "MissingPartition": {
+    "description": "Realtime was unable to find the expected messages partition."
   },
   "ErrorStartingPostgresCDC": {
     "description": "Error when starting the Postgres CDC extension which is used for Postgres Changes."
@@ -111,29 +118,29 @@
   "PoolingReplicationError": {
     "description": "Error when pooling the replication slot."
   },
+  "CheckOidsError": {
+    "description": "Error when fetching the publication tables (OIDs) during the periodic check; the existing OIDs, replication slot and subscribers are left untouched."
+  },
+  "SubscriptionCleanupFailed": {
+    "description": "Error when trying to clean up all subscriptions on subscription manager initialization or OID change."
+  },
   "SubscriptionDeletionFailed": {
     "description": "Error when trying to delete a subscription for postgres changes."
   },
-  "UnableToDeletePhantomSubscriptions": {
-    "description": "Error when trying to delete subscriptions that are no longer being used."
+  "ReplicationPollerConnectionFailed": {
+    "description": "Error when the replication poller process fails to connect to the database on startup."
+  },
+  "ReplicationPollerMaxRetriesReached": {
+    "description": "The replication poller gave up after the maximum number of consecutive retries and stopped the tenant's Postgres Changes workers."
+  },
+  "DropReplicationSlotFailed": {
+    "description": "Error when dropping the replication slot after the publication became empty; the poller stops so the temporary slot is released with the connection."
+  },
+  "SubscriptionManagerConnectionFailed": {
+    "description": "Error when the subscription manager process fails to connect to the database on startup."
   },
   "UnableToCheckProcessesOnRemoteNode": {
     "description": "Error when trying to check the processes on a remote node."
-  },
-  "UnableToCreateCounter": {
-    "description": "Error when trying to create a counter to track rate limits for a tenant."
-  },
-  "UnableToIncrementCounter": {
-    "description": "Error when trying to increment a counter to track rate limits for a tenant."
-  },
-  "UnableToDecrementCounter": {
-    "description": "Error when trying to decrement a counter to track rate limits for a tenant."
-  },
-  "UnableToUpdateCounter": {
-    "description": "Error when trying to update a counter to track rate limits for a tenant."
-  },
-  "UnableToFindCounter": {
-    "description": "Error when trying to find a counter to track rate limits for a tenant."
   },
   "UnhandledProcessMessage": {
     "description": "Unhandled message received by a Realtime process."
@@ -147,20 +154,14 @@
   "IncreaseConnectionPool": {
     "description": "The number of connections you have set for Realtime are not enough to handle your current use case."
   },
+  "IncreaseSubscriptionConnectionPool": {
+    "description": "The subscription connection pool hit too many database timeouts and should be increased."
+  },
   "RlsPolicyError": {
     "description": "Error on RLS policy used for authorization."
   },
-  "ConnectionInitializing": {
-    "description": "Database is initializing connection."
-  },
-  "DatabaseConnectionIssue": {
-    "description": "Database had connection issues and connection was not able to be established."
-  },
   "UnableToConnectToProject": {
     "description": "Unable to connect to Project database."
-  },
-  "InvalidJWTExpiration": {
-    "description": "JWT exp claim value it's incorrect."
   },
   "JwtSignatureError": {
     "description": "JWT signature was not able to be validated."
@@ -174,11 +175,8 @@
   "RealtimeRestarting": {
     "description": "Realtime is currently restarting."
   },
-  "UnableToProcessListenPayload": {
-    "description": "Payload sent in NOTIFY operation was not JSON parsable."
-  },
-  "UnableToListenToTenantDatabase": {
-    "description": "Unable to LISTEN for notifications against the Tenant Database."
+  "InvalidPresencePayload": {
+    "description": "Payload from track event sent to Presence isn't a map."
   },
   "UnprocessableEntity": {
     "description": "Received a HTTP request with a body that was not able to be processed by the endpoint."
@@ -192,6 +190,9 @@
   "ErrorOnRpcCall": {
     "description": "Error when calling another realtime node."
   },
+  "RpcError": {
+    "description": "Error returned when calling another realtime node over RPC."
+  },
   "ErrorExecutingTransaction": {
     "description": "Error executing a database transaction in tenant database."
   },
@@ -204,10 +205,98 @@
   "UnableToEncodeJson": {
     "description": "An error were we are not handling correctly the response to be sent to the end user."
   },
+  "UnableToBroadcastChanges": {
+    "description": "Error when trying to broadcast database changes (realtime.messages) to subscribers."
+  },
+  "WarnSendingBroadcastMessage": {
+    "description": "Warning when `realtime.send` or `realtime.send_binary` cannot insert the message.",
+    "references": [
+      {
+        "href": "/docs/guides/realtime/troubleshooting",
+        "description": "Realtime troubleshooting guide"
+      }
+    ]
+  },
+  "UnexpectedMessageReceived": {
+    "description": "An unexpected message was received by the replication connection process."
+  },
+  "ErrorRunningQuery": {
+    "description": "Error when running a query against the tenant database."
+  },
+  "QueryCanceled": {
+    "description": "A database query was canceled, usually due to a statement timeout."
+  },
+  "UnknownError": {
+    "description": "An unhandled error occurred."
+  },
   "UnknownErrorOnController": {
     "description": "An error we are not handling correctly was triggered on a controller."
   },
   "UnknownErrorOnChannel": {
     "description": "An error we are not handling correctly was triggered on a channel."
+  },
+  "PresenceRateLimitReached": {
+    "description": "Limit of presence events reached globally."
+  },
+  "ClientPresenceRateLimitReached": {
+    "description": "A single client sent Presence updates too frequently and had its channel closed. This usually means Presence is being used for high-frequency updates it is not designed for.",
+    "resolution": "Reserve Presence for slow-changing state and use Broadcast for high-frequency updates such as live cursors, or throttle your track() calls.",
+    "references": [
+      {
+        "href": "/docs/guides/troubleshooting/realtime-client-presence-rate-limit-reached",
+        "description": "Troubleshooting guide for the ClientPresenceRateLimitReached error"
+      }
+    ]
+  },
+  "UnableToReplayMessages": {
+    "description": "An error while replaying messages."
+  },
+  "JwtSignerError": {
+    "description": "Failed to generate a JWT signer — check your JWT secret or JWKS configuration."
+  },
+  "MalformedWebSocketMessage": {
+    "description": "Received a WebSocket message that is empty, invalid JSON, or missing required fields (`ref`, `topic`, or `event`). The connection is kept alive but the message is dropped."
+  },
+  "UnknownErrorOnWebSocketMessage": {
+    "description": "An unexpected error occurred while processing an incoming WebSocket message. The connection is kept alive but the message is dropped."
+  },
+  "ReplicationSlotLagTooHigh": {
+    "description": "The replication slot WAL lag has exceeded 50% of `max_slot_wal_keep_size`. The replication connection is shut down and will be restarted to prevent the slot from being invalidated by PostgreSQL."
+  },
+  "ReplicationSlotLagCheckSkipped": {
+    "description": "The periodic replication slot lag check could not be completed, typically because the tenant database connection was unavailable. The check is skipped and retried on the next watchdog interval."
+  },
+  "HttpServerError": {
+    "description": "Phoenix converted an unhandled exception into a 5xx HTTP response. The log includes the underlying error and status to explain a server error that request metrics alone would not surface."
+  },
+  "HttpClientError": {
+    "description": "Phoenix converted an exception into a 4xx HTTP response (for example a request to an unknown route). The log includes the underlying error and status."
+  },
+  "JoinsRateLimitReached": {
+    "description": "The rate of joins per second from your clients has reached the limit and the connection was refused."
+  },
+  "InvalidJWTToken": {
+    "description": "The JWT provided on connect is expired or is missing required claims (`role` and `exp`)."
+  },
+  "PrivateOnly": {
+    "description": "The connection was rejected because this project only allows private channels."
+  },
+  "UnableToHandleBroadcast": {
+    "description": "Error when handling a broadcast message."
+  },
+  "UnableToHandlePresence": {
+    "description": "Error when handling a presence message on a channel."
+  },
+  "ChannelShutdown": {
+    "description": "The channel was shut down and an error system message was pushed to the client."
+  },
+  "ReplicationRecoveryWindowExceeded": {
+    "description": "The replication connection recovery window was exceeded and the connection was terminated."
+  },
+  "MigrationCountMismatch": {
+    "description": "The cached `migrations_ran` count did not match the tenant database and is being reconciled."
+  },
+  "MigrationCountMismatchReconcileFailed": {
+    "description": "Failed to reconcile the `migrations_ran` count mismatch between the cache and the tenant database."
   }
 }

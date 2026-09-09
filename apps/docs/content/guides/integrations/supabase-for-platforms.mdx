@@ -13,7 +13,7 @@ This document will guide you on best practices when using Supabase for your own 
 
 ## Overview
 
-All features of Supabase can be managed through the [Management API](/docs/reference/api/introduction) or the [remote MCP Server](/docs/guides/getting-started/mcp).
+All features of Supabase can be managed through the [Management API](/docs/reference/api/introduction) or the [remote MCP Server](/docs/guides/ai-tools/mcp).
 
 ## Launching projects
 
@@ -393,7 +393,7 @@ Before transferring the project to your user's org, make sure to remove any cust
 
 ## Platform kit
 
-Docs: https://supabase.com/ui/docs/platform/platform-kit
+Docs: https://supabase.com/library/docs/platform/platform-kit
 
 <div className="video-container mb-8">
   <iframe
@@ -413,21 +413,26 @@ We've created Platform Kit, a collection of UI components that interact with Man
 
 ## Debugging projects
 
-Management API endpoint: [`GET /v1/projects/{ref}/analytics/endpoints/logs.all`](https://api.supabase.com/api/v1#tag/analytics/get/v1/projects/{ref}/analytics/endpoints/logs.all)
+Management API endpoint: [`GET /v1/projects/{ref}/analytics/endpoints/logs`](https://api.supabase.com/api/v1#tag/analytics/get/v1/projects/{ref}/analytics/endpoints/logs)
 
 When you need to debug a project, you can query the project's logs to see if there are any errors and address them accordingly.
 
+Every log line from every service is a row in a single `logs` table, so filter by the `source` column to pick a service. Structured fields live in the `log_attributes` map, and the SQL is the ClickHouse dialect.
+
 ```sh
-curl 'https://api.supabase.com/v1/projects/{ref}/analytics/endpoints/logs.all' \
+curl 'https://api.supabase.com/v1/projects/{ref}/analytics/endpoints/logs' \
   --get \
   --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
-  --data-urlencode 'sql=SELECT datetime(timestamp), status_code, path, event_message
-    FROM edge_logs
-    CROSS JOIN UNNEST(metadata) AS metadata
-    CROSS JOIN UNNEST(response) AS response
-    WHERE status_code >= 400
-    ORDER BY timestamp DESC
-    LIMIT 100' \
+  --data-urlencode "sql=select
+    timestamp,
+    log_attributes['response.status_code'] as status_code,
+    log_attributes['request.path'] as path,
+    event_message
+  from logs
+  where source = 'edge_logs'
+    and toInt32OrZero(log_attributes['response.status_code']) >= 400
+  order by timestamp desc
+  limit 100" \
   --data-urlencode 'iso_timestamp_start=2025-03-23T00:00:00Z' \
   --data-urlencode 'iso_timestamp_end=2025-03-23T01:00:00Z'
 ```

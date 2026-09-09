@@ -49,6 +49,7 @@ interface OrganizationProjectSelectorSelectorProps {
   }) => ReactNode
   renderActions?: (setOpen: (value: boolean) => void, options?: { embedded?: boolean }) => ReactNode
   onSelect?: (project: OrgProject) => void
+  getItemHref?: (project: OrgProject) => string
   onInitialLoad?: (projects: OrgProject[]) => void
   isOptionDisabled?: (project: OrgProject) => boolean
   fetchOnMount?: boolean
@@ -70,6 +71,7 @@ export const OrganizationProjectSelector = ({
   renderTrigger,
   renderActions,
   onSelect,
+  getItemHref,
   onInitialLoad,
   isOptionDisabled,
   fetchOnMount = false,
@@ -184,6 +186,7 @@ export const OrganizationProjectSelector = ({
           selectedRef={selectedRef ?? undefined}
           onSelect={onSelect}
           onClose={() => setOpen(false)}
+          getItemHref={getItemHref}
           renderRow={renderRow}
           checkPosition={checkPosition}
           isOptionDisabled={isOptionDisabled}
@@ -201,6 +204,7 @@ export const OrganizationProjectSelector = ({
             selectedRef={selectedRef ?? undefined}
             onSelect={onSelect}
             onClose={() => setOpen(false)}
+            href={getItemHref?.(project)}
             renderRow={renderRow}
             checkPosition={checkPosition}
             isOptionDisabled={isOptionDisabled}

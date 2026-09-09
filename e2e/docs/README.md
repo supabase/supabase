@@ -15,6 +15,7 @@ This page covers:
 - [Override which pages run](#override-which-pages-run) — when the default git
   scope is wrong
 - [What the suite covers](#what-the-suite-covers) — in-scope paths and limits
+- [Accessibility scans](#accessibility-scans) — WCAG coverage and skipped rules
 - [Debug failures](#debug-failures) — reports and traces
 - [How CI uses this suite](#how-ci-uses-this-suite) — pull request behavior
 
@@ -168,6 +169,30 @@ staged and unstaged working-tree changes.
 } | pnpm -C e2e/docs resolve-docs-scope
 ```
 
+## Accessibility scans
+
+The `@a11y`-tagged test scans each in-scope page for WCAG 2.1 A/AA violations using
+`@axe-core/playwright`, limited to the main article.
+
+```bash
+PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:a11y
+```
+
+Which pages get scanned comes from your branch, but the content comes from
+whatever you point `PLAYWRIGHT_BASE_URL` at. Production won't have your edits and
+will 404 on a page you just added, so use your pull request's preview to scan your
+own content.
+
+`EXCLUDED_RULES` in `utils/axe-helpers.ts` lists the rules the scan skips.
+`color-contrast` is most of the scan time and finds nothing inside an article, since
+docs contrast comes from shared tokens and chrome. The rest target `<html>`, `<head>`,
+and `<body>`, which an article-scoped scan can't reach.
+
+Cross-origin frames are skipped, so a third-party embed isn't reported as ours.
+
+Not covered: `/docs/reference/*`, shared chrome, and most of WCAG. Keyboard
+navigation, focus management, and screen reader behavior need manual testing.
+
 ## Debug failures
 
 1. Open the HTML report after a run:
@@ -186,7 +211,8 @@ owned docs content, partials, or `e2e/docs`.
 1. Diff the pull request against its base branch and resolve in-scope page paths.
 2. Skip Playwright when nothing in scope changed.
 3. When `apps/docs` changed, wait for the Vercel docs preview and set
-   `PLAYWRIGHT_BASE_URL` to that preview. Otherwise use production.
+   `PLAYWRIGHT_BASE_URL` to that preview. When no preview resolves, skip rather than
+   test against production.
 4. Run the suite with `DOCS_E2E_PAGE_PATHS` set to the resolved list.
 
 Draft pull requests stay skipped until you mark them ready for review. Manual

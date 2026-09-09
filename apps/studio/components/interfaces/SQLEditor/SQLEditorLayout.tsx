@@ -17,6 +17,7 @@ import {
 import { SQLEditorEditorPanel } from './SQLEditorEditorPanel'
 import { UtilityActions } from './UtilityPanel/UtilityActions'
 import { UtilityPanel } from './UtilityPanel/UtilityPanel'
+import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
 
 const SQLEditorRunWarningModal = () => {
   const { refocusEditor, clearPendingRunRefocus, markRefocusAfterRun } = useSQLEditorContext()
@@ -58,20 +59,43 @@ const SQLEditorToolbar = () => {
   const { clearPendingRunRefocus, markRefocusAfterRun } = useSQLEditorContext()
   const { id } = useSqlEditorSnippet()
   const { diff } = useSqlEditorAssistant()
-  const { executeQuery, readEditorSql, isExecuting, prettifyQuery } = useSqlEditorRun()
+  const {
+    executeQuery,
+    readEditorSql,
+    isExecuting,
+    prettifyQuery,
+    runSource,
+    executeLogsQuery,
+    readEditorLogsSql,
+  } = useSqlEditorRun()
   const { hasSelection } = useSqlEditorUi()
 
   // Run gesture from the toolbar button — promote here, at the user action.
   const runQuery = useCallback(() => {
     markRefocusAfterRun()
-    const sql = readEditorSql()
-    if (sql === undefined) return clearPendingRunRefocus()
-    void executeQuery(acceptUntrustedSql(sql))
-  }, [clearPendingRunRefocus, executeQuery, markRefocusAfterRun, readEditorSql])
+    if (runSource._tag === 'logs') {
+      const sql = readEditorLogsSql()
+      if (sql === undefined) return clearPendingRunRefocus()
+      void executeLogsQuery(acceptUntrustedLogsSql(sql))
+    } else {
+      const sql = readEditorSql()
+      if (sql === undefined) return clearPendingRunRefocus()
+      void executeQuery(acceptUntrustedSql(sql))
+    }
+  }, [
+    clearPendingRunRefocus,
+    executeLogsQuery,
+    executeQuery,
+    markRefocusAfterRun,
+    readEditorLogsSql,
+    readEditorSql,
+    runSource._tag,
+  ])
 
   return (
     <UtilityActions
       id={id}
+      runSource={runSource}
       isExecuting={isExecuting}
       isDisabled={diff.isDiffOpen}
       hasSelection={hasSelection}

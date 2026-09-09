@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Pencil, ThumbsDown, ThumbsUp, Trash2 } from 'lucide-react'
+import { Check, Copy, Pencil, Split, ThumbsDown, ThumbsUp, Trash2 } from 'lucide-react'
 import { useEffect, useState, type PropsWithChildren } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -23,7 +23,7 @@ export function MessageActions({
   alwaysShow = false,
 }: PropsWithChildren<{ alwaysShow?: boolean }>) {
   return (
-    <div className="flex items-center gap-4 mt-2 mb-1">
+    <div className="w-full max-w-3xl mx-auto flex items-center gap-4 mt-2 mb-1">
       <span className="h-0.5 w-5 bg-muted" />
       <div className={cn('group-hover:opacity-100 transition-opacity', !alwaysShow && 'opacity-0')}>
         {children}
@@ -64,6 +64,42 @@ function MessageActionsDelete({ onClick }: { onClick: () => void }) {
   )
 }
 MessageActions.Delete = MessageActionsDelete
+
+function MessageActionsBranch({ onClick }: { onClick: () => void }) {
+  return (
+    <ButtonTooltip
+      variant="text"
+      icon={<Split size={14} strokeWidth={1.5} />}
+      onClick={onClick}
+      className="text-foreground-light hover:text-foreground p-1 rounded-sm"
+      title="Branch in new chat"
+      aria-label="Branch in new chat"
+      tooltip={{ content: { side: 'bottom', text: 'Branch in new chat' } }}
+    />
+  )
+}
+MessageActions.Branch = MessageActionsBranch
+
+function MessageActionsCopy({ onClick }: { onClick: (onSuccess: () => void) => void }) {
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    if (copied) setTimeout(() => setCopied(false), 1000)
+  }, [copied])
+
+  return (
+    <ButtonTooltip
+      variant="text"
+      icon={copied ? <Check size={14} strokeWidth={2} /> : <Copy size={14} strokeWidth={1.5} />}
+      onClick={() => onClick(() => setCopied(true))}
+      className="text-foreground-light hover:text-foreground p-1 rounded-sm"
+      title="Copy response"
+      aria-label="Copy response"
+      tooltip={{ content: { side: 'bottom', text: 'Copy response' } }}
+    />
+  )
+}
+MessageActions.Copy = MessageActionsCopy
 
 function MessageActionsThumbsUp({
   onClick,

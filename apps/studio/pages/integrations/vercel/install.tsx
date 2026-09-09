@@ -3,7 +3,6 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
 import {
   Badge,
   Button,
@@ -15,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -24,7 +23,11 @@ import {
   VercelIntegrationLogo,
 } from '@/components/interfaces/Integrations/Vercel/VercelIntegrationInterstitial'
 import { getHasInstalledObject } from '@/components/layouts/IntegrationsLayout/Integrations.utils'
-import { InterstitialAccountRow, InterstitialLayout } from '@/components/layouts/InterstitialLayout'
+import {
+  InterstitialAccountRow,
+  InterstitialActionError,
+  InterstitialLayout,
+} from '@/components/layouts/InterstitialLayout'
 import { useIntegrationsQuery } from '@/data/integrations/integrations-query'
 import { useVercelIntegrationCreateMutation } from '@/data/integrations/vercel-integration-create-mutation'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
@@ -62,6 +65,7 @@ const VercelIntegration: NextPageWithLayout = () => {
   const { code, configurationId, currentProjectId, externalId, next, teamId, source } = useParams()
 
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
+  const [validationError, setValidationError] = useState<string>()
 
   const { username, primaryEmail, avatarUrl } = useProfileNameAndPicture()
   const displayName = primaryEmail ?? username ?? ''
@@ -146,46 +150,56 @@ const VercelIntegration: NextPageWithLayout = () => {
         break
       }
       default:
-        toast.error(
+        setValidationError(
           `Unsupported Vercel installation source: ${source}. Please contact support if this error persists.`
         )
     }
   }
 
-  const { mutate, isPending: isLoadingVercelIntegrationCreateMutation } =
-    useVercelIntegrationCreateMutation({
-      onMutate() {
-        snapshot.setLoading(true)
-      },
-      onSuccess() {
-        handleRouteChange()
-        snapshot.setLoading(false)
-      },
-      onError(error) {
-        snapshot.setLoading(false)
-        toast.error(`Creating Vercel integration failed: ${error.message}`)
-      },
-    })
+  const {
+    mutate,
+    isPending: isLoadingVercelIntegrationCreateMutation,
+    error: createIntegrationError,
+    reset: resetCreateIntegrationError,
+  } = useVercelIntegrationCreateMutation({
+    onMutate() {
+      snapshot.setLoading(true)
+    },
+    onSuccess() {
+      handleRouteChange()
+      snapshot.setLoading(false)
+    },
+    onError() {
+      snapshot.setLoading(false)
+    },
+  })
+  const actionError =
+    validationError ??
+    (createIntegrationError
+      ? `Creating Vercel integration failed: ${createIntegrationError.message}`
+      : undefined)
 
   function onInstall() {
+    setValidationError(undefined)
+    resetCreateIntegrationError()
     const orgSlug = selectedOrg?.slug
 
     const isIntegrationInstalled = orgSlug ? installed[orgSlug] : false
 
     if (!orgSlug) {
-      return toast.error('Please select an organization')
+      return setValidationError('Please select an organization')
     }
 
     if (!code) {
-      return toast.error('Vercel code missing')
+      return setValidationError('Vercel code missing')
     }
 
     if (!configurationId) {
-      return toast.error('Vercel Configuration ID missing')
+      return setValidationError('Vercel configuration ID missing')
     }
 
     if (!source) {
-      return toast.error('Vercel Configuration source missing')
+      return setValidationError('Vercel configuration source missing')
     }
 
     /**
@@ -271,7 +285,11 @@ const VercelIntegration: NextPageWithLayout = () => {
                 selectedOrg={selectedOrg}
                 disabled={noOrganizations || dataLoading}
                 installed={installed}
-                onSelectedOrgChange={setSelectedOrg}
+                onSelectedOrgChange={(organization) => {
+                  setSelectedOrg(organization)
+                  setValidationError(undefined)
+                  resetCreateIntegrationError()
+                }}
               />
 
               {missingParams.length > 0 && (
@@ -311,6 +329,7 @@ const VercelIntegration: NextPageWithLayout = () => {
                 >
                   {selectedOrg && installed[selectedOrg.slug] ? 'Continue' : 'Install integration'}
                 </Button>
+                <InterstitialActionError error={actionError} />
               </div>
             </div>
           )}

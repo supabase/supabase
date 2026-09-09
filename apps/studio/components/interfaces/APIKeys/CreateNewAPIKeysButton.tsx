@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
   Button,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
 

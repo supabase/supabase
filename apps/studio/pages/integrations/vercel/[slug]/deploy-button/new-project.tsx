@@ -1,6 +1,10 @@
 import { useParams } from 'common'
 import Head from 'next/head'
-import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useCallback, useEffect, useState } from 'react'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import {
@@ -13,7 +17,6 @@ import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-que
 import { useIntegrationsQuery } from '@/data/integrations/integrations-query'
 import { useIntegrationVercelConnectionsCreateMutation } from '@/data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
-import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
@@ -29,12 +32,12 @@ const VercelIntegration: NextPageWithLayout = () => {
   const snapshot = useIntegrationInstallationSnapshot()
 
   const [newProjectRef, setNewProjectRef] = useState<string>()
+  const [connectionError, setConnectionError] = useState<string>()
+  const [isConnecting, setIsConnecting] = useState(false)
+  const [isConnectionComplete, setIsConnectionComplete] = useState(false)
 
   const { data: integrationData } = useIntegrationsQuery()
   const organizationIntegration = integrationData?.find((x) => x.organization.slug === slug)
-
-  const { data: organizationData } = useOrganizationsQuery()
-  const organization = organizationData?.find((x) => x.slug === slug)
 
   const { data: vercelProjects } = useVercelProjectsQuery(
     { organization_integration_id: organizationIntegration?.id },
@@ -42,7 +45,13 @@ const VercelIntegration: NextPageWithLayout = () => {
   )
 
   // Wait for the new project to be created before creating the connection
-  const { data, isSuccess } = useProjectSettingsV2Query(
+  const {
+    data,
+    isSuccess,
+    isError: isProjectSettingsError,
+    error: projectSettingsError,
+    refetch: refetchProjectSettings,
+  } = useProjectSettingsV2Query(
     { projectRef: newProjectRef },
     {
       enabled: newProjectRef !== undefined,
@@ -56,49 +65,117 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const { mutateAsync: createConnections } = useIntegrationVercelConnectionsCreateMutation()
 
-  useEffect(() => {
-    if (!isSuccess) return
+  const connectProject = useCallback(async () => {
+    const isReady = (data?.service_api_keys ?? []).length > 0
 
-    const onSuccessFunc = async () => {
-      const isReady = (data.service_api_keys ?? []).length > 0
+    if (!isReady || !organizationIntegration || !foreignProjectId || !newProjectRef) {
+      return
+    }
 
-      if (!isReady || !organizationIntegration || !foreignProjectId || !newProjectRef) {
-        return
-      }
+    const projectDetails = vercelProjects?.find((x) => x.id === foreignProjectId)
+    setConnectionError(undefined)
+    setIsConnecting(true)
 
-      const projectDetails = vercelProjects?.find((x) => x.id === foreignProjectId)
-
-      try {
-        await createConnections({
-          organizationIntegrationId: organizationIntegration?.id,
-          connection: {
-            foreign_project_id: foreignProjectId,
-            supabase_project_ref: newProjectRef,
-            integration_id: '0',
-            metadata: {
-              ...projectDetails,
-              supabaseConfig: {
-                projectEnvVars: {
-                  write: true,
-                },
+    try {
+      await createConnections({
+        organizationIntegrationId: organizationIntegration.id,
+        connection: {
+          foreign_project_id: foreignProjectId,
+          supabase_project_ref: newProjectRef,
+          integration_id: '0',
+          metadata: {
+            ...projectDetails,
+            supabaseConfig: {
+              projectEnvVars: {
+                write: true,
               },
             },
           },
-          orgSlug: organization?.slug,
-        })
-      } catch (error) {
-        console.error('An error occurred during createConnections:', error)
-        return
-      }
-
+        },
+        orgSlug: slug,
+      })
       snapshot.setLoading(false)
-
+      setIsConnectionComplete(true)
       if (next && isVercelUrl(next)) window.location.href = next
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'An unknown error occurred'
+      setConnectionError(message)
+    } finally {
+      setIsConnecting(false)
+    }
+  }, [
+    createConnections,
+    data?.service_api_keys,
+    foreignProjectId,
+    newProjectRef,
+    next,
+    organizationIntegration,
+    snapshot,
+    slug,
+    vercelProjects,
+  ])
+
+  useEffect(() => {
+    if (isSuccess && !connectionError && !isConnecting && !isConnectionComplete) {
+      void connectProject()
+    }
+  }, [connectProject, connectionError, isConnecting, isConnectionComplete, isSuccess])
+
+  const renderContent = () => {
+    if (newProjectRef === undefined) {
+      return <ProjectCreationForm isVercelIntegrationFlow onCreateSuccess={setNewProjectRef} />
     }
 
-    onSuccessFunc()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, isSuccess])
+    if (isProjectSettingsError) {
+      return (
+        <VercelConnectionError
+          projectRef={newProjectRef}
+          message={projectSettingsError?.message ?? 'Unable to check whether the project is ready.'}
+          onRetry={() => void refetchProjectSettings()}
+        />
+      )
+    }
+
+    if (connectionError) {
+      return (
+        <VercelConnectionError
+          projectRef={newProjectRef}
+          message={connectionError}
+          onRetry={() => void connectProject()}
+        />
+      )
+    }
+
+    if (isConnectionComplete) {
+      return (
+        <div className="px-6 pb-6">
+          <div className="flex flex-col gap-3">
+            <Admonition
+              type="success"
+              title="Project connected"
+              description="Your Supabase project is connected to Vercel."
+            />
+            <Button asChild variant="primary" block>
+              <Link href={`/project/${newProjectRef}`}>Open project</Link>
+            </Button>
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div className="px-6 pb-6">
+        <div className="space-y-3" role="status">
+          <p className="text-sm text-foreground-light">
+            {isConnecting
+              ? 'Connecting your project to Vercel'
+              : 'Waiting for your project to be ready'}
+          </p>
+          <ShimmeringLoader className="h-2 w-full rounded-full py-0" />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -113,9 +190,37 @@ const VercelIntegration: NextPageWithLayout = () => {
         footer={<VercelIntegrationFooter />}
         widthClassName="max-w-2xl"
       >
-        <ProjectCreationForm isVercelIntegrationFlow onCreateSuccess={setNewProjectRef} />
+        {renderContent()}
       </InterstitialLayout>
     </>
+  )
+}
+
+export function VercelConnectionError({
+  projectRef,
+  message,
+  onRetry,
+}: {
+  projectRef: string
+  message: string
+  onRetry: () => void
+}) {
+  return (
+    <div>
+      <div className="px-6 pb-6">
+        <Admonition
+          type="danger"
+          title="Unable to connect to Vercel"
+          description={`Your Supabase project was still created. Error: ${message}`}
+        />
+      </div>
+      <div className="flex h-12 items-center justify-end gap-x-2 border-t border-default bg-surface-100 px-card">
+        <Button asChild variant="default">
+          <Link href={`/project/${projectRef}`}>Open project</Link>
+        </Button>
+        <Button onClick={onRetry}>Retry connection</Button>
+      </div>
+    </div>
   )
 }
 

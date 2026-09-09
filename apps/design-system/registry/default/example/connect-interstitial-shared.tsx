@@ -120,6 +120,18 @@ export function InterstitialShell({
   )
 }
 
+export function InterstitialActionError({ error }: { error?: React.ReactNode }) {
+  if (!error) return null
+
+  return (
+    <div className="mt-3 border-t border-muted pt-5">
+      <p role="alert" className="text-center text-xs text-destructive text-balance">
+        {error}
+      </p>
+    </div>
+  )
+}
+
 export function SignOutButton() {
   return <Button variant="default" icon={<LogOut />} className="px-2" aria-label="Sign out" />
 }

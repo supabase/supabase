@@ -1,5 +1,5 @@
-import { Button, Input, Textarea } from 'ui'
 import {
+  Button,
   Field,
   FieldContent,
   FieldDescription,
@@ -8,7 +8,9 @@ import {
   FieldLegend,
   FieldSeparator,
   FieldSet,
-} from 'ui/src/components/shadcn/ui/field'
+  Input,
+  Textarea,
+} from 'ui'
 
 export default function FieldResponsive() {
   return (

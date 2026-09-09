@@ -3,7 +3,7 @@ import { Clock, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 

@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import { ChevronLeft, ChevronRight, FileText, Receipt, ScrollText } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 import {
   Button,
@@ -56,13 +57,16 @@ export const InvoicesSettings = () => {
   const isPartnerBilledOrganization = isPartnerBillingOrganization(
     selectedOrganization?.billing_partner
   )
+
+  const { ref, inView } = useInView({ triggerOnce: true })
+
   const offset = (page - 1) * PAGE_LIMIT
 
   const { data: count, isError: isErrorCount } = useInvoicesCountQuery(
     {
       slug,
     },
-    { enabled: !isPartnerBilledOrganization }
+    { enabled: !isPartnerBilledOrganization && inView }
   )
   const {
     data,
@@ -75,7 +79,7 @@ export const InvoicesSettings = () => {
       offset,
       limit: PAGE_LIMIT,
     },
-    { enabled: !isPartnerBilledOrganization }
+    { enabled: !isPartnerBilledOrganization && inView }
   )
   const invoices = data || []
 
@@ -118,7 +122,7 @@ export const InvoicesSettings = () => {
     isLoading || invoices.length === 0 ? 'text-foreground-muted' : undefined
 
   return (
-    <Card>
+    <Card ref={ref}>
       <Table>
         <TableHeader>
           <TableRow>

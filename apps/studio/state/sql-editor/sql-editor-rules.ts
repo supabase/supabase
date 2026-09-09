@@ -51,7 +51,7 @@ export function buildUpsertPayload(snippet: LoadedSnippet, id: string): UpsertCo
     snippet
   return {
     id,
-    type: 'sql',
+    type: snippet.type,
     name: name ?? 'Untitled',
     description: description ?? '',
     visibility: visibility ?? 'user',

@@ -4,13 +4,13 @@ import { ArrowRight, Calendar } from 'lucide-react'
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Button,
+  ButtonProps,
   Calendar as CalendarPicker,
   Popover,
   PopoverContent,
   PopoverSeparator,
   PopoverTrigger,
 } from 'ui'
-import { ButtonProps } from 'ui/src/components/Button/Button'
 
 import { TimeSplitInput } from './TimeSplitInput'
 import type { DatePickerToFrom } from '@/components/interfaces/Settings/Logs/Logs.types'
@@ -81,6 +81,9 @@ export function DatePicker({
   const [endTime, setEndTime] = useState<any>(END_TIME_DEFAULT)
 
   const disabledDays = useMemo(() => calculateDisabledDays(minDate, maxDate), [minDate, maxDate])
+
+  const startMonth = minDate ? dayjs(minDate).startOf('month').toDate() : undefined
+  const endMonth = maxDate ? dayjs(maxDate).endOf('month').toDate() : undefined
 
   const clampDateToRange = useCallback(
     (date: Date | null) => {
@@ -286,6 +289,8 @@ export function DatePicker({
             {selectsRange ? (
               <CalendarPicker
                 mode="range"
+                startMonth={startMonth}
+                endMonth={endMonth}
                 disabled={disabledDays}
                 selected={{ from: startDate ?? undefined, to: endDate ?? undefined }}
                 onSelect={(range) => {
@@ -295,6 +300,8 @@ export function DatePicker({
             ) : (
               <CalendarPicker
                 mode="single"
+                startMonth={startMonth}
+                endMonth={endMonth}
                 disabled={disabledDays}
                 selected={endDate ?? undefined}
                 onSelect={(date) => {

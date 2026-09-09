@@ -26,7 +26,7 @@ import {
   TableHeadSort,
   TableRow,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { CreateOrUpdateCustomProviderSheet } from './CreateOrUpdateCustomProviderSheet'

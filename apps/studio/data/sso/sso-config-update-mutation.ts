@@ -1,20 +1,23 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import type { operations } from 'api-types'
 import { toast } from 'sonner'
 
 import { orgSSOKeys } from './keys'
-import type { components } from '@/data/api'
 import { handleError, put } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
+type UpdateSSOProviderBody =
+  operations['SSOProvidersController_updateSSOProvider']['requestBody']['content']['application/json']
+
 export type SSOConfigUpdateVariables = {
   slug: string
-  config: Partial<components['schemas']['UpdateSSOProviderBody']>
+  config: Partial<UpdateSSOProviderBody>
 }
 
 export async function updateSSOConfig({ slug, config }: SSOConfigUpdateVariables) {
   const { data, error } = await put('/platform/organizations/{slug}/sso', {
     params: { path: { slug } },
-    body: config as components['schemas']['UpdateSSOProviderBody'],
+    body: config as UpdateSSOProviderBody,
   })
 
   if (error) handleError(error)

@@ -14,7 +14,7 @@ import {
   SheetFooter,
   SheetSection,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -24,6 +24,7 @@ import {
   reservedSuffixes,
   validBucketNameRegex,
 } from './CreateAnalyticsBucketForm.utils'
+import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
 import { useAnalyticsBucketCreateMutation } from '@/data/storage/analytics-bucket-create-mutation'
@@ -226,9 +227,7 @@ export const CreateAnalyticsBucketForm = ({
                 <p className="prose max-w-full text-sm leading-normal!">
                   Update the <code className="text-code-inline">wrappers</code> extension by
                   upgrading your project from your{' '}
-                  <InlineLink href={`/project/${ref}/settings/infrastructure`}>
-                    project settings
-                  </InlineLink>{' '}
+                  <InlineLink href={getServiceVersionsPath(ref)}>project settings</InlineLink>{' '}
                   before creating an Analytics bucket.{' '}
                   <InlineLink href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}>
                     Learn more

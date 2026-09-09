@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
 import {
+  Badge,
   Button,
   cn,
   DropdownMenu,
@@ -29,12 +30,11 @@ import {
 
 import { Shortcut } from '../ui/Shortcut'
 import { Route } from '../ui/ui.types'
-import { useUnifiedLogsPreview } from './App/FeaturePreview/FeaturePreviewContext'
 import {
-  generateOtherRoutes,
   generateProductRoutes,
   generateSettingsRoutes,
-  generateToolRoutes,
+  useGenerateOtherRoutes,
+  useGenerateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
@@ -168,6 +168,7 @@ export function SideBarNavLink({
 } & ComponentPropsWithoutRef<typeof SidebarMenuButton>) {
   const router = useRouter()
   const { state: sidebarState } = useSidebar()
+
   const [sidebarBehaviour] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
     DEFAULT_SIDEBAR_BEHAVIOR
@@ -196,6 +197,14 @@ export function SideBarNavLink({
     <>
       {route.icon}
       <span>{route.label}</span>
+      {route.isNew && (
+        <Badge
+          variant="success"
+          className="ml-auto shrink-0 px-1.5 py-0.5 text-[9px] uppercase tracking-wider"
+        >
+          New
+        </Badge>
+      )}
     </>
   )
 
@@ -215,6 +224,7 @@ export function SideBarNavLink({
           onTrigger={() => router.push(route.link!)}
           side="right"
           delayDuration={shortcutPopoverDelay}
+          label={route.key === 'explorer' ? 'Go to Explorer' : undefined}
         >
           {button}
         </Shortcut>
@@ -252,10 +262,6 @@ const ProjectLinks = () => {
   const { ref } = useParams()
   const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
   const { securityLints, errorLints } = useLints()
-  const showReports = useIsFeatureEnabled('reports:all')
-  const showLogs = useIsFeatureEnabled('logs:all')
-
-  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -272,20 +278,18 @@ const ProjectLinks = () => {
   ])
 
   const authOverviewPageEnabled = useFlag('authOverviewPage')
+  const workersEnabled = useFlag('workers')
 
-  const toolRoutes = generateToolRoutes(ref, project)
+  const toolRoutes = useGenerateToolRoutes()
   const productRoutes = generateProductRoutes(ref, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     realtime: realtimeEnabled,
     authOverviewPage: authOverviewPageEnabled,
+    workers: workersEnabled,
   })
-  const otherRoutes = generateOtherRoutes(ref, project, {
-    unifiedLogs: isUnifiedLogsEnabled,
-    showReports,
-    showLogs,
-  })
+  const otherRoutes = useGenerateOtherRoutes()
   const settingsRoutes = generateSettingsRoutes(ref)
 
   return (

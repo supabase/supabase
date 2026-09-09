@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  buildDefaultColumnFilters,
   buildFilterSearchUpdate,
   columnFiltersToLogsFilters,
   logsFiltersToColumnFilters,
@@ -120,5 +121,48 @@ describe('buildFilterSearchUpdate', () => {
   it('nulls an absent timerange key so a cleared brush is removed from the URL', () => {
     const update = buildFilterSearchUpdate([{ id: 'method', value: ['GET'] }], fields)
     expect(update.date).toBeNull()
+  })
+})
+
+describe('buildDefaultColumnFilters', () => {
+  const fields = [
+    { value: 'date', type: 'timerange' },
+    { value: 'log_type', type: 'checkbox' },
+  ]
+
+  it('seeds a deep-linked `date` range so it survives the debounced sync back to the URL', () => {
+    const range = [new Date('2026-05-08T00:00:00Z'), new Date('2026-05-08T01:00:00Z')]
+    const columnFilters = buildDefaultColumnFilters({
+      filter: ['log_type:eq:postgres'],
+      date: range,
+    })
+    expect(columnFilters).toEqual([
+      { id: 'log_type', value: ['postgres'] },
+      { id: 'date', value: range },
+    ])
+
+    // Regression guard: without the `date` entry above, this would null out the range.
+    const update = buildFilterSearchUpdate(columnFilters, fields)
+    expect(update.date).toBe(range)
+  })
+
+  it('omits `date` when no range is present, matching the pre-existing no-filter case', () => {
+    expect(buildDefaultColumnFilters({ filter: ['log_type:eq:postgres'], date: null })).toEqual([
+      { id: 'log_type', value: ['postgres'] },
+    ])
+  })
+
+  it('omits `date` for a malformed single-element range', () => {
+    const columnFilters = buildDefaultColumnFilters({
+      filter: ['log_type:eq:postgres'],
+      date: [new Date('2026-05-08T00:00:00Z')],
+    })
+    expect(columnFilters).toEqual([{ id: 'log_type', value: ['postgres'] }])
+  })
+
+  it('does not duplicate the `date` id when a hand-crafted `filter` param also targets it', () => {
+    const range = [new Date('2026-05-08T00:00:00Z'), new Date('2026-05-08T01:00:00Z')]
+    const columnFilters = buildDefaultColumnFilters({ filter: ['date:eq:123'], date: range })
+    expect(columnFilters).toEqual([{ id: 'date', value: range }])
   })
 })

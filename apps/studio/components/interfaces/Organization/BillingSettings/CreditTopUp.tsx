@@ -8,7 +8,7 @@ import { useDebounce } from '@uidotdev/usehooks'
 import { AlertCircle, Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Alert,
@@ -104,7 +104,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const debouncedAddress = useDebounce(billingAddress, 1000)
   const debouncedTaxId = useDebounce(billingTaxId, 1000)
 
-  const watchedAmount = form.watch('amount')
+  const watchedAmount = useWatch({ control: form.control, name: 'amount' })
   const debouncedAmount = useDebounce(watchedAmount, 1000)
   const parsedAmount = Number(debouncedAmount)
   const validAmount =

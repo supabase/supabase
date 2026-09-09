@@ -69,12 +69,12 @@ The Data APIs allow you to interact with your database using REST or GraphQL req
 
 For convenience, you can also use the [Supabase client libraries](/docs/reference), which wrap the Data APIs with a developer-friendly interface and automatically handle authentication:
 
-- [JavaScript](/docs/reference/javascript)
-- [Flutter](/docs/reference/dart)
+- [JavaScript](/docs/reference/javascript/introduction)
+- [Flutter](/docs/reference/dart/introduction)
 - [Swift](/docs/reference/swift)
-- [Python](/docs/reference/python)
-- [C#](/docs/reference/csharp)
-- [Kotlin](/docs/reference/kotlin)
+- [Python](/docs/reference/python/introduction)
+- [C#](/docs/reference/csharp/introduction)
+- [Kotlin](/docs/reference/kotlin/introduction)
 
 ## Direct connection
 
@@ -168,7 +168,6 @@ Server-side poolers, such as Supabase's [Supavisor](https://github.com/supabase/
   width={1851}
   height={907}
   caption="Connecting to the database directly vs using a Connection Pooler"
-
 />
 
 They maintain hot connections with the database and intelligently share them with clients only when needed, maximizing the amount of queries a single connection can service. They're best used to manage queries from auto-scaling systems, such as edge and serverless functions.

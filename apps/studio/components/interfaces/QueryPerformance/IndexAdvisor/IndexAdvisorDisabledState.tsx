@@ -5,6 +5,7 @@ import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
 
 import { Markdown } from '../../Markdown'
 import { getIndexAdvisorExtensions } from './index-advisor.utils'
+import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
@@ -77,7 +78,7 @@ export const IndexAdvisorDisabledState = () => {
         <div className="flex items-center gap-x-2">
           {indexAdvisor === undefined ? (
             <Button asChild variant="default">
-              <Link href={`/project/${ref}/settings/infrastructure`}>Upgrade Postgres version</Link>
+              <Link href={getServiceVersionsPath(ref)}>Upgrade Postgres version</Link>
             </Button>
           ) : (
             <Button

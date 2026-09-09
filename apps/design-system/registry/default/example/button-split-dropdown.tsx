@@ -11,7 +11,11 @@ import {
 export default function ButtonSplitDropdownDemo() {
   return (
     <div className="flex w-fit">
-      <Button type="button" variant="default" className="rounded-r-none hover:z-10">
+      <Button
+        type="button"
+        variant="default"
+        className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
+      >
         Primary action
       </Button>
       <DropdownMenu>
@@ -20,7 +24,7 @@ export default function ButtonSplitDropdownDemo() {
             type="button"
             variant="default"
             aria-label="More actions"
-            className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px"
+            className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
             icon={<ChevronDown />}
           />
         </DropdownMenuTrigger>

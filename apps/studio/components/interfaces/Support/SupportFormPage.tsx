@@ -6,7 +6,7 @@ import type { UseFormReturn } from 'react-hook-form'
 import SVG from 'react-inlinesvg'
 import { toast } from 'sonner'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { AIAssistantOption } from './AIAssistantOption'
 import { DiscordCTACard } from './DiscordCTACard'

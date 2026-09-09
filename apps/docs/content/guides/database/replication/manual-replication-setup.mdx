@@ -14,7 +14,7 @@ This guide is for replicating data to destination systems using your own tools. 
 
 </Admonition>
 
-### Prerequisites
+## Prerequisites
 
 To set up replication, the following is recommended:
 
@@ -99,7 +99,7 @@ You can follow those steps with the following modifications:
 1. Use the `postgres` user for replication (or create a new user with replication permissions: `ALTER USER <user> WITH REPLICATION;`)
 2. Set `pluginname` to `test-decoding`
 3. Depending on your databases the pre-assessment may fail. It is not required.
-4. Increase `wal_sender_timeout` and other settings (`max_wal_size`) using the [Supabase CLI](/docs/guides/platform/custom-postgres-config)
+4. Increase `wal_sender_timeout` and other settings (`max_wal_size`) using the [Supabase CLI](/docs/guides/database/custom-postgres-config)
 
 </TabPanel>
 

@@ -144,7 +144,7 @@ export const CreateIcebergWrapperSheet = ({
     resolver: zodResolver(formSchema),
     defaultValues: INITIAL_VALUES,
   })
-  const { resetField, formState, setError, watch } = form
+  const { resetField, formState, setError } = form
   const { isDirty, isSubmitting } = formState
 
   useEffect(() => {
@@ -153,21 +153,23 @@ export const CreateIcebergWrapperSheet = ({
 
   const currentTarget = useRef<FormSchema['target']>(INITIAL_VALUES.target)
   useEffect(() => {
-    const subscription = watch((values) => {
-      if (!values.target || values.target === currentTarget.current) return
-      currentTarget.current = values.target
+    return form.subscribe({
+      name: 'target',
+      formState: { values: true },
+      callback: ({ values }) => {
+        if (!values.target || values.target === currentTarget.current) return
+        currentTarget.current = values.target
 
-      const fields = targetFields[values.target]
-      if (!fields) return
+        const fields = targetFields[values.target]
+        if (!fields) return
 
-      wrapperMeta.server.options.forEach((option) => {
-        // @ts-expect-error Can't reconcile with form schema
-        resetField(option.name, { defaultValue: option.defaultValue ?? '' })
-      })
+        wrapperMeta.server.options.forEach((option) => {
+          // @ts-expect-error Can't reconcile with form schema
+          resetField(option.name, { defaultValue: option.defaultValue ?? '' })
+        })
+      },
     })
-
-    return () => subscription.unsubscribe()
-  }, [resetField, watch, wrapperMeta])
+  }, [form, resetField, wrapperMeta])
 
   const onSubmit: SubmitHandler<FormSchema> = async (values) => {
     const foundSchema = schemas?.find((s) => s.name === values.target_schema)

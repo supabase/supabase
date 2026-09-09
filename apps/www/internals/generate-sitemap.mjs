@@ -139,10 +139,22 @@ async function generate() {
     }
   })()
 
+  // /evals is a separate app proxied onto supabase.com via a rewrite in lib/rewrites.js,
+  // so it has no page file for the globs above to find. Hardcode it here.
+  const proxiedAppUrls = [
+    `
+        <url>
+            <loc>https://supabase.com/evals</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.5</priority>
+        </url>
+      `,
+  ]
+
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-        ${[...staticUrls, ...changelogDetailUrls].join('')}
+        ${[...staticUrls, ...changelogDetailUrls, ...proxiedAppUrls].join('')}
     </urlset>
     `
 

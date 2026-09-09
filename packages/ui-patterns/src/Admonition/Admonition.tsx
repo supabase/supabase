@@ -1,11 +1,19 @@
 import { forwardRef } from 'react'
-import { Alert, AlertDescription, cn } from 'ui'
+import { Alert, AlertDescription, AlertTitle, cn } from 'ui'
 
 import { TYPE_LABEL, TYPE_TO_VARIANT } from './Admonition.constants'
 import type { AdmonitionLayout, AdmonitionProps, AdmonitionType } from './Admonition.types'
 import { AdmonitionTypeIcon } from './AdmonitionIcons'
 
 export type { AdmonitionLayout, AdmonitionProps, AdmonitionType }
+
+const admonitionBodyClassName = [
+  'text-sm leading-relaxed [&_code]:text-[0.75rem]',
+  'mb-0 [&_p]:mt-0 [&_p]:mb-1.5 [&_p:last-child]:mb-0',
+  '[&_ul]:my-1.5 [&_ol]:my-1.5 [&_li]:my-0.5',
+  '[&_ul]:list-none [&_ol]:list-decimal [&_ul]:pl-4 [&_ol]:pl-4',
+  '[&_ul>li]:relative [&_ul>li]:before:absolute [&_ul>li]:before:left-[-1rem] [&_ul>li]:before:top-2.5 [&_ul>li]:before:h-0.5 [&_ul>li]:before:w-2 [&_ul>li]:before:rounded [&_ul>li]:before:bg-border-strong [&_ul>li]:before:content-[""]',
+].join(' ')
 
 export const Admonition = forwardRef<
   React.ComponentRef<typeof Alert>,
@@ -40,7 +48,7 @@ export const Admonition = forwardRef<
         aria-label={label}
         variant={TYPE_TO_VARIANT[type]}
         className={cn(
-          'overflow-hidden',
+          'overflow-hidden text-sm leading-normal',
           layout === 'responsive' && '@container',
           type === 'success' && [
             'bg-brand-400/15 dark:bg-brand/10',
@@ -67,32 +75,40 @@ export const Admonition = forwardRef<
             )}
           >
             <div
-              {...childProps?.description}
               className={cn(
-                'text-foreground-light',
-                // Exclude the title <p> so these MDX body resets don't override its mb-0.5
-                // ([&_p]:!mb-1.5 beats !mb-0.5 on specificity: class+element vs class).
-                '[&_p:not([data-admonition-title])]:!mt-0 [&_p:not([data-admonition-title])]:!mb-1.5 [&_p:not([data-admonition-title]):last-child]:!mb-0',
-                '[&_ul]:!my-1.5 [&_ol]:!my-1.5 [&_li]:!my-0.5',
-                childProps?.description?.className
+                showIcon && (title || description || children) && (title ? 'mt-0.75' : 'mt-0.5')
               )}
             >
               {title && (
-                <p
+                <AlertTitle
                   {...childProps?.title}
-                  data-admonition-title
-                  className={cn('mb-0.5 font-medium text-foreground', childProps?.title?.className)}
+                  className={cn('!mt-0 text-foreground', childProps?.title?.className)}
                 >
                   {title}
-                </p>
+                </AlertTitle>
               )}
-              {description && <AlertDescription>{description}</AlertDescription>}
-              {children}
+              {description && (
+                <AlertDescription
+                  {...childProps?.description}
+                  className={cn(admonitionBodyClassName, childProps?.description?.className)}
+                >
+                  {description}
+                </AlertDescription>
+              )}
+              {children && (
+                <AlertDescription
+                  {...childProps?.description}
+                  className={cn(admonitionBodyClassName, childProps?.description?.className)}
+                >
+                  {children}
+                </AlertDescription>
+              )}
             </div>
             {actions && (
               <div
                 className={cn(
-                  'flex flex-row gap-3',
+                  'flex flex-row gap-2',
+                  '[&_button]:text-xs [&_a]:text-xs',
                   layout === 'vertical' && 'mt-3 items-start',
                   layout === 'horizontal' && 'items-center',
                   layout === 'responsive' && 'mt-3 items-start @md:mt-0 @md:items-center'

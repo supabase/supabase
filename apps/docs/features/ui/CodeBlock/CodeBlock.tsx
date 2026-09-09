@@ -1,10 +1,10 @@
-import { Fragment, type PropsWithChildren } from 'react'
+import { type PropsWithChildren } from 'react'
 import { bundledLanguages, createHighlighter, type BundledLanguage, type ThemedToken } from 'shiki'
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
 import { cn } from 'ui'
 
 import { AnnotatedSpan, CodeBlockControls } from './CodeBlock.client'
-import { getFontStyle } from './CodeBlock.utils'
+import { getCodeBlockLabel, getFontStyle } from './CodeBlock.utils'
 import theme from './supabase-2.json' with { type: 'json' }
 import denoTypes from './types/lib.deno.d.ts.include'
 
@@ -46,11 +46,7 @@ export async function CodeBlock({
       twoslashed = annotationsByLine(hoverNodes)
       code = editedCode
     } catch (_err) {
-      // Silently ignore, if imports aren't defined type compilation fails
-      // Uncomment lines below to debug in dev
-      // console.log('\n==========CODE==========\n')
-      // console.log(code)
-      // console.error(_err.recommendation)
+      // Type compilation fails when imports aren't defined
     }
   }
 
@@ -66,52 +62,71 @@ export async function CodeBlock({
         'group',
         'relative',
         'not-prose',
-        'w-full overflow-x-auto',
+        'w-full',
         'border border-default rounded-lg',
-        'bg-200',
+        'bg-200 shadow-codeblock',
         'text-sm',
         className
       )}
-      role="group"
-      aria-roledescription="code block"
     >
-      {!hideControls && <CodeBlockControls content={code.trim()} />}
-      <pre>
-        <code className={lineNumbers ? 'grid grid-cols-[auto_1fr]' : ''}>
-          {lineNumbers ? (
-            <>
-              {tokens.map((line, idx) => (
-                <Fragment key={idx}>
+      <div
+        className={cn(
+          'code-scroll',
+          'w-full overflow-x-auto overscroll-x-none rounded-lg',
+          'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring'
+        )}
+        role="group"
+        aria-roledescription="code block"
+        aria-label={getCodeBlockLabel(lang, tokens.length)}
+        tabIndex={0}
+      >
+        <pre>
+          <code
+            className={cn(
+              lineNumbers && 'grid grid-cols-[auto_1fr] w-fit min-w-full py-3',
+              '[--row-rest:var(--background-200)]',
+              '[--row-hover:color-mix(in_srgb,var(--foreground)_3%,var(--background-200))]'
+            )}
+          >
+            {lineNumbers ? (
+              tokens.map((line, idx) => (
+                <div key={idx} className="group/row contents">
                   <div
+                    aria-hidden="true"
                     className={cn(
-                      'select-none text-right text-muted bg-control px-2 min-h-5 leading-5',
-                      idx === 0 && 'pt-6',
-                      idx === tokens.length - 1 && 'pb-6'
+                      'select-none text-right text-muted/70 pl-3 pr-2 min-h-5 leading-5',
+                      'bg-[var(--row-rest)]',
+                      'sticky left-0 z-10',
+                      'group-hover/row:text-muted group-hover/row:bg-[var(--row-hover)]',
+                      'after:pointer-events-none after:absolute after:inset-y-0 after:left-full after:w-4',
+                      '[--gutter-fade:var(--row-rest)] group-hover/row:[--gutter-fade:var(--row-hover)]',
+                      'after:bg-[image:linear-gradient(to_right,var(--gutter-fade)_0%,color-mix(in_srgb,var(--gutter-fade)_85%,transparent)_25%,color-mix(in_srgb,var(--gutter-fade)_50%,transparent)_50%,color-mix(in_srgb,var(--gutter-fade)_15%,transparent)_75%,transparent_100%)]'
                     )}
                   >
                     {idx + 1}
                   </div>
                   <div
                     className={cn(
-                      'code-content min-h-5 leading-5 pl-6 pr-6',
-                      idx === 0 && 'pt-6',
-                      idx === tokens.length - 1 && 'pb-6'
+                      'code-content min-h-5 leading-5 pl-3 pr-18',
+                      'group-hover/row:bg-[var(--row-hover)]'
                     )}
                   >
                     <CodeLine tokens={line} twoslash={twoslashed?.get(idx)} />
                   </div>
-                </Fragment>
-              ))}
-            </>
-          ) : (
-            <div className="code-content p-6">
-              {tokens.map((line, idx) => (
-                <CodeLine key={idx} tokens={line} twoslash={twoslashed?.get(idx)} />
-              ))}
-            </div>
-          )}
-        </code>
-      </pre>
+                </div>
+              ))
+            ) : (
+              <div className="code-content p-6">
+                {tokens.map((line, idx) => (
+                  <CodeLine key={idx} tokens={line} twoslash={twoslashed?.get(idx)} />
+                ))}
+              </div>
+            )}
+          </code>
+        </pre>
+      </div>
+      {/* After the code so the block is named before its controls, and outside the scroller so they stay pinned */}
+      {!hideControls && <CodeBlockControls content={code.trim()} />}
     </div>
   )
 }

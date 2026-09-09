@@ -3,7 +3,7 @@ import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta/src/pg-forma
 import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
 import { Plus, Trash } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
+import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -30,6 +30,9 @@ import {
   SheetFooter,
   SheetSection,
   Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
@@ -91,7 +94,7 @@ export const CreateFunction = ({
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
-  const { type, language } = form.watch()
+  const [type, language] = useWatch({ control: form.control, name: ['type', 'language'] })
 
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
@@ -536,12 +539,20 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
               />
 
               {!readonly && (
-                <Button
-                  variant="default"
-                  icon={<Trash size={12} />}
-                  onClick={() => remove(index)}
-                  className="h-[34px] w-[34px]"
-                />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="default"
+                      icon={<Trash size={12} />}
+                      onClick={() => remove(index)}
+                      className="h-[34px] w-[34px]"
+                      aria-label="Remove argument"
+                      // Tooltip repeats the label; the description would read the name twice
+                      aria-describedby={undefined}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Remove </TooltipContent>
+                </Tooltip>
               )}
             </div>
           )

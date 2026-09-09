@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
-import { useMemo, useState, type ComponentPropsWithoutRef } from 'react'
+import { useMemo, useRef, useState, type ComponentPropsWithoutRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
@@ -99,6 +99,7 @@ export const ResumeProjectButton = ({
     mode: 'onChange',
     defaultValues: { postgresVersionSelection: '' },
   })
+  const lastValidPostgresVersionSelection = useRef('')
 
   const onSelectRestore = () => {
     if (project?.status !== PROJECT_STATUS.INACTIVE) {
@@ -209,6 +210,7 @@ export const ResumeProjectButton = ({
                         dbRegion={region?.displayName ?? ''}
                         cloudProvider={(project?.cloud_provider ?? 'AWS') as CloudProvider}
                         organizationSlug={selectedOrganization?.slug}
+                        lastValidSelectionRef={lastValidPostgresVersionSelection}
                       />
                     )}
                   />

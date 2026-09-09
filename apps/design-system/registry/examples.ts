@@ -1352,6 +1352,11 @@ export const examples: Registry = [
     files: ['example/info-tooltip-demo.tsx'],
   },
   {
+    name: 'skip-to-content-demo',
+    type: 'components:example',
+    files: ['example/skip-to-content-demo.tsx'],
+  },
+  {
     name: 'page-container-demo',
     type: 'components:example',
     files: ['example/page-container-demo.tsx'],
@@ -1402,6 +1407,11 @@ export const examples: Registry = [
     name: 'connect-interstitial-demo',
     type: 'components:example',
     files: ['example/connect-interstitial-demo.tsx'],
+  },
+  {
+    name: 'connect-interstitial-action-error',
+    type: 'components:example',
+    files: ['example/connect-interstitial-action-error.tsx'],
   },
   {
     name: 'connect-interstitial-logo-pair',

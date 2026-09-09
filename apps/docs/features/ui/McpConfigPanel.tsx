@@ -23,9 +23,10 @@ import {
   PopoverTrigger,
   ScrollArea,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
   createMcpCopyHandler,
+  MCP_HOSTED_AUTH_NOTE,
   McpConfigPanel as McpConfigPanelBase,
   type McpClient,
 } from 'ui-patterns/McpUrlBuilder'
@@ -336,17 +337,8 @@ export function McpConfigPanel() {
         />
       </div>
       {isPlatform && (
-        <Admonition type="note" title="Authentication" className="mt-3">
-          <p>
-            {
-              "Some MCP clients will automatically prompt you to login during setup, while others may require manual authentication steps. Either authentication method will open a browser window where you can login to your Supabase account and grant organization access to the MCP client. In the future, we'll offer more fine grain control over these permissions."
-            }
-          </p>
-          <p>
-            {
-              'Previously Supabase MCP required you to generate a personal access token (PAT), but this is no longer required.'
-            }
-          </p>
+        <Admonition type="note" title={MCP_HOSTED_AUTH_NOTE.title} className="mt-3">
+          <p>{MCP_HOSTED_AUTH_NOTE.body}</p>
         </Admonition>
       )}
     </>

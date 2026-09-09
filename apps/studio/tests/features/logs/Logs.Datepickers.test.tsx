@@ -11,9 +11,9 @@ import {
   generateDynamicHelper,
   generateDynamicHelpers,
   generateHelpersFromInput,
-  LogsDatePicker,
   parseCustomInput,
-} from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+} from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
+import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import { DatetimeHelper } from '@/components/interfaces/Settings/Logs/Logs.types'
 
 dayjs.extend(timezone)
@@ -96,7 +96,7 @@ describe('generateDynamicHelper', () => {
 })
 
 describe('generateDynamicHelpers', () => {
-  test('generates 3 helpers for minutes, hours, days', () => {
+  test('generates helpers for every supported relative unit', () => {
     const helpers = generateDynamicHelpers(5)
     expect(helpers).toHaveLength(3)
     expect(helpers[0].text).toBe('Last 5 minutes')
@@ -112,7 +112,7 @@ describe('generateHelpersFromInput', () => {
     expect(generateHelpersFromInput('2yoie')).toBeNull()
   })
 
-  test('returns 3 helpers for number only input', () => {
+  test('returns a helper for every unit for number only input', () => {
     const helpers = generateHelpersFromInput('25')
     expect(helpers).toHaveLength(3)
     expect(helpers![0].text).toBe('Last 25 minutes')

@@ -239,11 +239,16 @@ export function RefLink({
   section,
   skipChildren = false,
   className,
+  realNavigation,
 }: {
   basePath: string
   section: AbbrevApiReferenceSection
   skipChildren?: boolean
   className?: string
+  // Spike (DOCS-1268): when true, this link does a real navigation instead of
+  // the scroll-hijack below — used only by the API reference, whose endpoints
+  // are now real pages. Undefined everywhere else preserves current behavior.
+  realNavigation?: boolean
 }) {
   const ref = useRef<HTMLAnchorElement>(null)
 
@@ -260,8 +265,11 @@ export function RefLink({
   }, [isActive, className])
 
   const onClick = useCallback(
-    (evt: MouseEvent) => createReferenceSubsectionNavigator(href, section.slug)(evt),
-    [href, section.slug]
+    (evt: MouseEvent) => {
+      if (realNavigation) return
+      createReferenceSubsectionNavigator(href, section.slug)(evt)
+    },
+    [href, section.slug, realNavigation]
   )
 
   if (!('title' in section)) return null
@@ -272,13 +280,13 @@ export function RefLink({
   return (
     <>
       {isCompoundSection ? (
-        <CompoundRefLink basePath={basePath} section={section} />
+        <CompoundRefLink basePath={basePath} section={section} realNavigation={realNavigation} />
       ) : (
         <Link
           ref={ref}
-          // We don't use these links because we never do real navigation, so
-          // prefetching just wastes egress
-          prefetch={false}
+          // Scroll-hijack links never navigate, so disable prefetch. Real API
+          // pages omit the prop and keep Next.js's default prefetch behavior.
+          {...(!realNavigation ? { prefetch: false } : {})}
           href={href}
           className={getLinkStyles(isActive, className)}
           onClick={onClick}
@@ -321,9 +329,11 @@ function useCompoundRefLinkActive(basePath: string, section: AbbrevApiReferenceS
 function CompoundRefLink({
   basePath,
   section,
+  realNavigation,
 }: {
   basePath: string
   section: AbbrevApiReferenceSection
+  realNavigation?: boolean
 }) {
   const { open, setOpen, isActive } = useCompoundRefLinkActive(basePath, section)
 
@@ -357,7 +367,7 @@ function CompoundRefLink({
           {(section.items || []).map((item, idx) => {
             return (
               <li key={`${section.id}-${idx}`}>
-                <RefLink basePath={basePath} section={item} />
+                <RefLink basePath={basePath} section={item} realNavigation={realNavigation} />
               </li>
             )
           })}

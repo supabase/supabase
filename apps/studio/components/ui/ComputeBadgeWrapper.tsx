@@ -5,6 +5,7 @@ import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getAvailableComputeOptions } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { ProjectDetail } from '@/data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
@@ -195,9 +196,7 @@ export const ComputeBadgeWrapper = ({
                     })
                   }}
                 >
-                  <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
-                    Upgrade compute
-                  </Link>
+                  <Link href={getInfrastructurePath(projectRef)}>Upgrade compute</Link>
                 </Button>
               </div>
             </div>

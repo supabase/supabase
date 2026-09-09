@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Card } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { Markdown } from '@/components/interfaces/Markdown'
 import { InlineLink } from '@/components/ui/InlineLink'

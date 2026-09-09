@@ -1,12 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Check, ChevronDown } from 'lucide-react'
+import { ChartArea, Check, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { Button, cn, CommandGroup, CommandItem } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Restriction } from '../BillingSettings/Restriction'
@@ -26,12 +26,14 @@ import {
 } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { DateRangePicker } from '@/components/ui/DateRangePicker'
+import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
 import { useOrgDailyStatsQuery } from '@/data/analytics/org-daily-stats-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { resolveHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
 
 export const Usage = () => {
@@ -41,6 +43,12 @@ export const Usage = () => {
 
   const [selectedProjectRef, setSelectedProjectRef] = useQueryState('projectRef')
   const [openProjectSelector, setOpenProjectSelector] = useState(false)
+
+  const { data: selectedProject, isPending: isLoadingSelectedProject } = useProjectDetailQuery({
+    ref: selectedProjectRef ?? undefined,
+  })
+  const isHighAvailability = resolveHighAvailability(selectedProject)
+  const canLoadUsage = !selectedProjectRef || (!isLoadingSelectedProject && !isHighAvailability)
 
   const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -53,11 +61,7 @@ export const Usage = () => {
     isPending: isLoadingSubscription,
     isError: isErrorSubscription,
     isSuccess: isSuccessSubscription,
-  } = useOrgSubscriptionQuery({ orgSlug: slug })
-
-  const { data: selectedProject } = useProjectDetailQuery({
-    ref: selectedProjectRef ?? undefined,
-  })
+  } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canLoadUsage })
 
   const billingCycleStart = useMemo(() => {
     return dayjs.unix(subscription?.current_period_start ?? 0).utc()
@@ -107,12 +111,27 @@ export const Usage = () => {
     error: orgDailyStatsError,
     isPending: isLoadingOrgDailyStats,
     isError: isErrorOrgDailyStats,
-  } = useOrgDailyStatsQuery({
-    orgSlug: slug,
-    projectRef: selectedProjectRef ?? undefined,
-    startDate,
-    endDate,
-  })
+  } = useOrgDailyStatsQuery(
+    {
+      orgSlug: slug,
+      projectRef: selectedProjectRef ?? undefined,
+      startDate,
+      endDate,
+    },
+    { enabled: canLoadUsage }
+  )
+
+  if (isHighAvailability) {
+    return (
+      <div className="flex flex-1 items-center justify-center p-6">
+        <HighAvailabilityDisabledEmptyState
+          icon={ChartArea}
+          title="Usage unavailable on High Availability projects"
+          description="Usage insights for High Availability projects are coming soon."
+        />
+      </div>
+    )
+  }
 
   return (
     <>

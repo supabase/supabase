@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { DownloadBackupsSection } from './DownloadBackupsSection'

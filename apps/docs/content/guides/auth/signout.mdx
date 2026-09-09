@@ -68,6 +68,15 @@ supabase.auth.sign_out()
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Auth.SignOut();
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Sign out and scopes
@@ -125,6 +134,19 @@ await supabase.auth.signOut();
 
 // sign out from all sessions
 supabase.auth.signOut(SignOutScope.GLOBAL)
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+// defaults to the global scope
+await supabase.Auth.SignOut();
+
+// sign out from the current session only
+await supabase.Auth.SignOut(SignOutScope.Local);
 ```
 
 </TabPanel>

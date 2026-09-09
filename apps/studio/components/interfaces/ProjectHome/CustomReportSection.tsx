@@ -29,7 +29,7 @@ import { DEFAULT_CHART_CONFIG } from '@/components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from '@/data/analytics/constants'
 import { useInvalidateAnalyticsQuery } from '@/data/analytics/utils'
 import { useContentInfiniteQuery } from '@/data/content/content-infinite-query'
-import { Content } from '@/data/content/content-query'
+import { Content, ContentOfType } from '@/data/content/content-query'
 import {
   UpsertContentPayload,
   useContentUpsertMutation,
@@ -46,24 +46,25 @@ export function CustomReportSection() {
   const startDate = dayjs().subtract(7, 'day').toISOString()
   const endDate = dayjs().toISOString()
 
+  const track = useTrack()
   const { ref } = useParams()
   const { profile } = useProfile()
   const state = useDatabaseSelectorStateSnapshot()
-  const track = useTrack()
+
   const { invalidateInfraMonitoringQuery } = useInvalidateAnalyticsQuery()
   const { data: project } = useSelectedProjectQuery()
-
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
-  const [snippetToMakePublic, setSnippetToMakePublic] = useState<
-    { id: string; name: string } | undefined
-  >(undefined)
 
   const { data: reportsData } = useContentInfiniteQuery(
     { projectRef: ref, type: 'report', name: 'Home', limit: 1 },
     { placeholderData: keepPreviousData }
   )
-  const homeReport = reportsData?.pages?.[0]?.content?.[0] as Content | undefined
+  const homeReport = reportsData?.pages?.[0]?.content?.[0] as ContentOfType<'report'> | undefined
   const reportContent = homeReport?.content as Dashboards.Content | undefined
+
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
+  const [snippetToMakePublic, setSnippetToMakePublic] = useState<
+    { id: string; name: string } | undefined
+  >(undefined)
   const [editableReport, setEditableReport] = useState<Dashboards.Content | undefined>(
     reportContent
   )
@@ -201,8 +202,8 @@ export function CustomReportSection() {
           payload: {
             id: uuidv4(),
             type: 'report',
-            name: 'Home',
-            description: '',
+            name: 'Homepage Report',
+            description: "Report displayed on the project's home page",
             visibility: 'project',
             owner_id: profile.id,
             content: newReport,

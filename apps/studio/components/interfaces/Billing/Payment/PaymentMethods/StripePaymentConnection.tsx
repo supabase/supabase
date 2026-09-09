@@ -1,6 +1,6 @@
 import { ExternalLink } from 'lucide-react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'

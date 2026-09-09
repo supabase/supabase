@@ -8,6 +8,9 @@ import {
   DropdownMenuTrigger,
   TableCell,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 import { APIKeyDeleteDialog } from './APIKeyDeleteDialog'
@@ -63,18 +66,24 @@ export const APIKeyRow = ({
           <TableCell className="py-2">
             <div className="flex justify-end">
               <DropdownMenu>
-                <DropdownMenuTrigger className="px-1 focus-visible:outline-hidden" asChild>
-                  <Button
-                    variant="text"
-                    size="tiny"
-                    icon={
-                      <MoreVertical
-                        size="14"
-                        className="text-foreground-light hover:text-foreground"
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <DropdownMenuTrigger className="px-1 focus-visible:outline-hidden" asChild>
+                      <Button
+                        aria-label={`More actions for API key ${apiKey.name}`}
+                        variant="text"
+                        size="tiny"
+                        icon={
+                          <MoreVertical
+                            size="14"
+                            className="text-foreground-light hover:text-foreground"
+                          />
+                        }
                       />
-                    }
-                  />
-                </DropdownMenuTrigger>
+                    </DropdownMenuTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">More actions for API key</TooltipContent>
+                </Tooltip>
                 <DropdownMenuContent className="max-w-40" align="end">
                   <APIKeyDeleteDialog apiKey={apiKey} setKeyToDelete={setKeyToDelete} />
                 </DropdownMenuContent>

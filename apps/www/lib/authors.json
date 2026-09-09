@@ -872,7 +872,7 @@
     "username": "deepthi",
     "position": "Head of Databases",
     "author_url": "https://github.com/deepthi",
-    "author_image_url": "https://github.com/deepthi.png"
+    "author_image_url": "/images/avatars/deepthi-sigireddi.jpg"
   },
   {
     "author_id": "joe_sciarrino",
@@ -934,7 +934,7 @@
     "author_id": "gregor_vand",
     "author": "Gregor Vand",
     "username": "gregorvand",
-    "position": "Technical Program Manager",
+    "position": "Product",
     "author_url": "https://www.linkedin.com/in/gregorvand/",
     "author_image_url": "https://github.com/gregorvand.png"
   },
@@ -1016,5 +1016,21 @@
     "position": "Growth",
     "author_url": "https://github.com/ekhar",
     "author_image_url": "/images/blog/avatars/eric-kharitonashvili.png"
+  },
+  {
+    "author_id": "miranda_limonczenko",
+    "author": "Miranda Limonczenko",
+    "username": "czenko",
+    "position": "Docs Engineer",
+    "author_url": "https://github.com/czenko",
+    "author_image_url": "https://github.com/czenko.png"
+  },
+  {
+    "author_id": "nik_richers",
+    "author": "Nik Richers",
+    "username": "nrichers",
+    "position": "Product Manager",
+    "author_url": "https://github.com/nrichers",
+    "author_image_url": "https://github.com/nrichers.png"
   }
 ]

@@ -128,7 +128,7 @@ export const HookCard = ({ hook, onSelectEdit, onSelectDelete }: HookCardProps) 
             </Badge>
           )}
           <DropdownMenu>
-            <DropdownMenuTrigger>
+            <DropdownMenuTrigger asChild>
               <Button
                 variant="default"
                 className="px-1"

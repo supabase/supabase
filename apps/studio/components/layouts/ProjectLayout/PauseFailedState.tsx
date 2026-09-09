@@ -118,7 +118,7 @@ export const PauseFailedState = () => {
                 Download backup
               </ButtonTooltip>
               <DropdownMenu>
-                <DropdownMenuTrigger>
+                <DropdownMenuTrigger asChild>
                   <Button variant="default" className="px-1.5" icon={<MoreVertical />} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-72" align="end">

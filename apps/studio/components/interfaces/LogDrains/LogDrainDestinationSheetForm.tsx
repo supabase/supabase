@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { IS_PLATFORM } from 'common'
 import Link from 'next/link'
 import { ReactNode, useEffect, useMemo, useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -393,8 +393,8 @@ export function LogDrainDestinationSheetForm({
     values: formValues,
   })
 
-  const type = form.watch('type')
-  const tls = form.watch('tls')
+  const type = useWatch({ control: form.control, name: 'type' })
+  const tls = useWatch({ control: form.control, name: 'tls' })
 
   useEffect(() => {
     if (mode === 'create' && !open) {
@@ -411,12 +411,7 @@ export function LogDrainDestinationSheetForm({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        tabIndex={undefined}
-        showClose={false}
-        size="lg"
-        className="overflow-y-auto flex flex-col"
-      >
+      <SheetContent showClose={false} size="lg" className="overflow-y-auto flex flex-col">
         <SheetHeader>
           <SheetTitle>Add destination</SheetTitle>
         </SheetHeader>
@@ -507,16 +502,8 @@ export function LogDrainDestinationSheetForm({
                                 onValueChange={field.onChange}
                                 value={field.value}
                               >
-                                <FormItem asChild>
-                                  <FormControl>
-                                    <RadioGroupCardItem value="http1" label="HTTP/1" />
-                                  </FormControl>
-                                </FormItem>
-                                <FormItem asChild>
-                                  <FormControl>
-                                    <RadioGroupCardItem value="http2" label="HTTP/2" />
-                                  </FormControl>
-                                </FormItem>
+                                <RadioGroupCardItem value="http1" label="HTTP/1" />
+                                <RadioGroupCardItem value="http2" label="HTTP/2" />
                               </RadioGroupCard>
                             </FormControl>
                           </FormItemLayout>

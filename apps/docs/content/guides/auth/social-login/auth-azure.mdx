@@ -1,6 +1,6 @@
 ---
 id: 'auth-azure'
-title: 'Login with Azure (Microsoft)'
+title: 'Sign in with Azure (Microsoft)'
 description: 'Add Azure (Microsoft) OAuth to your Supabase project'
 ---
 
@@ -18,7 +18,7 @@ Setting up OAuth with Azure consists of four broad steps:
 ## Access your Azure Developer account
 
 - Go to [portal.azure.com](https://portal.azure.com/#home).
-- Login and select Microsoft Entra ID under the list of Azure Services.
+- Sign in and select Microsoft Entra ID under the list of Azure Services.
 
 ## Register an application
 
@@ -140,9 +140,9 @@ If your app is registered as _My organization only_ for the _Supported account t
 
 Configure this by storing a value under _Azure Tenant URL_ in the Supabase Auth provider configuration page for Azure that has the following format `https://login.microsoftonline.com/<tenant-id>`.
 
-## Add login code to your client app
+## Add sign-in code to your client app
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Supabase Auth requires that Azure returns a valid email address. Therefore you must request the `email` scope in the `signInWithOAuth` method.
 
@@ -209,6 +209,18 @@ suspend fun signInWithAzure() {
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.Azure` as the provider. Request the `email` scope:
+
+```c#
+var state = await supabase.Auth.SignIn(Provider.Azure, new SignInOptions { Scopes = "email" });
+var signInUrl = state.Uri;
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 <$Partial path="oauth_pkce_flow.mdx" />
@@ -256,6 +268,17 @@ When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) 
 suspend fun signOut() {
 	supabase.auth.signOut()
 }
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs out, call [SignOut()](/docs/reference/csharp/sign-out) to remove them from the browser session and any objects from local storage:
+
+```c#
+await supabase.Auth.SignOut();
 ```
 
 </TabPanel>
@@ -313,6 +336,16 @@ suspend fun signInWithAzure() {
         scopes.add("offline_access")
     }
 }
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var state = await supabase.Auth.SignIn(Provider.Azure, new SignInOptions { Scopes = "offline_access" });
+var signInUrl = state.Uri;
 ```
 
 </TabPanel>

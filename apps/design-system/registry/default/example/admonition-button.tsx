@@ -1,5 +1,5 @@
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 export default function AdmonitionDemo() {
   return (

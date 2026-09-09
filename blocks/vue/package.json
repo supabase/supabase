@@ -15,18 +15,17 @@
     "@supabase/supabase-js": "catalog:",
     "@vueuse/core": "^14.1.0",
     "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
+    "cn": "^0.2.4",
     "h3": "^1.15.10",
     "lucide-vue-next": "^0.562.0",
     "nuxt": "^4.4.6",
-    "tailwind-merge": "^3.5.0",
     "vue": "^3.5.35",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@typescript/native": "catalog:",
     "shadcn": "^3.3.1",
     "tsconfig": "workspace:*",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vite": "^7.3.2"
   }

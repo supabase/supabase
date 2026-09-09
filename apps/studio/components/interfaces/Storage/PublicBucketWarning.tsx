@@ -4,7 +4,7 @@ import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 

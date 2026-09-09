@@ -9,7 +9,7 @@ import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -201,8 +201,8 @@ export const NewOrgForm = ({
     setLatestTaxId(taxId)
   }, [])
 
-  const selectedPlan = form.watch('plan')
-  const selectedSpendCap = form.watch('spend_cap')
+  const selectedPlan = useWatch({ control: form.control, name: 'plan' })
+  const selectedSpendCap = useWatch({ control: form.control, name: 'spend_cap' })
 
   useEffect(() => {
     if (selectedPlan === 'FREE' || !setupIntent) {
@@ -445,7 +445,7 @@ export const NewOrgForm = ({
           <div className="divide-y divide-border-muted">
             <OrganizationDetailsFields
               control={form.control}
-              kind={form.watch('kind')}
+              kind={useWatch({ control: form.control, name: 'kind' })}
               renderFieldWrapper={(children, field) => (
                 <Panel.Content key={field}>{children}</Panel.Content>
               )}
@@ -494,7 +494,7 @@ export const NewOrgForm = ({
               </Panel.Content>
             )}
 
-            {form.watch('plan') === 'PRO' && (
+            {selectedPlan === 'PRO' && (
               <>
                 <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <FormField
@@ -535,7 +535,7 @@ export const NewOrgForm = ({
               </>
             )}
 
-            {setupIntent && form.watch('plan') !== 'FREE' && (
+            {setupIntent && selectedPlan !== 'FREE' && (
               <Panel.Content className="pt-5">
                 <Elements stripe={stripePromise} options={stripeOptionsPaymentMethod}>
                   <NewPaymentMethodElement

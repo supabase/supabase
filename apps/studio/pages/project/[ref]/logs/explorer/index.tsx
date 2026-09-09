@@ -1,5 +1,5 @@
 import { useMonaco } from '@monaco-editor/react'
-import { useLocalStorage } from '@uidotdev/usehooks'
+import { useDebounce, useLocalStorage } from '@uidotdev/usehooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import type { editor } from 'monaco-editor'
@@ -8,11 +8,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 
-import {
-  detectLogSource,
-  looksLikeLegacyLogsQuery,
-  rewriteLogsSqlWithAI,
-} from '@/components/interfaces/Settings/Logs/logs-sql-rewrite'
+import { LegacyLogsRewriteAdmonition } from '@/components/interfaces/Settings/Logs/LegacyLogsRewriteAdmonition'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   getDefaultHelper,
@@ -36,30 +32,35 @@ import {
   buildLogQueryParams,
   resolveLogDateRange,
 } from '@/components/interfaces/Settings/Logs/logsDateRange'
-import { LogsExplorerOtelBanner } from '@/components/interfaces/Settings/Logs/LogsExplorerOtelBanner'
 import { LogsQueryPanel } from '@/components/interfaces/Settings/Logs/LogsQueryPanel'
 import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
+import { useRecentLogSqlSnippets } from '@/components/interfaces/Settings/Logs/useRecentLogSqlSnippets'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { DiffEditor } from '@/components/ui/DiffEditor'
 import LoadingOpacity from '@/components/ui/LoadingOpacity'
 import ShimmerLine from '@/components/ui/ShimmerLine'
-import { useContentQuery } from '@/data/content/content-query'
+import { ContentOfType, useContentQuery } from '@/data/content/content-query'
 import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from '@/data/content/content-upsert-mutation'
-import { constructHeaders } from '@/data/fetchers'
-import { fetchOtelLogKeys } from '@/data/logs/otel-log-keys-query'
+import {
+  LEGACY_LOGS_DIALECT_CHECK_DEBOUNCE_MS,
+  shouldOfferLegacyLogsRewrite,
+} from '@/data/logs/logs-sql-rewrite'
+import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
+import {
+  useLegacyLogsRewrite,
+  type LegacyLogsRewriteProposal,
+} from '@/hooks/analytics/useLegacyLogsRewrite'
 import { useLogsQuery } from '@/hooks/analytics/useLogsQuery'
 import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useUpgradePrompt } from '@/hooks/misc/useUpgradePrompt'
 import { uuidv4 } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
@@ -99,9 +100,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const useOtelEndpoint = useFlag('otelLegacyLogs')
   const { logsShowMetadataIpTemplate } = useIsFeatureEnabled(['logs:show_metadata_ip_template'])
 
-  const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
-
   const allTemplates = useMemo(() => {
     const templates = getLogsTemplates(useOtelEndpoint)
     if (logsShowMetadataIpTemplate) return templates
@@ -140,26 +138,19 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
   const [showMissingLimitError, setShowMissingLimitError] = useState<boolean>(false)
   const [selectedLog, setSelectedLog] = useState<LogData | null>(null)
-  const [rewriteProposal, setRewriteProposal] = useState<{
-    original: string
-    modified: string
-  } | null>(null)
-  const [isRewriting, setIsRewriting] = useState<boolean>(false)
+  const [rewriteProposal, setRewriteProposal] = useState<LegacyLogsRewriteProposal | null>(null)
   const [rewriteBannerDismissed, setRewriteBannerDismissed] = useLocalStorage<boolean>(
     `project-${projectRef}-logs-rewrite-banner-dismissed`,
     false
   )
 
-  const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
-    `project-content-${projectRef}-recent-log-sql`,
-    []
-  )
+  const [recentLogs, setRecentLogs] = useRecentLogSqlSnippets(projectRef)
 
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
 
   const { data: content } = useContentQuery({ projectRef, type: 'log_sql' })
-  const query = content?.content.find((x) => x.id === queryId)
+  const query = content?.content.find((x): x is ContentOfType<'log_sql'> => x.id === queryId)
 
   const resolvedRange = useMemo(() => {
     if (datePickerValue.isHelper) {
@@ -190,7 +181,32 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const results = logData
   const isLoading = logsLoading
 
-  const showRewriteCTA = useOtelEndpoint && looksLikeLegacyLogsQuery(editorValue)
+  // Debounced so the dialect heuristics don't run on every keystroke, matching the
+  // SQL editor's rewrite banner.
+  const settledEditorValue = useDebounce(editorValue, LEGACY_LOGS_DIALECT_CHECK_DEBOUNCE_MS)
+  const shouldShowRewriteCTA = useMemo(
+    () =>
+      shouldOfferLegacyLogsRewrite({
+        sql: settledEditorValue,
+        isClickhouseLogsEnabled: useOtelEndpoint,
+      }),
+    [settledEditorValue, useOtelEndpoint]
+  )
+
+  const {
+    state: rewriteState,
+    requestRewrite,
+    dismiss: dismissRewriteBanner,
+  } = useLegacyLogsRewrite({
+    // Read straight from the editor instance — `editorValue` state can lag the
+    // most recent keystroke.
+    readSql: () => editorRef.current?.getValue() ?? editorValue,
+    onProposal: setRewriteProposal,
+    onDismissed: () => setRewriteBannerDismissed(true),
+  })
+  const isRewriting = rewriteState.status === 'rewriting'
+  const hasUnacknowledgedRewriteOutcome =
+    rewriteState.status === 'failed' || rewriteState.status === 'noRewriteNeeded'
 
   const { mutateAsync: upsertContent, isPending: isUpsertingContent } = useContentUpsertMutation({
     onError: (e) => {
@@ -216,7 +232,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const addRecentLogSqlSnippet = (snippet: Partial<LogSqlSnippets.Content>) => {
     const defaults: LogSqlSnippets.Content = {
       schema_version: '1',
-      sql: '',
+      unchecked_sql: untrustedLogSql(''),
       content_id: '',
     }
     setRecentLogs([...recentLogs, { ...defaults, ...snippet }])
@@ -241,43 +257,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       editorRef.current.focus()
     }
 
-    addRecentLogSqlSnippet({ sql: template.searchString })
-  }
-
-  const handleRewrite = async () => {
-    const currentSql = editorRef.current?.getValue() ?? editorValue
-    if (!currentSql.trim()) {
-      toast.info('Write a query to rewrite first')
-      return
-    }
-    setIsRewriting(true)
-    try {
-      const headerData = await constructHeaders()
-      const source = detectLogSource(currentSql)
-      const availableKeys = source
-        ? await fetchOtelLogKeys({ projectRef: projectRef!, source }).catch(() => undefined)
-        : undefined
-      const rewritten = await rewriteLogsSqlWithAI({
-        sql: currentSql,
-        projectRef: projectRef!,
-        connectionString: project?.connectionString,
-        orgSlug: organization?.slug,
-        authorizationHeader: headerData.get('Authorization'),
-        availableKeys,
-      })
-      // The editor may have changed while awaiting key discovery and the AI call;
-      // don't offer a proposal that would clobber intervening edits.
-      const latestSql = editorRef.current?.getValue() ?? editorValue
-      if (latestSql !== currentSql) {
-        toast.info('The query changed while rewriting. Please try again.')
-        return
-      }
-      setRewriteProposal({ original: currentSql, modified: rewritten })
-    } catch (error) {
-      toast.error(`Couldn't rewrite the query: ${(error as Error).message}`)
-    } finally {
-      setIsRewriting(false)
-    }
+    addRecentLogSqlSnippet({ unchecked_sql: untrustedLogSql(template.searchString) })
   }
 
   const acceptRewrite = () => {
@@ -321,7 +301,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       setTimeRange('', '')
     }
     setSearch(query)
-    addRecentLogSqlSnippet({ sql: query })
+    addRecentLogSqlSnippet({ unchecked_sql: untrustedLogSql(query) })
   }
 
   const handleInsertSource = (source: string) => {
@@ -367,7 +347,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       type: 'log_sql' as const,
       content: {
         content_id: editorId,
-        sql: editorValue,
+        unchecked_sql: untrustedLogSql(editorValue),
         schema_version: '1',
         favorite: false,
       } as LogSqlSnippets.Content,
@@ -393,7 +373,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         projectRef: projectRef!,
         payload: {
           ...query,
-          content: { ...(query.content as LogSqlSnippets.Content), sql: currentSql },
+          content: {
+            ...(query.content as LogSqlSnippets.Content),
+            unchecked_sql: untrustedLogSql(currentSql),
+          },
         },
       })
 
@@ -429,7 +412,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     }))
   }
 
-  const querySql = (query?.content as LogSqlSnippets.Content | undefined)?.sql
+  const querySql = (query?.content as LogSqlSnippets.Content | undefined)?.unchecked_sql
   useEffect(() => {
     if (search) {
       setEditorValue(search)
@@ -502,15 +485,16 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             templates={allTemplates.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
             warnings={warnings}
-            showRewriteAction={showRewriteCTA && rewriteBannerDismissed}
+            showRewriteAction={shouldShowRewriteCTA && rewriteBannerDismissed}
             isRewriting={isRewriting}
-            onRewrite={handleRewrite}
+            onRewrite={requestRewrite}
           />
-          {showRewriteCTA && !rewriteBannerDismissed && (
-            <LogsExplorerOtelBanner
-              isRewriting={isRewriting}
-              onRewrite={handleRewrite}
-              onDismiss={() => setRewriteBannerDismissed(true)}
+          {(hasUnacknowledgedRewriteOutcome ||
+            (shouldShowRewriteCTA && !rewriteBannerDismissed)) && (
+            <LegacyLogsRewriteAdmonition
+              state={rewriteState}
+              onRewrite={requestRewrite}
+              onDismiss={dismissRewriteBanner}
             />
           )}
           <ShimmerLine active={isLoading} />

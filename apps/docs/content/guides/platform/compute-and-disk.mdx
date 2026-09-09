@@ -33,11 +33,11 @@ In paid organizations, Nano Compute are billed at the same price as Micro Comput
 
 [^1]: Database max connections are recommended values and can be [customized via `max_connections`](/docs/guides/database/custom-postgres-config) depending on your use case. Be aware of [these considerations](/docs/guides/troubleshooting/how-to-change-max-database-connections-_BQ8P5) before modifying.
 
-[^2]: Database size for each compute instance is the default recommendation but the actual performance of your database has many contributing factors, including resources available to it and the size of the data contained within it. See the [shared responsibility model](/docs/guides/platform/shared-responsibility-model) for more information.
+[^2]: Database size for each compute instance is the default recommendation but the actual performance of your database has many contributing factors, including resources available to it and the size of the data contained within it. See the [shared responsibility model](/docs/guides/deployment/shared-responsibility-model) for more information.
 
 [^3]: Compute resources on the Free plan are subject to change.
 
-Compute sizes can be changed by first selecting your project in the dashboard [here](/dashboard/project/_/settings/compute-and-disk) and the upgrade process will [incur downtime](/docs/guides/platform/compute-and-disk#upgrades).
+Compute sizes can be changed by first selecting your project in the dashboard [here](/dashboard/project/_/settings/infrastructure) and the upgrade process will [incur downtime](/docs/guides/platform/compute-and-disk#upgrades).
 
 <Image
   alt="Compute Size Selection"
@@ -102,7 +102,7 @@ If you need consistent disk performance, choose the 4XL or larger compute instan
 
 ### Provisioned disk throughput and IOPS
 
-The default disk type is gp3, which comes with a baseline throughput of 125 MB/s and a default IOPS of 3,000. You can provision additional IOPS and throughput from the [Database Settings](/dashboard/project/_/settings/compute-and-disk) page, but keep in mind that the effective IOPS and throughput will be limited by the compute instance size. This requires Large compute size or above.
+The default disk type is gp3, which comes with a baseline throughput of 125 MB/s and a default IOPS of 3,000. You can provision additional IOPS and throughput from the [Infrastructure settings](/dashboard/project/_/settings/infrastructure) page, but keep in mind that the effective IOPS and throughput will be limited by the compute instance size. This requires Large compute size or above.
 
 <Admonition type="caution">
 
@@ -117,9 +117,9 @@ When selecting your disk, it's essential to focus on the performance needs of yo
 |                   | General Purpose SSD (gp3)                                                                                                                                                                        | High Performance SSD (io2)                                                                                                             |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
 | **Use Case**      | General workloads, development environments, small to medium databases                                                                                                                           | High-performance needs, large-scale databases, mission-critical applications                                                           |
-| **Max Disk Size** | 16 TB                                                                                                                                                                                            | 60 TB                                                                                                                                  |
-| **Max IOPS**      | 16,000 IOPS (at 32 GB disk size)                                                                                                                                                                 | 80,000 IOPS (at 80 GB disk size)                                                                                                       |
-| **Throughput**    | 125 MB/s (default) to 1,000 MB/s (maximum)                                                                                                                                                       | Automatically scales with IOPS                                                                                                         |
+| **Max Disk Size** | 64 TB                                                                                                                                                                                            | 60 TB                                                                                                                                  |
+| **Max IOPS**      | 80,000 IOPS (at 160 GB disk size)                                                                                                                                                                | 80,000 IOPS (at 80 GB disk size)                                                                                                       |
+| **Throughput**    | 125 MB/s (default) to 2,000 MB/s (maximum)                                                                                                                                                       | Automatically scales with IOPS                                                                                                         |
 | **Best For**      | Great value for most use cases                                                                                                                                                                   | Low latency and very high IOPS requirements                                                                                            |
 | **Pricing**       | Disk: 8 GB included, then <Price price="0.125" /> per GB<br/>IOPS: 3,000 included, then <Price price="0.024" /> per IOPS<br/>Throughput: 125 MB/s included, then <Price price="0.95" /> per MB/s | Disk: <Price price="0.195" /> per GB<br/>IOPS: <Price price="0.119" /> per IOPS<br/>Throughput: Scales with IOPS at no additional cost |
 

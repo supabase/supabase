@@ -20,8 +20,6 @@ export default defineConfig({
     baseURL: `http://localhost:${WEB_SERVER_PORT}`,
     browserName: 'chromium',
     headless: true,
-    // Higher than usual: each run boots a fresh dev server, so the first
-    // request to a route pays Next.js's on-demand compile cost.
     navigationTimeout: 60_000,
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
@@ -35,13 +33,11 @@ export default defineConfig({
         ['json', { outputFile: './test-results/local-smoke-results.json' }],
       ],
   outputDir: './test-results',
-  // Explicitly cleared so this suite is credential-free even if the local
-  // .env.local has real secrets, and never reused so a server already
-  // running on this port (possibly with real credentials) can't be reused.
   webServer: {
     command: 'pnpm --workspace-root run dev:docs',
     port: WEB_SERVER_PORT,
     timeout: 4 * 60 * 1000,
+    // Never reuse a running server: it may hold real credentials from .env.local.
     reuseExistingServer: false,
     env: {
       DOCS_GITHUB_APP_PRIVATE_KEY: '',

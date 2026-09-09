@@ -1,7 +1,7 @@
 import { Settings, Trash2, TriangleAlert } from 'lucide-react'
 import Link from 'next/link'
 import { Badge, Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { type ResourceGroup } from './MarketplaceIntegrationSettingsTab.types'
 import { type ConnectedResource } from '@/components/interfaces/Integrations/Landing/Landing.utils'

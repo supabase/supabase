@@ -13,7 +13,7 @@ export const BASE_MONACO_EDITOR_OPTIONS: editor.IStandaloneEditorConstructionOpt
   fontSize: 13,
   minimap: { enabled: false },
   wordWrap: 'on',
-  fixedOverflowWidgets: true,
+  fixedOverflowWidgets: false,
   contextmenu: true,
   scrollBeyondLastLine: false,
 }
@@ -27,4 +27,17 @@ export const alignEditor = (editor: editor.IStandaloneCodeEditor) => {
       domNode: document.createElement('div'),
     })
   })
+}
+
+/**
+ * The text a "run" gesture should act on: the current selection if there is one
+ * (a collapsed cursor has an empty range, so `getValueInRange` returns `''` and
+ * this falls through), otherwise the full editor value.
+ */
+export const getEditorValueOrSelection = (
+  editor: editor.IStandaloneCodeEditor
+): string | undefined => {
+  const selection = editor.getSelection()
+  const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
+  return selectedValue || editor.getValue()
 }

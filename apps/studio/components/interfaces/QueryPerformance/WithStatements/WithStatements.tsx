@@ -5,7 +5,7 @@ import { parseAsString, useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, LoadingLine } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { Markdown } from '../../Markdown'
@@ -241,7 +241,11 @@ export const WithStatements = ({
           </>
         }
       />
-      <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
+
+      <div>
+        <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
+      </div>
+
       <QueryPerformanceGrid
         aggregatedData={processedData}
         isLoading={isLoading}
@@ -293,7 +297,7 @@ export const WithStatements = ({
           <Markdown
             className="text-xs"
             content={`The Supabase CLI comes with a range of tools to help inspect your Postgres instances for
-            potential issues. [Learn more here](${DOCS_URL}/guides/database/inspect).`}
+            potential issues. [Learn more here](${DOCS_URL}/guides/observability/inspect).`}
           />
         </div>
       </div>

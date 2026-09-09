@@ -7,7 +7,7 @@ subtitle: 'Connecting to your Postgres database in serverless environments.'
 
 Supabase provides several options for connecting to your Postgres database from serverless environments.
 
-[supabase-js](/docs/reference/javascript/introduction) is an isomorphic JavaScript client that uses the [auto-generated REST API](/docs/guides/api) and therefore works in any environment that supports HTTPS connections. This API has a built-in [connection pooler](/docs/guides/database/connecting-to-postgres#connection-pooler) and can serve thousands of simultaneous requests, and therefore is ideal for Serverless workloads.
+[supabase-js](/docs/reference/javascript/introduction) is an isomorphic JavaScript client that uses the [auto-generated REST API](/docs/guides/api) and therefore works in any environment that supports HTTPS connections. This API has a built-in [connection pooler](/docs/guides/database/connecting-to-postgres#poolers) and can serve thousands of simultaneous requests, and therefore is ideal for Serverless workloads.
 
 ## Vercel Edge Functions
 
@@ -21,20 +21,20 @@ Choose one of these Vercel Deploy Templates which use our [Vercel Deploy Integra
   <div className="grid grid-cols-12 gap-6 not-prose">
     <Link
       href="https://supabase.link/nextjs-with-supabase-starter"
-      className="col-span-12 md:col-span-4"
+      className="col-span-12 md:col-span-6 xl:col-span-4"
       passHref
     >
-      <GlassPanel title="supabase-js" hasLightIcon={true} background={false} showIconBg={true}>
+      <GlassPanel title="supabase-js" hasLightIcon={true} showIconBg={true}>
         A Next.js App Router template configured with cookie-based auth using Supabase, TypeScript
         and Tailwind CSS.
       </GlassPanel>
     </Link>
     <Link
       href="https://supabase.link/nextjs-supabase-kysely"
-      className="col-span-12 md:col-span-4"
+      className="col-span-12 md:col-span-6 xl:col-span-4"
       passHref
     >
-      <GlassPanel title="Kysely" hasLightIcon={true} background={false} showIconBg={true}>
+      <GlassPanel title="Kysely" hasLightIcon={true} showIconBg={true}>
         Basic Next.js template that uses Supabase as the database and Kysely as the query builder.
       </GlassPanel>
     </Link>

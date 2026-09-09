@@ -4,6 +4,7 @@ import { useConstant, useFlag } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import { type Dispatch, type MouseEventHandler } from 'react'
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
+import { useWatch } from 'react-hook-form'
 import { DialogSectionSeparator, Form } from 'ui'
 
 import {
@@ -71,7 +72,10 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
   const { profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
 
-  const { organizationSlug, projectRef, category, severity, subject, library } = form.watch()
+  const [organizationSlug, projectRef, category, severity, subject, library] = useWatch({
+    control: form.control,
+    name: ['organizationSlug', 'projectRef', 'category', 'severity', 'subject', 'library'],
+  })
 
   const selectedOrgSlug = organizationSlug === NO_ORG_MARKER ? null : organizationSlug
   const selectedProjectRef = projectRef === NO_PROJECT_MARKER ? null : projectRef

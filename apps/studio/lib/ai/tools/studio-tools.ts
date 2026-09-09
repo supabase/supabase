@@ -7,6 +7,7 @@ import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import {
   EDGE_FUNCTION_PROMPT,
+  LOGS_PROMPT,
   PG_BEST_PRACTICES,
   REALTIME_PROMPT,
   RLS_PROMPT,
@@ -21,6 +22,7 @@ const KNOWLEDGE = {
   storage: STORAGE_PROMPT,
   edge_functions: EDGE_FUNCTION_PROMPT,
   realtime: REALTIME_PROMPT,
+  logs: LOGS_PROMPT,
 } as const
 
 type KnowledgeName = keyof typeof KNOWLEDGE

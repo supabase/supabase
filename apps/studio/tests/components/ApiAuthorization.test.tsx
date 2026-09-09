@@ -148,6 +148,22 @@ describe('AuthorizeConnectLogo', () => {
     expect(screen.queryByAltText('Claude')).not.toBeInTheDocument()
   })
 
+  test('pairs curated logos for localhost when the name matches a trusted partner', () => {
+    customRender(
+      <AuthorizeConnectLogo
+        icon={null}
+        name="Claude"
+        redirectUri="http://127.0.0.1:42813/callback"
+      />
+    )
+
+    expect(screen.getByAltText('Claude')).toHaveAttribute(
+      'src',
+      getMcpClientIconSrc({ icon: 'claude', useDarkVariant: false })
+    )
+    expect(screen.getByAltText('Supabase')).toBeInTheDocument()
+  })
+
   test('shows Supabase alone when the requester has no icon', () => {
     customRender(<AuthorizeConnectLogo icon={null} name="Acme" />)
 
@@ -346,9 +362,12 @@ describe('ApiAuthorizationScreen', () => {
           await screen.findByText('Authorize API access for Cursor')
           expect(screen.getByAltText('Cursor')).toBeInTheDocument()
           expect(screen.getByAltText('Supabase')).toBeInTheDocument()
+          expect(
+            screen.queryByText('Check this redirect before authorizing')
+          ).not.toBeInTheDocument()
         })
 
-        test('shows Supabase alone when name looks trusted but redirect host is not allowlisted', async () => {
+        test('warns when a trusted name redirects to a non-allowlisted host', async () => {
           mockBothEndpoints(
             createMockAuthResponse({
               name: 'Claude',
@@ -357,7 +376,14 @@ describe('ApiAuthorizationScreen', () => {
             })
           )
           renderScreen()
-          await screen.findByText('Authorize API access for Claude')
+          expect(
+            await screen.findByText('Check this redirect before authorizing')
+          ).toBeInTheDocument()
+          expect(
+            screen.getByText(
+              'This request uses the name Claude, but after you authorize you will be redirected to evil.com, not Claude.'
+            )
+          ).toBeInTheDocument()
           expect(screen.queryByAltText('Claude')).not.toBeInTheDocument()
           expect(screen.getByAltText('Supabase')).toBeInTheDocument()
         })
@@ -382,14 +408,19 @@ describe('ApiAuthorizationScreen', () => {
       describe('expiration', () => {
         test('shows expiration warning and hides action buttons when request has expired', async () => {
           mockBothEndpoints(
-            createMockAuthResponse({ expires_at: dayjs().subtract(1, 'hour').toISOString() })
+            createMockAuthResponse({
+              name: 'Claude',
+              redirect_uri: 'https://evil.com/callback',
+              expires_at: dayjs().subtract(1, 'hour').toISOString(),
+            })
           )
           renderScreen()
           await screen.findByText('Authorization request expired')
-          expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
           expect(
-            screen.queryByRole('button', { name: /Authorize Test App/ })
+            screen.queryByText('Check this redirect before authorizing')
           ).not.toBeInTheDocument()
+          expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
+          expect(screen.queryByRole('button', { name: /Authorize Claude/ })).not.toBeInTheDocument()
         })
 
         test('does not show expiration warning when request has not expired', async () => {
@@ -419,6 +450,25 @@ describe('ApiAuthorizationScreen', () => {
           await user.click(screen.getByRole('button', { name: /Authorize Test App/ }))
           await waitFor(() => expect(approveHandler).toHaveBeenCalled())
         })
+
+        test('shows an approval failure inline and keeps the action available', async () => {
+          const user = userEvent.setup()
+          mockBothEndpoints()
+          addAPIMock({
+            method: 'post',
+            path: '/platform/organizations/:slug/oauth/authorizations/:id',
+            response: () =>
+              HttpResponse.json<APIErrorBody>({ message: 'Authorization failed' }, { status: 500 }),
+          })
+          renderScreen()
+
+          await user.click(await screen.findByRole('button', { name: /Authorize Test App/ }))
+
+          expect(await screen.findByRole('alert')).toHaveTextContent(
+            'Failed to authorize request: Authorization failed'
+          )
+          expect(screen.getByRole('button', { name: /Authorize Test App/ })).toBeEnabled()
+        })
       })
 
       describe('decline action', () => {
@@ -438,6 +488,25 @@ describe('ApiAuthorizationScreen', () => {
           await user.click(screen.getByRole('button', { name: 'Cancel' }))
           await waitFor(() => expect(declineHandler).toHaveBeenCalled())
           await waitFor(() => expect(navigate).toHaveBeenCalledWith('/organizations'))
+        })
+
+        test('shows a cancellation failure inline and keeps the action available', async () => {
+          const user = userEvent.setup()
+          mockBothEndpoints()
+          addAPIMock({
+            method: 'delete',
+            path: '/platform/organizations/:slug/oauth/authorizations/:id',
+            response: () =>
+              HttpResponse.json<APIErrorBody>({ message: 'Cancellation failed' }, { status: 500 }),
+          })
+          renderScreen()
+
+          await user.click(await screen.findByRole('button', { name: 'Cancel' }))
+
+          expect(await screen.findByRole('alert')).toHaveTextContent(
+            'Failed to cancel authorization request: Cancellation failed'
+          )
+          expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled()
         })
       })
 

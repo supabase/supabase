@@ -23,11 +23,11 @@ export type SnowflakeValidationIssue = {
 }
 
 const SNOWFLAKE_REQUIRED_FIELDS: { path: SnowflakeFieldPath; message: string }[] = [
-  { path: 'snowflakeAccountId', message: 'Account ID is required' },
-  { path: 'snowflakeUser', message: 'User is required' },
-  { path: 'snowflakePrivateKey', message: 'Private key is required' },
-  { path: 'snowflakeDatabase', message: 'Database is required' },
-  { path: 'snowflakeSchema', message: 'Schema is required' },
+  { path: 'snowflakeAccountId', message: 'Account ID is required.' },
+  { path: 'snowflakeUser', message: 'User is required.' },
+  { path: 'snowflakePrivateKey', message: 'Private key is required.' },
+  { path: 'snowflakeDatabase', message: 'Database is required.' },
+  { path: 'snowflakeSchema', message: 'Schema is required.' },
 ]
 
 export const getSnowflakeValidationIssues = (

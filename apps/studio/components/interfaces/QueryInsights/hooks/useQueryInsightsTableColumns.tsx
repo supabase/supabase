@@ -1,6 +1,5 @@
 import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, ExternalLink, ScanSearch } from 'lucide-react'
 import { useMemo, type RefObject } from 'react'
-// eslint-disable-next-line no-restricted-imports
 import { type Column, type DataGridHandle } from 'react-data-grid'
 import {
   Button,
@@ -512,7 +511,7 @@ export function useQueryInsightsTableColumns({
                   <Button
                     variant="primary"
                     size="tiny"
-                    className="rounded-r-none border-r-0"
+                    className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
                     onClick={() => {
                       setSelectedTriageRow(props.rowIdx)
                       setSheetView('indexes')
@@ -525,7 +524,8 @@ export function useQueryInsightsTableColumns({
                       <Button
                         variant="primary"
                         size="tiny"
-                        className="rounded-l-none px-1"
+                        aria-label="More index actions"
+                        className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                         icon={<ChevronDown size={12} />}
                       />
                     </DropdownMenuTrigger>

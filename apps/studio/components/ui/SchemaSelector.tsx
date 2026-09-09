@@ -20,6 +20,7 @@ import {
   Skeleton,
 } from 'ui'
 
+import { RestartProjectDialog } from '@/components/interfaces/ErrorHandling/RestartProjectDialog'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
@@ -33,7 +34,6 @@ type SchemaSelectorProps = Omit<ComponentPropsWithoutRef<'div'>, 'onSelect'> & {
   placeholderLabel?: string
   supportSelectAll?: boolean
   excludedSchemas?: string[]
-  stopScrollPropagation?: boolean
   onSelectSchema: (name: string) => void
   onSelectCreateSchema?: () => void
   align?: 'start' | 'end'
@@ -54,7 +54,6 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
       placeholderLabel = 'Choose a schema...',
       supportSelectAll = false,
       excludedSchemas = DEFAULT_EXCLUDED_SCHEMAS,
-      stopScrollPropagation = false,
       onSelectSchema,
       onSelectCreateSchema,
       align = 'start',
@@ -65,6 +64,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
     ref
   ) => {
     const [internalOpen, setInternalOpen] = useState(false)
+    const [isRestartDialogVisible, setIsRestartDialogVisible] = useState(false)
     const isControlled = openProp !== undefined
     const open = isControlled ? openProp : internalOpen
     const setOpen = (next: boolean) => {
@@ -119,9 +119,19 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
             <AlertDescription className="text-xs mb-2 wrap-break-word">
               Error: {(schemasError as any)?.message}
             </AlertDescription>
-            <Button variant="default" size="tiny" onClick={() => refetchSchemas()}>
-              Reload schemas
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="default" size="tiny" onClick={() => refetchSchemas()}>
+                Reload schemas
+              </Button>
+              <Button variant="default" size="tiny" onClick={() => setIsRestartDialogVisible(true)}>
+                Restart database
+              </Button>
+            </div>
+            <RestartProjectDialog
+              visible={isRestartDialogVisible}
+              onClose={() => setIsRestartDialogVisible(false)}
+              restartType="database"
+            />
           </Alert>
         )}
 
@@ -160,9 +170,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
             >
               <Command>
                 <CommandInput className="text-xs" placeholder="Find schema..." />
-                <CommandList
-                  onWheel={stopScrollPropagation ? (event) => event.stopPropagation() : undefined}
-                >
+                <CommandList>
                   <CommandEmpty>No schemas found</CommandEmpty>
                   <CommandGroup>
                     <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>

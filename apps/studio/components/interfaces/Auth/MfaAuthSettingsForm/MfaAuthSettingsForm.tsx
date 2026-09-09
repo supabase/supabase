@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Alert,
@@ -48,6 +48,7 @@ import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-muta
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { IS_PLATFORM } from '@/lib/constants'
+import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
 
 function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
   return verifyEnabled ? (enrollEnabled ? 'Enabled' : 'Verify Enabled') : 'Disabled'
@@ -78,8 +79,7 @@ const MfaStatusToState = (status: (typeof MFAFactorSelectionOptions)[number]['va
 
 const totpSchema = z.object({
   MFA_TOTP: z.string().min(1, 'Required'),
-  MFA_MAX_ENROLLED_FACTORS: z.preprocess(
-    (val) => (val === '' || val == null ? undefined : val),
+  MFA_MAX_ENROLLED_FACTORS: preprocessEmptyNumberInput(
     z.coerce
       .number({ required_error: 'Required', invalid_type_error: 'Required' })
       .min(0, 'Must be a value 0 or larger')
@@ -91,8 +91,7 @@ type TotpFormValues = z.infer<typeof totpSchema>
 
 const phoneSchema = z.object({
   MFA_PHONE: z.string().min(1, 'Required'),
-  MFA_PHONE_OTP_LENGTH: z.preprocess(
-    (val) => (val === '' || val == null ? undefined : val),
+  MFA_PHONE_OTP_LENGTH: preprocessEmptyNumberInput(
     z.coerce
       .number({ required_error: 'Required', invalid_type_error: 'Required' })
       .min(6, 'Must be a value 6 or larger')
@@ -170,6 +169,7 @@ export const MfaAuthSettingsForm = () => {
     },
   })
   const { reset: resetPhoneForm } = phoneForm
+  const mfaPhoneValue = useWatch({ control: phoneForm.control, name: 'MFA_PHONE' })
 
   const securityForm = useForm<SecurityFormValues>({
     resolver: zodResolver(securitySchema),
@@ -329,8 +329,7 @@ export const MfaAuthSettingsForm = () => {
     )
   }
 
-  const phoneMFAIsEnabled =
-    phoneForm.watch('MFA_PHONE') === 'Enabled' || phoneForm.watch('MFA_PHONE') === 'Verify Enabled'
+  const phoneMFAIsEnabled = mfaPhoneValue === 'Enabled' || mfaPhoneValue === 'Verify Enabled'
   const hasUpgradedPhoneMFA =
     authConfig && !authConfig.MFA_PHONE_VERIFY_ENABLED && phoneMFAIsEnabled
 

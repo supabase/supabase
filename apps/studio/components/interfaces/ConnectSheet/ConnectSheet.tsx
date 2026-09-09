@@ -12,6 +12,7 @@ import { useAvailableConnectModes } from './useAvailableConnectModes'
 import { useConnectSheetParams } from './useConnectSheetParams'
 import { useConnectSheetShortcut } from './useConnectSheetShortcut'
 import { useConnectState } from './useConnectState'
+import { WarehouseModePanel } from './WarehouseModePanel/WarehouseModePanel'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -162,7 +163,6 @@ export const ConnectSheet = () => {
       <SheetContent
         size="lg"
         className="flex w-full min-w-0 flex-col gap-0 space-y-0 p-0 max-w-4xl"
-        tabIndex={undefined}
       >
         <SheetHeader className={cn('text-left border-b shrink-0 py-6 px-8')}>
           <SheetTitle>Connect to your project</SheetTitle>
@@ -178,18 +178,26 @@ export const ConnectSheet = () => {
             />
           </div>
 
-          {activeFields.length > 0 && (
+          {state.mode === 'warehouse' ? (
             <div className="p-8">
-              <ConnectConfigSection
-                state={state}
-                activeFields={activeFields}
-                onFieldChange={handleFieldChange}
-                getFieldOptions={getFieldOptions}
-              />
+              <WarehouseModePanel />
             </div>
-          )}
+          ) : (
+            <>
+              {activeFields.length > 0 && (
+                <div className="p-8">
+                  <ConnectConfigSection
+                    state={state}
+                    activeFields={activeFields}
+                    onFieldChange={handleFieldChange}
+                    getFieldOptions={getFieldOptions}
+                  />
+                </div>
+              )}
 
-          <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
+              <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
+            </>
+          )}
         </div>
       </SheetContent>
     </Sheet>
