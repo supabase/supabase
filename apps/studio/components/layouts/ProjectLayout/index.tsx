@@ -107,6 +107,7 @@ export interface ProjectLayoutProps {
   isBlocking?: boolean
   product?: string
   productMenuBadge?: ReactNode
+  productMenuHeader?: ReactNode
   productMenu?: ReactNode
   browserTitle?: {
     entity?: string
@@ -126,6 +127,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       isBlocking = true,
       product = '',
       productMenuBadge,
+      productMenuHeader,
       productMenu,
       browserTitle,
       children,
@@ -304,6 +306,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                       <ProductMenuBar
                         title={product}
                         titleBadge={productMenuBadge}
+                        header={productMenuHeader}
                         className={productMenuClassName}
                       >
                         {productMenu}
