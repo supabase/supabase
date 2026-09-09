@@ -6,6 +6,7 @@ import {
   type UntrustedSqlFragment,
 } from '@supabase/pg-meta'
 import { useFlag } from 'common'
+import { cloneDeep } from 'lodash'
 import { CodeSquare, Eye, EyeOff } from 'lucide-react'
 import type { editor as monacoEditor, Selection } from 'monaco-editor'
 import {
@@ -198,6 +199,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const sql = query.uncheckedSql
   const sqlRef = useLatest<string>(sql)
   const onSqlCommitRef = useLatest(onSqlCommit)
+  const resultRef = useLatest(result)
 
   const isOtelLogsEnabled = useFlag('otelLegacyLogs')
   const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
@@ -271,6 +273,13 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   ) => {
     if (!project) return
 
+    const editingContext = {
+      projectRef: project.ref,
+      databaseIdentifier,
+      roleImpersonationState: roleImpersonationState
+        ? cloneDeep({ role: roleImpersonationState.role, claims: roleImpersonationState.claims })
+        : undefined,
+    }
     const limitedSql = applyAutoLimit(safeSql, rowLimit)
 
     if (!isValidConnString(connectionString)) {
@@ -290,7 +299,12 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       isStatementTimeoutDisabled: true,
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     }).then(
-      (data) => onResultChange({ rows: data.result, ...querySnapshot }),
+      (data) =>
+        onResultChange({
+          rows: data.result,
+          ...querySnapshot,
+          editingContext,
+        }),
       (error) => onResultChange({ error, ...querySnapshot })
     )
   }
@@ -473,6 +487,10 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
         sql={result?.sql}
         source={result?.source}
         onDebug={onDebug}
+        canEditRows={!isReadOnly && !isRunDisabled && !isBusy}
+        onResultChange={(updatedResult) => {
+          if (resultRef.current === result) onResultChange(updatedResult)
+        }}
       />
     </ExplorerQueryResults>
   )

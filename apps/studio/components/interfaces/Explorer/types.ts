@@ -1,5 +1,6 @@
 import { type SqlSnippetSource } from '../SQLEditor/querySource'
 import { type ChartConfig } from '@/data/content/notebooks/notebook-schema'
+import type { RoleImpersonationState } from '@/lib/role-impersonation'
 
 export type QueryResult = {
   rows?: readonly Record<string, unknown>[]
@@ -8,6 +9,12 @@ export type QueryResult = {
   /** The query that was submitted to produce this result, snapshotted at run time. */
   sql?: string
   source?: SqlSnippetSource
+  /** Execution context belongs to the result, even if the editor's source or role changes. */
+  editingContext?: {
+    projectRef: string
+    databaseIdentifier?: string
+    roleImpersonationState?: RoleImpersonationState
+  }
 }
 
 /**

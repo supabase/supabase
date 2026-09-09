@@ -261,7 +261,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
 
   const state = proxy({
     drafts: {} as Record<string, ExplorerQueryDraft>,
-    results: {} as Record<string, ExplorerQueryResult>,
+    results: {} as Record<string, ReturnType<typeof ref<ExplorerQueryResult>>>,
 
     createDraft: ({
       id,

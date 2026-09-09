@@ -21,13 +21,13 @@ import type { Filter, Sort } from '@/components/grid/types'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { useTableRowsQuery } from '@/data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import {
-  RoleImpersonationState,
-  useRoleImpersonationStateSnapshot,
-} from '@/state/role-impersonation-state'
+import type { RoleImpersonationState } from '@/lib/role-impersonation'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 import { TableEditorTableStateContextProvider } from '@/state/table-editor-table'
 
 export interface ForeignRowSelectorProps {
+  sourceTableId?: number
+  roleImpersonationState?: RoleImpersonationState
   visible: boolean
   foreignKey?: ForeignKey
   isSaving?: boolean
@@ -41,13 +41,15 @@ export const ForeignRowSelector = ({
   isSaving,
   onSelect,
   closePanel,
+  sourceTableId,
+  roleImpersonationState: suppliedRoleState,
 }: ForeignRowSelectorProps) => {
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    id: !!id ? Number(id) : undefined,
+    id: sourceTableId ?? (id && Number.isFinite(Number(id)) ? Number(id) : undefined),
   })
 
   const { tableId: _tableId, schema: schemaName, table: tableName, columns } = foreignKey ?? {}
@@ -95,7 +97,8 @@ export const ForeignRowSelector = ({
   const rowsPerPage = 100
   const [page, setPage] = useState(1)
 
-  const roleImpersonationState = useRoleImpersonationStateSnapshot()
+  const defaultRoleState = useRoleImpersonationStateSnapshot()
+  const roleImpersonationState = suppliedRoleState ?? defaultRoleState
 
   const {
     data,

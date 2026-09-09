@@ -23,6 +23,8 @@ import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-st
 interface JsonEditProps {
   row?: { [key: string]: any }
   column: string
+  tableId?: number
+  roleImpersonationState?: RoleImpersonationState
   visible: boolean
   backButtonLabel?: string
   applyButtonLabel?: string
@@ -40,9 +42,11 @@ export const JsonEditor = ({
   readOnly = false,
   closePanel,
   onSaveJSON,
+  tableId,
+  roleImpersonationState: suppliedRoleState,
 }: JsonEditProps) => {
   const { id: _id } = useParams()
-  const id = _id ? Number(_id) : undefined
+  const id = tableId ?? (_id && Number.isFinite(Number(_id)) ? Number(_id) : undefined)
   const { data: project } = useSelectedProjectQuery()
 
   const { data: selectedTable } = useTableEditorQuery({
@@ -62,7 +66,8 @@ export const JsonEditor = ({
   const isTruncated = isValueTruncated(jsonString, columnFormat)
 
   const { mutate: getCellValue, isPending, isSuccess, reset } = useGetCellValueMutation()
-  const roleImpersonationState = useRoleImpersonationStateSnapshot()
+  const defaultRoleState = useRoleImpersonationStateSnapshot()
+  const roleImpersonationState = suppliedRoleState ?? defaultRoleState
 
   const validateJSON = useCallback(
     async (nextValue: string, resolve: () => void) => {

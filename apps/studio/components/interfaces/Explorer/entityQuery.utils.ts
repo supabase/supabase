@@ -9,8 +9,8 @@ export const TABLE_ENTITY_TYPES: ENTITY_TYPE[] = [ENTITY_TYPE.TABLE, ENTITY_TYPE
 /**
  * The database entity a query was opened from. A query opened this way is an ordinary
  * editable query — the binding records only where it came from, which is what lets its tab
- * show the entity's icon, lets closing it skip the discard prompt, and is where in-place
- * editing of the results will hang off once the query editor supports it.
+ * show the entity's icon and lets closing it skip the discard prompt. Row editing is
+ * determined from the executed query rather than this potentially stale binding.
  */
 export const queryEntityBindingSchema = z.object({
   schema: z.string(),

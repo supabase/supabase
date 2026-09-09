@@ -1,6 +1,8 @@
 import { parse } from 'libpg-query'
 import { NextApiRequest, NextApiResponse } from 'next'
 
+import { getEditableQuery } from '@/lib/query-result-editing'
+
 const getOperation = (stmt: Record<string, unknown>) => {
   if ('SelectStmt' in stmt) return 'SELECT'
   if ('InsertStmt' in stmt) return 'INSERT'
@@ -120,7 +122,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         ? getWhereClauseText(sql, stmtType, stmtNode as Record<string, unknown>)
         : null
 
-    return res.status(200).json({ tables, operation, whereClause, statementCount })
+    return res.status(200).json({
+      tables,
+      operation,
+      whereClause,
+      statementCount,
+      editableQuery: getEditableQuery(ast),
+    })
   } catch (error) {
     const message =
       (error as { sqlDetails?: { message?: string } })?.sqlDetails?.message ??

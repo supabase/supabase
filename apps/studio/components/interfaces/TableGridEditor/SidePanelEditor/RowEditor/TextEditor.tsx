@@ -19,6 +19,8 @@ import { RoleImpersonationState } from '@/lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 interface TextEditorProps {
+  tableId?: number
+  roleImpersonationState?: RoleImpersonationState
   visible: boolean
   readOnly?: boolean
   row?: { [key: string]: any }
@@ -34,9 +36,11 @@ export const TextEditor = ({
   column,
   closePanel,
   onSaveField,
+  tableId,
+  roleImpersonationState: suppliedRoleState,
 }: TextEditorProps) => {
   const { id: _id } = useParams()
-  const id = _id ? Number(_id) : undefined
+  const id = tableId ?? (_id && Number.isFinite(Number(_id)) ? Number(_id) : undefined)
   const { data: project } = useSelectedProjectQuery()
 
   const { data: selectedTable } = useTableEditorQuery({
@@ -51,7 +55,8 @@ export const TextEditor = ({
   const isTruncated = isValueTruncated(value)
 
   const { mutate: getCellValue, isPending, isSuccess, reset } = useGetCellValueMutation()
-  const roleImpersonationState = useRoleImpersonationStateSnapshot()
+  const defaultRoleState = useRoleImpersonationStateSnapshot()
+  const roleImpersonationState = suppliedRoleState ?? defaultRoleState
 
   const loadFullValue = () => {
     if (

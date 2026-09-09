@@ -2,6 +2,7 @@ import { type SqlSnippetSource } from '../../SQLEditor/querySource'
 import { type QueryResult } from '../types'
 import { QueryResultChart } from './QueryResultChart'
 import { QueryResultError } from './QueryResultError'
+import { QueryResultTable } from './QueryResultTable'
 import { DataGridResults } from '@/components/ui/DataGridResults'
 import { type ChartConfig } from '@/data/content/notebooks/notebook-schema'
 
@@ -13,6 +14,8 @@ interface QueryResultRendererProps {
   sql?: string
   source?: SqlSnippetSource
   onDebug?: (prompt: string) => void
+  canEditRows?: boolean
+  onResultChange?: (result: QueryResult) => void
 }
 
 export const QueryResultRenderer = ({
@@ -22,6 +25,8 @@ export const QueryResultRenderer = ({
   sql,
   source,
   onDebug,
+  canEditRows = false,
+  onResultChange,
 }: QueryResultRendererProps) => {
   const { rows, error, autoLimit } = result ?? {}
 
@@ -46,7 +51,16 @@ export const QueryResultRenderer = ({
   }
 
   if (rows && rows.length > 0) {
-    if (view === 'table') return <DataGridResults rows={rows} />
+    if (view === 'table')
+      return onResultChange ? (
+        <QueryResultTable
+          result={result}
+          canEditRows={canEditRows}
+          onResultChange={onResultChange}
+        />
+      ) : (
+        <DataGridResults rows={rows} />
+      )
     if (view === 'chart') return <QueryResultChart chart={chart} result={result} />
   }
 

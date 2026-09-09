@@ -1,6 +1,6 @@
 import type { PGTable } from '@supabase/pg-meta'
 import { isEmpty, noop, partition } from 'lodash'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
 import { Label, SidePanel, Switch } from 'ui'
 
 import { ActionBar } from '../ActionBar'
@@ -22,6 +22,7 @@ import { getStableRowIdentifiers } from '@/components/grid/utils/queueOperationU
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { RoleImpersonationState } from '@/lib/role-impersonation'
 import type { Dictionary } from '@/types'
 
 export interface RowEditorProps {
@@ -29,22 +30,25 @@ export interface RowEditorProps {
   selectedTable: PGTable
   visible: boolean
   editable?: boolean
+  applyButtonLabel?: string
+  roleImpersonationState?: RoleImpersonationState
   closePanel: () => void
   saveChanges: (payload: any, isNewRecord: boolean, configuration: any, resolve: () => void) => void
   updateEditorDirty: () => void
 }
-
-const formId = 'row-editor-panel'
 
 export const RowEditor = ({
   row,
   selectedTable,
   visible = false,
   editable = true,
+  applyButtonLabel,
+  roleImpersonationState,
   closePanel = noop,
   saveChanges = noop,
   updateEditorDirty = noop,
 }: RowEditorProps) => {
+  const formId = useId()
   const { data: project } = useSelectedProjectQuery()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const applyChangesLabel = isQueueOperationsEnabled ? 'Queue changes' : 'Save'
@@ -189,7 +193,7 @@ export const RowEditor = ({
           loading={loading}
           formId={formId}
           backButtonLabel="Cancel"
-          applyButtonLabel={applyChangesLabel}
+          applyButtonLabel={applyButtonLabel ?? applyChangesLabel}
           closePanel={closePanel}
           hideApply={!editable}
           visible={visible}
@@ -264,6 +268,8 @@ export const RowEditor = ({
             )}
 
             <TextEditor
+              tableId={selectedTable.id}
+              roleImpersonationState={roleImpersonationState}
               visible={isEditingText}
               row={editedRow}
               column={selectedValueForTextEdit?.column ?? ''}
@@ -275,6 +281,8 @@ export const RowEditor = ({
               readOnly={!editable}
             />
             <JsonEditor
+              tableId={selectedTable.id}
+              roleImpersonationState={roleImpersonationState}
               visible={isEditingJson}
               row={editedRow}
               column={selectedValueForJsonEdit?.column ?? ''}
@@ -290,6 +298,8 @@ export const RowEditor = ({
       </form>
 
       <ForeignRowSelector
+        sourceTableId={selectedTable.id}
+        roleImpersonationState={roleImpersonationState}
         key={`foreign-row-selector-${foreignKey?.id ?? 'null'}`}
         visible={isSelectingForeignKey}
         foreignKey={foreignKey}
