@@ -2,13 +2,13 @@ import type { PGTable } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { SidePanel } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
-import { RowEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor'
+import {
+  RowEditor,
+  type RowEditorProps,
+} from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { AlertError } from '@/components/ui/AlertError'
 import { queryResultRowQueryOptions } from '@/data/sql/query-result-table-query'
 import { useTableRowUpdateMutation } from '@/data/table-rows/table-row-update-mutation'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
@@ -58,67 +58,61 @@ export const QueryResultRowEditor = ({
     if (!isSaving) confirmOnClose()
   }
 
+  let loadState: RowEditorProps['loadState']
+  if (error) loadState = { status: 'error', error }
+  else if (isPending || isFetching) loadState = { status: 'loading' }
+
   return (
     <>
-      {(!row || isFetching || error) && (
-        <SidePanel visible size="large" header={`Edit row in ${table.name}`} onCancel={handleClose}>
-          <SidePanel.Content>
-            {(isPending || isFetching) && <GenericSkeletonLoader />}
-            {error && <AlertError error={error} subject="Failed to load row" />}
-          </SidePanel.Content>
-        </SidePanel>
-      )}
-      {row && !isFetching && !error && (
-        <RowEditor
-          visible
-          selectedTable={table}
-          row={row}
-          applyButtonLabel="Save"
-          roleImpersonationState={roleImpersonationState ?? { role: undefined, claims: undefined }}
-          closePanel={handleClose}
-          updateEditorDirty={() => setIsDirty(true)}
-          saveChanges={async (payload, _isNewRecord, _configuration, resolve) => {
-            try {
-              const changes = z.record(z.unknown()).parse(payload)
-              if (Object.keys(changes).length === 0) {
-                onClose()
-                return
-              }
-              const updated = await updateRow({
-                projectRef,
-                connectionString,
-                table,
-                payload: changes,
-                configuration: { identifiers },
-                enumArrayColumns: (table.columns ?? [])
-                  .filter(
-                    (column) =>
-                      column.enums.length > 0 && column.data_type.toLowerCase() === 'array'
-                  )
-                  .map(({ name }) => name),
-                returning: true,
-                roleImpersonationState,
-              })
-              const [savedRow] = z.array(z.record(z.unknown())).parse(updated)
-              if (!savedRow) {
-                toast.error(
-                  'No row was updated. It may have been deleted or your role may not have permission to update it.'
-                )
-                return
-              }
-              toast.success('Row updated')
-              onSave(savedRow)
-            } catch (error) {
-              if (error instanceof z.ZodError) {
-                toast.error('Unable to read the updated row. Run the query again.')
-              }
-              // The mutation displays its error; preserve the sheet and unsaved input for retry.
-            } finally {
-              resolve()
+      <RowEditor
+        visible
+        loadState={loadState}
+        selectedTable={table}
+        row={row}
+        applyButtonLabel="Save"
+        roleImpersonationState={roleImpersonationState ?? { role: undefined, claims: undefined }}
+        closePanel={handleClose}
+        updateEditorDirty={() => setIsDirty(true)}
+        saveChanges={async (payload, _isNewRecord, _configuration, resolve) => {
+          try {
+            const changes = z.record(z.unknown()).parse(payload)
+            if (Object.keys(changes).length === 0) {
+              onClose()
+              return
             }
-          }}
-        />
-      )}
+            const updated = await updateRow({
+              projectRef,
+              connectionString,
+              table,
+              payload: changes,
+              configuration: { identifiers },
+              enumArrayColumns: (table.columns ?? [])
+                .filter(
+                  (column) => column.enums.length > 0 && column.data_type.toLowerCase() === 'array'
+                )
+                .map(({ name }) => name),
+              returning: true,
+              roleImpersonationState,
+            })
+            const [savedRow] = z.array(z.record(z.unknown())).parse(updated)
+            if (!savedRow) {
+              toast.error(
+                'No row was updated. It may have been deleted or your role may not have permission to update it.'
+              )
+              return
+            }
+            toast.success('Row updated')
+            onSave(savedRow)
+          } catch (error) {
+            if (error instanceof z.ZodError) {
+              toast.error('Unable to read the updated row. Run the query again.')
+            }
+            // The mutation displays its error; preserve the sheet and unsaved input for retry.
+          } finally {
+            resolve()
+          }
+        }}
+      />
       <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )

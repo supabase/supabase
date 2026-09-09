@@ -128,7 +128,7 @@ export const DataGridResults = ({
                 <ButtonTooltip
                   variant="text"
                   size="tiny"
-                  className="px-1"
+                  className="px-1 opacity-0 transition-opacity group-hover/result-row:opacity-100 focus-visible:opacity-100"
                   aria-label="Edit row"
                   tooltip={{
                     content: {
@@ -205,7 +205,7 @@ export const DataGridResults = ({
             columns={gridColumns}
             rows={rows}
             className="grow min-h-0 border-t-0! border-b-0!"
-            rowClass={() => '[&>.rdg-cell]:items-center'}
+            rowClass={() => 'group/result-row [&>.rdg-cell]:items-center'}
             onCellKeyDown={handleCellKeyDown}
           />
           <CellDetailPanel

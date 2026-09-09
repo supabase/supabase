@@ -88,7 +88,15 @@ beforeEach(() => {
   })
 })
 
-function mockRows({ failFirstSave = false, missing = false } = {}) {
+function mockRows({
+  failFirstSave = false,
+  missing = false,
+  waitForRow,
+}: {
+  failFirstSave?: boolean
+  missing?: boolean
+  waitForRow?: Promise<void>
+} = {}) {
   const writes: string[] = []
   addAPIMock({
     method: 'post',
@@ -103,8 +111,10 @@ function mockRows({ failFirstSave = false, missing = false } = {}) {
           { ...originalRow, id: 'new-id', name: 'Server value' },
         ])
       }
-      if (/select\s+\*/i.test(query))
+      if (/select\s+\*/i.test(query)) {
+        await waitForRow
         return HttpResponse.json<Record<string, unknown>[]>(missing ? [] : [originalRow])
+      }
       return HttpResponse.json<Record<string, unknown>[]>([])
     },
   })
@@ -128,6 +138,26 @@ function renderEditor() {
 }
 
 describe('query result row editing', () => {
+  it('keeps the same sheet mounted while replacing the padded loader with the row form', async () => {
+    let releaseRow = () => {}
+    const waitForRow = new Promise<void>((resolve) => {
+      releaseRow = resolve
+    })
+    mockRows({ waitForRow })
+    renderEditor()
+
+    const sheet = await screen.findByTestId('side-panel-row-editor')
+    const loading = screen.getByRole('status', { name: 'Loading row' })
+    expect(loading.parentElement).toHaveClass('px-4', 'sm:px-6', 'py-4', 'sm:py-6')
+    expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument()
+
+    releaseRow()
+    expect(await screen.findByTestId('name-input')).toHaveValue(originalRow.name)
+    expect(screen.getByTestId('side-panel-row-editor')).toBe(sheet)
+    expect(screen.queryByRole('status', { name: 'Loading row' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled()
+  })
+
   it('loads the full row and saves through the original key and captured role', async () => {
     const writes = mockRows()
     const { onSave } = renderEditor()

@@ -74,6 +74,7 @@ export const queryResultTableQueryOptions = (args: QueryResultTableVariables) =>
     enabled: !!args.projectRef && !!args.sql,
     retry: false,
     staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
   })
 
 export type QueryResultRowVariables = Omit<QueryResultTableVariables, 'sql'> & {

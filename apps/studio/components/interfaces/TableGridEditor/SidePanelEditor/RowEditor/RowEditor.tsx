@@ -2,6 +2,7 @@ import type { PGTable } from '@supabase/pg-meta'
 import { isEmpty, noop, partition } from 'lodash'
 import { useEffect, useId, useMemo, useState } from 'react'
 import { Label, SidePanel, Switch } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ActionBar } from '../ActionBar'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
@@ -20,6 +21,7 @@ import {
 import { TextEditor } from './TextEditor'
 import { getStableRowIdentifiers } from '@/components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { AlertError } from '@/components/ui/AlertError'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import type { RoleImpersonationState } from '@/lib/role-impersonation'
@@ -32,6 +34,7 @@ export interface RowEditorProps {
   editable?: boolean
   applyButtonLabel?: string
   roleImpersonationState?: RoleImpersonationState
+  loadState?: { status: 'loading' } | { status: 'error'; error: { message: string } }
   closePanel: () => void
   saveChanges: (payload: any, isNewRecord: boolean, configuration: any, resolve: () => void) => void
   updateEditorDirty: () => void
@@ -44,6 +47,7 @@ export const RowEditor = ({
   editable = true,
   applyButtonLabel,
   roleImpersonationState,
+  loadState,
   closePanel = noop,
   saveChanges = noop,
   updateEditorDirty = noop,
@@ -62,7 +66,8 @@ export const RowEditor = ({
   const [isSelectingForeignKey, setIsSelectingForeignKey] = useState<boolean>(false)
   const [referenceRow, setReferenceRow] = useState<RowField>()
 
-  const isNewRecord = row === undefined
+  const isReady = visible && !loadState
+  const isNewRecord = row === undefined && !loadState
   const isEditingText = selectedValueForTextEdit !== undefined
   const isEditingJson = selectedValueForJsonEdit !== undefined
 
@@ -95,12 +100,12 @@ export const RowEditor = ({
   )
 
   useEffect(() => {
-    if (visible) {
+    if (isReady) {
       setErrors({})
       const rowFields = generateRowFields(row, selectedTable, foreignKeys)
       setRowFields(rowFields)
     }
-  }, [visible])
+  }, [isReady])
 
   const onUpdateField = (changes: Dictionary<any>) => {
     const updatedProperties = Object.keys(changes)
@@ -131,6 +136,7 @@ export const RowEditor = ({
 
   const onSaveChanges = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (!isReady) return
 
     const errors = validateFields(rowFields)
     setErrors(errors)
@@ -195,7 +201,7 @@ export const RowEditor = ({
           backButtonLabel="Cancel"
           applyButtonLabel={applyButtonLabel ?? applyChangesLabel}
           closePanel={closePanel}
-          hideApply={!editable}
+          hideApply={!editable || !isReady}
           visible={visible}
         >
           {isNewRecord && editable && (
@@ -212,7 +218,19 @@ export const RowEditor = ({
         </ActionBar>
       }
     >
-      <form id={formId} onSubmit={(e) => onSaveChanges(e)} className="h-full">
+      {loadState && (
+        <SidePanel.Content className="py-4 sm:py-6">
+          {loadState.status === 'loading' && (
+            <div role="status" aria-label="Loading row">
+              <GenericSkeletonLoader />
+            </div>
+          )}
+          {loadState.status === 'error' && (
+            <AlertError error={loadState.error} subject="Failed to load row" />
+          )}
+        </SidePanel.Content>
+      )}
+      <form id={formId} onSubmit={(e) => onSaveChanges(e)} className="h-full" hidden={!isReady}>
         <div className="flex h-full flex-col">
           <div className="flex grow flex-col">
             {requiredFields.length > 0 && (
@@ -229,7 +247,7 @@ export const RowEditor = ({
                         onEditText={setSelectedValueForTextEdit}
                         onSelectForeignKey={() => onOpenForeignRowSelector(field)}
                         isEditable={editable}
-                        isNewRow={isNewRecord || '__tempId' in row}
+                        isNewRow={isNewRecord || (row !== undefined && '__tempId' in row)}
                       />
                     )
                   })}
@@ -258,7 +276,7 @@ export const RowEditor = ({
                           onEditJson={setSelectedValueForJsonEdit}
                           onSelectForeignKey={() => onOpenForeignRowSelector(field)}
                           isEditable={editable}
-                          isNewRow={isNewRecord || '__tempId' in row}
+                          isNewRow={isNewRecord || (row !== undefined && '__tempId' in row)}
                         />
                       )
                     })}
