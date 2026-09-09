@@ -19,6 +19,7 @@
   - [x] डेटाबेस फ़ंक्शंस। [प्रलेखन](https://supabase.com/docs/guides/database/functions)
   - [x] एज फ़ंक्शंस। [प्रलेखन](https://supabase.com/docs/guides/functions)
 - [x] भंडारण। [प्रलेखन](https://supabase.com/docs/guides/storage)
+- [x] AI + वेक्टर/एम्बेडिंग्स टूलकिट। [Docs](https://supabase.com/docs/guides/ai)
 - [x] डैशबोर्ड।
 
 ![सुपाबेस का डैशबोर्ड।](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
@@ -36,14 +37,6 @@
 - [ई-मेल समर्थन](https://supabase.com/docs/support#business-support)। आपके डेटाबेस और इंफ़्रास्ट्रक्चर के साथ समस्याएं के लिए उचित है।
 - [डिस्कॉर्ड](https://discord.supabase.com/)। अपने प्रोजेक्ट्स शेयर करने के लिए और हमारी सुपाबेस समुदाय के साथ बातचीत करने के लिए उचित है।
 
-## स्थिति
-
-- [x] अल्फा: हम चुनिंदा ग्राहकों के साथ सुपरबास का परीक्षण कर रहे हैं
-- [x] सार्वजनिक अल्फा: कोई भी [supabase.com/dashboard](https://supabase.com/dashboard) के जरिए शामिल हो सकता है। लेकिन हम पर आसान हो जाओ, कुछ मोड़ हैं।
-- [x] सार्वजनिक बीटा: अधिकांश गैर-एंटरप्राइज़ उपयोग-मामलों के लिए पर्याप्त स्थिर
-- [ ] सार्वजनिक: उत्पादन-तैयार
-
-हम इस समय सार्वजनिक बीटा में हैं। प्रमुख अद्यतन की सूचना पाने के लिए इस रेपो का "रिलीज़" देखें।
 
 <kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="इस रेपो को देखें"/></kbd>
 
