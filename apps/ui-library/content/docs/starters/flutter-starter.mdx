@@ -1,0 +1,74 @@
+---
+title: Flutter Starter
+description: A Flutter user management app with magic links, profiles, and avatar uploads
+---
+
+<BlockOverview name="flutter-starter">
+  <div className="library-component-preview h-80 overflow-hidden border bg-surface-75 md:h-96">
+    <CatalogPreview kind="avatar" />
+  </div>
+</BlockOverview>
+
+Start from the [Supabase Flutter user management example](https://github.com/supabase/supabase/tree/master/examples/user-management/flutter-user-management). It includes a Flutter app, the Supabase Flutter SDK, account screens, and local database migrations.
+
+## Create the app
+
+Install the [Flutter SDK](https://docs.flutter.dev/get-started/install), then copy the example with a sparse Git checkout:
+
+```bash
+git clone --depth 1 --filter=blob:none --sparse https://github.com/supabase/supabase.git my-flutter-app
+cd my-flutter-app
+git sparse-checkout set examples/user-management/flutter-user-management
+cd examples/user-management/flutter-user-management
+```
+
+This checks out the complete Flutter project, including its Android, iOS, and web configuration. Flutter uses the example's Dart widgets and SDK dependencies directly.
+
+## Install dependencies
+
+```bash
+flutter pub get
+cp .env.example .env
+```
+
+## Configure Supabase
+
+Install [Docker](https://docs.docker.com/get-started/get-docker/) and the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started), then start the example's database and migrations:
+
+```bash
+supabase start
+```
+
+Fill in `.env` with the local API URL and publishable key printed by the CLI:
+
+```env
+SUPABASE_URL=your-local-api-url
+SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+```
+
+Update the initialization in `lib/main.dart` to read the same variable name as `.env.example`:
+
+```dart
+await Supabase.initialize(
+  url: dotenv.env['SUPABASE_URL']!,
+  anonKey: dotenv.env['SUPABASE_PUBLISHABLE_KEY']!,
+);
+```
+
+The SDK's `anonKey` argument accepts a publishable key. The example's original `SUPABASE_ANON_KEY` lookup must match the name you use in `.env`.
+
+## Run the app
+
+Start with the web target to use the local Supabase instance:
+
+```bash
+flutter run -d web-server --web-hostname localhost --web-port 3000
+```
+
+Open [the app](http://localhost:3000), request a magic link, and open the local email inbox printed by the Supabase CLI. Sign in, edit your profile, and upload an avatar.
+
+For Android or iOS, run `flutter run` and configure [mobile deep links](https://supabase.com/docs/guides/auth/native-mobile-deep-linking) for `io.supabase.flutterquickstart://login-callback/`. Use a Supabase URL reachable from your simulator or device.
+
+## Use a hosted project
+
+Follow the [Flutter user management tutorial](https://supabase.com/docs/guides/getting-started/tutorials/with-flutter) to set up the profile table, Storage policies, and authentication URLs in your Supabase project. Replace the local values in `.env` with that project's URL and publishable key.

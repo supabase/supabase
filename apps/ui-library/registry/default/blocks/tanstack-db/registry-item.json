@@ -12,5 +12,42 @@
     "@tanstack/react-db@latest"
   ],
   "files": [],
-  "docs": "This block provides TanStack DB integration with Supabase collections. The schemas and collections are generated based on your database schema."
+  "docs": "This block provides TanStack DB integration with Supabase collections. The schemas and collections are generated based on your database schema.",
+  "meta": {
+    "architecture": {
+      "resources": [
+        {
+          "id": "generated-collections",
+          "kind": "capability",
+          "label": "Typed collections",
+          "description": "Generated from the tables you select"
+        },
+        {
+          "id": "generated-schemas",
+          "kind": "capability",
+          "label": "Zod schemas",
+          "description": "Generated from your database schema"
+        },
+        {
+          "id": "existing-database",
+          "kind": "service",
+          "label": "Supabase Database",
+          "description": "Uses your existing tables",
+          "status": "existing"
+        }
+      ],
+      "relationships": [
+        {
+          "source": "generated-collections",
+          "target": "generated-schemas",
+          "label": "Validates records"
+        },
+        {
+          "source": "generated-collections",
+          "target": "existing-database",
+          "label": "Queries selected tables"
+        }
+      ]
+    }
+  }
 }

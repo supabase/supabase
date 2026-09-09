@@ -1,9 +1,52 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { describe, it } from 'node:test'
 
 import { transformLibraryMdx } from './library-mdx-to-markdown'
 
 describe('transformLibraryMdx', () => {
+  it('preserves the file tree and source when folder structure moves into the preview tabs', () => {
+    const source = readFileSync(
+      new URL('../content/docs/headless/mcp-server.mdx', import.meta.url),
+      'utf8'
+    )
+    const output = transformLibraryMdx(source)
+    assert.match(output, /## Files/)
+    assert.match(output, /`supabase\//)
+    assert.match(output, /`index\.ts`/)
+    assert.match(output, /Full source: https:\/\/supabase\.com\/library\/r\/mcp-server\.json/)
+    assert.doesNotMatch(output, /RegistryBlock|BlockOverview|## Folder structure/)
+    assert.match(output, /## Configure the project/)
+  })
+  it('preserves every framework quickstart in the agent-readable Markdown', () => {
+    const source = readFileSync(
+      new URL('../content/docs/getting-started/quickstart.mdx', import.meta.url),
+      'utf8'
+    )
+    const output = transformLibraryMdx(source)
+
+    for (const framework of ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs']) {
+      assert.ok(output.includes(`/supabase-client-${framework}.json`))
+      assert.ok(output.includes(`/password-based-auth-${framework}.json`))
+    }
+    for (const title of [
+      'Next.js',
+      'React Router',
+      'TanStack Start',
+      'React SPA',
+      'Vue',
+      'Nuxt.js',
+    ]) {
+      assert.ok(output.includes(`## ${title}`))
+    }
+    assert.equal(output.match(/init --template/g)?.length, 6)
+    assert.equal(output.match(/npm run dev/g)?.length, 6)
+    assert.match(output, /NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY/)
+    assert.match(output, /VITE_SUPABASE_PUBLISHABLE_KEY/)
+    assert.match(output, /NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY/)
+    assert.doesNotMatch(output, /FrameworkQuickstart|QuickstartStep/)
+  })
+
   it('lifts title and description into a markdown header', () => {
     const output = transformLibraryMdx(`---
 title: Password-based Authentication

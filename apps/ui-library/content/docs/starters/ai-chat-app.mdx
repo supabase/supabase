@@ -1,0 +1,59 @@
+---
+title: AI Chat App
+description: A Next.js chat app with streaming responses, authentication, and saved conversations
+---
+
+<BlockOverview name="ai-chat-app">
+  <div className="library-component-preview h-80 overflow-hidden border bg-surface-75 md:h-96">
+    <CatalogPreview kind="chat" />
+  </div>
+</BlockOverview>
+
+The [Supabase Community AI chatbot template](https://github.com/supabase-community/vercel-ai-chatbot) includes a chat interface, streaming responses, Supabase Auth, and conversation history in Postgres. Creating the app installs those features together.
+
+## Create the app
+
+Scaffold the template with the [Next.js CLI](https://nextjs.org/docs/app/api-reference/cli/create-next-app):
+
+```bash
+npx create-next-app@latest my-chat --example https://github.com/supabase-community/vercel-ai-chatbot --use-pnpm
+cd my-chat
+cp .env.example .env
+```
+
+This community template uses Next.js 13, AI SDK 2, and Supabase Auth Helpers. Review its [dependency versions](https://github.com/supabase-community/vercel-ai-chatbot/blob/main/package.json) and plan upgrades before deployment. For a new authentication foundation using `@supabase/ssr`, start with the [Next.js starter](/library/docs/starters/nextjs-starter).
+
+## Start Supabase
+
+Install [Docker](https://docs.docker.com/get-started/get-docker/) and the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started), then run the local stack from the template directory:
+
+```bash
+supabase start
+```
+
+The template includes database migrations for chat history. Use the project URL and `anon` key printed by the CLI in `.env`:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-local-api-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-local-anon-key
+OPENAI_API_KEY=your-model-provider-api-key
+NEXT_PUBLIC_AUTH_GITHUB=false
+```
+
+The variable names match the template's [environment example](https://github.com/supabase-community/vercel-ai-chatbot/blob/main/.env.example). Keep `OPENAI_API_KEY` on the server. To add GitHub sign-in, follow the template's [OAuth setup](https://github.com/supabase-community/vercel-ai-chatbot#set-up-github-oauth) and fill in its provider settings.
+
+## Choose a model
+
+The template selects its model in [`app/api/chat/route.ts`](https://github.com/supabase-community/vercel-ai-chatbot/blob/main/app/api/chat/route.ts). Replace the example model with one available to your provider account that supports the template's Chat Completions streaming API. Keep the model selection and API key in the server route.
+
+## Run the app
+
+```bash
+pnpm dev
+```
+
+Open [the app](http://localhost:3000), sign up, and send a message. Use the local email inbox URL printed by the Supabase CLI to confirm your account. Confirm that the response streams and that the conversation appears in your history after refreshing.
+
+## Deploy the app
+
+Follow the template's [deployment guide](https://github.com/supabase-community/vercel-ai-chatbot#deploy-your-own) to connect a hosted Supabase project, apply its migrations, and set the production Auth Site URL and server environment variables.

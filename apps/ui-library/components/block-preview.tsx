@@ -19,6 +19,7 @@ export function BlockPreview({ name, wide = false, isPair = false }: ComponentPr
           }
         >
           <iframe
+            title={`${name.split('/')[0].replaceAll('-', ' ')} preview`}
             src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/example/${name}`}
             style={{
               border: 'none',
@@ -36,10 +37,10 @@ export function BlockPreview({ name, wide = false, isPair = false }: ComponentPr
   const wideClasses = wide ? '2xl:-ml-12 2xl:-mr-12' : ''
 
   return (
-    <div className={cn('mt-4 w-full', wideClasses)}>
+    <div className={cn('library-block-preview relative isolate mt-4 w-full', wideClasses)}>
       <div
         className={cn(
-          'relative border rounded-lg overflow-hidden bg-muted min-h-[150px] h-[600px]',
+          'relative border overflow-hidden bg-background min-h-[150px] h-[600px]',
           isPair && 'rounded-none'
         )}
       >

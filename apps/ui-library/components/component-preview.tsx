@@ -51,7 +51,7 @@ export function ComponentPreview({
     }
 
     return <Component />
-  }, [name, config.style])
+  }, [name])
 
   const Codes = React.Children.toArray(children) as React.ReactElement[]
   const Code = Codes[index]
@@ -81,12 +81,9 @@ export function ComponentPreview({
   const wideClasses = wide ? '2xl:-ml-12 2xl:-mr-12' : ''
 
   return (
-    <div className={cn('mt-4 mb-12', wideClasses)}>
+    <div className={cn('library-component-preview mt-4 mb-12', wideClasses)}>
       <div
-        className={cn(
-          'relative bg-studio',
-          showCode ? 'rounded-tl-md rounded-tr-md border-t border-l border-r' : 'rounded-md border'
-        )}
+        className={cn('relative bg-background', showCode ? 'border-t border-l border-r' : 'border')}
       >
         {showGrid && (
           <div className="pointer-events-none absolute h-full w-full bg-[linear-gradient(to_right,oklch(from_var(--foreground-default)_l_c_h_/_0.02)_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>

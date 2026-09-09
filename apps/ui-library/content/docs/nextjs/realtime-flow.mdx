@@ -3,7 +3,9 @@ title: Realtime Flow
 description: Real-time flow diagram editor for collaborative applications
 ---
 
-<DualRealtimeFlow />
+<BlockOverview name="realtime-flow-nextjs" showFiles>
+  <DualRealtimeFlow />
+</BlockOverview>
 
 ## Installation
 
@@ -11,10 +13,6 @@ description: Real-time flow diagram editor for collaborative applications
   name="realtime-flow-nextjs"
   description="Real-time flow diagram editor for collaborative applications."
 />
-
-## Folder structure
-
-<RegistryBlock itemName="realtime-flow-nextjs" />
 
 ## Introduction
 
@@ -115,13 +113,14 @@ If you need programmatic access to nodes and edges (e.g. adding nodes, custom no
 
 ```tsx
 import {
-  ReactFlow,
-  ReactFlowProvider,
   Background,
   Controls,
-  type Node,
+  ReactFlow,
+  ReactFlowProvider,
   type Edge,
+  type Node,
 } from '@xyflow/react'
+
 import { useRealtimeFlow } from '@/hooks/use-realtime-flow'
 
 const initialNodes: Node[] = [

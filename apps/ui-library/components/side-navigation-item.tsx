@@ -19,7 +19,7 @@ interface NavigationItemProps
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void
 }
 
-const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props }) => {
+export const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props }) => {
   const { setOpen } = useMobileMenu()
   const { framework } = useFramework()
   const pathname = usePathname()
@@ -35,7 +35,9 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props
     // An item supports the current framework if either:
     // 1. It has no framework restrictions (supports all frameworks)
     // 2. The current framework is in its list of supported frameworks
-    return !hasFrameworkRestrictions || supportedFrameworks.includes(framework as any)
+    return (
+      !hasFrameworkRestrictions || supportedFrameworks.some((supported) => supported === framework)
+    )
   }
 
   // Build URL with priority:
@@ -85,27 +87,20 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props
       href={href || '#'}
       {...props}
       onClick={handleClick}
+      aria-current={isActive ? 'page' : undefined}
       className={cn(
         'relative',
         'flex',
         'items-center justify-between',
-        'h-6',
+        'min-h-8 rounded-md py-1.5',
         'text-sm',
-        'text-foreground-lighter px-6',
+        'text-foreground-light px-3',
         !isActive && 'hover:bg-surface-100 hover:text-foreground',
         isActive && 'bg-surface-200 text-foreground',
         'transition-all',
         props.className
       )}
     >
-      {/* Active indicator bar */}
-      <div
-        className={cn(
-          'transition',
-          'absolute left-0 w-1 h-full bg-foreground',
-          isActive ? 'opacity-100' : 'opacity-0'
-        )}
-      />
       {item.title}
       {item.new && <Badge variant="success">New</Badge>}
     </Link>
@@ -113,5 +108,3 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props
 }
 
 NavigationItem.displayName = 'NavigationItem'
-
-export default NavigationItem

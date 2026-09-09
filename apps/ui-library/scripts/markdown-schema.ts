@@ -54,6 +54,12 @@ function RegistryBlock({ props }: HandlerContext): string {
   return parts.join('\n').trim()
 }
 
+function BlockOverview({ props, children }: HandlerContext): string {
+  if (props.showFiles !== true && props.showFiles !== 'true') return children
+  const files = RegistryBlock({ props: { itemName: props.name }, children: '' })
+  return [children, '## Files', files].filter(Boolean).join('\n\n')
+}
+
 function formatTree(nodes: RegistryNode[], indent = 0): string {
   return nodes
     .map((node) => {
@@ -105,6 +111,7 @@ function Anchor({ props, children }: HandlerContext): string {
 
 export const markdownSchema: Record<string, ComponentHandler> = {
   BlockItem,
+  BlockOverview,
   RegistryBlock,
   Callout,
   Accordion: unwrap,

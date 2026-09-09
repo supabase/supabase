@@ -1,0 +1,73 @@
+---
+title: SaaS Starter
+description: A Next.js subscription app with Supabase Auth and Stripe billing
+---
+
+<BlockOverview name="saas-starter">
+  <div className="library-component-preview h-80 overflow-hidden border bg-surface-75 md:h-96">
+    <CatalogPreview kind="dashboard" />
+  </div>
+</BlockOverview>
+
+The [Supabase Community subscription template](https://github.com/supabase-community/nextjs-subscription-payments) includes authentication, subscription checkout, a customer portal, and database migrations. Its components and billing routes are installed together when you create the app.
+
+## Create the app
+
+Scaffold the complete template with the [Next.js CLI](https://nextjs.org/docs/app/api-reference/cli/create-next-app):
+
+```bash
+npx create-next-app@latest my-saas --example https://github.com/supabase-community/nextjs-subscription-payments --use-pnpm
+cd my-saas
+```
+
+The scaffold uses the template's dependency versions and includes its authentication implementation. Review dependency updates before deploying your app.
+
+## Start Supabase
+
+Install [Docker](https://docs.docker.com/get-started/get-docker/) and the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started). Copy the template's environment files, then start its local database and migrations:
+
+```bash
+cp .env.example .env
+cp .env.local.example .env.local
+pnpm supabase:start
+```
+
+Use the values printed by `pnpm supabase:status` to fill in `.env.local`:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-local-api-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-local-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-local-service-role-key
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your-stripe-test-publishable-key
+STRIPE_SECRET_KEY=your-stripe-test-secret-key
+STRIPE_WEBHOOK_SECRET=your-local-webhook-signing-secret
+```
+
+These names match the template. Keep `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, and `STRIPE_WEBHOOK_SECRET` in server environment variables.
+
+## Connect Stripe
+
+Install the [Stripe CLI](https://docs.stripe.com/stripe-cli), sign in, and keep webhook forwarding running in a separate terminal:
+
+```bash
+pnpm stripe:login
+pnpm stripe:listen
+```
+
+Copy the listener's signing secret into `STRIPE_WEBHOOK_SECRET`. Start the app in another terminal:
+
+```bash
+pnpm dev
+```
+
+Load the template's sample test products after the app and webhook listener are running:
+
+```bash
+pnpm stripe:fixtures
+```
+
+Open [the app](http://localhost:3000), create an account, and test a subscription. Configure the [Stripe customer portal](https://dashboard.stripe.com/test/settings/billing/portal) to let customers change or cancel their plans.
+
+## Deploy the app
+
+Follow the template's [deployment setup](https://github.com/supabase-community/nextjs-subscription-payments#step-by-step-setup) for the hosted database, Auth URLs, production Stripe keys, and webhook endpoint. The template's [package scripts](https://github.com/supabase-community/nextjs-subscription-payments/blob/main/package.json) cover local migrations and billing fixtures.

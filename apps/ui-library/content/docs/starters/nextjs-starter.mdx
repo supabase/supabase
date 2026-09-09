@@ -1,0 +1,59 @@
+---
+title: Next.js Starter
+description: A Next.js app with Supabase authentication, TypeScript, and Tailwind CSS
+---
+
+<BlockOverview name="password-based-auth-nextjs" showFiles>
+  <BlockPreview name="password-based-auth/auth/sign-up" />
+</BlockOverview>
+
+Start with a Next.js App Router project, then install the Library's password-based authentication block. The block adds sign-in, sign-up, password recovery, and a protected page.
+
+## Create the app
+
+Use [create-next-app](https://nextjs.org/docs/app/api-reference/cli/create-next-app) to scaffold the framework:
+
+```bash
+npx create-next-app@latest my-app --ts --tailwind --eslint --app --no-src-dir --import-alias "@/*" --use-npm --yes
+cd my-app
+npx shadcn@latest init --base radix
+```
+
+This creates the app at the project root with the import alias expected by the block.
+
+## Install the block
+
+Run the install command from your new project:
+
+<BlockItem name="password-based-auth-nextjs" showOpenInV0={false} />
+
+The installer adds the Supabase client and authentication routes. Keep the generated package lockfile with your project.
+
+## Configure Supabase
+
+Create a [Supabase project](https://supabase.com/dashboard/new), then add its URL and publishable key to `.env.local`:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+```
+
+Find these values in your project's [Connect dialog](https://supabase.com/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=nextjs).
+
+Set the Auth Site URL to `http://localhost:3000` in [URL configuration](https://supabase.com/dashboard/project/_/auth/url-configuration). Follow the [authentication block's email template and redirect setup](/library/docs/nextjs/password-based-auth#adding-email-templates) to enable email confirmation and password recovery. Set the generated forms' post-authentication destination to `/protected`.
+
+## Run the app
+
+```bash
+npm run dev
+```
+
+Open [the sign-up page](http://localhost:3000/auth/sign-up), create an account, and follow the confirmation email to the protected page.
+
+## Add more blocks
+
+- [Social Auth](/library/docs/nextjs/social-auth) adds OAuth sign-in providers.
+- [Current User Avatar](/library/docs/nextjs/current-user-avatar) displays the signed-in user's profile.
+- [Dropzone](/library/docs/nextjs/dropzone) adds file uploads.
+
+Built with [Next.js](https://nextjs.org/) and the [Supabase password-based authentication block](https://github.com/supabase/supabase/tree/master/apps/ui-library/registry/default/blocks/password-based-auth-nextjs).

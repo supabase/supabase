@@ -1,0 +1,63 @@
+@reference './globals.css';
+
+@keyframes library-celestial-drift {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translate3d(-50%, 0, 0) scale(0.96);
+  }
+  50% {
+    opacity: 0.68;
+    transform: translate3d(-50%, -4px, 0) scale(1.04);
+  }
+}
+
+.library-doc-content .mdx > * {
+  @apply mx-auto max-w-2xl;
+}
+
+.library-doc-content .mdx > ul,
+.library-doc-content .mdx > ol {
+  @apply pl-6;
+}
+
+.library-doc-content .mdx > h2 {
+  @apply mt-16 scroll-m-24 border-0 pb-0 text-xl font-semibold;
+}
+
+.library-doc-content .mdx > h3 {
+  @apply scroll-m-24 text-base font-semibold;
+}
+
+.library-doc-content .mdx > p,
+.library-doc-content .mdx > ul,
+.library-doc-content .mdx > ol {
+  @apply text-sm leading-7;
+}
+
+.library-doc-content .mdx > .library-block-preview,
+.library-doc-content .mdx > .library-block-overview,
+.library-doc-content .mdx > :has(.library-block-preview),
+.library-doc-content .mdx > .library-component-preview {
+  @apply max-w-none;
+}
+
+.library-overview-preview .library-block-preview,
+.library-overview-preview .library-component-preview {
+  @apply m-0;
+}
+
+.library-overview-preview > .library-component-preview,
+.library-overview-preview .library-block-preview > div,
+.library-overview-preview .library-component-preview > div:first-child {
+  @apply border-0;
+}
+
+.library-doc-content .mdx > .library-block-preview:first-child,
+.library-doc-content .mdx > .library-component-preview:first-child {
+  @apply mt-4 mb-16;
+}
+
+.library-doc-content .library-faq details > p {
+  @apply mt-4 text-sm leading-6;
+}

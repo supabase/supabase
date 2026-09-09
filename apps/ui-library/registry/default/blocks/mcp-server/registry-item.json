@@ -40,5 +40,31 @@
       "type": "registry:file",
       "target": "supabase/functions/mcp-server/tools/index.ts"
     }
-  ]
+  ],
+  "meta": {
+    "architecture": {
+      "resources": [
+        {
+          "id": "edge-function:supabase/functions/mcp-server",
+          "kind": "edge-function",
+          "label": "MCP server",
+          "description": "Expose MCP tools that run as the signed-in user"
+        },
+        {
+          "id": "supabase-auth",
+          "kind": "service",
+          "label": "Supabase Auth",
+          "description": "Verifies user access tokens",
+          "status": "existing"
+        }
+      ],
+      "relationships": [
+        {
+          "source": "edge-function:supabase/functions/mcp-server",
+          "target": "supabase-auth",
+          "label": "Authenticates requests"
+        }
+      ]
+    }
+  }
 }

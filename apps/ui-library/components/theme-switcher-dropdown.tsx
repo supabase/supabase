@@ -57,6 +57,7 @@ const ThemeSwitcherDropdown = () => {
           <Button
             variant="text"
             size="tiny"
+            aria-label="Choose a theme"
             className="px-1 group"
             icon={
               resolvedTheme?.includes('light') ? (
