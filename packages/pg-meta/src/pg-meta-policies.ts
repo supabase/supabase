@@ -41,7 +41,7 @@ function getIdentifierWhereClause(identifier: PolicyIdentifier): SafeSqlFragment
   if ('id' in identifier && identifier.id) {
     return safeSql`id = ${literal(identifier.id)}`
   } else if ('name' in identifier && identifier.name && identifier.schema && identifier.table) {
-    return safeSql`name = ${literal(identifier.name)} AND schema = ${literal(identifier.schema)} AND table = ${literal(identifier.table)}`
+    return safeSql`name = ${literal(identifier.name)} AND schema = ${literal(identifier.schema)} AND ${ident('table')} = ${literal(identifier.table)}`
   }
   throw new Error('Must provide either id or name, schema and table')
 }
