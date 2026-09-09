@@ -65,7 +65,7 @@ export function useSqlEditorExecution({
   const { mutate: execute, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
       if (id) {
-        sessionSnap.addResult(id, data.result, vars.autoLimit)
+        sessionSnap.addResult(id, data.result, vars.autoLimit, vars.sql)
       }
 
       // revalidate lint query
@@ -75,7 +75,7 @@ export function useSqlEditorExecution({
     onError(error: any, vars) {
       if (id) {
         editor.highlightErrorLine(error, hasSelection)
-        sessionSnap.addResultError(id, error, vars.autoLimit)
+        sessionSnap.addResultError(id, error, vars.autoLimit, vars.sql)
       }
 
       refocusEditorAfterRunIfNeeded()
