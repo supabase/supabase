@@ -1,6 +1,6 @@
 import { get, handleError } from '@/data/fetchers'
 
-export type ServiceHealthGranularity = 'day' | 'hour' | 'minute'
+export type ServiceHealthGranularity = 'day' | '12h' | '6h' | 'hour' | '30min' | '15min' | 'minute'
 
 export type ServiceHealthServiceData = {
   error: number

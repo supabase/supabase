@@ -46,7 +46,27 @@ export type ServiceHealthData = {
 const INTERVAL_TO_GRANULARITY: Record<'1hr' | '1day' | '7day', ServiceHealthGranularity> = {
   '1hr': 'minute',
   '1day': 'hour',
-  '7day': 'day',
+  '7day': '6h',
+}
+
+const GRANULARITY_SNAP_UNIT: Record<ServiceHealthGranularity, 'day' | 'hour' | 'minute'> = {
+  day: 'day',
+  '12h': 'hour',
+  '6h': 'hour',
+  hour: 'hour',
+  '30min': 'minute',
+  '15min': 'minute',
+  minute: 'minute',
+}
+
+const GRANULARITY_FILL_INTERVAL: Record<ServiceHealthGranularity, string> = {
+  day: '1d',
+  '12h': '12h',
+  '6h': '6h',
+  hour: '1h',
+  '30min': '30m',
+  '15min': '15m',
+  minute: '1m',
 }
 
 /** Maps our service keys to the field names returned by the service-health endpoint */
@@ -111,8 +131,9 @@ const useServiceHealthQuery = ({
 
   // Snap start/end to the granularity boundary so fillTimeseries iterates
   // in sync with the API's bucketed timestamps (e.g. midnight for 'day').
-  const fillStart = dayjs.utc(startDate).startOf(granularity).toISOString()
-  const fillEnd = dayjs.utc(endDate).startOf(granularity).toISOString()
+  const snapUnit = GRANULARITY_SNAP_UNIT[granularity]
+  const fillStart = dayjs.utc(startDate).startOf(snapUnit).toISOString()
+  const fillEnd = dayjs.utc(endDate).startOf(snapUnit).toISOString()
 
   // Fill gaps in timeseries
   const { data: filledData } = useFillTimeseriesSorted({
@@ -122,6 +143,7 @@ const useServiceHealthQuery = ({
     defaultValue: 0,
     startDate: fillStart,
     endDate: fillEnd,
+    interval: GRANULARITY_FILL_INTERVAL[granularity],
   })
 
   const eventChartData: LogsBarChartDatum[] = useMemo(
