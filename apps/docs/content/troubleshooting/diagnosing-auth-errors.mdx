@@ -1,0 +1,196 @@
+---
+title = "Diagnosing Auth Errors"
+github_url = "https://github.com/orgs/supabase/discussions/13043"
+date_created = "2023-03-16T04:52:50+00:00"
+topics = [ "auth", "database", "studio" ]
+keywords = [ ]
+
+---
+
+
+This is a practical guide for diagnosing authentication errors in Supabase. Most Auth issues can be traced by capturing the error code the client receives, then matching it against the logs on the server and database. This guide walks through both.
+
+---
+
+## Capturing the error in the browser
+
+If you can reproduce the failure in a browser, the fastest way to identify it is through the network console.
+
+1. Right-click anywhere on the page and choose **Inspect** to open developer tools.
+2. Switch to the **Network** tab.
+3. Reproduce the error so the failed request appears in the request list.
+4. Select the failed request. Its HTTP status code is shown in the request row and in the **Headers** panel.
+5. Open the **Response** tab for that request to read the error message.
+
+The error message shown in the Response tab can be matched against the [Auth error codes table](/docs/guides/auth/debugging/error-codes#auth-error-codes-table) to identify the underlying cause.
+
+---
+
+## Finding error messages in the logs
+
+When the error can't be reproduced in a browser — or you need more context than the client shows — the [Log Explorer](/dashboard/project/_/logs/explorer) is the primary tool.
+
+Two things to keep in mind before you start:
+
+- **Logs are batched.** New entries can take up to **5 minutes** to appear, so a very recent error may not show up immediately.
+- **Set an appropriate time range.** The Log Explorer defaults to a narrow window. Widen the range to cover when the error occurred, or your query will return nothing.
+
+Results are returned in a table, which can be hard to read for nested fields. **Double-click any row** to expand it into formatted JSON.
+
+The sections below contain ready-to-run queries. Paste them into the Log Explorer and adjust the filters as needed.
+
+---
+
+## Diagnostic queries
+
+### View Auth server logs
+
+This query joins the Auth logs with the edge logs to give a consolidated view of each failed Auth request — including the request ID, method, IP, error message, path, and error code. It's the best starting point for a broad look at what the Auth server is rejecting.
+
+Cross-reference the status codes returned from this query with the [Auth error reference table](https://github.com/supabase/auth/pull/1377).
+
+```sql
+SELECT
+  CAST(t1.timestamp AS datetime) AS timestamp,
+  t1_metadata.request_id AS request_id,
+  t1_metadata.method,
+  t1_metadata.remote_addr AS IP,
+  t1_metadata.error AS error_message,
+  t1_metadata.msg AS secondary_message,
+  t3.url AS path,
+  t1_metadata.path AS base_path,
+  t3.sb,
+  t3.x_sb_error_code AS error_code,
+  COALESCE(t1_metadata.status, t2.status) as status
+FROM auth_logs AS t1
+CROSS JOIN
+  UNNEST(t1.metadata) AS t1_metadata
+JOIN (
+  SELECT
+    m.request_id,
+    m.status
+  FROM
+    auth_logs t
+  CROSS JOIN UNNEST(t.metadata) AS m
+) AS t2
+  ON t1_metadata.request_id = t2.request_id
+FULL JOIN (
+  SELECT
+    req.url,
+    response_headers.cf_ray,
+    sb,
+    x_sb_error_code
+  FROM
+    edge_logs e
+  CROSS JOIN UNNEST(e.metadata) AS em
+  CROSS JOIN UNNEST(em.request) AS req
+  CROSS JOIN UNNEST(req.sb) AS sb
+  CROSS JOIN UNNEST(em.response) AS response
+  CROSS JOIN UNNEST(response.headers) AS response_headers
+) AS t3
+  ON t1_metadata.request_id = t3.cf_ray
+WHERE
+  t1_metadata.error IS NOT NULL
+  AND t2.status IS NOT NULL
+ORDER BY t1.timestamp DESC
+```
+
+### Find Auth errors at the database level
+
+Some Auth failures originate in Postgres rather than the Auth server — for example, a failing trigger on `auth.users`, a broken RLS policy, or a permissions issue. This query surfaces errors, fatals, and panics logged by the `supabase_auth_admin` role.
+
+> Match the `sql_state_code` values against the [Postgres error reference table](https://www.postgresql.org/docs/current/errcodes-appendix.html).
+
+```sql
+select
+    cast(postgres_logs.timestamp as datetime) as timestamp,
+    event_message,
+    parsed.error_severity,
+    parsed.user_name,
+    parsed.query,
+    parsed.detail,
+    parsed.hint,
+    parsed.sql_state_code,
+    parsed.backend_type
+from
+    postgres_logs
+    cross join unnest(metadata) as metadata
+    cross join unnest(metadata.parsed) as parsed
+where
+    regexp_contains(parsed.error_severity, 'ERROR|FATAL|PANIC')
+      and
+    regexp_contains(parsed.user_name, 'supabase_auth_admin')
+order by
+    timestamp desc
+limit 100;
+```
+
+### Find Auth API errors in the edge logs
+
+This query pulls every Auth API request that returned a 4xx or 5xx status from the [edge logs](/dashboard/project/_/logs/explorer). Uncomment and edit the `regexp_contains` filter on `event_message` to narrow to specific keywords in the request URL.
+
+> For examples of Auth API paths you can filter on, see the [self-hosting Auth reference](/docs/reference/self-hosting-auth/get-a-user).
+
+```sql
+select
+  cast(timestamp as datetime) as timestamp,
+  status_code,
+  event_message,
+  path
+from edge_logs
+cross join unnest(metadata) as metadata
+cross join unnest(response) AS response
+cross join unnest(request) AS request
+where
+   -- find all errors
+   status_code >= 400
+    and
+   -- only look at Auth API
+   regexp_contains(path, '^/auth/v1/')
+   -- optionally filter further by including a list of keywords that are in your request URL
+   -- and
+   -- regexp_contains(event_message, '(?i)keyword1|keyword2|keyword3...')
+```
+
+### Measure how often an error occurs
+
+Once you've identified a status code worth investigating, this query counts how frequently it occurs per path. The example below is tuned to rate-limiting errors (`429`); change the `status_code` value to focus on a different error.
+
+```sql
+select
+  status_code,
+  path,
+  count(path) as reoccurrence_per_path
+from edge_logs
+cross join unnest(metadata) as metadata
+cross join unnest(response) AS response
+cross join unnest(request) AS request
+where
+   -- find all rate limiting
+   status_code = 429
+    and
+   -- only look at auth API
+   regexp_contains(path, '^/auth/v1/')
+group by path, status_code
+order by reoccurrence_per_path;
+```
+
+---
+
+## A suggested workflow
+
+1. **Reproduce and capture.** If the error happens in a browser, grab the status code and Response-tab message from the Network tab (Section 1).
+2. **Look it up.** Match the message against the [Auth error codes table](/docs/guides/auth/debugging/error-codes#auth-error-codes-table).
+3. **Broaden to the server logs.** If the client message isn't enough, run the consolidated Auth server query (3.1) over the relevant time range.
+4. **Rule in or out the database.** If the error looks like it comes from Postgres, run the database-level query (3.2) and check the `sql_state_code`.
+5. **Quantify.** If you need to understand scale — is this a one-off or a pattern? — use the checks how often an error occurs.
+
+---
+
+## Reference links
+
+- [Auth error codes table](https://supabase.com/docs/guides/auth/debugging/error-codes#auth-error-codes-table)
+- [Postgres error codes appendix](https://www.postgresql.org/docs/current/errcodes-appendix.html)
+- [How to Interpret and Explore the Postgres Logs](https://github.com/orgs/supabase/discussions/26224)
+- [How to Interpret and Explore the Database API Logs](https://github.com/orgs/supabase/discussions/22849)
+- [How to filter the Log Explorer](https://github.com/orgs/supabase/discussions/22640)
