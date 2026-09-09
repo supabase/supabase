@@ -1,7 +1,7 @@
 'use client'
 
 import { cva, VariantProps } from 'class-variance-authority'
-import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
+import { Check, ChevronDown, X as RemoveIcon } from 'lucide-react'
 // @ts-ignore Required to avoid TS error: The inferred type of MultiSelectorContent cannot be named without a reference to @radix-ui
 import type { Popover as PopoverPrimitive } from 'radix-ui'
 import React, { Children, useEffect } from 'react'
@@ -489,7 +489,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           </div>
 
           {showIcon && (
-            <ChevronsUpDown
+            <ChevronDown
               aria-hidden="true"
               size={16}
               strokeWidth={1.5}

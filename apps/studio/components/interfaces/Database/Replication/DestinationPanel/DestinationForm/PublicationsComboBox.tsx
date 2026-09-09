@@ -1,10 +1,10 @@
 import { useParams } from 'common'
-import { Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { Check, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { ControllerRenderProps } from 'react-hook-form'
 import {
-  Button,
   cn,
+  ComboboxTrigger,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -78,19 +78,16 @@ export const PublicationsComboBox = ({
       }}
     >
       <PopoverTrigger asChild>
-        <Button
-          variant="default"
+        <ComboboxTrigger
+          aria-expanded={isDropdownOpen}
+          data-state={isDropdownOpen ? 'open' : 'closed'}
           size="small"
-          className={cn(
-            'w-full [&>span]:w-full text-left',
-            !selectedPublication && 'text-foreground-muted'
-          )}
-          iconRight={<ChevronsUpDown />}
+          className={cn(!selectedPublication && 'text-foreground-muted')}
           name={field.name}
           onBlur={field.onBlur}
         >
           {selectedPublication || 'Select publication'}
-        </Button>
+        </ComboboxTrigger>
       </PopoverTrigger>
       <PopoverContent
         sameWidthAsTrigger

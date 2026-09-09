@@ -58,7 +58,7 @@ describe('multi-select', () => {
     const trigger = screen.getByRole('combobox')
     expect(trigger).toHaveClass('h-[26px]', 'p-0.5')
     expect(trigger.firstElementChild).toHaveClass('gap-0.5')
-    expect(trigger.lastElementChild).toHaveAttribute('aria-hidden', 'true')
+    expect(trigger.querySelector('.lucide-chevron-down')).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('keeps the default trigger height stable when the first value is selected', () => {
