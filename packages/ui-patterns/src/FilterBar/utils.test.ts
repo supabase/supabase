@@ -292,6 +292,18 @@ describe('FilterBar Utils', () => {
       expect(result).toEqual({ operator: '=', value: 'true', focusTarget: 'value' })
     })
 
+    it('preserves an is-null value even when the property has fixed options', () => {
+      const booleanWithIsProperty: FilterProperty = {
+        ...booleanProperty,
+        operators: [
+          { value: '=', label: 'Equals', group: 'comparison' },
+          { value: 'is', label: 'Is', group: 'setNull' },
+        ],
+      }
+      const result = resolvePropertyChange('is', 'null', booleanWithIsProperty)
+      expect(result).toEqual({ operator: 'is', value: 'null', focusTarget: 'value' })
+    })
+
     it('resets everything when current operator is empty', () => {
       const result = resolvePropertyChange('', 'hello', stringProperty)
       expect(result).toEqual({ operator: '', value: '', focusTarget: 'operator' })
