@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { BarChart2, ChevronRight, ExternalLink, Telescope } from 'lucide-react'
 import Link from 'next/link'
@@ -29,6 +29,8 @@ import {
   AuthErrorCodeRow,
   fetchTopAuthErrorCodes,
   fetchTopResponseErrors,
+  parseAuthErrorCodes,
+  parseResponseErrors,
   ResponseErrorRow,
 } from './OverviewErrors.constants'
 import { OverviewTable } from './OverviewTable'
@@ -117,23 +119,6 @@ const LogsLink = ({ href }: { href: string }) => (
   </Tooltip>
 )
 
-function isResponseErrorRow(row: unknown): row is ResponseErrorRow {
-  if (!row || typeof row !== 'object') return false
-  const r = row as Record<string, unknown>
-  return (
-    typeof r.method === 'string' &&
-    typeof r.path === 'string' &&
-    typeof r.status_code === 'number' &&
-    typeof r.count === 'number'
-  )
-}
-
-function isAuthErrorCodeRow(row: unknown): row is AuthErrorCodeRow {
-  if (!row || typeof row !== 'object') return false
-  const r = row as Record<string, unknown>
-  return typeof r.error_code === 'string' && typeof r.count === 'number'
-}
-
 interface OverviewMetricsProps {
   metrics?: AuthMetricsResponse
   isLoading: boolean
@@ -142,6 +127,7 @@ interface OverviewMetricsProps {
 
 export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsProps) => {
   const { ref } = useParams()
+  const useOtel = useFlag('otelLegacyLogs')
   const endDate = dayjs().toISOString()
   const startDate = dayjs().subtract(24, 'hour').toISOString()
   const aiSnap = useAiAssistantStateSnapshot()
@@ -175,22 +161,22 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
   )
 
   const { data: respErrData, isPending: isLoadingResp } = useQuery({
-    queryKey: ['auth-overview', ref, 'top-response-errors'],
-    queryFn: () => fetchTopResponseErrors(ref as string),
+    queryKey: ['auth-overview', ref, 'top-response-errors', { otel: useOtel }],
+    queryFn: () => fetchTopResponseErrors(ref as string, useOtel),
     enabled: !!ref,
   })
 
   const { data: codeErrData, isPending: isLoadingCodes } = useQuery({
-    queryKey: ['auth-overview', ref, 'top-auth-error-codes'],
-    queryFn: () => fetchTopAuthErrorCodes(ref as string),
+    queryKey: ['auth-overview', ref, 'top-auth-error-codes', { otel: useOtel }],
+    queryFn: () => fetchTopAuthErrorCodes(ref as string, useOtel),
     enabled: !!ref,
   })
 
   const responseErrors: ResponseErrorRow[] = Array.isArray(respErrData?.result)
-    ? (respErrData?.result as unknown[]).filter(isResponseErrorRow)
+    ? parseResponseErrors(respErrData.result)
     : []
   const errorCodes: AuthErrorCodeRow[] = Array.isArray(codeErrData?.result)
-    ? (codeErrData?.result as unknown[]).filter(isAuthErrorCodeRow)
+    ? parseAuthErrorCodes(codeErrData.result)
     : []
 
   const errorCodesActions = [

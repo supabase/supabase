@@ -1,3 +1,5 @@
+import { analyticsLiteral, safeSql } from '@/data/logs/safe-analytics-sql'
+
 export const SUPAMONITOR_EXCLUDED_ROLES = [
   'supabase_admin',
   'supabase_auth_admin',
@@ -22,7 +24,7 @@ export const getSupamonitorLogsQuery = (startTime: string, endTime: string) => {
   const safeStart = new Date(startTime).toISOString()
   const safeEnd = new Date(endTime).toISOString()
 
-  return `
+  return safeSql`
 -- This query is run by Supabase Query Insights to aggregate pg_stat_statements
 -- data collected by the supamonitor extension. It reads from Logflare and groups
 -- execution metrics (timing, call counts, percentiles) by query and minute so
@@ -58,9 +60,46 @@ from supamonitor_logs as sml
 cross join unnest(sml.metadata) as sml_metadata
 cross join unnest(sml_metadata.supamonitor) as sml_parsed
 WHERE sml.event_message = 'log'
-  AND sml.timestamp >= CAST('${safeStart}' AS TIMESTAMP)
-  AND sml.timestamp <= CAST('${safeEnd}' AS TIMESTAMP)
+  AND sml.timestamp >= CAST(${analyticsLiteral(safeStart)} AS TIMESTAMP)
+  AND sml.timestamp <= CAST(${analyticsLiteral(safeEnd)} AS TIMESTAMP)
 GROUP BY timestamp, user_name, database_name, application_name, query_id, query
 ORDER BY timestamp DESC
-`.trim()
+`
+}
+
+export const getSupamonitorLogsQueryOtel = (startTime: string, endTime: string) => {
+  const safeStart = new Date(startTime).toISOString()
+  const safeEnd = new Date(endTime).toISOString()
+
+  return safeSql`
+select
+  formatDateTime(toStartOfMinute(logs.timestamp), '%Y-%m-%dT%H:%i:%SZ', 'UTC') as timestamp,
+  log_attributes['supamonitor.application_name'] as application_name,
+  sum(toInt64OrZero(log_attributes['supamonitor.calls'])) as calls,
+  log_attributes['supamonitor.database_name'] as database_name,
+  log_attributes['supamonitor.query'] as query,
+  log_attributes['supamonitor.query_id'] as query_id,
+  sum(toFloat64OrNull(log_attributes['supamonitor.total_exec_time'])) as total_exec_time,
+  sum(toFloat64OrNull(log_attributes['supamonitor.total_plan_time'])) as total_plan_time,
+  log_attributes['supamonitor.user_name'] as user_name,
+  if(calls > 0, total_exec_time / calls, 0) as mean_exec_time,
+  min(nullIf(toFloat64OrNull(log_attributes['supamonitor.total_exec_time']), 0)) as min_exec_time,
+  max(toFloat64OrNull(log_attributes['supamonitor.total_exec_time'])) as max_exec_time,
+  if(calls > 0, total_plan_time / calls, 0) as mean_plan_time,
+  min(nullIf(toFloat64OrNull(log_attributes['supamonitor.total_plan_time']), 0)) as min_plan_time,
+  max(toFloat64OrNull(log_attributes['supamonitor.total_plan_time'])) as max_plan_time,
+  quantile(0.50)(toFloat64OrNull(log_attributes['supamonitor.total_exec_time'])) as p50_exec_time,
+  quantile(0.95)(toFloat64OrNull(log_attributes['supamonitor.total_exec_time'])) as p95_exec_time,
+  quantile(0.50)(toFloat64OrNull(log_attributes['supamonitor.total_plan_time'])) as p50_plan_time,
+  quantile(0.95)(toFloat64OrNull(log_attributes['supamonitor.total_plan_time'])) as p95_plan_time
+from logs
+where source = 'supamonitor_logs'
+  and event_message = 'log'
+  and logs.timestamp >= parseDateTime64BestEffort(${analyticsLiteral(safeStart)})
+  and logs.timestamp <= parseDateTime64BestEffort(${analyticsLiteral(safeEnd)})
+group by formatDateTime(toStartOfMinute(logs.timestamp), '%Y-%m-%dT%H:%i:%SZ', 'UTC'),
+  user_name, database_name, application_name, query_id, query
+order by timestamp desc
+limit 10000
+`
 }

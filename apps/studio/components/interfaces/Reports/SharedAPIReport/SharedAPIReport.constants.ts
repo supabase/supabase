@@ -1,12 +1,14 @@
 import * as Sentry from '@sentry/nextjs'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { isEqual } from 'lodash'
 import { useState } from 'react'
 
 import { generateRegexpWhereSafe } from '../Reports.constants'
 import { ReportFilterItem } from '../Reports.types'
+import { API_REPORT_QUERIES_OTEL } from '../Reports.utils.otel'
 import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
+import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import { safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 
 const SOURCE_TABLE: Record<string, SafeLogSqlFragment> = {
@@ -225,6 +227,8 @@ export const useSharedAPIReport = ({
   const { ref } = useParams() as { ref: string }
   const [filters, setFilters] = useState<ReportFilterItem[]>([])
   const queryClient = useQueryClient()
+  const useOtel = useFlag('otelLegacyLogs')
+  const reportQueries = useOtel ? API_REPORT_QUERIES_OTEL : SHARED_API_REPORT_SQL
   const filterByMapSource = {
     functions: 'function_edge_logs',
     realtime: 'edge_logs',
@@ -252,9 +256,10 @@ export const useSharedAPIReport = ({
   const allFilters = [baseFilter, ...filters]
 
   const queries = useQueries({
-    queries: Object.entries(SHARED_API_REPORT_SQL).map(([key, value]) => ({
+    queries: Object.entries(reportQueries).map(([key, value]) => ({
       queryKey: [
         ...DEFAULT_KEYS,
+        { otel: useOtel },
         filterBy,
         key,
         filterByMapSource[filterBy],
@@ -268,7 +273,7 @@ export const useSharedAPIReport = ({
         try {
           const data = await executeAnalyticsSql({
             projectRef: ref,
-            endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
+            endpoint: logsAllEndpointUrl(useOtel),
             sql: value.safeSql(allFilters, filterByMapSource[filterBy]),
             iso_timestamp_start: start,
             iso_timestamp_end: end,
@@ -334,28 +339,13 @@ export const useSharedAPIReport = ({
   const isLoadingData = Object.values(isLoading).some(Boolean)
 
   const SQLMap: Record<SharedAPIReportKey, SafeLogSqlFragment> = {
-    totalRequests: SHARED_API_REPORT_SQL.totalRequests.safeSql(
-      allFilters,
-      filterByMapSource[filterBy]
-    ),
-    topRoutes: SHARED_API_REPORT_SQL.topRoutes.safeSql(allFilters, filterByMapSource[filterBy]),
-    errorCounts: SHARED_API_REPORT_SQL.errorCounts.safeSql(allFilters, filterByMapSource[filterBy]),
-    topErrorRoutes: SHARED_API_REPORT_SQL.topErrorRoutes.safeSql(
-      allFilters,
-      filterByMapSource[filterBy]
-    ),
-    responseSpeed: SHARED_API_REPORT_SQL.responseSpeed.safeSql(
-      allFilters,
-      filterByMapSource[filterBy]
-    ),
-    topSlowRoutes: SHARED_API_REPORT_SQL.topSlowRoutes.safeSql(
-      allFilters,
-      filterByMapSource[filterBy]
-    ),
-    networkTraffic: SHARED_API_REPORT_SQL.networkTraffic.safeSql(
-      allFilters,
-      filterByMapSource[filterBy]
-    ),
+    totalRequests: reportQueries.totalRequests.safeSql(allFilters, filterByMapSource[filterBy]),
+    topRoutes: reportQueries.topRoutes.safeSql(allFilters, filterByMapSource[filterBy]),
+    errorCounts: reportQueries.errorCounts.safeSql(allFilters, filterByMapSource[filterBy]),
+    topErrorRoutes: reportQueries.topErrorRoutes.safeSql(allFilters, filterByMapSource[filterBy]),
+    responseSpeed: reportQueries.responseSpeed.safeSql(allFilters, filterByMapSource[filterBy]),
+    topSlowRoutes: reportQueries.topSlowRoutes.safeSql(allFilters, filterByMapSource[filterBy]),
+    networkTraffic: reportQueries.networkTraffic.safeSql(allFilters, filterByMapSource[filterBy]),
   }
 
   return {
