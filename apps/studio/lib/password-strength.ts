@@ -23,7 +23,7 @@ export function passwordNeedsPercentEncoding(password: string) {
  * non-ASCII spaces of table C.1.2 that it folds into a plain space.
  */
 const SASLPREP_REWRITTEN_CHARACTERS =
-  /[\u00A0\u00AD\u034F\u1680\u1806\u180B-\u180D\u2000-\u200D\u2028\u2029\u202F\u205F\u2060\u3000\uFE00-\uFE0F\uFEFF]/
+  /[\u00A0\u00AD\u034F\u1680\u1806\u180B-\u180D\u2000-\u200D\u202F\u205F\u2060\u3000\uFE00-\uFE0F\uFEFF]/
 
 /**
  * True when Postgres would store a SCRAM verifier for a different string than the one

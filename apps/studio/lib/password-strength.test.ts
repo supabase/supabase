@@ -56,6 +56,17 @@ describe('passwordHasUnsupportedCharacters', () => {
     }
   })
 
+  it('returns false for characters SASLprep prohibits rather than rewrites', () => {
+    const passwords = {
+      'line separator': 'aB1\u2028xYz9',
+      'paragraph separator': 'aB1\u2029xYz9',
+    }
+
+    for (const [label, password] of Object.entries(passwords)) {
+      expect(passwordHasUnsupportedCharacters(password), label).toBe(false)
+    }
+  })
+
   it('returns true for decomposed accents that NFKC recomposes', () => {
     const decomposed = 'e\u0300FO\u0308\u00c6aB12345'
 
