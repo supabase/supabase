@@ -94,7 +94,7 @@ export const TimezoneSettings = () => {
                     size="small"
                   >
                     <span className="flex min-w-0 items-center gap-2">
-                      <Globe className="h-4 w-4 shrink-0" />
+                      <Globe aria-hidden="true" className="h-4 w-4 shrink-0" />
                       <span className="truncate">
                         {isAutoDetected ? `Auto detect (${timezone})` : triggerLabel}
                       </span>
