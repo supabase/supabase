@@ -33,6 +33,7 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             apps/www
+            apps/docs/content/guides
             packages
             supabase
             patches
