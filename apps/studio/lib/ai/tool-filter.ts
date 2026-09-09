@@ -34,6 +34,7 @@ export const toolSetValidationSchema = z.record(
     'rename_chat',
     'escalate_to_human',
     'resolve_support_conversation',
+    'get_active_incidents',
     'list_policies',
     'list_reports',
     'get_report',
