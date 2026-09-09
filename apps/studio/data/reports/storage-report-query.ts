@@ -13,7 +13,7 @@ import type { LogsEndpointParams } from '@/components/interfaces/Settings/Logs/L
 import { useLogsQuery } from '@/hooks/analytics/useLogsQuery'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
-export const useStorageReport = () => {
+export const useStorageReport = (initialParams: Partial<LogsEndpointParams>) => {
   const { ref: projectRef } = useParams()
   const useOtel = useFlag('otelLegacyLogs')
   const [filters, setFilters] = useState<ReportFilterItem[]>([])
@@ -30,6 +30,7 @@ export const useStorageReport = () => {
 
   const totalRequests = useLogsQuery({
     projectRef,
+    initialParams,
     sql: useOtel
       ? API_REPORT_QUERIES_OTEL.totalRequests.safeSql(formattedFilters)
       : getLogsSql(PRESET_CONFIG.api.queries.totalRequests, formattedFilters),
@@ -37,6 +38,7 @@ export const useStorageReport = () => {
   })
   const topRoutes = useLogsQuery({
     projectRef,
+    initialParams,
     sql: useOtel
       ? API_REPORT_QUERIES_OTEL.topRoutes.safeSql(formattedFilters)
       : getLogsSql(PRESET_CONFIG.api.queries.topRoutes, formattedFilters),
@@ -44,6 +46,7 @@ export const useStorageReport = () => {
   })
   const errorCounts = useLogsQuery({
     projectRef,
+    initialParams,
     sql: useOtel
       ? API_REPORT_QUERIES_OTEL.errorCounts.safeSql(formattedFilters)
       : getLogsSql(PRESET_CONFIG.api.queries.errorCounts, formattedFilters),
@@ -51,6 +54,7 @@ export const useStorageReport = () => {
   })
   const topErrorRoutes = useLogsQuery({
     projectRef,
+    initialParams,
     sql: useOtel
       ? API_REPORT_QUERIES_OTEL.topErrorRoutes.safeSql(formattedFilters)
       : getLogsSql(PRESET_CONFIG.api.queries.topErrorRoutes, formattedFilters),
@@ -58,6 +62,7 @@ export const useStorageReport = () => {
   })
   const responseSpeed = useLogsQuery({
     projectRef,
+    initialParams,
     sql: useOtel
       ? API_REPORT_QUERIES_OTEL.responseSpeed.safeSql(formattedFilters)
       : getLogsSql(PRESET_CONFIG.api.queries.responseSpeed, formattedFilters),
@@ -65,6 +70,7 @@ export const useStorageReport = () => {
   })
   const topSlowRoutes = useLogsQuery({
     projectRef,
+    initialParams,
     sql: useOtel
       ? API_REPORT_QUERIES_OTEL.topSlowRoutes.safeSql(formattedFilters)
       : getLogsSql(PRESET_CONFIG.api.queries.topSlowRoutes, formattedFilters),
@@ -72,6 +78,7 @@ export const useStorageReport = () => {
   })
   const networkTraffic = useLogsQuery({
     projectRef,
+    initialParams,
     sql: useOtel
       ? API_REPORT_QUERIES_OTEL.networkTraffic.safeSql(formattedFilters)
       : getLogsSql(PRESET_CONFIG.api.queries.networkTraffic, formattedFilters),
@@ -79,6 +86,7 @@ export const useStorageReport = () => {
   })
   const cacheHitRate = useLogsQuery({
     projectRef,
+    initialParams,
     sql: useOtel
       ? STORAGE_REPORT_QUERIES_OTEL.cacheHitRate.safeSql()
       : getLogsSql(PRESET_CONFIG.storage.queries.cacheHitRate, []),
@@ -86,6 +94,7 @@ export const useStorageReport = () => {
   })
   const topCacheMisses = useLogsQuery({
     projectRef,
+    initialParams,
     sql: useOtel
       ? STORAGE_REPORT_QUERIES_OTEL.topCacheMisses.safeSql()
       : getLogsSql(PRESET_CONFIG.storage.queries.topCacheMisses, []),
@@ -169,6 +178,8 @@ export const useStorageReport = () => {
       topErrorRoute: topErrorRoutes.error,
       topSlowRoutes: topSlowRoutes.error,
       networkTraffic: networkTraffic.error,
+      cacheHitRate: cacheHitRate.error,
+      topCacheMisses: topCacheMisses.error,
     },
     mergeParams: handleSetParams,
     filters,
