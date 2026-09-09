@@ -23,15 +23,24 @@ To access the auth token securely for your Edge Function call, we recommend stor
 
 </Admonition>
 
+A `pg_cron` job calls your function as a service, not on behalf of a signed-in user, so it authenticates the same way any other [service-to-service call](/docs/guides/functions/auth#service-to-service-calls) does: with a _secret key_ on the `apikey` header, not a publishable key. Publishable keys are meant for public clients such as web pages and mobile apps. Secret keys are for trusted backend callers like periodic jobs. See [Understanding API keys](/docs/guides/getting-started/api-keys) for the full breakdown.
+
+Since the request won't carry a user JWT on `Authorization`, also disable `verify_jwt` for the scheduled function in `supabase/config.toml`, and validate the secret key inside your handler with `auth: 'secret'`:
+
+```toml
+[functions.function-name]
+verify_jwt = false
+```
+
 ## Examples
 
 ### Invoke an Edge Function every minute
 
-Store `project_url` and `publishable_key` in Supabase Vault:
+Store `project_url` and `secret_key` in Supabase Vault:
 
 ```sql
 select vault.create_secret('https://project-ref.supabase.co', 'project_url');
-select vault.create_secret('YOUR_SUPABASE_PUBLISHABLE_KEY', 'publishable_key');
+select vault.create_secret('YOUR_SUPABASE_SECRET_KEY', 'secret_key');
 ```
 
 Make a POST request to a Supabase Edge Function every minute:
@@ -47,13 +56,19 @@ select
           url:= (select decrypted_secret from vault.decrypted_secrets where name = 'project_url') || '/functions/v1/function-name',
           headers:=jsonb_build_object(
             'Content-type', 'application/json',
-            'apikey', (select decrypted_secret from vault.decrypted_secrets where name = 'publishable_key')
+            'apikey', (select decrypted_secret from vault.decrypted_secrets where name = 'secret_key')
           ),
           body:=concat('{"time": "', now(), '"}')::jsonb
       ) as request_id;
     $$
   );
 ```
+
+<Admonition type="caution">
+
+Never use a publishable key here. With `verify_jwt` disabled, requests reach the function without platform JWT validation, so it's the handler's `auth: 'secret'` check that rejects callers without a secret key. A publishable key ships in your web or mobile app, so anyone holding it could reach the function too — don't rely on the platform check alone to keep it private.
+
+</Admonition>
 
 ## Resources
 
