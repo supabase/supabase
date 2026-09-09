@@ -115,3 +115,12 @@ export const API_REPORT_QUERIES_OTEL = {
       ),
   },
 }
+
+export const requestsByCountryOtel = (filters: ReportFilterItem[]) => safeSql`
+  select log_attributes['request.cf.country'] as country, toFloat64(count()) as count
+  from logs
+  where source = 'edge_logs' and log_attributes['request.cf.country'] != ''
+    ${generateReportFiltersOtel(filters)}
+  group by country
+  limit 1000
+`

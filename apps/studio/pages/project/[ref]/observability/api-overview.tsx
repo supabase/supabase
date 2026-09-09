@@ -28,7 +28,18 @@ import type { NextPageWithLayout } from '@/types'
 const REPORT_TITLE = 'API Gateway'
 
 export const ApiReport: NextPageWithLayout = () => {
-  const report = useApiReport()
+  const {
+    datePickerHelpers,
+    datePickerValue,
+    handleDatePickerChange: handleDatePickerChangeFromHook,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+
+  const report = useApiReport({
+    iso_timestamp_start: datePickerValue.from,
+    iso_timestamp_end: datePickerValue.to,
+  })
 
   const {
     data,
@@ -41,14 +52,6 @@ export const ApiReport: NextPageWithLayout = () => {
     addFilter,
     refresh,
   } = report
-
-  const {
-    datePickerHelpers,
-    datePickerValue,
-    handleDatePickerChange: handleDatePickerChangeFromHook,
-    showUpgradePrompt,
-    setShowUpgradePrompt,
-  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   const handleDatepickerChange = useCallback(
     (vals: DatePickerValue) => {
