@@ -28,7 +28,10 @@ export const SidebarBreadcrumb = ({
           {parent && (
             <>
               <BreadcrumbItem className="min-w-0">
-                <BreadcrumbLink asChild className="min-w-0 cursor-pointer truncate focus-ring">
+                <BreadcrumbLink
+                  asChild
+                  className="min-w-0 cursor-pointer truncate no-underline focus-ring"
+                >
                   <button type="button" tabIndex={0} onClick={parent.onClick} title={parent.label}>
                     {parent.label}
                   </button>

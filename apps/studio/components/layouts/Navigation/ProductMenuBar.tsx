@@ -8,6 +8,12 @@ interface ProductMenuBarProps {
   className?: string
 }
 
+export const ProductMenuBarHeader = ({ children }: PropsWithChildren) => (
+  <div className="border-default flex shrink-0 min-h-(--header-height) items-center gap-2 border-b px-6 justify-between">
+    {children}
+  </div>
+)
+
 export const ProductMenuBar = ({
   title,
   titleBadge,
@@ -26,14 +32,14 @@ export const ProductMenuBar = ({
         'hide-scrollbar bg-dash-sidebar border-default'
       )}
     >
-      <div className="border-default flex min-h-(--header-height) items-center gap-2 border-b px-6 justify-between">
+      <ProductMenuBarHeader>
         {header ?? (
           <>
             <h4 className="text-sm truncate min-w-0 flex-1">{title}</h4>
             {titleBadge}
           </>
         )}
-      </div>
+      </ProductMenuBarHeader>
       <div className={cn('grow overflow-y-auto', className)}>{children}</div>
     </div>
   )

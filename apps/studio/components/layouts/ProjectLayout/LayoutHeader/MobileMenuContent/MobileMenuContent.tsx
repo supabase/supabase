@@ -19,6 +19,7 @@ import {
   useGenerateOtherRoutes,
   useGenerateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
+import { ProductMenuBarHeader } from '@/components/layouts/Navigation/ProductMenuBar'
 import type { Route } from '@/components/ui/ui.types'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -151,9 +152,7 @@ export function MobileMenuContent({
         </div>
       )}
       {hasCurrentProductHeader && (
-        <div className="flex shrink-0 min-h-(--header-height) items-center gap-2 border-b px-3">
-          {currentProductMenuHeader}
-        </div>
+        <ProductMenuBarHeader>{currentProductMenuHeader}</ProductMenuBarHeader>
       )}
       <div
         className={cn(
@@ -188,7 +187,7 @@ export function MobileMenuContent({
           </nav>
         )}
         {viewLevel === 'section' && sectionKeyToShow && (
-          <div className={cn('p-1', hasCurrentProductHeader && 'min-h-0 flex-1')}>
+          <div className={cn('p-1', hasCurrentProductHeader && 'min-h-0 flex-1 p-0')}>
             {sectionKeyToShow === currentSectionKey && currentProductMenu ? (
               currentProductMenu
             ) : SectionMenuContent ? (
