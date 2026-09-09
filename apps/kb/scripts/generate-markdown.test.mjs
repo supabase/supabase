@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { absolutizeLinks, parseFrontmatter, renderMarkdown } from './generate-markdown.mjs'
+import {
+  absolutizeLinks,
+  parseFrontmatter,
+  renderMarkdown,
+  renderTopicMarkdown,
+} from './generate-markdown.mjs'
 
 describe('parseFrontmatter', () => {
   it('parses title/description out of the YAML frontmatter and returns the rest as body', () => {
@@ -69,5 +74,25 @@ describe('renderMarkdown', () => {
 
   it('skips the heading/lead lines gracefully when title or description are missing', () => {
     expect(renderMarkdown({}, 'Body text.')).toBe('Body text.\n')
+  })
+})
+
+describe('renderTopicMarkdown', () => {
+  const topic = { name: 'Tutorial', description: 'Step-by-step walkthroughs.' }
+
+  it('renders the topic as an h1/description followed by a bullet list of its guides', () => {
+    const guides = [
+      { title: 'Sample guide', url: 'https://supabase.com/kb/guides/sample-guide.md' },
+    ]
+
+    expect(renderTopicMarkdown(topic, guides)).toBe(
+      '# Tutorial\n\nStep-by-step walkthroughs.\n\n- [Sample guide](https://supabase.com/kb/guides/sample-guide.md)\n'
+    )
+  })
+
+  it('falls back to "No guides for this topic" when the list is empty', () => {
+    expect(renderTopicMarkdown(topic, [])).toBe(
+      '# Tutorial\n\nStep-by-step walkthroughs.\n\nNo guides for this topic\n'
+    )
   })
 })

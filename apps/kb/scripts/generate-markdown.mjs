@@ -9,6 +9,8 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import YAML from 'yaml'
 
+import { TOPICS, topicToSlug } from '../src/lib/topics.ts'
+
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url))
 const CONTENT_DIR = path.join(SCRIPT_DIR, '..', 'src', 'content')
 const OUTPUT_DIR = path.join(SCRIPT_DIR, '..', 'public', 'markdown')
@@ -69,10 +71,34 @@ export function renderMarkdown(data, body) {
   return `${heading}${lead}${absolutizeLinks(body.trim())}\n`
 }
 
+/**
+ * Renders a topic index: its name as an h1, its description as the
+ * paragraph beneath it, then a bullet list linking to every guide tagged
+ * with that topic — same data `src/pages/topics/[topic].astro` renders,
+ * as a plain markdown page.
+ *
+ * @param {{ name: string; description: string }} topic
+ * @param {{ title: string; url: string }[]} guides
+ */
+export function renderTopicMarkdown(topic, guides) {
+  const list = guides.length
+    ? guides.map((guide) => `- [${guide.title}](${guide.url})`).join('\n')
+    : 'No guides for this topic'
+  return `# ${topic.name}\n\n${topic.description}\n\n${list}\n`
+}
+
 // file.mdx -> file.md, file.md -> file.md — no regex, just a suffix swap.
 function toMdExtension(fileName) {
   if (fileName.endsWith('.mdx')) return `${fileName.slice(0, -'.mdx'.length)}.md`
   return fileName
+}
+
+// Strips the .md/.mdx extension off a content-relative path and turns it
+// into the full, absolute URL of that page's markdown export.
+function toGuideUrl(relativePath) {
+  const posixPath = relativePath.split(path.sep).join('/')
+  const withoutExt = toMdExtension(posixPath).slice(0, -'.md'.length)
+  return `${SITE_ORIGIN}${BASE_PATH}/${withoutExt}.md`
 }
 
 async function findContentFiles(dir) {
@@ -88,19 +114,41 @@ async function findContentFiles(dir) {
   return files.flat()
 }
 
+async function writeFileEnsuringDir(outputPath, contents) {
+  await mkdir(path.dirname(outputPath), { recursive: true })
+  await writeFile(outputPath, contents)
+}
+
 async function main() {
   const files = await findContentFiles(CONTENT_DIR)
+
+  // Only entries with a `topics` array (currently just the `guides`
+  // collection) feed the per-topic index pages below.
+  const guidesByTopic = new Map(TOPICS.map((topic) => [topic.name, []]))
 
   await Promise.all(
     files.map(async (file) => {
       const raw = await readFile(file, 'utf-8')
       const { data, body } = parseFrontmatter(raw)
-      const markdown = renderMarkdown(data, body)
+      const relativePath = path.relative(CONTENT_DIR, file)
 
-      const relativePath = toMdExtension(path.relative(CONTENT_DIR, file))
-      const outputPath = path.join(OUTPUT_DIR, relativePath)
-      await mkdir(path.dirname(outputPath), { recursive: true })
-      await writeFile(outputPath, markdown)
+      const markdown = renderMarkdown(data, body)
+      const outputPath = path.join(OUTPUT_DIR, toMdExtension(relativePath))
+      await writeFileEnsuringDir(outputPath, markdown)
+
+      if (!Array.isArray(data.topics)) return
+      const guide = { title: data.title, url: toGuideUrl(relativePath) }
+      for (const topicName of data.topics) {
+        guidesByTopic.get(topicName)?.push(guide)
+      }
+    })
+  )
+
+  await Promise.all(
+    TOPICS.map((topic) => {
+      const markdown = renderTopicMarkdown(topic, guidesByTopic.get(topic.name))
+      const outputPath = path.join(OUTPUT_DIR, 'topics', `${topicToSlug(topic.name)}.md`)
+      return writeFileEnsuringDir(outputPath, markdown)
     })
   )
 }
