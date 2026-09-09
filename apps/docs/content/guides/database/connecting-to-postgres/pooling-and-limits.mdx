@@ -42,7 +42,7 @@ Supabase offers two poolers. The shared pooler, [Supavisor](https://github.com/s
 
 The dedicated pooler runs on the same machine as your database, so it connects with lower latency than the shared pooler, which runs on a separate server. It also uses more of your project's compute resources. If your network supports IPv6, or you have the IPv4 add-on, use the dedicated pooler instead of the shared pooler. Direct connections have no pooler overhead, but they require IPv6 unless you have the IPv4 add-on.
 
-You can run both poolers at once, but don't do it unless you're trying to increase the total number of concurrent client connections. In most cases, choose either PgBouncer or Supavisor for pooled or transaction-based traffic. Direct connections remain the best choice for long-lived sessions, and shared pooler session mode is the alternative when those sessions need IPv4. Running both poolers at once increases the risk of hitting your database's maximum connection limit on smaller compute sizes.
+In most cases, choose either PgBouncer or Supavisor for pooled or transaction-based traffic. Direct connections remain the best choice for long-lived sessions, and shared pooler session mode is the alternative when those sessions need IPv4. Run both poolers at once only when you need to raise the total number of concurrent client connections, and expect a higher risk of hitting your database's maximum connection limit on smaller compute sizes.
 
 ## Connection limits
 
