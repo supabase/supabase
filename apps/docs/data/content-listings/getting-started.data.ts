@@ -60,14 +60,6 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
   type: 'grid',
   items: [
     {
-      title: 'Next.js',
-      href: '/guides/getting-started/quickstarts/nextjs',
-      icon: '/docs/img/icons/nextjs-icon',
-      hasLightIcon: true,
-      description:
-        'Full-stack React with server rendering, wired to Supabase Postgres and cookie-based auth.',
-    },
-    {
       title: 'React',
       href: '/guides/getting-started/quickstarts/reactjs',
       icon: '/docs/img/icons/react-icon',
@@ -76,12 +68,19 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
         'Build single-page apps from reusable components, and query Supabase Postgres from the browser.',
     },
     {
-      title: 'Nuxt',
-      href: '/guides/getting-started/quickstarts/nuxtjs',
-      icon: '/docs/img/icons/nuxt-icon',
-      hasLightIcon: false,
+      title: 'Next.js',
+      href: '/guides/getting-started/quickstarts/nextjs',
+      icon: '/docs/img/icons/nextjs-icon',
+      hasLightIcon: true,
       description:
-        'Full-stack Vue with server rendering, reading Postgres through a Supabase composable.',
+        'Full-stack React with server rendering, wired to Supabase Postgres and cookie-based auth.',
+    },
+    {
+      title: 'TanStack Start',
+      href: '/guides/getting-started/quickstarts/tanstack',
+      icon: '/docs/img/icons/tanstack-icon',
+      hasLightIcon: true,
+      description: 'Type-safe full-stack React that queries Supabase Postgres in server functions.',
     },
     {
       title: 'Astro',
@@ -100,28 +99,51 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
         'Build single-page apps with the Vue composition API, backed by Supabase Postgres.',
     },
     {
+      title: 'Nuxt',
+      href: '/guides/getting-started/quickstarts/nuxtjs',
+      icon: '/docs/img/icons/nuxt-icon',
+      hasLightIcon: false,
+      description:
+        'Full-stack Vue with server rendering, reading Postgres through a Supabase composable.',
+    },
+    {
+      title: 'SvelteKit',
+      href: '/guides/getting-started/quickstarts/sveltekit',
+      icon: '/docs/img/icons/svelte-icon',
+      hasLightIcon: false,
+      description: 'Full-stack Svelte that loads Supabase Postgres data in server load functions.',
+    },
+    {
+      title: 'SolidJS',
+      href: '/guides/getting-started/quickstarts/solidjs',
+      icon: '/docs/img/icons/solidjs-icon',
+      hasLightIcon: false,
+      description:
+        'Fine-grained reactive UIs that load Supabase Postgres data with Solid resources.',
+    },
+    {
+      title: 'RedwoodJS',
+      href: '/guides/getting-started/quickstarts/redwoodjs',
+      icon: '/docs/img/icons/redwood-icon',
+      hasLightIcon: false,
+      description:
+        'Full-stack React and GraphQL, with Prisma migrations against your Supabase Postgres database.',
+    },
+    {
+      title: 'Refine',
+      href: '/guides/getting-started/quickstarts/refine',
+      icon: '/docs/img/icons/refine-icon',
+      hasLightIcon: false,
+      description:
+        'Scaffold CRUD dashboards and admin panels straight from your Supabase Postgres tables.',
+    },
+    {
       title: 'Hono',
       href: '/guides/getting-started/quickstarts/hono',
       icon: '/docs/img/icons/hono-icon',
       hasLightIcon: false,
       description:
         'Lightweight web APIs with Supabase Auth anonymous sign-in and RLS-protected reads.',
-    },
-    {
-      title: 'Expo React Native',
-      href: '/guides/getting-started/quickstarts/expo-react-native',
-      icon: '/docs/img/icons/expo-icon',
-      hasLightIcon: true,
-      description:
-        'Ship iOS and Android from one React Native codebase, backed by Supabase Postgres.',
-    },
-    {
-      title: 'Flutter',
-      href: '/guides/getting-started/quickstarts/flutter',
-      icon: '/docs/img/icons/flutter-icon',
-      hasLightIcon: false,
-      feature: 'sdk:dart',
-      description: 'Ship iOS and Android from one Dart codebase, backed by Supabase Postgres.',
     },
     {
       title: 'iOS SwiftUI',
@@ -141,42 +163,20 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
         'Native Android apps in Kotlin and Jetpack Compose, using the Supabase Kotlin SDK.',
     },
     {
-      title: 'SvelteKit',
-      href: '/guides/getting-started/quickstarts/sveltekit',
-      icon: '/docs/img/icons/svelte-icon',
-      hasLightIcon: false,
-      description: 'Full-stack Svelte that loads Supabase Postgres data in server load functions.',
-    },
-    {
-      title: 'SolidJS',
-      href: '/guides/getting-started/quickstarts/solidjs',
-      icon: '/docs/img/icons/solidjs-icon',
-      hasLightIcon: false,
-      description:
-        'Fine-grained reactive UIs that load Supabase Postgres data with Solid resources.',
-    },
-    {
-      title: 'TanStack Start',
-      href: '/guides/getting-started/quickstarts/tanstack',
-      icon: '/docs/img/icons/tanstack-icon',
+      title: 'Expo React Native',
+      href: '/guides/getting-started/quickstarts/expo-react-native',
+      icon: '/docs/img/icons/expo-icon',
       hasLightIcon: true,
-      description: 'Type-safe full-stack React that queries Supabase Postgres in server functions.',
+      description:
+        'Ship iOS and Android from one React Native codebase, backed by Supabase Postgres.',
     },
     {
-      title: 'RedwoodJS',
-      href: '/guides/getting-started/quickstarts/redwoodjs',
-      icon: '/docs/img/icons/redwood-icon',
+      title: 'Flutter',
+      href: '/guides/getting-started/quickstarts/flutter',
+      icon: '/docs/img/icons/flutter-icon',
       hasLightIcon: false,
-      description:
-        'Full-stack React and GraphQL, with Prisma migrations against your Supabase Postgres database.',
-    },
-    {
-      title: 'Refine',
-      href: '/guides/getting-started/quickstarts/refine',
-      icon: '/docs/img/icons/refine-icon',
-      hasLightIcon: false,
-      description:
-        'Scaffold CRUD dashboards and admin panels straight from your Supabase Postgres tables.',
+      feature: 'sdk:dart',
+      description: 'Ship iOS and Android from one Dart codebase, backed by Supabase Postgres.',
     },
     {
       title: 'Python',
@@ -212,7 +212,8 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
     {
       title: 'Spring Boot',
       href: '/guides/getting-started/quickstarts/spring-boot',
-      icon: { kind: 'server', color: '#64748B', bg: 'rgba(100,116,139,0.1)' },
+      icon: '/docs/img/icons/spring-boot-icon',
+      hasLightIcon: false,
       description:
         'Java APIs with Spring Data JPA connected directly to your Supabase Postgres database.',
     },

@@ -367,16 +367,16 @@ export const gettingstarted: NavMenuConstant = {
       enabled: frameworkQuickstartsEnabled,
       items: [
         {
-          name: 'Next.js',
-          url: '/guides/getting-started/quickstarts/nextjs',
-        },
-        {
           name: 'React',
           url: '/guides/getting-started/quickstarts/reactjs',
         },
         {
-          name: 'Nuxt',
-          url: '/guides/getting-started/quickstarts/nuxtjs',
+          name: 'Next.js',
+          url: '/guides/getting-started/quickstarts/nextjs',
+        },
+        {
+          name: 'TanStack Start',
+          url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
         },
         {
           name: 'Astro',
@@ -387,24 +387,8 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/vue',
         },
         {
-          name: 'Hono',
-          url: '/guides/getting-started/quickstarts/hono',
-        },
-        {
-          name: 'Expo React Native',
-          url: '/guides/getting-started/quickstarts/expo-react-native',
-        },
-        {
-          name: 'Flutter',
-          url: '/guides/getting-started/quickstarts/flutter',
-        },
-        {
-          name: 'iOS SwiftUI',
-          url: '/guides/getting-started/quickstarts/ios-swiftui',
-        },
-        {
-          name: 'Android Kotlin',
-          url: '/guides/getting-started/quickstarts/kotlin' as `/${string}`,
+          name: 'Nuxt',
+          url: '/guides/getting-started/quickstarts/nuxtjs',
         },
         {
           name: 'SvelteKit',
@@ -415,16 +399,32 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/solidjs',
         },
         {
-          name: 'TanStack Start',
-          url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
-        },
-        {
           name: 'RedwoodJS',
           url: '/guides/getting-started/quickstarts/redwoodjs' as `/${string}`,
         },
         {
           name: 'Refine',
           url: '/guides/getting-started/quickstarts/refine',
+        },
+        {
+          name: 'Hono',
+          url: '/guides/getting-started/quickstarts/hono',
+        },
+        {
+          name: 'iOS SwiftUI',
+          url: '/guides/getting-started/quickstarts/ios-swiftui',
+        },
+        {
+          name: 'Android Kotlin',
+          url: '/guides/getting-started/quickstarts/kotlin' as `/${string}`,
+        },
+        {
+          name: 'Expo React Native',
+          url: '/guides/getting-started/quickstarts/expo-react-native',
+        },
+        {
+          name: 'Flutter',
+          url: '/guides/getting-started/quickstarts/flutter',
         },
         {
           name: 'Flask (Python)',
