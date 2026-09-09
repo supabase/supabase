@@ -31,3 +31,18 @@ describe('getRecentItemHref', () => {
     ).toBe('/project/default/explorer/notebook/notebook-1')
   })
 })
+
+it('reopens a schema visualizer with its encoded schema', () => {
+  expect(
+    getRecentItemHref(
+      {
+        id: 'schema-sales & reports',
+        type: 'schema',
+        label: 'Schema Visualizer',
+        timestamp: 1,
+        metadata: { schema: 'sales & reports' },
+      },
+      'default'
+    )
+  ).toBe('/project/default/explorer/schema?schema=sales%20%26%20reports')
+})

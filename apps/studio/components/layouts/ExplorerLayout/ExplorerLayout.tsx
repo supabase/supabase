@@ -20,6 +20,7 @@ import { ExplorerNavChats } from './ExplorerNavChats'
 import { ExplorerNavDatabase } from './ExplorerNavDatabase'
 import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
+import { ExplorerNavSchema } from './ExplorerNavSchema'
 import { ExplorerNavTables } from './ExplorerNavTables'
 import { ExplorerGeneratedPageTabCoordinator } from '@/components/interfaces/Explorer/ExplorerGeneratedPageTabCoordinator'
 import { ExplorerNotebookTabCoordinator } from '@/components/interfaces/Explorer/ExplorerNotebookTabCoordinator'
@@ -44,16 +45,23 @@ export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayout
   title?: string
 }
 
+type ExplorerNavEntry =
+  | { level: ExplorerNavLevel }
+  | { level: 'database-schema' | 'database-tables'; schema: string }
+
 export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayoutProps) => {
   const { ref } = useParams()
   const tabs = useTabsStateSnapshot()
 
   // A stack rather than a single value, so drilling in is a push and going back is a pop —
-  // which is what lets Database sit two levels deep without the layout tracking parents.
-  const [navStack, setNavStack] = useState<ExplorerNavLevel[]>([])
-  const level = navStack.at(-1)
+  // so each database level keeps its schema when returning from a deeper panel.
+  const [navStack, setNavStack] = useState<ExplorerNavEntry[]>([])
+  const entry = navStack.at(-1)
+  const level = entry?.level
 
-  const pushLevel = (next: ExplorerNavLevel) => setNavStack((stack) => [...stack, next])
+  const pushLevel = (next: ExplorerNavLevel) => setNavStack((stack) => [...stack, { level: next }])
+  const pushSchemaLevel = (level: 'database-schema' | 'database-tables', schema: string) =>
+    setNavStack((stack) => [...stack, { level, schema }])
   const popLevel = () => setNavStack((stack) => stack.slice(0, -1))
 
   const { setIsTemporary: setIsTemporarySqlEditorVisit } = useIsTemporarySqlEditorVisit(ref)
@@ -83,10 +91,26 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
           <AnimatePresence mode="wait">
             {level === undefined && <ExplorerNavHome key="home" onSelectLevel={pushLevel} />}
             {level === 'database' && (
-              <ExplorerNavDatabase key="database" onBack={popLevel} onSelectLevel={pushLevel} />
+              <ExplorerNavDatabase
+                key="database"
+                onBack={popLevel}
+                onSelectSchema={(schema) => pushSchemaLevel('database-schema', schema)}
+              />
             )}
-            {level === 'database-tables' && (
-              <ExplorerNavTables key="database-tables" onBack={popLevel} />
+            {entry?.level === 'database-schema' && (
+              <ExplorerNavSchema
+                key={`schema-${entry.schema}`}
+                schema={entry.schema}
+                onBack={popLevel}
+                onSelectTables={() => pushSchemaLevel('database-tables', entry.schema)}
+              />
+            )}
+            {entry?.level === 'database-tables' && (
+              <ExplorerNavTables
+                key={`tables-${entry.schema}`}
+                schema={entry.schema}
+                onBack={popLevel}
+              />
             )}
             {level === 'notebook' && <ExplorerNavNotebooks key="notebooks" onBack={popLevel} />}
             {level === 'chat' && <ExplorerNavChats key="chats" onBack={popLevel} />}

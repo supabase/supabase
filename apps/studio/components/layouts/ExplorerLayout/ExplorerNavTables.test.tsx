@@ -1,12 +1,15 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { HttpResponse } from 'msw'
 import type { ComponentType, PropsWithChildren } from 'react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ExplorerNavTables } from './ExplorerNavTables'
 import { entityQueryId } from '@/components/interfaces/Explorer/entityQuery.utils'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import type { EntityTypesResponse } from '@/data/entity-types/entity-types-infinite-query'
 import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
 
 const openEntityQuery = vi.fn()
 
@@ -26,8 +29,6 @@ vi.mock('./ExplorerLayout.constants', () => ({
   ExplorerNavPanel: ({ children }: PropsWithChildren) => <div>{children}</div>,
   rowClassName: (isActive: boolean) => (isActive ? 'active' : 'inactive'),
 }))
-
-vi.mock('@/components/ui/SchemaSelector', () => ({ SchemaSelector: () => null }))
 
 // The virtualizer measures a zero-height container in jsdom and renders no rows, so this
 // stands in for it to exercise the row itself.
@@ -50,35 +51,39 @@ vi.mock('@/components/interfaces/Explorer/hooks', () => ({
   useOpenEntityQuery: () => ({ openEntityQuery }),
 }))
 
-vi.mock('@/hooks/misc/useSchemaQueryState', () => ({
-  useQuerySchemaState: () => ({ selectedSchema: 'public', setSelectedSchema: vi.fn() }),
-}))
-
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useSelectedProjectQuery: () => ({ data: { ref: 'abc', connectionString: 'postgres://' } }),
 }))
 
-vi.mock('@/data/entity-types/entity-types-infinite-query', () => ({
-  useEntityTypesQuery: () => ({
-    data: {
-      pages: [
-        {
-          data: {
-            entities: [
-              { id: 1, schema: 'public', name: 'users', type: ENTITY_TYPE.TABLE },
-              { id: 2, schema: 'public', name: 'posts', type: ENTITY_TYPE.TABLE },
-            ],
-          },
-        },
-      ],
-    },
-    isPending: false,
-  }),
-}))
-
 describe('ExplorerNavTables', () => {
+  beforeEach(() => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async ({ request }) => {
+        const { query } = (await request.json()) as { query: string }
+        const schema = query.includes("'analytics'") ? 'analytics' : 'public'
+        return HttpResponse.json<EntityTypesResponse[]>([
+          {
+            data: {
+              count: 2,
+              entities: ['users', 'posts'].map((name, index) => ({
+                id: index + 1,
+                schema,
+                name,
+                type: ENTITY_TYPE.TABLE,
+                comment: null,
+                rls_enabled: true,
+              })),
+            },
+          },
+        ])
+      },
+    })
+  })
+
   it('marks the table backing the open query and opens the clicked one as a query', async () => {
-    customRender(<ExplorerNavTables onBack={vi.fn()} />)
+    customRender(<ExplorerNavTables schema="public" onBack={vi.fn()} />)
 
     await waitFor(() => expect(screen.getByRole('button', { name: 'users' })).toBeInTheDocument())
     expect(screen.getByRole('button', { name: 'posts' })).toHaveClass('active')
@@ -91,5 +96,40 @@ describe('ExplorerNavTables', () => {
       name: 'users',
       type: ENTITY_TYPE.TABLE,
     })
+  })
+})
+
+it('opens tables from the drilled schema even when the current query is in public', async () => {
+  addAPIMock({
+    method: 'post',
+    path: '/platform/pg-meta/:ref/query',
+    response: async ({ request }) => {
+      const { query } = (await request.json()) as { query: string }
+      expect(query).toContain("'analytics'")
+      return HttpResponse.json<EntityTypesResponse[]>([
+        {
+          data: {
+            count: 1,
+            entities: [
+              {
+                id: 3,
+                schema: 'analytics',
+                name: 'events',
+                type: ENTITY_TYPE.TABLE,
+                comment: null,
+                rls_enabled: true,
+              },
+            ],
+          },
+        },
+      ])
+    },
+  })
+  customRender(<ExplorerNavTables schema="analytics" onBack={vi.fn()} />)
+  await userEvent.click(await screen.findByRole('button', { name: 'events' }))
+  expect(openEntityQuery).toHaveBeenCalledWith({
+    schema: 'analytics',
+    name: 'events',
+    type: ENTITY_TYPE.TABLE,
   })
 })

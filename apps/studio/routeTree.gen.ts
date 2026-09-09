@@ -146,6 +146,7 @@ import { Route as ProjectRefLogsAuthLogsRouteImport } from './routes/project/$re
 import { Route as ProjectRefFunctionsSecretsRouteImport } from './routes/project/$ref/functions/secrets'
 import { Route as ProjectRefFunctionsNewRouteImport } from './routes/project/$ref/functions/new'
 import { Route as ProjectRefFunctionsFunctionSlugRouteImport } from './routes/project/$ref/functions/$functionSlug'
+import { Route as ProjectRefExplorerSchemaRouteImport } from './routes/project/$ref/explorer/schema'
 import { Route as ProjectRefEditorNewRouteImport } from './routes/project/$ref/editor/new'
 import { Route as ProjectRefEditorIdRouteImport } from './routes/project/$ref/editor/$id'
 import { Route as ProjectRefDatabaseTypesRouteImport } from './routes/project/$ref/database/types'
@@ -1062,6 +1063,12 @@ const ProjectRefFunctionsFunctionSlugRoute =
     id: '/$functionSlug',
     path: '/$functionSlug',
     getParentRoute: () => ProjectRefFunctionsRoute,
+  } as any)
+const ProjectRefExplorerSchemaRoute =
+  ProjectRefExplorerSchemaRouteImport.update({
+    id: '/schema',
+    path: '/schema',
+    getParentRoute: () => ProjectRefExplorerRoute,
   } as any)
 const ProjectRefEditorNewRoute = ProjectRefEditorNewRouteImport.update({
   id: '/new',
@@ -2262,6 +2269,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/types': typeof ProjectRefDatabaseTypesRoute
   '/project/$ref/editor/$id': typeof ProjectRefEditorIdRoute
   '/project/$ref/editor/new': typeof ProjectRefEditorNewRoute
+  '/project/$ref/explorer/schema': typeof ProjectRefExplorerSchemaRoute
   '/project/$ref/functions/$functionSlug': typeof ProjectRefFunctionsFunctionSlugRouteWithChildren
   '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
   '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
@@ -2571,6 +2579,7 @@ export interface FileRoutesByTo {
   '/project/$ref/database/types': typeof ProjectRefDatabaseTypesRoute
   '/project/$ref/editor/$id': typeof ProjectRefEditorIdRoute
   '/project/$ref/editor/new': typeof ProjectRefEditorNewRoute
+  '/project/$ref/explorer/schema': typeof ProjectRefExplorerSchemaRoute
   '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
   '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
   '/project/$ref/logs/auth-logs': typeof ProjectRefLogsAuthLogsRoute
@@ -2893,6 +2902,7 @@ export interface FileRoutesById {
   '/project/$ref/database/types': typeof ProjectRefDatabaseTypesRoute
   '/project/$ref/editor/$id': typeof ProjectRefEditorIdRoute
   '/project/$ref/editor/new': typeof ProjectRefEditorNewRoute
+  '/project/$ref/explorer/schema': typeof ProjectRefExplorerSchemaRoute
   '/project/$ref/functions/$functionSlug': typeof ProjectRefFunctionsFunctionSlugRouteWithChildren
   '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
   '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
@@ -3216,6 +3226,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/types'
     | '/project/$ref/editor/$id'
     | '/project/$ref/editor/new'
+    | '/project/$ref/explorer/schema'
     | '/project/$ref/functions/$functionSlug'
     | '/project/$ref/functions/new'
     | '/project/$ref/functions/secrets'
@@ -3525,6 +3536,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/types'
     | '/project/$ref/editor/$id'
     | '/project/$ref/editor/new'
+    | '/project/$ref/explorer/schema'
     | '/project/$ref/functions/new'
     | '/project/$ref/functions/secrets'
     | '/project/$ref/logs/auth-logs'
@@ -3846,6 +3858,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/types'
     | '/project/$ref/editor/$id'
     | '/project/$ref/editor/new'
+    | '/project/$ref/explorer/schema'
     | '/project/$ref/functions/$functionSlug'
     | '/project/$ref/functions/new'
     | '/project/$ref/functions/secrets'
@@ -5117,6 +5130,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/functions/$functionSlug'
       preLoaderRoute: typeof ProjectRefFunctionsFunctionSlugRouteImport
       parentRoute: typeof ProjectRefFunctionsRoute
+    }
+    '/project/$ref/explorer/schema': {
+      id: '/project/$ref/explorer/schema'
+      path: '/schema'
+      fullPath: '/project/$ref/explorer/schema'
+      preLoaderRoute: typeof ProjectRefExplorerSchemaRouteImport
+      parentRoute: typeof ProjectRefExplorerRoute
     }
     '/project/$ref/editor/new': {
       id: '/project/$ref/editor/new'
@@ -6732,6 +6752,7 @@ const ProjectRefEditorRouteWithChildren =
   ProjectRefEditorRoute._addFileChildren(ProjectRefEditorRouteChildren)
 
 interface ProjectRefExplorerRouteChildren {
+  ProjectRefExplorerSchemaRoute: typeof ProjectRefExplorerSchemaRoute
   ProjectRefExplorerIndexRoute: typeof ProjectRefExplorerIndexRoute
   ProjectRefExplorerChatIdRoute: typeof ProjectRefExplorerChatIdRoute
   ProjectRefExplorerNotebookIdRoute: typeof ProjectRefExplorerNotebookIdRoute
@@ -6740,6 +6761,7 @@ interface ProjectRefExplorerRouteChildren {
 }
 
 const ProjectRefExplorerRouteChildren: ProjectRefExplorerRouteChildren = {
+  ProjectRefExplorerSchemaRoute: ProjectRefExplorerSchemaRoute,
   ProjectRefExplorerIndexRoute: ProjectRefExplorerIndexRoute,
   ProjectRefExplorerChatIdRoute: ProjectRefExplorerChatIdRoute,
   ProjectRefExplorerNotebookIdRoute: ProjectRefExplorerNotebookIdRoute,

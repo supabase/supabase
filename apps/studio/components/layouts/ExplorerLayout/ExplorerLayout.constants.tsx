@@ -6,6 +6,7 @@ import { InnerSideBarFilters, InnerSideBarFilterSearchInput } from 'ui-patterns/
 
 import { useCreateChat, useCreateNotebook } from '@/components/interfaces/Explorer/hooks'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { onSearchInputEscape } from '@/lib/keyboard'
 
 /** Explorer resources the sidebar can both list and create. */
 export type ExplorerResourceType = 'notebook' | 'chat'
@@ -14,7 +15,7 @@ export type ExplorerResourceType = 'notebook' | 'chat'
  * A level in the sidebar's drill-down stack. The layout keeps these on a stack, so going
  * back is a pop and a new level costs one member here plus the panel that renders it.
  */
-export type ExplorerNavLevel = ExplorerResourceType | 'database' | 'database-tables'
+export type ExplorerNavLevel = ExplorerResourceType | 'database'
 
 type ExplorerNavIcon = ComponentType<{ size?: number; className?: string }>
 
@@ -106,6 +107,7 @@ export const ExplorerNavPanel = ({
                 placeholder={searchPlaceholder}
                 aria-labelledby="explorer-sidebar-search-label"
                 onChange={(event) => setSearch(event.target.value)}
+                onKeyDown={onSearchInputEscape(search ?? '', setSearch)}
               />
             </InnerSideBarFilters>
           </>

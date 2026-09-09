@@ -19,12 +19,13 @@ import type { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p'],
   sql: ['sql'],
-  explorer: ['notebook', 'query', 'chat', 'generated-page'],
+  explorer: ['notebook', 'query', 'chat', 'generated-page', 'schema'],
 }
 
 export type TabType =
   | ENTITY_TYPE
   | 'sql'
+  | 'schema'
   | 'notebook'
   | 'query'
   | 'chat'
@@ -475,6 +476,11 @@ export function createTabsState(projectRef: string) {
         case 'generated-page':
           router.push(`/project/${router.query.ref}/explorer/page/${tab.metadata?.generatedPageId}`)
           break
+        case 'schema':
+          router.push(
+            `/project/${router.query.ref}/explorer/schema?schema=${encodeURIComponent(tab.metadata?.schema ?? 'public')}`
+          )
+          break
         case 'explorer-home':
           router.push(`/project/${router.query.ref}/explorer`)
           break
@@ -755,6 +761,8 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
       return `query-${(params as CreateTabIdParams['query']).id}`
     case 'chat':
       return `chat-${(params as CreateTabIdParams['chat']).id}`
+    case 'schema':
+      return `schema-${(params as CreateTabIdParams['schema']).schema}`
     case 'generated-page':
       return `generated-page-${(params as CreateTabIdParams['generated-page']).id}`
     default:

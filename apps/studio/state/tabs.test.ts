@@ -466,3 +466,32 @@ describe('Explorer generated-page tabs', () => {
     expect(store.recentItems).toEqual([])
   })
 })
+
+describe('Explorer schema visualizer tabs', () => {
+  beforeEach(() => localStorage.clear())
+
+  it('keeps schemas in separate tabs, reuses existing tabs, and encodes navigation', () => {
+    const store = createTabsState('default')
+    const router = fakeRouter()
+    for (const schema of ['public', 'sales & reports', 'public']) {
+      store.addTab({
+        id: createTabId('schema', { schema }),
+        type: 'schema',
+        metadata: { schema },
+        isPreview: false,
+      })
+    }
+    expect(store.openTabs).toEqual(['schema-public', 'schema-sales & reports'])
+    store.handleTabNavigation('schema-sales & reports', router)
+    expect(router.push).toHaveBeenLastCalledWith(
+      '/project/default/explorer/schema?schema=sales%20%26%20reports'
+    )
+    store.handleTabClose({
+      id: 'schema-sales & reports',
+      router,
+      editor: 'explorer',
+      onClearDashboardHistory: () => {},
+    })
+    expect(router.push).toHaveBeenLastCalledWith('/project/default/explorer/schema?schema=public')
+  })
+})

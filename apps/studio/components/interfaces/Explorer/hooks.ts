@@ -197,3 +197,17 @@ export const useOpenEntityQuery = () => {
 
   return { openEntityQuery }
 }
+
+export const useOpenSchemaVisualizer = () => {
+  const router = useRouter()
+  const { data: project } = useSelectedProjectQuery()
+
+  const openSchemaVisualizer = (schema: string) => {
+    if (!project) return
+    return router.push(
+      `/project/${project.ref}/explorer/schema?schema=${encodeURIComponent(schema)}`
+    )
+  }
+
+  return { openSchemaVisualizer }
+}

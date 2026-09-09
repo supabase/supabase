@@ -2,7 +2,8 @@ import { act, renderHook } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { useSqlEditorTabsCleanup } from './Tabs.utils'
+import { useSqlEditorTabsCleanup, useTableEditorTabsCleanUp } from './Tabs.utils'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { sqlEditorState } from '@/state/sql-editor/sql-editor-state'
 import { createTabsState, TabsStateContext, type Tab } from '@/state/tabs'
 import { seedSnippet } from '@/tests/lib/sql-editor-test-utils'
@@ -112,4 +113,28 @@ describe('useSqlEditorTabsCleanup', () => {
     expect(recentIds).toContain('sql-logs-live')
     expect(recentIds).not.toContain('sql-logs-stale')
   })
+})
+
+it('preserves schema visualizer tabs and recents while removing deleted tables', () => {
+  const store = createTabsState('default')
+  store.addTab({
+    id: 'schema-public',
+    type: 'schema',
+    metadata: { schema: 'public' },
+    isPreview: false,
+  })
+  store.addTab({
+    id: 'r-1',
+    type: ENTITY_TYPE.TABLE,
+    metadata: { schema: 'public', tableId: 1 },
+    isPreview: false,
+  })
+  const { result } = renderHook(() => useTableEditorTabsCleanUp(), {
+    wrapper: ({ children }) => (
+      <TabsStateContext.Provider value={store}>{children}</TabsStateContext.Provider>
+    ),
+  })
+  act(() => result.current({ schemas: ['public'], entities: [] }))
+  expect(store.openTabs).toEqual(['schema-public'])
+  expect(store.recentItems.map((item) => item.id)).toEqual(['schema-public'])
 })

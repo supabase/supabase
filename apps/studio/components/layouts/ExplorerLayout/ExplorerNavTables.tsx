@@ -18,9 +18,7 @@ import {
   LoaderForIconMenuItems,
   type RowComponentBaseProps,
 } from '@/components/ui/InfiniteList'
-import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { useEntityTypesQuery, type Entity } from '@/data/entity-types/entity-types-infinite-query'
-import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const TABLE_ROW_HEIGHT = 28
@@ -53,11 +51,10 @@ const TableListItem = ({ item: table, style, activeQueryId, onOpen }: TableListI
  * creates the query that reads it, so a table lands in the same tab, editor and results as
  * any other query.
  */
-export const ExplorerNavTables = ({ onBack }: { onBack: () => void }) => {
+export const ExplorerNavTables = ({ schema, onBack }: { schema: string; onBack: () => void }) => {
   const router = useRouter()
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const { openEntityQuery } = useOpenEntityQuery()
 
   const [search, setSearch] = useState('')
@@ -72,7 +69,7 @@ export const ExplorerNavTables = ({ onBack }: { onBack: () => void }) => {
   } = useEntityTypesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schemas: [selectedSchema],
+    schemas: [schema],
     search: search.length === 0 ? search : debouncedSearch,
     sort: 'alphabetical',
     filterTypes: TABLE_ENTITY_TYPES,
@@ -94,13 +91,7 @@ export const ExplorerNavTables = ({ onBack }: { onBack: () => void }) => {
       searchPlaceholder="Search tables"
       onBack={onBack}
     >
-      <div className="px-3 pb-2">
-        <SchemaSelector
-          size="tiny"
-          selectedSchemaName={selectedSchema}
-          onSelectSchema={setSelectedSchema}
-        />
-      </div>
+      <p className="truncate px-6 pb-2 text-xs text-foreground-lighter">{schema}</p>
       <div className="flex flex-1 min-h-0 flex-col px-3 pb-3">
         {isPending && <GenericSkeletonLoader />}
         {!isPending && tables.length === 0 && (

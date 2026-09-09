@@ -19,7 +19,12 @@ export function useTableEditorTabsCleanUp() {
     const recentItemsFilteredToSchemas: string[] = []
     for (const schema of schemas) {
       recentItemsFilteredToSchemas.push(
-        ...recentItemsRef.current.filter((x) => x.metadata?.schema === schema).map((x) => x.id)
+        ...recentItemsRef.current
+          .filter(
+            (item) =>
+              item.metadata?.schema === schema && editorEntityTypes.table.includes(item.type)
+          )
+          .map((item) => item.id)
       )
     }
 
