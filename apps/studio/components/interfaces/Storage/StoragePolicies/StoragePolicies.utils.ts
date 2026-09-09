@@ -81,6 +81,10 @@ const createSQLStatementForUpdatePolicy = (
 ): PolicyForReview => {
   const { name, schema, table } = policyFormFields
 
+  // Fall back to 'true' when a USING or WITH CHECK expression is being cleared
+  const definitionValue = (fieldsToUpdate as any).definition || 'true'
+  const checkValue = (fieldsToUpdate as any).check || 'true'
+
   const definitionChanged = has(fieldsToUpdate, ['definition'])
   const checkChanged = has(fieldsToUpdate, ['check'])
   const nameChanged = has(fieldsToUpdate, ['name'])
@@ -100,8 +104,8 @@ const createSQLStatementForUpdatePolicy = (
   const alterStatement = `ALTER POLICY "${name}" ON "${schema}"."${table}"`
   const statement = [
     'BEGIN;',
-    ...(definitionChanged ? [`  ${alterStatement} USING (${fieldsToUpdate.definition});`] : []),
-    ...(checkChanged ? [`  ${alterStatement} WITH CHECK (${fieldsToUpdate.check});`] : []),
+    ...(definitionChanged ? [`  ${alterStatement} USING (${definitionValue});`] : []),
+    ...(checkChanged ? [`  ${alterStatement} WITH CHECK (${checkValue});`] : []),
     ...(rolesChanged ? [`  ${alterStatement} TO ${roles.join(', ')};`] : []),
     ...(nameChanged ? [`  ${alterStatement} RENAME TO "${fieldsToUpdate.name}";`] : []),
     'COMMIT;',
@@ -144,10 +148,10 @@ export const createPayloadForUpdatePolicy = (
     payload.name = policyFormFields.name
   }
   if (!isEqual(formattedDefinition, originalPolicyFormFields.definition)) {
-    payload.definition = !formattedDefinition ? undefined : untrustedSql(formattedDefinition)
+    payload.definition = !formattedDefinition ? null : untrustedSql(formattedDefinition)
   }
   if (!isEqual(formattedCheck, originalPolicyFormFields.check)) {
-    payload.check = !formattedCheck ? undefined : untrustedSql(formattedCheck)
+    payload.check = !formattedCheck ? null : untrustedSql(formattedCheck)
   }
   if (!isEqual(policyFormFields.roles, originalPolicyFormFields.roles)) {
     if (policyFormFields.roles.length === 0) payload.roles = ['public']
