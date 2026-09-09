@@ -1,21 +1,21 @@
 ---
 id: 'serverless-drivers'
-title: 'Serverless Drivers'
-description: 'Connecting to your Postgres database in serverless environments.'
-subtitle: 'Connecting to your Postgres database in serverless environments.'
+title: 'Serverless drivers'
+description: 'Connect to your Postgres database from a serverless environment'
+subtitle: 'Choose a driver for connecting to your Postgres database from a serverless environment.'
 ---
 
-Supabase provides several options for connecting to your Postgres database from serverless environments.
+Learn how to connect to your Postgres database from a serverless environment. The driver you use depends on which runtime your code runs in.
 
-[supabase-js](/docs/reference/javascript/introduction) is an isomorphic JavaScript client that uses the [auto-generated REST API](/docs/guides/api) and therefore works in any environment that supports HTTPS connections. This API has a built-in [connection pooler](/docs/guides/database/connecting-to-postgres#poolers) and can serve thousands of simultaneous requests, and therefore is ideal for Serverless workloads.
+[supabase-js](/docs/reference/javascript/introduction) is an isomorphic JavaScript client that uses the [auto-generated REST API](/docs/guides/api), so it works in any environment that supports HTTPS connections. This API has a built-in [connection pooler](/docs/guides/database/connecting-to-postgres#poolers) and can serve thousands of simultaneous requests, which suits serverless workloads.
 
 ## Vercel Edge Functions
 
-Vercel's [Edge runtime](https://vercel.com/docs/functions/runtimes/edge-runtime) is built on top of the [V8 engine](https://v8.dev/), that provides a limited set of Web Standard APIs.
+Vercel's [Edge runtime](https://vercel.com/docs/functions/runtimes/edge-runtime) runs on the [V8 engine](https://v8.dev/) and exposes a limited set of Web Standard APIs.
 
 ### Quickstart
 
-Choose one of these Vercel Deploy Templates which use our [Vercel Deploy Integration](https://vercel.com/integrations/supabase) to automatically configure your connection strings as environment variables on your Vercel project!
+Choose one of these Vercel Deploy Templates. They use the [Vercel Deploy Integration](https://vercel.com/integrations/supabase) to configure your connection strings as environment variables on your Vercel project.
 
 <div>
   <div className="grid grid-cols-12 gap-6 not-prose">
@@ -43,10 +43,13 @@ Choose one of these Vercel Deploy Templates which use our [Vercel Deploy Integra
 
 ### Manual configuration
 
-In your [`Database Settings`](/dashboard/project/_?showConnect=true&method=transaction) and copy the URI from the `Transaction pooler` section and save it as the `POSTGRES_URL` environment variable. Remember to replace the password placeholder with your actual database password and add the following suffix `?workaround=supabase-pooler.vercel`.
+1. In the Supabase Dashboard, click [Connect](/dashboard/project/_?showConnect=true&method=transaction) and copy the URI from the **Transaction pooler** section.
+2. Replace the password placeholder with your database password.
+3. Add the suffix `?workaround=supabase-pooler.vercel` to the URI.
+4. Save the result as the `POSTGRES_URL` environment variable.
 
 ```txt .env.local
-POSTGRES_URL="postgres://postgres.cfcxynqnhdybqtbhjemm:[YOUR-PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?workaround=supabase-pooler.vercel"
+POSTGRES_URL="postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:6543/postgres?workaround=supabase-pooler.vercel"
 ```
 
 <Tabs scrollable defaultActiveId="drizzle" type="underlined" size="small">
@@ -120,7 +123,7 @@ export { sql } from 'kysely'
 
 ## Cloudflare Workers
 
-Cloudflare's Workers runtime also uses the [V8 engine](https://v8.dev/) but provides polyfills for a subset of Node.js APIs and [TCP Sockets API](https://developers.cloudflare.com/workers/runtime-apis/tcp-sockets/), giving you a couple of options:
+Cloudflare's Workers runtime also uses the [V8 engine](https://v8.dev/), but it provides polyfills for a subset of Node.js APIs and the [TCP Sockets API](https://developers.cloudflare.com/workers/runtime-apis/tcp-sockets/). That gives you three options:
 
 - [supabase-js](https://developers.cloudflare.com/workers/databases/native-integrations/supabase/)
 - [Postgres.js](https://github.com/porsager/postgres?tab=readme-ov-file#cloudflare-workers-support)
@@ -128,7 +131,7 @@ Cloudflare's Workers runtime also uses the [V8 engine](https://v8.dev/) but prov
 
 ## Supabase Edge Functions
 
-Supabase Edge Functions uses the [Deno runtime](https://deno.com/) which has native support for TCP connections allowing you to choose your favorite client:
+Supabase Edge Functions use the [Deno runtime](https://deno.com/), which has native support for TCP connections. You can choose any of these clients:
 
 - [supabase-js](/docs/guides/functions/connect-to-postgres#using-supabase-js)
 - [Deno Postgres driver](/docs/guides/functions/connect-to-postgres#using-a-postgres-client)
