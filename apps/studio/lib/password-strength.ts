@@ -34,6 +34,11 @@ export function passwordHasUnsupportedCharacters(password: string) {
   return SASLPREP_REWRITTEN_CHARACTERS.test(password) || password.normalize('NFKC') !== password
 }
 
+/**
+ * Scores a database password and returns the copy shown under the input. Returns a
+ * strength of 0 with a warning for passwords that are too long, or that contain
+ * characters Postgres cannot authenticate with, before falling back to zxcvbn.
+ */
 export async function passwordStrength(value: string) {
   // [Alaister]: Lazy load zxcvbn to avoid bundling it with the main app (it's pretty chunky)
   const zxcvbn = await import('zxcvbn').then((module) => module.default)

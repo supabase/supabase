@@ -24,6 +24,10 @@ export function encryptString(stringToEncrypt: string): string {
   return crypto.AES.encrypt(stringToEncrypt, ENCRYPTION_KEY).toString()
 }
 
+/**
+ * Builds the pg-meta connection URI for the self-hosted Postgres instance. Credentials
+ * are percent-encoded so characters that are reserved in a URI do not truncate it.
+ */
 export function getConnectionString({ readOnly }: { readOnly: boolean }) {
   const postgresUser = readOnly ? POSTGRES_USER_READ_ONLY : POSTGRES_USER_READ_WRITE
 
