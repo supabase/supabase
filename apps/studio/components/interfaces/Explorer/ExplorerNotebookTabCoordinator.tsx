@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useContext, useEffect } from 'react'
+import { cn } from 'ui'
 import type { Snapshot } from 'valtio'
 
 import {
@@ -35,11 +36,18 @@ const NotebookTabStatusIndicator = ({ tab }: { tab: Tab }) => {
 
   if (!isNotebookTabDirty({ stateNotebook, ref, notebookId })) return null
 
+  const isNewNotebook = ['new', 'new_saving', 'new_save_failed'].includes(
+    stateNotebook?.status ?? ''
+  )
+
   return (
     <span
       role="img"
       aria-label="Unsaved changes"
-      className="block size-2 shrink-0 rounded-full bg-warning"
+      className={cn(
+        'block size-2 shrink-0 rounded-full',
+        isNewNotebook ? 'bg-brand-600' : 'bg-warning'
+      )}
     />
   )
 }
