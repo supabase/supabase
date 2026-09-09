@@ -143,6 +143,11 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
                 size={size}
                 disabled={disabled}
                 data-testid="schema-selector"
+                aria-label={
+                  selectedSchemaName
+                    ? `Schema ${selectedSchemaName === '*' ? 'All schemas' : selectedSchemaName}`
+                    : placeholderLabel
+                }
                 aria-expanded={open}
                 data-state={open ? 'open' : 'closed'}
                 className={size === 'tiny' ? 'w-full pr-1.5!' : 'w-full'}
