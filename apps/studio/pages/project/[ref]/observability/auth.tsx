@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, LogsIcon, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -64,6 +64,7 @@ const REPORT_TITLE = 'Auth'
 
 const AuthUsage = () => {
   const { ref } = useParams()
+  const useOtel = useFlag('otelLegacyLogs')
   const chartSyncId = `auth-report`
 
   const {
@@ -139,6 +140,7 @@ const AuthUsage = () => {
 
   const usageReportConfig = createUsageReportConfig({
     projectRef: ref || '',
+    useOtel,
     startDate: selectedDateRange?.period_start?.date,
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
@@ -147,6 +149,7 @@ const AuthUsage = () => {
 
   const errorsReportConfig = createErrorsReportConfig({
     projectRef: ref || '',
+    useOtel,
     startDate: selectedDateRange?.period_start?.date,
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
@@ -155,6 +158,7 @@ const AuthUsage = () => {
 
   const latencyReportConfig = createLatencyReportConfig({
     projectRef: ref || '',
+    useOtel,
     startDate: selectedDateRange?.period_start?.date,
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
@@ -287,6 +291,7 @@ const AuthUsage = () => {
                 <ReportChartV2
                   key={`${metric.id}`}
                   report={metric}
+                  queryGroup={useOtel ? 'auth-otel' : 'auth-bigquery'}
                   projectRef={ref!}
                   interval={selectedDateRange.interval}
                   startDate={selectedDateRange?.period_start?.date}
@@ -321,6 +326,7 @@ const AuthUsage = () => {
                 <ReportChartV2
                   key={`${metric.id}`}
                   report={metric}
+                  queryGroup={useOtel ? 'auth-otel' : 'auth-bigquery'}
                   projectRef={ref!}
                   interval={selectedDateRange.interval}
                   startDate={selectedDateRange?.period_start?.date}
@@ -345,6 +351,7 @@ const AuthUsage = () => {
                 <ReportChartV2
                   key={`${metric.id}`}
                   report={metric}
+                  queryGroup={useOtel ? 'auth-otel' : 'auth-bigquery'}
                   projectRef={ref!}
                   interval={selectedDateRange.interval}
                   startDate={selectedDateRange?.period_start?.date}
