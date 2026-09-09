@@ -4,6 +4,9 @@ import React from 'react'
 import { cn } from 'ui'
 import { isCrossAppLink } from 'lib/crossAppLink'
 
+/**
+ * Navigation dropdown menu item with optional icon, description, and chevron.
+ */
 const MenuItem = React.forwardRef<
   React.ElementRef<'a'>,
   React.ComponentPropsWithoutRef<'a'> & {

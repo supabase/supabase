@@ -6,6 +6,11 @@ import { cn } from 'ui'
 
 // Paths owned by a different Next.js app on the same origin
 const CROSS_APP_PREFIXES = ['/docs', '/dashboard']
+
+/**
+ * Returns true when `href` points to a route owned by a different
+ * Next.js app on the same origin (e.g. /docs/* or /dashboard/*).
+ */
 function isCrossAppLink(href?: string): boolean {
   if (!href) return false
 
@@ -44,6 +49,9 @@ interface Props {
   onClick?: () => void
 }
 
+/**
+ * Standard text link component with optional counter and animated chevron.
+ */
 export function TextLink({
   url = '',
   label,

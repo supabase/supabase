@@ -17,6 +17,9 @@ type Framework = {
   examples: { title: string; description: string; url: string; icon: string }[]
 }
 
+/**
+ * Client-side tabbed framework code preview and documentation links.
+ */
 export function FrameworksSectionClient({ frameworks }: { frameworks: Framework[] }) {
   const [activeIdx, setActiveIdx] = useState(0)
   const active = frameworks[activeIdx]

@@ -97,6 +97,9 @@ const SKELETON_CONTENT: Record<string, () => React.JSX.Element> = {
   'Next.js Starter': NextjsSkeleton,
 }
 
+/**
+ * Homepage section highlighting production-ready project templates and starters.
+ */
 export function BuiltWithSupabaseSection() {
   const featuredExamples = Examples.slice(0, 2)
   const gridExamples = Examples.slice(2, 6)

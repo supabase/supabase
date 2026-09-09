@@ -31,6 +31,9 @@ interface Props {
   hideFooter?: boolean
 }
 
+/**
+ * Main application footer component containing site-wide navigation links.
+ */
 const Footer = (props: Props) => {
   const pathname = usePathname()
 

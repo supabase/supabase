@@ -12,6 +12,9 @@ type LinkProps = {
   svg?: any
 }
 
+/**
+ * Developers navigation dropdown showing documentation links, resources, and latest blog posts.
+ */
 export const DevelopersDropdown = () => {
   const { jobsCount, latestBlogPosts } = staticContent
 

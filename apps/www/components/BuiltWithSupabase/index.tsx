@@ -7,6 +7,9 @@ import { Button, cn, IconGitHubSolid } from 'ui'
 import ExampleCard from '../ExampleCard'
 import ExamplesMobile from './ExamplesMobile'
 
+/**
+ * Section displaying examples and starters built with Supabase.
+ */
 const BuiltWithSupabase = () => {
   return (
     <>

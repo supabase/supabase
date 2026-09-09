@@ -36,6 +36,9 @@ interface Props {
   stickyNavbar?: boolean
 }
 
+/**
+ * Main desktop and mobile navigation header for the www application.
+ */
 const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const pathname = usePathname()
   const { width } = useWindowSize()

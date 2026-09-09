@@ -4,6 +4,11 @@ import * as Sentry from '@sentry/nextjs'
 import NextError from 'next/error'
 import { useEffect } from 'react'
 
+/**
+ * Global root error boundary for the www app.
+ * Captures unhandled client-side exceptions with Sentry and auto-reloads
+ * on ChunkLoadErrors to seamlessly recover fresh assets after deployments.
+ */
 export default function GlobalError({
   error,
 }: {

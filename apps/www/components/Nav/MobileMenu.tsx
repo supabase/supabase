@@ -24,6 +24,9 @@ interface Props {
   menu: Menu
 }
 
+/**
+ * Mobile responsive navigation menu drawer and accordion.
+ */
 export const MobileMenu = ({ open, setOpen, menu }: Props) => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
