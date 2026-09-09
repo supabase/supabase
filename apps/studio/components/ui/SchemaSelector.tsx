@@ -145,7 +145,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
                 data-testid="schema-selector"
                 aria-expanded={open}
                 data-state={open ? 'open' : 'closed'}
-                className="w-full"
+                className={size === 'tiny' ? 'w-full pr-1!' : 'w-full'}
               >
                 {selectedSchemaName ? (
                   <span className="flex w-full gap-1">
