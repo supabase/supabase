@@ -156,7 +156,7 @@
   --sidebar-accent-foreground: var(--foreground-default);
   --sidebar-border: var(--border-default);
   --sidebar-ring: var(--ring);
-  --header-height: 2.6rem;
+  --header-height: 3rem;
 }
 
 [data-theme='dark'],
