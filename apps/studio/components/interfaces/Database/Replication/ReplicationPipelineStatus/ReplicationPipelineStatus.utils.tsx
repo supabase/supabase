@@ -190,7 +190,7 @@ export const WAL_STATUS_META: Record<SlotWalStatus, WalStatusMeta> = {
 }
 
 // Postgres reports no WAL status (restart_lsn is null) as "unknown" too, so fall back to it.
-export const getWalStatusMeta = (status?: SlotWalStatus): WalStatusMeta =>
+export const getWalStatusMeta = (status?: SlotWalStatus | null): WalStatusMeta =>
   WAL_STATUS_META[status ?? 'unknown']
 
 // Legend entries from healthiest to most severe, ending with the unknown/unavailable case.
@@ -202,7 +202,7 @@ export const WAL_STATUS_LEGEND: WalStatusMeta[] = [
   WAL_STATUS_META.unknown,
 ]
 
-export const getWalStatusSeverity = (status?: SlotWalStatus): LagSeverity =>
+export const getWalStatusSeverity = (status?: SlotWalStatus | null): LagSeverity =>
   getWalStatusMeta(status).severity
 
 // Slot-loss risk from how much of the slot's WAL budget has been consumed, rather than fixed byte

@@ -72,7 +72,7 @@ export const Project = () => {
                 <div>
                   <p className="text-sm">{primaryActionLabel}</p>
                   <div className="max-w-[420px]">
-                    <p className="text-sm text-foreground-light">{primaryActionDescription}</p>
+                    <p className="text-sm text-foreground-lighter">{primaryActionDescription}</p>
                   </div>
                 </div>
                 {isPaused ? (
@@ -98,7 +98,7 @@ export const Project = () => {
                   <div>
                     <p className="text-sm">Pause {entityLabel}</p>
                     <div className="max-w-[420px]">
-                      <p className="text-sm text-foreground-light">
+                      <p className="text-sm text-foreground-lighter">
                         Your {entityLabel} will not be accessible while it is paused.
                       </p>
                     </div>

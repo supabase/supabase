@@ -276,13 +276,11 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        name="SESSIONS_SINGLE_PER_USER"
                         label="Enforce single session per user"
                         description="If enabled, all but a user's most recently active session will be terminated."
                       >
                         <FormControl>
                           <Switch
-                            id="SESSIONS_SINGLE_PER_USER"
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
@@ -300,14 +298,12 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        name="SESSIONS_TIMEBOX"
                         label="Time-box user sessions"
                         description={`The amount of time before a user is forced to sign in again. Use 0 for never. Maximum ${MAX_SESSIONS_TIMEBOX_HOURS} hours (1 year).`}
                       >
                         <FormControl className="w-full">
                           <InputGroup>
                             <FormInputGroupInput
-                              id="SESSIONS_TIMEBOX"
                               type="number"
                               min={0}
                               {...field}
@@ -332,14 +328,12 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        name="SESSIONS_INACTIVITY_TIMEOUT"
                         label="Inactivity timeout"
                         description={`The amount of time a user needs to be inactive to be forced to sign in again. Use 0 for never. Maximum ${MAX_SESSIONS_INACTIVITY_TIMEOUT_HOURS} hours (1 year).`}
                       >
                         <FormControl className="w-full">
                           <InputGroup>
                             <FormInputGroupInput
-                              id="SESSIONS_INACTIVITY_TIMEOUT"
                               type="number"
                               min={0}
                               {...field}
@@ -413,14 +407,12 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        name="JWT_EXP"
                         label="Access token expiry time"
                         description="How long access tokens are valid for before they must be refreshed. Recommendation: 3600 seconds."
                       >
                         <FormControl className="w-full">
                           <InputGroup>
                             <FormInputGroupInput
-                              id="JWT_EXP"
                               type="number"
                               min={1}
                               {...field}
@@ -480,13 +472,11 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        name="REFRESH_TOKEN_ROTATION_ENABLED"
                         label="Detect and revoke potentially compromised refresh tokens"
                         description="Prevent replay attacks from potentially compromised refresh tokens."
                       >
                         <FormControl>
                           <Switch
-                            id="REFRESH_TOKEN_ROTATION_ENABLED"
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!canUpdateConfig}
@@ -503,14 +493,12 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        name="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
                         label="Refresh token reuse interval"
                         description={`Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds. Maximum ${MAX_REFRESH_TOKEN_REUSE_INTERVAL_SECONDS} seconds (5 minutes).`}
                       >
                         <FormControl className="w-full">
                           <InputGroup>
                             <FormInputGroupInput
-                              id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
                               type="number"
                               min={0}
                               {...field}

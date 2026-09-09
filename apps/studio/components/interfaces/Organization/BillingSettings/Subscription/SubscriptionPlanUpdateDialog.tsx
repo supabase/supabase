@@ -64,6 +64,8 @@ type BreakdownItem =
 interface Props {
   selectedTier: 'tier_free' | 'tier_pro' | 'tier_team' | undefined
   onClose: () => void
+  /** Called after the subscription update succeeds, in addition to onClose. */
+  onSuccess?: () => void
   planMeta?: OrgPlan | null
   currentPlanMeta?: Partial<OrgPlan> & { features: (string | string[])[] }
   subscriptionPreviewQueryResult: OrganizationBillingSubscriptionPreviewQueryResult
@@ -77,6 +79,7 @@ interface Props {
 export const SubscriptionPlanUpdateDialog = ({
   selectedTier,
   onClose,
+  onSuccess,
   planMeta,
   subscriptionPreviewQueryResult,
   currentPlanMeta,
@@ -132,6 +135,7 @@ export const SubscriptionPlanUpdateDialog = ({
       `Successfully ${changeType === 'downgrade' ? 'downgraded' : 'upgraded'} subscription to ${subscriptionPlanMeta?.name}!`
     )
     onClose()
+    onSuccess?.()
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   }
 

@@ -143,7 +143,22 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/telemetry/:match*',
-    destination: '/docs/guides/monitoring-and-debugging/:match*',
+    destination: '/docs/guides/observability/:match*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging/resolve-issues',
+    destination: '/docs/guides/observability/detecting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging/debugging',
+    destination: '/docs/guides/observability/detecting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging/:match*',
+    destination: '/docs/guides/observability/:match*',
   },
   {
     permanent: false,
@@ -2283,6 +2298,11 @@ module.exports = [
     source: '/customers/mendableai',
     destination: '/customers/firecrawl',
   },
+  {
+    permanent: true,
+    source: '/customers/lingo-dev',
+    destination: '/customers/lingodotdev',
+  },
 
   {
     permanent: true,
@@ -2753,8 +2773,18 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/database/inspect',
+    destination: '/docs/guides/observability/inspect',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/database/database-linter',
-    destination: '/docs/guides/database/database-advisors',
+    destination: '/docs/guides/observability/advisors',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/database-advisors',
+    destination: '/docs/guides/observability/advisors',
   },
   {
     permanent: true,

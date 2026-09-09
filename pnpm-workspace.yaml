@@ -49,6 +49,7 @@ catalog:
   typescript: ~6.0.2
   valtio: ^2.3.2
   vite: ^8.0.16
+  velite: ^0.4.0
   vite-tsconfig-paths: ^6.1.1
   vitest: ^4.1.4
   zod: 3.25.76
@@ -90,6 +91,8 @@ minimumReleaseAgeExclude:
   - mdast-jsx
   # The following are excluded to fix vulnerablities.
   - react-use
+  - '@astrojs/markdown-satteri@0.3.8'
+  - astro@7.2.6
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3

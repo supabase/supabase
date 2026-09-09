@@ -228,19 +228,60 @@ describe('ExplorerNotebookTab', () => {
       expect(queries).toHaveLength(0)
     })
 
-    it('runs every cell, including the mutating one, when confirmed with "Run all cells"', async () => {
+    it('labels destructive queries and runs all cells after one confirmation', async () => {
       const queries = mockDatabaseQueryRequests()
 
       renderNotebookTab()
 
       await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
-      await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      expect(within(dialog).getByText('Mutating query')).toBeInTheDocument()
+      expect(within(dialog).getByText('Destructive')).toBeInTheDocument()
+      expect(queries).toHaveLength(0)
 
-      await userEvent.click(screen.getByRole('button', { name: 'Run all cells' }))
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Run all cells' }))
 
       await waitFor(() => expect(queries).toHaveLength(2))
       expect(queries.some((query) => query.includes('select 1'))).toBe(true)
       expect(queries.some((query) => query.includes('delete from foo'))).toBe(true)
+    })
+
+    it('runs no cells when the combined confirmation is cancelled', async () => {
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
+
+      await waitFor(() =>
+        expect(
+          screen.queryByRole('dialog', { name: 'Confirm to run notebook' })
+        ).not.toBeInTheDocument()
+      )
+      expect(queries).toHaveLength(0)
+    })
+
+    it('does not label non-destructive mutations', async () => {
+      seedNotebook([
+        readOnlyCell,
+        createQueryCellSkeleton({
+          title: 'Add signup',
+          sql: "insert into signups values ('test')",
+        }),
+      ])
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      expect(within(dialog).queryByText('Destructive')).not.toBeInTheDocument()
+
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Run all cells' }))
+
+      await waitFor(() => expect(queries).toHaveLength(2))
     })
 
     it('picks up a SQL commit that lands after this render but before the click handler runs', async () => {
@@ -291,6 +332,8 @@ describe('ExplorerNotebookTab', () => {
       const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
       expect(within(dialog).getByText('Read-only query')).toBeInTheDocument()
       expect(queries).toHaveLength(0)
+
+      expect(within(dialog).getByText('Destructive')).toBeInTheDocument()
     })
 
     it('runs only the read-only cells when "Skip these queries" is checked', async () => {

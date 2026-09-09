@@ -42,7 +42,7 @@ export const getRuntimeMeta = (runtime: string | undefined): RuntimeMeta | undef
   runtime === undefined ? undefined : RUNTIMES[runtime]
 
 export const formatRuntime = (runtime: string | undefined): string =>
-  getRuntimeMeta(runtime)?.label ?? runtime ?? 'Unknown'
+  getRuntimeMeta(runtime)?.label ?? runtime ?? 'Custom'
 
 // The API reports size as e.g. "2gb-1vcpu"; render the parts when they parse, the raw value if not.
 export const formatSize = (size: string): string => {

@@ -12,6 +12,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 import Table from '@/components/to-be-cleaned/Table'
@@ -97,9 +100,21 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
               <div className="flex justify-end gap-4">
                 {canUpdateWebhook ? (
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="default" className="px-1" icon={<MoreVertical />} />
-                    </DropdownMenuTrigger>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="default"
+                            className="px-1"
+                            icon={<MoreVertical />}
+                            aria-label={`${x.name} actions`}
+                            // Tooltip repeats the label; the description would read the name twice
+                            aria-describedby={undefined}
+                          />
+                        </DropdownMenuTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">More options</TooltipContent>
+                    </Tooltip>
 
                     <DropdownMenuContent side="left">
                       <>
