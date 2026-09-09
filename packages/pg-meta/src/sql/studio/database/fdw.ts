@@ -7,6 +7,29 @@ import {
   type SafeSqlFragment,
 } from '../../../pg-format'
 
+// Pick a `$$…$$` delimiter for a `DO` block that is absent from every
+// string in `values`. See the matching helper in
+// `packages/pg-meta/src/pg-meta-tables.ts` for the full rationale;
+// the same dollar-quote-collision bug exists in the three DO blocks
+// below (create-encrypted-keys, create-server, delete-encrypted-keys),
+// each of which embeds the wrapper_name (combined with the option
+// name into a `key`) via `${literal(key)}` inside the body. If
+// `wrapper_name` or `option.name` contains the literal `$$` the
+// rendered literal closes the outer `do $$` delimiter early.
+function getDoBlockDelimiter(values: string[]): SafeSqlFragment {
+  let suffix = 0
+  while (true) {
+    const delimiter =
+      suffix === 0
+        ? (safeSql`$pg_meta$` as SafeSqlFragment)
+        : (safeSql`$pg_meta_${literal(suffix)}$` as SafeSqlFragment)
+    if (values.every((value) => !value.includes(delimiter))) {
+      return delimiter
+    }
+    suffix += 1
+  }
+}
+
 type SimplifiedWrapperMeta = {
   handlerName: string
   validatorName: string
@@ -97,8 +120,23 @@ export function getCreateFDWSql({
     const key = `${formState.wrapper_name}_${option.name}`
     const quotedValue = literal(formState[option.name] || '')
 
+    // The body embeds `key` (composed of `wrapper_name` and
+    // `option.name`) via `${literal(key)}` and the encrypted
+    // option value as `new_secret := ${quotedValue}` (where
+    // `quotedValue = literal(formState[option.name] || '')`). If
+    // any of those values contains the literal `$$` the body
+    // closes the outer `do $$` delimiter early and the statement
+    // fails with `syntax error at or near "..."`. Pick a delimiter
+    // that is absent from all three values.
+    const doBlockDelimiter = getDoBlockDelimiter([
+      key,
+      formState.wrapper_name,
+      option.name,
+      formState[option.name] || '',
+    ])
+
     return safeSql`
-      do $$
+      do ${doBlockDelimiter}
       begin
         -- Old wrappers has an implicit dependency on pgsodium. For new wrappers
         -- we use Vault directly.
@@ -147,7 +185,7 @@ export function getCreateFDWSql({
             new_name := ${literal(key)}
           );
         end if;
-      end $$;
+      end ${doBlockDelimiter};
     `
   })
 
@@ -169,8 +207,26 @@ export function getCreateFDWSql({
     ','
   )
 
+  // The body embeds `formState.server_name` and `formState.wrapper_name`
+  // via `${ident(...)}` (which quotes the name as `"weird$$name"`
+  // rather than silently changing the meaning) and the option keys /
+  // values via `${literal(...)}`. If any of those values contains the
+  // literal `$$` the body closes the outer `do $$` delimiter early
+  // and the statement fails with `syntax error at or near "..."`.
+  // Pick a delimiter that is absent from every value that flows into
+  // the body.
+  const createServerDoBlockDelimiter = getDoBlockDelimiter([
+    formState.server_name,
+    formState.wrapper_name,
+    ...wrapperMeta.server.options.map((option) => option.name),
+    ...encryptedOptions.map((option) => `${formState.wrapper_name}_${option.name}`),
+    ...wrapperMeta.server.options
+      .filter((option) => formState[option.name])
+      .map((option) => formState[option.name]),
+  ])
+
   const createServerSql = safeSql`
-    do $$
+    do ${createServerDoBlockDelimiter}
     declare
       -- Old wrappers has an implicit dependency on pgsodium. For new wrappers
       -- we use Vault directly.
@@ -220,7 +276,7 @@ export function getCreateFDWSql({
         ),
         '\n'
       )}
-    
+
       execute format(
         E'create server ${ident(formState.server_name)} foreign data wrapper ${ident(formState.wrapper_name)} options (${optionsSqlArray});',
         ${joinSqlFragments(
@@ -233,7 +289,7 @@ export function getCreateFDWSql({
           ','
         )}
       );
-    end $$;
+    end ${createServerDoBlockDelimiter};
   `
 
   const createTablesSql = joinSqlFragments(
@@ -306,8 +362,15 @@ export const getDeleteFDWSql = ({
   const deleteEncryptedSecretsSqlArray = encryptedOptions.map((option) => {
     const key = `${wrapper.name}_${option.name}`
 
+    // Same dollar-quote-collision rationale as the create paths:
+    // the body embeds `key` (composed of `wrapper.name` and
+    // `option.name`) via `${literal(key)}`. If either contains the
+    // literal `$$` the body closes the outer `do $$` delimiter
+    // early. Pick a delimiter that is absent from both names.
+    const doBlockDelimiter = getDoBlockDelimiter([key, wrapper.name, option.name])
+
     return safeSql`
-      do $$
+      do ${doBlockDelimiter}
       begin
         -- Old wrappers has an implicit dependency on pgsodium. For new wrappers
         -- we use Vault directly.
@@ -345,7 +408,7 @@ export const getDeleteFDWSql = ({
         else
           delete from vault.secrets where name = ${literal(key)};
         end if;
-      end $$;
+      end ${doBlockDelimiter};
     `
   })
 
