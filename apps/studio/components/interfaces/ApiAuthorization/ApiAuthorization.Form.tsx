@@ -71,6 +71,7 @@ function isExternalRedirectUrl(url: string): boolean {
 }
 
 export interface ApiAuthorizationMainViewProps {
+  auth_id: string
   approvalState: ApprovalState
   form: UseFormReturn<IApprovalFormSchema>
   requester: ApiAuthorizationResponse
@@ -83,6 +84,7 @@ export interface ApiAuthorizationMainViewProps {
 }
 
 export function ApiAuthorizationMainView({
+  auth_id,
   approvalState,
   form,
   requester,
@@ -125,7 +127,7 @@ export function ApiAuthorizationMainView({
               {organizations._tag === 'error' && (
                 <OrganizationsErrorNotice error={organizations.error} />
               )}
-              {organizations._tag === 'empty' && <OrganizationsEmptyState />}
+              {organizations._tag === 'empty' && <OrganizationsEmptyState authId={auth_id} />}
               {organizations._tag === 'not_member' && <NotMemberOfOrganizationNotice />}
               {organizations._tag === 'success' && (
                 <OrganizationSelector
@@ -204,16 +206,21 @@ function OrganizationsErrorNotice({ error }: OrganizationsErrorNoticeProps): Rea
   )
 }
 
-function OrganizationsEmptyState(): ReactNode {
+interface OrganizationsEmptyStateProps {
+  authId: string
+}
+
+function OrganizationsEmptyState({ authId }: OrganizationsEmptyStateProps): ReactNode {
+  const returnTo = `/authorize?auth_id=${authId}`
+
   return (
     <Admonition
       type="warning"
       title="No organizations found"
       description="Create an organization before authorizing this request."
       actions={[
-        // [Joshen] JFYI this is a short term solution to guide users with creating an org from here
         <Button asChild key="new-org" variant="default">
-          <Link href="/new">Create an organization</Link>
+          <Link href={`/new?returnTo=${encodeURIComponent(returnTo)}`}>Create an organization</Link>
         </Button>,
       ]}
     />

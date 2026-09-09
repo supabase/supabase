@@ -9,6 +9,15 @@ const WAREHOUSE_TLD = IS_STAGING_OR_LOCAL ? 'red' : 'io'
  */
 export const WAREHOUSE_PUBLICATION_NAME = 'supabase_warehouse'
 
+/**
+ * Postgres schema the managed Warehouse destination keeps its DuckLake catalog in —
+ * `WAREHOUSE_METADATA_SCHEMA` in the platform repo, where it's a hardcoded constant: the schema is
+ * always provisioned under this name, the destination config is always built with it, and no
+ * request body accepts an override. Mirrored here so the schema picker can exclude it; the platform
+ * also rejects it server-side.
+ */
+export const WAREHOUSE_METADATA_SCHEMA = 'ducklake'
+
 export function getWarehouseFlightSqlEndpoint(projectRef: string): string {
   return `${projectRef}.warehouse.supabase.${WAREHOUSE_TLD}`
 }

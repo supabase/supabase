@@ -1,6 +1,7 @@
 import type { components } from 'api-types'
 
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
+import { WAREHOUSE_METADATA_SCHEMA } from '@/lib/warehouse'
 
 export type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
 export type WarehouseSetupTarget = WarehouseSetupBody['targets'][number]
@@ -26,9 +27,20 @@ const NON_SELECTABLE_SCHEMAS = new Set(
   INTERNAL_SCHEMAS.filter((schema) => !REPLICABLE_INTERNAL_SCHEMAS.includes(schema))
 )
 
-/** Postgres schemas Warehouse setup shouldn't offer for replication. */
+/**
+ * Postgres schemas Warehouse setup shouldn't offer for replication.
+ *
+ * `WAREHOUSE_METADATA_SCHEMA` is excluded on top of the infrastructure schemas above: it holds the
+ * DuckLake catalog describing the Warehouse itself, so replicating it would feed every Warehouse
+ * write back in as more catalog rows to replicate. The platform rejects it server-side too — this
+ * just keeps it out of the picker so the user never picks a target that can only fail.
+ */
 export function isSelectableWarehouseSchema(schemaName: string): boolean {
-  return !schemaName.startsWith('pg_') && !NON_SELECTABLE_SCHEMAS.has(schemaName)
+  return (
+    !schemaName.startsWith('pg_') &&
+    !NON_SELECTABLE_SCHEMAS.has(schemaName) &&
+    schemaName !== WAREHOUSE_METADATA_SCHEMA
+  )
 }
 
 export function getSelectedTableCount(selection: SchemaTableSelection): number {
