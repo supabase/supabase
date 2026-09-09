@@ -17,6 +17,14 @@ export function passwordNeedsPercentEncoding(password: string) {
   }
 }
 
+/**
+ * True when the password contains non-ASCII or non-printable characters.
+ * Database passwords must only contain standard printable ASCII characters.
+ */
+export function passwordHasUnsupportedCharacters(password: string) {
+  return /[^\x20-\x7E]/.test(password)
+}
+
 export async function passwordStrength(value: string) {
   // [Alaister]: Lazy load zxcvbn to avoid bundling it with the main app (it's pretty chunky)
   const zxcvbn = await import('zxcvbn').then((module) => module.default)
@@ -29,6 +37,9 @@ export async function passwordStrength(value: string) {
     if (value.length > 99) {
       message = `${PASSWORD_STRENGTH[0]} Maximum length of password exceeded`
       warning = `Password should be less than 100 characters`
+    } else if (passwordHasUnsupportedCharacters(value)) {
+      message = `${PASSWORD_STRENGTH[0]} Contains unsupported characters`
+      warning = `Password should only contain letters, numbers, and standard symbols`
     } else {
       const result = zxcvbn(value)
       const resultScore = result?.score ?? 0
