@@ -186,6 +186,14 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       description: 'Serve Flask web apps that query Postgres with the Supabase Python client.',
     },
     {
+      title: 'Reflex',
+      href: '/guides/getting-started/quickstarts/reflex',
+      icon: '/docs/img/icons/reflex-icon',
+      hasLightIcon: true,
+      description:
+        'Full-stack Python web apps that query Supabase Postgres with the async Python client.',
+    },
+    {
       title: 'Laravel',
       href: '/guides/getting-started/quickstarts/laravel',
       icon: '/docs/img/icons/laravel-icon',
