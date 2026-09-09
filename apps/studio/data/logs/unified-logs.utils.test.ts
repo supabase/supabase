@@ -191,7 +191,7 @@ describe('extractLogMetadata', () => {
       expect(extractLogMetadata(row)).toEqual({ status: null, method: null, pathname: null })
     })
 
-    it('preserves only Workers metadata while keeping unsupported fields null', () => {
+    it('preserves Workers metadata and level while keeping unsupported HTTP fields null', () => {
       const metadata = {
         cw_event_id: '39883203917805946105278943454814281535421893832620638214',
         launch_id: '1788424715503435269',
@@ -221,7 +221,7 @@ describe('extractLogMetadata', () => {
         event_message: 'Error: Dynamic require of "path" is not supported',
         metadata,
         status: null,
-        level: null,
+        level: 'success',
         method: null,
         pathname: null,
         auth_user: null,

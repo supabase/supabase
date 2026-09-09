@@ -42,16 +42,21 @@ import {
   buildFilterSearchUpdate,
   parseLogsFilterUrlParams,
 } from './UnifiedLogs.filters'
-import { useFilterSearchSync, useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
+import {
+  useFilterSearchSync,
+  useLiveMode,
+  useResetFocus,
+  useUnifiedLogsData,
+} from './UnifiedLogs.hooks'
 import { isUserFilterUnreachable } from './UnifiedLogs.queries'
 import { ColumnSchema } from './UnifiedLogs.schema'
-import { QuerySearchParamsType } from './UnifiedLogs.types'
 import {
   gateLogTypeFilters,
   gateLogTypeOptions,
   getFacetedUniqueValues,
   getLevelRowClassName,
   getWorkersLogsAvailability,
+  toQuerySearchParameters,
 } from './UnifiedLogs.utils'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
@@ -65,9 +70,6 @@ import { LiveButton } from '@/components/ui/DataTable/LiveButton'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { TimelineChart } from '@/components/ui/DataTable/TimelineChart'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
-import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
-import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
-import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
 import { useTrack } from '@/lib/telemetry/track'
@@ -136,15 +138,7 @@ export const UnifiedLogs = () => {
   // Create a stable query key object by removing nulls/undefined, id, and live
   // Mainly to prevent the react queries from unnecessarily re-fetching
   const searchParameters = useMemo(() => {
-    const parameters = Object.entries(search).reduce(
-      (acc, [key, value]) => {
-        if (!['id', 'live'].includes(key) && value !== null && value !== undefined) {
-          acc[key] = value
-        }
-        return acc
-      },
-      {} as Record<string, unknown>
-    ) as QuerySearchParamsType
+    const parameters = toQuerySearchParameters(search)
 
     if (parameters.filter) {
       parameters.filter =
@@ -157,7 +151,7 @@ export const UnifiedLogs = () => {
   }, [search, showMultigresLogs, workersAvailability.canQueryWorkers])
 
   const {
-    data: unifiedLogsData,
+    flatData,
     error,
     isError,
     isLoading,
@@ -165,57 +159,24 @@ export const UnifiedLogs = () => {
     isFetchingNextPage,
     isFetchingPreviousPage,
     hasNextPage,
-    refetch: refetchLogs,
     fetchNextPage,
     fetchPreviousPage,
-  } = useUnifiedLogsInfiniteQuery({ projectRef, search: searchParameters })
-
-  const {
-    data: counts,
-    isPending: isLoadingCounts,
-    isFetching: isFetchingCounts,
-    refetch: refetchCounts,
-  } = useUnifiedLogsCountQuery({
-    projectRef,
-    search: searchParameters,
-  })
-
-  const {
-    data: unifiedLogsChart = [],
-    isFetching: isFetchingCharts,
-    refetch: refetchCharts,
-  } = useUnifiedLogsChartQuery({
-    projectRef,
-    search: searchParameters,
-  })
-
-  const refetchAllData = () => {
-    refetchLogs()
-    refetchCounts()
-    refetchCharts()
-  }
-
-  const isRefetchingData = isFetching || isFetchingCounts || isFetchingCharts
+    totalRowCount: totalDBRowCount,
+    facets,
+    isLoadingCounts,
+    chartData: unifiedLogsChart,
+    isFetchingChart: isFetchingCharts,
+    refetchAll: refetchAllData,
+    isRefetching: isRefetchingData,
+  } = useUnifiedLogsData({ projectRef, search: searchParameters })
 
   // Only fade when filtering (not when loading more data or live mode)
   const isFetchingButNotPaginating = isFetching && !isFetchingNextPage && !isFetchingPreviousPage
 
-  const rawFlatData = useMemo(() => {
-    return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
-  }, [unifiedLogsData?.pages])
-  // [Joshen] Refer to unified-logs-infinite-query on why the need to deupe
-  const flatData = useMemo(() => {
-    return rawFlatData.filter((value, idx) => {
-      return idx === rawFlatData.findIndex((x) => x.id === value.id)
-    })
-  }, [rawFlatData])
   const liveMode = useLiveMode(flatData)
 
-  const totalDBRowCount = counts?.totalRowCount
   const filterDBRowCount = flatData.length
-
-  const facets = counts?.facets
-  const totalFetched = flatData?.length
+  const totalFetched = flatData.length
 
   // Create a filtered version of the chart config based on level filters in the URL.
   const filteredChartConfig = useMemo(() => {

@@ -197,6 +197,16 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).not.toContain("log_attributes['source'] != 'worker_api_logs'")
     })
 
+    it('derives a level for worker rows from severity instead of nulling it', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:workers'))
+      // Only the `level` projection: after `AS status,` and before `AS level`.
+      const levelExpr = sql.split('AS status,')[1]?.split('AS level')[0] ?? ''
+      expect(levelExpr).not.toContain('THEN null')
+      expect(levelExpr).toContain(
+        "severity_text IN ('ERROR','FATAL','CRITICAL','ALERT','EMERGENCY') THEN 'error'"
+      )
+    })
+
     it('scopes to a single worker via the generic log_attributes fallback', () => {
       const sql = getUnifiedLogsQuery(withFilters('log_type:eq:workers', 'worker:eq:fran-worker'))
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
@@ -320,13 +330,15 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       )
     })
 
-    it('does not classify Workers rows into a severity bucket', () => {
+    it('buckets Workers rows by severity so the chart is not empty for worker-only views', () => {
       const sql = getLogsChartQuery(withFilters('log_type:eq:workers'))
       const workerCondition =
         "log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
 
-      expect(sql).toContain(`WHEN ${workerCondition} THEN null`)
-      expect(sql).not.toContain(`WHEN ${workerCondition} THEN 'success'`)
+      expect(sql).not.toContain(`WHEN ${workerCondition} THEN null`)
+      expect(sql).toContain(
+        "severity_text IN ('ERROR','FATAL','CRITICAL','ALERT','EMERGENCY') THEN 'error'"
+      )
     })
   })
 

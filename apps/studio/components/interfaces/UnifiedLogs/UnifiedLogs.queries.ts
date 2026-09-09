@@ -13,7 +13,11 @@ import {
   safeSql,
   type SafeLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
-import { WORKER_LOG_SOURCES } from '@/lib/constants/workers'
+import {
+  WORKER_LOG_SOURCES,
+  WORKER_LOG_STREAM_SEARCH_PARAM,
+  WORKER_LOG_STREAMS,
+} from '@/lib/constants/workers'
 
 // Operator fragments for SQL emission. `safeSql` rejects plain strings, so we
 // pre-brand the keywords we want to switch between.
@@ -109,9 +113,9 @@ const METADATA_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITI
 // HTTP status is checked first so gateway and auth rows (which carry a
 // `severity_text` of `INFO` regardless of response code) bucket as
 // success/warning/error by status. Postgres-style severity is the
-// fallback for rows without a status code.
+// fallback for rows without a status code — including worker rows, whose
+// runtime output and build events carry no HTTP status.
 const LEVEL_EXPR: SafeLogSqlFragment = safeSql`CASE
-      WHEN ${WORKER_LOG_SOURCE_CONDITION} THEN null
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) >= 500 THEN 'error'
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 400 AND 499 THEN 'warning'
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 200 AND 299 THEN 'success'
@@ -335,18 +339,6 @@ const EDGE_SERVICE_PATH_FILTER: Record<'edge_auth' | 'edge_storage' | 'edge_post
   edge_postgrest: '%/rest/%',
 }
 
-// Maps each worker stream's view-option toggle to the OTEL `log_attributes['source']`
-// value it hides. Mirrors EDGE_SERVICE_PATH_FILTER above, but for the three streams
-// (Invocations/Logs/Activity) nested under the `workers` log type.
-const WORKER_STREAM_VIEW_OPTION: Record<
-  'worker_requests' | 'worker_output' | 'worker_builds',
-  string
-> = {
-  worker_requests: WORKER_LOG_SOURCES.requests,
-  worker_output: WORKER_LOG_SOURCES.output,
-  worker_builds: WORKER_LOG_SOURCES.builds,
-}
-
 /**
  * Returns view-option WHERE conditions — toggles from the filter sidebar that
  * hide a subset of rows without being a `filter` URL param (Postgres
@@ -437,10 +429,11 @@ const applySearchParamsFilter = (search: QuerySearchParamsType): SafeLogSqlFragm
   }
 
   // Visible by default — only an explicit `false` hides that stream within
-  // the Workers log type (Invocations/Logs/Activity).
-  for (const key of ['worker_requests', 'worker_output', 'worker_builds'] as const) {
-    if (search[key] === false) {
-      conditions.push(safeSql`log_attributes['source'] != ${lit(WORKER_STREAM_VIEW_OPTION[key])}`)
+  // the Workers log type (Invocations/Logs/Activity). Mirrors the edge_* toggles
+  // above, keyed on the OTEL `log_attributes['source']` value of each stream.
+  for (const stream of WORKER_LOG_STREAMS) {
+    if (search[WORKER_LOG_STREAM_SEARCH_PARAM[stream]] === false) {
+      conditions.push(safeSql`log_attributes['source'] != ${lit(WORKER_LOG_SOURCES[stream])}`)
     }
   }
 

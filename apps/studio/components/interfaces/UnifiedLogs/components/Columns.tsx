@@ -6,8 +6,10 @@ import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
 import { getEventMessageDisplay } from '../UnifiedLogs.utils'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
+import { getWorkerLogStream } from '@/components/interfaces/Workers/Workers.utils'
 import { DataTableColumnLevelIndicator } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { WORKER_LOG_STREAM_LABEL } from '@/lib/constants/workers'
 
 /**
  * Determines if a column should be hidden based on its values in the data.
@@ -242,9 +244,18 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
           logType,
           value
         )
+        // Worker rows share one log type, so the stream (Invocations / Logs /
+        // Activity) is the only thing that tells them apart at a glance.
+        const workerStream =
+          logType === 'workers' ? getWorkerLogStream(row.original.metadata) : undefined
 
         return (
           <div className="flex flex-row gap-2 items-center">
+            {workerStream && (
+              <span className="text-foreground-lighter bg-surface-400 px-[6px] py-[2px] h-fit rounded-md text-[0.8rem] leading-none">
+                {WORKER_LOG_STREAM_LABEL[workerStream]}
+              </span>
+            )}
             {logCount && (
               <Tooltip>
                 <TooltipTrigger>

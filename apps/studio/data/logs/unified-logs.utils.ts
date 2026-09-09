@@ -68,7 +68,7 @@ export const mapUnifiedLogRow = (row: UnifiedLogsQueryRow) => {
     pathname,
     status,
     timestamp: row.timestamp,
-    level: isWorkersLog ? null : row.level,
+    level: row.level,
     event_message: row.event_message ?? '',
     log_type: row.log_type,
     log_count: row.log_count ?? null,

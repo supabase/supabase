@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import type { SearchParamsType } from './UnifiedLogs.types'
 import {
   buildUnifiedLogsUrl,
   gateLogTypeFilters,
@@ -8,6 +9,7 @@ import {
   getRawLogData,
   getWorkersLogsAvailability,
   parseMultigresEventMessage,
+  toQuerySearchParameters,
 } from './UnifiedLogs.utils'
 
 describe('buildUnifiedLogsUrl', () => {
@@ -52,21 +54,21 @@ describe('buildUnifiedLogsUrl', () => {
     )
     expect(params.has('date')).toBe(false)
   })
+})
 
-  it('appends extraFilters alongside the log_type filter', () => {
-    const { params } = parse(
-      buildUnifiedLogsUrl({
-        projectRef: 'abc',
-        logType: 'workers',
-        extraFilters: ['worker:eq:fran-worker'],
-      })
-    )
-    expect(params.getAll('filter')).toEqual(['log_type:eq:workers', 'worker:eq:fran-worker'])
-  })
+describe('toQuerySearchParameters', () => {
+  it('drops UI-only and unset params but keeps everything the queries read', () => {
+    const date = [new Date('2026-05-08T09:00:00Z'), new Date('2026-05-08T10:00:00Z')]
+    const result = toQuerySearchParameters({
+      filter: ['log_type:eq:workers'],
+      date,
+      id: 'row-1',
+      live: true,
+      uuid: null,
+      worker_output: false,
+    } as SearchParamsType)
 
-  it('sets the id param to pre-select a row', () => {
-    const { params } = parse(buildUnifiedLogsUrl({ projectRef: 'abc', id: 'row-123' }))
-    expect(params.get('id')).toBe('row-123')
+    expect(result).toEqual({ filter: ['log_type:eq:workers'], date, worker_output: false })
   })
 })
 

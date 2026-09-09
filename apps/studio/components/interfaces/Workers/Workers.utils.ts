@@ -1,5 +1,17 @@
 import { RUNTIMES, WORKER_NAME_WORDS, type RuntimeMeta } from './Workers.constants'
 import type { Worker, WorkerAccess, WorkerBuildState } from './Workers.types'
+import { parseLogsFilterUrlParams } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
+import type {
+  QuerySearchParamsType,
+  SearchParamsType,
+} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import { toQuerySearchParameters } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import {
+  WORKER_LOG_SOURCES,
+  WORKER_LOG_STREAM_SEARCH_PARAM,
+  WORKER_LOG_STREAMS,
+  type WorkerLogStream,
+} from '@/lib/constants/workers'
 import { ResponseError } from '@/types'
 
 export interface WorkerFilters {
@@ -68,3 +80,37 @@ export const isWorkersUnavailable = (error: Error | null): boolean =>
 // An enrolled project still answers 403 when the caller lacks the workers permission.
 export const isWorkersForbidden = (error: Error | null): boolean =>
   error instanceof ResponseError && error.code === 403
+
+// Worker rows in unified logs carry their OTEL attributes as `metadata`; the
+// `source` attribute says which of the three streams the row came from.
+export const getWorkerLogStream = (
+  metadata: Record<string, unknown> | null | undefined
+): WorkerLogStream | undefined => {
+  const source = metadata?.source
+  return WORKER_LOG_STREAMS.find((stream) => WORKER_LOG_SOURCES[stream] === source)
+}
+
+// Streams currently shown, read from the boolean view-option params (all on by default).
+export const getVisibleWorkerLogStreams = (
+  search: Pick<SearchParamsType, 'worker_requests' | 'worker_output' | 'worker_builds'>
+): WorkerLogStream[] =>
+  WORKER_LOG_STREAMS.filter((stream) => search[WORKER_LOG_STREAM_SEARCH_PARAM[stream]] !== false)
+
+// The worker logs tab is always scoped to one worker: whatever the URL says, the
+// query only ever sees the `workers` log type and this worker's rows. Any
+// `log_type` / `worker` filters coming from the URL are dropped so they can't
+// widen (or duplicate) that scope.
+export const buildWorkerLogsSearchParameters = (
+  search: SearchParamsType,
+  workerName: string
+): QuerySearchParamsType => {
+  const parameters = toQuerySearchParameters(search)
+  const otherFilters = (parameters.filter ?? []).filter((raw) => {
+    const parsed = parseLogsFilterUrlParams([raw])[0]
+    return parsed !== undefined && parsed.column !== 'log_type' && parsed.column !== 'worker'
+  })
+  return {
+    ...parameters,
+    filter: [...otherFilters, 'log_type:eq:workers', `worker:eq:${workerName}`],
+  }
+}

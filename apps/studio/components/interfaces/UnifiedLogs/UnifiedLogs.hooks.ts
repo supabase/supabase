@@ -4,8 +4,65 @@ import { useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
 
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import type { QuerySearchParamsType } from './UnifiedLogs.types'
+import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
+import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
+import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+
+/**
+ * The three queries every unified-logs surface needs (rows, sidebar counts,
+ * timeline chart) plus the flattened + de-duplicated row list. Shared by the
+ * Logs page and the embedded, worker-scoped logs tab.
+ */
+export const useUnifiedLogsData = ({
+  projectRef,
+  search,
+}: {
+  projectRef?: string
+  search: QuerySearchParamsType
+}) => {
+  const logs = useUnifiedLogsInfiniteQuery({ projectRef, search })
+  const counts = useUnifiedLogsCountQuery({ projectRef, search })
+  const chart = useUnifiedLogsChartQuery({ projectRef, search })
+
+  const rawFlatData = useMemo(() => {
+    return logs.data?.pages?.flatMap((page) => page.data ?? []) ?? []
+  }, [logs.data?.pages])
+  // [Joshen] Refer to unified-logs-infinite-query on why the need to dedupe
+  const flatData = useMemo(() => {
+    return rawFlatData.filter((value, idx) => {
+      return idx === rawFlatData.findIndex((x) => x.id === value.id)
+    })
+  }, [rawFlatData])
+
+  const refetchAll = () => {
+    logs.refetch()
+    counts.refetch()
+    chart.refetch()
+  }
+
+  return {
+    flatData,
+    error: logs.error,
+    isError: logs.isError,
+    isLoading: logs.isLoading,
+    isFetching: logs.isFetching,
+    isFetchingNextPage: logs.isFetchingNextPage,
+    isFetchingPreviousPage: logs.isFetchingPreviousPage,
+    hasNextPage: logs.hasNextPage,
+    fetchNextPage: logs.fetchNextPage,
+    fetchPreviousPage: logs.fetchPreviousPage,
+    totalRowCount: counts.data?.totalRowCount,
+    facets: counts.data?.facets,
+    isLoadingCounts: counts.isPending,
+    chartData: chart.data ?? [],
+    isFetchingChart: chart.isFetching,
+    refetchAll,
+    isRefetching: logs.isFetching || counts.isFetching || chart.isFetching,
+  }
+}
 
 export const useFilterSearchSync = ({
   applyFilterSearch,

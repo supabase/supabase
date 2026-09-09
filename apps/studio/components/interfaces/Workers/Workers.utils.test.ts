@@ -3,15 +3,19 @@ import { describe, expect, it } from 'vitest'
 import { getWorkerStateMeta, WORKER_NAME_WORDS, workerUrl } from './Workers.constants'
 import type { Worker } from './Workers.types'
 import {
+  buildWorkerLogsSearchParameters,
   filterWorkers,
   formatResources,
   formatRuntime,
   formatSize,
   generateWorkerName,
   getPage,
+  getVisibleWorkerLogStreams,
+  getWorkerLogStream,
   isWorkersForbidden,
   isWorkersUnavailable,
 } from './Workers.utils'
+import type { SearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { ResponseError } from '@/types'
 
 const worker = (overrides: Partial<Worker> & Pick<Worker, 'name'>): Worker => ({
@@ -188,5 +192,64 @@ describe('getWorkerStateMeta', () => {
     expect(
       getWorkerStateMeta(worker({ name: 'a', buildState: 'active', isDeleting: true })).label
     ).toBe('Deleting')
+  })
+})
+
+describe('getWorkerLogStream', () => {
+  it('maps each OTEL source attribute to its stream', () => {
+    expect(getWorkerLogStream({ source: 'worker_ingress_logs' })).toBe('requests')
+    expect(getWorkerLogStream({ source: 'worker_guest_logs' })).toBe('output')
+    expect(getWorkerLogStream({ source: 'worker_api_logs' })).toBe('builds')
+  })
+
+  it('returns undefined for unknown or missing metadata', () => {
+    expect(getWorkerLogStream({ source: 'edge_logs' })).toBeUndefined()
+    expect(getWorkerLogStream(null)).toBeUndefined()
+    expect(getWorkerLogStream(undefined)).toBeUndefined()
+  })
+})
+
+describe('getVisibleWorkerLogStreams', () => {
+  it('shows every stream unless its view option is explicitly off', () => {
+    expect(
+      getVisibleWorkerLogStreams({
+        worker_requests: true,
+        worker_output: true,
+        worker_builds: true,
+      })
+    ).toEqual(['requests', 'output', 'builds'])
+    expect(
+      getVisibleWorkerLogStreams({
+        worker_requests: true,
+        worker_output: false,
+        worker_builds: true,
+      })
+    ).toEqual(['requests', 'builds'])
+  })
+})
+
+describe('buildWorkerLogsSearchParameters', () => {
+  const search = { id: 'row', live: false, size: 40 } as SearchParamsType
+
+  it('always scopes the query to the workers log type and the given worker', () => {
+    expect(buildWorkerLogsSearchParameters(search, 'embed')).toEqual({
+      size: 40,
+      filter: ['log_type:eq:workers', 'worker:eq:embed'],
+    })
+  })
+
+  it('keeps other filters but drops any log_type / worker filters from the URL', () => {
+    const result = buildWorkerLogsSearchParameters(
+      {
+        ...search,
+        filter: ['log_type:eq:postgres', 'worker:eq:other', 'event_message:ilike:timeout'],
+      },
+      'embed'
+    )
+    expect(result.filter).toEqual([
+      'event_message:ilike:timeout',
+      'log_type:eq:workers',
+      'worker:eq:embed',
+    ])
   })
 })

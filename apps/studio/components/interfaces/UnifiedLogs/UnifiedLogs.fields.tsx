@@ -6,6 +6,11 @@ import { getLevelLabel } from './UnifiedLogs.utils'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { DataTableFilterField, Option } from '@/components/ui/DataTable/DataTable.types'
 import { getLevelColor } from '@/components/ui/DataTable/DataTable.utils'
+import {
+  WORKER_LOG_STREAM_LABEL,
+  WORKER_LOG_STREAM_SEARCH_PARAM,
+  WORKER_LOG_STREAMS,
+} from '@/lib/constants/workers'
 
 // instead of filterFields, maybe just 'fields' with a filterDisabled prop?
 // that way, we could have 'message' or 'headers' field with label and value as well as type!
@@ -37,11 +42,10 @@ export const filterFields = [
           : value === 'postgres'
             ? [{ label: 'Connection logs', value: 'show_connection_logs' }]
             : value === 'workers'
-              ? [
-                  { label: 'Invocations', value: 'worker_requests' },
-                  { label: 'Logs', value: 'worker_output' },
-                  { label: 'Activity', value: 'worker_builds' },
-                ]
+              ? WORKER_LOG_STREAMS.map((stream) => ({
+                  label: WORKER_LOG_STREAM_LABEL[stream],
+                  value: WORKER_LOG_STREAM_SEARCH_PARAM[stream],
+                }))
               : [],
     })),
     component: (props: Option) => {

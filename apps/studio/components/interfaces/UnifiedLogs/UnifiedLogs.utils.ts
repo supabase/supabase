@@ -4,6 +4,7 @@ import { cn } from 'ui'
 import { LOG_TYPES_LABELS } from './UnifiedLogs.constants'
 import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import { ColumnSchema, FacetMetadataSchema } from './UnifiedLogs.schema'
+import type { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import type { UnifiedLogInspectionEntry } from '@/data/logs/unified-log-inspection-query'
@@ -34,8 +35,6 @@ export const buildUnifiedLogsUrl = ({
   user,
   start,
   end,
-  extraFilters,
-  id,
 }: {
   projectRef: string
   logType?: UnifiedLogType
@@ -43,20 +42,28 @@ export const buildUnifiedLogsUrl = ({
   user?: string
   start?: string | Date
   end?: string | Date
-  /** Additional raw `column:opAbbrev:value` filter strings, appended alongside `logType`. */
-  extraFilters?: string[]
-  /** Pre-selects this row so its detail panel opens as soon as the page loads. */
-  id?: string
 }) => {
   const params = new URLSearchParams()
   if (logType) params.append('filter', `log_type:eq:${logType}`)
-  extraFilters?.forEach((filter) => params.append('filter', filter))
   if (user) params.set('user', user)
   if (start && end) {
     params.set('date', `${new Date(start).valueOf()}-${new Date(end).valueOf()}`)
   }
-  if (id) params.set('id', id)
   return `/project/${projectRef}/logs?${params.toString()}`
+}
+
+/**
+ * Narrows the full URL state down to the params that drive the logs queries:
+ * drops `id`/`live` (UI-only) and unset values, so the resulting object is a
+ * stable query-key input that doesn't refetch on unrelated URL changes.
+ */
+export const toQuerySearchParameters = (search: SearchParamsType): QuerySearchParamsType => {
+  const parameters: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(search)) {
+    if (key === 'id' || key === 'live' || value === null || value === undefined) continue
+    parameters[key] = value
+  }
+  return parameters as QuerySearchParamsType
 }
 
 export const getFacetedUniqueValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {

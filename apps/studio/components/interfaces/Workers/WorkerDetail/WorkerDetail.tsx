@@ -11,6 +11,7 @@ import {
   BreadcrumbSeparator,
   Button,
   Card,
+  cn,
   NavMenu,
   NavMenuItem,
 } from 'ui'
@@ -77,7 +78,14 @@ export const WorkerDetail = () => {
   }
 
   return (
-    <div className="w-full min-h-full flex flex-col items-stretch">
+    // The logs tab scrolls inside its own table and docks a detail panel below it,
+    // so it needs the page to be exactly viewport height; the overview scrolls as a page.
+    <div
+      className={cn(
+        'w-full flex flex-col items-stretch',
+        tab === 'logs' ? 'h-full overflow-hidden' : 'min-h-full'
+      )}
+    >
       <PageBreadcrumbs>
         <BreadcrumbList>
           <BreadcrumbItem>
