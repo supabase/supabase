@@ -60,12 +60,18 @@ export function flattenOtelInspectionRow(
     row.source === 'postgres_logs' ? attrs['parsed.sql_state_code'] : attrs['response.status_code']
   const statusNum = Number(status)
 
-  // Derive level from HTTP status first, then postgres severity, then severity_text.
+  // Derive level from postgres severity for postgres rows (their `status` is a
+  // SQL state code, not an HTTP status), otherwise from HTTP status, then
+  // severity_text.
   let level = ''
-  if (Number.isFinite(statusNum) && statusNum > 0) {
+  if (row.source === 'postgres_logs') {
+    if (attrs['parsed.error_severity']) {
+      level = pgSeverityToLevel(String(attrs['parsed.error_severity']))
+    } else if (row.severity_text) {
+      level = String(row.severity_text).toLowerCase()
+    }
+  } else if (Number.isFinite(statusNum) && statusNum > 0) {
     level = httpStatusToLevel(statusNum)
-  } else if (attrs['parsed.error_severity']) {
-    level = pgSeverityToLevel(String(attrs['parsed.error_severity']))
   } else if (row.severity_text) {
     level = String(row.severity_text).toLowerCase()
   }
