@@ -392,16 +392,8 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     return () => node.removeEventListener('keydown', handleEscapeKey)
   }, [promptState?.isOpen])
 
-  const shouldCenterResults =
-    !result?.error && ((result?.rows ?? []).length === 0 || (view === 'chart' && !hasConfig))
-
   const queryResults = (
-    <ExplorerQueryResults
-      className={cn(
-        variant === 'embedded' ? 'max-h-80' : 'h-full',
-        shouldCenterResults ? 'items-center justify-center' : 'overflow-x-auto'
-      )}
-    >
+    <ExplorerQueryResults className={cn(variant === 'embedded' ? 'max-h-80' : 'h-full')}>
       <QueryResultRenderer
         view={view}
         result={result}
