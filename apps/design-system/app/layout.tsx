@@ -11,7 +11,7 @@ import { inter, manrope, sourceCodePro } from '@/lib/fonts'
 
 const className = `${inter.variable} ${manrope.variable} ${sourceCodePro.variable}`
 
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '/design-system'
+const BASE_PATH =  z.env.NEXT_PUBLIC_BASE_PATH || '/design-system'
 
 export const metadata: Metadata = {
   applicationName: 'Supabase Design System',
