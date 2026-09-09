@@ -144,9 +144,8 @@ withTestDatabase(
   }
 )
 
-// Composite (multi-column) FK: the relationships subquery expands it to one
-// entry per source×target column pair, all sharing constraint_name, so the
-// scoped ORDER BY tie-breaks on the column names to stay deterministic.
+// Composite (multi-column) FK: pairs source and target columns by ordinal position
+// sharing constraint_name.
 withTestDatabase(
   'scoped tables.retrieve orders composite-FK relationship entries deterministically',
   async ({ executeQuery }) => {
@@ -159,16 +158,14 @@ withTestDatabase(
     const scopedRow: any = scoped.zod.parse((await executeQuery(scoped.sql))[0])
     const legacyRow: any = legacy.zod.parse((await executeQuery(legacy.sql))[0])
 
-    // Four entries (2 source cols × 2 target cols), all one constraint_name.
-    expect(scopedRow.relationships).toHaveLength(4)
+    // Two entries paired by ordinal position (a -> x, b -> y), sharing constraint_name.
+    expect(scopedRow.relationships).toHaveLength(2)
     expect(new Set(scopedRow.relationships.map((r: any) => r.constraint_name)).size).toBe(1)
     // Scoped is already ordered by (name, source col, target col), raw.
     expect(
       scopedRow.relationships.map((r: any) => [r.source_column_name, r.target_column_name])
     ).toEqual([
       ['a', 'x'],
-      ['a', 'y'],
-      ['b', 'x'],
       ['b', 'y'],
     ])
     legacyRow.relationships = sortRels(legacyRow.relationships)
