@@ -41,7 +41,19 @@ import type { NextPageWithLayout } from '@/types'
 const REPORT_TITLE = 'Storage'
 
 export const StorageReport: NextPageWithLayout = () => {
-  const report = useStorageReport()
+  const {
+    datePickerHelpers,
+    datePickerValue,
+    handleDatePickerChange: handleDatePickerChangeFromHook,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+    selectedDateRange,
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+
+  const report = useStorageReport({
+    iso_timestamp_start: datePickerValue.from,
+    iso_timestamp_end: datePickerValue.to,
+  })
 
   const {
     data,
@@ -54,15 +66,6 @@ export const StorageReport: NextPageWithLayout = () => {
     addFilter,
     refresh,
   } = report
-
-  const {
-    datePickerHelpers,
-    datePickerValue,
-    handleDatePickerChange: handleDatePickerChangeFromHook,
-    showUpgradePrompt,
-    setShowUpgradePrompt,
-    selectedDateRange,
-  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   const handleDatepickerChange = (vals: DatePickerValue) => {
     const promptShown = handleDatePickerChangeFromHook(vals)
