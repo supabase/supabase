@@ -2,14 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
-import {
-  ident,
-  joinSqlFragments,
-  keyword,
-  literal,
-  safeSql,
-  type SafeSqlFragment,
-} from './pg-format'
+import { joinSqlFragments, keyword, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { COLUMN_PRIVILEGES_SQL, getScopedColumnPrivilegesSql } from './sql/column-privileges'
 
 const pgColumnPrivilegeGrant = z.object({
@@ -146,15 +139,41 @@ function list({
 }
 
 type ColumnPrivilegesGrant = z.infer<typeof privilegeGrant>
+function getGranteeFormat(grantee: string): {
+  format: SafeSqlFragment
+  value: SafeSqlFragment
+} {
+  if (grantee === 'public') {
+    return { format: safeSql`public`, value: safeSql`` }
+  }
+
+  // Keep the role name as a format argument rather than embedding its quoted
+  // identifier in the format string. This preserves names containing apostrophes.
+  return { format: safeSql`%I`, value: safeSql`, ${literal(grantee)}` }
+}
+
+function getDoBlockDelimiter(grantees: string[]): SafeSqlFragment {
+  let suffix = 0
+  while (true) {
+    const delimiter = suffix === 0 ? safeSql`$pg_meta$` : safeSql`$pg_meta_${literal(suffix)}$`
+    if (grantees.every((grantee) => !grantee.includes(delimiter))) {
+      return delimiter
+    }
+    suffix += 1
+  }
+}
+
 function grant(grants: ColumnPrivilegesGrant[]): { sql: SafeSqlFragment } {
+  const doBlockDelimiter = getDoBlockDelimiter(grants.map(({ grantee }) => grantee))
   const sql = safeSql`
-do $$
+do ${doBlockDelimiter}
 declare
   col record;
 begin
 ${joinSqlFragments(
   grants.map(({ privilegeType, columnId, grantee, isGrantable }) => {
     const [relationId, columnNumber] = columnId.split('.')
+    const granteeFormat = getGranteeFormat(grantee)
     return safeSql`
 select *
 from pg_attribute a
@@ -162,30 +181,32 @@ where a.attrelid = ${literal(relationId)}
   and a.attnum = ${literal(columnNumber)}
 into col;
 execute format(
-  'grant ${keyword(privilegeType)} (%I) on %s to ${
-    grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
-  } ${isGrantable ? safeSql`with grant option` : safeSql``}',
+  'grant ${keyword(privilegeType)} (%I) on %s to ${granteeFormat.format} ${
+    isGrantable ? safeSql`with grant option` : safeSql``
+  }',
   col.attname,
-  col.attrelid::regclass
+  col.attrelid::regclass${granteeFormat.value}
 );`
   }),
   '\n'
 )}
-end $$;
+end ${doBlockDelimiter};
 `
   return { sql }
 }
 
 type ColumnPrivilegesRevoke = Omit<ColumnPrivilegesGrant, 'isGrantable'>
 function revoke(revokes: ColumnPrivilegesRevoke[]): { sql: SafeSqlFragment } {
+  const doBlockDelimiter = getDoBlockDelimiter(revokes.map(({ grantee }) => grantee))
   const sql = safeSql`
-do $$
+do ${doBlockDelimiter}
 declare
   col record;
 begin
 ${joinSqlFragments(
   revokes.map(({ privilegeType, columnId, grantee }) => {
     const [relationId, columnNumber] = columnId.split('.')
+    const granteeFormat = getGranteeFormat(grantee)
     return safeSql`
 select *
 from pg_attribute a
@@ -193,16 +214,14 @@ where a.attrelid = ${literal(relationId)}
   and a.attnum = ${literal(columnNumber)}
 into col;
 execute format(
-  'revoke ${keyword(privilegeType)} (%I) on %s from ${
-    grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
-  }',
+  'revoke ${keyword(privilegeType)} (%I) on %s from ${granteeFormat.format}',
   col.attname,
-  col.attrelid::regclass
+  col.attrelid::regclass${granteeFormat.value}
 );`
   }),
   '\n'
 )}
-end $$;
+end ${doBlockDelimiter};
 `
   return { sql }
 }
