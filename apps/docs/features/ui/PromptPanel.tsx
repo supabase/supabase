@@ -11,7 +11,7 @@ import {
   type ReactNode,
 } from 'react'
 // shadcn tabs from packages/ui/src/components/shadcn/ui/tabs.tsx
-import { cn, copyToClipboard, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
+import { cn, copyToClipboard, Tabs, TabsContent, TabsIndicator, TabsList, TabsTrigger } from 'ui'
 
 type PromptTitleProps = {
   children: ReactNode
@@ -254,6 +254,7 @@ function PromptPanel({ children, className }: PromptPanelProps) {
               <TabLabel icon={prompt.icon}>{prompt.title}</TabLabel>
             </TabsTrigger>
           ))}
+          <TabsIndicator />
         </TabsList>
       ) : (
         <span
