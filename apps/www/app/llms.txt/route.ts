@@ -11,6 +11,21 @@ interface Source {
   enabled: boolean
 }
 
+const AGENT_RESOURCES: ReadonlyArray<{ title: string; url: string; description: string }> = [
+  {
+    title: 'Supabase Management API OpenAPI spec',
+    url: 'https://supabase.com/openapi.json',
+    description:
+      'OpenAPI 3.0 description of the Management API for managing organizations, projects, branches, and configuration',
+  },
+  {
+    title: 'Supabase MCP server',
+    url: 'https://mcp.supabase.com/mcp',
+    description:
+      'Streamable HTTP MCP endpoint, OAuth-protected, for managing projects, database schema, and queries from MCP clients',
+  },
+]
+
 /**
  * Resolved relative to apps/www (process.cwd() at runtime). The directory is
  * included in the serverless bundle via outputFileTracingIncludes in
@@ -81,6 +96,10 @@ export async function GET() {
     .map((source) => `- [${source.title}](https://supabase.com/${source.relPath})`)
     .join('\n')
 
+  const agentResourceLinks = AGENT_RESOURCES.map(
+    (resource) => `- [${resource.title}](${resource.url}): ${resource.description}`
+  ).join('\n')
+
   const content = [
     '# Supabase Docs',
     '',
@@ -93,6 +112,10 @@ export async function GET() {
     '## Pricing',
     '',
     '- [Supabase Pricing](https://supabase.com/pricing.md)',
+    '',
+    '## API and agent resources',
+    '',
+    agentResourceLinks,
   ].join('\n')
 
   return new Response(content, {
