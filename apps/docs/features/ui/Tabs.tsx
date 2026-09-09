@@ -1,7 +1,6 @@
 'use client'
 
 import { cva } from 'class-variance-authority'
-import { Tabs as TabsPrimitive } from 'radix-ui'
 import {
   Children,
   isValidElement,
@@ -13,7 +12,7 @@ import {
   useState,
   type KeyboardEvent,
 } from 'react'
-import { cn } from 'ui'
+import { cn, TabsContent, TabsList, Tabs as TabsRoot, TabsTrigger } from 'ui'
 
 import { useTocRerenderTrigger } from '../docs/GuidesMdx.state'
 import { useStickyTabs, UseStickyTabsOptions } from './useStickyTabs'
@@ -39,10 +38,10 @@ export interface TabsProps {
 export const tabsListVariants = cva(cn('flex'), {
   variants: {
     type: {
-      pills: 'space-x-1',
-      underlined: 'items-center border-b border-secondary',
-      cards: '',
-      'rounded-pills': 'flex-wrap gap-2',
+      pills: 'border-b-0 shadow-none space-x-1',
+      underlined: 'relative items-center [--tab-track:var(--border-secondary)]',
+      cards: 'border-b-0 shadow-none',
+      'rounded-pills': 'border-b-0 shadow-none flex-wrap gap-2',
     },
     scrollable: {
       true: 'overflow-auto whitespace-nowrap no-scrollbar mask-fadeout-right',
@@ -94,8 +93,9 @@ export const tabsTriggerListVariants = cva(
       {
         type: 'underlined',
         isActive: true,
-        className: '!text-foreground border-b-2 border-foreground',
+        className: '!text-foreground',
       },
+      { type: 'underlined', className: 'py-3 first:ps-0' },
       {
         type: 'rounded-pills',
         isActive: true,
@@ -208,12 +208,12 @@ export const Tabs = ({
     ]
   )
   return (
-    <TabsPrimitive.Root
+    <TabsRoot
       value={activeTab}
       className={cn('w-full justify-between space-y-4', baseClassNames)}
       ref={observedRef}
     >
-      <TabsPrimitive.List
+      <TabsList
         className={tabsListVariants({
           type,
           scrollable,
@@ -227,7 +227,7 @@ export const Tabs = ({
           const isActive = activeTab === tab.props.id
 
           return (
-            <TabsPrimitive.Trigger
+            <TabsTrigger
               onKeyDown={(e: KeyboardEvent<HTMLButtonElement>) => {
                 if (e.key === 'Enter') {
                   e.preventDefault()
@@ -242,13 +242,13 @@ export const Tabs = ({
               {tab.props.icon}
               <span>{tab.props.label}</span>
               {tab.props.iconRight}
-            </TabsPrimitive.Trigger>
+            </TabsTrigger>
           )
         })}
         {addOnAfter}
-      </TabsPrimitive.List>
+      </TabsList>
       {childrenArr}
-    </TabsPrimitive.Root>
+    </TabsRoot>
   )
 }
 
@@ -263,12 +263,8 @@ interface TabPanelProps {
 
 export const TabPanel = ({ children, id, className }: TabPanelProps) => {
   return (
-    <TabsPrimitive.Content
-      value={id}
-      className={cn('focus:outline-hidden transition-height', className)}
-      tabIndex={-1}
-    >
+    <TabsContent value={id} className={cn('mt-0 focus:outline-hidden', className)} tabIndex={-1}>
       {children}
-    </TabsPrimitive.Content>
+    </TabsContent>
   )
 }
