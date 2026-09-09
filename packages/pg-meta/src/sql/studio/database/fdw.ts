@@ -7,6 +7,20 @@ import {
   type SafeSqlFragment,
 } from '../../../pg-format'
 
+// DO blocks are dollar-quoted, so any user-derived value interpolated into the
+// block body could contain the closing delimiter and terminate the block early.
+// Generate a delimiter that cannot appear in any of the values instead.
+function getDoBlockDelimiter(values: string[]): SafeSqlFragment {
+  let suffix = 0
+  while (true) {
+    const delimiter = suffix === 0 ? safeSql`$pg_meta$` : safeSql`$pg_meta_${literal(suffix)}$`
+    if (values.every((value) => !value.includes(delimiter))) {
+      return delimiter
+    }
+    suffix += 1
+  }
+}
+
 type SimplifiedWrapperMeta = {
   handlerName: string
   validatorName: string
@@ -96,9 +110,10 @@ export function getCreateFDWSql({
   const createEncryptedKeysSqlArray = encryptedOptions.map((option) => {
     const key = `${formState.wrapper_name}_${option.name}`
     const quotedValue = literal(formState[option.name] || '')
+    const delimiter = getDoBlockDelimiter([key, formState[option.name] || ''])
 
     return safeSql`
-      do $$
+      do ${delimiter}
       begin
         -- Old wrappers has an implicit dependency on pgsodium. For new wrappers
         -- we use Vault directly.
@@ -147,7 +162,7 @@ export function getCreateFDWSql({
             new_name := ${literal(key)}
           );
         end if;
-      end $$;
+      end ${delimiter};
     `
   })
 
@@ -169,8 +184,19 @@ export function getCreateFDWSql({
     ','
   )
 
+  // Server/wrapper names reach format() as %s arguments (already-quoted
+  // identifiers) so quotes or backslashes in user-typed names never interact
+  // with the outer E'...' string.
+  const createServerDelimiter = getDoBlockDelimiter([
+    formState.server_name,
+    formState.wrapper_name,
+    ...encryptedOptions.map((option) => `${formState.wrapper_name}_${option.name}`),
+    ...encryptedOptions.map((option) => formState[option.name] || ''),
+    ...unencryptedOptionsFilter.map((option) => formState[option.name]),
+  ])
+
   const createServerSql = safeSql`
-    do $$
+    do ${createServerDelimiter}
     declare
       -- Old wrappers has an implicit dependency on pgsodium. For new wrappers
       -- we use Vault directly.
@@ -222,7 +248,9 @@ export function getCreateFDWSql({
       )}
     
       execute format(
-        E'create server ${ident(formState.server_name)} foreign data wrapper ${ident(formState.wrapper_name)} options (${optionsSqlArray});',
+        E'create server %s foreign data wrapper %s options (${optionsSqlArray});',
+        ${ident(formState.server_name)},
+        ${ident(formState.wrapper_name)},
         ${joinSqlFragments(
           [
             ...encryptedOptions
@@ -233,7 +261,7 @@ export function getCreateFDWSql({
           ','
         )}
       );
-    end $$;
+    end ${createServerDelimiter};
   `
 
   const createTablesSql = joinSqlFragments(
@@ -305,9 +333,10 @@ export const getDeleteFDWSql = ({
 
   const deleteEncryptedSecretsSqlArray = encryptedOptions.map((option) => {
     const key = `${wrapper.name}_${option.name}`
+    const delimiter = getDoBlockDelimiter([key])
 
     return safeSql`
-      do $$
+      do ${delimiter}
       begin
         -- Old wrappers has an implicit dependency on pgsodium. For new wrappers
         -- we use Vault directly.
@@ -345,7 +374,7 @@ export const getDeleteFDWSql = ({
         else
           delete from vault.secrets where name = ${literal(key)};
         end if;
-      end $$;
+      end ${delimiter};
     `
   })
 
