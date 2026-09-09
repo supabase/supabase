@@ -1,11 +1,11 @@
 import { useFlag } from 'common'
-import { CheckIcon, ChevronsUpDown, Globe } from 'lucide-react'
+import { CheckIcon, Globe } from 'lucide-react'
 import { useId, useMemo, useState } from 'react'
 import {
-  Button,
   Card,
   CardContent,
   cn,
+  ComboboxTrigger,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -87,20 +87,19 @@ export const TimezoneSettings = () => {
             >
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                  <Button
-                    role="combobox"
+                  <ComboboxTrigger
                     aria-expanded={open}
                     aria-controls={listboxId}
-                    className="w-full justify-between"
-                    variant="default"
+                    data-state={open ? 'open' : 'closed'}
                     size="small"
-                    icon={<Globe />}
-                    iconRight={<ChevronsUpDown size={14} strokeWidth={1.5} />}
                   >
-                    <span className="truncate text-left">
-                      {isAutoDetected ? `Auto detect (${timezone})` : triggerLabel}
+                    <span className="flex min-w-0 items-center gap-2">
+                      <Globe className="h-4 w-4 shrink-0" />
+                      <span className="truncate">
+                        {isAutoDetected ? `Auto detect (${timezone})` : triggerLabel}
+                      </span>
                     </span>
-                  </Button>
+                  </ComboboxTrigger>
                 </PopoverTrigger>
                 <PopoverContent id={listboxId} className="w-[--radix-popover-trigger-width] p-0">
                   <Command>
