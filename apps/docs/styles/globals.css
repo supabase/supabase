@@ -161,16 +161,15 @@ h6:not(.font-mono),
 }
 
 /* Remove underline from Button links */
-.prose :where(a[data-size]):where([class~='not-prose'], [class~='not-prose'] *),
-.prose :where(a[data-size]):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-  text-decoration-line: none;
+.prose a[data-size] {
+  @apply no-underline;
 }
 
 /* Alert set its own type scale to prevent drift in docs */
 .prose
   :where(p, li, a, figcaption):not(:where([class~='not-prose'], [class~='not-prose'] *)):not(
     :where(h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6) *
-  ):not(:where([data-slot='alert'] *)) {
+  ):not(:where([data-slot='alert'] *)):not(:where(a[data-size], a[data-size] p)) {
   @apply text-base leading-7;
 }
 
