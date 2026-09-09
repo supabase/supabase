@@ -66,7 +66,6 @@
     "@sentry/react": "^10.27.0",
     "@sentry/tanstackstart-react": "catalog:",
     "@smithy/property-provider": "^4.0.4",
-    "@std/path": "npm:@jsr/std__path@^1.0.8",
     "@stripe/react-stripe-js": "6.1.0",
     "@stripe/stripe-js": "9.1.0",
     "@stripe/sync-engine": "1.0.32",
