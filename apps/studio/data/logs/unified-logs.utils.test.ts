@@ -1,16 +1,19 @@
 import { describe, expect, it } from 'vitest'
 
-import { extractLogMetadata } from './unified-logs.utils'
+import {
+  extractLogMetadata,
+  mapUnifiedLogRow,
+  parseUnifiedLogsQueryRows,
+} from './unified-logs.utils'
 
 describe('extractLogMetadata', () => {
   describe('non-auth logs', () => {
-    it('returns the row status, method, and url-derived pathname', () => {
+    it('returns projected status, method, and pathname', () => {
       const row = {
         log_type: 'api',
         status: 404,
         method: 'GET',
-        url: 'https://example.supabase.co/rest/v1/users?select=id',
-        pathname: '/ignored',
+        pathname: '/rest/v1/users?select=id',
         event_message: 'irrelevant',
       }
 
@@ -21,12 +24,11 @@ describe('extractLogMetadata', () => {
       })
     })
 
-    it('falls back to row.pathname when url is missing', () => {
+    it('returns the projected pathname', () => {
       const row = {
         log_type: 'api',
         status: 500,
         method: 'POST',
-        url: '',
         pathname: '/fallback',
         event_message: '',
       }
@@ -34,7 +36,7 @@ describe('extractLogMetadata', () => {
       expect(extractLogMetadata(row).pathname).toBe('/fallback')
     })
 
-    it('returns empty string for pathname when both url and pathname are missing', () => {
+    it('returns an empty string when pathname is missing', () => {
       const row = {
         log_type: 'api',
         status: 200,
@@ -49,7 +51,6 @@ describe('extractLogMetadata', () => {
       const row = {
         log_type: 'api',
         method: 'GET',
-        url: 'https://example.supabase.co/health',
         event_message: '',
       }
 
@@ -63,7 +64,6 @@ describe('extractLogMetadata', () => {
         log_type: 'auth',
         status: 999,
         method: 'IGNORED',
-        url: 'https://ignored',
         event_message: JSON.stringify({
           status: 400,
           method: 'POST',
@@ -146,7 +146,6 @@ describe('extractLogMetadata', () => {
         log_type: 'auth',
         status: 200,
         method: 'GET',
-        url: 'https://example.supabase.co/token',
         event_message: 'not json',
       }
 
@@ -169,5 +168,142 @@ describe('extractLogMetadata', () => {
 
       expect(extractLogMetadata(row).status).toBe(200)
     })
+  })
+
+  describe('workers logs', () => {
+    it('does not synthesize unsupported request metadata', () => {
+      const row = {
+        event_message: 'Error: Dynamic require of "path" is not supported',
+        id: '51a29911-9293-4616-8984-743cc548b629',
+        log_type: 'workers',
+        metadata: {
+          cw_event_id: '39883203917805946105278943454814281535421893832620638214',
+          launch_id: '1788424715503435269',
+          log_group: '/aws/lambda-microvms/workers/cxkpapyhaaywrtudnqpl/api',
+          log_stream: 'launch-1788424715503435269',
+          source: 'worker_guest_logs',
+          worker: 'api',
+        },
+        project: 'cxkpapyhaaywrtudnqpl',
+        timestamp: 1788424716876000,
+      }
+
+      expect(extractLogMetadata(row)).toEqual({ status: null, method: null, pathname: null })
+    })
+
+    it('preserves only Workers metadata while keeping unsupported fields null', () => {
+      const metadata = {
+        cw_event_id: '39883203917805946105278943454814281535421893832620638214',
+        launch_id: '1788424715503435269',
+        log_group: '/aws/lambda-microvms/workers/cxkpapyhaaywrtudnqpl/api',
+        log_stream: 'launch-1788424715503435269',
+        source: 'worker_guest_logs',
+        worker: 'api',
+      }
+      const mapped = mapUnifiedLogRow({
+        event_message: 'Error: Dynamic require of "path" is not supported',
+        id: '51a29911-9293-4616-8984-743cc548b629',
+        log_type: 'workers',
+        metadata,
+        timestamp: 1788424716876000,
+        status: 200,
+        level: 'success',
+        method: 'GET',
+        pathname: '/invented',
+        auth_user: 'invented-user',
+        log_count: null,
+        logs: null,
+      })
+
+      expect(mapped).toMatchObject({
+        id: '51a29911-9293-4616-8984-743cc548b629',
+        timestamp: 1788424716876000,
+        event_message: 'Error: Dynamic require of "path" is not supported',
+        metadata,
+        status: null,
+        level: null,
+        method: null,
+        pathname: null,
+        auth_user: null,
+      })
+      expect(mapped).not.toHaveProperty('project')
+    })
+
+    it('does not add metadata to non-Workers rows', () => {
+      const mapped = mapUnifiedLogRow({
+        id: 'edge-log',
+        timestamp: 1788424716876000,
+        log_type: 'edge',
+        metadata: { request: 'existing metadata' },
+        status: 200,
+        level: 'success',
+        method: 'GET',
+        pathname: '/rest/v1',
+        event_message: null,
+        log_count: 0,
+        logs: null,
+      })
+
+      expect(mapped).not.toHaveProperty('metadata')
+      expect(mapped.log_count).toBe(0)
+    })
+  })
+})
+
+describe('parseUnifiedLogsQueryRows', () => {
+  const workersRow = {
+    event_message: 'Error: Dynamic require of "path" is not supported',
+    id: '51a29911-9293-4616-8984-743cc548b629',
+    metadata: {
+      cw_event_id: '39883203917805946105278943454814281535421893832620638214',
+      launch_id: '1788424715503435269',
+      log_group: '/aws/lambda-microvms/workers/cxkpapyhaaywrtudnqpl/api',
+      log_stream: 'launch-1788424715503435269',
+      source: 'worker_guest_logs',
+      worker: 'api',
+    },
+    project: 'cxkpapyhaaywrtudnqpl',
+    timestamp: 1788424716876000,
+    log_type: 'workers',
+    status: null,
+    level: null,
+    pathname: null,
+    method: null,
+    log_count: null,
+    logs: null,
+    auth_user: null,
+  }
+
+  it('parses the Workers projection and strips project', () => {
+    const [parsed] = parseUnifiedLogsQueryRows([workersRow])
+
+    expect(parsed).toMatchObject({
+      id: workersRow.id,
+      timestamp: workersRow.timestamp,
+      event_message: workersRow.event_message,
+      metadata: workersRow.metadata,
+      log_type: 'workers',
+      status: null,
+      level: null,
+      pathname: null,
+      method: null,
+    })
+    expect(parsed).not.toHaveProperty('project')
+  })
+
+  it('returns an empty array for undefined results', () => {
+    expect(parseUnifiedLogsQueryRows(undefined)).toEqual([])
+  })
+
+  it('rejects invalid metadata', () => {
+    expect(() => parseUnifiedLogsQueryRows([{ ...workersRow, metadata: 'invalid' }])).toThrow()
+  })
+
+  it.each([{ id: 42 }, { timestamp: true }])('rejects invalid identity fields', (invalidFields) => {
+    expect(() => parseUnifiedLogsQueryRows([{ ...workersRow, ...invalidFields }])).toThrow()
+  })
+
+  it('rejects invalid projected field types', () => {
+    expect(() => parseUnifiedLogsQueryRows([{ ...workersRow, level: 'info' }])).toThrow()
   })
 })

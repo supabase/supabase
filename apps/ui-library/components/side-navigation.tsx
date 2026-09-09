@@ -3,7 +3,13 @@ import Link from 'next/link'
 import { CommandMenu } from './command-menu'
 import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
 import NavigationItem from '@/components/side-navigation-item'
-import { componentPages, gettingStarted, oauthBlocks, platformBlocks } from '@/config/docs'
+import {
+  componentPages,
+  gettingStarted,
+  mcpBlocks,
+  oauthBlocks,
+  platformBlocks,
+} from '@/config/docs'
 
 function SideNavigation() {
   return (
@@ -93,6 +99,14 @@ function SideNavigation() {
           {oauthBlocks.title}
         </div>
         {oauthBlocks.items.map((item, i) => (
+          <NavigationItem item={item} key={`${item.href}-${i}`} />
+        ))}
+      </div>
+      <div className="pb-6">
+        <div className="font-mono uppercase text-xs text-foreground-lighter/75 mb-2 px-6 tracking-widest">
+          {mcpBlocks.title}
+        </div>
+        {mcpBlocks.items.map((item, i) => (
           <NavigationItem item={item} key={`${item.href}-${i}`} />
         ))}
       </div>

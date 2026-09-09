@@ -17,6 +17,7 @@ export interface WorkerSnippets {
   aiPrompt: string
   configToml: string
   cli: string
+  curl: string
   javascript: string
   python: string
 }
@@ -40,17 +41,20 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
 
   const cli = [
     `supabase ${CLI_NAME} new ${name} --runtime ${runtime}`,
-    // size comes from config.toml — push has no flag for it. Same for access: the CLI
-    // doesn't have a route to a private worker yet, so this always deploys as public.
-    `supabase ${CLI_NAME} push ${name} --instances ${input.instances}`,
-    ...(input.access === 'private' ? [`# note: the CLI can only deploy public workers today`] : []),
+    `supabase ${CLI_NAME} push ${name} --instances ${input.instances} --exposure ${input.access}`,
+  ].join('\n')
+
+  const curl = [
+    `curl --request POST '${url}' \\`,
+    `  --header 'Content-Type: application/json' \\`,
+    `  --data '{"name":"world"}'`,
   ].join('\n')
 
   const configBlock = [
     `[${CLI_NAME}.${name}]`,
     `runtime   = "${runtime}"`,
     `size      = "${input.size}"    # ${formatSize(input.size)}`,
-    `access    = "${input.access}"`,
+    `exposure  = "${input.access}"`,
     `instances = ${input.instances}`,
     `# region is locked to ${WORKERS_REGION} at alpha`,
   ].join('\n')
@@ -71,10 +75,7 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
     configBlock,
     '```',
     ``,
-    `3. Run \`supabase ${CLI_NAME} push ${name}\` to deploy it.`,
-    ...(input.access === 'private'
-      ? [``, `Note: the CLI can only deploy public workers today.`]
-      : []),
+    `3. Run \`supabase ${CLI_NAME} push ${name} --exposure ${input.access}\` to deploy it.`,
   ].join('\n')
 
   const keyPlaceholder = input.access === 'public' ? '[YOUR ANON KEY]' : '[YOUR SERVICE ROLE KEY]'
@@ -102,7 +103,7 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
     `print(res.json())`,
   ].join('\n')
 
-  return { aiPrompt, configToml, cli, javascript, python }
+  return { aiPrompt, configToml, cli, curl, javascript, python }
 }
 
 export interface WorkerCliCommand {

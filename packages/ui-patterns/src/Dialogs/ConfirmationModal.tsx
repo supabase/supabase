@@ -10,11 +10,12 @@ import {
   cn,
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogHeader,
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
-import { DialogDescription, DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 
 import { Admonition } from '../Admonition'
 

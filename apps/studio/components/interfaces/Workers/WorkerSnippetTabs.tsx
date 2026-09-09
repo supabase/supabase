@@ -7,12 +7,19 @@ import { buildWorkerSnippets, type WorkerSnippetInput } from './workerSnippets'
 import CopyButton from '@/components/ui/CopyButton'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 
-export type WorkerSnippetTab = 'ai' | 'config' | 'cli' | 'js' | 'python'
+export type WorkerSnippetTab = 'ai' | 'config' | 'cli' | 'curl' | 'js' | 'python'
+
+export const WORKER_CALL_TABS = [
+  'curl',
+  'js',
+  'python',
+] as const satisfies readonly WorkerSnippetTab[]
 
 const TAB_LABEL: Record<WorkerSnippetTab, string> = {
   ai: 'AI Prompt',
   config: 'config.toml',
   cli: 'CLI',
+  curl: 'cURL',
   js: 'JavaScript',
   python: 'Python',
 }
@@ -21,13 +28,14 @@ const TAB_ICON: Record<WorkerSnippetTab, LucideIcon> = {
   ai: Sparkles,
   config: FileCode,
   cli: Terminal,
+  curl: Terminal,
   js: FileCode,
   python: FileCode,
 }
 
 interface WorkerSnippetTabsProps {
   input: Omit<WorkerSnippetInput, 'endpoint' | 'protocol'>
-  tabs?: [WorkerSnippetTab, ...WorkerSnippetTab[]]
+  tabs?: readonly [WorkerSnippetTab, ...WorkerSnippetTab[]]
   className?: string
 }
 
@@ -45,6 +53,7 @@ export const WorkerSnippetTabs = ({ input, tabs = ['cli'], className }: WorkerSn
     ai: snippets.aiPrompt,
     config: snippets.configToml,
     cli: snippets.cli,
+    curl: snippets.curl,
     js: snippets.javascript,
     python: snippets.python,
   }

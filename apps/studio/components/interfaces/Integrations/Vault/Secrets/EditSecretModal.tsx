@@ -144,9 +144,9 @@ export const EditSecretModal = () => {
                     name="name"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="name" label="Name">
+                      <FormItemLayout label="Name">
                         <FormControl>
-                          <Input id="name" {...field} />
+                          <Input {...field} />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -156,13 +156,9 @@ export const EditSecretModal = () => {
                     name="description"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout
-                        name="description"
-                        label="Description"
-                        labelOptional="Optional"
-                      >
+                      <FormItemLayout label="Description" labelOptional="Optional">
                         <FormControl>
-                          <Input id="description" {...field} data-lpignore="true" />
+                          <Input {...field} data-lpignore="true" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -172,11 +168,10 @@ export const EditSecretModal = () => {
                     name="secret"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="secret" label="Secret value">
-                        <FormControl>
-                          <div className="relative">
+                      <FormItemLayout label="Secret value">
+                        <div className="relative">
+                          <FormControl>
                             <Textarea
-                              id="secret"
                               {...field}
                               rows={1}
                               ref={(el) => {
@@ -200,18 +195,16 @@ export const EditSecretModal = () => {
                                   Math.max(40, e.currentTarget.scrollHeight) + 'px'
                               }}
                             />
-                            <Button
-                              variant="default"
-                              title={showSecretValue ? `Hide secret value` : `Show secret value`}
-                              aria-label={
-                                showSecretValue ? `Hide secret value` : `Show secret value`
-                              }
-                              className="absolute right-1 top-1 w-7"
-                              icon={showSecretValue ? <EyeOff /> : <Eye />}
-                              onClick={() => setShowSecretValue(!showSecretValue)}
-                            />
-                          </div>
-                        </FormControl>
+                          </FormControl>
+                          <Button
+                            variant="default"
+                            title={showSecretValue ? `Hide secret value` : `Show secret value`}
+                            aria-label={showSecretValue ? `Hide secret value` : `Show secret value`}
+                            className="absolute right-1 top-1 w-7"
+                            icon={showSecretValue ? <EyeOff /> : <Eye />}
+                            onClick={() => setShowSecretValue(!showSecretValue)}
+                          />
+                        </div>
                       </FormItemLayout>
                     )}
                   />

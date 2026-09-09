@@ -102,7 +102,7 @@ export const DeployWorkerDialog = ({ open, onOpenChange }: DeployWorkerDialogPro
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItemLayout name="name" label="Name">
+                  <FormItemLayout label="Name">
                     <FormControl>
                       <Input {...field} placeholder="my-worker" />
                     </FormControl>
@@ -114,7 +114,7 @@ export const DeployWorkerDialog = ({ open, onOpenChange }: DeployWorkerDialogPro
                 control={form.control}
                 name="runtime"
                 render={({ field }) => (
-                  <FormItemLayout name="runtime" label="Runtime">
+                  <FormItemLayout label="Runtime">
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
@@ -138,7 +138,6 @@ export const DeployWorkerDialog = ({ open, onOpenChange }: DeployWorkerDialogPro
                 name="size"
                 render={({ field }) => (
                   <FormItemLayout
-                    name="size"
                     label="Size"
                     description="Fixed at deploy time and cannot be changed later"
                   >
@@ -165,7 +164,6 @@ export const DeployWorkerDialog = ({ open, onOpenChange }: DeployWorkerDialogPro
                 name="access"
                 render={({ field }) => (
                   <FormItemLayout
-                    name="access"
                     label="Access"
                     description="Public workers accept requests with a publishable key"
                   >
@@ -191,7 +189,7 @@ export const DeployWorkerDialog = ({ open, onOpenChange }: DeployWorkerDialogPro
                 control={form.control}
                 name="instances"
                 render={({ field }) => (
-                  <FormItemLayout name="instances" label="Instances" description="1 to 10">
+                  <FormItemLayout label="Instances" description="1 to 10">
                     <FormControl>
                       <Input
                         {...field}

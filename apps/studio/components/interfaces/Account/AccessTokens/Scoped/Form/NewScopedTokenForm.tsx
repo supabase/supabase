@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useReducedMotion } from 'common'
 import { ChevronRight, X } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -43,21 +43,36 @@ const DEFAULT_VALUES: TokenFormValues = {
   permissions: {},
 }
 
-export const NewScopedTokenForm = ({
-  isPending,
-  onCreateToken,
-  onCancel,
-}: {
-  isPending: boolean
-  onCreateToken: (values: TokenFormValues) => void
-  onCancel: () => void
-}) => {
+export interface NewScopedTokenFormHandle {
+  getAbandonmentContext: () => {
+    resourceAccess: TokenFormValues['resourceAccess']
+    formStep: 'form' | 'review'
+    isFormTouched: boolean
+  }
+}
+
+export const NewScopedTokenForm = forwardRef<
+  NewScopedTokenFormHandle,
+  {
+    isPending: boolean
+    onCreateToken: (values: TokenFormValues) => void
+    onCancel: () => void
+  }
+>(({ isPending, onCreateToken, onCancel }, ref) => {
   const form = useForm<TokenFormValues>({
     resolver: zodResolver(TokenFormSchema),
     defaultValues: DEFAULT_VALUES,
     mode: 'onChange',
   })
   const [step, setStep] = useState<'form' | 'review'>('form')
+  const { isDirty } = form.formState
+  useImperativeHandle(ref, () => ({
+    getAbandonmentContext: () => ({
+      resourceAccess: form.getValues('resourceAccess'),
+      formStep: step,
+      isFormTouched: isDirty,
+    }),
+  }))
   const [formValues, setFormValues] = useState<TokenFormValues>(DEFAULT_VALUES)
   const [isCreateHintDismissed, setIsCreateHintDismissed] = useState(false)
   const [missingPermissionsAttempts, setMissingPermissionsAttempts] = useState(0)
@@ -89,13 +104,15 @@ export const NewScopedTokenForm = ({
   const isReducedMotionPreferred = useReducedMotion()
   const isReducedMotionPreferredRef = useRef(isReducedMotionPreferred)
   isReducedMotionPreferredRef.current = isReducedMotionPreferred
+  const onCancelRef = useRef(onCancel)
+  onCancelRef.current = onCancel
 
   useEffect(() => {
     if (isError) {
       toast.error('Something went wrong, try again')
-      onCancel()
+      onCancelRef.current()
     }
-  }, [onCancel, isError])
+  }, [isError])
 
   useEffect(() => {
     if (missingPermissionsAttempts === 0) return
@@ -267,4 +284,6 @@ export const NewScopedTokenForm = ({
       </SheetFooter>
     </>
   )
-}
+})
+
+NewScopedTokenForm.displayName = 'NewScopedTokenForm'

@@ -14,6 +14,7 @@ import {
   copyToClipboard,
   Dialog,
   DialogContent,
+  DialogHeader,
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
@@ -26,7 +27,6 @@ import {
   FormMessage,
   Input,
 } from 'ui'
-import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
 
 import { Admonition } from '../Admonition'

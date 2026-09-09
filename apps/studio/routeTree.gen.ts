@@ -24,6 +24,7 @@ import { Route as ProjectChar91_Char93RouteImport } from './routes/project.[_]'
 import { Route as ProjectRefRouteImport } from './routes/project/$ref'
 import { Route as OrgChar91_Char93RouteImport } from './routes/org.[_]'
 import { Route as NewSlugRouteImport } from './routes/new/$slug'
+import { Route as McpSecretsRouteImport } from './routes/mcp/secrets'
 import { Route as IntegrationsVercelRouteImport } from './routes/integrations/vercel'
 import { Route as ApiStatusOverrideRouteImport } from './routes/api/status-override'
 import { Route as ApiScopedAccessTokenPermissionsRouteImport } from './routes/api/scoped-access-token-permissions'
@@ -100,6 +101,7 @@ import { Route as ApiPlatformProfileIndexRouteImport } from './routes/api/platfo
 import { Route as ApiPlatformOrganizationsIndexRouteImport } from './routes/api/platform/organizations/index'
 import { Route as AppOrgSlugIndexRouteImport } from './routes/_app/org/$slug/index'
 import { Route as AppAccountTokensIndexRouteImport } from './routes/_app/account/tokens/index'
+import { Route as ProjectRefWorkersSecretsRouteImport } from './routes/project/$ref/workers/secrets'
 import { Route as ProjectRefWorkersNameRouteImport } from './routes/project/$ref/workers/$name'
 import { Route as ProjectRefStorageS3RouteImport } from './routes/project/$ref/storage/s3'
 import { Route as ProjectRefSqlTemplatesRouteImport } from './routes/project/$ref/sql/templates'
@@ -177,6 +179,7 @@ import { Route as ProjectRefAuthAuditLogsRouteImport } from './routes/project/$r
 import { Route as ProjectRefAdvisorsSecurityRouteImport } from './routes/project/$ref/advisors/security'
 import { Route as ProjectRefAdvisorsRulesRouteImport } from './routes/project/$ref/advisors/rules'
 import { Route as ProjectRefAdvisorsPerformanceRouteImport } from './routes/project/$ref/advisors/performance'
+import { Route as ProjectRefAdvisorsHealthRouteImport } from './routes/project/$ref/advisors/health'
 import { Route as ApiPlatformTelemetryEventRouteImport } from './routes/api/platform/telemetry/event'
 import { Route as ApiPlatformIntegrationsSlugRouteImport } from './routes/api/platform/integrations/$slug'
 import { Route as ApiAiSqlTitleV2RouteImport } from './routes/api/ai/sql/title-v2'
@@ -399,6 +402,11 @@ const OrgChar91_Char93Route = OrgChar91_Char93RouteImport.update({
 const NewSlugRoute = NewSlugRouteImport.update({
   id: '/new/$slug',
   path: '/new/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpSecretsRoute = McpSecretsRouteImport.update({
+  id: '/mcp/secrets',
+  path: '/mcp/secrets',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IntegrationsVercelRoute = IntegrationsVercelRouteImport.update({
@@ -794,6 +802,12 @@ const AppAccountTokensIndexRoute = AppAccountTokensIndexRouteImport.update({
   path: '/tokens/',
   getParentRoute: () => AppAccountRoute,
 } as any)
+const ProjectRefWorkersSecretsRoute =
+  ProjectRefWorkersSecretsRouteImport.update({
+    id: '/secrets',
+    path: '/secrets',
+    getParentRoute: () => ProjectRefWorkersRoute,
+  } as any)
 const ProjectRefWorkersNameRoute = ProjectRefWorkersNameRouteImport.update({
   id: '/$name',
   path: '/$name',
@@ -1229,6 +1243,12 @@ const ProjectRefAdvisorsPerformanceRoute =
   ProjectRefAdvisorsPerformanceRouteImport.update({
     id: '/performance',
     path: '/performance',
+    getParentRoute: () => ProjectRefAdvisorsRoute,
+  } as any)
+const ProjectRefAdvisorsHealthRoute =
+  ProjectRefAdvisorsHealthRouteImport.update({
+    id: '/health',
+    path: '/health',
     getParentRoute: () => ProjectRefAdvisorsRoute,
   } as any)
 const ApiPlatformTelemetryEventRoute =
@@ -2135,6 +2155,7 @@ export interface FileRoutesByFullPath {
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
+  '/mcp/secrets': typeof McpSecretsRoute
   '/new/$slug': typeof NewSlugRoute
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/$ref': typeof ProjectRefRouteWithChildren
@@ -2200,6 +2221,7 @@ export interface FileRoutesByFullPath {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/advisors/health': typeof ProjectRefAdvisorsHealthRoute
   '/project/$ref/advisors/performance': typeof ProjectRefAdvisorsPerformanceRoute
   '/project/$ref/advisors/rules': typeof ProjectRefAdvisorsRulesRouteWithChildren
   '/project/$ref/advisors/security': typeof ProjectRefAdvisorsSecurityRoute
@@ -2277,6 +2299,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
   '/project/$ref/workers/$name': typeof ProjectRefWorkersNameRoute
+  '/project/$ref/workers/secrets': typeof ProjectRefWorkersSecretsRoute
   '/account/tokens/': typeof AppAccountTokensIndexRoute
   '/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
@@ -2451,6 +2474,7 @@ export interface FileRoutesByTo {
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
+  '/mcp/secrets': typeof McpSecretsRoute
   '/new/$slug': typeof NewSlugRoute
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/_': typeof ProjectChar91_Char93RouteWithChildren
@@ -2506,6 +2530,7 @@ export interface FileRoutesByTo {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/advisors/health': typeof ProjectRefAdvisorsHealthRoute
   '/project/$ref/advisors/performance': typeof ProjectRefAdvisorsPerformanceRoute
   '/project/$ref/advisors/rules': typeof ProjectRefAdvisorsRulesRouteWithChildren
   '/project/$ref/advisors/security': typeof ProjectRefAdvisorsSecurityRoute
@@ -2580,6 +2605,7 @@ export interface FileRoutesByTo {
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
   '/project/$ref/workers/$name': typeof ProjectRefWorkersNameRoute
+  '/project/$ref/workers/secrets': typeof ProjectRefWorkersSecretsRoute
   '/account/tokens': typeof AppAccountTokensIndexRoute
   '/org/$slug': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations': typeof ApiPlatformOrganizationsIndexRoute
@@ -2758,6 +2784,7 @@ export interface FileRoutesById {
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
+  '/mcp/secrets': typeof McpSecretsRoute
   '/new/$slug': typeof NewSlugRoute
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/$ref': typeof ProjectRefRouteWithChildren
@@ -2823,6 +2850,7 @@ export interface FileRoutesById {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/advisors/health': typeof ProjectRefAdvisorsHealthRoute
   '/project/$ref/advisors/performance': typeof ProjectRefAdvisorsPerformanceRoute
   '/project/$ref/advisors/rules': typeof ProjectRefAdvisorsRulesRouteWithChildren
   '/project/$ref/advisors/security': typeof ProjectRefAdvisorsSecurityRoute
@@ -2900,6 +2928,7 @@ export interface FileRoutesById {
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
   '/project/$ref/workers/$name': typeof ProjectRefWorkersNameRoute
+  '/project/$ref/workers/secrets': typeof ProjectRefWorkersSecretsRoute
   '/_app/account/tokens/': typeof AppAccountTokensIndexRoute
   '/_app/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
@@ -3077,6 +3106,7 @@ export interface FileRouteTypes {
     | '/api/scoped-access-token-permissions'
     | '/api/status-override'
     | '/integrations/vercel'
+    | '/mcp/secrets'
     | '/new/$slug'
     | '/org/_'
     | '/project/$ref'
@@ -3142,6 +3172,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/advisors/health'
     | '/project/$ref/advisors/performance'
     | '/project/$ref/advisors/rules'
     | '/project/$ref/advisors/security'
@@ -3219,6 +3250,7 @@ export interface FileRouteTypes {
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
     | '/project/$ref/workers/$name'
+    | '/project/$ref/workers/secrets'
     | '/account/tokens/'
     | '/org/$slug/'
     | '/api/platform/organizations/'
@@ -3393,6 +3425,7 @@ export interface FileRouteTypes {
     | '/api/scoped-access-token-permissions'
     | '/api/status-override'
     | '/integrations/vercel'
+    | '/mcp/secrets'
     | '/new/$slug'
     | '/org/_'
     | '/project/_'
@@ -3448,6 +3481,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/advisors/health'
     | '/project/$ref/advisors/performance'
     | '/project/$ref/advisors/rules'
     | '/project/$ref/advisors/security'
@@ -3522,6 +3556,7 @@ export interface FileRouteTypes {
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
     | '/project/$ref/workers/$name'
+    | '/project/$ref/workers/secrets'
     | '/account/tokens'
     | '/org/$slug'
     | '/api/platform/organizations'
@@ -3699,6 +3734,7 @@ export interface FileRouteTypes {
     | '/api/scoped-access-token-permissions'
     | '/api/status-override'
     | '/integrations/vercel'
+    | '/mcp/secrets'
     | '/new/$slug'
     | '/org/_'
     | '/project/$ref'
@@ -3764,6 +3800,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/advisors/health'
     | '/project/$ref/advisors/performance'
     | '/project/$ref/advisors/rules'
     | '/project/$ref/advisors/security'
@@ -3841,6 +3878,7 @@ export interface FileRouteTypes {
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
     | '/project/$ref/workers/$name'
+    | '/project/$ref/workers/secrets'
     | '/_app/account/tokens/'
     | '/_app/org/$slug/'
     | '/api/platform/organizations/'
@@ -4008,6 +4046,7 @@ export interface RootRouteChildren {
   ApiScopedAccessTokenPermissionsRoute: typeof ApiScopedAccessTokenPermissionsRoute
   ApiStatusOverrideRoute: typeof ApiStatusOverrideRoute
   IntegrationsVercelRoute: typeof IntegrationsVercelRouteWithChildren
+  McpSecretsRoute: typeof McpSecretsRoute
   NewSlugRoute: typeof NewSlugRoute
   OrgChar91_Char93Route: typeof OrgChar91_Char93RouteWithChildren
   ProjectRefRoute: typeof ProjectRefRouteWithChildren
@@ -4210,6 +4249,13 @@ declare module '@tanstack/react-router' {
       path: '/new/$slug'
       fullPath: '/new/$slug'
       preLoaderRoute: typeof NewSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp/secrets': {
+      id: '/mcp/secrets'
+      path: '/mcp/secrets'
+      fullPath: '/mcp/secrets'
+      preLoaderRoute: typeof McpSecretsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/integrations/vercel': {
@@ -4743,6 +4789,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/account/tokens/'
       preLoaderRoute: typeof AppAccountTokensIndexRouteImport
       parentRoute: typeof AppAccountRoute
+    }
+    '/project/$ref/workers/secrets': {
+      id: '/project/$ref/workers/secrets'
+      path: '/secrets'
+      fullPath: '/project/$ref/workers/secrets'
+      preLoaderRoute: typeof ProjectRefWorkersSecretsRouteImport
+      parentRoute: typeof ProjectRefWorkersRoute
     }
     '/project/$ref/workers/$name': {
       id: '/project/$ref/workers/$name'
@@ -5281,6 +5334,13 @@ declare module '@tanstack/react-router' {
       path: '/performance'
       fullPath: '/project/$ref/advisors/performance'
       preLoaderRoute: typeof ProjectRefAdvisorsPerformanceRouteImport
+      parentRoute: typeof ProjectRefAdvisorsRoute
+    }
+    '/project/$ref/advisors/health': {
+      id: '/project/$ref/advisors/health'
+      path: '/health'
+      fullPath: '/project/$ref/advisors/health'
+      preLoaderRoute: typeof ProjectRefAdvisorsHealthRouteImport
       parentRoute: typeof ProjectRefAdvisorsRoute
     }
     '/api/platform/telemetry/event': {
@@ -6484,12 +6544,14 @@ const ProjectRefAdvisorsRulesRouteWithChildren =
   )
 
 interface ProjectRefAdvisorsRouteChildren {
+  ProjectRefAdvisorsHealthRoute: typeof ProjectRefAdvisorsHealthRoute
   ProjectRefAdvisorsPerformanceRoute: typeof ProjectRefAdvisorsPerformanceRoute
   ProjectRefAdvisorsRulesRoute: typeof ProjectRefAdvisorsRulesRouteWithChildren
   ProjectRefAdvisorsSecurityRoute: typeof ProjectRefAdvisorsSecurityRoute
 }
 
 const ProjectRefAdvisorsRouteChildren: ProjectRefAdvisorsRouteChildren = {
+  ProjectRefAdvisorsHealthRoute: ProjectRefAdvisorsHealthRoute,
   ProjectRefAdvisorsPerformanceRoute: ProjectRefAdvisorsPerformanceRoute,
   ProjectRefAdvisorsRulesRoute: ProjectRefAdvisorsRulesRouteWithChildren,
   ProjectRefAdvisorsSecurityRoute: ProjectRefAdvisorsSecurityRoute,
@@ -6948,11 +7010,13 @@ const ProjectRefStorageRouteWithChildren =
 
 interface ProjectRefWorkersRouteChildren {
   ProjectRefWorkersNameRoute: typeof ProjectRefWorkersNameRoute
+  ProjectRefWorkersSecretsRoute: typeof ProjectRefWorkersSecretsRoute
   ProjectRefWorkersIndexRoute: typeof ProjectRefWorkersIndexRoute
 }
 
 const ProjectRefWorkersRouteChildren: ProjectRefWorkersRouteChildren = {
   ProjectRefWorkersNameRoute: ProjectRefWorkersNameRoute,
+  ProjectRefWorkersSecretsRoute: ProjectRefWorkersSecretsRoute,
   ProjectRefWorkersIndexRoute: ProjectRefWorkersIndexRoute,
 }
 
@@ -7071,6 +7135,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiScopedAccessTokenPermissionsRoute: ApiScopedAccessTokenPermissionsRoute,
   ApiStatusOverrideRoute: ApiStatusOverrideRoute,
   IntegrationsVercelRoute: IntegrationsVercelRouteWithChildren,
+  McpSecretsRoute: McpSecretsRoute,
   NewSlugRoute: NewSlugRoute,
   OrgChar91_Char93Route: OrgChar91_Char93RouteWithChildren,
   ProjectRefRoute: ProjectRefRouteWithChildren,
