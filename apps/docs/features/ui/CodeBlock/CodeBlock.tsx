@@ -1,4 +1,4 @@
-import { Fragment, type PropsWithChildren } from 'react'
+import { type PropsWithChildren } from 'react'
 import { bundledLanguages, createHighlighter, type BundledLanguage, type ThemedToken } from 'shiki'
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
 import { cn } from 'ui'
@@ -64,7 +64,7 @@ export async function CodeBlock({
         'not-prose',
         'w-full',
         'border border-default rounded-lg',
-        'bg-200',
+        'bg-200 shadow-codeblock',
         'text-sm',
         className
       )}
@@ -72,7 +72,7 @@ export async function CodeBlock({
       <div
         className={cn(
           'code-scroll',
-          'w-full overflow-x-auto rounded-lg',
+          'w-full overflow-x-auto overscroll-x-none rounded-lg',
           'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring'
         )}
         role="group"
@@ -81,33 +81,40 @@ export async function CodeBlock({
         tabIndex={0}
       >
         <pre>
-          <code className={lineNumbers ? 'grid grid-cols-[auto_1fr]' : ''}>
+          <code
+            className={cn(
+              lineNumbers && 'grid grid-cols-[auto_1fr] w-fit min-w-full py-3',
+              '[--row-rest:var(--background-200)]',
+              '[--row-hover:color-mix(in_srgb,var(--foreground)_3%,var(--background-200))]'
+            )}
+          >
             {lineNumbers ? (
-              <>
-                {tokens.map((line, idx) => (
-                  <Fragment key={idx}>
-                    <div
-                      aria-hidden="true"
-                      className={cn(
-                        'select-none text-right text-muted bg-control px-2 min-h-5 leading-5',
-                        idx === 0 && 'pt-6',
-                        idx === tokens.length - 1 && 'pb-6'
-                      )}
-                    >
-                      {idx + 1}
-                    </div>
-                    <div
-                      className={cn(
-                        'code-content min-h-5 leading-5 pl-6 pr-6',
-                        idx === 0 && 'pt-6',
-                        idx === tokens.length - 1 && 'pb-6'
-                      )}
-                    >
-                      <CodeLine tokens={line} twoslash={twoslashed?.get(idx)} />
-                    </div>
-                  </Fragment>
-                ))}
-              </>
+              tokens.map((line, idx) => (
+                <div key={idx} className="group/row contents">
+                  <div
+                    aria-hidden="true"
+                    className={cn(
+                      'select-none text-right text-muted/70 pl-3 pr-2 min-h-5 leading-5',
+                      'bg-[var(--row-rest)]',
+                      'sticky left-0 z-10',
+                      'group-hover/row:text-muted group-hover/row:bg-[var(--row-hover)]',
+                      'after:pointer-events-none after:absolute after:inset-y-0 after:left-full after:w-4',
+                      '[--gutter-fade:var(--row-rest)] group-hover/row:[--gutter-fade:var(--row-hover)]',
+                      'after:bg-[image:linear-gradient(to_right,var(--gutter-fade)_0%,color-mix(in_srgb,var(--gutter-fade)_85%,transparent)_25%,color-mix(in_srgb,var(--gutter-fade)_50%,transparent)_50%,color-mix(in_srgb,var(--gutter-fade)_15%,transparent)_75%,transparent_100%)]'
+                    )}
+                  >
+                    {idx + 1}
+                  </div>
+                  <div
+                    className={cn(
+                      'code-content min-h-5 leading-5 pl-3 pr-18',
+                      'group-hover/row:bg-[var(--row-hover)]'
+                    )}
+                  >
+                    <CodeLine tokens={line} twoslash={twoslashed?.get(idx)} />
+                  </div>
+                </div>
+              ))
             ) : (
               <div className="code-content p-6">
                 {tokens.map((line, idx) => (

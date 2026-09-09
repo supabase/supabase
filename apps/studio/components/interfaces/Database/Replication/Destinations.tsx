@@ -139,7 +139,6 @@ export const Destinations = () => {
     destinations.length === 0 &&
     pipelines.length === 0
 
-  const isLoading = isDestinationsLoading
   const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
   const hasErrorsFetchingData = !isLocalETLNotSetUp && isDestinationsError
 
@@ -275,7 +274,7 @@ export const Destinations = () => {
           <AlertError error={destinationsError} subject="Failed to retrieve destinations" />
         )}
 
-        {isLoading ? (
+        {isDestinationsLoading ? (
           <GenericSkeletonLoader />
         ) : hasDestinations ? (
           <Card>
@@ -302,22 +301,24 @@ export const Destinations = () => {
                     <DestinationRow key={destination.id} destinationId={destination.id} />
                   ))}
 
-                  {!isLoading && filteredDestinations.length === 0 && hasDestinations && (
-                    <TableRow>
-                      <TableCell colSpan={6}>
-                        <p>No results found</p>
-                        <p className="text-foreground-light">
-                          Your search for "{filterString}" did not return any results.
-                        </p>
-                      </TableCell>
-                    </TableRow>
-                  )}
+                  {!isDestinationsLoading &&
+                    filteredDestinations.length === 0 &&
+                    hasDestinations && (
+                      <TableRow>
+                        <TableCell colSpan={6}>
+                          <p>No results found</p>
+                          <p className="text-foreground-light">
+                            Your search for "{filterString}" did not return any results.
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                    )}
                 </TableBody>
               </Table>
             </CardContent>
           </Card>
         ) : (
-          !isLoading &&
+          !isDestinationsLoading &&
           !hasErrorsFetchingData && (
             <EmptyStatePresentational
               icon={Workflow}

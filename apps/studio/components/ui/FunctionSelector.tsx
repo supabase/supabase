@@ -1,12 +1,13 @@
 import { useParams } from 'common'
 import { uniqBy } from 'lodash'
-import { Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { Check, Plus } from 'lucide-react'
 import { useState } from 'react'
 import {
   Alert,
   AlertDescription,
   AlertTitle,
   Button,
+  ComboboxTrigger,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -37,7 +38,6 @@ interface FunctionSelectorProps {
   value: string
   onChange: (value: string) => void
   disabled?: boolean
-  stopScrollPropagation?: boolean
   // used to filter the functions by a criteria
   filterFunction?: (func: DatabaseFunction) => boolean
   noResultsLabel?: React.ReactNode
@@ -51,7 +51,6 @@ const FunctionSelector = ({
   schema,
   value,
   onChange,
-  stopScrollPropagation = false,
   filterFunction = () => true,
   noResultsLabel = <span>No functions found in this schema.</span>,
 }: FunctionSelectorProps) => {
@@ -99,33 +98,27 @@ const FunctionSelector = ({
       {isSuccess && (
         <Popover open={open} onOpenChange={setOpen} modal={false}>
           <PopoverTrigger asChild>
-            <Button
+            <ComboboxTrigger
               size={size}
               disabled={!!disabled}
-              variant="default"
-              className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
-              iconRight={
-                <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
-              }
+              aria-expanded={open}
+              data-state={open ? 'open' : 'closed'}
+              className={size === 'small' ? 'py-1.5' : undefined}
             >
               {value ? (
-                <div className="w-full flex gap-1">
-                  <p className="text-foreground-lighter">function:</p>
-                  <p className="text-foreground">{value}</p>
-                </div>
+                <span className="flex w-full gap-1">
+                  <span className="text-foreground-lighter">function:</span>
+                  <span className="text-foreground">{value}</span>
+                </span>
               ) : (
-                <div className="w-full flex gap-1">
-                  <p className="text-foreground-lighter">Select a function</p>
-                </div>
+                <span className="flex w-full gap-1 text-foreground-lighter">Select a function</span>
               )}
-            </Button>
+            </ComboboxTrigger>
           </PopoverTrigger>
           <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
             <Command>
               <CommandInput placeholder="Search functions..." />
-              <CommandList
-                onWheel={stopScrollPropagation ? (event) => event.stopPropagation() : undefined}
-              >
+              <CommandList>
                 <CommandEmpty>No functions found</CommandEmpty>
                 <CommandGroup>
                   <ScrollArea className={(functions || []).length > 7 ? 'h-[210px]' : ''}>
