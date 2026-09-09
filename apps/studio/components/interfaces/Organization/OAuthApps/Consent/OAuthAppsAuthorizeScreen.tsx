@@ -23,7 +23,7 @@ import type {
   OAuthAppsAuthorizeRedirect,
   OAuthAppsAuthorizeRoleValidationFailure,
 } from '@/data/oauth-apps/types'
-import { isRoleValidationFailure } from '@/data/oauth-apps/types'
+import { getFailedProjects, isRoleValidationFailure } from '@/data/oauth-apps/types'
 import { useSignOut } from '@/lib/auth'
 
 export interface OAuthAppsAuthorizeScreenProps {
@@ -64,6 +64,10 @@ export const OAuthAppsAuthorizeScreen = ({
   const approveMutation = useOAuthAppsAuthorizeApproveMutation({
     onSuccess: (data) => {
       if (isRoleValidationFailure(data)) {
+        // Only the per-project branch has a treatment on this screen. An organization-level
+        // result comes from the upfront org-role check, which has no endpoint or mock fetcher
+        // yet, so it reaches here with nothing to highlight and renders no failure state. That
+        // branch gets its own UI alongside the endpoint that can actually produce it.
         setRoleFailure(data)
         return
       }
@@ -99,7 +103,7 @@ export const OAuthAppsAuthorizeScreen = ({
 
   // Only the rejected projects still in the selection matter, so deselecting them clears the
   // failure treatment without another round trip.
-  const flaggedRefs = (roleFailure?.projects ?? [])
+  const flaggedRefs = getFailedProjects(roleFailure)
     .map((project) => project.ref)
     .filter((ref) => selectedProjectRefs.includes(ref))
   const hasRoleFailure = flaggedRefs.length > 0
@@ -206,7 +210,7 @@ export const OAuthAppsAuthorizeScreen = ({
               onChange={setSelectedProjectRefs}
               error={hasNoSelection ? 'Must select at least one project to authorize.' : undefined}
               flaggedRefs={flaggedRefs}
-              unavailableRefs={roleFailure?.projects.map((project) => project.ref)}
+              unavailableRefs={getFailedProjects(roleFailure).map((project) => project.ref)}
             />
           ) : (
             <NoProjectsNotice
