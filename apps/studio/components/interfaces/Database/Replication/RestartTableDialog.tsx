@@ -42,7 +42,7 @@ export const RestartTableDialog = ({
   const tableName = `${table.schema}.${table.name}`
   const willCopyTable = shouldCopyTable(tableSyncCopy, table.id)
 
-  const { mutate: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
+  const { mutateAsync: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: () => {
       toast.success(`"${tableName}" will replicate from scratch.`)
     },
@@ -55,16 +55,18 @@ export const RestartTableDialog = ({
     },
   })
 
-  const handleReset = () => {
+  const handleReset = async () => {
     if (!projectRef) return toast.error('Project ref is required')
     if (!pipelineId) return toast.error('Pipeline ID is required')
 
     onRestartStart?.()
-    rollbackTables({
-      projectRef,
-      pipelineId,
-      target: { type: 'single_table', table_id: table.id },
-    })
+    try {
+      await rollbackTables({
+        projectRef,
+        pipelineId,
+        target: { type: 'single_table', table_id: table.id },
+      })
+    } catch (error) {}
   }
 
   return (
