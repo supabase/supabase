@@ -84,13 +84,14 @@ export type UnifiedLogsCountData = Awaited<ReturnType<typeof getUnifiedLogsCount
 export type UnifiedLogsCountError = ResponseError
 
 export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
-  { projectRef, search }: UnifiedLogsVariables,
+  { projectRef, search, useOtel: useOtelOverride }: UnifiedLogsVariables,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<UnifiedLogsCountData, UnifiedLogsCountError, TData> = {}
 ) => {
-  const useOtel = useFlag('otelUnifiedLogs')
+  const otelFlag = useFlag('otelUnifiedLogs')
+  const useOtel = useOtelOverride ?? otelFlag
   return useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>({
     queryKey: [...logsKeys.unifiedLogsCount(projectRef, search), { otel: useOtel }],
     queryFn: ({ signal }) => getUnifiedLogsCount({ projectRef, search, useOtel }, signal),

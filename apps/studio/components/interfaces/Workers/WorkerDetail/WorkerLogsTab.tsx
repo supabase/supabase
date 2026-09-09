@@ -17,7 +17,7 @@ import { useMemo, useState } from 'react'
 import { Button, cn, ResizablePanel, ResizablePanelGroup } from 'ui'
 
 import { WorkerCommandLine } from '../WorkerCommandLine'
-import { buildWorkerLogsSearchParameters } from '../Workers.utils'
+import { buildWorkerLogsColumnFilters, buildWorkerLogsSearchParameters } from '../Workers.utils'
 import { WorkerLogStreamToggle } from './WorkerLogStreamToggle'
 import {
   generateDynamicColumns,
@@ -29,10 +29,7 @@ import { ServiceFlowPanel } from '@/components/interfaces/UnifiedLogs/ServiceFlo
 import { CHART_CONFIG } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.chart-config'
 import { SEARCH_PARAMS_PARSER } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.fields'
-import {
-  buildDefaultColumnFilters,
-  buildFilterSearchUpdate,
-} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
+import { buildFilterSearchUpdate } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
 import {
   useFilterSearchSync,
   useLiveMode,
@@ -70,12 +67,16 @@ const DEFAULT_COLUMN_VISIBILITY: VisibilityState = { select: false }
 
 const serializeLogsSearch = createSerializer(SEARCH_PARAMS_PARSER)
 
+// Worker logs only exist on the OTEL endpoint; the BigQuery path has no worker
+// sources, so the `otelUnifiedLogs` flag must not route this tab there.
+const USE_OTEL = true
+
 export const WorkerLogsTab = ({ workerName }: WorkerLogsTabProps) => {
   const { ref: projectRef } = useParams()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
 
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(() =>
-    buildDefaultColumnFilters(search)
+    buildWorkerLogsColumnFilters(search)
   )
   const [columnVisibility, setColumnVisibility] =
     useState<VisibilityState>(DEFAULT_COLUMN_VISIBILITY)
@@ -87,8 +88,8 @@ export const WorkerLogsTab = ({ workerName }: WorkerLogsTabProps) => {
 
   // Always scoped to this worker, whatever the URL says — see buildWorkerLogsSearchParameters.
   const searchParameters = useMemo(
-    () => buildWorkerLogsSearchParameters(search, workerName),
-    [search, workerName]
+    () => buildWorkerLogsSearchParameters(search, workerName, columnFilters),
+    [search, workerName, columnFilters]
   )
 
   const {
@@ -109,7 +110,7 @@ export const WorkerLogsTab = ({ workerName }: WorkerLogsTabProps) => {
     isFetchingChart,
     refetchAll,
     isRefetching,
-  } = useUnifiedLogsData({ projectRef, search: searchParameters })
+  } = useUnifiedLogsData({ projectRef, search: searchParameters, useOtel: USE_OTEL })
 
   const liveMode = useLiveMode(flatData)
 
@@ -201,7 +202,7 @@ export const WorkerLogsTab = ({ workerName }: WorkerLogsTabProps) => {
           <div className="ml-auto flex flex-wrap items-center gap-x-2 gap-y-2">
             <WorkerLogStreamToggle />
             <RefreshButton isLoading={isRefetching} onRefresh={refetchAll} />
-            <DownloadLogsButton searchParameters={searchParameters} />
+            <DownloadLogsButton searchParameters={searchParameters} useOtel={USE_OTEL} />
             <LiveButton
               fetchPreviousPage={fetchPreviousPage}
               searchParamsParser={SEARCH_PARAMS_PARSER}
@@ -264,7 +265,8 @@ export const WorkerLogsTab = ({ workerName }: WorkerLogsTabProps) => {
                   <div className="mx-auto max-w-md space-y-3 py-16 text-center">
                     <p className="text-sm text-foreground">No logs in the selected time range</p>
                     <p className="text-sm text-foreground-lighter">
-                      Follow them from the Supabase CLI while you wait for traffic.
+                      Widen the time range to find earlier deploys and builds, or follow new logs
+                      from the Supabase CLI.
                     </p>
                     <div className="pt-1 text-left">
                       <WorkerCommandLine

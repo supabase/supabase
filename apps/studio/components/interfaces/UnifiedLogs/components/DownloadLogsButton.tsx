@@ -37,9 +37,11 @@ const DEFAULT_DURATION = '1'
 
 interface DownloadLogsButtonProps {
   searchParameters: QuerySearchParamsType
+  /** Forces the OTEL endpoint for log types that only exist there (see UnifiedLogsVariables). */
+  useOtel?: boolean
 }
 
-export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps) => {
+export const DownloadLogsButton = ({ searchParameters, useOtel }: DownloadLogsButtonProps) => {
   const { ref } = useParams()
   const pathname = usePathname()
   const isLogs = pathname?.includes?.('/logs') ?? false
@@ -88,6 +90,7 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
       search: searchParameters,
       limit: Number(numRows),
       hoursAgo: !hasSpecificTimeRange ? Number(numHours) : undefined,
+      useOtel,
     })
   }
 

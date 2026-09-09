@@ -4,10 +4,12 @@ import { useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
 
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
-import type { QuerySearchParamsType } from './UnifiedLogs.types'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
-import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
+import {
+  useUnifiedLogsInfiniteQuery,
+  type UnifiedLogsVariables,
+} from '@/data/logs/unified-logs-infinite-query'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -16,16 +18,10 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
  * timeline chart) plus the flattened + de-duplicated row list. Shared by the
  * Logs page and the embedded, worker-scoped logs tab.
  */
-export const useUnifiedLogsData = ({
-  projectRef,
-  search,
-}: {
-  projectRef?: string
-  search: QuerySearchParamsType
-}) => {
-  const logs = useUnifiedLogsInfiniteQuery({ projectRef, search })
-  const counts = useUnifiedLogsCountQuery({ projectRef, search })
-  const chart = useUnifiedLogsChartQuery({ projectRef, search })
+export const useUnifiedLogsData = ({ projectRef, search, useOtel }: UnifiedLogsVariables) => {
+  const logs = useUnifiedLogsInfiniteQuery({ projectRef, search, useOtel })
+  const counts = useUnifiedLogsCountQuery({ projectRef, search, useOtel })
+  const chart = useUnifiedLogsChartQuery({ projectRef, search, useOtel })
 
   const rawFlatData = useMemo(() => {
     return logs.data?.pages?.flatMap((page) => page.data ?? []) ?? []

@@ -157,13 +157,14 @@ export type UnifiedLogsChartData = Awaited<ReturnType<typeof getUnifiedLogsChart
 export type UnifiedLogsChartError = ResponseError
 
 export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
-  { projectRef, search }: UnifiedLogsVariables,
+  { projectRef, search, useOtel: useOtelOverride }: UnifiedLogsVariables,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<UnifiedLogsChartData, UnifiedLogsChartError, TData> = {}
 ) => {
-  const useOtel = useFlag('otelUnifiedLogs')
+  const otelFlag = useFlag('otelUnifiedLogs')
+  const useOtel = useOtelOverride ?? otelFlag
   return useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>({
     queryKey: [...logsKeys.unifiedLogsChart(projectRef, search), { otel: useOtel }],
     queryFn: ({ signal }) => getUnifiedLogsChart({ projectRef, search, useOtel }, signal),

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { getWorkerStateMeta, WORKER_NAME_WORDS, workerUrl } from './Workers.constants'
 import type { Worker } from './Workers.types'
 import {
+  buildWorkerLogsColumnFilters,
   buildWorkerLogsSearchParameters,
   filterWorkers,
   formatResources,
@@ -250,6 +251,38 @@ describe('buildWorkerLogsSearchParameters', () => {
       'event_message:ilike:timeout',
       'log_type:eq:workers',
       'worker:eq:embed',
+    ])
+  })
+
+  it('falls back to the seeded date column filter until the URL carries a range', () => {
+    const range = [new Date('2026-09-08T10:00:00Z'), new Date('2026-09-09T10:00:00Z')]
+    const seeded = buildWorkerLogsSearchParameters(search, 'embed', [{ id: 'date', value: range }])
+    expect(seeded.date).toEqual(range)
+
+    const urlRange = [new Date('2026-09-09T09:00:00Z'), new Date('2026-09-09T10:00:00Z')]
+    const fromUrl = buildWorkerLogsSearchParameters({ ...search, date: urlRange }, 'embed', [
+      { id: 'date', value: range },
+    ])
+    expect(fromUrl.date).toEqual(urlRange)
+  })
+})
+
+describe('buildWorkerLogsColumnFilters', () => {
+  const now = new Date('2026-09-09T10:00:00Z')
+
+  it('defaults the time range to the last 24 hours when the URL has none', () => {
+    expect(buildWorkerLogsColumnFilters({ filter: null, date: null }, now)).toEqual([
+      { id: 'date', value: [new Date('2026-09-08T10:00:00Z'), now] },
+    ])
+  })
+
+  it('keeps a range and filters that came from the URL', () => {
+    const range = [new Date('2026-09-01T00:00:00Z'), new Date('2026-09-02T00:00:00Z')]
+    expect(
+      buildWorkerLogsColumnFilters({ filter: ['event_message:ilike:boom'], date: range }, now)
+    ).toEqual([
+      { id: 'event_message', value: { operator: '~~*', values: ['boom'] } },
+      { id: 'date', value: range },
     ])
   })
 })

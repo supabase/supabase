@@ -27,7 +27,15 @@ export const UNIFIED_LOGS_QUERY_OPTIONS = {
 
 export type UnifiedLogsData = any
 export type UnifiedLogsError = ResponseError
-export type UnifiedLogsVariables = { projectRef?: string; search: QuerySearchParamsType }
+export type UnifiedLogsVariables = {
+  projectRef?: string
+  search: QuerySearchParamsType
+  /**
+   * Overrides the `otelUnifiedLogs` flag. Some log types (e.g. workers) only
+   * exist on the OTEL endpoint, so their surfaces pass `true` regardless of the flag.
+   */
+  useOtel?: boolean
+}
 
 export const getUnifiedLogsISOStartEnd = (
   search: QuerySearchParamsType,
@@ -140,7 +148,7 @@ export async function getUnifiedLogs(
 }
 
 export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
-  { projectRef, search }: UnifiedLogsVariables,
+  { projectRef, search, useOtel: useOtelOverride }: UnifiedLogsVariables,
   {
     enabled = true,
     ...options
@@ -152,7 +160,8 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
     PageParam | null
   > = {}
 ) => {
-  const useOtel = useFlag('otelUnifiedLogs')
+  const otelFlag = useFlag('otelUnifiedLogs')
+  const useOtel = useOtelOverride ?? otelFlag
   return useInfiniteQuery({
     queryKey: [...logsKeys.unifiedLogsInfinite(projectRef, search), { otel: useOtel }],
     queryFn: ({ signal, pageParam }) => {
