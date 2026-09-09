@@ -60,20 +60,20 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
   type: 'grid',
   items: [
     {
-      title: 'React',
-      href: '/guides/getting-started/quickstarts/reactjs',
-      icon: '/docs/img/icons/react-icon',
-      hasLightIcon: false,
-      description:
-        'Build single-page apps from reusable components, and query Supabase Postgres from the browser.',
-    },
-    {
       title: 'Next.js',
       href: '/guides/getting-started/quickstarts/nextjs',
       icon: '/docs/img/icons/nextjs-icon',
       hasLightIcon: true,
       description:
         'Full-stack React with server rendering, wired to Supabase Postgres and cookie-based auth.',
+    },
+    {
+      title: 'React',
+      href: '/guides/getting-started/quickstarts/reactjs',
+      icon: '/docs/img/icons/react-icon',
+      hasLightIcon: false,
+      description:
+        'Build single-page apps from reusable components, and query Supabase Postgres from the browser.',
     },
     {
       title: 'Nuxt',
@@ -92,20 +92,20 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
         'Content-driven sites that render on the server and pull Supabase Postgres data per request.',
     },
     {
+      title: 'Vue',
+      href: '/guides/getting-started/quickstarts/vue',
+      icon: '/docs/img/icons/vuejs-icon',
+      hasLightIcon: false,
+      description:
+        'Build single-page apps with the Vue composition API, backed by Supabase Postgres.',
+    },
+    {
       title: 'Hono',
       href: '/guides/getting-started/quickstarts/hono',
       icon: '/docs/img/icons/hono-icon',
       hasLightIcon: false,
       description:
         'Lightweight web APIs with Supabase Auth anonymous sign-in and RLS-protected reads.',
-    },
-    {
-      title: 'RedwoodJS',
-      href: '/guides/getting-started/quickstarts/redwoodjs',
-      icon: '/docs/img/icons/redwood-icon',
-      hasLightIcon: false,
-      description:
-        'Full-stack React and GraphQL, with Prisma migrations against your Supabase Postgres database.',
     },
     {
       title: 'Expo React Native',
@@ -156,19 +156,19 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
         'Fine-grained reactive UIs that load Supabase Postgres data with Solid resources.',
     },
     {
-      title: 'Vue',
-      href: '/guides/getting-started/quickstarts/vue',
-      icon: '/docs/img/icons/vuejs-icon',
-      hasLightIcon: false,
-      description:
-        'Build single-page apps with the Vue composition API, backed by Supabase Postgres.',
-    },
-    {
       title: 'TanStack Start',
       href: '/guides/getting-started/quickstarts/tanstack',
       icon: '/docs/img/icons/tanstack-icon',
       hasLightIcon: true,
       description: 'Type-safe full-stack React that queries Supabase Postgres in server functions.',
+    },
+    {
+      title: 'RedwoodJS',
+      href: '/guides/getting-started/quickstarts/redwoodjs',
+      icon: '/docs/img/icons/redwood-icon',
+      hasLightIcon: false,
+      description:
+        'Full-stack React and GraphQL, with Prisma migrations against your Supabase Postgres database.',
     },
     {
       title: 'Refine',
@@ -208,6 +208,13 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       hasLightIcon: false,
       description:
         'Convention-driven Ruby apps with Active Record connected directly to your Supabase Postgres database.',
+    },
+    {
+      title: 'Spring Boot',
+      href: '/guides/getting-started/quickstarts/spring-boot',
+      icon: { kind: 'server', color: '#64748B', bg: 'rgba(100,116,139,0.1)' },
+      description:
+        'Java APIs with Spring Data JPA connected directly to your Supabase Postgres database.',
     },
   ],
 }

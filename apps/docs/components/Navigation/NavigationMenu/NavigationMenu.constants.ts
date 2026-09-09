@@ -375,12 +375,12 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/reactjs',
         },
         {
-          name: 'Astro',
-          url: '/guides/getting-started/quickstarts/astrojs',
-        },
-        {
           name: 'Nuxt',
           url: '/guides/getting-started/quickstarts/nuxtjs',
+        },
+        {
+          name: 'Astro',
+          url: '/guides/getting-started/quickstarts/astrojs',
         },
         {
           name: 'Vue',
@@ -411,6 +411,22 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/sveltekit' as `/${string}`,
         },
         {
+          name: 'SolidJS',
+          url: '/guides/getting-started/quickstarts/solidjs',
+        },
+        {
+          name: 'TanStack Start',
+          url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
+        },
+        {
+          name: 'RedwoodJS',
+          url: '/guides/getting-started/quickstarts/redwoodjs' as `/${string}`,
+        },
+        {
+          name: 'Refine',
+          url: '/guides/getting-started/quickstarts/refine',
+        },
+        {
           name: 'Flask (Python)',
           url: '/guides/getting-started/quickstarts/flask' as `/${string}`,
           enabled: !jsOnly,
@@ -419,10 +435,6 @@ export const gettingstarted: NavMenuConstant = {
           name: 'Reflex (Python)',
           url: '/guides/getting-started/quickstarts/reflex' as `/${string}`,
           enabled: !jsOnly,
-        },
-        {
-          name: 'TanStack Start',
-          url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
         },
         {
           name: 'Laravel PHP',
@@ -438,18 +450,6 @@ export const gettingstarted: NavMenuConstant = {
           name: 'Spring Boot',
           url: '/guides/getting-started/quickstarts/spring-boot' as `/${string}`,
           enabled: !jsOnly,
-        },
-        {
-          name: 'SolidJS',
-          url: '/guides/getting-started/quickstarts/solidjs',
-        },
-        {
-          name: 'RedwoodJS',
-          url: '/guides/getting-started/quickstarts/redwoodjs' as `/${string}`,
-        },
-        {
-          name: 'Refine',
-          url: '/guides/getting-started/quickstarts/refine',
         },
       ],
     },
