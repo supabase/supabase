@@ -14,7 +14,7 @@ import { ObservabilityOverviewFooter } from './ObservabilityOverviewFooter'
 import { ServiceHealthTable } from './ServiceHealthTable'
 import { useSlowQueriesCount } from './useSlowQueriesCount'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
-import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import {
   buildUnifiedLogsUrl,
   type UnifiedLogType,

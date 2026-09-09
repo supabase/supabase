@@ -4,13 +4,13 @@ import { ArrowRight, Calendar } from 'lucide-react'
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Button,
+  ButtonProps,
   Calendar as CalendarPicker,
   Popover,
   PopoverContent,
   PopoverSeparator,
   PopoverTrigger,
 } from 'ui'
-import { ButtonProps } from 'ui/src/components/Button/Button'
 
 import { TimeSplitInput } from './TimeSplitInput'
 import type { DatePickerToFrom } from '@/components/interfaces/Settings/Logs/Logs.types'

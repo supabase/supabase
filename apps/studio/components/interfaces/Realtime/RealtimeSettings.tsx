@@ -50,6 +50,8 @@ const REALTIME_SOFT_LIMITS = {
   max_payload_size_in_kb: 3_000,
 }
 
+const MAX_POSTGRES_CHANGES_POOL = 20
+
 export const RealtimeSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -141,6 +143,7 @@ export const RealtimeSettings = () => {
         .min(1)
         .max(maxConn?.maxConnections ?? 100)
         .optional(),
+      postgres_changes_pool: z.coerce.number().min(1).max(MAX_POSTGRES_CHANGES_POOL).optional(),
       max_concurrent_users: z.coerce
         .number()
         .min(1)
@@ -186,6 +189,7 @@ export const RealtimeSettings = () => {
         .number()
         .min(1)
         .max(maxConn?.maxConnections ?? 100),
+      postgres_changes_pool: z.coerce.number().min(1).max(MAX_POSTGRES_CHANGES_POOL),
       max_concurrent_users: z.coerce
         .number()
         .min(1)
@@ -226,6 +230,8 @@ export const RealtimeSettings = () => {
   const configValues = data ?? REALTIME_DEFAULT_CONFIG
   const sharedFormValues = {
     connection_pool: configValues.connection_pool ?? REALTIME_DEFAULT_CONFIG.connection_pool,
+    postgres_changes_pool:
+      configValues.postgres_changes_pool ?? REALTIME_DEFAULT_CONFIG.postgres_changes_pool,
     max_concurrent_users:
       configValues.max_concurrent_users ?? REALTIME_DEFAULT_CONFIG.max_concurrent_users,
     max_events_per_second:
@@ -277,6 +283,11 @@ export const RealtimeSettings = () => {
       private_only: !values.allow_public,
       connection_pool: Number(
         values.connection_pool ?? data?.connection_pool ?? REALTIME_DEFAULT_CONFIG.connection_pool
+      ),
+      postgres_changes_pool: Number(
+        values.postgres_changes_pool ??
+          data?.postgres_changes_pool ??
+          REALTIME_DEFAULT_CONFIG.postgres_changes_pool
       ),
       max_concurrent_users: Number(
         values.max_concurrent_users ??
@@ -465,6 +476,35 @@ export const RealtimeSettings = () => {
                               />
                             )}
                         </>
+                      )}
+                    />
+                  </CardContent>
+                  <CardContent>
+                    <FormField
+                      control={form.control}
+                      name="postgres_changes_pool"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          id="postgres_changes_pool"
+                          layout="flex-row-reverse"
+                          label="Postgres Changes connection pool size"
+                          description="Postgres Changes uses this database pool to create subscriptions when clients subscribe"
+                        >
+                          <FormControl>
+                            <InputGroup>
+                              <FormInputGroupInput
+                                {...field}
+                                id="postgres_changes_pool"
+                                type="number"
+                                disabled={!canUpdateConfig}
+                                value={field.value || ''}
+                              />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>connections</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl>
+                        </FormItemLayout>
                       )}
                     />
                   </CardContent>

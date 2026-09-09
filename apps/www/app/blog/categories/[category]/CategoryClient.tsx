@@ -11,10 +11,9 @@ import SectionContainer from '@/components/Layouts/SectionContainer'
 interface Props {
   posts: PostTypes[]
   initialView: BlogView
-  category: string
 }
 
-export default function CategoryClient({ posts, initialView, category: _category }: Props) {
+export default function CategoryClient({ posts, initialView }: Props) {
   const [view, setView] = useState<BlogView>(initialView)
   const [searchTerm, setSearchTerm] = useState('')
 

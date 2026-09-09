@@ -81,6 +81,7 @@ vi.mock('common', () => ({
       `project-integration-banner-dismissed-${ref}-${integrationSource}`,
   },
   isFeatureEnabled: () => false,
+  useFlag: () => false,
 }))
 
 vi.mock('framer-motion', () => ({
@@ -176,6 +177,7 @@ vi.mock('@/hooks/misc/useLocalStorage', () => ({
 vi.mock('@/components/ui/BannerStack/BannerStackProvider', () => ({
   BANNER_ID: {
     FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner',
+    SELECT_26: 'select-2026-banner',
   },
   useBannerStack: () => ({
     addBanner: mockAddBanner,
@@ -247,7 +249,11 @@ describe('ProjectLayout title', () => {
       integration_source: null,
     }
     mockBannerDismissedState.current = false
-    mockUseLocalStorageQuery.mockImplementation(() => [mockBannerDismissedState.current, vi.fn()])
+    mockUseLocalStorageQuery.mockImplementation(() => [
+      mockBannerDismissedState.current,
+      vi.fn(),
+      { isSuccess: true },
+    ])
   })
 
   afterEach(() => {

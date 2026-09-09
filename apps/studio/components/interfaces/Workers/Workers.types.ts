@@ -1,6 +1,6 @@
 import type { components } from 'api-types'
 
-type WorkerAttributes = components['schemas']['V2WorkerResponse']['data']['attributes']
+type WorkerAttributes = components['schemas']['V2WorkerResponse_Output']['data']['attributes']
 
 export type WorkerBuildState = WorkerAttributes['build_state']
 

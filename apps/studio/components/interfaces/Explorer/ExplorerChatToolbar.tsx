@@ -69,7 +69,7 @@ export const ExplorerChatToolbar = ({
     <div className="z-30 sticky top-0">
       <ExplorerToolbar aria-label="Chat toolbar">
         <ExplorerToolbarIcon>
-          <MessageSquare />
+          <MessageSquare size={16} strokeWidth={2} />
         </ExplorerToolbarIcon>
         <ExplorerToolbarTitle onSaveTitle={handleSaveName}>{chat?.name ?? ''}</ExplorerToolbarTitle>
         <ExplorerToolbarActions>
@@ -77,7 +77,7 @@ export const ExplorerChatToolbar = ({
             <DropdownMenuTrigger asChild>
               <ExplorerToolbarAction
                 aria-label="More options"
-                icon={<MoreVertical />}
+                icon={<MoreVertical size={16} strokeWidth={2} />}
                 disabled={isChatLoading}
               />
             </DropdownMenuTrigger>

@@ -21,10 +21,22 @@ describe('getConfirmFooterBar', () => {
     expect(getConfirmFooterBar('approval-responded')).toEqual({ show: true, isLoading: true })
   })
 
-  it('hides the bar for every other tool state', () => {
-    expect(getConfirmFooterBar('input-available')).toEqual({ show: false, isLoading: false })
-    expect(getConfirmFooterBar('output-available')).toEqual({ show: false, isLoading: false })
-    expect(getConfirmFooterBar('output-denied')).toEqual({ show: false, isLoading: false })
+  it('shows a terminal outcome after a completed approval', () => {
+    expect(getConfirmFooterBar('success')).toEqual({
+      show: true,
+      isLoading: false,
+      outcome: 'success',
+    })
+    expect(getConfirmFooterBar('error')).toEqual({
+      show: true,
+      isLoading: false,
+      outcome: 'error',
+    })
+    expect(getConfirmFooterBar('denied')).toEqual({
+      show: true,
+      isLoading: false,
+      outcome: 'denied',
+    })
   })
 })
 
@@ -45,6 +57,27 @@ describe('getManualToolApprovalConfirmState', () => {
         approval: { id: 'approval-1', approved: true },
       })
     ).toBe('approval-responded')
+  })
+
+  it('keeps a terminal footer after a manual tool completes', () => {
+    expect(
+      getManualToolApprovalConfirmState({
+        state: 'output-available',
+        approval: { id: 'approval-1', approved: true },
+      })
+    ).toBe('success')
+    expect(
+      getManualToolApprovalConfirmState({
+        state: 'output-error',
+        approval: { id: 'approval-1', approved: true },
+      })
+    ).toBe('error')
+    expect(
+      getManualToolApprovalConfirmState({
+        state: 'output-denied',
+        approval: { id: 'approval-1', approved: false },
+      })
+    ).toBe('denied')
   })
 
   it('hides the footer for automatic approvals', () => {
@@ -71,9 +104,10 @@ describe('getManualToolApprovalConfirmState', () => {
     ).toBeUndefined()
   })
 
-  it('ignores non-approval tool states', () => {
+  it('ignores terminal states that were not manually approved', () => {
     expect(getManualToolApprovalConfirmState({ state: 'input-available' })).toBeUndefined()
     expect(getManualToolApprovalConfirmState({ state: 'output-available' })).toBeUndefined()
+    expect(getManualToolApprovalConfirmState({ state: 'output-error' })).toBeUndefined()
     expect(getManualToolApprovalConfirmState({ state: 'output-denied' })).toBeUndefined()
   })
 })
@@ -115,6 +149,23 @@ describe('getManualToolApprovalHandlers', () => {
       id: 'approval-1',
       approved: false,
       reason: USER_SKIPPED_TOOL_REASON,
+    })
+  })
+
+  it('denyWithReason sends the given reason instead of USER_SKIPPED_TOOL_REASON', () => {
+    const addToolApprovalResponse = vi.fn()
+    const { denyWithReason } = getManualToolApprovalHandlers({
+      state: 'approval-requested',
+      approval: { id: 'approval-1' },
+      addToolApprovalResponse,
+    })
+
+    denyWithReason?.('No cell with id "missing" exists in this notebook.')
+
+    expect(addToolApprovalResponse).toHaveBeenCalledWith({
+      id: 'approval-1',
+      approved: false,
+      reason: 'No cell with id "missing" exists in this notebook.',
     })
   })
 

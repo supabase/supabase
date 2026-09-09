@@ -34,4 +34,5 @@ export { default as Storage } from './storage';
 export { default as TableEditor } from './table-editor';
 export { default as User } from './user';
 export { default as VectorBucket } from './vector-bucket';
+export { default as Workers } from './workers';
 

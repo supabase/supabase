@@ -5,7 +5,62 @@ export const WORKERS_REGION = 'us-west-2'
 export const WORKERS_REGION_LABEL = 'US West (Oregon)'
 export const WORKERS_REGION_SHORT = 'US West'
 
-// Workers answer on the project's own domain, alongside /functions/v1.
+// Sizes are fixed at deploy time — matches the `size` values the API accepts.
+export const WORKER_SIZES = ['2gb-1vcpu', '4gb-2vcpu'] as const
+
+export const WORKER_NAME_WORDS = [
+  'swift',
+  'nimble',
+  'brisk',
+  'bold',
+  'sleek',
+  'vivid',
+  'lucid',
+  'crisp',
+  'keen',
+  'agile',
+  'fierce',
+  'bright',
+  'orchid',
+  'lotus',
+  'iris',
+  'dahlia',
+  'tulip',
+  'jasmine',
+  'magnolia',
+  'azalea',
+  'poppy',
+  'marigold',
+  'hibiscus',
+  'camellia',
+  'synergy',
+  'bloom',
+  'scalable',
+  'pivot',
+  'paradigm',
+  'holistic',
+  'leverage',
+  'stream',
+  'viral',
+  'turnkey',
+  'quantum',
+  'photon',
+  'nebula',
+  'comet',
+  'orbit',
+  'cosmos',
+  'meteor',
+  'pulsar',
+  'quasar',
+  'vector',
+  'cipher',
+  'nova',
+  'zenith',
+  'warp',
+  'rocket',
+  'stellar',
+] as const
+
 export const workerUrl = ({
   endpoint,
   protocol = 'https',
@@ -58,6 +113,8 @@ export const RUNTIMES: Record<string, RuntimeMeta> = {
     swatchClassName: 'bg-[#2496ED]',
   },
 }
+
+export const WORKER_DEPLOYABLE_RUNTIMES = ['node', 'deno', 'dockerfile'] as const
 
 interface WorkerStateMeta {
   label: string

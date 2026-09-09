@@ -1,4 +1,4 @@
-import { ChevronRight, FileText, SquareCode } from 'lucide-react'
+import { ChevronRight, FileText, Loader2, SquareCode } from 'lucide-react'
 import {
   cn,
   Collapsible,
@@ -15,8 +15,15 @@ import {
   getCellLabel,
   getCellMonacoLanguage,
   getCellSourceText,
-  getEntryMetadataLine,
+  getEntryMetadata,
+  type NotebookDatabaseContext,
 } from './AssistantNotebookPreview.utils'
+import {
+  ExplorerQueryFooter,
+  ExplorerQueryResults,
+} from '@/components/interfaces/Explorer/ExplorerQuery'
+import { QueryResultRenderer } from '@/components/interfaces/Explorer/QueryEditor/QueryResultRenderer'
+import type { QueryResult } from '@/components/interfaces/Explorer/types'
 import { DiffEditor } from '@/components/ui/DiffEditor'
 import type { NotebookCellDiffEntry } from '@/data/content/notebooks/notebook-operations'
 import type { AgentCell, CellWire } from '@/data/content/notebooks/notebook-schema'
@@ -25,8 +32,10 @@ export interface AssistantNotebookPreviewCellProps {
   entry: NotebookCellDiffEntry
   isExpanded: boolean
   onExpandedChange: (isExpanded: boolean) => void
-  /** Create previews omit per-row change glyphs — every cell is an add. */
-  mode: 'create' | 'update'
+  /** Create and run previews omit per-row change glyphs. */
+  mode: 'create' | 'update' | 'run'
+  result?: QueryResult
+  databaseContext: NotebookDatabaseContext
 }
 
 /**
@@ -54,12 +63,14 @@ export const AssistantNotebookPreviewCell = ({
   isExpanded,
   onExpandedChange,
   mode,
+  result,
+  databaseContext,
 }: AssistantNotebookPreviewCellProps) => {
   const marker = CHANGE_MARKERS[entry._tag]
   const isRemoved = entry._tag === 'removed'
   const cell = getEntryCell(entry)
   const label = getCellLabel(cell)
-  const metadata = getEntryMetadataLine(entry)
+  const metadata = getEntryMetadata(entry, databaseContext)
 
   return (
     <Collapsible open={isExpanded} onOpenChange={onExpandedChange}>
@@ -81,18 +92,65 @@ export const AssistantNotebookPreviewCell = ({
         >
           {label}
         </span>
-        {metadata && (
+        {metadata.status !== 'hidden' ? (
           <span className="min-w-0 max-w-[45%] shrink truncate text-sm text-muted-foreground">
-            {metadata}
+            {metadata.status === 'loading' ? (
+              <span className="flex items-center gap-1.5">
+                <span className="animate-spin">
+                  <Loader2 aria-hidden size={12} />
+                </span>
+                Loading database…
+              </span>
+            ) : (
+              metadata.text
+            )}
           </span>
-        )}
+        ) : null}
       </CollapsibleTrigger>
       <CollapsibleContent>
         <div className="border-t">
           <CellBody entry={entry} />
         </div>
       </CollapsibleContent>
+      {result !== undefined && cell._tag !== 'markdown_cell' && (
+        <QueryCellResult cell={cell} result={result} />
+      )}
     </Collapsible>
+  )
+}
+
+const QueryCellResult = ({
+  cell,
+  result,
+}: {
+  cell: Extract<CellWire | AgentCell, { _tag: 'database_cell' | 'log_cell' }>
+  result: QueryResult
+}) => {
+  const rowCount = result.rows?.length ?? 0
+  const rowLimit = cell._tag === 'database_cell' ? cell.row_limit : undefined
+
+  return (
+    <>
+      <ExplorerQueryResults
+        className={cn(
+          'border-t',
+          rowCount === 0 ? 'min-h-20 items-center justify-center' : 'h-56 overflow-x-auto'
+        )}
+      >
+        <QueryResultRenderer view={cell.view ?? 'table'} result={result} chart={cell.chart} />
+      </ExplorerQueryResults>
+      <ExplorerQueryFooter className="flex items-center gap-x-2">
+        <p>
+          {rowCount.toLocaleString()} {rowCount === 1 ? 'row' : 'rows'}
+        </p>
+        {rowLimit !== undefined && (
+          <>
+            <p>·</p>
+            <p>{rowLimit < 0 ? 'No row limit' : `Limit ${rowLimit} rows`}</p>
+          </>
+        )}
+      </ExplorerQueryFooter>
+    </>
   )
 }
 

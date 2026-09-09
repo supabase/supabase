@@ -4,6 +4,7 @@ import {
   appendConnectionStringParams,
   buildConnectionParameters,
   buildConnectionStringWithPassword,
+  buildDotnetConnectionString,
   buildJdbcString,
   buildPsqlCommand,
   buildSafeConnectionString,
@@ -11,6 +12,7 @@ import {
   parseConnectionParams,
   PASSWORD_PLACEHOLDER,
   resolveConnectionString,
+  withRequiredSslmode,
 } from '../ConnectionString.utils'
 
 describe('parseConnectionParams', () => {
@@ -232,6 +234,52 @@ describe('buildJdbcString', () => {
   test('appends the query string using pgJDBC casing for sslnegotiation', () => {
     expect(buildJdbcString({ ...params, search: '?sslmode=require&sslnegotiation=direct' })).toBe(
       `jdbc:postgresql://db.proj.supabase.co:5432/postgres?user=postgres&password=${PASSWORD_PLACEHOLDER}&sslmode=require&sslNegotiation=direct`
+    )
+  })
+})
+
+describe('withRequiredSslmode', () => {
+  test('returns ?sslmode=require for an empty search', () => {
+    expect(withRequiredSslmode('')).toBe('?sslmode=require')
+  })
+
+  test('leaves a search that already sets sslmode unchanged', () => {
+    expect(withRequiredSslmode('?sslmode=require&sslnegotiation=direct')).toBe(
+      '?sslmode=require&sslnegotiation=direct'
+    )
+  })
+
+  test('appends sslmode=require to existing params without it', () => {
+    expect(withRequiredSslmode('?options=reference%3Dproj')).toBe(
+      '?options=reference%3Dproj&sslmode=require'
+    )
+  })
+})
+
+describe('buildDotnetConnectionString', () => {
+  const params = {
+    host: 'db.proj.supabase.co',
+    port: '5432',
+    user: 'postgres',
+    database: 'postgres',
+    search: '',
+  }
+
+  test('builds the base Npgsql string without SSL negotiation', () => {
+    expect(buildDotnetConnectionString(params)).toBe(
+      `Host=db.proj.supabase.co;Port=5432;Database=postgres;Username=postgres;Password=${PASSWORD_PLACEHOLDER};SSL Mode=Require;Trust Server Certificate=true`
+    )
+  })
+
+  test('appends SSL Negotiation=Direct when the URI requires direct negotiation', () => {
+    expect(
+      buildDotnetConnectionString({
+        ...params,
+        port: '5433',
+        search: '?sslmode=require&sslnegotiation=direct',
+      })
+    ).toBe(
+      `Host=db.proj.supabase.co;Port=5433;Database=postgres;Username=postgres;Password=${PASSWORD_PLACEHOLDER};SSL Mode=Require;Trust Server Certificate=true;SSL Negotiation=Direct`
     )
   })
 })

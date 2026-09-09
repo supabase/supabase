@@ -1,12 +1,8 @@
-import { useState } from 'react'
-import { Badge, Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
+import { Check, Database, UserCheck, UserX } from 'lucide-react'
+import { Separator, ToggleGroup, ToggleGroupItem } from 'ui'
 
-import { AnonIcon, AuthenticatedIcon, ServiceRoleIcon } from './Icons'
-import { RoleImpersonationRadio } from './RoleImpersonationRadio'
 import { UserImpersonationSelector } from './UserImpersonationSelector'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { DOCS_URL } from '@/lib/constants'
-import { PostgrestRole } from '@/lib/role-impersonation'
+import { useRoleImpersonationSelection } from './useRoleImpersonationSelection'
 import {
   useRoleImpersonationStateSnapshot,
   type RoleImpersonationController,
@@ -17,17 +13,13 @@ export interface RoleImpersonationSelectorProps {
   serviceRoleLabel?: string
   disallowAuthenticatedOption?: boolean
   title?: string
-  orientation?: 'horizontal' | 'vertical'
 }
 
 /**
- * Tightly coupled with the global role impersonation store
- * Use RoleImpersonationSelectorInterface to control the logic externally
+ * Tightly coupled with the global role impersonation store.
+ * Use RoleImpersonationSelectorInterface to control the logic externally.
  */
 export const RoleImpersonationSelector = (props: RoleImpersonationSelectorProps) => {
-  // valtio's Snapshot<> type is deep-readonly (incl. nested arrays), which isn't
-  // structurally assignable to RoleImpersonationController's plain array fields — same
-  // rationale as the cast in useGetImpersonatedRoleState.
   const state = useRoleImpersonationStateSnapshot() as unknown as RoleImpersonationController
 
   return <RoleImpersonationSelectorInterface {...props} state={state} />
@@ -37,143 +29,97 @@ type RoleImpersonationSelectorInterfaceProps = RoleImpersonationSelectorProps & 
   state: RoleImpersonationController
 }
 
-export const RoleImpersonationSelectorInterface = ({
-  state,
-  orientation,
-  serviceRoleLabel = 'Postgres',
-  disallowAuthenticatedOption = false,
-  header = 'Impersonate a database role',
-}: RoleImpersonationSelectorInterfaceProps) => {
-  const isVertical = orientation === 'vertical'
+export const RoleImpersonationSelectorInterface = (
+  props: RoleImpersonationSelectorInterfaceProps
+) => {
+  const { state } = props
+  const serviceRoleLabel = props.serviceRoleLabel ?? 'Postgres'
+  const disallowAuthenticatedOption = props.disallowAuthenticatedOption ?? false
+  const { selectedOption, onSelectedChange, keepAuthenticatedSelected } =
+    useRoleImpersonationSelection(state)
 
-  const [selectedOption, setSelectedOption] = useState<PostgrestRole>(() =>
-    state.role?.type === 'postgrest' &&
-    (state.role.role === 'anon' || state.role.role === 'authenticated')
-      ? state.role.role
-      : 'service_role'
-  )
-
-  const isAuthenticatedOptionFullySelected = Boolean(
-    selectedOption === 'authenticated' &&
-    state.role?.type === 'postgrest' &&
-    state.role.role === 'authenticated' &&
-    (('user' in state.role && state.role.user) ||
-      ('externalAuth' in state.role && state.role.externalAuth)) // Check for either auth type
-  )
-
-  function onSelectedChange(value: PostgrestRole) {
-    if (value === 'service_role') {
-      // do not set a role for service role
-      // as the default role is the "service role"
-      state.setRole(undefined)
-    }
-
-    if (value === 'anon') {
-      state.setRole({
-        type: 'postgrest',
-        role: value,
-      })
-    }
-
-    setSelectedOption(value)
-  }
+  const roleSummary = {
+    service_role: 'Bypasses RLS and can return all rows.',
+    anon: 'Returns rows available to anonymous users.',
+    authenticated: 'Returns rows available to the selected user.',
+  }[selectedOption]
 
   return (
-    <Card className="border-none">
-      <CardHeader className="flex-row items-center justify-between py-3 space-y-0">
-        <CardTitle>{header}</CardTitle>
-        <DocsButton
-          href={`${DOCS_URL}/guides/database/postgres/row-level-security#authenticated-and-unauthenticated-roles`}
-        />
-      </CardHeader>
-      <CardContent className="flex flex-col gap-y-4">
-        <form
-          onSubmit={(e) => {
-            // don't allow form submission
-            e.preventDefault()
+    <div className="flex w-80 flex-col">
+      <form
+        className="p-3"
+        onSubmit={(event) => {
+          event.preventDefault()
+        }}
+      >
+        <ToggleGroup
+          type="single"
+          orientation="vertical"
+          value={selectedOption}
+          onValueChange={(value) => {
+            if (value === 'service_role' || value === 'anon' || value === 'authenticated') {
+              void onSelectedChange(value)
+            }
           }}
+          variant="default"
+          aria-label={props.header ?? props.title ?? 'Run query as role'}
+          className="w-full flex-col items-stretch gap-0.5"
         >
-          <fieldset className={cn('flex gap-3', isVertical && 'flex-col gap-2')}>
-            <RoleImpersonationRadio
-              value="service_role"
-              isSelected={selectedOption === 'service_role'}
-              onSelectedChange={onSelectedChange}
-              label={serviceRoleLabel}
-              description="Superuser"
-              icon={<ServiceRoleIcon isSelected={selectedOption === 'service_role'} />}
-              fullWidth={isVertical}
+          <ToggleGroupItem value="service_role" className="w-full justify-between text-left">
+            <span className="flex min-w-0 items-center gap-3">
+              <Database size={16} strokeWidth={1.5} className="shrink-0" />
+              <span className="flex min-w-0 flex-col items-start">
+                <span>{serviceRoleLabel}</span>
+                <span className="text-xs font-normal text-foreground-lighter">Superuser</span>
+              </span>
+            </span>
+            {selectedOption === 'service_role' && <Check size={14} />}
+          </ToggleGroupItem>
+
+          <ToggleGroupItem value="anon" className="w-full justify-between text-left">
+            <span className="flex min-w-0 items-center gap-3">
+              <UserX size={16} strokeWidth={1.5} className="shrink-0" />
+              <span className="flex min-w-0 flex-col items-start">
+                <span>Anonymous</span>
+                <span className="text-xs font-normal text-foreground-lighter">Not logged in</span>
+              </span>
+            </span>
+            {selectedOption === 'anon' && <Check size={14} />}
+          </ToggleGroupItem>
+
+          {!disallowAuthenticatedOption && (
+            <ToggleGroupItem value="authenticated" className="w-full justify-between text-left">
+              <span className="flex min-w-0 items-center gap-3">
+                <UserCheck size={16} strokeWidth={1.5} className="shrink-0" />
+                <span className="flex min-w-0 flex-col items-start">
+                  <span>Authenticated</span>
+                  <span className="text-xs font-normal text-foreground-lighter">
+                    Logged-in user
+                  </span>
+                </span>
+              </span>
+              {selectedOption === 'authenticated' && <Check size={14} />}
+            </ToggleGroupItem>
+          )}
+        </ToggleGroup>
+
+        {!disallowAuthenticatedOption && (
+          <>
+            <Separator className="my-2.5" />
+            <UserImpersonationSelector
+              state={state}
+              disabled={selectedOption !== 'authenticated'}
+              onUserImpersonationCleared={keepAuthenticatedSelected}
             />
-
-            <RoleImpersonationRadio
-              value="anon"
-              label="Anonymous"
-              isSelected={selectedOption === 'anon'}
-              onSelectedChange={onSelectedChange}
-              description="Not logged in"
-              icon={<AnonIcon isSelected={selectedOption === 'anon'} />}
-              fullWidth={isVertical}
-            />
-
-            {!disallowAuthenticatedOption && (
-              <RoleImpersonationRadio
-                value="authenticated"
-                label="Authenticated"
-                isSelected={
-                  selectedOption === 'authenticated' &&
-                  (isAuthenticatedOptionFullySelected || 'partially')
-                }
-                onSelectedChange={onSelectedChange}
-                description="Specific logged in user"
-                icon={<AuthenticatedIcon isSelected={selectedOption === 'authenticated'} />}
-                fullWidth={isVertical}
-              />
-            )}
-          </fieldset>
-        </form>
-
-        {selectedOption === 'service_role' && (
-          <div>
-            <p className="text-sm">
-              Full admin access
-              <Badge className="ml-2">Default</Badge>
-            </p>
-            <p className="text-foreground-light text-sm">
-              The <code className="text-code-inline">postgres</code> role, which bypasses all Row
-              Level Security (RLS) policies.
-            </p>
-          </div>
+          </>
         )}
-
-        {selectedOption === 'anon' && (
-          <div>
-            <p className="text-sm">For unauthenticated access</p>
-            <p className="text-foreground-light text-sm">
-              The <code className="text-code-inline">anon</code> role, which the API (PostgREST)
-              uses when a user is not logged in.
-              <br />
-              Row Level Security (RLS) policies apply.
-            </p>
-          </div>
-        )}
-
-        {selectedOption === 'authenticated' && (
-          <div>
-            <p className="text-sm">For authenticated access</p>
-            <p className="text-foreground-light text-sm">
-              The <code className="text-code-inline">authenticated</code> role, which the API
-              (PostgREST) uses when a user is logged in.
-              <br />
-              Row Level Security (RLS) policies apply.
-            </p>
-          </div>
-        )}
-      </CardContent>
-
-      {selectedOption === 'authenticated' && (
-        <CardContent className="p-0">
-          <UserImpersonationSelector state={state} />
-        </CardContent>
-      )}
-    </Card>
+      </form>
+      <Separator />
+      <footer className="px-3 py-2">
+        <p aria-live="polite" className="text-xs text-foreground-lighter">
+          {roleSummary}
+        </p>
+      </footer>
+    </div>
   )
 }

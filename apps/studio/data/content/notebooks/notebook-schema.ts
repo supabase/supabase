@@ -16,7 +16,7 @@ const isoDateTimeSchema = z.string().transform((raw, ctx) => {
 
 export const MAX_CHART_Y_SERIES = 3
 
-const chartConfigSchema = z.object({
+export const chartConfigSchema = z.object({
   type: z.enum(['bar', 'line']),
   x_column: z.string(),
   y_series: z.array(z.string()).max(MAX_CHART_Y_SERIES),
@@ -54,12 +54,16 @@ export const timeRangeSchema = z
     { message: 'must be later than the start of the range', path: ['end'] }
   )
 
+// The read-replica `identifier`, or absent for the project's primary. An empty string is
+// normalized to absent — models asked to omit this key reliably substitute "" instead of
+// leaving it out.
+export const databaseIdentifierSchema = z
+  .string()
+  .optional()
+  .transform((value) => (value === '' ? undefined : value))
+
 export const databaseSourceSchema = z.object({
-  /**
-   * Which database the query runs against: the read-replica `identifier`, or absent
-   * for the project's primary.
-   */
-  database_identifier: z.string().optional(),
+  database_identifier: databaseIdentifierSchema,
 })
 
 export const logsSourceSchema = z.object({

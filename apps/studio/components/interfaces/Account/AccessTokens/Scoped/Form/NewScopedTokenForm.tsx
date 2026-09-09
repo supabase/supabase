@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useReducedMotion } from 'common'
 import { ChevronRight, X } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -19,6 +20,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 
 import { CLASSIC_TOKEN_WARNING } from '../../AccessToken.constants'
 import { countConfigured, PermissionMode } from '../../AccessToken.permissions'
+import { applyPreset, type PermissionPreset } from '../../AccessToken.presets'
 import { useTokenAccessEvaluation } from '../../hooks/useTokenAccessEvaluation'
 import { DEFAULT_EXPIRY, TokenFormSchema, TokenFormValues } from './NewScopedTokenForm.utils'
 import { NewScopedTokenFormReview } from './NewScopedTokenFormReview'
@@ -41,26 +43,41 @@ const DEFAULT_VALUES: TokenFormValues = {
   permissions: {},
 }
 
-export const NewScopedTokenForm = ({
-  isPending,
-  onCreateToken,
-  onCancel,
-}: {
-  isPending: boolean
-  onCreateToken: (values: TokenFormValues) => void
-  onCancel: () => void
-}) => {
+export interface NewScopedTokenFormHandle {
+  getAbandonmentContext: () => {
+    resourceAccess: TokenFormValues['resourceAccess']
+    formStep: 'form' | 'review'
+    isFormTouched: boolean
+  }
+}
+
+export const NewScopedTokenForm = forwardRef<
+  NewScopedTokenFormHandle,
+  {
+    isPending: boolean
+    onCreateToken: (values: TokenFormValues) => void
+    onCancel: () => void
+  }
+>(({ isPending, onCreateToken, onCancel }, ref) => {
   const form = useForm<TokenFormValues>({
     resolver: zodResolver(TokenFormSchema),
     defaultValues: DEFAULT_VALUES,
     mode: 'onChange',
   })
   const [step, setStep] = useState<'form' | 'review'>('form')
+  const { isDirty } = form.formState
+  useImperativeHandle(ref, () => ({
+    getAbandonmentContext: () => ({
+      resourceAccess: form.getValues('resourceAccess'),
+      formStep: step,
+      isFormTouched: isDirty,
+    }),
+  }))
   const [formValues, setFormValues] = useState<TokenFormValues>(DEFAULT_VALUES)
-  // Dismissal sticks for the sheet's lifetime, so bouncing between steps doesn't resurface it.
   const [isCreateHintDismissed, setIsCreateHintDismissed] = useState(false)
-  const [showMissingPermissionsWarning, setShowMissingPermissionsWarning] = useState(false)
+  const [missingPermissionsAttempts, setMissingPermissionsAttempts] = useState(0)
   const resourceSectionRef = useRef<HTMLDivElement>(null)
+  const missingPermissionsRef = useRef<HTMLDivElement>(null)
   const resourceAccess = useWatch({ control: form.control, name: 'resourceAccess' })
   const selection = useWatch({ control: form.control, name: 'permissions' })
   const organizationSlugs = useWatch({
@@ -84,23 +101,33 @@ export const NewScopedTokenForm = ({
   })
 
   const { data: permissionScopeMap, isError } = useGetEnabledEndpointsForCapability()
+  const isReducedMotionPreferred = useReducedMotion()
+  const isReducedMotionPreferredRef = useRef(isReducedMotionPreferred)
+  isReducedMotionPreferredRef.current = isReducedMotionPreferred
+  const onCancelRef = useRef(onCancel)
+  onCancelRef.current = onCancel
 
   useEffect(() => {
     if (isError) {
       toast.error('Something went wrong, try again')
-      onCancel()
+      onCancelRef.current()
     }
-  }, [onCancel, isError])
+  }, [isError])
 
-  // 'account' switches to the classic token flow: name + expiry only, no permissions or review.
+  useEffect(() => {
+    if (missingPermissionsAttempts === 0) return
+    missingPermissionsRef.current?.scrollIntoView({
+      behavior: isReducedMotionPreferredRef.current ? 'auto' : 'smooth',
+      block: 'nearest',
+    })
+  }, [missingPermissionsAttempts])
+
   const isClassicMode = resourceAccess === 'account'
 
-  // Single owner of the mode switch, so every entry point resets the same dependent fields.
   const handleSelectLegacyMode = () => {
     form.setValue('resourceAccess', 'account', { shouldValidate: true })
     form.setValue('organizationSlugs', [])
     form.setValue('projectRefs', [])
-    // The fields unmount in legacy mode, so drop any validation errors they were holding.
     form.clearErrors(['organizationSlugs', 'projectRefs'])
   }
 
@@ -110,7 +137,7 @@ export const NewScopedTokenForm = ({
       return
     }
     if (configuredCount === 0) {
-      setShowMissingPermissionsWarning(true)
+      setMissingPermissionsAttempts((attempts) => attempts + 1)
       return
     }
     setFormValues(values)
@@ -119,14 +146,17 @@ export const NewScopedTokenForm = ({
 
   const handlePermissionChange = (key: string, mode: PermissionMode) => {
     form.setValue('permissions', { ...selection, [key]: mode })
-    if (mode !== 'none') setShowMissingPermissionsWarning(false)
+    if (mode !== 'none') setMissingPermissionsAttempts(0)
+  }
+
+  const handleApplyPreset = (preset: PermissionPreset) => {
+    const next = applyPreset(preset, selection)
+    form.setValue('permissions', next)
+    if (countConfigured(next) > 0) setMissingPermissionsAttempts(0)
   }
 
   return (
     <>
-      {/* Radix wraps viewport children in an inline-styled display:table div that grows to fit
-          the widest child, which would let one long endpoint path expand the sheet instead of
-          clipping — force it back to block so widths are bounded and rows can truncate. */}
       <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]>div]:block!">
         {step === 'form' ? (
           <Form {...form}>
@@ -170,14 +200,12 @@ export const NewScopedTokenForm = ({
                   <PermissionsAccordion
                     selection={selection}
                     onChange={handlePermissionChange}
+                    onApplyPreset={handleApplyPreset}
                     access={access}
                   />
-                  {showMissingPermissionsWarning && (
-                    <div className="space-y-3 px-5 sm:px-6 pb-6">
+                  {missingPermissionsAttempts > 0 && (
+                    <div ref={missingPermissionsRef} className="space-y-3 px-5 sm:px-6 pb-6">
                       <Admonition
-                        ref={(node) => {
-                          node?.scrollIntoView()
-                        }}
                         type="warning"
                         title="No permissions selected"
                         description="This token won't be able to do anything until you grant at least one permission."
@@ -256,4 +284,6 @@ export const NewScopedTokenForm = ({
       </SheetFooter>
     </>
   )
-}
+})
+
+NewScopedTokenForm.displayName = 'NewScopedTokenForm'

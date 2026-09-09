@@ -28,7 +28,7 @@ supabase functions deploy your-function --debug
 
 - **Syntax errors:** TypeScript or JavaScript syntax issues in your function code
 - **Invalid imports:** Importing modules that don't exist or aren't compatible with Deno
-- **Large bundle size:** Functions have a 10MB source code limit. See [Bundle size issues](./edge-function-bundle-size-issues) for more details
+- **Large bundle size:** Functions have a maximum size of 20MB when bundled locally through the CLI, or 5MB when bundled server-side, for example through the Management API or Dashboard. See [Bundle size issues](./edge-function-bundle-size-issues) for more details
 - **Network issues:** Problems reaching the Supabase API during deployment
 
 ## Before opening a support ticket
@@ -37,8 +37,9 @@ Make sure you're using the latest version of the Supabase CLI:
 
 ```bash
 supabase --version
-supabase update
 ```
+
+If it's out of date, upgrade using whichever package manager installed the CLI, for example `brew upgrade supabase`, `npm update supabase --save-dev`, or `scoop update supabase`.
 
 If these steps don't resolve the issue, open a support ticket via the Supabase Dashboard and include all output from the diagnostic commands.
 

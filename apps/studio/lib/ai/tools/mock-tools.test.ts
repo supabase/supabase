@@ -117,6 +117,29 @@ describe('ai/tools/mock-tools getMockTools', () => {
       ).rejects.toThrow(/not found/i)
     })
 
+    it('shares deterministic run_notebook output with eval models', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      if (!mockTools.run_notebook.execute) throw new Error('execute is undefined')
+      if (!mockTools.run_notebook.toModelOutput) throw new Error('toModelOutput is undefined')
+
+      const output = await mockTools.run_notebook.execute(
+        { id: AUTH_HEALTH_NOTEBOOK_ID, expected_updated_at: MOCK_NOTEBOOKS_DATA[0].updated_at },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      const modelOutput = mockTools.run_notebook.toModelOutput({
+        toolCallId: 'test',
+        input: { id: AUTH_HEALTH_NOTEBOOK_ID, expected_updated_at: output.updated_at },
+        output,
+      })
+
+      expect(modelOutput).toMatchObject({
+        type: 'json',
+        value: {
+          cells: expect.arrayContaining([expect.objectContaining({ rows: [] })]),
+        },
+      })
+    })
+
     it('overrides create_notebook needsApproval to false, unlike the real tool', async () => {
       const mockTools = await getMockTools(undefined, new AbortController().signal)
 
@@ -240,6 +263,43 @@ describe('ai/tools/mock-tools getMockTools', () => {
         { toolCallId: 'test', messages: [], context: {} }
       )
       expect(after.cells.map((cell) => cell._tag)).toEqual(['markdown_cell', 'log_cell'])
+    })
+
+    it('overrides delete_notebook needsApproval to false, unlike the real tool', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+
+      expect(getNotebookTools().delete_notebook.needsApproval).toBe(true)
+      expect(mockTools.delete_notebook.needsApproval).toBe(false)
+    })
+
+    it('delete_notebook removes the notebook, and list_notebooks no longer returns it', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      if (!mockTools.delete_notebook.execute) throw new Error('execute is undefined')
+      if (!mockTools.list_notebooks.execute) throw new Error('execute is undefined')
+
+      const result = await mockTools.delete_notebook.execute(
+        { id: AUTH_HEALTH_NOTEBOOK_ID },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      expect(result).toEqual({ id: AUTH_HEALTH_NOTEBOOK_ID, name: 'Auth health check' })
+
+      const listed = await mockTools.list_notebooks.execute(
+        { limit: 20 },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      expect(listed.notebooks.map((notebook) => notebook.id)).toEqual([EDGE_FUNCTION_NOTEBOOK_ID])
+    })
+
+    it('delete_notebook rejects an unknown id', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      if (!mockTools.delete_notebook.execute) throw new Error('execute is undefined')
+
+      await expect(
+        mockTools.delete_notebook.execute(
+          { id: 'unknown-notebook-id' },
+          { toolCallId: 'test', messages: [], context: {} }
+        )
+      ).rejects.toThrow(/unknown-notebook-id/)
     })
 
     it('is isolated per call to getMockTools', async () => {

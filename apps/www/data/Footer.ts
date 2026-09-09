@@ -105,6 +105,10 @@ const footerData = [
         url: '/security',
       },
       {
+        text: 'Regions',
+        url: '/regions',
+      },
+      {
         text: 'SOC2',
         url: '/security',
       },

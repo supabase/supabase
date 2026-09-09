@@ -16,6 +16,7 @@ interface EdgeFunctionRendererProps {
   onDeny?: () => void
   isDeploying?: boolean
   initialIsDeployed?: boolean
+  errorText?: string
   confirmState?: ConfirmFooterApprovalState
 }
 
@@ -27,6 +28,7 @@ export const EdgeFunctionRenderer = ({
   onDeny,
   isDeploying = false,
   initialIsDeployed,
+  errorText,
   confirmState,
 }: EdgeFunctionRendererProps) => {
   const { ref } = useParams()
@@ -85,6 +87,9 @@ export const EdgeFunctionRenderer = ({
       cancelLabel="Skip"
       confirmLabel="Deploy"
       confirmLabelLoading="Deploying..."
+      successMessage="Edge Function deployed"
+      errorMessage="Failed to deploy Edge Function"
+      deniedMessage="Skipped Edge Function deployment"
       isLoading={isDeploying}
       onCancel={onDeny}
       onConfirm={handleDeploy}
@@ -97,6 +102,7 @@ export const EdgeFunctionRenderer = ({
         disabled={isConfirming}
         isDeploying={isDeploying}
         isDeployed={initialIsDeployed}
+        errorText={errorText}
         functionUrl={functionUrl}
         deploymentDetailsUrl={deploymentDetailsUrl}
         downloadCommand={downloadCommand}

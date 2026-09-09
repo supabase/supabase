@@ -95,6 +95,16 @@ describe('toolUsageScorer', () => {
     await expect(runToolUsageScorer({}, trace)).resolves.toBeNull()
   })
 
+  it('returns null when requiredTools is an empty array and forbiddenTools is unset', async () => {
+    const { trace } = mockToolTrace([{ name: 'execute_sql' }])
+    await expect(runToolUsageScorer({ requiredTools: [] }, trace)).resolves.toBeNull()
+  })
+
+  it('returns null when forbiddenTools is an empty array and requiredTools is unset', async () => {
+    const { trace } = mockToolTrace([{ name: 'execute_sql' }])
+    await expect(runToolUsageScorer({ forbiddenTools: [] }, trace)).resolves.toBeNull()
+  })
+
   it('returns null when there is no trace', async () => {
     await expect(runToolUsageScorer({ requiredTools: ['execute_sql'] })).resolves.toBeNull()
   })

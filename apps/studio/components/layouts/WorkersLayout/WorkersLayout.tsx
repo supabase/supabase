@@ -26,6 +26,12 @@ const useGenerateWorkersMenu = (): ProductMenuGroup[] => {
             url: `/project/${projectRef}/workers`,
             items: [],
           },
+          {
+            name: 'Secrets',
+            key: 'secrets',
+            url: `/project/${projectRef}/workers/secrets`,
+            items: [],
+          },
         ],
       },
     ],
@@ -85,7 +91,7 @@ const WorkersLayoutContent = ({ children, title }: PropsWithChildren<WorkersLayo
       {canReadWorkers ? (
         children
       ) : (
-        <NoPermission isFullPage resourceText={`view this project's ${PRODUCT_NAME} workers`} />
+        <NoPermission isFullPage resourceText="view this project's workers" />
       )}
     </ProjectLayout>
   )

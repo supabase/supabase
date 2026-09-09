@@ -129,11 +129,11 @@ const matchesRequiredTool = (
 }
 
 export const toolUsageScorer: AssistantEvalScorer = async ({ expected, trace }) => {
-  if ((!expected.requiredTools && !expected.forbiddenTools) || !trace) return null
-
-  const toolSpans = await getToolSpans(trace)
   const requiredTools = expected.requiredTools ?? []
   const forbiddenTools = expected.forbiddenTools ?? []
+  if ((requiredTools.length === 0 && forbiddenTools.length === 0) || !trace) return null
+
+  const toolSpans = await getToolSpans(trace)
 
   const presentCount = requiredTools.filter((tool) => matchesRequiredTool(toolSpans, tool)).length
   const violatedTools = forbiddenTools.filter((tool) => matchesRequiredTool(toolSpans, tool))

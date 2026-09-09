@@ -6,6 +6,7 @@ import {
   createAssistantQueryModel,
   getAssistantQueryDisplay,
   setAssistantQuerySql,
+  shouldClearAssistantQueryResult,
   toAssistantQueryResult,
 } from './AssistantQueryCell.utils'
 import { DEFAULT_CELL_ROW_LIMIT } from '@/components/interfaces/Explorer/QueryCell/QueryCell.utils'
@@ -62,6 +63,15 @@ describe('assistant query model', () => {
     })
   })
 
+  it('starts as a logs query when the source is logs', () => {
+    const time_range = { _tag: 'relative_time_range' as const, unit: 'day' as const, amount: 1 }
+    expect(createAssistantQueryModel('select 1 from logs', { _tag: 'logs', time_range })).toEqual({
+      _tag: 'logs',
+      uncheckedSql: untrustedLogSql('select 1 from logs'),
+      time_range,
+    })
+  })
+
   it('rebrands the live SQL for the current backend', () => {
     const database = createAssistantQueryModel('select 1')
     expect(setAssistantQuerySql(database, 'select 2').uncheckedSql).toBe(untrustedSql('select 2'))
@@ -86,5 +96,37 @@ describe('assistant query model', () => {
       uncheckedSql: untrustedSql('select 1'),
       rowLimit: DEFAULT_CELL_ROW_LIMIT,
     })
+  })
+
+  it('clears an existing result when only the logs time range changes', () => {
+    const logs = createAssistantQueryModel('select 1 from logs', {
+      _tag: 'logs',
+      time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 1 },
+    })
+
+    expect(
+      shouldClearAssistantQueryResult(logs, {
+        _tag: 'logs',
+        time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 3 },
+      })
+    ).toBe(true)
+    expect(
+      shouldClearAssistantQueryResult(logs, {
+        _tag: 'logs',
+        time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 1 },
+      })
+    ).toBe(false)
+  })
+
+  it('compares canonical database bindings when deciding whether to clear results', () => {
+    const database = createAssistantQueryModel('select 1')
+
+    expect(shouldClearAssistantQueryResult(database, { _tag: 'database' })).toBe(false)
+    expect(
+      shouldClearAssistantQueryResult(database, {
+        _tag: 'database',
+        database_identifier: 'replica-1',
+      })
+    ).toBe(true)
   })
 })

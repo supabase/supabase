@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   EXPLORER_SECTIONS,
@@ -12,6 +13,7 @@ import {
 } from './ExplorerLayout.constants'
 import { formatRelativeTimeShort, getRecentlyUpdatedItems } from './ExplorerNavHome.utils'
 import { useCreateChat } from '@/components/interfaces/Explorer/hooks'
+import { useContentCountQuery } from '@/data/content/content-count-query'
 import { useNotebooksInfiniteQuery } from '@/data/content/notebooks/notebooks-infinite-query'
 import { useAiAssistantChatList } from '@/state/ai-assistant-state'
 
@@ -26,6 +28,13 @@ export const ExplorerNavHome = ({
   const { data: notebooksData } = useNotebooksInfiniteQuery({ projectRef: ref, limit: 100 })
   const notebooks = notebooksData?.pages.flatMap((page) => page.content) ?? []
   const chats = useAiAssistantChatList()
+
+  const { data: notebookCountData, isPending } = useContentCountQuery({
+    projectRef: ref,
+    type: 'notebook',
+  })
+  // [Joshen] Notebooks are all shared by default, none private
+  const notebookCount = notebookCountData?.shared ?? 0
 
   const recentItems = getRecentlyUpdatedItems({ notebooks, chats })
 
@@ -52,7 +61,15 @@ export const ExplorerNavHome = ({
             >
               <Icon size={14} className="shrink-0" />
               <span className="flex-1 text-left">{label}</span>
-              <span className="text-xs text-foreground-lighter">{/* Length will be here */}</span>
+              {type === 'notebook' ? (
+                isPending ? (
+                  <ShimmeringLoader className="w-3 py-2" />
+                ) : (
+                  <span className="text-xs text-foreground-lighter">{notebookCount}</span>
+                )
+              ) : (
+                <span className="text-xs text-foreground-lighter">{chats.length}</span>
+              )}
               <ChevronRight size={14} className="shrink-0 text-foreground-muted" />
             </button>
           )

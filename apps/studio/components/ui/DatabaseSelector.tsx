@@ -1,8 +1,6 @@
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import { Check, ChevronDown, Loader2, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import {
@@ -22,12 +20,17 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { REPLICA_STATUS } from '../interfaces/Database/Replication/Replication.constants'
 import { Markdown } from '@/components/interfaces/Markdown'
-import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
+import {
+  getAddReadReplicaPath,
+  getInfrastructurePath,
+} from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
+import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
@@ -52,8 +55,9 @@ export const DatabaseSelector = ({
   className,
   isForm = false,
 }: DatabaseSelectorProps) => {
-  const router = useRouter()
   const { ref: projectRef } = useParams()
+  const isHighAvailability = useIsHighAvailability()
+
   const [open, setOpen] = useState(false)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
@@ -74,7 +78,7 @@ export const DatabaseSelector = ({
 
   const selectedAdditionalOption = additionalOptions.find((x) => x.id === selectedDatabaseId)
 
-  const newReplicaURL = `/project/${projectRef}/database/replication?destinationType=Read+Replica`
+  const newReplicaURL = getAddReadReplicaPath(projectRef)
 
   useEffect(() => {
     if (_selectedDatabaseId && !isForm) state.setSelectedDatabaseId(_selectedDatabaseId)
@@ -215,29 +219,19 @@ export const DatabaseSelector = ({
               </ScrollArea>
             </CommandGroup>
 
-            {IS_PLATFORM && infrastructureReadReplicas && (
+            {IS_PLATFORM && infrastructureReadReplicas && !isHighAvailability && (
               <CommandGroup className="border-t">
-                <CommandItem
-                  className="cursor-pointer w-full"
+                <CommandItemLink
+                  href={newReplicaURL}
+                  className="cursor-pointer w-full gap-2"
                   onSelect={() => {
                     setOpen(false)
-                    router.push(newReplicaURL)
+                    setShowConnect(false)
                   }}
-                  onClick={() => setOpen(false)}
                 >
-                  <Link
-                    href={newReplicaURL}
-                    onClick={async () => {
-                      setOpen(false)
-                      // [Joshen] This is used in the Connect UI which is available across all pages
-                      setShowConnect(false)
-                    }}
-                    className="w-full flex items-center gap-2"
-                  >
-                    <Plus size={14} strokeWidth={1.5} />
-                    <p>Create a new read replica</p>
-                  </Link>
-                </CommandItem>
+                  <Plus size={14} strokeWidth={1.5} />
+                  <p>Create a new read replica</p>
+                </CommandItemLink>
               </CommandGroup>
             )}
           </CommandList>

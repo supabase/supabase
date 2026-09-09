@@ -16,8 +16,8 @@ import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
 import {
   generateProductRoutes,
   generateSettingsRoutes,
-  generateToolRoutes,
   useGenerateOtherRoutes,
+  useGenerateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
 import type { Route } from '@/components/ui/ui.types'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -64,7 +64,7 @@ export function MobileMenuContent({
   const authOverviewPageEnabled = useFlag('authOverviewPage')
   const workersEnabled = useFlag('workers')
 
-  const toolRoutes = useMemo(() => generateToolRoutes(ref, project), [ref, project])
+  const toolRoutes = useGenerateToolRoutes()
   const productRoutes = useMemo(
     () =>
       generateProductRoutes(ref, project, {

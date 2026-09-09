@@ -1,9 +1,11 @@
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { useIsLoggedIn } from 'common'
 import { BookOpen } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 
 import ProductIcon from '../ProductIcon'
+import { getDashboardCtaHref } from '@/lib/dashboard-links'
 
 type subheader = string
 interface Types {
@@ -18,6 +20,7 @@ interface Types {
 }
 
 const ProductHeader = (props: Types) => {
+  const isLoggedIn = useIsLoggedIn()
   const sendTelemetryEvent = useSendTelemetryEvent()
   return (
     <div className="section-container relative pt-16 pb-0 lg:pt-28">
@@ -52,8 +55,7 @@ const ProductHeader = (props: Types) => {
           <div className="flex flex-row md:flex-row md:items-center">
             <Button asChild size="medium">
               <Link
-                href="https://supabase.com/dashboard"
-                as="https://supabase.com/dashboard"
+                href={getDashboardCtaHref(isLoggedIn)}
                 onClick={() =>
                   sendTelemetryEvent({
                     action: 'start_project_button_clicked',

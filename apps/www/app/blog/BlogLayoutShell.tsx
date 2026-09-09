@@ -6,6 +6,11 @@ import type PostTypes from 'types/post'
 import BlogHero from './BlogHero'
 import DefaultLayout from '@/components/Layouts/Default'
 
+// Listing routes have no page-specific title of their own, so they share the
+// generic screen-reader heading below. Without it the visible breadcrumb ends up
+// as the only heading on the page, and search engines pick that up as the title.
+const LISTING_ROUTE_PREFIXES = ['/blog/categories/', '/blog/tags/', '/blog/authors/']
+
 export default function BlogLayoutShell({
   featuredPost,
   secondaryPosts,
@@ -16,7 +21,8 @@ export default function BlogLayoutShell({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
-  const isListingRoute = pathname === '/blog' || Boolean(pathname?.startsWith('/blog/categories/'))
+  const isListingRoute =
+    pathname === '/blog' || LISTING_ROUTE_PREFIXES.some((prefix) => pathname?.startsWith(prefix))
 
   return (
     <DefaultLayout>

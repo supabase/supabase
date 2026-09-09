@@ -140,7 +140,7 @@ describe('OrganizationInvite', () => {
       'href',
       '/sign-in?returnTo=%2Fjoin%3Ftoken%3Dinvite-token%26slug%3Dacme-corp'
     )
-    expect(screen.getByRole('link', { name: 'Create an account' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Sign up' })).toHaveAttribute(
       'href',
       '/sign-up?returnTo=%2Fjoin%3Ftoken%3Dinvite-token%26slug%3Dacme-corp'
     )

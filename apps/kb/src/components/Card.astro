@@ -1,0 +1,45 @@
+---
+// Small "glass panel" card, adapted from apps/docs' GlassPanel
+// (packages/ui-patterns/src/GlassPanel/index.tsx) — same surface treatment
+// (bg-surface-75, hover:border-strong), trimmed to what kb needs: no
+// logo/icon-picker machinery, which pulled in next/image and next-themes
+// that don't apply to a plain Astro app.
+//
+// Unlike GlassPanel (always a plain <div>, link-agnostic — every call site
+// in docs wraps it in a Next.js <Link>), this renders as an <a> itself when
+// `href` is given. That's only safe because `topics` render as plain,
+// non-linked badges — nothing inside the card is itself a link, so there's
+// no nested-<a> problem.
+import { Badge } from 'ui'
+
+interface Props {
+	href?: string
+	title: string
+	description?: string
+	topics?: string[]
+	class?: string
+}
+
+const { href, title, description, topics = [], class: className } = Astro.props
+const Tag = href ? 'a' : 'div'
+---
+
+<Tag
+	href={href}
+	class:list={[
+		'relative flex h-full flex-col gap-2 rounded-lg border border-default bg-surface-75 p-5 text-left transition hover:border-strong',
+		className,
+	]}
+>
+	<h2 class="m-0 text-base font-medium text-foreground">{title}</h2>
+	{description && <p class="m-0 text-sm text-foreground-light">{description}</p>}
+	{
+		topics.length > 0 && (
+			<div class="mt-2 flex flex-wrap gap-2">
+				{topics.map((topic) => (
+					<Badge>{topic}</Badge>
+				))}
+			</div>
+		)
+	}
+</Tag>

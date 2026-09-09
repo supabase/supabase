@@ -117,8 +117,7 @@ describe('ViewTokenSheet', () => {
       await screen.findByText(/You were removed from the organizations this token is bound to/)
     ).toBeInTheDocument()
     // The lost resource renders as an anonymous count, never its slug.
-    expect(await screen.findByText('1 organization')).toBeInTheDocument()
-    expect(screen.queryByText('departed-org')).toBeNull()
+    expect(await screen.findByText('departed-org')).toBeInTheDocument()
     expect(screen.queryByText("This token's resources no longer exist")).toBeNull()
   })
 

@@ -1,21 +1,41 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { MouseEventHandler, ReactElement, ReactNode } from 'react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LocalDropdown } from './LocalDropdown'
 
-const { mockRouter, mockSetTheme, mockSetLastRoute, mockToggleFeaturePreviewModal } = vi.hoisted(
-  () => ({
-    mockRouter: {
-      pathname: '/project/[ref]/editor',
-      asPath: '/project/default/editor',
-    },
-    mockSetTheme: vi.fn(),
-    mockSetLastRoute: vi.fn(),
-    mockToggleFeaturePreviewModal: vi.fn(),
-  })
-)
+const {
+  mockRouter,
+  mockSetTheme,
+  mockSetLastRoute,
+  mockToggleFeaturePreviewModal,
+  mockEnableToolbar,
+  mockDismissDevToolbar,
+  mockSetDevToolbarOpen,
+  mockUseDevToolbar,
+} = vi.hoisted(() => ({
+  mockRouter: {
+    pathname: '/project/[ref]/editor',
+    asPath: '/project/default/editor',
+  },
+  mockSetTheme: vi.fn(),
+  mockSetLastRoute: vi.fn(),
+  mockToggleFeaturePreviewModal: vi.fn(),
+  mockEnableToolbar: vi.fn(),
+  mockDismissDevToolbar: vi.fn(),
+  mockSetDevToolbarOpen: vi.fn(),
+  mockUseDevToolbar: vi.fn(() => ({
+    isAvailable: false,
+    isEnabled: false,
+    isOpen: false,
+    setIsOpen: mockSetDevToolbarOpen,
+    enableToolbar: mockEnableToolbar,
+    dismissToolbar: mockDismissDevToolbar,
+    events: [],
+    setEvents: vi.fn(),
+  })),
+}))
 
 vi.mock('next/router', () => ({
   useRouter: () => mockRouter,
@@ -62,6 +82,10 @@ vi.mock('./App/FeaturePreview/FeaturePreviewContext', () => ({
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 
+vi.mock('dev-tools', () => ({
+  useDevToolbar: () => mockUseDevToolbar(),
+}))
+
 vi.mock('ui', async () => {
   const React = await import('react')
 
@@ -104,6 +128,19 @@ vi.mock('ui', async () => {
         </button>
       ),
     DropdownMenuLabel: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+    DropdownMenuCheckboxItem: ({
+      children,
+      checked,
+      onCheckedChange,
+    }: {
+      children: ReactNode
+      checked?: boolean
+      onCheckedChange?: (checked: boolean) => void
+    }) => (
+      <button tabIndex={0} aria-checked={checked} onClick={() => onCheckedChange?.(!checked)}>
+        {children}
+      </button>
+    ),
     DropdownMenuSeparator: () => <hr />,
     DropdownMenuRadioGroup: ({
       children,
@@ -144,6 +181,20 @@ vi.mock('ui', async () => {
 })
 
 describe('LocalDropdown', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockUseDevToolbar.mockReturnValue({
+      isAvailable: false,
+      isEnabled: false,
+      isOpen: false,
+      setIsOpen: mockSetDevToolbarOpen,
+      enableToolbar: mockEnableToolbar,
+      dismissToolbar: mockDismissDevToolbar,
+      events: [],
+      setEvents: vi.fn(),
+    })
+  })
+
   it('shows Preferences, removes Command menu, and keeps theme controls wired', async () => {
     const user = userEvent.setup()
 
@@ -152,6 +203,7 @@ describe('LocalDropdown', () => {
     expect(screen.getByText('Preferences')).toBeInTheDocument()
     expect(screen.queryByText('Command menu')).not.toBeInTheDocument()
     expect(screen.getByText('Theme')).toBeInTheDocument()
+    expect(screen.queryByText('Dev toolbar')).not.toBeInTheDocument()
 
     await user.click(screen.getByText('Preferences'))
     expect(mockSetLastRoute).toHaveBeenCalledWith('/project/default/editor')
@@ -161,5 +213,51 @@ describe('LocalDropdown', () => {
 
     await user.click(screen.getByText('Light'))
     expect(mockSetTheme).toHaveBeenCalledWith('light')
+  })
+
+  it('toggles Dev toolbar visibility from the menu', async () => {
+    mockUseDevToolbar.mockReturnValue({
+      isAvailable: true,
+      isEnabled: false,
+      isOpen: false,
+      setIsOpen: mockSetDevToolbarOpen,
+      enableToolbar: mockEnableToolbar,
+      dismissToolbar: mockDismissDevToolbar,
+      events: [],
+      setEvents: vi.fn(),
+    })
+
+    const user = userEvent.setup()
+
+    render(<LocalDropdown />)
+
+    expect(screen.getByText('Local tools')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Dev toolbar' }))
+
+    expect(mockEnableToolbar).toHaveBeenCalled()
+    expect(mockDismissDevToolbar).not.toHaveBeenCalled()
+  })
+
+  it('hides Dev toolbar from the menu when toggled off', async () => {
+    mockUseDevToolbar.mockReturnValue({
+      isAvailable: true,
+      isEnabled: true,
+      isOpen: false,
+      setIsOpen: mockSetDevToolbarOpen,
+      enableToolbar: mockEnableToolbar,
+      dismissToolbar: mockDismissDevToolbar,
+      events: [],
+      setEvents: vi.fn(),
+    })
+
+    const user = userEvent.setup()
+
+    render(<LocalDropdown />)
+
+    await user.click(screen.getByRole('button', { name: 'Dev toolbar' }))
+
+    expect(mockDismissDevToolbar).toHaveBeenCalled()
+    expect(mockEnableToolbar).not.toHaveBeenCalled()
   })
 })

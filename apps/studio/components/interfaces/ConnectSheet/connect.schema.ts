@@ -34,8 +34,7 @@ export const INSTALL_COMMANDS: Record<string, string> = {
   supabasejs: 'npm install @supabase/supabase-js',
   supabasepy: 'pip install supabase',
   supabaseflutter: 'flutter pub add supabase_flutter',
-  supabaseswift:
-    'swift package add-dependency https://github.com/supabase-community/supabase-swift',
+  supabaseswift: 'swift package add-dependency https://github.com/supabase/supabase-swift',
   supabasekt: 'implementation("io.github.jan-tennert.supabase:supabase-kt:VERSION")',
 }
 
@@ -289,6 +288,12 @@ export const connectSchema: ConnectSchema = {
       description: 'Connect your agent',
       fields: ['mcpClient', 'mcpReadonly', 'mcpFeatures'],
     },
+    {
+      id: 'warehouse',
+      label: 'Warehouse',
+      description: 'Connect to Warehouse',
+      fields: [],
+    },
   ],
 
   // -------------------------------------------------------------------------
@@ -467,6 +472,9 @@ export const connectSchema: ConnectSchema = {
         },
       },
       server: [serverInstallStep, serverEnvStep, serverSkillsInstallStep],
+      // Warehouse renders its own fully custom panel (WarehouseModePanel) instead of the
+      // generic field/step abstraction, so it has no steps of its own here.
+      warehouse: [],
       DEFAULT: [skillsInstallStep],
     },
   },
