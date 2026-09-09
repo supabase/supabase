@@ -62,7 +62,9 @@ const CommandPageHarness = () => {
 
   return (
     <>
-      <Button onClick={() => setPage('API Keys')}>Open API keys page</Button>
+      <Button variant="primary" onClick={() => setPage('API Keys')}>
+        Open API keys page
+      </Button>
       <ul>
         {commands.map((command) => (
           <li key={command.id}>{command.name}</li>

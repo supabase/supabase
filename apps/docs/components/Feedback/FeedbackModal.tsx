@@ -109,7 +109,13 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
             <Button type="reset" variant="default" onClick={handleCancel} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button type="submit" form={formId} loading={isSubmitting} disabled={isSubmitting}>
+            <Button
+              variant="primary"
+              type="submit"
+              form={formId}
+              loading={isSubmitting}
+              disabled={isSubmitting}
+            >
               Submit feedback
             </Button>
           </div>

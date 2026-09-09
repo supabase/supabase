@@ -228,6 +228,7 @@ export const ProjectCreationFooter = ({
         )}
 
         <Button
+          variant="primary"
           type="submit"
           loading={isCreatingNewProject || isSuccessNewProject}
           disabled={!canCreateProject}

@@ -226,7 +226,12 @@ const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps
           <Button type="reset" variant="default" onClick={onCancel} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button type="submit" loading={isSubmitting} disabled={isSubmitting || !isDirty}>
+          <Button
+            variant="primary"
+            type="submit"
+            loading={isSubmitting}
+            disabled={isSubmitting || !isDirty}
+          >
             Rename query
           </Button>
         </DialogFooter>

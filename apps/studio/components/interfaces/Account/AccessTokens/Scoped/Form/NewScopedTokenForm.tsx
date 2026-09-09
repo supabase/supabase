@@ -240,19 +240,23 @@ export const NewScopedTokenForm = forwardRef<
             <Button variant="default">Cancel</Button>
           </SheetClose>
           {step === 'form' && isClassicMode && (
-            <Button type="submit" form={FORM_ID} loading={isPending}>
+            <Button variant="primary" type="submit" form={FORM_ID} loading={isPending}>
               Generate token
             </Button>
           )}
           {step === 'form' && !isClassicMode && (
-            <Button type="submit" form={FORM_ID} iconRight={<ChevronRight />}>
+            <Button variant="primary" type="submit" form={FORM_ID} iconRight={<ChevronRight />}>
               Review access
             </Button>
           )}
           {step === 'review' && (
             <Popover open={!isCreateHintDismissed}>
               <PopoverAnchor asChild>
-                <Button loading={isPending} onClick={() => onCreateToken(formValues)}>
+                <Button
+                  variant="primary"
+                  loading={isPending}
+                  onClick={() => onCreateToken(formValues)}
+                >
                   Create token
                 </Button>
               </PopoverAnchor>

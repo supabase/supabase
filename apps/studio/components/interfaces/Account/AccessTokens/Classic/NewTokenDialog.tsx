@@ -246,7 +246,7 @@ export const NewTokenDialog = ({
           >
             Cancel
           </Button>
-          <Button form={formId} type="submit" loading={isPending}>
+          <Button variant="primary" form={formId} type="submit" loading={isPending}>
             Generate token
           </Button>
         </DialogFooter>
