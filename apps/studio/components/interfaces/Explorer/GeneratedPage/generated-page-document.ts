@@ -26,6 +26,8 @@
  */
 import { z } from 'zod'
 
+import { GENERATED_PAGE_TYPOGRAPHY_STYLES } from './generated-page-typography'
+
 /**
  * Pinned to the workspace catalog version of `@supabase/supabase-js` so the client running
  * inside the frame matches the one Studio itself builds against. Bump both together.
@@ -82,6 +84,8 @@ export type GeneratedPageSupabaseConfig = {
 
 export type BuildGeneratedPageDocumentOptions = {
   html: string
+  /** Allowlisted, resolved Studio color and typography variables captured when this run starts. */
+  themeStyles?: string
   databaseQueryIds: readonly string[]
   logQueryIds: readonly string[]
   /** Omitted when the page did not ask for a client, or when the parent could not build one. */
@@ -311,21 +315,18 @@ const BASE_STYLES = `
   :root { color-scheme: light; }
   html, body { margin: 0; padding: 0; }
   body {
-    background: #ffffff;
-    color: #171717;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
+    background: var(--background, Canvas);
+    color: var(--foreground, CanvasText);
     padding: 16px;
   }
   #studio-error-banner[hidden] { display: none; }
   #studio-error-banner {
     margin: 0 0 12px;
     padding: 8px 12px;
-    border: 1px solid #f0b4b4;
+    border: 1px solid var(--border-destructive, currentColor);
     border-radius: 6px;
-    background: #fdf2f2;
-    color: #8c1c1c;
+    background: var(--background, Canvas);
+    color: var(--destructive, CanvasText);
     font-size: 13px;
   }
 `
@@ -347,6 +348,8 @@ export function buildGeneratedPageDocument(options: BuildGeneratedPageDocumentOp
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="Content-Security-Policy" content="${csp}" />
     <style>${BASE_STYLES}</style>
+    <style>${GENERATED_PAGE_TYPOGRAPHY_STYLES}</style>
+    <style>${options.themeStyles ?? ''}</style>
     ${supabaseScript}
     <script>${buildBootstrapScript(options)}</script>
   </head>

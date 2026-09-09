@@ -38,7 +38,7 @@ export const GeneratedPageFrame = ({
       sandbox={GENERATED_PAGE_SANDBOX}
       srcDoc={document}
       onLoad={onLoad}
-      className={cn('w-full bg-white', height === undefined && 'h-full', className)}
+      className={cn('w-full bg-background', height === undefined && 'h-full', className)}
       style={style}
     />
   )

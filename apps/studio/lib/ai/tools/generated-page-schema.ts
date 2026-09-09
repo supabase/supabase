@@ -88,7 +88,7 @@ export const renderPageInputSchema = z
       .min(1)
       .max(MAX_GENERATED_PAGE_HTML_LENGTH)
       .describe(
-        'Self-contained HTML for the page body, including its own <style> and <script> tags.'
+        'Self-contained HTML for the page body, including inline <style> and <script> tags. Studio color variables and heading/text styles are already injected. Use var(--background), var(--foreground), var(--card), var(--border), etc. for all UI colors; do not hardcode colors or literal fallbacks. Audit CSS, SVG, and JavaScript before submitting. Only use custom colors when explicitly requested by the user or necessary for data visualization without a suitable token.'
       ),
     database_queries: z
       .array(generatedPageDatabaseQuerySchema)

@@ -82,6 +82,34 @@ afterEach(() => {
 })
 
 describe('GeneratedPageRenderer', () => {
+  it('copies the current Studio colors into the frame when the user runs the page', async () => {
+    const user = userEvent.setup()
+    const root = document.documentElement
+    const previousStyle = root.getAttribute('style')
+    root.style.setProperty('--background', 'oklch(0.19 0.0025 159)')
+    root.style.setProperty('--helpers-os-appearance', 'Dark')
+
+    try {
+      customRender(
+        <GeneratedPageRenderer
+          state="approval-requested"
+          input={input}
+          confirmState="approval-requested"
+        />
+      )
+
+      await user.click(await screen.findByRole('button', { name: 'Run page' }))
+
+      await waitFor(() => {
+        expect(getFrame()?.getAttribute('srcdoc')).toContain('--background: oklch(0.19 0.0025 159)')
+        expect(getFrame()?.getAttribute('srcdoc')).toContain('color-scheme: dark')
+      })
+    } finally {
+      if (previousStyle === null) root.removeAttribute('style')
+      else root.setAttribute('style', previousStyle)
+    }
+  })
+
   it('does not mount the iframe before the user approves', async () => {
     customRender(
       <GeneratedPageRenderer

@@ -12,6 +12,7 @@ import {
   type GeneratedPageQueryResponse,
   type GeneratedPageSupabaseConfig,
 } from './generated-page-document'
+import { buildGeneratedPageThemeStyles } from './generated-page-theme'
 import {
   describeSupabaseClientWarning,
   getGeneratedPageErrorMessage,
@@ -99,6 +100,10 @@ export function useGeneratedPageRuntime({
   const buildDocument = (): string =>
     buildGeneratedPageDocument({
       html: page?.html ?? '',
+      themeStyles:
+        typeof document === 'undefined'
+          ? undefined
+          : buildGeneratedPageThemeStyles(getComputedStyle(document.documentElement)),
       databaseQueryIds: page?.database_queries.map((query) => query.id) ?? [],
       logQueryIds: page?.log_queries.map((query) => query.id) ?? [],
       supabase: buildSupabaseConfig(),
