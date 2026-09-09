@@ -1,0 +1,105 @@
+---
+title: 'Use Supabase with Django'
+subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Django app.'
+breadcrumb: 'Framework Quickstarts'
+---
+
+<AiPrompt id="django" />
+
+<$Partial path="quickstart_db_setup.mdx" />
+
+## 3. Create a Django project
+
+Create a new directory for your Django project and set up a virtual environment.
+
+```bash
+mkdir my-app && cd my-app
+python3 -m venv venv
+source venv/bin/activate
+```
+
+## 4. Install Django and the Supabase client library
+
+The fastest way to get started is to use Django for the web framework and the `supabase-py` client library which provides a convenient interface for working with Supabase from a Python app.
+
+Install the required packages using pip.
+
+```bash
+pip install django supabase python-dotenv
+```
+
+Then create a new Django project called `myproject` and an app called `myapp`.
+
+```bash
+django-admin startproject myproject .
+python manage.py startapp myapp
+```
+
+## 5. Create environment variables file
+
+Create a `.env` file in your project root and populate it with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=django):
+
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=django">
+    Open Connect panel
+  </a>
+</Button>
+
+```text name=.env
+SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+```
+
+<$Partial path="api_settings.mdx" variables={{ "framework": "django", "tab": "frameworks" }} />
+
+## 6. Query data from the app
+
+Create a view in `myapp/views.py` that fetches data from your `instruments` table using the Supabase client and returns it as a JSON response.
+
+```python name=myapp/views.py
+import os
+from django.http import JsonResponse
+from supabase import create_client, Client
+from dotenv import load_dotenv
+
+load_dotenv()
+
+supabase: Client = create_client(
+    os.environ.get("SUPABASE_URL"),
+    os.environ.get("SUPABASE_PUBLISHABLE_KEY")
+)
+
+def instruments(request):
+    response = supabase.table('instruments').select("*").execute()
+    return JsonResponse(response.data, safe=False)
+```
+
+## 7. Configure URL routing
+
+Map the root URL to your view in your project's `myproject/urls.py` file.
+
+```python name=myproject/urls.py
+from django.contrib import admin
+from django.urls import path
+
+from myapp import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', views.instruments, name='instruments'),
+]
+```
+
+## 8. Start the app
+
+Run the Django development server, and go to http://localhost:8000 in your browser, you should see the list of instruments.
+
+```bash
+python manage.py runserver
+```
+
+## Next steps
+
+- Set up [Auth](/docs/guides/auth) for your app
+- [Insert more data](/docs/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/docs/guides/storage)
