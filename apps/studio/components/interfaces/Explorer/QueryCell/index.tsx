@@ -120,6 +120,7 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
         ref={ref}
         id={cell._id}
         variant="embedded"
+        className="min-h-0"
         title={title}
         query={toQueryModel(cell, sql)}
         result={result}
