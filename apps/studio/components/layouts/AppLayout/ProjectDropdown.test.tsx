@@ -85,6 +85,10 @@ vi.mock('@/components/ui/PartnerIcon', () => ({
     ),
 }))
 
+vi.mock('@/components/interfaces/Settings/Integrations/AWSPrivateLink/preview', () => ({
+  usePreviewNavManagedBy: (managedBy: string | undefined) => managedBy,
+}))
+
 describe('ProjectDropdown', () => {
   beforeEach(() => {
     vi.clearAllMocks()

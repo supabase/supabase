@@ -1,9 +1,11 @@
 import { Badge } from 'ui'
 
 import { getConnectionStatusUi, getConnectionTitle } from './AWSPrivateLink.utils'
+import PartnerIcon from '@/components/ui/PartnerIcon'
 import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
 import type { AWSAccount } from '@/data/aws-accounts/aws-accounts-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 
 export const AWSPrivateLinkAccountItem = ({
   account,
@@ -12,8 +14,9 @@ export const AWSPrivateLinkAccountItem = ({
   account: AWSAccount
   onView: () => void
 }) => {
-  const { account_name, aws_account_id, database_identifier, database_type, status } = account
-  const title = getConnectionTitle({ account_name, aws_account_id })
+  const { account_name, aws_account_id, database_identifier, database_type, partner, status } =
+    account
+  const title = getConnectionTitle({ account_name, aws_account_id, partner })
   const statusUi = getConnectionStatusUi(status)
   const replicaId = database_identifier ? formatDatabaseID(database_identifier) : undefined
   const showDatabase = database_type === 'READ_REPLICA' || title === aws_account_id
@@ -29,7 +32,16 @@ export const AWSPrivateLinkAccountItem = ({
       meta={<Badge variant={statusUi.badgeVariant}>{statusUi.badge}</Badge>}
     >
       <div className="min-w-0">
-        <div className="font-medium text-foreground truncate">{title}</div>
+        <div className="flex items-center gap-1.5">
+          <div className="font-medium text-foreground truncate">{title}</div>
+          {partner === 'vercel' && (
+            <PartnerIcon
+              organization={{ managed_by: MANAGED_BY.VERCEL_MARKETPLACE }}
+              tooltipText="Connected via Vercel"
+              size="small"
+            />
+          )}
+        </div>
         {showDatabase && <p className="text-xs text-foreground-lighter">{databaseLabel}</p>}
       </div>
     </ResourceItem>

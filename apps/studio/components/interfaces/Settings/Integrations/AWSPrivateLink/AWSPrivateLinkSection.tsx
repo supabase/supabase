@@ -29,6 +29,7 @@ import { getConnectionTitle } from './AWSPrivateLink.utils'
 import { AWSPrivateLinkAccountItem } from './AWSPrivateLinkAccountItem'
 import { AWSPrivateLinkAttentionAdmonition } from './AWSPrivateLinkAttentionAdmonition'
 import { AWSPrivateLinkForm } from './AWSPrivateLinkForm'
+import { usePrivateLinkPreview } from './preview'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useAWSAccountDeleteMutation } from '@/data/aws-accounts/aws-account-delete-mutation'
@@ -41,7 +42,12 @@ import { IS_PLATFORM } from '@/lib/constants'
 
 export const AWSPrivateLinkSection = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: accounts } = useAWSAccountsQuery({ projectRef: project?.ref })
+  const preview = usePrivateLinkPreview()
+  const { data: liveAccounts } = useAWSAccountsQuery(
+    { projectRef: project?.ref },
+    { enabled: !preview.enabled }
+  )
+  const accounts = preview.enabled ? preview.accounts : liveAccounts
 
   const [selectedAccount, setSelectedAccount] = useState<AWSAccount>()
   const [showForm, setShowForm] = useState(false)
@@ -57,7 +63,7 @@ export const AWSPrivateLinkSection = () => {
   })
 
   const { hasAccess: hasPrivateLinkAccess } = useCheckEntitlements('security.private_link')
-  const promptPlanUpgrade = IS_PLATFORM && !hasPrivateLinkAccess
+  const promptPlanUpgrade = IS_PLATFORM && !hasPrivateLinkAccess && !preview.skipUpgradeWall
 
   const onAddAccount = () => {
     setSelectedAccount(undefined)

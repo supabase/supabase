@@ -14,6 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
   PageSection,
   PageSectionAside,
@@ -28,6 +29,7 @@ import AddRestrictionModal from './AddRestrictionModal'
 import AllowAllModal from './AllowAllModal'
 import DisallowAllModal from './DisallowAllModal'
 import RemoveRestrictionModal from './RemoveRestrictionModal'
+import { usePrivateLinkPreview } from '@/components/interfaces/Settings/Integrations/AWSPrivateLink/preview'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'
@@ -86,6 +88,7 @@ export const NetworkRestrictions = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { isHighAvailability } = useHighAvailability()
+  const { showRestrictPublicAccess } = usePrivateLinkPreview()
   const [isAddingAddress, setIsAddingAddress] = useState<undefined | 'IPv4' | 'IPv6'>()
   const [isAllowingAll, setIsAllowingAll] = useState(false)
   const [isDisallowingAll, setIsDisallowingAll] = useState(false)
@@ -178,6 +181,15 @@ export const NetworkRestrictions = () => {
           </PageSectionAside>
         </PageSectionMeta>
         <PageSectionContent>
+          {showRestrictPublicAccess && (
+            <div className="mb-4">
+              <Admonition
+                type="warning"
+                title="PrivateLink is active"
+                description="Restrict public database access if traffic should only use the private path."
+              />
+            </div>
+          )}
           {isHighAvailability && (
             <div className="mb-4">
               <HighAvailabilityDisabledSectionNotice
