@@ -26,6 +26,7 @@ import { getPathnameWithoutQuery, getPathSegment } from '@/lib/pathname.utils'
 
 export interface MobileMenuContentProps {
   currentProductMenu: React.ReactNode
+  currentProductMenuHeader?: React.ReactNode
   currentProduct: string
   currentSectionKey: string | null
   onCloseSheet?: () => void
@@ -33,6 +34,7 @@ export interface MobileMenuContentProps {
 
 export function MobileMenuContent({
   currentProductMenu,
+  currentProductMenuHeader,
   currentProduct,
   currentSectionKey,
   onCloseSheet,
@@ -113,6 +115,8 @@ export function MobileMenuContent({
   })
 
   const SectionMenuContent = sectionKeyToShow ? getProductMenuComponent(sectionKeyToShow) : null
+  const hasCurrentProductHeader =
+    viewLevel === 'section' && sectionKeyToShow === currentSectionKey && !!currentProductMenuHeader
   const pageSegment = getPathSegment(pathname, 4)
 
   const renderRoute = (route: Route, isActive: boolean) => (
@@ -146,7 +150,17 @@ export function MobileMenuContent({
           </Button>
         </div>
       )}
-      <div className="flex-1 overflow-y-auto pb-8 text-sidebar-foreground">
+      {hasCurrentProductHeader && (
+        <div className="flex shrink-0 min-h-(--header-height) items-center gap-2 border-b px-3">
+          {currentProductMenuHeader}
+        </div>
+      )}
+      <div
+        className={cn(
+          'flex-1 overflow-y-auto pb-8 text-sidebar-foreground',
+          hasCurrentProductHeader && 'min-h-0 flex flex-col'
+        )}
+      >
         {viewLevel === 'top' && (
           <nav className="flex flex-col gap-2 p-1" aria-label="Project menu">
             <SidebarMenu>
@@ -174,7 +188,7 @@ export function MobileMenuContent({
           </nav>
         )}
         {viewLevel === 'section' && sectionKeyToShow && (
-          <div className="p-1">
+          <div className={cn('p-1', hasCurrentProductHeader && 'min-h-0 flex-1')}>
             {sectionKeyToShow === currentSectionKey && currentProductMenu ? (
               currentProductMenu
             ) : SectionMenuContent ? (
