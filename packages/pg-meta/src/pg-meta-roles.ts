@@ -3,6 +3,21 @@ import { z } from 'zod'
 import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { ROLES_SQL } from './sql/roles'
 
+// DO blocks are dollar-quoted, so any user-derived value interpolated into the
+// block body could contain the closing delimiter and terminate the block early.
+// Generate a delimiter that cannot appear in any of the values instead.
+function getDoBlockDelimiter(values: (string | undefined)[]): SafeSqlFragment {
+  const candidates = values.filter((value): value is string => typeof value === 'string')
+  let suffix = 0
+  while (true) {
+    const delimiter = suffix === 0 ? safeSql`$pg_meta$` : safeSql`$pg_meta_${literal(suffix)}$`
+    if (candidates.every((value) => !value.includes(delimiter))) {
+      return delimiter
+    }
+    suffix += 1
+  }
+}
+
 const pgRoleZod = z.object({
   id: z.number(),
   name: z.string(),
@@ -177,15 +192,22 @@ function update(identifier: RoleIdentifier, params: RoleUpdateParams): { sql: Sa
     password,
     validUntil,
   } = params
+  const identifierLabel = 'id' in identifier ? identifier.id : identifier.name
+  const delimiter = getDoBlockDelimiter([
+    typeof identifierLabel === 'string' ? identifierLabel : undefined,
+    newName,
+    password,
+    validUntil,
+  ])
   const sql = safeSql`
-do $$
+do ${delimiter}
 declare
   old record;
 begin
   with roles as (${ROLES_SQL})
   select * into old from roles where ${getIdentifierWhereClause(identifier)};
   if old is null then
-    raise exception 'Cannot find role with id %', id;
+    raise exception 'Cannot find role with: %', ${literal('id' in identifier ? identifier.id : identifier.name)};
   end if;
 
   execute(format('alter role %I
@@ -212,7 +234,7 @@ begin
   `
   }
 end
-$$;
+${delimiter};
 `
   return { sql }
 }
@@ -224,20 +246,24 @@ function remove(
   identifier: RoleIdentifier,
   { ifExists = false }: RoleRemoveParams = {}
 ): { sql: SafeSqlFragment } {
+  const identifierLabel = 'id' in identifier ? identifier.id : identifier.name
+  const delimiter = getDoBlockDelimiter([
+    typeof identifierLabel === 'string' ? identifierLabel : undefined,
+  ])
   const sql = safeSql`
-do $$
+do ${delimiter}
 declare
   old record;
 begin
   with roles as (${ROLES_SQL})
   select * into old from roles where ${getIdentifierWhereClause(identifier)};
   if old is null then
-    raise exception 'Cannot find role with id %', id;
+    raise exception 'Cannot find role with: %', ${literal('id' in identifier ? identifier.id : identifier.name)};
   end if;
 
   execute(format('drop role ${ifExists ? safeSql`if exists` : safeSql``} %I;', old.name));
 end
-$$;
+${delimiter};
 `
   return { sql }
 }
