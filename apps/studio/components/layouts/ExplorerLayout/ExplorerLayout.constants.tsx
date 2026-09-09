@@ -1,11 +1,9 @@
 import { motion } from 'framer-motion'
-import { ChevronLeft, Database, MessageSquare, NotebookText, Plus } from 'lucide-react'
-import { type ComponentType, type PropsWithChildren, type ReactNode } from 'react'
-import { Button, cn } from 'ui'
+import { Database, MessageSquare, NotebookText } from 'lucide-react'
+import { type ComponentType, type PropsWithChildren } from 'react'
+import { cn } from 'ui'
 import { InnerSideBarFilters, InnerSideBarFilterSearchInput } from 'ui-patterns/InnerSideMenu'
 
-import { useCreateChat, useCreateNotebook } from '@/components/interfaces/Explorer/hooks'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { onSearchInputEscape } from '@/lib/keyboard'
 
 /** Explorer resources the sidebar can both list and create. */
@@ -16,6 +14,10 @@ export type ExplorerResourceType = 'notebook' | 'chat'
  * back is a pop and a new level costs one member here plus the panel that renders it.
  */
 export type ExplorerNavLevel = ExplorerResourceType | 'database'
+
+export type ExplorerNavEntry =
+  | { level: ExplorerNavLevel }
+  | { level: 'database-schema' | 'database-tables'; schema: string }
 
 type ExplorerNavIcon = ComponentType<{ size?: number; className?: string }>
 
@@ -50,11 +52,7 @@ export const rowClassName = (isActive: boolean) =>
       : 'text-foreground-light hover:bg-surface-200 hover:text-foreground'
   )
 
-/**
- * One level of the sidebar: the sliding panel, its back control, an optional filter input,
- * and an optional action. Levels differ only in what they list, so they compose this rather
- * than each rebuilding the header.
- */
+/** Sliding sidebar content with an optional search field. Navigation lives in the header. */
 export const ExplorerNavPanel = ({
   label,
   className,
@@ -62,17 +60,13 @@ export const ExplorerNavPanel = ({
   search,
   setSearch,
   searchPlaceholder,
-  action,
-  onBack,
 }: PropsWithChildren<{
   label: string
   className?: string
   search?: string
-  /** Renders the filter input when given; otherwise the header shows `label` as a title. */
+  /** Renders the filter input when given. */
   setSearch?: (value: string) => void
   searchPlaceholder?: string
-  action?: ReactNode
-  onBack: () => void
 }>) => {
   return (
     <motion.div
@@ -82,44 +76,31 @@ export const ExplorerNavPanel = ({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: LEVEL_OFFSET }}
       transition={LEVEL_TRANSITION}
-      className={cn('absolute inset-0 flex flex-col', className)}
+      className={cn('absolute inset-0 flex flex-col', setSearch === undefined && 'pt-3', className)}
     >
-      <div className="flex items-center gap-2 p-3 pb-2">
-        <Button
-          size="tiny"
-          variant="outline"
-          aria-label="Back"
-          onClick={onBack}
-          className="size-7 shrink-0 px-0"
-          icon={<ChevronLeft />}
-        />
-        {setSearch === undefined ? (
-          <span className="flex-1 truncate text-sm text-foreground">{label}</span>
-        ) : (
-          <>
-            <span id="explorer-sidebar-search-label" className="sr-only">
-              {searchPlaceholder}
-            </span>
-            <InnerSideBarFilters className="w-full gap-0 p-0">
-              <InnerSideBarFilterSearchInput
-                name="explorer-sidebar-search"
-                value={search}
-                placeholder={searchPlaceholder}
-                aria-labelledby="explorer-sidebar-search-label"
-                onChange={(event) => setSearch(event.target.value)}
-                onKeyDown={onSearchInputEscape(search ?? '', setSearch)}
-              />
-            </InnerSideBarFilters>
-          </>
-        )}
-        {action}
-      </div>
+      {setSearch !== undefined && (
+        <div className="p-3 pb-2">
+          <span id="explorer-sidebar-search-label" className="sr-only">
+            {searchPlaceholder}
+          </span>
+          <InnerSideBarFilters className="w-full gap-0 p-0">
+            <InnerSideBarFilterSearchInput
+              name="explorer-sidebar-search"
+              value={search}
+              placeholder={searchPlaceholder}
+              aria-labelledby="explorer-sidebar-search-label"
+              onChange={(event) => setSearch(event.target.value)}
+              onKeyDown={onSearchInputEscape(search ?? '', setSearch)}
+            />
+          </InnerSideBarFilters>
+        </div>
+      )}
       {children}
     </motion.div>
   )
 }
 
-/** An `ExplorerNavPanel` for a creatable resource, adding its "new" action to the header. */
+/** A resource panel with its shared label and search copy. */
 export const ExplorerNavResourceWrapper = ({
   type,
   label,
@@ -127,17 +108,13 @@ export const ExplorerNavResourceWrapper = ({
   children,
   search,
   setSearch,
-  onBack,
 }: PropsWithChildren<{
   type: ExplorerResourceType
   label?: string
   className?: string
   search?: string
   setSearch: (value: string) => void
-  onBack: () => void
 }>) => {
-  const { createNotebook } = useCreateNotebook()
-  const { createChat } = useCreateChat()
   const { searchPlaceholder } = EXPLORER_RESOURCES[type]
 
   return (
@@ -147,21 +124,6 @@ export const ExplorerNavResourceWrapper = ({
       search={search}
       setSearch={setSearch}
       searchPlaceholder={searchPlaceholder}
-      onBack={onBack}
-      action={
-        <ButtonTooltip
-          size="tiny"
-          variant="outline"
-          aria-label={`New ${type}`}
-          className="size-7 shrink-0 px-0"
-          icon={<Plus />}
-          tooltip={{ content: { side: 'bottom', text: `New ${type}` } }}
-          onClick={() => {
-            if (type === 'notebook') createNotebook()
-            if (type === 'chat') createChat()
-          }}
-        />
-      }
     >
       {children}
     </ExplorerNavPanel>

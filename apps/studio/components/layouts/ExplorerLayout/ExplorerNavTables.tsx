@@ -51,7 +51,7 @@ const TableListItem = ({ item: table, style, activeQueryId, onOpen }: TableListI
  * creates the query that reads it, so a table lands in the same tab, editor and results as
  * any other query.
  */
-export const ExplorerNavTables = ({ schema, onBack }: { schema: string; onBack: () => void }) => {
+export const ExplorerNavTables = ({ schema }: { schema: string }) => {
   const router = useRouter()
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -89,9 +89,7 @@ export const ExplorerNavTables = ({ schema, onBack }: { schema: string; onBack: 
       search={search}
       setSearch={setSearch}
       searchPlaceholder="Search tables"
-      onBack={onBack}
     >
-      <p className="truncate px-6 pb-2 text-xs text-foreground-lighter">{schema}</p>
       <div className="flex flex-1 min-h-0 flex-col px-3 pb-3">
         {isPending && <GenericSkeletonLoader />}
         {!isPending && tables.length === 0 && (

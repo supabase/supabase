@@ -7,11 +7,9 @@ import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export const ExplorerNavSchema = ({
   schema,
-  onBack,
   onSelectTables,
 }: {
   schema: string
-  onBack: () => void
   onSelectTables: () => void
 }) => {
   const { openSchemaVisualizer } = useOpenSchemaVisualizer()
@@ -19,7 +17,7 @@ export const ExplorerNavSchema = ({
   const isVisualizerActive = tabs.activeTab === createTabId('schema', { schema })
 
   return (
-    <ExplorerNavPanel label={schema} onBack={onBack}>
+    <ExplorerNavPanel label={schema}>
       <nav className="flex flex-col gap-px px-3 pb-3">
         <button
           type="button"

@@ -15,9 +15,10 @@ import {
 import { EditorNavigationButton } from '../EditorNavigationButton'
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { EditorTabs } from '../Tabs/Tabs'
-import { type ExplorerNavLevel } from './ExplorerLayout.constants'
+import { type ExplorerNavEntry, type ExplorerNavLevel } from './ExplorerLayout.constants'
 import { ExplorerNavChats } from './ExplorerNavChats'
 import { ExplorerNavDatabase } from './ExplorerNavDatabase'
+import { ExplorerNavHeader } from './ExplorerNavHeader'
 import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
 import { ExplorerNavSchema } from './ExplorerNavSchema'
@@ -44,10 +45,6 @@ export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayout
   children: ReactNode
   title?: string
 }
-
-type ExplorerNavEntry =
-  | { level: ExplorerNavLevel }
-  | { level: 'database-schema' | 'database-tables'; schema: string }
 
 export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayoutProps) => {
   const { ref } = useParams()
@@ -85,7 +82,13 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
     <ProjectLayoutWithAuth
       product="Explorer"
       browserTitle={mergedBrowserTitle}
-      productMenuBadge={<BackToSqlEditorButton />}
+      productMenuHeader={
+        <ExplorerNavHeader
+          navStack={navStack}
+          onBack={popLevel}
+          rootAction={<BackToSqlEditorButton />}
+        />
+      }
       productMenu={
         <div className="relative h-full overflow-hidden">
           <AnimatePresence mode="wait">
@@ -93,7 +96,6 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
             {level === 'database' && (
               <ExplorerNavDatabase
                 key="database"
-                onBack={popLevel}
                 onSelectSchema={(schema) => pushSchemaLevel('database-schema', schema)}
               />
             )}
@@ -101,19 +103,14 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
               <ExplorerNavSchema
                 key={`schema-${entry.schema}`}
                 schema={entry.schema}
-                onBack={popLevel}
                 onSelectTables={() => pushSchemaLevel('database-tables', entry.schema)}
               />
             )}
             {entry?.level === 'database-tables' && (
-              <ExplorerNavTables
-                key={`tables-${entry.schema}`}
-                schema={entry.schema}
-                onBack={popLevel}
-              />
+              <ExplorerNavTables key={`tables-${entry.schema}`} schema={entry.schema} />
             )}
-            {level === 'notebook' && <ExplorerNavNotebooks key="notebooks" onBack={popLevel} />}
-            {level === 'chat' && <ExplorerNavChats key="chats" onBack={popLevel} />}
+            {level === 'notebook' && <ExplorerNavNotebooks key="notebooks" />}
+            {level === 'chat' && <ExplorerNavChats key="chats" />}
           </AnimatePresence>
         </div>
       }

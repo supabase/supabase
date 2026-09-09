@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { ExplorerNavDatabase } from './ExplorerNavDatabase'
+import { ExplorerNavHeader } from './ExplorerNavHeader'
 import { ExplorerNavSchema } from './ExplorerNavSchema'
 import type { SchemasData } from '@/data/database/schemas-query'
 import { customRender } from '@/tests/lib/custom-render'
@@ -33,15 +34,23 @@ const schemas: SchemasData = [
 
 function Navigation({ onSelectTables }: { onSelectTables: () => void }) {
   const [schema, setSchema] = useState<string>()
-  if (schema)
-    return (
-      <ExplorerNavSchema
-        schema={schema}
+  return (
+    <>
+      <ExplorerNavHeader
+        navStack={
+          schema
+            ? [{ level: 'database' }, { level: 'database-schema', schema }]
+            : [{ level: 'database' }]
+        }
         onBack={() => setSchema(undefined)}
-        onSelectTables={onSelectTables}
       />
-    )
-  return <ExplorerNavDatabase onBack={vi.fn()} onSelectSchema={setSchema} />
+      {schema ? (
+        <ExplorerNavSchema schema={schema} onSelectTables={onSelectTables} />
+      ) : (
+        <ExplorerNavDatabase onSelectSchema={setSchema} />
+      )}
+    </>
+  )
 }
 
 describe('Explorer database schema navigation', () => {
@@ -56,7 +65,7 @@ describe('Explorer database schema navigation', () => {
     customRender(<Navigation onSelectTables={onSelectTables} />)
     await screen.findByRole('button', { name: 'public' })
     expect(
-      within(screen.getByRole('navigation'))
+      within(within(screen.getByRole('group', { name: 'Database' })).getByRole('navigation'))
         .getAllByRole('button')
         .map((button) => button.textContent)
     ).toEqual(['analytics', 'public'])
@@ -76,7 +85,7 @@ describe('Explorer database schema navigation', () => {
     await user.tab()
     await user.keyboard('{Enter}')
     expect(onSelectTables).toHaveBeenCalledOnce()
-    await user.click(screen.getByRole('button', { name: 'Back' }))
+    await user.click(screen.getByRole('button', { name: 'Database' }))
     expect(await screen.findByRole('button', { name: 'public' })).toBeInTheDocument()
   })
 
@@ -86,7 +95,7 @@ describe('Explorer database schema navigation', () => {
       path: '/platform/pg-meta/:ref/query',
       response: () => HttpResponse.json<SchemasData>(schemas),
     })
-    customRender(<ExplorerNavDatabase onBack={vi.fn()} onSelectSchema={vi.fn()} />)
+    customRender(<ExplorerNavDatabase onSelectSchema={vi.fn()} />)
     await screen.findByRole('button', { name: 'public' })
     await userEvent.type(screen.getByRole('textbox', { name: 'Search schemas' }), 'missing')
     expect(screen.getByText('No schemas found')).toBeInTheDocument()

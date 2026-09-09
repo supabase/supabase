@@ -83,7 +83,7 @@ describe('ExplorerNavTables', () => {
   })
 
   it('marks the table backing the open query and opens the clicked one as a query', async () => {
-    customRender(<ExplorerNavTables schema="public" onBack={vi.fn()} />)
+    customRender(<ExplorerNavTables schema="public" />)
 
     await waitFor(() => expect(screen.getByRole('button', { name: 'users' })).toBeInTheDocument())
     expect(screen.getByRole('button', { name: 'posts' })).toHaveClass('active')
@@ -125,7 +125,7 @@ it('opens tables from the drilled schema even when the current query is in publi
       ])
     },
   })
-  customRender(<ExplorerNavTables schema="analytics" onBack={vi.fn()} />)
+  customRender(<ExplorerNavTables schema="analytics" />)
   await userEvent.click(await screen.findByRole('button', { name: 'events' }))
   expect(openEntityQuery).toHaveBeenCalledWith({
     schema: 'analytics',

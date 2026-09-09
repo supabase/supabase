@@ -10,10 +10,8 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 
 export const ExplorerNavDatabase = ({
-  onBack,
   onSelectSchema,
 }: {
-  onBack: () => void
   onSelectSchema: (schema: string) => void
 }) => {
   const { data: project } = useSelectedProjectQuery()
@@ -31,7 +29,6 @@ export const ExplorerNavDatabase = ({
   return (
     <ExplorerNavPanel
       label="Database"
-      onBack={onBack}
       search={search}
       setSearch={setSearch}
       searchPlaceholder="Search schemas"
