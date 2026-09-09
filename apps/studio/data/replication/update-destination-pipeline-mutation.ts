@@ -2,16 +2,21 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { components } from 'api-types'
 import { toast } from 'sonner'
 
-import { buildBigQueryTableOptionsUpdateApiConfig } from './create-destination-pipeline-mutation'
 import { optionalSecret } from './destination-secret-utils'
 import { replicationKeys } from './keys'
 import type {
   BigQueryDestinationConfig,
+  BigQueryTableOption,
   DestinationConfig,
   DucklakeDestinationConfig,
   PipelineConfig,
 } from './types'
-import { buildPipelineApiConfig, isDucklakeSupabaseConfig } from './utils'
+import {
+  buildBigQueryTableOptionApiConfig,
+  buildPipelineApiConfig,
+  getConfiguredBigQueryTableOptions,
+  isDucklakeSupabaseConfig,
+} from './utils'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -21,6 +26,15 @@ type UpdateDestinationApiConfig = UpdateDestinationPipelineBody['destination_con
 
 type UpdateBigQueryApiConfig = Extract<UpdateDestinationApiConfig, { big_query: unknown }>
 type UpdateDucklakeApiConfig = Extract<UpdateDestinationApiConfig, { ducklake: unknown }>
+
+const buildBigQueryTableOptionsUpdateApiConfig = (
+  tableOptions: BigQueryTableOption[] | undefined
+) => {
+  const configuredTableOptions = getConfiguredBigQueryTableOptions(tableOptions)
+  if (tableOptions === undefined) return undefined
+  if (configuredTableOptions.length === 0) return null
+  return { tables: configuredTableOptions.map(buildBigQueryTableOptionApiConfig) }
+}
 
 export function buildBigQueryUpdateApiConfig(
   config: BigQueryDestinationConfig
