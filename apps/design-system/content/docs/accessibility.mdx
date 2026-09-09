@@ -128,19 +128,18 @@ Apps with persistent header and sidebar chrome should expose a skip link as the 
 
 ## Disabled controls
 
-Not every unavailable control should use the same disabled pattern. Choose based on whether the user needs to discover why an action is blocked.
+Not every disabled control should use the same implementation. Choose based on whether the user needs to discover why an action is blocked.
 
 ### Native `disabled`
 
-Use native `disabled` when the control should be fully inert and the reason is obvious from context:
+Use native `disabled` when the control should be fully inert and nearby context makes the reason it is disabled easy to infer without focusing it:
 
-- Submit buttons until a form is valid
-- Loading states
-- Pagination at the first or last page
+- Previous or next pagination controls at a boundary, when the current page and opposite action remain visible
+- Move up or move down actions at a list boundary, when the selected position and opposite action remain visible
 
-Native `disabled` removes the control from the tab order, suppresses interaction, and applies browser styling. That is appropriate when no extra explanation is needed. Screen readers can still discover native `disabled` controls via browse or virtual cursor navigation and will announce their name and disabled state. Only Tab navigation skips these `disabled` controls.
+Native `disabled` removes the control from the tab order, suppresses interaction, and applies browser styling. Use it when skipping an inert control avoids an unnecessary tab stop without hiding an important capability. Screen readers can still discover native `disabled` controls via browse or virtual cursor navigation and will announce their name and disabled state. Only Tab navigation skips these `disabled` controls.
 
-<ComponentPreview name="disabled-native-form" />
+<ComponentPreview name="disabled-inferred-actions" />
 
 ### Focusable when disabled
 

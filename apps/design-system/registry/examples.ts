@@ -558,10 +558,10 @@ export const examples: Registry = [
     files: ['example/disabled-comparison.tsx'],
   },
   {
-    name: 'disabled-native-form',
+    name: 'disabled-inferred-actions',
     type: 'components:example',
-    registryDependencies: ['button', 'input', 'label'],
-    files: ['example/disabled-native-form.tsx'],
+    registryDependencies: ['button'],
+    files: ['example/disabled-inferred-actions.tsx'],
   },
   {
     name: 'disabled-unavailable-with-notice',
