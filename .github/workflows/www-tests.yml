@@ -11,6 +11,7 @@ on:
       - 'apps/www/content/md/**'
       - 'apps/www/scripts/**/*.mjs'
       - 'apps/www/public/.well-known/**'
+      - 'apps/docs/content/guides/**'
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
