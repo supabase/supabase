@@ -141,12 +141,23 @@ export const getTableRowsSql = ({
 }: BuildTableRowsQueryArgs): SafeSqlFragment => {
   if (!table || !table.columns) return safeSql``
 
+  // Drop any sorts/filters that reference columns no longer present on the
+  // table. Stale sort/filter state can be persisted in the URL or local storage
+  // and survive a column being dropped or renamed; without this guard it would
+  // generate a query referencing a non-existent column (e.g. `order by
+  // "table"."key"`), which fails with `column ... does not exist` and prevents
+  // any rows from loading. Filtering happens up front so a sort list containing
+  // only stale columns falls back to the default ordering below.
+  const validColumnNames = new Set(table.columns.map((column) => column.name))
+  const validFilters = filters.filter((filter) => validColumnNames.has(filter.column))
+  const validSorts = sorts.filter((sort) => validColumnNames.has(sort.column))
+
   const query = new Query()
 
   // Properly escape the table name and schema
   let queryChains = query.from(table.name, table.schema).select()
 
-  filters.forEach((x) => {
+  validFilters.forEach((x) => {
     const col = table.columns?.find((y) => y.name === x.column)
     const isStringTypeColumn = !!col ? (TEXT_TYPES as string[]).includes(col.format) : true
     queryChains = queryChains.filter(
@@ -159,7 +170,7 @@ export const getTableRowsSql = ({
   // If sorts is empty and table row count is within threshold, use the primary key as the default sort.
   // Only apply for selections over a Table, not View, MaterializedViews, ...
   const liveRowCount = (table as PGTable).live_rows_estimate || 0
-  if (sorts.length === 0 && liveRowCount <= THRESHOLD_COUNT && table.columns.length > 0) {
+  if (validSorts.length === 0 && liveRowCount <= THRESHOLD_COUNT && table.columns.length > 0) {
     const defaultOrderByColumns = getDefaultOrderByColumns(table as PGTable, {
       excludedColumns: sortExcludedColumns,
     })
@@ -169,7 +180,7 @@ export const getTableRowsSql = ({
       })
     }
   } else {
-    sorts.forEach((x) => {
+    validSorts.forEach((x) => {
       queryChains = queryChains.order(x.table, x.column, x.ascending, x.nullsFirst)
     })
   }
