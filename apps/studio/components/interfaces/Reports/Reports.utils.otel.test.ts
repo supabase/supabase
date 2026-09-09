@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { API_REPORT_QUERIES_OTEL, generateReportFiltersOtel } from './Reports.utils.otel'
+import {
+  API_REPORT_QUERIES_OTEL,
+  generateReportFiltersOtel,
+  requestsByCountryOtel,
+} from './Reports.utils.otel'
 
 const compact = (sql: string) => sql.replace(/\s+/g, ' ').trim()
 
@@ -72,5 +76,9 @@ describe('OTEL report queries', () => {
     expect(sql).toContain(
       "sum(toFloat64OrZero(log_attributes['response.headers.content_length'])) / 1000000 as egress_mb"
     )
+  })
+
+  it('uses the full country attribute', () => {
+    expect(requestsByCountryOtel([])).toContain("log_attributes['request.cf.country'] as country")
   })
 })
