@@ -31,7 +31,7 @@ channel.subscribe((status, err) => {
 
 This applies to messages sent with `channel.send({ type: 'broadcast', ... })`.
 
-1. Topic name has to match exactly on the sender and every listener (`supabase.channel('room-1')`). A typo, a casing difference, or an ID built differently on each side won't throw any error, it'll fail quietly. Log the topic string on both sides and diff them if you're stuck.
+1. Topic name has to match exactly on the sender and every listener (`supabase.channel('room-1')`). A typo, a casing difference, or an ID built differently on each side won't throw any error, it'll fail quietly. Log the topic string on both sides and diff them if you're stuck, or enable client and server logging to see what the Realtime server actually received: [Debug Realtime with Logger and Log Levels](./realtime-debugging-with-logger).
 2. Private channel? You'll need an `insert` RLS policy on `realtime.messages` scoped to `extension = 'broadcast'` for the connecting role. Check **Realtime → Policies**, and see [Realtime Authorization: Broadcast](/docs/guides/realtime/authorization#broadcast) for a working example.
 3. Same rate limits apply here as connections (message-per-second, channel limits) — same usage page, same [Realtime Limits](/docs/guides/realtime/limits#limits-by-plan) reference.
 
