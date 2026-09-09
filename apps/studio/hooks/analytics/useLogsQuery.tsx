@@ -89,9 +89,6 @@ export const useLogsQuery = ({
     queryFn: async ({ signal }) => {
       if (!projectRef) throw new Error('projectRef is required')
       const { iso_timestamp_start, iso_timestamp_end } = params
-      if (!iso_timestamp_start || !iso_timestamp_end) {
-        throw new Error('A start and end timestamp are required')
-      }
       const { data, error } =
         sql !== undefined
           ? {
@@ -99,8 +96,8 @@ export const useLogsQuery = ({
                 projectRef,
                 endpoint: logsAllEndpointUrl(useOtel),
                 sql,
-                iso_timestamp_start,
-                iso_timestamp_end,
+                iso_timestamp_start: iso_timestamp_start ?? '',
+                iso_timestamp_end: iso_timestamp_end ?? '',
                 method: 'get',
                 signal,
               }),
