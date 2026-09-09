@@ -1,19 +1,39 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useContext, useEffect } from 'react'
+import type { Snapshot } from 'valtio'
 
 import {
   evictNotebookFromCaches,
   hasDiscardableChanges,
 } from '@/data/content/notebooks/notebook-cache'
+import { hasNotebookDraft } from '@/state/notebooks/notebook-drafts'
 import { notebooksState, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
+import type { StateNotebook } from '@/state/notebooks/types'
 import { TabsStateContext, type Tab } from '@/state/tabs'
 
+function isNotebookTabDirty({
+  stateNotebook,
+  ref,
+  notebookId,
+}: {
+  stateNotebook: StateNotebook | Snapshot<StateNotebook> | undefined
+  ref: string | undefined
+  notebookId: string | undefined
+}): boolean {
+  if (!notebookId) return false
+  if (stateNotebook) return hasDiscardableChanges(stateNotebook)
+
+  return !!ref && hasNotebookDraft({ projectRef: ref, id: notebookId })
+}
+
 const NotebookTabStatusIndicator = ({ tab }: { tab: Tab }) => {
+  const { ref } = useParams()
   const notebooksSnap = useNotebooksStateSnapshot()
   const notebookId = tab.metadata?.notebookId
   const stateNotebook = notebookId ? notebooksSnap.notebooks[notebookId] : undefined
-  if (!hasDiscardableChanges(stateNotebook)) return null
+
+  if (!isNotebookTabDirty({ stateNotebook, ref, notebookId })) return null
 
   return (
     <span
@@ -24,29 +44,10 @@ const NotebookTabStatusIndicator = ({ tab }: { tab: Tab }) => {
   )
 }
 
-/**
- * Evicts a notebook's content from the valtio store and the React Query cache
- * when its tab closes, so reopening it always refetches instead of showing
- * whatever was last loaded. Unsaved edits are discarded the same way — safe
- * because `confirmClose` below has already asked the user to confirm.
- */
 export const ExplorerNotebookTabCoordinator = () => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
   const tabs = useContext(TabsStateContext)
-
-  useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      const hasUnsaved = Object.values(notebooksState.notebooks).some(hasDiscardableChanges)
-      if (hasUnsaved) {
-        event.preventDefault()
-        event.returnValue = true
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [])
 
   useEffect(() => {
     return tabs.registerTabTypeHandler('notebook', {
@@ -59,9 +60,11 @@ export const ExplorerNotebookTabCoordinator = () => {
       confirmClose: (notebookTabs) => {
         const dirtyCount = notebookTabs.filter((tab) => {
           const notebookId = tab.metadata?.notebookId
-          if (!notebookId) return false
-
-          return hasDiscardableChanges(notebooksState.notebooks[notebookId])
+          return isNotebookTabDirty({
+            stateNotebook: notebookId ? notebooksState.notebooks[notebookId] : undefined,
+            ref,
+            notebookId,
+          })
         }).length
 
         if (dirtyCount === 0) return null
