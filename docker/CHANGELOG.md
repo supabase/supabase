@@ -13,7 +13,7 @@ See per-service updates below for details. Only the most important changes relev
 ## [0.8.1](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.8.1) - 2026-09-09
 
 ### Configuration
-- Added an optional [PgBouncer](https://www.pgbouncer.org/) override (requires `docker-compose.pgbouncer.yml`) as an alternative to the default Supavisor pooler - PR [#49052](https://github.com/supabase/supabase/pull/49052) (via [@singh-inder](https://github.com/singh-inder/)
+- Added an optional [PgBouncer](https://www.pgbouncer.org/) override (requires `docker-compose.pgbouncer.yml`) as an alternative to the default Supavisor pooler - PR [#49052](https://github.com/supabase/supabase/pull/49052) (via [@singh-inder](https://github.com/singh-inder/))
 
 ### Documentation
 - Added a new guide [Accessing Postgres](https://supabase.com/docs/guides/self-hosting/accessing-postgres) - PR [#49303](https://github.com/supabase/supabase/pull/49303)
@@ -21,7 +21,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ### API gateway
 - Updated Envoy to `v1.39.1` - [Release](https://github.com/envoyproxy/envoy/releases/tag/v1.39.1)
-- Changed CORS configuration for `/pg` route (requires `docker-compose.yml`, `volumes/api/envoy/docker-entrypoints.sh`, `volumes/api/envoy/lds.template.yml` update) - PR [#49136](https://github.com/supabase/supabase/pull/49136)
+- Changed CORS configuration for `/pg` route (requires `docker-compose.yml`, `volumes/api/envoy/docker-entrypoint.sh`, `volumes/api/envoy/lds.template.yaml` update) - PR [#49136](https://github.com/supabase/supabase/pull/49136)
 - Updated [nginx-certbot](https://github.com/JonasAlfredsson/docker-nginx-certbot) to `6.2.0-nginx1.31.5` (requires `docker-compose.nginx.yml` update)
 
 ### Studio
