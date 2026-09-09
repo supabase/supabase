@@ -30,7 +30,7 @@ export const SidebarBreadcrumb = ({
               <BreadcrumbItem className="min-w-0">
                 <Button
                   variant="text"
-                  className="h-auto min-w-0 p-0 text-sm text-foreground-lighter hover:text-foreground [&>span]:truncate"
+                  className="h-auto min-w-0 border-0 bg-transparent p-0 text-sm text-foreground-lighter hover:bg-transparent hover:text-foreground data-[state=open]:bg-transparent motion-safe:active:scale-100 [&>span]:truncate"
                   onClick={parent.onClick}
                   title={parent.label}
                 >
