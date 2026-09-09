@@ -80,16 +80,19 @@ describe('agent discovery catalog (.well-known/ard.json)', () => {
 
   it('every JSON document under public/.well-known parses', async () => {
     const wellKnownDir = path.join(process.cwd(), 'public', '.well-known')
-    const dirents = await fs.readdir(wellKnownDir, { withFileTypes: true })
-    const fileNames = dirents.filter((dirent) => dirent.isFile()).map((dirent) => dirent.name)
+    const dirents = await fs.readdir(wellKnownDir, { recursive: true, withFileTypes: true })
+    const filePaths = dirents
+      .filter((dirent) => dirent.isFile())
+      .map((dirent) => path.join(dirent.parentPath, dirent.name))
 
-    for (const fileName of fileNames) {
-      const raw = await fs.readFile(path.join(wellKnownDir, fileName), 'utf-8')
-      const looksLikeJson = raw.trimStart().startsWith('{') || raw.trimStart().startsWith('[')
+    for (const filePath of filePaths) {
+      const raw = await fs.readFile(filePath, 'utf-8')
+      const trimmed = raw.trimStart()
+      const looksLikeJson = trimmed.startsWith('{') || trimmed.startsWith('[')
       if (!looksLikeJson) continue
       expect(
         () => JSON.parse(raw),
-        `public/.well-known/${fileName} is not valid JSON`
+        `${path.relative(process.cwd(), filePath)} is not valid JSON`
       ).not.toThrow()
     }
   })
