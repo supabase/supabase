@@ -58,6 +58,7 @@ describe('multi-select', () => {
     const trigger = screen.getByRole('combobox')
     expect(trigger).toHaveClass('h-[26px]', 'p-0.5')
     expect(trigger.firstElementChild).toHaveClass('gap-0.5')
+    expect(trigger.querySelector('.lucide-chevron-down')).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('renders selected values with a custom label', () => {
