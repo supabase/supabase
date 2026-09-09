@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { oauthAppsKeys } from './keys'
 import { getMockOAuthAppsAuthorizeRequest, USE_MOCKS } from './mocks'
-import type { OAuthExistingGrant, OAuthScopeGroup } from './types'
+import type { OAuthAppGrantConfig, OAuthExistingGrant, OAuthScopeGroup } from './types'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OAuthAppsAuthorizeRequestVariables = {
@@ -22,6 +22,11 @@ export type OAuthAppsAuthorizeRequest = {
    * client at registration; the exact field name lands with the real endpoint.
    */
   reuses_grant_across_workspaces: boolean
+  /**
+   * How the app author configured the consent flow. Drives whether the project picker renders
+   * at all. See {@link OAuthAppGrantConfig}.
+   */
+  grant_config: OAuthAppGrantConfig
   /** Populated when the user has authorized this app before. See {@link OAuthExistingGrant}. */
   existing_grant: OAuthExistingGrant | null
 }
