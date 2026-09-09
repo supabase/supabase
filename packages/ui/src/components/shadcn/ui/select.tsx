@@ -6,7 +6,8 @@ import { Select as SelectPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
-import { ComboboxTrigger, selectTriggerVariants } from './select-trigger'
+import { ComboboxTrigger } from './combobox-trigger'
+import { selectTriggerVariants } from './select-trigger'
 
 const Select = SelectPrimitive.Root
 
