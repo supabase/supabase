@@ -139,9 +139,9 @@ describe('AUTH_REPORT_SQL_OTEL', () => {
     expect(out).toContain("toInt32OrZero(log_attributes['response.status_code']) as status_code")
   })
 
-  it('selects the x_sb_error_code attribute for the by-code breakdown', () => {
+  it('preserves missing error codes as null so the report excludes uncategorized failures', () => {
     expect(sql(AUTH_REPORT_SQL_OTEL.ErrorsByAuthCode('1h'))).toContain(
-      "log_attributes['response.headers.x_sb_error_code'] as error_code"
+      "nullIf(log_attributes['response.headers.x_sb_error_code'], '') as error_code"
     )
   })
 

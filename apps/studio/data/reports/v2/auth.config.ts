@@ -527,7 +527,7 @@ export const AUTH_REPORT_SQL_OTEL: Record<
         select
           ${ts} as timestamp,
           count() as count,
-          log_attributes['response.headers.x_sb_error_code'] as error_code
+          nullIf(log_attributes['response.headers.x_sb_error_code'], '') as error_code
         from logs
         where source = 'edge_logs'
           and log_attributes['request.path'] like '%auth/v1%'
