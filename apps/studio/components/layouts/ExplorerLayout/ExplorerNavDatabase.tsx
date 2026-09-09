@@ -7,6 +7,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 
 export const ExplorerNavDatabase = ({
   onBack,
@@ -23,6 +24,7 @@ export const ExplorerNavDatabase = ({
   })
   const visibleSchemas = useSchemasFilteredForHighAvailability(data)
   const schemas = visibleSchemas
+    .filter((schema) => !INTERNAL_SCHEMAS.includes(schema.name))
     .filter((schema) => schema.name.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => a.name.localeCompare(b.name))
 

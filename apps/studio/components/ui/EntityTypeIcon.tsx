@@ -1,7 +1,7 @@
 import {
   Eye,
-  GitBranch,
   LayoutDashboard,
+  Map,
   MessageSquare,
   NotebookText,
   ScrollText,
@@ -118,7 +118,7 @@ export const EntityTypeIcon = ({
   }
 
   if (type === 'schema') {
-    return <GitBranch size={size} strokeWidth={strokeWidth} />
+    return <Map size={size} strokeWidth={strokeWidth} />
   }
 
   if (type === ENTITY_TYPE.VIEW) {

@@ -24,6 +24,11 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
 const schemas: SchemasData = [
   { id: 1, name: 'public', owner: 'postgres', comment: null },
   { id: 2, name: 'analytics', owner: 'postgres', comment: null },
+  { id: 3, name: 'auth', owner: 'supabase_admin', comment: null },
+  { id: 4, name: 'storage', owner: 'supabase_admin', comment: null },
+  { id: 5, name: 'supabase_migrations', owner: 'postgres', comment: null },
+  { id: 6, name: 'graphql_public', owner: 'supabase_admin', comment: null },
+  { id: 7, name: '_realtime', owner: 'supabase_admin', comment: null },
 ]
 
 function Navigation({ onSelectTables }: { onSelectTables: () => void }) {
@@ -50,6 +55,11 @@ describe('Explorer database schema navigation', () => {
     const onSelectTables = vi.fn()
     customRender(<Navigation onSelectTables={onSelectTables} />)
     await screen.findByRole('button', { name: 'public' })
+    expect(
+      within(screen.getByRole('navigation'))
+        .getAllByRole('button')
+        .map((button) => button.textContent)
+    ).toEqual(['analytics', 'public'])
     expect(screen.queryByRole('button', { name: 'Tables' })).not.toBeInTheDocument()
     const search = screen.getByRole('textbox', { name: 'Search schemas' })
     await user.type(search, 'ANALYTICS')
