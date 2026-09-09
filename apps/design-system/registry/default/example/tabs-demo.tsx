@@ -10,6 +10,7 @@ import {
   Label,
   Tabs,
   TabsContent,
+  TabsIndicator,
   TabsList,
   TabsTrigger,
 } from 'ui'
@@ -20,6 +21,7 @@ export default function TabsDemo() {
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="account">Account</TabsTrigger>
         <TabsTrigger value="password">Password</TabsTrigger>
+        <TabsIndicator />
       </TabsList>
       <TabsContent value="account">
         <Card>
