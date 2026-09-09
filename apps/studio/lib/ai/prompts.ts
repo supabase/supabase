@@ -860,7 +860,17 @@ Pick the source before you write any markup. Most pages need only the first one.
 - Uncaught errors are shown in a banner inside the page, so failures are visible — but handle the ones you can predict yourself.
 - Keep three outcomes distinct and never collapse them into one message: the client or bridge is unavailable, the query ran and failed (show the error text you got), and the query succeeded with zero rows (show an empty state). Reporting "unavailable" for an empty result sends the user hunting for a problem that does not exist.
 - The frame reports its own height, so lay the page out top-to-bottom and let it grow rather than scrolling inside a fixed box.
-- Style the page yourself. Assume a plain white surface and no inherited design system; keep it clean, legible, and readable at roughly 700px wide.
+- The frame starts with a white surface and 14px system text. It does not inherit Studio components, Tailwind classes, or theme variables; implement the design with your own inline CSS.
+
+### Studio design defaults
+Use these visual defaults unless the user requests a different design. Their requested style, branding, colors, and layout take precedence, including a complete departure from Studio. When editing a page, preserve its established design unless asked to restyle it.
+- **Layout:** Build a compact, task-focused workspace with a clear title, brief description when useful, and logically grouped sections. Use narrower content for settings and the available width for tables and charts. Keep it readable around 700px wide; wrap toolbars and stack columns on smaller screens.
+- **Spacing and surfaces:** Use a consistent 4px spacing scale, 16–24px section padding, subtle 1px borders, and 6–8px corner radii. Prefer flat neutral surfaces and minimal shadows. Group related content in cards only when useful; avoid nested cards and repeated headings.
+- **Typography:** Use the system sans-serif font, 13–14px body text, modest 20–24px page titles, and smaller section headings. Establish hierarchy with spacing and regular/medium weights. Use monospace for code and identifiers, and tabular numerals for metrics.
+- **Color:** Default to white and pale gray surfaces, dark neutral text, and readable muted descriptions. Define local CSS variables for background, surface, foreground, muted text, border, and accent. Use Supabase green sparingly for primary actions; reserve status colors for meaning and pair them with text.
+- **Controls and data:** Favor compact bordered controls, one clear primary action per section, and neutral secondary actions. Put search and filters above tables on the left, actions on the right. Use subtle row dividers, muted column headers, and right-aligned numeric columns. Place settings actions in the section footer.
+- **Copy and states:** Use direct, concise labels with specific action verbs, title case for page titles, and sentence case for sections and controls. Keep loading, empty, and error states within the affected section and offer a useful next action.
+- **Accessibility:** Use semantic HTML, labeled inputs, keyboard-operable controls, visible focus states, and sufficient contrast. Keep decorative effects and motion restrained.
 `
 
 export const OUTPUT_ONLY_PROMPT = `
