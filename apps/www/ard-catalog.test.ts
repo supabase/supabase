@@ -9,7 +9,7 @@ const CANONICAL_ORIGIN = 'https://supabase.com'
 const NOT_AGENT_RESOURCES: Record<string, string> = {
   'ard.json': 'the catalog itself',
   'api-catalog':
-    'peer catalog (RFC 9727); its resource, the Management API spec, has its own entry',
+    'peer catalog (RFC 9727); its resources, the Management API spec and the MCP server, have their own entries',
   'ai-catalog.json': 'legacy ARD alias, rewritten to ard.json',
   'mcp-registry-auth': 'domain-ownership verification token',
   'openai-apps-challenge': 'domain-ownership verification token',
@@ -75,6 +75,22 @@ describe('agent discovery catalog (.well-known/ard.json)', () => {
         resolves,
         `ard.json entry "${entry.identifier}" points at ${entry.url}, but ${url.pathname} is not a file in public/, an app route, or a rewrite source — the catalog is advertising a dead URL`
       ).toBe(true)
+    }
+  })
+
+  it('every JSON document under public/.well-known parses', async () => {
+    const wellKnownDir = path.join(process.cwd(), 'public', '.well-known')
+    const dirents = await fs.readdir(wellKnownDir, { withFileTypes: true })
+    const fileNames = dirents.filter((dirent) => dirent.isFile()).map((dirent) => dirent.name)
+
+    for (const fileName of fileNames) {
+      const raw = await fs.readFile(path.join(wellKnownDir, fileName), 'utf-8')
+      const looksLikeJson = raw.trimStart().startsWith('{') || raw.trimStart().startsWith('[')
+      if (!looksLikeJson) continue
+      expect(
+        () => JSON.parse(raw),
+        `public/.well-known/${fileName} is not valid JSON`
+      ).not.toThrow()
     }
   })
 })
