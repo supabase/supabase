@@ -367,7 +367,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   'project:api_gateway_keys_secret': {
     category: 'appsvc',
     name: 'JWT secret',
-    description: 'Project JWT secret.',
+    description: 'Project JWT secret exposure.',
     risk: 'high',
     riskReason: 'Read exposes project JWT secret.',
     allowsRead: ['Read project JWT secret'],
@@ -429,7 +429,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   'project:data_api_config_secret': {
     category: 'appsvc',
     name: 'Data API Config - JWT Secret',
-    description: 'Data API Config JWT secret.',
+    description: 'Data API Config JWT secret exposure.',
     risk: 'high',
     riskReason: 'Read exposes Data API JWT secret.',
     allowsRead: ['Read Data API JWT secret'],
