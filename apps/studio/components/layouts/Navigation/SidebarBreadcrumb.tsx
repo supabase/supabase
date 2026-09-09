@@ -2,10 +2,10 @@ import type { ReactNode } from 'react'
 import {
   Breadcrumb,
   BreadcrumbItem,
+  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-  Button,
 } from 'ui'
 
 interface SidebarBreadcrumbProps {
@@ -28,14 +28,11 @@ export const SidebarBreadcrumb = ({
           {parent && (
             <>
               <BreadcrumbItem className="min-w-0">
-                <Button
-                  variant="text"
-                  className="h-auto min-w-0 border-0 bg-transparent p-0 text-sm text-foreground-lighter hover:bg-transparent hover:text-foreground data-[state=open]:bg-transparent motion-safe:active:scale-100 [&>span]:truncate"
-                  onClick={parent.onClick}
-                  title={parent.label}
-                >
-                  {parent.label}
-                </Button>
+                <BreadcrumbLink asChild className="min-w-0 cursor-pointer truncate focus-ring">
+                  <button type="button" tabIndex={0} onClick={parent.onClick} title={parent.label}>
+                    {parent.label}
+                  </button>
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="shrink-0" />
             </>
