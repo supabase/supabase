@@ -1,3 +1,4 @@
+import { getSchemaHeaders, getSchemaPrefix } from '@/components/interfaces/Docs/Snippets'
 import { DOCS_URL } from '@/lib/constants'
 
 export const API_DOCS_CATEGORIES = {
@@ -587,13 +588,16 @@ export const DOCS_RESOURCE_CONTENT: {
       endpoint,
       apiKey,
       showBearer = true,
+      schema = 'public',
     }: {
       rpcName: string
       rpcParams: any[]
       endpoint: string
       apiKey: string
-      showBearer: boolean
+      showBearer?: boolean
+      schema?: string
     }) => {
+      const schemaHeaders = getSchemaHeaders(schema, 'write')
       let rpcList = rpcParams.map((x) => `"${x.name}": "value"`).join(', ')
       let noParams = !rpcParams.length
       let bashParams = noParams ? '' : `\n-d '{ ${rpcList} }' \\`
@@ -614,7 +618,7 @@ export const DOCS_RESOURCE_CONTENT: {
           bash: `
   curl -X POST '${endpoint}/rest/v1/rpc/${rpcName}' \\${bashParams}
   -H "Content-Type: application/json" \\
-  -H "apikey: ${apiKey}" ${
+  -H "apikey: ${apiKey}"${schemaHeaders.bash}${
     showBearer
       ? `\\
   -H "Authorization: Bearer ${apiKey}"`
@@ -623,7 +627,7 @@ export const DOCS_RESOURCE_CONTENT: {
         `,
           js: `
 let { data, error } = await supabase
-  .rpc('${rpcName}'${jsParams})
+  ${getSchemaPrefix(schema)}.rpc('${rpcName}'${jsParams})
 
 if (error) console.error(error)
 else console.log(data)
@@ -642,23 +646,26 @@ else console.log(data)
       resourceId,
       endpoint,
       apikey,
+      schema = 'public',
     }: {
       resourceId: string
       endpoint: string
       apikey: string
+      schema?: string
     }) => {
+      const schemaHeaders = getSchemaHeaders(schema)
       return [
         {
           key: 'read-all-rows',
           title: 'Read all rows',
           bash: `
 curl '${endpoint}/rest/v1/${resourceId}?select=*' \\
--H "apikey: ${apikey}" \\
+-H "apikey: ${apikey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apikey}"
           `,
           js: `
 let { data: ${resourceId}, error } = await supabase
-  .from('${resourceId}')
+  ${getSchemaPrefix(schema)}.from('${resourceId}')
   .select('*')
           `,
         },
@@ -667,12 +674,12 @@ let { data: ${resourceId}, error } = await supabase
           title: 'Read specific columns',
           bash: `
 curl '${endpoint}/rest/v1/${resourceId}?select=some_column,other_column' \\
--H "apikey: ${apikey}" \\
+-H "apikey: ${apikey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apikey}"
           `,
           js: `
 let { data: ${resourceId}, error } = await supabase
-  .from('${resourceId}')
+  ${getSchemaPrefix(schema)}.from('${resourceId}')
   .select('some_column,other_column')
   `,
         },
@@ -681,12 +688,12 @@ let { data: ${resourceId}, error } = await supabase
           title: 'Read referenced tables',
           bash: `
 curl '${endpoint}/rest/v1/${resourceId}?select=some_column,other_table(foreign_key)' \\
--H "apikey: ${apikey}" \\
+-H "apikey: ${apikey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apikey}"
           `,
           js: `
 let { data: ${resourceId}, error } = await supabase
-  .from('${resourceId}')
+  ${getSchemaPrefix(schema)}.from('${resourceId}')
   .select(\`
     some_column,
     other_table (
@@ -700,13 +707,13 @@ let { data: ${resourceId}, error } = await supabase
           title: 'With pagination',
           bash: `
 curl '${endpoint}/rest/v1/${resourceId}?select=*' \\
--H "apikey: ${apikey}" \\
+-H "apikey: ${apikey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apikey}" \\
 -H "Range: 0-9"
           `,
           js: `
 let { data: ${resourceId}, error } = await supabase
-  .from('${resourceId}')
+  ${getSchemaPrefix(schema)}.from('${resourceId}')
   .select('*')
   .range(0, 9)
           `,
@@ -724,18 +731,21 @@ let { data: ${resourceId}, error } = await supabase
       resourceId,
       endpoint,
       apikey,
+      schema = 'public',
     }: {
       resourceId: string
       endpoint: string
       apikey: string
+      schema?: string
     }) => {
+      const schemaHeaders = getSchemaHeaders(schema)
       return [
         {
           key: 'with-filtering',
           title: 'With filtering',
           bash: `
 curl --get '${endpoint}/rest/v1/${resourceId}' \\
--H "apikey: ${apikey}" \\
+-H "apikey: ${apikey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apikey}" \\
 -H "Range: 0-9" \\
 -d "select=*" \\
@@ -759,10 +769,10 @@ curl --get '${endpoint}/rest/v1/${resourceId}' \\
 \`# Logical operators\` \\
 -d "column=not.like.Negate+filter" \\
 -d "or=(some_column.eq.Some+value,other_column.eq.Other+value)"
-        `,
+          `,
           js: `
 let { data: ${resourceId}, error } = await supabase
-  .from('${resourceId}')
+  ${getSchemaPrefix(schema)}.from('${resourceId}')
   .select("*")
 
   // Filters
@@ -803,18 +813,21 @@ let { data: ${resourceId}, error } = await supabase
       resourceId,
       endpoint,
       apikey,
+      schema = 'public',
     }: {
       resourceId: string
       endpoint: string
       apikey: string
+      schema?: string
     }) => {
+      const schemaHeaders = getSchemaHeaders(schema, 'write')
       return [
         {
           key: 'insert-a-row',
           title: 'Insert a row',
           bash: `
 curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
--H "apikey: ${apikey}" \\
+-H "apikey: ${apikey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apikey}" \\
 -H "Content-Type: application/json" \\
 -H "Prefer: return=minimal" \\
@@ -822,7 +835,7 @@ curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
           `,
           js: `
 const { data, error } = await supabase
-  .from('${resourceId}')
+  ${getSchemaPrefix(schema)}.from('${resourceId}')
   .insert([
     { some_column: 'someValue', other_column: 'otherValue' },
   ])
@@ -834,14 +847,14 @@ const { data, error } = await supabase
           title: 'Insert many rows',
           bash: `
 curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
--H "apikey: ${apikey}" \\
+-H "apikey: ${apikey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apikey}" \\
 -H "Content-Type: application/json" \\
 -d '[{ "some_column": "someValue" }, { "other_column": "otherValue" }]'
           `,
           js: `
 const { data, error } = await supabase
-  .from('${resourceId}')
+  ${getSchemaPrefix(schema)}.from('${resourceId}')
   .insert([
     { some_column: 'someValue' },
     { some_column: 'otherValue' },
@@ -854,7 +867,7 @@ const { data, error } = await supabase
           title: 'Upsert matching rows',
           bash: `
 curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
--H "apikey: ${apikey}" \\
+-H "apikey: ${apikey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apikey}" \\
 -H "Content-Type: application/json" \\
 -H "Prefer: resolution=merge-duplicates" \\
@@ -862,7 +875,7 @@ curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
           `,
           js: `
 const { data, error } = await supabase
-  .from('${resourceId}')
+  ${getSchemaPrefix(schema)}.from('${resourceId}')
   .upsert({ some_column: 'someValue' })
   .select()
           `,
@@ -884,18 +897,21 @@ const { data, error } = await supabase
       resourceId,
       endpoint,
       apikey,
+      schema = 'public',
     }: {
       resourceId: string
       endpoint: string
       apikey: string
+      schema?: string
     }) => {
+      const schemaHeaders = getSchemaHeaders(schema, 'write')
       return [
         {
           key: 'update-matching-rows',
           title: 'Update matching rows',
           bash: `
 curl -X PATCH '${endpoint}/rest/v1/${resourceId}?some_column=eq.someValue' \\
--H "apikey: ${apikey}" \\
+-H "apikey: ${apikey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apikey}" \\
 -H "Content-Type: application/json" \\
 -H "Prefer: return=minimal" \\
@@ -903,7 +919,7 @@ curl -X PATCH '${endpoint}/rest/v1/${resourceId}?some_column=eq.someValue' \\
           `,
           js: `
 const { data, error } = await supabase
-  .from('${resourceId}')
+  ${getSchemaPrefix(schema)}.from('${resourceId}')
   .update({ other_column: 'otherValue' })
   .eq('some_column', 'someValue')
   .select()
@@ -924,23 +940,26 @@ const { data, error } = await supabase
       resourceId,
       endpoint,
       apikey,
+      schema = 'public',
     }: {
       resourceId: string
       endpoint: string
       apikey: string
+      schema?: string
     }) => {
+      const schemaHeaders = getSchemaHeaders(schema, 'write')
       return [
         {
           key: 'delete-matching-rows',
           title: 'Delete matching rows',
           bash: `
 curl -X DELETE '${endpoint}/rest/v1/${resourceId}?some_column=eq.someValue' \\
--H "apikey: ${apikey}" \\
+-H "apikey: ${apikey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apikey}"
           `,
           js: `
 const { error } = await supabase
-  .from('${resourceId}')
+  ${getSchemaPrefix(schema)}.from('${resourceId}')
   .delete()
   .eq('some_column', 'someValue')
           `,
@@ -956,7 +975,7 @@ const { error } = await supabase
 Supabase provides realtime functionality and broadcasts database changes to authorized users depending on Row Level Security (RLS) policies.
 `,
     docsUrl: `${DOCS_URL}/reference/javascript/subscribe`,
-    code: ({ resourceId }: { resourceId: string }) => {
+    code: ({ resourceId, schema = 'public' }: { resourceId: string; schema?: string }) => {
       return [
         {
           key: 'subscribe-all-events',
@@ -966,7 +985,7 @@ Supabase provides realtime functionality and broadcasts database changes to auth
 const channels = supabase.channel('custom-all-channel')
   .on(
     'postgres_changes',
-    { event: '*', schema: 'public', table: '${resourceId}' },
+    { event: '*', schema: '${schema}', table: '${resourceId}' },
     (payload) => {
       console.log('Change received!', payload)
     }
@@ -981,7 +1000,7 @@ const channels = supabase.channel('custom-all-channel')
 const channels = supabase.channel('custom-insert-channel')
   .on(
     'postgres_changes',
-    { event: 'INSERT', schema: 'public', table: '${resourceId}' },
+    { event: 'INSERT', schema: '${schema}', table: '${resourceId}' },
     (payload) => {
       console.log('Change received!', payload)
     }
@@ -996,7 +1015,7 @@ const channels = supabase.channel('custom-insert-channel')
 const channels = supabase.channel('custom-update-channel')
   .on(
     'postgres_changes',
-    { event: 'UPDATE', schema: 'public', table: '${resourceId}' },
+    { event: 'UPDATE', schema: '${schema}', table: '${resourceId}' },
     (payload) => {
       console.log('Change received!', payload)
     }
@@ -1011,7 +1030,7 @@ const channels = supabase.channel('custom-update-channel')
 const channels = supabase.channel('custom-delete-channel')
   .on(
     'postgres_changes',
-    { event: 'DELETE', schema: 'public', table: '${resourceId}' },
+    { event: 'DELETE', schema: '${schema}', table: '${resourceId}' },
     (payload) => {
       console.log('Change received!', payload)
     }
@@ -1026,7 +1045,7 @@ const channels = supabase.channel('custom-delete-channel')
 const channels = supabase.channel('custom-filter-channel')
   .on(
     'postgres_changes',
-    { event: '*', schema: 'public', table: '${resourceId}', filter: 'some_column=eq.some_value' },
+    { event: '*', schema: '${schema}', table: '${resourceId}', filter: 'some_column=eq.some_value' },
     (payload) => {
       console.log('Change received!', payload)
     }
