@@ -140,13 +140,6 @@ const nextConfig = {
         ],
       },
       {
-        source: '/openapi.json',
-        headers: [
-          { key: 'x-vercel-enable-rewrite-caching', value: '1' },
-          { key: 'CDN-Cache-Control', value: 'max-age=3600, stale-while-revalidate=86400' },
-        ],
-      },
-      {
         source: '/.well-known/vercel/flags',
         headers: [
           {
