@@ -1,122 +1,84 @@
 import path from 'path'
 import { getHighlighter, loadTheme } from '@shikijs/compat'
-import { defineDocumentType, defineNestedType, makeSource } from 'contentlayer2/source-files'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypePrettyCode from 'rehype-pretty-code'
 import rehypeSlug from 'rehype-slug'
 import { codeImport } from 'remark-code-import'
 import remarkGfm from 'remark-gfm'
 import { visit } from 'unist-util-visit'
+import { defineConfig, s } from 'velite'
 
-import { rehypeComponent } from './lib/rehype-component'
-import { rehypeNpmCommand } from './lib/rehype-npm-command'
+const LinksProperties = s.object({
+  doc: s.string().optional(),
+  api: s.string().optional(),
+})
 
-/** @type {import('contentlayer2/source-files').ComputedFields} */
-const computedFields = {
-  slug: {
-    type: 'string',
-    resolve: (doc) => `/${doc._raw.flattenedPath}`,
+const ExploreItem = s.object({
+  title: s.string(),
+  link: s.string(),
+  itemType: s.string().optional(),
+  description: s.string().optional(),
+})
+
+const CourseHero = s.object({
+  title: s.string(),
+  subtitle: s.string(),
+  description: s.string(),
+})
+
+const NestedProperties = s.object({
+  radix: s.boolean().optional(),
+  shadcn: s.boolean().optional(),
+  vaul: s.boolean().optional(),
+  inputOtp: s.boolean().optional(),
+  reactAccessibleTreeview: s.boolean().optional(),
+})
+
+const docs = s
+  .object({
+    title: s.string(),
+    description: s.string(),
+    published: s.boolean().default(true),
+    links: LinksProperties.optional(),
+    featured: s.boolean().default(false),
+    component: s.boolean().default(false),
+    fragment: s.boolean().default(false),
+    toc: s.boolean().default(true),
+    chapterNumber: s.number().optional(),
+    explore: s.array(ExploreItem).optional(),
+    courseHero: CourseHero.optional(),
+    source: NestedProperties.optional(),
+    // mirrors contentlayer2's `_raw.flattenedPath`: file path relative to the
+    // content dir, extension stripped, trailing `/index` dropped.
+    path: s.path(),
+    raw: s.raw(),
+    // internal doc cross-links (e.g. `[Button](components/button)`) aren't
+    // real files on disk — disable Velite's default asset-copying behavior,
+    // which otherwise treats every relative link as a local file to copy.
+    code: s.mdx({ copyLinkedFiles: false }),
+  })
+  .transform(({ path: flattenedPath, ...data }) => ({
+    ...data,
+    slug: `/${flattenedPath}`,
+    slugAsParams: flattenedPath,
+  }))
+
+export default defineConfig({
+  root: './content',
+  output: {
+    clean: true,
   },
-  slugAsParams: {
-    type: 'string',
-    resolve: (doc) => doc._raw.flattenedPath.split('/').slice(1).join('/'),
-  },
-}
-
-const LinksProperties = defineNestedType(() => ({
-  name: 'LinksProperties',
-  fields: {
-    doc: {
-      type: 'string',
-    },
-    api: {
-      type: 'string',
-    },
-  },
-}))
-
-const NestedProperties = defineNestedType(() => ({
-  name: 'NestedProperties',
-  fields: {
-    radix: {
-      type: 'boolean',
-    },
-    shadcn: {
-      type: 'boolean',
-    },
-    vaul: {
-      type: 'boolean',
-    },
-    inputOtp: {
-      type: 'boolean',
-    },
-    reactAccessibleTreeview: {
-      type: 'boolean',
-    },
-    recharts: {
-      type: 'boolean',
-    },
-  },
-}))
-
-export const Doc = defineDocumentType(() => ({
-  name: 'Doc',
-  filePathPattern: `docs/**/*.mdx`,
-  contentType: 'mdx',
-  fields: {
-    title: {
-      type: 'string',
-      required: true,
-    },
-    description: {
-      type: 'string',
-      required: true,
-    },
-    published: {
-      type: 'boolean',
-      default: true,
-    },
-    links: {
-      type: 'nested',
-      of: LinksProperties,
-    },
-    featured: {
-      type: 'boolean',
-      default: false,
-      required: false,
-    },
-    component: {
-      type: 'boolean',
-      default: false,
-      required: false,
-    },
-    fragment: {
-      type: 'boolean',
-      default: false,
-      required: false,
-    },
-    toc: {
-      type: 'boolean',
-      default: true,
-      required: false,
-    },
-    source: {
-      type: 'nested',
-      of: NestedProperties,
+  collections: {
+    allDocs: {
+      name: 'Doc',
+      pattern: '**/*.mdx',
+      schema: docs,
     },
   },
-  computedFields,
-}))
-
-export default makeSource({
-  contentDirPath: './content',
-  disableImportAliasWarning: true,
-  documentTypes: [Doc],
   mdx: {
     remarkPlugins: [remarkGfm, codeImport],
     rehypePlugins: [
       rehypeSlug,
-      rehypeComponent,
       () => (tree) => {
         visit(tree, (node) => {
           if (node?.type === 'element' && node?.tagName === 'pre') {
@@ -143,7 +105,6 @@ export default makeSource({
       },
       [
         rehypePrettyCode,
-        // rehypePrettyCodeOptions,
         {
           getHighlighter: async () => {
             const theme = await loadTheme(path.join(process.cwd(), '/lib/themes/supabase-2.json'))
@@ -193,7 +154,6 @@ export default makeSource({
           }
         })
       },
-      // rehypeNpmCommand,
       [
         rehypeAutolinkHeadings,
         {

@@ -117,7 +117,7 @@ export const OrganizationInvite = () => {
         </Button>
         {isSignUpEnabled && (
           <Button asChild variant="default" block>
-            <Link href={signupRedirectLink}>Create an account</Link>
+            <Link href={signupRedirectLink}>Sign up</Link>
           </Button>
         )}
       </div>

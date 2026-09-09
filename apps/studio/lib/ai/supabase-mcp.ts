@@ -81,17 +81,16 @@ export async function createSupabaseMCPClient({
 }
 
 /**
- * Legacy in-process MCP client — the pre-migration behavior, kept as a fallback
- * behind the `USE_REMOTE_MCP` gate (see `tools/mcp-tools.ts`).
+ * In-process MCP client used by the eval harness (`getMockTools`,
+ * `evals/preflight.ts`) so evals stay hermetic — no live remote endpoint or
+ * real access token needed. Not used by the production assistant, which always
+ * talks to the remote MCP server (`createSupabaseMCPClient`).
  *
  * Instantiates `@supabase/mcp-server-supabase` in-process and connects to it over
  * an in-memory transport. The heavy server package is imported dynamically so it
- * is code-split into its own chunk and stays out of the (default, post-migration)
- * remote path's bundle.
+ * is code-split into its own chunk and stays out of the remote path's bundle.
  *
- * TODO(AI-897): remove in process mcp — delete this once every environment has
- * been flipped to the remote MCP server and has been stable. Tracked alongside
- * the `USE_REMOTE_MCP` rollout.
+ * TODO(AI-897): point evals at the remote MCP server instead and delete this.
  */
 export async function createInProcessSupabaseMCPClient({
   accessToken,
@@ -100,8 +99,9 @@ export async function createInProcessSupabaseMCPClient({
   accessToken: string
   projectRef: string
 }) {
-  // Dynamic imports keep the in-process server + its transport out of the remote
-  // path's bundle (loaded only when this fallback is actually taken).
+  // Dynamic imports keep the in-process server + its transport out of the
+  // production assistant bundle, so they're loaded only when the eval harness
+  // actually calls this function.
   // `.js` is required for esbuild ESM resolution.
   const { InMemoryTransport } = await import('@modelcontextprotocol/sdk/inMemory.js')
   const { createSupabaseMcpServer } = await import('@supabase/mcp-server-supabase')
