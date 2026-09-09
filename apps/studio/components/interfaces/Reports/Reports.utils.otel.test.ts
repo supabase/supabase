@@ -4,6 +4,7 @@ import {
   API_REPORT_QUERIES_OTEL,
   generateReportFiltersOtel,
   requestsByCountryOtel,
+  STORAGE_REPORT_QUERIES_OTEL,
 } from './Reports.utils.otel'
 
 const compact = (sql: string) => sql.replace(/\s+/g, ' ').trim()
@@ -80,5 +81,24 @@ describe('OTEL report queries', () => {
 
   it('uses the full country attribute', () => {
     expect(requestsByCountryOtel([])).toContain("log_attributes['request.cf.country'] as country")
+  })
+
+  it('returns microsecond timestamps expected by the storage cache chart', () => {
+    const sql = STORAGE_REPORT_QUERIES_OTEL.cacheHitRate.safeSql()
+    expect(sql).toContain(
+      'toUnixTimestamp64Micro(toDateTime64(toStartOfHour(logs.timestamp), 6)) as timestamp'
+    )
+    expect(sql).toContain("startsWith(log_attributes['request.path'], '/storage/v1/object')")
+    expect(sql).toContain("log_attributes['request.method'] = 'GET'")
+    expect(sql).toContain('as hit_count')
+    expect(sql).toContain('as miss_count')
+  })
+
+  it('restricts top misses to uncached storage GET requests', () => {
+    const sql = compact(STORAGE_REPORT_QUERIES_OTEL.topCacheMisses.safeSql())
+    expect(sql).toContain(
+      "log_attributes['response.headers.cf_cache_status'] in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')"
+    )
+    expect(sql).toContain('group by path, search order by count desc limit 12')
   })
 })

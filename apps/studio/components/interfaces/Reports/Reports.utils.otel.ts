@@ -124,3 +124,36 @@ export const requestsByCountryOtel = (filters: ReportFilterItem[]) => safeSql`
   group by country
   limit 1000
 `
+
+const storageFilter = safeSql`
+  source = 'edge_logs'
+  and startsWith(log_attributes['request.path'], '/storage/v1/object')
+  and log_attributes['request.method'] = 'GET'
+`
+const cacheMiss = safeSql`log_attributes['response.headers.cf_cache_status'] in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')`
+
+export const STORAGE_REPORT_QUERIES_OTEL = {
+  cacheHitRate: {
+    safeSql: () => safeSql`
+      select toUnixTimestamp64Micro(toDateTime64(${hour}, 6)) as timestamp,
+        toFloat64(countIf(log_attributes['response.headers.cf_cache_status'] in ('HIT', 'STALE', 'REVALIDATED', 'UPDATING'))) as hit_count,
+        toFloat64(countIf(${cacheMiss})) as miss_count
+      from logs
+      where ${storageFilter}
+      group by ${hour}
+      order by timestamp desc
+      limit 10000
+    `,
+  },
+  topCacheMisses: {
+    safeSql: () => safeSql`
+      select log_attributes['request.path'] as path, log_attributes['request.search'] as search,
+        toFloat64(count()) as count
+      from logs
+      where ${storageFilter} and ${cacheMiss}
+      group by path, search
+      order by count desc
+      limit 12
+    `,
+  },
+}
