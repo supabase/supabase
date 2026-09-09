@@ -490,6 +490,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
 
           {showIcon && (
             <ChevronsUpDown
+              aria-hidden="true"
               size={16}
               strokeWidth={1.5}
               className="text-foreground-lighter shrink-0 ml-1.5 self-center"
