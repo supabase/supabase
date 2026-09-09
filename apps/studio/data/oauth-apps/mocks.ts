@@ -44,10 +44,12 @@ const VERCEL_REQUEST: OAuthAppsAuthorizeRequest = {
   redirect_uri: 'https://vercel.com/api/integrations/supabase/callback',
   scope_groups: VERCEL_SCOPE_GROUPS,
   reuses_grant_across_workspaces: false,
+  grant_config: { grant_kind: 'user_bound', allow_project_scoping: true },
   existing_grant: null,
 }
 
 const VERCEL_EXISTING_GRANT: OAuthExistingGrant = {
+  kind: 'user_bound',
   approved_scopes: ['project_settings', 'logs'],
   project_refs: ['northwindstorefront1', 'northwindcms1', 'northwinddeleted1'],
   created_at: '2026-08-14T09:12:00.000Z',
@@ -78,6 +80,7 @@ const KEMAL_BOT_REQUEST: OAuthAppsAuthorizeRequest = {
     },
   ],
   reuses_grant_across_workspaces: false,
+  grant_config: { grant_kind: 'organization_bound', allow_project_scoping: true },
   existing_grant: null,
 }
 
@@ -271,11 +274,22 @@ export function getMockOAuthAppsAuthorizeApproveResult(
   )
   if (blocked.length === 0) return approved
 
+  // Every blocked project fails the same scopes here because the mock blocks on one condition
+  // (a read-only role). The real check resolves scopes per project, so the shape stays per-project
+  // even though these lists happen to be identical.
+  const failedScopes = writeGroups.flatMap((scopeGroup) => scopeGroup.scopes)
+
   return {
     error_code: 'role_validation_failed',
     message: `Your role is read-only on ${blocked.length} of the selected projects.`,
-    failed_scopes: writeGroups.flatMap((scopeGroup) => scopeGroup.scopes),
-    projects: blocked.map(({ name, ref, role }) => ({ name, ref, role })),
-    roles: Array.from(new Set(blocked.map((project) => project.role))),
+    validation: {
+      scope_target: 'projects',
+      failures: blocked.map(({ name, ref, role }) => ({
+        ref,
+        name,
+        role,
+        failed_scopes: failedScopes,
+      })),
+    },
   }
 }
