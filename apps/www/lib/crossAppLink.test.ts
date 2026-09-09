@@ -16,6 +16,19 @@ describe('isCrossAppLink', () => {
     expect(isCrossAppLink('/dashboard/sign-up')).toBe(true)
   })
 
+  it('identifies relative cross-app routes with query strings or hash fragments', () => {
+    expect(isCrossAppLink('/docs?tab=api')).toBe(true)
+    expect(isCrossAppLink('/docs#overview')).toBe(true)
+    expect(isCrossAppLink('/docs/?tab=api')).toBe(true)
+    expect(isCrossAppLink('/docs/#overview')).toBe(true)
+    expect(isCrossAppLink('/dashboard?project=ref')).toBe(true)
+    expect(isCrossAppLink('/dashboard#projects')).toBe(true)
+    expect(isCrossAppLink('/dashboard/?project=ref')).toBe(true)
+    expect(isCrossAppLink('/dashboard/#projects')).toBe(true)
+    expect(isCrossAppLink('/docs/guides/auth?tab=api#setup')).toBe(true)
+    expect(isCrossAppLink('/dashboard/projects?sort=name#list')).toBe(true)
+  })
+
   it('identifies absolute URLs targeting cross-app routes on supabase.com', () => {
     expect(isCrossAppLink('https://supabase.com/docs/guides/api')).toBe(true)
     expect(isCrossAppLink('https://supabase.com/dashboard')).toBe(true)
@@ -26,10 +39,14 @@ describe('isCrossAppLink', () => {
   it('does not match same-app routes or partial prefixes', () => {
     expect(isCrossAppLink('/')).toBe(false)
     expect(isCrossAppLink('/pricing')).toBe(false)
+    expect(isCrossAppLink('/pricing?redirect=/docs')).toBe(false)
+    expect(isCrossAppLink('/pricing#docs')).toBe(false)
     expect(isCrossAppLink('/blog')).toBe(false)
     expect(isCrossAppLink('/docs-faq')).toBe(false)
+    expect(isCrossAppLink('/docs-faq?tab=api')).toBe(false)
     expect(isCrossAppLink('/documentation')).toBe(false)
     expect(isCrossAppLink('/dashboard-settings')).toBe(false)
+    expect(isCrossAppLink('/dashboard-settings#section')).toBe(false)
     expect(isCrossAppLink('https://github.com/supabase/supabase')).toBe(false)
   })
 

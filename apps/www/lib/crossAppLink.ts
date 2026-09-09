@@ -33,6 +33,8 @@ export function isCrossAppLink(href?: string): boolean {
     } catch {
       return false
     }
+  } else {
+    path = path.split(/[?#]/)[0]
   }
 
   return CROSS_APP_PREFIXES.some((prefix) => path === prefix || path.startsWith(prefix + '/'))
