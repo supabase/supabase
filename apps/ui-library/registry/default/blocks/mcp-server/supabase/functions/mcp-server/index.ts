@@ -1,21 +1,30 @@
 import 'jsr:@supabase/functions-js@2.108.2/edge-runtime.d.ts'
 
 import { createMcpHandler, McpServer } from 'npm:@modelcontextprotocol/server@2.0.0'
+import { pipeline } from 'npm:@supabase/middleware@0.5.0'
 import {
   withOAuthProtectedResource,
   withSupabase,
   type SupabaseContext,
-} from 'npm:@supabase/server@1.5.1'
+} from 'npm:@supabase/server@1.6.0'
 
-import { getPublicProjectUrl } from './oauth.ts'
 import { registerTools, type ToolContext } from './tools/index.ts'
 
-// An MCP server as a single Supabase Edge Function. withSupabase accepts any
-// verified user access token and builds an RLS-scoped client, so both embedded
-// product agents and external OAuth clients can act as the signed-in user.
+// An MCP server as a single Supabase Edge Function, composed as a pipeline:
 //
-// withOAuthProtectedResource adds OAuth discovery for external MCP clients and
-// points authentication failures at it. Tools are composed in ./tools/index.ts.
+//   withOAuthProtectedResource  OAuth discovery for external MCP clients. Runs
+//                               before the auth gate so unauthenticated clients
+//                               can fetch the RFC 9728 metadata, and adds the
+//                               WWW-Authenticate challenge to the gate's 401.
+//   withSupabase                Verifies the user access token and builds an
+//                               RLS-scoped client, so both embedded product
+//                               agents and external OAuth clients act as the
+//                               signed-in user.
+//   handleMcp                   MCP transport and tools (./tools/index.ts).
+//
+// On Supabase Edge Functions the public URLs in the OAuth metadata are derived
+// automatically, locally and hosted. Off Edge Functions, pass `resourceServer`
+// and `authorizationServer` to withOAuthProtectedResource.
 
 function readTextEnv(name: string, fallback: string): string {
   return Deno.env.get(name)?.trim() || fallback
@@ -67,14 +76,11 @@ async function handleMcp(request: Request, ctx: SupabaseContext): Promise<Respon
   return handler.fetch(request)
 }
 
+// The handler is passed inline so TypeScript infers its context from the entries.
+// Passing `handleMcp` directly collapses the inferred context to `object`.
 Deno.serve(
-  withOAuthProtectedResource(
-    {
-      // Local Edge Runtime can be detected as "edge-light" rather than "deno".
-      // Explicit URL resolvers avoid relying on middleware runtime detection.
-      resourceServer: (request) => `${getPublicProjectUrl(request)}/functions/v1/mcp-server`,
-      authorizationServer: (request) => `${getPublicProjectUrl(request)}/auth/v1`,
-    },
-    withSupabase({ auth: 'user', cors: { headers: CORS_HEADERS } }, handleMcp)
+  pipeline(
+    [withOAuthProtectedResource(), withSupabase({ auth: 'user', cors: { headers: CORS_HEADERS } })],
+    (request, ctx) => handleMcp(request, ctx)
   )
 )
