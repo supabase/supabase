@@ -510,7 +510,7 @@ select
     jsonb_build_object('hello', 'world'), -- JSONB Payload
     'event', -- Event name
     'topic', -- Topic
-    false -- Public / Private flag
+    false    -- Private flag - true: Private (default), false: Public
   );
 ```
 
@@ -531,7 +531,7 @@ select
     '\x012345'::bytea, -- bytea payload
     'event',           -- Event name
     'topic',           -- Topic
-    true               -- Private / Public flag (defaults to true)
+    true               -- Private flag - true: Private (default), false: Public
   );
 ```
 
