@@ -17,7 +17,7 @@ describe('isSqlStatement', () => {
     'create policy my_policy on profiles for select using (true)',
     'show search_path',
     'SHOW ALL;',
-    "set search_path to public",
+    'set search_path to public',
     "SET TIME ZONE 'UTC'",
   ])('returns true for %s', (message) => {
     expect(isSqlStatement(message)).toBe(true)
