@@ -30,6 +30,12 @@ When you build an MCP server that connects to your Supabase project, authenticat
 
 By leveraging Supabase Auth, your MCP server can authenticate AI agents using your existing user accounts without building a separate authentication system.
 
+<Admonition type="note">
+
+MCP authentication has no separate charge. AI agents authenticate as your existing users, so their sign-ins count toward your project's [Monthly Active Users (MAUs)](/docs/guides/platform/manage-your-usage/monthly-active-users). Supabase counts MAUs per distinct user, so multiple agents or MCP clients acting for the same user count as one MAU.
+
+</Admonition>
+
 ## Prerequisites
 
 Before setting up MCP authentication:

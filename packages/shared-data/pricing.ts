@@ -43,6 +43,7 @@ export type FeatureKey =
   | 'auth.userDataOwnership'
   | 'auth.anonSignIns'
   | 'auth.socialOAuthProviders'
+  | 'auth.oauthServer'
   | 'auth.customSMTPServer'
   | 'auth.removeSupabaseBranding'
   | 'auth.auditLogs'
@@ -267,6 +268,17 @@ export const pricing: Pricing = {
       {
         key: 'auth.socialOAuthProviders',
         title: 'Social OAuth providers',
+        plans: {
+          free: true,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
+        key: 'auth.oauthServer',
+        title: 'OAuth 2.1 Server',
         plans: {
           free: true,
           pro: true,
