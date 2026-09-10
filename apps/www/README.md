@@ -97,6 +97,12 @@ imgThumb: my-image.png
 ---
 ```
 
+#### Blog post dates
+
+- `date` (required, `YYYY-MM-DD`): publish date. Feeds the blog index order, JSON-LD `datePublished`, and the sitemap `<lastmod>` when `updated` is absent.
+- `updated` (optional, `YYYY-MM-DD`): set it when a post gets a substantive revision (new sections, corrected claims, changed recommendations). Leave it absent for typo, link, and image fixes. It becomes the sitemap `<lastmod>` and JSON-LD `dateModified`; a stale or inflated value is worse than none because search engines only trust lastmod they can verify against the page.
+- Quote both values (`'2026-08-24'`). An unquoted value with a time or zone is parsed by YAML into an absolute instant and the build rejects it, because the authored day can no longer be recovered.
+
 #### Events
 
 Events use different image fields to avoid confusion with their display patterns:
