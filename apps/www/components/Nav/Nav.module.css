@@ -1,0 +1,65 @@
+/*
+ * Single source of truth for the dropdown motion timings. The Tailwind
+ * motion constants in Nav/index.tsx consume these variables via
+ * duration-(--…)/ease-(--…) utilities, so tune them here only.
+ * --menu-motion-duration paces the viewport open/close, the content
+ * entrance/switch, and the viewport height transition so they stay in sync.
+ */
+.desktopMenu {
+  --menu-motion-duration: 180ms;
+  --menu-viewport-width-duration: 220ms;
+  --menu-ease-in-out-quad: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  --menu-ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.desktopMenuViewport {
+  transform-origin: top center;
+  transition-property: width, height !important;
+  transition-duration: var(--menu-viewport-width-duration), var(--menu-motion-duration) !important;
+  transition-timing-function: var(--menu-ease-in-out-quad), var(--menu-ease-out-quad) !important;
+}
+
+.desktopMenuViewport .desktopMenuContent:not([data-motion]) {
+  animation: desktop-menu-content-in var(--menu-motion-duration) ease both;
+  will-change: opacity, transform;
+}
+
+@keyframes desktop-menu-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*
+ * The 580px/1040px stops must stay in sync with the dropdown column widths:
+ * every dropdown (Product/Developers/Solutions) is xl:w-[1040px] with a
+ * 580px left column and 460px right column, and the viewport is forced to
+ * xl:w-[1040px] in Nav/index.tsx. The 1px stripe replaces the columns'
+ * left border at xl.
+ */
+@media (min-width: 80rem) {
+  .desktopMenuViewport {
+    background-image: linear-gradient(
+      to right,
+      var(--background) 0 580px,
+      var(--border) 580px 581px,
+      var(--background-surface-75) 581px 100%
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desktopMenuViewport {
+    transition: none !important;
+  }
+
+  .desktopMenuViewport .desktopMenuContent:not([data-motion]) {
+    animation: none !important;
+  }
+}

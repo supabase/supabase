@@ -18,8 +18,8 @@ export const ProductDropdown = () => {
   const isTablet = useBreakpoint(1279)
 
   return (
-    <div className="flex flex-col xl:flex-row">
-      <div className="flex flex-col">
+    <div className="flex flex-col xl:w-[1040px] xl:flex-row">
+      <div className="flex flex-col xl:w-[580px]">
         <div className="flex flex-row py-6 px-6 gap-2">
           <ul className="flex flex-col gap-4 w-[280px] xl:w-[250px]">
             {Object.values(MainProductsData)
@@ -122,7 +122,7 @@ export const ProductDropdown = () => {
           </div>
         </div>
       </div>
-      <div className="bg-surface-75 border-t xl:border-t-0 xl:border-l p-6 gap-8 flex flex-col w-full xl:w-[400px]">
+      <div className="bg-surface-75 border-t xl:border-t-0 xl:bg-transparent py-8 px-10 gap-8 flex flex-col w-full xl:w-[460px]">
         <div className="col-span-3 flex flex-row gap-8 xl:w-auto">
           <div>
             <Link
