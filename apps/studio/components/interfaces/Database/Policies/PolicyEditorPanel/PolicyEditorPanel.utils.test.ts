@@ -63,6 +63,41 @@ describe('generateUpdatePolicyPayload', () => {
     expect(payload).toEqual({ check: 'is_owner()' })
   })
 
+  it('omits the check for SELECT policies, which cannot take a WITH CHECK clause', () => {
+    const selectPolicy = mockPolicy({ command: 'SELECT' })
+    const payload = generateUpdatePolicyPayload(selectPolicy, {
+      ...baseForm,
+      check: 'is_admin()',
+    })
+    expect(payload).toEqual({})
+  })
+
+  it('omits the check for DELETE policies, which cannot take a WITH CHECK clause', () => {
+    const payload = generateUpdatePolicyPayload(mockPolicy({ command: 'DELETE' }), {
+      ...baseForm,
+      check: 'is_admin()',
+    })
+    expect(payload).toEqual({})
+  })
+
+  it('still includes the other changed fields for a SELECT policy with a check expression', () => {
+    const payload = generateUpdatePolicyPayload(mockPolicy({ command: 'SELECT' }), {
+      ...baseForm,
+      name: 'renamed_policy',
+      using: 'true',
+      check: 'is_admin()',
+    })
+    expect(payload).toEqual({ name: 'renamed_policy', definition: 'true' })
+  })
+
+  it('includes the check for ALL policies', () => {
+    const payload = generateUpdatePolicyPayload(mockPolicy({ command: 'ALL' }), {
+      ...baseForm,
+      check: 'is_admin()',
+    })
+    expect(payload).toEqual({ check: 'is_admin()' })
+  })
+
   it('omits the check when the check expression is unchanged or empty', () => {
     const withCheck = mockPolicy({ command: 'UPDATE', check: 'is_admin()' })
     expect(generateUpdatePolicyPayload(withCheck, { ...baseForm, check: '  is_admin()' })).toEqual(
