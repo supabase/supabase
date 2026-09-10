@@ -8,7 +8,7 @@ This guide aims to exhibit the process of transferring your Amazon RDS database 
 
 Supabase's core is Postgres, enabling the use of row-level security and providing access to over 40 Postgres extensions. By migrating from Amazon RDS to Supabase, you can leverage Postgres to its fullest potential and acquire all the features you need to complete your project.
 
-## Retrieve your Amazon RDS database credentials [#retrieve-rds-credentials]
+## Retrieve your Amazon RDS database credentials
 
 1. Sign in to your [Amazon RDS account](https://aws.amazon.com/rds/).
 1. Select the region where your RDS database is located.
@@ -20,7 +20,7 @@ Supabase's core is Postgres, enabling the use of row-level security and providin
 
 ![Copying RDS credentials from AWS Management Console](../../assets/guides/migrate-from-amazon-rds/amazon-rds_credentials.png)
 
-## Retrieve your Supabase host [#retrieve-supabase-host]
+## Retrieve your Supabase host
 
 1. If you're new to Supabase, [create a project](https://database.new). Make a note of your password, you will need this later. If you forget it, you can [reset it here](/dashboard/project/_/database/settings).
 1. On your project dashboard, click [Connect](/dashboard/project/_?showConnect=true&method=session)

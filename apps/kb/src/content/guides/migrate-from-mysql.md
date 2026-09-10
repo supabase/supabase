@@ -18,7 +18,7 @@ Before you begin the migration, you need to collect essential information about 
    - Username
    - Password
 
-## Retrieve your Supabase host [#retrieve-supabase-host]
+## Retrieve your Supabase host
 
 1. If you're new to Supabase, [create a project](/dashboard).
    Make a note of your password, you will need this later. If you forget it, you can [reset it here](/dashboard/project/_/database/settings).
