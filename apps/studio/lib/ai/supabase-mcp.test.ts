@@ -21,7 +21,6 @@ describe('createSupabaseMCPClient', () => {
   const originalSha = process.env.VERCEL_GIT_COMMIT_SHA
 
   beforeEach(() => {
-    vi.clearAllMocks()
     createMCPClientMock.mockResolvedValue({ tools: vi.fn() })
     delete process.env.VERCEL_GIT_COMMIT_SHA
   })

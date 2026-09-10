@@ -8,33 +8,37 @@
 export const TOPICS = [
   {
     name: 'Migration',
-    description: 'Moving data, schemas, or projects onto Supabase',
+    description: 'Moving data, schemas, or projects onto Supabase.',
     pinned: false,
   },
   {
     name: 'Comparison',
-    description: 'How Supabase compares to other databases and platforms',
+    description: 'How Supabase compares to other databases and platforms.',
     pinned: false,
   },
-  { name: 'Troubleshooting', description: 'Common errors and how to resolve them', pinned: false },
+  { name: 'Troubleshooting', description: 'Common errors and how to resolve them.', pinned: false },
   {
     name: 'Tutorial',
-    description: 'Step-by-step walkthroughs for building with Supabase',
+    description: 'Step-by-step walkthroughs for building with Supabase.',
     pinned: true,
   },
-  { name: 'Storage', description: 'Uploading, managing, and serving files', pinned: false },
-  { name: 'Auth', description: 'Authentication, authorization, and user management', pinned: true },
-  { name: 'Database', description: 'Postgres schemas, queries, and performance', pinned: true },
+  { name: 'Storage', description: 'Uploading, managing, and serving files.', pinned: false },
+  {
+    name: 'Auth',
+    description: 'Authentication, authorization, and user management.',
+    pinned: true,
+  },
+  { name: 'Database', description: 'Postgres schemas, queries, and performance.', pinned: true },
   {
     name: 'Edge Functions',
-    description: 'Deploying and running serverless functions',
+    description: 'Deploying and running serverless functions.',
     pinned: false,
   },
-  { name: 'Queues', description: 'Background jobs and message processing', pinned: false },
-  { name: 'Realtime', description: 'Broadcast, presence, and database changes', pinned: false },
+  { name: 'Queues', description: 'Background jobs and message processing.', pinned: false },
+  { name: 'Realtime', description: 'Broadcast, presence, and database changes.', pinned: false },
   {
     name: 'Supabase Platform',
-    description: 'Project settings, billing, and infrastructure',
+    description: 'Project settings, billing, and infrastructure.',
     pinned: false,
   },
 ] as const
