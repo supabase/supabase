@@ -91,7 +91,6 @@ export function notebookToMarkdown({
 }: {
   name: string
   cells: readonly Snapshot<Cell>[]
-  /** Looks up a query cell's last in-session result, if any (see `formatQueryResult`). */
   getResult?: (cellId: string) => QueryResult | undefined
 }): string {
   const sections = cells.map((cell) => {
