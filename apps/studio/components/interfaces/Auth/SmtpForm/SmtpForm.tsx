@@ -282,35 +282,36 @@ export const SmtpForm = () => {
                 <FormField
                   control={form.control}
                   name="ENABLE_SMTP"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Enable custom SMTP"
-                      description={
-                        <p className="text-sm text-foreground-lighter">
-                          Send auth emails through your custom SMTP provider.{' '}
-                          <InlineLink href={`/project/${projectRef}/auth/rate-limits`}>
-                            Rate limits
-                          </InlineLink>{' '}
-                          apply.
-                        </p>
-                      }
-                    >
-                      <FormControl>
+                  render={({ field }) => {
+                    const isSmtpLockedOn = isSmtpRequiredWhenEnabled && field.value
+                    return (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Enable custom SMTP"
+                        description={
+                          <p className="text-sm text-foreground-lighter">
+                            Send auth emails through your custom SMTP provider.{' '}
+                            <InlineLink href={`/project/${projectRef}/auth/rate-limits`}>
+                              Rate limits
+                            </InlineLink>{' '}
+                            apply.
+                          </p>
+                        }
+                      >
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <div>
-                              <Switch
-                                aria-label="Toggle SMTP"
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                                disabled={
-                                  !canUpdateConfig || (isSmtpRequiredWhenEnabled && field.value)
-                                }
-                              />
+                            <div tabIndex={isSmtpLockedOn ? 0 : undefined}>
+                              <FormControl>
+                                <Switch
+                                  aria-label="Toggle SMTP"
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                  disabled={!canUpdateConfig || isSmtpLockedOn}
+                                />
+                              </FormControl>
                             </div>
                           </TooltipTrigger>
-                          {isSmtpRequiredWhenEnabled && field.value && (
+                          {isSmtpLockedOn && (
                             <TooltipContent side="bottom" className="max-w-xs">
                               Self-hosted Supabase has no built-in email service, so custom SMTP
                               cannot be turned off. Update the settings below to change your
@@ -318,9 +319,9 @@ export const SmtpForm = () => {
                             </TooltipContent>
                           )}
                         </Tooltip>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
+                      </FormItemLayout>
+                    )
+                  }}
                 />
               </CardContent>
 
