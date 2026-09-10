@@ -57,11 +57,11 @@ Many database commands accept `--local` and `--linked` flags to choose what they
 
 ## Which diff engine you're on [#pg-delta]
 
-`db diff`, `db pull`, and the `db schema declarative` commands generate SQL with a diff engine. The CLI ships two. [`pg-delta`](https://github.com/supabase/pg-toolbelt/tree/main/packages/pg-delta) is the default for new projects, and [`migra`](https://github.com/djrobstep/migra) is the legacy engine.
+`db diff`, `db pull`, and the `db schema declarative` commands generate SQL with a diff engine. The CLI ships two. [`pg-delta`](https://github.com/supabase/pg-toolbelt/tree/main/packages/pg-delta) is the default engine, and [`migra`](https://github.com/djrobstep/migra) is the legacy engine.
 
 <$Partial path="diff_engine_check.mdx" />
 
-This guide describes `pg-delta` behavior and calls out where `migra` behaves differently. The `db schema declarative` commands require `pg-delta` and won't run on `migra`. For a side-by-side comparison and a switching procedure, see [Diff engines](/docs/guides/local-development/diff-engines).
+This guide describes `pg-delta` behavior and calls out where `migra` behaves differently. The `db schema declarative` commands require `pg-delta` and won't run on `migra`. For a side-by-side comparison and what to expect when an existing project upgrades, see [Diff engines](/docs/guides/local-development/diff-engines).
 
 ## Move an existing project to local development
 
@@ -227,7 +227,7 @@ supabase db schema declarative sync -f initial-schema
 
 This compares your declared schema files against your (currently empty) migration history and writes the difference as a migration file in `supabase/migrations/`. The command then offers to apply the migration to your local database. Pass `--apply` or `--no-apply` to skip the prompt in scripts. The global `--yes` flag also applies it. Without one of those flags, a non-interactive run (CI, or an agent without a terminal) writes the file and silently skips the apply step.
 
-The `db schema declarative` commands require [`pg-delta`](/docs/guides/local-development/diff-engines), which `supabase init` enabled for you (`[experimental.pgdelta] enabled = true` in `config.toml`). For the full declarative workflow, including managing views and functions and known caveats, see [Declarative database schemas](/docs/guides/local-development/declarative-database-schemas).
+The `db schema declarative` commands require [`pg-delta`](/docs/guides/local-development/diff-engines), which is the default engine (`supabase init` also writes `[experimental.pgdelta] enabled = true` into `config.toml` to make that explicit). For the full declarative workflow, including managing views and functions and known caveats, see [Declarative database schemas](/docs/guides/local-development/declarative-database-schemas).
 
 **Option B: Write the migration directly**
 
@@ -304,7 +304,7 @@ These steps assume the `pg-delta` engine. On the legacy `migra` engine, generate
 
 `db schema declarative sync` compares your `supabase/schemas/` files against your existing migrations. It does not read the live local database. Changes you make directly in Studio or via SQL are invisible to it, so it reports "No schema changes found" and silently drops them. Always edit the schema files, then sync.
 
-Don't use `db diff` to generate migrations from declarative files. Under `pg-delta`, `db diff` never uses `supabase/schemas/` as its baseline. The old `[db.migrations].schema_paths` setting no longer changes that, and the CLI warns whenever the setting is present, even the empty default that older `init` templates wrote.
+Don't use `db diff` to generate migrations from declarative files. Under `pg-delta`, `db diff` never uses `supabase/schemas/` as its baseline. The old `[db.migrations].schema_paths` setting no longer changes that, and the CLI warns when the setting lists any paths. Remove it from `config.toml`.
 
 </Admonition>
 
@@ -422,7 +422,7 @@ For multi-environment setups with CI/CD (feature branches, staging, production),
 | `supabase db schema declarative sync`     | Diffs `supabase/schemas/` against your migrations and writes the difference as new migration file(s)            |
 | `supabase db schema declarative generate` | Exports a live database into declarative schema files under `supabase/schemas/`                                 |
 | `supabase db pull`                        | Pulls remote schema into a new local migration file                                                             |
-| `supabase db pull --declarative`          | Updates `supabase/schemas/` from the remote database instead of creating a migration. `pg-delta` projects only  |
+| `supabase db pull --declarative`          | Updates `supabase/schemas/` from the remote database instead of creating a migration. Not for `migra` opt-outs  |
 | `supabase db push`                        | Applies pending local migrations to the remote database                                                         |
 | `supabase db dump`                        | Exports remote DB schema (or `--data-only` for data) via `pg_dump`                                              |
 | `supabase migration new <name>`           | Creates an empty migration file                                                                                 |
@@ -497,9 +497,9 @@ Local and remote are already in sync, so there is nothing to pull. If you script
 
 Under `pg-delta`, declarative files are never part of the `db diff` baseline, so `[db.migrations].schema_paths` has no effect on it. Generate migrations from declarative files with `supabase db schema declarative sync` instead.
 
-**The first pull after enabling `pg-delta` is unexpectedly large**
+**The first pull after upgrading to `pg-delta` is unexpectedly large**
 
-This happens when your migration history was built from legacy `migra` diffs, which didn't track objects such as comments, domains, roles, and publication membership. The first `db pull` on `pg-delta` captures those objects in a one-time catch-up migration. Your database already has them, so accept the prompt to record the migration as applied and review the file like any other generated migration. If your baseline came from the legacy engine's `pg_dump` path instead, it already contains those objects, and the first pull reports "No schema changes found". See [Switch an existing project to `pg-delta`](/docs/guides/local-development/diff-engines#switch-an-existing-project-to-pg-delta) for the full procedure.
+This happens when your migration history was built from legacy `migra` diffs, which didn't track objects such as comments, domains, roles, and publication membership. The first `db pull` on `pg-delta` captures those objects in a one-time catch-up migration. Your database already has them, so accept the prompt to record the migration as applied and review the file like any other generated migration. If your baseline came from the legacy engine's `pg_dump` path instead, it already contains those objects, and the first pull reports "No schema changes found". See [Upgrade an existing project to `pg-delta`](/docs/guides/local-development/diff-engines#switch-an-existing-project-to-pg-delta) for the full procedure.
 
 **A diff looks wrong or comes back empty unexpectedly**
 
