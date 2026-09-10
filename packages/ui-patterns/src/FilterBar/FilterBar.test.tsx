@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React, { useState } from 'react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { FilterBar } from './FilterBar'
 import { FilterGroup, FilterProperty } from './types'
@@ -36,10 +36,6 @@ const initialFilters: FilterGroup = {
 describe('FilterBar', () => {
   const mockOnFilterChange = vi.fn()
   const mockOnFreeformTextChange = vi.fn()
-
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
 
   it('renders with empty state', () => {
     render(

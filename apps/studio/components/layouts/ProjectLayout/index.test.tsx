@@ -319,7 +319,6 @@ describe('ProjectLayout title', () => {
   })
 
   afterEach(() => {
-    vi.clearAllMocks()
     document.title = ''
   })
 
@@ -434,7 +433,6 @@ describe('FREE_MICRO_UPGRADE banner', () => {
   })
 
   afterEach(() => {
-    vi.clearAllMocks()
     mockRouter.pathname = '/project/[ref]/observability/query-performance'
     mockRouter.asPath = '/project/default/observability/query-performance'
     mockProjectState.current = {

@@ -47,7 +47,6 @@ vi.mock('./PlanUpdateSidePanel', () => ({
 
 describe('Subscription', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockSubscription.mockReturnValue({
       data: {
         plan: { id: 'free', name: 'Free' },
