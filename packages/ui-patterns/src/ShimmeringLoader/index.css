@@ -1,0 +1,38 @@
+/* Loaders */
+.shimmering-loader {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    var(--border-default) 4%,
+    var(--background-surface-200) 25%,
+    var(--border-default) 36%
+  );
+  background-size: 1000px 100%;
+}
+
+.dark .shimmering-loader {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    var(--border-default) 4%,
+    var(--border-control) 25%,
+    var(--border-default) 36%
+  );
+  background-size: 1000px 100%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmering-loader,
+  .dark .shimmering-loader {
+    animation: none;
+  }
+}

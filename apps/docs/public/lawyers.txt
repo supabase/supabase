@@ -9,7 +9,7 @@ Supabase™ is a trademark of Supabase Inc.
 
 If you're a creator/contributor to one of these packages, thanks!
 
-Last updated: 2022-03-29
+Last updated: 2024-07-11
 
 JavaScript/TypeScript
 

@@ -3,58 +3,113 @@
 project_id = "edge-functions"
 
 [api]
+enabled = true
 # Port to use for the API URL.
 port = 54321
-# Schemas to expose in your API. Tables, views and stored procedures in this schema will get API
-# endpoints. public and storage are always included.
-schemas = []
-# Extra schemas to add to the search_path of every request.
-extra_search_path = ["extensions"]
-# The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
+# Schemas to expose in your API. Tables, views and functions in this schema will get API
+# endpoints. `public` is always included.
+schemas = ["public", "graphql_public"]
+# Extra schemas to add to the search_path of every request. `public` is always included.
+extra_search_path = ["public", "extensions"]
+# The maximum number of rows returned from a view, table, or function. Limits payload size
 # for accidental or malicious requests.
 max_rows = 1000
 
 [db]
 # Port to use for the local database URL.
 port = 54322
+# Port used by db diff command to initialize the shadow database.
+shadow_port = 54320
 # The database major version to use. This has to be the same as your remote database's. Run `SHOW
 # server_version;` on the remote database to check.
-major_version = 14
+major_version = 15
 
-[studio]
-# Port to use for Supabase Studio.
-port = 54323
-
-# Email testing server. Emails sent with the local dev setup are not actually sent - rather, they
-# are monitored, and you can view the emails that would have been sent from the web interface.
-[inbucket]
-# Port to use for the email testing server web interface.
-port = 54324
-
-[auth]
-# The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
-# in emails.
-site_url = "http://localhost:3000"
-# A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://localhost:3000"]
-# How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one
-# week).
-jwt_expiry = 3600
-# Allow/disallow new user signups to your project.
-enable_signup = true
-
-[auth.email]
-# Allow/disallow new user signups via email to your project.
-enable_signup = true
-# If enabled, a user will be required to confirm any email change on both the old, and new email
-# addresses. If disabled, only the new email is required to confirm.
-double_confirm_changes = true
-# If enabled, users need to confirm their email address before signing in.
-enable_confirmations = false
-
-# Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
-# `discord`, `facebook`, `github`, `gitlab`, `google`, `twitch`, `twitter`, `slack`, `spotify`.
-[auth.external.apple]
+[db.seed]
+# If enabled, seeds the database after migrations during a db reset.
 enabled = false
-client_id = ""
-secret = ""
+# Specifies an ordered list of seed files to load during db reset.
+# Supports glob patterns relative to supabase directory. For example:
+# sql_paths = ['./seeds/*.sql', '../project-src/seeds/*-load-testing.sql']
+
+[storage.buckets.my-bucket]
+[storage.buckets.videos]
+
+[storage.buckets.images]
+public = true
+objects_path = "./buckets/images"
+
+[functions.auth-hook-react-email-resend]
+verify_jwt = false
+[functions.background-upload-storage]
+verify_jwt = false
+[functions.browser-with-cors]
+verify_jwt = true
+[functions.cloudflare-turnstile]
+verify_jwt = false
+[functions.custom-jwt-validation]
+verify_jwt = false
+[functions.connect-supabase]
+[functions.discord-bot]
+[functions.elevenlabs-speech-to-text]
+verify_jwt = false
+[functions.elevenlabs-text-to-speech]
+verify_jwt = true
+[functions.file-upload-storage]
+[functions.get-tshirt-competition]
+verify_jwt = false
+[functions.github-action-deploy]
+verify_jwt = true
+[functions.huggingface-image-captioning]
+verify_jwt = false
+[functions.image-manipulation]
+verify_jwt = true
+[functions.location]
+verify_jwt = true
+[functions.oak-server]
+[functions.og-image-with-storage-cdn]
+verify_jwt = false
+[functions.openai]
+verify_jwt = true
+[functions.openai-image-generation]
+verify_jwt = false
+[functions.opengraph]
+verify_jwt = true
+[functions.postgres-on-the-edge]
+[functions.puppeteer]
+verify_jwt = true
+[functions.simple-mcp-server]
+verify_jwt = false
+entrypoint = "./functions/mcp/simple-mcp-server/index.ts"
+[functions.read-storage]
+[functions.restful-tasks]
+[functions.select-from-table-with-auth-rls]
+[functions.send-email-resend]
+verify_jwt = false
+[functions.send-email-smtp]
+verify_jwt = true
+[functions.sentry]
+verify_jwt = false
+[functions.sentryfied]
+verify_jwt = true
+[functions.slack-bot-mention]
+verify_jwt = false
+[functions.streams]
+verify_jwt = true
+[functions.stripe-webhooks]
+verify_jwt = false
+[functions.telegram-bot]
+verify_jwt = false
+[functions.tweet-to-image]
+verify_jwt = false
+[functions.upstash-redis-counter]
+verify_jwt = true
+[functions.upstash-redis-ratelimit]
+verify_jwt = true
+
+[functions.kysely-postgres]
+verify_jwt = true
+import_map = "./functions/import_map.json"
+
+[functions.wasm-modules]
+verify_jwt = true
+static_files = [ "./functions/wasm-modules/add-wasm/pkg/*.wasm"]

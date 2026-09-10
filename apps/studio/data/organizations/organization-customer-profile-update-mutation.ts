@@ -1,40 +1,59 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import type { OrganizationsData } from './organizations-query'
+import type { CustomerAddress, CustomerTaxId } from './types'
+import { handleError, put } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OrganizationCustomerProfileUpdateVariables = {
-  slug: string
-  address?: {
-    city: string | null
-    country: string | null
-    line1: string | null
-    line2: string | null
-    postal_code: string | null
-    state: string | null
-  } | null
-  invoice_settings?: {
-    default_payment_method: string
-  }
+  slug?: string
+  address?: CustomerAddress
+  billing_name?: string
+  /** Pass a tax ID object to set/update, `null` to clear, or `undefined` to leave unchanged */
+  tax_id?: CustomerTaxId | null
+  email?: string
+  additional_emails?: string[]
+  indirect_tax_registration_declaration?: 'yes' | 'no'
+  /** When true, validates the request without persisting changes */
+  dry_run?: boolean
 }
 
 export async function updateOrganizationCustomerProfile({
   slug,
   address,
-  invoice_settings,
+  billing_name,
+  tax_id,
+  email,
+  additional_emails,
+  indirect_tax_registration_declaration,
+  dry_run,
 }: OrganizationCustomerProfileUpdateVariables) {
   if (!slug) return console.error('Slug is required')
 
-  const payload: any = {}
-  if (address) payload.address = address
-  if (invoice_settings) payload.invoice_settings = invoice_settings
-
-  const response = await patch(`${API_URL}/organizations/${slug}/customer`, payload)
-  if (response.error) throw response.error
-  return response
+  const { data, error } = await put(`/platform/organizations/{slug}/customer`, {
+    params: {
+      path: {
+        slug,
+      },
+    },
+    body: {
+      address: address != null ? address : undefined,
+      billing_name,
+      ...(tax_id === null
+        ? { clear_tax_id: true as const }
+        : tax_id !== undefined
+          ? { tax_id }
+          : {}),
+      email,
+      additional_emails,
+      indirect_tax_registration_declaration,
+      ...(dry_run ? { dry_run } : {}),
+    },
+  })
+  if (error) throw handleError(error)
+  return data
 }
 
 type OrganizationCustomerProfileUpdateData = Awaited<
@@ -46,7 +65,7 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     OrganizationCustomerProfileUpdateData,
     ResponseError,
     OrganizationCustomerProfileUpdateVariables
@@ -59,10 +78,70 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
     OrganizationCustomerProfileUpdateData,
     ResponseError,
     OrganizationCustomerProfileUpdateVariables
-  >((vars) => updateOrganizationCustomerProfile(vars), {
+  >({
+    mutationFn: (vars) => updateOrganizationCustomerProfile(vars),
     async onSuccess(data, variables, context) {
-      const { slug } = variables
-      await queryClient.invalidateQueries(organizationKeys.customerProfile(slug))
+      const {
+        address,
+        slug,
+        billing_name,
+        tax_id,
+        email,
+        additional_emails,
+        indirect_tax_registration_declaration,
+        dry_run,
+      } = variables
+
+      if (dry_run) {
+        await onSuccess?.(data, variables, context)
+        return
+      }
+
+      // Optimistically update the cache for immediate UI consistency. Only patch the fields
+      // that were actually part of this mutation's variables - each caller (e.g. BillingEmail,
+      // BillingCustomerData) only sends the subset it owns, so an unconditional overwrite here
+      // would wipe out the other fields in the shared cache entry.
+      queryClient.setQueriesData(
+        { queryKey: organizationKeys.customerProfile(slug) },
+        (prev: any) => {
+          if (!prev) return prev
+          return {
+            ...prev,
+            ...(billing_name !== undefined ? { billing_name } : {}),
+            ...(address !== undefined ? { address } : {}),
+            ...(email !== undefined ? { email } : {}),
+            ...(additional_emails !== undefined ? { additional_emails: additional_emails } : {}),
+          }
+        }
+      )
+
+      if (tax_id !== undefined) {
+        queryClient.setQueryData(organizationKeys.taxId(slug), tax_id)
+      }
+
+      if (indirect_tax_registration_declaration !== undefined) {
+        queryClient.setQueryData<OrganizationsData>(organizationKeys.list(), (previous) =>
+          previous?.map((organization) =>
+            organization.slug === slug
+              ? { ...organization, requires_indirect_tax_declaration: false }
+              : organization
+          )
+        )
+      }
+
+      // Refetch after a delay to pick up server-canonical values (e.g. normalized tax IDs).
+      // The GET endpoint can be stale for 1-2 seconds after an update.
+      setTimeout(() => {
+        queryClient.invalidateQueries({
+          queryKey: organizationKeys.customerProfile(slug),
+        })
+        if (tax_id !== undefined) {
+          queryClient.invalidateQueries({
+            queryKey: organizationKeys.taxId(slug),
+          })
+        }
+      }, 3000)
+
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

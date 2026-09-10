@@ -1,0 +1,71 @@
+import type { SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import { databaseCronJobsKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+export type DatabaseCronJobCreateVariables = {
+  projectRef: string
+  connectionString?: string | null
+  query: SafeSqlFragment
+  searchTerm?: string
+  identifier?: string | number
+}
+
+export async function createDatabaseCronJob({
+  projectRef,
+  connectionString,
+  query,
+}: DatabaseCronJobCreateVariables) {
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql: query,
+    queryKey: databaseCronJobsKeys.create(),
+  })
+
+  return result
+}
+
+type DatabaseCronJobCreateData = Awaited<ReturnType<typeof createDatabaseCronJob>>
+
+export const useDatabaseCronJobCreateMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<
+    DatabaseCronJobCreateData,
+    ResponseError,
+    DatabaseCronJobCreateVariables
+  >,
+  'mutationFn'
+> = {}) => {
+  const queryClient = useQueryClient()
+
+  return useMutation<DatabaseCronJobCreateData, ResponseError, DatabaseCronJobCreateVariables>({
+    mutationFn: (vars) => createDatabaseCronJob(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, searchTerm } = variables
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: databaseCronJobsKeys.jobs(projectRef) }),
+        queryClient.invalidateQueries({
+          queryKey: databaseCronJobsKeys.listInfiniteMinimal(projectRef, searchTerm),
+        }),
+      ])
+
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create database cron job: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}

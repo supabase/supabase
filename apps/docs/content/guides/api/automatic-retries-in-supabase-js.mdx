@@ -1,0 +1,140 @@
+---
+id: automatic-retries-in-supabase-js
+title: 'How to do automatic retries with `supabase-js`'
+subtitle: 'Learn how to configure automatic retries for your Supabase API requests.'
+---
+
+<Admonition type="danger" title="Important">
+
+You should only enable retries if your requests fail with network errors (e.g. 520 status from Cloudflare). A high number of retries have the potential to exhaust the Data API connection pool, which could result in lower throughput and failed requests.
+
+</Admonition>
+
+## Built-in retries for PostgREST queries
+
+Starting with `supabase-js` v2.102.0, PostgREST queries (`.from()`, `.rpc()`) include built-in automatic retries for transient errors. Retries are **enabled by default** and use exponential backoff with jitter.
+
+Retryable errors include HTTP status codes 408 (Request Timeout), 409 (Conflict), 503 (Service Unavailable), and 504 (Gateway Timeout), as well as network failures. Only idempotent HTTP methods (GET, HEAD, OPTIONS) and POST requests (used by PostgREST) are retried.
+
+### Disable built-in retries
+
+If you prefer to handle retries yourself, you can disable the built-in retry behavior:
+
+```javascript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://your-project-id.supabase.co', 'your-publishable-key', {
+  db: {
+    retry: false,
+  },
+})
+```
+
+## Custom retries with `fetch-retry`
+
+For more control over retry behavior, or to add retries to non-PostgREST requests (auth, storage, functions), you can use the `fetch-retry` package. This approach wraps the native `fetch` function and applies to all requests made by the client.
+
+### 1. Install dependencies
+
+To get started, ensure you have both `supabase-js` and `fetch-retry` installed in your project:
+
+```bash
+npm install @supabase/supabase-js fetch-retry
+```
+
+### 2. Wrap the fetch function
+
+The `fetch-retry` package works by wrapping the native `fetch` function. You can create a custom fetch instance with retry logic and pass it to the `supabase-js` client.
+
+```javascript
+import { createClient } from '@supabase/supabase-js'
+import fetchRetry from 'fetch-retry'
+
+// Wrap the global fetch with fetch-retry
+const fetchWithRetry = fetchRetry(fetch)
+
+// Create a Supabase client instance with the custom fetch
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...', {
+  global: {
+    fetch: fetchWithRetry,
+  },
+})
+```
+
+### 3. Configure retry options
+
+You can configure `fetch-retry` options to control retry behavior, such as the number of retries, retry delay, and which errors should trigger a retry.
+
+Here is an example with custom retry options:
+
+```javascript
+const fetchWithRetry = fetchRetry(fetch, {
+  retries: 3, // Number of retry attempts
+  retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000), // Exponential backoff
+  retryOn: [520], // Retry only on Cloudflare errors
+})
+```
+
+In this example, the `retryDelay` function implements an exponential backoff strategy, and retries are triggered only for specific HTTP status codes.
+
+### 4. Using the Supabase client
+
+With `fetch-retry` integrated, you can use the Supabase client as usual. The retry logic will automatically apply to all network requests made by `supabase-js`.
+
+```javascript
+async function fetchData() {
+  const { data, error } = await supabase.from('your_table').select('*')
+
+  if (error) {
+    console.error('Error fetching data:', error)
+  } else {
+    console.log('Fetched data:', data)
+  }
+}
+
+fetchData()
+```
+
+### 5. Fine-tuning retries for specific requests
+
+If you need different retry logic for certain requests, you can use the `retryOn` with a custom function to inspect the URL or response and decide whether to retry the request.
+
+```javascript
+const fetchWithRetry = fetchRetry(fetch, {
+  retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000),
+  retryOn: (attempt, error, response) => {
+    const shouldRetry
+      = (attempt: number, error: Error | null, response: Response | null) =>
+        attempt < 3
+          && response
+          && response.status == 520 // Cloudflare errors
+          && response.url.includes('rpc/your_database_function')
+
+    if (shouldRetry(attempt, error, response)) {
+      console.log(`Retrying request... Attempt #${attempt}`, response)
+      return true
+    }
+
+    return false
+  }
+})
+
+async function yourDatabaseFunction() {
+  const { data, error } = await supabase
+    .rpc('your_database_function', { param1: 'value1' });
+
+  if (error) {
+    console.log('Error executing RPC:', error);
+  } else {
+    console.log('Response:', data);
+  }
+}
+
+yourDatabaseFunction();
+```
+
+By using `retryOn` with a custom function, you can define specific conditions for retrying requests. In this example, the retry logic is applied only to requests targeting a specific database function.
+
+## Conclusion
+
+For most use cases, the built-in PostgREST retry mechanism is sufficient. Use `fetch-retry` when you need retries on non-PostgREST requests or need fine-grained control over retry behavior.

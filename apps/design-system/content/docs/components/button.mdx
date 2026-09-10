@@ -1,0 +1,145 @@
+---
+title: Button
+description: Displays a button or a link that looks like a button.
+featured: true
+component: true
+---
+
+<ComponentPreview name="button-default" peekCode wide />
+
+## Usage
+
+```tsx
+import { Button } from '@/components/ui/button'
+```
+
+```tsx
+<Button variant="outline">Button</Button>
+```
+
+## Link
+
+You can use the `buttonVariants` helper to create a link that looks like a button.
+
+```tsx
+import { buttonVariants } from '@/components/ui/button'
+```
+
+```tsx
+<Link className={buttonVariants({ variant: 'outline' })}>Click here</Link>
+```
+
+Alternatively, you can set the `asChild` parameter and nest the link component.
+
+```tsx
+<Button asChild>
+  <Link href="/login">Login</Link>
+</Button>
+```
+
+## Examples
+
+### Sizes
+
+Use the `size` prop to determine the size of the button.
+
+<ComponentPreview name="button-sizes" />
+
+### Variants
+
+#### Default
+
+Used when no `variant` is specified. Prefer this unless another variant fits better, as below.
+
+<ComponentPreview name="button-default" />
+
+#### Primary
+
+Use sparingly for data insertion, confirming purchases, and other strong positive actions. Because it is so prominent, aim for at most one primary button in a viewport.
+
+<ComponentPreview name="button-demo" />
+
+#### Secondary
+
+Can be used for signaling a data or config change, but not as serious as a primary button.
+For destructive or side effect actions, use the `destructive` or `warning` variant.
+
+<ComponentPreview name="button-secondary" />
+
+#### Warning
+
+Used for actions that might have a side effect, but not as serious as a destructive action.
+
+<ComponentPreview name="button-warning" />
+
+#### Destructive (currently `danger`)
+
+Used for actions that will have a serious destructive side effect, like deleting data.
+
+prop `variant` will probably be changed to `destructive` in the future.
+
+<ComponentPreview name="button-destructive" />
+
+#### Outline
+
+Used for secondary actions, or actions that are not as important as the primary action.
+
+<ComponentPreview name="button-outline" />
+
+#### Ghost (currently `text`)
+
+Used for actions that are not as important as the primary action, or for actions that are not as important as the primary action.
+
+prop `variant` will probably be changed to `ghost` in the future.
+
+<ComponentPreview name="button-ghost" />
+
+#### Link
+
+Used for actions that are not as important as the primary action, or for actions that are not as important as the primary action.
+
+<ComponentPreview name="button-link" />
+
+### Only an icon
+
+Displaying only an Icon in a button.
+
+<Admonition type="note" title="This feature requires more support" className="mt-3">
+  We should update the button component to support this use case better.
+</Admonition>
+
+<ComponentPreview name="button-icon" />
+
+### As child
+
+Supports slot behavior with `asChild` prop.
+
+<ComponentPreview name="button-as-child" />
+
+### Split with dropdown
+
+Pair a button with a chevron `DropdownMenu` trigger when there are variations of the same action, or alternative ways to accomplish the same goal. The default or most likely option should be used on the exposed button.
+
+When secondary actions are related but distinct (not alternatives to the primary action) display the primary action as a button and place the rest in an overflow menu instead. See [Table multiple actions](./table#multiple-actions).
+
+<ComponentPreview name="button-split-dropdown" peekCode />
+
+Ensure the middle border is shared rather than doubled-up. Do not use `border-l-0` on the chevron button as that drops the divider on hover/focus. Instead:
+
+- Primary action: `rounded-r-none` and `hover:z-10` so its border stacks above the chevron on hover.
+- Chevron trigger: `rounded-l-none`, `shrink-0`, `px-[4px] py-[5px]`, and `-ml-px` to overlap the adjacent border by one pixel.
+- Both: `focus-visible:z-10` so the focus ring stacks above the neighbour, and `focus-visible:rounded-r-sm` / `focus-visible:rounded-l-sm` so the squared-off edge is slightly rounded while the ring is shown.
+- Chevron trigger only: `aria-label` describing the menu (the icon is decorative).
+
+Inside [Admonition](../fragments/admonition#split-button-with-dropdown) actions when `layout="responsive"`: also use `flex w-full @lg:w-auto` with `flex-1 @lg:flex-none` on the primary action.
+
+## Accessibility
+
+[Keyboard focus](../accessibility#focus-management) is automatically handled:
+
+- Enabled buttons default to `tabIndex={0}` (keyboard accessible)
+- Disabled buttons default to `tabIndex={-1}` (removed from tab order)
+- You can still override with an explicit `tabIndex` prop when needed
+- Keyboard focus uses the shared `focus-ring` utility; variants do not change ring colour
+
+You therefore don't need to manually set `tabIndex`, as Button handles it automatically based on its `disabled` state.

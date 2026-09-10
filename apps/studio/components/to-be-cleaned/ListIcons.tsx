@@ -1,7 +1,7 @@
-import { IconDatabase } from 'ui'
+import { Database } from 'lucide-react'
 
 export const vercelIcon = (
-  <div className="flex items-center justify-center rounded bg-black p-1">
+  <div className="flex items-center justify-center rounded-sm bg-black p-1">
     <svg
       className="m-auto fill-current text-white"
       width="12px"
@@ -14,12 +14,7 @@ export const vercelIcon = (
 )
 
 export const databaseIcon = (
-  <div className="flex items-center justify-center rounded bg-green-500 p-1 [[data-theme*=dark]_&]:text-typography-body-dark ">
-    {/* <SVG
-      src={'/icons/feather/database.svg'}
-      style={{ width: `12px`, height: `12px`, strokeWidth: '2px' }}
-      preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-white"')}
-    /> */}
-    <IconDatabase size={12} strokeWidth={2} />
+  <div className="flex items-center justify-center rounded-sm bg-green-500 p-1 in-data-[theme*=dark]:text-typography-body-dark ">
+    <Database size={12} strokeWidth={2} />
   </div>
 )

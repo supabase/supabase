@@ -1,12 +1,12 @@
-import { Element } from 'hast'
+import type { Element } from 'hast'
 import { hasProperty } from 'hast-util-has-property'
-import { Node } from 'unist'
+import type { Node } from 'unist'
 import { visit } from 'unist-util-visit'
 
 export type UrlTransformFunction = (url: string, node: Element) => string
 
 function modify(node: Element, prop: string, fn?: UrlTransformFunction) {
-  if (hasProperty(node, prop)) {
+  if (node.properties && hasProperty(node, prop)) {
     const property = node.properties[prop]
     if (typeof property !== 'string') {
       return

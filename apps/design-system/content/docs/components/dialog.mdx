@@ -1,0 +1,118 @@
+---
+title: Dialog
+description: A general-purpose modal for non-critical flows, forms, and custom interactions.
+component: true
+links:
+  doc: https://www.radix-ui.com/docs/primitives/components/dialog
+  api: https://www.radix-ui.com/docs/primitives/components/dialog#api-reference
+source:
+  radix: true
+  shadcn: true
+---
+
+Dialog is a flexible, general-purpose modal used for bespoke interactions such as forms, pickers, multi-step flows, or displaying non-urgent information. Unlike confirmation-focused dialogs, it is designed to be safely dismissible and does not force an explicit decision.
+
+Dialog can be closed by clicking outside the modal or pressing the Escape key, making it suitable for workflows where cancellation is expected and low-risk.
+
+Use Dialog when you need full control over layout, content, and behavior, and the interaction does not involve a critical or destructive action.
+
+For confirmations or warnings, try to use an existing component:
+
+- Use [Alert Dialog](../components/alert-dialog) for critical confirmations that require an explicit decision
+- Use [Confirmation Modal](../fragments/confirmation-modal) when additional context is needed for a confirmation
+- Use [Text Confirm Dialog](../fragments/text-confirm-dialog) for highly destructive actions that require typed intent
+
+See [Modality](../ui-patterns/modality) for guidance on choosing the appropriate dialog pattern.
+
+<ComponentPreview name="dialog-demo" peekCode wide />
+
+## Usage
+
+```tsx
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+```
+
+```tsx
+<Dialog>
+  <DialogTrigger>Open</DialogTrigger>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Project settings</DialogTitle>
+      <DialogDescription>
+        Update configuration options for this project. Changes can be discarded at any time.
+      </DialogDescription>
+    </DialogHeader>
+    {/* Custom content goes here */}
+  </DialogContent>
+</Dialog>
+```
+
+## Guidelines
+
+- **Use for non-critical interactions:** Dialog is appropriate when dismissal has no serious consequences.
+- **Design for cancellation**: Assume users may close the dialog without completing the action.
+- **Guard dirty forms on dismissal:** For form dialogs, keep `Dialog` dismissible but intercept close attempts when the form is dirty and show a discard-confirmation dialog (for example, Studio's `DiscardChangesConfirmationDialog` pattern via `useConfirmOnClose`).
+- **Keep focus contained**: Dialog content should remain scoped to a single task or flow.
+- **Avoid destructive confirmations**: If the dialog’s primary purpose is to confirm a risky action, use a confirmation-focused pattern instead.
+- **Compose freely**: Dialog is intentionally unopinionated. Build custom layouts, forms, or step-based flows as needed.
+
+## Examples
+
+### Custom close button
+
+<ComponentPreview name="dialog-close-button" />
+
+### Centered behavior
+
+You can control whether the dialog is centered by passing `centered={false}` to the `DialogContent` component.
+
+```tsx {3}
+<Dialog>
+  <ContextMenuTrigger>Click here</ContextMenuTrigger>
+  <DialogContent centered={false}>
+    {/*
+     * Content in here
+     */}
+  </DialogContent>
+</Dialog>
+```
+
+<ComponentPreview name="dialog-centered-off" />
+
+## Notes
+
+To activate the `Dialog` component from within a `Context Menu` or `Dropdown Menu`, you must encase the `Context Menu` or
+`Dropdown Menu` component in the `Dialog` component. For more information, refer to the linked issue [here](https://github.com/radix-ui/primitives/issues/1836).
+
+```tsx {7-11, 14-23}
+<Dialog>
+  <ContextMenu>
+    <ContextMenuTrigger>Show Menu</ContextMenuTrigger>
+    <ContextMenuContent>
+      <ContextMenuItem>Open</ContextMenuItem>
+      <ContextMenuItem>Download</ContextMenuItem>
+      <DialogTrigger asChild>
+        <ContextMenuItem>
+          <span>Show Dialog</span>
+        </ContextMenuItem>
+      </DialogTrigger>
+    </ContextMenuContent>
+  </ContextMenu>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Edit profile</DialogTitle>
+      <DialogDescription>Make changes to your profile here.</DialogDescription>
+    </DialogHeader>
+    <DialogFooter>
+      <Button>Save changes</Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+```

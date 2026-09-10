@@ -1,376 +1,250 @@
 ---
-id: 'connecting-to-postgres'
-title: 'Connecting to your database'
-description: 'Explore the options for connecting to your Postgres database.'
-subtitle: 'Explore the options for connecting to your Postgres database.'
+title: 'Connect to your database'
+description: 'Connect to Postgres from your frontend, backend, or serverless environment'
+subtitle: 'Supabase provides several ways to connect to your Postgres database, whether your code runs in the frontend, in a persistent backend, or in a serverless function.'
 ---
 
-Supabase provides several options for programmatically connecting to your Postgres database:
+Learn how to pick a connection method and where to find the connection string for it.
 
-1. Programmatic access using the Data APIs
-1. Connection pooling for scalable connections
-1. Direct connections using the built-in Postgres connection system
+- [Which connection method do you use?](#choose-a-connection-method) picks a method based on where your code runs.
+- [Get your connection string](#get-your-connection-string) shows where each string comes from.
+- [Configure your client](#configure-your-client) sets pool size, prepared statements, and SSL.
+- [Quickstarts](#quickstarts) connect a specific ORM or database GUI.
+
+For how pooling works and the limits that apply to your connections, see [Connection pooling and limits](/docs/guides/database/connecting-to-postgres/pooling-and-limits).
+
+## Which connection method do you use? [#choose-a-connection-method]
+
+How you connect to your database depends on where your code runs. Find your case in the table, then get the matching connection string.
+
+| Where your code runs                                      | Use                                                         | Why                                                                                           |
+| --------------------------------------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| A frontend application                                    | [Data API](#data-apis-and-client-libraries)                 | Works over REST or GraphQL, so you don't need a Postgres client. Requires Row Level Security. |
+| A serverless or edge function                             | [Shared pooler, transaction mode](#pooler-transaction-mode) | These environments open many short-lived connections.                                         |
+| A persistent backend on IPv6, or with the IPv4 add-on     | [Direct connection](#direct-connection)                     | No pooler in the path.                                                                        |
+| A persistent backend on an IPv4-only network              | [Shared pooler, session mode](#pooler-session-mode)         | The shared pooler is IPv4-only on every plan.                                                 |
+| A third-party tool, such as a BI client or database GUI   | [Shared pooler, session mode](#pooler-session-mode)         | Reachable over IPv4 from networks you don't control, and it supports prepared statements.     |
+| A high-performance application on a paid plan             | [Dedicated pooler](#dedicated-pooler)                       | Runs on the same machine as your database, so lower latency than the shared pooler.           |
+| Migrations, `pg_dump`, backup and restore, or replication | [Direct connection](#direct-connection)                     | These are single sessions and Postgres native commands.                                       |
 
 <Admonition type="caution">
 
-Direct database connections will start resolving to an IPv6 address. Starting from January 26, 2024, projects will be gradually migrated to this behavior. If you connect to your database using the REST or GraphQL endpoints, this doesn't affect you. If you use the database connection string, see the GitHub discussion on [how to prepare for IPv6](https://github.com/orgs/supabase/discussions/17817).
+The IPv4 add-on is not dual-stack: enabling it swaps the project's IPv6 (AAAA) DNS record for an IPv4 (A) record, so the project endpoint becomes reachable only over IPv4.
 
 </Admonition>
 
-## Data APIs
+For the host, port, and IP version of each mode, see [Endpoints and IP versions](#endpoints-and-ip-versions). For a named ORM or database GUI, see [Quickstarts](#quickstarts).
 
-Supabase provides auto-updating Data APIs. These are the easiest way to get started if you are managing data (fetching, inserting, updating). We provide several types of API to suit your preferences:
+## Get your connection string [#get-your-connection-string]
 
-- [REST](/docs/guides/api): interact with your database through a REST interface.
-- [GraphQL](/docs/guides/graphql/api): interact with your database through a GraphQL interface.
-- [Realtime](/docs/guides/realtime#realtime-api): listen to database changes over websockets.
+Connecting from a frontend application? You don't need a connection string. Skip to [Data APIs and client libraries](#data-apis-and-client-libraries), which uses your project URL and an API key instead.
 
-## Connection pooler
+For every Postgres connection mode, the string comes from the same place:
 
-A "connection pool" is a system (external to Postgres) which manages Postgres connections.
+1. Open your project in the [Supabase Dashboard](/dashboard/project/_).
+2. Click **Connect** at the top of the page.
+3. Choose the connection method you picked above.
+4. Copy the string and replace `[YOUR-PASSWORD]` with your database password. [Percent-encode](https://en.wikipedia.org/wiki/Percent-encoding) any reserved characters it contains, such as `&`, `#`, `?`, or a space.
 
-When a client makes a request, the pooler "allocates" an available connection to the client. When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
+The sections below show what each string looks like and when to use it. Take the host, port, and username from the string you copied rather than typing the bracketed placeholders literally. The pooler host in particular can't be composed from your region, and pooled connections use a different username from direct connections. Both are covered under [Endpoints and IP versions](#endpoints-and-ip-versions).
 
-<figure>
-  <Image
-    className="hidden dark:block"
-    alt="New migration files trigger migrations on the preview instance."
-    src="/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works.png"
-  />
-  <Image
-    className="dark:hidden"
-    alt="New migration files trigger migrations on the preview instance."
-    src="/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works--light.png"
-  />
-  <figcaption>Connecting to the database directly vs using a Connection Pooler</figcaption>
-</figure>
+### Direct connection [#direct-connection]
 
-Every Supabase project comes with a connection pooler for managing connections to your database. The pooler provides 2 important services:
+The direct connection string connects directly to your Postgres instance. Use it for persistent backends, such as virtual machines (VMs) and long-running containers. Examples include AWS EC2 machines, Fly.io VMs, and DigitalOcean Droplets.
 
-1. It manages connections for applications that connect and disconnect from the database frequently. For example, serverless functions and ORMs such as Prisma, Drizzle, and Kysely often make and drop connections to the database. If they connected directly each time, they would quickly exhaust your database server's memory. To connect to your database efficiently with such tools, you need a pooler.
-2. It provides an IPv4 endpoint to connect to your database, which you can use if your network provider doesn't support IPv6. This is unlike the direct database connection, which resolves to an IPv6 address, unless you've enabled the [IPv4 add-on](https://supabase.com/docs/guides/platform/ipv4-address).
+<Admonition type="caution">
 
-<Admonition type="tip">
-
-The connection pooler is available in 2 modes: `Transaction` and `Session`.
+Direct connections are on IPv6, or on IPv4 if the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address). If your network is IPv4-only and you don't have the add-on, use [session mode](#pooler-session-mode) instead.
 
 </Admonition>
 
-Transaction mode is recommended if you are connecting from serverless environments. A connection is assigned to the client for the duration of a transaction. Two consecutive transactions from the same client can be executed over two different connections. Some session-based Postgres features such as prepared statements are _not available_ with this option.
-
-Session mode is similar to connecting to your database directly. There is full support for prepared statements in this mode. When a new client connects, a connection is assigned to the client until it disconnects. You might run into pooler connection limits since the connection is held till the client disconnects.
-
-You can find the connection pool config in the [Database settings](/dashboard/project/_/settings/database) inside the dashboard:
-
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Under `Connection string`, make sure `Use connection pooling` is checked. Copy the URI.
-
-## Direct connections
-
-You can also use a direct connection to connect directly to your Postgres database. By default, you can connect to it via IPv6, which isn't supported by all networks. If you need an IPv4 address, use the [connection pooler](#connection-pooler) instead or enable the [IPv4 add-on](https://supabase.com/docs/guides/platform/ipv4-address).
-
-You can find the direct connection string in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
-
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Under `Connection string`, make sure `Use connection pooling` is unchecked. Copy the URI.
-
-## Choosing a connection method
-
-- Are you performing operations supported by the Data APIs? We recommend using the APIs.
-- Are you connecting to your database and then _disconnecting_ immediately (for example, are you running your code in a serverless environment)? Use the connection pooler in transaction mode.
-- Are you on a network that doesn't support IPv6? Use the connection pooler. (If you need a long-lived connection, for example for prepared statements, use session mode.)
-- Are you connecting to your database and _maintaining_ a connection, and does your network support IPv6? Use a direct connection.
-
-## Connecting with SSL
-
-You should connect to your database using SSL wherever possible, to prevent snooping and man-in-the-middle attacks.
-
-You can obtain your connection info and Server root certificate from your application's dashboard:
-
-![Connection Info and Certificate.](/docs/img/database/database-settings-ssl.png)
-
-## Integrations
-
-### Connecting with Drizzle
-
-[Drizzle ORM](https://github.com/drizzle-team/drizzle-orm) is a TypeScript ORM for SQL databases designed with maximum type safety in mind. You can use their ORM to connect to your database.
-
-<StepHikeCompact>
-
-  <StepHikeCompact.Step step={1}>
-
-    <StepHikeCompact.Details title="Install">
-
-    Install Drizzle and related dependencies.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-     ```shell
-     npm i drizzle-orm postgres
-     npm i -D drizzle-kit
-     ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={2}>
-
-    <StepHikeCompact.Details title="Create your models">
-
-    Create a `schema.ts` file and define your models.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-    ```ts schema.ts
-    import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
-
-    export const users = pgTable('users', {
-      id: serial('id').primaryKey(),
-      fullName: text('full_name'),
-      phone: varchar('phone', { length: 256 }),
-    });
-    ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={3}>
-
-    <StepHikeCompact.Details title="Connect">
-
-    Connect to your database using the Connection Pooler.
-
-    In your [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database), make sure `Use connection pooler` is checked, then copy the URI and save it as the `DATABASE_URL` environment variable. Remember to replace the password placeholder with your actual database password.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-    ```ts db.ts
-    import 'dotenv/config'
-
-    import { drizzle } from 'drizzle-orm/postgres-js'
-    import postgres from 'postgres'
-
-    const connectionString = process.env.DATABASE_URL
-
-    // Disable prefetch as it is not supported for "Transaction" pool mode
-    export const client = postgres(connectionString, { prepare: false })
-    export const db = drizzle(client);
-    ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-</StepHikeCompact>
-
-### Connecting with pgAdmin
-
-[`pgAdmin`](https://www.pgadmin.org/) is a GUI tool for managing Postgres databases. You can use it to connect to your database via SSL:
-
-<StepHikeCompact>
-
-  <StepHikeCompact.Step step={1}>
-
-    <StepHikeCompact.Details title="Register">
-
-    Register a new Postgres server.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-    <Image
-      className="hidden dark:block"
-      alt="Register a new postgres server."
-      src="/docs/img/guides/database/connecting-to-postgres/pgadmin/register-server-pgAdmin.png?v=2"
-    />
-    <Image
-      className="dark:hidden"
-      alt="Register a new postgres server."
-      src="/docs/img/guides/database/connecting-to-postgres/pgadmin/register-server-pgAdmin--light.png"
-    />
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={2}>
-
-    <StepHikeCompact.Details title="Name">
-
-    Name your server.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-     ![Name Postgres Server.](/docs/img/guides/database/connecting-to-postgres/pgadmin/name-pg-server.png)
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={3}>
-
-    <StepHikeCompact.Details title="Connect">
-
-    Add the connection info. Go to your [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database). Make sure `Use connection pooling` is enabled. Switch the connection mode to `Session` and copy your connection parameters.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-     ![Add Connection Info.](/docs/img/guides/database/connecting-to-postgres/pgadmin/add-pg-server-conn-info.png)
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={4}>
-
-    <StepHikeCompact.Details title="SSL">
-
-    Navigate to the Parameters tab and select connection parameter as Root Certificate. Next navigate to the Root certificate input, it will open up a file-picker modal. Select the certificate you downloaded from your Supabase dashboard and save the server details. PgAdmin should now be able to connect to your Postgres via SSL.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-     ![Add Connection Info.](/docs/img/guides/database/connecting-to-postgres/pgadmin/database-settings-host.png)
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-</StepHikeCompact>
-
-### Connecting with psql
-
-[`psql`](https://www.postgresql.org/docs/current/app-psql.html) is a command-line tool that comes with Postgres.
-
-Download your [SSL certificate](#connecting-with-ssl) to `/path/to/prod-supabase.cer`.
-
-Find your connection settings. Go to your [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database) and make sure `Use connection pooling` is checked. Change the connection mode to `Session`, and copy the parameters into the connection string:
-
-```shell
-psql "sslmode=verify-full sslrootcert=/path/to/prod-supabase.cer host=[CLOUD_PROVIDER]-0-[REGION].pooler.supabase.com dbname=postgres user=postgres.[PROJECT_REF]"
+```txt
+postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
 ```
 
-### Connecting with Prisma
+Get this string from the Supabase Dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
 
-Refer to our [Prisma integration guide](https://supabase.com/partners/integrations/prisma) for more details.
+### Shared pooler, session mode [#pooler-session-mode]
 
-### Connecting with Postgres.js
+The session mode connection string connects to your Postgres instance through the shared pooler. Use it as an alternative to a direct connection when you connect from an IPv4-only network.
 
-[Postgres.js](https://github.com/porsager/postgres) is a full-featured PostgreSQL client for Node.js and Deno.
+```txt
+postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:5432/postgres
+```
 
-<StepHikeCompact>
+Get this string from the Supabase Dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=session) and choosing **Session pooler**.
 
-  <StepHikeCompact.Step step={1}>
+### Shared pooler, transaction mode [#pooler-transaction-mode]
 
-    <StepHikeCompact.Details title="Install">
+The transaction mode connection string connects to your Postgres instance through the shared pooler in transaction-pooling mode. Use it for serverless and edge functions, which open many short-lived connections.
 
-    Install Postgres.js and related dependencies.
+<Admonition type="caution">
 
-    </StepHikeCompact.Details>
+Transaction mode does not support [prepared statements](https://postgresql.org/docs/current/sql-prepare.html). To avoid errors, turn them off in your connection library. See [Transaction mode limitations](#transaction-mode-limitations) for the setting your driver uses and for the other session-state features this affects.
 
-    <StepHikeCompact.Code>
+</Admonition>
 
-     ```shell
-     npm i postgres
-     ```
+```txt
+postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:6543/postgres
+```
 
-    </StepHikeCompact.Code>
+Get this string from the Supabase Dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=transaction) and choosing **Transaction pooler**.
 
-  </StepHikeCompact.Step>
+### Dedicated pooler [#dedicated-pooler]
 
-  <StepHikeCompact.Step step={2}>
+On paid plans, Supabase provisions a dedicated pooler that runs alongside your Postgres database. The dedicated pooler runs in transaction mode only. For session mode, use the [shared pooler](#pooler-session-mode). It is reachable over IPv6, or over IPv4 if the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address).
 
-    <StepHikeCompact.Details title="Connect">
+```txt
+postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:6543/postgres
+```
 
-    Create a `db.js` file with the connection details.
+Get this string from the Supabase Dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=transaction).
 
-    To get your connection details, go to your [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database). Make sure `Use connection pooling` is enabled. Choose `Transaction Mode` if you're on a platform with transient connections, such as a serverless function, and `Session Mode` if you have a long-lived connection. Copy the URI and save it as the environment variable `DATABASE_URL`.
+### Data APIs and client libraries [#data-apis-and-client-libraries]
 
-    </StepHikeCompact.Details>
+The Data APIs let you interact with your database using REST or GraphQL requests. You can use these APIs to fetch and insert data from the frontend, as long as your tables have [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) enabled and policies that allow the access. RLS with no policies denies every request.
 
-    <StepHikeCompact.Code>
+- [REST](/docs/guides/api)
+- [GraphQL](/docs/guides/graphql/api)
 
-    ```ts
-    // db.js
-    import postgres from 'postgres'
+For convenience, you can also use the [Supabase client libraries](/docs/reference), which wrap the Data APIs with a developer-friendly interface and handle authentication for you:
 
-    const connectionString = process.env.DATABASE_URL
-    const sql = postgres(connectionString)
+- [JavaScript](/docs/reference/javascript/introduction)
+- [Flutter](/docs/reference/dart/introduction)
+- [Swift](/docs/reference/swift)
+- [Python](/docs/reference/python/introduction)
+- [C#](/docs/reference/csharp/introduction)
+- [Kotlin](/docs/reference/kotlin/introduction)
 
-    export default sql
-    ```
+### Endpoints and IP versions [#endpoints-and-ip-versions]
 
-    </StepHikeCompact.Code>
+Each mode has its own host, port, and IP version support. IP version support depends on your plan and on whether the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address).
 
-  </StepHikeCompact.Step>
+| Mode                               | Host:Port                                       | Free | Paid | Paid + IPv4 add-on |
+| ---------------------------------- | ----------------------------------------------- | ---- | ---- | ------------------ |
+| Direct connection                  | `db.[PROJECT-REF].supabase.co:5432`             | IPv6 | IPv6 | IPv4               |
+| Shared pooler, session mode        | `aws-[INDEX]-[REGION].pooler.supabase.com:5432` | IPv4 | IPv4 | IPv4               |
+| Shared pooler, transaction mode    | `aws-[INDEX]-[REGION].pooler.supabase.com:6543` | IPv4 | IPv4 | IPv4               |
+| Dedicated pooler, transaction mode | `db.[PROJECT-REF].supabase.co:6543`             | -    | IPv6 | IPv4               |
 
-  <StepHikeCompact.Step step={3}>
+`[INDEX]` in the shared pooler host is a pooler cluster index, not part of the region name. A region can have more than one, so you can't work out your host from your region. Copy the host from the Connect dialog.
 
-    <StepHikeCompact.Details title="Execute commands">
+The username differs by connection type. Direct connections and the dedicated pooler use `postgres`. Shared pooler connections use `postgres.[PROJECT-REF]`. If you connect as a custom role through the shared pooler, the username is `[ROLE].[PROJECT-REF]`.
 
-    Use the connection to execute commands.
+The port routes the connection to the right pooler and mode. Port `5432` reaches Postgres for a direct connection and Supavisor for session mode. Port `6543` reaches PgBouncer for the dedicated pooler and Supavisor for shared transaction mode.
 
-    </StepHikeCompact.Details>
+To connect over IPv4, you have two options. The shared pooler is IPv4-only on every plan, in both session and transaction mode. Alternatively, add the [IPv4 add-on](/docs/guides/platform/ipv4-address) to your project, which makes the direct connection and the dedicated pooler reachable over IPv4 instead of IPv6.
 
-    <StepHikeCompact.Code>
+## Configure your client
 
-    ```ts
-    import sql from './db.js'
+A connection string on its own isn't enough. Your connection library keeps its own pool of connections, separate from the poolers Supabase runs, and its defaults assume a persistent backend.
 
-    async function getUsersOver(age) {
-      const users = await sql`
-        select name, age
-        from users
-        where age > ${ age }
-      `
-      // users = Result [{ name: "Walter", age: 80 }, { name: 'Murray', age: 68 }, ...]
-      return users
+In a serverless function:
+
+1. Create the client once at module scope, not per request.
+2. Set the pool to 1 connection. The client is shared by every invocation on that warm instance, so this caps the instance, not the request.
+3. Turn off prepared statements, which [transaction mode](#pooler-transaction-mode) doesn't support.
+4. Set SSL to `require`, so the driver refuses to connect without encryption.
+
+```ts lib/db.ts
+import postgres from 'postgres'
+
+export const sql = postgres(process.env.DATABASE_URL, {
+  max: 1,
+  prepare: false,
+  ssl: 'require',
+})
+```
+
+The rest of this section explains each setting, and what changes for a driver other than Postgres.js.
+
+### Application-side pool size
+
+Library defaults are too high for serverless. [Postgres.js](https://github.com/porsager/postgres) defaults to 10 connections. That is 10 connections for every warm instance of your function, and the number of warm instances isn't something you control. A few dozen instances is enough to exhaust the pool.
+
+Raise the pool above 1 only when you have evidence that concurrent invocations on one instance are queuing for the connection.
+
+For more on sizing an application-side pool, see the [Supavisor FAQ](/docs/guides/troubleshooting/supavisor-faq-YyP5tI). If you use Prisma, [Prisma troubleshooting](/docs/guides/database/prisma/prisma-troubleshooting) covers the equivalent `connection_limit` setting.
+
+### Transaction mode limitations
+
+[Transaction mode](#pooler-transaction-mode) returns your connection to the pool after each transaction, so anything that depends on session state doesn't survive between transactions. Three things are affected.
+
+**Prepared statements** aren't supported, so turn them off. Each driver does this differently:
+
+| Driver               | Setting                                   |
+| -------------------- | ----------------------------------------- |
+| Postgres.js, Drizzle | `prepare: false`                          |
+| Prisma               | `pgbouncer=true` on the connection string |
+| asyncpg              | `statement_cache_size=0`                  |
+| JDBC                 | `prepareThreshold=0`                      |
+
+For node-postgres, Psycopg, and Rust drivers, see [Disabling prepared statements](/docs/guides/troubleshooting/disabling-prepared-statements-qL8lEL).
+
+**Cursors** work inside a single transaction only. A `with hold` cursor is meant to outlive its transaction, and it doesn't survive the connection returning to the pool.
+
+**Session-level state** is lost between transactions. This covers `set` and `reset`, session-level advisory locks, `listen` and `notify`, and temporary tables. Run them inside the transaction that needs them, or use session mode or a direct connection instead.
+
+Direct connections and session mode support all three, so none of this applies to either.
+
+### SSL [#connecting-with-ssl]
+
+Connect using SSL wherever possible, to prevent snooping and man-in-the-middle attacks.
+
+Set SSL to `require` so the driver refuses to connect without encryption. Most drivers default to `prefer`, which falls back to sending your data in plaintext if the encrypted attempt fails. On a connection string, this is `sslmode=require`.
+
+`require` encrypts the connection but doesn't verify the server, so it doesn't stop a man-in-the-middle attack. To verify as well as encrypt, download your server root certificate from [Database settings](/dashboard/project/_/database/settings) in the Supabase Dashboard and point your driver at it. Downloading the certificate on its own changes nothing: the driver has to be told to use it, with `sslmode=verify-full` and `sslrootcert` on a connection string, or the equivalent option in your library. The same section has a toggle that rejects non-SSL connections to your database.
+
+![The SSL Configuration section of Database settings, with a toggle to enforce SSL on incoming connections and a Download Certificate button.](/docs/img/database/database-settings-ssl.png)
+
+### Stale connections
+
+Serverless runtimes freeze a function between requests, which can leave a pooled TCP socket stale. If you see `CONNECT_TIMEOUT` errors or queries that hang until the execution limit, see [Troubleshooting `CONNECT_TIMEOUT` or hanging queries in Serverless Functions](/docs/guides/troubleshooting/troubleshooting-connect_timeout-or-hanging-queries-in-vercel-serverless-functions-775f92).
+
+## Quickstarts [#quickstarts]
+
+Each quickstart connects one ORM or database GUI to your Supabase database.
+
+<div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-6   not-prose">
+  <NavData data="ormQuickstarts">
+    {(data) =>
+      data.items?.map((quickstart) => (
+        <Link key={quickstart.url} href={quickstart.url} passHref>
+          <GlassPanel
+            key={quickstart.name}
+            title={quickstart.name}
+            className="[&>div]:p-2 flex justify-center [&_p]:text-foreground-light"
+          />
+        </Link>
+      ))
     }
-    ```
+  </NavData>
+  <NavData data="guiQuickstarts">
+    {(data) =>
+      data.items?.map((quickstart) => (
+        <Link key={quickstart.url} href={quickstart.url} passHref>
+          <GlassPanel
+            key={quickstart.name}
+            title={quickstart.name}
+            className="[&>div]:p-2 flex justify-center [&_p]:text-foreground-light"
+          />
+        </Link>
+      ))
+    }
+  </NavData>
+</div>
 
-    </StepHikeCompact.Code>
+## Related
 
-  </StepHikeCompact.Step>
+- [Connection pooling and limits](/docs/guides/database/connecting-to-postgres/pooling-and-limits) explains poolers, pool size, and connection limits.
+- [Serverless drivers](/docs/guides/database/connecting-to-postgres/serverless-drivers) covers Vercel, Cloudflare Workers, and Supabase Edge Functions.
+- [Managing connections](/docs/guides/database/connection-management) covers monitoring and diagnosing stuck queries.
+- [Connecting with psql](/docs/guides/database/psql)
+- [Importing data into Supabase](/docs/guides/database/import-data)
 
-</StepHikeCompact>
+### Troubleshooting
 
-## Troubleshooting Supavisor
-
-Connection pooler logs are found [here](https://supabase.com/dashboard/project/_/logs/pooler-logs). The following are common errors and their solutions:
-
-- Max client connections reached
-  This error happens when the number of connections to Supavisor is more than [the allowed limit of your compute add-on](https://supabase.com/docs/guides/platform/compute-add-ons). Upgrade the database to a higher compute add-on to increase the number of Supavisor connections.
-
-- Connection failed \{:error, :eaddrnotavail} to 'db.xxx.supabase.co':5432
-  Supavisor cannot connect to the customer database. This is usually caused if the target database is unable to respond.
-
-- Connection failed \{:error, :nxdomain} to 'db.xxx.supabase.co':5432
-  Supavisor cannot connect to the customer database. This is usually caused if the target database is unable to respond.
-
-- Connection closed when state was authentication
-  This error happens when either the database doesn’t exist or if the user doesn't have the right credentials.
-
-- Subscribe error: \{:error, :worker_not_found}
-  This log event is emitted when the client tries to connect to the database, but Supavisor does not have the necessary information to route the connection. Try reconnecting to the database as it can take some time for the project information to propagate to Supavisor.
-
-- Subscribe error: \{:error, \{:badrpc, \{:error, \{:erpc, :timeout}}}}
-  This is a timeout error when the communication between different Supavisor nodes takes longer than expected. Try reconnecting to the database.
-
-- Terminating with reason :client_termination when state was :busy
-  This error happens when the client terminates the connection before the connection with the database is completed.
+- [Tenant or user not found](/docs/guides/troubleshooting/tenant-or-user-not-found), when the pooler can't match your host and username to a project.
+- [FATAL: Password authentication failed](/docs/guides/troubleshooting/fatal-password-authentication-failed)
+- [Connection refused](/docs/guides/troubleshooting/error-connection-refused-when-trying-to-connect-to-supabase-database-hwG0Dr), which is usually an IP ban rather than an outage.
+- [Too many connections](/docs/guides/troubleshooting/too-many-connections-for-database-postgres)

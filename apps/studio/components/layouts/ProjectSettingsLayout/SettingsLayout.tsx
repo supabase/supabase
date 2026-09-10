@@ -1,64 +1,47 @@
-import { useIsFeatureEnabled, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
-import { generateSettingsMenu } from './SettingsMenu.utils'
+import type { PropsWithChildren } from 'react'
 
-import { useParams } from 'common'
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { ProjectLayout } from '..'
-import { IS_PLATFORM } from 'lib/constants'
+import { ProjectLayout } from '../ProjectLayout'
+import { useGenerateSettingsMenu } from './SettingsMenu.utils'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
+import { withAuth } from '@/hooks/misc/withAuth'
 
-interface SettingsLayoutProps {
-  title?: string
-}
-
-const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
+/**
+ * Menu-only component for the settings section. Used by the desktop sidebar and by the
+ * mobile sheet submenu. Must not wrap ProjectLayout so that opening the settings submenu
+ * in the mobile sheet does not overwrite registerOpenMenu and break the menu button.
+ */
+export const SettingsProductMenu = () => {
   const router = useRouter()
-  const { ref } = useParams()
-  const project = useSelectedProject()
-  const organization = useSelectedOrganization()
 
-  useEffect(() => {
-    if (!IS_PLATFORM) {
-      router.push('/project/default')
-    }
-  }, [router])
-
-  // billing pages live under /billing/invoices and /billing/subscription, etc
-  // so we need to pass the [5]th part of the url to the menu
   const page = router.pathname.includes('billing')
     ? router.pathname.split('/')[5]
     : router.pathname.split('/')[4]
 
-  const {
-    projectAuthAll: authEnabled,
-    projectEdgeFunctionAll: edgeFunctionsEnabled,
-    projectStorageAll: storageEnabled,
-    billingInvoices: invoicesEnabled,
-  } = useIsFeatureEnabled([
-    'project_auth:all',
-    'project_edge_function:all',
-    'project_storage:all',
-    'billing:invoices',
-  ])
+  const menu = useGenerateSettingsMenu()
 
-  const menuRoutes = generateSettingsMenu(ref, project, organization, {
-    auth: authEnabled,
-    edgeFunctions: edgeFunctionsEnabled,
-    storage: storageEnabled,
-    invoices: invoicesEnabled,
-  })
+  return (
+    <>
+      <ProductMenuShortcuts menu={menu} />
+      <ProductMenu page={page} menu={menu} />
+    </>
+  )
+}
 
+interface SettingsLayoutProps {
+  title: string
+}
+
+export const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
   return (
     <ProjectLayout
       isBlocking={false}
-      title={title || 'Settings'}
       product="Settings"
-      productMenu={<ProductMenu page={page} menu={menuRoutes} />}
+      browserTitle={{ section: title }}
+      productMenu={<SettingsProductMenu />}
     >
-      <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-        {children}
-      </main>
+      {children}
     </ProjectLayout>
   )
 }

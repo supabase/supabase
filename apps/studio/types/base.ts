@@ -1,15 +1,14 @@
-import jsonLogic from 'json-logic-js'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import type { PermissionAction } from '@supabase/shared-types/out/constants'
+import type jsonLogic from 'json-logic-js'
 
-export interface Organization {
-  id: number
-  slug: string
-  name: string
-  billing_email: string
-  is_owner?: boolean
-  stripe_customer_id?: string
-  opt_in_tags: string[]
-  subscription_id?: string | null
+import type { OrganizationBase } from '@/data/organizations/organizations-query'
+import type { PlanId } from '@/data/subscriptions/types'
+import type { ManagedBy } from '@/lib/constants/infrastructure'
+
+export interface Organization extends OrganizationBase {
+  managed_by: ManagedBy
+  partner_id?: string
+  plan: { id: PlanId; name: string }
 }
 
 /**
@@ -33,15 +32,13 @@ export interface ProjectBase {
  */
 export interface Project extends ProjectBase {
   // available after projects.fetchDetail
-  connectionString?: string
+  connectionString?: string | null
   dbVersion?: string
-  kpsVersion?: string
   restUrl?: string
   lastDatabaseResizeAt?: string | null
   maxDatabasePreprovisionGb?: string | null
   parent_project_ref?: string
   is_branch_enabled?: boolean
-  serviceVersions: { gotrue: string; postgrest: string; 'supabase-postgres': string }
 
   /**
    * postgrestStatus is available on client side only.
@@ -77,8 +74,14 @@ export interface Role {
 export interface Permission {
   actions: PermissionAction[]
   condition: jsonLogic.RulesLogic
-  organization_id: number
+  organization_slug: string
   resources: string[]
+  restrictive?: boolean
+  /**
+   * Projects the row is limited to. Organization-wide rows arrive as [] or null — the API
+   * contract is nullable and some view-synthesized rows serialize as null.
+   */
+  project_refs: string[] | null
 }
 
 export interface ResponseFailure {
@@ -87,11 +90,43 @@ export interface ResponseFailure {
 
 export type SupaResponse<T> = T | ResponseFailure
 
-export interface ResponseError {
-  code?: number
-  message: string
-  requestId?: string
+// [Joshen] Trialing returning metadata for the error object. It's meant to be generic
+// but typed properly here, and we can create more types if needed with the | operator
+type CostMetadata = {
+  cost: number
+  sql: string
 }
+
+export type ErrorMetadata = CostMetadata
+
+export class ResponseError extends Error {
+  code?: number
+  requestId?: string
+  retryAfter?: number
+  requestPathname?: string
+  metadata?: CostMetadata
+  errorType?: string
+  formattedError?: string
+
+  constructor(
+    message: string | undefined,
+    code?: number,
+    requestId?: string,
+    retryAfter?: number,
+    requestPathname?: string,
+    metadata?: CostMetadata,
+    formattedError?: string
+  ) {
+    super(message || 'API error happened while trying to communicate with the server.')
+    this.code = code
+    this.requestId = requestId
+    this.retryAfter = retryAfter
+    this.requestPathname = requestPathname
+    this.metadata = metadata
+    this.formattedError = formattedError
+  }
+}
+
 export interface Dictionary<T> {
   [Key: string]: T
 }

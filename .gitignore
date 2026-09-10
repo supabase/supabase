@@ -7,6 +7,8 @@ tmp
 *.swp
 
 coverage
+# vitest reporter output (json/junit/html/attachments)
+.vitest
 allure-results
 allure-report
 .nyc_output
@@ -63,6 +65,9 @@ typings/
 # TypeScript cache
 *.tsbuildinfo
 
+# Next.js declaration files (auto-generated)
+next-env.d.ts
+
 # Optional npm cache directory
 .npm
 
@@ -109,9 +114,18 @@ typings/
 # DynamoDB Local files
 .dynamodb/
 
-.vscode
+.vscode/*
+!.vscode/content-listing.code-snippets
 .idea
 .vercel
+
+# AI assistant local files
+.claude/*
+!.claude/settings.json
+!.claude/scripts/
+!.claude/skills
+.agents/skills/me-*
+CLAUDE.local.md
 
 #include template .env file for docker-compose
 !docker/.env
@@ -127,12 +141,33 @@ apps/new-docs/*
 # UI tokens
 packages/ui/tokens/**/*.json
 
-# UI Storybook build
-packages/ui/storybook-static
-
 # For self-hosted logs: https://github.com/supabase/supabase/blob/86e3ab20abfdb9c3e666334d3d2f8efeef9ccf2c/docker/docker-compose-logging.yml#L101
 gcloud.json
 
 # sitemaps
 # apps/www/public/*.xml
 # apps/docs/public/*.xml
+
+# CLI version file
+.temp/cli-latest
+
+.pnpm-store/*
+
+# Sentry CLI config
+**/.sentryclirc
+
+keys.json
+
+# Playwright MCP
+.playwright-mcp/*
+
+# Application
+**/.superset/**
+
+# examples
+examples/**/package-lock.json
+examples/**/yarn.lock
+examples/**/pnpm-lock.yaml
+
+# local-only lockfile for the mcp-server registry block
+apps/ui-library/registry/default/blocks/mcp-server/supabase/functions/mcp-server/deno.lock

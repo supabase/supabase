@@ -1,5 +1,10 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { getMigrationsSql } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
+
+import { databaseKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { PROJECT_STATUS } from '@/lib/constants'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DatabaseMigration = {
   version: string
@@ -7,45 +12,49 @@ export type DatabaseMigration = {
   statements?: string[]
 }
 
-export const getMigrationsQuery = () => {
-  const sql = /* SQL */ `
-    select
-      *
-    from supabase_migrations.schema_migrations sm
-    order by sm.version desc
-  `.trim()
-
-  return sql
-}
-
 export type MigrationsVariables = {
   projectRef?: string
-  connectionString?: string
+  projectStatus?: string
+  connectionString?: string | null
 }
 
-export type MigrationsData = { result: DatabaseMigration[] }
-export type MigrationsError = unknown
-
-export const useMigrationsQuery = <TData extends MigrationsData = MigrationsData>(
+export async function getMigrations(
   { projectRef, connectionString }: MigrationsVariables,
-  options: UseQueryOptions<ExecuteSqlData, MigrationsError, TData> = {}
-) => {
-  return useExecuteSqlQuery(
-    {
-      projectRef,
-      connectionString,
-      sql: getMigrationsQuery(),
-      queryKey: ['migrations'],
-      handleError: (error: { code: number; message: string; requestId: string }) => {
-        if (
-          error.message.includes('relation "supabase_migrations.schema_migrations" does not exist')
-        ) {
-          return { result: [] }
-        } else {
-          throw error
-        }
-      },
-    },
-    options
-  )
+  signal?: AbortSignal
+) {
+  const sql = getMigrationsSql()
+
+  try {
+    const { result } = await executeSql(
+      { projectRef, connectionString, sql, queryKey: ['migrations'] },
+      signal
+    )
+
+    return result as DatabaseMigration[]
+  } catch (error) {
+    if (
+      (error as ResponseError).message.includes(
+        'relation "supabase_migrations.schema_migrations" does not exist'
+      )
+    ) {
+      return []
+    }
+
+    throw error
+  }
 }
+
+export type MigrationsData = Awaited<ReturnType<typeof getMigrations>>
+export type MigrationsError = ResponseError
+
+export const useMigrationsQuery = <TData = MigrationsData>(
+  { projectRef, projectStatus, connectionString }: MigrationsVariables,
+  { enabled = true, ...options }: UseCustomQueryOptions<MigrationsData, MigrationsError, TData> = {}
+) =>
+  useQuery<MigrationsData, MigrationsError, TData>({
+    queryKey: databaseKeys.migrations(projectRef),
+    queryFn: ({ signal }) => getMigrations({ projectRef, connectionString }, signal),
+    enabled:
+      enabled && typeof projectRef !== 'undefined' && projectStatus !== PROJECT_STATUS.COMING_UP,
+    ...options,
+  })

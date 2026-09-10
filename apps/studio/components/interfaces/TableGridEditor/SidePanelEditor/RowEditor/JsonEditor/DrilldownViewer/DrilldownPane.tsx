@@ -1,7 +1,7 @@
 import { isNull, noop } from 'lodash'
-import { IconChevronRight } from 'ui'
+import { ChevronRight } from 'lucide-react'
 
-import type { Dictionary } from 'types'
+import type { Dictionary } from '@/types'
 
 interface DrilldownPaneProps {
   pane: number
@@ -51,22 +51,24 @@ const DrilldownPane = ({ pane, jsonData, activeKey, onSelectKey = noop }: Drilld
             `}
           onClick={() => onSelectKey(key, pane)}
         >
-          <p className="font-mono text-xs !text-blue-900">{key}</p>
+          <p className="font-mono text-xs text-blue-900!">{key}</p>
           <div
             className={`${
               key === activeKey ? 'opacity-100' : 'opacity-50'
             } group-hover:opacity-100 transition`}
           >
-            <IconChevronRight strokeWidth={2} size={16} />
+            <ChevronRight strokeWidth={2} size={16} />
           </div>
         </div>
       ))}
       {keysWithoutChildren.map((key: string) => (
         <div key={key} className="flex space-x-2 py-2 px-5">
-          <p className="font-mono text-xs !text-blue-900">{key}:</p>
+          <p className="font-mono text-xs text-sky-800! dark:text-blue-900!">{key}:</p>
           <p
             className={`break-all font-mono text-xs ${
-              typeof jsonData[key] !== 'string' ? '!text-green-900' : '!text-yellow-900'
+              typeof jsonData[key] !== 'string'
+                ? 'text-purple-900! dark:text-green-900!'
+                : 'text-lime-800! dark:text-yellow-900!'
             }`}
           >
             {isNull(jsonData[key])

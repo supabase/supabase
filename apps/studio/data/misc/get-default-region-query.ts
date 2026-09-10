@@ -1,30 +1,48 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { useFlag } from 'common'
+import type { CloudProvider } from 'shared-data'
+import { AWS_REGIONS } from 'shared-data'
 
-import type { ResponseError } from 'types'
 import { miscKeys } from './keys'
-import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
-import { getDistanceLatLonKM } from 'lib/helpers'
-import {
-  AWS_REGIONS_COORDINATES,
-  FLY_REGIONS_COORDINATES,
-} from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { AWS_REGIONS, FLY_REGIONS } from 'lib/constants'
-
-const RESTRICTED_POOL = ['WEST_US', 'CENTRAL_EU', 'SOUTHEAST_ASIA']
+import { COUNTRY_LAT_LON } from '@/components/interfaces/ProjectCreation/ProjectCreation.constants'
+import { getAvailableRegions } from '@/components/interfaces/ProjectCreation/ProjectCreation.utils'
+import { AWS_REGIONS_COORDINATES } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { fetchHandler } from '@/data/fetchers'
+import { getDistanceLatLonKM, tryParseJson } from '@/lib/helpers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DefaultRegionVariables = {
-  cloudProvider?: 'AWS' | 'FLY'
+  cloudProvider?: CloudProvider
+  restrictedPool?: string[]
   useRestrictedPool?: boolean
+}
+
+// The geolocation-based default may only ever pick a region the selected cloud provider
+// actually offers (e.g. AWS_NIMBUS is restricted to a single region). The flag-based
+// restricted pool narrows within that set, and is ignored if it would leave no candidates.
+export function getDefaultRegionCandidateKeys(
+  cloudProvider: CloudProvider,
+  restrictedPool?: string[],
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT
+) {
+  const providerRegionKeys = Object.keys(getAvailableRegions(cloudProvider, environment))
+  const pooledRegionKeys = restrictedPool
+    ? providerRegionKeys.filter((key) => restrictedPool.includes(key))
+    : providerRegionKeys
+  return pooledRegionKeys.length > 0 ? pooledRegionKeys : providerRegionKeys
 }
 
 export async function getDefaultRegionOption({
   cloudProvider,
+  restrictedPool,
   useRestrictedPool = true,
 }: DefaultRegionVariables) {
   if (!cloudProvider) throw new Error('Cloud provider is required')
 
   try {
-    const data = await fetch('https://www.cloudflare.com/cdn-cgi/trace').then((res) => res.text())
+    const data = await fetchHandler('https://www.cloudflare.com/cdn-cgi/trace').then((res) =>
+      res.text()
+    )
     const locationCode: keyof typeof COUNTRY_LAT_LON = Object.fromEntries(
       data.split('\n').map((item) => item.split('='))
     )['loc']
@@ -32,26 +50,25 @@ export async function getDefaultRegionOption({
 
     if (locLatLon === undefined) return undefined
 
-    const allRegions = cloudProvider === 'AWS' ? AWS_REGIONS_COORDINATES : FLY_REGIONS_COORDINATES
-    const locations = useRestrictedPool
-      ? Object.entries(allRegions)
-          .filter((x) => RESTRICTED_POOL.includes(x[0]))
-          .reduce((o, val) => ({ ...o, [val[0]]: val[1] }), {})
-      : allRegions
+    const candidateKeys = getDefaultRegionCandidateKeys(
+      cloudProvider,
+      useRestrictedPool ? restrictedPool : undefined
+    )
+    const locations = Object.fromEntries(
+      Object.entries(AWS_REGIONS_COORDINATES).filter(([key]) => candidateKeys.includes(key))
+    )
 
     const distances = Object.keys(locations).map((reg) => {
       const region: { lat: number; lon: number } = {
-        lat: locations[reg as keyof typeof locations][1],
-        lon: locations[reg as keyof typeof locations][0],
+        lat: locations[reg][1],
+        lon: locations[reg][0],
       }
       return getDistanceLatLonKM(locLatLon.lat, locLatLon.lon, region.lat, region.lon)
     })
     const shortestDistance = Math.min(...distances)
     const closestRegion = Object.keys(locations)[distances.indexOf(shortestDistance)]
 
-    return cloudProvider === 'AWS'
-      ? AWS_REGIONS[closestRegion as keyof typeof AWS_REGIONS]
-      : FLY_REGIONS[closestRegion as keyof typeof FLY_REGIONS]
+    return AWS_REGIONS[closestRegion as keyof typeof AWS_REGIONS].displayName
   } catch (error) {
     throw error
   }
@@ -62,16 +79,23 @@ export type DefaultRegionError = ResponseError
 
 export const useDefaultRegionQuery = <TData = DefaultRegionData>(
   { cloudProvider, useRestrictedPool }: DefaultRegionVariables,
-  { enabled = true, ...options }: UseQueryOptions<DefaultRegionData, DefaultRegionError, TData> = {}
-) =>
-  useQuery<DefaultRegionData, DefaultRegionError, TData>(
-    miscKeys.defaultRegion(cloudProvider, useRestrictedPool ?? true),
-    () => getDefaultRegionOption({ cloudProvider, useRestrictedPool }),
-    {
-      enabled: enabled && typeof cloudProvider !== 'undefined',
-      retry(failureCount) {
-        return failureCount < 1
-      },
-      ...options,
-    }
-  )
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<DefaultRegionData, DefaultRegionError, TData> = {}
+) => {
+  // [Joshen] Flag allows us to specify restricted regions for users based on percentage
+  const restrictedPoolFlag = useFlag('defaultRegionRestrictedPool')
+  const restrictedPool = tryParseJson(restrictedPoolFlag)
+
+  return useQuery<DefaultRegionData, DefaultRegionError, TData>({
+    queryKey: miscKeys.defaultRegion(cloudProvider, useRestrictedPool ?? true),
+    queryFn: () => getDefaultRegionOption({ cloudProvider, restrictedPool, useRestrictedPool }),
+    enabled:
+      enabled && typeof cloudProvider !== 'undefined' && typeof restrictedPool !== 'undefined',
+    retry(failureCount) {
+      return failureCount < 1
+    },
+    ...options,
+  })
+}

@@ -1,0 +1,170 @@
+---
+title: Accessibility
+description: Make Supabase work for everyone.
+---
+
+Accessibility is about making an interface work for as many people as possible across as many circumstances as possible. All of us lean on affordances that accessible experiences provide:
+
+- Keyboard navigation
+- Legible and resizable elements
+- Large tap targets
+- Clear and simple language
+
+## Checklist
+
+About to push some code? At a minimum, check your work against this list:
+
+- Are interactive page elements [keyboard-focusable](#focus-management)?
+- Are all elements announcable by a [screen reader](#screen-reader-support)?
+- Are textual elements legible and scalable?
+- Can I use this on a smaller and/or older device?
+
+## Focus management
+
+All interactive page elements should be reachable by keyboard. Given the below inconsistency between devices and browsers, add `tabIndex={0}` to all buttons, links, and non-text inputs, ideally at the component level. Consider tying the state of `tabIndex` to the `disabled` state of a component, if applicable.
+
+Chromium-based browsers and Firefox handle this automatically via the Tab key. Safari, by default, requires the Option key to also be held down. Enabling _Keyboard navigation_ on macOS Settings [removes this requirement](https://mayank.co/blog/safari-focus/#keyboard-navigation) but makes links non-tabbable as a result.
+
+Interactive page elements should also provide visual feedback upon selection via a `focus-visible` state. We use one shared focus ring so users recognize this state instantly.
+
+### Focus ring recipe
+
+Prefer the shared utilities over inventing local styles:
+
+| Utility       | Use when                                                                   |
+| ------------- | -------------------------------------------------------------------------- |
+| `focus-ring`  | Buttons, inputs, and most controls (offset **ring**)                       |
+| `focus-inset` | Dense or flush surfaces such as interactive table rows (inset **outline**) |
+
+```tsx
+className = 'focus-ring'
+// or
+className = 'relative cursor-pointer focus-inset'
+```
+
+These expand to:
+
+**`focus-ring`**
+
+```txt
+outline-hidden
+focus-visible:ring-2
+focus-visible:ring-ring
+focus-visible:ring-offset-2
+focus-visible:ring-offset-background
+```
+
+**`focus-inset`**
+
+Uses `outline` (not `ring`) so it paints reliably on interactive `<tr>`s. Tailwind `ring` is `box-shadow`, which browsers often skip on `display: table-row` (notably Safari). Do not put `focus-ring` or raw `ring-*` on a `<tr>`, and do not add `outline-hidden` alongside `focus-inset`. `outline-hidden` sets `outline-style: none` and will hide the indicator.
+
+```txt
+outline: 2px solid transparent
+outline-offset: -2px
+transition-property: color, background-color, border-color, ...
+
+&:focus-visible {
+  outline-color: var(--ring)
+  border-radius: var(--radius-md)
+}
+```
+
+`focus-ring` keeps `outline-hidden` always on so mouse clicks do not show the browser’s default outline. `focus-inset` reserves a transparent outline instead. Its transition property list deliberately excludes outline properties so the keyboard focus indicator appears immediately, even when a call site uses `transition-all`.
+
+Rules:
+
+- Prefer `:focus-visible` over `:focus` so click/tap does not show a focus indicator
+- Never use `outline-none` / `outline-hidden` without a ring or outline replacement
+- Always use the shared color (`ring-ring` / `outline-ring`). Variants (primary, danger, warning) do not change focus colour
+- Do not animate the focus indicator; avoid `transition-all` / `transition` on controls that show one (prefer `transition-colors`)
+- Prefer `focus-ring` / `focus-inset` over copy-pasting the class stack
+- On interactive `<tr>`s, use `focus-inset` only. `focus-ring` will look fine in some browsers and invisible in others
+
+When the focused element is not the thing that should show the ring (e.g. a wrapping `Link` with `group`, or an `InputGroup` parent using `:has()`), keep the explicit `group-focus-visible:ring-*` / `has-[…]:focus-visible:ring-*` stack. The utilities bake in `:focus-visible` on the same element and do not compose as `group-focus-visible:focus-ring`.
+
+[Button](components/button) has focus, `tabIndex`, and the shared ring built-in. The same explicit `tabIndex` default is also baked into Checkbox, Switch, Select Trigger, Toggle, Accordion Trigger, Collapsible Trigger, Dropdown Menu Trigger, Popover Trigger, Dialog Trigger, Sheet Trigger, Alert Dialog Trigger, and the Sidebar Menu and action buttons. Bespoke interactive elements however, such as the below interactive [Table Row](components/table#examples), require these props to be added manually:
+
+```tsx showLineNumbers {4-14}
+<TableRow
+  key={id}
+  className="relative cursor-pointer h-16 focus-inset"
+  onClick={(event) => {
+    if (event.currentTarget !== event.target) return
+    handleBucketNavigation(bucket.id, event)
+  }}
+  onKeyDown={(event) => {
+    if (event.currentTarget !== event.target) return
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleBucketNavigation(bucket.id, event)
+    }
+  }}
+  tabIndex={0}
+>
+  <TableCell>{name}</TableCell>
+</TableRow>
+```
+
+Consider also affordances like `ctrl` and `meta` key support for opening in a new tab. Anything that you can do with a mouse input should be replicable by keyboard.
+
+See the examples within [Table](components/table#examples) for more.
+
+### Radio groups
+
+Single-select option groups such as `<input type="radio">` should behave as a single control. Only the first item of radio groups should become focused with the Tab key. The next Tab should move focus from the group to the next focusable control.
+
+Individual options inside of a group can be reached by arrow keys (↑ ↓ ← →). Space is the canonical key to activate radio options, with Enter being a secondary affordance.
+
+### Jumping ahead
+
+Some keyboard-navigable content may contain hundreds or thousands of items. Help users jump to specific content with:
+
+- Search and filtering
+- Pagination or virtualization
+- Skip links and “jump to” shortcuts
+
+Apps with persistent header and sidebar chrome should expose a skip link as the first focusable element. Use the shared [Skip to Content](fragments/skip-to-content) fragment which owns the component API, usage sample, and target landmark contract.
+
+## Screen readers
+
+Textual elements are supported out-of-the-box by screen readers.
+
+### Imagery
+
+Images should have their contents described with an `alt` attribute. Write an objective description of the content rather than its context. For example:
+
+```tsx showLineNumbers {2}
+// Correct: painting a picture with words
+<img src="beagle.png" alt="A tricolor beagle galloping through a grassy field, ears in the air" />
+
+// Incorrect: Unhelpful context
+<img src="beagle.png" alt="Our logo" />
+```
+
+Icons and other visual elements that aren’t strictly images should use the `aria-label` attribute. For example:
+
+```tsx showLineNumbers {2}
+<BucketTableCell>
+  <BucketIcon aria-label="bucket icon" size={16} />
+</BucketTableCell>
+```
+
+Visual elements that are _purely_ visual aids may be removed from the accessibility tree via the `aria-hidden` attribute. For example:
+
+```tsx showLineNumbers {2}
+<BucketTableCell>
+  <ChevronRight aria-hidden={true} size={14} />
+</BucketTableCell>
+```
+
+Never use `aria-hidden={true}` on focusable elements, since these are critical pieces of functionality.
+
+### Scaffolding
+
+Some scaffolding elements only make sense visually, in the context of surrounding visual content. For example: a table column for actions may not have a visual _Actions_ label because its purpose is obvious (by nearby contents) to a sighted person. For everyone else’s sake, this column should be titled with `sr-only` text:
+
+```tsx showLineNumbers {2}
+<TableHead>
+  <span className="sr-only">Actions</span>
+</TableHead>
+```

@@ -1,6 +1,6 @@
 ## Resumable Uploads with Supabase Storage and Uppy
 
-This example shows how to use [Supabase Storage](https://supabase.io/docs/reference/javascript/storage) with [Uppy](https://uppy.io/) to upload files to Supabase Storage using the TUS protocol (resumable uploads).
+This example shows how to use [Supabase Storage](https://supabase.com/docs/reference/javascript/storage) with [Uppy](https://uppy.io/) to upload files to Supabase Storage using the TUS protocol (resumable uploads).
 
 ### Running the example
 
@@ -10,7 +10,7 @@ This example shows how to use [Supabase Storage](https://supabase.io/docs/refere
 - Open the index.html file and replace the following variables with your own:
 
 ```js
-const SUPABASE_ANON_KEY = '' // your project's anon key
+const SUPABASE_PUBLISHABLE_KEY = '' // your project's publishable key
 const SUPABASE_PROJECT_ID = '' // your project ref
 const STORAGE_BUCKET = '' // your storage bucket name
 const BEARER_TOKEN = '' // your bearer token

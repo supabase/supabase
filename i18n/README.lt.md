@@ -7,11 +7,11 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) yra atvirojo kodo Firebase alternatyva. Kuriame "Firebase" funkcijas naudodami įmonių klasės atvirojo kodo įrankius.
+[Supabase](https://supabase.com) yra atvirojo kodo „Firebase" alternatyva. Kuriame „Firebase" funkcijas naudodami įmonių-lygmens atvirojo kodo įrankius.
 
 - [x] Prieglobos Postgres duomenų bazė. [Dokumentai](https://supabase.com/docs/guides/database)
-- [x] Autentiškumo nustatymas ir autorizavimas. [Dokumentai](https://supabase.com/docs/guides/auth)
-- [x] Automatiškai generuojamos API.
+- [x] Autentifikacijos nustatymas ir autorizavimas. [Dokumentai](https://supabase.com/docs/guides/auth)
+- [x] Automatiškai generuojami API.
   - [x] REST. [Dokumentai](https://supabase.com/docs/guides/api#rest-api-overview)
   - [x] GraphQL. [Dokumentai](https://supabase.com/docs/guides/api#graphql-api-overview)
   - [x] Realaus laiko prenumeratos. [Dokumentai](https://supabase.com/docs/guides/api#realtime-api-overview)
@@ -25,7 +25,7 @@
 
 ## Dokumentacija
 
-Išsamios dokumentacijos rasite [supabase.com/docs](https://supabase.com/docs)
+Išsamias dokumentacijas rasite [supabase.com/docs](https://supabase.com/docs)
 
 Norėdami sužinoti, kaip prisidėti, apsilankykite [Getting Started](../DEVELOPERS.md)
 
@@ -106,11 +106,11 @@ Mūsų požiūris į klientų bibliotekas yra modulinis. Kiekviena dalinė bibli
   <tr>
     <td>JavaScript (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
-    <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
-    <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
-    <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
-    <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
-    <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/auth-js" target="_blank" rel="noopener noreferrer">auth-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
   </tr>
     <tr>
     <td>Flutter</td>

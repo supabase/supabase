@@ -1,3 +1,4 @@
+**/dgph
 *.mode1v3
 *.mode2v3
 *.moved-aside
@@ -25,7 +26,6 @@ Flutter/flutter_assets/
 Flutter/flutter_export_environment.sh
 ServiceDefinitions.json
 Runner/GeneratedPluginRegistrant.*
-**/dgph
 
 # Exceptions to above rules.
 !default.mode1v3

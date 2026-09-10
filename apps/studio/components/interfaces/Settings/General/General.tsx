@@ -1,240 +1,272 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronRight } from 'lucide-react'
-import Link from 'next/link'
-import toast from 'react-hot-toast'
+import { IS_PLATFORM, useParams } from 'common'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Input } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-  Form,
-  IconAlertCircle,
-  IconBarChart2,
-  Input,
-} from 'ui'
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import * as z from 'zod'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  FormActions,
-  FormHeader,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
-import Panel from 'components/ui/Panel'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
-import { useCheckPermissions, useFlag, useProjectByRef, useSelectedOrganization } from 'hooks'
-import PauseProjectButton from './Infrastructure/PauseProjectButton'
-import RestartServerButton from './Infrastructure/RestartServerButton'
+import { AVAILABLE_REPLICA_REGIONS } from '../Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { ProjectAccessSection } from './ProjectAccessSection'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useBranchesQuery } from '@/data/branches/branches-query'
+import { useProjectUpdateMutation } from '@/data/projects/project-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
-const General = () => {
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
+export const General = () => {
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const isBranch = Boolean(project?.parent_project_ref)
+  const entityLabel = isBranch ? 'Branch' : 'Project'
 
-  // Also doubles up as a feature flag to enable display of the related alert,
-  // another dedicated flag would be redundant.
-  const v2AnnouncementUrl = useFlag('v2AnnouncementUrl')
+  const { data: branches } = useBranchesQuery(
+    { projectRef: project?.parent_project_ref },
+    { enabled: isBranch }
+  )
+  const branch = branches?.find((x) => x.project_ref === ref)
+  const projectName = isBranch ? branch?.name : project?.name
 
-  const v2MaintenanceWindow = project?.v2MaintenanceWindow
-  const v2MaintenanceDate = v2MaintenanceWindow?.start
-    ? new Date(v2MaintenanceWindow.start).toUTCString().slice(0, 16)
-    : undefined
-  const v2MaintenanceStartTime = v2MaintenanceWindow?.start?.substring(11, 16)
-  const v2MaintenanceEndTime = v2MaintenanceWindow?.end?.substring(11, 16)
-
-  const parentProject = useProjectByRef(project?.parent_project_ref)
-  const isBranch = parentProject !== undefined
-
-  const formId = 'project-general-settings'
-  const initialValues = { name: project?.name ?? '', ref: project?.ref ?? '' }
-  const canUpdateProject = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+  const { can: canUpdateProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
       project_id: project?.id,
     },
   })
 
-  const { mutateAsync: updateProject, isLoading: isUpdating } = useProjectUpdateMutation()
+  const { mutate: updateProject, isPending: isUpdating } = useProjectUpdateMutation()
 
-  const onSubmit = async (values: any, { resetForm }: any) => {
+  const formSchema = z.object({
+    name: z.string().trim().min(3, 'Project name must be at least 3 characters long'),
+  })
+
+  const defaultValues = { name: projectName ?? '' }
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues,
+    values: defaultValues,
+    mode: 'onSubmit',
+    reValidateMode: 'onBlur',
+  })
+
+  const regionLabel = AVAILABLE_REPLICA_REGIONS.find((region) =>
+    project?.region?.includes(region.region)
+  )
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!project?.ref) return console.error('Ref is required')
-    try {
-      const { name } = await updateProject({ ref: project.ref, name: values.name.trim() })
-      resetForm({ values: { name }, initialValues: { name } })
-      toast.success('Successfully saved settings')
-    } catch (error) {}
+
+    updateProject(
+      { ref: project.ref, name: values.name.trim() },
+      {
+        onSuccess: ({ name }) => {
+          form.reset({ name })
+          toast.success('Successfully saved settings')
+        },
+      }
+    )
+  }
+
+  const { isCli, isSelfHosted } = useDeploymentMode()
+
+  if (!IS_PLATFORM) {
+    return (
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>General settings</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent className="space-y-4">
+          {project === undefined ? (
+            <Card>
+              <CardContent>
+                <GenericSkeletonLoader />
+              </CardContent>
+            </Card>
+          ) : (
+            <Form {...form}>
+              <Card>
+                <CardContent>
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Project name"
+                    className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
+                  >
+                    <Input readOnly value={project.name ?? ''} />
+                  </FormItemLayout>
+                </CardContent>
+              </Card>
+            </Form>
+          )}
+          {isCli && (
+            <Admonition
+              type="default"
+              title="Local development with the Supabase CLI"
+              description={
+                <p>
+                  Project settings are configured in{' '}
+                  <code className="text-code-inline">supabase/config.toml</code> — applied on{' '}
+                  <code className="text-code-inline">supabase start</code>.
+                </p>
+              }
+              actions={<DocsButton href={`${DOCS_URL}/guides/local-development`} />}
+            />
+          )}
+          {isSelfHosted && (
+            <Admonition
+              type="default"
+              title="Self-hosted Supabase"
+              description={<p>Project settings are configured via environment variables.</p>}
+              actions={<DocsButton href={`${DOCS_URL}/guides/self-hosting`} />}
+            />
+          )}
+        </PageSectionContent>
+      </PageSection>
+    )
   }
 
   return (
-    <div>
-      <FormHeader title="Project Settings" description="" />
+    <>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>General settings</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          {isBranch && (
+            <Admonition
+              type="default"
+              className="mb-4"
+              title="You are currently on a preview branch of your project"
+            >
+              Certain settings are not available while you're on a preview branch. To adjust your
+              project settings, you may return to your{' '}
+              <InlineLink href={`/project/${project?.parent_project_ref}/settings/general`}>
+                main branch
+              </InlineLink>
+              .
+            </Admonition>
+          )}
 
-      {isBranch && (
-        <Alert_Shadcn_ variant="default" className="mb-6">
-          <IconAlertCircle strokeWidth={2} />
-          <AlertTitle_Shadcn_>
-            You are currently on a preview branch of your project
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            Certain settings are not available while you're on a preview branch. To adjust your
-            project settings, you may return to your{' '}
-            <Link href={`/project/${parentProject.ref}/settings/general`} className="text-brand">
-              main branch
-            </Link>
-            .
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-      )}
-
-      {project === undefined ? (
-        <GenericSkeletonLoader />
-      ) : (
-        <Form id={formId} initialValues={initialValues} onSubmit={onSubmit}>
-          {({ handleReset, values, initialValues }: any) => {
-            const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
-            return (
-              <FormPanel
-                disabled={!canUpdateProject}
-                footer={
-                  <div className="flex py-4 px-8">
-                    <FormActions
-                      form={formId}
-                      isSubmitting={isUpdating}
-                      hasChanges={hasChanges}
-                      handleReset={handleReset}
-                      helper={
-                        !canUpdateProject
-                          ? "You need additional permissions to manage this project's settings"
-                          : undefined
-                      }
-                    />
-                  </div>
-                }
-              >
-                <FormSection header={<FormSectionLabel>General settings</FormSectionLabel>}>
-                  <FormSectionContent loading={false}>
-                    <Input
-                      id="name"
-                      size="small"
-                      label="Project name"
-                      disabled={isBranch || !canUpdateProject}
-                    />
-                    <Input copy disabled id="ref" size="small" label="Reference ID" />
-                  </FormSectionContent>
-                </FormSection>
-              </FormPanel>
-            )
-          }}
-        </Form>
-      )}
-      {!isBranch && (
-        <>
-          <div className="mt-6" id="restart-project">
-            <FormPanel>
-              <div className="flex flex-col px-8 py-4">
-                {v2MaintenanceStartTime &&
-                  v2MaintenanceEndTime &&
-                  v2AnnouncementUrl !== 'https://' && (
-                    <Alert_Shadcn_ variant="warning" className="mb-4">
-                      <IconAlertCircle strokeWidth={2} />
-                      <AlertTitle_Shadcn_>Upcoming project restart scheduled</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                        This project will automatically restart on {v2MaintenanceDate} between{' '}
-                        {v2MaintenanceStartTime} and {v2MaintenanceEndTime} UTC, which will cause up
-                        to a few minutes of downtime.
-                        <Collapsible_Shadcn_>
-                          <CollapsibleTrigger_Shadcn_ className="text-foreground-light transition-all [&[data-state=open]&_svg]:rotate-90 hover:text-foreground data-[state=open]:text-foreground flex items-center gap-x-2 w-full">
-                            <ChevronRight
-                              className="transition-transform"
-                              strokeWidth={1.5}
-                              size={14}
+          {project === undefined ? (
+            <Card>
+              <CardContent>
+                <GenericSkeletonLoader />
+              </CardContent>
+            </Card>
+          ) : (
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                <Card>
+                  <CardContent>
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          layout="flex-row-reverse"
+                          label={`${entityLabel} name`}
+                          description="Displayed throughout the dashboard."
+                          className="[&>div]:md:w-1/2"
+                        >
+                          <FormControl>
+                            <Input
+                              {...field}
+                              readOnly={isBranch || !canUpdateProject}
+                              autoComplete="off"
                             />
-                            Why this time?
-                          </CollapsibleTrigger_Shadcn_>
-                          <CollapsibleContent_Shadcn_>
-                            Your project has historically had the least database queries across the
-                            previous 10 weeks during this 30 minute window.
-                          </CollapsibleContent_Shadcn_>
-                        </Collapsible_Shadcn_>
-                        You may also manually restart this project anytime before{' '}
-                        {v2MaintenanceDate} {v2MaintenanceStartTime} UTC at a time that is
-                        convenient for you.
-                        <br />
-                        <br />
-                        <em>
-                          <a
-                            href={v2AnnouncementUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="underline"
-                          >
-                            Find out more
-                          </a>{' '}
-                          about our v2 platform architecture migration.
-                        </em>
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
+                          </FormControl>
+                        </FormItemLayout>
+                      )}
+                    />
+                  </CardContent>
+
+                  {isBranch && (
+                    <CardContent>
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label={`${entityLabel} type`}
+                        description="Preview or persistent"
+                        className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
+                      >
+                        <FormControl>
+                          <Input readOnly value={branch?.persistent ? 'Persistent' : 'Preview'} />
+                        </FormControl>
+                      </FormItemLayout>
+                    </CardContent>
                   )}
-                <div className="flex justify-between">
-                  <div>
-                    <p className="text-sm">Restart project</p>
-                    <div className="max-w-[420px]">
-                      <p className="text-sm text-foreground-light">
-                        Your project will not be available for a few minutes.
-                      </p>
-                    </div>
-                  </div>
-                  <RestartServerButton />
-                </div>
-              </div>
-              <div
-                className="flex w-full items-center justify-between px-8 py-4"
-                id="pause-project"
-              >
-                <div>
-                  <p className="text-sm">Pause project</p>
-                  <div className="max-w-[420px]">
-                    <p className="text-sm text-foreground-light">
-                      Your project will not be accessible while it is paused.
-                    </p>
-                  </div>
-                </div>
-                <PauseProjectButton />
-              </div>
-            </FormPanel>
-          </div>
-          <div className="mt-6">
-            <Panel>
-              <Panel.Content>
-                <div className="flex justify-between">
-                  <div className="flex space-x-4">
-                    <IconBarChart2 strokeWidth={2} />
-                    <div>
-                      <p className="text-sm">Project usage statistics has been moved</p>
-                      <p className="text-foreground-light text-sm">
-                        You may view your project's usage under your organization's settings
-                      </p>
-                    </div>
-                  </div>
-                  <div>
-                    <Button asChild type="default">
-                      <Link href={`/org/${organization?.slug}/usage?projectRef=${project?.ref}`}>
-                        View project usage
-                      </Link>
+
+                  <CardContent>
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label={`${entityLabel} ID`}
+                      description="Reference used in APIs and URLs."
+                      className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
+                    >
+                      <FormControl>
+                        <PasswordInput copy readOnly size="small" value={project.ref} />
+                      </FormControl>
+                    </FormItemLayout>
+                  </CardContent>
+
+                  <CardContent>
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label={`${entityLabel} region`}
+                      description={regionLabel?.name}
+                      className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
+                    >
+                      <FormControl>
+                        <PasswordInput copy readOnly size="small" value={project.region} />
+                      </FormControl>
+                    </FormItemLayout>
+                  </CardContent>
+
+                  <CardFooter className="justify-end space-x-2">
+                    {form.formState.isDirty && (
+                      <Button
+                        variant="default"
+                        type="button"
+                        disabled={isUpdating}
+                        onClick={() => form.reset({ name: project?.name ?? '' })}
+                      >
+                        Cancel
+                      </Button>
+                    )}
+                    <Button
+                      variant="primary"
+                      type="submit"
+                      disabled={
+                        !form.formState.isDirty || isUpdating || !canUpdateProject || isBranch
+                      }
+                      loading={isUpdating}
+                    >
+                      Save changes
                     </Button>
-                  </div>
-                </div>
-              </Panel.Content>
-            </Panel>
-          </div>
-        </>
-      )}
-    </div>
+                  </CardFooter>
+                </Card>
+              </form>
+            </Form>
+          )}
+        </PageSectionContent>
+      </PageSection>
+
+      <ProjectAccessSection />
+    </>
   )
 }
-
-export default General

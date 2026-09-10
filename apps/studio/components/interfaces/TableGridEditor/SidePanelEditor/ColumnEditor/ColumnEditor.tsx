@@ -1,38 +1,30 @@
-import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import { safeSql } from '@supabase/pg-meta'
 import { useParams } from 'common'
 import { isEmpty, noop } from 'lodash'
+import { ExternalLink, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Checkbox,
-  IconAlertCircle,
-  IconAlertTriangle,
-  IconExternalLink,
-  IconPlus,
-  Input,
+  cn,
+  DialogSectionSeparator,
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
   SidePanel,
-  Toggle,
+  Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
-import {
-  CONSTRAINT_TYPE,
-  Constraint,
-  useTableConstraintsQuery,
-} from 'data/database/constraints-query'
-import {
-  ForeignKeyConstraint,
-  useForeignKeyConstraintsQuery,
-} from 'data/database/foreign-key-constraints-query'
-import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
-import type { Dictionary } from 'types'
-import ActionBar from '../ActionBar'
+import { ActionBar } from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
@@ -41,22 +33,44 @@ import type {
   CreateColumnPayload,
   UpdateColumnPayload,
 } from '../SidePanelEditor.types'
-import ColumnDefaultValue from './ColumnDefaultValue'
+import { ColumnDefaultValue } from './ColumnDefaultValue'
 import {
   generateColumnField,
-  generateColumnFieldFromPostgresColumn,
+  generateColumnFieldFromPGColumn,
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
+  getPlaceholderText,
   validateFields,
 } from './ColumnEditor.utils'
 import ColumnForeignKey from './ColumnForeignKey'
 import ColumnType from './ColumnType'
-import HeaderTitle from './HeaderTitle'
-import toast from 'react-hot-toast'
+import { HeaderTitle } from './HeaderTitle'
+import {
+  FormSection,
+  FormSectionContent,
+  FormSectionLabel,
+} from '@/components/ui/Forms/FormSection'
+import { SafeSqlInput } from '@/components/ui/SafeSqlInput'
+import {
+  Constraint,
+  CONSTRAINT_TYPE,
+  useTableConstraintsQuery,
+} from '@/data/database/constraints-query'
+import {
+  ForeignKeyConstraint,
+  useForeignKeyConstraintsQuery,
+} from '@/data/database/foreign-key-constraints-query'
+import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
+import type { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+import { DOCS_URL } from '@/lib/constants'
+import type { SafePostgresColumn } from '@/lib/postgres-types'
+import type { DeepReadonly } from '@/lib/type-helpers'
 
 export interface ColumnEditorProps {
-  column?: PostgresColumn
-  selectedTable: PostgresTable
+  column?: DeepReadonly<SafePostgresColumn>
+  selectedTable: RetrieveTableResult
   visible: boolean
   closePanel: () => void
   saveChanges: (
@@ -67,13 +81,14 @@ export interface ColumnEditorProps {
       primaryKey?: Constraint
       foreignKeyRelations: ForeignKey[]
       existingForeignKeyRelations: ForeignKeyConstraint[]
+      createMore?: boolean
     },
-    resolve: any
+    resolve: () => void
   ) => void
   updateEditorDirty: () => void
 }
 
-const ColumnEditor = ({
+export const ColumnEditor = ({
   column,
   selectedTable,
   visible = false,
@@ -82,25 +97,30 @@ const ColumnEditor = ({
   updateEditorDirty = noop,
 }: ColumnEditorProps) => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
-  const [errors, setErrors] = useState<Dictionary<any>>({})
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
   const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
+  const [foreignKeySelectorOpen, setForeignKeySelectorOpen] = useState(false)
+  const [createMore, setCreateMore] = useState(false)
+  const [placeholder, setPlaceholder] = useState(
+    getPlaceholderText(columnFields?.format, columnFields?.name)
+  )
 
   const { data: types } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
   const enumTypes = (types ?? []).filter(
-    (type) => !EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
+    (type) => !protectedSchemas.find((s) => s.name === type.schema)
   )
 
   const { data: constraints } = useTableConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: selectedTable?.schema,
-    table: selectedTable?.name,
+    id: selectedTable?.id,
   })
   const primaryKey = (constraints ?? []).find(
     (constraint) => constraint.type === CONSTRAINT_TYPE.PRIMARY_KEY_CONSTRAINT
@@ -126,12 +146,14 @@ const ColumnEditor = ({
   useEffect(() => {
     if (visible) {
       setErrors({})
+      setForeignKeySelectorOpen(false)
       const columnFields = isNewRecord
         ? generateColumnField({ schema: selectedTable.schema, table: selectedTable.name })
-        : generateColumnFieldFromPostgresColumn(column!, selectedTable, foreignKeyMeta)
+        : generateColumnFieldFromPGColumn(column, selectedTable, foreignKeyMeta)
       setColumnFields(columnFields)
       setFkRelations(formatForeignKeys(foreignKeys))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
 
   if (!columnFields) return null
@@ -142,7 +164,30 @@ const ColumnEditor = ({
       changes.defaultValue = null
     }
 
-    const updatedColumnFields = { ...columnFields, ...changes } as ColumnField
+    const changedName = 'name' in changes && changes.name !== columnFields.name
+    const changedFormat = 'format' in changes && changes.format !== columnFields.format
+
+    if (
+      changedName &&
+      fkRelations.find((fk) => fk.columns.find(({ source }) => source === columnFields?.name))
+    ) {
+      setFkRelations(
+        fkRelations.map((relation) => ({
+          ...relation,
+          columns: relation.columns.map((col) =>
+            col.source === columnFields?.name ? { ...col, source: changes.name! } : col
+          ),
+        }))
+      )
+    }
+
+    if (changedName || changedFormat) {
+      setPlaceholder(
+        getPlaceholderText(changes.format || columnFields.format, changes.name || columnFields.name)
+      )
+    }
+
+    const updatedColumnFields: ColumnField = { ...columnFields, ...changes }
     setColumnFields(updatedColumnFields)
     updateEditorDirty()
 
@@ -160,15 +205,27 @@ const ColumnEditor = ({
 
       if (isEmpty(errors)) {
         const payload = isNewRecord
-          ? generateCreateColumnPayload(selectedTable.id, columnFields)
+          ? generateCreateColumnPayload(selectedTable, columnFields)
           : generateUpdateColumnPayload(column!, selectedTable, columnFields)
         const configuration = {
           columnId: column?.id,
           primaryKey,
           foreignKeyRelations: fkRelations,
           existingForeignKeyRelations: foreignKeys,
+          createMore,
         }
-        saveChanges(payload, isNewRecord, configuration, resolve)
+        saveChanges(payload, isNewRecord, configuration, (err?: string) => {
+          resolve()
+          if (!err && createMore && isNewRecord) {
+            const freshColumnFields = generateColumnField({
+              schema: selectedTable.schema,
+              table: selectedTable.name,
+            })
+            setColumnFields(freshColumnFields)
+            setFkRelations([])
+            setErrors({})
+          }
+        })
       } else {
         resolve()
       }
@@ -176,252 +233,342 @@ const ColumnEditor = ({
   }
 
   return (
-    <SidePanel
-      size="xlarge"
-      key="ColumnEditor"
-      visible={visible}
-      // @ts-ignore
-      onConfirm={(resolve: () => void) => onSaveChanges(resolve)}
-      // @ts-ignore
-      header={<HeaderTitle table={selectedTable} column={column} />}
-      onCancel={closePanel}
-      customFooter={
-        <ActionBar
-          backButtonLabel="Cancel"
-          applyButtonLabel="Save"
-          closePanel={closePanel}
-          applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
-        />
-      }
-    >
-      <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>
-        <FormSectionContent loading={false} className="lg:!col-span-8">
-          <Input
-            label="Name"
-            type="text"
-            descriptionText="Recommended to use lowercase and use an underscore to separate words e.g. column_name"
-            placeholder="column_name"
-            error={errors.name}
-            value={columnFields?.name ?? ''}
-            onChange={(event: any) => onUpdateField({ name: event.target.value })}
-          />
-          <Input
-            label="Description"
-            labelOptional="Optional"
-            type="text"
-            value={columnFields?.comment ?? ''}
-            onChange={(event: any) => onUpdateField({ comment: event.target.value })}
-          />
-        </FormSectionContent>
-      </FormSection>
-      <SidePanel.Separator />
-      <FormSection
-        header={
-          <FormSectionLabel
-            className="lg:!col-span-4"
-            description={
-              <div className="space-y-2">
-                <Button
-                  asChild
-                  type="default"
-                  size="tiny"
-                  icon={<IconPlus size={14} strokeWidth={2} />}
-                >
-                  <Link href={`/project/${ref}/database/types`} target="_blank" rel="noreferrer">
-                    Create enum types
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  type="default"
-                  size="tiny"
-                  icon={<IconExternalLink size={14} strokeWidth={2} />}
-                >
-                  <Link
-                    href="https://supabase.com/docs/guides/database/tables#data-types"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    About data types
-                  </Link>
-                </Button>
-              </div>
-            }
-          >
-            Data Type
-          </FormSectionLabel>
-        }
+    <Sheet key="ColumnEditor" open={visible} onOpenChange={(open) => !open && closePanel()}>
+      <SheetContent
+        size="lg"
+        aria-describedby={undefined}
+        className="flex flex-col gap-0"
+        onInteractOutside={(e) => {
+          // Prevent sheet from closing when interacting with toasts
+          const target = e.target as HTMLElement
+          if (target?.closest('[data-sonner-toast]')) e.preventDefault()
+        }}
       >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
-          <ColumnType
-            showRecommendation
-            value={columnFields?.format ?? ''}
-            layout="vertical"
-            enumTypes={enumTypes}
-            error={errors.format}
-            description={
-              lockColumnType ? 'Column type cannot be changed as it has a foreign key relation' : ''
-            }
-            disabled={lockColumnType}
-            onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
-          />
-          {columnFields.foreignKey === undefined && (
-            <div className="space-y-4">
-              {columnFields.format.includes('int') && (
-                <div className="w-full">
-                  <Checkbox
-                    label="Is Identity"
-                    description="Automatically assign a sequential unique number to the column"
-                    checked={columnFields.isIdentity}
-                    onChange={() => {
-                      const isIdentity = !columnFields.isIdentity
-                      const isArray = isIdentity ? false : columnFields.isArray
-                      onUpdateField({ isIdentity, isArray })
-                    }}
-                  />
-                </div>
-              )}
-              {!columnFields.isPrimaryKey && (
-                <div className="w-full">
-                  <Checkbox
-                    label="Define as Array"
-                    description="Allow column to be defined as variable-length multidimensional arrays"
-                    checked={columnFields.isArray}
-                    onChange={() => {
-                      const isArray = !columnFields.isArray
-                      const isIdentity = isArray ? false : columnFields.isIdentity
-                      onUpdateField({ isArray, isIdentity })
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-          )}
-          <ColumnDefaultValue
-            columnFields={columnFields}
-            enumTypes={enumTypes}
-            onUpdateField={onUpdateField}
-          />
-        </FormSectionContent>
-      </FormSection>
-      <SidePanel.Separator />
-      <FormSection
-        header={<FormSectionLabel className="lg:!col-span-4">Foreign Keys</FormSectionLabel>}
-      >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
-          <ColumnForeignKey
-            column={columnFields}
-            relations={fkRelations}
-            closePanel={closePanel}
-            onUpdateColumnType={(format: string) => onUpdateField({ format, defaultValue: null })}
-            onUpdateFkRelations={setFkRelations}
-          />
-        </FormSectionContent>
-      </FormSection>
-      <SidePanel.Separator />
-      <FormSection
-        header={<FormSectionLabel className="lg:!col-span-4">Constraints</FormSectionLabel>}
-      >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
-          <Toggle
-            label="Is Primary Key"
-            descriptionText="A primary key indicates that a column or group of columns can be used as a unique identifier for rows in the table"
-            checked={columnFields?.isPrimaryKey ?? false}
-            onChange={() => onUpdateField({ isPrimaryKey: !columnFields?.isPrimaryKey })}
-          />
-          <Toggle
-            label="Allow Nullable"
-            descriptionText="Allow the column to assume a NULL value if no value is provided"
-            checked={columnFields.isNullable}
-            onChange={() => onUpdateField({ isNullable: !columnFields.isNullable })}
-          />
-          <Toggle
-            label="Is Unique"
-            descriptionText="Enforce values in the column to be unique across rows"
-            checked={columnFields.isUnique}
-            onChange={() => onUpdateField({ isUnique: !columnFields.isUnique })}
-          />
-          <Input
-            label="CHECK Constraint"
-            labelOptional="Optional"
-            placeholder={`e.g length(${columnFields?.name || 'column_name'}) < 500`}
-            type="text"
-            value={columnFields?.check ?? ''}
-            onChange={(event: any) => onUpdateField({ check: event.target.value })}
-            className="[&_input]:font-mono"
-          />
-        </FormSectionContent>
-      </FormSection>
+        <SheetHeader>
+          <SheetTitle>
+            <HeaderTitle table={selectedTable} column={column} />
+          </SheetTitle>
+        </SheetHeader>
 
-      {isNewRecord && (
-        <>
-          <SidePanel.Separator />
+        <SheetSection className="overflow-auto grow p-0">
           <FormSection
-            header={<FormSectionLabel className="lg:!col-span-4">Security</FormSectionLabel>}
+            header={<FormSectionLabel className="lg:col-span-4!">General</FormSectionLabel>}
           >
-            <FormSectionContent loading={false} className="lg:!col-span-8">
-              <Alert_Shadcn_>
-                <IconAlertCircle />
-                <AlertTitle_Shadcn_>
-                  Column encryption has been removed from the GUI
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  <p className="!leading-normal">
-                    You may still encrypt new columns through the SQL editor using{' '}
-                    <Link
-                      href={`/project/${ref}/database/extensions?filter=pgsodium`}
-                      className="text-brand hover:underline"
-                    >
-                      pgsodium's
-                    </Link>{' '}
-                    Transparent Column Encryption (TCE).
-                  </p>
-                  <Button asChild type="default" icon={<IconExternalLink />} className="mt-2">
-                    <Link
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://github.com/orgs/supabase/discussions/18849"
-                    >
-                      Learn more
-                    </Link>
-                  </Button>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+            <FormSectionContent loading={false} className="lg:col-span-8!">
+              <FormItemLayout
+                isReactForm={false}
+                id="name"
+                className={cn(errors.name && '[&>*>label]:text-destructive')}
+                label="Name"
+                description={
+                  <>
+                    Recommended to use lowercase and use an underscore to separate words e.g.{' '}
+                    <code className="text-code-inline">column_name</code>
+                  </>
+                }
+              >
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="column_name"
+                  value={columnFields?.name ?? ''}
+                  onChange={(event) => onUpdateField({ name: event.target.value })}
+                />
+                {errors.name && <p className="mt-2 text-destructive">{errors.name}</p>}
+              </FormItemLayout>
+              <FormItemLayout
+                isReactForm={false}
+                id="description"
+                label="Description"
+                labelOptional="Optional"
+              >
+                <Input
+                  id="description"
+                  type="text"
+                  value={columnFields?.comment ?? ''}
+                  onChange={(event) => onUpdateField({ comment: event.target.value })}
+                />
+              </FormItemLayout>
             </FormSectionContent>
           </FormSection>
-          <SidePanel.Separator />
 
-          {/* TODO: need to pull column privileges in here
-          if any columns are using column-level privileges, show this warning */}
+          <DialogSectionSeparator />
+
           <FormSection
             header={
-              <FormSectionLabel className="lg:!col-span-4">Column privileges</FormSectionLabel>
+              <FormSectionLabel
+                className="lg:col-span-4!"
+                description={
+                  <div className="space-y-2">
+                    <Button asChild variant="default" icon={<Plus />}>
+                      <Link
+                        target="_blank"
+                        rel="noreferrer"
+                        href={`/project/${ref}/database/types`}
+                      >
+                        Create enum types
+                      </Link>
+                    </Button>
+                    <Button asChild variant="default" icon={<ExternalLink />}>
+                      <Link
+                        target="_blank"
+                        rel="noreferrer"
+                        href={`${DOCS_URL}/guides/database/tables#data-types`}
+                      >
+                        About data types
+                      </Link>
+                    </Button>
+                  </div>
+                }
+              >
+                Data Type
+              </FormSectionLabel>
             }
           >
-            <FormSectionContent loading={false} className="lg:!col-span-8">
-              <Alert_Shadcn_ variant="warning">
-                <IconAlertTriangle strokeWidth={2} />
-                <AlertTitle_Shadcn_>This table uses column-privileges</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  <p>
-                    Several columns in this table have column-level privileges. This new column will
-                    have privileges set to on by default.
-                  </p>
-                  <p className="mt-3">
-                    <Link href={`/project/${ref}/database/privileges`} passHref>
-                      <Button asChild type="default" size="tiny">
-                        <a>Column-level privileges</a>
-                      </Button>
-                    </Link>
-                  </p>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+            <FormSectionContent loading={false} className="lg:col-span-8!">
+              <ColumnType
+                showRecommendation
+                value={{
+                  format: columnFields?.format ?? '',
+                  formatSchema: columnFields?.formatSchema,
+                }}
+                layout="vertical"
+                enumTypes={enumTypes}
+                error={errors.format}
+                description={
+                  lockColumnType
+                    ? 'Column type cannot be changed as it has a foreign key relation'
+                    : ''
+                }
+                disabled={lockColumnType}
+                onOptionSelect={({ format, formatSchema }) =>
+                  onUpdateField({ format, formatSchema, defaultValue: null })
+                }
+              />
+              {columnFields.foreignKey === undefined && (
+                <div className="space-y-4">
+                  {columnFields.format.includes('int') && (
+                    <FormItemLayout
+                      isReactForm={false}
+                      layout="flex"
+                      label="Is Identity"
+                      id="isIdentity"
+                      description="Automatically assign a sequential unique number to the column"
+                    >
+                      <Checkbox
+                        id="isIdentity"
+                        checked={columnFields.isIdentity}
+                        onCheckedChange={() => {
+                          const isIdentity = !columnFields.isIdentity
+                          const isArray = isIdentity ? false : columnFields.isArray
+                          onUpdateField({ isIdentity, isArray })
+                        }}
+                      />
+                    </FormItemLayout>
+                  )}
+                  {!columnFields.isPrimaryKey && (
+                    <FormItemLayout
+                      isReactForm={false}
+                      layout="flex"
+                      id="isArray"
+                      label="Define as Array"
+                      description="Allow column to be defined as variable-length multidimensional arrays"
+                    >
+                      <Checkbox
+                        id="isArray"
+                        checked={columnFields.isArray}
+                        onCheckedChange={() => {
+                          const isArray = !columnFields.isArray
+                          const isIdentity = isArray ? false : columnFields.isIdentity
+                          onUpdateField({ isArray, isIdentity })
+                        }}
+                      />
+                    </FormItemLayout>
+                  )}
+                </div>
+              )}
+              <ColumnDefaultValue
+                columnFields={columnFields}
+                enumTypes={enumTypes}
+                onUpdateField={onUpdateField}
+              />
             </FormSectionContent>
           </FormSection>
-        </>
-      )}
-    </SidePanel>
+
+          <SidePanel.Separator />
+
+          <FormSection
+            header={<FormSectionLabel className="lg:col-span-4!">Foreign Keys</FormSectionLabel>}
+          >
+            <FormSectionContent loading={false} className="lg:col-span-8!">
+              <ColumnForeignKey
+                tableId={selectedTable.id}
+                column={columnFields}
+                relations={fkRelations}
+                closePanel={closePanel}
+                onUpdateColumnType={({ format, formatSchema, isArray }) => {
+                  const bareFormat = isArray && format.startsWith('_') ? format.slice(1) : format
+                  onUpdateField({
+                    format: bareFormat,
+                    formatSchema,
+                    isArray,
+                    isIdentity: isArray ? false : columnFields.isIdentity,
+                  })
+                }}
+                onOpenChange={setForeignKeySelectorOpen}
+                onUpdateFkRelations={setFkRelations}
+              />
+            </FormSectionContent>
+          </FormSection>
+          <SidePanel.Separator />
+          <FormSection
+            header={<FormSectionLabel className="lg:col-span-4!">Constraints</FormSectionLabel>}
+          >
+            <FormSectionContent loading={false} className="lg:col-span-8!">
+              <FormItemLayout
+                isReactForm={false}
+                layout="flex"
+                id="isPrimaryKey"
+                label="Is Primary Key"
+                description="A primary key indicates that a column or group of columns can be used as a unique identifier for rows in the table"
+              >
+                <Switch
+                  id="isPrimaryKey"
+                  aria-label="Toggle primary key"
+                  checked={columnFields?.isPrimaryKey ?? false}
+                  onCheckedChange={() =>
+                    onUpdateField({
+                      isPrimaryKey: !columnFields?.isPrimaryKey,
+                      isUnique: false,
+                      isNullable: false,
+                    })
+                  }
+                />
+              </FormItemLayout>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  {/* Wrapped in a div as the Switch is a button itself and cannot be nested within the trigger button */}
+                  <div>
+                    <FormItemLayout
+                      isReactForm={false}
+                      layout="flex"
+                      id="isNullable"
+                      label="Allow Nullable"
+                      description="Allow the column to assume a NULL value if no value is provided"
+                    >
+                      <Switch
+                        id="isNullable"
+                        aria-label="Toggle is nullable"
+                        disabled={columnFields.isPrimaryKey}
+                        checked={columnFields.isNullable}
+                        onCheckedChange={() =>
+                          onUpdateField({ isNullable: !columnFields.isNullable })
+                        }
+                      />
+                    </FormItemLayout>
+                  </div>
+                </TooltipTrigger>
+                {columnFields.isPrimaryKey && (
+                  <TooltipContent side="left" align="start">
+                    Column is a primary key and hence cannot be NULL
+                  </TooltipContent>
+                )}
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  {/* Wrapped in a div as the Switch is a button itself and cannot be nested within the trigger button */}
+                  <div>
+                    <FormItemLayout
+                      isReactForm={false}
+                      layout="flex"
+                      id="isUnique"
+                      label="Is Unique"
+                      description="Enforce values in the column to be unique across rows"
+                    >
+                      <Switch
+                        id="isUnique"
+                        aria-label="Toggle is unique"
+                        disabled={columnFields.isPrimaryKey}
+                        checked={columnFields.isUnique}
+                        onCheckedChange={() => onUpdateField({ isUnique: !columnFields.isUnique })}
+                      />
+                    </FormItemLayout>
+                  </div>
+                </TooltipTrigger>
+                {columnFields.isPrimaryKey && (
+                  <TooltipContent side="left" align="start">
+                    Column is a primary key and hence already unique
+                  </TooltipContent>
+                )}
+              </Tooltip>
+
+              <FormItemLayout isReactForm={false} label="CHECK constraint" labelOptional="Optional">
+                <SafeSqlInput
+                  type="text"
+                  placeholder={placeholder}
+                  value={columnFields?.check ?? safeSql``}
+                  onChange={(_event, value) => onUpdateField({ check: value })}
+                  className="[&_input]:font-mono"
+                />
+              </FormItemLayout>
+            </FormSectionContent>
+          </FormSection>
+
+          <SidePanel.Separator />
+
+          <FormSection
+            header={<FormSectionLabel className="lg:col-span-4!">Data Privacy</FormSectionLabel>}
+          >
+            <FormSectionContent loading={false} className="lg:col-span-8!">
+              <FormItemLayout
+                isReactForm={false}
+                layout="flex"
+                id="isSensitiveData"
+                label="Mark as sensitive data"
+                description="Column will be masked when viewing table data by default"
+              >
+                <Switch
+                  id="isSensitiveData"
+                  checked={columnFields.isSensitiveData ?? false}
+                  onCheckedChange={() => {
+                    onUpdateField({ isSensitiveData: !columnFields.isSensitiveData })
+                  }}
+                />
+              </FormItemLayout>
+            </FormSectionContent>
+          </FormSection>
+        </SheetSection>
+
+        <SheetFooter className="justify-between! [&>div]:p-0 [&>div]:border-t-0">
+          <ActionBar
+            backButtonLabel="Cancel"
+            applyButtonLabel="Save"
+            closePanel={closePanel}
+            applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
+            visible={visible && !foreignKeySelectorOpen}
+          >
+            {isNewRecord && (
+              <div className="flex items-center gap-x-2">
+                <Switch
+                  id="toggle-create-more"
+                  aria-label="Toggle create more"
+                  checked={createMore}
+                  onCheckedChange={() => setCreateMore(!createMore)}
+                />
+                <label
+                  htmlFor="toggle-create-more"
+                  className="text-foreground-light text-sm cursor-pointer select-none"
+                  onClick={() => setCreateMore(!createMore)}
+                >
+                  Create more
+                </label>
+              </div>
+            )}
+          </ActionBar>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   )
 }
-
-export default ColumnEditor

@@ -1,0 +1,32 @@
+import Link from 'next/link'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+
+import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+interface UpgradeDatabaseAlertProps {
+  minimumVersion?: string
+}
+
+export const UpgradeDatabaseAlert = ({ minimumVersion = '15.6' }: UpgradeDatabaseAlertProps) => {
+  const { data: project } = useSelectedProjectQuery()
+
+  return (
+    <Admonition
+      type="default"
+      title="Database upgrade needed"
+      childProps={{ description: { className: 'flex flex-col gap-y-2' } }}
+    >
+      <div className="prose text-sm max-w-full">
+        <p>
+          This integration requires the <code>pgmq</code> extension which is not available on this
+          version of Postgres. The extension is available on version {minimumVersion} and higher.
+        </p>
+      </div>
+      <Button variant="primary" color="primary" className="w-fit">
+        <Link href={getServiceVersionsPath(project?.ref)}>Upgrade database</Link>
+      </Button>
+    </Admonition>
+  )
+}

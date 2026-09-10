@@ -13,7 +13,7 @@ This guide will walk you through a basic ["Hello World"](https://github.com/supa
 1. Add data to the collection
 1. Query the collection
 
-<DatabaseSetup />
+<$Partial path="database_setup.mdx" />
 
 ## Launching a notebook
 
@@ -41,7 +41,7 @@ DB_CONNECTION = "postgresql://<user>:<password>@<host>:<port>/<db_name>"
 vx = vecs.create_client(DB_CONNECTION)
 ```
 
-Replace the `DB_CONNECTION` with your own connection string for your database. You can find the Postgres connection string in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database) of your Supabase project.
+Replace the `DB_CONNECTION` with your Session pooler connection string. You can find the connection string on your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
 
 <Admonition type='note'>
 
@@ -51,7 +51,7 @@ SQLAlchemy requires the connection string to start with `postgresql://` (instead
 
 <Admonition type='note'>
 
-You must use the "connection pooling" string (domain ending in `*.pooler.supabase.com`) with Google Colab since Colab does not support IPv6.
+You must use the Session pooler connection string with Google Colab since Colab does not support IPv6.
 
 </Admonition>
 
@@ -59,7 +59,7 @@ You must use the "connection pooling" string (domain ending in `*.pooler.supabas
 
 Now all that's left is to step through the notebook. You can do this by clicking the "execute" button (`ctrl+enter`) at the top left of each code cell. The notebook guides you through the process of creating a collection, adding data to it, and querying it.
 
-You can view the inserted items in the [Table Editor](https://supabase.com/dashboard/project/_/editor/), by selecting the `vecs` schema from the schema dropdown.
+You can view the inserted items in the [Table Editor](/dashboard/project/_/editor/), by selecting the `vecs` schema from the schema dropdown.
 
 ![Colab documents](/docs/img/ai/google-colab/colab-documents.png)
 

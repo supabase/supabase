@@ -1,3 +1,5 @@
+import type { FeatureKey } from '@/data/entitlements/entitlements-query'
+
 export interface Enum {
   label: string
   value: string
@@ -8,6 +10,7 @@ export interface Provider {
   $schema: string
   type: 'object'
   title: string
+  link: string
   properties: {
     [x: string]: {
       title: string
@@ -21,11 +24,14 @@ export interface Provider {
       descriptionOptional?: string
       units?: string
       isSecret?: boolean
+      entitlementKey?: FeatureKey
+      link?: string
     }
   }
   validationSchema: any // todo: use Yup type
   misc: {
     iconKey: 'gitlab-icon'
+    hasLightIcon: boolean
     requiresRedirect: true
     helper: string
     alert: {

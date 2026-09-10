@@ -1,19 +1,51 @@
 import { isEmpty } from 'lodash'
 
 /**
+ * Procedures expose their arguments with explicit `IN` mode prefixes
+ * (e.g. "IN a integer, IN b integer"); strip them so they read like functions.
+ * `INOUT`/`VARIADIC` are left intact since `IN\s+` requires whitespace after `IN`.
+ */
+export function stripInArgModePrefixes(value: string) {
+  return value?.replace(/(^|,)\s*IN\s+/gi, '$1')
+}
+
+/**
  * convert argument_types = "a integer, b integer"
  * to args = {value: [{name:'a', type:'integer'}, {name:'b', type:'integer'}]}
  */
-export function convertArgumentTypes(value: string) {
-  const items = value?.split(',')
-  if (isEmpty(value) || !items || items?.length == 0) return { value: [] }
-  const temp = items.map((x) => {
-    const str = x.trim()
-    const space = str.indexOf(' ')
-    const name = str.slice(0, space !== 1 ? space : 0)
-    const type = str.slice(space + 1)
-    return { name, type }
-  })
+export function convertArgumentTypes({
+  type,
+  value,
+}: {
+  type: 'function' | 'procedure'
+  value: string
+}) {
+  const normalizedValue = type === 'procedure' ? stripInArgModePrefixes(value) : value
+  const items = normalizedValue?.split(',').map((item) => item.trim())
+  if (isEmpty(value) || !items || items.length === 0) return { value: [] }
+
+  const temp = items
+    .map((x) => {
+      const regex = /(\w+)\s+([\w\[\]]+)(?:\s+DEFAULT\s+(.*))?/i
+      const match = x.match(regex)
+      if (match) {
+        const [, name, type, defaultValue] = match
+        let parsedDefaultValue = defaultValue ? defaultValue.trim() : undefined
+
+        if (
+          ['timestamp', 'time', 'timetz', 'timestamptz'].includes(type.toLowerCase()) &&
+          parsedDefaultValue
+        ) {
+          parsedDefaultValue = `'${parsedDefaultValue}'`
+        }
+
+        return { name, type, defaultValue: parsedDefaultValue }
+      } else {
+        console.error('Error while trying to parse function arguments', x)
+        return null
+      }
+    })
+    .filter(Boolean) as { name: string; type: string; defaultValue?: string }[]
   return { value: temp }
 }
 

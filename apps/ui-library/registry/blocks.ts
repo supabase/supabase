@@ -1,0 +1,85 @@
+import { type RegistryItem } from 'shadcn/schema'
+
+import { clients } from './clients'
+import currentUserAvatar from './default/blocks/current-user-avatar/registry-item.json' with { type: 'json' }
+import dropzone from './default/blocks/dropzone/registry-item.json' with { type: 'json' }
+import infiniteQueryHook from './default/blocks/infinite-query-hook/registry-item.json' with { type: 'json' }
+import mcpServer from './default/blocks/mcp-server/registry-item.json' with { type: 'json' }
+import oauthConsentNextjs from './default/blocks/oauth-consent-nextjs/registry-item.json' with { type: 'json' }
+import oauthConsentReactRouter from './default/blocks/oauth-consent-react-router/registry-item.json' with { type: 'json' }
+import oauthConsentReact from './default/blocks/oauth-consent-react/registry-item.json' with { type: 'json' }
+import oauthConsentTanstack from './default/blocks/oauth-consent-tanstack/registry-item.json' with { type: 'json' }
+import passwordBasedAuthNextjs from './default/blocks/password-based-auth-nextjs/registry-item.json' with { type: 'json' }
+import passwordBasedAuthReactRouter from './default/blocks/password-based-auth-react-router/registry-item.json' with { type: 'json' }
+import passwordBasedAuthReact from './default/blocks/password-based-auth-react/registry-item.json' with { type: 'json' }
+import passwordBasedAuthTanstack from './default/blocks/password-based-auth-tanstack/registry-item.json' with { type: 'json' }
+import realtimeAvatarStack from './default/blocks/realtime-avatar-stack/registry-item.json' with { type: 'json' }
+import realtimeChat from './default/blocks/realtime-chat/registry-item.json' with { type: 'json' }
+import realtimeCursor from './default/blocks/realtime-cursor/registry-item.json' with { type: 'json' }
+import realtimeFlow from './default/blocks/realtime-flow/registry-item.json' with { type: 'json' }
+import realtimeMonaco from './default/blocks/realtime-monaco/registry-item.json' with { type: 'json' }
+import safeNextPath from './default/blocks/safe-next-path/registry-item.json' with { type: 'json' }
+import socialAuthNextjs from './default/blocks/social-auth-nextjs/registry-item.json' with { type: 'json' }
+import socialAuthReactRouter from './default/blocks/social-auth-react-router/registry-item.json' with { type: 'json' }
+import socialAuthReact from './default/blocks/social-auth-react/registry-item.json' with { type: 'json' }
+import socialAuthTanstack from './default/blocks/social-auth-tanstack/registry-item.json' with { type: 'json' }
+import tanstackDbNextjs from './default/blocks/tanstack-db/registry-item.json' with { type: 'json' }
+import { registryItemAppend } from './utils'
+
+const combine = (component: RegistryItem) => {
+  return clients.flatMap((client) => {
+    return registryItemAppend(
+      {
+        ...component,
+        name: `${component.name}-${client.name.replace('supabase-client-', '')}`,
+      },
+      [client]
+    )
+  })
+}
+
+const withClientAndDocs = (component: RegistryItem, client: RegistryItem) => ({
+  ...registryItemAppend(component, [client]),
+  docs: [component.docs, client.docs].filter(Boolean).join('\n\n'),
+})
+
+const nextjsClient = clients.find((client) => client.name === 'supabase-client-nextjs')
+const reactClient = clients.find((client) => client.name === 'supabase-client-react')
+const tanstackClient = clients.find((client) => client.name === 'supabase-client-tanstack')
+const reactRouterClient = clients.find((client) => client.name === 'supabase-client-react-router')
+
+export const blocks = [
+  safeNextPath as RegistryItem,
+
+  registryItemAppend(passwordBasedAuthNextjs as RegistryItem, [nextjsClient!]),
+  registryItemAppend(passwordBasedAuthReact as RegistryItem, [reactClient!]),
+  registryItemAppend(passwordBasedAuthReactRouter as RegistryItem, [reactRouterClient!]),
+  registryItemAppend(passwordBasedAuthTanstack as RegistryItem, [tanstackClient!]),
+
+  registryItemAppend(socialAuthNextjs as RegistryItem, [nextjsClient!]),
+  registryItemAppend(socialAuthReact as RegistryItem, [reactClient!]),
+  registryItemAppend(socialAuthReactRouter as RegistryItem, [reactRouterClient!]),
+  registryItemAppend(socialAuthTanstack as RegistryItem, [tanstackClient!]),
+
+  ...combine(dropzone as RegistryItem),
+  ...combine(realtimeCursor as RegistryItem),
+  ...combine(currentUserAvatar as RegistryItem),
+  ...combine(realtimeAvatarStack as RegistryItem),
+  ...combine(realtimeChat as RegistryItem),
+  ...combine(realtimeFlow as RegistryItem),
+  ...combine(realtimeMonaco as RegistryItem),
+  // infinite query hook is intentionally not combined with the clients since it depends on clients having database types.
+  infiniteQueryHook as RegistryItem,
+
+  // Backend-only Deno Edge Function block. Every file has an explicit target,
+  // so it can be installed directly into a Supabase project.
+  mcpServer as RegistryItem,
+
+  withClientAndDocs(oauthConsentNextjs as RegistryItem, nextjsClient!),
+  withClientAndDocs(oauthConsentReact as RegistryItem, reactClient!),
+  withClientAndDocs(oauthConsentReactRouter as RegistryItem, reactRouterClient!),
+  withClientAndDocs(oauthConsentTanstack as RegistryItem, tanstackClient!),
+
+  // tanstack-db is served dynamically via API route, but we register it here for the static build
+  registryItemAppend(tanstackDbNextjs as RegistryItem, [nextjsClient!]),
+] as RegistryItem[]

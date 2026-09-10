@@ -2,79 +2,333 @@ TEAM
 
 Supabase is 100% remote.
 
+Aaron Brooks
+Aaron Byrne
+Adam Mohammed
+Adam Mokan
+Adam Whitlock
+AJ Matias
+Akash Manimaran
+Akilesh Sethu
 Alaister Young
+Aleksi Immonen
+Alex Hall
+Alex Hsu
+Alexander Alexandrov
 Alexander Korotkov
+Ali Waseem
+Allan S
+Amir Issaei
+Amogh Rao
 Amy Q
+Ana Mogul
+Andrew Valleteau
+Andrey A
 Angelico de los Reyes
+Anna Baker
+Ant Evans
 Ant Wilson
+Anthony Lio
 Ariuna K
+Arshdeep Singh
+Artur Zakirov
+Artyom Borissov
+Aziz Quadri
+Barco Fourie
+Barry Roodt
 Beng Eu
-Bo Lu
+Benjamin Coenen
+Beth Long
 Bobbie Soedirgo
-Bruno Andrade
+Brad Gyger
+Brendan Stephens
+Brent Newson
+Brian Cullen
+Brent Schroeter
+Bruno Kilian
+Burhan A
+Carel de Waal
+Cameron Blackwood
+Cameron Michie
+Cemal Kılıç
 Chandana Anumula
 Charis Lam
+Chase Cresgy
 Chase Granberry
+Chris Caruso
+Chris Chandler
+Chris Chapman (Chappie)
 Chris Copplestone
 Chris Gwilliams
+Chris Martin
+Chris Opland
+Chris Stockton
+Christian Funkhouser
+Claudiu Dragalina-Paraipan
+Clayton Kast
+Colin Goodheart-Smithe
+Colin Murray
+Colum Ferry
+Craig Cannon
+Cuong Do
+Dane Harrigan
+Daniel Guerra
+Daniel Mitterdorfer
+Daniel Velázquez Lara
+Danny White
 Dave Wilson
+David A. Ventimiglia
+David Alvarez
+David Birdsong
+David Camacho Cateura
+David Weitzman
+David Whittington
+Davide Pellegatta
+Deepthi Sigireddi
+Deji I
+Dennis Senn
+Dimitrios Liappis
 Div Arora
+Dion Zeneli
 Divit D
-Egor Romanov
+Divya Sharma
+Donna Alexandra
+Douglas Hunley
+Eduardo Gurgel
+Eleftheria Trivyzaki
+Eliot Whalan
+Emmett Folger
+Erfi Anugrah
+Eric Kharitonashvili
+Etienne Stalmans
+Evan Cummack
 Fabrizio Fenoglio
+Fady A
+Fatuma Abdullahi
+Felipe Stival
+Ferhat Elmas
+Filipe Cabaco
+Firas El Rachidi
 Francesco Sansalvadore
+Gabriel Claudino
+Garrett Crowell
+Gerardo Estaba
+Gildas Garcia
+Giuseppe Mandato
+Greg Kress
+Greg Marzouka
+Greg P
 Greg Richardson
+Gregor Vand
+Guillaume Faas
 Guilherme Souza
+Hanefi Önaldı
+Hannah Bowers
+Hardik Maheshwari
+Haritabh Gupta
+Harold Giménez
 Haydn Maley
 Hieu Pham
+Hunter Luckow
+Ignacio Dobronich
+Illia Basalaiev
 Inian P
+Iryna Deans
+Ivan Vasilov
+Jamie Boyd
+Jared Patterson
+Jason Farber
+Jean-Paul Argudo
+Jeff Smick
+Jefferson Venerando
+Jenny Kibiri
+Jeremias Menichelli
+Jess Fink
 Jess Shears
-Joel Lee
+Jesse White
+Jim Brodeur
+Jim Chanco Jr
+Joakim Ahrlin
+Joanna Michniewicz
+Joaquim Moreno
+Joel Low
+Joey Freeland
+Joey Lei
+John Fitzgerald
+Joel Martin
+Johan Bergström
 John Pena
+John Schaeffer
 Jon M
 Jonny Summers-Muir
+Jordan McQueen
 Jordi Enric
+José Luis Ledesma
 Joshen Lim
+Julian Domke
+Julien Goux
+Kai M
+Kalleby Santos
+Kanad Gupta
+Kanishk Dudeja
 Kamil Ogórek
 Kang Ming Tay
 Karan S
 Karlo Ison
+Katerina Skroumpelou
+Keith Resar
+Keith Fiske
+Kemal Y
 Kevin Brolly
 Kevin Grüneberg
+Kevin Strong-Holte
+Kostas Botsas
+Krishna Sai Vandavasi
 Lakshan Perera
 Laura C
-Long Hoang
-Margarita Sandomirskaia
-Marijana Pavlinić
+Laurence Isla
+Leandro Pereira
+Leigh Anne Applewhite
+Lenny Urbanowski
+Leonardo Santiago
+Liam Cloud Hogan
+Lindsay Moss
+Lukas Bernert
+Lukas Klingsbo
+Łukasz Korbasiewicz
+Łukasz Niemier
+Maksym Ionutsa
+Manuel Mendez
+Manan Gupta
+Marcus Weiner
+Marija Milicevic
 Mark Burggraf
-Monica El Khoury
-Nikita Kotlyarov
+Márton Boros
+Matthew Hambright
+Matt Hudson
+Matt Johnston
+Matt Robinson
+Matt Rossman
+Matt Smiley
+Matthias Luft
+Mats Kindahl
+Mert Yerekapan
+Michal Kleczek
+Michelle Jubrey
+Miranda Limonczenko
+Mo Khan
+Monica Khoury
+Mrinal Paliwal
+Mykhailo Mischa Lieibenson
+Natalie Roberge
+Nick B
+Nick Littman
+Nick Nowlan
+Nicola Ferraro
+Nicolas Nosenzo
+Nik Richers
+Noah Moss
+Nyannyacha
 Oli R
 Pamela Chia
+Patricia Szasz
+Patrick Crane
+Paul Bauer
 Paul Caselton
 Paul Cioanca
 Paul Copplestone
+Paul Ibeabuchi
 Pavel Borisov
+Paweł Gulbinowicz
+Pedro Rodrigues
+Peter Lyn
+Peter Soderberg
+Pierre Ducroquet
+Pierre Frances
+Ping-Min Lin
+Prashansa Kulshrestha
 Qiao Han
+Quintin Willison
+Rafael Chacón
 Raminder Singh
+Rand Arete
+Raúl Barroso
+Riccardo Busetti
+Richard Kasprzak
+Rob Shields
+Rodrigo Esteves
 Rodrigo Mansueli
+Roman Hernandez
+Ronan Lehane
 Rory Wilding
+Ryan Goulet
+Ryan Senior
+Ruan Maia
+Saba Pochkhua
+Safa Orhan
+Sagar Shedge
+Sam Meech-Ward
+Sam Rome
 Sam Rose
+Samir Ketema
+Sana Cordeaux
+Sasi Kanumuri
+Sara Read
+Satya Rohith Gannamanedi
+Sean Geoghegan
+Sean Oliver
+Sean Romberg
+Sean Thompson
+Sergio Cioban Filho
+Shaii O
+Shane Adams
+Shaun Newman
+Shardul Borhade
+Shreekar Shetty
+Simon Tomlinson
 Sreyas Udayavarman
-Stanislav M
+Stephanie Jackson (stejacks)
+Stephen Morgan
 Steve Chavez
+Steven Eubank
 Stojan Dimitrovski
+Szymon Mentel
+Sugat Mahanti
+Sugu Sougoumarane
 Supun Sudaraka Kalidasa
+Taha Le Bras
+Tanun Chalermsinsuwan
+Tarun Khandelwal
+Taryn King
 Terry Sutton
+Terry Wilcox
+Thanya Nitithatsanakul
 Thomas E
-Thor Schaeff
+Tim Frietas
+Tim Palmer
+Timothy Lim
+Tina Ha
+Tobias Pfeiffer
 Tom Ashley
+Tom G
+Tomás Pozo
+Tomás Torgal
+Tomohiro Mitani
 Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
+Utkarash Singh
+Victor Farazdagi
+Warda Bibi
+Warwick Mitchell
 Wen Bo Xie
-Yuri Santana
+Wendie Cheung
+Yara Lacerda
+Yorvi Arias
+Yuliya Marinova
+Zach Marinov
+Zsolt Pazmandy
 ____________
 
 JOBS
@@ -88,10 +342,11 @@ TECHNOLOGIES
 
 Supabase would not be possible without the work of some other amazing open source contributors.
 
-- Postgres - https://www.postgresql.org/docs/devel/git.html
+- Postgres - https://www.postgresql.org/
 - PostgREST - https://github.com/PostgREST
-- Kong - https://github.com/kong/
+- Envoy - https://github.com/envoyproxy/envoy
 - Next.js - https://nextjs.org/
 - Tailwind CSS - https://tailwindcss.com/
+- shadcn/ui - https://ui.shadcn.com/
 - Phoenix - https://www.phoenixframework.org/
 - GoTrue - https://github.com/netlify/gotrue

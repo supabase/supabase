@@ -1,0 +1,145 @@
+---
+id: 'examples-amazon-bedrock-image-generator'
+title: 'Generate Images with Amazon Bedrock'
+description: 'Generate images with Amazon Bedrock and store them in Supabase Storage.'
+tocVideo: 'KIwN2TmkTlg'
+---
+
+[Amazon Bedrock](https://aws.amazon.com/bedrock) is a fully managed service that offers a choice of high-performing foundation models (FMs) from leading AI companies like AI21 Labs, Anthropic, Cohere, Meta, Mistral AI, Stability AI, and Amazon. Each model is accessible through a common API which implements a broad set of features to help build generative AI applications with security, privacy, and responsible AI in mind.
+
+This guide will walk you through an example using the Amazon Bedrock JavaScript SDK in Supabase Edge Functions to generate images using the [Amazon Titan Image Generator G1](https://aws.amazon.com/blogs/machine-learning/use-amazon-titan-models-for-image-generation-editing-and-searching/) model.
+
+## Setup
+
+- In your AWS console, navigate to Amazon Bedrock and under "Request model access", select the Amazon Titan Image Generator G1 model.
+- In your Supabase project, create a `.env` file in the `supabase` directory with the following contents:
+
+```txt
+AWS_DEFAULT_REGION="<your_region>"
+AWS_ACCESS_KEY_ID="<replace_your_own_credentials>"
+AWS_SECRET_ACCESS_KEY="<replace_your_own_credentials>"
+AWS_SESSION_TOKEN="<replace_your_own_credentials>"
+
+# Mocked config files
+AWS_SHARED_CREDENTIALS_FILE="./aws/credentials"
+AWS_CONFIG_FILE="./aws/config"
+```
+
+### Configure Storage
+
+- [locally] Run `supabase start`
+- Open Studio URL: [locally](http://127.0.0.1:54323/project/default/storage/buckets) | [hosted](https://app.supabase.com/project/_/storage/buckets)
+- Navigate to Storage
+- Click "New bucket"
+- Create a new public bucket called "images"
+
+## Code
+
+Create a new function in your project:
+
+```bash
+supabase functions new amazon-bedrock
+```
+
+And add the code to the `index.ts` file:
+
+```ts index.ts
+// We need to mock the file system for the AWS SDK to work.
+import { prepareVirtualFile } from 'https://deno.land/x/mock_file@v1.1.2/mod.ts'
+import { BedrockRuntimeClient, InvokeModelCommand } from 'npm:@aws-sdk/client-bedrock-runtime@^3'
+import { withSupabase } from 'npm:@supabase/server@^1'
+import { decode } from 'npm:base64-arraybuffer@^1'
+
+console.log('Hello from Amazon Bedrock!')
+
+// Called with a publishable key on the `apikey` header. Deploy with `verify_jwt = false`.
+export default {
+  fetch: withSupabase({ auth: 'publishable' }, async (req, ctx) => {
+    prepareVirtualFile('./aws/config')
+    prepareVirtualFile('./aws/credentials')
+
+    const client = new BedrockRuntimeClient({
+      region: Deno.env.get('AWS_DEFAULT_REGION') ?? 'us-west-2',
+      credentials: {
+        accessKeyId: Deno.env.get('AWS_ACCESS_KEY_ID') ?? '',
+        secretAccessKey: Deno.env.get('AWS_SECRET_ACCESS_KEY') ?? '',
+        sessionToken: Deno.env.get('AWS_SESSION_TOKEN') ?? '',
+      },
+    })
+
+    const { prompt, seed } = await req.json()
+    console.log(prompt)
+    const input = {
+      contentType: 'application/json',
+      accept: '*/*',
+      modelId: 'amazon.titan-image-generator-v1',
+      body: JSON.stringify({
+        taskType: 'TEXT_IMAGE',
+        textToImageParams: { text: prompt },
+        imageGenerationConfig: {
+          numberOfImages: 1,
+          quality: 'standard',
+          cfgScale: 8.0,
+          height: 512,
+          width: 512,
+          seed: seed ?? 0,
+        },
+      }),
+    }
+
+    const command = new InvokeModelCommand(input)
+    const response = await client.send(command)
+    console.log(response)
+
+    if (response.$metadata.httpStatusCode === 200) {
+      const { body, $metadata } = response
+
+      const textDecoder = new TextDecoder('utf-8')
+      const jsonString = textDecoder.decode(body.buffer)
+      const parsedData = JSON.parse(jsonString)
+      console.log(parsedData)
+      const image = parsedData.images[0]
+
+      const { data: upload, error: uploadError } = await ctx.supabase.storage
+        .from('images')
+        .upload(`${$metadata.requestId ?? ''}.png`, decode(image), {
+          contentType: 'image/png',
+          cacheControl: '3600',
+          upsert: false,
+        })
+      if (!upload) {
+        return Response.json({ error: uploadError?.message ?? 'Upload failed' }, { status: 500 })
+      }
+      const { data } = ctx.supabase.storage.from('images').getPublicUrl(upload.path!)
+      return Response.json(data)
+    }
+
+    return Response.json(response)
+  }),
+}
+```
+
+## Run the function locally
+
+1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
+2. Start with env: `supabase functions serve --no-verify-jwt --env-file supabase/.env`
+3. Make an HTTP request:
+
+```bash
+  curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/amazon-bedrock' \
+    --header 'apikey: <SUPABASE_PUBLISHABLE_KEY>' \
+    --header 'Content-Type: application/json' \
+    --data '{"prompt":"A beautiful picture of a bird"}'
+```
+
+4. Navigate back to your storage bucket. You might have to hit the refresh button to see the uploaded image.
+
+## Deploy to your hosted project
+
+```bash
+supabase link
+supabase functions deploy amazon-bedrock --no-verify-jwt
+supabase secrets set --env-file supabase/.env
+```
+
+You've now deployed a serverless function that uses AI to generate and upload images to your Supabase storage bucket.

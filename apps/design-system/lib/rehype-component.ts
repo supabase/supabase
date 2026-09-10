@@ -1,0 +1,352 @@
+import fs from 'fs'
+import path from 'path'
+// import { Column, IColumnProps } from './sample-component'
+import React from 'react'
+import { u } from 'unist-builder'
+import { visit } from 'unist-util-visit'
+
+import { registry } from '../registry/registry'
+import { styles } from '../registry/styles'
+import { UnistNode, UnistTree } from '@/types/unist'
+
+// Resolves registry files from the plain registry data (name/type/files
+// metadata only) rather than `__registry__` — the generated index that also
+// wires up `React.lazy` component imports. This plugin only ever needs file
+// paths to read source off disk, and pulling in the generated index (with its
+// deep chain of real component + npm dependencies) breaks Velite's esbuild-based
+// config bundling under pnpm's strict module resolution.
+function getRegistryFiles(styleName: string, name: string) {
+  const item = registry.find((entry) => entry.name === name)
+  if (!item || item.files.length === 0) {
+    throw new Error(`Registry item "${name}" has no source files`)
+  }
+  // `components:ui` items are the real shadcn primitives shared via `packages/ui`,
+  // not local copies under `registry/${styleName}/` like examples/fragments/blocks.
+  if (item.type === 'components:ui') {
+    return item.files.map((file) => `../../packages/ui/src/components/shadcn/ui/${file}`)
+  }
+  return item.files.map((file) => `registry/${styleName}/${file}`)
+}
+
+export function rehypeComponent() {
+  return async (tree: UnistTree) => {
+    visit(tree, (node: UnistNode) => {
+      // src prop overrides both name and fileName.
+      const { value: srcPath, name: componentName } =
+        (getNodeAttributeByName(node, 'src') as {
+          name: string
+          value?: string
+          type?: string
+        }) || {}
+
+      if (node.name === 'ComponentSource') {
+        // console.log('DO NOT USE THIS COMPONENT')
+        // This component should not be in use!
+        // console.log('node', node)
+
+        const name = getNodeAttributeByName(node, 'name')?.value as string
+        const fileName = getNodeAttributeByName(node, 'fileName')?.value as string | undefined
+
+        if (!name && !srcPath) {
+          return null
+        }
+
+        try {
+          for (const style of styles) {
+            let src: string
+
+            if (srcPath) {
+              src = srcPath
+            } else {
+              const files = getRegistryFiles(style.name, name)
+              // console.log('got to ELSE STATEMENT')
+              // console.log('filename', fileName)
+              // console.log('name', name)
+
+              src = fileName
+                ? files.find((file: string) => {
+                    return file.endsWith(`${fileName}.tsx`) || file.endsWith(`${fileName}.ts`)
+                  }) || files[0]
+                : files[0]
+              // console.log('got to END of ELSE STATEMENT')
+            }
+
+            // Read the source file.
+            const filePath = path.join(process.cwd(), src)
+            let source = fs.readFileSync(filePath, 'utf8')
+
+            // Replace imports.
+            // TODO: Use @swc/core and a visitor to replace this.
+            // For now a simple regex should do.
+            // source = source.replaceAll(`@/registry/${style.name}/`, '@/components/') // COMMENT THEE OUT
+            // source = source.replaceAll('export default', 'export')
+
+            // Add code as children so that rehype can take over at build time.
+            node.children?.push(
+              u('element', {
+                tagName: 'pre',
+                properties: {
+                  __src__: src,
+                  __style__: style.name,
+                },
+                attributes: [
+                  {
+                    name: 'styleName',
+                    type: 'mdxJsxAttribute',
+                    value: style.name,
+                  },
+                ],
+                children: [
+                  u('element', {
+                    tagName: 'code',
+                    properties: {
+                      className: ['language-tsx'],
+                    },
+                    children: [
+                      {
+                        type: 'text',
+                        value: source,
+                      },
+                    ],
+                  }),
+                ],
+              })
+            )
+          }
+        } catch (error) {
+          console.error(error)
+        }
+      }
+
+      if (node.name === 'ComponentPreview') {
+        const name = getNodeAttributeByName(node, 'name')?.value as string
+
+        if (!name) {
+          return null
+        }
+
+        try {
+          for (const style of styles) {
+            const files = getRegistryFiles(style.name, name)
+            // console.log('GOT HERE')
+            const src = files[0]
+
+            // Read the source file.
+            const filePath = path.join(process.cwd(), src)
+            let source = fs.readFileSync(filePath, 'utf8')
+
+            // Replace imports.
+            // TODO: Use @swc/core and a visitor to replace this.
+            // For now a simple regex should do.
+            source = source.replaceAll(`@/registry/${style.name}/`, '@/components/')
+            source = source.replaceAll('export default', 'export')
+
+            // Add code as children so that rehype can take over at build time.
+            node.children?.push(
+              u('element', {
+                tagName: 'pre',
+                properties: {
+                  __src__: src,
+                },
+                children: [
+                  u('element', {
+                    tagName: 'code',
+                    properties: {
+                      className: ['language-tsx'],
+                    },
+                    children: [
+                      {
+                        type: 'text',
+                        value: source,
+                      },
+                    ],
+                  }),
+                ],
+              })
+            )
+          }
+        } catch (error) {
+          console.error(error)
+        }
+      }
+
+      if (node.name === 'CodeFragment') {
+        const name = getNodeAttributeByName(node, 'name')?.value as string
+
+        if (!name) {
+          return null
+        }
+
+        try {
+          for (const style of styles) {
+            const files = getRegistryFiles(style.name, name)
+            // console.log('GOT HERE')
+            const src = files[0]
+
+            // Read the source file.
+            const filePath = path.join(process.cwd(), src)
+            let source = fs.readFileSync(filePath, 'utf8')
+
+            // Replace imports.
+            // TODO: Use @swc/core and a visitor to replace this.
+            // For now a simple regex should do.
+            source = source.replaceAll(`@/registry/${style.name}/`, '@/components/')
+            source = source.replaceAll('export default', 'export')
+
+            // Add code as children so that rehype can take over at build time.
+            node.children?.push(
+              u('element', {
+                tagName: 'pre',
+                properties: {
+                  __src__: src,
+                },
+                children: [
+                  u('element', {
+                    tagName: 'code',
+                    properties: {
+                      className: ['language-tsx'],
+                    },
+                    children: [
+                      {
+                        type: 'text',
+                        value: source,
+                      },
+                    ],
+                  }),
+                ],
+              })
+            )
+          }
+        } catch (error) {
+          console.error(error)
+        }
+      }
+
+      // if (node.name === "ComponentExample") {
+      //   const source = getComponentSourceFileContent(node)
+      //   if (!source) {
+      //     return
+      //   }
+
+      //   // Replace the Example component with a pre element.
+      //   node.children?.push(
+      //     u("element", {
+      //       tagName: "pre",
+      //       properties: {
+      //         __src__: src,
+      //       },
+      //       children: [
+      //         u("element", {
+      //           tagName: "code",
+      //           properties: {
+      //             className: ["language-tsx"],
+      //           },
+      //           children: [
+      //             {
+      //               type: "text",
+      //               value: source,
+      //             },
+      //           ],
+      //         }),
+      //       ],
+      //     })
+      //   )
+
+      //   const extractClassname = getNodeAttributeByName(
+      //     node,
+      //     "extractClassname"
+      //   )
+      //   if (
+      //     extractClassname &&
+      //     typeof extractClassname.value !== "undefined" &&
+      //     extractClassname.value !== "false"
+      //   ) {
+      //     // Extract className from string
+      //     // TODO: Use @swc/core and a visitor to extract this.
+      //     // For now, a simple regex should do.
+      //     const values = source.match(/className="(.*)"/)
+      //     const className = values ? values[1] : ""
+
+      //     // Add the className as a jsx prop so we can pass it to the copy button.
+      //     node.attributes?.push({
+      //       name: "extractedClassNames",
+      //       type: "mdxJsxAttribute",
+      //       value: className,
+      //     })
+
+      //     // Add a pre element with the className only.
+      //     node.children?.push(
+      //       u("element", {
+      //         tagName: "pre",
+      //         properties: {},
+      //         children: [
+      //           u("element", {
+      //             tagName: "code",
+      //             properties: {
+      //               className: ["language-tsx"],
+      //             },
+      //             children: [
+      //               {
+      //                 type: "text",
+      //                 value: className,
+      //               },
+      //             ],
+      //           }),
+      //         ],
+      //       })
+      //     )
+      //   }
+      // }
+
+      // if (node.name === "ComponentSource") {
+      //   const source = getComponentSourceFileContent(node)
+      //   if (!source) {
+      //     return
+      //   }
+
+      //   // Replace the Source component with a pre element.
+      //   node.children?.push(
+      //     u("element", {
+      //       tagName: "pre",
+      //       properties: {
+      //         __src__: src,
+      //       },
+      //       children: [
+      //         u("element", {
+      //           tagName: "code",
+      //           properties: {
+      //             className: ["language-tsx"],
+      //           },
+      //           children: [
+      //             {
+      //               type: "text",
+      //               value: source,
+      //             },
+      //           ],
+      //         }),
+      //       ],
+      //     })
+      //   )
+      // }
+    })
+  }
+}
+
+function getNodeAttributeByName(node: UnistNode, name: string) {
+  return node.attributes?.find((attribute) => attribute.name === name)
+}
+
+function getComponentSourceFileContent(node: UnistNode) {
+  const src = getNodeAttributeByName(node, 'src')?.value as string
+
+  if (!src) {
+    return null
+  }
+
+  // Read the source file.
+  const filePath = path.join(process.cwd(), src)
+  console.log('filePath', filePath)
+  const source = fs.readFileSync(filePath, 'utf8')
+
+  return source
+}

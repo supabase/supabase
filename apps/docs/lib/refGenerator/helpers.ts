@@ -1,9 +1,9 @@
-import { TsDoc } from '../../generator/legacy/definitions'
+import type { TsDoc } from '../../generator/legacy/definitions'
 
-import { values, mapValues } from 'lodash'
-import { OpenAPIV3 } from 'openapi-types'
+import { mapValues, values } from 'lodash-es'
+import type { OpenAPIV3 } from 'openapi-types'
+import type { ICommonItem } from '~/components/reference/Reference.types'
 import { flattenSections } from '../helpers'
-import { ICommonItem } from '~/components/reference/Reference.types'
 
 export function extractTsDocNode(nodeToFind: string, definition: any) {
   const nodePath = nodeToFind.split('.')
@@ -24,17 +24,17 @@ export function extractTsDocNode(nodeToFind: string, definition: any) {
 }
 
 export function generateParameters(tsDefinition: any) {
-  let functionDeclaration = null
+  let functionDeclaration: any = null
   if (tsDefinition.kindString == 'Method') {
     functionDeclaration = tsDefinition
   } else if (tsDefinition.kindString == 'Constructor') {
     functionDeclaration = tsDefinition
   } else functionDeclaration = tsDefinition?.type?.declaration
-  if (!functionDeclaration) return ''
+  if (!functionDeclaration || !functionDeclaration.signatures) return ''
 
   // Functions can have multiple signatures - select the last one since that
   // tends to be closer to primitive types (citation needed).
-  const paramDefinitions: TsDoc.TypeDefinition[] = functionDeclaration.signatures.at(-1).parameters
+  const paramDefinitions: TsDoc.TypeDefinition[] = functionDeclaration.signatures.at(-1)?.parameters
   if (!paramDefinitions) return ''
 
   // const paramsComments: TsDoc.CommentTag = tsDefinition.comment?.tags?.filter(x => x.tag == 'param')
@@ -46,7 +46,7 @@ function recurseThroughParams(paramDefinition: any) {
   const param = { ...paramDefinition }
   const labelParams = generateLabelParam(param)
 
-  let children: any[]
+  let children: any[] | undefined
   if (param.type?.type === 'literal') {
     // skip: literal types have no children
   } else if (param.type?.type === 'intrinsic') {
@@ -227,7 +227,11 @@ export type enrichedOperation = OpenAPIV3.OperationObject & {
   tags?: []
 }
 
-export function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { apiUrl: string }) {
+export function gen_v3(
+  spec: OpenAPIV3.Document,
+  dest: string,
+  { apiUrl, type }: { apiUrl: string; type?: 'client-lib' | 'cli' | 'api' | 'mgmt-api' }
+) {
   const specLayout = spec.tags || []
   const operations: enrichedOperation[] = []
 
@@ -236,12 +240,15 @@ export function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { api
 
     toArrayWithKey(val!, 'operation').forEach((o) => {
       const operation = o as v3OperationWithPath
+      const operationId =
+        type === 'mgmt-api' && operation.operationId && isValidSlug(operation.operationId)
+          ? operation.operationId
+          : slugify(operation.summary!)
       const enriched = {
         ...operation,
         path: key,
         fullPath,
-        operationId: slugify(operation.summary!),
-
+        operationId,
         responseList: toArrayWithKey(operation.responses!, 'responseCode') || [],
       }
       // @ts-expect-error // missing 'responses', see OpenAPIV3.OperationObject.responses
@@ -277,6 +284,11 @@ const slugify = (text: string) => {
     .replace(/\-\-+/g, '-') // Replace multiple - with single -
     .replace(/^-+/, '') // Trim - from start of text
     .replace(/-+$/, '') // Trim - from end of text
+}
+
+function isValidSlug(slug: string): boolean {
+  const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+  return slugRegex.test(slug)
 }
 
 // Uppercase the first letter of a string

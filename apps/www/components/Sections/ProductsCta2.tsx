@@ -1,0 +1,43 @@
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import MagnifiedProducts from '~/components/MagnifiedProducts'
+import { PRODUCT_SHORTNAMES } from '~/lib/constants'
+import Link from 'next/link'
+import React from 'react'
+import { Button, cn } from 'ui'
+
+import { StartYourProjectButton } from '@/components/StartYourProjectButton'
+
+export type Products = PRODUCT_SHORTNAMES
+
+interface Props {
+  currentProduct: Products | string
+  className?: string
+}
+
+function ProductsCta(props: Props) {
+  return (
+    <SectionContainer
+      className={cn(
+        'overflow-hidden flex flex-col xl:grid xl:grid-cols-2 gap-4 md:gap-8 xl:gap-10',
+        props.className
+      )}
+    >
+      <div className="w-full pb-6 md:h-[120px] flex items-center justify-center text-center col-span-1">
+        <MagnifiedProducts currentProduct={props.currentProduct} />
+      </div>
+      <div className="flex flex-col col-span-1 text-center xl:text-left xl:justify-center items-center xl:items-start">
+        <h2 className="h2 w-max">Ready to start building?</h2>
+        <div className="flex gap-2 py-2">
+          <StartYourProjectButton size="small" className="h-full" variant="primary">
+            Start for free
+          </StartYourProjectButton>
+          <Button asChild variant="default" size="small">
+            <Link href="https://forms.supabase.com/enterprise">Contact Enterprise</Link>
+          </Button>
+        </div>
+      </div>
+    </SectionContainer>
+  )
+}
+
+export default ProductsCta

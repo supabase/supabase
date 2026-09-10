@@ -1,17 +1,27 @@
 import createGlobe from 'cobe'
-import { useEffect, useRef } from 'react'
 import { useTheme } from 'next-themes'
+import { useEffect, useRef } from 'react'
 
 const Globe = () => {
   const { resolvedTheme } = useTheme()
-  const canvasRef = useRef<any>()
+  const canvasRef = useRef<any | null>(null)
 
   useEffect(() => {
-    let rotation: number = 0
-    let width: number = 0
-    const onResize = () => canvasRef.current && (width = canvasRef.current.offsetWidth)
-    window.addEventListener('resize', onResize)
-    onResize()
+    let rotation = 0
+    let width = 0
+    let previousWidth = 0
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        width = Math.round(entry.contentRect.width)
+      }
+    })
+
+    if (canvasRef.current) {
+      resizeObserver.observe(canvasRef.current)
+      width = Math.round(canvasRef.current.getBoundingClientRect().width)
+    }
+
     const cobe = createGlobe(canvasRef.current, {
       devicePixelRatio: 2,
       width: width * 2,
@@ -46,28 +56,31 @@ const Globe = () => {
       onRender: (state) => {
         state.phi = rotation
         rotation += 0.0025
-        state.width = width * 2
-        state.height = width * 2
+        if (width !== previousWidth) {
+          state.width = width * 2
+          state.height = width * 2
+          previousWidth = width
+        }
       },
     })
-    setTimeout(() => (canvasRef.current.style.opacity = '1'))
+
+    const timeoutId = setTimeout(() => {
+      if (canvasRef.current) {
+        canvasRef.current.style.opacity = '0.8'
+      }
+    }, 10)
+
     return () => {
+      resizeObserver.disconnect()
+      clearTimeout(timeoutId)
       cobe.destroy()
-      window.removeEventListener('resize', onResize)
     }
   }, [resolvedTheme])
 
   return (
     <canvas
       ref={canvasRef}
-      style={{
-        width: '100%',
-        height: '100%',
-        contain: 'layout paint size',
-        opacity: 0,
-        transition: 'opacity 1s ease',
-        borderRadius: '100%',
-      }}
+      className="absolute inset-0 w-full h-full opacity-0 transition-opacity object-contain"
     />
   )
 }

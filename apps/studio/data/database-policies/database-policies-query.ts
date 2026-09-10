@@ -1,56 +1,60 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import pgMeta, { type PGPolicy } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { executeSql } from '../sql/execute-sql-mutation'
 import { databasePoliciesKeys } from './keys'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-export type DatabasePoliciesVariables = {
+type DatabasePoliciesVariables = {
   projectRef?: string
-  connectionString?: string
-  schema?: string
+  connectionString?: string | null
+  schemas?: string[]
 }
 
 export async function getDatabasePolicies(
-  { projectRef, connectionString, schema }: DatabasePoliciesVariables,
+  { projectRef, connectionString, schemas }: DatabasePoliciesVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await get('/platform/pg-meta/{ref}/policies', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: {
-        included_schemas: schema || '',
-        excluded_schemas: '',
-      },
+  const { sql } = pgMeta.policies.list({ includedSchemas: schemas })
+  const { result } = await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['policies', schemas],
     },
-    headers,
-    signal,
-  })
+    signal
+  )
 
-  if (error) throw error
-  return data
+  return result as PGPolicy[]
 }
 
 export type DatabasePoliciesData = Awaited<ReturnType<typeof getDatabasePolicies>>
 export type DatabasePoliciesError = ResponseError
 
-export const useDatabasePoliciesQuery = <TData = DatabasePoliciesData>(
-  { projectRef, connectionString, schema }: DatabasePoliciesVariables,
-  {
-    enabled = true,
-    ...options
-  }: UseQueryOptions<DatabasePoliciesData, DatabasePoliciesError, TData> = {}
-) =>
-  useQuery<DatabasePoliciesData, DatabasePoliciesError, TData>(
-    databasePoliciesKeys.list(projectRef, schema),
-    ({ signal }) => getDatabasePolicies({ projectRef, connectionString, schema }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+function markSavedPolicySafe(policy: DatabasePoliciesData[number]): Policy {
+  return policy as Policy
+}
+
+export const useDatabasePoliciesQuery = <TData = Policy[]>(
+  { projectRef, connectionString, schemas }: DatabasePoliciesVariables,
+  { enabled = true, ...options }: UseCustomQueryOptions<Policy[], DatabasePoliciesError, TData> = {}
+) => {
+  const { data: project } = useSelectedProjectQuery()
+  const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+
+  return useQuery<Policy[], DatabasePoliciesError, TData>({
+    queryKey: databasePoliciesKeys.list(projectRef, schemas),
+    queryFn: ({ signal }) =>
+      getDatabasePolicies({ projectRef, connectionString, schemas }, signal).then((data) =>
+        data.map(markSavedPolicySafe)
+      ),
+    enabled: enabled && typeof projectRef !== 'undefined' && isActive,
+    ...options,
+  })
+}

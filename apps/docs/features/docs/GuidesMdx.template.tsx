@@ -1,0 +1,159 @@
+import Breadcrumbs from '~/components/Breadcrumbs'
+import GuidesSidebar from '~/components/GuidesSidebar'
+import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
+import { MDXRemoteBase } from '~/features/docs/MdxBase'
+import type { WithRequired } from '~/features/helpers.types'
+import { resolveBreadcrumbs } from '~/lib/breadcrumbs'
+import { type GuideFrontmatter } from '~/lib/docs'
+import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
+import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
+import { ExternalLink } from 'lucide-react'
+import { type ReactNode } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { cn } from 'ui'
+
+const EDIT_LINK_SYMBOL = Symbol('edit link')
+interface EditLink {
+  [EDIT_LINK_SYMBOL]: true
+  link: string
+  includesProtocol: boolean
+}
+
+/**
+ * Create an object representing a link where the original content can be
+ * edited.
+ *
+ * Takes either a relative path, which will be prefixed with
+ * `https://github.com/`, or a full URL including protocol.
+ */
+const newEditLink = (str: string): EditLink => {
+  if (str.startsWith('/')) {
+    throw Error(`Edit links cannot start with slashes. Received: ${str}`)
+  }
+
+  /**
+   * Catch strings that provide FQDNS without https?:
+   *
+   * At the start of a string, before the first slash, there is a dot
+   * surrounded by non-slash characters.
+   */
+  if (/^[^\/]+\.[^\/]+\//.test(str)) {
+    throw Error(`Fully qualified domain names must start with 'https?'. Received: ${str}`)
+  }
+
+  return {
+    [EDIT_LINK_SYMBOL]: true,
+    link: str,
+    includesProtocol: str.startsWith('http://') || str.startsWith('https://'),
+  }
+}
+
+interface BaseGuideTemplateProps {
+  meta?: GuideFrontmatter
+  content?: string
+  children?: ReactNode
+  editLink: EditLink
+  mdxOptions?: SerializeOptions
+  pathname: `/${string}`
+}
+
+type GuideTemplateProps =
+  | WithRequired<BaseGuideTemplateProps, 'children'>
+  | WithRequired<BaseGuideTemplateProps, 'content'>
+
+const GuideTemplate = ({
+  meta,
+  content,
+  children,
+  editLink,
+  mdxOptions,
+  pathname,
+}: GuideTemplateProps) => {
+  const hideToc = meta?.hideToc || meta?.hide_table_of_contents
+  const breadcrumbChain = resolveBreadcrumbs(pathname)
+  const breadcrumbSchema = breadcrumbListSchema({ pathname, chain: breadcrumbChain })
+  const breadcrumbJsonLd = breadcrumbSchema ? serializeJsonLd(breadcrumbSchema) : null
+
+  return (
+    <TocAnchorsProvider>
+      <div className={'grid grid-cols-12 relative gap-4'}>
+        <div
+          className={cn(
+            'relative',
+            'transition-all ease-out',
+            'duration-100',
+            'col-span-12 md:col-span-8'
+          )}
+        >
+          {breadcrumbJsonLd && (
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }}
+            />
+          )}
+          <Breadcrumbs className="mb-6" />
+          <article
+            // Used to get headings for the table of contents
+            id="sb-docs-guide-main-article"
+            data-testid="sb-docs-guide-main-article"
+            className="prose max-w-none"
+          >
+            <header className="mb-8">
+              <h1 className="mt-0 mb-0 [&>p]:m-0">
+                <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
+              </h1>
+              {meta?.subtitle && (
+                <div className="mt-3 not-prose [&_p]:text-xl [&_p]:leading-7 text-foreground-light [&>p]:m-0">
+                  <ReactMarkdown>{meta.subtitle}</ReactMarkdown>
+                </div>
+              )}
+            </header>
+
+            {content && (
+              <MDXRemoteBase source={content} options={mdxOptions} customPreprocess={(x) => x} />
+            )}
+            {children}
+
+            <footer className="mt-16 not-prose">
+              <a
+                href={
+                  editLink.includesProtocol ? editLink.link : `https://github.com/${editLink.link}`
+                }
+                className={cn(
+                  'w-fit',
+                  'flex items-center gap-1',
+                  'text-sm text-tertiary-foreground hover:text-foreground',
+                  'transition-colors'
+                )}
+                target="_blank"
+                rel="noreferrer noopener edit"
+              >
+                Edit this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
+              </a>
+            </footer>
+          </article>
+        </div>
+        <GuidesSidebar
+          video={meta?.tocVideo}
+          hideToc={hideToc}
+          className={cn(
+            'hidden md:flex',
+            'md:col-span-3 md:col-start-10',
+            'self-start',
+            'sticky',
+            /**
+             * --header-height: height of nav
+             * 3rem: content padding
+             */
+            'top-[calc(var(--header-height)+3rem)]',
+            // 4rem accounts for 3rem of top padding + 1rem of extra breathing room
+            'max-h-[calc(100vh-var(--header-height)-4rem)]'
+          )}
+        />
+      </div>
+    </TocAnchorsProvider>
+  )
+}
+
+export { GuideTemplate, newEditLink }
+export type { EditLink }

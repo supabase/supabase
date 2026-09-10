@@ -1,189 +1,227 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useCallback } from 'react'
-import toast from 'react-hot-toast'
-
-import { IntegrationConnectionItem } from 'components/interfaces/Integrations/IntegrationConnection'
-import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/IntegrationPanels'
-import { Markdown } from 'components/interfaces/Markdown'
+import { Plus } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useCallback, useMemo } from 'react'
+import { toast } from 'sonner'
+import { Button, Card, CardContent } from 'ui'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import {
-  ScaffoldContainer,
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import type {
-  IntegrationName,
-  IntegrationProjectConnection,
-} from 'data/integrations/integrations.types'
-import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
-import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { IntegrationImageHandler } from '../IntegrationsSettings'
-import GitHubIntegrationConnectionForm from './GitHubIntegrationConnectionForm'
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-const GitHubTitle = `GitHub Connections`
+import { IntegrationSectionIcon } from '../IntegrationsSettings'
+import { GitHubIntegrationConnectionForm } from './GitHubIntegrationConnectionForm'
+import { IntegrationConnectionItem } from '@/components/interfaces/Integrations/VercelGithub/IntegrationConnection'
+import { EmptyIntegrationConnection } from '@/components/interfaces/Integrations/VercelGithub/IntegrationPanels'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
+import { useGitHubConnectionDeleteMutation } from '@/data/integrations/github-connection-delete-mutation'
+import {
+  useGitHubConnectionsQuery,
+  type GitHubConnection,
+} from '@/data/integrations/github-connections-query'
+import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import {
+  GITHUB_INTEGRATION_INSTALLATION_URL,
+  GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL,
+} from '@/lib/github'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-const GitHubDetailsSection = `
-Connect any of your GitHub repositories to a project.
-`
+const toIntegrationProjectConnection = (
+  connection: GitHubConnection
+): IntegrationProjectConnection => ({
+  id: String(connection.id),
+  added_by: {
+    id: String(connection.user?.id),
+    primary_email: connection.user?.primary_email ?? '',
+    username: connection.user?.username ?? '',
+  },
+  foreign_project_id: String(connection.repository.id),
+  supabase_project_ref: connection.project.ref,
+  organization_integration_id: 'unused',
+  inserted_at: connection.inserted_at,
+  updated_at: connection.updated_at,
+  metadata: {
+    name: connection.repository.name,
+  } as IntegrationProjectConnection['metadata'],
+})
 
-const GitHubContentSectionTop = `
-
-### How will GitHub connections work?
-
-You will be able to connect a GitHub repository to a Supabase project.
-The GitHub app will watch for changes in your repository such as file changes, branch changes as well as pull request activity.
-`
-
-const GitHubSection = () => {
+export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
+  const router = useRouter()
   const { ref: projectRef } = useParams()
-  const project = useSelectedProject()
-  const org = useSelectedOrganization()
-  const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
+  const { data: org } = useSelectedOrganizationQuery()
 
-  const { data: allConnections } = useGitHubConnectionsQuery({ organizationId: org?.id })
-  const { data: branches } = useBranchesQuery({ projectRef })
+  const { can: canReadGitHubConnection, isLoading: isLoadingPermissions } =
+    useAsyncCheckPermissions(PermissionAction.READ, 'integrations.github_connections')
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'integrations.github_connections'
+  )
+  const { can: canUpdateGitHubConnection } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'integrations.github_connections'
+  )
+
+  const { data: gitHubAuthorization } = useGitHubAuthorizationQuery({
+    enabled: !isProjectScoped,
+  })
+  const { data: connections } = useGitHubConnectionsQuery(
+    { organizationId: org?.id },
+    { enabled: isProjectScoped ? !!projectRef && !!org?.id : !!org?.id }
+  )
 
   const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
     onSuccess: () => {
-      toast.success('Successfully deleted Github connection')
+      toast.success('GitHub connection deleted')
     },
   })
 
-  const { mutate: disableBranching } = useBranchesDisableMutation()
-
-  const hasAccessToBranching = useFlag<boolean>('branchManagement')
-
-  const previewBranches = (branches ?? []).filter((branch) => !branch.is_default)
-  const isBranch = project?.parent_project_ref !== undefined
-  const isBranchingEnabled =
-    project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
-
-  const connections =
-    allConnections?.filter((connection) =>
-      isBranch
-        ? connection.project.ref === project.parent_project_ref
-        : connection.project.ref === projectRef
-    ) ?? []
+  const existingConnection = useMemo(
+    () => connections?.find((c) => c.project.ref === projectRef),
+    [connections, projectRef]
+  )
 
   const onAddGitHubConnection = useCallback(() => {
-    sidePanelsStateSnapshot.setGithubConnectionsOpen(true)
-  }, [sidePanelsStateSnapshot])
+    router.push('/project/_/settings/integrations')
+  }, [router])
+
+  useShortcut(SHORTCUT_IDS.ORG_INTEGRATIONS_ADD_CONNECTION, onAddGitHubConnection, {
+    enabled: !isProjectScoped && canCreateGitHubConnection,
+  })
+
+  const description = isProjectScoped
+    ? 'Preview branches and production deploys from a connected GitHub repository.'
+    : 'Preview branches and production deploys from connected GitHub repositories.'
 
   const onDeleteGitHubConnection = useCallback(
     async (connection: IntegrationProjectConnection) => {
-      if (isBranchingEnabled) {
-        if (!projectRef) throw new Error('Project ref not found')
-        disableBranching({ projectRef, branchIds: previewBranches?.map((branch) => branch.id) })
+      if (!org?.id) {
+        toast.error('Organization not found')
+        return
       }
-      if (!org?.id) throw new Error('Organization not found')
-      deleteGitHubConnection({ connectionId: connection.id, organizationId: org.id })
+
+      deleteGitHubConnection({
+        connectionId: connection.id,
+        organizationId: org.id,
+      })
     },
-    [
-      deleteGitHubConnection,
-      disableBranching,
-      isBranchingEnabled,
-      org?.id,
-      previewBranches,
-      projectRef,
-    ]
+    [deleteGitHubConnection, org?.id]
   )
 
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection>
-        <ScaffoldSectionDetail title={GitHubTitle}>
-          <Markdown content={GitHubDetailsSection} />
-          <IntegrationImageHandler title="github" />
-        </ScaffoldSectionDetail>
-        <ScaffoldSectionContent>
-          <Markdown content={GitHubContentSectionTop} />
-
-          {connections.length > 0 ? (
-            <ul className="flex flex-col">
-              {connections.map((connection) => (
-                <div key={connection.id} className="relative flex flex-col -gap-[1px] [&>li]:pb-0">
-                  <IntegrationConnectionItem
+    <PageSection>
+      <PageSectionMeta>
+        <div className="flex flex-1 items-start gap-5">
+          <IntegrationSectionIcon title="github" />
+          <PageSectionSummary>
+            <PageSectionTitle>GitHub</PageSectionTitle>
+            <PageSectionDescription>{description}</PageSectionDescription>
+          </PageSectionSummary>
+        </div>
+      </PageSectionMeta>
+      <PageSectionContent>
+        {isLoadingPermissions ? (
+          <GenericSkeletonLoader />
+        ) : !canReadGitHubConnection ? (
+          <NoPermission resourceText="view GitHub connections" />
+        ) : isProjectScoped ? (
+          <GitHubIntegrationConnectionForm connection={existingConnection} />
+        ) : (
+          <div className="space-y-6">
+            <div className="flex flex-col gap-y-2">
+              {(connections?.length ?? 0) > 0 ? (
+                <>
+                  <ul className="flex flex-col gap-y-2">
+                    {connections?.map((connection) => (
+                      <IntegrationConnectionItem
+                        key={connection.id}
+                        disabled={!canUpdateGitHubConnection}
+                        connection={toIntegrationProjectConnection(connection)}
+                        type="GitHub"
+                        onDeleteConnection={onDeleteGitHubConnection}
+                      />
+                    ))}
+                  </ul>
+                  <EmptyIntegrationConnection
+                    onClick={onAddGitHubConnection}
                     showNode={false}
-                    disabled={isBranch}
-                    key={connection.id}
-                    connection={{
-                      id: String(connection.id),
-                      added_by: {
-                        id: String(connection.user?.id),
-                        primary_email: connection.user?.primary_email ?? '',
-                        username: connection.user?.username ?? '',
-                      },
-                      foreign_project_id: String(connection.repository.id),
-                      supabase_project_ref: connection.project.ref,
-                      organization_integration_id: 'unused',
-                      inserted_at: connection.inserted_at,
-                      updated_at: connection.updated_at,
-                      metadata: {
-                        name: connection.repository.name,
-                      } as any,
-                    }}
-                    type={'GitHub' as IntegrationName}
-                    onDeleteConnection={onDeleteGitHubConnection}
-                    className="!rounded-b-none !mb-0"
-                  />
+                    disabled={!canCreateGitHubConnection}
+                    icon={<Plus />}
+                  >
+                    Add connection
+                  </EmptyIntegrationConnection>
+                </>
+              ) : (
+                <GitHubOrgEmptyState
+                  disabled={!canCreateGitHubConnection}
+                  onClick={onAddGitHubConnection}
+                />
+              )}
+            </div>
 
-                  <div className="border-b border-l border-r rounded-b-lg">
-                    <GitHubIntegrationConnectionForm
-                      connection={{
-                        id: String(connection.id),
-                        added_by: {
-                          id: String(connection.user?.id),
-                          primary_email: connection.user?.primary_email ?? '',
-                          username: connection.user?.username ?? '',
-                        },
-                        foreign_project_id: String(connection.repository.id),
-                        supabase_project_ref: connection.project.ref,
-                        organization_integration_id: 'unused',
-                        inserted_at: connection.inserted_at,
-                        updated_at: connection.updated_at,
-                        metadata: {
-                          name: connection.repository.name,
-                          supabaseConfig: {
-                            supabaseDirectory: connection.workdir,
-                            supabaseChangesOnly: (connection as any).supabase_changes_only, //[Joshen] potentially API codegen issue
-                          },
-                        } as any,
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </ul>
-          ) : hasAccessToBranching ? (
-            <EmptyIntegrationConnection
-              onClick={onAddGitHubConnection}
-              orgSlug={org?.slug}
-              showNode={false}
-            >
-              Add new project connection
-            </EmptyIntegrationConnection>
-          ) : (
-            <p className="text-sm text-foreground-light">
-              Access to{' '}
-              <a
-                href="https://supabase.com/docs/guides/platform/branching"
-                target="_blank"
-                rel="noreferrer"
-                className="text-foreground"
-              >
-                branching
-              </a>{' '}
-              is required to add GitHub connections.
-            </p>
-          )}
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+            {gitHubAuthorization && (
+              <p className="text-sm text-foreground-light">
+                You are authorized with the Supabase GitHub app. You can configure your{' '}
+                <InlineLink href={GITHUB_INTEGRATION_INSTALLATION_URL}>
+                  GitHub App installations and repository access
+                </InlineLink>
+                , or{' '}
+                <InlineLink href={GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL}>
+                  revoke your authorization
+                </InlineLink>
+                .
+              </p>
+            )}
+          </div>
+        )}
+      </PageSectionContent>
+    </PageSection>
   )
 }
 
-export default GitHubSection
+function GitHubOrgEmptyState({ disabled, onClick }: { disabled: boolean; onClick: () => void }) {
+  return (
+    <Card>
+      <CardContent>
+        <FormLayout
+          layout="flex-row-reverse"
+          label="GitHub repository"
+          description="Add a connection to link a repository to a project"
+        >
+          {disabled ? (
+            <ButtonTooltip
+              icon={<Plus />}
+              variant="default"
+              size="tiny"
+              disabled
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'Additional permissions required to add connection',
+                },
+              }}
+            >
+              Add connection
+            </ButtonTooltip>
+          ) : (
+            <Button icon={<Plus />} variant="default" size="tiny" type="button" onClick={onClick}>
+              Add connection
+            </Button>
+          )}
+        </FormLayout>
+      </CardContent>
+    </Card>
+  )
+}

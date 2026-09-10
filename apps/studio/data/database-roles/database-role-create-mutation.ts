@@ -1,16 +1,16 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import pgMeta from '@supabase/pg-meta'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { post } from 'data/fetchers'
-import type { ResponseError } from 'types'
-import { databaseRolesKeys } from './keys'
-import type { components } from 'data/api'
+import { invalidateRolesQuery } from './database-roles-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
-type CreateRoleBody = components['schemas']['CreateRoleBody']
+type CreateRoleBody = Parameters<typeof pgMeta.roles.create>[0]
 
 export type DatabaseRoleCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   payload: CreateRoleBody
 }
 
@@ -19,20 +19,14 @@ export async function createDatabaseRole({
   connectionString,
   payload,
 }: DatabaseRoleCreateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await post('/platform/pg-meta/{ref}/roles', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-    },
-    body: payload,
-    headers,
+  const sql = pgMeta.roles.create(payload).sql
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['roles', 'create'],
   })
-
-  if (error) throw error
-  return data
+  return result
 }
 
 type DatabaseRoleCreateData = Awaited<ReturnType<typeof createDatabaseRole>>
@@ -42,27 +36,25 @@ export const useDatabaseRoleCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseRoleCreateData, ResponseError, DatabaseRoleCreateVariables>,
+  UseCustomMutationOptions<DatabaseRoleCreateData, ResponseError, DatabaseRoleCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseRoleCreateData, ResponseError, DatabaseRoleCreateVariables>(
-    (vars) => createDatabaseRole(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseRolesKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create database role: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseRoleCreateData, ResponseError, DatabaseRoleCreateVariables>({
+    mutationFn: (vars) => createDatabaseRole(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await invalidateRolesQuery(queryClient, projectRef)
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create database role: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

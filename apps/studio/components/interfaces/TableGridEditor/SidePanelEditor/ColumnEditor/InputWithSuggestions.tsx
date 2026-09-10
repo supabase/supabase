@@ -5,22 +5,24 @@
 // with timeouts and a lot of unnecessary defensive guards - but these can go away when we port
 // the component over to the UI library
 
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { noop } from 'lodash'
+import { List } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconList,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { Suggestion } from './ColumnEditor.types'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 const MAX_SUGGESTIONS = 3
 
@@ -38,22 +40,26 @@ interface InputWithSuggestionsProps {
   suggestionsHeader?: string
   onChange: (event: any) => void
   onSelectSuggestion: (suggestion: Suggestion) => void
+  'data-testid'?: string
+  'aria-label'?: string
 }
 
 const InputWithSuggestions = ({
+  className,
   label,
   description,
   placeholder,
   size,
   layout,
   disabled = false,
-  className = '',
   value = '',
   suggestions = [],
   suggestionsTooltip,
   suggestionsHeader,
   onChange = noop,
   onSelectSuggestion = noop,
+  'data-testid': dataTestId,
+  'aria-label': ariaLabel,
 }: InputWithSuggestionsProps) => {
   const ref = useRef(null)
   const [filteredSuggestions, setFilteredSuggestions] = useState<Suggestion[]>(suggestions)
@@ -80,64 +86,54 @@ const InputWithSuggestions = ({
 
   return (
     <div ref={ref} className="relative">
-      <Input
-        label={label}
-        descriptionText={description}
-        placeholder={placeholder}
-        size={size}
-        layout={layout}
-        disabled={disabled}
-        className={className}
-        inputClassName="pr-10"
-        type="text"
-        value={value}
-        onChange={onInputChange}
-        actions={
-          showSuggestions && (
-            <DropdownMenu>
-              <Tooltip.Root delayDuration={0}>
+      <FormItemLayout layout={layout} label={label} description={description} isReactForm={false}>
+        <InputGroup>
+          <InputGroupInput
+            className={className}
+            aria-label={ariaLabel}
+            data-testid={dataTestId}
+            disabled={disabled}
+            size={size}
+            value={value}
+            title={value}
+            onChange={onInputChange}
+            placeholder={placeholder}
+          />
+          {showSuggestions && (
+            <InputGroupAddon align="inline-end">
+              <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Tooltip.Trigger asChild>
-                    <Button type="default" className="!px-1 mr-0.5">
-                      <IconList strokeWidth={1.5} size={14} />
-                    </Button>
-                  </Tooltip.Trigger>
-                </DropdownMenuTrigger>
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'bg-alternative rounded py-1 px-2 leading-none shadow',
-                        'border-background border',
-                      ].join(' ')}
-                    >
-                      <span className="text-foreground text-xs">
-                        {suggestionsTooltip || 'Suggestions'}
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              </Tooltip.Root>
-
-              <DropdownMenuContent align="end" side="bottom">
-                <DropdownMenuLabel>{suggestionsHeader || 'Suggestions'}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {filteredSuggestions.map((suggestion: Suggestion) => (
-                  <DropdownMenuItem
-                    className="space-x-2"
-                    key={suggestion.name}
-                    onClick={() => onSelectSuggestion(suggestion)}
+                  <ButtonTooltip
+                    variant="text"
+                    size="tiny"
+                    className="px-1 mr-0.5"
+                    tooltip={{
+                      content: { text: suggestionsTooltip || 'Suggestions', side: 'bottom' },
+                    }}
                   >
-                    <div>{suggestion.name}</div>
-                    <div className="text-foreground-lighter">{suggestion.description}</div>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )
-        }
-      />
+                    <List strokeWidth={1.5} size={14} />
+                  </ButtonTooltip>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent align="end" side="bottom">
+                  <DropdownMenuLabel>{suggestionsHeader || 'Suggestions'}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {filteredSuggestions.map((suggestion: Suggestion) => (
+                    <DropdownMenuItem
+                      className="flex flex-col items-start"
+                      key={suggestion.name}
+                      onClick={() => onSelectSuggestion(suggestion)}
+                    >
+                      <p>{suggestion.name}</p>
+                      <p className="text-foreground-lighter">{suggestion.description}</p>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </InputGroupAddon>
+          )}
+        </InputGroup>
+      </FormItemLayout>
     </div>
   )
 }

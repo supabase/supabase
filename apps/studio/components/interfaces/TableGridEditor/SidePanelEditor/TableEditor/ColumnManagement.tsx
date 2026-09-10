@@ -1,24 +1,46 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { isEmpty, noop, partition } from 'lodash'
 import {
-  DragDropContext,
-  Draggable,
-  DraggableProvided,
-  Droppable,
-  DroppableProvided,
-} from 'react-beautiful-dnd'
-import { Alert, Button, IconEdit, IconExternalLink, IconHelpCircle, IconKey, IconTrash } from 'ui'
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { isEmpty, noop, partition } from 'lodash'
+import { Edit, ExternalLink, HelpCircle, Key, Trash } from 'lucide-react'
+import { useState } from 'react'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  WarningIcon,
+} from 'ui'
 
-import InformationBox from 'components/ui/InformationBox'
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
+import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
-import Column from './Column'
-import type { ImportContent } from './TableEditor.types'
+import { Column } from './Column'
+import type { ImportContent, TableField } from './TableEditor.types'
+import InformationBox from '@/components/ui/InformationBox'
+import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface ColumnManagementProps {
+  table: TableField
   columns?: ColumnField[]
   relations: ForeignKey[]
   enumTypes: EnumeratedType[]
@@ -27,9 +49,11 @@ interface ColumnManagementProps {
   onColumnsUpdated: (columns: ColumnField[]) => void
   onSelectImportData: () => void
   onClearImportContent: () => void
+  onUpdateFkRelations: (relations: ForeignKey[]) => void
 }
 
-const ColumnManagement = ({
+export const ColumnManagement = ({
+  table,
   columns = [],
   relations,
   enumTypes = [],
@@ -38,7 +62,15 @@ const ColumnManagement = ({
   onColumnsUpdated = noop,
   onSelectImportData = noop,
   onClearImportContent = noop,
+  onUpdateFkRelations,
 }: ColumnManagementProps) => {
+  const track = useTrack()
+
+  const [open, setOpen] = useState(false)
+  const [selectedColumn, setSelectedColumn] = useState<ColumnField>()
+  const [selectedFk, setSelectedFk] = useState<ForeignKey>()
+  const [columnIdToFocus, setColumnIdToFocus] = useState<string | null>(null)
+
   const hasImportContent = !isEmpty(importContent)
   const [primaryKeyColumns, otherColumns] = partition(
     columns,
@@ -78,6 +110,7 @@ const ColumnManagement = ({
   const onAddColumn = () => {
     const defaultColumn = generateColumnField()
     const updatedColumns = columns.concat(defaultColumn)
+    setColumnIdToFocus(defaultColumn.id)
     onColumnsUpdated(updatedColumns)
   }
 
@@ -86,28 +119,37 @@ const ColumnManagement = ({
     onColumnsUpdated(updatedColumns)
   }
 
-  const onSortColumns = (result: any, type: 'pks' | 'others') => {
+  const onSortColumns = (result: DragEndEvent, type: 'pks' | 'others') => {
     // Dropped outside of the list
-    if (!result.destination) {
+    if (result.over == null) {
       return
     }
 
     if (type === 'pks') {
-      const updatedPrimaryKeyColumns = primaryKeyColumns.slice()
-      const [removed] = updatedPrimaryKeyColumns.splice(result.source.index, 1)
-      updatedPrimaryKeyColumns.splice(result.destination.index, 0, removed)
+      const activeIndex = primaryKeyColumns.findIndex((item) => item.id === result.active.id)
+      const overIndex = primaryKeyColumns.findIndex((item) => item.id === result.over!.id)
+      if (activeIndex === -1 || overIndex === -1) return
+      const updatedPrimaryKeyColumns = arrayMove(primaryKeyColumns, activeIndex, overIndex)
       const updatedColumns = updatedPrimaryKeyColumns.concat(otherColumns)
       return onColumnsUpdated(updatedColumns)
     }
 
     if (type === 'others') {
-      const updatedOtherColumns = otherColumns.slice()
-      const [removed] = updatedOtherColumns.splice(result.source.index, 1)
-      updatedOtherColumns.splice(result.destination.index, 0, removed)
+      const activeIndex = otherColumns.findIndex((item) => item.id === result.active.id)
+      const overIndex = otherColumns.findIndex((item) => item.id === result.over!.id)
+      if (activeIndex === -1 || overIndex === -1) return
+      const updatedOtherColumns = arrayMove(otherColumns, activeIndex, overIndex)
       const updatedColumns = primaryKeyColumns.concat(updatedOtherColumns)
       return onColumnsUpdated(updatedColumns)
     }
   }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   return (
     <>
@@ -115,9 +157,9 @@ const ColumnManagement = ({
         <div className="flex items-center justify-between w-full">
           <h5>Columns</h5>
           <div className="flex items-center gap-x-2">
-            <Button asChild type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
+            <Button asChild variant="default" icon={<ExternalLink size={12} strokeWidth={2} />}>
               <a
-                href="https://supabase.com/docs/guides/database/tables#data-types"
+                href={`${DOCS_URL}/guides/database/tables#data-types`}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -129,16 +171,22 @@ const ColumnManagement = ({
                 <div className="py-3 border-r" />
                 {hasImportContent ? (
                   <div className="flex items-center gap-x-2">
-                    <Button type="default" icon={<IconEdit />} onClick={onSelectImportData}>
+                    <Button variant="default" icon={<Edit />} onClick={onSelectImportData}>
                       Edit content
                     </Button>
-                    <Button type="danger" icon={<IconTrash />} onClick={onClearImportContent}>
+                    <Button variant="danger" icon={<Trash />} onClick={onClearImportContent}>
                       Remove content
                     </Button>
                   </div>
                 ) : (
-                  <Button type="default" onClick={onSelectImportData}>
-                    Import data via spreadsheet
+                  <Button
+                    variant="default"
+                    onClick={() => {
+                      onSelectImportData()
+                      track('import_data_button_clicked', { tableType: 'New Table' })
+                    }}
+                  >
+                    Import data from CSV
                   </Button>
                 )}
               </>
@@ -154,20 +202,22 @@ const ColumnManagement = ({
         )}
 
         {primaryKeyColumns.length === 0 && (
-          <Alert title="Warning: No primary keys selected" variant="warning" withIcon>
-            Tables require at least one column as a primary key in order to uniquely identify each
-            row. Without a primary key, you will not be able to update or delete rows from the
-            table.
+          <Alert variant="warning">
+            <WarningIcon />
+            <AlertTitle>Warning: No primary keys selected</AlertTitle>
+            <AlertDescription>
+              Tables should have at least one column as the primary key to identify each row.
+              Without a primary key, you will not be able to update or delete rows from the table.
+            </AlertDescription>
           </Alert>
         )}
 
         {primaryKeyColumns.length > 1 && (
           <InformationBox
             block
-            icon={<IconKey className="text-white" size="large" />}
+            icon={<Key size={16} />}
             title="Composite primary key selected"
-            description="The columns that you've selected will be grouped as a primary key, and will serve
-          as the unique identifier for the rows in your table"
+            description="The columns that you've selected will be grouped as a primary key, and will serve as the unique identifier for the rows in your table"
           />
         )}
 
@@ -178,59 +228,30 @@ const ColumnManagement = ({
             {isNewRecord && <div className="w-[5%]" />}
             <div className="w-[25%] flex items-center space-x-2">
               <h5 className="text-xs text-foreground-lighter">Name</h5>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <h5 className="text-xs text-foreground-lighter">
-                    <IconHelpCircle size={15} strokeWidth={1.5} />
-                  </h5>
-                </Tooltip.Trigger>
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                        'border border-background w-[300px]', //border
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        Recommended to use lowercase and use an underscore to separate words e.g.
-                        column_name
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              </Tooltip.Root>
+              <Tooltip>
+                <TooltipTrigger>
+                  <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="w-[300px]">
+                  Recommended to use lowercase and use an underscore to separate words e.g.
+                  column_name
+                </TooltipContent>
+              </Tooltip>
             </div>
             <div className="w-[25%]">
               <h5 className="text-xs text-foreground-lighter">Type</h5>
             </div>
             <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'} flex items-center space-x-2`}>
               <h5 className="text-xs text-foreground-lighter">Default Value</h5>
-
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <h5 className="text-xs text-foreground-lighter">
-                    <IconHelpCircle size={15} strokeWidth={1.5} />
-                  </h5>
-                </Tooltip.Trigger>
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                        'border border-background w-[300px]', //border
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        Can either be a literal or an expression. When using an expression wrap your
-                        expression in brackets, e.g. (gen_random_uuid())
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              </Tooltip.Root>
+              <Tooltip>
+                <TooltipTrigger>
+                  <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="w-[300px]">
+                  Can either be a literal or an expression. When using an expression wrap your
+                  expression in brackets, e.g. (gen_random_uuid())
+                </TooltipContent>
+              </Tooltip>
             </div>
             <div className="w-[10%]">
               <h5 className="text-xs text-foreground-lighter">Primary</h5>
@@ -244,85 +265,108 @@ const ColumnManagement = ({
           </div>
 
           {primaryKeyColumns.length > 0 && (
-            <DragDropContext onDragEnd={(result: any) => onSortColumns(result, 'pks')}>
-              <Droppable droppableId="pk_columns_droppable">
-                {(droppableProvided: DroppableProvided) => (
-                  <div
-                    ref={droppableProvided.innerRef}
-                    className={`space-y-2 rounded-md bg-surface-200 px-3 py-2 ${
-                      isNewRecord ? '' : '-mx-3'
-                    }`}
-                  >
-                    {primaryKeyColumns.map((column: ColumnField, index: number) => (
-                      <Draggable key={column.id} draggableId={column.id} index={index}>
-                        {(draggableProvided: DraggableProvided) => (
-                          <div
-                            ref={draggableProvided.innerRef}
-                            {...draggableProvided.draggableProps}
-                          >
-                            <Column
-                              column={column}
-                              enumTypes={enumTypes}
-                              hasForeignKeys={checkIfHaveForeignKeys(column)}
-                              isNewRecord={isNewRecord}
-                              hasImportContent={hasImportContent}
-                              dragHandleProps={draggableProvided.dragHandleProps}
-                              onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
-                              onRemoveColumn={() => onRemoveColumn(column)}
-                            />
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {droppableProvided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          )}
-
-          <DragDropContext onDragEnd={(result: any) => onSortColumns(result, 'others')}>
-            <Droppable droppableId="other_columns_droppable">
-              {(droppableProvided: DroppableProvided) => (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={(result) => onSortColumns(result, 'pks')}
+            >
+              <SortableContext items={primaryKeyColumns} strategy={verticalListSortingStrategy}>
                 <div
-                  ref={droppableProvided.innerRef}
-                  className={`space-y-2 py-2 ${isNewRecord ? 'px-3 ' : ''}`}
+                  className={`space-y-2 rounded-md bg-surface-200 px-3 py-2 ${
+                    isNewRecord ? '' : '-mx-3'
+                  }`}
                 >
-                  {otherColumns.map((column: ColumnField, index: number) => (
-                    <Draggable key={column.id} draggableId={column.id} index={index}>
-                      {(draggableProvided: DraggableProvided) => (
-                        <div ref={draggableProvided.innerRef} {...draggableProvided.draggableProps}>
-                          <Column
-                            column={column}
-                            enumTypes={enumTypes}
-                            isNewRecord={isNewRecord}
-                            hasForeignKeys={checkIfHaveForeignKeys(column)}
-                            hasImportContent={hasImportContent}
-                            dragHandleProps={draggableProvided.dragHandleProps}
-                            onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
-                            onRemoveColumn={() => onRemoveColumn(column)}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
+                  {primaryKeyColumns.map((column: ColumnField) => (
+                    <Column
+                      key={column.id}
+                      column={column}
+                      relations={relations.filter((relation) => {
+                        return relation.columns.some((x) => x.source === column.name)
+                      })}
+                      enumTypes={enumTypes}
+                      hasForeignKeys={checkIfHaveForeignKeys(column)}
+                      isNewRecord={isNewRecord}
+                      hasImportContent={hasImportContent}
+                      shouldAutoFocusName={column.id === columnIdToFocus}
+                      onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
+                      onRemoveColumn={() => onRemoveColumn(column)}
+                      onEditForeignKey={(fk) => {
+                        setOpen(true)
+                        setSelectedColumn(column)
+                        if (fk) setSelectedFk(fk)
+                      }}
+                    />
                   ))}
-                  {droppableProvided.placeholder}
                 </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+              </SortableContext>
+            </DndContext>
+          )}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={(result) => onSortColumns(result, 'others')}
+          >
+            <SortableContext items={otherColumns} strategy={verticalListSortingStrategy}>
+              <div className={`space-y-2 py-2 ${isNewRecord ? 'px-3 ' : ''}`}>
+                {otherColumns.map((column: ColumnField) => (
+                  <Column
+                    key={column.id}
+                    column={column}
+                    relations={relations.filter((relation) => {
+                      return relation.columns.some((x) => x.source === column.name)
+                    })}
+                    enumTypes={enumTypes}
+                    isNewRecord={isNewRecord}
+                    hasForeignKeys={checkIfHaveForeignKeys(column)}
+                    hasImportContent={hasImportContent}
+                    shouldAutoFocusName={column.id === columnIdToFocus}
+                    onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
+                    onRemoveColumn={() => onRemoveColumn(column)}
+                    onEditForeignKey={(fk) => {
+                      setOpen(true)
+                      setSelectedColumn(column)
+                      if (fk) setSelectedFk(fk)
+                    }}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         </div>
 
         {!hasImportContent && (
-          <div className="flex items-center justify-center rounded border border-strong border-dashed py-3">
-            <Button type="default" onClick={() => onAddColumn()}>
+          <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-3">
+            <Button variant="default" onClick={() => onAddColumn()}>
               Add column
             </Button>
           </div>
         )}
       </div>
+
+      <ForeignKeySelector
+        visible={open}
+        column={selectedColumn}
+        table={{ id: table.id, name: table.name, columns: table.columns }}
+        foreignKey={selectedFk}
+        onClose={() => {
+          setOpen(false)
+          setSelectedFk(undefined)
+          setSelectedColumn(undefined)
+        }}
+        onSaveRelation={(fk) => {
+          const existingRelationIds = relations.map((x) => x.id)
+          if (fk.id !== undefined && existingRelationIds.includes(fk.id)) {
+            onUpdateFkRelations(
+              relations.map((x) => {
+                if (x.id === fk.id) return fk
+                return x
+              })
+            )
+          } else {
+            onUpdateFkRelations(relations.concat([fk]))
+          }
+        }}
+      />
     </>
   )
 }
-
-export default ColumnManagement

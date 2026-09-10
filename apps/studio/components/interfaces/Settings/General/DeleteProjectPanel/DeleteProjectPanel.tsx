@@ -1,35 +1,53 @@
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormHeader } from 'components/ui/Forms'
-import Panel from 'components/ui/Panel'
-import { Alert } from 'ui'
-import DeleteProjectButton from './DeleteProjectButton'
+import { Alert, AlertDescription, AlertTitle, CriticalIcon } from 'ui'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
-const DeleteProjectPanel = () => {
-  const { project } = useProjectContext()
+import { DeleteProjectButton } from './DeleteProjectButton'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+export const DeleteProjectPanel = () => {
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   if (project === undefined) return null
 
+  const title =
+    selectedOrganization?.managed_by === 'vercel-marketplace'
+      ? 'Deleting this project will also remove your database and uninstall the resource on Vercel.'
+      : 'Deleting this project will also remove your database.'
+  const description =
+    selectedOrganization?.managed_by === 'vercel-marketplace'
+      ? 'Make sure you have made a backup if you want to keep your data, and that no Vercel project is connected to this resource.'
+      : 'Make sure you have made a backup if you want to keep your data.'
+
   return (
-    <section id="delete-project">
-      <FormHeader title="Delete Project" description="" />
-      <Panel>
-        <Panel.Content>
-          <Alert
-            variant="danger"
-            withIcon
-            title="Deleting this project will also remove your database."
-          >
-            <div>
-              <p className="mb-4 block">
-                Make sure you have made a backup if you want to keep your data.
-              </p>
-              <DeleteProjectButton />
-            </div>
-          </Alert>
-        </Panel.Content>
-      </Panel>
-    </section>
+    <PageSection id="delete-project">
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Delete project</PageSectionTitle>
+          <PageSectionDescription>
+            Permanently remove your project and its database
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+
+      <PageSectionContent>
+        <Alert variant="destructive">
+          <CriticalIcon />
+          <AlertTitle>{title}</AlertTitle>
+          <AlertDescription>{description}</AlertDescription>
+          <div className="mt-2">
+            <DeleteProjectButton />
+          </div>
+        </Alert>
+      </PageSectionContent>
+    </PageSection>
   )
 }
-
-export default DeleteProjectPanel

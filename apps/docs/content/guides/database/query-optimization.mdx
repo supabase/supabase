@@ -25,20 +25,16 @@ select
   a.name,
   b.date_of_purchase
 from
-  customers a
-  join orders b
-    on a.id = b.customer_id
-where
-  a.sign_up_date > '2023-01-01'
-  and b.status = 'shipped'
-order by
-  b.date_of_purchase;
-limit 10
+  customers as a
+  join orders as b on a.id = b.customer_id
+where a.sign_up_date > '2023-01-01' and b.status = 'shipped'
+order by b.date_of_purchase
+limit 10;
 ```
 
 In this query, there are several parts that indexes could likely help in optimizing the performance:
 
-### `where` Clause:
+### `where` clause:
 
 The `where` clause filters rows based on certain conditions, and indexing the columns involved can improve this process:
 
@@ -51,18 +47,18 @@ create index idx_customers_sign_up_date on customers (sign_up_date);
 create index idx_orders_status on orders (status);
 ```
 
-### `join` Columns
+### `join` columns
 
 Indexes on the columns used for joining tables can help Postgres avoid scanning tables in their entirety when connecting tables.
 
-- Indexing and `b.customer_id` would likely improve the performance of the join in this query.
+- Indexing `a.id` and `b.customer_id` would likely improve the performance of the join in this query.
 - Note that if `a.id` is the primary key of the `customers` table it is already indexed
 
 ```sql
 create index idx_orders_customer_id on orders (customer_id);
 ```
 
-### `order by` Clause
+### `order by` clause
 
 Sorting can also be optimized by indexing:
 

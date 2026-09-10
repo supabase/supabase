@@ -1,0 +1,30 @@
+---
+title: 'Enforce MFA on Organization'
+description: 'All users in an organization must have a valid MFA session to interact with organization resources'
+---
+
+Supabase provides multi-factor authentication (MFA) enforcement on the organization level. With MFA enforcement, you can ensure that all organization members use MFA. Members cannot interact with your organization or your organization's projects without a valid MFA-backed session.
+
+<Admonition type="note">
+
+MFA enforcement is only available on the [Pro, Team and Enterprise plans](/pricing).
+
+</Admonition>
+
+## Manage MFA enforcement
+
+To enable MFA on an organization, visit the [security settings](/dashboard/org/_/security) page and toggle `Require MFA to access organization` on.
+
+- Only organization **owners** can modify this setting
+- The owner must have [MFA on their own account](/docs/guides/platform/multi-factor-authentication)
+- Supabase recommends creating two distinct MFA apps on your user account
+
+<Admonition type="caution">
+
+When MFA enforcement is enabled, users without MFA will immediately lose access all resources in the organization. The users will still be members of the organization and will regain their original permissions once they enable MFA on their account.
+
+</Admonition>
+
+## Personal access tokens
+
+Personal access tokens are not affected by MFA enforcement. Personal access tokens are designed for programmatic access and issuing of these require a valid Supabase session backed by MFA, if enabled on the account.

@@ -1,9 +1,9 @@
-import type { PostgresRelationship } from '@supabase/postgres-meta'
+import type { PGTableRelationship } from '@supabase/pg-meta'
 
-export interface JsonEditValue {
+export interface EditValue {
   row?: any
   column: string
-  jsonString: string
+  value: string
 }
 
 export interface RowField {
@@ -12,10 +12,11 @@ export interface RowField {
   comment: string
   format: string
   enums: string[]
-  value: string | null
+  value: string | null | undefined
   defaultValue: string | null
-  foreignKey?: PostgresRelationship
+  foreignKey?: PGTableRelationship
   isNullable: boolean
   isIdentity: boolean
+  isGenerated: boolean
   isPrimaryKey: boolean
 }

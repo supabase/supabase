@@ -1,6 +1,7 @@
+import { ChevronRight, Loader } from 'lucide-react'
 import Link from 'next/link'
-import React, { PropsWithChildren } from 'react'
-import { IconChevronRight, IconLoader, cn } from 'ui'
+import React, { cloneElement, PropsWithChildren } from 'react'
+import { cn } from 'ui'
 
 interface CardButtonProps {
   title?: string | React.ReactNode
@@ -17,6 +18,7 @@ interface CardButtonProps {
   fixedHeight?: boolean
   hideChevron?: boolean
   titleClass?: string
+  containerElement?: React.ReactNode
 }
 
 // Define separate interfaces for each type of container
@@ -30,8 +32,10 @@ interface UrlContainerProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorEl
 
 interface NonLinkContainerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {}
 
-interface ButtonContainerProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'title'> {}
+interface ButtonContainerProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'title'
+> {}
 
 // Union of all container props
 type ContainerProps =
@@ -55,6 +59,7 @@ const CardButton = ({
   fixedHeight = true,
   hideChevron = false,
   titleClass = '',
+  containerElement,
   ...props
 }: PropsWithChildren<CardButtonProps & ContainerProps>) => {
   const isLink = url || linkHref || props.onClick
@@ -62,23 +67,28 @@ const CardButton = ({
   let Container: React.ElementType
   let containerProps: ContainerProps = {}
 
+  const ContainerComponentOverride =
+    containerElement && React.isValidElement(containerElement)
+      ? (props: any) => cloneElement<any>(containerElement, { ...props })
+      : undefined
+
   if (props.onClick) {
-    Container = 'button'
+    Container = ContainerComponentOverride ?? 'button'
     containerProps = props
   } else if (linkHref) {
-    Container = Link
+    Container = ContainerComponentOverride ?? Link
     containerProps = {
       href: linkHref,
       ...props,
     }
   } else if (url) {
-    Container = 'a'
+    Container = ContainerComponentOverride ?? 'a'
     containerProps = {
       href: url,
       ...props,
     }
   } else {
-    Container = 'div'
+    Container = ContainerComponentOverride ?? 'div'
     containerProps = props
   }
 
@@ -100,7 +110,7 @@ const CardButton = ({
   }
 
   if (fixedHeight) {
-    containerClasses = [...containerClasses, 'h-32']
+    containerClasses = [...containerClasses, 'min-h-32 md:min-h-44']
   }
 
   const ImageContainer = ({ children }: { children: React.ReactNode }) => {
@@ -125,7 +135,7 @@ const CardButton = ({
       {icon && <ImageContainer>{icon}</ImageContainer>}
       <div className="flex h-full w-full flex-col space-y-2">
         {typeof title === 'string' ? (
-          <h5 className={`text-foreground ${titleClass}`}>{title}</h5>
+          <h5 className={`text-foreground pr-5 ${titleClass}`}>{title}</h5>
         ) : (
           title
         )}
@@ -135,7 +145,7 @@ const CardButton = ({
             <div className="w-full">{children && children}</div>
           </div>
         )}
-        {footer && <div className="w-full !mt-auto">{footer}</div>}
+        {footer && <div className="w-full mt-auto!">{footer}</div>}
       </div>
       {isLink && (
         <div
@@ -150,13 +160,7 @@ const CardButton = ({
           group-hover:text-foreground
         "
         >
-          {loading ? (
-            <IconLoader className="animate-spin" />
-          ) : !hideChevron ? (
-            <IconChevronRight />
-          ) : (
-            <></>
-          )}
+          {loading ? <Loader className="animate-spin" /> : !hideChevron ? <ChevronRight /> : <></>}
         </div>
       )}
     </>

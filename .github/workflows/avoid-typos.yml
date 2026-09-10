@@ -8,15 +8,20 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   misspell:
     name: runner / misspell
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: Check out code.
-        uses: actions/checkout@v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
       - name: misspell
-        uses: reviewdog/action-misspell@v1
+        uses: reviewdog/action-misspell@ba7ac4030fa6812f8c8b2d4e516af8bc99553c32 # v1.28.0
         with:
           github_token: ${{ secrets.github_token }}
           locale: 'US'
@@ -25,7 +30,7 @@ jobs:
           exclude: |
             *.css
             **/package.json
-            **/package-lock.json
+            **/pnpm-lock.yaml
             ./.git/*
             *.ipynb
             ./i18n/README.*.md

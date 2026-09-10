@@ -1,0 +1,55 @@
+name: '[Docs] Update last-changed dates'
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      reset:
+        description: 'Reset last-updated dates using Git commit dates'
+        required: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SEARCH_SUPABASE_URL }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SEARCH_SUPABASE_SERVICE_ROLE_KEY }}
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          sparse-checkout: |
+            apps/docs
+            patches
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Setup node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Download dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Update last-changed dates
+        working-directory: ./apps/docs
+        if: ${{ !inputs.reset }}
+        run: pnpm run last-changed
+
+      - name: Reset last-changed dates
+        working-directory: ./apps/docs
+        if: ${{ inputs.reset }}
+        run: pnpm run last-changed:reset

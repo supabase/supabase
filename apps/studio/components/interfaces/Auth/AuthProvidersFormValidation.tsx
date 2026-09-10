@@ -1,5 +1,9 @@
-import { boolean, number, object, string } from 'yup'
-import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
+import * as z from 'zod'
+
+import { NO_REQUIRED_CHARACTERS, urlRegex } from '@/components/interfaces/Auth/Auth.constants'
+import { ProjectAuthConfigData } from '@/data/auth/auth-config-query'
+import { DOCS_URL } from '@/lib/constants'
+import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
 
 const parseBase64URL = (b64url: string) => {
   return atob(b64url.replace(/[-]/g, '+').replace(/[_]/g, '/'))
@@ -11,15 +15,11 @@ const PROVIDER_EMAIL = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Email',
+  link: `${DOCS_URL}/guides/auth/passwords`,
   properties: {
     EXTERNAL_EMAIL_ENABLED: {
-      title: 'Enable Email provider',
-      description: 'This will enable Email based signup and login for your application',
-      type: 'boolean',
-    },
-    MAILER_AUTOCONFIRM: {
-      title: 'Confirm email',
-      description: `Users will need to confirm their email address before signing in for the first time.`,
+      title: 'Enable email provider',
+      description: 'Allow email-based sign up and log in for your application.',
       type: 'boolean',
     },
     MAILER_SECURE_EMAIL_CHANGE_ENABLED: {
@@ -30,42 +30,352 @@ const PROVIDER_EMAIL = {
     },
     SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: {
       title: 'Secure password change',
-      description: `Users will need to be recently logged in to change their password without requiring reauthentication.
+      description: `Users will need to be recently logged in to change their password without requiring reauthentication. (A user is considered recently logged in if the session was created within the last 24 hours.)
       If disabled, a user can change their password at any time.`,
       type: 'boolean',
     },
-    MAILER_OTP_EXP: {
-      title: 'Mailer OTP Expiration',
-      type: 'number',
-      description: 'Duration before an email otp / link expires.',
-      units: 'seconds',
+    SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: {
+      title: 'Require current password when updating',
+      description: `Requires that the user supplies their current password when changing their password. [Learn more](${DOCS_URL}/guides/auth/password-security#require-current-password-when-changing).`,
+      type: 'boolean',
+      isPaid: false,
+    },
+    PASSWORD_HIBP_ENABLED: {
+      title: 'Prevent use of leaked passwords',
+      description: `Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API. [Learn more](${DOCS_URL}/guides/auth/password-security#password-strength-and-leaked-password-protection)`,
+      type: 'boolean',
+      entitlementKey: 'auth.password_hibp',
     },
     PASSWORD_MIN_LENGTH: {
-      title: 'Min password length',
-      description: 'Users will not be able to use a password shorter than this.',
+      title: 'Minimum password length',
       type: 'number',
+      description:
+        'Passwords shorter than this value will be rejected as weak. Minimum 6 characters, though 8 or more is recommended.',
+      units: 'characters',
+    },
+    PASSWORD_REQUIRED_CHARACTERS: {
+      type: 'select',
+      title: 'Password requirements',
+      description: 'Passwords that do not have at least one of each will be rejected as weak.',
+      enum: [
+        {
+          label: 'No required characters (default)',
+          value: NO_REQUIRED_CHARACTERS,
+        },
+        {
+          label: 'Letters and digits',
+          value: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789',
+        },
+        {
+          label: 'Lowercase, uppercase letters and digits',
+          value: 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789',
+        },
+        {
+          label: 'Lowercase, uppercase letters, digits and symbols (recommended)',
+          value:
+            'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\\\:"|<>?,./`~',
+        },
+      ],
+    },
+    MAILER_OTP_EXP: {
+      title: 'Email OTP expiration',
+      type: 'number',
+      description: 'Duration before an email OTP / link expires.',
+      units: 'seconds',
+    },
+    MAILER_OTP_LENGTH: {
+      title: 'Email OTP length',
+      type: 'number',
+      description: 'Number of digits in the email OTP.',
+      units: 'digits',
     },
   },
-  validationSchema: object().shape({
-    PASSWORD_MIN_LENGTH: number()
-      .required('A password is required.')
-      .min(6, 'Password length must be at least 6 characters long'),
-    MAILER_OTP_EXP: number()
-      .min(0, 'Must be more than 0')
-      .max(86400, 'Must be no more than 86400')
-      .required('This is required'),
-  }),
+  validationSchema: z.discriminatedUnion('EXTERNAL_EMAIL_ENABLED', [
+    z.object({
+      EXTERNAL_EMAIL_ENABLED: z.literal(true),
+      MAILER_SECURE_EMAIL_CHANGE_ENABLED: z.boolean(),
+      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: z.boolean(),
+      SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: z.boolean(),
+      PASSWORD_HIBP_ENABLED: z.boolean(),
+      MAILER_OTP_EXP: preprocessEmptyNumberInput(
+        z.coerce
+          .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
+          .min(0, 'Must be greater or equal to 0')
+          .max(86400, 'Must be no more than 86400')
+      ),
+      MAILER_OTP_LENGTH: preprocessEmptyNumberInput(
+        z.coerce
+          .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
+          .min(6, 'Must be greater or equal to 6')
+          .max(10, 'Must be no more than 10')
+      ),
+      PASSWORD_MIN_LENGTH: preprocessEmptyNumberInput(
+        z.coerce
+          .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
+          .min(6, 'Must be greater or equal to 6')
+      ),
+      PASSWORD_REQUIRED_CHARACTERS: z.string(),
+    }),
+    z.object({
+      EXTERNAL_EMAIL_ENABLED: z.literal(false),
+      MAILER_SECURE_EMAIL_CHANGE_ENABLED: z.boolean().optional(),
+      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: z.boolean().optional(),
+      PASSWORD_HIBP_ENABLED: z.boolean().optional(),
+      SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: z.boolean().optional(),
+      MAILER_OTP_EXP: preprocessEmptyNumberInput(z.coerce.number().optional()),
+      MAILER_OTP_LENGTH: preprocessEmptyNumberInput(z.coerce.number().optional()),
+      PASSWORD_MIN_LENGTH: preprocessEmptyNumberInput(z.coerce.number().optional()),
+      PASSWORD_REQUIRED_CHARACTERS: z.string().optional(),
+    }),
+  ]),
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
-const PROVIDER_PHONE = {
+const smsProviderBaseSchema = z.object({
+  SMS_TEST_OTP: z
+    .string()
+    .trim()
+    .transform((value: string) => value.replace(/\s+/g, ''))
+    .refine((value) => {
+      // This ensure users can empty the SMS_TEST_OTP field
+      if (!value) return true
+      return /^\s*([0-9]{1,15}=[0-9]+)(\s*,\s*[0-9]{1,15}=[0-9]+)*\s*$/g.test(value)
+    }, 'Must be a comma-separated list of <phone number>=<OTP> pairs. Phone numbers should be in international format, without spaces, dashes or the + prefix. Example: 123456789=987654'),
+  SMS_TEST_OTP_VALID_UNTIL: z
+    .string()
+    .optional()
+    .refine((value) => {
+      if (!value) return true
+      const date = new Date(value)
+      return !isNaN(date.getTime())
+    }, 'Must be a valid date and time'),
+  SMS_AUTOCONFIRM: z.boolean().optional(),
+})
+
+const getSmsOtpPhoneProviderSchema = (optional = false) =>
+  z.object({
+    SMS_OTP_EXP: preprocessEmptyNumberInput(
+      z.coerce
+        .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
+        .min(0, 'Must be 0 or larger')
+    ),
+    SMS_OTP_LENGTH: preprocessEmptyNumberInput(
+      z.coerce
+        .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
+        .min(6, 'Must be 6 or larger')
+    ),
+    SMS_TEMPLATE: optional ? z.string() : z.string().min(1, 'SMS Template is required'),
+  })
+
+const getTwilioPhoneProviderSchema = (optional = false) =>
+  z.object({
+    SMS_TWILIO_ACCOUNT_SID: optional
+      ? z.string()
+      : z.string().min(1, 'Twilio Account SID is required'),
+    SMS_TWILIO_AUTH_TOKEN: optional
+      ? z.string()
+      : z.string().min(1, 'Twilio Auth Token is required'),
+    SMS_TWILIO_MESSAGE_SERVICE_SID: optional
+      ? z.string()
+      : z.string().min(1, 'Twilio Message Service SID is required'),
+    SMS_TWILIO_CONTENT_SID: z.string().optional(),
+  })
+
+const getTwilioVerifyPhoneProviderSchema = (optional = false) =>
+  z.object({
+    SMS_TWILIO_VERIFY_ACCOUNT_SID: optional
+      ? z.string()
+      : z.string().min(1, 'Twilio Verify Account SID is required'),
+    SMS_TWILIO_VERIFY_AUTH_TOKEN: optional
+      ? z.string()
+      : z.string().min(1, 'Twilio Verify Auth Token is required'),
+    SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: optional
+      ? z.string()
+      : z.string().min(1, 'Twilio Verify Message Service SID is required'),
+  })
+
+const getMessagebirdPhoneProviderSchema = (optional = false) =>
+  z.object({
+    SMS_MESSAGEBIRD_ACCESS_KEY: optional
+      ? z.string()
+      : z.string().min(1, 'Messagebird Access Key is required'),
+    SMS_MESSAGEBIRD_ORIGINATOR: optional
+      ? z.string()
+      : z.string().min(1, 'Messagebird Originator is required'),
+  })
+
+const getTextlocalPhoneProviderSchema = (optional = false) =>
+  z.object({
+    SMS_TEXTLOCAL_API_KEY: optional
+      ? z.string()
+      : z.string().min(1, 'Textlocal API Key is required'),
+    SMS_TEXTLOCAL_SENDER: optional
+      ? z.string()
+      : z.string().min(1, 'Textlocal Sender ID is required'),
+  })
+
+const getVonagePhoneProviderSchema = (optional = false) =>
+  z.object({
+    SMS_VONAGE_API_KEY: optional ? z.string() : z.string().min(1, 'Vonage API Key is required'),
+    SMS_VONAGE_API_SECRET: optional
+      ? z.string()
+      : z.string().min(1, 'Vonage API Secret is required'),
+    SMS_VONAGE_FROM: optional ? z.string() : z.string().min(1, 'Vonage From is required'),
+  })
+
+const smsProviderEnabledSchema = z.object({
+  EXTERNAL_PHONE_ENABLED: z.literal(true),
+})
+
+const smsProviderDisabledSchema = z
+  .object({
+    EXTERNAL_PHONE_ENABLED: z.literal(false),
+    SMS_PROVIDER: z.string().optional(),
+  })
+  .merge(smsProviderBaseSchema.partial())
+  .merge(getSmsOtpPhoneProviderSchema(true).partial())
+  .merge(getTwilioPhoneProviderSchema(true).partial())
+  .merge(getTwilioVerifyPhoneProviderSchema(true).partial())
+  .merge(getMessagebirdPhoneProviderSchema(true).partial())
+  .merge(getVonagePhoneProviderSchema(true).partial())
+  .merge(getTextlocalPhoneProviderSchema(true).partial())
+
+// When the SMS hook is enabled, the validation for the SMS provider selected should be disabled
+// as the SMS hook will be used in place of the configured SMS provider
+const makeProviderOptionalWhenSMSHookEnabled = (
+  config: ProjectAuthConfigData,
+  getSchema: (optional?: boolean) => z.ZodObject<z.ZodRawShape>
+) => {
+  return config.HOOK_SEND_SMS_ENABLED ? getSchema(true).partial() : getSchema()
+}
+
+// getPhoneProviderValidationSchema generate the validation schema for the SMS providers
+// based on whether the SMS hook is enabled
+export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) => {
+  const twilioSchema = makeProviderOptionalWhenSMSHookEnabled(config, getTwilioPhoneProviderSchema)
+    .merge(
+      z.object({
+        SMS_PROVIDER: z.literal('twilio'),
+      })
+    )
+    .merge(smsProviderBaseSchema)
+    .merge(getSmsOtpPhoneProviderSchema())
+    .merge(getTwilioVerifyPhoneProviderSchema(true).partial())
+    .merge(getMessagebirdPhoneProviderSchema(true).partial())
+    .merge(getVonagePhoneProviderSchema(true).partial())
+    .merge(getTextlocalPhoneProviderSchema(true).partial())
+
+  const twilioVerifySchema = makeProviderOptionalWhenSMSHookEnabled(
+    config,
+    getTwilioVerifyPhoneProviderSchema
+  )
+    .merge(
+      z.object({
+        SMS_PROVIDER: z.literal('twilio_verify'),
+      })
+    )
+    .merge(smsProviderBaseSchema)
+    .merge(getTwilioPhoneProviderSchema(true).partial())
+    .merge(getMessagebirdPhoneProviderSchema(true).partial())
+    .merge(getVonagePhoneProviderSchema(true).partial())
+    .merge(getTextlocalPhoneProviderSchema(true).partial())
+
+  const messagebirdSchema = makeProviderOptionalWhenSMSHookEnabled(
+    config,
+    getMessagebirdPhoneProviderSchema
+  )
+    .merge(
+      z.object({
+        SMS_PROVIDER: z.literal('messagebird'),
+      })
+    )
+    .merge(smsProviderBaseSchema)
+    .merge(getSmsOtpPhoneProviderSchema())
+    .merge(getTwilioPhoneProviderSchema(true).partial())
+    .merge(getTwilioVerifyPhoneProviderSchema(true).partial())
+    .merge(getVonagePhoneProviderSchema(true).partial())
+    .merge(getTextlocalPhoneProviderSchema(true).partial())
+
+  const vonageSchema = makeProviderOptionalWhenSMSHookEnabled(config, getVonagePhoneProviderSchema)
+    .merge(
+      z.object({
+        SMS_PROVIDER: z.literal('vonage'),
+      })
+    )
+    .merge(smsProviderBaseSchema)
+    .merge(getSmsOtpPhoneProviderSchema())
+    .merge(getTwilioPhoneProviderSchema(true).partial())
+    .merge(getTwilioVerifyPhoneProviderSchema(true).partial())
+    .merge(getMessagebirdPhoneProviderSchema(true).partial())
+    .merge(getTextlocalPhoneProviderSchema(true).partial())
+
+  const textlocalSchema = makeProviderOptionalWhenSMSHookEnabled(
+    config,
+    getTextlocalPhoneProviderSchema
+  )
+    .merge(
+      z.object({
+        SMS_PROVIDER: z.literal('textlocal'),
+      })
+    )
+    .merge(smsProviderBaseSchema)
+    .merge(getSmsOtpPhoneProviderSchema())
+    .merge(getTwilioPhoneProviderSchema(true).partial())
+    .merge(getTwilioVerifyPhoneProviderSchema(true).partial())
+    .merge(getMessagebirdPhoneProviderSchema(true).partial())
+    .merge(getVonagePhoneProviderSchema(true).partial())
+
+  const enabledSchema = z
+    .discriminatedUnion(
+      'SMS_PROVIDER',
+      [twilioSchema, twilioVerifySchema, messagebirdSchema, vonageSchema, textlocalSchema],
+      { message: 'Invalid SMS provider', invalid_type_error: 'Invalid SMS provider' }
+    )
+    .superRefine((values, ctx) => {
+      if (values.SMS_TEST_OTP && !values.SMS_TEST_OTP_VALID_UNTIL) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'You must provide a valid until date.',
+          path: ['SMS_TEST_OTP_VALID_UNTIL'],
+        })
+      }
+    })
+
+  return (
+    z
+      .discriminatedUnion('EXTERNAL_PHONE_ENABLED', [
+        smsProviderDisabledSchema,
+        // Passthrough only here to allow other values to propagate
+        // Must not be applied directly to smsProviderEnabledSchema to allow zod to transform the other values correctly
+        smsProviderEnabledSchema.passthrough(),
+      ])
+      // Trick: use superRefine to conditionally parse the enabled schema
+      .superRefine((values) => {
+        if (values.EXTERNAL_PHONE_ENABLED === true) {
+          return enabledSchema.parse(values)
+        }
+      })
+      // Trick: use transform to ensure the correct shape when EXTERNAL_PHONE_ENABLED is true.
+      // enabledSchema strips EXTERNAL_PHONE_ENABLED (not declared on its branches), so re-add it
+      // to keep the flag in the submitted payload.
+      .transform((values) => {
+        if (values.EXTERNAL_PHONE_ENABLED === true) {
+          return { ...enabledSchema.parse(values), EXTERNAL_PHONE_ENABLED: true as const }
+        }
+        return values
+      })
+  )
+}
+
+export const PROVIDER_PHONE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Phone',
+  link: `${DOCS_URL}/guides/auth/phone-login`,
   properties: {
     EXTERNAL_PHONE_ENABLED: {
       title: 'Enable Phone provider',
@@ -262,137 +572,11 @@ const PROVIDER_PHONE = {
       },
     },
   },
-  validationSchema: object().shape({
-    EXTERNAL_PHONE_ENABLED: boolean().required(),
-    SMS_PROVIDER: string().required(),
-
-    // Twilio
-    SMS_TWILIO_ACCOUNT_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio'
-      },
-      then: (schema) => schema.required('Twilio Account SID is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_TWILIO_AUTH_TOKEN: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio'
-      },
-      then: (schema) => schema.required('Twilio Auth Token is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_TWILIO_MESSAGE_SERVICE_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio'
-      },
-      then: (schema) => schema.required('Twilio Message Service SID is required'),
-      otherwise: (schema) => schema,
-    }),
-
-    // Twilio Verify
-    SMS_TWILIO_VERIFY_ACCOUNT_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
-      },
-      then: (schema) => schema.required('Twilio Verify Account SID is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_TWILIO_VERIFY_AUTH_TOKEN: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
-      },
-      then: (schema) => schema.required('Twilio Verify Auth Token is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string().when(
-      ['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'],
-      {
-        is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-          return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
-        },
-        then: (schema) => schema.required('Twilio Verify Service SID is required'),
-        otherwise: (schema) => schema,
-      }
-    ),
-
-    // Messagebird
-    SMS_MESSAGEBIRD_ACCESS_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'messagebird'
-      },
-      then: (schema) => schema.required('Messagebird Access Key is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_MESSAGEBIRD_ORIGINATOR: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'messagebird'
-      },
-      then: (schema) => schema.required('Messagebird Originator is required'),
-      otherwise: (schema) => schema,
-    }),
-
-    // Textlocal
-    SMS_TEXTLOCAL_API_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'textlocal'
-      },
-      then: (schema) => schema.required('Textlocal API Key is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_TEXTLOCAL_SENDER: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'textlocal'
-      },
-      then: (schema) => schema.required('Textlocal Sender is required'),
-      otherwise: (schema) => schema,
-    }),
-
-    // Vonage
-    SMS_VONAGE_API_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'vonage'
-      },
-      then: (schema) => schema.required('Vonage API is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_VONAGE_API_SECRET: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'vonage'
-      },
-      then: (schema) => schema.required('Vonage API Secret is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_VONAGE_FROM: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'vonage'
-      },
-      then: (schema) => schema.required('Vonage From is required'),
-      otherwise: (schema) => schema,
-    }),
-
-    // Phone SMS
-    SMS_OTP_EXP: number().min(0, 'Must be more than 0').required('This is required'),
-    SMS_OTP_LENGTH: number().min(6, 'Must be 6 or more in length').required('This is required'),
-    SMS_TEMPLATE: string().required('SMS template is required.'),
-    SMS_TEST_OTP: string()
-      .matches(
-        /^\s*([0-9]{1,15}=[0-9]+)(\s*,\s*[0-9]{1,15}=[0-9]+)*\s*$/g,
-        'Must be a comma-separated list of <phone number>=<OTP> pairs. Phone numbers should be in international format, without spaces, dashes or the + prefix. Example: 123456789=987654'
-      )
-      .trim()
-      .transform((value: string) => value.replace(/\s+/g, '')),
-    SMS_TEST_OTP_VALID_UNTIL: string().when(['SMS_TEST_OTP'], {
-      is: (SMS_TEST_OTP: string | null) => {
-        return !!SMS_TEST_OTP
-      },
-      then: (schema) => schema.required('You must provide a valid until date.'),
-      otherwise: (schema) => schema.transform((value: string) => ''),
-    }),
-  }),
+  validationSchema: null,
   misc: {
     iconKey: 'phone-icon4',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -400,6 +584,7 @@ const EXTERNAL_PROVIDER_APPLE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Apple',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-apple`,
   properties: {
     EXTERNAL_APPLE_ENABLED: {
       title: 'Enable Sign in with Apple',
@@ -408,129 +593,85 @@ const EXTERNAL_PROVIDER_APPLE = {
       type: 'boolean',
     },
     EXTERNAL_APPLE_CLIENT_ID: {
-      title: 'Service ID (for OAuth)',
-      description: `Client identifier used in the OAuth flow on the web.
-[Learn more](https://developer.apple.com/documentation/sign_in_with_apple/configuring_your_environment_for_sign_in_with_apple)`,
+      title: 'Client IDs',
+      description: `Comma separated list of allowed Apple app (Web, OAuth, iOS, macOS, watchOS, or tvOS) bundle IDs for native sign in, or service IDs for Sign in with Apple JS. [Learn more](https://developer.apple.com/documentation/signinwithapplejs)`,
       type: 'string',
     },
     EXTERNAL_APPLE_SECRET: {
       title: 'Secret Key (for OAuth)',
-      description: `Secret key used in the OAuth flow.
-[Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#generate-a-client_secret)`,
+      description: `Secret key used in the OAuth flow. [Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#generate-a-client_secret)`,
       type: 'string',
       isSecret: true,
     },
-    EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: {
-      title: 'Authorized Client IDs (iOS, macOS, watchOS, tvOS bundle IDs or service IDs)',
-      description: `Comma separated list of allowed Apple app bundle IDs for native sign in, or service IDs for Sign in with Apple JS. [Learn more](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_js)`,
-      type: 'string',
+    EXTERNAL_APPLE_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
     },
   },
-  validationSchema: object().shape({
-    EXTERNAL_APPLE_ENABLED: boolean().required(),
-    EXTERNAL_APPLE_SECRET: string()
-      .when(['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_APPLE_CLIENT_ID'], {
-        is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_APPLE_CLIENT_ID: string) => {
-          return EXTERNAL_APPLE_ENABLED && !!EXTERNAL_APPLE_CLIENT_ID
-        },
-        then: (schema) =>
-          schema
-            .required('Secret key is required when using the OAuth flow.')
-            .matches(/^[a-z0-9_-]+([.][a-z0-9_-]+){2}$/i, 'Secret key should be a JWT.')
-            .test({
-              message: 'Secret key is not a correctly generated JWT.',
-              test: (value?: string): boolean => {
-                if (!value) {
-                  return true
-                }
-                try {
-                  const parts = value.split('.').map((value) => parseBase64URL(value))
-                  const header = JSON.parse(parts[0])
-                  const body = JSON.parse(parts[1])
-                  return (
-                    typeof header === 'object' &&
-                    typeof body === 'object' &&
-                    header &&
-                    body &&
-                    header.alg === 'ES256' &&
-                    body.aud === 'https://appleid.apple.com'
-                  )
-                } catch (e: any) {
-                  console.log(e)
-                  return false
-                }
+  validationSchema: z.discriminatedUnion('EXTERNAL_APPLE_ENABLED', [
+    z.object({
+      EXTERNAL_APPLE_ENABLED: z.literal(false),
+      EXTERNAL_APPLE_SECRET: z.string().optional(),
+      EXTERNAL_APPLE_CLIENT_ID: z.string().optional(),
+      EXTERNAL_APPLE_EMAIL_OPTIONAL: z.boolean().optional(),
+    }),
+    z.object({
+      EXTERNAL_APPLE_ENABLED: z.literal(true),
+      EXTERNAL_APPLE_SECRET: z
+        .string()
+        .refine(
+          (value) => !value || /^([a-z0-9_-]+([.][a-z0-9_-]+){2})?$/i.test(value),
+          'Secret key should be a JWT.'
+        )
+        .refine((value) => {
+          if (!value) return true
+          try {
+            const parts = value.split('.').map((value) => parseBase64URL(value))
+            const header = JSON.parse(parts[0])
+            const body = JSON.parse(parts[1])
 
-                return true
-              },
-            })
-            .test({
-              message: 'Secret key expires in less than 7 days!',
-              test: (value?: string) => {
-                if (!value) {
-                  return true
-                }
-                try {
-                  const parts = value.split('.').map((value) => parseBase64URL(value))
-                  const body = JSON.parse(parts[1])
-                  return Date.now() > body.exp - 7 * 24 * 60 * 60 * 1000
-                } catch (e: any) {
-                  console.log(e)
-                  return false
-                }
-
-                return true
-              },
-            }),
-      })
-      .when(
-        [
-          'EXTERNAL_APPLE_ENABLED',
-          'EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS',
-          'EXTERNAL_APPLE_CLIENT_ID',
-        ],
-        {
-          is: (
-            EXTERNAL_APPLE_ENABLED: boolean,
-            EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: string,
-            EXTERNAL_APPLE_CLIENT_ID: string
-          ) => {
             return (
-              EXTERNAL_APPLE_ENABLED &&
-              !!EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS &&
-              !EXTERNAL_APPLE_CLIENT_ID
+              typeof header === 'object' &&
+              typeof body === 'object' &&
+              header &&
+              body &&
+              header.alg === 'ES256' &&
+              body.aud === 'https://appleid.apple.com'
             )
-          },
-          then: (schema) =>
-            schema.matches(
-              /^$/,
-              'Secret Key should only be set if Service ID for OAuth is provided.'
-            ),
-        }
-      ),
-    EXTERNAL_APPLE_CLIENT_ID: string().matches(
-      /^[a-z0-9.-]+$/i,
-      'Invalid characters. Apple recommends a reverse-domain name style string (e.g. com.example.app).'
-    ),
-    EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: string()
-      .matches(
-        /^([.a-z0-9-]+(,\s*[.a-z0-9-]+)*,*\s*)?$/i,
-        'Invalid characters. Apple recommends a reverse-domain name style string (e.g. com.example.app). You must only use explicit bundle IDs, asterisks (*) are not allowed.'
-      )
-      .when(['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_APPLE_CLIENT_ID'], {
-        is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_APPLE_CLIENT_ID: string) => {
-          return EXTERNAL_APPLE_ENABLED && !EXTERNAL_APPLE_CLIENT_ID
-        },
-        then: (schema) =>
-          schema.required(
-            'At least one Authorized Client ID is required when not using the OAuth flow.'
-          ),
-      }),
-  }),
+          } catch (e: any) {
+            console.log(e)
+            return false
+          }
+        }, 'Secret key is not a correctly generated JWT.')
+        .refine((value) => {
+          if (!value) return true
+          try {
+            const parts = value.split('.').map((value) => parseBase64URL(value))
+            const body = JSON.parse(parts[1])
+            return Date.now() < body.exp * 1000 - 7 * 24 * 60 * 60 * 1000
+          } catch (e: any) {
+            console.log(e)
+            return false
+          }
+        }, 'Secret key expires in less than 7 days!'),
+      EXTERNAL_APPLE_CLIENT_ID: z
+        .string()
+        .min(1, 'At least one Client ID is required when Apple sign-in is enabled.')
+        .regex(/^\S+$/, 'Client IDs should not contain spaces.')
+        .regex(
+          /^([a-z0-9-]+(\.[a-z0-9-]+)*(,[a-z0-9-]+(\.[a-z0-9-]+)*)*)$/i,
+          'Invalid characters. Each ID should follow a reverse-domain style string (e.g. com.example.app). Use commas to separate multiple IDs.'
+        ),
+      EXTERNAL_APPLE_EMAIL_OPTIONAL: z.boolean().optional(),
+    }),
+  ]),
   misc: {
     iconKey: 'apple-icon',
     requiresRedirect: true,
     helper: `Register this callback URL when using Sign in with Apple on the web in the Apple Developer Center.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
     alert: {
       title: `Apple OAuth secret keys expire every 6 months`,
       description: `A new secret should be generated every 6 months, otherwise users on the web will not be able to sign in.`,
@@ -542,6 +683,7 @@ const EXTERNAL_PROVIDER_AZURE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Azure',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-azure`,
   properties: {
     EXTERNAL_AZURE_ENABLED: {
       title: 'Azure enabled',
@@ -555,7 +697,7 @@ const EXTERNAL_PROVIDER_AZURE = {
     EXTERNAL_AZURE_SECRET: {
       // [TODO] Change docs
       title: 'Secret Value',
-      description: `Enter the data from Value, not the Secret ID. [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-azure#obtain-a-secret-id)`,
+      description: `Enter the data from Value, not the Secret ID. [Learn more](${DOCS_URL}/guides/auth/social-login/auth-azure#obtain-a-secret-id)`,
       type: 'string',
       isSecret: true,
     },
@@ -565,21 +707,31 @@ const EXTERNAL_PROVIDER_AZURE = {
       descriptionOptional: 'Optional',
       type: 'string',
     },
+    EXTERNAL_AZURE_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
-  validationSchema: object().shape({
-    EXTERNAL_AZURE_ENABLED: boolean().required(),
-    EXTERNAL_AZURE_CLIENT_ID: string().when('EXTERNAL_AZURE_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Application (client) ID is required'),
-      otherwise: (schema) => schema,
+  validationSchema: z.discriminatedUnion('EXTERNAL_AZURE_ENABLED', [
+    z.object({
+      EXTERNAL_AZURE_ENABLED: z.literal(true),
+      EXTERNAL_AZURE_CLIENT_ID: z.string().min(1, 'Application (client) ID is required'),
+      EXTERNAL_AZURE_SECRET: z.string().min(1, 'Secret Value is required'),
+      EXTERNAL_AZURE_URL: z
+        .string()
+        .refine((value) => !value || urlRegex().test(value), 'Must be a valid URL'),
+      EXTERNAL_AZURE_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_AZURE_SECRET: string().when('EXTERNAL_AZURE_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Secret Value is required'),
-      otherwise: (schema) => schema,
+    z.object({
+      EXTERNAL_AZURE_ENABLED: z.literal(false),
+      EXTERNAL_AZURE_CLIENT_ID: z.string().optional(),
+      EXTERNAL_AZURE_SECRET: z.string().optional(),
+      EXTERNAL_AZURE_URL: z.string().optional(),
+      EXTERNAL_AZURE_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_AZURE_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
-  }),
+  ]),
   misc: {
     iconKey: 'microsoft-icon',
     requiresRedirect: true,
@@ -590,6 +742,7 @@ const EXTERNAL_PROVIDER_BITBUCKET = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Bitbucket',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-bitbucket`,
   properties: {
     EXTERNAL_BITBUCKET_ENABLED: {
       title: 'Bitbucket enabled',
@@ -604,20 +757,27 @@ const EXTERNAL_PROVIDER_BITBUCKET = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_BITBUCKET_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
-  validationSchema: object().shape({
-    EXTERNAL_BITBUCKET_ENABLED: boolean().required(),
-    EXTERNAL_BITBUCKET_CLIENT_ID: string().when('EXTERNAL_BITBUCKET_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Key is required'),
-      otherwise: (schema) => schema,
+  validationSchema: z.discriminatedUnion('EXTERNAL_BITBUCKET_ENABLED', [
+    z.object({
+      EXTERNAL_BITBUCKET_ENABLED: z.literal(true),
+      EXTERNAL_BITBUCKET_CLIENT_ID: z.string().min(1, 'Key is required'),
+      EXTERNAL_BITBUCKET_SECRET: z.string().min(1, 'Secret is required'),
+      EXTERNAL_BITBUCKET_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_BITBUCKET_SECRET: string().when('EXTERNAL_BITBUCKET_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Secret is required'),
-      otherwise: (schema) => schema,
+    z.object({
+      EXTERNAL_BITBUCKET_ENABLED: z.literal(false),
+      EXTERNAL_BITBUCKET_CLIENT_ID: z.string().optional(),
+      EXTERNAL_BITBUCKET_SECRET: z.string().optional(),
+      EXTERNAL_BITBUCKET_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-  }),
+  ]),
   misc: {
     iconKey: 'bitbucket-icon',
     requiresRedirect: true,
@@ -628,6 +788,7 @@ const EXTERNAL_PROVIDER_DISCORD = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Discord',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-discord?`,
   properties: {
     EXTERNAL_DISCORD_ENABLED: {
       title: 'Discord enabled',
@@ -642,20 +803,27 @@ const EXTERNAL_PROVIDER_DISCORD = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_DISCORD_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
-  validationSchema: object().shape({
-    EXTERNAL_DISCORD_ENABLED: boolean().required(),
-    EXTERNAL_DISCORD_CLIENT_ID: string().when('EXTERNAL_DISCORD_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client ID is required'),
-      otherwise: (schema) => schema,
+  validationSchema: z.discriminatedUnion('EXTERNAL_DISCORD_ENABLED', [
+    z.object({
+      EXTERNAL_DISCORD_ENABLED: z.literal(true),
+      EXTERNAL_DISCORD_CLIENT_ID: z.string().min(1, 'Client ID is required'),
+      EXTERNAL_DISCORD_SECRET: z.string().min(1, 'Client Secret is required'),
+      EXTERNAL_DISCORD_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_DISCORD_SECRET: string().when('EXTERNAL_DISCORD_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client Secret is required'),
-      otherwise: (schema) => schema,
+    z.object({
+      EXTERNAL_DISCORD_ENABLED: z.literal(false),
+      EXTERNAL_DISCORD_CLIENT_ID: z.string().optional(),
+      EXTERNAL_DISCORD_SECRET: z.string().optional(),
+      EXTERNAL_DISCORD_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-  }),
+  ]),
   misc: {
     iconKey: 'discord-icon',
     requiresRedirect: true,
@@ -666,6 +834,7 @@ const EXTERNAL_PROVIDER_FACEBOOK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Facebook',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-facebook`,
   properties: {
     EXTERNAL_FACEBOOK_ENABLED: {
       title: 'Facebook enabled',
@@ -680,20 +849,27 @@ const EXTERNAL_PROVIDER_FACEBOOK = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_FACEBOOK_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
-  validationSchema: object().shape({
-    EXTERNAL_FACEBOOK_ENABLED: boolean().required(),
-    EXTERNAL_FACEBOOK_CLIENT_ID: string().when('EXTERNAL_FACEBOOK_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('"Facebook client ID" is required'),
-      otherwise: (schema) => schema,
+  validationSchema: z.discriminatedUnion('EXTERNAL_FACEBOOK_ENABLED', [
+    z.object({
+      EXTERNAL_FACEBOOK_ENABLED: z.literal(true),
+      EXTERNAL_FACEBOOK_CLIENT_ID: z.string().min(1, '"Facebook client ID" is required'),
+      EXTERNAL_FACEBOOK_SECRET: z.string().min(1, '"Facebook secret" is required'),
+      EXTERNAL_FACEBOOK_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_FACEBOOK_SECRET: string().when('EXTERNAL_FACEBOOK_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('"Facebook secret" is required'),
-      otherwise: (schema) => schema,
+    z.object({
+      EXTERNAL_FACEBOOK_ENABLED: z.literal(false),
+      EXTERNAL_FACEBOOK_CLIENT_ID: z.string().optional(),
+      EXTERNAL_FACEBOOK_SECRET: z.string().optional(),
+      EXTERNAL_FACEBOOK_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-  }),
+  ]),
   misc: {
     iconKey: 'facebook-icon',
     requiresRedirect: true,
@@ -704,6 +880,7 @@ const EXTERNAL_PROVIDER_FIGMA = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Figma',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-figma`,
   properties: {
     EXTERNAL_FIGMA_ENABLED: {
       title: 'Figma enabled',
@@ -718,20 +895,27 @@ const EXTERNAL_PROVIDER_FIGMA = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_FIGMA_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
-  validationSchema: object().shape({
-    EXTERNAL_FIGMA_ENABLED: boolean().required(),
-    EXTERNAL_FIGMA_CLIENT_ID: string().when('EXTERNAL_FIGMA_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client ID is required'),
-      otherwise: (schema) => schema,
+  validationSchema: z.discriminatedUnion('EXTERNAL_FIGMA_ENABLED', [
+    z.object({
+      EXTERNAL_FIGMA_ENABLED: z.literal(true),
+      EXTERNAL_FIGMA_CLIENT_ID: z.string().min(1, 'Client ID is required'),
+      EXTERNAL_FIGMA_SECRET: z.string().min(1, 'Client Secret is required'),
+      EXTERNAL_FIGMA_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_FIGMA_SECRET: string().when('EXTERNAL_FIGMA_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client Secret is required'),
-      otherwise: (schema) => schema,
+    z.object({
+      EXTERNAL_FIGMA_ENABLED: z.literal(false),
+      EXTERNAL_FIGMA_CLIENT_ID: z.string().optional(),
+      EXTERNAL_FIGMA_SECRET: z.string().optional(),
+      EXTERNAL_FIGMA_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-  }),
+  ]),
   misc: {
     iconKey: 'figma-icon',
     requiresRedirect: true,
@@ -742,6 +926,7 @@ const EXTERNAL_PROVIDER_GITHUB = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'GitHub',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-github`,
   properties: {
     EXTERNAL_GITHUB_ENABLED: {
       title: 'GitHub enabled',
@@ -756,20 +941,27 @@ const EXTERNAL_PROVIDER_GITHUB = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_GITHUB_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
-  validationSchema: object().shape({
-    EXTERNAL_GITHUB_ENABLED: boolean().required(),
-    EXTERNAL_GITHUB_CLIENT_ID: string().when('EXTERNAL_GITHUB_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client ID is required'),
-      otherwise: (schema) => schema,
+  validationSchema: z.discriminatedUnion('EXTERNAL_GITHUB_ENABLED', [
+    z.object({
+      EXTERNAL_GITHUB_ENABLED: z.literal(true),
+      EXTERNAL_GITHUB_CLIENT_ID: z.string().min(1, 'Client ID is required'),
+      EXTERNAL_GITHUB_SECRET: z.string().min(1, 'Client Secret is required'),
+      EXTERNAL_GITHUB_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_GITHUB_SECRET: string().when('EXTERNAL_GITHUB_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client Secret is required'),
-      otherwise: (schema) => schema,
+    z.object({
+      EXTERNAL_GITHUB_ENABLED: z.literal(false),
+      EXTERNAL_GITHUB_CLIENT_ID: z.string().optional(),
+      EXTERNAL_GITHUB_SECRET: z.string().optional(),
+      EXTERNAL_GITHUB_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-  }),
+  ]),
   misc: {
     iconKey: 'github-icon',
     requiresRedirect: true,
@@ -780,6 +972,7 @@ const EXTERNAL_PROVIDER_GITLAB = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'GitLab',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-gitlab`,
   properties: {
     EXTERNAL_GITLAB_ENABLED: {
       title: 'GitLab enabled',
@@ -801,21 +994,32 @@ const EXTERNAL_PROVIDER_GITLAB = {
       descriptionOptional: 'Optional',
       type: 'string',
     },
+    EXTERNAL_GITLAB_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
-  validationSchema: object().shape({
-    EXTERNAL_GITLAB_ENABLED: boolean().required(),
-    EXTERNAL_GITLAB_CLIENT_ID: string().when('EXTERNAL_GITLAB_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client ID is required'),
-      otherwise: (schema) => schema,
+  validationSchema: z.discriminatedUnion('EXTERNAL_GITLAB_ENABLED', [
+    z.object({
+      EXTERNAL_GITLAB_ENABLED: z.literal(false),
+      EXTERNAL_GITLAB_CLIENT_ID: z.string().optional(),
+      EXTERNAL_GITLAB_SECRET: z.string().optional(),
+      EXTERNAL_GITLAB_URL: z.string().optional(),
+      EXTERNAL_GITLAB_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_GITLAB_SECRET: string().when('EXTERNAL_GITLAB_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client Secret is required'),
-      otherwise: (schema) => schema,
+    z.object({
+      EXTERNAL_GITLAB_ENABLED: z.literal(true),
+      EXTERNAL_GITLAB_CLIENT_ID: z.string().min(1, 'Client ID is required'),
+      EXTERNAL_GITLAB_SECRET: z.string().min(1, 'Client Secret is required'),
+      EXTERNAL_GITLAB_URL: z
+        .string()
+        .refine((value) => !value || urlRegex().test(value), 'Must be a valid URL')
+        .optional(),
+      EXTERNAL_GITLAB_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_GITLAB_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
-  }),
+  ]),
   misc: {
     iconKey: 'gitlab-icon',
     requiresRedirect: true,
@@ -826,6 +1030,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Google',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-google`,
   properties: {
     EXTERNAL_GOOGLE_ENABLED: {
       title: 'Enable Sign in with Google',
@@ -834,8 +1039,9 @@ const EXTERNAL_PROVIDER_GOOGLE = {
       type: 'boolean',
     },
     EXTERNAL_GOOGLE_CLIENT_ID: {
-      title: 'Client ID (for OAuth)',
-      description: 'Client ID to use with the OAuth flow on the web.',
+      title: 'Client IDs',
+      description:
+        'Comma-separated list of client IDs for Web, OAuth, Android apps, One Tap, and Chrome extensions.',
       type: 'string',
     },
     EXTERNAL_GOOGLE_SECRET: {
@@ -844,85 +1050,47 @@ const EXTERNAL_PROVIDER_GOOGLE = {
       type: 'string',
       isSecret: true,
     },
-    EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: {
-      title: 'Authorized Client IDs (for Android, One Tap, and Chrome extensions)',
-      description:
-        'Comma separated list of client IDs of Android apps, One Tap or Chrome extensions that are allowed to log in to your project.',
-      type: 'string',
-    },
     EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: {
       title: 'Skip nonce checks',
       description:
-        "Allows ID tokens with any nonce to be accepted, which is less secure. Useful in situations where you don't have access to the nonce used to issue the ID token, such with iOS.",
+        "Allows ID tokens with any nonce to be accepted, which is less secure. Useful in situations where you don't have access to the nonce used to issue the ID token, such as with iOS.",
+      type: 'boolean',
+    },
+    EXTERNAL_GOOGLE_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
       type: 'boolean',
     },
   },
-  validationSchema: object().shape({
-    EXTERNAL_GOOGLE_ENABLED: boolean().required(),
-    EXTERNAL_GOOGLE_SECRET: string()
-      .when(['EXTERNAL_GOOGLE_ENABLED', 'EXTERNAL_GOOGLE_CLIENT_ID'], {
-        is: (EXTERNAL_GOOGLE_ENABLED: boolean, EXTERNAL_GOOGLE_CLIENT_ID: string) => {
-          return EXTERNAL_GOOGLE_ENABLED && !!EXTERNAL_GOOGLE_CLIENT_ID
-        },
-        then: (schema) =>
-          schema
-            .matches(
-              /^[a-z0-9.\/_-]*$/i,
-              'Invalid characters. Google OAuth Client Secrets usually contain letters, numbers, dots, dashes and underscores.'
-            )
-            .required('Client Secret is required when using the OAuth flow.'),
-      })
-      .when(
-        [
-          'EXTERNAL_GOOGLE_ENABLED',
-          'EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS',
-          'EXTERNAL_GOOGLE_CLIENT_ID',
-        ],
-        {
-          is: (
-            EXTERNAL_GOOGLE_ENABLED: boolean,
-            EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: string,
-            EXTERNAL_GOOGLE_CLIENT_ID: string
-          ) => {
-            return (
-              EXTERNAL_GOOGLE_ENABLED &&
-              !!EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS &&
-              !EXTERNAL_GOOGLE_CLIENT_ID
-            )
-          },
-          then: (schema) =>
-            schema.matches(
-              /^$/,
-              'Client Secret should only be set when Client ID for OAuth is set.'
-            ),
-        }
-      ),
-    EXTERNAL_GOOGLE_CLIENT_ID: string().matches(
-      /^([a-z0-9-]+([.][a-z0-9-]+)+)?$/i,
-      'Invalid characters. Google OAuth Client IDs are usually a domain-name (e.g. 01234567890-abcdefghijklmnopqrstuvwxyz012345.apps.googleusercontent.com).'
-    ),
-    EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: string()
-      .matches(
-        /^([a-z0-9-]+([.][a-z0-9-]+)*(,\s*[a-z0-9-]+([.][a-z0-9-]+)*)*,*\s*)?$/i,
-        'Invalid characters. Google Client IDs are usually a domain-name style string (e.g. com.example.com.app or *.apps.googleusercontent.com).'
-      )
-
-      .when(['EXTERNAL_GOOGLE_ENABLED', 'EXTERNAL_GOOGLE_CLIENT_ID'], {
-        is: (EXTERNAL_GOOGLE_ENABLED: boolean, EXTERNAL_GOOGLE_CLIENT_ID: string) => {
-          return EXTERNAL_GOOGLE_ENABLED && !EXTERNAL_GOOGLE_CLIENT_ID
-        },
-        then: (schema) =>
-          schema.required(
-            'At least one Authorized Client ID is required when not using the OAuth flow.'
-          ),
-      }),
-    EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: boolean().required(),
-  }),
+  validationSchema: z.discriminatedUnion('EXTERNAL_GOOGLE_ENABLED', [
+    z.object({
+      EXTERNAL_GOOGLE_ENABLED: z.literal(false),
+      EXTERNAL_GOOGLE_CLIENT_ID: z.string().optional(),
+      EXTERNAL_GOOGLE_SECRET: z.string().optional(),
+      EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: z.boolean().optional(),
+      EXTERNAL_GOOGLE_EMAIL_OPTIONAL: z.boolean().optional(),
+    }),
+    z.object({
+      EXTERNAL_GOOGLE_ENABLED: z.literal(true),
+      EXTERNAL_GOOGLE_CLIENT_ID: z
+        .string()
+        .min(1, 'At least one Client ID is required when Google sign-in is enabled.')
+        .regex(/^\S+$/, 'Client IDs should not contain spaces.')
+        .regex(
+          /^([a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*(,[a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*)*)$/i,
+          'Invalid characters. Google Client IDs should be a comma-separated list of domain-like strings.'
+        ),
+      EXTERNAL_GOOGLE_SECRET: z.string().optional(),
+      EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: z.boolean().optional(),
+      EXTERNAL_GOOGLE_EMAIL_OPTIONAL: z.boolean().optional(),
+    }),
+  ]),
   misc: {
     iconKey: 'google-icon',
     requiresRedirect: true,
     helper: `Register this callback URL when using Sign-in with Google on the web using OAuth.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-google#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-google#configure-your-services-id)`,
   },
 }
 
@@ -930,6 +1098,7 @@ const EXTERNAL_PROVIDER_KAKAO = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Kakao',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-kakao`,
   properties: {
     EXTERNAL_KAKAO_ENABLED: {
       title: 'Kakao enabled',
@@ -946,20 +1115,27 @@ const EXTERNAL_PROVIDER_KAKAO = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_KAKAO_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
-  validationSchema: object().shape({
-    EXTERNAL_KAKAO_ENABLED: boolean().required(),
-    EXTERNAL_KAKAO_CLIENT_ID: string().when('EXTERNAL_KAKAO_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('REST API Key is required'),
-      otherwise: (schema) => schema,
+  validationSchema: z.discriminatedUnion('EXTERNAL_KAKAO_ENABLED', [
+    z.object({
+      EXTERNAL_KAKAO_ENABLED: z.literal(false),
+      EXTERNAL_KAKAO_CLIENT_ID: z.string().optional(),
+      EXTERNAL_KAKAO_SECRET: z.string().optional(),
+      EXTERNAL_KAKAO_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_KAKAO_SECRET: string().when('EXTERNAL_KAKAO_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client Secret Code is required'),
-      otherwise: (schema) => schema,
+    z.object({
+      EXTERNAL_KAKAO_ENABLED: z.literal(true),
+      EXTERNAL_KAKAO_CLIENT_ID: z.string().min(1, 'REST API Key is required'),
+      EXTERNAL_KAKAO_SECRET: z.string().min(1, 'Client Secret Code is required'),
+      EXTERNAL_KAKAO_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-  }),
+  ]),
   misc: {
     iconKey: 'kakao-icon',
     requiresRedirect: true,
@@ -971,6 +1147,7 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'KeyCloak',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-keycloak`,
   properties: {
     EXTERNAL_KEYCLOAK_ENABLED: {
       title: 'Keycloak enabled',
@@ -990,26 +1167,32 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
       description: '',
       type: 'string',
     },
+    EXTERNAL_KEYCLOAK_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
-  validationSchema: object().shape({
-    EXTERNAL_KEYCLOAK_ENABLED: boolean().required(),
-    EXTERNAL_KEYCLOAK_CLIENT_ID: string().when('EXTERNAL_KEYCLOAK_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client ID is required'),
-      otherwise: (schema) => schema,
+  validationSchema: z.discriminatedUnion('EXTERNAL_KEYCLOAK_ENABLED', [
+    z.object({
+      EXTERNAL_KEYCLOAK_ENABLED: z.literal(false),
+      EXTERNAL_KEYCLOAK_CLIENT_ID: z.string().optional(),
+      EXTERNAL_KEYCLOAK_SECRET: z.string().optional(),
+      EXTERNAL_KEYCLOAK_URL: z.string().optional(),
+      EXTERNAL_KEYCLOAK_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_KEYCLOAK_SECRET: string().when('EXTERNAL_KEYCLOAK_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client secret is required'),
-      otherwise: (schema) => schema,
+    z.object({
+      EXTERNAL_KEYCLOAK_ENABLED: z.literal(true),
+      EXTERNAL_KEYCLOAK_CLIENT_ID: z.string().min(1, 'Client ID is required'),
+      EXTERNAL_KEYCLOAK_SECRET: z.string().min(1, 'Client secret is required'),
+      EXTERNAL_KEYCLOAK_URL: z
+        .string()
+        .min(1, 'Realm URL is required')
+        .regex(urlRegex(), 'Must be a valid URL'),
+      EXTERNAL_KEYCLOAK_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_KEYCLOAK_URL: string().when('EXTERNAL_KEYCLOAK_ENABLED', {
-      is: true,
-      then: (schema) =>
-        schema.matches(urlRegex, 'Must be a valid URL').required('Realm URL is required'),
-      otherwise: (schema) => schema.matches(urlRegex, 'Must be a valid URL'),
-    }),
-  }),
+  ]),
   misc: {
     iconKey: 'keycloak-icon',
     requiresRedirect: true,
@@ -1019,7 +1202,9 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
 const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
+  key: 'linkedin_oidc',
   title: 'LinkedIn (OIDC)',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-linkedin`,
   properties: {
     EXTERNAL_LINKEDIN_OIDC_ENABLED: {
       title: 'LinkedIn enabled',
@@ -1034,20 +1219,27 @@ const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_LINKEDIN_OIDC_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
-  validationSchema: object().shape({
-    EXTERNAL_LINKEDIN_OIDC_ENABLED: boolean().required(),
-    EXTERNAL_LINKEDIN_OIDC_CLIENT_ID: string().when('EXTERNAL_LINKEDIN_OIDC_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('API Key is required'),
-      otherwise: (schema) => schema,
+  validationSchema: z.discriminatedUnion('EXTERNAL_LINKEDIN_OIDC_ENABLED', [
+    z.object({
+      EXTERNAL_LINKEDIN_OIDC_ENABLED: z.literal(false),
+      EXTERNAL_LINKEDIN_OIDC_CLIENT_ID: z.string().optional(),
+      EXTERNAL_LINKEDIN_OIDC_SECRET: z.string().optional(),
+      EXTERNAL_LINKEDIN_OIDC_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_LINKEDIN_OIDC_SECRET: string().when('EXTERNAL_LINKEDIN_OIDC_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('API Secret Key is required'),
-      otherwise: (schema) => schema,
+    z.object({
+      EXTERNAL_LINKEDIN_OIDC_ENABLED: z.literal(true),
+      EXTERNAL_LINKEDIN_OIDC_CLIENT_ID: z.string().min(1, 'API Key is required'),
+      EXTERNAL_LINKEDIN_OIDC_SECRET: z.string().min(1, 'API Secret Key is required'),
+      EXTERNAL_LINKEDIN_OIDC_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-  }),
+  ]),
   misc: {
     iconKey: 'linkedin-icon',
     requiresRedirect: true,
@@ -1058,6 +1250,7 @@ const EXTERNAL_PROVIDER_NOTION = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Notion',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-notion`,
   properties: {
     EXTERNAL_NOTION_ENABLED: {
       title: 'Notion enabled',
@@ -1072,20 +1265,27 @@ const EXTERNAL_PROVIDER_NOTION = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_NOTION_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
-  validationSchema: object().shape({
-    EXTERNAL_NOTION_ENABLED: boolean().required(),
-    EXTERNAL_NOTION_CLIENT_ID: string().when('EXTERNAL_NOTION_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('OAuth client ID is required'),
-      otherwise: (schema) => schema,
+  validationSchema: z.discriminatedUnion('EXTERNAL_NOTION_ENABLED', [
+    z.object({
+      EXTERNAL_NOTION_ENABLED: z.literal(false),
+      EXTERNAL_NOTION_CLIENT_ID: z.string().optional(),
+      EXTERNAL_NOTION_SECRET: z.string().optional(),
+      EXTERNAL_NOTION_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_NOTION_SECRET: string().when('EXTERNAL_NOTION_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('OAuth client secret is required'),
-      otherwise: (schema) => schema,
+    z.object({
+      EXTERNAL_NOTION_ENABLED: z.literal(true),
+      EXTERNAL_NOTION_CLIENT_ID: z.string().min(1, 'OAuth client ID is required'),
+      EXTERNAL_NOTION_SECRET: z.string().min(1, 'OAuth client secret is required'),
+      EXTERNAL_NOTION_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-  }),
+  ]),
   misc: {
     iconKey: 'notion-icon',
     requiresRedirect: true,
@@ -1096,6 +1296,7 @@ const EXTERNAL_PROVIDER_TWITCH = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Twitch',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-twitch`,
   properties: {
     EXTERNAL_TWITCH_ENABLED: {
       title: 'Twitch enabled',
@@ -1110,20 +1311,27 @@ const EXTERNAL_PROVIDER_TWITCH = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_TWITCH_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
-  validationSchema: object().shape({
-    EXTERNAL_TWITCH_ENABLED: boolean().required(),
-    EXTERNAL_TWITCH_CLIENT_ID: string().when('EXTERNAL_TWITCH_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client ID is required'),
-      otherwise: (schema) => schema,
+  validationSchema: z.discriminatedUnion('EXTERNAL_TWITCH_ENABLED', [
+    z.object({
+      EXTERNAL_TWITCH_ENABLED: z.literal(false),
+      EXTERNAL_TWITCH_CLIENT_ID: z.string().optional(),
+      EXTERNAL_TWITCH_SECRET: z.string().optional(),
+      EXTERNAL_TWITCH_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_TWITCH_SECRET: string().when('EXTERNAL_TWITCH_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client secret is required'),
-      otherwise: (schema) => schema,
+    z.object({
+      EXTERNAL_TWITCH_ENABLED: z.literal(true),
+      EXTERNAL_TWITCH_CLIENT_ID: z.string().min(1, 'Client ID is required'),
+      EXTERNAL_TWITCH_SECRET: z.string().min(1, 'Client secret is required'),
+      EXTERNAL_TWITCH_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-  }),
+  ]),
   misc: {
     iconKey: 'twitch-icon',
     requiresRedirect: true,
@@ -1133,7 +1341,8 @@ const EXTERNAL_PROVIDER_TWITCH = {
 const EXTERNAL_PROVIDER_TWITTER = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  title: 'Twitter',
+  title: 'Twitter (Deprecated)',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-twitter`,
   properties: {
     EXTERNAL_TWITTER_ENABLED: {
       title: 'Twitter enabled',
@@ -1148,22 +1357,76 @@ const EXTERNAL_PROVIDER_TWITTER = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_TWITTER_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
-  validationSchema: object().shape({
-    EXTERNAL_TWITTER_ENABLED: boolean().required(),
-    EXTERNAL_TWITTER_CLIENT_ID: string().when('EXTERNAL_TWITTER_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('API Key is required'),
-      otherwise: (schema) => schema,
+  validationSchema: z.discriminatedUnion('EXTERNAL_TWITTER_ENABLED', [
+    z.object({
+      EXTERNAL_TWITTER_ENABLED: z.literal(false),
+      EXTERNAL_TWITTER_CLIENT_ID: z.string().optional(),
+      EXTERNAL_TWITTER_SECRET: z.string().optional(),
+      EXTERNAL_TWITTER_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_TWITTER_SECRET: string().when('EXTERNAL_TWITTER_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('API Secret Key is required'),
-      otherwise: (schema) => schema,
+    z.object({
+      EXTERNAL_TWITTER_ENABLED: z.literal(true),
+      EXTERNAL_TWITTER_CLIENT_ID: z.string().min(1, 'API Key is required'),
+      EXTERNAL_TWITTER_SECRET: z.string().min(1, 'API Secret Key is required'),
+      EXTERNAL_TWITTER_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-  }),
+  ]),
   misc: {
     iconKey: 'twitter-icon',
+    requiresRedirect: true,
+  },
+}
+
+const EXTERNAL_PROVIDER_X = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'X / Twitter (OAuth 2.0)',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-twitter`,
+  properties: {
+    EXTERNAL_X_ENABLED: {
+      title: 'X / Twitter enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_X_CLIENT_ID: {
+      title: 'Client ID',
+      type: 'string',
+    },
+    EXTERNAL_X_SECRET: {
+      title: 'Client Secret',
+      type: 'string',
+      isSecret: true,
+    },
+    EXTERNAL_X_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
+  },
+  validationSchema: z.discriminatedUnion('EXTERNAL_X_ENABLED', [
+    z.object({
+      EXTERNAL_X_ENABLED: z.literal(false),
+      EXTERNAL_X_CLIENT_ID: z.string().optional(),
+      EXTERNAL_X_SECRET: z.string().optional(),
+      EXTERNAL_X_EMAIL_OPTIONAL: z.boolean().optional(),
+    }),
+    z.object({
+      EXTERNAL_X_ENABLED: z.literal(true),
+      EXTERNAL_X_CLIENT_ID: z.string().min(1, 'Client ID is required'),
+      EXTERNAL_X_SECRET: z.string().min(1, 'Client Secret is required'),
+      EXTERNAL_X_EMAIL_OPTIONAL: z.boolean().optional(),
+    }),
+  ]),
+  misc: {
+    iconKey: 'x-icon',
+    hasLightIcon: true,
     requiresRedirect: true,
   },
 }
@@ -1171,7 +1434,8 @@ const EXTERNAL_PROVIDER_TWITTER = {
 const EXTERNAL_PROVIDER_SLACK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  title: 'Slack',
+  title: 'Slack (Deprecated)',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-slack`,
   properties: {
     EXTERNAL_SLACK_ENABLED: {
       title: 'Slack enabled',
@@ -1186,20 +1450,74 @@ const EXTERNAL_PROVIDER_SLACK = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_SLACK_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
-  validationSchema: object().shape({
-    EXTERNAL_SLACK_ENABLED: boolean().required(),
-    EXTERNAL_SLACK_CLIENT_ID: string().when('EXTERNAL_SLACK_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client ID is required'),
-      otherwise: (schema) => schema,
+  validationSchema: z.discriminatedUnion('EXTERNAL_SLACK_ENABLED', [
+    z.object({
+      EXTERNAL_SLACK_ENABLED: z.literal(false),
+      EXTERNAL_SLACK_CLIENT_ID: z.string().optional(),
+      EXTERNAL_SLACK_SECRET: z.string().optional(),
+      EXTERNAL_SLACK_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_SLACK_SECRET: string().when('EXTERNAL_SLACK_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client Secret is required'),
-      otherwise: (schema) => schema,
+    z.object({
+      EXTERNAL_SLACK_ENABLED: z.literal(true),
+      EXTERNAL_SLACK_CLIENT_ID: z.string().min(1, 'Client ID is required'),
+      EXTERNAL_SLACK_SECRET: z.string().min(1, 'Client Secret is required'),
+      EXTERNAL_SLACK_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-  }),
+  ]),
+  misc: {
+    iconKey: 'slack-icon',
+    requiresRedirect: true,
+  },
+}
+
+const EXTERNAL_PROVIDER_SLACK_OIDC = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Slack (OIDC)',
+  key: 'slack_oidc',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-slack`,
+  properties: {
+    EXTERNAL_SLACK_OIDC_ENABLED: {
+      title: 'Slack enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_SLACK_OIDC_CLIENT_ID: {
+      title: 'Client ID',
+      type: 'string',
+    },
+    EXTERNAL_SLACK_OIDC_SECRET: {
+      title: 'Client Secret',
+      type: 'string',
+      isSecret: true,
+    },
+    EXTERNAL_SLACK_OIDC_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
+  },
+  validationSchema: z.discriminatedUnion('EXTERNAL_SLACK_OIDC_ENABLED', [
+    z.object({
+      EXTERNAL_SLACK_OIDC_ENABLED: z.literal(false),
+      EXTERNAL_SLACK_OIDC_CLIENT_ID: z.string().optional(),
+      EXTERNAL_SLACK_OIDC_SECRET: z.string().optional(),
+      EXTERNAL_SLACK_OIDC_EMAIL_OPTIONAL: z.boolean().optional(),
+    }),
+    z.object({
+      EXTERNAL_SLACK_OIDC_ENABLED: z.literal(true),
+      EXTERNAL_SLACK_OIDC_CLIENT_ID: z.string().min(1, 'Client ID is required'),
+      EXTERNAL_SLACK_OIDC_SECRET: z.string().min(1, 'Client Secret is required'),
+      EXTERNAL_SLACK_OIDC_EMAIL_OPTIONAL: z.boolean().optional(),
+    }),
+  ]),
   misc: {
     iconKey: 'slack-icon',
     requiresRedirect: true,
@@ -1210,6 +1528,7 @@ const EXTERNAL_PROVIDER_SPOTIFY = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Spotify',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-spotify`,
   properties: {
     EXTERNAL_SPOTIFY_ENABLED: {
       title: 'Spotify enabled',
@@ -1224,20 +1543,27 @@ const EXTERNAL_PROVIDER_SPOTIFY = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_SPOTIFY_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
-  validationSchema: object().shape({
-    EXTERNAL_SPOTIFY_ENABLED: boolean().required(),
-    EXTERNAL_SPOTIFY_CLIENT_ID: string().when('EXTERNAL_SPOTIFY_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client ID is required'),
-      otherwise: (schema) => schema,
+  validationSchema: z.discriminatedUnion('EXTERNAL_SPOTIFY_ENABLED', [
+    z.object({
+      EXTERNAL_SPOTIFY_ENABLED: z.literal(false),
+      EXTERNAL_SPOTIFY_CLIENT_ID: z.string().optional(),
+      EXTERNAL_SPOTIFY_SECRET: z.string().optional(),
+      EXTERNAL_SPOTIFY_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_SPOTIFY_SECRET: string().when('EXTERNAL_SPOTIFY_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client Secret is required'),
-      otherwise: (schema) => schema,
+    z.object({
+      EXTERNAL_SPOTIFY_ENABLED: z.literal(true),
+      EXTERNAL_SPOTIFY_CLIENT_ID: z.string().min(1, 'Client ID is required'),
+      EXTERNAL_SPOTIFY_SECRET: z.string().min(1, 'Client Secret is required'),
+      EXTERNAL_SPOTIFY_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-  }),
+  ]),
   misc: {
     iconKey: 'spotify-icon',
     requiresRedirect: true,
@@ -1248,6 +1574,7 @@ const EXTERNAL_PROVIDER_WORKOS = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'WorkOS',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-workos`,
   properties: {
     EXTERNAL_WORKOS_ENABLED: {
       title: 'WorkOS enabled',
@@ -1267,26 +1594,23 @@ const EXTERNAL_PROVIDER_WORKOS = {
       isSecret: true,
     },
   },
-  validationSchema: object().shape({
-    EXTERNAL_WORKOS_ENABLED: boolean().required(),
-    EXTERNAL_WORKOS_URL: string()
-      .matches(urlRegex, 'Must be a valid URL')
-      .when('EXTERNAL_WORKOS_ENABLED', {
-        is: true,
-        then: (schema) => schema.required('WorkOS URL is required'),
-        otherwise: (schema) => schema,
-      }),
-    EXTERNAL_WORKOS_CLIENT_ID: string().when('EXTERNAL_WORKOS_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client ID is required'),
-      otherwise: (schema) => schema,
+  validationSchema: z.discriminatedUnion('EXTERNAL_WORKOS_ENABLED', [
+    z.object({
+      EXTERNAL_WORKOS_ENABLED: z.literal(false),
+      EXTERNAL_WORKOS_URL: z.string().optional(),
+      EXTERNAL_WORKOS_CLIENT_ID: z.string().optional(),
+      EXTERNAL_WORKOS_SECRET: z.string().optional(),
     }),
-    EXTERNAL_WORKOS_SECRET: string().when('EXTERNAL_WORKOS_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client Secret is required'),
-      otherwise: (schema) => schema,
+    z.object({
+      EXTERNAL_WORKOS_ENABLED: z.literal(true),
+      EXTERNAL_WORKOS_URL: z
+        .string()
+        .min(1, 'WorkOS URL is required')
+        .regex(urlRegex(), 'Must be a valid URL'),
+      EXTERNAL_WORKOS_CLIENT_ID: z.string().min(1, 'Client ID is required'),
+      EXTERNAL_WORKOS_SECRET: z.string().min(1, 'Client Secret is required'),
     }),
-  }),
+  ]),
   misc: {
     iconKey: 'workos-icon',
     requiresRedirect: true,
@@ -1297,6 +1621,7 @@ const EXTERNAL_PROVIDER_ZOOM = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Zoom',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-zoom`,
   properties: {
     EXTERNAL_ZOOM_ENABLED: {
       title: 'Zoom enabled',
@@ -1311,20 +1636,27 @@ const EXTERNAL_PROVIDER_ZOOM = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_ZOOM_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
-  validationSchema: object().shape({
-    EXTERNAL_ZOOM_ENABLED: boolean().required(),
-    EXTERNAL_ZOOM_CLIENT_ID: string().when('EXTERNAL_ZOOM_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client ID is required'),
-      otherwise: (schema) => schema,
+  validationSchema: z.discriminatedUnion('EXTERNAL_ZOOM_ENABLED', [
+    z.object({
+      EXTERNAL_ZOOM_ENABLED: z.literal(false),
+      EXTERNAL_ZOOM_CLIENT_ID: z.string().optional(),
+      EXTERNAL_ZOOM_SECRET: z.string().optional(),
+      EXTERNAL_ZOOM_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-    EXTERNAL_ZOOM_SECRET: string().when('EXTERNAL_ZOOM_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client secret is required'),
-      otherwise: (schema) => schema,
+    z.object({
+      EXTERNAL_ZOOM_ENABLED: z.literal(true),
+      EXTERNAL_ZOOM_CLIENT_ID: z.string().min(1, 'Client ID is required'),
+      EXTERNAL_ZOOM_SECRET: z.string().min(1, 'Client secret is required'),
+      EXTERNAL_ZOOM_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
-  }),
+  ]),
   misc: {
     iconKey: 'zoom-icon',
     requiresRedirect: true,
@@ -1335,19 +1667,74 @@ const PROVIDER_SAML = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'SAML 2.0',
+  link: `${DOCS_URL}/guides/auth/enterprise-sso/auth-sso-saml`,
   properties: {
     SAML_ENABLED: {
       title: 'Enable SAML 2.0 Single Sign-on',
+      description: `You will need to use the [Supabase CLI](${DOCS_URL}/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to set up SAML after enabling it`,
+      type: 'boolean',
+    },
+    SAML_EXTERNAL_URL: {
+      title: 'SAML metadata URL',
       description:
-        'You will need to use the [Supabase CLI](https://supabase.com/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to set up SAML after enabling it',
+        'You may use a different SAML metadata URL from what is defined with the API External URL. Please validate that your SAML External URL can reach the Custom Domain or Project URL.',
+      descriptionOptional: 'Optional',
+      type: 'string',
+    },
+    SAML_ALLOW_ENCRYPTED_ASSERTIONS: {
+      title: 'Allow encrypted SAML Assertions',
+      description:
+        'Some SAML Identity Providers require support for encrypted assertions. Usually this is not necessary.',
+      descriptionOptional: 'Optional',
       type: 'boolean',
     },
   },
-  validationSchema: object().shape({
-    SAML_ENABLED: boolean().required(),
-  }),
+  validationSchema: z.discriminatedUnion('SAML_ENABLED', [
+    z.object({
+      SAML_ENABLED: z.literal(false),
+      SAML_EXTERNAL_URL: z.string().optional(),
+      SAML_ALLOW_ENCRYPTED_ASSERTIONS: z.boolean().optional(),
+    }),
+    z.object({
+      SAML_ENABLED: z.literal(true),
+      SAML_EXTERNAL_URL: z.string().refine((value) => {
+        // Allow empty values
+        if (value == '') return true
+        return urlRegex().test(value)
+      }, 'Must be a valid URL'),
+      SAML_ALLOW_ENCRYPTED_ASSERTIONS: z.boolean().optional(),
+    }),
+  ]),
   misc: {
     iconKey: 'saml-icon',
+  },
+}
+
+const PROVIDER_WEB3 = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Web3 Wallet',
+  link: `${DOCS_URL}/guides/auth/auth-web3`,
+  properties: {
+    EXTERNAL_WEB3_ETHEREUM_ENABLED: {
+      title: 'Enable Sign in with Ethereum',
+      description:
+        'Allow Ethereum wallets to sign in to your project via the Sign in with Ethereum (EIP-4361). Set up [attack protection](../auth/protection) and adjust [rate limits](../auth/rate-limits) to counter abuse.',
+      type: 'boolean',
+    },
+    EXTERNAL_WEB3_SOLANA_ENABLED: {
+      title: 'Enable Sign in with Solana',
+      description:
+        'Allow Solana wallet holders to sign in to your project via the Sign in with Solana (SIWS, EIP-4361) standard. Set up [attack protection](../auth/protection) and adjust [rate limits](../auth/rate-limits) to counter abuse.',
+      type: 'boolean',
+    },
+  },
+  validationSchema: z.object({
+    EXTERNAL_WEB3_ETHEREUM_ENABLED: z.boolean(),
+    EXTERNAL_WEB3_SOLANA_ENABLED: z.boolean(),
+  }),
+  misc: {
+    iconKey: 'web3-icon',
   },
 }
 
@@ -1355,6 +1742,7 @@ export const PROVIDERS_SCHEMAS = [
   PROVIDER_EMAIL,
   PROVIDER_PHONE,
   PROVIDER_SAML,
+  PROVIDER_WEB3,
   EXTERNAL_PROVIDER_APPLE,
   EXTERNAL_PROVIDER_AZURE,
   EXTERNAL_PROVIDER_BITBUCKET,
@@ -1369,7 +1757,9 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_LINKEDIN_OIDC,
   EXTERNAL_PROVIDER_NOTION,
   EXTERNAL_PROVIDER_TWITCH,
+  EXTERNAL_PROVIDER_X,
   EXTERNAL_PROVIDER_TWITTER,
+  EXTERNAL_PROVIDER_SLACK_OIDC,
   EXTERNAL_PROVIDER_SLACK,
   EXTERNAL_PROVIDER_SPOTIFY,
   EXTERNAL_PROVIDER_WORKOS,

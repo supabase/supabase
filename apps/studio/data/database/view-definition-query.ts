@@ -1,44 +1,55 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { getViewDefinitionSql } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
 
-type GetViewDefinition = {
-  schema?: string
-  name?: string
+import { databaseKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
+
+type GetViewDefinitionArgs = {
+  id?: number
+  includeCreateStatement?: boolean
 }
 
-export const getViewDefinitionQuery = ({ schema, name }: GetViewDefinition) => {
-  const sql = /* SQL */ `
-    select pg_get_viewdef(to_regclass('"${schema}"."${name}"'), true) as definition
-  `.trim()
-
-  return sql
-}
-
-export type ViewDefinitionVariables = GetViewDefinition & {
+export type ViewDefinitionVariables = GetViewDefinitionArgs & {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
-export type ViewDefinitionData = string
-export type ViewDefinitionError = unknown
+export async function getViewDefinition(
+  { projectRef, connectionString, id, includeCreateStatement }: ViewDefinitionVariables,
+  signal?: AbortSignal
+) {
+  if (!id) throw new Error('View ID is required')
 
-export const useViewDefinitionQuery = <TData extends ViewDefinitionData = ViewDefinitionData>(
-  { projectRef, connectionString, schema, name }: ViewDefinitionVariables,
-  options: UseQueryOptions<ExecuteSqlData, ViewDefinitionError, TData> = {}
-) => {
-  return useExecuteSqlQuery(
+  const sql = getViewDefinitionSql({ id, includeCreateStatement })
+  const { result } = await executeSql(
     {
       projectRef,
       connectionString,
-      sql: getViewDefinitionQuery({ schema, name }),
-      queryKey: ['view-definition', schema, name],
+      sql,
+      queryKey: ['view-definition', id, includeCreateStatement ?? false],
     },
-    {
-      select(data) {
-        return data.result[0].definition.trim()
-      },
-      enabled: typeof schema !== 'undefined' && typeof name !== 'undefined',
-      ...options,
-    }
+    signal
   )
+
+  return result[0].definition.trim()
 }
+
+export type ViewDefinitionData = string
+export type ViewDefinitionError = ResponseError
+
+export const useViewDefinitionQuery = <TData = ViewDefinitionData>(
+  { projectRef, connectionString, id, includeCreateStatement }: ViewDefinitionVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<ViewDefinitionData, ViewDefinitionError, TData> = {}
+) =>
+  useQuery<ViewDefinitionData, ViewDefinitionError, TData>({
+    queryKey: databaseKeys.viewDefinition(projectRef, id, includeCreateStatement),
+    queryFn: ({ signal }) =>
+      getViewDefinition({ projectRef, connectionString, id, includeCreateStatement }, signal),
+    enabled:
+      enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
+    ...options,
+  })

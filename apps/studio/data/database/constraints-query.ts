@@ -1,9 +1,12 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { getTableConstraintsSql } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
+
+import { databaseKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type GetTableConstraintsVariables = {
-  schema?: string
-  table?: string
+  id?: number
 }
 
 export type Constraint = {
@@ -21,49 +24,39 @@ export enum CONSTRAINT_TYPE {
   EXCLUSION_CONSTRAINT = 'x',
 }
 
-export const getTableConstraints = ({ schema, table }: GetTableConstraintsVariables) => {
-  const sql = /* SQL */ `
-  SELECT 
-    con.oid as id,
-    con.conname as name,
-    con.contype as type
-  FROM pg_catalog.pg_constraint con
-  INNER JOIN pg_catalog.pg_class rel
-            ON rel.oid = con.conrelid
-  INNER JOIN pg_catalog.pg_namespace nsp
-            ON nsp.oid = connamespace
-  WHERE nsp.nspname = '${schema}'
-        AND rel.relname = '${table}';
-`.trim()
-
-  return sql
-}
-
 export type TableConstraintsVariables = GetTableConstraintsVariables & {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export type TableConstraintsData = Constraint[]
-export type TableConstraintsError = unknown
+export type TableConstraintsError = ResponseError
 
-export const useTableConstraintsQuery = <TData extends TableConstraintsData = TableConstraintsData>(
-  { projectRef, connectionString, schema, table }: TableConstraintsVariables,
-  options: UseQueryOptions<ExecuteSqlData, TableConstraintsError, TData> = {}
-) => {
-  return useExecuteSqlQuery(
-    {
-      projectRef,
-      connectionString,
-      sql: getTableConstraints({ schema, table }),
-      queryKey: ['table-constraints'],
-    },
-    {
-      enabled: typeof schema !== 'undefined' && typeof table !== 'undefined',
-      select(data) {
-        return (data as any)?.result ?? []
-      },
-      ...options,
-    }
+export async function getTableConstraints(
+  { projectRef, connectionString, id }: TableConstraintsVariables,
+  signal?: AbortSignal
+) {
+  if (!id) throw new Error('Table ID is required')
+
+  const sql = getTableConstraintsSql({ id })
+  const { result } = await executeSql(
+    { projectRef, connectionString, sql, queryKey: ['table-constraints', id] },
+    signal
   )
+
+  return (result as TableConstraintsData) ?? []
 }
+
+export const useTableConstraintsQuery = <TData = TableConstraintsData>(
+  { projectRef, connectionString, id }: TableConstraintsVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<TableConstraintsData, TableConstraintsError, TData> = {}
+) =>
+  useQuery<TableConstraintsData, TableConstraintsError, TData>({
+    queryKey: databaseKeys.tableConstraints(projectRef, id),
+    queryFn: ({ signal }) => getTableConstraints({ projectRef, connectionString, id }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
+    ...options,
+  })

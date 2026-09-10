@@ -1,93 +1,305 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { FormHeader, FormPanel } from 'components/ui/Forms'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { ChevronRight } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  IconExternalLink,
-  Tabs,
-} from 'ui'
-import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
-import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
-import TemplateEditor from './TemplateEditor'
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import * as z from 'zod'
 
-const EmailTemplates = () => {
+import { TEMPLATES_SCHEMAS } from './AuthTemplatesValidation'
+import { CustomEmailTemplateRestrictionAdmonition } from './CustomEmailTemplateRestrictionAdmonition'
+import {
+  hasCustomEmailSender,
+  isCustomEmailTemplateEditingRestricted,
+  isCustomEmailTemplateRestrictionStatusKnown,
+  slugifyTitle,
+} from './EmailTemplates.utils'
+import { SendEmailHookActiveAdmonition } from './SendEmailHookActiveAdmonition'
+import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+
+const notificationEnabledKeys = TEMPLATES_SCHEMAS.filter(
+  (t) => t.misc?.emailTemplateType === 'security'
+).map((template) => {
+  return `MAILER_NOTIFICATIONS_${template.id?.replace('_NOTIFICATION', '')}_ENABLED`
+})
+
+const NotificationsFormSchema = z.object({
+  ...notificationEnabledKeys.reduce(
+    (acc, key) => {
+      acc[key] = z.boolean()
+      return acc
+    },
+    {} as Record<string, z.ZodBoolean>
+  ),
+})
+
+export const EmailTemplates = () => {
   const { ref: projectRef } = useParams()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { data: selectedProject } = useSelectedProjectQuery()
+
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
+
   const {
     data: authConfig,
     error: authConfigError,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
 
-  const builtInSMTP =
-    isSuccess &&
-    authConfig &&
-    (!authConfig.SMTP_HOST || !authConfig.SMTP_USER || !authConfig.SMTP_PASS)
+  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
+    onError: (error) => {
+      toast.error(`Failed to update settings: ${error?.message}`)
+    },
+    onSuccess: () => {
+      toast.success('Successfully updated settings')
+    },
+  })
+
+  const usingBuiltInEmailSender = !hasCustomEmailSender(authConfig)
+  const hasSendEmailHook = !!(
+    authConfig?.HOOK_SEND_EMAIL_ENABLED && authConfig?.HOOK_SEND_EMAIL_URI
+  )
+  const isTemplateRestrictionStatusKnown = isCustomEmailTemplateRestrictionStatusKnown({
+    authConfig,
+    organization: selectedOrganization,
+    projectInsertedAt: selectedProject?.inserted_at,
+  })
+  const isTemplateEditBlocked =
+    isTemplateRestrictionStatusKnown &&
+    isCustomEmailTemplateEditingRestricted({
+      authConfig,
+      organization: selectedOrganization,
+      projectInsertedAt: selectedProject?.inserted_at,
+    })
+
+  const defaultValues = notificationEnabledKeys.reduce(
+    (acc, key) => {
+      acc[key] = authConfig ? Boolean(authConfig[key as keyof typeof authConfig]) : false
+      return acc
+    },
+    {} as Record<string, boolean>
+  )
+
+  const notificationsForm = useForm<z.infer<typeof NotificationsFormSchema>>({
+    resolver: zodResolver(NotificationsFormSchema),
+    defaultValues,
+  })
+
+  const onSubmit = (values: z.infer<typeof NotificationsFormSchema>) => {
+    if (!projectRef) return console.error('Project ref is required')
+    updateAuthConfig({ projectRef: projectRef, config: { ...values } })
+  }
+
+  useEffect(() => {
+    if (authConfig) {
+      notificationsForm.reset(defaultValues)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authConfig])
 
   return (
-    <div>
-      <div className="flex justify-between items-center">
-        <FormHeader
-          title="Email Templates"
-          description="Customize the emails that will be sent out to your users."
-        />
-        <div className="mb-6">
-          <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://supabase.com/docs/guides/auth/auth-email-templates"
-            >
-              Documentation
-            </a>
-          </Button>
-        </div>
-      </div>
+    <>
       {isError && (
-        <Alert_Shadcn_ variant="destructive">
-          <IconAlertCircle strokeWidth={2} />
-          <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+        <PageSection>
+          <PageSectionContent>
+            <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+          </PageSectionContent>
+        </PageSection>
       )}
-      {isLoading && <GenericSkeletonLoader />}
+      {isLoading && (
+        <PageSection>
+          <PageSectionContent>
+            <GenericSkeletonLoader />
+          </PageSectionContent>
+        </PageSection>
+      )}
       {isSuccess && (
-        <FormPanel>
-          <Tabs
-            scrollable
-            size="small"
-            type="underlined"
-            listClassNames="px-8 pt-4"
-            defaultActiveId={TEMPLATES_SCHEMAS[0].title.trim().replace(/\s+/g, '-')}
-          >
-            {TEMPLATES_SCHEMAS.map((template) => {
-              const panelId = template.title.trim().replace(/\s+/g, '-')
-              return (
-                <Tabs.Panel id={panelId} label={template.title} key={panelId}>
-                  {builtInSMTP ? (
-                    <div className="mx-8">
-                      <EmailRateLimitsAlert />
-                    </div>
-                  ) : null}
-                  <TemplateEditor
-                    key={template.title}
-                    template={template}
-                    authConfig={authConfig as any}
-                  />
-                </Tabs.Panel>
-              )
-            })}
-          </Tabs>
-        </FormPanel>
+        <>
+          {isTemplateEditBlocked && !hasSendEmailHook && (
+            <PageSection>
+              <PageSectionContent>
+                <CustomEmailTemplateRestrictionAdmonition />
+              </PageSectionContent>
+            </PageSection>
+          )}
+
+          {hasSendEmailHook && (
+            <PageSection>
+              <PageSectionContent>
+                <SendEmailHookActiveAdmonition />
+              </PageSectionContent>
+            </PageSection>
+          )}
+
+          <PageSection>
+            {usingBuiltInEmailSender && !isTemplateEditBlocked && (
+              <Admonition
+                type="warning"
+                title="Set up custom SMTP"
+                description={
+                  <p>
+                    You’re using the built-in email service. This service has rate limits and is not
+                    meant to be used for production apps.{' '}
+                    <InlineLink
+                      href={`${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`}
+                    >
+                      Learn more
+                    </InlineLink>{' '}
+                  </p>
+                }
+                layout="horizontal"
+                actions={
+                  <Button asChild variant="default">
+                    <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
+                  </Button>
+                }
+              />
+            )}
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Authentication</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
+            <PageSectionContent>
+              <Card>
+                {TEMPLATES_SCHEMAS.filter(
+                  (t) => t.misc?.emailTemplateType === 'authentication'
+                ).map((template) => {
+                  const templateSlug = slugifyTitle(template.title)
+
+                  return (
+                    <CardContent key={`${template.id}`} className="p-0">
+                      <Link
+                        href={`/project/${projectRef}/auth/templates/${templateSlug}`}
+                        className="flex items-center justify-between hover:bg-surface-200 transition-colors py-4 px-6 w-full h-full"
+                      >
+                        <div className="flex flex-col">
+                          <h3 className="text-sm text-foreground">{template.title}</h3>
+                          {template.purpose && (
+                            <p className="text-sm text-foreground-lighter">{template.purpose}</p>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                          <ChevronRight size={16} className="text-foreground-muted" />
+                        </div>
+                      </Link>
+                    </CardContent>
+                  )
+                })}
+              </Card>
+            </PageSectionContent>
+          </PageSection>
+
+          <PageSection>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Security</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
+            <PageSectionContent>
+              <Form {...notificationsForm}>
+                <form onSubmit={notificationsForm.handleSubmit(onSubmit)} className="space-y-4">
+                  <Card>
+                    {TEMPLATES_SCHEMAS.filter((t) => t.misc?.emailTemplateType === 'security').map(
+                      (template) => {
+                        const templateSlug = slugifyTitle(template.title)
+                        const templateEnabledKey =
+                          `MAILER_NOTIFICATIONS_${template.id?.replace('_NOTIFICATION', '')}_ENABLED` as keyof typeof authConfig
+
+                        return (
+                          <CardContent
+                            key={`${template.id}`}
+                            className="p-0 flex items-center justify-between hover:bg-surface-200 transition-colors w-full h-full"
+                          >
+                            <Link
+                              href={`/project/${projectRef}/auth/templates/${templateSlug}`}
+                              className="flex flex-col flex-1 py-4 px-6"
+                            >
+                              <h3 className="text-sm text-foreground">{template.title}</h3>
+                              {template.purpose && (
+                                <p className="text-sm text-foreground-lighter">
+                                  {template.purpose}
+                                </p>
+                              )}
+                            </Link>
+
+                            <div className="flex items-center gap-4 h-full pl-2 relative">
+                              <FormField
+                                control={notificationsForm.control}
+                                name={templateEnabledKey}
+                                render={({ field }) => (
+                                  <FormControl>
+                                    <Switch
+                                      checked={field.value}
+                                      onCheckedChange={field.onChange}
+                                      disabled={!canUpdateConfig}
+                                    />
+                                  </FormControl>
+                                )}
+                              />
+
+                              <Link
+                                href={`/project/${projectRef}/auth/templates/${templateSlug}`}
+                                className="py-6 pr-6"
+                              >
+                                <ChevronRight size={16} className="text-foreground-muted" />
+                              </Link>
+                            </div>
+                          </CardContent>
+                        )
+                      }
+                    )}
+                    <CardFooter className="justify-end space-x-2">
+                      {notificationsForm.formState.isDirty && (
+                        <Button variant="default" onClick={() => notificationsForm.reset()}>
+                          Cancel
+                        </Button>
+                      )}
+                      <Button
+                        variant="primary"
+                        type="submit"
+                        disabled={
+                          !canUpdateConfig ||
+                          isUpdatingConfig ||
+                          !notificationsForm.formState.isDirty
+                        }
+                        loading={isUpdatingConfig}
+                      >
+                        Save changes
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </form>
+              </Form>
+            </PageSectionContent>
+          </PageSection>
+        </>
       )}
-    </div>
+    </>
   )
 }
-
-export default EmailTemplates

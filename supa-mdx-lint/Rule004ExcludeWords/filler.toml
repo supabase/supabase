@@ -1,0 +1,16 @@
+description = "Remove '%s' for a more concise, direct sentence."
+level = "WARNING"
+words = [
+    "actually",
+    "easily",
+    "easy",
+    "just",
+    "let's",
+    "obviously",
+    "of course",
+    "please",
+    "quickly",
+    "simple",
+    "simply",
+    "that's it",
+]

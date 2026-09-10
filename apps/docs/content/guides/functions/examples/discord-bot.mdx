@@ -16,12 +16,12 @@ video: 'https://www.youtube.com/v/J24Bvo_m7DM'
 
 ## Create an application on Discord Developer portal
 
-1. Go to [https://discord.com/developers/applications](https://discord.com/developers/applications) (login using your discord account if required).
+1. Go to [https://discord.com/developers/applications](https://discord.com/developers/applications) (sign in using your discord account if required).
 2. Click on **New Application** button available at left side of your profile picture.
 3. Name your application and click on **Create**.
 4. Go to **Bot** section, click on **Add Bot**, and finally on **Yes, do it!** to confirm.
 
-That's it. A new application is created which will hold our Slash Command. Don't close the tab as we need information from this application page throughout our development.
+A new application is created which will hold our Slash Command. Don't close the tab as we need information from this application page throughout our development.
 
 Before we can write some code, we need to curl a discord endpoint to register a Slash Command in our app.
 
@@ -43,12 +43,13 @@ This will register a Slash Command named `hello` that accepts a parameter named 
 
 ```ts index.ts
 // Sift is a small routing library that abstracts away details like starting a
-// listener on a port, and provides a simple function (serve) that has an API
+// listener on a port, and provides a function (serve) that has an API
 // to invoke a function for a specific path.
-import { json, serve, validateRequest } from 'https://deno.land/x/sift@0.6.0/mod.ts'
+
 // TweetNaCl is a cryptography library that we use to verify requests
 // from Discord.
 import nacl from 'https://cdn.skypack.dev/tweetnacl@v1.0.3?dts'
+import { json, serve, validateRequest } from 'https://deno.land/x/sift@0.6.0/mod.ts'
 
 enum DiscordCommandType {
   Ping = 1,
@@ -138,7 +139,7 @@ function hexToUint8Array(hex: string) {
 }
 ```
 
-## Deploy the Slash Command handler
+## Deploy the slash command handler
 
 ```bash
 supabase functions deploy discord-bot --no-verify-jwt
@@ -152,9 +153,9 @@ Navigate to your Function details in the Supabase Dashboard to get your Endpoint
 1. Go back to your application (Greeter) page on Discord Developer Portal
 2. Fill **INTERACTIONS ENDPOINT URL** field with the URL and click on **Save Changes**.
 
-The application is now ready. Let's proceed to the next section to install it.
+The application is now ready. Proceed to the next section to install it.
 
-## Install the Slash Command on your Discord server
+## Install the slash command on your Discord server
 
 So to use the `hello` Slash Command, we need to install our Greeter application on our Discord server. Here are the steps:
 

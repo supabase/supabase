@@ -1,4 +1,4 @@
-import { ICommonMarkdown, ICommonSection } from '~/components/reference/Reference.types'
+import type { ICommonMarkdown, ICommonSection } from '~/components/reference/Reference.types'
 import generateRefMarkdown from '~/lib/mdx/generateRefMarkdown'
 
 async function handleRefStaticProps(sections: ICommonSection[], libraryPath: string) {

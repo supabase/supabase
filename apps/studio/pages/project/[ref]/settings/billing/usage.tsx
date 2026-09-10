@@ -1,15 +1,18 @@
-import { SettingsLayout } from 'components/layouts'
-import type { NextPageWithLayout } from 'types'
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { useSelectedOrganization } from 'hooks'
-import { useParams } from 'common'
+
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import type { NextPageWithLayout } from '@/types'
 
 const ProjectBillingUsage: NextPageWithLayout = () => {
   // This component is only used for redirects, as nextjs cant redirect based on hash
   const router = useRouter()
   const { ref } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const hash = router.asPath.split('#')[1]
   const route = router.route
@@ -20,7 +23,7 @@ const ProjectBillingUsage: NextPageWithLayout = () => {
     let redirectUrl
 
     if (['cpu', 'ram', 'disk_io'].includes(hash)) {
-      redirectUrl = `/project/${ref}/settings/infrastructure#${hash}`
+      redirectUrl = `${getInfrastructurePath(ref)}#${hash}`
     } else {
       redirectUrl = `/org/${organization.slug}/usage?projectRef=${ref}`
     }
@@ -31,6 +34,10 @@ const ProjectBillingUsage: NextPageWithLayout = () => {
   return null
 }
 
-ProjectBillingUsage.getLayout = (page) => <SettingsLayout title="Usage">{page}</SettingsLayout>
+ProjectBillingUsage.getLayout = (page) => (
+  <DefaultLayout>
+    <SettingsLayout title="Usage">{page}</SettingsLayout>
+  </DefaultLayout>
+)
 
 export default ProjectBillingUsage

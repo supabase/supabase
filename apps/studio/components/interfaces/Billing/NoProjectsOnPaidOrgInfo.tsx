@@ -1,50 +1,34 @@
 import Link from 'next/link'
-import { IconInfo } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
-import InformationBox from 'components/ui/InformationBox'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import type { Organization } from 'types'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
-interface NoProjectsOnPaidOrgInfoProps {
-  organization?: Organization
-}
+const EXCLUDED_PLANS = ['free', 'platform', 'enterprise']
 
-const NoProjectsOnPaidOrgInfo = ({ organization }: NoProjectsOnPaidOrgInfoProps) => {
-  const { data: allProjects } = useProjectsQuery({})
-  const projectCount =
-    allProjects?.filter((project) => project.organization_id === organization?.id).length ?? 0
+export const NoProjectsOnPaidOrgInfo = () => {
+  const { data: organization } = useSelectedOrganizationQuery()
+  const isEligible = organization != null && !EXCLUDED_PLANS.includes(organization.plan.id ?? '')
 
-  const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-
-  if (
-    projectCount > 0 ||
-    orgSubscription?.plan === undefined ||
-    orgSubscription.plan.id === 'free' ||
-    orgSubscription.plan.id === 'enterprise'
+  const { data } = useOrgProjectsInfiniteQuery(
+    { slug: organization?.slug },
+    { enabled: isEligible }
   )
-    return null
+  const projectCount = data?.pages[0].pagination.count ?? 0
+
+  if (!isEligible || projectCount > 0) return null
 
   return (
-    <InformationBox
-      defaultVisibility={true}
-      hideCollapse
-      title={`Your organization is on the ${orgSubscription.plan.name} plan with no projects running`}
-      icon={<IconInfo strokeWidth={2} />}
+    <Admonition
+      type="default"
+      title={`Your organization is on the ${organization.plan.name} plan with no projects running`}
       description={
-        <div>
+        <div className="max-w-full! prose text-sm">
           The monthly fees for the paid plan still apply. To cancel your subscription, head over to
           your{' '}
-          <Link
-            href={`/org/${organization?.slug}/billing`}
-            className="text-sm text-green-900 transition hover:text-green-1000"
-          >
-            organization billing settings .
-          </Link>
+          <Link href={`/org/${organization?.slug}/billing`}>organization billing settings</Link>
         </div>
       }
     />
   )
 }
-
-export default NoProjectsOnPaidOrgInfo

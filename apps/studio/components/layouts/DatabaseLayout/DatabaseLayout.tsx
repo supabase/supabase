@@ -1,46 +1,38 @@
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedProject, withAuth } from 'hooks'
-import { ProjectLayout } from '../'
-import { generateDatabaseMenu } from './DatabaseMenu.utils'
+import { ProjectLayout } from '../ProjectLayout'
+import { useGenerateDatabaseMenu } from './DatabaseMenu.utils'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 export interface DatabaseLayoutProps {
-  title?: string
+  title: string
 }
 
-const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
-  const project = useSelectedProject()
-
+export const DatabaseProductMenu = () => {
   const router = useRouter()
   const page = router.pathname.split('/')[4]
+  const menu = useGenerateDatabaseMenu()
 
-  const { data } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const { data: addons } = useProjectAddonsQuery({ projectRef: project?.ref })
+  return <ProductMenu page={page} menu={menu} />
+}
 
-  const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
-  const pitrEnabled = addons?.selected_addons.find((addon) => addon.type === 'pitr') !== undefined
+const DatabaseLayout = ({ children, title }: PropsWithChildren<DatabaseLayoutProps>) => {
+  const router = useRouter()
+  const page = router.pathname.split('/')[4]
+  const menu = useGenerateDatabaseMenu()
 
   return (
     <ProjectLayout
       product="Database"
-      productMenu={
-        <ProductMenu
-          page={page}
-          menu={generateDatabaseMenu(project, { pgNetExtensionExists, pitrEnabled })}
-        />
-      }
+      browserTitle={{ section: title }}
+      productMenu={<ProductMenu page={page} menu={menu} />}
       isBlocking={false}
     >
-      <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-        {children}
-      </main>
+      <ProductMenuShortcuts menu={menu} />
+      {children}
     </ProjectLayout>
   )
 }

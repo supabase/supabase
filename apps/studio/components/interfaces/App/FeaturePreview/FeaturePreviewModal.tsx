@@ -1,176 +1,337 @@
-import { useTelemetryProps } from 'common'
-import { FlaskConical } from 'lucide-react'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { Button, IconExternalLink, IconEye, IconEyeOff, Modal, ScrollArea, cn } from 'ui'
+import { ReactNode } from 'react'
+import { toast } from 'sonner'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  Badge,
+  Button,
+  cn,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  ScrollArea,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
-import { useFlag } from 'hooks'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import Telemetry from 'lib/telemetry'
-import { useAppStateSnapshot } from 'state/app-state'
-import APISidePanelPreview from './APISidePanelPreview'
-import CLSPreview from './CLSPreview'
-import { useFeaturePreviewContext } from './FeaturePreviewContext'
-import RLSAIAssistantPreview from './RLSAIAssistantPreview'
-import { SQLEditorAIAssistantPreview } from './SQLEditorAIAssistantPreview'
+import { AdvisorRulesPreview } from './AdvisorRulesPreview'
+import { CLSPreview } from './CLSPreview'
+import { ExplorerPreview } from './ExplorerPreview'
+import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
+import { IntegrationsLayoutPreview } from './IntegrationsLayoutPreview'
+import { JitDbAccessPreview } from './JitDbAccessPreview'
+import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
+import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
+import { SqlEditorManualSavePreview } from './SqlEditorManualSavePreview'
+import { StorageVersioningPreview } from './StorageVersioningPreview'
+import { UnifiedLogsPreview } from './UnifiedLogsPreview'
+import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
+import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
-const FeaturePreviewModal = () => {
-  const isAIConversational = useFlag('sqlEditorConversationalAi')
+const FEATURE_PREVIEW_KEY_TO_CONTENT: {
+  [key: string]: ReactNode
+} = {
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF]: <PgDeltaDiffPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]: <AdvisorRulesPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: <CLSPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]: <UnifiedLogsPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]: <PlatformWebhooksPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]: <JitDbAccessPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]: <SqlEditorManualSavePreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]: <IntegrationsLayoutPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]: <ExplorerPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING]: <StorageVersioningPreview />,
+}
 
-  // [Ivan] We should probably move this to a separate file, together with LOCAL_STORAGE_KEYS. We should make adding new feature previews as simple as possible.
-  const FEATURE_PREVIEWS: { key: string; name: string; content: any; discussionsUrl?: string }[] = [
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
-      name: 'Project API documentation',
-      content: <APISidePanelPreview />,
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
-    },
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
-      name: 'Supabase Assistant for RLS policies',
-      content: <RLSAIAssistantPreview />,
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/21882',
-    },
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
-      name: 'Column-level privileges',
-      content: <CLSPreview />,
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
-    },
-    // the user should only be able to see the panel for the AI assistant if the feature flag is true
-    ...(isAIConversational
-      ? [
-          {
-            key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_AI_ASSISTANT,
-            name: 'SQL Editor Conversational Assistant ',
-            content: <SQLEditorAIAssistantPreview />,
-            discussionsUrl: 'https://github.com/orgs/supabase/discussions/21967',
-          },
-        ]
-      : []),
-  ]
-
+export const FeaturePreviewModal = () => {
   const router = useRouter()
-  const snap = useAppStateSnapshot()
-  const telemetryProps = useTelemetryProps()
+  const { ref } = useParams()
+  const { dismissBanner } = useBannerStack()
+  const featurePreviews = useFeaturePreviews()
+  const {
+    showFeaturePreviewModal,
+    selectedFeatureKey,
+    selectFeaturePreview,
+    toggleFeaturePreviewModal,
+  } = useFeaturePreviewModal()
   const featurePreviewContext = useFeaturePreviewContext()
-
-  const selectedFeaturePreview =
-    snap.selectedFeaturePreview === '' ? FEATURE_PREVIEWS[0].key : snap.selectedFeaturePreview
-
-  const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(selectedFeaturePreview)
-
-  // this modal can be triggered on other pages
-  // Update local state when valtio state changes
-  useEffect(() => {
-    if (snap.selectedFeaturePreview !== '') {
-      setSelectedFeatureKey(snap.selectedFeaturePreview)
-    }
-  }, [snap.selectedFeaturePreview])
+  const track = useTrack()
 
   const { flags, onUpdateFlag } = featurePreviewContext
-  const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
-  const isSelectedFeatureEnabled = flags[selectedFeatureKey]
+  const allFeaturePreviews = (
+    IS_PLATFORM ? featurePreviews : featurePreviews.filter((x) => !x.isPlatformOnly)
+  ).filter((x) => x.enabled)
+
+  const selectedFeature =
+    allFeaturePreviews.find((preview) => preview.key === selectedFeatureKey) ??
+    allFeaturePreviews[0]
+  const isSelectedFeatureEnabled = flags[selectedFeature?.key]
+  const canDisableSelectedFeature = selectedFeature?.isForced !== true
+
+  const selectedFeatureRoute = selectedFeature?.getRoute?.(ref)
+  const hasRoute = selectedFeatureRoute !== undefined && ref !== undefined
+
+  const categories = (
+    [...new Set(allFeaturePreviews.map((preview) => preview.category).filter(Boolean))] as string[]
+  ).concat(['others'])
 
   const toggleFeature = () => {
-    onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
-    Telemetry.sendEvent(
-      {
-        category: 'ui_feature_previews',
-        action: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
-        label: selectedFeatureKey,
-      },
-      telemetryProps,
-      router
-    )
-  }
+    if (!selectedFeature) return
 
-  function handleCloseFeaturePreviewModal() {
-    snap.setShowFeaturePreviewModal(false)
-    snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
+    const isEnabling = !isSelectedFeatureEnabled
+
+    onUpdateFlag(selectedFeature.key, isEnabling)
+    track(isEnabling ? 'feature_preview_enabled' : 'feature_preview_disabled', {
+      feature: selectedFeature.key,
+    })
+
+    if (!isEnabling) {
+      toast(`${selectedFeature.name} disabled`)
+      return
+    }
+
+    if (hasRoute) {
+      // Navigating away drops the `featurePreviewModal` query param, which is
+      // what closes the modal. Don't also close it via
+      // toggleFeaturePreviewModal — its queued nuqs URL update races the push
+      // and can navigate back to the current page, swallowing the redirect.
+      router.push(selectedFeatureRoute)
+      toast.success(`${selectedFeature.name} enabled`, {
+        description: "We've taken you to where you can try it out.",
+      })
+      if (selectedFeature.bannerId) dismissBanner(selectedFeature.bannerId)
+    } else {
+      toggleFeaturePreviewModal(false)
+      toast.success(`${selectedFeature.name} enabled`, {
+        description: "It's now active across the dashboard.",
+      })
+    }
   }
 
   return (
-    <Modal
-      hideFooter
-      showCloseButton
-      size="xlarge"
-      className="max-w-4xl"
-      header="Dashboard feature previews"
-      visible={snap.showFeaturePreviewModal}
-      onCancel={handleCloseFeaturePreviewModal}
-    >
-      {FEATURE_PREVIEWS.length > 0 ? (
-        <div className="flex border-t">
-          <div>
-            <ScrollArea className="h-[550px] w-[280px] border-r">
-              {FEATURE_PREVIEWS.map((feature) => {
-                const isEnabled = flags[feature.key] ?? false
+    <Dialog open={showFeaturePreviewModal} onOpenChange={toggleFeaturePreviewModal}>
+      <DialogContent size="xlarge" className="flex flex-col max-w-4xl! h-[90dvh] md:h-auto">
+        <DialogHeader>
+          <DialogTitle>Dashboard feature previews</DialogTitle>
+          <DialogDescription>Get early access to new features and give feedback</DialogDescription>
+        </DialogHeader>
 
-                return (
-                  <div
-                    key={feature.key}
-                    onClick={() => setSelectedFeatureKey(feature.key)}
-                    className={cn(
-                      'flex items-center space-x-3 p-4 border-b cursor-pointer bg transition',
-                      selectedFeatureKey === feature.key ? 'bg-surface-300' : 'bg-surface-100'
+        <DialogSectionSeparator />
+
+        <DialogSection className="p-0! flex-1 min-h-0 h-full">
+          {allFeaturePreviews.length > 0 ? (
+            <div className="max-h-full flex-1 min-h-0 h-full flex flex-col gap-y-1 md:gap-y-4 md:flex-row">
+              <div>
+                <ScrollArea className="hidden md:block h-[550px] w-[280px] border-r">
+                  <Accordion type="multiple" defaultValue={categories}>
+                    {categories.map((category) => {
+                      const items =
+                        category === 'others'
+                          ? allFeaturePreviews.filter((x) => x.category === undefined)
+                          : allFeaturePreviews.filter((x) => x.category === category)
+                      return (
+                        <AccordionItem key={category} value={category}>
+                          <AccordionTrigger className="text-xs font-mono uppercase tracking-tight px-4 text-foreground-lighter py-2 bg-tertiary dark:bg-transparent">
+                            {category}
+                          </AccordionTrigger>
+                          <AccordionContent className="[&>div]:pb-0">
+                            {items.map((feature) => (
+                              <FeaturePreviewItem
+                                key={feature.key}
+                                feature={feature}
+                                selectedFeature={selectedFeature}
+                                selectFeaturePreview={selectFeaturePreview}
+                              />
+                            ))}
+                          </AccordionContent>
+                        </AccordionItem>
+                      )
+                    })}
+                  </Accordion>
+
+                  {/* {allFeaturePreviews.map((feature) => (
+                    <FeaturePreviewItem
+                      key={feature.key}
+                      feature={feature}
+                      selectedFeature={selectedFeature}
+                      selectFeaturePreview={selectFeaturePreview}
+                    />
+                  ))} */}
+                </ScrollArea>
+              </div>
+              <div className="block md:hidden px-4 pt-4">
+                <Select
+                  value={selectedFeature.key}
+                  onValueChange={selectFeaturePreview}
+                  defaultValue={selectedFeature.name}
+                >
+                  <SelectTrigger id="feature-preview-select">
+                    <div className="flex items-center gap-x-2">
+                      {(flags[selectedFeature.key] ?? false) ? (
+                        <Eye size={14} strokeWidth={2} className="text-brand" />
+                      ) : (
+                        <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
+                      )}
+                      <p>{selectedFeature.name}</p>
+                      {selectedFeature.isNew && <Badge variant="success">New</Badge>}
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="p-0! [&>div]:w-full! [&>div]:p-0! [&>div]:flex! [&>div]:flex-col! w-full flex">
+                    {allFeaturePreviews.map((feature) => (
+                      <SelectItem
+                        key={feature.key}
+                        value={feature.key}
+                        className="p-0 [&>span:nth-child(2)]:w-full [&>span:nth-child(1)]:left-3"
+                      >
+                        <FeaturePreviewItem
+                          feature={feature}
+                          selectedFeature={selectedFeature}
+                          selectFeaturePreview={selectFeaturePreview}
+                          className="pl-10 py-3 bg-transparent"
+                        />
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="w-full h-auto min-h-0 max-h-auto md:max-h-[550px] p-4 pb-0 flex flex-col">
+                <div className="flex items-center justify-between border-b gap-2 pb-3">
+                  <p>{selectedFeature?.name}</p>
+                  <div className="flex items-center gap-x-2">
+                    {selectedFeature?.discussionsUrl !== undefined && (
+                      <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                        <Link
+                          href={selectedFeature.discussionsUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Give feedback
+                        </Link>
+                      </Button>
                     )}
-                  >
-                    {isEnabled ? (
-                      <IconEye size={14} strokeWidth={2} className="text-brand" />
-                    ) : (
-                      <IconEyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
+                    {isSelectedFeatureEnabled && (
+                      <ButtonTooltip
+                        variant="default"
+                        disabled={!canDisableSelectedFeature}
+                        onClick={() => toggleFeature()}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            className: 'max-w-64 text-center',
+                            text: canDisableSelectedFeature
+                              ? undefined
+                              : 'This feature is now the default and can no longer be turned off',
+                          },
+                        }}
+                      >
+                        Disable feature
+                      </ButtonTooltip>
                     )}
-                    <p className="text-sm truncate" title={feature.name}>
-                      {feature.name}
-                    </p>
+                    {!isSelectedFeatureEnabled && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="default" onClick={() => toggleFeature()}>
+                            Enable feature
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="max-w-64 text-center">
+                          {hasRoute
+                            ? 'Enables the feature and takes you to where you can try it out'
+                            : 'Enables this preview across the dashboard'}
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
                   </div>
-                )
-              })}
-            </ScrollArea>
-          </div>
-          <div className="flex-grow max-h-[550px] p-4 space-y-3 overflow-y-auto">
-            <div className="flex items-center justify-between">
-              <p>{selectedFeature?.name}</p>
-              <div className="flex items-center space-x-2">
-                {selectedFeature?.discussionsUrl !== undefined && (
-                  <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                    <Link href={selectedFeature.discussionsUrl} target="_blank" rel="noreferrer">
-                      Give feedback
-                    </Link>
-                  </Button>
-                )}
-                <Button type="default" onClick={() => toggleFeature()}>
-                  {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
-                </Button>
+                </div>
+                <div className="overflow-y-scroll pt-3 pb-4">
+                  {FEATURE_PREVIEW_KEY_TO_CONTENT[selectedFeature?.key ?? '']}
+                </div>
               </div>
             </div>
-            {selectedFeature?.content}
-          </div>
-        </div>
-      ) : (
-        <div className="h-[550px] flex flex-col items-center justify-center">
-          <FlaskConical size={30} strokeWidth={1.5} className="text-foreground-light" />
-          <div className="mt-1 mb-3 flex flex-col items-center gap-y-0.5">
-            <p className="text-sm">No feature previews available</p>
-            <p className="text-sm text-foreground-light">
-              Have an idea for the dashboard? Let us know via Github Discussions!
-            </p>
-          </div>
-          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-            <Link
-              href="https://github.com/orgs/supabase/discussions/categories/feature-requests"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Github Discussions
-            </Link>
-          </Button>
-        </div>
-      )}
-    </Modal>
+          ) : (
+            <div className="h-[550px] flex flex-col items-center justify-center">
+              <FlaskConical size={30} strokeWidth={1.5} className="text-foreground-light" />
+              <div className="mt-1 mb-3 flex flex-col items-center gap-y-0.5">
+                <p className="text-sm">No feature previews available</p>
+                <p className="text-sm text-foreground-light">
+                  Have an idea for the dashboard? Let us know via GitHub Discussions!
+                </p>
+              </div>
+              <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                <Link
+                  href="https://github.com/orgs/supabase/discussions/categories/feature-requests"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  GitHub Discussions
+                </Link>
+              </Button>
+            </div>
+          )}
+        </DialogSection>
+      </DialogContent>
+    </Dialog>
   )
 }
 
-export default FeaturePreviewModal
+const FeaturePreviewItem = ({
+  feature,
+  selectedFeature,
+  selectFeaturePreview,
+  className,
+}: {
+  feature: FeaturePreview
+  selectedFeature: FeaturePreview
+  selectFeaturePreview: (key: string) => void
+  className?: string
+}) => {
+  const featurePreviewContext = useFeaturePreviewContext()
+  const { flags } = featurePreviewContext
+  const isEnabled = flags[feature.key] ?? false
+
+  return (
+    <button
+      type="button"
+      tabIndex={0}
+      key={feature.key}
+      onClick={() => selectFeaturePreview(feature.key)}
+      className={cn(
+        'w-full! flex-1 flex items-center justify-between p-4 cursor-pointer bg transition',
+        selectedFeature?.key === feature.key
+          ? 'bg-muted dark:bg-accent text-foreground'
+          : 'bg-card text-foreground-light',
+        className
+      )}
+    >
+      <div className="flex items-center gap-x-3">
+        {isEnabled ? (
+          <Eye size={14} strokeWidth={2} className="text-brand" />
+        ) : (
+          <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
+        )}
+        <p className="text-sm truncate" title={feature.name}>
+          {feature.name}
+        </p>
+      </div>
+      {feature.isNew && <Badge variant="success">New</Badge>}
+    </button>
+  )
+}

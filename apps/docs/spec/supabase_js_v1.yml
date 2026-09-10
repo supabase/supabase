@@ -27,7 +27,7 @@ functions:
             import { createClient } from '@supabase/supabase-js'
 
             // Create a single supabase client for interacting with your database
-            const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+            const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key')
           ```
       - id: with-additional-parameters
         name: With Additional Parameters
@@ -42,7 +42,7 @@ functions:
               persistSession: true,
               detectSessionInUrl: true,
             }
-            const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
+            const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', options)
           ```
       - id: api-schemas
         name: API schemas
@@ -57,7 +57,7 @@ functions:
               persistSession: true,
               detectSessionInUrl: true,
             }
-            const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
+            const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', options)
           ```
         description: |
           By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
@@ -70,7 +70,7 @@ functions:
           ```js
             import { createClient } from '@supabase/supabase-js'
 
-            const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+            const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', {
               fetch: fetch.bind(globalThis),
             })
           ```
@@ -82,7 +82,7 @@ functions:
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
-      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [supabase.com/dashboard](https://supabase.com/dashboard)
+      - By default, the user will need to verify their email address before signing in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [supabase.com/dashboard](https://supabase.com/dashboard)
       - If "Email Confirmations" is turned on, a `user` is returned but `session` will be null
       - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
       - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [supabase.com/dashboard](https://supabase.com/dashboard)
@@ -148,7 +148,7 @@ functions:
       - A user can sign up either via email or OAuth.
       - If you provide `email` without a `password`, the user will be sent a magic link.
       - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [supabase.com/dashboard](https://supabase.com/dashboard)
-      - Specifying a `provider` will open the browser to the relevant login page.
+      - Specifying a `provider` will open the browser to the relevant sign-in page.
     examples:
       - id: sign-in-with-email-and-password
         name: Sign in with email and password
@@ -192,13 +192,13 @@ functions:
       - id: sign-in-using-a-third-party-provider-with-redirect
         name: Sign in using a third-party provider with redirect
         description: |
-          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by
-          the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
+          Note that the `redirectTo` param is only relevant for OAuth sign-ins, where the sign-in flow is managed by
+          the Auth server. If you are using email/phone sign-ins you should set up your own redirects (within the email/sms template).
 
-          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for
+          Sometimes you want to control where the user is redirected to after they are signed in. Supabase supports this for
           any URL path on your website (the URL must either be on the same domain as your [Site URL](https://supabase.com/dashboard/project/_/auth/url-configuration) or match one of the Redirect URLs).
 
-          See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
         code: |
           ```js
           const { user, session, error } = await supabase.auth.signIn({
@@ -224,7 +224,7 @@ functions:
       - id: sign-in-with-refresh-token
         name: Sign in using a refresh token (e.g. in React Native).
         description: |
-          If you are completing a sign up or login in a React Native app you can pass the refresh token obtained from the provider to obtain a session.
+          If you are completing a sign up or sign-in in a React Native app you can pass the refresh token obtained from the provider to obtain a session.
         code: |
           ```js
           // An example using Expo's `AuthSession`
@@ -273,7 +273,7 @@ functions:
       This method gets the user object from memory.
     examples:
       - id:
-        name: Get the logged in user
+        name: Get the signed-in user
         isSpotlight: true
         code: |
           ```js
@@ -288,7 +288,7 @@ functions:
       To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
 
       User metadata: It's generally better to store user data in a table within your public schema (i.e., `public.users`).
-      Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
+      Use the `update()` method if you have data which rarely changes or is specific only to the signed-in user.
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -330,7 +330,7 @@ functions:
             const { access_token } = req.get('X-Supabase-Auth')
 
             // You can now use it within a Supabase Client
-            const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
+            const supabase = createClient("https://xyzcompany.supabase.co", "publishable-or-anon-key")
             const { user, error } = supabase.auth.setAuth(access_token)
 
             // This client will now send requests as this user
@@ -368,7 +368,7 @@ functions:
             const { access_token } = req.get('X-Supabase-Auth')
 
             // You can now use it within a Supabase Client
-            const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
+            const supabase = createClient("https://xyzcompany.supabase.co", "publishable-or-anon-key")
             const { user, error } = supabase.auth.setAuth(access_token)
 
             // This client will now send requests as this user
@@ -569,7 +569,7 @@ functions:
       Sends a password reset request to an email address.
       - When the user clicks the reset link in the email they are redirected back to your application.
       You can configure the URL that the user is redirected to via the `redirectTo` param.
-      See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - After the user has been redirected successfully, prompt them for a new password and call `updateUser()`:
       ```js
       const { data, error } = await supabase.auth.update({
@@ -737,7 +737,7 @@ functions:
       - id: passing-custom-headers
         name: Passing custom headers.
         description: |
-          You can pass custom headers to your Edge Function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
+          You can pass custom headers to your Edge Function. Note: supabase-js automatically passes the `Authorization` header with the signed-in user's JWT.
         isSpotlight: true
         code: |
           ```js
@@ -956,9 +956,9 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Middle Earth' })
-            .match({ name: 'Auckland' })
+            .from('characters')
+            .update({ name: 'Han Solo' })
+            .match({ name: 'Han' })
           ```
       - id: updating-json-data
         name: Updating JSON data
@@ -1122,7 +1122,7 @@ functions:
     title: 'on().subscribe()'
     $ref: '@supabase/supabase-js.lib/SupabaseQueryBuilder.SupabaseQueryBuilder.on'
     notes: |
-      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/database/api#managing-realtime).
+      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
     examples:
       - id: listen-to-all-database-changes
@@ -1259,6 +1259,18 @@ functions:
           const subscriptions = supabase.getSubscriptions()
           ```
 
+  - id: file-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with File Buckets.
+  # - id: analytics-buckets
+  #   title: 'Overview'
+  #   notes: |
+  #     This section contains methods for working with Analytics Buckets.
+  # - id: vector-buckets
+  #   title: 'Overview'
+  #   notes: |
+  #     This section contains methods for working with Vector Buckets.
   - id: list-buckets
     title: 'listBuckets()'
     $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.listBuckets'
@@ -1639,7 +1651,7 @@ functions:
           const { data, error } = await supabase
             .from('countries')
             .select('name, cities(name)')
-            .eq('name', 'United States')
+            .eq('name', 'The Shire')
             .limit(1, { foreignTable: 'cities' })
           ```
 
@@ -1664,7 +1676,7 @@ functions:
           const { data, error } = await supabase
             .from('countries')
             .select('name, cities(name)')
-            .eq('name', 'United States')
+            .eq('name', 'The Shire')
             .order('name', {foreignTable: 'cities'})
           ```
       - id: ordering-multiple-columns
@@ -1718,9 +1730,9 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .eq('name', 'Singapore')
+            .from('instruments')
+            .select('name, section_id')
+            .eq('name', 'violin')
             .maybeSingle()
           ```
 
@@ -1807,9 +1819,9 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
+            .from('characters')
+            .select('name, book_id')
+            .or('id.gt.20,and(name.eq.Harry,name.eq.Frodo)')
           ```
       - id: use-or-on-foreign-tables
         name: Use `or` on foreign tables
@@ -1817,9 +1829,9 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('countries')
-            .select('id, cities(*)')
-            .or('name.eq.Wellington,name.eq.Paris', { foreignTable: "cities" })
+            .from('books')
+            .select('id, characters(*)')
+            .or('name.eq.Luke,name.eq.Leia', { foreignTable: "characters" })
           ```
 
   - id: not
@@ -1829,7 +1841,7 @@ functions:
       - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
 
         ```js
-          .not('name','eq','Paris')
+          .not('name','eq','Luke')
           .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
           .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
           .not('id','in','(6,7)')  // Use Postgres list () for in filter.
@@ -1842,27 +1854,27 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .select('name, country_id')
-            .not('name', 'eq', 'Paris')
+            .not('name', 'eq', 'The Shire')
           ```
       - id: with-update
         name: With `update()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .update({ name: 'Mordor' })
-            .not('name', 'eq', 'Paris')
+            .not('name', 'eq', 'Rohan')
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .delete()
-            .not('name', 'eq', 'Paris')
+            .not('name', 'eq', 'The Shire')
           ```
       - id: with-rpc
         name: With `rpc()`
@@ -1870,8 +1882,8 @@ functions:
           ```js
           // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .not('name', 'eq', 'Paris')
+            .rpc('echo_all_countries')
+            .not('name', 'eq', 'The Shire')
           ```
 
   - id: match
@@ -1884,27 +1896,27 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .match({name: 'Beijing', country_id: 156})
+            .from('characters')
+            .select('name, book_id')
+            .match({name: 'Harry', book_id: 156})
           ```
       - id: with-update
         name: With `update()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .match({name: 'Beijing', country_id: 156})
+            .from('instruments')
+            .update({ name: 'piano' })
+            .match({name: 'harpsichord', section_id: 2})
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .delete()
-            .match({name: 'Beijing', country_id: 156})
+            .match({name: 'The Shire', country_id: 156})
           ```
       - id: with-rpc
         name: With `rpc()`
@@ -1912,8 +1924,8 @@ functions:
           ```js
           // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .match({name: 'Beijing', country_id: 156})
+            .rpc('echo_all_characters')
+            .match({name: 'Frodo', book_id: 156})
           ```
 
   - id: eq
@@ -1935,16 +1947,16 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .update({ name: 'Mordor' })
-            .eq('name', 'San Francisco')
+            .eq('name', 'Rohan')
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .delete()
             .eq('name', 'Mordor')
           ```
@@ -1954,8 +1966,8 @@ functions:
           ```js
           // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .eq('name', 'San Francisco')
+            .rpc('echo_all_countries')
+            .eq('name', 'Mordor')
           ```
 
   - id: neq
@@ -1977,16 +1989,16 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .update({ name: 'Mordor' })
-            .neq('name', 'San Francisco')
+            .neq('name', 'Gondor')
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .delete()
             .neq('name', 'Mordor')
           ```
@@ -1996,8 +2008,8 @@ functions:
           ```js
           // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .neq('name', 'Lagos')
+            .rpc('echo_all_countries')
+            .neq('name', 'Mordor')
           ```
 
   - id: gt
@@ -2304,27 +2316,27 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .in('name', ['Rio de Janeiro', 'San Francisco'])
+            .from('characters')
+            .select('name, book_id')
+            .in('name', ['Harry', 'Hermione'])
           ```
       - id: with-update
         name: With `update()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .update({ name: 'Mordor' })
-            .in('name', ['Rio de Janeiro', 'San Francisco'])
+            .in('name', ['Gondor', 'Rohan'])
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('characters')
             .delete()
-            .in('name', ['Rio de Janeiro', 'San Francisco'])
+            .in('name', ['Dumbledore', 'Snape'])
           ```
       - id: with-rpc
         name: With `rpc()`
@@ -2332,8 +2344,8 @@ functions:
           ```js
           // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .in('name', ['Rio de Janeiro', 'San Francisco'])
+            .rpc('echo_all_characters')
+            .in('name', ['Luke', 'Leia'])
           ```
 
   - id: contains
@@ -2781,27 +2793,27 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .filter('name', 'in', '("Paris","Tokyo")')
+            .from('characters')
+            .select('name, book_id')
+            .filter('name', 'in', '("Harry","Hermione")')
           ```
       - id: with-update
         name: With `update()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .update({ name: 'Mordor' })
-            .filter('name', 'in', '("Paris","Tokyo")')
+            .filter('name', 'in', '("Gondor","Rohan")')
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .delete()
-            .filter('name', 'in', '("Paris","Tokyo")')
+            .filter('name', 'in', '("Mordor","The Shire")')
           ```
       - id: with-rpc
         name: With `rpc()`
@@ -2809,15 +2821,15 @@ functions:
           ```js
           // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .filter('name', 'in', '("Paris","Tokyo")')
+            .rpc('echo_all_countries')
+            .filter('name', 'in', '("Mordor","The Shire")')
           ```
       - id: filter-embedded-resources
         name: Filter embedded resources
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, countries ( name )')
-            .filter('countries.name', 'in', '("France","Japan")')
+            .from('instruments')
+            .select('name, orchestral_sections ( name )')
+            .filter('orchestral_sections.name', 'in', '("strings","woodwinds")')
           ```

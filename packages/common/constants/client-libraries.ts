@@ -1,6 +1,6 @@
 export const CLIENT_LIBRARIES = [
   {
-    language: 'Javascript',
+    language: 'JavaScript',
     key: 'javascript',
     is_officially_supported: true,
     libraries: [
@@ -10,23 +10,23 @@ export const CLIENT_LIBRARIES = [
       },
       {
         name: 'postgrest-js',
-        url: 'https://github.com/supabase/postgrest-js',
+        url: 'https://github.com/supabase/supabase-js/tree/master/packages/core/postgrest-js',
       },
       {
-        name: 'gotrue-js',
-        url: 'https://github.com/supabase/gotrue-js',
+        name: 'auth-js',
+        url: 'https://github.com/supabase/supabase-js/tree/master/packages/core/auth-js',
       },
       {
         name: 'realtime-js',
-        url: 'https://github.com/supabase/realtime-js',
+        url: 'https://github.com/supabase/supabase-js/tree/master/packages/core/realtime-js',
       },
       {
         name: 'storage-js',
-        url: 'https://github.com/supabase/storage-js',
+        url: 'https://github.com/supabase/supabase-js/tree/master/packages/core/storage-js',
       },
       {
         name: 'functions-js',
-        url: 'https://github.com/supabase/functions-js',
+        url: 'https://github.com/supabase/supabase-js/tree/master/packages/core/functions-js',
       },
     ],
   },
@@ -136,8 +136,8 @@ export const CLIENT_LIBRARIES = [
         url: 'https://github.com/supabase-community/supabase-kt/tree/master/Postgrest',
       },
       {
-        name: 'gotrue-kt',
-        url: 'https://github.com/supabase-community/supabase-kt/tree/master/GoTrue',
+        name: 'auth-kt',
+        url: 'https://github.com/supabase-community/supabase-kt/tree/master/Auth',
       },
       {
         name: 'storage-kt',
@@ -156,31 +156,31 @@ export const CLIENT_LIBRARIES = [
   {
     language: 'Python',
     key: 'python',
-    is_officially_supported: false,
+    is_officially_supported: true,
     libraries: [
       {
         name: 'supabase-py',
-        url: 'https://github.com/supabase-community/supabase-py',
+        url: 'https://github.com/supabase/supabase-py',
       },
       {
         name: 'postgrest-py',
-        url: 'https://github.com/supabase-community/postgrest-py',
+        url: 'https://github.com/supabase/postgrest-py',
       },
       {
         name: 'gotrue-py',
-        url: 'https://github.com/supabase-community/gotrue-py',
+        url: 'https://github.com/supabase/gotrue-py',
       },
       {
         name: 'realtime-py',
-        url: 'https://github.com/supabase-community/realtime-py',
+        url: 'https://github.com/supabase/realtime-py',
       },
       {
         name: 'storage-py',
-        url: 'https://github.com/supabase-community/storage-py',
+        url: 'https://github.com/supabase/storage-py',
       },
       {
         name: 'functions-py',
-        url: 'https://github.com/supabase-community/functions-py',
+        url: 'https://github.com/supabase/functions-py',
       },
     ],
   },
@@ -217,7 +217,7 @@ export const CLIENT_LIBRARIES = [
     libraries: [
       {
         name: 'supabase-swift',
-        url: 'https://github.com/supabase-community/supabase-swift',
+        url: 'https://github.com/supabase/supabase-swift',
       },
       {
         name: 'postgrest-swift',

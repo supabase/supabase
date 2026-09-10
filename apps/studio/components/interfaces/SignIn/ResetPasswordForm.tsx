@@ -1,66 +1,156 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
+import { Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/router'
-import toast from 'react-hot-toast'
+import { useState } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
+import { toast } from 'sonner'
+import { Button, cn, Form, FormControl, FormField, Separator } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
 
-import { auth } from 'lib/gotrue'
-import { passwordSchema } from 'lib/schemas'
-import { Button, Form, Input } from 'ui'
+import PasswordConditionsHelper from './PasswordConditionsHelper'
+import { captureCriticalError } from '@/lib/error-reporting'
+import { auth, getReturnToPath } from '@/lib/gotrue'
+import { passwordValidation } from '@/lib/password-validation'
 
-const ResetPasswordForm = () => {
+const passwordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+  password: passwordValidation,
+})
+
+const recoveryPasswordSchema = z.object({
+  currentPassword: z.string().optional(),
+  password: passwordValidation,
+})
+
+type FormData = z.infer<typeof passwordSchema>
+
+export const ResetPasswordForm = () => {
   const router = useRouter()
+  const { type } = useParams()
+  const requireCurrentPassword = type === 'change'
 
-  const onResetPassword = async ({ password }: { password: string }) => {
+  const [showConditions, setShowConditions] = useState(false)
+  const [passwordHidden, setPasswordHidden] = useState(true)
+  const [currentPasswordHidden, setCurrentPasswordHidden] = useState(true)
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(requireCurrentPassword ? passwordSchema : recoveryPasswordSchema),
+    defaultValues: { password: '', currentPassword: '' },
+    mode: 'onChange',
+  })
+
+  const password = useWatch({ control: form.control, name: 'password' })
+
+  const onResetPassword = async (data: FormData) => {
     const toastId = toast.loading('Saving password...')
-    const { error } = await auth.updateUser({ password })
+    const { error } = await auth.updateUser({
+      password: data.password,
+      ...(requireCurrentPassword ? { current_password: data.currentPassword } : {}),
+    })
 
     if (!error) {
       toast.success('Password saved successfully!', { id: toastId })
 
       // logout all other sessions after changing password
       await auth.signOut({ scope: 'others' })
-      await router.push('/projects')
+      await router.push(getReturnToPath('/organizations'))
     } else {
-      toast.error(error.message, { id: toastId })
+      toast.error(`Failed to save password: ${error.message}`, { id: toastId })
+      captureCriticalError(error, 'reset password')
     }
   }
 
   return (
-    <Form
-      validateOnBlur
-      id="reset-password-form"
-      initialValues={{ password: '' }}
-      validationSchema={passwordSchema}
-      onSubmit={onResetPassword}
-    >
-      {({ isSubmitting }: { isSubmitting: boolean }) => {
-        return (
-          <div className="space-y-4 pt-4">
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              label="Password"
-              placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-              disabled={isSubmitting}
-              autoComplete="new-password"
-            />
+    <Form {...form}>
+      <form method="POST" onSubmit={form.handleSubmit(onResetPassword)} className="space-y-4 pt-4">
+        {requireCurrentPassword && (
+          <FormField
+            control={form.control}
+            name="currentPassword"
+            render={({ field }) => (
+              <FormItemLayout label="Current password">
+                <FormControl>
+                  <Input
+                    id="currentPassword"
+                    type={currentPasswordHidden ? 'password' : 'text'}
+                    placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                    disabled={form.formState.isSubmitting}
+                    actions={
+                      <Button
+                        icon={currentPasswordHidden ? <Eye /> : <EyeOff />}
+                        variant="default"
+                        className="w-7"
+                        onClick={() => setCurrentPasswordHidden((prev) => !prev)}
+                      />
+                    }
+                    {...field}
+                    onBlur={() => {
+                      field.onBlur()
+                      setCurrentPasswordHidden(true)
+                    }}
+                  />
+                </FormControl>
+              </FormItemLayout>
+            )}
+          />
+        )}
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItemLayout label="Password">
+              <FormControl>
+                <Input
+                  id="password"
+                  type={passwordHidden ? 'password' : 'text'}
+                  placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                  disabled={form.formState.isSubmitting}
+                  onFocus={() => setShowConditions(true)}
+                  autoComplete="new-password"
+                  actions={
+                    <Button
+                      icon={passwordHidden ? <Eye /> : <EyeOff />}
+                      variant="default"
+                      className="w-7"
+                      onClick={() => setPasswordHidden((prev) => !prev)}
+                    />
+                  }
+                  {...field}
+                  onBlur={() => {
+                    field.onBlur()
+                    setPasswordHidden(true)
+                  }}
+                />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
 
-            <div className="border-overlay-border border-t" />
+        <div
+          className={cn(
+            showConditions ? 'max-h-[500px]' : 'max-h-0',
+            'transition-all duration-400 overflow-y-hidden'
+          )}
+        >
+          <PasswordConditionsHelper password={password} />
+        </div>
 
-            <Button
-              block
-              form="reset-password-form"
-              htmlType="submit"
-              size="medium"
-              disabled={isSubmitting}
-              loading={isSubmitting}
-            >
-              Save New Password
-            </Button>
-          </div>
-        )
-      }}
+        <Separator className="bg-border" />
+
+        <Button
+          variant="primary"
+          block
+          type="submit"
+          size="medium"
+          disabled={form.formState.isSubmitting}
+          loading={form.formState.isSubmitting}
+        >
+          Save new password
+        </Button>
+      </form>
     </Form>
   )
 }
-
-export default ResetPasswordForm

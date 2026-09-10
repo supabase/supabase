@@ -1,89 +1,136 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import dayjs from 'dayjs'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import type { AnalyticsData } from './constants'
-import { analyticsKeys } from './keys'
+import { useQuery } from '@tanstack/react-query'
+import { paths } from 'api-types'
 
-export type InfraMonitoringVariables = {
-  projectRef?: string
-  attribute:
-    | 'max_cpu_usage'
-    | 'avg_cpu_usage'
-    | 'disk_io_budget'
-    | 'ram_usage'
-    | 'disk_io_consumption'
-    | 'swap_usage'
-  startDate?: string
-  endDate?: string
-  interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
-  dateFormat?: string
-  modifier?: (x: number) => number
+import type { AnalyticsInterval } from './constants'
+import { analyticsKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { UseCustomQueryOptions } from '@/types'
+
+export type InfraMonitoringAttribute = NonNullable<
+  paths['/platform/projects/{ref}/infra-monitoring']['get']['parameters']['query']['attributes']
+>[number]
+
+export type InfraMonitoringSeriesMetadata = {
+  yAxisLimit: number
+  format: string
+  total: number
+  totalAverage: number | string
 }
 
-export async function getInfraMonitoring(
-  { projectRef, attribute, startDate, endDate, interval = '1d' }: InfraMonitoringVariables,
+// TODO(raulb): Remove InfraMonitoringSingleResponse once API always returns multi-attribute format.
+// Single-attribute response shape (when API receives 1 attribute)
+export type InfraMonitoringSingleResponse = InfraMonitoringSeriesMetadata & {
+  data: {
+    period_start: string
+    [attribute: string]: string | undefined
+  }[]
+}
+
+// Multi-attribute response shape (when API receives 2+ attributes)
+export type InfraMonitoringMultiResponse = {
+  data: {
+    period_start: string
+    values: Record<string, string | undefined>
+  }[]
+  series: Record<string, InfraMonitoringSeriesMetadata>
+}
+
+// TODO(raulb): Simplify to just InfraMonitoringMultiResponse once API always returns multi-attribute format.
+// API returns different shapes based on attribute count
+export type InfraMonitoringResponse = InfraMonitoringSingleResponse | InfraMonitoringMultiResponse
+
+type InfraMonitoringInterval = AnalyticsInterval | '2m'
+
+export type InfraMonitoringMultiVariables = {
+  projectRef?: string
+  attributes: InfraMonitoringAttribute[]
+  startDate?: string
+  endDate?: string
+  interval?: InfraMonitoringInterval
+  databaseIdentifier?: string
+}
+
+export async function getInfraMonitoringAttributes(
+  {
+    projectRef,
+    attributes,
+    startDate,
+    endDate,
+    interval = '1h',
+    databaseIdentifier,
+  }: InfraMonitoringMultiVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('Project ref is required')
-  if (!attribute) throw new Error('Attribute is required')
+  if (!attributes?.length) throw new Error('At least one attribute is required')
   if (!startDate) throw new Error('Start date is required')
   if (!endDate) throw new Error('End date is required')
 
-  const data = await get(
-    `${API_URL}/projects/${projectRef}/infra-monitoring?attribute=${attribute}&startDate=${encodeURIComponent(
-      startDate
-    )}&endDate=${encodeURIComponent(endDate)}&interval=${interval}`,
-    { signal }
-  )
+  // Backend doesn't support 2m granularity, so request 1m and aggregate in frontend
+  const is2MinInterval = interval === '2m'
+  const requestInterval: AnalyticsInterval = is2MinInterval ? '1m' : (interval as AnalyticsInterval)
 
-  if (data.error) throw data.error
-  return data as AnalyticsData
+  const { data, error } = await get('/platform/projects/{ref}/infra-monitoring', {
+    params: {
+      path: { ref: projectRef },
+      // Attributes support is not yet reflected in the generated client types.
+      query: {
+        attributes,
+        startDate,
+        endDate,
+        interval: requestInterval,
+        databaseIdentifier,
+      } as any,
+    },
+    signal,
+  })
+
+  if (error) handleError(error)
+
+  const response = data as unknown as InfraMonitoringResponse & { _originalInterval?: '2m' }
+  if (is2MinInterval) {
+    response._originalInterval = '2m'
+  }
+
+  return response
 }
 
-export type InfraMonitoringData = Awaited<ReturnType<typeof getInfraMonitoring>>
 export type InfraMonitoringError = unknown
+export type InfraMonitoringMultiData = Awaited<ReturnType<typeof getInfraMonitoringAttributes>>
 
-export const useInfraMonitoringQuery = <TData = InfraMonitoringData>(
+export const useInfraMonitoringAttributesQuery = <TData = InfraMonitoringMultiData>(
   {
     projectRef,
-    attribute,
+    attributes,
     startDate,
     endDate,
-    interval = '1d',
-    dateFormat = 'DD MMM',
-    modifier,
-  }: InfraMonitoringVariables,
+    interval = '1h',
+    databaseIdentifier,
+  }: InfraMonitoringMultiVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<InfraMonitoringData, InfraMonitoringError, TData> = {}
+  }: UseCustomQueryOptions<InfraMonitoringMultiData, InfraMonitoringError, TData> = {}
 ) =>
-  useQuery<InfraMonitoringData, InfraMonitoringError, TData>(
-    analyticsKeys.infraMonitoring(projectRef, { attribute, startDate, endDate, interval }),
-    ({ signal }) =>
-      getInfraMonitoring({ projectRef, attribute, startDate, endDate, interval }, signal),
-    {
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof attribute !== 'undefined' &&
-        typeof startDate !== 'undefined' &&
-        typeof endDate !== 'undefined',
-      select(data) {
-        return {
-          ...data,
-          data: data.data.map((x) => {
-            return {
-              ...x,
-              [attribute]:
-                modifier !== undefined ? modifier(Number(x[attribute])) : Number(x[attribute]),
-              periodStartFormatted: dayjs(x.period_start).format(dateFormat),
-            }
-          }),
-        } as TData
-      },
-      staleTime: 1000 * 60, // default good for a minute
-      ...options,
-    }
-  )
+  useQuery<InfraMonitoringMultiData, InfraMonitoringError, TData>({
+    queryKey: analyticsKeys.infraMonitoringGroup(projectRef, {
+      attributes,
+      startDate,
+      endDate,
+      interval,
+      databaseIdentifier,
+    }),
+    queryFn: ({ signal }) =>
+      getInfraMonitoringAttributes(
+        { projectRef, attributes, startDate, endDate, interval, databaseIdentifier },
+        signal
+      ),
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      !!attributes?.length &&
+      typeof startDate !== 'undefined' &&
+      typeof endDate !== 'undefined',
+    staleTime: 1000 * 60,
+    ...options,
+  })

@@ -1,22 +1,38 @@
-import { useParams, useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useParams } from 'common'
+import { useCallback, useEffect, useState } from 'react'
 
-import Telemetry from 'lib/telemetry'
+import { EmptyRealtime } from './EmptyRealtime'
 import { Header } from './Header'
 import MessagesTable from './MessagesTable'
 import { SendMessageModal } from './SendMessageModal'
+import { useRealtimeInspectorShortcuts } from './useRealtimeInspectorShortcuts'
 import { RealtimeConfig, useRealtimeMessages } from './useRealtimeMessages'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 /**
  * Acts as a container component for the entire log display
  */
 export const RealtimeInspector = () => {
   const { ref } = useParams()
-  const telemetryProps = useTelemetryProps()
-  const router = useRouter()
-  const [sendMessageShown, setSendMessageShown] = useState(false)
+  const { data: project } = useSelectedProjectQuery()
 
+  // Check if realtime publications are available
+  const { data: publications } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const realtimePublication = (publications ?? []).find(
+    (publication) => publication.name === 'supabase_realtime'
+  )
+  const isRealtimeAvailable =
+    !!realtimePublication &&
+    ((realtimePublication?.tables ?? []).length > 0 || realtimePublication?.tables === null)
+
+  const [sendMessageShown, setSendMessageShown] = useState(false)
+  const [channelPopoverOpen, setChannelPopoverOpen] = useState(false)
+  const [filterPopoverOpen, setFilterPopoverOpen] = useState(false)
   const [realtimeConfig, setRealtimeConfig] = useState<RealtimeConfig>({
     enabled: false,
     projectRef: ref!,
@@ -25,41 +41,85 @@ export const RealtimeInspector = () => {
     token: '', // will be filled out by RealtimeTokensPopover
     schema: 'public',
     table: '*',
+    isChannelPrivate: false,
     filter: undefined,
     bearer: null,
     enablePresence: true,
-    enableDbChanges: true,
+    enableDbChanges: isRealtimeAvailable, // Initialize based on publications availability
     enableBroadcast: true,
   })
 
-  const { logData, sendMessage } = useRealtimeMessages(realtimeConfig)
+  const track = useTrack()
+  const { logData, sendMessage } = useRealtimeMessages(realtimeConfig, setRealtimeConfig)
+
+  const hasChannel = realtimeConfig.channelName.length > 0
+  const isListening = realtimeConfig.enabled
+
+  // Once a channel is set, MessagesTable renders its own empty states (including
+  // the "Broadcast a message" entry point), so sending doesn't depend on a
+  // message having arrived first. EmptyRealtime is only the pre-channel onboarding.
+  const showMessagesTable = hasChannel || (logData ?? []).length > 0
+
+  const handleJoinChannel = useCallback(() => {
+    if (!hasChannel) {
+      setChannelPopoverOpen(true)
+    }
+  }, [hasChannel])
+
+  const handleToggleFilters = useCallback(() => {
+    if (hasChannel) {
+      setFilterPopoverOpen(true)
+    }
+  }, [hasChannel])
+
+  const handleBroadcast = useCallback(() => {
+    if (isListening) {
+      setSendMessageShown(true)
+    }
+  }, [isListening])
+
+  useRealtimeInspectorShortcuts({
+    hasChannel,
+    isListening,
+    onJoinChannel: handleJoinChannel,
+    onToggleFilters: handleToggleFilters,
+    onBroadcast: handleBroadcast,
+  })
+
+  // Update enableDbChanges when publications change
+  useEffect(() => {
+    setRealtimeConfig((prev) => ({ ...prev, enableDbChanges: isRealtimeAvailable }))
+  }, [isRealtimeAvailable])
 
   return (
     <div className="flex flex-col grow h-full">
-      <Header config={realtimeConfig} onChangeConfig={setRealtimeConfig} />
+      <Header
+        config={realtimeConfig}
+        onChangeConfig={setRealtimeConfig}
+        channelPopoverOpen={channelPopoverOpen}
+        onChannelPopoverChange={setChannelPopoverOpen}
+        filterPopoverOpen={filterPopoverOpen}
+        onFilterPopoverChange={setFilterPopoverOpen}
+      />
       <div className="relative flex flex-col grow">
         <div className="flex grow">
-          <MessagesTable
-            hasChannelSet={realtimeConfig.channelName.length > 0}
-            enabled={realtimeConfig.enabled}
-            data={logData}
-            showSendMessage={() => setSendMessageShown(true)}
-          />
+          {showMessagesTable ? (
+            <MessagesTable
+              hasChannelSet={hasChannel}
+              enabled={isListening}
+              data={logData}
+              showSendMessage={() => setSendMessageShown(true)}
+            />
+          ) : (
+            <EmptyRealtime projectRef={ref!} />
+          )}
         </div>
       </div>
       <SendMessageModal
         visible={sendMessageShown}
         onSelectCancel={() => setSendMessageShown(false)}
         onSelectConfirm={(v) => {
-          Telemetry.sendEvent(
-            {
-              category: 'realtime_inspector',
-              action: 'send_broadcast_message',
-              label: 'realtime_inspector_results',
-            },
-            telemetryProps,
-            router
-          )
+          track('realtime_inspector_broadcast_sent')
           sendMessage(v.message, v.payload, () => setSendMessageShown(false))
         }}
       />

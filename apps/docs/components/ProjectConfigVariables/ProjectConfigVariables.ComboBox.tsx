@@ -1,24 +1,27 @@
+import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
+import { noop } from 'lodash-es'
 import { Check, ChevronsUpDown } from 'lucide-react'
-import { noop } from 'lodash'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Button_Shadcn_ as Button,
-  Popover_Shadcn_ as Popover,
-  PopoverTrigger_Shadcn_ as PopoverTrigger,
-  PopoverContent_Shadcn_ as PopoverContent,
-  Command_Shadcn_ as Command,
-  CommandInput_Shadcn_ as CommandInput,
-  CommandEmpty_Shadcn_ as CommandEmpty,
-  CommandItem_Shadcn_ as CommandItem,
-  CommandGroup_Shadcn_ as CommandGroup,
   cn,
+  Command,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export interface ComboBoxOption {
   id: string
   value: string
   displayName: string
+  disabled?: boolean
 }
 
 export function ComboBox<Opt extends ComboBoxOption>({
@@ -27,29 +30,59 @@ export function ComboBox<Opt extends ComboBoxOption>({
   name,
   options,
   selectedOption,
+  selectedDisplayName,
   onSelectOption = noop,
   className,
+  search = '',
+  hasNextPage = false,
+  isFetching = false,
+  isFetchingNextPage = false,
+  fetchNextPage,
+  setSearch = () => {},
+  useCommandSearch = true,
 }: {
   isLoading: boolean
   disabled?: boolean
   name: string
   options: Opt[]
   selectedOption?: string
+  selectedDisplayName?: string
   onSelectOption?: (newValue: string) => void
   className?: string
+  search?: string
+  hasNextPage?: boolean
+  isFetching?: boolean
+  isFetchingNextPage?: boolean
+  fetchNextPage?: () => void
+  setSearch?: (value: string) => void
+  useCommandSearch?: boolean
 }) {
   const [open, setOpen] = useState(false)
 
-  const selectedOptionDisplayName = options.find(
-    (option) => option.value === selectedOption
-  )?.displayName
+  const scrollRootRef = useRef<HTMLDivElement | null>(null)
+  const [sentinelRef, entry] = useIntersectionObserver({
+    root: scrollRootRef.current,
+    threshold: 0,
+    rootMargin: '0px',
+  })
+
+  useEffect(() => {
+    if (!isLoading && !isFetching && !isFetchingNextPage && hasNextPage && entry?.isIntersecting) {
+      fetchNextPage?.()
+    }
+  }, [isLoading, isFetching, isFetchingNextPage, hasNextPage, entry?.isIntersecting, fetchNextPage])
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={open}
+      onOpenChange={(value) => {
+        setOpen(value)
+        if (!value) setSearch('')
+      }}
+    >
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          role="combobox"
           disabled={disabled}
           aria-expanded={open}
           className={cn(
@@ -61,41 +94,72 @@ export function ComboBox<Opt extends ComboBoxOption>({
             className
           )}
         >
-          {isLoading
-            ? 'Loading...'
-            : options.length === 0
-              ? `No ${name} found`
-              : selectedOptionDisplayName ?? `Select a ${name}...`}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <span className="sr-only">{name}: </span>
+          {selectedDisplayName ??
+            (isLoading && options.length > 0
+              ? 'Loading...'
+              : options.length === 0
+                ? `No ${name} found`
+                : `Select a ${name}...`)}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" aria-hidden />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0" side="bottom">
-        <Command>
-          <CommandInput placeholder={`Search ${name}...`} className="border-none ring-0" />
-          <CommandEmpty>No {name} found.</CommandEmpty>
-          <CommandGroup>
-            <ScrollArea className={options.length > 10 ? 'h-[280px]' : ''}>
-              {options.map((option) => (
-                <CommandItem
-                  key={option.id}
-                  value={option.value}
-                  onSelect={(selectedValue: string) => {
-                    setOpen(false)
-                    onSelectOption(selectedValue)
-                  }}
-                  className="cursor-pointer"
-                >
-                  <Check
-                    className={cn(
-                      'mr-2 h-4 w-4',
-                      selectedOption === option.value ? 'opacity-100' : 'opacity-0'
-                    )}
-                  />
-                  {option.displayName}
-                </CommandItem>
-              ))}
-            </ScrollArea>
-          </CommandGroup>
+      <PopoverContent className="p-0" side="bottom" align="start">
+        <Command shouldFilter={useCommandSearch} label={`Search ${name}`}>
+          <CommandInput
+            placeholder={`Search ${name}...`}
+            className="border-none ring-0"
+            showResetIcon
+            value={search}
+            onValueChange={setSearch}
+            handleReset={() => setSearch('')}
+          />
+          <span className="sr-only" role="status">
+            {!isLoading && search.length > 0 && options.length === 0 ? `No ${name} found` : ''}
+          </span>
+          <CommandList label={`${name} options`}>
+            <CommandGroup>
+              {isLoading ? (
+                <div className="px-2 py-1 flex flex-col gap-2">
+                  <ShimmeringLoader className="w-full" />
+                  <ShimmeringLoader className="w-4/5" />
+                </div>
+              ) : (
+                <>
+                  {search.length > 0 && options.length === 0 && (
+                    <p className="text-xs text-center text-foreground-lighter py-3" aria-hidden>
+                      No {name}s found based on your search
+                    </p>
+                  )}
+                  <ScrollArea className={options.length > 7 ? 'h-[210px]' : ''}>
+                    {options.map((option) => (
+                      <CommandItem
+                        key={option.id}
+                        disabled={option.disabled}
+                        value={option.value}
+                        onSelect={(selectedValue: string) => {
+                          setOpen(false)
+                          onSelectOption(selectedValue)
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <Check
+                          className={cn(
+                            'mr-2 h-4 w-4',
+                            selectedOption === option.value ? 'opacity-100' : 'opacity-0'
+                          )}
+                          aria-hidden
+                        />
+                        {option.displayName}
+                      </CommandItem>
+                    ))}
+                    <div ref={sentinelRef} className="h-1 -mt-1" />
+                    {hasNextPage && <ShimmeringLoader className="px-2 py-3" />}
+                  </ScrollArea>
+                </>
+              )}
+            </CommandGroup>
+          </CommandList>
         </Command>
       </PopoverContent>
     </Popover>

@@ -10,100 +10,117 @@ This is a non-exhaustive list of features that Supabase provides for every proje
 
 ### Postgres database
 
-Every project is a full Postgres database. [Docs](/docs/guides/database).
+Every project is a full Postgres database. [Docs](/docs/guides/database/overview).
 
-### Database extensions
+### Vector database
 
-Every database comes with a full set of Postgres extensions. [Docs](/docs/guides/database/extensions).
+Store vector embeddings right next to the rest of your data. [Docs](/docs/guides/ai).
 
-### Database functions
-
-Create custom database functions which you can call from the browser. [Docs](/docs/guides/database/functions).
-
-### Database triggers
-
-Attach triggers to your tables to handle database changes. [Docs](/docs/guides/auth/managing-user-data#using-triggers).
-
-### Database webhooks
-
-Send database changes to any external service using Webhooks. [Link](https://supabase.com/blog/supabase-functions-updates#database-webhooks-alpha).
-
-### Database backups
-
-Projects are backed up daily with the option to upgrade to Point in Time recovery.
-
-### Search
-
-Build search functionality using Postgres Full Text Search. [Docs](/docs/guides/database/full-text-search).
-
-### Secrets and encryption
-
-Encrypt sensitive data and store secrets using our Postgres extension, Supabase Vault. [Link](https://supabase.com/blog/supabase-vault).
-
-### Database migrations
-
-Develop locally and push your changes to your production database using migrations. [Docs](/docs/guides/getting-started/local-development#database-migrations)
-
-<br />
-
-## Auth
-
-### Email & password logins
-
-Build email logins for your application or website. [Docs](/docs/guides/auth/auth-email).
-
-### Magic links
-
-Build passwordless logins for your application or website.[Docs](/docs/guides/auth/auth-magic-link).
-
-### Social logins
-
-Provide social logins - everything from Apple, to GitHub, to Slack. [Docs](/docs/guides/auth/social-login).
-
-### Phone logins
-
-Provide phone logins using a third-party SMS provider. [Docs](/docs/guides/auth/phone-login).
-
-### Row Level Security
-
-Control the data each user can access with Postgres Policies. [Docs](/docs/guides/auth/row-level-security).
-
-### Server-side Auth helpers
-
-Helpers for implementing user authentication in popular frameworks like [Next.js](/docs/guides/auth/auth-helpers/nextjs) and [SvelteKit](/docs/guides/auth/auth-helpers/sveltekit)
-
-### Auth UI kit
-
-Build login and registration pages with custom themes. [Docs](/docs/guides/auth/auth-helpers/auth-ui).
-
-<br />
-
-## APIs & client libraries
-
-### Auto-generated REST API
+### Auto-generated REST API via PostgREST
 
 RESTful APIs are auto-generated from your database, without a single line of code. [Docs](/docs/guides/api#rest-api-overview).
 
-### Auto-generated GraphQL API
+### Auto-generated GraphQL API via pg_graphql
 
 Fast GraphQL APIs using our custom Postgres GraphQL extension. [Docs](/docs/guides/graphql/api).
 
-### Realtime database changes
+### Database webhooks
 
-Receive your database changes through websockets. [Docs](/docs/guides/realtime/postgres-changes).
+Send database changes to any external service using Webhooks. [Docs](/docs/guides/database/webhooks).
 
-### User broadcasting
+### Secrets and encryption
 
-Send messages between connected users through websockets. [Docs](/docs/guides/realtime/broadcast).
+Encrypt sensitive data and store secrets using our Postgres extension, Supabase Vault. [Docs](/docs/guides/database/vault).
 
-### User presence
+### Replication
+
+Automatically replicate your database to destination systems like data warehouses and analytics platforms with Supabase Pipelines. Read [the documentation](/docs/guides/database/replication/pipelines) for more details.
+
+## Platform
+
+### Database backups
+
+Projects are backed up daily with the option to upgrade to Point in Time recovery. [Docs](/docs/guides/platform/backups).
+
+### Custom domains
+
+White-label the Supabase APIs to create a branded experience for your users. [Docs](/docs/guides/platform/custom-domains).
+
+### Network restrictions
+
+Restrict IP ranges that can connect to your database. [Docs](/docs/guides/platform/network-restrictions).
+
+### SSL enforcement
+
+Enforce Postgres clients to connect via SSL. [Docs](/docs/guides/platform/ssl-enforcement).
+
+### Branching
+
+Use Supabase Branches to test and preview changes. [Docs](/docs/guides/deployment/branching).
+
+### Terraform provider
+
+Manage Supabase infrastructure via Terraform, an Infrastructure as Code tool. [Docs](/docs/guides/deployment/terraform).
+
+### Read replicas
+
+Deploy read-only databases across multiple regions, for lower latency and better resource management. [Docs](/docs/guides/platform/read-replicas).
+
+### Log drains
+
+Export Supabase logs to third-party providers and external tooling. [Docs](/docs/guides/observability/log-drains).
+
+## Studio
+
+### Studio Single Sign-On
+
+Sign in to the Supabase dashboard via SSO. [Docs](/docs/guides/platform/sso).
+
+<br />
+
+## Realtime
+
+### Postgres changes
+
+Receive your database changes through WebSockets. [Docs](/docs/guides/realtime/postgres-changes).
+
+### Broadcast
+
+Send messages between connected users through WebSockets. [Docs](/docs/guides/realtime/broadcast).
+
+### Presence
 
 Synchronize shared state across your users, including online status and typing indicators. [Docs](/docs/guides/realtime/presence).
 
-### Client libraries
+## Auth
 
-Official client libraries for [JavaScript](/docs/reference/javascript/) and [Dart](/docs/reference/dart).
-Unofficial libraries [supported by the community](https://github.com/supabase-community#client-libraries).
+### Email sign-in
+
+Build email sign-in for your application or website. [Docs](/docs/guides/auth/passwords).
+
+### Social login
+
+Provide social login - everything from Apple, to GitHub, to Slack. [Docs](/docs/guides/auth/social-login).
+
+### Phone sign-in
+
+Provide phone sign-in using a third-party SMS provider. [Docs](/docs/guides/auth/phone-login).
+
+### Passwordless sign-in
+
+Build passwordless sign-in via magic links for your application or website. [Docs](/docs/guides/auth/auth-email-passwordless).
+
+### Authorization via Row Level Security
+
+Control the data each user can access with Postgres Policies. [Docs](/docs/guides/database/postgres/row-level-security).
+
+### CAPTCHA protection
+
+Add CAPTCHA to your sign-in, sign-up, and password reset forms. [Docs](/docs/guides/auth/auth-captcha).
+
+### Server-Side Auth
+
+Helpers for implementing user authentication in popular server-side languages and frameworks like Next.js, SvelteKit and Remix. [Docs](/docs/guides/auth/server-side).
 
 <br />
 
@@ -111,21 +128,27 @@ Unofficial libraries [supported by the community](https://github.com/supabase-co
 
 ### File storage
 
-Supabase Storage makes it simple to store and serve files. [Docs](/docs/guides/storage).
+Supabase Storage helps you store and serve files. [Docs](/docs/guides/storage).
 
-### Resumable uploads
-
-Upload large files easily using resumable uploads. [Docs](/docs/guides/storage/uploads/resumable-uploads).
-
-### Storage CDN
+### Content Delivery Network
 
 Cache large files using the Supabase CDN. [Docs](/docs/guides/storage/cdn/fundamentals).
+
+### Smart Content Delivery Network
+
+Automatically revalidate assets at the edge via the Smart CDN. [Docs](/docs/guides/storage/cdn/smart-cdn).
 
 ### Image transformations
 
 Transform images on the fly. [Docs](/docs/guides/storage/serving/image-transformations).
 
-<br />
+### Resumable uploads
+
+Upload large files using resumable uploads. [Docs](/docs/guides/storage/uploads/resumable-uploads).
+
+### S3 compatibility
+
+Interact with Storage from tool which supports the S3 protocol. [Docs](/docs/guides/storage/s3/compatibility).
 
 ## Edge Functions
 
@@ -133,7 +156,13 @@ Transform images on the fly. [Docs](/docs/guides/storage/serving/image-transform
 
 Globally distributed TypeScript functions to execute custom business logic. [Docs](/docs/guides/functions).
 
-<br />
+### Regional invocations
+
+Execute an Edge Function in a region close to your database. [Docs](/docs/guides/functions/regional-invocation).
+
+### NPM compatibility
+
+Edge functions natively support NPM modules and Node built-in APIs. [Link](/blog/edge-functions-node-npm).
 
 ## Project management
 
@@ -145,42 +174,86 @@ Use our CLI to develop your project locally and deploy to the Supabase Platform.
 
 Manage your projects programmatically. [Docs](/docs/reference/api).
 
-<br />
+## Client libraries
+
+Official client libraries for [JavaScript](/docs/reference/javascript/start), [Flutter](/docs/reference/dart/initializing) and [Swift](/docs/reference/swift/introduction).
+Unofficial libraries are supported by the community.
 
 ## Feature status
 
-Both Postgres and the Supabase Platform are production-ready. Some tools we offer on top of Postgres are still under development.
+Supabase Features are in 4 different states - Private Alpha, Public Alpha, Beta and Generally Available.
 
-| Product                    | Feature                | Stage  | Available on self-hosted                    |
-| -------------------------- | ---------------------- | ------ | ------------------------------------------- |
-| Database                   | Postgres               | `GA`   | ✅                                          |
-| Database                   | Triggers               | `GA`   | ✅                                          |
-| Database                   | Functions              | `GA`   | ✅                                          |
-| Database                   | Extensions             | `GA`   | ✅                                          |
-| Database                   | Full Text Search       | `GA`   | ✅                                          |
-| Database                   | Webhooks               | `GA`   | ✅                                          |
-| Database                   | Point-in-Time Recovery | `GA`   | 🚧 [wal-g](https://github.com/wal-g/wal-g)  |
-| Database                   | Vault                  | `beta` | ✅                                          |
-| Studio                     |                        | `GA`   | ✅                                          |
-| Realtime                   | Postgres Changes       | `GA`   | ✅                                          |
-| Realtime                   | Broadcast              | `beta` | ✅                                          |
-| Realtime                   | Presence               | `beta` | ✅                                          |
-| Storage                    |                        | `GA`   | ✅                                          |
-| Storage                    | S3 Backend             | `GA`   | ✅                                          |
-| Storage                    | CDN                    | `GA`   | 🚧 [Cloudflare](https://www.cloudflare.com) |
-| Storage                    | Smart CDN              | `beta` | 🚧 [Cloudflare](https://www.cloudflare.com) |
-| Storage                    | Image Transformations  | `GA`   | ✅                                          |
-| Storage                    | Resumable Uploads      | `beta` | ✅                                          |
-| Edge Functions             |                        | `beta` | ✅                                          |
-| Auth                       | OAuth Providers        | `GA`   | ✅                                          |
-| Auth                       | Passwordless           | `GA`   | ✅                                          |
-| Auth                       | Next.js Auth Helpers   | `beta` | ✅                                          |
-| Auth                       | SvelteKit Auth Helpers | `beta` | ✅                                          |
-| Auth                       | Remix Auth Helpers     | `beta` | ✅                                          |
-| CLI                        |                        | `beta` | ✅ Works with self-hosted                   |
-| Management API             |                        | `beta` | N/A                                         |
-| Client Library: JavaScript |                        | `GA`   | N/A                                         |
-| Client Library: Dart       |                        | `beta` | N/A                                         |
+### Private alpha
+
+Features are initially launched as a private alpha to gather feedback from the community. To join our early access program, send an email to product-ops@supabase.io.
+
+### Public alpha
+
+The alpha stage indicates that the API might change in the future, not that the service isn’t stable. Even though the [uptime Service Level Agreement](/sla) does not cover products in Alpha, we do our best to have the service as stable as possible.
+
+### Beta
+
+Features in Beta are tested by an external penetration tester for security issues. The API is guaranteed to be stable and there is a strict communication process for breaking changes.
+
+### Generally available
+
+In addition to the Beta requirements, features in GA are covered by the [uptime SLA](/sla).
+
+| Product        | Feature                    | Stage          | Available on self-hosted                    |
+| -------------- | -------------------------- | -------------- | ------------------------------------------- |
+| Database       | Postgres                   | `GA`           | ✅                                          |
+| Database       | Vector Database            | `GA`           | ✅                                          |
+| Database       | Auto-generated Rest API    | `GA`           | ✅                                          |
+| Database       | Auto-generated GraphQL API | `GA`           | ✅                                          |
+| Database       | Webhooks                   | `beta`         | ✅                                          |
+| Database       | Vault                      | `public alpha` | ✅                                          |
+| Database       | Supabase Pipelines         | `public alpha` | N/A                                         |
+| Platform       |                            | `GA`           | ✅                                          |
+| Platform       | Point-in-Time Recovery     | `GA`           | 🚧 [wal-g](https://github.com/wal-g/wal-g)  |
+| Platform       | Custom Domains             | `GA`           | N/A                                         |
+| Platform       | Network Restrictions       | `GA`           | N/A                                         |
+| Platform       | SSL enforcement            | `GA`           | N/A                                         |
+| Platform       | Branching                  | `beta`         | N/A                                         |
+| Platform       | Terraform Provider         | `public alpha` | N/A                                         |
+| Platform       | Read Replicas              | `GA`           | N/A                                         |
+| Platform       | Log Drains                 | `public alpha` | ✅                                          |
+| Platform       | MCP                        | `public alpha` | ✅                                          |
+| Platform       | PrivateLink                | `beta`         | N/A                                         |
+| Studio         |                            | `GA`           | ✅                                          |
+| Studio         | SSO                        | `GA`           | ✅                                          |
+| Studio         | Column Privileges          | `public alpha` | ✅                                          |
+| Realtime       | Postgres Changes           | `GA`           | ✅                                          |
+| Realtime       | Broadcast                  | `GA`           | ✅                                          |
+| Realtime       | Presence                   | `GA`           | ✅                                          |
+| Realtime       | Broadcast Authorization    | `public beta`  | ✅                                          |
+| Realtime       | Presence Authorization     | `public beta`  | ✅                                          |
+| Realtime       | Broadcast from Database    | `public beta`  | ✅                                          |
+| Storage        |                            | `GA`           | ✅                                          |
+| Storage        | CDN                        | `GA`           | 🚧 [Cloudflare](https://www.cloudflare.com) |
+| Storage        | Smart CDN                  | `GA`           | 🚧 [Cloudflare](https://www.cloudflare.com) |
+| Storage        | Image Transformations      | `GA`           | ✅                                          |
+| Storage        | Resumable Uploads          | `GA`           | ✅                                          |
+| Storage        | S3 compatibility           | `GA`           | ✅                                          |
+| Edge Functions |                            | `GA`           | ✅                                          |
+| Edge Functions | Regional Invocations       | `GA`           | ✅                                          |
+| Edge Functions | NPM compatibility          | `GA`           | ✅                                          |
+| Auth           |                            | `GA`           | ✅                                          |
+| Auth           | Email sign-in              | `GA`           | ✅                                          |
+| Auth           | Social login               | `GA`           | ✅                                          |
+| Auth           | Phone sign-in              | `GA`           | ✅                                          |
+| Auth           | Passwordless sign-in       | `GA`           | ✅                                          |
+| Auth           | SSO with SAML              | `GA`           | ✅                                          |
+| Auth           | Authorization via RLS      | `GA`           | ✅                                          |
+| Auth           | CAPTCHA protection         | `GA`           | ✅                                          |
+| Auth           | Server-side Auth           | `beta`         | ✅                                          |
+| Auth           | Third-Party Auth           | `GA`           | ✅                                          |
+| Auth           | Hooks                      | `beta`         | ✅                                          |
+| CLI            |                            | `GA`           | ✅ Works with self-hosted                   |
+| Management API |                            | `GA`           | N/A                                         |
+| Client Library | JavaScript                 | `GA`           | N/A                                         |
+| Client Library | Flutter                    | `GA`           | N/A                                         |
+| Client Library | Swift                      | `GA`           | N/A                                         |
+| Client Library | Python                     | `beta`         | N/A                                         |
 
 - ✅ = Fully Available
 - 🚧 = Available, but requires external tools or configuration

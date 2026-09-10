@@ -1,4 +1,4 @@
-import { products } from 'shared-data'
+import { products, PRODUCT_MODULES } from 'shared-data'
 
 export default {
   metaTitle: 'Supabase Open Source Community',
@@ -66,6 +66,7 @@ export default {
         'gotrue',
         'gotrue-dart',
         'gotrue-js',
+        'auth-js',
         'mailme',
       ],
     },
@@ -97,7 +98,7 @@ export default {
     },
     {
       label: 'Vector',
-      icon: products.vector.icon[16],
+      icon: PRODUCT_MODULES.vector.icon[16],
       repos: [
         'embeddings-generator',
         'headless-vector-search',

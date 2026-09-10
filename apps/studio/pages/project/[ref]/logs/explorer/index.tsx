@@ -1,73 +1,238 @@
-import { useParams } from 'common/hooks'
+import { useMonaco } from '@monaco-editor/react'
+import { useDebounce, useLocalStorage } from '@uidotdev/usehooks'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
+import type { editor } from 'monaco-editor'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
-import {
-  Button,
-  Form,
-  Input,
-  Modal,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from 'ui'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 
+import { LegacyLogsRewriteAdmonition } from '@/components/interfaces/Settings/Logs/LegacyLogsRewriteAdmonition'
 import {
-  DatePickerToFrom,
+  EXPLORER_DATEPICKER_HELPERS,
+  getDefaultHelper,
+  getLogsTemplates,
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
-  LogTable,
-  LogTemplate,
-  LogsQueryPanel,
-  LogsTableName,
+} from '@/components/interfaces/Settings/Logs/Logs.constants'
+import { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import {
+  LogData,
+  LogQueryError,
   LogsWarning,
-  TEMPLATES,
-  maybeShowUpgradePrompt,
+  LogTemplate,
+} from '@/components/interfaces/Settings/Logs/Logs.types'
+import { UpdateSavedQueryModal } from '@/components/interfaces/Settings/Logs/Logs.UpdateSavedQueryModal'
+import {
+  checkForLimitClause,
+  maybeShowUpgradePromptIfNotEntitled,
   useEditorHints,
-} from 'components/interfaces/Settings/Logs'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { LogsLayout } from 'components/layouts'
-import { CodeEditor } from 'components/ui/CodeEditor'
-import LoadingOpacity from 'components/ui/LoadingOpacity'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import { useContentInsertMutation } from 'data/content/content-insert-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useLocalStorage, useSelectedOrganization } from 'hooks'
-import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
-import type { LogSqlSnippets, NextPageWithLayout } from 'types'
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
+import {
+  buildLogQueryParams,
+  resolveLogDateRange,
+} from '@/components/interfaces/Settings/Logs/logsDateRange'
+import { LogsQueryPanel } from '@/components/interfaces/Settings/Logs/LogsQueryPanel'
+import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
+import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
+import { useRecentLogSqlSnippets } from '@/components/interfaces/Settings/Logs/useRecentLogSqlSnippets'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { DiffEditor } from '@/components/ui/DiffEditor'
+import LoadingOpacity from '@/components/ui/LoadingOpacity'
+import ShimmerLine from '@/components/ui/ShimmerLine'
+import { ContentOfType, useContentQuery } from '@/data/content/content-query'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from '@/data/content/content-upsert-mutation'
+import {
+  LEGACY_LOGS_DIALECT_CHECK_DEBOUNCE_MS,
+  shouldOfferLegacyLogsRewrite,
+} from '@/data/logs/logs-sql-rewrite'
+import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
+import {
+  useLegacyLogsRewrite,
+  type LegacyLogsRewriteProposal,
+} from '@/hooks/analytics/useLegacyLogsRewrite'
+import { useLogsQuery } from '@/hooks/analytics/useLogsQuery'
+import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useUpgradePrompt } from '@/hooks/misc/useUpgradePrompt'
+import { uuidv4 } from '@/lib/helpers'
+import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
+import type { LogSqlSnippets, NextPageWithLayout } from '@/types'
 
-const PLACEHOLDER_QUERY =
+type SaveQueryFormValues = { name: string; description?: string }
+
+const LOCAL_PLACEHOLDER_QUERY =
+  'select\n  timestamp, event_message, metadata\n  from edge_logs limit 5'
+
+const PLATFORM_PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
+
+const OTEL_PLACEHOLDER_QUERY =
+  "select\n  timestamp,\n  event_message,\n  log_attributes\nfrom logs\nwhere source = 'edge_logs'\norder by timestamp desc\nlimit 5"
+
+const otelSourceQuery = (source: string) =>
+  `select\n  timestamp,\n  event_message,\n  log_attributes\nfrom logs\nwhere source = '${source}'\norder by timestamp desc\nlimit 100`
+
+const MISSING_LIMIT_ERROR: LogQueryError = {
+  error: {
+    code: 400,
+    status: 'INVALID_ARGUMENT',
+    message: 'A LIMIT clause is required.',
+    errors: [{ domain: 'logs', reason: 'missingLimit', message: 'A LIMIT clause is required.' }],
+  },
+}
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
+  const track = useTrack()
+  const monaco = useMonaco()
   const router = useRouter()
-  const { ref: projectRef, q, ite, its } = useParams()
-  const organization = useSelectedOrganization()
-  const [editorId, setEditorId] = useState<string>(uuidv4())
+  const { profile } = useProfile()
+  const { ref: projectRef, q, queryId } = useParams()
+  const useOtelEndpoint = useFlag('otelLegacyLogs')
+  const { logsShowMetadataIpTemplate } = useIsFeatureEnabled(['logs:show_metadata_ip_template'])
+
+  const allTemplates = useMemo(() => {
+    const templates = getLogsTemplates(useOtelEndpoint)
+    if (logsShowMetadataIpTemplate) return templates
+    else return templates.filter((x) => x.label !== 'Metadata IP')
+  }, [logsShowMetadataIpTemplate, useOtelEndpoint])
+
+  const editorRef = useRef<editor.IStandaloneCodeEditor>(null)
+  const [editorId] = useState<string>(uuidv4())
+  const { search, setSearch, timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
+  const defaultHelper = useMemo(() => getDefaultHelper(EXPLORER_DATEPICKER_HELPERS), [])
+  const initialDatePickerValue = useMemo<DatePickerValue>(() => {
+    if (timestampStart && timestampEnd) {
+      return { from: timestampStart, to: timestampEnd, isHelper: false }
+    }
+    if (timestampStart) {
+      return { from: timestampStart, to: timestampEnd || '', isHelper: false }
+    }
+    return {
+      from: defaultHelper.calcFrom(),
+      to: defaultHelper.calcTo(),
+      isHelper: true,
+      text: defaultHelper.text,
+    }
+  }, [timestampStart, timestampEnd, defaultHelper])
+  const [datePickerValue, setDatePickerValue] = useState<DatePickerValue>(initialDatePickerValue)
+
+  const { logsDefaultQuery } = useCustomContent(['logs:default_query'])
+  const PLACEHOLDER_QUERY = useOtelEndpoint
+    ? OTEL_PLACEHOLDER_QUERY
+    : IS_PLATFORM
+      ? (logsDefaultQuery ?? PLATFORM_PLACEHOLDER_QUERY)
+      : LOCAL_PLACEHOLDER_QUERY
+
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const { params, logData, error, isLoading, changeQuery, runQuery, setParams } = useLogsQuery(
-    projectRef as string,
-    {
-      iso_timestamp_start: its ? (its as string) : undefined,
-      iso_timestamp_end: ite ? (ite as string) : undefined,
+  const [showMissingLimitError, setShowMissingLimitError] = useState<boolean>(false)
+  const [selectedLog, setSelectedLog] = useState<LogData | null>(null)
+  const [rewriteProposal, setRewriteProposal] = useState<LegacyLogsRewriteProposal | null>(null)
+  const [rewriteBannerDismissed, setRewriteBannerDismissed] = useLocalStorage<boolean>(
+    `project-${projectRef}-logs-rewrite-banner-dismissed`,
+    false
+  )
+
+  const [recentLogs, setRecentLogs] = useRecentLogSqlSnippets(projectRef)
+
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
+  const entitledToAuditLogDays = getEntitlementNumericValue()
+
+  const { data: content } = useContentQuery({ projectRef, type: 'log_sql' })
+  const query = content?.content.find((x): x is ContentOfType<'log_sql'> => x.id === queryId)
+
+  const resolvedRange = useMemo(() => {
+    if (datePickerValue.isHelper) {
+      return resolveLogDateRange(datePickerValue)
     }
+    if (timestampStart && timestampEnd) {
+      return { from: timestampStart, to: timestampEnd }
+    }
+    return resolveLogDateRange(datePickerValue)
+  }, [timestampStart, timestampEnd, datePickerValue])
+
+  const {
+    params,
+    logData,
+    error,
+    isLoading: logsLoading,
+    setParams,
+  } = useLogsQuery({
+    projectRef,
+    initialParams: {
+      iso_timestamp_start: resolvedRange.from,
+      iso_timestamp_end: resolvedRange.to,
+    },
+    enabled: true,
+    options: { useOtel: useOtelEndpoint },
+  })
+
+  const results = logData
+  const isLoading = logsLoading
+
+  // Debounced so the dialect heuristics don't run on every keystroke, matching the
+  // SQL editor's rewrite banner.
+  const settledEditorValue = useDebounce(editorValue, LEGACY_LOGS_DIALECT_CHECK_DEBOUNCE_MS)
+  const shouldShowRewriteCTA = useMemo(
+    () =>
+      shouldOfferLegacyLogsRewrite({
+        sql: settledEditorValue,
+        isClickhouseLogsEnabled: useOtelEndpoint,
+      }),
+    [settledEditorValue, useOtelEndpoint]
   )
-  const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
-    `project-content-${projectRef}-recent-log-sql`,
-    []
-  )
+
+  const {
+    state: rewriteState,
+    requestRewrite,
+    dismiss: dismissRewriteBanner,
+  } = useLegacyLogsRewrite({
+    // Read straight from the editor instance — `editorValue` state can lag the
+    // most recent keystroke.
+    readSql: () => editorRef.current?.getValue() ?? editorValue,
+    onProposal: setRewriteProposal,
+    onDismissed: () => setRewriteBannerDismissed(true),
+  })
+  const isRewriting = rewriteState.status === 'rewriting'
+  const hasUnacknowledgedRewriteOutcome =
+    rewriteState.status === 'failed' || rewriteState.status === 'noRewriteNeeded'
+
+  const { mutateAsync: upsertContent, isPending: isUpsertingContent } = useContentUpsertMutation({
+    onError: (e) => {
+      const error = e as { message: string }
+      console.error(error)
+      setSaveModalOpen(false)
+      if (queryId) {
+        toast.error(`Failed to update query: ${error.message}`)
+      } else {
+        toast.error(`Failed to save query: ${error.message}`)
+      }
+    },
+    onSuccess: (_data, vars) => {
+      setSaveModalOpen(false)
+      if (queryId) {
+        toast.success(`Updated "${vars.payload.name}" log query`)
+      } else {
+        toast.success(`Saved "${vars.payload.name}" log query`)
+      }
+    },
+  })
+
   const addRecentLogSqlSnippet = (snippet: Partial<LogSqlSnippets.Content>) => {
     const defaults: LogSqlSnippets.Content = {
       schema_version: '1',
-      favorite: false,
-      sql: '',
+      unchecked_sql: untrustedLogSql(''),
       content_id: '',
     }
     setRecentLogs([...recentLogs, { ...defaults, ...snippet }])
@@ -77,247 +242,341 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     params.iso_timestamp_start as string
   )
 
-  useEffect(() => {
-    // on mount, set initial values
-    if (q) {
-      onSelectTemplate({
-        mode: 'custom',
-        searchString: q as string,
-      })
-    }
-  }, [])
-
-  useEffect(() => {
-    let newWarnings = []
-    const start = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
-    const end = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
-    const daysDiff = Math.abs(start.diff(end, 'days'))
-    if (
-      editorValue &&
-      !editorValue.includes('limit') &&
-      daysDiff > LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD
-    ) {
-      newWarnings.push({ text: 'When querying large date ranges, include a LIMIT clause.' })
-    }
-    setWarnings(newWarnings)
-  }, [editorValue, params.iso_timestamp_start, params.iso_timestamp_end])
-
-  // Show the prompt on page load based on query params
-  useEffect(() => {
-    if (its) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(its as string, subscription?.plan?.id)
-      if (shouldShowUpgradePrompt) {
-        setShowUpgradePrompt(!showUpgradePrompt)
-      }
-    }
-  }, [its, subscription])
-
   const onSelectTemplate = (template: LogTemplate) => {
-    setEditorValue(template.searchString)
-    changeQuery(template.searchString)
-    setEditorId(uuidv4())
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, q: template.searchString },
-    })
-    addRecentLogSqlSnippet({ sql: template.searchString })
-  }
+    if (editorRef.current && monaco) {
+      const editorModel = editorRef.current?.getModel()
 
-  const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
-    const query = typeof value === 'string' ? value || editorValue : editorValue
-    if (value && typeof value === 'string') {
-      setEditorValue(value)
+      editorRef.current.pushUndoStop()
+      editorRef.current.executeEdits(`insert-identifier`, [
+        {
+          text: template.searchString,
+          range: editorModel?.getFullModelRange() ?? new monaco.Range(1, 1, 1, 1),
+        },
+      ])
+      editorRef.current.pushUndoStop()
+      editorRef.current.focus()
     }
-    changeQuery(query)
-    runQuery()
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, q: query },
-    })
-    addRecentLogSqlSnippet({ sql: query })
+
+    addRecentLogSqlSnippet({ unchecked_sql: untrustedLogSql(template.searchString) })
   }
 
-  const handleClear = () => {
-    setEditorValue('')
-    setEditorId(uuidv4())
-    changeQuery('')
+  const acceptRewrite = () => {
+    if (!rewriteProposal) return
+    editorRef.current?.setValue(rewriteProposal.modified)
+    setEditorValue(rewriteProposal.modified)
+    setRewriteProposal(null)
+    toast.success('Applied the ClickHouse rewrite')
   }
 
-  const handleInsertSource = (source: LogsTableName) => {
-    setEditorValue((prev) => {
-      const index = prev.indexOf('from')
-      if (index === -1) return `${prev}${source}`
-      return `${prev.substring(0, index + 4)} ${source} ${prev.substring(index + 5)}`
-    })
-    setEditorId(uuidv4())
+  const discardRewrite = () => setRewriteProposal(null)
+
+  const handleRun = (value?: string | React.MouseEvent) => {
+    track('log_explorer_query_run_button_clicked', { is_saved_query: !!queryId })
+
+    // Read the latest value straight from the editor instance rather than from
+    // `editorValue` state, which can lag behind the most recent keystroke. This
+    // keeps the Run button consistent with the Cmd+Enter keybinding.
+    const liveValue = editorRef.current?.getValue()
+    const query = typeof value === 'string' ? value || editorValue : (liveValue ?? editorValue)
+
+    if (!checkForLimitClause(query)) {
+      setShowMissingLimitError(true)
+      setSelectedLog(null)
+      return
+    }
+    setShowMissingLimitError(false)
+
+    const resolvedParams = buildLogQueryParams(datePickerValue, query)
+
+    setSelectedLog(null)
+    setParams((prev) => ({
+      ...prev,
+      sql: resolvedParams.sql,
+      iso_timestamp_start: resolvedParams.from,
+      iso_timestamp_end: resolvedParams.to,
+    }))
+    if (!datePickerValue.isHelper) {
+      setTimeRange(resolvedParams.from, resolvedParams.to)
+    } else {
+      setTimeRange('', '')
+    }
+    setSearch(query)
+    addRecentLogSqlSnippet({ unchecked_sql: untrustedLogSql(query) })
   }
 
-  function handleOnSave() {
+  const handleInsertSource = (source: string) => {
+    if (editorRef.current && monaco) {
+      const editorModel = editorRef.current?.getModel()
+      const currentValue = editorRef.current.getValue()
+
+      let updatedValue: string
+      if (useOtelEndpoint) {
+        const sourceFilter = /source\s*=\s*'[^']*'/i
+        updatedValue = sourceFilter.test(currentValue)
+          ? currentValue.replace(sourceFilter, `source = '${source}'`)
+          : otelSourceQuery(source)
+      } else {
+        const index = currentValue.indexOf('from')
+        updatedValue =
+          index < 0
+            ? `${currentValue}${source}`
+            : `${currentValue.substring(0, index + 4)} ${source} ${currentValue.substring(index + 5)}`
+      }
+
+      editorRef.current.pushUndoStop()
+      editorRef.current.executeEdits(`insert-identifier`, [
+        {
+          text: updatedValue,
+          range: editorModel?.getFullModelRange() ?? new monaco.Range(1, 1, 1, 1),
+        },
+      ])
+      editorRef.current.pushUndoStop()
+      editorRef.current.focus()
+    }
+  }
+
+  const handleCreateQuery = async (values: SaveQueryFormValues) => {
+    if (!projectRef) return console.error('Project ref is required')
+    if (!profile) return console.error('Profile is required')
+
+    const id = uuidv4()
+    const payload: UpsertContentPayload = {
+      id,
+      name: values.name,
+      description: values.description || '',
+      type: 'log_sql' as const,
+      content: {
+        content_id: editorId,
+        unchecked_sql: untrustedLogSql(editorValue),
+        schema_version: '1',
+        favorite: false,
+      } as LogSqlSnippets.Content,
+      owner_id: profile.id,
+      visibility: 'user' as const,
+    }
+    await upsertContent(
+      { projectRef, payload },
+      {
+        onSuccess: () => router.push(`/project/${projectRef}/logs/explorer?queryId=${id}`),
+      }
+    )
+  }
+
+  async function handleOnSave() {
+    if (!projectRef) return console.error('Project ref is required')
+
+    const currentSql = editorRef.current?.getValue() ?? editorValue
+
+    // if we have a queryId, we are editing a saved query
+    if (queryId && query) {
+      await upsertContent({
+        projectRef: projectRef!,
+        payload: {
+          ...query,
+          content: {
+            ...(query.content as LogSqlSnippets.Content),
+            unchecked_sql: untrustedLogSql(currentSql),
+          },
+        },
+      })
+
+      return
+    }
+
     setSaveModalOpen(!saveModalOpen)
   }
 
-  const handleDateChange = ({ to, from }: DatePickerToFrom) => {
-    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, subscription?.plan?.id)
+  const handleDateChange = (value: DatePickerValue) => {
+    setDatePickerValue(value)
+    const resolvedRange = resolveLogDateRange(value)
+    const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+      resolvedRange.from,
+      entitledToAuditLogDays
+    )
 
     if (shouldShowUpgradePrompt) {
-      setShowUpgradePrompt(!showUpgradePrompt)
-    } else {
-      setParams((prev) => ({
-        ...prev,
-        iso_timestamp_start: from || '',
-        iso_timestamp_end: to || '',
-      }))
-      router.push({
-        pathname: router.pathname,
-        query: { ...router.query, its: from || '', ite: to || '' },
-      })
+      setShowUpgradePrompt(true)
+      return
     }
+
+    if (value.isHelper) {
+      setTimeRange('', '')
+    } else {
+      setTimeRange(resolvedRange.from || '', resolvedRange.to || '')
+    }
+    setSelectedLog(null)
+    setParams((prev) => ({
+      ...prev,
+      iso_timestamp_start: resolvedRange.from,
+      iso_timestamp_end: resolvedRange.to,
+    }))
   }
 
-  const { isLoading: isSubmitting, mutate: createContent } = useContentInsertMutation({
-    onError: (e) => {
-      const error = e as { message: string }
-      console.error(error)
-      setSaveModalOpen(false)
-      toast.error(`Failed to save query: ${error.message}`)
-    },
-    onSuccess: (values) => {
-      setSaveModalOpen(false)
-      toast.success(`Saved "${values[0].name}" log query`)
-    },
-  })
+  const querySql = (query?.content as LogSqlSnippets.Content | undefined)?.unchecked_sql
+  useEffect(() => {
+    if (search) {
+      setEditorValue(search)
+    } else if (q && !queryId) {
+      setEditorValue(q)
+      setSearch(q)
+    } else if (queryId && querySql) {
+      setEditorValue(querySql)
+      editorRef.current?.setValue(querySql)
+    } else if (!queryId) {
+      setEditorValue(PLACEHOLDER_QUERY)
+      editorRef.current?.setValue(PLACEHOLDER_QUERY)
+    }
+  }, [q, search, queryId, querySql, setSearch, PLACEHOLDER_QUERY])
+
+  useEffect(() => {
+    // prevents overwriting when the user selects a helper.
+    // without this, if the user selects "last 3 days" it would overwrite it with "last hour"
+    // its the simplest solution I could come up with - jordi
+    if (!initialDatePickerValue.isHelper) {
+      setDatePickerValue(initialDatePickerValue)
+    }
+  }, [initialDatePickerValue])
+
+  useEffect(() => {
+    let newWarnings = []
+    const start = timestampStart ? dayjs(timestampStart) : dayjs()
+    const end = timestampEnd ? dayjs(timestampEnd) : dayjs()
+    const daysDiff = Math.abs(start.diff(end, 'days'))
+
+    if (daysDiff >= LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD) {
+      newWarnings.push({
+        text: 'Querying large date ranges can be slow. Consider selecting a smaller date range.',
+      })
+    }
+    setWarnings(newWarnings)
+  }, [timestampStart, timestampEnd])
+
+  useEffect(() => {
+    if (showMissingLimitError && checkForLimitClause(editorValue)) {
+      setShowMissingLimitError(false)
+    }
+  }, [editorValue, showMissingLimitError])
+
+  // Show the prompt on page load based on query params
+  useEffect(() => {
+    if (timestampStart) {
+      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+        timestampStart,
+        entitledToAuditLogDays
+      )
+      if (shouldShowUpgradePrompt) {
+        setShowUpgradePrompt(true)
+      }
+    }
+  }, [timestampStart, entitledToAuditLogDays, setShowUpgradePrompt])
 
   return (
     <div className="w-full h-full mx-auto">
       <ResizablePanelGroup
-        className="w-full h-full"
-        direction="vertical"
+        className="w-full h-full max-h-screen"
+        orientation="vertical"
         autoSaveId={LOCAL_STORAGE_KEYS.LOG_EXPLORER_SPLIT_SIZE}
       >
-        <ResizablePanel collapsible minSize={5}>
+        <ResizablePanel collapsible minSize="5">
           <LogsQueryPanel
-            defaultFrom={params.iso_timestamp_start || ''}
-            defaultTo={params.iso_timestamp_end || ''}
+            value={datePickerValue}
             onDateChange={handleDateChange}
             onSelectSource={handleInsertSource}
-            onClear={handleClear}
-            hasEditorValue={Boolean(editorValue)}
-            templates={TEMPLATES.filter((template) => template.mode === 'custom')}
+            templates={allTemplates.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
-            onSave={handleOnSave}
-            isLoading={isLoading}
             warnings={warnings}
+            showRewriteAction={shouldShowRewriteCTA && rewriteBannerDismissed}
+            isRewriting={isRewriting}
+            onRewrite={requestRewrite}
           />
-
+          {(hasUnacknowledgedRewriteOutcome ||
+            (shouldShowRewriteCTA && !rewriteBannerDismissed)) && (
+            <LegacyLogsRewriteAdmonition
+              state={rewriteState}
+              onRewrite={requestRewrite}
+              onDismiss={dismissRewriteBanner}
+            />
+          )}
           <ShimmerLine active={isLoading} />
-          <CodeEditor
-            id={editorId}
-            language="pgsql"
-            defaultValue={editorValue}
-            onInputChange={(v) => setEditorValue(v || '')}
-            onInputRun={handleRun}
-          />
+          <div className="relative h-full">
+            <CodeEditor
+              // Ensure we reset the editor to the query content whenever the selected query changes
+              key={queryId}
+              id={editorId}
+              editorRef={editorRef}
+              language="pgsql"
+              defaultValue={editorValue}
+              onInputChange={(v) => setEditorValue(v || '')}
+              actions={{ runQuery: { enabled: true, callback: handleRun } }}
+            />
+            {rewriteProposal && (
+              <div className="absolute inset-0 z-10 flex flex-col bg-studio">
+                <div className="flex items-center justify-between gap-2 border-b bg-surface-100 px-4 py-2">
+                  <span className="text-xs text-foreground-light">
+                    Review the ClickHouse SQL rewrite before accepting it
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Button variant="default" size="tiny" onClick={discardRewrite}>
+                      Discard
+                    </Button>
+                    <Button variant="primary" size="tiny" onClick={acceptRewrite}>
+                      Accept
+                    </Button>
+                  </div>
+                </div>
+                <div className="min-h-0 flex-1">
+                  <DiffEditor
+                    language="pgsql"
+                    original={rewriteProposal.original}
+                    modified={rewriteProposal.modified}
+                    options={{ renderSideBySide: true, renderGutterMenu: false }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel collapsible minSize={5} className="flex flex-col flex-grow">
+        <ResizablePanel collapsible minSize="5" className="overflow-auto">
           <LoadingOpacity active={isLoading}>
-            <div className="flex flex-grow">
-              <LogTable
-                onRun={handleRun}
-                onSave={handleOnSave}
-                hasEditorValue={Boolean(editorValue)}
-                params={params}
-                data={logData}
-                error={error}
-                projectRef={projectRef as string}
-              />
+            <LogTable
+              isSaving={isUpsertingContent}
+              showHistogramToggle={false}
+              onRun={handleRun}
+              onSave={handleOnSave}
+              hasEditorValue={Boolean(editorValue)}
+              data={showMissingLimitError ? [] : results}
+              error={showMissingLimitError ? MISSING_LIMIT_ERROR : error}
+              projectRef={projectRef!}
+              onSelectedLogChange={setSelectedLog}
+              selectedLog={selectedLog || undefined}
+              sqlQuery={editorValue}
+            />
+
+            <div className="flex flex-row justify-end mt-2">
+              <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
             </div>
           </LoadingOpacity>
-          <div className="flex flex-row justify-end mt-2">
-            <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
-          </div>
         </ResizablePanel>
       </ResizablePanelGroup>
 
-      <Modal
-        size="medium"
-        onCancel={() => setSaveModalOpen(!saveModalOpen)}
+      <UpdateSavedQueryModal
         header="Save log query"
         visible={saveModalOpen}
-        hideFooter
-      >
-        <Form
-          initialValues={{
-            name: '',
-            desdcription: '',
-          }}
-          onSubmit={async (values: any, { setSubmitting }: any) => {
-            setSubmitting(true)
-
-            const payload = {
-              id: uuidv4(),
-              name: values.name,
-              description: values.description || '',
-              type: 'log_sql' as const,
-              content: {
-                content_id: editorId,
-                sql: editorValue,
-                schema_version: '1',
-                favorite: false,
-              },
-              visibility: 'user' as const,
-            }
-
-            createContent({ projectRef: projectRef!, payload })
-          }}
-        >
-          {() => (
-            <>
-              <div className="py-4">
-                <Modal.Content>
-                  <div className="space-y-6">
-                    <Input layout="horizontal" label="Name" id="name" />
-                    <div className="text-area-text-sm">
-                      <Input.TextArea
-                        layout="horizontal"
-                        labelOptional="Optional"
-                        label="Description"
-                        id="description"
-                        rows={2}
-                      />
-                    </div>
-                  </div>
-                </Modal.Content>
-              </div>
-              <div className="py-3 border-t bg-surface-100">
-                <Modal.Content>
-                  <div className="flex items-center justify-end gap-2">
-                    <Button
-                      size="tiny"
-                      type="default"
-                      onClick={() => setSaveModalOpen(!saveModalOpen)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      size="tiny"
-                      loading={isSubmitting}
-                      disabled={isSubmitting}
-                      htmlType="submit"
-                    >
-                      Save
-                    </Button>
-                  </div>
-                </Modal.Content>
-              </div>
-            </>
-          )}
-        </Form>
-      </Modal>
+        initialValues={{ name: '', description: '' }}
+        onCancel={() => {
+          setSaveModalOpen(false)
+        }}
+        onSubmit={handleCreateQuery}
+      />
     </div>
   )
 }
 
-LogsExplorerPage.getLayout = (page) => <LogsLayout>{page}</LogsLayout>
+LogsExplorerPage.getLayout = (page) => (
+  <DefaultLayout>
+    <LogsLayout title="Explorer">{page}</LogsLayout>
+  </DefaultLayout>
+)
 
 export default LogsExplorerPage

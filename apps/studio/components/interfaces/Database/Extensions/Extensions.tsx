@@ -1,47 +1,78 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { isNull, partition } from 'lodash'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { Button, IconAlertCircle, IconExternalLink, IconSearch, Input } from 'ui'
+import { AlertCircle, Search } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import {
+  Card,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  ShadowScrollArea,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import InformationBox from 'components/ui/InformationBox'
-import NoSearchResults from 'components/ui/NoSearchResults'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
-import ExtensionCard from './ExtensionCard'
-import ExtensionCardSkeleton from './ExtensionCardSkeleton'
-import { HIDDEN_EXTENSIONS } from './Extensions.constants'
+import { ExtensionRow } from './ExtensionRow'
+import { HIDDEN_EXTENSIONS, SEARCH_TERMS } from './Extensions.constants'
+import InformationBox from '@/components/ui/InformationBox'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-const Extensions = () => {
+export const Extensions = () => {
   const { filter } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const { data, isLoading } = useDatabaseExtensionsQuery({
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search extensions' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setFilterString('')
+  })
+
+  const { data = [], isPending: isLoading } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
+  const visibleExtensions = data.filter((ext) => !HIDDEN_EXTENSIONS.includes(ext.name))
   const extensions =
     filterString.length === 0
-      ? data ?? []
-      : (data ?? []).filter((ext) => ext.name.includes(filterString))
-  const extensionsWithoutHidden = extensions.filter(
-    (ext: any) => !HIDDEN_EXTENSIONS.includes(ext.name)
-  )
+      ? visibleExtensions
+      : visibleExtensions.filter((ext) => {
+          const nameMatchesSearch = ext.name.toLowerCase().includes(filterString.toLowerCase())
+          const searchTermsMatchesSearch = (SEARCH_TERMS[ext.name] || []).some((x) =>
+            x.includes(filterString.toLowerCase())
+          )
+          return nameMatchesSearch || searchTermsMatchesSearch
+        })
   const [enabledExtensions, disabledExtensions] = partition(
-    extensionsWithoutHidden,
-    (ext: any) => !isNull(ext.installed_version)
+    extensions,
+    (ext) => !isNull(ext.installed_version)
   )
 
-  const canUpdateExtensions = useCheckPermissions(
+  const { can: canUpdateExtensions, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'extensions'
   )
-  const isPermissionsLoaded = usePermissionsLoaded()
 
   useEffect(() => {
     if (filter !== undefined) setFilterString(filter as string)
@@ -50,84 +81,79 @@ const Extensions = () => {
   return (
     <>
       <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <Input
-            size="small"
+        <InputGroup className="w-52">
+          <InputGroupInput
+            ref={searchInputRef}
+            size="tiny"
             placeholder="Search for an extension"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
-            className="w-64"
-            icon={<IconSearch size="tiny" />}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
           />
-          {isPermissionsLoaded && !canUpdateExtensions ? (
-            <div className="w-[500px]">
-              <InformationBox
-                icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
-                title="You need additional permissions to update database extensions"
-              />
-            </div>
-          ) : (
-            <Button asChild type="default" icon={<IconExternalLink />}>
-              <Link
-                href="https://supabase.com/docs/guides/database/extensions"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Documentation
-              </Link>
-            </Button>
-          )}
-        </div>
+          <InputGroupAddon>
+            <Search />
+          </InputGroupAddon>
+        </InputGroup>
       </div>
 
+      {isPermissionsLoaded && !canUpdateExtensions && (
+        <InformationBox
+          icon={<AlertCircle className="text-foreground-light" size={18} strokeWidth={2} />}
+          title="You need additional permissions to update database extensions"
+        />
+      )}
+
       {isLoading ? (
-        <div className="my-8 w-full space-y-12">
-          <div className="space-y-4">
-            <ShimmeringLoader className="h-[28px] w-40" />
-
-            <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <ExtensionCardSkeleton key={index} index={index} />
-              ))}
-            </div>
-          </div>
-        </div>
+        <GenericSkeletonLoader />
       ) : (
-        <>
-          {extensions.length === 0 && (
-            <NoSearchResults
-              searchString={filterString}
-              onResetFilter={() => setFilterString('')}
-            />
-          )}
-
-          <div className="my-8 w-full space-y-12">
-            {enabledExtensions.length > 0 && (
-              <div className="space-y-4">
-                <h4 className="text-lg">Enabled extensions</h4>
-                <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-                  {enabledExtensions.map((extension) => (
-                    <ExtensionCard key={extension.name} extension={extension} />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {disabledExtensions.length > 0 && (
-              <div className="space-y-4">
-                <h4 className="text-lg">Available extensions</h4>
-                <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-                  {disabledExtensions.map((extension) => (
-                    <ExtensionCard key={extension.name} extension={extension} />
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </>
+        <Card>
+          <ShadowScrollArea stickyLastColumn>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead key="name">Name</TableHead>
+                  <TableHead key="version" className="w-28">
+                    Version
+                  </TableHead>
+                  <TableHead key="schema">Schema</TableHead>
+                  <TableHead key="description" className="min-w-80">
+                    Description
+                  </TableHead>
+                  <TableHead key="used-by">Used by</TableHead>
+                  <TableHead key="links">Links</TableHead>
+                  {/*
+                    [Joshen] All these classes are just to make the last column sticky
+                    I reckon we can pull these out into the Table component where we can declare
+                    sticky columns via props, but we can do that if we start to have more tables
+                    in the dashboard with sticky columns
+                  */}
+                  <TableHead key="enabled" className="px-0">
+                    <div className="bg-200! px-4 w-full h-full flex items-center border-l">
+                      Enabled
+                    </div>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {[...enabledExtensions, ...disabledExtensions].map((extension) => (
+                  <ExtensionRow key={extension.name} extension={extension} />
+                ))}
+                {extensions.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={7}>
+                      <NoSearchResults
+                        className="border-none p-0! bg-transparent"
+                        searchString={filterString}
+                        onResetFilter={() => setFilterString('')}
+                      />
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </ShadowScrollArea>
+        </Card>
       )}
     </>
   )
 }
-
-export default Extensions

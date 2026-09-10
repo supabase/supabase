@@ -1,0 +1,64 @@
+name: Alert on master breakage
+
+on:
+  workflow_run:
+    workflows:
+      - 'Selfhosted Studio E2E Tests'
+      - 'Studio Unit Tests & Build Check'
+    branches: [master]
+    types:
+      - completed
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  notify:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Slack alert
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_DASHBOARD_WEBHOOK_URL }}
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+          WORKFLOW_URL: ${{ github.event.workflow_run.html_url }}
+          COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
+          COMMIT_MESSAGE: ${{ github.event.workflow_run.head_commit.message }}
+          COMMIT_AUTHOR: ${{ github.event.workflow_run.head_commit.author.name }}
+          REPO_URL: https://github.com/${{ github.repository }}
+        run: |
+          SHORT_SHA="${COMMIT_SHA:0:7}"
+          FIRST_LINE=$(echo "$COMMIT_MESSAGE" | head -1)
+
+          PAYLOAD=$(jq -n \
+            --arg workflow_name "$WORKFLOW_NAME" \
+            --arg workflow_url "$WORKFLOW_URL" \
+            --arg commit_sha "$COMMIT_SHA" \
+            --arg short_sha "$SHORT_SHA" \
+            --arg commit_msg "$FIRST_LINE" \
+            --arg author "$COMMIT_AUTHOR" \
+            --arg repo_url "$REPO_URL" \
+            '{
+              text: ":rotating_light: \($workflow_name) failed on master",
+              blocks: [
+                {
+                  type: "header",
+                  text: {
+                    type: "plain_text",
+                    text: ":rotating_light: master is broken"
+                  }
+                },
+                {
+                  type: "section",
+                  text: {
+                    type: "mrkdwn",
+                    text: "*Workflow:* <\($workflow_url)|\($workflow_name)>\n*Commit:* <\($repo_url)/commit/\($commit_sha)|\($short_sha)> \($commit_msg)\n*Author:* \($author)"
+                  }
+                }
+              ]
+            }')
+
+          curl -f -X POST "$SLACK_WEBHOOK_URL" \
+            -H 'Content-Type: application/json' \
+            -d "$PAYLOAD"

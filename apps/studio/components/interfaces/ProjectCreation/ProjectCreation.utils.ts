@@ -1,14 +1,105 @@
-import { AWS_REGIONS, CloudProvider, FLY_REGIONS, Region } from 'lib/constants'
-import { pluckObjectFields } from 'lib/helpers'
+import type { CloudProvider, Region } from 'shared-data'
+import { AWS_REGIONS } from 'shared-data'
+import { SMART_REGION_TO_EXACT_REGION_MAP } from 'shared-data/regions'
 
-export function getAvailableRegions(cloudProvider: CloudProvider): Region {
-  if (cloudProvider === 'AWS') {
-    return process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? pluckObjectFields(AWS_REGIONS, ['SOUTHEAST_ASIA'])
-      : AWS_REGIONS
-  } else if (cloudProvider === 'FLY') {
-    return FLY_REGIONS
+import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
+
+export function smartRegionToExactRegion(smartOrExactRegion: string) {
+  return SMART_REGION_TO_EXACT_REGION_MAP.get(smartOrExactRegion) ?? smartOrExactRegion
+}
+
+export function getAvailableRegions(
+  cloudProvider: CloudProvider,
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT
+): Region {
+  switch (cloudProvider) {
+    case 'AWS':
+    case 'AWS_K8S':
+      return AWS_REGIONS
+    case 'AWS_NIMBUS':
+      if (environment !== 'prod') {
+        // Only allow Southeast Asia for Nimbus (local/staging)
+        return {
+          SOUTHEAST_ASIA: AWS_REGIONS.SOUTHEAST_ASIA,
+        }
+      }
+
+      // Only allow US East for Nimbus (prod)
+      return {
+        EAST_US: AWS_REGIONS.EAST_US,
+      }
+    default:
+      throw new Error('Invalid cloud provider')
   }
+}
 
-  throw new Error('Invalid cloud provider')
+type ResolveDefaultDbRegionArgs = {
+  cloudProvider: CloudProvider
+  isHighAvailabilityRestricted: boolean
+  highAvailabilityRegionName: string | undefined
+  isSmartRegionEnabled: boolean
+  recommendedSmartRegion: string | undefined
+  autoDefaultRegion: string | undefined
+  fixedDefaultRegion: string
+  environment?: string
+}
+
+export function resolveDefaultDbRegion({
+  cloudProvider,
+  isHighAvailabilityRestricted,
+  highAvailabilityRegionName,
+  isSmartRegionEnabled,
+  recommendedSmartRegion,
+  autoDefaultRegion,
+  fixedDefaultRegion,
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT,
+}: ResolveDefaultDbRegionArgs): string | undefined {
+  if (isHighAvailabilityRestricted) return highAvailabilityRegionName
+  if (isSmartRegionEnabled) return recommendedSmartRegion
+
+  // The geolocated default is only usable if the provider actually offers that region
+  // (e.g. AWS_NIMBUS is restricted to a single region)
+  const isAutoDefaultRegionAvailable = Object.entries(
+    getAvailableRegions(cloudProvider, environment)
+  ).some(([, region]) => region.displayName === autoDefaultRegion)
+
+  return isAutoDefaultRegionAvailable && autoDefaultRegion !== undefined
+    ? autoDefaultRegion
+    : fixedDefaultRegion
+}
+
+/**
+ * When launching new projects, they only get assigned a compute size once successfully launched,
+ * this might assume wrong compute size, but only for projects being rapidly launched after one another on non-default compute sizes.
+ *
+ * Needs to be in the API in the future [kevin]
+ */
+export const monthlyInstancePrice = (instance: string | undefined): number => {
+  return instanceSizeSpecs[instance as DesiredInstanceSize]?.priceMonthly || 10
+}
+
+export const instanceLabel = (instance: string | undefined): string => {
+  return instanceSizeSpecs[instance as DesiredInstanceSize]?.label || 'Micro'
+}
+
+export const getHighAvailabilityRegionCode = (
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT
+) => {
+  // Local dev stacks can run in any of the supported regions, so they're left unrestricted
+  if (environment === 'prod') return 'us-east-1'
+  if (environment === 'staging') return 'us-east-1'
+  if (environment === 'local') return 'eu-central-1'
+  return undefined
+}
+
+export const filterHighAvailabilityRegions = <T extends { code: string }>(
+  regions: T[],
+  highAvailability: boolean,
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT
+) => {
+  const isLocal = environment === 'local'
+  const regionCode = getHighAvailabilityRegionCode(environment)
+  return highAvailability && !isLocal && regionCode !== undefined
+    ? regions.filter((region) => region.code === regionCode)
+    : regions
 }

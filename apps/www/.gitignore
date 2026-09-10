@@ -1,0 +1,45 @@
+# Dependencies
+/node_modules
+
+# Production
+/build
+
+# Generated files
+.cache-loader
+
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.staging.local
+.env.production.local
+*.swp
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+**/*/generated/**/*
+!**/*/generated/.gitkeep
+!**/*/generated/**/.gitkeep
+.generated
+
+# Sitemap (regenerated on every Vercel deploy by `pnpm postbuild` -> internals/generate-sitemap.mjs)
+public/sitemap.xml
+public/sitemap_www.xml
+
+# Generated .md content bundle (built by scripts/generateMdContent.mjs)
+app/api-v2/md/content.generated.ts
+
+# Generated feeds and markdown (built by content:build)
+/public/rss.xml
+/public/changelog-rss.xml
+/public/changelog-rss
+/public/changelog.md
+/public/changelog
+
+# contentlayer
+.contentlayer
+.vercel
+.env*.local

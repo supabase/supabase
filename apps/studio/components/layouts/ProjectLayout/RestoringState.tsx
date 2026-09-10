@@ -1,53 +1,122 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
-import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
-import { Button, IconAlertCircle, IconCheckCircle, IconLoader } from 'ui'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { CheckCircle, Download, Loader } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
-import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
-import { getWithTimeout } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { useProjectContext } from './ProjectContext'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useBackupDownloadMutation } from '@/data/database/backup-download-mutation'
+import { useDownloadableBackupQuery } from '@/data/database/backup-query'
+import { useInvalidateProjectDetailsQuery } from '@/data/projects/project-detail-query'
+import { useProjectStatusQuery } from '@/data/projects/project-status-query'
+import { useLongRunningTransitionState } from '@/hooks/misc/useLongRunningTransitionState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
+import {
+  clearPersistedTransitionStartTime,
+  minutesToMilliseconds,
+} from '@/lib/project-transition-state'
+import { getRestoreLongRunningThresholdMinutes } from '@/lib/restore-estimate'
 
-const RestoringState = () => {
+export const POLL_INTERVAL_MS = 4000
+
+export const RestoringState = () => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
-  const { project } = useProjectContext()
-  const checkServerInterval = useRef<number>()
+  const { data: project } = useSelectedProjectQuery()
 
-  const [loading, setLoading] = useState(false)
-  const [isFailed, setIsFailed] = useState(false)
-  const [isCompleted, setIsCompleted] = useState(false)
+  const [isConfirming, setIsConfirming] = useState(false)
+  const [hasLeftHealthyState, setHasLeftHealthyState] = useState(false)
+  const restoreStateStartStorageKey = ref
+    ? LOCAL_STORAGE_KEYS.PROJECT_RESTORING_STARTED_AT(ref)
+    : null
 
-  useEffect(() => {
-    checkServerInterval.current = window.setInterval(checkServer, 4000)
-    return () => clearInterval(checkServerInterval.current)
-  }, [])
+  const { data } = useDownloadableBackupQuery({ projectRef: ref })
+  const backups = data?.backups ?? []
+  const logicalBackups = backups.filter((b) => !b.isPhysicalBackup)
+  const longRunningThresholdMinutes = getRestoreLongRunningThresholdMinutes(project?.volumeSizeGb)
+  const longRunningThresholdMs = minutesToMilliseconds(longRunningThresholdMinutes)
+  const isTakingLongerThanExpected = useLongRunningTransitionState({
+    storageKey: restoreStateStartStorageKey,
+    thresholdMs: longRunningThresholdMs,
+  })
 
-  async function checkServer() {
-    if (!project) return
+  const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
-    const projectStatus = await getWithTimeout(`${API_URL}/projects/${project.ref}/status`, {
-      timeout: 2000,
-    })
-    if (projectStatus && !projectStatus.error) {
-      const { status } = projectStatus
-      if (status === PROJECT_STATUS.RESTORATION_FAILED) {
-        clearInterval(checkServerInterval.current)
-        setIsFailed(true)
-      } else if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-        clearInterval(checkServerInterval.current)
-        setIsCompleted(true)
-      }
+  const { data: projectStatusData } = useProjectStatusQuery(
+    { projectRef: ref },
+    {
+      enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
+      refetchInterval: (query) => {
+        const status = query.state.data?.status
+        if (status === PROJECT_STATUS.RESTORE_FAILED) return false
+        if (status === PROJECT_STATUS.ACTIVE_HEALTHY && hasLeftHealthyState) return false
+        return POLL_INTERVAL_MS
+      },
     }
+  )
+
+  const projectStatus = projectStatusData?.status
+
+  // Right after a restore is triggered the status endpoint can still report the stale
+  // pre-restore ACTIVE_HEALTHY, so completion is only trusted once the status has been
+  // observed leaving the healthy state.
+  if (
+    !hasLeftHealthyState &&
+    projectStatus !== undefined &&
+    projectStatus !== PROJECT_STATUS.ACTIVE_HEALTHY
+  ) {
+    setHasLeftHealthyState(true)
+  }
+
+  const hasRestoreFailed = projectStatus === PROJECT_STATUS.RESTORE_FAILED
+  const isCompleted = hasLeftHealthyState && projectStatus === PROJECT_STATUS.ACTIVE_HEALTHY
+
+  const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
+    onSuccess: (res) => {
+      const { fileUrl } = res
+
+      // Trigger browser download by create,trigger and remove tempLink
+      const tempLink = document.createElement('a')
+      tempLink.href = fileUrl
+      document.body.appendChild(tempLink)
+      tempLink.click()
+      document.body.removeChild(tempLink)
+    },
+  })
+
+  const onClickDownloadBackup = () => {
+    if (!ref) return console.error('Project ref is required')
+    if (logicalBackups.length === 0) return console.error('No available backups to download')
+
+    downloadBackup({ ref, backup: logicalBackups[0] })
   }
 
   const onConfirm = async () => {
-    if (!project) return console.error('Project is required')
-
-    setLoading(true)
-    if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
+    if (!ref) return console.error('Project ref is required')
+    setIsConfirming(true)
+    try {
+      await invalidateProjectDetailsQuery(ref)
+    } finally {
+      setIsConfirming(false)
+    }
   }
+
+  useEffect(() => {
+    if (!isCompleted && !hasRestoreFailed) return
+
+    if (restoreStateStartStorageKey) {
+      clearPersistedTransitionStartTime(restoreStateStartStorageKey)
+    }
+    if (hasRestoreFailed && ref) void invalidateProjectDetailsQuery(ref)
+  }, [
+    isCompleted,
+    hasRestoreFailed,
+    restoreStateStartStorageKey,
+    ref,
+    invalidateProjectDetailsQuery,
+  ])
 
   return (
     <div className="flex items-center justify-center h-full">
@@ -56,7 +125,7 @@ const RestoringState = () => {
           <div className="space-y-6 pt-6">
             <div className="flex px-8 space-x-8">
               <div className="mt-1">
-                <IconCheckCircle className="text-brand" size={18} strokeWidth={2} />
+                <CheckCircle className="text-brand" size={18} strokeWidth={2} />
               </div>
               <div className="space-y-1">
                 <p>Restoration complete!</p>
@@ -66,56 +135,77 @@ const RestoringState = () => {
               </div>
             </div>
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8">
-              <Button disabled={loading} loading={loading} onClick={onConfirm}>
+              <Button
+                variant="primary"
+                disabled={isConfirming}
+                loading={isConfirming}
+                onClick={onConfirm}
+              >
                 Return to project
               </Button>
             </div>
           </div>
-        ) : isFailed ? (
-          <div className="space-y-6 pt-6">
-            <div className="flex px-8 space-x-8">
-              <div className="mt-1">
-                <IconAlertCircle size={18} strokeWidth={2} />
-              </div>
-              <div className="space-y-1">
-                <p>Something went wrong while restoring your project</p>
-                <p className="text-sm text-foreground-light">
-                  Our engineers have already been notified of this, do hang tight while we are
-                  investigating into the issue.
-                </p>
-              </div>
-            </div>
-            {isFailed && (
-              <div className="border-t border-overlay flex items-center justify-end py-4 px-8">
-                <Button asChild type="default">
-                  <Link
-                    href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
-                  >
-                    Contact support
-                  </Link>
-                </Button>
-              </div>
-            )}
-          </div>
         ) : (
-          <div className="space-y-6 py-6">
-            <div className="flex px-8 space-x-8">
-              <div className="mt-1">
-                <IconLoader className="animate-spin" size={18} />
-              </div>
-              <div className="space-y-1">
-                <p>Restoration in progress</p>
-                <p className="text-sm text-foreground-light">
-                  Restoration can take from a few minutes up to several hours depending on the size
-                  of your database. Your project will be offline while the restoration is running.
-                </p>
+          <>
+            <div className="space-y-6 py-6">
+              <div className="flex px-8 space-x-8">
+                <div className="mt-1">
+                  <Loader className="animate-spin" size={18} />
+                </div>
+                <div className="space-y-1">
+                  <p>Restoration in progress</p>
+                  <p className="text-sm text-foreground-light">
+                    Restoration can take from a few minutes up to several hours depending on the
+                    size of your database. Your project will be offline while the restoration is
+                    running.
+                  </p>
+                  {isTakingLongerThanExpected && (
+                    <Admonition
+                      type="warning"
+                      title="This is taking longer than usual"
+                      layout="responsive"
+                      description="Contact support if this project remains in a restoring state."
+                      actions={
+                        <Button asChild variant="default">
+                          <SupportLink
+                            queryParams={{
+                              category: SupportCategories.DATABASE_UNRESPONSIVE,
+                              projectRef: project?.ref ?? ref,
+                              subject: 'Project stuck in restoring state',
+                              message: `Project "${project?.name ?? 'Unknown project'}" (ref: ${project?.ref ?? ref ?? 'unknown'}) has remained in a restoring state for over ${longRunningThresholdMinutes} minutes.`,
+                            }}
+                          >
+                            Contact support
+                          </SupportLink>
+                        </Button>
+                      }
+                      className="mt-5!"
+                    />
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+            <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
+              <ButtonTooltip
+                variant="default"
+                icon={<Download />}
+                loading={isDownloading}
+                disabled={logicalBackups.length === 0}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text:
+                      logicalBackups.length === 0 ? 'No available backups to download' : undefined,
+                  },
+                }}
+                onClick={onClickDownloadBackup}
+              >
+                Download latest backup
+              </ButtonTooltip>
+            </div>
+          </>
         )}
       </div>
     </div>
   )
 }
-
-export default RestoringState

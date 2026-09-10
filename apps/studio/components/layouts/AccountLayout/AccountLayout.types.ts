@@ -2,11 +2,12 @@ export type SidebarLink = {
   label: string
   href?: string
   key: string
-  icon?: string
+  icon?: React.ReactNode
   isExternal?: boolean
   isActive?: boolean
   subitemsKey?: string // I dont think this is being used at all
   onClick?: () => Promise<void>
+  shortcutId?: import('@/state/shortcuts/registry').ShortcutId
 }
 
 export type SidebarSection = {

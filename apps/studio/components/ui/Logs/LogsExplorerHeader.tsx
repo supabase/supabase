@@ -1,22 +1,36 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { useFlag, useParams } from 'common'
+import { BookOpen, Check, ChevronsUpDown, Copy, ExternalLink, List, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { logConstants } from 'shared-data'
 import {
   Button,
-  IconBookOpen,
-  IconCheck,
-  IconClipboard,
-  IconExternalLink,
-  IconList,
-  IconX,
+  cn,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  copyToClipboard,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   SidePanel,
-  Tabs,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
-import { LOGS_EXPLORER_DOCS_URL } from 'components/interfaces/Settings/Logs'
-import Table from 'components/to-be-cleaned/Table'
-import { copyToClipboard } from 'lib/helpers'
+import { DocsButton } from '../DocsButton'
+import { LOGS_EXPLORER_DOCS_URL } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import {
+  otelFieldsFromKeys,
+  toOtelFieldSchemas,
+} from '@/components/interfaces/Settings/Logs/Logs.fieldReference'
+import Table from '@/components/to-be-cleaned/Table'
+import { useOtelLogKeysQuery } from '@/data/logs/otel-log-keys-query'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface LogsExplorerHeaderProps {
   subtitle?: string
@@ -24,25 +38,32 @@ export interface LogsExplorerHeaderProps {
 
 const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
   const [showReference, setShowReference] = useState(false)
+  const [open, setOpen] = useState(false)
+  const useOtel = useFlag('otelLegacyLogs')
+  const schemas = useOtel ? toOtelFieldSchemas(logConstants.schemas) : logConstants.schemas
+  const [selectedRef, setSelectedRef] = useState(schemas[0]?.reference)
+  const selectedSchema = schemas.find((s) => s.reference === selectedRef) ?? schemas[0]
+
+  const { ref: projectRef } = useParams()
+  const { data: discoveredKeys, isPending: isLoadingKeys } = useOtelLogKeysQuery(
+    { projectRef, source: selectedRef },
+    { enabled: useOtel && showReference }
+  )
 
   return (
-    <div className={['flex items-center gap-8 transition-all pb-6 justify-between'].join(' ')}>
-      <div className="flex items-center gap-3">
-        <div
-          className="flex h-6 w-6 items-center justify-center rounded border
-            border-brand-600 bg-brand-300 text-brand
-          "
-        >
-          <IconList size={14} strokeWidth={3} />
-        </div>
+    <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 transition-all pb-6 justify-between">
+      <div className="flex flex-col md:flex-row md:items-center gap-3">
+        <div className="flex flex-row items-center gap-3">
+          <div className="flex h-6 w-6 items-center justify-center rounded-sm border border-brand-600 bg-brand-300 text-brand">
+            <List size={14} strokeWidth={3} />
+          </div>
 
-        <h1 className="text-2xl text-foreground">Logs Explorer</h1>
+          <h1>Logs Explorer</h1>
+        </div>
         {subtitle && <span className="text-2xl text-foreground-light">{subtitle}</span>}
       </div>
       <div className="flex flex-row gap-2">
-        <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-          <Link href={LOGS_EXPLORER_DOCS_URL}>Documentation</Link>
-        </Button>
+        <DocsButton href={LOGS_EXPLORER_DOCS_URL} />
 
         <SidePanel
           size="large"
@@ -50,10 +71,10 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
             <div className="flex flex-row justify-between items-center">
               <h3>Field Reference</h3>
               <Button
-                type="text"
+                variant="text"
                 className="px-1"
                 onClick={() => setShowReference(false)}
-                icon={<IconX size={18} strokeWidth={1.5} />}
+                icon={<X size={18} strokeWidth={1.5} />}
               />
             </div>
           }
@@ -63,69 +84,112 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
           hideFooter
           triggerElement={
             <Button
-              type="default"
+              variant="default"
               onClick={() => setShowReference(true)}
-              icon={<IconBookOpen strokeWidth={1.5} />}
+              icon={<BookOpen strokeWidth={1.5} />}
             >
-              Field Reference
+              <span>Field Reference</span>
             </Button>
           }
         >
           <SidePanel.Content>
             <div className="pt-4 pb-2 space-y-1">
-              <p className="text-sm">
-                The following table shows all the available paths that can be queried from each
-                respective source. Do note that to access nested keys, you would need to perform the
-                necessary{' '}
-                <Link
-                  href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-brand"
-                >
-                  unnesting joins
-                  <IconExternalLink
-                    size="tiny"
-                    className="ml-1 inline -translate-y-[2px]"
-                    strokeWidth={1.5}
-                  />
-                </Link>
-              </p>
+              {useOtel ? (
+                <p className="text-sm">
+                  The following table shows the fields available on each source. Nested fields live
+                  in the <code className="text-xs">log_attributes</code> map and are read with{' '}
+                  <code className="text-xs">log_attributes['key']</code> — no unnesting joins
+                  needed.
+                </p>
+              ) : (
+                <p className="text-sm">
+                  The following table shows all the available paths that can be queried from each
+                  respective source. Do note that to access nested keys, you would need to perform
+                  the necessary{' '}
+                  <Link
+                    href={`${DOCS_URL}/guides/platform/logs#unnesting-arrays`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-brand"
+                  >
+                    unnesting joins
+                    <ExternalLink
+                      size={14}
+                      className="ml-1 inline translate-y-[-2px]"
+                      strokeWidth={1.5}
+                    />
+                  </Link>
+                </p>
+              )}
             </div>
           </SidePanel.Content>
           <SidePanel.Separator />
-          <Tabs
-            scrollable
-            size="small"
-            type="underlined"
-            defaultActiveId="edge_logs"
-            listClassNames="px-2"
-          >
-            {logConstants.schemas.map((schema) => (
-              <Tabs.Panel
-                key={schema.reference}
-                id={schema.reference}
-                label={schema.name}
-                className="px-4 pb-4"
-              >
-                <Table
-                  head={[
-                    <Table.th className="text-xs !p-2" key="path">
-                      Path
-                    </Table.th>,
-                    <Table.th key="type" className="text-xs !p-2">
-                      Type
-                    </Table.th>,
-                  ]}
-                  body={schema.fields
-                    .sort((a: any, b: any) => a.path - b.path)
-                    .map((field) => (
-                      <Field key={field.path} field={field} />
-                    ))}
-                />
-              </Tabs.Panel>
-            ))}
-          </Tabs>
+          <div className="px-4 pb-4 flex flex-col gap-4">
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="default"
+                  role="combobox"
+                  size={'small'}
+                  aria-expanded={open}
+                  className="w-full justify-between"
+                  iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                >
+                  {selectedSchema?.name ?? 'Select source...'}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="p-0" sameWidthAsTrigger>
+                <Command>
+                  <CommandInput placeholder="Search source..." />
+                  <CommandList>
+                    <CommandEmpty>No source found.</CommandEmpty>
+                    <CommandGroup>
+                      {schemas.map((schema) => (
+                        <CommandItem
+                          key={schema.reference}
+                          value={schema.reference}
+                          onSelect={() => {
+                            setSelectedRef(schema.reference)
+                            setOpen(false)
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              'mr-2 h-4 w-4',
+                              selectedSchema?.reference === schema.reference
+                                ? 'opacity-100'
+                                : 'opacity-0'
+                            )}
+                          />
+                          {schema.name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            {useOtel && isLoadingKeys ? (
+              <p className="text-sm text-foreground-light py-2">Loading fields…</p>
+            ) : (
+              <Table
+                head={[
+                  <Table.th className="text-xs p-2!" key="path">
+                    Path
+                  </Table.th>,
+                  <Table.th key="type" className="text-xs p-2!">
+                    Type
+                  </Table.th>,
+                ]}
+                body={(() => {
+                  const fields = useOtel
+                    ? otelFieldsFromKeys(discoveredKeys ?? [])
+                    : selectedSchema.fields
+                  return fields.map((field) => <Field key={field.path} field={field} />)
+                })()}
+              />
+            )}
+          </div>
         </SidePanel>
       </div>
     </div>
@@ -147,7 +211,7 @@ const Field = ({
   return (
     <Table.tr>
       <Table.td
-        className="font-mono text-xs !p-2 cursor-pointer hover:text-foreground transition flex items-center space-x-2"
+        className="font-mono text-xs p-2! cursor-pointer hover:text-foreground transition flex items-center space-x-2"
         onClick={() =>
           copyToClipboard(field.path, () => {
             setIsCopied(true)
@@ -157,46 +221,26 @@ const Field = ({
       >
         <span>{field.path}</span>
         {isCopied ? (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <IconCheck size={14} strokeWidth={3} className="text-brand" />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">Copied</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+          <Tooltip>
+            <TooltipTrigger>
+              <Check size={14} strokeWidth={3} className="text-brand" />
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="font-sans">
+              Copied
+            </TooltipContent>
+          </Tooltip>
         ) : (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <IconClipboard size="tiny" strokeWidth={1.5} />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">Copy value</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+          <Tooltip>
+            <TooltipTrigger>
+              <Copy size={14} />
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="font-sans">
+              Copy value
+            </TooltipContent>
+          </Tooltip>
         )}
       </Table.td>
-      <Table.td className="font-mono text-xs !p-2">{field.type}</Table.td>
+      <Table.td className="font-mono text-xs p-2!">{field.type}</Table.td>
     </Table.tr>
   )
 }

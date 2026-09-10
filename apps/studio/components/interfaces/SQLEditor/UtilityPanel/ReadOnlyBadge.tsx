@@ -1,16 +1,18 @@
 import { Badge } from 'ui'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useUser } from 'common'
+
+import { useProfile } from '@/lib/profile'
+import { isSnippetOwner } from '@/state/sql-editor/sql-editor-rules'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export type ReadOnlyBadgeProps = { id: string }
 const ReadOnlyBadge = ({ id }: ReadOnlyBadgeProps) => {
-  const user = useUser()
-  const snap = useSqlEditorStateSnapshot()
+  const { profile } = useProfile()
+  const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const snippet = snap.snippets[id]
-  const isSnippetOwner = user?.user_metadata?.user_name === snippet?.snippet?.owner?.username
+  const snippet = snapV2.snippets[id]
+  const snippetIsOwned = !!snippet && isSnippetOwner(snippet.snippet, profile?.id)
 
-  return <>{isSnippetOwner ? null : <Badge>Read-only</Badge>}</>
+  return <>{snippetIsOwned ? null : <Badge>Read-only</Badge>}</>
 }
 
 export default ReadOnlyBadge

@@ -1,17 +1,17 @@
 ---
 title: 'Native Mobile Deep Linking'
-description: 'Learn how to handle deep linking for OAuth and email based login.'
+subtitle: 'Set up Deep Linking for mobile applications.'
 tocVideo: '8TZ6O1C8ujE'
 ---
 
-In certain auth scenarios you will need to handle linking back into your application to finish the user's sign in.
+Many Auth methods involve a redirect to your app. For example:
 
-### When do you need to setup deep links
+- Signup confirmation emails, Magic Link signins, and password reset emails contain a link that redirects to your app.
+- In OAuth signins, an automatic redirect occurs to your app.
 
-- Magic link login.
-- Have `confirm email` enabled and are using email login.
-- Resetting password for email login.
-- Calling `.signInWithOAuth()` method.
+With Deep Linking, you can configure this redirect to open a specific page. This is necessary if, for example, you need to display a form for [password reset](/docs/guides/auth/passwords#resetting-a-users-password-forgot-password), or to manually exchange a token hash.
+
+## Setting up deep linking
 
 <Tabs
   scrollable
@@ -31,7 +31,7 @@ In certain auth scenarios you will need to handle linking back into your applica
     }
     ```
 
-    In your project's [auth settings](https://supabase.com/dashboard/project/_/auth/url-configuration) add the redirect URL, e.g. `com.supabase://**`.
+    In your project's [auth settings](/dashboard/project/_/auth/url-configuration) add the redirect URL, e.g. `com.supabase://**`.
 
     Finally, implement the OAuth and linking handlers. See the [supabase-js reference](/docs/reference/javascript/initializing?example=react-native-options-async-storage) for instructions on initializing the supabase-js client in React Native.
 
@@ -85,7 +85,7 @@ In certain auth scenarios you will need to handle linking back into your applica
 
     const sendMagicLink = async () => {
       const { error } = await supabase.auth.signInWithOtp({
-        email: "example@email.com",
+        email: "valid.email@supabase.io",
         options: {
           emailRedirectTo: redirectTo,
         },
@@ -97,12 +97,12 @@ In certain auth scenarios you will need to handle linking back into your applica
 
     export default function Auth() {
       // Handle linking into app from email app.
-      const url = Linking.useURL();
+      const url = Linking.useLinkingURL();
       if (url) createSessionFromUrl(url);
 
       return (
         <>
-          <Button onPress={performOAuth} title="Sign in with Github" />
+          <Button onPress={performOAuth} title="Sign in with GitHub" />
           <Button onPress={sendMagicLink} title="Send Magic Link" />
         </>
       );
@@ -113,14 +113,14 @@ In certain auth scenarios you will need to handle linking back into your applica
 
   </TabPanel>
   <TabPanel id="flutter" label="Flutter">
-    \*Currently supabase_flutter supports deep links on Android, iOS, Web, MacOS and Windows.
+    // Currently supabase_flutter supports deep links on Android, iOS, Web, macOS and Windows.
 
     ### Deep link config
 
-    - Go to your [auth settings](https://supabase.com/dashboard/project/_/auth/url-configuration) page.
+    - Go to your [auth settings](/dashboard/project/_/auth/url-configuration) page.
     - You need to enter your app redirect callback on `Additional Redirect URLs` field.
 
-    The redirect callback url should have this format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.flutterquickstart://login-callback` is just an example, you can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
+    The redirect callback URL should have this format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.flutterquickstart://login-callback` is an example. You can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
 
     ![Supabase console deep link setting](/docs/img/deeplink-setting.png)
 
@@ -190,6 +190,8 @@ In certain auth scenarios you will need to handle linking back into your applica
       ```
 
       For more info: https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app
+
+      <$Partial path="universal_links_apple.mdx" />
 
     </TabPanel>
     <TabPanel id="windows" label="Windows">
@@ -269,11 +271,10 @@ In certain auth scenarios you will need to handle linking back into your applica
 
       You can achieve it with [url_protocol](https://pub.dev/packages/url_protocol) inside you app.
 
-      The most relevant solution is to include those registry modifications into your installer to allow
-      for deregistration.
+      The most relevant solution is to include those registry modifications into your installer to allow for deregistration.
 
     </TabPanel>
-    <TabPanel id="macos" label="MacOS">
+    <TabPanel id="macos" label="macOS">
 
       Add this XML chapter in your `macos/Runner/Info.plist` inside `<plist version="1.0"><dict>` chapter:
 
@@ -305,13 +306,15 @@ In certain auth scenarios you will need to handle linking back into your applica
 
   </TabPanel>
 
+<$Show if="sdk:swift">
+
   <TabPanel id="swift" label="Swift">
   ### Deep link config
 
-    1. Go to your [auth settings](https://supabase.com/dashboard/project/_/auth/url-configuration) page.
+    1. Go to your [auth settings](/dashboard/project/_/auth/url-configuration) page.
     2. Enter your app redirect URL in the `Additional Redirect URLs` field. This is the URL that the user gets redirected to after clicking a magic link.
 
-    The redirect callback url should have the format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.user-management://login-callback` is just an example. You can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
+    The redirect callback URL should have the format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.user-management://login-callback` is an example. You can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
 
     ![Supabase console deep link setting](/docs/img/deeplink-setting.png)
 
@@ -342,14 +345,82 @@ In certain auth scenarios you will need to handle linking back into your applica
       </plist>
     ```
 
+### Handling the incoming URL
+
+    Once the OS opens your app via the redirect URL, pass that URL to `supabase.auth.handle(_:)` to complete the sign-in.
+
+    #### SwiftUI
+
+    Use the `onOpenURL` view modifier on your root view:
+
+    ```swift
+    SomeView()
+      .onOpenURL { url in
+        supabase.auth.handle(url)
+      }
+    ```
+
+    #### UIKit: App delegate
+
+    Forward the URL from `application(_:open:options:)`, and from `didFinishLaunchingWithOptions` if the app was launched cold via the link:
+
+    ```swift
+    func application(
+      _ application: UIApplication,
+      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
+      if let url = launchOptions?[.url] as? URL {
+        supabase.auth.handle(url)
+      }
+
+      return true
+    }
+
+    func application(
+      _ app: UIApplication,
+      open url: URL,
+      options: [UIApplication.OpenURLOptionsKey: Any]
+    ) -> Bool {
+      supabase.auth.handle(url)
+      return true
+    }
+    ```
+
+    #### UIKit: Scene delegate
+
+    Forward the URL from `SceneDelegate.swift`, handling both a cold launch (via `scene(_:willConnectTo:options:)`) and a URL received while the scene is already running (via `scene(_:openURLContexts:)`):
+
+    ```swift
+    func scene(
+      _ scene: UIScene,
+      willConnectTo session: UISceneSession,
+      options connectionOptions: UIScene.ConnectionOptions
+    ) {
+      for context in connectionOptions.urlContexts {
+        supabase.auth.handle(context.url)
+      }
+    }
+
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+      guard let url = URLContexts.first?.url else { return }
+      supabase.auth.handle(url)
+    }
+    ```
+
+    `handle(_:)` is a convenience wrapper that calls `session(from:)` and logs any error. See the [Auth API reference](/docs/reference/swift/auth-api) for details, or call `session(from:)` directly if you need the returned `Session` or want control over error handling.
+
+    <$Partial path="universal_links_apple.mdx" />
+
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:kotlin">
   <TabPanel id="kotlin" label="Android Kotlin">
   ### Deep link config
 
-    1. Go to your [auth settings](https://supabase.com/dashboard/project/_/auth/url-configuration) page.
+    1. Go to your [auth settings](/dashboard/project/_/auth/url-configuration) page.
     2. Enter your app redirect URL in the `Additional Redirect URLs` field. This is the URL that the user gets redirected to after clicking a magic link.
 
-    The redirect callback url should have the format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.user-management://login-callback` is just an example. You can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
+    The redirect callback URL must have the format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. For example: `io.supabase.user-management://login-callback`. You can use any values for `YOUR_SCHEME` and `YOUR_HOSTNAME`, but the scheme must be unique across the user's device. For this reason, a reverse domain of your website is typically used.
 
     Now, edit the Android manifest to make sure the app opens when the user clicks on the magic link.
 
@@ -394,7 +465,8 @@ In certain auth scenarios you will need to handle linking back into your applica
     }
     ```
 
-    The user will now be authenticated when your app receives a valid deeplink!
+    The user will now be authenticated when your app receives a valid deep link!
 
   </TabPanel>
+  </$Show>
 </Tabs>

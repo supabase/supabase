@@ -1,7 +1,7 @@
 ---
 title: 'Hugging Face is now supported in Supabase'
 description: "We've added support Hugging Face support in our Python Vector Client and Edge Functions."
-launchweek: 8
+launchweek: '8'
 categories:
   - product
 tags:
@@ -10,11 +10,11 @@ tags:
 date: '2023-08-07'
 toc_depth: 3
 author: gregnr,oli_rice
-image: launch-week-8/day-1/hugging-face-supabase-og.jpg
-thumb: launch-week-8/day-1/hugging-face-supabase-thumb.jpg
+imgSocial: launch-week-8/day-1/hugging-face-supabase-og.jpg
+imgThumb: launch-week-8/day-1/hugging-face-supabase-thumb.jpg
 ---
 
-Since launching our [Vector Toolkit](https://supabase.com/vector) a few months ago, the number of AI applications on Supabase has grown - a lot. Hundreds of new databases every week are using [pgvector](https://github.com/pgvector/pgvector).
+Since launching our [Vector Toolkit](https://supabase.com/modules/vector) a few months ago, the number of AI applications on Supabase has grown - a lot. Hundreds of new databases every week are using [pgvector](https://github.com/pgvector/pgvector).
 
 98% of those applications use OpenAI to store embeddings using the `text-embedding-ada-002` model. While OpenAI is easy, it’s not open source, which means it can’t be self-hosted.
 
@@ -96,7 +96,7 @@ Let’s step through a small demo where we accept some text, convert it into an 
 ```ts
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { env, pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.5.0'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 // Preparation for Deno runtime
 env.useBrowserCache = false

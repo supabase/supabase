@@ -1,39 +1,43 @@
 ---
 id: 'auth-twitter'
-title: 'Login with Twitter'
-description: 'Add Twitter OAuth to your Supabase project'
+title: 'Sign in with X / Twitter'
+description: 'Add X / Twitter OAuth to your Supabase project'
 ---
 
-To enable Twitter Auth for your project, you need to set up a Twitter OAuth application and add the application credentials in the Supabase Dashboard.
+To enable X / Twitter Auth for your project, you need to set up an X OAuth 2.0 application and add the application credentials in the Supabase Dashboard.
 
 ## Overview
 
-Setting up Twitter logins for your application consists of 3 parts:
+<Admonition type="caution">
 
-- Create and configure a Twitter Project and App on the [Twitter Developer Dashboard](https://developer.twitter.com/en/portal/dashboard).
-- Add your Twitter `API Key` and `API Secret Key` to your [Supabase Project](https://supabase.com/dashboard).
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
+We recommend using the **X / Twitter (OAuth 2.0)** provider. The legacy **Twitter (OAuth 1.0a)**
+provider will be deprecated in future releases.
 
-## Access your Twitter Developer account
+</Admonition>
 
-- Go to [developer.twitter.com](https://developer.twitter.com).
-- Click on `Sign in` at the top right to log in.
+Setting up X / Twitter sign-in for your application consists of 3 parts:
 
-![Twitter Developer Portal.](/docs/img/guides/auth-twitter/twitter-portal.png)
+- Create and configure an X Project and App on the [X Developer Dashboard](https://developer.x.com/en/portal/dashboard).
+- Add your X OAuth 2.0 `Client ID` and `Client Secret` to your [Supabase Project](/dashboard).
+- Add the sign-in code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
+
+## Access your X developer account
+
+- Go to [developer.x.com](https://developer.x.com).
+- Click on `Sign in` at the top right to sign in.
 
 ## Find your callback URL
 
-<SocialProviderSetup provider="Twitter" />
+<$Partial path="social_provider_setup.mdx" variables={{ "provider": "X / Twitter (OAuth 2.0)" }} />
 
-## Create a Twitter OAuth app
+## Create an X OAuth app
 
 - Click `+ Create Project`.
   - Enter your project name, click `Next`.
   - Select your use case, click `Next`.
   - Enter a description for your project, click `Next`.
   - Enter a name for your app, click `Next`.
-  - Copy and save your `API Key` (this is your `client_id`).
-  - Copy and save your `API Secret Key` (this is your `client_secret`).
+  - Copy and save your **API Key** and **API Secret Key** (these are used for OAuth 1.0a, which is being deprecated).
   - Click on `App settings` to proceed to next steps.
 - At the bottom, you will find `User authentication settings`. Click on `Set up`.
 - Under `User authentication settings`, you can configure `App permissions`.
@@ -45,12 +49,35 @@ Setting up Twitter logins for your application consists of 3 parts:
   - Enter your `Terms of service URL`.
   - Enter your `Privacy policy URL`.
 - Click `Save`.
+- After saving, navigate to `Keys and tokens` on your App page.
+  - Scroll to the bottom of the page and copy your **Client ID**.
+  - Click the `Regenerate` button next to **Client Secret**.
+  - In the confirmation modal, click `Yes, regenerate`.
+  - Copy and save your **Client Secret**.
 
-## Enter your Twitter credentials into your Supabase project
+## Enter your X credentials into your Supabase project
 
-<SocialProviderSettingsSupabase provider="Twitter" />
+<$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "X / Twitter (OAuth 2.0)" }} />
 
-## Add login code to your client app
+You can also configure the X / Twitter (OAuth 2.0) auth provider using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Configure X / Twitter (OAuth 2.0) auth provider
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "external_x_enabled": true,
+    "external_x_client_id": "your-x-client-id",
+    "external_x_secret": "your-x-client-secret"
+  }'
+```
+
+## Add sign-in code to your client app
 
 <Tabs
   scrollable
@@ -61,29 +88,81 @@ Setting up Twitter logins for your application consists of 3 parts:
 >
 <TabPanel id="js" label="JavaScript">
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `twitter` as the `provider`:
+<$Partial path="create_client_snippet.mdx" />
+
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `x` as the `provider`:
 
 ```js
-async function signInWithTwitter() {
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+
+// ---cut---
+async function signInWithX() {
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'twitter',
+    provider: 'x',
   })
 }
 ```
 
 </TabPanel>
-<TabPanel id="kotlin" label="Kotlin">
+<TabPanel id="flutter" label="Flutter">
 
-When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Twitter` as the `Provider`:
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) with `x` as the `provider`:
 
-```kotlin
-suspend fun signInWithTwitter() {
-	supabase.auth.signInWith(Twitter)
+```dart
+Future<void> signInWithX() async {
+  await supabase.auth.signInWithOAuth(
+    OAuthProvider.x,
+    redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+    authScreenLaunchMode:
+        kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+  );
 }
 ```
 
 </TabPanel>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+When your user signs in, call [`signInWithOAuth(provider:)`](/docs/reference/swift/auth-signinwithoauth) with `.x` as the `provider`:
+
+```swift
+func signInWithX() async throws {
+  try await supabase.auth.signInWithOAuth(provider: .x)
+}
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `X` as the `Provider`:
+
+```kotlin
+suspend fun signInWithX() {
+	supabase.auth.signInWith(X)
+}
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.Twitter` as the provider:
+
+```c#
+var state = await supabase.Auth.SignIn(Provider.Twitter);
+var signInUrl = state.Uri;
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
+
+<$Partial path="oauth_pkce_flow.mdx" />
 
 <Tabs
   scrollable
@@ -97,15 +176,45 @@ suspend fun signInWithTwitter() {
 When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+
+// ---cut---
 async function signOut() {
   const { error } = await supabase.auth.signOut()
 }
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+  await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+When your user signs out, call [signOut()](/docs/reference/swift/auth-signout) to remove them from the browser session:
+
+```swift
+func signOut() async throws {
+  try await supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```kotlin
 suspend fun signOut() {
@@ -114,10 +223,22 @@ suspend fun signOut() {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs out, call [SignOut()](/docs/reference/csharp/sign-out) to remove them from the browser session and any objects from local storage:
+
+```c#
+await supabase.Auth.SignOut();
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Resources
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
+- [Supabase - Get started for free](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
-- [Twitter Developer Dashboard](https://developer.twitter.com/en/portal/dashboard)
+- [X Developer Dashboard](https://developer.x.com/en/portal/dashboard)

@@ -1,7 +1,9 @@
-import type { Datum } from 'components/ui/Charts/Charts.types'
+import type { SafeSqlFragment } from '@supabase/pg-meta'
 import React from 'react'
 
-interface Metadata {
+import type { Datum } from '@/components/ui/Charts/Charts.types'
+
+export interface Metadata {
   [key: string]: string | number | Object | Object[] | any
 }
 
@@ -20,13 +22,13 @@ export interface LogsWarning {
   linkText?: string
 }
 export interface LogsEndpointParams {
-  project: string // project ref
   iso_timestamp_start?: string
   iso_timestamp_end?: string
   sql?: string
 }
 
 export interface CustomLogData {
+  query?: SafeSqlFragment | undefined
   [other: string]: unknown
 }
 
@@ -35,6 +37,7 @@ export interface PreviewLogData extends CustomLogData {
   timestamp: number
   event_message: string
   metadata?: Metadata
+  [key: string]: string | number | Metadata | undefined
 }
 export type LogData = CustomLogData & PreviewLogData
 
@@ -51,7 +54,9 @@ export interface CountData {
 }
 
 export interface EventChartData extends Datum {
-  count: number
+  error_count: number
+  warning_count: number
+  ok_count: number
   timestamp: string
 }
 
@@ -87,6 +92,11 @@ export type QueryType =
   | 'storage'
   | 'supavisor'
   | 'postgrest'
+  | 'pg_upgrade'
+  | 'pg_cron'
+  | 'pgbouncer'
+  | 'etl'
+  | 'multigres'
 
 export type Mode = 'simple' | 'custom'
 

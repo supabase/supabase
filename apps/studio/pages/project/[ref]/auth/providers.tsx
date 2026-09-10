@@ -1,29 +1,30 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { PageContainer } from 'ui-patterns/PageContainer'
 
-import { AuthProvidersForm } from 'components/interfaces/Auth'
-import { AuthLayout } from 'components/layouts'
-import { FormsContainer } from 'components/ui/Forms'
-import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
-import type { NextPageWithLayout } from 'types'
+import { AuthProvidersForm } from '@/components/interfaces/Auth/AuthProvidersForm'
+import { BasicAuthSettingsForm } from '@/components/interfaces/Auth/BasicAuthSettingsForm'
+import { CustomAuthProviders } from '@/components/interfaces/Auth/CustomAuthProviders'
+import { AuthProvidersLayout } from '@/components/layouts/AuthLayout/AuthProvidersLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import type { NextPageWithLayout } from '@/types'
 
-const PageLayout: NextPageWithLayout = () => {
-  const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
-  const isPermissionsLoaded = usePermissionsLoaded()
+const ProvidersPage: NextPageWithLayout = () => {
+  const showProviders = useIsFeatureEnabled('authentication:show_providers')
+  const showCustomProviders = useIsFeatureEnabled('authentication:show_custom_providers')
 
-  if (isPermissionsLoaded && !canReadAuthSettings) {
-    return <NoPermission isFullPage resourceText="access your project's auth provider settings" />
-  } else {
-    return (
-      <FormsContainer>
-        <AuthProvidersForm />
-      </FormsContainer>
-    )
-  }
+  return (
+    <PageContainer size="default">
+      <BasicAuthSettingsForm />
+      {showProviders && <AuthProvidersForm />}
+      {showCustomProviders && <CustomAuthProviders />}
+    </PageContainer>
+  )
 }
 
-PageLayout.getLayout = (page) => {
-  return <AuthLayout>{page}</AuthLayout>
-}
+ProvidersPage.getLayout = (page) => (
+  <DefaultLayout>
+    <AuthProvidersLayout>{page}</AuthProvidersLayout>
+  </DefaultLayout>
+)
 
-export default PageLayout
+export default ProvidersPage

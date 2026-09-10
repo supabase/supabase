@@ -1,35 +1,32 @@
 // src/hooks.server.ts
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
-import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public'
+import { createServerClient } from '@supabase/ssr'
 import type { Handle } from '@sveltejs/kit'
 
 export const handle: Handle = async ({ event, resolve }) => {
-	event.locals.supabase = createSupabaseServerClient({
-		supabaseUrl: PUBLIC_SUPABASE_URL,
-		supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
-		event
-	})
+  event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
+    cookies: {
+      getAll: () => event.cookies.getAll(),
+      /**
+       * Note: You have to add the `path` variable to the
+       * set and remove method due to sveltekit's cookie API
+       * requiring this to be set, setting the path to `/`
+       * will replicate previous/standard behaviour (https://kit.svelte.dev/docs/types#public-types-cookies)
+       */
+      setAll: (cookiesToSet, headers) => {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          event.cookies.set(name, value, { ...options, path: '/' })
+        })
+        if (Object.keys(headers).length > 0) {
+          event.setHeaders(headers)
+        }
+      },
+    },
+  })
 
-	/**
-	 * a little helper that is written for convenience so that instead
-	 * of calling `const { data: { session } } = await supabase.auth.getSession()`
-	 * you just call this `await getSession()`
-	 */
-	event.locals.getSession = async () => {
-		const {
-			data: { session }
-		} = await event.locals.supabase.auth.getSession()
-		return session
-	}
-
-	return resolve(event, {
-		/**
-		 * There´s an issue with `filterSerializedResponseHeaders` not working when using `sequence`
-		 *
-		 * https://github.com/sveltejs/kit/issues/8061
-		 */
-		filterSerializedResponseHeaders(name) {
-			return name === 'content-range'
-		}
-	})
+  return resolve(event, {
+    filterSerializedResponseHeaders(name: string) {
+      return name === 'content-range' || name === 'x-supabase-api-version'
+    },
+  })
 }

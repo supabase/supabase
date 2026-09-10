@@ -1,27 +1,25 @@
+import { debounce } from 'lodash'
+import { Check, Code, Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
-  IconCheck,
-  IconCode,
-  IconLoader,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { debounce } from 'lodash'
+import { useEntityTypesQuery } from '@/data/entity-types/entity-types-infinite-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface TableSelectorProps {
   className?: string
@@ -42,14 +40,21 @@ const TableSelector = ({
 }: TableSelectorProps) => {
   const [open, setOpen] = useState(false)
   const [initiallyLoaded, setInitiallyLoaded] = useState(false)
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [searchInput, setSearchInput] = useState('')
 
-  const { data, isLoading, isSuccess, isError, error, refetch } = useEntityTypesQuery({
+  const {
+    data,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    error,
+    refetch,
+  } = useEntityTypesQuery({
     projectRef: project?.ref,
     search: searchInput,
     connectionString: project?.connectionString,
-    schema: selectedSchemaName,
+    schemas: [selectedSchemaName],
   })
   useEffect(() => {
     if (!initiallyLoaded && isSuccess) {
@@ -71,16 +76,16 @@ const TableSelector = ({
 
   return (
     <div className={className}>
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={setOpen} modal={false}>
+        <PopoverTrigger asChild>
           <Button
             size={size}
-            type="outline"
+            variant="outline"
             disabled={isLoading}
             className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
-            icon={isLoading ? <IconLoader className="animate-spin" size={12} /> : null}
+            icon={isLoading ? <Loader className="animate-spin" size={12} /> : null}
             iconRight={
-              <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
+              <Code className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
             }
           >
             {initiallyLoaded ? (
@@ -94,42 +99,37 @@ const TableSelector = ({
               <p className="flex text-xs text-light">Loading tables...</p>
             )}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="start">
-          <Command_Shadcn_>
-            <CommandInput_Shadcn_
-              placeholder="Find table..."
-              onValueChange={(str) => searchTables(str)}
-            />
-            <CommandList_Shadcn_>
+        </PopoverTrigger>
+        <PopoverContent className="p-0 w-64" side="bottom" align="start">
+          <Command>
+            <CommandInput placeholder="Find table..." onValueChange={(str) => searchTables(str)} />
+            <CommandList>
               {isLoading && (
                 <div className="flex items-center justify-center space-x-2 px-3 py-2">
-                  <IconLoader className="animate-spin" size={12} />
+                  <Loader className="animate-spin" size={12} />
                   <p className="flex text-xs text-light">Loading tables...</p>
                 </div>
               )}
 
               {showError && isError && (
-                <Alert_Shadcn_ variant="warning" className="!px-3 !py-3 !border-0 rounded-none">
-                  <AlertTitle_Shadcn_ className="text-xs text-amber-900">
-                    Failed to load tables
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_ className="text-xs mb-2">
+                <Alert variant="warning" className="px-3! py-3! border-0! rounded-none">
+                  <AlertTitle className="text-xs text-amber-900">Failed to load tables</AlertTitle>
+                  <AlertDescription className="text-xs mb-2">
                     Error: {(error as any)?.message}
-                  </AlertDescription_Shadcn_>
-                  <Button type="default" size="tiny" onClick={() => refetch()}>
+                  </AlertDescription>
+                  <Button variant="default" size="tiny" onClick={() => refetch()}>
                     Reload tables
                   </Button>
-                </Alert_Shadcn_>
+                </Alert>
               )}
 
               {isSuccess && (
                 <>
-                  <CommandGroup_Shadcn_ forceMount>
+                  <CommandGroup forceMount>
                     <ScrollArea className={(entities || []).length > 7 ? 'h-[210px]' : ''}>
-                      <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
+                      {entities.length === 0 && <CommandEmpty>No tables found</CommandEmpty>}
                       {!searchInput && (
-                        <CommandItem_Shadcn_
+                        <CommandItem
                           key="all-tables"
                           className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                           onSelect={() => {
@@ -143,12 +143,12 @@ const TableSelector = ({
                         >
                           <span>All tables</span>
                           {selectedSchemaName === '*' && (
-                            <IconCheck className="text-brand" strokeWidth={2} />
+                            <Check className="text-brand" strokeWidth={2} />
                           )}
-                        </CommandItem_Shadcn_>
+                        </CommandItem>
                       )}
                       {entities?.map((table) => (
-                        <CommandItem_Shadcn_
+                        <CommandItem
                           key={table.id}
                           className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                           onSelect={() => {
@@ -162,18 +162,18 @@ const TableSelector = ({
                         >
                           <span>{table.name}</span>
                           {selectedSchemaName === table.name && (
-                            <IconCheck className="text-brand" strokeWidth={2} />
+                            <Check className="text-brand" strokeWidth={2} />
                           )}
-                        </CommandItem_Shadcn_>
+                        </CommandItem>
                       ))}
                     </ScrollArea>
-                  </CommandGroup_Shadcn_>
+                  </CommandGroup>
                 </>
               )}
-            </CommandList_Shadcn_>
-          </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }

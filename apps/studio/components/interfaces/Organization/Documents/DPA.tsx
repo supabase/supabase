@@ -1,49 +1,43 @@
+import { Button } from 'ui'
+
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import { Button, IconExternalLink } from 'ui'
+} from '@/components/layouts/Scaffold'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useTrack } from '@/lib/telemetry/track'
 
-const DPA = () => {
+export const DPA = () => {
+  const track = useTrack()
+
   return (
-    <ScaffoldSection>
-      <ScaffoldSectionDetail className="sticky space-y-6 top-12">
-        <p className="text-base m-0">Data Processing Addendum (DPA)</p>
-        <div className="space-y-2 text-sm text-foreground-light m-0">
+    <ScaffoldSection className="py-12">
+      <ScaffoldSectionDetail>
+        <h4 className="mb-5">Data Processing Addendum (DPA)</h4>
+        <div className="space-y-2 text-sm text-foreground-light [&_p]:m-0">
           <p>
-            All organizations can access and use our DPA as part of their GDPR compliance. This is
-            only to access the document. Please ignore this if you have sent the signed document to
-            us.
+            Our Data Processing Addendum is incorporated into our{' '}
+            <InlineLink href="https://supabase.com/terms">Terms of Service</InlineLink>, so all
+            organizations get its protections automatically. No separate signed DPA is needed.
           </p>
-          <p>
-            Please review these details and add data specific to user processing where required.
-            Sign and return the signed DPA document to{' '}
-            <a
-              href="mailto:privacy@supabase.com"
-              target="_blank"
-              className="text-brand hover:text-brand"
-            >
-              privacy@supabase.com
-            </a>{' '}
-            for the document to be considered executed.
-          </p>
+          <p>If you signed a DPA with us previously, that agreement remains binding.</p>
         </div>
       </ScaffoldSectionDetail>
-      <ScaffoldSectionContent className="flex items-center justify-center h-full">
-        <a
-          href="https://supabase.com/downloads/docs/Supabase+DPA+231211.pdf"
-          target="_blank"
-          rel="noreferrer noopener"
-          download={true}
-        >
-          <Button type="default" iconRight={<IconExternalLink />}>
-            View DPA
+      <ScaffoldSectionContent>
+        <div className="@lg:flex items-center justify-center h-full">
+          <Button asChild variant="default">
+            <a
+              href="https://supabase.com/legal/customer-resources/data-processing-addendum"
+              target="_blank"
+              rel="noreferrer noopener"
+              onClick={() => track('document_view_button_clicked', { documentName: 'DPA' })}
+            >
+              View DPA
+            </a>
           </Button>
-        </a>
+        </div>
       </ScaffoldSectionContent>
     </ScaffoldSection>
   )
 }
-
-export default DPA

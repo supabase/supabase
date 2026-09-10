@@ -1,14 +1,24 @@
-import ServiceList from 'components/interfaces/Settings/API/ServiceList'
-import { SettingsLayout } from 'components/layouts'
-import type { NextPageWithLayout } from 'types'
+import { useParams } from 'common'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+
+import { IS_PLATFORM } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const ApiSettings: NextPageWithLayout = () => {
-  return (
-    <div className="flex flex-col gap-8 px-5 py-6 mx-auto 1xl:px-28 lg:px-16 xl:px-24 2xl:px-32">
-      <ServiceList />
-    </div>
-  )
+  const router = useRouter()
+  const { ref } = useParams()
+
+  useEffect(() => {
+    if (!ref) return
+    if (IS_PLATFORM) {
+      router.replace(`/project/${ref}/integrations/data_api/overview`)
+    } else {
+      router.replace(`/project/${ref}/settings/general`)
+    }
+  }, [ref, router])
+
+  return null
 }
 
-ApiSettings.getLayout = (page) => <SettingsLayout title="API Settings">{page}</SettingsLayout>
 export default ApiSettings

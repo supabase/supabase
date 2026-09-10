@@ -1,31 +1,30 @@
-import Panel from 'components/ui/Panel'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_ } from 'ui'
-import { CriticalIcon } from 'ui-patterns/Icons/StatusIcons'
-import DeleteOrganizationButton from './DeleteOrganizationButton'
+import { Admonition } from 'ui-patterns/Admonition'
 
-const OrganizationDeletePanel = () => {
-  return (
-    <Panel
-      title={
-        <p key="panel-title" className="uppercase">
-          Danger Zone
-        </p>
-      }
+import { DeleteOrganizationButton } from './DeleteOrganizationButton'
+import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
+
+export const OrganizationDeletePanel = () => {
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+
+  return selectedOrganization?.managed_by !== 'vercel-marketplace' ? (
+    <Admonition
+      type="destructive"
+      title="Deleting this organization will also remove its projects"
+      description="Make sure you have made a backup of your projects if you want to keep your data"
     >
-      <Panel.Content>
-        <Alert_Shadcn_ variant="destructive">
-          <CriticalIcon />
-          <AlertTitle_Shadcn_>
-            Deleting this organization will also remove its projects
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            Make sure you have made a backup if you want to keep your data
-          </AlertDescription_Shadcn_>
-          <DeleteOrganizationButton />
-        </Alert_Shadcn_>
-      </Panel.Content>
-    </Panel>
+      <DeleteOrganizationButton />
+    </Admonition>
+  ) : (
+    <PartnerManagedResource
+      managedBy={MANAGED_BY.VERCEL_MARKETPLACE}
+      resource="Organizations"
+      cta={{
+        installationId: selectedOrganization?.partner_id,
+        path: '/settings',
+        message: 'Delete organization in Vercel Marketplace',
+      }}
+    />
   )
 }
-
-export default OrganizationDeletePanel

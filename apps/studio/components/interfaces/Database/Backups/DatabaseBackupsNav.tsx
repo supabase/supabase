@@ -1,33 +1,52 @@
 import Link from 'next/link'
-import React from 'react'
-import { NavMenu, NavMenuItem } from 'ui'
+import { Badge, NavMenu, NavMenuItem } from 'ui'
+
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 type Props = {
-  projRef: string
-  active: 'scheduled' | 'pitr'
+  active: 'pitr' | 'scheduled' | 'rtnp'
 }
 
-function DatabaseBackupsNav({ projRef, active }: Props) {
+function DatabaseBackupsNav({ active }: Props) {
+  const { ref } = useSelectedProjectQuery()?.data || {}
+  const { databaseRestoreToNewProject } = useIsFeatureEnabled(['database:restore_to_new_project'])
+
   const navMenuItems = [
     {
+      enabled: true,
       id: 'scheduled',
       label: 'Scheduled backups',
-      href: `/project/${projRef}/database/backups/scheduled`,
+      href: `/project/${ref}/database/backups/scheduled`,
     },
     {
+      enabled: true,
       id: 'pitr',
       label: 'Point in time',
-      href: `/project/${projRef}/database/backups/pitr`,
+      href: `/project/${ref}/database/backups/pitr`,
     },
-  ]
+    {
+      enabled: databaseRestoreToNewProject,
+      id: 'rtnp',
+      label: (
+        <div className="flex items-center gap-2">
+          Restore to new project <Badge variant="warning">Beta</Badge>
+        </div>
+      ),
+      href: `/project/${ref}/database/backups/restore-to-new-project`,
+    },
+  ] as const
 
   return (
-    <NavMenu>
-      {navMenuItems.map((item) => (
-        <NavMenuItem key={item.label} active={item.id === active}>
-          <Link href={item.href}>{item.label}</Link>
-        </NavMenuItem>
-      ))}
+    <NavMenu className="overflow-hidden overflow-x-auto">
+      {navMenuItems.map(
+        (item) =>
+          item.enabled && (
+            <NavMenuItem key={item.id} active={item.id === active}>
+              <Link href={item.href}>{item.label}</Link>
+            </NavMenuItem>
+          )
+      )}
     </NavMenu>
   )
 }

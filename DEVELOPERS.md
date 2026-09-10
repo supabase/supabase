@@ -11,8 +11,8 @@
       - [Shared components](#shared-components)
       - [Installing packages](#installing-packages)
   - [Running Docker for Supabase Studio](#running-docker-for-supabase-studio)
-      - [Prerequsites](#prerequsites)
-      - [Get Started](#get-started)
+    - [Prerequisites](#prerequisites)
+    - [Get Started](#get-started)
   - [Create a pull request](#create-a-pull-request)
   - [Issue assignment](#issue-assignment)
   - [Common tasks](#common-tasks)
@@ -21,8 +21,6 @@
   - [Community channels](#community-channels)
   - [Contributors](#contributors)
 
-- [Common tasks](#common-tasks)
-  - [Add a redirect](#add-a-redirect)
 - [Community channels](#community-channels)
 
 ## Getting started
@@ -35,10 +33,11 @@ To ensure a positive and inclusive environment, please read our [code of conduct
 
 You will need to install and configure the following dependencies on your machine to build [Supabase](https://supabase.com):
 
-- [Git](http://git-scm.com/)
-- [Node.js v18.x (LTS)](http://nodejs.org)
-- [npm](https://www.npmjs.com/) version 9.x.x
-- [Docker](https://docs.docker.com/get-docker/) (to run studio locally)
+- [**Git**](https://git-scm.com/)
+- [**Node.js**](https://nodejs.org) (version as documented in [`.nvmrc`](./.nvmrc))
+- [**pnpm**](https://pnpm.io/) (version as documented in the `packageManager` field in [`package.json`](./package.json))
+- [**make**](https://www.gnu.org/software/make/) (or the equivalent to `build-essentials` for your OS)
+- [**Docker**](https://docs.docker.com/get-docker/) (to run studio locally)
 
 ## Local development
 
@@ -65,10 +64,10 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
 
 ### Install dependencies
 
-1. Install the dependencies in the root of the repo.
+1. Install the dependencies in the root of the repo:
 
    ```sh
-   npm install # install dependencies
+   pnpm install # install dependencies
    ```
 
 2. Copy the example `.env.local.example` to `.env.local`
@@ -77,9 +76,9 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
    cp apps/www/.env.local.example apps/www/.env.local
    ```
 
-3. After that you can run the apps simultaneously with the following.
+3. After that you can run the apps simultaneously with the following:
    ```sh
-   npm run dev # start all the applications
+   pnpm dev # start all the applications
    ```
 
 Then visit, and edit, any of the following sites:
@@ -95,10 +94,10 @@ Then visit, and edit, any of the following sites:
 You can run any of the sites individually by using the scope name. For example:
 
 ```sh
-npm run dev:www
+pnpm dev:www
 ```
 
-Note: Particularly for `www` make sure you have copied `apps/www/.env.local.example` to `apps/www/.env.local`
+Note: Particularly for `www` make sure you have copied `apps/www/.env.local.example` to `apps/www/.env.local`. For `docs`, see [`apps/docs/DEVELOPERS.md`](./apps/docs/DEVELOPERS.md).
 
 #### Shared components
 
@@ -113,17 +112,12 @@ The monorepo has a set of shared components under `/packages`:
 
 #### Installing packages
 
-Installing a package with NPM workspaces requires you to add the `-w` flag to tell NPM which workspace you want to install into. Do not install dependencies in their local folder, install them from the route using the `-w` flag.
-
-The format is: `npm install <package name> -w=<workspace to install in>`.
+Installing a package in a specific workspace requires you to move to the workspace and then run the install command.
 
 For example:
 
-- `npm install react -w common`: installs into `./packages/common`
-- `npm install react -w www`: installs into `./apps/www`
-- `npm install react -w studio`: installs into `./apps/studio`
-
-You do not need to install `devDependencies` in each workspace. These can all be installed in the root package.
+1. `cd apps/studio`: move to the `studio` workspace.
+2. `pnpm add react`: installs `react` into `studio` workspace.
 
 ---
 
@@ -131,7 +125,7 @@ You do not need to install `devDependencies` in each workspace. These can all be
 
 To run Studio locally, you'll need to setup Docker in addition to your NextJS frontend.
 
-#### Prerequsites
+#### Prerequisites
 
 First, make sure you have the Docker installed on your device. You can download and install it from [here](https://docs.docker.com/get-docker/).
 
@@ -149,7 +143,7 @@ First, make sure you have the Docker installed on your device. You can download 
    cp .env.example .env
    ```
 
-3. Run docker
+3. Run docker:
 
    ```sh
    docker compose up
@@ -190,13 +184,13 @@ Create a new entry in the [`redirects.js`](https://github.com/supabase/supabase/
 We support "federating" docs, meaning doc content can come directly from external repos other than [`supabase/supabase`](https://github.com/supabase/supabase).
 
 - It's great for things like client libs who have their own set of docs that we don't want to duplicate on the official Supabase docs (eg. [`supabase/vecs`](https://github.com/supabase/vecs)).
-- No duplication or manual steps required - fetches and generates automatically as part of the docs build pipeline
-- It's flexible - you can "embed" external docs nearly anywhere at any level in Supabase docs, but they will feel native
-- If you are maintaining a repo containing docs that you think could also live in Supabase docs, feel free to create an issue and we can work together to integrate
+- No duplication or manual steps required - fetches and generates automatically as part of the docs build pipeline.
+- It's flexible - you can "embed" external docs nearly anywhere at any level in Supabase docs, but they will feel native.
+- If you are maintaining a repo containing docs that you think could also live in Supabase docs, feel free to create an issue and we can work together to integrate.
 
 Federated docs work using Next.js's build pipeline. We use `getStaticProps()` to fetch remote documentation (ie. markdown) at build time which is processed and passed to the respective page within the docs.
 
-See the [Vecs Python source code](https://github.com/supabase/supabase/blob/master/apps/docs/pages/guides/ai/python/%5Bslug%5D.tsx) to see how we do this for [`supabase/vecs`](https://github.com/supabase/vecs). Use this as a starting point for federating other docs.
+See the [Vecs Python source code](https://github.com/supabase/supabase/tree/master/apps/docs/app/guides/ai/python/%5Bslug%5D) to see how we do this for [`supabase/vecs`](https://github.com/supabase/vecs). Use this as a starting point for federating other docs.
 
 Some things to consider:
 
@@ -207,7 +201,7 @@ Some things to consider:
 
 ## Community channels
 
-If you get stuck somewhere or have any questions, join our [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
+If you get stuck somewhere or have any questions, join our [Discord Community Server](https://discord.supabase.com/) or the [GitHub Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
 
 ## Contributors
 

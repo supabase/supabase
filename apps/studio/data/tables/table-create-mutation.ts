@@ -1,35 +1,36 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import pgMeta from '@supabase/pg-meta'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
-import { tableKeys } from './keys'
+import { privilegeKeys } from '@/data/privileges/keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
-export type CreateTableBody = components['schemas']['CreateTableBody']
+export type CreateTableBody = {
+  name: string
+  schema?: string
+  comment?: string | null
+}
 
 export type TableCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   // the schema is required field
   payload: CreateTableBody & { schema: string }
 }
 
 export async function createTable({ projectRef, connectionString, payload }: TableCreateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+  const { sql } = pgMeta.tables.create(payload)
 
-  const { data, error } = await post('/platform/pg-meta/{ref}/tables', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-    },
-    body: payload,
-    headers,
+  const { result } = await executeSql<void>({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['table', 'create'],
   })
 
-  if (error) handleError(error)
-  return data
+  return result
 }
 
 type TableCreateData = Awaited<ReturnType<typeof createTable>>
@@ -39,28 +40,36 @@ export const useTableCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<TableCreateData, ResponseError, TableCreateVariables>,
+  UseCustomMutationOptions<TableCreateData, ResponseError, TableCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableCreateData, ResponseError, TableCreateVariables>(
-    (vars) => createTable(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, payload } = variables
+  return useMutation<TableCreateData, ResponseError, TableCreateVariables>({
+    mutationFn: (vars) => createTable(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, payload } = variables
 
-        await queryClient.invalidateQueries(tableKeys.list(projectRef, payload.schema))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create database table: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await Promise.all([
+        invalidateTableMetadata(queryClient, {
+          projectRef,
+          schema: payload.schema,
+          tableName: payload.name,
+          includeLint: true,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: privilegeKeys.tablePrivilegesList(projectRef),
+        }),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create database table: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

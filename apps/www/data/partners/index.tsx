@@ -1,4 +1,4 @@
-import { IconAward, IconCompass, IconDollarSign, IconGlobe, IconTrendingUp } from 'ui'
+import { Compass, DollarSign, Globe, TrendingUp } from 'lucide-react'
 
 export default {
   metaTitle: 'Partner with Supabase',
@@ -15,13 +15,13 @@ export default {
     image: (
       <div className="relative z-10 flex items-center justify-center mb-4">
         <div
-          className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#3ECF8E] via-[#576a61] to-[#3ecfb2] border border-brand-900 flex items-center justify-center"
+          className="w-12 h-12 rounded-xl bg-brand border border-brand-900 flex items-center justify-center"
           style={{
-            boxShadow: '0 0 20px #25e7761f, 0 0 30px rgba(238, 240, 190, 0.1)',
+            boxShadow: '0 0 20px hsl(var(--brand-300)), 0 0 30px hsl(var(--brand-200))',
           }}
         >
           <svg
-            className="text-background-alternative h-8 w-8 flex-shrink-0"
+            className="text-background-alternative h-8 w-8 shrink-0"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -42,6 +42,10 @@ export default {
       label: 'Become a Partner',
       link: 'https://forms.supabase.com/partner',
     },
+    secondaryCta: {
+      label: 'Partner Catalog',
+      link: '/partners/catalog',
+    },
   },
   oAuthApp: {
     steps: [
@@ -51,7 +55,7 @@ export default {
       },
       {
         title: 'Add OAuth2 Support',
-        text: 'Use the OAuth2 protocol to access a users organization or project',
+        text: "Use the OAuth2 protocol to access a user's organization or project",
       },
       {
         title: 'Receive Tokens',
@@ -67,22 +71,22 @@ export default {
     {
       title: 'Technical support',
       description: 'Access technical support to back your integrations and customer projects.',
-      icon: <IconCompass strokeWidth={1.5} />,
+      icon: <Compass strokeWidth={1.5} />,
     },
     {
       title: 'Expand your ecosystem',
       description: 'Offer your own products and services to Supabase customers.',
-      icon: <IconGlobe strokeWidth={1.5} />,
+      icon: <Globe strokeWidth={1.5} />,
     },
     {
       title: 'Business growth',
       description: 'Explore new revenue streams and growth potential.',
-      icon: <IconDollarSign strokeWidth={1.5} />,
+      icon: <DollarSign strokeWidth={1.5} />,
     },
     {
       title: 'Scale with us',
       description: 'Scale automatically with the power of open-source Postgres technology.',
-      icon: <IconTrendingUp strokeWidth={1.5} />,
+      icon: <TrendingUp strokeWidth={1.5} />,
     },
   ],
   featuredApps: [

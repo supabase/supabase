@@ -1,9 +1,0 @@
-extends: existence
-message: "Use 'AM' or 'PM' (preceded by a space)."
-link: 'https://developers.google.com/style/word-list'
-level: error
-nonword: true
-tokens:
-  - '\d{1,2}[AP]M'
-  - '\d{1,2} ?[ap]m'
-  - '\d{1,2} ?[aApP]\.[mM]\.'

@@ -1,0 +1,68 @@
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import { databaseCronJobsKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+export type DatabaseCronJobDeleteVariables = {
+  projectRef: string
+  connectionString?: string | null
+  jobId: number
+  searchTerm?: string
+}
+
+export async function deleteDatabaseCronJob({
+  projectRef,
+  connectionString,
+  jobId,
+}: DatabaseCronJobDeleteVariables) {
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql: safeSql`SELECT cron.unschedule(${literal(jobId)});`,
+    queryKey: databaseCronJobsKeys.delete(),
+  })
+
+  return result
+}
+
+type DatabaseCronJobDeleteData = Awaited<ReturnType<typeof deleteDatabaseCronJob>>
+
+export const useDatabaseCronJobDeleteMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<
+    DatabaseCronJobDeleteData,
+    ResponseError,
+    DatabaseCronJobDeleteVariables
+  >,
+  'mutationFn'
+> = {}) => {
+  const queryClient = useQueryClient()
+
+  return useMutation<DatabaseCronJobDeleteData, ResponseError, DatabaseCronJobDeleteVariables>({
+    mutationFn: (vars) => deleteDatabaseCronJob(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, searchTerm } = variables
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: databaseCronJobsKeys.jobs(projectRef) }),
+        queryClient.invalidateQueries({
+          queryKey: databaseCronJobsKeys.listInfiniteMinimal(projectRef, searchTerm),
+        }),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete database cron job: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}

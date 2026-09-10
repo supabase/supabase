@@ -40,10 +40,6 @@ commands:
     title: supabase gen types
     product: 'general'
 
-  - id: supabase-gen-types-typescript
-    title: supabase gen types typescript
-    product: 'general'
-
   - id: supabase-secrets
     title: supabase secrets
     product: 'secrets'

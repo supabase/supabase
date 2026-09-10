@@ -1,0 +1,117 @@
+---
+title: 'Use Supabase with iOS and SwiftUI'
+subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from an iOS app.'
+breadcrumb: 'Framework Quickstarts'
+---
+
+<AiPrompt id="ios-swiftui" />
+
+<$Partial path="quickstart_db_setup.mdx" />
+
+## 3. Create an iOS SwiftUI app with Xcode
+
+Select the **Xcode > New Project > iOS > App** menu item.
+
+## 4. Set up AI tooling (optional)
+
+<$Partial path="quickstart_ai_tooling.mdx" />
+
+## 5. Install the Supabase client library
+
+Add the [supabase-swift](https://github.com/supabase/supabase-swift) package to your app using the Swift Package Manager.
+
+In Xcode, navigate to **File > Add Package Dependencies...** and enter the repository URL `https://github.com/supabase/supabase-swift` in the search bar. For detailed instructions, see Apple's [tutorial on adding package dependencies](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
+
+Make sure to add `Supabase` product package as a dependency to your application target.
+
+## 6. Initialize the Supabase client
+
+Create a new `Supabase.swift` file and initialize a Supabase client using your project URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=swift&connectTab=mobiles):
+
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=mobiles&framework=swift">
+    Open Connect panel
+  </a>
+</Button>
+
+```swift name=Supabase.swift
+import Supabase
+
+let supabase = SupabaseClient(
+  supabaseURL: URL(string: "YOUR_SUPABASE_URL")!,
+  supabaseKey: "YOUR_SUPABASE_PUBLISHABLE_KEY"
+)
+```
+
+<$Partial path="api_settings.mdx" variables={{ "framework": "swift", "tab": "mobiles" }} />
+
+<$Partial path="quickstart_mobile_env_note.mdx" />
+
+## 7. Create a data model for instruments
+
+Create a decodable struct to deserialize the data from the database.
+
+Add the following code to a new file named `Instrument.swift`.
+
+```swift name=Instrument.swift
+struct Instrument: Decodable, Identifiable {
+  let id: Int
+  let name: String
+}
+```
+
+## 8. Query data from the app
+
+Use a `task` to fetch the data from the database and display it using a `List`.
+
+Replace the default `ContentView` with the following code.
+
+```swift name=ContentView.swift
+import SwiftUI
+
+struct ContentView: View {
+
+  @State var instruments: [Instrument] = []
+  @State var errorMessage: String?
+  @State var isLoading = true
+
+  var body: some View {
+    List(instruments) { instrument in
+      Text(instrument.name)
+    }
+    .overlay {
+      if let errorMessage {
+        Text("Error loading instruments: \(errorMessage)")
+      } else if isLoading {
+        ProgressView()
+      }
+    }
+    .task {
+      do {
+        instruments = try await supabase.from("instruments").select().execute().value
+      } catch {
+        errorMessage = error.localizedDescription
+      }
+
+      isLoading = false
+    }
+  }
+}
+```
+
+## 9. Start the app
+
+Run the app on a simulator or a physical device by hitting `Cmd + R` on Xcode.
+
+## 10. Setting up deep links (optional)
+
+If you want to implement authentication features like magic links or OAuth, you need to set up deep links to redirect users back to your app. For instructions on configuring custom URL schemes for your iOS app, see the [deep linking guide](/docs/guides/auth/native-mobile-deep-linking?platform=swift).
+
+<$Partial path="quickstart_going_to_production.mdx" />
+
+## Next steps
+
+- Learn how to build a complete user management app with authentication in the [Swift tutorial](/docs/guides/getting-started/tutorials/with-swift)
+- Explore the [supabase-swift](https://github.com/supabase/supabase-swift) library on GitHub
+- [Insert more data](/docs/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/docs/guides/storage)

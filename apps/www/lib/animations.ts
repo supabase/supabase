@@ -2,6 +2,8 @@ export const DEFAULT_EASE = [0.24, 0.25, 0.05, 1]
 export const DEFAULT_DURATION = 0.4
 export const DEFAULT_DELAY = 0
 export const DEFAULT_TRANSITION = { ease: DEFAULT_EASE, duration: DEFAULT_DURATION }
+export const EASE_IN = [1, 0.05, 0, 0]
+export const EASE_OUT = [0, 0, 0.05, 1]
 
 interface AnimationProps {
   delay?: number

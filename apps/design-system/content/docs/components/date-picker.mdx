@@ -1,0 +1,75 @@
+---
+title: Date Picker
+description: A date picker component with range and presets.
+component: true
+source:
+  shadcn: true
+---
+
+<ComponentPreview name="date-picker-demo" peekCode wide />
+
+## Installation
+
+The Date Picker is built using a composition of the `<Popover />`, `<Button />` and `<Calendar />` components.
+
+See installation instructions for the [Popover](/docs/components/popover#installation) and the [Calendar](/docs/components/calendar#installation) components.
+
+## Usage
+
+```tsx
+'use client'
+
+import { format } from 'date-fns'
+import * as React from 'react'
+import { Button, Calendar } from 'ui'
+import {
+  DatePicker,
+  DatePickerButton,
+  DatePickerContent,
+  DatePickerTrigger,
+} from 'ui-patterns/DatePicker'
+
+export function DatePickerDemo() {
+  const [date, setDate] = React.useState<Date>()
+
+  return (
+    <DatePicker>
+      <DatePickerTrigger asChild>
+        <DatePickerButton variant="outline" className="w-[280px]">
+          {date ? format(date, 'PPP') : <span>Pick a date</span>}
+        </DatePickerButton>
+      </DatePickerTrigger>
+      <DatePickerContent>
+        <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+      </DatePickerContent>
+    </DatePicker>
+  )
+}
+```
+
+See the [React DayPicker](https://react-day-picker.js.org) documentation for more information.
+
+## API Reference
+
+- `<DatePicker />` accepts the same props as [the `<Popover />` component](./popover).
+- `<DatePickerTrigger />` accepts the same props as [the `<PopoverTrigger />` component](./popover#api-reference).
+- `<DatePickerContent />` accepts the same props as [the `<PopoverContent />` component](./popover#api-reference).
+- `<DatePickerButton />` accepts the same props as [the `<Button />` component](./button) and an optional `isInvalid` prop to visually indicate an invalid date.
+
+## Examples
+
+### Date Picker
+
+<ComponentPreview name="date-picker-demo" peekCode wide />
+
+### Date Range Picker
+
+<ComponentPreview name="date-picker-with-range" />
+
+### With Presets
+
+<ComponentPreview name="date-picker-with-presets" />
+
+### Form
+
+<ComponentPreview name="date-picker-form" />

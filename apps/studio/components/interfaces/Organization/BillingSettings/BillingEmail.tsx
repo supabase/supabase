@@ -1,110 +1,223 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
-import { useEffect } from 'react'
-import toast from 'react-hot-toast'
-
 import { useParams } from 'common'
+import { useEffect } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
+import { useInView } from 'react-intersection-observer'
+import { toast } from 'sonner'
+import { Form, FormControl, FormField, FormMessage, Input } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
+import { z } from 'zod'
+
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import { FormActions, FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
-import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
-import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
-import { Form, Input } from 'ui'
+} from '@/components/layouts/Scaffold'
+import { FormActions } from '@/components/ui/Forms/FormActions'
+import { FormPanel } from '@/components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
+import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+
+const FORM_ID = 'org-billing-email'
+const formSchema = z.object({
+  billingEmail: z.string().email('Please provide a valid email address').optional(),
+  additionalBillingEmails: z.string().email({ message: 'invalid_email' }).array().default([]),
+})
 
 const BillingEmail = () => {
   const { slug } = useParams()
-  const queryClient = useQueryClient()
-  const selectedOrganization = useSelectedOrganization()
-  const { name, billing_email } = selectedOrganization ?? {}
 
-  const formId = 'org-billing-email'
-  const initialValues = { billing_email: billing_email ?? '' }
+  const { can: canReadBillingEmail, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.customer'
+  )
+  const { can: canUpdateBillingData } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.customer'
+  )
 
-  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-  const canReadBillingEmail = useCheckPermissions(PermissionAction.READ, 'organizations')
-  const { mutateAsync: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
+  const { ref, inView } = useInView({ triggerOnce: true })
 
-  const onUpdateOrganizationEmail = async (values: any, { resetForm }: any) => {
-    if (!canUpdateOrganization) {
+  const { data: customerProfile, isPending: loadingBillingCustomer } =
+    useOrganizationCustomerProfileQuery(
+      { slug },
+      {
+        enabled: canReadBillingEmail && inView,
+        select: (data) =>
+          data ? { email: data.email, additional_emails: data.additional_emails } : data,
+      }
+    )
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      billingEmail: customerProfile?.email ?? '',
+      additionalBillingEmails: customerProfile?.additional_emails ?? [],
+    },
+  })
+  const additionalBillingEmails = useWatch({
+    control: form.control,
+    name: 'additionalBillingEmails',
+  })
+  const { errors, isDirty } = form.formState
+  const additionalEmailsError = errors.additionalBillingEmails ?? []
+
+  const { mutate: updateCustomerProfile, isPending: isUpdating } =
+    useOrganizationCustomerProfileUpdateMutation()
+
+  const onUpdateOrganizationEmail = async (values: z.infer<typeof formSchema>) => {
+    if (!canUpdateBillingData) {
       return toast.error('You do not have the required permissions to update this organization')
     }
     if (!slug) return console.error('Slug is required')
-    if (!name) return console.error('Organization name is required')
 
-    try {
-      const { billing_email } = await updateOrganization({
+    updateCustomerProfile(
+      {
         slug,
-        name,
-        billing_email: values.billing_email,
-      })
-      resetForm({ values: { billing_email }, initialValues: { billing_email } })
-      invalidateOrganizationsQuery(queryClient)
-      toast.success('Successfully saved settings')
-    } finally {
-    }
+        email: values.billingEmail,
+        additional_emails: values.additionalBillingEmails,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Successfully saved settings')
+          form.reset(values)
+        },
+      }
+    )
   }
 
+  useEffect(() => {
+    if (customerProfile && !isDirty) {
+      form.reset({
+        billingEmail: customerProfile.email ?? '',
+        additionalBillingEmails: customerProfile.additional_emails ?? [],
+      })
+    }
+  }, [form, customerProfile, isDirty])
+
   return (
-    <ScaffoldSection>
+    <ScaffoldSection ref={ref}>
       <ScaffoldSectionDetail>
         <div className="sticky space-y-2 top-12">
-          <p className="text-base m-0">Email Recipient</p>
+          <p className="text-foreground text-base m-0">Email Recipient</p>
           <p className="text-sm text-foreground-light m-0">
             All billing correspondence will go to this email
           </p>
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        <Form id={formId} initialValues={initialValues} onSubmit={onUpdateOrganizationEmail}>
-          {({ handleReset, values, initialValues, resetForm }: any) => {
-            const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
-
-            // [Alaister] although this "technically" is breaking the rules of React hooks
-            // it won't error because the hooks are always rendered in the same order
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            useEffect(() => {
-              const values = { billing_email: billing_email ?? '' }
-              resetForm({ values, initialValues: values })
-              // eslint-disable-next-line react-hooks/exhaustive-deps
-            }, [slug])
-
-            return (
+        {isPermissionsLoaded && !canReadBillingEmail ? (
+          <NoPermission resourceText="view this organization's email recipients" />
+        ) : (
+          <Form {...form}>
+            <form id={FORM_ID} onSubmit={form.handleSubmit(onUpdateOrganizationEmail)}>
               <FormPanel
                 footer={
                   <div className="flex py-4 px-8">
                     <FormActions
-                      form={formId}
+                      form={FORM_ID}
                       isSubmitting={isUpdating}
-                      hasChanges={hasChanges}
-                      handleReset={handleReset}
+                      hasChanges={isDirty}
+                      handleReset={form.reset}
+                      disabled={!canUpdateBillingData}
                       helper={
-                        !canUpdateOrganization
-                          ? "You need additional permissions to manage this organization's settings"
+                        !canUpdateBillingData
+                          ? 'You need additional permissions to update billing emails'
                           : undefined
                       }
                     />
                   </div>
                 }
               >
-                <FormSection>
-                  <FormSectionContent fullWidth loading={false}>
-                    <Input
-                      id="billing_email"
-                      size="small"
-                      label="Email address"
-                      type={canReadBillingEmail ? 'text' : 'password'}
-                      disabled={!canUpdateOrganization}
+                <FormSection className="px-8!">
+                  <FormSectionContent fullWidth loading={loadingBillingCustomer}>
+                    <FormField
+                      control={form.control}
+                      name="billingEmail"
+                      render={({ field }) => (
+                        <FormItemLayout label="Email address">
+                          <FormControl>
+                            <Input
+                              type="email"
+                              {...field}
+                              placeholder="Email"
+                              disabled={!canUpdateBillingData}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItemLayout>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="additionalBillingEmails"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          hideMessage
+                          label={
+                            <div className="flex items-center gap-x-1">
+                              <span>Additional emails</span>
+                              <InfoTooltip side="bottom">
+                                These email addresses will be CC'd in automated invoice or payment
+                                failure emails. Payment receipts will still only go to the primary
+                                billing address.
+                              </InfoTooltip>
+                            </div>
+                          }
+                        >
+                          <FormControl>
+                            <MultiSelector
+                              values={field.value}
+                              onValuesChange={field.onChange}
+                              disabled={!canUpdateBillingData}
+                            >
+                              <MultiSelectorTrigger
+                                deletableBadge
+                                showIcon={false}
+                                mode="inline-combobox"
+                                label="Add additional recipients"
+                                badgeLimit="wrap"
+                              />
+                              <MultiSelectorContent>
+                                <MultiSelectorList creatable />
+                              </MultiSelectorContent>
+                            </MultiSelector>
+                          </FormControl>
+                          {/* [Joshen] Manually construct the message here as MultiSelector doesn't handle array errors from RHF atm */}
+                          {Array.isArray(additionalEmailsError) &&
+                            additionalEmailsError.length > 0 && (
+                              <div className="flex flex-col gap-y-1 mt-2">
+                                {additionalEmailsError.map((_x, idx) => (
+                                  <p
+                                    key={`email-error-${idx}`}
+                                    className="text-sm text-destructive"
+                                  >
+                                    "{additionalBillingEmails[idx]}" is not a valid email address
+                                  </p>
+                                ))}
+                              </div>
+                            )}
+                        </FormItemLayout>
+                      )}
                     />
                   </FormSectionContent>
                 </FormSection>
               </FormPanel>
-            )
-          }}
-        </Form>
+            </form>
+          </Form>
+        )}
       </ScaffoldSectionContent>
     </ScaffoldSection>
   )

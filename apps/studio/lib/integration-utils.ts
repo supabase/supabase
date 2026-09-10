@@ -1,27 +1,22 @@
-import type { Integration } from 'data/integrations/integrations.types'
-import type { SupaResponse } from 'types'
-import { isResponseOk } from './common/fetch'
+import { getCreateMigrationsTableSQL, getInsertMigrationSQL } from '@supabase/pg-meta'
+
+import { isResponseOk } from './api/apiWrapper'
+import { fetchHandler } from '@/data/fetchers'
+import type { Integration } from '@/data/integrations/integrations.types'
+import { ResponseError, type SupaResponse } from '@/types'
 
 async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponse<T>> {
-  const response = await fetch(url)
+  const response = await fetchHandler(url)
   if (!response.ok) {
     return {
-      error: {
-        code: response.status,
-        message: response.statusText,
-        requestId: '',
-      },
+      error: new ResponseError(response.statusText, response.status),
     }
   }
   try {
     return (responseJson ? await response.json() : await response.text()) as T
   } catch (error: any) {
     return {
-      error: {
-        message: error.message,
-        code: 500,
-        requestId: '',
-      },
+      error: new ResponseError(error.message, 500),
     }
   }
 }
@@ -83,31 +78,25 @@ export async function getInitialMigrationSQLFromGitHubRepo(
   const migrations = migrationFileResponses.filter((response) => isResponseOk(response)).join(';')
   const seed = isResponseOk(seedFileResponse) ? seedFileResponse : ''
 
-  const migrationsTableSql = /* SQL */ `
-    create schema if not exists supabase_migrations;
-    create table if not exists supabase_migrations.schema_migrations (
-      version text not null primary key,
-      statements text[],
-      name text
-    );
-    ${sortedFiles.map((file, i) => {
-      const migration = migrationFileResponses[i]
-      if (!isResponseOk(migration)) return ''
+  const createMigrationsTableSql = getCreateMigrationsTableSQL()
 
-      const version = file.name.split('_')[0]
-      const statements = JSON.stringify(
-        migration
-          .split(';')
-          .map((statement) => statement.trim())
-          .filter(Boolean)
-      )
+  const migrationsTableSql = `
+    ${createMigrationsTableSql}
+    ${sortedFiles
+      .map((file, i) => {
+        const migration = migrationFileResponses[i]
+        if (!isResponseOk(migration)) return ''
 
-      return /* SQL */ `
-        insert into supabase_migrations.schema_migrations (version, statements, name)
-        select '${version}', array_agg(jsonb_statements)::text[], '${file.name}'
-        from jsonb_array_elements_text($statements$${statements}$statements$::jsonb) as jsonb_statements;
-      `
-    })}
+        const version = file.name.split('_')[0]
+        const statements = JSON.stringify(
+          migration
+            .split(';')
+            .map((statement) => statement.trim())
+            .filter(Boolean)
+        )
+        return getInsertMigrationSQL({ name: file.name, version, statements })
+      })
+      .join('')}
   `
 
   return `${migrations};${migrationsTableSql};${seed}`

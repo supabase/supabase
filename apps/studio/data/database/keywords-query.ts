@@ -1,42 +1,39 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { getKeywordsSql } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
 
-export type DatabaseKeyword = { word: string }
-
-export const getKeywordsQuery = () => {
-  const sql = /* SQL */ `
-SELECT word FROM pg_get_keywords();
-`.trim()
-
-  return sql
-}
+import { databaseKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type KeywordsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
-export type KeywordsData = { result: string[] }
-export type KeywordsError = unknown
-
-export const useKeywordsQuery = <TData extends KeywordsData = KeywordsData>(
+export async function getKeywords(
   { projectRef, connectionString }: KeywordsVariables,
-  options: UseQueryOptions<ExecuteSqlData, KeywordsError, TData> = {}
-) => {
-  return useExecuteSqlQuery(
-    {
-      projectRef,
-      connectionString,
-      sql: getKeywordsQuery(),
-      queryKey: ['keywords'],
-    },
-    {
-      select: (data) => {
-        return {
-          result: data.result.map((x: DatabaseKeyword) => x.word.toLocaleLowerCase()),
-        } as any
-      },
-      ...options,
-    }
+  signal?: AbortSignal
+) {
+  const sql = getKeywordsSql()
+
+  const { result } = await executeSql(
+    { projectRef, connectionString, sql, queryKey: ['keywords'] },
+    signal
   )
+
+  return result.map((x: { word: string }) => x.word.toLocaleLowerCase()) as string[]
 }
+
+export type KeywordsData = Awaited<ReturnType<typeof getKeywords>>
+export type KeywordsError = ResponseError
+
+export const useKeywordsQuery = <TData = KeywordsData>(
+  { projectRef, connectionString }: KeywordsVariables,
+  { enabled = true, ...options }: UseCustomQueryOptions<KeywordsData, KeywordsError, TData> = {}
+) =>
+  useQuery<KeywordsData, KeywordsError, TData>({
+    queryKey: databaseKeys.keywords(projectRef),
+    queryFn: ({ signal }) => getKeywords({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

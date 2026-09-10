@@ -1,40 +1,73 @@
 import { includes, noop } from 'lodash'
-import { Button, IconEdit2, IconLink, Input, Listbox, Select } from 'ui'
+import { Edit, Expand, Eye } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+  InputGroupTextarea,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  TextArea,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import { DateTimeInput } from './DateTimeInput'
-import type { RowField } from './RowEditor.types'
+import type { EditValue, RowField } from './RowEditor.types'
+import { isValueTruncated } from './RowEditor.utils'
+
+const TRUNCATE_DESCRIPTION =
+  'Note: Value is too large to be rendered in the dashboard. Please expand the editor to edit the value'
 
 export interface InputFieldProps {
   field: RowField
   errors: any
+  isNewRow?: boolean
   isEditable?: boolean
   onUpdateField?: (changes: object) => void
   onEditJson?: (data: any) => void
+  onEditText?: (data: EditValue) => void
   onSelectForeignKey?: () => void
 }
 
-const InputField = ({
+export const InputField = ({
   field,
   errors,
+  isNewRow = false,
   isEditable = true,
   onUpdateField = noop,
   onEditJson = noop,
+  onEditText = noop,
   onSelectForeignKey = noop,
 }: InputFieldProps) => {
   if (field.enums.length > 0) {
     const isArray = field.format[0] === '_'
     if (isArray) {
       return (
-        <div className="text-area-text-sm">
-          <Input.TextArea
-            layout="horizontal"
-            label={field.name}
+        <FormItemLayout
+          isReactForm={false}
+          layout="horizontal"
+          label={field.name}
+          labelOptional={field.format}
+          description={field.comment}
+          className="[&>div:first-child>span]:text-foreground-lighter"
+          error={errors[field.name]}
+        >
+          <TextArea
+            data-testid={`${field.name}-input`}
             className="text-sm"
-            descriptionText={field.comment}
-            labelOptional={field.format}
             disabled={!isEditable}
-            error={errors[field.name]}
             rows={5}
             value={field.value ?? ''}
             placeholder={
@@ -44,138 +77,214 @@ const InputField = ({
                   ? 'EMPTY'
                   : `Default: ${field.defaultValue}`
             }
-            onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+            onChange={(event) => onUpdateField({ [field.name]: event.target.value })}
           />
-        </div>
+        </FormItemLayout>
       )
     } else {
       return (
-        <Select
-          size="medium"
+        <FormItemLayout
+          isReactForm={false}
           layout="horizontal"
-          value={field.value ?? ''}
           label={field.name}
           labelOptional={field.format}
-          descriptionText={field.comment}
-          disabled={!isEditable}
-          error={errors[field.name]}
-          onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+          description={field.comment}
+          className="[&>div:first-child>span]:text-foreground-lighter"
         >
-          <Select.Option value="">---</Select.Option>
-          {field.enums.map((value: string) => (
-            <Select.Option key={value} value={value}>
-              {value}
-            </Select.Option>
-          ))}
-        </Select>
+          <Select
+            value={field.value ?? ''}
+            onValueChange={(value: string) => onUpdateField({ [field.name]: value })}
+            disabled={!isEditable}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="---" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value={null as any}>---</SelectItem>
+                {field.enums.map((value) => (
+                  <SelectItem key={value} value={value}>
+                    {value}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </FormItemLayout>
       )
     }
   }
 
   if (field.foreignKey !== undefined) {
     return (
-      <Input
+      <FormItemLayout
+        isReactForm={false}
         layout="horizontal"
         label={field.name}
-        value={field.value ?? ''}
-        descriptionText={
+        labelOptional={field.format}
+        description={
           <>
-            {field.comment && (
-              <span className="text-sm text-foreground-lighter">{field.comment} </span>
-            )}
-            <span className="text-sm text-foreground-lighter">
-              {field.comment && '('}Has a foreign key relation to
-            </span>
-            <span className="text-code font-mono text-xs text-foreground-lighter">
-              {field.foreignKey.target_table_schema}.{field.foreignKey.target_table_name}.
-              {field.foreignKey.target_column_name}
-            </span>
-            {field.comment && <span className="text-sm text-foreground-lighter">{`)`}</span>}
+            <>
+              {field.comment && (
+                <span className="text-sm text-foreground-lighter">{field.comment} </span>
+              )}
+              <span className="text-sm text-foreground-lighter">
+                {field.comment && '('}Has a foreign key relation to
+              </span>
+              <span className="text-code font-mono text-xs text-foreground-lighter">
+                {field.foreignKey.target_table_schema}.{field.foreignKey.target_table_name}.
+                {field.foreignKey.target_column_name}
+              </span>
+              {field.comment && <span className="text-sm text-foreground-lighter">{`)`}</span>}
+            </>
           </>
         }
-        labelOptional={field.format}
-        disabled={!isEditable}
+        className="[&>div:first-child>span]:text-foreground-lighter"
         error={errors[field.name]}
-        onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
-        actions={
-          <Button
-            type="default"
-            className="mr-1"
-            htmlType="button"
-            onClick={onSelectForeignKey}
-            icon={<IconLink />}
-          >
-            Select record
-          </Button>
-        }
-      />
+      >
+        <InputGroup>
+          <InputGroupInput
+            data-testid={`${field.name}-input`}
+            placeholder={field.defaultValue !== null ? `Default: ${field.defaultValue}` : 'NULL'}
+            value={field.value ?? ''}
+            disabled={!isEditable}
+            onChange={(event) => onUpdateField({ [field.name]: event.target.value })}
+          />
+          <InputGroupAddon align="inline-end">
+            {isEditable && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <InputGroupButton variant="default" icon={<Edit />} className="px-1.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-28">
+                  {field.isNullable && (
+                    <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
+                      Set to NULL
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={onSelectForeignKey}>Select record</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </InputGroupAddon>
+        </InputGroup>
+      </FormItemLayout>
     )
   }
 
   if (includes(TEXT_TYPES, field.format)) {
+    const isTruncated = isValueTruncated(field.value, field.format)
+
+    /**
+     * Handle `undefined` as the default value of the input field
+     * Otherwise, NULL should be treated as NULL, empty strings should be treated as empty strings
+     */
+
     return (
-      <div className="text-area-text-sm">
-        <Input.TextArea
-          layout="horizontal"
-          label={field.name}
-          className="text-sm"
-          descriptionText={field.comment}
-          labelOptional={field.format}
-          disabled={!isEditable}
-          error={errors[field.name]}
-          rows={5}
-          value={field.value ?? ''}
-          placeholder={
-            field.value === null && field.defaultValue === null
-              ? 'NULL'
-              : field.value === ''
-                ? 'EMPTY'
-                : typeof field.defaultValue === 'string' && field.defaultValue.length === 0
+      <FormItemLayout
+        isReactForm={false}
+        layout="horizontal"
+        label={field.name}
+        labelOptional={field.format}
+        description={
+          <>
+            {field.comment && <p>{field.comment}</p>}
+            {isTruncated && <p>{TRUNCATE_DESCRIPTION}</p>}
+          </>
+        }
+        error={errors[field.name]}
+      >
+        <InputGroup>
+          <InputGroupTextarea
+            data-testid={`${field.name}-input`}
+            className="text-sm"
+            disabled={!isEditable || isTruncated}
+            rows={5}
+            value={field.value ?? ''}
+            placeholder={
+              field.value === null
+                ? 'NULL'
+                : field.value === '' ||
+                    (typeof field.defaultValue === 'string' && field.defaultValue.length === 0)
                   ? 'EMPTY'
-                  : `NULL (Default: ${field.defaultValue})`
-          }
-          actions={
-            <div className="mr-1 mt-0.5">
-              {(field.isNullable || (!field.isNullable && field.defaultValue)) && (
-                <Button
-                  type="default"
-                  size="tiny"
-                  onClick={() => onUpdateField({ [field.name]: null })}
+                  : `Default: ${field.defaultValue === null ? 'NULL' : field.defaultValue}`
+            }
+            onChange={(event) => onUpdateField({ [field.name]: event.target.value })}
+          />
+          <InputGroupAddon align="block-end">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <InputGroupButton
+                  data-testid={`${field.name}-field-actions`}
+                  variant="default"
+                  icon={<Edit />}
+                  className="ml-auto px-1.5"
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-28">
+                {isEditable && (
+                  <>
+                    <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
+                      Set to NULL
+                    </DropdownMenuItem>
+                    {isNewRow && (
+                      <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: undefined })}>
+                        Set to Default
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+
+                <DropdownMenuItem
+                  onClick={() => onEditText({ column: field.name, value: field.value || '' })}
                 >
-                  Set to NULL
-                </Button>
-              )}
-            </div>
-          }
-          onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
-        />
-      </div>
+                  Expand editor
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </InputGroupAddon>
+        </InputGroup>
+      </FormItemLayout>
     )
   }
 
   if (includes(JSON_TYPES, field.format)) {
+    const isTruncated = isValueTruncated(field.value, field.format)
+
     return (
-      <Input
+      <FormItemLayout
+        isReactForm={false}
         layout="horizontal"
-        value={field.value ?? ''}
         label={field.name}
-        descriptionText={field.comment}
         labelOptional={field.format}
-        disabled={!isEditable}
-        placeholder={field?.defaultValue ?? 'NULL'}
-        error={errors[field.name]}
-        onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
-        actions={
-          <Button
-            type="default"
-            htmlType="button"
-            onClick={() => onEditJson({ column: field.name, jsonString: field.value })}
-            icon={<IconEdit2 />}
-          >
-            Edit JSON
-          </Button>
+        description={
+          <>
+            {field.comment && <p>{field.comment}</p>}
+            {isTruncated && <p>{TRUNCATE_DESCRIPTION}</p>}
+          </>
         }
-      />
+        error={errors[field.name]}
+      >
+        <InputGroup>
+          <InputGroupInput
+            data-testid={`${field.name}-input`}
+            value={field.value ?? ''}
+            disabled={!isEditable || isTruncated}
+            placeholder={!!field?.defaultValue ? `Default: ${field.defaultValue}` : 'NULL'}
+            onChange={(event) => onUpdateField({ [field.name]: event.target.value })}
+          />
+          <InputGroupAddon align="inline-end">
+            <InputGroupButton
+              variant="default"
+              type="button"
+              icon={isEditable ? <Edit /> : <Expand />}
+              className="px-1.5"
+              onClick={() => onEditJson({ column: field.name, value: field.value })}
+            />
+          </InputGroupAddon>
+        </InputGroup>
+      </FormItemLayout>
     )
   }
 
@@ -185,13 +294,15 @@ const InputField = ({
         name={field.name}
         format={field.format}
         value={field.value ?? ''}
+        isNullable={field.isNullable}
         description={
           <>
             {field.defaultValue && <p>Default: {field.defaultValue}</p>}
             {field.comment && <p>{field.comment}</p>}
           </>
         }
-        onChange={(value: any) => onUpdateField({ [field.name]: value })}
+        onChange={(value) => onUpdateField({ [field.name]: value })}
+        disabled={!isEditable}
       />
     )
   }
@@ -203,63 +314,107 @@ const InputField = ({
       ...(field.isNullable ? [{ value: 'null', label: 'NULL' }] : []),
     ]
 
-    // Ivan: The value coming in from backend is processed (NULL converted to 'null' string) so that
-    // it's properly selected in the listbox. The issue is with the internal implementation of the
-    // Listbox where the default column value is only considered when field.value is null
-    // (the JS kind). Since we're converting that null into 'null', defaultValue isn't used as it
-    // should. To fix this, we're only setting the defaultValue of the listbox and not setting the
-    // value in the next renders. This makes the ListBox an uncontrolled component but it works.
-    // PS: This is the third time we're fixing this in a month. If you have to fix this again, just
-    // use Input for booleans.
-    const defaultValue = field.value === 'null' ? field.defaultValue : field.value
+    const defaultValue = field.value === null ? undefined : field.value
 
     return (
-      <Listbox
-        size="small"
+      <FormItemLayout
+        isReactForm={false}
         layout="horizontal"
-        name={field.name}
         label={field.name}
         labelOptional={field.format}
-        descriptionText={field.comment}
-        value={defaultValue === null ? 'null' : defaultValue}
-        onChange={(value: string) => {
-          if (value === 'null') onUpdateField({ [field.name]: null })
-          else onUpdateField({ [field.name]: value })
-        }}
+        description={field.comment}
       >
-        {options.map((option) => (
-          <Listbox.Option
-            id={option.value}
-            key={option.value}
-            label={option.label}
-            value={option.value}
-          >
-            {option.label}
-          </Listbox.Option>
-        ))}
-      </Listbox>
+        <Select
+          value={defaultValue === null ? 'null' : defaultValue}
+          onValueChange={(value) => onUpdateField({ [field.name]: value })}
+          disabled={!isEditable}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select a value" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {options.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </FormItemLayout>
     )
   }
 
+  if (field.format === 'bytea') {
+    return (
+      <FormItemLayout
+        isReactForm={false}
+        layout="horizontal"
+        label={field.name}
+        labelOptional={field.format}
+        description={
+          <>
+            {field.comment && <p>{field.comment}</p>}
+            <p>Bytea columns are edited and displayed as hex in the dashboard</p>
+          </>
+        }
+        error={errors[field.name]}
+      >
+        <Input
+          data-testid={`${field.name}-input`}
+          value={field.value ?? ''}
+          placeholder={`\\x`}
+          disabled={!isEditable}
+          onChange={(event) => onUpdateField({ [field.name]: event.target.value })}
+        />
+      </FormItemLayout>
+    )
+  }
+
+  const isTruncated = isValueTruncated(field.value, field.format)
+
   return (
-    <Input
+    <FormItemLayout
+      isReactForm={false}
       layout="horizontal"
       label={field.name}
-      descriptionText={field.comment}
       labelOptional={field.format}
-      error={errors[field.name]}
-      value={field.value ?? ''}
-      placeholder={
-        field.isIdentity
-          ? 'Automatically generated as identity'
-          : field.defaultValue !== null
-            ? `Default: ${field.defaultValue}`
-            : 'NULL'
+      description={
+        <>
+          {field.comment && <p>{field.comment}</p>}
+          {isTruncated && <p>{TRUNCATE_DESCRIPTION}</p>}
+        </>
       }
-      disabled={!isEditable}
-      onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
-    />
+      error={errors[field.name]}
+    >
+      <InputGroup>
+        <InputGroupInput
+          data-testid={`${field.name}-input`}
+          value={field.value ?? ''}
+          placeholder={
+            field.isIdentity
+              ? 'Automatically generated as identity'
+              : field.defaultValue !== null
+                ? `Default: ${field.defaultValue}`
+                : 'NULL'
+          }
+          disabled={!isEditable || isTruncated}
+          onChange={(event) => onUpdateField({ [field.name]: event.target.value })}
+        />
+        <InputGroupAddon align="inline-end">
+          {isTruncated ? (
+            <InputGroupButton
+              variant="default"
+              type="button"
+              onClick={() => onEditJson({ column: field.name, value: field.value })}
+              icon={isEditable ? <Edit /> : <Eye />}
+            >
+              {isEditable ? 'Edit' : 'View'}
+            </InputGroupButton>
+          ) : undefined}
+        </InputGroupAddon>
+      </InputGroup>
+    </FormItemLayout>
   )
 }
-
-export default InputField

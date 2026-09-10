@@ -1,3 +1,13 @@
+import type {
+  DesiredInstanceSize,
+  PostgresEngine,
+  ReleaseChannel,
+} from '@/data/projects/new-project.constants'
+
+export const HIGH_AVAILABILITY_POSTGRES_ENGINE = '17' satisfies PostgresEngine
+export const HIGH_AVAILABILITY_RELEASE_CHANNEL = 'ga' satisfies ReleaseChannel
+export const HIGH_AVAILABILITY_INSTANCE_SIZE: DesiredInstanceSize = 'large'
+
 // [Joshen] Obtained from https://gist.github.com/tadast/8827699
 export const COUNTRY_LAT_LON = {
   AF: { lat: 33, lon: 65 },
@@ -252,3 +262,5 @@ export const COUNTRY_LAT_LON = {
   ZM: { lat: -15, lon: 30 },
   ZW: { lat: -20, lon: 30 },
 }
+
+export const sizes: DesiredInstanceSize[] = ['micro', 'small', 'medium']

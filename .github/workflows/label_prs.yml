@@ -1,0 +1,26 @@
+name: 'Pull Request Labeler'
+
+on:
+  pull_request_target:
+
+jobs:
+  labeler:
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - id: label
+        uses: actions/labeler@b8dd2d9be0f68b860e7dae5dae7d772984eacd6d # v6.2.0
+
+      - name: Comment when api-deploy-required is auto-applied
+        if: contains(steps.label.outputs.new-labels, 'api-deploy-required')
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'The `api-deploy-required` label was auto-applied to this PR because it updates the API types. The `Verify production API types` check reports whether the committed types match production; it is currently observational and does not block merging.',
+            })

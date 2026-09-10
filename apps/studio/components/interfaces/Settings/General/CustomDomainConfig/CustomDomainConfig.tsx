@@ -1,115 +1,207 @@
-import Link from 'next/link'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { useFlag, useParams } from 'common'
+import { AlertCircle } from 'lucide-react'
+import { Card, CardContent } from 'ui'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
-import { useParams } from 'common/hooks'
-import { FormHeader } from 'components/ui/Forms'
-import Panel from 'components/ui/Panel'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { IconAlertCircle } from 'ui'
-import CustomDomainActivate from './CustomDomainActivate'
-import CustomDomainDelete from './CustomDomainDelete'
-import CustomDomainsConfigureHostname from './CustomDomainsConfigureHostname'
-import CustomDomainsShimmerLoader from './CustomDomainsShimmerLoader'
-import CustomDomainVerify from './CustomDomainVerify'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useFlag, useSelectedOrganization } from 'hooks'
+import { CustomDomainActivate } from './CustomDomainActivate'
+import { CustomDomainDelete } from './CustomDomainDelete'
+import { CustomDomainsConfigureHostname } from './CustomDomainsConfigureHostname'
+import { CustomDomainsShimmerLoader } from './CustomDomainsShimmerLoader'
+import { CustomDomainVerify } from './CustomDomainVerify'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import {
+  useCustomDomainsQuery,
+  type CustomDomainsData,
+} from '@/data/custom-domains/custom-domains-query'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-const CustomDomainConfig = () => {
+export const CustomDomainConfig = () => {
   const { ref } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { isHighAvailability, isPending: isHighAvailabilityPending } = useHighAvailability()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const isBranch = Boolean(project?.parent_project_ref)
+  const entityLabel = isBranch ? 'branch' : 'project'
 
   const customDomainsDisabledDueToQuota = useFlag('customDomainsDisabledDueToQuota')
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const plan = organization?.plan?.id
+  const canLoadCustomDomains = !isHighAvailability && !isHighAvailabilityPending
 
-  const plan = subscription?.plan?.id
-  const { isLoading: isSettingsLoading, data: settings } = useProjectApiQuery({
-    projectRef: ref,
-  })
+  const { data: addons, isPending: isLoadingAddons } = useProjectAddonsQuery(
+    { projectRef: ref },
+    { enabled: canLoadCustomDomains }
+  )
+  const hasCustomDomainAddon = !!addons?.selected_addons.find((x) => x.type === 'custom_domain')
 
   const {
-    isLoading: isCustomDomainsLoading,
+    data: customDomainData,
+    isPending: isCustomDomainsLoading,
     isError,
     isSuccess,
-    data,
-  } = useCustomDomainsQuery({ projectRef: ref })
+    status: customDomainStatus,
+  } = useCustomDomainsQuery(
+    { projectRef: ref },
+    {
+      enabled: canLoadCustomDomains,
+      refetchInterval: (query) => {
+        const data = query.state.data
+        // while setting up the ssl certificate, we want to poll every 5 seconds
+        if (data?.customDomain?.ssl.status) {
+          return 10000 // 10 seconds
+        }
 
-  const isLoading = isSettingsLoading || isCustomDomainsLoading
+        return false
+      },
+    }
+  )
+
+  const { status } = customDomainData || {}
+
+  if (isHighAvailability) {
+    return (
+      <PageSection id="custom-domains">
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Custom domains</PageSectionTitle>
+            <PageSectionDescription>
+              Present a branded experience to your users
+            </PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <HighAvailabilityDisabledEmptyState
+            title="Custom domains unavailable on High Availability projects"
+            description="We're working to bring custom domains to High Availability projects. Contact support if this is blocking your work."
+            className="max-w-none mx-0 py-6"
+          />
+        </PageSectionContent>
+      </PageSection>
+    )
+  }
 
   return (
-    <section id="custom-domains">
-      <FormHeader title="Custom Domains" description="Present a branded experience to your users" />
-      {isLoading ? (
-        <Panel>
-          <Panel.Content className="space-y-6">
-            <CustomDomainsShimmerLoader />
-          </Panel.Content>
-        </Panel>
-      ) : isError ? (
-        <Panel>
-          <Panel.Content className="space-y-6">
-            <div className="flex items-center justify-center space-x-2 py-8">
-              <IconAlertCircle size={16} strokeWidth={1.5} />
-              <p className="text-sm text-foreground-light">
-                Failed to retrieve custom domain configuration. Please try again later or{' '}
-                <Link href={`/support/new?ref=${ref}&category=sales`} className="underline">
-                  contact support
-                </Link>
-                .
-              </p>
-            </div>
-          </Panel.Content>
-        </Panel>
-      ) : data?.status === '0_no_hostname_configured' ? (
-        <CustomDomainsConfigureHostname />
-      ) : data?.status === '0_not_allowed' ? (
-        <UpgradeToPro
-          icon={<IconAlertCircle size={18} strokeWidth={1.5} />}
-          primaryText={
-            customDomainsDisabledDueToQuota
-              ? 'New custom domains are temporarily disabled'
-              : 'Custom domains are a Pro plan add-on'
-          }
-          projectRef={ref}
-          organizationSlug={organization?.slug}
-          secondaryText={
-            customDomainsDisabledDueToQuota
-              ? 'We are working with our upstream DNS provider before we are able to sign up new custom domains. Please check back in a few hours.'
-              : plan === 'free'
-                ? 'To configure a custom domain for your project, please upgrade to the Pro plan with the custom domains add-on selected'
-                : 'To configure a custom domain for your project, please enable the add-on'
-          }
-          addon="customDomain"
-          disabled={customDomainsDisabledDueToQuota}
-        />
-      ) : (
-        <Panel>
-          {isSuccess && (
-            <div className="flex flex-col">
-              {(data.status === '1_not_started' ||
-                data.status === '2_initiated' ||
-                data.status === '3_challenge_verified') && (
-                <CustomDomainVerify
-                  projectRef={ref}
-                  customDomain={data.customDomain}
-                  settings={settings}
+    <PageSection id="custom-domains">
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Custom domains</PageSectionTitle>
+          <PageSectionDescription>
+            Present a branded experience to your users
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
+        {isHighAvailabilityPending || isLoadingAddons ? (
+          <Card>
+            <CardContent className="space-y-6">
+              <CustomDomainsShimmerLoader />
+            </CardContent>
+          </Card>
+        ) : !hasCustomDomainAddon ? (
+          <UpgradeToPro
+            primaryText={
+              customDomainsDisabledDueToQuota
+                ? 'New custom domains are temporarily disabled'
+                : 'Custom domains are a Pro Plan add-on'
+            }
+            secondaryText={
+              customDomainsDisabledDueToQuota
+                ? 'We are working with our upstream DNS provider before we are able to sign up new custom domains. Please check back in a few hours.'
+                : plan === 'free'
+                  ? 'Paid Plans come with free vanity subdomains or Custom Domains for an additional $10/month per domain.'
+                  : `To configure a custom domain for your ${entityLabel}, please enable the add-on. Each Custom Domain costs $10 per month.`
+            }
+            addon="customDomain"
+            source="customDomain"
+            featureProposition="enable custom domains"
+            disabled={customDomainsDisabledDueToQuota}
+          />
+        ) : isCustomDomainsLoading ? (
+          <Card>
+            <CardContent className="space-y-6">
+              <CustomDomainsShimmerLoader />
+            </CardContent>
+          </Card>
+        ) : isError ? (
+          <Card>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-center space-x-2 py-8">
+                <AlertCircle size={16} strokeWidth={1.5} />
+                <p className="text-sm text-foreground-light">
+                  Failed to retrieve custom domain configuration. Please try again later or{' '}
+                  <SupportLink
+                    queryParams={{ projectRef: ref, category: SupportCategories.SALES_ENQUIRY }}
+                    className={InlineLinkClassName}
+                  >
+                    contact support
+                  </SupportLink>
+                  .
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        ) : status === '0_no_hostname_configured' ? (
+          <CustomDomainsConfigureHostname />
+        ) : (
+          <Card>
+            <CardContent className="p-0">
+              {isSuccess ? (
+                <div className="flex flex-col">
+                  {(status === '1_not_started' ||
+                    status === '2_initiated' ||
+                    status === '3_challenge_verified') && <CustomDomainVerify />}
+
+                  {customDomainData.status === '4_origin_setup_completed' && (
+                    <CustomDomainActivate
+                      projectRef={ref}
+                      customDomain={customDomainData.customDomain}
+                    />
+                  )}
+
+                  {customDomainData.status === '5_services_reconfigured' && (
+                    <CustomDomainDelete
+                      projectRef={ref}
+                      customDomain={customDomainData.customDomain}
+                    />
+                  )}
+                </div>
+              ) : (
+                <CustomDomainConfigFallthrough
+                  fetchStatus={customDomainStatus}
+                  data={customDomainData}
                 />
               )}
-
-              {data.status === '4_origin_setup_completed' && (
-                <CustomDomainActivate projectRef={ref} customDomain={data.customDomain} />
-              )}
-
-              {data.status === '5_services_reconfigured' && (
-                <CustomDomainDelete projectRef={ref} customDomain={data.customDomain} />
-              )}
-            </div>
-          )}
-        </Panel>
-      )}
-    </section>
+            </CardContent>
+          </Card>
+        )}
+      </PageSectionContent>
+    </PageSection>
   )
 }
 
-export default CustomDomainConfig
+interface CustomDomainConfigFallthroughProps {
+  fetchStatus: 'error' | 'success' | 'pending'
+  data: CustomDomainsData | undefined
+}
+
+function CustomDomainConfigFallthrough({ fetchStatus, data }: CustomDomainConfigFallthroughProps) {
+  console.error(`Failing to display UI for custom domains:
+Fetch status: ${fetchStatus}
+Custom domain status: ${data?.status}`)
+
+  return null
+}

@@ -1,11 +1,11 @@
-import clsx from 'clsx'
 import { useParams } from 'common'
+import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import SVG from 'react-inlinesvg'
-import { Badge, Button, IconArrowRight } from 'ui'
+import { Badge, Button, cn } from 'ui'
 
-import { BASE_PATH } from 'lib/constants'
 import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
+import { BASE_PATH } from '@/lib/constants'
 
 interface ForeignKeyProps {
   foreignKey: ForeignKey
@@ -23,7 +23,7 @@ export const ForeignKeyRow = ({
   disabled = false,
   status,
   layout = 'horizontal',
-  closePanel,
+  closePanel: _closePanel,
   onSelectEdit,
   onSelectRemove,
   onSelectUndoRemove,
@@ -32,7 +32,7 @@ export const ForeignKeyRow = ({
 
   return (
     <div
-      className={clsx(
+      className={cn(
         layout === 'horizontal' ? 'items-center justify-between gap-x-2' : 'flex-col gap-y-3',
         'flex border border-strong px-4 py-4',
         'border-b-0 last:border-b first:rounded-t-md last:rounded-b-md'
@@ -49,7 +49,7 @@ export const ForeignKeyRow = ({
             {status !== undefined && (
               <Badge
                 variant={
-                  status === 'ADD' ? 'brand' : status === 'UPDATE' ? 'warning' : 'destructive'
+                  status === 'ADD' ? 'success' : status === 'UPDATE' ? 'warning' : 'destructive'
                 }
               >
                 {status}
@@ -60,7 +60,7 @@ export const ForeignKeyRow = ({
             </p>
             <Button
               asChild
-              type="default"
+              variant="default"
               title={`${foreignKey.schema}.${foreignKey.table}`}
               className="py-0.5 px-1.5 font-mono"
               icon={
@@ -71,14 +71,15 @@ export const ForeignKeyRow = ({
                   preProcessor={(code: any) =>
                     code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
                   }
-                  loader={<span className="block w-4 h-4 bg-[#133929] rounded-sm" />}
+                  loader={<span className="block w-4 h-4 bg-[#133929] rounded-xs" />}
                   cacheRequests={true}
                 />
               }
             >
               <Link
+                target="_blank"
+                rel="norefererer"
                 href={`/project/${ref}/editor/${foreignKey.tableId}`}
-                onClick={() => closePanel()}
               >
                 {foreignKey.schema}.{foreignKey.table}
               </Link>
@@ -89,9 +90,13 @@ export const ForeignKeyRow = ({
         <div className="flex flex-col gap-y-1">
           {foreignKey.columns.map((x, idx) => (
             <div key={`relation-${idx}}`} className="flex items-center gap-x-2">
-              <code className="text-xs">{x.source}</code>
-              <IconArrowRight />
-              <code className="text-xs">
+              <code
+                className={cn('text-xs', (x?.source ?? '').length === 0 && 'text-foreground-light')}
+              >
+                {x.source || '[column_name]'}
+              </code>
+              <ArrowRight size={16} />
+              <code className="text-code-inline">
                 {foreignKey.schema}.{foreignKey.table}.{x.target}
               </code>
             </div>
@@ -100,15 +105,15 @@ export const ForeignKeyRow = ({
       </div>
       {!disabled && (
         <div className="flex items-center gap-x-2">
-          <Button type="default" onClick={onSelectEdit}>
+          <Button variant="default" onClick={onSelectEdit}>
             Edit
           </Button>
           {foreignKey.toRemove ? (
-            <Button type="default" onClick={onSelectUndoRemove}>
+            <Button variant="default" onClick={onSelectUndoRemove}>
               Cancel remove
             </Button>
           ) : (
-            <Button type="default" onClick={onSelectRemove}>
+            <Button variant="default" onClick={onSelectRemove}>
               Remove
             </Button>
           )}

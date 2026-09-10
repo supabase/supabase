@@ -1,0 +1,290 @@
+---
+title = "Discovering and Interpreting API Errors in the Logs"
+github_url = "https://github.com/orgs/supabase/discussions/22849"
+date_created = "2024-04-18T02:38:44+00:00"
+topics = [ "database", "platform" ]
+keywords = [ "logs", "api", "errors", "postgrest", "cloudflare" ]
+database_id = "188986c9-019d-4f26-baaf-6f58cec8fa7a"
+---
+
+> A complimentary [guide](https://github.com/orgs/supabase/discussions/26224) was made for the Postgres logs
+
+## Navigating the API logs:
+
+The Database API is powered by a [ PostgREST web-server](https://postgrest.org/en/v12/), recording every request to the API Edge Network logs. To precisely navigate them, use the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs) with the query source set to **Logs**. These logs run on ClickHouse. Every log line is a row in a single `logs` table, tagged by a `source` column.
+
+API requests are the rows where `source = 'edge_logs'`.
+
+Notably, it contains:
+| field | description |
+--------|-------------|
+| event_message | the log's message |
+| timestamp | time event was recorded |
+| log_attributes | structured request and response fields, keyed by dotted path |
+
+Request and response details live in the `log_attributes` map. Read a field with bracket access, keeping the full dotted key. There are no unnesting joins.
+
+**Field access example**
+
+```sql
+select
+  -- event_message is a column, so it needs no lookup
+  event_message,
+  -- response.status_code is a log_attributes key
+  log_attributes['response.status_code'] as status_code
+from logs
+where source = 'edge_logs'
+limit 100;
+```
+
+The most useful fields for debugging are:
+
+> NOTE: not every field is included below. For a full list, check the API Gateway and Function Edge [logs field reference](/docs/guides/observability/log-field-reference).
+
+### Request object
+
+#### Cloudflare geographic data:
+
+**Suggested use cases:**
+
+- Detecting abuse from a specific region
+- Detecting activity spikes from certain regions
+
+| Column               | Description           | Sample value                                          |
+| -------------------- | --------------------- | ----------------------------------------------------- |
+| request.cf.city      | Requester's city      | Munich                                                |
+| request.cf.country   | Requester's country   | [DE](https://www.iso.org/iso-3166-country-codes.html) |
+| request.cf.continent | Requester's continent | EU                                                    |
+| request.cf.region    | Requester's region    | Bavaria                                               |
+| request.cf.latitudex | Requester's latitude  | 48.10840                                              |
+| request.cf.longitude | Requester's longitude | 11.61020                                              |
+| request.cf.timezone  | Requester's timezone  | Europe/Berlin                                         |
+
+**Unnesting example:**
+
+```sql
+select
+  log_attributes['request.cf.city'] as city
+from logs
+where source = 'edge_logs'
+limit 100;
+```
+
+#### IP and browser/environment data:
+
+**Suggested use cases:**
+
+- Detecting request behavior from IP
+- Detecting abuse by IP
+- Detecting errors by user_agent
+
+| Column                           | Description                            | Sample value                                                                                                    |
+| -------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| request.headers.cf_connecting_ip | Requester's IP                         | 80.81.18.138                                                                                                    |
+| request.headers.user_agent       | Requester's browser or app environment | Mozilla/5.0 (Linux; Android 11; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36 |
+
+**Unnesting example:**
+
+```sql
+select
+  log_attributes['request.headers.cf_connecting_ip'] as cf_connecting_ip
+from logs
+where source = 'edge_logs'
+limit 100;
+```
+
+#### Query type and formatting data:
+
+**Suggested use cases:**
+
+- identify problematic queries
+
+| Column         | Description                                               | Sample value                                                                                                              |
+| -------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| request.method | Request Method (PATCH, GET, PUT...)                       | GET                                                                                                                       |
+| request.url    | Request URL, which contains the PostgREST formatted query | https://yuhplfrsdxxxtldakizi.supabase.co/rest/v1/users?select=username&id=eq.63b6190e-214f-4b8a-b72d-3af6e1921411&limit=1 |
+
+**Unnesting example:**
+
+```sql
+select
+  log_attributes['request.method'] as method,
+  log_attributes['request.url'] as url
+from logs
+where source = 'edge_logs'
+limit 100;
+```
+
+### Response object
+
+#### Status code:
+
+**Suggested use cases:**
+
+- detect success/errors
+
+| Column               | Description                             | Sample value |
+| -------------------- | --------------------------------------- | ------------ |
+| response.status_code | Response status code (200, 404, 500...) | 404          |
+
+**Unnesting example:**
+
+```sql
+select
+  log_attributes['response.status_code'] as status_code
+from logs
+where source = 'edge_logs'
+limit 100;
+```
+
+## Finding errors
+
+### API level errors
+
+The `metadata.request.url` contains PostgREST formatted queries.
+
+For example, the following call to the JS client:
+
+```js
+let { data: countries, error } = await supabase.from('countries').select('name')
+```
+
+translates to calling the following endpoint:
+
+```bash
+https://<project ref>.supabase.co/rest/v1/countries?select=name
+```
+
+You can use regex ([Advanced Regex Guide](https://github.com/orgs/supabase/discussions/22640)) to find the objects related to your query. Try isolating by:
+
+- function names
+- column names
+- table names
+- query methods (select, insert, ...)
+
+Example:
+
+```sql
+select
+  timestamp,
+  log_attributes['response.status_code'] as status_code,
+  log_attributes['request.url'] as url,
+  event_message
+from logs
+where
+  source = 'edge_logs'
+  -- find all errors
+  and toInt32OrZero(log_attributes['response.status_code']) >= 400
+  -- find queries featuring a specific <table_name> and <column_name>
+  and match(log_attributes['request.url'], '<table_name>')
+  and match(event_message, '<column_name1>|<column_name2>')
+order by timestamp desc
+limit 100;
+```
+
+PostgREST has an [error reference table](https://postgrest.org/en/v12/references/errors.html) that you can use to interpret status codes.
+
+### Database-level errors
+
+However, some errors that are reported through the Database API occur at the Postgres level. If it is not clear which error occurred you should reference the timestamp of the error and try to see if you can find it in the Postgres logs.
+
+```sql
+select
+  timestamp,
+  log_attributes['parsed.error_severity'] as error_severity,
+  log_attributes['parsed.user_name'] as user_name,
+  log_attributes['parsed.query'] as query,
+  log_attributes['parsed.detail'] as detail,
+  log_attributes['parsed.sql_state_code'] as sql_state_code,
+  event_message
+from logs
+where
+  source = 'postgres_logs'
+  -- filter only for error events
+  and log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
+  -- All DB API requests are registered as the authenticator role
+  and log_attributes['parsed.user_name'] = 'authenticator'
+  -- find failed queries featuring the function <function_name>
+  and match(log_attributes['parsed.query'], '<function_name>')
+  -- limit the time of the search to be around the time of the failed API request
+  and timestamp between '2024-04-15 10:50:00' and '2024-04-15 10:50:27'
+order by timestamp desc
+limit 100;
+```
+
+Like PostgREST, Postgres has a [reference table](https://www.postgresql.org/docs/current/errcodes-appendix.html) for interpreting error codes.
+
+### PostgREST server and Cloudflare errors
+
+In some cases, errors may emerge because of Cloudflare or PostgREST server errors. For 500 and above errors, you may want to check your [PostgREST](/dashboard/project/_/logs/postgrest-logs) logs and the [Cloudflare docs.](https://developers.cloudflare.com/support/troubleshooting/cloudflare-errors/troubleshooting-cloudflare-5xx-errors/#error-502-bad-gateway-or-error-504-gateway-timeout))
+
+## Practical examples:
+
+**Find All Errors:**
+
+```sql
+select
+  timestamp,
+  log_attributes['response.status_code'] as status_code,
+  event_message,
+  log_attributes['request.path'] as path
+from logs
+where
+  source = 'edge_logs'
+  -- find all errors
+  and toInt32OrZero(log_attributes['response.status_code']) >= 400
+  -- only look at DB API
+  and match(log_attributes['request.path'], '^/rest/v1/')
+order by timestamp desc
+limit 100;
+```
+
+**Group errors by path and code:**
+
+```sql
+select
+  log_attributes['response.status_code'] as status_code,
+  log_attributes['request.path'] as path,
+  count() as reoccurrence_per_path
+from logs
+where
+  source = 'edge_logs'
+  -- find all errors
+  and toInt32OrZero(log_attributes['response.status_code']) >= 400
+  and match(log_attributes['request.path'], '^/rest/v1/') -- only look at DB API
+group by path, status_code
+order by reoccurrence_per_path desc
+limit 100;
+```
+
+**Find requests by region:**
+
+```sql
+select
+  log_attributes['request.path'] as path,
+  log_attributes['request.cf.region'] as region,
+  count() as region_count
+from logs
+where
+  source = 'edge_logs'
+  -- only look at DB API
+  and match(log_attributes['request.path'], '^/rest/v1/')
+group by region, path
+order by region_count desc
+limit 100;
+```
+
+**Find total requests by IP:**
+
+```sql
+select
+  log_attributes['request.headers.cf_connecting_ip'] as ip,
+  count() as ip_count
+from logs
+where
+  source = 'edge_logs'
+  and match(log_attributes['request.path'], '^/auth/v1/')
+group by ip
+order by ip_count desc
+limit 100;
+```

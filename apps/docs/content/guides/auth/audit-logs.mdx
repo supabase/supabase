@@ -1,0 +1,84 @@
+---
+id: 'auth-audit-logs'
+title: 'Auth Audit Logs'
+description: 'Monitor and track authentication events with audit logging.'
+subtitle: 'Monitor and track authentication events with audit logging.'
+---
+
+Auth audit logs provide comprehensive tracking of authentication events in your Supabase project. Audit logs are automatically captured for all authentication events and help you monitor user authentication activities, detect suspicious behavior, and maintain compliance with security requirements.
+
+## What gets logged
+
+Supabase auth audit logs automatically capture all authentication events including:
+
+- User sign-ups and sign-ins
+- Password changes and resets
+- Email verification events
+- Token refresh and sign-out events
+
+## Storage options
+
+Audit logs are stored in:
+
+- **External log storage** - Cost-efficient storage accessible through the dashboard
+- **Postgres database** (optional) - Stored in the `auth.audit_log_entries` table, searchable via SQL, but uses additional database storage
+
+You can enable or disable Postgres database storage to optimize your costs.
+
+### Configuring audit log storage
+
+1. Navigate to your project’s dashboard
+2. Go to **Authentication**
+3. Find the **Audit Logs** under the **Configuration** section
+4. Toggle "Write audit logs to the database" on to enable or off to disable database storage
+
+## Log format
+
+Audit logs contain detailed information about each authentication event:
+
+```json
+{
+  "timestamp": "2025-08-01T10:30:00Z",
+  "user_id": "uuid",
+  "action": "user_signedup",
+  "ip_address": "192.168.1.1",
+  "user_agent": "Mozilla/5.0...",
+  "metadata": {
+    "provider": "email"
+  }
+}
+```
+
+### Log actions reference
+
+| Action                          | Description                             |
+| ------------------------------- | --------------------------------------- |
+| `login`                         | User sign-in attempt                    |
+| `logout`                        | User sign-out                           |
+| `invite_accepted`               | Team invitation accepted                |
+| `user_signedup`                 | New user registration                   |
+| `user_invited`                  | User invitation sent                    |
+| `user_deleted`                  | User account deleted                    |
+| `user_modified`                 | User profile updated                    |
+| `user_recovery_requested`       | Password reset request                  |
+| `user_reauthenticate_requested` | User reauthentication required          |
+| `user_confirmation_requested`   | Email/phone confirmation requested      |
+| `user_repeated_signup`          | Duplicate signup attempt                |
+| `user_updated_password`         | Password change completed               |
+| `token_revoked`                 | Refresh token revoked                   |
+| `token_refreshed`               | Refresh token used to obtain new tokens |
+| `generate_recovery_codes`       | MFA recovery codes generated            |
+| `factor_in_progress`            | MFA factor enrollment started           |
+| `factor_unenrolled`             | MFA factor removed                      |
+| `challenge_created`             | MFA challenge initiated                 |
+| `verification_attempted`        | MFA verification attempt                |
+| `factor_deleted`                | MFA factor deleted                      |
+| `recovery_codes_deleted`        | MFA recovery codes deleted              |
+| `factor_updated`                | MFA factor settings updated             |
+| `mfa_code_login`                | Sign in with MFA code                   |
+| `identity_unlinked`             | An identity unlinked from account       |
+
+## Limitations
+
+- There may be a short delay before logs appear
+- Query capabilities are limited to the dashboard interface

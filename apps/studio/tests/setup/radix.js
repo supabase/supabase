@@ -27,6 +27,7 @@ class PointerEvent extends Event {
 }
 
 window.PointerEvent = PointerEvent
+window.HTMLElement.prototype.scrollIntoView = function () {}
 
 // // https://github.com/radix-ui/primitives/issues/420#issuecomment-771615182
 window.ResizeObserver = class ResizeObserver {
@@ -36,15 +37,4 @@ window.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
   disconnect() {}
-}
-
-window.DOMRect = {
-  fromRect: () => ({
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0,
-    width: 0,
-    height: 0,
-  }),
 }

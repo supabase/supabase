@@ -1,9 +1,19 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { isFeatureEnabled } from 'common'
 
-export const CATEGORY_OPTIONS = [
+const billingEnabled = isFeatureEnabled('billing:all')
+
+export type ExtendedSupportCategories = SupportCategories | 'Plan_upgrade' | 'Others'
+
+export const CATEGORY_OPTIONS: {
+  value: ExtendedSupportCategories
+  label: string
+  description: string
+  query?: string
+}[] = [
   {
     value: SupportCategories.PROBLEM,
-    label: 'Issues with APIs / client libraries',
+    label: 'APIs and client libraries',
     description: "Issues with your project's API and client libraries",
     query: undefined,
   },
@@ -22,20 +32,8 @@ export const CATEGORY_OPTIONS = [
   {
     value: SupportCategories.PERFORMANCE_ISSUES,
     label: 'Performance issues',
-    description: 'Reporting of performance issues is only available on the Pro plan',
+    description: 'Reporting of performance issues is only available on the Pro Plan',
     query: 'Performance',
-  },
-  {
-    value: SupportCategories.SALES_ENQUIRY,
-    label: 'Sales enquiry',
-    description: 'Questions about pricing, paid plans and Enterprise plans',
-    query: undefined,
-  },
-  {
-    value: SupportCategories.BILLING,
-    label: 'Billing',
-    description: 'Issues with credit card charges | invoices | overcharging',
-    query: undefined,
   },
   {
     value: SupportCategories.ABUSE,
@@ -44,15 +42,48 @@ export const CATEGORY_OPTIONS = [
     query: undefined,
   },
   {
-    value: SupportCategories.REFUND,
-    label: 'Refund enquiry',
-    description: 'Formal enquiry form for requesting refunds',
-    query: undefined,
-  },
-  {
     value: SupportCategories.LOGIN_ISSUES,
     label: 'Issues with logging in',
     description: 'Issues with logging in and MFA',
+    query: undefined,
+  },
+  ...(billingEnabled
+    ? [
+        {
+          value: SupportCategories.SALES_ENQUIRY,
+          label: 'Sales enquiry',
+          description: 'Questions about pricing, paid plans and Enterprise plans',
+          query: undefined,
+        },
+        {
+          value: SupportCategories.BILLING,
+          label: 'Billing',
+          description: 'Issues with credit card charges | invoices | overcharging',
+          query: undefined,
+        },
+        {
+          value: SupportCategories.REFUND,
+          label: 'Refund enquiry',
+          description: 'Formal enquiry form for requesting refunds',
+          query: undefined,
+        },
+      ]
+    : [
+        // [Joshen] Ideally shift this to shared-types, although not critical as API isn't validating the category
+        {
+          value: 'Plan_upgrade' as const,
+          label: 'Plan upgrade',
+          description: 'Enquire a plan upgrade for your organization',
+          query: undefined,
+        },
+      ]),
+  {
+    // Must stay 'Others' (plural). The backend lowercases this before writing
+    // it to Front's `Type` custom field, which is a fixed, case-sensitive
+    // enum containing 'others' — not 'other'.
+    value: 'Others' as const,
+    label: 'Other',
+    description: "An issue that doesn't fit the categories above",
     query: undefined,
   },
 ]
@@ -107,20 +138,41 @@ export const SERVICE_OPTIONS = [
   },
   {
     id: 5,
+    name: 'Multigres',
+    value: 'Multigres',
+    disabled: false,
+  },
+  {
+    id: 6,
     name: 'Realtime',
     value: 'Realtime',
     disabled: false,
   },
   {
-    id: 6,
+    id: 7,
     name: 'Storage',
     value: 'Storage',
     disabled: false,
   },
   {
-    id: 7,
+    id: 8,
     name: 'Others',
     value: 'Others',
     disabled: false,
   },
+]
+
+export const IPV4_MIGRATION_STRINGS = [
+  'ipv4',
+  'ipv6',
+  'supavisor',
+  'pgbouncer',
+  '5432',
+  'ENETUNREACH',
+  'ECONNREFUSED',
+  'P1001',
+  'connect: no route to',
+  'network is unreac',
+  'could not translate host name',
+  'address family not supported by protocol',
 ]

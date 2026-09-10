@@ -1,5 +1,4 @@
 import { FC } from 'react'
-import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
 import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import GuideLayout from './guides'
 
@@ -9,7 +8,6 @@ interface Props {
     description?: string
     hide_table_of_contents?: boolean
     video?: string
-    footerHelpType?: FooterHelpCalloutType
   }
   children: any
   toc?: any

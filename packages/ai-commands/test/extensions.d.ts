@@ -1,11 +1,10 @@
-import 'expect'
+import 'vitest'
 
-declare module 'expect' {
-  interface Matchers {
-    /**
-     * Check that a string matches a natural language criteria
-     * describing the expected output. Uses a LLM to evaluate.
-     */
-    toMatchCriteria(criteria: string): Promise<void>
-  }
+interface CustomMatchers<R = unknown> {
+  toMatchCriteria(criteria: string): R
+}
+
+declare module 'vitest' {
+  // `Matchers<R, T>` augments both `Assertion` and `AsymmetricMatchersContaining`.
+  interface Matchers<R, T> extends CustomMatchers<R> {}
 }

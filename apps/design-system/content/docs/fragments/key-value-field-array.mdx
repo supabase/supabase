@@ -1,0 +1,75 @@
+---
+title: Key/Value Field Array
+description: A shared form fragment for repeated text key/value pairs.
+component: true
+fragment: true
+---
+
+<ComponentPreview
+  name="key-value-field-array-demo"
+  description="A shared form fragment for repeated text key/value pairs."
+  peekCode
+  showDottedGrid
+  wide
+/>
+
+## Usage
+
+Use `KeyValueFieldArray` when each row is two text inputs backed by `react-hook-form`, such as HTTP headers, query parameters, or configuration parameters.
+
+```tsx
+import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
+import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
+```
+
+```tsx
+<KeyValueFieldArray
+  control={form.control}
+  name="headers"
+  keyFieldName="name"
+  valueFieldName="value"
+  createEmptyRow={() => ({ name: '', value: '' })}
+  keyPlaceholder="Header name"
+  valuePlaceholder="Header value"
+  addLabel="Add header"
+/>
+```
+
+`KeyValueFieldArray` owns the row add/remove behavior and renders the per-input form messages for you. Compose it inside `FormItemLayout` when you want the standard label, description, and message treatment around the entire section.
+
+## Validation
+
+`KeyValueFieldArray` is rendering-only. Keep validation in the consumer schema and use the shared validation helper when you want the standard draft-row behaviour:
+
+- fully empty rows may remain drafts
+- partially filled rows should show inline errors on the missing cell
+
+If you persist the array rows directly, strip fully empty draft rows before saving them.
+
+```tsx
+const formSchema = z
+  .object({
+    headers: z.array(z.object({ name: z.string().trim(), value: z.string().trim() })),
+  })
+  .superRefine((data, ctx) => {
+    getKeyValueFieldArrayValidationIssues({
+      rows: data.headers,
+      keyFieldName: 'name',
+      valueFieldName: 'value',
+      keyRequiredMessage: 'Header name is required',
+      valueRequiredMessage: 'Header value is required',
+    }).forEach((issue) => {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: issue.message,
+        path: ['headers', ...issue.path],
+      })
+    })
+  })
+```
+
+## When to use it
+
+- Use [Single Value Field Array](./single-value-field-array) for repeated single values such as redirect URIs.
+- Use `KeyValueFieldArray` for repeated text/text pairs such as headers, parameters, and config entries.
+- Build a custom row UI instead when each row mixes different controls, such as a text input paired with a `Select`.

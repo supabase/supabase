@@ -1,11 +1,13 @@
-import { useClickedOutside } from 'hooks'
 import { KeyboardEvent, ReactNode, useCallback, useEffect, useRef } from 'react'
+
+import { useClickedOutside } from '@/hooks/ui/useClickedOutside'
 
 interface BlockKeysProps {
   value: string | null
   children: ReactNode
   onEscape?: (value: string | null) => void
   onEnter?: (value: string | null) => void
+  ignoreOutsideClicks?: boolean
 }
 
 /**
@@ -13,7 +15,13 @@ interface BlockKeysProps {
  * We use this with cell editor to allow editor component to handle keys.
  * Example: press enter to add newline on textEditor
  */
-export const BlockKeys = ({ value, children, onEscape, onEnter }: BlockKeysProps) => {
+export const BlockKeys = ({
+  value,
+  children,
+  onEscape,
+  onEnter,
+  ignoreOutsideClicks = false,
+}: BlockKeysProps) => {
   const ref = useRef(null)
   const isClickedOutside = useClickedOutside(ref)
 
@@ -37,6 +45,7 @@ export const BlockKeys = ({ value, children, onEscape, onEnter }: BlockKeysProps
   )
 
   useEffect(() => {
+    if (ignoreOutsideClicks) return
     if (isClickedOutside && onEnter !== undefined) onEnter(value)
   }, [isClickedOutside])
 

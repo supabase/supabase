@@ -1,0 +1,37 @@
+---
+title: Badge
+description: Add contextual metadata to another item.
+component: true
+---
+
+Badge displays contextual information such as surrounding state or product category. Its purpose should be be self-evident based on surrounding context.
+
+<ComponentPreview name="badge-demo" peekCode />
+
+## Usage
+
+```tsx
+import { Badge } from '@/components/ui/badge'
+```
+
+```tsx
+<Badge variant="default">Default</Badge>
+```
+
+Avoid altering the Badge style, such as text case or roundedness. Consistent implementation makes Badge immediately recognizable throughout Supabase for denoting state or category. Use or create another component for other use cases, such as compute size and status.
+
+Keep Badge text to one or two words as it is designed to support other elements, not as a primary communication aid.
+
+Badge is designed to stand out, so should be used sparingly.
+
+## Examples
+
+### States
+
+<ComponentPreview name="badge-state" peekCode />
+
+### Secondary
+
+A content-only variant similar to the `text` variant of [Button](../components/button#types).
+
+<ComponentPreview name="badge-secondary" peekCode />

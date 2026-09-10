@@ -1,16 +1,22 @@
-import matter from 'gray-matter'
-
-import { MDXRemote } from 'next-mdx-remote'
-import { NextSeo } from 'next-seo'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Button, IconChevronRight, IconExternalLink, IconChevronLeft } from 'ui'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
+import { breadcrumbs } from '~/lib/breadcrumbs'
+import { SITE_ORIGIN } from '~/lib/constants'
+import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
-import { SITE_ORIGIN } from '~/lib/constants'
+import matter from 'gray-matter'
+import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
+import { MDXClient } from 'next-mdx-remote-client/csr'
+import { NextSeo } from 'next-seo'
+import Head from 'next/head'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Button } from 'ui'
+
+import SectionContainer from '@/components/Layouts/SectionContainer'
+import { MarkdownActions } from '@/components/MarkdownActions'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -62,16 +68,36 @@ export async function getStaticProps({ params }: any) {
 }
 
 function CaseStudyPage(props: any) {
-  const content = props.blog.content
+  const {
+    about,
+    company_url,
+    content,
+    date,
+    description,
+    logo,
+    meta_description,
+    meta_title,
+    misc,
+    name,
+    slug,
+    title,
+  } = props.blog
+
+  const ogImageUrl = encodeURI(
+    `${process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:54321' : 'https://obuldanrptloktxcffvn.supabase.co'}/functions/v1/og-images?site=customers&customer=${slug}&title=${meta_title ?? title}`
+  )
 
   const meta = {
-    title: props.blog.meta_title ?? `${props.blog.name} | Supabase Customer Stories`,
-    description: props.blog.meta_description ?? props.blog.description,
-    image:
-      `${SITE_ORIGIN}${props.blog.og_image}` ??
-      `${SITE_ORIGIN}/images/customers/og/customer-stories.jpg`,
-    url: `${SITE_ORIGIN}/customers/${props.blog.slug}`,
+    title: meta_title ?? `${name} | Supabase Customer Stories`,
+    description: meta_description ?? description,
+    image: ogImageUrl ?? `${SITE_ORIGIN}/images/customers/og/customer-stories.jpg`,
+    url: `${SITE_ORIGIN}/customers/${slug}`,
   }
+
+  const breadcrumbItems = [
+    ...breadcrumbs.customersIndex,
+    { name: meta_title ?? title, url: `https://supabase.com/customers/${slug}` },
+  ]
 
   return (
     <>
@@ -86,7 +112,7 @@ function CaseStudyPage(props: any) {
             //
             // to do: add expiration and modified dates
             // https://github.com/garmeeh/next-seo#article
-            publishedTime: props.blog.date,
+            publishedTime: date,
           },
           images: [
             {
@@ -96,42 +122,40 @@ function CaseStudyPage(props: any) {
           ],
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbItems)),
+          }}
+        />
+      </Head>
       <DefaultLayout>
-        <div
-          className="
-            container mx-auto px-8 py-16 sm:px-16
-            xl:px-20
-          "
-        >
+        <SectionContainer className="py-8 sm:py-16!">
           <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 mb-2 xl:col-span-2">
+            <div className="hidden xl:block col-span-12 mb-2 xl:col-span-2">
               {/* Back button */}
               <Link
                 href="/customers"
                 className="text-foreground-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
               >
-                <IconChevronLeft style={{ padding: 0 }} />
+                <ChevronLeft style={{ padding: 0 }} />
                 Back
               </Link>
             </div>
 
-            <div
-              className="col-span-12 lg:col-span-8
-
-          "
-            >
+            <div className="col-span-12 lg:col-span-8">
               <div>
                 <article className="flex flex-col gap-8">
-                  <div className="flex flex-col gap-8 max-w-xxl">
-                    <Link href="/customers" className="text-brand hover:text-brand-600 mb-2 mt-0">
+                  <div className="flex flex-col gap-4 sm:gap-8 max-w-xxl">
+                    <Link
+                      href="/customers"
+                      className="text-brand hover:text-brand-600 sm:mb-2 mt-0"
+                    >
                       Customer Stories
                     </Link>
-                    <h1 className="text-foreground text-4xl font-semibold xl:text-5xl">
-                      {props.blog.title}
-                    </h1>
-                    <h2 className="text-foreground text-xl xl:text-2xl">
-                      {props.blog.description}
-                    </h2>
+                    <h1 className="text-foreground text-4xl font-semibold xl:text-5xl">{title}</h1>
+                    <p className="text-foreground text-xl xl:text-2xl">{description}</p>
                   </div>
 
                   <div className="grid grid-cols-12 prose max-w-none gap-8 lg:gap-20">
@@ -141,37 +165,43 @@ function CaseStudyPage(props: any) {
                         <div className="relative h-16 w-32 lg:mt-5">
                           <Image
                             fill
-                            src={`${props.blog.logo}`}
-                            alt={`${props.blog.title} logo`}
+                            src={logo}
+                            alt={`${title} logo`}
+                            priority
+                            placeholder="blur"
+                            blurDataURL="/images/blur.png"
+                            draggable={false}
                             className="
-                                bg-no-repeat
-                                object-left
-                                object-contain
-                                m-0
+                              bg-no-repeat
+                              object-left
+                              object-contain
+                              m-0
 
-                                [[data-theme*=dark]_&]:brightness-200
-                                [[data-theme*=dark]_&]:contrast-0
-                                [[data-theme*=dark]_&]:filter
-                              "
+                              in-data-[theme*=dark]:brightness-200
+                              in-data-[theme*=dark]:contrast-0
+                              in-data-[theme*=dark]:filter
+                            "
                           />
                         </div>
 
                         <div className="flex flex-col space-y-2">
                           <span className="text-foreground-lighter">About</span>
-                          <p>{props.blog.about}</p>
-                          <span className="not-prose ">
-                            <a
-                              href={props.blog.company_url}
-                              className="flex cursor-pointer items-center space-x-1 transition-opacity text-foreground-lightround-ligtext-foreground-light:text-foreground-light"
-                              target="_blank"
-                            >
-                              <span>{props.blog.company_url}</span>
-                              <IconExternalLink size={14} />
-                            </a>
-                          </span>
+                          <p>{about}</p>
+                          {company_url && (
+                            <span className="not-prose ">
+                              <a
+                                href={company_url}
+                                className="flex cursor-pointer items-center space-x-1 transition-opacity text-foreground-lightround-ligtext-foreground-light:text-foreground-light"
+                                target="_blank"
+                              >
+                                <span>{company_url}</span>
+                                <ExternalLink size={14} />
+                              </a>
+                            </span>
+                          )}
                         </div>
 
-                        {props.blog.misc.map((x: any) => {
+                        {misc?.map((x: any) => {
                           return (
                             <div className="flex flex-col gap-0">
                               <span className="text-foreground-lighter">{x.label}</span>
@@ -180,10 +210,16 @@ function CaseStudyPage(props: any) {
                           )
                         })}
 
+                        <MarkdownActions
+                          pagePath={`/customers/${slug}`}
+                          pageType="customers"
+                          className="not-prose"
+                        />
+
                         <div>
                           <p>Ready to get started?</p>
                           <div>
-                            <Button asChild type="default" iconRight={<IconChevronRight />}>
+                            <Button asChild variant="default" iconRight={<ChevronRight />}>
                               <Link
                                 href="https://supabase.com/contact/enterprise"
                                 className="no-underline"
@@ -196,14 +232,14 @@ function CaseStudyPage(props: any) {
                       </div>
                     </div>
                     <div className="xm:col-span-7 col-span-12 lg:col-span-8 xl:col-span-8 ">
-                      <MDXRemote {...content} components={mdxComponents()} />
+                      <MDXClient {...content} components={mdxComponents()} />
                     </div>
                   </div>
                 </article>
               </div>
             </div>
           </div>
-        </div>
+        </SectionContainer>
 
         <CTABanner />
       </DefaultLayout>

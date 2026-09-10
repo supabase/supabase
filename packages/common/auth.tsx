@@ -1,4 +1,6 @@
-import type { Session } from '@supabase/supabase-js'
+'use client'
+
+import type { AuthError, Session } from '@supabase/supabase-js'
 import {
   createContext,
   PropsWithChildren,
@@ -8,7 +10,11 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { gotrueClient } from './gotrue'
+
+import { clearLocalStorage } from './constants/local-storage'
+import { gotrueClient, type User } from './gotrue'
+
+export type { User }
 
 const DEFAULT_SESSION: any = {
   access_token: undefined,
@@ -38,10 +44,12 @@ const DEFAULT_SESSION: any = {
 type AuthState =
   | {
       session: Session | null
+      error: AuthError | null
       isLoading: false
     }
   | {
       session: null
+      error: AuthError | null
       isLoading: true
     }
 
@@ -49,6 +57,7 @@ export type AuthContext = { refreshSession: () => Promise<Session | null> } & Au
 
 export const AuthContext = createContext<AuthContext>({
   session: null,
+  error: null,
   isLoading: true,
   refreshSession: () => Promise.resolve(null),
 })
@@ -61,14 +70,32 @@ export const AuthProvider = ({
   alwaysLoggedIn,
   children,
 }: PropsWithChildren<AuthProviderProps>) => {
-  const [state, setState] = useState<AuthState>({ session: null, isLoading: true })
+  const [state, setState] = useState<AuthState>({ session: null, error: null, isLoading: true })
+
+  useEffect(() => {
+    let mounted = true
+    gotrueClient.initialize().then(({ error }) => {
+      if (mounted && error !== null) {
+        setState((prev) => ({ ...prev, error }))
+      }
+    })
+
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   // Keep the session in sync
   useEffect(() => {
     const {
       data: { subscription },
     } = gotrueClient.onAuthStateChange((_event, session) => {
-      setState({ session, isLoading: false })
+      setState((prev) => ({
+        session,
+        // If there is a session, we clear the error
+        error: session !== null ? null : prev.error,
+        isLoading: false,
+      }))
     })
 
     return subscription.unsubscribe
@@ -86,7 +113,7 @@ export const AuthProvider = ({
 
   const value = useMemo(() => {
     if (alwaysLoggedIn) {
-      return { session: DEFAULT_SESSION, isLoading: false, refreshSession } as const
+      return { session: DEFAULT_SESSION, error: null, isLoading: false, refreshSession } as const
     } else {
       return { ...state, refreshSession } as const
     }
@@ -101,7 +128,16 @@ export const useAuth = () => useContext(AuthContext)
 
 export const useSession = () => useAuth().session
 
-export const useUser = () => useSession()?.user ?? null
+export const useUser = () => {
+  const user = useSession()?.user ?? null
+
+  // auth-js substitutes a throwing proxy for `user` when it was configured with
+  // `userStorage` and hasn't migrated the user into storage yet. Treat that as
+  // "no user" instead of crashing whenever a property on it is read.
+  if (user && (user as any).__isUserNotAvailableProxy) return null
+
+  return user
+}
 
 export const useIsUserLoading = () => useAuth().isLoading
 
@@ -109,4 +145,41 @@ export const useIsLoggedIn = () => {
   const user = useUser()
 
   return user !== null
+}
+
+export const useAuthError = () => useAuth().error
+
+export const useIsMFAEnabled = () => {
+  const user = useUser()
+
+  return user !== null && user.factors && user.factors.length > 0
+}
+
+export const signOut = async () => await gotrueClient.signOut()
+
+export const logOut = async () => {
+  await signOut()
+  clearLocalStorage()
+}
+
+gotrueClient.onAuthStateChange((_event, _session) => {})
+
+/**
+ * Gets a current access token.
+ *
+ * Calls getSession, which will refresh the token if needed.
+ */
+export async function getAccessToken() {
+  // ignore if server-side
+  if (typeof window === 'undefined') return undefined
+
+  const {
+    data: { session },
+    error,
+  } = await gotrueClient.getSession()
+  if (error) {
+    throw error
+  }
+
+  return session?.access_token
 }

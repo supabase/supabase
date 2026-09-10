@@ -1,7 +1,9 @@
-import React, { PropsWithChildren, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
-import { cn } from 'ui'
+'use client'
+
 import { detectBrowser, isBrowser } from 'common'
+import { motion } from 'framer-motion'
+import React, { PropsWithChildren, useEffect, useRef } from 'react'
+import { cn } from 'ui'
 
 interface Props {
   outerClassName?: string
@@ -12,6 +14,8 @@ interface Props {
   hasInnerShimmer?: boolean
   shimmerFromColor?: string
   shimmerToColor?: string
+  style?: React.CSSProperties
+  innerStyle?: React.CSSProperties
   hasMotion?: boolean
 }
 
@@ -26,6 +30,8 @@ const Panel = ({
   shimmerToColor,
   hasMotion = false,
   children,
+  style,
+  innerStyle,
 }: PropsWithChildren<Props>) => {
   const outerRef = useRef(null)
   const innerRef = useRef(null)
@@ -47,18 +53,18 @@ const Panel = ({
       const activeGlow =
         hasActiveOnHover && isActive
           ? `radial-gradient(65rem circle at ${x}px ${y}px, ${
-              activeColor === 'brand' ? 'var(--colors-brand9)' : 'hsl(var(--border-stronger))'
+              activeColor === 'brand' ? 'var(--color-brand-900)' : 'var(--border-stronger)'
             }, transparent), `
           : ''
       outerElement.style.backgroundImage = `
       ${activeGlow}radial-gradient(30rem circle at ${x}px ${y}px, ${
-        shimmerFromColor ?? 'hsl(var(--border-strong))'
-      }, ${shimmerToColor ?? 'hsl(var(--background-surface-300))'})`
+        shimmerFromColor ?? 'var(--border-strong)'
+      }, ${shimmerToColor ?? 'var(--background-surface-300)'})`
     }
 
     if (hasInnerShimmer) {
       innerElement.style.backgroundImage = isActive
-        ? `radial-gradient(7rem circle at ${x}px ${y}px, hsl(var(--background-surface-300)), transparent), radial-gradient(20rem circle at ${x}px ${y}px, hsl(var(--background-surface-200)), transparent)`
+        ? `radial-gradient(7rem circle at ${x}px ${y}px, var(--background-surface-300), transparent), radial-gradient(20rem circle at ${x}px ${y}px, var(--background-surface-200), transparent)`
         : ''
     }
   }
@@ -76,21 +82,23 @@ const Panel = ({
     <Component
       ref={outerRef}
       className={cn(
-        'relative rounded-xl bg-surface-100 bg-gradient-to-b from-border to-surface-200 p-px transition-all shadow-md',
+        'group/panel relative rounded-lg md:rounded-xl p-px bg-surface-75 bg-linear-to-b from-border to-border/50 dark:to-surface-100 transition-all hover:shadow-md',
         !trackCursor && hasActiveOnHover
           ? activeColor === 'brand'
-            ? 'hover:bg-none hover:!bg-brand'
-            : 'hover:bg-none hover:!bg-border-stronger'
+            ? 'hover:bg-none hover:bg-brand!'
+            : 'hover:bg-none hover:bg-border-stronger!'
           : '',
         outerClassName
       )}
       {...(hasMotion ? { whileHover: 'hover', animate: 'initial' } : undefined)}
+      style={style}
     >
       <div
         className={cn(
-          'relative z-10 w-full h-full rounded-xl bg-surface-100 overflow-hidden text-foreground-light',
+          'relative z-10 w-full h-full rounded-[7px] md:rounded-[11px] bg-surface-75 overflow-hidden text-foreground-light',
           innerClassName
         )}
+        style={innerStyle}
       >
         {children}
         <div

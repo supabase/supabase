@@ -1,33 +1,43 @@
-import clsx from 'clsx'
+import { motion, type Variants } from 'framer-motion'
+import { Check } from 'lucide-react'
 import { PricingInformation } from 'shared-data'
-import { Button, IconCheck } from 'ui'
+import { Button, cn } from 'ui'
+
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 export interface EnterpriseCardProps {
   plan: PricingInformation
   isCurrentPlan: boolean
-  billingViaPartner: boolean
+  variants?: Variants
 }
 
-const EnterpriseCard = ({ plan, isCurrentPlan, billingViaPartner }: EnterpriseCardProps) => {
-  const features = billingViaPartner ? plan.featuresPartner : plan.features
+export const EnterpriseCard = ({ plan, isCurrentPlan, variants }: EnterpriseCardProps) => {
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+
+  const features = plan.features
+  const currentPlan = selectedOrganization?.plan.name
+
+  const track = useTrack()
 
   return (
-    <div
+    <motion.div
       key={plan.id}
-      className={clsx(
+      variants={variants}
+      className={cn(
         'grid grid-cols-1 md:grid-cols-3 border rounded-md bg-studio',
         'py-4 col-span-12 justify-between gap-x-8'
       )}
     >
       <div className="flex flex-col justify-center px-4">
         <div className="flex items-center space-x-2">
-          <p className={clsx('text-brand text-sm uppercase')}>{plan.name}</p>
+          <p className={cn('text-brand text-sm uppercase')}>{plan.name}</p>
           {isCurrentPlan ? (
-            <div className="text-xs bg-surface-300 text-foreground-light rounded px-2 py-0.5">
+            <div className="text-xs bg-surface-300 text-foreground-light rounded-sm px-2 py-0.5">
               Current plan
             </div>
           ) : plan.nameBadge ? (
-            <div className="text-xs bg-surface-200 text-brand rounded px-2 py-0.5">
+            <div className="text-xs bg-surface-200 text-brand rounded-sm px-2 py-0.5">
               {plan.nameBadge}
             </div>
           ) : null}
@@ -35,11 +45,22 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingViaPartner }: EnterpriseCa
 
         <p className="text-sm mt-2 mb-4">{plan.description}</p>
 
-        <a href={plan.href} className="hidden md:block" target="_blank">
-          <Button block type="default" size="tiny">
+        <Button
+          block
+          asChild
+          variant="default"
+          size="tiny"
+          onClick={() =>
+            track('studio_pricing_plan_cta_clicked', {
+              selectedPlan: 'Enterprise',
+              currentPlan,
+            })
+          }
+        >
+          <a href={plan.href} className="hidden md:block" target="_blank">
             {plan.cta}
-          </Button>
-        </a>
+          </a>
+        </Button>
       </div>
 
       <div className="flex flex-col justify-center col-span-2 px-4 md:px-0">
@@ -52,7 +73,7 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingViaPartner }: EnterpriseCa
               key={typeof feature === 'string' ? feature : feature[0]}
               className="flex items-center py-2 first:mt-0"
             >
-              <IconCheck className="text-brand h-4 w-4" aria-hidden="true" strokeWidth={3} />
+              <Check className="text-brand h-4 w-4" aria-hidden="true" strokeWidth={3} />
               <span className="text-foreground mb-0 ml-3 ">
                 {typeof feature === 'string' ? feature : feature[0]}
               </span>
@@ -60,14 +81,23 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingViaPartner }: EnterpriseCa
           ))}
         </ul>
 
-        <a href={plan.href} className="visible md:hidden mt-8" target="_blank">
-          <Button block type="default" size="tiny">
+        <Button
+          block
+          asChild
+          variant="default"
+          size="tiny"
+          onClick={() =>
+            track('studio_pricing_plan_cta_clicked', {
+              selectedPlan: 'Enterprise',
+              currentPlan,
+            })
+          }
+        >
+          <a href={plan.href} className="visible md:hidden mt-8" target="_blank">
             {plan.cta}
-          </Button>
-        </a>
+          </a>
+        </Button>
       </div>
-    </div>
+    </motion.div>
   )
 }
-
-export default EnterpriseCard

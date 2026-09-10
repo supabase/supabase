@@ -1,61 +1,60 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import pgMeta from '@supabase/pg-meta'
+import { QueryClient, useQuery } from '@tanstack/react-query'
+import { z } from 'zod'
 
-import type { components } from 'data/api'
-import { get } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { privilegeKeys } from './keys'
+import { isScopedIntrospection, scopedIntrospectionReady } from '@/data/scoped-introspection'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type TablePrivilegesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
+  includedSchemas?: string[]
 }
 
-export type TablePrivilege = components['schemas']['PostgresTablePrivileges']
+export type PgTablePrivileges = z.infer<typeof pgMeta.tablePrivileges.zod>
 
-export async function getTablePrivileges(
-  { projectRef, connectionString }: TablePrivilegesVariables,
-  signal?: AbortSignal
-) {
-  if (!projectRef) throw new Error('projectRef is required')
-
-  const headers = new Headers()
-  if (connectionString) {
-    headers.set('x-connection-encrypted', connectionString)
-  }
-
-  const { data, error } = await get('/platform/pg-meta/{ref}/table-privileges', {
-    params: {
-      path: {
-        ref: projectRef,
-      },
-      // this is needed to satisfy the typescript, but it doesn't pass the actual header
-      header: {
-        'x-connection-encrypted': connectionString!,
-      },
-    },
-    signal,
-    headers,
-  })
-  if (error) throw error
-
-  return data
-}
-
-export type TablePrivilegesData = Awaited<ReturnType<typeof getTablePrivileges>>
+const pgMetaTablePrivilegesList = pgMeta.tablePrivileges.list()
+export type TablePrivilegesData = z.infer<typeof pgMetaTablePrivilegesList.zod>
 export type TablePrivilegesError = ResponseError
 
+async function getTablePrivileges(
+  { projectRef, connectionString, includedSchemas }: TablePrivilegesVariables,
+  signal?: AbortSignal
+) {
+  // Cold-load race guard -- see the module comment on scoped-introspection.ts.
+  await scopedIntrospectionReady()
+  const sql = pgMeta.tablePrivileges.list({
+    includedSchemas,
+    scoped: isScopedIntrospection(),
+  }).sql
+  const queryKey = ['table-privileges', includedSchemas?.join(',')]
+
+  const { result } = await executeSql({ projectRef, connectionString, sql, queryKey }, signal)
+
+  return result as TablePrivilegesData
+}
+
 export const useTablePrivilegesQuery = <TData = TablePrivilegesData>(
-  { projectRef, connectionString }: TablePrivilegesVariables,
+  vars: TablePrivilegesVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<TablePrivilegesData, TablePrivilegesError, TData> = {}
-) =>
-  useQuery<TablePrivilegesData, TablePrivilegesError, TData>(
-    privilegeKeys.tablePrivilegesList(projectRef),
-    ({ signal }) => getTablePrivileges({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  }: UseCustomQueryOptions<TablePrivilegesData, TablePrivilegesError, TData> = {}
+) => {
+  const { projectRef, includedSchemas } = vars
+  return useQuery<TablePrivilegesData, TablePrivilegesError, TData>({
+    queryKey: privilegeKeys.tablePrivilegesList(projectRef, includedSchemas),
+    queryFn: ({ signal }) => getTablePrivileges(vars, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
+}
+
+export function invalidateTablePrivilegesQuery(
+  client: QueryClient,
+  projectRef: string | undefined
+) {
+  return client.invalidateQueries({ queryKey: privilegeKeys.tablePrivilegesList(projectRef) })
+}

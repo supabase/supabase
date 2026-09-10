@@ -16,7 +16,7 @@ const NavigationMenuRefList = ({
   commonSectionsFile,
   specFile,
 }: NavigationMenuRefListProps) => {
-  const commonSections = useCommonSections(commonSectionsFile)
+  const commonSections = useCommonSections(commonSectionsFile, { enabled: !!commonSectionsFile })
   const spec = useSpec(specFile)
 
   if (!commonSections) {

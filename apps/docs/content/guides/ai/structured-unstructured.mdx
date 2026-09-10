@@ -13,9 +13,9 @@ Most vector stores treat metadata associated with embeddings like NoSQL, unstruc
 ```sql
 create table docs (
   id uuid primary key,
-  embedding vector(3),
+  embedding extensions.vector(3),
   content text,
-  url string
+  url text
 );
 
 insert into docs
@@ -24,14 +24,14 @@ values
   ('79409372-7556-4ccc-ab8f-5786a6cfa4f7', array[0.1, 0.2, 0.3], 'Hello world', '/hello-world');
 ```
 
-Notice that we've associated two pieces of metadata, `content` and `url`, with the embedding. Those fields can be filtered, constrained, indexed, and generally operated on using the full power of SQL. Structured metadata fits naturally with a traditional Supabase application, and can be managed via database [migrations](/docs/guides/getting-started/local-development#database-migrations).
+Notice that we've associated two pieces of metadata, `content` and `url`, with the embedding. Those fields can be filtered, constrained, indexed, and generally operated on using the full power of SQL. Structured metadata fits naturally with a traditional Supabase application, and can be managed via database [migrations](/docs/guides/deployment/database-migrations).
 
 ## Unstructured
 
 ```sql
 create table docs (
   id uuid primary key,
-  embedding vector(3),
+  embedding extensions.vector(3),
   meta jsonb
 );
 
@@ -59,6 +59,12 @@ Client libraries like python's [vecs](https://github.com/supabase/vecs) use this
 #!/usr/bin/env python3
 import vecs
 
+# In practice, do not hard-code your password. Use environment variables.
+DB_CONNECTION = "postgresql://<user>:<password>@<host>:<port>/<db_name>"
+
+# create vector store client
+vx = vecs.create_client(DB_CONNECTION)
+
 docs = vx.get_or_create_collection(name="docs", dimension=1536)
 
 docs.upsert(vectors=[
@@ -78,7 +84,7 @@ The structured metadata style is recommended when the fields being tracked are k
 ```sql
 create table docs (
   id uuid primary key,
-  embedding vector(3),
+  embedding extensions.vector(3),
   content text,
   url string,
   meta jsonb

@@ -1,6 +1,7 @@
+import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { useAudio } from 'react-use'
-import { IconArrowRight, cn } from 'ui'
+import { cn } from 'ui'
 
 const Player = () => {
   const [audio, state, controls, ref] = useAudio({
@@ -22,21 +23,22 @@ const Player = () => {
         href="https://supabase.productions/"
         target="_blank"
         className={cn(
-          'opacity-0 outline-none group translate-x-2 !ease-[.24,0,.22,.99] duration-200 transition-all text-foreground-muted hover:text-foreground !leading-3 font-mono uppercase text-[10px] flex flex-col text-right',
+          'opacity-0 outline-hidden group translate-x-2 ease-[cubic-bezier(.24,0,.22,.99)]! duration-200 transition-all text-foreground-muted hover:text-foreground leading-3! font-mono uppercase text-[10px] flex flex-col text-right',
           isPlaying && 'opacity-100 translate-x-0'
         )}
       >
         <span className="text-border-strong">Now playing</span>
         <span className="tracking-widest flex justify-end gap-px text-right translate-x-0 transition-transform group-hover:-translate-x-2">
           {trackName}
-          <IconArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 -mr-full absolute -right-3 text-current transition-opacity" />
+          <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 -mr-full absolute -right-3 text-current transition-opacity" />
         </span>
       </Link>
       <button
+        tabIndex={0}
         onClick={isPlaying ? controls.pause : controls.play}
         className="relative outline-border-muted w-7 h-7 opacity-70 hover:opacity-100 rounded-full flex items-center justify-center text-foreground-muted hover:text-foreground-lighter transition-opacity"
         style={{
-          background: `radial-gradient(closest-side, #060809 79%, transparent 95% 100%),conic-gradient(hsl(var(--foreground-lighter)) ${progress.toFixed()}%, hsl(var(--border-muted)) 0)`,
+          background: `radial-gradient(closest-side, #060809 79%, transparent 95% 100%),conic-gradient(var(--foreground-lighter) ${progress.toFixed()}%, var(--border-muted) 0)`,
         }}
       >
         <svg
@@ -47,7 +49,7 @@ const Player = () => {
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <circle opacity="0.1" cx="8" cy="8" r="7.5" stroke="hsl(var(--foreground-default))" />
+          <circle opacity="0.1" cx="8" cy="8" r="7.5" stroke="var(--foreground-default)" />
           <circle
             cx="8"
             cy="8"

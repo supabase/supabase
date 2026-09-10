@@ -1,19 +1,67 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { PropsWithChildren, useMemo } from 'react'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { PropsWithChildren, useEffect } from 'react'
 
-import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
-import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
-import TableEditorMenu from './TableEditorMenu'
+import { ProjectLayoutWithAuth } from '../ProjectLayout'
+import { SaveQueueActionBar } from '@/components/grid/components/footer/operations/SaveQueueActionBar'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { BannerTableEditorQueueOperations } from '@/components/ui/BannerStack/Banners/BannerTableEditorQueueOperations'
+import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
-const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
-  const canReadTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
-  const isPermissionsLoaded = usePermissionsLoaded()
+export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
+  const { ref } = useParams()
+  const { addBanner, dismissBanner } = useBannerStack()
+  const isTableQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
-  const tableEditorMenu = useMemo(() => <TableEditorMenu />, [])
+  const [isTableEditorQueueOperationsBannerDismissed] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED(ref ?? ''),
+    false
+  )
+
+  const { can: canReadTables, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_READ,
+    'tables'
+  )
+
+  const { can: canWriteTables } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
+
+  useEffect(() => {
+    if (!isPermissionsLoaded) return
+
+    if (
+      canWriteTables &&
+      !isTableEditorQueueOperationsBannerDismissed &&
+      !isTableQueueOperationsEnabled
+    ) {
+      addBanner({
+        id: 'table-editor-queue-operations-banner',
+        priority: 2,
+        isDismissed: false,
+        content: <BannerTableEditorQueueOperations />,
+      })
+    } else {
+      dismissBanner('table-editor-queue-operations-banner')
+    }
+
+    return () => {
+      dismissBanner('table-editor-queue-operations-banner')
+    }
+  }, [
+    addBanner,
+    dismissBanner,
+    isPermissionsLoaded,
+    canWriteTables,
+    isTableEditorQueueOperationsBannerDismissed,
+    isTableQueueOperationsEnabled,
+  ])
 
   if (isPermissionsLoaded && !canReadTables) {
-    debugger
     return (
       <ProjectLayoutWithAuth isBlocking={false}>
         <NoPermission isFullPage resourceText="view tables from this project" />
@@ -22,15 +70,9 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   }
 
   return (
-    <ProjectLayoutWithAuth
-      product="Table Editor"
-      productMenu={tableEditorMenu}
-      isBlocking={false}
-      resizableSidebar
-    >
+    <>
       {children}
-    </ProjectLayoutWithAuth>
+      <SaveQueueActionBar />
+    </>
   )
 }
-
-export default TableEditorLayout

@@ -1,6 +1,6 @@
 ---
 id: 'auth-linkedin'
-title: 'Login with LinkedIn'
+title: 'Sign in with LinkedIn'
 description: 'Add LinkedIn OAuth to your Supabase project'
 ---
 
@@ -8,28 +8,22 @@ To enable LinkedIn Auth for your project, you need to set up a LinkedIn OAuth ap
 
 ## Overview
 
-<Admonition type="caution">
-
-We will be replacing the existing _LinkedIn_ provider with a new _LinkedIn (OIDC)_ provider. Developers with LinkedIn OAuth Applications created prior to 1st August 2023 should create a new OAuth application and migrate their credentials from the _LinkedIn_ provider to the _LinkedIn (OIDC)_ provider. Alternatively, you can also add the newly released `Sign In with LinkedIn using OpenID Connect` to your existing OAuth application. [Read this section](/docs/guides/auth/social-login/auth-linkedin#linkedin-open-id-connect-oidc) to find out more.
-
-</Admonition>
-
-Setting up LinkedIn logins for your application consists of 3 parts:
+Setting up LinkedIn sign-in for your application consists of 3 parts:
 
 - Create and configure a LinkedIn Project and App on the [LinkedIn Developer Dashboard](https://www.linkedin.com/developers/apps).
-- Add your _LinkedIn (OIDC)_ `client_id` and `client_secret` to your [Supabase Project](https://supabase.com/dashboard).
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
+- Add your _LinkedIn (OIDC)_ `client_id` and `client_secret` to your [Supabase Project](/dashboard).
+- Add the sign-in code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
 ## Access your LinkedIn Developer account
 
 - Go to [LinkedIn Developer Dashboard](https://www.linkedin.com/developers/apps).
-- Log in (if necessary.)
+- Sign in (if necessary.)
 
 ![LinkedIn Developer Portal](/docs/img/guides/auth-linkedin/linkedin_developers_page.png)
 
 ## Find your callback URL
 
-<SocialProviderSetup provider="LinkedIn" />
+<$Partial path="social_provider_setup.mdx" variables={{ "provider": "LinkedIn" }} />
 
 ## Create a LinkedIn OAuth app
 
@@ -50,9 +44,27 @@ Ensure that the appropriate scopes have been added under OAuth 2.0 Scopes at the
 
 ## Enter your LinkedIn (OIDC) credentials into your Supabase project
 
-<SocialProviderSettingsSupabase provider="LinkedIn (OIDC)" />
+<$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "LinkedIn (OIDC)" }} />
 
-## Add login code to your client app
+You can also configure the LinkedIn (OIDC) auth provider using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Configure LinkedIn (OIDC) auth provider
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "external_linkedin_oidc_enabled": true,
+    "external_linkedin_oidc_client_id": "your-linkedin-client-id",
+    "external_linkedin_oidc_secret": "your-linkedin-client-secret"
+  }'
+```
+
+## Add sign-in code to your client app
 
 <Tabs
   scrollable
@@ -63,9 +75,16 @@ Ensure that the appropriate scopes have been added under OAuth 2.0 Scopes at the
 >
 <TabPanel id="js" label="JavaScript">
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `linkedin_oidc` as the `provider`:
+<$Partial path="create_client_snippet.mdx" />
+
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `linkedin_oidc` as the `provider`:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+
+// ---cut---
 async function signInWithLinkedIn() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'linkedin_oidc',
@@ -74,6 +93,23 @@ async function signInWithLinkedIn() {
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) with `linkedin_oidc` as the `provider`:
+
+```dart
+Future<void> signInWithLinkedIn() async {
+  await supabase.auth.signInWithOAuth(
+    OAuthProvider.linkedinOidc,
+    redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+    authScreenLaunchMode:
+        kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+  );
+}
+```
+
+</TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `LinkedIn` as the `Provider`:
@@ -85,7 +121,22 @@ suspend fun signInWithKaLinkedIn() {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.LinkedInOIDC` as the provider:
+
+```c#
+var state = await supabase.Auth.SignIn(Provider.LinkedInOIDC);
+var signInUrl = state.Uri;
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
+
+<$Partial path="oauth_pkce_flow.mdx" />
 
 <Tabs
   scrollable
@@ -99,15 +150,32 @@ suspend fun signInWithKaLinkedIn() {
 When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+
+// ---cut---
 async function signOut() {
   const { error } = await supabase.auth.signOut()
 }
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+  await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```kotlin
 suspend fun signOut() {
@@ -116,11 +184,23 @@ suspend fun signOut() {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs out, call [SignOut()](/docs/reference/csharp/sign-out) to remove them from the browser session and any objects from local storage:
+
+```c#
+await supabase.Auth.SignOut();
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## LinkedIn Open ID Connect (OIDC)
 
-We will be replacing the _LinkedIn_ provider with a new _LinkedIn (OIDC)_ provider to support recent changes to the LinkedIn [OAuth APIs](https://learn.microsoft.com/en-us/linkedin/shared/authentication/authorization-code-flow?context=linkedin%2Fcontext&tabs=HTTPS1). The new provider utilizes the [Open ID Connect standard](https://learn.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/sign-in-with-linkedin-v2#validating-id-tokens). In view of this change, we have disabled edits on the _LinkedIn_ provider and will be removing it effective 4th January 2024. Developers with LinkedIn OAuth Applications created prior to 1st August 2023 should create a new OAuth application [via the steps outlined above](/docs/guides/auth/social-login/auth-linkedin#create-a-linkedin-oauth-app) and migrate their credentials from the _LinkedIn_ provider to the _LinkedIn (OIDC)_ provider. Alternatively, you can also head to the `Products` section and add the newly release`Sign In with LinkedIn using OpenID Connect` to your existing OAuth application.
+We are replacing the _LinkedIn_ provider with a new _LinkedIn (OIDC)_ provider to support recent changes to the LinkedIn [OAuth APIs](https://learn.microsoft.com/en-us/linkedin/shared/authentication/authorization-code-flow?context=linkedin%2Fcontext&tabs=HTTPS1). The new provider uses the [Open ID Connect standard](https://learn.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/sign-in-with-linkedin-v2#validating-id-tokens). In view of this change, we have disabled edits on the _LinkedIn_ provider and will be removing it effective 4th January 2024. Developers with LinkedIn OAuth Applications created before 1st August 2023 should create a new OAuth application [via the steps outlined above](/docs/guides/auth/social-login/auth-linkedin#create-a-linkedin-oauth-app) and migrate their credentials from the _LinkedIn_ provider to the _LinkedIn (OIDC)_ provider. Alternatively, you can also head to the `Products` section and add the newly release`Sign In with LinkedIn using OpenID Connect` to your existing OAuth application.
 
 Developers using the Supabase CLI to test their LinkedIn OAuth application should also update their `config.toml` to make use of the new provider:
 
@@ -135,6 +215,6 @@ Do reach out to support if you have any concerns around this change.
 
 ## Resources
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
+- [Supabase - Get started for free](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
-- [LinkedIn Developer Dashboard](https://api.LinkedIn.com/apps)
+- [LinkedIn Developer Dashboard](https://www.linkedin.com/developers/apps)

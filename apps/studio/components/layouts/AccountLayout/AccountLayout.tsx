@@ -1,168 +1,137 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
+import type { PropsWithChildren } from 'react'
+import { useEffect, useLayoutEffect, useMemo } from 'react'
+import { cn } from 'ui'
 
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useFlag, useSelectedOrganization, withAuth } from 'hooks'
-import { useSignOut } from 'lib/auth'
-import { IS_PLATFORM } from 'lib/constants'
-import SettingsLayout from '../SettingsLayout/SettingsLayout'
-import type { SidebarSection } from './AccountLayout.types'
-import WithSidebar from './WithSidebar'
+import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
+import { AccountMenuContent } from './AccountMenuContent'
+import { WithSidebar } from './WithSidebar'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { IS_PLATFORM } from '@/lib/constants'
+import { buildStudioPageTitle } from '@/lib/page-title'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export interface AccountLayoutProps {
   title: string
-  breadcrumbs: {
-    key: string
-    label: string
-  }[]
 }
 
-const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<AccountLayoutProps>) => {
+const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps>) => {
   const router = useRouter()
-  const { data: organizations } = useOrganizationsQuery()
-  const selectedOrganization = useSelectedOrganization()
+  const appSnap = useAppStateSnapshot()
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
+  const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
+  const currentPath = router.pathname
 
-  const navLayoutV2 = useFlag('navigationLayoutV2')
+  const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
 
-  const signOut = useSignOut()
-  const onClickLogout = async () => {
-    await signOut()
-    await router.push('/sign-in')
-  }
+  const { appTitle } = useCustomContent(['app:title'])
+  const brandTitle = appTitle || 'Supabase'
+  const surfaceLabel = IS_PLATFORM ? 'Account' : 'Preferences'
+
+  const backToDashboardURL =
+    appSnap.lastRouteBeforeVisitingAccountPage.length > 0
+      ? appSnap.lastRouteBeforeVisitingAccountPage
+      : IS_PLATFORM && !!lastVisitedOrganization
+        ? `/org/${lastVisitedOrganization}`
+        : IS_PLATFORM
+          ? '/organizations'
+          : '/project/default'
+
+  const pageTitle = buildStudioPageTitle({
+    section: title,
+    surface: surfaceLabel,
+    brand: brandTitle,
+  })
+
+  const sections = useMemo(
+    () =>
+      !IS_PLATFORM
+        ? [
+            {
+              key: 'preferences',
+              links: [
+                {
+                  key: 'preferences',
+                  label: 'Preferences',
+                  href: '/account/me',
+                  isActive: currentPath === '/account/me',
+                },
+              ],
+            },
+          ]
+        : [
+            {
+              key: 'account-settings',
+              heading: 'Account Settings',
+              links: [
+                {
+                  key: 'preferences',
+                  label: 'Preferences',
+                  href: '/account/me',
+                  isActive: currentPath === '/account/me',
+                },
+                {
+                  key: 'access-tokens',
+                  label: 'Access Tokens',
+                  href: '/account/tokens',
+                  isActive:
+                    currentPath === '/account/tokens' || currentPath === '/account/tokens/scoped',
+                },
+                ...(showSecuritySettings
+                  ? [
+                      {
+                        key: 'security',
+                        label: 'Security',
+                        href: '/account/security',
+                        isActive: currentPath === '/account/security',
+                      },
+                    ]
+                  : []),
+              ],
+            },
+            {
+              key: 'logs',
+              heading: 'Logs',
+              links: [
+                {
+                  key: 'audit-logs',
+                  label: 'Audit Logs',
+                  href: '/account/audit',
+                  isActive: currentPath === '/account/audit',
+                },
+              ],
+            },
+          ],
+    [currentPath, showSecuritySettings]
+  )
+
+  useLayoutEffect(() => {
+    const unregister = registerOpenMenu(() => {
+      setMobileSheetContent(
+        <AccountMenuContent sections={sections} onCloseSheet={() => setMobileSheetContent(null)} />
+      )
+    })
+    return unregister
+  }, [registerOpenMenu, setMobileSheetContent, sections])
 
   useEffect(() => {
-    if (!IS_PLATFORM) {
+    if (!IS_PLATFORM && currentPath !== '/account/me') {
       router.push('/project/default')
     }
-  }, [router])
-
-  const organizationsLinks = (organizations ?? [])
-    .map((organization) => ({
-      isActive:
-        router.pathname.startsWith('/org/') && selectedOrganization?.slug === organization.slug,
-      label: organization.name,
-      href: `/org/${organization.slug}/general`,
-      key: organization.slug,
-    }))
-    .sort((a, b) => a.label.localeCompare(b.label))
-
-  const sectionsWithHeaders: SidebarSection[] = [
-    {
-      heading: 'Projects',
-      key: 'projects',
-      links: [
-        {
-          isActive: router.pathname === '/projects',
-          label: 'All projects',
-          href: '/projects',
-          key: 'all-projects-item',
-        },
-      ],
-    },
-    ...(IS_PLATFORM && organizationsLinks?.length > 0
-      ? [
-          {
-            heading: 'Organizations',
-            key: 'organizations',
-            links: organizationsLinks,
-          },
-        ]
-      : []),
-    ...(IS_PLATFORM
-      ? [
-          {
-            heading: 'Account',
-            key: 'account',
-            links: [
-              {
-                isActive: router.pathname === `/account/me`,
-                icon: `${router.basePath}/img/user.svg`,
-                label: 'Preferences',
-                href: `/account/me`,
-                key: `/account/me`,
-              },
-              {
-                isActive: router.pathname === `/account/tokens`,
-                icon: `${router.basePath}/img/user.svg`,
-                label: 'Access Tokens',
-                href: `/account/tokens`,
-                key: `/account/tokens`,
-              },
-
-              {
-                isActive: router.pathname === `/account/security`,
-                icon: `${router.basePath}/img/user.svg`,
-                label: 'Security',
-                href: `/account/security`,
-                key: `/account/security`,
-              },
-              {
-                isActive: router.pathname === `/account/audit`,
-                icon: `${router.basePath}/img/user.svg`,
-                label: 'Audit Logs',
-                href: `/account/audit`,
-                key: `/account/audit`,
-              },
-            ],
-          },
-        ]
-      : []),
-    {
-      heading: 'Documentation',
-      key: 'documentation',
-      links: [
-        {
-          key: 'ext-guides',
-          icon: `${router.basePath}/img/book.svg`,
-          label: 'Guides',
-          href: 'https://supabase.com/docs',
-          isExternal: true,
-        },
-        {
-          key: 'ext-guides',
-          icon: `${router.basePath}/img/book-open.svg`,
-          label: 'API Reference',
-          href: 'https://supabase.com/docs/guides/api',
-          isExternal: true,
-        },
-      ],
-    },
-    ...(IS_PLATFORM
-      ? [
-          {
-            key: 'logout-link',
-            links: [
-              {
-                key: `logout`,
-                icon: '/icons/feather/power.svg',
-                label: 'Log out',
-                href: undefined,
-                onClick: onClickLogout,
-              },
-            ],
-          },
-        ]
-      : []),
-  ]
-
-  if (navLayoutV2) {
-    return <SettingsLayout>{children}</SettingsLayout>
-  }
+  }, [currentPath, router])
 
   return (
     <>
       <Head>
-        <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
+        <title>{pageTitle}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <div className="h-screen min-h-[0px] basis-0 flex-1">
-        <WithSidebar
-          hideSidebar={navLayoutV2}
-          title={title}
-          breadcrumbs={breadcrumbs}
-          sections={sectionsWithHeaders}
-        >
+      <div className={cn('flex flex-col w-screen h-[calc(100vh-48px)]')}>
+        <WithSidebar backToDashboardURL={backToDashboardURL} sections={sections}>
           {children}
         </WithSidebar>
       </div>

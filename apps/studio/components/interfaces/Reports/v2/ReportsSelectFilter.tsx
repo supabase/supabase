@@ -1,0 +1,155 @@
+import { ChevronDown } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import {
+  Button,
+  Checkbox,
+  cn,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from 'ui'
+import { z } from 'zod'
+
+export interface ReportSelectOption {
+  label: React.ReactNode
+  value: string
+  quantity?: number
+  description?: string
+}
+
+export const selectFilterSchema = z.array(z.string())
+export type SelectFilters = z.infer<typeof selectFilterSchema>
+
+interface ReportsSelectFilterProps {
+  label: string
+  options: ReportSelectOption[]
+  value: SelectFilters
+  onChange: (value: SelectFilters) => void
+  isLoading?: boolean
+  className?: string
+  popoverClassName?: string
+  showSearch?: boolean
+}
+
+export const ReportsSelectFilter = ({
+  label,
+  options,
+  value,
+  onChange,
+  isLoading = false,
+  className,
+  popoverClassName,
+  showSearch = false,
+}: ReportsSelectFilterProps) => {
+  const [open, setOpen] = useState(false)
+  const [tempValue, setTempValue] = useState<SelectFilters>(value)
+
+  const isActive = tempValue.length > 0
+
+  useEffect(() => {
+    if (!open) {
+      setTempValue(value)
+    }
+  }, [open, value])
+
+  const handleApply = () => {
+    onChange([...tempValue].sort())
+    setOpen(false)
+  }
+
+  const handleClearAll = () => {
+    setTempValue([])
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleApply()
+    }
+  }
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant={isActive ? 'default' : 'outline'}
+          className={cn(
+            'min-w-20 border-dashed relative group justify-between',
+            { 'border-solid': isActive },
+            className
+          )}
+          iconRight={<ChevronDown size={14} />}
+        >
+          <span>
+            {label}
+            {tempValue.length > 0 && <span className="ml-1 text-xs">({tempValue.length})</span>}
+          </span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className={cn('p-0 w-72', popoverClassName)}>
+        <Command>
+          {showSearch && <CommandInput placeholder="Search..." className="text-xs" />}
+          <CommandList className="max-h-72">
+            <CommandEmpty>No options found.</CommandEmpty>
+            <CommandGroup>
+              {options.map((option) => (
+                <CommandItem key={option.value}>
+                  <Label
+                    key={option.value}
+                    className={'flex items-center overflow-hidden rounded-xs gap-x-3 w-full h-full'}
+                  >
+                    <Checkbox
+                      id={`${label}-${option.value}`}
+                      checked={tempValue.includes(option.value)}
+                      onCheckedChange={(checked) => {
+                        setTempValue(
+                          checked
+                            ? [...tempValue, option.value]
+                            : tempValue.filter((x) => x !== option.value)
+                        )
+                      }}
+                      onKeyDown={handleKeyDown}
+                    />
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex flex-col text-xs">
+                        <span className="flex items-center gap-x-2">{option.label}</span>
+                        {option.description && (
+                          <span className="text-foreground-lighter">{option.description}</span>
+                        )}
+                      </div>
+                      {!!option.quantity && (
+                        <code className="p-0 px-1 text-code-inline">{option.quantity}</code>
+                      )}
+                    </div>
+                  </Label>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+
+        <div className="flex items-center justify-end gap-2 border-t border-default p-2">
+          <Button size="tiny" variant="outline" onClick={handleClearAll} disabled={isLoading}>
+            Clear
+          </Button>
+          <Button
+            loading={isLoading}
+            size="tiny"
+            variant="primary"
+            onClick={handleApply}
+            type="button"
+          >
+            Apply
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+}

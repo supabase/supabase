@@ -1,60 +1,57 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useRouter } from 'next/router'
+import { useParams } from 'common'
 import { PropsWithChildren } from 'react'
 
-import NoPermission from 'components/ui/NoPermission'
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { useCheckPermissions, useIsFeatureEnabled, useSelectedProject, withAuth } from 'hooks'
-import { ProjectLayout } from '../'
-import { generateLogsMenu } from './LogsMenu.utils'
+import { ProjectLayout } from '../ProjectLayout'
+import { LogsSidebarMenuV2 } from './LogsSidebarMenuV2'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 interface LogsLayoutProps {
-  title?: string
+  title: string
 }
 
 const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => {
-  const router = useRouter()
-  const pathArr = router.pathname.split('/')
-  const page = pathArr[pathArr.length - 1]
+  const { ref } = useParams()
+  const logsEnabled = useIsFeatureEnabled('logs:all')
 
-  const {
-    projectAuthAll: authEnabled,
-    projectStorageAll: storageEnabled,
-    realtimeAll: realtimeEnabled,
-  } = useIsFeatureEnabled(['project_storage:all', 'project_auth:all', 'realtime:all'])
+  const { isLoading, can: canUseLogsExplorer } = useAsyncCheckPermissions(
+    PermissionAction.ANALYTICS_READ,
+    'logflare'
+  )
 
-  const project = useSelectedProject()
-
-  const canUseLogsExplorer = useCheckPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
-
-  if (!canUseLogsExplorer) {
+  if (!logsEnabled) {
     return (
-      <ProjectLayout>
-        <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-          <NoPermission isFullPage resourceText="access your project's logs explorer" />
-        </main>
+      <ProjectLayout product="Logs" browserTitle={{ section: title }}>
+        <UnknownInterface urlBack={`/project/${ref}`} />
       </ProjectLayout>
     )
   }
 
+  if (!canUseLogsExplorer) {
+    if (isLoading) {
+      return <ProjectLayout isLoading product="Logs" browserTitle={{ section: title }} />
+    }
+
+    if (!isLoading && !canUseLogsExplorer) {
+      return (
+        <ProjectLayout product="Logs" browserTitle={{ section: title }}>
+          <NoPermission isFullPage resourceText="access your project's logs" />
+        </ProjectLayout>
+      )
+    }
+  }
+
   return (
     <ProjectLayout
-      title={title}
       product="Logs"
-      productMenu={
-        <ProductMenu
-          page={page}
-          menu={generateLogsMenu(project, {
-            auth: authEnabled,
-            storage: storageEnabled,
-            realtime: realtimeEnabled,
-          })}
-        />
-      }
+      browserTitle={{ section: title }}
+      productMenu={<LogsSidebarMenuV2 />}
     >
-      <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-        {children}
-      </main>
+      {children}
     </ProjectLayout>
   )
 }

@@ -1,38 +1,34 @@
-import React, { useEffect, useState } from 'react'
+import staticContent from '.generated/staticContent/_index.json'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { Button } from 'ui'
 
+export const kFormatter = (num: number) => {
+  const kFormat = Math.floor(num / 1000)
+  const lastTwoDigits = num % 1000
+
+  const decimalPart = Math.floor((lastTwoDigits % 100) / 10)
+  const hundreds = Math.floor(lastTwoDigits / 100)
+
+  const isAlmostNextThousand = decimalPart >= 8 && hundreds >= 9
+
+  const showDecimals =
+    (!isAlmostNextThousand && hundreds >= 1) || (hundreds === 0 && decimalPart >= 8)
+
+  return showDecimals
+    ? `${kFormat}.${decimalPart >= 8 ? hundreds + 1 : hundreds}K`
+    : `${isAlmostNextThousand ? kFormat + 1 : kFormat}K`
+}
+
 const GitHubButton = () => {
-  const [stars, setStars] = useState<string>('63')
-
-  const kFormatter = (num: number) => {
-    const kFormat = num / 1000
-    const decimals = kFormat.toFixed(2).split('.')[1]
-    const firstDecimal = decimals.split('')[0]
-    const showDecimals = firstDecimal !== '0'
-
-    return kFormat.toFixed(showDecimals ? 1 : 0)
-  }
-
-  useEffect(() => {
-    async function fetchOctoData() {
-      const { Octokit } = await import('@octokit/core')
-      const octokit = new Octokit()
-      const res = await octokit.request('GET /repos/{org}/{repo}', {
-        org: 'supabase',
-        repo: 'supabase',
-        type: 'public',
-      })
-
-      setStars(kFormatter(res.data?.stargazers_count))
-    }
-    fetchOctoData()
-  }, [])
+  const sendTelemetryEvent = useSendTelemetryEvent()
+  const githubStars = staticContent.githubStars
 
   return (
     <Button
-      className="hidden group lg:flex text-foreground-light hover:text-foreground"
-      type="text"
+      className="hidden group lg:flex text-foreground-light hover:text-foreground in-data-nav-transparent:text-foreground"
+      variant="text"
       asChild
+      onClick={() => sendTelemetryEvent({ action: 'homepage_github_button_clicked' })}
     >
       <a type={undefined} href="https://github.com/supabase/supabase" target="_blank">
         <span className="flex items-center gap-1">
@@ -49,7 +45,7 @@ const GitHubButton = () => {
               fill="currentColor"
             />
           </svg>
-          {stars}K
+          {kFormatter(githubStars)}
         </span>
       </a>
     </Button>

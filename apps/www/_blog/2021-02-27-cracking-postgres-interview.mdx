@@ -5,16 +5,15 @@ author: ant_wilson
 author_title: Supabase
 author_url: https://github.com/awalias
 author_image_url: https://github.com/awalias.png
-authorURL: https://github.com/awalias
-image: elephants.png
-thumb: elephants.png
+imgSocial: elephants.png
+imgThumb: elephants.png
 categories:
   - postgres
 tags:
   - sql
   - postgres
   - planetpg
-date: '02-27-2021'
+date: '2021-02-27'
 ---
 
 There are plenty of resources out there for preparing for PostgreSQL interview questions. Most posts are for technical interviews with a focus on PostgreSQL, however many just cover the basics and the advanced resources often conflate transactional SQL with analytical SQL (WINDOW/RANK functions, aggregates etc.).
@@ -101,7 +100,7 @@ We use Row Level Security in Supabase as a way to grant/restrict access on a row
 
 ```sql
 CREATE POLICY "Individuals can only write their own messages." ON messages FOR
-    INSERT WITH CHECK (auth.uid() = user_id);
+    INSERT WITH CHECK ((select auth.uid()) = user_id);
 
 -- auth.uid() is a function provided by Supabase which plucks the uid out
 --   of the JWT sent along with an API request more on this here:

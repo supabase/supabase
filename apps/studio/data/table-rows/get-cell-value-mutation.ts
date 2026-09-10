@@ -1,0 +1,77 @@
+import { ident } from '@supabase/pg-meta'
+import { Query } from '@supabase/pg-meta/src/query'
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+export type GetCellValueVariables = {
+  projectRef: string
+  connectionString?: string | null
+  table: { schema: string; name: string }
+  column: string
+  pkMatch: { [key: string]: any }
+  roleImpersonationState?: RoleImpersonationState
+}
+
+export function getCellValueSql({
+  table,
+  column,
+  pkMatch,
+}: Pick<GetCellValueVariables, 'table' | 'column' | 'pkMatch'>) {
+  return new Query()
+    .from(table.name, table.schema ?? undefined)
+    .select(ident(column))
+    .match(pkMatch)
+    .toSql()
+}
+
+export async function getCellValue({
+  projectRef,
+  connectionString,
+  table,
+  column,
+  pkMatch,
+  roleImpersonationState,
+}: GetCellValueVariables) {
+  const sql = wrapWithRoleImpersonation(
+    getCellValueSql({ table, column, pkMatch }),
+    roleImpersonationState
+  )
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+  })
+  return result?.[0][column]
+}
+
+type TableRowCreateData = Awaited<ReturnType<typeof getCellValue>>
+
+export const useGetCellValueMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<TableRowCreateData, ResponseError, GetCellValueVariables>,
+  'mutationFn'
+> = {}) => {
+  return useMutation<TableRowCreateData, ResponseError, GetCellValueVariables>({
+    mutationFn: (vars) => getCellValue(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(data.message)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}

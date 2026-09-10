@@ -1,11 +1,14 @@
-import React, { useState, useEffect, ReactNode } from 'react'
-import Link from 'next/link'
-import { AnimatePresence, motion, useAnimation } from 'framer-motion'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import { Button, IconArrowUpRight } from 'ui'
+import 'swiper/css'
+
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
-import { Swiper, SwiperSlide } from 'swiper/react'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { AnimatePresence, motion, useAnimation } from 'framer-motion'
+import { ArrowUpRight } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { useEffect, useState, type ReactNode } from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button } from 'ui'
 
 interface TabProps {
   label: string
@@ -18,9 +21,10 @@ interface TabProps {
 
 const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }: TabProps) => (
   <button
+    tabIndex={0}
     onClick={onClick}
     className={`text-left text-lg flex flex-col group gap-1 transition-all ${
-      isActive ? 'flex-[2] text-foreground' : 'flex-[1] text-foreground-light'
+      isActive ? 'flex-2 text-foreground' : 'flex-1 text-foreground-light'
     }`}
     aria-selected={isActive}
     role="tab"
@@ -55,13 +59,13 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
 interface Tab {
   label: string
   paragraph?: string
-  panel?: JSX.Element
+  panel?: ReactNode
   colabUrl: string
   code?: string
 }
 
 interface Props {
-  title: string | ReactNode
+  title: ReactNode
   paragraph: string
   cta?: {
     label?: string
@@ -135,7 +139,7 @@ const TimedTabsSection = ({
           </h2>
           <p className="text-foreground-lighter mb-4 max-w-sm">{paragraph}</p>
           {cta && (
-            <Button asChild type="default" size="small" icon={<IconArrowUpRight />}>
+            <Button asChild variant="default" size="small" icon={<ArrowUpRight />}>
               <Link href={cta.link}>{cta.label ?? 'Explore more'}</Link>
             </Button>
           )}
@@ -167,7 +171,7 @@ const TimedTabsSection = ({
           </Swiper>
           <OpenInColab
             colabUrl={tabs[activeTab]?.colabUrl}
-            className="flex md:hidden !relative !top-0 !right-0 mt-8 w-full justify-center"
+            className="flex md:hidden relative! top-0! right-0! mt-8 w-full justify-center"
           />
         </div>
       </div>

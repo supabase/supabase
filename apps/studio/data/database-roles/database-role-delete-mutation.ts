@@ -1,35 +1,34 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import pgMeta from '@supabase/pg-meta'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { del } from 'data/fetchers'
-import type { ResponseError } from 'types'
-import { databaseRolesKeys } from './keys'
+import { invalidateRolesQuery } from './database-roles-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+type DropRoleBody = Parameters<typeof pgMeta.roles.remove>[1]
 
 export type DatabaseRoleDeleteVariables = {
   projectRef: string
-  connectionString?: string
-  id: string
+  connectionString?: string | null
+  id: number
+  payload?: DropRoleBody
 }
 
 export async function deleteDatabaseRole({
   projectRef,
   connectionString,
   id,
+  payload,
 }: DatabaseRoleDeleteVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await del('/platform/pg-meta/{ref}/roles', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: { id },
-    },
-    headers,
+  const sql = pgMeta.roles.remove({ id }, payload).sql
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['roles', 'delete'],
   })
-
-  if (error) throw error
-  return data
+  return result
 }
 
 type DatabaseRoleDeleteData = Awaited<ReturnType<typeof deleteDatabaseRole>>
@@ -39,27 +38,25 @@ export const useDatabaseRoleDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseRoleDeleteData, ResponseError, DatabaseRoleDeleteVariables>,
+  UseCustomMutationOptions<DatabaseRoleDeleteData, ResponseError, DatabaseRoleDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseRoleDeleteData, ResponseError, DatabaseRoleDeleteVariables>(
-    (vars) => deleteDatabaseRole(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseRolesKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete database role: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseRoleDeleteData, ResponseError, DatabaseRoleDeleteVariables>({
+    mutationFn: (vars) => deleteDatabaseRole(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await invalidateRolesQuery(queryClient, projectRef)
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete database role: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

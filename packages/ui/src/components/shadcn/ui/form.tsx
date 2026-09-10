@@ -1,5 +1,7 @@
-import * as LabelPrimitive from '@radix-ui/react-label'
-import { Slot } from '@radix-ui/react-slot'
+'use client'
+
+import { AnimatePresence, motion } from 'framer-motion'
+import { Label as LabelPrimitive, Slot as SlotPrimitive } from 'radix-ui'
 import * as React from 'react'
 import {
   Controller,
@@ -8,10 +10,14 @@ import {
   FieldValues,
   FormProvider,
   useFormContext,
+  useWatch,
 } from 'react-hook-form'
 
 import { cn } from '../../../lib/utils/cn'
+import type { InputProps } from './input'
+import { InputGroupInput, InputGroupTextarea } from './input-group'
 import { Label } from './label'
+import type { TextareaProps } from './textarea'
 
 const Form = FormProvider
 
@@ -66,36 +72,41 @@ type FormItemContextValue = {
 
 const FormItemContext = React.createContext<FormItemContextValue>({} as FormItemContextValue)
 
-const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => {
-    const id = React.useId()
+const FormItem = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { asChild?: boolean }
+>(({ asChild, ...props }, ref) => {
+  const id = React.useId()
 
-    return (
-      <FormItemContext.Provider value={{ id }}>
-        <div ref={ref} className={cn('space-y-2', className)} {...props} />
-      </FormItemContext.Provider>
-    )
-  }
-)
+  const Comp = asChild ? SlotPrimitive.Slot : 'div'
+
+  return (
+    <FormItemContext.Provider value={{ id }}>
+      <Comp ref={ref} {...props} />
+    </FormItemContext.Provider>
+  )
+})
 FormItem.displayName = 'FormItem'
 
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & { enableSelection?: boolean }
+>(({ className, enableSelection = false, htmlFor, ...props }, ref) => {
   const { error, formItemId } = useFormField()
 
+  const Comp = enableSelection ? 'label' : Label
+
   return (
-    <Label
+    <Comp
       ref={ref}
       className={cn(
-        'text-foreground-light',
+        'text-foreground-light text-sm',
         'transition-colors',
         error && '!text-destructive',
         className,
         'leading-normal'
       )}
-      htmlFor={formItemId}
+      htmlFor={htmlFor ?? formItemId}
       {...props}
     />
   )
@@ -103,13 +114,13 @@ const FormLabel = React.forwardRef<
 FormLabel.displayName = 'FormLabel'
 
 const FormControl = React.forwardRef<
-  React.ElementRef<typeof Slot>,
-  React.ComponentPropsWithoutRef<typeof Slot>
+  React.ElementRef<typeof SlotPrimitive.Slot>,
+  React.ComponentPropsWithoutRef<typeof SlotPrimitive.Slot>
 >(({ ...props }, ref) => {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
 
   return (
-    <Slot
+    <SlotPrimitive.Slot
       ref={ref}
       id={formItemId}
       aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
@@ -127,7 +138,7 @@ const FormDescription = React.forwardRef<
   const { formDescriptionId } = useFormField()
 
   return (
-    <p
+    <div
       ref={ref}
       id={formDescriptionId}
       className={cn('text-sm text-foreground-light', className)}
@@ -144,22 +155,63 @@ const FormMessage = React.forwardRef<
   const { error, formMessageId } = useFormField()
   const body = error ? String(error?.message) : children
 
-  if (!body) {
-    return null
-  }
-
   return (
-    <p
-      ref={ref}
-      id={formMessageId}
-      className={cn('text-sm text-destructive', className)}
-      {...props}
-    >
-      {body}
-    </p>
+    <AnimatePresence initial={false}>
+      {body ? ( // Only animate if there is a message body
+        <motion.div
+          key={formMessageId} // Use a unique key to help with animations
+          initial={{ opacity: 0, y: -5, height: 0 }} // Start slightly hidden
+          animate={{ opacity: 1, y: 0, height: 'auto' }} // Fade in and slide up
+          exit={{ opacity: 0, y: -5, height: 0 }} // Fade out and slide back up
+          transition={{ duration: 0.15, ease: 'easeInOut' }} // Smooth transition
+        >
+          <p
+            ref={ref}
+            id={formMessageId}
+            className={cn('text-sm text-destructive', className)}
+            {...props}
+          >
+            {body}
+          </p>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
   )
 })
+
 FormMessage.displayName = 'FormMessage'
+
+const FormInputGroupInput = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
+
+  return (
+    <InputGroupInput
+      ref={ref}
+      id={formItemId}
+      aria-describedby={!error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`}
+      aria-invalid={!!error}
+      {...props}
+    />
+  )
+})
+FormInputGroupInput.displayName = 'FormInputGroupInput'
+
+const FormInputGroupTextArea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  (props, ref) => {
+    const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
+
+    return (
+      <InputGroupTextarea
+        ref={ref}
+        id={formItemId}
+        aria-describedby={!error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`}
+        aria-invalid={!!error}
+        {...props}
+      />
+    )
+  }
+)
+FormInputGroupTextArea.displayName = 'FormInputGroupTextArea'
 
 export {
   Form,
@@ -170,4 +222,7 @@ export {
   FormLabel,
   FormMessage,
   useFormField,
+  FormInputGroupInput,
+  FormInputGroupTextArea,
+  useWatch,
 }

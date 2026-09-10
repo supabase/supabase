@@ -1,307 +1,455 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Lock, MousePointer2, PlusCircle } from 'lucide-react'
+import { Realtime } from 'icons'
+import { BookOpenText, Lightbulb, Lock, MoreVertical, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
-import { Button, Modal, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
+import { toast } from 'sonner'
+import {
+  Button,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import APIDocsButton from 'components/ui/APIDocsButton'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
-import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
-import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { EnableIndexAdvisorDialog } from '../QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
+import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
+import { ExposedMaterializedViewDialog } from './ExposedMaterializedViewDialog'
+import { InsertButton } from './InsertButton'
+import { RealtimeToggleDialog } from './RealtimeToggleDialog'
+import { SecurityDefinerViewPopover } from './SecurityDefinerViewPopover'
+import { ViewEntityAutofixSecurityModal } from './ViewEntityAutofixSecurityModal'
+import { RefreshButton } from '@/components/grid/components/header/RefreshButton'
+import { useTableIndexAdvisor } from '@/components/grid/context/TableIndexAdvisorContext'
+import { RLSToggleDialog } from '@/components/interfaces/Database/RLSToggleDialog'
+import {
+  getEntityLintDetails,
+  getTablePoliciesUrl,
+} from '@/components/interfaces/TableGridEditor/TableEntity.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useIsTableRealtimeEnabled } from '@/data/database-publications/database-publications-query'
+import { useProjectLintsQuery } from '@/data/lint/lint-query'
+import {
+  Entity,
+  isTableLike,
+  isForeignTable as isTableLikeForeignTable,
+  isMaterializedView as isTableLikeMaterializedView,
+  isView as isTableLikeView,
+} from '@/data/table-editor/table-editor-types'
+import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAppStateSnapshot } from '@/state/app-state'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface GridHeaderActionsProps {
-  table: PostgresTable
-  canEditViaTableEditor: boolean
-  isViewSelected: boolean
-  isTableSelected: boolean
+  table: Entity
+  isRefetching: boolean
 }
-
-const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeaderActionsProps) => {
+export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProps) => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
-  const realtimeEnabled = useIsFeatureEnabled('realtime:all')
-  const isLocked = EXCLUDED_SCHEMAS.includes(table.schema)
+  const track = useTrack()
+  const appSnap = useAppStateSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
+  const { data: project } = useSelectedProjectQuery()
 
-  const { mutate: updateTable } = useTableUpdateMutation({
+  const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
+  const [realtimeDialogOpen, setRealtimeDialogOpen] = useState(false)
+  const [indexAdvisorDialogOpen, setIndexAdvisorDialogOpen] = useState(false)
+  const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
+  const [isExposedMaterializedViewDialogOpen, setIsExposedMaterializedViewDialogOpen] =
+    useState(false)
+
+  const [showWarning, setShowWarning] = useQueryState(
+    'showWarning',
+    parseAsBoolean.withDefault(false)
+  )
+
+  // need project lints to get security status for views
+  const { data: lints = [] } = useProjectLintsQuery({ projectRef: project?.ref })
+
+  // Use table-specific index advisor context
+  const { isAvailable: isIndexAdvisorAvailable, isEnabled: isIndexAdvisorEnabled } =
+    useTableIndexAdvisor()
+
+  const isTable = isTableLike(table)
+  const isForeignTable = isTableLikeForeignTable(table)
+  const isView = isTableLikeView(table)
+  const isMaterializedView = isTableLikeMaterializedView(table)
+
+  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
+
+  const isRealtimeEnabled = useIsTableRealtimeEnabled({ id: table.id })
+
+  const { mutateAsync: updateTable, isPending: isUpdatingTable } = useTableUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to toggle RLS: ${error.message}`)
     },
-    onSettled: () => {
-      closeConfirmModal()
-    },
   })
 
-  const [showEnableRealtime, setShowEnableRealtime] = useState(false)
-  const [open, setOpen] = useState(false)
-  const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
+  const showHeaderActions = snap.selectedRows.size === 0
 
   const projectRef = project?.ref
-  const { data } = useDatabasePoliciesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data } = useDatabasePoliciesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schemas: [table.schema],
+    },
+    { enabled: !!table }
+  )
   const policies = (data ?? []).filter(
     (policy) => policy.schema === table.schema && policy.table === table.name
   )
 
-  const { data: publications } = useDatabasePublicationsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const realtimePublication = (publications ?? []).find(
-    (publication) => publication.name === 'supabase_realtime'
+  const { can: canSqlWriteTables, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
   )
-  const realtimeEnabledTables = realtimePublication?.tables ?? []
-  const isRealtimeEnabled = realtimeEnabledTables.some((t: any) => t.id === table?.id)
-
-  const { mutate: updatePublications, isLoading: isTogglingRealtime } =
-    useDatabasePublicationUpdateMutation({
-      onSuccess: () => {
-        setShowEnableRealtime(false)
-      },
-      onError: (error) => {
-        toast.error(`Failed to toggle realtime for ${table.name}: ${error.message}`)
-      },
-    })
-
-  const canSqlWriteTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-  const canSqlWriteColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
-  const isReadOnly = !canSqlWriteTables && !canSqlWriteColumns
+  const { can: canSqlWriteColumns } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'columns'
+  )
+  const isReadOnly = !isLoadingPermissions && !canSqlWriteTables && !canSqlWriteColumns
   // This will change when we allow autogenerated API docs for schemas other than `public`
   const doesHaveAutoGeneratedAPIDocs = table.schema === 'public'
 
-  const toggleRealtime = async () => {
-    if (!project) return console.error('Project is required')
-    if (!realtimePublication) return console.error('Unable to find realtime publication')
+  const { hasLint: tableHasLints } = getEntityLintDetails(
+    table.name,
+    'rls_disabled_in_public',
+    ['ERROR'],
+    lints,
+    table.schema
+  )
 
-    const exists = realtimeEnabledTables.some((x: any) => x.id == table.id)
-    const tables = !exists
-      ? [`${table.schema}.${table.name}`].concat(
-          realtimeEnabledTables.map((t: any) => `${t.schema}.${t.name}`)
-        )
-      : realtimeEnabledTables
-          .filter((x: any) => x.id != table.id)
-          .map((x: any) => `${x.schema}.${x.name}`)
+  const { hasLint: viewHasLints, matchingLint: matchingViewLint } = getEntityLintDetails(
+    table.name,
+    'security_definer_view',
+    ['ERROR', 'WARN'],
+    lints,
+    table.schema
+  )
 
-    updatePublications({
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      id: realtimePublication.id,
-      tables,
-    })
+  const { hasLint: materializedViewHasLints, matchingLint: matchingMaterializedViewLint } =
+    getEntityLintDetails(
+      table.name,
+      'materialized_view_in_api',
+      ['ERROR', 'WARN'],
+      lints,
+      table.schema
+    )
+
+  const onViewAPIDocs = () => {
+    appSnap.setActiveDocsSection(['entities', table.name])
+    appSnap.setShowProjectApiDocs(true)
+
+    track('api_docs_opened', { source: 'table_editor' })
   }
 
-  const closeConfirmModal = () => {
-    setRlsConfirmModalOpen(false)
-  }
   const onToggleRLS = async () => {
     const payload = {
       id: table.id,
-      rls_enabled: !table.rls_enabled,
+      rls_enabled: !(isTable && table.rls_enabled),
     }
 
-    updateTable({
+    const updateTablePromise = updateTable({
       projectRef: project?.ref!,
       connectionString: project?.connectionString,
-      id: payload.id,
+      id: table.id,
+      name: table.name,
       schema: table.schema,
       payload: payload,
     })
+
+    track('table_rls_enabled', {
+      method: 'table_editor',
+      schema_name: table.schema,
+      table_name: table.name,
+    })
+
+    return updateTablePromise
   }
 
   return (
-    <>
-      <div className="flex items-center gap-2">
-        {isReadOnly && (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className="w-full">
-              <div className="border border-strong rounded bg-overlay-hover px-3 py-1 text-xs">
-                Viewing as read-only
-              </div>
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">
-                    You need additional permissions to manage your project's data
-                  </span>
+    <div className="flex items-center space-x-2">
+      {showHeaderActions && (
+        <div className="flex items-center gap-x-2">
+          {isReadOnly && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="border border-strong rounded-sm bg-overlay-hover px-3 py-1 text-xs">
+                  Viewing as read-only
                 </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
-        )}
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                You need additional permissions to manage your project's data
+              </TooltipContent>
+            </Tooltip>
+          )}
 
-        {isTableSelected ? (
-          table.rls_enabled ? (
-            <>
-              {policies.length < 1 && !isLocked ? (
-                <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger asChild className="w-full">
-                    <Button
-                      asChild
-                      type="default"
-                      className="group"
-                      icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
-                    >
-                      <Link
-                        passHref
-                        href={`/project/${projectRef}/auth/policies?search=${table.id}`}
-                      >
-                        Add RLS policy
-                      </Link>
-                    </Button>
-                  </Tooltip.Trigger>
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <div className="text-xs text-foreground p-1 leading-relaxed">
-                          <p>RLS is enabled for this table, but no policies are set. </p>
-                          <p>
-                            Select queries will return an <u>empty array</u> of results.
-                          </p>
+          {isTable && !isSchemaLocked ? (
+            table.rls_enabled ? (
+              <>
+                {policies.length < 1 && !isSchemaLocked ? (
+                  <ButtonTooltip
+                    asChild
+                    variant="default"
+                    className="group"
+                    icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        className: 'w-[280px]',
+                        text: 'RLS is enabled for this table, but no policies are set. Select queries may return 0 results.',
+                      },
+                    }}
+                  >
+                    <Link passHref href={getTablePoliciesUrl(projectRef, table.schema, table.name)}>
+                      Add RLS policy
+                    </Link>
+                  </ButtonTooltip>
+                ) : (
+                  <Button
+                    asChild
+                    variant={policies.length < 1 && !isSchemaLocked ? 'warning' : 'default'}
+                    className="group"
+                    icon={
+                      isSchemaLocked || policies.length > 0 ? (
+                        <div
+                          className={cn(
+                            'flex items-center justify-center rounded-full bg-border-stronger h-[16px]',
+                            policies.length > 9 ? ' px-1' : 'w-[16px]',
+                            ''
+                          )}
+                        >
+                          <span className="text-[11px] text-foreground font-mono text-center">
+                            {policies.length}
+                          </span>
                         </div>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                </Tooltip.Root>
-              ) : (
-                <Button
-                  asChild
-                  type={policies.length < 1 && !isLocked ? 'warning' : 'default'}
-                  className="group"
-                  icon={
-                    isLocked || policies.length > 0 ? (
-                      <span className="text-right text-xs rounded-xl px-[6px] bg-foreground-lighter/30 text-brand-1100">
-                        {policies.length}
-                      </span>
-                    ) : (
-                      <PlusCircle strokeWidth={1.5} />
-                    )
-                  }
-                >
-                  <Link passHref href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
-                    Auth {policies.length > 1 ? 'policies' : 'policy'}
-                  </Link>
-                </Button>
-              )}
-            </>
-          ) : (
-            <Popover_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
-              <PopoverTrigger_Shadcn_ asChild>
-                <Button type="warning" icon={<Lock strokeWidth={1.5} />}>
-                  RLS disabled
-                </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
-                <h3 className="flex items-center gap-2">
-                  <Lock size={16} /> Row Level Security (RLS)
-                </h3>
-                <div className="grid gap-2 mt-4 text-foreground-light text-sm">
-                  <p>
-                    You can restrict and control who can read, write and update data in this table
-                    using Row Level Security.
-                  </p>
-                  <p>
-                    With RLS enabled, anonymous users will not be able to read/write data in the
-                    table.
-                  </p>
-                  {!isLocked && (
-                    <div className="mt-2">
+                      ) : (
+                        <PlusCircle strokeWidth={1.5} />
+                      )
+                    }
+                  >
+                    <Link passHref href={getTablePoliciesUrl(projectRef, table.schema, table.name)}>
+                      RLS {policies.length > 1 ? 'policies' : 'policy'}
+                    </Link>
+                  </Button>
+                )}
+              </>
+            ) : tableHasLints ? (
+              <Popover modal={false} open={showWarning} onOpenChange={setShowWarning}>
+                <PopoverTrigger asChild>
+                  <Button variant="danger" icon={<Lock strokeWidth={1.5} />}>
+                    RLS disabled
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 text-sm" align="end">
+                  <h4 className="flex items-center gap-2">
+                    <Lock size={16} /> Row Level Security (RLS)
+                  </h4>
+                  <div className="grid gap-2 mt-4 text-foreground-light text-xs">
+                    <p>
+                      You can restrict and control who can read, write and update data in this table
+                      using Row Level Security.
+                    </p>
+                    <p>
+                      With RLS enabled, anonymous users will not be able to read/write data in the
+                      table.
+                    </p>
+                    {!isSchemaLocked && (
                       <Button
-                        type="default"
+                        variant="default"
+                        className="mt-2 w-min"
                         onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
                       >
                         Enable RLS for this table
                       </Button>
-                    </div>
-                  )}
-                </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
-          )
-        ) : null}
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            ) : null
+          ) : null}
 
-        <RoleImpersonationPopover serviceRoleLabel="postgres" />
-
-        {realtimeEnabled && !isViewSelected && (
-          <Button
-            type="default"
-            icon={
-              <MousePointer2
-                strokeWidth={1.5}
-                className={isRealtimeEnabled ? 'text-brand' : 'text-foreground-muted'}
-              />
-            }
-            onClick={() => setShowEnableRealtime(true)}
-          >
-            Realtime {isRealtimeEnabled ? 'on' : 'off'}
-          </Button>
-        )}
-
-        {doesHaveAutoGeneratedAPIDocs && <APIDocsButton section={['entities', table.name]} />}
-      </div>
-
-      <ConfirmationModal
-        visible={showEnableRealtime}
-        loading={isTogglingRealtime}
-        header={`${isRealtimeEnabled ? 'Disable' : 'Enable'} realtime for ${table.name}`}
-        buttonLabel={`${isRealtimeEnabled ? 'Disable' : 'Enable'} realtime`}
-        buttonLoadingLabel={`${isRealtimeEnabled ? 'Disabling' : 'Enabling'} realtime`}
-        onSelectCancel={() => setShowEnableRealtime(false)}
-        onSelectConfirm={() => toggleRealtime()}
-      >
-        <Modal.Content className="py-4 space-y-2">
-          <p className="text-sm">
-            Once realtime has been {isRealtimeEnabled ? 'disabled' : 'enabled'}, the table will{' '}
-            {isRealtimeEnabled ? 'no longer ' : ''}broadcast any changes to authorized subscribers.
-          </p>
-          {!isRealtimeEnabled && (
-            <p className="text-sm">
-              You may also select which events to broadcast to subscribers on the{' '}
-              <Link href={`/project/${ref}/database/replication`} className="text-brand">
-                database replication
-              </Link>{' '}
-              settings.
-            </p>
+          {isView && viewHasLints && (
+            <SecurityDefinerViewPopover
+              lint={matchingViewLint}
+              onAutofix={() => {
+                setIsAutofixViewSecurityModalOpen(true)
+              }}
+            />
           )}
-        </Modal.Content>
-      </ConfirmationModal>
 
-      <ConfirmModal
-        danger={table.rls_enabled}
-        visible={rlsConfirmModalOpen}
-        title="Confirm to enable Row Level Security"
-        description="Are you sure you want to enable Row Level Security for this table?"
-        buttonLabel="Enable RLS"
-        buttonLoadingLabel="Updating"
-        onSelectCancel={closeConfirmModal}
-        onSelectConfirm={onToggleRLS}
+          {isMaterializedView && materializedViewHasLints && (
+            <Popover modal={false}>
+              <PopoverTrigger asChild>
+                <Button variant="warning" icon={<Unlock strokeWidth={1.5} />}>
+                  Materialized View in API
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="min-w-[395px] text-sm" align="end">
+                <h3 className="flex items-center gap-2">
+                  <Unlock size={16} /> Secure your Materialized View
+                </h3>
+                <div className="grid gap-2 mt-4 text-foreground-light text-sm">
+                  <p>
+                    Because materialized views do not automatically enforce RLS policies from their
+                    source tables, exposing them through the API may reveal data that would
+                    otherwise be protected.
+                  </p>
+
+                  <p>
+                    Since this materialized view is in a schema accessible to API roles, it can be
+                    queried through your project's APIs.
+                  </p>
+
+                  <div className="mt-2 flex items-center gap-2">
+                    <ExposedMaterializedViewDialog
+                      table={table}
+                      isExposedMaterializedViewDialogOpen={isExposedMaterializedViewDialogOpen}
+                      setIsExposedMaterializedViewDialogOpen={
+                        setIsExposedMaterializedViewDialogOpen
+                      }
+                    />
+
+                    <Button variant="default" asChild>
+                      <Link
+                        target="_blank"
+                        href={`/project/${ref}/advisors/security?preset=${matchingMaterializedViewLint?.level}&id=${matchingMaterializedViewLint?.cache_key}`}
+                      >
+                        Learn more
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+
+          {isForeignTable && table.schema === 'public' && (
+            <Popover modal={false} open={showWarning} onOpenChange={setShowWarning}>
+              <PopoverTrigger asChild>
+                <Button variant="warning" icon={<Unlock strokeWidth={1.5} />}>
+                  Unprotected Data API access
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="min-w-[395px] text-sm" align="end">
+                <h3 className="flex items-center gap-2">
+                  <Unlock size={16} /> Secure Foreign table
+                </h3>
+                <div className="grid gap-2 mt-4 text-foreground-light text-sm">
+                  <p>
+                    Foreign tables do not enforce RLS, which may allow unrestricted access. To
+                    secure them, either move foreign tables to a private schema not exposed by
+                    PostgREST, or <a href="">disable PostgREST access</a> entirely.
+                  </p>
+
+                  <div className="mt-2">
+                    <Button variant="default" asChild>
+                      <Link
+                        target="_blank"
+                        href={`${DOCS_URL}/guides/database/extensions/wrappers/overview#security`}
+                      >
+                        Learn more
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+
+          <RoleImpersonationPopover header="View data as a role" align="center" />
+
+          <DropdownMenu>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="default"
+                    icon={<MoreVertical />}
+                    className="h-7 w-7"
+                    aria-label={`More options for ${table.name}`}
+                  />
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">More options</TooltipContent>
+            </Tooltip>
+            <DropdownMenuContent className="w-48">
+              {isTable && realtimeEnabled && (
+                <DropdownMenuItem className="gap-x-2" onClick={() => setRealtimeDialogOpen(true)}>
+                  <Realtime size={14} className={isRealtimeEnabled ? 'text-brand' : ''} />
+                  <span>{isRealtimeEnabled ? 'Disable' : 'Enable'} Realtime</span>
+                </DropdownMenuItem>
+              )}
+              {doesHaveAutoGeneratedAPIDocs && (
+                <DropdownMenuItem className="gap-x-2" onClick={() => onViewAPIDocs()}>
+                  <BookOpenText size={14} />
+                  <span>View API docs</span>
+                </DropdownMenuItem>
+              )}
+              {isTable && isIndexAdvisorAvailable && !isIndexAdvisorEnabled && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="gap-x-2"
+                    onClick={() => setIndexAdvisorDialogOpen(true)}
+                  >
+                    <Lightbulb size={14} />
+                    <span>Enable Index Advisor</span>
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <RefreshButton tableId={table.id} isRefetching={isRefetching} />
+
+          {showHeaderActions && <InsertButton />}
+        </div>
+      )}
+
+      <ViewEntityAutofixSecurityModal
+        table={table}
+        isAutofixViewSecurityModalOpen={isAutofixViewSecurityModalOpen}
+        setIsAutofixViewSecurityModalOpen={setIsAutofixViewSecurityModalOpen}
       />
-    </>
+
+      {isTable && (
+        <RLSToggleDialog
+          open={rlsConfirmModalOpen}
+          tableName={table.name}
+          isEnabled={table.rls_enabled}
+          isSubmitting={isUpdatingTable}
+          onOpenChange={setRlsConfirmModalOpen}
+          onConfirm={onToggleRLS}
+        />
+      )}
+
+      <RealtimeToggleDialog
+        table={table}
+        open={realtimeDialogOpen}
+        setOpen={setRealtimeDialogOpen}
+      />
+
+      <EnableIndexAdvisorDialog open={indexAdvisorDialogOpen} setOpen={setIndexAdvisorDialogOpen} />
+    </div>
   )
 }
-
-export default GridHeaderActions

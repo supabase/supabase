@@ -1,35 +1,80 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { zodResolver } from '@hookform/resolvers/zod'
 import type { AuthError } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
+import { useAuthError } from 'common'
+import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useRef, useState } from 'react'
-import toast from 'react-hot-toast'
-import { object, string } from 'yup'
+import { useEffect, useRef, useState } from 'react'
+import { useForm, type SubmitHandler } from 'react-hook-form'
+import { toast } from 'sonner'
+import { Button, Form, FormControl, FormField, Input } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
 
-import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticator-assurance-level-query'
-import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
-import { Button, Form, Input } from 'ui'
+import { LastSignInWrapper } from './LastSignInWrapper'
+import { resolveCaptchaToken } from './SignIn.utils'
+import { AlertError } from '@/components/ui/AlertError'
+import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
+import { getMfaAuthenticatorAssuranceLevel } from '@/data/profile/mfa-authenticator-assurance-level-query'
+import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
+import { captureCriticalError } from '@/lib/error-reporting'
+import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
+import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
+import { useTrack } from '@/lib/telemetry/track'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
-const signInSchema = object({
-  email: string().email('Must be a valid email').required('Email is required'),
-  password: string().required('Password is required'),
+const schema = z.object({
+  email: z.string().min(1, 'Email is required').email('Must be a valid email'),
+  password: z.string().min(1, 'Password is required'),
 })
 
-const SignInForm = () => {
+const formId = 'sign-in-form'
+
+export const SignInForm = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
+  const [_, setLastSignIn] = useLastSignIn()
+
+  const [passwordHidden, setPasswordHidden] = useState(true)
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
+  const [returnTo, setReturnTo] = useState<string | null>(null)
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: '', password: '' },
+  })
+  const isSubmitting = form.formState.isSubmitting
 
-  const onSignIn = async ({ email, password }: { email: string; password: string }) => {
+  useEffect(() => {
+    // Only call getReturnToPath after component mounts client-side
+    setReturnTo(getReturnToPath())
+  }, [])
+
+  const track = useTrack()
+  const trackFunnelError = useTrackFunnelError()
+  const { mutate: addLoginEvent } = useAddLoginEvent()
+
+  let forgotPasswordUrl = `/forgot-password`
+
+  if (returnTo && !returnTo.includes('/forgot-password')) {
+    forgotPasswordUrl = `${forgotPasswordUrl}?returnTo=${encodeURIComponent(returnTo)}`
+  }
+
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = async ({ email, password }) => {
     const toastId = toast.loading('Signing in...')
 
     let token = captchaToken
     if (!token) {
-      const captchaResponse = await captchaRef.current?.execute({ async: true })
-      token = captchaResponse?.response ?? null
+      const captcha = await resolveCaptchaToken(captchaRef, trackFunnelError, toastId)
+      if (!captcha.ok) {
+        setCaptchaToken(null)
+        captchaRef.current?.resetCaptcha()
+        return
+      }
+      token = captcha.token
     }
 
     const { error } = await auth.signInWithPassword({
@@ -39,109 +84,155 @@ const SignInForm = () => {
     })
 
     if (!error) {
+      setLastSignIn('email')
       try {
         const data = await getMfaAuthenticatorAssuranceLevel()
         if (data) {
           if (data.currentLevel !== data.nextLevel) {
             toast.success(`You need to provide your second factor authentication`, { id: toastId })
-            const url = buildPathWithParams('/sign-in-mfa')
+            const url = buildPathWithParams('/sign-in-mfa?method=email')
             router.replace(url)
             return
           }
         }
 
         toast.success(`Signed in successfully!`, { id: toastId })
-        await queryClient.resetQueries()
+        track('sign_in', { category: 'account', method: 'email' })
+        addLoginEvent({})
 
-        router.push(getReturnToPath())
-      } catch (error) {
-        toast.error((error as AuthError).message, { id: toastId })
+        await queryClient.resetQueries()
+        // since we're already on the /sign-in page, prevent redirect loops
+        let redirectPath = '/organizations'
+        if (returnTo && returnTo !== '/sign-in') {
+          redirectPath = returnTo
+        }
+        router.push(redirectPath)
+      } catch (error: any) {
+        toast.error(`Failed to sign in: ${(error as AuthError).message}`, { id: toastId })
+        trackFunnelError('signin', classifyApiError('signin', error), 'toast', toastId)
+        captureCriticalError(error, 'sign in via EP')
       }
     } else {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
 
       if (error.message.toLowerCase() === 'email not confirmed') {
-        return toast.error(
-          'Account has not been verified, please check the link sent to your email',
+        toast.error(
+          'Your account has not been verified. Please check the verification link sent to your email. If you have not received the email or the link has expired, please sign up again to request a new verification link.',
           { id: toastId }
         )
+        trackFunnelError('signin', classifyApiError('signin', error), 'toast', toastId)
+        return
       }
 
       toast.error(error.message, { id: toastId })
+      trackFunnelError('signin', classifyApiError('signin', error), 'toast', toastId)
     }
   }
 
+  const authError = useAuthError()
+
   return (
-    <Form
-      validateOnBlur
-      id="signIn-form"
-      initialValues={{ email: '', password: '' }}
-      validationSchema={signInSchema}
-      onSubmit={onSignIn}
-    >
-      {({ isSubmitting }: { isSubmitting: boolean }) => {
-        return (
-          <div className="flex flex-col gap-4">
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              label="Email"
-              placeholder="you@example.com"
-              disabled={isSubmitting}
-              autoComplete="email"
-            />
+    <Form {...form}>
+      <form
+        id={formId}
+        method="POST"
+        className="flex flex-col gap-4"
+        onSubmit={(e) => {
+          track('sign_in_submitted', { category: 'account', method: 'email' })
+          return form.handleSubmit(onSubmit, (errors) =>
+            trackFunnelError('signin', classifyValidationError('signin', errors), 'form')
+          )(e)
+        }}
+      >
+        {authError && <AlertError error={authError} subject="Error while signing in" />}
+        <FormField
+          key="email"
+          name="email"
+          control={form.control}
+          render={({ field }) => (
+            <FormItemLayout label="Email">
+              <FormControl>
+                <Input
+                  type="email"
+                  autoComplete="email"
+                  {...field}
+                  placeholder="you@example.com"
+                  disabled={isSubmitting}
+                />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
 
-            <div className="relative">
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                label="Password"
-                placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                disabled={isSubmitting}
-                autoComplete="current-password"
-              />
+        <div className="relative">
+          <FormField
+            key="password"
+            name="password"
+            control={form.control}
+            render={({ field }) => (
+              <FormItemLayout label="Password">
+                <div className="relative">
+                  <FormControl>
+                    <Input
+                      type={passwordHidden ? 'password' : 'text'}
+                      autoComplete="current-password"
+                      {...field}
+                      placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                      disabled={isSubmitting}
+                      className="pr-10"
+                    />
+                  </FormControl>
+                  <Button
+                    variant="default"
+                    title={passwordHidden ? `Show password` : `Hide password`}
+                    aria-label={passwordHidden ? `Show password` : `Hide password`}
+                    className="absolute right-1 top-1 px-1.5"
+                    icon={passwordHidden ? <Eye /> : <EyeOff />}
+                    disabled={isSubmitting}
+                    onClick={() => setPasswordHidden((prev) => !prev)}
+                  />
+                </div>
+              </FormItemLayout>
+            )}
+          />
 
-              {/* positioned using absolute instead of labelOptional prop so tabbing between inputs works smoothly */}
-              <Link
-                href="/forgot-password"
-                className="absolute top-0 right-0 text-sm text-foreground-lighter"
-              >
-                Forgot Password?
-              </Link>
-            </div>
+          {/* positioned using absolute instead of labelOptional prop so tabbing between inputs works smoothly */}
+          <Link
+            href={forgotPasswordUrl}
+            className="absolute top-0 right-0 text-sm text-foreground-lighter"
+          >
+            Forgot password?
+          </Link>
+        </div>
 
-            <div className="self-center">
-              <HCaptcha
-                ref={captchaRef}
-                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-                size="invisible"
-                onVerify={(token) => {
-                  setCaptchaToken(token)
-                }}
-                onExpire={() => {
-                  setCaptchaToken(null)
-                }}
-              />
-            </div>
+        <div className="self-center">
+          <HCaptcha
+            ref={captchaRef}
+            sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+            size="invisible"
+            onVerify={(token) => {
+              setCaptchaToken(token)
+            }}
+            onExpire={() => {
+              setCaptchaToken(null)
+            }}
+          />
+        </div>
 
-            <Button
-              block
-              form="signIn-form"
-              htmlType="submit"
-              size="large"
-              disabled={isSubmitting}
-              loading={isSubmitting}
-            >
-              Sign In
-            </Button>
-          </div>
-        )
-      }}
+        <LastSignInWrapper type="email">
+          <Button
+            variant="primary"
+            block
+            form={formId}
+            type="submit"
+            size="large"
+            loading={isSubmitting}
+          >
+            Sign in
+          </Button>
+        </LastSignInWrapper>
+      </form>
     </Form>
   )
 }
-
-export default SignInForm

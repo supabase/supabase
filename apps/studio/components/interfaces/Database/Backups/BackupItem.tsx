@@ -1,26 +1,37 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
-import { Badge, Button, IconDownload } from 'ui'
+import { useParams } from 'common'
+import { Download } from 'lucide-react'
+import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
-import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
-import type { DatabaseBackup } from 'data/database/backups-query'
-import { useCheckPermissions } from 'hooks'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useBackupDownloadMutation } from '@/data/database/backup-download-mutation'
+import type { DatabaseBackup } from '@/data/database/backups-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface BackupItemProps {
   index: number
   isHealthy: boolean
-  projectRef: string
+  isHighAvailability: boolean
   backup: DatabaseBackup
   onSelectBackup: () => void
 }
 
-const BackupItem = ({ index, isHealthy, backup, projectRef, onSelectBackup }: BackupItemProps) => {
-  const canTriggerScheduledBackups = useCheckPermissions(
+export const BackupItem = ({
+  index,
+  isHealthy,
+  isHighAvailability,
+  backup,
+  onSelectBackup,
+}: BackupItemProps) => {
+  const { ref: projectRef } = useParams()
+  const { can: canTriggerScheduledBackups } = useAsyncCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )
 
-  const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
+  const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
       const { fileUrl } = res
 
@@ -33,38 +44,61 @@ const BackupItem = ({ index, isHealthy, backup, projectRef, onSelectBackup }: Ba
     },
   })
 
-  const generateSideButtons = (backup: any) => {
+  function getTooltipText() {
+    if (isHighAvailability) {
+      return 'Restoring from a backup is unavailable on High Availability projects'
+    } else if (!isHealthy) {
+      return 'Cannot be restored as project is not active'
+    } else if (!canTriggerScheduledBackups) {
+      return 'You need additional permissions to trigger a restore'
+    } else {
+      return undefined
+    }
+  }
+
+  const generateSideButtons = (backup: DatabaseBackup) => {
     if (backup.status === 'COMPLETED')
       return (
         <div className="flex space-x-4">
-          <Button
-            type="default"
-            disabled={!isHealthy || !canTriggerScheduledBackups}
+          <ButtonTooltip
+            variant="default"
+            disabled={!isHealthy || !canTriggerScheduledBackups || isHighAvailability}
             onClick={onSelectBackup}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: getTooltipText(),
+              },
+            }}
           >
             Restore
-          </Button>
+          </ButtonTooltip>
+
           {!backup.isPhysicalBackup && (
-            <Button
-              type="default"
-              disabled={!canTriggerScheduledBackups || isDownloading}
-              onClick={() => downloadBackup({ ref: projectRef, backup })}
+            <ButtonTooltip
+              variant="default"
+              icon={<Download />}
               loading={isDownloading}
-              icon={<IconDownload />}
+              disabled={!canTriggerScheduledBackups || isDownloading}
+              onClick={() => {
+                if (!projectRef) return console.error('Project ref is required')
+                downloadBackup({ ref: projectRef, backup })
+              }}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canTriggerScheduledBackups
+                    ? 'You need additional permissions to download backups'
+                    : undefined,
+                },
+              }}
             >
               Download
-            </Button>
+            </ButtonTooltip>
           )}
         </div>
       )
     return <Badge variant="warning">Backup In Progress...</Badge>
-  }
-
-  const generateBackupName = (backup: any) => {
-    if (backup.status == 'COMPLETED') {
-      return `${dayjs(backup.inserted_at).format('DD MMM YYYY HH:mm:ss')} UTC`
-    }
-    return dayjs(backup.inserted_at).format('DD MMM YYYY')
   }
 
   return (
@@ -73,10 +107,28 @@ const BackupItem = ({ index, isHealthy, backup, projectRef, onSelectBackup }: Ba
         index ? 'border-t border-default' : ''
       }`}
     >
-      <p className="text-sm text-foreground ">{generateBackupName(backup)}</p>
+      <div className="flex items-center gap-x-2">
+        <TimestampInfo
+          displayAs="utc"
+          utcTimestamp={backup.inserted_at}
+          labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+          className="text-left text-sm! font-mono tracking-tight"
+        />
+        <Tooltip>
+          <TooltipTrigger>
+            <Badge variant="default">{backup.isPhysicalBackup ? 'Physical' : 'Logical'}</Badge>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            {backup.isPhysicalBackup
+              ? 'File-level backups of your entire database.'
+              : 'SQL-based backups of your entire database.'}{' '}
+            <InlineLink href="https://supabase.com/blog/postgresql-physical-logical-backups">
+              Learn more
+            </InlineLink>
+          </TooltipContent>
+        </Tooltip>
+      </div>
       <div>{generateSideButtons(backup)}</div>
     </div>
   )
 }
-
-export default BackupItem

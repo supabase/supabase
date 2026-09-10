@@ -1,46 +1,56 @@
-import 'react-medium-image-zoom/dist/styles.css'
-
-import { PropsWithChildren } from 'react'
-import Image from 'next/image'
-import { ThemeImage } from 'ui-patterns/ThemeImage'
-
-import Avatar from '~/components/Avatar'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
-import { CH } from '@code-hike/mdx/components'
-import ImageGrid from '~/components/ImageGrid'
-import Quote from '~/components/Quote'
-import Chart from '~/components/Charts/PGCharts'
-import InlineCodeTag from '~/components/InlineCode'
 import {
-  Admonition,
-  Badge,
-  cn,
-  Collapsible_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  Heading,
-  IconArrowUpRight,
-  IconTriangle,
-} from 'ui'
+  Annotation,
+  annotations,
+  Code,
+  CodeSlot,
+  InlineCode,
+  Preview,
+  PreviewSlot,
+  Scrollycoding,
+  Section,
+  SectionCode,
+  SectionLink,
+  Slideshow,
+  Spotlight,
+} from '@code-hike/mdx/components'
+import Avatar from '~/components/Avatar'
+import BlogCollapsible from '~/components/Blog/BlogCollapsible'
+import DeveloperGrowthChart from '~/components/Charts/DeveloperGrowthChart'
+import Chart from '~/components/Charts/PGCharts'
+import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import { NamedCodeBlock } from '~/components/CodeTabs'
 import ImageFadeStack from '~/components/ImageFadeStack'
-import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
+import ImageGrid from '~/components/ImageGrid'
+import InlineCodeTag from '~/components/InlineCode'
+import Quote from '~/components/Quote'
+import Tabs, { TabPanel } from '~/components/Tabs/Tabs'
+import { ArrowUpRight } from 'lucide-react'
+import type { PropsWithChildren } from 'react'
+import { Badge, cn, Heading } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { Image, type ImageProps } from 'ui-patterns/Image'
+import { Mermaid } from 'ui-patterns/Mermaid'
+
+const CH = {
+  Annotation,
+  Code,
+  CodeSlot,
+  InlineCode,
+  Preview,
+  PreviewSlot,
+  Scrollycoding,
+  Section,
+  SectionCode,
+  SectionLink,
+  Slideshow,
+  Spotlight,
+  annotations,
+}
 
 // import all components used in blog articles here
 // to do: move this into a helper/utils, it is used elsewhere
 
 const ignoreClass = 'ignore-on-export'
-
-const getCaptionAlign = (align?: 'left' | 'center' | 'right') => {
-  switch (align) {
-    case 'left':
-      return 'text-left'
-    case 'right':
-      return 'text-right'
-    case 'center':
-    default:
-      return 'text-center'
-  }
-}
 
 const LinkComponent = (props: PropsWithChildren<HTMLAnchorElement>) => (
   <a
@@ -49,36 +59,16 @@ const LinkComponent = (props: PropsWithChildren<HTMLAnchorElement>) => (
     className={cn('inline relative [&_p]:inline', props.target === '_blank' && 'mr-4')}
   >
     {props.children}{' '}
-    {props.target === '_blank' && <IconArrowUpRight className="absolute -right-3.5 w-3 top-0" />}
+    {props.target === '_blank' && <ArrowUpRight className="absolute -right-3.5 w-3 top-0" />}
   </a>
 )
-
-const BlogCollapsible = ({ title, ...props }: { title: string }) => {
-  return (
-    <Collapsible_Shadcn_>
-      <CollapsibleTrigger_Shadcn_
-        className="
-        data-[state=open]:text
-        hover:text-foreground-light
-        flex items-center gap-3
-        [&>svg]:fill-current
-        [&>svg]:rotate-90
-        [&>svg]:transition-transform
-        [&>svg]:data-[state='open']:rotate-180
-        [&>svg]:data-[state='open']:text
-        "
-      >
-        <IconTriangle size={10} />
-        <span>{title}</span>
-      </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_ {...props} />
-    </Collapsible_Shadcn_>
-  )
-}
 
 export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
   const components = {
     CodeBlock,
+    Tabs,
+    TabPanel,
+    NamedCodeBlock,
     CH,
     h1: (props: any) => <Heading {...props} tag="h1" />,
     h2: (props: any) => <Heading {...props} tag="h2" />,
@@ -92,9 +82,15 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     PGChart: (props: any) => {
       return <Chart {...props} />
     },
+    DeveloperGrowthChart,
     pre: (props: any) => {
       if (props.className !== ignoreClass) {
-        return <CodeBlock {...props.children.props} />
+        const childProps = props.children?.props
+        // Detect mermaid code blocks and render with Mermaid component
+        if (childProps?.className === 'language-mermaid') {
+          return <Mermaid chart={childProps.children} />
+        }
+        return <CodeBlock {...childProps} />
       } else {
         return <code {...props} />
       }
@@ -104,42 +100,38 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     img: (props: any) => {
       if (props.className !== ignoreClass) {
         return (
-          <span className={['next-image--dynamic-fill'].join(' ')}>
-            <Image
-              {...props}
-              className={[type === 'blog' ? 'm-0 object-cover rounded-md border' : ''].join(' ')}
-              fill
-              loading="lazy"
-            />
-          </span>
-        )
-      }
-      return <img {...props} />
-    },
-    Img: ({ zoomable = true, className, ...props }: any) => (
-      <figure className={cn('m-0', className)}>
-        <ZoomableImg zoomable={zoomable}>
-          <span
-            className={[
-              'next-image--dynamic-fill',
+          <Image
+            fill
+            className={cn(
+              'm-0 object-cover',
               type === 'blog' ? 'rounded-md border' : '',
               props.wide && 'wide',
-            ].join(' ')}
-          >
-            <ThemeImage fill className="m-0 object-cover" {...props} />
-          </span>
-        </ZoomableImg>
-        {props.caption && (
-          <figcaption className={[getCaptionAlign(props.captionAlign)].join(' ')}>
-            {props.caption}
-          </figcaption>
-        )}
-      </figure>
+              props.className
+            )}
+            {...props}
+          />
+        )
+      }
+      // biome-ignore lint/a11y/useAltText: provided in props
+      return <img {...props} />
+    },
+    Img: ({ zoomable = true, className, ...props }: ImageProps & { wide?: boolean }) => (
+      <Image
+        fill
+        containerClassName={cn(props.wide && 'wide')}
+        className={cn('m-0 object-cover', type === 'blog' ? 'rounded-md border' : '', className)}
+        zoomable={zoomable}
+        {...props}
+      />
     ),
     Link: LinkComponent,
     code: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
     BlogCollapsible: (props: any) => <BlogCollapsible {...props} />,
+    Subtitle: (props: any) => (
+      <p className={cn('-mt-6 text-foreground-lighter text-lg', props.className)} {...props} />
+    ),
     Admonition,
+    Mermaid,
   }
 
   return components as any

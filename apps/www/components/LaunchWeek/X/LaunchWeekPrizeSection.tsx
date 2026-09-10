@@ -1,8 +1,9 @@
+import Image from 'next/image'
 import React from 'react'
 import { cn } from 'ui'
+
 import LabelBadge from './LabelBadge'
 import LaunchWeekPrizeCard from './LaunchWeekPrizeCard'
-import Image from 'next/image'
 
 export default function LaunchWeekPrizeSection({ className }: { className?: string }) {
   return (
@@ -14,7 +15,6 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
       )}
     >
       <h2 className="w-full text-sm font-mono uppercase tracking-[1px]">Awards</h2>
-      <p>Stay tuned on Launch Week X's final day to find out if you're one of the lucky winners.</p>
       <div className="w-full pt-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mx-auto h-auto text-[#EDEDED]">
           <LaunchWeekPrizeCard
@@ -22,7 +22,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
             contentClassName="flex flex-col justify-between"
             content={
               <>
-                <div className="p-4 md:p-6 flex flex-col flex-shrink gap-2 text-sm items-start">
+                <div className="p-4 md:p-6 flex flex-col shrink gap-2 text-sm items-start">
                   <LabelBadge text="10 keyboards" />
                   <p className="text-lg text-[#8B9092] max-w-lg">
                     Limited-edition{' '}
@@ -34,6 +34,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                     <Image
                       src="/images/launchweek/lwx/swag/lwx_keyboard.png"
                       fill
+                      sizes="100%"
                       quality={100}
                       alt="/images/launchweek/lwx/swag/lwx_keyboard.png"
                       className="h-full w-full block"
@@ -45,7 +46,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
           />
           <div className="w-full flex flex-col gap-4 items-stretch">
             <LaunchWeekPrizeCard
-              className="flex-grow"
+              className="grow"
               content={
                 <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
                   <LabelBadge text="20 t-shirts" />
@@ -54,7 +55,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
               }
             />
             <LaunchWeekPrizeCard
-              className="flex-grow"
+              className="grow"
               content={
                 <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
                   <LabelBadge text="25 caps" />
@@ -63,7 +64,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
               }
             />
             <LaunchWeekPrizeCard
-              className="flex-grow"
+              className="grow"
               content={
                 <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
                   <LabelBadge text="50 stickers" />

@@ -1,107 +1,83 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { useUser } from 'common'
-import { usePrevious } from 'hooks'
+import { usePrevious } from '@uidotdev/usehooks'
+import { AlertCircle, Check, Loader2, RefreshCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { Button, IconAlertCircle, IconCheck, IconLoader, IconRefreshCcw } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import ReadOnlyBadge from './ReadOnlyBadge'
+import { useProfile } from '@/lib/profile'
+import { isSaveFailed, isSaving } from '@/state/sql-editor/sql-editor-lifecycle'
+import { isSnippetOwner } from '@/state/sql-editor/sql-editor-rules'
+import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export type SavingIndicatorProps = { id: string }
 
 const SavingIndicator = ({ id }: SavingIndicatorProps) => {
-  const snap = useSqlEditorStateSnapshot()
-  const savingState = snap.savingStates[id]
-  const user = useUser()
+  const { profile } = useProfile()
+  const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const previousState = usePrevious(savingState)
+  const snippet = snapV2.snippets[id]
+  const status = snippet?.snippet.status
+  const saving = isSaving(status)
+  const saveFailed = isSaveFailed(status)
+  const previousSaving = usePrevious(saving)
   const [showSavedText, setShowSavedText] = useState(false)
-  const snippet = snap.snippets[id]
-  const isSnippetOwner = user?.user_metadata?.user_name === snippet?.snippet?.owner?.username
+
+  const snippetIsOwned = !!snippet && isSnippetOwner(snippet.snippet, profile?.id)
+  const { requestSave } = useSqlEditorSaveCoordinator()
 
   useEffect(() => {
     let cancel = false
 
-    if (previousState === 'UPDATING' && savingState === 'IDLE') {
+    if (previousSaving && status === 'saved') {
       setShowSavedText(true)
       setTimeout(() => {
         if (!cancel) setShowSavedText(false)
-      }, 3000)
+      }, 5000)
     }
 
     return () => {
       cancel = true
     }
-  }, [savingState])
+  }, [status, previousSaving])
 
-  const retry = () => {
-    snap.addNeedsSaving(id)
-  }
+  const retry = () => requestSave(id)
 
   return (
     <>
       <div className="mx-2 flex items-center gap-2">
-        {isSnippetOwner && savingState === 'UPDATING_FAILED' && (
+        {snippetIsOwned && saveFailed && (
           <Button
-            type="text"
+            variant="text"
             size="tiny"
-            icon={<IconRefreshCcw className="text-gray-1100" size="tiny" strokeWidth={2} />}
+            icon={<RefreshCcw className="text-gray-1100" strokeWidth={2} />}
             onClick={retry}
           >
             Retry
           </Button>
         )}
         {showSavedText ? (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <IconCheck className="text-brand" size={14} strokeWidth={3} />
-            </Tooltip.Trigger>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'bg-alternative rounded py-1 px-2 leading-none shadow',
-                  'border-background border ',
-                ].join(' ')}
-              >
-                <span className="text-foreground text-xs">All changes saved</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Root>
-        ) : isSnippetOwner && savingState === 'UPDATING' ? (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <IconLoader className="animate-spin" size={14} strokeWidth={2} />
-            </Tooltip.Trigger>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'bg-alternative rounded py-1 px-2 leading-none shadow',
-                  'border-background border',
-                ].join(' ')}
-              >
-                <span className="text-foreground text-xs">Saving changes...</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Root>
-        ) : savingState === 'UPDATING_FAILED' ? (
-          isSnippetOwner ? (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <IconAlertCircle className="text-red-900" size={14} strokeWidth={2} />
-              </Tooltip.Trigger>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'bg-alternative rounded py-1 px-2 leading-none shadow',
-                    'border-background border ',
-                  ].join(' ')}
-                >
-                  <span className="text-foreground text-xs">Failed to save changes</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Root>
+          <Tooltip>
+            <TooltipTrigger>
+              <Check className="text-brand" size={14} strokeWidth={3} />
+            </TooltipTrigger>
+            <TooltipContent side="bottom">All changes saved</TooltipContent>
+          </Tooltip>
+        ) : saving ? (
+          <Tooltip>
+            <TooltipTrigger>
+              <Loader2 className="animate-spin" size={14} strokeWidth={2} />
+            </TooltipTrigger>
+            <TooltipContent>Saving changes...</TooltipContent>
+          </Tooltip>
+        ) : saveFailed ? (
+          snippetIsOwned ? (
+            <Tooltip>
+              <TooltipTrigger>
+                <AlertCircle className="text-red-900" size={14} strokeWidth={2} />
+              </TooltipTrigger>
+              <TooltipContent>Failed to save changes</TooltipContent>
+            </Tooltip>
           ) : (
             <ReadOnlyBadge id={id} />
           )

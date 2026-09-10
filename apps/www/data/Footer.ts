@@ -1,9 +1,19 @@
+import {
+  appTypeSolutions,
+  migrationSolutions,
+  skillBasedSolutions,
+  useCaseSolutions,
+} from 'data/Solutions'
 import { PrivacySettings } from 'ui-patterns/PrivacySettings'
 
 const footerData = [
   {
     title: 'Product',
     links: [
+      {
+        text: 'Pricing',
+        url: '/pricing',
+      },
       {
         text: 'Database',
         url: '/database',
@@ -26,21 +36,50 @@ const footerData = [
       },
       {
         text: 'Vector',
-        url: '/vector',
+        url: '/modules/vector',
       },
       {
-        text: 'Pricing',
-        url: '/pricing',
+        text: 'Cron',
+        url: '/modules/cron',
       },
       {
-        text: 'Launch Week X',
+        text: 'Feature Catalog',
+        url: '/features',
+      },
+      {
+        text: 'Launch Week',
         url: '/launch-week',
       },
     ],
   },
   {
+    title: 'Solutions',
+    links: [
+      ...skillBasedSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
+      ...useCaseSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
+      ...appTypeSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
+      ...migrationSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
+    ],
+  },
+  {
     title: 'Resources',
     links: [
+      {
+        text: 'Blog',
+        url: '/blog',
+      },
       {
         text: 'Support',
         url: '/support',
@@ -54,24 +93,20 @@ const footerData = [
         url: '/partners',
       },
       {
-        text: 'Integrations',
-        url: '/partners/integrations',
+        text: 'Partner Catalog',
+        url: '/partners/catalog',
       },
       {
-        text: 'Experts',
-        url: '/partners/experts',
-      },
-      {
-        text: 'Brand Assets / Logos',
+        text: 'Brand Assets',
         url: '/brand-assets',
       },
       {
-        text: 'Security and Compliance',
+        text: 'Security & Compliance',
         url: '/security',
       },
       {
-        text: 'DPA',
-        url: '/legal/dpa',
+        text: 'Regions',
+        url: '/regions',
       },
       {
         text: 'SOC2',
@@ -91,24 +126,12 @@ const footerData = [
         url: '/docs',
       },
       {
+        text: 'Supabase Library',
+        url: 'https://supabase.com/library',
+      },
+      {
         text: 'Changelog',
         url: '/changelog',
-      },
-      {
-        text: 'Contributing',
-        url: '/docs/handbook/contributing',
-      },
-      {
-        text: 'Open Source',
-        url: '/open-source',
-      },
-      {
-        text: 'SupaSquad',
-        url: '/supasquad',
-      },
-      {
-        text: 'DevTo',
-        url: 'https://dev.to/supabase',
       },
       {
         text: 'RSS',
@@ -117,27 +140,48 @@ const footerData = [
     ],
   },
   {
+    title: 'Community',
+    links: [
+      {
+        text: 'Events & Webinars',
+        url: '/events',
+      },
+      {
+        text: 'SupaSquad',
+        url: '/supasquad',
+      },
+      {
+        text: 'Contributing',
+        url: 'https://github.com/supabase/supabase/blob/master/CONTRIBUTING.md',
+      },
+      {
+        text: 'Open Source',
+        url: '/open-source',
+      },
+      {
+        text: 'DevTo',
+        url: 'https://dev.to/supabase',
+      },
+    ],
+  },
+  {
     title: 'Company',
     links: [
       {
-        text: 'Blog',
-        url: '/blog',
-      },
-      {
-        text: 'Customer Stories',
-        url: '/customers',
+        text: 'Company',
+        url: '/company',
       },
       {
         text: 'Careers',
         url: '/careers',
       },
       {
-        text: 'Company',
-        url: '/company',
+        text: 'General Availability',
+        url: '/ga',
       },
       {
-        text: 'Terms of Service',
-        url: '/terms',
+        text: 'Legal Hub',
+        url: '/legal',
       },
       {
         text: 'Privacy Policy',
@@ -152,14 +196,6 @@ const footerData = [
         url: '/aup',
       },
       {
-        text: 'Support Policy',
-        url: '/support-policy',
-      },
-      {
-        text: 'Service Level Agreement',
-        url: '/sla',
-      },
-      {
         text: 'Humans.txt',
         url: '/humans.txt',
       },
@@ -170,6 +206,10 @@ const footerData = [
       {
         text: 'Security.txt',
         url: '/.well-known/security.txt',
+      },
+      {
+        text: 'Contact Us',
+        url: '/contact-us',
       },
     ],
   },

@@ -1,67 +1,47 @@
-import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCallback } from 'react'
+import pgMeta, { type PGView } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { executeSql } from '../sql/execute-sql-mutation'
 import { viewKeys } from './keys'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ViewsVariables = {
   projectRef?: string
-  connectionString?: string
-  schema?: string
+  connectionString?: string | null
+  schemas?: string[]
 }
 
 export async function getViews(
-  { projectRef, connectionString, schema }: ViewsVariables,
+  { projectRef, connectionString, schemas }: ViewsVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await get('/platform/pg-meta/{ref}/views', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: {
-        included_schemas: schema || '',
-      } as any,
+  const { sql } = pgMeta.views.list({ includedSchemas: schemas })
+  const { result } = await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['views', schemas].filter(Boolean),
     },
-    headers,
-    signal,
-  })
+    signal
+  )
 
-  if (error) handleError(error)
-  return data
+  return result as PGView[]
 }
 
 export type ViewsData = Awaited<ReturnType<typeof getViews>>
 export type ViewsError = ResponseError
 
 export const useViewsQuery = <TData = ViewsData>(
-  { projectRef, connectionString, schema }: ViewsVariables,
-  { enabled = true, ...options }: UseQueryOptions<ViewsData, ViewsError, TData> = {}
+  { projectRef, connectionString, schemas }: ViewsVariables,
+  { enabled = true, ...options }: UseCustomQueryOptions<ViewsData, ViewsError, TData> = {}
 ) =>
-  useQuery<ViewsData, ViewsError, TData>(
-    schema ? viewKeys.listBySchema(projectRef, schema) : viewKeys.list(projectRef),
-    ({ signal }) => getViews({ projectRef, connectionString, schema }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      staleTime: 0,
-      ...options,
-    }
-  )
-
-export const useViewsPrefetch = ({ projectRef, connectionString, schema }: ViewsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(
-        schema ? viewKeys.listBySchema(projectRef, schema) : viewKeys.list(projectRef),
-        ({ signal }) => getViews({ projectRef, connectionString, schema }, signal)
-      )
-    }
-  }, [projectRef, schema])
-}
+  useQuery<ViewsData, ViewsError, TData>({
+    queryKey: schemas ? viewKeys.listBySchema(projectRef, schemas) : viewKeys.list(projectRef),
+    queryFn: ({ signal }) => getViews({ projectRef, connectionString, schemas }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    staleTime: 0,
+    ...options,
+  })

@@ -1,52 +1,82 @@
-import type { Session, User } from '@supabase/gotrue-js'
-import { gotrueClient } from 'common'
+import type { JwtPayload } from '@supabase/supabase-js'
+import { type User } from 'common/auth'
+import { gotrueClient } from 'common/gotrue'
 
 export const auth = gotrueClient
 
-let currentSession: Session | null = null
-
-auth.onAuthStateChange((event, session) => {
-  currentSession = session
-})
+export const DEFAULT_FALLBACK_PATH = '/organizations'
+export const DEFAULT_SIGNUP_RETURN_PATH = '/new'
 
 /**
- * Grabs the currently available access token, or calls getSession.
+ * When unauthenticated users hit protected dashboard routes, withAuth sets
+ * returnTo to the current path. Marketing entry via /dashboard often ends up
+ * as returnTo=/org (or /organizations). New users who switch to sign-up should
+ * start org creation instead.
  */
-export async function getAccessToken() {
-  // ignore if server-side
-  if (typeof window === 'undefined') return undefined
+export function getSignUpReturnTo(returnTo: string | string[] | undefined): string {
+  const value = Array.isArray(returnTo) ? returnTo[0] : returnTo
 
-  const aboutToExpire = currentSession?.expires_at
-    ? currentSession.expires_at - Math.ceil(Date.now() / 1000) < 30
-    : false
-
-  if (!currentSession || aboutToExpire) {
-    const {
-      data: { session },
-      error,
-    } = await auth.getSession()
-    if (error) {
-      throw error
-    }
-
-    return session?.access_token
+  if (!value) {
+    return DEFAULT_SIGNUP_RETURN_PATH
   }
 
-  return currentSession.access_token
+  const [pathname, query] = value.split('?', 2)
+  if (pathname === DEFAULT_FALLBACK_PATH || pathname === '/org') {
+    return query ? `${DEFAULT_SIGNUP_RETURN_PATH}?${query}` : DEFAULT_SIGNUP_RETURN_PATH
+  }
+
+  return value
 }
 
-export const getAuthUser = async (token: String): Promise<any> => {
+/** Post-signup redirect path, normalising returnTo and excluding it from merged query params. */
+export function buildSignUpReturnPath(returnTo: string | string[] | undefined): string {
+  const basePath = validateReturnTo(getSignUpReturnTo(returnTo), DEFAULT_SIGNUP_RETURN_PATH)
+  const [pathOnly, pathQuery] = basePath.split('?', 2)
+  const pathnameSearchParams = new URLSearchParams(pathQuery || '')
+
+  if (typeof location === 'undefined') {
+    const queryString = pathnameSearchParams.toString()
+    return queryString ? `${pathOnly}?${queryString}` : pathOnly
+  }
+
+  const mergedParams = new URLSearchParams(location.search)
+  mergedParams.delete('returnTo')
+  for (const [key, val] of pathnameSearchParams.entries()) {
+    mergedParams.set(key, val)
+  }
+
+  const queryString = mergedParams.toString()
+  return queryString ? `${pathOnly}?${queryString}` : pathOnly
+}
+
+export const validateReturnTo = (
+  returnTo: string,
+  fallback: string = DEFAULT_FALLBACK_PATH
+): string => {
+  // Block protocol-relative URLs and external URLs
+  if (returnTo.startsWith('//') || returnTo.includes('://')) {
+    return fallback
+  }
+
+  // For internal paths:
+  // 1. Must start with /
+  // 2. Only allow alphanumeric chars, slashes, hyphens, underscores
+  // 3. For query params, also allow =, &, and ?
+  const safePathPattern = /^\/[a-zA-Z0-9/\-_]*(?:\?[a-zA-Z0-9\-_=&]*)?$/
+  return safePathPattern.test(returnTo) ? returnTo : fallback
+}
+
+export const getUserClaims = async (
+  token: String
+): Promise<{ error: any | null; claims: JwtPayload | null }> => {
   try {
-    const {
-      data: { user },
-      error,
-    } = await auth.getUser(token.replace('Bearer ', ''))
+    const { data, error } = await auth.getClaims(token.replace(/bearer /i, ''))
     if (error) throw error
 
-    return { user, error: null }
+    return { claims: data?.claims ?? null, error: null }
   } catch (err) {
     console.error(err)
-    return { user: null, error: err }
+    return { claims: null, error: err }
   }
 }
 
@@ -69,11 +99,27 @@ export const getIdentity = (gotrueUser: User) => {
  * Transfers the search params from the current location path to a newly built path
  */
 export const buildPathWithParams = (pathname: string) => {
-  const searchParams = new URLSearchParams(location.search)
-  return `${pathname}?${searchParams.toString()}`
+  const [basePath, existingParams] = pathname.split('?', 2)
+
+  const pathnameSearchParams = new URLSearchParams(existingParams || '')
+
+  // Merge the parameters, with pathname parameters taking precedence
+  // over the current location's search parameters
+  const mergedParams = new URLSearchParams(location.search)
+  for (const [key, value] of pathnameSearchParams.entries()) {
+    mergedParams.set(key, value)
+  }
+
+  const queryString = mergedParams.toString()
+  return queryString ? `${basePath}?${queryString}` : basePath
 }
 
-export const getReturnToPath = (fallback = '/projects') => {
+export const getReturnToPath = (fallback = DEFAULT_FALLBACK_PATH) => {
+  // If we're in a server environment, return the fallback
+  if (typeof location === 'undefined') {
+    return fallback
+  }
+
   const searchParams = new URLSearchParams(location.search)
 
   let returnTo = searchParams.get('returnTo') ?? fallback
@@ -85,18 +131,20 @@ export const getReturnToPath = (fallback = '/projects') => {
   searchParams.delete('returnTo')
 
   const remainingSearchParams = searchParams.toString()
+  const validReturnTo = validateReturnTo(returnTo, fallback)
 
-  let validReturnTo
+  const [path, existingQuery] = validReturnTo.split('?')
 
-  // only allow returning to internal pages. e.g. /projects
-  try {
-    // if returnTo is a relative path, this will throw an error
-    new URL(returnTo)
-    // if no error, returnTo is a valid URL and NOT an internal page
-    validReturnTo = fallback
-  } catch (_) {
-    validReturnTo = returnTo
+  const finalSearchParams = new URLSearchParams(existingQuery || '')
+
+  // Add all remaining search params to the final search params
+  if (remainingSearchParams) {
+    const remainingParams = new URLSearchParams(remainingSearchParams)
+    remainingParams.forEach((value, key) => {
+      finalSearchParams.append(key, value)
+    })
   }
 
-  return validReturnTo + (remainingSearchParams ? `?${remainingSearchParams}` : '')
+  const finalQuery = finalSearchParams.toString()
+  return path + (finalQuery ? `?${finalQuery}` : '')
 }

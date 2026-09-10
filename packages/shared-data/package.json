@@ -4,7 +4,18 @@
   "description": "Data shared between Supabase apps",
   "main": "./index.ts",
   "types": "./index.ts",
-  "scripts": {},
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "tsconfig": "workspace:"
+  },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/shared-types": "0.1.91",
+    "zod": "catalog:"
+  }
 }

@@ -1,11 +1,11 @@
 import { Database } from '@/lib/schema'
-import { Session, useSupabaseClient } from '@supabase/auth-helpers-react'
+import { supabase } from '@/lib/initSupabase'
+import { Session } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
 
 type Todos = Database['public']['Tables']['todos']['Row']
 
 export default function TodoList({ session }: { session: Session }) {
-  const supabase = useSupabaseClient<Database>()
   const [todos, setTodos] = useState<Todos[]>([])
   const [newTaskText, setNewTaskText] = useState('')
   const [errorText, setErrorText] = useState('')
@@ -24,7 +24,7 @@ export default function TodoList({ session }: { session: Session }) {
     }
 
     fetchTodos()
-  }, [supabase])
+  }, [])
 
   const addTodo = async (taskText: string) => {
     let task = taskText.trim()
@@ -90,7 +90,6 @@ export default function TodoList({ session }: { session: Session }) {
 }
 
 const Todo = ({ todo, onDelete }: { todo: Todos; onDelete: () => void }) => {
-  const supabase = useSupabaseClient<Database>()
   const [isCompleted, setIsCompleted] = useState(todo.is_complete)
 
   const toggle = async () => {
@@ -110,7 +109,7 @@ const Todo = ({ todo, onDelete }: { todo: Todos; onDelete: () => void }) => {
   }
 
   return (
-    <li className="w-full block cursor-pointer hover:bg-gray-200 focus:outline-none focus:bg-gray-200 transition duration-150 ease-in-out">
+    <li className="w-full block cursor-pointer hover:bg-200 focus:outline-none focus:bg-200 transition duration-150 ease-in-out">
       <div className="flex items-center px-4 py-4 sm:px-6">
         <div className="min-w-0 flex-1 flex items-center">
           <div className="text-sm leading-5 font-medium truncate">{todo.task}</div>

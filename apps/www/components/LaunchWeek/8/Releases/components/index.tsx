@@ -85,8 +85,8 @@ export const HackernewsSvg = () => (
 export const TwitterSpacesSvg = () => (
   <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
-      fill-rule="evenodd"
-      clip-rule="evenodd"
+      fillRule="evenodd"
+      clipRule="evenodd"
       d="M4.46228 5.78799C4.46228 3.4802 6.3331 1.60938 8.64089 1.60938C10.9487 1.60938 12.8195 3.4802 12.8195 5.78799V8.17578C12.8195 10.4836 10.9487 12.3544 8.64089 12.3544C6.3331 12.3544 4.46228 10.4836 4.46228 8.17578V5.78799ZM6.85006 8.17578C7.09719 8.17578 7.29777 7.9752 7.29777 7.72807V6.2357C7.29777 5.98857 7.09719 5.78799 6.85006 5.78799C6.60292 5.78799 6.40235 5.98857 6.40235 6.2357V7.72807C6.40235 7.9752 6.60292 8.17578 6.85006 8.17578ZM8.64089 8.77272C8.88803 8.77272 9.0886 8.57215 9.0886 8.32501V5.63876C9.0886 5.39162 8.88803 5.19105 8.64089 5.19105C8.39376 5.19105 8.19319 5.39162 8.19319 5.63876V8.32501C8.19319 8.57215 8.39376 8.77272 8.64089 8.77272ZM10.4317 8.17578C10.6789 8.17578 10.8794 7.9752 10.8794 7.72807V6.2357C10.8794 5.98857 10.6789 5.78799 10.4317 5.78799C10.1846 5.78799 9.98402 5.98857 9.98402 6.2357V7.72807C9.98402 7.9752 10.1846 8.17578 10.4317 8.17578Z"
       fill="#8F8F8F"
     />
@@ -101,8 +101,8 @@ export const ProductHuntSvg = () => (
   <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0_3061_22934)">
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M8.00078 15.5094C12.0787 15.5094 15.3844 12.2037 15.3844 8.12578C15.3844 4.04782 12.0787 0.742188 8.00078 0.742188C3.92282 0.742188 0.617188 4.04782 0.617188 8.12578C0.617188 12.2037 3.92282 15.5094 8.00078 15.5094ZM6.89312 8.12578H8.98527C9.279 8.12578 9.56071 8.00909 9.76841 7.80139C9.97612 7.59369 10.0928 7.31198 10.0928 7.01824C10.0928 6.7245 9.97612 6.4428 9.76841 6.23509C9.56071 6.02739 9.279 5.9107 8.98527 5.9107H6.89312V8.12578ZM5.41641 4.43398H8.98527C9.67065 4.43398 10.328 4.70625 10.8126 5.1909C11.2973 5.67554 11.5695 6.33285 11.5695 7.01824C11.5695 7.70363 11.2973 8.36095 10.8126 8.84559C10.328 9.33023 9.67065 9.6025 8.98527 9.6025H6.89312V11.8176H5.41641V4.43398Z"
         fill="#8F8F8F"
       />
@@ -118,8 +118,8 @@ export const ProductHuntSvg = () => (
 export const CheckCircleSolidIcon = () => (
   <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
-      fill-rule="evenodd"
-      clip-rule="evenodd"
+      fillRule="evenodd"
+      clipRule="evenodd"
       d="M8.00156 14.7805C11.5362 14.7805 14.4016 11.9151 14.4016 8.38047C14.4016 4.84585 11.5362 1.98047 8.00156 1.98047C4.46694 1.98047 1.60156 4.84585 1.60156 8.38047C1.60156 11.9151 4.46694 14.7805 8.00156 14.7805ZM10.9672 7.34615C11.2797 7.03373 11.2797 6.5272 10.9672 6.21478C10.6548 5.90236 10.1483 5.90236 9.83588 6.21478L7.20156 8.8491L6.16725 7.81478C5.85483 7.50236 5.3483 7.50236 5.03588 7.81478C4.72346 8.1272 4.72346 8.63373 5.03588 8.94615L6.63588 10.5462C6.9483 10.8586 7.45483 10.8586 7.76725 10.5462L10.9672 7.34615Z"
       fill="currentColor"
     />
@@ -137,7 +137,7 @@ export const SmallCard = ({
 }) => (
   <div
     className={[
-      'group relative p-[1px] bg-gradient-to-b from-[#11171890] to-[#1C1C1C60] rounded-2xl overflow-hidden shadow-lg',
+      'group relative p-px bg-linear-to-b from-[#11171890] to-[#1C1C1C60] rounded-2xl overflow-hidden shadow-lg',
       className,
     ].join(' ')}
   >
@@ -165,8 +165,8 @@ export const StyledArticleBadge = ({
       ' '
     )}
   >
-    <div className="!bg-transparent rounded-full !py-1 !px-4 w-full inset-[1px] text-sm border-none from-foreground to-[#6453C5]">
-      <span className="text-sm text-[#F4FFFA80] bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#7E7AAD]">
+    <div className="bg-transparent! rounded-full py-1! px-4! w-full inset-px text-sm border-none from-foreground to-[#6453C5]">
+      <span className="text-sm text-[#F4FFFA80] bg-clip-text bg-linear-to-r from-[#F4FFFA] to-[#7E7AAD]">
         {children}
       </span>
       <div className="absolute inset-0 w-full h-full bg-[#1C1C1C] rounded-full blur-2xl" />
@@ -217,15 +217,15 @@ export const AccordionHeader = ({
         </span>
         {shippable && shipped && (
           <Badge
-            className={`relative hidden sm:inline-flex inset-0 !bg-[#05090B] border !border-[#061517] !py-1 !px-4 h-fit`}
+            className={`relative hidden sm:inline-flex inset-0 bg-[#05090B]! border border-[#061517]! py-1! px-4! h-fit`}
           >
-            <span className="text-[#F4FFFA40] text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
+            <span className="text-[#F4FFFA40] text-sm font-normal bg-clip-text bg-linear-to-r from-[#F4FFFA] to-[#675FA7]">
               Shipped
             </span>
           </Badge>
         )}
         {shippable && shipped && youtube_id && (
-          <div className={['hover:cursor-pointer hover:!opacity-100'].join(' ')}>
+          <div className={['hover:cursor-pointer hover:opacity-100!'].join(' ')}>
             <ExpandableVideo
               videoId={youtube_id}
               trigger={
@@ -250,7 +250,7 @@ export const VideoPreviewTrigger = ({
   thumbnail: string
 }) => (
   <div className="flex items-center h-full gap-3 text-xs group/vid text-foreground-light hover:text-foreground transition-colors">
-    <div className="relative h-10 !aspect-video flex items-center justify-center rounded overflow-hidden border border-foreground-lighter opacity-80 group-hover/vid:opacity-100 transition-colors">
+    <div className="relative h-10 aspect-video! flex items-center justify-center rounded-sm overflow-hidden border border-foreground-lighter opacity-80 group-hover/vid:opacity-100 transition-colors">
       <div className="absolute z-10 w-2.5 h-2.5 text-white opacity-100">
         <svg viewBox="0 0 81 91" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
@@ -259,7 +259,7 @@ export const VideoPreviewTrigger = ({
           />
         </svg>
       </div>
-      <Image src={thumbnail} alt="Video thumbnail" layout="fill" objectFit="cover" />
+      <Image src={thumbnail} alt="Video thumbnail" fill sizes="100%" className="object-cover" />
     </div>
     {title && <span>{title}</span>}
   </div>
@@ -271,7 +271,7 @@ export const MultistepSectionHeader = ({ title, blog }: any) => {
       <div className="flex gap-4 w-full items-center justify-between md:justify-start">
         {title && <span className="text-foreground text-lg mt-3 sm:mt-0">{title}</span>}
         {!!blog && (
-          <ChipLink href={blog} className="!w-auto !text-left !justify-between !flex-none">
+          <ChipLink href={blog} className="w-auto! text-left! justify-between! flex-none!">
             Blog post
             <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
               <PencilSvg />
@@ -299,7 +299,7 @@ export const ChipLink = ({
   uiOnly ? (
     <span
       className={[
-        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-stronger backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
+        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-linear-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-stronger backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
         className,
       ].join(' ')}
     >
@@ -311,7 +311,7 @@ export const ChipLink = ({
       target={target ?? '_self'}
       rel="noopener"
       className={[
-        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-stronger backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
+        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-linear-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-stronger backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
         className,
       ].join(' ')}
     >
@@ -418,7 +418,7 @@ export const SectionButtons = ({
 export const CartTitle = ({ children, className }: { children: any; className?: string }) => (
   <span
     className={[
-      'z-0 relative text-[#F4FFFA90] bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7] tracking-[-.5px] text-xl',
+      'z-0 relative text-[#F4FFFA90] bg-clip-text bg-linear-to-r from-[#F4FFFA] to-[#675FA7] tracking-[-.5px] text-xl',
       className,
     ].join(' ')}
   >

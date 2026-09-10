@@ -1,30 +1,28 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useEffect } from 'react'
-import toast from 'react-hot-toast'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Input } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Form,
-  IconAlertCircle,
-  Input,
-} from 'ui'
-import { object, string } from 'yup'
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import * as z from 'zod'
 
-import {
-  FormActions,
-  FormHeader,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-} from 'components/ui/Forms'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks'
+import { AlertError } from '@/components/ui/AlertError'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
-const schema = object({
-  SITE_URL: string().required('Must have a Site URL'),
+const schema = z.object({
+  SITE_URL: z.string().trim().min(1, 'Must have a Site URL'),
 })
 
 const SiteUrl = () => {
@@ -32,28 +30,46 @@ const SiteUrl = () => {
   const {
     data: authConfig,
     error: authConfigError,
-    isLoading,
     isError,
-    isSuccess,
+    isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
+  const [isUpdatingSiteUrl, setIsUpdatingSiteUrl] = useState(false)
 
-  const formId = 'auth-config-general-form'
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
 
-  const INITIAL_VALUES = { SITE_URL: authConfig?.SITE_URL }
+  const siteUrlForm = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      SITE_URL: '',
+    },
+  })
+  const { isDirty } = siteUrlForm.formState
 
-  const onSubmit = (values: any, { resetForm }: any) => {
-    const payload = { ...values }
+  useEffect(() => {
+    if (authConfig && !isUpdatingSiteUrl) {
+      siteUrlForm.reset({
+        SITE_URL: authConfig.SITE_URL || '',
+      })
+    }
+  }, [authConfig, isUpdatingSiteUrl])
+
+  const onSubmitSiteUrl = (values: any) => {
+    setIsUpdatingSiteUrl(true)
+
     updateAuthConfig(
-      { projectRef: projectRef!, config: payload },
+      { projectRef: projectRef!, config: values },
       {
-        onError: () => {
-          toast.error('Failed to update settings')
+        onError: (error) => {
+          toast.error(`Failed to update site URL: ${error?.message}`)
+          setIsUpdatingSiteUrl(false)
         },
         onSuccess: () => {
-          toast.success('Successfully updated settings')
-          resetForm({ values: values, initialValues: values })
+          toast.success('Successfully updated site URL')
+          setIsUpdatingSiteUrl(false)
         },
       }
     )
@@ -61,62 +77,73 @@ const SiteUrl = () => {
 
   if (isError) {
     return (
-      <Alert_Shadcn_ variant="destructive">
-        <IconAlertCircle strokeWidth={2} />
-        <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+      <PageSection>
+        <PageSectionContent>
+          <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+        </PageSectionContent>
+      </PageSection>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <PageSection>
+        <PageSectionContent>
+          <GenericSkeletonLoader />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   return (
-    <Form id={formId} initialValues={INITIAL_VALUES} onSubmit={onSubmit} validationSchema={schema}>
-      {({ handleReset, resetForm, values, initialValues }: any) => {
-        const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Site URL</PageSectionTitle>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
+        <Form {...siteUrlForm}>
+          <form onSubmit={siteUrlForm.handleSubmit(onSubmitSiteUrl)}>
+            <Card>
+              <CardContent>
+                <FormField
+                  control={siteUrlForm.control}
+                  name="SITE_URL"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Site URL"
+                      description="Configure the default redirect URL used when a redirect URL is not specified or doesn't match one from the allow list. This value is also exposed as a template variable in the email templates section. Wildcards cannot be used here."
+                    >
+                      <FormControl>
+                        <Input {...field} disabled={!canUpdateConfig} />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
 
-        // Form is reset once remote data is loaded in store
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        useEffect(() => {
-          if (isSuccess) {
-            resetForm({ values: INITIAL_VALUES, initialValues: INITIAL_VALUES })
-          }
-        }, [isSuccess])
-
-        return (
-          <>
-            <FormHeader
-              title="Site URL"
-              description="Configure the default redirect URL used when a redirect URL is not specified or doesn't match one from the allow list. This value is also exposed as a template variable in the email templates section. Wildcards cannot be used here."
-            />
-            <FormPanel
-              disabled={true}
-              footer={
-                <div className="flex py-4 px-8">
-                  <FormActions
-                    form={formId}
-                    isSubmitting={isUpdatingConfig}
-                    hasChanges={hasChanges}
-                    handleReset={handleReset}
-                    disabled={!canUpdateConfig}
-                    helper={
-                      !canUpdateConfig
-                        ? 'You need additional permissions to update authentication settings'
-                        : undefined
-                    }
-                  />
-                </div>
-              }
-            >
-              <FormSection>
-                <FormSectionContent loading={isLoading}>
-                  <Input id="SITE_URL" size="small" label="Site URL" disabled={!canUpdateConfig} />
-                </FormSectionContent>
-              </FormSection>
-            </FormPanel>
-          </>
-        )
-      }}
-    </Form>
+              <CardFooter className="justify-end space-x-2">
+                {isDirty && (
+                  <Button variant="default" onClick={() => siteUrlForm.reset()}>
+                    Cancel
+                  </Button>
+                )}
+                <Button
+                  variant="primary"
+                  type="submit"
+                  disabled={!canUpdateConfig || isUpdatingSiteUrl || !isDirty}
+                  loading={isUpdatingSiteUrl}
+                >
+                  Save changes
+                </Button>
+              </CardFooter>
+            </Card>
+          </form>
+        </Form>
+      </PageSectionContent>
+    </PageSection>
   )
 }
 

@@ -1,36 +1,70 @@
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { FormHeader, FormPanel } from 'components/ui/Forms'
-import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
-import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
-import { BASE_PATH } from 'lib/constants'
+import { Globe } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { Badge, Card, CardContent, Skeleton } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Badge,
-  Button,
-  IconAlertTriangle,
-  IconExternalLink,
-  IconGlobe,
-  Modal,
-} from 'ui'
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
-const BannedIPs = () => {
+import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'
+import { useBannedIPsDeleteMutation } from '@/data/banned-ips/banned-ips-delete-mutations'
+import { useBannedIPsQuery } from '@/data/banned-ips/banned-ips-query'
+import { useUserIPAddressQuery } from '@/data/misc/user-ip-address-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+
+const HA_DISABLED_TITLE = 'Network bans unavailable on High Availability projects'
+const HA_DISABLED_DESCRIPTION =
+  "We're working to bring network bans to High Availability projects. Contact support if this is blocking your work."
+
+export const BannedIPs = () => {
   const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const { isHighAvailability } = useHighAvailability()
+
   const [selectedIPToUnban, setSelectedIPToUnban] = useState<string | null>(null) // Track the selected IP for unban
-  const { data: ipList } = useBannedIPsQuery({
+
+  const {
+    isPending: isLoadingIPList,
+    isFetching: isFetchingIPList,
+    data: ipList,
+    error: ipListError,
+  } = useBannedIPsQuery({
     projectRef: ref,
   })
+
+  const { data: userIPAddress } = useUserIPAddressQuery()
+
+  const ipListLoading = isLoadingIPList || isFetchingIPList
 
   const [showUnban, setShowUnban] = useState(false)
   const [confirmingIP, setConfirmingIP] = useState<string | null>(null) // Track the IP being confirmed for unban
 
-  const { mutate: unbanIPs, isLoading: isUnbanning } = useBannedIPsDeleteMutation({
+  const { can: canUnbanNetworks } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
+
+  const isSectionDisabled = isHighAvailability || !canUnbanNetworks
+  const sectionDisabledReason = isHighAvailability
+    ? HA_DISABLED_TITLE
+    : 'You need additional permissions to unban networks'
+
+  const { mutate: unbanIPs, isPending: isUnbanning } = useBannedIPsDeleteMutation({
     onSuccess: () => {
       toast.success('IP address successfully unbanned')
       setSelectedIPToUnban(null) // Reset the selected IP for unban
@@ -55,81 +89,87 @@ const BannedIPs = () => {
     setShowUnban(true)
   }
 
-  const [userIPAddress, setUserIPAddress] = useState<string | null>(null)
-
-  useEffect(() => {
-    // Fetch user's IP address
-    fetch(`${BASE_PATH}/api/get-ip-address`)
-      .then((response) => response.json())
-      .then((data) => setUserIPAddress(data.ipAddress))
-  }, [])
-
   return (
-    <div id="banned-ips">
-      <div className="flex items-center justify-between">
-        <FormHeader
-          title="Network Bans"
-          description="List of IP addresses that are temporarily blocked if their traffic pattern looks abusive"
-        />
-        <div className="flex items-center space-x-2 mb-6">
-          <Button asChild type="default" icon={<IconExternalLink />}>
-            <Link
-              href="https://supabase.com/docs/reference/cli/supabase-network-bans"
-              target="_blank"
-            >
-              Documentation
-            </Link>
-          </Button>
-        </div>
-      </div>
-      <FormPanel>
-        {ipList && ipList.banned_ipv4_addresses.length > 0 ? (
-          ipList.banned_ipv4_addresses.map((ip) => (
-            <div key={ip} className="px-8 py-4 flex items-center justify-between">
-              <div className="flex items-center space-x-5">
-                <IconGlobe size={16} className="text-foreground-lighter" />
-                <p className="text-sm font-mono">{ip}</p>
-                {ip === userIPAddress && <Badge>Your IP address</Badge>}
-              </div>
-              <div>
-                <Button type="default" onClick={() => openConfirmationModal(ip)}>
-                  Unban IP
-                </Button>
-              </div>
+    <>
+      <PageSection id="banned-ips">
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Network bans</PageSectionTitle>
+            <PageSectionDescription>
+              IP addresses temporarily blocked due to suspicious traffic
+            </PageSectionDescription>
+          </PageSectionSummary>
+          <DocsButton href={`${DOCS_URL}/reference/cli/supabase-network-bans`} />
+        </PageSectionMeta>
+        <PageSectionContent>
+          {isHighAvailability && (
+            <div className="mb-4">
+              <HighAvailabilityDisabledSectionNotice
+                title={HA_DISABLED_TITLE}
+                description={HA_DISABLED_DESCRIPTION}
+              />
             </div>
-          ))
-        ) : (
-          <p className="text-foreground-light text-sm px-8 py-4">
-            There are no banned IP addresses for your project.
-          </p>
-        )}
-      </FormPanel>
+          )}
+          {!isHighAvailability &&
+            (ipListLoading ? (
+              <Card>
+                <CardContent className="space-y-4">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                </CardContent>
+              </Card>
+            ) : ipListError ? (
+              <AlertError error={ipListError} subject="Failed to retrieve banned IP addresses" />
+            ) : ipList.banned_ipv4_addresses.length > 0 ? (
+              <Card>
+                {ipList.banned_ipv4_addresses.map((ip) => (
+                  <CardContent key={ip} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-5">
+                      <Globe size={16} className="text-foreground-lighter" />
+                      <p className="text-sm font-mono">{ip}</p>
+                      {ip === userIPAddress && <Badge>Your IP address</Badge>}
+                    </div>
+                    <ButtonTooltip
+                      variant="default"
+                      disabled={isSectionDisabled}
+                      onClick={() => openConfirmationModal(ip)}
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: isSectionDisabled ? sectionDisabledReason : undefined,
+                        },
+                      }}
+                    >
+                      Unban IP
+                    </ButtonTooltip>
+                  </CardContent>
+                ))}
+              </Card>
+            ) : (
+              <Card>
+                <CardContent className="text-foreground text-sm">
+                  There are no banned IP addresses for your project
+                </CardContent>
+              </Card>
+            ))}
+        </PageSectionContent>
+      </PageSection>
 
       <ConfirmationModal
-        danger
+        variant="destructive"
         size="medium"
         loading={isUnbanning}
         visible={showUnban}
-        header="Confirm Unban IP"
-        buttonLabel="Confirm Unban"
-        buttonLoadingLabel="Unbanning..."
-        onSelectConfirm={onConfirmUnbanIP}
-        onSelectCancel={() => setShowUnban(false)}
-      >
-        <Modal.Content>
-          <div className="py-6">
-            <Alert_Shadcn_ variant="warning">
-              <IconAlertTriangle strokeWidth={2} />
-              <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                Are you sure you want to unban this IP address {selectedIPToUnban}?
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          </div>
-        </Modal.Content>
-      </ConfirmationModal>
-    </div>
+        title="Confirm Unban IP"
+        confirmLabel="Confirm Unban"
+        confirmLabelLoading="Unbanning..."
+        onCancel={() => setShowUnban(false)}
+        onConfirm={onConfirmUnbanIP}
+        alert={{
+          title: 'This action cannot be undone',
+          description: `Are you sure you want to unban this IP address ${selectedIPToUnban}?`,
+        }}
+      />
+    </>
   )
 }
-
-export default BannedIPs

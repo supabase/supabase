@@ -1,44 +1,49 @@
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 
-import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
-import { withAuth } from 'hooks'
-import { ProjectLayout } from '../'
-import { generateAuthMenu } from './AuthLayout.utils'
+import { ProjectLayout } from '../ProjectLayout'
+import { useGenerateAuthMenu } from './AuthLayout.utils'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
+import { useAuthConfigPrefetch } from '@/data/auth/auth-config-query'
+import { withAuth } from '@/hooks/misc/withAuth'
 
-export interface AuthLayoutProps {
-  title?: string
-}
-
-const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
+export const AuthProductMenu = () => {
+  const router = useRouter()
   const { ref: projectRef = 'default' } = useParams()
-  const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
 
   useAuthConfigPrefetch({ projectRef })
-
-  const router = useRouter()
   const page = router.pathname.split('/')[4]
+  const menu = useGenerateAuthMenu()
+
+  return <ProductMenu page={page} menu={menu} />
+}
+
+const AuthLayout = ({ title, children }: PropsWithChildren<{ title: string }>) => {
+  const router = useRouter()
+  const { ref: projectRef = 'default' } = useParams()
+
+  useAuthConfigPrefetch({ projectRef })
+  const page = router.pathname.split('/')[4]
+  const menu = useGenerateAuthMenu()
 
   return (
     <ProjectLayout
-      title={title || 'Authentication'}
       product="Authentication"
-      productMenu={
-        <ProductMenu
-          page={page}
-          menu={generateAuthMenu(projectRef ?? 'default', { columnLevelPrivileges })}
-        />
-      }
+      browserTitle={{ section: title }}
+      productMenu={<ProductMenu page={page} menu={menu} />}
       isBlocking={false}
     >
-      <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-        {children}
-      </main>
+      <ProductMenuShortcuts menu={menu} />
+      {children}
     </ProjectLayout>
   )
 }
 
+/**
+ * Layout for all auth pages on the dashboard, wrapped with withAuth to verify logged in state
+ *
+ * Handles rendering the navigation for each section under the auth pages.
+ */
 export default withAuth(AuthLayout)

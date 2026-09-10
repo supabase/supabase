@@ -1,148 +1,243 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { motion } from 'framer-motion'
+import { Eye, EyeOff } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { parseAsString, useQueryStates } from 'nuqs'
 import { useRef, useState } from 'react'
-import toast from 'react-hot-toast'
-import * as yup from 'yup'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
+import { toast } from 'sonner'
+import { Button, cn, Form, FormControl, FormField, Input } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
 
-import { useSignUpMutation } from 'data/misc/signup-mutation'
-import { BASE_PATH } from 'lib/constants'
-import { passwordSchema } from 'lib/schemas'
-import { Alert, Button, Form, IconEye, IconEyeOff, Input } from 'ui'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
+import { useSignUpMutation } from '@/data/misc/signup-mutation'
+import { BASE_PATH } from '@/lib/constants'
+import { buildSignUpReturnPath } from '@/lib/gotrue'
+import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
-const signUpSchema = passwordSchema.shape({
-  email: yup.string().email().required().label('Email'),
+const schema = z.object({
+  email: z.string().min(1, 'Email is required').email('Must be a valid email'),
+  password: z
+    .string()
+    .min(1, 'Password is required')
+    .max(72, 'Password cannot exceed 72 characters')
+    .refine((password) => password.length >= 8, 'Password must be at least 8 characters')
+    .refine(
+      (password) => /[A-Z]/.test(password),
+      'Password must contain at least 1 uppercase character'
+    )
+    .refine(
+      (password) => /[a-z]/.test(password),
+      'Password must contain at least 1 lowercase character'
+    )
+    .refine((password) => /[0-9]/.test(password), 'Password must contain at least 1 number')
+    .refine(
+      (password) => /[!@#$%^&*()_+\-=\[\]{};`':"\\|,.<>\/?]/.test(password),
+      'Password must contain at least 1 symbol'
+    ),
 })
 
-const SignUpForm = () => {
+const formId = 'sign-up-form'
+
+export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const captchaRef = useRef<HCaptcha>(null)
   const [showConditions, setShowConditions] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [passwordHidden, setPasswordHidden] = useState(true)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const router = useRouter()
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: '', password: '' },
+  })
 
-  const { mutate: signup, isLoading: isSigningUp } = useSignUpMutation({
+  const [searchParams] = useQueryStates({
+    auth_id: parseAsString.withDefault(''),
+    token: parseAsString.withDefault(''),
+    organization_slug: parseAsString.withDefault(''),
+  })
+
+  const trackFunnelError = useTrackFunnelError()
+
+  const { mutate: signup, isPending: isSigningUp } = useSignUpMutation({
     onSuccess: () => {
       toast.success(`Signed up successfully!`)
       setIsSubmitted(true)
+      onSuccess?.()
     },
     onError: (error) => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
-      toast.error(`Failed to sign up: ${error.message}`)
+      const toastId = toast.error(`Failed to sign up: ${error.message}`)
+      trackFunnelError('signup', classifyApiError('signup', error), 'toast', toastId)
     },
   })
 
-  const onSignUp = async ({ email, password }: { email: string; password: string }) => {
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = async ({ email, password }) => {
+    // [Joshen] Separate submitting state as there's 2 async processes here
     let token = captchaToken
     if (!token) {
       const captchaResponse = await captchaRef.current?.execute({ async: true })
       token = captchaResponse?.response ?? null
     }
 
+    const isInsideOAuthFlow = !!searchParams.auth_id
+    const redirectUrlBase = `${
+      process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+        ? location.origin
+        : process.env.NEXT_PUBLIC_SITE_URL
+    }${BASE_PATH}`
+
+    let redirectTo: string
+
+    if (isInsideOAuthFlow) {
+      const authorizeParams = new URLSearchParams({ auth_id: searchParams.auth_id })
+      if (searchParams.token) authorizeParams.set('token', searchParams.token)
+      if (searchParams.organization_slug) {
+        authorizeParams.set('organization_slug', searchParams.organization_slug)
+      }
+      redirectTo = `${redirectUrlBase}/authorize?${authorizeParams.toString()}`
+    } else {
+      // Build the post-verification return path from returnTo and other query params.
+      const { returnTo } = router.query
+      const fullPath = buildSignUpReturnPath(returnTo)
+      const fullRedirectUrl = `${redirectUrlBase}${fullPath}`
+      redirectTo = fullRedirectUrl
+    }
+
     signup({
       email,
       password,
       hcaptchaToken: token ?? null,
-      redirectTo: `${
-        process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-          ? location.origin
-          : process.env.NEXT_PUBLIC_SITE_URL
-      }${BASE_PATH}/sign-in`,
+      redirectTo,
     })
   }
 
+  const password = useWatch({ control: form.control, name: 'password' })
+  const isSubmitting = form.formState.isSubmitting || isSigningUp
+
   return (
     <div className="relative">
+      {isSubmitted && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="w-full"
+        >
+          <Admonition
+            type="success"
+            title="Check your email"
+            description="We sent you a link to finish signing up. It expires in 10 minutes."
+          />
+        </motion.div>
+      )}
       <div
-        className={`absolute top-0 duration-500 delay-300 w-full ${
-          isSubmitted ? 'opacity-100' : 'opacity-0'
-        }`}
+        inert={isSubmitted || undefined}
+        className={cn(
+          'w-full transition-all duration-500',
+          isSubmitted
+            ? 'max-h-0 overflow-hidden opacity-0 pointer-events-none py-0'
+            : 'max-h-[1000px] opacity-100'
+        )}
       >
-        <Alert className="w-full" withIcon variant="success" title="Check your email to confirm">
-          You've successfully signed up. Please check your email to confirm your account before
-          signing in to the Supabase dashboard
-        </Alert>
-      </div>
-      <Form
-        validateOnBlur
-        id="signUp-form"
-        className={`w-full py-1 transition-all overflow-y-hidden duration-500 ${
-          isSubmitted ? 'max-h-[100px] opacity-0 pointer-events-none' : 'max-h-[1000px] opacity-100'
-        }`}
-        initialValues={{ email: '', password: '' }}
-        validationSchema={signUpSchema}
-        onSubmit={onSignUp}
-      >
-        {({ values }: { values: any }) => {
-          return (
-            <div className="flex flex-col gap-4">
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                label="Email"
-                placeholder="you@example.com"
-                disabled={isSigningUp}
-                autoComplete="email"
-              />
+        <Form {...form}>
+          <form
+            id={formId}
+            method="POST"
+            className="flex flex-col gap-4"
+            onSubmit={form.handleSubmit(onSubmit, (errors) =>
+              trackFunnelError('signup', classifyValidationError('signup', errors), 'form')
+            )}
+          >
+            <FormField
+              key="email"
+              name="email"
+              control={form.control}
+              render={({ field }) => (
+                <FormItemLayout label="Email">
+                  <FormControl>
+                    <Input
+                      autoComplete="email"
+                      disabled={isSubmitting}
+                      {...field}
+                      placeholder="you@example.com"
+                    />
+                  </FormControl>
+                </FormItemLayout>
+              )}
+            />
 
-              <Input
-                id="password"
-                name="password"
-                type={passwordHidden ? 'password' : 'text'}
-                label="Password"
-                placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                disabled={isSigningUp}
-                autoComplete="new-password"
-                onFocus={() => setShowConditions(true)}
-                actions={
-                  <Button
-                    icon={passwordHidden ? <IconEye /> : <IconEyeOff />}
-                    type="default"
-                    className="!mr-1"
-                    onClick={() => setPasswordHidden((prev) => !prev)}
-                  />
-                }
-              />
+            <FormField
+              key="password"
+              name="password"
+              control={form.control}
+              render={({ field }) => (
+                <FormItemLayout label="Password">
+                  <div className="relative">
+                    <FormControl>
+                      <Input
+                        type={passwordHidden ? 'password' : 'text'}
+                        autoComplete="new-password"
+                        placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                        {...field}
+                        onFocus={() => setShowConditions(true)}
+                        disabled={isSubmitting}
+                      />
+                    </FormControl>
+                    <Button
+                      variant="default"
+                      title={passwordHidden ? `Show password` : `Hide password`}
+                      aria-label={passwordHidden ? `Show password` : `Hide password`}
+                      className="absolute right-1 top-1 px-1.5"
+                      icon={passwordHidden ? <Eye /> : <EyeOff />}
+                      disabled={isSubmitting}
+                      onClick={() => setPasswordHidden((prev) => !prev)}
+                    />
+                  </div>
+                </FormItemLayout>
+              )}
+            />
 
-              <div
-                className={`${
-                  showConditions ? 'max-h-[500px]' : 'max-h-[0px]'
-                } transition-all duration-400 overflow-y-hidden`}
+            {showConditions && (
+              <motion.div
+                initial={{ maxHeight: '0px' }}
+                animate={{ maxHeight: '500px' }}
+                transition={{ duration: 0.8, delay: 0 }}
+                className="overflow-y-hidden"
               >
-                <PasswordConditionsHelper password={values.password} />
-              </div>
+                <PasswordConditionsHelper password={password} />
+              </motion.div>
+            )}
 
-              <div className="self-center">
-                <HCaptcha
-                  ref={captchaRef}
-                  sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-                  size="invisible"
-                  onVerify={(token) => {
-                    setCaptchaToken(token)
-                  }}
-                  onExpire={() => {
-                    setCaptchaToken(null)
-                  }}
-                />
-              </div>
-
-              <Button
-                block
-                form="signUp-form"
-                htmlType="submit"
-                size="large"
-                disabled={values.password.length === 0 || isSigningUp}
-                loading={isSigningUp}
-              >
-                Sign Up
-              </Button>
+            <div className="self-center">
+              <HCaptcha
+                ref={captchaRef}
+                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+                size="invisible"
+                onVerify={(token) => setCaptchaToken(token)}
+                onExpire={() => setCaptchaToken(null)}
+              />
             </div>
-          )
-        }}
-      </Form>
+
+            <Button
+              variant="primary"
+              block
+              form={formId}
+              type="submit"
+              size="large"
+              disabled={password.length === 0 || isSubmitting}
+              loading={isSubmitting}
+            >
+              Sign up
+            </Button>
+          </form>
+        </Form>
+      </div>
     </div>
   )
 }
-
-export default SignUpForm

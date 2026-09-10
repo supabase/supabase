@@ -1,150 +1,266 @@
-import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
-
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
-import type { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { isError } from 'data/utils/error-check'
-import { useSelectedOrganization } from 'hooks'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
-import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
+import { useRouter } from 'next/router'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import {
+  AiIconAnimation,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Textarea,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
+import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
+import { getContentById, getSqlSnippetById } from '@/data/content/content-id-query'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from '@/data/content/content-upsert-mutation'
+import { Snippet } from '@/data/content/sql-folders-query'
+import type { SqlSnippet } from '@/data/content/sql-snippets-query'
+import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export interface RenameQueryModalProps {
-  snippet: SqlSnippet
+  snippet?: SqlSnippet | Snippet
   visible: boolean
   onCancel: () => void
   onComplete: () => void
 }
 
-const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQueryModalProps) => {
-  const { ref } = useParams()
-  const organization = useSelectedOrganization()
-  const snap = useSqlEditorStateSnapshot()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+const formSchema = z.object({
+  name: z.string().min(1, 'Please enter a query name'),
+  description: z.string().optional(),
+})
 
-  // Customers on HIPAA plans should not have access to Supabase AI
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+interface RenameQueryFormProps {
+  snippet: SqlSnippet | Snippet
+  onCancel: () => void
+  onComplete: () => void
+}
+
+const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps) => {
+  const { ref } = useParams()
+  const router = useRouter()
+
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const tabsSnap = useTabsStateSnapshot()
+  const isSQLSnippet = snippet.type === 'sql'
+
+  // Orgs on HIPAA plans or that have disabled AI should not have access to Supabase AI
+  const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  const isAiOptedOut = aiOptInLevel === 'disabled'
 
   const { id, name, description } = snippet
 
-  const [nameInput, setNameInput] = useState(name)
-  const [descriptionInput, setDescriptionInput] = useState(description)
+  const { mutate: getGeneratedValues, isPending: isTitleGenerationLoading } =
+    useSqlTitleGenerateMutation({
+      onSuccess: (data) => {
+        const { title, description } = data
+        form.setValue('name', title, { shouldDirty: true })
+        if (!form.getValues().description) {
+          form.setValue('description', description, { shouldDirty: true })
+        }
+      },
+      onError: (error) => {
+        toast.error(`Failed to generate title and description: ${error.message}`)
+      },
+    })
+  const { data: check } = useCheckOpenAIKeyQuery()
+  const isApiKeySet = !!check?.hasKey
 
-  useEffect(() => {
-    setNameInput(name)
-  }, [name])
-
-  const validate = () => {
-    const errors: any = {}
-    if (!nameInput) errors.name = 'Please enter a query name'
-    return errors
-  }
-
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
-    if (!ref) return console.error('Project ref is required')
-    if (!id) return console.error('Snippet ID is required')
-
-    setSubmitting(true)
-    try {
-      snap.renameSnippet(id, nameInput, descriptionInput)
-      if (onComplete) onComplete()
-      return Promise.resolve()
-    } catch (error: any) {
-      toast.error(`Failed to rename query: ${error.message}`)
+  const generateTitle = async () => {
+    if ('content' in snippet && isSQLSnippet) {
+      getGeneratedValues({ sql: snippet.content.unchecked_sql })
+    } else {
+      try {
+        const { content } = await getContentById({ projectRef: ref, id: snippet.id })
+        if ('unchecked_sql' in content) getGeneratedValues({ sql: content.unchecked_sql })
+      } catch (error) {
+        toast.error('Unable to generate title based on query contents')
+      }
     }
   }
 
-  const { mutateAsync: titleSql, isLoading: isTitleGenerationLoading } =
-    useSqlTitleGenerateMutation()
+  const { mutateAsync: upsertContent } = useContentUpsertMutation()
 
-  const isAiButtonVisible = !!snippet.content.sql
+  const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async ({ name, description }) => {
+    if (!ref) return console.error('Project ref is required')
+    if (!id) return console.error('Snippet ID is required')
+
+    try {
+      let localSnippet = snippet
+
+      // [Joshen] For SQL V2 - content is loaded on demand so we need to fetch the data if its not already loaded in the valtio state
+      if (!('content' in localSnippet)) {
+        const fetched = await getSqlSnippetById({ projectRef: ref, id })
+        snapV2.addSnippet({ projectRef: ref, snippet: fetched })
+        localSnippet = fetched
+      }
+
+      const changedSnippet = await upsertContent({
+        projectRef: ref,
+        payload: {
+          ...localSnippet,
+          name,
+          description,
+        } as UpsertContentPayload,
+      })
+
+      if (IS_PLATFORM) {
+        snapV2.renameSnippet({ id, name, description })
+
+        const tabId = createTabId('sql', { id })
+        tabsSnap.updateTab(tabId, { label: name })
+      } else if (changedSnippet) {
+        // In self-hosted, the snippet also updates the id when renaming it. This code is to ensure the previous snippet
+        // is removed, new one is added, tab state is updated and the router is updated.
+
+        // remove the old snippet from the state without saving to API
+        snapV2.removeSnippet(id, true)
+
+        snapV2.addSnippet({ projectRef: ref, snippet: changedSnippet })
+
+        // remove the tab for the old snippet if the snippet was open. Renaming can also happen when the tab is not open.
+        const tabId = createTabId('sql', { id })
+        if (tabsSnap.hasTab(tabId)) {
+          tabsSnap.removeTab(tabId)
+          await router.push(`/project/${ref}/sql/${changedSnippet.id}`)
+        }
+      }
+
+      toast.success('Successfully renamed snippet!')
+      reset({ name, description })
+      if (onComplete) onComplete()
+    } catch (error: any) {
+      // [Joshen] We probably need some rollback cause all the saving is async
+      toast.error(`Failed to rename snippet: ${error.message}`)
+    }
+  }
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { name: name ?? '', description: description ?? '' },
+  })
+  const { reset, formState } = form
+  const { isDirty, isSubmitting } = formState
 
   return (
-    <Modal visible={visible} onCancel={onCancel} hideFooter header="Rename" size="small">
-      <Form
-        onReset={onCancel}
-        validateOnBlur
-        initialValues={{
-          name: name ?? '',
-          description: description ?? '',
-        }}
-        validate={validate}
-        onSubmit={onSubmit}
-      >
-        {({ isSubmitting }: { isSubmitting: boolean }) => (
-          <div className="space-y-4 py-4">
-            <Modal.Content>
-              <Input
-                label="Name"
-                id="name"
-                name="name"
-                value={nameInput}
-                onChange={(e) => setNameInput(e.target.value)}
-              />
-              <div className="flex w-full justify-end mt-2">
-                {!hasHipaaAddon && isAiButtonVisible && (
-                  <Button
-                    type="default"
-                    onClick={async () => {
-                      try {
-                        const { title, description } = await titleSql({
-                          sql: snippet.content.sql,
-                        })
-
-                        setNameInput(title)
-
-                        // Only update description if it was empty
-                        if (!descriptionInput) {
-                          setDescriptionInput(description)
-                        }
-                      } catch (error: unknown) {
-                        if (isError(error)) {
-                          toast.error(`Failed to rename query: ${error.message}`)
-                        }
-                      }
-                    }}
-                    size="tiny"
-                    disabled={isTitleGenerationLoading}
-                  >
-                    <div className="flex items-center gap-1">
-                      <div className="scale-75">
-                        <AiIconAnimation loading={isTitleGenerationLoading} />
-                      </div>
-                      <span>Rename with Supabase AI</span>
-                    </div>
-                  </Button>
-                )}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+        <DialogSection className="space-y-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItemLayout layout="vertical" label="Name">
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+              </FormItemLayout>
+            )}
+          />
+          <div className="flex w-full justify-end mt-2">
+            <ButtonTooltip
+              variant="default"
+              onClick={() => generateTitle()}
+              size="tiny"
+              disabled={
+                isTitleGenerationLoading || !isApiKeySet || isHipaaProjectDisallowed || isAiOptedOut
+              }
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: isHipaaProjectDisallowed
+                    ? 'This feature is not available for HIPAA projects.'
+                    : isAiOptedOut
+                      ? 'Your organization has opted out of AI features.'
+                      : isApiKeySet
+                        ? undefined
+                        : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
+                },
+              }}
+            >
+              <div className="flex items-center gap-1">
+                <div className="scale-75">
+                  <AiIconAnimation loading={isTitleGenerationLoading} />
+                </div>
+                <span>Rename with Supabase AI</span>
               </div>
-            </Modal.Content>
-            <Modal.Content>
-              <Input.TextArea
-                label="Description"
-                id="description"
-                placeholder="Describe query"
-                size="medium"
-                textAreaClassName="resize-none"
-                value={descriptionInput}
-                onChange={(e) => setDescriptionInput(e.target.value)}
-              />
-            </Modal.Content>
-            <Modal.Separator />
-            <Modal.Content>
-              <div className="flex items-center justify-end gap-2">
-                <Button htmlType="reset" type="default" onClick={onCancel} disabled={isSubmitting}>
-                  Cancel
-                </Button>
-                <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
-                  Rename query
-                </Button>
-              </div>
-            </Modal.Content>
+            </ButtonTooltip>
           </div>
-        )}
-      </Form>
-    </Modal>
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItemLayout layout="vertical" label="Description">
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    rows={4}
+                    placeholder="Describe query"
+                    className="resize-none"
+                  />
+                </FormControl>
+              </FormItemLayout>
+            )}
+          />
+        </DialogSection>
+        <DialogFooter>
+          <Button type="reset" variant="default" onClick={onCancel} disabled={isSubmitting}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            type="submit"
+            loading={isSubmitting}
+            disabled={isSubmitting || !isDirty}
+          >
+            Rename query
+          </Button>
+        </DialogFooter>
+      </form>
+    </Form>
   )
 }
 
-export default RenameQueryModal
+export const RenameQueryModal = ({
+  snippet = {} as any,
+  visible,
+  onCancel,
+  onComplete,
+}: RenameQueryModalProps) => {
+  return (
+    <Dialog open={visible} onOpenChange={onCancel}>
+      <DialogContent size="small">
+        <DialogHeader>
+          <DialogTitle>Rename</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        {/* Keyed by snippet so that each snippet gets a fresh form, with no state carried over */}
+        <RenameQueryForm
+          key={snippet.id}
+          snippet={snippet}
+          onCancel={onCancel}
+          onComplete={onComplete}
+        />
+      </DialogContent>
+    </Dialog>
+  )
+}

@@ -1,36 +1,90 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { clientSdkIds } from '~/content/navigation.references'
+import { BASE_PATH } from '~/lib/constants'
+import MARKDOWN_SLUGS from '~/public/markdown/manifest.json'
+import { negotiateMarkdown } from 'common/markdown-negotiation'
 import { isbot } from 'isbot'
+import { NextResponse, type NextRequest } from 'next/server'
+
+const REFERENCE_PATH = `${BASE_PATH ?? ''}/reference`
+const GUIDES_PATH = `${BASE_PATH ?? ''}/guides`
+const GUIDES_MARKDOWN_SLUGS = new Set(MARKDOWN_SLUGS)
 
 export function middleware(request: NextRequest) {
-  const specs = ['javascript', 'dart', 'csharp']
+  const url = new URL(request.url)
+  const { pathname } = url
 
-  let version = ''
-  if (request.url.includes('/v1/')) {
-    version = 'v1'
+  if (pathname.startsWith(GUIDES_PATH + '/')) {
+    const isMdSuffix = pathname.endsWith('.md')
+    const slug = pathname.replace(`${GUIDES_PATH}/`, '').replace(/\.md$/, '')
+    const decision = negotiateMarkdown(
+      { acceptHeader: request.headers.get('accept') ?? '' },
+      { hasMarkdownVariant: GUIDES_MARKDOWN_SLUGS.has(slug), isMarkdownSuffix: isMdSuffix }
+    )
+
+    if (decision === 'not-acceptable') {
+      return new NextResponse('Not Acceptable', {
+        status: 406,
+        headers: { 'Cache-Control': 'no-store', Vary: 'Accept' },
+      })
+    }
+
+    if (decision === 'markdown') {
+      const rewriteUrl = new URL(url)
+      rewriteUrl.pathname = `${BASE_PATH ?? ''}/api/guides-md/${slug}`
+      return NextResponse.rewrite(rewriteUrl)
+    }
   }
-  if (request.url.includes('/v0/')) {
-    version = 'v0'
+
+  if (!pathname.startsWith(REFERENCE_PATH)) {
+    return NextResponse.next()
   }
 
   if (isbot(request.headers.get('user-agent'))) {
-    for (const lib of specs) {
-      if (request.url.includes(`reference/${lib}`)) {
-        const requestSlug = request.url.split('/').pop()
+    let [, lib, maybeVersion, ...slug] = pathname.replace(REFERENCE_PATH, '').split('/')
 
-        return NextResponse.rewrite(
-          new URL(
-            `/docs/reference/${lib}/${version ? version + '/' : ''}crawlers/${requestSlug}`,
-            request.url
-          ).toString()
-        )
+    if (clientSdkIds.includes(lib)) {
+      const version = /v\d+/.test(maybeVersion) ? maybeVersion : undefined
+      if (!version) {
+        slug = [maybeVersion, ...slug]
+      }
+
+      if (slug.length > 0) {
+        const rewriteUrl = new URL(url)
+        rewriteUrl.pathname = (BASE_PATH ?? '') + '/api/crawlers'
+        return NextResponse.rewrite(rewriteUrl)
       }
     }
-  } else {
-    return NextResponse.next()
   }
+
+  const [, lib, maybeVersion] = pathname.replace(REFERENCE_PATH, '').split('/')
+
+  if (lib === 'cli') {
+    const rewritePath = [REFERENCE_PATH, 'cli'].join('/')
+    return NextResponse.rewrite(new URL(rewritePath, request.url))
+  }
+
+  // Spike (DOCS-1268): only the bare /reference/api needs normalizing now.
+  // /reference/api/<slug> has its own statically generated page — don't
+  // collapse it back to the monolith.
+  if (lib === 'api' && !maybeVersion) {
+    const rewritePath = [REFERENCE_PATH, 'api'].join('/')
+    return NextResponse.rewrite(new URL(rewritePath, request.url))
+  }
+
+  if (lib?.startsWith('self-hosting-')) {
+    const rewritePath = [REFERENCE_PATH, lib].join('/')
+    return NextResponse.rewrite(new URL(rewritePath, request.url))
+  }
+
+  if (clientSdkIds.includes(lib)) {
+    const version = /v\d+/.test(maybeVersion) ? maybeVersion : null
+    const rewritePath = [REFERENCE_PATH, lib, version].filter(Boolean).join('/')
+    return NextResponse.rewrite(new URL(rewritePath, request.url))
+  }
+
+  return NextResponse.next()
 }
 
 export const config = {
-  matcher: '/((?!api|_next|static|public|favicon.ico).*)',
+  matcher: ['/reference/:path*', '/guides/:path*'],
 }

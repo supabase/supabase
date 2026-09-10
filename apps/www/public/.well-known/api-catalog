@@ -1,0 +1,31 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://supabase.com/.well-known/api-catalog",
+      "item": [
+        {
+          "href": "https://api.supabase.com/v1"
+        }
+      ]
+    },
+    {
+      "anchor": "https://api.supabase.com/v1",
+      "service-desc": [
+        {
+          "href": "https://api.supabase.com/api/v1-json",
+          "type": "application/openapi+json"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://api.supabase.com/api/v1"
+        }
+      ],
+      "status": [
+        {
+          "href": "https://status.supabase.com"
+        }
+      ]
+    }
+  ]
+}

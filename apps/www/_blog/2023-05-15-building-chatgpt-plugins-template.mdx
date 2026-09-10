@@ -10,8 +10,8 @@ tags:
 date: '2023-05-15'
 toc_depth: 2
 author: thor_schaeff
-image: 2023-05-15-chatgpt-plugin-temnplate-deno/chatgpt_plugin_template_deno.jpeg
-thumb: 2023-05-15-chatgpt-plugin-temnplate-deno/chatgpt_plugin_template_deno.jpeg
+imgSocial: 2023-05-15-chatgpt-plugin-temnplate-deno/chatgpt_plugin_template_deno.jpeg
+imgThumb: 2023-05-15-chatgpt-plugin-temnplate-deno/chatgpt_plugin_template_deno.jpeg
 ---
 
 ChatGPT Plugins support is [rolling out in beta](https://help.openai.com/en/articles/6825453-chatgpt-release-notes) this week! To help you get up and running quickly, we're releasing a [plugin template](https://github.com/supabase-community/chatgpt-plugin-template-deno) written in TypeScript and running on [Supabase Edge Runtime](https://supabase.com/blog/edge-runtime-self-hosted-deno-functions)!
@@ -37,7 +37,7 @@ Supabase Edge Runtime does currently not support hosting/serving of static files
 
 ```ts
 // functions/main/index.ts
-import aiPlugins from './ai-plugins.json' assert { type: 'json' }
+import aiPlugins from './ai-plugins.json' with { type: 'json' }
 
 // [...]
 
@@ -89,7 +89,7 @@ Next, we create our `/functions/chatgpt-plugin/index.ts` [file](https://github.c
 ```ts
 // /functions/chatgpt-plugin/index.ts
 import { Application, Router } from 'https://deno.land/x/oak@v11.1.0/mod.ts'
-import openapi from './openapi.json' assert { type: 'json' }
+import openapi from './openapi.json' with { type: 'json' }
 
 console.log('Hello from `chatgpt-plugin` Function!')
 

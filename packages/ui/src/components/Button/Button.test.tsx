@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import Link from 'next/link'
 import React from 'react'
+import { describe, expect, it } from 'vitest'
+
 import { Button } from './Button'
 
 const SIZES = ['tiny', 'small', 'medium', 'large', 'xlarge'] as const
@@ -23,6 +24,22 @@ describe('#Button', () => {
 
     expect(wrapper.getByText('Button')).toBeInTheDocument()
     expect(() => wrapper.unmount()).not.toThrow()
+  })
+
+  it('should default to the neutral default variant', () => {
+    render(<Button>Neutral</Button>)
+
+    const button = screen.getByRole('button', { name: 'Neutral' })
+    expect(button.className).toContain('bg-background')
+    expect(button.className).toContain('hover:bg-popover')
+    expect(button.className).not.toContain('bg-brand-400')
+  })
+
+  it('should allow an explicit primary variant override', () => {
+    render(<Button variant="primary">Primary</Button>)
+
+    const button = screen.getByRole('button', { name: 'Primary' })
+    expect(button.className).toContain('bg-brand-400')
   })
 
   it('should render different text', () => {
@@ -73,14 +90,11 @@ describe('#Button', () => {
     expect(screen.queryByRole('button')).toHaveClass('w-full')
   })
 
-  it("shouldn't crash when wrapped with next/link", () => {
-    expect(() =>
-      render(
-        <Button asChild>
-          <Link href="https://supabase.com">Button</Link>
-        </Button>
-      )
-    ).not.toThrow()
+  it('should hide decorative icons from assistive technology', () => {
+    render(<Button icon={<svg data-testid="button-icon" />}>Save</Button>)
+
+    expect(screen.getByTestId('button-icon').parentElement).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
   })
 
   it('should forward ref', () => {

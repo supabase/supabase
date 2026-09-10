@@ -1,10 +1,13 @@
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
-import { DataPoint } from 'data/analytics/constants'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import SectionHeader from '../SectionHeader'
 import { CategoryMetaKey, USAGE_CATEGORIES } from '../Usage.constants'
 import AttributeUsage from './AttributeUsage'
+import DatabaseSizeUsage from './DatabaseSizeUsage'
+import { DiskUsage } from './DiskUsage'
+import { ScaffoldContainer } from '@/components/layouts/Scaffold'
+import { DataPoint } from '@/data/analytics/constants'
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
+import { useOrgUsageQuery } from '@/data/usage/org-usage-query'
 
 export interface ChartMeta {
   [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
@@ -12,11 +15,13 @@ export interface ChartMeta {
 
 export interface UsageSectionProps {
   orgSlug: string
-  projectRef?: string
+  projectRef?: string | null
   categoryKey: CategoryMetaKey
   subscription?: OrgSubscription
   chartMeta: ChartMeta
   currentBillingCycleSelected: boolean
+  startDate?: string
+  endDate?: string
 }
 
 const UsageSection = ({
@@ -26,43 +31,76 @@ const UsageSection = ({
   chartMeta,
   subscription,
   currentBillingCycleSelected,
+  startDate,
+  endDate,
 }: UsageSectionProps) => {
   const {
     data: usage,
     error: usageError,
-    isLoading: isLoadingUsage,
+    isPending: isLoadingUsage,
     isError: isErrorUsage,
     isSuccess: isSuccessUsage,
-  } = useOrgUsageQuery({ orgSlug })
+  } = useOrgUsageQuery({
+    orgSlug,
+    projectRef,
+    start: !currentBillingCycleSelected && startDate ? new Date(startDate) : undefined,
+    end: !currentBillingCycleSelected && endDate ? new Date(endDate) : undefined,
+  })
 
-  const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === categoryKey)
+  const categoryMeta = USAGE_CATEGORIES(subscription).find(
+    (category) => category.key === categoryKey
+  )
   if (!categoryMeta) return null
 
   return (
     <>
       <ScaffoldContainer>
-        <SectionHeader title={categoryMeta.name} description={categoryMeta.description} />
+        <SectionHeader
+          title={categoryMeta.name}
+          description={categoryMeta.description}
+          className="pb-0"
+        />
       </ScaffoldContainer>
 
-      <ScaffoldDivider />
-
-      {categoryMeta.attributes.map((attribute) => (
-        <AttributeUsage
-          key={attribute.name}
-          slug={orgSlug}
-          projectRef={projectRef}
-          attribute={attribute}
-          usage={usage}
-          usageMeta={usage?.usages.find((x) => x.metric === attribute.key)}
-          chartMeta={chartMeta}
-          subscription={subscription}
-          error={usageError}
-          isLoading={isLoadingUsage}
-          isError={isErrorUsage}
-          isSuccess={isSuccessUsage}
-          currentBillingCycleSelected={currentBillingCycleSelected}
-        />
-      ))}
+      {categoryMeta.attributes.map((attribute) =>
+        attribute.key === 'diskSize' ? (
+          <DiskUsage
+            key={attribute.name}
+            slug={orgSlug}
+            projectRef={projectRef}
+            attribute={attribute}
+            subscription={subscription}
+            currentBillingCycleSelected={currentBillingCycleSelected}
+            usage={usage}
+          />
+        ) : attribute.key === PricingMetric.DATABASE_SIZE && subscription?.plan.id === 'free' ? (
+          <DatabaseSizeUsage
+            key={attribute.name}
+            slug={orgSlug}
+            projectRef={projectRef}
+            attribute={attribute}
+            subscription={subscription}
+            currentBillingCycleSelected={currentBillingCycleSelected}
+            usage={usage}
+          />
+        ) : (
+          <AttributeUsage
+            key={attribute.name}
+            slug={orgSlug}
+            projectRef={projectRef}
+            attribute={attribute}
+            usage={usage}
+            usageMeta={usage?.usages.find((x) => x.metric === attribute.key)}
+            chartMeta={chartMeta}
+            subscription={subscription}
+            error={usageError}
+            isLoading={isLoadingUsage}
+            isError={isErrorUsage}
+            isSuccess={isSuccessUsage}
+            currentBillingCycleSelected={currentBillingCycleSelected}
+          />
+        )
+      )}
     </>
   )
 }

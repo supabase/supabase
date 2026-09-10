@@ -1,0 +1,54 @@
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import Link from 'next/link'
+import React from 'react'
+import { PRODUCT_NAMES, products } from 'shared-data/products'
+import { cn } from 'ui'
+
+interface Props {
+  activePage: PRODUCT_NAMES
+}
+
+function ProductsNav({ activePage }: Props) {
+  return (
+    <nav className="relative z-30 flex items-center bg-background w-full border-b">
+      <SectionContainer className="w-full py-0! flex gap-3 items-center">
+        {Object.entries(products).map((obj: any) => {
+          const product = obj[1]
+          const isAuth = product.name === PRODUCT_NAMES.AUTHENTICATION
+
+          return (
+            <Link
+              key={product.name}
+              className={cn(
+                'flex items-center gap-1.5 px-2 first:-ml-2 py-4 border-b border-transparent text-sm text-foreground-lighter hover:text-foreground',
+                'focus-ring focus-visible:text-foreground',
+                product.name === activePage && 'border-foreground-light text-foreground'
+              )}
+              href={`/${isAuth ? 'auth' : product.name.toLowerCase().replace(' ', '-')}`}
+            >
+              <svg
+                className="h-4 w-4 group-hover/menu-item:text-foreground group-focus-visible/menu-item:text-foreground"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 18 18"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1"
+                  d={product.icon['18']}
+                  stroke="currentColor"
+                />
+              </svg>
+              <p className={product.name !== activePage ? 'hidden md:block' : ''}>
+                {isAuth ? 'Auth' : product.name}
+              </p>
+            </Link>
+          )
+        })}
+      </SectionContainer>
+    </nav>
+  )
+}
+
+export default ProductsNav

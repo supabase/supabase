@@ -1,215 +1,248 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
-
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { template } from 'lodash'
+import { Download, Loader2 } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
+import { Button, Card, CardContent, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import {
-  FormHeader,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
-import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
-import { useCheckPermissions } from 'hooks'
-import { Alert, Button, IconDownload, IconExternalLink, IconLoader, Toggle } from 'ui'
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
-const SSLConfiguration = () => {
+import { SSLEnforcementConfirmDialog } from './SSLEnforcementConfirmDialog'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useJitDbAccessQuery } from '@/data/jit-db-access/jit-db-access-query'
+import { useSSLEnforcementQuery } from '@/data/ssl-enforcement/ssl-enforcement-query'
+import { useSSLEnforcementUpdateMutation } from '@/data/ssl-enforcement/ssl-enforcement-update-mutation'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+
+export const SSLConfiguration = () => {
   const { ref } = useParams()
-  const [isEnforced, setIsEnforced] = useState(false)
+  const { data: project } = useSelectedProjectQuery()
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
 
-  const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
+
+  // High Availability projects always enforce SSL and the API rejects any
+  // attempt to read or change the setting, so skip the query for them and
+  // show the setting as always on.
+  const { isHighAvailability, isPending: isHighAvailabilityPending } = useHighAvailability()
+  const canLoadSSLEnforcement = !isHighAvailability && !isHighAvailabilityPending
   const {
     data: sslEnforcementConfiguration,
-    isLoading,
-    isSuccess,
-  } = useSSLEnforcementQuery({
-    projectRef: ref,
-  })
-  const { mutate: updateSSLEnforcement, isLoading: isSubmitting } = useSSLEnforcementUpdateMutation(
-    {
+    isPending: isSSLEnforcementPending,
+    isSuccess: isSSLEnforcementSuccess,
+  } = useSSLEnforcementQuery({ projectRef: ref }, { enabled: canLoadSSLEnforcement })
+
+  const isLoading = isHighAvailabilityPending || (!isHighAvailability && isSSLEnforcementPending)
+  const isSuccess = isHighAvailability || isSSLEnforcementSuccess
+  const { data: jitDbAccessConfiguration } = useJitDbAccessQuery({ projectRef: ref })
+  const { mutateAsync: updateSSLEnforcement, isPending: isSubmitting } =
+    useSSLEnforcementUpdateMutation({
       onSuccess: () => {
         toast.success('Successfully updated SSL configuration')
       },
       onError: (error) => {
-        setIsEnforced(initialIsEnforced)
         toast.error(`Failed to update SSL enforcement: ${error.message}`)
+      },
+    })
+
+  const { can: canUpdateSSLEnforcement } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
       },
     }
   )
 
-  const { project } = useProjectContext()
-  const canUpdateSSLEnforcement = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
-  const initialIsEnforced = isSuccess
-    ? sslEnforcementConfiguration.appliedSuccessfully &&
-      sslEnforcementConfiguration.currentConfig.database
-    : false
+  // Derived directly from the query so a refetch triggered elsewhere (e.g.
+  // enabling SSL enforcement from the JIT DB access unavailable banner) is
+  // reflected here too, instead of relying on a mirrored local state that
+  // would only resync on the initial load.
+  const isEnforced =
+    isHighAvailability ||
+    (isSSLEnforcementSuccess &&
+      sslEnforcementConfiguration.appliedSuccessfully &&
+      sslEnforcementConfiguration.currentConfig.database)
 
-  const hasAccessToSSLEnforcement = !sslEnforcementConfiguration?.isNotAllowed
+  const hasAccessToSSLEnforcement = !(
+    sslEnforcementConfiguration !== undefined &&
+    'isNotAllowed' in sslEnforcementConfiguration &&
+    sslEnforcementConfiguration.isNotAllowed
+  )
+
+  // Temporary access requires SSL enforcement to be enabled, so SSL enforcement
+  // can't be turned off again while temporary access is still enabled.
+  const isTemporaryAccessEnabled =
+    jitDbAccessConfiguration?.state === 'enabled' && jitDbAccessConfiguration.appliedSuccessfully
+
+  const isSwitchDisabled =
+    isLoading ||
+    isSubmitting ||
+    isHighAvailability ||
+    !canUpdateSSLEnforcement ||
+    !hasAccessToSSLEnforcement ||
+    isTemporaryAccessEnabled
+
+  let switchTooltipMessage: string | undefined
+  if (isHighAvailability) {
+    switchTooltipMessage = 'SSL is always enforced on High Availability projects'
+  } else if (!canUpdateSSLEnforcement) {
+    switchTooltipMessage =
+      'You need additional permissions to update SSL enforcement for your project'
+  } else if (!hasAccessToSSLEnforcement) {
+    switchTooltipMessage = 'Your project does not have access to SSL enforcement'
+  } else if (isTemporaryAccessEnabled) {
+    switchTooltipMessage =
+      'Temporary access must first be disabled before SSL enforcement can be disabled'
+  }
+
+  let loadingAnnouncement = ''
+  if (isSubmitting) {
+    loadingAnnouncement = 'Updating SSL enforcement'
+  } else if (isLoading) {
+    loadingAnnouncement = 'Loading SSL configuration'
+  }
+
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
   const hasSSLCertificate =
-    projectSettings?.project !== undefined &&
-    new Date(projectSettings.project.inserted_at) >= new Date('2021-04-30')
+    settings?.inserted_at !== undefined && new Date(settings.inserted_at) >= new Date('2021-04-30')
 
-  useEffect(() => {
-    if (!isLoading && sslEnforcementConfiguration) {
-      setIsEnforced(initialIsEnforced)
-    }
-  }, [isLoading])
+  const { sslCertificateUrl: sslCertificateUrlTemplate } = useCustomContent(['ssl:certificate_url'])
+  const sslCertificateUrl = useMemo(
+    () => template(sslCertificateUrlTemplate ?? '')({ env }),
+    [sslCertificateUrlTemplate, env]
+  )
 
   const toggleSSLEnforcement = async () => {
     if (!ref) return console.error('Project ref is required')
-    setIsEnforced(!isEnforced)
-    updateSSLEnforcement({ projectRef: ref, requestedConfig: { database: !isEnforced } })
+    await updateSSLEnforcement({ projectRef: ref, requestedConfig: { database: !isEnforced } })
   }
 
   return (
-    <div id="ssl-configuration">
-      <div className="flex items-center justify-between">
-        <FormHeader title="SSL Configuration" description="" />
-        <div className="flex items-center space-x-2 mb-6">
-          <Button asChild type="default" icon={<IconExternalLink />}>
-            <Link href="https://supabase.com/docs/guides/platform/ssl-enforcement" target="_blank">
-              Documentation
-            </Link>
-          </Button>
-        </div>
-      </div>
-      <FormPanel>
-        <FormSection
-          header={
-            <FormSectionLabel
-              className="lg:col-span-7"
-              description={
-                <div className="space-y-4">
-                  <p className="text-sm text-foreground-light">
-                    Reject non-SSL connections to your database
-                  </p>
-                  {isSuccess && !sslEnforcementConfiguration?.appliedSuccessfully && (
-                    <Alert
-                      withIcon
-                      variant="warning"
-                      title="SSL enforcement was not updated successfully"
-                    >
-                      Please try updating again, or contact{' '}
-                      <Link
-                        href="/support/new"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="underline"
-                      >
-                        support
-                      </Link>{' '}
-                      if this error persists
-                    </Alert>
-                  )}
-                </div>
-              }
+    <PageSection id="ssl-configuration">
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>SSL configuration</PageSectionTitle>
+        </PageSectionSummary>
+        <DocsButton href={`${DOCS_URL}/guides/platform/ssl-enforcement`} />
+      </PageSectionMeta>
+      <PageSectionContent>
+        <Card>
+          <CardContent className="space-y-4">
+            <FormLayout
+              layout="flex-row-reverse"
+              label="Enforce SSL on incoming connections"
+              description="Reject non-SSL connections to your database"
             >
-              Enforce SSL on incoming connections
-            </FormSectionLabel>
-          }
-        >
-          <FormSectionContent loading={false} className="lg:!col-span-5">
-            <div className="flex items-center justify-end mt-2.5 space-x-2">
-              {(isLoading || isSubmitting) && (
-                <IconLoader className="animate-spin" strokeWidth={1.5} size={16} />
-              )}
-              {isSuccess && (
-                <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger>
-                    <Toggle
-                      checked={isEnforced}
-                      disabled={
-                        isLoading ||
-                        isSubmitting ||
-                        !canUpdateSSLEnforcement ||
-                        !hasAccessToSSLEnforcement
-                      }
-                      onChange={toggleSSLEnforcement}
-                    />
-                  </Tooltip.Trigger>
-                  {(!canUpdateSSLEnforcement || !hasAccessToSSLEnforcement) && (
-                    <Tooltip.Portal>
-                      <Tooltip.Content align="center" side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-alternative py-1 px-2 leading-none shadow',
-                            'border border-background w-[250px]',
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-foreground text-center flex items-center justify-center">
-                            {!canUpdateSSLEnforcement
-                              ? 'You need additional permissions to update SSL enforcement for your project'
-                              : !hasAccessToSSLEnforcement
-                                ? 'Your project does not have access to SSL enforcement'
-                                : ''}
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  )}
-                </Tooltip.Root>
-              )}
-            </div>
-          </FormSectionContent>
-        </FormSection>
-
-        <div className="grid grid-cols-1 items-center lg:grid-cols-2 p-8">
-          <div className="space-y-2">
-            <p className="block text-sm">SSL Certificate</p>
-            <div style={{ maxWidth: '420px' }}>
-              <p className="text-sm opacity-50">
-                Use this certificate when connecting to your database to prevent snooping and
-                man-in-the-middle attacks.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-end justify-end">
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button type="default" disabled={!hasSSLCertificate} icon={<IconDownload />}>
-                  <a
-                    href={`https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt`}
+              <div className="flex items-center justify-end mt-2.5 space-x-2">
+                {(isLoading || isSubmitting) && (
+                  <Loader2
+                    aria-hidden="true"
+                    className="animate-spin motion-reduce:animate-none"
+                    strokeWidth={1.5}
+                    size={16}
+                  />
+                )}
+                {isSuccess && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
+                      {/* A disabled switch can't take focus, so the wrapper becomes the focus
+                          target to keep the tooltip reachable by keyboard */}
+                      <div tabIndex={isSwitchDisabled ? 0 : undefined}>
+                        {/* The dialog is opened from the switch itself rather than a wrapping
+                            trigger, so a disabled switch can never open it. */}
+                        <Switch
+                          size="large"
+                          checked={isEnforced}
+                          disabled={isSwitchDisabled}
+                          onCheckedChange={() => setIsConfirmDialogOpen(true)}
+                        />
+                      </div>
+                    </TooltipTrigger>
+                    {switchTooltipMessage && (
+                      <TooltipContent side="bottom" className="w-64 text-center">
+                        {switchTooltipMessage}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                )}
+                {/* Kept mounted so screen readers announce loading state changes */}
+                <span className="sr-only" role="status">
+                  {loadingAnnouncement}
+                </span>
+              </div>
+              <SSLEnforcementConfirmDialog
+                open={isConfirmDialogOpen}
+                onOpenChange={setIsConfirmDialogOpen}
+                isTargetEnforced={!isEnforced}
+                isSubmitting={isSubmitting}
+                onConfirm={toggleSSLEnforcement}
+              />
+            </FormLayout>
+            {isSSLEnforcementSuccess && !sslEnforcementConfiguration.appliedSuccessfully && (
+              <Admonition
+                type="warning"
+                layout="horizontal"
+                title="SSL enforcement was not updated successfully"
+                description={
+                  <>
+                    Please try updating again, or contact{' '}
+                    <SupportLink className={InlineLinkClassName}>support</SupportLink> if this error
+                    persists
+                  </>
+                }
+              />
+            )}
+          </CardContent>
+          <CardContent>
+            <FormLayout
+              layout="flex-row-reverse"
+              label="SSL Certificate"
+              description="Use this certificate when connecting to your database to prevent snooping and man-in-the-middle attacks."
+            >
+              <div className="flex items-end justify-end">
+                {!hasSSLCertificate ? (
+                  <ButtonTooltip
+                    disabled
+                    variant="default"
+                    icon={<Download />}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: 'Projects before 15:08 (GMT+08), 29th April 2021 do not have SSL certificates installed',
+                      },
+                    }}
                   >
-                    Download Certificate
-                  </a>
-                </Button>
-              </Tooltip.Trigger>
-              {!hasSSLCertificate && (
-                <Tooltip.Portal>
-                  <Tooltip.Content align="center" side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background w-[250px]',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        Projects before 15:08 (GMT+08), 29th April 2021 do not have SSL certificates
-                        installed
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
-          </div>
-        </div>
-      </FormPanel>
-    </div>
+                    Download certificate
+                  </ButtonTooltip>
+                ) : (
+                  <Button variant="default" icon={<Download />}>
+                    <a href={sslCertificateUrl}>Download certificate</a>
+                  </Button>
+                )}
+              </div>
+            </FormLayout>
+          </CardContent>
+        </Card>
+      </PageSectionContent>
+    </PageSection>
   )
 }
-
-export default SSLConfiguration

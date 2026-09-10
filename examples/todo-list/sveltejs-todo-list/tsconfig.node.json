@@ -1,9 +1,8 @@
 {
-    "compilerOptions": {
-      "composite": true,
-      "module": "ESNext",
-      "moduleResolution": "Node"
-    },
-    "include": ["vite.config.ts"]
-  }
-  
+  "compilerOptions": {
+    "composite": true,
+    "module": "ESNext",
+    "moduleResolution": "Node"
+  },
+  "include": ["vite.config.ts"]
+}

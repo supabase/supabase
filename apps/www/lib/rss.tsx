@@ -1,28 +1,31 @@
 import authors from 'lib/authors.json'
+
 const dayjs = require('dayjs')
 var utc = require('dayjs/plugin/utc')
 var advancedFormat = require('dayjs/plugin/advancedFormat')
 dayjs.extend(utc)
 dayjs.extend(advancedFormat)
 
-const generateRssItem = (post: any): string => {
-  const xmlEncode = (str: string) => {
-    if (str === undefined || str === null) {
-      return ''
-    }
-
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&apos;')
+export function xmlEncodeRss(str: string | undefined | null): string {
+  if (str === undefined || str === null) {
+    return ''
   }
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+}
 
-  const encodedTitle = xmlEncode(post.title)
-  const encodedPath = xmlEncode(post.path)
-  const encodedDescription = xmlEncode(post.description)
-  const formattedDate = dayjs(post.date).utc().format('ddd, DD MMM YYYY HH:mm:ss [GMT]')
+const generateRssItem = (post: any): string => {
+  const encodedTitle = xmlEncodeRss(post.title)
+  const encodedPath = xmlEncodeRss(post.path)
+  const encodedDescription = xmlEncodeRss(post.description)
+  const formattedDate = dayjs(post.date)
+    .utcOffset(0, true)
+    .startOf('day')
+    .format('ddd, DD MMM YYYY HH:mm:ss [-0700]')
 
   return `<item>
   <guid>https://supabase.com${encodedPath}</guid>
@@ -34,10 +37,34 @@ const generateRssItem = (post: any): string => {
 `
 }
 
-// we generate a main rss.xml flie as well as individual files for
-// authors who publish under the `planetpg` tag
+export type ChangelogRssItemInput = {
+  title: string
+  slug: string
+  sortDate: string
+  affectedProducts?: string[]
+}
+
+/** Implemented in `./changelog-rss.mjs` (used by `scripts/generateStaticContent.mjs`). */
+export { generateChangelogRssXml } from './changelog-rss.mjs'
+
+// This utility generates RSS feeds for specialized content:
+// 1. Customer stories RSS feed (customers-rss.xml) - used by pages/customers.tsx via getStaticProps
+// 2. Author-specific PlanetPG RSS feeds (planetpg-{authorID}-rss.xml) - filtered feeds for individual authors
+// 3. Changelog RSS (changelog-rss.xml) — built in generateStaticContent.mjs via ./changelog-rss.mjs
+//
+// Note: The main blog RSS feed (rss.xml) containing all blog posts is generated separately
+// in generateStaticContent.mjs during the build process. This file is NOT used for the main blog feed.
+//
+// Usage:
+//   - Without authorID: Generates generic RSS feed (used for customer stories)
+//   - With authorID: Generates author-specific feed with custom title/description for PlanetPG authors
 export const generateRss = (posts: any[], authorID?: string): string => {
   const authorInfo = authors.find((item) => item.author_id === authorID)
+
+  const formattedDate = dayjs(posts[0].date)
+    .utcOffset(0, true)
+    .startOf('day')
+    .format('ddd, DD MMM YYYY HH:mm:ss [-0700]')
 
   if (authorID) {
     return `
@@ -47,9 +74,7 @@ export const generateRss = (posts: any[], authorID?: string): string => {
       <link>https://supabase.com/blog</link>
       <description>Latest Postgres news from ${authorInfo?.author} at Supabase</description>
       <language>en</language>
-      <lastBuildDate>${dayjs(posts[0].date)
-        .utc()
-        .format('ddd, DD MMM YYYY HH:mm:ss [GMT]')}</lastBuildDate>
+      <lastBuildDate>${formattedDate}</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-${authorID}-rss.xml" rel="self" type="application/rss+xml"/>
       ${posts.map(generateRssItem).join('')}
     </channel>
@@ -63,9 +88,7 @@ export const generateRss = (posts: any[], authorID?: string): string => {
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>${dayjs(posts[0].date)
-        .utc()
-        .format('ddd, DD MMM YYYY HH:mm:ss [GMT]')}</lastBuildDate>
+      <lastBuildDate>${formattedDate}</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       ${posts.map(generateRssItem).join('')}
     </channel>

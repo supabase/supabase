@@ -1,31 +1,31 @@
 import dagre from '@dagrejs/dagre'
-import { Edge, Node, Position } from 'reactflow'
+import { Edge, Node, Position } from '@xyflow/react'
+import { groupBy } from 'lodash'
+import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'shared-data'
 
 import {
   AVAILABLE_REPLICA_REGIONS,
-  NODE_ROW_HEIGHT,
+  AWS_REGIONS_COORDINATES,
+  NODE_HEIGHT_FALLBACKS,
   NODE_SEP,
   NODE_WIDTH,
+  ReplicaNodeData,
 } from './InstanceConfiguration.constants'
-import { groupBy } from 'lodash'
-import type { Database } from 'data/read-replicas/replicas-query'
-import type { LoadBalancer } from 'data/read-replicas/load-balancers-query'
+import type { LoadBalancer } from '@/data/read-replicas/load-balancers-query'
+import type { Database } from '@/data/read-replicas/replicas-query'
 
 // [Joshen] Just FYI the nodes generation assumes each project only has one load balancer
 // Will need to change if this eventually becomes otherwise
 
-export const generateNodes = (
-  primary: Database,
-  replicas: Database[],
-  loadBalancers: LoadBalancer[],
-  {
-    onSelectRestartReplica,
-    onSelectDropReplica,
-  }: {
-    onSelectRestartReplica: (database: Database) => void
-    onSelectDropReplica: (database: Database) => void
-  }
-): Node[] => {
+export const generateNodes = ({
+  primary,
+  replicas,
+  loadBalancers,
+}: {
+  primary: Database
+  replicas: Database[]
+  loadBalancers: LoadBalancer[]
+}): Node[] => {
   const position = { x: 0, y: 0 }
   const regions = groupBy(replicas, (d) => {
     const region = AVAILABLE_REPLICA_REGIONS.find((region) => d.region.includes(region.region))
@@ -47,16 +47,34 @@ export const generateNodes = (
         }
       : undefined
 
-  const primaryRegion = AVAILABLE_REPLICA_REGIONS.find((region) =>
-    primary.region.includes(region.region)
-  )
+  // [Joshen] We should be finding from AVAILABLE_REPLICA_REGIONS instead
+  // but because the new regions (zurich, stockholm, ohio, paris) dont have
+  // coordinates yet in AWS_REGIONS_COORDINATES - we'll need to add them in once
+  // they are ready to spin up coordinates for
+  const primaryRegion = Object.keys(AWS_REGIONS)
+    .map((key) => {
+      return {
+        key: key as AWS_REGIONS_KEYS,
+        name: AWS_REGIONS?.[key as AWS_REGIONS_KEYS].displayName,
+        region: AWS_REGIONS?.[key as AWS_REGIONS_KEYS].code,
+        coordinates: AWS_REGIONS_COORDINATES[key],
+      }
+    })
+    .find((region) => primary.region.includes(region.region))
+
+  // [Joshen] Once we have the coordinates for Zurich and Stockholm, we can remove the above
+  // and uncomment below for better simplicity
+  // const primaryRegion = AVAILABLE_REPLICA_REGIONS.find((region) =>
+  //   primary.region.includes(region.region)
+  // )
+
   const primaryNode: Node = {
     position,
     id: primary.identifier,
     type: 'PRIMARY',
     data: {
       id: primary.identifier,
-      region: primaryRegion,
+      region: primaryRegion ?? { name: primary.region },
       provider: primary.cloud_provider,
       inserted_at: primary.inserted_at,
       computeSize: primary.size,
@@ -85,8 +103,6 @@ export const generateNodes = (
           inserted_at: database.inserted_at,
           computeSize: database.size,
           status: database.status,
-          onSelectRestartReplica: () => onSelectRestartReplica(database),
-          onSelectDropReplica: () => onSelectDropReplica(database),
         },
       }
     })
@@ -98,15 +114,24 @@ export const generateNodes = (
   ]
 }
 
-export const getDagreGraphLayout = (nodes: Node[], edges: Edge[]) => {
+export const getDagreNodeHeight = (node: Node) => {
+  if (node.measured?.height) return node.measured.height
+  return NODE_HEIGHT_FALLBACKS[node.type ?? ''] ?? 100
+}
+
+export const getDagreGraphLayout = (
+  nodes: Node[],
+  edges: Edge[],
+  { ranksep = 60 }: { ranksep?: number } = {}
+) => {
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
-  dagreGraph.setGraph({ rankdir: 'TB', ranksep: 160, nodesep: NODE_SEP })
+  dagreGraph.setGraph({ rankdir: 'TB', ranksep, nodesep: NODE_SEP })
 
   nodes.forEach((node) => {
     dagreGraph.setNode(node.id, {
       width: NODE_WIDTH / 2,
-      height: node.id === 'load-balancer' ? -70 : NODE_ROW_HEIGHT / 2,
+      height: getDagreNodeHeight(node),
     })
   })
 
@@ -141,7 +166,9 @@ export const getDagreGraphLayout = (nodes: Node[], edges: Edge[]) => {
  */
 export const addRegionNodes = (nodes: Node[], edges: Edge[]) => {
   const regionNodes: Node[] = []
-  const replicaNodes = nodes.filter((node) => node.type === 'READ_REPLICA')
+  const replicaNodes = nodes.filter(
+    (node) => node.type === 'READ_REPLICA'
+  ) as Node<ReplicaNodeData>[]
 
   const nodesByRegion = groupBy(replicaNodes, (node) => node.data.region.key)
   Object.entries(nodesByRegion).map(([key, value]) => {
@@ -165,4 +192,12 @@ export const addRegionNodes = (nodes: Node[], edges: Edge[]) => {
   })
 
   return { nodes: [...regionNodes, ...nodes], edges }
+}
+
+export const formatSeconds = (value: number) => {
+  const hours = ~~(value / 3600)
+  const minutes = Math.floor((value % 3600) / 60)
+  const seconds = Math.floor(value % 60)
+
+  return `${hours > 0 ? `${hours}h` : ''} ${minutes > 0 ? `${minutes}m` : ''} ${seconds > 0 ? `${seconds}s` : ''}`.trim()
 }

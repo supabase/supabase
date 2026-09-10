@@ -1,0 +1,203 @@
+import { useParams } from 'common'
+import { UseFormReturn, useWatch } from 'react-hook-form'
+import {
+  FormControl,
+  FormField,
+  FormInputGroupInput,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+} from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import { DiskStorageSchemaType } from '../DiskManagement.schema'
+import { DISK_AUTOSCALE_CONFIG_DEFAULTS } from '../ui/DiskManagement.constants'
+import { useDiskAutoscaleCustomConfigQuery } from '@/data/config/disk-autoscale-config-query'
+
+type AutoScaleFieldProps = {
+  form: UseFormReturn<DiskStorageSchemaType>
+  disableInput?: boolean
+}
+
+export const AutoScaleFields = ({ form, disableInput = false }: AutoScaleFieldProps) => {
+  const { ref: projectRef } = useParams()
+  const {
+    control,
+    setValue,
+    formState: { errors },
+  } = form
+  const [totalSize, growthPercent, maxSizeGb, minIncrementGb] = useWatch({
+    control,
+    name: ['totalSize', 'growthPercent', 'maxSizeGb', 'minIncrementGb'],
+  })
+
+  const { isError } = useDiskAutoscaleCustomConfigQuery({ projectRef })
+
+  const _growthPercent = growthPercent ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
+  const _minIncrementGb = minIncrementGb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
+  const _maxSizeGb = errors.maxSizeGb
+    ? DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
+    : (maxSizeGb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb)
+
+  const growthSize = Math.floor(totalSize * (_growthPercent / 100))
+  const autoscaleGrowValue = Math.min(
+    Math.max(Math.floor((totalSize * _growthPercent) / 100), _minIncrementGb),
+    200
+  )
+
+  const totalSizeAfterGrowth = Math.max(autoscaleGrowValue + totalSize, 8)
+  const formattedTotalSizeAfterGrowth =
+    totalSizeAfterGrowth < _maxSizeGb ? totalSizeAfterGrowth : _maxSizeGb
+  const formattedGrowValue = formattedTotalSizeAfterGrowth - totalSize
+
+  return (
+    <>
+      <FormField
+        name="growthPercent"
+        control={control}
+        render={({ field }) => {
+          return (
+            <FormItemLayout
+              layout="flex-row-reverse"
+              label="Autoscale growth percent"
+              id={field.name}
+              labelOptional="Percentage of current disk size to grow"
+              description={
+                !errors.growthPercent
+                  ? `This amounts to ${growthSize} GB based on the current disk size of ${totalSize} GB`
+                  : undefined
+              }
+              className="[&>div>span]:text-foreground-lighter"
+            >
+              <FormControl className="max-w-20">
+                <InputGroup>
+                  <FormInputGroupInput
+                    {...field}
+                    id={field.name}
+                    type="number"
+                    value={field.value ?? undefined}
+                    disabled={disableInput || isError}
+                    onChange={(e) => {
+                      setValue(
+                        'growthPercent',
+                        e.target.value === '' ? null : e.target.valueAsNumber,
+                        {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        }
+                      )
+                    }}
+                    placeholder={String(DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent)}
+                  />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupText>%</InputGroupText>
+                  </InputGroupAddon>
+                </InputGroup>
+              </FormControl>
+            </FormItemLayout>
+          )
+        }}
+      />
+
+      <FormField
+        name="minIncrementGb"
+        control={control}
+        render={({ field }) => {
+          return (
+            <FormItemLayout
+              layout="flex-row-reverse"
+              label="Minimum increment"
+              id={field.name}
+              labelOptional="Minimum value to autoscale disk size by"
+              description={
+                !!minIncrementGb && minIncrementGb > growthSize && !errors.minIncrementGb
+                  ? `This value takes precedence as the minimum increment is larger than the growth percent`
+                  : undefined
+              }
+              className="[&>div>span]:text-foreground-lighter"
+            >
+              <FormControl className="max-w-32">
+                <InputGroup>
+                  <FormInputGroupInput
+                    {...field}
+                    id={field.name}
+                    type="number"
+                    value={field.value ?? undefined}
+                    disabled={disableInput || isError}
+                    onChange={(e) => {
+                      setValue(
+                        'minIncrementGb',
+                        e.target.value === '' ? null : e.target.valueAsNumber,
+                        {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        }
+                      )
+                    }}
+                    placeholder={String(DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize)}
+                  />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupText>GB</InputGroupText>
+                  </InputGroupAddon>
+                </InputGroup>
+              </FormControl>
+            </FormItemLayout>
+          )
+        }}
+      />
+
+      <FormField
+        name="maxSizeGb"
+        control={control}
+        render={({ field }) => {
+          return (
+            <FormItemLayout
+              layout="flex-row-reverse"
+              label="Maximum disk size"
+              id={field.name}
+              labelOptional="Maximum size that the disk can grow to"
+              className="[&>div>span]:text-foreground-lighter"
+            >
+              <FormControl className="max-w-32">
+                <InputGroup>
+                  <FormInputGroupInput
+                    {...field}
+                    id={field.name}
+                    type="number"
+                    value={field.value ?? undefined}
+                    disabled={disableInput || isError}
+                    onChange={(e) => {
+                      setValue('maxSizeGb', e.target.value === '' ? null : e.target.valueAsNumber, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }}
+                    placeholder={String(DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb)}
+                  />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupText>GB</InputGroupText>
+                  </InputGroupAddon>
+                </InputGroup>
+              </FormControl>
+            </FormItemLayout>
+          )
+        }}
+      />
+
+      {
+        <Admonition type="default" showIcon={false} className="[&>div]:text-foreground-light">
+          Disk size will automatically be expanded by{' '}
+          <span className="text-foreground">
+            {String(formattedGrowValue).length > 4
+              ? formattedGrowValue.toFixed(2)
+              : formattedGrowValue}{' '}
+            GB
+          </span>{' '}
+          to a total of <span className="text-foreground">{formattedTotalSizeAfterGrowth} GB</span>{' '}
+          when the database reaches 90% of the disk size
+        </Admonition>
+      }
+    </>
+  )
+}

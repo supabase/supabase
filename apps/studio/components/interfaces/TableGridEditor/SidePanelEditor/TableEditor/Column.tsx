@@ -1,13 +1,36 @@
-import { noop } from 'lodash'
-import { Checkbox, IconMenu, IconSettings, IconX, Input, Popover } from 'ui'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { Eye, EyeOff, GripVertical, Link, Plus, Settings, X } from 'lucide-react'
+import { useState } from 'react'
+import {
+  Badge,
+  Button,
+  Checkbox,
+  cn,
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
-import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
-import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
-import type { Suggestion } from '../ColumnEditor/ColumnEditor.types'
+import { ColumnDefaultValue } from '../ColumnEditor/ColumnDefaultValue'
 import ColumnType from '../ColumnEditor/ColumnType'
-import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
+import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from '../SidePanelEditor.types'
+import { checkIfRelationChanged } from './ForeignKeysManagement/ForeignKeysManagement.utils'
+import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
+import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { EMPTY_ARR, EMPTY_OBJ } from '@/lib/void'
 
 /**
  * [Joshen] For context:
@@ -29,26 +52,31 @@ import type { ColumnField } from '../SidePanelEditor.types'
 
 interface ColumnProps {
   column: ColumnField
+  relations: ForeignKey[]
   enumTypes: EnumeratedType[]
   isNewRecord: boolean
   hasForeignKeys: boolean
   hasImportContent: boolean
-  dragHandleProps?: any
+  shouldAutoFocusName?: boolean
   onUpdateColumn: (changes: Partial<ColumnField>) => void
   onRemoveColumn: () => void
+  onEditForeignKey: (relation?: ForeignKey) => void
 }
 
-const Column = ({
+export const Column = ({
   column = EMPTY_OBJ as ColumnField,
+  relations = EMPTY_ARR as ForeignKey[],
   enumTypes = EMPTY_ARR as EnumeratedType[],
   isNewRecord = false,
   hasForeignKeys = false,
   hasImportContent = false,
-  dragHandleProps = EMPTY_OBJ,
-  onUpdateColumn = noop,
-  onRemoveColumn = noop,
+  shouldAutoFocusName = false,
+  onUpdateColumn,
+  onRemoveColumn,
+  onEditForeignKey,
 }: ColumnProps) => {
-  const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
+  const { data: project } = useSelectedProjectQuery()
+  const [open, setOpen] = useState(false)
 
   const settingsCount = [
     column.isNullable ? 1 : 0,
@@ -57,170 +85,372 @@ const Column = ({
     column.isArray ? 1 : 0,
   ].reduce((a, b) => a + b, 0)
 
+  const { data } = useForeignKeyConstraintsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: column.schema,
+  })
+
+  const getRelationStatus = (fk: ForeignKey) => {
+    const existingRelation = (data ?? []).find((x) => x.id === fk.id)
+    const stateRelation = relations.find((x) => x.id === fk.id)
+
+    if (stateRelation?.toRemove) return 'REMOVE'
+    if (existingRelation === undefined && stateRelation !== undefined) return 'ADD'
+    if (existingRelation !== undefined && stateRelation !== undefined) {
+      const hasUpdated = checkIfRelationChanged(existingRelation, stateRelation)
+      if (hasUpdated) return 'UPDATE'
+      else return undefined
+    }
+  }
+
+  const hasChangesInRelations = relations
+    .map((r) => getRelationStatus(r))
+    .some((x) => x !== undefined)
+
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition } =
+    useSortable({
+      id: column.id,
+    })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
   return (
-    <div className="flex w-full items-center">
+    <div className="flex w-full items-center" ref={setNodeRef} style={style}>
       <div className={`w-[5%] ${!isNewRecord ? 'hidden' : ''}`}>
-        <div className="cursor-drag" {...dragHandleProps}>
-          <IconMenu strokeWidth={1} size={15} />
-        </div>
+        <button
+          ref={setActivatorNodeRef}
+          {...attributes}
+          {...listeners}
+          tabIndex={0}
+          className="opacity-50 hover:opacity-100 disabled:hover:opacity-50 transition cursor-grab text-foreground"
+          type="button"
+        >
+          <GripVertical size={16} strokeWidth={1.5} />
+        </button>
       </div>
-      <div className="w-[25%]">
+      <div className="w-[30%]">
         <div className="flex w-[95%] items-center justify-between">
+          <div className="h-4 w-px bg-border" />
           <Input
-            value={column.name}
+            autoFocus={shouldAutoFocusName}
+            aria-label="Column name"
             size="small"
+            value={column.name}
             title={column.name}
             disabled={hasImportContent}
             placeholder="column_name"
-            className={`table-editor-columns-input bg-surface-100 lg:gap-0 ${
+            className={cn(
+              '[&>div>div>div>input]:py-1.5 [&>div>div>div>input]:border-r-transparent [&>div>div>div>input]:rounded-r-none',
               hasImportContent ? 'opacity-50' : ''
-            } rounded-md`}
-            onChange={(event: any) => onUpdateColumn({ name: event.target.value })}
+            )}
+            onChange={(event) => onUpdateColumn({ name: event.target.value })}
           />
+
+          {relations.filter((r) => !r.toRemove).length === 0 ? (
+            <div className="flex items-center gap-x-1">
+              <Button
+                variant="dashed"
+                className="rounded-l-none h-[30px] py-0 px-2"
+                onClick={() => onEditForeignKey()}
+              >
+                <Link size={12} />
+              </Button>
+              <div className="h-4 w-px bg-border" />
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    tabIndex={0}
+                    onClick={() => {
+                      const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
+
+                      const isSensitive = !column.isSensitiveData
+
+                      let updatedComment = column.comment || ''
+
+                      if (isSensitive && !updatedComment.includes(SENSITIVE_DATA_MARKER)) {
+                        updatedComment = updatedComment
+                          ? `${updatedComment} ${SENSITIVE_DATA_MARKER}`
+                          : SENSITIVE_DATA_MARKER
+                      } else if (!isSensitive) {
+                        updatedComment = updatedComment.replace(SENSITIVE_DATA_MARKER, '').trim()
+                      }
+
+                      onUpdateColumn({ isSensitiveData: isSensitive, comment: updatedComment })
+                    }}
+                    className={cn(
+                      'transition cursor-pointer p-1 hover:bg-surface-100 rounded',
+
+                      column.isSensitiveData
+                        ? 'opacity-100 text-foreground'
+                        : 'opacity-50 hover:opacity-100 text-foreground-light'
+                    )}
+                    type="button"
+                    aria-label={
+                      column.isSensitiveData ? 'Marked as sensitive' : 'Not marked as sensitive'
+                    }
+                  >
+                    {column.isSensitiveData ? (
+                      <EyeOff size={14} strokeWidth={1.5} />
+                    ) : (
+                      <Eye size={14} strokeWidth={1.5} />
+                    )}
+                  </button>
+                </TooltipTrigger>
+
+                <TooltipContent side="bottom">
+                  {column.isSensitiveData
+                    ? 'Data is masked in grid display. Actual data unchanged in database.'
+                    : 'Mark as sensitive to mask in grid display'}
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          ) : (
+            <Popover open={open} onOpenChange={setOpen} modal={false}>
+              <PopoverTrigger asChild>
+                <Button variant="default" className="rounded-l-none h-[30px] py-0 px-2">
+                  <Link size={12} />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                className={cn('p-0', hasChangesInRelations ? 'w-96' : 'w-72')}
+                side="bottom"
+                align="center"
+              >
+                <div className="text-xs px-2 pt-2">
+                  Involved in {relations.length} foreign key{relations.length > 1 ? 's' : ''}
+                </div>
+                <Command>
+                  <CommandList>
+                    <CommandGroup>
+                      {relations.map((relation, idx) => {
+                        const key = String(relation?.id ?? `${column.id}-relation-${idx}`)
+                        const status = getRelationStatus(relation)
+                        if (status === 'REMOVE') return null
+
+                        return (
+                          <CommandItem
+                            key={key}
+                            value={key}
+                            className="cursor-pointer w-full"
+                            onSelect={() => onEditForeignKey(relation)}
+                            onClick={() => onEditForeignKey(relation)}
+                          >
+                            {status === undefined ? (
+                              <div className="w-full flex items-center justify-between truncate">
+                                {relation.name}
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-x-2 truncate">
+                                <Badge variant={status === 'ADD' ? 'success' : 'warning'}>
+                                  {status}
+                                </Badge>
+                                <p className="truncate">
+                                  {relation.name || (
+                                    <>
+                                      To{' '}
+                                      {relation.columns
+                                        .filter((c) => c.source === column.name)
+                                        .map((c) => {
+                                          return (
+                                            <code key={`${c.source}-${c.target}`}>
+                                              {relation.schema}.{relation.table}.{c.target}
+                                            </code>
+                                          )
+                                        })}
+                                      {relation.columns.length > 1 && (
+                                        <>
+                                          and {relation.columns.length - 1} other column
+                                          {relation.columns.length > 2 ? 's' : ''}
+                                        </>
+                                      )}
+                                    </>
+                                  )}
+                                </p>
+                              </div>
+                            )}
+                          </CommandItem>
+                        )
+                      })}
+                    </CommandGroup>
+                    <CommandSeparator />
+                    <CommandGroup>
+                      <CommandItem
+                        className="cursor-pointer w-full gap-x-2"
+                        onSelect={() => onEditForeignKey()}
+                        onClick={() => onEditForeignKey()}
+                      >
+                        <Plus size={14} strokeWidth={1.5} />
+                        <p>Add foreign key relation</p>
+                      </CommandItem>
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
       </div>
       <div className="w-[25%]">
         <div className="w-[95%]">
           <ColumnType
-            value={column.format}
+            value={{ format: column.format, formatSchema: column.formatSchema }}
             enumTypes={enumTypes}
-            size="small"
             showLabel={false}
             className="table-editor-column-type lg:gap-0 "
             disabled={hasForeignKeys}
             description={
               hasForeignKeys ? 'Column type cannot be changed as it has a foreign key relation' : ''
             }
-            onOptionSelect={(format: string) => {
+            onOptionSelect={({ format, formatSchema }) => {
               const defaultValue = format === 'uuid' ? 'gen_random_uuid()' : null
-              onUpdateColumn({ format, defaultValue })
+              onUpdateColumn({ format, formatSchema, defaultValue })
             }}
           />
         </div>
       </div>
       <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'}`}>
         <div className="w-[95%]">
-          <InputWithSuggestions
-            placeholder={
-              typeof column.defaultValue === 'string' && column.defaultValue.length === 0
-                ? 'EMPTY'
-                : 'NULL'
-            }
+          <ColumnDefaultValue
+            columnFields={column}
+            enumTypes={enumTypes}
+            showLabel={false}
             size="small"
-            value={column.defaultValue ?? ''}
-            disabled={column.format.includes('int') && column.isIdentity}
-            className={`rounded bg-surface-100 lg:gap-0 ${
+            className={`rounded-sm lg:gap-0 ${
               column.format.includes('int') && column.isIdentity ? 'opacity-50' : ''
             }`}
-            suggestions={suggestions}
-            suggestionsHeader="Suggested expressions"
-            suggestionsTooltip="Suggested expressions"
-            onChange={(event: any) => onUpdateColumn({ defaultValue: event.target.value })}
-            onSelectSuggestion={(suggestion: Suggestion) =>
-              onUpdateColumn({ defaultValue: suggestion.value })
-            }
+            data-testid={`${column.name}-default-value`}
+            aria-label="Column default value"
+            onUpdateField={onUpdateColumn}
           />
         </div>
       </div>
       <div className="w-[10%]">
         <Checkbox
-          label=""
+          aria-label="Check to make this column a primary key"
           checked={column.isPrimaryKey}
-          onChange={() => onUpdateColumn({ isPrimaryKey: !column.isPrimaryKey })}
+          onCheckedChange={() => {
+            const updatedValue = !column.isPrimaryKey
+            onUpdateColumn({
+              isPrimaryKey: updatedValue,
+              isNullable: updatedValue ? false : column.isNullable,
+            })
+          }}
         />
       </div>
       <div className={`${hasImportContent ? 'w-[10%]' : 'w-[0%]'}`} />
       <div className="flex w-[5%] justify-end">
         {(!column.isPrimaryKey || column.format.includes('int')) && (
-          <>
-            <Popover
-              size="xlarge"
-              className="pointer-events-auto"
-              align="end"
-              modal={true}
-              header={
-                <div className="flex items-center justify-center">
-                  <h5 className="text-sm text-foreground">Extra options</h5>
+          <Popover>
+            <PopoverTrigger
+              data-testid={`${column.name}-extra-options`}
+              className="group flex items-center -space-x-1"
+            >
+              {settingsCount > 0 && (
+                <div className="rounded-full bg-foreground h-4 w-4 flex items-center justify-center text-xs text-background">
+                  {settingsCount}
                 </div>
-              }
-              overlay={[
-                <div className="flex flex-col space-y-1" key={`${column.id}_configuration`}>
-                  {!column.isPrimaryKey && (
-                    <>
-                      <Checkbox
-                        label="Is Nullable"
-                        description="Specify if the column can assume a NULL value if no value is provided"
-                        checked={column.isNullable}
-                        className="p-4"
-                        onChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
-                      />
-                      <Popover.Separator />
-                    </>
-                  )}
-                  <Checkbox
+              )}
+              <div className="text-foreground-light transition-colors group-hover:text-foreground">
+                <Settings size={16} strokeWidth={1} />
+              </div>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-0">
+              <div className="flex items-center justify-center bg-surface-200 gap-y-1 py-1.5 px-3 border-b border-overlay">
+                <h5 className="text-foreground">Extra options</h5>
+              </div>
+
+              <div className="flex flex-col gap-y-4 p-4" key={`${column.id}_configuration`}>
+                {!column.isPrimaryKey && (
+                  <FormItemLayout
+                    isReactForm={false}
+                    layout="flex"
+                    id="isNullable"
+                    label="Is Nullable"
+                    description="Specify if the column can assume a NULL value if no value is provided"
+                  >
+                    <Checkbox
+                      id="isNullable"
+                      checked={column.isNullable}
+                      onCheckedChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
+                    />
+                  </FormItemLayout>
+                )}
+                {!column.isPrimaryKey && (
+                  <FormItemLayout
+                    isReactForm={false}
+                    layout="flex"
+                    id="isUnique"
                     label="Is Unique"
                     description="Enforce if values in the column should be unique across rows"
-                    checked={column.isUnique}
-                    className="p-4"
-                    onChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
-                  />
-                  <Popover.Separator />
-                  {column.format.includes('int') && (
-                    <>
-                      <Checkbox
-                        label="Is Identity"
-                        description="Automatically assign a sequential unique number to the column"
-                        checked={column.isIdentity}
-                        className="p-4"
-                        onChange={() => {
-                          const isIdentity = !column.isIdentity
-                          const isArray = isIdentity ? false : column.isArray
-                          onUpdateColumn({ isIdentity, isArray })
-                        }}
-                      />
-                      <Popover.Separator />
-                    </>
-                  )}
-
-                  {!column.isPrimaryKey && (
+                  >
                     <Checkbox
-                      label="Define as Array"
-                      description="Define your column as a variable-length multidimensional array"
+                      id="isUnique"
+                      checked={column.isUnique}
+                      onCheckedChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
+                    />
+                  </FormItemLayout>
+                )}
+                {column.format.includes('int') && (
+                  <FormItemLayout
+                    isReactForm={false}
+                    layout="flex"
+                    id="isIdentity"
+                    label="Is Identity"
+                    description="Automatically assign a sequential unique number to the column"
+                  >
+                    <Checkbox
+                      id="isIdentity"
+                      checked={column.isIdentity}
+                      onCheckedChange={() => {
+                        const isIdentity = !column.isIdentity
+                        const isArray = isIdentity ? false : column.isArray
+                        onUpdateColumn({ isIdentity, isArray })
+                      }}
+                    />
+                  </FormItemLayout>
+                )}
+                {!column.isPrimaryKey && (
+                  <FormItemLayout
+                    isReactForm={false}
+                    layout="flex"
+                    id="defineAsArray"
+                    label="Define as Array"
+                    description="Define your column as a variable-length multidimensional array"
+                  >
+                    <Checkbox
+                      id="defineAsArray"
                       checked={column.isArray}
-                      className="p-4"
-                      onChange={() => {
+                      onCheckedChange={() => {
                         const isArray = !column.isArray
                         const isIdentity = isArray ? false : column.isIdentity
                         onUpdateColumn({ isArray, isIdentity })
                       }}
                     />
-                  )}
-                </div>,
-              ]}
-            >
-              <div className="group flex items-center -space-x-1">
-                {settingsCount > 0 && (
-                  <div className="rounded-full bg-foreground py-0.5 px-2 text-xs text-background">
-                    {settingsCount}
-                  </div>
+                  </FormItemLayout>
                 )}
-                <div className="text-foreground-light transition-colors group-hover:text-foreground">
-                  <IconSettings size={18} strokeWidth={1} />
-                </div>
               </div>
-            </Popover>
-          </>
+            </PopoverContent>
+          </Popover>
         )}
       </div>
       {!hasImportContent && (
         <div className="flex w-[5%] justify-end">
-          <button className="cursor-pointer" onClick={() => onRemoveColumn()}>
-            <IconX strokeWidth={1} />
+          <button
+            type="button"
+            tabIndex={0}
+            aria-label="Remove column"
+            className="cursor-pointer"
+            onClick={() => onRemoveColumn()}
+          >
+            <X size={16} strokeWidth={1} />
           </button>
         </div>
       )}
     </div>
   )
 }
-
-export default Column

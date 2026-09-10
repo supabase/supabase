@@ -1,23 +1,52 @@
 import { useParams } from 'common'
+import { AlertTriangle, BookOpen, ChartLine, ChevronDown, Sparkles, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { COMPUTE_DISK } from 'shared-data'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
-  IconAlertTriangle,
-  IconExternalLink,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from 'ui'
 
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
-import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
+import {
+  getResourceWarningCorrectionUrl,
+  getWarningContent,
+  isComputeUpgradeWarning,
+} from './ResourceExhaustionWarningBanner.utils'
+import { mapComputeSizeNameToAddonVariantId } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
-const ResourceExhaustionWarningBanner = () => {
+export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const { data: organization, isLoading: isOrgLoading } = useSelectedOrganizationQuery()
+  const { data: project } = useSelectedProjectQuery()
+  const diskIoBaselineLabel = (() => {
+    const variant = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
+    const baseline = COMPUTE_DISK[variant]?.baselineThroughputMBps
+    return typeof baseline === 'number' ? `${baseline} MB/s` : 'its baseline'
+  })()
+  const applyDiskIoBaseline = (text?: string) =>
+    text ? text.replace(/\{baseline\}/g, diskIoBaselineLabel) : text
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
+  const track = useTrack()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ ref: ref })
+  // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === ref
   )
@@ -48,19 +77,21 @@ const ResourceExhaustionWarningBanner = () => {
       ? getWarningContent(projectResourceWarnings, activeWarnings[0], 'bannerContent')
       : undefined
 
-  const title =
+  const title = applyDiskIoBaseline(
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].title
       : warningContent?.title
+  )
 
-  const description =
+  const description = applyDiskIoBaseline(
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].description
       : warningContent?.description
+  )
 
   const learnMoreUrl =
     activeWarnings.length > 1
@@ -68,68 +99,180 @@ const ResourceExhaustionWarningBanner = () => {
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.docsUrl
 
+  const singleWarningMessage =
+    activeWarnings.length === 1 ? RESOURCE_WARNING_MESSAGES[activeWarnings[0]] : undefined
+  const metricsHref = singleWarningMessage?.metricsHref?.replace('[ref]', ref ?? 'default')
+
   const metric =
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.metric
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.metric
 
-  const correctionUrl = (
-    metric === undefined
-      ? undefined
-      : metric === null
-        ? '/project/[ref]/settings/[infra-path]'
-        : metric === 'disk_space' || metric === 'read_only'
-          ? '/project/[ref]/settings/database'
-          : metric === 'auth_email_rate_limit'
-            ? '/project/[ref]/settings/auth'
-            : `/project/[ref]/settings/[infra-path]#${metric}`
-  )
-    ?.replace('[ref]', ref ?? 'default')
-    ?.replace('[infra-path]', 'infrastructure')
+  const isFreePlan = organization?.plan?.id === 'free'
 
-  const buttonText =
-    activeWarnings.length > 1
+  // True for a single compute warning, or when all active warnings are compute-related
+  const isComputeUpgradeMetric = isComputeUpgradeWarning(metric, activeWarnings)
+
+  const correctionUrl = getResourceWarningCorrectionUrl({
+    metric,
+    activeWarnings,
+    projectRef: ref,
+    isFreePlan,
+    organizationSlug: organization?.slug,
+  })
+
+  const buttonText = (() => {
+    if (isComputeUpgradeMetric) return 'Upgrade compute'
+    return activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.buttonText
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.buttonText
+  })()
 
-  // Don't show banner if no warnings, or on usage/infra page
+  const aiPrompt =
+    activeWarnings.length > 1
+      ? isComputeUpgradeMetric
+        ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.aiPrompt
+        : undefined
+      : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
+          ?.aiPrompt
+
+  const handleAskAI = () => {
+    track('resource_exhaustion_banner_ai_assistant_clicked', {
+      warningTypes: activeWarnings,
+    })
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    aiSnap.newChat({ initialInput: aiPrompt })
+  }
+
+  const hasNoWarnings = activeWarnings.length === 0
+  const hasNoWarningContent =
+    warningContent === undefined || (!warningContent?.title && !warningContent?.description)
+  const isUsageOrInfraPage =
+    router.pathname.endsWith('/usage') || router.pathname.endsWith('/infrastructure')
+  // Compute warnings now link to infrastructure, so they should remain visible on usage.
+  const onUsageOrInfraAndNotInReadOnlyMode =
+    isUsageOrInfraPage &&
+    !activeWarnings.includes('is_readonly_mode_enabled') &&
+    !isComputeUpgradeMetric
+  // Suppress when already on the target page (no-op CTA). Paid-plan compute warnings link to
+  // infrastructure; free-plan links to billing instead, so we keep the banner visible for them.
+  const shouldSuppressOnInfrastructurePage =
+    router.pathname.endsWith('settings/infrastructure') &&
+    (activeWarnings.includes('is_readonly_mode_enabled') || (isComputeUpgradeMetric && !isFreePlan))
+
+  // these take precedence over each other, so there's only one active warning to check
+  const activeWarning =
+    RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
+  const restrictToRoutes = activeWarning?.restrictToRoutes
+
+  const isVisible =
+    restrictToRoutes === undefined ||
+    restrictToRoutes.some((route: string) => {
+      // check for exact match with /project/[ref] (project home) first
+      // doing this let's us avoid checking with regex, keeping it simple
+      if (route === '/project/[ref]') {
+        const isExactMatch = router.pathname === '/project/[ref]'
+        return isExactMatch
+      }
+
+      // For other routes, use the original startsWith logic
+      const isMatch = router.pathname.startsWith(route)
+      return isMatch
+    })
+
   if (
-    activeWarnings.length === 0 ||
-    warningContent === undefined ||
-    ((router.pathname.endsWith('/usage') || router.pathname.endsWith('/infrastructure')) &&
-      !activeWarnings.includes('is_readonly_mode_enabled')) ||
-    (activeWarnings.includes('is_readonly_mode_enabled') &&
-      router.pathname.endsWith('settings/database'))
-  )
+    hasNoWarnings ||
+    hasNoWarningContent ||
+    onUsageOrInfraAndNotInReadOnlyMode ||
+    shouldSuppressOnInfrastructurePage ||
+    !isVisible
+  ) {
     return null
+  }
 
   return (
-    <Alert_Shadcn_
+    <Alert
       variant={isCritical ? 'destructive' : 'warning'}
-      className="border-0 border-r-0 rounded-none [&>svg]:left-6 px-6 [&>svg]:w-[26px]
-[&>svg]:h-[26px]"
+      className={cn(
+        'flex items-center justify-between',
+        'border-0 border-r-0 rounded-none [&>svg]:left-6 px-6 [&>svg]:w-[26px] [&>svg]:h-[26px]'
+      )}
     >
-      <IconAlertTriangle />
-      <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
-      <div className="absolute top-5 right-5 flex items-center space-x-2">
-        {learnMoreUrl !== undefined && (
-          <Button asChild type="default" icon={<IconExternalLink />}>
+      <AlertTriangle />
+      <div className="">
+        <AlertTitle>{title}</AlertTitle>
+        <AlertDescription>{description}</AlertDescription>
+      </div>
+      <div className="flex items-center gap-x-2">
+        {learnMoreUrl !== undefined && aiPrompt !== undefined ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="default"
+                icon={<Wrench size={14} />}
+                iconRight={<ChevronDown size={14} />}
+              >
+                Troubleshoot
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {metricsHref !== undefined && (
+                <DropdownMenuItem asChild>
+                  <Link href={metricsHref} className="flex items-center gap-x-2 cursor-pointer">
+                    <ChartLine size={14} />
+                    View metrics
+                  </Link>
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem asChild>
+                <a
+                  href={learnMoreUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-x-2 cursor-pointer"
+                >
+                  <BookOpen size={14} />
+                  Documentation
+                </a>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="flex items-center gap-x-2 cursor-pointer"
+                onClick={handleAskAI}
+              >
+                <Sparkles size={14} />
+                Ask AI Assistant
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : learnMoreUrl !== undefined ? (
+          <Button asChild variant="default" icon={<BookOpen size={14} />}>
             <a href={learnMoreUrl} target="_blank" rel="noreferrer">
               Learn more
             </a>
           </Button>
-        )}
+        ) : aiPrompt !== undefined ? (
+          <Button variant="default" onClick={handleAskAI}>
+            Ask AI Assistant
+          </Button>
+        ) : null}
         {correctionUrl !== undefined && (
-          <Button asChild type="default">
+          <Button
+            asChild
+            variant="primary"
+            disabled={isComputeUpgradeMetric && isOrgLoading}
+            onClick={() =>
+              track('resource_exhaustion_banner_upgrade_clicked', {
+                warningTypes: activeWarnings,
+                destination: correctionUrl,
+              })
+            }
+          >
             <Link href={correctionUrl}>{buttonText ?? 'Check'}</Link>
           </Button>
         )}
       </div>
-    </Alert_Shadcn_>
+    </Alert>
   )
 }
-
-export default ResourceExhaustionWarningBanner

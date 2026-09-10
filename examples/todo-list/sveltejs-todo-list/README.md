@@ -22,13 +22,13 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 
 ![image](https://user-images.githubusercontent.com/10214025/88916245-528c2680-d298-11ea-8a71-708f93e1ce4f.png)
 
-**_NOTE_**: The `service_role` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
+**_NOTE_**: The `secret` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
 
 ## Supabase details
 
 ### Postgres Row level security
 
-This project uses very high-level Authorization using Postgres' Role Level Security.
+This project uses very high-level Authorization using Postgres' Row Level Security.
 When you start a Postgres database on Supabase, we populate it with an `auth` schema, and some helper functions.
 When a user logs in, they are issued a JWT with the role `authenticated` and their UUID.
 We can use these details to provide fine-grained control over what each user can and cannot do.
@@ -47,16 +47,16 @@ create table todos (
 alter table todos enable row level security;
 
 create policy "Individuals can create todos." on todos for
-    insert with check (auth.uid() = user_id);
+    insert with check ((select auth.uid()) = user_id);
 
 create policy "Individuals can view their own todos. " on todos for
-    select using (auth.uid() = user_id);
+    select using ((select auth.uid()) = user_id);
 
 create policy "Individuals can update their own todos." on todos for
-    update using (auth.uid() = user_id);
+    update using ((select auth.uid()) = user_id);
 
 create policy "Individuals can delete their own todos." on todos for
-    delete using (auth.uid() = user_id);
+    delete using ((select auth.uid()) = user_id);
 ```
 
 ## Authors

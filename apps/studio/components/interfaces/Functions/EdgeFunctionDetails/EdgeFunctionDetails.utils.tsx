@@ -1,8 +1,17 @@
-export const generateCLICommands = (
-  selectedFunction: any,
-  functionUrl: string,
+import { getAnchor } from 'ui'
+
+import { EdgeFunction } from '@/data/edge-functions/edge-function-query'
+import { DOCS_URL } from '@/lib/constants'
+
+export const generateCLICommands = ({
+  selectedFunction,
+  functionUrl,
+  anonKey,
+}: {
+  selectedFunction?: EdgeFunction
+  functionUrl: string
   anonKey: string
-) => {
+}) => {
   const managementCommands: any = [
     {
       command: `supabase functions deploy ${selectedFunction?.slug}`,
@@ -10,8 +19,7 @@ export const generateCLICommands = (
       jsx: () => {
         return (
           <>
-            <span className="text-brand-600">supabase</span> functions deploy{' '}
-            {selectedFunction?.slug}
+            <span className="text-brand">supabase</span> functions deploy {selectedFunction?.slug}
           </>
         )
       },
@@ -23,8 +31,7 @@ export const generateCLICommands = (
       jsx: () => {
         return (
           <>
-            <span className="text-brand-600">supabase</span> functions delete{' '}
-            {selectedFunction?.slug}
+            <span className="text-brand">supabase</span> functions delete {selectedFunction?.slug}
           </>
         )
       },
@@ -39,7 +46,7 @@ export const generateCLICommands = (
       jsx: () => {
         return (
           <>
-            <span className="text-brand-600">supabase</span> secrets list
+            <span className="text-brand">supabase</span> secrets list
           </>
         )
       },
@@ -51,7 +58,7 @@ export const generateCLICommands = (
       jsx: () => {
         return (
           <>
-            <span className="text-brand-600">supabase</span> secrets set NAME1=VALUE1 NAME2=VALUE2
+            <span className="text-brand">supabase</span> secrets set NAME1=VALUE1 NAME2=VALUE2
           </>
         )
       },
@@ -63,7 +70,7 @@ export const generateCLICommands = (
       jsx: () => {
         return (
           <>
-            <span className="text-brand-600">supabase</span> secrets unset NAME1 NAME2
+            <span className="text-brand">supabase</span> secrets unset NAME1 NAME2
           </>
         )
       },
@@ -80,8 +87,12 @@ export const generateCLICommands = (
       jsx: () => {
         return (
           <>
-            <span className="text-brand-600">curl</span> -L -X POST '{functionUrl}' -H
-            'Authorization: Bearer [YOUR ANON KEY]' {`--data '{"name":"Functions"}'`}
+            <span className="text-brand">curl</span> -L -X POST '{functionUrl}'{' '}
+            {selectedFunction?.verify_jwt
+              ? `-H
+            'Authorization: Bearer [YOUR ANON KEY]' `
+              : ''}
+            {`--data '{"name":"Functions"}'`}
           </>
         )
       },
@@ -90,4 +101,19 @@ export const generateCLICommands = (
   ]
 
   return { managementCommands, secretCommands, invokeCommands }
+}
+
+export const getEdgeFunctionErrorDocs = (headers: Record<string, string | string[]>) => {
+  const header = Object.entries(headers).find(
+    ([name]) => name.toLowerCase() === 'sb-error-code'
+  )?.[1]
+  const code = (Array.isArray(header) ? header[0] : header)?.trim()
+  const anchor = code ? getAnchor(code) : undefined
+
+  if (!code || !anchor) return undefined
+
+  return {
+    code,
+    href: `${DOCS_URL}/guides/functions/error-codes#${anchor}`,
+  }
 }

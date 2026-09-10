@@ -1,12 +1,15 @@
+import { ChevronDown, X } from 'lucide-react'
 import { KeyboardEvent, memo } from 'react'
-import { Button, IconChevronDown, IconX, Input } from 'ui'
+import { Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { DropdownControl } from 'components/grid/components/common'
-import type { Filter, FilterOperator, SupaTable } from 'components/grid/types'
 import { FilterOperatorOptions } from './Filter.constants'
+import { DropdownControl } from '@/components/grid/components/common/DropdownControl'
+import { getColumnFormat } from '@/components/grid/components/grid/ColumnHeader.utils'
+import type { Filter, FilterOperator } from '@/components/grid/types'
+import { getColumnType } from '@/components/grid/utils/gridColumns'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface FilterRowProps {
-  table: SupaTable
   filterIdx: number
   filter: Filter
   onChange: (index: number, filter: Filter) => void
@@ -14,11 +17,18 @@ export interface FilterRowProps {
   onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void
 }
 
-const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: FilterRowProps) => {
-  const column = table.columns.find((x) => x.name === filter.column)
+const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterRowProps) => {
+  const snap = useTableEditorTableStateSnapshot()
+  const column = snap.table.columns.find((x) => x.name === filter.column)
+  // Prefer display labels that match column headers (format, with arrays as int4[]).
+  // Avoid raw dataType, which is "USER-DEFINED" for extension types like geography.
   const columnOptions =
-    table.columns?.map((x) => {
-      return { value: x.name, label: x.name, postLabel: x.dataType }
+    snap.table.columns?.map((x) => {
+      return {
+        value: x.name,
+        label: x.name,
+        postLabel: getColumnFormat(getColumnType(x), x.format),
+      }
     }) || []
 
   const placeholder =
@@ -29,7 +39,7 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: 
         : 'Enter a value'
 
   return (
-    <div className="sb-grid-filter-row px-3">
+    <div className="flex w-full items-center justify-between gap-x-1 px-3">
       <DropdownControl
         align="start"
         options={columnOptions}
@@ -37,10 +47,10 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: 
       >
         <Button
           asChild
-          type="outline"
+          variant="outline"
           icon={
             <div className="text-foreground-lighter">
-              <IconChevronDown strokeWidth={1.5} size={14} />
+              <ChevronDown strokeWidth={1.5} />
             </div>
           }
           className="w-32 justify-start"
@@ -60,10 +70,10 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: 
       >
         <Button
           asChild
-          type="outline"
+          variant="outline"
           icon={
             <div className="text-foreground-lighter">
-              <IconChevronDown strokeWidth={1.5} size={14} />
+              <ChevronDown strokeWidth={1.5} />
             </div>
           }
         >
@@ -72,7 +82,7 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: 
       </DropdownControl>
       <Input
         size="tiny"
-        className="w-full"
+        className="bg-control w-full"
         placeholder={placeholder}
         value={filter.value}
         onChange={(event) =>
@@ -83,12 +93,18 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: 
         }
         onKeyDown={onKeyDown}
       />
-      <Button
-        icon={<IconX strokeWidth={1.5} size={14} />}
-        size="tiny"
-        type="text"
-        onClick={() => onDelete(filterIdx)}
-      />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="text"
+            className="px-1"
+            icon={<X strokeWidth={1.5} />}
+            onClick={() => onDelete(filterIdx)}
+            aria-label="Remove filter"
+          />
+        </TooltipTrigger>
+        <TooltipContent side="bottom">Remove filter</TooltipContent>
+      </Tooltip>
     </div>
   )
 }

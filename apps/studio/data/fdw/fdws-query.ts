@@ -1,44 +1,10 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { getFDWsSql } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
 
-export const getFDWsSql = () => {
-  const sql = /* SQL */ `
-    select
-      s.oid as "id",
-      w.fdwname as "name",
-      s.srvname as "server_name",
-      s.srvoptions as "server_options",
-      c.proname as "handler",
-      (
-        select jsonb_agg(
-          jsonb_build_object(
-            'id', c.oid::bigint,
-            'schema', relnamespace::regnamespace::text,
-            'name', c.relname,
-            'columns', (
-              select jsonb_agg(
-                jsonb_build_object(
-                  'name', a.attname,
-                  'type', pg_catalog.format_type(a.atttypid, a.atttypmod)
-                )
-              )
-              from pg_catalog.pg_attribute a
-              where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
-            ),
-            'options', t.ftoptions
-          )
-        )
-        from pg_catalog.pg_class c
-        join pg_catalog.pg_foreign_table t on c.oid = t.ftrelid
-        where c.oid = any (select t.ftrelid from pg_catalog.pg_foreign_table t where t.ftserver = s.oid)
-      ) as "tables"
-    from pg_catalog.pg_foreign_server s
-    join pg_catalog.pg_foreign_data_wrapper w on s.srvfdw = w.oid
-    join pg_catalog.pg_proc c on w.fdwhandler = c.oid;
-  `
-
-  return sql
-}
+import { fdwKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { EMPTY_ARR } from '@/lib/void'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type FDWColumn = {
   name: string
@@ -58,32 +24,39 @@ export type FDW = {
   name: string
   handler: string
   server_name: string
-  server_options: string[]
+  server_options: string[] | null
   tables: FDWTable[]
-}
-
-export type FDWsResponse = {
-  result: FDW[]
 }
 
 export type FDWsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
-export type FDWsData = FDWsResponse
-export type FDWsError = unknown
-
-export const useFDWsQuery = <TData extends FDWsData = FDWsData>(
+export async function getFDWs(
   { projectRef, connectionString }: FDWsVariables,
-  options: UseQueryOptions<ExecuteSqlData, FDWsError, TData> = {}
-) =>
-  useExecuteSqlQuery(
-    {
-      projectRef,
-      connectionString,
-      sql: getFDWsSql(),
-      queryKey: ['fdws'],
-    },
-    options
+  signal?: AbortSignal
+) {
+  const sql = getFDWsSql()
+
+  const { result } = await executeSql(
+    { projectRef, connectionString, sql, queryKey: ['fdws'] },
+    signal
   )
+
+  return (Array.isArray(result) ? result : EMPTY_ARR) as FDW[]
+}
+
+export type FDWsData = Awaited<ReturnType<typeof getFDWs>>
+export type FDWsError = ResponseError
+
+export const useFDWsQuery = <TData = FDWsData>(
+  { projectRef, connectionString }: FDWsVariables,
+  { enabled = true, ...options }: UseCustomQueryOptions<FDWsData, FDWsError, TData> = {}
+) =>
+  useQuery<FDWsData, FDWsError, TData>({
+    queryKey: fdwKeys.list(projectRef),
+    queryFn: ({ signal }) => getFDWs({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

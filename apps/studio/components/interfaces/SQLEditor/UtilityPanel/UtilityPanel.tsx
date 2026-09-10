@@ -1,50 +1,63 @@
-import { useMemo, useState } from 'react'
-import ResultsDropdown from './ResultsDropdown'
-import UtilityActions from './UtilityActions'
-import UtilityTabResults from './UtilityTabResults'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
-import { ChartConfig } from './ChartConfig'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { useContentQuery } from 'data/content/content-query'
 import { useParams } from 'common'
-import { useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
-import { contentKeys } from 'data/content/keys'
-import { SqlSnippets } from 'types'
+import { toast } from 'sonner'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+
+import { ChartConfig } from './ChartConfig'
+import { UtilityTabResults } from './UtilityTabResults'
+import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
+import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
+import { Snippet } from '@/data/content/sql-folders-query'
+import { useTrack } from '@/lib/telemetry/track'
+import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export type UtilityPanelProps = {
   id: string
   isExecuting?: boolean
+  isDebugging?: boolean
   isDisabled?: boolean
-  hasSelection: boolean
-  prettifyQuery: () => void
-  executeQuery: () => void
+  onDebug: () => void
+  buildDebugPrompt: () => string
+  activeTab?: string
+  onActiveTabChange?: (tab: string) => void
 }
 
-const DEFAULT_CHART_CONFIG = {
+const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
   cumulative: false,
   xKey: '',
   yKey: '',
-} as const
+  showLabels: false,
+  showGrid: false,
+}
 
-const UtilityPanel = ({
+export const UtilityPanel = ({
   id,
   isExecuting,
+  isDebugging,
   isDisabled,
-  hasSelection,
-  prettifyQuery,
-  executeQuery,
+  onDebug,
+  buildDebugPrompt,
+  activeTab = 'results',
+  onActiveTabChange,
 }: UtilityPanelProps) => {
-  const snap = useSqlEditorStateSnapshot()
   const { ref } = useParams()
-  const { data } = useContentQuery(ref)
-  const snippet = snap.snippets[id]?.snippet
+  const track = useTrack()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const sessionSnap = useSqlEditorSessionSnapshot()
 
-  const queryKeys = contentKeys.list(ref)
+  const snippet = snapV2.snippets[id]?.snippet
+  const result = sessionSnap.results[id]?.[0]
 
-  const upsertContent = useContentUpsertMutation({
+  const { mutate: upsertContent } = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,
     // Optimistic update to the cache
     onMutate: async (newContentSnippet) => {
@@ -54,9 +67,6 @@ const UtilityPanel = ({
       if (payload.type !== 'sql') return
       if (!('chart' in payload.content)) return
 
-      // Cancel any existing queries so that the new content is fetched
-      await queryClient.cancelQueries(queryKeys)
-
       const newSnippet = {
         ...snippet,
         content: {
@@ -65,20 +75,19 @@ const UtilityPanel = ({
         },
       }
 
-      snap.updateSnippet(id, newSnippet)
+      snapV2.updateSnippet({ id, snippet: newSnippet as unknown as Snippet })
     },
-    onError: async (err, newContent, context) => {
+    onError: async (_err, _newContent, _context) => {
       toast.error(`Failed to update chart. Please try again.`)
     },
   })
-  const queryClient = useQueryClient()
 
   function getChartConfig() {
     if (!snippet || snippet.type !== 'sql') {
       return DEFAULT_CHART_CONFIG
     }
 
-    if (!snippet.content.chart) {
+    if (!snippet.content?.chart) {
       return DEFAULT_CHART_CONFIG
     }
 
@@ -87,14 +96,10 @@ const UtilityPanel = ({
 
   const chartConfig = getChartConfig()
 
-  const result = snap.results[id]?.[0]
-
   function onConfigChange(config: ChartConfig) {
-    if (!ref || !snippet.id) {
-      return
-    }
+    if (!ref || !snippet?.id) return
 
-    upsertContent.mutateAsync({
+    upsertContent({
       projectRef: ref,
       payload: {
         ...snippet,
@@ -111,40 +116,76 @@ const UtilityPanel = ({
   }
 
   return (
-    <Tabs_Shadcn_ defaultValue="results" className="w-full h-full">
-      <TabsList_Shadcn_ className="flex justify-between px-2">
-        <div>
-          <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
-            Results{' '}
-            {!isExecuting &&
-              (result?.rows ?? []).length > 0 &&
-              `(${result.rows.length.toLocaleString()})`}
-          </TabsTrigger_Shadcn_>
+    <Tabs
+      value={activeTab}
+      onValueChange={onActiveTabChange}
+      className="w-full h-full flex flex-col"
+    >
+      <TabsList className="flex justify-between gap-2 px-4 overflow-x-auto min-h-[42px]">
+        <div className="flex items-center gap-4">
+          <TabsTrigger className="py-3 text-xs" value="results">
+            <span className="translate-y-px">Results</span>
+          </TabsTrigger>
+          <TabsTrigger className="py-3 text-xs" value="chart">
+            <span className="translate-y-px">Chart</span>
+          </TabsTrigger>
+        </div>
 
-          <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
-            Chart
-          </TabsTrigger_Shadcn_>
+        <div className="flex items-center gap-4">
+          {result?.rows !== undefined && !isExecuting && (
+            <Tooltip>
+              <TooltipTrigger>
+                <p className="text-xs">
+                  <span className="text-foreground">
+                    {result.rows.length} row{result.rows.length === 1 ? '' : 's'}
+                  </span>
+                  <span className="text-foreground-lighter ml-1">
+                    {result.autoLimit !== undefined && `(Limited to only ${result.autoLimit} rows)`}
+                  </span>
+                </p>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p className="flex flex-col gap-y-1">
+                  <span>
+                    Results are automatically limited to preserve browser performance, in particular
+                    if your query returns an exceptionally large number of rows.
+                  </span>
+                  <span className="text-foreground-light">
+                    You may change or remove this limit from the toolbar above.
+                  </span>
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+
+          {result?.rows && (
+            <DownloadResultsButton
+              variant="text"
+              results={result.rows as any[]}
+              fileName={`Supabase Snippet ${snippet?.name ?? 'Results'}`}
+              onDownloadAsCSV={() => track('sql_editor_result_download_csv_clicked')}
+              onCopyAsMarkdown={() => track('sql_editor_result_copy_markdown_clicked')}
+              onCopyAsJSON={() => track('sql_editor_result_copy_json_clicked')}
+              onCopyAsCSV={() => track('sql_editor_result_copy_csv_clicked')}
+            />
+          )}
         </div>
-        <div className="flex gap-1 h-full">
-          {result && result.rows && <ResultsDropdown id={id} />}
-          <UtilityActions
-            id={id}
-            isExecuting={isExecuting}
-            isDisabled={isDisabled}
-            hasSelection={hasSelection}
-            prettifyQuery={prettifyQuery}
-            executeQuery={executeQuery}
-          />
-        </div>
-      </TabsList_Shadcn_>
-      <TabsContent_Shadcn_ className="mt-0 h-full" value="results">
-        <UtilityTabResults id={id} isExecuting={isExecuting} />
-      </TabsContent_Shadcn_>
-      <TabsContent_Shadcn_ className="mt-0 h-full" value="chart">
+      </TabsList>
+
+      <TabsContent asChild value="results" className="mt-0 grow">
+        <UtilityTabResults
+          id={id}
+          isExecuting={isExecuting}
+          isDisabled={isDisabled}
+          onDebug={onDebug}
+          buildDebugPrompt={buildDebugPrompt}
+          isDebugging={isDebugging}
+        />
+      </TabsContent>
+
+      <TabsContent asChild value="chart" className="mt-0 grow">
         <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />
-      </TabsContent_Shadcn_>
-    </Tabs_Shadcn_>
+      </TabsContent>
+    </Tabs>
   )
 }
-
-export default UtilityPanel

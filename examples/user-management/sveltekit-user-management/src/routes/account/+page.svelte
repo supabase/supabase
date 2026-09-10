@@ -1,25 +1,22 @@
-<!-- src/routes/account/+page.svelte -->
 <script lang="ts">
-	import { enhance, type SubmitFunction } from '$app/forms'
-	import Avatar from './Avatar.svelte'
+	import { enhance } from '$app/forms';
+	import type { SubmitFunction } from '@sveltejs/kit';
+    import Avatar from './Avatar.svelte'
 
-	export let data
-	export let form
-
-	let { session, supabase, profile } = data
-	$: ({ session, supabase, profile } = data)
-
+	let { data, form } = $props()
+	let { claims, supabase, profile } = $derived(data)
 	let profileForm: HTMLFormElement
-	let loading = false
+	let loading = $state(false)
 	let fullName: string = profile?.full_name ?? ''
 	let username: string = profile?.username ?? ''
 	let website: string = profile?.website ?? ''
-	let avatarUrl: string = profile?.avatar_url ?? ''
+	let avatarUrl: string = $state(profile?.avatar_url ?? '')
 
 	const handleSubmit: SubmitFunction = () => {
 		loading = true
-		return async () => {
+		return async ({ update }) => {
 			loading = false
+			update()
 		}
 	}
 
@@ -40,17 +37,18 @@
 		use:enhance={handleSubmit}
 		bind:this={profileForm}
 	>
-		<Avatar
-			{supabase}
-			bind:url={avatarUrl}
-			size={10}
-			on:upload={() => {
-				profileForm.requestSubmit()
-			}}
-		/>
+        <Avatar
+            {supabase}
+            bind:url={avatarUrl}
+            size={10}
+            onupload={() => {
+                profileForm.requestSubmit();
+            }}
+        />
+		<input type="hidden" name="avatarUrl" value={avatarUrl} />
 		<div>
 			<label for="email">Email</label>
-			<input name="email" id="email" type="text" value={session?.user.email} disabled />
+			<input id="email" type="text" value={claims?.email ?? ''} disabled />
 		</div>
 
 		<div>

@@ -1,30 +1,36 @@
-import { useParams } from 'common'
-import Link from 'next/link'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Download } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
-import { Button, IconDownload, Modal } from 'ui'
+import { toast } from 'sonner'
+import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { getDocument } from 'data/documents/document-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+} from '@/components/layouts/Scaffold'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { getDocument } from '@/data/documents/document-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
-const SOC2 = () => {
-  const { slug } = useParams()
-  const {
-    data: subscription,
-    error,
-    isLoading,
-    isError,
-    isSuccess,
-  } = useOrgSubscriptionQuery({ orgSlug: slug })
-  const currentPlan = subscription?.plan
+export const SOC2 = () => {
+  const { data: organization } = useSelectedOrganizationQuery()
+  const slug = organization?.slug
+
+  const track = useTrack()
+  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
+  const { hasAccess: hasAccessToSoc2Report, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('security.soc2_report')
+
   const [isOpen, setIsOpen] = useState(false)
 
   const fetchSOC2 = async (orgSlug: string) => {
@@ -32,98 +38,101 @@ const SOC2 = () => {
       const soc2Link = await getDocument({ orgSlug, docType: 'soc2-type-2-report' })
       if (soc2Link?.fileUrl) window.open(soc2Link.fileUrl, '_blank')
       setIsOpen(false)
-    } catch (error: any) {
-      toast.error(`Failed to download SOC2 report: ${error.message}`)
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error occurred'
+      toast.error(`Failed to download SOC2 report: ${message}`)
     }
   }
 
+  const handleDownloadClick = () => {
+    if (!slug) return
+
+    track('document_view_button_clicked', { documentName: 'SOC2' })
+    setIsOpen(true)
+  }
+
   return (
-    <ScaffoldSection>
-      <ScaffoldSectionDetail className="sticky space-y-6 top-12">
-        <p className="text-base m-0">SOC2 Type 2</p>
-        <div className="space-y-2 text-sm text-foreground-light m-0">
+    <ScaffoldSection className="py-12">
+      <ScaffoldSectionDetail>
+        <h4 className="mb-5">SOC2 Type 2</h4>
+        <div className="space-y-2 text-sm text-foreground-light [&_p]:m-0">
           <p>
-            Organizations on Teams plan or above have access to our most recent SOC2 Type 2 report.
+            Organizations on Team Plan or above have access to our most recent SOC2 Type 2 report.
           </p>
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {isLoading && (
-          <div className="space-y-2">
-            <ShimmeringLoader />
-            <ShimmeringLoader className="w-3/4" />
-            <ShimmeringLoader className="w-1/2" />
+        {isLoadingPermissions || isLoadingEntitlement ? (
+          <div className="@lg:flex items-center justify-center h-full">
+            <ShimmeringLoader className="w-24" />
           </div>
-        )}
-
-        {isError && <AlertError subject="Failed to retrieve subscription" error={error} />}
-
-        {isSuccess && (
-          <div className="flex items-center justify-center h-full">
-            {currentPlan?.id === 'free' || currentPlan?.id === 'pro' ? (
-              <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
-                <Button type="default">Upgrade to Teams</Button>
-              </Link>
-            ) : (
-              <Button type="default" iconRight={<IconDownload />} onClick={() => setIsOpen(true)}>
-                Download SOC2 Type 2 Report
-              </Button>
-            )}
+        ) : !canReadSubscriptions ? (
+          <NoPermission resourceText="access our SOC2 Type 2 report" />
+        ) : !hasAccessToSoc2Report ? (
+          <div className="@lg:flex items-center justify-center h-full">
+            <UpgradePlanButton
+              variant="default"
+              plan="Team"
+              source="org-documents-soc2"
+              featureProposition="download the SOC2 Type 2report"
+            />
+          </div>
+        ) : (
+          <div className="@lg:flex items-center justify-center h-full">
+            <Button
+              variant="default"
+              icon={<Download />}
+              onClick={handleDownloadClick}
+              disabled={!slug}
+            >
+              Download SOC2 Type 2 Report
+            </Button>
           </div>
         )}
         <ConfirmationModal
           visible={isOpen}
-          header="Non-Disclosure Agreement to access Supabase's SOC2 Report"
-          buttonLabel="I agree"
-          buttonLoadingLabel="Downloading"
-          onSelectCancel={() => setIsOpen(false)}
           size="large"
-          onSelectConfirm={() => {
+          title="Non-Disclosure Agreement to access Supabase's SOC2 Report"
+          confirmLabel="I agree"
+          confirmLabelLoading="Downloading"
+          onCancel={() => setIsOpen(false)}
+          onConfirm={() => {
             if (slug) fetchSOC2(slug)
           }}
         >
-          <Modal.Content>
-            <div className="py-4 text-sm text-foreground-light pl-30">
-              <ol className="list-decimal list-inside">
-                <li>The information that you are about to access is confidential.</li>
+          <ol className="list-decimal list-inside text-sm text-foreground-light pl-30">
+            <li>The information that you are about to access is confidential.</li>
+            <li>
+              Your access to our SOC 2 materials is governed by confidentiality obligations
+              contained in the agreement between Supabase, Inc ("Supabase", "we", "our" or "us") and
+              the Supabase customer that has authorized you to access our platform to obtain this
+              information (our "Customer").
+            </li>
+            <li>
+              You must ensure that you treat the information in our SOC 2 materials in accordance
+              with those confidentiality obligations, as communicated to you by the Customer.
+            </li>
+            <li>
+              By clicking "I agree" below or otherwise accessing our SOC 2 materials, you:
+              <ol className="list-[lower-roman] list-inside pl-4">
+                <li>acknowledge that you have read and understood this Confidentiality Notice;</li>
                 <li>
-                  Your access to our SOC 2 materials is governed by confidentiality obligations
-                  contained in the agreement between Supabase, Inc ("Supabase", "we", "our" or "us")
-                  and the Supabase customer that has authorized you to access our platform to obtain
-                  this information (our "Customer").
-                </li>
-                <li>
-                  You must ensure that you treat the information in our SOC 2 materials in
-                  accordance with those confidentiality obligations, as communicated to you by the
-                  Customer.
-                </li>
-                <li>
-                  By clicking "I agree" below or otherwise accessing our SOC 2 materials, you:
-                  <ol className="list-[lower-roman] list-inside pl-4">
-                    <li>
-                      acknowledge that you have read and understood this Confidentiality Notice;
-                    </li>
-                    <li>
-                      confirm that you have been authorized by the Customer to access this
-                      information, and your use of our SOC 2 materials is subject to the
-                      confidentiality obligations owed by the Customer to us.
-                    </li>
-                  </ol>
-                </li>
-                <li>
-                  This Confidentiality Notice does not substitute or supersede any agreement between
-                  us and the Customer, or any internal rules or policies that the Customer requires
-                  you to comply with in your access to and use of confidential information. However,
-                  your failure to comply with this Confidentiality Notice may be used to determine
-                  whether the Customer has complied with its confidentiality obligations to us.
+                  confirm that you have been authorized by the Customer to access this information,
+                  and your use of our SOC 2 materials is subject to the confidentiality obligations
+                  owed by the Customer to us.
                 </li>
               </ol>
-            </div>
-          </Modal.Content>
+            </li>
+            <li>
+              This Confidentiality Notice does not substitute or supersede any agreement between us
+              and the Customer, or any internal rules or policies that the Customer requires you to
+              comply with in your access to and use of confidential information. However, your
+              failure to comply with this Confidentiality Notice may be used to determine whether
+              the Customer has complied with its confidentiality obligations to us.
+            </li>
+          </ol>
         </ConfirmationModal>
       </ScaffoldSectionContent>
     </ScaffoldSection>
   )
 }
-
-export default SOC2

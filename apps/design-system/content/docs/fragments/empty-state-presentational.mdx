@@ -1,0 +1,35 @@
+---
+title: Empty State Presentational
+description: An empty state for encouraging action.
+component: true
+fragment: true
+---
+
+<ComponentPreview name="empty-state-presentational-icon" peekCode />
+
+Expects a title, description, and optional action buttons or other children.
+
+## Props
+
+### Text
+
+All text should be written using active language. The title should prompt the user to take an action, and the description should clearly explain the value of doing so.
+
+### Icon
+
+Supports both Lucide icons and [custom icons](../icons) via the `icons` package. If neither are passed, Empty State Presentational falls back to Lucide’s `SquarePlus`.
+
+<ComponentPreview name="empty-state-presentational-demo" peekCode />
+
+See also [Empty States](../ui-patterns/empty-states).
+
+## Examples
+
+It’s okay to repeat buttons inside of Empty State Presentational that are also available outside of it. The alternative is to conditionally determine button placement whilst polling for list length (to determine whether to show an empty state or not). This is problematic for two reasons:
+
+1. Rendering after client-side polling often leads to confusing layout shift. This layout shift becomes exacerbated when buttons are stacked against other objects.
+2. Consistent entry points outside of Empty State Presentational also teach a pattern that will continue to exist post initial object creation.
+
+When repeating buttons, set the `type` to `default` so the original `primary`, button remains the only `primary` action on display.
+
+<ComponentPreview name="empty-state-presentational-buttons" peekCode />

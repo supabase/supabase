@@ -1,114 +1,442 @@
-import { DatePicker } from 'components/ui/DatePicker'
 import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
+import { Clock, HistoryIcon, Lock } from 'lucide-react'
+import type { PropsWithChildren } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
-  Alert,
   Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-  IconClock,
+  ButtonProps,
+  Calendar,
+  cn,
+  copyToClipboard,
+  Input,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  RadioGroup,
+  RadioGroupItem,
 } from 'ui'
-import { DatetimeHelper, getDefaultHelper, LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from '.'
 
-interface Props {
+import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
+import { generateHelpersFromInput } from './Logs.datePickerHelpers'
+import type { DatetimeHelper } from './Logs.types'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { TimeSplitInput } from '@/components/ui/DatePicker/TimeSplitInput'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import type { ShortcutId } from '@/state/shortcuts/registry'
+
+export type DatePickerValue = {
   to: string
   from: string
-  onChange: React.ComponentProps<typeof DatePicker>['onChange']
-  helpers: DatetimeHelper[]
+  isHelper?: boolean
+  text?: string
 }
-const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
-  const defaultHelper = getDefaultHelper(helpers)
-  const [helperValue, setHelperValue] = useState<string>(to || from ? '' : defaultHelper.text)
+
+const toValidDate = (value?: string): Date | null => {
+  if (!value) return null
+  const date = new Date(value)
+  return isNaN(date.getTime()) ? null : date
+}
+
+interface LogsDatePickerProps {
+  value: DatePickerValue
+  helpers: DatetimeHelper[]
+  onSubmit: (value: DatePickerValue) => void
+  buttonTriggerProps?: ButtonProps
+  popoverContentProps?: typeof PopoverContent
+  hideWarnings?: boolean
+  align?: 'start' | 'end' | 'center'
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  /**
+   * Registered shortcut id whose hotkey is shown in a tooltip on the trigger
+   * button. The tooltip hides while the popover is open so it doesn't sit on
+   * top of the picker. Leave undefined to render no tooltip.
+   */
+  shortcutId?: ShortcutId
+}
+
+export const LogsDatePicker = ({
+  onSubmit,
+  helpers,
+  value,
+  buttonTriggerProps,
+  popoverContentProps,
+  hideWarnings,
+  align = 'end',
+  open: openProp,
+  onOpenChange,
+  shortcutId,
+}: PropsWithChildren<LogsDatePickerProps>) => {
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = openProp !== undefined
+  const open = isControlled ? openProp : internalOpen
+  const setOpen = (next: boolean) => {
+    if (!isControlled) setInternalOpen(next)
+    onOpenChange?.(next)
+  }
+  const [customValue, setCustomValue] = useState('')
+
+  const displayedHelpers = useMemo(() => {
+    if (!customValue.trim()) return helpers
+    const generated = generateHelpersFromInput(customValue)
+    return generated ?? []
+  }, [customValue, helpers])
+
+  // Reset the state when the popover closes
+  useEffect(() => {
+    if (!open) {
+      setCustomValue('')
+      setStartDate(toValidDate(value.from))
+      const defaultEndDate = toValidDate(value.to) ?? new Date()
+      setEndDate(defaultEndDate)
+      setCurrentMonth(new Date(defaultEndDate))
+
+      const fromDate = toValidDate(value.from)
+      const toDate = toValidDate(value.to)
+
+      setStartTime({
+        HH: fromDate?.getHours().toString().padStart(2, '0') || '00',
+        mm: fromDate?.getMinutes().toString().padStart(2, '0') || '00',
+        ss: fromDate?.getSeconds().toString().padStart(2, '0') || '00',
+      })
+
+      const now = new Date()
+      const nowHH = now.getHours().toString().padStart(2, '0')
+      const nowMM = now.getMinutes().toString().padStart(2, '0')
+      const nowSS = now.getSeconds().toString().padStart(2, '0')
+
+      setEndTime({
+        HH: toDate?.getHours().toString().padStart(2, '0') || nowHH,
+        mm: toDate?.getMinutes().toString().padStart(2, '0') || nowMM,
+        ss: toDate?.getSeconds().toString().padStart(2, '0') || nowSS,
+      })
+    }
+  }, [open, value])
 
   const handleHelperChange = (newValue: string) => {
-    const selectedHelper = helpers.find((h) => h.text === newValue)
-
-    if (onChange && selectedHelper) {
-      onChange({ to: selectedHelper.calcTo(), from: selectedHelper.calcFrom() })
+    const selectedHelper = displayedHelpers.find((h) => h.text === newValue)
+    if (onSubmit && selectedHelper) {
+      onSubmit({
+        to: selectedHelper.calcTo(),
+        from: selectedHelper.calcFrom(),
+        isHelper: true,
+        text: selectedHelper.text,
+      })
     }
+
+    setOpen(false)
   }
 
-  const selectedHelper = helpers.find((helper) => {
-    if (to === helper.calcTo() && from === helper.calcFrom()) {
-      return true
-    } else {
-      return false
-    }
+  const [startDate, setStartDate] = useState<Date | null>(toValidDate(value.from))
+  const [endDate, setEndDate] = useState<Date | null>(toValidDate(value.to) ?? new Date())
+  const [currentMonth, setCurrentMonth] = useState<Date>(() => toValidDate(value.to) ?? new Date())
+
+  const [startTime, setStartTime] = useState({
+    HH: startDate?.getHours().toString() || '00',
+    mm: startDate?.getMinutes().toString() || '00',
+    ss: startDate?.getSeconds().toString() || '00',
+  })
+  const [endTime, setEndTime] = useState({
+    HH: endDate?.getHours().toString() || '23',
+    mm: endDate?.getMinutes().toString() || '59',
+    ss: endDate?.getSeconds().toString() || '59',
   })
 
+  function handleDatePickerChange(dates: [from: Date | null, to: Date | null]) {
+    const [from, to] = dates
+
+    setStartDate(from)
+    setEndDate(to)
+  }
+
+  function handleApply() {
+    const from = startDate || new Date()
+    const to = endDate || new Date()
+
+    // Add Time to the dates
+    const finalFrom = new Date(from.setHours(+startTime.HH, +startTime.mm, +startTime.ss))
+    const finalTo = new Date(to.setHours(+endTime.HH, +endTime.mm, +endTime.ss))
+
+    onSubmit({
+      from: finalFrom.toISOString(),
+      to: finalTo.toISOString(),
+      isHelper: false,
+    })
+
+    setOpen(false)
+  }
+
+  const [copied, setCopied] = useState(false)
+  const [pasted, setPasted] = useState(false)
+
   useEffect(() => {
-    if (selectedHelper && helperValue !== selectedHelper.text) {
-      setHelperValue(selectedHelper.text)
-    } else if (!selectedHelper && (to || from)) {
-      setHelperValue('')
+    if (copied) {
+      setTimeout(() => {
+        setCopied(false)
+      }, 2000)
     }
-  }, [selectedHelper, to, from])
+  }, [copied])
+
+  function handlePaste() {
+    navigator.clipboard
+      .readText()
+      .then((text) => {
+        try {
+          const json = JSON.parse(text)
+
+          if (!json.from || !json.to) {
+            console.warn('Invalid date range format in clipboard')
+            return
+          }
+
+          const fromDate = new Date(json.from)
+          const toDate = new Date(json.to)
+
+          // Check if dates are valid
+          if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+            console.warn('Invalid date values in clipboard')
+            return
+          }
+
+          setStartDate(fromDate)
+          setEndDate(toDate)
+          setCurrentMonth(new Date(toDate))
+
+          // Update time states
+          setStartTime({
+            HH: fromDate.getHours().toString(),
+            mm: fromDate.getMinutes().toString(),
+            ss: fromDate.getSeconds().toString(),
+          })
+
+          setEndTime({
+            HH: toDate.getHours().toString(),
+            mm: toDate.getMinutes().toString(),
+            ss: toDate.getSeconds().toString(),
+          })
+
+          setPasted(true)
+        } catch (error) {
+          console.warn('Failed to parse clipboard content as date range:', error)
+        }
+      })
+      .catch((error) => {
+        console.warn('Failed to read clipboard:', error)
+      })
+  }
+
+  const handleCopy = useCallback(() => {
+    if (!startDate || !endDate) return
+
+    const fromDate = new Date(startDate)
+    const toDate = new Date(endDate)
+
+    // Add time from time states
+    fromDate.setHours(+startTime.HH, +startTime.mm, +startTime.ss)
+    toDate.setHours(+endTime.HH, +endTime.mm, +endTime.ss)
+
+    copyToClipboard(
+      JSON.stringify({
+        from: fromDate.toISOString(),
+        to: toDate.toISOString(),
+      })
+    )
+
+    setCopied(true)
+  }, [startDate, endDate, startTime, endTime])
+
+  useEffect(() => {
+    if (pasted) {
+      setTimeout(() => {
+        setPasted(false)
+      }, 2000)
+    }
+  }, [pasted])
+
+  useEffect(() => {
+    if (open) {
+      document.addEventListener('paste', handlePaste)
+      document.addEventListener('copy', handleCopy)
+    }
+    return () => {
+      document.removeEventListener('paste', handlePaste)
+      document.removeEventListener('copy', handleCopy)
+    }
+  }, [open, startDate, endDate, handleCopy])
+
+  const isLargeRange =
+    Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) >
+    LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD - 1
+
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
+  const entitledToAuditLogDays = getEntitlementNumericValue()
+
+  const showHelperBadge = (helper?: DatetimeHelper) => {
+    if (!helper) return false
+    if (!entitledToAuditLogDays) return false
+
+    const day = Math.abs(dayjs().diff(dayjs(helper.calcFrom()), 'day'))
+    if (day <= entitledToAuditLogDays) return false
+    return true
+  }
+
+  const triggerButton = (
+    <PopoverTrigger asChild>
+      <Button variant="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
+        {value.isHelper
+          ? value.text
+          : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
+      </Button>
+    </PopoverTrigger>
+  )
 
   return (
-    <div className="flex items-center">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            type={helperValue ? 'secondary' : 'default'}
-            icon={<IconClock size={12} />}
-            className="rounded-r-none"
-          >
-            <span>{selectedHelper?.text || defaultHelper.text}</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" align="start">
-          <DropdownMenuRadioGroup
+    <Popover open={open} onOpenChange={setOpen}>
+      {shortcutId ? (
+        <ShortcutTooltip shortcutId={shortcutId} side="bottom" open={open ? false : undefined}>
+          {triggerButton}
+        </ShortcutTooltip>
+      ) : (
+        triggerButton
+      )}
+      <PopoverContent
+        className="flex w-full p-0"
+        side="bottom"
+        align={align}
+        {...popoverContentProps}
+      >
+        <div className="border-r p-2 flex flex-col gap-px">
+          <Input
+            type="text"
+            placeholder="e.g. 2h, 30m, 7d"
+            value={customValue}
+            onChange={(e) => setCustomValue(e.target.value)}
+            className="mb-2 text-xs h-7 rounded-xs"
+          />
+          <RadioGroup
             onValueChange={handleHelperChange}
-            value={selectedHelper?.text || ''}
+            value={value.isHelper ? value.text : ''}
+            className="flex flex-col gap-px"
           >
-            {helpers.map((helper) => (
-              <DropdownMenuRadioItem
+            {displayedHelpers.map((helper) => (
+              <Label
                 key={helper.text}
-                value={helper.text}
-                disabled={helper.disabled}
+                className={cn(
+                  '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-xs text-xs w-full',
+                  {
+                    'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
+                  }
+                )}
               >
-                <span
-                  className={[
-                    helper.disabled ? 'text-foreground-light cursor-not-allowed' : '',
-                  ].join(' ')}
-                >
-                  {helper.text}
-                </span>
-              </DropdownMenuRadioItem>
+                <RadioGroupItem
+                  hidden
+                  key={helper.text}
+                  value={helper.text}
+                  disabled={helper.disabled}
+                  aria-disabled={helper.disabled}
+                ></RadioGroupItem>
+                {helper.text}
+                {showHelperBadge(helper) ? (
+                  <Lock size={12} className="text-foreground-muted" />
+                ) : null}
+              </Label>
             ))}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </RadioGroup>
+        </div>
 
-      <DatePicker
-        triggerButtonClassName="rounded-l-none"
-        triggerButtonType={selectedHelper ? 'default' : 'secondary'}
-        triggerButtonTitle="Custom"
-        onChange={(value) => {
-          setHelperValue('')
-          if (onChange) onChange(value)
-        }}
-        to={!helperValue ? to : undefined}
-        from={!helperValue ? from : undefined}
-        renderFooter={({ to, from }) => {
-          if (
-            to &&
-            from &&
-            Math.abs(dayjs(from).diff(dayjs(to), 'day')) > LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD
-          ) {
-            return (
-              <Alert title={''} variant="warning" className="mx-3 pl-2 pr-2 pt-1 pb-2">
-                Large ranges may result in memory errors for big projects.
-              </Alert>
-            )
-          }
-        }}
-      />
-    </div>
+        <div className="w-fit max-w-full">
+          <div className="flex p-2 gap-2 items-center">
+            <div className="flex grow *:grow gap-2 font-mono">
+              <TimeSplitInput
+                type="start"
+                startTime={startTime}
+                endTime={endTime}
+                time={startTime}
+                setTime={setStartTime}
+                setStartTime={setStartTime}
+                setEndTime={setEndTime}
+                startDate={startDate}
+                endDate={endDate}
+              />
+              <TimeSplitInput
+                type="end"
+                startTime={startTime}
+                endTime={endTime}
+                time={endTime}
+                setTime={setEndTime}
+                setStartTime={setStartTime}
+                setEndTime={setEndTime}
+                startDate={startDate}
+                endDate={endDate}
+              />
+            </div>
+            <div className="shrink">
+              <ButtonTooltip
+                tooltip={{
+                  content: {
+                    text: 'Clear time range',
+                  },
+                }}
+                icon={<HistoryIcon size={14} />}
+                variant="text"
+                size="tiny"
+                className="px-1.5"
+                onClick={() => {
+                  setStartTime({ HH: '00', mm: '00', ss: '00' })
+                  setEndTime({ HH: '00', mm: '00', ss: '00' })
+                }}
+              ></ButtonTooltip>
+            </div>
+          </div>
+          <div className="border-t">
+            <Calendar
+              mode="range"
+              month={currentMonth}
+              onMonthChange={(month) => setCurrentMonth(new Date(month))}
+              selected={{ from: startDate ?? undefined, to: endDate ?? undefined }}
+              onSelect={(range) => {
+                handleDatePickerChange([range?.from ?? null, range?.to ?? null])
+              }}
+            />
+          </div>
+          {isLargeRange && !hideWarnings && (
+            <p className="w-0 min-w-full px-3 pt-1 pb-4 text-xs text-warning">
+              Large ranges may result in memory errors for big projects.
+            </p>
+          )}
+          <div className="flex items-center justify-end gap-2 p-2 border-t">
+            {startDate && endDate ? (
+              <Button
+                variant="text"
+                size="tiny"
+                onClick={handleCopy}
+                className={cn({
+                  'text-brand-link': copied || pasted,
+                })}
+              >
+                {copied ? 'Copied!' : pasted ? 'Pasted!' : 'Copy range'}
+              </Button>
+            ) : null}
+
+            <Button
+              variant="default"
+              onClick={() => {
+                const today = new Date()
+                setCurrentMonth(today)
+                setStartDate(new Date(today))
+                setEndDate(new Date(today))
+              }}
+            >
+              Today
+            </Button>
+            <Button variant="primary" onClick={handleApply}>
+              Apply
+            </Button>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
   )
 }
-
-export default DatePickers

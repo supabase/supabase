@@ -1,49 +1,51 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
+import { safeLocalStorage, safeSessionStorage } from 'common'
+import { compact } from 'lodash'
+import { useSearchParams } from 'next/navigation'
+import { parseAsNativeArrayOf, parseAsString, useQueryStates } from 'nuqs'
+import { useEffect, useMemo } from 'react'
+import {
+  CalculatedColumn,
+  CellKeyboardEvent,
+  CellKeyDownArgs,
+  RowsChangeData,
+} from 'react-data-grid'
+import { toast } from 'sonner'
+import { copyToClipboard } from 'ui'
+
+import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
-import { InitialStateType } from './store/reducers'
-import type { Sort, SupabaseGridProps, SupaColumn, SupaTable } from './types'
-import type { Dictionary } from 'types'
-import { getGridColumns } from './utils/gridColumns'
-import { FilterOperatorOptions } from './components/header/filter'
-import type { Filter } from 'components/grid/types'
+import type { Sort, SupaColumn, SupaRow, SupaTable } from './types'
+import { formatClipboardValue } from './utils/common'
+import { isBoolColumn } from './utils/types'
+import type { Filter, SavedState } from '@/components/grid/types'
+import { Entity, isTableLike } from '@/data/table-editor/table-editor-types'
+import { BASE_PATH } from '@/lib/constants'
+import { eventMatchesAnyShortcut } from '@/state/shortcuts/matchEvent'
+import { tableEditorRegistry } from '@/state/shortcuts/registry/table-editor'
 
-export function defaultErrorHandler(error: any) {
-  console.error('Supabase grid error: ', error)
-}
-
-/**
- * Ensure that if editable is false, we should remove all editing actions
- * to prevent rare-case bugs with the UI
- */
-export function cleanupProps(props: SupabaseGridProps) {
-  const { editable } = props
-  if (!editable) {
-    return {
-      ...props,
-      onAddColumn: undefined,
-      onAddRow: undefined,
-      onEditColumn: undefined,
-      onDeleteColumn: undefined,
-      onEditRow: undefined,
-    }
-  } else {
-    return props
+export function formatSortURLParams(
+  // Should match the Entity type.
+  table: { name: string; columns: { name: string }[] },
+  sort?: string[]
+): Sort[] {
+  if (Array.isArray(sort)) {
+    return compact(
+      sort.map((s) => {
+        const [column, order] = s.split(':')
+        // Reject any possible malformed sort param
+        if (!column || !order) return undefined
+        // if the sort column name doesn't exist in the table, reject it as well to avoid confusion
+        if (table.columns.find((c) => c.name === column) === undefined) return undefined
+        else return { table: table.name, column, ascending: order === 'asc' }
+      })
+    )
   }
+  return []
 }
 
-export function formatSortURLParams(sort?: string[]) {
-  return (
-    Array.isArray(sort)
-      ? sort
-          .map((s) => {
-            const [column, order] = s.split(':')
-            // Reject any possible malformed sort param
-            if (!column || !order) return undefined
-            else return { column, ascending: order === 'asc' }
-          })
-          .filter((s) => s !== undefined)
-      : []
-  ) as Sort[]
+export function sortsToUrlParams(sorts: { column: string; ascending?: boolean }[]) {
+  return sorts.map((sort) => `${sort.column}:${sort.ascending ? 'asc' : 'desc'}`)
 }
 
 export function formatFilterURLParams(filter?: string[]): Filter[] {
@@ -67,74 +69,29 @@ export function formatFilterURLParams(filter?: string[]): Filter[] {
   ) as Filter[]
 }
 
-export async function initTable(
-  props: SupabaseGridProps,
-  state: InitialStateType,
-  dispatch: (value: any) => void,
-  sort?: string[], // Comes directly from URL param
-  filter?: string[] // Comes directly from URL param
-): Promise<{ savedState: { sorts?: string[]; filters?: string[] } }> {
-  const savedState = props.projectRef
-    ? onLoadStorage(props.projectRef, props.table.name, props.table.schema)
-    : undefined
+export function filtersToUrlParams(
+  filters: { column: string | Array<string>; operator: string; value: string }[]
+) {
+  return filters.map((filter) => {
+    const selectedOperator = FilterOperatorOptions.find(
+      (option) => option.value === filter.operator
+    )
 
-  // Check for saved state on initial load and also, load sort and filters via URL param only if given
-  // Otherwise load from local storage to resume user session
-  if (
-    !state.isInitialComplete &&
-    sort === undefined &&
-    filter === undefined &&
-    (savedState?.sorts || savedState?.filters)
-  ) {
-    return {
-      savedState: {
-        sorts: savedState.sorts,
-        filters: savedState.filters,
-      },
-    }
-  }
-
-  const gridColumns = getGridColumns(props.table, {
-    projectRef: props.projectRef,
-    tableId: props.tableId,
-    editable: props.editable,
-    defaultWidth: props.gridProps?.defaultColumnWidth,
-    onAddColumn: props.editable ? props.onAddColumn : undefined,
-    onExpandJSONEditor: props.onExpandJSONEditor,
-    onExpandTextEditor: props.onExpandTextEditor,
+    return `${filter.column}:${selectedOperator?.abbrev}:${filter.value}`
   })
-
-  dispatch({
-    type: 'INIT_TABLE',
-    payload: {
-      table: props.table,
-      gridProps: props.gridProps,
-      gridColumns,
-      savedState,
-      editable: props.editable,
-      onError: props.onError ?? defaultErrorHandler,
-    },
-  })
-
-  return { savedState: {} }
 }
 
-export function parseSupaTable(
-  data: {
-    table: Dictionary<any>
-    columns: Dictionary<any>[]
-    primaryKeys: Dictionary<any>[]
-    relationships: Dictionary<any>[]
-  },
-  encryptedColumns: string[] = []
-): SupaTable {
-  const { table, columns, primaryKeys, relationships } = data
+export function parseSupaTable(table: Entity): SupaTable {
+  const columns = table.columns
+  const primaryKeys = isTableLike(table) ? table.primary_keys : []
+  const uniqueIndexes = isTableLike(table) ? table.unique_indexes : []
+  const relationships = isTableLike(table) ? table.relationships : []
 
   const supaColumns: SupaColumn[] = columns.map((column) => {
     const temp = {
       position: column.ordinal_position,
       name: column.name,
-      defaultValue: column.default_value,
+      defaultValue: column.default_value as string | null | undefined,
       dataType: column.data_type,
       format: column.format,
       isPrimaryKey: false,
@@ -142,14 +99,14 @@ export function parseSupaTable(
       isGeneratable: column.identity_generation == 'BY DEFAULT',
       isNullable: column.is_nullable,
       isUpdatable: column.is_updatable,
-      isEncrypted: encryptedColumns.includes(column.name),
       enum: column.enums,
       comment: column.comment,
       foreignKey: {
-        targetTableSchema: null,
-        targetTableName: null,
-        targetColumnName: null,
-        deletionAction: undefined,
+        targetTableSchema: null as string | null,
+        targetTableName: null as string | null,
+        targetColumnName: null as string | null,
+        deletionAction: undefined as string | undefined,
+        updateAction: undefined as string | undefined,
       },
     }
     const primaryKey = primaryKeys.find((pk) => pk.name == column.name)
@@ -167,57 +124,236 @@ export function parseSupaTable(
       temp.foreignKey.targetTableName = relationship.target_table_name
       temp.foreignKey.targetColumnName = relationship.target_column_name
       temp.foreignKey.deletionAction = relationship.deletion_action
+      temp.foreignKey.updateAction = relationship.update_action
     }
     return temp
   })
 
   return {
+    id: table.id,
     name: table.name,
     comment: table.comment,
     schema: table.schema,
+    type: table.entity_type,
     columns: supaColumns,
+    estimateRowCount: isTableLike(table) ? table.live_rows_estimate : 0,
+    primaryKey: primaryKeys?.length > 0 ? primaryKeys.map((col) => col.name) : undefined,
+    uniqueIndexes:
+      !!uniqueIndexes && uniqueIndexes.length > 0
+        ? uniqueIndexes.map(({ columns }) => columns)
+        : undefined,
   }
 }
 
-function onLoadStorage(storageRef: string, tableName: string, schema?: string | null) {
-  const storageKey = getStorageKey(STORAGE_KEY_PREFIX, storageRef)
-  const jsonStr = localStorage.getItem(storageKey)
+export function getStorageKey(prefix: string, ref: string) {
+  return `${prefix}_${ref}`
+}
+
+export function loadTableEditorStateFromLocalStorage(
+  projectRef: string,
+  tableId: number
+): SavedState | undefined {
+  const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
+  // Prefer sessionStorage (scoped to current tab) over localStorage
+  const jsonStr = safeSessionStorage.getItem(storageKey) ?? safeLocalStorage.getItem(storageKey)
   if (!jsonStr) return
   const json = JSON.parse(jsonStr)
-  const tableKey = !schema || schema == 'public' ? tableName : `${schema}.${tableName}`
-  return json[tableKey]
+  return json[tableId]
 }
 
-export const saveStorageDebounced = AwesomeDebouncePromise(saveStorage, 500)
+/**
+ * Builds a table editor URL with the given project reference, table ID. It will load the saved state from local storage
+ * and add the sort and filter parameters to the URL.
+ */
+export function buildTableEditorUrl({
+  projectRef = 'default',
+  tableId,
+  schema,
+}: {
+  projectRef?: string
+  tableId: number
+  schema?: string
+}) {
+  const url = new URL(`${BASE_PATH}/project/${projectRef}/editor/${tableId}`, location.origin)
 
-function saveStorage(
-  state: InitialStateType,
-  storageRef: string,
-  sorts?: string[],
+  // If the schema is provided, add it to the URL so that the left sidebar is opened to the correct schema
+  if (schema) {
+    url.searchParams.set('schema', schema)
+  }
+
+  const savedState = loadTableEditorStateFromLocalStorage(projectRef, tableId)
+  if (savedState?.sorts && savedState.sorts.length > 0) {
+    savedState.sorts?.forEach((sort) => url.searchParams.append('sort', sort))
+  }
+  if (savedState?.filters && savedState.filters.length > 0) {
+    savedState.filters?.forEach((filter) => url.searchParams.append('filter', filter))
+  }
+  return url.toString()
+}
+
+export function saveTableEditorStateToLocalStorage({
+  projectRef,
+  tableId,
+  gridColumns,
+  sorts,
+  filters,
+  sensitiveDataColumns,
+}: {
+  projectRef: string
+  tableId: number
+  gridColumns?: CalculatedColumn<any, any>[]
+  sorts?: string[]
   filters?: string[]
-) {
-  if (!state.table) return
+  sensitiveDataColumns?: string[]
+}) {
+  const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
+  const savedStr = safeSessionStorage.getItem(storageKey) ?? safeLocalStorage.getItem(storageKey)
 
   const config = {
-    gridColumns: state.gridColumns,
-    ...(sorts !== undefined && { sorts }),
-    ...(filters !== undefined && { filters }),
+    ...(gridColumns !== undefined && { gridColumns }),
+    ...(sorts !== undefined && { sorts: sorts.filter((sort) => sort !== '') }),
+    ...(filters !== undefined && { filters: filters.filter((filter) => filter !== '') }),
+    ...(sensitiveDataColumns !== undefined && { sensitiveDataColumns }),
   }
-  const storageKey = getStorageKey(STORAGE_KEY_PREFIX, storageRef)
-  const savedStr = localStorage.getItem(storageKey)
 
   let savedJson
-  const { name, schema } = state.table
-  const tableKey = !schema || schema == 'public' ? name : `${schema}.${name}`
   if (savedStr) {
     savedJson = JSON.parse(savedStr)
-    savedJson = { ...savedJson, [tableKey]: config }
+    const previousConfig = savedJson[tableId]
+    savedJson = { ...savedJson, [tableId]: { ...previousConfig, ...config } }
   } else {
-    savedJson = { [tableKey]: config }
+    savedJson = { [tableId]: config }
   }
-  localStorage.setItem(storageKey, JSON.stringify(savedJson))
+  // Save to both localStorage and sessionStorage so it's consistent to current tab
+  safeLocalStorage.setItem(storageKey, JSON.stringify(savedJson))
+  safeSessionStorage.setItem(storageKey, JSON.stringify(savedJson))
 }
 
-function getStorageKey(prefix: string, ref: string) {
-  return `${prefix}_${ref}`
+export const saveTableEditorStateToLocalStorageDebounced = AwesomeDebouncePromise(
+  saveTableEditorStateToLocalStorage,
+  500
+)
+
+function getLatestParams() {
+  const queryParams = new URLSearchParams(window.location.search)
+  const sort = queryParams.getAll('sort')
+  const filter = queryParams.getAll('filter')
+  return { sort, filter }
+}
+
+export function useSyncTableEditorStateFromLocalStorageWithUrl({
+  projectRef,
+  table,
+}: {
+  projectRef: string | undefined
+  table: Entity | undefined
+}) {
+  // Warning: nuxt url state often fails to update to changes to URL
+  useQueryStates(
+    {
+      sort: parseAsNativeArrayOf(parseAsString),
+      filter: parseAsNativeArrayOf(parseAsString),
+    },
+    {
+      history: 'replace',
+    }
+  )
+  // Use nextjs useSearchParams to get the latest URL params
+  const searchParams = useSearchParams()
+  const urlParams = useMemo(() => {
+    const sort = searchParams?.getAll('sort') ?? []
+    const filter = searchParams?.getAll('filter') ?? []
+    return { sort, filter }
+  }, [searchParams])
+
+  useEffect(() => {
+    if (!projectRef || !table) {
+      return
+    }
+
+    // `urlParams` from `useQueryStates` can be stale so always get the latest from the URL
+    const latestUrlParams = getLatestParams()
+
+    saveTableEditorStateToLocalStorage({
+      projectRef,
+      tableId: table.id,
+      sorts: latestUrlParams.sort,
+      filters: latestUrlParams.filter,
+    })
+  }, [urlParams, table, projectRef])
+}
+
+export const handleCellKeyDown = <TRow extends Record<string, unknown> = SupaRow>(
+  args: CellKeyDownArgs<TRow, unknown>,
+  event: CellKeyboardEvent,
+  context?: {
+    rows: TRow[]
+    columns: SupaColumn[]
+    onRowsChange: (rows: TRow[], data: RowsChangeData<TRow, unknown>) => void
+    sensitiveDataColumns?: Set<string>
+  }
+) => {
+  const { mode, column, row, rowIdx } = args
+  if (mode !== 'SELECT') return
+  const key = event.key.toLowerCase()
+
+  if (key === 'c' && (event.metaKey || event.ctrlKey)) {
+    if (window.getSelection()?.isCollapsed === false) return
+
+    const isSensitive = context?.sensitiveDataColumns?.has(column.key as string)
+    const value = formatClipboardValue(row[column.key] ?? '')
+    event.preventDefault()
+    event.preventGridDefault()
+    void copyToClipboard(value, () => {
+      if (isSensitive) {
+        toast.warning('Copied sensitive data to clipboard')
+      } else {
+        toast.success('Copied cell value to clipboard')
+      }
+    })
+    return
+  }
+
+  // Let registered shortcuts win over rdg's "type a key to enter edit mode" default,
+  // unless a printable key enters edit mode.
+  if (eventMatchesAnyShortcut(event.nativeEvent, tableEditorRegistry)) {
+    if (
+      event.key.length === 1 &&
+      event.key !== ' ' &&
+      !event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.shiftKey &&
+      column.renderEditCell != null
+    ) {
+      event.stopPropagation()
+    } else {
+      event.preventGridDefault()
+      return
+    }
+  }
+
+  // Toggle boolean cells with T/F when no modifier keys are pressed.
+  if (context === undefined) return
+
+  if (event.altKey || event.ctrlKey || event.metaKey || (key !== 't' && key !== 'f')) return
+
+  const supaColumn = context.columns.find((c) => c.name === column.key)
+  if (
+    supaColumn === undefined ||
+    !isBoolColumn(supaColumn.dataType) ||
+    column.renderEditCell == null
+  ) {
+    return
+  }
+
+  event.preventDefault()
+  event.preventGridDefault()
+
+  const nextValue = key === 't'
+  if (row[column.key] === nextValue) return
+
+  const updatedRows = [...context.rows]
+  updatedRows[rowIdx] = { ...row, [column.key]: nextValue }
+  context.onRowsChange(updatedRows, { indexes: [rowIdx], column })
 }

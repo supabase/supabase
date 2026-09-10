@@ -1,0 +1,77 @@
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import { databaseQueuesKeys } from './keys'
+import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+export type DatabaseQueueMessageDeleteVariables = {
+  projectRef: string
+  connectionString?: string | null
+  queueName: string
+  messageId: number
+}
+
+export async function deleteDatabaseQueueMessage({
+  projectRef,
+  connectionString,
+  queueName,
+  messageId,
+}: DatabaseQueueMessageDeleteVariables) {
+  if (!isQueueNameValid(queueName)) {
+    throw new Error(
+      'Invalid queue name: must contain only alphanumeric characters, underscores, and hyphens'
+    )
+  }
+
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql: safeSql`SELECT * FROM pgmq.delete(${literal(queueName)}, ${literal(messageId)})`,
+    queryKey: databaseQueuesKeys.create(),
+  })
+
+  return result
+}
+
+type DatabaseQueueMessageDeleteData = Awaited<ReturnType<typeof deleteDatabaseQueueMessage>>
+
+export const useDatabaseQueueMessageDeleteMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<
+    DatabaseQueueMessageDeleteData,
+    ResponseError,
+    DatabaseQueueMessageDeleteVariables
+  >,
+  'mutationFn'
+> = {}) => {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    DatabaseQueueMessageDeleteData,
+    ResponseError,
+    DatabaseQueueMessageDeleteVariables
+  >({
+    mutationFn: (vars) => deleteDatabaseQueueMessage(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, queueName } = variables
+      await queryClient.invalidateQueries({
+        queryKey: databaseQueuesKeys.getMessagesInfinite(projectRef, queueName),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete database queue message: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}

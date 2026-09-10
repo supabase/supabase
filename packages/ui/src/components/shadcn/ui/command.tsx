@@ -1,6 +1,8 @@
-import { DialogProps } from '@radix-ui/react-dialog'
+'use client'
+
 import { Command as CommandPrimitive } from 'cmdk'
-import { Search } from 'lucide-react'
+import { X as RemoveIcon, Search } from 'lucide-react'
+import { Dialog as DialogPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
@@ -21,13 +23,13 @@ const Command = React.forwardRef<
 ))
 Command.displayName = CommandPrimitive.displayName
 
-interface CommandDialogProps extends DialogProps {}
+interface CommandDialogProps extends DialogPrimitive.DialogProps {}
 
 const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
   return (
     <Dialog {...props}>
       <DialogContent className="overflow-hidden p-0 shadow-lg">
-        <Command className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-foreground-muted [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
+        <Command className="**:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-foreground-muted [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 **:[[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 **:[[cmdk-input]]:h-12 **:[[cmdk-item]]:px-2 **:[[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
           {children}
         </Command>
       </DialogContent>
@@ -37,30 +39,73 @@ const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
 
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
->(({ className, ...props }, ref) => (
-  <div className="flex items-center border-b border-overlay px-3" cmdk-input-wrapper="">
-    <Search className="h-4 w-4 shrink-0 opacity-50" />
-    <CommandPrimitive.Input
-      ref={ref}
-      className={cn(
-        'flex h-9 w-full rounded-md bg-transparent py-3 text-xs text outline-none placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50 border-none focus:ring-0',
-        className
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & {
+    wrapperClassName?: string
+    showResetIcon?: boolean
+    showSearchIcon?: boolean
+    handleReset?: () => void
+  }
+>(
+  (
+    {
+      className,
+      wrapperClassName,
+      showResetIcon = false,
+      showSearchIcon = true,
+      handleReset,
+      ...props
+    },
+    ref
+  ) => (
+    <div className={cn('flex items-center border-b px-4', wrapperClassName)} cmdk-input-wrapper="">
+      {showSearchIcon && <Search className="h-4 w-4 shrink-0 opacity-50" aria-hidden />}
+      <CommandPrimitive.Input
+        ref={ref}
+        className={cn(
+          'flex h-9 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50 border-none focus:ring-0',
+          className
+        )}
+        {...props}
+      />
+      {showResetIcon && (
+        <button
+          type="button"
+          tabIndex={props.disabled || !props.value?.length ? -1 : 0}
+          disabled={props.disabled || !props.value?.length}
+          onClick={handleReset}
+          aria-label="Clear search"
+          className={cn(
+            'text-foreground-lighter hover:text-foreground-light hover:cursor-pointer transition-all opacity-0 duration-100',
+            !!props.value?.length && 'opacity-100'
+          )}
+        >
+          <RemoveIcon size={14} aria-hidden />
+        </button>
       )}
-      {...props}
-    />
-  </div>
-))
+    </div>
+  )
+)
 
 CommandInput.displayName = CommandPrimitive.Input.displayName
 
 const CommandList = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
->(({ className, ...props }, ref) => (
+>(({ className, onWheel, onTouchMove, ...props }, ref) => (
   <CommandPrimitive.List
     ref={ref}
-    className={cn('max-h-[300px] overflow-y-auto overflow-x-hidden', className)}
+    className={cn('max-h-full overflow-y-auto overflow-x-hidden', className)}
+    // A dialog or sheet locks scrolling by cancelling wheel and touch events that land outside
+    // it, and a dropdown portals to the body. Keeping both off the document is what lets the
+    // list scroll with a trackpad and with a finger while an overlay is open.
+    onWheel={(event) => {
+      event.stopPropagation()
+      onWheel?.(event)
+    }}
+    onTouchMove={(event) => {
+      event.stopPropagation()
+      onTouchMove?.(event)
+    }}
     {...props}
   />
 ))
@@ -87,7 +132,10 @@ const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
-      'overflow-hidden p-1 text-foreground-light [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-foreground-muted',
+      'overflow-hidden p-1 text-foreground-light **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-1.5 **:[[cmdk-group-heading]]:text-xs **:[[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted',
+      '**:[[cmdk-group-heading]]:font-mono',
+      '**:[[cmdk-group-heading]]:uppercase',
+      '**:[[cmdk-group-heading]]:tracking-wider',
       className
     )}
     {...props}
@@ -115,7 +163,7 @@ const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-xs outline-none aria-selected:bg-overlay-hover aria-selected:text-strong data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'relative flex cursor-default select-none items-center rounded-xs px-2 py-1.5 text-xs outline-hidden data-[selected=true]:bg-overlay-hover data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
       className
     )}
     {...props}

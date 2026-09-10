@@ -1,21 +1,20 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
-import SchemaSelector from 'components/ui/SchemaSelector'
-
 import {
   Button,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  Select_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
+
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 
 export interface PrivilegesHeadProps {
   disabled: boolean
   selectedSchema: string
   selectedRole: string
-  selectedTable?: PostgresTable
+  selectedTable?: { name: string }
   tables: string[]
   roles: string[]
   onChangeSchema: (schema: string) => void
@@ -44,28 +43,20 @@ const PrivilegesHead = ({
 }: PrivilegesHeadProps) => {
   return (
     <div className="flex items-center justify-between">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-x-2">
         <SchemaSelector
-          className="bg-control rounded-md w-[200px] [&>button]:py-[5px]"
+          className="bg-control rounded-md w-[180px] [&>button]:py-[5px]"
           selectedSchemaName={selectedSchema}
           onSelectSchema={onChangeSchema}
         />
-        <div className="w-[200px]">
-          <TablesSelect
-            selectedTable={selectedTable}
-            tables={tables}
-            onChangeTable={onChangeTable}
-          />
-        </div>
+        <TablesSelect selectedTable={selectedTable} tables={tables} onChangeTable={onChangeTable} />
         <div className="h-[20px] w-px border-r border-scale-600"></div>
-        <div className="w-[200px]">
-          <RolesSelect selectedRole={selectedRole} roles={roles} onChangeRole={onChangeRole} />
-        </div>
+        <RolesSelect selectedRole={selectedRole} roles={roles} onChangeRole={onChangeRole} />
       </div>
 
       <div className="flex items-center gap-2">
         <Button
-          type="default"
+          variant="default"
           size="tiny"
           onClick={resetChanges}
           disabled={!hasChanges || isApplyingChanges}
@@ -73,7 +64,7 @@ const PrivilegesHead = ({
           Reset
         </Button>
         <Button
-          type="primary"
+          variant="primary"
           size="tiny"
           onClick={applyChanges}
           disabled={disabled || !hasChanges || isApplyingChanges}
@@ -96,20 +87,20 @@ const RolesSelect = ({
   onChangeRole: (role: string) => void
 }) => {
   return (
-    <Select_Shadcn_ value={selectedRole} onValueChange={onChangeRole}>
-      <SelectTrigger_Shadcn_>
-        <SelectValue_Shadcn_ placeholder="Select a role" />
-      </SelectTrigger_Shadcn_>
-      <SelectContent_Shadcn_>
-        <SelectGroup_Shadcn_>
+    <Select value={selectedRole} onValueChange={onChangeRole}>
+      <SelectTrigger size="tiny" className="w-40">
+        <SelectValue placeholder="Select a role" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
           {roles.map((role) => (
-            <SelectItem_Shadcn_ key={role} value={role}>
-              <span className="text-foreground-light">role</span> {role}
-            </SelectItem_Shadcn_>
+            <SelectItem key={role} value={role} className="text-xs">
+              <span className="text-foreground-light mr-1">role</span> {role}
+            </SelectItem>
           ))}
-        </SelectGroup_Shadcn_>
-      </SelectContent_Shadcn_>
-    </Select_Shadcn_>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   )
 }
 
@@ -118,30 +109,32 @@ const TablesSelect = ({
   tables,
   onChangeTable,
 }: {
-  selectedTable?: PostgresTable
+  selectedTable?: {
+    name: string
+  }
   tables: string[]
   onChangeTable: (table: string) => void
 }) => {
   return (
-    <Select_Shadcn_ value={selectedTable?.name} onValueChange={onChangeTable}>
-      <SelectTrigger_Shadcn_>
-        <SelectValue_Shadcn_ placeholder="Select a table" />
-      </SelectTrigger_Shadcn_>
-      <SelectContent_Shadcn_>
-        <SelectGroup_Shadcn_>
+    <Select value={selectedTable?.name} onValueChange={onChangeTable}>
+      <SelectTrigger size="tiny" className="w-44">
+        <SelectValue placeholder="Select a table" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
           {tables.length === 0 ? (
             <div className="text-xs text-foreground-light p-2">
               No tables available in this schema
             </div>
           ) : null}
           {tables.map((table) => (
-            <SelectItem_Shadcn_ key={table} value={table}>
-              <span className="text-foreground-light">table</span> {table}
-            </SelectItem_Shadcn_>
+            <SelectItem key={table} value={table} className="text-xs">
+              <span className="text-foreground-light mr-1">table</span> {table}
+            </SelectItem>
           ))}
-        </SelectGroup_Shadcn_>
-      </SelectContent_Shadcn_>
-    </Select_Shadcn_>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   )
 }
 

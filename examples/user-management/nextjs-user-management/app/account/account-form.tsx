@@ -1,29 +1,35 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import Avatar from './avatar'
-import { Database } from '../database.types'
-import { Session, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
-export default function AccountForm({ session }: { session: Session | null }) {
-  const supabase = createClientComponentClient<Database>()
+type Claims = { sub: string; email?: string; [key: string]: unknown }
+
+export default function AccountForm({ claims }: { claims: Claims | null }) {
+  const supabase = createClient()
   const [loading, setLoading] = useState(true)
   const [fullname, setFullname] = useState<string | null>(null)
   const [username, setUsername] = useState<string | null>(null)
   const [website, setWebsite] = useState<string | null>(null)
   const [avatar_url, setAvatarUrl] = useState<string | null>(null)
-  const user = session?.user
 
   const getProfile = useCallback(async () => {
     try {
+      if (!claims?.sub) {
+        setLoading(false)
+        return
+      }
+
       setLoading(true)
 
-      let { data, error, status } = await supabase
+      const { data, error, status } = await supabase
         .from('profiles')
         .select(`full_name, username, website, avatar_url`)
-        .eq('id', user?.id)
+        .eq('id', claims.sub)
         .single()
 
       if (error && status !== 406) {
+        console.log(error)
         throw error
       }
 
@@ -38,11 +44,11 @@ export default function AccountForm({ session }: { session: Session | null }) {
     } finally {
       setLoading(false)
     }
-  }, [user, supabase])
+  }, [claims, supabase])
 
   useEffect(() => {
     getProfile()
-  }, [user, getProfile])
+  }, [claims, getProfile])
 
   async function updateProfile({
     username,
@@ -55,10 +61,15 @@ export default function AccountForm({ session }: { session: Session | null }) {
     avatar_url: string | null
   }) {
     try {
+      if (!claims?.sub) {
+        alert('You must be logged in to update your profile')
+        return
+      }
+
       setLoading(true)
 
-      let { error } = await supabase.from('profiles').upsert({
-        id: user?.id as string,
+      const { error } = await supabase.from('profiles').upsert({
+        id: claims.sub,
         full_name: fullname,
         username,
         website,
@@ -77,7 +88,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
   return (
     <div className="form-widget">
       <Avatar
-        uid={user!.id}
+        uid={claims?.sub ?? null}
         url={avatar_url}
         size={150}
         onUpload={(url) => {
@@ -87,7 +98,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
       />
       <div>
         <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={session?.user.email} disabled />
+        <input id="email" type="text" value={claims?.email ?? ''} disabled />
       </div>
       <div>
         <label htmlFor="fullName">Full Name</label>
@@ -121,7 +132,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
         <button
           className="button primary block"
           onClick={() => updateProfile({ fullname, username, website, avatar_url })}
-          disabled={loading}
+          disabled={loading || !claims?.sub}
         >
           {loading ? 'Loading ...' : 'Update'}
         </button>

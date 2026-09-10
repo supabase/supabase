@@ -1,92 +1,160 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
-import { DatabaseLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
-import { useBackupsQuery } from 'data/database/backups-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, usePermissionsLoaded, useSelectedOrganization } from 'hooks'
-import type { NextPageWithLayout } from 'types'
-import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
+import { useParams } from 'common'
+import { AlertCircle, DatabaseBackup } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderNavigationTabs,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import DatabaseBackupsNav from '@/components/interfaces/Database/Backups/DatabaseBackupsNav'
+import { PITRNotice } from '@/components/interfaces/Database/Backups/PITR/PITRNotice'
+import { PITRSelection } from '@/components/interfaces/Database/Backups/PITR/PITRSelection'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { AlertError } from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useBackupsQuery } from '@/data/database/backups-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { useIsOrioleDbInAws, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL, PROJECT_STATUS } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
-  const { project } = useProjectContext()
-  const ref = project?.ref ?? 'default'
-
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection>
-        <div className="col-span-12">
-          <div className="space-y-6">
-            <h3 className="text-xl text-foreground">Database Backups</h3>
-            <DatabaseBackupsNav active="pitr" projRef={ref} />
+    <>
+      <PageHeader>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Database Backups</PageHeaderTitle>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+        <PageHeaderNavigationTabs>
+          <DatabaseBackupsNav active="pitr" />
+        </PageHeaderNavigationTabs>
+      </PageHeader>
+      <PageContainer>
+        <PageSection>
+          <PageSectionContent>
             <div className="space-y-8">
               <PITR />
             </div>
-          </div>
-        </div>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    </>
   )
 }
 
 DatabasePhysicalBackups.getLayout = (page) => (
-  <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  <DefaultLayout>
+    <DatabaseLayout title="Backups">{page}</DatabaseLayout>
+  </DefaultLayout>
 )
 
 const PITR = () => {
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
+  const { ref: projectRef } = useParams()
+  const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
+  const { isHighAvailability } = useHighAvailability()
+  const { hasAccess: hasAccessToPitr, isLoading: isLoadingEntitlements } =
+    useCheckEntitlements('pitr.available_variants')
+  const isOrioleDbInAws = useIsOrioleDbInAws()
   const {
     data: backups,
     error,
-    isLoading,
+    isPending: isLoadingBackups,
     isError,
     isSuccess,
-  } = useBackupsQuery({
-    projectRef: project?.ref,
-  })
+  } = useBackupsQuery({ projectRef })
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-
-  const ref = project?.ref ?? 'default'
-  const plan = subscription?.plan?.id
+  const isLoading = isLoadingBackups || isLoadingEntitlements || isProjectPending
   const isEnabled = backups?.pitr_enabled
+  const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  const canReadPhysicalBackups = useCheckPermissions(PermissionAction.READ, 'physical_backups')
-  const isPermissionsLoaded = usePermissionsLoaded()
+  const { can: canReadPhysicalBackups, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'physical_backups'
+  )
 
   if (isPermissionsLoaded && !canReadPhysicalBackups) {
     return <NoPermission resourceText="view PITR backups" />
   }
 
+  if (isOrioleDbInAws) {
+    return (
+      <Admonition
+        type="default"
+        title="Database backups are not available for OrioleDB"
+        description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
+      >
+        <DocsButton abbrev={false} className="mt-2" href={DOCS_URL} />
+      </Admonition>
+    )
+  }
+
+  if (isLoading) {
+    return <GenericSkeletonLoader />
+  }
+
+  if (isHighAvailability) {
+    return (
+      <HighAvailabilityDisabledEmptyState
+        icon={DatabaseBackup}
+        title="Point-in-Time Recovery unavailable on High Availability projects"
+        description="We're working to bring point-in-time recovery to High Availability projects. Contact support if this is blocking your work."
+        className="max-w-none mx-0"
+      />
+    )
+  }
+
   return (
     <>
-      {isLoading && <GenericSkeletonLoader />}
       {isError && <AlertError error={error} subject="Failed to retrieve PITR backups" />}
       {isSuccess && (
         <>
-          {isEnabled ? (
+          {!isEnabled ? (
+            <UpgradeToPro
+              addon={hasAccessToPitr ? 'pitr' : undefined}
+              source="pitr"
+              featureProposition="enable Point-in-Time Recovery"
+              primaryText={
+                hasAccessToPitr
+                  ? 'Point in Time Recovery is available as an add-on'
+                  : 'Point in Time Recovery is a Pro Plan add-on'
+              }
+              secondaryText={
+                !hasAccessToPitr
+                  ? 'Roll back your database to a specific second. Starts at $100/month. Pro Plan already includes daily backups at no extra cost.'
+                  : 'Enable the add-on to add point-in-time recovery to your project.'
+              }
+            />
+          ) : !isActiveHealthy ? (
+            <Alert>
+              <AlertCircle />
+              <AlertTitle>
+                Point in Time Recovery is not available while project is offline
+              </AlertTitle>
+              <AlertDescription>
+                Your project needs to be online to restore your database with Point in Time Recovery
+              </AlertDescription>
+            </Alert>
+          ) : (
             <>
               <PITRNotice />
               <PITRSelection />
             </>
-          ) : (
-            <UpgradeToPro
-              organizationSlug={organization!.slug}
-              projectRef={ref}
-              primaryText="Point in time recovery is a Pro plan add-on."
-              secondaryText={
-                plan === 'free'
-                  ? 'Upgrade to the Pro plan with the PITR add-on selected to enable point in time recovery for your project.'
-                  : 'Please enable the add-on to enable point in time recovery for your project.'
-              }
-              addon="pitr"
-            />
           )}
         </>
       )}

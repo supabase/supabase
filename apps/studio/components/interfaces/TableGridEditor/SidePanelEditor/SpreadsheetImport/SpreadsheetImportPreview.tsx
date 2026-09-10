@@ -1,17 +1,19 @@
-import clsx from 'clsx'
+import { AlertCircle, ArrowRight, ChevronDown, ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Badge,
   Button,
+  cn,
   Collapsible,
-  IconAlertCircle,
-  IconArrowRight,
-  IconChevronDown,
-  IconChevronRight,
+  CollapsibleContent,
+  CollapsibleTrigger,
   SidePanel,
+  WarningIcon,
 } from 'ui'
 
-import type { PostgresTable } from '@supabase/postgres-meta'
 import type { SpreadsheetData } from './SpreadsheetImport.types'
 import SpreadsheetPreviewGrid from './SpreadsheetPreviewGrid'
 
@@ -19,19 +21,21 @@ const MAX_ROWS = 20
 const MAX_HEADERS = 20
 
 interface SpreadsheetImportPreviewProps {
-  selectedTable?: PostgresTable
+  selectedTable?: { name: string }
   spreadsheetData: SpreadsheetData
   errors?: any[]
   selectedHeaders: string[]
   incompatibleHeaders: string[]
+  emptyStringAsNullHeaders: string[]
 }
 
-const SpreadsheetImportPreview = ({
+export const SpreadsheetImportPreview = ({
   selectedTable,
   spreadsheetData,
   errors = [],
   selectedHeaders,
   incompatibleHeaders,
+  emptyStringAsNullHeaders,
 }: SpreadsheetImportPreviewProps) => {
   const [expandPreview, setExpandPreview] = useState(false)
   const [expandedErrors, setExpandedErrors] = useState<string[]>([])
@@ -56,23 +60,36 @@ const SpreadsheetImportPreview = ({
     }
   }
 
+  /**
+   * Remove items with duplicate row and code values because of the papaparse issue
+   * @link https://github.com/supabase/supabase/pull/38422#issue-3381886843
+   **/
+  const dedupedErrors = errors.filter(
+    (error, index, self) =>
+      index === self.findIndex((t) => t.row === error.row && t.code === error.code)
+  )
+
   return (
     <Collapsible open={expandPreview} onOpenChange={setExpandPreview} className={''}>
-      <Collapsible.Trigger asChild>
+      <CollapsibleTrigger asChild>
         <SidePanel.Content>
           <div className="py-1 flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <p className="text-sm">Preview data to be imported</p>
               {!isCompatible && <Badge variant="destructive">Data incompatible</Badge>}
-              {errors.length > 0 && <Badge variant="warning">{errors.length} issues found</Badge>}
+              {dedupedErrors.length > 0 && (
+                <Badge variant="warning">
+                  {dedupedErrors.length} {dedupedErrors.length === 1 ? 'issue' : 'issues'} found
+                </Badge>
+              )}
             </div>
             <Button
-              type="text"
+              variant="text"
               icon={
-                <IconChevronDown
+                <ChevronDown
                   size={18}
                   strokeWidth={2}
-                  className={clsx('text-foreground-light', expandPreview && 'rotate-180')}
+                  className={cn('text-foreground-light', expandPreview && 'rotate-180')}
                 />
               }
               className="px-1"
@@ -80,8 +97,8 @@ const SpreadsheetImportPreview = ({
             />
           </div>
         </SidePanel.Content>
-      </Collapsible.Trigger>
-      <Collapsible.Content>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
         <SidePanel.Content>
           <div className="mb-4">
             <p className="text-sm text-foreground-light">
@@ -99,10 +116,15 @@ const SpreadsheetImportPreview = ({
           </div>
           <div className="mb-4">
             {previewHeaders.length > 0 && previewRows.length > 0 ? (
-              <SpreadsheetPreviewGrid height={350} headers={previewHeaders} rows={previewRows} />
+              <SpreadsheetPreviewGrid
+                height={350}
+                headers={previewHeaders}
+                rows={previewRows}
+                emptyStringAsNullHeaders={emptyStringAsNullHeaders}
+              />
             ) : (
               <div className="flex items-center justify-center py-4 border border-control rounded-md space-x-2">
-                <IconAlertCircle size={16} strokeWidth={1.5} className="text-foreground-light" />
+                <AlertCircle size={16} strokeWidth={1.5} className="text-foreground-light" />
                 <p className="text-sm text-foreground-light">
                   {previewHeaders.length === 0
                     ? 'No headers have been selected'
@@ -113,88 +135,112 @@ const SpreadsheetImportPreview = ({
               </div>
             )}
           </div>
-          {(!isCompatible || errors.length > 0) && (
-            <div className="space-y-2 my-4">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm">Issues found in spreadsheet</p>
-                {isCompatible && (
-                  <p className="text-sm text-foreground-light">
-                    {selectedTable !== undefined
-                      ? 'This CSV can still be imported into your table despite issues in the following rows.'
-                      : 'Your table can still be created nonetheless despite issues in the following rows.'}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                {!isCompatible && (
-                  <div className="space-y-2">
-                    <div className="flex items-start space-x-2">
-                      <div className="w-[14px] h-[14px] flex items-center justify-center translate-y-[3px]">
-                        <div className="w-[6px] h-[6px] rounded-full bg-foreground-lighter" />
+          {(!isCompatible || dedupedErrors.length > 0) && (
+            <Alert variant="warning" className="my-4">
+              <WarningIcon />
+              <AlertTitle>Issues found in spreadsheet</AlertTitle>
+              <AlertDescription>
+                <div className="space-y-2">
+                  {isCompatible ? (
+                    <p className="text-sm">
+                      {selectedTable !== undefined
+                        ? `This CSV can still be imported, but we found ${dedupedErrors.length === 1 ? 'an issue' : 'issues'}:`
+                        : `You can still create the table, but we found ${dedupedErrors.length === 1 ? 'an issue' : 'issues'}:`}
+                    </p>
+                  ) : (
+                    <p className="text-sm">
+                      This CSV <span className="text-red-900">cannot</span> be imported into your
+                      table due to incompatible headers.
+                    </p>
+                  )}
+                  {!isCompatible && (
+                    <div className="space-y-2">
+                      <div className="flex items-start space-x-2">
+                        <div className="size-[14px] flex items-center justify-center translate-y-[3px]">
+                          <div className="size-[6px] rounded-full bg-foreground-lighter" />
+                        </div>
+                        <p className="text-sm">
+                          The column{incompatibleHeaders.length > 1 ? 's' : ''}{' '}
+                          {incompatibleHeaders.map((x) => `"${x}"`).join(', ')}{' '}
+                          {incompatibleHeaders.length > 1 ? 'are' : 'is'} not present in your table
+                        </p>
                       </div>
-                      <p className="text-sm">
-                        This CSV <span className="text-red-900">cannot</span> be imported into your
-                        table due to incompatible headers:
-                        <br />
-                        The column{incompatibleHeaders.length > 1 ? 's' : ''}{' '}
-                        {incompatibleHeaders.map((x) => `"${x}"`).join(', ')}{' '}
-                        {incompatibleHeaders.length > 1 ? 'are' : 'is'} not present in your table
-                      </p>
                     </div>
-                  </div>
-                )}
-                {errors.map((error: any, idx: number) => {
-                  const key = `import-error-${idx}`
-                  const isExpanded = expandedErrors.includes(key)
+                  )}
+                  <ul className="space-y-2 list-none">
+                    {dedupedErrors.map((error: any, idx: number) => {
+                      const key = `import-error-${idx}`
+                      const isExpanded = expandedErrors.includes(key)
+                      const errorData = error.data
 
-                  return (
-                    <div key={key} className="space-y-2">
-                      <div
-                        className="flex items-center space-x-2 cursor-pointer"
-                        onClick={() => onSelectExpandError(key)}
-                      >
-                        {error.data !== undefined ? (
-                          <IconChevronRight
-                            size={14}
-                            className={`transform ${isExpanded ? 'rotate-90' : ''}`}
-                          />
-                        ) : (
-                          <div className="w-[14px] h-[14px] flex items-center justify-center">
-                            <div className="w-[6px] h-[6px] rounded-full bg-foreground-lighter" />
-                          </div>
-                        )}
-                        {error.data !== undefined && (
-                          <p className="text-sm w-14">Row: {error.row}</p>
-                        )}
-                        <p className="text-sm">{error.message}</p>
-                        {error.data?.__parsed_extra && (
-                          <>
-                            <IconArrowRight size={14} />
-                            <p className="text-sm">Extra field(s):</p>
-                            {error.data?.__parsed_extra.map((value: any, i: number) => (
-                              <code key={i} className="text-xs">
-                                {value}
-                              </code>
-                            ))}
-                          </>
-                        )}
-                      </div>
-                      {error.data !== undefined && isExpanded && (
-                        <SpreadsheetPreviewGrid
-                          headers={spreadsheetData.headers}
-                          rows={[error.data]}
-                        />
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
+                      return (
+                        <li key={key} className="space-y-2">
+                          {errorData !== undefined ? (
+                            <button
+                              type="button"
+                              tabIndex={0}
+                              className="flex cursor-pointer items-center space-x-2 focus-ring"
+                              onClick={() => onSelectExpandError(key)}
+                              aria-expanded={isExpanded}
+                              aria-controls={`${key}-panel`}
+                              aria-labelledby={`${key}-summary`}
+                            >
+                              <ChevronRight
+                                size={14}
+                                className={cn('transform transition-transform', {
+                                  'rotate-90': isExpanded,
+                                })}
+                                aria-hidden="true"
+                              />
+                              <span
+                                id={`${key}-summary`}
+                                className="sr-only"
+                              >{`Toggle details for row ${error.row}`}</span>
+                              <p className="text-sm">Row {error.row}:</p>
+                              <p className="text-sm">{error.message}</p>
+                              {errorData?.__parsed_extra && (
+                                <>
+                                  <ArrowRight size={14} aria-hidden="true" />
+                                  <p className="text-sm">Extra field(s):</p>
+                                  <ul className="ml-2 list-disc">
+                                    {errorData.__parsed_extra.map((value: string, i: number) => (
+                                      <li key={i}>
+                                        <code className="text-code-inline">{value}</code>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </>
+                              )}
+                            </button>
+                          ) : (
+                            <div className="flex items-center space-x-2">
+                              <div
+                                className="size-[14px] flex items-center justify-center"
+                                aria-hidden="true"
+                              >
+                                <div className="size-[6px] rounded-full bg-foreground-lighter" />
+                              </div>
+                              <p className="text-sm">Row {error.row}:</p>
+                              <p className="text-sm">{error.message}</p>
+                            </div>
+                          )}
+                          {errorData !== undefined && isExpanded && (
+                            <SpreadsheetPreviewGrid
+                              headers={spreadsheetData.headers}
+                              rows={[errorData]}
+                              emptyStringAsNullHeaders={emptyStringAsNullHeaders}
+                            />
+                          )}
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </div>
+              </AlertDescription>
+            </Alert>
           )}
         </SidePanel.Content>
-      </Collapsible.Content>
+      </CollapsibleContent>
     </Collapsible>
   )
 }
-
-export default SpreadsheetImportPreview

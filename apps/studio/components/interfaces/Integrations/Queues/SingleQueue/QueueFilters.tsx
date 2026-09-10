@@ -1,0 +1,25 @@
+import { QUEUE_MESSAGE_OPTIONS, QUEUE_MESSAGE_TYPE } from './Queue.utils'
+import { FilterPopover } from '@/components/ui/FilterPopover'
+
+interface QueueFiltersProps {
+  selectedTypes: QUEUE_MESSAGE_TYPE[]
+  setSelectedTypes: (value: QUEUE_MESSAGE_TYPE[]) => void
+}
+
+export const QueueFilters = ({ selectedTypes, setSelectedTypes }: QueueFiltersProps) => {
+  return (
+    <FilterPopover
+      name={selectedTypes.length === 0 ? 'All types' : 'Types'}
+      title="Select types to show"
+      buttonType={selectedTypes.length === 0 ? 'dashed' : 'default'}
+      options={QUEUE_MESSAGE_OPTIONS} // Ignore user image column
+      labelKey="name"
+      valueKey="id"
+      labelClass="text-xs"
+      maxHeightClass="h-[190px]"
+      clearButtonText="Reset"
+      activeOptions={selectedTypes}
+      onSaveFilters={(value) => setSelectedTypes(value as any)}
+    />
+  )
+}

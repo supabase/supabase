@@ -1,127 +1,87 @@
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { useQuery } from '@tanstack/react-query'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
-import { useParams } from 'common'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
-import { useAppBannerContext } from 'components/interfaces/App/AppBannerWrapperContext'
-import { useProfile } from 'lib/profile'
-import { Button, IconExternalLink } from 'ui'
+import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-// [Joshen] For this notice specifically, just FYI
-// 1 month after 26th Jan we'll need to add some contextual information about this deprecation
-// in the database settings pooling config section, for projects created before September 27th 2023
+// Update this whenever the banner content below changes so old client bundles
+// stop displaying outdated notices after the relevant date passes.
+const BANNER_EXPIRES_AT = new Date('2026-06-09T15:00:00Z')
 
+const SUPAVISOR_UPDATE_REGIONS = {
+  'eu-central-1': {
+    start: Date.UTC(2026, 4, 26, 13, 0, 0),
+    end: Date.UTC(2026, 4, 26, 15, 0, 0),
+    url: 'https://status.supabase.com/incidents/jy1tm4wfs68t',
+  },
+  'eu-west-2': {
+    start: Date.UTC(2026, 5, 9, 13, 0, 0),
+    end: Date.UTC(2026, 5, 9, 15, 0, 0),
+    url: 'https://status.supabase.com/incidents/3t293hpd545z',
+  },
+  'us-west-1': {
+    start: Date.UTC(2026, 5, 2, 16, 0, 0),
+    end: Date.UTC(2026, 5, 2, 18, 0, 0),
+    url: 'https://status.supabase.com/incidents/8f72bnv3xs8r',
+  },
+  'us-east-1': {
+    start: Date.UTC(2026, 5, 3, 13, 0, 0),
+    end: Date.UTC(2026, 5, 3, 15, 0, 0),
+    url: 'https://status.supabase.com/incidents/y8rp6dwjyplw',
+  },
+}
+
+/**
+ * Used to display urgent notices that apply for all users, such as maintenance windows.
+ */
 export const NoticeBanner = () => {
   const router = useRouter()
-  const { isLoading: isLoadingProfile } = useProfile()
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
 
-  const appBannerContext = useAppBannerContext()
-  const {
-    ipv6BannerAcknowledged,
-    pgbouncerBannerAcknowledged,
-    vercelBannerAcknowledged,
-    onUpdateAcknowledged,
-  } = appBannerContext
-
-  const supabase = useSupabaseClient()
-  const { ref: projectRef } = useParams()
-
-  // [Alaister]: using inline queries here since this is temporary
-  const { data, isLoading: isLoadingIpv6Enabled } = useQuery(
-    ['projects', projectRef, 'pgbouncer-enabled'],
-    async ({ signal }) => {
-      let query = supabase.rpc('ipv6_active_status', { project_ref: projectRef }).returns<
-        {
-          pgbouncer_active: boolean
-          vercel_active: boolean
-        }[]
-      >()
-
-      if (signal) {
-        query = query.abortSignal(signal)
-      }
-
-      const result = await query
-
-      if (result.data === null) {
-        return {
-          pgbouncer_active: false,
-          vercel_active: false,
-        }
-      }
-
-      return result.data[0]
-    },
-    { enabled: Boolean(projectRef) }
+  const [bannerAcknowledged, setBannerAcknowledged, { isSuccess }] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SUPAVISOR_MAINTENANCE(ref ?? ''),
+    false
   )
 
-  const pgbouncerEnabled = data?.pgbouncer_active ?? false
-  const vercelWithoutSupavisorEnabled = data?.vercel_active ?? false
-
-  // [Joshen] Pgbouncer list and vercel list are mutually exclusive
-  const pgbouncerProjectAcknowledged = pgbouncerBannerAcknowledged.includes(projectRef ?? '')
-  const vercelProjectAcknowledged = vercelBannerAcknowledged.includes(projectRef ?? '')
-  const allAcknowledged =
-    (!pgbouncerEnabled && !vercelWithoutSupavisorEnabled && ipv6BannerAcknowledged) ||
-    (ipv6BannerAcknowledged && pgbouncerEnabled && pgbouncerProjectAcknowledged) ||
-    (ipv6BannerAcknowledged && vercelWithoutSupavisorEnabled && vercelProjectAcknowledged)
+  const region = project?.region ?? ''
+  const maintenanceWindow =
+    SUPAVISOR_UPDATE_REGIONS[region as keyof typeof SUPAVISOR_UPDATE_REGIONS]
 
   if (
-    isLoadingProfile ||
-    isLoadingIpv6Enabled ||
+    Date.now() >= BANNER_EXPIRES_AT.getTime() ||
     router.pathname.includes('sign-in') ||
-    allAcknowledged
+    !isSuccess ||
+    !project ||
+    !maintenanceWindow ||
+    bannerAcknowledged
   ) {
     return null
   }
 
-  const currentlyViewing =
-    pgbouncerEnabled && !pgbouncerProjectAcknowledged
-      ? ('pgbouncer' as const)
-      : vercelWithoutSupavisorEnabled && !vercelProjectAcknowledged
-        ? ('vercel' as const)
-        : ('ipv6' as const)
-
   return (
-    <div
-      className="flex items-center justify-center gap-x-4 bg-surface-100 py-3 transition text-foreground box-border border-b border-default"
-      style={{ height: '44px' }}
-    >
-      <p className="text-sm">
-        {currentlyViewing === 'pgbouncer' &&
-          'Our logs on 26th Jan show that you have accessed PgBouncer. Please migrate now. You can ignore this warning if you have already migrated.'}
-        {currentlyViewing === 'vercel' &&
-          "To prepare for the IPv4 migration, please redeploy your Vercel application to detect the updated environment variables if it hasn't been deployed since 27th January."}
-        {currentlyViewing === 'ipv6' &&
-          'We are migrating our infrastructure from IPv4 to IPv6. Please migrate now. You can ignore this warning if you have already migrated.'}
-      </p>
-      <div className="flex items-center gap-x-1">
-        <Button asChild type="link" iconRight={<IconExternalLink />}>
-          <a
-            href={
-              currentlyViewing === 'vercel'
-                ? 'https://supabase.com/partners/integrations/vercel'
-                : 'https://github.com/orgs/supabase/discussions/17817'
-            }
-            target="_blank"
-            rel="noreferrer"
-          >
-            Learn more
-          </a>
-        </Button>
-        <Button
-          type="text"
-          className="opacity-75"
-          onClick={() =>
-            onUpdateAcknowledged(
-              currentlyViewing,
-              currentlyViewing === 'ipv6' ? true : projectRef ?? ''
-            )
-          }
-        >
-          Dismiss
-        </Button>
-      </div>
-    </div>
+    <HeaderBanner
+      variant="note"
+      title="Upcoming maintenance"
+      description={
+        <>
+          Shared pooler maintenance in{' '}
+          <a target="_blank" rel="noopener referrer" href={maintenanceWindow.url}>
+            {project.region}
+          </a>{' '}
+          on{' '}
+          <TimestampInfo
+            className="text-sm"
+            utcTimestamp={maintenanceWindow.start}
+            label={dayjs(maintenanceWindow.start).format('DD MMM, HH:mm')}
+          />
+          .
+        </>
+      }
+      onDismiss={() => setBannerAcknowledged(true)}
+    />
   )
 }

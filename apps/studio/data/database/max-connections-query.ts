@@ -1,39 +1,46 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { getMaxConnectionsSql } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
 
-export const getMaxConnectionsQuery = () => {
-  const sql = /* SQL */ `show max_connections`
-
-  return sql
-}
+import { databaseKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type MaxConnectionsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   table?: string
   schema?: string
 }
 
-export type MaxConnectionsData = { maxConnections: number }
-export type MaxConnectionsError = unknown
-
-export const useMaxConnectionsQuery = <TData extends MaxConnectionsData = MaxConnectionsData>(
+export async function getMaxConnections(
   { projectRef, connectionString }: MaxConnectionsVariables,
-  options: UseQueryOptions<ExecuteSqlData, MaxConnectionsError, TData> = {}
-) => {
-  return useExecuteSqlQuery<TData>(
-    {
-      projectRef,
-      connectionString,
-      sql: getMaxConnectionsQuery(),
-      queryKey: ['max-connections'],
-    },
-    {
-      select: (data: { result: { max_connections: string }[] }) => {
-        const connections = parseInt(data.result[0].max_connections)
-        return { maxConnections: connections } as any
-      },
-      ...options,
-    }
+  signal?: AbortSignal
+) {
+  const sql = getMaxConnectionsSql()
+
+  const { result } = await executeSql(
+    { projectRef, connectionString, sql, queryKey: ['max-connections'] },
+    signal
   )
+
+  const connections = parseInt(result[0].max_connections)
+
+  return { maxConnections: connections }
 }
+
+export type MaxConnectionsData = Awaited<ReturnType<typeof getMaxConnections>>
+export type MaxConnectionsError = ResponseError
+
+export const useMaxConnectionsQuery = <TData = MaxConnectionsData>(
+  { projectRef, connectionString }: MaxConnectionsVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<MaxConnectionsData, MaxConnectionsError, TData> = {}
+) =>
+  useQuery<MaxConnectionsData, MaxConnectionsError, TData>({
+    queryKey: databaseKeys.maxConnections(projectRef),
+    queryFn: ({ signal }) => getMaxConnections({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

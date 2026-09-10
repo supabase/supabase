@@ -1,8 +1,5 @@
 {
-  "extends": "../tsconfig/react-library.json",
-  "compilerOptions": {
-    "resolveJsonModule": true
-  },
+  "extends": "tsconfig/react-library.json",
   "include": ["."],
-  "exclude": ["dist", "build", "node_modules", "**/*.stories.tsx"]
+  "exclude": ["dist", "build", "node_modules"]
 }

@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useRef } from 'react'
+'use client'
+
 import { debounce } from 'lodash'
+import { useEffect, useMemo, useRef } from 'react'
 
 export const useDebounce = (callback: () => void, delay: number = 1000) => {
-  const ref = useRef<any>()
+  const ref = useRef<any | null>(null)
 
   useEffect(() => {
     ref.current = callback

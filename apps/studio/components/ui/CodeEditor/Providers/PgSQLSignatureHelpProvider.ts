@@ -1,9 +1,11 @@
 import { RefObject } from 'react'
+
 import BackwardIterator from './BackwardIterator'
+import type { DatabaseFunction } from '@/data/database-functions/database-functions-query'
 
 // [Joshen] Needs to be fixed
 
-export default function getPgsqlSignatureHelpProvider(monaco: any, pgInfoRef: RefObject<any>) {
+export default function getPgsqlSignatureHelpProvider(_monaco: any, pgInfoRef: RefObject<any>) {
   return {
     signatureHelpTriggerCharacters: ['(', ','],
     provideSignatureHelp: function (model: any, position: any) {
@@ -17,8 +19,8 @@ export default function getPgsqlSignatureHelpProvider(monaco: any, pgInfoRef: Re
       let ident = iterator.readIdent()
       if (!ident || ident.match(/^\".*?\"$/)) return null
 
-      let fn = pgInfoRef.current.functions.find(
-        (f: any) => f.name.toLocaleLowerCase() === ident.toLocaleLowerCase()
+      let fn = (pgInfoRef.current.functions as DatabaseFunction[]).find(
+        (f) => f.name.toLocaleLowerCase() === ident.toLocaleLowerCase()
       )
       if (!fn) return null
       if (!fn.args || fn.args.length < paramCount) return null
@@ -27,10 +29,9 @@ export default function getPgsqlSignatureHelpProvider(monaco: any, pgInfoRef: Re
       const activeParameter = Math.min(paramCount, fn.args.length - 1)
       const signatures = []
       signatures.push({
-        label: `${fn.name}( ${fn.args.join(' , ')} )`,
-        documentation: fn.description,
-        parameters: fn.args.map((v: any) => {
-          return { label: v }
+        label: `${fn.name}(${fn.argument_types})`,
+        parameters: fn.args.map((v) => {
+          return { label: v.name }
         }),
       })
 

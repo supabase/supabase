@@ -1,24 +1,31 @@
 import { useParams } from 'common'
+import { Save } from 'lucide-react'
 import Link from 'next/link'
-import { IconSave, Loading } from 'ui'
+import { Loading } from 'ui'
 
-import { LogsSavedQueriesItem } from 'components/interfaces/Settings/Logs'
-import { LogsLayout } from 'components/layouts'
-import Table from 'components/to-be-cleaned/Table'
-import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
-import { useContentQuery } from 'data/content/content-query'
-import type { NextPageWithLayout } from 'types'
+import { SavedQueriesItem } from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
+import Table from '@/components/to-be-cleaned/Table'
+import LogsExplorerHeader from '@/components/ui/Logs/LogsExplorerHeader'
+import { useContentQuery } from '@/data/content/content-query'
+import type { NextPageWithLayout } from '@/types'
 
+// [Joshen] This page looks like its not longer in use from a UI POV - double checking and deprecate + add redirects
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { data, isLoading } = useContentQuery(ref)
+  const { data, isPending: isLoading } = useContentQuery({
+    projectRef: ref,
+    type: 'log_sql',
+  })
 
   if (isLoading) {
     return <Loading active={true}>{null}</Loading>
   }
 
-  let saved = [...(data?.content ?? [])].filter((c) => c.type === 'log_sql')
-  saved.sort((a, b) => a.name.localeCompare(b.name))
+  const saved = [...(data?.content ?? [])]
+    .filter((c) => c.type === 'log_sql')
+    .sort((a, b) => a.name.localeCompare(b.name))
 
   return (
     <div className="mx-auto w-full px-5 py-6 h-full">
@@ -37,14 +44,18 @@ export const LogsSavedPage: NextPageWithLayout = () => {
               </>
             }
             body={saved.map((item) => (
-              <LogsSavedQueriesItem key={item.id} item={item} />
+              <Table.tr key={item.id}>
+                <Table.td colSpan={5} className="p-0!">
+                  <SavedQueriesItem item={item} />
+                </Table.td>
+              </Table.tr>
             ))}
           />
         </div>
       )}
       {saved.length === 0 && (
-        <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
-          <IconSave className="animate-bounce" />
+        <div className="my-auto flex h-full grow flex-col items-center justify-center gap-1">
+          <Save className="animate-bounce" />
           <h3 className="text-lg text-foreground">No Saved Queries Yet</h3>
           <p className="text-sm text-foreground-lighter">
             Saved queries will appear here. Queries can be saved from the{' '}
@@ -59,6 +70,10 @@ export const LogsSavedPage: NextPageWithLayout = () => {
   )
 }
 
-LogsSavedPage.getLayout = (page) => <LogsLayout>{page}</LogsLayout>
+LogsSavedPage.getLayout = (page) => (
+  <DefaultLayout>
+    <LogsLayout title="Saved">{page}</LogsLayout>
+  </DefaultLayout>
+)
 
 export default LogsSavedPage

@@ -1,119 +1,79 @@
-import Link from 'next/link'
-import { IconBackground, IconPlay } from 'ui'
-import { useBreakpoint } from 'common'
+'use client'
+
+import {
+  Prompt,
+  PromptContent,
+  PromptCopy,
+  PromptPanel,
+  PromptTitle,
+} from '~/features/ui/PromptPanel'
+import { isFeatureEnabled } from 'common'
+import { Sparkles, Terminal } from 'lucide-react'
+import { type ReactNode } from 'react'
+
+import { getCustomContent } from '../lib/custom-content/getCustomContent'
 import DocsCoverLogo from './DocsCoverLogo'
-import { IconPanel } from 'ui-patterns/IconPanel'
+import { setupCommand, setupCommands, setupPrompt } from './HomePageCover.constants'
 
-const HomePageCover = (props) => {
-  const isXs = useBreakpoint(639)
-  const iconSize = isXs ? 'sm' : 'lg'
+const fullGettingStartedEnabled = isFeatureEnabled('docs:full_getting_started')
 
-  const frameworks = [
-    {
-      tooltip: 'ReactJS',
-      icon: '/docs/img/icons/react-icon',
-      href: '/guides/getting-started/quickstarts/reactjs',
-    },
-    {
-      tooltip: 'Next.js',
-      icon: '/docs/img/icons/nextjs-icon',
-      href: '/guides/getting-started/quickstarts/nextjs',
-    },
-    {
-      tooltip: 'RedwoodJS',
-      icon: '/docs/img/icons/redwoodjs-icon',
-      href: '/guides/getting-started/quickstarts/redwoodjs',
-    },
-    {
-      tooltip: 'Flutter',
-      icon: '/docs/img/icons/flutter-icon',
-      href: '/guides/getting-started/quickstarts/flutter',
-    },
-    {
-      tooltip: 'Android Kotlin',
-      icon: '/docs/img/icons/kotlin-icon',
-      href: '/guides/getting-started/quickstarts/kotlin',
-    },
-    {
-      tooltip: 'SvelteKit',
-      icon: '/docs/img/icons/svelte-icon',
-      href: '/guides/getting-started/quickstarts/sveltekit',
-    },
-    {
-      tooltip: 'SolidJS',
-      icon: '/docs/img/icons/solidjs-icon',
-      href: '/guides/getting-started/quickstarts/solidjs',
-    },
-    {
-      tooltip: 'Vue',
-      icon: '/docs/img/icons/vuejs-icon',
-      href: '/guides/getting-started/quickstarts/vue',
-    },
-    {
-      tooltip: 'NuxtJS',
-      icon: '/docs/img/icons/nuxt-icon',
-      href: '/guides/getting-started/quickstarts/nuxtjs',
-    },
-    {
-      tooltip: 'refine',
-      icon: '/docs/img/icons/refine-icon',
-      href: '/guides/getting-started/quickstarts/refine',
-    },
-  ]
-
-  const GettingStarted = () => (
-    <div
-      className="
-        border bg-background
-        relative overflow-hidden
-        grid grid-cols-12
-        rounded-lg
-        p-5 md:p-8
-        "
-    >
-      <div className="col-span-full flex flex-col md:flex-row xl:flex-col justify-between gap-1 md:gap-3">
-        <div className="md:max-w-xs shrink w-fit xl:max-w-none">
-          <div className="flex items-center gap-3 mb-3">
-            <IconBackground>
-              <IconPlay aria-hidden="true" className="text-brand-600 w-4" strokeWidth={2} />
-            </IconBackground>
-            <h2 className="text-2xl m-0 text-foreground">Getting Started</h2>
-          </div>
-          <p className="text-foreground-light text-sm">
-            Discover how to set up a database to an app making queries in just a few minutes.
-          </p>
-        </div>
-        <div className="flex shrink-0 flex-wrap md:grid md:grid-cols-5 gap-2 sm:gap-3">
-          {frameworks.map((framework, i) => (
-            <Link key={i} href={framework.href} passHref className="no-underline">
-              <IconPanel
-                iconSize={iconSize}
-                hideArrow
-                tooltip={framework.tooltip}
-                icon={framework.icon}
-              />
-            </Link>
-          ))}
-        </div>
-      </div>
-    </div>
+function SetupPrompt({ cliCode }: { cliCode: ReactNode }) {
+  return (
+    <PromptPanel>
+      <Prompt value="prompt">
+        <PromptTitle icon={<Sparkles />}>AI Prompt</PromptTitle>
+        <PromptCopy>{setupPrompt}</PromptCopy>
+        <PromptContent>
+          Help me get set up with Supabase. Do the following: 1. Install the Supabase CLI globally
+          with{' '}
+          <code className="shimmer-none rounded bg-surface-200 px-1 py-0.5 font-mono text-xs text-foreground">
+            {setupCommand.installCli}
+          </code>
+          . 2. Install the Supabase Plugin with{' '}
+          <code className="shimmer-none rounded bg-surface-200 px-1 py-0.5 font-mono text-xs text-foreground">
+            {setupCommand.installPlugin}
+          </code>
+          . 3. Review my project and determine whether Supabase is already initialized. If it is not
+          initialized, run{' '}
+          <code className="shimmer-none rounded bg-surface-200 px-1 py-0.5 font-mono text-xs text-foreground">
+            {setupCommand.initialize}
+          </code>
+          . 4. Suggest the most relevant next steps.
+        </PromptContent>
+      </Prompt>
+      <Prompt value="cli">
+        <PromptTitle icon={<Terminal />}>CLI</PromptTitle>
+        <PromptCopy>{setupCommands}</PromptCopy>
+        <PromptContent shimmer={false}>{cliCode}</PromptContent>
+      </Prompt>
+    </PromptPanel>
   )
+}
+
+const HomePageCover = ({ title, cliCode }: { title: string; cliCode: ReactNode }) => {
+  const { homepageHeading } = getCustomContent(['homepage:heading'])
 
   return (
-    <div className="w-full bg-alternative border-b max-w-none mb-16 md:mb-12 xl:mb-0">
-      <div className="max-w-7xl px-5 mx-auto py-8 sm:pb-16 sm:pt-12 xl:pt-16 flex flex-col xl:flex-row justify-between gap-12 xl:gap-12">
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-start sm:items-center w-full max-w-xl xl:max-w-[33rem]">
-          <DocsCoverLogo aria-hidden="true" />
-          <div className="flex flex-col">
-            <h1 className="m-0 mb-3 text-2xl sm:text-3xl text-foreground">{props.meta?.title}</h1>
-            <p className="m-0 text-foreground-light">
-              Learn how to get up and running with Supabase through tutorials, APIs and platform
-              resources.
-            </p>
+    <div className="w-full border-b bg-muted/10">
+      <div className="mx-auto max-w-7xl px-6 py-16">
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-12 xl:gap-16">
+          <div className="flex w-full min-w-0 flex-1 items-center gap-4 sm:gap-8">
+            <DocsCoverLogo aria-hidden="true" className="w-12 shrink-0 sm:w-[60px] md:w-[100px]" />
+            <div className="flex min-w-0 flex-col">
+              <h1 className="m-0 text-3xl text-foreground sm:text-4xl">
+                {homepageHeading || title}
+              </h1>
+              <p className="m-0 mt-2 text-base leading-7 text-foreground-light sm:mt-3 sm:text-xl">
+                Learn how to get up and running with Supabase through tutorials, APIs and platform
+                resources.
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="w-full xl:max-w-[440px] -mb-40">
-          <GettingStarted />
+          {fullGettingStartedEnabled && (
+            <div className="w-full lg:max-w-[478px] lg:shrink-0">
+              <SetupPrompt cliCode={cliCode} />
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,214 +1,87 @@
-import { isUndefined } from 'lodash'
+import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
-import { ReactNode } from 'react'
-import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
+import { PropsWithChildren, ReactNode } from 'react'
+import { cn } from 'ui'
 
-import { useFlag } from 'hooks'
-import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
-import type { SidebarLink, SidebarSection } from './AccountLayout.types'
+import type { SidebarSection } from './AccountLayout.types'
+import { getActiveKey, toSubMenuSections } from './AccountLayout.utils'
+import { SubMenu } from '@/components/ui/ProductMenu/SubMenu'
 
 interface WithSidebarProps {
-  title: string
-  breadcrumbs: any[]
+  title?: string
   sections: SidebarSection[]
   header?: ReactNode
-  subitems?: any[]
-  subitemsParentKey?: number
-  hideSidebar?: boolean
-  customSidebarContent?: ReactNode
-  children: ReactNode
+  backToDashboardURL?: string
 }
 
-const WithSidebar = ({
+export const WithSidebar = ({
   title,
   header,
-  breadcrumbs = [],
   children,
   sections,
-  subitems,
-  subitemsParentKey,
-  hideSidebar = false,
-  customSidebarContent,
-}: WithSidebarProps) => {
-  const noContent = !sections && !customSidebarContent
-  const navLayoutV2 = useFlag('navigationLayoutV2')
+  backToDashboardURL,
+}: PropsWithChildren<WithSidebarProps>) => {
+  const noContent = !sections
 
   return (
-    <div className="flex h-full">
-      {!hideSidebar && !noContent && (
-        <div
-          id="with-sidebar"
-          className={[
-            'h-full bg-studio',
-            'hide-scrollbar w-64 overflow-auto border-r border-default',
-          ].join(' ')}
-        >
-          {title && (
-            <div className="mb-2">
-              <div className="flex h-12 max-h-12 items-center border-b px-6 border-default">
-                <h4 className="mb-0 text-lg truncate" title={title}>
-                  {title}
-                </h4>
-              </div>
-            </div>
-          )}
-          {header && header}
-          <div className="-mt-1">
-            <Menu>
-              {customSidebarContent}
-              {sections.map((section) => {
-                return Boolean(section.heading) ? (
-                  <SectionWithHeaders
-                    key={section.key}
-                    section={section}
-                    subitems={subitems}
-                    subitemsParentKey={subitemsParentKey}
-                  />
-                ) : (
-                  <div className="border-b py-5 px-6 border-default" key={section.key}>
-                    <SidebarItem
-                      links={section.links}
-                      subitems={subitems}
-                      subitemsParentKey={subitemsParentKey}
-                    />
-                  </div>
-                )
-              })}
-            </Menu>
-          </div>
-        </div>
+    <div className="flex flex-col md:flex-row h-full">
+      {!noContent && (
+        <SidebarContent
+          title={title}
+          header={header}
+          sections={sections}
+          backToDashboardURL={backToDashboardURL}
+          className="hidden md:flex"
+        />
       )}
       <div className="flex flex-1 flex-col">
-        {!navLayoutV2 && <LayoutHeader breadcrumbs={breadcrumbs} />}
-        <div className="flex-1 flex-grow overflow-y-auto">{children}</div>
+        <div className="flex-1 grow overflow-y-auto">{children}</div>
       </div>
     </div>
   )
 }
-export default WithSidebar
 
-interface SectionWithHeadersProps {
-  section: SidebarSection
-  subitems?: any[]
-  subitemsParentKey?: number
-}
-
-const SectionWithHeaders = ({ section, subitems, subitemsParentKey }: SectionWithHeadersProps) => (
-  <div key={section.heading} className="border-b py-5 px-6 border-default">
-    {section.heading && <Menu.Group title={section.heading} />}
-    {section.versionLabel && (
-      <div className="mb-1 px-3">
-        <Badge variant="warning">{section.versionLabel}</Badge>
-      </div>
-    )}
-    {
-      <SidebarItem
-        links={section.links}
-        subitems={subitems}
-        subitemsParentKey={subitemsParentKey}
-      />
-    }
-  </div>
-)
-interface SidebarItemProps {
-  links: SidebarLink[]
-  subitems?: any[]
-  subitemsParentKey?: number
-}
-
-const SidebarItem = ({ links, subitems, subitemsParentKey }: SidebarItemProps) => {
-  return (
-    <ul className="space-y-1">
-      {links.map((link, i: number) => {
-        // disable active state for link with subitems
-        const isActive = link.isActive && !subitems
-
-        let render: any = (
-          <SidebarLinkItem
-            key={`${link.key}-${i}-sidebarItem`}
-            id={`${link.key}-${i}`}
-            isActive={isActive}
-            label={link.label}
-            href={link.href}
-            onClick={link.onClick}
-            isExternal={link.isExternal || false}
-          />
-        )
-
-        if (subitems && link.subitemsKey === subitemsParentKey) {
-          const subItemsRender = subitems.map((y: any, i: number) => (
-            <SidebarLinkItem
-              key={`${y.key || y.as}-${i}-sidebarItem`}
-              id={`${y.key || y.as}-${i}`}
-              isSubitem={true}
-              label={y.label}
-              onClick={y.onClick}
-              isExternal={link.isExternal || false}
-            />
-          ))
-          render = [render, ...subItemsRender]
-        }
-        return render
-      })}
-    </ul>
-  )
-}
-
-interface SidebarLinkProps extends SidebarLink {
-  id: string
-  isSubitem?: boolean
-}
-
-const SidebarLinkItem = ({
-  id,
-  label,
-  href,
-  isActive,
-  isSubitem,
-  isExternal,
-  onClick,
-}: SidebarLinkProps) => {
-  if (isUndefined(href)) {
-    let icon
-    if (isExternal) {
-      icon = <IconArrowUpRight size={'tiny'} />
-    }
-
-    if (label === 'Log out') {
-      icon = <IconLogOut size={'tiny'} />
-    }
-
-    return (
-      <Menu.Item
-        rounded
-        key={id}
-        style={{
-          marginLeft: isSubitem ? '.5rem' : '0rem',
-        }}
-        active={isActive ? true : false}
-        onClick={onClick || (() => {})}
-        icon={icon}
-      >
-        {isSubitem ? <p className="text-sm">{label}</p> : label}
-      </Menu.Item>
-    )
-  }
+export const SidebarContent = ({
+  header,
+  sections,
+  backToDashboardURL,
+  className,
+}: PropsWithChildren<Omit<WithSidebarProps, 'breadcrumbs'>> & { className?: string }) => {
+  const page = getActiveKey(sections)
+  const subMenuSections = toSubMenuSections(sections)
 
   return (
-    <Link href={href || ''} className="block" target={isExternal ? '_blank' : '_self'}>
-      <span className="group flex max-w-full cursor-pointer items-center space-x-2 border-default py-1 font-normal outline-none ring-foreground focus-visible:z-10 focus-visible:ring-1 group-hover:border-foreground-muted">
-        {isExternal && (
-          <span className="truncate text-sm text-foreground-lighter transition group-hover:text-foreground-light">
-            <IconArrowUpRight size={'tiny'} />
-          </span>
+    <>
+      <div
+        id="with-sidebar"
+        className={cn(
+          'h-full bg-dash-sidebar flex flex-col justify-between',
+          'hide-scrollbar w-full md:w-64 md:border-r border-default',
+          className
         )}
-        <span
-          title={label}
-          className="w-full truncate text-sm text-foreground-light transition group-hover:text-foreground"
-        >
-          {isSubitem ? <p>{label}</p> : label}
-        </span>
-      </span>
-    </Link>
+      >
+        <div className="flex-1 flex flex-col">
+          {backToDashboardURL && (
+            <div className="shrink-0 hidden md:block">
+              <div className="flex h-12 max-h-12 items-center border-b px-6 border-default">
+                <Link
+                  href={backToDashboardURL}
+                  className="flex text-sm flex-row gap-2 items-center text-foreground-lighter focus-visible:text-foreground hover:text-foreground"
+                >
+                  <ArrowLeft strokeWidth={1.5} size={16} />
+                  Back to dashboard
+                </Link>
+              </div>
+            </div>
+          )}
+          {header && header}
+          <div className="flex-1 overflow-auto">
+            <div className="flex flex-col">
+              <SubMenu sections={subMenuSections} page={page} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   )
 }

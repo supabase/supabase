@@ -1,0 +1,205 @@
+import { isToolUIPart, type UIMessage } from 'ai'
+import { toast } from 'sonner'
+
+import { SAFE_FUNCTIONS } from './AiAssistant.constants'
+import {
+  isLogsSource,
+  sqlSourceToFenceLanguage,
+} from '@/components/interfaces/SQLEditor/querySource'
+import { authKeys } from '@/data/auth/keys'
+import { databaseExtensionsKeys } from '@/data/database-extensions/keys'
+import { databaseIndexesKeys } from '@/data/database-indexes/keys'
+import { databasePoliciesKeys } from '@/data/database-policies/keys'
+import { databaseTriggerKeys } from '@/data/database-triggers/keys'
+import { databaseKeys } from '@/data/database/keys'
+import { enumeratedTypesKeys } from '@/data/enumerated-types/keys'
+import { handleError } from '@/data/fetchers'
+import { tableKeys } from '@/data/tables/keys'
+import { isManualApprovalRequested } from '@/lib/ai/message-utils'
+import { tryParseJson } from '@/lib/helpers'
+import type { SqlSnippet } from '@/state/ai-assistant-state'
+import { ResponseError } from '@/types'
+
+export type MutationCategory = 'functions' | 'rls-policies'
+
+// [Joshen] This is just very basic identification, but possible can extend perhaps
+export const identifyQueryType = (query: string): MutationCategory | undefined => {
+  const formattedQuery = query.toLowerCase().replaceAll('\n', ' ')
+  if (
+    formattedQuery.includes('create function') ||
+    formattedQuery.includes('create or replace function')
+  ) {
+    return 'functions'
+  } else if (formattedQuery.includes('create policy') || formattedQuery.includes('alter policy')) {
+    return 'rls-policies'
+  }
+  return undefined
+}
+
+// Check for function calls that aren't in the safe list
+/** @deprecated [Joshen] Ideally we move away from this as this isn't a scalable way to deduce */
+export const containsUnknownFunction = (query: string) => {
+  const normalizedQuery = query.trim().toLowerCase()
+  const functionCallRegex = /\w+\s*\(/g
+  const functionCalls = normalizedQuery.match(functionCallRegex) || []
+
+  return functionCalls.some((func) => {
+    const isReadOnlyFunc = SAFE_FUNCTIONS.some((safeFunc) => func.trim().toLowerCase() === safeFunc)
+    return !isReadOnlyFunc
+  })
+}
+
+/** @deprecated
+ * [Joshen] This isn't really a scalable way to reduce this behaviour, we now have support
+ * for a readonly connection string which we can use this to run queries, and is a much
+ * clearer way to deduce if the query is read only or not
+ */
+export const isReadOnlySelect = (query: string): boolean => {
+  const normalizedQuery = query.trim().toLowerCase()
+
+  // Check if it starts with SELECT
+  if (!normalizedQuery.startsWith('select')) return false
+
+  // List of keywords that indicate write operations
+  const writeOperations = ['insert', 'update', 'delete', 'alter', 'drop', 'create', 'replace']
+
+  // Words that may appear in column names etc
+  const allowedPatterns = ['created', 'inserted', 'updated', 'deleted', 'truncate']
+
+  // Check for any write operations
+  const hasWriteOperation = writeOperations.some((op) => {
+    // Ignore if part of allowed pattern
+    const isAllowed = allowedPatterns.some(
+      (allowed) => normalizedQuery.includes(allowed) && allowed.includes(op)
+    )
+    return !isAllowed && normalizedQuery.includes(op)
+  })
+  if (hasWriteOperation) return false
+
+  const hasUnknownFunction = containsUnknownFunction(normalizedQuery)
+  if (hasUnknownFunction) return false
+
+  return true
+}
+
+export const hasPendingToolApproval = (messages: Pick<UIMessage, 'role' | 'parts'>[]) => {
+  return messages.some((message) => {
+    if (message.role !== 'assistant') return false
+
+    return message.parts?.some((part) => isManualApprovalRequested(part))
+  })
+}
+
+export const resolvePendingToolApprovalsAsDenied = (messages: UIMessage[]): UIMessage[] => {
+  return messages.map((message) => {
+    if (message.role !== 'assistant') return message
+
+    const parts = message.parts?.map((part) => {
+      if (!isToolUIPart(part) || part.state !== 'approval-requested') return part
+
+      return {
+        ...part,
+        state: 'output-denied',
+        approval: {
+          id: part.approval.id,
+          approved: false,
+          reason: 'Skipped because the user sent a follow-up message.',
+        },
+      } as UIMessage['parts'][number]
+    })
+
+    return { ...message, parts } as UIMessage
+  })
+}
+
+const getContextKey = (pathname: string) => {
+  const [, , , ...rest] = pathname.split('/')
+  const key = rest.join('/')
+  return key
+}
+
+export const getContextualInvalidationKeys = ({
+  ref,
+  pathname,
+  schema = 'public',
+}: {
+  ref: string
+  pathname: string
+  schema?: string
+}) => {
+  const key = getContextKey(pathname)
+
+  return (
+    (
+      {
+        'auth/users': [authKeys.usersInfinite(ref)],
+        'database/policies': [databasePoliciesKeys.list(ref)],
+        'database/functions': [databaseKeys.databaseFunctions(ref)],
+        'database/tables': [
+          tableKeys.list(ref, schema, { includeColumns: true }),
+          tableKeys.list(ref, schema, { includeColumns: false }),
+        ],
+        'database/triggers': [databaseTriggerKeys.list(ref)],
+        'database/types': [enumeratedTypesKeys.list(ref)],
+        'database/extensions': [databaseExtensionsKeys.list(ref)],
+        'database/indexes': [databaseIndexesKeys.list(ref, schema)],
+      } as const
+    )[key] ?? []
+  )
+}
+
+export const onErrorChat = (error: Error) => {
+  const parsedError = error ? tryParseJson(error.message) : undefined
+
+  try {
+    handleError(parsedError?.error || parsedError || error)
+  } catch (e: any) {
+    if (e instanceof ResponseError) {
+      toast.error(e.message)
+    } else if (e instanceof Error) {
+      toast.error(e.message)
+    } else if (typeof e === 'string') {
+      toast.error(e)
+    } else {
+      toast.error('An unknown error occurred')
+    }
+  }
+}
+
+export function containsLogsSnippets(snippets: readonly SqlSnippet[] | undefined): boolean {
+  return (snippets ?? []).some(
+    (snippet) => typeof snippet !== 'string' && isLogsSource(snippet.source)
+  )
+}
+
+export const getSnippetLabel = (snippet: SqlSnippet, index: number): string =>
+  typeof snippet === 'string' ? `Snippet ${index + 1}` : snippet.label
+
+export const getSnippetContent = (snippet: SqlSnippet): string =>
+  typeof snippet === 'string' ? snippet : snippet.content
+
+/**
+ * The fence language an attached query is written into the message with. A logs query
+ * is fenced as `clickhouse` so the model can tell which attachment is ClickHouse
+ * against the `logs` table — a single message can carry both dialects.
+ *
+ * It also keeps the two apart in the rendered message: MessageMarkdown treats a `sql`
+ * fence as runnable Postgres (`AssistantQueryCell`, branded with `untrustedSql`),
+ * which a ClickHouse query must never be offered as.
+ */
+function getSnippetFenceLanguage(snippet: SqlSnippet): 'sql' | 'clickhouse' {
+  return sqlSourceToFenceLanguage(typeof snippet === 'string' ? undefined : snippet.source)
+}
+
+/**
+ * Renders attached queries as the fenced code blocks appended to the message text,
+ * each labelled with its own dialect.
+ */
+export function formatAttachedSnippets(snippets: readonly SqlSnippet[]): string {
+  return snippets
+    .map(
+      (snippet) =>
+        '```' + getSnippetFenceLanguage(snippet) + '\n' + getSnippetContent(snippet) + '\n```'
+    )
+    .join('\n')
+}

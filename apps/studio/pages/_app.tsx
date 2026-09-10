@@ -1,75 +1,133 @@
-import 'styles/code.scss'
-import 'styles/contextMenu.scss'
-import 'styles/date-picker.scss'
-import 'styles/editor.scss'
-import 'styles/graphiql-base.scss'
-import 'styles/grid.scss'
-import 'styles/main.scss'
-import 'styles/markdown-preview.scss'
-import 'styles/monaco.scss'
-import 'styles/react-data-grid-logs.scss'
-import 'styles/reactflow.scss'
-import 'styles/storage.scss'
-import 'styles/stripe.scss'
-import 'styles/toast.scss'
-import 'styles/ui.scss'
-import 'ui/build/css/themes/dark.css'
-import 'ui/build/css/themes/light.css'
+import '@/styles/code.css'
+import '@/styles/globals.css'
+import '@/styles/graphiql-base.css'
+import '@/styles/grid.css'
+import '@/styles/markdown-preview.css'
+import '@/styles/monaco.css'
+import '@/styles/react-data-grid-logs.css'
+import '@/styles/reactflow.css'
+import '@/styles/storage.css'
+import '@/styles/stripe.css'
+import '@/styles/ui.css'
+import 'react-data-grid/lib/styles.css'
+import 'ui-patterns/ShimmeringLoader/index.css'
 
-import { loader } from '@monaco-editor/react'
-import { TooltipProvider } from '@radix-ui/react-tooltip'
-import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { createClient } from '@supabase/supabase-js'
-import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
+import * as Sentry from '@sentry/nextjs'
+import { HydrationBoundary, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ThemeProvider, useThemeSandbox } from 'common'
+import {
+  FeatureFlagProvider,
+  getFlags,
+  TelemetryTagManager,
+  ThemeProvider,
+  useThemeSandbox,
+} from 'common'
+import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
+import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
+import dynamic from 'next/dynamic'
 import Head from 'next/head'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
-import { PortalToast, Toaster } from 'ui'
-import { ConsentToast } from 'ui-patterns/ConsentToast'
+import { NuqsAdapter } from 'nuqs/adapters/next/pages'
+import { ErrorInfo, useCallback, useEffect, useState, type ComponentProps } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
+import { TooltipProvider } from 'ui'
+import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
-import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import {
-  AppBannerWrapper,
-  CommandMenuWrapper,
-  RouteValidationWrapper,
-} from 'components/interfaces/App'
-import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
-import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
-import FlagProvider from 'components/ui/Flag/FlagProvider'
-import PageTelemetry from 'components/ui/PageTelemetry'
-import { useRootQueryClient } from 'data/query-client'
-import { AuthProvider } from 'lib/auth'
-import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { ProfileProvider } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
-import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
-import { AppPropsWithLayout } from 'types'
+import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
+import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
+import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/IndirectTaxDeclarationModal'
+import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
+import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
+import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
+import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
+import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
+import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
+import { getCLIReleaseVersion } from '@/data/misc/cli-release-version-query'
+import { useRootQueryClient } from '@/data/query-client'
+import { inter, manrope, sourceCodePro } from '@/fonts'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { AuthProvider } from '@/lib/auth'
+import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
+import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
+import { TimezoneProvider, useTimezone } from '@/lib/datetime'
+import { ProfileProvider } from '@/lib/profile'
+import { Telemetry } from '@/lib/telemetry'
+import { ToastErrorTracker } from '@/lib/toast-errors'
+import { Toaster } from '@/lib/toaster'
+import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
+import type { AppPropsWithLayout } from '@/types'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
+dayjs.extend(duration)
 
-loader.config({
-  // [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
-  // locally. We're however, only storing the assets which we need (based on what the network tab loads
-  // while using monaco). If we end up facing more effort trying to maintain this, probably to either
-  // use cloudflare or find some way to pull all the files from a CDN via a CLI, rather than tracking individual files
-  // The alternative was to import * as monaco from 'monaco-editor' but i couldn't get it working
-  paths: {
-    vs: IS_PLATFORM
-      ? 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.0/min/vs'
-      : `${BASE_PATH}/monaco-editor`,
-  },
-})
+// Keep dev-only components out of the production bundle
+const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+const IS_DEV_TOOLBAR_ENABLED = env === 'local' || env === 'staging'
+
+const ResourceWarningsTab = IS_DEV_TOOLBAR_ENABLED
+  ? dynamic(() =>
+      import('@/components/ui/DevToolbar/ResourceWarningsTab').then((m) => m.ResourceWarningsTab)
+    )
+  : () => null
+
+const ProjectStatusTab = IS_DEV_TOOLBAR_ENABLED
+  ? dynamic(() =>
+      import('@/components/ui/DevToolbar/ProjectStatusTab').then((m) => m.ProjectStatusTab)
+    )
+  : () => null
+
+const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
+  ? [
+      { id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> },
+      { id: 'project-status', label: 'Project Status', content: <ProjectStatusTab /> },
+    ]
+  : []
+
+const FeatureFlagProviderWithOrgContext = ({
+  children,
+  ...props
+}: ComponentProps<typeof FeatureFlagProvider>) => {
+  const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
+  const cloudProvider = useDefaultProvider()
+
+  const getConfigCatFlags = useCallback(
+    (userEmail?: string) => {
+      const customAttributes: Record<string, string> = {}
+      if (cloudProvider) customAttributes.cloud_provider = cloudProvider
+      if (selectedOrganization?.plan?.id) customAttributes.plan = selectedOrganization.plan.id
+      return getFlags(userEmail, customAttributes)
+    },
+    [cloudProvider, selectedOrganization?.plan?.id]
+  )
+
+  return (
+    <FeatureFlagProvider
+      {...props}
+      getConfigCatFlags={getConfigCatFlags}
+      organizationSlug={selectedOrganization?.slug ?? undefined}
+    >
+      {children}
+    </FeatureFlagProvider>
+  )
+}
+
+const TimestampInfoTimezoneBridge = ({ children }: { children: React.ReactNode }) => {
+  const { timezone } = useTimezone()
+  return <TimestampInfoProvider timezone={timezone}>{children}</TimestampInfoProvider>
+}
+
+configureMonacoLoader()
 
 // [Joshen TODO] Once we settle on the new nav layout - we'll need a lot of clean up in terms of our layout components
 // a lot of them are unnecessary and introduce way too many cluttered CSS especially with the height styles that make
@@ -77,106 +135,117 @@ loader.config({
 // the dashboard, all other layout components should not be doing that
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
-  const snap = useAppStateSnapshot()
   const queryClient = useRootQueryClient()
-  const consentToastId = useRef<string>()
-
-  // [Joshen] Some issues with using createBrowserSupabaseClient
-  const [supabase] = useState(() =>
-    IS_PLATFORM
-      ? createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
-        )
-      : undefined
-  )
+  const { appTitle } = useCustomContent(['app:title'])
+  const [isCLI, setIsCLI] = useState(false)
 
   const getLayout = Component.getLayout ?? ((page) => page)
 
-  const AuthContainer = useMemo(
-    // eslint-disable-next-line react/display-name
-    () => (props: any) => {
-      return IS_PLATFORM ? (
-        <SessionContextProvider supabaseClient={supabase as any}>
-          <AuthProvider>{props.children}</AuthProvider>
-        </SessionContextProvider>
-      ) : (
-        <AuthProvider>{props.children}</AuthProvider>
-      )
-    },
-    [supabase]
-  )
-
-  useEffect(() => {
-    // Check for telemetry consent
-    if (typeof window !== 'undefined') {
-      const onAcceptConsent = () => {
-        snap.setIsOptedInTelemetry(true)
-        if (consentToastId.current) toast.dismiss(consentToastId.current)
+  const errorBoundaryHandler = (error: Error, _info: ErrorInfo) => {
+    Sentry.withScope(function (scope) {
+      scope.setTag('globalErrorBoundary', true)
+      const eventId = Sentry.captureException(error)
+      // Attach the Sentry event ID to the error object so it can be accessed by the error boundary
+      if (eventId && error && typeof error === 'object') {
+        ;(error as any).sentryId = eventId
       }
+    })
 
-      const onOptOut = () => {
-        snap.setIsOptedInTelemetry(false)
-        if (consentToastId.current) toast.dismiss(consentToastId.current)
-      }
-
-      const hasAcknowledgedConsent = localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      if (IS_PLATFORM && hasAcknowledgedConsent === null) {
-        consentToastId.current = toast(
-          <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
-          {
-            id: 'consent-toast',
-            position: 'bottom-right',
-            duration: Infinity,
-          }
-        )
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    console.error(error.stack)
+  }
 
   useThemeSandbox()
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
+  // [Joshen] Should target hosted staging, local dev, and local CLI only
+  const isNonProdEnv = (IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') || isCLI
+
+  const checkCliEnvironment = async () => {
+    const data = await getCLIReleaseVersion()
+    if (!!data.current) setIsCLI(true)
+  }
+
+  useEffect(() => {
+    if (!IS_PLATFORM) checkCliEnvironment()
+  }, [])
+
   return (
     <QueryClientProvider client={queryClient}>
-      <Hydrate state={pageProps.dehydratedState}>
-        <AuthContainer>
-          <ProfileProvider>
-            <FlagProvider>
-              <Head>
-                <title>Supabase</title>
-                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-              </Head>
-              <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
-              <PageTelemetry>
-                <TooltipProvider>
-                  <RouteValidationWrapper>
-                    <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-                      <AppBannerContextProvider>
-                        <CommandMenuWrapper>
-                          <AppBannerWrapper>
-                            <FeaturePreviewContextProvider>
-                              {getLayout(<Component {...pageProps} />)}
-                              <FeaturePreviewModal />
-                            </FeaturePreviewContextProvider>
-                          </AppBannerWrapper>
-                        </CommandMenuWrapper>
-                      </AppBannerContextProvider>
-                    </ThemeProvider>
-                  </RouteValidationWrapper>
-                </TooltipProvider>
-              </PageTelemetry>
-
-              <HCaptchaLoadedStore />
-              <Toaster />
-              <PortalToast />
-              {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
-            </FlagProvider>
-          </ProfileProvider>
-        </AuthContainer>
-      </Hydrate>
+      <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
+        <NuqsAdapter>
+          <HydrationBoundary state={pageProps.dehydratedState}>
+            <AuthProvider>
+              <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
+                <ProfileProvider>
+                  <TimezoneProvider>
+                    <TimestampInfoTimezoneBridge>
+                      <Head>
+                        <title>{appTitle ?? 'Supabase'}</title>
+                        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                        <meta property="og:image" content={`${BASE_PATH}/img/supabase-og.png`} />
+                        <meta name="googlebot" content="notranslate" />
+                        {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
+                        <style
+                          dangerouslySetInnerHTML={{
+                            __html: `:root{--font-sans:${inter.style.fontFamily};--font-heading:${manrope.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
+                          }}
+                        />
+                        {/* Speed up initial API loading times by pre-connecting to the API domain */}
+                        {IS_PLATFORM && (
+                          <link
+                            rel="preconnect"
+                            href={new URL(API_URL).origin}
+                            crossOrigin="use-credentials"
+                          />
+                        )}
+                      </Head>
+                      <MetaFaviconsPagesRouter
+                        includeManifest
+                        applicationName="Supabase Studio"
+                        route={isNonProdEnv ? '/favicon/staging' : '/favicon'}
+                      />
+                      <TooltipProvider>
+                        <RouteValidationWrapper>
+                          <ThemeProvider>
+                            <DevToolbarProvider apiUrl={API_URL}>
+                              <AiAssistantStateContextProvider>
+                                <CommandProvider>
+                                  <BannerStackProvider>
+                                    <FeaturePreviewContextProvider>
+                                      <MainScrollContainerProvider>
+                                        {getLayout(<Component {...pageProps} />)}
+                                      </MainScrollContainerProvider>
+                                      <GlobalShortcuts />
+                                      <StudioCommandMenu />
+                                      <FeaturePreviewModal />
+                                      <IndirectTaxDeclarationModal />
+                                    </FeaturePreviewContextProvider>
+                                  </BannerStackProvider>
+                                  <Toaster />
+                                  <MonacoThemeProvider />
+                                </CommandProvider>
+                              </AiAssistantStateContextProvider>
+                              <DevToolbar extraTabs={devToolbarExtraTabs} />
+                              <DevToolbarTrigger />
+                            </DevToolbarProvider>
+                          </ThemeProvider>
+                        </RouteValidationWrapper>
+                      </TooltipProvider>
+                      <Telemetry />
+                      <ToastErrorTracker />
+                      {!isTestEnv && (
+                        <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
+                      )}
+                    </TimestampInfoTimezoneBridge>
+                  </TimezoneProvider>
+                </ProfileProvider>
+              </FeatureFlagProviderWithOrgContext>
+            </AuthProvider>
+          </HydrationBoundary>
+        </NuqsAdapter>
+        <TelemetryTagManager />
+      </ErrorBoundary>
     </QueryClientProvider>
   )
 }

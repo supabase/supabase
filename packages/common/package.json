@@ -1,32 +1,51 @@
 {
   "name": "common",
   "version": "0.0.0",
+  "type": "module",
   "main": "./index.tsx",
   "types": "./index.tsx",
   "license": "MIT",
   "scripts": {
-    "typecheck_CURRENTLY_IGNORED": "tsc --noEmit"
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo",
+    "gen:types": "supabase gen types typescript --local >| ./database-types.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@types/dat.gui": "^0.7.12",
-    "config": "*",
+    "@usercentrics/cmp-browser-sdk": "^4.42.0",
+    "api-types": "workspace:*",
+    "config": "workspace:*",
+    "configcat-js": "^9.5.1",
     "dat.gui": "^0.7.9",
-    "lodash": "^4.17.21",
-    "next-themes": "^0.2.1",
-    "react-hot-toast": "^2.4.1",
-    "react-use": "^17.4.0"
+    "flags": "^4.0.0",
+    "lodash": "catalog:",
+    "next-themes": "catalog:",
+    "posthog-js": "^1.391.2",
+    "react-use": "^17.4.0",
+    "valtio": "catalog:"
   },
   "devDependencies": {
-    "@types/react": "^18.2.24",
-    "@types/react-dom": "^18.2.8",
-    "tsconfig": "*",
-    "typescript": "^5.4.3"
+    "@types/lodash": "4.17.5",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@typescript/native": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
+    "lucide-react": "*",
+    "tsconfig": "workspace:*",
+    "type-fest": "5.6.0",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
-    "@supabase/supabase-js": "*",
-    "@supabase/gotrue-js": "^2.58.0",
-    "next": "*",
-    "react": "*",
-    "react-dom": "*"
+    "@supabase/auth-js": "catalog:",
+    "@supabase/supabase-js": "catalog:",
+    "lucide-react": "*",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
   }
 }

@@ -1,8 +1,5 @@
-import Table from 'components/to-be-cleaned/Table'
-import type { OAuthApp } from 'data/oauth/oauth-apps-query'
-import dayjs from 'dayjs'
-import { copyToClipboard } from 'lib/helpers'
-import { useState } from 'react'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Edit, MoreVertical, Trash } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -10,12 +7,17 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconCheck,
-  IconClipboard,
-  IconEdit,
-  IconMoreVertical,
-  IconTrash,
+  TableCell,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
+import CopyButton from '@/components/ui/CopyButton'
+import type { OAuthApp } from '@/data/oauth/oauth-apps-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export interface OAuthAppRowProps {
   app: OAuthApp
@@ -23,71 +25,96 @@ export interface OAuthAppRowProps {
   onSelectDelete: () => void
 }
 
-const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) => {
-  const [isCopied, setIsCopied] = useState(false)
+export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) => {
+  const { can: canUpdateOAuthApps } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'approved_oauth_apps'
+  )
+  const { can: canDeleteOAuthApps } = useAsyncCheckPermissions(
+    PermissionAction.DELETE,
+    'approved_oauth_apps'
+  )
 
   return (
-    <Table.tr>
-      <Table.td>
+    <TableRow>
+      <TableCell className="w-[62px] min-w-[62px] max-w-[62px]">
         <div
-          className="w-[30px] h-[30px] rounded-full bg-no-repeat bg-cover bg-center border border-control flex items-center justify-center"
+          className="w-[30px] h-[30px] rounded-full bg-no-repeat bg-cover bg-center border border-control flex items-center justify-center text-xs"
           style={{ backgroundImage: app.icon ? `url('${app.icon}')` : 'none' }}
         >
           {!!app.icon ? '' : `${app.name[0]}`}
         </div>
-      </Table.td>
-      <Table.td>
+      </TableCell>
+      <TableCell>
         <p title={app.name} className="truncate">
           {app.name}
         </p>
-      </Table.td>
-      <Table.td>
-        <div className="flex items-center">
-          <p className="font-mono truncate w-[220px]" title={app.client_id}>
+      </TableCell>
+      <TableCell>
+        <div className="flex items-center gap-x-2">
+          <p className="text-xs font-mono truncate" title={app.client_id}>
             {app.client_id}
           </p>
-          <Button
-            type="default"
-            icon={
-              isCopied ? <IconCheck className="text-brand" strokeWidth={3} /> : <IconClipboard />
-            }
-            className="ml-2 px-1"
-            onClick={() => {
-              copyToClipboard(app.client_id)
-              setIsCopied(true)
-              setTimeout(() => {
-                setIsCopied(false)
-              }, 3000)
-            }}
-          />
+          <CopyButton variant="default" iconOnly text={app.client_id ?? ''} className="px-1" />
         </div>
-      </Table.td>
-      <Table.td>
-        <span className="font-mono" title={app.client_secret_alias}>
-          {app.client_secret_alias}...
-        </span>
-      </Table.td>
-      <Table.td>{dayjs(app.created_at).format('DD/MM/YYYY, HH:mm:ss')}</Table.td>
-      <Table.td align="right">
+      </TableCell>
+      <TableCell>
+        <TimestampInfo
+          utcTimestamp={app.created_at ?? ''}
+          labelFormat="DD/MM/YYYY, HH:mm:ss"
+          className="text-sm"
+        />
+      </TableCell>
+      <TableCell className="text-right">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="default" icon={<IconMoreVertical />} className="px-1" />
+            <Button variant="default" icon={<MoreVertical />} className="px-1" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" side="bottom">
-            <DropdownMenuItem className="space-x-2" key="edit" onClick={() => onSelectEdit()}>
-              <IconEdit />
-              <p>Edit app</p>
-            </DropdownMenuItem>
+          <DropdownMenuContent align="end" side="bottom" className="w-32">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuItem
+                  key="edit"
+                  disabled={!canUpdateOAuthApps}
+                  className="space-x-2 pointer-events-auto!"
+                  onClick={() => {
+                    if (canUpdateOAuthApps) onSelectEdit()
+                  }}
+                >
+                  <Edit size={16} />
+                  <p>Edit app</p>
+                </DropdownMenuItem>
+              </TooltipTrigger>
+              {!canUpdateOAuthApps && (
+                <TooltipContent side="left">
+                  You need additional permissions to edit apps
+                </TooltipContent>
+              )}
+            </Tooltip>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="space-x-2" key="delete" onClick={() => onSelectDelete()}>
-              <IconTrash />
-              <p>Delete app</p>
-            </DropdownMenuItem>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuItem
+                  disabled={!canDeleteOAuthApps}
+                  className="space-x-2 pointer-events-auto!"
+                  key="delete"
+                  onClick={() => {
+                    if (canDeleteOAuthApps) onSelectDelete()
+                  }}
+                >
+                  <Trash size={16} />
+                  <p>Delete app</p>
+                </DropdownMenuItem>
+              </TooltipTrigger>
+              {!canDeleteOAuthApps && (
+                <TooltipContent side="left">
+                  You need additional permissions to delete apps
+                </TooltipContent>
+              )}
+            </Tooltip>
           </DropdownMenuContent>
         </DropdownMenu>
-      </Table.td>
-    </Table.tr>
+      </TableCell>
+    </TableRow>
   )
 }
-
-export default OAuthAppRow
