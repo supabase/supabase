@@ -1,11 +1,8 @@
 import { motion } from 'framer-motion'
-import { ChevronLeft, MessageSquare, NotebookText, Plus } from 'lucide-react'
-import { type ComponentType, type PropsWithChildren } from 'react'
-import { Button, cn } from 'ui'
+import { MessageSquare, NotebookText } from 'lucide-react'
+import { type ComponentType, type PropsWithChildren, type ReactNode } from 'react'
+import { cn } from 'ui'
 import { InnerSideBarFilters, InnerSideBarFilterSearchInput } from 'ui-patterns/InnerSideMenu'
-
-import { useCreateChat, useCreateNotebook } from '@/components/interfaces/Explorer/hooks'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 export type ExplorerResourceType = 'notebook' | 'chat'
 
@@ -29,7 +26,7 @@ export const EXPLORER_SECTIONS: Array<{
 
 export const rowClassName = (isActive: boolean) =>
   cn(
-    'group relative flex h-7 w-full items-center gap-2 rounded-md pl-3 pr-2 text-sm',
+    'group relative flex h-7 w-full items-center gap-2 rounded-md px-2 text-sm',
     isActive
       ? 'bg-selection text-foreground'
       : 'text-foreground-light hover:bg-surface-200 hover:text-foreground'
@@ -38,21 +35,19 @@ export const rowClassName = (isActive: boolean) =>
 export const ExplorerNavResourceWrapper = ({
   type,
   label,
+  header,
   className,
   children,
   search,
   setSearch,
-  onBack,
 }: PropsWithChildren<{
   type: ExplorerResourceType
   label?: string
+  header: ReactNode
   className?: string
   search?: string
   setSearch: (value: string) => void
-  onBack: () => void
 }>) => {
-  const { createNotebook } = useCreateNotebook()
-  const { createChat } = useCreateChat()
   const searchPlaceholder = EXPLORER_SECTIONS.find((x) => x.type === type)?.searchPlaceholder
 
   return (
@@ -65,15 +60,8 @@ export const ExplorerNavResourceWrapper = ({
       transition={LEVEL_TRANSITION}
       className={cn('absolute inset-0 flex flex-col', className)}
     >
-      <div className="flex items-center gap-2 p-3 pb-2">
-        <Button
-          size="tiny"
-          variant="outline"
-          aria-label="Back"
-          onClick={onBack}
-          className="size-7 shrink-0 px-0"
-          icon={<ChevronLeft />}
-        />
+      {header}
+      <div className="px-4 py-2">
         <span id="explorer-sidebar-search-label" className="sr-only">
           {searchPlaceholder}
         </span>
@@ -86,18 +74,6 @@ export const ExplorerNavResourceWrapper = ({
             onChange={(event) => setSearch(event.target.value)}
           />
         </InnerSideBarFilters>
-        <ButtonTooltip
-          size="tiny"
-          variant="outline"
-          aria-label={`New ${type}`}
-          className="size-7 shrink-0 px-0"
-          icon={<Plus />}
-          tooltip={{ content: { side: 'bottom', text: `New ${type}` } }}
-          onClick={() => {
-            if (type === 'notebook') createNotebook()
-            if (type === 'chat') createChat()
-          }}
-        />
       </div>
       {children}
     </motion.div>

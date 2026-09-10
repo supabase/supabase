@@ -52,7 +52,7 @@ vi.mock('@/state/ai-assistant-state', () => ({
 
 describe('ExplorerNavChats', () => {
   it('filters support chats, safely sorts rehydrated chats, and marks the route active', () => {
-    customRender(<ExplorerNavChats onBack={vi.fn()} />)
+    customRender(<ExplorerNavChats header={null} />)
 
     const chatButtons = screen.getAllByRole('button')
     expect(chatButtons.map((button) => button.textContent)).toEqual([

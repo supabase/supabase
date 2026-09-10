@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { NotebookText } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { ReactNode, useMemo, useState } from 'react'
 import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -45,7 +45,7 @@ const NotebookListItem = ({
   )
 }
 
-export const ExplorerNavNotebooks = ({ onBack }: { onBack: () => void }) => {
+export const ExplorerNavNotebooks = ({ header }: { header: ReactNode }) => {
   const router = useRouter()
   const { ref, id } = useParams()
 
@@ -76,11 +76,11 @@ export const ExplorerNavNotebooks = ({ onBack }: { onBack: () => void }) => {
   return (
     <ExplorerNavResourceWrapper
       type="notebook"
+      header={header}
       search={search}
       setSearch={setSearch}
-      onBack={onBack}
     >
-      <div className="flex flex-1 min-h-0 flex-col px-3 pb-3">
+      <div className="flex flex-1 min-h-0 flex-col px-4 pb-3">
         {isPending ? (
           <GenericSkeletonLoader />
         ) : notebooks.length === 0 ? (
