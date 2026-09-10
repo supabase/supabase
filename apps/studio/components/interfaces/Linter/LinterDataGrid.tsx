@@ -196,7 +196,7 @@ export const LinterDataGrid = ({
                 <LintCategoryBadge category={selectedLint.categories[0]} />
               </div>
               <ShortcutTooltip shortcutId={SHORTCUT_IDS.ADVISORS_CLOSE_DETAIL} side="left">
-                <Button variant="text" icon={<X />} onClick={handleSidepanelClose} />
+                <Button variant="text" icon={<X />} onClick={handleSidepanelClose} aria-label="Close lint details panel"/>
               </ShortcutTooltip>
             </div>
             <div className="p-6 flex-grow min-h-0 overflow-y-auto">
