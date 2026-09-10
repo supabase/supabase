@@ -19,7 +19,7 @@ export const ComputeEmptyState = ({ onDeploy }: ComputeEmptyStateProps) => {
   return (
     <EmptyStatePresentational
       icon={BoxPlus}
-      title="Deploy your first instance"
+      title="Deploy your first Compute instance"
       description="Spin up a Compute instance locally, then deploy it to the cloud. Dockerfile, Node.js and Deno supported at Private Alpha."
     >
       <ButtonTooltip
@@ -37,7 +37,7 @@ export const ComputeEmptyState = ({ onDeploy }: ComputeEmptyStateProps) => {
           },
         }}
       >
-        Deploy an instance
+        Deploy
       </ButtonTooltip>
     </EmptyStatePresentational>
   )

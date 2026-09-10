@@ -86,7 +86,7 @@ describe('/project/[ref]/compute', () => {
 
     await renderComputePage()
 
-    expect(screen.getByText('Deploy your first instance')).toBeVisible()
+    expect(screen.getByText('Deploy your first Compute instance')).toBeVisible()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
   })
 

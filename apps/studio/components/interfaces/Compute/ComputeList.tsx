@@ -140,7 +140,7 @@ export const ComputeList = ({
             Refresh
           </Button>
           <Button variant="primary" icon={<Terminal />} onClick={onDeploy}>
-            Deploy an instance
+            Deploy
           </Button>
         </div>
       </div>

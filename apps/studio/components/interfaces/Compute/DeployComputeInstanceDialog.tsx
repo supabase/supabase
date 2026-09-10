@@ -88,7 +88,7 @@ export const DeployComputeInstanceDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="large">
         <DialogHeader>
-          <DialogTitle>Deploy an instance</DialogTitle>
+          <DialogTitle>Deploy</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />

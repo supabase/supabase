@@ -25,7 +25,7 @@ const ICON_MAP: Partial<Record<(typeof LOG_TYPES)[number], IconComponent>> = {
   supavisor: Cable,
   pgbouncer: Cable,
   multigres: Network,
-  workers: Compute,
+  compute: Compute,
 }
 
 export const LogTypeIcon = ({
