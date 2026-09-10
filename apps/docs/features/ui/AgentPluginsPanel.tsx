@@ -169,6 +169,38 @@ function PluginInstructions({ client }: { client: PluginClient }) {
       </div>
     )
   }
+  if (client.key === 'omp') {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-foreground-light">
+          omp reads the Claude Code plugin format, so install the Supabase plugin from the{' '}
+          <a
+            href="https://github.com/anthropics/claude-plugins-official"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-link hover:underline"
+          >
+            official Anthropic marketplace
+          </a>
+          :
+        </p>
+        <CodeBlock
+          value={`omp plugin marketplace add anthropics/claude-plugins-official\nomp plugin install supabase@claude-plugins-official`}
+          language="bash"
+          focusable={false}
+          className="block"
+        />
+        <p className="text-xs text-foreground-lighter">
+          Installs with <code>--scope user</code> by default, making it available across all your
+          projects. Use <code>--scope project</code> to install it for the current project only.
+        </p>
+        <p className="text-xs text-foreground-lighter">
+          Inside a session, run <code>/marketplace</code> to browse plugins, then{' '}
+          <code>/reload-plugins</code> after installing to load the skills and MCP server.
+        </p>
+      </div>
+    )
+  }
 
   if (client.key === 'vscode') {
     return (

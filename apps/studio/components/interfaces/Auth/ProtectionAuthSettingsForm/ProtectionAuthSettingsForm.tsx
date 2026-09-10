@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -33,7 +33,6 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
-import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { NoPermission } from '@/components/ui/NoPermission'
@@ -50,22 +49,6 @@ const CAPTCHA_PROVIDERS = [
 type CaptchaProviders = 'hcaptcha' | 'turnstile'
 
 const baseSchema = z.object({
-  DISABLE_SIGNUP: z.boolean(),
-  EXTERNAL_ANONYMOUS_USERS_ENABLED: z.boolean(),
-  SECURITY_MANUAL_LINKING_ENABLED: z.boolean(),
-  SITE_URL: z.string().min(1, 'Must have a Site URL'),
-  PASSWORD_MIN_LENGTH: z
-    .preprocess(
-      (val) => (val === '' || val == null ? undefined : val),
-      z.coerce
-        .number({
-          required_error: 'Must have a password min length',
-          invalid_type_error: 'Must have a password min length',
-        })
-        .min(6, 'Must be greater or equal to 6.')
-    )
-    .optional(),
-  PASSWORD_REQUIRED_CHARACTERS: z.string().optional(),
   PASSWORD_HIBP_ENABLED: z.boolean().optional(),
 })
 
@@ -83,7 +66,7 @@ const captchaDisabledSchema = z
   .object({
     SECURITY_CAPTCHA_ENABLED: z.literal(false),
     SECURITY_CAPTCHA_SECRET: z.string().optional(),
-    SECURITY_CAPTCHA_PROVIDER: z.string().optional(),
+    SECURITY_CAPTCHA_PROVIDER: z.enum(['hcaptcha', 'turnstile']).optional(),
   })
   .merge(baseSchema)
 
@@ -122,15 +105,9 @@ export const ProtectionAuthSettingsForm = () => {
   const protectionForm = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      DISABLE_SIGNUP: true,
-      EXTERNAL_ANONYMOUS_USERS_ENABLED: false,
-      SECURITY_MANUAL_LINKING_ENABLED: false,
-      SITE_URL: '',
       SECURITY_CAPTCHA_ENABLED: false,
       SECURITY_CAPTCHA_SECRET: '',
       SECURITY_CAPTCHA_PROVIDER: 'hcaptcha',
-      PASSWORD_MIN_LENGTH: 6,
-      PASSWORD_REQUIRED_CHARACTERS: NO_REQUIRED_CHARACTERS,
       PASSWORD_HIBP_ENABLED: false,
     },
   })
@@ -142,47 +119,17 @@ export const ProtectionAuthSettingsForm = () => {
       const SECURITY_CAPTCHA_PROVIDER = (authConfig.SECURITY_CAPTCHA_PROVIDER ||
         'hcaptcha') as CaptchaProviders
 
-      if (authConfig.SECURITY_CAPTCHA_ENABLED) {
-        protectionForm.reset({
-          DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
-          EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED || false,
-          SECURITY_MANUAL_LINKING_ENABLED: authConfig.SECURITY_MANUAL_LINKING_ENABLED || false,
-          SITE_URL: authConfig.SITE_URL || '',
-          SECURITY_CAPTCHA_ENABLED: authConfig.SECURITY_CAPTCHA_ENABLED,
-          SECURITY_CAPTCHA_SECRET: authConfig.SECURITY_CAPTCHA_SECRET || '',
-          SECURITY_CAPTCHA_PROVIDER,
-          PASSWORD_MIN_LENGTH: authConfig.PASSWORD_MIN_LENGTH || 6,
-          PASSWORD_REQUIRED_CHARACTERS:
-            authConfig.PASSWORD_REQUIRED_CHARACTERS || NO_REQUIRED_CHARACTERS,
-          PASSWORD_HIBP_ENABLED: authConfig.PASSWORD_HIBP_ENABLED || false,
-        })
-      } else {
-        protectionForm.reset({
-          DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
-          EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED || false,
-          SECURITY_MANUAL_LINKING_ENABLED: authConfig.SECURITY_MANUAL_LINKING_ENABLED || false,
-          SITE_URL: authConfig.SITE_URL || '',
-          SECURITY_CAPTCHA_ENABLED: authConfig.SECURITY_CAPTCHA_ENABLED,
-          SECURITY_CAPTCHA_SECRET: authConfig.SECURITY_CAPTCHA_SECRET || '',
-          SECURITY_CAPTCHA_PROVIDER,
-          PASSWORD_MIN_LENGTH: authConfig.PASSWORD_MIN_LENGTH || 6,
-          PASSWORD_REQUIRED_CHARACTERS:
-            authConfig.PASSWORD_REQUIRED_CHARACTERS || NO_REQUIRED_CHARACTERS,
-          PASSWORD_HIBP_ENABLED: authConfig.PASSWORD_HIBP_ENABLED || false,
-        })
-      }
+      protectionForm.reset({
+        SECURITY_CAPTCHA_ENABLED: authConfig.SECURITY_CAPTCHA_ENABLED,
+        SECURITY_CAPTCHA_SECRET: authConfig.SECURITY_CAPTCHA_SECRET || '',
+        SECURITY_CAPTCHA_PROVIDER,
+        PASSWORD_HIBP_ENABLED: authConfig.PASSWORD_HIBP_ENABLED || false,
+      })
     }
   }, [authConfig, isUpdatingConfig])
 
-  const onSubmitProtection = (values: any) => {
-    const payload = { ...values }
-    payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
-    // The backend uses empty string to represent no required characters in the password
-    if (payload.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS) {
-      payload.PASSWORD_REQUIRED_CHARACTERS = ''
-    }
-
-    updateAuthConfig({ projectRef: projectRef!, config: payload })
+  const onSubmitProtection: SubmitHandler<z.infer<typeof formSchema>> = (values) => {
+    updateAuthConfig({ projectRef: projectRef!, config: values })
   }
 
   const SECURITY_CAPTCHA_ENABLED = useWatch({
@@ -243,6 +190,7 @@ export const ProtectionAuthSettingsForm = () => {
                     >
                       <FormControl>
                         <Switch
+                          aria-label="Toggle Captcha protection"
                           checked={field.value}
                           onCheckedChange={field.onChange}
                           disabled={!canUpdateConfig}

@@ -34,8 +34,8 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const isPlatformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
-  const isDatabaseConnectionsEnabled = useFlag('topForPostgres')
   const isExplorerEnabled = useFlag('explorer')
+  const isStorageVersioningEnabled = useFlag('storageVersioningPrivateAlpha')
 
   const isSqlEditorManualSaveForced = useFlag('sqlEditorManualSaveForced')
 
@@ -139,16 +139,14 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         isForced: isSqlEditorManualSaveForced,
       },
       {
-        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS,
-        name: 'Diagnose blocked queries',
-        category: 'observability',
-        discussionsUrl: 'https://github.com/orgs/supabase/discussions/48639',
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING,
+        name: 'Storage versioning',
+        discussionsUrl: undefined,
         isNew: true,
-        isPlatformOnly: false,
-        isDefaultOptIn: isDatabaseConnectionsEnabled,
-        enabled: true,
-        getRoute: (ref?: string) => `/project/${ref}/observability/connections`,
-        bannerId: 'database-connections-banner',
+        isPlatformOnly: true,
+        isDefaultOptIn: true,
+        enabled: isStorageVersioningEnabled,
+        getRoute: (ref?: string) => `/project/${ref}/storage/files`,
       },
     ]
 
@@ -158,7 +156,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
     isPlatformWebhooksEnabled,
     jitDbAccessEnabled,
     isMarketplaceEnabled,
-    isDatabaseConnectionsEnabled,
     isExplorerEnabled,
+    isStorageVersioningEnabled,
   ])
 }

@@ -125,7 +125,9 @@ export const QueuesTab = () => {
               >
                 Refresh
               </Button>
-              <Button onClick={() => setCreateQueueSheetShown(true)}>Create queue</Button>
+              <Button variant="primary" onClick={() => setCreateQueueSheetShown(true)}>
+                Create queue
+              </Button>
             </div>
           </div>
 

@@ -189,9 +189,6 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const rowLimit = query._tag === 'database' ? query.rowLimit : undefined
   const databaseIdentifier = query._tag === 'database' ? query.database_identifier : undefined
 
-  const { x_column, y_series } = display?.chart ?? {}
-  const hasConfig = !!x_column && (y_series ?? []).length > 0
-
   const [promptInput, setPromptInput] = useState('')
   const [pendingRun, setPendingRun] = useState<{ sql: string; issues: PotentialIssues }>()
   const [pendingProposal, setPendingProposal] = useState<PendingProposal | null>(null)
@@ -392,16 +389,8 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     return () => node.removeEventListener('keydown', handleEscapeKey)
   }, [promptState?.isOpen])
 
-  const shouldCenterResults =
-    !result?.error && ((result?.rows ?? []).length === 0 || (view === 'chart' && !hasConfig))
-
   const queryResults = (
-    <ExplorerQueryResults
-      className={cn(
-        variant === 'embedded' ? 'max-h-80' : 'h-full',
-        shouldCenterResults ? 'items-center justify-center' : 'overflow-x-auto'
-      )}
-    >
+    <ExplorerQueryResults className={cn(variant === 'embedded' ? 'max-h-80' : 'h-full')}>
       <QueryResultRenderer
         view={view}
         result={result}

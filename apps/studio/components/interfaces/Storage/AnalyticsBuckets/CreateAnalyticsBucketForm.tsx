@@ -260,6 +260,7 @@ export const CreateAnalyticsBucketForm = ({
           Cancel
         </Button>
         <Button
+          variant="primary"
           form={formId}
           type="submit"
           loading={isCreating}

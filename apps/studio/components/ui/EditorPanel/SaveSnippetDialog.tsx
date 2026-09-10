@@ -108,7 +108,7 @@ export const SaveSnippetDialog = ({ open, sql, onOpenChange, onSave }: SaveSnipp
           <Button variant="default" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button disabled={!name.trim()} onClick={handleSave}>
+          <Button variant="primary" disabled={!name.trim()} onClick={handleSave}>
             Save snippet
           </Button>
         </DialogFooter>
