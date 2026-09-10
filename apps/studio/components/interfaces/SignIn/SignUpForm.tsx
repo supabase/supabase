@@ -225,6 +225,7 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
             </div>
 
             <Button
+              variant="primary"
               block
               form={formId}
               type="submit"

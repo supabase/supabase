@@ -122,7 +122,6 @@ function renderScreen(props: Partial<Parameters<typeof AwsMarketplaceOnboardingS
 
 describe('AwsMarketplaceOnboardingScreen', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     window.localStorage.clear()
   })
 

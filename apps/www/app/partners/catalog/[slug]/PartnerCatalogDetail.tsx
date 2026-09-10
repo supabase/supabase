@@ -142,7 +142,12 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
                 <h1 className="h1 mb-0!">{partner.title}</h1>
               </div>
               {installHref && (
-                <Button asChild size="medium" iconRight={<ArrowUpRight strokeWidth={1.5} />}>
+                <Button
+                  variant="primary"
+                  asChild
+                  size="medium"
+                  iconRight={<ArrowUpRight strokeWidth={1.5} />}
+                >
                   <a href={installHref} target="_blank" rel="noreferrer">
                     {activeListing.publishedInMarketplace
                       ? 'Install integration'
@@ -295,7 +300,7 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
                   </div>
                 </div>
                 {installHref && (
-                  <Button asChild>
+                  <Button variant="primary" asChild>
                     <a href={installHref} target="_blank" rel="noreferrer">
                       {activeListing.publishedInMarketplace
                         ? 'Install integration'
@@ -311,7 +316,7 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
         <div className="border-t bg-background">
           <SectionContainerWithCn className="mx-auto max-w-2xl flex flex-col items-center gap-6 py-24 px-6 text-center">
             <h2 className="h2 text-balance">Interested in partnering with Supabase?</h2>
-            <Button asChild size="medium">
+            <Button variant="primary" asChild size="medium">
               <Link href="/partners#become-a-partner">Become a partner</Link>
             </Button>
           </SectionContainerWithCn>
