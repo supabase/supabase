@@ -27,8 +27,8 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_JIT_DB_ACCESS: 'supabase-ui-jit-db-access',
   UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE: 'supabase-ui-sql-editor-manual-save',
   UI_PREVIEW_MARKETPLACE: 'supabase-ui-marketplace',
-  UI_PREVIEW_DATABASE_CONNECTIONS: 'preview-database-connections',
   UI_PREVIEW_EXPLORER: 'preview-explorer',
+  UI_PREVIEW_STORAGE_VERSIONING: 'supabase-ui-storage-versioning',
 
   AI_ASSISTANT_MCP_OPT_IN: 'ai-assistant-mcp-opt-in',
 
@@ -56,6 +56,7 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_TEMPORARY_FROM_EXPLORER: (ref: string) => `sql-editor-temporary-from-explorer-${ref}`,
 
   EXPLORER_QUERY_DRAFTS: (ref: string) => `explorer-query-drafts-${ref}`,
+  NOTEBOOK_DRAFTS: (ref: string) => `notebook-drafts-${ref}`,
 
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
   GRAPHQL_INTROSPECTION_NOTICE_COLLAPSED: (ref: string) =>
@@ -113,8 +114,6 @@ export const LOCAL_STORAGE_KEYS = {
 
   PROJECT_SECURITY_DISMISSED_AT: (ref: string) => `project-security-dismissed-at-${ref}`,
 
-  DATABASE_CONNECTIONS_BANNER_DISMISSED: (ref: string) =>
-    `database-connections-banner-dismissed-${ref}`,
   ORGANIZATION_MARKETPLACE_BANNER_DISMISSED: (orgSlug: string, managedBy: string) =>
     `organization-marketplace-banner-dismissed-${orgSlug}-${managedBy}`,
   PROJECT_INTEGRATION_BANNER_DISMISSED: (ref: string, integrationSource: string) =>
@@ -172,6 +171,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE,
   LOCAL_STORAGE_KEYS.SQL_EDITOR_MANUAL_SAVE_NOTICE_DISMISSED,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING,
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,

@@ -1526,33 +1526,6 @@ export interface DatabaseConnectionsLiveModeClickedEvent {
 }
 
 /**
- * User clicked the dismiss button on the Database Connections banner in studio project pages.
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/observability/connections
- */
-export interface DatabaseConnectionsBannerDismissButtonClickedEvent {
-  action: 'database_connections_banner_dismiss_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked the CTA button on the Database Connections banner in studio project pages.
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/observability/connections
- */
-export interface DatabaseConnectionsBannerCtaButtonClickedEvent {
-  action: 'database_connections_banner_cta_button_clicked'
-  properties: {
-    isEnabled: boolean
-  }
-  groups: TelemetryGroups
-}
-
-/**
  * The Explorer feature preview banner was rendered in studio project pages, fired at most once
  * per page load. Acts as the denominator for the banner's dismiss and CTA rates; dedupe per
  * session or per user at query time.
@@ -2375,7 +2348,7 @@ export interface HomeConnectActionClickedEvent {
     /**
      * The connect action/tile that was clicked
      */
-    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'server' | 'api_keys'
+    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'server' | 'warehouse' | 'api_keys'
   }
   groups: TelemetryGroups
 }
@@ -3534,6 +3507,27 @@ export interface AccessTokenCreatedEvent {
 }
 
 /**
+ * Triggered when the access token creation sheet is closed before a token was created, either by
+ * the user (Escape, outside click, or Cancel) or because the permissions map failed to load and
+ * forced the sheet shut. The token created step blocks non-safe closes, so this event never fires
+ * for a completed creation.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens
+ */
+export interface AccessTokenCreationSheetDismissedEvent {
+  action: 'access_token_creation_sheet_dismissed'
+  properties: {
+    resourceAccess: 'project' | 'organization' | 'account'
+    formStep: 'form' | 'review'
+    isFormTouched: boolean
+    trigger: 'user' | 'permissions_load_error'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * Triggered when an access token is successfully deleted.
  *
  * @group Events
@@ -3544,6 +3538,57 @@ export interface AccessTokenRemovedEvent {
   action: 'access_token_removed'
   properties: {
     tokenType: 'classic' | 'scoped'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when the copy button is used on the token value shown after creation. The value is
+ * only ever displayed once, so this measures how many users leave with a usable token.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens (token created step of the generate token sheet)
+ */
+export interface AccessTokenCopiedEvent {
+  action: 'access_token_copied'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when the "I have copied the key and stored it securely" checkbox is toggled on the
+ * token created step. `isChecked` is the resulting state, so unticking is tracked too.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens (token created step of the generate token sheet)
+ */
+export interface AccessTokenStoredCheckboxClickedEvent {
+  action: 'access_token_stored_checkbox_clicked'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+    /** The state the checkbox was toggled into */
+    isChecked: boolean
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when the "Done" button dismisses the token created step, completing the creation flow.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens (token created step of the generate token sheet)
+ */
+export interface AccessTokenDoneButtonClickedEvent {
+  action: 'access_token_done_button_clicked'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+    /** Whether the copy button was used before finishing, as opposed to copying the value manually */
+    hasCopiedToken: boolean
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -3636,6 +3681,7 @@ export interface UnifiedLogsRowClickedEvent {
       | 'supavisor'
       | 'pgbouncer'
       | 'multigres'
+      | 'workers'
   }
   groups: TelemetryGroups
 }
@@ -3912,8 +3958,6 @@ export type TelemetryEvent =
   | DatabaseConnectionsOverviewMetricCardClickedEvent
   | DatabaseConnectionsFilterUpdatedEvent
   | DatabaseConnectionsBlockerViewClickedEvent
-  | DatabaseConnectionsBannerDismissButtonClickedEvent
-  | DatabaseConnectionsBannerCtaButtonClickedEvent
   | ExplorerBannerExposedEvent
   | ExplorerBannerDismissButtonClickedEvent
   | ExplorerBannerCtaButtonClickedEvent
@@ -4008,7 +4052,11 @@ export type TelemetryEvent =
   | UpgradeCtaClickedEvent
   | PricingPanelPlanPresentationExperimentExposedEvent
   | AccessTokenCreatedEvent
+  | AccessTokenCreationSheetDismissedEvent
   | AccessTokenRemovedEvent
+  | AccessTokenCopiedEvent
+  | AccessTokenStoredCheckboxClickedEvent
+  | AccessTokenDoneButtonClickedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
   | ResourceExhaustionBannerAiAssistantClickedEvent
   | UnifiedLogsRowClickedEvent

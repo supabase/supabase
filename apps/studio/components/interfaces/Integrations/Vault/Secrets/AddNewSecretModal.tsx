@@ -177,6 +177,7 @@ export const AddNewSecretModal = () => {
             Cancel
           </Button>
           <Button
+            variant="primary"
             form={formId}
             type="submit"
             disabled={!isDirty || isSubmitting}

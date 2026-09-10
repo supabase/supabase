@@ -218,7 +218,9 @@ export function VercelConnectionError({
         <Button asChild variant="default">
           <Link href={`/project/${projectRef}`}>Open project</Link>
         </Button>
-        <Button onClick={onRetry}>Retry connection</Button>
+        <Button variant="primary" onClick={onRetry}>
+          Retry connection
+        </Button>
       </div>
     </div>
   )

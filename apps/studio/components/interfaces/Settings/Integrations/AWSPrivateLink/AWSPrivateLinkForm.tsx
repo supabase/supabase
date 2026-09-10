@@ -269,7 +269,7 @@ export const AWSPrivateLinkForm = ({
                   >
                     Cancel
                   </Button>
-                  <Button form={FORM_ID} type="submit" loading={isPending}>
+                  <Button variant="primary" form={FORM_ID} type="submit" loading={isPending}>
                     Add connection
                   </Button>
                 </>

@@ -9,13 +9,14 @@ import { absoluteUrl } from '@/lib/utils'
 import '@/styles/code-block-variables.css'
 import '@/styles/mdx.css'
 
-import { allDocs } from 'contentlayer/generated'
 import { ChevronRight } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Balancer from 'react-wrap-balancer'
 import { ScrollArea, Separator } from 'ui'
+
+import { allDocs } from '@/.velite'
 
 interface DocPageProps {
   params: Promise<{
@@ -83,7 +84,7 @@ export default async function DocPage(props: DocPageProps) {
     notFound()
   }
 
-  const toc = await getTableOfContents(doc.body.raw)
+  const toc = await getTableOfContents(doc.raw)
   const breadcrumbSegments = getBreadcrumbSegments(doc)
 
   return (
@@ -128,7 +129,7 @@ export default async function DocPage(props: DocPageProps) {
         <Separator className="mb-6" />
         <SourcePanel doc={doc} />
         <div className="pb-12">
-          <Mdx code={doc.body.code} />
+          <Mdx code={doc.code} />
         </div>
         <DocsPager doc={doc} />
       </div>

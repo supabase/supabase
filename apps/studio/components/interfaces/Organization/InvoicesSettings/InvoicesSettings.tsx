@@ -90,7 +90,11 @@ export const InvoicesSettings = () => {
   const fetchInvoice = async (id: string) => {
     try {
       const invoice = await getInvoice({ invoiceId: id, slug })
-      if (invoice?.invoice_pdf) window.open(invoice.invoice_pdf, '_blank')
+      if (invoice?.invoice_pdf) {
+        window.open(invoice.invoice_pdf, '_blank')
+      } else {
+        toast.error('Invoice PDF is not available yet. Please try again later.')
+      }
     } catch (error: any) {
       toast.error(`Failed to fetch the selected invoice: ${error.message}`)
     }
@@ -171,6 +175,10 @@ export const InvoicesSettings = () => {
           ) : (
             <>
               {invoices.map((x) => {
+                // invoice_pdf can be null. Not reflected in the generated schema yet, but will
+                // be soon
+                const hasInvoicePdf = Boolean(x.invoice_pdf)
+
                 return (
                   <TableRow key={x.id}>
                     <TableCell className="w-2">
@@ -208,8 +216,17 @@ export const InvoicesSettings = () => {
                           variant="outline"
                           className="w-7"
                           icon={<ScrollText size={16} strokeWidth={1.5} />}
+                          aria-label="Download invoice"
+                          disabled={!hasInvoicePdf}
                           onClick={() => fetchInvoice(x.id)}
-                          tooltip={{ content: { side: 'bottom', text: 'Download invoice' } }}
+                          tooltip={{
+                            content: {
+                              side: 'bottom',
+                              text: hasInvoicePdf
+                                ? 'Download invoice'
+                                : 'Invoice PDF is not available yet. Please try again later.',
+                            },
+                          }}
                         />
 
                         {x.status === InvoiceStatus.PAID && x.amount_due > 0 && (
@@ -217,6 +234,7 @@ export const InvoicesSettings = () => {
                             variant="outline"
                             className="w-7"
                             icon={<Receipt size={16} strokeWidth={1.5} />}
+                            aria-label="Download receipt"
                             onClick={() => fetchReceipt(x.id)}
                             tooltip={{ content: { side: 'bottom', text: 'Download receipt' } }}
                           />

@@ -33,7 +33,7 @@ import type {
   CreateColumnPayload,
   UpdateColumnPayload,
 } from '../SidePanelEditor.types'
-import ColumnDefaultValue from './ColumnDefaultValue'
+import { ColumnDefaultValue } from './ColumnDefaultValue'
 import {
   generateColumnField,
   generateColumnFieldFromPGColumn,

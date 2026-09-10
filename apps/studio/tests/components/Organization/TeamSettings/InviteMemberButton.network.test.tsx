@@ -2,7 +2,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components, operations } from 'api-types'
 import { HttpResponse } from 'msw'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { InviteMemberButton } from '@/components/interfaces/Organization/TeamSettings/InviteMemberButton'
 import type { ProfileContextType } from '@/lib/profile'
@@ -179,10 +179,6 @@ async function openDialog() {
 }
 
 describe('InviteMemberButton (network)', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   test('renders each role with its permission description and a roles docs link', async () => {
     setupMocks()
     customRender(<InviteMemberButton />, { profileContext: PROFILE_CONTEXT })

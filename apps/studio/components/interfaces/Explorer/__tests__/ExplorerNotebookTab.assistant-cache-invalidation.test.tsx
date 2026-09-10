@@ -231,7 +231,7 @@ describe('ExplorerNotebookTab — assistant cache invalidation', () => {
 
     await waitFor(() => expect(mutationCount).toBe(1))
     expect(
-      screen.queryByRole('dialog', { name: 'Assistant changes detected' })
+      screen.queryByRole('dialog', { name: 'Notebook changed on the server' })
     ).not.toBeInTheDocument()
   })
 
@@ -239,13 +239,13 @@ describe('ExplorerNotebookTab — assistant cache invalidation', () => {
     {
       type: 'updated' as const,
       description:
-        "An assistant updated this notebook after your local changes. Saving will overwrite the assistant's update.",
+        'This notebook changed on the server after your local changes. Saving will overwrite those changes.',
       saveLabel: 'Save anyway',
     },
     {
       type: 'deleted' as const,
       description:
-        'An assistant deleted this notebook after your local changes. Saving will recreate it.',
+        'This notebook was deleted on the server after your local changes. Saving will recreate it.',
       saveLabel: 'Recreate',
     },
   ])('shows the $type conflict copy before saving', async ({ type, description, saveLabel }) => {
@@ -261,7 +261,7 @@ describe('ExplorerNotebookTab — assistant cache invalidation', () => {
 
     await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
 
-    const dialog = await screen.findByRole('dialog', { name: 'Assistant changes detected' })
+    const dialog = await screen.findByRole('dialog', { name: 'Notebook changed on the server' })
     expect(dialog).toHaveTextContent(description)
     expect(dialog).toHaveTextContent(saveLabel)
     expect(dialog).toHaveTextContent('Discard changes')
@@ -425,7 +425,7 @@ describe('ExplorerNotebookTab — assistant cache invalidation', () => {
       renderNotebookTab(new QueryClient())
 
       await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
-      const dialog = await screen.findByRole('dialog', { name: 'Assistant changes detected' })
+      const dialog = await screen.findByRole('dialog', { name: 'Notebook changed on the server' })
       if (dismissal === 'the close button') {
         await userEvent.click(screen.getByRole('button', { name: 'Close' }))
       } else {
@@ -434,7 +434,7 @@ describe('ExplorerNotebookTab — assistant cache invalidation', () => {
 
       await waitFor(() =>
         expect(
-          screen.queryByRole('dialog', { name: 'Assistant changes detected' })
+          screen.queryByRole('dialog', { name: 'Notebook changed on the server' })
         ).not.toBeInTheDocument()
       )
       expect(notebooksState.notebooks[NOTEBOOK_ID]).toBeDefined()

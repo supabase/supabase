@@ -16,7 +16,7 @@ import {
 } from '../utils/axe-helpers.js'
 import {
   articleSelectorForPagePath,
-  browserLikeUserAgent,
+  checkLinkFromBrowser,
   collectDocsOwnedLinks,
 } from '../utils/docs-links.js'
 
@@ -56,22 +56,17 @@ test.describe('Docs owned pages', () => {
       await expect(article, 'Page article should be present').toBeVisible()
 
       const links = await collectDocsOwnedLinks(page, baseURL!, articleSelector)
-      const userAgent = await browserLikeUserAgent(page)
 
       for (const url of links) {
-        try {
-          const linkResponse = await page.request.get(url, { headers: { 'user-agent': userAgent } })
-          expect
-            .soft(linkResponse.ok(), `${url} should resolve (status ${linkResponse.status()})`)
-            .toBeTruthy()
-        } catch (error) {
-          expect
-            .soft(
-              null,
-              `${url} should be reachable (${error instanceof Error ? error.message : error})`
-            )
-            .toBeTruthy()
-        }
+        const result = await checkLinkFromBrowser(page, url)
+        expect
+          .soft(
+            result.ok,
+            result.error
+              ? `${url} should be reachable (${result.error})`
+              : `${url} should resolve (status ${result.status})`
+          )
+          .toBeTruthy()
       }
     })
   }

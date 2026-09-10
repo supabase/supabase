@@ -306,7 +306,6 @@ function renderInfrastructurePage() {
 
 describe('/project/[ref]/settings/infrastructure', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockInfrastructureEndpoints()
     window.HTMLElement.prototype.scrollIntoView = vi.fn()
   })

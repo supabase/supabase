@@ -39,7 +39,6 @@ Barry Roodt
 Beng Eu
 Benjamin Coenen
 Beth Long
-Bo Lu
 Bobbie Soedirgo
 Brad Gyger
 Brendan Stephens
@@ -103,7 +102,6 @@ Erfi Anugrah
 Eric Kharitonashvili
 Etienne Stalmans
 Evan Cummack
-Eyal Ehrlich
 Fabrizio Fenoglio
 Fady A
 Fatuma Abdullahi
@@ -284,7 +282,6 @@ Sean Thompson
 Sergio Cioban Filho
 Shaii O
 Shane Adams
-Shane E
 Shaun Newman
 Shardul Borhade
 Shreekar Shetty
