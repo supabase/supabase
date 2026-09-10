@@ -75,6 +75,21 @@ describe('Results.utils', () => {
       const md = convertResultsToMarkdown(results)
       expect(md).toContain('a\\\\\\|b')
     })
+
+    it('should replace newlines with <br> so a multiline value cannot create extra table rows', () => {
+      const results = [
+        { id: 1, query: 'select 1;\nselect 2;' },
+        { id: 2, query: 'select 3;\r\nselect 4;' },
+        { id: 3, query: 'select 5;\rselect 6;' },
+      ]
+      const md = convertResultsToMarkdown(results)
+      const rows = md!.split('\n')
+      // header + separator + 3 data rows, not more
+      expect(rows).toHaveLength(5)
+      expect(rows[2]).toContain('select 1;<br>select 2;')
+      expect(rows[3]).toContain('select 3;<br>select 4;')
+      expect(rows[4]).toContain('select 5;<br>select 6;')
+    })
   })
 
   describe('convertResultsToJSON', () => {
