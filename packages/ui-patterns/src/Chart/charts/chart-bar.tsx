@@ -155,13 +155,18 @@ export const ChartBar = ({
     ...XAxisProps,
   }
 
+  // Recharts reserves this much horizontal space for the y axis. The faux x axis
+  // below is plain HTML outside the SVG, so it has to be indented by the same
+  // amount to line up with where the plot actually starts.
+  const yAxisWidth = showYAxis ? (YAxisProps?.width ?? 60) : 0
+
   const yAxisConfig = {
     tick: showYAxis
       ? { fill: 'var(--color-foreground-lighter)', fontSize: 10, fontFamily: 'var(--font-mono)' }
       : false,
     hide: !showYAxis,
     tickMargin: showYAxis ? (YAxisProps?.tickMargin ?? 4) : 0,
-    width: showYAxis ? (YAxisProps?.width ?? 60) : 0,
+    width: yAxisWidth,
     axisLine: { stroke: CHART_COLORS.AXIS },
     tickLine: { stroke: CHART_COLORS.AXIS },
     ...YAxisProps,
@@ -309,7 +314,10 @@ export const ChartBar = ({
       </ChartContainer>
 
       {hasDateRangeFooter && (
-        <div className="text-foreground-lighter flex h-4 items-center justify-between text-[10px] font-mono">
+        <div
+          className="text-foreground-lighter flex h-4 items-center justify-between text-[10px] font-mono"
+          style={{ paddingLeft: yAxisWidth + margin.left }}
+        >
           <span>{dayjs(data[0][xKey]).format(DateTimeFormat)}</span>
           <span>{dayjs(data[data.length - 1]?.[xKey]).format(DateTimeFormat)}</span>
         </div>
