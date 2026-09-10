@@ -1,11 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { Check, Plus } from 'lucide-react'
 import { ComponentPropsWithoutRef, forwardRef, useMemo, useState } from 'react'
 import {
   Alert,
   AlertDescription,
   AlertTitle,
   Button,
+  ComboboxTrigger,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -138,29 +139,32 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
         {isSchemasSuccess && (
           <Popover open={open} onOpenChange={setOpen} modal={false}>
             <PopoverTrigger asChild>
-              <Button
+              <ComboboxTrigger
                 size={size}
                 disabled={disabled}
-                variant="default"
                 data-testid="schema-selector"
-                className={`w-full [&>span]:w-full pr-1! space-x-1`}
-                iconRight={
-                  <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+                aria-label={
+                  selectedSchemaName
+                    ? `Schema ${selectedSchemaName === '*' ? 'All schemas' : selectedSchemaName}`
+                    : placeholderLabel
                 }
+                aria-expanded={open}
+                data-state={open ? 'open' : 'closed'}
+                className={size === 'tiny' ? 'w-full pr-1.5!' : 'w-full'}
               >
                 {selectedSchemaName ? (
-                  <div className="w-full flex gap-1">
-                    <p className="text-foreground-lighter">schema</p>
-                    <p className="text-foreground">
+                  <span className="flex w-full gap-1">
+                    <span className="text-foreground-lighter">schema</span>
+                    <span className="text-foreground">
                       {selectedSchemaName === '*' ? 'All schemas' : selectedSchemaName}
-                    </p>
-                  </div>
+                    </span>
+                  </span>
                 ) : (
-                  <div className="w-full flex gap-1">
-                    <p className="text-foreground-lighter">{placeholderLabel}</p>
-                  </div>
+                  <span className="flex w-full gap-1 text-foreground-lighter">
+                    {placeholderLabel}
+                  </span>
                 )}
-              </Button>
+              </ComboboxTrigger>
             </PopoverTrigger>
             <PopoverContent
               className="p-0 min-w-[200px] pointer-events-auto"

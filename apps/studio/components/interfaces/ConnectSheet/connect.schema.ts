@@ -34,8 +34,7 @@ export const INSTALL_COMMANDS: Record<string, string> = {
   supabasejs: 'npm install @supabase/supabase-js',
   supabasepy: 'pip install supabase',
   supabaseflutter: 'flutter pub add supabase_flutter',
-  supabaseswift:
-    'swift package add-dependency https://github.com/supabase-community/supabase-swift',
+  supabaseswift: 'swift package add-dependency https://github.com/supabase/supabase-swift',
   supabasekt: 'implementation("io.github.jan-tennert.supabase:supabase-kt:VERSION")',
 }
 

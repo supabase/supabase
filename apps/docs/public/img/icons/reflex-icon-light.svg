@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <!-- Light-mode mark: official Reflex "R" letterform, padded to a square -->
+  <g transform="translate(7.5 6)" fill="#110F1F">
+    <path
+      d="M0 11.6V.4h8.96v4.48H6.72V2.64H2.24v2.24h4.48v2.24H2.24v4.48H0Zm6.72 0V7.12h2.24v4.48H6.72Z"
+    />
+  </g>
+</svg>

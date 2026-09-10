@@ -327,6 +327,16 @@ describe('ApiAuthorizationScreen', () => {
           ).not.toBeInTheDocument()
         })
 
+        test('empty state links back to this authorize request via returnTo', async () => {
+          mockBothEndpoints(createMockAuthResponse(), [])
+          renderScreen()
+          const link = await screen.findByRole('link', { name: 'Create an organization' })
+          expect(link).toHaveAttribute(
+            'href',
+            `/new?returnTo=${encodeURIComponent('/authorize?auth_id=test-auth-id')}`
+          )
+        })
+
         test('shows not_member notice when organization_slug does not match any user organization', async () => {
           mockBothEndpoints()
           renderScreen({ organization_slug: 'nonexistent-org' })

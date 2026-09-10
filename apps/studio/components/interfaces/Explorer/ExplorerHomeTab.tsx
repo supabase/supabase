@@ -14,7 +14,7 @@ export const ExplorerHomeTab = () => {
   const [value, setValue] = useState<string>('')
 
   return (
-    <div className="bg-surface-100 h-full flex flex-col items-center justify-center">
+    <div className="bg-surface-100 h-full flex flex-col items-center justify-center px-10">
       <div className="w-full max-w-2xl">
         <div className="flex items-center justify-center flex-col gap-y-1 mb-12">
           <h1 className="heading-section">Explore your project</h1>
