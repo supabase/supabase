@@ -84,6 +84,22 @@ describe('WarehouseOverviewTab', () => {
     }
   )
 
+  test('keeps the first section flush with the top of the tab', async () => {
+    mockSetupStatus('complete')
+    mockCatalog()
+
+    const { container } = customRender(<WarehouseOverviewTab />)
+
+    const firstSection = await screen.findByText('Replication status')
+    const section = firstSection.closest('[data-slot="page-section"]')
+
+    // PageSection cancels its 48px top padding with `first:pt-0`, which only applies to a real
+    // :first-child. The sections must therefore live in their own wrapper: returned as a bare
+    // fragment, the integration shell's markdown takes that slot and the gap comes back.
+    expect(section?.parentElement).not.toBe(container)
+    expect(section).toBe(section?.parentElement?.firstElementChild)
+  })
+
   test('shows everything on one page once complete', async () => {
     mockSetupStatus('complete')
     mockCatalog()

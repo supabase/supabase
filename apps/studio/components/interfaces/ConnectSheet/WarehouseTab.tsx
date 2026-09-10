@@ -36,9 +36,8 @@ const getNotProvisionedContent = (setupStatus?: WarehouseSetupStatus) => {
   return {
     type: 'default' as const,
     title: 'Warehouse is not set up',
-    description:
-      'Replicate this database to Warehouse to query it from analytical tools over FlightSQL.',
-    action: 'Set up Warehouse',
+    description: 'Choose which schemas or tables to replicate in order to enable Warehouse.',
+    action: 'Choose tables',
   }
 }
 
