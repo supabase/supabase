@@ -23,6 +23,7 @@ export function CodeBlockTokens({
     <pre>
       <code
         className={cn(
+          '[contain:content]',
           lineNumbers && 'grid grid-cols-[auto_1fr] w-fit min-w-full py-3',
           '[--row-rest:var(--background-200)]',
           '[--row-hover:color-mix(in_srgb,var(--foreground)_3%,var(--background-200))]'
