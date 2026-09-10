@@ -96,11 +96,16 @@ describe('parseValue', () => {
   it('should return originalValue even when an error occurs', () => {
     const originalValue = 'some value'
     const format = 'some format'
-    // Mocking an error occurring during parsing
-    JSON.stringify = vi.fn(() => {
+    // Mocking an error occurring during parsing. Must be restored before the file
+    // ends: the coverage provider serializes its data with JSON.stringify.
+    const stringifySpy = vi.spyOn(JSON, 'stringify').mockImplementation(() => {
       throw new Error('Mocked error')
     })
-    expect(parseValue(originalValue, format)).toEqual(originalValue)
+    try {
+      expect(parseValue(originalValue, format)).toEqual(originalValue)
+    } finally {
+      stringifySpy.mockRestore()
+    }
   })
 })
 
@@ -459,9 +464,7 @@ describe('validateFields', () => {
     expect(validateFields(fields)).toEqual({ tags: 'Value is an invalid array' })
   })
 
-  it('should handle JSON validation (minifyJSON dependency issue)', () => {
-    // Note: This test shows that minifyJSON currently fails on all JSON input
-    // This may be due to missing dependencies in the test environment
+  it('should accept valid JSON', () => {
     const fields: RowField[] = [
       createField({
         name: 'data',
@@ -469,8 +472,7 @@ describe('validateFields', () => {
         value: '{}',
       }),
     ]
-    // Currently all JSON fails validation in test environment
-    expect(validateFields(fields)).toEqual({ data: 'Value is invalid JSON' })
+    expect(validateFields(fields)).toEqual({})
   })
 
   it('should return error for invalid JSON', () => {

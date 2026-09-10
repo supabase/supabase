@@ -7,6 +7,8 @@ tmp
 *.swp
 
 coverage
+# vitest reporter output (json/junit/html/attachments)
+.vitest
 allure-results
 allure-report
 .nyc_output

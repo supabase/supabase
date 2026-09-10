@@ -292,7 +292,7 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
                           })
                         }
                       >
-                        <Button block asChild>
+                        <Button variant="primary" block asChild>
                           <a type={undefined} className="h-10 py-4">
                             Start your project
                           </a>

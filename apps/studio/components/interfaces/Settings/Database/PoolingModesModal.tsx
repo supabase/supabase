@@ -51,7 +51,7 @@ export const PoolingModesModal = () => {
             <div className="w-full flex items-center justify-between">
               <p className="max-w-2xl">Which pooling mode should I use?</p>
               <DocsButton
-                href={`${DOCS_URL}/guides/database/connecting-to-postgres#how-connection-pooling-works`}
+                href={`${DOCS_URL}/guides/database/connecting-to-postgres/pooling-and-limits#how-connection-pooling-works`}
               />
             </div>
           </DialogTitle>

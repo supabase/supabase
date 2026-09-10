@@ -107,6 +107,51 @@ LIMIT 5;
 </TabPanel>
 </Tabs>
 
+## Retrieve more than 100 results
+
+Hosted vector buckets return at most 100 query results per response. To retrieve more nearest-neighbor results, set `topK` to the total number of results you need, up to 10,000, and follow `nextToken` until the response omits it. Keep the other query parameters unchanged between requests.
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://your-project-id.supabase.co', 'your-service-key')
+const index = supabase.storage.vectors.from('embeddings').index('documents-openai')
+
+const query = {
+  queryVector: {
+    float32: [0.1, 0.2, 0.3 /* ... embedding of 1536 dimensions ... */],
+  },
+  topK: 1000,
+  returnDistance: true,
+  returnMetadata: true,
+}
+
+const matches = []
+let nextToken: string | undefined
+
+do {
+  const { data, error } = await index.queryVectors({
+    ...query,
+    ...(nextToken ? { nextToken } : {}),
+  })
+
+  if (error) {
+    throw error
+  }
+
+  matches.push(...data.vectors)
+  nextToken = data.nextToken
+} while (nextToken)
+
+console.log(`Retrieved ${matches.length} matches`)
+```
+
+<Admonition type="note" title="Local query limit">
+
+Local vector buckets use pgvector. They accept `topK` values up to 100 and do not support `nextToken` for `queryVectors`. See [Vector Bucket limits](/docs/guides/storage/vector/limits) for the provider-specific limits.
+
+</Admonition>
+
 ## Semantic search
 
 Find documents similar to a query by embedding the query text:

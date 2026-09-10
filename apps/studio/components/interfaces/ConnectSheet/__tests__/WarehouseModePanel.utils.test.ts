@@ -10,6 +10,7 @@ import {
   type SchemaTableSelection,
   type SchemaWithTables,
 } from '../WarehouseModePanel/WarehouseModePanel.utils'
+import { WAREHOUSE_METADATA_SCHEMA } from '@/lib/warehouse'
 
 describe('WarehouseModePanel.utils:isSelectableWarehouseSchema', () => {
   test('excludes information_schema', () => {
@@ -40,6 +41,17 @@ describe('WarehouseModePanel.utils:isSelectableWarehouseSchema', () => {
   test('includes auth and storage, which hold product data users replicate', () => {
     expect(isSelectableWarehouseSchema('auth')).toBe(true)
     expect(isSelectableWarehouseSchema('storage')).toBe(true)
+  })
+
+  test("excludes the Warehouse's own DuckLake catalog schema", () => {
+    // Replicating the catalog that describes the Warehouse would feed it its own metadata
+    expect(isSelectableWarehouseSchema(WAREHOUSE_METADATA_SCHEMA)).toBe(false)
+    expect(isSelectableWarehouseSchema('ducklake')).toBe(false)
+  })
+
+  test('includes schemas whose names merely resemble the catalog schema', () => {
+    expect(isSelectableWarehouseSchema('ducklake_staging')).toBe(true)
+    expect(isSelectableWarehouseSchema('my_ducklake')).toBe(true)
   })
 })
 

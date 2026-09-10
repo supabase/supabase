@@ -97,6 +97,7 @@ export const RedirectUrlList = ({
             side="bottom"
           >
             <ButtonTooltip
+              variant="primary"
               disabled={!canUpdateConfig}
               onClick={() => onSelectAddURL()}
               tooltip={{

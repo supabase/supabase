@@ -1526,33 +1526,6 @@ export interface DatabaseConnectionsLiveModeClickedEvent {
 }
 
 /**
- * User clicked the dismiss button on the Database Connections banner in studio project pages.
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/observability/connections
- */
-export interface DatabaseConnectionsBannerDismissButtonClickedEvent {
-  action: 'database_connections_banner_dismiss_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked the CTA button on the Database Connections banner in studio project pages.
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/observability/connections
- */
-export interface DatabaseConnectionsBannerCtaButtonClickedEvent {
-  action: 'database_connections_banner_cta_button_clicked'
-  properties: {
-    isEnabled: boolean
-  }
-  groups: TelemetryGroups
-}
-
-/**
  * The Explorer feature preview banner was rendered in studio project pages, fired at most once
  * per page load. Acts as the denominator for the banner's dismiss and CTA rates; dedupe per
  * session or per user at query time.
@@ -3985,8 +3958,6 @@ export type TelemetryEvent =
   | DatabaseConnectionsOverviewMetricCardClickedEvent
   | DatabaseConnectionsFilterUpdatedEvent
   | DatabaseConnectionsBlockerViewClickedEvent
-  | DatabaseConnectionsBannerDismissButtonClickedEvent
-  | DatabaseConnectionsBannerCtaButtonClickedEvent
   | ExplorerBannerExposedEvent
   | ExplorerBannerDismissButtonClickedEvent
   | ExplorerBannerCtaButtonClickedEvent

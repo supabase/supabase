@@ -84,8 +84,6 @@ const REALTIME_ENTITLEMENTS: Entitlement[] = (
 
 describe('RealtimeSettings', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true, isSuccess: true })
     mockUseSelectedProjectQuery.mockReturnValue({
       data: { ref: 'default', connectionString: 'postgresql://example' },
