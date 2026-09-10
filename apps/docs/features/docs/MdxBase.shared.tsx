@@ -29,6 +29,7 @@ import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
+import { YouTube } from '~/features/ui/YouTube'
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { type ComponentPropsWithoutRef } from 'react'
@@ -113,6 +114,7 @@ const components = {
   TabPanel,
   TerraformProviderSchema,
   WrapperDashboardIntegration,
+  YouTube,
   a: MdxAnchor,
   h2: (props: ComponentPropsWithoutRef<'h2'>) => (
     <Heading tag="h2" {...props}>
