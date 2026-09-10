@@ -590,7 +590,7 @@ export const PlatformWebhooksEndpointSheet = ({
             label={mode === 'create' ? 'Create endpoint' : 'Save changes'}
             onTrigger={() => form.handleSubmit(onSubmit)()}
           >
-            <Button form="platform-webhook-endpoint-form" type="submit">
+            <Button variant="primary" form="platform-webhook-endpoint-form" type="submit">
               {mode === 'create' ? 'Create endpoint' : 'Save changes'}
             </Button>
           </Shortcut>

@@ -213,7 +213,7 @@ export default function SheetConfirmOnCloseDemo() {
             <Button variant="default" onClick={confirmOnClose}>
               Cancel
             </Button>
-            <Button onClick={saveChanges} disabled={!isDirty}>
+            <Button variant="primary" onClick={saveChanges} disabled={!isDirty}>
               Save changes
             </Button>
           </SheetFooter>

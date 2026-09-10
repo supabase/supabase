@@ -534,7 +534,13 @@ export const DestinationForm = ({
           <Button disabled={isSaving} variant="default" onClick={onCancel}>
             Cancel
           </Button>
-          <Button disabled={isSubmitDisabled} loading={isSaving} form={formId} type="submit">
+          <Button
+            variant="primary"
+            disabled={isSubmitDisabled}
+            loading={isSaving}
+            form={formId}
+            type="submit"
+          >
             {getSubmitButtonText()}
           </Button>
         </div>

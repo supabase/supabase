@@ -352,6 +352,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
               Cancel
             </Button>
             <Button
+              variant="primary"
               type="button"
               loading={isCreatingBucket}
               disabled={!newBucketName.trim()}
