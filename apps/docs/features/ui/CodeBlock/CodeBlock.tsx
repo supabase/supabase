@@ -4,7 +4,7 @@ import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
 import { cn } from 'ui'
 
 import { CodeBlockControls, CodeBlockTokens, type CodeToken } from './CodeBlock.client'
-import { encodeTokenColor, getCodeBlockLabel } from './CodeBlock.utils'
+import { getCodeBlockLabel, getTokenClassName } from './CodeBlock.utils'
 import theme from './supabase-2.json' with { type: 'json' }
 import denoTypes from './types/lib.deno.d.ts.include'
 
@@ -87,17 +87,15 @@ export async function CodeBlock({
           lineNumbers={lineNumbers}
           lines={tokens.map((line, lineIndex) => {
             let offset = 0
-            return line.map(({ content, color, fontStyle, htmlStyle }): CodeToken => {
+            return line.map(({ content, color, fontStyle }): CodeToken => {
               const annotations = twoslashed
                 ?.get(lineIndex)
                 ?.get(offset)
                 ?.map(({ text, docs, tags }) => ({ text, docs, tags }))
               offset += content.length
-              const encodedColor = encodeTokenColor(color)
+              const className = getTokenClassName(color, fontStyle)
 
-              return annotations
-                ? [content, encodedColor, fontStyle || 0, { annotations, htmlStyle }]
-                : [content, encodedColor, fontStyle || 0]
+              return annotations ? [content, className, annotations] : [content, className]
             })
           })}
         />

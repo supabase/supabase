@@ -52,6 +52,50 @@
   --code-highlight-color: #1c1c1c;
 }
 
+/* Token classes emitted by CodeBlock.utils.ts */
+.shiki .s-f {
+  color: var(--code-foreground);
+}
+.shiki .s-c {
+  color: var(--code-token-comment);
+}
+.shiki .s-n {
+  color: var(--code-token-constant);
+}
+.shiki .s-u {
+  color: var(--code-token-function);
+}
+.shiki .s-k {
+  color: var(--code-token-keyword);
+}
+.shiki .s-a {
+  color: var(--code-token-parameter);
+}
+.shiki .s-r {
+  color: var(--code-token-property);
+}
+.shiki .s-p {
+  color: var(--code-token-punctuation);
+}
+.shiki .s-s {
+  color: var(--code-token-string);
+}
+.shiki .s-e {
+  color: var(--code-token-string-expression);
+}
+.shiki .s-v {
+  color: var(--code-token-variable);
+}
+.shiki .s-i {
+  font-style: italic;
+}
+.shiki .s-b {
+  font-weight: bold;
+}
+.shiki .s-l {
+  text-decoration: underline;
+}
+
 /* Word wrap styles for code blocks */
 .shiki[data-wrapped='true'] .code-scroll {
   overflow-x: hidden !important;

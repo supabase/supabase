@@ -1,5 +1,3 @@
-import { type CSSProperties } from 'react'
-
 // As defined in @shikijs/core/dist/chunk-tokens.d.mts
 enum FontStyle {
   NotSet = -1,
@@ -7,24 +5,6 @@ enum FontStyle {
   Italic = 1,
   Bold = 2,
   Underline = 4,
-}
-
-export function getFontStyle(styleFlags: number): CSSProperties {
-  let style: CSSProperties = {}
-
-  if (styleFlags & FontStyle.Italic) {
-    ;(style ??= {}).fontStyle = 'italic'
-  }
-
-  if (styleFlags & FontStyle.Bold) {
-    ;(style ??= {}).fontWeight = 'bold'
-  }
-
-  if (styleFlags & FontStyle.Underline) {
-    ;(style ??= {}).textDecoration = 'underline'
-  }
-
-  return style
 }
 
 // Fence aliases a screen reader would otherwise read letter by letter
@@ -56,26 +36,31 @@ export function getCodeBlockLabel(lang: string | null, lineCount: number): strin
  *
  * nb. color missing from this table still renders but full length
  */
-const COLOR_CODES: Record<string, string> = {
-  'var(--code-foreground)': 'f',
-  'var(--code-token-comment)': 'c',
-  'var(--code-token-constant)': 'n',
-  'var(--code-token-function)': 'u',
-  'var(--code-token-keyword)': 'k',
-  'var(--code-token-parameter)': 'a',
-  'var(--code-token-property)': 'r',
-  'var(--code-token-punctuation)': 'p',
-  'var(--code-token-string)': 's',
-  'var(--code-token-string-expression)': 'e',
-  'var(--code-token-variable)': 'v',
+const COLOR_CLASSES: Record<string, string> = {
+  'var(--code-foreground)': 's-f',
+  'var(--code-token-comment)': 's-c',
+  'var(--code-token-constant)': 's-n',
+  'var(--code-token-function)': 's-u',
+  'var(--code-token-keyword)': 's-k',
+  'var(--code-token-parameter)': 's-a',
+  'var(--code-token-property)': 's-r',
+  'var(--code-token-punctuation)': 's-p',
+  'var(--code-token-string)': 's-s',
+  'var(--code-token-string-expression)': 's-e',
+  'var(--code-token-variable)': 's-v',
 }
 
-const COLORS_BY_CODE: Record<string, string> = Object.fromEntries(
-  Object.entries(COLOR_CODES).map(([color, code]) => [code, color])
-)
-
-export const encodeTokenColor = (color: string | undefined): string | undefined =>
-  color === undefined ? undefined : (COLOR_CODES[color] ?? color)
-
-export const decodeTokenColor = (code: string | undefined): string | undefined =>
-  code === undefined ? undefined : (COLORS_BY_CODE[code] ?? code)
+export const getTokenClassName = (
+  color: string | undefined,
+  fontStyle: number | undefined
+): string | undefined => {
+  const classes: Array<string> = []
+  const colorClass = color === undefined ? undefined : COLOR_CLASSES[color]
+  if (colorClass) classes.push(colorClass)
+  if (fontStyle && fontStyle > 0) {
+    if (fontStyle & FontStyle.Italic) classes.push('s-i')
+    if (fontStyle & FontStyle.Bold) classes.push('s-b')
+    if (fontStyle & FontStyle.Underline) classes.push('s-l')
+  }
+  return classes.length ? classes.join(' ') : undefined
+}

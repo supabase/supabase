@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { decodeTokenColor, encodeTokenColor } from './CodeBlock.utils'
+import { getTokenClassName } from './CodeBlock.utils'
 import theme from './supabase-2.json' with { type: 'json' }
 
 const themeColors = (): Array<string> => {
@@ -25,17 +25,22 @@ const themeColors = (): Array<string> => {
   return [...colors]
 }
 
-describe('token color encoding', () => {
-  it('shortens every theme color and restores it unchanged', () => {
+describe('token class names', () => {
+  it('maps every theme color to a class', () => {
     const colors = themeColors()
     expect(colors.length).toBeGreaterThan(0)
 
     for (const color of colors) {
-      const encoded = encodeTokenColor(color)
-      expect(encoded!.length, `${color} is missing from the encoding table`).toBeLessThan(
-        color.length
+      expect(getTokenClassName(color, 0), `${color} is missing from the class table`).toMatch(
+        /^s-[a-z]$/
       )
-      expect(decodeTokenColor(encoded)).toBe(color)
     }
+  })
+
+  it('appends font style classes', () => {
+    expect(getTokenClassName('var(--code-token-comment)', 1)).toBe('s-c s-i')
+    expect(getTokenClassName(undefined, 2 | 4)).toBe('s-b s-l')
+    expect(getTokenClassName(undefined, 0)).toBeUndefined()
+    expect(getTokenClassName(undefined, -1)).toBeUndefined()
   })
 })
