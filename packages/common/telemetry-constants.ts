@@ -3681,7 +3681,7 @@ export interface UnifiedLogsRowClickedEvent {
       | 'supavisor'
       | 'pgbouncer'
       | 'multigres'
-      | 'workers'
+      | 'compute'
   }
   groups: TelemetryGroups
 }
