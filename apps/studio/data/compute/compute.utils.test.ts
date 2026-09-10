@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseComputeInstance } from './compute.utils'
+import {
+  COMPUTE_POLL_BASELINE_INTERVAL,
+  COMPUTE_POLL_TRANSIENT_INTERVAL,
+  computeInstanceRefetchInterval,
+  computeRefetchInterval,
+  parseComputeInstance,
+} from './compute.utils'
 
 const datum = (attributes: Record<string, unknown>) => ({
   id: 'embed',
@@ -61,5 +67,40 @@ describe('parseComputeInstance', () => {
   it('rejects a response missing the fields the UI renders', () => {
     expect(() => parseComputeInstance({ id: 'embed', attributes: {} })).toThrow()
     expect(() => parseComputeInstance(undefined)).toThrow()
+  })
+})
+
+describe('computeRefetchInterval', () => {
+  const active = parseComputeInstance(datum({}))
+  const building = parseComputeInstance(datum({ build_state: 'building' }))
+  const deleting = parseComputeInstance(datum({ deleting: true }))
+
+  it('keeps polling once every instance has settled', () => {
+    expect(computeRefetchInterval([active])).toBe(COMPUTE_POLL_BASELINE_INTERVAL)
+    expect(computeRefetchInterval([])).toBe(COMPUTE_POLL_BASELINE_INTERVAL)
+    expect(computeRefetchInterval(undefined)).toBe(COMPUTE_POLL_BASELINE_INTERVAL)
+  })
+
+  it('polls faster while any instance is building or being deleted', () => {
+    expect(computeRefetchInterval([active, building])).toBe(COMPUTE_POLL_TRANSIENT_INTERVAL)
+    expect(computeRefetchInterval([active, deleting])).toBe(COMPUTE_POLL_TRANSIENT_INTERVAL)
+  })
+})
+
+describe('computeInstanceRefetchInterval', () => {
+  it('keeps polling once the instance has settled', () => {
+    expect(computeInstanceRefetchInterval(parseComputeInstance(datum({})))).toBe(
+      COMPUTE_POLL_BASELINE_INTERVAL
+    )
+    expect(computeInstanceRefetchInterval(undefined)).toBe(COMPUTE_POLL_BASELINE_INTERVAL)
+  })
+
+  it('polls faster while the instance is building or being deleted', () => {
+    expect(
+      computeInstanceRefetchInterval(parseComputeInstance(datum({ build_state: 'building' })))
+    ).toBe(COMPUTE_POLL_TRANSIENT_INTERVAL)
+    expect(computeInstanceRefetchInterval(parseComputeInstance(datum({ deleting: true })))).toBe(
+      COMPUTE_POLL_TRANSIENT_INTERVAL
+    )
   })
 })

@@ -36,6 +36,22 @@ const ComputeInstanceResponseSchema = z.object({
   }),
 })
 
+// Deploys/deletes happen via the CLI, not a dashboard mutation, so polling never fully stops —
+// it just slows down once nothing is building or deleting.
+export const COMPUTE_POLL_BASELINE_INTERVAL = 10000
+export const COMPUTE_POLL_TRANSIENT_INTERVAL = 3000
+
+const isTransient = (instance: ComputeInstance) =>
+  instance.buildState === 'building' || instance.isDeleting
+
+export const computeRefetchInterval = (instances: ComputeInstance[] | undefined) =>
+  instances?.some(isTransient) ? COMPUTE_POLL_TRANSIENT_INTERVAL : COMPUTE_POLL_BASELINE_INTERVAL
+
+export const computeInstanceRefetchInterval = (instance: ComputeInstance | undefined) =>
+  instance !== undefined && isTransient(instance)
+    ? COMPUTE_POLL_TRANSIENT_INTERVAL
+    : COMPUTE_POLL_BASELINE_INTERVAL
+
 export const parseComputeInstance = (datum: unknown): ComputeInstance => {
   const { id, attributes } = ComputeInstanceResponseSchema.parse(datum)
   return {

@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
 
-import { parseComputeInstance } from './compute.utils'
+import { computeRefetchInterval, parseComputeInstance } from './compute.utils'
 import { computeKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -29,4 +29,5 @@ export const computeQueryOptions = ({ projectRef }: ComputeVariables) =>
     queryFn: ({ signal }) => getComputeInstances({ projectRef }, signal),
     enabled: IS_PLATFORM && typeof projectRef !== 'undefined',
     refetchOnWindowFocus: 'always',
+    refetchInterval: (query) => computeRefetchInterval(query.state.data),
   })

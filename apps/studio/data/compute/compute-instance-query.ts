@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
 
-import { parseComputeInstance } from './compute.utils'
+import { computeInstanceRefetchInterval, parseComputeInstance } from './compute.utils'
 import { computeKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -32,4 +32,5 @@ export const computeInstanceQueryOptions = ({ projectRef, name }: ComputeInstanc
     queryKey: computeKeys.detail(projectRef, name),
     queryFn: ({ signal }) => getComputeInstance({ projectRef, name }, signal),
     enabled: IS_PLATFORM && typeof projectRef !== 'undefined' && typeof name !== 'undefined',
+    refetchInterval: (query) => computeInstanceRefetchInterval(query.state.data),
   })

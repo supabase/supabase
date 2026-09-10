@@ -34,15 +34,21 @@ import type { NextPageWithLayout } from '@/types'
 const ComputePage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const [isDeployInstructionsOpen, setIsDeployInstructionsOpen] = useState(false)
+  const [isManuallyRefreshing, setIsManuallyRefreshing] = useState(false)
   const {
     data: instances,
     error,
     isPending,
     isError,
     isSuccess,
-    isFetching,
     refetch,
   } = useQuery(computeQueryOptions({ projectRef: ref }))
+
+  // Separate from the query's own isFetching so background polling doesn't flash the button
+  const handleManualRefresh = () => {
+    setIsManuallyRefreshing(true)
+    refetch().finally(() => setIsManuallyRefreshing(false))
+  }
 
   const isNotEnrolled = isError && isComputeUnavailable(error)
   const isMissingPermission = isError && isComputeForbidden(error)
@@ -88,8 +94,8 @@ const ComputePage: NextPageWithLayout = () => {
                   <Button
                     variant="default"
                     icon={<RefreshCw />}
-                    loading={isFetching}
-                    onClick={() => refetch()}
+                    loading={isManuallyRefreshing}
+                    onClick={handleManualRefresh}
                   >
                     Refresh
                   </Button>
@@ -104,8 +110,8 @@ const ComputePage: NextPageWithLayout = () => {
                 projectRef={ref}
                 instances={instances}
                 onDeploy={() => setIsDeployInstructionsOpen(true)}
-                onRefresh={() => refetch()}
-                isRefreshing={isFetching}
+                onRefresh={handleManualRefresh}
+                isRefreshing={isManuallyRefreshing}
               />
             )}
           </PageSectionContent>
