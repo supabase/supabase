@@ -34,15 +34,23 @@ import type { NextPageWithLayout } from '@/types'
 const WorkersPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const [isDeployInstructionsOpen, setIsDeployInstructionsOpen] = useState(false)
+  const [isManuallyRefreshing, setIsManuallyRefreshing] = useState(false)
   const {
     data: workers,
     error,
     isPending,
     isError,
     isSuccess,
-    isFetching,
     refetch,
   } = useQuery(workersQueryOptions({ projectRef: ref }))
+
+  // The list also polls silently in the background while a worker is building or being deleted
+  // (see workersQueryOptions), so `isFetching` alone would make the Refresh button flash on
+  // every background poll. Track the manually-triggered refresh separately to keep those quiet.
+  const handleManualRefresh = () => {
+    setIsManuallyRefreshing(true)
+    refetch().finally(() => setIsManuallyRefreshing(false))
+  }
 
   const isNotEnrolled = isError && isWorkersUnavailable(error)
   const isMissingPermission = isError && isWorkersForbidden(error)
@@ -86,8 +94,8 @@ const WorkersPage: NextPageWithLayout = () => {
                   <Button
                     variant="default"
                     icon={<RefreshCw />}
-                    loading={isFetching}
-                    onClick={() => refetch()}
+                    loading={isManuallyRefreshing}
+                    onClick={handleManualRefresh}
                   >
                     Refresh
                   </Button>
@@ -102,8 +110,8 @@ const WorkersPage: NextPageWithLayout = () => {
                 projectRef={ref}
                 workers={workers}
                 onDeploy={() => setIsDeployInstructionsOpen(true)}
-                onRefresh={() => refetch()}
-                isRefreshing={isFetching}
+                onRefresh={handleManualRefresh}
+                isRefreshing={isManuallyRefreshing}
               />
             )}
           </PageSectionContent>
