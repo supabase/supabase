@@ -44,9 +44,9 @@ const WorkersPage: NextPageWithLayout = () => {
     refetch,
   } = useQuery(workersQueryOptions({ projectRef: ref }))
 
-  // The list also polls silently in the background while a worker is building or being deleted
-  // (see workersQueryOptions), so `isFetching` alone would make the Refresh button flash on
-  // every background poll. Track the manually-triggered refresh separately to keep those quiet.
+  // The list polls silently in the background (see workersQueryOptions), so `isFetching` alone
+  // would make the Refresh button flash on every background poll. Track the manually-triggered
+  // refresh separately to keep those quiet.
   const handleManualRefresh = () => {
     setIsManuallyRefreshing(true)
     refetch().finally(() => setIsManuallyRefreshing(false))

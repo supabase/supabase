@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseWorker } from './workers.utils'
+import {
+  WORKER_POLL_BASELINE_INTERVAL,
+  WORKER_POLL_TRANSIENT_INTERVAL,
+  parseWorker,
+  workerRefetchInterval,
+  workersRefetchInterval,
+} from './workers.utils'
 
 const datum = (attributes: Record<string, unknown>) => ({
   id: 'embed',
@@ -56,5 +62,40 @@ describe('parseWorker', () => {
   it('rejects a response missing the fields the UI renders', () => {
     expect(() => parseWorker({ id: 'embed', attributes: {} })).toThrow()
     expect(() => parseWorker(undefined)).toThrow()
+  })
+})
+
+describe('workersRefetchInterval', () => {
+  const active = parseWorker(datum({}))
+  const building = parseWorker(datum({ build_state: 'building' }))
+  const deleting = parseWorker(datum({ deleting: true }))
+
+  it('keeps polling once every worker has settled', () => {
+    // Deploys happen in the CLI, so a settled list still has to discover workers it has not seen
+    expect(workersRefetchInterval([active])).toBe(WORKER_POLL_BASELINE_INTERVAL)
+    expect(workersRefetchInterval([])).toBe(WORKER_POLL_BASELINE_INTERVAL)
+    expect(workersRefetchInterval(undefined)).toBe(WORKER_POLL_BASELINE_INTERVAL)
+  })
+
+  it('polls faster while any worker is building or being deleted', () => {
+    expect(workersRefetchInterval([active, building])).toBe(WORKER_POLL_TRANSIENT_INTERVAL)
+    expect(workersRefetchInterval([active, deleting])).toBe(WORKER_POLL_TRANSIENT_INTERVAL)
+  })
+})
+
+describe('workerRefetchInterval', () => {
+  it('keeps polling once the worker has settled', () => {
+    // A delete started from the CLI has to be noticed while the detail page sits on an active worker
+    expect(workerRefetchInterval(parseWorker(datum({})))).toBe(WORKER_POLL_BASELINE_INTERVAL)
+    expect(workerRefetchInterval(undefined)).toBe(WORKER_POLL_BASELINE_INTERVAL)
+  })
+
+  it('polls faster while the worker is building or being deleted', () => {
+    expect(workerRefetchInterval(parseWorker(datum({ build_state: 'building' })))).toBe(
+      WORKER_POLL_TRANSIENT_INTERVAL
+    )
+    expect(workerRefetchInterval(parseWorker(datum({ deleting: true })))).toBe(
+      WORKER_POLL_TRANSIENT_INTERVAL
+    )
   })
 })

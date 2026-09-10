@@ -29,6 +29,24 @@ const WorkerResponseSchema = z.object({
   }),
 })
 
+// Deploys and deletes happen in the CLI rather than the dashboard, so no mutation ever
+// invalidates this cache — polling is the only way the UI notices a worker appearing, entering
+// `deleting`, or finishing a build. The baseline therefore has to keep ticking after everything
+// settles: gating it on the workers already in the cache leaves the list unable to discover the
+// ones it has not seen yet.
+export const WORKER_POLL_BASELINE_INTERVAL = 10000
+export const WORKER_POLL_TRANSIENT_INTERVAL = 3000
+
+const isTransient = (worker: Worker) => worker.buildState === 'building' || worker.isDeleting
+
+export const workersRefetchInterval = (workers: Worker[] | undefined) =>
+  workers?.some(isTransient) ? WORKER_POLL_TRANSIENT_INTERVAL : WORKER_POLL_BASELINE_INTERVAL
+
+export const workerRefetchInterval = (worker: Worker | undefined) =>
+  worker !== undefined && isTransient(worker)
+    ? WORKER_POLL_TRANSIENT_INTERVAL
+    : WORKER_POLL_BASELINE_INTERVAL
+
 export const parseWorker = (datum: unknown): Worker => {
   const { id, attributes } = WorkerResponseSchema.parse(datum)
   return {

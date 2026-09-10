@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query'
 
 import { workersKeys } from './keys'
-import { parseWorker } from './workers.utils'
+import { parseWorker, workersRefetchInterval } from './workers.utils'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError } from '@/types'
@@ -29,12 +29,5 @@ export const workersQueryOptions = ({ projectRef }: WorkersVariables) =>
     queryFn: ({ signal }) => getWorkers({ projectRef }, signal),
     enabled: IS_PLATFORM && typeof projectRef !== 'undefined',
     refetchOnWindowFocus: 'always',
-    refetchInterval: (query) => {
-      // Poll while any worker in the list is mid-build or being torn down, stop once all settle
-      const workers = query.state.data
-      const hasTransientWorker = workers?.some(
-        (worker) => worker.buildState === 'building' || worker.isDeleting
-      )
-      return hasTransientWorker ? 3000 : false
-    },
+    refetchInterval: (query) => workersRefetchInterval(query.state.data),
   })
