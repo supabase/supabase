@@ -9,13 +9,9 @@ export const WarehouseOverviewTab = () => {
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
   const { isProvisioned } = useIsWarehouseProvisioned()
 
-  if (isMarketplaceEnabled) {
-    return (
-      <div className="px-4 md:px-10 max-w-4xl space-y-4">
-        <WarehouseSetupPanel />
-      </div>
-    )
-  }
+  // The marketplace shell supplies its own padding, so returning the content bare avoids
+  // double-padding it.
+  if (isMarketplaceEnabled) return <WarehouseSetupPanel />
 
   return (
     <IntegrationOverviewTab

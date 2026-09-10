@@ -33,17 +33,13 @@ export const WarehouseSettingsTab = () => {
 
   return (
     <ConstrainedIntegrationTabScaffold>
-      <div className="space-y-8">
-        <WarehouseSchemaTablePicker
-          isEditing
-          isSubmitting={setupMutation.isPending}
-          onSubmit={handleSubmit}
-        />
-        <div className="h-px bg-border" />
-        <WarehouseCatalogAccessCard />
-        <div className="h-px bg-border" />
-        <WarehouseDisableCard />
-      </div>
+      <WarehouseSchemaTablePicker
+        isEditing
+        isSubmitting={setupMutation.isPending}
+        onSubmit={handleSubmit}
+      />
+      <WarehouseCatalogAccessCard />
+      <WarehouseDisableCard />
     </ConstrainedIntegrationTabScaffold>
   )
 }

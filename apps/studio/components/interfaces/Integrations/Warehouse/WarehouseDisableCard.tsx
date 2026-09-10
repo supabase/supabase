@@ -2,8 +2,16 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Button } from 'ui'
+import { Button, Card, CardContent } from 'ui'
 import { TextConfirmModal } from 'ui-patterns/Dialogs/TextConfirmModal'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 import { warehouseKeys } from '@/data/warehouse/keys'
 import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
@@ -27,16 +35,27 @@ export const WarehouseDisableCard = () => {
   })
 
   return (
-    <div>
-      <h3 className="text-sm font-medium text-foreground mb-1">Disable Warehouse</h3>
-      <p className="text-sm text-foreground-light max-w-xl mb-3">
-        Stops replication and removes the Warehouse pipeline, publication, catalog access, and
-        foreign tables from this project.
-      </p>
-
-      <Button variant="danger" onClick={() => setIsConfirming(true)}>
-        Disable Warehouse
-      </Button>
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Disable Warehouse</PageSectionTitle>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
+        <Card>
+          <CardContent>
+            <FormLayout
+              layout="flex-row-reverse"
+              label="Disable Warehouse for this project"
+              description="Stops replication and removes the Warehouse pipeline, publication, catalog access, and foreign tables."
+            >
+              <Button variant="danger" onClick={() => setIsConfirming(true)}>
+                Disable Warehouse
+              </Button>
+            </FormLayout>
+          </CardContent>
+        </Card>
+      </PageSectionContent>
 
       <TextConfirmModal
         variant="destructive"
@@ -55,6 +74,6 @@ export const WarehouseDisableCard = () => {
         onCancel={() => setIsConfirming(false)}
         onConfirm={() => projectRef && setupMutation.mutate({ projectRef, body: { targets: [] } })}
       />
-    </div>
+    </PageSection>
   )
 }

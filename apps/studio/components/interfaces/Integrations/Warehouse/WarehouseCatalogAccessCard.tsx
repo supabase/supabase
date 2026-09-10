@@ -1,6 +1,14 @@
 import { useParams } from 'common'
 import { toast } from 'sonner'
-import { Switch } from 'ui'
+import { Card, CardContent, Switch } from 'ui'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AlertError } from '@/components/ui/AlertError'
@@ -18,24 +26,37 @@ export const WarehouseCatalogAccessCard = () => {
   })
 
   return (
-    <div>
-      <h3 className="text-sm font-medium text-foreground mb-1">Catalog access</h3>
-      <p className="text-sm text-foreground-light max-w-xl mb-3">
-        Lets DuckDB clients attach this project&apos;s Warehouse through its DuckLake catalog.
-      </p>
-
-      {isPending && <GenericSkeletonLoader />}
-      {isError && <AlertError subject="Failed to load DuckLake catalog access" error={error} />}
-
-      {!isPending && !isError && (
-        <Switch
-          checked={catalog?.enabled ?? false}
-          disabled={catalogMutation.isPending || !projectRef}
-          onCheckedChange={(enabled) =>
-            projectRef && catalogMutation.mutate({ projectRef, body: { enabled } })
-          }
-        />
-      )}
-    </div>
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Catalog access</PageSectionTitle>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
+        <Card>
+          <CardContent>
+            {isPending && <GenericSkeletonLoader />}
+            {isError && (
+              <AlertError subject="Failed to load DuckLake catalog access" error={error} />
+            )}
+            {!isPending && !isError && (
+              <FormLayout
+                layout="flex-row-reverse"
+                label="Allow DuckDB clients to attach Warehouse"
+                description="Exposes the DuckLake catalog and its credentials so external tools can attach this project's Warehouse."
+              >
+                <Switch
+                  checked={catalog?.enabled ?? false}
+                  disabled={catalogMutation.isPending || !projectRef}
+                  onCheckedChange={(enabled) =>
+                    projectRef && catalogMutation.mutate({ projectRef, body: { enabled } })
+                  }
+                />
+              </FormLayout>
+            )}
+          </CardContent>
+        </Card>
+      </PageSectionContent>
+    </PageSection>
   )
 }

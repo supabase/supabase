@@ -1,10 +1,19 @@
 import { useParams } from 'common'
 import { KeyRound } from 'lucide-react'
 import Link from 'next/link'
-import { Button } from 'ui'
+import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { WarehouseCatalogCredentials } from './Warehouse.utils'
@@ -23,13 +32,9 @@ import {
 
 function FieldRow({ label, children }: { label: React.ReactNode; children: React.ReactNode }) {
   return (
-    // `minmax(0,1fr)` rather than `1fr`: a 1fr track keeps `min-width: auto`, so a long
-    // single-line value (the FlightSQL connection string) stretches the track past the panel
-    // instead of truncating inside it.
-    <div className="grid grid-cols-[180px_minmax(0,1fr)] gap-4 items-center">
-      <span className="text-sm text-foreground-light">{label}</span>
-      <div className="min-w-0">{children}</div>
-    </div>
+    <FormLayout layout="horizontal" label={label}>
+      {children}
+    </FormLayout>
   )
 }
 
@@ -113,80 +118,103 @@ export const WarehouseConnectionDetails = () => {
   const usqlCommand = getWarehouseUsqlCommand(projectRef)
 
   return (
-    <div>
-      <h3 className="text-sm font-medium text-foreground mb-3">External access</h3>
-      <div className="flex flex-col gap-3">
-        <FieldRow label="Endpoint">
-          <Input readOnly copy className="font-mono" value={endpoint} />
-        </FieldRow>
-        <FieldRow label="Connection string">
-          <Input readOnly copy className="font-mono" value={connectionString} />
-        </FieldRow>
-        <FieldRow label="User">
-          <Input readOnly copy className="font-mono" value="postgres" />
-        </FieldRow>
-        <FieldRow label="Password">
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-foreground-light">
-              Same password as your primary database.
-            </span>
-            <Button
-              asChild
-              variant="default"
-              size="tiny"
-              icon={<KeyRound size={14} />}
-              className="ml-auto"
-            >
-              <Link href={`/project/${projectRef}/settings/database`}>Reset database password</Link>
-            </Button>
-          </div>
-        </FieldRow>
-      </div>
+    <>
+      <PageSection className="first:pt-0">
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>External access</PageSectionTitle>
+            <PageSectionDescription>
+              Credentials for connecting analytical tools to Warehouse.
+            </PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Card>
+            <CardContent className="space-y-4">
+              <FieldRow label="Endpoint">
+                <Input readOnly copy className="font-mono" value={endpoint} />
+              </FieldRow>
+              <FieldRow label="Connection string">
+                <Input readOnly copy className="font-mono" value={connectionString} />
+              </FieldRow>
+              <FieldRow label="User">
+                <Input readOnly copy className="font-mono" value="postgres" />
+              </FieldRow>
+              <FieldRow label="Password">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-foreground-light">
+                    Same password as your primary database.
+                  </span>
+                  <Button
+                    asChild
+                    variant="default"
+                    size="tiny"
+                    icon={<KeyRound size={14} />}
+                    className="ml-auto"
+                  >
+                    <Link href={`/project/${projectRef}/settings/database`}>
+                      Reset database password
+                    </Link>
+                  </Button>
+                </div>
+              </FieldRow>
+            </CardContent>
+          </Card>
+        </PageSectionContent>
+      </PageSection>
 
-      <div className="h-px bg-border my-6" />
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Connect with FlightSQL</PageSectionTitle>
+            <PageSectionDescription>
+              Warehouse speaks the Arrow FlightSQL protocol, so any FlightSQL client can connect.
+              For example, using the usql CLI:
+            </PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <CodeBlock
+            className="[&_code]:text-foreground"
+            language="bash"
+            hideLineNumbers
+            wrapLongLines
+            value={usqlCommand}
+          />
+        </PageSectionContent>
+      </PageSection>
 
-      <h3 className="text-sm font-medium text-foreground mb-1">Connect with FlightSQL</h3>
-      <p className="text-sm text-foreground-light max-w-xl mb-3">
-        Warehouse speaks the Arrow FlightSQL protocol. Any FlightSQL-compatible client can connect —
-        for example, using the <span className="font-mono">usql</span> CLI:
-      </p>
-      <CodeBlock
-        className="[&_code]:text-foreground"
-        language="bash"
-        hideLineNumbers
-        wrapLongLines
-        value={usqlCommand}
-      />
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Connect with DuckDB</PageSectionTitle>
+            <PageSectionDescription>
+              Attach Warehouse from DuckDB through its DuckLake catalog.
+            </PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          {isCatalogPending && <GenericSkeletonLoader />}
 
-      <div className="h-px bg-border my-6" />
+          {isCatalogError && (
+            <AlertError subject="Failed to load DuckLake catalog access" error={catalogError} />
+          )}
 
-      <h3 className="text-sm font-medium text-foreground mb-1">
-        Connect with DuckDB (DuckLake catalog)
-      </h3>
+          {!isCatalogPending && !isCatalogError && !catalog?.enabled && (
+            <p className="text-sm text-foreground-light max-w-lg">
+              Catalog access is off. Turn it on in{' '}
+              <InlineLink href={`/project/${projectRef}/integrations/warehouse/settings`}>
+                Warehouse settings
+              </InlineLink>{' '}
+              to attach this project&apos;s Warehouse from DuckDB.
+            </p>
+          )}
 
-      {isCatalogPending && <GenericSkeletonLoader />}
-
-      {isCatalogError && (
-        <AlertError
-          className="mt-2"
-          subject="Failed to load DuckLake catalog access"
-          error={catalogError}
-        />
-      )}
-
-      {!isCatalogPending && !isCatalogError && !catalog?.enabled && (
-        <p className="text-sm text-foreground-light max-w-lg mt-2">
-          Catalog access is off. Turn it on in{' '}
-          <InlineLink href={`/project/${projectRef}/integrations/warehouse/settings`}>
-            Warehouse settings
-          </InlineLink>{' '}
-          to attach this project's Warehouse directly from DuckDB.
-        </p>
-      )}
-
-      {!isCatalogPending && !isCatalogError && catalog?.enabled && catalog.credentials && (
-        <DuckLakeSetup credentials={catalog.credentials} />
-      )}
-    </div>
+          {!isCatalogPending && !isCatalogError && catalog?.enabled && catalog.credentials && (
+            <DuckLakeSetup credentials={catalog.credentials} />
+          )}
+        </PageSectionContent>
+      </PageSection>
+    </>
   )
 }

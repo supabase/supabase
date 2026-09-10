@@ -1,7 +1,14 @@
 import dayjs from 'dayjs'
 import { Loader2 } from 'lucide-react'
-import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, Card, CardContent, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 import type { WarehouseSetupTable } from './Warehouse.utils'
 import type { WarehouseSetupStatusResponse } from '@/data/warehouse/warehouse-setup-status-query'
@@ -53,37 +60,52 @@ export const WarehouseTableStatusList = ({ tables }: WarehouseTableStatusListPro
   const hasSizes = tables.some((table) => table.warehouse_size_bytes !== undefined)
 
   return (
-    <div className="border rounded-md overflow-hidden divide-y">
-      {tables.map((table) => {
-        const badge = TABLE_STATE_BADGE[table.state]
-        return (
-          <div
-            key={`${table.schema}.${table.name}`}
-            className="flex items-center gap-4 px-3 py-2.5"
-          >
-            <span className="text-sm font-mono text-foreground flex-1 truncate">
-              {table.schema}.{table.name}
-            </span>
-            <TableLag table={table} />
-            {hasSizes && (
-              <span className="text-sm text-foreground-light tabular-nums">
-                {table.warehouse_size_bytes === undefined
-                  ? '—'
-                  : formatBytes(table.warehouse_size_bytes)}
+    <Card>
+      <CardContent className="p-0 divide-y">
+        {tables.map((table) => {
+          const badge = TABLE_STATE_BADGE[table.state]
+          return (
+            <div
+              key={`${table.schema}.${table.name}`}
+              className="flex items-center gap-4 px-3 py-2.5"
+            >
+              <span className="text-sm font-mono text-foreground flex-1 truncate">
+                {table.schema}.{table.name}
               </span>
-            )}
-            <Badge variant={badge.variant}>{badge.label}</Badge>
-          </div>
-        )
-      })}
-      {tables.length === 0 && (
-        <p className="px-3 py-2.5 text-sm text-foreground-lighter">
-          No tables are being copied yet.
-        </p>
-      )}
-    </div>
+              <TableLag table={table} />
+              {hasSizes && (
+                <span className="text-sm text-foreground-light tabular-nums">
+                  {table.warehouse_size_bytes === undefined
+                    ? '—'
+                    : formatBytes(table.warehouse_size_bytes)}
+                </span>
+              )}
+              <Badge variant={badge.variant}>{badge.label}</Badge>
+            </div>
+          )
+        })}
+        {tables.length === 0 && (
+          <p className="px-3 py-2.5 text-sm text-foreground-lighter">
+            No tables are being copied yet.
+          </p>
+        )}
+      </CardContent>
+    </Card>
   )
 }
+
+export const WarehouseReplicatedTablesSection = ({ tables }: WarehouseTableStatusListProps) => (
+  <PageSection className="first:pt-0">
+    <PageSectionMeta>
+      <PageSectionSummary>
+        <PageSectionTitle>Replicated tables</PageSectionTitle>
+      </PageSectionSummary>
+    </PageSectionMeta>
+    <PageSectionContent>
+      <WarehouseTableStatusList tables={tables} />
+    </PageSectionContent>
+  </PageSection>
+)
 
 export interface WarehouseEnablingProgressProps {
   status: WarehouseSetupStatusResponse

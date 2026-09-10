@@ -11,7 +11,10 @@ import {
 } from './Warehouse.utils'
 import { WarehouseConnectionDetails } from './WarehouseConnectionDetails'
 import { WarehouseSchemaTablePicker } from './WarehouseSchemaTablePicker'
-import { WarehouseEnablingProgress, WarehouseTableStatusList } from './WarehouseTableStatusList'
+import {
+  WarehouseEnablingProgress,
+  WarehouseReplicatedTablesSection,
+} from './WarehouseTableStatusList'
 import { AlertError } from '@/components/ui/AlertError'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useUpdateWarehouseCatalogMutation } from '@/data/warehouse/warehouse-catalog-mutation'
@@ -113,9 +116,9 @@ export const WarehouseSetupPanel = () => {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <WarehouseTableStatusList tables={data.tables} />
+    <>
+      <WarehouseReplicatedTablesSection tables={data.tables} />
       <WarehouseConnectionDetails />
-    </div>
+    </>
   )
 }
