@@ -9,15 +9,19 @@
     "dev": "astro dev --port 3008",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest --run"
   },
   "dependencies": {
+    "@astrojs/markdown-remark": "7.2.4",
+    "@astrojs/mdx": "^7.0.7",
     "@astrojs/react": "^6.0.4",
     "astro": "^7.2.6",
     "lucide-react": "*",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "ui": "workspace:*"
+    "ui": "workspace:*",
+    "ui-patterns": "workspace:*"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.2.4",
@@ -25,7 +29,8 @@
     "@types/react-dom": "catalog:",
     "config": "workspace:*",
     "lodash-es": "catalog:",
-    "tailwindcss": "catalog:"
+    "tailwindcss": "catalog:",
+    "vitest": "catalog:"
   },
   "allowScripts": {
     "esbuild": true
