@@ -8,10 +8,10 @@ import type {
   TypeDetails,
 } from '~/features/docs/Reference.typeSpec'
 import { TYPESPEC_NODE_ANONYMOUS } from '~/features/docs/Reference.typeSpec'
-import { ReferenceSectionWrapper } from '~/features/docs/Reference.ui.client'
+import { DetailsTrigger, ReferenceSectionWrapper } from '~/features/docs/Reference.ui.client'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 import { isEqual } from 'lodash-es'
-import { ChevronRight, XCircle } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import type { HTMLAttributes, PropsWithChildren } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -302,43 +302,12 @@ function TypeSubDetails({
 }) {
   return (
     <Collapsible defaultOpen={defaultOpen}>
-      <CollapsibleTrigger
-        className={cn(
-          'group',
-          'w-fit rounded-full',
-          'px-5 py-1',
-          'border border-default',
-          'flex items-center gap-2',
-          'text-left text-sm text-foreground-light',
-          'hover:bg-surface-100',
-          'data-open:w-full',
-          'data-open:rounded-b-none data-open:rounded-tl-lg data-open:rounded-tr-lg',
-          'transition [transition-property:width,background-color]',
-          className
-        )}
-      >
-        <XCircle
-          size={14}
-          className={cn(
-            'text-foreground-muted',
-            'group-data-closed:rotate-45',
-            'transition-transform'
-          )}
-        />
-        Details
-      </CollapsibleTrigger>
+      <DetailsTrigger label="Details" className={className} />
       <CollapsibleContent>
-        <ul className={cn('border-b border-x border-default', 'rounded-b-lg')}>
+        <ul className="reference-details-panel">
           {details.map(
             (detail: SubContent | CustomTypePropertyType | TypeDetails, index: number) => (
-              <li
-                key={index}
-                className={cn(
-                  'px-5 py-3',
-                  'border-t border-default first:border-t-0',
-                  'flex flex-col gap-3'
-                )}
-              >
+              <li key={index} className="reference-details-item">
                 <ParamOrTypeDetails paramOrType={detail} />
               </li>
             )
@@ -542,42 +511,10 @@ export function ApiSchemaParamSubdetails({
 
   return (
     <Collapsible>
-      <CollapsibleTrigger
-        className={cn(
-          'group',
-          'w-fit rounded-full',
-          'px-5 py-1',
-          'border border-default',
-          'flex items-center gap-2',
-          'text-left text-sm text-foreground-light',
-          'hover:bg-surface-100',
-          'data-open:w-full',
-          'data-open:rounded-b-none data-open:rounded-tl-lg data-open:rounded-tr-lg',
-          'transition [transition-property:width,background-color]',
-          className
-        )}
-      >
-        <XCircle
-          size={14}
-          className={cn(
-            'text-foreground-muted',
-            'group-data-closed:rotate-45',
-            'transition-transform'
-          )}
-        />
-        {'enum' in schema
-          ? 'Accepted values'
-          : 'allOf' in schema || 'anyOf' in schema || 'oneOf' in schema
-            ? 'Options'
-            : schema.type === 'array'
-              ? 'Items'
-              : schema.type === 'object'
-                ? 'Object schema'
-                : 'Details'}
-      </CollapsibleTrigger>
+      <DetailsTrigger label={schemaDetailsLabel(schema)} className={className} />
       <CollapsibleContent>
         {'type' in schema && schema.type === 'object' ? (
-          <div className={cn('border-b border-x border-default', 'rounded-b-lg')}>
+          <div className="reference-details-panel">
             <div className="p-5 border-b border-default">
               <ApiSchema schema={schema} />
             </div>
@@ -590,23 +527,16 @@ export function ApiSchemaParamSubdetails({
           typeof schema.items === 'object' &&
           'type' in schema.items &&
           schema.items.type === 'object' ? (
-          <div className={cn('border-b border-x border-default', 'rounded-b-lg')}>
+          <div className="reference-details-panel">
             <div className="p-5 border-b border-default">
               <ApiSchema schema={schema} />
             </div>
             <ApiOperationRequestBodyDetailsInternal schema={schema.items} className="px-5" />
           </div>
         ) : (
-          <ul className={cn('border-b border-x border-default', 'rounded-b-lg')}>
+          <ul className="reference-details-panel">
             {subContent.map((detail: any, index: number) => (
-              <li
-                key={index}
-                className={cn(
-                  'px-5 py-3',
-                  'border-t border-default first:border-t-0',
-                  'flex flex-col gap-3'
-                )}
-              >
+              <li key={index} className="reference-details-item">
                 {'enum' in schema ? (
                   <span className="font-mono text-sm font-medium text-foreground">
                     {String(detail)}
@@ -633,6 +563,15 @@ export function ApiSchemaParamSubdetails({
       </CollapsibleContent>
     </Collapsible>
   )
+}
+
+const schemaDetailsLabel = (schema: ISchema): string => {
+  if ('enum' in schema) return 'Accepted values'
+  if ('allOf' in schema || 'anyOf' in schema || 'oneOf' in schema) return 'Options'
+  if (schema.type === 'array') return 'Items'
+  if (schema.type === 'object') return 'Object schema'
+
+  return 'Details'
 }
 
 /**
