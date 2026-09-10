@@ -13,7 +13,8 @@ import { CellContextMenuWrapper } from './CellContextMenuWrapper'
 import { DefaultFormatter } from './DefaultFormatter'
 import { JsonFormatter } from './JsonFormatter'
 import { COLUMN_MIN_WIDTH } from '@/components/grid/constants'
-import type { SupaColumn, SupaRow } from '@/components/grid/types'
+import { filtersToUrlParams } from '@/components/grid/SupabaseGrid.utils'
+import type { Filter, SupaColumn, SupaRow } from '@/components/grid/types'
 import {
   ESTIMATED_CHARACTER_PIXEL_WIDTH,
   getColumnDefaultWidth,
@@ -30,11 +31,11 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface ReferenceRecordPeekProps {
   table: PGTable
-  column: string
-  value: string | number | Record<string, unknown>
+  /** One equality filter per foreign key column, identifying the referenced record */
+  filters: Filter[]
 }
 
-export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPeekProps) => {
+export const ReferenceRecordPeek = ({ table, filters }: ReferenceRecordPeekProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -48,12 +49,16 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
     {
       projectRef: project?.ref,
       tableId: table.id,
-      filters: [{ column, operator: '=', value }],
+      filters,
       page: 1,
       limit: 10,
     },
     { placeholderData: keepPreviousData }
   )
+
+  const filterSearchParams = filtersToUrlParams(filters)
+    .map((filter) => `filter=${encodeURIComponent(filter)}`)
+    .join('&')
 
   const rows = useMemo(() => data?.rows ?? [], [data?.rows])
   const selectedCellRef = useRef<{ idx: number; rowIdx: number } | null>(null)
@@ -159,10 +164,10 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
       </div>
       <div className="flex items-center justify-end px-2 py-1">
         <EditorTablePageLink
-          href={`/project/${ref}/editor/${table.id}?schema=${table.schema}&filter=${column}%3Aeq%3A${value}`}
+          href={`/project/${ref}/editor/${table.id}?schema=${table.schema}&${filterSearchParams}`}
           projectRef={ref}
           id={String(table.id)}
-          filters={[{ column, operator: '=', value: String(value) }]}
+          filters={filters}
         >
           <Button variant="default">Open table</Button>
         </EditorTablePageLink>
