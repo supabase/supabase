@@ -192,9 +192,9 @@ Your migrations control whether a branch re-enables these privileges. If your ba
 If your migration history was not initialized by Supabase Branching or the Supabase CLI and you want to keep default privileges enabled on branches, add the following statements to the start of your initial migration file. Subsequent migrations then inherit these privileges, so the final database state is unchanged.
 
 ```sql
-alter default privileges for role postgres in schema public grant usage, select, update on sequences to postgres, anon, authenticated, service_role;
-alter default privileges for role postgres in schema public grant execute on functions to postgres, anon, authenticated, service_role;
-alter default privileges for role postgres in schema public grant select, insert, update, delete on tables to postgres, anon, authenticated, service_role;
+alter default privileges for role postgres in schema public grant usage, select, update on sequences to anon, authenticated, service_role;
+alter default privileges for role postgres in schema public grant execute on functions to anon, authenticated, service_role;
+alter default privileges for role postgres in schema public grant select, insert, update, delete on tables to anon, authenticated, service_role;
 ```
 
 After updating the local migration file, run `supabase migration repair --status applied <migration-timestamp>` so the migration history of your base project matches. See [Diagnosing and fixing sync errors](/docs/guides/deployment/database-migrations#diagnosing-and-fixing-sync-errors).
