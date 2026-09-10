@@ -26,17 +26,23 @@ const config: ChartConfig = Object.fromEntries(
   SERIES.map((s, i) => [s.key, { label: s.label, color: `var(--chart-series-${i + 1})` }])
 )
 
-const data: ChartBarTick[] = Array.from({ length: 14 }, (_, i) => {
-  const row: ChartBarTick = { time: `${String(8 + i).padStart(2, '0')}:00` }
+const data: ChartBarTick[] = Array.from({ length: 40 }, (_, i) => {
+  const start = new Date('2026-09-10T08:00:00Z')
+  start.setUTCMinutes(start.getUTCMinutes() + i * 3)
+  const row: ChartBarTick = { timestamp: start.toISOString() }
+
+  const trend = Math.sin((i / 40) * Math.PI * 2)
   SERIES.forEach((s, idx) => {
-    row[s.key] = Math.round(6 + idx * 2 + Math.sin(i / 2.2 + idx) * 3.5)
+    const phase = Math.sin(i / 3.5 + idx * 1.7)
+    const jitter = Math.sin(i * 2.3 + idx * 0.9) * 1.5
+    row[s.key] = Math.max(1, Math.round(5 + idx * 1.8 + phase * 3 + trend * 2 + jitter))
   })
   return row
 })
 
 export default function ChartPaletteStress() {
   return (
-    <div className="flex w-full flex-col gap-6">
+    <div className="flex flex-col gap-6 w-8/12">
       <Chart>
         <ChartCard>
           <ChartHeader>
@@ -48,7 +54,6 @@ export default function ChartPaletteStress() {
             <div className="h-40">
               <ChartBar
                 data={data}
-                xKey="time"
                 dataKey={SERIES[0].key}
                 dataKeys={SERIES.map((s) => s.key)}
                 config={config}
@@ -56,10 +61,7 @@ export default function ChartPaletteStress() {
                 isFullHeight
                 showGrid
                 showYAxis
-                showXAxis
                 YAxisProps={{ width: 36 }}
-                XAxisProps={{ interval: 3 }}
-                margin={{ top: 4, right: 8 }}
               />
             </div>
           </ChartContent>
