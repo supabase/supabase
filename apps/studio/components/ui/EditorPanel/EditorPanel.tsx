@@ -9,7 +9,7 @@ import {
   CheckCircle2,
   FolderOpen,
   Loader2,
-  Maximize2,
+  Maximize,
   PlusIcon,
   X,
 } from 'lucide-react'
@@ -461,12 +461,12 @@ export const EditorPanel = () => {
           <ButtonTooltip
             variant="text"
             className="w-7 h-7 p-0"
-            icon={<Maximize2 strokeWidth={1.5} />}
-            aria-label={isExplorerEnabled ? 'Open in Explorer' : 'Expand to SQL editor'}
+            icon={<Maximize strokeWidth={1.5} />}
+            aria-label={isExplorerEnabled ? 'Open in Explorer' : 'Open in SQL editor'}
             tooltip={{
               content: {
                 side: 'bottom',
-                text: isExplorerEnabled ? 'Open in Explorer' : 'Expand to SQL editor',
+                text: isExplorerEnabled ? 'Open in Explorer' : 'Open in SQL editor',
               },
             }}
             onClick={handleExpand}
