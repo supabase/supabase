@@ -1,7 +1,24 @@
 import { useParams } from 'common'
-import { ChevronRight, Warehouse } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Button, Checkbox, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+import {
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  Checkbox,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from 'ui'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -147,111 +164,106 @@ export const WarehouseSchemaTablePicker = ({
   }
 
   return (
-    <div>
-      <div className="flex gap-3 mb-5">
-        <div className="w-8 h-8 rounded-md bg-brand-200 flex items-center justify-center shrink-0">
-          <Warehouse size={16} strokeWidth={1.5} className="text-brand" />
-        </div>
-        <div>
-          <p className="text-sm font-medium text-foreground">
-            {isEditing ? 'Edit replicated tables' : 'Enable Warehouse'}
-          </p>
-          <p className="text-sm text-foreground-light mt-1 max-w-xl">
+    <PageSection className="first:pt-0">
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>
+            {isEditing ? 'Replicated tables' : 'Enable Warehouse'}
+          </PageSectionTitle>
+          <PageSectionDescription>
             {isEditing
-              ? 'Choose which schemas or tables to replicate to your Warehouse. Tables already replicating are selected.'
-              : 'Replicate your database to a low-latency analytical endpoint over FlightSQL. Choose which schemas or tables to replicate — you can change this later.'}
-          </p>
-        </div>
-      </div>
+              ? 'Choose which schemas or tables to replicate to Warehouse. Tables already replicating are selected.'
+              : 'Replicate your database to an analytical endpoint over FlightSQL. Choose which schemas or tables to replicate, and change this later at any time.'}
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
+        <Card>
+          <CardContent className="p-0 divide-y">
+            {schemasWithTables.map((schema) => {
+              const keys = schema.tables.map((table) => getSchemaTableKey(schema.schema, table))
+              const checkedCount = keys.filter((key) => selection[key]).length
+              const checkedState = getSchemaCheckedState({
+                selectedCount: checkedCount,
+                totalCount: keys.length,
+              })
+              const isOpen = expandedOverrides[schema.schema] ?? checkedCount > 0
 
-      <p className="text-sm font-medium text-foreground-light mb-2">
-        Schemas and tables to replicate
-      </p>
-
-      <div className="border rounded-md overflow-hidden divide-y">
-        {schemasWithTables.map((schema) => {
-          const keys = schema.tables.map((table) => getSchemaTableKey(schema.schema, table))
-          const checkedCount = keys.filter((key) => selection[key]).length
-          const checkedState = getSchemaCheckedState({
-            selectedCount: checkedCount,
-            totalCount: keys.length,
-          })
-          const isOpen = expandedOverrides[schema.schema] ?? checkedCount > 0
-
-          return (
-            <Collapsible
-              key={schema.schema}
-              open={isOpen}
-              onOpenChange={(open) => setExpanded(schema.schema, open)}
-            >
-              <div className="flex items-center gap-2 px-3 py-2 bg-surface-75">
-                <CollapsibleTrigger
-                  aria-label={isOpen ? `Collapse ${schema.schema}` : `Expand ${schema.schema}`}
-                  className="group text-foreground-lighter"
+              return (
+                <Collapsible
+                  key={schema.schema}
+                  open={isOpen}
+                  onOpenChange={(open) => setExpanded(schema.schema, open)}
                 >
-                  <ChevronRight
-                    size={14}
-                    className="transition-transform group-data-[state=open]:rotate-90"
-                  />
-                </CollapsibleTrigger>
-                <Checkbox
-                  checked={checkedState}
-                  onCheckedChange={() => toggleSchema(schema)}
-                  disabled={schema.tables.length === 0}
-                  aria-label={`Select all tables in ${schema.schema}`}
-                  // The shared Checkbox only fills itself for `data-state=checked`, so a partial
-                  // selection would otherwise render identically to an empty one. A muted fill
-                  // keeps all three states visually distinct.
-                  className="data-[state=indeterminate]:border-foreground-lighter data-[state=indeterminate]:bg-foreground-lighter"
-                />
-                <span className="text-sm font-mono text-foreground">{schema.schema}</span>
-                <span className="text-xs text-foreground-lighter ml-auto">
-                  {checkedCount}/{keys.length} tables
-                </span>
-              </div>
-              <CollapsibleContent>
-                {schema.tables.map((table) => {
-                  const key = getSchemaTableKey(schema.schema, table)
-                  return (
-                    <div key={key} className="flex items-center gap-2 pl-10 pr-3 py-2">
-                      <Checkbox
-                        checked={!!selection[key]}
-                        onCheckedChange={() => toggleTable(schema.schema, table)}
-                        aria-label={`Select ${schema.schema}.${table}`}
+                  <div className="flex items-center gap-2 px-3 py-2 bg-surface-75">
+                    <CollapsibleTrigger
+                      aria-label={isOpen ? `Collapse ${schema.schema}` : `Expand ${schema.schema}`}
+                      className="group text-foreground-lighter"
+                    >
+                      <ChevronRight
+                        size={14}
+                        className="transition-transform group-data-[state=open]:rotate-90"
                       />
-                      <span className="text-sm font-mono text-foreground-light">{table}</span>
-                    </div>
-                  )
-                })}
-                {schema.tables.length === 0 && (
-                  <p className="pl-10 pr-3 py-2 text-sm text-foreground-lighter">
-                    No tables in this schema.
-                  </p>
-                )}
-              </CollapsibleContent>
-            </Collapsible>
-          )
-        })}
-      </div>
-
-      <div className="flex items-center justify-between mt-4">
-        <span className="text-sm text-foreground-lighter">
-          {selectedCount} table{selectedCount === 1 ? '' : 's'} selected
-        </span>
-        {/*
-          An empty selection is a valid request that tears Warehouse down, so submitting one from
-          here would destroy a project's Warehouse with no confirmation. Disabling keeps teardown
-          on the dedicated action, which asks first.
-        */}
-        <Button
-          variant="primary"
-          disabled={selectedCount === 0}
-          loading={isSubmitting}
-          onClick={handleSubmit}
-        >
-          {isEditing ? 'Update replicated tables' : 'Enable Warehouse'}
-        </Button>
-      </div>
-    </div>
+                    </CollapsibleTrigger>
+                    <Checkbox
+                      checked={checkedState}
+                      onCheckedChange={() => toggleSchema(schema)}
+                      disabled={schema.tables.length === 0}
+                      aria-label={`Select all tables in ${schema.schema}`}
+                      // The shared Checkbox only fills itself for `data-state=checked`, so a partial
+                      // selection would otherwise render identically to an empty one. A muted fill
+                      // keeps all three states visually distinct.
+                      className="data-[state=indeterminate]:border-foreground-lighter data-[state=indeterminate]:bg-foreground-lighter"
+                    />
+                    <span className="text-sm font-mono text-foreground">{schema.schema}</span>
+                    <span className="text-xs text-foreground-lighter ml-auto">
+                      {checkedCount}/{keys.length} tables
+                    </span>
+                  </div>
+                  <CollapsibleContent>
+                    {schema.tables.map((table) => {
+                      const key = getSchemaTableKey(schema.schema, table)
+                      return (
+                        <div key={key} className="flex items-center gap-2 pl-10 pr-3 py-2">
+                          <Checkbox
+                            checked={!!selection[key]}
+                            onCheckedChange={() => toggleTable(schema.schema, table)}
+                            aria-label={`Select ${schema.schema}.${table}`}
+                          />
+                          <span className="text-sm font-mono text-foreground-light">{table}</span>
+                        </div>
+                      )
+                    })}
+                    {schema.tables.length === 0 && (
+                      <p className="pl-10 pr-3 py-2 text-sm text-foreground-lighter">
+                        No tables in this schema.
+                      </p>
+                    )}
+                  </CollapsibleContent>
+                </Collapsible>
+              )
+            })}
+          </CardContent>
+          <CardFooter className="justify-between">
+            <span className="text-sm text-foreground-lighter">
+              {selectedCount} table{selectedCount === 1 ? '' : 's'} selected
+            </span>
+            {/*
+              An empty selection is a valid request that tears Warehouse down, so submitting one
+              from here would destroy a project's Warehouse with no confirmation. Disabling keeps
+              teardown on the dedicated action, which asks first.
+            */}
+            <Button
+              variant="primary"
+              disabled={selectedCount === 0}
+              loading={isSubmitting}
+              onClick={handleSubmit}
+            >
+              {isEditing ? 'Update replicated tables' : 'Enable Warehouse'}
+            </Button>
+          </CardFooter>
+        </Card>
+      </PageSectionContent>
+    </PageSection>
   )
 }
