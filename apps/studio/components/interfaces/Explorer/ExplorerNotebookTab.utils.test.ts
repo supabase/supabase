@@ -220,7 +220,7 @@ describe('notebookToMarkdown', () => {
     _id: 'cell-3',
     title: 'Edge errors',
     view: 'table',
-    unchecked_sql: untrustedLogSql("select * from edge_logs where status_code >= 500"),
+    unchecked_sql: untrustedLogSql('select * from edge_logs where status_code >= 500'),
     time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 24 },
   }
 
