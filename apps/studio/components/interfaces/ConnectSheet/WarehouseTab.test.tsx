@@ -1,5 +1,7 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
+import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { describe, expect, test } from 'vitest'
 
@@ -46,6 +48,9 @@ const mockCatalog = (catalog: WarehouseCatalogResponse) =>
     response: () => HttpResponse.json<WarehouseCatalogResponse>(catalog),
   })
 
+// The query engine selector is a Radix Select.
+mockAnimationsApi()
+
 describe('WarehouseTab', () => {
   test('points at the integration and shows no setup UI when Warehouse is not set up', async () => {
     mockSetupStatus({ setup_status: 'not_started' })
@@ -53,7 +58,7 @@ describe('WarehouseTab', () => {
     customRender(<WarehouseTab />)
 
     expect(await screen.findByText('Warehouse is not set up')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Set up Warehouse' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Choose tables' })).toHaveAttribute(
       'href',
       '/project/default/integrations/warehouse/overview'
     )
@@ -77,7 +82,7 @@ describe('WarehouseTab', () => {
 
     customRender(<WarehouseTab />)
 
-    expect(await screen.findByText('External access')).toBeInTheDocument()
+    expect(await screen.findByText('Connect')).toBeInTheDocument()
     expect(screen.getByDisplayValue('default.warehouse.supabase.io')).toBeInTheDocument()
     expect(
       screen.getByDisplayValue(
@@ -85,10 +90,8 @@ describe('WarehouseTab', () => {
       )
     ).toBeInTheDocument()
 
-    // Turning catalog access on is provisioning, so it belongs on the integration, not here.
-    expect(await screen.findByText(/Turn on catalog access/i)).toBeInTheDocument()
+    // FlightSQL is the default engine and needs no catalog access, so nothing here provisions.
     expect(screen.queryByRole('switch')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Enable catalog access/i })).not.toBeInTheDocument()
   })
 
   test('renders the DuckLake attach script when catalog access is on', async () => {
@@ -108,12 +111,17 @@ describe('WarehouseTab', () => {
 
     customRender(<WarehouseTab />)
 
+    await userEvent.click(await screen.findByRole('combobox', { name: 'Query engine' }))
+    await userEvent.click(await screen.findByRole('option', { name: 'DuckDB' }))
+
     // The setup script renders through a syntax highlighter that splits it across elements, so
     // assert on the env vars it tells you to set and the values behind them.
     expect(await screen.findByText('DUCKLAKE_S3_SECRET')).toBeInTheDocument()
     expect(screen.getByText('DUCKLAKE_METADATA_PASSWORD')).toBeInTheDocument()
     expect(screen.getByDisplayValue('s3-secret')).toBeInTheDocument()
     expect(screen.getByDisplayValue(CATALOG_PASSWORD)).toBeInTheDocument()
+    // Catalog access is provisioning, so the sheet never offers the toggle.
+    expect(screen.queryByRole('switch')).not.toBeInTheDocument()
   })
 
   test('surfaces a failure to load the status', async () => {

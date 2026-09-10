@@ -9,7 +9,7 @@ import {
   isWarehouseSettingUp,
   type WarehouseSetupStatus,
 } from '../Integrations/Warehouse/Warehouse.utils'
-import { WarehouseConnectionDetails } from '../Integrations/Warehouse/WarehouseConnectionDetails'
+import { WarehouseConnectSection } from '../Integrations/Warehouse/WarehouseConnectSection'
 import { AlertError } from '@/components/ui/AlertError'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
@@ -82,5 +82,5 @@ export const WarehouseTab = () => {
     )
   }
 
-  return <WarehouseConnectionDetails />
+  return <WarehouseConnectSection />
 }

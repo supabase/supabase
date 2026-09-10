@@ -175,7 +175,7 @@ export const WarehouseSchemaTablePicker = ({
           <PageSectionDescription>
             {isEditing
               ? 'Tables currently replicating are selected. Changes apply on save.'
-              : 'Choose which schemas or tables to replicate. You can change this later at any time.'}
+              : 'Choose which schemas or tables to replicate. You can change this at any time.'}
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>

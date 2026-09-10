@@ -10,8 +10,7 @@ import {
   isWarehouseSettingUp,
   type WarehouseSetupTarget,
 } from './Warehouse.utils'
-import { WarehouseCatalogAccessCard } from './WarehouseCatalogAccessCard'
-import { WarehouseConnectionDetails } from './WarehouseConnectionDetails'
+import { WarehouseConnectSection } from './WarehouseConnectSection'
 import { WarehouseDisableCard } from './WarehouseDisableCard'
 import { WarehouseSchemaTablePicker } from './WarehouseSchemaTablePicker'
 import {
@@ -138,14 +137,13 @@ export const WarehouseSetupPanel = () => {
   return (
     <Sections>
       <WarehouseReplicatedTablesSection tables={data.tables} />
-      <WarehouseConnectionDetails />
+      <WarehouseConnectSection canManageCatalog />
       <WarehouseSchemaTablePicker
         isEditing
         onSubmit={handleSetup}
         isSubmitting={setupMutation.isPending}
         error={setupMutation.error}
       />
-      <WarehouseCatalogAccessCard />
       <WarehouseDisableCard />
     </Sections>
   )
