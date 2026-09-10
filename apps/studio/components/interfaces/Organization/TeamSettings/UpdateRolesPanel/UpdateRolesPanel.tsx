@@ -373,6 +373,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                 Cancel
               </Button>
               <Button
+                variant="primary"
                 loading={false}
                 disabled={!canSaveRoles || hasNoChanges}
                 onClick={() => {

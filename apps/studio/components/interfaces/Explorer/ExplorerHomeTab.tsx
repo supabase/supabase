@@ -1,9 +1,11 @@
-import { MessageSquarePlus, NotebookText, SquareCode } from 'lucide-react'
+import { NotebookText, SquareCode } from 'lucide-react'
 import { useState } from 'react'
 
 import { useCreateChat, useCreateNotebook, useCreateQuery } from './hooks'
-import { CHAT_TEMPLATES, NOTEBOOK_TEMPLATES } from './templates'
+import { NOTEBOOK_TEMPLATES } from './templates'
 import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
+import { CHAT_TEMPLATES } from '@/components/ui/AIAssistantPanel/AIAssistant.prompts'
+import { AssistantAgentHarnessFooter } from '@/components/ui/AIAssistantPanel/AssistantAgentHarnessFooter'
 import { AssistantChatForm } from '@/components/ui/AIAssistantPanel/AssistantChatForm'
 
 export const ExplorerHomeTab = () => {
@@ -16,21 +18,19 @@ export const ExplorerHomeTab = () => {
   return (
     <div className="bg-surface-100 h-full flex flex-col items-center justify-center px-10">
       <div className="w-full max-w-2xl">
-        <div className="flex items-center justify-center flex-col gap-y-1 mb-12">
-          <h1 className="heading-section">Explore your project</h1>
-          <p className="text-foreground-lighter text-sm">
-            Ask the Assistant about your data, or begin with a new resource.
-          </p>
+        <div className="text-center mb-6">
+          <h1 className="heading-section">Run SQL. Chat with your project. Create a Notebook</h1>
         </div>
 
         <AssistantChatForm
           loading={false}
           className="bg"
-          placeholder="Ask anything about your project"
+          placeholder="Explore your data, check project health, create a notebook..."
           value={value}
           onValueChange={(e) => setValue(e.target.value)}
           onSubmit={(message) => createChat({ initialMessage: message })}
         />
+        <AssistantAgentHarnessFooter />
 
         <section className="mt-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -70,9 +70,8 @@ export const ExplorerHomeTab = () => {
             {CHAT_TEMPLATES.map((template) => (
               <ActionCard
                 key={template.title}
-                icon={<MessageSquarePlus className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                icon={<template.icon className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
                 title={template.title}
-                description={template.description}
                 bgColor="bg-blue-500"
                 onClick={() =>
                   createChat({ name: template.title, initialMessage: template.initialMessage })

@@ -455,6 +455,7 @@ export const CreateFunction = ({
               Cancel
             </Button>
             <Button
+              variant="primary"
               form={FORM_ID}
               type="submit"
               disabled={isCreating || isUpdating}
