@@ -122,7 +122,7 @@ A shallow clone of the full Supabase repository. Works on any OS with `git` inst
 
 ```sh
 # Get the code
-git clone --depth 1 --branch self-hosted/v0.8.0 https://github.com/supabase/supabase
+git clone --depth 1 --branch self-hosted/v0.8.1 https://github.com/supabase/supabase
 
 # Make your new supabase project directory
 mkdir supabase-project
@@ -139,7 +139,7 @@ cp -rf supabase/docker/. supabase-project
 cd supabase-project && cp .env.example .env
 
 # Record the base version so update.sh can upgrade this install later
-printf 'ref=self-hosted/v0.8.0\n' > .supabase-version
+printf 'ref=self-hosted/v0.8.1\n' > .supabase-version
 
 # Pull the latest images
 docker compose pull
@@ -153,7 +153,7 @@ Only downloads the `docker/` directory from the repository, saving bandwidth and
 
 ```sh
 # Get the code using git sparse checkout
-git clone --filter=blob:none --no-checkout --depth=1 --quiet --branch self-hosted/v0.8.0 https://github.com/supabase/supabase
+git clone --filter=blob:none --no-checkout --depth=1 --quiet --branch self-hosted/v0.8.1 https://github.com/supabase/supabase
 cd supabase
 git sparse-checkout init --cone
 git sparse-checkout set docker
@@ -175,7 +175,7 @@ cp -rf supabase/docker/. supabase-project
 cd supabase-project && cp .env.example .env
 
 # Record the base version so update.sh can upgrade this install later
-printf 'ref=self-hosted/v0.8.0\n' > .supabase-version
+printf 'ref=self-hosted/v0.8.1\n' > .supabase-version
 
 # Pull the latest images
 docker compose pull
@@ -491,6 +491,24 @@ The script generates a new password, updates all database roles, and modifies yo
 ```sh
 sh run.sh recreate
 ```
+
+### Rotating API keys
+
+Unlike the managed platform, where you rotate keys from the Dashboard, self-hosted API keys live in your `.env` file. To rotate the publishable and secret keys (`SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY`) without changing the asymmetric signing key pair, run:
+
+```sh
+sh utils/rotate-new-api-keys.sh --update-env
+```
+
+Then restart the services and update your applications with the new keys:
+
+```sh
+sh run.sh recreate
+```
+
+Use the publishable key in client apps and the secret key only in trusted server-side environments. Rotating these keys does not invalidate existing user session tokens. You can also set a custom value by editing `SUPABASE_PUBLISHABLE_KEY` or `SUPABASE_SECRET_KEY` in `.env` directly, then recreating the services.
+
+For rotating versus fully regenerating the asymmetric key pair (which does affect active sessions), see [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys#regenerating-asymmetric-key-pair).
 
 ### Configuring secrets
 

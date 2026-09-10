@@ -591,7 +591,7 @@ const EntityTooltipTrigger = ({
       if (materializedViewHasLints) {
         tooltipContent = (
           <>
-            {accessWarning} as this is a Security definer view {learnMoreCTA}.
+            {accessWarning} as materialized view is accessible via API. {learnMoreCTA}.
           </>
         )
       }

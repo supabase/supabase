@@ -518,7 +518,12 @@ export const CreateOrUpdateOAuthAppSheet = ({
             <Button variant="default" disabled={isCreating || isUpdating} onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" form={FORM_ID} loading={isCreating || isUpdating}>
+            <Button
+              variant="primary"
+              type="submit"
+              form={FORM_ID}
+              loading={isCreating || isUpdating}
+            >
               {isEditMode ? 'Update app' : 'Create app'}
             </Button>
           </SheetFooter>

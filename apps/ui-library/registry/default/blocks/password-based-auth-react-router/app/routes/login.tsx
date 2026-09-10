@@ -50,8 +50,8 @@ export default function Login() {
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl">Login</CardTitle>
-              <CardDescription>Enter your email below to login to your account</CardDescription>
+              <CardTitle className="text-2xl">Sign in</CardTitle>
+              <CardDescription>Enter your email below to sign in to your account</CardDescription>
             </CardHeader>
             <CardContent>
               <fetcher.Form method="post">
@@ -81,7 +81,7 @@ export default function Login() {
                   </div>
                   {error && <p className="text-sm text-red-500">{error}</p>}
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'Logging in...' : 'Login'}
+                    {loading ? 'Signing in...' : 'Sign in'}
                   </Button>
                 </div>
                 <div className="mt-4 text-center text-sm">

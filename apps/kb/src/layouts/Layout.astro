@@ -1,4 +1,5 @@
 ---
+import Footer from '../components/Footer.astro'
 import { Header } from '../components/Header'
 import '../styles/globals.css'
 
@@ -62,7 +63,10 @@ const { title, description } = Astro.props
 	</head>
 	<body>
 		<Header client:load />
-		<slot />
+		<main>
+			<slot />
+		</main>
+		<Footer />
 	</body>
 </html>
 

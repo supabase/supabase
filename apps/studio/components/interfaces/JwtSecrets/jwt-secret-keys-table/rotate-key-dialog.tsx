@@ -275,6 +275,7 @@ export function RotateKeyDialog({
       </DialogSection>
       <DialogFooter>
         <Button
+          variant="primary"
           onClick={() => mutate({ projectRef, keyId: standbyKey.id, status: 'in_use' })}
           disabled={
             isLoadingEdgeFunctions ||

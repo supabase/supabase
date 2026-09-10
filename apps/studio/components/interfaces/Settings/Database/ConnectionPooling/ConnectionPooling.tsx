@@ -50,6 +50,7 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
 
 const formId = 'pooling-configuration-form'
 const HIGH_AVAILABILITY_MAX_CLIENT_CONNECTIONS = 100_000
@@ -57,14 +58,8 @@ const HA_DISABLED_TITLE =
   'Connection pooling settings are managed automatically on High Availability projects'
 
 const PoolingConfigurationFormSchema = z.object({
-  default_pool_size: z.preprocess(
-    (val) => (val === '' || val === null || val === undefined ? undefined : val),
-    z.coerce.number().optional()
-  ),
-  max_client_conn: z.preprocess(
-    (val) => (val === '' || val === null || val === undefined ? undefined : val),
-    z.coerce.number().optional()
-  ),
+  default_pool_size: preprocessEmptyNumberInput(z.coerce.number().optional()),
+  max_client_conn: preprocessEmptyNumberInput(z.coerce.number().optional()),
 })
 
 /**
@@ -170,7 +165,7 @@ export const ConnectionPooling = () => {
         </PageSectionSummary>
         <PageSectionAside>
           <DocsButton
-            href={`${DOCS_URL}/guides/database/connecting-to-postgres#connection-pooler`}
+            href={`${DOCS_URL}/guides/database/connecting-to-postgres/pooling-and-limits#how-connection-pooling-works`}
           />
         </PageSectionAside>
       </PageSectionMeta>

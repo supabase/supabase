@@ -12,13 +12,11 @@ import {
   buildDestinationConfigForValidation,
   buildTableSyncCopyConfig,
 } from './DestinationForm.utils'
-import {
-  useCreateDestinationPipelineMutation,
-  type BatchConfig,
-} from '@/data/replication/create-destination-pipeline-mutation'
+import { useCreateDestinationPipelineMutation } from '@/data/replication/create-destination-pipeline-mutation'
 import type { ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
+import { type BatchConfig } from '@/data/replication/types'
 import { useUpdateDestinationPipelineMutation } from '@/data/replication/update-destination-pipeline-mutation'
 import {
   useValidateDestinationMutation,
