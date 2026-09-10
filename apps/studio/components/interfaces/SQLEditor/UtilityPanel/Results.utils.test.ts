@@ -60,6 +60,21 @@ describe('Results.utils', () => {
       const md = convertResultsToMarkdown(results)
       expect(md).toContain('{"role":"admin"}')
     })
+
+    it('should escape pipe characters so a value cannot split into extra columns', () => {
+      const results = [{ id: 1, name: 'a|b' }]
+      const md = convertResultsToMarkdown(results)
+      const rows = md!.split('\n')
+      // header + separator + one data row, not more
+      expect(rows).toHaveLength(3)
+      expect(rows[2]).toContain('a\\|b')
+    })
+
+    it('should escape backslashes so an escaped pipe cannot be forged', () => {
+      const results = [{ id: 1, name: 'a\\|b' }]
+      const md = convertResultsToMarkdown(results)
+      expect(md).toContain('a\\\\\\|b')
+    })
   })
 
   describe('convertResultsToJSON', () => {
