@@ -88,7 +88,7 @@ describe('AdvisorButton', () => {
 
     expect(container.querySelector('.bg-warning')).toBeInTheDocument()
     expect(container.querySelector('.bg-destructive')).not.toBeInTheDocument()
-    expect(container.querySelector('.bg-brand')).not.toBeInTheDocument()
+    expect(container.querySelector('.bg-brand-default')).not.toBeInTheDocument()
   })
 
   it('keeps the destructive dot when a critical issue is present', () => {
@@ -155,7 +155,7 @@ describe('AdvisorButton', () => {
 
     const { container } = render(<AdvisorButton projectRef="project-ref" />)
 
-    expect(container.querySelector('.bg-brand')).toBeInTheDocument()
+    expect(container.querySelector('.bg-brand-default')).toBeInTheDocument()
     expect(container.querySelector('.bg-warning')).not.toBeInTheDocument()
     expect(container.querySelector('.bg-destructive')).not.toBeInTheDocument()
     expect(screen.getByRole('button')).toBeInTheDocument()

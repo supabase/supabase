@@ -90,7 +90,7 @@ const LWXStickyNav: FC = () => {
                       {day.isToday && (
                         <span
                           title="Live"
-                          className="w-1 h-1 animate-pulse rounded-full bg-brand block"
+                          className="w-1 h-1 animate-pulse rounded-full bg-brand-default block"
                         />
                       )}
                     </Link>
@@ -115,7 +115,7 @@ const LWXStickyNav: FC = () => {
                     {day.isToday && (
                       <span
                         title="Live"
-                        className="w-1 h-1 ml-1 animate-pulse rounded-full bg-brand mb-2 block"
+                        className="w-1 h-1 ml-1 animate-pulse rounded-full bg-brand-default mb-2 block"
                       />
                     )}
                   </Link>

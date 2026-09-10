@@ -14,7 +14,7 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
   const [isBlinking, setIsBlinking] = useState(false)
   const accent = useAccent()
 
-  const accentBg = 'bg-brand'
+  const accentBg = 'bg-brand-default'
 
   useEffect(() => {
     if (answers.length <= 1) return

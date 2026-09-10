@@ -9,7 +9,7 @@ export function SurveyRankedAnswersPair({
 }) {
   const accent = useAccent()
 
-  const accentBlocks = ['bg-brand', 'bg-brand-500', 'bg-brand-300']
+  const accentBlocks = ['bg-brand-default', 'bg-brand-500', 'bg-brand-300']
 
   const accentRankText = 'text-brand'
 

@@ -63,7 +63,7 @@ export function EventList() {
           <div
             className={cn(
               'absolute top-2 left-[-59px] rounded-full size-1.5',
-              index === 0 ? 'bg-brand size-2 left-[-60px]' : 'bg-foreground-muted'
+              index === 0 ? 'bg-brand-default size-2 left-[-60px]' : 'bg-foreground-muted'
             )}
           />
 

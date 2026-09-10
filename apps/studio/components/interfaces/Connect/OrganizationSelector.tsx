@@ -210,7 +210,7 @@ const ConnectOrganizationButton = ({
         'pointer-events-none shadow-none transition-colors',
         !disabled && !selected && 'group-hover:border-default group-hover:bg-surface-200',
         selected &&
-          'border-brand bg-brand-200/20 dark:bg-brand-300 pr-10 group-hover:border-brand group-hover:bg-brand-200/20'
+          'border-brand-default bg-brand-200/20 dark:bg-brand-300 pr-10 group-hover:border-brand-default group-hover:bg-brand-200/20'
       )}
     />
     {selected && (

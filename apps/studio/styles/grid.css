@@ -60,7 +60,7 @@
 
   .rdg-cell {
     border-left-color: hsl(var(--brand-default));
-    color: hsl(var(--brand-link));
+    color: hsl(var(--brand-text));
   }
 
   /* First cell gets a stronger left border to indicate new row */
@@ -329,7 +329,7 @@
 }
 
 .sb-grid-column-header__inner svg {
-  @apply border-brand text-brand;
+  @apply border-brand-default text-brand;
 }
 
 /*

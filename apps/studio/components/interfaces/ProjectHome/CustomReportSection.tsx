@@ -394,7 +394,7 @@ export function CustomReportSection() {
       </div>
       <div className="relative">
         {isDraggingOver && (
-          <div className="absolute inset-0 rounded-sm bg-brand/10 pointer-events-none z-10" />
+          <div className="absolute inset-0 rounded-sm bg-brand-default/10 pointer-events-none z-10" />
         )}
         {layout.length === 0 ? (
           <div

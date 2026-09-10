@@ -14,7 +14,7 @@ type IconVisual = 'default' | 'warning' | 'destructive' | 'success'
 
 const ICON_BADGE_CLASS: Record<IconVisual, string> = {
   default: 'text-background bg-foreground-muted',
-  success: 'text-white dark:text-brand-link bg-brand dark:bg-brand-500/50',
+  success: 'text-white dark:text-brand bg-brand-default dark:bg-brand-500/50',
   warning: 'text-warning-200 bg-warning-600',
   destructive: 'text-destructive-200 bg-destructive-600',
 }

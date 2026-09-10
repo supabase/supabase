@@ -184,7 +184,7 @@ export const BigQueryFields = ({
                 {isDraggingFile ? (
                   <div
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 rounded-md ring-2 ring-brand ring-offset-2 ring-offset-background"
+                    className="pointer-events-none absolute inset-0 rounded-md ring-2 ring-brand-default ring-offset-2 ring-offset-background"
                   />
                 ) : null}
               </div>

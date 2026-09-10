@@ -35,9 +35,9 @@ export const BannerFreeMicroUpgrade = () => {
               <ComputeBadge
                 infraComputeSize="nano"
                 icon={<ChevronsUpAnimated />}
-                className="text-brand-600 border-brand-500 bg-brand/10 gap-1"
+                className="text-brand-600 border-brand-500 bg-brand-default/10 gap-1"
               />
-              <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-linear-to-br from-transparent via-brand/20 to-transparent blur-md" />
+              <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-linear-to-br from-transparent via-brand-default/20 to-transparent blur-md" />
             </div>
           </div>
         </div>

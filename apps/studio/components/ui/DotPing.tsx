@@ -12,7 +12,7 @@ export const DotPing = ({ animate = true, variant = 'primary' }: DotPingProps) =
         className={cn(
           'absolute inset-0 rounded-full',
           animate && 'animate-ping',
-          variant === 'primary' && 'bg-brand/20',
+          variant === 'primary' && 'bg-brand-default/20',
           variant === 'default' && 'bg-selection/20',
           variant === 'warning' && 'bg-warning/20'
         )}
@@ -24,7 +24,7 @@ export const DotPing = ({ animate = true, variant = 'primary' }: DotPingProps) =
       <span
         className={cn(
           'absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 inline-block w-2 h-2 rounded-full',
-          variant === 'primary' && 'bg-brand',
+          variant === 'primary' && 'bg-brand-default',
           variant === 'default' && 'bg-selection',
           variant === 'warning' && 'bg-warning'
         )}

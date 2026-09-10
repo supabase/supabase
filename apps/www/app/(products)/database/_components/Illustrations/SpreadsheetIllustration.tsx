@@ -140,7 +140,7 @@ export function SpreadsheetIllustration() {
                   <td
                     key={col.name}
                     className={`border-b border-r last:border-r-0 border-secondary px-3 py-1.5 max-w-[200px] ${
-                      isEdited ? 'bg-brand/10' : ''
+                      isEdited ? 'bg-brand-default/10' : ''
                     }`}
                   >
                     <span

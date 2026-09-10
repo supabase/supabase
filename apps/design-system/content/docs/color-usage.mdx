@@ -9,9 +9,18 @@ The shorthand utility classes below simplify our full color palette by providing
 
 Use accent text colors (e.g. text-destructive, text-warning) sparingly to avoid visual overload.
 
+Use `text-brand` for readable branded text such as links, labels, and statuses. It meets the 4.5:1
+WCAG AA requirement for normal text on light-theme surfaces. Reserve `text-brand-display` for
+large, expressive type. These text tokens are mode-aware and intentionally separate from the
+canonical brand colour used by non-text utilities.
+
 <Colors definition={'text'} />
 
 ## Background
+
+Use `bg-brand-default` when the canonical Supabase green is required as a fill. The same
+`brand-default` suffix applies to borders and other non-text utilities, such as
+`border-brand-default`.
 
 <Colors definition={'background'} />
 

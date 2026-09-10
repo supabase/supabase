@@ -131,7 +131,7 @@ function TOCItem({ item }: { item: TOCItemType }) {
     <Primitive.TOCItem
       href={`#${formatSlug(item.url)}`}
       className={cn(
-        'text-foreground-lighter hover:text-brand-link transition-colors py-1 wrap-anywhere first:pt-0 last:pb-0 data-[active=true]:text-foreground',
+        'text-foreground-lighter hover:text-brand transition-colors py-1 wrap-anywhere first:pt-0 last:pb-0 data-[active=true]:text-foreground',
         item.depth <= 2 && 'ps-3',
         item.depth === 3 && 'ps-6',
         item.depth >= 4 && 'ps-8'

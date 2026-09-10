@@ -68,7 +68,7 @@ export function ParticipantsCarousel({ participants }: { participants: Participa
                     href={participant.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs md:text-sm font-mono tracking-widest uppercase text-foreground-lighter hover:text-brand-link transition-colors whitespace-nowrap"
+                    className="text-xs md:text-sm font-mono tracking-widest uppercase text-foreground-lighter hover:text-brand transition-colors whitespace-nowrap"
                   >
                     {participant.company}
                   </Link>

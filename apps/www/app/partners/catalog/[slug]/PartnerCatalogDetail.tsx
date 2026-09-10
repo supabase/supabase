@@ -360,7 +360,7 @@ function PartnerDetails({
               <span className="text-lighter">Category</span>
               <Link
                 href={`/partners/catalog?cat=${encodeURIComponent(category.slug)}`}
-                className="text-brand-link hover:underline transition-colors"
+                className="text-brand hover:underline transition-colors"
               >
                 {category.name}
               </Link>
@@ -378,7 +378,7 @@ function PartnerDetails({
                 }
                 target="_blank"
                 rel="noreferrer"
-                className="text-brand-link hover:underline transition-colors"
+                className="text-brand hover:underline transition-colors"
               >
                 {(() => {
                   try {
@@ -401,7 +401,7 @@ function PartnerDetails({
                 href={activeListing.docsUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="text-brand-link hover:underline transition-colors"
+                className="text-brand hover:underline transition-colors"
               >
                 <span className="flex items-center space-x-1">
                   <span>Learn</span>

@@ -247,7 +247,7 @@
   --border-destructive: oklch(from var(--destructive) l c h / 30%);
   --border-warning: oklch(from var(--warning) l c h / 30%);
   --border-info: oklch(from var(--info) l c h / 30%);
-  --border-brand: oklch(from var(--primary) l c h / 30%);
+  --border-brand-default: oklch(from var(--primary) l c h / 30%);
 
   --border: oklch(
     from var(--foreground) l calc(c * 0.54) h / calc(2% + 20% * var(--contrast-border))

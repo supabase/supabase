@@ -132,7 +132,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
               </div>
               <div
                 className={cn(
-                  'relative w-full bg-brand',
+                  'relative w-full bg-brand-default',
                   'border rounded-lg overflow-hidden',
                   'mx-auto max-w-3xl',
                   'flex items-center justify-center',

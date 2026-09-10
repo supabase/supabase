@@ -10,7 +10,7 @@ const badgeVariants = cva(
       variant: {
         default: 'bg-surface-75 text-foreground-light border border-strong',
         warning: 'bg-warning/10 text-warning-600 border border-warning-500',
-        success: 'bg-brand/10 text-brand-600 border border-brand-500',
+        success: 'bg-brand-default/10 text-brand-600 border border-brand-500',
         destructive: 'bg-destructive/10 text-destructive border border-border-destructive',
         // Secondary is invisible
         secondary:
