@@ -160,6 +160,7 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
             Cancel
           </Button>
           <ButtonTooltip
+            variant="primary"
             disabled={!canCreateTriggers}
             loading={isCreating}
             onClick={handleCreateTrigger}

@@ -97,6 +97,12 @@ const frameworks = [
     href: '/guides/getting-started/quickstarts/flask',
   },
   {
+    name: 'Reflex',
+    icon: '/docs/img/icons/reflex-icon',
+    href: '/guides/getting-started/quickstarts/reflex',
+    hasLightIcon: true,
+  },
+  {
     name: 'Laravel',
     icon: '/docs/img/icons/laravel-icon',
     href: '/guides/getting-started/quickstarts/laravel',
@@ -105,6 +111,11 @@ const frameworks = [
     name: 'Ruby on Rails',
     icon: '/docs/img/icons/rails-icon',
     href: '/guides/getting-started/quickstarts/ruby-on-rails',
+  },
+  {
+    name: 'Spring Boot',
+    icon: '/docs/img/icons/spring-boot-icon',
+    href: '/guides/getting-started/quickstarts/spring-boot',
   },
 ]
 

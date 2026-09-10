@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { Dialog, DialogContent } from 'ui'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { CreateKeyDialog } from './create-key-dialog'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -25,10 +25,6 @@ vi.mock('sonner', () => ({
 }))
 
 describe('CreateKeyDialog', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('wraps the create standby key button with the submit shortcut', () => {
     render(
       <Dialog open>

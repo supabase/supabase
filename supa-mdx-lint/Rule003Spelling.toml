@@ -350,6 +350,8 @@ allow_list = [
     "PGroonga",
     "pg_basebackup",
     "PgBouncer",
+    "pgcrypto",
+    "Pgcrypto",
     "pgjwt",
     "PHI",
     "Pico",

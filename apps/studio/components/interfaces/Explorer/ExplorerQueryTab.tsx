@@ -121,7 +121,9 @@ export const ExplorerQueryTab = () => {
             This local draft may have been closed or cleared from this browser.
           </p>
         </div>
-        <Button onClick={() => router.push(`/project/${ref}/explorer`)}>Back to Explorer</Button>
+        <Button variant="primary" onClick={() => router.push(`/project/${ref}/explorer`)}>
+          Back to Explorer
+        </Button>
       </div>
     )
   }

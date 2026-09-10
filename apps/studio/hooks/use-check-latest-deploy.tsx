@@ -25,6 +25,7 @@ const DeployCheckToast = ({ id }: { id: string | number }) => {
           Not now
         </Button>
         <Button
+          variant="primary"
           onClick={() => {
             // Document requests carry no skew-protection pin (only built
             // asset URLs do — see skewProtectionDpl in vite.config.ts), so a

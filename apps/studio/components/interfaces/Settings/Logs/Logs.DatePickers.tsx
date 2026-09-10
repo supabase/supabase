@@ -431,7 +431,9 @@ export const LogsDatePicker = ({
             >
               Today
             </Button>
-            <Button onClick={handleApply}>Apply</Button>
+            <Button variant="primary" onClick={handleApply}>
+              Apply
+            </Button>
           </div>
         </div>
       </PopoverContent>

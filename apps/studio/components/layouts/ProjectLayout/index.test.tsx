@@ -1,10 +1,11 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { MobileSheetProvider } from '../Navigation/NavigationBar/MobileSheetContext'
+import { MobileSheetProvider, useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
 import { ProjectLayout } from './index'
+import type { MobileMenuContentProps } from './LayoutHeader/MobileMenuContent'
 import { STUDIO_PAGE_TITLE_SEPARATOR } from '@/lib/page-title'
 
 const { mockRouter, mockSetSelectedDatabaseId, mockSetMobileMenuOpen } = vi.hoisted(() => ({
@@ -226,6 +227,67 @@ vi.mock('@/state/database-selector', () => ({
   }),
 }))
 
+vi.mock('./LayoutHeader/MobileMenuContent', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./LayoutHeader/MobileMenuContent')>()
+  return {
+    ...actual,
+    MobileMenuContent: ({
+      currentProductMenuHeader,
+      currentProductMenu,
+    }: MobileMenuContentProps) => (
+      <div>
+        {currentProductMenuHeader}
+        {currentProductMenu}
+      </div>
+    ),
+  }
+})
+
+vi.mock('../Navigation/ProductMenuBar', () => ({
+  ProductMenuBar: () => null,
+}))
+
+const MobileSheetHarness = () => {
+  const { content, openMenu, setContent } = useMobileSheet()
+  return (
+    <>
+      <button tabIndex={0} onClick={openMenu}>
+        Open menu
+      </button>
+      <button tabIndex={0} onClick={() => setContent(<span>Other sheet</span>)}>
+        Open other sheet
+      </button>
+      <div data-testid="mobile-sheet">{content}</div>
+    </>
+  )
+}
+
+const ResourceMenuHarness = () => {
+  const [section, setSection] = useState('Explorer')
+  return (
+    <>
+      <button tabIndex={0} onClick={() => setSection('Chats')}>
+        Change section
+      </button>
+      <ProjectLayout
+        product="Explorer"
+        isBlocking={false}
+        productMenuHeader={<span>{section} header</span>}
+        productMenu={
+          <button
+            tabIndex={0}
+            onClick={() => setSection(section === 'Explorer' ? 'Notebooks' : 'Explorer')}
+          >
+            {section === 'Explorer' ? 'Open notebooks' : 'Return to Explorer'}
+          </button>
+        }
+      >
+        <div />
+      </ProjectLayout>
+    </>
+  )
+}
+
 const renderLayout = () =>
   render(
     <MobileSheetProvider>
@@ -257,8 +319,26 @@ describe('ProjectLayout title', () => {
   })
 
   afterEach(() => {
-    vi.clearAllMocks()
     document.title = ''
+  })
+
+  it('updates the open mobile menu when resource navigation changes without replacing other sheets', () => {
+    render(
+      <MobileSheetProvider>
+        <ResourceMenuHarness />
+        <MobileSheetHarness />
+      </MobileSheetProvider>
+    )
+    expect(screen.getByTestId('mobile-sheet')).toBeEmptyDOMElement()
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }))
+    expect(screen.getByText('Explorer header')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Open notebooks' }))
+    expect(screen.getByText('Notebooks header')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Return to Explorer' }))
+    expect(screen.getByText('Explorer header')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Open other sheet' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Change section' }))
+    expect(screen.getByTestId('mobile-sheet')).toHaveTextContent('Other sheet')
   })
 
   it('sets a composed document title and deduplicates identical section/surface labels', async () => {
@@ -353,7 +433,6 @@ describe('FREE_MICRO_UPGRADE banner', () => {
   })
 
   afterEach(() => {
-    vi.clearAllMocks()
     mockRouter.pathname = '/project/[ref]/observability/query-performance'
     mockRouter.asPath = '/project/default/observability/query-performance'
     mockProjectState.current = {

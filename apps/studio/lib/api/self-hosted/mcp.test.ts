@@ -23,7 +23,6 @@ describe('api/self-hosted/mcp', () => {
     let getProjectSettingsMock: ReturnType<typeof vi.fn>
 
     beforeEach(async () => {
-      vi.clearAllMocks()
       vi.unstubAllEnvs()
       const settings = await import('./settings')
       getProjectSettingsMock = vi.mocked(settings.getProjectSettings)
@@ -91,7 +90,6 @@ describe('api/self-hosted/mcp', () => {
     let retrieveAnalyticsDataMock: ReturnType<typeof vi.fn>
 
     beforeEach(async () => {
-      vi.clearAllMocks()
       vi.unstubAllEnvs()
       const logs = await import('./logs')
       retrieveAnalyticsDataMock = vi.mocked(logs.retrieveAnalyticsData)
