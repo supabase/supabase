@@ -6,12 +6,12 @@ import { type ThemedToken } from 'shiki'
 import { type NodeHover } from 'twoslash'
 import { Button, cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { getFontStyle } from './CodeBlock.utils'
+import { decodeTokenColor, getFontStyle } from './CodeBlock.utils'
 
 type CodeAnnotation = Pick<NodeHover, 'text' | 'docs' | 'tags'>
 export type CodeToken = [
   content: string,
-  color: ThemedToken['color'],
+  color: string | undefined,
   fontStyle: number,
   annotation?: {
     annotations: Array<CodeAnnotation>
@@ -65,7 +65,7 @@ function CodeLine({ tokens }: { tokens: Array<CodeToken> }) {
         annotation ? (
           <AnnotatedSpan key={idx} content={content} {...annotation} />
         ) : (
-          <span key={idx} style={{ color, ...getFontStyle(fontStyle) }}>
+          <span key={idx} style={{ color: decodeTokenColor(color), ...getFontStyle(fontStyle) }}>
             {content}
           </span>
         )
