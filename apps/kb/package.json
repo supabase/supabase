@@ -17,6 +17,7 @@
     "lucide-react": "*",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "sharp": "^0.35.4",
     "ui": "workspace:*"
   },
   "devDependencies": {
