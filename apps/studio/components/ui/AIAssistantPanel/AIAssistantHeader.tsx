@@ -61,6 +61,12 @@ export const AIAssistantHeader = ({
   const [isEditingName, setIsEditingName] = useState(false)
   const [isOptInModalOpen, setIsOptInModalOpen] = useState(false)
 
+  const maximiseLabel = isExplorerEnabled
+    ? 'Open in Explorer'
+    : isMaximised
+      ? 'Minimize'
+      : 'Maximize'
+
   const onSelectMaximise = () => {
     if (isExplorerEnabled) handleOpenInExplorer()
     else toggleMaximise()
@@ -163,12 +169,12 @@ export const AIAssistantHeader = ({
 
             <ShortcutTooltip
               side="bottom"
-              label={isExplorerEnabled ? 'Open in Explorer' : isMaximised ? 'Minimize' : 'Maximize'}
+              label={maximiseLabel}
               shortcutId={SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE}
             >
               <Button
                 variant="text"
-                aria-label="Open in Explorer"
+                aria-label={maximiseLabel}
                 size="tiny"
                 icon={<Maximize />}
                 onClick={onSelectMaximise}
