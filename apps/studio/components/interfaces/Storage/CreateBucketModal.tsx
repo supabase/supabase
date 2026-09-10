@@ -376,6 +376,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
             Cancel
           </Button>
           <Button
+            variant="primary"
             form={formId}
             type="submit"
             loading={isCreatingBucket}

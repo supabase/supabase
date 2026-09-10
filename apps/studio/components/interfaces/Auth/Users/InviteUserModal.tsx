@@ -95,6 +95,7 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
               Cancel
             </Button>
             <Button
+              variant="primary"
               form={formId}
               type="submit"
               loading={isInviting}

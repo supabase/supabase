@@ -135,7 +135,12 @@ export const RestoringState = () => {
               </div>
             </div>
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8">
-              <Button disabled={isConfirming} loading={isConfirming} onClick={onConfirm}>
+              <Button
+                variant="primary"
+                disabled={isConfirming}
+                loading={isConfirming}
+                onClick={onConfirm}
+              >
                 Return to project
               </Button>
             </div>

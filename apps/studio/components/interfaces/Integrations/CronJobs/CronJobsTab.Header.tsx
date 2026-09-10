@@ -64,7 +64,9 @@ export const CronJobsTabHeader = ({
         <Button variant="default" icon={<RefreshCw />} loading={isRefreshing} onClick={onRefresh}>
           Refresh
         </Button>
-        <Button onClick={onCreateJob}>Create job</Button>
+        <Button variant="primary" onClick={onCreateJob}>
+          Create job
+        </Button>
       </div>
     </div>
   )

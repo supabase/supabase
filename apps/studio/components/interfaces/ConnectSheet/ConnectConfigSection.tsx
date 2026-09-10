@@ -1,5 +1,17 @@
+import { Check, ChevronsUpDown } from 'lucide-react'
+import { useState } from 'react'
 import {
+  Button,
   cn,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Select,
@@ -19,6 +31,7 @@ import {
 } from 'ui-patterns/multi-select'
 
 import type { ConnectMode, FieldOption, ResolvedField } from './Connect.types'
+import { getOptionMatchScore } from './ConnectConfigSection.utils'
 import { ConnectionIcon } from './ConnectionIcon'
 import {
   ConnectModeButton,
@@ -55,6 +68,33 @@ export function ConnectConfigSection({
         }
 
         switch (field.type) {
+          case 'combobox':
+            return (
+              <FormItemLayout
+                key={field.id}
+                isReactForm={false}
+                layout="horizontal"
+                label={field.label}
+                description={field.description}
+                name={`connect-${field.id}`}
+              >
+                <ConnectCombobox
+                  id={`connect-${field.id}`}
+                  options={options}
+                  value={String(value ?? '')}
+                  onValueChange={(v) => onFieldChange(field.id, v)}
+                  placeholder={field.combobox?.placeholder ?? 'Select option'}
+                  searchPlaceholder={field.combobox?.searchPlaceholder ?? 'Search...'}
+                  emptyMessage={field.combobox?.emptyMessage ?? 'No results found'}
+                  /*
+                    [Joshen] Omitting MCP icons for now as the images are not optimized (large)
+                    and is causing noticeably latency issues on the browser (even with the existing Connect UI)
+                   */
+                  showIcons={field.id === 'framework'}
+                />
+              </FormItemLayout>
+            )
+
           case 'radio-grid':
             return (
               <FormItemLayout
@@ -230,6 +270,109 @@ export function ConnectConfigSection({
         }
       })}
     </div>
+  )
+}
+
+interface ConnectComboboxProps {
+  id: string
+  options: FieldOption[]
+  value: string
+  onValueChange: (value: string) => void
+  placeholder: string
+  searchPlaceholder: string
+  emptyMessage: string
+  showIcons: boolean
+}
+
+function ConnectCombobox({
+  id,
+  options,
+  value,
+  onValueChange,
+  placeholder,
+  searchPlaceholder,
+  emptyMessage,
+  showIcons,
+}: ConnectComboboxProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const [listboxElementId, setListboxElementId] = useState<string>()
+  const selectedOption = options.find((option) => option.value === value)
+  const showEmptyStatus =
+    search.trim().length > 0 &&
+    !options.some((option) => getOptionMatchScore(option.label, search, [option.value]) > 0)
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
+    if (!open) setSearch('')
+  }
+
+  return (
+    <Popover open={isOpen} onOpenChange={handleOpenChange} modal={false}>
+      <PopoverTrigger asChild>
+        <Button
+          id={id}
+          variant="default"
+          size="small"
+          role="combobox"
+          aria-expanded={isOpen}
+          aria-controls={listboxElementId}
+          className={cn('w-full justify-between', !selectedOption && 'text-foreground-muted')}
+          iconRight={<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" strokeWidth={1} />}
+        >
+          <span className="flex min-w-0 items-center gap-x-2">
+            {showIcons && selectedOption?.icon && (
+              <span aria-hidden="true" className="flex shrink-0">
+                <ConnectionIcon icon={selectedOption.icon} />
+              </span>
+            )}
+            <span className="truncate">{selectedOption?.label ?? placeholder}</span>
+          </span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="p-0" sameWidthAsTrigger>
+        <Command filter={getOptionMatchScore}>
+          <CommandInput placeholder={searchPlaceholder} value={search} onValueChange={setSearch} />
+          <p className="sr-only" role="status" aria-live="polite">
+            {showEmptyStatus ? emptyMessage : ''}
+          </p>
+          <CommandList
+            className="max-h-72 overscroll-contain"
+            ref={(node) => {
+              if (node?.id) setListboxElementId(node.id)
+            }}
+          >
+            <CommandEmpty>{emptyMessage}</CommandEmpty>
+            <CommandGroup>
+              {options.map((option) => (
+                <CommandItem
+                  key={option.value}
+                  value={option.label}
+                  keywords={[option.value]}
+                  onSelect={() => {
+                    onValueChange(option.value)
+                    handleOpenChange(false)
+                  }}
+                  className="gap-x-2"
+                >
+                  <Check
+                    className={cn(
+                      'h-4 w-4 shrink-0',
+                      option.value === value ? 'opacity-100' : 'opacity-0'
+                    )}
+                  />
+                  {showIcons && option.icon && (
+                    <span aria-hidden="true" className="flex shrink-0">
+                      <ConnectionIcon icon={option.icon} />
+                    </span>
+                  )}
+                  <span className="truncate">{option.label}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }
 

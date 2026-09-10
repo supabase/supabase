@@ -545,6 +545,7 @@ export const PolicyEditorPanel = memo(function ({
                       </Button>
 
                       <ButtonTooltip
+                        variant="primary"
                         form={FORM_ID}
                         type="submit"
                         loading={isExecuting || isUpdating}

@@ -222,7 +222,7 @@ export const EditSecretModal = () => {
               >
                 Cancel
               </Button>
-              <Button form={formId} type="submit" loading={isSubmitting}>
+              <Button variant="primary" form={formId} type="submit" loading={isSubmitting}>
                 Update secret
               </Button>
             </DialogFooter>

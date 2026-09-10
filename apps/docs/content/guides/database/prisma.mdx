@@ -19,7 +19,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
     <StepHikeCompact.Details title="Create a custom user for Prisma">
       - In the [SQL Editor](/dashboard/project/_/sql/new), create a Prisma DB user with full privileges on the public schema.
       - This gives you better control over Prisma's access and makes it easier to monitor using Supabase tools like the [Query Performance Dashboard](/dashboard/project/_/advisors/query-performance) and [Log Explorer](/dashboard/project/_/logs/explorer).
-      <Admonition type="note" title="password manager">
+      <Admonition type="note" title="Password manager">
 
         For security, consider using a [password generator](https://bitwarden.com/password-generator/) for the Prisma role.
 
@@ -103,9 +103,9 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
               yarn add prisma tsx @types/pg --save-dev
               yarn add @prisma/client @prisma/adapter-pg dotenv pg
 
-              npx tsc --init
+              yarn tsc --init
 
-              npx prisma init
+              yarn prisma init
               ```
             </TabPanel>
             <TabPanel id="bun_initiate" label="bun">
@@ -285,8 +285,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             </TabPanel>
             <TabPanel id="yarn_migrate" label="yarn">
             ```bash
-            npx prisma migrate dev --name first_prisma_migration
-            npx prisma generate
+            yarn prisma migrate dev --name first_prisma_migration
+            yarn prisma generate
             ```
             </TabPanel>
             <TabPanel id="bun_migrate" label="bun">
@@ -325,7 +325,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
               --to-schema prisma/schema.prisma \
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
-            <Admonition type="note" title="conflict management">
+            <Admonition type="note" title="Conflict management">
 
               If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma/prisma-troubleshooting) for more details
 
@@ -354,7 +354,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
               --to-schema prisma/schema.prisma \
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
-            <Admonition type="note" title="conflict management">
+            <Admonition type="note" title="Conflict management">
 
               If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma/prisma-troubleshooting) for more details
 
@@ -368,7 +368,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
           <TabPanel id="yarn_sync" label="yarn">
             ```bash
-            npx prisma db pull
+            yarn prisma db pull
             ```
 
             Create a migration file
@@ -378,20 +378,20 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
             Synchronize the migrations
             ```bash
-              npx prisma migrate diff \
+              yarn prisma migrate diff \
               --from-empty \
               --to-schema prisma/schema.prisma \
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
-            <Admonition type="note" title="conflict management">
+            <Admonition type="note" title="Conflict management">
 
               If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma/prisma-troubleshooting) for more details
 
             </Admonition>
 
             ```bash
-            npx prisma migrate resolve --applied 0_init_supabase
-            npx prisma generate
+            yarn prisma migrate resolve --applied 0_init_supabase
+            yarn prisma generate
             ```
           </TabPanel>
 
@@ -412,7 +412,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
               --to-schema prisma/schema.prisma \
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
-            <Admonition type="note" title="conflict management">
+            <Admonition type="note" title="Conflict management">
 
               If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma/prisma-troubleshooting) for more details
 

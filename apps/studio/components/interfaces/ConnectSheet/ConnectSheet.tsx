@@ -12,6 +12,7 @@ import { useAvailableConnectModes } from './useAvailableConnectModes'
 import { useConnectSheetParams } from './useConnectSheetParams'
 import { useConnectSheetShortcut } from './useConnectSheetShortcut'
 import { useConnectState } from './useConnectState'
+import { WarehouseModePanel } from './WarehouseModePanel/WarehouseModePanel'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -177,18 +178,26 @@ export const ConnectSheet = () => {
             />
           </div>
 
-          {activeFields.length > 0 && (
+          {state.mode === 'warehouse' ? (
             <div className="p-8">
-              <ConnectConfigSection
-                state={state}
-                activeFields={activeFields}
-                onFieldChange={handleFieldChange}
-                getFieldOptions={getFieldOptions}
-              />
+              <WarehouseModePanel />
             </div>
-          )}
+          ) : (
+            <>
+              {activeFields.length > 0 && (
+                <div className="p-8">
+                  <ConnectConfigSection
+                    state={state}
+                    activeFields={activeFields}
+                    onFieldChange={handleFieldChange}
+                    getFieldOptions={getFieldOptions}
+                  />
+                </div>
+              )}
 
-          <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
+              <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
+            </>
+          )}
         </div>
       </SheetContent>
     </Sheet>

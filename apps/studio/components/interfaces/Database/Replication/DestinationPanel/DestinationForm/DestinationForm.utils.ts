@@ -24,9 +24,14 @@ import {
 } from './DuckLake/DuckLake.constants'
 import { type DucklakeApiConfig } from './DuckLake/DuckLake.utils'
 import { type SnowflakeApiConfig } from './Snowflake/Snowflake.utils'
-import {
+import { type ReplicationDestinationByIdData } from '@/data/replication/destination-by-id-query'
+import { type ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
+import { type ReplicationPublicationData } from '@/data/replication/publication-query'
+import type {
   BatchConfig,
   BigQueryDestinationConfig,
+  BigQueryPartitionBy,
+  BigQueryTableOption,
   ClickHouseDestinationConfig,
   DestinationConfig,
   DucklakeDestinationConfig,
@@ -35,10 +40,7 @@ import {
   IcebergDestinationConfig,
   SnowflakeDestinationConfig,
   TableSyncCopyConfig,
-} from '@/data/replication/create-destination-pipeline-mutation'
-import { type ReplicationDestinationByIdData } from '@/data/replication/destination-by-id-query'
-import { type ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
-import { type ReplicationPublication } from '@/data/replication/publications-query'
+} from '@/data/replication/types'
 import { type ValidationFailure } from '@/data/replication/validate-destination-mutation'
 import {
   type CreateS3AccessKeyCredentialVariables,
@@ -119,6 +121,7 @@ export const generateDefaultValues = ({
       (config as { big_query?: { connection_pool_size?: number } } | undefined)?.big_query
         ?.connection_pool_size ?? DEFAULT_CONNECTION_POOL_SIZE,
     maxStalenessMins: bigQueryConfig?.max_staleness_mins ?? undefined, // Default: null
+    tableOptions: (bigQueryConfig?.table_options?.tables ?? []).map(parseBigQueryTableOption),
     // Analytics Bucket fields
     warehouseName: icebergConfig?.warehouse_name ?? '',
     namespace: icebergConfig?.namespace ?? '',
@@ -203,15 +206,15 @@ export const buildBatchConfig = ({
 }
 
 // The set of table ids (as strings, matching form state) currently in the
-// selected publication. Selective table-copy only ever offers/keeps ids that
-// are in this set; ids selected previously that fall out of it are dropped at
-// submit time rather than resolved or displayed.
+// selected publication. Selective table-copy only ever offers ids in this set;
+// previously selected ids that fall out of it are highlighted in the form and
+// dropped at submit time.
 export const getPublicationTableIds = (
-  publications: ReplicationPublication[],
+  publication: ReplicationPublicationData,
   publicationName: string
 ): Set<string> => {
-  const publication = publications.find(({ name }) => name === publicationName)
-  return new Set((publication?.tables ?? []).map(({ id }) => String(id)))
+  if (publication.name !== publicationName) return new Set()
+  return new Set(publication.tables.map(({ id }) => String(id)))
 }
 
 // Drops selected table ids that are no longer in the current publication.
@@ -220,19 +223,71 @@ export const getPublicationTableIds = (
 export const pruneStaleSelectedTableIds = ({
   mode,
   selectedTableIds,
-  publications,
+  publication,
   publicationName,
 }: {
   mode: DestinationPanelSchemaType['tableSyncCopyMode']
   selectedTableIds: string[]
-  publications: ReplicationPublication[]
+  publication: ReplicationPublicationData
   publicationName: string
 }): string[] => {
   if (mode === 'include_all_tables' || mode === 'skip_all_tables') return selectedTableIds
 
-  const publicationTableIds = getPublicationTableIds(publications, publicationName)
+  const publicationTableIds = getPublicationTableIds(publication, publicationName)
   return selectedTableIds.filter((id) => publicationTableIds.has(id))
 }
+
+export const pruneStaleTableOptions = ({
+  tableOptions,
+  publication,
+  publicationName,
+}: {
+  tableOptions?: BigQueryTableOption[]
+  publication: ReplicationPublicationData
+  publicationName: string
+}): BigQueryTableOption[] | undefined => {
+  if (tableOptions === undefined) return undefined
+
+  const publicationTableIds = getPublicationTableIds(publication, publicationName)
+  return tableOptions.filter((option) => publicationTableIds.has(String(option.tableId)))
+}
+
+// Derived from the generated response type rather than hand-typed, so `granularity` stays the
+// same literal union the API actually returns instead of a widened `string` needing a cast.
+type BigQueryConfigResponse = Extract<
+  NonNullable<ReplicationDestinationByIdData['config']>,
+  { big_query: unknown }
+>['big_query']
+type BigQueryTableOptionResponse = NonNullable<
+  NonNullable<BigQueryConfigResponse['table_options']>['tables']
+>[number]
+type BigQueryPartitionByResponse = NonNullable<BigQueryTableOptionResponse['partition_by']>
+
+const parseBigQueryPartitionBy = (
+  partitionBy: BigQueryPartitionByResponse
+): BigQueryPartitionBy => {
+  switch (partitionBy.kind) {
+    case 'time_column':
+      return {
+        kind: 'time_column',
+        column: partitionBy.column,
+        granularity: partitionBy.granularity ?? 'day',
+      }
+    case 'integer_range':
+      return { ...partitionBy }
+    case 'ingestion_time':
+      return {
+        kind: 'ingestion_time',
+        granularity: partitionBy.granularity ?? 'day',
+      }
+  }
+}
+
+const parseBigQueryTableOption = (option: BigQueryTableOptionResponse): BigQueryTableOption => ({
+  tableId: option.table_id,
+  partitionBy: option.partition_by ? parseBigQueryPartitionBy(option.partition_by) : undefined,
+  clusterBy: option.cluster_by ?? [],
+})
 
 const buildBigQueryConfig = (
   data: z.infer<typeof DestinationPanelFormSchema>
@@ -242,6 +297,7 @@ const buildBigQueryConfig = (
   serviceAccountKey: data.serviceAccountKey ?? '',
   connectionPoolSize: data.connectionPoolSize,
   maxStalenessMins: data.maxStalenessMins,
+  tableOptions: data.tableOptions,
 })
 
 const buildSnowflakeConfig = (

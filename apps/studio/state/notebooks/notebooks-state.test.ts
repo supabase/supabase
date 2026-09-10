@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
+import { persistNotebookDraft, readNotebookDraft } from './notebook-drafts'
 import { notebooksState } from './notebooks-state'
 import type { Notebook } from './types'
 import type { Notebooks } from '@/types'
@@ -28,12 +29,21 @@ describe('notebooksState', () => {
     notebooksState.needsSaving.clear()
     notebooksState.cellLocalState.clear()
     notebooksState.serverDivergedWhileDirty.clear()
+    localStorage.clear()
   })
 
   it('addNotebook marks a locally-created notebook as new', () => {
     notebooksState.addNotebook({ projectRef: 'ref', notebook: makeNotebook('notebook-1') })
 
     expect(notebooksState.notebooks['notebook-1'].status).toBe('new')
+  })
+
+  it('addNotebook persists a local draft immediately, even for a still-empty notebook', () => {
+    notebooksState.addNotebook({ projectRef: 'ref', notebook: makeNotebook('notebook-1') })
+
+    const draft = readNotebookDraft({ projectRef: 'ref', id: 'notebook-1' })
+    expect(draft?.name).toBe('My Notebook')
+    expect(draft?.content.cells).toEqual([])
   })
 
   it('setNotebook marks a notebook not yet in the store as saved', () => {
@@ -76,6 +86,22 @@ describe('notebooksState', () => {
 
     expect(notebooksState.notebooks['notebook-1'].status).toBe('unsaved')
     expect(notebooksState.needsSaving.get('notebook-1')).toBe(false)
+  })
+
+  it('renaming a loaded (saved) notebook transitions it to unsaved and persists a draft', () => {
+    notebooksState.setNotebook({
+      projectRef: 'ref',
+      notebook: makeNotebook('notebook-1', { updated_at: '2024-01-01T00:00:00.000Z' }),
+    })
+
+    notebooksState.renameNotebook({ id: 'notebook-1', name: 'Renamed notebook' })
+
+    expect(notebooksState.notebooks['notebook-1'].status).toBe('unsaved')
+    expect(notebooksState.notebooks['notebook-1'].notebook.name).toBe('Renamed notebook')
+
+    const draft = readNotebookDraft({ projectRef: 'ref', id: 'notebook-1' })
+    expect(draft?.name).toBe('Renamed notebook')
+    expect(draft?.baseUpdatedAt).toBe('2024-01-01T00:00:00.000Z')
   })
 
   it('editing a notebook that has never been saved keeps it as new', () => {
@@ -132,5 +158,101 @@ describe('notebooksState', () => {
 
     expect(notebooksState.notebooks['notebook-1']).toBeUndefined()
     expect(notebooksState.serverDivergedWhileDirty.has('notebook-1')).toBe(false)
+  })
+
+  it('persists a local draft of every cell edit', () => {
+    notebooksState.setNotebook({
+      projectRef: 'ref',
+      notebook: makeNotebook('notebook-1', { updated_at: '2024-01-01T00:00:00.000Z' }),
+    })
+
+    notebooksState.updateCells({
+      id: 'notebook-1',
+      cells: [{ _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' }],
+    })
+
+    const draft = readNotebookDraft({ projectRef: 'ref', id: 'notebook-1' })
+    expect(draft?.content.cells).toMatchObject([{ _tag: 'markdown_cell', text: 'hello' }])
+    expect(draft?.baseUpdatedAt).toBe('2024-01-01T00:00:00.000Z')
+  })
+
+  it('clears a notebook local draft once it is saved', () => {
+    notebooksState.setNotebook({ projectRef: 'ref', notebook: makeNotebook('notebook-1') })
+    notebooksState.updateCells({
+      id: 'notebook-1',
+      cells: [{ _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' }],
+    })
+    expect(readNotebookDraft({ projectRef: 'ref', id: 'notebook-1' })).toBeDefined()
+
+    notebooksState.markSaved({ id: 'notebook-1', updatedAt: '2024-02-02T00:00:00.000Z' })
+
+    expect(readNotebookDraft({ projectRef: 'ref', id: 'notebook-1' })).toBeUndefined()
+    expect(notebooksState.notebooks['notebook-1'].notebook.updated_at).toBe(
+      '2024-02-02T00:00:00.000Z'
+    )
+  })
+
+  it('clears a notebook local draft when the notebook is removed', () => {
+    notebooksState.setNotebook({ projectRef: 'ref', notebook: makeNotebook('notebook-1') })
+    notebooksState.updateCells({
+      id: 'notebook-1',
+      cells: [{ _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' }],
+    })
+
+    notebooksState.removeNotebook({ id: 'notebook-1' })
+
+    expect(readNotebookDraft({ projectRef: 'ref', id: 'notebook-1' })).toBeUndefined()
+  })
+
+  it('restores a local draft onto a freshly-loaded notebook', () => {
+    persistNotebookDraft({
+      projectRef: 'ref',
+      id: 'notebook-1',
+      name: 'Restored name',
+      content: {
+        schema_version: 1,
+        cells: [{ _tag: 'markdown_cell', _id: 'cell-1', text: 'draft' }],
+      },
+      baseUpdatedAt: '2024-01-01T00:00:00.000Z',
+    })
+    notebooksState.setNotebook({
+      projectRef: 'ref',
+      notebook: makeNotebook('notebook-1', { updated_at: '2024-01-01T00:00:00.000Z' }),
+    })
+
+    notebooksState.restoreDraft({
+      projectRef: 'ref',
+      id: 'notebook-1',
+      baseUpdatedAt: '2024-01-01T00:00:00.000Z',
+    })
+
+    expect(notebooksState.notebooks['notebook-1'].notebook.name).toBe('Restored name')
+    expect(notebooksState.notebooks['notebook-1'].notebook.content?.cells).toMatchObject([
+      { _tag: 'markdown_cell', text: 'draft' },
+    ])
+    expect(notebooksState.notebooks['notebook-1'].status).toBe('unsaved')
+    expect(notebooksState.serverDivergedWhileDirty.has('notebook-1')).toBe(false)
+  })
+
+  it('flags a server-diverged conflict when the draft branched from a stale server version', () => {
+    persistNotebookDraft({
+      projectRef: 'ref',
+      id: 'notebook-1',
+      name: 'Restored name',
+      content: { schema_version: 1, cells: [] },
+      baseUpdatedAt: '2024-01-01T00:00:00.000Z',
+    })
+    notebooksState.setNotebook({
+      projectRef: 'ref',
+      notebook: makeNotebook('notebook-1', { updated_at: '2024-06-01T00:00:00.000Z' }),
+    })
+
+    notebooksState.restoreDraft({
+      projectRef: 'ref',
+      id: 'notebook-1',
+      baseUpdatedAt: '2024-06-01T00:00:00.000Z',
+    })
+
+    expect(notebooksState.serverDivergedWhileDirty.get('notebook-1')).toBe('updated')
   })
 })

@@ -208,6 +208,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                 Cancel
               </Button>
               <Button
+                variant="primary"
                 block
                 form={formId}
                 type="submit"
