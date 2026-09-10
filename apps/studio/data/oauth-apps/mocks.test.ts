@@ -8,7 +8,12 @@ import {
   OAUTH_APPS_MOCK_SCENARIOS,
   USE_MOCKS,
 } from './mocks'
-import { getFailedProjects, isRoleValidationFailure } from './types'
+import {
+  getFailedProjects,
+  getOAuthAppType,
+  getScopedProjectRefs,
+  isRoleValidationFailure,
+} from './types'
 
 const NORTHWIND_SLUG = 'northwind-traders'
 
@@ -63,9 +68,19 @@ describe('oauth-apps mocks', () => {
     const request = getMockOAuthAppsAuthorizeRequest(OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent)
 
     expect(request.existing_grant).not.toBeNull()
-    expect(request.existing_grant?.project_refs.length).toBeGreaterThan(0)
+    expect(request.existing_grant?.project_scope.target).toBe('selected_projects')
+    expect(getScopedProjectRefs(request.existing_grant!.project_scope).length).toBeGreaterThan(0)
     expect(request.existing_grant?.created_at).toBeTruthy()
     expect(request.existing_grant?.updated_at).toBeTruthy()
+  })
+
+  test('an all-projects grant has a fixture, and it carries no refs to preselect', () => {
+    const request = getMockOAuthAppsAuthorizeRequest(
+      OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects
+    )
+
+    expect(request.existing_grant?.project_scope.target).toBe('all_projects')
+    expect(getScopedProjectRefs(request.existing_grant!.project_scope)).toEqual([])
   })
 
   test('the existing grant declares what it is bound to', () => {
@@ -78,27 +93,30 @@ describe('oauth-apps mocks', () => {
     Object.values(OAUTH_APPS_MOCK_SCENARIOS).forEach((scenario) => {
       const { grant_config: grantConfig } = getMockOAuthAppsAuthorizeRequest(scenario)
 
-      expect(['user_bound', 'organization_bound']).toContain(grantConfig.grant_kind)
-      expect(typeof grantConfig.allow_project_scoping).toBe('boolean')
+      expect(typeof grantConfig.bind_to_authorizing_user).toBe('boolean')
+      expect(['off', 'optional', 'required']).toContain(grantConfig.project_selection)
+      expect(typeof grantConfig.is_dynamic_client).toBe('boolean')
     })
   })
 
-  test('both grant kinds have a fixture', () => {
-    const kinds = new Set(
-      Object.values(OAUTH_APPS_MOCK_SCENARIOS).map(
-        (scenario) => getMockOAuthAppsAuthorizeRequest(scenario).grant_config.grant_kind
+  test('every app type from the addendum has a fixture', () => {
+    const types = new Set(
+      Object.values(OAUTH_APPS_MOCK_SCENARIOS).map((scenario) =>
+        getOAuthAppType(getMockOAuthAppsAuthorizeRequest(scenario).grant_config)
       )
     )
 
-    expect(kinds).toEqual(new Set(['user_bound', 'organization_bound']))
+    expect(types).toEqual(new Set(['A', 'B', 'C', 'D', 'E']))
   })
 
-  test('every fixture allows project scoping while nothing suppresses the picker', () => {
-    Object.values(OAUTH_APPS_MOCK_SCENARIOS).forEach((scenario) => {
-      expect(getMockOAuthAppsAuthorizeRequest(scenario).grant_config.allow_project_scoping).toBe(
-        true
+  test('every project selection mode has a fixture', () => {
+    const modes = new Set(
+      Object.values(OAUTH_APPS_MOCK_SCENARIOS).map(
+        (scenario) => getMockOAuthAppsAuthorizeRequest(scenario).grant_config.project_selection
       )
-    })
+    )
+
+    expect(modes).toEqual(new Set(['off', 'optional', 'required']))
   })
 
   test('the existing grant holds a stale ref that does not resolve against live projects', () => {
@@ -106,7 +124,7 @@ describe('oauth-apps mocks', () => {
     const liveRefs = getMockOAuthAppsAuthorizeOrganizationProjects(NORTHWIND_SLUG).map(
       (project) => project.ref
     )
-    const grantedRefs = request.existing_grant?.project_refs ?? []
+    const grantedRefs = getScopedProjectRefs(request.existing_grant!.project_scope)
 
     expect(grantedRefs.some((ref) => !liveRefs.includes(ref))).toBe(true)
     expect(grantedRefs.some((ref) => liveRefs.includes(ref))).toBe(true)
@@ -130,7 +148,10 @@ describe('oauth-apps mocks', () => {
 
   describe('post-submit role validation', () => {
     const approve = (authId: string, projectRefs: string[]) =>
-      getMockOAuthAppsAuthorizeApproveResult(authId, { slug: NORTHWIND_SLUG, projectRefs })
+      getMockOAuthAppsAuthorizeApproveResult(authId, {
+        slug: NORTHWIND_SLUG,
+        projectScope: { target: 'selected_projects', project_refs: projectRefs },
+      })
 
     const readOnlyRefs = () =>
       getMockOAuthAppsAuthorizeOrganizationProjects(NORTHWIND_SLUG)
@@ -227,6 +248,21 @@ describe('oauth-apps mocks', () => {
       const result = approve(OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper, readOnlyRefs())
 
       expect(isRoleValidationFailure(result)).toBe(false)
+    })
+
+    test('an all-projects grant is validated against every project in the organization', () => {
+      const result = getMockOAuthAppsAuthorizeApproveResult(
+        OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects,
+        { slug: NORTHWIND_SLUG, projectScope: { target: 'all_projects' } }
+      )
+
+      if (!isRoleValidationFailure(result)) throw new Error('expected a role validation failure')
+
+      expect(
+        getFailedProjects(result)
+          .map((project) => project.ref)
+          .sort()
+      ).toEqual(readOnlyRefs().sort())
     })
   })
 })
