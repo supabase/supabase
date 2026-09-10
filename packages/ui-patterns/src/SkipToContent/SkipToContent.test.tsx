@@ -34,7 +34,7 @@ describe('SkipToContent', () => {
     render(<SkipToContent href="#main" />)
 
     const link = screen.getByRole('link', { name: 'Skip to content' })
-    expect(link.className).toContain('hover:bg-popover')
+    expect(link.className).toContain('hover:bg-accent')
     expect(link.className).not.toContain('bg-surface-300')
     expect(link.className).not.toContain('hover:bg-secondary')
   })

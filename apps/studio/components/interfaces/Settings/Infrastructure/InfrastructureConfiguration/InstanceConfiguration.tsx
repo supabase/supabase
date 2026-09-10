@@ -177,7 +177,7 @@ const InstanceConfigurationUI = () => {
         {isSuccessReplicas && !isLoadingProject && (
           <>
             {infrastructureReadReplicas && (
-              <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
+              <div className="z-10 absolute top-4 right-4 inline-flex items-center justify-center gap-x-2 rounded-lg bg-background">
                 {isAws && (
                   <div className="flex items-center justify-center">
                     <Button

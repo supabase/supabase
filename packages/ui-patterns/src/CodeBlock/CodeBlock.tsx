@@ -268,7 +268,7 @@ export const CodeBlock = ({
           {!hideCopy && (value || children) && className ? (
             <div
               className={[
-                'absolute right-2 top-2',
+                'absolute right-2 top-2 inline-flex rounded-lg bg-surface-100 dark:bg-200',
                 'opacity-0 group-hover:opacity-100 transition',
                 `${isDarkTheme ? 'dark' : ''}`,
               ].join(' ')}

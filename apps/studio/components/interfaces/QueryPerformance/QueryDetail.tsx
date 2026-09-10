@@ -126,14 +126,16 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
           )}
         />
         <div className="absolute bottom-[-13px] left-0 right-0 w-full flex items-center justify-center z-10">
-          <Button
-            variant="default"
-            className="rounded-full"
-            icon={<ChevronsUpDown />}
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded ? 'Collapse' : 'Expand'}
-          </Button>
+          <div className="inline-flex rounded-full bg-background">
+            <Button
+              variant="default"
+              className="rounded-full"
+              icon={<ChevronsUpDown />}
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              {isExpanded ? 'Collapse' : 'Expand'}
+            </Button>
+          </div>
         </div>
       </QueryPanelSection>
       <QueryPanelSection className="pb-3 pt-6">

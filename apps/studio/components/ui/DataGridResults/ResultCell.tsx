@@ -25,19 +25,21 @@ export const ResultCell = ({ column, value, onContextMenu, onExpand }: ResultCel
       {value === null ? <NullValue /> : formatCellValue(value)}
       {showExpand && (
         <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="default"
-              size="tiny"
-              className="absolute right-1 top-1/2 -translate-y-1/2 px-1 opacity-0 group-hover/cell:opacity-100 focus-visible:opacity-100"
-              icon={<Expand size={10} />}
-              aria-label="View full cell content"
-              onClick={(e) => {
-                e.stopPropagation()
-                onExpand(column, value)
-              }}
-            />
-          </TooltipTrigger>
+          <div className="absolute right-1 top-1/2 inline-flex -translate-y-1/2 rounded-lg bg-background opacity-0 group-hover/cell:opacity-100 focus-within:opacity-100">
+            <TooltipTrigger asChild>
+              <Button
+                variant="default"
+                size="tiny"
+                className="px-1"
+                icon={<Expand size={10} />}
+                aria-label="View full cell content"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onExpand(column, value)
+                }}
+              />
+            </TooltipTrigger>
+          </div>
           <TooltipContent side="left">View full cell content</TooltipContent>
         </Tooltip>
       )}
