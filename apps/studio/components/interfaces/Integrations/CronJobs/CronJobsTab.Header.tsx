@@ -1,6 +1,6 @@
 import { RefreshCw, Search, X } from 'lucide-react'
 import type { KeyboardEvent, Ref } from 'react'
-import { Button } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { EnableCleanupButton } from './CronJobsTab.EnableCleanupButton'
@@ -47,14 +47,22 @@ export const CronJobsTabHeader = ({
         onKeyDown={handleKeyDown}
         actions={[
           search && (
-            <Button
-              key="clear-search"
-              size="tiny"
-              variant="text"
-              icon={<X />}
-              onClick={onClearSearch}
-              className="p-0 h-5 w-5"
-            />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  key="clear-search"
+                  size="tiny"
+                  variant="text"
+                  icon={<X />}
+                  onClick={onClearSearch}
+                  className="p-0 h-5 w-5"
+                  aria-label="Clear search"
+                  // Tooltip repeats the label; the description would read the name twice
+                  aria-describedby={undefined}
+                />
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Clear search</TooltipContent>
+            </Tooltip>
           ),
         ]}
       />
