@@ -33,10 +33,11 @@ const mockSetupStatus = (status: Partial<WarehouseSetupStatusResponse>) =>
       }),
   })
 
-// Assembled rather than written inline: a literal `postgres://user:pass@host` in the source trips
-// GitHub secret scanning, even though every value here is made up.
-const CATALOG_PASSWORD = 'not-a-real-password'
-const CATALOG_URL = `postgres://postgres:${CATALOG_PASSWORD}@db.default.supabase.co:5432/postgres`
+// Placeholder host and password, matching the fixtures in `lib/warehouse.test.ts`. A realistic
+// `db.<ref>.supabase.co` host with a plausible password reads as a real credential to secret
+// scanning.
+const CATALOG_PASSWORD = 'pwd'
+const CATALOG_URL = 'postgres://postgres:pwd@db.example.supabase.co:5432/postgres'
 
 const mockCatalog = (catalog: WarehouseCatalogResponse) =>
   addAPIMock({
