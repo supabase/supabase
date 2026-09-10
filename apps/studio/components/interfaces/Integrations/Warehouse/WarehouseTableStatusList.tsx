@@ -98,7 +98,7 @@ export const WarehouseReplicatedTablesSection = ({ tables }: WarehouseTableStatu
   <PageSection className="first:pt-0">
     <PageSectionMeta>
       <PageSectionSummary>
-        <PageSectionTitle>Replicated tables</PageSectionTitle>
+        <PageSectionTitle>Replication status</PageSectionTitle>
       </PageSectionSummary>
     </PageSectionMeta>
     <PageSectionContent>

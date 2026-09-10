@@ -90,10 +90,18 @@ describe('WarehouseOverviewTab', () => {
 
     customRender(<WarehouseOverviewTab />)
 
-    expect(await screen.findByText('External access')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Replicated tables' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Catalog access' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Disable Warehouse' })).toBeInTheDocument()
+    // findByRole throws on duplicates, so this also guards the section titles staying distinct.
+    // The picker's own "Tables" title isn't here because the picker is stubbed above.
+    for (const name of [
+      'Replication status',
+      'External access',
+      'Connect with FlightSQL',
+      'Connect with DuckDB',
+      'Catalog access',
+      'Disable Warehouse',
+    ]) {
+      expect(await screen.findByRole('heading', { name })).toBeInTheDocument()
+    }
     expect(screen.getByText('Replicated tables picker')).toBeInTheDocument()
   })
 

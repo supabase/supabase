@@ -171,11 +171,11 @@ export const WarehouseSchemaTablePicker = ({
     <PageSection className="first:pt-0">
       <PageSectionMeta>
         <PageSectionSummary>
-          {isEditing && <PageSectionTitle>Replicated tables</PageSectionTitle>}
+          <PageSectionTitle>Tables</PageSectionTitle>
           <PageSectionDescription>
             {isEditing
-              ? 'Choose which schemas or tables to replicate to Warehouse. Tables already replicating are selected.'
-              : 'Replicate your database to an analytical endpoint over FlightSQL. Choose which schemas or tables to replicate, and change this later at any time.'}
+              ? 'Tables currently replicating are selected. Changes apply on save.'
+              : 'Choose which schemas or tables to replicate. You can change this later at any time.'}
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
