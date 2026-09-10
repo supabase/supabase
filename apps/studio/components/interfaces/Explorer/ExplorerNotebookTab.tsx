@@ -316,8 +316,13 @@ export const ExplorerNotebookTab = () => {
   }
 
   const handleCopyAsMarkdown = () => {
-    copyToClipboard(notebookToMarkdown({ name: name ?? '', cells }), () =>
-      toast.success('Copied notebook as Markdown to clipboard')
+    copyToClipboard(
+      notebookToMarkdown({
+        name: name ?? '',
+        cells,
+        getResult: (cellId) => queryCellRefs.current.get(cellId)?.getResult(),
+      }),
+      () => toast.success('Copied notebook as Markdown to clipboard')
     )
   }
 

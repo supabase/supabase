@@ -269,4 +269,47 @@ describe('notebookToMarkdown', () => {
       `_Time range: ${expectedBound(absoluteRangeStart)} → ${expectedBound(absoluteRangeEnd)}_`
     )
   })
+
+  it('omits the results section when the cell has not been run this session', () => {
+    const result = notebookToMarkdown({
+      name: 'Notebook',
+      cells: [databaseCell],
+      getResult: () => undefined,
+    })
+    expect(result).not.toContain('**Results:**')
+    expect(result).not.toContain('**Error:**')
+  })
+
+  it('renders the last result as a markdown table when present', () => {
+    const result = notebookToMarkdown({
+      name: 'Notebook',
+      cells: [databaseCell],
+      getResult: (cellId) =>
+        cellId === 'cell-2' ? { rows: [{ id: 1, email: 'a@example.com' }] } : undefined,
+    })
+
+    expect(result).toContain(
+      '**Results:**\n\n| id | email         |\n| -- | ------------- |\n| 1  | a@example.com |'
+    )
+  })
+
+  it('omits the results section when the cell ran but returned no rows', () => {
+    const result = notebookToMarkdown({
+      name: 'Notebook',
+      cells: [databaseCell],
+      getResult: () => ({ rows: [] }),
+    })
+    expect(result).not.toContain('**Results:**')
+  })
+
+  it('shows the error instead of a results table when the last run failed', () => {
+    const result = notebookToMarkdown({
+      name: 'Notebook',
+      cells: [databaseCell],
+      getResult: () => ({ error: { message: 'relation "foo" does not exist' } }),
+    })
+
+    expect(result).toContain('**Error:** relation "foo" does not exist')
+    expect(result).not.toContain('**Results:**')
+  })
 })

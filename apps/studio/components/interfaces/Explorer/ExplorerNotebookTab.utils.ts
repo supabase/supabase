@@ -1,5 +1,7 @@
 import { type Snapshot } from 'valtio'
 
+import { type QueryResult } from './types'
+import { convertResultsToMarkdown } from '@/components/interfaces/SQLEditor/UtilityPanel/Results.utils'
 import { formatTimeRange } from '@/components/ui/AIAssistantPanel/AssistantNotebookPreview.utils'
 import { type Cell } from '@/data/content/notebooks/notebook-schema'
 import { removeCommentsFromSql } from '@/lib/helpers'
@@ -63,27 +65,54 @@ export function isMutatingSql(sql: string): boolean {
 }
 
 /**
+ * A query cell's last in-session result rendered as a markdown table, or its error if the
+ * last run failed — whichever is more useful to paste. Undefined when the cell hasn't been
+ * run this session, since results aren't persisted with the notebook (see QueryCell's local
+ * result state).
+ */
+function formatQueryResult(result: QueryResult | undefined): string | undefined {
+  if (!result) return undefined
+  if (result.error) return `**Error:** ${result.error.message}`
+
+  const table = result.rows ? convertResultsToMarkdown([...result.rows]) : undefined
+  return table ? `**Results:**\n\n${table}` : undefined
+}
+
+/**
  * Renders a notebook as a markdown document meant to be pasted into an external agent:
- * markdown cells verbatim, query cells as a labelled SQL block. Query results are never
- * included since they aren't persisted with the notebook (see QueryCell's local result
- * state) and a log cell's `time_range` is called out separately since it's applied as a
- * request parameter rather than baked into the SQL text.
+ * markdown cells verbatim, query cells as a labelled SQL block. A log cell's `time_range`
+ * is called out separately since it's applied as a request parameter rather than baked
+ * into the SQL text.
  */
 export function notebookToMarkdown({
   name,
   cells,
+  getResult,
 }: {
   name: string
   cells: readonly Snapshot<Cell>[]
+  /** Looks up a query cell's last in-session result, if any (see `formatQueryResult`). */
+  getResult?: (cellId: string) => QueryResult | undefined
 }): string {
   const sections = cells.map((cell) => {
     switch (cell._tag) {
       case 'markdown_cell':
         return cell.text
       case 'database_cell':
-        return `### ${cell.title ?? 'Untitled query'} (Postgres)\n\n\`\`\`sql\n${cell.unchecked_sql}\n\`\`\``
-      case 'log_cell':
-        return `### ${cell.title ?? 'Untitled query'} (Logs — ClickHouse)\n\n_Time range: ${formatTimeRange(cell.time_range)}_\n\n\`\`\`sql\n${cell.unchecked_sql}\n\`\`\``
+      case 'log_cell': {
+        const header =
+          cell._tag === 'database_cell'
+            ? `### ${cell.title ?? 'Untitled query'} (Postgres)`
+            : `### ${cell.title ?? 'Untitled query'} (Logs — ClickHouse)\n\n_Time range: ${formatTimeRange(cell.time_range)}_`
+
+        return [
+          header,
+          `\`\`\`sql\n${cell.unchecked_sql}\n\`\`\``,
+          formatQueryResult(getResult?.(cell._id)),
+        ]
+          .filter((part): part is string => part !== undefined)
+          .join('\n\n')
+      }
     }
   })
 

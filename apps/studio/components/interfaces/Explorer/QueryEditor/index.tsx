@@ -116,6 +116,8 @@ export type QueryEditorHandle = {
   getSql: () => string
   /** Formats the editor's SQL in place and commits the result, same as the SQL Editor's Prettify SQL action. */
   prettify: () => Promise<void>
+  /** The last result this cell produced in this session, or undefined if it hasn't been run. */
+  getResult: () => QueryResult | undefined
 }
 
 type QueryEditorProps = {
@@ -379,6 +381,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     run: (force = false) => handleRunQuery({ shouldForce: force }),
     getSql: () => sqlRef.current,
     prettify: handlePrettify,
+    getResult: () => result,
   }))
 
   useEffect(() => {
