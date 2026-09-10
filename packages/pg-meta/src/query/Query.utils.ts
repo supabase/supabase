@@ -295,7 +295,7 @@ function inTupleFilterSql(filter: Filter) {
 }
 
 function isFilterSql(filter: Filter) {
-  const filterValueTxt = String(filter.value)
+  const filterValueTxt = String(filter.value).trim().toLowerCase()
   switch (filterValueTxt) {
     case 'null':
     case 'false':
