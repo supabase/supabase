@@ -33,6 +33,7 @@ import {
   parseResponseErrors,
   ResponseErrorRow,
 } from './OverviewErrors.constants'
+import { formatMetricChange, formatMetricValue } from './OverviewMetrics.utils'
 import { OverviewTable } from './OverviewTable'
 import {
   AuthMetricsResponse,
@@ -67,15 +68,6 @@ const StatCard = ({
   tooltip?: string
 }) => {
   const router = useRouter()
-  let formattedCurrent = 'No data'
-  if (current !== null) {
-    if (suffix === 'ms') formattedCurrent = `${current.toFixed(2)}${suffix}`
-    else if (suffix === '%') formattedCurrent = `${current.toFixed(1)}${suffix}`
-    else formattedCurrent = `${Math.round(current).toLocaleString()}${suffix}`
-  }
-  const changeUnit = suffix === '%' ? ' pp' : '%'
-  const formattedChange =
-    change === null ? undefined : `${Number(change.toFixed(1)).toFixed(1)}${changeUnit}`
 
   const actions = [
     {
@@ -93,8 +85,8 @@ const StatCard = ({
             className="pb-4"
             label={title}
             tooltip={tooltip}
-            diffValue={formattedChange}
-            value={formattedCurrent}
+            diffValue={formatMetricChange(change, suffix)}
+            value={formatMetricValue(current, suffix)}
           />
           <ChartActions actions={actions} />
         </ChartHeader>
