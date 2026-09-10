@@ -79,6 +79,15 @@ function formatQueryResult(result: QueryResult | undefined): string | undefined 
 }
 
 /**
+ * A backtick fence long enough to enclose `content` without being closed early by a run of
+ * backticks inside it (e.g. a SQL comment or string literal quoting markdown).
+ */
+function getCodeFence(content: string): string {
+  const longestBacktickRun = Math.max(0, ...(content.match(/`+/g)?.map((run) => run.length) ?? []))
+  return '`'.repeat(Math.max(3, longestBacktickRun + 1))
+}
+
+/**
  * Renders a notebook as a markdown document meant to be pasted into an external agent:
  * markdown cells verbatim, query cells as a labelled SQL block. A log cell's `time_range`
  * is called out separately since it's applied as a request parameter rather than baked
@@ -104,9 +113,11 @@ export function notebookToMarkdown({
             ? `### ${cell.title ?? 'Untitled query'} (Postgres)`
             : `### ${cell.title ?? 'Untitled query'} (Logs — ClickHouse)\n\n_Time range: ${formatTimeRange(cell.time_range)}_`
 
+        const fence = getCodeFence(cell.unchecked_sql)
+
         return [
           header,
-          `\`\`\`sql\n${cell.unchecked_sql}\n\`\`\``,
+          `${fence}sql\n${cell.unchecked_sql}\n${fence}`,
           formatQueryResult(getResult?.(cell._id)),
         ]
           .filter((part): part is string => part !== undefined)

@@ -315,15 +315,20 @@ export const ExplorerNotebookTab = () => {
     }
   }
 
-  const handleCopyAsMarkdown = () => {
-    copyToClipboard(
-      notebookToMarkdown({
-        name: name ?? '',
-        cells,
-        getResult: (cellId) => queryCellRefs.current.get(cellId)?.getResult(),
-      }),
-      () => toast.success('Copied notebook as Markdown to clipboard')
-    )
+  const handleCopyAsMarkdown = async () => {
+    try {
+      await copyToClipboard(
+        notebookToMarkdown({
+          name: name ?? '',
+          cells,
+          getResult: (cellId) => queryCellRefs.current.get(cellId)?.getResult(),
+        }),
+        () => toast.success('Copied notebook as Markdown to clipboard')
+      )
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      toast.error('Failed to copy notebook as Markdown: ' + message)
+    }
   }
 
   const handleConfirmDeleteNotebook = () => {

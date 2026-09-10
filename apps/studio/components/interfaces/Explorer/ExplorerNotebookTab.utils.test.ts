@@ -312,4 +312,16 @@ describe('notebookToMarkdown', () => {
     expect(result).toContain('**Error:** relation "foo" does not exist')
     expect(result).not.toContain('**Results:**')
   })
+
+  it('widens the code fence when the SQL contains a comment or string with embedded backticks', () => {
+    const sql = "select 1 -- a ```sql``` code block\nunion all select '`literal`'"
+    const cellWithBackticks: Cell = {
+      ...databaseCell,
+      unchecked_sql: untrustedSql(sql),
+    }
+
+    const result = notebookToMarkdown({ name: 'Notebook', cells: [cellWithBackticks] })
+
+    expect(result).toContain(`\`\`\`\`sql\n${sql}\n\`\`\`\``)
+  })
 })
