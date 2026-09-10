@@ -405,7 +405,7 @@ width={1600}
 height={1145}
 />
 
-If you don't explicitly pass a schema when creating a table, Postgres creates the table in the `public` schema.
+If you don't explicitly pass a schema when creating a table, Postgres creates the table in the first schema in the current [`search_path`](https://www.postgresql.org/docs/current/ddl-schemas.html#DDL-SCHEMAS-PATH). That's the `public` schema unless you change it.
 
 You can create schemas to organize tables. For example, you might want a private schema that's hidden from your API:
 
