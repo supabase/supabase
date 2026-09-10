@@ -11,6 +11,7 @@ import { KeyboardEvent, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
+  cn,
   copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
@@ -178,7 +179,7 @@ export const AIAssistantHeader = ({
                 size="tiny"
                 icon={<Maximize />}
                 onClick={onSelectMaximise}
-                className="h-7 w-7 p-0"
+                className={cn('h-7 w-7 p-0', !isExplorerEnabled && 'hidden md:flex')}
               />
             </ShortcutTooltip>
 
