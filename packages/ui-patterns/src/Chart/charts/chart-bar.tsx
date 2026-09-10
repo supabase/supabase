@@ -15,6 +15,11 @@ import {
 import type { CategoricalChartState } from 'recharts/types/chart/types'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 
+// Applied to every bar outside the hovered column, matching the dimming
+// LogsBarChart does with its muted per-series colours. Opacity is used instead
+// so it works for any ChartConfig, not just hues with a hand-picked muted step.
+const DIMMED_FILL_OPACITY = 0.35
+
 const CHART_COLORS = {
   TICK: 'var(--background-overlay-hover)',
   AXIS: 'var(--background-overlay-hover)',
@@ -162,6 +167,13 @@ export const ChartBar = ({
     ...YAxisProps,
   }
 
+  // The faux x axis below sits outside the plot, in normal flow. Its 16px height
+  // plus the column's 12px gap is subtracted from the chart so the component's
+  // overall height is unchanged. Kept as a definite height rather than flex-1:
+  // Recharts' ResponsiveContainer measures its parent and renders nothing if it
+  // reads 0 before layout settles.
+  const hasDateRangeFooter = xKey === 'timestamp' && data.length > 0
+
   const margin = {
     top: 0,
     right: 0,
@@ -175,7 +187,10 @@ export const ChartBar = ({
       data-testid="chart-bar"
       className={cn('flex flex-col gap-y-3 w-full', isFullHeight ? 'h-full' : 'h-24', className)}
     >
-      <ChartContainer className="w-full! h-full" config={chartConfig}>
+      <ChartContainer
+        className={cn('w-full!', hasDateRangeFooter ? 'h-[calc(100%-28px)]' : 'h-full')}
+        config={chartConfig}
+      >
         <RechartBarChart
           data={data}
           syncId={syncId}
@@ -247,7 +262,7 @@ export const ChartBar = ({
             />
           )}
           {isMultiSeries ? (
-            keysToRender.map((key, index) => {
+            keysToRender.map((key) => {
               const keyConfig = chartConfig[key]
               const barColor =
                 keyConfig?.color ||
@@ -256,7 +271,6 @@ export const ChartBar = ({
                     ? keyConfig.theme.dark
                     : keyConfig.theme.light
                   : color)
-              const isTopOfStack = index === keysToRender.length - 1
               return (
                 <Bar
                   key={key}
@@ -264,8 +278,20 @@ export const ChartBar = ({
                   fill={barColor}
                   maxBarSize={24}
                   stackId={isStacked ? 'stack' : undefined}
-                  radius={isStacked && isTopOfStack ? [2, 2, 0, 0] : undefined}
-                />
+                >
+                  {data.map((_entry: ChartBarTick, dataIndex: number) => (
+                    <Cell
+                      key={`${key}-${dataIndex}`}
+                      className="cursor-pointer transition-opacity"
+                      fill={barColor}
+                      fillOpacity={
+                        focusDataIndex === null || focusDataIndex === dataIndex
+                          ? 1
+                          : DIMMED_FILL_OPACITY
+                      }
+                    />
+                  ))}
+                </Bar>
               )
             })
           ) : (
@@ -282,8 +308,8 @@ export const ChartBar = ({
         </RechartBarChart>
       </ChartContainer>
 
-      {xKey === 'timestamp' && data && data.length > 0 && (
-        <div className="text-foreground-lighter -mt-6 flex items-center justify-between text-[10px] font-mono">
+      {hasDateRangeFooter && (
+        <div className="text-foreground-lighter flex h-4 items-center justify-between text-[10px] font-mono">
           <span>{dayjs(data[0][xKey]).format(DateTimeFormat)}</span>
           <span>{dayjs(data[data.length - 1]?.[xKey]).format(DateTimeFormat)}</span>
         </div>
