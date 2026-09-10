@@ -6,7 +6,6 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 const GENERATOR = path.join(process.cwd(), 'internals', 'generate-sitemap.mjs')
 const LEGACY_LINK = 'https://supabase.com/changelog/12345-legacy-entry'
-const PLAIN_LINK = 'https://supabase.com/changelog/plain-slug-entry'
 const SPAWN_TIMEOUT_MS = 30_000
 
 const createdDirs: string[] = []
@@ -30,6 +29,7 @@ function runGenerator(fixtureDir: string) {
     cwd: fixtureDir,
     encoding: 'utf-8',
     env: { ...process.env, TZ: 'UTC' },
+    timeout: SPAWN_TIMEOUT_MS,
   })
 }
 
@@ -86,10 +86,7 @@ describe('generate-sitemap lastmod', () => {
       '_customers/acme.mdx': mdx("date: '2024-05-16T08:00:00Z'"),
       '_events/2026-02-01-webinar.mdx': mdx("date: '2026-02-01T19:00:00.000-07:00'"),
       'pages/pricing.tsx': '',
-      'public/changelog-rss.xml': rss([
-        rssItem(LEGACY_LINK, 'Tue, 03 Feb 2026 00:00:00 +0000'),
-        rssItem(PLAIN_LINK, 'Wed, 04 Feb 2026 00:00:00 +0000'),
-      ]),
+      'public/changelog-rss.xml': rss([rssItem(LEGACY_LINK, 'Tue, 03 Feb 2026 00:00:00 +0000')]),
     })
     result = runGenerator(fixtureDir)
     const sitemapPath = path.join(fixtureDir, 'public', 'sitemap_www.xml')
@@ -112,9 +109,15 @@ describe('generate-sitemap lastmod', () => {
     expect(entryFor('https://supabase.com/blog/revised')?.lastmod).toBe('2026-03-01')
   })
 
-  it('keeps the authored calendar day regardless of time part, quoting, or YAML type', () => {
+  it('drops the time part of a quoted datetime string', () => {
     expect(entryFor('https://supabase.com/blog/with-time')?.lastmod).toBe('2026-01-07')
+  })
+
+  it('accepts an unquoted datetime without seconds, which YAML leaves as a string', () => {
     expect(entryFor('https://supabase.com/blog/unquoted-minutes')?.lastmod).toBe('2026-01-08')
+  })
+
+  it('accepts an unquoted date-only value, which YAML parses into a Date', () => {
     expect(entryFor('https://supabase.com/blog/unquoted-date')?.lastmod).toBe('2026-01-09')
   })
 

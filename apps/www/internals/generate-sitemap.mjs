@@ -14,7 +14,6 @@ function lastmodError(source, value, hint = '') {
 }
 
 function toIsoDate(value, source) {
-  let candidate
   if (value instanceof Date) {
     if (Number.isNaN(value.getTime())) throw lastmodError(source, value)
     const hasTimePart =
@@ -23,14 +22,12 @@ function toIsoDate(value, source) {
       value.getUTCSeconds() !== 0 ||
       value.getUTCMilliseconds() !== 0
     if (hasTimePart) throw lastmodError(source, value, "; quote it as a date-only 'YYYY-MM-DD'")
-    candidate = value.toISOString().slice(0, 10)
-  } else if (typeof value === 'string') {
-    const match = ISO_DATE_SHAPE.exec(value)
-    if (!match) throw lastmodError(source, value)
-    candidate = match[1]
-  } else {
-    throw lastmodError(source, value)
+    return value.toISOString().slice(0, 10)
   }
+  if (typeof value !== 'string') throw lastmodError(source, value)
+  const match = ISO_DATE_SHAPE.exec(value)
+  if (!match) throw lastmodError(source, value)
+  const candidate = match[1]
   const roundTrip = new Date(`${candidate}T00:00:00Z`)
   if (Number.isNaN(roundTrip.getTime()) || roundTrip.toISOString().slice(0, 10) !== candidate) {
     throw lastmodError(source, value, '; not a real calendar day')
@@ -47,9 +44,7 @@ function contentLastmod(filePath) {
 
 function changelogLastmod(pubDate, link) {
   const source = `changelog-rss ${link}`
-  if (!RSS_PUB_DATE_SHAPE.test(pubDate)) {
-    throw new Error(`${source}: unparseable pubDate ${JSON.stringify(pubDate)}`)
-  }
+  if (!RSS_PUB_DATE_SHAPE.test(pubDate)) throw lastmodError(source, pubDate)
   return toIsoDate(new Date(pubDate), source)
 }
 
