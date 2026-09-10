@@ -1,7 +1,5 @@
-import { useParams } from 'common'
 import { ArrowRight, Check, ChevronRight, User, X } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo } from 'react'
 import {
   Badge,
   cn,
@@ -18,33 +16,43 @@ import { isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { ProfileImage } from '@/components/ui/ProfileImage'
-import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
+import { OrganizationRolesResponse } from '@/data/organization-members/organization-roles-query'
 import { OrganizationMember } from '@/data/organizations/organization-members-query'
-import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { OrganizationBase } from '@/data/organizations/organizations-query'
+import { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useProfile } from '@/lib/profile'
+import type { Permission } from '@/types'
 
 interface MemberRowProps {
   member: OrganizationMember
+  members: OrganizationMember[]
+  roles: OrganizationRolesResponse | undefined
+  isLoadingRoles: boolean
+  orgProjects: OrgProject[]
+  permissions: Permission[] | undefined
+  selectedOrganization: OrganizationBase | undefined
+  organizationMembersDeletionEnabled: boolean
+  onManageAccess: (member: OrganizationMember) => void
 }
 
 const MEMBER_ORIGIN_TO_MANAGED_BY = {
   vercel: 'vercel-marketplace',
 } as const
 
-export const MemberRow = ({ member }: MemberRowProps) => {
-  const { slug } = useParams()
+export const MemberRow = ({
+  member,
+  members,
+  roles,
+  isLoadingRoles,
+  orgProjects,
+  permissions,
+  selectedOrganization,
+  organizationMembersDeletionEnabled,
+  onManageAccess,
+}: MemberRowProps) => {
   const { profile } = useProfile()
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { data: roles, isPending: isLoadingRoles } = useOrganizationRolesV2Query({
-    slug: selectedOrganization?.slug,
-  })
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
-
-  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
-  const orgProjects =
-    useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
   const isInvitedUser = Boolean(member.invited_id)
 
@@ -188,7 +196,15 @@ export const MemberRow = ({ member }: MemberRowProps) => {
       </TableCell>
 
       <TableCell>
-        <MemberActions member={member} />
+        <MemberActions
+          member={member}
+          members={members}
+          allRoles={roles}
+          permissions={permissions}
+          selectedOrganization={selectedOrganization}
+          organizationMembersDeletionEnabled={organizationMembersDeletionEnabled}
+          onManageAccess={onManageAccess}
+        />
       </TableCell>
     </TableRow>
   )
