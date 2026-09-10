@@ -18,7 +18,7 @@ type WorkerDatum = ListWorkersResponse['data'][number]
 // reads it no matter what the router URL says.
 const PROJECT_REF = 'default'
 
-const instanceDatum = (
+const computeInstanceDatum = (
   id: string,
   attributes: Partial<WorkerDatum['attributes']> = {}
 ): WorkerDatum => ({
@@ -32,10 +32,10 @@ const instanceDatum = (
   },
 })
 
-const mockInstancesList = (instances: WorkerDatum[]) =>
+const mockComputeInstancesList = (instances: WorkerDatum[]) =>
   addAPIMock({ method: 'get', path: '/v2/projects/:ref/workers', response: { data: instances } })
 
-const mockInstancesListFailure = (status: number) =>
+const mockComputeInstancesListFailure = (status: number) =>
   addAPIMock({
     method: 'get',
     path: '/v2/projects/:ref/workers',
@@ -60,9 +60,9 @@ describe('/project/[ref]/compute', () => {
   })
 
   it('lists the instances the API returns', async () => {
-    mockInstancesList([
-      instanceDatum('embed'),
-      instanceDatum('resize', {
+    mockComputeInstancesList([
+      computeInstanceDatum('embed'),
+      computeInstanceDatum('resize', {
         build_state: 'building',
         spec: { exposure: 'private', instances: 2, runtime: 'python', size: '4gb-2vcpu' },
       }),
@@ -82,7 +82,7 @@ describe('/project/[ref]/compute', () => {
   })
 
   it('invites you to deploy one when the project has none', async () => {
-    mockInstancesList([])
+    mockComputeInstancesList([])
 
     await renderComputePage()
 
@@ -91,18 +91,18 @@ describe('/project/[ref]/compute', () => {
   })
 
   it('refreshes the instances list on request', async () => {
-    mockInstancesList([instanceDatum('existing')])
+    mockComputeInstancesList([computeInstanceDatum('existing')])
 
     await renderComputePage()
 
-    mockInstancesList([instanceDatum('embed')])
+    mockComputeInstancesList([computeInstanceDatum('embed')])
     fireEvent.click(screen.getByRole('button', { name: 'Refresh' }))
 
     expect(await screen.findByRole('link', { name: 'embed' })).toBeVisible()
   })
 
   it('explains that a project outside the alpha is not enrolled', async () => {
-    mockInstancesListFailure(404)
+    mockComputeInstancesListFailure(404)
 
     await renderComputePage()
 
@@ -111,7 +111,7 @@ describe('/project/[ref]/compute', () => {
   })
 
   it('asks for permissions when the project is enrolled but the caller is not allowed', async () => {
-    mockInstancesListFailure(403)
+    mockComputeInstancesListFailure(403)
 
     await renderComputePage()
 
@@ -131,7 +131,7 @@ describe('/project/[ref]/compute', () => {
           return HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 500 })
         }
 
-        return HttpResponse.json<ListWorkersResponse>({ data: [instanceDatum('embed')] })
+        return HttpResponse.json<ListWorkersResponse>({ data: [computeInstanceDatum('embed')] })
       },
     })
 

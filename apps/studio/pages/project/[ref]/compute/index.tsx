@@ -21,7 +21,7 @@ import {
 } from '@/components/interfaces/Compute/Compute.utils'
 import { ComputeEmptyState } from '@/components/interfaces/Compute/ComputeEmptyState'
 import { ComputeList } from '@/components/interfaces/Compute/ComputeList'
-import { DeployInstanceDialog } from '@/components/interfaces/Compute/DeployInstanceDialog'
+import { DeployComputeInstanceDialog } from '@/components/interfaces/Compute/DeployComputeInstanceDialog'
 import { ComputeLayout } from '@/components/layouts/ComputeLayout/ComputeLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { AlertError } from '@/components/ui/AlertError'
@@ -112,7 +112,7 @@ const ComputePage: NextPageWithLayout = () => {
         </PageSection>
       </PageContainer>
 
-      <DeployInstanceDialog
+      <DeployComputeInstanceDialog
         open={isDeployInstructionsOpen}
         onOpenChange={setIsDeployInstructionsOpen}
       />

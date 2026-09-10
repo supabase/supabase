@@ -1,19 +1,19 @@
-import { COMPUTE_REGION, instanceUrl, RUNTIMES } from './Compute.constants'
-import type { InstanceAccess } from './Compute.types'
+import { COMPUTE_REGION, computeInstanceUrl, RUNTIMES } from './Compute.constants'
+import type { ComputeInstanceAccess } from './Compute.types'
 import { formatSize } from './Compute.utils'
 import { CLI_NAME } from '@/lib/constants/compute'
 
-export interface InstanceSnippetInput {
+export interface ComputeInstanceSnippetInput {
   name: string
   endpoint: string | undefined
   protocol?: string
   runtime: string | undefined
   size: string
-  access: InstanceAccess
+  access: ComputeInstanceAccess
   instances: number
 }
 
-export interface InstanceSnippets {
+export interface ComputeInstanceSnippets {
   aiPrompt: string
   configToml: string
   cli: string
@@ -22,22 +22,25 @@ export interface InstanceSnippets {
   python: string
 }
 
-export const EXAMPLE_INSTANCE: Omit<InstanceSnippetInput, 'endpoint' | 'protocol'> = {
-  name: 'my-instance',
-  runtime: 'node',
-  size: '2gb-1vcpu',
-  access: 'public',
-  instances: 1,
-}
+export const EXAMPLE_COMPUTE_INSTANCE: Omit<ComputeInstanceSnippetInput, 'endpoint' | 'protocol'> =
+  {
+    name: 'my-instance',
+    runtime: 'node',
+    size: '2gb-1vcpu',
+    access: 'public',
+    instances: 1,
+  }
 
 const safeName = (name: string) => (name.trim().length > 0 ? name.trim() : 'my-instance')
 
-export function buildInstanceSnippets(input: InstanceSnippetInput): InstanceSnippets {
+export function buildComputeInstanceSnippets(
+  input: ComputeInstanceSnippetInput
+): ComputeInstanceSnippets {
   const name = safeName(input.name)
   const runtime = input.runtime ?? 'node'
 
   const url =
-    instanceUrl({ endpoint: input.endpoint, protocol: input.protocol, name }) ??
+    computeInstanceUrl({ endpoint: input.endpoint, protocol: input.protocol, name }) ??
     '[YOUR INSTANCE URL]'
 
   const cli = [
@@ -107,12 +110,12 @@ export function buildInstanceSnippets(input: InstanceSnippetInput): InstanceSnip
   return { aiPrompt, configToml, cli, curl, javascript, python }
 }
 
-export interface InstanceCliCommand {
+export interface ComputeInstanceCliCommand {
   comment: string
   command: string
 }
 
-export function buildInstanceCliCommands(name: string): InstanceCliCommand[] {
+export function buildComputeInstanceCliCommands(name: string): ComputeInstanceCliCommand[] {
   const slug = safeName(name)
   return [
     { comment: 'Recreate the source locally', command: `supabase ${CLI_NAME} pull ${slug}` },

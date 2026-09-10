@@ -1,15 +1,18 @@
 import { cn } from 'ui'
 
-import { getInstanceStateMeta } from './Compute.constants'
+import { getComputeInstanceStateMeta } from './Compute.constants'
 import type { ComputeInstance } from './Compute.types'
 
-interface InstanceStatePillProps {
+interface ComputeInstanceStatePillProps {
   instance: ComputeInstance
   className?: string
 }
 
-export const InstanceStatePill = ({ instance, className }: InstanceStatePillProps) => {
-  const meta = getInstanceStateMeta(instance)
+export const ComputeInstanceStatePill = ({
+  instance,
+  className,
+}: ComputeInstanceStatePillProps) => {
+  const meta = getComputeInstanceStateMeta(instance)
   const isPulsing = instance.buildState === 'building' || instance.isDeleting
 
   return (

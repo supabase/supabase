@@ -2,16 +2,16 @@ import { z } from 'zod'
 
 import type {
   ComputeInstance,
-  InstanceBuildState,
+  ComputeInstanceBuildState,
 } from '@/components/interfaces/Compute/Compute.types'
 
 const BUILD_STATES = [
   'building',
   'active',
   'failed',
-] as const satisfies readonly InstanceBuildState[]
+] as const satisfies readonly ComputeInstanceBuildState[]
 
-const InstanceResponseSchema = z.object({
+const ComputeInstanceResponseSchema = z.object({
   id: z.string(),
   attributes: z.object({
     build_state: z.enum(BUILD_STATES).catch('failed'),
@@ -36,8 +36,8 @@ const InstanceResponseSchema = z.object({
   }),
 })
 
-export const parseInstance = (datum: unknown): ComputeInstance => {
-  const { id, attributes } = InstanceResponseSchema.parse(datum)
+export const parseComputeInstance = (datum: unknown): ComputeInstance => {
+  const { id, attributes } = ComputeInstanceResponseSchema.parse(datum)
   return {
     name: id,
     buildState: attributes.build_state,

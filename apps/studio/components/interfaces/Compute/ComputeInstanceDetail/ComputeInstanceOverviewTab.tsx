@@ -15,17 +15,20 @@ import {
 import { COMPUTE_REGION_LABEL, LISTENING_PORT } from '../Compute.constants'
 import type { ComputeInstance } from '../Compute.types'
 import { formatSize, getRuntimeMeta } from '../Compute.utils'
-import { InstanceCommandLine } from '../InstanceCommandLine'
-import { buildInstanceCliCommands } from '../instanceSnippets'
-import { INSTANCE_CALL_TABS, InstanceSnippetTabs } from '../InstanceSnippetTabs'
+import { ComputeInstanceCommandLine } from '../ComputeInstanceCommandLine'
+import { buildComputeInstanceCliCommands } from '../computeInstanceSnippets'
+import {
+  COMPUTE_INSTANCE_CALL_TABS,
+  ComputeInstanceSnippetTabs,
+} from '../ComputeInstanceSnippetTabs'
 import { RuntimeBadge } from '../RuntimeBadge'
 import { CLI_NAME } from '@/lib/constants/compute'
 
-interface InstanceOverviewTabProps {
+interface ComputeInstanceOverviewTabProps {
   instance: ComputeInstance
 }
 
-const InstanceCount = ({
+const ComputeInstanceCount = ({
   label,
   value,
   tooltip,
@@ -64,9 +67,9 @@ const SettingsRow = ({
   </div>
 )
 
-export const InstanceOverviewTab = ({ instance }: InstanceOverviewTabProps) => {
+export const ComputeInstanceOverviewTab = ({ instance }: ComputeInstanceOverviewTabProps) => {
   const runtime = getRuntimeMeta(instance.runtime)
-  const commands = buildInstanceCliCommands(instance.name)
+  const commands = buildComputeInstanceCliCommands(instance.name)
 
   return (
     <PageContainer size="small">
@@ -76,7 +79,7 @@ export const InstanceOverviewTab = ({ instance }: InstanceOverviewTabProps) => {
             <Admonition type="destructive" title="This instance failed to build">
               <div className="space-y-3">
                 <p>{instance.stateReason ?? 'The build did not complete.'}</p>
-                <InstanceCommandLine
+                <ComputeInstanceCommandLine
                   comment="Redeploy after fixing the build"
                   command={`supabase ${CLI_NAME} push ${instance.name}`}
                 />
@@ -115,22 +118,22 @@ export const InstanceOverviewTab = ({ instance }: InstanceOverviewTabProps) => {
                 instances ready
               </p>
               <div className="grid grid-cols-2 divide-x divide-y rounded-md border border-default bg-surface-100 sm:grid-cols-4 sm:divide-y-0">
-                <InstanceCount
+                <ComputeInstanceCount
                   label="Instances"
                   value={instance.instances.declared}
                   tooltip="The number of instances you configured for this deployment."
                 />
-                <InstanceCount
+                <ComputeInstanceCount
                   label="Live"
                   value={instance.instances.live}
                   tooltip="Instances currently running."
                 />
-                <InstanceCount
+                <ComputeInstanceCount
                   label="Ready"
                   value={instance.instances.ready}
                   tooltip="Instances passing health checks and serving requests."
                 />
-                <InstanceCount
+                <ComputeInstanceCount
                   label="Stale"
                   value={instance.instances.stale}
                   tooltip="Instances from a previous deployment, being replaced."
@@ -219,7 +222,7 @@ export const InstanceOverviewTab = ({ instance }: InstanceOverviewTabProps) => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <InstanceSnippetTabs
+          <ComputeInstanceSnippetTabs
             input={{
               name: instance.name,
               runtime: instance.runtime,
@@ -227,7 +230,7 @@ export const InstanceOverviewTab = ({ instance }: InstanceOverviewTabProps) => {
               access: instance.access,
               instances: instance.declaredInstances,
             }}
-            tabs={INSTANCE_CALL_TABS}
+            tabs={COMPUTE_INSTANCE_CALL_TABS}
           />
         </PageSectionContent>
       </PageSection>
@@ -244,7 +247,7 @@ export const InstanceOverviewTab = ({ instance }: InstanceOverviewTabProps) => {
         <PageSectionContent>
           <div className="space-y-4 rounded-md border border-default bg-surface-100 p-4">
             {commands.map((command) => (
-              <InstanceCommandLine
+              <ComputeInstanceCommandLine
                 key={command.command}
                 comment={command.comment}
                 command={command.command}

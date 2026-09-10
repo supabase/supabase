@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
 
-import { parseInstance } from './compute.utils'
+import { parseComputeInstance } from './compute.utils'
 import { computeKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -18,7 +18,7 @@ async function getComputeInstances({ projectRef }: ComputeVariables, signal?: Ab
   })
 
   if (error) return handleError(error)
-  return data.data.map((instance) => parseInstance(instance))
+  return data.data.map((instance) => parseComputeInstance(instance))
 }
 
 export type ComputeData = Awaited<ReturnType<typeof getComputeInstances>>

@@ -10,9 +10,9 @@ import { analyticsLiteral, safeSql } from '@/data/logs/safe-analytics-sql'
 import { IS_PLATFORM } from '@/lib/constants'
 import { WORKER_LOG_SOURCES } from '@/lib/constants/compute'
 
-export type InstanceLogStream = keyof typeof WORKER_LOG_SOURCES
+export type ComputeInstanceLogStream = keyof typeof WORKER_LOG_SOURCES
 
-export const INSTANCE_LOG_STREAM_LABEL: Record<InstanceLogStream, string> = {
+export const COMPUTE_INSTANCE_LOG_STREAM_LABEL: Record<ComputeInstanceLogStream, string> = {
   requests: 'Invocations',
   output: 'Logs',
   builds: 'Activity',
@@ -26,26 +26,26 @@ const STREAM_KEY = 'source'
 
 const LOG_LIMIT = 100
 
-const instanceLogRowSchema = z.object({
+const computeInstanceLogRowSchema = z.object({
   id: z.string(),
   timestamp: z.union([z.string(), z.number()]),
   severity: z.string().nullish(),
   message: z.string().nullish(),
 })
 
-export type InstanceLogsVariables = {
+export type ComputeInstanceLogsVariables = {
   projectRef?: string
   name?: string
-  stream: InstanceLogStream
+  stream: ComputeInstanceLogStream
   iso_timestamp_start: string
   iso_timestamp_end: string
   message?: string
 }
 
-export const instanceLogsSql = (
+export const computeInstanceLogsSql = (
   name: string,
-  stream: InstanceLogStream,
-  { message }: Pick<InstanceLogsVariables, 'message'> = {}
+  stream: ComputeInstanceLogStream,
+  { message }: Pick<ComputeInstanceLogsVariables, 'message'> = {}
 ) => {
   const messageFilter = message
     ? safeSql` and event_message ilike ${analyticsLiteral(`%${message}%`)}`
@@ -54,9 +54,9 @@ export const instanceLogsSql = (
   return safeSql`select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes[${analyticsLiteral(WORKER_NAME_KEY)}] = ${analyticsLiteral(name)} and log_attributes[${analyticsLiteral(STREAM_KEY)}] = ${analyticsLiteral(WORKER_LOG_SOURCES[stream])}${messageFilter} order by timestamp desc limit ${analyticsLiteral(LOG_LIMIT)}`
 }
 
-export const parseInstanceLogRows = (result: unknown): LogData[] =>
+export const parseComputeInstanceLogRows = (result: unknown): LogData[] =>
   z
-    .array(instanceLogRowSchema)
+    .array(computeInstanceLogRowSchema)
     .parse(result ?? [])
     .map((row) => ({
       id: row.id,
@@ -65,7 +65,7 @@ export const parseInstanceLogRows = (result: unknown): LogData[] =>
       severity_text: row.severity ?? '',
     }))
 
-async function getInstanceLogs(
+async function getComputeInstanceLogs(
   {
     projectRef,
     name,
@@ -73,7 +73,7 @@ async function getInstanceLogs(
     iso_timestamp_start,
     iso_timestamp_end,
     message,
-  }: InstanceLogsVariables,
+  }: ComputeInstanceLogsVariables,
   signal?: AbortSignal
 ): Promise<LogData[]> {
   if (!projectRef) throw new Error('projectRef is required')
@@ -82,16 +82,16 @@ async function getInstanceLogs(
   const data = await executeAnalyticsSql({
     projectRef,
     endpoint: logsAllEndpointUrl(true),
-    sql: instanceLogsSql(name, stream, { message }),
+    sql: computeInstanceLogsSql(name, stream, { message }),
     iso_timestamp_start,
     iso_timestamp_end,
     signal,
   })
 
-  return parseInstanceLogRows(data?.result)
+  return parseComputeInstanceLogRows(data?.result)
 }
 
-export const instanceLogsQueryOptions = (variables: InstanceLogsVariables) => {
+export const computeInstanceLogsQueryOptions = (variables: ComputeInstanceLogsVariables) => {
   const { projectRef, name, stream, iso_timestamp_start, iso_timestamp_end } = variables
   const message = variables.message?.trim() || undefined
 
@@ -102,7 +102,7 @@ export const instanceLogsQueryOptions = (variables: InstanceLogsVariables) => {
       message,
     }),
     queryFn: ({ signal }) =>
-      getInstanceLogs(
+      getComputeInstanceLogs(
         { projectRef, name, stream, iso_timestamp_start, iso_timestamp_end, message },
         signal
       ),

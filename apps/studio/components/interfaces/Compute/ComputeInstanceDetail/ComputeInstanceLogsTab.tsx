@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { Button, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { InstanceCommandLine } from '../InstanceCommandLine'
+import { ComputeInstanceCommandLine } from '../ComputeInstanceCommandLine'
 import { ComputeLogsColumnRender } from '@/components/interfaces/Settings/Logs/LogColumnRenderers/ComputeLogsColumnRender'
 import { EXPLORER_DATEPICKER_HELPERS } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import {
@@ -16,16 +16,16 @@ import type { LogData } from '@/components/interfaces/Settings/Logs/Logs.types'
 import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
 import { AlertError } from '@/components/ui/AlertError'
 import {
-  INSTANCE_LOG_STREAM_LABEL,
-  instanceLogsQueryOptions,
-  type InstanceLogStream,
-} from '@/data/compute/instance-logs-query'
+  COMPUTE_INSTANCE_LOG_STREAM_LABEL,
+  computeInstanceLogsQueryOptions,
+  type ComputeInstanceLogStream,
+} from '@/data/compute/compute-instance-logs-query'
 import { useDebouncedValue } from '@/hooks/misc/useDebouncedValue'
 import { CLI_NAME } from '@/lib/constants/compute'
 
-interface InstanceLogsTabProps {
+interface ComputeInstanceLogsTabProps {
   instanceName: string
-  stream: InstanceLogStream
+  stream: ComputeInstanceLogStream
 }
 
 const defaultDateRange = (): DatePickerValue => {
@@ -39,7 +39,7 @@ const defaultDateRange = (): DatePickerValue => {
   }
 }
 
-export const InstanceLogsTab = ({ instanceName, stream }: InstanceLogsTabProps) => {
+export const ComputeInstanceLogsTab = ({ instanceName, stream }: ComputeInstanceLogsTabProps) => {
   const { ref: projectRef } = useParams()
   const [selectedLog, setSelectedLog] = useState<LogData | null>(null)
   const [dateRange, setDateRange] = useState<DatePickerValue>(defaultDateRange)
@@ -54,7 +54,7 @@ export const InstanceLogsTab = ({ instanceName, stream }: InstanceLogsTabProps) 
     isFetching,
     refetch,
   } = useQuery(
-    instanceLogsQueryOptions({
+    computeInstanceLogsQueryOptions({
       projectRef,
       name: instanceName,
       stream,
@@ -64,7 +64,7 @@ export const InstanceLogsTab = ({ instanceName, stream }: InstanceLogsTabProps) 
     })
   )
 
-  const label = INSTANCE_LOG_STREAM_LABEL[stream].toLowerCase()
+  const label = COMPUTE_INSTANCE_LOG_STREAM_LABEL[stream].toLowerCase()
 
   return (
     <div className="flex flex-1 flex-col min-h-0">
@@ -129,7 +129,7 @@ export const InstanceLogsTab = ({ instanceName, stream }: InstanceLogsTabProps) 
                   Follow them from the Supabase CLI while you wait for traffic.
                 </p>
                 <div className="pt-1 text-left">
-                  <InstanceCommandLine
+                  <ComputeInstanceCommandLine
                     command={`supabase ${CLI_NAME} logs ${instanceName} --follow`}
                   />
                 </div>

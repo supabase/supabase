@@ -3,19 +3,22 @@ import { FileCode, Sparkles, Terminal, type LucideIcon } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from 'ui'
 
-import { buildInstanceSnippets, type InstanceSnippetInput } from './instanceSnippets'
+import {
+  buildComputeInstanceSnippets,
+  type ComputeInstanceSnippetInput,
+} from './computeInstanceSnippets'
 import CopyButton from '@/components/ui/CopyButton'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 
-export type InstanceSnippetTab = 'ai' | 'config' | 'cli' | 'curl' | 'js' | 'python'
+export type ComputeInstanceSnippetTab = 'ai' | 'config' | 'cli' | 'curl' | 'js' | 'python'
 
-export const INSTANCE_CALL_TABS = [
+export const COMPUTE_INSTANCE_CALL_TABS = [
   'curl',
   'js',
   'python',
-] as const satisfies readonly InstanceSnippetTab[]
+] as const satisfies readonly ComputeInstanceSnippetTab[]
 
-const TAB_LABEL: Record<InstanceSnippetTab, string> = {
+const TAB_LABEL: Record<ComputeInstanceSnippetTab, string> = {
   ai: 'AI Prompt',
   config: 'config.toml',
   cli: 'CLI',
@@ -24,7 +27,7 @@ const TAB_LABEL: Record<InstanceSnippetTab, string> = {
   python: 'Python',
 }
 
-const TAB_ICON: Record<InstanceSnippetTab, LucideIcon> = {
+const TAB_ICON: Record<ComputeInstanceSnippetTab, LucideIcon> = {
   ai: Sparkles,
   config: FileCode,
   cli: Terminal,
@@ -33,27 +36,27 @@ const TAB_ICON: Record<InstanceSnippetTab, LucideIcon> = {
   python: FileCode,
 }
 
-interface InstanceSnippetTabsProps {
-  input: Omit<InstanceSnippetInput, 'endpoint' | 'protocol'>
-  tabs?: readonly [InstanceSnippetTab, ...InstanceSnippetTab[]]
+interface ComputeInstanceSnippetTabsProps {
+  input: Omit<ComputeInstanceSnippetInput, 'endpoint' | 'protocol'>
+  tabs?: readonly [ComputeInstanceSnippetTab, ...ComputeInstanceSnippetTab[]]
   className?: string
 }
 
-export const InstanceSnippetTabs = ({
+export const ComputeInstanceSnippetTabs = ({
   input,
   tabs = ['cli'],
   className,
-}: InstanceSnippetTabsProps) => {
+}: ComputeInstanceSnippetTabsProps) => {
   const { ref } = useParams()
-  const [active, setActive] = useState<InstanceSnippetTab>(tabs[0])
+  const [active, setActive] = useState<ComputeInstanceSnippetTab>(tabs[0])
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref }, { enabled: !!ref })
-  const snippets = buildInstanceSnippets({
+  const snippets = buildComputeInstanceSnippets({
     ...input,
     endpoint: settings?.app_config?.endpoint,
     protocol: settings?.app_config?.protocol,
   })
-  const snippetByTab: Record<InstanceSnippetTab, string> = {
+  const snippetByTab: Record<ComputeInstanceSnippetTab, string> = {
     ai: snippets.aiPrompt,
     config: snippets.configToml,
     cli: snippets.cli,

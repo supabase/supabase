@@ -1,4 +1,4 @@
-import type { ComputeInstance, InstanceBuildState } from './Compute.types'
+import type { ComputeInstance, ComputeInstanceBuildState } from './Compute.types'
 
 // Locked to one region at alpha, so nothing in the UI lets you change it.
 export const COMPUTE_REGION = 'us-west-2'
@@ -6,9 +6,9 @@ export const COMPUTE_REGION_LABEL = 'US West (Oregon)'
 export const COMPUTE_REGION_SHORT = 'US West'
 
 // Sizes are fixed at deploy time — matches the `size` values the API accepts.
-export const INSTANCE_SIZES = ['2gb-1vcpu', '4gb-2vcpu'] as const
+export const COMPUTE_INSTANCE_SIZES = ['2gb-1vcpu', '4gb-2vcpu'] as const
 
-export const INSTANCE_NAME_WORDS = [
+export const COMPUTE_INSTANCE_NAME_WORDS = [
   'swift',
   'nimble',
   'brisk',
@@ -61,7 +61,7 @@ export const INSTANCE_NAME_WORDS = [
   'stellar',
 ] as const
 
-export const instanceUrl = ({
+export const computeInstanceUrl = ({
   endpoint,
   protocol = 'https',
   name,
@@ -114,15 +114,15 @@ export const RUNTIMES: Record<string, RuntimeMeta> = {
   },
 }
 
-export const INSTANCE_DEPLOYABLE_RUNTIMES = ['node', 'deno', 'dockerfile'] as const
+export const COMPUTE_INSTANCE_DEPLOYABLE_RUNTIMES = ['node', 'deno', 'dockerfile'] as const
 
-interface InstanceStateMeta {
+interface ComputeInstanceStateMeta {
   label: string
   dotClassName: string
   textClassName: string
 }
 
-const BUILD_STATE_META: Record<InstanceBuildState, InstanceStateMeta> = {
+const BUILD_STATE_META: Record<ComputeInstanceBuildState, ComputeInstanceStateMeta> = {
   building: {
     label: 'Building',
     dotClassName: 'bg-warning',
@@ -136,11 +136,11 @@ const BUILD_STATE_META: Record<InstanceBuildState, InstanceStateMeta> = {
   },
 }
 
-const DELETING_STATE_META: InstanceStateMeta = {
+const DELETING_STATE_META: ComputeInstanceStateMeta = {
   label: 'Deleting',
   dotClassName: 'bg-foreground-muted',
   textClassName: 'text-foreground-lighter',
 }
 
-export const getInstanceStateMeta = (instance: ComputeInstance): InstanceStateMeta =>
+export const getComputeInstanceStateMeta = (instance: ComputeInstance): ComputeInstanceStateMeta =>
   instance.isDeleting ? DELETING_STATE_META : BUILD_STATE_META[instance.buildState]

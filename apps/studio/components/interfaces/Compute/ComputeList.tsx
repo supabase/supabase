@@ -22,9 +22,13 @@ import {
 } from 'ui'
 
 import { COMPUTE_REGION_SHORT } from './Compute.constants'
-import type { ComputeInstance, InstanceAccess, InstanceBuildState } from './Compute.types'
-import { filterInstances, formatResources, getPage } from './Compute.utils'
-import { InstanceStatePill } from './InstanceStatePill'
+import type {
+  ComputeInstance,
+  ComputeInstanceAccess,
+  ComputeInstanceBuildState,
+} from './Compute.types'
+import { filterComputeInstances, formatResources, getPage } from './Compute.utils'
+import { ComputeInstanceStatePill } from './ComputeInstanceStatePill'
 import { RuntimeBadge } from './RuntimeBadge'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
@@ -36,14 +40,14 @@ interface ComputeListProps {
   isRefreshing: boolean
 }
 
-const STATE_FILTERS: { value: InstanceBuildState | 'all'; label: string }[] = [
+const STATE_FILTERS: { value: ComputeInstanceBuildState | 'all'; label: string }[] = [
   { value: 'all', label: 'All states' },
   { value: 'active', label: 'Active' },
   { value: 'building', label: 'Building' },
   { value: 'failed', label: 'Failed' },
 ]
 
-const ACCESS_FILTERS: { value: InstanceAccess | 'all'; label: string }[] = [
+const ACCESS_FILTERS: { value: ComputeInstanceAccess | 'all'; label: string }[] = [
   { value: 'all', label: 'All access' },
   { value: 'public', label: 'Public' },
   { value: 'private', label: 'Private' },
@@ -51,10 +55,10 @@ const ACCESS_FILTERS: { value: InstanceAccess | 'all'; label: string }[] = [
 
 const PAGE_SIZE = 10
 
-const parseStateFilter = (value: string): InstanceBuildState | 'all' =>
+const parseStateFilter = (value: string): ComputeInstanceBuildState | 'all' =>
   STATE_FILTERS.find((option) => option.value === value)?.value ?? 'all'
 
-const parseAccessFilter = (value: string): InstanceAccess | 'all' =>
+const parseAccessFilter = (value: string): ComputeInstanceAccess | 'all' =>
   ACCESS_FILTERS.find((option) => option.value === value)?.value ?? 'all'
 
 export const ComputeList = ({
@@ -66,11 +70,11 @@ export const ComputeList = ({
 }: ComputeListProps) => {
   const router = useRouter()
   const [search, setSearch] = useState('')
-  const [stateFilter, setStateFilter] = useState<InstanceBuildState | 'all'>('all')
-  const [accessFilter, setAccessFilter] = useState<InstanceAccess | 'all'>('all')
+  const [stateFilter, setStateFilter] = useState<ComputeInstanceBuildState | 'all'>('all')
+  const [accessFilter, setAccessFilter] = useState<ComputeInstanceAccess | 'all'>('all')
   const [page, setPage] = useState(1)
 
-  const filtered = filterInstances(instances, {
+  const filtered = filterComputeInstances(instances, {
     search,
     state: stateFilter,
     access: accessFilter,
@@ -79,7 +83,7 @@ export const ComputeList = ({
 
   const resetToFirstPage = () => setPage(1)
 
-  const instancePagePath = (name: string) => `/project/${projectRef}/compute/${name}`
+  const computeInstancePagePath = (name: string) => `/project/${projectRef}/compute/${name}`
 
   return (
     <div className="space-y-4">
@@ -165,15 +169,18 @@ export const ComputeList = ({
               <TableRow
                 key={instance.name}
                 className="cursor-pointer"
-                onClick={() => router.push(instancePagePath(instance.name))}
+                onClick={() => router.push(computeInstancePagePath(instance.name))}
               >
                 <TableCell className="font-medium text-foreground">
-                  <Link href={instancePagePath(instance.name)} onClick={(e) => e.stopPropagation()}>
+                  <Link
+                    href={computeInstancePagePath(instance.name)}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     {instance.name}
                   </Link>
                 </TableCell>
                 <TableCell>
-                  <InstanceStatePill instance={instance} />
+                  <ComputeInstanceStatePill instance={instance} />
                 </TableCell>
                 <TableCell>
                   <RuntimeBadge runtime={instance.runtime} />

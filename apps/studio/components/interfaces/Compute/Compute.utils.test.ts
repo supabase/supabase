@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest'
 
-import { getInstanceStateMeta, INSTANCE_NAME_WORDS, instanceUrl } from './Compute.constants'
+import {
+  COMPUTE_INSTANCE_NAME_WORDS,
+  computeInstanceUrl,
+  getComputeInstanceStateMeta,
+} from './Compute.constants'
 import type { ComputeInstance } from './Compute.types'
 import {
-  filterInstances,
+  filterComputeInstances,
   formatResources,
   formatRuntime,
   formatSize,
-  generateInstanceName,
+  generateComputeInstanceName,
   getPage,
   isComputeForbidden,
   isComputeUnavailable,
@@ -28,7 +32,7 @@ const instance = (
 
 const NO_FILTERS = { search: '', state: 'all', access: 'all' } as const
 
-describe('filterInstances', () => {
+describe('filterComputeInstances', () => {
   const instances = [
     instance({ name: 'embed', buildState: 'active', access: 'public' }),
     instance({ name: 'resize-images', buildState: 'building', access: 'private' }),
@@ -36,30 +40,34 @@ describe('filterInstances', () => {
   ]
 
   it('returns every instance when no filters are set', () => {
-    expect(filterInstances(instances, NO_FILTERS)).toHaveLength(3)
+    expect(filterComputeInstances(instances, NO_FILTERS)).toHaveLength(3)
   })
 
   it('matches names case-insensitively on a partial term', () => {
-    const names = filterInstances(instances, { ...NO_FILTERS, search: 'EMBED' }).map((i) => i.name)
+    const names = filterComputeInstances(instances, { ...NO_FILTERS, search: 'EMBED' }).map(
+      (i) => i.name
+    )
     expect(names).toEqual(['embed', 'embed-batch'])
   })
 
   it('ignores surrounding whitespace in the search term', () => {
-    expect(filterInstances(instances, { ...NO_FILTERS, search: '  resize  ' })).toHaveLength(1)
+    expect(filterComputeInstances(instances, { ...NO_FILTERS, search: '  resize  ' })).toHaveLength(
+      1
+    )
   })
 
   it('filters by build state and by access', () => {
     expect(
-      filterInstances(instances, { ...NO_FILTERS, state: 'failed' }).map((i) => i.name)
+      filterComputeInstances(instances, { ...NO_FILTERS, state: 'failed' }).map((i) => i.name)
     ).toEqual(['embed-batch'])
     expect(
-      filterInstances(instances, { ...NO_FILTERS, access: 'private' }).map((i) => i.name)
+      filterComputeInstances(instances, { ...NO_FILTERS, access: 'private' }).map((i) => i.name)
     ).toEqual(['resize-images'])
   })
 
   it('combines filters', () => {
     expect(
-      filterInstances(instances, { search: 'embed', state: 'active', access: 'public' })
+      filterComputeInstances(instances, { search: 'embed', state: 'active', access: 'public' })
     ).toEqual([instances[0]])
   })
 })
@@ -148,49 +156,54 @@ describe('compute error classification', () => {
   })
 })
 
-describe('instanceUrl', () => {
+describe('computeInstanceUrl', () => {
   it('answers on the project domain alongside /compute/v1', () => {
-    expect(instanceUrl({ endpoint: 'abcdefgh.supabase.co', name: 'embed' })).toBe(
+    expect(computeInstanceUrl({ endpoint: 'abcdefgh.supabase.co', name: 'embed' })).toBe(
       'https://abcdefgh.supabase.co/compute/v1/embed'
     )
   })
 
   it('honors a non-https protocol', () => {
-    expect(instanceUrl({ endpoint: 'localhost:8000', protocol: 'http', name: 'embed' })).toBe(
-      'http://localhost:8000/compute/v1/embed'
-    )
+    expect(
+      computeInstanceUrl({ endpoint: 'localhost:8000', protocol: 'http', name: 'embed' })
+    ).toBe('http://localhost:8000/compute/v1/embed')
   })
 
   it('has no url until the project settings resolve', () => {
-    expect(instanceUrl({ endpoint: undefined, name: 'embed' })).toBeUndefined()
+    expect(computeInstanceUrl({ endpoint: undefined, name: 'embed' })).toBeUndefined()
   })
 })
 
-describe('generateInstanceName', () => {
+describe('generateComputeInstanceName', () => {
   it('produces a name that already passes the CLI naming rules', () => {
-    const name = generateInstanceName()
-    expect(name).toMatch(/^instance-[a-z]+-\d{6}$/)
-    expect(INSTANCE_NAME_WORDS).toContain(name.split('-')[1])
+    const name = generateComputeInstanceName()
+    expect(name).toMatch(/^compute-[a-z]+-\d{6}$/)
+    expect(COMPUTE_INSTANCE_NAME_WORDS).toContain(name.split('-')[1])
   })
 
   it('varies across calls', () => {
-    const names = new Set(Array.from({ length: 20 }, () => generateInstanceName()))
+    const names = new Set(Array.from({ length: 20 }, () => generateComputeInstanceName()))
     expect(names.size).toBeGreaterThan(1)
   })
 })
 
-describe('getInstanceStateMeta', () => {
+describe('getComputeInstanceStateMeta', () => {
   it('labels every build state', () => {
-    expect(getInstanceStateMeta(instance({ name: 'a', buildState: 'building' })).label).toBe(
+    expect(getComputeInstanceStateMeta(instance({ name: 'a', buildState: 'building' })).label).toBe(
       'Building'
     )
-    expect(getInstanceStateMeta(instance({ name: 'a', buildState: 'active' })).label).toBe('Active')
-    expect(getInstanceStateMeta(instance({ name: 'a', buildState: 'failed' })).label).toBe('Failed')
+    expect(getComputeInstanceStateMeta(instance({ name: 'a', buildState: 'active' })).label).toBe(
+      'Active'
+    )
+    expect(getComputeInstanceStateMeta(instance({ name: 'a', buildState: 'failed' })).label).toBe(
+      'Failed'
+    )
   })
 
   it('reports deleting over the build state', () => {
     expect(
-      getInstanceStateMeta(instance({ name: 'a', buildState: 'active', isDeleting: true })).label
+      getComputeInstanceStateMeta(instance({ name: 'a', buildState: 'active', isDeleting: true }))
+        .label
     ).toBe('Deleting')
   })
 })

@@ -1,16 +1,20 @@
-import { INSTANCE_NAME_WORDS, RUNTIMES, type RuntimeMeta } from './Compute.constants'
-import type { ComputeInstance, InstanceAccess, InstanceBuildState } from './Compute.types'
+import { COMPUTE_INSTANCE_NAME_WORDS, RUNTIMES, type RuntimeMeta } from './Compute.constants'
+import type {
+  ComputeInstance,
+  ComputeInstanceAccess,
+  ComputeInstanceBuildState,
+} from './Compute.types'
 import { ResponseError } from '@/types'
 
-export interface InstanceFilters {
+export interface ComputeInstanceFilters {
   search: string
-  state: InstanceBuildState | 'all'
-  access: InstanceAccess | 'all'
+  state: ComputeInstanceBuildState | 'all'
+  access: ComputeInstanceAccess | 'all'
 }
 
-export const filterInstances = (
+export const filterComputeInstances = (
   instances: ComputeInstance[],
-  filters: InstanceFilters
+  filters: ComputeInstanceFilters
 ): ComputeInstance[] => {
   const search = filters.search.trim().toLowerCase()
   return instances.filter((instance) => {
@@ -58,10 +62,11 @@ export const formatResources = (instance: ComputeInstance): string =>
   `${formatSize(instance.size)} · ${instance.declaredInstances} inst`
 
 // Suggests a friendly, already-valid starting name so the deploy dialog isn't blank.
-export const generateInstanceName = (): string => {
-  const word = INSTANCE_NAME_WORDS[Math.floor(Math.random() * INSTANCE_NAME_WORDS.length)]
+export const generateComputeInstanceName = (): string => {
+  const word =
+    COMPUTE_INSTANCE_NAME_WORDS[Math.floor(Math.random() * COMPUTE_INSTANCE_NAME_WORDS.length)]
   const number = Math.floor(Math.random() * 900000) + 100000
-  return `instance-${word}-${number}`
+  return `compute-${word}-${number}`
 }
 
 // A project outside the alpha allow-list gets a 404, not a 403.

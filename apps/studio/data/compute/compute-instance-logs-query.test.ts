@@ -1,34 +1,34 @@
 import { describe, expect, it } from 'vitest'
 
-import { instanceLogsSql, parseInstanceLogRows } from './instance-logs-query'
+import { computeInstanceLogsSql, parseComputeInstanceLogRows } from './compute-instance-logs-query'
 import { computeKeys } from './keys'
 
-describe('instanceLogsSql', () => {
+describe('computeInstanceLogsSql', () => {
   it('reads one instance stream, newest first', () => {
-    expect(instanceLogsSql('embed', 'output')).toBe(
+    expect(computeInstanceLogsSql('embed', 'output')).toBe(
       "select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes['worker'] = 'embed' and log_attributes['source'] = 'worker_guest_logs' order by timestamp desc limit 100"
     )
   })
 
   it('filters by event message before applying the limit', () => {
-    expect(instanceLogsSql('embed', 'requests', { message: 'timeout' })).toBe(
+    expect(computeInstanceLogsSql('embed', 'requests', { message: 'timeout' })).toBe(
       "select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes['worker'] = 'embed' and log_attributes['source'] = 'worker_ingress_logs' and event_message ilike '%timeout%' order by timestamp desc limit 100"
     )
   })
 
   it('names the right stream for each tab', () => {
-    expect(instanceLogsSql('embed', 'requests')).toContain("'worker_ingress_logs'")
-    expect(instanceLogsSql('embed', 'builds')).toContain("'worker_api_logs'")
+    expect(computeInstanceLogsSql('embed', 'requests')).toContain("'worker_ingress_logs'")
+    expect(computeInstanceLogsSql('embed', 'builds')).toContain("'worker_api_logs'")
   })
 
   it('escapes an instance name rather than interpolating it raw', () => {
-    expect(instanceLogsSql("embed' or '1'='1", 'output')).toContain(
+    expect(computeInstanceLogsSql("embed' or '1'='1", 'output')).toContain(
       "log_attributes['worker'] = 'embed'' or ''1''=''1'"
     )
   })
 
   it('escapes filter values rather than interpolating them raw', () => {
-    expect(instanceLogsSql('embed', 'requests', { message: "can't connect" })).toContain(
+    expect(computeInstanceLogsSql('embed', 'requests', { message: "can't connect" })).toContain(
       "event_message ilike '%can''t connect%'"
     )
   })
@@ -58,9 +58,9 @@ describe('computeKeys.logs', () => {
   })
 })
 
-describe('parseInstanceLogRows', () => {
+describe('parseComputeInstanceLogRows', () => {
   it('shapes rows for the logs table with a numeric timestamp', () => {
-    const [row] = parseInstanceLogRows([
+    const [row] = parseComputeInstanceLogRows([
       { id: 'a', timestamp: '2026-08-24T10:00:00.000000', severity: 'ERROR', message: 'boom' },
     ])
     expect(row.id).toBe('a')
@@ -71,7 +71,7 @@ describe('parseInstanceLogRows', () => {
   })
 
   it('falls back to empty strings for null severity and message', () => {
-    const [row] = parseInstanceLogRows([
+    const [row] = parseComputeInstanceLogRows([
       { id: 'a', timestamp: '2026-08-24T10:00:00.000000', severity: null, message: null },
     ])
     expect(row.severity_text).toBe('')
@@ -79,10 +79,12 @@ describe('parseInstanceLogRows', () => {
   })
 
   it('returns an empty array for a missing result', () => {
-    expect(parseInstanceLogRows(undefined)).toEqual([])
+    expect(parseComputeInstanceLogRows(undefined)).toEqual([])
   })
 
   it('rejects a malformed row rather than passing bad data to the table', () => {
-    expect(() => parseInstanceLogRows([{ timestamp: '2026-08-24T10:00:00.000000' }])).toThrow()
+    expect(() =>
+      parseComputeInstanceLogRows([{ timestamp: '2026-08-24T10:00:00.000000' }])
+    ).toThrow()
   })
 })

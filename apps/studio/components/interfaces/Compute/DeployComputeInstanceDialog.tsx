@@ -23,53 +23,60 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { COMPUTE_REGION, INSTANCE_DEPLOYABLE_RUNTIMES, INSTANCE_SIZES } from './Compute.constants'
-import type { InstanceAccess } from './Compute.types'
-import { formatSize, generateInstanceName } from './Compute.utils'
-import { InstanceSnippetTabs } from './InstanceSnippetTabs'
+import {
+  COMPUTE_INSTANCE_DEPLOYABLE_RUNTIMES,
+  COMPUTE_INSTANCE_SIZES,
+  COMPUTE_REGION,
+} from './Compute.constants'
+import type { ComputeInstanceAccess } from './Compute.types'
+import { formatSize, generateComputeInstanceName } from './Compute.utils'
+import { ComputeInstanceSnippetTabs } from './ComputeInstanceSnippetTabs'
 import { RuntimeBadge } from './RuntimeBadge'
 
 const FORM_ID = 'deploy-instance-form'
 
-const DeployInstanceFormSchema = z.object({
+const DeployComputeInstanceFormSchema = z.object({
   name: z
     .string()
     .trim()
     .min(1, 'Name is required')
     .regex(/^[a-z0-9-]+$/, 'Lowercase letters, numbers, and hyphens only'),
-  runtime: z.enum(INSTANCE_DEPLOYABLE_RUNTIMES),
-  size: z.enum(INSTANCE_SIZES),
+  runtime: z.enum(COMPUTE_INSTANCE_DEPLOYABLE_RUNTIMES),
+  size: z.enum(COMPUTE_INSTANCE_SIZES),
   access: z.enum(['private', 'public']),
   instances: z
     .union([z.literal(''), z.coerce.number().int().gte(1).lte(10)])
     .refine((value) => value !== '', 'Instances is required'),
 })
 
-type DeployInstanceFormValues = z.infer<typeof DeployInstanceFormSchema>
+type DeployComputeInstanceFormValues = z.infer<typeof DeployComputeInstanceFormSchema>
 
-const DEFAULT_VALUES: DeployInstanceFormValues = {
+const DEFAULT_VALUES: DeployComputeInstanceFormValues = {
   name: '',
   runtime: 'deno',
-  size: INSTANCE_SIZES[0],
+  size: COMPUTE_INSTANCE_SIZES[0],
   access: 'private',
   instances: 1,
 }
 
-const ACCESS_OPTIONS: { value: InstanceAccess; label: string }[] = [
+const ACCESS_OPTIONS: { value: ComputeInstanceAccess; label: string }[] = [
   { value: 'private', label: 'Private' },
   { value: 'public', label: 'Public' },
 ]
 
-interface DeployInstanceDialogProps {
+interface DeployComputeInstanceDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export const DeployInstanceDialog = ({ open, onOpenChange }: DeployInstanceDialogProps) => {
-  const form = useForm<DeployInstanceFormValues>({
+export const DeployComputeInstanceDialog = ({
+  open,
+  onOpenChange,
+}: DeployComputeInstanceDialogProps) => {
+  const form = useForm<DeployComputeInstanceFormValues>({
     mode: 'onBlur',
-    resolver: zodResolver(DeployInstanceFormSchema),
-    defaultValues: { ...DEFAULT_VALUES, name: generateInstanceName() },
+    resolver: zodResolver(DeployComputeInstanceFormSchema),
+    defaultValues: { ...DEFAULT_VALUES, name: generateComputeInstanceName() },
   })
 
   const [name, runtime, size, access, instances] = useWatch({
@@ -122,7 +129,7 @@ export const DeployInstanceDialog = ({ open, onOpenChange }: DeployInstanceDialo
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {INSTANCE_DEPLOYABLE_RUNTIMES.map((value) => (
+                        {COMPUTE_INSTANCE_DEPLOYABLE_RUNTIMES.map((value) => (
                           <SelectItem key={value} value={value}>
                             <RuntimeBadge runtime={value} />
                           </SelectItem>
@@ -148,7 +155,7 @@ export const DeployInstanceDialog = ({ open, onOpenChange }: DeployInstanceDialo
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {INSTANCE_SIZES.map((value) => (
+                        {COMPUTE_INSTANCE_SIZES.map((value) => (
                           <SelectItem key={value} value={value}>
                             {formatSize(value)}
                           </SelectItem>
@@ -213,7 +220,7 @@ export const DeployInstanceDialog = ({ open, onOpenChange }: DeployInstanceDialo
         <DialogSectionSeparator />
 
         <DialogSection>
-          <InstanceSnippetTabs
+          <ComputeInstanceSnippetTabs
             input={{
               name: name ?? '',
               runtime: runtime ?? DEFAULT_VALUES.runtime,

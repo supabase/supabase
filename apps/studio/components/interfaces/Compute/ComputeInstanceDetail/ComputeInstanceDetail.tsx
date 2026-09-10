@@ -26,37 +26,37 @@ import {
 import { PageNav } from 'ui-patterns/PageNav'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { InstanceStatePill } from '../InstanceStatePill'
+import { ComputeInstanceStatePill } from '../ComputeInstanceStatePill'
 import { RuntimeBadge } from '../RuntimeBadge'
-import { InstanceLogsTab } from './InstanceLogsTab'
-import { InstanceOverviewTab } from './InstanceOverviewTab'
+import { ComputeInstanceLogsTab } from './ComputeInstanceLogsTab'
+import { ComputeInstanceOverviewTab } from './ComputeInstanceOverviewTab'
 import { AlertError } from '@/components/ui/AlertError'
-import type { InstanceLogStream } from '@/data/compute/instance-logs-query'
-import { instanceQueryOptions } from '@/data/compute/instance-query'
+import type { ComputeInstanceLogStream } from '@/data/compute/compute-instance-logs-query'
+import { computeInstanceQueryOptions } from '@/data/compute/compute-instance-query'
 import { PRODUCT_NAME } from '@/lib/constants/compute'
 
-type InstanceTab = 'overview' | 'invocations' | 'logs' | 'activity'
-const INSTANCE_TABS: InstanceTab[] = ['overview', 'invocations', 'logs', 'activity']
+type ComputeInstanceTab = 'overview' | 'invocations' | 'logs' | 'activity'
+const COMPUTE_INSTANCE_TABS: ComputeInstanceTab[] = ['overview', 'invocations', 'logs', 'activity']
 
-const TAB_LABEL: Record<InstanceTab, string> = {
+const TAB_LABEL: Record<ComputeInstanceTab, string> = {
   overview: 'Overview',
   invocations: 'Invocations',
   logs: 'Logs',
   activity: 'Activity',
 }
 
-const TAB_STREAM: Partial<Record<InstanceTab, InstanceLogStream>> = {
+const TAB_STREAM: Partial<Record<ComputeInstanceTab, ComputeInstanceLogStream>> = {
   invocations: 'requests',
   logs: 'output',
   activity: 'builds',
 }
 
-export const InstanceDetail = () => {
+export const ComputeInstanceDetail = () => {
   const { ref: projectRef, name: instanceName } = useParams()
 
   const [tab, setTab] = useQueryState(
     'tab',
-    parseAsStringEnum<InstanceTab>(INSTANCE_TABS)
+    parseAsStringEnum<ComputeInstanceTab>(COMPUTE_INSTANCE_TABS)
       .withDefault('overview')
       .withOptions({ history: 'push' })
   )
@@ -66,7 +66,7 @@ export const InstanceDetail = () => {
     error,
     isPending,
     isError,
-  } = useQuery(instanceQueryOptions({ projectRef, name: instanceName }))
+  } = useQuery(computeInstanceQueryOptions({ projectRef, name: instanceName }))
 
   if (!projectRef) return null
   if (isPending) return <GenericSkeletonLoader className="p-6" />
@@ -113,7 +113,7 @@ export const InstanceDetail = () => {
           <PageHeaderSummary>
             <PageHeaderTitle>{instance.name}</PageHeaderTitle>
             <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-              <InstanceStatePill instance={instance} />
+              <ComputeInstanceStatePill instance={instance} />
               <RuntimeBadge runtime={instance.runtime} />
               {instance.imageVersion !== undefined && (
                 <span className="flex items-center gap-2 text-foreground-light">
@@ -127,7 +127,7 @@ export const InstanceDetail = () => {
       </PageHeader>
       <PageNav>
         <NavMenu>
-          {INSTANCE_TABS.map((item) => (
+          {COMPUTE_INSTANCE_TABS.map((item) => (
             <NavMenuItem key={item} active={tab === item}>
               <button type="button" tabIndex={0} onClick={() => setTab(item)}>
                 {TAB_LABEL[item]}
@@ -137,10 +137,10 @@ export const InstanceDetail = () => {
         </NavMenu>
       </PageNav>
 
-      {tab === 'overview' && <InstanceOverviewTab instance={instance} />}
+      {tab === 'overview' && <ComputeInstanceOverviewTab instance={instance} />}
       {stream !== undefined && (
         <div className="flex flex-1 flex-col min-h-0">
-          <InstanceLogsTab key={stream} instanceName={instance.name} stream={stream} />
+          <ComputeInstanceLogsTab key={stream} instanceName={instance.name} stream={stream} />
         </div>
       )}
     </div>

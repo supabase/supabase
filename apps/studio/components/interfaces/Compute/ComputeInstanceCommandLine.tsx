@@ -1,11 +1,14 @@
 import CopyButton from '@/components/ui/CopyButton'
 
-interface InstanceCommandLineProps {
+interface ComputeInstanceCommandLineProps {
   command: string
   comment?: string
 }
 
-export const InstanceCommandLine = ({ command, comment }: InstanceCommandLineProps) => (
+export const ComputeInstanceCommandLine = ({
+  command,
+  comment,
+}: ComputeInstanceCommandLineProps) => (
   <div className="space-y-1">
     {comment && <p className="font-mono text-xs text-foreground-lighter">{`> ${comment}`}</p>}
     <div className="flex items-center gap-2 font-mono text-sm text-foreground">
