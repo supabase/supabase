@@ -230,12 +230,14 @@ psql \
 
 #### Schema changes to `auth` and `storage`
 
-If you have modified the `auth` and `storage` schemas in your old project, such as adding triggers or Row Level Security(RLS) policies, you have to restore them separately. The Supabase CLI can help you diff the changes to these schemas using the following commands.
+If you have modified the `auth` and `storage` schemas in your old project, such as adding triggers or Row Level Security (RLS) policies, you have to restore them separately. The Supabase CLI can help you diff the old project against your local migrations:
 
 ```bash
 supabase link --project-ref "$OLD_PROJECT_REF"
-supabase db diff --linked --schema auth,storage > changes.sql
+supabase db diff --linked > changes.sql
 ```
+
+The diff engine decides what in these managed schemas belongs to you: your own triggers on managed tables (such as `auth.users`) and your RLS policies on `storage.objects`, `storage.buckets`, and `realtime.messages` are included, while platform objects are excluded. Other objects you created inside these schemas, such as your own functions or indexes, are not diffed - recreate those on the new project from your own migration files or through the Dashboard.
 
 ### Troubleshooting notes
 
