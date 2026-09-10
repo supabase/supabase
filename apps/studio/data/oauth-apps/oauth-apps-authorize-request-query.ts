@@ -23,8 +23,10 @@ export type OAuthAppsAuthorizeRequest = {
    */
   reuses_grant_across_workspaces: boolean
   /**
-   * How the app author configured the consent flow. Drives whether the project picker renders
-   * at all. See {@link OAuthAppGrantConfig}.
+   * How the app author configured the consent flow. Read it through `getOAuthConsentModel` rather
+   * than field by field — that is what normalizes dynamic clients and derives whether the picker
+   * renders, whether org-wide is offered, and whether only an owner can approve.
+   * See {@link OAuthAppGrantConfig}.
    */
   grant_config: OAuthAppGrantConfig
   /** Populated when the user has authorized this app before. See {@link OAuthExistingGrant}. */
