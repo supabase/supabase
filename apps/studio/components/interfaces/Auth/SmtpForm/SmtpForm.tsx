@@ -18,6 +18,9 @@ import {
   InputGroupAddon,
   InputGroupText,
   Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
@@ -148,6 +151,7 @@ export const SmtpForm = () => {
   })
 
   const { isDirty } = form.formState
+  const isSmtpRequiredWhenEnabled = !IS_PLATFORM
   const smtpHost = useWatch({ control: form.control, name: 'SMTP_HOST' })
   const enableSmtp = useWatch({ control: form.control, name: 'ENABLE_SMTP' })
 
@@ -293,12 +297,27 @@ export const SmtpForm = () => {
                       }
                     >
                       <FormControl>
-                        <Switch
-                          aria-label="Toggle SMTP"
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={!canUpdateConfig || (!IS_PLATFORM && field.value)}
-                        />
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div>
+                              <Switch
+                                aria-label="Toggle SMTP"
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                disabled={
+                                  !canUpdateConfig || (isSmtpRequiredWhenEnabled && field.value)
+                                }
+                              />
+                            </div>
+                          </TooltipTrigger>
+                          {isSmtpRequiredWhenEnabled && field.value && (
+                            <TooltipContent side="bottom" className="max-w-xs">
+                              Self-hosted Supabase has no built-in email service, so custom SMTP
+                              cannot be turned off. Update the settings below to change your
+                              provider.
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
                       </FormControl>
                     </FormItemLayout>
                   )}
