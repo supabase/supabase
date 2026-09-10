@@ -1,10 +1,16 @@
 import { untrustedSql } from '@supabase/pg-meta'
+import dayjs from 'dayjs'
 import { describe, expect, it } from 'vitest'
 
-import { findQueryCellsMatchingSql, isMutatingSql } from './ExplorerNotebookTab.utils'
+import {
+  findQueryCellsMatchingSql,
+  isMutatingSql,
+  notebookToMarkdown,
+} from './ExplorerNotebookTab.utils'
 import { checkDestructiveQuery } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { type Cell } from '@/data/content/notebooks/notebook-schema'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
+import { isoDateTimeString } from '@/lib/iso-datetime'
 
 describe('isMutatingSql', () => {
   it('returns false for a read-only query', () => {
@@ -190,5 +196,77 @@ describe('findQueryCellsMatchingSql', () => {
         matchers: { destructiveQueries: checkDestructiveQuery },
       }).destructiveQueries
     ).toEqual([{ id: 'cell-1', title: 'Signups' }])
+  })
+})
+
+describe('notebookToMarkdown', () => {
+  const markdownCell: Cell = {
+    _tag: 'markdown_cell',
+    _id: 'cell-1',
+    text: '## Notes\n\nSome context here.',
+  }
+
+  const databaseCell: Cell = {
+    _tag: 'database_cell',
+    _id: 'cell-2',
+    title: 'Signups',
+    view: 'table',
+    unchecked_sql: untrustedSql('select * from auth.users'),
+    row_limit: 50,
+  }
+
+  const relativeLogCell: Cell = {
+    _tag: 'log_cell',
+    _id: 'cell-3',
+    title: 'Edge errors',
+    view: 'table',
+    unchecked_sql: untrustedLogSql("select * from edge_logs where status_code >= 500"),
+    time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 24 },
+  }
+
+  const absoluteRangeStart = isoDateTimeString('2026-01-01T00:00:00.000Z')!
+  const absoluteRangeEnd = isoDateTimeString('2026-01-02T00:00:00.000Z')!
+
+  const absoluteLogCell: Cell = {
+    _tag: 'log_cell',
+    _id: 'cell-4',
+    title: undefined,
+    view: 'table',
+    unchecked_sql: untrustedLogSql('select * from postgres_logs'),
+    time_range: {
+      _tag: 'absolute_time_range',
+      start: absoluteRangeStart,
+      end: absoluteRangeEnd,
+    },
+  }
+
+  it('renders the notebook name as a heading followed by each cell in order', () => {
+    const result = notebookToMarkdown({ name: 'My notebook', cells: [markdownCell, databaseCell] })
+
+    expect(result).toBe(
+      [
+        '# My notebook',
+        '## Notes\n\nSome context here.',
+        '### Signups (Postgres)\n\n```sql\nselect * from auth.users\n```',
+      ].join('\n\n')
+    )
+  })
+
+  it('falls back to "Untitled query" when a query cell has no title', () => {
+    const result = notebookToMarkdown({ name: 'Notebook', cells: [absoluteLogCell] })
+    expect(result).toContain('### Untitled query (Logs — ClickHouse)')
+  })
+
+  it('labels a relative time range in plain English', () => {
+    const result = notebookToMarkdown({ name: 'Notebook', cells: [relativeLogCell] })
+    expect(result).toContain('_Time range: Last 24 hours_')
+  })
+
+  it('formats an absolute time range as a start → end pair in local time', () => {
+    const result = notebookToMarkdown({ name: 'Notebook', cells: [absoluteLogCell] })
+    const expectedBound = (value: string) => dayjs(value).format('MMM D, YYYY h:mm A')
+    expect(result).toContain(
+      `_Time range: ${expectedBound(absoluteRangeStart)} → ${expectedBound(absoluteRangeEnd)}_`
+    )
   })
 })

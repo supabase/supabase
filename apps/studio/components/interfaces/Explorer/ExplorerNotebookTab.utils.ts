@@ -1,5 +1,6 @@
 import { type Snapshot } from 'valtio'
 
+import { formatTimeRange } from '@/components/ui/AIAssistantPanel/AssistantNotebookPreview.utils'
 import { type Cell } from '@/data/content/notebooks/notebook-schema'
 import { removeCommentsFromSql } from '@/lib/helpers'
 
@@ -59,4 +60,32 @@ export function findQueryCellsMatchingSql<T extends SqlMatchers>({
 export function isMutatingSql(sql: string): boolean {
   const cleanedSql = removeCommentsFromSql(sql)
   return cleanedSql.split(';').some((statement) => MUTATING_STATEMENT_REGEX.test(statement))
+}
+
+/**
+ * Renders a notebook as a markdown document meant to be pasted into an external agent:
+ * markdown cells verbatim, query cells as a labelled SQL block. Query results are never
+ * included since they aren't persisted with the notebook (see QueryCell's local result
+ * state) and a log cell's `time_range` is called out separately since it's applied as a
+ * request parameter rather than baked into the SQL text.
+ */
+export function notebookToMarkdown({
+  name,
+  cells,
+}: {
+  name: string
+  cells: readonly Snapshot<Cell>[]
+}): string {
+  const sections = cells.map((cell) => {
+    switch (cell._tag) {
+      case 'markdown_cell':
+        return cell.text
+      case 'database_cell':
+        return `### ${cell.title ?? 'Untitled query'} (Postgres)\n\n\`\`\`sql\n${cell.unchecked_sql}\n\`\`\``
+      case 'log_cell':
+        return `### ${cell.title ?? 'Untitled query'} (Logs — ClickHouse)\n\n_Time range: ${formatTimeRange(cell.time_range)}_\n\n\`\`\`sql\n${cell.unchecked_sql}\n\`\`\``
+    }
+  })
+
+  return [`# ${name}`, ...sections].join('\n\n')
 }
