@@ -300,7 +300,7 @@ If you have additional triggers or RLS policies defined on your `auth` schema, h
 
 <$Partial path="diff_engine_check.mdx" />
 
-On `pg-delta`, a plain `supabase db pull` captures your customizations automatically. Triggers on managed tables (such as a trigger on `auth.users` calling a function in `public`) are included in the diff.
+On `pg-delta`, a plain `supabase db pull` captures your customizations automatically. Triggers on managed tables (such as a trigger on `auth.users` calling a function in `public`) and RLS policies on `auth` tables are included in the diff.
 
 On the legacy `migra` engine, recent CLI versions include these customizations in the initial `pg_dump` baseline too. Older CLI versions excluded the `auth` schema and printed a message saying so. If you see that message, capture existing customizations once with an explicit pull:
 

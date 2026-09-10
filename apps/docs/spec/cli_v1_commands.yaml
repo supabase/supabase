@@ -3234,7 +3234,7 @@ commands:
 
       If no entries exist in the migration history table, the behavior depends on the diff engine. Under `pg-delta`, the remote database is diffed against an empty shadow database. Under the legacy `migra` engine, the CLI uses `pg_dump` to capture all contents of the remote schemas you have created. Otherwise, this command only diffs schema changes against the remote database, similar to running `db diff --linked`.
 
-      Pass `--diff-engine pg-delta` to keep the migration-file `db pull` workflow while using pg-delta for the shadow diff step. Pass `--declarative` to replace the declarative schema tree under `supabase/schemas` from the selected database instead of creating a migration.
+      pg-delta is the default diff engine. To fall back to the legacy migra engine, set `enabled = false` under `[experimental.pgdelta]` in `config.toml`, or pass `--diff-engine migra` for a single run. Pass `--declarative` to replace the declarative schema tree under `supabase/schemas` from the selected database instead of creating a migration.
 
       Under the pg-delta engine, your own customizations in Supabase-managed schemas are captured automatically, such as triggers on managed tables like `auth.users` and RLS policies on `storage.objects` and `storage.buckets`. Under the legacy migra engine, trigger and RLS policy changes in managed schemas are diffed, and recent CLI versions include them in the initial `pg_dump` baseline. If an older CLI reports that `auth` and `storage` were excluded, capture existing customizations there with `--schema auth,storage`.
     examples:
@@ -3284,12 +3284,12 @@ commands:
       - id: declarative
         name: --declarative
         description: |
-          Replace the declarative schema tree from the selected database instead of creating a migration. Migration history is not updated. Only use this on projects with `[experimental.pgdelta] enabled = true`. On the legacy migra engine, `db diff` tries to load the generated tree as its baseline and fails.
+          Replace the declarative schema tree from the selected database instead of creating a migration. Migration history is not updated. Don't use it on a project that opted out with `[experimental.pgdelta] enabled = false`, because `db diff` on the legacy migra engine tries to load the generated tree as its baseline and fails.
         default_value: 'false'
       - id: diff-engine
         name: --diff-engine <[ migra | pg-delta ]>
         description: Diff engine to use for migration-style db pull.
-        default_value: migra
+        default_value: pg-delta
         accepted_values:
           - id: migra
             name: migra
@@ -3518,11 +3518,13 @@ commands:
 
       Requires the local development stack to be running when diffing against the local database. To diff against a remote or self-hosted database, specify the `--linked` or `--db-url` flag respectively.
 
-      Runs [djrobstep/migra](https://github.com/djrobstep/migra) in a container to compare schema differences between the target database and a shadow database. The shadow database is created by applying migrations in local `supabase/migrations` directory in a separate container. Output is written to stdout by default. For convenience, you can also save the schema diff as a new migration file by passing in `-f` flag.
+      Compares schema differences between the target database and a shadow database, using the bundled pg-delta engine by default. The legacy [djrobstep/migra](https://github.com/djrobstep/migra) engine, which runs in a container, remains available as a fallback. The shadow database is created by applying migrations in local `supabase/migrations` directory in a separate container. Output is written to stdout by default. For convenience, you can also save the schema diff as a new migration file by passing in `-f` flag.
 
       By default, all schemas in the target database are diffed. Use the `--schema public,extensions` flag to restrict diffing to a subset of schemas.
 
-      While the diff command is able to capture most schema changes, there are cases where it is known to fail. Currently, this could happen if you schema contains:
+      pg-delta is the default diff engine for all projects. To fall back to the legacy migra engine, set `enabled = false` under `[experimental.pgdelta]` in `config.toml`, or pass `--use-migra` for a single run.
+
+      Under the legacy migra engine, the diff is known to miss some changes. This could happen if your schema contains:
 
       - Changes to publication
       - Changes to storage buckets
@@ -3606,7 +3608,7 @@ commands:
       - id: use-migra
         name: --use-migra
         description: Use migra to generate schema diff.
-        default_value: 'true'
+        default_value: 'false'
       - id: use-pg-delta
         name: --use-pg-delta
         description: Use pg-delta to generate schema diff.

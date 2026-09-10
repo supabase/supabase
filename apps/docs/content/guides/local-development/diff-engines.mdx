@@ -1,28 +1,28 @@
 ---
 id: 'diff-engines'
 title: 'Diff engines: pg-delta and migra'
-description: 'How the Supabase CLI generates migrations, which engine your project uses, and how to switch.'
-subtitle: 'How the Supabase CLI generates migrations, which engine your project uses, and how to switch.'
+description: 'How the Supabase CLI generates migrations, which engine your project uses, and how to roll back.'
+subtitle: 'How the Supabase CLI generates migrations, which engine your project uses, and how to roll back.'
 ---
 
-A diff engine compares two database states and generates the SQL that turns one into the other. It powers `supabase db diff`, `supabase db pull`, and the `supabase db schema declarative` commands. The CLI ships two engines, and the same command can behave differently depending on which one your project uses. This page explains how to tell which engine you're on, what differs between them, and how to move an existing project from one to the other.
+A diff engine compares two database states and generates the SQL that turns one into the other. It powers `supabase db diff`, `supabase db pull`, and the `supabase db schema declarative` commands. The CLI ships two engines, and the same command can behave differently depending on which one your project uses. This page explains how to tell which engine you're on, what differs between them, what to expect when an existing project upgrades to `pg-delta`, and how to roll back to `migra`.
 
-[`pg-delta`](https://github.com/supabase/pg-toolbelt/tree/main/packages/pg-delta) is Supabase's open source engine and the default for new projects. Rather than parsing SQL to understand your schema, it loads each state into a real Postgres instance and reads the result from the catalog. It models entities the legacy engine missed, such as comments, domains, roles, publication membership, and the security invoker setting on views, and it supports Postgres 14 through 18. It ships under the `[experimental.pgdelta]` config namespace and remains pre-1.0.
+[`pg-delta`](https://github.com/supabase/pg-toolbelt/tree/main/packages/pg-delta) is Supabase's open source engine and the default for every project. Rather than parsing SQL to understand your schema, it loads each state into a real Postgres instance and reads the result from the catalog. It models entities the legacy engine missed, such as comments, domains, roles, publication membership, and the security invoker setting on views, and it supports Postgres 14 through 18. It ships under the `[experimental.pgdelta]` config namespace and remains pre-1.0.
 
-[`migra`](https://github.com/djrobstep/migra) is `djrobstep`'s open source Python library for diffing Postgres schemas, and the CLI has shelled out to it since before `pg-delta` existed. It compares two live Postgres databases and generates the SQL that turns one into the other, the mechanism behind `supabase db diff`. Projects that haven't opted in to `pg-delta` continue to use it, and every command they relied on keeps working.
+[`migra`](https://github.com/djrobstep/migra) is `djrobstep`'s open source Python library for diffing Postgres schemas, and the CLI has shelled out to it since before `pg-delta` existed. It compares two live Postgres databases and generates the SQL that turns one into the other, the mechanism behind `supabase db diff`. Projects that opt out of `pg-delta` continue to use it, and every command they relied on keeps working.
 
 ## Which engine your project uses
 
 <$Partial path="diff_engine_check.mdx" />
 
-Projects created with a recent `supabase init` use `pg-delta` because `init` writes this into `config.toml`:
+`pg-delta` is the default, so a project uses it without any configuration. `supabase init` still writes the setting explicitly so the choice is visible in `config.toml`:
 
 ```toml name=supabase/config.toml
 [experimental.pgdelta]
 enabled = true
 ```
 
-Existing projects without that section keep the legacy `migra` engine until they add it. See [Switch an existing project to `pg-delta`](#switch-an-existing-project-to-pg-delta).
+Existing projects move to `pg-delta` when you upgrade the CLI, whether or not `config.toml` mentions the section. See [Upgrade an existing project to `pg-delta`](#switch-an-existing-project-to-pg-delta) for what to expect on the first pull.
 
 To use `migra` for a single run without changing `config.toml`, the flag depends on the command:
 
@@ -31,7 +31,7 @@ To use `migra` for a single run without changing `config.toml`, the flag depends
 | `db diff` | `--use-migra`                |
 | `db pull` | `--diff-engine migra`        |
 
-To opt out entirely, set `enabled = false` under `[experimental.pgdelta]`.
+To opt out entirely, set `enabled = false` under `[experimental.pgdelta]`. The `SUPABASE_EXPERIMENTAL_PG_DELTA` environment variable from earlier CLI versions is ignored, so the config setting is the only project-wide switch.
 
 ## What differs between the engines
 
@@ -42,7 +42,7 @@ The commands and the migration workflow are the same on both engines. What diffe
 | What `db diff` compares                      | Always the live database against a shadow database built from your migrations. Never reads `supabase/schemas/`.                                                                                                            | The live database against your migrations, unless `supabase/schemas/` contains declarative files. Then it compares those files against your migrations instead.                                                                 |
 | Generating migrations from declarative files | `supabase db schema declarative sync`                                                                                                                                                                                      | `supabase db diff`, with the local stack stopped                                                                                                                                                                                |
 | Exporting a database into declarative files  | `supabase db schema declarative generate`                                                                                                                                                                                  | Not available. Use `supabase db dump` and split the output by hand.                                                                                                                                                             |
-| Ordering of declarative files                | Automatic, based on dependencies between statements. `[db.migrations].schema_paths` is ignored, and the CLI warns whenever the setting is present, even when empty.                                                        | Lexicographic by default. `[db.migrations].schema_paths` overrides the order. Files in `supabase/schemas/` are used even when the setting is empty.                                                                             |
+| Ordering of declarative files                | Automatic, based on dependencies between statements. `[db.migrations].schema_paths` is ignored, and the CLI warns when the setting lists any paths.                                                                        | Lexicographic by default. `[db.migrations].schema_paths` overrides the order. Files in `supabase/schemas/` are used even when the setting is empty.                                                                             |
 | Initial `db pull` (empty migration history)  | Diffs the remote database against an empty shadow database. Your customizations in managed schemas, such as triggers on `auth.users` and RLS policies on `storage.objects`, are included.                                  | Uses `pg_dump` to capture the schemas you created. Recent CLI versions include your customizations in `auth` and `storage`. Older versions excluded those schemas and told you to run `supabase db pull --schema auth,storage`. |
 | Later `db pull` runs                         | Diffs the remote database against your migrations.                                                                                                                                                                         | Same. Trigger and RLS policy changes in managed schemas are included.                                                                                                                                                           |
 | `db pull --declarative`                      | Replaces `supabase/schemas/` from the selected database without creating a migration.                                                                                                                                      | Runs, but don't use it. The tree it writes is only readable by the `db schema declarative` commands. `db diff` on the legacy engine then tries to load that tree as its baseline and fails.                                     |
@@ -53,18 +53,18 @@ The commands and the migration workflow are the same on both engines. What diffe
 
 For a walkthrough of the day-to-day commands on `pg-delta`, see [Local development workflow](/docs/guides/local-development/cli-workflows). For the declarative workflow on each engine, see [Declarative database schemas](/docs/guides/local-development/declarative-database-schemas).
 
-## Switch an existing project to `pg-delta` [#switch-an-existing-project-to-pg-delta]
+## Upgrade an existing project to `pg-delta` [#switch-an-existing-project-to-pg-delta]
 
-Switching is a one-time change to `config.toml` followed by a catch-up migration. Do it on a branch so you can review everything before it reaches your team.
+Existing projects move to `pg-delta` automatically when you upgrade to a CLI version where it is the default. No `config.toml` change is needed. What needs attention is the first `db pull` after the upgrade and any scripts that relied on `migra` behavior. Do the first pull on a branch so you can review everything before it reaches your team.
 
-1. Add the engine setting to `config.toml`:
+1. Upgrade the CLI. If you want the engine choice visible to your team, add the setting `supabase init` writes for new projects. The CLI behaves the same without it:
 
    ```toml name=supabase/config.toml
    [experimental.pgdelta]
    enabled = true
    ```
 
-2. If your project uses declarative schemas, remove `[db.migrations].schema_paths`, even if it's empty. Ordering is automatic on `pg-delta`, and the CLI warns while the setting is present.
+2. If your project uses declarative schemas, remove `[db.migrations].schema_paths`. Ordering is automatic on `pg-delta`, and the CLI warns when the setting lists any paths.
 
 3. Pull once against your linked project to create a catch-up migration:
 
@@ -86,4 +86,4 @@ Switching is a one-time change to `config.toml` followed by a catch-up migration
 
 If you deploy through the [GitHub integration](/docs/guides/deployment/branching/github-integration), branching runs every migration inside a transaction and doesn't honor the `-- pg-delta: transaction=false` directive. A migration that carries it applies with `supabase db push` but fails when branching deploys it.
 
-To go back, set `enabled = false`. Migrations already generated by `pg-delta` are plain SQL and keep working on either engine.
+To roll back, set `enabled = false` under `[experimental.pgdelta]`, or use the per-command flags above for a single run. Migrations already generated by `pg-delta` are plain SQL and keep working on either engine.
