@@ -16,20 +16,8 @@ export type OAuthAppsAuthorizeRequest = {
   is_verified: boolean
   redirect_uri: string
   scope_groups: OAuthScopeGroup[]
-  /**
-   * PROVISIONAL — set for clients that map one Supabase authorization onto several of their own
-   * workspaces, so a grant made here shows up in places the user did not expect. Declared by the
-   * client at registration; the exact field name lands with the real endpoint.
-   */
   reuses_grant_across_workspaces: boolean
-  /**
-   * How the app author configured the consent flow. Read it through `getOAuthConsentModel` rather
-   * than field by field — that is what normalizes dynamic clients and derives whether the picker
-   * renders, whether org-wide is offered, and whether only an owner can approve.
-   * See {@link OAuthAppGrantConfig}.
-   */
   grant_config: OAuthAppGrantConfig
-  /** Populated when the user has authorized this app before. See {@link OAuthExistingGrant}. */
   existing_grant: OAuthExistingGrant | null
 }
 

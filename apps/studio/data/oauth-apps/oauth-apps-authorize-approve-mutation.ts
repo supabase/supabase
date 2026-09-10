@@ -7,11 +7,6 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 export type OAuthAppsAuthorizeApproveVariables = {
   slug: string
   auth_id: string
-  /**
-   * What the grant should cover. Apps that hide the picker submit the `all_projects` scope from
-   * `getOAuthConsentModel().implicit_project_scope` rather than an empty ref list, so "the member
-   * picked nothing" stays distinguishable from "this app is org-wide by design".
-   */
   project_scope: OAuthGrantProjectScope
 }
 

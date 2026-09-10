@@ -13,7 +13,6 @@ const PROJECT_SCOPE: OAuthGrantProjectScope = {
   project_refs: ['northwindstorefront1'],
 }
 
-// approve now returns a redirect-or-role-failure union, so narrow before reading the url.
 async function approveExpectingRedirect(
   variables: Parameters<typeof approveOAuthAppsAuthorize>[0]
 ) {
