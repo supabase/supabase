@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  parseWorker,
   WORKER_POLL_BASELINE_INTERVAL,
   WORKER_POLL_TRANSIENT_INTERVAL,
-  parseWorker,
   workerRefetchInterval,
   workersRefetchInterval,
 } from './workers.utils'
@@ -71,7 +71,6 @@ describe('workersRefetchInterval', () => {
   const deleting = parseWorker(datum({ deleting: true }))
 
   it('keeps polling once every worker has settled', () => {
-    // Deploys happen in the CLI, so a settled list still has to discover workers it has not seen
     expect(workersRefetchInterval([active])).toBe(WORKER_POLL_BASELINE_INTERVAL)
     expect(workersRefetchInterval([])).toBe(WORKER_POLL_BASELINE_INTERVAL)
     expect(workersRefetchInterval(undefined)).toBe(WORKER_POLL_BASELINE_INTERVAL)
@@ -85,7 +84,6 @@ describe('workersRefetchInterval', () => {
 
 describe('workerRefetchInterval', () => {
   it('keeps polling once the worker has settled', () => {
-    // A delete started from the CLI has to be noticed while the detail page sits on an active worker
     expect(workerRefetchInterval(parseWorker(datum({})))).toBe(WORKER_POLL_BASELINE_INTERVAL)
     expect(workerRefetchInterval(undefined)).toBe(WORKER_POLL_BASELINE_INTERVAL)
   })
