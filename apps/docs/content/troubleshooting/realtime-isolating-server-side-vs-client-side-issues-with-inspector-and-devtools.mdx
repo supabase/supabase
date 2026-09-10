@@ -1,0 +1,71 @@
+---
+title = "Realtime: Isolating Server-Side vs. Client-Side Issues with Inspector and DevTools"
+date_created = "2026-09-02T00:00:00+00:00"
+topics = [ "realtime" ]
+keywords = [ "postgres changes", "broadcast", "presence", "inspector", "devtools", "websocket", "subscribe" ]
+---
+
+Use this guide when a channel appears to subscribe successfully but the client consistently receives no `broadcast` messages, `presence` updates, or `postgres_changes` events. These steps help you determine whether the issue is on the server, in the client code, or in the client's network.
+
+This guide does not cover events that arrive late or are dropped intermittently. Those symptoms may indicate a different issue, such as replication lag or an unstable connection.
+
+#### Step 1: Verify server-side delivery with Realtime Inspector
+
+Open [Realtime Inspector](https://supabase.com/dashboard/project/_/realtime/inspector) and select the feature you are debugging.
+
+1. For `postgres_changes`, enter the same schema, table, event type, and filter used by your app. Connect as `postgres`, then perform the actual change that matches your event type and filter, for example inserting a row that satisfies the filter if you're testing `INSERT`. Check whether the event appears in Inspector.
+2. Repeat the test as an authenticated user with the same role as your app. This can reveal RLS or authorization issues that are not visible when testing as `postgres`.
+3. For `broadcast` or `presence`, test according to the channel type:
+   - **Public channels:** Authorization checks do not run, so test only as `postgres`.
+   - **Private channels:** Test as both `postgres` and an authenticated user. Use a session that matches the one sent by your app.
+
+For `broadcast`, you can trigger the message directly from Inspector. For `presence`, Inspector can only observe the channel; the `track()` call has to come from your end, so open Inspector on the same channel name first, then trigger `track()` from your app and confirm that the state appears in Inspector.
+
+**If the test fails as `postgres`:**
+
+- For `postgres_changes`, see [Realtime: Postgres Changes Troubleshooting](https://supabase.com/docs/guides/troubleshooting/realtime-postgres-changes-troubleshooting#step-1-is-the-table-in-the-realtime-publication). It covers publication membership and other server-side configuration.
+- For `broadcast` or `presence`, the failure occurs before authorization. Verify that the trigger or send call is firing.
+
+**If the test succeeds as `postgres` but fails as the authenticated user:**
+
+- For `postgres_changes`, the issue is likely related to RLS. See [Realtime: Postgres Changes Troubleshooting](https://supabase.com/docs/guides/troubleshooting/realtime-postgres-changes-troubleshooting#step-2-is-rls-quietly-blocking-the-row) for guidance on testing and fixing policies.
+- For `broadcast` or `presence`, the issue is likely related to channel authorization on `realtime.messages` for that role. Review the [policy examples in the Realtime Authorization docs](https://supabase.com/docs/guides/realtime/authorization?queryGroups=language&language=js#examples). Also check whether a complex policy is causing authorization checks to run slowly or time out.
+
+**If both tests succeed:** The Realtime server and Postgres are working as expected. The issue is likely in the client or network path. Continue to Step 2.
+
+#### Step 2: Check the client configuration
+
+Check for these common configuration issues:
+
+- **`postgres_changes`:** Confirm that the filter, schema, table, and event type match. See the "Check the subscription code itself" section of [Realtime: Postgres Changes Troubleshooting](https://supabase.com/docs/guides/troubleshooting/realtime-postgres-changes-troubleshooting#step-4-check-the-subscription-code-itself) for common mismatches.
+- **`broadcast`:** Confirm that the sender and receiver use the same topic and event name.
+- **`presence`:** Confirm that `track()` is called after the channel reaches `SUBSCRIBED` and that all clients use the same channel name.
+
+Also make sure you are using a recent version of `@supabase/supabase-js` and, if pinned separately, `@supabase/realtime-js`. Older versions may contain bugs that cause events to be dropped.
+
+If the configuration and package versions are correct but events still do not arrive, continue to Step 3.
+
+#### Step 3: Inspect WebSocket traffic in Chrome DevTools
+
+1. Open your application in Chrome, then open DevTools on that tab and go to the Network tab.  
+2. Trigger the action in your app that initiates the Realtime connection. Find the connection to `wss://<project-ref>.supabase.co/realtime/v1/websocket`.(Note: If your app connects on page load, refresh the page while DevTools is open).
+3. Select the connection, then open the **Messages** tab.
+4. Find the initial `phx_join` message and its corresponding `phx_reply`.
+5. Keep the connection open for one or two minutes to capture heartbeats and other traffic.
+6. Trigger the expected event, for example, insert a row, send a broadcast, or track presence.
+
+Use the captured messages to determine what happened, then act accordingly:
+
+- *Channel joined, but the server never sent the event:* The subscription doesn't match what was tested in Step 1. Recheck it against Step 2.
+- *Server sent the event, but the application didn't process it:* The issue is in the client-side handler, not the subscription config. Check for a thrown error or rejected promise inside the callback that could be silently swallowing it.
+- *WebSocket connection didn't complete at all:* Continue to Step 4.
+
+#### Step 4: Check the network path
+
+Confirm that the WebSocket request to `wss://.../realtime/v1/websocket` receives a `101 Switching Protocols` response.
+
+If it does not, or if the console reports a TLS or certificate error, a firewall, proxy, or SSL-inspecting network appliance may be blocking the connection before it reaches Realtime.
+
+Try testing the same app on a completely different network to confirm if the issue is network-specific.
+
+If you still need help, [contact Support](https://supabase.com/support) and include a description of the issue, relevant results of these tests, and the troubleshooting steps you've already tried. This information will help narrow down the cause.
