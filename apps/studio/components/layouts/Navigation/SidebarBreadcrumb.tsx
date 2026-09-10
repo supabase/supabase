@@ -29,8 +29,15 @@ export const SidebarBreadcrumb = ({
             <>
               <BreadcrumbItem className="min-w-0 leading-none">
                 <BreadcrumbLink
+                  role="button"
                   tabIndex={0}
                   onClick={parent.onClick}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      parent.onClick()
+                    }
+                  }}
                   title={parent.label}
                   className="min-w-0 cursor-pointer truncate no-underline focus-ring"
                 >
