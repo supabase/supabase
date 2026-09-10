@@ -105,7 +105,9 @@ export function shouldInvalidateResultOnSourceChange(
 ): boolean {
   const isBackendChange = (source._tag === 'logs') !== (cell._tag === 'log_cell')
   const isTimeRangeChange =
-    source._tag === 'logs' && cell._tag === 'log_cell' && !isEqual(source.time_range, cell.time_range)
+    source._tag === 'logs' &&
+    cell._tag === 'log_cell' &&
+    !isEqual(source.time_range, cell.time_range)
 
   return isBackendChange || isTimeRangeChange
 }
