@@ -22,8 +22,13 @@
     "lucide-react": "*",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
     "ui": "workspace:*",
     "ui-patterns": "workspace:*",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.1.0",
     "yaml": "^2.9.0"
   },
   "devDependencies": {

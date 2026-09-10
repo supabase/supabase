@@ -23,7 +23,11 @@ export const TOPICS = [
     pinned: true,
   },
   { name: 'Storage', description: 'Uploading, managing, and serving files.', pinned: false },
-  { name: 'Auth', description: 'Authentication, authorization, and user management.', pinned: true },
+  {
+    name: 'Auth',
+    description: 'Authentication, authorization, and user management.',
+    pinned: true,
+  },
   { name: 'Database', description: 'Postgres schemas, queries, and performance.', pinned: true },
   {
     name: 'Edge Functions',

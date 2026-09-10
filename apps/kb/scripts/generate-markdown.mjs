@@ -7,6 +7,11 @@
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import remarkGfm from 'remark-gfm'
+import remarkParse from 'remark-parse'
+import remarkStringify from 'remark-stringify'
+import { unified } from 'unified'
+import { visit } from 'unist-util-visit'
 import YAML from 'yaml'
 
 import { TOPICS, topicToSlug } from '../src/lib/topics.ts'
@@ -19,6 +24,35 @@ const OUTPUT_DIR = path.join(SCRIPT_DIR, '..', 'public', 'markdown')
 // full URLs so the exported file still makes sense read on its own.
 const SITE_ORIGIN = 'https://supabase.com'
 const BASE_PATH = '/kb'
+
+// Single processor reused for every file: parses GFM markdown to an mdast
+// tree and serializes it back, same extensions on both ends so nothing
+// (tables, strikethrough, alert blockquotes) gets mangled in the round trip.
+// `emphasis`/`rule` match the markers content already uses (see
+// src/content/guides/sample-guide.mdx) so the round trip doesn't normalize
+// authors' `_italic_`/`---` into the serializer's own `*italic*`/`***`.
+const processor = unified()
+  .use(remarkParse)
+  .use(remarkGfm)
+  .use(remarkStringify, { bullet: '-', listItemIndent: 'one', emphasis: '_', rule: '-' })
+
+/**
+ * Absolute base URL to prepend to root-relative links, mirroring apps/docs'
+ * `getInternalLinkBaseUrl()`. Empty in local dev/CI (outside Vercel), which
+ * keeps links relative there — resolved instead against whatever host is
+ * serving the build.
+ *
+ * Resolution order:
+ *  - `VERCEL_ENV=production` → `https://supabase.com`
+ *  - `VERCEL_ENV=preview`    → `https://${VERCEL_URL}`
+ *  - anything else          → ''
+ */
+export function getInternalLinkBaseUrl() {
+  const env = process.env.VERCEL_ENV
+  if (env === 'production') return SITE_ORIGIN
+  if (env === 'preview' && process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+  return ''
+}
 
 /**
  * Splits a `.md`/`.mdx` file's raw text into its YAML frontmatter (parsed
@@ -42,19 +76,27 @@ export function parseFrontmatter(raw) {
 }
 
 /**
- * Rewrites root-relative markdown links (`](/some/path)`) into full,
- * absolute URLs — the same "show full URLs" transform apps/docs applies
- * to its own markdown export, so links still resolve when this file is
- * read outside of the site.
+ * Rewrites root-relative markdown links into full, absolute URLs by parsing
+ * the body to an mdast tree, visiting its `link` nodes, and serializing it
+ * back — the AST equivalent of apps/docs' `addBaseUrlPrefix()`, so this file
+ * still makes sense read outside of the site (no regex over the raw text).
  *
  * @param {string} body
  */
 export function absolutizeLinks(body) {
-  return body.replace(/\]\((\/[^)\s]+)\)/g, (_match, href) => {
+  const tree = processor.parse(body)
+  const baseUrl = getInternalLinkBaseUrl()
+
+  visit(tree, 'link', (node) => {
+    if (!node.url.startsWith('/') || node.url.startsWith('//')) return
     const withBase =
-      href === BASE_PATH || href.startsWith(`${BASE_PATH}/`) ? href : `${BASE_PATH}${href}`
-    return `](${SITE_ORIGIN}${withBase})`
+      node.url === BASE_PATH || node.url.startsWith(`${BASE_PATH}/`)
+        ? node.url
+        : `${BASE_PATH}${node.url}`
+    node.url = `${baseUrl}${withBase}`
   })
+
+  return String(processor.stringify(tree))
 }
 
 /**
@@ -68,7 +110,9 @@ export function absolutizeLinks(body) {
 export function renderMarkdown(data, body) {
   const heading = data.title ? `# ${data.title}\n\n` : ''
   const lead = data.description ? `${data.description}\n\n` : ''
-  return `${heading}${lead}${absolutizeLinks(body.trim())}\n`
+  // absolutizeLinks() already normalizes to exactly one trailing newline
+  // (remark-stringify's doing, not ours) — no extra "\n" needed here.
+  return `${heading}${lead}${absolutizeLinks(body.trim())}`
 }
 
 /**

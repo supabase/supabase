@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import {
   absolutizeLinks,
+  getInternalLinkBaseUrl,
   parseFrontmatter,
   renderMarkdown,
   renderTopicMarkdown,
@@ -39,27 +40,105 @@ describe('parseFrontmatter', () => {
   })
 })
 
-describe('absolutizeLinks', () => {
-  it('leaves already-absolute links untouched', () => {
-    const body = 'See [the docs](https://example.com/guide) for more.'
+describe('getInternalLinkBaseUrl', () => {
+  const ORIGINAL_ENV = process.env
 
-    expect(absolutizeLinks(body)).toBe(body)
+  beforeEach(() => {
+    process.env = { ...ORIGINAL_ENV }
+    delete process.env.VERCEL_ENV
+    delete process.env.VERCEL_URL
+  })
+
+  afterEach(() => {
+    process.env = ORIGINAL_ENV
+  })
+
+  it('returns the production origin when VERCEL_ENV=production', () => {
+    process.env.VERCEL_ENV = 'production'
+    expect(getInternalLinkBaseUrl()).toBe('https://supabase.com')
+  })
+
+  it('returns the deployment URL when VERCEL_ENV=preview', () => {
+    process.env.VERCEL_ENV = 'preview'
+    process.env.VERCEL_URL = 'kb-git-fork-supabase.vercel.app'
+    expect(getInternalLinkBaseUrl()).toBe('https://kb-git-fork-supabase.vercel.app')
+  })
+
+  it('returns empty when preview is set but VERCEL_URL is missing', () => {
+    process.env.VERCEL_ENV = 'preview'
+    expect(getInternalLinkBaseUrl()).toBe('')
+  })
+
+  it('returns empty when VERCEL_ENV is not set (local dev/CI)', () => {
+    expect(getInternalLinkBaseUrl()).toBe('')
+  })
+})
+
+describe('absolutizeLinks', () => {
+  const ORIGINAL_ENV = process.env
+
+  beforeEach(() => {
+    process.env = { ...ORIGINAL_ENV, VERCEL_ENV: 'production' }
+  })
+
+  afterEach(() => {
+    process.env = ORIGINAL_ENV
+  })
+
+  it('leaves already-absolute links untouched', () => {
+    expect(absolutizeLinks('See [the docs](https://example.com/guide) for more.')).toBe(
+      'See [the docs](https://example.com/guide) for more.\n'
+    )
   })
 
   it('rewrites a root-relative link into a full URL under the kb base path', () => {
-    const body = 'See [another guide](/guides/other-guide) for more.'
-
-    expect(absolutizeLinks(body)).toBe(
-      'See [another guide](https://supabase.com/kb/guides/other-guide) for more.'
+    expect(absolutizeLinks('See [another guide](/guides/other-guide) for more.')).toBe(
+      'See [another guide](https://supabase.com/kb/guides/other-guide) for more.\n'
     )
   })
 
   it('does not double up the base path when a link already includes it', () => {
-    const body = '[another guide](/kb/guides/other-guide)'
-
-    expect(absolutizeLinks(body)).toBe(
-      '[another guide](https://supabase.com/kb/guides/other-guide)'
+    expect(absolutizeLinks('[another guide](/kb/guides/other-guide)')).toBe(
+      '[another guide](https://supabase.com/kb/guides/other-guide)\n'
     )
+  })
+
+  it('leaves the link relative (base path only, no origin) outside of Vercel', () => {
+    process.env.VERCEL_ENV = undefined
+    expect(absolutizeLinks('[another guide](/guides/other-guide)')).toBe(
+      '[another guide](/kb/guides/other-guide)\n'
+    )
+  })
+
+  it('does not rewrite image URLs', () => {
+    expect(absolutizeLinks('![alt](/img.png)')).toBe('![alt](/img.png)\n')
+  })
+
+  it('skips link-like text inside fenced code blocks', () => {
+    expect(absolutizeLinks('```\n[x](/x)\n```\n\n[y](/y)')).toBe(
+      '```\n[x](/x)\n```\n\n[y](https://supabase.com/kb/y)\n'
+    )
+  })
+
+  it('leaves a root-relative URL inside a fenced code block untouched, even outside link syntax', () => {
+    const body = '```bash\ncurl -X GET /guides/foo\n```'
+    expect(absolutizeLinks(body)).toBe('```bash\ncurl -X GET /guides/foo\n```\n')
+  })
+
+  it('leaves a root-relative URL inside a fenced markdown code block untouched', () => {
+    const body = '```md\n[Guides](/guides/foo)\n```'
+    expect(absolutizeLinks(body)).toBe('```md\n[Guides](/guides/foo)\n```\n')
+  })
+
+  it('leaves a root-relative URL inside an inline code span untouched', () => {
+    expect(absolutizeLinks('Run `GET /guides/foo` to fetch it.')).toBe(
+      'Run `GET /guides/foo` to fetch it.\n'
+    )
+  })
+
+  it('round-trips GFM tables and strikethrough without mangling them', () => {
+    const body = '| a | b |\n| - | - |\n| 1 | 2 |\n\n~~gone~~'
+    expect(absolutizeLinks(body)).toBe('| a | b |\n| - | - |\n| 1 | 2 |\n\n~~gone~~\n')
   })
 })
 
