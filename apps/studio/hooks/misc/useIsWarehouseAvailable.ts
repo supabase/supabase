@@ -13,16 +13,15 @@ const WAREHOUSE_CONFIGCAT_FLAG_KEY = 'warehouse'
 const WAREHOUSE_ALLOW_ALL_SENTINEL = 'all'
 
 /**
- * Returns whether the Warehouse tab should be shown in the Connect dialog.
+ * Returns whether Warehouse is available to this org, which is a different question from whether
+ * it has been set up on this project — see `useIsWarehouseProvisioned` for that.
  *
  * The API gates every `/platform/warehouse/{ref}/*` call against the same ConfigCat `warehouse`
- * flag, so this mirrors that check client-side and tab visibility matches what the API allows.
+ * flag, so this mirrors that check client-side and what we surface matches what the API allows.
  */
-export function useIsWarehouseEnabled(): boolean {
+export function useIsWarehouseAvailable(): boolean {
   const { ref: projectRef } = useParams()
-  const { projectConnectionShowWarehouse: isFeatureFlagEnabled } = useIsFeatureEnabled([
-    'project_connection:show_warehouse',
-  ])
+  const { warehouseShow: isFeatureFlagEnabled } = useIsFeatureEnabled(['warehouse:show'])
   const { data: organization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
 
   const { data: allowedOrgSlugs, isSuccess } = useQuery({

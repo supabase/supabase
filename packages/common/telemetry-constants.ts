@@ -3860,6 +3860,41 @@ export interface HeaderLocalVersionPopoverOpenedEvent {
 /**
  * @hidden
  */
+/**
+ * User enabled Warehouse for a project by submitting the schema and table selection.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/warehouse/overview
+ */
+export interface WarehouseEnabledEvent {
+  action: 'warehouse_enabled'
+  properties: {
+    /**
+     * Number of schemas replicated in full.
+     */
+    schemaTargetCount: number
+    /**
+     * Number of tables replicated individually, outside a fully selected schema.
+     */
+    tableTargetCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User disabled Warehouse for a project, tearing down its pipeline and catalog access.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/warehouse/settings
+ */
+export interface WarehouseDisabledEvent {
+  action: 'warehouse_disabled'
+  properties: {}
+  groups: TelemetryGroups
+}
+
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
@@ -4075,3 +4110,5 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
+  | WarehouseEnabledEvent
+  | WarehouseDisabledEvent

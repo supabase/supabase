@@ -10,10 +10,10 @@ import {
   buildSafeConnectionString,
   DEFAULT_PORT,
   parseConnectionParams,
-  PASSWORD_PLACEHOLDER,
   resolveConnectionString,
   withRequiredSslmode,
 } from '../ConnectionString.utils'
+import { PASSWORD_PLACEHOLDER } from '@/lib/constants'
 
 describe('parseConnectionParams', () => {
   test('returns hidden defaults for an empty string', () => {

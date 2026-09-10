@@ -1,58 +1,40 @@
 import { useParams } from 'common'
-import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import {
+  buildRetryTargets,
+  isWarehouseSettingUp,
+  type WarehouseSetupTarget,
+} from './Warehouse.utils'
 import { WarehouseConnectionDetails } from './WarehouseConnectionDetails'
-import { WarehouseEnablingProgress } from './WarehouseEnablingProgress'
-import type { WarehouseSetupTarget } from './WarehouseModePanel.utils'
 import { WarehouseSchemaTablePicker } from './WarehouseSchemaTablePicker'
+import { WarehouseEnablingProgress, WarehouseTableStatusList } from './WarehouseTableStatusList'
 import { AlertError } from '@/components/ui/AlertError'
+import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useUpdateWarehouseCatalogMutation } from '@/data/warehouse/warehouse-catalog-mutation'
 import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
+import { useTrack } from '@/lib/telemetry/track'
 
-const POLLING_SETUP_STATUSES = new Set(['setting_up', 'copying'])
-
-interface WarehouseSetupCompleteProps {
-  onSubmit: (targets: WarehouseSetupTarget[]) => void
-  isSubmitting: boolean
-}
-
-const WarehouseSetupComplete = ({ onSubmit, isSubmitting }: WarehouseSetupCompleteProps) => {
-  const [isEditingTables, setIsEditingTables] = useState(false)
-
-  if (isEditingTables) {
-    return (
-      <WarehouseSchemaTablePicker
-        onSubmit={onSubmit}
-        isSubmitting={isSubmitting}
-        onBack={() => setIsEditingTables(false)}
-      />
-    )
-  }
-
-  return <WarehouseConnectionDetails onEditTables={() => setIsEditingTables(true)} />
-}
-
-export const WarehouseModePanel = () => {
+export const WarehouseSetupPanel = () => {
   const { ref: projectRef } = useParams()
+  const track = useTrack()
 
   const { data, isPending, isError, error } = useWarehouseSetupStatusQuery(
     { projectRef },
     {
-      refetchInterval: (query) => {
-        const status = query.state.data?.setup_status
-        return status && POLLING_SETUP_STATUSES.has(status) ? 3000 : false
-      },
+      refetchInterval: (query) =>
+        isWarehouseSettingUp(query.state.data?.setup_status) ? 3000 : false,
     }
   )
 
   const catalogMutation = useUpdateWarehouseCatalogMutation({
     onError: (error) => {
       toast.error(
-        `Warehouse was enabled, but DuckLake catalog access could not be enabled automatically: ${error.message}. You can retry this from the connection details.`
+        `Warehouse was enabled, but DuckLake catalog access could not be enabled automatically: ${error.message}. You can retry this from Warehouse settings.`
       )
     },
   })
@@ -65,8 +47,12 @@ export const WarehouseModePanel = () => {
       { projectRef, body: { targets } },
       {
         onSuccess: () => {
+          track('warehouse_enabled', {
+            schemaTargetCount: targets.filter((target) => target.type === 'schema').length,
+            tableTargetCount: targets.filter((target) => target.type === 'table').length,
+          })
           // Fire-and-forget: setup itself should proceed even if enabling catalog access fails.
-          // The connection details panel offers a manual "Enable catalog access" fallback.
+          // Warehouse settings offers a manual toggle as the fallback.
           catalogMutation.mutate({ projectRef, body: { enabled: true } })
         },
       }
@@ -74,6 +60,18 @@ export const WarehouseModePanel = () => {
   }
 
   if (isPending) return <GenericSkeletonLoader />
+
+  // Warehouse rides on the replication API, which isn't wired up in local development. Same
+  // treatment Pipelines gives it, so a local dev doesn't read this as a broken build.
+  if (isError && checkLocalETLNotSetUp(error)) {
+    return (
+      <Admonition
+        type="default"
+        title="Warehouse is unavailable locally"
+        description="Configure the replication API to set up Warehouse in local development."
+      />
+    )
+  }
   if (isError) return <AlertError subject="Failed to load Warehouse status" error={error} />
   if (!data) return <GenericSkeletonLoader />
 
@@ -85,16 +83,12 @@ export const WarehouseModePanel = () => {
     )
   }
 
-  if (status === 'setting_up' || status === 'copying') {
+  if (isWarehouseSettingUp(status)) {
     return <WarehouseEnablingProgress status={data} />
   }
 
   if (status === 'error') {
-    const retryTargets: WarehouseSetupTarget[] = (data.tables ?? []).map((table) => ({
-      type: 'table' as const,
-      schema: table.schema,
-      name: table.name,
-    }))
+    const retryTargets = buildRetryTargets(data.tables)
     const failingStep = data.steps.find((step) => step.status === 'error')
 
     return (
@@ -118,6 +112,10 @@ export const WarehouseModePanel = () => {
     )
   }
 
-  // status === 'complete'
-  return <WarehouseSetupComplete onSubmit={handleSetup} isSubmitting={setupMutation.isPending} />
+  return (
+    <div className="flex flex-col gap-6">
+      <WarehouseTableStatusList tables={data.tables} />
+      <WarehouseConnectionDetails />
+    </div>
+  )
 }

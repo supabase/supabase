@@ -1,5 +1,4 @@
-import { PASSWORD_PLACEHOLDER } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
-import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
+import { IS_STAGING_OR_LOCAL, PASSWORD_PLACEHOLDER } from '@/lib/constants'
 
 const WAREHOUSE_TLD = IS_STAGING_OR_LOCAL ? 'red' : 'io'
 

@@ -1,15 +1,15 @@
 import { useParams } from 'common'
 import { KeyRound } from 'lucide-react'
 import Link from 'next/link'
-import { Badge, Button } from 'ui'
+import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import type { WarehouseCatalogCredentials } from './WarehouseModePanel.utils'
+import type { WarehouseCatalogCredentials } from './Warehouse.utils'
 import { AlertError } from '@/components/ui/AlertError'
-import { useUpdateWarehouseCatalogMutation } from '@/data/warehouse/warehouse-catalog-mutation'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useWarehouseCatalogQuery } from '@/data/warehouse/warehouse-catalog-query'
 import {
   DUCKLAKE_METADATA_PASSWORD_ENV_VAR,
@@ -20,10 +20,6 @@ import {
   getWarehouseUsqlCommand,
   parseWarehouseCatalogUrl,
 } from '@/lib/warehouse'
-
-export interface WarehouseConnectionDetailsProps {
-  onEditTables: () => void
-}
 
 function FieldRow({ label, children }: { label: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -96,7 +92,11 @@ function DuckLakeSetup({ credentials }: { credentials: WarehouseCatalogCredentia
   )
 }
 
-export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnectionDetailsProps) => {
+/**
+ * Read-only view of how to reach a project's Warehouse. Rendered both on the Warehouse integration
+ * and in the Connect sheet, so it must not contain any action that changes Warehouse setup.
+ */
+export const WarehouseConnectionDetails = () => {
   const { ref: projectRef } = useParams()
 
   const {
@@ -105,7 +105,6 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
     isError: isCatalogError,
     error: catalogError,
   } = useWarehouseCatalogQuery({ projectRef })
-  const catalogMutation = useUpdateWarehouseCatalogMutation()
 
   if (!projectRef) return null
 
@@ -115,18 +114,6 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
 
   return (
     <div>
-      <div className="flex items-center gap-3 mb-5">
-        <Badge variant="success">Warehouse enabled</Badge>
-        <button
-          type="button"
-          tabIndex={0}
-          onClick={onEditTables}
-          className="text-sm text-foreground-light underline underline-offset-2 ml-auto"
-        >
-          Edit replicated tables
-        </button>
-      </div>
-
       <h3 className="text-sm font-medium text-foreground mb-3">External access</h3>
       <div className="flex flex-col gap-3">
         <FieldRow label="Endpoint">
@@ -188,19 +175,13 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
       )}
 
       {!isCatalogPending && !isCatalogError && !catalog?.enabled && (
-        <div className="flex items-center gap-3 mt-2">
-          <p className="text-sm text-foreground-light max-w-lg">
-            Enable catalog access to attach this project's Warehouse directly from DuckDB.
-          </p>
-          <Button
-            variant="default"
-            className="ml-auto shrink-0"
-            loading={catalogMutation.isPending}
-            onClick={() => catalogMutation.mutate({ projectRef, body: { enabled: true } })}
-          >
-            Enable catalog access
-          </Button>
-        </div>
+        <p className="text-sm text-foreground-light max-w-lg mt-2">
+          Catalog access is off. Turn it on in{' '}
+          <InlineLink href={`/project/${projectRef}/integrations/warehouse/settings`}>
+            Warehouse settings
+          </InlineLink>{' '}
+          to attach this project's Warehouse directly from DuckDB.
+        </p>
       )}
 
       {!isCatalogPending && !isCatalogError && catalog?.enabled && catalog.credentials && (

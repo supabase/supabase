@@ -2,9 +2,13 @@ import { describe, expect, test } from 'vitest'
 
 import {
   getDuckLakeSetupScript,
+  getWarehouseFlightSqlConnectionString,
+  getWarehouseFlightSqlEndpoint,
+  getWarehouseUsqlCommand,
   parseWarehouseCatalogUrl,
   type WarehouseCatalogConnection,
 } from './warehouse'
+import { PASSWORD_PLACEHOLDER } from '@/lib/constants'
 
 const CREDENTIALS = {
   data_path: 's3://warehouse/',
@@ -99,5 +103,30 @@ describe('getDuckLakeSetupScript', () => {
   test('binds the metadata secret into the DuckLake secret', () => {
     expect(script).toContain("'SECRET': 'ducklake_metadata'")
     expect(script).toContain("METADATA_PATH ''")
+  })
+})
+
+describe('getWarehouseFlightSqlEndpoint', () => {
+  test('builds the endpoint from the project ref', () => {
+    // The TLD follows IS_STAGING_OR_LOCAL, which is false under test.
+    expect(getWarehouseFlightSqlEndpoint('abcdefghijklmnop')).toBe(
+      'abcdefghijklmnop.warehouse.supabase.io'
+    )
+  })
+})
+
+describe('getWarehouseFlightSqlConnectionString', () => {
+  test('uses the FlightSQL scheme, TLS, and the shared password placeholder', () => {
+    expect(getWarehouseFlightSqlConnectionString('abcdefghijklmnop')).toBe(
+      `flightsql://postgres:${PASSWORD_PLACEHOLDER}@abcdefghijklmnop.warehouse.supabase.io:443?tls=enabled`
+    )
+  })
+})
+
+describe('getWarehouseUsqlCommand', () => {
+  test('omits the password so the command is safe to copy as-is', () => {
+    const command = getWarehouseUsqlCommand('abcdefghijklmnop')
+    expect(command).toContain('abcdefghijklmnop.warehouse.supabase.io:443')
+    expect(command).not.toContain(PASSWORD_PLACEHOLDER)
   })
 })

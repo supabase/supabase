@@ -291,7 +291,7 @@ export const connectSchema: ConnectSchema = {
     {
       id: 'warehouse',
       label: 'Warehouse',
-      description: 'Connect to Warehouse',
+      description: 'Analytical endpoint',
       fields: [],
     },
   ],
@@ -482,8 +482,8 @@ export const connectSchema: ConnectSchema = {
         },
       },
       server: [serverInstallStep, serverEnvStep, serverSkillsInstallStep],
-      // Warehouse renders its own fully custom panel (WarehouseModePanel) instead of the
-      // generic field/step abstraction, so it has no steps of its own here.
+      // Warehouse renders read-only connection details (WarehouseTab) instead of the generic
+      // field/step abstraction, so it has no steps of its own here.
       warehouse: [],
       DEFAULT: [skillsInstallStep],
     },

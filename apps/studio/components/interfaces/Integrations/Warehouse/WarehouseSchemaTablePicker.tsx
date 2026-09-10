@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ArrowLeft, ChevronRight, Warehouse } from 'lucide-react'
+import { ChevronRight, Warehouse } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Button, Checkbox, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -14,7 +14,7 @@ import {
   type SchemaTableSelection,
   type SchemaWithTables,
   type WarehouseSetupTarget,
-} from './WarehouseModePanel.utils'
+} from './Warehouse.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
@@ -26,21 +26,17 @@ import { WAREHOUSE_PUBLICATION_NAME } from '@/lib/warehouse'
 export interface WarehouseSchemaTablePickerProps {
   onSubmit: (targets: WarehouseSetupTarget[]) => void
   isSubmitting: boolean
-  /**
-   * Provided only when the picker was opened to edit an already-enabled Warehouse, which is what
-   * gives it something to navigate back to (the connection details).
-   */
-  onBack?: () => void
+  /** Set when editing an already-enabled Warehouse rather than setting one up for the first time. */
+  isEditing?: boolean
 }
 
 export const WarehouseSchemaTablePicker = ({
   onSubmit,
   isSubmitting,
-  onBack,
+  isEditing = false,
 }: WarehouseSchemaTablePickerProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const isEditing = onBack !== undefined
 
   // `null` until the user touches a checkbox, so the selection seeded from the existing
   // publication can arrive asynchronously without an effect syncing it into state.
@@ -242,21 +238,19 @@ export const WarehouseSchemaTablePicker = ({
         <span className="text-sm text-foreground-lighter">
           {selectedCount} table{selectedCount === 1 ? '' : 's'} selected
         </span>
-        <div className="flex items-center gap-2">
-          {isEditing && (
-            <Button variant="default" icon={<ArrowLeft size={14} />} onClick={onBack}>
-              Back
-            </Button>
-          )}
-          <Button
-            variant="primary"
-            disabled={selectedCount === 0}
-            loading={isSubmitting}
-            onClick={handleSubmit}
-          >
-            {isEditing ? 'Update replicated tables' : 'Enable Warehouse'}
-          </Button>
-        </div>
+        {/*
+          An empty selection is a valid request that tears Warehouse down, so submitting one from
+          here would destroy a project's Warehouse with no confirmation. Disabling keeps teardown
+          on the dedicated action, which asks first.
+        */}
+        <Button
+          variant="primary"
+          disabled={selectedCount === 0}
+          loading={isSubmitting}
+          onClick={handleSubmit}
+        >
+          {isEditing ? 'Update replicated tables' : 'Enable Warehouse'}
+        </Button>
       </div>
     </div>
   )

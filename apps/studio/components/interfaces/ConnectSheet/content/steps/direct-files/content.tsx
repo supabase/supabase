@@ -15,13 +15,13 @@ import {
   buildDotnetConnectionString,
   buildSafeConnectionString,
   parseConnectionParams,
-  PASSWORD_PLACEHOLDER,
   resolveConnectionString,
   withRequiredSslmode,
 } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { PasswordEncodingNote } from '@/components/interfaces/ConnectSheet/PasswordEncodingNote'
 import { useConnectionStringDatabases } from '@/components/interfaces/ConnectSheet/useConnectionStringDatabases'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
+import { PASSWORD_PLACEHOLDER } from '@/lib/constants'
 
 type DirectFilesConfig = {
   files: {

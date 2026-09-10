@@ -5,6 +5,18 @@ import { WAREHOUSE_METADATA_SCHEMA } from '@/lib/warehouse'
 
 export type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
 export type WarehouseSetupTarget = WarehouseSetupBody['targets'][number]
+export type WarehouseSetupStatus =
+  components['schemas']['WarehouseSetupStatusResponse']['setup_status']
+export type WarehouseSetupTable =
+  components['schemas']['WarehouseSetupStatusResponse']['tables'][number]
+
+export function isWarehouseProvisioned(setupStatus?: WarehouseSetupStatus): boolean {
+  return setupStatus === 'complete'
+}
+
+export function isWarehouseSettingUp(setupStatus?: WarehouseSetupStatus): boolean {
+  return setupStatus === 'setting_up' || setupStatus === 'copying'
+}
 
 /** Selection map keyed by `${schema}.${table}`. */
 export type SchemaTableSelection = Record<string, boolean>
@@ -83,6 +95,9 @@ export function getSchemaCheckedState({
  * every currently-known table is selected is sent as a single `{ type: 'schema' }` target
  * (matching the API's semantics of "the currently eligible tables in that schema"); otherwise each
  * selected table is sent individually. Schemas with no tables, or no selected tables, are omitted.
+ *
+ * The API replaces the previous selection with whatever is sent, so an empty result is meaningful:
+ * it tears Warehouse down rather than being a no-op.
  */
 export function buildWarehouseSetupTargets(
   selection: SchemaTableSelection,
@@ -106,6 +121,16 @@ export function buildWarehouseSetupTargets(
   }
 
   return targets
+}
+
+/**
+ * Retrying a failed setup reuses whatever the platform already recorded rather than the picker's
+ * selection, which is gone by the time the error surfaces.
+ */
+export function buildRetryTargets(
+  tables: Pick<WarehouseSetupTable, 'schema' | 'name'>[] = []
+): WarehouseSetupTarget[] {
+  return tables.map((table) => ({ type: 'table', schema: table.schema, name: table.name }))
 }
 
 export type WarehouseCatalogCredentials = NonNullable<

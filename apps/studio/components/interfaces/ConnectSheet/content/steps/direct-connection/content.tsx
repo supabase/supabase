@@ -22,7 +22,6 @@ import {
   buildPsqlCommand,
   buildSafeConnectionString,
   parseConnectionParams,
-  PASSWORD_PLACEHOLDER,
   resolveConnectionString,
 } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { PasswordEncodingNote } from '@/components/interfaces/ConnectSheet/PasswordEncodingNote'
@@ -31,7 +30,7 @@ import { ResetDbPasswordDialog } from '@/components/interfaces/Settings/Database
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL } from '@/lib/constants'
+import { DOCS_URL, PASSWORD_PLACEHOLDER } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 const CONNECTION_METHOD_TO_TELEMETRY: Record<
