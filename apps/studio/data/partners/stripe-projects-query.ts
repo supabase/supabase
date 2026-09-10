@@ -8,7 +8,7 @@ type GetAccountRequestVariables = {
   arId?: string
 }
 
-export type AccountRequestDetails = components['schemas']['AccountRequestDetailsDto']
+export type AccountRequestDetails = components['schemas']['AccountRequestDetailsDto_Output']
 
 async function getAccountRequest({ arId }: GetAccountRequestVariables, signal?: AbortSignal) {
   if (!arId) throw new Error('Account request ID is required')

@@ -18,7 +18,7 @@ interface SavedQueriesItemProps {
   item: {
     id: string
     name: string
-    description?: string
+    description?: string | null
     owner_id: number
     content: {
       unchecked_sql: UntrustedLogSqlFragment
@@ -123,7 +123,7 @@ export const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
       <UpdateSavedQueryModal
         header="Update saved query"
         visible={showUpdateModal}
-        initialValues={{ name: item.name, description: item.description }}
+        initialValues={{ name: item.name, description: item.description ?? undefined }}
         onCancel={() => {
           setShowUpdateModal(false)
         }}
