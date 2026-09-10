@@ -10,6 +10,7 @@
     },
     "build": {
       "dependsOn": ["^build"],
+      "passThroughEnv": ["SENTRY_AUTH_TOKEN"],
       "env": [
         "ANALYZE",
         "CI",
