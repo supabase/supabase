@@ -61,10 +61,10 @@ export type LinkCheckResult = {
   error?: string
 }
 
-// Vercel routes requests without a real browser network fingerprint (e.g. Playwright's
-// Node-side page.request) differently from page navigations, and heavy reference pages
-// 502 with FALLBACK_BODY_TOO_LARGE on that path. Fetching from inside the page uses the
-// same network stack as page.goto, so it resolves like a real browser visit would.
+// The docs middleware rewrites /reference/* requests whose user agent looks like a bot
+// (isbot, which matches HeadlessChrome) to /api/crawlers. Fetching from inside the page
+// keeps the browser's own user agent and network stack, so a link resolves the same way
+// page.goto resolves it in this suite.
 export async function checkLinkFromBrowser(page: Page, url: string): Promise<LinkCheckResult> {
   return page.evaluate(async (linkUrl) => {
     try {
