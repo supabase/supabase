@@ -10,7 +10,7 @@ import {
 } from './mocks'
 import {
   getFailedProjects,
-  getOAuthAppType,
+  getOAuthConsentModel,
   getScopedProjectRefs,
   isRoleValidationFailure,
 } from './types'
@@ -99,14 +99,31 @@ describe('oauth-apps mocks', () => {
     })
   })
 
-  test('every app type from the addendum has a fixture', () => {
-    const types = new Set(
-      Object.values(OAUTH_APPS_MOCK_SCENARIOS).map((scenario) =>
-        getOAuthAppType(getMockOAuthAppsAuthorizeRequest(scenario).grant_config)
-      )
+  test('every consent model shape has a fixture', () => {
+    const shapes = new Set(
+      Object.values(OAUTH_APPS_MOCK_SCENARIOS).map((scenario) => {
+        const model = getOAuthConsentModel(getMockOAuthAppsAuthorizeRequest(scenario).grant_config)
+        return `${model.grant_kind}:${model.project_selection}`
+      })
     )
 
-    expect(types).toEqual(new Set(['A', 'B', 'C', 'D', 'E']))
+    expect(shapes).toEqual(
+      new Set([
+        'organization_bound:off',
+        'organization_bound:required',
+        'user_bound:off',
+        'user_bound:required',
+        'user_bound:optional',
+      ])
+    )
+  })
+
+  test('a dynamic client has a fixture', () => {
+    const dynamic = Object.values(OAUTH_APPS_MOCK_SCENARIOS).filter(
+      (scenario) => getMockOAuthAppsAuthorizeRequest(scenario).grant_config.is_dynamic_client
+    )
+
+    expect(dynamic.length).toBeGreaterThan(0)
   })
 
   test('every project selection mode has a fixture', () => {
