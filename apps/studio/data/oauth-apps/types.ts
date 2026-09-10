@@ -26,45 +26,28 @@ export type OAuthAppsAuthorizeOrganizationProject = {
   role: OrganizationRole
 }
 
+/** PROVISIONAL — mirrors the app author settings panel; the backend contract is not published yet. */
 export type OAuthAppGrantConfig = {
   bind_to_authorizing_user: boolean
   project_selection: OAuthProjectSelectionMode
   is_dynamic_client: boolean
 }
 
-export type OAuthAppType = 'A' | 'B' | 'C' | 'D' | 'E'
-
-export function getOAuthAppType(config: OAuthAppGrantConfig): OAuthAppType {
-  if (config.is_dynamic_client) return 'E'
-  if (config.bind_to_authorizing_user) return config.project_selection === 'off' ? 'C' : 'D'
-  return config.project_selection === 'off' ? 'A' : 'B'
-}
-
 export type OAuthConsentModel = {
-  app_type: OAuthAppType
   grant_kind: Exclude<OAuthGrantKind, 'compatibility'>
-  requires_owner: boolean
-  shows_project_picker: boolean
-  offers_all_projects: boolean
-  implicit_project_scope: OAuthGrantProjectScope | null
+  project_selection: OAuthProjectSelectionMode
 }
 
 export function getOAuthConsentModel(config: OAuthAppGrantConfig): OAuthConsentModel {
   const boundToUser = config.is_dynamic_client || config.bind_to_authorizing_user
-  const selection: OAuthProjectSelectionMode = config.is_dynamic_client
-    ? 'required'
-    : config.project_selection
 
   return {
-    app_type: getOAuthAppType(config),
     grant_kind: boundToUser ? 'user_bound' : 'organization_bound',
-    requires_owner: !boundToUser,
-    shows_project_picker: selection !== 'off',
-    offers_all_projects: selection === 'optional',
-    implicit_project_scope: selection === 'off' ? { target: 'all_projects' } : null,
+    project_selection: config.is_dynamic_client ? 'required' : config.project_selection,
   }
 }
 
+/** PROVISIONAL — replaces a flat `project_refs`; not yet agreed with the backend. */
 export type OAuthGrantProjectScope =
   | { target: 'all_projects' }
   | { target: 'selected_projects'; project_refs: string[] }
@@ -112,6 +95,7 @@ export type OAuthScopeValidationProjectFailure = Extract<
   { scope_target: 'projects' }
 >['failures'][number]
 
+/** PROVISIONAL — mirrors the agreed Slack contract; exact JSON still to be published. */
 export type OAuthAppsAuthorizeRoleValidationFailure = {
   error_code: 'role_validation_failed'
   message: string

@@ -16,6 +16,7 @@ export type OAuthAppsAuthorizeRequest = {
   is_verified: boolean
   redirect_uri: string
   scope_groups: OAuthScopeGroup[]
+  /** PROVISIONAL — exact field name lands with the real endpoint. */
   reuses_grant_across_workspaces: boolean
   grant_config: OAuthAppGrantConfig
   existing_grant: OAuthExistingGrant | null
