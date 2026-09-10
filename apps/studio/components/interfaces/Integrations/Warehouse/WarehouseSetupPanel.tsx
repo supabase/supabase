@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -18,7 +17,6 @@ import {
 } from './WarehouseTableStatusList'
 import { AlertError } from '@/components/ui/AlertError'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
-import { useUpdateWarehouseCatalogMutation } from '@/data/warehouse/warehouse-catalog-mutation'
 import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
 import { useTrack } from '@/lib/telemetry/track'
@@ -35,13 +33,6 @@ export const WarehouseSetupPanel = () => {
     }
   )
 
-  const catalogMutation = useUpdateWarehouseCatalogMutation({
-    onError: (error) => {
-      toast.error(
-        `Warehouse was enabled, but DuckLake catalog access could not be enabled automatically: ${error.message}. You can retry this from Warehouse settings.`
-      )
-    },
-  })
   // Rendered inline by the picker rather than as a toast: a setup failure is something the user
   // has to act on, so it must not disappear.
   const setupMutation = useWarehouseSetupMutation({ onError: () => {} })
@@ -57,9 +48,6 @@ export const WarehouseSetupPanel = () => {
             schemaTargetCount: targets.filter((target) => target.type === 'schema').length,
             tableTargetCount: targets.filter((target) => target.type === 'table').length,
           })
-          // Fire-and-forget: setup itself should proceed even if enabling catalog access fails.
-          // Warehouse settings offers a manual toggle as the fallback.
-          catalogMutation.mutate({ projectRef, body: { enabled: true } })
         },
       }
     )
