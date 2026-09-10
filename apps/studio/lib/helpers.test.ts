@@ -221,15 +221,14 @@ describe('copyToClipboard', () => {
 })
 
 describe('detectBrowser', () => {
-  const originalNavigator = global.navigator
-
   const setUserAgent = (ua: string) => {
     vi.stubGlobal('navigator', { userAgent: ua })
   }
 
   afterEach(() => {
+    // `global.navigator` can't be assigned directly (jsdom defines it as a getter),
+    // so restore it by unstubbing.
     vi.unstubAllGlobals()
-    global.navigator = originalNavigator
   })
 
   it('detects Chrome', () => {

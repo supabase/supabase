@@ -7,8 +7,6 @@ describe('createNavigationHandler', () => {
   let mockWindowOpen: any
 
   beforeEach(() => {
-    vi.clearAllMocks()
-
     // Mock router with push method
     mockRouter = {
       push: vi.fn(),
