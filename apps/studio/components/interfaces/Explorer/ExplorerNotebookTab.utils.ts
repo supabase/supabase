@@ -67,11 +67,16 @@ export function isMutatingSql(sql: string): boolean {
 /**
  * A query cell's last in-session result rendered as a markdown table, or its error if the
  * last run failed — whichever is more useful to paste. Undefined when the cell hasn't been
- * run this session, since results aren't persisted with the notebook (see QueryCell's local
- * result state).
+ * run this session (results aren't persisted with the notebook, see QueryCell's local result
+ * state), or when `currentSql` has since diverged from the SQL that produced the result —
+ * e.g. the cell was edited but not rerun — since pairing stale results with the current SQL
+ * would misrepresent what that query actually returns.
  */
-function formatQueryResult(result: QueryResult | undefined): string | undefined {
-  if (!result) return undefined
+function formatQueryResult(
+  result: QueryResult | undefined,
+  currentSql: string
+): string | undefined {
+  if (!result || result.sql !== currentSql) return undefined
   if (result.error) return `**Error:** ${result.error.message}`
 
   const table = result.rows ? convertResultsToMarkdown([...result.rows]) : undefined
@@ -118,7 +123,7 @@ export function notebookToMarkdown({
         return [
           header,
           `${fence}sql\n${cell.unchecked_sql}\n${fence}`,
-          formatQueryResult(getResult?.(cell._id)),
+          formatQueryResult(getResult?.(cell._id), cell.unchecked_sql),
         ]
           .filter((part): part is string => part !== undefined)
           .join('\n\n')

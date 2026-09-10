@@ -285,7 +285,9 @@ describe('notebookToMarkdown', () => {
       name: 'Notebook',
       cells: [databaseCell],
       getResult: (cellId) =>
-        cellId === 'cell-2' ? { rows: [{ id: 1, email: 'a@example.com' }] } : undefined,
+        cellId === 'cell-2'
+          ? { sql: databaseCell.unchecked_sql, rows: [{ id: 1, email: 'a@example.com' }] }
+          : undefined,
     })
 
     expect(result).toContain(
@@ -297,7 +299,7 @@ describe('notebookToMarkdown', () => {
     const result = notebookToMarkdown({
       name: 'Notebook',
       cells: [databaseCell],
-      getResult: () => ({ rows: [] }),
+      getResult: () => ({ sql: databaseCell.unchecked_sql, rows: [] }),
     })
     expect(result).not.toContain('**Results:**')
   })
@@ -306,10 +308,23 @@ describe('notebookToMarkdown', () => {
     const result = notebookToMarkdown({
       name: 'Notebook',
       cells: [databaseCell],
-      getResult: () => ({ error: { message: 'relation "foo" does not exist' } }),
+      getResult: () => ({
+        sql: databaseCell.unchecked_sql,
+        error: { message: 'relation "foo" does not exist' },
+      }),
     })
 
     expect(result).toContain('**Error:** relation "foo" does not exist')
+    expect(result).not.toContain('**Results:**')
+  })
+
+  it('omits a stale result whose recorded SQL no longer matches the cell', () => {
+    const result = notebookToMarkdown({
+      name: 'Notebook',
+      cells: [databaseCell],
+      getResult: () => ({ sql: 'select * from auth.identities', rows: [{ id: 1 }] }),
+    })
+
     expect(result).not.toContain('**Results:**')
   })
 
