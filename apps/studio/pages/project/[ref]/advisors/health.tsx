@@ -20,23 +20,9 @@ import type { NextPageWithLayout } from '@/types'
 
 const ProjectHealthLints: NextPageWithLayout = () => {
   const router = useRouter()
-  const { preset, id, ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
+  const { ref } = useParams()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const isHealthAdvisorEnabled = useFlag('healthAdvisor') === true
-
-  const [filters, setFilters] = useState<{ level: LINTER_LEVELS; filters: string[] }[]>([
-    { level: LINTER_LEVELS.ERROR, filters: [] },
-    { level: LINTER_LEVELS.WARN, filters: [] },
-    { level: LINTER_LEVELS.INFO, filters: [] },
-  ])
-  const [currentTab, setCurrentTab] = useState<LINTER_LEVELS>(
-    parseLinterLevel(preset) ?? LINTER_LEVELS.ERROR
-  )
-  const { data, isPending, isRefetching, refetch } = useProjectHealthLintsQuery(
-    { projectRef: project?.ref },
-    { enabled: isHealthAdvisorEnabled }
-  )
 
   const isFlagLoading = IS_PLATFORM && !flagsLoaded
 
@@ -47,6 +33,25 @@ const ProjectHealthLints: NextPageWithLayout = () => {
   }, [isFlagLoading, isHealthAdvisorEnabled, ref, router])
 
   if (isFlagLoading || !isHealthAdvisorEnabled) return null
+
+  return <ProjectHealthLintsContent />
+}
+
+const ProjectHealthLintsContent = () => {
+  const { preset, id } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
+  const [filters, setFilters] = useState<{ level: LINTER_LEVELS; filters: string[] }[]>([
+    { level: LINTER_LEVELS.ERROR, filters: [] },
+    { level: LINTER_LEVELS.WARN, filters: [] },
+    { level: LINTER_LEVELS.INFO, filters: [] },
+  ])
+  const [currentTab, setCurrentTab] = useState<LINTER_LEVELS>(
+    parseLinterLevel(preset) ?? LINTER_LEVELS.ERROR
+  )
+  const { data, isPending, isRefetching, refetch } = useProjectHealthLintsQuery({
+    projectRef: project?.ref,
+  })
 
   // Health checks are platform-only. If this page is opened self-hosted the query stays
   // disabled, and `isPending` would otherwise spin forever.
