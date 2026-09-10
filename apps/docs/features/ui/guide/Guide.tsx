@@ -46,6 +46,7 @@ export function Guide({ meta, children, className }: GuideProps) {
           {!hideToc && (
             <GuidesTableOfContents
               video={meta?.tocVideo}
+              videoTitle={meta?.title}
               className={cn(
                 'hidden md:flex',
                 'md:col-span-3 md:col-start-10',

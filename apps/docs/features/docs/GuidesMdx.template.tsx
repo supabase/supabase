@@ -135,6 +135,7 @@ const GuideTemplate = ({
         </div>
         <GuidesSidebar
           video={meta?.tocVideo}
+          videoTitle={meta?.title}
           hideToc={hideToc}
           className={cn(
             'hidden md:flex',
