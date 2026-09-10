@@ -12,6 +12,17 @@
 }
 
 @theme {
+  /* Scale Tailwind's default radius tokens by 4/3 to match the Studio curve. */
+  --radius: 0.333333rem;
+  --radius-xs: 0.166667rem;
+  --radius-sm: 0.333333rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.666667rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.333333rem;
+  --radius-3xl: 2rem;
+  --radius-4xl: 2.666667rem;
+
   --text-grid: 13px;
 
   --color-typography-body-light: var(--foreground-light);

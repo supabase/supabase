@@ -422,14 +422,16 @@ export const QueryInsightsTable = ({
               : 'opacity-0 translate-y-4 pointer-events-none',
           ].join(' ')}
         >
-          <Button
-            variant="default"
-            size="tiny"
-            className="rounded-full shadow-md"
-            onClick={() => onCurrentSelectQuery?.(null)}
-          >
-            Clear query
-          </Button>
+          <div className="inline-flex rounded-full bg-background">
+            <Button
+              variant="default"
+              size="tiny"
+              className="rounded-full shadow-md"
+              onClick={() => onCurrentSelectQuery?.(null)}
+            >
+              Clear query
+            </Button>
+          </div>
         </div>
         {isLoading ? (
           <div className="px-6 py-4">

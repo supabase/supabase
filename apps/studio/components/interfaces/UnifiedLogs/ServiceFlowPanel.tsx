@@ -246,19 +246,21 @@ export function ServiceFlowPanel({
                 </div>
               )}
               <div className="sticky top-2 z-10 flex justify-end px-2 -mb-9 pointer-events-none">
-                <Button
-                  size="tiny"
-                  variant="default"
-                  className="pointer-events-auto px-1.5"
-                  icon={jsonCopied ? <Check size={12} /> : <Copy size={12} />}
-                  onClick={() => {
-                    copyToClipboard(JSON.stringify(formattedJsonData, null, 2))
-                    setJsonCopied(true)
-                    setTimeout(() => setJsonCopied(false), 1000)
-                  }}
-                >
-                  {jsonCopied ? 'Copied' : ''}
-                </Button>
+                <div className="inline-flex rounded-lg bg-background pointer-events-auto">
+                  <Button
+                    size="tiny"
+                    variant="default"
+                    className="px-1.5"
+                    icon={jsonCopied ? <Check size={12} /> : <Copy size={12} />}
+                    onClick={() => {
+                      copyToClipboard(JSON.stringify(formattedJsonData, null, 2))
+                      setJsonCopied(true)
+                      setTimeout(() => setJsonCopied(false), 1000)
+                    }}
+                  >
+                    {jsonCopied ? 'Copied' : ''}
+                  </Button>
+                </div>
               </div>
               <CodeBlock
                 language="json"

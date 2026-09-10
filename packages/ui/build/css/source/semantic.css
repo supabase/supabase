@@ -1,22 +1,21 @@
 /*
  * Core semantic color system.
  *
- * Themes override the small set of inputs below; every semantic color is then
- * derived from them in OKLCH. The stepped numeric scales (brand / warning /
+ * Themes override the small set of inputs below; neutral and status colors are
+ * derived from them in OKLCH. Primary preserves the original button fill's
+ * lightness and chroma while following the semantic primary hue.
+ * The stepped numeric scales (brand / warning /
  * destructive / secondary) are NOT derived here — they live as per-theme values
  * in the theme files and are mapped to utilities in packages/config/css/theme.css.
  */
 
 :root {
   /*
-   * Hue inputs. A single --hue used to drive both the neutral surface/text ramp
-   * and the brand, so the two could never drift apart. They are now split so a
-   * theme can run, say, a cool-gray surface against the green brand:
-   *   --surface-hue  tints backgrounds, text and borders (the neutral ramp)
-   *   --primary-hue  is the brand hue that --primary is built from
-   * Both default to --hue (Supabase green ≈159° in OKLCH), so a theme that only
-   * sets --hue keeps surfaces and brand locked together as before; override
-   * either one to let them diverge. */
+   * Hue inputs for the neutral ramp and status palettes:
+   *   --surface-hue  tints backgrounds, text and borders
+   *   --primary-hue  tints the primary fill and anchors status palettes
+   * Both default to --hue (Supabase green ≈159° in OKLCH). Override either one
+   * to adjust them independently. */
   --hue: 159;
   --surface-hue: var(--hue);
   --primary-hue: var(--hue);
@@ -150,7 +149,7 @@
   );
   /* Inverse of --foreground: canvas-coloured text for use on inverted fills
      (bg-foreground, bg-black / dark:bg-white, etc). Not the same as
-     --primary-foreground, which stays dark for the vivid primary fill. */
+     --primary-foreground, which stays light for the dark primary fill. */
   --foreground-contrast: oklch(var(--surface) calc(var(--chroma) * 0.55) var(--surface-hue));
 
   --card: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-1)) c h);
@@ -158,16 +157,9 @@
   --popover: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-2)) c h);
   --popover-foreground: var(--foreground);
 
-  /* Primary is the brand-derived accent: a fixed, vivid Supabase green on
-     --primary-hue, mode-invariant and decoupled from the --chroma knob so it
-     holds its identity even as neutrals desaturate. NOTE: the `brand` utility
-     (--color-brand in theme.css) is deliberately NOT this — it maps to the
-     per-theme --brand-default scale (master behavior) while we resolve how
-     `brand` is used across the interface. */
-  --primary: oklch(0.76 0.15 var(--primary-hue));
-  --primary-foreground: oklch(
-    min(var(--surface), var(--foreground-lightness)) calc(var(--chroma) * 0.45) var(--primary-hue)
-  );
+  /* Preserve the original dark button fill's lightness and chroma, with semantic hue. */
+  --primary: oklch(0.43627 0.10433 var(--primary-hue));
+  --primary-foreground: oklch(0.95 0.00275 var(--primary-hue));
 
   --secondary: oklch(
     from var(--background) calc(l + var(--elevation-step) * var(--elevation-3)) c h
