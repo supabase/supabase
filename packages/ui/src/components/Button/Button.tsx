@@ -20,7 +20,7 @@ const buttonVariants = cva(
   font-medium
   ease-[cubic-bezier(0.22,1,0.36,1)]
   duration-200
-  rounded-lg
+  rounded-md
   transition-[background-color,border-color,color,scale]
   motion-safe:active:scale-[0.97]
   focus-ring
