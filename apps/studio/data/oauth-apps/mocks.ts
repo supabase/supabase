@@ -23,8 +23,6 @@ export const OAUTH_APPS_MOCK_SCENARIOS = {
   vercelManyProjects: 'mock-vercel-many-projects',
   vercelRoleValidation: 'mock-vercel-role-validation',
   kemalBot: 'mock-kemal-bot',
-  // One scenario per app type from the addendum, so every branch of the consent model is
-  // reachable from a URL. The scenarios above are all type D.
   vercelOptionalProjects: 'mock-vercel-optional-projects',
   vercelAllProjects: 'mock-vercel-all-projects',
   vercelReconsentAllProjects: 'mock-vercel-reconsent-all-projects',
@@ -32,7 +30,6 @@ export const OAUTH_APPS_MOCK_SCENARIOS = {
   dynamicMcpClient: 'mock-dynamic-mcp-client',
 } as const
 
-/** Type D: the shape the addendum treats as the full migration, and the default for new fixtures. */
 const USER_BOUND_REQUIRED_PROJECTS: OAuthAppGrantConfig = {
   bind_to_authorizing_user: true,
   project_selection: 'required',
@@ -85,20 +82,16 @@ const VERCEL_CROSS_WORKSPACE_REQUEST: OAuthAppsAuthorizeRequest = {
   reuses_grant_across_workspaces: true,
 }
 
-/** Type D on `optional`: the picker renders alongside an all-current-and-future-projects choice. */
 const VERCEL_OPTIONAL_PROJECTS_REQUEST: OAuthAppsAuthorizeRequest = {
   ...VERCEL_REQUEST,
   grant_config: { ...USER_BOUND_REQUIRED_PROJECTS, project_selection: 'optional' },
 }
 
-/** Type C: the member's own permissions, but no picker — the grant covers the whole org. */
 const VERCEL_ALL_PROJECTS_REQUEST: OAuthAppsAuthorizeRequest = {
   ...VERCEL_REQUEST,
   grant_config: { ...USER_BOUND_REQUIRED_PROJECTS, project_selection: 'off' },
 }
 
-// Re-consenting out of an all-projects grant. Separate from VERCEL_EXISTING_GRANT because the two
-// scopes are different union members, and the screen has to preselect each one differently.
 const VERCEL_ALL_PROJECTS_EXISTING_GRANT: OAuthExistingGrant = {
   ...VERCEL_EXISTING_GRANT,
   project_scope: { target: 'all_projects' },
@@ -109,10 +102,6 @@ const VERCEL_RECONSENT_ALL_PROJECTS_REQUEST: OAuthAppsAuthorizeRequest = {
   existing_grant: VERCEL_ALL_PROJECTS_EXISTING_GRANT,
 }
 
-/**
- * Type E: a dynamic MCP client. The flags are forced by Supabase, so this fixture deliberately
- * carries a stale `project_selection: 'off'` — `getOAuthConsentModel` must still show the picker.
- */
 const DYNAMIC_MCP_CLIENT_REQUEST: OAuthAppsAuthorizeRequest = {
   ...VERCEL_REQUEST,
   client_id: 'dynamic-mcp-client',
@@ -141,7 +130,6 @@ const KEMAL_BOT_REQUEST: OAuthAppsAuthorizeRequest = {
     },
   ],
   reuses_grant_across_workspaces: false,
-  // Type B: the author turned on project selection but kept the shared owner-approved grant.
   grant_config: {
     bind_to_authorizing_user: false,
     project_selection: 'required',
@@ -150,10 +138,6 @@ const KEMAL_BOT_REQUEST: OAuthAppsAuthorizeRequest = {
   existing_grant: null,
 }
 
-/**
- * Type A: the author never opened the settings page. Every app that exists today is in this state
- * on day one — an org owner approves once, org-wide, with owner-level permissions.
- */
 const KEMAL_BOT_ORG_WIDE_REQUEST: OAuthAppsAuthorizeRequest = {
   ...KEMAL_BOT_REQUEST,
   grant_config: {
@@ -202,16 +186,12 @@ const TAILSPIN_TOYS_ADMIN: OAuthOrganizationRole = {
   default_role: 'administrator',
 }
 
-// Contoso Labs is the other owner-role fixture, but it is deliberately empty, so it can never
-// reach the admin warning. This one carries projects.
 const FABRIKAM_OWNER: OAuthOrganizationRole = {
   slug: 'fabrikam-industries',
   name: 'Fabrikam Industries',
   default_role: 'owner',
 }
 
-// Deliberately a plain developer: an owner/admin role would stack the "scoped to one member"
-// warning onto the screen and muddy the selection-cap preview.
 const WINGTIP_TOYS_DEVELOPER: OAuthOrganizationRole = {
   slug: 'wingtip-toys',
   name: 'Wingtip Toys',
@@ -233,8 +213,6 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
   },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelCrossWorkspace]: {
     email: 'admin@example.com',
-    // Tailspin Toys is a member org here purely so the stacked case (this notice plus the
-    // org-admin warning) is reachable via `?organization_slug=tailspin-toys`.
     organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS, TAILSPIN_TOYS_ADMIN],
   },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelOrgAdmin]: {
@@ -249,8 +227,6 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
     email: 'admin@example.com',
     organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
   },
-  // Types A and B need an owner to approve at all, so this pair is deliberately mixed: Northwind
-  // is the blocked-member state, Contoso Labs is the only org where approval can proceed.
   [OAUTH_APPS_MOCK_SCENARIOS.kemalBot]: {
     email: 'admin@example.com',
     organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
@@ -263,8 +239,6 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
     email: 'admin@example.com',
     organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
   },
-  // Northwind holds read-only on two of its four projects and Vercel requests write scopes, so
-  // this is the type C case the addendum leaves open: nothing to deselect, nothing to fix.
   [OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects]: {
     email: 'admin@example.com',
     organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
@@ -355,9 +329,6 @@ export function getMockOAuthAppsAuthorizeRedirect(
   return { url }
 }
 
-// Only these scenarios run the post-submit role check, so every state that predates it keeps
-// approving whatever it is handed. `vercelAllProjects` is in the set because a hidden picker does
-// not exempt a grant from validation — it just leaves the user with no way to resolve a failure.
 const ROLE_VALIDATED_SCENARIOS = new Set<string>([
   OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation,
   OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects,
@@ -365,10 +336,6 @@ const ROLE_VALIDATED_SCENARIOS = new Set<string>([
 
 const WRITE_SCOPE_LEVELS: OAuthScopeLevel[] = ['write', 'read_write']
 
-/**
- * Derives the outcome from the submitted scope rather than returning a canned failure, so
- * deselecting the flagged projects and retrying actually succeeds.
- */
 export function getMockOAuthAppsAuthorizeApproveResult(
   authId: string,
   { slug, projectScope }: { slug: string; projectScope: OAuthGrantProjectScope }
@@ -381,8 +348,6 @@ export function getMockOAuthAppsAuthorizeApproveResult(
   )
   if (writeGroups.length === 0) return approved
 
-  // An all-projects grant is validated against every project in the org, which is what makes it
-  // possible for the check to fail with no selection the user can narrow.
   const orgProjects = getMockOAuthAppsAuthorizeOrganizationProjects(slug)
   const submitted =
     projectScope.target === 'all_projects'
@@ -392,9 +357,6 @@ export function getMockOAuthAppsAuthorizeApproveResult(
   const blocked = submitted.filter((project) => project.role === 'read_only')
   if (blocked.length === 0) return approved
 
-  // Every blocked project fails the same scopes here because the mock blocks on one condition
-  // (a read-only role). The real check resolves scopes per project, so the shape stays per-project
-  // even though these lists happen to be identical.
   const failedScopes = writeGroups.flatMap((scopeGroup) => scopeGroup.scopes)
 
   return {
