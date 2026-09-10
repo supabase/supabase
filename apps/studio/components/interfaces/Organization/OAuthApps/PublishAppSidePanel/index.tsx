@@ -430,7 +430,12 @@ export const PublishAppSidePanel = ({
                     options={{ enabled: visible && !isSubmitting }}
                     side="top"
                   >
-                    <Button type="submit" loading={isSubmitting} disabled={isSubmitting}>
+                    <Button
+                      variant="primary"
+                      type="submit"
+                      loading={isSubmitting}
+                      disabled={isSubmitting}
+                    >
                       Confirm
                     </Button>
                   </Shortcut>

@@ -19,7 +19,7 @@ export function CTASection() {
           <span className="text-foreground block sm:inline"> scale to millions</span>
         </h2>
         <div className="flex items-center gap-2">
-          <Button asChild size="medium">
+          <Button variant="primary" asChild size="medium">
             <Link
               href={getDashboardCtaHref(isLoggedIn)}
               onClick={() =>

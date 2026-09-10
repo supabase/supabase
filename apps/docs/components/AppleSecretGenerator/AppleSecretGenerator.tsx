@@ -157,6 +157,7 @@ const AppleSecretGenerator = () => {
       <div style={{ height: '1rem' }} />
 
       <Button
+        variant="primary"
         size="medium"
         disabled={
           !(

@@ -75,7 +75,6 @@ const createMockInvoiceWithoutPdf = (): Invoice => {
 
 describe('InvoicesSettings', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
         slug: 'stripe-org',

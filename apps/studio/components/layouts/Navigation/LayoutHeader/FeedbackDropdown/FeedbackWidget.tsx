@@ -309,6 +309,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
             onChange={onFilesUpload}
           />
           <Button
+            variant="primary"
             disabled={feedback.length === 0 || isSending}
             loading={isSending}
             onClick={() => {

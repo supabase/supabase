@@ -99,7 +99,6 @@ describe('LayoutSidebar', () => {
   afterEach(() => {
     resetSidebarManagerState()
     localStorage.clear()
-    vi.clearAllMocks()
   })
 
   const renderSidebar = () =>

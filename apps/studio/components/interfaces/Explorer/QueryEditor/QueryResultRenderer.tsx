@@ -1,3 +1,5 @@
+import { Play } from 'lucide-react'
+
 import { type SqlSnippetSource } from '../../SQLEditor/querySource'
 import { type QueryResult } from '../types'
 import { QueryResultChart } from './QueryResultChart'
@@ -26,7 +28,12 @@ export const QueryResultRenderer = ({
   const { rows, error, autoLimit } = result ?? {}
 
   if (!result) {
-    return <p className="text-xs text-foreground-lighter py-8">Run the query to see results</p>
+    return (
+      <div className="flex items-center gap-x-2 p-3 w-full">
+        <Play size={12} className="text-foreground-lighter" />
+        <p className="text-xs text-foreground-lighter">Run the query to see results</p>
+      </div>
+    )
   }
 
   if (error) {

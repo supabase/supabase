@@ -17,7 +17,7 @@ imgThumb: launch-week-8/day-5/supavisor-thumb.jpg
 
 One of the most [widely-discussed shortcomings](https://news.ycombinator.com/item?id=24735012) of Postgres is it's connection system. Every Postgres connection has a reasonably high memory footprint, and determining the maximum number of connections your database can handle is a [bit of an art](https://momjian.us/main/blogs/pgblog/2020.html#April_22_2020).
 
-A common solution is [connection pooling](https://supabase.com/docs/guides/database/connecting-to-postgres#how-connection-pooling-works). Supabase currently offers [pgbouncer](http://www.pgbouncer.org/) which is single-threaded, making it difficult to scale. We've seen some [novel ways](https://twitter.com/viggy28/status/1677674197664038912?s=12&t=_WCn3v_QJ7tkQLvOvkZkqg) to scale pgbouncer, but we have a [few other goals](https://github.com/supabase/supavisor#motivation) in mind for our platform.
+A common solution is [connection pooling](https://supabase.com/docs/guides/database/connecting-to-postgres/pooling-and-limits#how-connection-pooling-works). Supabase currently offers [pgbouncer](http://www.pgbouncer.org/) which is single-threaded, making it difficult to scale. We've seen some [novel ways](https://twitter.com/viggy28/status/1677674197664038912?s=12&t=_WCn3v_QJ7tkQLvOvkZkqg) to scale pgbouncer, but we have a [few other goals](https://github.com/supabase/supavisor#motivation) in mind for our platform.
 
 And so we've built [Supavisor](https://github.com/supabase/supavisor), a Postgres connection pooler that can handle millions of connections.
 

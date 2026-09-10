@@ -184,6 +184,7 @@ export const CustomDomainVerify = () => {
               Cancel
             </Button>
             <Button
+              variant="primary"
               icon={<RefreshCw />}
               onClick={onReverifyCustomDomain}
               loading={!isValidating && isReverifyLoading}
