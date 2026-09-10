@@ -55,8 +55,23 @@ export async function collectDocsOwnedLinks(
   return [...links].sort()
 }
 
-// Vercel bot protection blocks the HeadlessChrome UA on some routes; strip it.
-export async function browserLikeUserAgent(page: Page): Promise<string> {
-  const userAgent = await page.evaluate(() => navigator.userAgent)
-  return userAgent.replace('HeadlessChrome', 'Chrome')
+export type LinkCheckResult = {
+  ok: boolean
+  status: number
+  error?: string
+}
+
+// Vercel routes requests without a real browser network fingerprint (e.g. Playwright's
+// Node-side page.request) differently from page navigations, and heavy reference pages
+// 502 with FALLBACK_BODY_TOO_LARGE on that path. Fetching from inside the page uses the
+// same network stack as page.goto, so it resolves like a real browser visit would.
+export async function checkLinkFromBrowser(page: Page, url: string): Promise<LinkCheckResult> {
+  return page.evaluate(async (linkUrl) => {
+    try {
+      const response = await fetch(linkUrl)
+      return { ok: response.ok, status: response.status }
+    } catch (error) {
+      return { ok: false, status: 0, error: error instanceof Error ? error.message : String(error) }
+    }
+  }, url)
 }
