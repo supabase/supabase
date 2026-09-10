@@ -37,6 +37,7 @@ import { OverviewTable } from './OverviewTable'
 import {
   AuthMetricsResponse,
   calculatePercentageChange,
+  calculatePercentagePointChange,
   getApiSuccessRates,
   getAuthSuccessRates,
   getMetricValues,
@@ -51,29 +52,30 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 const StatCard = ({
   title,
   current,
-  previous,
+  change,
   loading,
   suffix = '',
   href,
   tooltip,
 }: {
   title: string
-  current: number
-  previous: number
+  current: number | null
+  change: number | null
   loading: boolean
   suffix?: string
-  invert?: boolean
   href?: string
   tooltip?: string
 }) => {
   const router = useRouter()
-  const formattedCurrent =
-    suffix === 'ms'
-      ? current.toFixed(2)
-      : suffix === '%'
-        ? current.toFixed(1)
-        : Math.round(current).toLocaleString()
-  // const signChar = previous > 0 ? '+' : previous < 0 ? '-' : ''
+  let formattedCurrent = 'No data'
+  if (current !== null) {
+    if (suffix === 'ms') formattedCurrent = `${current.toFixed(2)}${suffix}`
+    else if (suffix === '%') formattedCurrent = `${current.toFixed(1)}${suffix}`
+    else formattedCurrent = `${Math.round(current).toLocaleString()}${suffix}`
+  }
+  const changeUnit = suffix === '%' ? ' pp' : '%'
+  const formattedChange =
+    change === null ? undefined : `${Number(change.toFixed(1)).toFixed(1)}${changeUnit}`
 
   const actions = [
     {
@@ -91,8 +93,8 @@ const StatCard = ({
             className="pb-4"
             label={title}
             tooltip={tooltip}
-            diffValue={`${previous.toFixed(1)}%`}
-            value={`${formattedCurrent}${suffix}`}
+            diffValue={formattedChange}
+            value={formattedCurrent}
           />
           <ChartActions actions={actions} />
         </ChartHeader>
@@ -151,11 +153,11 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
   const { current: authSuccessRateCurrent, previous: authSuccessRatePrevious } =
     getAuthSuccessRates(metrics)
 
-  const apiSuccessRateChange = calculatePercentageChange(
+  const apiSuccessRateChange = calculatePercentagePointChange(
     apiSuccessRateCurrent,
     apiSuccessRatePrevious
   )
-  const authSuccessRateChange = calculatePercentageChange(
+  const authSuccessRateChange = calculatePercentagePointChange(
     authSuccessRateCurrent,
     authSuccessRatePrevious
   )
@@ -225,7 +227,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
             <StatCard
               title="Auth Activity"
               current={activeUsersCurrent}
-              previous={activeUsersChange}
+              change={activeUsersChange}
               loading={isLoading}
               href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#usage`}
               tooltip="Users who generated any Auth event in this period. This metric tracks authentication activity, not total product usage. Some active users won't appear here if their session stayed valid."
@@ -233,7 +235,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
             <StatCard
               title="Sign ups"
               current={signUpsCurrent}
-              previous={signUpsChange}
+              change={signUpsChange}
               loading={isLoading}
               href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#usage`}
             />
@@ -252,17 +254,19 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
             <StatCard
               title="Auth API Success Rate"
               current={apiSuccessRateCurrent}
-              previous={apiSuccessRateChange}
+              change={apiSuccessRateChange}
               loading={isLoading}
               suffix="%"
+              tooltip="Change from the previous period in percentage points (pp); no data means no requests were recorded."
               href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#monitoring`}
             />
             <StatCard
               title="Auth Server Success Rate"
               current={authSuccessRateCurrent}
-              previous={authSuccessRateChange}
+              change={authSuccessRateChange}
               loading={isLoading}
               suffix="%"
+              tooltip="Change from the previous period in percentage points (pp); no data means no requests were recorded."
               href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#monitoring`}
             />
           </div>
