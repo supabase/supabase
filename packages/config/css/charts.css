@@ -1,0 +1,96 @@
+/*
+ * Categorical chart palette.
+ *
+ * Slots are assigned in fixed order and never cycled. Each slot is one var
+ * name that resolves per theme, because it points at a Radix scale entry that
+ * colors.css already redefines under [data-theme*='dark'] — so charts need no
+ * light/dark branching in JS and classic-dark is picked up for free.
+ *
+ * Steps were snapped by the validator, not chosen by eye. Every slot clears the
+ * OKLCH lightness band and the chroma floor, and adjacent-pair separation clears
+ * both CVD (protanopia/deuteranopia, Machado 2009) and the normal-vision floor
+ * against the light (#ffffff) and dark (#1b1919) chart surface. Worst adjacent
+ * pair: ΔE 24.6 light / 23.3 dark, against a target of 8.
+ *
+ * Two slots sit below 3:1 against the surface — brand and red, in both modes.
+ * That is a relief obligation, not a dismissable warning: any chart using them
+ * must carry a legend and either direct labels or a table view, so identity is
+ * never conveyed by color alone. Studio charts do; keep it that way.
+ *
+ * Re-run after any change:
+ *   node scripts/validate_palette.js "<slot hexes>" --mode light --surface '#ffffff'
+ *   node scripts/validate_palette.js "<slot hexes>" --mode dark  --surface '#1b1919'
+ *
+ * Warm hues are absent from the categorical slots for two independent reasons.
+ * First, reserved meaning: amber reads as "warning" to a viewer, so spending it
+ * on "series 3" makes a neutral metric look like a problem. Second, it would
+ * fail anyway — no amber/orange/yellow/gold step in colors.css clears the
+ * dark-mode lightness ceiling, and neither does the semantic --warning token
+ * (dark resolves to oklch(0.8 0.14 75), L 0.80 against a 0.67 ceiling).
+ *
+ * Status colors live below as their own group. They are never slots.
+ */
+
+:root {
+  --chart-series-1: var(--color-brand-800);
+  --chart-series-2: var(--color-indigo-1000);
+  --chart-series-3: var(--color-green-900);
+  --chart-series-4: var(--color-violet-900);
+  --chart-series-5: var(--color-red-800);
+  --chart-series-6: var(--color-purple-1000);
+  --chart-series-7: var(--color-tomato-1000);
+  --chart-series-8: var(--color-blue-900);
+
+  --chart-series-1-fill: var(--color-brand-500);
+  --chart-series-2-fill: var(--color-indigo-500);
+  --chart-series-3-fill: var(--color-green-500);
+  --chart-series-4-fill: var(--color-violet-500);
+  --chart-series-5-fill: var(--color-red-500);
+  --chart-series-6-fill: var(--color-purple-500);
+  --chart-series-7-fill: var(--color-tomato-500);
+  --chart-series-8-fill: var(--color-blue-500);
+
+  /*
+   * Pinned pair. Directional series step outside sequential slot assignment so
+   * that read/in is the same hue in every chart that plots it — Disk IOPS lists
+   * write first and Disk throughput lists read first, so positional assignment
+   * would invert them between two charts on the same page.
+   */
+  --chart-in: var(--chart-series-8);
+  --chart-out: var(--chart-series-7);
+  --chart-in-fill: var(--chart-series-8-fill);
+  --chart-out-fill: var(--chart-series-7-fill);
+
+  /*
+   * Rendering defaults, not palette slots. Chart authors never set these: a
+   * reference line gets --chart-reference, and "absence of data" (headroom,
+   * idle, unused capacity) gets --chart-muted. Both are neutral, and the
+   * neutral scales flip at these steps, which is what a mid-grey wants.
+   */
+  --chart-reference: var(--color-scale-1000);
+  --chart-muted: var(--color-scale-700);
+  --chart-muted-fill: var(--color-scale-400);
+
+  /*
+   * Status. Reserved meaning — never assign these to a series to get a colour.
+   * Values mirror the set LogsBarChart has been using, so a threshold breach in
+   * a chart matches the badge next to it. Two tiers each: the base, and a muted
+   * tier for the not-hovered/de-emphasised state.
+   *
+   * --chart-warning / --chart-warning-muted are declared in Studio's globals.css
+   * and pick a *different* warning step per theme, so they cannot resolve through
+   * a single indirection the way the slots above do. The fallback keeps other
+   * apps working; keep it until that pair moves into shared CSS.
+   *
+   * None of these clear the categorical lightness band — warning is L 0.82 light
+   * and 0.71 dark, and the muted tiers fall under the chroma floor. That is
+   * acceptable for a reserved status colour that always carries an icon or a
+   * label, and is a further reason none of them can be a slot.
+   */
+  --chart-status-success: hsl(var(--brand-default));
+  --chart-status-success-muted: hsl(var(--brand-500));
+  --chart-status-warning: var(--chart-warning, hsl(var(--warning-default)));
+  --chart-status-warning-muted: var(--chart-warning-muted, hsl(var(--warning-500)));
+  --chart-status-destructive: hsl(var(--destructive-default));
+  --chart-status-destructive-muted: hsl(var(--destructive-500));
+}

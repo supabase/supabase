@@ -23,6 +23,37 @@ Our charts use a combination of our own presentational components and [Recharts]
 
 3. **Keep it simple**: Try to avoid abstracting the chart content too much. These components should cover most of your presentational needs.
 
+## Color
+
+Series colors come from a fixed palette of eight categorical slots (`--chart-series-1` …
+`--chart-series-8`) defined in `packages/config/css/charts.css`. Slots are assigned in order and never cycled — a ninth
+series folds into "Other", becomes small multiples, or gets a second encoding.
+
+Each slot is a single CSS variable that resolves per theme, so charts never branch on
+light/dark in JavaScript. Steps were snapped with a validator against the OKLCH lightness
+band, chroma floor, colorblind separation, and contrast on both surfaces — pick slots in
+order rather than picking colors.
+
+Reference lines and "absence of data" (headroom, idle, unused capacity) use
+`--chart-reference` and `--chart-muted`. Chart authors do not set these; the chart applies
+them. Directional series use the pinned `--chart-in` / `--chart-out` pair so that read and
+write keep the same hue across every chart that plots them.
+
+Status colors — `--chart-status-success`, `--chart-status-warning`,
+`--chart-status-destructive`, each with a `-muted` tier — are reserved, and match the set
+`LogsBarChart` already uses. Never assign one to a series just to get a color: amber reads
+as "warning", so spending it on "series 3" makes a neutral metric look like a problem. They
+always ship with an icon or a label, because state must never be carried by color alone.
+
+<ComponentPreview name="chart-palette" wide />
+
+### Eight series at once
+
+The case that breaks palettes: every slot stacked on screen together. Check it in both
+themes, and check that adjacent segments stay separable.
+
+<ComponentPreview name="chart-palette-stress" wide />
+
 ## Examples
 
 ### Basic Chart Types

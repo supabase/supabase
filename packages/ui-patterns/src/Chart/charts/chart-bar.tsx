@@ -66,6 +66,8 @@ export interface ChartBarProps {
   showGrid?: boolean
   showYAxis?: boolean
   showXAxis?: boolean
+  isStacked?: boolean
+  margin?: { top?: number; right?: number; bottom?: number; left?: number }
   XAxisProps?: {
     tick?: boolean
     tickFormatter?: (value: any) => string
@@ -102,6 +104,8 @@ export const ChartBar = ({
   showGrid = false,
   showYAxis = false,
   showXAxis = false,
+  isStacked = false,
+  margin: marginProp,
   XAxisProps,
   YAxisProps,
 }: ChartBarProps) => {
@@ -163,6 +167,7 @@ export const ChartBar = ({
     right: 0,
     left: 0,
     bottom: 0,
+    ...marginProp,
   }
 
   return (
@@ -242,7 +247,7 @@ export const ChartBar = ({
             />
           )}
           {isMultiSeries ? (
-            keysToRender.map((key) => {
+            keysToRender.map((key, index) => {
               const keyConfig = chartConfig[key]
               const barColor =
                 keyConfig?.color ||
@@ -251,7 +256,17 @@ export const ChartBar = ({
                     ? keyConfig.theme.dark
                     : keyConfig.theme.light
                   : color)
-              return <Bar key={key} dataKey={key} fill={barColor} maxBarSize={24} />
+              const isTopOfStack = index === keysToRender.length - 1
+              return (
+                <Bar
+                  key={key}
+                  dataKey={key}
+                  fill={barColor}
+                  maxBarSize={24}
+                  stackId={isStacked ? 'stack' : undefined}
+                  radius={isStacked && isTopOfStack ? [2, 2, 0, 0] : undefined}
+                />
+              )
             })
           ) : (
             <Bar dataKey={dataKey} fill={color} maxBarSize={24}>
