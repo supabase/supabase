@@ -16,7 +16,7 @@
 import { createSearchDocsTool } from '@/lib/ai/tools/search-docs-tool'
 
 async function runPreflight() {
-  const searchDocs = createSearchDocsTool()
+  const searchDocs = await createSearchDocsTool()
 
   if (!searchDocs?.execute) {
     throw new Error(
