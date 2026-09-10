@@ -9,13 +9,13 @@ import {
 const CREDENTIALS = {
   data_path: 's3://warehouse/',
   metadata_schema: 'ducklake',
-  s3_access_key_id: '9bca431b472accc23f8eb6de9f36259b',
-  s3_endpoint: 'fcdidtxgcaijqkrrngdt.storage.supabase.red/storage/v1/s3',
+  s3_access_key_id: 'test-s3-access-key-id',
+  s3_endpoint: 'test-project-ref.storage.supabase.red/storage/v1/s3',
   s3_region: 'ap-southeast-1',
 }
 
 const CONNECTION: WarehouseCatalogConnection = {
-  host: 'db.fcdidtxgcaijqkrrngdt.supabase.co',
+  host: 'db.test-project-ref.supabase.co',
   port: '5432',
   database: 'postgres',
   user: 'postgres',
