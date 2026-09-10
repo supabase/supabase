@@ -210,7 +210,7 @@ export SUPABASE_DB_URL="Postgres://postgres.[ref]:[password]@aws-0-[region].pool
 # 4XL: 16 vCPUs → use -j 16
 # (larger sizes: match -j to the vCPU count shown on the pricing page)
 
-RESTORE_JOBS=8  # Adjust based on your Supabase compute size
+RESTORE_JOBS=2  # Safe for all compute sizes — increase per the guidance above
 
 # Restore the dump (parallel mode)
 # Note: -j cannot be used with --single-transaction
