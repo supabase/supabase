@@ -4,11 +4,11 @@ title: 'Model Context Protocol (MCP) Authentication'
 description: 'Integrate Supabase Auth with MCP servers to authenticate AI agents using your existing user base'
 ---
 
-The Model Context Protocol (MCP) is an open standard for connecting AI agents and LLM tools to data sources and services. While Supabase doesn't provide MCP server functionality, you can build your own MCP servers that connect to your Supabase project and leverage Supabase Auth's OAuth 2.1 capabilities to authenticate AI agents using your existing user base.
+The Model Context Protocol (MCP) is an open standard for connecting AI agents and LLM tools to data sources and services. You can give your own app an MCP server that runs on Supabase and uses Supabase Auth's OAuth 2.1 capabilities to authenticate AI agents as your existing users. This page covers the authentication side. For the end-to-end walkthrough, including the Edge Function that hosts the server, see [Deploy MCP servers](/docs/guides/ai-tools/byo-mcp).
 
 ## Why use Supabase Auth for MCP?
 
-When building MCP servers that connect to your Supabase project, you can leverage your existing Supabase Auth infrastructure to authenticate AI agents:
+When building MCP servers that connect to your Supabase project, you can use your existing Supabase Auth infrastructure to authenticate AI agents:
 
 - **Use your existing user base** - No need to create separate authentication systems; AI agents authenticate as your existing users
 - **Standards-compliant OAuth 2.1** - Full implementation with PKCE that MCP clients expect
@@ -28,7 +28,7 @@ When you build an MCP server that connects to your Supabase project, authenticat
 4. **Token exchange**: Supabase issues access and refresh tokens for the authenticated user
 5. **Authenticated access**: The MCP server can now make requests to your Supabase APIs on behalf of the user
 
-By leveraging Supabase Auth, your MCP server can authenticate AI agents using your existing user accounts without building a separate authentication system.
+With Supabase Auth, your MCP server can authenticate AI agents using your existing user accounts without building a separate authentication system.
 
 ## Prerequisites
 
@@ -73,7 +73,26 @@ Dynamic registration allows any MCP client to register with your project. Consid
 
 ## Building an MCP server with Supabase Auth
 
-When building your own MCP server, integrate with Supabase Auth to authenticate AI agents as your existing users and leverage your RLS policies.
+When building your own MCP server, integrate with Supabase Auth to authenticate AI agents as your existing users and apply your RLS policies.
+
+On Supabase Edge Functions, or any runtime with a `fetch`-style handler, [`@supabase/server`](/docs/reference/server) does the OAuth plumbing for you. `withOAuthProtectedResource()` publishes the protected resource metadata and the `WWW-Authenticate` challenge that MCP clients use to find your Auth server; `withSupabase({ auth: 'user' })` verifies the token and gives your tools a client scoped to that user:
+
+```ts
+import { pipeline } from 'npm:@supabase/middleware@^0.5.0'
+import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@^1.6.0'
+
+Deno.serve(
+  pipeline(
+    [withOAuthProtectedResource(), withSupabase({ auth: 'user' })],
+    async (req, { supabase }) => {
+      // supabase is scoped to the signed-in user; hand it to your MCP tools
+      return mcpHandler(req, supabase)
+    }
+  )
+)
+```
+
+The [MCP Server block](/library/docs/headless/mcp-server) in the Supabase Library packages this as an installable Edge Function, and the [OAuth Consent block](/library/docs/nextjs/oauth-consent) provides the consent screen. See [Deploy MCP servers](/docs/guides/ai-tools/byo-mcp) for the full setup.
 
 <Admonition type="note">
 

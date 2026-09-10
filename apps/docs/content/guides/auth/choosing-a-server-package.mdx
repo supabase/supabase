@@ -78,6 +78,8 @@ export default {
 
 See the [`@supabase/server` reference](/docs/reference/server) for the full API.
 
+`@supabase/server` is also the package for MCP servers. Its `withOAuthProtectedResource` middleware handles OAuth discovery for MCP clients, and composed with `withSupabase({ auth: 'user' })` every tool call runs as the signed-in user. See [Deploy MCP servers](/docs/guides/ai-tools/byo-mcp).
+
 <Admonition type="note">
 
 `@supabase/ssr` and `@supabase/server` coexist and are not replacements for each other, and `@supabase/ssr` is not deprecated. Pick based on where your code runs and how auth reaches it, using the table above.

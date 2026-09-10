@@ -4,56 +4,36 @@ title: 'Deploy MCP servers'
 description: 'Build and deploy remote MCP servers on Supabase Edge Functions'
 ---
 
-Build and deploy [Model Context Protocol](https://modelcontextprotocol.io/specification/2025-11-25) (MCP) servers on Supabase using [Edge Functions](/docs/guides/functions).
+Build and deploy [Model Context Protocol](https://modelcontextprotocol.io/specification/2026-07-28) (MCP) servers on Supabase using [Edge Functions](/docs/guides/functions). MCP clients such as Claude, ChatGPT, Cursor, or VS Code call the tools you define.
+
+This guide has two parts. [Deploy a public MCP server](#deploy-a-public-mcp-server) gets a server with no authentication running in a few minutes. [Add authentication](#add-authentication) puts Supabase Auth in front of it, so users sign in with their existing accounts and every tool call runs as that user under your Row Level Security (RLS) policies.
 
 <Admonition type="note">
 
-This guide covers MCP servers that do not require authentication. Auth support for MCP on Edge Functions is coming soon.
+This is the MCP server your app exposes to its users. The [Supabase MCP server](/docs/guides/ai-tools/mcp) is different: it connects your own coding agent to your project so you can build the app.
 
 </Admonition>
 
 ## Prerequisites
 
-Before you begin, make sure you have:
+- [Docker](https://docs.docker.com/get-docker/) or a compatible runtime, running (for local development)
+- [Deno](https://deno.land/)
+- [Supabase CLI](/docs/guides/local-development) 2.117.0 or later, installed and authenticated
+- [Node.js 20 or later](https://nodejs.org/) (required by the Supabase CLI)
 
-- [Docker](https://docs.docker.com/get-docker/) or a compatible runtime installed and running (required for local development)
-- [Deno](https://deno.land/) installed (Supabase Edge Functions runtime)
-- [Supabase CLI](/docs/guides/local-development) installed and authenticated
-- [Node.js 20 or later](https://nodejs.org/) (required by Supabase CLI)
+The tutorial uses the official [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk). Any MCP framework that runs on the Edge Runtime works the same way, for example [mcp-lite](/docs/guides/functions/examples/mcp-server-mcp-lite).
 
-## Deploy your MCP server
+## Deploy a public MCP server
 
-### Step 1: Create a new project
+A public server needs no user. Every caller sees the same tools, so this fits open data, calculators, and anything you would otherwise expose as an unauthenticated API.
 
-Start by creating a new Supabase project:
+### Step 1: Create a project and a function
 
 ```bash
-mkdir my-mcp-server
-cd my-mcp-server
+mkdir my-mcp-server && cd my-mcp-server
 supabase init
-```
-
-<Admonition type="note">
-
-After this step, you should have a project directory with a `supabase` folder containing `config.toml` and an empty `functions` directory.
-
-</Admonition>
-
----
-
-### Step 2: Create the MCP server function
-
-Create a new Edge Function for your MCP server:
-
-```bash
 supabase functions new mcp
 ```
-
-<Admonition type="note">
-
-This tutorial uses the [official MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk) with the `WebStandardStreamableHTTPServerTransport`, but you can use any MCP framework that's compatible with the [Edge Runtime](/docs/guides/functions), such as [mcp-lite](https://github.com/fiberplane/mcp-lite) or [mcp-handler](https://github.com/vercel/mcp-handler).
-
-</Admonition>
 
 Replace the contents of `supabase/functions/mcp/index.ts` with:
 
@@ -61,172 +41,349 @@ Replace the contents of `supabase/functions/mcp/index.ts` with:
 // Setup type definitions for built-in Supabase Runtime APIs
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 
-import { McpServer } from 'npm:@modelcontextprotocol/sdk@1.25.3/server/mcp.js'
-import { WebStandardStreamableHTTPServerTransport } from 'npm:@modelcontextprotocol/sdk@1.25.3/server/webStandardStreamableHttp.js'
-import { Hono } from 'npm:hono@^4.9.7'
-import { z } from 'npm:zod@^4.1.13'
+import { createMcpHandler, McpServer } from 'npm:@modelcontextprotocol/server@^2.0.0'
+import { z } from 'npm:zod@^4.3.6'
 
-// Create Hono app
-const app = new Hono()
+const handler = createMcpHandler(() => {
+  const server = new McpServer({ name: 'mcp', version: '0.1.0' })
 
-// Create your MCP server
-const server = new McpServer({
-  name: 'mcp',
-  version: '0.1.0',
+  server.registerTool(
+    'add',
+    {
+      title: 'Addition Tool',
+      description: 'Add two numbers together',
+      inputSchema: z.object({ a: z.number(), b: z.number() }),
+    },
+    ({ a, b }) => ({ content: [{ type: 'text', text: String(a + b) }] })
+  )
+
+  return server
 })
 
-// Register an addition tool
-server.registerTool(
-  'add',
-  {
-    title: 'Addition Tool',
-    description: 'Add two numbers together',
-    inputSchema: { a: z.number(), b: z.number() },
-  },
-  ({ a, b }) => ({
-    content: [{ type: 'text', text: String(a + b) }],
-  })
-)
-
-// Handle MCP requests
-app.all('*', async (c) => {
-  const transport = new WebStandardStreamableHTTPServerTransport()
-  await server.connect(transport)
-  return transport.handleRequest(c.req.raw)
-})
-
-Deno.serve(app.fetch)
+Deno.serve((req) => handler.fetch(req))
 ```
 
-<Admonition type="note">
+`createMcpHandler` runs the Streamable HTTP transport and builds a fresh `McpServer` for each request, which suits the stateless Edge Functions runtime.
 
-After this step, you should have a new file at `supabase/functions/mcp/index.ts`.
+The gateway verifies a JWT on every request by default. A public server has no JWT, so turn that off for this function:
 
-</Admonition>
+```toml name=supabase/config.toml
+[functions.mcp]
+verify_jwt = false
+```
 
-<Admonition type="caution">
-
-Within Edge Functions, paths are prefixed with the function name. If your function is named something other than `mcp`, configure Hono with a base path: `new Hono().basePath('/your-function-name')`.
-
-</Admonition>
-
----
-
-### Step 3: Test locally
-
-Start the Supabase local development stack:
+### Step 2: Test locally
 
 ```bash
 supabase start
+supabase functions serve mcp
 ```
 
-In a separate terminal, serve your function:
+Your MCP server is at `http://127.0.0.1:54321/functions/v1/mcp`. Call the `add` tool with curl:
 
 ```bash
-supabase functions serve --no-verify-jwt mcp
-```
-
-Your MCP server is now running at:
-
-```
-http://localhost:54321/functions/v1/mcp
-```
-
-<Admonition type="note">
-
-The `--no-verify-jwt` flag disables JWT verification at the Edge Function layer so your MCP server can accept unauthenticated requests. Authenticated MCP support is coming soon.
-
-</Admonition>
-
-#### Test with curl
-
-You can also test your MCP server directly with curl. Call the `add` tool:
-
-```bash
-curl -X POST 'http://localhost:54321/functions/v1/mcp' \
+curl -X POST 'http://127.0.0.1:54321/functions/v1/mcp' \
   -H 'Content-Type: application/json' \
   -H 'Accept: application/json, text/event-stream' \
-  -d '{
-    "jsonrpc": "2.0",
-    "id": 1,
-    "method": "tools/call",
-    "params": {
-      "name": "add",
-      "arguments": {
-        "a": 5,
-        "b": 3
-      }
-    }
-  }'
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"add","arguments":{"a":5,"b":3}}}'
 ```
-
-<Admonition type="note">
-
-The MCP Streamable HTTP transport requires the `Accept: application/json, text/event-stream` header to indicate the client supports both JSON and Server-Sent Events responses.
-
-</Admonition>
-
-**Expected response:**
-
-The response uses Server-Sent Events (SSE) format:
 
 ```
 event: message
 data: {"result":{"content":[{"type":"text","text":"8"}]},"jsonrpc":"2.0","id":1}
 ```
 
-#### Test with MCP Inspector
+The `Accept` header tells the transport the client understands both JSON and Server-Sent Events. Without it the request is rejected.
 
-Test your server with the official [MCP Inspector](https://github.com/modelcontextprotocol/inspector):
+To explore the server from a UI, run the [MCP Inspector](https://github.com/modelcontextprotocol/inspector), choose the Streamable HTTP transport, and enter the URL above:
 
 ```bash
 npx -y @modelcontextprotocol/inspector
 ```
 
-Use the local endpoint `http://localhost:54321/functions/v1/mcp` in the inspector UI to explore available tools and test them interactively.
-
-<Admonition type="note">
-
-After this step, you should have your MCP server running locally and be able to test the `add` tool in the MCP Inspector.
-
-</Admonition>
-
-### Step 4: Deploy to production
-
-When you're ready to deploy, link your project and deploy the function:
+### Step 3: Deploy
 
 ```bash
 supabase link --project-ref <your-project-ref>
-supabase functions deploy --no-verify-jwt mcp
+supabase config push
+supabase functions deploy mcp
 ```
 
-Your MCP server will be available at:
+Your MCP server is at `https://<your-project-ref>.supabase.co/functions/v1/mcp`. Point any client from the [table below](#connect-from-mcp-clients) at it; no sign-in is involved.
+
+## Add authentication
+
+Most servers act on user data, and then the question is who the caller is. With Supabase Auth as the OAuth 2.1 authorization server, users sign in with their existing accounts, approve the MCP client once, and every tool call runs as that user. Your RLS policies decide what each client can see, with no per-tool authorization code.
+
+### How it works
+
+The authenticated function composes two pieces of middleware from [`@supabase/server`](/docs/reference/server) into a `pipeline` from `@supabase/middleware`, followed by your MCP handler:
 
 ```
-https://<your-project-ref>.supabase.co/functions/v1/mcp
+pipeline([...], handler)
+  withOAuthProtectedResource()    OAuth discovery for MCP clients (RFC 9728, WWW-Authenticate on 401)
+  withSupabase({ auth: 'user' })  verifies the user's token, hands you an RLS-scoped client
+  handler                         MCP transport and your tools
 ```
 
-Update your MCP client configuration to use the production URL.
+`withOAuthProtectedResource()` runs before the auth gate. It serves the OAuth Protected Resource Metadata document so clients can find your authorization server, and it adds the `WWW-Authenticate` challenge to unauthenticated responses. `withSupabase({ auth: 'user' })` rejects requests without a valid user token and gives your handler a Supabase client scoped to that user. Anything the tools read or write goes through RLS.
+
+Two things must be in place beyond the prerequisites above:
+
+- A Supabase project that signs JWTs with an asymmetric key (ES256 or RS256). `withSupabase` verifies user tokens against the project JWKS and rejects legacy HS256 tokens; switch in [JWT Signing Keys](/docs/guides/auth/signing-keys) if your project still uses the legacy secret.
+- A web frontend where users sign in. The OAuth consent screen is hosted there, not by Supabase.
+
+### Step 1: Configure Supabase Auth
+
+MCP clients authenticate through OAuth 2.1, with Supabase Auth as the authorization server. Three settings need to be on.
+
+1. **Enable the OAuth 2.1 server.** Follow the [getting started guide](/docs/guides/auth/oauth-server/getting-started).
+2. **Enable dynamic client registration.** MCP clients register themselves before starting an OAuth flow. Enable it under **Authentication** > **OAuth Server** in the dashboard. It lets any compatible client register, so review registered clients and let users revoke grants.
+3. **Host a consent screen.** Auth redirects users to your frontend to approve the client. The [OAuth Consent block](/library/docs/nextjs/oauth-consent) in the Supabase Library installs a ready-made `/oauth/consent` route for Next.js, React, React Router, and TanStack Start. Set the Auth **Site URL** to the origin that serves it.
+
+For local development, the same settings live in `supabase/config.toml`:
+
+```toml name=supabase/config.toml
+[auth]
+site_url = "http://localhost:3000"
+
+[auth.oauth_server]
+enabled = true
+authorization_url_path = "/oauth/consent"
+allow_dynamic_registration = true
+```
+
+### Step 2: Create the MCP server
+
+The fastest path is the [MCP Server block](/library/docs/headless/mcp-server) in the Supabase Library. It installs an Edge Function with the middleware already wired, a `whoami` tool, and a small tool registry to extend:
+
+```bash
+npx shadcn@latest add https://supabase.com/library/r/mcp-server.json
+```
+
+To write the function yourself, start with a table for the tools to work on. Create it with RLS so each user only sees their own rows; the `user_id` default means inserts don't need to pass it. Save this as a migration with `supabase migration new create_todos` and paste it into the generated file:
+
+```sql
+create table public.todos (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
+  title text not null,
+  done boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+alter table public.todos enable row level security;
+
+create policy "Users manage their own todos"
+  on public.todos for all to authenticated
+  using ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id);
+```
+
+If you skipped the public part, create the function now with `supabase functions new mcp`. The `verify_jwt = false` setting from that part is needed here too: the function verifies tokens itself, and the gateway would otherwise reject the unauthenticated discovery request before `withOAuthProtectedResource` can answer it.
+
+The function imports a `Database` type so the Supabase client inside the tools knows the table's columns. Start the local stack, which applies the migration, then generate the type from it. If the stack is already running, apply the migration with `supabase migration up` first:
+
+```bash
+supabase start
+supabase gen types typescript --local > supabase/functions/mcp/database.types.ts
+```
+
+Replace the contents of `supabase/functions/mcp/index.ts`. Compared with the public server, the handler moves inside a `pipeline` so it receives the caller's Supabase client, and the tools query a table instead of adding numbers:
+
+```ts name=supabase/functions/mcp/index.ts
+// Setup type definitions for built-in Supabase Runtime APIs
+import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+
+import { createMcpHandler, McpServer } from 'npm:@modelcontextprotocol/server@^2.0.0'
+import { pipeline } from 'npm:@supabase/middleware@^0.5.0'
+import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@^1.6.0'
+import { z } from 'npm:zod@^4.3.6'
+
+import type { Database } from './database.types.ts'
+
+Deno.serve(
+  pipeline(
+    // 1. OAuth discovery for MCP clients, 2. verify the user's token and scope a client to them
+    [withOAuthProtectedResource(), withSupabase<Database>({ auth: 'user' })],
+    async (req, { supabase }) => {
+      // A fresh server per request: Edge Functions are stateless
+      const handler = createMcpHandler(() => {
+        const server = new McpServer({ name: 'todos', version: '0.1.0' })
+
+        server.registerTool(
+          'list_todos',
+          {
+            description: 'List the todos of the signed-in user',
+            inputSchema: z.object({ limit: z.number().int().min(1).max(100).default(20) }),
+            annotations: { readOnlyHint: true },
+          },
+          async ({ limit }) => {
+            // RLS scopes this query to the signed-in user
+            const { data, error } = await supabase
+              .from('todos')
+              .select('id, title, done')
+              .order('created_at', { ascending: false })
+              .limit(limit)
+            if (error) throw new Error(error.message)
+            return { content: [{ type: 'text', text: JSON.stringify(data) }] }
+          }
+        )
+
+        server.registerTool(
+          'create_todo',
+          {
+            description: 'Create a todo for the signed-in user',
+            inputSchema: z.object({ title: z.string().min(1).max(200) }),
+          },
+          async ({ title }) => {
+            const { data, error } = await supabase.from('todos').insert({ title }).select().single()
+            if (error) throw new Error(error.message)
+            return { content: [{ type: 'text', text: JSON.stringify(data) }] }
+          }
+        )
+
+        return server
+      })
+
+      return handler.fetch(req)
+    }
+  )
+)
+```
 
 <Admonition type="note">
 
-After this step, you have a fully deployed MCP server accessible from anywhere. You can test it using the MCP Inspector with your production URL.
+Composing `withSupabase` as a `pipeline` entry is alpha and tracks `@supabase/middleware` 0.x. The nested form, `withOAuthProtectedResource(withSupabase({ auth: 'user' }, handler))`, is stable and behaves the same. Both need `@supabase/server` 1.6.0 or later.
 
 </Admonition>
 
+### Step 3: Test locally
+
+With the local stack still running from Step 2, serve the function:
+
+```bash
+supabase functions serve mcp
+```
+
+The `tools/call` request from the public part now fails, because the caller has no token. Check the OAuth handshake instead. An unauthenticated request returns `401` with a `WWW-Authenticate` header naming the metadata document:
+
+```bash
+curl -si -X POST 'http://127.0.0.1:54321/functions/v1/mcp' \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"curl","version":"0"}}}' \
+  | grep -i '^HTTP\|www-authenticate'
+```
+
+```
+HTTP/1.1 401 Unauthorized
+www-authenticate: Bearer resource_metadata="http://127.0.0.1:54321/functions/v1/mcp/oauth-protected-resource"
+```
+
+The metadata document points clients at your project's Auth server:
+
+```bash
+curl -s 'http://127.0.0.1:54321/functions/v1/mcp/oauth-protected-resource'
+```
+
+```json
+{
+  "resource": "http://127.0.0.1:54321/functions/v1/mcp",
+  "authorization_servers": ["http://127.0.0.1:54321/auth/v1"],
+  "bearer_methods_supported": ["header"]
+}
+```
+
+Both URLs use the public origin of your local stack, taken from the headers the gateway forwards, not the Docker-internal `http://kong:8000` that `SUPABASE_URL` holds inside the function. Supabase CLI 2.117.0 and later also injects the function slug, so the `resource` path stays canonical whatever sub-path a request arrives on.
+
+#### Test with MCP Inspector
+
+The official [MCP Inspector](https://github.com/modelcontextprotocol/inspector) runs the OAuth flow and lets you call tools from a UI. Your frontend must be running so the consent screen is reachable.
+
+```bash
+npx -y @modelcontextprotocol/inspector
+```
+
+In the Inspector, choose the Streamable HTTP transport, enter `http://127.0.0.1:54321/functions/v1/mcp`, and connect. The browser opens your sign-in page, then the consent screen. After you approve, the Tools tab lists `list_todos` and `create_todo`; call them from there.
+
+#### Test with Claude Code
+
+Add the server to [Claude Code](https://docs.anthropic.com/en/docs/claude-code/mcp):
+
+```bash
+claude mcp add --transport http todos http://127.0.0.1:54321/functions/v1/mcp
+```
+
+Run `/mcp` in Claude Code and authenticate. The same sign-in and consent flow runs in the browser. After you approve, ask Claude to list your todos or create one.
+
+### Step 4: Deploy
+
+Link your project, push the Auth settings from `config.toml`, and deploy the function:
+
+```bash
+supabase link --project-ref <your-project-ref>
+supabase config push
+supabase functions deploy mcp
+```
+
+Your MCP server is now at `https://<your-project-ref>.supabase.co/functions/v1/mcp`. Deploy your frontend with the consent route to the origin configured as the Auth Site URL.
+
+## Connect from MCP clients
+
+Every client that implements the MCP authorization specification discovers your Auth server from the `WWW-Authenticate` challenge, registers itself, and runs the OAuth flow. The server URL is the only configuration they need.
+
+| Client      | Where to add the URL                                                                  |
+| ----------- | ------------------------------------------------------------------------------------- |
+| Claude Code | `claude mcp add --transport http <name> <url>`                                        |
+| Claude      | Settings > Connectors > Add custom connector                                          |
+| Cursor      | `.cursor/mcp.json`: `{ "mcpServers": { "<name>": { "url": "<url>" } } }`              |
+| VS Code     | `.vscode/mcp.json`: `{ "servers": { "<name>": { "type": "http", "url": "<url>" } } }` |
+| ChatGPT     | Settings > Connectors, with developer mode enabled. Requires a public HTTPS URL.      |
+
+Users can review and revoke connected clients through the [OAuth grant management](/docs/guides/auth/oauth-server/oauth-flows#managing-user-grants) endpoints. The [Headless App block](/library/docs/tanstack/headless-app) ships an `/agents` page that does this.
+
+## Run it outside Edge Functions
+
+The same pipeline mounts in any runtime that speaks `Request` in, `Response` out: a Next.js route handler, a SvelteKit endpoint, Cloudflare Workers, or a plain Node, Bun, or Deno server. Off Edge Functions there are no forwarded headers to derive the public URLs from, so pass them explicitly:
+
+```ts
+import { pipeline } from '@supabase/middleware'
+import { fromSupabaseUrl, withOAuthProtectedResource, withSupabase } from '@supabase/server'
+
+export default {
+  fetch: pipeline(
+    [
+      withOAuthProtectedResource({
+        resourceServer: (req) => new URL(req.url).origin + '/api/mcp',
+        authorizationServer: fromSupabaseUrl('https://<your-project-ref>.supabase.co'),
+      }),
+      withSupabase({ auth: 'user' }),
+    ],
+    handler
+  ),
+}
+```
+
+`resourceServer` is the public URL of the MCP endpoint. `authorizationServer` is the Auth issuer; `fromSupabaseUrl` derives it from your project URL. Both accept a string or a function of the request, so you can also point at a non-Supabase OAuth 2.1 server.
+
+## Limitations
+
+Edge Functions are stateless. The server answers one HTTP request at a time with no open channel back to the client, which rules out MCP sampling (the server asking the client to run an LLM completion). Tools that need more input from the user should return a message asking for it instead.
+
 ## Examples
 
-You can find ready-to-use MCP server implementations here:
+Both examples in this guide are in the `supabase/supabase` repository, ready to serve or deploy:
 
-{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
-
-- [Simple MCP server](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp/simple-mcp-server) - Unauthenticated example
+- [Public MCP server](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp/simple-mcp-server): the `add` tool, no authentication
+- [Authenticated MCP server](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp/authenticated-mcp-server): the `todos` tools behind Supabase Auth, with the migration and RLS policy
 
 ## Resources
 
-- [Model Context Protocol Specification](https://modelcontextprotocol.io/specification/2025-11-25)
-- [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)
-- [Supabase Edge Functions](/docs/guides/functions)
-- [OAuth 2.1 Server](/docs/guides/auth/oauth-server)
-- [MCP Authentication](/docs/guides/auth/oauth-server/mcp-authentication)
-- [Building MCP servers with mcp-lite](/docs/guides/functions/examples/mcp-server-mcp-lite) - Alternative lightweight framework
+- [MCP Server block](/library/docs/headless/mcp-server) and [Headless App block](/library/docs/tanstack/headless-app) in the Supabase Library
+- [`@supabase/server` reference](/docs/reference/server)
+- [MCP authentication with Supabase Auth](/docs/guides/auth/oauth-server/mcp-authentication)
+- [OAuth 2.1 server](/docs/guides/auth/oauth-server)
+- [Token security and RLS](/docs/guides/auth/oauth-server/token-security)
+- [Model Context Protocol specification](https://modelcontextprotocol.io/specification/2026-07-28)
+- [Building MCP servers with mcp-lite](/docs/guides/functions/examples/mcp-server-mcp-lite): an alternative lightweight framework
