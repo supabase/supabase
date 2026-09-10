@@ -978,9 +978,7 @@ export async function insertRowsViaSpreadsheet({
               projectRef,
               connectionString,
               sql: insertQuery,
-              isRoleImpersonationEnabled: isRoleImpersonationEnabled(
-                roleImpersonationState?.role
-              ),
+              isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
             })
           )
         } catch (error) {
@@ -1084,9 +1082,7 @@ export async function insertTableRows({
               projectRef,
               connectionString,
               sql: insertQuery,
-              isRoleImpersonationEnabled: isRoleImpersonationEnabled(
-                roleImpersonationState?.role
-              ),
+              isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
             })
           } catch (error) {
             insertError = error
