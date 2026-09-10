@@ -218,8 +218,33 @@ test('getTablesPaginatedSql: plan stays scoped for a schema page', async () => {
 
 // ── getTableColumnsSql (database/columns.ts) — per-table ─────────────────────
 test('getTableColumnsSql: plan stays scoped for a single table', async () => {
-  const result = await explainAnalyze(db, getTableColumnsSql({ table: 't_1000', schema: 'stress' }))
+  const result = await explainAnalyze(
+    db,
+    getTableColumnsSql({ table: 't_1000', schema: 'stress', scoped: true })
+  )
   assertPlanWithinBudget(result, {})
+}, 60_000)
+
+// ── getTableColumnsSql — whole-catalog (SQL Editor intellisense) ─────────────
+// useAddDefinitions calls this with no schema/table, so this shape is inherently
+// O(catalog) and cannot be index-driven: pg_class has no index on relkind or
+// relnamespace. What the budget pins is that it stays at ONE pg_class scan --
+// the previous `union all` over relkind='r' then ('v','m') scanned it twice --
+// and that pg_attribute is reached by index rather than scanned.
+test('getTableColumnsSql: whole-catalog plan scans pg_class once and indexes pg_attribute', async () => {
+  const result = await explainAnalyze(db, getTableColumnsSql({ scoped: true }))
+  assertPlanWithinBudget(result, {
+    allowedSeqScans: {
+      pg_class: {
+        max: 1,
+        reason:
+          'unfiltered intellisense fetch enumerates every relation; no index on relkind/relnamespace',
+      },
+    },
+    // Whole-catalog work on the stress catalog; the seq-scan budget above is the
+    // real guard here, this only catches a gross regression.
+    maxExecutionTimeMs: 6000,
+  })
 }, 60_000)
 
 // ── getIndexesSQL (database/indexes.ts) — per-schema list ────────────────────

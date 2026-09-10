@@ -55,6 +55,8 @@ function startingQuoteScenarioSuggestions(monaco: any, pgInfoRef: RefObject<any>
 
     if (!table) return { suggestions: items }
     table.columns.forEach((field: any) => {
+      if (!field) return
+
       items.push({
         label: field.attname,
         kind: monaco.languages.CompletionItemKind.Property,
@@ -123,6 +125,8 @@ function dotScenarioSuggestions(monaco: any, pgInfoRef: RefObject<any>, iterator
 
   if (table) {
     table.columns.forEach((field: any) => {
+      if (!field) return
+
       items.push({
         label: field.attname,
         kind: monaco.languages.CompletionItemKind.Property,
