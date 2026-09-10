@@ -306,7 +306,7 @@ supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
 response = supabase.storage.from_('bucket').download(
   'image.jpg',
   {
-       'transform': {
+    'transform': {
       'width': 800,
       'height': 300,
     },
