@@ -45,13 +45,8 @@ export default defineConfig({
   trailingSlash: 'ignore',
   integrations: [
     react(),
-    // GFM alert blockquotes (`> [!NOTE] ...`) in .mdx guides render through
-    // the real Admonition component — see src/lib/mdx/rehype-admonitions.ts.
-    // Scoped to MDX's own processor (not the site-wide `markdown.processor`,
-    // which stays on Astro's default satteri pipeline for plain .md content
-    // — the shikiConfig below still applies to .mdx too, it's inherited
-    // regardless of processor) since rehype-admonitions is a standard
-    // rehype plugin, not a satteri-native one.
+    // rehype-admonitions is a custom rehype plugin and Astro's default pipeline is
+    // satteri, so .mdx gets its own unified processor. Plain .md stays on satteri.
     mdx({
       processor: unified({
         rehypePlugins: [rehypeAdmonitions],
