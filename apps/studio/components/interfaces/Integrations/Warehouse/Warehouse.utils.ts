@@ -28,16 +28,10 @@ export function getSchemaTableKey(schema: string, table: string): string {
 }
 
 /**
- * Internal schemas that still hold product data users legitimately want in their warehouse.
- * Everything else in `INTERNAL_SCHEMAS` is Supabase infrastructure — `vault` (secrets),
- * `pgsodium`, `cron`/`pgmq` bookkeeping, migration history — which should never be offered as a
- * replication target.
+ * Supabase-managed schemas are not eligible Warehouse replication targets. This also excludes
+ * product schemas such as `auth` and `storage`, matching the platform API validation.
  */
-const REPLICABLE_INTERNAL_SCHEMAS = ['auth', 'storage']
-
-const NON_SELECTABLE_SCHEMAS = new Set(
-  INTERNAL_SCHEMAS.filter((schema) => !REPLICABLE_INTERNAL_SCHEMAS.includes(schema))
-)
+const NON_SELECTABLE_SCHEMAS = new Set(INTERNAL_SCHEMAS)
 
 /**
  * Postgres schemas Warehouse setup shouldn't offer for replication.

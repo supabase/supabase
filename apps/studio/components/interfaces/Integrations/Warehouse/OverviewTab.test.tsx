@@ -27,10 +27,11 @@ vi.mock('../Integration/IntegrationOverviewTab', () => ({
 // Exercised by its own unit tests, and it fires four upstream queries of its own.
 vi.mock('./WarehouseSchemaTablePicker', () => ({
   WarehouseSchemaTablePicker: ({ error }: { error?: { message: string } | null }) => (
-    <div>
+    <section>
+      <h2>Tables</h2>
       <span>Replicated tables picker</span>
       {!!error && <span>Picker error: {error.message}</span>}
-    </div>
+    </section>
   ),
 }))
 
@@ -84,22 +85,6 @@ describe('WarehouseOverviewTab', () => {
     }
   )
 
-  test('keeps the first section flush with the top of the tab', async () => {
-    mockSetupStatus('complete')
-    mockCatalog()
-
-    const { container } = customRender(<WarehouseOverviewTab />)
-
-    const firstSection = await screen.findByText('Replication status')
-    const section = firstSection.closest('[data-slot="page-section"]')
-
-    // PageSection cancels its 48px top padding with `first:pt-0`, which only applies to a real
-    // :first-child. The sections must therefore live in their own wrapper: returned as a bare
-    // fragment, the integration shell's markdown takes that slot and the gap comes back.
-    expect(section?.parentElement).not.toBe(container)
-    expect(section).toBe(section?.parentElement?.firstElementChild)
-  })
-
   test('shows everything on one page once complete', async () => {
     mockSetupStatus('complete')
     mockCatalog()
@@ -107,11 +92,17 @@ describe('WarehouseOverviewTab', () => {
     customRender(<WarehouseOverviewTab />)
 
     // findByRole throws on duplicates, so this also guards the section titles staying distinct.
-    // The picker's own "Tables" title isn't here because the picker is stubbed above.
-    for (const name of ['Replication status', 'Connect', 'Disable Warehouse']) {
+    for (const name of ['Status', 'Tables', 'Connect', 'Disable']) {
       expect(await screen.findByRole('heading', { name })).toBeInTheDocument()
     }
     expect(screen.getByText('Replicated tables picker')).toBeInTheDocument()
+
+    const headings = screen
+      .getAllByRole('heading')
+      .map((heading) => heading.textContent)
+      .filter((heading) => ['Status', 'Tables', 'Connect', 'Disable'].includes(heading ?? ''))
+
+    expect(headings).toEqual(['Status', 'Tables', 'Connect', 'Disable'])
   })
 
   test('tears Warehouse down with an empty target list, and only after confirmation', async () => {

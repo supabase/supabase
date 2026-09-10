@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import type { PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -23,15 +22,6 @@ import { useUpdateWarehouseCatalogMutation } from '@/data/warehouse/warehouse-ca
 import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
 import { useTrack } from '@/lib/telemetry/track'
-
-/**
- * `PageSection` cancels its own top padding with `first:pt-0`, which only applies to a real
- * `:first-child`. Without this wrapper the integration shell's markdown takes that slot and every
- * section keeps a 48px gap above it. Data API wraps its sections for the same reason.
- */
-const Sections = ({ children }: PropsWithChildren) => (
-  <div className="flex flex-col">{children}</div>
-)
 
 export const WarehouseSetupPanel = () => {
   const { ref: projectRef } = useParams()
@@ -95,13 +85,11 @@ export const WarehouseSetupPanel = () => {
 
   if (status === 'not_started') {
     return (
-      <Sections>
-        <WarehouseSchemaTablePicker
-          onSubmit={handleSetup}
-          isSubmitting={setupMutation.isPending}
-          error={setupMutation.error}
-        />
-      </Sections>
+      <WarehouseSchemaTablePicker
+        onSubmit={handleSetup}
+        isSubmitting={setupMutation.isPending}
+        error={setupMutation.error}
+      />
     )
   }
 
@@ -116,6 +104,7 @@ export const WarehouseSetupPanel = () => {
     return (
       <AlertError
         subject="Warehouse setup failed"
+        showErrorPrefix={false}
         error={{
           message: failingStep?.message ?? 'An unknown error occurred while setting up Warehouse.',
         }}
@@ -135,16 +124,16 @@ export const WarehouseSetupPanel = () => {
   }
 
   return (
-    <Sections>
+    <>
       <WarehouseReplicatedTablesSection tables={data.tables} />
-      <WarehouseConnectSection canManageCatalog />
       <WarehouseSchemaTablePicker
         isEditing
         onSubmit={handleSetup}
         isSubmitting={setupMutation.isPending}
         error={setupMutation.error}
       />
+      <WarehouseConnectSection />
       <WarehouseDisableCard />
-    </Sections>
+    </>
   )
 }

@@ -76,13 +76,16 @@ describe('WarehouseTab', () => {
     expect(screen.getByRole('link', { name: 'View progress' })).toBeInTheDocument()
   })
 
-  test('renders read-only connection details, and no catalog action, once complete', async () => {
+  test('renders connection details and offers catalog access only for DuckDB', async () => {
     mockSetupStatus({ setup_status: 'complete' })
     mockCatalog({ enabled: false })
 
-    customRender(<WarehouseTab />)
+    const { container } = customRender(<WarehouseTab />)
 
-    expect(await screen.findByText('Connect')).toBeInTheDocument()
+    expect(await screen.findByRole('combobox', { name: 'Query engine' })).toBeInTheDocument()
+    expect(container.firstElementChild).toHaveClass('border-0', 'shadow-none', '[&>div]:p-0')
+    expect(container.querySelector('[data-orientation="horizontal"]')).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Connect' })).not.toBeInTheDocument()
     expect(screen.getByDisplayValue('default.warehouse.supabase.io')).toBeInTheDocument()
     expect(
       screen.getByDisplayValue(
@@ -92,6 +95,12 @@ describe('WarehouseTab', () => {
 
     // FlightSQL is the default engine and needs no catalog access, so nothing here provisions.
     expect(screen.queryByRole('switch')).not.toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('combobox', { name: 'Query engine' }))
+    await userEvent.click(screen.getByRole('option', { name: 'DuckDB' }))
+    expect(
+      await screen.findByRole('switch', { name: 'Enable DuckDB catalog access' })
+    ).not.toBeChecked()
   })
 
   test('renders the DuckLake attach script when catalog access is on', async () => {
@@ -114,14 +123,22 @@ describe('WarehouseTab', () => {
     await userEvent.click(await screen.findByRole('combobox', { name: 'Query engine' }))
     await userEvent.click(await screen.findByRole('option', { name: 'DuckDB' }))
 
-    // The setup script renders through a syntax highlighter that splits it across elements, so
-    // assert on the env vars it tells you to set and the values behind them.
-    expect(await screen.findByText('DUCKLAKE_S3_SECRET')).toBeInTheDocument()
-    expect(screen.getByText('DUCKLAKE_METADATA_PASSWORD')).toBeInTheDocument()
-    expect(screen.getByDisplayValue('s3-secret')).toBeInTheDocument()
-    expect(screen.getByDisplayValue(CATALOG_PASSWORD)).toBeInTheDocument()
-    // Catalog access is provisioning, so the sheet never offers the toggle.
-    expect(screen.queryByRole('switch')).not.toBeInTheDocument()
+    expect(
+      await screen.findByRole('switch', { name: 'Enable DuckDB catalog access' })
+    ).toBeChecked()
+    expect(await screen.findByText('DUCKLAKE_S3_SECRET=')).toBeInTheDocument()
+    expect(screen.getByText('DUCKLAKE_METADATA_PASSWORD=')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Copy all DuckLake environment variables' })
+    ).toBeInTheDocument()
+
+    expect(screen.queryByText('s3-secret')).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Reveal DUCKLAKE_S3_SECRET' }))
+    expect(screen.getByText('s3-secret')).toBeInTheDocument()
+
+    expect(screen.queryByText(CATALOG_PASSWORD)).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Reveal DUCKLAKE_METADATA_PASSWORD' }))
+    expect(screen.getByText(CATALOG_PASSWORD)).toBeInTheDocument()
   })
 
   test('surfaces a failure to load the status', async () => {

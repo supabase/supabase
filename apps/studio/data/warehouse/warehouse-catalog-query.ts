@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { warehouseKeys } from './keys'
+import { getWarehouseLocalMockCatalog } from './warehouse-local-mock'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -14,6 +15,9 @@ async function getWarehouseCatalog(
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
+
+  const mock = getWarehouseLocalMockCatalog(projectRef)
+  if (mock !== undefined) return mock
 
   const { data, error } = await get('/platform/warehouse/{ref}/catalog', {
     params: { path: { ref: projectRef } },

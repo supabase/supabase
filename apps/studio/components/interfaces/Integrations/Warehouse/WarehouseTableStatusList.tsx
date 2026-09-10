@@ -1,10 +1,10 @@
 import dayjs from 'dayjs'
-import { Loader2 } from 'lucide-react'
 import { Badge, Card, CardContent, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import {
   PageSection,
   PageSectionContent,
+  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
@@ -44,7 +44,9 @@ const TableLag = ({ table }: { table: WarehouseSetupTable }) => {
 
   return (
     <Tooltip>
-      <TooltipTrigger className="text-sm text-foreground-light">{label}</TooltipTrigger>
+      <TooltipTrigger className="text-sm text-foreground-light underline decoration-dotted decoration-foreground-muted/30 underline-offset-4 transition-[text-decoration-color] duration-200 hover:decoration-foreground-lighter">
+        {label}
+      </TooltipTrigger>
       <TooltipContent side="bottom">
         Last synced {dayjs(table.last_synced_at).fromNow()}
       </TooltipContent>
@@ -57,8 +59,6 @@ export interface WarehouseTableStatusListProps {
 }
 
 export const WarehouseTableStatusList = ({ tables }: WarehouseTableStatusListProps) => {
-  const hasSizes = tables.some((table) => table.warehouse_size_bytes !== undefined)
-
   return (
     <Card>
       <CardContent className="p-0 divide-y">
@@ -69,15 +69,14 @@ export const WarehouseTableStatusList = ({ tables }: WarehouseTableStatusListPro
               key={`${table.schema}.${table.name}`}
               className="flex items-center gap-4 px-3 py-2.5"
             >
-              <span className="text-sm font-mono text-foreground flex-1 truncate">
-                {table.schema}.{table.name}
+              <span className="flex-1 truncate text-sm">
+                <span className="text-foreground-lighter">{table.schema}.</span>
+                <span className="text-foreground">{table.name}</span>
               </span>
               <TableLag table={table} />
-              {hasSizes && (
+              {table.warehouse_size_bytes !== undefined && (
                 <span className="text-sm text-foreground-light tabular-nums">
-                  {table.warehouse_size_bytes === undefined
-                    ? '—'
-                    : formatBytes(table.warehouse_size_bytes)}
+                  {formatBytes(table.warehouse_size_bytes)}
                 </span>
               )}
               <Badge variant={badge.variant}>{badge.label}</Badge>
@@ -98,7 +97,8 @@ export const WarehouseReplicatedTablesSection = ({ tables }: WarehouseTableStatu
   <PageSection className="first:pt-0">
     <PageSectionMeta>
       <PageSectionSummary>
-        <PageSectionTitle>Replication status</PageSectionTitle>
+        <PageSectionTitle>Status</PageSectionTitle>
+        <PageSectionDescription>Replication status of the selected tables.</PageSectionDescription>
       </PageSectionSummary>
     </PageSectionMeta>
     <PageSectionContent>
@@ -112,18 +112,28 @@ export interface WarehouseEnablingProgressProps {
 }
 
 export const WarehouseEnablingProgress = ({ status }: WarehouseEnablingProgressProps) => {
-  return (
-    <div>
-      <Admonition
-        type="default"
-        icon={
-          <Loader2 size={16} strokeWidth={1.5} className="animate-spin text-foreground-light" />
-        }
-        description="Setting up your Warehouse — this can take a few minutes while we backfill selected tables."
-        className="mb-5"
-      />
+  const syncedTableCount = status.tables.filter((table) => table.state === 'live').length
+  const progressDescription =
+    status.setup_status === 'setting_up'
+      ? 'Creating the replication pipeline. Connection details appear once the first backfill finishes.'
+      : `Backfilling selected tables. ${syncedTableCount} of ${status.tables.length} tables synced.`
 
-      <WarehouseTableStatusList tables={status.tables} />
-    </div>
+  return (
+    <PageSection className="first:pt-0">
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Status</PageSectionTitle>
+          <PageSectionDescription>Warehouse setup progress.</PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent className="space-y-4">
+        <Admonition
+          type="default"
+          title="Warehouse is being set up"
+          description={progressDescription}
+        />
+        {status.tables.length > 0 && <WarehouseTableStatusList tables={status.tables} />}
+      </PageSectionContent>
+    </PageSection>
   )
 }

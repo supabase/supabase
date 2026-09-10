@@ -41,9 +41,9 @@ describe('Warehouse.utils:isSelectableWarehouseSchema', () => {
     expect(isSelectableWarehouseSchema('analytics')).toBe(true)
   })
 
-  test('includes auth and storage, which hold product data users replicate', () => {
-    expect(isSelectableWarehouseSchema('auth')).toBe(true)
-    expect(isSelectableWarehouseSchema('storage')).toBe(true)
+  test('excludes Supabase-managed product schemas rejected by Warehouse replication', () => {
+    expect(isSelectableWarehouseSchema('auth')).toBe(false)
+    expect(isSelectableWarehouseSchema('storage')).toBe(false)
   })
 
   test("excludes the Warehouse's own DuckLake catalog schema", () => {

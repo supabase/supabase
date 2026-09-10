@@ -3,6 +3,7 @@ import { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { warehouseKeys } from './keys'
+import { setupWarehouseLocalMock } from './warehouse-local-mock'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -15,6 +16,9 @@ export type WarehouseSetupVariables = {
 
 async function setupWarehouse({ projectRef, body }: WarehouseSetupVariables) {
   if (!projectRef) throw new Error('projectRef is required')
+
+  const mock = await setupWarehouseLocalMock({ projectRef, body })
+  if (mock !== undefined) return mock
 
   const { data, error } = await post('/platform/warehouse/{ref}/setup', {
     params: { path: { ref: projectRef } },

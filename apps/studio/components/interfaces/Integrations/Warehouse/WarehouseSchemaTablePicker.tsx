@@ -1,16 +1,19 @@
 import { useParams } from 'common'
-import { ChevronRight } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import {
   Button,
   Card,
   CardContent,
   CardFooter,
-  Checkbox,
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
+  CommandGroup,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+import { MultiSelector } from 'ui-patterns/multi-select'
 import {
   PageSection,
   PageSectionContent,
@@ -24,7 +27,6 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import {
   buildSelectionFromPublicationTables,
   buildWarehouseSetupTargets,
-  getSchemaCheckedState,
   getSchemaTableKey,
   getSelectedTableCount,
   isSelectableWarehouseSchema,
@@ -62,7 +64,9 @@ export const WarehouseSchemaTablePicker = ({
   // `null` until the user touches a checkbox, so the selection seeded from the existing
   // publication can arrive asynchronously without an effect syncing it into state.
   const [selectionOverride, setSelectionOverride] = useState<SchemaTableSelection | null>(null)
-  const [expandedOverrides, setExpandedOverrides] = useState<Record<string, boolean>>({})
+  const [selectionModeOverride, setSelectionModeOverride] = useState<'all' | 'selected' | null>(
+    null
+  )
 
   const {
     data: schemas,
@@ -108,8 +112,6 @@ export const WarehouseSchemaTablePicker = ({
     [publication]
   )
 
-  const selection = selectionOverride ?? initialSelection
-
   const schemasWithTables: SchemaWithTables[] = useMemo(() => {
     if (!schemas || !tables) return []
     return schemas
@@ -121,33 +123,40 @@ export const WarehouseSchemaTablePicker = ({
       .sort((a, b) => a.schema.localeCompare(b.schema))
   }, [schemas, tables])
 
+  const tableKeys = schemasWithTables.flatMap(({ schema, tables }) =>
+    tables.map((table) => getSchemaTableKey(schema, table))
+  )
+  const allTablesSelection = Object.fromEntries(tableKeys.map((key) => [key, true]))
+  const initialSelectedCount = getSelectedTableCount(initialSelection)
+  const areAllTablesInitiallySelected =
+    initialSelectedCount === tableKeys.length && tableKeys.length > 0
+  const initialSelectionMode = !isEditing || areAllTablesInitiallySelected ? 'all' : 'selected'
+  const selectionMode = selectionModeOverride ?? initialSelectionMode
+  const selection =
+    selectionMode === 'all' ? allTablesSelection : (selectionOverride ?? initialSelection)
   const selectedCount = getSelectedTableCount(selection)
+  const selectedTableKeys = tableKeys.filter((key) => selection[key])
 
   const updateSelection = (updater: (current: SchemaTableSelection) => SchemaTableSelection) => {
     setSelectionOverride((prev) => updater(prev ?? initialSelection))
   }
 
-  const toggleTable = (schema: string, table: string) => {
-    const key = getSchemaTableKey(schema, table)
-    updateSelection((current) => ({ ...current, [key]: !current[key] }))
+  const handleSelectionModeChange = (value: string) => {
+    if (value !== 'all' && value !== 'selected') return
+    if (value === 'selected' && selectionOverride === null) {
+      setSelectionOverride({})
+    }
+    setSelectionModeOverride(value)
   }
 
-  const toggleSchema = (schema: SchemaWithTables) => {
-    const allSelected =
-      schema.tables.length > 0 &&
-      schema.tables.every((table) => selection[getSchemaTableKey(schema.schema, table)])
+  const handleSchemaSelection = (schema: SchemaWithTables) => {
+    const keys = schema.tables.map((table) => getSchemaTableKey(schema.schema, table))
+    const areAllSelected = keys.every((key) => selection[key])
 
-    updateSelection((current) => {
-      const next = { ...current }
-      schema.tables.forEach((table) => {
-        next[getSchemaTableKey(schema.schema, table)] = !allSelected
-      })
-      return next
-    })
-  }
-
-  const setExpanded = (schemaName: string, isOpen: boolean) => {
-    setExpandedOverrides((prev) => ({ ...prev, [schemaName]: isOpen }))
+    updateSelection((current) => ({
+      ...current,
+      ...Object.fromEntries(keys.map((key) => [key, !areAllSelected])),
+    }))
   }
 
   const handleSubmit = () => {
@@ -158,7 +167,29 @@ export const WarehouseSchemaTablePicker = ({
 
   // Waiting on the publication too, so the pre-checked selection is in place before the user can
   // start toggling (an early toggle would otherwise pin an override that omits existing tables).
-  if (isSchemasPending || isTablesPending || isSelectionPending) return <GenericSkeletonLoader />
+  if (isSchemasPending || isTablesPending || isSelectionPending) {
+    return (
+      <PageSection className="first:pt-0">
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Tables</PageSectionTitle>
+            <PageSectionDescription>
+              {isEditing
+                ? 'Tables currently replicating are selected. Changes apply on save.'
+                : 'Choose which schemas or tables to replicate. You can change this at any time.'}
+            </PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Card>
+            <CardContent>
+              <GenericSkeletonLoader />
+            </CardContent>
+          </Card>
+        </PageSectionContent>
+      </PageSection>
+    )
+  }
   if (isSchemasError) return <AlertError subject="Failed to load schemas" error={schemasError} />
   if (isTablesError) return <AlertError subject="Failed to load tables" error={tablesError} />
   // Only blocking when editing: a first-time setup starts from an empty selection anyway, so a
@@ -189,75 +220,95 @@ export const WarehouseSchemaTablePicker = ({
           />
         )}
         <Card>
-          <CardContent className="p-0 divide-y">
-            {schemasWithTables.map((schema) => {
-              const keys = schema.tables.map((table) => getSchemaTableKey(schema.schema, table))
-              const checkedCount = keys.filter((key) => selection[key]).length
-              const checkedState = getSchemaCheckedState({
-                selectedCount: checkedCount,
-                totalCount: keys.length,
-              })
-              const isOpen = expandedOverrides[schema.schema] ?? checkedCount > 0
-
-              return (
-                <Collapsible
-                  key={schema.schema}
-                  open={isOpen}
-                  onOpenChange={(open) => setExpanded(schema.schema, open)}
-                >
-                  <div className="flex items-center gap-2 px-3 py-2 bg-surface-75">
-                    <CollapsibleTrigger
-                      aria-label={isOpen ? `Collapse ${schema.schema}` : `Expand ${schema.schema}`}
-                      className="group text-foreground-lighter"
-                    >
-                      <ChevronRight
-                        size={14}
-                        className="transition-transform group-data-[state=open]:rotate-90"
-                      />
-                    </CollapsibleTrigger>
-                    <Checkbox
-                      checked={checkedState}
-                      onCheckedChange={() => toggleSchema(schema)}
-                      disabled={schema.tables.length === 0}
-                      aria-label={`Select all tables in ${schema.schema}`}
-                      // The shared Checkbox only fills itself for `data-state=checked`, so a partial
-                      // selection would otherwise render identically to an empty one. A muted fill
-                      // keeps all three states visually distinct.
-                      className="data-[state=indeterminate]:border-foreground-lighter data-[state=indeterminate]:bg-foreground-lighter"
-                    />
-                    <span className="text-sm font-mono text-foreground">{schema.schema}</span>
-                    <span className="text-xs text-foreground-lighter ml-auto">
-                      {checkedCount}/{keys.length} tables
-                    </span>
-                  </div>
-                  <CollapsibleContent>
-                    {schema.tables.map((table) => {
-                      const key = getSchemaTableKey(schema.schema, table)
-                      return (
-                        <div key={key} className="flex items-center gap-2 pl-10 pr-3 py-2">
-                          <Checkbox
-                            checked={!!selection[key]}
-                            onCheckedChange={() => toggleTable(schema.schema, table)}
-                            aria-label={`Select ${schema.schema}.${table}`}
-                          />
-                          <span className="text-sm font-mono text-foreground-light">{table}</span>
-                        </div>
-                      )
-                    })}
-                    {schema.tables.length === 0 && (
-                      <p className="pl-10 pr-3 py-2 text-sm text-foreground-lighter">
-                        No tables in this schema.
-                      </p>
-                    )}
-                  </CollapsibleContent>
-                </Collapsible>
-              )
-            })}
+          <CardContent>
+            <FormLayout
+              layout="horizontal"
+              label="Tables to replicate"
+              description="Choose whether to replicate every eligible table or only selected tables."
+            >
+              <Select value={selectionMode} onValueChange={handleSelectionModeChange}>
+                <SelectTrigger aria-label="Tables to replicate">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All tables</SelectItem>
+                  <SelectItem value="selected">Selected tables</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormLayout>
           </CardContent>
-          <CardFooter className="justify-between">
-            <span className="text-sm text-foreground-lighter">
-              {selectedCount} table{selectedCount === 1 ? '' : 's'} selected
-            </span>
+          {selectionMode === 'selected' && (
+            <>
+              <CardContent>
+                <FormLayout
+                  layout="horizontal"
+                  label="Selected tables"
+                  description={`${selectedCount} table${selectedCount === 1 ? '' : 's'} selected`}
+                >
+                  <MultiSelector
+                    values={selectedTableKeys}
+                    onValuesChange={(values) => {
+                      const nextValues = new Set(values)
+                      updateSelection(() =>
+                        Object.fromEntries(tableKeys.map((key) => [key, nextValues.has(key)]))
+                      )
+                    }}
+                    className="w-full"
+                  >
+                    <MultiSelector.Trigger
+                      aria-label="Select tables to replicate"
+                      label="Select tables..."
+                      badgeLimit={3}
+                      className="w-full"
+                    />
+                    <MultiSelector.Content>
+                      <MultiSelector.Input placeholder="Search tables..." showResetIcon />
+                      <MultiSelector.List emptyLabel="No tables available">
+                        {schemasWithTables
+                          .filter((schema) => schema.tables.length > 0)
+                          .map((schema) => {
+                            const keys = schema.tables.map((table) =>
+                              getSchemaTableKey(schema.schema, table)
+                            )
+                            const areAllSelected = keys.every((key) => selection[key])
+
+                            return (
+                              <CommandGroup
+                                key={schema.schema}
+                                heading={
+                                  <div className="flex items-center justify-between">
+                                    <span>{schema.schema}</span>
+                                    <Button
+                                      type="button"
+                                      variant="text"
+                                      size="tiny"
+                                      className="font-sans! normal-case! tracking-normal!"
+                                      onClick={() => handleSchemaSelection(schema)}
+                                    >
+                                      {areAllSelected ? 'Clear' : 'Select all'}
+                                    </Button>
+                                  </div>
+                                }
+                              >
+                                {schema.tables.map((table) => {
+                                  const key = getSchemaTableKey(schema.schema, table)
+                                  return (
+                                    <MultiSelector.Item key={key} value={key}>
+                                      {table}
+                                    </MultiSelector.Item>
+                                  )
+                                })}
+                              </CommandGroup>
+                            )
+                          })}
+                      </MultiSelector.List>
+                    </MultiSelector.Content>
+                  </MultiSelector>
+                </FormLayout>
+              </CardContent>
+            </>
+          )}
+          <CardFooter className="justify-end">
             {/*
               An empty selection is a valid request that tears Warehouse down, so submitting one
               from here would destroy a project's Warehouse with no confirmation. Disabling keeps

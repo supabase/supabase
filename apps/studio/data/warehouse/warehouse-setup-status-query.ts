@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { warehouseKeys } from './keys'
+import { getWarehouseLocalMockStatus } from './warehouse-local-mock'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -14,6 +15,9 @@ async function getWarehouseSetupStatus(
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
+
+  const mock = getWarehouseLocalMockStatus(projectRef)
+  if (mock !== undefined) return mock
 
   const { data, error } = await get('/platform/warehouse/{ref}/setup-status', {
     params: { path: { ref: projectRef } },

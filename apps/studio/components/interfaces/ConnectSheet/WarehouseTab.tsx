@@ -9,7 +9,7 @@ import {
   isWarehouseSettingUp,
   type WarehouseSetupStatus,
 } from '../Integrations/Warehouse/Warehouse.utils'
-import { WarehouseConnectSection } from '../Integrations/Warehouse/WarehouseConnectSection'
+import { WarehouseConnectionCard } from '../Integrations/Warehouse/WarehouseConnectSection'
 import { AlertError } from '@/components/ui/AlertError'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
@@ -36,7 +36,7 @@ const getNotProvisionedContent = (setupStatus?: WarehouseSetupStatus) => {
   return {
     type: 'default' as const,
     title: 'Warehouse is not set up',
-    description: 'Choose which schemas or tables to replicate in order to enable Warehouse.',
+    description: 'Choose which schemas or tables to replicate in order to connect to Warehouse.',
     action: 'Choose tables',
   }
 }
@@ -82,5 +82,5 @@ export const WarehouseTab = () => {
     )
   }
 
-  return <WarehouseConnectSection />
+  return <WarehouseConnectionCard variant="sheet" />
 }
