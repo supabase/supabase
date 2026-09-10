@@ -24,17 +24,17 @@ export const SidebarBreadcrumb = ({
   return (
     <>
       <Breadcrumb aria-label={ariaLabel} className="min-w-0 flex-1">
-        <BreadcrumbList className="flex-nowrap gap-1 text-sm sm:gap-1">
+        <BreadcrumbList className="flex-nowrap text-sm sm:gap-x-1">
           {parent && (
             <>
-              <BreadcrumbItem className="min-w-0">
+              <BreadcrumbItem className="min-w-0 leading-none">
                 <BreadcrumbLink
-                  asChild
+                  tabIndex={0}
+                  onClick={parent.onClick}
+                  title={parent.label}
                   className="min-w-0 cursor-pointer truncate no-underline focus-ring"
                 >
-                  <button type="button" tabIndex={0} onClick={parent.onClick} title={parent.label}>
-                    {parent.label}
-                  </button>
+                  {parent.label}
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="shrink-0" />
