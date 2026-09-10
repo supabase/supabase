@@ -7,6 +7,7 @@ import {
   getSchemaCheckedState,
   getSchemaTableKey,
   getSelectedTableCount,
+  isPipelineLimitError,
   isSelectableWarehouseSchema,
   isWarehouseProvisioned,
   isWarehouseSettingUp,
@@ -148,7 +149,7 @@ describe('Warehouse.utils:getSelectedTableCount', () => {
 
 describe('Warehouse.utils:buildWarehouseSetupTargets', () => {
   // The API replaces the previous selection with whatever is sent, so an empty result tears
-  // Warehouse down rather than being a no-op — callers must not submit it unintentionally.
+  // Warehouse down rather than being a no-op. Callers must not submit it unintentionally.
   test('returns an empty array for an empty selection, which is the teardown payload', () => {
     const schemas: SchemaWithTables[] = [{ schema: 'public', tables: ['orders', 'customers'] }]
     expect(buildWarehouseSetupTargets({}, schemas)).toEqual([])
@@ -271,5 +272,19 @@ describe('Warehouse.utils:buildRetryTargets', () => {
   test('returns an empty list when the status recorded no tables', () => {
     expect(buildRetryTargets([])).toEqual([])
     expect(buildRetryTargets()).toEqual([])
+  })
+})
+
+describe('Warehouse.utils:isPipelineLimitError', () => {
+  test('recognises the replication API cap regardless of the limit', () => {
+    expect(isPipelineLimitError('This project has reached its maximum of 1 pipelines')).toBe(true)
+    expect(isPipelineLimitError('This project has reached its maximum of 12 pipelines')).toBe(true)
+  })
+
+  test('ignores unrelated failures', () => {
+    expect(isPipelineLimitError('Project must be active and healthy.')).toBe(false)
+    expect(isPipelineLimitError('The Pipelines API is not configured')).toBe(false)
+    expect(isPipelineLimitError('')).toBe(false)
+    expect(isPipelineLimitError(undefined)).toBe(false)
   })
 })

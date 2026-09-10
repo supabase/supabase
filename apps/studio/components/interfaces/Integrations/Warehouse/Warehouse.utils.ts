@@ -130,3 +130,15 @@ export function buildRetryTargets(
 export type WarehouseCatalogCredentials = NonNullable<
   components['schemas']['WarehouseCatalogResponse']['credentials']
 >
+
+/**
+ * Warehouse provisions a replication pipeline, and projects are capped on how many they may have.
+ * The cap is a feature-flagged value inside the replication API and is not exposed to Studio, so
+ * this recognises the failure after the fact rather than predicting it. Deliberately no
+ * client-side limit constant: guessing one would block the wrong people the moment the cap changes
+ * or Warehouse stops consuming a slot.
+ */
+export function isPipelineLimitError(message?: string): boolean {
+  if (!message) return false
+  return /maximum of \d+ pipelines/i.test(message)
+}

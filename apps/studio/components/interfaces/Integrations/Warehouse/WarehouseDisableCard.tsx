@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button, Card, CardContent } from 'ui'
-import { TextConfirmModal } from 'ui-patterns/Dialogs/TextConfirmModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import {
   PageSection,
@@ -47,7 +47,7 @@ export const WarehouseDisableCard = () => {
             <FormLayout
               layout="flex-row-reverse"
               label="Disable Warehouse for this project"
-              description="Stops replication and removes the Warehouse pipeline, publication, catalog access, and foreign tables."
+              description="Stops replication and removes the Warehouse pipeline, publication, catalog access, and foreign tables. Data already copied to DuckLake is kept in storage."
             >
               <Button variant="danger" onClick={() => setIsConfirming(true)}>
                 Disable Warehouse
@@ -57,15 +57,17 @@ export const WarehouseDisableCard = () => {
         </Card>
       </PageSectionContent>
 
-      <TextConfirmModal
+      {/*
+        A plain confirmation rather than type-to-confirm: nothing is destroyed. Replication stops
+        and the infrastructure is removed, but the copied DuckLake data stays in storage.
+      */}
+      <ConfirmationModal
         variant="destructive"
         visible={isConfirming}
         loading={setupMutation.isPending}
         title="Disable Warehouse"
         confirmLabel="Disable Warehouse"
-        confirmPlaceholder="Type the project ref to confirm"
-        confirmString={projectRef ?? ''}
-        text="Disabling Warehouse stops replication and removes its pipeline, publication, catalog access, and foreign tables."
+        description="Replication stops and the Warehouse pipeline, publication, catalog access, and foreign tables are removed. Data already copied to DuckLake is kept in storage."
         alert={{
           title: 'Analytical tools will lose access',
           description:
