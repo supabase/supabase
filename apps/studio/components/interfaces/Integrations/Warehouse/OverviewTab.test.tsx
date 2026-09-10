@@ -127,7 +127,7 @@ describe('WarehouseOverviewTab', () => {
     // Nothing is destroyed, so this is a plain confirmation rather than type-to-confirm. The copy
     // has to keep saying so.
     const dialog = await screen.findByRole('dialog')
-    expect(dialog).toHaveTextContent('Data already copied to DuckLake is kept in storage.')
+    expect(dialog).toHaveTextContent('Copied data stays in storage')
     expect(screen.queryByPlaceholderText('Type the project ref to confirm')).not.toBeInTheDocument()
 
     fireEvent.click(within(dialog).getByRole('button', { name: 'Disable Warehouse' }))
