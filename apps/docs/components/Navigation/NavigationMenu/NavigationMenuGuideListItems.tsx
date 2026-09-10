@@ -43,9 +43,10 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
   const { resolvedTheme } = useTheme()
   const activeItem = props.subItem.url === pathname
   const activeItemRef = useRef<HTMLLIElement>(null)
+  const hasChildren = props.subItem.items && props.subItem.items.length > 0
 
   const isChildActive =
-    props.subItem.items &&
+    hasChildren &&
     props.subItem.items.some((child: NavAccordionItem) => hasActiveDescendant(child, pathname))
 
   const LinkContainer = (props) => {
@@ -73,16 +74,8 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
     }
   })
   return (
-    <>
-      {props.subItemIndex === 0 && (
-        <>
-          <div className="h-px w-full bg-border my-3"></div>
-          <span className="font-mono text-xs uppercase text-foreground font-medium tracking-wider">
-            {props.parent.name}
-          </span>
-        </>
-      )}
-      {props.subItem.items && props.subItem.items.length > 0 ? (
+    <li ref={!hasChildren && activeItem ? activeItemRef : null}>
+      {hasChildren ? (
         <Accordion.Root
           collapsible
           type="single"
@@ -115,67 +108,60 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               </span>
             </Accordion.Trigger>
             <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
-              {props.subItem.items
-                .filter((subItem) => subItem.enabled !== false)
-                .map((subSubItem) => {
-                  if (subSubItem.items && subSubItem.items.length > 0) {
-                    return (
-                      <ContentAccordionLink
-                        key={subSubItem.name}
-                        subItem={subSubItem}
-                        subItemIndex={-1}
-                        parent={props.subItem}
-                      />
-                    )
-                  }
+              <ul>
+                {props.subItem.items
+                  .filter((subItem) => subItem.enabled !== false)
+                  .map((subSubItem) => {
+                    if (subSubItem.items && subSubItem.items.length > 0) {
+                      return <ContentAccordionLink key={subSubItem.name} subItem={subSubItem} />
+                    }
 
-                  return (
-                    <li key={`${props.subItem.name}-${subSubItem.url}`}>
-                      <Link
-                        href={`${subSubItem.url}`}
-                        className={[
-                          'cursor-pointer transition text-sm',
-                          subSubItem.url === pathname
-                            ? 'text-brand-link'
-                            : 'hover:text-brand-link text-foreground-lighter',
-                        ].join(' ')}
-                      >
-                        {subSubItem.name}
-                      </Link>
-                    </li>
-                  )
-                })}
+                    return (
+                      <li key={`${props.subItem.name}-${subSubItem.url}`}>
+                        <Link
+                          href={`${subSubItem.url}`}
+                          className={[
+                            'cursor-pointer transition text-sm',
+                            subSubItem.url === pathname
+                              ? 'text-brand-link'
+                              : 'hover:text-brand-link text-foreground-lighter',
+                          ].join(' ')}
+                        >
+                          {subSubItem.name}
+                        </Link>
+                      </li>
+                    )
+                  })}
+              </ul>
             </Accordion.Content>
           </Accordion.Item>
         </Accordion.Root>
       ) : (
-        <li key={props.subItem.name} ref={activeItem ? activeItemRef : null}>
-          <LinkContainer
-            url={props.subItem.url}
-            className={[
-              'flex items-center gap-2',
-              'cursor-pointer transition text-sm',
-              activeItem
-                ? 'text-brand-link font-medium'
-                : 'hover:text-foreground text-foreground-lighter',
-            ].join(' ')}
-            parent={props.subItem.parent}
-          >
-            <div className="flex items-center gap-2">
-              {props.subItem.icon && (
-                <Image
-                  alt={props.subItem.name}
-                  src={`${props.subItem.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
-                  width={15}
-                  height={15}
-                />
-              )}
-              {props.subItem.name}
-            </div>
-          </LinkContainer>
-        </li>
+        <LinkContainer
+          url={props.subItem.url}
+          className={[
+            'flex items-center gap-2',
+            'cursor-pointer transition text-sm',
+            activeItem
+              ? 'text-brand-link font-medium'
+              : 'hover:text-foreground text-foreground-lighter',
+          ].join(' ')}
+          parent={props.subItem.parent}
+        >
+          <div className="flex items-center gap-2">
+            {props.subItem.icon && (
+              <Image
+                alt={props.subItem.name}
+                src={`${props.subItem.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
+                width={15}
+                height={15}
+              />
+            )}
+            {props.subItem.name}
+          </div>
+        </LinkContainer>
       )}
-    </>
+    </li>
   )
 })
 
@@ -210,7 +196,7 @@ const Content = (props) => {
   }
 
   return (
-    <ul className={['relative w-full flex flex-col gap-0 pb-5'].join(' ')}>
+    <div className="relative w-full flex flex-col gap-0 pb-5">
       <Link href={menu.url ?? ''}>
         <div className="flex items-center gap-3 my-3 text-brand-link">
           <MenuIconPicker icon={menu.icon} />
@@ -218,33 +204,35 @@ const Content = (props) => {
         </div>
       </Link>
 
-      {menu.items
-        .filter((item) => item.enabled !== false)
-        .map((x) => {
-          return (
-            <div key={x.name}>
-              {x.items && x.items.length > 0 ? (
+      <ul data-testid="docs-guide-navigation-list" className="flex flex-col gap-0">
+        {menu.items.map((x) => {
+          if (x.enabled === false) return null
+
+          if (x.items && x.items.length > 0) {
+            const enabledItems = x.items.filter((item) => item.enabled !== false)
+            if (enabledItems.length === 0) return null
+
+            return (
+              <li key={x.name}>
                 <div className="flex flex-col gap-2.5">
-                  {x.items
-                    .filter((item) => item.enabled !== false)
-                    .map((subItem, subItemIndex) => {
-                      return (
-                        <ContentAccordionLink
-                          key={subItem.name}
-                          subItem={subItem}
-                          subItemIndex={subItemIndex}
-                          parent={x}
-                        />
-                      )
+                  <div className="h-px w-full bg-border my-3"></div>
+                  <span className="font-mono text-xs uppercase text-foreground font-medium tracking-wider">
+                    {x.name}
+                  </span>
+                  <ul className="flex flex-col gap-2.5">
+                    {enabledItems.map((subItem) => {
+                      return <ContentAccordionLink key={subItem.name} subItem={subItem} />
                     })}
+                  </ul>
                 </div>
-              ) : x.url ? (
-                <ContentLink url={x.url} icon={x.icon} name={x.name} key={x.name} />
-              ) : null}
-            </div>
-          )
+              </li>
+            )
+          }
+
+          return x.url ? <ContentLink url={x.url} icon={x.icon} name={x.name} key={x.name} /> : null
         })}
-    </ul>
+      </ul>
+    </div>
   )
 }
 
