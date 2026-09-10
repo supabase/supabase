@@ -97,11 +97,11 @@ export const UnifiedLogs = () => {
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
   const showMultigresLogs = useShowMultigresLogs()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
-  const workersEnabled = !!useFlag('workers')
+  const computeEnabled = !!useFlag('compute')
   const workersAvailability = getWorkersLogsAvailability({
     isPlatform: IS_PLATFORM,
     flagsLoaded,
-    workersEnabled,
+    workersEnabled: computeEnabled,
   })
   const visibleSearchFilters = gateLogTypeFilters(search.filter, {
     multigres: showMultigresLogs,

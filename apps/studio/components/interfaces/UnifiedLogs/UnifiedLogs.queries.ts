@@ -13,7 +13,7 @@ import {
   safeSql,
   type SafeLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
-import { WORKER_LOG_SOURCES } from '@/lib/constants/workers'
+import { WORKER_LOG_SOURCES } from '@/lib/constants/compute'
 
 // Operator fragments for SQL emission. `safeSql` rejects plain strings, so we
 // pre-brand the keywords we want to switch between.
