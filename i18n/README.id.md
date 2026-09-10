@@ -66,7 +66,7 @@ Anda juga bisa [menghosting sendiri](https://supabase.com/docs/guides/hosting/ov
 - [pg_graphql](http://github.com/supabase/pg_graphql/) ekstensi PostgreSQL yang mengekspos API GraphQL
 - [Storage](https://github.com/supabase/storage-api) menyediakan antarmuka RESTful untuk mengelola File yang disimpan di S3, menggunakan Postgres untuk mengelola izin.
 - [postgres-meta](https://github.com/supabase/postgres-meta) adalah API RESTful untuk mengelola Postgres Anda, yang memungkinkan Anda untuk mengambil tabel, menambahkan peran, dan menjalankan kueri, dll.
-- [GoTrue](https://github.com/netlify/gotrue) adalah API berbasis SWT untuk mengelola pengguna dan menerbitkan token SWT.
+- [GoTrue](https://github.com/supabase/gotrue) adalah API berbasis JWT untuk mengelola pengguna dan menerbitkan token JWT.
 - [Kong](https://github.com/Kong/kong) adalah gateway API asli cloud.
 
 #### Perpustakaan klien

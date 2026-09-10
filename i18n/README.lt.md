@@ -66,7 +66,7 @@ Taip pat galite [savarankiškai talpinti](https://supabase.com/docs/guides/hosti
 - [pg_graphql](http://github.com/supabase/pg_graphql/) - "PostgreSQL" plėtinys, kuris atveria GraphQL API
 - [Storage](https://github.com/supabase/storage-api) - tai REST sąsaja, skirta S3 saugomiems failams valdyti, naudojant "Postgres" leidimams valdyti.
 - [postgres-meta](https://github.com/supabase/postgres-meta) - tai RESTful API, skirta "Postgres" valdymui, leidžianti gauti lenteles, pridėti vaidmenis, vykdyti užklausas ir t. t.
-- [GoTrue](https://github.com/netlify/gotrue) yra SWT pagrįsta API, skirta naudotojams valdyti ir SWT žetonams išduoti.
+- [GoTrue](https://github.com/supabase/gotrue) yra JWT pagrįsta API, skirta naudotojams valdyti ir JWT žetonams išduoti.
 - [Kong](https://github.com/Kong/kong) - tai debesijos API vartai.
 
 #### Kliento bibliotekos

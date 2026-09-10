@@ -64,7 +64,7 @@
 - [PostgREST](http://postgrest.org/) एक वेब सर्वर है जो आपके पोस्टग्रेससीक्यूएल डेटाबेस को सीधे RESTful एपीआई में बदल देता है
 - [Storage](https://github.com/supabase/storage-api) अनुमतियाँ प्रबंधित करने के लिए पोस्टग्रेस का उपयोग करके S3 में संग्रहीत फ़ाइलों के प्रबंधन के लिए एक RESTful इंटरफ़ेस प्रदान करता है।
 - [postgres-meta](https://github.com/supabase/postgres-meta) आपके पोस्टग्रेज के प्रबंधन के लिए एक RESTful एपीआई है, जिससे आप टेबल प्राप्त कर सकते हैं, भूमिकाएँ जोड़ सकते हैं और क्वेरीज़ आदि चला सकते हैं।
-- [GoTrue](https://github.com/netlify/gotrue) उपयोगकर्ताओं को प्रबंधित करने और SWT टोकन जारी करने के लिए एक SWT आधारित एपीआई है।
+- [GoTrue](https://github.com/supabase/gotrue) उपयोगकर्ताओं को प्रबंधित करने और JWT टोकन जारी करने के लिए एक JWT आधारित एपीआई है।
 - [Kong](https://github.com/Kong/kong) एक क्लाउड-नेटिव एपीआई गेटवे है।
 
 #### मुवक्किल लाइब्रेरीज़

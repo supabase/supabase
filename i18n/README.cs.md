@@ -66,7 +66,7 @@ Můžete také [hostovat sami](https://supabase.com/docs/guides/hosting/overview
 - [pg_graphql](http://github.com/supabase/pg_graphql/) je rozšíření PostgreSQL, které vystavuje rozhraní GraphQL API
 - [Storage](https://github.com/supabase/storage-api) poskytuje rozhraní RESTful pro správu souborů uložených v S3, přičemž ke správě oprávnění využívá Postgres.
 - [Postgres-meta](https://github.com/supabase/postgres-meta) je rozhraní RESTful API pro správu Postgresu, které umožňuje načítat tabulky, přidávat role, spouštět dotazy atd.
-- [GoTrue](https://github.com/netlify/gotrue) je rozhraní API založené na SWT pro správu uživatelů a vydávání tokenů SWT.
+- [GoTrue](https://github.com/supabase/gotrue) je rozhraní API založené na JWT pro správu uživatelů a vydávání tokenů JWT.
 - [Kong](https://github.com/Kong/kong) je cloudová brána API.
 
 klientské knihovny ####
