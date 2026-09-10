@@ -1,3 +1,9 @@
+import { useState, useEffect } from 'react'
+import './App.css'
+import { supabase } from './supabaseClient'
+import Auth from './Auth'
+import Account from './Account'
+
 function App() {
   const [claims, setClaims] = useState(null)
 
@@ -26,3 +32,5 @@ function App() {
     </div>
   )
 }
+
+export default App
