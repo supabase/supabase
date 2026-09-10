@@ -613,14 +613,16 @@ export default function FormPatternsPageLayout() {
                           values={field.value}
                           size="small"
                         >
-                          <MultiSelectorTrigger
-                            mode="inline-combobox"
-                            label="Select options..."
-                            badgeLimit="wrap"
-                            showIcon={false}
-                            deletableBadge
-                            className="w-full"
-                          />
+                          <FormControl>
+                            <MultiSelectorTrigger
+                              mode="inline-combobox"
+                              label="Select options..."
+                              badgeLimit="wrap"
+                              showIcon={false}
+                              deletableBadge
+                              className="w-full"
+                            />
+                          </FormControl>
                           <MultiSelectorContent>
                             <MultiSelectorList>
                               <MultiSelectorItem value="public">public</MultiSelectorItem>
@@ -675,23 +677,23 @@ export default function FormPatternsPageLayout() {
                         label="Date Picker"
                         description="Date selection with calendar popover"
                       >
-                        <FormControl>
-                          <DatePicker>
+                        <DatePicker>
+                          <FormControl>
                             <DatePickerTrigger asChild>
                               <DatePickerButton block isInvalid={fieldState.invalid}>
                                 {field.value ? format(field.value, 'PPP') : 'Pick a date'}
                               </DatePickerButton>
                             </DatePickerTrigger>
-                            <DatePickerContent>
-                              <Calendar
-                                mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                initialFocus
-                              />
-                            </DatePickerContent>
-                          </DatePicker>
-                        </FormControl>
+                          </FormControl>
+                          <DatePickerContent>
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              initialFocus
+                            />
+                          </DatePickerContent>
+                        </DatePicker>
                       </FormItemLayout>
                     )}
                   />

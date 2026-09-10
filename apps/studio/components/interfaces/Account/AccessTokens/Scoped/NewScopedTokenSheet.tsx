@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -12,7 +12,7 @@ import {
 
 import { selectionToScopes } from '../AccessToken.permissions'
 import { ExperimentalTokenDropdown } from '../Classic/ExperimentalTokenDropdown'
-import { NewScopedTokenForm } from './Form/NewScopedTokenForm'
+import { NewScopedTokenForm, type NewScopedTokenFormHandle } from './Form/NewScopedTokenForm'
 import { getExpiryDate, type TokenFormValues } from './Form/NewScopedTokenForm.utils'
 import { NewScopedTokenSuccess } from './Form/NewScopedTokenSuccess'
 import { TokenDocsButtons } from './TokenDocsButtons'
@@ -35,6 +35,7 @@ interface NewScopedTokenSheetProps {
 export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedTokenSheetProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const track = useTrack()
+  const formRef = useRef<NewScopedTokenFormHandle>(null)
   const { mutate: createToken, isPending: isCreatingScopedToken } =
     useScopedAccessTokenCreateMutation()
   const { mutate: createClassicToken, isPending: isCreatingClassicToken } =
@@ -42,12 +43,15 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
 
   const [step, setStep] = useState<'form' | 'success'>('form')
   const [createdToken, setCreatedToken] = useState<
-    NewScopedAccessToken | NewAccessToken | undefined
+    { token: NewScopedAccessToken | NewAccessToken; tokenType: 'classic' | 'scoped' } | undefined
   >()
 
-  const showCreatedToken = (data: NewScopedAccessToken | NewAccessToken) => {
+  const showCreatedToken = (
+    data: NewScopedAccessToken | NewAccessToken,
+    tokenType: 'classic' | 'scoped'
+  ) => {
     toast.success('Access token created successfully')
-    setCreatedToken(data)
+    setCreatedToken({ token: data, tokenType })
     setStep('success')
   }
 
@@ -66,7 +70,7 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
               expiryPreset: values.expiresAt,
               resourceAccess: 'account',
             })
-            showCreatedToken(data)
+            showCreatedToken(data, 'classic')
           },
         }
       )
@@ -94,8 +98,18 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
           resourceAccess: values.resourceAccess,
           permissionCount: permissions.length,
         })
-        showCreatedToken(data)
+        showCreatedToken(data, 'scoped')
       },
+    })
+  }
+
+  const trackDismissed = (trigger: 'user' | 'permissions_load_error') => {
+    const abandonmentContext = formRef.current?.getAbandonmentContext()
+    track('access_token_creation_sheet_dismissed', {
+      resourceAccess: abandonmentContext?.resourceAccess ?? 'project',
+      formStep: abandonmentContext?.formStep ?? 'form',
+      isFormTouched: abandonmentContext?.isFormTouched ?? false,
+      trigger,
     })
   }
 
@@ -103,8 +117,14 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
   // as we need to make sure they copied the new token first
   const handleOpenChange = (open: boolean, isSafe = false) => {
     if (open === false && step === 'success' && !isSafe) return
+    if (open === false && !isSafe) trackDismissed('user')
     setStep('form')
     setIsOpen(open)
+  }
+
+  const handlePermissionsLoadError = () => {
+    trackDismissed('permissions_load_error')
+    handleOpenChange(false, true)
   }
 
   return (
@@ -134,15 +154,17 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
         </SheetHeader>
         {step === 'success' && createdToken ? (
           <NewScopedTokenSuccess
-            tokenName={createdToken.name}
-            tokenValue={createdToken.token}
+            tokenName={createdToken.token.name}
+            tokenValue={createdToken.token.token}
+            tokenType={createdToken.tokenType}
             onClose={() => handleOpenChange(false, true)}
           />
         ) : (
           <NewScopedTokenForm
+            ref={formRef}
             isPending={isCreatingScopedToken || isCreatingClassicToken}
             onCreateToken={handleCreate}
-            onCancel={() => handleOpenChange(false, true)}
+            onCancel={handlePermissionsLoadError}
           />
         )}
       </SheetContent>

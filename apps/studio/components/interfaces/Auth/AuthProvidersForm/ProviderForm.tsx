@@ -291,6 +291,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                   Cancel
                 </Button>
                 <ButtonTooltip
+                  variant="primary"
                   form={formId}
                   type="submit"
                   loading={isUpdatingConfig}

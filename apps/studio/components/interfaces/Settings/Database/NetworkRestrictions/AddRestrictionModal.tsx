@@ -267,7 +267,13 @@ const AddRestrictionModal = ({
             <Button variant="default" disabled={isApplying} onClick={() => onClose()}>
               Cancel
             </Button>
-            <Button form={formId} type="submit" loading={isApplying} disabled={isApplying}>
+            <Button
+              variant="primary"
+              form={formId}
+              type="submit"
+              loading={isApplying}
+              disabled={isApplying}
+            >
               Save restriction
             </Button>
           </DialogFooter>

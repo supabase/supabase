@@ -40,7 +40,9 @@ export default function DialogDemo() {
           </div>
         </DialogSection>
         <DialogFooter>
-          <Button type="submit">Save changes</Button>
+          <Button variant="primary" type="submit">
+            Save changes
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

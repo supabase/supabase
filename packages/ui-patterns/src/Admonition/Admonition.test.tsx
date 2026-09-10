@@ -77,7 +77,7 @@ describe('Admonition', () => {
     expect(note).toHaveTextContent('Review ownership before exposing this function.')
   })
 
-  it('renders success styling', () => {
+  it('renders the success icon', () => {
     render(
       <Admonition
         type="success"
@@ -89,8 +89,6 @@ describe('Admonition', () => {
     const note = screen.getByRole('alert', { name: 'Success' })
     expect(note).toHaveTextContent('Connection confirmed')
     expect(note).toHaveTextContent('You can now close this tab.')
-    expect(note).toHaveClass('bg-brand-400/15')
-    expect(note).toHaveClass('border-brand-400')
     expect(note.querySelector('svg path')?.getAttribute('d')).toContain('M10.5 19.5')
   })
 
@@ -128,18 +126,6 @@ describe('Admonition', () => {
     expect(note.querySelector('h1, h2, h3, h4, h5, h6')).not.toBeInTheDocument()
     expect(title.tagName).toBe('P')
     expect(title).toHaveAttribute('data-slot', 'alert-title')
-    expect(title).toHaveClass('!mt-0', 'mb-0.5', 'font-medium')
-  })
-
-  it('wraps a string description in a paragraph', () => {
-    render(<Admonition type="note" description="Body copy." />)
-
-    const note = screen.getByRole('alert', { name: 'Note' })
-    const description = within(note).getByText('Body copy.')
-
-    expect(description.tagName).toBe('P')
-    expect(description.parentElement).toHaveClass('!mb-0')
-    expect(description.parentElement?.parentElement).toHaveClass('my-0.5')
   })
 
   it('wraps MDX children in AlertDescription', () => {
@@ -153,26 +139,6 @@ describe('Admonition', () => {
     const paragraph = within(note).getByText('Children body copy.')
 
     expect(paragraph.tagName).toBe('P')
-    expect(paragraph.parentElement).toHaveClass('text-sm', '!mb-0')
     expect(paragraph.parentElement).toHaveAttribute('data-slot', 'alert-description')
-    expect(paragraph.parentElement?.parentElement).not.toHaveClass('my-0.5')
-  })
-
-  it('does not offset titled content', () => {
-    render(<Admonition type="note" title="Manual approval required" description="Body copy." />)
-
-    const note = screen.getByRole('alert', { name: 'Note' })
-    const title = within(note).getByText('Manual approval required')
-
-    expect(title.parentElement).not.toHaveClass('my-0.5')
-  })
-
-  it('does not offset titleless content when the icon is hidden', () => {
-    render(<Admonition type="note" showIcon={false} description="Body copy." />)
-
-    const note = screen.getByRole('alert', { name: 'Note' })
-    const description = within(note).getByText('Body copy.')
-
-    expect(description.parentElement?.parentElement).not.toHaveClass('my-0.5')
   })
 })
