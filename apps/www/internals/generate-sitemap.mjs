@@ -1,6 +1,68 @@
 import { readFileSync, writeFileSync } from 'fs'
 import { globby } from 'globby'
+import matter from 'gray-matter'
 import prettier from 'prettier'
+
+const DATED_COLLECTIONS = ['_blog/', '_alternatives/', '_customers/']
+const ISO_DATE_SHAPE =
+  /^(\d{4}-\d{2}-\d{2})(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)?$/
+const RSS_PUB_DATE_SHAPE = /^[A-Z][a-z]{2}, \d{2} [A-Z][a-z]{2} \d{4} \d{2}:\d{2}:\d{2} \+0000$/
+
+function lastmodError(source, value, hint = '') {
+  const shown = value instanceof Date ? String(value) : JSON.stringify(value)
+  return new Error(`${source}: cannot derive lastmod from date value ${shown}${hint}`)
+}
+
+function toIsoDate(value, source) {
+  let candidate
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) throw lastmodError(source, value)
+    const hasTimePart =
+      value.getUTCHours() !== 0 ||
+      value.getUTCMinutes() !== 0 ||
+      value.getUTCSeconds() !== 0 ||
+      value.getUTCMilliseconds() !== 0
+    if (hasTimePart) throw lastmodError(source, value, "; quote it as a date-only 'YYYY-MM-DD'")
+    candidate = value.toISOString().slice(0, 10)
+  } else if (typeof value === 'string') {
+    const match = ISO_DATE_SHAPE.exec(value)
+    if (!match) throw lastmodError(source, value)
+    candidate = match[1]
+  } else {
+    throw lastmodError(source, value)
+  }
+  const roundTrip = new Date(`${candidate}T00:00:00Z`)
+  if (Number.isNaN(roundTrip.getTime()) || roundTrip.toISOString().slice(0, 10) !== candidate) {
+    throw lastmodError(source, value, '; not a real calendar day')
+  }
+  return candidate
+}
+
+function contentLastmod(filePath) {
+  const { data } = matter(readFileSync(filePath, 'utf-8'))
+  const value = data.updated ?? data.date
+  if (value === undefined || value === null) return undefined
+  return toIsoDate(value, filePath)
+}
+
+function changelogLastmod(pubDate, link) {
+  const source = `changelog-rss ${link}`
+  if (!RSS_PUB_DATE_SHAPE.test(pubDate)) {
+    throw new Error(`${source}: unparseable pubDate ${JSON.stringify(pubDate)}`)
+  }
+  return toIsoDate(new Date(pubDate), source)
+}
+
+function urlEntry(loc, lastmod) {
+  return `
+        <url>
+            <loc>${loc}</loc>
+            ${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}
+            <changefreq>weekly</changefreq>
+            <priority>0.5</priority>
+        </url>
+      `
+}
 
 async function generate() {
   const prettierConfig = await prettier.resolveConfig('./.prettierrc.js')
@@ -106,50 +168,37 @@ async function generate() {
         route = `/${eventsUrl}/` + substring
       }
 
-      return `
-        <url>
-            <loc>${`https://supabase.com${route}`}</loc>
-            <changefreq>weekly</changefreq>
-            <priority>0.5</priority>
-        </url>
-      `
+      const lastmod = DATED_COLLECTIONS.some((prefix) => page.startsWith(prefix))
+        ? contentLastmod(page)
+        : undefined
+
+      return urlEntry(`https://supabase.com${route}`, lastmod)
     })
     .filter(Boolean)
 
   // Changelog detail pages are dynamic routes; include them from generated changelog RSS links.
   const changelogDetailUrls = (() => {
+    let rss
     try {
-      const rss = readFileSync('public/changelog-rss.xml', 'utf-8')
-      const matches = [
-        ...rss.matchAll(/<link>(https:\/\/supabase\.com\/changelog\/\d+[^<]*)<\/link>/g),
-      ]
-      const uniqueUrls = [...new Set(matches.map((match) => match[1]))]
-
-      return uniqueUrls.map(
-        (url) => `
-        <url>
-            <loc>${url}</loc>
-            <changefreq>weekly</changefreq>
-            <priority>0.5</priority>
-        </url>
-      `
-      )
+      rss = readFileSync('public/changelog-rss.xml', 'utf-8')
     } catch {
       return []
     }
+
+    const lastmodByUrl = new Map()
+    for (const [, item] of rss.matchAll(/<item>([\s\S]*?)<\/item>/g)) {
+      const link = item.match(/<link>(https:\/\/supabase\.com\/changelog\/\d+[^<]*)<\/link>/)?.[1]
+      if (!link || lastmodByUrl.has(link)) continue
+      const pubDate = item.match(/<pubDate>([^<]*)<\/pubDate>/)?.[1]
+      lastmodByUrl.set(link, pubDate ? changelogLastmod(pubDate, link) : undefined)
+    }
+
+    return [...lastmodByUrl].map(([url, lastmod]) => urlEntry(url, lastmod))
   })()
 
   // /evals is a separate app proxied onto supabase.com via a rewrite in lib/rewrites.js,
   // so it has no page file for the globs above to find. Hardcode it here.
-  const proxiedAppUrls = [
-    `
-        <url>
-            <loc>https://supabase.com/evals</loc>
-            <changefreq>weekly</changefreq>
-            <priority>0.5</priority>
-        </url>
-      `,
-  ]
+  const proxiedAppUrls = [urlEntry('https://supabase.com/evals')]
 
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
