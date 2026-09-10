@@ -142,15 +142,15 @@ export const WorkersList = ({
       </div>
 
       <Card>
-        <Table>
+        <Table className="table-fixed">
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-              <TableHead>State</TableHead>
-              <TableHead>Runtime</TableHead>
-              <TableHead>Access</TableHead>
-              <TableHead className="hidden xl:table-cell">Region</TableHead>
-              <TableHead className="hidden lg:table-cell">Resources</TableHead>
+              <TableHead className="w-36">State</TableHead>
+              <TableHead className="w-40">Runtime</TableHead>
+              <TableHead className="w-28">Access</TableHead>
+              <TableHead className="hidden w-20 xl:table-cell">Region</TableHead>
+              <TableHead className="hidden w-48 lg:table-cell">Resources</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -167,28 +167,32 @@ export const WorkersList = ({
                 className="cursor-pointer"
                 onClick={() => router.push(workerPagePath(worker.name))}
               >
-                <TableCell className="font-medium text-foreground">
-                  <Link href={workerPagePath(worker.name)} onClick={(e) => e.stopPropagation()}>
+                <TableCell className="max-w-0 font-medium text-foreground">
+                  <Link
+                    href={workerPagePath(worker.name)}
+                    className="block truncate"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     {worker.name}
                   </Link>
                 </TableCell>
-                <TableCell>
+                <TableCell className="w-36">
                   <WorkerStatePill worker={worker} />
                 </TableCell>
-                <TableCell>
+                <TableCell className="w-40 truncate">
                   <RuntimeBadge runtime={worker.runtime} />
                 </TableCell>
-                <TableCell>
+                <TableCell className="w-28">
                   {worker.access === 'public' ? (
                     <Badge variant="success">Public</Badge>
                   ) : (
                     <Badge>Private</Badge>
                   )}
                 </TableCell>
-                <TableCell className="hidden text-foreground-light xl:table-cell">
+                <TableCell className="hidden w-20 truncate text-foreground-light xl:table-cell">
                   {WORKERS_REGION_SHORT}
                 </TableCell>
-                <TableCell className="hidden text-foreground-light lg:table-cell">
+                <TableCell className="hidden w-48 truncate text-foreground-light lg:table-cell">
                   {formatResources(worker)}
                 </TableCell>
               </TableRow>
