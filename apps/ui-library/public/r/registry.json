@@ -1792,11 +1792,6 @@
           "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/index.ts",
           "type": "registry:file",
           "target": "~/supabase/functions/mcp-server/tools/index.ts"
-        },
-        {
-          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/oauth.ts",
-          "type": "registry:file",
-          "target": "~/supabase/functions/mcp-server/oauth.ts"
         }
       ]
     },
@@ -1884,11 +1879,6 @@
           "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/whoami.ts",
           "type": "registry:file",
           "target": "~/supabase/functions/mcp-server/tools/whoami.ts"
-        },
-        {
-          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/oauth.ts",
-          "type": "registry:file",
-          "target": "~/supabase/functions/mcp-server/oauth.ts"
         },
         {
           "path": "registry/default/clients/tanstack/lib/supabase/client.ts",

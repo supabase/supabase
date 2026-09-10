@@ -31,7 +31,7 @@ try {
 
   for (const args of [
     ['check', '--frozen', 'index.ts'],
-    ['test', '--frozen', '--allow-env=SUPABASE_PUBLIC_URL', 'tasks.test.ts'],
+    ['test', '--frozen', 'tasks.test.ts'],
   ]) {
     const result = spawnSync('deno', args, { cwd: functionRoot, stdio: 'inherit' })
     if (result.error) throw result.error
