@@ -597,7 +597,7 @@ export async function getMockTools(overrides: MockToolOverrides | undefined) {
   const mockedStudioTools = createMockedStudioTools()
   const notebookStore = createMockNotebookStore()
 
-  const search_docs = createSearchDocsTool()
+  const search_docs = await createSearchDocsTool()
 
   const tools = {
     ...mockedStudioTools,

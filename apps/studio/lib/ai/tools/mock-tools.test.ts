@@ -32,7 +32,9 @@ describe('ai/tools/mock-tools getMockTools', () => {
   // (drops it from getMockTools, or createSearchDocsTool breaks), fail loudly
   // in normal CI instead of only surfacing during an opt-in Braintrust eval run.
   it('throws a clear error when search_docs is missing from the harness tools', async () => {
-    vi.mocked(createSearchDocsTool).mockReturnValueOnce(undefined as any)
+    vi.mocked(createSearchDocsTool).mockResolvedValueOnce(
+      undefined as unknown as SearchDocsToolModule.SearchDocsTool
+    )
 
     await expect(getMockTools(undefined)).rejects.toThrow(
       'search_docs tool is missing from the eval harness'
