@@ -33,6 +33,7 @@
 |                                  | Read-write      | [Update action run status](/docs/reference/api/v1-update-action-run-status)                                         |
 | Advisors                         | Read            | [Get performance advisors](/docs/reference/api/v1-get-performance-advisors)                                         |
 |                                  |                 | [Get security advisors](/docs/reference/api/v1-get-security-advisors)                                               |
+|                                  |                 | [Run project advisors](/docs/reference/api/v2-run-project-advisors)                                                 |
 | Analytics Config                 | Read            | [List log drains](/docs/reference/api/v2-list-log-drains)                                                           |
 |                                  | Read-write      | [Create log drain](/docs/reference/api/v2-create-log-drain)                                                         |
 |                                  |                 | [Delete log drain](/docs/reference/api/v2-delete-log-drain)                                                         |
@@ -157,6 +158,7 @@
 |                                  |                 | [Get a branch config](/docs/reference/api/v1-get-a-branch-config)                                                   |
 |                                  |                 | [List all branches](/docs/reference/api/v1-list-all-branches)                                                       |
 |                                  | Read-write      | [Create a branch](/docs/reference/api/v1-create-a-branch)                                                           |
+|                                  |                 | [Create a branch](/docs/reference/api/v2-create-a-branch)                                                           |
 |                                  |                 | [Delete a branch](/docs/reference/api/v1-delete-a-branch)                                                           |
 |                                  |                 | [Diff a branch](/docs/reference/api/v1-diff-a-branch)                                                               |
 |                                  |                 | [Merge a branch](/docs/reference/api/v1-merge-a-branch)                                                             |
@@ -168,6 +170,7 @@
 |                                  |                 | [Get a branch config](/docs/reference/api/v1-get-a-branch-config)                                                   |
 |                                  |                 | [List all branches](/docs/reference/api/v1-list-all-branches)                                                       |
 |                                  | Read-write      | [Create a branch](/docs/reference/api/v1-create-a-branch)                                                           |
+|                                  |                 | [Create a branch](/docs/reference/api/v2-create-a-branch)                                                           |
 |                                  |                 | [Delete a branch](/docs/reference/api/v1-delete-a-branch)                                                           |
 |                                  |                 | [Diff a branch](/docs/reference/api/v1-diff-a-branch)                                                               |
 |                                  |                 | [Disable preview branching](/docs/reference/api/v1-disable-preview-branching)                                       |
@@ -234,3 +237,5 @@
 [^4]: Requires **Project Settings** (Read-write) and **Database** (Read-write).
 
 [^5]: Requires **Database Config** (Read), **Database** (Read), **SSL Enforcement** (Read), **Network Restrictions** (Read), **Auth Config** (Read), **Data API Config** (Read), **Realtime Config** (Read), and **Storage Config** (Read).
+
+{/* Not documented, missing from the shared permission catalog (packages/shared-data/scoped-access-token-permissions.ts): api_gateway_keys_secret_read, data_api_config_secret_read */}
