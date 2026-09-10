@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { useDestinationForm } from './useDestinationForm'
+import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
 
 const mocks = vi.hoisted(() => ({
   validateDestination: vi.fn(),
@@ -132,46 +133,58 @@ describe('useDestinationForm validation', () => {
     expect(onValidationFail).toHaveBeenCalledOnce()
   })
 
-  it('preserves hidden batch fields and submits the selected table-copy policy on edit', async () => {
-    const { result } = renderHook(() => useDestinationForm({ selectedType: 'BigQuery' }))
+  it.each([true, false])(
+    'preserves edit settings without an extra start (enabled: %s)',
+    async (enabled) => {
+      const { result } = renderHook(() => useDestinationForm({ selectedType: 'BigQuery' }))
 
-    await act(async () => {
-      await result.current.submitPipeline({
-        data: formData,
-        existingDestination: {
+      await act(async () => {
+        await result.current.submitPipeline({
+          data: formData,
+          existingDestination: {
+            destinationId: 7,
+            pipelineId: 8,
+            enabled,
+            statusName: enabled ? 'started' : 'stopped',
+          },
+          existingBatch: {
+            max_fill_ms: 200,
+            max_bytes: 8_388_608,
+            memory_budget_ratio: 0.2,
+          },
+          onSuccess: vi.fn(),
+          onClose: vi.fn(),
+        })
+      })
+
+      expect(mocks.updateDestinationPipeline).toHaveBeenCalledWith(
+        expect.objectContaining({
           destinationId: 7,
           pipelineId: 8,
-          enabled: true,
-          statusName: 'started',
-        },
-        existingBatch: {
-          max_fill_ms: 200,
-          max_bytes: 8_388_608,
-          memory_budget_ratio: 0.2,
-        },
-        onSuccess: vi.fn(),
-        onClose: vi.fn(),
-      })
-    })
-
-    expect(mocks.updateDestinationPipeline).toHaveBeenCalledWith(
-      expect.objectContaining({
-        destinationId: 7,
-        pipelineId: 8,
-        pipelineConfig: expect.objectContaining({
-          tableSyncCopy: { type: 'include_tables', table_ids: [101] },
-          batch: {
-            maxFillMs: 500,
-            maxBytes: 8_388_608,
-            memoryBudgetRatio: 0.2,
-          },
+          pipelineConfig: expect.objectContaining({
+            tableSyncCopy: { type: 'include_tables', table_ids: [101] },
+            batch: {
+              maxFillMs: 500,
+              maxBytes: 8_388_608,
+              memoryBudgetRatio: 0.2,
+            },
+          }),
         }),
-      }),
-      expect.any(Object)
-    )
-    expect(mocks.createDestinationPipeline).not.toHaveBeenCalled()
-    expect(mocks.startPipeline).not.toHaveBeenCalled()
-  })
+        expect.any(Object)
+      )
+      expect(mocks.createDestinationPipeline).not.toHaveBeenCalled()
+      expect(mocks.startPipeline).not.toHaveBeenCalled()
+      if (enabled) {
+        expect(mocks.setRequestStatus).toHaveBeenCalledWith(
+          8,
+          PipelineStatusRequestStatus.RestartRequested,
+          'started'
+        )
+      } else {
+        expect(mocks.setRequestStatus).not.toHaveBeenCalled()
+      }
+    }
+  )
 
   it('omits an unchanged batch when editing only the table-copy policy', async () => {
     const { result } = renderHook(() => useDestinationForm({ selectedType: 'BigQuery' }))

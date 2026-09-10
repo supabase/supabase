@@ -72,13 +72,15 @@ export const TableReplicationRow = ({
       </TableCell>
 
       <TableCell className="align-top">
-        {isRestarting ? (
-          <p className="text-sm text-foreground-lighter">
-            Replication is being restarted for this table. The pipeline will restart automatically.
-          </p>
-        ) : showDisabledState ? (
+        <p role="status" className="text-sm text-foreground-lighter">
+          {isRestarting
+            ? 'Preparing this table to replicate from scratch. Running pipelines restart automatically; stopped pipelines remain stopped.'
+            : ''}
+        </p>
+        {!isRestarting && showDisabledState && (
           <p className="text-sm text-foreground-lighter">{disabledStateMessage}</p>
-        ) : (
+        )}
+        {!isRestarting && !showDisabledState && (
           <div className="flex flex-col gap-y-3">
             <div className="text-sm text-foreground">
               {statusConfig.description}{' '}
@@ -106,12 +108,14 @@ export const TableReplicationRow = ({
                 className="w-7"
                 icon={<RotateCcw />}
                 disabled={showDisabledState || isRestarting || isAnyRestartInProgress}
-                aria-label={`Restart replication for ${table.schema}.${table.name}`}
+                aria-label={`Restart replication from scratch for ${table.schema}.${table.name}`}
                 onClick={onSelectRestart}
               />
             </TooltipTrigger>
             <TooltipContent side="bottom" align="center">
-              {isPipelineStopped ? 'Reset table and start pipeline' : 'Reset and restart pipeline'}
+              {isPipelineStopped
+                ? 'Restart replication from scratch when the pipeline is started'
+                : 'Restart replication from scratch'}
             </TooltipContent>
           </Tooltip>
         </div>

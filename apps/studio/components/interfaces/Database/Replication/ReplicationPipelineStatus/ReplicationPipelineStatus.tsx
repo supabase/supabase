@@ -428,7 +428,7 @@ export const ReplicationPipelineStatus = () => {
                     setShowBatchRestartDialog(true)
                   }}
                 >
-                  Restart all tables
+                  Restart all tables from scratch
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -440,7 +440,7 @@ export const ReplicationPipelineStatus = () => {
                       disabled={showDisabledState || isPipelineError}
                     />
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-44">
+                  <DropdownMenuContent align="end" className="w-64">
                     <DropdownMenuItemTooltip
                       disabled={!hasErroredTables || isAnyRestartInProgress || showDisabledState}
                       onClick={() => {
@@ -454,7 +454,7 @@ export const ReplicationPipelineStatus = () => {
                         },
                       }}
                     >
-                      Restart failed tables only
+                      Restart failed tables from scratch
                     </DropdownMenuItemTooltip>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -584,7 +584,6 @@ export const ReplicationPipelineStatus = () => {
           tableSyncCopy={pipeline?.config.table_sync_copy}
           sourceId={pipeline?.source_id}
           publicationName={pipeline?.config.publication_name}
-          pipelineStatusName={statusName}
           onRestartStart={() => {
             setRestartingTableIds((prev) => new Set(prev).add(selectedTableForRestart.id))
           }}
@@ -619,7 +618,6 @@ export const ReplicationPipelineStatus = () => {
           sourceId={pipeline?.source_id}
           publicationName={pipeline?.config.publication_name}
           tableSyncCopy={pipeline?.config.table_sync_copy}
-          pipelineStatusName={statusName}
           onRestartStart={(tableIds) => {
             setRestartingTableIds((prev) => new Set([...prev, ...tableIds]))
           }}
