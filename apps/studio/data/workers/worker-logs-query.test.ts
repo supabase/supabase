@@ -6,19 +6,25 @@ import { parseWorkerLogRows, workerLogsSql } from './worker-logs-query'
 describe('workerLogsSql', () => {
   it('reads one worker stream, newest first', () => {
     expect(workerLogsSql('embed', 'output')).toBe(
-      "select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes['worker'] = 'embed' and log_attributes['source'] = 'worker_guest_logs' order by timestamp desc limit 100"
+      "select id, timestamp, severity_text as severity, event_message as message from logs where source = 'worker_logs' and log_attributes['worker'] = 'embed' and subservice = 'worker_guest_logs' order by timestamp desc limit 100"
     )
   })
 
   it('filters by event message before applying the limit', () => {
     expect(workerLogsSql('embed', 'requests', { message: 'timeout' })).toBe(
-      "select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes['worker'] = 'embed' and log_attributes['source'] = 'worker_ingress_logs' and event_message ilike '%timeout%' order by timestamp desc limit 100"
+      "select id, timestamp, severity_text as severity, event_message as message from logs where source = 'worker_logs' and log_attributes['worker'] = 'embed' and subservice = 'worker_ingress_logs' and event_message ilike '%timeout%' order by timestamp desc limit 100"
     )
   })
 
-  it('names the right stream for each tab', () => {
-    expect(workerLogsSql('embed', 'requests')).toContain("'worker_ingress_logs'")
-    expect(workerLogsSql('embed', 'builds')).toContain("'worker_api_logs'")
+  it.each([
+    ['requests', 'worker_ingress_logs'],
+    ['output', 'worker_guest_logs'],
+    ['builds', 'worker_api_logs'],
+  ] as const)('filters the %s tab by its top-level subservice', (stream, subservice) => {
+    const sql = workerLogsSql('embed', stream)
+    expect(sql).toContain("source = 'worker_logs'")
+    expect(sql).toContain(`subservice = '${subservice}'`)
+    expect(sql).not.toContain("log_attributes['source']")
   })
 
   it('escapes a worker name rather than interpolating it raw', () => {

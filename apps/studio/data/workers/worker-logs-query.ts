@@ -8,9 +8,9 @@ import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
 import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import { analyticsLiteral, safeSql } from '@/data/logs/safe-analytics-sql'
 import { IS_PLATFORM } from '@/lib/constants'
-import { WORKER_LOG_SOURCES } from '@/lib/constants/workers'
+import { WORKER_LOG_SUBSERVICES } from '@/lib/constants/workers'
 
-export type WorkerLogStream = keyof typeof WORKER_LOG_SOURCES
+export type WorkerLogStream = keyof typeof WORKER_LOG_SUBSERVICES
 
 export const WORKER_LOG_STREAM_LABEL: Record<WorkerLogStream, string> = {
   requests: 'Invocations',
@@ -18,10 +18,7 @@ export const WORKER_LOG_STREAM_LABEL: Record<WorkerLogStream, string> = {
   builds: 'Activity',
 }
 
-// Both are read from `log_attributes` rather than the endpoint's own `source` column:
-// that column is derived from a mapping which does not currently classify worker rows.
 const WORKER_NAME_KEY = 'worker'
-const STREAM_KEY = 'source'
 
 const LOG_LIMIT = 100
 
@@ -50,7 +47,7 @@ export const workerLogsSql = (
     ? safeSql` and event_message ilike ${analyticsLiteral(`%${message}%`)}`
     : safeSql``
 
-  return safeSql`select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes[${analyticsLiteral(WORKER_NAME_KEY)}] = ${analyticsLiteral(name)} and log_attributes[${analyticsLiteral(STREAM_KEY)}] = ${analyticsLiteral(WORKER_LOG_SOURCES[stream])}${messageFilter} order by timestamp desc limit ${analyticsLiteral(LOG_LIMIT)}`
+  return safeSql`select id, timestamp, severity_text as severity, event_message as message from logs where source = 'worker_logs' and log_attributes[${analyticsLiteral(WORKER_NAME_KEY)}] = ${analyticsLiteral(name)} and subservice = ${analyticsLiteral(WORKER_LOG_SUBSERVICES[stream])}${messageFilter} order by timestamp desc limit ${analyticsLiteral(LOG_LIMIT)}`
 }
 
 export const parseWorkerLogRows = (result: unknown): LogData[] =>
