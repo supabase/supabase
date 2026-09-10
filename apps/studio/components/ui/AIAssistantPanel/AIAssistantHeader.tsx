@@ -24,10 +24,12 @@ import { ButtonTooltip } from '../ButtonTooltip'
 import { ShortcutPills, ShortcutTooltip } from '../ShortcutTooltip'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
 import { AIAssistantMetadataWarning } from './AIAssistantMetadataWarning'
+import { useIsExplorerEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useCreateChat } from '@/components/interfaces/Explorer/hooks'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AIAssistantHeaderProps {
   isChatLoading: boolean
@@ -50,11 +52,19 @@ export const AIAssistantHeader = ({
   isHipaaProjectDisallowed,
   aiOptInLevel,
 }: AIAssistantHeaderProps) => {
-  const snap = useAiAssistantStateSnapshot()
   const { openChat } = useCreateChat()
+  const snap = useAiAssistantStateSnapshot()
+  const { isMaximised, toggleMaximise } = useSidebarManagerSnapshot()
+  const isExplorerEnabled = useIsExplorerEnabled()
+
   const [value, setValue] = useState(snap.activeChat?.name)
   const [isEditingName, setIsEditingName] = useState(false)
   const [isOptInModalOpen, setIsOptInModalOpen] = useState(false)
+
+  const onSelectMaximise = () => {
+    if (isExplorerEnabled) handleOpenInExplorer()
+    else toggleMaximise()
+  }
 
   const handleOpenInExplorer = () => {
     if (!snap.activeChatId) return
@@ -100,7 +110,7 @@ export const AIAssistantHeader = ({
     enabled: shortcutsEnabled && !isChatLoading,
   })
 
-  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE, handleOpenInExplorer, {
+  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE, onSelectMaximise, {
     enabled: shortcutsEnabled && !isChatLoading,
   })
 
@@ -153,7 +163,7 @@ export const AIAssistantHeader = ({
 
             <ShortcutTooltip
               side="bottom"
-              label="Open in Explorer"
+              label={isExplorerEnabled ? 'Open in Explorer' : isMaximised ? 'Minimize' : 'Maximize'}
               shortcutId={SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE}
             >
               <Button
@@ -161,7 +171,7 @@ export const AIAssistantHeader = ({
                 aria-label="Open in Explorer"
                 size="tiny"
                 icon={<Maximize />}
-                onClick={handleOpenInExplorer}
+                onClick={onSelectMaximise}
                 className="h-7 w-7 p-0"
               />
             </ShortcutTooltip>
