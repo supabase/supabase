@@ -10,7 +10,7 @@ Supabase is one of the best free alternative to Render Postgres. Supabase provid
 
 This guide demonstrates how to migrate from Render to Supabase to get the most out of Postgres while gaining access to all the features you need to build a project.
 
-## Retrieve your Render database credentials [#retrieve-render-credentials]
+## Retrieve your Render database credentials
 
 1. Sign in to your [Render account](https://render.com) and select the project you want to migrate.
 1. Click **Dashboard** in the menu and click in your **Postgres** database.
@@ -24,7 +24,7 @@ Example:
 %env PSQL_COMMAND=PGPASSWORD=RgaMDfTS_password_FTPa7 psql -h dpg-a_server_in.oregon-postgres.render.com -U my_db_pxl0_user my_db_pxl0
 ```
 
-## Retrieve your Supabase connection string [#retrieve-supabase-connection-string]
+## Retrieve your Supabase connection string
 
 1. If you're new to Supabase, [create a project](/dashboard).
    Make a note of your password, you will need this later. If you forget it, you can [reset it here](/dashboard/project/_/database/settings).

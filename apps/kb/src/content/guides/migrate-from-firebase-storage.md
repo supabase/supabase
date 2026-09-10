@@ -9,7 +9,7 @@ Supabase provides several [tools](https://github.com/supabase-community/firebase
 1. Files are downloaded from a Firebase storage bucket to a local filesystem.
 2. Files are uploaded from the local filesystem to a Supabase storage bucket.
 
-## Set up the migration tool [#set-up-migration-tool]
+## Set up the migration tool
 
 1. Clone the [`firebase-to-supabase`](https://github.com/supabase-community/firebase-to-supabase) repository:
 
@@ -22,7 +22,7 @@ Supabase provides several [tools](https://github.com/supabase-community/firebase
 1. Copy the **Project URL** and update the `SUPABASE_URL` value in `supabase-keys.js`.
 1. Under **Project API keys**, copy the **secret** key and update the `SUPABASE_KEY` value in `supabase-keys.js`.
 
-## Generate a Firebase private key [#generate-firebase-private-key]
+## Generate a Firebase private key
 
 1. Sign in to your [Firebase Console](https://console.firebase.google.com/project) and open your project.
 1. Click the gear icon next to **Project Overview** in the sidebar and select **Project Settings**.
@@ -32,7 +32,7 @@ Supabase provides several [tools](https://github.com/supabase-community/firebase
 
 ## Command line options
 
-### Download Firestore Storage bucket to a local filesystem folder [#download-firestore-storage-bucket]
+### Download Firestore Storage bucket to a local filesystem folder
 
 `node download.js <prefix> [<folder>] [<batchSize>] [<limit>] [<token>]`
 
@@ -44,7 +44,7 @@ Supabase provides several [tools](https://github.com/supabase-community/firebase
 
 To process in batches using multiple command-line executions, you must use the same parameters with a new `<token>` on subsequent calls. Use the token displayed on the last call to continue the process at a given point.
 
-### Upload files to Supabase Storage bucket [#upload-to-supabase-storage-bucket]
+### Upload files to Supabase Storage bucket
 
 `node upload.js <prefix> <folder> <bucket>`
 

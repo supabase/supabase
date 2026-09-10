@@ -6,7 +6,7 @@ topics: ['Migration', 'Database']
 
 This guide demonstrates how to migrate your Neon database to Supabase to get the most out of Postgres while gaining access to all the features you need to build a project.
 
-## Retrieve your Neon database credentials [#retrieve-credentials]
+## Retrieve your Neon database credentials
 
 1. Sign in to your Neon Console [https://console.neon.tech/login](https://console.neon.tech/login).
 1. Select **Projects** on the left.
@@ -29,7 +29,7 @@ Example:
 export OLD_DB_URL="postgresql://neondb_owner:xxxxxxxxxxxxxxx-random-word-yyyyyyyy.us-west-2.aws.neon.tech/neondb?sslmode=require"
 ```
 
-## Retrieve your Supabase connection string [#retrieve-supabase-connection-string]
+## Retrieve your Supabase connection string
 
 1. If you're new to Supabase, [create a project](/dashboard).
    Make a note of your password, you will need this later. If you forget it, you can [reset it here](/dashboard/project/_/database/settings).

@@ -8,7 +8,7 @@ Supabase provides several [tools](https://github.com/supabase-community/firebase
 
 The Firestore `collection` is "flattened" and converted to a table with basic columns of one of the following types: `text`, `numeric`, `boolean`, or `jsonb`. If your structure is more complex, you can write a program to split the newly-created `json` file into multiple, related tables before you import your `json` file(s) to Supabase.
 
-## Set up the migration tool [#set-up-migration-tool]
+## Set up the migration tool
 
 1. Clone the [`firebase-to-supabase`](https://github.com/supabase-community/firebase-to-supabase) repository:
 
@@ -32,7 +32,7 @@ The Firestore `collection` is "flattened" and converted to a table with basic co
 1. Under the Session pooler, click on the View parameters under the connect string. Replace the `Host` and `User` fields with the values shown.
 1. Enter the password you used when you created your Supabase project in the `password` entry in the `supabase-service.json` file.
 
-## Generate a Firebase private key [#generate-firebase-private-key]
+## Generate a Firebase private key
 
 1. Sign in to your [Firebase Console](https://console.firebase.google.com/project) and open your project.
 1. Click the gear icon next to **Project Overview** in the sidebar and select **Project Settings**.
@@ -76,7 +76,7 @@ And split it into two files (one table for users and one table for items):
 ]
 ```
 
-### Import JSON file to Supabase (Postgres) [#import-to-supabase]
+### Import JSON file to Supabase (Postgres)
 
 `node json2supabase.js <path_to_json_file> [<primary_key_strategy>] [<primary_key_name>]`
 
