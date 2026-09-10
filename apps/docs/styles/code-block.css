@@ -105,7 +105,7 @@
 
 .shiki[data-wrapped='true'] .code-content {
   white-space: pre-wrap !important;
-  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
 }
 
 .shadow-codeblock {
