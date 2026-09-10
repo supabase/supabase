@@ -54,9 +54,11 @@ const HeaderLink = React.memo(function HeaderLink(props: {
 const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any) {
   const pathname = usePathname()
   const { resolvedTheme } = useTheme()
-  const activeItem = props.subItem.url === pathname
-  const activeItemRef = useRef<HTMLLIElement>(null)
   const childItems = props.subItem.items ?? []
+  const activeItem =
+    props.subItem.url === pathname &&
+    !childItems.some((child: NavAccordionItem) => child.url === pathname)
+  const activeItemRef = useRef<HTMLLIElement>(null)
   const enabledChildren = childItems.filter(isRenderable)
   const hasChildren = enabledChildren.length > 0
 
@@ -107,6 +109,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               className={[
                 'flex items-center gap-2 w-full',
                 'cursor-pointer transition text-sm',
+                'focus-inset rounded-md',
                 activeItem
                   ? 'text-brand-link font-medium'
                   : 'hover:text-foreground text-foreground-lighter',
@@ -140,7 +143,8 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                         <Link
                           href={child.url}
                           className={[
-                            'relative block py-1.25 cursor-pointer transition text-sm',
+                            'relative block py-1.25 pl-1 -ml-1 cursor-pointer transition text-sm',
+                            'focus-inset rounded-md',
                             child.url === pathname
                               ? 'text-brand-link'
                               : 'hover:text-brand-link text-foreground-lighter',
@@ -168,6 +172,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
           className={[
             'flex items-center gap-2',
             'cursor-pointer transition text-sm',
+            'focus-inset rounded-md',
             activeItem
               ? 'text-brand-link font-medium'
               : 'hover:text-foreground text-foreground-lighter',
@@ -200,6 +205,7 @@ const ContentLink = React.memo(function ContentLink(props: any) {
         href={props.url}
         className={[
           'cursor-pointer transition text-sm',
+          'focus-inset rounded-md',
           props.url === pathname
             ? 'text-brand-link'
             : 'hover:text-foreground text-foreground-lighter',
