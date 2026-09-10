@@ -6,24 +6,16 @@ import prettier from 'prettier'
 const DATED_COLLECTIONS = ['_blog/', '_alternatives/', '_customers/']
 const ISO_DATE_SHAPE =
   /^(\d{4}-\d{2}-\d{2})(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)?$/
-const RSS_PUB_DATE_SHAPE = /^[A-Z][a-z]{2}, \d{2} [A-Z][a-z]{2} \d{4} \d{2}:\d{2}:\d{2} \+0000$/
+const RSS_PUB_DATE_SHAPE =
+  /^[A-Z][a-z]{2}, \d{2} [A-Z][a-z]{2} \d{4} \d{2}:\d{2}:\d{2} (?:[+-]\d{4}|GMT|UTC)$/
 
 function lastmodError(source, value, hint = '') {
-  const shown = value instanceof Date ? String(value) : JSON.stringify(value)
+  const isValidDate = value instanceof Date && !Number.isNaN(value.getTime())
+  const shown = isValidDate ? value.toISOString() : JSON.stringify(value)
   return new Error(`${source}: cannot derive lastmod from date value ${shown}${hint}`)
 }
 
 function toIsoDate(value, source) {
-  if (value instanceof Date) {
-    if (Number.isNaN(value.getTime())) throw lastmodError(source, value)
-    const hasTimePart =
-      value.getUTCHours() !== 0 ||
-      value.getUTCMinutes() !== 0 ||
-      value.getUTCSeconds() !== 0 ||
-      value.getUTCMilliseconds() !== 0
-    if (hasTimePart) throw lastmodError(source, value, "; quote it as a date-only 'YYYY-MM-DD'")
-    return value.toISOString().slice(0, 10)
-  }
   if (typeof value !== 'string') throw lastmodError(source, value)
   const match = ISO_DATE_SHAPE.exec(value)
   if (!match) throw lastmodError(source, value)
@@ -35,17 +27,38 @@ function toIsoDate(value, source) {
   return candidate
 }
 
+function authoredDay(file, key, source) {
+  const value = file.data[key]
+  if (!(value instanceof Date)) return toIsoDate(value, source)
+  const unquotedDateOnly = new RegExp(`^${key}:[ \\t]*(\\d{4}-\\d{2}-\\d{2})[ \\t]*$`, 'm').exec(
+    file.matter
+  )
+  if (!unquotedDateOnly) throw lastmodError(source, value, "; quote it as a date-only 'YYYY-MM-DD'")
+  return toIsoDate(unquotedDateOnly[1], source)
+}
+
+function isSet(value) {
+  return value !== undefined && value !== null
+}
+
 function contentLastmod(filePath) {
-  const { data } = matter(readFileSync(filePath, 'utf-8'))
-  const value = data.updated ?? data.date
-  if (value === undefined || value === null) return undefined
-  return toIsoDate(value, filePath)
+  const file = matter(readFileSync(filePath, 'utf-8'))
+  if (!isSet(file.data.updated)) {
+    return isSet(file.data.date) ? authoredDay(file, 'date', filePath) : undefined
+  }
+  const updated = authoredDay(file, 'updated', filePath)
+  if (isSet(file.data.date) && updated < authoredDay(file, 'date', filePath)) {
+    throw lastmodError(filePath, file.data.updated, '; updated is earlier than date')
+  }
+  return updated
 }
 
 function changelogLastmod(pubDate, link) {
   const source = `changelog-rss ${link}`
   if (!RSS_PUB_DATE_SHAPE.test(pubDate)) throw lastmodError(source, pubDate)
-  return toIsoDate(new Date(pubDate), source)
+  const instant = new Date(pubDate)
+  if (Number.isNaN(instant.getTime())) throw lastmodError(source, pubDate)
+  return instant.toISOString().slice(0, 10)
 }
 
 function urlEntry(loc, lastmod) {

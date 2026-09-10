@@ -6,6 +6,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 const GENERATOR = path.join(process.cwd(), 'internals', 'generate-sitemap.mjs')
 const LEGACY_LINK = 'https://supabase.com/changelog/12345-legacy-entry'
+const TIMED_LINK = 'https://supabase.com/changelog/23456-timed-entry'
 const SPAWN_TIMEOUT_MS = 30_000
 
 const createdDirs: string[] = []
@@ -58,8 +59,8 @@ function rss(items: string[]): string {
 
 function urlEntries(xml: string): UrlEntry[] {
   return [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map(([, block]) => ({
-    loc: block.match(/<loc>\s*([^<\s]+)\s*<\/loc>/)![1],
-    lastmod: block.match(/<lastmod>\s*([^<\s]+)\s*<\/lastmod>/)?.[1],
+    loc: block.match(/<loc\s*>\s*([^<\s]+)\s*<\/loc\s*>/)![1],
+    lastmod: block.match(/<lastmod\s*>\s*([^<\s]+)\s*<\/lastmod\s*>/)?.[1],
   }))
 }
 
@@ -85,8 +86,11 @@ describe('generate-sitemap lastmod', () => {
       '_alternatives/supabase-vs-example.mdx': mdx("date: '2025-11-20'"),
       '_customers/acme.mdx': mdx("date: '2024-05-16T08:00:00Z'"),
       '_events/2026-02-01-webinar.mdx': mdx("date: '2026-02-01T19:00:00.000-07:00'"),
-      'pages/pricing.tsx': '',
-      'public/changelog-rss.xml': rss([rssItem(LEGACY_LINK, 'Tue, 03 Feb 2026 00:00:00 +0000')]),
+      'pages/company.tsx': '',
+      'public/changelog-rss.xml': rss([
+        rssItem(LEGACY_LINK, 'Tue, 03 Feb 2026 00:00:00 +0000'),
+        rssItem(TIMED_LINK, 'Wed, 04 Feb 2026 20:15:00 -0700'),
+      ]),
     })
     result = runGenerator(fixtureDir)
     const sitemapPath = path.join(fixtureDir, 'public', 'sitemap_www.xml')
@@ -131,7 +135,7 @@ describe('generate-sitemap lastmod', () => {
   it('emits no lastmod for events, static pages, and the proxied evals app', () => {
     for (const loc of [
       'https://supabase.com/events/webinar',
-      'https://supabase.com/pricing',
+      'https://supabase.com/company',
       'https://supabase.com/evals',
     ]) {
       const entry = entryFor(loc)
@@ -144,9 +148,13 @@ describe('generate-sitemap lastmod', () => {
     expect(entryFor(LEGACY_LINK)?.lastmod).toBe('2026-02-03')
   })
 
+  it('truncates a timed, offset pubDate to its UTC day', () => {
+    expect(entryFor(TIMED_LINK)?.lastmod).toBe('2026-02-05')
+  })
+
   it('emits only day-precision lastmod values, one per dated source', () => {
     const lastmods = entries.map((entry) => entry.lastmod).filter(Boolean)
-    expect(lastmods).toHaveLength(8)
+    expect(lastmods).toHaveLength(9)
     for (const lastmod of lastmods) expect(lastmod).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   })
 
@@ -163,6 +171,27 @@ describe('generate-sitemap rejects dates it cannot trust', () => {
       name: 'a non-date word',
       files: blogFixture('2026-01-10-bad-word', "date: '2026-01-10'\nupdated: 'soon'"),
       stderrIncludes: ['_blog/2026-01-10-bad-word.mdx', '"soon"'],
+    },
+    {
+      name: 'an unquoted offset value that lands on UTC midnight',
+      files: blogFixture(
+        '2026-01-15-unquoted-offset',
+        "date: '2026-01-15'\nupdated: 2026-01-15T16:00:00-08:00"
+      ),
+      stderrIncludes: ['_blog/2026-01-15-unquoted-offset.mdx', 'quote it'],
+    },
+    {
+      name: 'an unquoted zoned midnight value',
+      files: blogFixture(
+        '2026-01-16-unquoted-zulu',
+        "date: '2026-01-16'\nupdated: 2026-01-16T00:00:00Z"
+      ),
+      stderrIncludes: ['_blog/2026-01-16-unquoted-zulu.mdx', 'quote it'],
+    },
+    {
+      name: 'an updated value earlier than the publish date',
+      files: blogFixture('2026-01-17-backdated', "date: '2026-01-17'\nupdated: '2025-12-31'"),
+      stderrIncludes: ['_blog/2026-01-17-backdated.mdx', 'earlier than date'],
     },
     {
       name: 'trailing text after a valid day',
@@ -207,4 +236,31 @@ describe('generate-sitemap rejects dates it cannot trust', () => {
       SPAWN_TIMEOUT_MS
     )
   }
+})
+
+describe('generate-sitemap against the repo content', () => {
+  const wwwRoot = process.cwd()
+  const mdxCount = (dir: string) =>
+    fs.readdirSync(path.join(wwwRoot, dir)).filter((name) => name.endsWith('.mdx')).length
+
+  it(
+    'dates every blog, alternatives, and customers file without throwing',
+    () => {
+      const result = runGenerator(wwwRoot)
+      expect(result.status, result.stderr).toBe(0)
+      const entries = urlEntries(
+        fs.readFileSync(path.join(wwwRoot, 'public', 'sitemap_www.xml'), 'utf-8')
+      )
+      const datedContent = entries.filter(
+        (entry) => entry.lastmod && !entry.loc.includes('/changelog/')
+      )
+      expect(datedContent).toHaveLength(
+        mdxCount('_blog') + mdxCount('_alternatives') + mdxCount('_customers')
+      )
+      expect(
+        entries.filter((entry) => entry.loc.includes('/events/') && entry.lastmod)
+      ).toHaveLength(0)
+    },
+    SPAWN_TIMEOUT_MS
+  )
 })
