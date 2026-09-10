@@ -120,7 +120,7 @@ export function ApiOperationBodySchemeSelector({
 export function DetailsTrigger({ label, className }: { label: string; className?: string }) {
   return (
     <CollapsibleTrigger className={cn('group reference-details-trigger', className)}>
-      <XCircle size={14} className="reference-details-trigger-icon" />
+      <XCircle size={14} aria-hidden="true" className="reference-details-trigger-icon" />
       {label}
     </CollapsibleTrigger>
   )
