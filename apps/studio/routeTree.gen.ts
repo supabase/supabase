@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
+import { Route as StripeAtlasApplicationRouteImport } from './routes/stripe-atlas-application'
 import { Route as RedeemRouteImport } from './routes/redeem'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as LogoutRouteImport } from './routes/logout'
@@ -333,6 +334,11 @@ import { Route as ApiPlatformStorageRefBucketsIdObjectsDownloadRouteImport } fro
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
   path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StripeAtlasApplicationRoute = StripeAtlasApplicationRouteImport.update({
+  id: '/stripe-atlas-application',
+  path: '/stripe-atlas-application',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RedeemRoute = RedeemRouteImport.update({
@@ -2129,6 +2135,7 @@ export interface FileRoutesByFullPath {
   '/logout': typeof LogoutRoute
   '/maintenance': typeof MaintenanceRoute
   '/redeem': typeof RedeemRoute
+  '/stripe-atlas-application': typeof StripeAtlasApplicationRoute
   '/verify-email': typeof VerifyEmailRoute
   '/account': typeof AppAccountRouteWithChildren
   '/org': typeof AppOrgRouteWithChildren
@@ -2449,6 +2456,7 @@ export interface FileRoutesByTo {
   '/logout': typeof LogoutRoute
   '/maintenance': typeof MaintenanceRoute
   '/redeem': typeof RedeemRoute
+  '/stripe-atlas-application': typeof StripeAtlasApplicationRoute
   '/verify-email': typeof VerifyEmailRoute
   '/account': typeof AppAccountRouteWithChildren
   '/organizations': typeof AppOrganizationsRoute
@@ -2758,6 +2766,7 @@ export interface FileRoutesById {
   '/logout': typeof LogoutRoute
   '/maintenance': typeof MaintenanceRoute
   '/redeem': typeof RedeemRoute
+  '/stripe-atlas-application': typeof StripeAtlasApplicationRoute
   '/verify-email': typeof VerifyEmailRoute
   '/_app/account': typeof AppAccountRouteWithChildren
   '/_app/org': typeof AppOrgRouteWithChildren
@@ -3080,6 +3089,7 @@ export interface FileRouteTypes {
     | '/logout'
     | '/maintenance'
     | '/redeem'
+    | '/stripe-atlas-application'
     | '/verify-email'
     | '/account'
     | '/org'
@@ -3400,6 +3410,7 @@ export interface FileRouteTypes {
     | '/logout'
     | '/maintenance'
     | '/redeem'
+    | '/stripe-atlas-application'
     | '/verify-email'
     | '/account'
     | '/organizations'
@@ -3708,6 +3719,7 @@ export interface FileRouteTypes {
     | '/logout'
     | '/maintenance'
     | '/redeem'
+    | '/stripe-atlas-application'
     | '/verify-email'
     | '/_app/account'
     | '/_app/org'
@@ -4031,6 +4043,7 @@ export interface RootRouteChildren {
   LogoutRoute: typeof LogoutRoute
   MaintenanceRoute: typeof MaintenanceRoute
   RedeemRoute: typeof RedeemRoute
+  StripeAtlasApplicationRoute: typeof StripeAtlasApplicationRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   ApiCheckCnameRoute: typeof ApiCheckCnameRoute
   ApiCliReleaseVersionRoute: typeof ApiCliReleaseVersionRoute
@@ -4151,6 +4164,13 @@ declare module '@tanstack/react-router' {
       path: '/verify-email'
       fullPath: '/verify-email'
       preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stripe-atlas-application': {
+      id: '/stripe-atlas-application'
+      path: '/stripe-atlas-application'
+      fullPath: '/stripe-atlas-application'
+      preLoaderRoute: typeof StripeAtlasApplicationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/redeem': {
@@ -7120,6 +7140,7 @@ const rootRouteChildren: RootRouteChildren = {
   LogoutRoute: LogoutRoute,
   MaintenanceRoute: MaintenanceRoute,
   RedeemRoute: RedeemRoute,
+  StripeAtlasApplicationRoute: StripeAtlasApplicationRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   ApiCheckCnameRoute: ApiCheckCnameRoute,
   ApiCliReleaseVersionRoute: ApiCliReleaseVersionRoute,
