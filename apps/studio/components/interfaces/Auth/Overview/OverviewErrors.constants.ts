@@ -117,11 +117,19 @@ export const fetchTopResponseErrors = async (projectRef: string, useOtel = false
     AUTH_TOP_RESPONSE_ERRORS_SQL_OTEL,
     AUTH_TOP_RESPONSE_ERRORS_SQL
   )
-  return await fetchLogs(projectRef, sql, start, end, useOtel)
+  const data = await fetchLogs(projectRef, sql, start, end, useOtel)
+  if (data?.error) {
+    throw new Error(typeof data.error === 'string' ? data.error : data.error.message)
+  }
+  return data
 }
 
 export const fetchTopAuthErrorCodes = async (projectRef: string, useOtel = false) => {
   const { start, end } = getDateRange()
   const sql = pickLogsQueryBuilder(useOtel, AUTH_TOP_ERROR_CODES_SQL_OTEL, AUTH_TOP_ERROR_CODES_SQL)
-  return await fetchLogs(projectRef, sql, start, end, useOtel)
+  const data = await fetchLogs(projectRef, sql, start, end, useOtel)
+  if (data?.error) {
+    throw new Error(typeof data.error === 'string' ? data.error : data.error.message)
+  }
+  return data
 }

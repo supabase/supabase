@@ -162,13 +162,23 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
     authSuccessRatePrevious
   )
 
-  const { data: respErrData, isPending: isLoadingResp } = useQuery({
+  const {
+    data: respErrData,
+    isPending: isLoadingResp,
+    isError: isResponseError,
+    error: responseError,
+  } = useQuery({
     queryKey: ['auth-overview', ref, 'top-response-errors', { otel: useOtel }],
     queryFn: () => fetchTopResponseErrors(ref as string, useOtel),
     enabled: !!ref,
   })
 
-  const { data: codeErrData, isPending: isLoadingCodes } = useQuery({
+  const {
+    data: codeErrData,
+    isPending: isLoadingCodes,
+    isError: isCodeError,
+    error: codeError,
+  } = useQuery({
     queryKey: ['auth-overview', ref, 'top-auth-error-codes', { otel: useOtel }],
     queryFn: () => fetchTopAuthErrorCodes(ref as string, useOtel),
     enabled: !!ref,
@@ -272,7 +282,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
           </div>
 
           <div className="grid grid-cols-1 gap-4">
-            <Chart isLoading={isLoadingResp}>
+            <Chart isLoading={isLoadingResp} isErrored={isResponseError}>
               <ChartCard>
                 <ChartHeader>
                   <ChartTitle>Auth API Errors</ChartTitle>
@@ -280,6 +290,15 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                 <ChartContent
                   className="p-0!"
                   isEmpty={responseErrors.length === 0}
+                  errorState={
+                    <div className="p-6">
+                      <AlertError
+                        projectRef={ref}
+                        subject="Failed to retrieve Auth API errors"
+                        error={responseError}
+                      />
+                    </div>
+                  }
                   emptyState={
                     <div className="p-6">
                       <ChartEmptyState
@@ -334,7 +353,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
               </ChartCard>
             </Chart>
 
-            <Chart isLoading={isLoadingCodes}>
+            <Chart isLoading={isLoadingCodes} isErrored={isCodeError}>
               <ChartCard>
                 <ChartHeader>
                   <ChartTitle>Auth Server Errors</ChartTitle>
@@ -343,6 +362,15 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                 <ChartContent
                   className="p-0!"
                   isEmpty={errorCodes.length === 0}
+                  errorState={
+                    <div className="p-6">
+                      <AlertError
+                        projectRef={ref}
+                        subject="Failed to retrieve Auth server errors"
+                        error={codeError}
+                      />
+                    </div>
+                  }
                   emptyState={
                     <div className="p-6">
                       <ChartEmptyState
