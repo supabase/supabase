@@ -1,8 +1,8 @@
 import { screen } from '@testing-library/react'
 import { test } from 'vitest'
 
-import { StorageReport } from 'pages/project/[ref]/observability/storage'
-import { render } from 'tests/helpers'
+import { StorageReport } from '@/pages/project/[ref]/observability/storage'
+import { render } from '@/tests/helpers'
 
 // [Joshen] Mock data for ApiReport is in __mocks__/hooks/useStorageReport
 // I don't think this is an ideal set up as the mock data is not clear in this file itself

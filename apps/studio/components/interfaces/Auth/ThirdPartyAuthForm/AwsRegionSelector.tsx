@@ -1,19 +1,19 @@
-import { Check, ChevronsUpDown } from 'lucide-react'
-import { useState } from 'react'
+import { Check } from 'lucide-react'
+import { useId, useState } from 'react'
 import {
-  Button,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
-  FormControl_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  ScrollArea,
   cn,
+  ComboboxTrigger,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  FormControl,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  ScrollArea,
 } from 'ui'
 
 // copied from https://docs.aws.amazon.com/general/latest/gr/cognito_identity.html
@@ -56,33 +56,32 @@ export const AwsRegionSelector = ({
   onChange: (value: string) => void
 }) => {
   const [open, setOpen] = useState(false)
+  const listboxId = useId()
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
-        <FormControl_Shadcn_>
-          <Button
-            type="default"
-            role="combobox"
-            className={cn('w-full justify-between', !value && 'text-muted-foreground')}
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <FormControl>
+          <ComboboxTrigger
+            aria-expanded={open}
+            aria-controls={listboxId}
+            data-state={open ? 'open' : 'closed'}
+            className={cn(!value && 'text-muted-foreground')}
             size="small"
-            iconRight={
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" strokeWidth={1} />
-            }
           >
             {value ?? 'Select a region'}
-          </Button>
-        </FormControl_Shadcn_>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0" sameWidthAsTrigger>
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_ placeholder="Search AWS regions..." />
-          <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>No regions found.</CommandEmpty_Shadcn_>
-            <CommandGroup_Shadcn_>
+          </ComboboxTrigger>
+        </FormControl>
+      </PopoverTrigger>
+      <PopoverContent id={listboxId} className="p-0" sameWidthAsTrigger>
+        <Command>
+          <CommandInput placeholder="Search AWS regions..." />
+          <CommandList>
+            <CommandEmpty>No regions found.</CommandEmpty>
+            <CommandGroup>
               <ScrollArea className="h-72">
                 {AWS_IDP_REGIONS.map((option) => (
-                  <CommandItem_Shadcn_
+                  <CommandItem
                     value={option}
                     key={option}
                     onSelect={(currentValue) => {
@@ -94,13 +93,13 @@ export const AwsRegionSelector = ({
                       className={cn('mr-2 h-4 w-4', option === value ? 'opacity-100' : 'opacity-0')}
                     />
                     {option}
-                  </CommandItem_Shadcn_>
+                  </CommandItem>
                 ))}
               </ScrollArea>
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

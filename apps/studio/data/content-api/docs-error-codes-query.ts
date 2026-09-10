@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-import { executeGraphQL } from 'data/graphql/execute'
-import { graphql } from 'data/graphql/gql'
-import { Service } from 'data/graphql/graphql'
+
 import { contentApiKeys } from './keys'
-import { UseCustomQueryOptions } from 'types'
+import { executeGraphQL } from '@/data/graphql/execute'
+import { graphql } from '@/data/graphql/gql'
+import { Service } from '@/data/graphql/graphql'
+import { UseCustomQueryOptions } from '@/types'
 
 const ErrorCodeQuery = graphql(`
   query ErrorCodeQuery($code: String!, $service: Service) {
@@ -40,6 +41,8 @@ export const useErrorCodesQuery = <TData = ErrorCodeDescriptionsData>(
     queryKey: contentApiKeys.errorCodes(variables),
     queryFn: ({ signal }) => getErrorCodeDescriptions(variables, signal),
     enabled,
+    retry: false,
+    staleTime: Infinity,
     ...options,
   })
 }

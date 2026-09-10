@@ -1,5 +1,4 @@
-import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
-
+import ReactMarkdown from 'react-markdown'
 import { Badge } from 'ui'
 
 type IParamProps = any
@@ -22,7 +21,9 @@ const Param = ({ name, isOptional, type, description, children, isPrimitive }: I
         <span className="text-foreground-muted text-xs">{type ?? 'no type'}</span>
       </div>
       {description && (
-        <ReactMarkdown className="text-sm text-foreground-lighter m-0">{description}</ReactMarkdown>
+        <div className="text-sm text-foreground-lighter m-0">
+          <ReactMarkdown>{description}</ReactMarkdown>
+        </div>
       )}
       {children}
     </div>

@@ -5,7 +5,7 @@ const ClassLabel = React.forwardRef<HTMLSpanElement, { children: React.ReactNode
     return (
       <span
         ref={ref}
-        className="bg-surface-100 rounded-full border px-2 font-mono text-xs text-foreground-lighter group-data-[state=open]:text-foreground"
+        className="bg-surface-100 rounded-full border px-2 font-mono text-xs text-foreground-lighter group-data-open:text-foreground"
       >
         {children}
       </span>

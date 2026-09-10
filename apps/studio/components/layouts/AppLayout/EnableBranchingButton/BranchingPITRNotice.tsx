@@ -1,12 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { Clock } from 'lucide-react'
 import Link from 'next/link'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useAppStateSnapshot } from 'state/app-state'
 import { Button } from 'ui'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export const BranchingPITRNotice = () => {
   const { ref } = useParams()
@@ -36,7 +36,7 @@ export const BranchingPITRNotice = () => {
           <ButtonTooltip
             disabled
             size="tiny"
-            type="default"
+            variant="default"
             tooltip={{
               content: {
                 side: 'bottom',
@@ -47,7 +47,7 @@ export const BranchingPITRNotice = () => {
             Enable PITR add-on
           </ButtonTooltip>
         ) : (
-          <Button size="tiny" type="default" asChild>
+          <Button size="tiny" variant="default" asChild>
             <Link
               href={`/project/${ref}/settings/addons?panel=pitr`}
               onClick={() => snap.setShowCreateBranchModal(false)}

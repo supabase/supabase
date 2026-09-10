@@ -1,15 +1,31 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import { useParams } from 'common'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { useDatabaseQueueMessageSendMutation } from 'data/database-queues/database-queue-messages-send-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input, Modal } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { useDatabaseQueueMessageSendMutation } from '@/data/database-queues/database-queue-messages-send-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface SendMessageModalProps {
   visible: boolean
@@ -22,6 +38,7 @@ const FormSchema = z.object({
     (val) => {
       try {
         JSON.parse(val)
+        return true
       } catch {
         return false
       }
@@ -71,69 +88,77 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
   }, [visible])
 
   return (
-    <Modal
-      size="medium"
-      alignFooter="right"
-      header="Add a message to the queue"
-      visible={visible}
-      loading={isPending}
-      onCancel={onClose}
-      confirmText="Add"
-      onConfirm={() => {
-        const values = form.getValues()
-        onSubmit(values)
-      }}
-    >
-      <Modal.Content className="flex flex-col gap-y-4">
-        <Form_Shadcn_ {...form}>
-          <form
-            id={FORM_ID}
-            className="flex-grow overflow-auto gap-2 flex flex-col"
-            onSubmit={form.handleSubmit(onSubmit)}
+    <Dialog open={visible} onOpenChange={onClose}>
+      <DialogContent size="medium">
+        <DialogHeader>
+          <DialogTitle>Add a message to the queue</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection className="flex flex-col gap-y-4">
+          <Form {...form}>
+            <form
+              id={FORM_ID}
+              className="grow overflow-auto gap-2 flex flex-col"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <FormField
+                control={form.control}
+                name="delay"
+                render={({ field: { ref, ...rest } }) => (
+                  <FormItemLayout
+                    label="Delay"
+                    layout="vertical"
+                    className="gap-1"
+                    description="Time in seconds before the message becomes available for reading."
+                  >
+                    <FormControl>
+                      <InputGroup>
+                        <InputGroupInput {...rest} type="number" placeholder="1" />
+                        <InputGroupAddon align="inline-end">
+                          <InputGroupText>sec</InputGroupText>
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="payload"
+                render={({ field }) => (
+                  <FormItemLayout label="Message payload" layout="vertical" className="gap-1">
+                    <FormControl>
+                      <CodeEditor
+                        id="message-payload"
+                        language="json"
+                        autofocus={false}
+                        className="mb-0! h-32 overflow-hidden rounded-sm border"
+                        onInputChange={(e: string | undefined) => field.onChange(e)}
+                        options={{ wordWrap: 'off', contextmenu: false }}
+                        value={field.value}
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </form>
+          </Form>
+        </DialogSection>
+        <DialogFooter>
+          <Button variant="default" onClick={onClose} disabled={isPending}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            type="submit"
+            form={FORM_ID}
+            disabled={isPending}
+            loading={isPending}
           >
-            <FormField_Shadcn_
-              control={form.control}
-              name="delay"
-              render={({ field: { ref, ...rest } }) => (
-                <FormItemLayout
-                  label="Delay"
-                  layout="vertical"
-                  className="gap-1"
-                  description="Time in seconds before the message becomes available for reading."
-                >
-                  <FormControl_Shadcn_>
-                    <Input
-                      {...rest}
-                      type="number"
-                      placeholder="1"
-                      actions={<p className="text-foreground-light pr-2">sec</p>}
-                    />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-            <FormField_Shadcn_
-              control={form.control}
-              name="payload"
-              render={({ field }) => (
-                <FormItemLayout label="Message payload" layout="vertical" className="gap-1">
-                  <FormControl_Shadcn_>
-                    <CodeEditor
-                      id="message-payload"
-                      language="json"
-                      autofocus={false}
-                      className="!mb-0 h-32 overflow-hidden rounded border"
-                      onInputChange={(e: string | undefined) => field.onChange(e)}
-                      options={{ wordWrap: 'off', contextmenu: false }}
-                      value={field.value}
-                    />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-          </form>
-        </Form_Shadcn_>
-      </Modal.Content>
-    </Modal>
+            Add
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

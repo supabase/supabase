@@ -1,15 +1,27 @@
+import 'react-data-grid/lib/styles.css'
 import '@/styles/globals.css'
-import '../../studio/styles/typography.scss'
-import type { Metadata } from 'next'
-import { ThemeProvider } from './Providers'
-import { SonnerToaster } from './SonnerToast'
-import { customFont, sourceCodePro } from './fonts'
 
-const className = `${customFont.variable} ${sourceCodePro.variable}`
+import type { Metadata, Viewport } from 'next'
+
+import { genFaviconData } from 'common/MetaFavicons/app-router'
+
+import { Providers } from './Providers'
+import { Toaster } from './toaster'
+import { inter, manrope, sourceCodePro } from '@/lib/fonts'
+
+const className = `${inter.variable} ${manrope.variable} ${sourceCodePro.variable}`
+
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '/design-system'
 
 export const metadata: Metadata = {
+  applicationName: 'Supabase Design System',
   title: 'Supabase Design System',
   description: 'Design resources for building consistent user experiences at Supabase.',
+  icons: genFaviconData(BASE_PATH),
+}
+
+export const viewport: Viewport = {
+  themeColor: '#1E1E1E',
 }
 
 interface RootLayoutProps {
@@ -23,21 +35,17 @@ export default async function Layout({ children }: RootLayoutProps) {
         {/* [Danny]: This has to be an inline style tag here and not a separate component due to next/font */}
         <style
           dangerouslySetInnerHTML={{
-            __html: `:root{--font-custom:${customFont.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
+            __html: `:root{--font-sans:${inter.style.fontFamily};--font-heading:${manrope.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
           }}
         />
       </head>
       <body>
-        <ThemeProvider
-          themes={['dark', 'light', 'classic-dark']}
-          defaultTheme="system"
-          enableSystem
-        >
+        <Providers>
           <div vaul-drawer-wrapper="">
             <div className="relative flex min-h-screen flex-col bg-background">{children}</div>
           </div>
-          <SonnerToaster />
-        </ThemeProvider>
+          <Toaster />
+        </Providers>
       </body>
     </html>
   )

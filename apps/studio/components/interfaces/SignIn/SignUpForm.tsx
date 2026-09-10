@@ -1,30 +1,23 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
-import { CheckCircle, Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useRef, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
+import { Button, cn, Form, FormControl, FormField, Input } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import { useSignUpMutation } from 'data/misc/signup-mutation'
-import { BASE_PATH } from 'lib/constants'
-import { buildPathWithParams } from 'lib/gotrue'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
-  cn,
-} from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
+import { useSignUpMutation } from '@/data/misc/signup-mutation'
+import { BASE_PATH } from '@/lib/constants'
+import { buildSignUpReturnPath } from '@/lib/gotrue'
+import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -50,7 +43,7 @@ const schema = z.object({
 
 const formId = 'sign-up-form'
 
-export const SignUpForm = () => {
+export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const captchaRef = useRef<HCaptcha>(null)
   const [showConditions, setShowConditions] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -65,17 +58,22 @@ export const SignUpForm = () => {
   const [searchParams] = useQueryStates({
     auth_id: parseAsString.withDefault(''),
     token: parseAsString.withDefault(''),
+    organization_slug: parseAsString.withDefault(''),
   })
+
+  const trackFunnelError = useTrackFunnelError()
 
   const { mutate: signup, isPending: isSigningUp } = useSignUpMutation({
     onSuccess: () => {
       toast.success(`Signed up successfully!`)
       setIsSubmitted(true)
+      onSuccess?.()
     },
     onError: (error) => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
-      toast.error(`Failed to sign up: ${error.message}`)
+      const toastId = toast.error(`Failed to sign up: ${error.message}`)
+      trackFunnelError('signup', classifyApiError('signup', error), 'toast', toastId)
     },
   })
 
@@ -97,12 +95,16 @@ export const SignUpForm = () => {
     let redirectTo: string
 
     if (isInsideOAuthFlow) {
-      redirectTo = `${redirectUrlBase}/authorize?auth_id=${searchParams.auth_id}${searchParams.token && `&token=${searchParams.token}`}`
+      const authorizeParams = new URLSearchParams({ auth_id: searchParams.auth_id })
+      if (searchParams.token) authorizeParams.set('token', searchParams.token)
+      if (searchParams.organization_slug) {
+        authorizeParams.set('organization_slug', searchParams.organization_slug)
+      }
+      redirectTo = `${redirectUrlBase}/authorize?${authorizeParams.toString()}`
     } else {
-      // Use getRedirectToPath to handle redirect_to parameter and other query params
+      // Build the post-verification return path from returnTo and other query params.
       const { returnTo } = router.query
-      const basePath = returnTo || '/sign-in'
-      const fullPath = buildPathWithParams(basePath as string)
+      const fullPath = buildSignUpReturnPath(returnTo)
       const fullRedirectUrl = `${redirectUrlBase}${fullPath}`
       redirectTo = fullRedirectUrl
     }
@@ -115,7 +117,7 @@ export const SignUpForm = () => {
     })
   }
 
-  const password = form.watch('password')
+  const password = useWatch({ control: form.control, name: 'password' })
   const isSubmitting = form.formState.isSubmitting || isSigningUp
 
   return (
@@ -125,55 +127,60 @@ export const SignUpForm = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="absolute top-0 w-full"
+          className="w-full"
         >
-          <Alert_Shadcn_ variant="default">
-            <CheckCircle />
-            <AlertTitle_Shadcn_>Check your email to confirm</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="text-xs">
-              You've successfully signed up. Please check your email to confirm your account before
-              signing in to the Supabase dashboard. The confirmation link expires in 10 minutes.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+          <Admonition
+            type="success"
+            title="Check your email"
+            description="We sent you a link to finish signing up. It expires in 10 minutes."
+          />
         </motion.div>
       )}
       <div
+        inert={isSubmitted || undefined}
         className={cn(
-          'w-full py-1 transition-all duration-500',
-          isSubmitted ? 'max-h-[100px] opacity-0 pointer-events-none' : 'max-h-[1000px] opacity-100'
+          'w-full transition-all duration-500',
+          isSubmitted
+            ? 'max-h-0 overflow-hidden opacity-0 pointer-events-none py-0'
+            : 'max-h-[1000px] opacity-100'
         )}
       >
-        <Form_Shadcn_ {...form}>
-          <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField_Shadcn_
+        <Form {...form}>
+          <form
+            id={formId}
+            method="POST"
+            className="flex flex-col gap-4"
+            onSubmit={form.handleSubmit(onSubmit, (errors) =>
+              trackFunnelError('signup', classifyValidationError('signup', errors), 'form')
+            )}
+          >
+            <FormField
               key="email"
               name="email"
               control={form.control}
               render={({ field }) => (
-                <FormItemLayout name="email" label="Email">
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_
-                      id="email"
+                <FormItemLayout label="Email">
+                  <FormControl>
+                    <Input
                       autoComplete="email"
                       disabled={isSubmitting}
                       {...field}
                       placeholder="you@example.com"
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               key="password"
               name="password"
               control={form.control}
               render={({ field }) => (
-                <FormItemLayout name="password" label="Password">
-                  <FormControl_Shadcn_>
-                    <div className="relative">
-                      <Input_Shadcn_
-                        id="password"
+                <FormItemLayout label="Password">
+                  <div className="relative">
+                    <FormControl>
+                      <Input
                         type={passwordHidden ? 'password' : 'text'}
                         autoComplete="new-password"
                         placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
@@ -181,28 +188,31 @@ export const SignUpForm = () => {
                         onFocus={() => setShowConditions(true)}
                         disabled={isSubmitting}
                       />
-                      <Button
-                        type="default"
-                        title={passwordHidden ? `Hide password` : `Show password`}
-                        aria-label={passwordHidden ? `Hide password` : `Show password`}
-                        className="absolute right-1 top-1 px-1.5"
-                        icon={passwordHidden ? <Eye /> : <EyeOff />}
-                        disabled={isSubmitting}
-                        onClick={() => setPasswordHidden((prev) => !prev)}
-                      />
-                    </div>
-                  </FormControl_Shadcn_>
+                    </FormControl>
+                    <Button
+                      variant="default"
+                      title={passwordHidden ? `Show password` : `Hide password`}
+                      aria-label={passwordHidden ? `Show password` : `Hide password`}
+                      className="absolute right-1 top-1 px-1.5"
+                      icon={passwordHidden ? <Eye /> : <EyeOff />}
+                      disabled={isSubmitting}
+                      onClick={() => setPasswordHidden((prev) => !prev)}
+                    />
+                  </div>
                 </FormItemLayout>
               )}
             />
 
-            <div
-              className={`${
-                showConditions ? 'max-h-[500px]' : 'max-h-[0px]'
-              } transition-all duration-400 overflow-y-hidden`}
-            >
-              <PasswordConditionsHelper password={password} />
-            </div>
+            {showConditions && (
+              <motion.div
+                initial={{ maxHeight: '0px' }}
+                animate={{ maxHeight: '500px' }}
+                transition={{ duration: 0.8, delay: 0 }}
+                className="overflow-y-hidden"
+              >
+                <PasswordConditionsHelper password={password} />
+              </motion.div>
+            )}
 
             <div className="self-center">
               <HCaptcha
@@ -215,9 +225,10 @@ export const SignUpForm = () => {
             </div>
 
             <Button
+              variant="primary"
               block
               form={formId}
-              htmlType="submit"
+              type="submit"
               size="large"
               disabled={password.length === 0 || isSubmitting}
               loading={isSubmitting}
@@ -225,7 +236,7 @@ export const SignUpForm = () => {
               Sign up
             </Button>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </div>
     </div>
   )

@@ -1,4 +1,4 @@
-import type { components } from 'data/api'
+import type { components } from '@/data/api'
 
 export type SubscriptionTier =
   | 'tier_free'

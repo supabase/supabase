@@ -12,7 +12,7 @@
     "@react-native-async-storage/async-storage": "1.23.1",
     "@rneui/themed": "^4.0.0-rc.8",
     "@shopify/flash-list": "1.6.4",
-    "@supabase/supabase-js": "^2.38.2",
+    "@supabase/supabase-js": "^2",
     "expo": "~51.0.8",
     "expo-constants": "~16.0.1",
     "expo-dev-client": "~4.0.14",

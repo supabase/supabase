@@ -9,8 +9,9 @@ import {
 
 import { useQuery } from './hooks/queryHooks'
 
-interface TextHighlighterBaseProps
-  extends PropsWithChildren<DetailedHTMLProps<HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>> {
+interface TextHighlighterBaseProps extends PropsWithChildren<
+  DetailedHTMLProps<HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>
+> {
   query: string
   text?: string
 }

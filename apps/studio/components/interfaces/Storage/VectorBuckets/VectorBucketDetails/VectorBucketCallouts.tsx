@@ -1,17 +1,15 @@
 import Link from 'next/link'
 import { toast } from 'sonner'
-
-import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
-import { ScaffoldSection } from 'components/layouts/Scaffold'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
-import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
-import { useS3VectorsWrapperCreateMutation } from 'data/storage/s3-vectors-wrapper-create-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
-import { getVectorBucketFDWSchemaName } from '../VectorBuckets.utils'
+import { Admonition } from 'ui-patterns/Admonition'
+
+import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
+import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
+import { ScaffoldSection } from '@/components/layouts/Scaffold'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
+import { useS3VectorsWrapperCreateMutation } from '@/data/storage/s3-vectors-wrapper-create-mutation'
+import { DOCS_URL } from '@/lib/constants'
 
 export const ExtensionNotInstalled = ({
   projectRef,
@@ -27,7 +25,7 @@ export const ExtensionNotInstalled = ({
 
   return (
     <ScaffoldSection isFullWidth>
-      <Admonition type="warning" title="Missing required extension" className="mb-0">
+      <Admonition type="warning" title="Missing required extension">
         <p>
           The Wrappers extension is required in order to query vector tables.{' '}
           {databaseNeedsUpgrading &&
@@ -39,11 +37,11 @@ export const ExtensionNotInstalled = ({
             Learn more
           </InlineLink>
         </p>
-        <Button type="default" asChild className="mt-2">
+        <Button variant="default" asChild className="mt-2">
           <Link
             href={
               databaseNeedsUpgrading
-                ? `/project/${projectRef}/settings/infrastructure`
+                ? getServiceVersionsPath(projectRef)
                 : `/project/${projectRef}/database/extensions?filter=wrappers`
             }
           >
@@ -71,7 +69,7 @@ export const ExtensionNeedsUpgrade = ({
 
   return (
     <ScaffoldSection isFullWidth>
-      <Admonition type="warning" title="Outdated extension version" className="mb-0">
+      <Admonition type="warning" title="Outdated extension version">
         <p>
           The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
           {wrapperMeta.minimumExtensionVersion}. You have version{' '}
@@ -83,11 +81,11 @@ export const ExtensionNeedsUpgrade = ({
           Before reinstalling the wrapper extension, you must first remove all existing wrappers.
           Afterward, you can recreate the wrappers.
         </p>
-        <Button asChild type="default">
+        <Button asChild variant="default">
           <Link
             href={
               databaseNeedsUpgrading
-                ? `/project/${projectRef}/settings/infrastructure`
+                ? getServiceVersionsPath(projectRef)
                 : `/project/${projectRef}/database/extensions?filter=wrappers`
             }
           >
@@ -100,20 +98,13 @@ export const ExtensionNeedsUpgrade = ({
 }
 
 export const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
-  const { data: project } = useSelectedProjectQuery()
   const { mutateAsync: createS3VectorsWrapper, isPending: isCreatingS3VectorsWrapper } =
     useS3VectorsWrapperCreateMutation()
-  const { mutateAsync: createSchema, isPending: isCreatingSchema } = useSchemaCreateMutation()
 
   const onSetupWrapper = async () => {
     if (!bucketName) return console.error('Bucket name is required')
     try {
       await createS3VectorsWrapper({ bucketName })
-      await createSchema({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        name: getVectorBucketFDWSchemaName(bucketName),
-      })
     } catch (error) {
       toast.error(
         `Failed to install wrapper: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -121,13 +112,11 @@ export const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
     }
   }
 
-  const isLoading = isCreatingS3VectorsWrapper || isCreatingSchema
-
   return (
     <ScaffoldSection isFullWidth>
-      <Admonition type="warning" title="Missing integration" className="mb-0">
+      <Admonition type="warning" title="Missing integration">
         <p>The S3 Vectors Wrapper integration is required in order to query vector tables.</p>
-        <Button type="default" loading={isLoading} onClick={onSetupWrapper}>
+        <Button variant="default" loading={isCreatingS3VectorsWrapper} onClick={onSetupWrapper}>
           Install wrapper
         </Button>
       </Admonition>

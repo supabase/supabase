@@ -89,6 +89,7 @@ export default function Extensions() {
             </ul>
             <p className="mt-2">
               <button
+                tabIndex={0}
                 type="reset"
                 className="text-xs hover:underline"
                 onClick={() => setFilters([])}
@@ -108,11 +109,12 @@ export default function Extensions() {
               )
               .map((extension) => (
                 <Link
+                  key={extension.name}
                   href={extension.link}
                   target={getLinkTarget(extension.link)}
                   className="no-underline"
                 >
-                  <GlassPanel title={extension.name} background={false} key={extension.name}>
+                  <GlassPanel title={extension.name}>
                     <p className="mt-4">
                       {extension.comment.charAt(0).toUpperCase() + extension.comment.slice(1)}
                     </p>

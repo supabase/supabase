@@ -17,12 +17,12 @@ Testing is a critical part of database development, especially when working with
 - Functions and procedures
 - Data integrity
 
-This example demonstrates setting up and testing RLS policies for a simple todo application:
+This example demonstrates setting up and testing RLS policies for a basic todo application:
 
 1. Create a test table with RLS enabled:
 
    ```sql
-   -- Create a simple todos table
+   -- Create a todos table
    create table todos (
    id uuid primary key default gen_random_uuid(),
    task text not null,
@@ -132,9 +132,9 @@ Instead, design your tests to be independent by using unique user IDs for each t
 Here's an example using TypeScript that mirrors the pgTAP tests above:
 
 ```typescript
+import crypto from 'crypto'
 import { createClient } from '@supabase/supabase-js'
 import { beforeAll, describe, expect, it } from 'vitest'
-import crypto from 'crypto'
 
 describe('Todos RLS', () => {
   // Generate unique IDs for this test suite to avoid conflicts with other tests
@@ -145,7 +145,7 @@ describe('Todos RLS', () => {
 
   beforeAll(async () => {
     // Setup test data specific to this test suite
-    const adminSupabase = createClient(process.env.SUPABASE_URL!, process.env.SERVICE_ROLE_KEY!)
+    const adminSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SECRET_KEY!)
 
     // Create test users with unique IDs
     await adminSupabase.auth.admin.createUser({
@@ -281,13 +281,11 @@ jobs:
 ## Best practices
 
 1. **Test Data Setup**
-
    - Use begin and rollback to ensure test isolation
    - Create realistic test data that covers edge cases
    - Use different user roles and permissions in tests
 
 2. **RLS Policy Testing**
-
    - Test Create, Read, Update, Delete operations
    - Test with different user roles: anonymous and authenticated
    - Test edge cases and potential security bypasses
@@ -310,7 +308,6 @@ For more complex, real-world examples of database testing, check out:
 Common issues and solutions:
 
 1. **Test Failures Due to RLS**
-
    - Ensure you've set the correct role `set local role authenticated;`
    - Verify JWT claims are set `set local "request.jwt.claims"`
    - Check policy definitions match your test assumptions

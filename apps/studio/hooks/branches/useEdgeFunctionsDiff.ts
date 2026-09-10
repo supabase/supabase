@@ -1,16 +1,15 @@
-import { useMemo, useCallback } from 'react'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
-import { handleError } from 'data/fetchers'
+import { useCallback, useMemo } from 'react'
+
 import {
   getEdgeFunctionBody,
   type EdgeFunctionBodyData,
-} from 'data/edge-functions/edge-function-body-query'
+} from '@/data/edge-functions/edge-function-body-query'
 import {
   useEdgeFunctionsQuery,
   type EdgeFunctionsData,
-} from 'data/edge-functions/edge-functions-query'
-import { basename } from 'path'
-import { edgeFunctionsKeys } from 'data/edge-functions/keys'
+} from '@/data/edge-functions/edge-functions-query'
+import { edgeFunctionsKeys } from '@/data/edge-functions/keys'
 
 interface UseEdgeFunctionsDiffProps {
   currentBranchRef?: string
@@ -46,8 +45,10 @@ export interface EdgeFunctionsDiffResult {
   clearDiffsOptimistically: () => void
 }
 
-// Small helper around path.basename but avoids importing the full Node path lib for the browser bundle
-const fileKey = (fullPath: string) => basename(fullPath)
+// Equivalent of path.basename without importing Node's path lib — `path` isn't
+// polyfilled in the browser bundle under Vite, so importing it crashes the route.
+// Exported so EdgeFunctionsDiffPanel matches files with identical semantics.
+export const fileKey = (fullPath: string) => fullPath.slice(fullPath.lastIndexOf('/') + 1)
 
 export const useEdgeFunctionsDiff = ({
   currentBranchRef,
@@ -58,7 +59,7 @@ export const useEdgeFunctionsDiff = ({
   // Fetch edge functions for both branches
   const {
     data: currentBranchFunctions,
-    isLoading: isCurrentFunctionsLoading,
+    isPending: isCurrentFunctionsLoading,
     refetch: refetchCurrentBranchFunctions,
   } = useEdgeFunctionsQuery(
     { projectRef: currentBranchRef },
@@ -71,7 +72,7 @@ export const useEdgeFunctionsDiff = ({
 
   const {
     data: mainBranchFunctions,
-    isLoading: isMainFunctionsLoading,
+    isPending: isMainFunctionsLoading,
     refetch: refetchMainBranchFunctions,
   } = useEdgeFunctionsQuery(
     { projectRef: mainBranchRef },
@@ -161,18 +162,6 @@ export const useEdgeFunctionsDiff = ({
     ].some((q) => q.isLoading) ||
     isCurrentFunctionsLoading ||
     isMainFunctionsLoading
-
-  // Aggregate errors across all queries and handle the first encountered error.
-  const firstError = [
-    ...currentBodiesQueries,
-    ...mainBodiesQueries,
-    ...addedBodiesQueries,
-    ...removedBodiesQueries,
-  ].find((q) => q.error)?.error
-
-  if (firstError) {
-    handleError(firstError)
-  }
 
   // Build lookup maps --------------------------------------------------------
   const currentBodiesMap: Record<string, EdgeFunctionBodyData | undefined> = {}
@@ -292,5 +281,3 @@ export const useEdgeFunctionsDiff = ({
     clearDiffsOptimistically,
   }
 }
-
-export default useEdgeFunctionsDiff

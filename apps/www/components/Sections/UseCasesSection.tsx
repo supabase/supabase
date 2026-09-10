@@ -1,12 +1,11 @@
-import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import Panel from '~/components/Panel'
+import { getAnimation, INITIAL_BOTTOM } from '~/lib/animations'
+import { domAnimation, LazyMotion, m, useInView } from 'framer-motion'
+import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useRef } from 'react'
 import { Button } from 'ui'
-import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
-
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import Panel from '~/components/Panel'
-import { ArrowUpRight } from 'lucide-react'
 
 interface UseCase {
   img?: string
@@ -64,7 +63,7 @@ const UseCase = ({
 
   return (
     <m.div initial={initial} animate={isInView ? animate : initial} className="flex">
-      <Panel outerClassName="w-full" innerClassName="p-4 md:p-8 h-full !bg-background">
+      <Panel outerClassName="w-full" innerClassName="p-4 md:p-8 h-full bg-background!">
         <div className="h-full flex flex-col gap-4 items-start justify-between">
           <div className="prose">
             <div className="flex items-center gap-2">
@@ -75,7 +74,7 @@ const UseCase = ({
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <path d={useCase.icon} fillRule="evenodd" fill="hsl(var(--foreground-light))" />
+                <path d={useCase.icon} fillRule="evenodd" fill="var(--foreground-light)" />
               </svg>
               <h4 className="text-base sm:text-lg m-0">{useCase.title}</h4>
             </div>
@@ -83,11 +82,11 @@ const UseCase = ({
           </div>
           {useCase.cta &&
             (useCase.cta.isDisabled ? (
-              <Button size="tiny" type="default" disabled className="justify-end">
+              <Button size="tiny" variant="default" disabled className="justify-end">
                 {useCase.cta.label ?? 'View example'}
               </Button>
             ) : (
-              <Button asChild size="tiny" type="default" iconRight={<ArrowUpRight />}>
+              <Button asChild size="tiny" variant="default" iconRight={<ArrowUpRight />}>
                 <Link href={useCase.cta.link} target="_blank">
                   {useCase.cta.label ?? 'View example'}
                 </Link>

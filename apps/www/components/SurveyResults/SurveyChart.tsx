@@ -1,7 +1,10 @@
 'use client'
-import { useEffect, useState, useRef, useCallback } from 'react'
+
 import { createClient } from '@supabase/supabase-js'
+import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import { motion } from 'framer-motion'
+import { ChevronsUpDown } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Button,
   DropdownMenu,
@@ -9,9 +12,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { ChevronsUpDown } from 'lucide-react'
-import TwoOptionToggle from '../../../studio/components/ui/TwoOptionToggle'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
+
+import { TwoOptionToggle } from '../../../studio/components/ui/TwoOptionToggle'
 
 // Separate Supabase client for survey project
 const externalSupabase = createClient(
@@ -312,7 +314,7 @@ export function SurveyChart({
       ref={chartRef}
       className="w-full bg-200 border-t border-muted"
       style={{
-        background: `radial-gradient(circle at center -150%, hsl(var(--brand-300)), transparent 80%), radial-gradient(ellipse at center 230%, hsl(var(--background-surface-200)), transparent 75%)`,
+        background: `radial-gradient(circle at center -150%, hsl(var(--brand-300)), transparent 80%), radial-gradient(ellipse at center 230%, var(--background-surface-200), transparent 75%)`,
       }}
     >
       <header className="px-8 py-8">
@@ -340,7 +342,7 @@ export function SurveyChart({
             <TwoOptionToggle
               options={['SQL', 'chart']}
               activeOption={view}
-              onClickOption={handleViewChange}
+              onClickOption={(value) => handleViewChange(value as 'sql' | 'chart')}
               borderOverride="border-overlay"
             />
           </div>
@@ -435,7 +437,7 @@ export function SurveyChart({
                     No responses match those filters. Maybe next year?
                   </p>
                   <Button
-                    type="primary"
+                    variant="primary"
                     size="tiny"
                     onClick={() =>
                       setActiveFilters(
@@ -472,12 +474,12 @@ export function SurveyChart({
             !dataLoading &&
             !dataError &&
             chartData.length > 3 && (
-              <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-gradient-to-b from-transparent to-background">
+              <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-linear-to-b from-transparent to-background">
                 <Button
-                  type="default"
+                  variant="default"
                   size="tiny"
                   onClick={() => setIsExpanded(true)}
-                  className="shadow-sm"
+                  className="shadow-xs"
                 >
                   Show more
                 </Button>
@@ -527,7 +529,7 @@ function SurveyFilter({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          type="default"
+          variant="default"
           size="tiny"
           iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
         >

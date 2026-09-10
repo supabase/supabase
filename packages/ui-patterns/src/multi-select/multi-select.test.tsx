@@ -1,5 +1,7 @@
-import { render, fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { fireEvent, render, screen } from '@testing-library/react'
+import { useState } from 'react'
+import { describe, expect, it } from 'vitest'
+
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -8,7 +10,6 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from './index'
-import { useState } from 'react'
 
 // This fixes a "ReferenceError: ResizeObserver is not defined" error in the test
 class ResizeObserver {
@@ -47,6 +48,55 @@ function MultiSelectDemo() {
 }
 
 describe('multi-select', () => {
+  it('supports the tiny control size', () => {
+    render(
+      <MultiSelector size="tiny" values={['Apple']} onValuesChange={() => undefined}>
+        <MultiSelectorTrigger label="Select fruits" />
+      </MultiSelector>
+    )
+
+    const trigger = screen.getByRole('combobox')
+    expect(trigger).toHaveClass('h-[26px]', 'p-0.5')
+    expect(trigger.firstElementChild).toHaveClass('gap-0.5')
+    expect(trigger.querySelector('.lucide-chevron-down')).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('keeps the default trigger height stable when the first value is selected', () => {
+    const { rerender } = render(
+      <MultiSelector values={[]} onValuesChange={() => undefined}>
+        <MultiSelectorTrigger label="Select fruits" />
+      </MultiSelector>
+    )
+
+    const trigger = screen.getByRole('combobox')
+    expect(trigger).toHaveClass('min-h-[34px]', 'py-1.5')
+    expect(screen.getByText('Select fruits')).toHaveClass('leading-5')
+
+    rerender(
+      <MultiSelector values={['Apple']} onValuesChange={() => undefined}>
+        <MultiSelectorTrigger label="Select fruits" />
+      </MultiSelector>
+    )
+
+    expect(screen.getByText('Apple').closest('[class*=rounded]')).toHaveClass(
+      'text-xs/none',
+      'py-[3px]'
+    )
+    expect(trigger).toHaveClass('min-h-[34px]', 'py-1.5')
+  })
+
+  it('renders selected values with a custom label', () => {
+    render(
+      <MultiSelector values={['101']} onValuesChange={() => undefined}>
+        <MultiSelectorTrigger renderValue={(value) => `Public.MixedCase_${value}`} />
+      </MultiSelector>
+    )
+
+    const badge = screen.getByText('Public.MixedCase_101').closest('[class*=rounded]')
+    expect(screen.getByRole('combobox')).toHaveTextContent('Public.MixedCase_101')
+    expect(badge).toHaveClass('normal-case', 'tracking-normal')
+  })
+
   it('opens the dropdown when the MultiSelectorTrigger is clicked', () => {
     render(<MultiSelectDemo />)
 
@@ -55,6 +105,45 @@ describe('multi-select', () => {
 
     fireEvent.click(trigger) // Click on the trigger to open
     expect(screen.getByText('Apple')).toBeInTheDocument() // Apple should be visible in the dropdown
+  })
+
+  it('shows loading rows only inside the open dropdown', () => {
+    render(
+      <MultiSelector values={[]} onValuesChange={() => undefined}>
+        <MultiSelectorTrigger label="Select fruits" />
+        <MultiSelectorContent>
+          <MultiSelectorList loading>
+            <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>
+          </MultiSelectorList>
+        </MultiSelectorContent>
+      </MultiSelector>
+    )
+
+    expect(document.querySelector('.shimmering-loader')).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('combobox'))
+
+    expect(document.querySelector('.shimmering-loader')).toBeInTheDocument()
+    expect(screen.queryByText('Apple')).not.toBeInTheDocument()
+  })
+
+  it('shows a custom loading error instead of an empty result', () => {
+    render(
+      <MultiSelector values={[]} onValuesChange={() => undefined}>
+        <MultiSelectorTrigger label="Select fruits" />
+        <MultiSelectorContent>
+          <MultiSelectorList error errorLabel="Unable to load fruits">
+            <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>
+          </MultiSelectorList>
+        </MultiSelectorContent>
+      </MultiSelector>
+    )
+
+    fireEvent.click(screen.getByRole('combobox'))
+
+    expect(screen.getByText('Unable to load fruits')).toBeInTheDocument()
+    expect(screen.queryByText('Apple')).not.toBeInTheDocument()
+    expect(screen.queryByText('No results found')).not.toBeInTheDocument()
   })
 
   it('adds and removes value when toggling MultiSelectorItem', () => {

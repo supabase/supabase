@@ -157,13 +157,13 @@ GRANT INSERT ON TABLE public.profiles TO supabase_auth_admin;
 
 ## Coding Concerns
 
-* Check that you're using `@supabase/realtime-js` v2.44.0 or later.
-* You need to define that the channel is private using the new configuration field during channel creation:
+- Check that you're using `@supabase/realtime-js` v2.44.0 or later.
+- You need to define that the channel is private using the new configuration field during channel creation:
 
 ```typescript
-  const channel = supabase.channel('room-1', {
-    config: { private: true },
-  })
+const channel = supabase.channel('room-1', {
+  config: { private: true },
+})
 ```
 
 You can check `app/protected/page.tsx` to see how we've set it up in the demo.

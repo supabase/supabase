@@ -10,7 +10,6 @@ export const CATEGORY_OPTIONS: {
   label: string
   description: string
   query?: string
-  hidden?: boolean
 }[] = [
   {
     value: SupportCategories.PROBLEM,
@@ -79,11 +78,13 @@ export const CATEGORY_OPTIONS: {
         },
       ]),
   {
+    // Must stay 'Others' (plural). The backend lowercases this before writing
+    // it to Front's `Type` custom field, which is a fixed, case-sensitive
+    // enum containing 'others' — not 'other'.
     value: 'Others' as const,
-    label: 'Others',
-    description: 'Issues that are not related to any of the other categories',
+    label: 'Other',
+    description: "An issue that doesn't fit the categories above",
     query: undefined,
-    hidden: true,
   },
 ]
 
@@ -137,18 +138,24 @@ export const SERVICE_OPTIONS = [
   },
   {
     id: 5,
+    name: 'Multigres',
+    value: 'Multigres',
+    disabled: false,
+  },
+  {
+    id: 6,
     name: 'Realtime',
     value: 'Realtime',
     disabled: false,
   },
   {
-    id: 6,
+    id: 7,
     name: 'Storage',
     value: 'Storage',
     disabled: false,
   },
   {
-    id: 7,
+    id: 8,
     name: 'Others',
     value: 'Others',
     disabled: false,

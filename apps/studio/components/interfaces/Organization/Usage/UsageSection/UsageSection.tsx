@@ -1,13 +1,13 @@
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
-import { DataPoint } from 'data/analytics/constants'
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import SectionHeader from '../SectionHeader'
 import { CategoryMetaKey, USAGE_CATEGORIES } from '../Usage.constants'
 import AttributeUsage from './AttributeUsage'
 import DatabaseSizeUsage from './DatabaseSizeUsage'
 import { DiskUsage } from './DiskUsage'
+import { ScaffoldContainer } from '@/components/layouts/Scaffold'
+import { DataPoint } from '@/data/analytics/constants'
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
+import { useOrgUsageQuery } from '@/data/usage/org-usage-query'
 
 export interface ChartMeta {
   [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
@@ -37,7 +37,7 @@ const UsageSection = ({
   const {
     data: usage,
     error: usageError,
-    isLoading: isLoadingUsage,
+    isPending: isLoadingUsage,
     isError: isErrorUsage,
     isSuccess: isSuccessUsage,
   } = useOrgUsageQuery({
@@ -73,7 +73,7 @@ const UsageSection = ({
             currentBillingCycleSelected={currentBillingCycleSelected}
             usage={usage}
           />
-        ) : attribute.key === PricingMetric.DATABASE_SIZE ? (
+        ) : attribute.key === PricingMetric.DATABASE_SIZE && subscription?.plan.id === 'free' ? (
           <DatabaseSizeUsage
             key={attribute.name}
             slug={orgSlug}

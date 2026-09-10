@@ -1,5 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/registry/default/components/ui/card'
 import { createFileRoute } from '@tanstack/react-router'
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/registry/default/components/ui/card'
 
 export const Route = createFileRoute('/auth/error')({
   component: AuthError,

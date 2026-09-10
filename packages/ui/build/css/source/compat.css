@@ -1,0 +1,56 @@
+/*
+ * Backwards-compatibility aliases.
+ *
+ * These map the old token names onto the semantic system in semantic.css so
+ * components can migrate gradually. Nothing new should reference them — they
+ * exist only so un-migrated call sites keep resolving. Delete entries as their
+ * consumers move to the semantic tokens; the file goes away once it is empty.
+ *
+ * Kept separate from semantic.css so the core model reads as just inputs →
+ * derivations. Must be imported after semantic.css (see tailwind.config.css).
+ */
+
+:root {
+  /* Legacy foreground aliases */
+  --foreground-default: var(--foreground);
+  --foreground-light: var(--muted-foreground);
+  --foreground-lighter: var(--tertiary-foreground);
+  --foreground-muted: var(--tertiary-foreground);
+  /* --foreground-contrast lives in semantic.css — do not remap to --primary-foreground */
+
+  /* Legacy background aliases */
+  --background-default: var(--background);
+  --background-200: var(--card);
+  --background-alternative-default: var(--background);
+  --background-alternative-200: var(--card);
+  --background-selection: var(--accent);
+  --background-control: var(--accent);
+  --background-surface-75: var(--card);
+  --background-surface-100: var(--card);
+  --background-surface-200: var(--muted);
+  --background-surface-300: var(--secondary);
+  --background-surface-400: var(--tertiary);
+  --background-overlay-default: var(--secondary);
+  --background-overlay-hover: var(--accent);
+  --background-muted: var(--muted);
+  --background-button-default: var(--secondary);
+  --background-dialog-default: var(--popover);
+  --background-dash-sidebar: var(--background);
+  --background-dash-canvas: var(--background);
+
+  /* Legacy border aliases */
+  --border-default: var(--border);
+  --border-muted: var(--border);
+  --border-secondary: var(--border-muted);
+  --border-overlay: oklch(
+    from var(--foreground) l calc(c * 0.5) h / calc(4% + 34% * var(--contrast-border))
+  );
+  --border-control: var(--input);
+  --border-alternative: var(--border);
+  --border-strong: var(--input);
+  --border-stronger: oklch(
+    from var(--foreground) l calc(c * 0.5) h / calc(5% + 45% * var(--contrast-border))
+  );
+  --border-button-default: var(--border);
+  --border-button-hover: var(--border-stronger);
+}

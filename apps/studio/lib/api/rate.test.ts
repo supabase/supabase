@@ -1,4 +1,5 @@
 import { expect, test, vi } from 'vitest'
+
 // End of third-party imports
 
 import rate from '../../pages/api/ai/feedback/rate'
@@ -6,6 +7,35 @@ import { sanitizeMessagePart } from '../ai/tools/tool-sanitizer'
 
 vi.mock('../ai/tools/tool-sanitizer', () => ({
   sanitizeMessagePart: vi.fn((part) => part),
+}))
+
+vi.mock('@/lib/ai/ai-details', () => ({
+  getAIDetails: vi.fn().mockResolvedValue({
+    aiOptInLevel: 'schema_and_log_and_data',
+    hasAccessToAdvanceModel: true,
+    hasHipaaAddon: false,
+    region: 'us-east-1',
+    isSensitive: false,
+  }),
+}))
+
+vi.mock('@/lib/ai/model', () => ({
+  getModel: vi.fn().mockResolvedValue({
+    modelParams: { model: {} },
+  }),
+}))
+
+vi.mock('ai', () => ({
+  generateText: vi.fn().mockResolvedValue({
+    output: {
+      category: 'sql_generation',
+    },
+  }),
+  Output: { object: vi.fn() },
+}))
+
+vi.mock('@/components/ui/AIAssistantPanel/Message.utils', () => ({
+  rateMessageResponseSchema: {},
 }))
 
 test('rate calls the tool sanitizer', async () => {
@@ -41,32 +71,6 @@ test('rate calls the tool sanitizer', async () => {
     json: vi.fn(() => mockRes),
     setHeader: vi.fn(() => mockRes),
   }
-
-  vi.mock('lib/ai/org-ai-details', () => ({
-    getOrgAIDetails: vi.fn().mockResolvedValue({
-      aiOptInLevel: 'schema_and_log_and_data',
-      isLimited: false,
-    }),
-  }))
-
-  vi.mock('lib/ai/model', () => ({
-    getModel: vi.fn().mockResolvedValue({
-      model: {},
-      error: null,
-    }),
-  }))
-
-  vi.mock('ai', () => ({
-    generateObject: vi.fn().mockResolvedValue({
-      object: {
-        category: 'sql_generation',
-      },
-    }),
-  }))
-
-  vi.mock('components/ui/AIAssistantPanel/Message.utils', () => ({
-    rateMessageResponseSchema: {},
-  }))
 
   await rate(mockReq as any, mockRes as any)
 

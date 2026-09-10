@@ -97,6 +97,17 @@ supabase.storage.create_bucket(
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var bucket = await supabase.Storage.CreateBucket("avatars", new BucketUpsertOptions { Public = true });
+```
+
+[Reference.](/docs/reference/csharp/create-bucket)
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Restricting uploads

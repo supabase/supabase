@@ -1,9 +1,13 @@
-import { inferColumnType } from 'components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.utils'
-import { describe, test, expect } from 'vitest'
+import { describe, expect, test } from 'vitest'
 
-describe('SpreadsheedImport.utils: inferColumnType', () => {
+import {
+  inferColumnType,
+  parseSpreadsheetText,
+} from '@/components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.utils'
+
+describe('SpreadsheetImport.utils: inferColumnType', () => {
   test('should default column type to text if no rows to infer from', () => {
-    const mockData: any[] = []
+    const mockData: Array<unknown> = []
     const type = inferColumnType('id', mockData)
     expect(type).toBe('text')
   })
@@ -63,5 +67,50 @@ describe('SpreadsheedImport.utils: inferColumnType', () => {
     ]
     const type4 = inferColumnType('date', mockData4)
     expect(type4).toBe('timestamptz')
+  })
+})
+
+interface SampleRow {
+  name: string
+  age: string | null
+  city?: string | null
+}
+
+describe('SpreadsheetImport.utils: parseSpreadsheetText', () => {
+  test('should keep empty cells as empty strings if no headers given', async () => {
+    const csv = `name,age\nJohn,25\nJane,`
+    const { rows } = await parseSpreadsheetText({ text: csv, emptyStringAsNullHeaders: [] })
+    expect((rows[1] as SampleRow).age).toBe('')
+  })
+
+  test('should convert empty cells to null when treatEmptyAsNull is true', async () => {
+    const csv = `name,age\nJohn,25\nJane,`
+    const { rows } = await parseSpreadsheetText({ text: csv, emptyStringAsNullHeaders: undefined })
+    expect((rows[1] as SampleRow).age).toBeNull()
+  })
+
+  test('should not affect non-empty values when treatEmptyAsNull is true', async () => {
+    const csv = `name,age\nJohn,25\nJane,`
+    const { rows } = await parseSpreadsheetText({ text: csv, emptyStringAsNullHeaders: undefined })
+    expect((rows[0] as SampleRow).name).toBe('John')
+    expect((rows[0] as SampleRow).age).toBe('25')
+  })
+
+  test('should handle multiple empty cells across columns when treatEmptyAsNull is true', async () => {
+    const csv = `name,age,city\nJohn,,\nJane,30,`
+    const { rows } = await parseSpreadsheetText({ text: csv, emptyStringAsNullHeaders: undefined })
+    expect((rows[0] as SampleRow).age).toBeNull()
+    expect((rows[0] as SampleRow).city).toBeNull()
+    expect((rows[1] as SampleRow).age).toBe('30')
+    expect((rows[1] as SampleRow).city).toBeNull()
+  })
+
+  test('should return correct headers regardless of treatEmptyAsNull', async () => {
+    const csv = `name,age\nJohn,25`
+    const { headers } = await parseSpreadsheetText({
+      text: csv,
+      emptyStringAsNullHeaders: undefined,
+    })
+    expect(headers).toEqual(['name', 'age'])
   })
 })

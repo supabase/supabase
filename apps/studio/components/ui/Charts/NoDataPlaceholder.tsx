@@ -1,6 +1,6 @@
 import { BarChart2 } from 'lucide-react'
-
 import { cn } from 'ui'
+
 import { ChartHeader } from './ChartHeader'
 import { useChartSize } from './Charts.utils'
 
@@ -15,6 +15,7 @@ interface NoDataPlaceholderProps {
   isFullHeight?: boolean
   titleTooltip?: string
   hideTotalPlaceholder?: boolean
+  docsUrl?: string
 }
 const NoDataPlaceholder = ({
   attribute,
@@ -26,6 +27,7 @@ const NoDataPlaceholder = ({
   isFullHeight = false,
   titleTooltip,
   hideTotalPlaceholder = false,
+  docsUrl,
 }: NoDataPlaceholderProps) => {
   const { minHeight } = useChartSize(size)
 
@@ -37,11 +39,12 @@ const NoDataPlaceholder = ({
           format={format}
           highlightedValue={hideTotalPlaceholder ? undefined : 0}
           titleTooltip={titleTooltip}
+          docsUrl={docsUrl}
         />
       )}
       <div
         className={cn(
-          'border-control flex flex-grow w-full flex-col items-center justify-center space-y-2 border border-dashed text-center',
+          'border-control flex grow w-full flex-col items-center justify-center space-y-2 border border-dashed text-center',
           isFullHeight && 'h-full',
           className
         )}

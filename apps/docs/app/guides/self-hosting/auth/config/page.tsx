@@ -1,6 +1,6 @@
 import Param from '~/components/Params'
-import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import specAuthV1 from '~/spec/gotrue_v1_config.yaml' with { type: 'yml' }
 
@@ -21,8 +21,9 @@ const AuthConfigPage = async () => {
     <GuideTemplate
       meta={meta}
       editLink={newEditLink(
-        'supabase/supabase/blob/master/apps/docs/app/guides/(with-sidebar)/self-hosting/auth/config/page.tsx'
+        'supabase/supabase/blob/master/apps/docs/app/guides/self-hosting/auth/config/page.tsx'
       )}
+      pathname="/guides/self-hosting/auth/config"
     >
       <MDXRemoteBase source={descriptionMdx} />
 

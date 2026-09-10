@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { IS_PLATFORM } from 'common'
-import type { components } from 'data/api'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { usageKeys } from './keys'
+import type { components } from '@/data/api'
+import { get, handleError } from '@/data/fetchers'
+import { EMPTY_ARR } from '@/lib/void'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ResourceWarningsVariables = {
   ref?: string
@@ -26,7 +27,7 @@ export async function getResourceWarnings(
   })
   if (error) handleError(error)
 
-  return data
+  return Array.isArray(data) ? data : EMPTY_ARR
 }
 
 export type ResourceWarning = components['schemas']['ProjectResourceWarningsResponse']
@@ -45,6 +46,6 @@ export const useResourceWarningsQuery = <TData = ResourceWarningsData>(
     queryFn: ({ signal }) => getResourceWarnings(variables, signal),
     enabled:
       IS_PLATFORM && enabled && (variables.ref !== undefined || variables.slug !== undefined),
-    staleTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 5,
     ...options,
   })

@@ -8,5 +8,5 @@
 
 ```txt
 RESEND_API_KEY=<your_resend_api_key>
-SEND_EMAIL_HOOK_SECRET=<base64_secret>
+SEND_EMAIL_HOOK_SECRET="v1,whsec_<base64_secret>"
 ```

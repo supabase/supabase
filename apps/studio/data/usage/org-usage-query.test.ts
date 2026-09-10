@@ -1,7 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
 import { getOrgUsage } from './org-usage-query'
 
-vi.mock('data/fetchers', () => ({
+vi.mock('@/data/fetchers', () => ({
   get: vi.fn(),
   handleError: vi.fn((error) => {
     throw error
@@ -9,17 +10,13 @@ vi.mock('data/fetchers', () => ({
 }))
 
 describe('org-usage-query', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   describe('getOrgUsage', () => {
     it('throws error when orgSlug is not provided', async () => {
       await expect(getOrgUsage({ orgSlug: undefined })).rejects.toThrow('orgSlug is required')
     })
 
     it('calls API with correct parameters including project_ref', async () => {
-      const { get } = await import('data/fetchers')
+      const { get } = await import('@/data/fetchers')
       const mockGet = get as unknown as ReturnType<typeof vi.fn>
 
       const mockResponse = { usages: [] }
@@ -52,7 +49,7 @@ describe('org-usage-query', () => {
     })
 
     it('calls API without project_ref when projectRef is null', async () => {
-      const { get } = await import('data/fetchers')
+      const { get } = await import('@/data/fetchers')
       const mockGet = get as unknown as ReturnType<typeof vi.fn>
 
       const mockResponse = { usages: [] }
@@ -79,7 +76,7 @@ describe('org-usage-query', () => {
     })
 
     it('calls API without date params when start and end are undefined', async () => {
-      const { get } = await import('data/fetchers')
+      const { get } = await import('@/data/fetchers')
       const mockGet = get as unknown as ReturnType<typeof vi.fn>
 
       const mockResponse = { usages: [] }
@@ -105,7 +102,7 @@ describe('org-usage-query', () => {
     })
 
     it('handles API errors correctly', async () => {
-      const { get, handleError } = await import('data/fetchers')
+      const { get, handleError } = await import('@/data/fetchers')
       const mockGet = get as unknown as ReturnType<typeof vi.fn>
       const mockHandleError = handleError as unknown as ReturnType<typeof vi.fn>
 

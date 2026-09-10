@@ -1,30 +1,31 @@
 import fs from 'fs'
 import path from 'path'
-import { UnistNode, UnistTree } from 'types/unist'
+// import { Column, IColumnProps } from './sample-component'
+import React from 'react'
 import { u } from 'unist-builder'
 import { visit } from 'unist-util-visit'
 
-import { Index } from '../__registry__'
+import { registry } from '../registry/registry'
 import { styles } from '../registry/styles'
+import { UnistNode, UnistTree } from '@/types/unist'
 
-// import { parse } from 'react-docgen'
-
-// import * as reactDocgenTypescript from 'react-docgen-typescript'
-
-// import { Column, IColumnProps } from './sample-component'
-import React from 'react' // ComponentType
-
-function inspectComponentProps<T>(component: React.ComponentType<T>): void {
-  // Assert the component's props type
-  const defaultProps = (component as React.ComponentType<any>).defaultProps || {}
-
-  // console.log('Component props:')
-  // console.log('----------------')
-
-  for (const propName in defaultProps) {
-    const propType = typeof defaultProps[propName]
-    console.log(`${propName}: ${propType}`)
+// Resolves registry files from the plain registry data (name/type/files
+// metadata only) rather than `__registry__` — the generated index that also
+// wires up `React.lazy` component imports. This plugin only ever needs file
+// paths to read source off disk, and pulling in the generated index (with its
+// deep chain of real component + npm dependencies) breaks Velite's esbuild-based
+// config bundling under pnpm's strict module resolution.
+function getRegistryFiles(styleName: string, name: string) {
+  const item = registry.find((entry) => entry.name === name)
+  if (!item || item.files.length === 0) {
+    throw new Error(`Registry item "${name}" has no source files`)
   }
+  // `components:ui` items are the real shadcn primitives shared via `packages/ui`,
+  // not local copies under `registry/${styleName}/` like examples/fragments/blocks.
+  if (item.type === 'components:ui') {
+    return item.files.map((file) => `../../packages/ui/src/components/shadcn/ui/${file}`)
+  }
+  return item.files.map((file) => `registry/${styleName}/${file}`)
 }
 
 export function rehypeComponent() {
@@ -37,61 +38,6 @@ export function rehypeComponent() {
           value?: string
           type?: string
         }) || {}
-
-      // console.log(srcPath, componentName)
-
-      // inspectComponentProps(Column)
-
-      // console.log('NEW NODE: ', node.name)
-
-      // if (node.name === 'ComponentProps') {
-      //   // Parse a file for docgen info
-      //   const options = {
-      //     // savePropValueAsString: true,
-      //   }
-
-      //   // const parser = reactDocgenTypescript.parse('./sample-component.tsx', options)
-
-      //   // console.log('PARSER', parser)
-
-      //   const code = `
-      //   /** My first component */
-      //   export default ({ name, title }: {
-      //     /** My first component */
-      //     name: string,
-      //     /** My first component */
-      //     title: string
-      //   }) => <div>{{name}}</div>;
-      //   `
-      //   // console.log('node', node)
-
-      //   const documentation = parse(code)[0]
-
-      //   // console.log('documentation', documentation)
-
-      //   // Add attributes to object
-
-      //   node.attributes?.push({
-      //     type: 'mdxJsxAttribute',
-      //     name: 'docs',
-      //     value: JSON.stringify(documentation),
-      //   })
-
-      //   // console.log('node after', node)
-
-      //   // Add random text as children
-      //   // node.children?.push({
-      //   //   type: 'text',
-      //   //   value: 'I am random text', // Generate a random UUID as text content
-      //   // })
-
-      //   // node.data = {
-      //   //   ...node.data,
-      //   //   name: 'documentation',
-      //   //   type: 'mdxJsxAttribute',
-      //   //   value: documentation,
-      //   // }
-      // }
 
       if (node.name === 'ComponentSource') {
         // console.log('DO NOT USE THIS COMPONENT')
@@ -112,16 +58,16 @@ export function rehypeComponent() {
             if (srcPath) {
               src = srcPath
             } else {
-              const component = Index[style.name][name]
+              const files = getRegistryFiles(style.name, name)
               // console.log('got to ELSE STATEMENT')
               // console.log('filename', fileName)
               // console.log('name', name)
 
               src = fileName
-                ? component.files.find((file: string) => {
+                ? files.find((file: string) => {
                     return file.endsWith(`${fileName}.tsx`) || file.endsWith(`${fileName}.ts`)
-                  }) || component.files[0]
-                : component.files[0]
+                  }) || files[0]
+                : files[0]
               // console.log('got to END of ELSE STATEMENT')
             }
 
@@ -181,9 +127,9 @@ export function rehypeComponent() {
 
         try {
           for (const style of styles) {
-            const component = Index[style.name][name]
+            const files = getRegistryFiles(style.name, name)
             // console.log('GOT HERE')
-            const src = component.files[0]
+            const src = files[0]
 
             // Read the source file.
             const filePath = path.join(process.cwd(), src)
@@ -233,9 +179,9 @@ export function rehypeComponent() {
 
         try {
           for (const style of styles) {
-            const component = Index[style.name][name]
+            const files = getRegistryFiles(style.name, name)
             // console.log('GOT HERE')
-            const src = component.files[0]
+            const src = files[0]
 
             // Read the source file.
             const filePath = path.join(process.cwd(), src)

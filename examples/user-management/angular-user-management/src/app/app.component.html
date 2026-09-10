@@ -1,0 +1,4 @@
+<div class="container" style="padding: 50px 0 100px 0">
+  <app-account *ngIf="user" [user]="user"></app-account>
+  <app-auth *ngIf="!user"></app-auth>
+</div>

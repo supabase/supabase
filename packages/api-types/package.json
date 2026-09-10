@@ -6,14 +6,17 @@
   "types": "./index.ts",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf node_modules",
-    "codegen": "openapi-typescript --redocly ./redocly.yaml --alphabetize --default-non-nullable=false && prettier --cache --write types/*.d.ts"
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo",
+    "codegen": "openapi-typescript --redocly ./redocly.yaml --alphabetize --default-non-nullable=false && prettier --cache --write types/*.d.ts",
+    "verify-production-types": "node ./scripts/verify-production-types.mjs",
+    "test": "node --test ./scripts/*.test.mjs"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "openapi-typescript": "^7.4.3",
-    "prettier": "3.2.4",
+    "prettier": "*",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:"
   }
 }

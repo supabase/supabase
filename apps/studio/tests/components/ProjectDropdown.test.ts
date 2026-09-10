@@ -1,5 +1,6 @@
-import { sanitizeRoute } from 'components/layouts/AppLayout/ProjectDropdown'
-import { test, expect } from 'vitest'
+import { expect, test } from 'vitest'
+
+import { sanitizeRoute } from '@/components/layouts/AppLayout/ProjectDropdown.utils'
 
 test('Should sanitize project routes correctly when switching projects by removing project specific parameters', () => {
   expect(sanitizeRoute('/project/[ref]', { ref: 'abc' })).toBe('/project/[ref]')
@@ -17,4 +18,7 @@ test('Should sanitize project routes correctly when switching projects by removi
   expect(sanitizeRoute('/project/[ref]/logs/explorer?q=select', { ref: 'abc' })).toBe(
     '/project/[ref]/logs/explorer?q=select'
   )
+  expect(
+    sanitizeRoute('/project/[ref]/advisors/security/[preset]', { ref: 'abc', preset: 'auth' })
+  ).toBe('/project/[ref]/advisors/security')
 })

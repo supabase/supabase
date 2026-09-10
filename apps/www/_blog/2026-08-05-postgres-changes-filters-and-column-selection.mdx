@@ -1,0 +1,105 @@
+---
+title: 'Postgres Changes gets AND filters, new operators, and column selection'
+description: 'Postgres Changes subscriptions can now combine filters with AND, match on more operators, and select only the columns you need in the payload.'
+author: filipe
+date: '2026-08-05'
+categories:
+  - product
+tags:
+  - realtime
+  - postgres
+imgSocial: 'postgres-changes-filters-and-column-selection/og.png'
+imgThumb: 'postgres-changes-filters-and-column-selection/thumb.png'
+toc_depth: 2
+---
+
+Postgres Changes just got more capable. We're shipping three improvements: filters that combine across multiple columns, more filter operators, and column selection so a subscription returns only the fields you ask for. All three are available now.
+
+Postgres Changes lets you subscribe to inserts, updates, and deletes on a Postgres table and receive them over a WebSocket as they happen.
+
+## Filter on more than one column
+
+A support inbox is a good example. You want a live view of the tickets that are open and assigned to your team, and nothing else. Until now a filter could only look at one column, so you could match on status or on team, but not both at once. The workaround was to subscribe to every open ticket in the table and drop the ones for other teams once they reached your app.
+
+Filters now compose. Separate them with a comma and every condition has to match:
+
+```typescript
+supabase
+  .channel('team-inbox')
+  .on(
+    'postgres_changes',
+    {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'tickets',
+      filter: 'status=eq.open,team=eq.billing',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+## More filter operators
+
+Filters also support `like` and `ilike` for patterns, `is` for null and boolean checks, `match` and `imatch` for POSIX regular expressions, and `isdistinct` for NULL-safe inequality. Prefix any of them with `not.` to invert it:
+
+```typescript
+filter: 'email=like.%@example.com'
+filter: 'deleted_at=is.null'
+filter: 'state=isdistinct.active'
+filter: 'status=not.eq.archived'
+```
+
+If you'd rather build filters in code than assemble strings, there's a builder:
+
+```typescript
+import { postgresChangesFilter } from '@supabase/supabase-js'
+
+filter: postgresChangesFilter().eq('status', 'open').gte('priority', 3)
+```
+
+Chained conditions combine with AND, the same as the comma form. This gets Postgres Changes closer to the filter syntax the Supabase client libraries already use elsewhere.
+
+## Select which columns you receive
+
+Filters narrow which rows arrive. Column selection narrows what's inside them. Every event used to carry the whole row, ticket body and metadata included, even when your UI only rendered a subject line.
+
+Add a `select` option and only those columns come back in the payload:
+
+```typescript
+supabase
+  .channel('team-inbox')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'tickets',
+      select: ['id', 'subject', 'updated_at'],
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+The table's primary key always comes through, even if you leave it out, so you can still tell which row changed. This one is opt in: existing subscriptions keep receiving the full row until you add `select`.
+
+## What this does to your usage
+
+Realtime [bills on messages](https://supabase.com/docs/guides/realtime/pricing) and egress. A database change counts as one message for every client subscribed to it, so an event a filter rejects saves a message per subscriber. A payload trimmed by `select` sends fewer bytes to every subscriber. Both reduce billable usage, so the same workload costs less.
+
+## Things to know
+
+- Column selection requires `@supabase/supabase-js` 2.109.0 or newer. The filter changes work with the client library you already have.
+- The columns you list must be selectable by the subscribing role. Row Level Security still applies.
+- DELETE events only carry the row's primary key, so column filters can't be evaluated on deletes.
+- Only AND composition shipped in this release. OR is not supported.
+
+## What's not supported yet
+
+Postgres Changes filters don't cover the whole PostgREST surface. Array and JSON containment, full text search, and range operators aren't included, and neither is OR composition. None of these are scheduled yet. If one of them would unblock you, tell us in [feature requests](https://github.com/orgs/supabase/discussions/categories/feature-requests) and describe your use case.
+
+## Get started
+
+- Read the [Postgres Changes documentation](https://supabase.com/docs/guides/realtime/postgres-changes) for the full operator table and publication setup
+- If you're already subscribed to Postgres Changes, nothing changes unless you add a filter or a `select` option

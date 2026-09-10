@@ -1,4 +1,5 @@
-import { CodeBlock } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+
 import type { LogQueryError } from '../Logs.types'
 
 export interface ErrorRendererProps {
@@ -13,7 +14,7 @@ export const DefaultErrorRenderer: React.FC<ErrorRendererProps> = ({ error }) =>
       language="json"
       hideLineNumbers
       value={typeof error === 'string' ? error : JSON.stringify(error, null, 2)}
-      className="w-full font-mono"
+      className="w-full font-mono px-4"
     />
   </div>
 )

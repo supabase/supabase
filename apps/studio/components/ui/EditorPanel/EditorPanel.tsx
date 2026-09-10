@@ -1,49 +1,72 @@
-import { Book, Maximize2, X } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import type { Monaco } from '@monaco-editor/react'
+import { acceptUntrustedSql, safeSql, untrustedSql } from '@supabase/pg-meta'
+import { useQueryClient } from '@tanstack/react-query'
+import { useDebounce } from '@uidotdev/usehooks'
+import { useParams } from 'common'
 import {
-  createSqlSnippetSkeletonV2,
-  suffixWithLimit,
-} from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
-import { SqlRunButton } from 'components/interfaces/SQLEditor/UtilityPanel/RunButton'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+  AlertCircle,
+  Book,
+  CheckCircle2,
+  FolderOpen,
+  Loader2,
+  Maximize2,
+  PlusIcon,
+  X,
+} from 'lucide-react'
+import type { editor as MonacoEditor } from 'monaco-editor'
+import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   cn,
-  CodeBlock,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  HoverCard_Shadcn_,
-  HoverCardContent_Shadcn_,
-  HoverCardTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
   KeyboardShortcut,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   SQL_ICON,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
-import AIEditor from '../AIEditor'
+import { AIEditor } from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
+import { DataGridResults } from '../DataGridResults'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
+import { formatSqlError } from './EditorPanel.utils'
+import { SaveSnippetDialog } from './SaveSnippetDialog'
+import { useIsExplorerEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { isExplainQuery } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import { useCreateQuery } from '@/components/interfaces/Explorer/hooks'
+import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
+import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefinitions'
+import { SqlRunButton } from '@/components/interfaces/SQLEditor/UtilityPanel/RunButton'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useContentIdQuery } from '@/data/content/content-id-query'
+import { useContentQuery, type Content } from '@/data/content/content-query'
+import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
+import { contentKeys } from '@/data/content/keys'
+import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
+import { applyAutoLimit } from '@/data/sql/utils'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
+import { useProfile } from '@/lib/profile'
+import { editorPanelState, useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export const EditorPanel = () => {
   const {
@@ -57,22 +80,41 @@ export const EditorPanel = () => {
     setTemplates,
     setResults,
     setError,
+    activeSnippetId,
+    pendingReset,
   } = useEditorPanelStateSnapshot()
-  const { closeSidebar } = useSidebarManagerSnapshot()
   const { profile } = useProfile()
+  const { closeSidebar } = useSidebarManagerSnapshot()
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
+  const isExplorerEnabled = useIsExplorerEnabled()
+  const { createQuery } = useCreateQuery()
+  const queryClient = useQueryClient()
 
-  const label = 'SQL Editor'
-  const [isInlineEditorHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.EDITOR_PANEL),
-    true
-  )
-  const [isAIAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.AI_ASSISTANT),
-    true
-  )
+  const [activeSnippet, setActiveSnippet] = useState<Extract<Content, { type: 'sql' }> | null>(null)
+  const [isEditingTitle, setIsEditingTitle] = useState(false)
+  const [titleInput, setTitleInput] = useState('')
+  const titleInputRef = useRef<HTMLInputElement>(null)
+  const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null)
+  const shouldRefocusAfterRunRef = useRef(false)
+  const [monaco, setMonaco] = useState<Monaco | null>(null)
 
-  const currentValue = value || ''
+  useAddDefinitions('', monaco)
+
+  const label = activeSnippet?.name ?? 'SQL Editor'
+
+  const commitRename = () => {
+    const newName = titleInput.trim()
+    if (!newName || !activeSnippet) {
+      setIsEditingTitle(false)
+      return
+    }
+    setActiveSnippet({ ...activeSnippet, name: newName })
+    setIsEditingTitle(false)
+  }
+  const isInlineEditorHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.INLINE_EDITOR_TOGGLE)
+  const isAIAssistantHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE)
+
+  const currentValue = value || safeSql``
 
   const { ref } = useParams()
   const router = useRouter()
@@ -81,25 +123,93 @@ export const EditorPanel = () => {
 
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
   const [showResults, setShowResults] = useState(true)
-  const [isTemplatesOpen, setIsTemplatesOpen] = useState(false)
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false)
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout>>(null)
+  const originalSnippetRef = useRef<{ sql: string; name: string } | null>(null)
 
-  const errorHeader = error?.formattedError?.split('\n')?.filter((x: string) => x.length > 0)?.[0]
-  const errorContent =
-    'formattedError' in (error || {})
-      ? error?.formattedError
-          ?.split('\n')
-          ?.filter((x: string) => x.length > 0)
-          ?.slice(1) ?? []
-      : [error?.message ?? '']
+  const refocusEditor = () => {
+    requestAnimationFrame(() => {
+      setTimeout(() => editorRef.current?.focus(), 0)
+    })
+  }
+
+  const clearPendingRunRefocus = () => {
+    shouldRefocusAfterRunRef.current = false
+  }
+
+  const refocusEditorAfterRunIfNeeded = () => {
+    if (!shouldRefocusAfterRunRef.current) return
+
+    shouldRefocusAfterRunRef.current = false
+    refocusEditor()
+  }
+
+  const showSaveSuccess = () => {
+    setSaveStatus('success')
+    if (saveStatusTimerRef.current) {
+      clearTimeout(saveStatusTimerRef.current)
+    }
+    saveStatusTimerRef.current = setTimeout(() => setSaveStatus('idle'), 2000)
+  }
+  const [isTemplatesOpen, setIsTemplatesOpen] = useState(false)
+  const [isSnippetsOpen, setIsSnippetsOpen] = useState(false)
+  const [snippetSearch, setSnippetSearch] = useState('')
+  const debouncedSnippetSearch = useDebounce(snippetSearch, 300)
+
+  const { data: snippetsData, isLoading: isLoadingSnippets } = useContentQuery(
+    { projectRef: ref, type: 'sql', name: debouncedSnippetSearch || undefined },
+    { enabled: isSnippetsOpen }
+  )
+
+  const { data: snippetById } = useContentIdQuery(
+    { projectRef: ref, id: activeSnippetId ?? undefined },
+    { enabled: !!activeSnippetId }
+  )
+
+  useEffect(() => {
+    if (!pendingReset) return
+    setActiveSnippet(null)
+    setIsEditingTitle(false)
+    originalSnippetRef.current = null
+    editorPanelState.pendingReset = false
+  }, [pendingReset, setActiveSnippet, setIsEditingTitle])
+
+  useEffect(() => {
+    if (!snippetById || !activeSnippetId) return
+    const sqlSnippet = snippetById as unknown as Extract<Content, { type: 'sql' }>
+    const sql = sqlSnippet.content.unchecked_sql ?? safeSql``
+    setValue(sql)
+    setActiveSnippet(sqlSnippet)
+    originalSnippetRef.current = { sql, name: sqlSnippet.name }
+    editorPanelState.setActiveSnippetId(null)
+  }, [snippetById, activeSnippetId, setValue, setActiveSnippet])
+
+  const { header: errorHeader, lines: errorContent } = error
+    ? formatSqlError(error)
+    : { header: undefined, lines: [] as string[] }
+
+  const { mutate: upsertContent, isPending: isUpserting } = useContentUpsertMutation({
+    onSuccess: (_, vars) => {
+      if (vars.payload.id && ref) {
+        queryClient.invalidateQueries({ queryKey: contentKeys.resource(ref, vars.payload.id) })
+      }
+      originalSnippetRef.current = { sql: currentValue, name: vars.payload.name }
+      showSaveSuccess()
+    },
+    onError: () => setSaveStatus('error'),
+  })
 
   const { mutate: executeSql, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess: async (res) => {
       setResults(res.result)
       setError(undefined)
+      refocusEditorAfterRunIfNeeded()
     },
     onError: (mutationError) => {
       setError(mutationError)
       setResults([])
+      refocusEditorAfterRunIfNeeded()
     },
   })
 
@@ -108,7 +218,10 @@ export const EditorPanel = () => {
     setShowWarning(undefined)
     setResults(undefined)
 
-    if (currentValue.length === 0) return
+    if (currentValue.length === 0) {
+      clearPendingRunRefocus()
+      return
+    }
 
     if (!skipValidation) {
       const isReadOnlySelectSQL = isReadOnlySelect(currentValue)
@@ -120,9 +233,10 @@ export const EditorPanel = () => {
     }
 
     executeSql({
-      sql: suffixWithLimit(currentValue, 100),
+      sql: applyAutoLimit(acceptUntrustedSql(currentValue), 100).sql,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
+      isStatementTimeoutDisabled: true,
       handleError: (executeError) => {
         throw executeError
       },
@@ -130,9 +244,12 @@ export const EditorPanel = () => {
     })
   }
 
+  // Check if this is an EXPLAIN query result
+  const isValidExplainQuery = isExplainQuery(results ?? [])
+
   const handleChange = (value: string) => {
-    setValue(value)
-    onChange?.(value)
+    setValue(untrustedSql(value))
+    onChange?.(untrustedSql(value))
   }
 
   const onSelectTemplate = (content: string) => {
@@ -140,25 +257,153 @@ export const EditorPanel = () => {
     setIsTemplatesOpen(false)
   }
 
+  const onExecuteSqlFromButton = () => {
+    shouldRefocusAfterRunRef.current = true
+    onExecuteSql()
+    refocusEditor()
+  }
+
   const handleClosePanel = () => {
+    clearPendingRunRefocus()
     closeSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     setTemplates([])
     setError(undefined)
     setShowWarning(undefined)
     setShowResults(true)
+    setActiveSnippet(null)
+    setIsEditingTitle(false)
+    editorPanelState.setActiveSnippetId(null)
+  }
+
+  const handleExpand = () => {
+    if (isExplorerEnabled) {
+      const id = createQuery({ sql: currentValue, name: generateSnippetTitle() })
+      if (id) handleClosePanel()
+      return
+    }
+
+    if (!ref) return console.error('Project ref is required')
+
+    if (!project) {
+      console.error('Project is required')
+      return
+    }
+    if (!profile) {
+      console.error('Profile is required')
+      return
+    }
+
+    const snippet = createSqlSnippetSkeletonV2({
+      name: generateSnippetTitle(),
+      sql: currentValue,
+      owner_id: profile.id,
+      project_id: project.id,
+    })
+
+    sqlEditorSnap.addSnippet({ projectRef: ref, snippet })
+    sqlEditorSnap.addNeedsSaving(snippet.id)
+
+    router.push(`/project/${ref}/sql/${snippet.id}`)
+    handleClosePanel()
   }
 
   return (
-    <div className="flex h-full flex-col bg-background">
-      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 px-4 h-[46px]">
-        <div className="text-xs">{label}</div>
-        <div className="flex items-center">
+    <div className="flex h-full flex-col bg-card">
+      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 pl-4 pr-3 h-(--header-height)">
+        {isEditingTitle ? (
+          <input
+            ref={titleInputRef}
+            value={titleInput}
+            onChange={(e) => setTitleInput(e.target.value)}
+            onBlur={commitRename}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') commitRename()
+              if (e.key === 'Escape') setIsEditingTitle(false)
+            }}
+            className="text-xs bg-transparent border-b border-foreground-lighter outline-hidden w-48 py-0.5"
+            autoFocus
+          />
+        ) : (
+          <div
+            className={cn('text-xs', activeSnippet && 'cursor-pointer hover:text-foreground')}
+            onClick={() => {
+              if (!activeSnippet) return
+              setTitleInput(activeSnippet.name)
+              setIsEditingTitle(true)
+            }}
+          >
+            {label}
+          </div>
+        )}
+        <div className="flex items-center gap-2">
+          {activeSnippet && (
+            <ButtonTooltip
+              size="tiny"
+              variant="text"
+              className="w-7 h-7 p-0"
+              icon={<PlusIcon size={14} />}
+              tooltip={{ content: { side: 'bottom', text: 'New snippet' } }}
+              onClick={() => editorPanelState.openAsNew()}
+            />
+          )}
+          <Popover open={isSnippetsOpen} onOpenChange={setIsSnippetsOpen}>
+            <PopoverTrigger asChild>
+              <ButtonTooltip
+                size="tiny"
+                variant="text"
+                role="combobox"
+                aria-expanded={isSnippetsOpen}
+                className="w-7 h-7 p-0"
+                icon={<FolderOpen size={14} />}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'Open snippet',
+                  },
+                }}
+              ></ButtonTooltip>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-[300px] p-0">
+              <Command shouldFilter={false}>
+                <CommandInput
+                  placeholder="Search snippets..."
+                  value={snippetSearch}
+                  onValueChange={setSnippetSearch}
+                />
+                <CommandList>
+                  {isLoadingSnippets ? (
+                    <div className="py-6 text-center text-sm text-foreground-light">
+                      Loading snippets...
+                    </div>
+                  ) : (
+                    <CommandEmpty>No snippets found.</CommandEmpty>
+                  )}
+                  <CommandGroup>
+                    {(snippetsData?.content ?? []).map((snippet) => (
+                      <CommandItem
+                        key={snippet.id}
+                        value={snippet.id}
+                        className="cursor-pointer"
+                        onSelect={() => {
+                          if (snippet.id) editorPanelState.setActiveSnippetId(snippet.id)
+                          setIsSnippetsOpen(false)
+                          setSnippetSearch('')
+                        }}
+                      >
+                        {snippet.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
           {templates.length > 0 && (
-            <Popover_Shadcn_ open={isTemplatesOpen} onOpenChange={setIsTemplatesOpen}>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover open={isTemplatesOpen} onOpenChange={setIsTemplatesOpen}>
+              <PopoverTrigger asChild>
                 <Button
                   size="tiny"
-                  type="default"
+                  variant="default"
                   role="combobox"
                   className="mr-2"
                   aria-expanded={isTemplatesOpen}
@@ -166,17 +411,17 @@ export const EditorPanel = () => {
                 >
                   Templates
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ align="end" className="w-[300px] p-0">
-                <Command_Shadcn_>
-                  <CommandInput_Shadcn_ placeholder="Search templates..." />
-                  <CommandList_Shadcn_>
-                    <CommandEmpty_Shadcn_>No templates found.</CommandEmpty_Shadcn_>
-                    <CommandGroup_Shadcn_>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-[300px] p-0">
+                <Command>
+                  <CommandInput placeholder="Search templates..." />
+                  <CommandList>
+                    <CommandEmpty>No templates found.</CommandEmpty>
+                    <CommandGroup>
                       {templates.map((template) => (
-                        <HoverCard_Shadcn_ key={template.name}>
-                          <HoverCardTrigger_Shadcn_ asChild>
-                            <CommandItem_Shadcn_
+                        <HoverCard key={template.name}>
+                          <HoverCardTrigger asChild>
+                            <CommandItem
                               value={template.name}
                               onSelect={() => onSelectTemplate(template.content)}
                               className="cursor-pointer"
@@ -195,64 +440,40 @@ export const EditorPanel = () => {
                                   </p>
                                 </div>
                               </div>
-                            </CommandItem_Shadcn_>
-                          </HoverCardTrigger_Shadcn_>
-                          <HoverCardContent_Shadcn_ side="left" className="w-[500px] p-0">
+                            </CommandItem>
+                          </HoverCardTrigger>
+                          <HoverCardContent side="left" className="w-[500px] p-0">
                             <CodeBlock
                               language="sql"
                               className="language-sql border-none"
                               hideLineNumbers
                               value={template.content}
                             />
-                          </HoverCardContent_Shadcn_>
-                        </HoverCard_Shadcn_>
+                          </HoverCardContent>
+                        </HoverCard>
                       ))}
-                    </CommandGroup_Shadcn_>
-                  </CommandList_Shadcn_>
-                </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           )}
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="w-7 h-7 p-0"
             icon={<Maximize2 strokeWidth={1.5} />}
+            aria-label={isExplorerEnabled ? 'Open in Explorer' : 'Expand to SQL editor'}
             tooltip={{
               content: {
                 side: 'bottom',
-                text: 'Expand to SQL editor',
+                text: isExplorerEnabled ? 'Open in Explorer' : 'Expand to SQL editor',
               },
             }}
-            onClick={() => {
-              if (!ref) return console.error('Project ref is required')
-
-              if (!project) {
-                console.error('Project is required')
-                return
-              }
-              if (!profile) {
-                console.error('Profile is required')
-                return
-              }
-
-              const snippet = createSqlSnippetSkeletonV2({
-                id: uuidv4(),
-                name: 'New query',
-                sql: currentValue,
-                owner_id: profile.id,
-                project_id: project.id,
-              })
-
-              sqlEditorSnap.addSnippet({ projectRef: ref, snippet })
-              sqlEditorSnap.addNeedsSaving(snippet.id)
-
-              router.push(`/project/${ref}/sql/${snippet.id}`)
-              handleClosePanel()
-            }}
+            onClick={handleExpand}
           />
 
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="w-7 h-7 p-0"
             onClick={handleClosePanel}
             icon={<X strokeWidth={1.5} />}
@@ -272,17 +493,22 @@ export const EditorPanel = () => {
       </div>
 
       <div className="flex-1 overflow-hidden flex flex-col h-full">
-        <div className="flex-1 min-h-0 relative [&_.monaco-editor]:!bg [&_.monaco-editor_.margin]:!bg [&_.monaco-editor_.monaco-editor-background]:!bg">
+        <div className="flex-1 min-h-0 relative [&_.monaco-editor]:!bg-card [&_.monaco-editor_.margin]:!bg-card [&_.monaco-editor_.monaco-editor-background]:!bg-card">
           <AIEditor
             autoFocus
             language="pgsql"
             value={currentValue}
             onChange={handleChange}
+            onMount={(editor, m) => {
+              editorRef.current = editor
+              setMonaco(m)
+            }}
             aiEndpoint={`${BASE_PATH}/api/ai/code/complete`}
             aiMetadata={{
               projectRef: project?.ref,
               connectionString: project?.connectionString,
               orgSlug: org?.slug,
+              language: 'sql',
             }}
             initialPrompt={initialPrompt}
             options={{
@@ -292,7 +518,7 @@ export const EditorPanel = () => {
               wordWrap: 'on',
               lineNumbers: 'on',
               folding: false,
-              padding: { top: 16 },
+              padding: { top: 12 },
               lineNumbersMinChars: 3,
             }}
             executeQuery={onExecuteSql}
@@ -301,12 +527,11 @@ export const EditorPanel = () => {
             openAIAssistantShortcutEnabled={isAIAssistantHotkeyEnabled}
           />
         </div>
-
         {error !== undefined && (
           <div className="shrink-0">
             <Admonition
               type="warning"
-              className="m-0 rounded-none border-x-0 border-b-0 [&>div>div>pre]:text-sm [&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
+              className="rounded-none border-x-0 border-b-0 [&>div>div>pre]:text-sm [&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
               title={errorHeader || 'Error running SQL query'}
               description={
                 <div>
@@ -324,24 +549,34 @@ export const EditorPanel = () => {
             />
           </div>
         )}
-
         {showWarning && (
           <SqlWarningAdmonition
             className="border-t"
             warningType={showWarning}
-            onCancel={() => setShowWarning(undefined)}
+            onCancel={() => {
+              clearPendingRunRefocus()
+              setShowWarning(undefined)
+              refocusEditor()
+            }}
             onConfirm={() => {
+              shouldRefocusAfterRunRef.current = true
               setShowWarning(undefined)
               onExecuteSql(true)
+              refocusEditor()
             }}
           />
         )}
-
         {results !== undefined && results.length > 0 && (
-          <div className={cn(`max-h-72 shrink-0 flex flex-col`, showResults && 'h-full')}>
+          <div
+            className={cn(
+              `shrink-0 flex flex-col`,
+              isValidExplainQuery ? 'max-h-[600px]' : 'max-h-72',
+              showResults && 'h-full'
+            )}
+          >
             {showResults && (
-              <div className="border-t flex-1 overflow-auto">
-                <Results rows={results} />
+              <div className="border-t flex-1 overflow-hidden">
+                <DataGridResults rows={results} />
               </div>
             )}
             <div className="text-xs text-foreground-light border-t py-2 px-5 flex items-center justify-between">
@@ -350,7 +585,7 @@ export const EditorPanel = () => {
               </span>
               <Button
                 size="tiny"
-                type="default"
+                variant="default"
                 className="ml-2"
                 onClick={() => setShowResults((prev) => !prev)}
               >
@@ -366,13 +601,93 @@ export const EditorPanel = () => {
             </p>
           </div>
         )}
+        <div className="relative shrink-0 flex items-center gap-2 justify-end px-5 py-4 w-full border-t">
+          {(isUpserting || saveStatus !== 'idle') && (
+            <div
+              className={cn(
+                'absolute left-0 flex items-center gap-2 px-5 py-3 text-xs',
+                saveStatus === 'success' && 'text-brand-600',
+                saveStatus === 'error' && 'text-warning',
+                saveStatus === 'idle' && 'text-foreground-light'
+              )}
+            >
+              {isUpserting && <Loader2 size={13} className="animate-spin" />}
+              {saveStatus === 'success' && <CheckCircle2 size={13} />}
+              {saveStatus === 'error' && <AlertCircle size={13} />}
+              <span>
+                {isUpserting
+                  ? 'Saving...'
+                  : saveStatus === 'success'
+                    ? 'Snippet updated'
+                    : 'Failed to save snippet'}
+              </span>
+            </div>
+          )}
+          <Button
+            variant="default"
+            size="tiny"
+            disabled={
+              !currentValue ||
+              isExecuting ||
+              isUpserting ||
+              (!!activeSnippet &&
+                currentValue === originalSnippetRef.current?.sql &&
+                activeSnippet.name === originalSnippetRef.current?.name)
+            }
+            onClick={() => {
+              if (!ref || !profile || !project) return
 
-        <div className="flex items-center gap-2 justify-end px-5 py-4 w-full border-t shrink-0">
-          <SqlRunButton isDisabled={isExecuting} isExecuting={isExecuting} onClick={onExecuteSql} />
+              if (activeSnippet) {
+                setSaveStatus('idle')
+                upsertContent({
+                  projectRef: ref,
+                  payload: {
+                    id: activeSnippet.id,
+                    type: 'sql',
+                    name: activeSnippet.name,
+                    description: activeSnippet.description ?? '',
+                    visibility: activeSnippet.visibility ?? 'user',
+                    project_id: project.id,
+                    owner_id: profile.id,
+                    content: {
+                      ...activeSnippet.content,
+                      unchecked_sql: untrustedSql(currentValue),
+                    },
+                  },
+                })
+              } else {
+                setIsSaveDialogOpen(true)
+              }
+            }}
+          >
+            {activeSnippet ? 'Update snippet' : 'Save as snippet'}
+          </Button>
+          <SqlRunButton
+            isDisabled={isExecuting}
+            isExecuting={isExecuting}
+            onClick={onExecuteSqlFromButton}
+          />
         </div>
       </div>
+      <SaveSnippetDialog
+        open={isSaveDialogOpen}
+        sql={currentValue}
+        onOpenChange={setIsSaveDialogOpen}
+        onSave={(name) => {
+          if (!ref || !profile || !project) return
+          const snippet = createSqlSnippetSkeletonV2({
+            name,
+            sql: currentValue,
+            owner_id: profile.id,
+            project_id: project.id,
+          })
+          sqlEditorSnap.addSnippet({ projectRef: ref, snippet })
+          sqlEditorSnap.addNeedsSaving(snippet.id)
+          setActiveSnippet(snippet as unknown as Extract<Content, { type: 'sql' }>)
+          originalSnippetRef.current = { sql: currentValue, name }
+          showSaveSuccess()
+        }}
+      />
     </div>
   )
 }
-
-export default EditorPanel

@@ -1,0 +1,281 @@
+---
+title: Charts
+description: Composable charts for Reports, Dashboards and other visualizations.
+links:
+  doc: https://recharts.github.io/en-US/
+source:
+  recharts: true
+---
+
+<ComponentPreview name="chart-composed-demo" peekCode wide />
+
+## About
+
+Charts are an integral part of Observability at Supabase. Charts aim to be composable and reusable for frictionless setup.
+
+Our charts use a combination of our own presentational components and [Recharts](https://recharts.github.io/en-US/) for extensibility.
+
+## Best Practices
+
+1. **Use provided chart types first**: Always try to use the default provided charts first, otherwise passing Recharts compoennts to `<ChartContent>` is possible but not recommended to avoid complexity.
+
+2. **Use the `useChart` context to show loading and disabled states**: The `useChart` context provides boolean flags for child components to show `isLoading` and `isDisabled` states.
+
+3. **Keep it simple**: Try to avoid abstracting the chart content too much. These components should cover most of your presentational needs.
+
+## Examples
+
+### Basic Chart Types
+
+<ComponentPreview name="chart-composed-basic" wide />
+
+### Chart States
+
+<ComponentPreview name="chart-composed-states" wide />
+
+### Charts as Standalone Metrics
+
+<ComponentPreview name="chart-composed-metrics" wide />
+
+### Charts with Actions
+
+<ComponentPreview name="chart-composed-actions" wide />
+
+### Chart with Table
+
+<ComponentPreview name="chart-composed-table" wide />
+
+You can pass through our [Table](/docs/components/table) component to the `ChartFooter` and expect it to be styled correctly. There is no additional need to style the table, `ChartFooter` will handle the styling for you.
+
+## API
+
+### Chart
+
+The root container component that provides chart context to all child components.
+
+| Prop         | Type                                   | Default | Description                                                        |
+| ------------ | -------------------------------------- | ------- | ------------------------------------------------------------------ |
+| `children`   | `React.ReactNode`                      | -       | Chart child components                                             |
+| `isLoading`  | `boolean`                              | `false` | Shows loading state in child components via the `useChart` context |
+| `isDisabled` | `boolean`                              | `false` | Disables chart interactions via the `useChart` context             |
+| `className`  | `string`                               | -       | Additional CSS classes                                             |
+| `...props`   | `React.HTMLAttributes<HTMLDivElement>` | -       | All standard div props                                             |
+
+### ChartCard
+
+A card wrapper for the chart. Can be used as a Card component or as a slot.
+
+| Prop        | Type                                   | Default | Description                                                                   |
+| ----------- | -------------------------------------- | ------- | ----------------------------------------------------------------------------- |
+| `children`  | `React.ReactNode`                      | -       | Chart content                                                                 |
+| `asChild`   | `boolean`                              | -       | Render as child component (uses Slot) - ideal for removing the `Card` wrapper |
+| `className` | `string`                               | -       | Additional CSS classes                                                        |
+| `...props`  | `React.HTMLAttributes<HTMLDivElement>` | -       | All standard div props                                                        |
+
+### ChartHeader
+
+Container for chart header content like title and actions.
+
+| Prop        | Type                                   | Default    | Description                                                         |
+| ----------- | -------------------------------------- | ---------- | ------------------------------------------------------------------- |
+| `children`  | `React.ReactNode`                      | -          | Header content (typically ChartTitle, ChartActions, or ChartMetric) |
+| `align`     | `'start' \| 'center'`                  | `'center'` | Alignment of header content                                         |
+| `className` | `string`                               | -          | Additional CSS classes                                              |
+| `...props`  | `React.HTMLAttributes<HTMLDivElement>` | -          | All standard div props                                              |
+
+### ChartTitle
+
+Displays the chart title with optional tooltip.
+
+| Prop        | Type                                   | Default | Description                           |
+| ----------- | -------------------------------------- | ------- | ------------------------------------- |
+| `children`  | `React.ReactNode`                      | -       | Title text                            |
+| `tooltip`   | `string`                               | -       | Tooltip text shown on help icon hover |
+| `className` | `string`                               | -       | Additional CSS classes                |
+| `...props`  | `React.HTMLAttributes<HTMLDivElement>` | -       | All standard div props                |
+
+### ChartActions
+
+Renders action buttons or links in the chart header.
+
+| Prop        | Type                                   | Default | Description                                                |
+| ----------- | -------------------------------------- | ------- | ---------------------------------------------------------- |
+| `actions`   | `ChartAction[]`                        | -       | Array of action objects (see ChartAction type below)       |
+| `children`  | `React.ReactNode`                      | -       | Custom action content (takes precedence over actions prop) |
+| `className` | `string`                               | -       | Additional CSS classes                                     |
+| `...props`  | `React.HTMLAttributes<HTMLDivElement>` | -       | All standard div props                                     |
+
+#### ChartAction Type
+
+| Property    | Type                 | Description                                     |
+| ----------- | -------------------- | ----------------------------------------------- |
+| `label`     | `string`             | Accessible label for the action                 |
+| `icon`      | `React.ReactNode`    | Icon component to display                       |
+| `onClick`   | `() => void`         | Click handler for button actions                |
+| `href`      | `string`             | URL for link actions                            |
+| `type`      | `'button' \| 'link'` | Action type (auto-detected if href is provided) |
+| `className` | `string`             | Additional CSS classes                          |
+
+### ChartMetric
+
+Displays a metric value with optional status indicator.
+
+| Prop        | Type                                                 | Default   | Description                                         |
+| ----------- | ---------------------------------------------------- | --------- | --------------------------------------------------- |
+| `label`     | `string`                                             | -         | Metric label text                                   |
+| `value`     | `string \| number \| null \| undefined`              | -         | Metric value to display                             |
+| `diffValue` | `string \| number \| null \| undefined`              | -         | Differential value to display (shown as +/- change) |
+| `status`    | `'positive' \| 'negative' \| 'warning' \| 'default'` | -         | Status indicator color                              |
+| `align`     | `'start' \| 'end'`                                   | `'start'` | Alignment of the metric                             |
+| `tooltip`   | `string`                                             | -         | Tooltip text shown on help icon hover               |
+| `className` | `string`                                             | -         | Additional CSS classes                              |
+| `...props`  | `React.HTMLAttributes<HTMLDivElement>`               | -         | All standard div props                              |
+
+### ChartContent
+
+Container for the main chart visualization. Handles loading and empty states.
+
+| Prop              | Type                                   | Default | Description                            |
+| ----------------- | -------------------------------------- | ------- | -------------------------------------- |
+| `children`        | `React.ReactNode`                      | -       | Chart visualization content            |
+| `isEmpty`         | `boolean`                              | `false` | Whether to show empty state            |
+| `emptyState`      | `React.ReactNode`                      | -       | Custom empty state component           |
+| `loadingState`    | `React.ReactNode`                      | -       | Custom loading state component         |
+| `disabledState`   | `React.ReactNode`                      | -       | Custom disabled state component        |
+| `disabledActions` | `ChartAction[]`                        | -       | Actions to show when chart is disabled |
+| `className`       | `string`                               | -       | Additional CSS classes                 |
+| `...props`        | `React.HTMLAttributes<HTMLDivElement>` | -       | All standard div props                 |
+
+### ChartEmptyState
+
+Pre-built empty state component for charts.
+
+| Prop          | Type                                   | Default | Description              |
+| ------------- | -------------------------------------- | ------- | ------------------------ |
+| `title`       | `string`                               | -       | Empty state title        |
+| `description` | `string`                               | -       | Empty state description  |
+| `icon`        | `React.ReactNode`                      | -       | Optional icon to display |
+| `className`   | `string`                               | -       | Additional CSS classes   |
+| `...props`    | `React.HTMLAttributes<HTMLDivElement>` | -       | All standard div props   |
+
+### ChartLoadingState
+
+Pre-built loading state component. Takes no props.
+
+### ChartFooter
+
+Container for footer content below the chart.
+
+| Prop        | Type                                   | Default | Description            |
+| ----------- | -------------------------------------- | ------- | ---------------------- |
+| `children`  | `React.ReactNode`                      | -       | Footer content         |
+| `className` | `string`                               | -       | Additional CSS classes |
+| `...props`  | `React.HTMLAttributes<HTMLDivElement>` | -       | All standard div props |
+
+### ChartConfig
+
+Type definition for chart configuration used with Recharts components.
+
+```tsx
+type ChartConfig = {
+  [key: string]: {
+    label?: React.ReactNode
+    icon?: React.ComponentType
+  } & (
+    | { color?: string; theme?: never }
+    | { color?: never; theme: Record<'light' | 'dark', string> }
+  )
+}
+```
+
+| Property | Type                                | Description                                              |
+| -------- | ----------------------------------- | -------------------------------------------------------- |
+| `label`  | `React.ReactNode`                   | Label for the data series                                |
+| `icon`   | `React.ComponentType`               | Icon component for the data series                       |
+| `color`  | `string`                            | Single color value (mutually exclusive with theme)       |
+| `theme`  | `Record<'light' \| 'dark', string>` | Theme-aware color values (mutually exclusive with color) |
+
+### ChartLine
+
+Line chart component for displaying time-series data.
+
+| Prop                | Type                                                                  | Default                       | Description                                                       |
+| ------------------- | --------------------------------------------------------------------- | ----------------------------- | ----------------------------------------------------------------- |
+| `data`              | `ChartLineTick[]`                                                     | -                             | Array of data points with timestamp                               |
+| `dataKey`           | `string`                                                              | -                             | Key in data object to plot                                        |
+| `config`            | `ChartConfig?`                                                        | -                             | Chart configuration for styling                                   |
+| `onLineClick`       | `(datum: ChartLineTick, tooltipData?: CategoricalChartState) => void` | -                             | Click handler for line points                                     |
+| `DateTimeFormat`    | `string`                                                              | `'MMM D, YYYY, hh:mma'`       | Date format for tooltips and labels                               |
+| `isFullHeight`      | `boolean`                                                             | `false`                       | Whether chart should take full height                             |
+| `className`         | `string`                                                              | -                             | Additional CSS classes                                            |
+| `color`             | `string`                                                              | `'hsl(var(--brand-default))'` | Line color                                                        |
+| `hoverColor`        | `string`                                                              | `'hsl(var(--brand-500))'`     | Line color on hover                                               |
+| `chartHighlight`    | `ChartHighlight`                                                      | -                             | Highlight selection configuration                                 |
+| `updateDateRange`   | `(from: string, to: string) => void`                                  | -                             | Callback when date range is updated via highlight                 |
+| `highlightActions`  | `ChartHighlightAction[]`                                              | -                             | Actions to show when area is highlighted                          |
+| `syncId`            | `string`                                                              | -                             | ID to sync multiple charts                                        |
+| `showHighlightArea` | `boolean`                                                             | `true`                        | Whether to show highlight area                                    |
+| `cursor`            | `string`                                                              | -                             | Cursor style (defaults to 'crosshair' if chartHighlight provided) |
+| `showGrid`          | `boolean`                                                             | `false`                       | Whether to show grid lines                                        |
+| `showYAxis`         | `boolean`                                                             | `false`                       | Whether to show Y-axis                                            |
+| `YAxisProps`        | `object`                                                              | -                             | Additional Y-axis props (tick, tickFormatter, width, etc.)        |
+| `strokeWidth`       | `number`                                                              | `1.5`                         | Line stroke width                                                 |
+
+#### ChartLineTick Type
+
+| Property        | Type               | Description                  |
+| --------------- | ------------------ | ---------------------------- |
+| `timestamp`     | `string`           | Timestamp for the data point |
+| `[key: string]` | `string \| number` | Additional data fields       |
+
+#### ChartHighlight Type
+
+| Property          | Type                                                          | Description                          |
+| ----------------- | ------------------------------------------------------------- | ------------------------------------ |
+| `handleMouseDown` | `(e: { activeLabel?: string; coordinates?: string }) => void` | Mouse down handler                   |
+| `handleMouseMove` | `(e: { activeLabel?: string; coordinates?: string }) => void` | Mouse move handler                   |
+| `handleMouseUp`   | `(e: { chartX?: number; chartY?: number }) => void`           | Mouse up handler                     |
+| `coordinates`     | `{ left?: string; right?: string }`                           | Highlight area coordinates           |
+| `clearHighlight`  | `() => void?`                                                 | Optional function to clear highlight |
+
+#### ChartHighlightAction Type
+
+| Property     | Type                                                                             | Description                                          |
+| ------------ | -------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `id`         | `string`                                                                         | Unique identifier for the action                     |
+| `label`      | `string \| ((ctx: { start: string; end: string; clear: () => void }) => string)` | Action label or function that returns label          |
+| `icon`       | `ReactNode?`                                                                     | Optional icon component                              |
+| `isDisabled` | `(ctx: { start: string; end: string; clear: () => void }) => boolean?`           | Optional function to determine if action is disabled |
+| `onSelect`   | `(ctx: { start: string; end: string; clear: () => void }) => void`               | Action selection handler                             |
+
+### ChartBar
+
+Bar chart component for displaying time-series data.
+
+| Prop                | Type                                                                 | Default                       | Description                                                       |
+| ------------------- | -------------------------------------------------------------------- | ----------------------------- | ----------------------------------------------------------------- |
+| `data`              | `ChartBarTick[]`                                                     | -                             | Array of data points with timestamp                               |
+| `dataKey`           | `string`                                                             | -                             | Key in data object to plot                                        |
+| `config`            | `ChartConfig?`                                                       | -                             | Chart configuration for styling                                   |
+| `onBarClick`        | `(datum: ChartBarTick, tooltipData?: CategoricalChartState) => void` | -                             | Click handler for bars                                            |
+| `DateTimeFormat`    | `string`                                                             | `'MMM D, YYYY, hh:mma'`       | Date format for tooltips and labels                               |
+| `isFullHeight`      | `boolean`                                                            | `false`                       | Whether chart should take full height                             |
+| `className`         | `string`                                                             | -                             | Additional CSS classes                                            |
+| `color`             | `string`                                                             | `'hsl(var(--brand-default))'` | Bar color                                                         |
+| `hoverColor`        | `string`                                                             | `'hsl(var(--brand-500))'`     | Bar color on hover                                                |
+| `chartHighlight`    | `ChartHighlight`                                                     | -                             | Highlight selection configuration                                 |
+| `updateDateRange`   | `(from: string, to: string) => void`                                 | -                             | Callback when date range is updated via highlight                 |
+| `highlightActions`  | `ChartHighlightAction[]`                                             | -                             | Actions to show when area is highlighted                          |
+| `syncId`            | `string`                                                             | -                             | ID to sync multiple charts                                        |
+| `showHighlightArea` | `boolean`                                                            | `true`                        | Whether to show highlight area                                    |
+| `cursor`            | `string`                                                             | -                             | Cursor style (defaults to 'crosshair' if chartHighlight provided) |
+| `showGrid`          | `boolean`                                                            | `false`                       | Whether to show grid lines                                        |
+| `showYAxis`         | `boolean`                                                            | `false`                       | Whether to show Y-axis                                            |
+| `YAxisProps`        | `object`                                                             | -                             | Additional Y-axis props (tick, tickFormatter, width, etc.)        |
+
+#### ChartBarTick Type
+
+| Property        | Type               | Description                  |
+| --------------- | ------------------ | ---------------------------- |
+| `timestamp`     | `string`           | Timestamp for the data point |
+| `[key: string]` | `string \| number` | Additional data fields       |

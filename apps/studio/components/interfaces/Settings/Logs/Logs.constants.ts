@@ -1,8 +1,9 @@
+import { IS_PLATFORM } from 'common'
 import dayjs from 'dayjs'
 
-import { DOCS_URL } from 'lib/constants'
 import type { DatetimeHelper, FilterTableSet, LogTemplate } from './Logs.types'
-import { IS_PLATFORM } from 'common'
+import { analyticsLiteral, safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+import { DOCS_URL } from '@/lib/constants'
 
 export const LOGS_EXPLORER_DOCS_URL = `${DOCS_URL}/guides/platform/logs#querying-with-the-logs-explorer`
 
@@ -285,67 +286,232 @@ limit 100;
   },
 ]
 
-const _SQL_FILTER_COMMON = {
-  search_query: (value: string) => `regexp_contains(event_message, '${value}')`,
+// ClickHouse rewrites of the custom BigQuery templates above, used when the OTEL
+// logs engine is on. Keyed by template label. Simple-mode templates are plain
+// event_message searches that work unchanged, so they have no entry here.
+const OTEL_TEMPLATE_SEARCH_STRINGS: Record<string, string> = {
+  'Commits By User': `select
+  log_attributes['parsed.user_name'] as user_name,
+  count() as count
+from logs
+where source = 'postgres_logs'
+  and event_message like '%COMMIT%'
+group by user_name
+order by count desc
+limit 100`,
+  'Metadata IP': `select
+  timestamp,
+  log_attributes['request.headers.x_real_ip'] as x_real_ip
+from logs
+where source = 'edge_logs'
+  and log_attributes['request.headers.x_real_ip'] != ''
+order by timestamp desc
+limit 100`,
+  'Requests by Geography': `select
+  log_attributes['request.cf.country'] as country,
+  count() as count
+from logs
+where source = 'edge_logs'
+group by country
+order by count desc
+limit 100`,
+  'Slow Response Time': `select
+  timestamp,
+  event_message,
+  toInt32OrZero(log_attributes['response.origin_time']) as origin_time
+from logs
+where source = 'edge_logs'
+  and toInt32OrZero(log_attributes['response.origin_time']) > 1000
+order by timestamp desc
+limit 100`,
+  '500 Request Codes': `select
+  timestamp,
+  event_message,
+  toInt32OrZero(log_attributes['response.status_code']) as status_code
+from logs
+where source = 'edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) >= 500
+order by timestamp desc
+limit 100`,
+  'Top Paths': `select
+  log_attributes['request.path'] as path,
+  log_attributes['request.search'] as params,
+  count() as c
+from logs
+where source = 'edge_logs'
+group by path, params
+order by c desc
+limit 100`,
+  'REST Requests': `select
+  timestamp,
+  event_message
+from logs
+where source = 'edge_logs'
+  and log_attributes['request.path'] like '%rest/v1%'
+order by timestamp desc
+limit 100`,
+  Errors: `select
+  timestamp,
+  log_attributes['parsed.error_severity'] as error_severity,
+  event_message
+from logs
+where source = 'postgres_logs'
+  and log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
+order by timestamp desc
+limit 100`,
+  'Error Count by User': `select
+  count() as count,
+  log_attributes['parsed.user_name'] as user_name,
+  log_attributes['parsed.error_severity'] as error_severity
+from logs
+where source = 'postgres_logs'
+  and log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
+group by user_name, error_severity
+order by count desc
+limit 100`,
+  'Auth Endpoint Events': `select
+  timestamp,
+  event_message
+from logs
+where source = 'auth_logs'
+  and match(event_message, 'level.{3}(info|warning|error|fatal)')
+order by timestamp desc
+limit 100`,
+  'Auth Audit Logs': `select
+  timestamp,
+  event_message,
+  log_attributes
+from logs
+where source = 'auth_audit_logs'
+order by timestamp desc
+limit 10`,
+  'Storage Object Requests': `select
+  log_attributes['request.method'] as http_verb,
+  log_attributes['request.path'] as filepath,
+  count() as num_requests
+from logs
+where source = 'edge_logs'
+  and log_attributes['request.path'] like '%storage/v1/object/%'
+group by http_verb, filepath
+order by num_requests desc
+limit 100`,
+  'Storage Egress Requests': `select
+  log_attributes['request.method'] as http_verb,
+  log_attributes['request.path'] as filepath,
+  (log_attributes['response.headers.cf_cache_status'] = 'HIT') as cached,
+  count() as num_requests
+from logs
+where source = 'edge_logs'
+  and (
+    log_attributes['request.path'] like '%storage/v1/object/%'
+    or log_attributes['request.path'] like '%storage/v1/render/%'
+  )
+  and log_attributes['request.method'] = 'GET'
+group by http_verb, filepath, cached
+order by num_requests desc
+limit 100`,
+  'Storage Top Cache Misses': `select
+  log_attributes['request.path'] as path,
+  log_attributes['request.search'] as search,
+  count() as count
+from logs
+where source = 'edge_logs'
+  and startsWith(log_attributes['request.path'], '/storage/v1/object')
+  and log_attributes['request.method'] = 'GET'
+  and log_attributes['response.headers.cf_cache_status'] in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
+group by path, search
+order by count desc
+limit 100`,
 }
 
-export const SQL_FILTER_TEMPLATES: any = {
+/**
+ * Returns the log templates for the active engine. On the OTEL/ClickHouse engine
+ * the custom templates, written for BigQuery, are swapped for their ClickHouse
+ * rewrites; everything else is returned unchanged.
+ */
+export function getLogsTemplates(useOtel: boolean): LogTemplate[] {
+  if (!useOtel) return TEMPLATES
+  return TEMPLATES.map((template) => {
+    const otelSearchString = template.label && OTEL_TEMPLATE_SEARCH_STRINGS[template.label]
+    return otelSearchString ? { ...template, searchString: otelSearchString } : template
+  })
+}
+
+type SqlFilterFn = (value: any) => SafeLogSqlFragment
+export type SqlFilterEntry = SafeLogSqlFragment | SqlFilterFn
+
+const _SQL_FILTER_COMMON: Record<string, SqlFilterEntry> = {
+  search_query: (value: string) =>
+    safeSql`regexp_contains(event_message, ${analyticsLiteral(value)})`,
+}
+
+// Auth logs always emit `level: info` even for failed requests, so HTTP status
+// is the reliable severity signal. Shared by the severity filter, the chart,
+// and the table badge so all three agree: 5xx (or level error/fatal) = error,
+// 4xx (or level warning) = warning, everything else = info. IFNULL keeps each
+// condition strictly boolean (never NULL) so the info condition can safely
+// negate the other two when a row has no status or no level.
+export const AUTH_LOG_ERROR_CONDITION: SafeLogSqlFragment = safeSql`IFNULL(metadata.level, '') IN ('error', 'fatal') OR IFNULL(SAFE_CAST(metadata.status AS INT64), 0) >= 500`
+export const AUTH_LOG_WARNING_CONDITION: SafeLogSqlFragment = safeSql`IFNULL(metadata.level, '') = 'warning' OR IFNULL(SAFE_CAST(metadata.status AS INT64), 0) BETWEEN 400 AND 499`
+export const AUTH_LOG_INFO_CONDITION: SafeLogSqlFragment = safeSql`NOT (${AUTH_LOG_ERROR_CONDITION}) AND NOT (${AUTH_LOG_WARNING_CONDITION})`
+
+export const SQL_FILTER_TEMPLATES: Record<string, Record<string, SqlFilterEntry>> = {
   postgres_logs: {
     ..._SQL_FILTER_COMMON,
-    database: (value: string) => `identifier = '${value}'`,
-    'severity.error': `parsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
-    'severity.noError': `parsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
-    'severity.log': `parsed.error_severity = 'LOG'`,
+    database: (value: string) => safeSql`identifier = ${analyticsLiteral(value)}`,
+    'severity.error': safeSql`parsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
+    'severity.noError': safeSql`parsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
+    'severity.log': safeSql`parsed.error_severity = 'LOG'`,
   },
   edge_logs: {
     ..._SQL_FILTER_COMMON,
-    database: (value: string) => `identifier = '${value}'`,
-    'status_code.error': `response.status_code between 500 and 599`,
-    'status_code.success': `response.status_code between 200 and 299`,
-    'status_code.warning': `response.status_code between 400 and 499`,
+    database: (value: string) => safeSql`identifier = ${analyticsLiteral(value)}`,
+    'status_code.error': safeSql`response.status_code between 500 and 599`,
+    'status_code.success': safeSql`response.status_code between 200 and 299`,
+    'status_code.warning': safeSql`response.status_code between 400 and 499`,
 
-    'product.database': `request.path like '/rest/%' or request.path like '/graphql/%'`,
-    'product.storage': `request.path like '/storage/%'`,
-    'product.auth': `request.path like '/auth/%'`,
-    'product.realtime': `request.path like '/realtime/%'`,
+    'product.database': safeSql`request.path like '/rest/%' or request.path like '/graphql/%'`,
+    'product.storage': safeSql`request.path like '/storage/%'`,
+    'product.auth': safeSql`request.path like '/auth/%'`,
+    'product.realtime': safeSql`request.path like '/realtime/%'`,
 
-    'method.get': `request.method = 'GET'`,
-    'method.post': `request.method = 'POST'`,
-    'method.put': `request.method = 'PUT'`,
-    'method.patch': `request.method = 'PATCH'`,
-    'method.delete': `request.method = 'DELETE'`,
-    'method.options': `request.method = 'OPTIONS'`,
+    'method.get': safeSql`request.method = 'GET'`,
+    'method.post': safeSql`request.method = 'POST'`,
+    'method.put': safeSql`request.method = 'PUT'`,
+    'method.patch': safeSql`request.method = 'PATCH'`,
+    'method.delete': safeSql`request.method = 'DELETE'`,
+    'method.options': safeSql`request.method = 'OPTIONS'`,
   },
   function_edge_logs: {
     ..._SQL_FILTER_COMMON,
-    'status_code.error': `response.status_code between 500 and 599`,
-    'status_code.success': `response.status_code between 200 and 299`,
-    'status_code.warning': `response.status_code between 400 and 499`,
+    'status_code.error': safeSql`response.status_code between 500 and 599`,
+    'status_code.success': safeSql`response.status_code between 200 and 299`,
+    'status_code.warning': safeSql`response.status_code between 400 and 499`,
   },
   function_logs: {
     ..._SQL_FILTER_COMMON,
-    'severity.error': `metadata.level = 'error'`,
-    'severity.notError': `metadata.level != 'error'`,
-    'severity.log': `metadata.level = 'log'`,
-    'severity.info': `metadata.level = 'info'`,
-    'severity.debug': `metadata.level = 'debug'`,
-    'severity.warn': `metadata.level = 'warn'`,
+    'severity.error': safeSql`metadata.level = 'error'`,
+    'severity.notError': safeSql`metadata.level != 'error'`,
+    'severity.log': safeSql`metadata.level = 'log'`,
+    'severity.info': safeSql`metadata.level = 'info'`,
+    'severity.debug': safeSql`metadata.level = 'debug'`,
+    'severity.warn': safeSql`metadata.level = 'warn'`,
   },
   auth_logs: {
     ..._SQL_FILTER_COMMON,
-    'severity.error': `metadata.level = 'error' or metadata.level = 'fatal'`,
-    'severity.warning': `metadata.level = 'warning'`,
-    'severity.info': `metadata.level = 'info'`,
-    'status_code.server_error': `cast(metadata.status as int64) between 500 and 599`,
-    'status_code.client_error': `cast(metadata.status as int64) between 400 and 499`,
-    'status_code.redirection': `cast(metadata.status as int64) between 300 and 399`,
-    'status_code.success': `cast(metadata.status as int64) between 200 and 299`,
-    'endpoints.admin': `REGEXP_CONTAINS(metadata.path, "/admin")`,
-    'endpoints.signup': `REGEXP_CONTAINS(metadata.path, "/signup|/invite|/verify")`,
-    'endpoints.authentication': `REGEXP_CONTAINS(metadata.path, "/token|/authorize|/callback|/otp|/magiclink")`,
-    'endpoints.recover': `REGEXP_CONTAINS(metadata.path, "/recover")`,
-    'endpoints.user': `REGEXP_CONTAINS(metadata.path, "/user")`,
-    'endpoints.logout': `REGEXP_CONTAINS(metadata.path, "/logout")`,
+    'severity.error': AUTH_LOG_ERROR_CONDITION,
+    'severity.warning': AUTH_LOG_WARNING_CONDITION,
+    'severity.info': AUTH_LOG_INFO_CONDITION,
+    'status_code.server_error': safeSql`cast(metadata.status as int64) between 500 and 599`,
+    'status_code.client_error': safeSql`cast(metadata.status as int64) between 400 and 499`,
+    'status_code.redirection': safeSql`cast(metadata.status as int64) between 300 and 399`,
+    'status_code.success': safeSql`cast(metadata.status as int64) between 200 and 299`,
+    'endpoints.admin': safeSql`REGEXP_CONTAINS(metadata.path, "/admin")`,
+    'endpoints.signup': safeSql`REGEXP_CONTAINS(metadata.path, "/signup|/invite|/verify")`,
+    'endpoints.authentication': safeSql`REGEXP_CONTAINS(metadata.path, "/token|/authorize|/callback|/otp|/magiclink")`,
+    'endpoints.recover': safeSql`REGEXP_CONTAINS(metadata.path, "/recover")`,
+    'endpoints.user': safeSql`REGEXP_CONTAINS(metadata.path, "/user")`,
+    'endpoints.logout': safeSql`REGEXP_CONTAINS(metadata.path, "/logout")`,
   },
   realtime_logs: {
     ..._SQL_FILTER_COMMON,
@@ -355,14 +521,14 @@ export const SQL_FILTER_TEMPLATES: any = {
   },
   postgrest_logs: {
     ..._SQL_FILTER_COMMON,
-    database: (value: string) => `identifier = '${value}'`,
+    database: (value: string) => safeSql`identifier = ${analyticsLiteral(value)}`,
   },
   pgbouncer_logs: {
     ..._SQL_FILTER_COMMON,
   },
   supavisor_logs: {
     ..._SQL_FILTER_COMMON,
-    database: (value: string) => `m.project like '${value}%'`,
+    database: (value: string) => safeSql`m.project like ${analyticsLiteral(value + '%')}`,
   },
   pg_upgrade_logs: {
     ..._SQL_FILTER_COMMON,
@@ -372,7 +538,7 @@ export const SQL_FILTER_TEMPLATES: any = {
   },
   etl_replication_logs: {
     ..._SQL_FILTER_COMMON,
-    pipeline_id: (value: string | number) => `pipeline_id = ${value}`,
+    pipeline_id: (value: string | number) => safeSql`pipeline_id = ${analyticsLiteral(value)}`,
   },
 }
 
@@ -391,6 +557,7 @@ export enum LogsTableName {
   PG_UPGRADE = 'pg_upgrade_logs',
   PG_CRON = 'pg_cron_logs',
   ETL = 'etl_replication_logs',
+  MULTIGRES = 'multigres_logs',
 }
 
 export const LOGS_TABLES = {
@@ -407,6 +574,7 @@ export const LOGS_TABLES = {
   pg_cron: LogsTableName.POSTGRES,
   pgbouncer: LogsTableName.PGBOUNCER,
   etl: LogsTableName.ETL,
+  multigres: LogsTableName.MULTIGRES,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -424,6 +592,7 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.PG_UPGRADE]: 'Logs generated by the Postgres version upgrade process',
   [LogsTableName.PG_CRON]: 'Postgres logs from pg_cron cron jobs',
   [LogsTableName.ETL]: 'Logs from the replication process',
+  [LogsTableName.MULTIGRES]: 'Logs from the Multigres high availability service',
 }
 
 export const FILTER_OPTIONS: FilterTableSet = {

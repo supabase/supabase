@@ -4,7 +4,7 @@ import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, Tabl
 export default function EmptyStateZeroItemsTable() {
   return (
     <div className="flex flex-col gap-y-4 w-full">
-      <Button className="w-fit self-end" type="primary" size="tiny" icon={<Plus size={14} />}>
+      <Button className="w-fit self-end" variant="primary" size="tiny" icon={<Plus size={14} />}>
         New table
       </Button>
       <Card>

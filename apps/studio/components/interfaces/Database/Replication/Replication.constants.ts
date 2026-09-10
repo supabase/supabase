@@ -1,4 +1,4 @@
-export const STATUS_REFRESH_FREQUENCY_MS: number = 5000
+export const STATUS_REFRESH_FREQUENCY_MS: number = 10000 // 10 seconds
 
 export enum PipelineStatusName {
   FAILED = 'failed',
@@ -8,3 +8,5 @@ export enum PipelineStatusName {
   STOPPING = 'stopping',
   UNKNOWN = 'unknown',
 }
+
+export const PIPELINES_FEEDBACK_URL = 'https://github.com/orgs/supabase/discussions/39416'

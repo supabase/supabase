@@ -1,0 +1,624 @@
+import { act, render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+declare global {
+  interface Window {
+    devToolbar?: () => void
+  }
+}
+
+const flags = vi.hoisted(() => ({ devToolbarDefaultOn: false }))
+
+// Mock common package
+vi.mock('common', async () => {
+  return {
+    useParams: () => ({ ref: 'default' }),
+    useFeatureFlags: () => ({
+      posthog: {},
+      configcat: {},
+    }),
+    useFlag: (name: string) => (name === 'devToolbarDefaultOn' ? flags.devToolbarDefaultOn : false),
+    posthogClient: {
+      subscribeToEvents: vi.fn(() => () => {}),
+    },
+    ensurePlatformSuffix: (url: string) => url,
+  }
+})
+
+const originalEnv = process.env.NEXT_PUBLIC_ENVIRONMENT
+
+/**
+ * Helper to render the full component tree as used in production.
+ * The Provider sets up window.devToolbar and manages state.
+ * The Trigger shows the activity icon in the header.
+ * The Toolbar is the actual panel/sheet.
+ */
+async function renderFullToolbar() {
+  const { DevToolbarProvider } = await import('./DevToolbarContext')
+  const { DevToolbarTrigger } = await import('./DevToolbarTrigger')
+  const { DevToolbar } = await import('./DevToolbar')
+  const { TooltipProvider } = await import('ui')
+
+  return render(
+    <TooltipProvider>
+      <DevToolbarProvider apiUrl="http://localhost:3000">
+        <DevToolbarTrigger />
+        <DevToolbar />
+      </DevToolbarProvider>
+    </TooltipProvider>
+  )
+}
+
+describe('DevToolbar', () => {
+  beforeEach(() => {
+    const store = new Map<string, string>()
+    const localStorageMock = {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        store.set(key, value)
+      },
+      removeItem: (key: string) => {
+        store.delete(key)
+      },
+      clear: () => {
+        store.clear()
+      },
+      key: (index: number) => Array.from(store.keys())[index] ?? null,
+      get length() {
+        return store.size
+      },
+    }
+
+    Object.defineProperty(globalThis, 'localStorage', {
+      value: localStorageMock,
+      writable: true,
+    })
+
+    localStorage.clear()
+    flags.devToolbarDefaultOn = false
+    delete window.devToolbar
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    if (originalEnv === undefined) {
+      delete process.env.NEXT_PUBLIC_ENVIRONMENT
+    } else {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = originalEnv
+    }
+    vi.resetModules()
+    vi.restoreAllMocks()
+  })
+
+  describe('when not in local development', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'prod'
+    })
+
+    it('returns null and does not render anything', async () => {
+      vi.resetModules()
+      const { container } = await renderFullToolbar()
+
+      // Neither trigger nor toolbar should render in production
+      expect(container.querySelector('button')).toBeNull()
+    })
+
+    it('does not register window.devToolbar', async () => {
+      vi.resetModules()
+      await renderFullToolbar()
+
+      expect(window.devToolbar).toBeUndefined()
+    })
+  })
+
+  describe('when in local development but not enabled', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+    })
+
+    it('does not render trigger when toolbar is not enabled', async () => {
+      vi.resetModules()
+      const { container } = await renderFullToolbar()
+
+      // Trigger should not render when not enabled
+      expect(container.querySelector('button')).toBeNull()
+    })
+
+    it('registers window.devToolbar function', async () => {
+      vi.resetModules()
+      await renderFullToolbar()
+
+      expect(window.devToolbar).toBeDefined()
+      expect(typeof window.devToolbar).toBe('function')
+    })
+  })
+
+  describe('when in local development and enabled', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+      localStorage.setItem('dev-telemetry-toolbar-enabled', 'true')
+    })
+
+    it('renders the trigger button when enabled via localStorage', async () => {
+      vi.resetModules()
+      await renderFullToolbar()
+
+      // The trigger should be a button with the Activity icon
+      const triggerButton = screen.getByRole('button')
+      expect(triggerButton).toBeInTheDocument()
+    })
+
+    it('opens the toolbar sheet when trigger is clicked', async () => {
+      vi.resetModules()
+      const user = userEvent.setup()
+      await renderFullToolbar()
+
+      const triggerButton = screen.getByRole('button')
+      await user.click(triggerButton)
+
+      // Sheet should open with the title
+      await waitFor(() => {
+        expect(screen.getByText('Dev Toolbar')).toBeInTheDocument()
+      })
+    })
+
+    it('shows Events and Flags tabs in the toolbar', async () => {
+      vi.resetModules()
+      const user = userEvent.setup()
+      await renderFullToolbar()
+
+      const triggerButton = screen.getByRole('button')
+      await user.click(triggerButton)
+
+      await waitFor(() => {
+        expect(screen.getByRole('tab', { name: /Events/i })).toBeInTheDocument()
+        expect(screen.getByRole('tab', { name: /Flags/i })).toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('when in staging environment and enabled', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'staging'
+      localStorage.setItem('dev-telemetry-toolbar-enabled', 'true')
+    })
+
+    it('renders the toolbar trigger', async () => {
+      vi.resetModules()
+      await renderFullToolbar()
+      const triggerButton = screen.getByRole('button')
+      expect(triggerButton).toBeInTheDocument()
+    })
+
+    it('shows server events notice in events tab', async () => {
+      vi.resetModules()
+      const user = userEvent.setup()
+      await renderFullToolbar()
+
+      const triggerButton = screen.getByRole('button')
+      await user.click(triggerButton)
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            'Server-side events are only visible when using the toolbar in local development'
+          )
+        ).toBeInTheDocument()
+      })
+    })
+
+    it('does not connect to SSE in staging', async () => {
+      const EventSourceSpy = vi.fn()
+      vi.stubGlobal('EventSource', EventSourceSpy)
+
+      vi.resetModules()
+      await renderFullToolbar()
+
+      expect(EventSourceSpy).not.toHaveBeenCalled()
+
+      vi.unstubAllGlobals()
+    })
+  })
+
+  describe('when devToolbarDefaultOn flag is enabled', () => {
+    it('renders the trigger without calling window.devToolbar in local', async () => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+      flags.devToolbarDefaultOn = true
+
+      vi.resetModules()
+      await renderFullToolbar()
+
+      const triggerButton = screen.getByRole('button')
+      expect(triggerButton).toBeInTheDocument()
+    })
+
+    it('renders the trigger without calling window.devToolbar in staging', async () => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'staging'
+      flags.devToolbarDefaultOn = true
+
+      vi.resetModules()
+      await renderFullToolbar()
+
+      const triggerButton = screen.getByRole('button')
+      expect(triggerButton).toBeInTheDocument()
+    })
+
+    it('does not render the trigger in production even when flag is on', async () => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'prod'
+      flags.devToolbarDefaultOn = true
+
+      vi.resetModules()
+      const { container } = await renderFullToolbar()
+
+      expect(container.querySelector('button')).toBeNull()
+    })
+  })
+
+  describe('enableToolbar', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+    })
+
+    it('enables toolbar and exposes isAvailable in local development', async () => {
+      vi.resetModules()
+      const { DevToolbarProvider, useDevToolbar } = await import('./DevToolbarContext')
+      const { DevToolbarTrigger } = await import('./DevToolbarTrigger')
+      const { TooltipProvider } = await import('ui')
+
+      function ToolbarLauncher() {
+        const { isAvailable, enableToolbar } = useDevToolbar()
+        return (
+          <button type="button" onClick={enableToolbar}>
+            {isAvailable ? 'Launch toolbar' : 'Unavailable'}
+          </button>
+        )
+      }
+
+      render(
+        <TooltipProvider>
+          <DevToolbarProvider apiUrl="http://localhost:3000">
+            <ToolbarLauncher />
+            <DevToolbarTrigger />
+          </DevToolbarProvider>
+        </TooltipProvider>
+      )
+
+      expect(screen.getByRole('button', { name: 'Launch toolbar' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Open dev toolbar' })).not.toBeInTheDocument()
+
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Launch toolbar' }))
+
+      expect(localStorage.getItem('dev-telemetry-toolbar-enabled')).toBe('true')
+      expect(screen.getByRole('button', { name: 'Open dev toolbar' })).toBeInTheDocument()
+    })
+
+    it('returns isAvailable false in production', async () => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'prod'
+
+      vi.resetModules()
+      const { DevToolbarProvider, useDevToolbar } = await import('./DevToolbarContext')
+
+      function ToolbarAvailability() {
+        const { isAvailable } = useDevToolbar()
+        return <span>{isAvailable ? 'available' : 'unavailable'}</span>
+      }
+
+      render(
+        <DevToolbarProvider apiUrl="http://localhost:3000">
+          <ToolbarAvailability />
+        </DevToolbarProvider>
+      )
+
+      expect(screen.getByText('unavailable')).toBeInTheDocument()
+    })
+  })
+
+  describe('dismissToolbar', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+    })
+
+    async function renderDismissHarness() {
+      const { DevToolbarProvider, useDevToolbar } = await import('./DevToolbarContext')
+      const { DevToolbarTrigger } = await import('./DevToolbarTrigger')
+      const { TooltipProvider } = await import('ui')
+
+      function ToolbarDismisser() {
+        const { dismissToolbar } = useDevToolbar()
+        return (
+          <button type="button" onClick={dismissToolbar}>
+            Dismiss toolbar
+          </button>
+        )
+      }
+
+      return render(
+        <TooltipProvider>
+          <DevToolbarProvider apiUrl="http://localhost:3000">
+            <ToolbarDismisser />
+            <DevToolbarTrigger />
+          </DevToolbarProvider>
+        </TooltipProvider>
+      )
+    }
+
+    it('persists the opt-out so it survives a remount', async () => {
+      localStorage.setItem('dev-telemetry-toolbar-enabled', 'true')
+
+      vi.resetModules()
+      const { unmount } = await renderDismissHarness()
+
+      expect(screen.getByRole('button', { name: 'Open dev toolbar' })).toBeInTheDocument()
+
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Dismiss toolbar' }))
+
+      expect(localStorage.getItem('dev-telemetry-toolbar-enabled')).toBe('false')
+      expect(screen.queryByRole('button', { name: 'Open dev toolbar' })).not.toBeInTheDocument()
+
+      unmount()
+      await renderDismissHarness()
+
+      expect(screen.queryByRole('button', { name: 'Open dev toolbar' })).not.toBeInTheDocument()
+    })
+
+    it('takes precedence over the devToolbarDefaultOn flag', async () => {
+      flags.devToolbarDefaultOn = true
+
+      vi.resetModules()
+      const { unmount } = await renderDismissHarness()
+
+      expect(screen.getByRole('button', { name: 'Open dev toolbar' })).toBeInTheDocument()
+
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Dismiss toolbar' }))
+
+      expect(screen.queryByRole('button', { name: 'Open dev toolbar' })).not.toBeInTheDocument()
+
+      unmount()
+      await renderDismissHarness()
+
+      expect(screen.queryByRole('button', { name: 'Open dev toolbar' })).not.toBeInTheDocument()
+    })
+  })
+
+  describe('window.devToolbar function', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+    })
+
+    it('enables toolbar when called', async () => {
+      vi.resetModules()
+      const { rerender } = await renderFullToolbar()
+
+      // Trigger should not be visible initially
+      expect(screen.queryByRole('button')).not.toBeInTheDocument()
+
+      // Call devToolbar to enable
+      act(() => {
+        window.devToolbar?.()
+      })
+
+      // Re-import and rerender to pick up state change
+      vi.resetModules()
+      const { DevToolbarProvider } = await import('./DevToolbarContext')
+      const { DevToolbarTrigger } = await import('./DevToolbarTrigger')
+      const { DevToolbar } = await import('./DevToolbar')
+      const { TooltipProvider } = await import('ui')
+
+      rerender(
+        <TooltipProvider>
+          <DevToolbarProvider apiUrl="http://localhost:3000">
+            <DevToolbarTrigger />
+            <DevToolbar />
+          </DevToolbarProvider>
+        </TooltipProvider>
+      )
+
+      expect(localStorage.getItem('dev-telemetry-toolbar-enabled')).toBe('true')
+    })
+  })
+
+  describe('cleanup', () => {
+    it('removes window.devToolbar on unmount', async () => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+
+      vi.resetModules()
+      const result = await renderFullToolbar()
+
+      expect(window.devToolbar).toBeDefined()
+
+      result.unmount()
+
+      expect(window.devToolbar).toBeUndefined()
+    })
+  })
+
+  describe('EventCard keyboard accessibility', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+      localStorage.setItem('dev-telemetry-toolbar-enabled', 'true')
+    })
+
+    it('toolbar renders correctly with empty events state', async () => {
+      vi.resetModules()
+
+      const user = userEvent.setup()
+      await renderFullToolbar()
+
+      const triggerButton = screen.getByRole('button')
+      await user.click(triggerButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Dev Toolbar')).toBeInTheDocument()
+      })
+
+      // Events tab should be active by default and show empty state
+      expect(screen.getByText(/No events yet/i)).toBeInTheDocument()
+    })
+  })
+
+  describe('Flag override UI', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+      localStorage.setItem('dev-telemetry-toolbar-enabled', 'true')
+    })
+
+    it('shows PostHog and ConfigCat sub-tabs in Flags tab', async () => {
+      vi.resetModules()
+      const user = userEvent.setup()
+      await renderFullToolbar()
+
+      const triggerButton = screen.getByRole('button')
+      await user.click(triggerButton)
+
+      // Switch to Flags tab
+      await waitFor(() => {
+        expect(screen.getByRole('tab', { name: /Flags/i })).toBeInTheDocument()
+      })
+
+      const flagsTab = screen.getByRole('tab', { name: /Flags/i })
+      await user.click(flagsTab)
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /PostHog/i })).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: /ConfigCat/i })).toBeInTheDocument()
+      })
+    })
+  })
+})
+
+describe('DevToolbar utils', () => {
+  describe('safeJsonParse', () => {
+    it('logs warning for invalid JSON in local environment', async () => {
+      process.env.NODE_ENV = 'development'
+      const consoleSpy = vi.spyOn(console, 'warn')
+
+      vi.resetModules()
+      const { safeJsonParse } = await import('./utils')
+
+      const result = safeJsonParse('invalid json', {}, 'test context')
+
+      expect(result).toEqual({})
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[DevToolbar] Failed to parse JSON'),
+        expect.anything()
+      )
+    })
+
+    it('returns fallback for undefined input', async () => {
+      vi.resetModules()
+      const { safeJsonParse } = await import('./utils')
+
+      const result = safeJsonParse(undefined, { default: true })
+
+      expect(result).toEqual({ default: true })
+    })
+
+    it('parses valid JSON correctly', async () => {
+      vi.resetModules()
+      const { safeJsonParse } = await import('./utils')
+
+      const result = safeJsonParse('{"key": "value"}', {})
+
+      expect(result).toEqual({ key: 'value' })
+    })
+  })
+
+  describe('parseOverrideValue', () => {
+    it('preserves number type when original is number', async () => {
+      vi.resetModules()
+      const { parseOverrideValue } = await import('./utils')
+
+      // String input should be converted to number
+      expect(parseOverrideValue('42', 0)).toBe(42)
+      expect(parseOverrideValue('3.14', 0)).toBe(3.14)
+    })
+
+    it('returns original for invalid number strings', async () => {
+      vi.resetModules()
+      const { parseOverrideValue } = await import('./utils')
+
+      expect(parseOverrideValue('not a number', 5)).toBe(5)
+    })
+
+    it('preserves boolean type', async () => {
+      vi.resetModules()
+      const { parseOverrideValue } = await import('./utils')
+
+      expect(parseOverrideValue(true, false)).toBe(true)
+      expect(parseOverrideValue(false, true)).toBe(false)
+    })
+
+    it('preserves string type', async () => {
+      vi.resetModules()
+      const { parseOverrideValue } = await import('./utils')
+
+      expect(parseOverrideValue('new value', 'original')).toBe('new value')
+      expect(parseOverrideValue(123, 'original')).toBe('123')
+    })
+  })
+
+  describe('valuesAreEqual', () => {
+    it('handles number/string comparison', async () => {
+      vi.resetModules()
+      const { valuesAreEqual } = await import('./utils')
+
+      expect(valuesAreEqual(42, '42')).toBe(true)
+      expect(valuesAreEqual('42', 42)).toBe(true)
+      expect(valuesAreEqual(42, '43')).toBe(false)
+    })
+
+    it('handles boolean comparison strictly', async () => {
+      vi.resetModules()
+      const { valuesAreEqual } = await import('./utils')
+
+      expect(valuesAreEqual(true, true)).toBe(true)
+      expect(valuesAreEqual(false, false)).toBe(true)
+      expect(valuesAreEqual(true, false)).toBe(false)
+    })
+
+    it('handles null values', async () => {
+      vi.resetModules()
+      const { valuesAreEqual } = await import('./utils')
+
+      expect(valuesAreEqual(null, null)).toBe(true)
+      expect(valuesAreEqual(null, 'value')).toBe(false)
+      expect(valuesAreEqual('value', null)).toBe(false)
+    })
+  })
+
+  describe('getEventCountBadge', () => {
+    it('returns null for zero or negative counts', async () => {
+      vi.resetModules()
+      const { getEventCountBadge } = await import('./utils')
+
+      expect(getEventCountBadge(0)).toBeNull()
+      expect(getEventCountBadge(-1)).toBeNull()
+    })
+
+    it('returns a compact circle for single-digit counts', async () => {
+      vi.resetModules()
+      const { getEventCountBadge } = await import('./utils')
+
+      expect(getEventCountBadge(7)).toEqual({ label: '7', sizeClass: 'size-3.5' })
+    })
+
+    it('returns a larger circle for double-digit counts', async () => {
+      vi.resetModules()
+      const { getEventCountBadge } = await import('./utils')
+
+      expect(getEventCountBadge(42)).toEqual({ label: '42', sizeClass: 'size-4' })
+    })
+
+    it('returns a capped pill for large counts', async () => {
+      vi.resetModules()
+      const { getEventCountBadge } = await import('./utils')
+
+      expect(getEventCountBadge(150)).toEqual({
+        label: '99+',
+        sizeClass: 'h-3.5 min-w-3.5 px-1',
+      })
+    })
+  })
+})

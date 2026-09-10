@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import type { components } from 'api-types'
 import { toast } from 'sonner'
 
-import type { components } from 'api-types'
-import { handleError, post } from 'data/fetchers'
-import { organizationKeys } from 'data/organizations/keys'
-import { castOrganizationResponseToOrganization } from 'data/organizations/organizations-query'
-import { permissionKeys } from 'data/permissions/keys'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { handleError, post } from '@/data/fetchers'
+import { organizationKeys } from '@/data/organizations/keys'
+import { castOrganizationResponseToOrganization } from '@/data/organizations/organizations-query'
+import { permissionKeys } from '@/data/permissions/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type PendingSubscriptionCreateVariables = {
   payment_intent_id: string

@@ -2,7 +2,7 @@ import { useMonaco } from '@monaco-editor/react'
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
 
-const getTheme = (theme: string) => {
+export const getTheme = (theme: string) => {
   const isDarkMode = theme.includes('dark')
   // [TODO] Probably need better theming for light mode
   return {

@@ -1,13 +1,12 @@
-import { NextPage } from 'next'
-import dynamic from 'next/dynamic'
-import { NextSeo } from 'next-seo'
-import { Calendar, MapPin, Clock, Users, ChevronRight, CheckCircle } from 'lucide-react'
-import Link from 'next/link'
-import { Button, Badge } from 'ui'
-
 import Layout from 'components/Layouts/Default'
 import SectionContainer from 'components/Layouts/SectionContainer'
 import data from 'data/aws-reinvent-2025'
+import { Calendar, CheckCircle, ChevronRight, Clock, MapPin, Users } from 'lucide-react'
+import { NextPage } from 'next'
+import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
+import Link from 'next/link'
+import { Badge, Button } from 'ui'
 
 const ProductHeader = dynamic(() => import('components/Sections/ProductHeader2'))
 const PlatformSection = dynamic(() => import('components/Solutions/PlatformSection'))
@@ -55,7 +54,7 @@ const AWSReInvent2025: NextPage = () => {
                   ))}
                 </ul>
                 <Button
-                  type="primary"
+                  variant="primary"
                   size="large"
                   iconRight={<ChevronRight className="size-3" />}
                   asChild
@@ -71,7 +70,7 @@ const AWSReInvent2025: NextPage = () => {
 
         {/* Schedule Section */}
         <section id={data.scheduleSection.id} className="relative py-16 md:py-24">
-          <SectionContainer className="lg:!py-0">
+          <SectionContainer className="lg:py-0!">
             <div className="lg:text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-medium mb-4">
                 {data.scheduleSection.title}
@@ -131,7 +130,7 @@ const AWSReInvent2025: NextPage = () => {
 
                             {event.cta && (
                               <Button
-                                type="default"
+                                variant="default"
                                 size="small"
                                 iconRight={<ChevronRight className="w-3 h-3" />}
                                 asChild
@@ -171,7 +170,7 @@ const AWSReInvent2025: NextPage = () => {
               <p className="text-foreground-light text-lg mb-8">
                 Accelerate your business growth and app development using Supabase scale.
               </p>
-              <Button type="default" size="large" asChild>
+              <Button variant="default" size="large" asChild>
                 <Link href={data.consultationSection.cta.href} target="_blank">
                   Book a meeting
                 </Link>

@@ -146,15 +146,15 @@ const navCommands = [
   },
   {
     id: 'nav-integrations',
-    name: 'Go to Integrations',
-    route: 'https://supabase.com/partners/integrations',
+    name: 'Go to Partner Catalog',
+    route: 'https://supabase.com/partners/catalog',
     icon: () => <ArrowRight />,
     enabled: isFeatureEnabled('integrations:partners'),
   },
   {
     id: 'nav-ui',
-    name: 'Go to Supabase UI Library',
-    route: 'https://supabase.com/ui',
+    name: 'Go to Supabase Library',
+    route: 'https://supabase.com/library',
     icon: () => <ArrowRight />,
   },
 ] satisfies Array<ICommand & { enabled?: boolean }>

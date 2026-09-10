@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState, type PropsWithChildren } from 'react'
-import { AnchorProvider } from 'ui-patterns'
+import { AnchorProvider } from 'ui-patterns/Toc'
+
 import { TocAnchorsContext, useSubscribeTocRerender } from './GuidesMdx.state'
 
 interface TOCHeader {
@@ -36,8 +37,7 @@ const TocAnchorsProvider = ({ children }: PropsWithChildren) => {
         .filter((heading) => heading.id)
         .map((heading) => {
           const text = heading.textContent?.replace('#', '') || ''
-          const link = heading.querySelector('a')?.getAttribute('href')
-          if (!link) return null
+          const link = heading.id ? `#${heading.id}` : null
 
           const level = heading.tagName === 'H2' ? 2 : 3
 

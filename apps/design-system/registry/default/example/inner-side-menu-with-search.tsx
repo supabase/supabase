@@ -1,15 +1,15 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Card } from 'ui'
 import {
-  InnerSideMenuCollapsible,
-  InnerSideMenuCollapsibleTrigger,
-  InnerSideMenuCollapsibleContent,
-  InnerSideMenuItem,
+  InnerSideBarEmptyPanel,
   InnerSideBarFilters,
   InnerSideBarFilterSearchInput,
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
-  InnerSideBarEmptyPanel,
+  InnerSideMenuCollapsible,
+  InnerSideMenuCollapsibleContent,
+  InnerSideMenuCollapsibleTrigger,
+  InnerSideMenuItem,
 } from 'ui-patterns/InnerSideMenu'
 
 export default function InnerSideMenuWithSearch() {

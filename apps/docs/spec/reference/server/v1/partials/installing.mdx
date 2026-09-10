@@ -1,0 +1,84 @@
+---
+id: installing
+title: Installing
+slug: installing
+---
+
+### Install as a package
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Install `@supabase/server` via your package manager.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    <Tabs
+      size="small"
+      type="underlined"
+      defaultActiveId="npm"
+      queryGroup="platform"
+    >
+      <TabPanel id="npm" label="npm">
+
+        ```sh Terminal
+        npm install @supabase/server
+        ```
+
+      </TabPanel>
+      <TabPanel id="yarn" label="Yarn">
+
+        ```sh Terminal
+        yarn add @supabase/server
+        ```
+
+      </TabPanel>
+      <TabPanel id="pnpm" label="pnpm">
+
+        ```sh Terminal
+        pnpm add @supabase/server
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Use via JSR (Deno / Bun)
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    `@supabase/server` is also published to [JSR](https://jsr.io/@supabase/server) for Deno and Bun environments.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    <Tabs
+      size="small"
+      type="underlined"
+      defaultActiveId="deno"
+      queryGroup="platform"
+    >
+      <TabPanel id="deno" label="Deno">
+
+        ```sh Terminal
+        deno add jsr:@supabase/server
+        ```
+
+      </TabPanel>
+      <TabPanel id="bun" label="Bun">
+
+        ```sh Terminal
+        bunx jsr add @supabase/server
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>

@@ -3,8 +3,8 @@ import { bundledLanguages, createHighlighter, type BundledLanguage, type ThemedT
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
 import { cn } from 'ui'
 
-import { AnnotatedSpan, CodeCopyButton } from './CodeBlock.client'
-import { getFontStyle } from './CodeBlock.utils'
+import { AnnotatedSpan, CodeBlockControls } from './CodeBlock.client'
+import { getCodeBlockLabel, getFontStyle } from './CodeBlock.utils'
 import theme from './supabase-2.json' with { type: 'json' }
 import denoTypes from './types/lib.deno.d.ts.include'
 
@@ -26,12 +26,16 @@ export async function CodeBlock({
   contents,
   children,
   skipTypeGeneration,
+  hideControls = false,
+  compact = false,
 }: PropsWithChildren<{
   className?: string
   lang?: string
   lineNumbers?: boolean
   contents?: string
   skipTypeGeneration?: boolean
+  hideControls?: boolean
+  compact?: boolean
 }>) {
   let code = (contents || extractCode(children)).trim()
   const lang = tryToBundledLanguage(langSetting || '') || extractLang(children)
@@ -44,11 +48,7 @@ export async function CodeBlock({
       twoslashed = annotationsByLine(hoverNodes)
       code = editedCode
     } catch (_err) {
-      // Silently ignore, if imports aren't defined type compilation fails
-      // Uncomment lines below to debug in dev
-      // console.log('\n==========CODE==========\n')
-      // console.log(code)
-      // console.error(_err.recommendation)
+      // Type compilation fails when imports aren't defined
     }
   }
 
@@ -64,35 +64,72 @@ export async function CodeBlock({
         'group',
         'relative',
         'not-prose',
-        'w-full overflow-hidden',
-        'border border-default rounded-lg',
+        'w-full',
+        compact ? 'border-0 my-0!' : 'border border-default rounded-lg shadow-codeblock',
         'bg-200',
         'text-sm',
         className
       )}
     >
-      <pre>
-        <code className={lineNumbers ? 'flex' : ''}>
-          {lineNumbers && (
-            <div className="flex-shrink-0 select-none text-right text-muted bg-control py-6 px-2">
-              {tokens.map((_, idx) => (
-                <div key={idx} className="w-full">
-                  {idx + 1}
+      <div
+        className={cn(
+          'code-scroll',
+          'w-full overflow-x-auto overscroll-x-none',
+          !compact && 'rounded-lg',
+          'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring'
+        )}
+        role="group"
+        aria-roledescription="code block"
+        aria-label={getCodeBlockLabel(lang, tokens.length)}
+        tabIndex={0}
+      >
+        <pre>
+          <code
+            className={cn(
+              lineNumbers && 'grid grid-cols-[auto_1fr] w-fit min-w-full py-3',
+              '[--row-rest:var(--background-200)]',
+              '[--row-hover:color-mix(in_srgb,var(--foreground)_3%,var(--background-200))]'
+            )}
+          >
+            {lineNumbers ? (
+              tokens.map((line, idx) => (
+                <div key={idx} className="group/row contents">
+                  <div
+                    aria-hidden="true"
+                    className={cn(
+                      'select-none text-right text-muted/70 pl-3 pr-2 min-h-5 leading-5',
+                      'bg-[var(--row-rest)]',
+                      'sticky left-0 z-10',
+                      'group-hover/row:text-muted group-hover/row:bg-[var(--row-hover)]',
+                      'after:pointer-events-none after:absolute after:inset-y-0 after:left-full after:w-4',
+                      '[--gutter-fade:var(--row-rest)] group-hover/row:[--gutter-fade:var(--row-hover)]',
+                      'after:bg-[image:linear-gradient(to_right,var(--gutter-fade)_0%,color-mix(in_srgb,var(--gutter-fade)_85%,transparent)_25%,color-mix(in_srgb,var(--gutter-fade)_50%,transparent)_50%,color-mix(in_srgb,var(--gutter-fade)_15%,transparent)_75%,transparent_100%)]'
+                    )}
+                  >
+                    {idx + 1}
+                  </div>
+                  <div
+                    className={cn(
+                      'code-content min-h-5 leading-5 pl-3 pr-18',
+                      'group-hover/row:bg-[var(--row-hover)]'
+                    )}
+                  >
+                    <CodeLine tokens={line} twoslash={twoslashed?.get(idx)} />
+                  </div>
                 </div>
-              ))}
-            </div>
-          )}
-          <div className={cn('p-6 overflow-x-auto', lineNumbers ? 'flex-grow' : '')}>
-            {tokens.map((line, idx) => (
-              <CodeLine key={idx} tokens={line} twoslash={twoslashed?.get(idx)} />
-            ))}
-          </div>
-        </code>
-      </pre>
-      <CodeCopyButton
-        content={code.trim()}
-        className="hidden group-hover:block absolute top-2 right-2"
-      />
+              ))
+            ) : (
+              <div className="code-content p-6">
+                {tokens.map((line, idx) => (
+                  <CodeLine key={idx} tokens={line} twoslash={twoslashed?.get(idx)} />
+                ))}
+              </div>
+            )}
+          </code>
+        </pre>
+      </div>
+      {/* After the code so the block is named before its controls, and outside the scroller so they stay pinned */}
+      {!hideControls && <CodeBlockControls content={code.trim()} />}
     </div>
   )
 }
@@ -112,7 +149,7 @@ function CodeLine({
   })
 
   return (
-    <span className="block h-5">
+    <span className="block min-h-5 leading-5">
       {tokens.map((token) =>
         twoslash?.has(token.offset) ? (
           <AnnotatedSpan

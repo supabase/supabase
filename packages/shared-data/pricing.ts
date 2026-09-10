@@ -37,7 +37,7 @@ export type FeatureKey =
   | 'database.pausing'
   | 'database.branching'
   | 'database.egress'
-  | 'database.cachedEgress'
+  | 'database.replication'
   | 'auth.totalUsers'
   | 'auth.maus'
   | 'auth.userDataOwnership'
@@ -58,9 +58,9 @@ export type FeatureKey =
   | 'storage.size'
   | 'storage.customAccessControls'
   | 'storage.maxFileSize'
+  | 'storage.cachedEgress'
   | 'storage.cdn'
   | 'storage.transformations'
-  | 'storage.byoc'
   | 'functions.invocations'
   | 'functions.scriptSize'
   | 'functions.numberOfFunctions'
@@ -70,12 +70,13 @@ export type FeatureKey =
   | 'realtime.maxMessageSize'
   | 'dashboard.teamMembers'
   | 'security.platformAuditLogs'
-  | 'security.byoc'
   | 'security.logRetention'
   | 'security.logDrain'
   | 'security.metricsEndpoint'
   | 'security.soc2'
+  | 'security.iso27001'
   | 'security.hipaa'
+  | 'security.privateLink'
   | 'security.sso'
   | 'security.uptimeSla'
   | 'security.accessRoles'
@@ -194,12 +195,20 @@ export const pricing: Pricing = {
         usage_based: true,
       },
       {
-        key: 'database.cachedEgress',
-        title: 'Cached Egress',
+        key: 'database.replication',
+        title: 'Pipelines',
         plans: {
-          free: '5 GB included',
-          pro: ['250 GB included', 'then $0.03 per GB'],
-          team: ['250 GB included', 'then $0.03 per GB'],
+          free: false,
+          pro: [
+            '$0.053 per pipeline per hour',
+            '$3.00 per GB processed during ongoing replication',
+            '$0.60 per GB processed during initial sync',
+          ],
+          team: [
+            '$0.053 per pipeline per hour',
+            '$3.00 per GB processed during ongoing replication',
+            '$0.60 per GB processed during initial sync',
+          ],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -411,8 +420,19 @@ export const pricing: Pricing = {
         title: 'Storage',
         plans: {
           free: '1 GB included',
-          pro: ['100 GB included', 'then $0.021 per GB'],
-          team: ['100 GB included', 'then $0.021 per GB'],
+          pro: ['100 GB included', 'then $0.0213 per GB'],
+          team: ['100 GB included', 'then $0.0213 per GB'],
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
+      {
+        key: 'storage.cachedEgress',
+        title: 'Cached Egress',
+        plans: {
+          free: '5 GB included',
+          pro: ['250 GB included', 'then $0.03 per GB'],
+          team: ['250 GB included', 'then $0.03 per GB'],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -460,17 +480,6 @@ export const pricing: Pricing = {
           enterprise: 'Custom',
         },
         usage_based: true,
-      },
-      {
-        key: 'storage.byoc',
-        title: 'Bring your own storage provider',
-        plans: {
-          free: false,
-          pro: false,
-          team: false,
-          enterprise: true,
-        },
-        usage_based: false,
       },
     ],
   },
@@ -532,7 +541,7 @@ export const pricing: Pricing = {
         key: 'realtime.maxMessageSize',
         title: 'Max Message Size',
         plans: {
-          free: '250 KB',
+          free: '256 KB',
           pro: '3 MB',
           team: '3 MB',
           enterprise: 'Custom',
@@ -563,17 +572,6 @@ export const pricing: Pricing = {
     icon: 'M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z',
     features: [
       {
-        key: 'security.byoc',
-        title: 'BYO cloud',
-        plans: {
-          free: false,
-          pro: false,
-          team: false,
-          enterprise: true,
-        },
-        usage_based: false,
-      },
-      {
         key: 'security.logRetention',
         title: 'Log retention (API & Database)',
         plans: {
@@ -589,7 +587,7 @@ export const pricing: Pricing = {
         title: 'Log Drain',
         plans: {
           free: false,
-          pro: false,
+          pro: ['$60 per drain per month', '+ $0.20 per million events', '+ $0.09 per GB egress'],
           team: ['$60 per drain per month', '+ $0.20 per million events', '+ $0.09 per GB egress'],
           enterprise: 'Custom',
         },
@@ -629,6 +627,17 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
+        key: 'security.iso27001',
+        title: 'ISO 27001',
+        plans: {
+          free: false,
+          pro: false,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
         key: 'security.hipaa',
         title: 'HIPAA',
         plans: {
@@ -636,6 +645,17 @@ export const pricing: Pricing = {
           pro: false,
           team: 'Available as paid add-on',
           enterprise: 'Available as paid add-on',
+        },
+        usage_based: false,
+      },
+      {
+        key: 'security.privateLink',
+        title: 'AWS PrivateLink',
+        plans: {
+          free: false,
+          pro: false,
+          team: true,
+          enterprise: true,
         },
         usage_based: false,
       },

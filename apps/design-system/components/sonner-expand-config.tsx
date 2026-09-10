@@ -1,6 +1,7 @@
-import { useConfig } from '@/hooks/use-config'
 import { Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import { useConfig } from '@/hooks/use-config'
 
 function SonnerExpandConfig() {
   const [config, setConfig] = useConfig()

@@ -1,70 +1,92 @@
-import { useParams } from 'common'
-import { ReplicationComingSoon } from 'components/interfaces/Database/Replication/ComingSoon'
-import { Destinations } from 'components/interfaces/Database/Replication/Destinations'
-import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication/useIsETLPrivateAlpha'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { AlphaNotice } from 'components/ui/AlphaNotice'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { PipelineRequestStatusProvider } from 'state/replication-pipeline-request-status'
-import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { ReadReplicasMovedCallout } from '@/components/interfaces/Database/Replication/DestinationPanel/ReadReplicasMovedCallout'
+import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
+import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
+import { InstanceConfiguration } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
+import type { NextPageWithLayout } from '@/types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
-  const { ref } = useParams()
-  const enablePgReplicate = useIsETLPrivateAlpha()
+  const { data: selectedProject, isPending } = useSelectedProjectQuery()
+  const { isHighAvailability } = useHighAvailability()
   const showPgReplicate = useIsFeatureEnabled('database:replication')
 
   if (!showPgReplicate) {
-    return <UnknownInterface urlBack={`/project/${ref}/database/schemas`} />
+    return <UnknownInterface urlBack={`/project/${selectedProject?.ref}/database/schemas`} />
+  }
+
+  if (isHighAvailability) {
+    return (
+      <>
+        <PageHeader size="large">
+          <PageHeaderMeta>
+            <PageHeaderSummary>
+              <PageHeaderTitle>Replication</PageHeaderTitle>
+              <PageHeaderDescription>High Availability cluster topology</PageHeaderDescription>
+            </PageHeaderSummary>
+          </PageHeaderMeta>
+        </PageHeader>
+
+        <PageContainer size="large">
+          <PageSection>
+            <PageSectionContent>
+              <div className="relative h-[500px] w-full overflow-hidden rounded-md border border-muted">
+                <InstanceConfiguration />
+              </div>
+            </PageSectionContent>
+          </PageSection>
+        </PageContainer>
+      </>
+    )
   }
 
   return (
-    <>
-      {enablePgReplicate ? (
-        <PipelineRequestStatusProvider>
-          <ScaffoldContainer>
-            <ScaffoldSection>
-              <div className="col-span-12">
-                <div className="w-full mb-6">
-                  <div className="flex items-center gap-x-2 mb-1">
-                    <h3 className="text-foreground text-xl prose">Replication</h3>
-                  </div>
-                  <p className="prose text-sm max-w-full">
-                    Automatically replicate your database changes to external data warehouses and
-                    analytics platforms in real-time
-                  </p>
-                </div>
-                <AlphaNotice
-                  entity="Replication"
-                  feedbackUrl="https://github.com/orgs/supabase/discussions/39416"
-                />
-                <Destinations />
-              </div>
-            </ScaffoldSection>
-          </ScaffoldContainer>
-        </PipelineRequestStatusProvider>
-      ) : (
-        <>
-          <ScaffoldContainer>
-            <ScaffoldSection>
-              <div className="col-span-12">
-                <FormHeader title="Replication" description="Send data to other destinations" />
-              </div>
-            </ScaffoldSection>
-          </ScaffoldContainer>
-          <ReplicationComingSoon projectRef={ref || '_'} />
-        </>
-      )}
-    </>
+    <PipelineRequestStatusProvider>
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Replication</PageHeaderTitle>
+            <PageHeaderDescription>Send data to external destinations</PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+
+      <PageContainer size="large">
+        {isPending ? (
+          <GenericSkeletonLoader />
+        ) : (
+          <PageSection>
+            <PageSectionContent className="flex flex-col gap-12">
+              <ReadReplicasMovedCallout />
+              <ReplicationDiagram />
+              <Destinations />
+            </PageSectionContent>
+          </PageSection>
+        )}
+      </PageContainer>
+    </PipelineRequestStatusProvider>
   )
 }
 
 DatabaseReplicationPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database Replication">{page}</DatabaseLayout>
+    <DatabaseLayout title="Replication">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

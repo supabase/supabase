@@ -2,131 +2,172 @@ import { snakeCase } from 'lodash'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import {
+  Button,
+  cn,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  type DialogProps,
+} from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
-import type { ModalProps } from '@ui/components/Modal/Modal'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { DOCS_URL } from 'lib/constants'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { Button, CodeBlock, Modal, Tabs } from 'ui'
-import { Markdown } from '../Markdown'
 import {
   generateFileCliCommand,
   generateMigrationCliCommand,
   generateSeedCliCommand,
 } from './SQLEditor.utils'
+import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
+import { DOCS_URL } from '@/lib/constants'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
-export interface DownloadSnippetModalProps extends ModalProps {
+const CLI_DOCS_URL = `${DOCS_URL}/guides/cli/local-development`
+
+export interface DownloadSnippetModalProps extends DialogProps {
   id: string
 }
 
-const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
+type DownloadFormat = 'migration' | 'seed' | 'sql'
+
+export const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const snippet = snapV2.snippets[id]?.snippet
   const migrationName = snakeCase(snippet?.name)
 
-  const [selectedView, setSelectedView] = useState<'CLI' | 'NPM'>('CLI')
+  const [downloadFormat, setDownloadFormat] = useState<DownloadFormat>('migration')
+  const [selectedView, setSelectedView] = useState<'CLI' | 'NPX'>('CLI')
 
   const SNIPPETS = [
     {
-      id: 'migration',
+      id: 'migration' as const,
       label: 'Migration',
-      title: 'Download as migration',
-      description: `Download the snippet in a new migration named \`${migrationName}\``,
+      caption: (
+        <>
+          Run this command from your project directory to download the snippet in a new migration
+          named <code className="text-code-inline break-normal">{migrationName}</code>.
+        </>
+      ),
+      docLink: {
+        label: 'About migrations',
+        href: `${DOCS_URL}/guides/deployment/database-migrations`,
+      },
       cli: generateMigrationCliCommand(id, migrationName),
-      npm: generateMigrationCliCommand(id, migrationName, true),
+      npx: generateMigrationCliCommand(id, migrationName, true),
     },
     {
-      id: 'seed',
+      id: 'seed' as const,
       label: 'Seed file',
-      title: 'Download as seed file',
-      description:
-        'If your query consists of sample data, append the snippet to the end of `supabase/seed.sql`',
+      caption: (
+        <>
+          Run this command from your project directory to download the snippet. If your query
+          consists of sample data, append it to the end of{' '}
+          <code className="text-code-inline break-normal">supabase/seed.sql</code>.
+        </>
+      ),
+      docLink: {
+        label: 'About seeding',
+        href: `${DOCS_URL}/guides/local-development/seeding-your-database`,
+      },
       cli: generateSeedCliCommand(id),
-      npm: generateSeedCliCommand(id, true),
+      npx: generateSeedCliCommand(id, true),
     },
     {
-      id: 'sql',
+      id: 'sql' as const,
       label: 'SQL file',
-      title: 'Download as SQL file',
-      description: `Download the snippet directly into a new SQL file named \`${migrationName}.sql\``,
+      caption: (
+        <>
+          Run this command from your project directory to download the snippet into a new SQL file
+          named <code className="text-code-inline break-normal">{migrationName}.sql</code>.
+        </>
+      ),
       cli: generateFileCliCommand(id, migrationName),
-      npm: generateFileCliCommand(id, migrationName, true),
+      npx: generateFileCliCommand(id, migrationName, true),
     },
   ]
 
-  return (
-    <Modal
-      hideFooter
-      showCloseButton
-      size="xlarge"
-      header={<p>Download snippet as local migration file via the Supabase CLI.</p>}
-      {...props}
-    >
-      <div className="flex flex-col items-start justify-between gap-4 relative pt-2">
-        <Tabs type="underlined" listClassNames="pl-5">
-          {SNIPPETS.map((snippet) => {
-            return (
-              <Tabs.Panel key={snippet.id} id={snippet.id} label={snippet.label}>
-                <Modal.Content className="!py-0">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex flex-col gap-y-1">
-                      <p className="text-base">{snippet.title}</p>
-                      <Markdown
-                        className="text-sm text-scale-1000 [&>p>code]:!break-normal"
-                        content={snippet.description}
-                      />
-                    </div>
-                    <TwoOptionToggle
-                      width={50}
-                      options={['CLI', 'NPM']}
-                      activeOption={selectedView}
-                      borderOverride="border-muted"
-                      onClickOption={() =>
-                        selectedView === 'CLI' ? setSelectedView('NPM') : setSelectedView('CLI')
-                      }
-                    />
-                  </div>
-                  <pre>
-                    <CodeBlock
-                      language="bash"
-                      className="language-bash prose dark:prose-dark max-w-none"
-                    >
-                      {selectedView === 'CLI' ? snippet.cli : snippet.npm}
-                    </CodeBlock>
-                  </pre>
-                </Modal.Content>
-              </Tabs.Panel>
-            )
-          })}
-        </Tabs>
-        <Modal.Content className="w-full flex items-center justify-between pt-0">
-          <p className="text-xs text-lighter">Run this command from your project directory</p>
-          <div className="flex justify-between items-center gap-x-2">
-            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-              <Link
-                href={`${DOCS_URL}/guides/deployment/database-migrations`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                About migrations
-              </Link>
-            </Button>
+  const selectedSnippet = SNIPPETS.find((s) => s.id === downloadFormat) ?? SNIPPETS[0]
+  const commandValue = selectedView === 'CLI' ? selectedSnippet.cli : selectedSnippet.npx
 
-            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-              <Link
-                href={`${DOCS_URL}/guides/cli/local-development`}
-                target="_blank"
-                rel="noreferrer"
-              >
+  return (
+    <Dialog {...props}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Export query</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection className="flex flex-col gap-y-4">
+          <div className="flex items-center justify-between gap-x-2">
+            <p className="text-sm">Export as</p>
+            <Select
+              value={downloadFormat}
+              onValueChange={(value) => setDownloadFormat(value as DownloadFormat)}
+            >
+              <SelectTrigger className="w-auto">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SNIPPETS.map((snippet) => (
+                  <SelectItem key={snippet.id} value={snippet.id}>
+                    {snippet.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex flex-col gap-y-2">
+            <div className="flex items-center justify-between gap-x-2">
+              <p className="text-sm">Run with</p>
+              <TwoOptionToggle
+                width={50}
+                options={['CLI', 'NPX']}
+                activeOption={selectedView}
+                borderOverride="border-muted"
+                onClickOption={() =>
+                  selectedView === 'CLI' ? setSelectedView('NPX') : setSelectedView('CLI')
+                }
+              />
+            </div>
+            <CodeBlock
+              language="bash"
+              value={commandValue}
+              hideLineNumbers
+              wrapperClassName="[&_pre]:px-4 [&_pre]:py-3"
+              className={cn(
+                '!bg-surface-75 border-border [&_code]:text-[12px] [&_code]:text-foreground'
+              )}
+            />
+            <p className="text-xs text-foreground-lighter leading-relaxed">
+              {selectedSnippet.caption}
+            </p>
+          </div>
+        </DialogSection>
+        <DialogSection>
+          <div className="flex items-center justify-start gap-x-2">
+            {selectedSnippet.docLink && (
+              <Button asChild variant="default" icon={<ExternalLink />}>
+                <Link href={selectedSnippet.docLink.href} target="_blank" rel="noreferrer">
+                  {selectedSnippet.docLink.label}
+                </Link>
+              </Button>
+            )}
+
+            <Button asChild variant="default" icon={<ExternalLink />}>
+              <Link href={CLI_DOCS_URL} target="_blank" rel="noreferrer">
                 About CLI
               </Link>
             </Button>
           </div>
-        </Modal.Content>
-      </div>
-    </Modal>
+        </DialogSection>
+      </DialogContent>
+    </Dialog>
   )
 }
-
-export default DownloadSnippetModal

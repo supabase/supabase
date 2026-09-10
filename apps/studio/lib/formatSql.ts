@@ -1,3 +1,4 @@
+import { type SafeSqlFragment } from '@supabase/pg-meta'
 import { format } from 'sql-formatter'
 
 /**
@@ -5,7 +6,9 @@ import { format } from 'sql-formatter'
  * formatting is consistent across the app. It also has a try/catch block which returns the original SQL in case of
  * an error.
  */
-export const formatSql = (sql: string) => {
+export function formatSql(sql: SafeSqlFragment): SafeSqlFragment
+export function formatSql(sql: string): string
+export function formatSql(sql: string): string {
   try {
     return format(sql, {
       language: 'postgresql',

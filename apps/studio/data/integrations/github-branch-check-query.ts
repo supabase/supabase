@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type GithubBranchVariables = {
   repositoryId: number

@@ -1,13 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { replicationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type ReplicationPipelineVersionParams = { projectRef?: string; pipelineId?: number }
-type ReplicationPipelineVersionResponse =
-  components['schemas']['ReplicationPipelineVersionResponse']
+type ReplicationPipelineVersionResponse = components['schemas']['PipelineVersionResponse_Output']
 
 export async function fetchReplicationPipelineVersion(
   { projectRef, pipelineId }: ReplicationPipelineVersionParams,

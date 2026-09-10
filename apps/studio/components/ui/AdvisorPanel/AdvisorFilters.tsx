@@ -1,9 +1,30 @@
 import { X } from 'lucide-react'
+import { z } from 'zod'
 
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FilterPopover } from 'components/ui/FilterPopover'
-import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
-import { TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
+import { advisorCategoryLabels } from './AdvisorPanel.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FilterPopover } from '@/components/ui/FilterPopover'
+import {
+  AdvisorCategory,
+  advisorCategorySchema,
+  AdvisorSeverity,
+  advisorSeveritySchema,
+} from '@/state/advisor-state'
+
+/**
+ * FilterPopover reports its selection as plain strings, so validate them against the
+ * schema before they flow back into typed state. Unrecognized values are dropped rather
+ * than throwing — a stale option should not take the panel down.
+ */
+const parseFilterValues = <T extends string>(schema: z.ZodType<T>, values: string[]): T[] =>
+  values.flatMap((value) => {
+    const result = schema.safeParse(value)
+    return result.success ? [result.data] : []
+  })
+
+const platformCategories: AdvisorCategory[] = ['security', 'performance', 'health', 'messages']
+// Health runs against platform infrastructure and messages are platform notifications
+const selfHostedCategories: AdvisorCategory[] = ['security', 'performance']
 
 const severityOptions = [
   { label: 'Critical', value: 'critical' },
@@ -17,53 +38,45 @@ const statusOptions = [
 ]
 
 interface AdvisorFiltersProps {
-  activeTab: AdvisorTab
-  onTabChange: (tab: string) => void
+  categoryFilters: AdvisorCategory[]
+  onCategoryFiltersChange: (filters: AdvisorCategory[]) => void
   severityFilters: AdvisorSeverity[]
   onSeverityFiltersChange: (filters: AdvisorSeverity[]) => void
   statusFilters: string[]
   onStatusFiltersChange: (filters: string[]) => void
-  hasProjectRef?: boolean
   onClose: () => void
   isPlatform?: boolean
 }
 
 export const AdvisorFilters = ({
-  activeTab,
-  onTabChange,
+  categoryFilters,
+  onCategoryFiltersChange,
   severityFilters,
   onSeverityFiltersChange,
   statusFilters,
   onStatusFiltersChange,
-  hasProjectRef = true,
   onClose,
   isPlatform = false,
 }: AdvisorFiltersProps) => {
+  const categoryOptions = (isPlatform ? platformCategories : selfHostedCategories).map(
+    (category) => ({ label: advisorCategoryLabels[category], value: category })
+  )
+
   return (
-    <div className="border-b">
-      <div className="flex items-center justify-between gap-3 px-4 h-[46px]">
-        <Tabs_Shadcn_ value={activeTab} onValueChange={onTabChange} className="h-full">
-          <TabsList_Shadcn_ className="border-b-0 gap-4 h-full">
-            <TabsTrigger_Shadcn_ value="all" className="h-full text-xs">
-              All
-            </TabsTrigger_Shadcn_>
-            <TabsTrigger_Shadcn_ value="security" className="h-full text-xs">
-              Security
-            </TabsTrigger_Shadcn_>
-            <TabsTrigger_Shadcn_ value="performance" className="h-full text-xs">
-              Performance
-            </TabsTrigger_Shadcn_>
-            {isPlatform && (
-              <TabsTrigger_Shadcn_
-                value="messages"
-                className="h-full text-xs flex items-center gap-2"
-              >
-                Messages
-              </TabsTrigger_Shadcn_>
-            )}
-          </TabsList_Shadcn_>
-        </Tabs_Shadcn_>
-        <div className="flex items-center gap-2">
+    <div className="border-b overflow-x-auto">
+      <div className="flex items-center justify-between gap-x-4 h-[calc(var(--header-height)-1px)]">
+        <div className="flex items-center gap-x-2 pl-3">
+          <FilterPopover
+            name="Category"
+            options={categoryOptions}
+            activeOptions={[...categoryFilters]}
+            valueKey="value"
+            labelKey="label"
+            isMinimized={true}
+            onSaveFilters={(values) => {
+              onCategoryFiltersChange(parseFilterValues(advisorCategorySchema, values))
+            }}
+          />
           {isPlatform && (
             <FilterPopover
               name="Status"
@@ -83,17 +96,17 @@ export const AdvisorFilters = ({
             labelKey="label"
             isMinimized={true}
             onSaveFilters={(values) => {
-              onSeverityFiltersChange(values as AdvisorSeverity[])
+              onSeverityFiltersChange(parseFilterValues(advisorSeveritySchema, values))
             }}
           />
-          <ButtonTooltip
-            type="text"
-            className="w-7 h-7 p-0"
-            icon={<X strokeWidth={1.5} />}
-            onClick={onClose}
-            tooltip={{ content: { side: 'bottom', text: 'Close Advisor Center' } }}
-          />
         </div>
+        <ButtonTooltip
+          variant="text"
+          className="w-7 h-7 p-0 mr-3"
+          icon={<X strokeWidth={1.5} />}
+          onClick={onClose}
+          tooltip={{ content: { side: 'bottom', text: 'Close Advisor Center' } }}
+        />
       </div>
     </div>
   )

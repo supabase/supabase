@@ -1,10 +1,9 @@
 import fs from 'fs'
-
+import type { ICommonMarkdown } from '~/components/reference/Reference.types'
 import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import matter from 'gray-matter'
-import { serialize } from 'next-mdx-remote/serialize'
+import { serialize } from 'next-mdx-remote-client/serialize'
 import remarkGfm from 'remark-gfm'
-import type { ICommonMarkdown } from '~/components/reference/Reference.types'
 
 async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {
   let markdownContent: any[] = []
@@ -39,14 +38,15 @@ async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {
         meta: data,
         // introPage: introPages.includes(x),
         content: content
-          ? await serialize(content ?? '', {
-              // MDX's available options, see the MDX docs for more info.
-              // https://mdxjs.com/packages/mdx/#compilefile-options
-              mdxOptions: {
-                useDynamicImport: true,
-                remarkPlugins: [remarkGfm],
+          ? await serialize({
+              source: content ?? '',
+              options: {
+                // MDX's available options, see the MDX docs for more info.
+                // https://mdxjs.com/packages/mdx/#compilefile-options
+                mdxOptions: {
+                  remarkPlugins: [remarkGfm],
+                },
               },
-              // Indicates whether or not to parse the frontmatter from the mdx source
             })
           : null,
       })

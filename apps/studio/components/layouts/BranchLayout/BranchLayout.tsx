@@ -1,12 +1,12 @@
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
-import { useParams } from 'common'
-import { GitHubStatus } from 'components/interfaces/Settings/Integrations/GithubIntegration/GitHubStatus'
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { withAuth } from 'hooks/misc/withAuth'
 import { ProjectLayout } from '../ProjectLayout'
 import { generateBranchMenu } from './BranchLayout.utils'
+import { GitHubStatus } from '@/components/interfaces/Settings/Integrations/GithubIntegration/GitHubStatus'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 const BranchProductMenu = () => {
   const router = useRouter()
@@ -26,12 +26,7 @@ const BranchProductMenu = () => {
 
 const BranchLayout = ({ children }: PropsWithChildren<{}>) => {
   return (
-    <ProjectLayout
-      title="Branching"
-      product="Branching"
-      productMenu={<BranchProductMenu />}
-      isBlocking={false}
-    >
+    <ProjectLayout product="Branching" productMenu={<BranchProductMenu />} isBlocking={false}>
       {children}
     </ProjectLayout>
   )

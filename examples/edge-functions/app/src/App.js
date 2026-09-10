@@ -1,14 +1,97 @@
 import React, { useState } from 'react'
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 import JSONInput from 'react-json-editor-ajrm'
 import locale from 'react-json-editor-ajrm/locale/en'
-import { supabase } from './utils/supabaseClient'
+
 import { functionsList } from './functionsList'
+import { supabase } from './utils/supabaseClient'
+import { useUser } from './utils/userContext'
 
 const sampleObject = { name: 'world' }
 
+function AuthForm() {
+  const [mode, setMode] = useState('sign-in')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [message, setMessage] = useState(null)
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    setLoading(true)
+    setError(null)
+    setMessage(null)
+
+    if (mode === 'sign-in') {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) setError(error.message)
+    } else {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: `${window.location.origin}/` },
+      })
+      if (error) {
+        setError(error.message)
+      } else if (data.user && !data.session) {
+        setMessage('Check your email for a confirmation link to complete sign up.')
+      }
+    }
+
+    setLoading(false)
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex max-w-sm flex-col gap-3">
+      <label className="flex flex-col gap-1 text-sm">
+        Email
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
+          className="rounded border border-gray-300 px-2 py-1"
+        />
+      </label>
+      <label className="flex flex-col gap-1 text-sm">
+        Password
+        <input
+          type="password"
+          required
+          minLength={6}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          autoComplete={mode === 'sign-in' ? 'current-password' : 'new-password'}
+          className="rounded border border-gray-300 px-2 py-1"
+        />
+      </label>
+      <button
+        type="submit"
+        disabled={loading}
+        className="rounded bg-green-500 py-2 px-4 font-bold text-white hover:bg-green-700 disabled:opacity-50"
+      >
+        {loading ? 'Loading...' : mode === 'sign-in' ? 'Sign in' : 'Sign up'}
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          setMode(mode === 'sign-in' ? 'sign-up' : 'sign-in')
+          setError(null)
+          setMessage(null)
+        }}
+        className="text-sm text-blue-600 underline"
+      >
+        {mode === 'sign-in' ? 'Need an account? Sign up' : 'Already have an account? Sign in'}
+      </button>
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      {message && <p className="text-sm text-gray-700">{message}</p>}
+    </form>
+  )
+}
+
 function App() {
-  const { user } = Auth.useUser()
+  const { user } = useUser()
   const [supaFunction, setSupaFunction] = useState(functionsList[0])
   const [requestJson, setRequestJson] = useState(sampleObject)
   const [responseJson, setResponseJson] = useState({})
@@ -43,7 +126,7 @@ function App() {
               font-normal
               text-gray-700
               transition
-              ease-in-out 
+              ease-in-out
               focus:bg-white focus:text-gray-700 focus:outline-none"
             onChange={(e) => setSupaFunction(e.target.value)}
           >
@@ -89,7 +172,7 @@ function App() {
               </button>
             </div>
           ) : (
-            <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />
+            <AuthForm />
           )}
         </div>
       </div>

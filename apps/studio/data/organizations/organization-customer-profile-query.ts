@@ -1,11 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
-
 import { IS_PLATFORM } from 'common'
-import { get, handleError } from 'data/fetchers'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { organizationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrganizationCustomerProfileVariables = {
   slug?: string
@@ -50,7 +50,9 @@ export const useOrganizationCustomerProfileQuery = <TData = OrganizationCustomer
   // unnecessary requests, although this behaviour still needs handling on the UI
   const { can: canReadCustomerProfile } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
-    'stripe.customer'
+    'stripe.customer',
+    undefined,
+    { organizationSlug: slug }
   )
 
   return useQuery<OrganizationCustomerProfileData, OrganizationCustomerProfileError, TData>({

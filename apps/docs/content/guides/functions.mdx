@@ -1,8 +1,8 @@
 ---
 id: 'functions'
 title: 'Edge Functions'
-description: 'Globally distributed TypeScript functions.'
-subtitle: 'Globally distributed TypeScript functions.'
+description: 'Run TypeScript functions globally at the edge.'
+subtitle: 'Run TypeScript functions globally at the edge.'
 sidebar_label: 'Overview'
 tocVideo: 'za_loEtS4gs'
 ---
@@ -25,7 +25,7 @@ Edge Functions are server-side TypeScript functions, distributed globally at the
 
 ## Quick technical notes
 
-- **Runtime:** Supabase Edge Runtime (Deno compatible runtime with TypeScript first). Functions are simple `.ts` files that export a handler.
+- **Runtime:** Supabase Edge Runtime (Deno compatible runtime with TypeScript first). Functions are `.ts` files that export a handler.
 - **Local dev parity:** Use Supabase CLI for a local runtime similar to production for faster iteration (`supabase functions serve` command).
 - **Global deployment:** Deploy your Edge Functions via Supabase Dashboard, CLI or MCP.
 - **Cold starts & concurrency:** cold starts are possible — design for short-lived, idempotent operations. Heavy long-running jobs should be moved to [background workers](/docs/guides/functions/background-tasks).
@@ -41,167 +41,18 @@ Edge Functions are server-side TypeScript functions, distributed globally at the
 - Sending transactional emails.
 - Building messaging bots for Slack, Discord, etc.
 
-<div className="not-prose">
-  <Button size="medium" asChild>
-    <a href="/docs/guides/functions/quickstart">Get started</a>
-  </Button>
-</div>
+<ContentListings id="functions-get-started" />
 
 ## Examples
 
-Check out the [Edge Function Examples](https://github.com/supabase/supabase/tree/master/examples/edge-functions) in our GitHub repository.
+Check out [Supabase Edge Function Examples](https://github.com/supabase/supabase/tree/master/examples/edge-functions) in GitHub or try these examples:
 
-<div className="grid md:grid-cols-12 gap-4 not-prose">
-  {[
-    {
-      name: 'With supabase-js',
-      description: 'Use the Supabase client inside your Edge Function.',
-      href: '/guides/functions/auth',
-    },
-    {
-      name: 'Type-Safe SQL with Kysely',
-      description:
-        'Combining Kysely with Deno Postgres gives you a convenient developer experience for interacting directly with your Postgres database.',
-      href: '/guides/functions/kysely-postgres',
-    },
-    {
-      name: 'Monitoring with Sentry',
-      description: 'Monitor Edge Functions with the Sentry Deno SDK.',
-      href: '/guides/functions/examples/sentry-monitoring',
-    },
-    {
-      name: 'With CORS headers',
-      description: 'Send CORS headers for invoking from the browser.',
-      href: '/guides/functions/cors',
-    },
-    {
-      name: 'React Native with Stripe',
-      description: 'Full example for using Supabase and Stripe, with Expo.',
-      href: 'https://github.com/supabase-community/expo-stripe-payments-with-supabase-functions',
-    },
-    {
-      name: 'Flutter with Stripe',
-      description: 'Full example for using Supabase and Stripe, with Flutter.',
-      href: 'https://github.com/supabase-community/flutter-stripe-payments-with-supabase-functions',
-    },
-    {
-      name: 'Building a RESTful Service API',
-      description:
-        'Learn how to use HTTP methods and paths to build a RESTful service for managing tasks.',
-      href: 'https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/restful-tasks/index.ts',
-    },
-    {
-      name: 'Working with Supabase Storage',
-      description: 'An example on reading a file from Supabase Storage.',
-      href: 'https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/read-storage/index.ts',
-    },
-    {
-      name: 'Open Graph Image Generation',
-      description: 'Generate Open Graph images with Deno and Supabase Edge Functions.',
-      href: '/guides/functions/examples/og-image',
-    },
-    {
-      name: 'OG Image Generation & Storage CDN Caching',
-      description: 'Cache generated images with Supabase Storage CDN.',
-      href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/og-image-with-storage-cdn',
-    },
-    {
-      name: 'Get User Location',
-      description: `Get user location data from user's IP address.`,
-      href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/location',
-    },
-    {
-      name: 'Cloudflare Turnstile',
-      description: `Protecting Forms with Cloudflare Turnstile.`,
-      href: '/guides/functions/examples/cloudflare-turnstile',
-    },
-    {
-      name: 'Connect to Postgres',
-      description: `Connecting to Postgres from Edge Functions.`,
-      href: '/guides/functions/connect-to-postgres',
-    },
-    {
-      name: 'GitHub Actions',
-      description: `Deploying Edge Functions with GitHub Actions.`,
-      href: '/guides/functions/examples/github-actions',
-    },
-    {
-      name: 'Oak Server Middleware',
-      description: `Request Routing with Oak server middleware.`,
-      href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/oak-server',
-    },
-    {
-      name: 'Hugging Face',
-      description: `Access 100,000+ Machine Learning models.`,
-      href: '/guides/ai/examples/huggingface-image-captioning',
-    },
-    {
-      name: 'Amazon Bedrock',
-      description: `Amazon Bedrock Image Generator`,
-      href: '/guides/functions/examples/amazon-bedrock-image-generator',
-    },
-    {
-      name: 'OpenAI',
-      description: `Using OpenAI in Edge Functions.`,
-      href: '/guides/ai/examples/openai',
-    },
-    {
-      name: 'Stripe Webhooks',
-      description: `Handling signed Stripe Webhooks with Edge Functions.`,
-      href: '/guides/functions/examples/stripe-webhooks',
-    },
-    {
-      name: 'Send emails',
-      description: `Send emails in Edge Functions with Resend.`,
-      href: '/guides/functions/examples/send-emails',
-    },
-    {
-      name: 'Web Stream',
-      description: `Server-Sent Events in Edge Functions.`,
-      href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/streams',
-    },
-    {
-      name: 'Puppeteer',
-      description: `Generate screenshots with Puppeteer.`,
-      href: '/guides/functions/examples/screenshots',
-    },
-    {
-      name: 'Discord Bot',
-      description: `Building a Slash Command Discord Bot with Edge Functions.`,
-      href: '/guides/functions/examples/discord-bot',
-    },
-    {
-      name: 'Telegram Bot',
-      description: `Building a Telegram Bot with Edge Functions.`,
-      href: '/guides/functions/examples/telegram-bot',
-    },
-    {
-      name: 'Upload File',
-      description: `Process multipart/form-data.`,
-      href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/file-upload-storage',
-    },
-    {
-      name: 'Upstash Redis',
-      description: `Build an Edge Functions Counter with Upstash Redis.`,
-      href: '/guides/functions/examples/upstash-redis',
-    },
-    {
-      name: 'Rate Limiting',
-      description: `Rate Limiting Edge Functions with Upstash Redis.`,
-      href: '/guides/functions/examples/rate-limiting',
-    },
-    {
-      name: 'Slack Bot Mention Edge Function',
-      description: `Slack Bot handling Slack mentions in Edge Function`,
-      href: '/guides/functions/examples/slack-bot-mention',
-    },
-  ].map((x) => (
-    <div className="col-span-4" key={x.href}>
-      <Link href={x.href} passHref>
-        <GlassPanel icon={'/docs/img/icons/github-icon'} hasLightIcon={true} title={x.name}>
-          {x.description}
-        </GlassPanel>
-      </Link>
-    </div>
-  ))}
-</div>
+<ContentListings id="functions-examples-supabase" />
+
+<ContentListings id="functions-examples-webhooks-payments" />
+
+<ContentListings id="functions-examples-ai-media" />
+
+<ContentListings id="functions-examples-messaging" />
+
+<ContentListings id="functions-examples-operations" />

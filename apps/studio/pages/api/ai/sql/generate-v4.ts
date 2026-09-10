@@ -1,28 +1,35 @@
 import pgMeta from '@supabase/pg-meta'
-import { convertToModelMessages, type ModelMessage, stepCountIs, streamText } from 'ai'
-import { source } from 'common-tags'
+import type { JwtPayload } from '@supabase/supabase-js'
+import { pipeUIMessageStreamToResponse, safeValidateUIMessages, toUIMessageStream } from 'ai'
+import { IS_PLATFORM } from 'common'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
-import { IS_PLATFORM } from 'common'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { getModel } from 'lib/ai/model'
-import { getOrgAIDetails } from 'lib/ai/org-ai-details'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { getAIDetails } from '@/lib/ai/ai-details'
+import { NO_SCHEMA_ACCESS_MESSAGE } from '@/lib/ai/assistant-context'
 import {
-  CHAT_PROMPT,
-  EDGE_FUNCTION_PROMPT,
-  GENERAL_PROMPT,
-  PG_BEST_PRACTICES,
-  RLS_PROMPT,
-  REALTIME_PROMPT,
-  SECURITY_PROMPT,
-  LIMITATIONS_PROMPT,
-} from 'lib/ai/prompts'
-import { getTools } from 'lib/ai/tools'
-import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
-import apiWrapper from 'lib/api/apiWrapper'
-import { executeQuery } from 'lib/api/self-hosted/query'
+  assistantMessageMetadataSchema,
+  messagesIncludeLogsSnippets,
+} from '@/lib/ai/assistant-message-metadata'
+import { isTracingAllowed } from '@/lib/ai/braintrust-logger'
+import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
+import { isExplorerEnabled } from '@/lib/ai/is-explorer-enabled'
+import { getModel } from '@/lib/ai/model'
+import {
+  DEFAULT_ASSISTANT_BASE_MODEL_ID,
+  getAssistantModelEntry,
+  isAssistantBaseModelId,
+  isKnownAssistantModelId,
+  type AssistantModelId,
+} from '@/lib/ai/model.utils'
+import { getTools } from '@/lib/ai/tools'
+import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tools'
+import { apiWrapper } from '@/lib/api/apiWrapper'
+import { executeQuery } from '@/lib/api/self-hosted/query'
+import { getURL } from '@/lib/helpers'
+import { trustedUserEmail } from '@/lib/server/configcat'
 
 export const maxDuration = 120
 
@@ -34,12 +41,12 @@ export const config = {
   },
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
   const { method } = req
 
   switch (method) {
     case 'POST':
-      return handlePost(req, res)
+      return handlePost(req, res, claims)
     default:
       res.setHeader('Allow', ['POST'])
       res.status(405).json({
@@ -60,18 +67,22 @@ const requestBodySchema = z.object({
   connectionString: z.string(),
   schema: z.string().optional(),
   table: z.string().optional(),
+  chatId: z.string().optional(),
   chatName: z.string().optional(),
+  supportMode: z.boolean().optional(),
   orgSlug: z.string().optional(),
-  model: z.enum(['gpt-5', 'gpt-5-mini']).optional(),
+  model: z.string().optional(),
 })
 
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
   const authorization = req.headers.authorization
   const accessToken = authorization?.replace('Bearer ', '')
 
   if (IS_PLATFORM && !accessToken) {
     return res.status(401).json({ error: 'Authorization token is required' })
   }
+
+  const userId = claims?.sub
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
   const { data, error: parseError } = requestBodySchema.safeParse(body)
@@ -84,29 +95,56 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     messages: rawMessages,
     projectRef,
     connectionString,
-    orgSlug,
+    orgSlug: rawOrgSlug,
+    chatId,
     chatName,
-    model: requestedModel,
+    model: rawRequestedModel,
+    supportMode,
   } = data
 
+  const requestedModel: AssistantModelId | undefined =
+    rawRequestedModel && isKnownAssistantModelId(rawRequestedModel) ? rawRequestedModel : undefined
+
+  const messagesValidation = await safeValidateUIMessages({
+    messages: rawMessages,
+    metadataSchema: assistantMessageMetadataSchema,
+  })
+  if (!messagesValidation.success) {
+    return res.status(400).json({
+      error: 'Invalid request body',
+      message: messagesValidation.error.message,
+    })
+  }
+  const messages = messagesValidation.data
+
+  const includesLogsSnippets = messagesIncludeLogsSnippets(messages)
+
   let aiOptInLevel: AiOptInLevel = 'disabled'
-  let isLimited = false
+  let hasAccessToAdvanceModel = false
+  let orgHasHipaaAddon: boolean | undefined
+  let projectIsSensitive: boolean | null | undefined
+  let projectRegion: string | undefined
+  let orgId: number | undefined
+  let orgSlug: string | undefined
+  let planId: string | undefined
 
   if (!IS_PLATFORM) {
     aiOptInLevel = 'schema'
+    hasAccessToAdvanceModel = true
   }
 
-  if (IS_PLATFORM && orgSlug && authorization && projectRef) {
+  if (IS_PLATFORM && rawOrgSlug && authorization && projectRef) {
     try {
-      // Get organizations and compute opt in level server-side
-      const { aiOptInLevel: orgAIOptInLevel, isLimited: orgAILimited } = await getOrgAIDetails({
-        orgSlug,
-        authorization,
-        projectRef,
-      })
+      const aiDetails = await getAIDetails({ orgSlug: rawOrgSlug, projectRef, authorization })
 
-      aiOptInLevel = orgAIOptInLevel
-      isLimited = orgAILimited
+      aiOptInLevel = aiDetails.aiOptInLevel
+      hasAccessToAdvanceModel = aiDetails.hasAccessToAdvanceModel
+      orgHasHipaaAddon = aiDetails.hasHipaaAddon
+      orgId = aiDetails.orgId
+      orgSlug = aiDetails.orgSlug
+      planId = aiDetails.planId
+      projectIsSensitive = aiDetails.isSensitive
+      projectRegion = aiDetails.region
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
@@ -114,42 +152,22 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  // Only returns last 7 messages
-  // Filters out tools with invalid states
-  // Filters out tool outputs based on opt-in level using renderingToolOutputParser
-  const messages = (rawMessages || []).slice(-7).map((msg: any) => {
-    if (msg && msg.role === 'assistant' && 'results' in msg) {
-      const cleanedMsg = { ...msg }
-      delete cleanedMsg.results
-      return cleanedMsg
-    }
-    if (msg && msg.role === 'assistant' && msg.parts) {
-      const cleanedParts = msg.parts
-        .filter((part: any) => {
-          if (part.type.startsWith('tool-')) {
-            const invalidStates = ['input-streaming', 'input-available', 'output-error']
-            return !invalidStates.includes(part.state)
-          }
-          return true
-        })
-        .map((part: any) => {
-          return sanitizeMessagePart(part, aiOptInLevel)
-        })
-      return { ...msg, parts: cleanedParts }
-    }
-    return msg
-  })
+  const explorerEnabled = await isExplorerEnabled(trustedUserEmail(claims?.email))
+
+  const envThrottled = process.env.IS_THROTTLED !== 'false'
+
+  let effectiveModel: AssistantModelId = requestedModel ?? DEFAULT_ASSISTANT_BASE_MODEL_ID
+  if (!hasAccessToAdvanceModel || (envThrottled && !isAssistantBaseModelId(effectiveModel))) {
+    effectiveModel = DEFAULT_ASSISTANT_BASE_MODEL_ID
+  }
 
   const {
-    model,
+    modelParams,
     error: modelError,
-    promptProviderOptions,
-    providerOptions,
+    systemProviderOptions,
   } = await getModel({
     provider: 'openai',
-    model: requestedModel ?? 'gpt-5',
-    routingKey: projectRef,
-    isLimited,
+    modelEntry: getAssistantModelEntry(effectiveModel),
   })
 
   if (modelError) {
@@ -157,87 +175,87 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    // Get a list of all schemas to add to context
-    const pgMetaSchemasList = pgMeta.schemas.list()
-    type Schemas = z.infer<(typeof pgMetaSchemasList)['zod']>
-
-    const { result: schemas } =
-      aiOptInLevel !== 'disabled'
-        ? await executeSql<Schemas>(
-            {
-              projectRef,
-              connectionString,
-              sql: pgMetaSchemasList.sql,
-            },
-            undefined,
-            {
-              'Content-Type': 'application/json',
-              ...(authorization && { Authorization: authorization }),
-            },
-            IS_PLATFORM ? undefined : executeQuery
-          )
-        : { result: [] }
-
-    const schemasString =
-      schemas?.length > 0
-        ? `The available database schema names are: ${JSON.stringify(schemas)}`
-        : "You don't have access to any schemas."
-
-    // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
-    const system = source`
-      ${GENERAL_PROMPT}
-      ${CHAT_PROMPT}
-      ${PG_BEST_PRACTICES}
-      ${RLS_PROMPT}
-      ${EDGE_FUNCTION_PROMPT}
-      ${REALTIME_PROMPT}
-      ${SECURITY_PROMPT}
-      ${LIMITATIONS_PROMPT}
-    `
-
-    // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
-    // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
-    const coreMessages: ModelMessage[] = [
-      {
-        role: 'system',
-        content: system,
-        ...(promptProviderOptions && {
-          providerOptions: promptProviderOptions,
-        }),
-      },
-      {
-        role: 'assistant',
-        // Add any dynamic context here
-        content: `The user's current project is ${projectRef}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName}`,
-      },
-      ...convertToModelMessages(messages),
-    ]
-
     const abortController = new AbortController()
     req.on('close', () => abortController.abort())
     req.on('aborted', () => abortController.abort())
+    // Fires when the response finishes streaming or the connection drops, which
+    // is what tears down the remote MCP connection opened in getTools.
+    res.on('close', () => abortController.abort())
 
-    // Get tools
     const tools = await getTools({
       projectRef,
       connectionString,
       authorization,
       aiOptInLevel,
       accessToken,
+      baseUrl: getURL(),
+      supportMode,
+      isExplorerEnabled: explorerEnabled,
+      signal: abortController.signal,
     })
 
-    const result = streamText({
-      model,
-      stopWhen: stepCountIs(5),
-      messages: coreMessages,
-      ...(providerOptions && { providerOptions }),
+    // Get a list of all schemas to add to context
+    const getSchemas = async (): Promise<string> => {
+      const pgMetaSchemasList = pgMeta.schemas.list()
+      type Schemas = z.infer<(typeof pgMetaSchemasList)['zod']>
+
+      const { result: schemas } = await executeSql<Schemas>(
+        {
+          projectRef,
+          connectionString,
+          sql: pgMetaSchemasList.sql,
+        },
+        undefined,
+        {
+          'Content-Type': 'application/json',
+          ...(authorization && { Authorization: authorization }),
+        },
+        IS_PLATFORM ? undefined : executeQuery
+      )
+
+      return schemas?.length > 0
+        ? `The available database schema names are: ${JSON.stringify(schemas)}`
+        : NO_SCHEMA_ACCESS_MESSAGE
+    }
+
+    const result = await generateAssistantResponse({
+      messages,
+      ...modelParams,
       tools,
+      aiOptInLevel,
+      getSchemas: aiOptInLevel !== 'disabled' ? getSchemas : undefined,
+      projectRef,
+      chatId,
+      chatName,
+      allowTracing: isTracingAllowed({
+        orgHasHipaaAddon,
+        projectIsSensitive,
+        projectRegion,
+      }),
+      supportMode,
+      userId,
+      orgId,
+      orgSlug,
+      planId,
+      includesLogsSnippets,
+      isExplorerEnabled: explorerEnabled,
+      requestedModel,
+      systemProviderOptions,
       abortSignal: abortController.signal,
+      onSpanCreated: (spanId) => {
+        res.setHeader('x-braintrust-span-id', spanId)
+      },
     })
 
-    result.pipeUIMessageStreamToResponse(res, {
+    const stream = toUIMessageStream({
+      stream: result.stream,
       sendReasoning: true,
       onError: (error) => {
+        console.error('Assistant stream error:', error)
+
+        const encoded = encodeNotebookToolError(error)
+        if (encoded !== null) return encoded
+
         if (error == null) {
           return 'unknown error'
         }
@@ -252,6 +270,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
         return JSON.stringify(error)
       },
+    })
+
+    pipeUIMessageStreamToResponse({
+      response: res,
+      stream,
+      headers: { 'Content-Encoding': 'none' },
     })
   } catch (error) {
     console.error('Error in handlePost:', error)

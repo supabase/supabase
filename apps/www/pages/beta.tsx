@@ -51,7 +51,7 @@ const NavFlyOutMenu = (props: any) => {
 const VideoShot = (props: any) => {
   const { src } = props
   return (
-    <div className="p-2 rounded-xl bg-gradient-to-b from-border-strong to-background-surface-300">
+    <div className="p-2 rounded-xl bg-linear-to-b from-border-strong to-background-surface-300">
       <div className="rounded-md shadow-lg" style={{ height: 'fit-content' }}>
         <div className="flex items-center justify-start w-full h-5 px-2 bg-border-strong rounded-t-md">
           <div className="w-2 h-2 mr-2 rounded-full bg-overlay" />

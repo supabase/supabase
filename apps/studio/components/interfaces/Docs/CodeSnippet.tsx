@@ -1,7 +1,6 @@
-import { useParams } from 'common'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { SimpleCodeBlock } from 'ui'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
+
+import { useTrack } from '@/lib/telemetry/track'
 
 interface CodeSnippetProps {
   selectedLang: 'bash' | 'js'
@@ -13,31 +12,24 @@ interface CodeSnippetProps {
 }
 
 const CodeSnippet = ({ selectedLang, snippet }: CodeSnippetProps) => {
-  const { ref: projectRef } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const handleCopy = () => {
-    sendEvent({
-      action: 'api_docs_code_copy_button_clicked',
-      properties: {
-        title: snippet.title,
-        selectedLanguage: selectedLang,
-      },
-      groups: {
-        project: projectRef ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
+    track('api_docs_code_copy_button_clicked', {
+      title: snippet.title,
+      selectedLanguage: selectedLang,
     })
   }
 
   if (!snippet[selectedLang]) return null
   return (
-    <div className="codeblock-container">
-      <h4>{snippet.title}</h4>
-      <SimpleCodeBlock className={snippet[selectedLang]?.language} onCopy={handleCopy}>
-        {snippet[selectedLang]?.code}
-      </SimpleCodeBlock>
+    <div>
+      <h4 className="heading-default mb-2">{snippet.title}</h4>
+      <div className="[&_.codeBlock]:p-0 [&_.token-line]:text-sm">
+        <SimpleCodeBlock className={snippet[selectedLang]?.language} onCopy={handleCopy}>
+          {snippet[selectedLang]?.code}
+        </SimpleCodeBlock>
+      </div>
     </div>
   )
 }

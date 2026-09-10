@@ -35,10 +35,8 @@ interface ComponentAProps {
   sampleProp: string
 }
 
-// Name your component accordingly
-const ComponentA = ({ sampleProp }: ComponentAProps) => {
+// Name your component accordingly — use a named export, not a default export
+export const ComponentA = ({ sampleProp }: ComponentAProps) => {
   return <div>ComponentA: {sampleProp}</div>
 }
-
-export default ComponentA
 ```

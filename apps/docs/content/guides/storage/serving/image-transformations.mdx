@@ -15,6 +15,16 @@ Image Resizing is currently enabled for [Pro Plan and above](/pricing).
 
 </Admonition>
 
+## Manage image transformations
+
+You can enable or disable Image Transformations for your project from the [**Storage** > **Settings**](/dashboard/project/_/storage/files/settings) section of the Dashboard and toggle the **Enable Image Transformations** option.
+
+<Admonition type="note">
+
+Disabling Image Transformations prevents any image transformation requests from being processed. This can be useful to prevent unexpected usage or cost if you do not use this feature.
+
+</Admonition>
+
 ## Get a public URL for a transformed image
 
 Our client libraries methods like `getPublicUrl` and `createSignedUrl` support the `transform` option. This returns the URL that serves the transformed image.
@@ -30,6 +40,7 @@ Our client libraries methods like `getPublicUrl` and `createSignedUrl` support t
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
@@ -98,6 +109,19 @@ url = supabase.storage.from_('avatars').get_public_url(
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var url = supabase.Storage.From("bucket").GetPublicUrl("image.jpg", new TransformOptions
+{
+    Width = 500,
+    Height = 600
+});
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 An example URL could look like this:
@@ -121,6 +145,7 @@ To share a transformed image in a private bucket for a fixed amount of time, pro
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
@@ -177,6 +202,19 @@ val url = supabase.storage.from("bucket").createSignedUrl("image.jpg", 60.second
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var url = await supabase.Storage.From("bucket").CreateSignedUrl("image.jpg", 60000, new TransformOptions
+{
+    Width = 200,
+    Height = 200
+});
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 The transformation options are embedded into the token attached to the URL — they cannot be changed once signed.
@@ -196,6 +234,7 @@ To download a transformed image, pass the `transform` option to the `download` f
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
@@ -275,6 +314,19 @@ response = supabase.storage.from_('bucket').download(
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var data = await supabase.Storage.From("bucket").Download("image.jpg", new TransformOptions
+{
+    Width = 800,
+    Height = 300
+});
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Automatic image optimization (WebP)
@@ -304,6 +356,7 @@ In case you'd like to return the original format of the image and **opt-out** fr
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
@@ -391,6 +444,20 @@ response = supabase.storage.from_('bucket').download(
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var data = await supabase.Storage.From("bucket").Download("image.jpeg", new TransformOptions
+{
+    Width = 200,
+    Height = 200,
+    Format = "origin"
+});
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Next.js loader
@@ -449,6 +516,7 @@ Example:
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
@@ -526,6 +594,18 @@ response = supabase.storage.from_('bucket').download(
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var data = await supabase.Storage.From("bucket").Download("image.jpg", new TransformOptions
+{
+    Quality = 50
+});
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ### Resizing
@@ -557,6 +637,7 @@ Example:
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
@@ -644,6 +725,20 @@ response = supabase.storage.from_('bucket').download(
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var data = await supabase.Storage.From("bucket").Download("image.jpg", new TransformOptions
+{
+    Width = 800,
+    Height = 300,
+    Resize = TransformOptions.ResizeType.Contain // Cover | Fill
+});
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ### Limits
@@ -673,9 +768,15 @@ response = supabase.storage.from_('bucket').download(
 
 ## Self hosting
 
-Our solution to image resizing and optimization can be self-hosted as with any other Supabase product. Under the hood we use [imgproxy](https://imgproxy.net/)
+Our solution to image resizing and optimization can be self-hosted as with any other Supabase product. Under the hood we use [imgproxy](https://imgproxy.net/).
 
-#### imgproxy configuration:
+<Admonition type="note">
+
+If you run the official self-hosted stack from the [`supabase/supabase`](https://github.com/supabase/supabase/tree/master/docker) Docker Compose setup, an `imgproxy` service is **already included** and wired up to the `storage` service for you (the `storage` service sets `ENABLE_IMAGE_TRANSFORMATION: "true"` and `IMGPROXY_URL: http://imgproxy:5001`). You only need the steps below if you run `storage-api` outside of that Compose stack and have to provide your own imgproxy container.
+
+</Admonition>
+
+### imgproxy configuration:
 
 Deploy an imgproxy container with the following configuration:
 
@@ -689,7 +790,7 @@ imgproxy:
 
 Note: make sure that this service can only be reachable within an internal network and not exposed to the public internet
 
-#### Storage API configuration:
+### Storage API configuration:
 
 Once [imgproxy](https://imgproxy.net/) is deployed we need to configure a couple of environment variables in your self-hosted [`storage-api`](https://github.com/supabase/storage-api) service as follows:
 

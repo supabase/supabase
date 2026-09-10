@@ -1,6 +1,5 @@
 import { Code, GripHorizontal } from 'lucide-react'
 import { DragEvent, PropsWithChildren, ReactNode } from 'react'
-
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface ReportBlockContainerProps {
@@ -12,6 +11,7 @@ interface ReportBlockContainerProps {
   draggable?: boolean
   showDragHandle?: boolean
   tooltip?: ReactNode
+  className?: string
   onDragStart?: (e: DragEvent) => void
 }
 
@@ -24,6 +24,7 @@ export const ReportBlockContainer = ({
   draggable = false,
   showDragHandle = false,
   tooltip,
+  className,
   onDragStart,
   children,
 }: PropsWithChildren<ReportBlockContainerProps>) => {
@@ -36,7 +37,10 @@ export const ReportBlockContainer = ({
       draggable={draggable}
       unselectable={draggable ? 'on' : undefined}
       onDragStart={onDragStart}
-      className="h-full flex flex-col overflow-hidden bg-surface-100 border-overlay relative rounded border shadow-sm"
+      className={cn(
+        'h-full flex flex-col overflow-hidden bg-surface-100 border-overlay relative rounded-sm border shadow-xs',
+        className
+      )}
     >
       <Tooltip>
         <TooltipTrigger asChild>
@@ -53,11 +57,11 @@ export const ReportBlockContainer = ({
             ) : (
               <Code size={16} strokeWidth={1.5} className="text-foreground-muted" />
             )}
-            <div className={cn('flex items-center gap-2 flex-1 transition-opacity')}>
+            <div className={cn('flex items-center gap-2 flex-1 min-w-0 transition-opacity')}>
               <h3 className="heading-meta truncate">{label}</h3>
               {badge && <div className="flex items-center shrink-0">{badge}</div>}
             </div>
-            <div className="flex items-center">{actions}</div>
+            <div className="flex items-center shrink-0">{actions}</div>
           </div>
         </TooltipTrigger>
         {tooltip && (
@@ -68,13 +72,13 @@ export const ReportBlockContainer = ({
       </Tooltip>
       <div
         className={cn(
-          'relative flex flex-col flex-grow w-full',
+          'relative flex flex-col grow w-full',
           hasChildren && 'border-t overflow-hidden'
         )}
       >
         <div
           className={cn(
-            'flex flex-col flex-grow items-center overflow-hidden',
+            'flex flex-col grow items-center overflow-hidden',
             loading && 'pointer-events-none'
           )}
         >

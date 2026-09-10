@@ -1,13 +1,13 @@
+import { Button, Card, CardContent } from 'ui'
 import {
   PageSection,
+  PageSectionAside,
+  PageSectionContent,
+  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-  PageSectionDescription,
-  PageSectionAside,
-  PageSectionContent,
 } from 'ui-patterns/PageSection'
-import { Button, Card, CardContent } from 'ui'
 
 export default function PageSectionWithAside() {
   return (
@@ -21,10 +21,10 @@ export default function PageSectionWithAside() {
             </PageSectionDescription>
           </PageSectionSummary>
           <PageSectionAside>
-            <Button type="default" size="small">
+            <Button variant="default" size="small">
               Secondary
             </Button>
-            <Button type="primary" size="small">
+            <Button variant="primary" size="small">
               Primary Action
             </Button>
           </PageSectionAside>

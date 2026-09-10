@@ -18,10 +18,8 @@ Call the sign out method from the client library. It removes the active session 
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(
-  'https://your-project-id.supabase.co',
-  'sb_publishable_... or anon key'
-)
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 async function signOut() {
@@ -70,6 +68,15 @@ supabase.auth.sign_out()
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Auth.SignOut();
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Sign out and scopes
@@ -93,10 +100,8 @@ You can invoke these by providing the `scope` option:
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(
-  'https://your-project-id.supabase.co',
-  'sb_publishable_... or anon key'
-)
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 // defaults to the global scope
@@ -129,6 +134,19 @@ await supabase.auth.signOut();
 
 // sign out from all sessions
 supabase.auth.signOut(SignOutScope.GLOBAL)
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+// defaults to the global scope
+await supabase.Auth.SignOut();
+
+// sign out from the current session only
+await supabase.Auth.SignOut(SignOutScope.Local);
 ```
 
 </TabPanel>

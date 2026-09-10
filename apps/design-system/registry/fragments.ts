@@ -2,6 +2,12 @@ import { Registry } from '@/registry/schema'
 
 export const fragments: Registry = [
   {
+    name: 'CollapsibleCardSection',
+    type: 'components:fragment',
+    files: ['/CollapsibleCardSection.tsx'],
+    optionalPath: '',
+  },
+  {
     name: 'ConfirmationModal',
     type: 'components:fragment',
     files: ['/Dialogs/ConfirmationModal.tsx'],
@@ -20,12 +26,6 @@ export const fragments: Registry = [
     optionalPath: '/Dialogs',
   },
   {
-    name: 'ConfirmDialog',
-    type: 'components:fragment',
-    files: ['/Dialogs/ConfirmDialog.tsx'],
-    optionalPath: '/Dialogs',
-  },
-  {
     name: 'PageContainer',
     type: 'components:fragment',
     files: ['/PageContainer/index.tsx'],
@@ -38,9 +38,27 @@ export const fragments: Registry = [
     optionalPath: '/PageHeader',
   },
   {
+    name: 'PageBreadcrumbs',
+    type: 'components:fragment',
+    files: ['/PageBreadcrumbs/index.tsx'],
+    optionalPath: '/PageBreadcrumbs',
+  },
+  {
+    name: 'PageNav',
+    type: 'components:fragment',
+    files: ['/PageNav/index.tsx'],
+    optionalPath: '/PageNav',
+  },
+  {
     name: 'PageSection',
     type: 'components:fragment',
     files: ['/PageSection/index.tsx'],
     optionalPath: '/PageSection',
+  },
+  {
+    name: 'StatusCode',
+    type: 'components:fragment',
+    files: ['/StatusCode/index.tsx'],
+    optionalPath: '/StatusCode',
   },
 ]

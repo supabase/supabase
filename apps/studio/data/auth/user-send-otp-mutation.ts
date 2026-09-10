@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import type { User } from './users-infinite-query'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type UserSendOTPVariables = {
   projectRef: string
@@ -39,7 +39,7 @@ export const useUserSendOTPMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to send magic link: ${data.message}`)
+        toast.error(`Failed to send OTP: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

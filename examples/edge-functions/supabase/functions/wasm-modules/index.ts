@@ -1,9 +1,11 @@
-import { add } from "./add-wasm/pkg/add_wasm.js";
+import { withSupabase } from 'npm:@supabase/server@^1'
 
-Deno.serve(async (req) => {
-  const { a, b } = await req.json();
-  return new Response(
-    JSON.stringify({ result: add(a, b) }),
-    { headers: { "Content-Type": "application/json" } },
-  );
-});
+import { add } from './add-wasm/pkg/add_wasm.js'
+
+// Authenticated endpoint, so deploy with verify_jwt = true.
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req) => {
+    const { a, b } = await req.json()
+    return Response.json({ result: add(a, b) })
+  }),
+}

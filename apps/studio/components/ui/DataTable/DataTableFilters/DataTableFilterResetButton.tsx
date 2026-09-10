@@ -1,6 +1,6 @@
 import { X } from 'lucide-react'
-
 import { Button } from 'ui'
+
 import type { DataTableFilterField } from '../DataTable.types'
 import { useDataTable } from '../providers/DataTableProvider'
 
@@ -15,9 +15,9 @@ export function DataTableFilterResetButton<TData>({ value: _value }: DataTableFi
 
   return (
     <Button
-      type="outline"
+      variant="outline"
       icon={<X />}
-      className="h-5 rounded-full px-1.5 py-1 font-mono text-[10px] [&>span]:-translate-y-[0.6px] space-x-1"
+      className="h-5 rounded-full px-1.5 py-1 font-mono text-[10px] [&>span]:translate-y-[-0.6px] space-x-1"
       onClick={(e) => {
         e.stopPropagation()
         column?.setFilterValue(undefined)
@@ -29,7 +29,7 @@ export function DataTableFilterResetButton<TData>({ value: _value }: DataTableFi
         }
       }}
     >
-      {filters.length}
+      {(column?.columnDef.meta as Record<string, string>)?.dataType === 'date' ? 1 : filters.length}
     </Button>
   )
 }

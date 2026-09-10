@@ -1,12 +1,12 @@
+import { useIsLoggedIn, useParams } from 'common'
 import jsonLogic from 'json-logic-js'
 import { useMemo } from 'react'
 
-import { useIsLoggedIn, useParams } from 'common'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { IS_PLATFORM } from 'lib/constants'
-import type { Permission } from 'types'
 import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 import { useSelectedProjectQuery } from './useSelectedProject'
+import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { Permission } from '@/types'
 
 const toRegexpString = (actionOrResource: string) =>
   `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`
@@ -34,7 +34,7 @@ export function doPermissionsCheck(
   resource: string,
   data?: object,
   organizationSlug?: string,
-  projectRef?: string
+  projectRef?: string | null
 ) {
   if (!permissions || !Array.isArray(permissions)) {
     return false
@@ -76,12 +76,12 @@ export function useGetPermissions(
 function useGetProjectPermissions(
   permissionsOverride?: Permission[],
   organizationSlugOverride?: string,
-  projectRefOverride?: string,
+  projectRefOverride?: string | null,
   enabled = true
 ) {
   const {
     data,
-    isLoading: isLoadingPermissions,
+    isPending: isLoadingPermissions,
     isSuccess: isSuccessPermissions,
   } = usePermissionsQuery({
     enabled: permissionsOverride === undefined && enabled,
@@ -91,7 +91,7 @@ function useGetProjectPermissions(
   const getOrganizationDataFromParamsSlug = organizationSlugOverride === undefined && enabled
   const {
     data: organizationData,
-    isLoading: isLoadingOrganization,
+    isPending: isLoadingOrganization,
     isSuccess: isSuccessOrganization,
   } = useSelectedOrganizationQuery({
     enabled: getOrganizationDataFromParamsSlug,
@@ -104,7 +104,7 @@ function useGetProjectPermissions(
   const getProjectDataFromParamsRef = !!urlProjectRef && projectRefOverride === undefined && enabled
   const {
     data: projectData,
-    isLoading: isLoadingProject,
+    isPending: isLoadingProject,
     isSuccess: isSuccessProject,
   } = useSelectedProjectQuery({
     enabled: getProjectDataFromParamsRef,
@@ -114,7 +114,12 @@ function useGetProjectPermissions(
       ? projectData
       : { ref: projectRefOverride, parent_project_ref: undefined }
 
-  const projectRef = project?.parent_project_ref ? project.parent_project_ref : project?.ref
+  const projectRef =
+    projectRefOverride === null
+      ? null
+      : project?.parent_project_ref
+        ? project.parent_project_ref
+        : project?.ref
 
   const isLoading =
     isLoadingPermissions ||
@@ -142,7 +147,7 @@ export function useAsyncCheckPermissions(
   data?: object,
   overrides?: {
     organizationSlug?: string
-    projectRef?: string
+    projectRef?: string | null
     permissions?: Permission[]
   }
 ) {

@@ -1,10 +1,10 @@
 import { has } from 'lodash'
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
-import { RowIcon } from './FileExplorerRow'
+import { StorageRowIcon } from '../StorageRowIcon'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export interface FileExplorerRowEditingProps {
   item: StorageItem
@@ -90,18 +90,21 @@ export const FileExplorerRowEditing = ({
   return (
     <div
       style={style}
-      className="storage-row flex items-center justify-between rounded bg-gray-500"
+      className="storage-row flex items-center justify-between rounded-sm bg-gray-500"
     >
-      <div className="flex h-full flex-grow items-center px-2.5">
+      <div className="flex h-full grow items-center px-2.5">
         <div>
-          <RowIcon
+          <StorageRowIcon
             view={view}
             status={item.status}
             fileType={item.type}
             mimeType={item.metadata?.mimetype}
           />
         </div>
-        <form className="h-9" onSubmit={(event) => onSaveItemName(itemName, event)}>
+        <form
+          className="h-9"
+          onSubmit={(event) => onSaveItemName(itemName.trim() || item.name, event)}
+        >
           <input
             autoFocus
             ref={inputRef}
@@ -109,12 +112,13 @@ export const FileExplorerRowEditing = ({
             type="text"
             value={itemName}
             onChange={(event) => setItemName(event.target.value)}
-            onBlur={(event) => onSaveItemName(itemName, event)}
+            onBlur={(event) => onSaveItemName(itemName.trim() || item.name, event)}
           />
           <button
+            tabIndex={-1}
             className="hidden"
             type="submit"
-            onClick={(event) => onSaveItemName(itemName, event)}
+            onClick={(event) => onSaveItemName(itemName.trim() || item.name, event)}
           />
         </form>
       </div>

@@ -1,6 +1,7 @@
 import { expect } from '@playwright/test'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
+import { env } from '../env.config.js'
 
 const LOG_DRAIN_OPTIONS = [
   {
@@ -18,6 +19,8 @@ const LOG_DRAIN_OPTIONS = [
 ]
 
 test.describe('Log Drains Settings', () => {
+  test.skip(env.IS_PLATFORM, 'Log drains are not supported on platform')
+
   test.beforeEach(async ({ page, ref }) => {
     // Navigate to the log drains settings page
     await page.goto(toUrl(`/project/${ref}/settings/log-drains`))

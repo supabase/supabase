@@ -1,18 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
+import { useFlag, useParams } from 'common'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import Panel from 'components/ui/Panel'
-import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
-import { getLastUsedAPIKeys, useLastUsedAPIKeysLogQuery } from './DisplayApiSettings.utils'
+
+import { getLastUsedAPIKeys } from './DisplayApiSettings.utils'
+import Panel from '@/components/ui/Panel'
+import { useApiKeysLastUsedQuery } from '@/data/analytics/api-keys-last-used-query'
+import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export const DisplayApiSettings = ({
   showTitle = true,
@@ -28,12 +29,12 @@ export const DisplayApiSettings = ({
   const {
     data: settings,
     isError: isProjectSettingsError,
-    isLoading: isProjectSettingsLoading,
+    isPending: isProjectSettingsLoading,
   } = useProjectSettingsV2Query({ projectRef })
   const {
     data,
     isError: isJwtSecretUpdateStatusError,
-    isLoading: isJwtSecretUpdateStatusLoading,
+    isPending: isJwtSecretUpdateStatusLoading,
   } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
@@ -51,12 +52,28 @@ export const DisplayApiSettings = ({
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
 
-  const { isLoading: isLoadingLastUsed, logData: lastUsedLogData } = useLastUsedAPIKeysLogQuery(
-    projectRef!
+  const now = useRef(new Date()).current
+  const showApiKeyLastUsed = useFlag('showApiKeysLastUsed')
+  const {
+    isLoading: isLoadingLastUsed,
+    isError: isLastUsedError,
+    data: lastUsedLogData,
+  } = useApiKeysLastUsedQuery(
+    {
+      projectRef,
+      isoTimestampStart: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
+      isoTimestampEnd: now.toISOString(),
+    },
+    { enabled: showApiKeyLastUsed }
   )
 
   const lastUsedAPIKeys = useMemo(() => {
-    if (apiKeys.length < 1 || !lastUsedLogData || lastUsedLogData.length < 1) {
+    if (
+      apiKeys.length < 1 ||
+      !lastUsedLogData ||
+      lastUsedLogData.length < 1 ||
+      !showApiKeyLastUsed
+    ) {
       return {}
     }
 
@@ -67,7 +84,7 @@ export const DisplayApiSettings = ({
       console.error(e)
       return {}
     }
-  }, [lastUsedLogData, apiKeys])
+  }, [lastUsedLogData, apiKeys, showApiKeyLastUsed])
 
   return (
     <Panel
@@ -121,7 +138,7 @@ export const DisplayApiSettings = ({
             key={x.api_key}
             className={
               i >= 1 &&
-              'border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark'
+              'border-t border-panel-border-interior-light in-data-[theme*=dark]:border-panel-border-interior-dark'
             }
           >
             <FormLayout
@@ -135,7 +152,7 @@ export const DisplayApiSettings = ({
                   ))}
                   {x.tags === 'service_role' && (
                     <>
-                      <code className="text-code-inline !bg-destructive !text-white !border-destructive">
+                      <code className="text-code-inline bg-destructive! text-destructive-foreground! border-destructive!">
                         secret
                       </code>
                     </>
@@ -193,20 +210,24 @@ export const DisplayApiSettings = ({
                       ? 'JWT secret update failed, new API key may have issues'
                       : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
                         ? 'Updating JWT secret...'
-                        : x?.api_key ?? 'You need additional permissions to view API keys'
+                        : (x?.api_key ?? 'You need additional permissions to view API keys')
                 }
                 onChange={() => {}}
               />
             </FormLayout>
 
-            <div
-              className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
-              data-invisible={isLoadingLastUsed}
-            >
-              {lastUsedAPIKeys[x.api_key]
-                ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
-                : 'No requests in the past 24 hours.'}
-            </div>
+            {showApiKeyLastUsed && (
+              <div
+                className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
+                data-invisible={isLoadingLastUsed}
+              >
+                {isLastUsedError
+                  ? 'Unable to load requests from the past 24 hours.'
+                  : lastUsedAPIKeys[x.api_key]
+                    ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
+                    : 'No requests in the past 24 hours.'}
+              </div>
+            )}
           </Panel.Content>
         ))
       )}

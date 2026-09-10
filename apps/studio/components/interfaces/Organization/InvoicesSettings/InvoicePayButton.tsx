@@ -1,6 +1,7 @@
-import { useInvoicePaymentLinkGetMutation } from 'data/invoices/invoice-payment-link-mutation'
 import { toast } from 'sonner'
 import { Button } from 'ui'
+
+import { useInvoicePaymentLinkGetMutation } from '@/data/invoices/invoice-payment-link-mutation'
 
 interface InvoicePayButtonProps {
   slug?: string
@@ -21,8 +22,8 @@ const InvoicePayButton = ({ slug, invoiceId }: InvoicePayButtonProps) => {
   }
 
   return (
-    <Button onClick={onPayNow} loading={isPending} disabled={isPending}>
-      Pay Now
+    <Button variant="primary" onClick={onPayNow} loading={isPending} disabled={isPending}>
+      Pay now
     </Button>
   )
 }

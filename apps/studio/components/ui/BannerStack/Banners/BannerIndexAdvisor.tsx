@@ -1,11 +1,12 @@
-import { BannerCard } from '../BannerCard'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks'
 import { Lightbulb } from 'lucide-react'
-import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
+
+import { BannerCard } from '../BannerCard'
 import { useBannerStack } from '../BannerStackProvider'
-import { useTrack } from 'lib/telemetry/track'
+import { EnableIndexAdvisorButton } from '@/components/interfaces/QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const BannerIndexAdvisor = () => {
   const track = useTrack()
@@ -26,7 +27,7 @@ export const BannerIndexAdvisor = () => {
     >
       <div className="flex flex-col gap-y-4">
         <div className="flex flex-col gap-y-2 items-start">
-          <div className="p-2 rounded-lg bg-warning-200 text-warning dark:bg-warning-300">
+          <div className="p-2 rounded-lg bg-warning-300 text-warning">
             <Lightbulb size={16} />
           </div>
         </div>

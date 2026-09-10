@@ -1,8 +1,10 @@
 import { Column } from 'react-data-grid'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
 import type { LogData } from '../Logs.types'
+import { extractEdgeFunctionName } from '../Logs.utils'
 import { ResponseCodeFormatter, RowLayout, TextFormatter } from '../LogsFormatters'
 import { defaultRenderCell } from './DefaultPreviewColumnRenderer'
-import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 const columns: Column<LogData>[] = [
   {
@@ -13,11 +15,13 @@ const columns: Column<LogData>[] = [
       if (!props.row.status_code && !props.row.method) {
         return defaultRenderCell(props)
       }
+      const functionName = extractEdgeFunctionName(props.row.pathname)
       return (
         <RowLayout>
           <TimestampInfo utcTimestamp={props.row.timestamp!} />
           <ResponseCodeFormatter value={String(props.row.status_code)} />
           <TextFormatter value={String(props.row.method)} />
+          {functionName && <TextFormatter value={functionName} />}
           <TextFormatter value={String(props.row.id)} />
         </RowLayout>
       )
