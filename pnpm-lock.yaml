@@ -750,6 +750,9 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.2.6(react@19.2.6)
+      sharp:
+        specifier: ^0.35.4
+        version: 0.35.4(@types/node@22.13.14)
       ui:
         specifier: workspace:*
         version: link:../../packages/ui
@@ -34970,7 +34973,6 @@ snapshots:
       '@img/sharp-win32-ia32': 0.35.4
       '@img/sharp-win32-x64': 0.35.4
       '@types/node': 22.13.14
-    optional: true
 
   shebang-command@1.2.0:
     dependencies:
