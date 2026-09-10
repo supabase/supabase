@@ -31,6 +31,7 @@
   --code-token-link: #ffffff;
   --code-token-number: #ffffff;
   --code-token-property: #3ecf8e;
+  --code-token-variable: var(--code-foreground);
   --code-highlight-color: #232323;
   --shadow-codeblock:
     0 0 0 0 var(--border-default), 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 0 rgba(0, 0, 0, 0.3);
@@ -49,6 +50,7 @@
   --code-token-link: oklch(from var(--foreground-light) l c h / 1);
   --code-token-number: oklch(from var(--foreground-light) l c h / 1);
   --code-token-property: #15593b;
+  --code-token-variable: var(--code-foreground);
   --code-highlight-color: #1c1c1c;
 }
 
