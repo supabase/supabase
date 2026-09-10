@@ -18,7 +18,6 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { WarehouseCatalogCredentials } from './Warehouse.utils'
 import { AlertError } from '@/components/ui/AlertError'
-import { InlineLink } from '@/components/ui/InlineLink'
 import { useWarehouseCatalogQuery } from '@/data/warehouse/warehouse-catalog-query'
 import {
   DUCKLAKE_METADATA_PASSWORD_ENV_VAR,
@@ -202,11 +201,7 @@ export const WarehouseConnectionDetails = () => {
 
           {!isCatalogPending && !isCatalogError && !catalog?.enabled && (
             <p className="text-sm text-foreground-light max-w-lg">
-              Catalog access is off. Turn it on in{' '}
-              <InlineLink href={`/project/${projectRef}/integrations/warehouse/settings`}>
-                Warehouse settings
-              </InlineLink>{' '}
-              to attach this project&apos;s Warehouse from DuckDB.
+              Turn on catalog access below to attach this project&apos;s Warehouse from DuckDB.
             </p>
           )}
 

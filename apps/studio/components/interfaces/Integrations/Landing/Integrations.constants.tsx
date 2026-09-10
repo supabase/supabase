@@ -432,34 +432,18 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         route: 'overview',
         label: 'Overview',
       },
-      {
-        route: 'settings',
-        label: 'Settings',
-        layout: 'constrained',
-      },
     ],
     navigate: ({ pageId = 'overview' }) => {
-      switch (pageId) {
-        case 'overview':
-          return dynamic(
-            () =>
-              import('@/components/interfaces/Integrations/Warehouse/OverviewTab').then(
-                (mod) => mod.WarehouseOverviewTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
-        case 'settings':
-          return dynamic(
-            () =>
-              import('@/components/interfaces/Integrations/Warehouse/SettingsTab').then(
-                (mod) => mod.WarehouseSettingsTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
+      if (pageId === 'overview') {
+        return dynamic(
+          () =>
+            import('@/components/interfaces/Integrations/Warehouse/OverviewTab').then(
+              (mod) => mod.WarehouseOverviewTab
+            ),
+          {
+            loading: Loading,
+          }
+        )
       }
       return null
     },

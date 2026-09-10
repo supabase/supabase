@@ -9,7 +9,9 @@ import {
   isWarehouseSettingUp,
   type WarehouseSetupTarget,
 } from './Warehouse.utils'
+import { WarehouseCatalogAccessCard } from './WarehouseCatalogAccessCard'
 import { WarehouseConnectionDetails } from './WarehouseConnectionDetails'
+import { WarehouseDisableCard } from './WarehouseDisableCard'
 import { WarehouseSchemaTablePicker } from './WarehouseSchemaTablePicker'
 import {
   WarehouseEnablingProgress,
@@ -41,7 +43,9 @@ export const WarehouseSetupPanel = () => {
       )
     },
   })
-  const setupMutation = useWarehouseSetupMutation()
+  // Rendered inline by the picker rather than as a toast: a setup failure is something the user
+  // has to act on, so it must not disappear.
+  const setupMutation = useWarehouseSetupMutation({ onError: () => {} })
 
   const handleSetup = (targets: WarehouseSetupTarget[]) => {
     if (!projectRef || targets.length === 0) return
@@ -82,7 +86,11 @@ export const WarehouseSetupPanel = () => {
 
   if (status === 'not_started') {
     return (
-      <WarehouseSchemaTablePicker onSubmit={handleSetup} isSubmitting={setupMutation.isPending} />
+      <WarehouseSchemaTablePicker
+        onSubmit={handleSetup}
+        isSubmitting={setupMutation.isPending}
+        error={setupMutation.error}
+      />
     )
   }
 
@@ -119,6 +127,14 @@ export const WarehouseSetupPanel = () => {
     <>
       <WarehouseReplicatedTablesSection tables={data.tables} />
       <WarehouseConnectionDetails />
+      <WarehouseSchemaTablePicker
+        isEditing
+        onSubmit={handleSetup}
+        isSubmitting={setupMutation.isPending}
+        error={setupMutation.error}
+      />
+      <WarehouseCatalogAccessCard />
+      <WarehouseDisableCard />
     </>
   )
 }

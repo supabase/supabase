@@ -39,18 +39,22 @@ import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { WAREHOUSE_PUBLICATION_NAME } from '@/lib/warehouse'
+import type { ResponseError } from '@/types'
 
 export interface WarehouseSchemaTablePickerProps {
   onSubmit: (targets: WarehouseSetupTarget[]) => void
   isSubmitting: boolean
   /** Set when editing an already-enabled Warehouse rather than setting one up for the first time. */
   isEditing?: boolean
+  /** Failure from the submit itself, rendered inline rather than as a toast the user can lose. */
+  error?: ResponseError | null
 }
 
 export const WarehouseSchemaTablePicker = ({
   onSubmit,
   isSubmitting,
   isEditing = false,
+  error,
 }: WarehouseSchemaTablePickerProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -167,9 +171,7 @@ export const WarehouseSchemaTablePicker = ({
     <PageSection className="first:pt-0">
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>
-            {isEditing ? 'Replicated tables' : 'Enable Warehouse'}
-          </PageSectionTitle>
+          {isEditing && <PageSectionTitle>Replicated tables</PageSectionTitle>}
           <PageSectionDescription>
             {isEditing
               ? 'Choose which schemas or tables to replicate to Warehouse. Tables already replicating are selected.'
@@ -177,7 +179,15 @@ export const WarehouseSchemaTablePicker = ({
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
-      <PageSectionContent>
+      <PageSectionContent className="space-y-4">
+        {!!error && (
+          <AlertError
+            subject={
+              isEditing ? 'Failed to update replicated tables' : 'Failed to enable Warehouse'
+            }
+            error={error}
+          />
+        )}
         <Card>
           <CardContent className="p-0 divide-y">
             {schemasWithTables.map((schema) => {

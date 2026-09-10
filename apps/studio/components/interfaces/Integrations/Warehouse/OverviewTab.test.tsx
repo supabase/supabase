@@ -5,7 +5,7 @@ import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { WarehouseSettingsTab } from './SettingsTab'
+import { WarehouseOverviewTab } from './OverviewTab'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -13,16 +13,25 @@ type WarehouseSetupStatusResponse = components['schemas']['WarehouseSetupStatusR
 type WarehouseCatalogResponse = components['schemas']['WarehouseCatalogResponse']
 type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
 
-// The tab renders the same content on both the marketplace and legacy shells; the flag reads a
-// context plus ConfigCat, neither of which `customRender` provides.
+// Both integration shells are live, and the flag reads a context plus ConfigCat that
+// `customRender` doesn't provide.
 const mockIsMarketplaceEnabled = vi.fn(() => false)
 vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
   useIsMarketplaceEnabled: () => mockIsMarketplaceEnabled(),
 }))
 
-// The schema/table picker is exercised by its own unit tests and fires four upstream queries.
+vi.mock('../Integration/IntegrationOverviewTab', () => ({
+  IntegrationOverviewTab: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}))
+
+// Exercised by its own unit tests, and it fires four upstream queries of its own.
 vi.mock('./WarehouseSchemaTablePicker', () => ({
-  WarehouseSchemaTablePicker: () => <div>Replicated tables picker</div>,
+  WarehouseSchemaTablePicker: ({ error }: { error?: { message: string } | null }) => (
+    <div>
+      <span>Replicated tables picker</span>
+      {!!error && <span>Picker error: {error.message}</span>}
+    </div>
+  ),
 }))
 
 mockAnimationsApi()
@@ -56,38 +65,37 @@ const mockCatalog = () =>
     response: () => HttpResponse.json<WarehouseCatalogResponse>({ enabled: false }),
   })
 
-describe('WarehouseSettingsTab', () => {
+describe('WarehouseOverviewTab', () => {
   beforeEach(() => {
-    mockIsMarketplaceEnabled.mockReturnValue(false)
-  })
-
-  test('sends users back to Overview when Warehouse is not set up', async () => {
-    mockSetupStatus('not_started')
-
-    customRender(<WarehouseSettingsTab />)
-
-    expect(await screen.findByText('Warehouse is not set up')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Overview' })).toHaveAttribute(
-      'href',
-      '/project/default/integrations/warehouse/overview'
-    )
-    expect(screen.queryByText('Replicated tables picker')).not.toBeInTheDocument()
+    mockIsMarketplaceEnabled.mockReturnValue(true)
   })
 
   test.each([false, true])(
-    'renders the settings once provisioned (marketplace: %s)',
+    'offers only the picker before setup (marketplace: %s)',
     async (isMarketplaceEnabled) => {
       mockIsMarketplaceEnabled.mockReturnValue(isMarketplaceEnabled)
-      mockSetupStatus('complete')
-      mockCatalog()
+      mockSetupStatus('not_started')
 
-      customRender(<WarehouseSettingsTab />)
+      customRender(<WarehouseOverviewTab />)
 
       expect(await screen.findByText('Replicated tables picker')).toBeInTheDocument()
-      expect(screen.getByText('Catalog access')).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Disable Warehouse' })).toBeInTheDocument()
+      expect(screen.queryByText('External access')).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Disable Warehouse' })).not.toBeInTheDocument()
     }
   )
+
+  test('shows everything on one page once complete', async () => {
+    mockSetupStatus('complete')
+    mockCatalog()
+
+    customRender(<WarehouseOverviewTab />)
+
+    expect(await screen.findByText('External access')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Replicated tables' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Catalog access' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Disable Warehouse' })).toBeInTheDocument()
+    expect(screen.getByText('Replicated tables picker')).toBeInTheDocument()
+  })
 
   test('tears Warehouse down with an empty target list, and only after confirmation', async () => {
     mockSetupStatus('complete')
@@ -103,11 +111,9 @@ describe('WarehouseSettingsTab', () => {
       },
     })
 
-    customRender(<WarehouseSettingsTab />)
+    customRender(<WarehouseOverviewTab />)
 
     await userEvent.click(await screen.findByRole('button', { name: 'Disable Warehouse' }))
-
-    // Opening the dialog must not be enough on its own.
     expect(setupRequests).toEqual([])
 
     await userEvent.type(

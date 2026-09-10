@@ -85,8 +85,9 @@ describe('WarehouseTab', () => {
       )
     ).toBeInTheDocument()
 
-    // Enabling catalog access is provisioning, so it belongs on the integration, not here.
-    expect(await screen.findByRole('link', { name: 'Warehouse settings' })).toBeInTheDocument()
+    // Turning catalog access on is provisioning, so it belongs on the integration, not here.
+    expect(await screen.findByText(/Turn on catalog access/i)).toBeInTheDocument()
+    expect(screen.queryByRole('switch')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Enable catalog access/i })).not.toBeInTheDocument()
   })
 
