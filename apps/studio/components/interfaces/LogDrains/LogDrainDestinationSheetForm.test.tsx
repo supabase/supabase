@@ -77,8 +77,6 @@ const submitForm = () =>
 
 describe('LogDrainDestinationSheetForm', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
     useFlagMock.mockReturnValue(true)
     useParamsMock.mockReturnValue({ ref: 'project-ref' })
     useLogDrainsQueryMock.mockReturnValue({ data: [] })

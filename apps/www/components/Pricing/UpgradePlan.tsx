@@ -141,7 +141,7 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large', planId }: Up
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button disabled={!value} asChild>
+          <Button variant="primary" disabled={!value} asChild>
             <Link
               href={
                 value === 'new-organization'

@@ -66,7 +66,6 @@
     "@sentry/react": "^10.27.0",
     "@sentry/tanstackstart-react": "catalog:",
     "@smithy/property-provider": "^4.0.4",
-    "@std/path": "npm:@jsr/std__path@^1.0.8",
     "@stripe/react-stripe-js": "6.1.0",
     "@stripe/stripe-js": "9.1.0",
     "@stripe/sync-engine": "1.0.32",
@@ -173,8 +172,8 @@
     "@tailwindcss/vite": "4.2.4",
     "@tanstack/devtools-vite": "^0.6.0",
     "@testing-library/dom": "^10.0.0",
-    "@testing-library/jest-dom": "^6.6.0",
-    "@testing-library/react": "^16.0.0",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.0.0",
     "@types/common-tags": "^1.8.1",
     "@types/crypto-js": "^4.2.2",
@@ -216,7 +215,6 @@
     "tsx": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vite-tsconfig-paths": "catalog:",
     "vitest": "catalog:"
   }
 }

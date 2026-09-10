@@ -20,7 +20,8 @@ const buttonVariants = cva(
   ease-out
   duration-200
   rounded-md
-  transition-colors
+  transition-[background-color,border-color,color,scale]
+  motion-safe:active:scale-[0.97]
   focus-ring
   border
   `,
@@ -190,7 +191,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     {
       asChild = false,
       size = 'tiny',
-      variant = 'primary',
+      variant = 'default',
       children,
       loading,
       block,

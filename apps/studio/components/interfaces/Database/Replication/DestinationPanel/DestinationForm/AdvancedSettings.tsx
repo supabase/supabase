@@ -19,6 +19,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationType } from '../DestinationPanel.types'
+import { TableOptions } from './BigQuery/TableOptions'
 import {
   DEFAULT_CONNECTION_POOL_SIZE,
   DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
@@ -40,16 +41,16 @@ export const AdvancedSettings = ({
   form: UseFormReturn<DestinationPanelSchemaType>
 }) => {
   const handleNumberChange =
-    (field: { onChange: (value?: number) => void }) => (e: ChangeEvent<HTMLInputElement>) => {
+    (field: { onChange: (value: number | '') => void }) => (e: ChangeEvent<HTMLInputElement>) => {
       const parsed = e.target.valueAsNumber
-      field.onChange(e.target.value === '' || Number.isNaN(parsed) ? undefined : parsed)
+      field.onChange(e.target.value === '' || Number.isNaN(parsed) ? '' : parsed)
     }
 
   return (
-    <div className="px-5">
+    <div className="w-full">
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1" className="border-none">
-          <AccordionTrigger className="font-normal gap-2 justify-between text-sm py-3 hover:no-underline">
+          <AccordionTrigger className="font-normal gap-2 justify-between px-5 py-3 text-sm hover:no-underline">
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">
@@ -57,7 +58,7 @@ export const AdvancedSettings = ({
               </span>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
+          <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4 [&>div]:px-5">
             <FormField
               control={form.control}
               name="maxFillMs"
@@ -237,6 +238,17 @@ export const AdvancedSettings = ({
                     </FormItemLayout>
                   )}
                 />
+
+                <div className="flex flex-col gap-y-3">
+                  <div className="flex flex-col gap-y-1">
+                    <span className="text-sm text-foreground">Table layout</span>
+                    <p className="text-sm text-foreground-lighter">
+                      Partitioning and clustering for each BigQuery table. Applied when a
+                      destination table is first created or reset.
+                    </p>
+                  </div>
+                  <TableOptions control={form.control} />
+                </div>
               </>
             )}
           </AccordionContent>
