@@ -16,6 +16,9 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -36,6 +39,7 @@ import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePrev
 import { getExtensionDefaultSchema } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/IntegrationOverviewTabV2.utils'
 import { RequiredExtensionsSection } from '@/components/interfaces/Integrations/Integration/RequiredExtensionsSection'
 import { useIntegrationDetail } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
+import { Tool } from '@/components/ui/AIAssistantPanel/elements/Tool'
 import {
   FormSection,
   FormSectionContent,
@@ -426,22 +430,38 @@ export const CreateWrapperSheet = ({
                               </p>
                             </div>
                             <div className="flex items-center space-x-2">
-                              <Button
-                                variant="default"
-                                className="px-1"
-                                icon={<Edit />}
-                                onClick={() => {
-                                  setSelectedTableToEdit(table)
-                                }}
-                              />
-                              <Button
-                                variant="default"
-                                className="px-1"
-                                icon={<Trash />}
-                                onClick={() => {
-                                  removeTable(tableIndex)
-                                }}
-                              />
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="default"
+                                    className="px-1"
+                                    icon={<Edit />}
+                                    onClick={() => {
+                                      setSelectedTableToEdit(table)
+                                    }}
+                                    aria-label={`Edit ${table.table_name} foreign table`}
+                                    // Tooltip repeats the label; the description would read the name twice
+                                    aria-describedby={undefined}
+                                  />
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">{`Edit ${table.table_name} foreign table`}</TooltipContent>
+                              </Tooltip>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="default"
+                                    className="px-1"
+                                    icon={<Trash />}
+                                    onClick={() => {
+                                      removeTable(tableIndex)
+                                    }}
+                                    aria-label={`Remove ${table.table_name} foreign table`}
+                                    // Tooltip repeats the label; the description would read the name twice
+                                    aria-describedby={undefined}
+                                  />
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">{`Remove ${table.table_name} foreign table`}</TooltipContent>
+                              </Tooltip>
                             </div>
                           </div>
                         )
