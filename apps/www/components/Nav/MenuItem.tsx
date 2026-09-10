@@ -30,11 +30,12 @@ const MenuItem = React.forwardRef<
     },
     ref
   ) => {
+    const Component = isCrossAppLink(href) ? 'a' : Link
+
     return (
-      <Link
+      <Component
         href={href}
         ref={ref}
-        prefetch={isCrossAppLink(href) ? false : undefined}
         className={cn(
           'group/menu-item flex items-center text-foreground-light text-sm hover:text-foreground select-none gap-3 rounded-md p-2 leading-none no-underline focus-ring focus-visible:text-foreground',
           description && 'items-center',
@@ -88,7 +89,7 @@ const MenuItem = React.forwardRef<
             </div>
           </>
         )}
-      </Link>
+      </Component>
     )
   }
 )

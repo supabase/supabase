@@ -194,10 +194,17 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
                 <AccordionTrigger className={className}>{menuItem.title}</AccordionTrigger>
                 <AccordionMenuItem menuItem={menuItem} />
               </AccordionItem>
+            ) : isCrossAppLink(menuItem.url) ? (
+              <a
+                href={menuItem.url ?? '/'}
+                className={cn(className, 'block focus-ring rounded-sm')}
+                onClick={() => setOpen(false)}
+              >
+                {menuItem.title}
+              </a>
             ) : (
               <Link
                 href={menuItem.url ?? '/'}
-                prefetch={isCrossAppLink(menuItem.url ?? '/') ? false : undefined}
                 className={cn(className, 'block focus-ring rounded-sm')}
                 onClick={() => setOpen(false)}
               >
@@ -260,51 +267,41 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
               {!isUserLoading && (
                 <>
                   {isLoggedIn ? (
-                    <Link href="/dashboard/projects" prefetch={false} passHref legacyBehavior>
-                      <Button block asChild>
-                        <a type={undefined} className="h-10 py-4">
-                          Dashboard
-                        </a>
-                      </Button>
-                    </Link>
+                    <Button block asChild>
+                      <a href="/dashboard/projects" className="h-10 py-4">
+                        Dashboard
+                      </a>
+                    </Button>
                   ) : (
                     <>
-                      <Link
-                        href="https://supabase.com/dashboard"
-                        prefetch={false}
-                        passHref
-                        legacyBehavior
-                        onClick={() =>
-                          sendTelemetryEvent({
-                            action: 'sign_in_button_clicked',
-                            properties: { buttonLocation: 'Mobile Nav' },
-                          })
-                        }
-                      >
-                        <Button block asChild>
-                          <a type={undefined} className="h-10 py-4">
-                            Sign in
-                          </a>
-                        </Button>
-                      </Link>
-                      <Link
-                        href="https://supabase.com/dashboard/sign-up"
-                        prefetch={false}
-                        passHref
-                        legacyBehavior
-                        onClick={() =>
-                          sendTelemetryEvent({
-                            action: 'start_project_button_clicked',
-                            properties: { buttonLocation: 'Mobile Nav' },
-                          })
-                        }
-                      >
-                        <Button variant="primary" block asChild>
-                          <a type={undefined} className="h-10 py-4">
-                            Start your project
-                          </a>
-                        </Button>
-                      </Link>
+                      <Button block asChild>
+                        <a
+                          href="https://supabase.com/dashboard"
+                          className="h-10 py-4"
+                          onClick={() =>
+                            sendTelemetryEvent({
+                              action: 'sign_in_button_clicked',
+                              properties: { buttonLocation: 'Mobile Nav' },
+                            })
+                          }
+                        >
+                          Sign in
+                        </a>
+                      </Button>
+                      <Button variant="primary" block asChild>
+                        <a
+                          href="https://supabase.com/dashboard/sign-up"
+                          className="h-10 py-4"
+                          onClick={() =>
+                            sendTelemetryEvent({
+                              action: 'start_project_button_clicked',
+                              properties: { buttonLocation: 'Mobile Nav' },
+                            })
+                          }
+                        >
+                          Start your project
+                        </a>
+                      </Button>
                     </>
                   )}
                 </>

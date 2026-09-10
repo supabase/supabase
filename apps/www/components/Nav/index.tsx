@@ -4,9 +4,7 @@ import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import ScrollProgress from 'components/ScrollProgress'
 import { getMenu } from 'data/nav'
 import { DevToolbarTrigger } from 'dev-tools'
-import { isCrossAppLink } from 'lib/crossAppLink'
 import { useSendTelemetryEvent } from 'lib/telemetry'
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
@@ -165,18 +163,15 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                   {isLoggedIn ? (
                     <>
                       <Button className="hidden lg:block" asChild>
-                        <Link href="/dashboard/projects" prefetch={false}>
-                          Dashboard
-                        </Link>
+                        <a href="/dashboard/projects">Dashboard</a>
                       </Button>
                       <AuthenticatedDropdownMenu menu={userMenu} user={user} site="www" />
                     </>
                   ) : (
                     <>
                       <Button className="hidden lg:block" asChild>
-                        <Link
+                        <a
                           href="https://supabase.com/dashboard"
-                          prefetch={false}
                           onClick={() =>
                             sendTelemetryEvent({
                               action: 'sign_in_button_clicked',
@@ -185,12 +180,11 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                           }
                         >
                           Sign in
-                        </Link>
+                        </a>
                       </Button>
                       <Button variant="primary" className="hidden lg:block" asChild>
-                        <Link
+                        <a
                           href="https://supabase.com/dashboard/sign-up"
-                          prefetch={false}
                           onClick={() =>
                             sendTelemetryEvent({
                               action: 'start_project_button_clicked',
@@ -199,7 +193,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                           }
                         >
                           Start your project
-                        </Link>
+                        </a>
                       </Button>
                     </>
                   )}

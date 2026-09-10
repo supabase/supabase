@@ -235,15 +235,10 @@ const Footer = (props: Props) => {
                         return (
                           <li key={`${segment.title}_link_${idx}`}>
                             {link.url ? (
-                              link.url.startsWith('https') ? (
+                              link.url.startsWith('https') || isCrossAppLink(link.url) ? (
                                 <a href={link.url}>{children}</a>
                               ) : (
-                                <Link
-                                  href={link.url}
-                                  prefetch={isCrossAppLink(link.url) ? false : undefined}
-                                >
-                                  {children}
-                                </Link>
+                                <Link href={link.url}>{children}</Link>
                               )
                             ) : (
                               Component && <Component>{children}</Component>

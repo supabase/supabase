@@ -62,10 +62,11 @@ export function TextLink({
   target = '_self',
   ...props
 }: Props) {
+  const Component = isCrossAppLink(url) ? 'a' : Link
+
   return (
-    <Link
+    <Component
       href={url}
-      prefetch={isCrossAppLink(url) ? false : undefined}
       className={cn(
         'group/text-link text-foreground-light hover:text-foreground mt-3 block cursor-pointer text-sm focus-ring focus-visible:rounded-xs focus-visible:text-foreground',
         className
@@ -92,6 +93,6 @@ export function TextLink({
           </div>
         )}
       </div>
-    </Link>
+    </Component>
   )
 }

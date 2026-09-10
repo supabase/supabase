@@ -1,16 +1,15 @@
 /**
  * Paths that are served by a different Next.js app on the same origin.
- * Links to these paths must never be prefetched by the www router,
- * because their RSC payloads and chunks belong to a different build
- * and will poison webpack's chunk cache.
+ * Links to these paths should use ordinary <a> tags instead of Next.js <Link>
+ * components as per Next.js multi-zones recommendation, preventing the router
+ * from prefetching RSC payloads from sibling builds.
  */
 const CROSS_APP_PREFIXES = ['/docs', '/dashboard']
 
 /**
  * Returns true when `href` points to a route owned by a different
  * Next.js app on the same origin (e.g. /docs/* or /dashboard/*).
- * Use this to set `prefetch={false}` on any `<Link>` that would
- * otherwise cause a cross-build prefetch.
+ * Use this to render an ordinary <a> tag instead of Next.js <Link>.
  */
 export function isCrossAppLink(href?: string): boolean {
   if (!href) return false
