@@ -48,7 +48,7 @@ export const LogsCustomRangeDialog = ({
           <Button variant="default" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button disabled={!canApply} onClick={handleApply}>
+          <Button variant="primary" disabled={!canApply} onClick={handleApply}>
             Apply
           </Button>
         </DialogFooter>

@@ -1,9 +1,10 @@
+import styles from '~/styles/animations.module.css'
+import { PlayCircle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button, cn } from 'ui'
-import styles from '~/styles/animations.module.css'
+
 import AnnouncementBadge from '../Announcement/Badge'
-import { PlayCircle } from 'lucide-react'
 
 interface Types {
   h1: string | React.ReactNode
@@ -102,7 +103,7 @@ const ProductModulesHeader = (props: Types) => (
         </div>
         <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:items-center gap-2">
           {props.cta && (
-            <Button size="small" asChild>
+            <Button variant="primary" size="small" asChild>
               <Link href={props.cta.link} as={props.cta.link}>
                 {props.cta.label ?? 'Start for free'}
               </Link>

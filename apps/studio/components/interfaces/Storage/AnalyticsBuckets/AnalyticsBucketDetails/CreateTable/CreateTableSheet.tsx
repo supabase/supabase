@@ -267,7 +267,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
               >
                 Cancel
               </Button>
-              <Button form={formId} type="submit" loading={isCreating}>
+              <Button variant="primary" form={formId} type="submit" loading={isCreating}>
                 Create table
               </Button>
             </SheetFooter>

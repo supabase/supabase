@@ -112,7 +112,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
                 Adding an index will help this query execute faster
               </AlertDescription>
               <AlertDescription>
-                <Button className="mt-3" onClick={() => onClickViewSuggestion()}>
+                <Button variant="primary" className="mt-3" onClick={() => onClickViewSuggestion()}>
                   View suggestion
                 </Button>
               </AlertDescription>
