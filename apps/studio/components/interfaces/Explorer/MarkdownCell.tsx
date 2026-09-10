@@ -55,7 +55,7 @@ export const MarkdownCell = ({ cell, onEdit }: MarkdownCellProps) => {
       id={cell._id}
       actions={<AddCellDropdown cellId={cell._id} />}
       gripDropdownContent={<MoveCellDropdownContent cellId={cell._id} />}
-      gripClassName="mt-1.5 opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
+      gripClassName="mt-1.5 sm:opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
     >
       {isEditing ? (
         <div

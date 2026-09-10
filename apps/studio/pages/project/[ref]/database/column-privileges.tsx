@@ -335,7 +335,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                     privileges here
                   </p>
                   {selectedSchema === 'public' && (
-                    <Button asChild className="mt-4">
+                    <Button variant="primary" asChild className="mt-4">
                       <Link href={`/project/${ref}/editor`}>Create a new table</Link>
                     </Button>
                   )}

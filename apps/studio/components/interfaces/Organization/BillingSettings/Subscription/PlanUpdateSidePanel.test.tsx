@@ -152,7 +152,6 @@ vi.mock('@/hooks/misc/useTrackExperimentExposure', () => ({
 
 describe('PlanUpdateSidePanel', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockIsPlatform.value = true
     mockFeatureFlags.mockReturnValue({ posthog: {}, configcat: {}, hasLoaded: true })
     mockUsePHFlag.mockReturnValue('control')

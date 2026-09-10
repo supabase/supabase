@@ -203,7 +203,7 @@ export default function IntegrationsContent({
                 {metaDescription}
               </p>
             </div>
-            <Button asChild size="tiny" className="shrink-0">
+            <Button variant="primary" asChild size="tiny" className="shrink-0">
               <Link href="https://forms.supabase.com/partner">Apply as a Partner</Link>
             </Button>
           </div>
@@ -461,7 +461,7 @@ export default function IntegrationsContent({
           className="mx-auto max-w-2xl flex flex-col items-center gap-6 py-32 px-6 text-center"
         >
           <h2 className="h2 text-balance">Interested in partnering with Supabase?</h2>
-          <Button asChild size="medium" iconRight={<ArrowRight />}>
+          <Button variant="primary" asChild size="medium" iconRight={<ArrowRight />}>
             <Link href="https://forms.supabase.com/partner">Apply as a Partner</Link>
           </Button>
         </div>

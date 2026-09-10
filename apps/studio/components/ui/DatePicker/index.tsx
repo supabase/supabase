@@ -321,7 +321,9 @@ export function DatePicker({
                 Clear
               </Button>
             )}
-            <Button onClick={() => handleSubmit()}>Apply</Button>
+            <Button variant="primary" onClick={() => handleSubmit()}>
+              Apply
+            </Button>
           </div>
         </>
       </PopoverContent>

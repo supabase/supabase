@@ -94,7 +94,6 @@ const removeRecipient = (email: string) => {
 
 describe('BillingEmail', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockCheckPermissions.mockImplementation(() => ({ can: true, isSuccess: true }))
   })
 

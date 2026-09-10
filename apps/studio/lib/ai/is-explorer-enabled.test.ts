@@ -15,7 +15,6 @@ vi.mock('@/lib/server/configcat', async (importOriginal) => {
 
 describe('isExplorerEnabled', () => {
   beforeEach(async () => {
-    vi.clearAllMocks()
     const common = await import('common')
     vi.spyOn(common, 'IS_PLATFORM', 'get').mockReturnValue(true)
   })

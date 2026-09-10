@@ -258,6 +258,7 @@ export const EnableExtensionModal = ({
             Cancel
           </Button>
           <Button
+            variant="primary"
             type="submit"
             form="enable-extensions-form"
             loading={isEnabling}

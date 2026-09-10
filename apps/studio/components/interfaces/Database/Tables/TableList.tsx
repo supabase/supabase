@@ -342,12 +342,18 @@ export const TableList = ({
               onTrigger={() => onAddTable()}
               side="bottom"
             >
-              <Button className="w-auto ml-auto" icon={<Plus />} onClick={() => onAddTable()}>
+              <Button
+                variant="primary"
+                className="w-auto ml-auto"
+                icon={<Plus />}
+                onClick={() => onAddTable()}
+              >
                 New table
               </Button>
             </Shortcut>
           ) : (
             <ButtonTooltip
+              variant="primary"
               className="w-auto ml-auto"
               icon={<Plus />}
               disabled

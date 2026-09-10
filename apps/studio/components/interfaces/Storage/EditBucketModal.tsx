@@ -413,7 +413,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
           <Button variant="default" disabled={isUpdating} onClick={closeModal}>
             Cancel
           </Button>
-          <Button form={formId} type="submit" loading={isUpdating}>
+          <Button variant="primary" form={formId} type="submit" loading={isUpdating}>
             Save
           </Button>
         </DialogFooter>
