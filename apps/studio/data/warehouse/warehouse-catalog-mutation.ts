@@ -3,7 +3,6 @@ import { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { warehouseKeys } from './keys'
-import { updateWarehouseLocalMockCatalog } from './warehouse-local-mock'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -16,12 +15,6 @@ export type UpdateWarehouseCatalogVariables = {
 
 async function updateWarehouseCatalog({ projectRef, body }: UpdateWarehouseCatalogVariables) {
   if (!projectRef) throw new Error('projectRef is required')
-
-  const mock = await updateWarehouseLocalMockCatalog({
-    projectRef,
-    enabled: body.enabled,
-  })
-  if (mock !== undefined) return mock
 
   const { data, error } = await post('/platform/warehouse/{ref}/catalog', {
     params: { path: { ref: projectRef } },
