@@ -120,7 +120,10 @@ jobs:
           cache: 'pnpm'
 
       # Vercel skips the preview when only the harness changed, so wait for one
-      # only when apps/www changed. See scripts/waitForVercelPreview.js.
+      # only when apps/www changed. A head commit that leaves apps/www untouched
+      # gets a skipped build whose URL serves a placeholder page, so the script
+      # falls back to the newest READY preview from an earlier commit of the PR.
+      # See scripts/waitForVercelPreview.js.
       - name: Wait for Vercel www preview
         if: steps.scope.outputs.skip == 'false' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.changes.outputs.www_app == 'true'
         id: deployment
@@ -129,6 +132,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
           VERCEL_STATUS_CONTEXT: 'Vercel – zone-www-dot-com'
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
