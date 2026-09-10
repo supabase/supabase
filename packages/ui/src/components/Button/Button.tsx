@@ -191,7 +191,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     {
       asChild = false,
       size = 'tiny',
-      variant = 'primary',
+      variant = 'default',
       children,
       loading,
       block,

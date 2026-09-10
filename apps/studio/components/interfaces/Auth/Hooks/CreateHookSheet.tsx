@@ -559,6 +559,7 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
             Cancel
           </Button>
           <Button
+            variant="primary"
             form={FORM_ID}
             type="submit"
             disabled={isUpdatingAuthHooks}

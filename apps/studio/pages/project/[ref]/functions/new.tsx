@@ -409,6 +409,7 @@ const NewFunctionPage = () => {
             />
           </div>
           <Button
+            variant="primary"
             loading={isDeploying}
             size="medium"
             disabled={files.length === 0 || isDeploying}
