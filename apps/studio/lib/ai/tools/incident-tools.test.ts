@@ -12,7 +12,6 @@ describe('ai/tools/incident-tools', () => {
   let mockAbortSignal: AbortSignal
 
   beforeEach(() => {
-    vi.clearAllMocks()
     mockFetch = vi.fn()
     global.fetch = mockFetch as typeof fetch
 

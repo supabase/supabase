@@ -255,7 +255,9 @@ export const RealtimeFilterPopover = ({
             <Button variant="default" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={() => setApplyConfigOpen(true)}>Apply</Button>
+            <Button variant="primary" onClick={() => setApplyConfigOpen(true)}>
+              Apply
+            </Button>
           </div>
         </PopoverContent>
       </Popover>

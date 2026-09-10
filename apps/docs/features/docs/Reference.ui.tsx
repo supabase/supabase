@@ -12,6 +12,7 @@ import { ReferenceSectionWrapper } from '~/features/docs/Reference.ui.client'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 import { isEqual } from 'lodash-es'
 import { ChevronRight, XCircle } from 'lucide-react'
+import { fromMarkdown } from 'mdast-util-from-markdown'
 import type { HTMLAttributes, PropsWithChildren } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Badge, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
@@ -115,32 +116,57 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
 }
 
 export function CollapsibleDetails({ title, content }: { title: string; content: string }) {
+  const blocks = fromMarkdown(content).children
+  const isCodeOnly = blocks.length === 1 && blocks[0].type === 'code'
+
   return (
-    <Collapsible>
+    <Collapsible
+      className={cn(
+        'overflow-hidden',
+        'border border-default rounded-lg bg-surface-100',
+        'has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2',
+        'has-[:focus-visible]:outline-offset-[-2px] has-[:focus-visible]:outline-[var(--ring)]'
+      )}
+    >
       <CollapsibleTrigger
         className={cn(
-          'group',
-          'w-full h-8',
-          'border bg-surface-100 rounded-sm',
-          'px-5',
-          'flex items-center gap-3',
+          'group/trigger',
+          'w-full min-h-8',
+          'px-2 py-1.5',
+          'flex items-center gap-2',
           'text-xs text-foreground-light',
-          'data-open:bg-surface-200',
-          'data-open:rounded-b-none data-open:border-b-0',
-          'transition motion-reduce:duration-1 ease-out'
+          'cursor-pointer hover:bg-surface-200 hover:text-foreground',
+          'focus-visible:outline-none',
+          'transition-[background-color,color] duration-150 ease-out'
         )}
       >
-        <ChevronRight size={12} className="group-data-open:rotate-90 transition-transform" />
         {title}
+        <ChevronRight
+          size={12}
+          strokeWidth={2}
+          aria-hidden
+          className="ms-auto shrink-0 text-foreground-muted group-data-open/trigger:rotate-90 transition-transform duration-200 ease-out motion-reduce:transition-none"
+        />
       </CollapsibleTrigger>
       <CollapsibleContent
         className={cn(
-          'border border-default bg-surface-100 rounded-b',
-          'px-5 py-2',
-          'prose max-w-none text-sm'
+          'overflow-hidden',
+          'data-open:animate-collapsible-down data-closed:animate-collapsible-up',
+          'motion-reduce:animate-none'
         )}
       >
-        <MDXRemoteRefs source={content} />
+        <div
+          className={cn(
+            'border-t border-default',
+            'prose max-w-none text-sm',
+            !isCodeOnly && 'px-4 py-3 [&_:where(p,li)]:text-sm [&_:where(p,li)]:leading-6'
+          )}
+        >
+          <MDXRemoteRefs
+            source={content}
+            codeBlockProps={isCodeOnly ? { compact: true } : undefined}
+          />
+        </div>
       </CollapsibleContent>
     </Collapsible>
   )

@@ -315,6 +315,7 @@ export const OAuthAppsList = () => {
               </Shortcut>
             ) : (
               <ButtonTooltip
+                variant="primary"
                 disabled
                 icon={<Plus />}
                 onClick={() => setShowCreateSheet(true)}

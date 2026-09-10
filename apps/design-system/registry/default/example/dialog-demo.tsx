@@ -36,7 +36,7 @@ export default function DialogDemo() {
           </div>
         </DialogSection>
         <DialogFooter>
-          <Button>Save changes</Button>
+          <Button variant="primary">Save changes</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
