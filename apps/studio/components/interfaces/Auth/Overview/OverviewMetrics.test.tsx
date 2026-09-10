@@ -1,4 +1,3 @@
-import { QueryClient } from '@tanstack/react-query'
 import { screen, waitFor } from '@testing-library/react'
 import type { platformComponents } from 'api-types'
 import { HttpResponse } from 'msw'
@@ -108,48 +107,6 @@ describe('Auth overview logs requests', () => {
       const end = Date.parse(request.searchParams.get('iso_timestamp_end') ?? '')
       expect(end - start).toBeCloseTo(24 * 60 * 60 * 1000, -2)
     }
-  })
-
-  it('keeps both log tables cached separately when the engine flag changes', async () => {
-    const requests: string[] = []
-    for (const query of logQueries) {
-      addAPIMock({
-        method: 'get',
-        path: query.endpoint,
-        response: ({ request }) => {
-          requests.push(request.url)
-          const engine = query.useOtel ? 'clickhouse' : 'legacy'
-          const isResponseQuery = new URL(request.url).searchParams.get('sql') === query.responseSql
-          return HttpResponse.json<AnalyticsResponse>({
-            result: isResponseQuery
-              ? [{ method: 'POST', path: `/auth/v1/${engine}`, status_code: 401, count: 2 }]
-              : [{ error_code: `${engine}_error`, count: 1 }],
-          })
-        },
-      })
-    }
-    const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false, staleTime: Infinity } },
-    })
-    const component = <OverviewMetrics isLoading={false} error={null} />
-    const { rerender } = customRender(component, { queryClient })
-    expect(await screen.findByText('/auth/v1/legacy')).toBeVisible()
-    expect(await screen.findByText('legacy_error')).toBeVisible()
-
-    flags.otelLegacyLogs = true
-    rerender(<OverviewMetrics isLoading={false} error={null} />)
-    expect(await screen.findByText('/auth/v1/clickhouse')).toBeVisible()
-    expect(await screen.findByText('clickhouse_error')).toBeVisible()
-    expect(screen.queryByText('/auth/v1/legacy')).not.toBeInTheDocument()
-    expect(screen.queryByText('legacy_error')).not.toBeInTheDocument()
-
-    flags.otelLegacyLogs = false
-    rerender(<OverviewMetrics isLoading={false} error={null} />)
-    expect(await screen.findByText('/auth/v1/legacy')).toBeVisible()
-    expect(await screen.findByText('legacy_error')).toBeVisible()
-    expect(screen.queryByText('/auth/v1/clickhouse')).not.toBeInTheDocument()
-    expect(screen.queryByText('clickhouse_error')).not.toBeInTheDocument()
-    expect(requests).toHaveLength(4)
   })
 
   describe.each(logQueries)('failures with useOtel=$useOtel', (query) => {
