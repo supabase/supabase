@@ -552,16 +552,10 @@ export const examples: Registry = [
     files: ['example/dialog-centered-off.tsx'],
   },
   {
-    name: 'disabled-comparison',
+    name: 'disabled-focusable',
     type: 'components:example',
     registryDependencies: ['button', 'tooltip'],
-    files: ['example/disabled-comparison.tsx'],
-  },
-  {
-    name: 'disabled-inferred-actions',
-    type: 'components:example',
-    registryDependencies: ['button'],
-    files: ['example/disabled-inferred-actions.tsx'],
+    files: ['example/disabled-focusable.tsx'],
   },
   {
     name: 'disabled-unavailable-with-notice',

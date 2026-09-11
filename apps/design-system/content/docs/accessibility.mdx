@@ -128,18 +128,7 @@ Apps with persistent header and sidebar chrome should expose a skip link as the 
 
 ## Disabled controls
 
-Not every disabled control should use the same implementation. Choose based on whether the user needs to discover why an action is blocked.
-
-### Native `disabled`
-
-Use native `disabled` when the control should be fully inert and nearby context makes the reason it is disabled easy to infer without focusing it:
-
-- Previous or next pagination controls at a boundary, when the current page and opposite action remain visible
-- Move up or move down actions at a list boundary, when the selected position and opposite action remain visible
-
-Native `disabled` removes the control from the tab order, suppresses interaction, and applies browser styling. Use it when skipping an inert control avoids an unnecessary tab stop without hiding an important capability. Screen readers can still discover native `disabled` controls via browse or virtual cursor navigation and will announce their name and disabled state. Only Tab navigation skips these `disabled` controls.
-
-<ComponentPreview name="disabled-inferred-actions" />
+Native `disabled` controls are removed from the tab order. When users need to focus a disabled button to discover the action or understand why it is unavailable, add `focusableWhenDisabled`.
 
 ### Focusable when disabled
 
@@ -151,9 +140,9 @@ Use `disabled` with `focusableWhenDisabled` when an action is unavailable for a 
 
 `focusableWhenDisabled` changes how the disabled state is implemented. It sets `aria-disabled="true"`, keeps the control in the tab order, and applies disabled styling without `pointer-events-none`. Guard handlers are built into [Button](components/button). See also [MDN: aria-disabled](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-disabled).
 
-Tab through the comparison below with the keyboard. Only the focusable disabled button stays focusable and exposes its tooltip.
+Tab to the example below with the keyboard. The disabled button stays focusable and exposes its tooltip.
 
-<ComponentPreview name="disabled-comparison" />
+<ComponentPreview name="disabled-focusable" />
 
 Implementation checklist for focusable disabled buttons:
 
