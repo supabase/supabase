@@ -12,7 +12,7 @@ import { useAvailableConnectModes } from './useAvailableConnectModes'
 import { useConnectSheetParams } from './useConnectSheetParams'
 import { useConnectSheetShortcut } from './useConnectSheetShortcut'
 import { useConnectState } from './useConnectState'
-import { WarehouseModePanel } from './WarehouseModePanel/WarehouseModePanel'
+import { WarehouseTab } from './WarehouseTab'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -179,9 +179,7 @@ export const ConnectSheet = () => {
           </div>
 
           {state.mode === 'warehouse' ? (
-            <div className="p-8">
-              <WarehouseModePanel />
-            </div>
+            <WarehouseTab />
           ) : (
             <>
               {activeFields.length > 0 && (

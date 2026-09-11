@@ -5,6 +5,18 @@ import { WAREHOUSE_METADATA_SCHEMA } from '@/lib/warehouse'
 
 export type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
 export type WarehouseSetupTarget = WarehouseSetupBody['targets'][number]
+export type WarehouseSetupStatus =
+  components['schemas']['WarehouseSetupStatusResponse']['setup_status']
+export type WarehouseSetupTable =
+  components['schemas']['WarehouseSetupStatusResponse']['tables'][number]
+
+export function isWarehouseProvisioned(setupStatus?: WarehouseSetupStatus): boolean {
+  return setupStatus === 'complete'
+}
+
+export function isWarehouseSettingUp(setupStatus?: WarehouseSetupStatus): boolean {
+  return setupStatus === 'setting_up' || setupStatus === 'copying'
+}
 
 /** Selection map keyed by `${schema}.${table}`. */
 export type SchemaTableSelection = Record<string, boolean>
@@ -16,10 +28,9 @@ export function getSchemaTableKey(schema: string, table: string): string {
 }
 
 /**
- * Internal schemas that still hold product data users legitimately want in their warehouse.
- * Everything else in `INTERNAL_SCHEMAS` is Supabase infrastructure — `vault` (secrets),
- * `pgsodium`, `cron`/`pgmq` bookkeeping, migration history — which should never be offered as a
- * replication target.
+ * Internal schemas that hold product data can be useful in analytics. Keep `auth` and `storage`
+ * available while their platform support is being finalised, and exclude the remaining Supabase
+ * infrastructure schemas.
  */
 const REPLICABLE_INTERNAL_SCHEMAS = ['auth', 'storage']
 
@@ -32,7 +43,7 @@ const NON_SELECTABLE_SCHEMAS = new Set(
  *
  * `WAREHOUSE_METADATA_SCHEMA` is excluded on top of the infrastructure schemas above: it holds the
  * DuckLake catalog describing the Warehouse itself, so replicating it would feed every Warehouse
- * write back in as more catalog rows to replicate. The platform rejects it server-side too — this
+ * write back in as more catalog rows to replicate. The platform rejects it server-side too. This
  * just keeps it out of the picker so the user never picks a target that can only fail.
  */
 export function isSelectableWarehouseSchema(schemaName: string): boolean {
@@ -45,6 +56,19 @@ export function isSelectableWarehouseSchema(schemaName: string): boolean {
 
 export function getSelectedTableCount(selection: SchemaTableSelection): number {
   return Object.values(selection).filter(Boolean).length
+}
+
+export function getInitialSelectionMode({
+  isEditing,
+  selectedTableCount,
+  totalTableCount,
+}: {
+  isEditing: boolean
+  selectedTableCount: number
+  totalTableCount: number
+}): 'all' | 'selected' {
+  const areAllTablesSelected = selectedTableCount === totalTableCount && totalTableCount > 0
+  return isEditing && areAllTablesSelected ? 'all' : 'selected'
 }
 
 /**
@@ -83,6 +107,9 @@ export function getSchemaCheckedState({
  * every currently-known table is selected is sent as a single `{ type: 'schema' }` target
  * (matching the API's semantics of "the currently eligible tables in that schema"); otherwise each
  * selected table is sent individually. Schemas with no tables, or no selected tables, are omitted.
+ *
+ * The API replaces the previous selection with whatever is sent, so an empty result is meaningful:
+ * it tears Warehouse down rather than being a no-op.
  */
 export function buildWarehouseSetupTargets(
   selection: SchemaTableSelection,
@@ -108,6 +135,28 @@ export function buildWarehouseSetupTargets(
   return targets
 }
 
+/**
+ * Retrying a failed setup reuses whatever the platform already recorded rather than the picker's
+ * selection, which is gone by the time the error surfaces.
+ */
+export function buildRetryTargets(
+  tables: Pick<WarehouseSetupTable, 'schema' | 'name'>[] = []
+): WarehouseSetupTarget[] {
+  return tables.map((table) => ({ type: 'table', schema: table.schema, name: table.name }))
+}
+
 export type WarehouseCatalogCredentials = NonNullable<
   components['schemas']['WarehouseCatalogResponse']['credentials']
 >
+
+/**
+ * Warehouse provisions a replication pipeline, and projects are capped on how many they may have.
+ * The cap is a feature-flagged value inside the replication API and is not exposed to Studio, so
+ * this recognises the failure after the fact rather than predicting it. Deliberately no
+ * client-side limit constant: guessing one would block the wrong people the moment the cap changes
+ * or Warehouse stops consuming a slot.
+ */
+export function isPipelineLimitError(message?: string): boolean {
+  if (!message) return false
+  return /maximum of \d+ pipelines/i.test(message)
+}

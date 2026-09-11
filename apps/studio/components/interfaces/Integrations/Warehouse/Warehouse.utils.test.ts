@@ -1,18 +1,23 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  buildRetryTargets,
   buildSelectionFromPublicationTables,
   buildWarehouseSetupTargets,
+  getInitialSelectionMode,
   getSchemaCheckedState,
   getSchemaTableKey,
   getSelectedTableCount,
+  isPipelineLimitError,
   isSelectableWarehouseSchema,
+  isWarehouseProvisioned,
+  isWarehouseSettingUp,
   type SchemaTableSelection,
   type SchemaWithTables,
-} from '../WarehouseModePanel/WarehouseModePanel.utils'
+} from './Warehouse.utils'
 import { WAREHOUSE_METADATA_SCHEMA } from '@/lib/warehouse'
 
-describe('WarehouseModePanel.utils:isSelectableWarehouseSchema', () => {
+describe('Warehouse.utils:isSelectableWarehouseSchema', () => {
   test('excludes information_schema', () => {
     expect(isSelectableWarehouseSchema('information_schema')).toBe(false)
   })
@@ -38,7 +43,7 @@ describe('WarehouseModePanel.utils:isSelectableWarehouseSchema', () => {
     expect(isSelectableWarehouseSchema('analytics')).toBe(true)
   })
 
-  test('includes auth and storage, which hold product data users replicate', () => {
+  test('includes auth and storage while their Warehouse support is being finalised', () => {
     expect(isSelectableWarehouseSchema('auth')).toBe(true)
     expect(isSelectableWarehouseSchema('storage')).toBe(true)
   })
@@ -55,7 +60,7 @@ describe('WarehouseModePanel.utils:isSelectableWarehouseSchema', () => {
   })
 })
 
-describe('WarehouseModePanel.utils:buildSelectionFromPublicationTables', () => {
+describe('Warehouse.utils:buildSelectionFromPublicationTables', () => {
   test('returns an empty selection when the publication has no tables', () => {
     expect(buildSelectionFromPublicationTables([])).toEqual({})
   })
@@ -103,7 +108,7 @@ describe('WarehouseModePanel.utils:buildSelectionFromPublicationTables', () => {
   })
 })
 
-describe('WarehouseModePanel.utils:getSchemaCheckedState', () => {
+describe('Warehouse.utils:getSchemaCheckedState', () => {
   test('is unchecked when nothing is selected', () => {
     expect(getSchemaCheckedState({ selectedCount: 0, totalCount: 3 })).toBe(false)
   })
@@ -122,13 +127,13 @@ describe('WarehouseModePanel.utils:getSchemaCheckedState', () => {
   })
 })
 
-describe('WarehouseModePanel.utils:getSchemaTableKey', () => {
+describe('Warehouse.utils:getSchemaTableKey', () => {
   test('joins schema and table with a dot', () => {
     expect(getSchemaTableKey('public', 'orders')).toBe('public.orders')
   })
 })
 
-describe('WarehouseModePanel.utils:getSelectedTableCount', () => {
+describe('Warehouse.utils:getSelectedTableCount', () => {
   test('returns 0 for an empty selection', () => {
     expect(getSelectedTableCount({})).toBe(0)
   })
@@ -143,8 +148,30 @@ describe('WarehouseModePanel.utils:getSelectedTableCount', () => {
   })
 })
 
-describe('WarehouseModePanel.utils:buildWarehouseSetupTargets', () => {
-  test('returns an empty array for an empty selection', () => {
+describe('Warehouse.utils:getInitialSelectionMode', () => {
+  test('starts first-time setup with selected tables and no implicit selection', () => {
+    expect(
+      getInitialSelectionMode({ isEditing: false, selectedTableCount: 0, totalTableCount: 4 })
+    ).toBe('selected')
+  })
+
+  test('shows all tables when editing an existing all-table selection', () => {
+    expect(
+      getInitialSelectionMode({ isEditing: true, selectedTableCount: 4, totalTableCount: 4 })
+    ).toBe('all')
+  })
+
+  test('shows selected tables when editing a partial selection', () => {
+    expect(
+      getInitialSelectionMode({ isEditing: true, selectedTableCount: 2, totalTableCount: 4 })
+    ).toBe('selected')
+  })
+})
+
+describe('Warehouse.utils:buildWarehouseSetupTargets', () => {
+  // The API replaces the previous selection with whatever is sent, so an empty result tears
+  // Warehouse down rather than being a no-op. Callers must not submit it unintentionally.
+  test('returns an empty array for an empty selection, which is the teardown payload', () => {
     const schemas: SchemaWithTables[] = [{ schema: 'public', tables: ['orders', 'customers'] }]
     expect(buildWarehouseSetupTargets({}, schemas)).toEqual([])
   })
@@ -213,5 +240,72 @@ describe('WarehouseModePanel.utils:buildWarehouseSetupTargets', () => {
       { type: 'schema', schema: 'public' },
       { type: 'table', schema: 'auth', name: 'users' },
     ])
+  })
+})
+
+describe('Warehouse.utils:isWarehouseProvisioned', () => {
+  test('is true only once setup completes', () => {
+    expect(isWarehouseProvisioned('complete')).toBe(true)
+  })
+
+  test.each(['not_started', 'setting_up', 'copying', 'error'] as const)(
+    'is false while status is %s',
+    (status) => {
+      expect(isWarehouseProvisioned(status)).toBe(false)
+    }
+  )
+
+  test('is false before the status has loaded', () => {
+    expect(isWarehouseProvisioned(undefined)).toBe(false)
+  })
+})
+
+describe('Warehouse.utils:isWarehouseSettingUp', () => {
+  test.each(['setting_up', 'copying'] as const)('is true while status is %s', (status) => {
+    expect(isWarehouseSettingUp(status)).toBe(true)
+  })
+
+  test.each(['not_started', 'complete', 'error'] as const)(
+    'is false while status is %s',
+    (status) => {
+      expect(isWarehouseSettingUp(status)).toBe(false)
+    }
+  )
+
+  test('is false before the status has loaded', () => {
+    expect(isWarehouseSettingUp(undefined)).toBe(false)
+  })
+})
+
+describe('Warehouse.utils:buildRetryTargets', () => {
+  test('maps recorded tables back to individual targets', () => {
+    expect(
+      buildRetryTargets([
+        { schema: 'public', name: 'orders' },
+        { schema: 'auth', name: 'users' },
+      ])
+    ).toEqual([
+      { type: 'table', schema: 'public', name: 'orders' },
+      { type: 'table', schema: 'auth', name: 'users' },
+    ])
+  })
+
+  test('returns an empty list when the status recorded no tables', () => {
+    expect(buildRetryTargets([])).toEqual([])
+    expect(buildRetryTargets()).toEqual([])
+  })
+})
+
+describe('Warehouse.utils:isPipelineLimitError', () => {
+  test('recognises the replication API cap regardless of the limit', () => {
+    expect(isPipelineLimitError('This project has reached its maximum of 1 pipelines')).toBe(true)
+    expect(isPipelineLimitError('This project has reached its maximum of 12 pipelines')).toBe(true)
+  })
+
+  test('ignores unrelated failures', () => {
+    expect(isPipelineLimitError('Project must be active and healthy.')).toBe(false)
+    expect(isPipelineLimitError('The Pipelines API is not configured')).toBe(false)
+    expect(isPipelineLimitError('')).toBe(false)
+    expect(isPipelineLimitError(undefined)).toBe(false)
   })
 })
