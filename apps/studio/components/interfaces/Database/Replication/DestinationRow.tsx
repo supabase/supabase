@@ -148,6 +148,8 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   // a pipeline exists, so there is no "no pipeline" case to handle here.
   const renderLag = () => {
     if (isReplicationStatusLoading) return <ShimmeringLoader />
+    if (isInitialSyncRunning)
+      return <span className="text-foreground-light whitespace-nowrap">Initial sync</span>
     if (isReplicationStatusError || !applyLag)
       return (
         <>
@@ -155,8 +157,6 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
           <span className="sr-only">Lag unavailable</span>
         </>
       )
-    if (isInitialSyncRunning)
-      return <span className="text-foreground-light whitespace-nowrap">Initial sync</span>
     if (isCaughtUp)
       return <span className="text-foreground-light whitespace-nowrap">Caught up</span>
     return <span className="text-foreground-light whitespace-nowrap">{lag.display}</span>

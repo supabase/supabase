@@ -97,7 +97,7 @@ export const UpdateVersionModal = ({
         </p>
         <div className="overflow-hidden rounded-md border">
           <table className="w-full text-sm">
-            <tbody>
+            <tbody aria-live="polite" aria-atomic="true">
               <tr className="border-b">
                 <td className="px-3 py-2 text-foreground-lighter">Current</td>
                 <td className="px-3 py-2 text-right text-foreground" translate="no">

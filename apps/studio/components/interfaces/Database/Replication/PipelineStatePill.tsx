@@ -49,27 +49,34 @@ export const PipelineStatePill = ({
       statusName as PipelineStatusName
     )
 
-  if (isLoading) return <ShimmeringLoader className="w-20" />
-
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <StateDot
-          tabIndex={0}
-          variant={isError ? 'default' : VARIANT_BY_TYPE[type]}
-          isPulsing={!isError && type === 'loading'}
-          labelClassName={cn('text-foreground-light', TOOLTIP_UNDERLINE_CLASS_NAME)}
-        >
-          {isError ? 'Unknown' : label}
-        </StateDot>
-      </TooltipTrigger>
-      <TooltipContent side="bottom" className="max-w-xs">
-        {isError
-          ? `Unable to retrieve status: ${error?.message}`
-          : showLogsHint
-            ? `${message}. Check the logs for more information.`
-            : message}
-      </TooltipContent>
-    </Tooltip>
+    <span className="inline-flex" aria-live="polite" aria-atomic="true">
+      {isLoading ? (
+        <>
+          <span className="sr-only">Loading pipeline status</span>
+          <ShimmeringLoader className="w-20" />
+        </>
+      ) : (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <StateDot
+              tabIndex={0}
+              variant={isError ? 'default' : VARIANT_BY_TYPE[type]}
+              isPulsing={!isError && type === 'loading'}
+              labelClassName={cn('text-foreground-light', TOOLTIP_UNDERLINE_CLASS_NAME)}
+            >
+              {isError ? 'Unknown' : label}
+            </StateDot>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-xs">
+            {isError
+              ? `Unable to retrieve status: ${error?.message}`
+              : showLogsHint
+                ? `${message}. Check the logs for more information.`
+                : message}
+          </TooltipContent>
+        </Tooltip>
+      )}
+    </span>
   )
 }

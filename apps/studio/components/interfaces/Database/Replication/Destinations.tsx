@@ -81,10 +81,16 @@ const combinePipelineStatuses = (
       .map((data) => [data.pipeline_id, getStatusName(data.status)])
   )
 
-const compareStatusNames = (a?: PipelineStatusName, b?: PipelineStatusName) => {
-  const rankA = a === undefined ? STATUS_SORT_ORDER.length : STATUS_SORT_ORDER.indexOf(a)
-  const rankB = b === undefined ? STATUS_SORT_ORDER.length : STATUS_SORT_ORDER.indexOf(b)
-  return rankA - rankB
+const compareStatusNames = (
+  a: PipelineStatusName | undefined,
+  b: PipelineStatusName | undefined,
+  direction: 'asc' | 'desc'
+) => {
+  if (a === undefined) return b === undefined ? 0 : 1
+  if (b === undefined) return -1
+
+  const comparison = STATUS_SORT_ORDER.indexOf(a) - STATUS_SORT_ORDER.indexOf(b)
+  return direction === 'asc' ? comparison : -comparison
 }
 
 export const Destinations = () => {
@@ -191,12 +197,16 @@ export const Destinations = () => {
   // Not memoized: the status map is rebuilt whenever a pipeline status refetches, so a useMemo
   // here would never hit. Sorting a handful of destinations per render costs nothing.
   const sortedDestinations = [...filteredDestinations].sort((a, b) => {
-    const comparison =
-      sortColumn === 'name'
-        ? a.name.localeCompare(b.name)
-        : compareStatusNames(getDestinationStatus(a.id), getDestinationStatus(b.id)) ||
-          a.name.localeCompare(b.name)
+    if (sortColumn === 'status') {
+      const nameComparison = a.name.localeCompare(b.name)
 
+      return (
+        compareStatusNames(getDestinationStatus(a.id), getDestinationStatus(b.id), sortDirection) ||
+        (sortDirection === 'asc' ? nameComparison : -nameComparison)
+      )
+    }
+
+    const comparison = a.name.localeCompare(b.name)
     return sortDirection === 'asc' ? comparison : -comparison
   })
 
