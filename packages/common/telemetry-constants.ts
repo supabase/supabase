@@ -3657,7 +3657,7 @@ export interface ResourceExhaustionBannerAiAssistantClickedEvent {
 }
 
 /**
- * User clicked a "View metrics" or documentation item in the Troubleshoot menu of a resource exhaustion warning banner.
+ * User clicked a metrics or documentation link on a resource exhaustion warning banner (Troubleshoot menu item or single-action button).
  *
  * @group Events
  * @source studio
