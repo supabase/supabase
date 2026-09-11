@@ -6,7 +6,7 @@ description: 'A mental model for adding Supabase building blocks as your app gro
 
 Supabase is more than hosted Postgres. It's a set of composable building blocks you grow into. The Supabase way is this: **start with the database, add a building block only when a real need appears, and keep as much logic as possible in Postgres.**
 
-The [Architecture](/guides/getting-started/architecture) page tells you what the pieces are. This page tells you which to reach for, and when. Each stage below names the need that triggers it, the block you add, the mental model to hold, and the anti-pattern it prevents. Follow the links to build each piece.
+The [Architecture](/docs/guides/getting-started/architecture) page tells you what the pieces are. This page tells you which to reach for, and when. Each stage below names the need that triggers it, the block you add, the mental model to hold, and the anti-pattern it prevents. Follow the links to build each piece.
 
 ## The progression at a glance
 
@@ -24,7 +24,7 @@ You don't need all of it. Most apps start at the first row and stop wherever the
 
 ## Start with your database
 
-Every Supabase project is a full Postgres database, and Supabase generates a [REST API](/guides/api) and a [GraphQL API](/guides/graphql) from your schema automatically. Design your tables well and you have a working backend with no server code.
+Every Supabase project is a full Postgres database, and Supabase generates a [REST API](/docs/guides/api) and a [GraphQL API](/docs/guides/graphql/api) from your schema automatically. Design your tables well and you have a working backend with no server code.
 
 **Mental model:** your schema is your API. The shape of your data is the shape of what clients can do.
 
@@ -36,21 +36,21 @@ If you find yourself building a REST server that only forwards create, read, upd
 
 </Admonition>
 
-**Build it:** [Database overview](/guides/database/overview) · [REST API](/guides/api) · [Connect a framework](/guides/getting-started/quickstarts/nextjs)
+**Build it:** [Database overview](/docs/guides/database/overview) · [REST API](/docs/guides/api) · [Connect a framework](/docs/guides/getting-started/quickstarts/nextjs)
 
 ## Add users: Auth
 
-The moment your app needs to know who is making a request, add [Supabase Auth](/guides/auth). It manages users and issues a signed JWT that carries the caller's identity.
+The moment your app needs to know who is making a request, add [Supabase Auth](/docs/guides/auth). It manages users and issues a signed JWT that carries the caller's identity.
 
 **Mental model:** auth issues a verifiable identity (a JWT) that the database itself can read. Sign-in isn't a separate silo. It's the key that unlocks per-user behavior everywhere else.
 
 **Trigger:** any multi-user app, personalization, or anything that must be private to an account.
 
-**Build it:** [Auth overview](/guides/auth) · [Server-side auth](/guides/auth/server-side) · [Social login](/guides/auth/social-login)
+**Build it:** [Auth overview](/docs/guides/auth) · [Server-side auth](/docs/guides/auth/server-side) · [Social login](/docs/guides/auth/social-login)
 
 ## Add authorization in the database: RLS
 
-This is the pivotal Supabase way moment. Once you have users, you need each user to see only their own data. With [Row Level Security](/guides/database/postgres/row-level-security), you write that rule once, as a policy on the table, and Postgres enforces it on every query, from every client, forever.
+This is the pivotal Supabase way moment. Once you have users, you need each user to see only their own data. With [Row Level Security](/docs/guides/database/postgres/row-level-security), you write that rule once, as a policy on the table, and Postgres enforces it on every query, from every client, forever.
 
 **Mental model:** authorization is data, enforced by Postgres, not logic scattered across your app. The policy lives next to the rows it protects.
 
@@ -62,11 +62,11 @@ This is the pivotal Supabase way moment. Once you have users, you need each user
 
 </Admonition>
 
-**Build it:** [Row Level Security](/guides/database/postgres/row-level-security) · [Column Level Security](/guides/database/postgres/column-level-security)
+**Build it:** [Row Level Security](/docs/guides/database/postgres/row-level-security) · [Column Level Security](/docs/guides/database/postgres/column-level-security)
 
 ## Add live updates: Realtime
 
-When your UI has to reflect changes as they happen, [Realtime](/guides/realtime) streams database changes, broadcasts messages, and tracks presence over WebSockets.
+When your UI has to reflect changes as they happen, [Realtime](/docs/guides/realtime) streams database changes, broadcasts messages, and tracks presence over WebSockets.
 
 **Mental model:** subscribe to the database instead of polling it. The client reacts to change; it doesn't ask "anything new?" on a timer.
 
@@ -78,11 +78,11 @@ A `setInterval` that re-fetches every few seconds wastes requests, adds latency,
 
 </Admonition>
 
-**Build it:** [Realtime overview](/guides/realtime) · [Postgres Changes](/guides/realtime/postgres-changes) · [Presence](/guides/realtime/presence)
+**Build it:** [Realtime overview](/docs/guides/realtime) · [Postgres Changes](/docs/guides/realtime/postgres-changes) · [Presence](/docs/guides/realtime/presence)
 
 ## Add files: Storage
 
-For uploads, images, and documents, [Storage](/guides/storage) gives you S3-compatible object storage that keeps its metadata in Postgres, so the same RLS model that guards your rows also guards your files.
+For uploads, images, and documents, [Storage](/docs/guides/storage) gives you S3-compatible object storage that keeps its metadata in Postgres, so the same RLS model that guards your rows also guards your files.
 
 **Mental model:** files are governed by the same authorization model as your data. Access to an object is a policy, not a separate ACL system to keep in sync.
 
@@ -94,13 +94,13 @@ If file access rules live in a separate ACL that doesn't know about your users t
 
 </Admonition>
 
-**Build it:** [Storage overview](/guides/storage) · [Access control](/guides/storage/security/access-control) · [Image transformations](/guides/storage/serving/image-transformations)
+**Build it:** [Storage overview](/docs/guides/storage) · [Access control](/docs/guides/storage/security/access-control) · [Image transformations](/docs/guides/storage/serving/image-transformations)
 
 ## Add server-side logic: Edge Functions
 
-Some logic can't live in the client (it needs secrets) and isn't a good fit for the database (it calls third-party APIs or reacts to events). That's [Edge Functions](/guides/functions): TypeScript running close to your users.
+Some logic can't live in the client (it needs secrets) and isn't a good fit for the database (it calls third-party APIs or reacts to events). That's [Edge Functions](/docs/guides/functions): TypeScript running close to your users.
 
-**Mental model:** put data-shaped logic in Postgres (triggers, [database functions](/guides/database/functions), RPC) and integration-shaped logic at the edge (webhooks, third-party calls, anything holding a secret key).
+**Mental model:** put data-shaped logic in Postgres (triggers, [database functions](/docs/guides/database/functions), RPC) and integration-shaped logic at the edge (webhooks, third-party calls, anything holding a secret key).
 
 **Trigger:** payment webhooks, calling an external API, sending email, any code that must hold a credential the browser can't see.
 
@@ -110,20 +110,20 @@ A secret key in frontend code is a secret no longer. Move that call to an Edge F
 
 </Admonition>
 
-**Build it:** [Edge Functions overview](/guides/functions) · [Database functions](/guides/database/functions) · [Database webhooks](/guides/database/webhooks)
+**Build it:** [Edge Functions overview](/docs/guides/functions) · [Database functions](/docs/guides/database/functions) · [Database webhooks](/docs/guides/database/webhooks)
 
 ## Harden for production
 
-Before real traffic, close the gap between "it works" and "it's safe at scale." Run the [advisors](/guides/observability/advisors), review every RLS policy, pool connections with [Supavisor](/guides/database/connecting-to-postgres), set up observability and backups, and check query and index performance.
+Before real traffic, close the gap between "it works" and "it's safe at scale." Run the [advisors](/docs/guides/observability/advisors), review every RLS policy, pool connections with [Supavisor](/docs/guides/database/connecting-to-postgres), set up observability and backups, and check query and index performance.
 
 **Mental model:** production readiness is verification, not new features. The blocks are already in place; now you confirm they hold.
 
 **Trigger:** launch, real users, real data, real money.
 
-**Build it:** [Production checklist](/guides/deployment/going-into-prod) · [Security](/guides/security/product-security) · [Performance and advisors](/guides/observability/advisors)
+**Build it:** [Production checklist](/docs/guides/deployment/going-into-prod) · [Security](/docs/guides/security/product-security) · [Performance and advisors](/docs/guides/observability/advisors)
 
 ## Where to go next
 
-- New here? Start with a [framework quickstart](/guides/getting-started/quickstarts/nextjs) and come back to add blocks as you need them.
-- Want the component-level picture? See [Architecture](/guides/getting-started/architecture).
+- New here? Start with a [framework quickstart](/docs/guides/getting-started/quickstarts/nextjs) and come back to add blocks as you need them.
+- Want the component-level picture? See [Architecture](/docs/guides/getting-started/architecture).
 - Ready to build a specific piece? Follow the **Build it** links in each stage above.
