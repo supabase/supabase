@@ -51,9 +51,17 @@ export interface WarehouseConnectionDetailsProps {
   onEditTables: () => void
 }
 
-function FieldRow({ label, children }: { label: React.ReactNode; children: React.ReactNode }) {
+function FieldRow({
+  id,
+  label,
+  children,
+}: {
+  id?: string
+  label: React.ReactNode
+  children: React.ReactNode
+}) {
   return (
-    <FormLayout layout="horizontal" label={label}>
+    <FormLayout id={id} layout="horizontal" label={label}>
       {children}
     </FormLayout>
   )
@@ -61,24 +69,26 @@ function FieldRow({ label, children }: { label: React.ReactNode; children: React
 
 const FlightSqlContent = ({ projectRef }: { projectRef: string }) => (
   <div className="space-y-4">
-    <FieldRow label="Endpoint">
+    <FieldRow id="warehouse-flightsql-endpoint" label="Endpoint">
       <Input
+        id="warehouse-flightsql-endpoint"
         readOnly
         copy
         className="font-mono"
         value={getWarehouseFlightSqlEndpoint(projectRef)}
       />
     </FieldRow>
-    <FieldRow label="Connection string">
+    <FieldRow id="warehouse-flightsql-connection-string" label="Connection string">
       <Input
+        id="warehouse-flightsql-connection-string"
         readOnly
         copy
         className="font-mono"
         value={getWarehouseFlightSqlConnectionString(projectRef)}
       />
     </FieldRow>
-    <FieldRow label="User">
-      <Input readOnly copy className="font-mono" value="postgres" />
+    <FieldRow id="warehouse-flightsql-user" label="User">
+      <Input id="warehouse-flightsql-user" readOnly copy className="font-mono" value="postgres" />
     </FieldRow>
     <FieldRow label="Password">
       <div className="flex justify-end">
@@ -137,7 +147,7 @@ const DuckLakeEnvironmentVariables = ({
   ].join('\n')
 
   return (
-    <div className="overflow-hidden rounded-lg border bg-surface-75">
+    <div className="overflow-hidden rounded-lg border bg-surface-75" data-connect-prompt-ignore>
       <div className="flex items-center justify-between border-b bg-surface-100 py-2 pl-4 pr-2">
         <span className="font-mono text-xs text-foreground-light">.env</span>
         <CopyButton
@@ -171,8 +181,15 @@ const DuckLakeSetup = ({ credentials }: { credentials: WarehouseCatalogCredentia
           title="Could not read the catalog connection details"
           description="Copy the catalog URL and configure the DuckLake secrets manually."
         />
-        <FieldRow label="Catalog URL">
-          <Input readOnly copy reveal className="font-mono" value={credentials.catalog_url} />
+        <FieldRow id="warehouse-catalog-url" label="Catalog URL">
+          <Input
+            id="warehouse-catalog-url"
+            readOnly
+            copy
+            reveal
+            className="font-mono"
+            value={credentials.catalog_url}
+          />
         </FieldRow>
       </div>
     )
@@ -252,6 +269,12 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
 
   if (!projectRef) return null
 
+  let catalogStatus = ''
+  if (engine === 'duckdb' && isCatalogPending) catalogStatus = 'Loading DuckDB catalog access'
+  if (engine === 'duckdb' && !isCatalogPending && !isCatalogError) {
+    catalogStatus = 'DuckDB catalog access loaded'
+  }
+
   return (
     <div>
       <div className="space-y-4 p-8">
@@ -262,9 +285,9 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
           </Button>
         </div>
 
-        <FieldRow label="Query engine">
+        <FieldRow id="warehouse-query-engine" label="Query engine">
           <Select value={engine} onValueChange={(value) => setEngine(value as QueryEngine)}>
-            <SelectTrigger className="ml-auto w-48" aria-label="Query engine">
+            <SelectTrigger id="warehouse-query-engine" className="ml-auto w-48">
               <SelectValue />
             </SelectTrigger>
             <SelectContent align="end">
@@ -290,6 +313,9 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
             )}
           </>
         )}
+        <span className="sr-only" role="status" aria-live="polite">
+          {catalogStatus}
+        </span>
       </div>
 
       {engine === 'duckdb' &&

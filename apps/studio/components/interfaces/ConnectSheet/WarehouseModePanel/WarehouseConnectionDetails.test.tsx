@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -10,6 +10,7 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
 type WarehouseCatalogResponse = components['schemas']['WarehouseCatalogResponse']
+type UpdateWarehouseCatalogBody = components['schemas']['UpdateWarehouseCatalogBody']
 
 const CATALOG_PASSWORD = 'pwd'
 const CATALOG_URL = 'postgres://postgres:pwd@db.example.supabase.co:5432/postgres'
@@ -93,5 +94,44 @@ describe('WarehouseConnectionDetails', () => {
 
     expect(screen.queryByRole('heading', { name: 'Follow these steps' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Copy prompt' })).not.toBeInTheDocument()
+  })
+
+  test('enables and disables DuckDB catalog access', async () => {
+    let catalog: WarehouseCatalogResponse = { enabled: false }
+    const requestBodies: UpdateWarehouseCatalogBody[] = []
+
+    addAPIMock({
+      method: 'get',
+      path: '/platform/warehouse/:ref/catalog',
+      response: () => HttpResponse.json<WarehouseCatalogResponse>(catalog),
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/warehouse/:ref/catalog',
+      response: async ({ request }) => {
+        const body = (await request.json()) as UpdateWarehouseCatalogBody
+        requestBodies.push(body)
+        catalog = { enabled: body.enabled }
+        return HttpResponse.json<WarehouseCatalogResponse>(catalog)
+      },
+    })
+
+    customRender(<WarehouseConnectionDetails onEditTables={vi.fn()} />)
+
+    await userEvent.click(await screen.findByRole('combobox', { name: 'Query engine' }))
+    await userEvent.click(screen.getByRole('option', { name: 'DuckDB' }))
+
+    const catalogSwitch = await screen.findByRole('switch', {
+      name: 'Enable DuckDB catalog access',
+    })
+    expect(catalogSwitch).not.toBeChecked()
+
+    await userEvent.click(catalogSwitch)
+    await waitFor(() => expect(catalogSwitch).toBeChecked())
+
+    await userEvent.click(catalogSwitch)
+    await waitFor(() => expect(catalogSwitch).not.toBeChecked())
+
+    expect(requestBodies).toEqual([{ enabled: true }, { enabled: false }])
   })
 })

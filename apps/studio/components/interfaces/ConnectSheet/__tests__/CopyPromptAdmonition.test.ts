@@ -28,4 +28,26 @@ describe('buildConnectPrompt', () => {
     )
     expect(prompt).not.toContain('temporary-password')
   })
+
+  test('omits content marked as sensitive', () => {
+    const container = document.createElement('div')
+    container.innerHTML = `
+      <div
+        data-connect-step
+        data-step-title="Set environment variables"
+        data-step-description="Add these credentials to your environment."
+      >
+        <div data-step-content>
+          <div data-connect-prompt-ignore>
+            DUCKLAKE_S3_SECRET=temporary-secret
+          </div>
+        </div>
+      </div>
+    `
+
+    const prompt = buildConnectPrompt(container)
+
+    expect(prompt).toContain('Set environment variables')
+    expect(prompt).not.toContain('temporary-secret')
+  })
 })
