@@ -37,7 +37,7 @@ async function runPreflight() {
   // (mcpTextContentSpanOutputSchema / docsFaithfulnessScorer).
   const content = output?.content
   const text = content?.[0]?.text
-  if (!Array.isArray(content) || typeof text !== 'string' || !text) {
+  if (!Array.isArray(content) || content[0]?.type !== 'text' || typeof text !== 'string' || !text) {
     throw new Error(
       '`search_docs` returned an unexpected shape. Expected MCP text content ' +
         '({ content: [{ type: "text", text: string }] }) but got: ' +
