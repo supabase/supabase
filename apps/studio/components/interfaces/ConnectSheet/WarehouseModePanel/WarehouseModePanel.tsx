@@ -23,11 +23,13 @@ const WarehouseSetupComplete = ({ onSubmit, isSubmitting }: WarehouseSetupComple
 
   if (isEditingTables) {
     return (
-      <WarehouseSchemaTablePicker
-        onSubmit={onSubmit}
-        isSubmitting={isSubmitting}
-        onBack={() => setIsEditingTables(false)}
-      />
+      <div className="p-8">
+        <WarehouseSchemaTablePicker
+          onSubmit={onSubmit}
+          isSubmitting={isSubmitting}
+          onBack={() => setIsEditingTables(false)}
+        />
+      </div>
     )
   }
 
