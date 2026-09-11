@@ -10,7 +10,11 @@ import denoTypes from './types/lib.deno.d.ts.include'
 
 const extraFiles: ExtraFiles = { 'deno.d.ts': denoTypes }
 
-const twoslasher = createTwoslasher({ extraFiles })
+const twoslasher = createTwoslasher({
+  extraFiles,
+  // todo: remove once Twoslash stops using deprecated baseUrl and node10 resolution
+  compilerOptions: { ignoreDeprecations: '6.0' },
+})
 const TWOSLASHABLE_LANGS: ReadonlyArray<string> = ['js', 'ts', 'javascript', 'typescript']
 
 const BUNDLED_LANGUAGES = Object.keys(bundledLanguages)
