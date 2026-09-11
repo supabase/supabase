@@ -170,30 +170,28 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.getByText(/admin@example\.com/)).toBeInTheDocument()
   })
 
-  test('tells the member an organization-bound grant is shared', async () => {
+  test('tells the member an organization-bound grant is shared, exactly once', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBot })
 
     expect(
-      await screen.findByText('This grant is shared with the whole organization')
-    ).toBeInTheDocument()
+      await screen.findAllByText('This grant is shared with the whole organization')
+    ).toHaveLength(1)
     expect(
-      screen.getByText(
+      screen.getAllByText(
         'kemal-bot acts with owner permissions for every member of northwind-traders, and stays active if you leave.'
       )
-    ).toBeInTheDocument()
+    ).toHaveLength(1)
   })
 
-  test('keeps the acts-as-you reassurance for a user-bound grant', async () => {
+  test('shows no shared-grant messaging for a user-bound grant', async () => {
     renderScreen()
 
-    expect(
-      await screen.findByText(
-        'This grant acts as you. It can never do more than your role in this organization allows.'
-      )
-    ).toBeInTheDocument()
+    await screen.findByText('Permissions requested')
     expect(
       screen.queryByText('This grant is shared with the whole organization')
     ).not.toBeInTheDocument()
+    expect(screen.queryByText(/acts with owner permissions/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/This grant acts as you/)).not.toBeInTheDocument()
   })
 
   test('says the grant covers future projects when there is no picker', async () => {
