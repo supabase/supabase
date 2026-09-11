@@ -6164,6 +6164,7 @@ export interface components {
     }
     CreateGitHubConnectionBody: {
       branch_limit?: number
+      comment_on_no_changes?: boolean
       installation_id: number
       new_branch_per_pr?: boolean
       project_ref: string
@@ -6173,6 +6174,7 @@ export interface components {
     }
     CreateGitHubConnectionResponse: {
       branch_limit: number
+      comment_on_no_changes: boolean
       id: number
       inserted_at: string
       installation_id: number
@@ -9757,6 +9759,7 @@ export interface components {
     ListGitHubConnectionsResponse: {
       connections: {
         branch_limit: number
+        comment_on_no_changes: boolean
         id: number
         inserted_at: string
         installation_id: number
@@ -13535,6 +13538,7 @@ export interface components {
     }
     UpdateGitHubConnectionBody: {
       branch_limit?: number
+      comment_on_no_changes?: boolean
       new_branch_per_pr?: boolean
       supabase_changes_only?: boolean
       workdir?: string
