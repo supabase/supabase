@@ -117,6 +117,22 @@ describe('OAuthAppsAuthorizeScreen post-submit role validation', () => {
     expect(await screen.findByText('Vercel is connected')).toBeInTheDocument()
   })
 
+  test('a preselected read-only project still produces the post-submit banner', async () => {
+    customRender(
+      <OAuthAppsAuthorizeScreen
+        authId={OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation}
+        request={getMockOAuthAppsAuthorizeRequest(OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation)}
+        suggestedProjectRefs={['fabrikamapi1']}
+        navigate={vi.fn()}
+      />
+    )
+
+    await screen.findByText('fabrikam-api')
+    authorize()
+
+    expect(await screen.findByText("Couldn't authorize 1 project")).toBeInTheDocument()
+  })
+
   test('a request outside the role-validated set approves read-only projects', async () => {
     renderScreen(OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper)
 
