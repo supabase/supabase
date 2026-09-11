@@ -49,7 +49,7 @@ jobs:
         run: pnpm run --filter docs troubleshooting:sync
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # v7.0.5
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           commit-message: '[bot] sync troubleshooting guides to db'
           title: '[bot] sync troubleshooting guides to db'
