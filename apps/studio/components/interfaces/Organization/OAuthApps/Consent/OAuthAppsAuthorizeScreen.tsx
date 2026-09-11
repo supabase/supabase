@@ -360,8 +360,9 @@ export const OAuthAppsAuthorizeScreen = ({
           ) : (
             <>
               <p>
-                No admin approval is needed if your role permits this access. This authorization
-                will appear in Authorized apps.
+                {grantKind === 'user_bound' &&
+                  'No admin approval is needed if your role permits this access. '}
+                This authorization will appear in Authorized apps.
               </p>
               <p>
                 Authorizing will redirect you to{' '}
