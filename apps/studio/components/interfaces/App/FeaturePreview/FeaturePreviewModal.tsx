@@ -40,10 +40,9 @@ import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { SqlEditorManualSavePreview } from './SqlEditorManualSavePreview'
 import { StorageVersioningPreview } from './StorageVersioningPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
-import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
+import { FeaturePreview, useVisibleFeaturePreviewsByCategory } from './useFeaturePreviews'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
@@ -65,7 +64,7 @@ export const FeaturePreviewModal = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { dismissBanner } = useBannerStack()
-  const featurePreviews = useFeaturePreviews()
+  const previewsByCategory = useVisibleFeaturePreviewsByCategory()
   const {
     showFeaturePreviewModal,
     selectedFeatureKey,
@@ -76,9 +75,7 @@ export const FeaturePreviewModal = () => {
   const track = useTrack()
 
   const { flags, onUpdateFlag } = featurePreviewContext
-  const allFeaturePreviews = (
-    IS_PLATFORM ? featurePreviews : featurePreviews.filter((x) => !x.isPlatformOnly)
-  ).filter((x) => x.enabled)
+  const allFeaturePreviews = previewsByCategory.flatMap(({ previews }) => previews)
 
   const selectedFeature =
     allFeaturePreviews.find((preview) => preview.key === selectedFeatureKey) ??
@@ -88,10 +85,6 @@ export const FeaturePreviewModal = () => {
 
   const selectedFeatureRoute = selectedFeature?.getRoute?.(ref)
   const hasRoute = selectedFeatureRoute !== undefined && ref !== undefined
-
-  const categories = (
-    [...new Set(allFeaturePreviews.map((preview) => preview.category).filter(Boolean))] as string[]
-  ).concat(['others'])
 
   const toggleFeature = () => {
     if (!selectedFeature) return
@@ -141,30 +134,27 @@ export const FeaturePreviewModal = () => {
             <div className="max-h-full flex-1 min-h-0 h-full flex flex-col gap-y-1 md:gap-y-4 md:flex-row">
               <div>
                 <ScrollArea className="hidden md:block h-[550px] w-[280px] border-r">
-                  <Accordion type="multiple" defaultValue={categories}>
-                    {categories.map((category) => {
-                      const items =
-                        category === 'others'
-                          ? allFeaturePreviews.filter((x) => x.category === undefined)
-                          : allFeaturePreviews.filter((x) => x.category === category)
-                      return (
-                        <AccordionItem key={category} value={category}>
-                          <AccordionTrigger className="text-xs font-mono uppercase tracking-tight px-4 text-foreground-lighter py-2 bg-tertiary dark:bg-transparent">
-                            {category}
-                          </AccordionTrigger>
-                          <AccordionContent className="[&>div]:pb-0">
-                            {items.map((feature) => (
-                              <FeaturePreviewItem
-                                key={feature.key}
-                                feature={feature}
-                                selectedFeature={selectedFeature}
-                                selectFeaturePreview={selectFeaturePreview}
-                              />
-                            ))}
-                          </AccordionContent>
-                        </AccordionItem>
-                      )
-                    })}
+                  <Accordion
+                    type="multiple"
+                    defaultValue={previewsByCategory.map(({ category }) => category ?? 'others')}
+                  >
+                    {previewsByCategory.map(({ category, previews }) => (
+                      <AccordionItem key={category ?? 'others'} value={category ?? 'others'}>
+                        <AccordionTrigger className="text-xs font-mono uppercase tracking-tight px-4 text-foreground-lighter py-2 bg-tertiary dark:bg-transparent">
+                          {category ?? 'others'}
+                        </AccordionTrigger>
+                        <AccordionContent className="[&>div]:pb-0">
+                          {previews.map((feature) => (
+                            <FeaturePreviewItem
+                              key={feature.key}
+                              feature={feature}
+                              selectedFeature={selectedFeature}
+                              selectFeaturePreview={selectFeaturePreview}
+                            />
+                          ))}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
                   </Accordion>
 
                   {/* {allFeaturePreviews.map((feature) => (
