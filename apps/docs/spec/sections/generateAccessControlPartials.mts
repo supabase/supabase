@@ -89,9 +89,6 @@ const permissionRows: PermissionRow[] = PERMISSION_CATALOG_BY_CATEGORY.flatMap((
 
 const rowByScope = new Map(permissionRows.flatMap((row) => row.scopes.map((scope) => [scope, row])))
 
-// Workers permissions are present in the API spec but are not live for scoped PATs yet.
-const EXCLUDED_SCOPES = new Set(['workers_read', 'workers_write'])
-
 // The public v2 webhook operations currently omit x-fga-permissions from the OpenAPI projection.
 // Keep this fallback narrow so the generated table can still link those endpoints, and fail below
 // if any other public operation has not been classified for the scoped-PAT table.
@@ -136,7 +133,6 @@ function webhookPermissionGroups(
 
 function knownGroups(groups: ScopeGroupAlternatives, missing: Set<string>) {
   return groups.filter((group) => {
-    if (group.some((scope) => EXCLUDED_SCOPES.has(scope))) return false
     const unknown = group.filter((scope) => !rowByScope.has(scope))
     unknown.forEach((scope) => missing.add(scope))
     return unknown.length === 0
@@ -265,12 +261,19 @@ function generatePermissionsPartial(specPaths: string[], tools: McpMap, outputPa
       const link = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(endpoint.operationId)
         ? `[${label}](/docs/reference/api/${endpoint.operationId})`
         : label
-      const unlocksAlone = endpoint.groups.some((group) =>
+      // An endpoint can list alternative permission sets (e.g. reading API keys needs
+      // `api_gateway_keys_read`, and revealing their secret values needs that plus
+      // `api_gateway_keys_secret_read`). Only the alternatives that include this row's own scope
+      // say anything about this row, so the footnote ignores the rest.
+      const relevantGroups = endpoint.groups.filter((group) =>
+        group.some((scope) => rowScopes.has(scope))
+      )
+      const unlocksAlone = relevantGroups.some((group) =>
         group.every((scope) => rowScopes.has(scope))
       )
       let requirement = ''
       if (!unlocksAlone) {
-        const text = `Requires ${formatRequirement(endpoint.groups)}.`
+        const text = `Requires ${formatRequirement(relevantGroups)}.`
         const id = footnotes.get(text) ?? String(footnotes.size + 1)
         footnotes.set(text, id)
         requirement = `[^${id}]`
