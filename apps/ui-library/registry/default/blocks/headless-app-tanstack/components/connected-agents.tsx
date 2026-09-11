@@ -66,11 +66,10 @@ function ConnectAgent({
       <p className="text-xs text-muted-foreground">
         Use the prompt if your agent supports adding MCP servers through chat.
       </p>
-      {copied && (
-        <span role="status" className="sr-only">
-          Copied to clipboard
-        </span>
-      )}
+      {/* Always mounted so screen readers announce the change. */}
+      <span role="status" className="sr-only">
+        {copied ? 'Copied to clipboard' : ''}
+      </span>
       {error && (
         <p role="alert" className="text-sm text-destructive">
           {error}
@@ -156,11 +155,10 @@ export function ConnectedAgentsView({
             </Button>
           )}
         </div>
-        {isLoading && (
-          <p role="status" className="text-sm text-muted-foreground">
-            Loading connected agents...
-          </p>
-        )}
+        {/* Always mounted so screen readers announce the change. */}
+        <p role="status" className="text-sm text-muted-foreground">
+          {isLoading ? 'Loading connected agents...' : ''}
+        </p>
         {grants && grants.length > 0 && (
           <ul className="divide-y rounded-lg border bg-muted text-sm">
             {grants.map((grant) => (
