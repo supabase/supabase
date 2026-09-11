@@ -27,8 +27,8 @@ export const DeleteEventTrigger = ({
       title="Delete this event trigger"
       loading={isLoading}
       confirmLabel={`Delete trigger ${name}`}
-      confirmPlaceholder="Type in name of trigger"
-      confirmString={name}
+      confirmAction="delete"
+      confirmSubject="this event trigger"
       text={
         <>
           This will delete your event trigger called{' '}

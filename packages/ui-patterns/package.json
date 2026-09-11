@@ -318,6 +318,10 @@
       "import": "./src/Dialogs/TextConfirmModal.tsx",
       "types": "./src/Dialogs/TextConfirmModal.tsx"
     },
+    "./Dialogs/confirm-actions": {
+      "import": "./src/Dialogs/confirm-actions.ts",
+      "types": "./src/Dialogs/confirm-actions.ts"
+    },
     "./EmptyStatePresentational": {
       "import": "./src/EmptyStatePresentational/index.tsx",
       "types": "./src/EmptyStatePresentational/index.tsx"

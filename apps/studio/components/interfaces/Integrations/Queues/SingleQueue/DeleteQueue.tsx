@@ -46,8 +46,8 @@ export const DeleteQueue = ({ queueName, visible, onClose }: DeleteQueueProps) =
       title="Delete this queue"
       loading={isPending}
       confirmLabel={`Delete queue ${queueName}`}
-      confirmPlaceholder="Type in name of queue"
-      confirmString={queueName ?? 'Unknown'}
+      confirmAction="delete"
+      confirmSubject="this queue"
       text={
         <>
           <span>This will delete the queue</span>{' '}

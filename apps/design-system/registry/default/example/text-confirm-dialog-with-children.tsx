@@ -9,6 +9,7 @@ import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 const TextConfirmModalWithChildren = () => {
   const [visible, setVisible] = useState(false)
   const [loading, setLoading] = useState(false)
+  const projectName = 'my-production-app'
 
   function onVisibleChange() {
     setVisible(!visible)
@@ -30,16 +31,20 @@ const TextConfirmModalWithChildren = () => {
       </Button>
       <TextConfirmModal
         key="withChildren"
-        confirmString="project name"
+        confirmAction="delete"
+        confirmSubject="this project"
         visible={visible}
         variant="destructive"
         title="Are you sure you want to delete?"
         onCancel={onVisibleChange}
         loading={loading}
-        confirmPlaceholder='Type "project name" to confirm'
         onConfirm={onSubmit}
       >
         <div className="flex flex-col gap-3 text-sm">
+          <p>
+            This will permanently delete{' '}
+            <span className="font-medium text-foreground">{projectName}</span>.
+          </p>
           <div className="flex gap-3 items-center">
             <UserPlus className="text-foreground-lighter" />
             <p>

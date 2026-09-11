@@ -98,9 +98,8 @@ export const APIKeyRow = ({
         onCancel={() => setKeyToDelete(null)}
         onConfirm={onDelete}
         title={`Delete ${apiKey.type} API key: ${apiKey.name}`}
-        confirmString={apiKey.name}
-        confirmLabel="Yes, irreversibly delete this API key"
-        confirmPlaceholder="Type the name of the API key to confirm"
+        confirmAction="delete"
+        confirmSubject="this API key"
         loading={isDeleting}
         variant="destructive"
         alert={{
@@ -108,7 +107,12 @@ export const APIKeyRow = ({
           description:
             'Make sure all applications and services using it have been updated before deletion. Deletion will cause them to receive HTTP 401 Unauthorized status codes on all Supabase APIs.',
         }}
-      />
+      >
+        <p className="text-sm">
+          This will permanently delete the API key{' '}
+          <span className="font-medium text-foreground">{apiKey.name}</span>.
+        </p>
+      </TextConfirmModal>
     </>
   )
 }

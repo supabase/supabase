@@ -35,9 +35,9 @@ export const DeleteBranchModal = ({ open, branch, onClose, onSuccess }: DeleteBr
       onConfirm={() => onConfirmDeleteBranch()}
       loading={isDeleting}
       title="Delete branch"
-      confirmLabel="Delete branch"
-      confirmPlaceholder="Type in name of branch"
-      confirmString={branch?.name ?? ''}
+      confirmLabel="Delete branch and its data"
+      confirmPlaceholder={branch ? `delete ${branch.name}` : 'delete branch name'}
+      confirmString={branch ? `delete ${branch.name}` : ''}
       alert={{
         title: 'You cannot recover this branch once deleted',
       }}
