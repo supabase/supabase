@@ -161,7 +161,7 @@ describe('generate-sitemap lastmod', () => {
     expect(entryFor(TEXT_SLUG_LINK)?.lastmod).toBe('2026-02-05')
   })
 
-  it('lists every RSS item exactly once', () => {
+  it('emits exactly the RSS item links as changelog URLs', () => {
     const changelogLocs = entries
       .filter((entry) => entry.loc.includes('/changelog/'))
       .map((entry) => entry.loc)
