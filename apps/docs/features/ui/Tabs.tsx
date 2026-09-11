@@ -67,7 +67,7 @@ export const tabsTriggerListVariants = cva(
     variants: {
       type: {
         pills: 'border-b-0 data-[state=active]:border-b-stronger shadow-xs rounded-sm border',
-        underlined: 'text-foreground-lighter',
+        underlined: 'text-foreground-lighter data-[state=active]:shadow-none',
         cards: 'border-b-0',
         'rounded-pills':
           'border-b-0 data-[state=active]:border-b-foreground shadow-xs rounded-full',
