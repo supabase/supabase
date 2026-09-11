@@ -10,13 +10,13 @@ The [Architecture](/docs/guides/getting-started/architecture) page tells you wha
 
 ## The progression at a glance
 
-| Your app needs to …           | Reach for                                                    | Keep in mind                                  |
+| Your app needs to …          | Reach for                                                    | Keep in mind                                  |
 | ---------------------------- | ------------------------------------------------------------ | --------------------------------------------- |
 | Store data and expose an API | [Postgres + auto APIs](#start-with-your-database)            | Your schema is your API                       |
 | Know who is calling          | [Auth](#add-users-auth)                                      | An identity the database can read             |
 | Scope data to each user      | [Row Level Security](#add-authorization-in-the-database-rls) | Authorization enforced by Postgres            |
 | Reflect changes live         | [Realtime](#add-live-updates-realtime)                       | Subscribe, don't poll                         |
-| Handle files and uploads     | [Storage](#add-files-storage)                                | Files use your data's access rules            |
+| Handle files and uploads     | [Storage](#add-files-storage)                                | Files get their own RLS policies              |
 | Run server-side logic        | [Edge Functions](#add-server-side-logic-edge-functions)      | Data logic in Postgres, edge for integrations |
 | Serve real traffic safely    | [Harden for production](#harden-for-production)              | Verify, pool, observe, back up                |
 
@@ -28,7 +28,9 @@ Every Supabase project is a full Postgres database, and Supabase generates a [RE
 
 **Mental model:** your schema is your API. The shape of your data is the shape of what clients can do.
 
-**Enough on its own for:** internal tools, prototypes, read-heavy apps, and anything single-user or trusted-client.
+**Enough on its own for:** internal tools, prototypes, and read-heavy apps.
+
+Any table a browser or mobile client can reach still needs [Row Level Security](#add-authorization-in-the-database-rls), even for public data. Reserve unprotected tables for server-side callers. A single-user or trusted-client assumption is not a security boundary.
 
 Avoid hand-writing a REST server that only forwards create, read, update, and delete calls to the database. That rebuilds what PostgREST already generates for you. Put your effort into the schema instead.
 
@@ -46,7 +48,7 @@ When your app needs to know who is making a request, add [Supabase Auth](/docs/g
 
 ## Add authorization in the database: RLS
 
-This is the pivotal Supabase way moment. Once you have users, each user needs to see only their own data. With [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS), you write that rule once, as a policy on the table, and Postgres enforces it on every query, from every client.
+This is the pivotal Supabase way moment. Once you have users, each user needs to see only their own data. With [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS), you write that rule once, as a policy on the table, and Postgres enforces it on every request made with your publishable (anon) or user keys. The secret (`service_role`) key bypasses RLS, so keep it server-side and enforce authorization there yourself.
 
 **Mental model:** authorization is data, enforced by Postgres, not logic scattered across your app. The policy lives next to the rows it protects.
 
@@ -74,13 +76,13 @@ Avoid polling loops. A `setInterval` that re-fetches every few seconds wastes re
 
 ## Add files: Storage
 
-For uploads, images, and documents, [Storage](/docs/guides/storage) gives you S3-compatible object storage that keeps its metadata in Postgres, so the same access rules that guard your rows also guard your files.
+For uploads, images, and documents, [Storage](/docs/guides/storage) gives you S3-compatible object storage that keeps its metadata in Postgres, so you secure files with RLS, the same model you use for your rows.
 
-**Mental model:** files are governed by the same authorization model as your data. Access to an object is a policy, not a separate access-control system to keep in sync.
+**Mental model:** files are secured by RLS too, but with their own policies on the `storage.objects` table. They don't inherit your app-table policies, and a public bucket serves files to anyone.
 
 **Trigger:** user avatars, attachments, media, and any binary a user owns.
 
-Keep object access on the same RLS foundation as your data. File rules that live in a separate system, disconnected from your users table, drift out of sync with your data rules.
+Write and review Storage policies alongside your data policies. They don't sync automatically, and a public bucket or a missing policy exposes files regardless of your table rules.
 
 <ContentListings id="supabase-way-storage-build" />
 
@@ -94,7 +96,7 @@ Some logic can't live in the client, because it needs secrets, and isn't a good 
 
 <Admonition type="danger" title="Never ship a secret key in client code">
 
-A secret key in frontend code is exposed to anyone who opens the browser. Keep credentials in an Edge Function or a database function, where the client can't read them.
+A secret key in frontend code is exposed to anyone who opens the browser. Keep credentials in Edge Function secrets or [Supabase Vault](/docs/guides/database/vault), never in client code.
 
 </Admonition>
 
