@@ -1,17 +1,5 @@
 @reference './globals.css';
 
-@keyframes library-celestial-drift {
-  0%,
-  100% {
-    opacity: 0.5;
-    transform: translate3d(-50%, 0, 0) scale(0.96);
-  }
-  50% {
-    opacity: 0.68;
-    transform: translate3d(-50%, -4px, 0) scale(1.04);
-  }
-}
-
 .library-doc-content .mdx > * {
   @apply mx-auto max-w-2xl;
 }

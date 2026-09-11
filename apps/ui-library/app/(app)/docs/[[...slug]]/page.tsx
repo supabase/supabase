@@ -87,7 +87,7 @@ export default async function DocPage(props: DocPageProps) {
     <main className="isolate px-4 pb-10 pt-4 md:px-8 md:pb-16 md:pt-6">
       <header
         className={cn(
-          'relative z-20 flex flex-col gap-6 py-8 md:py-12',
+          'relative z-20 flex flex-col gap-5 py-8 md:py-12',
           isGuide ? 'mx-auto max-w-2xl items-start text-left' : 'items-center text-center'
         )}
       >
@@ -127,7 +127,7 @@ export default async function DocPage(props: DocPageProps) {
         <SourcePanel doc={doc} />
       </div>
       {doc.preview && (
-        <div className="library-doc-preview mx-auto max-w-5xl">
+        <div className="library-doc-preview mx-auto mb-16 max-w-5xl">
           <Mdx code={doc.preview} />
         </div>
       )}

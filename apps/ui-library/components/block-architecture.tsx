@@ -151,7 +151,7 @@ export function BlockArchitectureDiagram({ architecture }: { architecture: Block
 
   return (
     <div
-      className="flex h-full flex-col bg-surface-100"
+      className="flex h-full flex-col"
       role="region"
       aria-label={`${architecture.title} resources`}
     >
@@ -173,7 +173,6 @@ export function BlockArchitectureDiagram({ architecture }: { architecture: Block
               fitViewOptions={{ padding: 0.12, maxZoom: 1 }}
               minZoom={0.15}
               maxZoom={1.5}
-              className="bg-surface-100!"
             >
               <Background color="var(--border-default)" gap={20} />
               <Controls

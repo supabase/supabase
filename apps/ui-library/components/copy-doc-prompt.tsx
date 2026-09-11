@@ -36,7 +36,7 @@ export function CopyDocPrompt({ title, markdownPath, intent }: CopyDocPromptProp
   }
 
   return (
-    <div className="flex max-w-full flex-col items-center gap-2">
+    <div className="flex max-w-full flex-col items-center">
       <Button
         variant="secondary"
         size="medium"
@@ -52,18 +52,12 @@ export function CopyDocPrompt({ title, markdownPath, intent }: CopyDocPromptProp
       >
         {status === 'copied' ? 'Prompt copied' : 'Copy agent prompt'}
       </Button>
-      <a
-        href={markdownPath}
-        className="text-xs text-foreground-light underline underline-offset-4 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        View Markdown guide
-      </a>
       <span
         role="status"
         className={status === 'error' ? 'max-w-sm text-xs text-foreground-light' : 'sr-only'}
       >
         {status === 'error'
-          ? 'Unable to copy the prompt. Open the Markdown guide to view the instructions.'
+          ? 'Unable to copy the prompt. Try again.'
           : status === 'copied'
             ? 'Prompt copied to clipboard'
             : ''}

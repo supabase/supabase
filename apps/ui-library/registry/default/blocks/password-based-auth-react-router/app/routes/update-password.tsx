@@ -45,7 +45,7 @@ export default function Page() {
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl">Reset Your Password</CardTitle>
+              <CardTitle className="font-medium text-lg tracking-normal">Reset Your Password</CardTitle>
               <CardDescription>Please enter your new password below.</CardDescription>
             </CardHeader>
             <CardContent>

@@ -45,7 +45,7 @@ function ConsentCardShell({
             </div>
           </div>
           <div className="space-y-1.5">
-            <CardTitle className="text-2xl">Authorize {clientName}</CardTitle>
+            <CardTitle className="font-medium text-lg tracking-normal">Authorize {clientName}</CardTitle>
             <CardDescription>Review what this client gets access to.</CardDescription>
           </div>
         </CardHeader>

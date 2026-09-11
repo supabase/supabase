@@ -31,15 +31,11 @@ export function BlockOverviewTabs({
 }) {
   return (
     <div className="library-block-overview relative z-0 mt-4">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-44 left-1/2 -z-1 h-[30rem] w-[min(48rem,92vw)] [transform:translateX(-50%)] animate-[library-celestial-drift_8s_ease-in-out_infinite] bg-[radial-gradient(ellipse_at_30%_54%,oklch(0.72_0.17_245_/_0.22),transparent_43%),radial-gradient(ellipse_at_50%_42%,oklch(0.76_0.16_155_/_0.18),transparent_40%),radial-gradient(ellipse_at_68%_52%,oklch(0.7_0.18_325_/_0.2),transparent_43%),radial-gradient(ellipse_at_52%_70%,oklch(0.78_0.14_75_/_0.12),transparent_48%)] [filter:blur(34px)_saturate(115%)] motion-reduce:animate-none"
-      />
       <Tabs
         defaultValue={children ? 'preview' : 'architecture'}
-        className="relative z-10 overflow-hidden rounded-xl border bg-background"
+        className="overflow-hidden rounded-xl border bg-muted/50"
       >
-        <TabsList aria-label="Block overview" className="gap-0 bg-muted px-3">
+        <TabsList aria-label="Block overview" className="gap-0 px-3">
           {children && (
             <TabsTrigger
               value="preview"

@@ -40,7 +40,7 @@ export function BlockPreview({ name, wide = false, isPair = false }: ComponentPr
     <div className={cn('library-block-preview relative isolate mt-4 w-full', wideClasses)}>
       <div
         className={cn(
-          'relative border overflow-hidden bg-background min-h-[150px] h-[600px]',
+          'relative border overflow-hidden min-h-[150px] h-[600px]',
           isPair && 'rounded-none'
         )}
       >

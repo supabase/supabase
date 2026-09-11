@@ -83,7 +83,7 @@ export function ComponentPreview({
   return (
     <div className={cn('library-component-preview mt-4 mb-12', wideClasses)}>
       <div
-        className={cn('relative bg-background', showCode ? 'border-t border-l border-r' : 'border')}
+        className={cn('relative', showCode ? 'border-t border-l border-r' : 'border')}
       >
         {showGrid && (
           <div className="pointer-events-none absolute h-full w-full bg-[linear-gradient(to_right,oklch(from_var(--foreground-default)_l_c_h_/_0.02)_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>

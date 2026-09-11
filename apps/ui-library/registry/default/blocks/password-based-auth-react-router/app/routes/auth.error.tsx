@@ -11,7 +11,7 @@ export default function Page() {
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl">Sorry, something went wrong.</CardTitle>
+              <CardTitle className="font-medium text-lg tracking-normal">Sorry, something went wrong.</CardTitle>
             </CardHeader>
             <CardContent>
               {searchParams?.get('error') ? (
