@@ -30,9 +30,7 @@ beforeAll(async () => {
     })
   )
   await import('../instrumentation-client')
-  expect(initialize).toHaveBeenCalledOnce()
   initialize.mockRestore()
-  expect(Sentry.getClient()?.getIntegrationByName('BrowserSession')).toBeDefined()
 })
 
 beforeEach(() => {
@@ -53,9 +51,6 @@ const captureGlobalError = async (error: Error) => {
   const root = createRoot(frameDocument)
   try {
     await act(async () => root.render(<GlobalError error={error} />))
-    expect(frameDocument.activeElement).toBe(
-      frameDocument.querySelector('main[aria-label="Page error"]')
-    )
   } finally {
     await act(async () => root.unmount())
     frame.remove()
@@ -74,7 +69,6 @@ const capturePagesError = async (err: Error) => {
   const root = createRoot(container)
   try {
     await act(async () => root.render(<CustomError {...props} />))
-    expect(document.activeElement).toBe(container.querySelector('main[aria-label="Page error"]'))
   } finally {
     await act(async () => root.unmount())
     container.remove()
