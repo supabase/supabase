@@ -25,7 +25,8 @@ const MOCK_SCENARIOS: Record<string, { authId: string; organizationSlug?: string
   dynamic_client: { authId: OAUTH_APPS_MOCK_SCENARIOS.dynamicMcpClient },
   suggested_projects: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelSuggestedProjects },
   org_bound: { authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBot },
-  org_bound_all_projects: { authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide },
+  org_bound_all: { authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide },
+  user_bound_all: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects },
 }
 
 const APIAuthorizationPage: NextPageWithLayout = () => {
