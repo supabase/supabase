@@ -1,6 +1,15 @@
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
 import { aiToolsBuildingIntoApp, aiToolsSupportedAgents } from './ai-tools.data'
+import {
+  supabaseWayAuthBuild,
+  supabaseWayDatabaseBuild,
+  supabaseWayFunctionsBuild,
+  supabaseWayProductionBuild,
+  supabaseWayRealtimeBuild,
+  supabaseWayRlsBuild,
+  supabaseWayStorageBuild,
+} from './architecting-for-growth.data'
 import { authGetStarted, authNextSteps, authPricing } from './auth.data'
 import { databaseGetStarted, databaseNextSteps } from './database.data'
 import {
@@ -38,6 +47,13 @@ import {
 const ALL_GROUPS: readonly ContentListingGroup[] = [
   aiToolsSupportedAgents,
   aiToolsBuildingIntoApp,
+  supabaseWayDatabaseBuild,
+  supabaseWayAuthBuild,
+  supabaseWayRlsBuild,
+  supabaseWayRealtimeBuild,
+  supabaseWayStorageBuild,
+  supabaseWayFunctionsBuild,
+  supabaseWayProductionBuild,
   authGetStarted,
   authPricing,
   authNextSteps,
