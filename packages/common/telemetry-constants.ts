@@ -2956,7 +2956,7 @@ export interface AuditLogDrainRemovedEvent {
 }
 
 type AdvisorCategory =
-  components['schemas']['GetProjectLintsResponse'][number]['categories'][number]
+  components['schemas']['GetProjectLintsResponse_Output'][number]['categories'][number]
 type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
 
 /**

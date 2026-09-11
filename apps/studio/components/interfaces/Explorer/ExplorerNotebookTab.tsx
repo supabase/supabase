@@ -269,7 +269,7 @@ export const ExplorerNotebookTab = () => {
       projectRef: ref,
       id: notebookId,
       name,
-      description: currentNotebook?.notebook.description,
+      description: currentNotebook?.notebook.description ?? undefined,
       content: writableContent,
     })
   }

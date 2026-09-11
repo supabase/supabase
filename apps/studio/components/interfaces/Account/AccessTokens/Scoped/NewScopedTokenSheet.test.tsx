@@ -10,9 +10,9 @@ import { createMockOrganizationResponse, createMockProject } from '@/tests/helpe
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
-type ProjectsResponse = components['schemas']['ListProjectsPaginatedResponse']
-type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
+type ProjectsResponse = components['schemas']['ListProjectsPaginatedResponse_Output']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
 type CreateTokenResponse = components['schemas']['CreateScopedAccessTokenResponse']
 type CreateClassicTokenResponse = components['schemas']['CreateAccessTokenResponse']
 

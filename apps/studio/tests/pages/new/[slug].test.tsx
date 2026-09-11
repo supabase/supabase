@@ -16,14 +16,14 @@ import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 import { routerMock } from '@/tests/lib/route-mock'
 import type { Permission } from '@/types'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type CreateProjectBody = components['schemas']['CreateProjectBody']
-type CreateProjectResponse = components['schemas']['CreateProjectResponse']
-type RegionsInfo = components['schemas']['RegionsInfo']
-type MemberWithFreeProjectLimit = components['schemas']['MemberWithFreeProjectLimit']
-type OverdueInvoiceCount = components['schemas']['OverdueInvoiceCount']
-type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
-type Entitlement = components['schemas']['ListEntitlementsResponse']['entitlements'][number]
+type CreateProjectResponse = components['schemas']['CreateProjectResponse_Output']
+type RegionsInfo = components['schemas']['RegionsInfo_Output']
+type MemberWithFreeProjectLimit = components['schemas']['MemberWithFreeProjectLimit_Output']
+type OverdueInvoiceCount = components['schemas']['OverdueInvoiceCount_Output']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
+type Entitlement = components['schemas']['ListEntitlementsResponse_Output']['entitlements'][number]
 type AvailableVersion = {
   postgres_engine: '15' | '17' | '17-oriole'
   release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
