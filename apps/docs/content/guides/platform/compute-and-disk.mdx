@@ -56,7 +56,7 @@ We charge hourly for additional compute based on your usage. Read more about [us
 
 ### Dedicated vs shared CPU
 
-All Postgres databases on Supabase run in isolated environments. Compute instances `Nano` to `2XL` compute size have CPUs which can burst to higher performance levels for short periods of time. Instances bigger than `Large` have predictable performance levels and do not exhibit the same burst behavior.
+All Postgres databases on Supabase run in isolated environments. Compute sizes up to `Medium` run on shared CPU, while `Large` and above run on dedicated vCPUs. The burst behavior you can observe on Supabase relates to disk IO rather than CPU — see [Compute size](#compute-size) for the disk limits of each compute size.
 
 ### Compute upgrades [#upgrades]
 
@@ -88,13 +88,13 @@ The following sections explain how these attributes affect disk performance.
 
 ### Compute size
 
-The compute size of your project affects the effective disk throughput and IOPS. The table below shows both the baseline (sustained) limits and the burst (maximum) limits for each instance size. For instance, an 8XL compute instance has a throughput of 1,188 MB/s and IOPS of 40,000.
+The compute size of your project affects the effective disk throughput and IOPS. The table below shows the baseline (sustained) limits and the burst (maximum) limits for each compute size. These values are minimums: every project of a given compute size gets at least these limits, and depending on the configuration your project runs on, the actual limits can be higher. For instance, an 8XL compute instance has a throughput of at least 1,188 MB/s and IOPS of at least 40,000.
 
 <ComputeDiskLimitsTable />
 
-Smaller compute instances like Nano, Micro, Small, and Medium can burst above baseline for short periods of time. Once burst capacity is exhausted, performance returns to baseline. If you need consistent disk performance, consider upgrading your compute size.
+Compute sizes up to 2XL can burst above their baseline for short periods of time, drawing on a disk IO budget. Once the budget is exhausted, performance returns to baseline. If you need consistent disk performance, consider upgrading your compute size.
 
-Larger compute instances (4XL and above) are designed for sustained, high performance with specific IOPS and throughput limits which you can [configure](/docs/guides/platform/manage-your-usage/disk-throughput). If you hit your IOPS or throughput limit, throttling will occur.
+Larger compute instances (4XL and above) are designed for sustained, high performance with specific IOPS and throughput limits which you can [configure](/docs/guides/platform/manage-your-usage/disk-throughput). From 8XL, baseline and maximum are the same, so performance does not depend on burst capacity. If you hit your IOPS or throughput limit, throttling will occur.
 
 ### Choosing the right compute instance for consistent disk performance
 
