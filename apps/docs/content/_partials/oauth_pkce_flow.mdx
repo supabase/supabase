@@ -32,12 +32,31 @@ await supabase.auth.signInWithOAuth({
 In the server, you need to handle the redirect to the OAuth provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to.
 
 ```js
-import { createClient, type Provider } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+import type { Provider } from '@supabase/supabase-js'
 const provider = 'provider' as Provider
-const redirect = (url: string) => {}
+const redirect = (url: string, init?: { headers: Headers }) => {}
 
 // ---cut---
+const headers = new Headers()
+
+const supabase = createServerClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_PUBLISHABLE_KEY!,
+  {
+    cookies: {
+      getAll() {
+        return parseCookieHeader(request.headers.get('Cookie') ?? '')
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) =>
+          headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+        )
+      },
+    },
+  }
+)
+
 const { data, error } = await supabase.auth.signInWithOAuth({
   provider,
   options: {
@@ -46,9 +65,11 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 })
 
 if (data.url) {
-  redirect(data.url) // use the redirect API for your server framework
+  redirect(data.url, { headers }) // use the redirect API for your server framework
 }
 ```
+
+You must forward the `Set-Cookie` headers on redirect. Otherwise the PKCE verifier cookie never reaches the browser and the OAuth callback fails.
 
 </TabPanel>
 
