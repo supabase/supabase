@@ -312,14 +312,13 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                   icon={lifecycleIcon}
                   onClick={() => onLifecycleAction()}
                   loading={
-                    Boolean(pipelineError) ||
                     displayState.type === 'loading' ||
                     isTransitioning ||
                     isStartingPipeline ||
                     isStoppingPipeline ||
                     isRestartingPipeline
                   }
-                  disabled={!pipeline || isTransitioning || !isActionable}
+                  disabled={Boolean(pipelineError) || !pipeline || isTransitioning || !isActionable}
                 >
                   {lifecycleLabel}
                 </Button>
