@@ -20,6 +20,7 @@ import { cn } from 'ui'
 import { AdvisorSection } from './AdvisorSection'
 import { ConnectSection } from './ConnectSection'
 import { CustomReportSection } from './CustomReportSection'
+import { DatabaseHealthSection } from './DatabaseHealthSection'
 import { DEFAULT_SECTION_ORDER, mergeSectionOrder } from './Home.utils'
 import { ProjectUsageSection } from './ProjectUsageSection'
 import { ProjectUsageSectionDeltas } from './ProjectUsageSectionDeltas'
@@ -146,6 +147,18 @@ export const ProjectHome = () => {
                         >
                           <SortableSection gripClassName={SORT_GRIP_CLASS} id={id}>
                             <AdvisorSection showEmptyState={isComingUp} />
+                          </SortableSection>
+                        </div>
+                      )
+                    }
+                    if (id === 'database-health') {
+                      return (
+                        <div
+                          key={id}
+                          className={cn(isComingUp && 'opacity-60 pointer-events-none')}
+                        >
+                          <SortableSection gripClassName={SORT_GRIP_CLASS} id={id}>
+                            <DatabaseHealthSection />
                           </SortableSection>
                         </div>
                       )
