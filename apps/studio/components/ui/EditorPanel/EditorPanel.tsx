@@ -56,6 +56,7 @@ import { useContentIdQuery } from '@/data/content/content-id-query'
 import { useContentQuery, type Content } from '@/data/content/content-query'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { contentKeys } from '@/data/content/keys'
+import type { Snippet } from '@/data/content/sql-folders-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { applyAutoLimit } from '@/data/sql/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -66,6 +67,7 @@ import { editorPanelState, useEditorPanelStateSnapshot } from '@/state/editor-pa
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export const EditorPanel = () => {
@@ -86,6 +88,7 @@ export const EditorPanel = () => {
   const { profile } = useProfile()
   const { closeSidebar } = useSidebarManagerSnapshot()
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
+  const { requestSave } = useSqlEditorSaveCoordinator()
   const isExplorerEnabled = useIsExplorerEnabled()
   const { createQuery } = useCreateQuery()
   const queryClient = useQueryClient()
@@ -194,6 +197,14 @@ export const EditorPanel = () => {
       if (vars.payload.id && ref) {
         queryClient.invalidateQueries({ queryKey: contentKeys.resource(ref, vars.payload.id) })
       }
+      if (activeSnippet) {
+        const updatedSnippet = { ...activeSnippet, content: vars.payload.content }
+        sqlEditorSnap.updateSnippet({
+          id: activeSnippet.id,
+          snippet: updatedSnippet as unknown as Snippet,
+          skipSave: true,
+        })
+      }
       originalSnippetRef.current = { sql: currentValue, name: vars.payload.name }
       showSaveSuccess()
     },
@@ -301,7 +312,7 @@ export const EditorPanel = () => {
     })
 
     sqlEditorSnap.addSnippet({ projectRef: ref, snippet })
-    sqlEditorSnap.addNeedsSaving(snippet.id)
+    requestSave(snippet.id)
 
     router.push(`/project/${ref}/sql/${snippet.id}`)
     handleClosePanel()
@@ -313,6 +324,7 @@ export const EditorPanel = () => {
         {isEditingTitle ? (
           <input
             ref={titleInputRef}
+            aria-label="Snippet name"
             value={titleInput}
             onChange={(e) => setTitleInput(e.target.value)}
             onBlur={commitRename}
@@ -674,7 +686,7 @@ export const EditorPanel = () => {
             project_id: project.id,
           })
           sqlEditorSnap.addSnippet({ projectRef: ref, snippet })
-          sqlEditorSnap.addNeedsSaving(snippet.id)
+          requestSave(snippet.id)
           setActiveSnippet(snippet as unknown as Extract<Content, { type: 'sql' }>)
           originalSnippetRef.current = { sql: currentValue, name }
           showSaveSuccess()
