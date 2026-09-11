@@ -121,7 +121,7 @@ describe('RealtimeSettings', () => {
       method: 'get',
       path: '/platform/projects/:ref/config/realtime',
       response: () =>
-        HttpResponse.json<components['schemas']['RealtimeConfigResponse']>(
+        HttpResponse.json<components['schemas']['RealtimeConfigResponse_Output']>(
           configWithoutPool as any
         ),
     })

@@ -151,12 +151,7 @@ export function SurveyChart({
 
         {view === 'chart' && !isExpanded && chartData.length > 3 && (
           <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-linear-to-b from-transparent to-background">
-            <Button
-              variant="default"
-              size="tiny"
-              onClick={() => setIsExpanded(true)}
-              className="shadow-xs"
-            >
+            <Button size="tiny" onClick={() => setIsExpanded(true)} className="shadow-xs">
               Show more
             </Button>
           </div>

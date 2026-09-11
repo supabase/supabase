@@ -582,9 +582,7 @@ export const PlatformWebhooksEndpointSheet = ({
           </Form>
         </SheetSection>
         <SheetFooter>
-          <Button variant="default" onClick={confirmOnClose}>
-            Cancel
-          </Button>
+          <Button onClick={confirmOnClose}>Cancel</Button>
           <Shortcut
             id={SHORTCUT_IDS.ACTION_BAR_SAVE}
             label={mode === 'create' ? 'Create endpoint' : 'Save changes'}

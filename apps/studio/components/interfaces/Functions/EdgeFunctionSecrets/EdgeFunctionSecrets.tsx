@@ -27,7 +27,7 @@ import { DOCS_URL } from '@/lib/constants'
 
 export const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()
-  const workersEnabled = useFlag('workers')
+  const computeEnabled = useFlag('compute')
   const [searchString, setSearchString] = useState('')
 
   const { can: canReadSecrets, isLoading: isLoadingSecretsPermissions } = useAsyncCheckPermissions(
@@ -232,11 +232,11 @@ export const EdgeFunctionSecrets = () => {
           }
         }}
       >
-        {workersEnabled ? (
+        {computeEnabled ? (
           <p className="text-sm">
             Ensure none of your <span className="font-medium">edge functions</span> or{' '}
-            <span className="font-medium">workers</span> are actively using this secret before
-            deleting it. This action cannot be undone.
+            <span className="font-medium">compute instances</span> are actively using this secret
+            before deleting it. This action cannot be undone.
           </p>
         ) : (
           <p className="text-sm">

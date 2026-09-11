@@ -1,3 +1,4 @@
+import { QueryClient } from '@tanstack/react-query'
 import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
@@ -5,6 +6,7 @@ import { useEffect, useRef, type ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ExplorerQueryTab } from '../ExplorerQueryTab'
+import { projectKeys } from '@/data/projects/keys'
 import type { ReadReplicasData } from '@/data/read-replicas/replicas-query'
 import { explorerQueryState } from '@/state/explorer-query'
 import { createTabId, createTabsState, TabsStateContext } from '@/state/tabs'
@@ -155,12 +157,45 @@ vi.mock('../QueryEditor/QueryResultChart', () => ({
   QueryResultChart: () => <div>Chart results</div>,
 }))
 
-const renderQueryTab = (tabsState = createTabsState('default')) =>
+const renderQueryTab = (tabsState = createTabsState('default'), queryClient?: QueryClient) =>
   customRender(
     <TabsStateContext.Provider value={tabsState}>
       <ExplorerQueryTab />
-    </TabsStateContext.Provider>
+    </TabsStateContext.Provider>,
+    { queryClient }
   )
+
+/**
+ * By the time a query tab can auto-run, its project is already cached - the Explorer home tab
+ * that created the draft required the same project data to do so. Priming the cache here
+ * mirrors that instead of racing this test against a cold fetch of `/platform/projects/:ref`.
+ */
+const createWarmProjectQueryClient = (ref: string = 'default') => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  })
+  queryClient.setQueryData(projectKeys.detail(ref), {
+    id: 1,
+    ref,
+    organization_id: 1,
+    name: 'Test Project',
+    status: 'ACTIVE_HEALTHY',
+    cloud_provider: 'AWS',
+    region: 'us-east-1',
+    db_host: `db.${ref}.supabase.co`,
+    restUrl: `https://${ref}.supabase.co/rest/v1/`,
+    inserted_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z',
+    subscription_id: 'sub_123',
+    is_branch_enabled: false,
+    is_physical_backups_enabled: false,
+    high_availability: false,
+    integration_source: null,
+    connectionString: 'postgresql://postgres@localhost:5432/postgres',
+    is_hibernating: false,
+  })
+  return queryClient
+}
 
 const createDraft = (
   source:
@@ -169,7 +204,8 @@ const createDraft = (
         _tag: 'logs'
         time_range: { _tag: 'relative_time_range'; amount: number; unit: 'hour' }
       },
-  sql: string = 'select 1'
+  sql: string = 'select 1',
+  { autoRun = false }: { autoRun?: boolean } = {}
 ) => {
   explorerQueryState.removeDraft({ id: 'query-test', projectRef: 'default' })
   explorerQueryState.createDraft({
@@ -177,6 +213,7 @@ const createDraft = (
     projectRef: 'default',
     sql,
     source,
+    autoRun,
   })
 }
 
@@ -198,6 +235,29 @@ describe('QueryTab execution', () => {
 
     expect(screen.getByRole('status', { name: 'Loading query' })).toBeInTheDocument()
     expect(screen.queryByText('Query draft not found')).not.toBeInTheDocument()
+  })
+
+  it('auto-runs a draft created with autoRun, then clears the flag', async () => {
+    // `/platform/pg-meta/:ref/query` is also hit by unrelated background metadata fetches
+    // (autocomplete definitions, event triggers, ...), so the run is asserted via the stored
+    // result it produces rather than by counting requests to that shared endpoint.
+    createDraft({ _tag: 'database' }, 'select 1', { autoRun: true })
+
+    renderQueryTab(createTabsState('default'), createWarmProjectQueryClient())
+
+    await waitFor(() => expect(explorerQueryState.results['query-test']).toBeDefined())
+    expect(explorerQueryState.results['query-test']).toMatchObject({ rows: [] })
+    expect(explorerQueryState.drafts['query-test']?.pendingAutoRun).toBe(false)
+  })
+
+  it('does not auto-run a draft created without autoRun', async () => {
+    createDraft({ _tag: 'database' })
+
+    renderQueryTab()
+    await screen.findByRole('button', { name: 'Run' })
+
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect(explorerQueryState.results['query-test']).toBeUndefined()
   })
 
   it('records an unavailable error and skips the logs endpoint when the flag is off', async () => {
@@ -282,7 +342,7 @@ describe('QueryTab execution', () => {
 
     renderQueryTab()
     const runButton = await screen.findByRole('button', { name: 'Run' })
-    expect(runButton).toBeDisabled()
+    expect(runButton).toBeAriaDisabled()
 
     act(() => releaseReplicas())
     await waitFor(() => expect(runButton).toBeEnabled())

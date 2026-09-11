@@ -116,7 +116,6 @@ export const UtilityActions = ({
               <Button
                 aria-label="More actions"
                 data-testid="sql-editor-utility-actions"
-                variant="default"
                 className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
                 icon={<MoreVertical className="text-foreground-light" />}
               />
@@ -269,10 +268,7 @@ export const UtilityActions = ({
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="default"
-                  iconRight={<ChevronDown size={14} className="text-foreground-light" />}
-                >
+                <Button iconRight={<ChevronDown size={14} className="text-foreground-light" />}>
                   <span className="text-foreground-light">Limit</span>{' '}
                   {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === sessionSnap.limit)?.label}
                 </Button>
