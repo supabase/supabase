@@ -8,9 +8,14 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import type { SupaRow } from '../../types'
 import { isColumnMasked } from '../../utils/sensitive-data'
 import { NullValue } from '../common/NullValue'
+import {
+  findColumnForeignKeyConstraint,
+  getReferencingRecordFilters,
+} from './ForeignKeyFormatter.utils'
 import { ReferenceRecordPeek } from './ReferenceRecordPeek'
 import { convertByteaToHex } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useTableQuery } from '@/data/tables/table-retrieve-query'
@@ -39,41 +44,55 @@ export const ForeignKeyFormatter = (props: Props) => {
   const foreignKeyColumn = data?.columns.find((x) => x.name === column.key)
   const selectedTable = isTableLike(data) ? data : undefined
 
-  const relationship = (selectedTable?.relationships ?? []).find(
-    (r) =>
-      r.source_schema === selectedTable?.schema &&
-      r.source_table_name === selectedTable?.name &&
-      r.source_column_name === column.name
-  )
+  // The constraints query returns source/target columns as ordinally paired
+  // arrays, which is what a composite foreign key needs to filter correctly.
+  const { data: foreignKeys, isPending: isLoadingForeignKeys } = useForeignKeyConstraintsQuery({
+    projectRef: project?.ref,
+    schema: selectedTable?.schema,
+  })
+
+  const foreignKey =
+    selectedTable !== undefined
+      ? findColumnForeignKeyConstraint({
+          foreignKeys: foreignKeys ?? [],
+          schema: selectedTable.schema,
+          table: selectedTable.name,
+          columnName: column.key,
+        })
+      : undefined
 
   const { data: targetTable, isPending: isLoadingTargetTable } = useTableQuery<PGTable>(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: relationship?.target_table_schema ?? '',
-      name: relationship?.target_table_name ?? '',
+      schema: foreignKey?.target_schema ?? '',
+      name: foreignKey?.target_table ?? '',
     },
-    {
-      enabled:
-        !!project?.ref && !!relationship?.target_table_schema && !!relationship?.target_table_name,
-    }
+    { enabled: !!project?.ref && foreignKey !== undefined }
   )
 
   const value = row[column.key]
   const formattedValue =
     foreignKeyColumn?.format === 'bytea' && !!value ? convertByteaToHex(value) : value
 
+  const filters =
+    foreignKey !== undefined
+      ? getReferencingRecordFilters({ foreignKey, row, columns: data?.columns ?? [] })
+      : []
+  const hasReferencingRecord = filters.length > 0
+  const isLoadingMetadata = isLoading || (selectedTable !== undefined && isLoadingForeignKeys)
+
   return (
     <div className="flex w-full items-center justify-between flex justify-between">
       <span className="m-0 grow overflow-hidden text-ellipsis">
         {formattedValue === null ? <NullValue /> : isMasked ? '••••••••' : formattedValue}
       </span>
-      {isLoading && formattedValue !== null && (
+      {isLoadingMetadata && formattedValue !== null && (
         <div className="w-6 h-6 flex items-center justify-center">
           <ShimmeringLoader className="w-4 h-4" />
         </div>
       )}
-      {!isLoading && relationship !== undefined && formattedValue !== null && (
+      {!isLoadingMetadata && hasReferencingRecord && (
         <>
           {isLoadingTargetTable && (
             <div className="w-6 h-6 flex items-center justify-center">
@@ -103,11 +122,7 @@ export const ForeignKeyFormatter = (props: Props) => {
                   e.stopPropagation()
                 }}
               >
-                <ReferenceRecordPeek
-                  table={targetTable}
-                  column={relationship.target_column_name}
-                  value={formattedValue}
-                />
+                <ReferenceRecordPeek table={targetTable} filters={filters} />
               </PopoverContent>
             </Popover>
           )}
