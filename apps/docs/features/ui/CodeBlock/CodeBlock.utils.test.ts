@@ -1,6 +1,7 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
-import { getTokenClassName } from './CodeBlock.utils'
+import { getCodeBlockLabel, getTokenClassName } from './CodeBlock.utils'
 import theme from './supabase-2.json' with { type: 'json' }
 
 const themeColors = (): Array<string> => {
@@ -30,10 +31,12 @@ describe('token class names', () => {
     const colors = themeColors()
     expect(colors.length).toBeGreaterThan(0)
 
+    const css = readFileSync(new URL('../../../styles/code-block.css', import.meta.url), 'utf8')
     for (const color of colors) {
       expect(getTokenClassName(color, 0), `${color} is missing from the class table`).toMatch(
         /^s-[a-z]$/
       )
+      expect(css).toContain(`.shiki .${getTokenClassName(color, 0)} {\n  color: ${color};`)
     }
   })
 
@@ -42,5 +45,14 @@ describe('token class names', () => {
     expect(getTokenClassName(undefined, 2 | 4)).toBe('s-b s-l')
     expect(getTokenClassName(undefined, 0)).toBeUndefined()
     expect(getTokenClassName(undefined, -1)).toBeUndefined()
+  })
+})
+
+describe('code block labels', () => {
+  it('names language aliases and singular or plural line counts', () => {
+    expect(getCodeBlockLabel('ts', 1)).toBe('TypeScript, 1 line')
+    expect(getCodeBlockLabel('sh', 2)).toBe('Shell, 2 lines')
+    expect(getCodeBlockLabel('rust', 3)).toBe('rust, 3 lines')
+    expect(getCodeBlockLabel(null, 1)).toBe('1 line')
   })
 })
