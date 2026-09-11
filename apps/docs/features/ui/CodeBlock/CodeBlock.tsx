@@ -1,11 +1,11 @@
 import { type PropsWithChildren } from 'react'
-import { bundledLanguages, createHighlighter, type BundledLanguage } from 'shiki'
+import { bundledLanguages, type BundledLanguage } from 'shiki'
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
 import { cn } from 'ui'
 
 import { CodeBlockControls, CodeBlockTokens, type CodeToken } from './CodeBlock.client'
+import { highlightCode } from './CodeBlock.highlight'
 import { getCodeBlockLabel, getTokenClassName } from './CodeBlock.utils'
-import theme from './supabase-2.json' with { type: 'json' }
 import denoTypes from './types/lib.deno.d.ts.include'
 
 const extraFiles: ExtraFiles = { 'deno.d.ts': denoTypes }
@@ -14,10 +14,6 @@ const twoslasher = createTwoslasher({ extraFiles })
 const TWOSLASHABLE_LANGS: ReadonlyArray<string> = ['js', 'ts', 'javascript', 'typescript']
 
 const BUNDLED_LANGUAGES = Object.keys(bundledLanguages)
-const highlighter = await createHighlighter({
-  themes: [theme],
-  langs: BUNDLED_LANGUAGES,
-})
 
 export async function CodeBlock({
   className,
@@ -52,12 +48,7 @@ export async function CodeBlock({
     }
   }
 
-  const { tokens } = highlighter.codeToTokens(code, {
-    lang: lang || undefined,
-    theme: 'Supabase Theme',
-    tokenizeTimeLimit: 0,
-    tokenizeMaxLineLength: 100_000,
-  })
+  const { tokens } = await highlightCode(code, lang)
 
   return (
     <div
