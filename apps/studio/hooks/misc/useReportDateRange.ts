@@ -23,6 +23,26 @@ export const getIntervalGranularity = (from: string, to: string): AnalyticsInter
   return '1d'
 }
 
+export const resolveHelperFromUrl = (
+  isHelper: boolean,
+  helperText: string
+): ReportsDatetimeHelper | undefined => {
+  if (!isHelper || helperText === '') return undefined
+  return REPORTS_DATEPICKER_HELPERS.find((helper) => helper.text === helperText)
+}
+
+const resolveHelperFromArgument = (
+  defaultHelper: REPORT_DATERANGE_HELPER_LABELS | string | ReportsDatetimeHelper
+): ReportsDatetimeHelper | undefined => {
+  if (typeof defaultHelper === 'string') {
+    return REPORTS_DATEPICKER_HELPERS.find((helper) => helper.text === defaultHelper)
+  }
+  if (defaultHelper && typeof defaultHelper === 'object' && 'text' in defaultHelper) {
+    return defaultHelper
+  }
+  return undefined
+}
+
 export const DATERANGE_LIMITS: { [key: string]: number } = {
   free: 1,
   pro: 7,
@@ -91,15 +111,9 @@ export const useReportDateRange = (
   )
 
   const getDefaultHelper = useCallback(() => {
-    let targetHelper: ReportsDatetimeHelper | undefined
-
-    if (typeof defaultHelper === 'string') {
-      // Find helper by text (supports both enum values and direct strings)
-      targetHelper = REPORTS_DATEPICKER_HELPERS.find((helper) => helper.text === defaultHelper)
-    } else if (defaultHelper && typeof defaultHelper === 'object' && 'text' in defaultHelper) {
-      // Use the provided helper object directly
-      targetHelper = defaultHelper
-    }
+    const targetHelper =
+      resolveHelperFromUrl(isHelperValue, helperTextValue) ??
+      resolveHelperFromArgument(defaultHelper)
 
     // Check if the target helper is available for the current entitlement
     if (targetHelper && hasAccessToHelper(targetHelper)) {
@@ -142,7 +156,7 @@ export const useReportDateRange = (
       end: defaultEnd,
       helper: { isHelper: false },
     }
-  }, [defaultHelper, hasAccessToHelper])
+  }, [defaultHelper, hasAccessToHelper, helperTextValue, isHelperValue])
 
   // Get current effective values (from URL or defaults, but don't set URL)
   const timestampStart = useMemo(() => {

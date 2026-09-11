@@ -1,8 +1,9 @@
 import dayjs from 'dayjs'
 import { describe, expect, test } from 'vitest'
 
+import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import { analyticsIntervalToGranularity } from '@/data/reports/report.utils'
-import { getIntervalGranularity } from '@/hooks/misc/useReportDateRange'
+import { getIntervalGranularity, resolveHelperFromUrl } from '@/hooks/misc/useReportDateRange'
 
 const rangeOf = (value: number, unit: dayjs.ManipulateType) => {
   const to = dayjs()
@@ -31,5 +32,21 @@ describe('getIntervalGranularity', () => {
   ])('leaves a %s-%s range on the %s interval', (value, unit, expected) => {
     const { from, to } = rangeOf(value, unit)
     expect(getIntervalGranularity(from, to)).toBe(expected)
+  })
+})
+
+describe('resolveHelperFromUrl', () => {
+  test('returns the helper named by the URL when the helper flag is set', () => {
+    expect(resolveHelperFromUrl(true, 'Last 3 hours')?.text).toBe(
+      REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS
+    )
+  })
+
+  test('ignores the label when the helper flag is off', () => {
+    expect(resolveHelperFromUrl(false, 'Last 3 hours')).toBeUndefined()
+  })
+
+  test('ignores labels that are not a known helper', () => {
+    expect(resolveHelperFromUrl(true, 'Last 3 fortnights')).toBeUndefined()
   })
 })
