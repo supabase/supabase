@@ -9,10 +9,14 @@ import { addAPIMock } from '@/tests/lib/msw'
 import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
 
 vi.mock('@/components/ui/CodeEditor/Providers/PgSQLCompletionProvider', () => ({
-  default: vi.fn((_monaco: unknown, pgInfoRef: unknown) => ({ __pgInfoRef: pgInfoRef })),
+  getPgsqlCompletionProvider: vi.fn((_monaco: unknown, pgInfoRef: unknown) => ({
+    __pgInfoRef: pgInfoRef,
+  })),
 }))
 vi.mock('@/components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider', () => ({
-  default: vi.fn((_monaco: unknown, pgInfoRef: unknown) => ({ __pgInfoRef: pgInfoRef })),
+  getPgsqlSignatureHelpProvider: vi.fn((_monaco: unknown, pgInfoRef: unknown) => ({
+    __pgInfoRef: pgInfoRef,
+  })),
 }))
 
 describe('acquireSharedRegistration', () => {
@@ -94,9 +98,9 @@ describe('useAddDefinitions', () => {
     }) as any
 
   it('keeps the registered provider reading fresh data after the registering editor unmounts, as long as a sibling editor is still active', async () => {
-    const getPgsqlCompletionProvider = (
-      await import('@/components/ui/CodeEditor/Providers/PgSQLCompletionProvider')
-    ).default as unknown as ReturnType<typeof vi.fn>
+    const { getPgsqlCompletionProvider } = (await import(
+      '@/components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
+    )) as unknown as { getPgsqlCompletionProvider: ReturnType<typeof vi.fn> }
 
     let keywordWords = ['select']
     setupSqlEditorMocks()
