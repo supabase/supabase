@@ -130,12 +130,6 @@ SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
 
 Install [dotenv](https://www.npmjs.com/package/dotenv):
 
-```bash
-npm i dotenv
-```
-
-And initialize it:
-
 <Tabs size="small" type="underlined" queryGroup="package-manager" defaultActiveId="npm">
 
 <TabPanel id="npm" label="npm">
@@ -163,6 +157,12 @@ pnpm add dotenv
 </TabPanel>
 
 </Tabs>
+
+Then load the file before you read any variable from it. Put this on the first line of your entry point, above every other import:
+
+```js app.js
+require('dotenv').config()
+```
 
 </TabPanel>
 <TabPanel id="hono" label="Hono">
@@ -785,7 +785,7 @@ You can now use any Supabase feature from your client or server code.
 >
 <TabPanel id="server-client" label="Server Client">
 
-```ts lib/supabase.js
+```js lib/supabase.js
 const { createServerClient, parseCookieHeader, serializeCookieHeader } = require('@supabase/ssr')
 
 exports.createClient = (context) => {
@@ -808,9 +808,10 @@ exports.createClient = (context) => {
 </TabPanel>
 <TabPanel id="express-route" label="Route">
 
-```ts app.js
+```js app.js
+require("dotenv").config()
+
 const express = require("express")
-const dotenv = require("dotenv")
 
 const { createClient } = require("./lib/supabase")
 
