@@ -20,6 +20,7 @@ import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
 import { RegionsList, SmartRegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
+import Table from '~/components/Table'
 import { TerraformProviderSchema } from '~/components/TerraformProviderSchema'
 import { WrapperDashboardIntegration } from '~/components/WrapperDashboardIntegration'
 import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
@@ -109,6 +110,7 @@ const components = {
   ShowUntil,
   SqlToRest,
   StepHikeCompact,
+  Table,
   Tabs,
   TabPanel,
   TerraformProviderSchema,
@@ -130,6 +132,7 @@ const components = {
     </Heading>
   ),
   pre: Pre,
+  table: Table,
   /**
    * Force inline code tags to go sync, this prevents Heading anchor resolution fail due to
    * our CodeBlock component being async. We need to find a better solution for more future

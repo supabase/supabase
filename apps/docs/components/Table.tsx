@@ -1,3 +1,5 @@
+'use client'
+
 import React, { TableHTMLAttributes, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 
