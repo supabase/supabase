@@ -118,12 +118,16 @@ describe('getResourceWarningMetricsHref', () => {
     )
   })
 
-  it('honors a chart override', () => {
-    expect(
-      getResourceWarningMetricsHref('disk_io_exhaustion', 'abc', {
-        disk_io_exhaustion: 'disk-io-burst-balance',
-      })
-    ).toContain('chart=disk-io-burst-balance')
+  it('targets the burst balance chart for disk IO when that chart is shown', () => {
+    expect(getResourceWarningMetricsHref('disk_io_exhaustion', 'abc', true)).toContain(
+      'chart=disk-io-burst-balance'
+    )
+  })
+
+  it('leaves other warnings alone when the burst balance chart is shown', () => {
+    expect(getResourceWarningMetricsHref('cpu_exhaustion', 'abc', true)).toContain(
+      'chart=cpu-usage'
+    )
   })
 
   it.each(['auth_rate_limit_exhaustion', 'is_readonly_mode_enabled'])(

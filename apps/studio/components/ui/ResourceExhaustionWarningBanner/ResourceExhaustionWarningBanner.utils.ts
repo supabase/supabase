@@ -76,8 +76,6 @@ export const getResourceWarningCorrectionUrl = ({
   return correctionUrlVariants[metric] ?? `${infrastructurePath}#${metric}`
 }
 
-export type ChartIdOverrides = Partial<Record<string, string>>
-
 export type TroubleshootItem =
   | { kind: 'metrics'; warningType: string; menuLabel: string; buttonLabel: string; href: string }
   | { kind: 'docs'; warningType: string; menuLabel: string; buttonLabel: string; href: string }
@@ -107,10 +105,12 @@ export const applyResourceList = (
 export const getResourceWarningMetricsHref = (
   warningType: string,
   projectRef: string,
-  chartIdOverrides: ChartIdOverrides = {}
+  showBurstBalanceChart = false
 ): string | undefined => {
   const chartId =
-    chartIdOverrides[warningType] ?? RESOURCE_WARNING_MESSAGES[warningType]?.metricsChartId
+    warningType === 'disk_io_exhaustion' && showBurstBalanceChart
+      ? 'disk-io-burst-balance'
+      : RESOURCE_WARNING_MESSAGES[warningType]?.metricsChartId
   if (chartId === undefined) return undefined
 
   const params = new URLSearchParams({
@@ -133,17 +133,17 @@ export const getTroubleshootItems = ({
   activeWarnings,
   projectRef,
   aiPrompt,
-  chartIdOverrides = {},
+  showBurstBalanceChart = false,
 }: {
   activeWarnings: string[]
   projectRef: string
   aiPrompt: string | undefined
-  chartIdOverrides?: ChartIdOverrides
+  showBurstBalanceChart?: boolean
 }): TroubleshootItem[] => {
   const isSingleWarning = activeWarnings.length === 1
 
   const metricsItems = activeWarnings.flatMap((warningType): TroubleshootItem[] => {
-    const href = getResourceWarningMetricsHref(warningType, projectRef, chartIdOverrides)
+    const href = getResourceWarningMetricsHref(warningType, projectRef, showBurstBalanceChart)
     const label = RESOURCE_WARNING_MESSAGES[warningType]?.resourceLabel
     if (href === undefined || (!isSingleWarning && label === undefined)) return []
     return [

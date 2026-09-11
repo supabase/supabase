@@ -177,14 +177,11 @@ export const ResourceExhaustionWarningBanner = () => {
   })()
 
   const aiPrompt = getResourceWarningAiPrompt(activeWarnings)
-  const chartIdOverrides = showBurstBalanceChart
-    ? { disk_io_exhaustion: 'disk-io-burst-balance' }
-    : {}
   const troubleshootItems = getTroubleshootItems({
     activeWarnings,
     projectRef: ref ?? 'default',
     aiPrompt,
-    chartIdOverrides,
+    showBurstBalanceChart,
   })
   const soleTroubleshootItem = troubleshootItems.length === 1 ? troubleshootItems[0] : undefined
 
