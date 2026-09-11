@@ -1,6 +1,6 @@
 # Stacked PRs for a page edit
 
-Mechanics for shipping the [`edit-the-docs`](../SKILL.md) buckets as a stack. **A stack is the exception.** Phase 0 decides whether the edit needs one at all, and how many branches. This file covers how to build and submit them.
+Mechanics for shipping the [`edit-the-docs`](../SKILL.md) buckets as a stack. **A stack is the exception, and the requester approves it.** Phase 0 covers when to offer one. This file covers how to build and submit it once they agree.
 
 ## Branch names
 

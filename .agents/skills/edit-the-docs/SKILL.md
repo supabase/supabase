@@ -15,7 +15,7 @@ Improves **existing** Supabase docs pages: structure, order, connective text, an
 
 **Not this skill:** [`write-the-docs`](../write-the-docs/SKILL.md) drafts net-new content or product-grounded rewrites from intent and code. [`review-the-docs`](../review-the-docs/SKILL.md) covers lint, build, and PR triage.
 
-**Output is one pull request, with one change type per commit.** A reviewer reads the style diff apart from the structure diff without holding several PRs in their head. Split into a stack of PRs only when the edit is large enough that one PR stops being reviewable. Phase 0 applies that gate, and [reference/stacked-prs.md](reference/stacked-prs.md) covers the stacking mechanics.
+**Output is one pull request, with one change type per commit.** A reviewer reads the style diff apart from the structure diff without holding several PRs in their head. Split into a stack of PRs only when the requester asks for one, or approves the split you offer because the diff turned out large. Phase 0 covers when to raise it, and [reference/stacked-prs.md](reference/stacked-prs.md) covers the mechanics.
 
 ## Core rules
 
@@ -33,13 +33,15 @@ Improves **existing** Supabase docs pages: structure, order, connective text, an
 3. Note structural problems: mixed information types interrupting a procedure, missing intro navigation on a long page, weak transitions, redundancy, or over-explained mechanics.
 4. Sort the diagnosis into the buckets below. **Drop any bucket that comes back empty, and say so.** Style, structure, and technical revision take one commit or branch each. Additions take as many as the content needs, so the edit has no fixed size. A style edit plus a structural edit is the common shape, because most pages that need restructuring are already correct. Two buckets is a complete result, not a truncated one.
 5. Know where the edit ends. **The edit is only the buckets that have content.** Any bucket you drop is beyond the edit, and a later request for that change type is a new request. That includes one you raise yourself. Name it, keep the work in progress clean, and ask whether it belongs in this edit, in a separate ticket, or nowhere. Absorbing it into a bucket that's already open is what turns an edit into a rewrite.
-6. Apply the split gate. **Default to one PR**, with each bucket as its own commit. Stack only when both hold:
+6. Size the edit. **When it comes out large, offer a stack. Don't choose one.** One PR with each bucket as its own commit is the output unless the requester approves a split. Raise the question when both hold:
    - The edit rewrites prose and moves sections, or it corrects a technical claim.
    - It runs over roughly 150 changed lines.
 
-   **When in doubt, one PR.** A stack costs the reviewer something a mixed diff doesn't: no PR page shows the whole edit, so seeing it end to end means an extra command. Clean commits in one PR give the same per-change-type diffs for free. Stack when the edit is too big to read that way, not by default.
+   Say how large the diff is and propose the branches. Name the trade in the ask: a stack gives a reviewer clean per-change-type diffs, and it also means no PR page shows the whole edit, so reading it end to end costs them an extra command. Their reviewers pay that cost, so it's their call. **No answer means one PR.**
 
-7. Summarize the diagnosis and the proposed split to the requester, and **wait for confirmation before creating any branch.** Name which buckets are empty and why. When nobody is available to confirm, record the diagnosis in the PR body and carry on.
+7. Summarize the diagnosis and the proposed split to the requester, and **wait for confirmation before creating any branch.** Name which buckets are empty and why. When nobody is available to confirm, record the diagnosis in the PR body and ship one PR.
+
+**When the diff outgrows the estimate mid-edit, stop and offer the split then.** A size call made at diagnosis can be wrong by the time the style pass lands. Say how large it got and ask. Splitting unasked is the failure here, and so is carrying on quietly because you already have an answer.
 
 **The sections below are named for the stacked case.** In a single PR they're commits, in the same order and under the same rules.
 
