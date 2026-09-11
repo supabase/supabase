@@ -415,7 +415,6 @@ export const NewOrgForm = ({
           footer={
             <div key="panel-footer" className="flex w-full items-center justify-between">
               <Button
-                variant="default"
                 disabled={newOrgLoading || paymentConfirmationLoading}
                 onClick={() => {
                   if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)

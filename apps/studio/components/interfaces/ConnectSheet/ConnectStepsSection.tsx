@@ -274,7 +274,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
             title="Database access requires the Data API"
             description="Client library database queries will not work until the Data API is enabled."
             actions={[
-              <Button asChild key="enable" variant="default">
+              <Button asChild key="enable">
                 <Link href={`/project/${ref}/integrations/data_api`}>Enable Data API</Link>
               </Button>,
             ]}
@@ -295,7 +295,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
               </>
             }
             actions={
-              <Button asChild variant="default">
+              <Button asChild>
                 <Link href={`/project/${ref}/settings/addons?panel=ipv4`}>Enable IPv4 add-on</Link>
               </Button>
             }

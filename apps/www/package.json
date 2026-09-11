@@ -57,6 +57,7 @@
     "gray-matter": "^4.0.3",
     "gsap": "^3.13.0",
     "icons": "workspace:*",
+    "js-yaml": "^3.15.1",
     "lucide-react": "*",
     "markdown-toc": "^1.2.0",
     "marketing": "workspace:*",

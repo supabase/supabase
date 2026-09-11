@@ -6,7 +6,7 @@ import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type PlatformAppInstallation =
-  components['schemas']['ListPlatformAppInstallationsResponse']['installations'][number]
+  components['schemas']['ListPlatformAppInstallationsResponse_Output']['installations'][number]
 
 export async function getPlatformAppInstallations(
   { slug }: { slug?: string },

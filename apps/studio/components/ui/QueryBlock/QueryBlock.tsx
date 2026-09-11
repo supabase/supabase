@@ -375,7 +375,7 @@ export const QueryBlock = ({
                 Queries that involve any mutation will not be run in reports
               </p>
               {!!onRemoveChart && (
-                <Button variant="default" className="mt-2" onClick={() => onRemoveChart()}>
+                <Button className="mt-2" onClick={() => onRemoveChart()}>
                   Remove chart
                 </Button>
               )}

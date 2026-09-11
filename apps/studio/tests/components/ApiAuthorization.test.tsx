@@ -17,10 +17,10 @@ import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type GetOAuthAuthorizationResponse = components['schemas']['GetOAuthAuthorizationResponse']
-type ApproveAuthorizationResponse = components['schemas']['ApproveAuthorizationResponse']
-type DeclineAuthorizationResponse = components['schemas']['DeclineAuthorizationResponse']
+type ApproveAuthorizationResponse = components['schemas']['ApproveAuthorizationResponse_Output']
+type DeclineAuthorizationResponse = components['schemas']['DeclineAuthorizationResponse_Output']
 
 // --- Fixtures ---
 

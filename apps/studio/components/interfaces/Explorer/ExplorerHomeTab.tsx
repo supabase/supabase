@@ -2,6 +2,7 @@ import { NotebookText, SquareCode } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from 'ui'
 
+import { isSqlStatement } from './ExplorerHomeTab.utils'
 import { useCreateChat, useCreateNotebook, useCreateQuery } from './hooks'
 import { NOTEBOOK_TEMPLATES } from './templates'
 import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
@@ -35,7 +36,11 @@ export const ExplorerHomeTab = () => {
             placeholder="Explore your data, check project health, create a notebook..."
             value={value}
             onValueChange={(e) => setValue(e.target.value)}
-            onSubmit={(message) => createChat({ initialMessage: message })}
+            onSubmit={(message) =>
+              isSqlStatement(message)
+                ? createQuery({ sql: message, autoRun: true })
+                : createChat({ initialMessage: message })
+            }
           />
           <AssistantAgentHarnessFooter />
 

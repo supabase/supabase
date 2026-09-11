@@ -1,10 +1,10 @@
 import { type PropsWithChildren } from 'react'
-import { bundledLanguages, createHighlighter, type BundledLanguage, type ThemedToken } from 'shiki'
+import { bundledLanguages, createHighlighter, type BundledLanguage } from 'shiki'
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
 import { cn } from 'ui'
 
-import { AnnotatedSpan, CodeBlockControls } from './CodeBlock.client'
-import { getCodeBlockLabel, getFontStyle } from './CodeBlock.utils'
+import { CodeBlockControls, CodeBlockTokens, type CodeToken } from './CodeBlock.client'
+import { getCodeBlockLabel } from './CodeBlock.utils'
 import theme from './supabase-2.json' with { type: 'json' }
 import denoTypes from './types/lib.deno.d.ts.include'
 
@@ -83,90 +83,26 @@ export async function CodeBlock({
         aria-label={getCodeBlockLabel(lang, tokens.length)}
         tabIndex={0}
       >
-        <pre>
-          <code
-            className={cn(
-              lineNumbers && 'grid grid-cols-[auto_1fr] w-fit min-w-full py-3',
-              '[--row-rest:var(--background-200)]',
-              '[--row-hover:color-mix(in_srgb,var(--foreground)_3%,var(--background-200))]'
-            )}
-          >
-            {lineNumbers ? (
-              tokens.map((line, idx) => (
-                <div key={idx} className="group/row contents">
-                  <div
-                    aria-hidden="true"
-                    className={cn(
-                      'select-none text-right text-muted/70 pl-3 pr-2 min-h-5 leading-5',
-                      'bg-[var(--row-rest)]',
-                      'sticky left-0 z-10',
-                      'group-hover/row:text-muted group-hover/row:bg-[var(--row-hover)]',
-                      'after:pointer-events-none after:absolute after:inset-y-0 after:left-full after:w-4',
-                      '[--gutter-fade:var(--row-rest)] group-hover/row:[--gutter-fade:var(--row-hover)]',
-                      'after:bg-[image:linear-gradient(to_right,var(--gutter-fade)_0%,color-mix(in_srgb,var(--gutter-fade)_85%,transparent)_25%,color-mix(in_srgb,var(--gutter-fade)_50%,transparent)_50%,color-mix(in_srgb,var(--gutter-fade)_15%,transparent)_75%,transparent_100%)]'
-                    )}
-                  >
-                    {idx + 1}
-                  </div>
-                  <div
-                    className={cn(
-                      'code-content min-h-5 leading-5 pl-3 pr-18',
-                      'group-hover/row:bg-[var(--row-hover)]'
-                    )}
-                  >
-                    <CodeLine tokens={line} twoslash={twoslashed?.get(idx)} />
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="code-content p-6">
-                {tokens.map((line, idx) => (
-                  <CodeLine key={idx} tokens={line} twoslash={twoslashed?.get(idx)} />
-                ))}
-              </div>
-            )}
-          </code>
-        </pre>
+        <CodeBlockTokens
+          lineNumbers={lineNumbers}
+          lines={tokens.map((line, lineIndex) => {
+            let offset = 0
+            return line.map(({ content, color, fontStyle, htmlStyle }): CodeToken => {
+              const annotations = twoslashed
+                ?.get(lineIndex)
+                ?.get(offset)
+                ?.map(({ text, docs, tags }) => ({ text, docs, tags }))
+              offset += content.length
+              return annotations
+                ? [content, color, fontStyle || 0, { annotations, htmlStyle }]
+                : [content, color, fontStyle || 0]
+            })
+          })}
+        />
       </div>
       {/* After the code so the block is named before its controls, and outside the scroller so they stay pinned */}
       {!hideControls && <CodeBlockControls content={code.trim()} />}
     </div>
-  )
-}
-
-function CodeLine({
-  tokens: rawTokens,
-  twoslash,
-}: {
-  tokens: Array<ThemedToken>
-  twoslash?: Map<number, Array<NodeHover>>
-}) {
-  let offset = 0
-  const tokens = rawTokens.map((token) => {
-    const newToken = { ...token, offset }
-    offset += token.content.length
-    return newToken
-  })
-
-  return (
-    <span className="block min-h-5 leading-5">
-      {tokens.map((token) =>
-        twoslash?.has(token.offset) ? (
-          <AnnotatedSpan
-            key={token.offset}
-            token={token}
-            annotations={twoslash.get(token.offset)!}
-          />
-        ) : (
-          <span
-            key={token.offset}
-            style={{ color: token.color, ...getFontStyle(token.fontStyle || 0) }}
-          >
-            {token.content}
-          </span>
-        )
-      )}
-    </span>
   )
 }
 

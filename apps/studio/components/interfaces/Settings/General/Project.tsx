@@ -77,7 +77,7 @@ export const Project = () => {
                 </div>
                 {isPaused ? (
                   shouldShowDashboardLink ? (
-                    <Button asChild variant="default">
+                    <Button asChild>
                       <Link href={`/project/${project?.ref}`}>View project dashboard</Link>
                     </Button>
                   ) : (

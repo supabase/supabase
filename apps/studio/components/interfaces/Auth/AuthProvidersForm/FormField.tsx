@@ -291,7 +291,7 @@ const FormField = ({
                       {description ? <Markdown content={description} /> : null}
                       {properties.link && (
                         <span>
-                          <Button asChild variant="default" size="tiny" icon={<ExternalLink />}>
+                          <Button asChild size="tiny" icon={<ExternalLink />}>
                             <a href={properties.link} target="_blank" rel="noreferrer noopener">
                               Documentation
                             </a>

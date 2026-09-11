@@ -92,7 +92,7 @@ export const CreateSecretAPIKeyDialog = () => {
         side="bottom"
         tooltipOpen={visible === 'secret' ? false : undefined}
       >
-        <Button variant="default" className="mt-2" icon={<Plus />} onClick={openDialog}>
+        <Button className="mt-2" icon={<Plus />} onClick={openDialog}>
           New secret key
         </Button>
       </Shortcut>
