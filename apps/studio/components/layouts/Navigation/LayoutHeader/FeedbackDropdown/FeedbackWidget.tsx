@@ -180,10 +180,10 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
       </div>
       <PopoverSeparator />
       <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
-        <Button variant="default" size="tiny" onClick={onSwitchToIssueOptions}>
+        <Button size="tiny" onClick={onSwitchToIssueOptions}>
           Get help
         </Button>
-        <Button variant="default" size="tiny" onClick={onClose}>
+        <Button size="tiny" onClick={onClose}>
           Close
         </Button>
       </div>
@@ -237,7 +237,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
       <PopoverSeparator />
 
       <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
-        <Button variant="default" size="tiny" onClick={onSwitchToIssueOptions}>
+        <Button size="tiny" onClick={onSwitchToIssueOptions}>
           Get help instead
         </Button>
         <div className="flex items-center gap-2 flex-row">
@@ -271,7 +271,6 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant="default"
                   disabled={isSavingScreenshot}
                   loading={isSavingScreenshot}
                   className="w-7"
@@ -309,6 +308,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
             onChange={onFilesUpload}
           />
           <Button
+            variant="primary"
             disabled={feedback.length === 0 || isSending}
             loading={isSending}
             onClick={() => {

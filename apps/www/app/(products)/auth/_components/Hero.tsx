@@ -20,7 +20,7 @@ export function Hero() {
         </div>
         <div className="flex items-center gap-2">
           <StartYourProjectButton />
-          <Button asChild size="medium" variant="default">
+          <Button asChild size="medium">
             <Link href="/docs/guides/auth">Documentation</Link>
           </Button>
         </div>

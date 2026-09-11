@@ -17,7 +17,7 @@ export default function DialogDemo() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="default">Show Dialog</Button>
+        <Button>Show Dialog</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -36,7 +36,7 @@ export default function DialogDemo() {
           </div>
         </DialogSection>
         <DialogFooter>
-          <Button>Save changes</Button>
+          <Button variant="primary">Save changes</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

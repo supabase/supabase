@@ -208,12 +208,7 @@ export const Destinations = () => {
         <div className="flex items-center gap-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                aria-label="More actions"
-                variant="default"
-                icon={<MoreVertical />}
-                className="px-1"
-              />
+              <Button aria-label="More actions" icon={<MoreVertical />} className="px-1" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
               <DropdownMenuItem asChild>
@@ -243,7 +238,7 @@ export const Destinations = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button asChild variant="default" icon={<MessageSquare />}>
+          <Button asChild icon={<MessageSquare />}>
             <a href={PIPELINES_FEEDBACK_URL} target="_blank" rel="noreferrer noopener">
               Leave feedback
             </a>
@@ -326,7 +321,6 @@ export const Destinations = () => {
               description="Connect an external destination for analytics workloads."
             >
               <Button
-                variant="default"
                 icon={<Plus />}
                 disabled={!newDestinationDefaultType}
                 onClick={openDestinationPanel}

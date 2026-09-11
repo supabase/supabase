@@ -611,11 +611,7 @@ export const CreateBranchModal = () => {
             </DialogSection>
 
             <DialogFooter className="justify-end gap-2" padding="medium">
-              <Button
-                variant="default"
-                disabled={isCreatingBranch}
-                onClick={() => setShowCreateBranchModal(false)}
-              >
+              <Button disabled={isCreatingBranch} onClick={() => setShowCreateBranchModal(false)}>
                 Cancel
               </Button>
               <ButtonTooltip

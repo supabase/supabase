@@ -451,10 +451,11 @@ export const CreateFunction = ({
             </form>
           </Form>
           <SheetFooter>
-            <Button disabled={isCreating || isUpdating} variant="default" onClick={confirmOnClose}>
+            <Button disabled={isCreating || isUpdating} onClick={confirmOnClose}>
               Cancel
             </Button>
             <Button
+              variant="primary"
               form={FORM_ID}
               type="submit"
               disabled={isCreating || isUpdating}
@@ -542,7 +543,6 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      variant="default"
                       icon={<Trash size={12} />}
                       onClick={() => remove(index)}
                       className="h-[34px] w-[34px]"
@@ -560,7 +560,6 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
 
         {!readonly && (
           <Button
-            variant="default"
             icon={<Plus size={12} />}
             onClick={() => append({ name: '', type: 'integer' })}
             disabled={readonly}

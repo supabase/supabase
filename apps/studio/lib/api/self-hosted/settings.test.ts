@@ -16,7 +16,6 @@ describe('api/self-hosted/settings', () => {
   let mockAssertSelfHosted: ReturnType<typeof vi.fn>
 
   beforeEach(async () => {
-    vi.clearAllMocks()
     vi.resetModules()
 
     const util = await import('./util')

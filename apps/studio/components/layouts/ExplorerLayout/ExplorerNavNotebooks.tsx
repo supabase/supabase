@@ -45,7 +45,7 @@ const NotebookListItem = ({
   )
 }
 
-export const ExplorerNavNotebooks = ({ onBack }: { onBack: () => void }) => {
+export const ExplorerNavNotebooks = () => {
   const router = useRouter()
   const { ref, id } = useParams()
 
@@ -74,12 +74,7 @@ export const ExplorerNavNotebooks = ({ onBack }: { onBack: () => void }) => {
   const itemProps = useMemo(() => ({ projectRef: ref, activeNotebookId }), [ref, activeNotebookId])
 
   return (
-    <ExplorerNavResourceWrapper
-      type="notebook"
-      search={search}
-      setSearch={setSearch}
-      onBack={onBack}
-    >
+    <ExplorerNavResourceWrapper type="notebook" search={search} setSearch={setSearch}>
       <div className="flex flex-1 min-h-0 flex-col px-3 pb-3">
         {isPending ? (
           <GenericSkeletonLoader />

@@ -338,7 +338,6 @@ export default function FormPatternsSidePanel() {
                             </Button>
                             {logoUrl && (
                               <Button
-                                variant="default"
                                 size="tiny"
                                 icon={<Trash size={12} />}
                                 onClick={() => {
@@ -445,7 +444,6 @@ export default function FormPatternsSidePanel() {
                                       {file.name}
                                     </span>
                                     <Button
-                                      variant="default"
                                       size="tiny"
                                       icon={<Trash size={12} />}
                                       onClick={() => {
@@ -772,15 +770,12 @@ export default function FormPatternsSidePanel() {
                 >
                   <div className="col-span-6 flex gap-2 items-center">
                     <Button
-                      variant="default"
                       icon={<ExternalLink size={14} />}
                       onClick={() => console.log('Action performed')}
                     >
                       View documentation
                     </Button>
-                    <Button variant="default" onClick={() => console.log('Reset action')}>
-                      Reset API key
-                    </Button>
+                    <Button onClick={() => console.log('Reset action')}>Reset API key</Button>
                   </div>
                 </FormItemLayout>
               </SheetSection>
@@ -788,7 +783,6 @@ export default function FormPatternsSidePanel() {
           </Form>
           <SheetFooter>
             <Button
-              variant="default"
               onClick={() => {
                 form.reset()
                 setOpen(false)

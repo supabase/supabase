@@ -37,7 +37,7 @@ export const ExtensionNotInstalled = ({
             Learn more
           </InlineLink>
         </p>
-        <Button variant="default" asChild className="mt-2">
+        <Button asChild className="mt-2">
           <Link
             href={
               databaseNeedsUpgrading
@@ -81,7 +81,7 @@ export const ExtensionNeedsUpgrade = ({
           Before reinstalling the wrapper extension, you must first remove all existing wrappers.
           Afterward, you can recreate the wrappers.
         </p>
-        <Button asChild variant="default">
+        <Button asChild>
           <Link
             href={
               databaseNeedsUpgrading
@@ -116,7 +116,7 @@ export const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
     <ScaffoldSection isFullWidth>
       <Admonition type="warning" title="Missing integration">
         <p>The S3 Vectors Wrapper integration is required in order to query vector tables.</p>
-        <Button variant="default" loading={isCreatingS3VectorsWrapper} onClick={onSetupWrapper}>
+        <Button loading={isCreatingS3VectorsWrapper} onClick={onSetupWrapper}>
           Install wrapper
         </Button>
       </Admonition>

@@ -9,7 +9,7 @@ import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type GetUserContentByIdResponse = Omit<
-  components['schemas']['GetUserContentByIdResponse'],
+  components['schemas']['GetUserContentByIdResponse_Output'],
   'content'
 > & {
   content: Content['content']

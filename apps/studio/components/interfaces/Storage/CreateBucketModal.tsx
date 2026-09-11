@@ -372,10 +372,11 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
         </Form>
 
         <DialogFooter>
-          <Button variant="default" disabled={isCreatingBucket} onClick={() => onOpenChange(false)}>
+          <Button disabled={isCreatingBucket} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button
+            variant="primary"
             form={formId}
             type="submit"
             loading={isCreatingBucket}

@@ -203,7 +203,7 @@ export default function IntegrationsContent({
                 {metaDescription}
               </p>
             </div>
-            <Button asChild size="tiny" className="shrink-0">
+            <Button variant="primary" asChild size="tiny" className="shrink-0">
               <Link href="https://forms.supabase.com/partner">Apply as a Partner</Link>
             </Button>
           </div>
@@ -237,7 +237,7 @@ export default function IntegrationsContent({
                 {/* Mobile-only: opens bottom sheet with filters */}
                 <Sheet>
                   <SheetTrigger asChild>
-                    <Button variant="default" size="small" className="shrink-0 md:hidden flex">
+                    <Button size="small" className="shrink-0 md:hidden flex">
                       <div className="flex gap-1.5 items-center text-foreground-lighter hover:text-foreground">
                         <Filter size={14} />
                         {activeFilterCount > 0 && (
@@ -461,7 +461,7 @@ export default function IntegrationsContent({
           className="mx-auto max-w-2xl flex flex-col items-center gap-6 py-32 px-6 text-center"
         >
           <h2 className="h2 text-balance">Interested in partnering with Supabase?</h2>
-          <Button asChild size="medium" iconRight={<ArrowRight />}>
+          <Button variant="primary" asChild size="medium" iconRight={<ArrowRight />}>
             <Link href="https://forms.supabase.com/partner">Apply as a Partner</Link>
           </Button>
         </div>

@@ -16,7 +16,7 @@ const mockNotebook = (updatedAt = UPDATED_AT) =>
     method: 'get',
     path: '/platform/projects/:ref/content/item/:id',
     response: () =>
-      HttpResponse.json<components['schemas']['GetUserContentByIdResponse']>({
+      HttpResponse.json<components['schemas']['GetUserContentByIdResponse_Output']>({
         id: NOTEBOOK_ID,
         type: 'notebook',
         name: 'Signup funnel',

@@ -52,7 +52,6 @@ vi.mock('@/data/config/project-settings-v2-query', () => ({
 
 describe('QueryResultError', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mocks.useParams.mockReturnValue({ ref: 'default' })
     mocks.useOrgSubscriptionQuery.mockReturnValue({ data: undefined, isSuccess: true })
     mocks.useProjectSettingsV2Query.mockReturnValue({ data: undefined, isSuccess: true })

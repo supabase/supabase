@@ -345,11 +345,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                   setOpen={setShowProjectDropdown}
                   modal={true}
                   onSelect={onSelectProject}
-                  renderTrigger={() => (
-                    <Button variant="default" className="w-min">
-                      Add project
-                    </Button>
-                  )}
+                  renderTrigger={() => <Button className="w-min">Add project</Button>}
                   renderRow={(project) => {
                     const hasRoleAssigned = projectsRoleConfiguration.some(
                       (p) => p.ref === project.ref
@@ -369,10 +365,11 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
             </SheetSection>
 
             <SheetFooter className="flex items-center justify-end! px-5 py-4 w-full border-t">
-              <Button variant="default" disabled={false} onClick={() => onClose()}>
+              <Button disabled={false} onClick={() => onClose()}>
                 Cancel
               </Button>
               <Button
+                variant="primary"
                 loading={false}
                 disabled={!canSaveRoles || hasNoChanges}
                 onClick={() => {

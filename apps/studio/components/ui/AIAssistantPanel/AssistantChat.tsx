@@ -21,6 +21,7 @@ import {
   resolvePendingToolApprovalsAsDenied,
 } from './AIAssistant.utils'
 import { AIOnboarding } from './AIOnboarding'
+import { AssistantAgentHarnessFooter } from './AssistantAgentHarnessFooter'
 import { AssistantChatForm } from './AssistantChatForm'
 import {
   Conversation,
@@ -445,8 +446,94 @@ export const AssistantChat = ({
   } else if (isSupportChat) {
     placeholder = 'Describe your support issue...'
   } else {
-    placeholder = 'Chat to Postgres...'
+    placeholder = 'Ask about your data, troubleshoot an issue, or explore your project...'
   }
+
+  const composer = (
+    <div className={cn('relative z-20 w-full', hasMessages && 'px-7 pb-3')}>
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-y-3">
+        {isSupportChat && !isSupportChatClosed && (
+          <div>
+            <div className="mb-3 border-t" />
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="tiny"
+                disabled={!supportConversationId}
+                onClick={() => state.setSupportLifecycleStatus(chatId, 'escalated')}
+              >
+                Escalate to human
+              </Button>
+              <Button
+                variant="outline"
+                size="tiny"
+                disabled={!supportConversationId}
+                onClick={() => state.setSupportLifecycleStatus(chatId, 'user_resolved')}
+              >
+                Resolve
+              </Button>
+            </div>
+          </div>
+        )}
+        {disablePrompts && (
+          <Admonition
+            showIcon={false}
+            type="default"
+            title="Assistant has been temporarily disabled"
+            description="We're currently looking into getting it back online"
+          />
+        )}
+
+        {isSuccess && !isApiKeySet && (
+          <Admonition
+            type="default"
+            title="OpenAI API key not set"
+            description={
+              <Markdown
+                content={
+                  'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
+                }
+              />
+            }
+          />
+        )}
+
+        <div>
+          <AssistantChatForm
+            textAreaRef={inputRef}
+            className={cn('z-20', !hasMessages && 'bg')}
+            loading={isChatLoading}
+            isEditing={!!editingMessageId}
+            disabled={isChatInputDisabled}
+            placeholder={placeholder}
+            value={value}
+            onValueChange={(e) => {
+              setValue(e.target.value)
+              onInputChange?.(e.target.value)
+            }}
+            onSubmit={(finalMessage) => {
+              sendMessageToAssistant(finalMessage)
+            }}
+            onStop={() => {
+              stop()
+              // to save partial responses from the AI
+              const lastMessage = chatMessages[chatMessages.length - 1]
+              if (lastMessage && lastMessage.role === 'assistant') {
+                state.updateMessage(lastMessage, chatId)
+              }
+            }}
+            sqlSnippets={composerContext?.sqlSnippets}
+            onRemoveSnippet={(index) => {
+              const newSnippets = [...(composerContext?.sqlSnippets ?? [])]
+              newSnippets.splice(index, 1)
+              composerContext?.onSetSqlSnippets?.(newSnippets)
+            }}
+            includeSnippetsInMessage={includeSnippetsInMessage}
+          />
+        </div>
+      </div>
+    </div>
+  )
 
   return (
     <ErrorBoundary
@@ -495,26 +582,15 @@ export const AssistantChat = ({
                     additionalActions={
                       <div className="flex items-center gap-x-2 mr-auto">
                         {isContextExceededError ? (
-                          <Button
-                            variant="default"
-                            size="tiny"
-                            onClick={onNewChat}
-                            className="text-xs"
-                          >
+                          <Button size="tiny" onClick={onNewChat} className="text-xs">
                             New chat
                           </Button>
                         ) : (
                           <>
-                            <Button
-                              variant="default"
-                              size="tiny"
-                              onClick={() => regenerate()}
-                              className="text-xs"
-                            >
+                            <Button size="tiny" onClick={() => regenerate()} className="text-xs">
                               Retry
                             </Button>
                             <ButtonTooltip
-                              variant="default"
                               size="tiny"
                               onClick={handleClearMessages}
                               className="w-7 h-7"
@@ -546,15 +622,7 @@ export const AssistantChat = ({
             </ConversationContent>
             <ConversationScrollButton />
           </Conversation>
-        ) : (
-          <AIOnboarding
-            key={chatId}
-            sqlSnippets={composerContext?.sqlSnippets}
-            suggestions={composerContext?.suggestions}
-            onValueChange={(val) => setValue(val)}
-            onFocusInput={() => inputRef.current?.focus()}
-          />
-        )}
+        ) : null}
 
         <AnimatePresence>
           {editingMessageId && (
@@ -600,87 +668,23 @@ export const AssistantChat = ({
           )}
         </AnimatePresence>
 
-        <div className="relative z-20 w-full px-7 pb-3">
-          <div className="mx-auto flex w-full max-w-3xl flex-col gap-y-3">
-            {isSupportChat && !isSupportChatClosed && (
-              <div>
-                <div className="mb-3 border-t" />
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="tiny"
-                    disabled={!supportConversationId}
-                    onClick={() => state.setSupportLifecycleStatus(chatId, 'escalated')}
-                  >
-                    Escalate to human
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="tiny"
-                    disabled={!supportConversationId}
-                    onClick={() => state.setSupportLifecycleStatus(chatId, 'user_resolved')}
-                  >
-                    Resolve
-                  </Button>
-                </div>
-              </div>
-            )}
-            {disablePrompts && (
-              <Admonition
-                showIcon={false}
-                type="default"
-                title="Assistant has been temporarily disabled"
-                description="We're currently looking into getting it back online"
-              />
-            )}
-
-            {isSuccess && !isApiKeySet && (
-              <Admonition
-                type="default"
-                title="OpenAI API key not set"
-                description={
-                  <Markdown
-                    content={
-                      'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
-                    }
-                  />
-                }
-              />
-            )}
-
-            <AssistantChatForm
-              textAreaRef={inputRef}
-              className="z-20"
-              loading={isChatLoading}
-              isEditing={!!editingMessageId}
-              disabled={isChatInputDisabled}
-              placeholder={placeholder}
-              value={value}
-              onValueChange={(e) => {
-                setValue(e.target.value)
-                onInputChange?.(e.target.value)
-              }}
-              onSubmit={(finalMessage) => {
-                sendMessageToAssistant(finalMessage)
-              }}
-              onStop={() => {
-                stop()
-                // to save partial responses from the AI
-                const lastMessage = chatMessages[chatMessages.length - 1]
-                if (lastMessage && lastMessage.role === 'assistant') {
-                  state.updateMessage(lastMessage, chatId)
-                }
-              }}
-              sqlSnippets={composerContext?.sqlSnippets}
-              onRemoveSnippet={(index) => {
-                const newSnippets = [...(composerContext?.sqlSnippets ?? [])]
-                newSnippets.splice(index, 1)
-                composerContext?.onSetSqlSnippets?.(newSnippets)
-              }}
-              includeSnippetsInMessage={includeSnippetsInMessage}
-            />
-          </div>
-        </div>
+        {hasMessages ? (
+          composer
+        ) : (
+          <AIOnboarding
+            key={chatId}
+            sqlSnippets={composerContext?.sqlSnippets}
+            suggestions={composerContext?.suggestions}
+            onValueChange={(prompt) => {
+              setValue(prompt)
+              onInputChange?.(prompt)
+            }}
+            onFocusInput={() => inputRef.current?.focus()}
+          >
+            {composer}
+            {!isSupportChat && <AssistantAgentHarnessFooter />}
+          </AIOnboarding>
+        )}
       </div>
     </ErrorBoundary>
   )

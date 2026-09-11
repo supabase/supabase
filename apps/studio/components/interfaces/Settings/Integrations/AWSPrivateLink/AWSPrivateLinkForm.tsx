@@ -255,7 +255,7 @@ export const AWSPrivateLinkForm = ({
                   <Button type="button" variant="danger" onClick={onDelete}>
                     Delete
                   </Button>
-                  <Button type="button" variant="default" onClick={() => handleOpenChange(false)}>
+                  <Button type="button" onClick={() => handleOpenChange(false)}>
                     Close
                   </Button>
                 </>
@@ -263,13 +263,12 @@ export const AWSPrivateLinkForm = ({
                 <>
                   <Button
                     type="button"
-                    variant="default"
                     disabled={isPending}
                     onClick={() => handleOpenChange(false)}
                   >
                     Cancel
                   </Button>
-                  <Button form={FORM_ID} type="submit" loading={isPending}>
+                  <Button variant="primary" form={FORM_ID} type="submit" loading={isPending}>
                     Add connection
                   </Button>
                 </>

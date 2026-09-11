@@ -56,7 +56,6 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="default"
           className="text-foreground-light"
           iconRight={<ChevronsUpDown strokeWidth={1} size={12} />}
         >

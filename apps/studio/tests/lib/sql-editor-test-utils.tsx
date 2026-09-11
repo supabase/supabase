@@ -243,7 +243,6 @@ export function setupSqlEditorMocks({
     path: '/platform/organizations/:slug/billing/subscription',
     response: {
       addons: [],
-      billing_cycle_anchor: 1700000000,
       billing_via_partner: false,
       current_period_end: 1700000000,
       current_period_start: 1700000000,
@@ -251,7 +250,6 @@ export function setupSqlEditorMocks({
       payment_method_type: 'card',
       plan: { id: 'free', name: 'Free' },
       project_addons: [],
-      scheduled_plan_change: null,
       usage_billing_enabled: false,
     },
   })
@@ -283,6 +281,7 @@ export function setupSqlEditorMocks({
       {
         identifier: ref,
         connectionString,
+        connection_string_read_only: connectionString,
         cloud_provider: 'AWS',
         db_host: `db.${ref}.supabase.co`,
         db_name: 'postgres',
