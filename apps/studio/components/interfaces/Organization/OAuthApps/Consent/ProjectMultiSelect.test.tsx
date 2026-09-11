@@ -40,7 +40,7 @@ describe('ProjectMultiSelect', () => {
     expect(trigger).not.toHaveTextContent('project-1')
   })
 
-  test('collapses the projects past the badge limit into a counter', () => {
+  test('shows two selected projects as two badges', () => {
     customRender(
       <ProjectMultiSelect
         projects={PROJECTS}
@@ -51,8 +51,21 @@ describe('ProjectMultiSelect', () => {
 
     const trigger = screen.getByRole('combobox')
     expect(trigger).toHaveTextContent('production')
+    expect(trigger).toHaveTextContent('staging')
+    expect(trigger).not.toHaveTextContent('+')
+    expect(trigger).not.toHaveTextContent('project-1')
+  })
+
+  test('collapses the projects past the badge limit into a counter', () => {
+    customRender(
+      <ProjectMultiSelect projects={MANY_PROJECTS} selectedRefs={refsUpTo(3)} onChange={vi.fn()} />
+    )
+
+    const trigger = screen.getByRole('combobox')
+    expect(trigger).toHaveTextContent('project 1')
+    expect(trigger).toHaveTextContent('project 2')
     expect(trigger).toHaveTextContent('+1')
-    expect(trigger).not.toHaveTextContent('staging')
+    expect(trigger).not.toHaveTextContent('project 3')
     expect(trigger).not.toHaveTextContent('project-1')
   })
 
