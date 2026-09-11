@@ -7,7 +7,7 @@ import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import { UseCustomQueryOptions } from '@/types'
 
-export type OverdueInvoicesResponse = components['schemas']['OverdueInvoiceCount']
+export type OverdueInvoicesResponse = components['schemas']['OverdueInvoiceCount_Output']
 
 export async function getOverdueInvoices(signal?: AbortSignal) {
   const { data, error } = await get('/platform/stripe/invoices/overdue', {

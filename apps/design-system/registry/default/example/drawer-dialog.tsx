@@ -81,7 +81,9 @@ function ProfileForm({ className }: React.ComponentProps<'form'>) {
         <Label htmlFor="username">Username</Label>
         <Input id="username" defaultValue="@shadcn" />
       </div>
-      <Button type="submit">Save changes</Button>
+      <Button variant="primary" type="submit">
+        Save changes
+      </Button>
     </form>
   )
 }

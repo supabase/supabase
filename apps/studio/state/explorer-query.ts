@@ -32,6 +32,7 @@ type ExplorerQueryDraftBase = {
   updatedAt: number
   view: QueryDisplay['view']
   chart?: QueryDisplay['chart']
+  pendingAutoRun?: boolean
 }
 
 /**
@@ -271,6 +272,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       source = createDefaultSourceBinding('database'),
       rowLimit = DEFAULT_CELL_ROW_LIMIT,
       entity,
+      autoRun = false,
     }: {
       id: string
       projectRef: string
@@ -279,6 +281,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       source?: QuerySourceBinding
       rowLimit?: number
       entity?: QueryEntityBinding
+      autoRun?: boolean
     }) => {
       const draft = toDraft({
         id,
@@ -293,11 +296,17 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
           view: 'table',
         },
       })
+      draft.pendingAutoRun = autoRun
 
       state.drafts[id] = draft
       persistDraft(draft)
 
       return id
+    },
+
+    clearPendingAutoRun: ({ id }: { id: string }) => {
+      const draft = state.drafts[id]
+      if (draft) draft.pendingAutoRun = false
     },
 
     restoreDraft: ({ id, projectRef }: { id: string; projectRef: string }) => {

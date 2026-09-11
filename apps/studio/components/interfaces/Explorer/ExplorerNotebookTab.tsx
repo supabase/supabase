@@ -16,6 +16,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   Check,
+  Copy,
   FileText,
   Keyboard,
   Loader2,
@@ -36,6 +37,7 @@ import {
   Badge,
   Button,
   Checkbox,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -49,6 +51,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   findQueryCellsMatchingSql,
   isMutatingSql,
+  notebookToMarkdown,
   type QueryCellSummary,
 } from './ExplorerNotebookTab.utils'
 import {
@@ -118,9 +121,9 @@ export const ExplorerNotebookTab = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       if (id && content === savedContentRef.current) {
-        snap.markSaved({ id })
+        snap.markSaved({ id, updatedAt: data?.updated_at })
         toast.success('Successfully saved notebook!')
         if (isSaveBeforeAnalyzeOpen) {
           setIsSaveBeforeAnalyzeOpen(false)
@@ -266,7 +269,7 @@ export const ExplorerNotebookTab = () => {
       projectRef: ref,
       id: notebookId,
       name,
-      description: currentNotebook?.notebook.description,
+      description: currentNotebook?.notebook.description ?? undefined,
       content: writableContent,
     })
   }
@@ -309,6 +312,22 @@ export const ExplorerNotebookTab = () => {
       setIsSaveBeforeAnalyzeOpen(true)
     } else {
       handleAnalyze()
+    }
+  }
+
+  const handleCopyAsMarkdown = async () => {
+    try {
+      await copyToClipboard(
+        notebookToMarkdown({
+          name: name ?? '',
+          cells,
+          getResult: (cellId) => queryCellRefs.current.get(cellId)?.getResult(),
+        }),
+        () => toast.success('Copied notebook as Markdown to clipboard')
+      )
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      toast.error('Failed to copy notebook as Markdown: ' + message)
     }
   }
 
@@ -418,6 +437,10 @@ export const ExplorerNotebookTab = () => {
                     <span>Intellisense enabled</span>
                   </div>
                   {isIntellisenseEnabled && <Check className="text-brand" size={16} />}
+                </DropdownMenuItem>
+                <DropdownMenuItem className="gap-x-2" onClick={handleCopyAsMarkdown}>
+                  <Copy size={14} />
+                  <span>Copy as Markdown</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="gap-x-2" onClick={() => setIsDeleteModalOpen(true)}>
@@ -543,7 +566,7 @@ export const ExplorerNotebookTab = () => {
       <ConfirmationModal
         size="small"
         visible={isSaveConflictOpen}
-        title="Assistant changes detected"
+        title="Notebook changed on the server"
         additionalActionLabel="Discard changes"
         confirmLabel={
           id && snap.serverDivergedWhileDirty.get(id) === 'deleted' ? 'Recreate' : 'Save anyway'
@@ -554,8 +577,8 @@ export const ExplorerNotebookTab = () => {
       >
         <p className="text-sm">
           {id && snap.serverDivergedWhileDirty.get(id) === 'deleted'
-            ? 'An assistant deleted this notebook after your local changes. Saving will recreate it.'
-            : "An assistant updated this notebook after your local changes. Saving will overwrite the assistant's update."}
+            ? 'This notebook was deleted on the server after your local changes. Saving will recreate it.'
+            : 'This notebook changed on the server after your local changes. Saving will overwrite those changes.'}
         </p>
       </ConfirmationModal>
 

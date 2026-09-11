@@ -8,7 +8,7 @@ import type { APIKeysData } from '@/data/api-keys/api-keys-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type ApiKeyResponse = components['schemas']['ApiKeyResponse']
+type ApiKeyResponse = components['schemas']['ApiKeyResponse_Output']
 
 // Permissions are non-network global state — mock the hook (the skill's allowed
 // exception), matching the neighboring PublishableAPIKeys.test.tsx.

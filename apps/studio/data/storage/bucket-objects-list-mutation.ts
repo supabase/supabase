@@ -12,7 +12,7 @@ type ListBucketObjectsParams = {
   options: components['schemas']['GetObjectsBody']['options']
 }
 
-export type StorageObject = components['schemas']['StorageObject']
+export type StorageObject = components['schemas']['StorageObject_Output']
 
 // [Joshen] Ideally we transform this into a query that uses a POST i think
 export const listBucketObjects = async (

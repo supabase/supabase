@@ -29,8 +29,6 @@ describe('/api/mcp', () => {
   beforeEach(() => {
     // Disable MSW for these tests
     mswServer.close()
-    // Clear mock state between tests
-    vi.clearAllMocks()
   })
 
   describe('Method handling', async () => {

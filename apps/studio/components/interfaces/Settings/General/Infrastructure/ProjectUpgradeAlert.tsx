@@ -283,7 +283,12 @@ export const ProjectUpgradeAlert = () => {
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={isUpgrading} loading={isUpgrading}>
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    disabled={isUpgrading}
+                    loading={isUpgrading}
+                  >
                     Confirm upgrade
                   </Button>
                 </DialogFooter>

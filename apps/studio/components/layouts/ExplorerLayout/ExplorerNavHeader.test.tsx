@@ -88,7 +88,7 @@ describe('Explorer sidebar header', () => {
 
   it('keeps the default title and badge for other product sidebars', () => {
     customRender(<ProductMenuBar title="Database" titleBadge={<span>Preview</span>} />)
-    expect(screen.getByRole('heading', { name: 'Database' })).toHaveClass('text-lg')
+    expect(screen.getByRole('heading', { name: 'Database' })).toHaveClass('text-sm')
     expect(screen.getByText('Preview')).toBeInTheDocument()
   })
 })

@@ -7,9 +7,9 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export const FIXED_ROLE_ORDER = ['Owner', 'Administrator', 'Developer', 'Read-only']
 export type OrganizationRolesVariables = { slug?: string }
-export type OrganizationRolesResponse = components['schemas']['OrganizationRoleResponse']
+export type OrganizationRolesResponse = components['schemas']['OrganizationRoleResponse_Output']
 export type OrganizationRole =
-  components['schemas']['OrganizationRoleResponse']['org_scoped_roles'][0]
+  components['schemas']['OrganizationRoleResponse_Output']['org_scoped_roles'][0]
 
 export async function getOrganizationRoles(
   { slug }: OrganizationRolesVariables,

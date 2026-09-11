@@ -138,7 +138,7 @@ export const ConnectionPooling = () => {
           toast.success(`Successfully updated pooler configuration`)
           if (data) {
             form.reset({
-              default_pool_size: data.default_pool_size,
+              default_pool_size: data.default_pool_size ?? undefined,
             })
           }
         },
@@ -165,7 +165,7 @@ export const ConnectionPooling = () => {
         </PageSectionSummary>
         <PageSectionAside>
           <DocsButton
-            href={`${DOCS_URL}/guides/database/connecting-to-postgres#connection-pooler`}
+            href={`${DOCS_URL}/guides/database/connecting-to-postgres/pooling-and-limits#how-connection-pooling-works`}
           />
         </PageSectionAside>
       </PageSectionMeta>

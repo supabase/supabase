@@ -258,7 +258,11 @@ const Reports = () => {
     if (config === undefined) return console.error('Config is required')
     upsertContent({
       projectRef: ref,
-      payload: { ...currentReport, content: config },
+      payload: {
+        ...currentReport,
+        description: currentReport.description ?? undefined,
+        content: config,
+      },
     })
   }
 

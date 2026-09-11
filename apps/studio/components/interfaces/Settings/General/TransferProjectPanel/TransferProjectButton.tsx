@@ -287,6 +287,7 @@ export const TransferProjectButton = () => {
             Cancel
           </Button>
           <Button
+            variant="primary"
             onClick={() => handleTransferProject()}
             disabled={
               !transferPreviewData || !transferPreviewData.valid || isTransferring || !selectedOrg

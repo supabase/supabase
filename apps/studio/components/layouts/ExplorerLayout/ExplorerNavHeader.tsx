@@ -1,13 +1,5 @@
 import { Plus } from 'lucide-react'
 import type { ReactNode } from 'react'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-  Button,
-} from 'ui'
 
 import {
   EXPLORER_SECTIONS,
@@ -15,6 +7,7 @@ import {
   type ExplorerResourceType,
 } from './ExplorerLayout.constants'
 import { useCreateChat, useCreateNotebook } from '@/components/interfaces/Explorer/hooks'
+import { SidebarBreadcrumb } from '@/components/layouts/Navigation/SidebarBreadcrumb'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 const getLevelLabel = (entry: ExplorerNavEntry | undefined) => {
@@ -36,38 +29,21 @@ export const ExplorerNavHeader = ({
   const entry = navStack.at(-1)
   const parentLabel = getLevelLabel(navStack.at(-2))
   const currentLabel = getLevelLabel(entry)
+  let action = rootAction
+  if (entry) {
+    action =
+      entry.level === 'notebook' || entry.level === 'chat' ? (
+        <ExplorerResourceAction type={entry.level} />
+      ) : undefined
+  }
 
   return (
-    <>
-      <Breadcrumb aria-label="Explorer navigation" className="min-w-0 flex-1">
-        <BreadcrumbList className="flex-nowrap gap-1 text-sm sm:gap-1">
-          {entry && (
-            <>
-              <BreadcrumbItem className="min-w-0">
-                <Button
-                  variant="text"
-                  className="h-auto min-w-0 p-0 text-sm text-foreground-lighter hover:text-foreground [&>span]:truncate"
-                  onClick={onBack}
-                  title={parentLabel}
-                >
-                  {parentLabel}
-                </Button>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="shrink-0" />
-            </>
-          )}
-          <BreadcrumbItem className="min-w-0">
-            <BreadcrumbPage className="truncate text-sm" title={currentLabel}>
-              {currentLabel}
-            </BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-      {!entry && rootAction}
-      {(entry?.level === 'notebook' || entry?.level === 'chat') && (
-        <ExplorerResourceAction type={entry.level} />
-      )}
-    </>
+    <SidebarBreadcrumb
+      aria-label="Explorer navigation"
+      label={currentLabel}
+      parent={entry ? { label: parentLabel, onClick: onBack } : undefined}
+      action={action}
+    />
   )
 }
 

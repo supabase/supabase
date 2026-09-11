@@ -29,7 +29,6 @@ describe('apiAuthenticate', () => {
   const mockRes = {} as any
 
   beforeEach(() => {
-    vi.clearAllMocks()
     mocks.getUserClaims.mockResolvedValue({
       claims: {
         sub: 'test-gotrue-id',

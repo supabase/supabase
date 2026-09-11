@@ -53,7 +53,7 @@ const ProductHeader = (props: Types) => {
               })}
           </div>
           <div className="flex flex-row md:flex-row md:items-center">
-            <Button asChild size="medium">
+            <Button variant="primary" asChild size="medium">
               <Link
                 href={getDashboardCtaHref(isLoggedIn)}
                 onClick={() =>

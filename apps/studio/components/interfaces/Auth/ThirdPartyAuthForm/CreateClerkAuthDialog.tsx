@@ -139,7 +139,13 @@ export const CreateClerkAuthIntegrationDialog = ({
           <Button disabled={isPending} variant="default" onClick={() => onClose()}>
             Cancel
           </Button>
-          <Button form={FORM_ID} type="submit" disabled={isPending} loading={isPending}>
+          <Button
+            variant="primary"
+            form={FORM_ID}
+            type="submit"
+            disabled={isPending}
+            loading={isPending}
+          >
             Create connection
           </Button>
         </DialogFooter>
