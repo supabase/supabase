@@ -9,7 +9,7 @@ import {
   isSelectableWarehouseSchema,
   type SchemaTableSelection,
   type SchemaWithTables,
-} from '../WarehouseModePanel/WarehouseModePanel.utils'
+} from './Warehouse.utils'
 import { WAREHOUSE_METADATA_SCHEMA } from '@/lib/warehouse'
 
 describe('WarehouseModePanel.utils:isSelectableWarehouseSchema', () => {
