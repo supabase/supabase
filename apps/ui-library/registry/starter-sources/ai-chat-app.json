@@ -1,0 +1,41 @@
+{
+  "name": "ai-chat-app",
+  "framework": "nextjs",
+  "source": {
+    "repository": "supabase-community/vercel-ai-chatbot",
+    "root": "",
+    "revision": "5a8fcfec092749263d9c3bf34cf7dda11c8ad22b",
+    "treeUrl": "https://github.com/supabase-community/vercel-ai-chatbot/tree/5a8fcfec092749263d9c3bf34cf7dda11c8ad22b"
+  },
+  "files": [
+    {
+      "path": "app/api/auth/callback/route.ts"
+    },
+    {
+      "path": "app/api/chat/route.ts"
+    },
+    {
+      "path": "app/chat/[id]/page.tsx"
+    },
+    {
+      "path": "app/page.tsx"
+    },
+    {
+      "path": "app/share/[id]/page.tsx"
+    },
+    {
+      "path": "app/sign-in/page.tsx"
+    },
+    {
+      "path": "app/sign-up/page.tsx"
+    },
+    {
+      "path": "supabase/config.toml",
+      "content": "# A string used to distinguish different Supabase projects on the same host. Defaults to the working\n# directory name when running `supabase init`.\nproject_id = \"vercel-ai-chatbot\"\n\n[api]\n# Port to use for the API URL.\nport = 54321\n# Schemas to expose in your API. Tables, views and stored procedures in this schema will get API\n# endpoints. public and storage are always included.\nschemas = [\"public\", \"storage\", \"graphql_public\"]\n# Extra schemas to add to the search_path of every request. public is always included.\nextra_search_path = [\"public\", \"extensions\"]\n# The maximum number of rows returns from a view, table, or stored procedure. Limits payload size\n# for accidental or malicious requests.\nmax_rows = 1000\n\n[db]\n# Port to use for the local database URL.\nport = 54322\n# The database major version to use. This has to be the same as your remote database's. Run `SHOW\n# server_version;` on the remote database to check.\nmajor_version = 15\n\n[studio]\n# Port to use for Supabase Studio.\nport = 54323\n\n# Email testing server. Emails sent with the local dev setup are not actually sent - rather, they\n# are monitored, and you can view the emails that would have been sent from the web interface.\n[inbucket]\n# Port to use for the email testing server web interface.\nport = 54324\nsmtp_port = 54325\npop3_port = 54326\n\n[storage]\n# The maximum file size allowed (e.g. \"5MB\", \"500KB\").\nfile_size_limit = \"50MiB\"\n\n[auth]\n# The base URL of your website. Used as an allow-list for redirects and for constructing URLs used\n# in emails.\nsite_url = \"http://localhost:3000\"\n# A list of *exact* URLs that auth providers are permitted to redirect to post authentication.\nadditional_redirect_urls = [\"http://localhost:3000/api/auth/callback\"]\n# How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one\n# week).\njwt_expiry = 3600\n# Allow/disallow new user signups to your project.\nenable_signup = true\n\n[auth.email]\n# Allow/disallow new user signups via email to your project.\nenable_signup = true\n# If enabled, a user will be required to confirm any email change on both the old, and new email\n# addresses. If disabled, only the new email is required to confirm.\ndouble_confirm_changes = true\n# If enabled, users need to confirm their email address before signing in.\nenable_confirmations = true\n\n# Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,\n# `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin`, `notion`, `twitch`,\n# `twitter`, `slack`, `spotify`, `workos`, `zoom`.\n[auth.external.github]\nenabled = true\nclient_id = \"env(AUTH_GITHUB_ID)\"\nsecret = \"env(AUTH_GITHUB_SECRET)\"\n# Overrides the default auth redirectUrl.\nredirect_uri = \"\"\n# Overrides the default auth provider URL. Used to support self-hosted gitlab, single-tenant Azure,\n# or any other third-party OIDC providers.\nurl = \"\"\n\n[analytics]\nenabled = false\nport = 54327\nvector_port = 54328\n# Setup BigQuery project to enable log viewer on local development stack.\n# See: https://supabase.com/docs/guides/getting-started/local-development#enabling-local-logging\ngcp_project_id = \"\"\ngcp_project_number = \"\"\ngcp_jwt_path = \"supabase/gcloud.json\"\n"
+    },
+    {
+      "path": "supabase/migrations/20230707053030_init.sql",
+      "content": "create table \"public\".\"chats\" (\n    \"id\" text not null,\n    \"user_id\" uuid null default auth.uid (),\n    \"payload\" jsonb\n);\n\nCREATE UNIQUE INDEX chats_pkey ON public.chats USING btree (id);\n\nalter table \"public\".\"chats\" add constraint \"chats_pkey\" PRIMARY KEY using index \"chats_pkey\";\n\nalter table \"public\".\"chats\" add constraint \"chats_user_id_fkey\" FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE not valid;\n\nalter table \"public\".\"chats\" validate constraint \"chats_user_id_fkey\";\n\n-- RLS\nalter table \"public\".\"chats\" enable row level security;\n\ncreate policy \"Allow public read for shared chats\"\non \"public\".\"chats\"\nas permissive\nfor select\nto public\nusing (((payload ->> 'sharePath'::text) IS NOT NULL));\n\ncreate policy \"Allow full access to own chats\"\non \"public\".\"chats\"\nas permissive\nfor all\nto authenticated\nusing ((auth.uid() = user_id))\nwith check ((auth.uid() = user_id));\n\n\n\n"
+    }
+  ]
+}

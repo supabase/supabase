@@ -5,6 +5,7 @@ import path from 'node:path'
 import { describe, it } from 'node:test'
 import { fileURLToPath } from 'node:url'
 
+import { getBlockArchitecture } from '../lib/block-architecture'
 import { collectMdxFiles, getDocSlug } from './library-documents'
 import { transformLibraryMdx } from './library-mdx-to-markdown'
 
@@ -129,37 +130,78 @@ description: Vue dropzone
     )
   })
 
-  it('preserves illustrative starter resources, relationships, and compatibility instructions', () => {
+  it('exports detected starter resources, source provenance, and compatibility instructions', () => {
     const source = readFileSync(
       new URL('../content/docs/starters/ai-chat-app.mdx', import.meta.url),
       'utf8'
     )
     const output = transformLibraryMdx(source)
-    assert.match(output, /overview illustrates key resources/)
-    assert.match(output, /### Added resources/)
-    assert.match(output, /public.chats/)
-    assert.match(output, /### Existing resources/)
-    assert.match(output, /Supabase Auth/)
-    assert.match(output, /### Relationships/)
-    assert.match(output, /Chat API → public.chats: Saves completed replies/)
+    assert.match(output, /## What's added/)
+    assert.match(output, /### Tables/)
+    assert.match(output, /\*\*public.chats\*\*/)
+    assert.match(output, /### Pages/)
+    assert.match(output, /### API routes/)
+    const architecture = getBlockArchitecture('ai-chat-app')
+    assert.ok(architecture.source)
+    assert.ok(
+      output.includes(
+        `Template source: [${architecture.source.revision.slice(0, 7)}](${architecture.source.url})`
+      )
+    )
+    assert.doesNotMatch(output, /### Existing resources|### Relationships|overview illustrates/)
     assert.match(output, /Next.js 13, AI SDK 2, and Supabase Auth/)
     assert.ok(output.indexOf('npx create-next-app') < output.indexOf('## Start Supabase'))
     assert.doesNotMatch(output, /CatalogPreview|BlockOverview/)
   })
 
-  it('exports existing MCP authentication and its connection to the installed function', () => {
+  it('exports the detected MCP function and preserves authentication setup in the guide', () => {
     const source = readFileSync(
       new URL('../content/docs/headless/mcp-server.mdx', import.meta.url),
       'utf8'
     )
     const output = transformLibraryMdx(source, { documentSlug: 'headless/mcp-server' })
-    assert.match(output, /### Added resources/)
-    assert.match(output, /edge-function/)
-    assert.match(output, /### Existing resources/)
-    assert.match(output, /Supabase Auth/)
-    assert.match(output, /### Relationships/)
+    assert.match(output, /## What's added/)
+    assert.match(output, /### Edge Functions/)
+    assert.match(output, /\*\*mcp-server\*\*/)
+    assert.doesNotMatch(output, /### Existing resources|### Relationships/)
     assert.match(output, /https:\/\/supabase.com\/library\/docs\/nextjs\/oauth-consent.md/)
     assert.match(output, /No\n?\s*`components.json` is required/)
+  })
+
+  it('reports an empty primitive inventory truthfully for component-only blocks', () => {
+    const output = transformLibraryMdx('<BlockOverview name="dropzone-nextjs" />')
+    assert.match(
+      output,
+      /No tables, Edge Functions, API routes, or pages were detected in the supplied files/
+    )
+    assert.doesNotMatch(output, /### Tables|### Edge Functions|### API routes|### Pages|capability/)
+  })
+
+  it('exports exactly the same entity inventory consumed by the rendered overview', () => {
+    for (const name of [
+      'password-based-auth-nextjs',
+      'mcp-server',
+      'ai-chat-app',
+      'flutter-starter',
+      'dropzone-nextjs',
+    ]) {
+      const architecture = getBlockArchitecture(name)
+      const output = transformLibraryMdx(`<BlockOverview name="${name}" />`)
+      const exportedNames = Array.from(
+        output.matchAll(/^- \*\*([^*]+)\*\*/gm),
+        ([, name]) => name
+      ).sort()
+      const manifestNames = architecture.resources
+        .map((resource) =>
+          resource.schema ? `${resource.schema}.${resource.name}` : resource.name
+        )
+        .sort()
+      assert.deepEqual(exportedNames, manifestNames, name)
+      for (const resource of architecture.resources) {
+        if (resource.route)
+          assert.ok(output.includes(resource.route), `${name}: missing route ${resource.route}`)
+      }
+    }
   })
 
   it('keeps dynamic TanStack DB setup with a noninteractive fallback', () => {
@@ -218,7 +260,7 @@ description: Vue dropzone
     )
     assert.throws(
       () => transformLibraryMdx('<BlockOverview name="missing-block" />'),
-      /Missing registry item.*missing-block/
+      /Missing generated resources for block.*missing-block/
     )
     assert.throws(() => transformLibraryMdx('<BlockItem />'), /requires a name/)
     assert.throws(

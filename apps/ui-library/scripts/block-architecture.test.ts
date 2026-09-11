@@ -1,302 +1,143 @@
 import assert from 'node:assert/strict'
-import { readdirSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { describe, it } from 'node:test'
+import { fileURLToPath } from 'node:url'
 
-import { starterArchitectureDefinitions } from '../config/starter-architecture'
-import { generateBlockArchitecture, summarizeBlockArchitecture } from '../lib/block-architecture'
+import { starterSources, type StarterSourceSnapshot } from '../config/starter-sources'
+import { getBlockArchitecture } from '../lib/block-architecture'
+import { getInstalledPath, resolveRegistryItem } from '../lib/registry-resolution'
 import { registry } from '../registry'
+import { collectMdxFiles } from './library-documents'
 
-function registryItem(name: string) {
-  return JSON.parse(
-    readFileSync(
-      new URL(`../registry/default/blocks/${name}/registry-item.json`, import.meta.url),
-      'utf8'
-    )
-  )
-}
+const resourceKinds = new Set(['table', 'edge-function', 'api-route', 'page'])
 
-describe('block architecture', () => {
-  it('summarizes application structure without repeating implementation files', () => {
-    const definition = registry.items.find((item) => item.name === 'password-based-auth-nextjs')!
-    const overview = summarizeBlockArchitecture(generateBlockArchitecture(definition))
-    assert.ok(
-      overview.resources.every(
-        (resource) =>
-          !['client', 'hook', 'utility', 'config', 'file', 'migration'].includes(resource.kind)
-      )
-    )
-    const signIn = overview.resources.find((resource) => resource.route === '/auth/login')!
-    assert.equal(signIn.label, 'Sign in')
-    assert.equal(signIn.description, 'Sign in with email and password')
-    assert.ok(overview.resources.some((resource) => resource.label === 'Sign in form'))
-    assert.ok(!overview.resources.some((resource) => /\.(tsx?|json)$/.test(resource.label)))
-    assert.ok(
-      overview.relationships.every(
-        (relationship) =>
-          overview.resources.some((resource) => resource.id === relationship.source) &&
-          overview.resources.some((resource) => resource.id === relationship.target)
-      )
-    )
-  })
-
-  it('represents a headless block as one capability rather than its helper files', () => {
-    const definition = registry.items.find((item) => item.name === 'supabase-client-nextjs')!
-    const overview = summarizeBlockArchitecture(generateBlockArchitecture(definition))
-    assert.equal(overview.resources.length, 1)
-    assert.equal(overview.resources[0].kind, 'capability')
-    assert.equal(overview.resources[0].label, definition.title)
-  })
-
-  it('groups all MCP implementation files into its single deployed Edge Function', () => {
-    const definition = registryItem('mcp-server')
-    const graph = generateBlockArchitecture(definition)
-    assert.equal(graph.fileCount, definition.files.length)
-    const functions = graph.resources.filter((resource) => resource.kind === 'edge-function')
-    assert.equal(functions.length, 1)
-    assert.equal(functions[0].label, 'MCP server')
-    assert.equal(functions[0].files.length, 7)
-  })
-
-  it('derives Next.js pages, handlers, middleware, and components from the installed files', () => {
-    const graph = generateBlockArchitecture(registryItem('password-based-auth-nextjs'))
-    assert.equal(graph.resources.find((resource) => resource.route === '/auth/login')?.kind, 'page')
-    assert.equal(
-      graph.resources.find((resource) => resource.route === '/auth/confirm')?.kind,
-      'route'
-    )
-    assert.ok(graph.resources.some((resource) => resource.kind === 'middleware'))
-    assert.ok(
-      graph.resources.some((resource) => resource.files.includes('components/login-form.tsx'))
-    )
-    assert.equal(graph.resources.filter((resource) => resource.kind === 'page').length, 7)
-    assert.equal(graph.resources.filter((resource) => resource.kind === 'component').length, 5)
-    assert.ok(
-      graph.resources
-        .filter((resource) => resource.files.length)
-        .every((resource) => resource.status === 'added')
-    )
-  })
-
-  it('distinguishes framework middleware from the Supabase session helper', () => {
-    const definition = registry.items.find((item) => item.name === 'password-based-auth-nextjs')!
-    const graph = generateBlockArchitecture(definition)
-    assert.equal(graph.resources.filter((resource) => resource.kind === 'middleware').length, 1)
-    assert.equal(
-      graph.resources.find((resource) => resource.files.includes('lib/supabase/middleware.ts'))
-        ?.kind,
-      'client'
-    )
-  })
-
-  it('derives flat React Router and pathless TanStack routes without claiming runtime connections', () => {
-    const router = generateBlockArchitecture(registryItem('password-based-auth-react-router'))
-    assert.equal(
-      router.resources.find((resource) => resource.route === '/auth/confirm')?.kind,
-      'route'
-    )
-    assert.equal(
-      router.resources.find((resource) => resource.files[0] === 'app/routes.ts')?.kind,
-      'file'
-    )
-    const tanstack = generateBlockArchitecture(registryItem('password-based-auth-tanstack'))
-    assert.equal(
-      tanstack.resources.find((resource) => resource.route === '/protected')?.kind,
-      'route'
-    )
-    assert.equal(
-      tanstack.resources.find((resource) => resource.files[0] === 'routes/_protected.tsx')?.kind,
-      'layout'
-    )
-    assert.deepEqual(tanstack.relationships, [])
-  })
-
-  it('handles route groups, index routes, dynamic routes, Vue pages, and server handlers', () => {
-    const graph = generateBlockArchitecture({
-      name: 'routes',
-      files: [
-        { path: 'app/(auth)/login/page.tsx' },
-        { path: 'app/index/page.tsx' },
-        { path: 'app/notpage.tsx' },
-        { path: 'routes/_app.users.$id.tsx' },
-        { path: 'pages/account/index.vue' },
-        { path: 'server/api/profile.get.ts' },
-      ],
-    })
-    assert.equal(graph.resources[0].route, '/login')
-    assert.equal(graph.resources[1].route, '/index')
-    assert.equal(graph.resources[2].kind, 'file')
-    assert.equal(graph.resources[3].route, '/users/:id')
-    assert.equal(graph.resources[4].route, '/account')
-    assert.equal(graph.resources[5].kind, 'route')
-    assert.equal(graph.resources[5].route, '/api/profile')
-  })
-
-  it('shows SQL migrations without inventing database tables from their filenames', () => {
-    const graph = generateBlockArchitecture({
-      name: 'database',
-      files: [{ path: 'supabase/migrations/20260101_create_users.sql' }],
-    })
-    assert.equal(graph.resources[0].kind, 'migration')
-    assert.ok(!graph.resources.some((resource) => resource.kind === 'table'))
-    assert.equal(generateBlockArchitecture({ name: 'empty' }).resources.length, 0)
-  })
-
-  it('uses explicit resources and relationships to describe database and service architecture', () => {
-    const graph = generateBlockArchitecture({
-      name: 'upload',
-      files: [{ path: 'components/uploader.tsx', type: 'registry:component' }],
-      meta: {
-        architecture: {
-          resources: [
-            {
-              id: 'uploader',
-              label: 'Uploader',
-              kind: 'component',
-              files: ['components/uploader.tsx'],
-            },
-            { id: 'uploads', label: 'uploads', kind: 'table', description: 'Upload metadata' },
-            { id: 'storage', label: 'Files', kind: 'bucket', status: 'existing' },
-          ],
-          relationships: [
-            { source: 'uploader', target: 'uploads', label: 'Saves metadata' },
-            {
-              source: 'component:components/uploader.tsx',
-              target: 'storage',
-              label: 'Uploads files',
-            },
-            { source: 'uploader', target: 'uploads', label: 'Saves metadata' },
-          ],
-        },
-      },
-    })
-    assert.equal(graph.fileCount, 1)
-    assert.equal(graph.resources.length, 3)
-    assert.equal(graph.resources.find((resource) => resource.id === 'storage')?.status, 'existing')
-    assert.equal(graph.resources.find((resource) => resource.id === 'uploads')?.status, 'added')
-    assert.equal(graph.relationships.length, 2)
-    assert.equal(graph.relationships[1].source, 'uploader')
-  })
-
-  it('deduplicates identical files and does not mutate the block definition', () => {
-    const definition = {
-      name: 'hook',
-      files: [
-        { path: 'registry/default/blocks/hook/hooks/use-data.ts', type: 'registry:hook' },
-        { path: 'registry/default/blocks/hook/hooks/use-data.ts', type: 'registry:hook' },
-      ],
-    }
-    const before = JSON.stringify(definition)
-    const first = generateBlockArchitecture(definition)
-    assert.equal(first.fileCount, 1)
-    assert.equal(first.resources[0].kind, 'hook')
-    assert.deepEqual(generateBlockArchitecture(definition), first)
-    assert.equal(JSON.stringify(definition), before)
-  })
-
-  it('rejects conflicting files instead of hiding one installed source', () => {
-    assert.throws(
-      () =>
-        generateBlockArchitecture({
-          name: 'conflict',
-          files: [
-            { path: 'registry/default/blocks/hook/hooks/use-data.ts' },
-            { path: 'other/source.ts', target: './hooks/use-data.ts' },
-          ],
-        }),
-      /Architecture "conflict": conflicting destination "hooks\/use-data.ts"/
-    )
-  })
-
-  it('rejects duplicate resource IDs, unknown files, and missing relationship endpoints', () => {
-    const resource = { id: 'uploads', label: 'Uploads', kind: 'table' as const }
-    assert.throws(
-      () =>
-        generateBlockArchitecture({
-          name: 'duplicate',
-          meta: { architecture: { resources: [resource, resource] } },
-        }),
-      /duplicate resource ID "uploads"/
-    )
-    assert.throws(
-      () =>
-        generateBlockArchitecture({
-          name: 'missing-file',
-          meta: { architecture: { resources: [{ ...resource, files: ['missing.sql'] }] } },
-        }),
-      /resource "uploads" references missing file "missing.sql"/
-    )
-    assert.throws(
-      () =>
-        generateBlockArchitecture({
-          name: 'missing-endpoint',
-          meta: {
-            architecture: {
-              resources: [resource],
-              relationships: [{ source: 'uploads', target: 'missing' }],
-            },
-          },
-        }),
-      /relationship "uploads" -> "missing" references a missing resource/
-    )
-  })
-
-  it('resolves every block documentation overview to exactly one nonempty architecture definition', () => {
-    const directory = new URL('../content/docs/', import.meta.url)
-    const pages = readdirSync(directory, { recursive: true })
-      .filter((file): file is string => typeof file === 'string')
-      .filter((file) => file.endsWith('.mdx') && !file.startsWith('getting-started/'))
-    const definitions = [...registry.items, ...starterArchitectureDefinitions]
+describe('generated block architecture', () => {
+  it('resolves every documentation overview to resources supported by source files', () => {
+    const directory = fileURLToPath(new URL('../content/docs/', import.meta.url))
+    const pages = collectMdxFiles(directory).filter((file) => !file.includes('/getting-started/'))
     assert.ok(pages.length > 0)
     for (const page of pages) {
-      const source = readFileSync(new URL(page, directory), 'utf8')
-      assert.doesNotMatch(
-        source,
-        /<RegistryBlock|^## Folder structure/m,
-        `${page} duplicates the file tab in the body`
-      )
+      const source = readFileSync(page, 'utf8')
+      assert.doesNotMatch(source, /<RegistryBlock|^## Folder structure/m, page)
       const overviews = Array.from(source.matchAll(/<BlockOverview\s+name="([^"]+)"/g))
       assert.equal(overviews.length, 1, `${page} must render one architecture overview`)
-      if (/<BlockOverview\b[^>]*\bshowFiles\b/.test(source)) {
-        const files = JSON.parse(
-          readFileSync(new URL(`../public/r/${overviews[0][1]}.json`, import.meta.url), 'utf8')
-        ).files
-        assert.ok(files.length > 0, `${page} has no files for its Files tab`)
-      }
-      const matches = definitions.filter((definition) => definition.name === overviews[0][1])
-      assert.equal(matches.length, 1, `${page} must resolve to one definition`)
-      const graph = generateBlockArchitecture(matches[0])
-      assert.ok(graph.resources.length > 0, `${page} must describe its architecture`)
+      const name = overviews[0][1]
+      const architecture = getBlockArchitecture(name)
+      assert.equal(architecture.name, name)
+      assert.ok(architecture.title.trim(), `${name} has no title`)
+      assert.ok(Array.isArray(architecture.diagnostics), `${name} has no diagnostics list`)
       assert.equal(
-        new Set(graph.resources.map((resource) => resource.id)).size,
-        graph.resources.length
+        new Set(architecture.resources.map((resource) => resource.id)).size,
+        architecture.resources.length,
+        name
       )
+      for (const resource of architecture.resources) {
+        assert.ok(
+          resourceKinds.has(resource.kind),
+          `${name}: unsupported resource ${resource.kind}`
+        )
+        assert.ok(resource.name.trim(), `${name}: unnamed resource`)
+        assert.ok(resource.files.length > 0, `${name}: ${resource.id} has no source files`)
+      }
+      if (/<BlockOverview\b[^>]*\bshowFiles\b/.test(source)) {
+        const resolved = resolveRegistryItem(registry, name)
+        const installedPaths = new Set(resolved.files.map(getInstalledPath))
+        assert.equal(architecture.fileCount, installedPaths.size, name)
+        for (const resource of architecture.resources) {
+          assert.ok(
+            resource.files.every((file) => installedPaths.has(file)),
+            `${name}: ${resource.id} references files outside its resolved registry`
+          )
+        }
+      }
+    }
+  })
+
+  it('does not invent primitive resources for blocks containing only client or component files', () => {
+    for (const name of ['supabase-client-nextjs', 'dropzone-nextjs', 'infinite-query-composable']) {
+      const architecture = getBlockArchitecture(name)
+      assert.ok(architecture.fileCount > 0, name)
+      assert.deepEqual(architecture.resources, [], name)
+    }
+  })
+
+  it('groups MCP source evidence into one Edge Function and keeps the full installed file count', () => {
+    const architecture = getBlockArchitecture('mcp-server')
+    assert.equal(architecture.fileCount, 7)
+    assert.equal(architecture.resources.length, 1)
+    const resource = architecture.resources[0]
+    assert.equal(resource.kind, 'edge-function')
+    assert.equal(resource.name, 'mcp-server')
+    assert.equal(resource.files.length, 6)
+    assert.ok(resource.files.every((file) => file.startsWith('supabase/functions/mcp-server/')))
+    assert.ok(resource.files.includes('supabase/functions/mcp-server/index.ts'))
+    assert.ok(!resource.files.includes('supabase/functions/mcp-server/.env.example'))
+  })
+
+  it('detects Next.js authentication pages and the confirmation API route without inventing tables', () => {
+    const architecture = getBlockArchitecture('password-based-auth-nextjs')
+    assert.equal(
+      architecture.resources.find((resource) => resource.route === '/auth/login')?.kind,
+      'page'
+    )
+    assert.equal(
+      architecture.resources.find((resource) => resource.route === '/auth/confirm')?.kind,
+      'api-route'
+    )
+    assert.equal(architecture.resources.filter((resource) => resource.kind === 'page').length, 7)
+    assert.equal(architecture.resources.filter((resource) => resource.kind === 'table').length, 0)
+    assert.ok(
+      architecture.resources.every(
+        (resource) => resource.kind === 'page' || resource.kind === 'api-route'
+      )
+    )
+  })
+
+  it('retains the exact pinned starter source provenance and file evidence', () => {
+    for (const descriptor of starterSources) {
+      const snapshot: StarterSourceSnapshot = JSON.parse(
+        readFileSync(
+          new URL(`../registry/starter-sources/${descriptor.name}.json`, import.meta.url),
+          'utf8'
+        )
+      )
+      const architecture = getBlockArchitecture(descriptor.name)
+      assert.deepEqual(architecture.source, {
+        url: snapshot.source.treeUrl,
+        revision: snapshot.source.revision,
+      })
+      assert.equal(architecture.fileCount, snapshot.files.length)
+      const inputPaths = new Set(snapshot.files.map((file) => file.path))
+      assert.ok(architecture.resources.length > 0, descriptor.name)
       assert.ok(
-        graph.relationships.every(
-          (relationship) =>
-            graph.resources.some((resource) => resource.id === relationship.source) &&
-            graph.resources.some((resource) => resource.id === relationship.target)
+        architecture.resources.every((resource) =>
+          resource.files.every((file) => inputPaths.has(file))
         ),
-        `${page} has invalid relationship endpoints`
+        descriptor.name
       )
     }
   })
 
-  it('declares MCP authentication as an existing service connected to the added function', () => {
-    const definition = registry.items.find((item) => item.name === 'mcp-server')
-    assert.ok(definition)
-    const graph = generateBlockArchitecture(definition)
-    const edgeFunction = graph.resources.find((resource) => resource.kind === 'edge-function')
-    const auth = graph.resources.find(
-      (resource) => resource.kind === 'service' && /auth/i.test(resource.label)
+  it('derives the Flutter profiles table and screens from the template snapshot', () => {
+    const architecture = getBlockArchitecture('flutter-starter')
+    const profiles = architecture.resources.find(
+      (resource) => resource.kind === 'table' && resource.name === 'profiles'
     )
-    assert.ok(edgeFunction)
-    assert.ok(auth)
-    assert.equal(edgeFunction.status, 'added')
-    assert.equal(auth.status, 'existing')
+    assert.ok(profiles)
+    assert.equal(profiles.schema, 'public')
+    assert.deepEqual(profiles.files, ['supabase/migrations/20240404030631_init.sql'])
     assert.ok(
-      graph.relationships.some(
-        (relationship) => relationship.source === edgeFunction.id && relationship.target === auth.id
+      architecture.resources.some(
+        (resource) =>
+          resource.kind === 'page' && resource.files.includes('lib/pages/splash_page.dart')
       )
     )
+    assert.equal(architecture.resources.filter((resource) => resource.kind === 'table').length, 1)
+  })
+
+  it('rejects missing block names instead of returning a fabricated overview', () => {
+    for (const name of ['missing-block', '__proto__', 'constructor']) {
+      assert.throws(() => getBlockArchitecture(name), /Missing generated resources for block/)
+    }
   })
 })

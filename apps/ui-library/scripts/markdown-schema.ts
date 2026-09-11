@@ -1,11 +1,6 @@
 import path from 'node:path'
 
-import { starterArchitectureDefinitions } from '../config/starter-architecture'
-import {
-  generateBlockArchitecture,
-  summarizeBlockArchitecture,
-  type BlockArchitecture,
-} from '../lib/block-architecture'
+import { getBlockArchitecture, type BlockArchitecture } from '../lib/block-architecture'
 import { getInstallCommands } from '../lib/install-command'
 import { generateRegistryTree, type RegistryNode } from '../lib/process-registry'
 import { resolveRegistryItem } from '../lib/registry-resolution'
@@ -78,31 +73,41 @@ function RegistryBlock({ props, options }: HandlerContext): string {
 }
 
 function formatArchitecture(architecture: BlockArchitecture): string {
-  const sections = ['## Architecture']
-  for (const status of ['added', 'existing'] as const) {
-    const resources = architecture.resources.filter((resource) => resource.status === status)
+  const sections = ["## What's added"]
+  const labels = {
+    table: 'Tables',
+    'edge-function': 'Edge Functions',
+    'api-route': 'API routes',
+    page: 'Pages',
+  } as const
+  for (const [kind, label] of Object.entries(labels)) {
+    const resources = architecture.resources.filter((resource) => resource.kind === kind)
     if (!resources.length) continue
-    sections.push(status === 'added' ? '### Added resources' : '### Existing resources')
+    sections.push(`### ${label}`)
     sections.push(
       resources
         .map((resource) => {
-          const route = resource.route ? `; route \`${resource.route}\`` : ''
-          const description = resource.description ? `: ${resource.description}` : ''
-          return `- **${resource.label}** (${resource.kind}${route})${description}`
+          const name = resource.schema ? `${resource.schema}.${resource.name}` : resource.name
+          const route =
+            resource.route && resource.route !== resource.name ? ` — \`${resource.route}\`` : ''
+          return `- **${name}**${route}`
         })
         .join('\n')
     )
   }
-  if (architecture.relationships.length) {
-    const labels = new Map(architecture.resources.map((resource) => [resource.id, resource.label]))
-    sections.push('### Relationships')
+  if (!architecture.resources.length) {
     sections.push(
-      architecture.relationships
-        .map(({ source, target, label }) => {
-          const description = label ? `: ${label}` : ''
-          return `- ${labels.get(source)} → ${labels.get(target)}${description}`
-        })
-        .join('\n')
+      'No tables, Edge Functions, API routes, or pages were detected in the supplied files.'
+    )
+  }
+  if (architecture.diagnostics.length) {
+    sections.push(
+      'Some resources could not be determined from the supplied files. Follow the complete setup guide for details.'
+    )
+  }
+  if (architecture.source) {
+    sections.push(
+      `Template source: [${architecture.source.revision.slice(0, 7)}](${architecture.source.url}).`
     )
   }
   return sections.join('\n\n')
@@ -110,21 +115,14 @@ function formatArchitecture(architecture: BlockArchitecture): string {
 
 function BlockOverview({ props, children, options }: HandlerContext): string {
   const name = requiredName(props, 'name')
-  const template = starterArchitectureDefinitions.find((item) => item.name === name)
-  const definition = template ?? resolveRegistryItem(registry, name)
-  const architecture = formatArchitecture(
-    summarizeBlockArchitecture(generateBlockArchitecture(definition))
-  )
-  const scope = template
-    ? 'This template overview illustrates key resources. It is not a complete inventory of scaffolded files.'
-    : ''
+  const architecture = formatArchitecture(getBlockArchitecture(name))
   const files =
     props.showFiles === true || props.showFiles === 'true'
       ? ['## Files', RegistryBlock({ props: { itemName: name }, children: '', options })].join(
           '\n\n'
         )
       : ''
-  return [children, scope, architecture, files].filter(Boolean).join('\n\n')
+  return [children, architecture, files].filter(Boolean).join('\n\n')
 }
 
 function formatTree(nodes: RegistryNode[], indent = 0): string {

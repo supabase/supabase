@@ -36,7 +36,7 @@ The shared command helper supplies both the page and its Markdown export. Vue co
 
 The primary Copy prompt action points agents to the canonical `/library/docs/<framework>/<slug>.md` guide. It does not repeat installation commands. Starter prompts describe creating a new application; block prompts describe integrating into the existing project. The page also exposes a Markdown link.
 
-The Markdown exporter reads the same MDX body, expands registry commands and file trees, and preserves architecture summaries. Instruction-bearing MDX components need an explicit Markdown handler and a fixture in `scripts/library-mdx-to-markdown.test.ts`. Missing registry files, document references, or unsupported components fail generation.
+The Markdown exporter reads the same MDX body, expands registry commands and file trees, and preserves resource summaries. Instruction-bearing MDX components need an explicit Markdown handler and a fixture in `scripts/library-mdx-to-markdown.test.ts`. Missing registry files, document references, or unsupported components fail generation.
 
 Register discoverable blocks and starter apps in `config/library.ts` and the existing navigation definitions in `config/docs.ts`. The catalog test compares these routes with the actual content directory. Keep intentional omissions explicit in that test.
 
@@ -48,14 +48,21 @@ From this directory, regenerate local database types with:
 supabase gen types --local > registry/default/fixtures/database.types.ts
 ```
 
-## Block architecture
+## What’s added
 
-Add `showFiles` to `BlockOverview` to display the registry's folder tree and source code in a Files tab. Keep installation notes in the page body; the folder tree is rendered once in the overview. Markdown exports retain the tree and registry source link.
+The overview shows four types of resources: tables, Edge Functions, API routes, and pages. It is generated from source files with the reusable `analyzeProjectResources` utility in `packages/common/project-resources`. The utility accepts root-relative paths and contents, performs no file or network access, and returns detected resources plus diagnostics. It has no React or registry dependency.
 
-Wrap a block's preview in `<BlockOverview name="registry-item-name">`, or use a self-closing element for blocks without a preview. The shared overview reads the resolved registry definition, including its client files. Installed paths determine pages, routes, middleware, components, and helpers. Files under `supabase/functions/<name>` become one Edge Function.
+Registry generation finishes by building `__registry__/resources.json`. The analysis combines each block's files with its Supabase registry dependencies. The HTML diagram and Markdown export both read this generated inventory. No per-block resource declarations or relationship maps are needed. Blocks that only add components or helpers have an empty resource overview; their source files remain available in the Files tab.
 
-The displayed overview summarizes application structure: pages, components, server routes, Edge Functions, and data resources. Client helpers, hooks, configuration, and other implementation files remain in the file tree. Use descriptive labels and explain each resource's purpose. Use `kind: "capability"` for a meaningful feature implemented across helper files, such as billing operations. Blocks that only supply helpers are summarized as one capability.
+Edge Function entrypoints identify one function regardless of its implementation file count. Postgres parsing identifies table creation statements in supplied migrations and schemas. Framework conventions identify pages and API routes. Detection covers the supplied setup files; it does not compare them with a user's live project or deploy resources. Diagnostics mark input that could not be analyzed completely.
 
-Declare resources that cannot be derived from file paths in the registry item's `meta.architecture.resources`, such as tables created by setup instructions, Storage buckets, or existing services. Each resource has an `id`, `kind`, and `label`; optional `description`, `files`, and `status` fields describe its provenance. Use `status: "existing"` for resources the block uses without creating them. Declared `files` can group or override resources inferred from those installed paths. SQL migration filenames do not imply that a table is created.
+Starter inputs are generated source snapshots in `registry/starter-sources/`, with source revisions recorded in each snapshot. Refresh them explicitly when updating a template:
 
-Use `meta.architecture.relationships` to connect resource IDs with `source`, `target`, and an optional `label`. Connections describe declared relationships; filenames alone do not imply runtime connections. See the [MCP definition](registry/default/blocks/mcp-server/registry-item.json) for an Edge Function connected to existing Auth, and [starter definitions](config/starter-architecture.ts) for tables and buckets supplied by templates. Run `pnpm test:architecture` to validate generation and documentation coverage.
+```bash
+pnpm --filter library update:starter-sources
+pnpm --filter library build:registry
+```
+
+Pass a starter name to refresh only that source, for example `pnpm --filter library update:starter-sources flutter-starter`. The refresh reads public template repositories and the committed local Flutter example; ordinary builds work from the checked-in snapshots without network access. The overview links to the analyzed revision. Do not edit snapshots or `__registry__/resources.json` by hand.
+
+Run `pnpm --filter common test:project-resources` for the standalone utility tests, or `pnpm --filter library test:architecture` for both utility and integration coverage.

@@ -1,0 +1,1233 @@
+{
+  "ai-chat-app": {
+    "name": "ai-chat-app",
+    "title": "AI Chat App",
+    "fileCount": 9,
+    "source": {
+      "url": "https://github.com/supabase-community/vercel-ai-chatbot/tree/5a8fcfec092749263d9c3bf34cf7dda11c8ad22b",
+      "revision": "5a8fcfec092749263d9c3bf34cf7dda11c8ad22b"
+    },
+    "resources": [
+      {
+        "id": "api-route:/api/auth/callback",
+        "kind": "api-route",
+        "name": "/api/auth/callback",
+        "route": "/api/auth/callback",
+        "files": [
+          "app/api/auth/callback/route.ts"
+        ]
+      },
+      {
+        "id": "api-route:/api/chat",
+        "kind": "api-route",
+        "name": "/api/chat",
+        "route": "/api/chat",
+        "files": [
+          "app/api/chat/route.ts"
+        ]
+      },
+      {
+        "id": "page:/",
+        "kind": "page",
+        "name": "/",
+        "route": "/",
+        "files": [
+          "app/page.tsx"
+        ]
+      },
+      {
+        "id": "page:/chat/:id",
+        "kind": "page",
+        "name": "/chat/:id",
+        "route": "/chat/:id",
+        "files": [
+          "app/chat/[id]/page.tsx"
+        ]
+      },
+      {
+        "id": "page:/share/:id",
+        "kind": "page",
+        "name": "/share/:id",
+        "route": "/share/:id",
+        "files": [
+          "app/share/[id]/page.tsx"
+        ]
+      },
+      {
+        "id": "page:/sign-in",
+        "kind": "page",
+        "name": "/sign-in",
+        "route": "/sign-in",
+        "files": [
+          "app/sign-in/page.tsx"
+        ]
+      },
+      {
+        "id": "page:/sign-up",
+        "kind": "page",
+        "name": "/sign-up",
+        "route": "/sign-up",
+        "files": [
+          "app/sign-up/page.tsx"
+        ]
+      },
+      {
+        "name": "chats",
+        "schema": "public",
+        "id": "table:[\"public\",\"chats\"]",
+        "kind": "table",
+        "files": [
+          "supabase/migrations/20230707053030_init.sql"
+        ]
+      }
+    ],
+    "diagnostics": []
+  },
+  "current-user-avatar-nextjs": {
+    "name": "current-user-avatar-nextjs",
+    "title": "Current User Avatar",
+    "fileCount": 6,
+    "resources": [],
+    "diagnostics": []
+  },
+  "current-user-avatar-nuxtjs": {
+    "name": "current-user-avatar-nuxtjs",
+    "title": "Current User Avatar",
+    "fileCount": 3,
+    "resources": [],
+    "diagnostics": []
+  },
+  "current-user-avatar-react": {
+    "name": "current-user-avatar-react",
+    "title": "Current User Avatar",
+    "fileCount": 4,
+    "resources": [],
+    "diagnostics": []
+  },
+  "current-user-avatar-react-router": {
+    "name": "current-user-avatar-react-router",
+    "title": "Current User Avatar",
+    "fileCount": 5,
+    "resources": [],
+    "diagnostics": []
+  },
+  "current-user-avatar-tanstack": {
+    "name": "current-user-avatar-tanstack",
+    "title": "Current User Avatar",
+    "fileCount": 5,
+    "resources": [],
+    "diagnostics": []
+  },
+  "current-user-avatar-vue": {
+    "name": "current-user-avatar-vue",
+    "title": "Current User Avatar",
+    "fileCount": 3,
+    "resources": [],
+    "diagnostics": []
+  },
+  "dropzone-nextjs": {
+    "name": "dropzone-nextjs",
+    "title": "Dropzone (File Upload)",
+    "fileCount": 5,
+    "resources": [],
+    "diagnostics": []
+  },
+  "dropzone-nuxtjs": {
+    "name": "dropzone-nuxtjs",
+    "title": "Dropzone (File Upload) for Nuxt and Supabase",
+    "fileCount": 4,
+    "resources": [],
+    "diagnostics": []
+  },
+  "dropzone-react": {
+    "name": "dropzone-react",
+    "title": "Dropzone (File Upload)",
+    "fileCount": 3,
+    "resources": [],
+    "diagnostics": []
+  },
+  "dropzone-react-router": {
+    "name": "dropzone-react-router",
+    "title": "Dropzone (File Upload)",
+    "fileCount": 4,
+    "resources": [],
+    "diagnostics": []
+  },
+  "dropzone-tanstack": {
+    "name": "dropzone-tanstack",
+    "title": "Dropzone (File Upload)",
+    "fileCount": 4,
+    "resources": [],
+    "diagnostics": []
+  },
+  "dropzone-vue": {
+    "name": "dropzone-vue",
+    "title": "Dropzone (File Upload) for Vue and Supabase",
+    "fileCount": 4,
+    "resources": [],
+    "diagnostics": []
+  },
+  "flutter-starter": {
+    "name": "flutter-starter",
+    "title": "Flutter Starter",
+    "fileCount": 5,
+    "source": {
+      "url": "https://github.com/supabase/supabase/tree/fa11c1c74c2c3548c1f0de5cf97a1fec86703798/examples/user-management/flutter-user-management",
+      "revision": "fa11c1c74c2c3548c1f0de5cf97a1fec86703798"
+    },
+    "resources": [
+      {
+        "id": "page:lib/pages/account_page.dart",
+        "kind": "page",
+        "name": "account_page",
+        "files": [
+          "lib/pages/account_page.dart"
+        ]
+      },
+      {
+        "id": "page:lib/pages/login_page.dart",
+        "kind": "page",
+        "name": "login_page",
+        "files": [
+          "lib/pages/login_page.dart"
+        ]
+      },
+      {
+        "id": "page:lib/pages/splash_page.dart",
+        "kind": "page",
+        "name": "splash_page",
+        "files": [
+          "lib/pages/splash_page.dart"
+        ]
+      },
+      {
+        "name": "profiles",
+        "schema": "public",
+        "id": "table:[\"public\",\"profiles\"]",
+        "kind": "table",
+        "files": [
+          "supabase/migrations/20240404030631_init.sql"
+        ]
+      }
+    ],
+    "diagnostics": []
+  },
+  "infinite-query-composable": {
+    "name": "infinite-query-composable",
+    "title": "Infinite Query for Vue and Supabase",
+    "fileCount": 1,
+    "resources": [],
+    "diagnostics": []
+  },
+  "infinite-query-hook": {
+    "name": "infinite-query-hook",
+    "title": "Infinite Query Hook",
+    "fileCount": 1,
+    "resources": [],
+    "diagnostics": []
+  },
+  "mcp-server": {
+    "name": "mcp-server",
+    "title": "MCP Server",
+    "fileCount": 7,
+    "resources": [
+      {
+        "id": "edge-function:mcp-server",
+        "kind": "edge-function",
+        "name": "mcp-server",
+        "files": [
+          "supabase/functions/mcp-server/deno.json",
+          "supabase/functions/mcp-server/index.ts",
+          "supabase/functions/mcp-server/tools/index.ts",
+          "supabase/functions/mcp-server/tools/result.ts",
+          "supabase/functions/mcp-server/tools/types.ts",
+          "supabase/functions/mcp-server/tools/whoami.ts"
+        ]
+      }
+    ],
+    "diagnostics": []
+  },
+  "oauth-consent-nextjs": {
+    "name": "oauth-consent-nextjs",
+    "title": "OAuth Consent for Next.js",
+    "fileCount": 7,
+    "resources": [
+      {
+        "id": "page:/oauth/consent",
+        "kind": "page",
+        "name": "/oauth/consent",
+        "route": "/oauth/consent",
+        "files": [
+          "app/oauth/consent/page.tsx"
+        ]
+      }
+    ],
+    "diagnostics": []
+  },
+  "oauth-consent-react": {
+    "name": "oauth-consent-react",
+    "title": "OAuth Consent for React",
+    "fileCount": 4,
+    "resources": [],
+    "diagnostics": []
+  },
+  "oauth-consent-react-router": {
+    "name": "oauth-consent-react-router",
+    "title": "OAuth Consent for React Router",
+    "fileCount": 6,
+    "resources": [
+      {
+        "id": "page:/oauth/consent",
+        "kind": "page",
+        "name": "/oauth/consent",
+        "route": "/oauth/consent",
+        "files": [
+          "app/routes/oauth.consent.tsx"
+        ]
+      }
+    ],
+    "diagnostics": []
+  },
+  "oauth-consent-tanstack": {
+    "name": "oauth-consent-tanstack",
+    "title": "OAuth Consent for TanStack Start",
+    "fileCount": 6,
+    "resources": [
+      {
+        "id": "page:/oauth/consent",
+        "kind": "page",
+        "name": "/oauth/consent",
+        "route": "/oauth/consent",
+        "files": [
+          "routes/oauth/consent.tsx"
+        ]
+      }
+    ],
+    "diagnostics": []
+  },
+  "password-based-auth-nextjs": {
+    "name": "password-based-auth-nextjs",
+    "title": "Password Based Auth flow for Nextjs and Supabase",
+    "fileCount": 18,
+    "resources": [
+      {
+        "id": "api-route:/auth/confirm",
+        "kind": "api-route",
+        "name": "/auth/confirm",
+        "route": "/auth/confirm",
+        "files": [
+          "app/auth/confirm/route.ts"
+        ]
+      },
+      {
+        "id": "page:/auth/error",
+        "kind": "page",
+        "name": "/auth/error",
+        "route": "/auth/error",
+        "files": [
+          "app/auth/error/page.tsx"
+        ]
+      },
+      {
+        "id": "page:/auth/forgot-password",
+        "kind": "page",
+        "name": "/auth/forgot-password",
+        "route": "/auth/forgot-password",
+        "files": [
+          "app/auth/forgot-password/page.tsx"
+        ]
+      },
+      {
+        "id": "page:/auth/login",
+        "kind": "page",
+        "name": "/auth/login",
+        "route": "/auth/login",
+        "files": [
+          "app/auth/login/page.tsx"
+        ]
+      },
+      {
+        "id": "page:/auth/sign-up",
+        "kind": "page",
+        "name": "/auth/sign-up",
+        "route": "/auth/sign-up",
+        "files": [
+          "app/auth/sign-up/page.tsx"
+        ]
+      },
+      {
+        "id": "page:/auth/sign-up-success",
+        "kind": "page",
+        "name": "/auth/sign-up-success",
+        "route": "/auth/sign-up-success",
+        "files": [
+          "app/auth/sign-up-success/page.tsx"
+        ]
+      },
+      {
+        "id": "page:/auth/update-password",
+        "kind": "page",
+        "name": "/auth/update-password",
+        "route": "/auth/update-password",
+        "files": [
+          "app/auth/update-password/page.tsx"
+        ]
+      },
+      {
+        "id": "page:/protected",
+        "kind": "page",
+        "name": "/protected",
+        "route": "/protected",
+        "files": [
+          "app/protected/page.tsx"
+        ]
+      }
+    ],
+    "diagnostics": []
+  },
+  "password-based-auth-nuxtjs": {
+    "name": "password-based-auth-nuxtjs",
+    "title": "Password Based Auth flow for Nuxt.js and Supabase",
+    "fileCount": 12,
+    "resources": [
+      {
+        "id": "api-route:/auth/confirm",
+        "kind": "api-route",
+        "name": "/auth/confirm",
+        "route": "/auth/confirm",
+        "files": [
+          "server/routes/auth/confirm.get.ts"
+        ]
+      },
+      {
+        "id": "page:/auth/error",
+        "kind": "page",
+        "name": "/auth/error",
+        "route": "/auth/error",
+        "files": [
+          "app/pages/auth/error.vue"
+        ]
+      },
+      {
+        "id": "page:/auth/forgot-password",
+        "kind": "page",
+        "name": "/auth/forgot-password",
+        "route": "/auth/forgot-password",
+        "files": [
+          "app/pages/auth/forgot-password.vue"
+        ]
+      },
+      {
+        "id": "page:/auth/login",
+        "kind": "page",
+        "name": "/auth/login",
+        "route": "/auth/login",
+        "files": [
+          "app/pages/auth/login.vue"
+        ]
+      },
+      {
+        "id": "page:/auth/sign-up",
+        "kind": "page",
+        "name": "/auth/sign-up",
+        "route": "/auth/sign-up",
+        "files": [
+          "app/pages/auth/sign-up.vue"
+        ]
+      },
+      {
+        "id": "page:/auth/sign-up-success",
+        "kind": "page",
+        "name": "/auth/sign-up-success",
+        "route": "/auth/sign-up-success",
+        "files": [
+          "app/pages/auth/sign-up-success.vue"
+        ]
+      },
+      {
+        "id": "page:/auth/update-password",
+        "kind": "page",
+        "name": "/auth/update-password",
+        "route": "/auth/update-password",
+        "files": [
+          "app/pages/auth/update-password.vue"
+        ]
+      },
+      {
+        "id": "page:/protected",
+        "kind": "page",
+        "name": "/protected",
+        "route": "/protected",
+        "files": [
+          "app/pages/protected/index.vue"
+        ]
+      }
+    ],
+    "diagnostics": []
+  },
+  "password-based-auth-react": {
+    "name": "password-based-auth-react",
+    "title": "Password Based Auth flow for React and Supabase",
+    "fileCount": 6,
+    "resources": [],
+    "diagnostics": []
+  },
+  "password-based-auth-react-router": {
+    "name": "password-based-auth-react-router",
+    "title": "Password Based Auth flow for React Router and Supabase",
+    "fileCount": 12,
+    "resources": [
+      {
+        "id": "api-route:/auth/confirm",
+        "kind": "api-route",
+        "name": "/auth/confirm",
+        "route": "/auth/confirm",
+        "files": [
+          "app/routes/auth.confirm.tsx"
+        ]
+      },
+      {
+        "id": "api-route:/logout",
+        "kind": "api-route",
+        "name": "/logout",
+        "route": "/logout",
+        "files": [
+          "app/routes/logout.tsx"
+        ]
+      },
+      {
+        "id": "page:/auth/error",
+        "kind": "page",
+        "name": "/auth/error",
+        "route": "/auth/error",
+        "files": [
+          "app/routes/auth.error.tsx"
+        ]
+      },
+      {
+        "id": "page:/forgot-password",
+        "kind": "page",
+        "name": "/forgot-password",
+        "route": "/forgot-password",
+        "files": [
+          "app/routes/forgot-password.tsx"
+        ]
+      },
+      {
+        "id": "page:/login",
+        "kind": "page",
+        "name": "/login",
+        "route": "/login",
+        "files": [
+          "app/routes/login.tsx"
+        ]
+      },
+      {
+        "id": "page:/protected",
+        "kind": "page",
+        "name": "/protected",
+        "route": "/protected",
+        "files": [
+          "app/routes/protected.tsx"
+        ]
+      },
+      {
+        "id": "page:/sign-up",
+        "kind": "page",
+        "name": "/sign-up",
+        "route": "/sign-up",
+        "files": [
+          "app/routes/sign-up.tsx"
+        ]
+      },
+      {
+        "id": "page:/update-password",
+        "kind": "page",
+        "name": "/update-password",
+        "route": "/update-password",
+        "files": [
+          "app/routes/update-password.tsx"
+        ]
+      }
+    ],
+    "diagnostics": []
+  },
+  "password-based-auth-tanstack": {
+    "name": "password-based-auth-tanstack",
+    "title": "Password Based Auth flow for tanstack and Supabase",
+    "fileCount": 17,
+    "resources": [
+      {
+        "id": "page:/auth/error",
+        "kind": "page",
+        "name": "/auth/error",
+        "route": "/auth/error",
+        "files": [
+          "routes/auth/error.tsx"
+        ]
+      },
+      {
+        "id": "page:/forgot-password",
+        "kind": "page",
+        "name": "/forgot-password",
+        "route": "/forgot-password",
+        "files": [
+          "routes/forgot-password.tsx"
+        ]
+      },
+      {
+        "id": "page:/login",
+        "kind": "page",
+        "name": "/login",
+        "route": "/login",
+        "files": [
+          "routes/login.tsx"
+        ]
+      },
+      {
+        "id": "page:/protected",
+        "kind": "page",
+        "name": "/protected",
+        "route": "/protected",
+        "files": [
+          "routes/_protected/protected.tsx"
+        ]
+      },
+      {
+        "id": "page:/sign-up",
+        "kind": "page",
+        "name": "/sign-up",
+        "route": "/sign-up",
+        "files": [
+          "routes/sign-up.tsx"
+        ]
+      },
+      {
+        "id": "page:/sign-up-success",
+        "kind": "page",
+        "name": "/sign-up-success",
+        "route": "/sign-up-success",
+        "files": [
+          "routes/sign-up-success.tsx"
+        ]
+      },
+      {
+        "id": "page:/update-password",
+        "kind": "page",
+        "name": "/update-password",
+        "route": "/update-password",
+        "files": [
+          "routes/update-password.tsx"
+        ]
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "ambiguous-route",
+        "message": "A route loader alone does not identify a page component or an API handler.",
+        "files": [
+          "routes/auth/confirm.ts"
+        ]
+      }
+    ]
+  },
+  "password-based-auth-vue": {
+    "name": "password-based-auth-vue",
+    "title": "Password Based Auth flow for Vue and Supabase",
+    "fileCount": 4,
+    "resources": [],
+    "diagnostics": []
+  },
+  "platform-kit-nextjs": {
+    "name": "platform-kit-nextjs",
+    "title": "Platform Kit for Nextjs and Supabase",
+    "fileCount": 32,
+    "resources": [
+      {
+        "id": "api-route:/api/ai/sql",
+        "kind": "api-route",
+        "name": "/api/ai/sql",
+        "route": "/api/ai/sql",
+        "files": [
+          "app/api/ai/sql/route.ts"
+        ]
+      },
+      {
+        "id": "api-route:/api/supabase-proxy/:path*",
+        "kind": "api-route",
+        "name": "/api/supabase-proxy/:path*",
+        "route": "/api/supabase-proxy/:path*",
+        "files": [
+          "app/api/supabase-proxy/[...path]/route.ts"
+        ]
+      }
+    ],
+    "diagnostics": []
+  },
+  "realtime-avatar-stack-nextjs": {
+    "name": "realtime-avatar-stack-nextjs",
+    "title": "Avatar Stack with Realtime Presence",
+    "fileCount": 8,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-avatar-stack-nuxtjs": {
+    "name": "realtime-avatar-stack-nuxtjs",
+    "title": "Realtime Avatar Stack",
+    "fileCount": 5,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-avatar-stack-react": {
+    "name": "realtime-avatar-stack-react",
+    "title": "Avatar Stack with Realtime Presence",
+    "fileCount": 6,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-avatar-stack-react-router": {
+    "name": "realtime-avatar-stack-react-router",
+    "title": "Avatar Stack with Realtime Presence",
+    "fileCount": 7,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-avatar-stack-tanstack": {
+    "name": "realtime-avatar-stack-tanstack",
+    "title": "Avatar Stack with Realtime Presence",
+    "fileCount": 7,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-avatar-stack-vue": {
+    "name": "realtime-avatar-stack-vue",
+    "title": "Realtime Avatar Stack",
+    "fileCount": 5,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-chat-nextjs": {
+    "name": "realtime-chat-nextjs",
+    "title": "Realtime Chat",
+    "fileCount": 7,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-chat-nuxtjs": {
+    "name": "realtime-chat-nuxtjs",
+    "title": "Realtime Chat",
+    "fileCount": 4,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-chat-react": {
+    "name": "realtime-chat-react",
+    "title": "Realtime Chat",
+    "fileCount": 5,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-chat-react-router": {
+    "name": "realtime-chat-react-router",
+    "title": "Realtime Chat",
+    "fileCount": 6,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-chat-tanstack": {
+    "name": "realtime-chat-tanstack",
+    "title": "Realtime Chat",
+    "fileCount": 6,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-chat-vue": {
+    "name": "realtime-chat-vue",
+    "title": "Realtime Chat",
+    "fileCount": 4,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-cursor-nextjs": {
+    "name": "realtime-cursor-nextjs",
+    "title": "Realtime Cursor",
+    "fileCount": 6,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-cursor-nuxtjs": {
+    "name": "realtime-cursor-nuxtjs",
+    "title": "Realtime Cursor for Nuxt and Supabase",
+    "fileCount": 3,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-cursor-react": {
+    "name": "realtime-cursor-react",
+    "title": "Realtime Cursor",
+    "fileCount": 4,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-cursor-react-router": {
+    "name": "realtime-cursor-react-router",
+    "title": "Realtime Cursor",
+    "fileCount": 5,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-cursor-tanstack": {
+    "name": "realtime-cursor-tanstack",
+    "title": "Realtime Cursor",
+    "fileCount": 5,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-cursor-vue": {
+    "name": "realtime-cursor-vue",
+    "title": "Realtime Cursor for Vue and Supabase",
+    "fileCount": 3,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-flow-nextjs": {
+    "name": "realtime-flow-nextjs",
+    "title": "Realtime Flow",
+    "fileCount": 5,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-flow-react": {
+    "name": "realtime-flow-react",
+    "title": "Realtime Flow",
+    "fileCount": 3,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-flow-react-router": {
+    "name": "realtime-flow-react-router",
+    "title": "Realtime Flow",
+    "fileCount": 4,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-flow-tanstack": {
+    "name": "realtime-flow-tanstack",
+    "title": "Realtime Flow",
+    "fileCount": 4,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-monaco-nextjs": {
+    "name": "realtime-monaco-nextjs",
+    "title": "Realtime Monaco",
+    "fileCount": 5,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-monaco-react": {
+    "name": "realtime-monaco-react",
+    "title": "Realtime Monaco",
+    "fileCount": 3,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-monaco-react-router": {
+    "name": "realtime-monaco-react-router",
+    "title": "Realtime Monaco",
+    "fileCount": 4,
+    "resources": [],
+    "diagnostics": []
+  },
+  "realtime-monaco-tanstack": {
+    "name": "realtime-monaco-tanstack",
+    "title": "Realtime Monaco",
+    "fileCount": 4,
+    "resources": [],
+    "diagnostics": []
+  },
+  "saas-starter": {
+    "name": "saas-starter",
+    "title": "SaaS Starter",
+    "fileCount": 9,
+    "source": {
+      "url": "https://github.com/supabase-community/nextjs-subscription-payments/tree/3aa0d956fb46dda45a6676f74ffa77eb0fe10a11",
+      "revision": "3aa0d956fb46dda45a6676f74ffa77eb0fe10a11"
+    },
+    "resources": [
+      {
+        "id": "api-route:/api/webhooks",
+        "kind": "api-route",
+        "name": "/api/webhooks",
+        "route": "/api/webhooks",
+        "files": [
+          "app/api/webhooks/route.ts"
+        ]
+      },
+      {
+        "id": "api-route:/auth/callback",
+        "kind": "api-route",
+        "name": "/auth/callback",
+        "route": "/auth/callback",
+        "files": [
+          "app/auth/callback/route.ts"
+        ]
+      },
+      {
+        "id": "api-route:/auth/reset_password",
+        "kind": "api-route",
+        "name": "/auth/reset_password",
+        "route": "/auth/reset_password",
+        "files": [
+          "app/auth/reset_password/route.ts"
+        ]
+      },
+      {
+        "id": "page:/",
+        "kind": "page",
+        "name": "/",
+        "route": "/",
+        "files": [
+          "app/page.tsx"
+        ]
+      },
+      {
+        "id": "page:/account",
+        "kind": "page",
+        "name": "/account",
+        "route": "/account",
+        "files": [
+          "app/account/page.tsx"
+        ]
+      },
+      {
+        "id": "page:/signin",
+        "kind": "page",
+        "name": "/signin",
+        "route": "/signin",
+        "files": [
+          "app/signin/page.tsx"
+        ]
+      },
+      {
+        "id": "page:/signin/:id",
+        "kind": "page",
+        "name": "/signin/:id",
+        "route": "/signin/:id",
+        "files": [
+          "app/signin/[id]/page.tsx"
+        ]
+      },
+      {
+        "name": "customers",
+        "schema": "public",
+        "id": "table:[\"public\",\"customers\"]",
+        "kind": "table",
+        "files": [
+          "supabase/migrations/20230530034630_init.sql"
+        ]
+      },
+      {
+        "name": "prices",
+        "schema": "public",
+        "id": "table:[\"public\",\"prices\"]",
+        "kind": "table",
+        "files": [
+          "supabase/migrations/20230530034630_init.sql"
+        ]
+      },
+      {
+        "name": "products",
+        "schema": "public",
+        "id": "table:[\"public\",\"products\"]",
+        "kind": "table",
+        "files": [
+          "supabase/migrations/20230530034630_init.sql"
+        ]
+      },
+      {
+        "name": "subscriptions",
+        "schema": "public",
+        "id": "table:[\"public\",\"subscriptions\"]",
+        "kind": "table",
+        "files": [
+          "supabase/migrations/20230530034630_init.sql"
+        ]
+      },
+      {
+        "name": "users",
+        "schema": "public",
+        "id": "table:[\"public\",\"users\"]",
+        "kind": "table",
+        "files": [
+          "supabase/migrations/20230530034630_init.sql"
+        ]
+      }
+    ],
+    "diagnostics": []
+  },
+  "safe-next-path": {
+    "name": "safe-next-path",
+    "title": "Safe next path",
+    "fileCount": 1,
+    "resources": [],
+    "diagnostics": []
+  },
+  "social-auth-nextjs": {
+    "name": "social-auth-nextjs",
+    "title": "Social Auth flow for Nextjs and Supabase",
+    "fileCount": 11,
+    "resources": [
+      {
+        "id": "api-route:/auth/oauth",
+        "kind": "api-route",
+        "name": "/auth/oauth",
+        "route": "/auth/oauth",
+        "files": [
+          "app/auth/oauth/route.ts"
+        ]
+      },
+      {
+        "id": "page:/auth/error",
+        "kind": "page",
+        "name": "/auth/error",
+        "route": "/auth/error",
+        "files": [
+          "app/auth/error/page.tsx"
+        ]
+      },
+      {
+        "id": "page:/auth/login",
+        "kind": "page",
+        "name": "/auth/login",
+        "route": "/auth/login",
+        "files": [
+          "app/auth/login/page.tsx"
+        ]
+      },
+      {
+        "id": "page:/protected",
+        "kind": "page",
+        "name": "/protected",
+        "route": "/protected",
+        "files": [
+          "app/protected/page.tsx"
+        ]
+      }
+    ],
+    "diagnostics": []
+  },
+  "social-auth-nuxtjs": {
+    "name": "social-auth-nuxtjs",
+    "title": "Social Auth flow for Nuxt and Supabase",
+    "fileCount": 7,
+    "resources": [
+      {
+        "id": "api-route:/auth/oauth",
+        "kind": "api-route",
+        "name": "/auth/oauth",
+        "route": "/auth/oauth",
+        "files": [
+          "server/routes/auth/oauth.ts"
+        ]
+      },
+      {
+        "id": "page:/auth/error",
+        "kind": "page",
+        "name": "/auth/error",
+        "route": "/auth/error",
+        "files": [
+          "app/pages/auth/error.vue"
+        ]
+      },
+      {
+        "id": "page:/auth/login",
+        "kind": "page",
+        "name": "/auth/login",
+        "route": "/auth/login",
+        "files": [
+          "app/pages/auth/login.vue"
+        ]
+      },
+      {
+        "id": "page:/protected",
+        "kind": "page",
+        "name": "/protected",
+        "route": "/protected",
+        "files": [
+          "app/pages/protected/index.vue"
+        ]
+      }
+    ],
+    "diagnostics": []
+  },
+  "social-auth-react": {
+    "name": "social-auth-react",
+    "title": "Social Auth flow for React and Supabase",
+    "fileCount": 2,
+    "resources": [],
+    "diagnostics": []
+  },
+  "social-auth-react-router": {
+    "name": "social-auth-react-router",
+    "title": "Social Auth flow for React Router and Supabase",
+    "fileCount": 9,
+    "resources": [
+      {
+        "id": "api-route:/auth/oauth",
+        "kind": "api-route",
+        "name": "/auth/oauth",
+        "route": "/auth/oauth",
+        "files": [
+          "app/routes/auth.oauth.tsx"
+        ]
+      },
+      {
+        "id": "api-route:/logout",
+        "kind": "api-route",
+        "name": "/logout",
+        "route": "/logout",
+        "files": [
+          "app/routes/logout.tsx"
+        ]
+      },
+      {
+        "id": "page:/auth/error",
+        "kind": "page",
+        "name": "/auth/error",
+        "route": "/auth/error",
+        "files": [
+          "app/routes/auth.error.tsx"
+        ]
+      },
+      {
+        "id": "page:/login",
+        "kind": "page",
+        "name": "/login",
+        "route": "/login",
+        "files": [
+          "app/routes/login.tsx"
+        ]
+      },
+      {
+        "id": "page:/protected",
+        "kind": "page",
+        "name": "/protected",
+        "route": "/protected",
+        "files": [
+          "app/routes/protected.tsx"
+        ]
+      }
+    ],
+    "diagnostics": []
+  },
+  "social-auth-tanstack": {
+    "name": "social-auth-tanstack",
+    "title": "Social Auth flow for TanStack and Supabase",
+    "fileCount": 10,
+    "resources": [
+      {
+        "id": "page:/auth/error",
+        "kind": "page",
+        "name": "/auth/error",
+        "route": "/auth/error",
+        "files": [
+          "routes/auth/error.tsx"
+        ]
+      },
+      {
+        "id": "page:/info",
+        "kind": "page",
+        "name": "/info",
+        "route": "/info",
+        "files": [
+          "routes/_protected/protected.tsx"
+        ]
+      },
+      {
+        "id": "page:/login",
+        "kind": "page",
+        "name": "/login",
+        "route": "/login",
+        "files": [
+          "routes/login.tsx"
+        ]
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "ambiguous-route",
+        "message": "A route loader alone does not identify a page component or an API handler.",
+        "files": [
+          "routes/auth/oauth.ts"
+        ]
+      }
+    ]
+  },
+  "social-auth-vue": {
+    "name": "social-auth-vue",
+    "title": "Social Auth flow for Vue and Supabase",
+    "fileCount": 1,
+    "resources": [],
+    "diagnostics": []
+  },
+  "supabase-client-nextjs": {
+    "name": "supabase-client-nextjs",
+    "title": "Supabase Client for Next.js",
+    "fileCount": 3,
+    "resources": [],
+    "diagnostics": []
+  },
+  "supabase-client-nuxtjs": {
+    "name": "supabase-client-nuxtjs",
+    "title": "Supabase Client for Nuxt.js",
+    "fileCount": 4,
+    "resources": [
+      {
+        "id": "api-route:/api/profile",
+        "kind": "api-route",
+        "name": "/api/profile",
+        "route": "/api/profile",
+        "files": [
+          "server/api/profile.get.ts"
+        ]
+      }
+    ],
+    "diagnostics": []
+  },
+  "supabase-client-react": {
+    "name": "supabase-client-react",
+    "title": "Supabase Client for React",
+    "fileCount": 1,
+    "resources": [],
+    "diagnostics": []
+  },
+  "supabase-client-react-router": {
+    "name": "supabase-client-react-router",
+    "title": "Supabase Client for React Router",
+    "fileCount": 2,
+    "resources": [],
+    "diagnostics": []
+  },
+  "supabase-client-tanstack": {
+    "name": "supabase-client-tanstack",
+    "title": "Supabase Client for TanStack Start",
+    "fileCount": 2,
+    "resources": [],
+    "diagnostics": []
+  },
+  "supabase-client-vue": {
+    "name": "supabase-client-vue",
+    "title": "Supabase Client for Vue",
+    "fileCount": 1,
+    "resources": [],
+    "diagnostics": []
+  },
+  "tanstack-db-nextjs": {
+    "name": "tanstack-db-nextjs",
+    "title": "TanStack DB for Next.js and Supabase",
+    "fileCount": 3,
+    "resources": [],
+    "diagnostics": []
+  }
+}

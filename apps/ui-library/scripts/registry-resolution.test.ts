@@ -5,7 +5,6 @@ import path from 'node:path'
 import { describe, it } from 'node:test'
 import { registrySchema, type RegistryItem } from 'shadcn/schema'
 
-import { generateBlockArchitecture } from '../lib/block-architecture'
 import { generateRegistryTree, type RegistryNode } from '../lib/process-registry'
 import {
   getInstalledPath,
@@ -166,7 +165,7 @@ describe('registry composition and resolution', () => {
   it('validates the published registry definitions and includes safe-next-path in auth inventory', () => {
     registrySchema.parse(registry)
     for (const definition of registry.items) {
-      generateBlockArchitecture(resolveRegistryItem(registry, definition.name))
+      resolveRegistryItem(registry, definition.name)
     }
     const auth = resolveRegistryItem(registry, 'password-based-auth-nextjs')
     assert.ok(auth.files.some((file) => getInstalledPath(file) === 'lib/safe-next-path.ts'))

@@ -3,8 +3,7 @@ import type { ReactNode } from 'react'
 
 import { BlockItemCode } from './block-item-code'
 import { BlockOverviewTabs } from './block-overview-tabs'
-import { starterArchitectureDefinitions } from '@/config/starter-architecture'
-import { generateBlockArchitecture, summarizeBlockArchitecture } from '@/lib/block-architecture'
+import { getBlockArchitecture } from '@/lib/block-architecture'
 import { generateRegistryTree } from '@/lib/process-registry'
 import { resolveRegistryItem } from '@/lib/registry-resolution'
 import { registry } from '@/registry'
@@ -21,13 +20,11 @@ export function BlockOverview({
   const resolved = registry.items.some((item) => item.name === name)
     ? resolveRegistryItem(registry, name)
     : undefined
-  const definition = resolved ?? starterArchitectureDefinitions.find((item) => item.name === name)
-
-  if (!definition) throw new Error(`Missing architecture definition for block: ${name}`)
+  const architecture = getBlockArchitecture(name)
 
   return (
     <BlockOverviewTabs
-      architecture={summarizeBlockArchitecture(generateBlockArchitecture(definition))}
+      architecture={architecture}
       files={
         showFiles ? (
           <div className="flex h-full flex-col">

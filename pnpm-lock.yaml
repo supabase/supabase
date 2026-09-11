@@ -2301,6 +2301,9 @@ importers:
       flags:
         specifier: ^4.0.0
         version: 4.0.1(@opentelemetry/api@1.9.1)(next@16.2.11(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      libpg-query:
+        specifier: 17.6.0
+        version: 17.6.0
       lodash:
         specifier: ^4.18.1
         version: 4.18.1
@@ -2322,6 +2325,9 @@ importers:
       react-use:
         specifier: ^17.4.0
         version: 17.6.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      smol-toml:
+        specifier: 1.8.0
+        version: 1.8.0
       valtio:
         specifier: 'catalog:'
         version: 2.3.2(@types/react@19.2.14)(react@19.2.6)
