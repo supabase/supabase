@@ -250,6 +250,19 @@ describe('generate-sitemap rejects dates it cannot trust', () => {
       stderrIncludes: ['_blog/2026-01-13-bad-month.mdx', '"2026-13-45"'],
     },
     {
+      name: 'a time of day that does not exist',
+      files: blogFixture('2026-01-18-bad-time', "date: '2026-01-18'\nupdated: '2026-01-18T99:99'"),
+      stderrIncludes: ['_blog/2026-01-18-bad-time.mdx', '"2026-01-18T99:99"'],
+    },
+    {
+      name: 'an offset that does not exist',
+      files: blogFixture(
+        '2026-01-19-bad-offset',
+        "date: '2026-01-19'\nupdated: '2026-01-19T09:30:00+99:00'"
+      ),
+      stderrIncludes: ['_blog/2026-01-19-bad-offset.mdx', '"2026-01-19T09:30:00+99:00"'],
+    },
+    {
       name: 'an unparseable changelog pubDate',
       files: { 'public/changelog-rss.xml': rss([rssItem(LEGACY_LINK, 'Invalid Date +0000')]) },
       stderrIncludes: [`changelog-rss ${LEGACY_LINK}`, '"Invalid Date +0000"'],

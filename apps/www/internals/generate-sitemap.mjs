@@ -6,7 +6,7 @@ import { parseFrontmatter } from '../lib/frontmatter.mjs'
 
 const DATED_COLLECTIONS = ['_blog/', '_alternatives/', '_customers/']
 const ISO_DATE_SHAPE =
-  /^(\d{4}-\d{2}-\d{2})(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)?$/
+  /^(\d{4}-\d{2}-\d{2})(?:T(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|[+-](?:[01]\d|2[0-3]):?[0-5]\d)?)?$/
 const RSS_PUB_DATE_SHAPE =
   /^[A-Z][a-z]{2}, \d{2} [A-Z][a-z]{2} \d{4} \d{2}:\d{2}:\d{2} (?:[+-]\d{4}|GMT|UTC)$/
 
