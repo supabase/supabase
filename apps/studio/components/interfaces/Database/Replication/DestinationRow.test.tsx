@@ -234,6 +234,38 @@ describe('DestinationRow', () => {
     expect(await screen.findByText('Initial sync')).toHaveClass('text-foreground-light')
   })
 
+  test('shows initial sync when apply lag is unavailable', async () => {
+    addSourcesMock()
+    addDestinationMock()
+    addPipelinesMock()
+    addPipelineStatusMock('started')
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/replication-status',
+      response: () =>
+        HttpResponse.json<ReplicationPipelineReplicationStatusResponse>({
+          pipeline_id: PIPELINE_ID,
+          apply_lag: null,
+          table_statuses: [
+            {
+              id: 1,
+              schema: 'public',
+              name: 'orders',
+              table_id: 1,
+              table_name: 'public.orders',
+              state: { name: 'queued' },
+            },
+          ],
+        }),
+    })
+    addVersionMock()
+
+    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
+
+    expect(await screen.findByText('Initial sync')).toBeInTheDocument()
+    expect(screen.queryByText('Lag unavailable')).not.toBeInTheDocument()
+  })
+
   test('announces lag loading and replaces it with the resolved value', async () => {
     let resolveReplicationStatus: (
       response: ReplicationPipelineReplicationStatusResponse
@@ -319,7 +351,11 @@ describe('DestinationRow', () => {
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
-    expect(await screen.findByText('Running')).toBeInTheDocument()
+    const status = await screen.findByText('Running')
+    const liveRegion = status.closest('[aria-live="polite"]')
+
+    expect(status).toBeInTheDocument()
+    expect(liveRegion).toHaveAttribute('aria-atomic', 'true')
   })
 
   test('shows Failed badge when pipeline has failed', async () => {
