@@ -1,15 +1,6 @@
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
 import { aiToolsBuildingIntoApp, aiToolsSupportedAgents } from './ai-tools.data'
-import {
-  supabaseWayAuthBuild,
-  supabaseWayDatabaseBuild,
-  supabaseWayFunctionsBuild,
-  supabaseWayProductionBuild,
-  supabaseWayRealtimeBuild,
-  supabaseWayRlsBuild,
-  supabaseWayStorageBuild,
-} from './architecting-for-growth.data'
 import { authGetStarted, authNextSteps, authPricing } from './auth.data'
 import { databaseGetStarted, databaseNextSteps } from './database.data'
 import {
@@ -43,6 +34,15 @@ import {
   telemetryExport,
   telemetryHireAgent,
 } from './telemetry.data'
+import {
+  supabaseWayAuthBuild,
+  supabaseWayDatabaseBuild,
+  supabaseWayFunctionsBuild,
+  supabaseWayProductionBuild,
+  supabaseWayRealtimeBuild,
+  supabaseWayRlsBuild,
+  supabaseWayStorageBuild,
+} from './the-supabase-way-to-build.data'
 
 const ALL_GROUPS: readonly ContentListingGroup[] = [
   aiToolsSupportedAgents,
