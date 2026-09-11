@@ -265,14 +265,53 @@ describe('sanitizeNameForDuplicateInColumn', () => {
       )
     })
 
-    it('treats the whole name as the extension when there is no dot (existing behaviour)', () => {
-      // NOTE: the function splits on '.' and always treats the last segment as the
-      // extension, so a dotless name produces " (1).myfile" rather than "myfile (1)".
-      // This is a known quirk of the implementation — not a regression.
+    it('preserves names without an extension', () => {
       const state = makeState([[{ name: 'myfile' }]])
       expect(sanitizeNameForDuplicateInColumn(state, { name: 'myfile', autofix: true })).toBe(
-        ' (1).myfile'
+        'myfile (1)'
       )
+    })
+
+    it('uses an available suffix when a previous copy has been deleted', () => {
+      const state = makeState([[{ name: 'file.txt' }, { name: 'file (2).txt' }]])
+      expect(sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', autofix: true })).toBe(
+        'file (1).txt'
+      )
+    })
+
+    it('checks generated names case-insensitively', () => {
+      const state = makeState([[{ name: 'FILE.TXT' }, { name: 'FILE (1).TXT' }]])
+      expect(sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', autofix: true })).toBe(
+        'file (2).txt'
+      )
+    })
+
+    it.each([
+      ['report (final).txt', 'report (final) (1).txt'],
+      ['report+.txt', 'report+ (1).txt'],
+      ['report?.txt', 'report? (1).txt'],
+      ['report(.txt', 'report( (1).txt'],
+      ['archive.tar.gz', 'archive.tar (1).gz'],
+      ['.env', '.env (1)'],
+    ])('preserves the filename in %s', (name, expected) => {
+      const state = makeState([[{ name }]])
+      expect(sanitizeNameForDuplicateInColumn(state, { name, autofix: true })).toBe(expected)
+    })
+
+    it('does not count files that only match part of the name', () => {
+      const state = makeState([[{ name: 'file.txt' }, { name: 'other-file (1).txt' }]])
+      expect(sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', autofix: true })).toBe(
+        'file (1).txt'
+      )
+    })
+
+    it('checks numbered copies of filenames containing parentheses literally', () => {
+      const state = makeState([
+        [{ name: 'report (final).txt' }, { name: 'report (final) (1).txt' }],
+      ])
+      expect(
+        sanitizeNameForDuplicateInColumn(state, { name: 'report (final).txt', autofix: true })
+      ).toBe('report (final) (2).txt')
     })
   })
 })
