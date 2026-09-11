@@ -198,6 +198,7 @@ export const NewScopedTokenForm = forwardRef<
                   </div>
                   <Separator />
                   <PermissionsAccordion
+                    control={form.control}
                     selection={selection}
                     onChange={handlePermissionChange}
                     onApplyPreset={handleApplyPreset}
