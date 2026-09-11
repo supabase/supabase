@@ -62,6 +62,32 @@ export function getScopedProjectRefs(scope: OAuthGrantProjectScope): string[] {
   return scope.target === 'selected_projects' ? scope.project_refs : []
 }
 
+export function getPreselectedProjectRefs({
+  existingGrant,
+  suggestedRefs,
+  liveProjects,
+  max = 10,
+}: {
+  existingGrant: OAuthExistingGrant | null
+  suggestedRefs: string[]
+  liveProjects: OAuthAppsAuthorizeOrganizationProject[]
+  max?: number
+}): string[] {
+  if (liveProjects.length === 0) return []
+  if (existingGrant && isAllProjectsScope(existingGrant.project_scope)) return []
+
+  const liveRefs = new Set(liveProjects.map((project) => project.ref))
+  const grantRefs = existingGrant ? getScopedProjectRefs(existingGrant.project_scope) : []
+
+  const preselected: string[] = []
+  for (const ref of [...grantRefs, ...suggestedRefs]) {
+    if (!liveRefs.has(ref) || preselected.includes(ref)) continue
+    preselected.push(ref)
+    if (preselected.length >= max) break
+  }
+  return preselected
+}
+
 export type OAuthExistingGrant = {
   kind: OAuthGrantKind
   approved_scopes: OAuthScope[] | null

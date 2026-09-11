@@ -28,6 +28,7 @@ export const OAUTH_APPS_MOCK_SCENARIOS = {
   vercelReconsentAllProjects: 'mock-vercel-reconsent-all-projects',
   kemalBotOrgWide: 'mock-kemal-bot-org-wide',
   dynamicMcpClient: 'mock-dynamic-mcp-client',
+  vercelSuggestedProjects: 'mock-vercel-suggested-projects',
 } as const
 
 const USER_BOUND_REQUIRED_PROJECTS: OAuthAppGrantConfig = {
@@ -57,6 +58,7 @@ const VERCEL_REQUEST: OAuthAppsAuthorizeRequest = {
   redirect_uri: 'https://vercel.com/api/integrations/supabase/callback',
   scope_groups: VERCEL_SCOPE_GROUPS,
   reuses_grant_across_workspaces: false,
+  suggested_project_refs: [],
   grant_config: USER_BOUND_REQUIRED_PROJECTS,
   existing_grant: null,
 }
@@ -130,12 +132,18 @@ const KEMAL_BOT_REQUEST: OAuthAppsAuthorizeRequest = {
     },
   ],
   reuses_grant_across_workspaces: false,
+  suggested_project_refs: [],
   grant_config: {
     bind_to_authorizing_user: false,
     project_selection: 'required',
     is_dynamic_client: false,
   },
   existing_grant: null,
+}
+
+const VERCEL_SUGGESTED_PROJECTS_REQUEST: OAuthAppsAuthorizeRequest = {
+  ...VERCEL_REQUEST,
+  suggested_project_refs: ['northwindstorefront1', 'northwindcms1', 'northwindghost1'],
 }
 
 const KEMAL_BOT_ORG_WIDE_REQUEST: OAuthAppsAuthorizeRequest = {
@@ -161,6 +169,7 @@ const MOCK_AUTHORIZE_REQUESTS: Record<string, OAuthAppsAuthorizeRequest> = {
   [OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects]: VERCEL_RECONSENT_ALL_PROJECTS_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide]: KEMAL_BOT_ORG_WIDE_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.dynamicMcpClient]: DYNAMIC_MCP_CLIENT_REQUEST,
+  [OAUTH_APPS_MOCK_SCENARIOS.vercelSuggestedProjects]: VERCEL_SUGGESTED_PROJECTS_REQUEST,
 }
 
 const NORTHWIND_TRADERS_DEVELOPER: OAuthOrganizationRole = {
@@ -248,6 +257,10 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
     organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
   },
   [OAUTH_APPS_MOCK_SCENARIOS.dynamicMcpClient]: {
+    email: 'admin@example.com',
+    organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
+  },
+  [OAUTH_APPS_MOCK_SCENARIOS.vercelSuggestedProjects]: {
     email: 'admin@example.com',
     organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
   },
