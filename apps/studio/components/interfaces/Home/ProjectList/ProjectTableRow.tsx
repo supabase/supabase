@@ -181,7 +181,6 @@ export const ProjectTableRow = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant="default"
                   icon={<MoreVertical />}
                   aria-label={`Project ${name} actions`}
                   className="w-7"

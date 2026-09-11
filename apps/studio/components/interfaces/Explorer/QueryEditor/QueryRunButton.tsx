@@ -29,7 +29,6 @@ export const QueryRunButton = ({
     <div className="flex w-fit">
       <ButtonTooltip
         type="button"
-        variant="default"
         size="tiny"
         loading={isExecuting}
         disabled={disabled}
@@ -54,7 +53,6 @@ export const QueryRunButton = ({
         <DropdownMenuTrigger asChild>
           <Button
             type="button"
-            variant="default"
             size="tiny"
             disabled={disabled}
             aria-label="More actions"

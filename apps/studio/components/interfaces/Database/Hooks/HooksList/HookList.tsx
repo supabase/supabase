@@ -104,7 +104,6 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                       <TooltipTrigger asChild>
                         <DropdownMenuTrigger asChild>
                           <Button
-                            variant="default"
                             className="px-1"
                             icon={<MoreVertical />}
                             aria-label={`${x.name} actions`}
@@ -139,7 +138,6 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                 ) : (
                   <ButtonTooltip
                     disabled
-                    variant="default"
                     className="px-1"
                     icon={<MoreVertical />}
                     tooltip={{

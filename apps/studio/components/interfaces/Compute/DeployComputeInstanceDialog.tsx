@@ -233,9 +233,7 @@ export const DeployComputeInstanceDialog = ({
         </DialogSection>
 
         <DialogFooter>
-          <Button variant="default" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
+          <Button onClick={() => onOpenChange(false)}>Cancel</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -23,7 +23,6 @@ export function NextUp({ title, description, href, chapterNumber }: NextUpProps)
           <div className="mt-2">
             <Link href={href}>
               <Button
-                variant="default"
                 iconRight={<ArrowRight className="h-4 w-4" />}
                 className="flex items-center gap-2"
               >

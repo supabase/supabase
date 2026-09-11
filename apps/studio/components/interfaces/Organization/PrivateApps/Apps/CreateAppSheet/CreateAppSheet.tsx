@@ -182,7 +182,6 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                     <div className="flex items-center gap-2">
                       {selectedPermissions.length > 0 && (
                         <Button
-                          variant="default"
                           size="tiny"
                           className="p-1"
                           icon={<RotateCcw size={16} />}
@@ -196,12 +195,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                         modal
                       >
                         <PopoverTrigger asChild>
-                          <Button
-                            variant="default"
-                            size="tiny"
-                            icon={<Plus size={14} />}
-                            disabled={isLoading}
-                          >
+                          <Button size="tiny" icon={<Plus size={14} />} disabled={isLoading}>
                             Add permission
                           </Button>
                         </PopoverTrigger>
@@ -316,7 +310,6 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                         <h3 className="text-sm font-medium">Private key</h3>
                         <div className="flex items-center gap-2">
                           <Button
-                            variant="default"
                             size="tiny"
                             icon={<Copy size={12} />}
                             onClick={() => copy(generatedKey.private_key, { withToast: true })}
@@ -324,7 +317,6 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                             Copy
                           </Button>
                           <Button
-                            variant="default"
                             size="tiny"
                             icon={<Download size={12} />}
                             onClick={() => {
@@ -368,7 +360,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
 
           <SheetFooter className="justify-end! w-full mt-auto py-4 border-t">
             <div className="flex gap-2">
-              <Button variant="default" onClick={handleRequestClose} disabled={isLoading}>
+              <Button onClick={handleRequestClose} disabled={isLoading}>
                 Cancel
               </Button>
               {keyRevealed ? (

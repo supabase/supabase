@@ -32,7 +32,7 @@ export const HIPAA = () => {
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
         <div className="@lg:flex items-center justify-center h-full">
-          <Button asChild variant="default" iconRight={<ExternalLink />}>
+          <Button asChild iconRight={<ExternalLink />}>
             <a
               href="https://forms.supabase.com/hipaa2"
               target="_blank"

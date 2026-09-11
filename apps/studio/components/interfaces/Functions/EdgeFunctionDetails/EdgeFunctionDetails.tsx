@@ -215,9 +215,7 @@ export const EdgeFunctionDetails = () => {
 
                     <CardFooter className="flex justify-end space-x-2">
                       {form.formState.isDirty && (
-                        <Button variant="default" onClick={() => form.reset()}>
-                          Cancel
-                        </Button>
+                        <Button onClick={() => form.reset()}>Cancel</Button>
                       )}
                       <Button
                         variant="primary"
@@ -259,7 +257,6 @@ export const EdgeFunctionDetails = () => {
                   ))}
                   {selectedTab === 'curl' && (
                     <Button
-                      variant="default"
                       className="ml-auto -translate-y-2 translate-x-3"
                       onClick={() => setShowKey(!showKey)}
                     >

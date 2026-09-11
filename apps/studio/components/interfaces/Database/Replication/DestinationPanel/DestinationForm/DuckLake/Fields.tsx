@@ -313,7 +313,6 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
               </div>
               <Button
                 type="button"
-                variant="default"
                 icon={<Plus />}
                 disabled={!ducklakeStorageProjectRef}
                 onClick={() => setShowNewBucketDialog(true)}
@@ -345,7 +344,6 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
           <DialogFooter>
             <Button
               type="button"
-              variant="default"
               disabled={isCreatingBucket}
               onClick={() => setShowNewBucketDialog(false)}
             >
@@ -413,7 +411,6 @@ const DuckLakeCustomFields = ({
                   actions={
                     <div className="flex items-center justify-center">
                       <Button
-                        variant="default"
                         className="w-7"
                         icon={showCatalogUrl ? <Eye /> : <EyeOff />}
                         onClick={() => setShowCatalogUrl(!showCatalogUrl)}
@@ -525,7 +522,6 @@ const DuckLakeCustomFields = ({
                 />
               </FormControl>
               <Button
-                variant="default"
                 icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
                 className="w-7 absolute right-6 top-[4px]"
                 onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}

@@ -93,7 +93,7 @@ const page: GoPageInput = {
                 Watch the webinar
               </Link>
             </Button>
-            <Button asChild variant="default" size="medium">
+            <Button asChild size="medium">
               <Link
                 href="https://supabase.link/postgresconf-sjc-2026-slides"
                 target="_blank"
@@ -118,7 +118,7 @@ const page: GoPageInput = {
             <li>Fill out the entry form below</li>
             <li>Complete these steps by Monday, September 14, 2026 at 12:00 PM PST</li>
           </ol>
-          <Button asChild variant="default" size="medium">
+          <Button asChild size="medium">
             <Link href="https://supabase.com/dashboard">Create your account</Link>
           </Button>
           <p className="text-xs text-foreground-lighter mt-4">

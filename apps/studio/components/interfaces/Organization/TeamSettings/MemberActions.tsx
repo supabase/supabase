@@ -181,7 +181,6 @@ export const MemberActions = ({
     <>
       <div className="flex items-center justify-end gap-x-2">
         <ButtonTooltip
-          variant="default"
           disabled={isPendingInviteAcceptance || !canRemoveMember}
           onClick={() => onManageAccess(member)}
           tooltip={{
