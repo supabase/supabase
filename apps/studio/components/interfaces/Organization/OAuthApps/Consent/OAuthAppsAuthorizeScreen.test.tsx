@@ -14,18 +14,21 @@ type RenderScreenOptions = {
   authId?: string
   request?: OAuthAppsAuthorizeRequest
   organizationSlug?: string
+  suggestedProjectRefs?: string[]
 }
 
 function renderScreen({
   authId = OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper,
   request,
   organizationSlug,
+  suggestedProjectRefs,
 }: RenderScreenOptions = {}) {
   return customRender(
     <OAuthAppsAuthorizeScreen
       authId={authId}
       request={request ?? getMockOAuthAppsAuthorizeRequest(authId)}
       organizationSlug={organizationSlug}
+      suggestedProjectRefs={suggestedProjectRefs}
       navigate={vi.fn()}
     />
   )
@@ -342,6 +345,63 @@ describe('OAuthAppsAuthorizeScreen', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('combobox')).toBeInTheDocument()
     expect(screen.queryByText('All current and future projects')).not.toBeInTheDocument()
+  })
+
+  test('preselects the projects named by repeated project_ref params', async () => {
+    renderScreen({ suggestedProjectRefs: ['northwindstorefront1', 'northwindcms1'] })
+
+    expect(await screen.findByText('northwind-storefront')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
+    expect(
+      screen.queryByText('Must select at least one project to authorize.')
+    ).not.toBeInTheDocument()
+  })
+
+  test('preselects a single project_ref param', async () => {
+    renderScreen({ suggestedProjectRefs: ['northwindcms1'] })
+
+    expect(await screen.findByText('northwind-cms')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
+  })
+
+  test('an unknown project_ref preselects nothing and shows no notice', async () => {
+    renderScreen({ suggestedProjectRefs: ['no-such-ref'] })
+
+    expect(await screen.findByRole('button', { name: /Authorize Vercel/ })).toBeDisabled()
+    expect(screen.getByText('Must select at least one project to authorize.')).toBeInTheDocument()
+    expect(screen.queryByText(/couldn't be preselected/i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  test('a project_selection off app ignores project_ref params', async () => {
+    renderScreen({
+      authId: OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects,
+      organizationSlug: 'contoso-labs',
+      suggestedProjectRefs: ['northwindstorefront1'],
+    })
+
+    fireEvent.click(await screen.findByRole('button', { name: /Authorize Vercel/ }))
+
+    expect(await screen.findByText('Vercel is connected')).toBeInTheDocument()
+    expect(screen.getByText('All projects, including ones created later')).toBeInTheDocument()
+    expect(screen.queryByText(/northwind-storefront/)).not.toBeInTheDocument()
+  })
+
+  test('the suggested-projects fixture preselects only its live refs', async () => {
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelSuggestedProjects })
+
+    expect(await screen.findByText('northwind-storefront')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
+  })
+
+  test('url project_ref params override the fixture suggestion when present', async () => {
+    renderScreen({
+      authId: OAUTH_APPS_MOCK_SCENARIOS.vercelSuggestedProjects,
+      suggestedProjectRefs: ['fabrikamapi1'],
+    })
+
+    expect(await screen.findByText('fabrikam-api')).toBeInTheDocument()
+    expect(screen.queryByText('northwind-storefront')).not.toBeInTheDocument()
   })
 
   test('shows no fixed-settings note for an authored app', async () => {

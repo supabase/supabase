@@ -1,3 +1,4 @@
+import { useQueries } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -14,9 +15,14 @@ import {
   LogoPair,
   SupabaseLogo,
 } from '@/components/layouts/InterstitialLayout'
+import { oauthAppsKeys } from '@/data/oauth-apps/keys'
+import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 import { useOAuthAppsAuthorizeApproveMutation } from '@/data/oauth-apps/oauth-apps-authorize-approve-mutation'
 import { useOAuthAppsAuthorizeDenyMutation } from '@/data/oauth-apps/oauth-apps-authorize-deny-mutation'
-import { useOAuthAppsAuthorizeOrganizationProjectsQuery } from '@/data/oauth-apps/oauth-apps-authorize-organization-projects-query'
+import {
+  getOAuthAppsAuthorizeOrganizationProjects,
+  useOAuthAppsAuthorizeOrganizationProjectsQuery,
+} from '@/data/oauth-apps/oauth-apps-authorize-organization-projects-query'
 import { useOAuthAppsAuthorizeOrganizationsQuery } from '@/data/oauth-apps/oauth-apps-authorize-organizations-query'
 import type { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/oauth-apps-authorize-request-query'
 import type {
@@ -27,7 +33,7 @@ import type {
 import {
   getFailedProjects,
   getOAuthConsentModel,
-  getScopedProjectRefs,
+  getPreselectedProjectRefs,
   isAllProjectsScope,
   isRoleValidationFailure,
 } from '@/data/oauth-apps/types'
@@ -37,6 +43,7 @@ export interface OAuthAppsAuthorizeScreenProps {
   authId: string
   request: OAuthAppsAuthorizeRequest
   organizationSlug?: string
+  suggestedProjectRefs?: string[]
   navigate: (destination: string) => void
 }
 
@@ -44,6 +51,7 @@ export const OAuthAppsAuthorizeScreen = ({
   authId,
   request,
   organizationSlug,
+  suggestedProjectRefs = [],
   navigate,
 }: OAuthAppsAuthorizeScreenProps) => {
   const model = getOAuthConsentModel(request.grant_config)
@@ -62,7 +70,42 @@ export const OAuthAppsAuthorizeScreen = ({
     null
   )
 
-  const orgSlug = organizationSlug ?? identity?.organizations[0]?.slug
+  const suggestedRefs =
+    suggestedProjectRefs.length > 0 ? suggestedProjectRefs : request.suggested_project_refs
+
+  const needsOrgResolution =
+    showProjectPicker &&
+    !organizationSlug &&
+    suggestedRefs.length > 0 &&
+    (identity?.organizations.length ?? 0) > 1
+
+  const orgProjectsQueries = useQueries({
+    queries: (identity?.organizations ?? []).map((organization) => ({
+      queryKey: oauthAppsKeys.authorizeOrganizationProjects(authId, organization.slug),
+      queryFn: () =>
+        getOAuthAppsAuthorizeOrganizationProjects({ id: authId, slug: organization.slug }),
+      enabled: USE_MOCKS && needsOrgResolution,
+    })),
+  })
+  const orgResolutionSettled =
+    !needsOrgResolution || orgProjectsQueries.every((query) => query.isSuccess)
+
+  const resolvedOrgSlug = (() => {
+    if (!needsOrgResolution || !orgResolutionSettled || !identity) return undefined
+
+    const orgRefSets = orgProjectsQueries.map(
+      (query) => new Set((query.data ?? []).map((project) => project.ref))
+    )
+    const resolvingRefs = suggestedRefs.filter((ref) => orgRefSets.some((refs) => refs.has(ref)))
+    if (resolvingRefs.length === 0) return undefined
+
+    const owners = identity.organizations.filter((_, index) =>
+      resolvingRefs.every((ref) => orgRefSets[index].has(ref))
+    )
+    return owners.length === 1 ? owners[0].slug : undefined
+  })()
+
+  const orgSlug = organizationSlug ?? resolvedOrgSlug ?? identity?.organizations[0]?.slug
   const memberOrg = identity?.organizations.find((org) => org.slug === orgSlug)
 
   const { data: projects } = useOAuthAppsAuthorizeOrganizationProjectsQuery({
@@ -70,22 +113,33 @@ export const OAuthAppsAuthorizeScreen = ({
     slug: orgSlug,
   })
 
-  const seededFromExistingGrant = useRef(false)
+  const seeded = useRef(false)
   useEffect(() => {
-    const grant = request.existing_grant
-    if (seededFromExistingGrant.current || !grant || !projects) return
-    seededFromExistingGrant.current = true
+    if (seeded.current || !projects || !orgResolutionSettled) return
+    seeded.current = true
 
-    if (isAllProjectsScope(grant.project_scope)) {
+    const grant = request.existing_grant
+    if (grant && isAllProjectsScope(grant.project_scope)) {
       if (allowAllProjects) setAllProjectsSelected(true)
       return
     }
+    if (!showProjectPicker) return
 
-    const liveRefs = getScopedProjectRefs(grant.project_scope).filter((ref) =>
-      projects.some((project) => project.ref === ref)
-    )
-    if (liveRefs.length > 0) setSelectedProjectRefs(liveRefs.slice(0, MAX_SELECTED_PROJECTS))
-  }, [request.existing_grant, projects, allowAllProjects])
+    const refs = getPreselectedProjectRefs({
+      existingGrant: grant,
+      suggestedRefs,
+      liveProjects: projects,
+      max: MAX_SELECTED_PROJECTS,
+    })
+    if (refs.length > 0) setSelectedProjectRefs(refs)
+  }, [
+    request.existing_grant,
+    projects,
+    orgResolutionSettled,
+    allowAllProjects,
+    showProjectPicker,
+    suggestedRefs,
+  ])
 
   const signOut = useSignOut()
 
@@ -108,7 +162,7 @@ export const OAuthAppsAuthorizeScreen = ({
   const isSubmitting = approveMutation.isPending
   const hasProjects = (projects?.length ?? 0) > 0
 
-  if (!identity || !orgSlug || !memberOrg) return null
+  if (!identity || !orgSlug || !memberOrg || !orgResolutionSettled) return null
 
   const isBlockedOnProjects = showProjectPicker && !hasProjects
   const canProceed = !isBlockedOnProjects
