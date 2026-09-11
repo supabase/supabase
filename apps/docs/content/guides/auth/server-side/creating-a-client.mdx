@@ -7,6 +7,17 @@ Learn how to configure your Supabase client to use cookies. Your app can then re
 
 Server-Side Rendering (SSR) with Supabase requires cookie-based session storage. The `@supabase/ssr` package handles this for JavaScript and TypeScript applications.
 
+Use this guide to:
+
+1. [Install the packages](#install).
+2. [Set environment variables](#set-environment-variables).
+3. [Create a client](#create-a-client) for your framework.
+
+Refer to these reference sections to make better decisions about verifying users and caching responses:
+
+- [Choosing an auth method](#choosing-an-auth-method), before you write code that checks who the user is.
+- [Caching considerations](#caching-considerations), if you deploy behind a CDN or use ISR.
+
 ## Install
 
 Install the `@supabase/supabase-js` and `@supabase/ssr` helper packages:
@@ -178,7 +189,7 @@ You need setup code to configure a Supabase client to use cookies. Once you have
 
 Use the browser client in code that runs on the browser, and the server client in code that runs on the server.
 
-<$Partial path="auth_methods.mdx" />
+Before you write code that checks who the user is, see [Choosing an auth method](#choosing-an-auth-method).
 
 <Tabs
   scrollable
@@ -189,7 +200,7 @@ Use the browser client in code that runs on the browser, and the server client i
 >
 <TabPanel id="nextjs" label="Next.js">
 
-### Write utility functions to create Supabase clients
+### Write utility functions to create Supabase clients [#nextjs-utility-functions]
 
 To access Supabase from a Next.js app, you need 2 types of Supabase clients:
 
@@ -203,8 +214,6 @@ The Proxy is responsible for:
 1. Refreshing the Auth token by calling `supabase.auth.getClaims()`.
 2. Passing the refreshed Auth token to Server Components, so they don't attempt to refresh the same token themselves. This is accomplished with `request.cookies.set`.
 3. Passing the refreshed Auth token to the browser, so it replaces the old token. This is accomplished with `response.cookies.set`.
-
-<$Partial path="auth_methods.mdx" />
 
 <Accordion>
 
@@ -266,8 +275,6 @@ It's safe to trust `getClaims()` because it validates the JWT signature against 
 
 </Admonition>
 
-<$Partial path="auth_methods.mdx" />
-
 <div className="mt-12">
   <$CodeTabs>
     <$CodeSample path="/auth/nextjs/proxy.ts" meta="name=proxy.ts" language="typescript" />
@@ -279,7 +286,7 @@ It's safe to trust `getClaims()` because it validates the JWT signature against 
   </$CodeTabs>
 </div>
 
-## Congratulations
+### Congratulations [#nextjs-congratulations]
 
 To recap, you've:
 
@@ -300,8 +307,6 @@ Set up server-side hooks in `src/hooks.server.ts`. The hooks:
 - Create a request-specific Supabase client, using the user credentials from the request cookie. This client is used for server-only code.
 - Check user authentication.
 - Guard protected pages.
-
-<$Partial path="auth_methods.mdx" />
 
 <$CodeSample
 path="/auth/sveltekit/src/hooks.server.ts"
@@ -337,7 +342,7 @@ language="typescript"
 />
 </$CodeTabs>
 
-## Congratulations
+### Congratulations [#sveltekit-congratulations]
 
 To recap, you've:
 
@@ -349,6 +354,8 @@ You can now use any Supabase feature from your client or server code.
 </TabPanel>
 <TabPanel id="astro" label="Astro">
 
+### Configure Astro for SSR
+
 Astro apps are static by default, so requests for data happen at build time rather than when a user requests a page. At build time there is no user, session, or cookie. Configure Astro for SSR if you want data fetched per request.
 
 ```js astro.config.mjs
@@ -358,6 +365,8 @@ export default defineConfig({
   output: 'server',
 })
 ```
+
+### Create the Supabase clients [#astro-create-clients]
 
 <Tabs
   scrollable
@@ -468,7 +477,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 </TabPanel>
 </Tabs>
 
-## Congratulations
+### Congratulations [#astro-congratulations]
 
 To recap, you've:
 
@@ -479,6 +488,8 @@ You can now use any Supabase feature from your client or server code.
 
 </TabPanel>
 <TabPanel id="remix" label="Remix">
+
+### Create the Supabase clients [#remix-create-clients]
 
 With Remix, in a route module such as `_index.tsx`, you can export a `loader`, an `action`, and a default component.
 
@@ -571,7 +582,7 @@ export default function Index() {
 }
 ```
 
-## Congratulations
+### Congratulations [#remix-congratulations]
 
 To recap, you've:
 
@@ -584,6 +595,8 @@ You can now use any Supabase feature from your client or server code.
 </TabPanel>
 
 <TabPanel id="nuxt" label="Nuxt">
+
+### Create the Supabase clients [#nuxt-create-clients]
 
 <Tabs
   scrollable
@@ -650,7 +663,7 @@ export default defineNuxtPlugin(() => {
 </TabPanel>
 </Tabs>
 
-## Congratulations
+### Congratulations [#nuxt-congratulations]
 
 To recap, you've:
 
@@ -662,6 +675,8 @@ You can now use any Supabase feature from your client or server code.
 </TabPanel>
 
 <TabPanel id="react-router" label="React Router">
+
+### Create the Supabase clients [#react-router-create-clients]
 
 In React Router, a route module such as `_index.tsx` can export a `loader`, an `action`, and a default component. Create a server client inside the `loader` and `action`, and a browser client inside the component, passing the env vars through the `loader`.
 
@@ -746,7 +761,7 @@ export default function Index() {
 }
 ```
 
-## Congratulations
+### Congratulations [#react-router-congratulations]
 
 To recap, you've:
 
@@ -758,6 +773,8 @@ You can now use any Supabase feature from your client or server code.
 </TabPanel>
 
 <TabPanel id="express" label="Express">
+
+### Create the Supabase clients [#express-create-clients]
 
 <Tabs
   scrollable
@@ -810,7 +827,7 @@ app.post("/hello-world", async function (req, res, next) {
 </TabPanel>
 </Tabs>
 
-## Congratulations
+### Congratulations [#express-congratulations]
 
 To recap, you've:
 
@@ -822,6 +839,8 @@ You can now use any Supabase feature from your client or server code.
 </TabPanel>
 
 <TabPanel id="hono" label="Hono">
+
+### Create the Supabase clients [#hono-create-clients]
 
 <Tabs
   scrollable
@@ -845,8 +864,6 @@ language="typescript"
 
 You can now use this middleware in your Hono application to create a server Supabase client that can be used to make authenticated requests.
 
-<$Partial path="auth_methods.mdx" />
-
 <$CodeSample
 path="/auth/hono/src/index.tsx"
 meta="name=src/index.tsx"
@@ -856,10 +873,19 @@ language="typescript"
 </TabPanel>
 </Tabs>
 
+### Congratulations [#hono-congratulations]
+
+To recap, you've:
+
+- Created a Hono middleware that builds a request-specific server client.
+- Used that client in a route to make authenticated requests.
+
+You can now use any Supabase feature from your client or server code.
+
 </TabPanel>
 <TabPanel id="tanstack" label="TanStack Start">
 
-### Write utility functions to create Supabase clients
+### Write utility functions to create Supabase clients [#tanstack-utility-functions]
 
 TanStack Start renders matched routes on the server by default, so `beforeLoad` and `loader` run server-side on the initial request. Unlike Next.js, this means you don't need a proxy or middleware layer to keep sessions fresh. The server client reads and writes the session cookie directly on each request.
 
@@ -867,8 +893,6 @@ Create a `lib/supabase` folder at the root of your project, or inside the `./src
 
 1. **Create a browser client in `lib/supabase/client.ts`.** Use it to access Supabase from components that run in the browser.
 2. **Create a server client in `lib/supabase/server.ts`.** Use it to access Supabase from loaders, server functions, and other code that runs only on the server.
-
-<$Partial path="auth_methods.mdx" />
 
 Copy the lib utility functions below into each file:
 
@@ -921,7 +945,7 @@ Skipping the check inside the server function exposes private data to unauthenti
 
 Any other server function that returns or mutates private data needs this same check. Don't rely on a route being nested under `_protected` alone.
 
-## Congratulations
+### Congratulations [#tanstack-congratulations]
 
 To recap, you've:
 
@@ -933,6 +957,10 @@ You can now use any Supabase feature from your client or server code.
 
 </TabPanel>
 </Tabs>
+
+## Choosing an auth method
+
+<$Partial path="auth_methods.mdx" />
 
 ## Caching considerations
 
