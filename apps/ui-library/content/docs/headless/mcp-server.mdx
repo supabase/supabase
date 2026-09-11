@@ -32,16 +32,16 @@ The function verifies access tokens itself, so disable the gateway JWT check:
 verify_jwt = false
 ```
 
-The project must sign JWTs with an asymmetric key. Projects that still use the
-legacy HS256 secret do not expose signing keys from the JWKS endpoint, so the
-function cannot authenticate embedded product sessions or external MCP clients.
-Switch to an ES256 or RS256 key in
+The project must sign JWTs with an asymmetric key. `withSupabase` verifies user
+tokens against the project JWKS and rejects legacy HS256 tokens, so a project
+that still uses the legacy secret cannot authenticate embedded product sessions
+or external MCP clients. Switch to an ES256 or RS256 key in
 [JWT Keys](https://supabase.com/dashboard/project/_/settings/jwt).
 
 Use Supabase CLI 2.117.0 or later. It supplies asymmetric signing keys for local
-development and injects the function slug and public project URL into the Edge
-Function, so the URLs advertised in the OAuth discovery metadata are canonical
-whatever path a request arrives on.
+development and injects the function slug into the Edge Function, so the URL
+advertised in the OAuth discovery metadata is canonical whatever path a request
+arrives on.
 
 ## Choose how agents authenticate
 
@@ -193,8 +193,9 @@ cp supabase/functions/mcp-server/.env.example supabase/functions/.env
 ```
 
 Add `supabase/functions/.env` to `.gitignore`. Supabase supplies the project URL,
-API keys, function slug, and public project URL to Edge Functions automatically;
-OAuth discovery uses those to advertise the public URL of the function.
+API keys, and function slug to Edge Functions automatically; OAuth discovery
+combines the slug with the public origin the gateway forwards to advertise the
+function's public URL.
 
 ## Deploy
 
