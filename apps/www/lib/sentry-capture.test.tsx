@@ -46,14 +46,39 @@ afterAll(async () => {
 })
 
 const captureGlobalError = async (error: Error) => {
-  const document = window.document.implementation.createHTMLDocument()
-  const root = createRoot(document)
-  await act(async () => root.render(<GlobalError error={error} />))
-  await act(async () => root.unmount())
+  const frame = document.createElement('iframe')
+  document.body.appendChild(frame)
+  const frameDocument = frame.contentDocument
+  if (!frameDocument) throw new Error('Missing frame document')
+  const root = createRoot(frameDocument)
+  try {
+    await act(async () => root.render(<GlobalError error={error} />))
+    expect(frameDocument.activeElement).toBe(
+      frameDocument.querySelector('main[aria-label="Page error"]')
+    )
+  } finally {
+    await act(async () => root.unmount())
+    frame.remove()
+  }
 }
 
 const capturePagesError = async (err: Error) => {
-  await CustomError.getInitialProps({ err, pathname: '/crash', query: {}, AppTree: () => null })
+  const props = await CustomError.getInitialProps({
+    err,
+    pathname: '/crash',
+    query: {},
+    AppTree: () => null,
+  })
+  const container = document.createElement('div')
+  document.body.appendChild(container)
+  const root = createRoot(container)
+  try {
+    await act(async () => root.render(<CustomError {...props} />))
+    expect(document.activeElement).toBe(container.querySelector('main[aria-label="Page error"]'))
+  } finally {
+    await act(async () => root.unmount())
+    container.remove()
+  }
 }
 
 describe.each([
