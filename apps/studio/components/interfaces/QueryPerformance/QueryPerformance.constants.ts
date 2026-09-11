@@ -60,7 +60,7 @@ export const QUERY_PERFORMANCE_ROLE_DESCRIPTION = [
   {
     name: 'dashboard_user',
     description:
-      'A legacy role. Queries run from the Supabase Dashboard execute as postgres and include a "-- source: dashboard" comment.',
+      'The Supabase Dashboard doesn\'t connect as this role. Dashboard queries execute as postgres and include a "-- source: dashboard" comment.',
   },
   {
     name: 'supabase_admin',

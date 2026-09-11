@@ -125,7 +125,7 @@ This role:
 
 ### `dashboard_user`
 
-A legacy role. Queries you run in the Supabase Dashboard execute as `postgres` and include a `-- source: dashboard` comment, which you can use to [find them in the Postgres logs](/docs/guides/troubleshooting/how-to-interpret-and-explore-the-postgres-logs-OuCIOj).
+The Supabase Dashboard doesn't connect as this role. Queries you run in the Dashboard execute as `postgres` and include a `-- source: dashboard` comment, which you can use to [find them in the Postgres logs](/docs/guides/troubleshooting/how-to-interpret-and-explore-the-postgres-logs-OuCIOj).
 
 ### `supabase_admin`
 
