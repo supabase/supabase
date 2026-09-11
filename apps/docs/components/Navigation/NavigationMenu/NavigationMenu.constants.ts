@@ -1063,8 +1063,12 @@ export const database: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Managing tables, views, and data',
+          name: 'Managing tables and data',
           url: '/guides/database/tables' as `/${string}`,
+        },
+        {
+          name: 'Views',
+          url: '/guides/database/views' as `/${string}`,
         },
         {
           name: 'Working with arrays',
@@ -1646,8 +1650,12 @@ export const api: NavMenuConstant = {
       url: '/guides/api/data-apis',
       items: [
         {
-          name: 'Managing tables, views, and data',
+          name: 'Managing tables and data',
           url: '/guides/database/tables' as `/${string}`,
+        },
+        {
+          name: 'Views',
+          url: '/guides/database/views' as `/${string}`,
         },
         {
           name: 'Querying joins and nested tables',
