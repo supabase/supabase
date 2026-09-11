@@ -183,6 +183,24 @@ describe('OAuthAppsAuthorizeScreen', () => {
     ).toHaveLength(1)
   })
 
+  test('keeps the no-admin-approval footer line for a user-bound grant', async () => {
+    renderScreen()
+
+    expect(
+      await screen.findByText(/No admin approval is needed if your role permits this access/)
+    ).toBeInTheDocument()
+  })
+
+  test('drops the no-admin-approval footer line for an organization-bound grant', async () => {
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBot })
+
+    await screen.findByText('Permissions requested')
+    expect(screen.queryByText(/No admin approval is needed/)).not.toBeInTheDocument()
+    expect(
+      screen.getByText(/This authorization will appear in Authorized apps/)
+    ).toBeInTheDocument()
+  })
+
   test('shows no shared-grant messaging for a user-bound grant', async () => {
     renderScreen()
 
