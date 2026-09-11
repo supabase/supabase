@@ -12,7 +12,7 @@ import type {
   UseCustomQueryOptions,
 } from '@/types'
 
-export type ContentBase = components['schemas']['GetUserContentResponse']['data'][number]
+export type ContentBase = components['schemas']['GetUserContentResponse_Output']['data'][number]
 
 export type Content = Omit<ContentBase, 'content' | 'type'> &
   (

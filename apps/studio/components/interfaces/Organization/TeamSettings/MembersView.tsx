@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { partition } from 'lodash'
 import { AlertCircle } from 'lucide-react'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import {
   Card,
   Loading,
@@ -17,9 +17,17 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { MemberRow } from './MemberRow'
+import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
 import { AlertError } from '@/components/ui/AlertError'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
-import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import {
+  useOrganizationMembersQuery,
+  type OrganizationMember,
+} from '@/data/organizations/organization-members-query'
+import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useProfile } from '@/lib/profile'
 
 export interface MembersViewProps {
@@ -40,11 +48,22 @@ const MembersView = ({ searchString }: MembersViewProps) => {
   const {
     data: roles,
     error: rolesError,
+    isPending: isLoadingRoles,
     isSuccess: isSuccessRoles,
     isError: isErrorRoles,
   } = useOrganizationRolesV2Query({
     slug,
   })
+
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { data: permissions } = usePermissionsQuery()
+  const organizationMembersDeletionEnabled = useIsFeatureEnabled('organization_members:delete')
+
+  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
+  const orgProjects = useMemo(
+    () => projectsData?.pages.flatMap((page) => page.projects) ?? [],
+    [projectsData?.pages]
+  )
 
   const filteredMembers = useMemo(() => {
     return !searchString
@@ -66,6 +85,13 @@ const MembersView = ({ searchString }: MembersViewProps) => {
     filteredMembers,
     (m) => m.gotrue_id === profile?.gotrue_id
   )
+
+  const [memberForRoleUpdate, setMemberForRoleUpdate] = useState<OrganizationMember>()
+  const [showRoleUpdatePanel, setShowRoleUpdatePanel] = useState(false)
+  const handleManageAccess = (member: OrganizationMember) => {
+    setMemberForRoleUpdate(member)
+    setShowRoleUpdatePanel(true)
+  }
 
   const userMember = members.find((m) => m.gotrue_id === profile?.gotrue_id)
   const orgScopedRoleIds = (roles?.org_scoped_roles ?? []).map((r) => r.id)
@@ -122,9 +148,35 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                           </TableRow>,
                         ]
                       : []),
-                    ...(!!user ? [<MemberRow key={user.gotrue_id} member={user} />] : []),
+                    ...(!!user
+                      ? [
+                          <MemberRow
+                            key={user.gotrue_id}
+                            member={user}
+                            members={members}
+                            roles={roles}
+                            isLoadingRoles={isLoadingRoles}
+                            orgProjects={orgProjects}
+                            permissions={permissions}
+                            selectedOrganization={selectedOrganization}
+                            organizationMembersDeletionEnabled={organizationMembersDeletionEnabled}
+                            onManageAccess={handleManageAccess}
+                          />,
+                        ]
+                      : []),
                     ...sortedMembers.map((member) => (
-                      <MemberRow key={member.gotrue_id} member={member} />
+                      <MemberRow
+                        key={member.gotrue_id}
+                        member={member}
+                        members={members}
+                        roles={roles}
+                        isLoadingRoles={isLoadingRoles}
+                        orgProjects={orgProjects}
+                        permissions={permissions}
+                        selectedOrganization={selectedOrganization}
+                        organizationMembersDeletionEnabled={organizationMembersDeletionEnabled}
+                        onManageAccess={handleManageAccess}
+                      />
                     )),
                     ...(searchString.length > 0 && filteredMembers.length === 0
                       ? [
@@ -155,6 +207,14 @@ const MembersView = ({ searchString }: MembersViewProps) => {
             </Loading>
           </Card>
         </div>
+      )}
+
+      {memberForRoleUpdate && (
+        <UpdateRolesPanel
+          visible={showRoleUpdatePanel}
+          member={memberForRoleUpdate}
+          onClose={() => setShowRoleUpdatePanel(false)}
+        />
       )}
     </>
   )

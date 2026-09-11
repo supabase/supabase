@@ -154,7 +154,7 @@ const PITRSidePanel = () => {
         isSubmitting ||
         !canUpdatePitr ||
         (!!selectedPitr && !hasSufficientCompute) ||
-        blockDowngradeDueToHipaa
+        (blockDowngradeDueToHipaa ?? undefined)
       }
       tooltip={
         blockDowngradeDueToHipaa
