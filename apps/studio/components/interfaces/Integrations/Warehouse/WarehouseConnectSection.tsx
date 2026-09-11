@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { Eye, EyeOff, KeyRound } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -33,7 +33,9 @@ import {
 } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { ConnectSheetStep } from '../../ConnectSheet/ConnectSheetStep'
 import { EnvRow } from '../../ConnectSheet/content/server/common/EnvRow'
+import { CopyPromptButton } from '../../ConnectSheet/CopyPromptAdmonition'
 import type { WarehouseCatalogCredentials } from './Warehouse.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import CopyButton from '@/components/ui/CopyButton'
@@ -137,12 +139,54 @@ const DuckLakeSecretRow = ({ name, value }: { name: string; value: string }) => 
  * The DuckDB setup script inlines everything except the two passwords, which it reads via
  * `getenv()` -- so those are the only credential values surfaced as their own rows here.
  */
-const DuckLakeSetup = ({ credentials }: { credentials: WarehouseCatalogCredentials }) => {
+const DuckLakeEnvironmentVariables = ({
+  credentials,
+  password,
+}: {
+  credentials: WarehouseCatalogCredentials
+  password: string
+}) => {
+  const environmentVariables = [
+    `${DUCKLAKE_S3_SECRET_ENV_VAR}=${credentials.s3_secret_access_key}`,
+    `${DUCKLAKE_METADATA_PASSWORD_ENV_VAR}=${password}`,
+  ].join('\n')
+
+  return (
+    <div className="overflow-hidden rounded-lg border bg-surface-75">
+      <div className="flex items-center justify-between border-b bg-surface-100 py-2 pl-4 pr-2">
+        <span className="font-mono text-xs text-foreground-light">.env</span>
+        <CopyButton
+          variant="default"
+          size="tiny"
+          copyLabel="Copy all"
+          aria-label="Copy all DuckLake environment variables"
+          text={environmentVariables}
+        />
+      </div>
+      <div className="divide-y">
+        <DuckLakeSecretRow
+          name={DUCKLAKE_S3_SECRET_ENV_VAR}
+          value={credentials.s3_secret_access_key}
+        />
+        <DuckLakeSecretRow name={DUCKLAKE_METADATA_PASSWORD_ENV_VAR} value={password} />
+      </div>
+    </div>
+  )
+}
+
+const DuckLakeSetup = ({
+  credentials,
+  variant,
+}: {
+  credentials: WarehouseCatalogCredentials
+  variant: 'default' | 'sheet'
+}) => {
   const connection = parseWarehouseCatalogUrl(credentials.catalog_url)
+  const stepsContainerRef = useRef<HTMLDivElement | null>(null)
 
   if (connection === null) {
-    return (
-      <CardContent className="space-y-4">
+    const errorContent = (
+      <>
         <Admonition
           type="warning"
           title="Could not read the catalog connection details"
@@ -151,51 +195,57 @@ const DuckLakeSetup = ({ credentials }: { credentials: WarehouseCatalogCredentia
         <FieldRow label="Catalog URL">
           <Input readOnly copy reveal className="font-mono" value={credentials.catalog_url} />
         </FieldRow>
+      </>
+    )
+
+    return variant === 'sheet' ? (
+      <div className="space-y-4 border-t bg-muted/50 p-8">{errorContent}</div>
+    ) : (
+      <CardContent className="space-y-4">{errorContent}</CardContent>
+    )
+  }
+
+  const script = (
+    <CodeBlock
+      className="[&_code]:text-foreground"
+      language="sql"
+      hideLineNumbers
+      value={getDuckLakeSetupScript({ credentials, connection })}
+    />
+  )
+
+  if (variant === 'default') {
+    return (
+      <CardContent className="space-y-4">
+        <DuckLakeEnvironmentVariables credentials={credentials} password={connection.password} />
+        {script}
       </CardContent>
     )
   }
 
-  const environmentVariables = [
-    `${DUCKLAKE_S3_SECRET_ENV_VAR}=${credentials.s3_secret_access_key}`,
-    `${DUCKLAKE_METADATA_PASSWORD_ENV_VAR}=${connection.password}`,
-  ].join('\n')
-
   return (
-    <CardContent className="space-y-4">
-      <div className="overflow-hidden rounded-lg border bg-surface-75">
-        <div className="flex items-center justify-between border-b bg-surface-100 py-2 pl-4 pr-2">
-          <span className="font-mono text-xs text-foreground-light">.env</span>
-          <CopyButton
-            variant="default"
-            size="tiny"
-            copyLabel="Copy all"
-            aria-label="Copy all DuckLake environment variables"
-            text={environmentVariables}
-          />
-        </div>
-        <div className="divide-y">
-          <DuckLakeSecretRow
-            name={DUCKLAKE_S3_SECRET_ENV_VAR}
-            value={credentials.s3_secret_access_key}
-          />
-          <DuckLakeSecretRow
-            name={DUCKLAKE_METADATA_PASSWORD_ENV_VAR}
-            value={connection.password}
-          />
-        </div>
+    <div className="border-t bg-muted/50 p-8">
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <h3>Follow these steps</h3>
+        <CopyPromptButton stepsContainerRef={stepsContainerRef} />
       </div>
-      {/*
-        `className` is what switches CodeBlock from its plain <code> fallback to the syntax
-        highlighter -- without it the SQL renders unhighlighted and the blank lines between steps
-        collapse.
-      */}
-      <CodeBlock
-        className="[&_code]:text-foreground"
-        language="sql"
-        hideLineNumbers
-        value={getDuckLakeSetupScript({ credentials, connection })}
-      />
-    </CardContent>
+      <div ref={stepsContainerRef}>
+        <ConnectSheetStep
+          number={1}
+          title="Set environment variables"
+          description="Add these credentials to your environment before running the SQL."
+        >
+          <DuckLakeEnvironmentVariables credentials={credentials} password={connection.password} />
+        </ConnectSheetStep>
+        <ConnectSheetStep
+          number={2}
+          title="Attach Warehouse"
+          description="Run this script in DuckDB to configure the secrets and attach Warehouse."
+        >
+          {script}
+        </ConnectSheetStep>
+      </div>
+    </div>
   )
 }
 
@@ -250,7 +300,7 @@ export const WarehouseConnectionCard = ({ variant = 'default' }: WarehouseConnec
 
   const isSheet = variant === 'sheet'
 
-  return (
+  const connectionCard = (
     <Card
       className={cn(
         isSheet &&
@@ -292,12 +342,29 @@ export const WarehouseConnectionCard = ({ variant = 'default' }: WarehouseConnec
           {!isCatalogPending && !isCatalogError && catalog !== undefined && (
             <CatalogAccessToggle projectRef={projectRef} isEnabled={catalog.enabled} />
           )}
-          {!isCatalogPending && !isCatalogError && catalog?.enabled && catalog.credentials && (
-            <DuckLakeSetup credentials={catalog.credentials} />
-          )}
+          {!isSheet &&
+            !isCatalogPending &&
+            !isCatalogError &&
+            catalog?.enabled &&
+            catalog.credentials && (
+              <DuckLakeSetup credentials={catalog.credentials} variant="default" />
+            )}
         </>
       )}
     </Card>
+  )
+
+  if (!isSheet) return connectionCard
+
+  return (
+    <div>
+      <div className="p-8">{connectionCard}</div>
+      {engine === 'duckdb' &&
+        !isCatalogPending &&
+        !isCatalogError &&
+        catalog?.enabled &&
+        catalog.credentials && <DuckLakeSetup credentials={catalog.credentials} variant="sheet" />}
+    </div>
   )
 }
 

@@ -90,7 +90,7 @@ export function getDuckLakeSetupScript({
   }
   connection: WarehouseCatalogConnection
 }): string {
-  return `-- 1. S3 credentials for reading the Warehouse data files
+  return `-- S3 credentials for reading the Warehouse data files
 CREATE OR REPLACE SECRET ducklake_s3 (
   TYPE s3,
   KEY_ID '${credentials.s3_access_key_id}',
@@ -100,7 +100,7 @@ CREATE OR REPLACE SECRET ducklake_s3 (
   URL_STYLE 'path'
 );
 
--- 2. Postgres credentials for the DuckLake metadata catalog
+-- Postgres credentials for the DuckLake metadata catalog
 CREATE OR REPLACE SECRET ducklake_metadata (
   TYPE postgres,
   HOST '${connection.host}',
@@ -110,7 +110,7 @@ CREATE OR REPLACE SECRET ducklake_metadata (
   PASSWORD getenv('${DUCKLAKE_METADATA_PASSWORD_ENV_VAR}')
 );
 
--- 3. Bind the metadata secret into a DuckLake secret configuration
+-- Bind the metadata secret into a DuckLake secret configuration
 CREATE OR REPLACE SECRET ducklake_warehouse (
   TYPE ducklake,
   METADATA_PATH '',
@@ -122,6 +122,6 @@ CREATE OR REPLACE SECRET ducklake_warehouse (
   }
 );
 
--- 4. Clean attach using only the secret identifier
+-- Attach Warehouse using only the secret identifier
 ATTACH 'ducklake:ducklake_warehouse' AS warehouse;`
 }

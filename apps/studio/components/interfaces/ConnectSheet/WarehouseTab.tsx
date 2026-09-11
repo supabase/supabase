@@ -49,36 +49,52 @@ export const WarehouseTab = () => {
   const { ref: projectRef } = useParams()
   const { data, isPending, isError, error } = useWarehouseSetupStatusQuery({ projectRef })
 
-  if (isPending) return <GenericSkeletonLoader />
+  if (isPending) {
+    return (
+      <div className="p-8">
+        <GenericSkeletonLoader />
+      </div>
+    )
+  }
 
   // Warehouse rides on the replication API, which isn't wired up in local development. Same
   // treatment Pipelines gives it, so a local dev doesn't read this as a broken build.
   if (isError && checkLocalETLNotSetUp(error)) {
     return (
-      <Admonition
-        type="default"
-        title="Warehouse is unavailable locally"
-        description="Configure the replication API to set up Warehouse in local development."
-      />
+      <div className="p-8">
+        <Admonition
+          type="default"
+          title="Warehouse is unavailable locally"
+          description="Configure the replication API to set up Warehouse in local development."
+        />
+      </div>
     )
   }
-  if (isError) return <AlertError subject="Failed to load Warehouse status" error={error} />
+  if (isError) {
+    return (
+      <div className="p-8">
+        <AlertError subject="Failed to load Warehouse status" error={error} />
+      </div>
+    )
+  }
 
   if (!isWarehouseProvisioned(data?.setup_status)) {
     const { type, title, description, action } = getNotProvisionedContent(data?.setup_status)
 
     return (
-      <Admonition
-        type={type}
-        layout="responsive"
-        title={title}
-        description={description}
-        actions={[
-          <Button key="open-warehouse" asChild variant="default">
-            <Link href={`/project/${projectRef}/integrations/warehouse/overview`}>{action}</Link>
-          </Button>,
-        ]}
-      />
+      <div className="p-8">
+        <Admonition
+          type={type}
+          layout="responsive"
+          title={title}
+          description={description}
+          actions={[
+            <Button key="open-warehouse" asChild variant="default">
+              <Link href={`/project/${projectRef}/integrations/warehouse/overview`}>{action}</Link>
+            </Button>,
+          ]}
+        />
+      </div>
     )
   }
 
