@@ -10,15 +10,15 @@ The [Architecture](/docs/guides/getting-started/architecture) page tells you wha
 
 ## The progression at a glance
 
-| Your app needs to…                  | Reach for                                                    | Keep in mind                                                        |
-| ----------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------- |
-| Store and query data, expose an API | [Postgres + auto APIs](#start-with-your-database)            | Your schema is your API                                             |
-| Know who is calling                 | [Auth](#add-users-auth)                                      | Auth issues an identity the database can read                       |
-| Show each user only their own data  | [Row Level Security](#add-authorization-in-the-database-rls) | Authorization is data, enforced by Postgres                         |
-| Reflect changes without a refresh   | [Realtime](#add-live-updates-realtime)                       | Subscribe to the database, don't poll it                            |
-| Handle uploads and files            | [Storage](#add-files-storage)                                | Files obey the same access rules as your rows                       |
-| Run server-side logic and secrets   | [Edge Functions](#add-server-side-logic-edge-functions)      | Data-shaped logic in Postgres, integration-shaped logic at the edge |
-| Serve real traffic safely           | [Harden for production](#harden-for-production)              | Verify, pool, observe, back up                                      |
+| Your app needs to…           | Reach for                                                    | Keep in mind                                  |
+| ---------------------------- | ------------------------------------------------------------ | --------------------------------------------- |
+| Store data and expose an API | [Postgres + auto APIs](#start-with-your-database)            | Your schema is your API                       |
+| Know who is calling          | [Auth](#add-users-auth)                                      | An identity the database can read             |
+| Scope data to each user      | [Row Level Security](#add-authorization-in-the-database-rls) | Authorization enforced by Postgres            |
+| Reflect changes live         | [Realtime](#add-live-updates-realtime)                       | Subscribe, don't poll                         |
+| Handle files and uploads     | [Storage](#add-files-storage)                                | Files use your data's access rules            |
+| Run server-side logic        | [Edge Functions](#add-server-side-logic-edge-functions)      | Data logic in Postgres, edge for integrations |
+| Serve real traffic safely    | [Harden for production](#harden-for-production)              | Verify, pool, observe, back up                |
 
 You don't need all of it. Most apps start at the first row and stop wherever their needs stop. Add the next block when a concrete need shows up, not before.
 
