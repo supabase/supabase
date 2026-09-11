@@ -3,6 +3,46 @@ id: release-notes
 title: Release Notes
 ---
 
+## 8.1.0 - 2026-09-07
+
+- Stream Edge Function responses ([#417](https://github.com/supabase-community/supabase-csharp/issues/417)).
+- Realtime: add an `enabled` flag to opt into the initial presence sync ([#407](https://github.com/supabase-community/supabase-csharp/issues/407)).
+- Fix: keep `!` and unary `-` attached to their values in `Where` filter expressions ([#414](https://github.com/supabase-community/supabase-csharp/issues/414)).
+- Fix: write integer arrays as JSON arrays and reject invalid literals with a `JsonException` ([#408](https://github.com/supabase-community/supabase-csharp/issues/408)).
+
+## 8.0.0 - 2026-09-03
+
+Major release. All `Supabase.*` packages are versioned in lockstep. See the [migration guide](https://github.com/supabase-community/supabase-csharp/blob/master/docs/migrations/v8.0.0.md) for upgrade steps.
+
+**Breaking changes**
+
+- Migrate from `Newtonsoft.Json` to `System.Text.Json` across every package. Custom models with `[JsonProperty]` should move to `[JsonPropertyName]`; direct `JsonConvert` calls should move to `JsonSerializer` ([#360](https://github.com/supabase-community/supabase-csharp/issues/360)).
+- Retarget every package to `netstandard2.1` (from `netstandard2.0`). .NET Framework and pre-`netstandard2.1` runtimes (Mono < 6.4, older Xamarin/Unity) are no longer supported — move to a `netstandard2.1`-capable target (.NET Core 3.0+/.NET 5+).
+- Postgrest: parameterless `Table.Delete()` now returns `Task<ModeledResponse<T>>` (the deleted rows) instead of `Task` ([#342](https://github.com/supabase-community/supabase-csharp/issues/342)).
+- Postgrest: `Single()` now throws a `PostgrestException` (status `406`) when more than one row matches, instead of returning `null` ([#346](https://github.com/supabase-community/supabase-csharp/issues/346)).
+- Realtime: registering a `postgres_changes` listener after `Subscribe()` now throws a `RealtimeException` ([#385](https://github.com/supabase-community/supabase-csharp/issues/385)).
+- Gotrue: stop sending the OAuth `state` parameter to `/authorize`; `SignInOptions.State` and `ProviderAuthState.State` are removed ([#388](https://github.com/supabase-community/supabase-csharp/issues/388)).
+- Gotrue: rename `NetworkStatus.PingCheck` to `PingCheckAsync`.
+
+**Features**
+
+- Add the `Supabase.Extensions.DependencyInjection` package for DI registration ([#387](https://github.com/supabase-community/supabase-csharp/issues/387)).
+- Add retry/backoff and injectable `HttpClient` support across all services ([#383](https://github.com/supabase-community/supabase-csharp/issues/383)).
+- Support publishable and secret API keys ([#397](https://github.com/supabase-community/supabase-csharp/issues/397)).
+- Gotrue: support async session persistence ([#399](https://github.com/supabase-community/supabase-csharp/issues/399)) and soft-delete on admin `DeleteUser` ([#402](https://github.com/supabase-community/supabase-csharp/issues/402)).
+- Storage: expose the service error code ([#380](https://github.com/supabase-community/supabase-csharp/issues/380)).
+
+**Fixes**
+
+- Gotrue: a failed token refresh no longer signs the user out — only a server-reported invalid refresh token does ([#394](https://github.com/supabase-community/supabase-csharp/issues/394)).
+- Postgrest: drop the `.` before nested `and`/`or` groups ([#389](https://github.com/supabase-community/supabase-csharp/issues/389)).
+- Storage: percent-encode the object key in CDN purge URLs ([#384](https://github.com/supabase-community/supabase-csharp/issues/384)).
+
+## 1.6.0 - 2026-08-07
+
+- Bump Supabase dependencies ([#301](https://github.com/supabase-community/supabase-csharp/issues/301)).
+- Fix: match auth header names case-insensitively, enabling developer overrides ([#295](https://github.com/supabase-community/supabase-csharp/issues/295)).
+
 ## 1.5.0 - 2026-07-30
 
 - Update dependency: `Supabase.Realtime@7.3.1`
