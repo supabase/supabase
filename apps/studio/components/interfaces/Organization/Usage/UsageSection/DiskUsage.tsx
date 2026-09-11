@@ -50,12 +50,16 @@ export const DiskUsage = ({
             const isBranchExceedingFreeQuota =
               project.is_branch && project.databases.some((db) => (db.disk_volume_size_gb ?? 8) > 8)
 
+            const isFilteredBranch = project.is_branch && project.ref === projectRef
+
             const isActiveProject = project.status !== PROJECT_STATUS.INACTIVE
 
             const isHostedOnAws = project.databases.every((db) => db.cloud_provider === 'AWS')
 
             return (
-              (!project.is_branch || isBranchExceedingFreeQuota) && isActiveProject && isHostedOnAws
+              (!project.is_branch || isBranchExceedingFreeQuota || isFilteredBranch) &&
+              isActiveProject &&
+              isHostedOnAws
             )
           })
           .filter((it) => it.ref === projectRef || !projectRef)
