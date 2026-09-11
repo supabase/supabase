@@ -112,7 +112,7 @@ export const useReportDateRange = (
 
   const getDefaultHelper = useCallback(() => {
     const targetHelper =
-      resolveHelperFromUrl(isHelperValue, helperTextValue) ??
+      resolveHelperFromUrl(Boolean(isHelperValue), helperTextValue ?? '') ??
       resolveHelperFromArgument(defaultHelper)
 
     // Check if the target helper is available for the current entitlement
