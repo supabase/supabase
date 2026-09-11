@@ -49,6 +49,7 @@ export const ShareSnippetModal = ({
         projectRef,
         payload: {
           ...snippet,
+          description: snippet.description ?? undefined,
           visibility: 'project',
           folder_id: null,
           content: snippetContent,

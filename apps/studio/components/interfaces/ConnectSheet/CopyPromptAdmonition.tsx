@@ -140,7 +140,6 @@ export function CopyPromptButton({ stepsContainerRef, customPrompt }: CopyPrompt
   return (
     <>
       <ButtonTooltip
-        variant="default"
         icon={showCopied ? <Check strokeWidth={2} className="text-brand" /> : <Copy />}
         onClick={() => {
           const textToCopy = customPrompt ?? buildConnectPrompt(stepsContainerRef.current)

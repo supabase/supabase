@@ -170,7 +170,6 @@ export function OpenSourceSection() {
               <Button
                 asChild
                 size="small"
-                variant="default"
                 icon={
                   <svg viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path

@@ -108,7 +108,7 @@ This mode is similar to connecting to your database directly. There is full supp
         )}
         <DialogFooter>
           <DialogClose onClick={() => snap.setShowPoolingModeHelper(false)}>
-            <Button variant="default">Close</Button>
+            <Button>Close</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

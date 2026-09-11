@@ -290,7 +290,7 @@ export const ReplicationPipelineStatus = () => {
               </Button>
             )}
 
-            <Button asChild variant="default">
+            <Button asChild>
               <Link href={logsUrl}>View logs</Link>
             </Button>
 
@@ -418,7 +418,6 @@ export const ReplicationPipelineStatus = () => {
               <div className="flex items-center">
                 <Button
                   size="tiny"
-                  variant="default"
                   className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
                   icon={<RotateCcw />}
                   disabled={isAnyRestartInProgress || showDisabledState || isPipelineError}
@@ -433,7 +432,6 @@ export const ReplicationPipelineStatus = () => {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      variant="default"
                       aria-label="More restart options"
                       icon={<ChevronDown />}
                       className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"

@@ -136,7 +136,7 @@ export const ComputeList = ({
         </Select>
 
         <div className="flex items-center gap-3 md:ml-auto">
-          <Button variant="default" icon={<RefreshCw />} loading={isRefreshing} onClick={onRefresh}>
+          <Button icon={<RefreshCw />} loading={isRefreshing} onClick={onRefresh}>
             Refresh
           </Button>
           <Button variant="primary" icon={<Terminal />} onClick={onDeploy}>
@@ -214,7 +214,6 @@ export const ComputeList = ({
               <ButtonTooltip
                 icon={<ChevronLeft />}
                 aria-label="Previous page"
-                variant="default"
                 size="tiny"
                 disabled={currentPage === 1}
                 onClick={() => setPage(currentPage - 1)}
@@ -231,7 +230,6 @@ export const ComputeList = ({
               <ButtonTooltip
                 icon={<ChevronRight />}
                 aria-label="Next page"
-                variant="default"
                 size="tiny"
                 disabled={currentPage >= totalPages}
                 onClick={() => setPage(currentPage + 1)}

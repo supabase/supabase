@@ -219,7 +219,7 @@ function CaseStudyPage(props: any) {
                         <div>
                           <p>Ready to get started?</p>
                           <div>
-                            <Button asChild variant="default" iconRight={<ChevronRight />}>
+                            <Button asChild iconRight={<ChevronRight />}>
                               <Link
                                 href="https://supabase.com/contact/enterprise"
                                 className="no-underline"

@@ -124,7 +124,7 @@ describe('InvoicesSettings', () => {
 
     render(<InvoicesSettings />)
 
-    expect(screen.getByRole('button', { name: 'Download invoice' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Download invoice' })).toBeAriaDisabled()
   })
 
   it('shows an error when the fetched invoice has no PDF', async () => {

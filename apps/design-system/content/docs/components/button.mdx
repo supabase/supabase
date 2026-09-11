@@ -138,8 +138,22 @@ Inside [Admonition](../fragments/admonition#split-button-with-dropdown) actions 
 [Keyboard focus](../accessibility#focus-management) is automatically handled:
 
 - Enabled buttons default to `tabIndex={0}` (keyboard accessible)
-- Disabled buttons default to `tabIndex={-1}` (removed from tab order)
+- Buttons with native `disabled` default to `tabIndex={-1}` (removed from tab order)
 - You can still override with an explicit `tabIndex` prop when needed
 - Keyboard focus uses the shared `focus-ring` utility; variants do not change ring colour
 
-You therefore don't need to manually set `tabIndex`, as Button handles it automatically based on its `disabled` state.
+You therefore don't need to manually set `tabIndex` for buttons using native `disabled`.
+
+When a disabled action has a non-obvious reason and needs a tooltip, add `focusableWhenDisabled` so keyboard users can still focus the control. See [Disabled controls](../accessibility#disabled-controls).
+
+### Focusable when disabled
+
+Use `focusableWhenDisabled` with `disabled` when the action is blocked for a non-obvious reason and you need a tooltip or other explanation. The control stays in the tab order and uses `aria-disabled` instead of native `disabled`.
+
+```tsx
+<Button disabled focusableWhenDisabled>
+  Pause project
+</Button>
+```
+
+In Studio, `ButtonTooltip` adds `focusableWhenDisabled` to disabled buttons with tooltip text automatically.

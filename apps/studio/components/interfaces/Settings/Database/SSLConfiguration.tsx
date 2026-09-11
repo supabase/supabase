@@ -222,7 +222,6 @@ export const SSLConfiguration = () => {
                 {!hasSSLCertificate ? (
                   <ButtonTooltip
                     disabled
-                    variant="default"
                     icon={<Download />}
                     tooltip={{
                       content: {
@@ -234,7 +233,7 @@ export const SSLConfiguration = () => {
                     Download certificate
                   </ButtonTooltip>
                 ) : (
-                  <Button variant="default" icon={<Download />}>
+                  <Button icon={<Download />}>
                     <a href={sslCertificateUrl}>Download certificate</a>
                   </Button>
                 )}

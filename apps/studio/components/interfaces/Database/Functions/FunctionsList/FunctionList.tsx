@@ -168,7 +168,6 @@ export const FunctionList = ({
                           <DropdownMenuTrigger asChild>
                             <Button
                               aria-label={`${x.name} actions`}
-                              variant="default"
                               className="px-1"
                               icon={<MoreVertical />}
                             />
@@ -247,7 +246,6 @@ export const FunctionList = ({
                   ) : (
                     <ButtonTooltip
                       disabled
-                      variant="default"
                       icon={<MoreVertical />}
                       className="px-1"
                       tooltip={{

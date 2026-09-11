@@ -151,7 +151,7 @@ export const CreateFirebaseAuthIntegrationDialog = ({
             </div>
           )}
 
-          <Button disabled={isPending} variant="default" onClick={() => onClose()}>
+          <Button disabled={isPending} onClick={() => onClose()}>
             Cancel
           </Button>
           <Button

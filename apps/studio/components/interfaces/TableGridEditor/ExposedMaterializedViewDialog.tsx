@@ -72,7 +72,7 @@ $$;`}
 
         <DialogFooter>
           <div className="flex items-center justify-end space-x-2">
-            <Button variant="default" onClick={() => setIsExposedMaterializedViewDialogOpen(false)}>
+            <Button onClick={() => setIsExposedMaterializedViewDialogOpen(false)}>
               Understood
             </Button>
           </div>
