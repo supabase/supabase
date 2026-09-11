@@ -750,12 +750,30 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.2.6(react@19.2.6)
+      remark-gfm:
+        specifier: ^4.0.1
+        version: 4.0.1(supports-color@8.1.1)
+      remark-parse:
+        specifier: ^11.0.0
+        version: 11.0.0(supports-color@8.1.1)
+      remark-stringify:
+        specifier: ^11.0.0
+        version: 11.0.0
       ui:
         specifier: workspace:*
         version: link:../../packages/ui
       ui-patterns:
         specifier: workspace:*
         version: link:../../packages/ui-patterns
+      unified:
+        specifier: ^11.0.5
+        version: 11.0.5
+      unist-util-visit:
+        specifier: ^5.1.0
+        version: 5.1.0
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
     devDependencies:
       '@tailwindcss/vite':
         specifier: 4.2.4
@@ -1033,8 +1051,8 @@ importers:
         specifier: 'catalog:'
         version: 2.112.4
       '@supabase/shared-types':
-        specifier: 0.1.91
-        version: 0.1.91
+        specifier: 0.1.95
+        version: 0.1.95
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.112.4(@opentelemetry/api@1.9.1)
@@ -1826,6 +1844,9 @@ importers:
       icons:
         specifier: workspace:*
         version: link:../../packages/icons
+      js-yaml:
+        specifier: ^3.15.1
+        version: 3.15.1
       lucide-react:
         specifier: '*'
         version: 0.436.0(react@19.2.6)
@@ -2599,8 +2620,8 @@ importers:
   packages/shared-data:
     dependencies:
       '@supabase/shared-types':
-        specifier: 0.1.91
-        version: 0.1.91
+        specifier: 0.1.95
+        version: 0.1.95
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -8007,8 +8028,8 @@ packages:
     resolution: {integrity: sha512-vZ+j079SKrM0Xiq7MJCvQKLDpaH2kfKfLY68xuQE1sqsCsMmx1CyrDBJHsxZ3cX01VOs5SI9igmoZAF3BmdZxw==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/shared-types@0.1.91':
-    resolution: {integrity: sha512-n4co7cT2MD0RGKkAdVPRz8O+f+LaWAqfujV/ug/4U434u5bmopLvCWrA8AzIgNSEr9xyJ+Yv3ksCQo9C0UJWTw==}
+  '@supabase/shared-types@0.1.95':
+    resolution: {integrity: sha512-Z/L/nHCiQVqj6nRIBerfQJLcEgYUUFTw+pIr/RMCbldibFrsAg8AkZQxVx/Oe9kSlwgKVxiWHj8m89CLtqo6lg==}
 
   '@supabase/sql-to-rest@0.1.6':
     resolution: {integrity: sha512-06KgjeINtc6405XQvfnchBE1azEsU8G2NElfadmvVHKmHa5l2bFzjbtFbpaYgpgTzccHlcDmBaCgedVf2Gyl8Q==}
@@ -24568,7 +24589,7 @@ snapshots:
       '@supabase/phoenix': 0.4.5
       tslib: 2.8.1
 
-  '@supabase/shared-types@0.1.91': {}
+  '@supabase/shared-types@0.1.95': {}
 
   '@supabase/sql-to-rest@0.1.6(encoding@0.1.13)(supports-color@8.1.1)':
     dependencies:
@@ -31264,7 +31285,7 @@ snapshots:
       '@types/mdast': 4.0.4
       escape-string-regexp: 5.0.0
       unist-util-is: 6.0.0
-      unist-util-visit-parents: 6.0.1
+      unist-util-visit-parents: 6.0.2
 
   mdast-util-from-markdown@1.3.1(supports-color@8.1.1):
     dependencies:
@@ -36270,7 +36291,7 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
       unist-util-is: 6.0.0
-      unist-util-visit-parents: 6.0.1
+      unist-util-visit-parents: 6.0.2
 
   unist-util-stringify-position@2.0.3:
     dependencies:
@@ -36319,7 +36340,7 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
       unist-util-is: 6.0.0
-      unist-util-visit-parents: 6.0.1
+      unist-util-visit-parents: 6.0.2
 
   universal-github-app-jwt@2.2.0: {}
 

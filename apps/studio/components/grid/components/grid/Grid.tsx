@@ -300,11 +300,7 @@ export const Grid = memo(
                     <div className="flex flex-col items-center justify-center">
                       <p className="text-sm text-light">This page does not have any data</p>
                       <div className="flex items-center space-x-2 mt-4">
-                        <Button
-                          variant="default"
-                          className="pointer-events-auto"
-                          onClick={() => snap.setPage(1)}
-                        >
+                        <Button className="pointer-events-auto" onClick={() => snap.setPage(1)}>
                           Head back to first page
                         </Button>
                       </div>
@@ -327,7 +323,6 @@ export const Grid = memo(
                       ) : canImportData ? (
                         <div className="flex flex-col items-center gap-4 mt-4">
                           <Button
-                            variant="default"
                             className="pointer-events-auto"
                             onClick={() => {
                               tableEditorSnap.onImportData()
@@ -348,11 +343,7 @@ export const Grid = memo(
                         The filters applied have returned no results from this table
                       </p>
                       <div className="flex items-center space-x-2 mt-4">
-                        <Button
-                          variant="default"
-                          className="pointer-events-auto"
-                          onClick={() => removeAllFilters()}
-                        >
+                        <Button className="pointer-events-auto" onClick={() => removeAllFilters()}>
                           Remove all filters
                         </Button>
                       </div>

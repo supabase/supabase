@@ -486,11 +486,7 @@ export const LogTable = ({
 
       {showHistogramToggle && (
         <div className="flex items-center gap-2">
-          <Button
-            variant="default"
-            icon={isHistogramShowing ? <Eye /> : <EyeOff />}
-            onClick={onHistogramToggle}
-          >
+          <Button icon={isHistogramShowing ? <Eye /> : <EyeOff />} onClick={onHistogramToggle}>
             Histogram
           </Button>
         </div>
@@ -499,7 +495,6 @@ export const LogTable = ({
       <div className="gap-x-2 flex items-center">
         {IS_PLATFORM && (
           <ButtonTooltip
-            variant="default"
             onClick={onSave}
             loading={isSaving}
             disabled={!canCreateLogQuery || !hasEditorValue}

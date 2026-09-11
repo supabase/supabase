@@ -536,11 +536,7 @@ export const PolicyEditorPanel = memo(function ({
                       <QueryError error={error} open={errorPanelOpen} setOpen={setErrorPanelOpen} />
                     )}
                     <SheetFooter className="flex items-center justify-end! px-5 py-4 w-full border-t">
-                      <Button
-                        variant="default"
-                        disabled={isExecuting || isUpdating}
-                        onClick={confirmOnClose}
-                      >
+                      <Button disabled={isExecuting || isUpdating} onClick={confirmOnClose}>
                         Cancel
                       </Button>
 

@@ -301,7 +301,7 @@ export const NamespaceWithTables = ({
                 ) : null}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="default" className="w-7" icon={<MoreVertical />} />
+                    <Button className="w-7" icon={<MoreVertical />} />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-fit min-w-[180px]">
                     <DropdownMenuItem

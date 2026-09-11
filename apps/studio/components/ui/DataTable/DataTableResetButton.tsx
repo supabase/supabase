@@ -28,7 +28,7 @@ export function DataTableResetButton({ onReset }: DataTableResetButtonProps) {
       label="Reset filters"
       side="left"
     >
-      <Button variant="default" size="tiny" onClick={reset} icon={<X />}>
+      <Button size="tiny" onClick={reset} icon={<X />}>
         Reset
       </Button>
     </ShortcutTooltip>

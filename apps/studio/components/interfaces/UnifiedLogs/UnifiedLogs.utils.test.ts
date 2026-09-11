@@ -4,9 +4,9 @@ import {
   buildUnifiedLogsUrl,
   gateLogTypeFilters,
   gateLogTypeOptions,
+  getComputeLogsAvailability,
   getEventMessageDisplay,
   getRawLogData,
-  getWorkersLogsAvailability,
   parseMultigresEventMessage,
 } from './UnifiedLogs.utils'
 
@@ -98,7 +98,7 @@ describe('getEventMessageDisplay', () => {
 })
 
 describe('getRawLogData', () => {
-  it('returns only the real Workers payload fields', () => {
+  it('returns only the real Compute payload fields', () => {
     const row = {
       event_message: 'Error: Dynamic require of "path" is not supported',
       id: '51a29911-9293-4616-8984-743cc548b629',
@@ -112,7 +112,7 @@ describe('getRawLogData', () => {
       },
       project: 'cxkpapyhaaywrtudnqpl',
       timestamp: 1788424716876000,
-      log_type: 'workers' as const,
+      log_type: 'compute' as const,
       status: null,
       level: null,
       method: null,
@@ -129,7 +129,7 @@ describe('getRawLogData', () => {
     })
   })
 
-  it('returns non-Workers rows unchanged', () => {
+  it('returns non-Compute rows unchanged', () => {
     const row = {
       id: 'edge-log',
       timestamp: 1788424716876000,
@@ -153,30 +153,30 @@ describe('gateLogTypeOptions', () => {
       options: [
         { label: 'Postgres', value: 'postgres' },
         { label: 'Multigres', value: 'multigres' },
-        { label: 'Workers', value: 'workers' },
+        { label: 'Compute', value: 'compute' },
       ],
     },
   ]
 
   it('drops log_type options whose flags are disabled', () => {
-    const gated = gateLogTypeOptions(fields, { multigres: false, workers: false })
+    const gated = gateLogTypeOptions(fields, { multigres: false, compute: false })
     const logType = gated.find((field) => field.value === 'log_type')
     expect(logType?.options?.map((option) => option.value)).toEqual(['postgres'])
   })
 
   it('keeps independently enabled log types', () => {
-    const gated = gateLogTypeOptions(fields, { multigres: false, workers: true })
+    const gated = gateLogTypeOptions(fields, { multigres: false, compute: true })
     const logType = gated.find((field) => field.value === 'log_type')
-    expect(logType?.options?.map((option) => option.value)).toEqual(['postgres', 'workers'])
+    expect(logType?.options?.map((option) => option.value)).toEqual(['postgres', 'compute'])
   })
 
   it('returns the original fields when every gated log type is enabled', () => {
-    const gated = gateLogTypeOptions(fields, { multigres: true, workers: true })
+    const gated = gateLogTypeOptions(fields, { multigres: true, compute: true })
     expect(gated).toBe(fields)
   })
 
   it('leaves non log_type fields untouched', () => {
-    const gated = gateLogTypeOptions(fields, { workers: false })
+    const gated = gateLogTypeOptions(fields, { compute: false })
     expect(gated.find((field) => field.value === 'date')).toEqual({ value: 'date' })
   })
 })
@@ -185,77 +185,77 @@ describe('gateLogTypeFilters', () => {
   it('removes disabled log types from equality and inequality filters', () => {
     expect(
       gateLogTypeFilters(
-        ['log_type:eq:workers', 'log_type:neq:multigres', 'log_type:eq:postgres', 'method:eq:GET'],
-        { workers: false, multigres: false }
+        ['log_type:eq:compute', 'log_type:neq:multigres', 'log_type:eq:postgres', 'method:eq:GET'],
+        { compute: false, multigres: false }
       )
     ).toEqual(['log_type:eq:postgres', 'method:eq:GET'])
   })
 
   it('keeps enabled log types and unrelated filters unchanged', () => {
-    const filters = ['log_type:eq:workers', 'method:eq:GET']
-    expect(gateLogTypeFilters(filters, { workers: true })).toBe(filters)
+    const filters = ['log_type:eq:compute', 'method:eq:GET']
+    expect(gateLogTypeFilters(filters, { compute: true })).toBe(filters)
   })
 
   it('preserves absent filter values', () => {
-    expect(gateLogTypeFilters(undefined, { workers: false })).toBeUndefined()
-    expect(gateLogTypeFilters(null, { workers: false })).toBeNull()
+    expect(gateLogTypeFilters(undefined, { compute: false })).toBeUndefined()
+    expect(gateLogTypeFilters(null, { compute: false })).toBeNull()
   })
 })
 
-describe('getWorkersLogsAvailability', () => {
-  const workersFilter = ['log_type:eq:workers']
+describe('getComputeLogsAvailability', () => {
+  const computeFilter = ['log_type:eq:compute']
 
   it('preserves an unresolved platform filter without allowing it into queries or sync', () => {
-    const availability = getWorkersLogsAvailability({
+    const availability = getComputeLogsAvailability({
       isPlatform: true,
       flagsLoaded: false,
-      workersEnabled: false,
+      computeEnabled: false,
     })
 
-    expect(gateLogTypeFilters(workersFilter, { workers: availability.preserveWorkersFilter })).toBe(
-      workersFilter
+    expect(gateLogTypeFilters(computeFilter, { compute: availability.preserveComputeFilter })).toBe(
+      computeFilter
     )
-    expect(gateLogTypeFilters(workersFilter, { workers: availability.canQueryWorkers })).toEqual([])
+    expect(gateLogTypeFilters(computeFilter, { compute: availability.canQueryCompute })).toEqual([])
     expect(availability.readyToSyncFilters).toBe(false)
   })
 
-  it('allows Workers filters and queries when the platform flag is enabled', () => {
-    const availability = getWorkersLogsAvailability({
+  it('allows Compute filters and queries when the platform flag is enabled', () => {
+    const availability = getComputeLogsAvailability({
       isPlatform: true,
       flagsLoaded: true,
-      workersEnabled: true,
+      computeEnabled: true,
     })
 
     expect(availability).toEqual({
-      canQueryWorkers: true,
-      preserveWorkersFilter: true,
+      canQueryCompute: true,
+      preserveComputeFilter: true,
       readyToSyncFilters: true,
     })
   })
 
-  it('removes Workers filters and queries when the platform flag is disabled', () => {
-    const availability = getWorkersLogsAvailability({
+  it('removes Compute filters and queries when the platform flag is disabled', () => {
+    const availability = getComputeLogsAvailability({
       isPlatform: true,
       flagsLoaded: true,
-      workersEnabled: false,
+      computeEnabled: false,
     })
 
     expect(availability).toEqual({
-      canQueryWorkers: false,
-      preserveWorkersFilter: false,
+      canQueryCompute: false,
+      preserveComputeFilter: false,
       readyToSyncFilters: true,
     })
   })
 
-  it('syncs generic filters immediately while keeping Workers unavailable on self-hosted', () => {
-    const availability = getWorkersLogsAvailability({
+  it('syncs generic filters immediately while keeping Compute unavailable on self-hosted', () => {
+    const availability = getComputeLogsAvailability({
       isPlatform: false,
-      workersEnabled: false,
+      computeEnabled: false,
     })
 
     expect(availability).toEqual({
-      canQueryWorkers: false,
-      preserveWorkersFilter: false,
+      canQueryCompute: false,
+      preserveComputeFilter: false,
       readyToSyncFilters: true,
     })
   })
