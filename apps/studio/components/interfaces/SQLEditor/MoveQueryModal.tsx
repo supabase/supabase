@@ -150,7 +150,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                 id: snippet.id,
                 type: 'sql',
                 name: snippet.name,
-                description: snippet.description,
+                description: snippet.description ?? undefined,
                 visibility: snippet.visibility,
                 project_id: snippet.project_id,
                 owner_id: snippet.owner_id,

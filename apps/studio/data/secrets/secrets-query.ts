@@ -9,7 +9,7 @@ export type SecretsVariables = {
   projectRef?: string
 }
 
-export type ProjectSecret = components['schemas']['SecretResponse']
+export type ProjectSecret = components['schemas']['SecretResponse_Output']
 
 export async function getSecrets({ projectRef }: SecretsVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('Project ref is required')

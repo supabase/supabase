@@ -36,9 +36,9 @@ import { usePlatformAppInstallationCreateMutation } from '@/data/platform-apps/p
 import { usePlatformAppSigningKeyCreateMutation } from '@/data/platform-apps/platform-app-signing-key-create-mutation'
 import { useCopyToClipboard } from '@/hooks/ui/useCopyToClipboard'
 
-type CreatePlatformAppResponse = components['schemas']['CreatePlatformAppResponse']
+type CreatePlatformAppResponse = components['schemas']['CreatePlatformAppResponse_Output']
 type CreatePlatformAppSigningKeyResponse =
-  components['schemas']['CreatePlatformAppSigningKeyResponse']
+  components['schemas']['CreatePlatformAppSigningKeyResponse_Output']
 
 interface CreateAppSheetProps {
   visible: boolean

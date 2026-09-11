@@ -373,6 +373,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         projectRef: projectRef!,
         payload: {
           ...query,
+          description: query.description ?? undefined,
           content: {
             ...(query.content as LogSqlSnippets.Content),
             unchecked_sql: untrustedLogSql(currentSql),

@@ -137,4 +137,17 @@ describe('useCreateQuery', () => {
       name: undefined,
     })
   })
+
+  it('forwards autoRun to the draft so its query tab can run itself once mounted', () => {
+    const { result } = renderHook(() => useCreateQuery())
+
+    result.current.createQuery({ sql: 'select 1', autoRun: true })
+    expect(mockCreateDraft).toHaveBeenCalledWith({
+      id: 'query-new',
+      projectRef: 'default',
+      sql: 'select 1',
+      name: undefined,
+      autoRun: true,
+    })
+  })
 })

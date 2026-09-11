@@ -10,11 +10,11 @@ import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
-type Member = components['schemas']['Member']
-type InvitationResponse = components['schemas']['InvitationResponse']
-type OrganizationRoleResponse = components['schemas']['OrganizationRoleResponse']
-type ListEntitlementsResponse = components['schemas']['ListEntitlementsResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
+type Member = components['schemas']['Member_Output']
+type InvitationResponse = components['schemas']['InvitationResponse_Output']
+type OrganizationRoleResponse = components['schemas']['OrganizationRoleResponse_Output']
+type ListEntitlementsResponse = components['schemas']['ListEntitlementsResponse_Output']
 type CreateInvitationResponse =
   operations['InvitationsController_createInvitation']['responses']['201']['content']['application/json']
 type AccessControlPermission = components['schemas']['AccessControlPermission']
