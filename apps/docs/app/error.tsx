@@ -7,7 +7,7 @@ import { Button } from 'ui'
 
 const ErrorPage = ({ error }) => {
   useEffect(() => {
-    Sentry.captureException(error)
+    Sentry.captureException(error, { tags: { globalErrorBoundary: true } })
   }, [error])
 
   return (

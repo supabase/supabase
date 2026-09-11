@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom/vitest'
+import './lib/disabled-matchers'
 
 import { cleanup } from '@testing-library/react'
 import dayjs from 'dayjs'

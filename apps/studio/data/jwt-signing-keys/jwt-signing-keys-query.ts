@@ -5,9 +5,9 @@ import { jwtSigningKeysKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-export type JWTSigningKey = components['schemas']['SigningKeyResponse']
+export type JWTSigningKey = components['schemas']['SigningKeyResponse_Output']
 
-export type JWTAlgorithm = components['schemas']['SigningKeyResponse']['algorithm']
+export type JWTAlgorithm = components['schemas']['SigningKeyResponse_Output']['algorithm']
 
 interface JWTSigningKeysVariables {
   projectRef?: string

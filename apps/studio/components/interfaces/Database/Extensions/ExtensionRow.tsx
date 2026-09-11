@@ -122,7 +122,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
         <TableCell>
           <div className="flex gap-2 items-center">
             {extensionMeta?.github_url && (
-              <Button asChild variant="default" icon={<Github />} className="rounded-full">
+              <Button asChild icon={<Github />} className="rounded-full">
                 <a
                   target="_blank"
                   rel="noreferrer"
@@ -134,7 +134,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
               </Button>
             )}
             {docsUrl !== undefined && (
-              <Button asChild variant="default" icon={<Book />} className="rounded-full">
+              <Button asChild icon={<Book />} className="rounded-full">
                 <a
                   target="_blank"
                   rel="noreferrer"

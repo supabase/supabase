@@ -130,7 +130,6 @@ const AWSReInvent2025: NextPage = () => {
 
                             {event.cta && (
                               <Button
-                                variant="default"
                                 size="small"
                                 iconRight={<ChevronRight className="w-3 h-3" />}
                                 asChild
@@ -170,7 +169,7 @@ const AWSReInvent2025: NextPage = () => {
               <p className="text-foreground-light text-lg mb-8">
                 Accelerate your business growth and app development using Supabase scale.
               </p>
-              <Button variant="default" size="large" asChild>
+              <Button size="large" asChild>
                 <Link href={data.consultationSection.cta.href} target="_blank">
                   Book a meeting
                 </Link>

@@ -42,7 +42,7 @@ const page: GoPageInput = {
             <li>Fill out the entry form below</li>
             <li>Complete these steps by the contest deadline</li>
           </ol>
-          <Button asChild variant="default" size="medium">
+          <Button asChild size="medium">
             <Link href="https://supabase.com/dashboard">Create your account</Link>
           </Button>
           <p className="text-xs text-foreground-lighter mt-4">

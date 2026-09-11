@@ -167,7 +167,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                     </>
                   ) : (
                     <>
-                      <Button variant="default" className="hidden lg:block" asChild>
+                      <Button className="hidden lg:block" asChild>
                         <Link
                           href="https://supabase.com/dashboard"
                           onClick={() =>

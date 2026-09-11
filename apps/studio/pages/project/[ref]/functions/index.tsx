@@ -165,12 +165,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                         shortcutId={SHORTCUT_IDS.FUNCTIONS_LIST_REFRESH}
                         side="bottom"
                       >
-                        <Button
-                          variant="default"
-                          icon={<RefreshCw />}
-                          loading={isFetching}
-                          onClick={() => refetch()}
-                        >
+                        <Button icon={<RefreshCw />} loading={isFetching} onClick={() => refetch()}>
                           Refresh
                         </Button>
                       </ShortcutTooltip>
@@ -244,7 +239,7 @@ export const EdgeFunctionsIndexPageWrapper = ({ children }: PropsWithChildren) =
           </PageHeaderSummary>
           <PageHeaderAside>
             <DocsButton href={`${DOCS_URL}/guides/functions`} />
-            <Button asChild variant="default" icon={<ExternalLink />}>
+            <Button asChild icon={<ExternalLink />}>
               <a
                 target="_blank"
                 rel="noreferrer"

@@ -101,7 +101,6 @@ function StateOfStartupsPage() {
         <div className="relative">
           {/* Closed ToC */}
           <Button
-            variant="default"
             size="small"
             onClick={() => setIsTocOpen(true)}
             className={cn(
@@ -324,7 +323,7 @@ const CTABanner = forwardRef<HTMLElement>((props, ref) => {
             Start your project
           </Link>
         </Button>
-        <Button asChild size="medium" variant="default">
+        <Button asChild size="medium">
           <Link
             href="/contact/sales"
             onClick={() =>

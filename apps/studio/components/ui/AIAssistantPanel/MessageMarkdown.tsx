@@ -97,9 +97,7 @@ export const Hyperlink = memo(({ href, children }: { href?: string; children?: R
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="default" className="opacity-100">
-              Cancel
-            </Button>
+            <Button className="opacity-100">Cancel</Button>
           </DialogClose>
           <DialogClose asChild>
             <Button asChild variant="primary" className="opacity-100">

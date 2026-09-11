@@ -403,7 +403,6 @@ export const EditorPanel = () => {
               <PopoverTrigger asChild>
                 <Button
                   size="tiny"
-                  variant="default"
                   role="combobox"
                   className="mr-2"
                   aria-expanded={isTemplatesOpen}
@@ -583,12 +582,7 @@ export const EditorPanel = () => {
               <span className="font-mono">
                 {results.length} rows{results.length >= 100 && ` (Limited to only 100 rows)`}
               </span>
-              <Button
-                size="tiny"
-                variant="default"
-                className="ml-2"
-                onClick={() => setShowResults((prev) => !prev)}
-              >
+              <Button size="tiny" className="ml-2" onClick={() => setShowResults((prev) => !prev)}>
                 {showResults ? 'Hide Results' : 'Show Results'}
               </Button>
             </div>
@@ -624,7 +618,6 @@ export const EditorPanel = () => {
             </div>
           )}
           <Button
-            variant="default"
             size="tiny"
             disabled={
               !currentValue ||
@@ -636,7 +629,6 @@ export const EditorPanel = () => {
             }
             onClick={() => {
               if (!ref || !profile || !project) return
-
               if (activeSnippet) {
                 setSaveStatus('idle')
                 upsertContent({

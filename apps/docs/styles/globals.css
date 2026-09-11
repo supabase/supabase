@@ -34,6 +34,19 @@
   --font-weight-normal: 450;
 }
 
+@utility code-line-number {
+  @apply select-none text-right text-muted/70 pl-3 pr-2 min-h-5 leading-5;
+  @apply bg-[var(--row-rest)] sticky left-0 z-10;
+  @apply group-hover/row:text-muted group-hover/row:bg-[var(--row-hover)];
+  @apply after:pointer-events-none after:absolute after:inset-y-0 after:left-full after:w-4;
+  @apply [--gutter-fade:var(--row-rest)] group-hover/row:[--gutter-fade:var(--row-hover)];
+  @apply after:bg-[image:linear-gradient(to_right,var(--gutter-fade)_0%,color-mix(in_srgb,var(--gutter-fade)_85%,transparent)_25%,color-mix(in_srgb,var(--gutter-fade)_50%,transparent)_50%,color-mix(in_srgb,var(--gutter-fade)_15%,transparent)_75%,transparent_100%)];
+}
+
+@utility code-line-content {
+  @apply min-h-5 leading-5 pl-3 pr-18 group-hover/row:bg-[var(--row-hover)];
+}
+
 @layer utilities {
   .prose--remove-p-margin p {
     margin: 0;

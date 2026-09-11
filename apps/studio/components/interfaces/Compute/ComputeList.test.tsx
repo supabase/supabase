@@ -75,12 +75,12 @@ describe('ComputeList', () => {
 
     expect(rowNames()).toHaveLength(10)
     expect(screen.getByText('Page 1 of 2')).toBeVisible()
-    expect(screen.getByRole('button', { name: 'Previous page' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Previous page' })).toBeAriaDisabled()
 
     await userEvent.click(screen.getByRole('button', { name: 'Next page' }))
 
     expect(rowNames()).toEqual(['instance-10', 'instance-11'])
-    expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Next page' })).toBeAriaDisabled()
   })
 
   it('returns to the first page when a search shrinks the results', async () => {

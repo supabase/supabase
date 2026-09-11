@@ -244,7 +244,7 @@ export const WarehouseSchemaTablePicker = ({
         </span>
         <div className="flex items-center gap-2">
           {isEditing && (
-            <Button variant="default" icon={<ArrowLeft size={14} />} onClick={onBack}>
+            <Button icon={<ArrowLeft size={14} />} onClick={onBack}>
               Back
             </Button>
           )}

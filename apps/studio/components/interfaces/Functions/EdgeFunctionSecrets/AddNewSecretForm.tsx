@@ -241,7 +241,6 @@ export const AddNewSecretForm = () => {
                             />
                           </FormControl>
                           <Button
-                            variant="default"
                             className="w-[34px] h-[34px] shrink-0 p-0"
                             aria-label="Remove secret"
                             icon={<Trash size={12} />}
@@ -310,9 +309,7 @@ export const AddNewSecretForm = () => {
               </p>
 
               <div className="flex items-center space-x-2">
-                <Button variant="default" onClick={handleAddAnotherSecret}>
-                  Add another
-                </Button>
+                <Button onClick={handleAddAnotherSecret}>Add another</Button>
                 <Button variant="primary" type="submit" disabled={isCreating} loading={isCreating}>
                   {isCreating ? 'Saving...' : fields.length > 1 ? 'Bulk save' : 'Save'}
                 </Button>

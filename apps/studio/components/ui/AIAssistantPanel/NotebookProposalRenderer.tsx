@@ -113,7 +113,7 @@ export const NotebookProposalRenderer = (props: NotebookProposalRendererProps) =
   const canOpenNotebook = mode !== 'delete' && state === 'output-available'
   const footerAction =
     canOpenNotebook && parsedOutput.success && ref ? (
-      <Button asChild variant="default" size="tiny">
+      <Button asChild size="tiny">
         <Link href={`/project/${ref}/explorer/notebook/${parsedOutput.data.id}`}>
           Open notebook
         </Link>
@@ -178,7 +178,7 @@ function UpdateNotebookTerminalSummary({
     <div className="flex items-center justify-between gap-2 my-2 mx-4 px-3 py-1.5 text-sm border rounded-md bg-surface-75">
       <span className="text-foreground-light truncate">{label}</span>
       {state === 'output-available' && parsedOutput.success && ref && (
-        <Button asChild variant="default" size="tiny">
+        <Button asChild size="tiny">
           <Link href={`/project/${ref}/explorer/notebook/${parsedOutput.data.id}`}>
             Open notebook
           </Link>
