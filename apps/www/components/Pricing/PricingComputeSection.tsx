@@ -124,7 +124,7 @@ const PricingComputeSection = () => {
             </p>
             <h3 className="text-foreground text-2xl ml-0.5 md:ml-0 mb-2 md:mb-0">
               Scale compute up to
-              <br className="hidden sm:block" /> 64 cores and 256 GB RAM
+              <br className="hidden sm:block" /> 64 vCPUs and 256 GB RAM
             </h3>
           </div>
 
