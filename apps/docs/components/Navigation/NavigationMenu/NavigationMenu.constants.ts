@@ -358,6 +358,7 @@ export const gettingstarted: NavMenuConstant = {
     { name: 'API Keys', url: '/guides/getting-started/api-keys' },
     { name: 'Local Development', url: '/guides/local-development/cli/getting-started' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
+    { name: 'The Supabase way to build', url: '/guides/getting-started/architecting-for-growth' },
     {
       name: 'Migrating to new API keys',
       url: '/guides/getting-started/migrating-to-new-api-keys',
