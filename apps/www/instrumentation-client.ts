@@ -1,8 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 import { hasConsented } from 'common/consent-state'
 import { IS_PLATFORM } from 'common/constants/environment'
-
-import { filterSentryEvent } from './lib/sentry-client'
+import { filterSentryEvent } from 'common/sentry'
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,

@@ -9,6 +9,7 @@ export default defineConfig({
         resolve: { tsconfigPaths: true },
         test: {
           name: 'unit',
+          include: [...configDefaults.include, '../../packages/common/sentry.test.ts'],
           exclude: [...configDefaults.exclude, '.next/*', 'lib/sentry-capture.test.tsx'],
         },
       },

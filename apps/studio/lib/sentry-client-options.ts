@@ -16,6 +16,7 @@ import * as Sentry from '@sentry/react'
 import { thirdPartyErrorFilterIntegration } from '@sentry/react'
 import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
+import { filterSentryEvent, isSentryErrorBoundaryCrash } from 'common/sentry'
 
 import { MIRRORED_BREADCRUMBS } from '@/lib/breadcrumbs'
 import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from '@/lib/sanitize'
@@ -195,28 +196,11 @@ export function buildSentryClientOptions({
       return cleanedBreadcrumb
     },
     beforeSend(event, hint) {
-      const consent = hasConsented()
-
-      if (!consent) {
+      if (!filterSentryEvent(event, { isPlatform: IS_PLATFORM, hasConsent: hasConsented() })) {
         return null
       }
 
-      if (!IS_PLATFORM) {
-        return null
-      }
-
-      const isErrorBoundaryCrash =
-        event.tags?.globalErrorBoundary === true || event.tags?.globalErrorBoundary === 'true'
-      const isThirdPartyOnly =
-        event.tags?.third_party_code === true || event.tags?.third_party_code === 'true'
-
-      // Drop third-party-only errors UNLESS they crashed the page via the global error boundary.
-      // This preserves noise reduction for browser extensions and injected scripts,
-      // while ensuring page-crashing errors from third-party libs (caused by first-party bugs)
-      // are always reported.
-      if (isThirdPartyOnly && !isErrorBoundaryCrash) {
-        return null
-      }
+      const isErrorBoundaryCrash = isSentryErrorBoundaryCrash(event)
 
       // Downsample only known high-noise classes; keep all other errors at full rate.
       const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
