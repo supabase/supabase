@@ -53,11 +53,7 @@ A branch created with **Include data** holds a copy of your production data, tre
 
 </Admonition>
 
-<Admonition type="note">
-
-A branch uses a larger disk and matches the compute size of your project, which increases its cost.
-
-</Admonition>
+A branch with data uses a larger disk than production, sized to fit a copy of your production data plus backup overhead (capped at the maximum size for the volume type). Its compute size is estimated from your production disk usage, not copied from your project's actual compute size — a project with disk usage on the smaller end of a compute tier's range may get a branch sized lower or higher than the project's own instance. You can override the branch's compute size explicitly when creating it. Both the disk and compute size increase the branch's cost.
 
 ## Making changes to a branch
 
