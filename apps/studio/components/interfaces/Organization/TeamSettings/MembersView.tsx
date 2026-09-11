@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { partition } from 'lodash'
 import { AlertCircle } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import {
   Card,
   Loading,
@@ -34,9 +34,16 @@ export interface MembersViewProps {
   searchString: string
 }
 
-const MembersView = ({ searchString }: MembersViewProps) => {
+export const MembersView = ({ searchString }: MembersViewProps) => {
   const { slug } = useParams()
   const { profile } = useProfile()
+
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { data: permissions } = usePermissionsQuery()
+  const organizationMembersDeletionEnabled = useIsFeatureEnabled('organization_members:delete')
+
+  const [memberForRoleUpdate, setMemberForRoleUpdate] = useState<OrganizationMember>()
+  const [showRoleUpdatePanel, setShowRoleUpdatePanel] = useState(false)
 
   const {
     data: members = [],
@@ -54,10 +61,6 @@ const MembersView = ({ searchString }: MembersViewProps) => {
   } = useOrganizationRolesV2Query({
     slug,
   })
-
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const { data: permissions } = usePermissionsQuery()
-  const organizationMembersDeletionEnabled = useIsFeatureEnabled('organization_members:delete')
 
   const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
   const orgProjects = useMemo(
@@ -81,30 +84,32 @@ const MembersView = ({ searchString }: MembersViewProps) => {
         })
   }, [members, searchString])
 
-  const [[user], _otherMembers] = partition(
-    filteredMembers,
-    (m) => m.gotrue_id === profile?.gotrue_id
-  )
-
-  const [memberForRoleUpdate, setMemberForRoleUpdate] = useState<OrganizationMember>()
-  const [showRoleUpdatePanel, setShowRoleUpdatePanel] = useState(false)
-  const handleManageAccess = (member: OrganizationMember) => {
+  const handleManageAccess = useCallback((member: OrganizationMember) => {
     setMemberForRoleUpdate(member)
     setShowRoleUpdatePanel(true)
-  }
+  }, [])
 
   const userMember = members.find((m) => m.gotrue_id === profile?.gotrue_id)
   const orgScopedRoleIds = (roles?.org_scoped_roles ?? []).map((r) => r.id)
   const isOrgScopedRole = orgScopedRoleIds.includes(userMember?.role_ids?.[0] ?? -1)
 
-  // [Joshen] Temp wait on API level changes but I think it makes sense to hide invites for
-  // project scoped users since they can't see other members to begin with. Not a security issue nonetheless
-  const otherMembers = isOrgScopedRole
-    ? _otherMembers
-    : _otherMembers.filter((x) => !('invited_id' in x))
-  const sortedMembers = otherMembers.sort((a, b) =>
-    (a.primary_email ?? '').localeCompare(b.primary_email ?? '')
-  )
+  const { user, sortedMembers } = useMemo(() => {
+    const [[currentUser], _otherMembers] = partition(
+      filteredMembers,
+      (m) => m.gotrue_id === profile?.gotrue_id
+    )
+
+    // [Joshen] Temp wait on API level changes but I think it makes sense to hide invites for
+    // project scoped users since they can't see other members to begin with. Not a security issue nonetheless
+    const otherMembers = isOrgScopedRole
+      ? _otherMembers
+      : _otherMembers.filter((x) => !('invited_id' in x))
+    const sorted = [...otherMembers].sort((a, b) =>
+      (a.primary_email ?? '').localeCompare(b.primary_email ?? '')
+    )
+
+    return { user: currentUser, sortedMembers: sorted }
+  }, [filteredMembers, profile?.gotrue_id, isOrgScopedRole])
 
   return (
     <>
@@ -219,5 +224,3 @@ const MembersView = ({ searchString }: MembersViewProps) => {
     </>
   )
 }
-
-export default MembersView

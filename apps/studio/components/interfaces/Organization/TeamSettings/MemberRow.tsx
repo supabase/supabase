@@ -1,5 +1,6 @@
 import { ArrowRight, Check, ChevronRight, User, X } from 'lucide-react'
 import Link from 'next/link'
+import { memo } from 'react'
 import {
   Badge,
   cn,
@@ -39,7 +40,7 @@ const MEMBER_ORIGIN_TO_MANAGED_BY = {
   vercel: 'vercel-marketplace',
 } as const
 
-export const MemberRow = ({
+export const MemberRow = memo(function MemberRow({
   member,
   members,
   roles,
@@ -49,7 +50,7 @@ export const MemberRow = ({
   selectedOrganization,
   organizationMembersDeletionEnabled,
   onManageAccess,
-}: MemberRowProps) => {
+}: MemberRowProps) {
   const { profile } = useProfile()
 
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
@@ -93,7 +94,7 @@ export const MemberRow = ({
                   organization={{
                     managed_by:
                       MEMBER_ORIGIN_TO_MANAGED_BY[
-                        (member.metadata as any).origin as keyof typeof MEMBER_ORIGIN_TO_MANAGED_BY
+                        member.metadata.origin as keyof typeof MEMBER_ORIGIN_TO_MANAGED_BY
                       ] ?? 'supabase',
                   }}
                   tooltipText="Managed by Vercel Marketplace."
@@ -208,4 +209,4 @@ export const MemberRow = ({
       </TableCell>
     </TableRow>
   )
-}
+})
