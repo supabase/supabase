@@ -95,7 +95,36 @@ function rewriteLibraryLinks(tree: Root): void {
 
 export function transformLibraryMdx(raw: string): string {
   const { content, data } = matter(raw)
-  const tree = parseMdx(content)
+  const installation = (data.installation ?? []).map(
+    (step: {
+      title: string
+      registry?: string
+      command?: string
+      before?: string
+      after?: string
+    }) =>
+      [
+        `### ${step.title}`,
+        step.before,
+        step.registry
+          ? `<BlockItem name=${JSON.stringify(step.registry)} />`
+          : `\`\`\`bash\n${step.command}\n\`\`\``,
+        step.after,
+      ]
+        .filter(Boolean)
+        .join('\n\n')
+  )
+  const tree = parseMdx(
+    [
+      data.preview,
+      (installation.length || data.installationContent) && '## Installation',
+      ...installation,
+      data.installationContent,
+      content,
+    ]
+      .filter(Boolean)
+      .join('\n\n')
+  )
   rewriteLibraryLinks(tree)
   applySchema(tree, markdownSchema)
   const body = serializeMdx(tree).trim()

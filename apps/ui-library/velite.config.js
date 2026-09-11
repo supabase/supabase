@@ -25,6 +25,24 @@ const docs = s
   .object({
     title: s.string(),
     description: s.string(),
+    preview: s.mdx({ copyLinkedFiles: false }).optional(),
+    installationContent: s.mdx({ copyLinkedFiles: false }).optional(),
+    installation: s
+      .array(
+        s
+          .object({
+            title: s.string(),
+            registry: s.string().optional(),
+            command: s.string().optional(),
+            showOpenInV0: s.boolean().default(false),
+            before: s.mdx({ copyLinkedFiles: false }).optional(),
+            after: s.mdx({ copyLinkedFiles: false }).optional(),
+          })
+          .refine((step) => Boolean(step.registry) !== Boolean(step.command), {
+            message: 'Define either a registry block or a custom command for each install step.',
+          })
+      )
+      .default([]),
     published: s.boolean().default(true),
     links: LinksProperties.optional(),
     featured: s.boolean().default(false),

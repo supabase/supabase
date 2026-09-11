@@ -10,12 +10,13 @@ import Balancer from 'react-wrap-balancer'
 
 import { allDocs } from '@/.velite'
 import { metadata as mainMetadata } from '@/app/layout'
+import { BlockInstallation } from '@/components/block-installation'
 import { CopyDocPrompt } from '@/components/copy-doc-prompt'
 import { FrameworkSelector } from '@/components/framework-selector'
 import { Mdx } from '@/components/mdx-components'
 import { SourcePanel } from '@/components/source-panel'
 import { libraryBlocks } from '@/config/library'
-import { getTableOfContents } from '@/lib/toc'
+import { getInstallationCommands } from '@/lib/install-command'
 import { absoluteUrl, cn } from '@/lib/utils'
 
 interface DocPageProps {
@@ -79,27 +80,20 @@ export default async function DocPage(props: DocPageProps) {
     notFound()
   }
 
-  const toc = await getTableOfContents(doc.raw)
   const isGuide = doc.slugAsParams.startsWith('getting-started/')
   const libraryBlock = libraryBlocks.find((block) => block.href === `/docs/${doc.slugAsParams}`)
-  const markdownPath = `${process.env.NEXT_PUBLIC_BASE_PATH ?? '/library'}/docs/${doc.slugAsParams}.md`
-  const installation = toc.items?.find((item) =>
-    ['Installation', 'Create the app'].includes(item.title)
-  )
+  const pagePath = `${process.env.NEXT_PUBLIC_BASE_PATH ?? '/library'}/docs/${doc.slugAsParams}`
+  const installCommand = getInstallationCommands(doc.installation).npm
 
   return (
-    <main className="isolate px-4 py-10 md:px-8 md:py-16">
+    <main className="isolate px-4 pb-10 pt-4 md:px-8 md:pb-16 md:pt-6">
       <header
         className={cn(
           'relative z-20 flex flex-col gap-6 py-8 md:py-12',
           isGuide ? 'mx-auto max-w-2xl items-start text-left' : 'items-center text-center'
         )}
       >
-        {isGuide ? (
-          <p className="text-xs text-foreground-lighter">
-            {doc.slugAsParams === 'getting-started/faq' ? 'Docs' : 'Docs / Getting started'}
-          </p>
-        ) : (
+        {!isGuide && (
           <div className="flex flex-wrap items-center justify-center gap-2">
             <span className="inline-flex h-7 items-center gap-1.5 rounded-md border bg-surface-75 px-2 text-xs text-foreground-light">
               <Blocks size={12} />
@@ -114,37 +108,28 @@ export default async function DocPage(props: DocPageProps) {
             )}
           </div>
         )}
-        <h1 className="max-w-2xl scroll-m-24 text-balance font-heading text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
+        <h1 className="max-w-2xl scroll-m-24 text-balance font-heading text-4xl font-normal leading-tight tracking-tight sm:text-5xl sm:leading-none">
           {doc.title}
         </h1>
         {doc.description && (
-          <p
-            className={cn(
-              'max-w-xl text-foreground-light',
-              isGuide ? 'text-sm leading-6' : 'font-heading text-xl font-semibold tracking-tight'
-            )}
-          >
+          <p className="max-w-xl text-balance text-lg text-foreground-muted">
             <Balancer>{doc.description}</Balancer>
           </p>
         )}
-        {!isGuide && (
-          <div className="mt-2 flex flex-col items-center gap-3">
-            <CopyDocPrompt title={doc.title} markdownPath={markdownPath} />
-            {installation && (
-              <a
-                href={installation.url}
-                className="text-xs text-foreground-lighter underline-offset-4 hover:text-foreground hover:underline"
-              >
-                Or start with the commands below.
-              </a>
-            )}
-          </div>
+        {!isGuide && installCommand && (
+          <CopyDocPrompt title={doc.title} pagePath={pagePath} command={installCommand} />
         )}
       </header>
 
       <div className="mx-auto max-w-2xl">
         <SourcePanel doc={doc} />
       </div>
+      {doc.preview && (
+        <div className="library-doc-preview mx-auto max-w-5xl">
+          <Mdx code={doc.preview} />
+        </div>
+      )}
+      <BlockInstallation doc={doc} pagePath={pagePath} />
       <article className="library-doc-content relative z-0 min-w-0 pb-12">
         <Mdx code={doc.code} />
       </article>

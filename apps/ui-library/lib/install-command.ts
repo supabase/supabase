@@ -42,3 +42,55 @@ export function getInstallCommands(
     bun: `bunx --bun ${cli} add ${specifier}`,
   }
 }
+
+function getCustomCommandForPackageManager(
+  command: string,
+  packageManager: PackageManager
+): string {
+  if (packageManager === 'npm') return command
+
+  const replacements: Record<Exclude<PackageManager, 'npm'>, Array<[RegExp, string]>> = {
+    pnpm: [
+      [/\bnpx create-next-app@latest/g, 'pnpm create next-app@latest'],
+      [/\bnpx (shadcn(?:-vue)?@latest)/g, 'pnpm dlx $1'],
+      [/--use-npm/g, '--use-pnpm'],
+    ],
+    yarn: [
+      [/\bnpx create-next-app@latest/g, 'yarn create next-app'],
+      [/\bnpx (shadcn(?:-vue)?@latest)/g, 'yarn dlx $1'],
+      [/--use-npm/g, '--use-yarn'],
+    ],
+    bun: [
+      [/\bnpx create-next-app@latest/g, 'bun create next-app'],
+      [/\bnpx (shadcn(?:-vue)?@latest)/g, 'bunx --bun $1'],
+      [/--use-npm/g, '--use-bun'],
+    ],
+  }
+
+  return replacements[packageManager].reduce(
+    (result, [pattern, replacement]) => result.replace(pattern, replacement),
+    command
+  )
+}
+
+export function getInstallationCommands(
+  steps: Array<{ registry?: string; command?: string }>
+): Partial<Record<PackageManager, string>> {
+  const packageManagers: PackageManager[] = steps.some((step) => step.registry)
+    ? ['npm', 'pnpm', 'yarn', 'bun']
+    : ['npm']
+
+  return Object.fromEntries(
+    packageManagers.map((packageManager) => [
+      packageManager,
+      steps
+        .map((step) =>
+          step.registry
+            ? getInstallCommands(step.registry)[packageManager]
+            : getCustomCommandForPackageManager(step.command ?? '', packageManager)
+        )
+        .filter(Boolean)
+        .join('\n\n'),
+    ])
+  ) as Partial<Record<PackageManager, string>>
+}

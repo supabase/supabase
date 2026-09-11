@@ -5,6 +5,20 @@ import { describe, it } from 'node:test'
 import { transformLibraryMdx } from './library-mdx-to-markdown'
 
 describe('transformLibraryMdx', () => {
+  it('exports ordered install steps and their setup notes from page metadata', () => {
+    const source = readFileSync(
+      new URL('../content/docs/starters/nextjs-starter.mdx', import.meta.url),
+      'utf8'
+    )
+    const output = transformLibraryMdx(source)
+    assert.equal(output.match(/^## Installation$/gm)?.length, 1)
+    assert.match(output, /cd my-app\nnpx shadcn@latest init --base radix/)
+    assert.ok(output.indexOf('npx create-next-app') < output.indexOf('npx shadcn@latest add'))
+    assert.ok(output.indexOf('npx shadcn@latest add') < output.indexOf('## Configure Supabase'))
+    assert.match(output, /Keep the generated package lockfile/)
+    assert.doesNotMatch(output, /<BlockItem|<BlockOverview/)
+  })
+
   it('preserves the file tree and source when folder structure moves into the preview tabs', () => {
     const source = readFileSync(
       new URL('../content/docs/headless/mcp-server.mdx', import.meta.url),

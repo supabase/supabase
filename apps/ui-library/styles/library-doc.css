@@ -39,7 +39,7 @@
 .library-doc-content .mdx > .library-block-overview,
 .library-doc-content .mdx > :has(.library-block-preview),
 .library-doc-content .mdx > .library-component-preview {
-  @apply max-w-none;
+  @apply max-w-5xl;
 }
 
 .library-overview-preview .library-block-preview,

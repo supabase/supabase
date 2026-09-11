@@ -39,5 +39,42 @@
     "NEXT_PUBLIC_SUPABASE_URL": "",
     "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
   },
+  "meta": {
+    "architecture": {
+      "resources": [
+        {
+          "id": "generated-collections",
+          "kind": "capability",
+          "label": "Typed collections",
+          "description": "Generated from the tables you select"
+        },
+        {
+          "id": "generated-schemas",
+          "kind": "capability",
+          "label": "Zod schemas",
+          "description": "Generated from your database schema"
+        },
+        {
+          "id": "existing-database",
+          "kind": "service",
+          "label": "Supabase Database",
+          "description": "Uses your existing tables",
+          "status": "existing"
+        }
+      ],
+      "relationships": [
+        {
+          "source": "generated-collections",
+          "target": "generated-schemas",
+          "label": "Validates records"
+        },
+        {
+          "source": "generated-collections",
+          "target": "existing-database",
+          "label": "Queries selected tables"
+        }
+      ]
+    }
+  },
   "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`."
 }

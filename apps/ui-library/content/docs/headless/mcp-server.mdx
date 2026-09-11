@@ -1,21 +1,22 @@
 ---
 title: MCP Server
 description: Add a user-scoped MCP server to your product
----
+preview: <BlockOverview name="mcp-server" showFiles />
+installation:
+  - title: Installation
+    registry: mcp-server
+    showOpenInV0: false
+    after: >-
+      Installs Deno Edge Function files into a Supabase project or empty
+      directory. No
 
-<BlockOverview name="mcp-server" showFiles />
+      `components.json` is required.
+---
 
 Give embedded product agents and external clients such as Codex, Claude Code,
 and ChatGPT secure, user-scoped access to your product through MCP tools. This
 block runs as a Supabase Edge Function, verifies Supabase user access tokens,
 and gives every tool an RLS-scoped client.
-
-## Installation
-
-<BlockItem name="mcp-server" showOpenInV0={false} />
-
-Installs Deno Edge Function files into a Supabase project or empty directory. No
-`components.json` is required.
 
 ## Configure the project
 

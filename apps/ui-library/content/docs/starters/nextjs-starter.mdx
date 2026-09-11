@@ -1,33 +1,36 @@
 ---
 title: Next.js Starter
-description: A Next.js app with Supabase authentication, TypeScript, and Tailwind CSS
+description: 'A Next.js app with Supabase authentication, TypeScript, and Tailwind CSS'
+preview: |-
+  <BlockOverview name="password-based-auth-nextjs" showFiles>
+    <BlockPreview name="password-based-auth/auth/sign-up" />
+  </BlockOverview>
+installation:
+  - title: Create the app
+    before: >-
+      Use
+      [create-next-app](https://nextjs.org/docs/app/api-reference/cli/create-next-app)
+      to scaffold the framework:
+    command: >-
+      npx create-next-app@latest my-app --ts --tailwind --eslint --app
+      --no-src-dir --import-alias "@/*" --use-npm --yes
+
+      cd my-app
+
+      npx shadcn@latest init --base radix
+    after: >-
+      This creates the app at the project root with the import alias expected by
+      the block.
+  - title: Install the block
+    before: 'Run the install command from your new project:'
+    registry: password-based-auth-nextjs
+    showOpenInV0: false
+    after: >-
+      The installer adds the Supabase client and authentication routes. Keep the
+      generated package lockfile with your project.
 ---
 
-<BlockOverview name="password-based-auth-nextjs" showFiles>
-  <BlockPreview name="password-based-auth/auth/sign-up" />
-</BlockOverview>
-
 Start with a Next.js App Router project, then install the Library's password-based authentication block. The block adds sign-in, sign-up, password recovery, and a protected page.
-
-## Create the app
-
-Use [create-next-app](https://nextjs.org/docs/app/api-reference/cli/create-next-app) to scaffold the framework:
-
-```bash
-npx create-next-app@latest my-app --ts --tailwind --eslint --app --no-src-dir --import-alias "@/*" --use-npm --yes
-cd my-app
-npx shadcn@latest init --base radix
-```
-
-This creates the app at the project root with the import alias expected by the block.
-
-## Install the block
-
-Run the install command from your new project:
-
-<BlockItem name="password-based-auth-nextjs" showOpenInV0={false} />
-
-The installer adds the Supabase client and authentication routes. Keep the generated package lockfile with your project.
 
 ## Configure Supabase
 

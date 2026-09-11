@@ -114,6 +114,115 @@
           "type": "registry:lib"
         }
       ],
+      "meta": {
+        "architecture": {
+          "resources": [
+            {
+              "id": "supabase-auth",
+              "kind": "service",
+              "label": "Supabase Auth",
+              "description": "Managed users and sessions",
+              "status": "existing"
+            },
+            {
+              "id": "page:app/auth/login/page.tsx",
+              "kind": "page",
+              "label": "Sign in",
+              "description": "Sign in with email and password"
+            },
+            {
+              "id": "page:app/auth/error/page.tsx",
+              "kind": "page",
+              "label": "Authentication error",
+              "description": "Explain when authentication cannot complete"
+            },
+            {
+              "id": "page:app/protected/page.tsx",
+              "kind": "page",
+              "label": "Protected page",
+              "description": "An example page that requires a signed-in user"
+            },
+            {
+              "id": "route:app/auth/confirm/route.ts",
+              "kind": "route",
+              "label": "Email confirmation",
+              "description": "Verify email confirmation and password reset links"
+            },
+            {
+              "id": "middleware:middleware.ts",
+              "kind": "middleware",
+              "label": "Session handling",
+              "description": "Refresh the session and redirect unauthenticated requests"
+            },
+            {
+              "id": "page:app/auth/sign-up/page.tsx",
+              "kind": "page",
+              "label": "Sign up",
+              "description": "Create an account with email and password"
+            },
+            {
+              "id": "page:app/auth/sign-up-success/page.tsx",
+              "kind": "page",
+              "label": "Check your email",
+              "description": "Prompt new users to confirm their email address"
+            },
+            {
+              "id": "page:app/auth/forgot-password/page.tsx",
+              "kind": "page",
+              "label": "Forgot password",
+              "description": "Request a password reset email"
+            },
+            {
+              "id": "page:app/auth/update-password/page.tsx",
+              "kind": "page",
+              "label": "Update password",
+              "description": "Choose a new password after a reset"
+            }
+          ],
+          "relationships": [
+            {
+              "source": "page:app/auth/login/page.tsx",
+              "target": "middleware:middleware.ts",
+              "label": ""
+            },
+            {
+              "source": "page:app/auth/error/page.tsx",
+              "target": "middleware:middleware.ts",
+              "label": ""
+            },
+            {
+              "source": "page:app/protected/page.tsx",
+              "target": "middleware:middleware.ts",
+              "label": ""
+            },
+            {
+              "source": "page:app/auth/sign-up/page.tsx",
+              "target": "middleware:middleware.ts",
+              "label": ""
+            },
+            {
+              "source": "page:app/auth/sign-up-success/page.tsx",
+              "target": "middleware:middleware.ts",
+              "label": ""
+            },
+            {
+              "source": "page:app/auth/forgot-password/page.tsx",
+              "target": "middleware:middleware.ts",
+              "label": ""
+            },
+            {
+              "source": "page:app/auth/update-password/page.tsx",
+              "target": "middleware:middleware.ts",
+              "label": ""
+            },
+            {
+              "source": "middleware:middleware.ts",
+              "target": "supabase-auth",
+              "label": "Refreshes sessions"
+            }
+          ]
+        }
+      },
       "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "NEXT_PUBLIC_SUPABASE_URL": "",
@@ -1788,7 +1897,33 @@
           "type": "registry:file",
           "target": "supabase/functions/mcp-server/tools/index.ts"
         }
-      ]
+      ],
+      "meta": {
+        "architecture": {
+          "resources": [
+            {
+              "id": "edge-function:supabase/functions/mcp-server",
+              "kind": "edge-function",
+              "label": "MCP server",
+              "description": "Expose MCP tools that run as the signed-in user"
+            },
+            {
+              "id": "supabase-auth",
+              "kind": "service",
+              "label": "Supabase Auth",
+              "description": "Verifies user access tokens",
+              "status": "existing"
+            }
+          ],
+          "relationships": [
+            {
+              "source": "edge-function:supabase/functions/mcp-server",
+              "target": "supabase-auth",
+              "label": "Authenticates requests"
+            }
+          ]
+        }
+      }
     },
     {
       "name": "oauth-consent-nextjs",
@@ -1991,6 +2126,43 @@
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
+      "meta": {
+        "architecture": {
+          "resources": [
+            {
+              "id": "generated-collections",
+              "kind": "capability",
+              "label": "Typed collections",
+              "description": "Generated from the tables you select"
+            },
+            {
+              "id": "generated-schemas",
+              "kind": "capability",
+              "label": "Zod schemas",
+              "description": "Generated from your database schema"
+            },
+            {
+              "id": "existing-database",
+              "kind": "service",
+              "label": "Supabase Database",
+              "description": "Uses your existing tables",
+              "status": "existing"
+            }
+          ],
+          "relationships": [
+            {
+              "source": "generated-collections",
+              "target": "generated-schemas",
+              "label": "Validates records"
+            },
+            {
+              "source": "generated-collections",
+              "target": "existing-database",
+              "label": "Queries selected tables"
+            }
+          ]
+        }
+      },
       "envVars": {
         "NEXT_PUBLIC_SUPABASE_URL": "",
         "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""

@@ -1,35 +1,37 @@
 ---
 title: Flutter Starter
-description: A Flutter user management app with magic links, profiles, and avatar uploads
+description: 'A Flutter user management app with magic links, profiles, and avatar uploads'
+preview: |-
+  <BlockOverview name="flutter-starter">
+    <div className="library-component-preview h-80 overflow-hidden border bg-surface-75 md:h-96">
+      <CatalogPreview kind="avatar" />
+    </div>
+  </BlockOverview>
+installation:
+  - title: Create the app
+    before: >-
+      Install the [Flutter SDK](https://docs.flutter.dev/get-started/install),
+      then copy the example with a sparse Git checkout:
+    command: >-
+      git clone --depth 1 --filter=blob:none --sparse
+      https://github.com/supabase/supabase.git my-flutter-app
+
+      cd my-flutter-app
+
+      git sparse-checkout set examples/user-management/flutter-user-management
+
+      cd examples/user-management/flutter-user-management
+    after: >-
+      This checks out the complete Flutter project, including its Android, iOS,
+      and web configuration. Flutter uses the example's Dart widgets and SDK
+      dependencies directly.
+  - title: Install dependencies
+    command: |-
+      flutter pub get
+      cp .env.example .env
 ---
 
-<BlockOverview name="flutter-starter">
-  <div className="library-component-preview h-80 overflow-hidden border bg-surface-75 md:h-96">
-    <CatalogPreview kind="avatar" />
-  </div>
-</BlockOverview>
-
 Start from the [Supabase Flutter user management example](https://github.com/supabase/supabase/tree/master/examples/user-management/flutter-user-management). It includes a Flutter app, the Supabase Flutter SDK, account screens, and local database migrations.
-
-## Create the app
-
-Install the [Flutter SDK](https://docs.flutter.dev/get-started/install), then copy the example with a sparse Git checkout:
-
-```bash
-git clone --depth 1 --filter=blob:none --sparse https://github.com/supabase/supabase.git my-flutter-app
-cd my-flutter-app
-git sparse-checkout set examples/user-management/flutter-user-management
-cd examples/user-management/flutter-user-management
-```
-
-This checks out the complete Flutter project, including its Android, iOS, and web configuration. Flutter uses the example's Dart widgets and SDK dependencies directly.
-
-## Install dependencies
-
-```bash
-flutter pub get
-cp .env.example .env
-```
 
 ## Configure Supabase
 

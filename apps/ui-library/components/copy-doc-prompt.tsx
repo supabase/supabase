@@ -6,10 +6,11 @@ import { Button } from 'ui'
 
 interface CopyDocPromptProps {
   title: string
-  markdownPath: string
+  pagePath: string
+  command: string
 }
 
-export function CopyDocPrompt({ title, markdownPath }: CopyDocPromptProps) {
+export function CopyDocPrompt({ title, pagePath, command }: CopyDocPromptProps) {
   const [status, setStatus] = useState<'idle' | 'copied' | 'error'>('idle')
 
   useEffect(() => {
@@ -19,8 +20,8 @@ export function CopyDocPrompt({ title, markdownPath }: CopyDocPromptProps) {
   }, [status])
 
   async function copyPrompt() {
-    const url = new URL(markdownPath, window.location.origin).href
-    const prompt = `Help me add ${title} from the Supabase UI Library to my project. Read the documentation at ${url} and follow its installation and setup instructions. Check my existing project structure and reuse any Supabase client setup that is already in place.`
+    const url = new URL(pagePath, window.location.origin).href
+    const prompt = `Help me install ${title} from the Supabase UI Library in my project. Read ${url} for the full setup instructions. Run these commands from my project directory:\n\n${command}\n\nCheck my existing project structure and reuse any Supabase client setup that is already in place.`
 
     try {
       await navigator.clipboard.writeText(prompt)
@@ -35,10 +36,17 @@ export function CopyDocPrompt({ title, markdownPath }: CopyDocPromptProps) {
       <Button
         variant="secondary"
         size="medium"
-        icon={status === 'copied' ? <Check size={14} /> : <Copy size={14} />}
+        className="rounded-full border-0 px-4"
+        icon={
+          status === 'copied' ? (
+            <Check size={16} strokeWidth={2} />
+          ) : (
+            <Copy size={16} strokeWidth={2} />
+          )
+        }
         onClick={copyPrompt}
       >
-        {status === 'copied' ? 'Prompt copied' : 'Copy agent prompt'}
+        {status === 'copied' ? 'Prompt copied' : 'Copy prompt'}
       </Button>
       <span
         role="status"
