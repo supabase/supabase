@@ -1,13 +1,22 @@
 import { useParams } from 'common'
-import { ExternalLink, RotateCcw } from 'lucide-react'
+import { TableEditor } from 'icons'
+import { MoreVertical, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
-import { Badge, Button, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  TableCell,
+  TableRow,
+} from 'ui'
 
 import { ErroredTableDetails } from '../ErroredTableDetails'
-import { TableState } from './ReplicationPipelineStatus.types'
-import { getStatusConfig } from './ReplicationPipelineStatus.utils'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { StateDot } from '../StateDot'
+import { SlotLagMetrics as SlotLagMetricsType, TableState } from './ReplicationPipelineStatus.types'
+import { getStatusConfig, getTableSyncLagLabel } from './ReplicationPipelineStatus.utils'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 
 interface TableReplicationRowProps {
@@ -32,88 +41,112 @@ export const TableReplicationRow = ({
   onSelectShowError,
 }: TableReplicationRowProps) => {
   const { ref } = useParams()
-  const isErrorState = table.state.name === 'error'
   const statusConfig = getStatusConfig(table.state as TableState['state'])
+  const tableName = `${table.schema}.${table.name}`
+  const canRestart = !showDisabledState && !isRestarting && !isAnyRestartInProgress
+  const restartLabel = isPipelineStopped
+    ? 'Reset table and start pipeline'
+    : 'Reset table and restart pipeline'
+
+  const isErrorState = table.state.name === 'error'
+  const canShowError =
+    isErrorState && 'reason' in table.state && !showDisabledState && !isRestarting
+  // A table copying during the initial sync reports its own slot metrics. Shown as one line rather
+  // than a grid, so the detail survives without a table cell turning into a dashboard.
+  const syncLag = table.table_sync_lag as SlotLagMetricsType | undefined
+  const syncLagParts = syncLag === undefined ? undefined : getTableSyncLagLabel(syncLag)
+  const syncLagLabel =
+    syncLagParts !== undefined && syncLagParts.length > 0 ? syncLagParts.join(' · ') : undefined
+  // Status column already names the state (Copying, Queued, …). Prefer the sync line when we have
+  // one; keep the description only when it adds something the status label doesn't say.
+  const detailsLine =
+    syncLagLabel !== undefined ? syncLagLabel : isErrorState ? undefined : statusConfig.description
 
   return (
     <TableRow>
-      <TableCell className="align-top">
-        <div className="flex items-center gap-x-2">
-          <p>
-            {table.schema}.{table.name}
-          </p>
+      <TableCell>{tableName}</TableCell>
 
-          <ButtonTooltip
-            asChild
-            variant="text"
-            className="px-1.5"
-            icon={<ExternalLink />}
-            tooltip={{
-              content: { side: 'bottom', text: 'Table Editor' },
-            }}
-          >
-            <Link
-              target="_blank"
-              rel="noopener noreferrer"
-              href={`/project/${ref}/editor/${table.id}`}
-            />
-          </ButtonTooltip>
-        </div>
-      </TableCell>
-
-      <TableCell className="align-top">
+      <TableCell>
         {isRestarting ? (
-          <Badge variant="default">Restarting</Badge>
+          <StateDot variant="warning" isPulsing>
+            Restarting
+          </StateDot>
         ) : showDisabledState ? (
-          <Badge variant="default">Not Available</Badge>
+          <StateDot variant="default">Not available</StateDot>
         ) : (
-          statusConfig.badge
+          <StateDot
+            variant={statusConfig.variant}
+            isPulsing={statusConfig.isPulsing}
+            pulseDelayMs={statusConfig.isPulsing ? (table.id % 8) * 55 : undefined}
+          >
+            {statusConfig.label}
+          </StateDot>
         )}
       </TableCell>
 
-      <TableCell className="align-top">
+      <TableCell>
         {isRestarting ? (
           <p className="text-sm text-foreground-lighter">
-            Replication is being restarted for this table. The pipeline will restart automatically.
+            Being reset. The pipeline will restart itself…
           </p>
         ) : showDisabledState ? (
           <p className="text-sm text-foreground-lighter">{disabledStateMessage}</p>
         ) : (
-          <div className="flex flex-col gap-y-3">
-            <div className="text-sm text-foreground">
-              {statusConfig.description}{' '}
-              {isErrorState && 'reason' in table.state && (
-                <button
-                  tabIndex={0}
-                  className={InlineLinkClassName}
-                  onClick={() => onSelectShowError()}
-                >
-                  View error.
-                </button>
-              )}
-            </div>
-            {table.state.name === 'error' && <ErroredTableDetails table={table} />}
-          </div>
+          <p className="text-sm text-foreground-lighter">
+            {isErrorState ? (
+              <>
+                {statusConfig.description}. <ErroredTableDetails table={table} />
+              </>
+            ) : (
+              detailsLine
+            )}
+          </p>
         )}
       </TableCell>
 
-      <TableCell className="align-top">
-        <div className="flex items-center justify-end">
-          <Tooltip>
-            <TooltipTrigger asChild>
+      <TableCell>
+        <div className="flex items-center justify-end gap-x-2">
+          {canShowError && (
+            <Button variant="default" onClick={onSelectShowError}>
+              View error
+            </Button>
+          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button
                 variant="default"
-                className="w-7"
-                icon={<RotateCcw />}
-                disabled={showDisabledState || isRestarting || isAnyRestartInProgress}
-                aria-label={`Restart replication for ${table.schema}.${table.name}`}
-                onClick={onSelectRestart}
+                className="px-1.25 hit-area-2"
+                aria-label={`Options for ${tableName}`}
+                icon={<MoreVertical />}
               />
-            </TooltipTrigger>
-            <TooltipContent side="bottom" align="center">
-              {isPipelineStopped ? 'Reset table and start pipeline' : 'Reset and restart pipeline'}
-            </TooltipContent>
-          </Tooltip>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="end" className="w-64">
+              <DropdownMenuItemTooltip
+                className="gap-x-2"
+                disabled={!canRestart}
+                onClick={onSelectRestart}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: canRestart ? undefined : disabledStateMessage,
+                  },
+                }}
+              >
+                <RotateCcw size={14} />
+                <span>{restartLabel}</span>
+              </DropdownMenuItemTooltip>
+              <DropdownMenuItem className="gap-x-2" asChild>
+                <Link
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={`/project/${ref}/editor/${table.id}`}
+                >
+                  <TableEditor size={14} />
+                  <span>View in Table Editor</span>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </TableCell>
     </TableRow>
