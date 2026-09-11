@@ -9,7 +9,8 @@ SELECT * FROM today WHERE you = 'building';
 -- +---------+-----------------------------------+
 -- | time    | event                             |
 -- +---------+-----------------------------------+
--- | 9:30 AM | doors open + check-in             |
+-- | 9:00 AM | sponsors arrive                   |
+-- | 9:15 AM | doors open + check-in             |
 -- | 9:45 AM | kickoff (theme drops on stage)    |
 -- | 1:00 PM | lunch                             |
 -- | 5:30 PM | !! submissions close + happy hour |
