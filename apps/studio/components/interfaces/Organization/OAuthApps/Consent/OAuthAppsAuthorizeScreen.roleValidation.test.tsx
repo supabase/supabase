@@ -2,7 +2,21 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 import { OAuthAppsAuthorizeScreen } from './OAuthAppsAuthorizeScreen'
+import {
+  getMockOAuthAppsAuthorizeRequest,
+  OAUTH_APPS_MOCK_SCENARIOS,
+} from '@/data/oauth-apps/mocks'
 import { customRender } from '@/tests/lib/custom-render'
+
+function renderScreen(authId: string) {
+  return customRender(
+    <OAuthAppsAuthorizeScreen
+      authId={authId}
+      request={getMockOAuthAppsAuthorizeRequest(authId)}
+      navigate={vi.fn()}
+    />
+  )
+}
 
 // northwind-traders roles: northwind-storefront (administrator), northwind-cms (developer),
 // fabrikam-api and fabrikam-jobs (both read_only, so both fail the write-scope check).
@@ -23,7 +37,7 @@ function deselectFlagged() {
 }
 
 async function submitTwoBlockedAndOneAllowed() {
-  customRender(<OAuthAppsAuthorizeScreen mockState="role_validation" navigate={vi.fn()} />)
+  renderScreen(OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation)
 
   await selectProjects([...READ_ONLY_PROJECTS, WRITABLE_PROJECT])
   authorize()
@@ -95,7 +109,7 @@ describe('OAuthAppsAuthorizeScreen post-submit role validation', () => {
   })
 
   test('a selection of only writable projects never triggers validation', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="role_validation" navigate={vi.fn()} />)
+    renderScreen(OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation)
 
     await selectProjects([WRITABLE_PROJECT])
     authorize()
@@ -103,8 +117,8 @@ describe('OAuthAppsAuthorizeScreen post-submit role validation', () => {
     expect(await screen.findByText('Vercel is connected')).toBeInTheDocument()
   })
 
-  test('states that predate the role check still approve read-only projects', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
+  test('a request outside the role-validated set approves read-only projects', async () => {
+    renderScreen(OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper)
 
     await selectProjects([READ_ONLY_PROJECTS[0]])
     authorize()

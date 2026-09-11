@@ -3,7 +3,6 @@ import type { OAuthScopeGroup, OAuthScopeLevel } from '@/data/oauth-apps/types'
 export interface ScopeGroupCardProps {
   appName: string
   scopeGroups: OAuthScopeGroup[]
-  /** Set to false for a receipt view (e.g. the success screen) that has no intro copy of its own. */
   showHeading?: boolean
 }
 
