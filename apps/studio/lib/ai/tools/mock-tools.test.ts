@@ -6,20 +6,24 @@ import type { AgentNotebook } from '@/data/content/notebooks/notebook-schema'
 import { createSearchDocsTool } from '@/lib/ai/tools/search-docs-tool'
 import type * as SearchDocsToolModule from '@/lib/ai/tools/search-docs-tool'
 
-// search_docs is the real self-contained custom tool (calls the public docs
-// GraphQL API directly; no live connection at construction time). We spy on
-// the factory so the regression-guard test can force it to return nothing —
-// all other tests use the real implementation via the default mock.
-vi.mock('@/lib/ai/tools/search-docs-tool', async (importOriginal) => {
-  const actual = await importOriginal<typeof SearchDocsToolModule>()
-  return { ...actual, createSearchDocsTool: vi.fn(actual.createSearchDocsTool) }
-})
+// search_docs normally fetches the live docs GraphQL schema on construction
+// (see search-docs-tool.ts), which would make every test in this file depend
+// on the public docs API. Mock it with a deterministic local fixture instead
+// — live connectivity (including the schema fetch) is covered separately by
+// evals/preflight.ts. The regression-guard test below overrides this default
+// to verify the missing-tool guard fires.
+vi.mock('@/lib/ai/tools/search-docs-tool', () => ({
+  createSearchDocsTool: vi.fn().mockResolvedValue({
+    description: 'Search the Supabase documentation using GraphQL.',
+    execute: async () => ({ content: [{ type: 'text' as const, text: '{}' }] }),
+  } as unknown as SearchDocsToolModule.SearchDocsTool),
+}))
 
 describe('ai/tools/mock-tools getMockTools', () => {
-  it('returns the real search_docs custom tool alongside the deterministic mocks', async () => {
+  it('wires the mocked search_docs tool through from the shared module, alongside the deterministic mocks', async () => {
     const result = await getMockTools(undefined)
 
-    // The real custom tool, wired through from the shared module
+    // The mocked tool, wired through from the shared module
     expect(result.search_docs).toBeDefined()
     expect(result.search_docs.description).toContain('Search the Supabase documentation')
     expect(typeof result.search_docs.execute).toBe('function')
