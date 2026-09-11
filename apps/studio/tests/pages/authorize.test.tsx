@@ -10,12 +10,13 @@ vi.mock('@/hooks/misc/withAuth', () => ({
 }))
 
 const flags = vi.hoisted(() => ({ scopedGrants: false }))
+const params = vi.hoisted(() => ({ current: {} as Record<string, string | undefined> }))
 
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
   return {
     ...actual,
-    useParams: () => ({}),
+    useParams: () => params.current,
     useFlag: () => flags.scopedGrants,
   }
 })
@@ -55,6 +56,7 @@ const DEFAULT_PROFILE_CONTEXT: ProfileContextType = {
 describe('APIAuthorizationPage', () => {
   afterEach(() => {
     flags.scopedGrants = false
+    params.current = {}
   })
 
   test('renders loading interstitial while router is not ready', () => {
@@ -105,5 +107,35 @@ describe('APIAuthorizationPage', () => {
 
     expect(await screen.findByText('northwind-cms')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
+  })
+
+  test('org_bound_all renders without a picker and covers every project', async () => {
+    flags.scopedGrants = true
+    params.current = { mock_scenario: 'org_bound_all' }
+    useRouterMock.mockReturnValue({ isReady: true, push: routerPushMock, query: {} })
+
+    customRender(<APIAuthorizationPage dehydratedState={{}} />, {
+      profileContext: DEFAULT_PROFILE_CONTEXT,
+    })
+
+    expect(await screen.findByText('This grant covers every project')).toBeInTheDocument()
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    expect(screen.getByText('This grant is shared with the whole organization')).toBeInTheDocument()
+  })
+
+  test('user_bound_all renders without a picker and covers every project', async () => {
+    flags.scopedGrants = true
+    params.current = { mock_scenario: 'user_bound_all' }
+    useRouterMock.mockReturnValue({ isReady: true, push: routerPushMock, query: {} })
+
+    customRender(<APIAuthorizationPage dehydratedState={{}} />, {
+      profileContext: DEFAULT_PROFILE_CONTEXT,
+    })
+
+    expect(await screen.findByText('This grant covers every project')).toBeInTheDocument()
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('This grant is shared with the whole organization')
+    ).not.toBeInTheDocument()
   })
 })
