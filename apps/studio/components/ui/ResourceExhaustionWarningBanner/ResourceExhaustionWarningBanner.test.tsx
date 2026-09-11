@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { describe, expect, test, vi } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 
 import { ResourceExhaustionWarningBanner } from './ResourceExhaustionWarningBanner'
 import type { ProfileContextType } from '@/lib/profile'
@@ -17,7 +17,10 @@ type ProjectResourceWarningsResponse =
 
 const PROJECT_REF = 'project-ref'
 
-const { trackSpy } = vi.hoisted(() => ({ trackSpy: vi.fn() }))
+const { trackSpy, flags } = vi.hoisted(() => ({
+  trackSpy: vi.fn(),
+  flags: { showDiskIOBurstBalanceChart: false },
+}))
 
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
@@ -26,13 +29,17 @@ vi.mock('common', async (importOriginal) => {
     IS_PLATFORM: true,
     useIsLoggedIn: () => true,
     useParams: () => ({ ref: PROJECT_REF }),
-    useFlag: () => false,
+    useFlag: () => flags.showDiskIOBurstBalanceChart,
   }
 })
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => trackSpy }))
 
 mockAnimationsApi()
+
+afterEach(() => {
+  flags.showDiskIOBurstBalanceChart = false
+})
 
 const PROFILE_CONTEXT: ProfileContextType = {
   profile: {
@@ -187,6 +194,17 @@ describe('ResourceExhaustionWarningBanner', () => {
     expect(menu.getByRole('menuitem', { name: 'View Disk IO metrics' })).toHaveAttribute(
       'href',
       metricsHref('disk-throughput')
+    )
+  })
+
+  test('disk IO links to the burst balance chart when the report renders it', async () => {
+    flags.showDiskIOBurstBalanceChart = true
+    renderBanner({ disk_io_exhaustion: 'warning' })
+
+    const menu = await openTroubleshootMenu()
+    expect(menu.getByRole('menuitem', { name: 'View metrics' })).toHaveAttribute(
+      'href',
+      metricsHref('disk-io-burst-balance')
     )
   })
 })
