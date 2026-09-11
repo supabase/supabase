@@ -1,4 +1,5 @@
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
+import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
 
@@ -73,4 +74,108 @@ export const getResourceWarningCorrectionUrl = ({
   if (metric === undefined) return undefined
   if (metric === null) return infrastructurePath
   return correctionUrlVariants[metric] ?? `${infrastructurePath}#${metric}`
+}
+
+export type ChartIdOverrides = Partial<Record<string, string>>
+
+export type TroubleshootItem =
+  | { kind: 'metrics'; warningType: string; menuLabel: string; buttonLabel: string; href: string }
+  | { kind: 'docs'; warningType: string; menuLabel: string; buttonLabel: string; href: string }
+  | { kind: 'ai'; menuLabel: string; buttonLabel: string }
+
+const resourceListFormatter = new Intl.ListFormat('en-US', { style: 'long', type: 'conjunction' })
+
+export const formatResourceList = (labels: string[]): string => resourceListFormatter.format(labels)
+
+export const getResourceWarningLabels = (activeWarnings: string[]): string[] =>
+  activeWarnings.flatMap((warningType) => {
+    const label = RESOURCE_WARNING_MESSAGES[warningType]?.resourceLabel
+    return label === undefined ? [] : [label]
+  })
+
+export const applyResourceList = (
+  text: string | undefined,
+  activeWarnings: string[]
+): string | undefined => {
+  if (text === undefined) return undefined
+  return text.replaceAll(
+    '{resources}',
+    formatResourceList(getResourceWarningLabels(activeWarnings))
+  )
+}
+
+export const getResourceWarningMetricsHref = (
+  warningType: string,
+  projectRef: string,
+  chartIdOverrides: ChartIdOverrides = {}
+): string | undefined => {
+  const chartId =
+    chartIdOverrides[warningType] ?? RESOURCE_WARNING_MESSAGES[warningType]?.metricsChartId
+  if (chartId === undefined) return undefined
+
+  const params = new URLSearchParams({
+    chart: chartId,
+    isHelper: 'true',
+    helperText: REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS,
+  })
+  return `/project/${projectRef}/observability/database?${params}`
+}
+
+export const getResourceWarningAiPrompt = (activeWarnings: string[]): string | undefined => {
+  if (activeWarnings.length === 1) return RESOURCE_WARNING_MESSAGES[activeWarnings[0]]?.aiPrompt
+  return applyResourceList(
+    RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.aiPrompt,
+    activeWarnings
+  )
+}
+
+export const getTroubleshootItems = ({
+  activeWarnings,
+  projectRef,
+  aiPrompt,
+  chartIdOverrides = {},
+}: {
+  activeWarnings: string[]
+  projectRef: string
+  aiPrompt: string | undefined
+  chartIdOverrides?: ChartIdOverrides
+}): TroubleshootItem[] => {
+  const isSingleWarning = activeWarnings.length === 1
+
+  const metricsItems = activeWarnings.flatMap((warningType): TroubleshootItem[] => {
+    const href = getResourceWarningMetricsHref(warningType, projectRef, chartIdOverrides)
+    const label = RESOURCE_WARNING_MESSAGES[warningType]?.resourceLabel
+    if (href === undefined || (!isSingleWarning && label === undefined)) return []
+    return [
+      {
+        kind: 'metrics',
+        warningType,
+        menuLabel: isSingleWarning ? 'View metrics' : `View ${label} metrics`,
+        buttonLabel: 'View metrics',
+        href,
+      },
+    ]
+  })
+
+  const docsItems = activeWarnings.flatMap((warningType): TroubleshootItem[] => {
+    const href = RESOURCE_WARNING_MESSAGES[warningType]?.docsUrl
+    const label = RESOURCE_WARNING_MESSAGES[warningType]?.resourceLabel
+    if (href === undefined || (!isSingleWarning && label === undefined)) return []
+    return [
+      {
+        kind: 'docs',
+        warningType,
+        menuLabel: isSingleWarning ? 'Documentation' : `${label} documentation`,
+        buttonLabel: 'Learn more',
+        href,
+      },
+    ]
+  })
+
+  const aiItems: TroubleshootItem[] =
+    aiPrompt === undefined
+      ? []
+      : [{ kind: 'ai', menuLabel: 'Ask AI Assistant', buttonLabel: 'Ask AI Assistant' }]
+
+  return [...metricsItems, ...docsItems, ...aiItems]
 }
