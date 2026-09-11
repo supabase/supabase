@@ -496,7 +496,7 @@ describe('buildSentryClientOptions', () => {
   })
 })
 
-describe('shared Sentry crash policy in Studio', () => {
+describe('which errors Studio sends to Sentry', () => {
   let beforeSend: NonNullable<ReturnType<typeof buildSentryClientOptions>['beforeSend']>
   let restoreConsent: () => void
 
@@ -521,20 +521,23 @@ describe('shared Sentry crash policy in Studio', () => {
     vi.resetModules()
   })
 
-  it('drops third-party noise', async () => {
+  it('drops errors from outside the app', async () => {
     expect(await beforeSend({ type: undefined, tags: { third_party_code: true } }, {})).toBeNull()
   })
 
-  it.each([true, 'true'])('keeps a boundary crash tagged %s without stack frames', async (tag) => {
-    const event: Parameters<typeof beforeSend>[0] = {
-      type: undefined,
-      tags: { third_party_code: true, globalErrorBoundary: tag },
-      exception: { values: [{ value: 'Page crashed' }] },
+  it.each([true, 'true'])(
+    'sends page crashes even when the code location is missing: %s',
+    async (tag) => {
+      const event: Parameters<typeof beforeSend>[0] = {
+        type: undefined,
+        tags: { third_party_code: true, globalErrorBoundary: tag },
+        exception: { values: [{ value: 'Page crashed' }] },
+      }
+      expect(await beforeSend(event, {})).toBe(event)
     }
-    expect(await beforeSend(event, {})).toBe(event)
-  })
+  )
 
-  it('retains Studio filtering of non-boundary exceptions without stack frames', async () => {
+  it('drops errors with no code location when they did not crash the page', async () => {
     expect(
       await beforeSend({ type: undefined, exception: { values: [{ value: 'No stack' }] } }, {})
     ).toBeNull()

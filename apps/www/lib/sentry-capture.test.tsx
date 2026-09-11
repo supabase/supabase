@@ -84,8 +84,8 @@ const capturePagesError = async (err: Error) => {
 describe.each([
   ['app router', captureGlobalError],
   ['pages router', capturePagesError],
-])('%s crash capture', (_, capture) => {
-  it('sends the crash through the initialized browser sdk with the boundary tag', async () => {
+])('%s page crashes', (_, capture) => {
+  it('sends the error to Sentry marked as a page crash', async () => {
     await capture(new Error('render failed'))
     await Sentry.flush()
     expect(events()).toEqual([
@@ -98,7 +98,7 @@ describe.each([
     ])
   })
 
-  it('does not send the crash when consent is declined', async () => {
+  it("does not send the page crash without the user's permission", async () => {
     consentState.hasConsented = false
     await capture(new Error('private render failed'))
     await Sentry.flush()
@@ -106,9 +106,9 @@ describe.each([
   })
 })
 
-describe('browser initialization', () => {
+describe('browser error reporting', () => {
   it.each([true, false])(
-    'captures application errors only with consent: %s',
+    "sends app errors only with the user's permission: %s",
     async (hasConsent) => {
       consentState.hasConsented = hasConsent
       const error = new Error(`application failed with consent ${hasConsent}`)
