@@ -1,6 +1,6 @@
 'use client'
 
-import { CircleIcon, LaptopIcon, MoonIcon, SunIcon } from 'lucide-react'
+import { LaptopIcon, MoonIcon, SunIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
@@ -79,7 +79,7 @@ export function CommandMenu({ ...props }: DialogProps) {
           Find guides, blocks, starter apps, and theme settings.
         </DialogDescription>
         <CommandInput placeholder="Type a command or search..." />
-        <CommandList>
+        <CommandList className="min-h-0 max-h-[min(400px,calc(100dvh-8rem))] overscroll-contain [&_[cmdk-group]]:p-2! [&_[cmdk-item]]:rounded-md [&_[cmdk-item]]:p-2!">
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandGroup key="pages" heading="Pages">
             {gettingStarted.items.map((navItem) => (
@@ -88,9 +88,6 @@ export function CommandMenu({ ...props }: DialogProps) {
                 value={navItem.title}
                 onSelect={() => runCommand(() => router.push(navItem.href as string))}
               >
-                <div className="mr-2 flex h-4 w-4 items-center justify-center">
-                  <CircleIcon className="h-3 w-3" strokeWidth={1} />
-                </div>
                 {navItem.title}
               </CommandItem>
             ))}
@@ -111,7 +108,6 @@ export function CommandMenu({ ...props }: DialogProps) {
                       })
                     }
                   >
-                    <CircleIcon className="mr-2 h-3 w-3" strokeWidth={1} />
                     {block.title}
                   </CommandItem>
                 ))}

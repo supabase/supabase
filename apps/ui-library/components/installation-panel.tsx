@@ -4,6 +4,7 @@ import { Check, Copy } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
+import { TerminalCode } from './terminal-code'
 import type { PackageManager } from '@/lib/install-command'
 
 interface InstallationPanelProps {
@@ -72,9 +73,7 @@ export function InstallationPanel({ title, pagePath, commands }: InstallationPan
         </div>
         {packageManagers.map((manager) => (
           <TabsContent key={manager} value={manager} className="m-0 p-5">
-            <pre className="min-w-0 flex-1 overflow-x-auto whitespace-pre-wrap break-words font-mono text-xs leading-6 text-foreground">
-              <code>{commands[manager]}</code>
-            </pre>
+            <TerminalCode command={commands[manager] ?? ''} />
           </TabsContent>
         ))}
         <TabsContent value="prompt" className="m-0 p-5">

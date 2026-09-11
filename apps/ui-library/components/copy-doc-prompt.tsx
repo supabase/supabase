@@ -46,7 +46,7 @@ export function CopyDocPrompt({ title, pagePath, command }: CopyDocPromptProps) 
         }
         onClick={copyPrompt}
       >
-        {status === 'copied' ? 'Prompt copied' : 'Copy prompt'}
+        {status === 'copied' ? 'Prompt copied' : 'Copy agent prompt'}
       </Button>
       <span
         role="status"

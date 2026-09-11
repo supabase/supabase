@@ -58,7 +58,7 @@ const ThemeSwitcherDropdown = () => {
             variant="text"
             size="tiny"
             aria-label="Choose a theme"
-            className="px-1 group"
+            className="group h-8 w-8 p-0"
             icon={
               resolvedTheme?.includes('light') ? (
                 <Sun className={iconClasses} />
