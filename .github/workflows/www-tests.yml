@@ -11,6 +11,8 @@ on:
       - 'apps/www/content/md/**'
       - 'apps/www/scripts/**/*.mjs'
       - 'apps/www/public/.well-known/**'
+      # www catalog tests check that linked docs guides exist, so guide changes
+      # must trigger these tests and their sources must be included in checkout.
       - 'apps/docs/content/guides/**'
 
 # Cancel old builds on new commit for same workflow + branch/PR
