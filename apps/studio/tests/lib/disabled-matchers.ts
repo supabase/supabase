@@ -19,10 +19,7 @@ expect.extend({
 })
 
 declare module 'vitest' {
-  interface Assertion<T> {
-    toBeAriaDisabled(): void
-  }
-  interface AsymmetricMatchersContaining {
-    toBeAriaDisabled(): void
+  interface Matchers<R extends void | Promise<void> = void | Promise<void>, T = unknown> {
+    toBeAriaDisabled(): R
   }
 }
