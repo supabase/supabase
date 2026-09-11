@@ -4,6 +4,9 @@ import os from 'node:os'
 import path from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
+import { parseFrontmatter } from './lib/frontmatter.mjs'
+import { blogPostingSchema, serializeJsonLd } from './lib/json-ld'
+
 const GENERATOR = path.join(process.cwd(), 'internals', 'generate-sitemap.mjs')
 const LEGACY_LINK = 'https://supabase.com/changelog/12345-legacy-entry'
 const TIMED_LINK = 'https://supabase.com/changelog/23456-timed-entry'
@@ -121,7 +124,7 @@ describe('generate-sitemap lastmod', () => {
     expect(entryFor('https://supabase.com/blog/unquoted-minutes')?.lastmod).toBe('2026-01-08')
   })
 
-  it('accepts an unquoted date-only value, which YAML parses into a Date', () => {
+  it('accepts an unquoted date-only value', () => {
     expect(entryFor('https://supabase.com/blog/unquoted-date')?.lastmod).toBe('2026-01-09')
   })
 
@@ -165,28 +168,66 @@ describe('generate-sitemap lastmod', () => {
   })
 })
 
+describe('frontmatter dates in sitemap and blog JSON-LD', () => {
+  it.each([
+    ['2026-01-14T09:30:00', '2026-01-14'],
+    ['2026-01-15T16:00:00-08:00', '2026-01-15'],
+    ['2026-01-16T00:00:00Z', '2026-01-16'],
+    ['2026-01-17T00:30:00+14:00', '2026-01-17'],
+    ['2026-01-18', '2026-01-18'],
+  ])('preserves the authored day of %s regardless of quoting', (value, expectedDay) => {
+    const files = {
+      ...blogFixture('2026-01-01-quoted', `date: '2026-01-01'\nupdated: '${value}'`),
+      ...blogFixture('2026-01-01-unquoted', `date: 2026-01-01\nupdated: ${value} # revision`),
+    }
+    const dir = writeFixture(files)
+    const result = runGenerator(dir)
+    expect(result.status, result.stderr).toBe(0)
+    const entries = urlEntries(fs.readFileSync(path.join(dir, 'public/sitemap_www.xml'), 'utf-8'))
+    expect(
+      entries.filter((entry) => entry.loc.includes('/blog/')).map((entry) => entry.lastmod)
+    ).toEqual([expectedDay, expectedDay])
+
+    for (const content of Object.values(files)) {
+      const { data } = parseFrontmatter(content)
+      const schema = JSON.parse(
+        serializeJsonLd(
+          blogPostingSchema({
+            url: 'https://supabase.com/blog/example',
+            headline: 'Example',
+            image: 'https://supabase.com/example.png',
+            datePublished: data.date,
+            dateModified: data.updated ?? data.date,
+            authors: [{ name: 'Supabase' }],
+          })
+        )
+      )
+      expect(schema.datePublished).toBe('2026-01-01')
+      expect(schema.dateModified).toBe(value)
+      expect(schema.dateModified.slice(0, 10)).toBe(expectedDay)
+    }
+  })
+
+  it.each(['javascript', 'js', 'JavaScript'])(
+    'rejects %s frontmatter without executing it',
+    (language) => {
+      const content = `---${language}\n(require('fs').writeFileSync('executed', 'yes'), {date: '2026-01-01'})\n---\n`
+      const dir = writeFixture({ '_blog/2026-01-01-script.mdx': content })
+      const result = runGenerator(dir)
+      expect(result.status).not.toBe(0)
+      expect(result.stderr).toContain('JavaScript frontmatter is not supported')
+      expect(fs.existsSync(path.join(dir, 'executed'))).toBe(false)
+      expect(() => parseFrontmatter(content)).toThrow('JavaScript frontmatter is not supported')
+    }
+  )
+})
+
 describe('generate-sitemap rejects dates it cannot trust', () => {
   const cases: Array<{ name: string; files: Record<string, string>; stderrIncludes: string[] }> = [
     {
       name: 'a non-date word',
       files: blogFixture('2026-01-10-bad-word', "date: '2026-01-10'\nupdated: 'soon'"),
       stderrIncludes: ['_blog/2026-01-10-bad-word.mdx', '"soon"'],
-    },
-    {
-      name: 'an unquoted offset value that lands on UTC midnight',
-      files: blogFixture(
-        '2026-01-15-unquoted-offset',
-        "date: '2026-01-15'\nupdated: 2026-01-15T16:00:00-08:00"
-      ),
-      stderrIncludes: ['_blog/2026-01-15-unquoted-offset.mdx', 'quote it'],
-    },
-    {
-      name: 'an unquoted zoned midnight value',
-      files: blogFixture(
-        '2026-01-16-unquoted-zulu',
-        "date: '2026-01-16'\nupdated: 2026-01-16T00:00:00Z"
-      ),
-      stderrIncludes: ['_blog/2026-01-16-unquoted-zulu.mdx', 'quote it'],
     },
     {
       name: 'an updated value earlier than the publish date',
@@ -207,14 +248,6 @@ describe('generate-sitemap rejects dates it cannot trust', () => {
       name: 'a month that does not exist',
       files: blogFixture('2026-01-13-bad-month', "date: '2026-01-13'\nupdated: '2026-13-45'"),
       stderrIncludes: ['_blog/2026-01-13-bad-month.mdx', '"2026-13-45"'],
-    },
-    {
-      name: 'an unquoted value carrying a time part',
-      files: blogFixture(
-        '2026-01-14-unquoted-time',
-        "date: '2026-01-14'\nupdated: 2026-01-14T09:30:00"
-      ),
-      stderrIncludes: ['_blog/2026-01-14-unquoted-time.mdx', 'quote it'],
     },
     {
       name: 'an unparseable changelog pubDate',

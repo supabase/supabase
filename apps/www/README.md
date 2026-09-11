@@ -99,9 +99,7 @@ imgThumb: my-image.png
 
 #### Blog post dates
 
-- `date` (required, `YYYY-MM-DD`): publish date. Feeds the blog index order, JSON-LD `datePublished`, and the sitemap `<lastmod>` when `updated` is absent.
-- `updated` (optional, `YYYY-MM-DD`): set it when a post gets a substantive revision (new sections, corrected claims, changed recommendations). Leave it absent for typo, link, and image fixes. It becomes the sitemap `<lastmod>` and JSON-LD `dateModified`; a stale or inflated value is worse than none because search engines only trust lastmod they can verify against the page.
-- Quote both values (`'2026-08-24'`). An unquoted date-only value is accepted as written; an unquoted value with a time or zone is rejected at build time, because YAML converts it into an absolute instant and the authored day can no longer be recovered. `updated` must not be earlier than `date`.
+Use quoted `YYYY-MM-DD` values. `date` is the publication date. Set optional `updated` for substantive content revisions, excluding typo, link, or image fixes. It must be on or after `date` and supplies the sitemap and structured-data modification date. When absent, `date` supplies both.
 
 #### Events
 

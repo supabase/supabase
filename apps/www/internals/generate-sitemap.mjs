@@ -1,7 +1,8 @@
 import { readFileSync, writeFileSync } from 'fs'
 import { globby } from 'globby'
-import matter from 'gray-matter'
 import prettier from 'prettier'
+
+import { parseFrontmatter } from '../lib/frontmatter.mjs'
 
 const DATED_COLLECTIONS = ['_blog/', '_alternatives/', '_customers/']
 const ISO_DATE_SHAPE =
@@ -10,9 +11,9 @@ const RSS_PUB_DATE_SHAPE =
   /^[A-Z][a-z]{2}, \d{2} [A-Z][a-z]{2} \d{4} \d{2}:\d{2}:\d{2} (?:[+-]\d{4}|GMT|UTC)$/
 
 function lastmodError(source, value, hint = '') {
-  const isValidDate = value instanceof Date && !Number.isNaN(value.getTime())
-  const shown = isValidDate ? value.toISOString() : JSON.stringify(value)
-  return new Error(`${source}: cannot derive lastmod from date value ${shown}${hint}`)
+  return new Error(
+    `${source}: cannot derive lastmod from date value ${JSON.stringify(value)}${hint}`
+  )
 }
 
 function toIsoDate(value, source) {
@@ -27,30 +28,14 @@ function toIsoDate(value, source) {
   return candidate
 }
 
-function authoredDay(file, key, source) {
-  const value = file.data[key]
-  if (!(value instanceof Date)) return toIsoDate(value, source)
-  const unquotedDateOnly = new RegExp(`^${key}:[ \\t]*(\\d{4}-\\d{2}-\\d{2})[ \\t]*$`, 'm').exec(
-    file.matter
-  )
-  if (!unquotedDateOnly) throw lastmodError(source, value, "; quote it as a date-only 'YYYY-MM-DD'")
-  return toIsoDate(unquotedDateOnly[1], source)
-}
-
-function isSet(value) {
-  return value !== undefined && value !== null
-}
-
 function contentLastmod(filePath) {
-  const file = matter(readFileSync(filePath, 'utf-8'))
-  if (!isSet(file.data.updated)) {
-    return isSet(file.data.date) ? authoredDay(file, 'date', filePath) : undefined
+  const { data } = parseFrontmatter(readFileSync(filePath, 'utf-8'))
+  const published = data.date == null ? undefined : toIsoDate(data.date, filePath)
+  const updated = data.updated == null ? undefined : toIsoDate(data.updated, filePath)
+  if (published && updated && updated < published) {
+    throw lastmodError(filePath, data.updated, '; updated is earlier than date')
   }
-  const updated = authoredDay(file, 'updated', filePath)
-  if (isSet(file.data.date) && updated < authoredDay(file, 'date', filePath)) {
-    throw lastmodError(filePath, file.data.updated, '; updated is earlier than date')
-  }
-  return updated
+  return updated ?? published
 }
 
 function changelogLastmod(pubDate, link) {
