@@ -127,6 +127,8 @@ The Table Editor enables row level security for you when you create a table in t
    using ( true );
    ```
 
+A policy decides which rows a role reaches, not whether it holds privileges on the table. The Data API roles carry the grants they need by default, so a request that fails with `permission denied for table` points at a revoked grant rather than a missing policy. See [Securing your API](/docs/guides/api/securing-your-api).
+
 For insert, update, and delete policies, and for how policies are evaluated, see [Row Level Security](/docs/guides/database/postgres/row-level-security).
 
 #### Tables with different readers
