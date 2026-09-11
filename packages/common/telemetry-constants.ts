@@ -3887,7 +3887,7 @@ export interface WarehouseEnabledEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/integrations/warehouse/settings
+ * @page /dashboard/project/{ref}/integrations/warehouse/overview
  */
 export interface WarehouseDisabledEvent {
   action: 'warehouse_disabled'

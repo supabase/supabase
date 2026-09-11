@@ -162,9 +162,6 @@ const DuckLakeSetup = ({ credentials }: { credentials: WarehouseCatalogCredentia
 
   return (
     <CardContent className="space-y-4">
-      <p className="text-sm text-foreground-light max-w-xl">
-        Set these environment variables before running the script:
-      </p>
       <div className="overflow-hidden rounded-lg border bg-surface-75">
         <div className="flex items-center justify-between border-b bg-surface-100 py-2 pl-4 pr-2">
           <span className="font-mono text-xs text-foreground-light">.env</span>
