@@ -291,9 +291,6 @@ export const OAuthAppsAuthorizeScreen = ({
                 allProjectsSelected={allProjectsSelected}
                 onAllProjectsChange={setAllProjectsSelected}
               />
-              {isDynamicClient && (
-                <p className="text-xs text-foreground-lighter">{CONSENT_COPY.dynamicClient}</p>
-              )}
             </div>
           )}
 
@@ -329,6 +326,8 @@ export const OAuthAppsAuthorizeScreen = ({
             </>
           )}
         </fieldset>
+
+        {isDynamicClient && <Admonition type="default" description={CONSENT_COPY.dynamicClient} />}
 
         <div className="flex flex-col gap-2">
           {canProceed ? (
