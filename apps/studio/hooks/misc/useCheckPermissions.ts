@@ -8,11 +8,14 @@ import { usePermissionsQuery } from '@/data/permissions/permissions-query'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { Permission } from '@/types'
 
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
 const regexpCache = new Map<string, RegExp>()
 const getActionResourceRegexp = (actionOrResource: string) => {
   let regexp = regexpCache.get(actionOrResource)
   if (!regexp) {
-    regexp = new RegExp(`^${actionOrResource.replace(/\./g, '\\.').replace(/%/g, '.*')}$`)
+    const pattern = actionOrResource.split('%').map(escapeRegExp).join('.*')
+    regexp = new RegExp(`^${pattern}$`)
     regexpCache.set(actionOrResource, regexp)
   }
   return regexp
