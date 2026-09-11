@@ -48,7 +48,7 @@ const ThemeSwitcherDropdown = () => {
     )
   }
 
-  const iconClasses = 'text-foreground-light group-data-open:text-foreground'
+  const iconClasses = 'text-muted-foreground group-hover:text-foreground group-data-open:text-foreground'
 
   return (
     <>
@@ -58,7 +58,7 @@ const ThemeSwitcherDropdown = () => {
             variant="text"
             size="tiny"
             aria-label="Choose a theme"
-            className="group h-8 w-8 p-0"
+            className="group h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
             icon={
               resolvedTheme?.includes('light') ? (
                 <Sun className={iconClasses} />

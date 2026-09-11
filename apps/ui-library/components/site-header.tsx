@@ -179,7 +179,7 @@ export function SiteHeader() {
             asChild
             variant="text"
             size="tiny"
-            className="hidden h-8 w-8 p-0 sm:inline-flex"
+            className="hidden h-8 w-8 p-0 text-muted-foreground hover:text-foreground sm:inline-flex"
             aria-label="View source on GitHub"
           >
             <a href="https://github.com/supabase/supabase/tree/master/apps/ui-library">
@@ -190,7 +190,7 @@ export function SiteHeader() {
             asChild
             variant="text"
             size="small"
-            className="hidden h-8 px-3 text-sm sm:inline-flex"
+            className="hidden h-8 px-3 text-sm text-muted-foreground hover:text-foreground sm:inline-flex"
             iconRight={<ArrowUpRight size={14} />}
           >
             <a href="https://supabase.com/docs">Docs</a>
