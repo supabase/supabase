@@ -6,6 +6,7 @@ import {
   cn,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -13,7 +14,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/Admonition'
 
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -65,41 +65,33 @@ export const EnablePipelinesModal = ({
           </Button>
         </DialogTrigger>
       )}
-      <DialogContent aria-describedby={undefined}>
+      <DialogContent size="small">
         <DialogHeader>
           <DialogTitle>Enable Pipelines</DialogTitle>
+          <DialogDescription>
+            {hasAccess
+              ? 'Enabling creates Pipelines resources for this project.'
+              : 'Upgrade to the Pro plan to replicate database changes to data warehouses and analytics platforms.'}
+          </DialogDescription>
         </DialogHeader>
-        <DialogSectionSeparator />
-        <DialogSection className="flex flex-col gap-y-2 p-0!">
-          <Admonition
-            type="warning"
-            className="rounded-none border-0"
-            title="Pipelines is currently in public alpha"
-          >
-            {hasAccess ? (
-              <>
-                <p className="text-sm leading-normal!">
-                  Public alpha features may change as we refine the product and incorporate customer
-                  feedback.
-                </p>
-                <p className="text-sm leading-normal!">
-                  Pipelines is billed for configured pipeline hours and Postgres row data processed
-                  during initial sync and ongoing replication. Review the{' '}
-                  <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/pipelines`}>
-                    Pipelines pricing
-                  </InlineLink>{' '}
-                  before enabling it.
-                </p>
-              </>
-            ) : (
+        {hasAccess && (
+          <>
+            <DialogSectionSeparator />
+            <DialogSection className="flex flex-col gap-y-3">
               <p className="text-sm text-foreground-light">
-                Supabase Pipelines replicates database changes to supported destination systems.{' '}
-                {hasAccess ? 'Enable Pipelines for your project' : 'Upgrade to the Pro plan'} to
-                replicate database changes to data warehouses and analytics platforms.
+                Pipelines is in public alpha and may change as we refine it.
               </p>
-            )}
-          </Admonition>
-        </DialogSection>
+              <p className="text-sm text-foreground-light">
+                You’ll be billed for configured pipeline hours and for Postgres row data processed
+                during initial sync and ongoing replication. Review{' '}
+                <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/pipelines`}>
+                  Pipelines pricing
+                </InlineLink>{' '}
+                before enabling.
+              </p>
+            </DialogSection>
+          </>
+        )}
         <DialogFooter>
           <Button variant="default" disabled={creatingTenantSource} onClick={() => setOpen(false)}>
             Cancel
