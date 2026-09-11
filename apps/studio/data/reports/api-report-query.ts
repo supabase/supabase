@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { isEqual } from 'lodash'
 import { useEffect, useState } from 'react'
 
@@ -11,13 +11,15 @@ import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 export const useApiReport = () => {
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
+  const useOtel = useFlag('otelReports')
 
   const identifier = state.selectedDatabaseId
   const [filters, setFilters] = useState<ReportFilterItem[]>([])
 
   const queryHooks = queriesFactory<keyof typeof PRESET_CONFIG.api.queries>(
     PRESET_CONFIG.api.queries,
-    projectRef ?? 'default'
+    projectRef ?? 'default',
+    useOtel
   )
   const totalRequests = queryHooks.totalRequests()
   const topRoutes = queryHooks.topRoutes()
@@ -74,44 +76,48 @@ export const useApiReport = () => {
     // update sql for each query
     if (totalRequests.changeQuery) {
       totalRequests.changeQuery(
-        getLogsSql(PRESET_CONFIG.api.queries.totalRequests, formattedFilters)
+        getLogsSql(PRESET_CONFIG.api.queries.totalRequests, formattedFilters, useOtel)
       )
     }
     if (topRoutes.changeQuery) {
-      topRoutes.changeQuery(getLogsSql(PRESET_CONFIG.api.queries.topRoutes, formattedFilters))
+      topRoutes.changeQuery(
+        getLogsSql(PRESET_CONFIG.api.queries.topRoutes, formattedFilters, useOtel)
+      )
     }
     if (errorCounts.changeQuery) {
-      errorCounts.changeQuery(getLogsSql(PRESET_CONFIG.api.queries.errorCounts, formattedFilters))
+      errorCounts.changeQuery(
+        getLogsSql(PRESET_CONFIG.api.queries.errorCounts, formattedFilters, useOtel)
+      )
     }
 
     if (topErrorRoutes.changeQuery) {
       topErrorRoutes.changeQuery(
-        getLogsSql(PRESET_CONFIG.api.queries.topErrorRoutes, formattedFilters)
+        getLogsSql(PRESET_CONFIG.api.queries.topErrorRoutes, formattedFilters, useOtel)
       )
     }
     if (responseSpeed.changeQuery) {
       responseSpeed.changeQuery(
-        getLogsSql(PRESET_CONFIG.api.queries.responseSpeed, formattedFilters)
+        getLogsSql(PRESET_CONFIG.api.queries.responseSpeed, formattedFilters, useOtel)
       )
     }
 
     if (topSlowRoutes.changeQuery) {
       topSlowRoutes.changeQuery(
-        getLogsSql(PRESET_CONFIG.api.queries.topSlowRoutes, formattedFilters)
+        getLogsSql(PRESET_CONFIG.api.queries.topSlowRoutes, formattedFilters, useOtel)
       )
     }
 
     if (networkTraffic.changeQuery) {
       networkTraffic.changeQuery(
-        getLogsSql(PRESET_CONFIG.api.queries.networkTraffic, formattedFilters)
+        getLogsSql(PRESET_CONFIG.api.queries.networkTraffic, formattedFilters, useOtel)
       )
     }
     if (requestsByCountry.changeQuery) {
       requestsByCountry.changeQuery(
-        getLogsSql(PRESET_CONFIG.api.queries.requestsByCountry, formattedFilters)
+        getLogsSql(PRESET_CONFIG.api.queries.requestsByCountry, formattedFilters, useOtel)
       )
     }
-  }, [JSON.stringify(formattedFilters)])
+  }, [JSON.stringify(formattedFilters), useOtel])
 
   const handleRefresh = async () => {
     activeHooks.forEach((hook) => hook.runQuery())
