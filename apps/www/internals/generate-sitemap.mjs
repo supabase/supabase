@@ -65,6 +65,7 @@ async function generate() {
     'pages/*.tsx',
     'pages/*.mdx',
     'pages/**/*.tsx',
+    'app/**/page.tsx',
     '_blog/*.mdx',
     '_case-studies/*.mdx',
     '_customers/*.mdx',
@@ -90,6 +91,13 @@ async function generate() {
   // Generate URLs for static pages
   const staticUrls = pages
     .map((page) => {
+      if (page.startsWith('app/')) {
+        const segments = page.split('/').slice(1, -1)
+        if (segments.some((segment) => segment.includes('['))) return null
+        const path = segments.filter((segment) => !/^\(.*\)$/.test(segment)).join('/')
+        return urlEntry(`https://supabase.com${path ? `/${path}` : ''}`)
+      }
+
       const path = page
         .replace('.next/server/pages', '')
         .replace(/^pages/, '')
