@@ -16,14 +16,21 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AddNewFactorModal } from './AddNewFactorModal'
 import DeleteFactorModal from './DeleteFactorModal'
+import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
+import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
 import { AlertError } from '@/components/ui/AlertError'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
+import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
 import { DATETIME_FORMAT } from '@/lib/constants'
 
 export const TOTPFactors = () => {
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
   const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
   const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
+  const shouldVerifyRecoveryCodes = !!data?.all.length
+  const { data: recoveryCodesStatus } = useRecoveryCodesStatusQuery({
+    enabled: shouldVerifyRecoveryCodes,
+  })
 
   const totpFactors = data?.totp ?? []
   const canAddApp = isSuccess && totpFactors.length < 2
@@ -51,6 +58,17 @@ export const TOTPFactors = () => {
           )}
         </PageSectionMeta>
         <PageSectionContent className="flex flex-col gap-4">
+          {recoveryCodesStatus?.status === 'unenrolled' && <GenerateRecoveryCodesModal />}
+          {recoveryCodesStatus?.status === 'available' &&
+            !!recoveryCodesStatus?.data?.remaining && (
+              <Admonition
+                layout="responsive"
+                title={`${recoveryCodesStatus?.data?.remaining}/${recoveryCodesStatus?.data?.total} recovery codes available`}
+                description="Recovery codes allow you to recover your account in case you lost access to your MFA apps."
+                // TODO: Needed the Unenroll to ease working on recovery codes. Not sure we should keep it even though the API allows it
+                actions={<UnenrollRecoveryCodesModal />}
+              />
+            )}
           {shouldShowLockoutWarning && (
             <Admonition
               type="danger"
@@ -91,7 +109,7 @@ export const TOTPFactors = () => {
                         </p>
                       </div>
                       <Button size="tiny" onClick={() => setFactorToBeDeleted(factor.id)}>
-                        Delete{' '}
+                        Delete
                       </Button>
                     </CardContent>
                   ))}
