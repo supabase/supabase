@@ -13,11 +13,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
-import {
-  DISK_LIMITS,
-  DiskType,
-  RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
-} from '../ui/DiskManagement.constants'
+import { DISK_LIMITS, DiskType } from '../ui/DiskManagement.constants'
 import { DiskManagementThroughputReadReplicas } from '../ui/DiskManagementReadReplicas'
 import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 
@@ -33,13 +29,9 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
 
   const watchedStorageType = useWatch({ control, name: 'storageType' })
   const watchedTotalSize = useWatch({ control, name: 'totalSize' })
-  const watchedComputeSize = useWatch({ control, name: 'computeSize' })
   const throughput_mbps = formState.defaultValues?.throughput
 
   useDiskAttributesQuery({ projectRef })
-
-  const disableIopsInput =
-    RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(watchedComputeSize) && watchedStorageType === 'gp3'
 
   // Watch storageType and allocatedStorage to adjust constraints dynamically
   useEffect(() => {
@@ -109,7 +101,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                           shouldValidate: true,
                         })
                       }}
-                      disabled={disableInput || disableIopsInput || watchedStorageType === 'io2'}
+                      disabled={disableInput || watchedStorageType === 'io2'}
                     />
                     <InputGroupAddon align="inline-end">
                       <InputGroupText>MB/s</InputGroupText>

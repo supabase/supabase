@@ -2,8 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useForm, useWatch, type Resolver } from 'react-hook-form'
 import { CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
 import { Button, cn, Form } from 'ui'
@@ -21,6 +21,8 @@ import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement
 import { DiskManagementMessage } from './DiskManagement.types'
 import {
   calculateDiskSizeRequiredForIopsWithGp3,
+  getDiskConfigEditability,
+  isDiskConfigOverProvisioned,
   mapComputeSizeNameToAddonVariantId,
 } from './DiskManagement.utils'
 import { AdvancedSection, ComputeSection, DiskSection } from './DiskManagementForm.sections'
@@ -33,6 +35,7 @@ import {
   DiskType,
   PLAN_DETAILS,
   RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
+  SUPPORTED_DISK_CONFIG_UNDER_COST_GUARDRAIL,
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import type { RecommendedComputeForReadReplicas } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/recommendCompute'
@@ -163,14 +166,23 @@ export function DiskManagementForm({
     maxSizeGb: max_size_gb,
   }
 
-  const form = useForm<DiskStorageSchemaType>({
-    resolver: zodResolver(
+  // The schema needs to react to live edits inside this dialog (e.g. raising compute size
+  // back above Large should immediately lift the downsize-only ceiling below), but those
+  // live values can only be read from `form.control`, which doesn't exist until after this
+  // useForm() call returns. Route the resolver through a ref so it can be kept in sync from
+  // further down in this component without a circular dependency on `form` itself.
+  const resolverRef = useRef<Resolver<DiskStorageSchemaType>>(
+    zodResolver(
       CreateDiskStorageSchema({
         defaultTotalSize: defaultValues.totalSize,
         cloudProvider: project?.cloud_provider as CloudProvider,
         isSpendCapEnabled,
       })
-    ),
+    )
+  )
+
+  const form = useForm<DiskStorageSchemaType>({
+    resolver: (values, context, options) => resolverRef.current(values, context, options),
     defaultValues,
     mode: 'onBlur',
     reValidateMode: 'onChange',
@@ -206,13 +218,12 @@ export function DiskManagementForm({
   const errors = formState.errors
   const usedSize = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
   const totalSize = formState.defaultValues?.totalSize || 0
-  const usedPercentage = (usedSize / totalSize) * 100
+  const usedPercentage = totalSize === 0 ? 0 : (usedSize / totalSize) * 100
 
-  const disableIopsThroughputConfig =
-    isHighAvailability ||
-    (modifiedComputeSize &&
-      !isSpendCapEnabled &&
-      RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize))
+  const isComputeSizeGuardrailActive =
+    !!modifiedComputeSize && RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)
+
+  const isCostGuardrailActive = isComputeSizeGuardrailActive || isSpendCapEnabled
 
   const watchedTotalSize = useWatch({ control: form.control, name: 'totalSize' }) ?? 0
   const watchedStorageType = useWatch({ control: form.control, name: 'storageType' })
@@ -223,7 +234,7 @@ export function DiskManagementForm({
   // Suggested target when prompting a resize, sits above the floor so users
   // aren't pinned at the minimum between disk-config modifications.
   const suggestedDiskSizeForCustomIops = PLAN_DETAILS.pro.includedDiskGB.gp3
-  const isDiskTooSmallForCustomIops =
+  const isDiskTooSmallForIopsOrThroughput =
     watchedStorageType === 'gp3' && watchedTotalSize < minDiskSizeForCustomIops
 
   const isBranch = project?.parent_project_ref !== undefined
@@ -237,6 +248,51 @@ export function DiskManagementForm({
     !isAws
 
   const disableDiskInputs = disableDiskSizeInput || isSpendCapEnabled || isHighAvailability
+
+  // Checks against the CURRENT PERSISTED configuration, not the requested
+  // configuration. The requested configuration's own validity is enforced by
+  // the schema below.
+  const isDiskOverProvisioned =
+    isAws &&
+    isDiskAttributesSuccess &&
+    isDiskConfigOverProvisioned({
+      storageType: defaultValues.storageType as DiskType,
+      provisionedIOPS: defaultValues.provisionedIOPS,
+      throughput: defaultValues.throughput,
+    })
+
+  const diskConfigEditability = getDiskConfigEditability({
+    isHardBlocked: disableDiskSizeInput,
+    isComputeSizeGuardrailActive,
+    isSpendCapEnabled,
+    isDiskOverProvisioned,
+  })
+
+  const diskStorageSchema = useMemo(
+    () =>
+      CreateDiskStorageSchema({
+        defaultTotalSize: defaultValues.totalSize,
+        cloudProvider: project?.cloud_provider as CloudProvider,
+        isSpendCapEnabled,
+        downsizeOnlyFrom: isCostGuardrailActive
+          ? {
+              storageType: defaultValues.storageType as DiskType,
+              provisionedIOPS: defaultValues.provisionedIOPS,
+              throughput: defaultValues.throughput,
+            }
+          : undefined,
+      }),
+    [
+      defaultValues.totalSize,
+      defaultValues.storageType,
+      defaultValues.provisionedIOPS,
+      defaultValues.throughput,
+      project?.cloud_provider,
+      isSpendCapEnabled,
+      isCostGuardrailActive,
+    ]
+  )
+  resolverRef.current = zodResolver(diskStorageSchema)
 
   // Compute resizing is not supported for High Availability projects during Alpha
   const disableComputeInputs = isPlanUpgradeRequired || isHighAvailability
@@ -361,17 +417,22 @@ export function DiskManagementForm({
     }
   }, [data, isDiskAttributesSuccess, form, refetchInterval])
 
-  // We only support disk configurations for >=Large instances
-  // If a customer downgrades back to <Large, we should reset the storage settings to avoid incurring unnecessary costs
+  // We only support disk configurations for >=Large instances. If a customer
+  // downgrades compute below Large *inside this dialog*, reset storage settings
+  // to avoid incurring unnecessary costs. Only active when the user downgrades
+  // their compute DURING THE CURRENT SET OF EDITS. When a user already has an
+  // over-provisioned disk created through another channel, the schema already
+  // enforces that they can configure options downwards but not upwards.
   useEffect(() => {
-    if (modifiedComputeSize && project?.infra_compute_size && isDialogOpen) {
-      if (RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)) {
-        form.setValue('storageType', DiskType.GP3)
-        form.setValue('throughput', DISK_LIMITS['gp3'].minThroughput)
-        form.setValue('provisionedIOPS', DISK_LIMITS['gp3'].minIops)
-      }
-    }
-  }, [modifiedComputeSize, form, isDialogOpen, project])
+    if (!isDialogOpen) return
+    const provisionedComputeSize = form.formState.defaultValues?.computeSize
+    if (!modifiedComputeSize || modifiedComputeSize === provisionedComputeSize) return
+    if (!RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)) return
+
+    form.setValue('storageType', SUPPORTED_DISK_CONFIG_UNDER_COST_GUARDRAIL.storageType)
+    form.setValue('throughput', SUPPORTED_DISK_CONFIG_UNDER_COST_GUARDRAIL.throughput)
+    form.setValue('provisionedIOPS', SUPPORTED_DISK_CONFIG_UNDER_COST_GUARDRAIL.provisionedIOPS)
+  }, [modifiedComputeSize, form, isDialogOpen])
 
   useEffect(() => {
     // Initialize field values properly when data has been loaded, preserving any user changes.
@@ -554,12 +615,13 @@ export function DiskManagementForm({
                   showBillingBadge={showAdvancedBillingBadge}
                   beforePrice={advancedBeforePrice}
                   afterPrice={advancedAfterPrice}
-                  disableIopsThroughputConfig={disableIopsThroughputConfig}
                   canUpdateDiskConfiguration={canUpdateDiskConfiguration}
-                  isDiskTooSmallForCustomIops={isDiskTooSmallForCustomIops}
+                  isDiskTooSmallForIopsOrThroughput={isDiskTooSmallForIopsOrThroughput}
                   disableDiskInputs={disableDiskInputs}
                   disableDiskSizeInput={disableDiskSizeInput}
                   suggestedDiskSizeForCustomIops={suggestedDiskSizeForCustomIops}
+                  diskConfigEditability={diskConfigEditability}
+                  provisionedStorageType={defaultValues.storageType as DiskType}
                 />
               )}
             </PageSectionContent>

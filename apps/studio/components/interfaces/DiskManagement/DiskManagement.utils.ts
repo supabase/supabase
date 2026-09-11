@@ -7,9 +7,17 @@ import {
 import {
   ComputeInstanceAddonVariantId,
   ComputeInstanceSize,
+  DiskConfigEditability,
+  DiskConfigGuardrail,
   InfraInstanceSize,
 } from './DiskManagement.types'
-import { DISK_LIMITS, DISK_PRICING, DiskType, PLAN_DETAILS } from './ui/DiskManagement.constants'
+import {
+  DISK_LIMITS,
+  DISK_PRICING,
+  DiskType,
+  PLAN_DETAILS,
+  SUPPORTED_DISK_CONFIG_UNDER_COST_GUARDRAIL,
+} from './ui/DiskManagement.constants'
 import { ProjectDetail } from '@/data/projects/project-detail-query'
 import { PlanId, ProjectAddonVariantMeta } from '@/data/subscriptions/types'
 import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from '@/lib/constants'
@@ -459,4 +467,49 @@ export const formatNumber = (num: number): string => {
 
 export const showMicroUpgrade = (plan: PlanId, infraComputeSize: InfraInstanceSize): boolean => {
   return plan !== 'free' && infraComputeSize === 'nano'
+}
+
+// Detects whether a project's *persisted* disk config already exceeds the baseline
+// that's safe under either cost guardrail (compute below Large, or spend cap enabled).
+export const isDiskConfigOverProvisioned = ({
+  storageType,
+  provisionedIOPS,
+  throughput,
+}: {
+  storageType?: DiskType
+  provisionedIOPS?: number
+  throughput?: number
+}): boolean => {
+  const supported = SUPPORTED_DISK_CONFIG_UNDER_COST_GUARDRAIL
+  return (
+    storageType !== supported.storageType ||
+    (provisionedIOPS ?? 0) > supported.provisionedIOPS ||
+    (throughput ?? 0) > supported.throughput
+  )
+}
+
+export const getDiskConfigEditability = ({
+  isHardBlocked,
+  isComputeSizeGuardrailActive,
+  isSpendCapEnabled,
+  isDiskOverProvisioned,
+}: {
+  /**
+   * Reasons unrelated to cost avoidance (a pending modification, plan entitlement, cooldown
+   * window, missing permission, non-AWS project, High Availability) — always wins.
+   */
+  isHardBlocked: boolean
+  isComputeSizeGuardrailActive: boolean
+  isSpendCapEnabled: boolean
+  isDiskOverProvisioned: boolean
+}): DiskConfigEditability => {
+  const guardrails: DiskConfigGuardrail[] = []
+  if (isComputeSizeGuardrailActive) guardrails.push('computeSize')
+  if (isSpendCapEnabled) guardrails.push('spendCap')
+
+  if (isHardBlocked) return { status: 'locked', guardrails }
+  if (guardrails.length === 0) return { status: 'editable' }
+  return isDiskOverProvisioned
+    ? { status: 'downsizeOnly', guardrails }
+    : { status: 'locked', guardrails }
 }
