@@ -281,8 +281,9 @@ export function getAvailableComputeOptions(
   return computeOptions
 }
 
+const MAX_GP3_IOPS = DISK_LIMITS[DiskType.GP3]['maxIops']
 export const calculateMaxIopsAllowedForDiskSizeWithGp3 = (totalSize: number) => {
-  return Math.max(3000, Math.min(500 * totalSize, 16000))
+  return Math.max(3000, Math.min(500 * totalSize, MAX_GP3_IOPS))
 }
 
 export const calculateDiskSizeRequiredForIopsWithGp3 = (iops: number) => {
