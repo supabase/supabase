@@ -123,6 +123,11 @@ export const getResourceWarningMetricsHref = (
 
 export const getResourceWarningAiPrompt = (activeWarnings: string[]): string | undefined => {
   if (activeWarnings.length === 1) return RESOURCE_WARNING_MESSAGES[activeWarnings[0]]?.aiPrompt
+
+  const hasComputeWarning = activeWarnings.some((warningType) =>
+    COMPUTE_UPGRADE_WARNING_TYPES.includes(warningType)
+  )
+  if (!hasComputeWarning) return undefined
   return applyResourceList(
     RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.aiPrompt,
     activeWarnings

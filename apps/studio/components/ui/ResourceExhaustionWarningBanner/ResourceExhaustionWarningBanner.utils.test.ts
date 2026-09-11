@@ -215,4 +215,10 @@ describe('getResourceWarningAiPrompt', () => {
       '(CPU and Disk space)'
     )
   })
+
+  it('offers no prompt when none of the tripped resources is a compute resource', () => {
+    expect(
+      getResourceWarningAiPrompt(['disk_space_exhaustion', 'auth_rate_limit_exhaustion'])
+    ).toBeUndefined()
+  })
 })
