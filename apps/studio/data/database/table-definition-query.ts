@@ -1,15 +1,12 @@
 import { getTableDefinitionSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { useFlag } from 'common'
 
 import { databaseKeys } from './keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { PG_META_SCOPED_INTROSPECTION_FLAG } from '@/data/table-editor/table-editor-query'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type GetTableDefinitionArgs = {
   id?: number
-  scoped?: boolean
 }
 
 export type TableDefinitionVariables = GetTableDefinitionArgs & {
@@ -18,12 +15,12 @@ export type TableDefinitionVariables = GetTableDefinitionArgs & {
 }
 
 export async function getTableDefinition(
-  { projectRef, connectionString, id, scoped }: TableDefinitionVariables,
+  { projectRef, connectionString, id }: TableDefinitionVariables,
   signal?: AbortSignal
 ) {
   if (!id) throw new Error('id is required')
 
-  const sql = getTableDefinitionSql({ id, scoped })
+  const sql = getTableDefinitionSql({ id })
   const { result } = await executeSql(
     {
       projectRef,
@@ -47,12 +44,9 @@ export const useTableDefinitionQuery = <TData = TableDefinitionData>(
     ...options
   }: UseCustomQueryOptions<TableDefinitionData, TableDefinitionError, TData> = {}
 ) => {
-  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
-
   return useQuery<TableDefinitionData, TableDefinitionError, TData>({
-    queryKey: [...databaseKeys.tableDefinition(projectRef, id), { scoped }],
-    queryFn: ({ signal }) =>
-      getTableDefinition({ projectRef, connectionString, id, scoped }, signal),
+    queryKey: databaseKeys.tableDefinition(projectRef, id),
+    queryFn: ({ signal }) => getTableDefinition({ projectRef, connectionString, id }, signal),
     enabled:
       enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
     ...options,

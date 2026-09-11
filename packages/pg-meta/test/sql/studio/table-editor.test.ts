@@ -46,13 +46,8 @@ const withTestDatabase = (
   })
 }
 
-// The `scoped` flag gates the PR #47894 scoping predicates (default OFF for
-// progressive rollout). Both code paths must return semantically identical
-// entities; running the same assertions for scoped:true and scoped:false is the
-// CI equivalence guard. Once the rollout completes, drop scoped:false here.
-for (const scoped of [true, false]) {
-  withTestDatabase(
-    `scopes primary keys, unique indexes, relationships and columns to the target table (scoped=${scoped})`,
+withTestDatabase(
+    'scopes primary keys, unique indexes, relationships and columns to the target table',
     async ({ executeQuery }) => {
       await executeQuery(`
       create schema if not exists editor_scope;
@@ -79,7 +74,7 @@ for (const scoped of [true, false]) {
         `select 'editor_scope.books'::regclass::oid::int8 as id;`
       )
 
-      const sql = getTableEditorSql({ id: booksId, scoped })
+      const sql = getTableEditorSql({ id: booksId })
       const [{ entity }] = await executeQuery<{ entity: Entity }[]>(sql)
 
       // Basic identity.
@@ -129,4 +124,3 @@ for (const scoped of [true, false]) {
       expect(priceCol.check).toContain('price > 0')
     }
   )
-}

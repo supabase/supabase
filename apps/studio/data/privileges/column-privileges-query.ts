@@ -5,7 +5,6 @@ import { z } from 'zod'
 import { executeSql } from '../sql/execute-sql-mutation'
 import { privilegeKeys } from './keys'
 import type { components } from '@/data/api'
-import { isScopedIntrospection, scopedIntrospectionReady } from '@/data/scoped-introspection'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ColumnPrivilegesVariables = {
@@ -36,12 +35,9 @@ export async function getColumnPrivileges(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  // Cold-load race guard -- see the module comment on scoped-introspection.ts.
-  await scopedIntrospectionReady()
   const sql = pgMeta.columnPrivileges.list({
     includedSchemas: [schema],
     relationName: table,
-    scoped: isScopedIntrospection(),
   }).sql
   const queryKey = ['column-privileges', schema, table]
   const { result } = await executeSql({ projectRef, connectionString, sql, queryKey }, signal)

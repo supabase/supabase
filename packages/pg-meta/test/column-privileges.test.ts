@@ -100,48 +100,18 @@ withTestDatabase('revoke & grant column privileges', async ({ executeQuery }) =>
 
   let privs = listZod.parse(await executeQuery(listSqlTodos))
   expect(privs.length).toBe(1)
+  privs[0].privileges.sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)))
   expect(privs[0]).toMatchInlineSnapshot(
-    { column_id: expect.stringMatching(/^\d+\.\d+$/) },
-    `
+    { column_id: expect.stringMatching(/^\d+\.\d+$/) }, `
     {
       "column_id": StringMatching /\\^\\\\d\\+\\\\\\.\\\\d\\+\\$/,
       "column_name": "id",
       "privileges": [
         {
-          "grantee": "${testRole}",
-          "grantor": "postgres",
-          "is_grantable": false,
-          "privilege_type": "UPDATE",
-        },
-        {
-          "grantee": "${testRole}",
-          "grantor": "postgres",
-          "is_grantable": false,
-          "privilege_type": "SELECT",
-        },
-        {
-          "grantee": "${testRole}",
-          "grantor": "postgres",
-          "is_grantable": false,
-          "privilege_type": "REFERENCES",
-        },
-        {
-          "grantee": "${testRole}",
+          "grantee": "postgres",
           "grantor": "postgres",
           "is_grantable": false,
           "privilege_type": "INSERT",
-        },
-        {
-          "grantee": "postgres",
-          "grantor": "postgres",
-          "is_grantable": false,
-          "privilege_type": "UPDATE",
-        },
-        {
-          "grantee": "postgres",
-          "grantor": "postgres",
-          "is_grantable": false,
-          "privilege_type": "SELECT",
         },
         {
           "grantee": "postgres",
@@ -153,14 +123,43 @@ withTestDatabase('revoke & grant column privileges', async ({ executeQuery }) =>
           "grantee": "postgres",
           "grantor": "postgres",
           "is_grantable": false,
+          "privilege_type": "SELECT",
+        },
+        {
+          "grantee": "postgres",
+          "grantor": "postgres",
+          "is_grantable": false,
+          "privilege_type": "UPDATE",
+        },
+        {
+          "grantee": "${testRole}",
+          "grantor": "postgres",
+          "is_grantable": false,
           "privilege_type": "INSERT",
+        },
+        {
+          "grantee": "${testRole}",
+          "grantor": "postgres",
+          "is_grantable": false,
+          "privilege_type": "REFERENCES",
+        },
+        {
+          "grantee": "${testRole}",
+          "grantor": "postgres",
+          "is_grantable": false,
+          "privilege_type": "SELECT",
+        },
+        {
+          "grantee": "${testRole}",
+          "grantor": "postgres",
+          "is_grantable": false,
+          "privilege_type": "UPDATE",
         },
       ],
       "relation_name": "todos",
       "relation_schema": "public",
     }
-  `
-  )
+  `)
 
   // Revoke all privileges
   const { sql: revokeSql } = pgMeta.columnPrivileges.revoke([
@@ -175,9 +174,9 @@ withTestDatabase('revoke & grant column privileges', async ({ executeQuery }) =>
   // Verify privileges were revoked
   privs = listZod.parse(await executeQuery(listSqlTodos))
   expect(privs.length).toBe(1)
+  privs[0].privileges.sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)))
   expect(privs[0]).toMatchInlineSnapshot(
-    { column_id: expect.stringMatching(/^\d+\.\d+$/) },
-    `
+    { column_id: expect.stringMatching(/^\d+\.\d+$/) }, `
     {
       "column_id": StringMatching /\\^\\\\d\\+\\\\\\.\\\\d\\+\\$/,
       "column_name": "id",
@@ -186,13 +185,7 @@ withTestDatabase('revoke & grant column privileges', async ({ executeQuery }) =>
           "grantee": "postgres",
           "grantor": "postgres",
           "is_grantable": false,
-          "privilege_type": "UPDATE",
-        },
-        {
-          "grantee": "postgres",
-          "grantor": "postgres",
-          "is_grantable": false,
-          "privilege_type": "SELECT",
+          "privilege_type": "INSERT",
         },
         {
           "grantee": "postgres",
@@ -204,14 +197,19 @@ withTestDatabase('revoke & grant column privileges', async ({ executeQuery }) =>
           "grantee": "postgres",
           "grantor": "postgres",
           "is_grantable": false,
-          "privilege_type": "INSERT",
+          "privilege_type": "SELECT",
+        },
+        {
+          "grantee": "postgres",
+          "grantor": "postgres",
+          "is_grantable": false,
+          "privilege_type": "UPDATE",
         },
       ],
       "relation_name": "todos",
       "relation_schema": "public",
     }
-  `
-  )
+  `)
 })
 
 withTestDatabase(
@@ -242,48 +240,18 @@ withTestDatabase(
     // Verify privileges were granted
     let privs = listZod.parse(await executeQuery(listSqlT1))
     expect(privs.length).toBe(1)
+    privs[0].privileges.sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)))
     expect(privs[0]).toMatchInlineSnapshot(
-      { column_id: expect.stringMatching(/^\d+\.\d+$/) },
-      `
+      { column_id: expect.stringMatching(/^\d+\.\d+$/) }, `
       {
         "column_id": StringMatching /\\^\\\\d\\+\\\\\\.\\\\d\\+\\$/,
         "column_name": "c 1",
         "privileges": [
           {
-            "grantee": "${testRole}",
-            "grantor": "postgres",
-            "is_grantable": false,
-            "privilege_type": "UPDATE",
-          },
-          {
-            "grantee": "${testRole}",
-            "grantor": "postgres",
-            "is_grantable": false,
-            "privilege_type": "SELECT",
-          },
-          {
-            "grantee": "${testRole}",
-            "grantor": "postgres",
-            "is_grantable": false,
-            "privilege_type": "REFERENCES",
-          },
-          {
-            "grantee": "${testRole}",
+            "grantee": "postgres",
             "grantor": "postgres",
             "is_grantable": false,
             "privilege_type": "INSERT",
-          },
-          {
-            "grantee": "postgres",
-            "grantor": "postgres",
-            "is_grantable": false,
-            "privilege_type": "UPDATE",
-          },
-          {
-            "grantee": "postgres",
-            "grantor": "postgres",
-            "is_grantable": false,
-            "privilege_type": "SELECT",
           },
           {
             "grantee": "postgres",
@@ -295,14 +263,43 @@ withTestDatabase(
             "grantee": "postgres",
             "grantor": "postgres",
             "is_grantable": false,
+            "privilege_type": "SELECT",
+          },
+          {
+            "grantee": "postgres",
+            "grantor": "postgres",
+            "is_grantable": false,
+            "privilege_type": "UPDATE",
+          },
+          {
+            "grantee": "${testRole}",
+            "grantor": "postgres",
+            "is_grantable": false,
             "privilege_type": "INSERT",
+          },
+          {
+            "grantee": "${testRole}",
+            "grantor": "postgres",
+            "is_grantable": false,
+            "privilege_type": "REFERENCES",
+          },
+          {
+            "grantee": "${testRole}",
+            "grantor": "postgres",
+            "is_grantable": false,
+            "privilege_type": "SELECT",
+          },
+          {
+            "grantee": "${testRole}",
+            "grantor": "postgres",
+            "is_grantable": false,
+            "privilege_type": "UPDATE",
           },
         ],
         "relation_name": "t 1",
         "relation_schema": "public",
       }
-    `
-    )
+    `)
     // Revoke all privileges
     const { sql: revokeSql } = pgMeta.columnPrivileges.revoke([
       {
@@ -316,9 +313,9 @@ withTestDatabase(
     // Verify privileges were revoked
     privs = listZod.parse(await executeQuery(listSqlT1))
     expect(privs.length).toBe(1)
+    privs[0].privileges.sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)))
     expect(privs[0]).toMatchInlineSnapshot(
-      { column_id: expect.stringMatching(/^\d+\.\d+$/) },
-      `
+      { column_id: expect.stringMatching(/^\d+\.\d+$/) }, `
       {
         "column_id": StringMatching /\\^\\\\d\\+\\\\\\.\\\\d\\+\\$/,
         "column_name": "c 1",
@@ -327,13 +324,7 @@ withTestDatabase(
             "grantee": "postgres",
             "grantor": "postgres",
             "is_grantable": false,
-            "privilege_type": "UPDATE",
-          },
-          {
-            "grantee": "postgres",
-            "grantor": "postgres",
-            "is_grantable": false,
-            "privilege_type": "SELECT",
+            "privilege_type": "INSERT",
           },
           {
             "grantee": "postgres",
@@ -345,18 +336,23 @@ withTestDatabase(
             "grantee": "postgres",
             "grantor": "postgres",
             "is_grantable": false,
-            "privilege_type": "INSERT",
+            "privilege_type": "SELECT",
+          },
+          {
+            "grantee": "postgres",
+            "grantor": "postgres",
+            "is_grantable": false,
+            "privilege_type": "UPDATE",
           },
         ],
         "relation_name": "t 1",
         "relation_schema": "public",
       }
-    `
-    )
+    `)
   }
 )
 
-withTestDatabase('scoped list matches the legacy path row-for-row', async ({ executeQuery }) => {
+withTestDatabase('list surfaces PUBLIC and column-level grants', async ({ executeQuery }) => {
   await executeQuery(`
     drop role if exists col_grantee_a;
     drop role if exists col_grantee_b;
@@ -371,47 +367,9 @@ withTestDatabase('scoped list matches the legacy path row-for-row', async ({ exe
     grant select (id) on public.col_priv_view to col_grantee_b;
   `)
 
-  // Neither path orders rows or the privileges array (see the note on the first
-  // test in this file), and the two plans emit them in different orders, so
-  // compare on normalized copies.
-  const normalize = <T extends { column_id: string; privileges: Array<unknown> }>(rows: Array<T>) =>
-    rows
-      .map((row) => ({
-        ...row,
-        privileges: [...row.privileges].sort((a, b) =>
-          JSON.stringify(a).localeCompare(JSON.stringify(b))
-        ),
-      }))
-      .sort((a, b) => a.column_id.localeCompare(b.column_id))
-
-  for (const options of [
-    {},
-    { includedSchemas: ['public'] },
-    { excludedSchemas: ['public'] },
-    { includedSchemas: ['public'], relationName: 'col_priv_demo' },
-    { includedSchemas: ['public'], relationName: 'col_priv_view' },
-    { includedSchemas: ['public'], relationName: 'does_not_exist' },
-    { includeSystemSchemas: true, includedSchemas: ['public'] },
-  ]) {
-    const legacy = pgMeta.columnPrivileges.list(options)
-    const scoped = pgMeta.columnPrivileges.list({ ...options, scoped: true })
-    const legacyRes = legacy.zod.parse(await executeQuery(legacy.sql))
-    const scopedRes = scoped.zod.parse(await executeQuery(scoped.sql))
-    expect(normalize(scopedRes), `list options: ${JSON.stringify(options)}`).toEqual(
-      normalize(legacyRes)
-    )
-    // Row counts must match exactly, independent of the normalization above.
-    expect(scopedRes.length, `row count for options: ${JSON.stringify(options)}`).toBe(
-      legacyRes.length
-    )
-  }
-
-  // The scoped path must surface the PUBLIC grantee, and the column-level grants
-  // that only the second UNION arm can produce.
   const { sql, zod } = pgMeta.columnPrivileges.list({
     includedSchemas: ['public'],
     relationName: 'col_priv_demo',
-    scoped: true,
   })
   const rows = zod.parse(await executeQuery(sql))
   const dataColumn = rows.find((r) => r.column_name === 'data')!
@@ -423,12 +381,14 @@ withTestDatabase('scoped list matches the legacy path row-for-row', async ({ exe
     )
   ).toBe(true)
 
-  // columnIds: the scoped path prunes pg_class by relation oid and keeps the
-  // exact attnum predicate outside, so it must still match legacy exactly.
   const columnIds = rows.map((r) => r.column_id).slice(0, 2)
-  const legacyByIds = pgMeta.columnPrivileges.list({ columnIds })
-  const scopedByIds = pgMeta.columnPrivileges.list({ columnIds, scoped: true })
-  expect(normalize(scopedByIds.zod.parse(await executeQuery(scopedByIds.sql)))).toEqual(
-    normalize(legacyByIds.zod.parse(await executeQuery(legacyByIds.sql)))
-  )
+  const byIds = pgMeta.columnPrivileges.list({ columnIds })
+  const byIdsRows = byIds.zod.parse(await executeQuery(byIds.sql))
+  expect(byIdsRows.map((r) => r.column_id).sort()).toEqual([...columnIds].sort())
+
+  const missing = pgMeta.columnPrivileges.list({
+    includedSchemas: ['public'],
+    relationName: 'does_not_exist',
+  })
+  expect(missing.zod.parse(await executeQuery(missing.sql))).toEqual([])
 })

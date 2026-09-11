@@ -14,11 +14,7 @@ import { safeSql, type SafeSqlFragment } from '../pg-format'
  * relationships filter keeps BOTH directions (conrelid OR confrelid), matching
  * the outgoing/incoming FK rows the unscoped query would have matched by name.
  *
- * When `targetOid` is omitted the injected fragments are empty and the rendered
- * SQL is the legacy full-catalog query -- `TABLES_SQL` below is exactly that
- * rendering, so every existing consumer is unaffected. Behavioral equivalence
- * between the scoped and unscoped forms is enforced by execution-based tests in
- * test/tables.test.ts, not by a byte-for-byte SQL snapshot.
+ * Omit `targetOid` for the full-catalog listing used by `tables.list`.
  */
 export const getTablesSql = (targetOid?: SafeSqlFragment) => {
   const mainScope = targetOid
@@ -33,10 +29,8 @@ export const getTablesSql = (targetOid?: SafeSqlFragment) => {
     ? safeSql`
       and (c.conrelid = ${targetOid} or c.confrelid = ${targetOid})`
     : safeSql``
-  // Scoped path only: deterministic relationships order (plan-order dependent
-  // otherwise). A composite FK expands to one entry per source×target column
-  // pair sharing constraint_name, so tie-break on the column names. Empty for
-  // legacy, keeping TABLES_SQL byte-for-byte unchanged.
+  // retrieve only: deterministic relationships order. A composite FK expands
+  // to one entry per source×target column pair, so tie-break on column names.
   const relOrder = targetOid
     ? safeSql` order by relationships.constraint_name, relationships.source_column_name, relationships.target_column_name`
     : safeSql``
@@ -140,8 +134,4 @@ group by
 `
 }
 
-// FROZEN legacy path: the unscoped rendering served while the
-// pgMetaScopedIntrospection flag is off. Do not edit its shape -- it must keep
-// matching production behavior until the flag cleanup deletes it. The scoped
-// form is getTablesSql(targetOid) (used by tables.retrieve).
 export const TABLES_SQL = getTablesSql()

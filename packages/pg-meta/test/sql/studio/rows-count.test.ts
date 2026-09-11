@@ -42,24 +42,12 @@ const runCount = async (db: Db, args: CountArgs) => {
   return { count: Number(row.count), is_estimate: row.is_estimate }
 }
 
-// Execute BOTH the scoped and legacy renderings of the same args against the DB
-// and assert identical results -- the equivalence contract for every case where
-// the two paths must agree (the ONLY intentional divergence is a never-analyzed
-// table whose heap exceeds the byte gate; that asymmetry is the fix and is
-// asserted separately below).
-const assertScopedEqualsLegacy = async (db: Db, base: Omit<CountArgs, 'scoped'>) => {
-  const legacy = await runCount(db, { ...base, scoped: false })
-  const scoped = await runCount(db, { ...base, scoped: true })
-  expect(scoped, 'scoped must equal legacy for this case').toEqual(legacy)
-  return scoped
-}
-
 // A never-analyzed table has pg_class.reltuples = -1 -- true for a brand-new
 // EMPTY table, a small one, AND a freshly bulk-loaded huge one. autovacuum is
 // disabled on every fixture so reltuples cannot flip mid-test.
 
 withTestDatabase(
-  'scoped: empty never-analyzed table -> exact count 0, is_estimate=false (both modes)',
+  'empty never-analyzed table -> exact count 0 (writable and read-only)',
   async (db) => {
     await db.executeQuery(
       `create table public.empty_t (id int primary key) with (autovacuum_enabled = false);`
@@ -70,8 +58,8 @@ withTestDatabase(
     // Postgres estimates a never-vacuumed heap at a ~10-page minimum, so a naive
     // reltuples=-1 -> estimate would report phantom rows here. The size gate
     // routes an empty (0-byte) heap to an exact count instead.
-    expect(await runCount(db, { table, scoped: true })).toEqual({ count: 0, is_estimate: false })
-    expect(await runCount(db, { table, scoped: true, isReadOnlyContext: true })).toEqual({
+    expect(await runCount(db, { table })).toEqual({ count: 0, is_estimate: false })
+    expect(await runCount(db, { table, isReadOnlyContext: true })).toEqual({
       count: 0,
       is_estimate: false,
     })
@@ -79,7 +67,7 @@ withTestDatabase(
 )
 
 withTestDatabase(
-  'scoped: small never-analyzed table -> exact count, is_estimate=false (both modes)',
+  'small never-analyzed table -> exact count (writable and read-only)',
   async (db) => {
     await db.executeQuery(`
       create table public.small_unanalyzed (id int primary key, val text)
@@ -90,8 +78,8 @@ withTestDatabase(
     const table = await tableOf(db, 'public.small_unanalyzed', 'small_unanalyzed', 'public')
 
     // Heap is a few tens of KB -- well under the byte gate -> exact count.
-    expect(await runCount(db, { table, scoped: true })).toEqual({ count: 1000, is_estimate: false })
-    expect(await runCount(db, { table, scoped: true, isReadOnlyContext: true })).toEqual({
+    expect(await runCount(db, { table })).toEqual({ count: 1000, is_estimate: false })
+    expect(await runCount(db, { table, isReadOnlyContext: true })).toEqual({
       count: 1000,
       is_estimate: false,
     })
@@ -99,11 +87,11 @@ withTestDatabase(
 )
 
 withTestDatabase(
-  'scoped INTENTIONALLY diverges from legacy: large never-analyzed table -> estimate',
+  'large never-analyzed table -> estimate',
   async (db) => {
     // Wide rows (~300-byte payload) so the heap clears the ~10MB byte gate with a
-    // modest, fast-to-insert row count (~19MB at 60k rows) -- the case the legacy
-    // path mishandles (treats reltuples=-1 as small, runs a timing-out count).
+    // modest, fast-to-insert row count (~19MB at 60k rows) so reltuples=-1
+    // would otherwise look "small" and exact-count.
     await db.executeQuery(`
       create table public.bulk_unanalyzed (id int primary key, val text)
         with (autovacuum_enabled = false);
@@ -117,29 +105,23 @@ withTestDatabase(
     expect(Number(bytes)).toBeGreaterThan(10_000_000)
     const table = await tableOf(db, 'public.bulk_unanalyzed', 'bulk_unanalyzed', 'public')
 
-    // Non-readonly scoped: EXPLAIN-based estimate (works without ANALYZE).
-    const scoped = await runCount(db, { table, scoped: true })
-    expect(scoped.is_estimate).toBe(true)
-    expect(scoped.count).toBeGreaterThan(1000)
-    expect(scoped.count).not.toBe(-1)
+    // Writable: EXPLAIN-based estimate (works without ANALYZE).
+    const writable = await runCount(db, { table })
+    expect(writable.is_estimate).toBe(true)
+    expect(writable.count).toBeGreaterThan(1000)
+    expect(writable.count).not.toBe(-1)
 
-    // Readonly scoped: cannot create the estimate function -> reports -1 as an
+    // Read-only cannot create the estimate function -> reports -1 as an
     // estimate rather than a timing-out exact count.
-    expect(await runCount(db, { table, scoped: true, isReadOnlyContext: true })).toEqual({
+    expect(await runCount(db, { table, isReadOnlyContext: true })).toEqual({
       count: -1,
       is_estimate: true,
     })
-
-    // The intentional divergence: legacy (scoped:false) still runs an exact count
-    // on the -1 table (the pre-fix behavior the scoped path corrects).
-    const legacy = await runCount(db, { table })
-    expect(legacy).toEqual({ count: 60000, is_estimate: false })
-    expect(legacy.is_estimate).not.toBe(scoped.is_estimate)
   }
 )
 
 withTestDatabase(
-  'scoped == legacy for an analyzed table below THRESHOLD_COUNT (default, filtered, enforceExactCount)',
+  'analyzed table below THRESHOLD_COUNT (default, filtered, enforceExactCount)',
   async (db) => {
     await db.executeQuery(`
       create table public.analyzed_small (id int primary key, status text);
@@ -151,25 +133,25 @@ withTestDatabase(
     const table = await tableOf(db, 'public.analyzed_small', 'analyzed_small', 'public')
     const activeFilter: Filter[] = [{ column: 'status', operator: '=', value: 'active' }]
 
-    // Default count: both paths exact-count a small analyzed table.
-    expect(await assertScopedEqualsLegacy(db, { table })).toEqual({ count: 10, is_estimate: false })
+    // Small analyzed table: exact count.
+    expect(await runCount(db, { table })).toEqual({ count: 10, is_estimate: false })
     // Read-only default count agrees too.
-    expect(await assertScopedEqualsLegacy(db, { table, isReadOnlyContext: true })).toEqual({
+    expect(await runCount(db, { table, isReadOnlyContext: true })).toEqual({
       count: 10,
       is_estimate: false,
     })
     // Filtered count agrees.
-    expect(await assertScopedEqualsLegacy(db, { table, filters: activeFilter })).toEqual({
+    expect(await runCount(db, { table, filters: activeFilter })).toEqual({
       count: 5,
       is_estimate: false,
     })
-    // enforceExactCount ignores scoped entirely and agrees, with/without filters.
-    expect(await assertScopedEqualsLegacy(db, { table, enforceExactCount: true })).toEqual({
+    // enforceExactCount always runs a real count, with or without filters.
+    expect(await runCount(db, { table, enforceExactCount: true })).toEqual({
       count: 10,
       is_estimate: false,
     })
     expect(
-      await assertScopedEqualsLegacy(db, {
+      await runCount(db, {
         table,
         enforceExactCount: true,
         filters: activeFilter,
@@ -179,11 +161,10 @@ withTestDatabase(
 )
 
 withTestDatabase(
-  'scoped == legacy for an analyzed table over THRESHOLD_COUNT (estimate path unchanged)',
+  'analyzed table over THRESHOLD_COUNT uses estimate',
   async (db) => {
-    // reltuples > 50000 after analyze routes BOTH paths to the estimate branch
-    // (raw reltuples when unfiltered) -- identical output; the byte gate only
-    // affects the reltuples = -1 case, not this one.
+    // reltuples > 50000 after analyze uses the estimate branch (raw reltuples
+    // when unfiltered). The byte gate only affects reltuples = -1.
     await db.executeQuery(`
       create table public.big_analyzed (id int primary key)
         with (autovacuum_enabled = false);
@@ -194,18 +175,18 @@ withTestDatabase(
     const table = await tableOf(db, 'public.big_analyzed', 'big_analyzed', 'public')
 
     // Non-readonly: both return the raw reltuples estimate.
-    const scoped = await assertScopedEqualsLegacy(db, { table })
-    expect(scoped.is_estimate).toBe(true)
-    expect(scoped.count).toBeGreaterThan(1000)
+    const estimated = await runCount(db, { table })
+    expect(estimated.is_estimate).toBe(true)
+    expect(estimated.count).toBeGreaterThan(1000)
 
     // Read-only: both report -1 as an estimate.
-    expect(await assertScopedEqualsLegacy(db, { table, isReadOnlyContext: true })).toEqual({
+    expect(await runCount(db, { table, isReadOnlyContext: true })).toEqual({
       count: -1,
       is_estimate: true,
     })
 
-    // enforceExactCount over the threshold still runs a real count in both paths.
-    expect(await assertScopedEqualsLegacy(db, { table, enforceExactCount: true })).toEqual({
+    // enforceExactCount over the threshold still runs a real count.
+    expect(await runCount(db, { table, enforceExactCount: true })).toEqual({
       count: 60000,
       is_estimate: false,
     })
@@ -217,7 +198,7 @@ withTestDatabase(
 // or a large never-analyzed partitioned table would be misclassified as small
 // and exact-counted across all partitions -- the exact timeout being fixed.
 withTestDatabase(
-  'scoped: large never-analyzed PARTITIONED table -> estimate (partition-tree size gate)',
+  'large never-analyzed PARTITIONED table -> estimate (partition-tree size gate)',
   async (db) => {
     await db.executeQuery(`
       create table public.part_big (id int, region text, val text) partition by list (region);
@@ -241,23 +222,20 @@ withTestDatabase(
     expect(Number(tree)).toBeGreaterThan(10_000_000) // the tree sum clears the gate
     const table = await tableOf(db, 'public.part_big', 'part_big', 'public')
 
-    const scoped = await runCount(db, { table, scoped: true })
-    expect(scoped.is_estimate).toBe(true)
-    expect(scoped.count).toBeGreaterThan(1000)
-    expect(scoped.count).not.toBe(-1)
+    const estimated = await runCount(db, { table })
+    expect(estimated.is_estimate).toBe(true)
+    expect(estimated.count).toBeGreaterThan(1000)
+    expect(estimated.count).not.toBe(-1)
 
-    expect(await runCount(db, { table, scoped: true, isReadOnlyContext: true })).toEqual({
+    expect(await runCount(db, { table, isReadOnlyContext: true })).toEqual({
       count: -1,
       is_estimate: true,
     })
-
-    // Legacy still exact-counts across all partitions (the pre-fix behavior).
-    expect(await runCount(db, { table })).toEqual({ count: 45000, is_estimate: false })
   }
 )
 
 withTestDatabase(
-  'scoped: small never-analyzed PARTITIONED table -> exact count (both modes)',
+  'small never-analyzed PARTITIONED table -> exact count (writable and read-only)',
   async (db) => {
     await db.executeQuery(`
       create table public.part_small (id int, region text) partition by list (region);
@@ -271,8 +249,8 @@ withTestDatabase(
     expect(await reltuplesOf(db, 'public.part_small')).toBe(-1)
     const table = await tableOf(db, 'public.part_small', 'part_small', 'public')
 
-    expect(await runCount(db, { table, scoped: true })).toEqual({ count: 100, is_estimate: false })
-    expect(await runCount(db, { table, scoped: true, isReadOnlyContext: true })).toEqual({
+    expect(await runCount(db, { table })).toEqual({ count: 100, is_estimate: false })
+    expect(await runCount(db, { table, isReadOnlyContext: true })).toEqual({
       count: 100,
       is_estimate: false,
     })
@@ -280,7 +258,7 @@ withTestDatabase(
 )
 
 withTestDatabase(
-  'scoped == legacy for an ANALYZED partitioned table below THRESHOLD_COUNT',
+  'analyzed partitioned table below THRESHOLD_COUNT is exact',
   async (db) => {
     await db.executeQuery(`
       create table public.part_analyzed (id int, region text) partition by list (region);
@@ -291,11 +269,11 @@ withTestDatabase(
       analyze public.part_analyzed;
     `)
     const table = await tableOf(db, 'public.part_analyzed', 'part_analyzed', 'public')
-    expect(await assertScopedEqualsLegacy(db, { table })).toEqual({
+    expect(await runCount(db, { table })).toEqual({
       count: 100,
       is_estimate: false,
     })
-    expect(await assertScopedEqualsLegacy(db, { table, isReadOnlyContext: true })).toEqual({
+    expect(await runCount(db, { table, isReadOnlyContext: true })).toEqual({
       count: 100,
       is_estimate: false,
     })
@@ -303,7 +281,7 @@ withTestDatabase(
 )
 
 withTestDatabase(
-  'scoped == legacy for a view flowing through the row-count builder',
+  'view flowing through the row-count builder is exact',
   async (db) => {
     await db.executeQuery(`
     create table public.view_src (id int primary key);
@@ -313,9 +291,9 @@ withTestDatabase(
     const table = await tableOf(db, 'public.v_rows', 'v_rows', 'public')
 
     // A view has no heap (pg_relation_size 0, no partition tree) -> the gate keeps
-    // an exact count; scoped and legacy agree.
-    expect(await assertScopedEqualsLegacy(db, { table })).toEqual({ count: 7, is_estimate: false })
-    expect(await assertScopedEqualsLegacy(db, { table, isReadOnlyContext: true })).toEqual({
+    // an exact count.
+    expect(await runCount(db, { table })).toEqual({ count: 7, is_estimate: false })
+    expect(await runCount(db, { table, isReadOnlyContext: true })).toEqual({
       count: 7,
       is_estimate: false,
     })
@@ -325,7 +303,7 @@ withTestDatabase(
 // ── Fix #1: the embedded estimate select is quoted with literal(), so backslash
 // identifiers survive regardless of the session's standard_conforming_strings.
 withTestDatabase(
-  'scoped estimate path quotes the embedded select safely (backslash names, scs on & off)',
+  'estimate path quotes the embedded select safely (backslash names, scs on & off)',
   async (db) => {
     // Names contain a backslash; in the JS template `\\` is one literal backslash.
     await db.executeQuery(`
@@ -342,28 +320,18 @@ withTestDatabase(
     const table = { id: Number(id), name: 'wei\\rd', schema: 'public' }
     const filters: Filter[] = [{ column: 'col\\umn', operator: '=', value: 1 }]
 
-    // Default standard_conforming_strings (on): both paths take the estimate
-    // branch and agree on the value.
-    const scopedOn = await runCount(db, { table, scoped: true, filters })
-    expect(scopedOn.is_estimate).toBe(true)
-    expect(Number.isFinite(scopedOn.count)).toBe(true)
-    expect(await assertScopedEqualsLegacy(db, { table, filters })).toEqual(scopedOn)
+    const scsOn = await runCount(db, { table, filters })
+    expect(scsOn.is_estimate).toBe(true)
+    expect(Number.isFinite(scsOn.count)).toBe(true)
 
     // standard_conforming_strings = off in the SAME connection: the SET, the
     // CREATE FUNCTION, and the count must share one query (the test uses a pool).
     const withScsOff = (sql: string) => `set standard_conforming_strings = off;\n${sql}`
-    const [scopedOff] = await db.executeQuery<CountRow[]>(
-      withScsOff(getTableRowsCountSql({ table, scoped: true, filters }))
+    const [scsOff] = await db.executeQuery<CountRow[]>(
+      withScsOff(getTableRowsCountSql({ table, filters }))
     )
     // literal()/E'...' keeps the backslash identifiers intact under scs=off.
-    expect(scopedOff.is_estimate).toBe(true)
-    expect(Number.isFinite(Number(scopedOff.count))).toBe(true)
-
-    // The legacy apostrophe-only escaping mangles the backslashes under scs=off
-    // (the bug the scoped path fixes), so legacy errors there -- assert only the
-    // scoped behavior, per contract.
-    await expect(
-      db.executeQuery(withScsOff(getTableRowsCountSql({ table, filters })))
-    ).rejects.toThrow()
+    expect(scsOff.is_estimate).toBe(true)
+    expect(Number.isFinite(Number(scsOff.count))).toBe(true)
   }
 )
