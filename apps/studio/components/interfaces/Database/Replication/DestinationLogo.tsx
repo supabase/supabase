@@ -8,6 +8,9 @@ import { BASE_PATH } from '@/lib/constants'
 // so a new destination type never renders an empty square.
 const BRAND_MARK_BY_TYPE: Partial<Record<DestinationType, string>> = {
   BigQuery: `${BASE_PATH}/img/icons/bigquery-icon.svg`,
+  ClickHouse: `${BASE_PATH}/img/icons/clickhouse-icon.svg`,
+  DuckLake: `${BASE_PATH}/img/icons/ducklake-icon.svg`,
+  Snowflake: `${BASE_PATH}/img/icons/snowflake-icon.svg`,
 }
 
 const SIZE_CLASS_NAME = {
