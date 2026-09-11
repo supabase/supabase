@@ -1,6 +1,6 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useQueries, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { MessageSquare, MoreVertical, Plus, Search, Workflow, X } from 'lucide-react'
+import { MoreVertical, Plus, Search, Workflow, X } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -18,6 +18,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
+  TableHeadSort,
   TableRow,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -29,7 +30,8 @@ import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
 import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { EnablePipelinesModal } from './EnablePipelinesCallout'
-import { PIPELINES_FEEDBACK_URL } from './Replication.constants'
+import { getStatusName } from './Pipeline.utils'
+import { PipelineStatusName } from './Replication.constants'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
@@ -39,20 +41,51 @@ import {
 } from './useIsETLPrivateAlpha'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
 import { AlertError } from '@/components/ui/AlertError'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { replicationKeys } from '@/data/replication/keys'
+import {
+  replicationPipelineStatusQueryOptions,
+  type ReplicationPipelineStatusData,
+} from '@/data/replication/pipeline-status-query'
 import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+
+type DestinationSortColumn = 'name' | 'status'
+type DestinationSort = `${DestinationSortColumn}:${'asc' | 'desc'}`
+
+// Worst first, so sorting ascending by status surfaces the pipelines that need attention.
+const STATUS_SORT_ORDER: PipelineStatusName[] = [
+  PipelineStatusName.FAILED,
+  PipelineStatusName.STOPPED,
+  PipelineStatusName.STOPPING,
+  PipelineStatusName.STARTING,
+  PipelineStatusName.STARTED,
+  PipelineStatusName.UNKNOWN,
+]
+
+// Keyed by pipeline id from the responses themselves, so this never closes over component state.
+const combinePipelineStatuses = (
+  results: { data?: ReplicationPipelineStatusData }[]
+): Map<number, PipelineStatusName | undefined> =>
+  new Map(
+    results
+      .map((result) => result.data)
+      .filter((data): data is ReplicationPipelineStatusData => data !== undefined)
+      .map((data) => [data.pipeline_id, getStatusName(data.status)])
+  )
+
+const compareStatusNames = (a?: PipelineStatusName, b?: PipelineStatusName) => {
+  const rankA = a === undefined ? STATUS_SORT_ORDER.length : STATUS_SORT_ORDER.indexOf(a)
+  const rankB = b === undefined ? STATUS_SORT_ORDER.length : STATUS_SORT_ORDER.indexOf(b)
+  return rankA - rankB
+}
 
 export const Destinations = () => {
   const queryClient = useQueryClient()
@@ -108,19 +141,64 @@ export const Destinations = () => {
   } = useReplicationDestinationsQuery({
     projectRef,
   })
-  const destinations = destinationsData?.destinations ?? []
+  const destinations = useMemo(
+    () => destinationsData?.destinations ?? [],
+    [destinationsData?.destinations]
+  )
   const hasDestinations = isDestinationsSuccess && destinationsData?.destinations.length > 0
-  const filteredDestinations =
-    filterString.length === 0
-      ? (destinations ?? [])
-      : (destinations ?? []).filter((destination) =>
-          destination.name.toLowerCase().includes(filterString.toLowerCase())
-        )
+  const filteredDestinations = useMemo(
+    () =>
+      filterString.length === 0
+        ? destinations
+        : destinations.filter((destination) =>
+            destination.name.toLowerCase().includes(filterString.toLowerCase())
+          ),
+    [destinations, filterString]
+  )
 
   const { data: pipelinesData, isSuccess: isPipelinesSuccess } = useReplicationPipelinesQuery({
     projectRef,
   })
-  const pipelines = pipelinesData?.pipelines ?? []
+  const pipelines = useMemo(() => pipelinesData?.pipelines ?? [], [pipelinesData?.pipelines])
+
+  // Sorting by status needs every pipeline's status up here, not just inside each row. These share
+  // the rows' query keys, so each status is still only fetched once.
+  const statusByPipelineId = useQueries({
+    queries: pipelines.map((pipeline) =>
+      replicationPipelineStatusQueryOptions({ projectRef, pipelineId: pipeline.id })
+    ),
+    combine: combinePipelineStatuses,
+  })
+
+  const getDestinationStatus = (destinationId: number) => {
+    const pipeline = pipelines.find((p) => p.destination_id === destinationId)
+    return pipeline === undefined ? undefined : statusByPipelineId.get(pipeline.id)
+  }
+
+  const [sort, setSort] = useState<DestinationSort>('name:asc')
+  const [sortColumn, sortDirection] = sort.split(':') as [DestinationSortColumn, 'asc' | 'desc']
+
+  const getAriaSort = (column: DestinationSortColumn) => {
+    if (sortColumn !== column) return 'none'
+    return sortDirection === 'asc' ? 'ascending' : 'descending'
+  }
+
+  const handleSortChange = (column: DestinationSortColumn) => {
+    if (sortColumn !== column) return setSort(`${column}:asc`)
+    setSort(`${column}:${sortDirection === 'asc' ? 'desc' : 'asc'}`)
+  }
+
+  // Not memoized: the status map is rebuilt whenever a pipeline status refetches, so a useMemo
+  // here would never hit. Sorting a handful of destinations per render costs nothing.
+  const sortedDestinations = [...filteredDestinations].sort((a, b) => {
+    const comparison =
+      sortColumn === 'name'
+        ? a.name.localeCompare(b.name)
+        : compareStatusNames(getDestinationStatus(a.id), getDestinationStatus(b.id)) ||
+          a.name.localeCompare(b.name)
+
+    return sortDirection === 'asc' ? comparison : -comparison
+  })
 
   const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
     projectRef,
@@ -153,7 +231,7 @@ export const Destinations = () => {
       searchInputRef.current?.focus()
       searchInputRef.current?.select()
     },
-    { label: 'Search destinations' }
+    { label: 'Search pipelines' }
   )
 
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setFilterString(''))
@@ -185,7 +263,7 @@ export const Destinations = () => {
         <div className="flex items-center">
           <Input
             ref={searchInputRef}
-            placeholder="Filter destinations"
+            placeholder="Search pipelines"
             size="tiny"
             icon={<Search />}
             value={filterString}
@@ -195,7 +273,7 @@ export const Destinations = () => {
             actions={
               filterString.length > 0 && (
                 <Button
-                  aria-label="Clear filter"
+                  aria-label="Clear search"
                   variant="text"
                   icon={<X />}
                   className="p-0 h-5 w-5"
@@ -212,10 +290,10 @@ export const Destinations = () => {
                 aria-label="More actions"
                 variant="default"
                 icon={<MoreVertical />}
-                className="px-1"
+                className="px-1.25"
               />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52">
+            <DropdownMenuContent align="end" className="w-64">
               <DropdownMenuItem asChild>
                 <Link href={`/org/${organization?.slug}/usage#pipeline-initial-sync-data`}>
                   View Pipelines usage
@@ -227,32 +305,28 @@ export const Destinations = () => {
                   Enable Pipelines
                 </DropdownMenuItem>
               ) : (
-                <DropdownMenuItemTooltip
+                <DropdownMenuItem
+                  className="data-disabled:pointer-events-auto data-disabled:cursor-not-allowed"
                   disabled={!canDisablePipelines}
-                  tooltip={{
-                    content: {
-                      side: 'left',
-                      text: 'Remove all existing destinations before disabling Pipelines',
-                    },
+                  onClick={() => {
+                    if (!canDisablePipelines) return
+                    setShowDisablePipelinesDialog(true)
                   }}
-                  onClick={() => setShowDisablePipelinesDialog(true)}
                 >
-                  Disable Pipelines
-                </DropdownMenuItemTooltip>
+                  <div className="flex flex-col gap-y-0.5">
+                    <p>Disable Pipelines</p>
+                    {!canDisablePipelines && (
+                      <p className="text-foreground-lighter">Delete all pipelines first</p>
+                    )}
+                  </div>
+                </DropdownMenuItem>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button asChild variant="default" icon={<MessageSquare />}>
-            <a href={PIPELINES_FEEDBACK_URL} target="_blank" rel="noreferrer noopener">
-              Leave feedback
-            </a>
-          </Button>
-          <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
-
           <Shortcut
             id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
-            label="Add destination"
+            label="Add pipeline"
             onTrigger={openDestinationPanel}
             options={{ enabled: !!newDestinationDefaultType }}
             side="bottom"
@@ -263,31 +337,48 @@ export const Destinations = () => {
               disabled={!newDestinationDefaultType}
               onClick={openDestinationPanel}
             >
-              Add destination
+              Add pipeline
             </Button>
           </Shortcut>
         </div>
       </div>
 
       <div className="w-full overflow-hidden overflow-x-auto flex flex-col gap-y-4">
+        {/* Mounted whether or not it has anything to say, so the update is announced */}
+        <p role="status" aria-live="polite" className="sr-only">
+          {isDestinationsLoading ? 'Loading pipelines' : ''}
+        </p>
+
         {hasErrorsFetchingData && (
-          <AlertError error={destinationsError} subject="Failed to retrieve destinations" />
+          <AlertError error={destinationsError} subject="Failed to retrieve pipelines" />
         )}
 
-        {isDestinationsLoading ? (
-          <GenericSkeletonLoader />
-        ) : hasDestinations ? (
+        {isDestinationsLoading && <GenericSkeletonLoader />}
+
+        {!isDestinationsLoading && hasDestinations && (
           <Card>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead key="type" className="w-[40px]" />
-                    <TableHead key="name" className="w-[250px]">
-                      Name
+                    <TableHead key="name" className="w-[250px]" aria-sort={getAriaSort('name')}>
+                      <TableHeadSort
+                        column="name"
+                        currentSort={sort}
+                        onSortChange={handleSortChange}
+                      >
+                        Name
+                      </TableHeadSort>
                     </TableHead>
-                    <TableHead key="status" className="w-[150px]">
-                      Status
+                    <TableHead key="status" className="w-[150px]" aria-sort={getAriaSort('status')}>
+                      <TableHeadSort
+                        column="status"
+                        currentSort={sort}
+                        onSortChange={handleSortChange}
+                      >
+                        Status
+                      </TableHeadSort>
                     </TableHead>
                     <TableHead key="lag" className="w-[150px]">
                       Lag
@@ -297,7 +388,7 @@ export const Destinations = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredDestinations.map((destination) => (
+                  {sortedDestinations.map((destination) => (
                     <DestinationRow key={destination.id} destinationId={destination.id} />
                   ))}
 
@@ -308,7 +399,7 @@ export const Destinations = () => {
                         <TableCell colSpan={6}>
                           <p>No results found</p>
                           <p className="text-foreground-light">
-                            Your search for "{filterString}" did not return any results.
+                            Your search for “{filterString}” did not return any results.
                           </p>
                         </TableCell>
                       </TableRow>
@@ -317,24 +408,23 @@ export const Destinations = () => {
               </Table>
             </CardContent>
           </Card>
-        ) : (
-          !isDestinationsLoading &&
-          !hasErrorsFetchingData && (
-            <EmptyStatePresentational
-              icon={Workflow}
-              title="Add a destination"
-              description="Connect an external destination for analytics workloads."
+        )}
+
+        {!isDestinationsLoading && !hasDestinations && !hasErrorsFetchingData && (
+          <EmptyStatePresentational
+            icon={Workflow}
+            title="Add a pipeline"
+            description="Send tables to an external destination for analytics workloads."
+          >
+            <Button
+              variant="default"
+              icon={<Plus />}
+              disabled={!newDestinationDefaultType}
+              onClick={openDestinationPanel}
             >
-              <Button
-                variant="default"
-                icon={<Plus />}
-                disabled={!newDestinationDefaultType}
-                onClick={openDestinationPanel}
-              >
-                Add destination
-              </Button>
-            </EmptyStatePresentational>
-          )
+              Add pipeline
+            </Button>
+          </EmptyStatePresentational>
         )}
       </div>
 
