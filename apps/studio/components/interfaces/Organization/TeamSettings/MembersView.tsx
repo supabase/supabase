@@ -163,9 +163,7 @@ export const MembersView = ({ searchString }: MembersViewProps) => {
                           </TableRow>,
                         ]
                       : []),
-                    ...(!!user
-                      ? [<MemberRow key={user.gotrue_id} member={user} />]
-                      : []),
+                    ...(!!user ? [<MemberRow key={user.gotrue_id} member={user} />] : []),
                     ...sortedMembers.map((member) => (
                       <MemberRow key={member.gotrue_id} member={member} />
                     )),
