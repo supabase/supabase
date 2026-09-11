@@ -31,13 +31,37 @@ await supabase.auth.signInWithOAuth({
 
 In the server, you need to handle the redirect to the OAuth provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to.
 
-```js
-import { createClient, type Provider } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+`signInWithOAuth` also sets a PKCE `code_verifier` cookie that the callback route needs to complete the exchange. Use the server client from the [Creating a client](/docs/guides/auth/server-side/creating-a-client) guide (which already wires up cookie handling for your framework) so this cookie is written to the response, rather than a plain client from `@supabase/supabase-js`. If your framework doesn't apply cookies set during the request to a redirect response automatically (e.g. Remix, Astro), attach the response headers to the redirect explicitly, the same way the callback examples below do:
+
+```ts
+import type { Provider } from '@supabase/supabase-js'
+import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+const request = new Request('http://example.com')
 const provider = 'provider' as Provider
-const redirect = (url: string) => {}
+const redirect = (url: string, init?: { headers: Headers }) => {}
 
 // ---cut---
+const responseHeaders = new Headers()
+
+// The client you created from the Server-Side Auth instructions, configured
+// to write any cookies it sets onto `responseHeaders`
+const supabase = createServerClient(
+  'https://your-project-id.supabase.co',
+  'sb_publishable_...',
+  {
+    cookies: {
+      getAll() {
+        return parseCookieHeader(request.headers.get('Cookie') ?? '')
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) =>
+          responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value, options))
+        )
+      },
+    },
+  }
+)
+
 const { data, error } = await supabase.auth.signInWithOAuth({
   provider,
   options: {
@@ -46,7 +70,8 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 })
 
 if (data.url) {
-  redirect(data.url) // use the redirect API for your server framework
+  // pass responseHeaders so the code_verifier cookie reaches the browser
+  redirect(data.url, { headers: responseHeaders })
 }
 ```
 
