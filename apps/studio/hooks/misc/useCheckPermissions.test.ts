@@ -6,7 +6,7 @@ import type { Permission } from '@/types'
 function permission(overrides: Partial<Permission>): Permission {
   return {
     actions: ['read'] as any,
-    condition: null,
+    condition: null as unknown as Permission['condition'],
     organization_slug: 'org-slug',
     resources: ['tables'],
     restrictive: false,
@@ -29,14 +29,24 @@ describe('doPermissionsCheck', () => {
   it('treats every "." in a resource as literal, not "any character"', () => {
     // Regression for the incomplete-escaping bug: only the first "." used to get escaped,
     // so a resource with two dots would let any single character stand in for the second one.
-    const permissions = [
-      permission({ resources: ['queue_job.projects.update_jwt'] }),
-    ]
+    const permissions = [permission({ resources: ['queue_job.projects.update_jwt'] })]
     expect(
-      doPermissionsCheck(permissions, 'read', 'queue_job.projects.update_jwt', undefined, 'org-slug')
+      doPermissionsCheck(
+        permissions,
+        'read',
+        'queue_job.projects.update_jwt',
+        undefined,
+        'org-slug'
+      )
     ).toBe(true)
     expect(
-      doPermissionsCheck(permissions, 'read', 'queue_jobXprojectsXupdate_jwt', undefined, 'org-slug')
+      doPermissionsCheck(
+        permissions,
+        'read',
+        'queue_jobXprojectsXupdate_jwt',
+        undefined,
+        'org-slug'
+      )
     ).toBe(false)
   })
 
@@ -46,7 +56,13 @@ describe('doPermissionsCheck', () => {
       doPermissionsCheck(permissions, 'read', 'queue_job.restore.prepare', undefined, 'org-slug')
     ).toBe(true)
     expect(
-      doPermissionsCheck(permissions, 'read', 'queue_job.walg.prepare_restore', undefined, 'org-slug')
+      doPermissionsCheck(
+        permissions,
+        'read',
+        'queue_job.walg.prepare_restore',
+        undefined,
+        'org-slug'
+      )
     ).toBe(true)
   })
 
