@@ -3657,6 +3657,23 @@ export interface ResourceExhaustionBannerAiAssistantClickedEvent {
 }
 
 /**
+ * User clicked a "View metrics" or documentation item in the Troubleshoot menu of a resource exhaustion warning banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ResourceExhaustionBannerTroubleshootClickedEvent {
+  action: 'resource_exhaustion_banner_troubleshoot_clicked'
+  groups: TelemetryGroups
+  properties: {
+    troubleshootAction: 'metrics' | 'docs'
+    warningType: string
+    warningTypes: string[]
+    destination: string
+  }
+}
+
+/**
  * User clicked a row in the Unified Logs interface.
  *
  * @group Events
@@ -4059,6 +4076,7 @@ export type TelemetryEvent =
   | AccessTokenDoneButtonClickedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
   | ResourceExhaustionBannerAiAssistantClickedEvent
+  | ResourceExhaustionBannerTroubleshootClickedEvent
   | UnifiedLogsRowClickedEvent
   | HeaderHomeLogoClickedEvent
   | HeaderBackToDashboardClickedEvent
