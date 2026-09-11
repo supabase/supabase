@@ -2,7 +2,7 @@
 
 import dayjs from 'dayjs'
 import { useTheme } from 'next-themes'
-import { ReactNode, useState } from 'react'
+import { ReactNode, useId, useState } from 'react'
 import {
   Area,
   CartesianGrid,
@@ -118,6 +118,8 @@ export const ChartLine = ({
   referenceLines,
 }: ChartLineProps) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
+  // useId contains colons, which are not valid in an SVG id referenced by url().
+  const gradientPrefix = `chart-line-fill-${useId().replace(/:/g, '')}`
   const { resolvedTheme } = useTheme()
   const isDarkMode = resolvedTheme?.includes('dark')
 
@@ -157,16 +159,36 @@ export const ChartLine = ({
     ...XAxisProps,
   }
 
+  // Recharts reserves this much horizontal space for the y axis. The faux x axis
+  // below is plain HTML outside the SVG, so it has to be indented by the same
+  // amount to line up with where the plot actually starts.
+  const yAxisWidth = showYAxis ? (YAxisProps?.width ?? 60) : 0
+
   const yAxisConfig = {
     tick: showYAxis
       ? { fill: 'var(--color-foreground-lighter)', fontSize: 10, fontFamily: 'var(--font-mono)' }
       : false,
     hide: !showYAxis,
     tickMargin: showYAxis ? (YAxisProps?.tickMargin ?? 4) : 0,
-    width: showYAxis ? (YAxisProps?.width ?? 60) : 0,
+    width: yAxisWidth,
     axisLine: { stroke: CHART_COLORS.AXIS },
     tickLine: { stroke: CHART_COLORS.AXIS },
     ...YAxisProps,
+  }
+
+  // The faux x axis below sits outside the plot, in normal flow. Its 16px height
+  // plus the column's 12px gap is subtracted from the chart so the component's
+  // overall height is unchanged. Kept as a definite height rather than flex-1:
+  // Recharts' ResponsiveContainer measures its parent and renders nothing if it
+  // reads 0 before layout settles.
+  const hasDateRangeFooter = xKey === 'timestamp' && data.length > 0
+
+  const resolveSeriesColor = (key: string) => {
+    const keyConfig = chartConfig[key]
+    return (
+      keyConfig?.color ||
+      (keyConfig?.theme ? (isDarkMode ? keyConfig.theme.dark : keyConfig.theme.light) : color)
+    )
   }
 
   const margin = {
@@ -189,7 +211,10 @@ export const ChartLine = ({
       data-testid="chart-line"
       className={cn('flex flex-col gap-y-3 w-full', isFullHeight ? 'h-full' : 'h-24', className)}
     >
-      <ChartContainer className="w-full! h-full" config={chartConfig}>
+      <ChartContainer
+        className={cn('w-full!', hasDateRangeFooter ? 'h-[calc(100%-28px)]' : 'h-full')}
+        config={chartConfig}
+      >
         <RechartAreaChart
           data={data}
           syncId={syncId}
@@ -236,6 +261,21 @@ export const ChartLine = ({
             if (onLineClick) onLineClick(datum, tooltipData)
           }}
         >
+          <defs>
+            {keysToRender.map((key, index) => (
+              <linearGradient
+                key={key}
+                id={`${gradientPrefix}-${index}`}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop offset="5%" stopColor={resolveSeriesColor(key)} stopOpacity={0.8} />
+                <stop offset="95%" stopColor={resolveSeriesColor(key)} stopOpacity={0} />
+              </linearGradient>
+            ))}
+          </defs>
           {showGrid && <CartesianGrid vertical={false} stroke={CHART_COLORS.AXIS} />}
           <YAxis {...yAxisConfig} />
           <XAxis {...xAxisConfig} />
@@ -295,38 +335,26 @@ export const ChartLine = ({
               strokeDasharray={line.strokeDasharray ?? '4 4'}
             />
           ))}
-          {keysToRender.map((key, index) => {
-            const keyConfig = chartConfig[key]
-            const lineColor =
-              keyConfig?.color ||
-              (keyConfig?.theme
-                ? isDarkMode
-                  ? keyConfig.theme.dark
-                  : keyConfig.theme.light
-                : color)
-            const baseOpacity = 0.2
-            const opacityIncrement = 0.1
-            const maxOpacity = 0.6
-            const fillOpacity = Math.min(baseOpacity + index * opacityIncrement, maxOpacity)
-
-            return (
-              <Area
-                key={key}
-                type="step"
-                dataKey={key}
-                fill={lineColor}
-                fillOpacity={fillOpacity}
-                stroke={lineColor}
-                strokeWidth={strokeWidth}
-                stackId={keysToRender.length > 1 ? `stack-${key}` : undefined}
-              />
-            )
-          })}
+          {keysToRender.map((key, index) => (
+            <Area
+              key={key}
+              type="step"
+              dataKey={key}
+              fill={`url(#${gradientPrefix}-${index})`}
+              fillOpacity={0.1}
+              stroke={resolveSeriesColor(key)}
+              strokeWidth={strokeWidth}
+              stackId={keysToRender.length > 1 ? `stack-${key}` : undefined}
+            />
+          ))}
         </RechartAreaChart>
       </ChartContainer>
 
-      {xKey === 'timestamp' && data && data.length > 0 && (
-        <div className="text-foreground-lighter -mt-6 flex items-center justify-between text-[10px] font-mono">
+      {hasDateRangeFooter && (
+        <div
+          className="text-foreground-lighter flex h-4 items-center justify-between text-[10px] font-mono"
+          style={{ paddingLeft: yAxisWidth + margin.left }}
+        >
           <span>{dayjs(data[0][xKey]).format(DateTimeFormat)}</span>
           <span>{dayjs(data[data.length - 1]?.[xKey]).format(DateTimeFormat)}</span>
         </div>

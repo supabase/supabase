@@ -15,6 +15,11 @@ import {
 import type { CategoricalChartState } from 'recharts/types/chart/types'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 
+// Applied to every bar outside the hovered column, matching the dimming
+// LogsBarChart does with its muted per-series colours. Opacity is used instead
+// so it works for any ChartConfig, not just hues with a hand-picked muted step.
+const DIMMED_FILL_OPACITY = 0.35
+
 const CHART_COLORS = {
   TICK: 'var(--background-overlay-hover)',
   AXIS: 'var(--background-overlay-hover)',
@@ -66,6 +71,8 @@ export interface ChartBarProps {
   showGrid?: boolean
   showYAxis?: boolean
   showXAxis?: boolean
+  isStacked?: boolean
+  margin?: { top?: number; right?: number; bottom?: number; left?: number }
   XAxisProps?: {
     tick?: boolean
     tickFormatter?: (value: any) => string
@@ -102,6 +109,8 @@ export const ChartBar = ({
   showGrid = false,
   showYAxis = false,
   showXAxis = false,
+  isStacked = false,
+  margin: marginProp,
   XAxisProps,
   YAxisProps,
 }: ChartBarProps) => {
@@ -146,23 +155,36 @@ export const ChartBar = ({
     ...XAxisProps,
   }
 
+  // Recharts reserves this much horizontal space for the y axis. The faux x axis
+  // below is plain HTML outside the SVG, so it has to be indented by the same
+  // amount to line up with where the plot actually starts.
+  const yAxisWidth = showYAxis ? (YAxisProps?.width ?? 60) : 0
+
   const yAxisConfig = {
     tick: showYAxis
       ? { fill: 'var(--color-foreground-lighter)', fontSize: 10, fontFamily: 'var(--font-mono)' }
       : false,
     hide: !showYAxis,
     tickMargin: showYAxis ? (YAxisProps?.tickMargin ?? 4) : 0,
-    width: showYAxis ? (YAxisProps?.width ?? 60) : 0,
+    width: yAxisWidth,
     axisLine: { stroke: CHART_COLORS.AXIS },
     tickLine: { stroke: CHART_COLORS.AXIS },
     ...YAxisProps,
   }
+
+  // The faux x axis below sits outside the plot, in normal flow. Its 16px height
+  // plus the column's 12px gap is subtracted from the chart so the component's
+  // overall height is unchanged. Kept as a definite height rather than flex-1:
+  // Recharts' ResponsiveContainer measures its parent and renders nothing if it
+  // reads 0 before layout settles.
+  const hasDateRangeFooter = xKey === 'timestamp' && data.length > 0
 
   const margin = {
     top: 0,
     right: 0,
     left: 0,
     bottom: 0,
+    ...marginProp,
   }
 
   return (
@@ -170,7 +192,10 @@ export const ChartBar = ({
       data-testid="chart-bar"
       className={cn('flex flex-col gap-y-3 w-full', isFullHeight ? 'h-full' : 'h-24', className)}
     >
-      <ChartContainer className="w-full! h-full" config={chartConfig}>
+      <ChartContainer
+        className={cn('w-full!', hasDateRangeFooter ? 'h-[calc(100%-28px)]' : 'h-full')}
+        config={chartConfig}
+      >
         <RechartBarChart
           data={data}
           syncId={syncId}
@@ -251,7 +276,28 @@ export const ChartBar = ({
                     ? keyConfig.theme.dark
                     : keyConfig.theme.light
                   : color)
-              return <Bar key={key} dataKey={key} fill={barColor} maxBarSize={24} />
+              return (
+                <Bar
+                  key={key}
+                  dataKey={key}
+                  fill={barColor}
+                  maxBarSize={24}
+                  stackId={isStacked ? 'stack' : undefined}
+                >
+                  {data.map((_entry: ChartBarTick, dataIndex: number) => (
+                    <Cell
+                      key={`${key}-${dataIndex}`}
+                      className="cursor-pointer transition-opacity"
+                      fill={barColor}
+                      fillOpacity={
+                        focusDataIndex === null || focusDataIndex === dataIndex
+                          ? 1
+                          : DIMMED_FILL_OPACITY
+                      }
+                    />
+                  ))}
+                </Bar>
+              )
             })
           ) : (
             <Bar dataKey={dataKey} fill={color} maxBarSize={24}>
@@ -267,8 +313,11 @@ export const ChartBar = ({
         </RechartBarChart>
       </ChartContainer>
 
-      {xKey === 'timestamp' && data && data.length > 0 && (
-        <div className="text-foreground-lighter -mt-6 flex items-center justify-between text-[10px] font-mono">
+      {hasDateRangeFooter && (
+        <div
+          className="text-foreground-lighter flex h-4 items-center justify-between text-[10px] font-mono"
+          style={{ paddingLeft: yAxisWidth + margin.left }}
+        >
           <span>{dayjs(data[0][xKey]).format(DateTimeFormat)}</span>
           <span>{dayjs(data[data.length - 1]?.[xKey]).format(DateTimeFormat)}</span>
         </div>
