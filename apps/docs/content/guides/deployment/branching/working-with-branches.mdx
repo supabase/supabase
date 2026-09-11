@@ -200,6 +200,15 @@ If your migration history was not initialized by Supabase Branching or the Supab
 
 <StepHikeCompact>
   <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Turn on default privileges on your base project" fullWidth>
+
+      Open the [Data API settings](/dashboard/project/_/integrations/data_api/settings) in the Supabase Dashboard and turn on **Default privileges for new entities**.
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Add grants to your initial migration" fullWidth>
 
       Insert the following statements at the start of your initial migration file. Subsequent migrations then inherit these privileges, so the final database state is unchanged.
@@ -214,7 +223,7 @@ If your migration history was not initialized by Supabase Branching or the Supab
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={2}>
+  <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Repair the migration history of your base project" fullWidth>
 
       Mark the updated migration as applied so it isn't rerun on your base project. See [Diagnosing and fixing sync errors](/docs/guides/deployment/database-migrations#diagnosing-and-fixing-sync-errors).
@@ -222,15 +231,6 @@ If your migration history was not initialized by Supabase Branching or the Supab
       ```bash
       supabase migration repair --status applied <migration-timestamp>
       ```
-
-    </StepHikeCompact.Details>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Commit and push" fullWidth>
-
-      Commit the updated migration file and push it to your Git repository. New branches run the initial migration and start with default privileges enabled.
 
     </StepHikeCompact.Details>
 
@@ -254,7 +254,13 @@ For improved security, we recommend not exposing the `public` schema automatical
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Add a new migration that revokes the grants" fullWidth>
 
-      Create a new migration file with the following statements. Don't edit the initial migration, because that affects subsequent migrations in your history.
+      Create a new migration file with the Supabase CLI. Don't edit the initial migration, because that affects subsequent migrations in your history.
+
+      ```bash
+      supabase migration new revoke_default_privileges
+      ```
+
+      Add the following statements to the generated file:
 
       ```sql
       alter default privileges for role postgres in schema public revoke select, insert, update, delete on tables from anon, authenticated, service_role;
