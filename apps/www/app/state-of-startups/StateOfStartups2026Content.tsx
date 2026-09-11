@@ -301,7 +301,7 @@ const CTABanner = forwardRef<HTMLElement>((props, ref) => {
         </p>
       </div>
       <div className="flex items-center justify-center gap-2 mt-4">
-        <Button asChild size="medium">
+        <Button variant="primary" asChild size="medium">
           <Link
             href="https://supabase.com/dashboard"
             onClick={() =>
@@ -314,7 +314,7 @@ const CTABanner = forwardRef<HTMLElement>((props, ref) => {
             Start your project
           </Link>
         </Button>
-        <Button asChild size="medium" variant="default">
+        <Button asChild size="medium">
           <Link
             href="/contact/sales"
             onClick={() =>

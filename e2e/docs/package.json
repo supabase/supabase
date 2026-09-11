@@ -12,10 +12,12 @@
     "resolve-docs-scope": "node --experimental-strip-types scripts/resolve-docs-scope.ts"
   },
   "dependencies": {
-    "@playwright/test": "^1.59.1"
+    "@playwright/test": "^1.59.1",
+    "e2e-shared": "workspace:*"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
-    "@types/node": "catalog:"
+    "@types/node": "catalog:",
+    "axe-core": "^4.12.1"
   }
 }

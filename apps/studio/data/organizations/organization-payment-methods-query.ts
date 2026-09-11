@@ -8,7 +8,7 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrganizationPaymentMethodsVariables = { slug?: string }
-export type OrganizationPaymentMethod = components['schemas']['PaymentsResponse']['data'][0]
+export type OrganizationPaymentMethod = components['schemas']['PaymentsResponse_Output']['data'][0]
 
 export async function getOrganizationPaymentMethods(
   { slug }: OrganizationPaymentMethodsVariables,

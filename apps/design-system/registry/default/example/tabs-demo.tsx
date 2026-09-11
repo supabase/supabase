@@ -40,7 +40,7 @@ export default function TabsDemo() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button>Save changes</Button>
+            <Button variant="primary">Save changes</Button>
           </CardFooter>
         </Card>
       </TabsContent>
@@ -63,7 +63,7 @@ export default function TabsDemo() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button>Save password</Button>
+            <Button variant="primary">Save password</Button>
           </CardFooter>
         </Card>
       </TabsContent>

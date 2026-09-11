@@ -3,21 +3,8 @@ import React from 'react'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
-import { type SqlSnippet } from './AIAssistant.types'
-
-export const getSnippetLabel = (snippet: SqlSnippet, index: number): string => {
-  if (typeof snippet === 'string') {
-    return `Snippet ${index + 1}`
-  }
-  return snippet.label
-}
-
-export const getSnippetContent = (snippet: SqlSnippet): string => {
-  if (typeof snippet === 'string') {
-    return snippet
-  }
-  return snippet.content
-}
+import { getSnippetContent, getSnippetLabel } from './AIAssistant.utils'
+import { type SqlSnippet } from '@/state/ai-assistant-state'
 
 interface SnippetRowProps {
   snippets: SqlSnippet[]

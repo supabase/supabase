@@ -22,7 +22,7 @@ vi.mock('sonner', () => ({
   toast: { error: vi.fn() },
 }))
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 
 const DEFAULT_PROFILE_CONTEXT: ProfileContextType = {
   profile: {
@@ -122,7 +122,6 @@ function renderScreen(props: Partial<Parameters<typeof AwsMarketplaceOnboardingS
 
 describe('AwsMarketplaceOnboardingScreen', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     window.localStorage.clear()
   })
 

@@ -10,7 +10,7 @@ export type DesiredInstanceSizeForAvailableRegions =
 
 export type OrganizationAvailableRegionsVariables = {
   slug?: string
-  cloudProvider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
+  cloudProvider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
   desiredInstanceSize?: DesiredInstanceSizeForAvailableRegions
 }
 

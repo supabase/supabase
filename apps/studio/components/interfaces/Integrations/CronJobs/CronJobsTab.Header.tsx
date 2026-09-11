@@ -61,10 +61,12 @@ export const CronJobsTabHeader = ({
 
       <div className="flex items-center gap-x-2">
         <EnableCleanupButton onScheduled={onRefresh} />
-        <Button variant="default" icon={<RefreshCw />} loading={isRefreshing} onClick={onRefresh}>
+        <Button icon={<RefreshCw />} loading={isRefreshing} onClick={onRefresh}>
           Refresh
         </Button>
-        <Button onClick={onCreateJob}>Create job</Button>
+        <Button variant="primary" onClick={onCreateJob}>
+          Create job
+        </Button>
       </div>
     </div>
   )

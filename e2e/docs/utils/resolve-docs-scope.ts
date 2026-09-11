@@ -1,11 +1,8 @@
 import { readdir, readFile } from 'node:fs/promises'
-import { basename, join, relative, sep } from 'node:path'
+import { basename, join, relative } from 'node:path'
 
-/**
- * Federated guide section prefixes — mirrors
- * apps/docs/scripts/federated-content/sources/*.ts. Checked automatically
- * against those files by assertFederatedSectionsInSync below.
- */
+import { normalizeRepoPath } from '../../shared/paths.ts'
+
 export const FEDERATED_SECTIONS = [
   'graphql',
   'database/extensions/wrappers',
@@ -22,16 +19,18 @@ const PARTIALS_PREFIX = 'apps/docs/content/_partials/'
 const DOCS_GUIDES_URL_PREFIX = '/docs/guides/'
 const DOCS_TROUBLESHOOTING_URL_PREFIX = '/docs/guides/troubleshooting/'
 const FEDERATED_CONTENT_SOURCES_DIR = 'apps/docs/scripts/federated-content/sources'
+export const GUIDE_LIST_COMPONENT =
+  'apps/docs/components/Navigation/NavigationMenu/NavigationMenuGuideListItems.tsx'
+
+export const GUIDE_LIST_COMPONENT_PAGES = [
+  '/docs/guides/getting-started/api-keys',
+  '/docs/guides/getting-started/quickstarts/nextjs',
+  '/docs/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes',
+]
 
 const PARTIAL_PATH_RE = /<\$Partial\b[\s\S]*?\bpath\s*=\s*"([^"]+)"[\s\S]*?\/?>/g
 const SOURCE_SECTION_RE = /\bsection:\s*'([^']+)'/g
 
-/**
- * Compares FEDERATED_SECTIONS against the `section:` field declared in each
- * apps/docs/scripts/federated-content/sources/*.ts file, so a section added
- * or removed there can't silently drift from what this suite treats as
- * out-of-scope.
- */
 async function assertFederatedSectionsInSync(repoRoot: string): Promise<void> {
   const sourcesDir = join(repoRoot, FEDERATED_CONTENT_SOURCES_DIR)
   const sourceFiles = (await readdir(sourcesDir)).filter((file) => file.endsWith('.ts'))
@@ -70,21 +69,14 @@ async function assertFederatedSectionsInSync(repoRoot: string): Promise<void> {
 }
 
 export type ResolveDocsScopeOptions = {
-  /** Repo-root-relative changed file paths */
   changedFiles: string[]
-  /** Absolute path to the monorepo root */
   repoRoot: string
-  /** Max pages to test before the rest are truncated (default MAX_SCOPED_PAGES) */
   maxPages?: number
 }
 
 export type ResolveDocsScopeResult = {
   pages: string[]
   skip: boolean
-}
-
-function normalizeRepoPath(filePath: string): string {
-  return filePath.replaceAll('\\', '/')
 }
 
 function isFederatedGuideSlug(slug: string): boolean {
@@ -95,9 +87,6 @@ function isHiddenMdx(filePath: string): boolean {
   return basename(filePath).startsWith('_')
 }
 
-/**
- * Map a changed content file to a docs URL, or null if not a testable page.
- */
 export function changedFileToPagePath(filePath: string): string | null {
   const normalized = normalizeRepoPath(filePath)
 
@@ -129,8 +118,6 @@ function partialRelPathFromChangedFile(filePath: string): string | null {
 }
 
 function normalizePartialRef(pathAttr: string): string | null {
-  // $Partial paths are relative to content/_partials (see Partial.ts).
-  // Leading-slash example-code paths are not real partials.
   if (!pathAttr || pathAttr.startsWith('/') || pathAttr.startsWith('http')) {
     return null
   }
@@ -172,9 +159,7 @@ async function walkMdxFiles(dir: string): Promise<string[]> {
 }
 
 type PartialIndex = {
-  /** partial rel path → set of partial rel paths that include it */
   includedByPartials: Map<string, Set<string>>
-  /** page URL → set of direct partial rel paths */
   pagePartials: Map<string, Set<string>>
 }
 
@@ -225,10 +210,6 @@ async function buildPartialIndex(repoRoot: string): Promise<PartialIndex> {
   return { includedByPartials, pagePartials }
 }
 
-/**
- * Expand a changed partial to all partials that transitively include it
- * (including itself).
- */
 function expandPartialClosure(
   seed: string,
   includedByPartials: Map<string, Set<string>>
@@ -266,11 +247,6 @@ function pagesUsingPartials(
   return pages
 }
 
-/**
- * Resolve which docs pages to E2E-test from a list of changed repo files.
- * Truncates to maxPages (sorted) so a widely shared partial can't blow up
- * runtime; use resolveAllDocsPages / `pnpm e2e:docs:all` to cover everything.
- */
 export async function resolveDocsScope(
   options: ResolveDocsScopeOptions
 ): Promise<ResolveDocsScopeResult> {
@@ -278,9 +254,15 @@ export async function resolveDocsScope(
 
   const maxPages = options.maxPages ?? MAX_SCOPED_PAGES
   const pages = new Set<string>()
+  const requiredPages = new Set<string>()
   const changedPartials: string[] = []
 
   for (const file of options.changedFiles) {
+    if (normalizeRepoPath(file) === GUIDE_LIST_COMPONENT) {
+      for (const page of GUIDE_LIST_COMPONENT_PAGES) requiredPages.add(page)
+      continue
+    }
+
     const page = changedFileToPagePath(file)
     if (page) {
       pages.add(page)
@@ -303,7 +285,13 @@ export async function resolveDocsScope(
     }
   }
 
-  const sorted = [...pages].sort().slice(0, maxPages)
+  const selectedRequiredPages = [...requiredPages].sort().slice(0, maxPages)
+  const remainingSlots = Math.max(0, maxPages - selectedRequiredPages.length)
+  const selectedPages = [...pages]
+    .filter((page) => !requiredPages.has(page))
+    .sort()
+    .slice(0, remainingSlots)
+  const sorted = [...selectedRequiredPages, ...selectedPages].sort()
 
   return {
     pages: sorted,
@@ -311,11 +299,6 @@ export async function resolveDocsScope(
   }
 }
 
-/**
- * List every in-scope docs page — all guides (excluding federated sections)
- * and all troubleshooting entries — regardless of what changed. Used for
- * full-suite runs rather than the default changed-files scope.
- */
 export async function resolveAllDocsPages(repoRoot: string): Promise<string[]> {
   await assertFederatedSectionsInSync(repoRoot)
 
@@ -341,13 +324,4 @@ export async function resolveAllDocsPages(repoRoot: string): Promise<string[]> {
   }
 
   return [...pages].sort()
-}
-
-/** Parse changed-file list from stdin or newline/comma-separated string. */
-export function parseChangedFilesList(input: string): string[] {
-  return input
-    .split(/[\n,]/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => normalizeRepoPath(line.split(sep).join('/')))
 }

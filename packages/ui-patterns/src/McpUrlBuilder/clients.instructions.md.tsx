@@ -88,6 +88,28 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
       </>
     ),
   },
+  grok: {
+    primary: ({ url }) => (
+      <>
+        <paragraph>Add the Supabase MCP server to Grok:</paragraph>
+        <code lang="bash" value={MCP_CLI_COMMANDS['grok'].install!(url)} />
+      </>
+    ),
+    alternate: () => (
+      <>
+        <paragraph>
+          The command writes the server to your user config (
+          <inlineCode value="~/.grok/config.toml" />
+          ), making it available across all your projects. Start Grok and complete the Supabase
+          OAuth flow when prompted on first use.
+        </paragraph>
+        <paragraph>
+          Verify the connection by running <inlineCode value="/mcps" /> inside a Grok session, or{' '}
+          <inlineCode value="grok mcp doctor supabase" /> from your terminal.
+        </paragraph>
+      </>
+    ),
+  },
   kimi: {
     alternate: () => (
       <>
@@ -188,21 +210,6 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
       </>
     ),
   },
-  windsurf: {
-    primary: () => (
-      <blockquote data={{ callout: 'warning' }}>
-        <paragraph>
-          Ensure you are running Windsurf version <inlineCode value="0.1.37" /> or higher.
-        </paragraph>
-      </blockquote>
-    ),
-    alternate: () => (
-      <paragraph>
-        Windsurf does not currently support remote MCP servers over HTTP transport. You need to use
-        the mcp-remote package as a proxy.
-      </paragraph>
-    ),
-  },
   goose: {
     primary: ({ url }) => (
       <>
@@ -243,6 +250,76 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
         <code lang="bash" value={MCP_CLI_COMMANDS['opencode'].authenticate!} />
         <paragraph>
           This will open your browser to complete the OAuth authentication flow.
+        </paragraph>
+      </>
+    ),
+  },
+  fx: {
+    alternate: () => (
+      <>
+        <paragraph>
+          fx reads MCP servers only from this profile, so a file inside a repository cannot add one.
+          If a session is already open, apply the change with <inlineCode value="/mcp reload" />.
+        </paragraph>
+        <paragraph>
+          Then authenticate from the fx shell. This opens your browser to complete the OAuth flow:
+        </paragraph>
+        <code lang="bash" value={MCP_CLI_COMMANDS['fx'].authenticate!} />
+        <paragraph>
+          Confirm the server is connected with <inlineCode value="/mcp list" />.
+        </paragraph>
+        <paragraph>
+          For more details, see{' '}
+          <link url="https://fx.sh/docs/capabilities/mcp">MCP configuration</link> in fx.
+        </paragraph>
+      </>
+    ),
+  },
+  cursor: {
+    alternate: () => (
+      <>
+        <paragraph>
+          To make the server available across all projects, place the configuration in{' '}
+          <inlineCode value="~/.cursor/mcp.json" /> instead.
+        </paragraph>
+        <heading depth={5}>Using Cursor CLI</heading>
+        <paragraph>
+          Cursor IDE and the Cursor CLI (<inlineCode value="agent" />) use the same MCP
+          configuration. After you add the configuration above or install with the one-click button,
+          manage the server from your terminal using the{' '}
+          <link url="https://cursor.com/docs/cli/mcp">Cursor CLI</link>.
+        </paragraph>
+        <paragraph>Approve the server locally:</paragraph>
+        <code lang="bash" value="agent mcp enable supabase" />
+        <paragraph>Authenticate with Supabase:</paragraph>
+        <code lang="bash" value={MCP_CLI_COMMANDS['cursor'].authenticate!} />
+        <paragraph>Check the server connection status:</paragraph>
+        <code lang="bash" value="agent mcp list" />
+      </>
+    ),
+  },
+  omp: {
+    primary: () => (
+      <>
+        <paragraph>
+          Start <inlineCode value="omp" /> and add the Supabase MCP server with the guided setup:
+        </paragraph>
+        <code lang="bash" value="/mcp add" />
+      </>
+    ),
+    alternate: () => (
+      <>
+        <paragraph>
+          That path is project-scoped. To use the server in every project, add the same entry to{' '}
+          <inlineCode value="~/.omp/agent/mcp.json" /> instead.
+        </paragraph>
+        <paragraph>
+          If a session is already open, pick up the change with <inlineCode value="/mcp reload" />.
+          omp opens your browser to complete the Supabase OAuth flow the first time it connects.
+        </paragraph>
+        <paragraph>
+          Confirm the server is connected with <inlineCode value="/mcp list" />, or authorize again
+          with a different account using <inlineCode value="/mcp reauth supabase" />.
         </paragraph>
       </>
     ),

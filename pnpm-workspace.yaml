@@ -11,14 +11,14 @@ updateNotifier: false
 enableGlobalVirtualStore: false
 
 catalog:
-  '@monaco-editor/react': ^4.7.0
+  '@monaco-editor/react': 4.8.0-rc.3
   '@sentry/nextjs': ^10.59.0
   '@sentry/tanstackstart-react': ^10.59.0
-  '@supabase/auth-js': 2.110.9
-  '@supabase/postgrest-js': 2.110.9
-  '@supabase/realtime-js': 2.110.9
+  '@supabase/auth-js': 2.112.4
+  '@supabase/postgrest-js': 2.112.4
+  '@supabase/realtime-js': 2.112.4
   '@supabase/ssr': 0.10.2
-  '@supabase/supabase-js': 2.110.9
+  '@supabase/supabase-js': 2.112.4
   '@tanstack/react-router': ^1.169.2
   '@tanstack/react-start': ^1.167.65
   '@tanstack/react-table': ^8.21.3
@@ -32,8 +32,8 @@ catalog:
   # https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/
   '@typescript/native': npm:typescript@~7.0.2
   '@vitejs/plugin-react': ^6.0.1
-  '@vitest/coverage-v8': ^4.1.4
-  '@vitest/ui': ^4.1.4
+  '@vitest/coverage-v8': ^5.0.0
+  '@vitest/ui': ^5.0.0
   lodash: ^4.18.1
   lodash-es: ^4.18.1
   monaco-editor: 0.52.2
@@ -49,8 +49,8 @@ catalog:
   typescript: ~6.0.2
   valtio: ^2.3.2
   vite: ^8.0.16
-  vite-tsconfig-paths: ^6.1.1
-  vitest: ^4.1.4
+  velite: ^0.4.0
+  vitest: ^5.0.0
   zod: 3.25.76
 
 allowBuilds:
@@ -90,6 +90,8 @@ minimumReleaseAgeExclude:
   - mdast-jsx
   # The following are excluded to fix vulnerablities.
   - react-use
+  - '@astrojs/markdown-satteri@0.3.8'
+  - astro@7.2.6
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
@@ -114,7 +116,6 @@ overrides:
   postcss: 'catalog:'
   qs: ^6.15.2
   refractor>prismjs: ^1.30.0
-  supabase>tar: ^7.5.21
   tmp: ^0.2.7
   vite>esbuild: ^0.28.1
   webpack: ^5.104.1

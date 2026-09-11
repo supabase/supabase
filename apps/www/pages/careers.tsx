@@ -1,3 +1,4 @@
+import staticContent from '.generated/staticContent/_index.json'
 import { GlobeAltIcon } from '@heroicons/react/outline'
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -95,8 +96,13 @@ interface CareersPageProps {
   contributors: { login: string; avatar_url: string; html_url: string }[]
 }
 
-const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) => {
+const CareerPage = ({
+  jobs = {},
+  placeholderJob = null,
+  contributors = [],
+}: Partial<CareersPageProps>) => {
   const { basePath } = useRouter()
+  const { jobsCount } = staticContent
 
   const meta_title = 'Careers | Supabase'
   const meta_description = 'Help build software developers love'
@@ -137,8 +143,8 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
             <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
               Explore remote opportunities and join our team to help us achieve it.
             </p>
-            <Button asChild variant="primary" className="mt-4">
-              <Link href="#positions">Open positions</Link>
+            <Button asChild variant="primary" size="medium" className="mt-4">
+              <Link href="#positions">Open positions ({jobsCount})</Link>
             </Button>
           </SectionContainer>
         </header>
@@ -485,11 +491,11 @@ const JobItem = ({ job }: { job: JobItemProps }) => {
       <h4 className="text-base min-w-[240px] lg:min-w-[316px] grow sm:truncate mr-6">
         {job.title}
       </h4>
-      <div className="flex justify-between justify-[normal] pt-2 md:pt-0 lg:w-1/3 items-center">
-        <div className="flex items-center gap-4">
+      <div className="flex justify-between justify-[normal] pt-2 md:pt-0 items-center">
+        <div className="flex items-center gap-4 min-w-0">
           <Badge>
-            <GlobeAltIcon className="w-3 h-3" />
-            <span>{job.location}</span>
+            <GlobeAltIcon className="w-3 h-3 shrink-0" />
+            <span className="truncate">{job.location}</span>
           </Badge>
           <span className="hidden md:block">{job.employment}</span>
         </div>

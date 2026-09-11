@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { UpdateRolesPanel } from '@/components/interfaces/Organization/TeamSettings/UpdateRolesPanel/UpdateRolesPanel'
 import type { OrganizationMember } from '@/data/organizations/organization-members-query'
@@ -12,10 +12,10 @@ import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
-type OrganizationRoleResponse = components['schemas']['OrganizationRoleResponse']
-type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
-type ListEntitlementsResponse = components['schemas']['ListEntitlementsResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
+type OrganizationRoleResponse = components['schemas']['OrganizationRoleResponse_Output']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
+type ListEntitlementsResponse = components['schemas']['ListEntitlementsResponse_Output']
 type AccessControlPermission = components['schemas']['AccessControlPermission']
 
 const ORG_SLUG = 'test-org'
@@ -83,6 +83,7 @@ const buildPermission = (resource: string): AccessControlPermission => ({
 
 const MEMBER: OrganizationMember = {
   gotrue_id: 'gotrue-member',
+  avatar_url: null,
   is_sso_user: false,
   metadata: {},
   mfa_enabled: false,
@@ -143,10 +144,6 @@ function setupMocks() {
 }
 
 describe('UpdateRolesPanel (network)', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   test('shows each role with its permission description and a roles docs link', async () => {
     setupMocks()
     customRender(<UpdateRolesPanel visible member={MEMBER} onClose={vi.fn()} />, {

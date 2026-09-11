@@ -1,10 +1,14 @@
 'use client'
 
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { useIsLoggedIn } from 'common'
 import Link from 'next/link'
 import { Button } from 'ui'
 
+import { getDashboardCtaHref } from '@/lib/dashboard-links'
+
 export function CTASection() {
+  const isLoggedIn = useIsLoggedIn()
   const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
@@ -15,9 +19,9 @@ export function CTASection() {
           <span className="text-foreground block sm:inline"> scale to millions</span>
         </h2>
         <div className="flex items-center gap-2">
-          <Button asChild size="medium">
+          <Button variant="primary" asChild size="medium">
             <Link
-              href="https://supabase.com/dashboard"
+              href={getDashboardCtaHref(isLoggedIn)}
               onClick={() =>
                 sendTelemetryEvent({
                   action: 'start_project_button_clicked',
@@ -28,7 +32,7 @@ export function CTASection() {
               Start your project
             </Link>
           </Button>
-          <Button asChild size="medium" variant="default">
+          <Button asChild size="medium">
             <Link
               href="/contact/sales"
               onClick={() =>

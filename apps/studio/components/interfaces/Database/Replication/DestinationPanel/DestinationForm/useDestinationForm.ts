@@ -12,13 +12,11 @@ import {
   buildDestinationConfigForValidation,
   buildTableSyncCopyConfig,
 } from './DestinationForm.utils'
-import {
-  useCreateDestinationPipelineMutation,
-  type BatchConfig,
-} from '@/data/replication/create-destination-pipeline-mutation'
+import { useCreateDestinationPipelineMutation } from '@/data/replication/create-destination-pipeline-mutation'
 import type { ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
+import { type BatchConfig } from '@/data/replication/types'
 import { useUpdateDestinationPipelineMutation } from '@/data/replication/update-destination-pipeline-mutation'
 import {
   useValidateDestinationMutation,
@@ -85,7 +83,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
   // Helper function to handle namespace creation if needed
   const resolveNamespace = async (data: z.infer<typeof FormSchema>) => {
     if (data.namespace === CREATE_NEW_NAMESPACE) {
-      if (!data.newNamespaceName) throw new Error('New namespace name is required')
+      if (!data.newNamespaceName) throw new Error('New namespace name is required.')
 
       await createNamespace({
         projectRef,
@@ -224,7 +222,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
         resolveNamespace,
       })
 
-      if (!destinationConfig) throw new Error('Destination configuration is missing')
+      if (!destinationConfig) throw new Error('Destination configuration is missing.')
 
       const shouldSendBatch =
         !editMode || data.maxFillMs !== (existingBatch?.max_fill_ms ?? DEFAULT_MAX_FILL_MS)

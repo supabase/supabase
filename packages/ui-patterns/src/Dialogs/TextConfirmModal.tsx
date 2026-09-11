@@ -14,6 +14,7 @@ import {
   copyToClipboard,
   Dialog,
   DialogContent,
+  DialogHeader,
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
@@ -26,7 +27,6 @@ import {
   FormMessage,
   Input,
 } from 'ui'
-import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
 
 import { Admonition } from '../Admonition'
@@ -184,7 +184,6 @@ export const TextConfirmModal = forwardRef<
                       Type{' '}
                       {enableCopy ? (
                         <Button
-                          variant="default"
                           className="h-[23px] px-1.5 py-0 border-muted text-sm whitespace-pre break-all"
                           iconRight={
                             showCopied ? <Check strokeWidth={2} className="text-brand" /> : <Copy />
@@ -218,13 +217,7 @@ export const TextConfirmModal = forwardRef<
               />
               <div className="flex gap-2">
                 {!blockDeleteButton && (
-                  <Button
-                    size="medium"
-                    block
-                    variant="default"
-                    disabled={loading}
-                    onClick={onCancel}
-                  >
+                  <Button size="medium" block disabled={loading} onClick={onCancel}>
                     {cancelLabel}
                   </Button>
                 )}

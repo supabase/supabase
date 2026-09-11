@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { sslEnforcementKeys } from './keys'
 import { handleError, put } from '@/data/fetchers'
+import { jitDbAccessKeys } from '@/data/jit-db-access/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type SSLEnforcementUpdateVariables = {
@@ -48,6 +49,9 @@ export const useSSLEnforcementUpdateMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await queryClient.invalidateQueries({ queryKey: sslEnforcementKeys.list(projectRef) })
+      // JIT DB access can report `unavailableReason: 'ssl_enforcement_required'`,
+      // so its status needs to be refetched whenever SSL enforcement changes.
+      await queryClient.invalidateQueries({ queryKey: jitDbAccessKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

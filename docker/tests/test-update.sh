@@ -339,6 +339,40 @@ assert_file_missing_pattern ".env" "NEW_KEY"                   "malformed manife
 assert_path_absent   "backups"                                 "malformed manifest: no backup taken"
 assert_file_contains ".supabase-version" "ref=self-hosted/v0.9.0" "malformed manifest: stamp not advanced"
 
+echo ""
+echo "=== update.sh: never overwrites the running script; stages the target's copy as .dist ==="
+
+# A dedicated upstream whose docker/ ships an update.sh that DIFFERS from the one
+# we run, so the merge must divert it to update.sh.dist rather than rewrite the
+# live script mid-run (which would corrupt this process).
+SELFSRC="$WORK/selfsrc"
+mkdir -p "$SELFSRC/docker"
+cd "$SELFSRC"
+git init -q
+git config user.email t@t.t
+git config user.name t
+printf 'services:\n  db:\n    image: x\n' > docker/docker-compose.yml
+printf 'KEEP=1\n' > docker/.env.example
+cp "$DOCKER_DIR/.gitignore" docker/.gitignore
+printf '#!/bin/sh\necho THIS-IS-THE-NEW-UPDATE-SH\n' > docker/update.sh
+git add -A && git commit -qm self && git tag self-hosted/v2.0.0
+
+SELFDEP="$WORK/selfdep"
+mkdir -p "$SELFDEP"
+printf 'services:\n  db:\n    image: x\n' > "$SELFDEP/docker-compose.yml"
+printf 'KEEP=1\n' > "$SELFDEP/.env"
+cp "$UPDATE_SH" "$SELFDEP/update.sh"   # the running script = the real update.sh
+printf 'ref=self-hosted/v2.0.0\n' > "$SELFDEP/.supabase-version"
+cd "$SELFDEP"
+rc=0
+SUPABASE_REPO_URL="$SELFSRC" sh ./update.sh --to self-hosted/v2.0.0 --yes > "$WORK/self.log" 2>&1 || rc=$?
+if [ "$rc" = "0" ]; then ok "self-update run exits 0"; else bad "expected exit 0, got $rc"; fi
+if cmp -s ./update.sh "$UPDATE_SH"; then ok "running update.sh left byte-identical"; else bad "running update.sh was modified in place"; fi
+assert_no_line "./update.sh" '^(<<<<<<<|=======|>>>>>>>)'      "no conflict markers written into the running update.sh"
+assert_path_exists "$SELFDEP/update.sh.dist"                   "target's update.sh staged as update.sh.dist"
+assert_file_contains "$SELFDEP/update.sh.dist" "THIS-IS-THE-NEW-UPDATE-SH" "update.sh.dist holds the target's version"
+assert_file_contains "$WORK/self.log" "update.sh.dist"         "summary points the user at update.sh.dist"
+
 # --- summary -----------------------------------------------------------------
 
 echo ""

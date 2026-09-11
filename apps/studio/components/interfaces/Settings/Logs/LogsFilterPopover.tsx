@@ -1,8 +1,5 @@
-import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
-import { Label } from '@ui/components/shadcn/ui/label'
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import { useEffect, useMemo, useState } from 'react'
-import { Button, cn } from 'ui'
+import { Button, Checkbox, cn, Label, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
 import type { Filters, FilterSet } from './Logs.types'
 
@@ -110,7 +107,7 @@ const LogsFilterPopover = ({
           ))}
 
           <div className="flex items-center justify-end gap-2 border-t border-default p-2">
-            <Button size="tiny" variant="default" onClick={handleReset} type="button">
+            <Button size="tiny" onClick={handleReset} type="button">
               Clear
             </Button>
             <Button loading={isLoading} variant="primary" type="submit">

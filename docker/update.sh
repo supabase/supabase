@@ -70,6 +70,7 @@ cd "$(dirname "$0")"
 
 REPO_URL="${SUPABASE_REPO_URL:-https://github.com/supabase/supabase}"
 STAMP_FILE=".supabase-version"
+SELF_NAME=$(basename "$0")
 DRY_RUN=0
 ASSUME_YES=0
 TO_REF=""
@@ -177,7 +178,7 @@ fetch_snapshot() {
     _dest="$2"
     _work=$(mktemp -d "$TMP_ROOT/fetch.XXXXXX")
     if _sparse_init "$_work" \
-        && git -C "$_work" fetch --depth=1 -q origin "$_ref" 2>/dev/null \
+        && git -C "$_work" fetch --depth=1 --filter=blob:none -q origin "$_ref" 2>/dev/null \
         && git -C "$_work" checkout -q FETCH_HEAD 2>/dev/null \
         && [ -d "$_work/docker" ]; then
         mkdir -p "$_dest"
@@ -311,9 +312,8 @@ $(grep -E '^[A-Za-z_][A-Za-z0-9_]*=' "$TARGET_DIR/.env.example" | cut -d= -f1)
 EOF
     fi
     echo ""
-    warn "This is NOT the full update. To see what would actually change (updated files,"
-    warn "conflicts, breaking-change gate), record a base version - see the guidance above -"
-    warn "then re-run. Nothing was written."
+    warn "This is NOT the full update. To see what would actually change, record a base version."
+    warn "See the guidance above and re-run the script. Nothing was written."
 }
 
 # --- breaking-change gate (manifest-driven, before any writes) ---------------
@@ -333,9 +333,9 @@ build_gate_report() {
     fi
 
     if [ -z "$BASE_VER" ] || [ -z "$TARGET_VER" ]; then
-        warn "Base or target is not a self-hosted/vX.Y.Z tag; cannot compute an exact"
-        warn "update window. Showing all applicable manual-action releases - review"
-        warn "which ones apply to your deployment."
+        warn "Base or target is not a self-hosted/vX.Y.Z tag; cannot compute an exact update window."
+        warn "Showing all applicable manual-action releases."
+        warn "Review which ones apply to your deployment."
     fi
 
     for k in $(jq -r 'keys[]' "$_manifest" 2>/dev/null); do
@@ -469,6 +469,19 @@ merge_one_file() {
     fi
 }
 
+# The running script is a vendor file too, but overwriting it in place would
+# corrupt this process (the shell reads $0 as it runs). Never write it directly:
+# if the target ships a different version, stage it as <name>.dist to review.
+stage_self_update() {
+    _t="$TARGET_DIR/$SELF_NAME"
+    if [ ! -f "$_t" ] || cmp -s "$SELF_NAME" "$_t"; then
+        record "unchanged" "$SELF_NAME"
+        return 0
+    fi
+    [ "$DRY_RUN" = "1" ] || cp -f "$_t" "$SELF_NAME.dist"
+    record "self-staged" "$SELF_NAME"
+}
+
 merge_vendor_files() {
     _empty="$TMP_ROOT/empty"
     : > "$_empty"
@@ -477,6 +490,10 @@ merge_vendor_files() {
     while IFS= read -r f; do
         [ -n "$f" ] || continue
         is_excluded "$f" && continue
+        if [ "$f" = "$SELF_NAME" ]; then
+            stage_self_update
+            continue
+        fi
         merge_one_file "$f" "$_empty"
     done <<EOF
 $( { list_files "$BASE_DIR"; list_files "$TARGET_DIR"; } | sort -u )
@@ -556,6 +573,15 @@ print_summary() {
         log "Removed upstream but kept in place (you may no longer need these):"
         list_status removed-upstream
     fi
+    if [ "$(count_status self-staged)" != "0" ]; then
+        echo ""
+        if [ "$DRY_RUN" = "1" ]; then
+            log "$SELF_NAME differs from the version in '$TARGET_REF'; a real run would stage that version as $SELF_NAME.dist (the running script is never overwritten in place)."
+        else
+            log "$SELF_NAME differs from the version in '$TARGET_REF', staged as $SELF_NAME.dist (the running script was not modified)."
+            log "Review it, then swap it in if needed: mv $SELF_NAME.dist $SELF_NAME"
+        fi
+    fi
     if [ -s "$ENV_ADDED" ]; then
         echo ""
         log ".env keys added (review values):"
@@ -586,7 +612,7 @@ write_stamp() {
 print_next_steps() {
     echo ""
     log "Next steps:"
-    echo "  1. Review the changes (git diff, or compare against the backup in backups/)."
+    echo "  1. Review the changes above (compare against the latest backup in backups/ if needed)."
     echo "  2. sh run.sh pull"
     echo "  3. sh run.sh recreate"
 }

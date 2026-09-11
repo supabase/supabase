@@ -20,6 +20,11 @@ export interface AddendumSummary {
   versions: VersionSummary[]
 }
 
+// Slugs whose display title cannot be derived by capitalizing the slug words.
+const TITLE_OVERRIDES: Record<string, string> = {
+  'oauth-partner-addendum': 'Open Authorization Integration Addendum',
+}
+
 function slugToTitle(slug: string) {
   return slug
     .split('-')
@@ -58,7 +63,7 @@ export function getAddendaList(): AddendumSummary[] {
 
     return {
       slug,
-      title: slugToTitle(slug),
+      title: TITLE_OVERRIDES[slug] ?? slugToTitle(slug),
       href: baseHref,
       versions,
     }

@@ -18,7 +18,6 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { type QuerySource } from '../querySource'
 import { ROWS_PER_PAGE_OPTIONS } from '../SQLEditor.constants'
 import { AutosaveStatus } from './AutosaveStatus'
 import { QuerySourceMenu } from './QuerySourceMenu/QuerySourceMenu'
@@ -27,17 +26,21 @@ import { SqlSaveButton } from './SaveButton'
 import SavingIndicator from './SavingIndicator'
 import { useIsSqlEditorManualSaveEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export type UtilityActionsProps = {
   id: string
-  runSource: QuerySource
+  runSource: QuerySourceBinding
   isExecuting?: boolean
   isDisabled?: boolean
   hasSelection?: boolean
@@ -60,11 +63,12 @@ export const UtilityActions = ({
   const snapV2 = useSqlEditorV2StateSnapshot()
   const sessionSnap = useSqlEditorSessionSnapshot()
   const isManualSaveEnabled = useIsSqlEditorManualSaveEnabled()
+  const { saveFavorite } = useSqlEditorSaveCoordinator()
 
   const isLogsSourceEnabled = useFlag('sqlEditorLogsSource')
   const isOtelLogsEnabled = useFlag('otelLegacyLogs')
 
-  const isLogs = runSource.type === 'logs'
+  const isLogs = runSource._tag === 'logs'
   const canCreateLogsSnippet = isLogsSourceEnabled && isOtelLogsEnabled
   const canShowSourceIndicator = isLogs || canCreateLogsSnippet
   const isLogsRunBlocked = isLogs && !isOtelLogsEnabled
@@ -93,10 +97,6 @@ export const UtilityActions = ({
     )
   }
 
-  const addFavorite = () => snapV2.addFavorite(id)
-
-  const removeFavorite = () => snapV2.removeFavorite(id)
-
   const onSelectDatabase = (databaseId: string) => {
     sessionSnap.resetResult(id)
     setLastSelectedDb(databaseId)
@@ -116,7 +116,6 @@ export const UtilityActions = ({
               <Button
                 aria-label="More actions"
                 data-testid="sql-editor-utility-actions"
-                variant="default"
                 className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
                 icon={<MoreVertical className="text-foreground-light" />}
               />
@@ -135,13 +134,7 @@ export const UtilityActions = ({
           {IS_PLATFORM && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="gap-x-2"
-                onClick={() => {
-                  if (isFavorite) removeFavorite()
-                  else addFavorite()
-                }}
-              >
+              <DropdownMenuItem className="gap-x-2" onClick={() => saveFavorite(id, !isFavorite)}>
                 <Heart
                   size={14}
                   strokeWidth={2}
@@ -153,13 +146,23 @@ export const UtilityActions = ({
               </DropdownMenuItem>
             </>
           )}
-          <DropdownMenuItem className="justify-between" onClick={prettifyQuery} disabled={isLogs}>
+          <DropdownMenuItemTooltip
+            className="justify-between"
+            onClick={prettifyQuery}
+            disabled={isLogs}
+            tooltip={{
+              content: {
+                side: 'left',
+                text: isLogs ? 'Can only prettify database queries' : undefined,
+              },
+            }}
+          >
             <span className="flex items-center gap-x-2">
               <AlignLeft size={14} strokeWidth={2} className="text-foreground-light" />
               Prettify SQL
             </span>
             {formatKeys && <KeyboardShortcut keys={formatKeys} />}
-          </DropdownMenuItem>
+          </DropdownMenuItemTooltip>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -193,7 +196,7 @@ export const UtilityActions = ({
                 <Button
                   variant="text"
                   size="tiny"
-                  onClick={removeFavorite}
+                  onClick={() => saveFavorite(id, false)}
                   className="px-1"
                   icon={<Heart className="fill-brand stroke-none" />}
                   aria-label="Remove from favorites"
@@ -202,7 +205,7 @@ export const UtilityActions = ({
                 <Button
                   variant="text"
                   size="tiny"
-                  onClick={addFavorite}
+                  onClick={() => saveFavorite(id, true)}
                   className="px-1"
                   icon={<Heart className="fill-none stroke-foreground-light" />}
                   aria-label="Add to favorites"
@@ -215,24 +218,28 @@ export const UtilityActions = ({
           </Tooltip>
         )}
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="text"
-              onClick={prettifyQuery}
-              disabled={isLogs}
-              className="px-1"
-              icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}
-              aria-label="Prettify SQL"
-            />
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="p-1 pl-2.5">
-            <div className="flex items-center gap-2.5">
-              <span>Prettify SQL</span>
-              {formatKeys && <KeyboardShortcut keys={formatKeys} />}
-            </div>
-          </TooltipContent>
-        </Tooltip>
+        <ButtonTooltip
+          variant="text"
+          onClick={prettifyQuery}
+          disabled={isLogs}
+          className="px-1"
+          icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}
+          aria-label="Prettify SQL"
+          tooltip={{
+            content: {
+              side: 'bottom',
+              className: isLogs ? undefined : 'p-1 pl-2.5',
+              text: isLogs ? (
+                'Can only prettify database queries'
+              ) : (
+                <div className="flex items-center gap-2.5">
+                  <span>Prettify SQL</span>
+                  {formatKeys && <KeyboardShortcut keys={formatKeys} />}
+                </div>
+              ),
+            },
+          }}
+        />
       </div>
 
       <div className="flex items-center gap-x-2">
@@ -261,10 +268,7 @@ export const UtilityActions = ({
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="default"
-                  iconRight={<ChevronDown size={14} className="text-foreground-light" />}
-                >
+                <Button iconRight={<ChevronDown size={14} className="text-foreground-light" />}>
                   <span className="text-foreground-light">Limit</span>{' '}
                   {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === sessionSnap.limit)?.label}
                 </Button>

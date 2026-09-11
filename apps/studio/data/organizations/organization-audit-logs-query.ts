@@ -29,6 +29,10 @@ export type AuditLog = {
     app_id?: string
     app_name?: string
     ip?: string
+    partner?: string
+    partner_installation_id?: string
+    partner_user_email?: string
+    partner_user_id?: string
   }
   timestamp: number
 }

@@ -150,11 +150,9 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       {isPipelineSuccess && (
         <TableRow>
           <TableCell>
-            <DestinationIcon
-              type={type ?? 'Read Replica'}
-              size={18}
-              className="text-foreground-light"
-            />
+            {type ? (
+              <DestinationIcon type={type} size={18} className="text-foreground-light" />
+            ) : null}
           </TableCell>
 
           <TableCell className="max-w-[180px]">
@@ -224,7 +222,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                   </TooltipContent>
                 </Tooltip>
               )}
-              <Button asChild variant="default" className="relative">
+              <Button asChild className="relative">
                 <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
                   View pipeline
                 </Link>

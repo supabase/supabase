@@ -57,7 +57,10 @@ export const BillingCustomerData = () => {
     isSuccess,
   } = useOrganizationCustomerProfileQuery(
     { slug },
-    { enabled: canReadBillingCustomerData && inView }
+    {
+      enabled: canReadBillingCustomerData && inView,
+      select: (data) => (data ? { address: data.address, billing_name: data.billing_name } : data),
+    }
   )
 
   const {
@@ -236,11 +239,7 @@ export const BillingCustomerData = () => {
                           </span>
                         )}
                         <div className="flex items-center gap-2">
-                          <Button
-                            variant="default"
-                            onClick={handleReset}
-                            disabled={isSubmitDisabled}
-                          >
+                          <Button onClick={handleReset} disabled={isSubmitDisabled}>
                             Cancel
                           </Button>
                           <Button

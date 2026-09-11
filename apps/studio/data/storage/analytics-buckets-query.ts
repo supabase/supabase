@@ -9,7 +9,7 @@ import { PROJECT_STATUS } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type AnalyticsBucketsVariables = { projectRef?: string }
-export type AnalyticsBucket = components['schemas']['StorageAnalyticsBucketResponse']
+export type AnalyticsBucket = components['schemas']['StorageAnalyticsBucketResponse_Output']
 export type AnalyticsBuckets = components['schemas'][]
 
 export async function getAnalyticsBuckets(

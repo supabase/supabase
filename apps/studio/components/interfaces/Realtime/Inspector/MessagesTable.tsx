@@ -41,11 +41,7 @@ const NoResultAlert = ({
     'service_api_keys'
   )
 
-  const broadcastButton = (
-    <Button variant="default" onClick={showSendMessage}>
-      Broadcast a message
-    </Button>
-  )
+  const broadcastButton = <Button onClick={showSendMessage}>Broadcast a message</Button>
 
   return (
     <div className="w-full max-w-md flex items-center flex-col">
@@ -90,9 +86,7 @@ const NoResultAlert = ({
                 </p>
               </div>
               <Link href={`/project/${ref}/realtime/inspector`} target="_blank" rel="noreferrer">
-                <Button variant="default" iconRight={<ExternalLink />}>
-                  Open inspector
-                </Button>
+                <Button iconRight={<ExternalLink />}>Open inspector</Button>
               </Link>
             </div>
 
@@ -106,9 +100,7 @@ const NoResultAlert = ({
                 <p className="text-foreground-lighter text-xs">Tables must have realtime enabled</p>
               </div>
               <Link href={`/project/${ref}/database/publications`} target="_blank" rel="noreferrer">
-                <Button variant="default" iconRight={<ExternalLink />}>
-                  Publications settings
-                </Button>
+                <Button iconRight={<ExternalLink />}>Publications settings</Button>
               </Link>
             </div>
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex rounded-b-md bg-studio">
@@ -164,31 +156,32 @@ const MessagesTable = ({
           )}
         >
           <div className="flex grow flex-col lg:w-1/2">
-            {enabled && (
-              <div className="w-full h-9 px-4 bg-surface-100 items-center inline-flex justify-between text-foreground-light">
-                <div className="inline-flex gap-2.5 text-xs">
-                  <Loader2 size="16" className="animate-spin" />
-                  <div>Listening</div>
-                  <div>•</div>
-                  <div>
-                    {data.length > 0
-                      ? data.length >= 100
-                        ? `Found a large number of messages, showing only the latest 100...`
-                        : `Found ${data.length} messages...`
-                      : `No message found yet...`}
+            {/* Persistent role="status" live region so screen readers announce when
+            listening starts — a live region only announces updates to content it
+            already contains. */}
+            <div role="status">
+              {enabled && (
+                <div className="w-full h-9 px-4 bg-surface-100 items-center inline-flex justify-between text-foreground-light">
+                  <div className="inline-flex gap-2.5 text-xs">
+                    <Loader2 size="16" aria-hidden="true" className="animate-spin" />
+                    <div>Listening</div>
+                    <div aria-hidden="true">•</div>
+                    <div>
+                      {data.length > 0
+                        ? data.length >= 100
+                          ? `Found a large number of messages, showing only the latest 100...`
+                          : `Found ${data.length} messages...`
+                        : `No message found yet...`}
+                    </div>
                   </div>
+                  <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_BROADCAST} side="bottom">
+                    <Button onClick={showSendMessage} icon={<Megaphone strokeWidth={1.5} />}>
+                      <span>Broadcast a message</span>
+                    </Button>
+                  </ShortcutTooltip>
                 </div>
-                <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_BROADCAST} side="bottom">
-                  <Button
-                    variant="default"
-                    onClick={showSendMessage}
-                    icon={<Megaphone strokeWidth={1.5} />}
-                  >
-                    <span>Broadcast a message</span>
-                  </Button>
-                </ShortcutTooltip>
-              </div>
-            )}
+              )}
+            </div>
 
             <DataGrid
               className="data-grid--simple-logs h-full border-t-0! border-b-0!"

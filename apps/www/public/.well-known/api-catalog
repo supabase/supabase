@@ -1,6 +1,17 @@
 {
   "linkset": [
     {
+      "anchor": "https://supabase.com/.well-known/api-catalog",
+      "item": [
+        {
+          "href": "https://api.supabase.com/v1"
+        },
+        {
+          "href": "https://mcp.supabase.com/mcp"
+        }
+      ]
+    },
+    {
       "anchor": "https://api.supabase.com/v1",
       "service-desc": [
         {
@@ -16,6 +27,20 @@
       "status": [
         {
           "href": "https://status.supabase.com"
+        }
+      ]
+    },
+    {
+      "anchor": "https://mcp.supabase.com/mcp",
+      "service-doc": [
+        {
+          "href": "https://supabase.com/docs/guides/ai-tools/mcp"
+        }
+      ],
+      "service-meta": [
+        {
+          "href": "https://mcp.supabase.com/.well-known/oauth-protected-resource/mcp",
+          "type": "application/json"
         }
       ]
     }

@@ -283,7 +283,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
         )}
 
         <DialogFooter className="px-5 py-4">
-          <Button block size="large" variant="default" onClick={() => setIsDialogOpen(false)}>
+          <Button block size="large" onClick={() => setIsDialogOpen(false)}>
             Cancel
           </Button>
           <Button

@@ -1,7 +1,6 @@
 import { useParams } from 'common'
 import { Check, ChevronDown, Plus, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { HTMLAttributes } from 'react'
 import {
   Badge,
@@ -20,6 +19,7 @@ import {
 } from 'ui'
 
 import { Project, type ForeignProject, type ProjectLinkerProps } from './VercelGithub.types'
+import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -71,7 +71,6 @@ export const ForeignProjectSelector = ({
     <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
         <Button
-          variant="default"
           block
           disabled={loadingForeignProjects}
           loading={loadingForeignProjects}
@@ -161,7 +160,6 @@ export const SupabaseProjectSelector = ({
   setOpen: (val: boolean) => void
   setSelectedSupabaseProject: (project: Project) => void
 } & Pick<ProjectLinkerProps, 'slug' | 'variant' | 'defaultSupabaseProject'>) => {
-  const router = useRouter()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
@@ -196,7 +194,6 @@ export const SupabaseProjectSelector = ({
       renderTrigger={() => {
         return (
           <Button
-            variant="default"
             block
             disabled={defaultSupabaseProject !== undefined || loadingSupabaseProjects}
             loading={loadingSupabaseProjects}
@@ -226,23 +223,14 @@ export const SupabaseProjectSelector = ({
         return (
           projectCreationEnabled && (
             <CommandGroup>
-              <CommandItem
-                className="cursor-pointer w-full"
-                onSelect={() => {
-                  setOpen(false)
-                  router.push(`/new/${selectedOrganization?.slug}`)
-                }}
-                onClick={() => setOpen(false)}
+              <CommandItemLink
+                href={`/new/${selectedOrganization?.slug}`}
+                className="cursor-pointer w-full gap-2"
+                onSelect={() => setOpen(false)}
               >
-                <Link
-                  href={`/new/${selectedOrganization?.slug}`}
-                  className="w-full flex items-center gap-2"
-                  onClick={() => setOpen(false)}
-                >
-                  <Plus size={14} strokeWidth={1.5} />
-                  <p>Create a new project</p>
-                </Link>
-              </CommandItem>
+                <Plus size={14} strokeWidth={1.5} />
+                <p>Create a new project</p>
+              </CommandItemLink>
             </CommandGroup>
           )
         )
