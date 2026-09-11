@@ -288,6 +288,11 @@ describe('generate-sitemap rejects dates it cannot trust', () => {
       files: { 'public/changelog-rss.xml': rss([rssItem(LEGACY_LINK, 'Invalid Date +0000')]) },
       stderrIncludes: [`changelog-rss ${LEGACY_LINK}`, '"Invalid Date +0000"'],
     },
+    {
+      name: 'an unparseable changelog pubDate on a text-slug entry',
+      files: { 'public/changelog-rss.xml': rss([rssItem(TEXT_SLUG_LINK, 'Invalid Date +0000')]) },
+      stderrIncludes: [`changelog-rss ${TEXT_SLUG_LINK}`, '"Invalid Date +0000"'],
+    },
   ]
 
   for (const testCase of cases) {
