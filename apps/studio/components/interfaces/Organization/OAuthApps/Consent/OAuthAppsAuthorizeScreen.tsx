@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { AuthorizeSuccessScreen } from './AuthorizeSuccessScreen'
 import { AuthorizingAsCard } from './AuthorizingAsCard'
 import { NoProjectsNotice } from './NoProjectsNotice'
-import { EMPTY_ORG_MOCK_SLUG, getMockScenarioId } from './OAuthAppsAuthorizeScreen.utils'
-import { ProjectMultiSelect } from './ProjectMultiSelect'
+import { CONSENT_COPY } from './OAuthAppsAuthorizeScreen.utils'
+import { MAX_SELECTED_PROJECTS, ProjectMultiSelect } from './ProjectMultiSelect'
 import { ScopeGroupCard } from './ScopeGroupCard'
 import {
   DestinationLogo,
@@ -18,56 +18,80 @@ import { useOAuthAppsAuthorizeApproveMutation } from '@/data/oauth-apps/oauth-ap
 import { useOAuthAppsAuthorizeDenyMutation } from '@/data/oauth-apps/oauth-apps-authorize-deny-mutation'
 import { useOAuthAppsAuthorizeOrganizationProjectsQuery } from '@/data/oauth-apps/oauth-apps-authorize-organization-projects-query'
 import { useOAuthAppsAuthorizeOrganizationsQuery } from '@/data/oauth-apps/oauth-apps-authorize-organizations-query'
-import { useOAuthAppsAuthorizeRequestQuery } from '@/data/oauth-apps/oauth-apps-authorize-request-query'
+import type { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/oauth-apps-authorize-request-query'
 import type {
   OAuthAppsAuthorizeRedirect,
   OAuthAppsAuthorizeRoleValidationFailure,
+  OAuthGrantProjectScope,
 } from '@/data/oauth-apps/types'
-import { getFailedProjects, isRoleValidationFailure } from '@/data/oauth-apps/types'
+import {
+  getFailedProjects,
+  getOAuthConsentModel,
+  getScopedProjectRefs,
+  isAllProjectsScope,
+  isRoleValidationFailure,
+} from '@/data/oauth-apps/types'
 import { useSignOut } from '@/lib/auth'
 
 export interface OAuthAppsAuthorizeScreenProps {
-  authId?: string
+  authId: string
+  request: OAuthAppsAuthorizeRequest
   organizationSlug?: string
-  mockState?: string
   navigate: (destination: string) => void
 }
 
 export const OAuthAppsAuthorizeScreen = ({
+  authId,
+  request,
   organizationSlug,
-  mockState,
   navigate,
 }: OAuthAppsAuthorizeScreenProps) => {
-  const scenarioId = getMockScenarioId(mockState)
+  const model = getOAuthConsentModel(request.grant_config)
+  const grantKind = model.grant_kind
+  const projectSelection = model.project_selection
+  const showProjectPicker = projectSelection !== 'off'
+  const allowAllProjects = projectSelection === 'optional'
+  const isDynamicClient = request.grant_config.is_dynamic_client
 
-  const { data: request } = useOAuthAppsAuthorizeRequestQuery({ id: scenarioId })
-  const { data: identity } = useOAuthAppsAuthorizeOrganizationsQuery({ id: scenarioId })
+  const { data: identity } = useOAuthAppsAuthorizeOrganizationsQuery({ id: authId })
 
-  const selectedOrgSlug =
-    organizationSlug ?? (mockState === 'empty_org' ? EMPTY_ORG_MOCK_SLUG : undefined)
   const [selectedProjectRefs, setSelectedProjectRefs] = useState<string[]>([])
+  const [allProjectsSelected, setAllProjectsSelected] = useState(false)
   const [approveRedirect, setApproveRedirect] = useState<OAuthAppsAuthorizeRedirect | null>(null)
   const [roleFailure, setRoleFailure] = useState<OAuthAppsAuthorizeRoleValidationFailure | null>(
     null
   )
 
-  const orgSlug = selectedOrgSlug ?? identity?.organizations[0]?.slug
+  const orgSlug = organizationSlug ?? identity?.organizations[0]?.slug
   const memberOrg = identity?.organizations.find((org) => org.slug === orgSlug)
 
   const { data: projects } = useOAuthAppsAuthorizeOrganizationProjectsQuery({
-    id: scenarioId,
+    id: authId,
     slug: orgSlug,
   })
+
+  const seededFromExistingGrant = useRef(false)
+  useEffect(() => {
+    const grant = request.existing_grant
+    if (seededFromExistingGrant.current || !grant || !projects) return
+    seededFromExistingGrant.current = true
+
+    if (isAllProjectsScope(grant.project_scope)) {
+      if (allowAllProjects) setAllProjectsSelected(true)
+      return
+    }
+
+    const liveRefs = getScopedProjectRefs(grant.project_scope).filter((ref) =>
+      projects.some((project) => project.ref === ref)
+    )
+    if (liveRefs.length > 0) setSelectedProjectRefs(liveRefs.slice(0, MAX_SELECTED_PROJECTS))
+  }, [request.existing_grant, projects, allowAllProjects])
 
   const signOut = useSignOut()
 
   const approveMutation = useOAuthAppsAuthorizeApproveMutation({
     onSuccess: (data) => {
       if (isRoleValidationFailure(data)) {
-        // Only the per-project branch has a treatment on this screen. An organization-level
-        // result comes from the upfront org-role check, which has no endpoint or mock fetcher
-        // yet, so it reaches here with nothing to highlight and renders no failure state. That
-        // branch gets its own UI alongside the endpoint that can actually produce it.
         setRoleFailure(data)
         return
       }
@@ -84,25 +108,15 @@ export const OAuthAppsAuthorizeScreen = ({
   const isSubmitting = approveMutation.isPending
   const hasProjects = (projects?.length ?? 0) > 0
 
-  if (!request || !identity || !orgSlug || !memberOrg) return null
+  if (!identity || !orgSlug || !memberOrg) return null
 
-  // mock_state=success lets a design review load straight into the receipt screen without
-  // clicking through the flow first - it's a preview only, never a substitute for the real
-  // approve mutation's result.
-  const approvedUrl =
-    approveRedirect?.url ?? (mockState === 'success' ? request.redirect_uri : null)
+  const isBlockedOnProjects = showProjectPicker && !hasProjects
+  const canProceed = !isBlockedOnProjects
 
-  const grantedProjects =
-    selectedProjectRefs.length > 0
-      ? (projects ?? []).filter((project) => selectedProjectRefs.includes(project.ref))
-      : (projects ?? [])
+  const grantedProjects = (projects ?? []).filter((project) =>
+    selectedProjectRefs.includes(project.ref)
+  )
 
-  const isOrgAdminOrOwner =
-    memberOrg.default_role === 'owner' || memberOrg.default_role === 'administrator'
-  const orgRoleNoun = memberOrg.default_role === 'owner' ? 'owner' : 'admin'
-
-  // Only the rejected projects still in the selection matter, so deselecting them clears the
-  // failure treatment without another round trip.
   const flaggedRefs = getFailedProjects(roleFailure)
     .map((project) => project.ref)
     .filter((ref) => selectedProjectRefs.includes(ref))
@@ -111,11 +125,15 @@ export const OAuthAppsAuthorizeScreen = ({
     ? `Deselect ${flaggedRefs.length} ${flaggedRefs.length === 1 ? 'project' : 'projects'}`
     : `Authorize ${request.app_name}`
   const primaryActionVariant = hasRoleFailure || isSubmitting ? 'default' : 'primary'
-  // Derived, not stored: the primary action is disabled while this holds, so a post-click
-  // validation error would never be reachable.
-  const hasNoSelection = selectedProjectRefs.length === 0
 
-  if (approvedUrl) {
+  const usesSelectedProjects = showProjectPicker && !allProjectsSelected
+  const hasNoSelection = usesSelectedProjects && selectedProjectRefs.length === 0
+
+  const projectScope: OAuthGrantProjectScope = usesSelectedProjects
+    ? { target: 'selected_projects', project_refs: selectedProjectRefs }
+    : { target: 'all_projects' }
+
+  if (approveRedirect) {
     return (
       <InterstitialLayout
         logo={<DestinationLogo name={request.app_name} />}
@@ -128,11 +146,12 @@ export const OAuthAppsAuthorizeScreen = ({
           grant={{
             email: identity.email,
             organization_slug: memberOrg.slug,
+            project_scope: projectScope,
             projects: grantedProjects,
             scope_groups: request.scope_groups,
           }}
           onReturn={() => {
-            window.location.href = approvedUrl
+            window.location.href = approveRedirect.url
           }}
         />
       </InterstitialLayout>
@@ -152,19 +171,19 @@ export const OAuthAppsAuthorizeScreen = ({
   const handleApprove = () => {
     if (hasNoSelection) return
     approveMutation.mutate({
-      auth_id: scenarioId,
+      auth_id: authId,
       slug: orgSlug,
-      project_refs: selectedProjectRefs,
+      project_scope: projectScope,
     })
   }
 
   const handleDeny = () => {
-    denyMutation.mutate({ auth_id: scenarioId, slug: orgSlug })
+    denyMutation.mutate({ auth_id: authId, slug: orgSlug })
   }
 
   const footerMessage = isSubmitting
     ? "Don't close this window."
-    : hasProjects
+    : canProceed
       ? null
       : `Cancelling will redirect you to ${request.redirect_uri} with access denied.`
 
@@ -178,21 +197,14 @@ export const OAuthAppsAuthorizeScreen = ({
     >
       <div className="flex flex-col gap-6 px-6 pb-6">
         {!request.is_verified && (
-          <Admonition
-            type="warning"
-            description="This publisher isn't verified by Supabase. Only continue if you trust it."
-          />
+          <Admonition type="warning" description={CONSENT_COPY.unverifiedPublisher} />
         )}
 
         {hasRoleFailure && (
           <Admonition
             type="destructive"
-            title={
-              flaggedRefs.length === 1
-                ? "Couldn't authorize 1 project"
-                : `Couldn't authorize ${flaggedRefs.length} projects`
-            }
-            description={`${request.app_name} needs write access but your role is read-only on the projects highlighted. Deselect them to continue.`}
+            title={CONSENT_COPY.roleFailure.title(flaggedRefs.length)}
+            description={CONSENT_COPY.roleFailure.description(request.app_name)}
           />
         )}
 
@@ -200,19 +212,11 @@ export const OAuthAppsAuthorizeScreen = ({
           <AuthorizingAsCard
             email={identity.email}
             organizationSlug={memberOrg.slug}
+            grantKind={grantKind}
             onSignOut={handleSignOut}
           />
 
-          {hasProjects ? (
-            <ProjectMultiSelect
-              projects={projects ?? []}
-              selectedRefs={selectedProjectRefs}
-              onChange={setSelectedProjectRefs}
-              error={hasNoSelection ? 'Must select at least one project to authorize.' : undefined}
-              flaggedRefs={flaggedRefs}
-              unavailableRefs={getFailedProjects(roleFailure).map((project) => project.ref)}
-            />
-          ) : (
+          {isBlockedOnProjects && (
             <NoProjectsNotice
               appName={request.app_name}
               organizationSlug={orgSlug}
@@ -220,22 +224,53 @@ export const OAuthAppsAuthorizeScreen = ({
             />
           )}
 
-          {hasProjects && (
+          {canProceed && showProjectPicker && (
+            <div className="flex flex-col gap-2">
+              <ProjectMultiSelect
+                projects={projects ?? []}
+                selectedRefs={selectedProjectRefs}
+                onChange={setSelectedProjectRefs}
+                maxSelected={MAX_SELECTED_PROJECTS}
+                error={hasNoSelection ? CONSENT_COPY.selectionRequired : undefined}
+                flaggedRefs={flaggedRefs}
+                unavailableRefs={getFailedProjects(roleFailure).map((project) => project.ref)}
+                showAllProjectsOption={allowAllProjects}
+                allProjectsSelected={allProjectsSelected}
+                onAllProjectsChange={setAllProjectsSelected}
+              />
+              {isDynamicClient && (
+                <p className="text-xs text-foreground-lighter">{CONSENT_COPY.dynamicClient}</p>
+              )}
+            </div>
+          )}
+
+          {canProceed && (
             <>
               <ScopeGroupCard appName={request.app_name} scopeGroups={request.scope_groups} />
 
-              {request.reuses_grant_across_workspaces && (
+              {!showProjectPicker && (
                 <Admonition
                   type="default"
-                  description="Some clients may reuse one authorization across workspaces. Check your client's workspace or account settings if project access does not behave as expected."
+                  title={CONSENT_COPY.coversEveryProject.title}
+                  description={CONSENT_COPY.coversEveryProject.description(
+                    request.app_name,
+                    orgSlug
+                  )}
                 />
               )}
 
-              {isOrgAdminOrOwner && (
+              {request.reuses_grant_across_workspaces && (
+                <Admonition type="default" description={CONSENT_COPY.workspaceReuse} />
+              )}
+
+              {grantKind === 'organization_bound' && (
                 <Admonition
                   type="default"
-                  title="Want this scoped to one member?"
-                  description={`Have them authorize ${request.app_name} from their own account. Authorizing here gives it your full ${orgRoleNoun} access.`}
+                  title={CONSENT_COPY.organizationBoundGrant.title}
+                  description={CONSENT_COPY.organizationBoundGrant.description(
+                    request.app_name,
+                    orgSlug
+                  )}
                 />
               )}
             </>
@@ -243,7 +278,7 @@ export const OAuthAppsAuthorizeScreen = ({
         </fieldset>
 
         <div className="flex flex-col gap-2">
-          {hasProjects ? (
+          {canProceed ? (
             <Button
               block
               variant={primaryActionVariant}

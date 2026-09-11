@@ -1,5 +1,5 @@
 import { useId } from 'react'
-import { cn } from 'ui'
+import { Checkbox, cn } from 'ui'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -9,44 +9,43 @@ import {
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
 
+import { CONSENT_COPY } from './OAuthAppsAuthorizeScreen.utils'
 import type { OAuthAppsAuthorizeOrganizationProject } from '@/data/oauth-apps/oauth-apps-authorize-organization-projects-query'
 
 export const MAX_SELECTED_PROJECTS = 10
-const SHOW_COUNTER_FROM = 8
 
 export interface ProjectMultiSelectProps {
   projects: OAuthAppsAuthorizeOrganizationProject[]
   selectedRefs: string[]
   onChange: (selectedRefs: string[]) => void
+  maxSelected?: number
   error?: string
-  /**
-   * Selected refs a post-submit role validation rejected — a subset of {@link selectedRefs}, so
-   * it empties as they are deselected. Drives the count beneath the picker.
-   */
   flaggedRefs?: string[]
-  /**
-   * Every ref the last validation rejected, whether or not it is still selected. Outlives
-   * {@link flaggedRefs} on purpose: the dropdown has to keep marking these, or deselecting them
-   * would leave nothing to stop the user picking the same projects straight back.
-   */
   unavailableRefs?: string[]
+  showAllProjectsOption?: boolean
+  allProjectsSelected?: boolean
+  onAllProjectsChange?: (selected: boolean) => void
 }
 
 export const ProjectMultiSelect = ({
   projects,
   selectedRefs,
   onChange,
+  maxSelected = MAX_SELECTED_PROJECTS,
   error,
   flaggedRefs = [],
   unavailableRefs = [],
+  showAllProjectsOption = false,
+  allProjectsSelected = false,
+  onAllProjectsChange,
 }: ProjectMultiSelectProps) => {
   const labelId = useId()
   const hasFlagged = flaggedRefs.length > 0
-  const atCap = selectedRefs.length >= MAX_SELECTED_PROJECTS
-  const showCounter = selectedRefs.length >= SHOW_COUNTER_FROM
+  const atCap = selectedRefs.length >= maxSelected
+  const showCounter = selectedRefs.length >= maxSelected - 2
 
   const handleValuesChange = (nextRefs: string[]) => {
-    if (nextRefs.length > MAX_SELECTED_PROJECTS) return
+    if (nextRefs.length > maxSelected) return
     onChange(nextRefs)
   }
 
@@ -59,52 +58,66 @@ export const ProjectMultiSelect = ({
         >
           Projects
         </p>
-        {showCounter && (
+        {!allProjectsSelected && showCounter && (
           <p className="text-xs text-foreground-lighter">
-            {selectedRefs.length}/{MAX_SELECTED_PROJECTS}
+            {selectedRefs.length}/{maxSelected}
           </p>
         )}
       </div>
 
-      <MultiSelector values={selectedRefs} onValuesChange={handleValuesChange}>
-        <MultiSelectorTrigger
-          aria-labelledby={labelId}
-          label="Select projects..."
-          badgeLimit={1}
-          deletableBadge
-          renderValue={(value) => projects.find((project) => project.ref === value)?.name ?? value}
-        />
-        <MultiSelectorContent>
-          <MultiSelectorInput placeholder="Search projects" showResetIcon />
-          <MultiSelectorList emptyLabel="No projects found">
-            {projects.map((project) => (
-              <MultiSelectorItem
-                key={project.ref}
-                value={project.ref}
-                disabled={atCap && !selectedRefs.includes(project.ref)}
-              >
-                {project.name}
-                {unavailableRefs.includes(project.ref) && (
-                  <span className="text-foreground-lighter"> - Unavailable</span>
-                )}
-              </MultiSelectorItem>
-            ))}
-          </MultiSelectorList>
-        </MultiSelectorContent>
-      </MultiSelector>
+      {showAllProjectsOption && (
+        <label className="flex cursor-pointer items-center gap-2 py-1 text-sm text-foreground">
+          <Checkbox
+            checked={allProjectsSelected}
+            onCheckedChange={(checked) => onAllProjectsChange?.(checked === true)}
+          />
+          {CONSENT_COPY.allProjectsOption}
+        </label>
+      )}
 
-      {hasFlagged && (
-        <p className="text-xs text-destructive">
-          {flaggedRefs.length} of {selectedRefs.length}{' '}
-          {selectedRefs.length === 1 ? 'project' : 'projects'} unavailable
-        </p>
+      {!allProjectsSelected && (
+        <>
+          <MultiSelector values={selectedRefs} onValuesChange={handleValuesChange}>
+            <MultiSelectorTrigger
+              aria-labelledby={labelId}
+              label="Select projects..."
+              badgeLimit={1}
+              deletableBadge
+              renderValue={(value) =>
+                projects.find((project) => project.ref === value)?.name ?? value
+              }
+            />
+            <MultiSelectorContent>
+              <MultiSelectorInput placeholder="Search projects" showResetIcon />
+              <MultiSelectorList emptyLabel="No projects found">
+                {projects.map((project) => (
+                  <MultiSelectorItem
+                    key={project.ref}
+                    value={project.ref}
+                    disabled={atCap && !selectedRefs.includes(project.ref)}
+                  >
+                    {project.name}
+                    {unavailableRefs.includes(project.ref) && (
+                      <span className="text-foreground-lighter"> - Unavailable</span>
+                    )}
+                  </MultiSelectorItem>
+                ))}
+              </MultiSelectorList>
+            </MultiSelectorContent>
+          </MultiSelector>
+
+          {hasFlagged && (
+            <p className="text-xs text-destructive">
+              {flaggedRefs.length} of {selectedRefs.length}{' '}
+              {selectedRefs.length === 1 ? 'project' : 'projects'} unavailable
+            </p>
+          )}
+          {atCap && (
+            <p className="text-xs text-foreground-lighter">{CONSENT_COPY.maxProjectsReached}</p>
+          )}
+          {error && <p className="text-xs text-foreground-light">{error}</p>}
+        </>
       )}
-      {atCap && (
-        <p className="text-xs text-foreground-lighter">
-          Maximum reached. Deselect a project to choose a different one.
-        </p>
-      )}
-      {error && <p className="text-xs text-foreground-light">{error}</p>}
     </div>
   )
 }

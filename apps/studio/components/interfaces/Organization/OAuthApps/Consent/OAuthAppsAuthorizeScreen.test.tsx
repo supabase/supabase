@@ -3,15 +3,39 @@ import { describe, expect, test, vi } from 'vitest'
 
 import { OAuthAppsAuthorizeScreen } from './OAuthAppsAuthorizeScreen'
 import { MAX_SELECTED_PROJECTS } from './ProjectMultiSelect'
+import {
+  getMockOAuthAppsAuthorizeRequest,
+  OAUTH_APPS_MOCK_SCENARIOS,
+} from '@/data/oauth-apps/mocks'
+import type { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/oauth-apps-authorize-request-query'
 import { customRender } from '@/tests/lib/custom-render'
+
+type RenderScreenOptions = {
+  authId?: string
+  request?: OAuthAppsAuthorizeRequest
+  organizationSlug?: string
+}
+
+function renderScreen({
+  authId = OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper,
+  request,
+  organizationSlug,
+}: RenderScreenOptions = {}) {
+  return customRender(
+    <OAuthAppsAuthorizeScreen
+      authId={authId}
+      request={request ?? getMockOAuthAppsAuthorizeRequest(authId)}
+      organizationSlug={organizationSlug}
+      navigate={vi.fn()}
+    />
+  )
+}
 
 function selectProject(projectName: string) {
   fireEvent.click(screen.getByRole('combobox'))
   fireEvent.click(screen.getByText(projectName))
 }
 
-// The list stays open after a selection, and the project name then matches both an option row
-// and the trigger badge - so target the row explicitly to toggle the same project twice.
 function toggleProjectOption(projectName: string) {
   const option = screen
     .getAllByText(projectName)
@@ -24,14 +48,14 @@ function toggleProjectOption(projectName: string) {
 
 describe('OAuthAppsAuthorizeScreen', () => {
   test('disables authorize and states the constraint while nothing is selected', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
+    renderScreen()
 
     expect(await screen.findByRole('button', { name: /Authorize Vercel/ })).toBeDisabled()
     expect(screen.getByText('Must select at least one project to authorize.')).toBeInTheDocument()
   })
 
   test('enables authorize and drops the constraint once a project is selected', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
+    renderScreen()
 
     await screen.findByRole('combobox')
     selectProject('northwind-storefront')
@@ -43,7 +67,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
   })
 
   test('re-disables authorize when the last project is deselected', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
+    renderScreen()
 
     fireEvent.click(await screen.findByRole('combobox'))
     toggleProjectOption('northwind-storefront')
@@ -54,7 +78,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
   })
 
   test('shows no upfront over-role warning, even for the read-only fixture', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="over_role" navigate={vi.fn()} />)
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReadOnly })
 
     await screen.findByText('Permissions requested')
     expect(
@@ -64,7 +88,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
   })
 
   test('renders the empty-org notice, hides permissions, and shows the cancel footer', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="empty_org" navigate={vi.fn()} />)
+    renderScreen({ organizationSlug: 'contoso-labs' })
 
     expect(await screen.findByText('No projects in contoso-labs')).toBeInTheDocument()
     expect(screen.queryByText('Permissions requested')).not.toBeInTheDocument()
@@ -75,8 +99,8 @@ describe('OAuthAppsAuthorizeScreen', () => {
     ).toBeInTheDocument()
   })
 
-  test('renders the publisher warning for the unverified fixture', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="unverified" navigate={vi.fn()} />)
+  test('renders the publisher warning for an unverified app', async () => {
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBot })
 
     expect(
       await screen.findByText(
@@ -85,8 +109,8 @@ describe('OAuthAppsAuthorizeScreen', () => {
     ).toBeInTheDocument()
   })
 
-  test('shows no publisher warning and no verified tick for a verified fixture', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
+  test('shows no publisher warning and no verified tick for a verified app', async () => {
+    renderScreen()
 
     await screen.findByText('Permissions requested')
     expect(
@@ -98,7 +122,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
   })
 
   test('renders the success screen after the approve mutation resolves', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
+    renderScreen()
 
     await screen.findByRole('combobox')
     selectProject('northwind-storefront')
@@ -109,7 +133,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
   })
 
   test('success screen shows exactly the submitted projects and scopes', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
+    renderScreen()
 
     await screen.findByRole('combobox')
     selectProject('northwind-cms')
@@ -131,8 +155,8 @@ describe('OAuthAppsAuthorizeScreen', () => {
     ).toBeInTheDocument()
   })
 
-  test('unverified fixture reaches the success screen with the authorizing identity', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="unverified" navigate={vi.fn()} />)
+  test('an organization-bound app reaches the success screen with the authorizing identity', async () => {
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBot })
 
     await screen.findByRole('combobox')
     selectProject('northwind-storefront')
@@ -143,8 +167,84 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.getByText(/admin@example\.com/)).toBeInTheDocument()
   })
 
+  test('tells the member an organization-bound grant is shared', async () => {
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBot })
+
+    expect(
+      await screen.findByText('This grant is shared with the whole organization')
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'kemal-bot acts with owner permissions for every member of northwind-traders, and stays active if you leave.'
+      )
+    ).toBeInTheDocument()
+  })
+
+  test('keeps the acts-as-you reassurance for a user-bound grant', async () => {
+    renderScreen()
+
+    expect(
+      await screen.findByText(
+        'This grant acts as you. It can never do more than your role in this organization allows.'
+      )
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText('This grant is shared with the whole organization')
+    ).not.toBeInTheDocument()
+  })
+
+  test('says the grant covers future projects when there is no picker', async () => {
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects })
+
+    expect(await screen.findByText('This grant covers every project')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Vercel can reach every project in northwind-traders, including ones created later.'
+      )
+    ).toBeInTheDocument()
+  })
+
+  test('does not claim future projects when the member picks them', async () => {
+    renderScreen()
+
+    await screen.findByText('Permissions requested')
+    expect(screen.queryByText('This grant covers every project')).not.toBeInTheDocument()
+  })
+
+  test('authorizes an app that hides the picker, with nothing selected', async () => {
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects })
+
+    expect(await screen.findByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Must select at least one project to authorize.')
+    ).not.toBeInTheDocument()
+  })
+
+  test('does not demand projects from an empty org when the app is org-wide', async () => {
+    renderScreen({
+      authId: OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects,
+      organizationSlug: 'contoso-labs',
+    })
+
+    expect(await screen.findByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
+    expect(screen.queryByText(/No projects in/)).not.toBeInTheDocument()
+  })
+
+  test('reports an all-projects grant as such rather than listing projects', async () => {
+    renderScreen({
+      authId: OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects,
+      organizationSlug: 'contoso-labs',
+    })
+
+    fireEvent.click(await screen.findByRole('button', { name: /Authorize Vercel/ }))
+
+    expect(await screen.findByText('Vercel is connected')).toBeInTheDocument()
+    expect(screen.getByText('All projects, including ones created later')).toBeInTheDocument()
+  })
+
   test('renders the cross-workspace notice for a client that reuses one grant', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="cross_workspace" navigate={vi.fn()} />)
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelCrossWorkspace })
 
     expect(
       await screen.findByText(
@@ -154,62 +254,100 @@ describe('OAuthAppsAuthorizeScreen', () => {
   })
 
   test('hides the cross-workspace notice for a client that does not reuse a grant', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
+    renderScreen()
 
     await screen.findByText('Permissions requested')
     expect(screen.queryByText(/reuse one authorization across workspaces/)).not.toBeInTheDocument()
   })
 
-  test('warns an org admin that the grant carries their full access', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="admin_warning" navigate={vi.fn()} />)
-
-    expect(await screen.findByText('Want this scoped to one member?')).toBeInTheDocument()
-    expect(
-      screen.getByText(
-        'Have them authorize Vercel from their own account. Authorizing here gives it your full admin access.'
-      )
-    ).toBeInTheDocument()
-  })
-
-  test('names the owner role rather than admin when the member is an owner', async () => {
-    customRender(
-      <OAuthAppsAuthorizeScreen
-        mockState="admin_warning"
-        organizationSlug="fabrikam-industries"
-        navigate={vi.fn()}
-      />
-    )
-
-    expect(await screen.findByText('Want this scoped to one member?')).toBeInTheDocument()
-    expect(screen.getByText(/your full owner access\./)).toBeInTheDocument()
-    expect(screen.queryByText(/your full admin access/)).not.toBeInTheDocument()
-  })
-
-  test('shows no admin warning for a member below admin', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="ideal" navigate={vi.fn()} />)
-
-    await screen.findByText('Permissions requested')
-    expect(screen.queryByText('Want this scoped to one member?')).not.toBeInTheDocument()
-  })
-
-  test('the max-projects state offers enough projects to reach the selection cap', async () => {
-    customRender(<OAuthAppsAuthorizeScreen mockState="max_projects" navigate={vi.fn()} />)
+  test('the many-projects fixture offers enough projects to reach the selection cap', async () => {
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelManyProjects })
 
     fireEvent.click(await screen.findByRole('combobox'))
 
     expect(screen.getAllByRole('option').length).toBeGreaterThan(MAX_SELECTED_PROJECTS)
   })
 
-  test('stacks the cross-workspace notice and the admin warning when both apply', async () => {
-    customRender(
-      <OAuthAppsAuthorizeScreen
-        mockState="cross_workspace"
-        organizationSlug="tailspin-toys"
-        navigate={vi.fn()}
-      />
-    )
+  test('re-consent preselects the still-live projects from the existing grant', async () => {
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent })
 
-    expect(await screen.findByText(/reuse one authorization across workspaces/)).toBeInTheDocument()
-    expect(screen.getByText('Want this scoped to one member?')).toBeInTheDocument()
+    expect(await screen.findByText('northwind-storefront')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
+    expect(
+      screen.queryByText('Must select at least one project to authorize.')
+    ).not.toBeInTheDocument()
+  })
+
+  test('re-consent submits only the still-live preselected projects', async () => {
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent })
+
+    await screen.findByText('northwind-storefront')
+    fireEvent.click(screen.getByRole('button', { name: /Authorize Vercel/ }))
+
+    await screen.findByText('Vercel is connected')
+
+    expect(screen.getByText(/northwind-storefront/)).toBeInTheDocument()
+    expect(screen.getByText(/northwind-cms/)).toBeInTheDocument()
+    expect(screen.queryByText(/northwind-deleted/)).not.toBeInTheDocument()
+  })
+
+  test('offers the all-projects choice only when project selection is optional', async () => {
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelOptionalProjects })
+
+    expect(await screen.findByText('All current and future projects')).toBeInTheDocument()
+  })
+
+  test('hides the all-projects choice when project selection is required', async () => {
+    renderScreen()
+
+    await screen.findByRole('combobox')
+    expect(screen.queryByText('All current and future projects')).not.toBeInTheDocument()
+  })
+
+  test('choosing all projects enables authorize without a selection', async () => {
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelOptionalProjects })
+
+    expect(await screen.findByRole('button', { name: /Authorize Vercel/ })).toBeDisabled()
+
+    fireEvent.click(screen.getByRole('checkbox'))
+
+    expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+  })
+
+  test('an all-projects approval reports the grant as all projects', async () => {
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelOptionalProjects })
+
+    fireEvent.click(await screen.findByRole('checkbox'))
+    fireEvent.click(screen.getByRole('button', { name: /Authorize Vercel/ }))
+
+    expect(await screen.findByText('Vercel is connected')).toBeInTheDocument()
+    expect(screen.getByText('All projects, including ones created later')).toBeInTheDocument()
+  })
+
+  test('re-consent of an all-projects grant preselects the all-projects choice', async () => {
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects })
+
+    expect(await screen.findByRole('checkbox')).toBeChecked()
+    expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
+  })
+
+  test('shows the fixed-settings note for a dynamic client, with a required picker', async () => {
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.dynamicMcpClient })
+
+    expect(
+      await screen.findByText(
+        'This client was registered automatically. Supabase sets its access settings.'
+      )
+    ).toBeInTheDocument()
+    expect(screen.getByRole('combobox')).toBeInTheDocument()
+    expect(screen.queryByText('All current and future projects')).not.toBeInTheDocument()
+  })
+
+  test('shows no fixed-settings note for an authored app', async () => {
+    renderScreen()
+
+    await screen.findByRole('combobox')
+    expect(screen.queryByText(/registered automatically/)).not.toBeInTheDocument()
   })
 })
