@@ -162,6 +162,12 @@ function createStorageExplorerState({
       })
     },
 
+    searchString: '',
+    setSearchString: (value: string) => {
+      state.searchString = value
+      state.isSearching = value.length > 0
+    },
+
     isSearching: false,
     setIsSearching: (value: boolean) => (state.isSearching = value),
 
@@ -268,7 +274,7 @@ function createStorageExplorerState({
       folderId,
       folderName,
       index,
-      searchString,
+      searchString = state.searchString,
     }: {
       bucketId: string
       folderId: string | null
@@ -349,7 +355,7 @@ function createStorageExplorerState({
     fetchMoreFolderContents: async ({
       index,
       column,
-      searchString = '',
+      searchString = state.searchString,
     }: {
       index: number
       column: StorageColumn
@@ -395,9 +401,9 @@ function createStorageExplorerState({
       }
     },
 
-    refetchAllOpenedFolders: async () => {
+    refetchAllOpenedFolders: async (searchString = state.searchString) => {
       const paths = state.openedFolders.map((folder) => folder.name)
-      await state.fetchFoldersByPath({ paths })
+      await state.fetchFoldersByPath({ paths, searchString })
     },
 
     refreshAll: async () => {
@@ -411,7 +417,7 @@ function createStorageExplorerState({
 
     fetchFoldersByPath: async ({
       paths,
-      searchString = '',
+      searchString = state.searchString,
       showLoading = false,
     }: {
       paths: string[]
