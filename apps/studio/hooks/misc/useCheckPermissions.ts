@@ -12,7 +12,7 @@ const regexpCache = new Map<string, RegExp>()
 const getActionResourceRegexp = (actionOrResource: string) => {
   let regexp = regexpCache.get(actionOrResource)
   if (!regexp) {
-    regexp = new RegExp(`^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`)
+    regexp = new RegExp(`^${actionOrResource.replace(/\./g, '\\.').replace(/%/g, '.*')}$`)
     regexpCache.set(actionOrResource, regexp)
   }
   return regexp
