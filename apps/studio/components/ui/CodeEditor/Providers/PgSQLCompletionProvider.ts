@@ -45,15 +45,15 @@ export function getPgsqlCompletionProvider(
         // position.column should minus 2 as it returns 2 for first char
         // position.lineNumber should minus 1
         const iterator = new BackwardIterator(model, position.column - 2, position.lineNumber - 1)
-        const range = getReplacementRange(model, position)
+        const { range, isQuoted } = getReplacementRange(model, position)
         const statement = getStatementAtOffset(model.getValue(), model.getOffsetAt(position))
 
         if (context.triggerCharacter === '"') {
-          return startingQuoteScenarioSuggestions(monaco, pgInfo, iterator, range)
+          return startingQuoteScenarioSuggestions(monaco, pgInfo, iterator, range, isQuoted)
         } else if (context.triggerCharacter === '.') {
-          return dotScenarioSuggestions(monaco, pgInfo, iterator, range, statement)
+          return dotScenarioSuggestions(monaco, pgInfo, iterator, range, statement, isQuoted)
         } else {
-          return defaultScenarioSuggestions(monaco, pgInfo, statement, range)
+          return defaultScenarioSuggestions(monaco, pgInfo, statement, range, isQuoted)
         }
       } catch (_) {
         // any error, returns empty suggestion
@@ -65,16 +65,29 @@ export function getPgsqlCompletionProvider(
 
 // Monaco requires a range on every completion item; when one isn't supplied it falls back to
 // replacing the current word anyway, so we compute that explicitly rather than leave it implicit.
+//
+// `"` is a word separator for Monaco, so `getWordUntilPosition` never includes surrounding double
+// quotes in the word it finds. When the identifier being completed already sits between a pair of
+// them (typed by hand, or auto-closed by the editor as you type the opening quote), we expand the
+// range to swallow both quotes and flag `isQuoted` so callers always emit fully-quoted insertText —
+// otherwise a quoted insertText lands inside the untouched existing quotes and doubles them up.
 function getReplacementRange(
   model: editor.ITextModel,
   position: Position
-): languages.CompletionItem['range'] {
+): { range: languages.CompletionItem['range']; isQuoted: boolean } {
   const word = model.getWordUntilPosition(position)
+  const line = model.getLineContent(position.lineNumber)
+  const isQuoted =
+    line.charAt(word.startColumn - 2) === '"' && line.charAt(word.endColumn - 1) === '"'
+
   return {
-    startLineNumber: position.lineNumber,
-    endLineNumber: position.lineNumber,
-    startColumn: word.startColumn,
-    endColumn: word.endColumn,
+    range: {
+      startLineNumber: position.lineNumber,
+      endLineNumber: position.lineNumber,
+      startColumn: isQuoted ? word.startColumn - 1 : word.startColumn,
+      endColumn: isQuoted ? word.endColumn + 1 : word.endColumn,
+    },
+    isQuoted,
   }
 }
 
@@ -82,7 +95,8 @@ function startingQuoteScenarioSuggestions(
   monaco: Monaco,
   pgInfo: PgInfo,
   iterator: BackwardIterator,
-  range: languages.CompletionItem['range']
+  range: languages.CompletionItem['range'],
+  isQuoted: boolean
 ) {
   const items: languages.CompletionItem[] = []
 
@@ -112,7 +126,7 @@ function startingQuoteScenarioSuggestions(
         label: field.attname,
         kind: monaco.languages.CompletionItemKind.Property,
         detail: field.data_type,
-        insertText: field.attname,
+        insertText: formatInsertText(field.attname, isQuoted),
         range,
       })
     })
@@ -122,7 +136,7 @@ function startingQuoteScenarioSuggestions(
       items.push({
         label: table.tablename,
         kind: monaco.languages.CompletionItemKind.Class,
-        insertText: table.tablename,
+        insertText: formatInsertText(table.tablename, isQuoted),
         range,
       })
     })
@@ -136,7 +150,8 @@ function dotScenarioSuggestions(
   pgInfo: PgInfo,
   iterator: BackwardIterator,
   range: languages.CompletionItem['range'],
-  statement: string
+  statement: string,
+  isQuoted: boolean
 ) {
   const items: languages.CompletionItem[] = []
 
@@ -169,7 +184,7 @@ function dotScenarioSuggestions(
           label: field.attname,
           kind: monaco.languages.CompletionItemKind.Property,
           detail: field.data_type,
-          insertText: formatInsertText(field.attname),
+          insertText: formatInsertText(field.attname, isQuoted),
           range,
         })
       })
@@ -195,7 +210,7 @@ function dotScenarioSuggestions(
         label: tbl.tablename,
         kind: monaco.languages.CompletionItemKind.Class,
         detail: tbl.schemaname !== 'public' ? tbl.schemaname : undefined,
-        insertText: formatInsertText(tbl.tablename),
+        insertText: formatInsertText(tbl.tablename, isQuoted),
         range,
       })
     })
@@ -218,7 +233,7 @@ function dotScenarioSuggestions(
         label: field.attname,
         kind: monaco.languages.CompletionItemKind.Property,
         detail: field.data_type,
-        insertText: formatInsertText(field.attname),
+        insertText: formatInsertText(field.attname, isQuoted),
         range,
       })
     })
@@ -231,7 +246,8 @@ function defaultScenarioSuggestions(
   monaco: Monaco,
   pgInfo: PgInfo,
   statement: string,
-  range: languages.CompletionItem['range']
+  range: languages.CompletionItem['range'],
+  isQuoted: boolean
 ) {
   const items: languages.CompletionItem[] = []
 
@@ -263,7 +279,7 @@ function defaultScenarioSuggestions(
       kind: x.is_table
         ? monaco.languages.CompletionItemKind.Class
         : monaco.languages.CompletionItemKind.Interface,
-      insertText: formatInsertText(insertText),
+      insertText: formatInsertText(insertText, isQuoted),
       range,
     })
   })
@@ -314,7 +330,7 @@ function defaultScenarioSuggestions(
           kind: monaco.languages.CompletionItemKind.Field,
           detail: field.data_type,
           documentation: x.tablename,
-          insertText: formatInsertText(field.attname),
+          insertText: formatInsertText(field.attname, isQuoted),
           range,
           sortText: hasResolvedFromTables ? `0_${field.attname}` : undefined,
         }
@@ -352,7 +368,7 @@ function readIdents(iterator: BackwardIterator, maxlvl: number): QuotableIdent[]
   })
 }
 
-function formatInsertText(value: string) {
+function formatInsertText(value: string, forceQuote = false) {
   const hasUpperCase = !(value == value.toLowerCase())
-  return hasUpperCase ? `"${value}"` : value
+  return hasUpperCase || forceQuote ? `"${value}"` : value
 }

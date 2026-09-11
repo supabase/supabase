@@ -23,12 +23,36 @@ function createModel(sql: string): editor.ITextModel {
   return {
     getValue: () => sql,
     getOffsetAt: () => sql.length,
+    getLineContent: () => sql,
     getWordUntilPosition: () => ({
       word: '',
       startColumn: sql.length + 1,
       endColumn: sql.length + 1,
     }),
   } as unknown as editor.ITextModel
+}
+
+// Simulates the cursor sitting mid-identifier between an already-present pair of double quotes,
+// e.g. `where "OrderD|"` (the closing quote auto-closed by the editor when `"` was typed).
+function createQuotedIdentModel(line: string, word: string): editor.ITextModel {
+  const wordStartColumn = line.indexOf(`"${word}`) + 2
+  const wordEndColumn = wordStartColumn + word.length
+
+  return {
+    getValue: () => line,
+    getOffsetAt: () => wordEndColumn - 1,
+    getLineContent: () => line,
+    getWordUntilPosition: () => ({
+      word,
+      startColumn: wordStartColumn,
+      endColumn: wordEndColumn,
+    }),
+  } as unknown as editor.ITextModel
+}
+
+function createQuotedIdentPosition(line: string, word: string): ProvideCompletionItemsParams[1] {
+  const wordEndColumn = line.indexOf(`"${word}`) + 2 + word.length
+  return { column: wordEndColumn, lineNumber: 1 } as unknown as ProvideCompletionItemsParams[1]
 }
 
 type ProvideCompletionItemsParams = Parameters<
@@ -205,5 +229,59 @@ describe('getPgsqlCompletionProvider - dot scenario', () => {
     }
     const suggestions = getDotSuggestions(pgInfoRef, 'select * from app.colors c where c.')
     expect(suggestions.map((s) => s.label).sort()).toStrictEqual(['hex', 'id'])
+  })
+})
+
+describe('getPgsqlCompletionProvider - quoted identifiers', () => {
+  function createQuotedPgInfoRef(): { current: PgInfo } {
+    return {
+      current: {
+        keywords: [],
+        schemas: [{ name: 'public' }] as unknown as PgInfo['schemas'],
+        functions: [] as unknown as PgInfo['functions'],
+        tableColumns: [
+          {
+            schemaname: 'public',
+            tablename: 'test_orders',
+            quoted_name: 'test_orders',
+            is_table: true,
+            columns: [
+              { attname: 'OrderDate', data_type: 'date' },
+              { attname: 'id', data_type: 'bigint' },
+            ],
+          },
+        ],
+      },
+    }
+  }
+
+  it('replaces the whole existing quote pair instead of doubling up quotes on a mixed-case column', () => {
+    // Regression test for: typing `where "OrderD` with the editor auto-closing the quote to
+    // `where "OrderD|"`, then accepting the `OrderDate` suggestion produced `""OrderDate""`.
+    const pgInfoRef = createQuotedPgInfoRef()
+    const line = 'select * from test_orders where "OrderDate"'
+    const word = 'OrderDate'
+
+    const provider = getPgsqlCompletionProvider(monaco, pgInfoRef)
+    const context = { triggerCharacter: undefined } as unknown as ProvideCompletionItemsParams[2]
+    const token = {} as ProvideCompletionItemsParams[3]
+
+    const result = provider.provideCompletionItems(
+      createQuotedIdentModel(line, word),
+      createQuotedIdentPosition(line, word),
+      context,
+      token
+    ) as languages.CompletionList
+
+    const suggestion = result.suggestions.find((s) => s.label === 'OrderDate')
+    expect(suggestion?.insertText).toBe('"OrderDate"')
+
+    // The range must swallow both surrounding quotes, otherwise the quoted insertText lands
+    // inside the pre-existing, untouched quote pair and doubles them up.
+    const quoteStart = line.indexOf('"')
+    const quoteEnd = line.indexOf('"', quoteStart + 1)
+    const range = suggestion?.range as { startColumn: number; endColumn: number }
+    expect(range.startColumn).toBe(quoteStart + 1)
+    expect(range.endColumn).toBe(quoteEnd + 2)
   })
 })
