@@ -75,7 +75,7 @@ Dynamic registration allows any MCP client to register with your project. Consid
 
 When building your own MCP server, integrate with Supabase Auth to authenticate AI agents as your existing users and apply your RLS policies.
 
-On Supabase Edge Functions, or any runtime with a `fetch`-style handler, [`@supabase/server`](/docs/reference/server) does the OAuth plumbing for you. `withOAuthProtectedResource()` publishes the protected resource metadata and the `WWW-Authenticate` challenge that MCP clients use to find your Auth server; `withSupabase({ auth: 'user' })` verifies the token and gives your tools a client scoped to that user:
+On Supabase Edge Functions, or any runtime with a `fetch`-style handler, [`@supabase/server`](/docs/reference/server/introduction) does the OAuth plumbing for you. `withOAuthProtectedResource()` publishes the protected resource metadata and the `WWW-Authenticate` challenge that MCP clients use to find your Auth server; `withSupabase({ auth: 'user' })` verifies the token and gives your tools a client scoped to that user:
 
 ```ts
 import { pipeline } from 'npm:@supabase/middleware@^0.5.0'

@@ -117,7 +117,7 @@ Most servers act on user data, and then the question is who the caller is. With 
 
 ### How it works
 
-The authenticated function composes two pieces of middleware from [`@supabase/server`](/docs/reference/server) into a `pipeline` from `@supabase/middleware`, followed by your MCP handler:
+The authenticated function composes two pieces of middleware from [`@supabase/server`](/docs/reference/server/introduction) into a `pipeline` from `@supabase/middleware`, followed by your MCP handler:
 
 ```
 pipeline([...], handler)
@@ -381,7 +381,7 @@ Both examples in this guide are in the `supabase/supabase` repository, ready to 
 ## Resources
 
 - [MCP Server block](/library/docs/headless/mcp-server) and [Headless App block](/library/docs/tanstack/headless-app) in the Supabase Library
-- [`@supabase/server` reference](/docs/reference/server)
+- [`@supabase/server` reference](/docs/reference/server/introduction)
 - [MCP authentication with Supabase Auth](/docs/guides/auth/oauth-server/mcp-authentication)
 - [OAuth 2.1 server](/docs/guides/auth/oauth-server)
 - [Token security and RLS](/docs/guides/auth/oauth-server/token-security)
