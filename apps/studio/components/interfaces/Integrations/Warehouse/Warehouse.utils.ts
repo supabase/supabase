@@ -5,6 +5,18 @@ import { WAREHOUSE_METADATA_SCHEMA } from '@/lib/warehouse'
 
 export type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
 export type WarehouseSetupTarget = WarehouseSetupBody['targets'][number]
+export type WarehouseSetupStatus =
+  components['schemas']['WarehouseSetupStatusResponse']['setup_status']
+export type WarehouseSetupTable =
+  components['schemas']['WarehouseSetupStatusResponse']['tables'][number]
+
+export function isWarehouseProvisioned(setupStatus?: WarehouseSetupStatus): boolean {
+  return setupStatus === 'complete'
+}
+
+export function isWarehouseSettingUp(setupStatus?: WarehouseSetupStatus): boolean {
+  return setupStatus === 'setting_up' || setupStatus === 'copying'
+}
 
 /** Selection map keyed by `${schema}.${table}`. */
 export type SchemaTableSelection = Record<string, boolean>
@@ -17,8 +29,8 @@ export function getSchemaTableKey(schema: string, table: string): string {
 
 /**
  * Internal schemas that still hold product data users legitimately want in their warehouse.
- * Everything else in `INTERNAL_SCHEMAS` is Supabase infrastructure — `vault` (secrets),
- * `pgsodium`, `cron`/`pgmq` bookkeeping, migration history — which should never be offered as a
+ * Everything else in `INTERNAL_SCHEMAS` is Supabase infrastructure: `vault` (secrets),
+ * `pgsodium`, `cron`/`pgmq` bookkeeping, and migration history. These should never be offered as a
  * replication target.
  */
 const REPLICABLE_INTERNAL_SCHEMAS = ['auth', 'storage']
@@ -32,7 +44,7 @@ const NON_SELECTABLE_SCHEMAS = new Set(
  *
  * `WAREHOUSE_METADATA_SCHEMA` is excluded on top of the infrastructure schemas above: it holds the
  * DuckLake catalog describing the Warehouse itself, so replicating it would feed every Warehouse
- * write back in as more catalog rows to replicate. The platform rejects it server-side too — this
+ * write back in as more catalog rows to replicate. The platform rejects it server-side too. This
  * just keeps it out of the picker so the user never picks a target that can only fail.
  */
 export function isSelectableWarehouseSchema(schemaName: string): boolean {
@@ -106,6 +118,12 @@ export function buildWarehouseSetupTargets(
   }
 
   return targets
+}
+
+export function buildRetryTargets(
+  tables: Pick<WarehouseSetupTable, 'schema' | 'name'>[] = []
+): WarehouseSetupTarget[] {
+  return tables.map((table) => ({ type: 'table', schema: table.schema, name: table.name }))
 }
 
 export type WarehouseCatalogCredentials = NonNullable<
