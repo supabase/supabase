@@ -98,9 +98,10 @@ describe('useAddDefinitions', () => {
     }) as any
 
   it('keeps the registered provider reading fresh data after the registering editor unmounts, as long as a sibling editor is still active', async () => {
-    const { getPgsqlCompletionProvider } = (await import(
-      '@/components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
-    )) as unknown as { getPgsqlCompletionProvider: ReturnType<typeof vi.fn> }
+    const { getPgsqlCompletionProvider } =
+      (await import('@/components/ui/CodeEditor/Providers/PgSQLCompletionProvider')) as unknown as {
+        getPgsqlCompletionProvider: ReturnType<typeof vi.fn>
+      }
 
     let keywordWords = ['select']
     setupSqlEditorMocks()
