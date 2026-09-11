@@ -8,8 +8,13 @@ on:
       - 'apps/www/next.config.mjs'
       - 'apps/www/next.config.js'
       - 'apps/www/lib/**/*.js'
+      - 'apps/www/lib/**/*.mjs'
       - 'apps/www/content/md/**'
       - 'apps/www/scripts/**/*.mjs'
+      - 'apps/www/internals/**/*.mjs'
+      - 'apps/www/_blog/**'
+      - 'apps/www/_alternatives/**'
+      - 'apps/www/_customers/**'
       - 'apps/www/public/.well-known/**'
       # www catalog tests check that linked docs guides exist, so guide changes
       # must trigger these tests and their sources must be included in checkout.
