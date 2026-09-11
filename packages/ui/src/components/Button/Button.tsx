@@ -45,10 +45,10 @@ const buttonVariants = cva(
         default: `
           text-foreground
           border-0
-          bg-muted/50 dark:bg-muted hover:bg-accent
-          bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
+          bg-card hover:bg-accent dark:bg-muted
+          dark:bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
           shadow-[0_1px_3px_0_hsl(var(--colors-black)/var(--button-shadow-opacity)),inset_0_1px_0_0_hsl(var(--button-edge-color)/calc(0.04*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--colors-black)/calc(0.06*var(--button-edge-strength))),inset_0_-1px_0_0_hsl(var(--colors-black)/calc(0.06*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.1*var(--button-edge-strength)))]
-          data-[state=open]:bg-accent
+          data-[state=open]:bg-popover dark:data-[state=open]:bg-accent
           `,
         secondary: `
           bg-foreground
