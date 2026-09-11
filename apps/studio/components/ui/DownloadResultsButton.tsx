@@ -136,10 +136,12 @@ export const DownloadResultsButton = ({
   })
   useShortcut(SHORTCUT_IDS.RESULTS_DOWNLOAD_CSV, downloadAsCSV, {
     enabled: !isEmpty,
+    conflictBehavior: 'allow',
     registerInCommandMenu: true,
   })
   useShortcut(SHORTCUT_IDS.RESULTS_DOWNLOAD_JSON, downloadAsJSON, {
     enabled: !isEmpty,
+    conflictBehavior: 'allow',
     registerInCommandMenu: true,
   })
 
