@@ -41,13 +41,13 @@ export const RestartCostEstimate = ({
     [estimate, tables]
   )
   return (
-    <div className="border-t p-4">
+    <div className="space-y-2">
       {tables.length === 0 ? (
         <div className="flex items-center justify-between gap-x-6">
           <div className="min-w-0">
             <p className="text-sm font-medium">No additional initial sync charge</p>
             <p className="text-xs text-foreground-lighter">
-              This restart will skip initial sync based on the pipeline's settings.
+              This reset will skip initial sync based on the pipeline’s settings.
             </p>
           </div>
           <span className="shrink-0 font-mono text-lg font-semibold" translate="no">
@@ -71,18 +71,18 @@ export const RestartCostEstimate = ({
           </span>
         </div>
       ) : (
-        <p className="text-xs text-foreground-lighter">
-          A cost estimate is unavailable. You can still restart the{' '}
+        <p className="text-sm text-foreground-light">
+          A cost estimate is unavailable. You can still reset the{' '}
           {tables.length === 1 ? 'table' : 'tables'}.
         </p>
       )}
       {restartEstimate?.isComplete && restartEstimate.hasRowFilteredTables && (
-        <p className="mt-2 text-xs text-foreground-lighter">
+        <p className="text-xs text-foreground-lighter">
           *Row filters can reduce the data processed compared with this estimate.
         </p>
       )}
       {restartEstimate?.isComplete && (
-        <p className="mt-2 text-xs text-foreground-lighter">
+        <p className="text-xs text-foreground-lighter">
           Quick planning estimate; the final charge is based on successfully processed initial sync
           data, which is billed again.
         </p>
