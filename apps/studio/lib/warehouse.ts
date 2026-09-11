@@ -1,3 +1,5 @@
+import { literal } from '@supabase/pg-meta'
+
 import { PASSWORD_PLACEHOLDER } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
@@ -40,6 +42,7 @@ export const DUCKLAKE_METADATA_PASSWORD_ENV_VAR = 'DUCKLAKE_METADATA_PASSWORD'
 
 export interface WarehouseCatalogConnection {
   host: string
+  hostaddr?: string
   port: string
   database: string
   user: string
@@ -56,8 +59,11 @@ export function parseWarehouseCatalogUrl(catalogUrl: string): WarehouseCatalogCo
     const url = new URL(catalogUrl)
     if (!url.hostname) return null
 
+    const hostaddr = url.searchParams.get('hostaddr')
+
     return {
-      host: url.hostname,
+      host: url.hostname.replace(/^\[|\]$/g, ''),
+      ...(hostaddr ? { hostaddr } : {}),
       port: url.port || '5432',
       database: url.pathname.replace(/^\//, '') || 'postgres',
       user: decodeURIComponent(url.username) || 'postgres',
@@ -104,7 +110,7 @@ CREATE OR REPLACE SECRET ducklake_s3 (
 -- 2. Postgres credentials for the DuckLake metadata catalog
 CREATE OR REPLACE SECRET ducklake_metadata (
   TYPE postgres,
-  HOST '${connection.host}',
+  HOST ${literal(connection.host)},${connection.hostaddr ? `\n  HOSTADDR ${literal(connection.hostaddr)},` : ''}
   PORT ${connection.port},
   DATABASE '${connection.database}',
   USER '${connection.user}',
