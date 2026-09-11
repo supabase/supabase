@@ -121,7 +121,7 @@ export async function createClient() {
 
 ## CORRECT PROXY IMPLEMENTATION
 
-This file goes at the project root, next to `package.json`, and must be named `proxy.ts`. On Next.js 15 and earlier, name it `middleware.ts` and export `middleware` instead of `proxy`.
+If the project uses `src/app` or `src/pages`, put this file in `src`, at the same level as the routing directory. Otherwise, put it at the project root, next to `package.json`. It must be named `proxy.ts`. On Next.js 15 and earlier, name it `middleware.ts` and export `middleware` instead of `proxy`.
 
 ```typescript proxy.ts
 import { createServerClient } from '@supabase/ssr'
