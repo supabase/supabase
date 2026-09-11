@@ -89,6 +89,26 @@ describe('oauth-apps mocks', () => {
     expect(request.existing_grant?.kind).toBe('user_bound')
   })
 
+  test('every fixture carries a suggested_project_refs array', () => {
+    Object.values(OAUTH_APPS_MOCK_SCENARIOS).forEach((scenario) => {
+      expect(Array.isArray(getMockOAuthAppsAuthorizeRequest(scenario).suggested_project_refs)).toBe(
+        true
+      )
+    })
+  })
+
+  test('the suggested-projects fixture mixes live and unknown refs', () => {
+    const request = getMockOAuthAppsAuthorizeRequest(
+      OAUTH_APPS_MOCK_SCENARIOS.vercelSuggestedProjects
+    )
+    const liveRefs = getMockOAuthAppsAuthorizeOrganizationProjects(NORTHWIND_SLUG).map(
+      (project) => project.ref
+    )
+
+    expect(request.suggested_project_refs.some((ref) => liveRefs.includes(ref))).toBe(true)
+    expect(request.suggested_project_refs.some((ref) => !liveRefs.includes(ref))).toBe(true)
+  })
+
   test('every request carries the grant config the consent flow reads', () => {
     Object.values(OAUTH_APPS_MOCK_SCENARIOS).forEach((scenario) => {
       const { grant_config: grantConfig } = getMockOAuthAppsAuthorizeRequest(scenario)

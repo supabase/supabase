@@ -18,6 +18,8 @@ export type OAuthAppsAuthorizeRequest = {
   scope_groups: OAuthScopeGroup[]
   /** PROVISIONAL — exact field name lands with the real endpoint. */
   reuses_grant_across_workspaces: boolean
+  /** PROVISIONAL — repeated ?project_ref params on the authorize URL, validated server-side to refs the member can access, capped at 10. */
+  suggested_project_refs: string[]
   grant_config: OAuthAppGrantConfig
   existing_grant: OAuthExistingGrant | null
 }
