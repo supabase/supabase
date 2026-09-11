@@ -118,7 +118,7 @@ The Table Editor enables row level security for you when you create a table in t
    alter table movies enable row level security;
    ```
 
-2. Add a policy that describes who can read the table. Enabling row level security without a policy blocks every request, so a table in that state returns no rows to anyone:
+2. Add a policy that describes who can read the table. Until one exists, Data API requests return no rows. The table's owner and roles with `BYPASSRLS` aren't subject to policies, which is why the same query still returns rows in the SQL editor:
 
    ```sql
    create policy "Anyone can read movies"
@@ -189,6 +189,8 @@ Confirm that every table exists and is protected before you build against it.
 
 There are several ways to load data in Supabase. You can load data directly into the database, or use the [Data API](/docs/guides/api).
 If you're loading large data sets, follow the [bulk data loading](#bulk-data-loading) instructions.
+
+The read-only policy from [Securing your tables](#securing-your-tables) rejects inserts through the Data API. Run the client examples below against a table that has an insert policy for the role you're using, or load the data over a direct connection instead.
 
 #### Basic data loading
 
