@@ -1,0 +1,182 @@
+---
+title: "Realtime and Testing"
+subtitle: "Subscribe to database changes, broadcast messages, track presence, manage channels, and write tests with pytest."
+breadcrumb: "Python Client Guide"
+---
+
+The Supabase client exposes the full realtime API for subscribing to database changes, broadcasting messages, and tracking presence.
+
+## Channels
+
+A channel groups related subscriptions. Create one with a unique topic name:
+
+```python
+channel = supabase.channel("room-1")
+```
+
+## Broadcast
+
+Send and receive messages on a channel:
+
+```python
+import asyncio
+
+async def main():
+    client = await create_async_client(url, key)
+
+    def on_broadcast(payload):
+        print(f"Received: {payload}")
+
+    channel = client.channel("room-1")
+    channel.on_broadcast("chat", on_broadcast)
+    await channel.subscribe()
+
+    # Send a message
+    await channel.send_broadcast("chat", {"message": "hello!"})
+
+asyncio.run(main())
+```
+
+## Presence
+
+Track who is online in a channel:
+
+```python
+import asyncio
+
+async def main():
+    client = await create_async_client(url, key)
+    channel = client.channel("room-1")
+
+    def on_presence(presence):
+        print(f"Online users: {presence}")
+
+    channel.on_presence_sync(on_presence)
+    await channel.subscribe()
+
+    # Announce presence
+    await channel.track({"user": "alice", "status": "online"})
+
+asyncio.run(main())
+```
+
+## Postgres changes
+
+Subscribe to database changes in realtime. First, ensure the table is added to the Realtime publication in your [Supabase Dashboard](/dashboard/project/_/database/replication) or via SQL:
+
+```sql
+alter publication supabase_realtime add table messages;
+```
+
+Then subscribe to changes:
+
+```python
+import asyncio
+
+async def main():
+    client = await create_async_client(url, key)
+
+    def on_insert(payload):
+        print(f"New row: {payload.new}")
+
+    await (
+        client.channel("schema-db-changes")
+        .on_postgres_changes(
+            "INSERT",
+            schema="public",
+            table="messages",
+            callback=on_insert,
+        )
+        .subscribe()
+    )
+
+asyncio.run(main())
+```
+
+The `callback` receives a payload with `.new` (the new row), `.old` (the previous row for UPDATE/DELETE), and `.event_type`.
+
+Supported events: `INSERT`, `UPDATE`, `DELETE`, `*` (all).
+
+## Channel lifecycle
+
+```python
+import asyncio
+
+async def main():
+    client = await create_async_client(url, key)
+    channel = client.channel("room-1")
+    await channel.subscribe()        # Connect and start receiving events
+    channel.unsubscribe()            # Disconnect but keep the channel
+    client.remove_channel(channel)   # Unsubscribe and remove
+
+    # List all active channels
+    channels = client.get_channels()
+
+    # Remove all channels at once
+    client.remove_all_channels()
+
+asyncio.run(main())
+```
+
+## Testing patterns
+
+Use pytest with a session-scoped fixture to reuse one client across tests:
+
+```python
+import os
+import pytest
+from supabase import create_client, Client
+
+@pytest.fixture(scope="session")
+def supabase() -> Client:
+    url = os.environ["SUPABASE_TEST_URL"]
+    key = os.environ["SUPABASE_TEST_KEY"]
+    return create_client(url, key)
+
+def test_insert(supabase: Client):
+    result = supabase.table("countries").insert({
+        "name": "Test Country"
+    }).execute()
+    assert len(result.data) > 0
+
+def test_select(supabase: Client):
+    result = supabase.table("countries").select("*").execute()
+    assert len(result.data) > 0
+```
+
+For async tests, install `pytest-asyncio` and use `@pytest.mark.asyncio`:
+
+```python
+import os
+import pytest
+import pytest_asyncio
+from supabase import create_async_client, AsyncClient
+
+@pytest_asyncio.fixture(loop_scope="session")
+async def async_client() -> AsyncClient:
+    url = os.environ["SUPABASE_TEST_URL"]
+    key = os.environ["SUPABASE_TEST_KEY"]
+    return await create_async_client(url, key)
+
+@pytest.mark.asyncio
+async def test_async_query(async_client: AsyncClient):
+    result = await async_client.table("countries").select("*").execute()
+    assert len(result.data) > 0
+```
+
+### Environment setup
+
+The test runner expects these environment variables (set via `.env`, shell exports, or CI secrets):
+
+```text
+SUPABASE_TEST_URL=https://<project-id>.supabase.co
+SUPABASE_TEST_KEY=<your-anon-or-service-role-key>
+```
+
+The supabase-py test suite loads them from `tests/tests.env` via `python-dotenv`.
+
+## Next steps
+
+- [Getting Started](/docs/guides/getting-started/python-client/start) — quickstart and first query
+- [Database Queries](/docs/guides/getting-started/python-client/database-queries) — full CRUD and filter reference
+- [Authentication](/docs/guides/getting-started/python-client/authentication) — sign-in, sessions, and auth events

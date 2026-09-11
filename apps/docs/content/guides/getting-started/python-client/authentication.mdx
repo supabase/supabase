@@ -1,0 +1,134 @@
+---
+title: "Authentication"
+subtitle: "Sign up, sign in with multiple methods, manage sessions, listen to auth events, and understand how auth headers propagate to all services."
+breadcrumb: "Python Client Guide"
+---
+
+The Supabase client integrates deeply with Supabase Auth (GoTrue). The `client.auth` property exposes the full auth API. Auth state changes automatically propagate to all other services — PostgREST, Storage, and Functions always carry the correct `Authorization` header.
+
+## Signing up
+
+```python
+response = supabase.auth.sign_up({
+    "email": "user@example.com",
+    "password": "secure-password",
+})
+print(response.user)     # User object
+print(response.session)  # Session (if auto-confirm is enabled)
+```
+
+## Signing in
+
+**Password:**
+
+```python
+response = supabase.auth.sign_in_with_password({
+    "email": "user@example.com",
+    "password": "secure-password",
+})
+print(response.session.access_token)
+```
+
+**OAuth (Google, GitHub, etc.):**
+
+```python
+response = supabase.auth.sign_in_with_oauth({
+    "provider": "google",
+    "options": {"redirect_to": "https://myapp.com/callback"},
+})
+# Open response.url in a browser to start the OAuth flow
+```
+
+**OTP (passwordless):**
+
+```python
+supabase.auth.sign_in_with_otp({
+    "email": "user@example.com",
+})
+```
+
+**SSO:**
+
+```python
+response = supabase.auth.sign_in_with_sso({
+    "domain": "company.com",
+})
+# Redirect the user to response.url
+```
+
+**Anonymous:**
+
+```python
+response = supabase.auth.sign_in_anonymously()
+# The user gets a temporary anonymous session
+```
+
+**Exchange OAuth code for session:**
+
+```python
+response = supabase.auth.exchange_code_for_session({
+    "auth_code": "...",
+    "code_verifier": "...",
+    "redirect_to": "https://myapp.com/callback",
+})
+```
+
+## Signing out
+
+```python
+supabase.auth.sign_out()
+
+# Scope: global (all sessions), local (this session), others (all but this)
+supabase.auth.sign_out({"scope": "global"})
+```
+
+## Session management
+
+```python
+# Get the current session
+session = supabase.auth.get_session()
+print(session.access_token)
+print(session.user.email)
+
+# Refresh an expiring token (auto_refresh_token handles this by default)
+session = supabase.auth.refresh_session()
+
+# Get the current user
+user = supabase.auth.get_user()
+
+# Update user attributes
+user = supabase.auth.update_user({"email": "new@example.com"})
+
+# Listen for auth state changes
+def on_auth_change(event, session):
+    print(f"Auth event: {event}")
+    if session:
+        print(f"User: {session.user.email}")
+
+subscription = supabase.auth.on_auth_state_change(on_auth_change)
+# Later: subscription.unsubscribe()
+```
+
+## Auth events
+
+| Event                    | Trigger                                         |
+| ------------------------ | ----------------------------------------------- |
+| `SIGNED_IN`              | User signs in (password, OAuth, OTP, anonymous) |
+| `SIGNED_OUT`             | User signs out                                  |
+| `TOKEN_REFRESHED`        | Access token is automatically refreshed         |
+| `USER_UPDATED`           | User profile is modified                        |
+| `PASSWORD_RECOVERY`      | Password recovery flow initiated                |
+| `USER_DELETED`           | User account is deleted                         |
+| `MFA_CHALLENGE_VERIFIED` | Multi-factor challenge completed                |
+
+## How auth headers propagate
+
+When a user signs in or refreshes a token, the client:
+
+1. Updates `client.options.headers["Authorization"]` with the new `Bearer <token>`.
+2. Resets the internal PostgREST, Storage, and Functions clients to `None` — they are lazily recreated on next access with the updated headers.
+3. In async mode, also pushes the new token to the realtime websocket: `asyncio.create_task(self.realtime.set_auth(token))`.
+
+This means **every subsequent query automatically carries the authenticated user's credentials** — no manual header management required.
+
+By default, the client uses the project API key (anon or service role) for all requests until a user signs in.

@@ -1,0 +1,97 @@
+---
+title: "Getting Started with the Python Client"
+subtitle: "Install the Supabase Python client, configure your environment, create your first client, and run your first query."
+breadcrumb: "Python Client Guide"
+---
+
+This guide walks you through installing supabase-py, configuring your environment, creating your first client, and running your first query.
+
+## Installation
+
+Install the package (Python >= 3.9):
+
+```bash
+# with pip
+pip install supabase
+
+# with uv
+uv add supabase
+
+# with conda
+conda install -c conda-forge supabase
+```
+
+## Environment variables
+
+The client needs your Supabase project URL and API key. Store them as environment variables:
+
+```bash
+export SUPABASE_URL="https://<project-id>.supabase.co"
+export SUPABASE_KEY="<your-publishable-key>"
+```
+
+Or in a `.env` file:
+
+```text name=.env
+SUPABASE_URL=https://<project-id>.supabase.co
+SUPABASE_KEY=<your-publishable-key>
+```
+
+## Creating a client
+
+### Synchronous client
+
+Use `create_client`:
+
+```python
+import os
+from supabase import create_client, Client
+
+url: str = os.environ["SUPABASE_URL"]
+key: str = os.environ["SUPABASE_KEY"]
+supabase: Client = create_client(url, key)
+```
+
+### Asynchronous client
+
+Use `create_async_client`:
+
+```python
+import os
+from supabase import create_async_client, AsyncClient
+
+url: str = os.environ["SUPABASE_URL"]
+key: str = os.environ["SUPABASE_KEY"]
+supabase: AsyncClient = await create_async_client(url, key)
+```
+
+The async factory is also available as `acreate_client` for brevity.
+
+## Your first query
+
+With a client in hand, run a query against a public table:
+
+```python
+# Insert a row
+result = supabase.table("countries").insert({"name": "Germany"}).execute()
+print(result.data)  # [{"id": 1, "name": "Germany", ...}]
+
+# Select rows
+result = supabase.table("countries").select("*").execute()
+print(result.data)
+```
+
+The pattern is always the same: choose a table, build a query chain, and call `.execute()`. See [Database Queries](/docs/guides/getting-started/python-client/database-queries) for all supported operations.
+
+## Client reuse guidance
+
+- **Reuse a single client instance** for anonymous or service-role use within your application's lifetime. The client internally manages auth state, header propagation, and lazy service clients (PostgREST, Storage, Functions).
+- **Do not create a new client per request.** Client initialization is cheap but not free, and each client maintains its own session tracking and realtime connections.
+- **Multiple clients are fine** when you need separate auth contexts (for example, different user sessions). Create one client per session store.
+- **For authenticated user requests**, create a fresh client per user session or per request. The client mutates its internal headers on auth state changes, so a shared client cannot isolate multiple users. For serverless or per-request environments, use per-request client instances with the user's access token.
+
+## Next steps
+
+- [Client Options](/docs/guides/getting-started/python-client/clients) — customize timeouts, schemas, shared HTTP clients
+- [Async Lifecycle](/docs/guides/getting-started/python-client/async-lifecycle) — understand sync vs async patterns
+- [Database Queries](/docs/guides/getting-started/python-client/database-queries) — full CRUD and filter reference
