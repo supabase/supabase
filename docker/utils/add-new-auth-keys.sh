@@ -38,8 +38,14 @@ else
         exit 1
     fi
 
-    if ! docker info >/dev/null 2>&1; then
-        echo "Error: docker is installed but the daemon is not running."
+    if ! docker_info_err=$(docker info 2>&1 >/dev/null); then
+        if printf '%s' "$docker_info_err" | grep -qi "permission denied"; then
+            echo "Error: permission denied connecting to the Docker daemon."
+            echo "Add your user to the docker group (sudo usermod -aG docker \$USER)," \
+                 "start a new shell (or run 'newgrp docker'), and try again."
+        else
+            echo "Error: docker is installed but the daemon is not running."
+        fi
         exit 1
     fi
 
