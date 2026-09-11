@@ -523,9 +523,9 @@ services:
       [
         "postgres",
         "-c",
-        "config_file=/etc/postgresql/postgresql.conf",
-        "-c",
-        "log_min_messages=fatal" # prevents Realtime polling queries from appearing in logs
+        "config_file=/etc/postgresql/postgresql.conf"
+        # Realtime/Supavisor's internal polling queries are silenced per-role instead of
+        # instance-wide; see supabase_admin's log_min_messages override in roles.sql
       ]
 
   # Update the DATABASE_URL if you are using an external Postgres database
