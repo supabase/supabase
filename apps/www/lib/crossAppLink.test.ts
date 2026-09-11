@@ -29,11 +29,11 @@ describe('isCrossAppLink', () => {
     expect(isCrossAppLink('/dashboard/projects?sort=name#list')).toBe(true)
   })
 
-  it('identifies absolute URLs targeting cross-app routes on supabase.com', () => {
-    expect(isCrossAppLink('https://supabase.com/docs/guides/api')).toBe(true)
-    expect(isCrossAppLink('https://supabase.com/dashboard')).toBe(true)
-    expect(isCrossAppLink('https://supabase.com/dashboard/sign-up')).toBe(true)
-    expect(isCrossAppLink('http://localhost:3000/docs')).toBe(true)
+  it('returns false for absolute URLs (callers should use <a> tags directly)', () => {
+    expect(isCrossAppLink('https://supabase.com/docs/guides/api')).toBe(false)
+    expect(isCrossAppLink('https://supabase.com/dashboard')).toBe(false)
+    expect(isCrossAppLink('http://localhost:3000/docs')).toBe(false)
+    expect(isCrossAppLink('https://github.com/supabase/supabase')).toBe(false)
   })
 
   it('does not match same-app routes or partial prefixes', () => {
@@ -47,7 +47,6 @@ describe('isCrossAppLink', () => {
     expect(isCrossAppLink('/documentation')).toBe(false)
     expect(isCrossAppLink('/dashboard-settings')).toBe(false)
     expect(isCrossAppLink('/dashboard-settings#section')).toBe(false)
-    expect(isCrossAppLink('https://github.com/supabase/supabase')).toBe(false)
   })
 
   it('handles empty or undefined inputs safely', () => {

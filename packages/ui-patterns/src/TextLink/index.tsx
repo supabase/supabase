@@ -10,30 +10,13 @@ const CROSS_APP_PREFIXES = ['/docs', '/dashboard']
 /**
  * Returns true when `href` points to a route owned by a different
  * Next.js app on the same origin (e.g. /docs/* or /dashboard/*).
+ *
+ * Only handles relative paths — absolute URLs should use <a> directly.
  */
 function isCrossAppLink(href?: string): boolean {
-  if (!href) return false
+  if (!href || !href.startsWith('/')) return false
 
-  let path = href
-  if (path.startsWith('http://') || path.startsWith('https://')) {
-    try {
-      const url = new URL(path)
-      if (
-        url.hostname === 'supabase.com' ||
-        url.hostname.endsWith('.supabase.com') ||
-        url.hostname === 'localhost' ||
-        url.hostname === '127.0.0.1'
-      ) {
-        path = url.pathname
-      } else {
-        return false
-      }
-    } catch {
-      return false
-    }
-  } else {
-    path = path.split(/[?#]/)[0]
-  }
+  const path = href.split(/[?#]/)[0]
 
   return CROSS_APP_PREFIXES.some((prefix) => path === prefix || path.startsWith(prefix + '/'))
 }
