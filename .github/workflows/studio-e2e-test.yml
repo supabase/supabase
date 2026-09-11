@@ -190,7 +190,7 @@ jobs:
 
       - name: Comment Playwright test results on PR
         if: always() && github.event_name == 'pull_request' && !github.event.pull_request.head.repo.fork
-        uses: daun/playwright-report-comment@be9e270edd5ad86038604d3caa84a819a6ff6fed # v3.10.0
+        uses: daun/playwright-report-comment@31ed947ec7a623d18a66cfd20ef546dc66ef8063 # v4.1.0
         with:
           report-file: e2e/studio/test-results/test-results.json
           comment-title: '🎭 Playwright Test Results (${{ matrix.framework }})'
