@@ -68,10 +68,10 @@ select * from transcripts;
 
 ## View security
 
-By default, views are accessed with their creator's permission, known as `security definer`. If a privileged role creates a view, others accessing it use that role's elevated permissions. To enforce row level security policies, define the view with the `security_invoker` modifier.
+By default, Postgres checks permissions on a view's underlying tables against the view's owner rather than the role running the query. If a privileged role creates a view, everyone reading it does so through that role's permissions. Define the view with the `security_invoker` modifier to check the querying role's permissions instead, which is also what makes the underlying tables' row level security policies apply.
 
 ```sql
--- alter a security_definer view to be security_invoker
+-- switch an existing view to the querying role's permissions
 alter view <view name>
 set (security_invoker = true);
 
