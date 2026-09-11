@@ -6,6 +6,7 @@ import { BlockOverviewTabs } from './block-overview-tabs'
 import { starterArchitectureDefinitions } from '@/config/starter-architecture'
 import { generateBlockArchitecture, summarizeBlockArchitecture } from '@/lib/block-architecture'
 import { generateRegistryTree } from '@/lib/process-registry'
+import { resolveRegistryItem } from '@/lib/registry-resolution'
 import { registry } from '@/registry'
 
 export function BlockOverview({
@@ -17,9 +18,10 @@ export function BlockOverview({
   children?: ReactNode
   showFiles?: boolean
 }) {
-  const definition = [...registry.items, ...starterArchitectureDefinitions].find(
-    (item) => item.name === name
-  )
+  const resolved = registry.items.some((item) => item.name === name)
+    ? resolveRegistryItem(registry, name)
+    : undefined
+  const definition = resolved ?? starterArchitectureDefinitions.find((item) => item.name === name)
 
   if (!definition) throw new Error(`Missing architecture definition for block: ${name}`)
 
@@ -28,10 +30,31 @@ export function BlockOverview({
       architecture={summarizeBlockArchitecture(generateBlockArchitecture(definition))}
       files={
         showFiles ? (
-          <BlockItemCode
-            files={generateRegistryTree(path.join(process.cwd(), 'public', 'r', `${name}.json`))}
-            embedded
-          />
+          <div className="flex h-full flex-col">
+            {resolved && (
+              <p className="border-b px-4 py-3 text-xs text-foreground-light">
+                Supabase files
+                {resolved.firstPartyDependencies.length > 0
+                  ? ', including registry dependencies'
+                  : ''}
+                .
+                {resolved.externalRegistryDependencies.length > 0 && (
+                  <>
+                    {' '}
+                    External UI dependencies: {resolved.externalRegistryDependencies.join(', ')}.
+                  </>
+                )}
+              </p>
+            )}
+            <div className="min-h-0 flex-1">
+              <BlockItemCode
+                files={generateRegistryTree(
+                  path.join(process.cwd(), 'public', 'r', `${name}.json`)
+                )}
+                embedded
+              />
+            </div>
+          </div>
         ) : undefined
       }
     >

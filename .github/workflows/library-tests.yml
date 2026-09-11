@@ -1,0 +1,58 @@
+name: Library checks
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'apps/ui-library/**'
+      - 'blocks/vue/**'
+      - 'packages/ui/**'
+      - 'packages/ui-patterns/**'
+      - 'packages/common/**'
+      - 'packages/icons/**'
+      - 'packages/shared-data/**'
+      - 'packages/api-types/**'
+      - 'packages/config/**'
+      - 'packages/tsconfig/**'
+      - 'packages/eslint-config-supabase/**'
+      - 'patches/**'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'package.json'
+      - '.github/workflows/library-tests.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          run_install: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter library test
+      - name: Check generated registry
+        run: |
+          registry_changes="$(git status --porcelain --untracked-files=all -- apps/ui-library/public/r apps/ui-library/__registry__)"
+          if [ -n "$registry_changes" ]; then
+            printf '%s\n' "$registry_changes"
+            echo 'Run pnpm --filter library build:registry and commit the generated registry files.'
+            exit 1
+          fi
+      - run: pnpm --filter library build

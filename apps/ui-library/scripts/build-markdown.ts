@@ -1,30 +1,17 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
+import { collectMdxFiles, getDocSlug } from './library-documents'
 import { transformLibraryMdx } from './library-mdx-to-markdown'
 
 const CONTENT_DIR = path.join(process.cwd(), 'content', 'docs')
 const OUTPUT_DIR = path.join(process.cwd(), 'public', 'markdown', 'docs')
 const MANIFEST_PATH = path.join(process.cwd(), 'public', 'markdown', 'manifest.json')
 
-async function collectMdxFiles(dir: string): Promise<string[]> {
-  const entries = await fs.readdir(dir, { withFileTypes: true })
-  const files: string[] = []
-
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name)
-    if (entry.isDirectory()) {
-      files.push(...(await collectMdxFiles(fullPath)))
-    } else if (entry.name.endsWith('.mdx')) {
-      files.push(fullPath)
-    }
-  }
-
-  return files.sort((a, b) => a.localeCompare(b))
-}
-
 async function generate() {
-  const sources = await collectMdxFiles(CONTENT_DIR)
+  const sources = collectMdxFiles(CONTENT_DIR)
+  const documentSlugs = new Set(sources.map((file) => getDocSlug(path.relative(CONTENT_DIR, file))))
+  if (documentSlugs.size !== sources.length) throw new Error('Duplicate library document slugs')
   const slugs: string[] = []
 
   // Wipe first so pages that were renamed or deleted don't leave stale markdown
@@ -34,13 +21,13 @@ async function generate() {
 
   for (const sourceFile of sources) {
     const relativePath = path.relative(CONTENT_DIR, sourceFile)
-    const slug = relativePath.replace(/\.mdx$/, '').replace(/\\/g, '/')
+    const slug = getDocSlug(relativePath)
     const outPath = path.join(OUTPUT_DIR, `${slug}.md`)
     const raw = await fs.readFile(sourceFile, 'utf8')
 
     let output: string
     try {
-      output = transformLibraryMdx(raw)
+      output = transformLibraryMdx(raw, { documentSlugs, documentSlug: slug })
     } catch (err) {
       throw new Error(
         `Failed to process ${sourceFile}: ${err instanceof Error ? err.message : err}`,

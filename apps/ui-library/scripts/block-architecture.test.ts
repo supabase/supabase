@@ -165,7 +165,6 @@ describe('block architecture', () => {
               label: 'Uploads files',
             },
             { source: 'uploader', target: 'uploads', label: 'Saves metadata' },
-            { source: 'uploader', target: 'missing' },
           ],
         },
       },
@@ -178,12 +177,12 @@ describe('block architecture', () => {
     assert.equal(graph.relationships[1].source, 'uploader')
   })
 
-  it('deduplicates installed destinations and does not mutate the block definition', () => {
+  it('deduplicates identical files and does not mutate the block definition', () => {
     const definition = {
       name: 'hook',
       files: [
         { path: 'registry/default/blocks/hook/hooks/use-data.ts', type: 'registry:hook' },
-        { path: 'other/source.ts', target: './hooks/use-data.ts', type: 'registry:hook' },
+        { path: 'registry/default/blocks/hook/hooks/use-data.ts', type: 'registry:hook' },
       ],
     }
     const before = JSON.stringify(definition)
@@ -192,6 +191,53 @@ describe('block architecture', () => {
     assert.equal(first.resources[0].kind, 'hook')
     assert.deepEqual(generateBlockArchitecture(definition), first)
     assert.equal(JSON.stringify(definition), before)
+  })
+
+  it('rejects conflicting files instead of hiding one installed source', () => {
+    assert.throws(
+      () =>
+        generateBlockArchitecture({
+          name: 'conflict',
+          files: [
+            { path: 'registry/default/blocks/hook/hooks/use-data.ts' },
+            { path: 'other/source.ts', target: './hooks/use-data.ts' },
+          ],
+        }),
+      /Architecture "conflict": conflicting destination "hooks\/use-data.ts"/
+    )
+  })
+
+  it('rejects duplicate resource IDs, unknown files, and missing relationship endpoints', () => {
+    const resource = { id: 'uploads', label: 'Uploads', kind: 'table' as const }
+    assert.throws(
+      () =>
+        generateBlockArchitecture({
+          name: 'duplicate',
+          meta: { architecture: { resources: [resource, resource] } },
+        }),
+      /duplicate resource ID "uploads"/
+    )
+    assert.throws(
+      () =>
+        generateBlockArchitecture({
+          name: 'missing-file',
+          meta: { architecture: { resources: [{ ...resource, files: ['missing.sql'] }] } },
+        }),
+      /resource "uploads" references missing file "missing.sql"/
+    )
+    assert.throws(
+      () =>
+        generateBlockArchitecture({
+          name: 'missing-endpoint',
+          meta: {
+            architecture: {
+              resources: [resource],
+              relationships: [{ source: 'uploads', target: 'missing' }],
+            },
+          },
+        }),
+      /relationship "uploads" -> "missing" references a missing resource/
+    )
   })
 
   it('resolves every block documentation overview to exactly one nonempty architecture definition', () => {

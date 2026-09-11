@@ -9,28 +9,23 @@ preview: |-
       <CatalogPreview kind="chat" />
     </div>
   </BlockOverview>
-installation:
-  - title: Create the app
-    before: >-
-      Scaffold the template with the [Next.js
-      CLI](https://nextjs.org/docs/app/api-reference/cli/create-next-app):
-    command: >-
-      npx create-next-app@latest my-chat --example
-      https://github.com/supabase-community/vercel-ai-chatbot --use-pnpm
-
-      cd my-chat
-
-      cp .env.example .env
-    after: >-
-      This community template uses Next.js 13, AI SDK 2, and Supabase Auth
-      Helpers. Review its [dependency
-      versions](https://github.com/supabase-community/vercel-ai-chatbot/blob/main/package.json)
-      and plan upgrades before deployment. For a new authentication foundation
-      using `@supabase/ssr`, start with the [Next.js
-      starter](/library/docs/starters/nextjs-starter).
 ---
 
 The [Supabase Community AI chatbot template](https://github.com/supabase-community/vercel-ai-chatbot) includes a chat interface, streaming responses, Supabase Auth, and conversation history in Postgres. Creating the app installs those features together.
+
+## Installation
+
+### Create the app
+
+Scaffold the template with the [Next.js CLI](https://nextjs.org/docs/app/api-reference/cli/create-next-app):
+
+```bash
+npx create-next-app@latest my-chat --example https://github.com/supabase-community/vercel-ai-chatbot --use-pnpm
+cd my-chat
+cp .env.example .env
+```
+
+This community template uses Next.js 13, AI SDK 2, and Supabase Auth Helpers. Review its [dependency versions](https://github.com/supabase-community/vercel-ai-chatbot/blob/main/package.json) and plan upgrades before deployment. For a new authentication foundation using `@supabase/ssr`, start with the [Next.js starter](/library/docs/starters/nextjs-starter).
 
 ## Start Supabase
 

@@ -1,4 +1,3 @@
-import matter from 'gray-matter'
 import type { Content, Parent, Root } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
@@ -9,13 +8,15 @@ import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { visit } from 'unist-util-visit'
 
-import { markdownSchema } from './markdown-schema'
+import { parseLibraryDocument, toAgentHref } from './library-documents'
+import { markdownSchema, type MarkdownOptions } from './markdown-schema'
 
 type JsxNode = MdxJsxFlowElement | MdxJsxTextElement
 type ComponentHandler = (ctx: {
   props: Record<string, unknown>
   children: string
   node: JsxNode
+  options: MarkdownOptions
 }) => string
 
 const PARSE_OPTIONS = {
@@ -31,8 +32,6 @@ const SERIALIZE_OPTIONS = {
 const parseMdx = (source: string): Root => fromMarkdown(source, PARSE_OPTIONS)
 const serializeMdx = (tree: Parent): string => toMarkdown(tree as Root, SERIALIZE_OPTIONS)
 
-const defaultHandler: ComponentHandler = ({ children }) => children
-
 const isJsx = (n: Content): n is JsxNode =>
   n.type === 'mdxJsxFlowElement' || n.type === 'mdxJsxTextElement'
 
@@ -47,9 +46,13 @@ function propsFrom(node: JsxNode): Record<string, unknown> {
   return props
 }
 
-function applySchema(parent: Parent, schema: Record<string, ComponentHandler>): void {
+function applySchema(
+  parent: Parent,
+  schema: Record<string, ComponentHandler>,
+  options: MarkdownOptions
+): void {
   for (const child of parent.children as Content[]) {
-    if ('children' in child) applySchema(child as Parent, schema)
+    if ('children' in child) applySchema(child as Parent, schema, options)
   }
   const next: Content[] = []
   for (const child of parent.children as Content[]) {
@@ -61,12 +64,17 @@ function applySchema(parent: Parent, schema: Record<string, ComponentHandler>): 
       continue
     }
     if (isJsx(child)) {
-      const handler = schema[child.name ?? ''] ?? defaultHandler
+      const handler = schema[child.name ?? '']
+      if (!handler && child.name && /^[A-Z]/.test(child.name)) {
+        throw new Error(`No Markdown handler for component: ${child.name}`)
+      }
       const children = serializeMdx({
         type: 'root',
         children: child.children as Root['children'],
       }).trim()
-      const value = handler({ props: propsFrom(child), children, node: child })
+      const value = handler
+        ? handler({ props: propsFrom(child), children, node: child, options })
+        : children
       if (value) {
         next.push({ type: 'html', value } as Content)
       }
@@ -77,56 +85,17 @@ function applySchema(parent: Parent, schema: Record<string, ComponentHandler>): 
   parent.children = next as Parent['children']
 }
 
-function rewriteLibraryLinks(tree: Root): void {
+function rewriteLibraryLinks(tree: Root, options: MarkdownOptions): void {
   visit(tree, 'link', (node) => {
-    if (!node.url.startsWith('/')) return
-    if (node.url.startsWith('//')) return
-
-    if (node.url.startsWith('/library/docs/')) {
-      const [pathname, hash] = node.url.split('#')
-      const withMd = pathname.endsWith('.md') ? pathname : `${pathname}.md`
-      node.url = `https://supabase.com${withMd}${hash ? `#${hash}` : ''}`
-      return
-    }
-
-    node.url = `https://supabase.com${node.url}`
+    node.url = toAgentHref(node.url, options.documentSlugs, options.documentSlug)
   })
 }
 
-export function transformLibraryMdx(raw: string): string {
-  const { content, data } = matter(raw)
-  const installation = (data.installation ?? []).map(
-    (step: {
-      title: string
-      registry?: string
-      command?: string
-      before?: string
-      after?: string
-    }) =>
-      [
-        `### ${step.title}`,
-        step.before,
-        step.registry
-          ? `<BlockItem name=${JSON.stringify(step.registry)} />`
-          : `\`\`\`bash\n${step.command}\n\`\`\``,
-        step.after,
-      ]
-        .filter(Boolean)
-        .join('\n\n')
-  )
-  const tree = parseMdx(
-    [
-      data.preview,
-      (installation.length || data.installationContent) && '## Installation',
-      ...installation,
-      data.installationContent,
-      content,
-    ]
-      .filter(Boolean)
-      .join('\n\n')
-  )
-  rewriteLibraryLinks(tree)
-  applySchema(tree, markdownSchema)
+export function transformLibraryMdx(raw: string, options: MarkdownOptions = {}): string {
+  const { content, data } = parseLibraryDocument(raw)
+  const tree = parseMdx([data.preview, content].filter(Boolean).join('\n\n'))
+  rewriteLibraryLinks(tree, options)
+  applySchema(tree, markdownSchema, options)
   const body = serializeMdx(tree).trim()
 
   const headerParts: string[] = []

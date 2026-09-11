@@ -5,14 +5,21 @@ preview: |-
   <BlockOverview name="realtime-avatar-stack-nuxtjs" showFiles>
     <BlockPreview name="realtime-avatar-stack-demo" />
   </BlockOverview>
-installation:
-  - title: Installation
-    registry: realtime-avatar-stack-nuxtjs
-    showOpenInV0: true
-    after: >-
-      This block assumes that you have already installed a Supabase client for
-      Nuxt from the previous step.
 ---
+
+## Installation
+
+### Set up the Supabase client
+
+This block requires a Supabase client for Nuxt.js. If your project already has one, reuse it and update the block's imports to match your client. Otherwise, install the client:
+
+<BlockItem name="supabase-client-nuxtjs" framework="vue" showOpenInV0={false} />
+
+Configure the environment variables described in the [Nuxt.js client guide](/library/docs/nuxtjs/client#getting-started) before using the block.
+
+### Install the block
+
+<BlockItem name="realtime-avatar-stack-nuxtjs" framework="vue" />
 
 ## Usage
 

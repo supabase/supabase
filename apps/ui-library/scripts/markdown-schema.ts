@@ -1,11 +1,27 @@
 import path from 'node:path'
 
+import { starterArchitectureDefinitions } from '../config/starter-architecture'
+import {
+  generateBlockArchitecture,
+  summarizeBlockArchitecture,
+  type BlockArchitecture,
+} from '../lib/block-architecture'
 import { getInstallCommands } from '../lib/install-command'
 import { generateRegistryTree, type RegistryNode } from '../lib/process-registry'
+import { resolveRegistryItem } from '../lib/registry-resolution'
+import { registry } from '../registry'
+import { toAgentHref } from './library-documents'
+
+export type MarkdownOptions = {
+  registryDirectory?: string
+  documentSlugs?: ReadonlySet<string>
+  documentSlug?: string
+}
 
 type HandlerContext = {
   props: Record<string, unknown>
   children: string
+  options: MarkdownOptions
 }
 
 type ComponentHandler = (ctx: HandlerContext) => string
@@ -13,51 +29,102 @@ type ComponentHandler = (ctx: HandlerContext) => string
 const omit: ComponentHandler = () => ''
 const unwrap: ComponentHandler = ({ children }) => children
 
-function toAgentHref(href: string): string {
-  if (!href) return href
-  if (href.startsWith('/library/docs/')) {
-    const [pathname, hash] = href.split('#')
-    const withMd = pathname.endsWith('.md') ? pathname : `${pathname}.md`
-    return `https://supabase.com${withMd}${hash ? `#${hash}` : ''}`
+function requiredName(props: Record<string, unknown>, field: string): string {
+  const name = props[field]
+  if (typeof name !== 'string' || !name) {
+    throw new Error(`Registry component requires a ${field}`)
   }
-  if (href.startsWith('/') && !href.startsWith('//')) {
-    return `https://supabase.com${href}`
-  }
-  return href
+  return name
 }
 
 function BlockItem({ props }: HandlerContext): string {
-  const name = String(props.name ?? '')
-  if (!name) return ''
-  const command = getInstallCommands(name, { production: true }).npm
+  const name = requiredName(props, 'name')
+  resolveRegistryItem(registry, name)
+  const framework = props.framework ?? 'react'
+  if (framework !== 'react' && framework !== 'vue') {
+    throw new Error(`Unsupported install framework for ${name}: ${String(framework)}`)
+  }
+  const command = getInstallCommands(name, { framework, production: true }).npm
   return ['Install this block:', '', '```bash', command, '```'].join('\n')
 }
 
-function RegistryBlock({ props }: HandlerContext): string {
-  const itemName = String(props.itemName ?? '')
-  if (!itemName) return ''
-
-  const registryPath = path.join(process.cwd(), 'public', 'r', `${itemName}.json`)
-  let listing = ''
+function RegistryBlock({ props, options }: HandlerContext): string {
+  const itemName = requiredName(props, 'itemName')
+  const definition = resolveRegistryItem(registry, itemName)
+  const registryPath = path.join(
+    options.registryDirectory ?? path.join(process.cwd(), 'public', 'r'),
+    `${itemName}.json`
+  )
+  let tree: RegistryNode[]
   try {
-    const tree = generateRegistryTree(registryPath)
-    listing = formatTree(tree)
-  } catch {
-    listing = ''
+    tree = generateRegistryTree(registryPath)
+  } catch (error) {
+    throw new Error(`Cannot export registry files for ${itemName}: ${String(error)}`, {
+      cause: error,
+    })
   }
 
-  const registryUrl = `https://supabase.com/library/r/${itemName}.json`
-  const parts = [listing, listing ? '' : null, `Full source: ${registryUrl}`].filter(
-    (part) => part !== null
+  const sources = [itemName, ...definition.firstPartyDependencies].map(
+    (name) => `Full source: https://supabase.com/library/r/${name}.json`
   )
+  const scope = definition.firstPartyDependencies.length
+    ? `Includes first-party dependencies: ${definition.firstPartyDependencies.join(', ')}.`
+    : ''
+  const external = definition.externalRegistryDependencies.length
+    ? `External registry dependencies: ${definition.externalRegistryDependencies.join(', ')}.`
+    : ''
 
-  return parts.join('\n').trim()
+  return [scope, formatTree(tree), external, sources.join('\n')].filter(Boolean).join('\n\n')
 }
 
-function BlockOverview({ props, children }: HandlerContext): string {
-  if (props.showFiles !== true && props.showFiles !== 'true') return children
-  const files = RegistryBlock({ props: { itemName: props.name }, children: '' })
-  return [children, '## Files', files].filter(Boolean).join('\n\n')
+function formatArchitecture(architecture: BlockArchitecture): string {
+  const sections = ['## Architecture']
+  for (const status of ['added', 'existing'] as const) {
+    const resources = architecture.resources.filter((resource) => resource.status === status)
+    if (!resources.length) continue
+    sections.push(status === 'added' ? '### Added resources' : '### Existing resources')
+    sections.push(
+      resources
+        .map((resource) => {
+          const route = resource.route ? `; route \`${resource.route}\`` : ''
+          const description = resource.description ? `: ${resource.description}` : ''
+          return `- **${resource.label}** (${resource.kind}${route})${description}`
+        })
+        .join('\n')
+    )
+  }
+  if (architecture.relationships.length) {
+    const labels = new Map(architecture.resources.map((resource) => [resource.id, resource.label]))
+    sections.push('### Relationships')
+    sections.push(
+      architecture.relationships
+        .map(({ source, target, label }) => {
+          const description = label ? `: ${label}` : ''
+          return `- ${labels.get(source)} → ${labels.get(target)}${description}`
+        })
+        .join('\n')
+    )
+  }
+  return sections.join('\n\n')
+}
+
+function BlockOverview({ props, children, options }: HandlerContext): string {
+  const name = requiredName(props, 'name')
+  const template = starterArchitectureDefinitions.find((item) => item.name === name)
+  const definition = template ?? resolveRegistryItem(registry, name)
+  const architecture = formatArchitecture(
+    summarizeBlockArchitecture(generateBlockArchitecture(definition))
+  )
+  const scope = template
+    ? 'This template overview illustrates key resources. It is not a complete inventory of scaffolded files.'
+    : ''
+  const files =
+    props.showFiles === true || props.showFiles === 'true'
+      ? ['## Files', RegistryBlock({ props: { itemName: name }, children: '', options })].join(
+          '\n\n'
+        )
+      : ''
+  return [children, scope, architecture, files].filter(Boolean).join('\n\n')
 }
 
 function formatTree(nodes: RegistryNode[], indent = 0): string {
@@ -81,8 +148,8 @@ function AccordionTrigger({ children }: HandlerContext): string {
   return title ? `**${title}**` : ''
 }
 
-function LinkedCard({ props, children }: HandlerContext): string {
-  const href = toAgentHref(String(props.href ?? ''))
+function LinkedCard({ props, children, options }: HandlerContext): string {
+  const href = toAgentHref(String(props.href ?? ''), options.documentSlugs, options.documentSlug)
   const label = children.replace(/\s+/g, ' ').trim()
   return href ? `- [${label || href}](${href})` : label
 }
@@ -104,8 +171,8 @@ function TanstackDBGenerator(): string {
   ].join('\n')
 }
 
-function Anchor({ props, children }: HandlerContext): string {
-  const href = toAgentHref(String(props.href ?? ''))
+function Anchor({ props, children, options }: HandlerContext): string {
+  const href = toAgentHref(String(props.href ?? ''), options.documentSlugs, options.documentSlug)
   return href ? `[${children}](${href})` : children
 }
 
@@ -120,7 +187,11 @@ export const markdownSchema: Record<string, ComponentHandler> = {
   AccordionContent: unwrap,
   Card: unwrap,
   LinkedCard,
+  FrameworkQuickstart: unwrap,
+  FrameworkQuickstartTab: unwrap,
+  QuickstartStep: unwrap,
   ComponentPreview,
+  CatalogPreview: omit,
   BlockPreview: omit,
   DualRealtimeChat: omit,
   DualRealtimeFlow: omit,

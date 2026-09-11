@@ -1,11 +1,18 @@
 import * as fs from 'fs'
 import * as path from 'path'
 
+import { normalizeVueRegistryFiles } from '../lib/registry-resolution'
+
 function processJsonFile(filePath: string) {
   try {
     // Read the file
     const content = fs.readFileSync(filePath, 'utf8')
     const json = JSON.parse(content)
+
+    // Normalize only after shadcn build has read the original package source files.
+    for (const item of Array.isArray(json.items) ? json.items : [json]) {
+      if (Array.isArray(item.files)) item.files = normalizeVueRegistryFiles(item.files)
+    }
 
     // Convert to string to do replacement
     let stringified = JSON.stringify(json, null, 2)
@@ -44,7 +51,7 @@ function processJsonFile(filePath: string) {
     fs.writeFileSync(filePath, stringified)
     console.log(`✓ Updated ${filePath}`)
   } catch (error) {
-    console.error(`Error processing ${filePath}:`, error)
+    throw new Error(`Unable to prepare registry artifact "${filePath}"`, { cause: error })
   }
 }
 

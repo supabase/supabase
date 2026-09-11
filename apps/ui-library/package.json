@@ -7,13 +7,13 @@
     "preinstall": "npx only-allow pnpm",
     "dev:content": "velite dev",
     "dev:next": "next dev --port 3004",
-    "dev": "run-p build:content build:registry build:markdown && run-p --race dev:*",
+    "dev": "pnpm build:prepare && run-p --race dev:*",
     "build:content": "velite build --strict",
     "build:registry": "rimraf -G public/r/* && tsx ./scripts/build-registry.mts && shadcn build public/r/registry.json && tsx scripts/clean-registry.ts",
     "build:markdown": "tsx ./scripts/build-markdown.ts",
     "build:llms": "tsx ./scripts/build-llms-txt.ts",
     "build:next": "next build --turbopack",
-    "build": "run-p build:content build:registry build:llms build:markdown && pnpm build:next",
+    "build": "pnpm build:prepare && pnpm build:next",
     "test:markdown": "tsx --test scripts/library-mdx-to-markdown.test.ts",
     "test:architecture": "tsx --test scripts/block-architecture.test.ts",
     "test:catalog": "tsx --test scripts/library-catalog.test.ts",
@@ -22,7 +22,9 @@
     "lint": "eslint .",
     "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
     "clean": "rimraf .next .turbo tsconfig.tsbuildinfo .contentlayer .velite",
-    "typecheck": "pnpm build:content && tsc --noEmit -p tsconfig.json"
+    "typecheck": "pnpm build:content && next typegen && tsc --noEmit -p tsconfig.json",
+    "build:prepare": "pnpm build:registry && run-p build:content build:markdown build:llms",
+    "test": "pnpm build:prepare && tsx --test scripts/*.test.ts middleware.test.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",

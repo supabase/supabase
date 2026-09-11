@@ -3,10 +3,23 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { registrySchema } from 'shadcn/schema'
+
+import { starterArchitectureDefinitions } from '../config/starter-architecture'
+import { generateBlockArchitecture } from '../lib/block-architecture'
+import { resolveRegistryItem } from '../lib/registry-resolution'
 import { registry } from '../registry/index'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const registryPath = path.join(__dirname, '..', 'public', 'r', 'registry.json')
+
+registrySchema.parse(registry)
+for (const item of registry.items) {
+  generateBlockArchitecture(resolveRegistryItem(registry, item.name))
+}
+for (const definition of starterArchitectureDefinitions) {
+  generateBlockArchitecture(definition)
+}
 
 const cleanedRegistry = {
   $schema: 'https://ui.shadcn.com/schema/registry.json',

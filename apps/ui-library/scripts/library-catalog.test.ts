@@ -1,11 +1,54 @@
 import assert from 'node:assert/strict'
 import { existsSync } from 'node:fs'
+import path from 'node:path'
 import { describe, it } from 'node:test'
+import { fileURLToPath } from 'node:url'
 
 import { componentPages, mcpBlocks, oauthBlocks, platformBlocks } from '../config/docs'
 import { getLibraryBlockHref, libraryBlocks, libraryCategories } from '../config/library'
+import { collectMdxFiles, getDocSlug } from './library-documents'
 
 describe('library catalog', () => {
+  it('accounts for every block guide and framework variant in the content directory', () => {
+    const contentDirectory = fileURLToPath(new URL('../content/docs', import.meta.url))
+    const catalogRoutes = new Set(
+      libraryBlocks.flatMap((block) => [
+        block.href,
+        ...(block.supportedFrameworks ?? []).map((framework) =>
+          getLibraryBlockHref(block, framework)
+        ),
+      ])
+    )
+    // These guides are reachable directly but intentionally absent from the block catalog.
+    const unlistedRoutes = new Set([
+      '/docs/getting-started/introduction',
+      '/docs/getting-started/quickstart',
+      '/docs/getting-started/faq',
+      '/docs/nextjs/tanstack-db',
+    ])
+    const documentRoutes = new Set(
+      collectMdxFiles(contentDirectory).map(
+        (file) => `/docs/${getDocSlug(path.relative(contentDirectory, file))}`
+      )
+    )
+
+    for (const route of documentRoutes) {
+      assert.ok(
+        catalogRoutes.has(route) || unlistedRoutes.has(route),
+        `${route} needs a catalog entry`
+      )
+    }
+    for (const route of [...catalogRoutes, ...unlistedRoutes]) {
+      assert.ok(documentRoutes.has(route), `${route} must resolve to a guide`)
+    }
+    for (const block of libraryBlocks) {
+      assert.ok(block.title.trim(), `${block.slug} needs a title`)
+      assert.ok(block.description?.trim(), `${block.slug} needs a description`)
+      assert.ok(block.preview, `${block.slug} needs a preview`)
+      assert.ok(libraryCategories.some((category) => category.name === block.category))
+    }
+  })
+
   it('keeps every existing block discoverable with a valid category and documentation route', () => {
     const existingItems = [
       ...componentPages.items,

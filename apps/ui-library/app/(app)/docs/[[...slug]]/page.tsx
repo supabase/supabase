@@ -10,13 +10,11 @@ import Balancer from 'react-wrap-balancer'
 
 import { allDocs } from '@/.velite'
 import { metadata as mainMetadata } from '@/app/layout'
-import { BlockInstallation } from '@/components/block-installation'
 import { CopyDocPrompt } from '@/components/copy-doc-prompt'
 import { FrameworkSelector } from '@/components/framework-selector'
 import { Mdx } from '@/components/mdx-components'
 import { SourcePanel } from '@/components/source-panel'
 import { libraryBlocks } from '@/config/library'
-import { getInstallationCommands } from '@/lib/install-command'
 import { absoluteUrl, cn } from '@/lib/utils'
 
 interface DocPageProps {
@@ -81,9 +79,9 @@ export default async function DocPage(props: DocPageProps) {
   }
 
   const isGuide = doc.slugAsParams.startsWith('getting-started/')
+  const isStarter = doc.slugAsParams.startsWith('starters/')
   const libraryBlock = libraryBlocks.find((block) => block.href === `/docs/${doc.slugAsParams}`)
-  const pagePath = `${process.env.NEXT_PUBLIC_BASE_PATH ?? '/library'}/docs/${doc.slugAsParams}`
-  const installCommand = getInstallationCommands(doc.installation).npm
+  const markdownPath = `${process.env.NEXT_PUBLIC_BASE_PATH ?? '/library'}/docs/${doc.slugAsParams}.md`
 
   return (
     <main className="isolate px-4 pb-10 pt-4 md:px-8 md:pb-16 md:pt-6">
@@ -97,7 +95,7 @@ export default async function DocPage(props: DocPageProps) {
           <div className="flex flex-wrap items-center justify-center gap-2">
             <span className="inline-flex h-7 items-center gap-1.5 rounded-md border bg-surface-75 px-2 text-xs text-foreground-light">
               <Blocks size={12} />
-              Block
+              {isStarter ? 'Starter' : 'Block'}
             </span>
             {libraryBlock?.frameworkLabel ? (
               <span className="inline-flex h-7 items-center rounded-md border bg-surface-75 px-2 text-xs text-foreground-light">
@@ -116,8 +114,12 @@ export default async function DocPage(props: DocPageProps) {
             <Balancer>{doc.description}</Balancer>
           </p>
         )}
-        {!isGuide && installCommand && (
-          <CopyDocPrompt title={doc.title} pagePath={pagePath} command={installCommand} />
+        {!isGuide && (
+          <CopyDocPrompt
+            title={doc.title}
+            markdownPath={markdownPath}
+            intent={isStarter ? 'create-app' : 'add-to-project'}
+          />
         )}
       </header>
 
@@ -129,7 +131,6 @@ export default async function DocPage(props: DocPageProps) {
           <Mdx code={doc.preview} />
         </div>
       )}
-      <BlockInstallation doc={doc} pagePath={pagePath} />
       <article className="library-doc-content relative z-0 min-w-0 pb-12">
         <Mdx code={doc.code} />
       </article>

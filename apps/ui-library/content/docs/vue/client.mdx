@@ -2,11 +2,13 @@
 title: Supabase Client Libraries
 description: Supabase client for Vue Single Page Applications
 preview: <BlockOverview name="supabase-client-vue" showFiles />
-installation:
-  - title: Installation
-    registry: supabase-client-vue
-    showOpenInV0: true
 ---
+
+## Installation
+
+If your project already has a Supabase client, reuse it instead of running this command. Otherwise, install the client and configure the environment variables below.
+
+<BlockItem name="supabase-client-vue" framework="vue" />
 
 ## Usage
 
@@ -33,12 +35,12 @@ You can use the client in your Vue component like following:
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 
-import { createClient } from './lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 
 const profile = ref(null)
 
 onMounted(async () => {
-  const { data, error } = await createClient.from('profiles').select('*').single()
+  const { data, error } = await createClient().from('profiles').select('*').single()
 
   if (!error) profile.value = data
 })

@@ -1,20 +1,27 @@
-export type ArchitectureResourceKind =
-  | 'capability'
-  | 'page'
-  | 'route'
-  | 'layout'
-  | 'middleware'
-  | 'component'
-  | 'hook'
-  | 'client'
-  | 'utility'
-  | 'edge-function'
-  | 'migration'
-  | 'table'
-  | 'bucket'
-  | 'service'
-  | 'config'
-  | 'file'
+import { z } from 'zod'
+
+import { getInstalledPath, uniqueInstalledFiles } from './registry-resolution'
+
+const resourceKinds = [
+  'capability',
+  'page',
+  'route',
+  'layout',
+  'middleware',
+  'component',
+  'hook',
+  'client',
+  'utility',
+  'edge-function',
+  'migration',
+  'table',
+  'bucket',
+  'service',
+  'config',
+  'file',
+] as const
+
+export type ArchitectureResourceKind = (typeof resourceKinds)[number]
 
 export type ArchitectureResource = {
   id: string
@@ -58,14 +65,33 @@ export type BlockArchitectureDefinition = {
 
 const extension = /\.(?:[cm]?[jt]sx?|vue|svelte)$/
 
+const architectureDeclarationSchema = z.object({
+  resources: z
+    .array(
+      z.object({
+        id: z.string().min(1),
+        label: z.string().min(1),
+        kind: z.enum(resourceKinds),
+        description: z.string().optional(),
+        status: z.enum(['added', 'existing']).optional(),
+        files: z.array(z.string().min(1)).optional(),
+        route: z.string().optional(),
+      })
+    )
+    .optional(),
+  relationships: z
+    .array(
+      z.object({
+        source: z.string().min(1),
+        target: z.string().min(1),
+        label: z.string().optional(),
+      })
+    )
+    .optional(),
+})
+
 function normalizePath(path: string): string {
   return path.replace(/\\/g, '/').replace(/^\.\//, '')
-}
-
-function installationPath(file: NonNullable<BlockArchitectureDefinition['files']>[number]): string {
-  const path = normalizePath(file.target || file.path)
-  // Registry source directories are packaging details, not installed folders.
-  return path.replace(/^registry\/[^/]+\/(?:blocks|clients|platform)\/[^/]+\//, '')
 }
 
 function routePath(path: string, flat: boolean, removeIndex = true): string {
@@ -130,8 +156,17 @@ function classify(path: string, type?: string): Pick<ArchitectureResource, 'kind
 export function generateBlockArchitecture(
   definition: BlockArchitectureDefinition
 ): BlockArchitecture {
+  const context = `Architecture "${definition.name}"`
+  const declaration = architectureDeclarationSchema.safeParse(definition.meta?.architecture ?? {})
+  if (!declaration.success) {
+    throw new Error(`${context}: invalid resource or relationship metadata`, {
+      cause: declaration.error,
+    })
+  }
   const files = new Map(
-    (definition.files ?? []).map((file) => [installationPath(file), file] as const)
+    uniqueInstalledFiles(definition.files ?? [], context).map(
+      (file) => [getInstalledPath(file), file] as const
+    )
   )
   const resources = new Map<string, ArchitectureResource>()
   for (const [path, file] of files) {
@@ -168,8 +203,26 @@ export function generateBlockArchitecture(
   // A declaration can group installed files into one resource or add a resource
   // created by setup instructions, such as a database table or storage bucket.
   const replacements = new Map<string, string>()
-  for (const declared of definition.meta?.architecture?.resources ?? []) {
+  const declaredIds = new Set<string>()
+  const declaredFileOwners = new Map<string, string>()
+  for (const declared of declaration.data.resources ?? []) {
+    if (declaredIds.has(declared.id)) {
+      throw new Error(`${context}: duplicate resource ID "${declared.id}"`)
+    }
+    declaredIds.add(declared.id)
     const declaredFiles = declared.files?.map(normalizePath)
+    for (const file of declaredFiles ?? []) {
+      if (!files.has(file)) {
+        throw new Error(`${context}: resource "${declared.id}" references missing file "${file}"`)
+      }
+      const owner = declaredFileOwners.get(file)
+      if (owner && owner !== declared.id) {
+        throw new Error(
+          `${context}: file "${file}" belongs to both "${owner}" and "${declared.id}"`
+        )
+      }
+      declaredFileOwners.set(file, declared.id)
+    }
     const previous = resources.get(declared.id)
     const resource: ArchitectureResource = {
       ...previous,
@@ -194,10 +247,15 @@ export function generateBlockArchitecture(
   }
 
   const relationships = new Map<string, ArchitectureRelationship>()
-  for (const relationship of definition.meta?.architecture?.relationships ?? []) {
+  for (const relationship of declaration.data.relationships ?? []) {
     const source = replacements.get(relationship.source) ?? relationship.source
     const target = replacements.get(relationship.target) ?? relationship.target
-    if (!resources.has(source) || !resources.has(target) || source === target) continue
+    if (!resources.has(source) || !resources.has(target)) {
+      throw new Error(
+        `${context}: relationship "${relationship.source}" -> "${relationship.target}" references a missing resource`
+      )
+    }
+    if (source === target) continue
     const label = relationship.label ?? ''
     const id = JSON.stringify([source, target, label])
     relationships.set(id, { id, source, target, label })

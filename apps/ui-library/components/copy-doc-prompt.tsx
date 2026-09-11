@@ -6,22 +6,26 @@ import { Button } from 'ui'
 
 interface CopyDocPromptProps {
   title: string
-  pagePath: string
-  command: string
+  markdownPath: string
+  intent: 'create-app' | 'add-to-project'
 }
 
-export function CopyDocPrompt({ title, pagePath, command }: CopyDocPromptProps) {
+export function CopyDocPrompt({ title, markdownPath, intent }: CopyDocPromptProps) {
   const [status, setStatus] = useState<'idle' | 'copied' | 'error'>('idle')
 
   useEffect(() => {
-    if (status === 'idle') return
+    if (status !== 'copied') return
     const timeout = window.setTimeout(() => setStatus('idle'), 2500)
     return () => window.clearTimeout(timeout)
   }, [status])
 
   async function copyPrompt() {
-    const url = new URL(pagePath, window.location.origin).href
-    const prompt = `Help me install ${title} from the Supabase UI Library in my project. Read ${url} for the full setup instructions. Run these commands from my project directory:\n\n${command}\n\nCheck my existing project structure and reuse any Supabase client setup that is already in place.`
+    const url = new URL(markdownPath, window.location.origin).href
+    const task =
+      intent === 'create-app'
+        ? `Help me create a new application using ${title} from the Supabase UI Library. Inspect my workspace and create the app in a suitable directory.`
+        : `Help me add ${title} from the Supabase UI Library to my existing project. Inspect my project structure and reuse any Supabase client setup that is already in place.`
+    const prompt = `${task} Read ${url} for the complete guide before making changes. Follow its prerequisites, installation, and configuration steps, adapting them to my project. Verify that the setup works.`
 
     try {
       await navigator.clipboard.writeText(prompt)
@@ -32,7 +36,7 @@ export function CopyDocPrompt({ title, pagePath, command }: CopyDocPromptProps) 
   }
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex max-w-full flex-col items-center gap-2">
       <Button
         variant="secondary"
         size="medium"
@@ -48,12 +52,18 @@ export function CopyDocPrompt({ title, pagePath, command }: CopyDocPromptProps) 
       >
         {status === 'copied' ? 'Prompt copied' : 'Copy agent prompt'}
       </Button>
+      <a
+        href={markdownPath}
+        className="text-xs text-foreground-light underline underline-offset-4 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        View Markdown guide
+      </a>
       <span
         role="status"
-        className={status === 'error' ? 'text-xs text-foreground-light' : 'sr-only'}
+        className={status === 'error' ? 'max-w-sm text-xs text-foreground-light' : 'sr-only'}
       >
         {status === 'error'
-          ? 'Unable to copy. Open the Markdown link to view the instructions.'
+          ? 'Unable to copy the prompt. Open the Markdown guide to view the instructions.'
           : status === 'copied'
             ? 'Prompt copied to clipboard'
             : ''}

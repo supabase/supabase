@@ -5,19 +5,26 @@ preview: |-
   <BlockOverview name="social-auth-vue" showFiles>
     <BlockPreview name="social-auth/auth/login" />
   </BlockOverview>
-installation:
-  - title: Installation
-    registry: social-auth-vue
-    showOpenInV0: true
-    after: >-
-      This block assumes that you have already installed a Supabase client for
-      Vue from the previous step.
 ---
 
 <Callout className="mt-4">
   The block is using GitHub provider by default, but can be easily switched by changing a single
   parameter.
 </Callout>
+
+## Installation
+
+### Set up the Supabase client
+
+This block requires a Supabase client for Vue. If your project already has one, reuse it and update the block's imports to match your client. Otherwise, install the client:
+
+<BlockItem name="supabase-client-vue" framework="vue" showOpenInV0={false} />
+
+Configure the environment variables described in the [Vue client guide](/library/docs/vue/client#getting-started) before using the block.
+
+### Install the block
+
+<BlockItem name="social-auth-vue" framework="vue" />
 
 ## Usage
 

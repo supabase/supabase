@@ -76,5 +76,5 @@
       ]
     }
   },
-  "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`."
+  "docs": "This block provides TanStack DB integration with Supabase collections. The schemas and collections are generated based on your database schema.\n\nYou'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`."
 }

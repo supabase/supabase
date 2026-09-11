@@ -7,24 +7,22 @@ preview: |-
       <CatalogPreview kind="dashboard" />
     </div>
   </BlockOverview>
-installation:
-  - title: Create the app
-    before: >-
-      Scaffold the complete template with the [Next.js
-      CLI](https://nextjs.org/docs/app/api-reference/cli/create-next-app):
-    command: >-
-      npx create-next-app@latest my-saas --example
-      https://github.com/supabase-community/nextjs-subscription-payments
-      --use-pnpm
-
-      cd my-saas
-    after: >-
-      The scaffold uses the template's dependency versions and includes its
-      authentication implementation. Review dependency updates before deploying
-      your app.
 ---
 
 The [Supabase Community subscription template](https://github.com/supabase-community/nextjs-subscription-payments) includes authentication, subscription checkout, a customer portal, and database migrations. Its components and billing routes are installed together when you create the app.
+
+## Installation
+
+### Create the app
+
+Scaffold the complete template with the [Next.js CLI](https://nextjs.org/docs/app/api-reference/cli/create-next-app):
+
+```bash
+npx create-next-app@latest my-saas --example https://github.com/supabase-community/nextjs-subscription-payments --use-pnpm
+cd my-saas
+```
+
+The scaffold uses the template's dependency versions and includes its authentication implementation. Review dependency updates before deploying your app.
 
 ## Start Supabase
 
