@@ -19,7 +19,7 @@ export interface McpClient {
   label: string
   icon?: string
   /** When true, use -icon-dark.svg in dark theme; otherwise the same -icon.svg is used for both themes. */
-  hasDistinctDarkIcon?: boolean
+  hasDarkIcon?: boolean
   docsUrl?: string
   externalDocsUrl?: string
   configFile?: string
