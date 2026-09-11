@@ -220,13 +220,27 @@ const DatabaseUsage = () => {
         state.setSelectedDatabaseId(db)
       }, 100)
     }
-    if (chart !== undefined) {
-      setTimeout(() => {
-        const el = document.getElementById(chart)
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }, 200)
-    }
-  }, [db, chart, state])
+  }, [db, state])
+
+  // Charts below the fold mount lazily and the query string is empty on the first client render
+  // of a hard load, so the target can appear well after mount.
+  const hasScrolledToChartRef = useRef(false)
+  useEffect(() => {
+    if (chart === undefined || hasScrolledToChartRef.current) return
+
+    let attempts = 0
+    const pollForChart = window.setInterval(() => {
+      attempts += 1
+      const target = document.getElementById(chart)
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        hasScrolledToChartRef.current = true
+      }
+      if (target || attempts >= 25) window.clearInterval(pollForChart)
+    }, 200)
+
+    return () => window.clearInterval(pollForChart)
+  }, [chart])
 
   return (
     <>
