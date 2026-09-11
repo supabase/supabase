@@ -58,7 +58,15 @@ function rssItem(link: string, pubDate: string): string {
 }
 
 function rss(items: string[]): string {
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0"><channel>\n${items.join('\n')}\n</channel></rss>\n`
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel>',
+    '<link>https://supabase.com/changelog</link>',
+    '<atom:link href="https://supabase.com/changelog-rss.xml" rel="self" type="application/rss+xml"/>',
+    ...items,
+    '</channel></rss>',
+    '',
+  ].join('\n')
 }
 
 function urlEntries(xml: string): UrlEntry[] {
@@ -92,9 +100,9 @@ describe('generate-sitemap lastmod', () => {
       '_events/2026-02-01-webinar.mdx': mdx("date: '2026-02-01T19:00:00.000-07:00'"),
       'pages/company.tsx': '',
       'public/changelog-rss.xml': rss([
-        rssItem(LEGACY_LINK, 'Tue, 03 Feb 2026 00:00:00 +0000'),
         rssItem(TIMED_LINK, 'Wed, 04 Feb 2026 20:15:00 -0700'),
         rssItem(TEXT_SLUG_LINK, 'Thu, 05 Feb 2026 00:00:00 +0000'),
+        rssItem(LEGACY_LINK, 'Tue, 03 Feb 2026 00:00:00 +0000'),
       ]),
     })
     result = runGenerator(fixtureDir)
@@ -163,9 +171,9 @@ describe('generate-sitemap lastmod', () => {
 
   it('emits exactly the RSS item links as changelog URLs', () => {
     const changelogLocs = entries
-      .filter((entry) => entry.loc.includes('/changelog/'))
+      .filter((entry) => entry.loc.startsWith('https://supabase.com/changelog'))
       .map((entry) => entry.loc)
-    expect(changelogLocs).toEqual([LEGACY_LINK, TIMED_LINK, TEXT_SLUG_LINK])
+    expect(changelogLocs).toEqual([TIMED_LINK, TEXT_SLUG_LINK, LEGACY_LINK])
   })
 
   it('emits only day-precision lastmod values, one per dated source', () => {
