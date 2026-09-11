@@ -266,7 +266,6 @@ export const OAuthAppsAuthorizeScreen = ({
           <AuthorizingAsCard
             email={identity.email}
             organizationSlug={memberOrg.slug}
-            grantKind={grantKind}
             onSignOut={handleSignOut}
           />
 

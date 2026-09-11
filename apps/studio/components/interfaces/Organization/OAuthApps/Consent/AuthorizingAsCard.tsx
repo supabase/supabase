@@ -4,14 +4,12 @@ import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 export interface AuthorizingAsCardProps {
   email: string
   organizationSlug: string
-  grantKind: 'user_bound' | 'organization_bound'
   onSignOut: () => void
 }
 
 export const AuthorizingAsCard = ({
   email,
   organizationSlug,
-  grantKind,
   onSignOut,
 }: AuthorizingAsCardProps) => {
   return (
@@ -41,11 +39,6 @@ export const AuthorizingAsCard = ({
           <span className="min-w-0 truncate text-right text-foreground">{organizationSlug}</span>
         </div>
       </div>
-      <p className="text-xs text-foreground-lighter">
-        {grantKind === 'user_bound'
-          ? 'This grant acts as you. It can never do more than your role in this organization allows.'
-          : 'This grant is shared with the whole organization. It acts with owner permissions, and stays active if you leave.'}
-      </p>
     </section>
   )
 }
