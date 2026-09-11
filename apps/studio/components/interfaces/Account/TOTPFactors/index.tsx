@@ -58,7 +58,7 @@ export const TOTPFactors = () => {
               title="Avoid being locked out"
               description="Add a backup authenticator app now. Losing access to your only app will permanently lock you out of your account."
               actions={
-                <Button variant="default" icon={<Plus />} onClick={handleAddNewApp}>
+                <Button icon={<Plus />} onClick={handleAddNewApp}>
                   Add another app
                 </Button>
               }
@@ -90,11 +90,7 @@ export const TOTPFactors = () => {
                           Added on {dayjs(factor.created_at).format(DATETIME_FORMAT)}
                         </p>
                       </div>
-                      <Button
-                        size="tiny"
-                        variant="default"
-                        onClick={() => setFactorToBeDeleted(factor.id)}
-                      >
+                      <Button size="tiny" onClick={() => setFactorToBeDeleted(factor.id)}>
                         Delete{' '}
                       </Button>
                     </CardContent>

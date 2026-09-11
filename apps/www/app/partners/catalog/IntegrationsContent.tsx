@@ -237,7 +237,7 @@ export default function IntegrationsContent({
                 {/* Mobile-only: opens bottom sheet with filters */}
                 <Sheet>
                   <SheetTrigger asChild>
-                    <Button variant="default" size="small" className="shrink-0 md:hidden flex">
+                    <Button size="small" className="shrink-0 md:hidden flex">
                       <div className="flex gap-1.5 items-center text-foreground-lighter hover:text-foreground">
                         <Filter size={14} />
                         {activeFilterCount > 0 && (

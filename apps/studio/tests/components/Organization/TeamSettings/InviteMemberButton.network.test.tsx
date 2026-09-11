@@ -2,7 +2,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components, operations } from 'api-types'
 import { HttpResponse } from 'msw'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { InviteMemberButton } from '@/components/interfaces/Organization/TeamSettings/InviteMemberButton'
 import type { ProfileContextType } from '@/lib/profile'
@@ -10,11 +10,11 @@ import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
-type Member = components['schemas']['Member']
-type InvitationResponse = components['schemas']['InvitationResponse']
-type OrganizationRoleResponse = components['schemas']['OrganizationRoleResponse']
-type ListEntitlementsResponse = components['schemas']['ListEntitlementsResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
+type Member = components['schemas']['Member_Output']
+type InvitationResponse = components['schemas']['InvitationResponse_Output']
+type OrganizationRoleResponse = components['schemas']['OrganizationRoleResponse_Output']
+type ListEntitlementsResponse = components['schemas']['ListEntitlementsResponse_Output']
 type CreateInvitationResponse =
   operations['InvitationsController_createInvitation']['responses']['201']['content']['application/json']
 type AccessControlPermission = components['schemas']['AccessControlPermission']
@@ -179,10 +179,6 @@ async function openDialog() {
 }
 
 describe('InviteMemberButton (network)', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   test('renders each role with its permission description and a roles docs link', async () => {
     setupMocks()
     customRender(<InviteMemberButton />, { profileContext: PROFILE_CONTEXT })

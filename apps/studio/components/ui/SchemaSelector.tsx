@@ -104,7 +104,6 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
       <div ref={ref} className={className} {...rest}>
         {isSchemasLoading && (
           <Button
-            variant="default"
             key="schema-selector-skeleton"
             className="w-full [&>span]:w-full"
             size={size}
@@ -121,10 +120,10 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
               Error: {(schemasError as any)?.message}
             </AlertDescription>
             <div className="flex flex-wrap gap-2">
-              <Button variant="default" size="tiny" onClick={() => refetchSchemas()}>
+              <Button size="tiny" onClick={() => refetchSchemas()}>
                 Reload schemas
               </Button>
-              <Button variant="default" size="tiny" onClick={() => setIsRestartDialogVisible(true)}>
+              <Button size="tiny" onClick={() => setIsRestartDialogVisible(true)}>
                 Restart database
               </Button>
             </div>

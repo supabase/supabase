@@ -12,6 +12,7 @@ import postgresSummit2026Contest from './events/postgres-summit-2026/contest'
 import postgresSummit2026ContestThankYou from './events/postgres-summit-2026/contest-thank-you'
 import postgresconfContest from './events/postgresconf-sjc-2026/contest'
 import postgresconfContestThankYou from './events/postgresconf-sjc-2026/contest-thank-you'
+import selectHackathon2026Schedule from './events/select-2026/hackathon-2026-schedule'
 import selectPartnerDay from './events/select-2026/partner-day'
 import selectPartnerDayThankYou from './events/select-2026/partner-day-thank-you'
 import selectVipDinner from './events/select-2026/vip-dinner'
@@ -68,6 +69,7 @@ const pages: GoPageInput[] = [
   selectVipExperienceThankYou, // remove after Select 2026
   selectPartnerDay, // remove after Select 2026
   selectPartnerDayThankYou, // remove after Select 2026
+  selectHackathon2026Schedule, // remove after Select 2026
   startupGrindContest, // remove after May 31, 2026
   vercelShipSydneyContest, // remove after July 31, 2026
   vercelShipSydneyContestThankYou, // remove after July 31, 2026

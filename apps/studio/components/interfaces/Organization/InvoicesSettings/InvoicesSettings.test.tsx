@@ -75,7 +75,6 @@ const createMockInvoiceWithoutPdf = (): Invoice => {
 
 describe('InvoicesSettings', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
         slug: 'stripe-org',
@@ -125,7 +124,7 @@ describe('InvoicesSettings', () => {
 
     render(<InvoicesSettings />)
 
-    expect(screen.getByRole('button', { name: 'Download invoice' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Download invoice' })).toBeAriaDisabled()
   })
 
   it('shows an error when the fetched invoice has no PDF', async () => {

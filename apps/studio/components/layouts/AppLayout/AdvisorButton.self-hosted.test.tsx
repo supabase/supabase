@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AdvisorButton } from '@/components/layouts/AppLayout/AdvisorButton'
 import { render } from '@/tests/helpers'
@@ -53,10 +53,6 @@ describe('AdvisorButton on self-hosted', () => {
       isError: false,
       dismissSignal: vi.fn(),
     })
-  })
-
-  afterEach(() => {
-    vi.clearAllMocks()
   })
 
   it('disables the notifications query so no request is made to the platform endpoint', () => {

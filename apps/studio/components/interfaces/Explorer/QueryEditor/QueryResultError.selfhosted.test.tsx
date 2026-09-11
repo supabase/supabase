@@ -40,7 +40,6 @@ vi.mock('@/data/config/project-settings-v2-query', () => ({
 
 describe('QueryResultError (self-hosted)', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mocks.useParams.mockReturnValue({ ref: 'default' })
     addAPIMock({
       method: 'get',

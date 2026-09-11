@@ -17,6 +17,7 @@ import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { EditorTabs } from '../Tabs/Tabs'
 import { type ExplorerResourceType } from './ExplorerLayout.constants'
 import { ExplorerNavChats } from './ExplorerNavChats'
+import { ExplorerNavHeader } from './ExplorerNavHeader'
 import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
 import { ExplorerNotebookTabCoordinator } from '@/components/interfaces/Explorer/ExplorerNotebookTabCoordinator'
@@ -68,17 +69,19 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
     <ProjectLayoutWithAuth
       product="Explorer"
       browserTitle={mergedBrowserTitle}
-      productMenuBadge={<BackToSqlEditorButton />}
+      productMenuHeader={
+        <ExplorerNavHeader
+          section={section}
+          onBack={() => setSection(undefined)}
+          rootAction={<BackToSqlEditorButton />}
+        />
+      }
       productMenu={
         <div className="relative h-full overflow-hidden">
           <AnimatePresence mode="wait">
             {section === undefined && <ExplorerNavHome key="home" onSelectSection={setSection} />}
-            {section === 'notebook' && (
-              <ExplorerNavNotebooks key="notebooks" onBack={() => setSection(undefined)} />
-            )}
-            {section === 'chat' && (
-              <ExplorerNavChats key="chats" onBack={() => setSection(undefined)} />
-            )}
+            {section === 'notebook' && <ExplorerNavNotebooks key="notebooks" />}
+            {section === 'chat' && <ExplorerNavChats key="chats" />}
           </AnimatePresence>
         </div>
       }

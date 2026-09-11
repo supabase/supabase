@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { ResizablePanelGroup } from 'ui'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { UserPanel } from './UserPanel'
 import type { User } from '@/data/auth/users-infinite-query'
@@ -69,10 +69,6 @@ const renderPanel = (disabledFeatures: string[] = []) => {
 }
 
 describe('UserPanel', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('shows the Logs tab when logs:all is enabled', async () => {
     renderPanel([])
 

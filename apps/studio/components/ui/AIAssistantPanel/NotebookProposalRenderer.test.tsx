@@ -39,8 +39,8 @@ const mockContentItem = (row: ReturnType<typeof mockNotebookRow>) =>
     method: 'get',
     path: '/platform/projects/:ref/content/item/:id',
     response: () =>
-      HttpResponse.json<components['schemas']['GetUserContentByIdResponse']>(
-        row as unknown as components['schemas']['GetUserContentByIdResponse']
+      HttpResponse.json<components['schemas']['GetUserContentByIdResponse_Output']>(
+        row as unknown as components['schemas']['GetUserContentByIdResponse_Output']
       ),
   })
 

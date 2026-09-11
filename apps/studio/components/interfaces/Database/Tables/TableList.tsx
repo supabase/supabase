@@ -321,7 +321,6 @@ export const TableList = ({
                     </div>
                     <Button
                       size="tiny"
-                      variant="default"
                       onClick={() => setVisibleTypes([value])}
                       className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
                     >
@@ -517,7 +516,7 @@ export const TableList = ({
                         </TableCell>
                         <TableCell>
                           <div className="flex justify-end gap-2">
-                            <Button asChild variant="default">
+                            <Button asChild>
                               <Link href={`/project/${ref}/database/tables/${x.id}`}>
                                 View columns
                               </Link>
@@ -529,7 +528,6 @@ export const TableList = ({
                                   <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
                                       <Button
-                                        variant="default"
                                         className="px-1"
                                         icon={<MoreVertical />}
                                         aria-label={`Table ${x.name} actions`}

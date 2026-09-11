@@ -29,7 +29,7 @@ export default function EmptyStatePresentationalIcon() {
             title="Add a provider"
             description="Use third-party authentication systems to access your project."
           >
-            <Button size="tiny" variant="default" icon={<Plus size={14} />}>
+            <Button size="tiny" icon={<Plus size={14} />}>
               Add provider
             </Button>
           </EmptyStatePresentational>

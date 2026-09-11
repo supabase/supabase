@@ -199,7 +199,6 @@ export const QueryPerformanceGrid = ({
                   tooltip={{ content: { text: 'Query details' } }}
                   icon={<ArrowRight size={14} />}
                   size="tiny"
-                  variant="default"
                   onClick={(e) => {
                     e.stopPropagation()
                     setSelectedRow(props.rowIdx)
@@ -488,9 +487,7 @@ export const QueryPerformanceGrid = ({
           >
             {onRetry && (
               <div className="mt-4">
-                <Button variant="default" onClick={onRetry}>
-                  Try again
-                </Button>
+                <Button onClick={onRetry}>Try again</Button>
               </div>
             )}
           </Admonition>

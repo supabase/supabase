@@ -14,7 +14,7 @@ type DestinationResponse = components['schemas']['DestinationResponse_Output']
 type PipelineResponse = components['schemas']['PipelineResponse_Output']
 type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
 type PublicationNamesResponse = components['schemas']['ReadPublicationsResponse_Output']
-type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse']
+type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse_Output']
 type SourcesResponse = components['schemas']['SourcesResponse_Output']
 
 const mocks = vi.hoisted(() => ({
@@ -251,7 +251,6 @@ vi.mock('@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketS
 
 describe('DestinationForm edit submission', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     pipelineTableIds = [101, 999]
     mocks.submitPipeline.mockResolvedValue(undefined)
     mocks.validateConfiguration.mockResolvedValue({ canContinue: true, warnings: [] })

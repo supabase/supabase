@@ -8,7 +8,7 @@ import { PROJECT_STATUS } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type VectorBucketIndex =
-  components['schemas']['StorageVectorBucketListIndexesResponse']['indexes'][number]
+  components['schemas']['StorageVectorBucketListIndexesResponse_Output']['indexes'][number]
 export type GetVectorBucketsIndexesVariables = { projectRef?: string; vectorBucketName?: string }
 
 export async function getVectorBucketsIndexes(
