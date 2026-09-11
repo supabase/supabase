@@ -59,7 +59,7 @@ git show <branch>:<path> | grep -c '<marker>'
 
 One marker per change, checked against the count you expect. A restructure large enough to conflict is large enough that reading the diff will not catch a missing paragraph.
 
-Restore anything missing as a new commit on the branch that owns it, then rebase again. Don't fold it into a neighbouring branch to avoid a second rebase; that breaks the one-change-type-per-PR rule the stack exists for.
+Restore anything missing as a new commit on the branch that owns it, then rebase again. Don't fold it into a neighboring branch to avoid a second rebase; that breaks the one-change-type-per-PR rule the stack exists for.
 
 ## Merge order
 
