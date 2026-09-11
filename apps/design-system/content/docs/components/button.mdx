@@ -5,7 +5,7 @@ featured: true
 component: true
 ---
 
-<ComponentPreview name="button-demo" peekCode wide />
+<ComponentPreview name="button-default" peekCode wide />
 
 ## Usage
 
@@ -47,22 +47,17 @@ Use the `size` prop to determine the size of the button.
 
 ### Variants
 
-These are all the different `variant` variations.
+#### Default
+
+Used when no `variant` is specified. Prefer this unless another variant fits better, as below.
+
+<ComponentPreview name="button-default" />
 
 #### Primary
 
-Used for data insertion actions, confirming purchases, strong positive actions.
+Use sparingly for data insertion, confirming purchases, and other strong positive actions. Because it is so prominent, aim for at most one primary button in a viewport.
 
 <ComponentPreview name="button-demo" />
-
-#### Default
-
-Used for opening dialogs, navigating to pages, and other non CRUD actions.
-
-This `variant` will probably be the most used button variant.
-It will probably be changed to be the default variant in future.
-
-<ComponentPreview name="button-default" />
 
 #### Secondary
 

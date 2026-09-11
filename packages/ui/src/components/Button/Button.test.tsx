@@ -26,6 +26,22 @@ describe('#Button', () => {
     expect(() => wrapper.unmount()).not.toThrow()
   })
 
+  it('should default to the neutral default variant', () => {
+    render(<Button>Neutral</Button>)
+
+    const button = screen.getByRole('button', { name: 'Neutral' })
+    expect(button.className).toContain('bg-background')
+    expect(button.className).toContain('hover:bg-popover')
+    expect(button.className).not.toContain('bg-brand-400')
+  })
+
+  it('should allow an explicit primary variant override', () => {
+    render(<Button variant="primary">Primary</Button>)
+
+    const button = screen.getByRole('button', { name: 'Primary' })
+    expect(button.className).toContain('bg-brand-400')
+  })
+
   it('should render different text', () => {
     const wrapper = render(<Button>Button</Button>)
 

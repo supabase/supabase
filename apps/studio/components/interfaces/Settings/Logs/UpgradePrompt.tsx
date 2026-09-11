@@ -88,7 +88,7 @@ const UpgradePrompt: React.FC<Props> = ({
           <Button variant="default" onClick={() => setShowUpgradePrompt(false)}>
             Close
           </Button>
-          <Button asChild size="tiny">
+          <Button variant="primary" asChild size="tiny">
             <Link
               href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=${source}`}
             >

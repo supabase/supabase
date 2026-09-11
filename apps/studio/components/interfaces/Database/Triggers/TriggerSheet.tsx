@@ -483,7 +483,12 @@ export const TriggerSheet = ({
             >
               Cancel
             </Button>
-            <Button form={formId} type="submit" loading={isCreating || isUpdating}>
+            <Button
+              variant="primary"
+              form={formId}
+              type="submit"
+              loading={isCreating || isUpdating}
+            >
               {isEditing ? 'Save' : 'Create'} trigger
             </Button>
           </SheetFooter>

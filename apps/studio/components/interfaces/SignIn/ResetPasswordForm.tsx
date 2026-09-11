@@ -141,6 +141,7 @@ export const ResetPasswordForm = () => {
         <Separator className="bg-border" />
 
         <Button
+          variant="primary"
           block
           type="submit"
           size="medium"

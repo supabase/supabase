@@ -134,7 +134,7 @@ export const EnableCleanupButton = ({ onScheduled }: EnableCleanupButtonProps) =
           <Button variant="default" disabled={isScheduling} onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button loading={isScheduling} onClick={onConfirm}>
+          <Button variant="primary" loading={isScheduling} onClick={onConfirm}>
             Enable cleanup
           </Button>
         </DialogFooter>

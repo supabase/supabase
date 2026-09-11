@@ -176,7 +176,7 @@ export const CreateSecretAPIKeyDialog = () => {
             options={{ enabled: visible === 'secret' && !isCreatingAPIKey }}
             side="top"
           >
-            <Button form={FORM_ID} type="submit" loading={isCreatingAPIKey}>
+            <Button variant="primary" form={FORM_ID} type="submit" loading={isCreatingAPIKey}>
               Create API key
             </Button>
           </Shortcut>

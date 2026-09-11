@@ -114,12 +114,13 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
       id={cell._id}
       actions={<AddCellDropdown cellId={cell._id} />}
       gripDropdownContent={<MoveCellDropdownContent cellId={cell._id} />}
-      gripClassName="mt-2 opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
+      gripClassName="mt-2 sm:opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
     >
       <QueryEditor
         ref={ref}
         id={cell._id}
         variant="embedded"
+        className="min-h-0"
         title={title}
         query={toQueryModel(cell, sql)}
         result={result}
