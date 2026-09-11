@@ -33,6 +33,7 @@ export interface ReportQueryLogs {
     page?: number,
     pageSize?: number
   ) => SafeLogSqlFragment
+  safeSqlOtel?: (filters: ReportFilterItem[]) => SafeLogSqlFragment
 }
 
 export interface ReportQueryDb {
