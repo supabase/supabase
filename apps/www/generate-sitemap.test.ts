@@ -10,6 +10,7 @@ import { blogPostingSchema, serializeJsonLd } from './lib/json-ld'
 const GENERATOR = path.join(process.cwd(), 'internals', 'generate-sitemap.mjs')
 const LEGACY_LINK = 'https://supabase.com/changelog/12345-legacy-entry'
 const TIMED_LINK = 'https://supabase.com/changelog/23456-timed-entry'
+const TEXT_SLUG_LINK = 'https://supabase.com/changelog/text-slug-entry'
 const SPAWN_TIMEOUT_MS = 30_000
 
 const createdDirs: string[] = []
@@ -93,6 +94,7 @@ describe('generate-sitemap lastmod', () => {
       'public/changelog-rss.xml': rss([
         rssItem(LEGACY_LINK, 'Tue, 03 Feb 2026 00:00:00 +0000'),
         rssItem(TIMED_LINK, 'Wed, 04 Feb 2026 20:15:00 -0700'),
+        rssItem(TEXT_SLUG_LINK, 'Thu, 05 Feb 2026 00:00:00 +0000'),
       ]),
     })
     result = runGenerator(fixtureDir)
@@ -155,9 +157,20 @@ describe('generate-sitemap lastmod', () => {
     expect(entryFor(TIMED_LINK)?.lastmod).toBe('2026-02-05')
   })
 
+  it('includes changelog entries whose slug has no numeric prefix', () => {
+    expect(entryFor(TEXT_SLUG_LINK)?.lastmod).toBe('2026-02-05')
+  })
+
+  it('lists every RSS item exactly once', () => {
+    const changelogLocs = entries
+      .filter((entry) => entry.loc.includes('/changelog/'))
+      .map((entry) => entry.loc)
+    expect(changelogLocs).toEqual([LEGACY_LINK, TIMED_LINK, TEXT_SLUG_LINK])
+  })
+
   it('emits only day-precision lastmod values, one per dated source', () => {
     const lastmods = entries.map((entry) => entry.lastmod).filter(Boolean)
-    expect(lastmods).toHaveLength(9)
+    expect(lastmods).toHaveLength(10)
     for (const lastmod of lastmods) expect(lastmod).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   })
 
