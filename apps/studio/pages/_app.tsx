@@ -45,6 +45,7 @@ import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/
 import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/IndirectTaxDeclarationModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
+import { ThemeOverridesProvider } from '@/components/interfaces/App/ThemeOverridesProvider'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
@@ -224,6 +225,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                   </BannerStackProvider>
                                   <Toaster />
                                   <MonacoThemeProvider />
+                                  <ThemeOverridesProvider />
                                 </CommandProvider>
                               </AiAssistantStateContextProvider>
                               <DevToolbar extraTabs={devToolbarExtraTabs} />
