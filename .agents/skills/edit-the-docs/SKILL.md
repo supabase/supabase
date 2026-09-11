@@ -15,7 +15,7 @@ Improves **existing** Supabase docs pages: structure, order, connective text, an
 
 **Not this skill:** [`write-the-docs`](../write-the-docs/SKILL.md) drafts net-new content or product-grounded rewrites from intent and code. [`review-the-docs`](../review-the-docs/SKILL.md) covers lint, build, and PR triage.
 
-**Output is a stack of pull requests, one change type per PR.** A reviewer reads a style diff, a structure diff, and a technical diff separately instead of one mixed blob. Phase 0 sizes the edit and decides how many PRs it needs. Mechanics live in [reference/stacked-prs.md](reference/stacked-prs.md).
+**Output is one pull request, with one change type per commit.** A reviewer reads the style diff apart from the structure diff without holding several PRs in their head. Split into a stack of PRs only when the edit is large enough that one PR stops being reviewable. Phase 0 applies that gate, and [reference/stacked-prs.md](reference/stacked-prs.md) covers the stacking mechanics.
 
 ## Core rules
 
@@ -24,23 +24,24 @@ Improves **existing** Supabase docs pages: structure, order, connective text, an
 3. **Follow CONTRIBUTING.md and WORD_LIST.md** for voice, terminology, and formatting. See [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md) and [`apps/docs/WORD_LIST.md`](../../../apps/docs/WORD_LIST.md).
 4. **Prefer brevity.** Use broad strokes when mechanical detail doesn't help the reader's task. Cut redundancy. Don't over-explain.
 5. **Reuse sibling skills.** Get IA and architecture from [`ask-the-docs`](../ask-the-docs/SKILL.md). Get validation and self-review from [`review-the-docs`](../review-the-docs/SKILL.md). Apply the shared pitfalls in [`write-the-docs/reference/common-pitfalls.md`](../write-the-docs/reference/common-pitfalls.md) rather than duplicating them here.
-6. **One change type per PR.** A branch that mixes reworded prose with moved sections is unreviewable, because the reader can't tell a move from a rewrite.
+6. **One change type per diff.** A diff that mixes reworded prose with moved sections is unreviewable, because the reader can't tell a move from a rewrite. Separate them by commit in a single PR, or by branch in a stack.
 
 ## Phase 0: Size and split
 
 1. Identify the document type per CONTRIBUTING.md. The types are explainer, tutorial, guide, reference, and troubleshooting.
 2. State the reader's goal and prerequisites in one or two lines.
 3. Note structural problems: mixed information types interrupting a procedure, missing intro navigation on a long page, weak transitions, redundancy, or over-explained mechanics.
-4. Sort the diagnosis into the PR buckets below. **Drop any bucket that comes back empty, and say so.** Style, structure, and technical revision take at most one branch each. Additions take as many as the content needs, so the stack has no fixed height. A style edit plus a structural edit is the common shape, because most pages that need restructuring are already correct. A stack of two is a complete result, not a truncated one.
-5. Know where the edit ends. **The edit is only the buckets that have content.** Any bucket you drop is beyond the edit, and a later request for that change type is a new request. That includes one you raise yourself. Name it, keep the open branches clean, and ask whether it belongs in this stack, in a separate ticket, or nowhere. Absorbing it into an open branch is what turns an edit into a rewrite.
-6. Apply the split gate. Skip the stack and open a single PR only when all three hold:
-   - The full edit is under roughly 150 changed lines.
-   - No sections move.
-   - No technical claim changes.
+4. Sort the diagnosis into the buckets below. **Drop any bucket that comes back empty, and say so.** Style, structure, and technical revision take one commit or branch each. Additions take as many as the content needs, so the edit has no fixed size. A style edit plus a structural edit is the common shape, because most pages that need restructuring are already correct. Two buckets is a complete result, not a truncated one.
+5. Know where the edit ends. **The edit is only the buckets that have content.** Any bucket you drop is beyond the edit, and a later request for that change type is a new request. That includes one you raise yourself. Name it, keep the work in progress clean, and ask whether it belongs in this edit, in a separate ticket, or nowhere. Absorbing it into a bucket that's already open is what turns an edit into a rewrite.
+6. Apply the split gate. **Default to one PR**, with each bucket as its own commit. Stack only when both hold:
+   - The edit rewrites prose and moves sections, or it corrects a technical claim.
+   - It runs over roughly 150 changed lines.
 
-   Otherwise stack. When in doubt, stack. A reviewer can merge a stack quickly, but can't unmix a mixed diff.
+   **When in doubt, one PR.** A stack costs the reviewer something a mixed diff doesn't: no PR page shows the whole edit, so seeing it end to end means an extra command. Clean commits in one PR give the same per-change-type diffs for free. Stack when the edit is too big to read that way, not by default.
 
-7. Summarize the diagnosis and the proposed stack to the requester, and **wait for confirmation before creating any branch.** Name which buckets are empty and why. When nobody is available to confirm, record the diagnosis in the bottom PR's body and carry on.
+7. Summarize the diagnosis and the proposed split to the requester, and **wait for confirmation before creating any branch.** Name which buckets are empty and why. When nobody is available to confirm, record the diagnosis in the PR body and carry on.
+
+**The sections below are named for the stacked case.** In a single PR they're commits, in the same order and under the same rules.
 
 ## PR 1: Style
 
@@ -178,9 +179,9 @@ Once it's scoped:
 
 ## Validate each PR
 
-Run this before submitting each branch, not once at the end of the stack:
+Run this per change type, before you submit the commit or branch that carries it, not once at the end:
 
-- [ ] The diff contains only this PR's change type
+- [ ] The diff contains only this change type
 - [ ] Section groups follow information type, and procedures aren't interrupted by long context
 - [ ] Intro navigation is present only when the page needs it, and links resolve
 - [ ] Connective text is selective, not link spam

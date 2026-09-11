@@ -1,6 +1,6 @@
 # Stacked PRs for a page edit
 
-Mechanics for shipping the [`edit-the-docs`](../SKILL.md) phases as a stack. Phase 0 decides how many branches you need. This file covers how to build and submit them.
+Mechanics for shipping the [`edit-the-docs`](../SKILL.md) buckets as a stack. **A stack is the exception.** Phase 0 decides whether the edit needs one at all, and how many branches. This file covers how to build and submit them.
 
 ## Branch names
 
@@ -15,7 +15,7 @@ One branch per change type, bottom to top:
 
 The first three names are fixed, because there's one of each. **Additions get one branch per topic, named for the content it adds:** `docs/tables-rls` and `docs/tables-datatypes`, not `docs/tables-additions-1` and `-2`. Use `docs/<page>-additions` when a single branch carries all of them.
 
-**Create only the branches whose buckets have content.** A two-branch stack is the common case. `gh stack init` takes however many you pass it.
+**Create only the branches whose buckets have content.** Two branches is the common shape once an edit clears the gate. `gh stack init` takes however many you pass it.
 
 **Use a category prefix and a short second segment.** Don't prefix a branch with an author name, even when a tracker suggests that format.
 
@@ -36,6 +36,16 @@ Never chain `gh pr create --base <previous-branch>`. That produces correct base 
 **Draft state doesn't reliably survive.** `--open` marks existing PRs ready for review, not just new ones, and a resubmit has been observed taking drafts out of draft without it. Check the draft state of every PR after submitting, and set it back with `gh pr ready --undo` if it moved.
 
 **Other commands.** `gh stack link <pr> <pr> <pr>` registers the GitHub stack without local tracking. `gh stack unstack` removes a stack. The extension is `github/gh-stack`.
+
+## Reading the stack as a whole
+
+No PR page shows the whole edit, so a reviewer who wants it in one view needs the command:
+
+```bash
+git diff master...<top-branch> -- <path>
+```
+
+`gh stack view` lists the branches in order, so it gives you the top one. Put the command in the bottom PR's body. Without it the reviewer reconstructs the edit branch by branch, and that cost is why Phase 0 defaults to a single PR.
 
 ## Restacking after a change low in the stack
 
