@@ -422,10 +422,12 @@ const supabase = createServerClient(
 <TabPanel id="astro-server-endpoint" label="Server Endpoint">
 
 ```ts route.ts
-import { createServerClient, parseCookieHeader } from "@supabase/ssr";
-import type { APIContext } from "astro";
+import { createServerClient, parseCookieHeader } from '@supabase/ssr'
+import type { APIContext } from 'astro'
 
 export async function GET(context: APIContext) {
+  const responseHeaders = new Headers()
+
   const supabase = createServerClient(
     import.meta.env.PUBLIC_SUPABASE_URL,
     import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
@@ -434,15 +436,17 @@ export async function GET(context: APIContext) {
         getAll() {
           return parseCookieHeader(context.request.headers.get('Cookie') ?? '')
         },
-        setAll(cookiesToSet, _headers) {
-          cookiesToSet.forEach(({ name, value }) =>
-            context.cookies.set(name, value))
+        setAll(cookiesToSet, headers) {
+          cookiesToSet.forEach(({ name, value }) => context.cookies.set(name, value))
+          Object.entries(headers).forEach(([key, value]) => responseHeaders.set(key, value))
         },
       },
     }
-  );
+  )
 
-  return ...
+  // Build your response here, and pass `responseHeaders` to it. Without them a
+  // shared cache can store this response along with its Set-Cookie header.
+  return new Response(null, { headers: responseHeaders })
 }
 ```
 
@@ -455,6 +459,8 @@ import { createServerClient, parseCookieHeader } from '@supabase/ssr'
 import { defineMiddleware } from 'astro:middleware'
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  const responseHeaders = new Headers()
+
   const supabase = createServerClient(
     import.meta.env.PUBLIC_SUPABASE_URL,
     import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
@@ -463,14 +469,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
         getAll() {
           return parseCookieHeader(context.request.headers.get('Cookie') ?? '')
         },
-        setAll(cookiesToSet, _headers) {
+        setAll(cookiesToSet, headers) {
           cookiesToSet.forEach(({ name, value }) => context.cookies.set(name, value))
+          Object.entries(headers).forEach(([key, value]) => responseHeaders.set(key, value))
         },
       },
     }
   )
 
-  return next()
+  const response = await next()
+  responseHeaders.forEach((value, key) => response.headers.set(key, value))
+  return response
 })
 ```
 
@@ -609,7 +618,7 @@ You can now use any Supabase feature from your client or server code.
 
 ```ts server/api/hello.ts
 import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
-import { appendHeader, defineEventHandler, getHeader } from 'h3'
+import { appendHeader, defineEventHandler, getHeader, setHeader } from 'h3'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -622,10 +631,11 @@ export default defineEventHandler(async (event) => {
         getAll() {
           return parseCookieHeader(getHeader(event, 'Cookie') ?? '')
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, cacheHeaders) {
           cookiesToSet.forEach(({ name, value, options }) => {
             appendHeader(event, 'Set-Cookie', serializeCookieHeader(name, value, options))
           })
+          Object.entries(cacheHeaders).forEach(([key, value]) => setHeader(event, key, value))
         },
       },
     }
