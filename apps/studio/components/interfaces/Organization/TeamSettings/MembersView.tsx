@@ -17,6 +17,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { MemberRow } from './MemberRow'
+import { TeamSettingsDataProvider } from './TeamSettingsDataContext'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
 import { AlertError } from '@/components/ui/AlertError'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
@@ -112,7 +113,16 @@ export const MembersView = ({ searchString }: MembersViewProps) => {
   }, [filteredMembers, profile?.gotrue_id, isOrgScopedRole])
 
   return (
-    <>
+    <TeamSettingsDataProvider
+      members={members}
+      roles={roles}
+      isLoadingRoles={isLoadingRoles}
+      orgProjects={orgProjects}
+      permissions={permissions}
+      selectedOrganization={selectedOrganization}
+      organizationMembersDeletionEnabled={organizationMembersDeletionEnabled}
+      onManageAccess={handleManageAccess}
+    >
       {isLoadingMembers && <GenericSkeletonLoader />}
 
       {isErrorMembers && (
@@ -154,34 +164,10 @@ export const MembersView = ({ searchString }: MembersViewProps) => {
                         ]
                       : []),
                     ...(!!user
-                      ? [
-                          <MemberRow
-                            key={user.gotrue_id}
-                            member={user}
-                            members={members}
-                            roles={roles}
-                            isLoadingRoles={isLoadingRoles}
-                            orgProjects={orgProjects}
-                            permissions={permissions}
-                            selectedOrganization={selectedOrganization}
-                            organizationMembersDeletionEnabled={organizationMembersDeletionEnabled}
-                            onManageAccess={handleManageAccess}
-                          />,
-                        ]
+                      ? [<MemberRow key={user.gotrue_id} member={user} />]
                       : []),
                     ...sortedMembers.map((member) => (
-                      <MemberRow
-                        key={member.gotrue_id}
-                        member={member}
-                        members={members}
-                        roles={roles}
-                        isLoadingRoles={isLoadingRoles}
-                        orgProjects={orgProjects}
-                        permissions={permissions}
-                        selectedOrganization={selectedOrganization}
-                        organizationMembersDeletionEnabled={organizationMembersDeletionEnabled}
-                        onManageAccess={handleManageAccess}
-                      />
+                      <MemberRow key={member.gotrue_id} member={member} />
                     )),
                     ...(searchString.length > 0 && filteredMembers.length === 0
                       ? [
@@ -221,6 +207,6 @@ export const MembersView = ({ searchString }: MembersViewProps) => {
           onClose={() => setShowRoleUpdatePanel(false)}
         />
       )}
-    </>
+    </TeamSettingsDataProvider>
   )
 }

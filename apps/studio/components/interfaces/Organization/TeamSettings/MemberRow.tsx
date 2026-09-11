@@ -15,46 +15,24 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
+import { useTeamSettingsData } from './TeamSettingsDataContext'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { ProfileImage } from '@/components/ui/ProfileImage'
-import {
-  OrganizationRole,
-  OrganizationRolesResponse,
-} from '@/data/organization-members/organization-roles-query'
+import { OrganizationRole } from '@/data/organization-members/organization-roles-query'
 import { OrganizationMember } from '@/data/organizations/organization-members-query'
-import { OrganizationBase } from '@/data/organizations/organizations-query'
-import { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useProfile } from '@/lib/profile'
-import type { Permission } from '@/types'
 
 interface MemberRowProps {
   member: OrganizationMember
-  members: OrganizationMember[]
-  roles: OrganizationRolesResponse | undefined
-  isLoadingRoles: boolean
-  orgProjects: OrgProject[]
-  permissions: Permission[] | undefined
-  selectedOrganization: OrganizationBase | undefined
-  organizationMembersDeletionEnabled: boolean
-  onManageAccess: (member: OrganizationMember) => void
 }
 
 const MEMBER_ORIGIN_TO_MANAGED_BY = {
   vercel: 'vercel-marketplace',
 } as const
 
-export const MemberRow = memo(function MemberRow({
-  member,
-  members,
-  roles,
-  isLoadingRoles,
-  orgProjects,
-  permissions,
-  selectedOrganization,
-  organizationMembersDeletionEnabled,
-  onManageAccess,
-}: MemberRowProps) {
+export const MemberRow = memo(function MemberRow({ member }: MemberRowProps) {
   const { profile } = useProfile()
+  const { roles, isLoadingRoles, orgProjects } = useTeamSettingsData()
 
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
 
@@ -119,7 +97,7 @@ export const MemberRow = memo(function MemberRow({
                 </Badge>
               )}
               {member.is_sso_user && <Badge variant="default">SSO</Badge>}
-              {(member.metadata as any)?.origin && (
+              {Boolean(member.metadata?.origin) && (
                 <PartnerIcon
                   organization={{
                     managed_by:
@@ -210,15 +188,7 @@ export const MemberRow = memo(function MemberRow({
       </TableCell>
 
       <TableCell>
-        <MemberActions
-          member={member}
-          members={members}
-          allRoles={roles}
-          permissions={permissions}
-          selectedOrganization={selectedOrganization}
-          organizationMembersDeletionEnabled={organizationMembersDeletionEnabled}
-          onManageAccess={onManageAccess}
-        />
+        <MemberActions member={member} />
       </TableCell>
     </TableRow>
   )
