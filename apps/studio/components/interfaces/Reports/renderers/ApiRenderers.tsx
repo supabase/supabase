@@ -1,6 +1,7 @@
 import { geoCentroid } from 'd3-geo'
 import sumBy from 'lodash/sumBy'
 import { ChevronRight } from 'lucide-react'
+import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { Fragment, useRef, useState, type ReactNode } from 'react'
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
@@ -39,27 +40,27 @@ import { AlertError } from '@/components/ui/AlertError'
 import BarChart from '@/components/ui/Charts/BarChart'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
-import { BASE_PATH } from '@/lib/constants'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError } from '@/types'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
     timestamp: string
     ingress: number
-    egress: number
   }>
 ) => {
+  const { data: organization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
   const { data, error, isError } = useFillTimeseriesSorted({
     data: props.data,
     timestampKey: 'timestamp',
-    valueKey: ['ingress_mb', 'egress_mb'],
+    valueKey: 'ingress_mb',
     defaultValue: 0,
     startDate: props.params?.iso_timestamp_start,
     endDate: props.params?.iso_timestamp_end,
   })
 
   const totalIngress = sumBy(props.data, 'ingress_mb')
-  const totalEgress = sumBy(props.data, 'egress_mb')
 
   function determinePrecision(valueInMb: number) {
     return valueInMb < 0.001 ? 7 : totalIngress > 1 ? 2 : 4
@@ -95,18 +96,19 @@ export const NetworkTrafficRenderer = (
         displayDateInUtc
       />
 
-      <BarChart
-        size="small"
-        title="Egress"
-        highlightedValue={totalEgress}
-        format="MB"
-        valuePrecision={determinePrecision(totalEgress)}
-        className="w-full"
-        data={data}
-        yAxisKey="egress_mb"
-        xAxisKey="timestamp"
-        displayDateInUtc
-      />
+      {organization && (
+        <div className="flex items-center justify-between gap-4 rounded border border-default bg-surface-200 px-4 py-3">
+          <div>
+            <p className="text-sm text-foreground">Billable egress</p>
+            <p className="text-sm text-foreground-light">
+              View your organization&apos;s Usage page for billable egress.
+            </p>
+          </div>
+          <Button asChild variant="default" size="tiny">
+            <Link href={`/org/${organization.slug}/usage#egress`}>View Usage</Link>
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
