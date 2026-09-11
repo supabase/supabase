@@ -81,7 +81,7 @@ export const ProjectMultiSelect = ({
             <MultiSelectorTrigger
               aria-labelledby={labelId}
               label="Select projects..."
-              badgeLimit={1}
+              badgeLimit={2}
               deletableBadge
               renderValue={(value) =>
                 projects.find((project) => project.ref === value)?.name ?? value
