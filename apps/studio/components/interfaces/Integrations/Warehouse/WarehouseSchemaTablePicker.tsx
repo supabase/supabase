@@ -27,6 +27,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import {
   buildSelectionFromPublicationTables,
   buildWarehouseSetupTargets,
+  getInitialSelectionMode,
   getSchemaTableKey,
   getSelectedTableCount,
   isPipelineLimitError,
@@ -130,9 +131,11 @@ export const WarehouseSchemaTablePicker = ({
   )
   const allTablesSelection = Object.fromEntries(tableKeys.map((key) => [key, true]))
   const initialSelectedCount = getSelectedTableCount(initialSelection)
-  const areAllTablesInitiallySelected =
-    initialSelectedCount === tableKeys.length && tableKeys.length > 0
-  const initialSelectionMode = !isEditing || areAllTablesInitiallySelected ? 'all' : 'selected'
+  const initialSelectionMode = getInitialSelectionMode({
+    isEditing,
+    selectedTableCount: initialSelectedCount,
+    totalTableCount: tableKeys.length,
+  })
   const selectionMode = selectionModeOverride ?? initialSelectionMode
   const selection =
     selectionMode === 'all' ? allTablesSelection : (selectionOverride ?? initialSelection)

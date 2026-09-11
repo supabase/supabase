@@ -28,17 +28,22 @@ export function getSchemaTableKey(schema: string, table: string): string {
 }
 
 /**
- * Supabase-managed schemas are not eligible Warehouse replication targets. This also excludes
- * product schemas such as `auth` and `storage`, matching the platform API validation.
+ * Internal schemas that hold product data can be useful in analytics. Keep `auth` and `storage`
+ * available while their platform support is being finalised, and exclude the remaining Supabase
+ * infrastructure schemas.
  */
-const NON_SELECTABLE_SCHEMAS = new Set(INTERNAL_SCHEMAS)
+const REPLICABLE_INTERNAL_SCHEMAS = ['auth', 'storage']
+
+const NON_SELECTABLE_SCHEMAS = new Set(
+  INTERNAL_SCHEMAS.filter((schema) => !REPLICABLE_INTERNAL_SCHEMAS.includes(schema))
+)
 
 /**
  * Postgres schemas Warehouse setup shouldn't offer for replication.
  *
  * `WAREHOUSE_METADATA_SCHEMA` is excluded on top of the infrastructure schemas above: it holds the
  * DuckLake catalog describing the Warehouse itself, so replicating it would feed every Warehouse
- * write back in as more catalog rows to replicate. The platform rejects it server-side too — this
+ * write back in as more catalog rows to replicate. The platform rejects it server-side too. This
  * just keeps it out of the picker so the user never picks a target that can only fail.
  */
 export function isSelectableWarehouseSchema(schemaName: string): boolean {
@@ -51,6 +56,19 @@ export function isSelectableWarehouseSchema(schemaName: string): boolean {
 
 export function getSelectedTableCount(selection: SchemaTableSelection): number {
   return Object.values(selection).filter(Boolean).length
+}
+
+export function getInitialSelectionMode({
+  isEditing,
+  selectedTableCount,
+  totalTableCount,
+}: {
+  isEditing: boolean
+  selectedTableCount: number
+  totalTableCount: number
+}): 'all' | 'selected' {
+  const areAllTablesSelected = selectedTableCount === totalTableCount && totalTableCount > 0
+  return isEditing && areAllTablesSelected ? 'all' : 'selected'
 }
 
 /**

@@ -4,6 +4,7 @@ import {
   buildRetryTargets,
   buildSelectionFromPublicationTables,
   buildWarehouseSetupTargets,
+  getInitialSelectionMode,
   getSchemaCheckedState,
   getSchemaTableKey,
   getSelectedTableCount,
@@ -42,9 +43,9 @@ describe('Warehouse.utils:isSelectableWarehouseSchema', () => {
     expect(isSelectableWarehouseSchema('analytics')).toBe(true)
   })
 
-  test('excludes Supabase-managed product schemas rejected by Warehouse replication', () => {
-    expect(isSelectableWarehouseSchema('auth')).toBe(false)
-    expect(isSelectableWarehouseSchema('storage')).toBe(false)
+  test('includes auth and storage while their Warehouse support is being finalised', () => {
+    expect(isSelectableWarehouseSchema('auth')).toBe(true)
+    expect(isSelectableWarehouseSchema('storage')).toBe(true)
   })
 
   test("excludes the Warehouse's own DuckLake catalog schema", () => {
@@ -144,6 +145,26 @@ describe('Warehouse.utils:getSelectedTableCount', () => {
       'public.events': true,
     }
     expect(getSelectedTableCount(selection)).toBe(2)
+  })
+})
+
+describe('Warehouse.utils:getInitialSelectionMode', () => {
+  test('starts first-time setup with selected tables and no implicit selection', () => {
+    expect(
+      getInitialSelectionMode({ isEditing: false, selectedTableCount: 0, totalTableCount: 4 })
+    ).toBe('selected')
+  })
+
+  test('shows all tables when editing an existing all-table selection', () => {
+    expect(
+      getInitialSelectionMode({ isEditing: true, selectedTableCount: 4, totalTableCount: 4 })
+    ).toBe('all')
+  })
+
+  test('shows selected tables when editing a partial selection', () => {
+    expect(
+      getInitialSelectionMode({ isEditing: true, selectedTableCount: 2, totalTableCount: 4 })
+    ).toBe('selected')
   })
 })
 
