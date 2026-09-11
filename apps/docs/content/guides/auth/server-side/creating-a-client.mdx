@@ -273,13 +273,19 @@ Create a `lib/supabase` folder at the root of your project, or inside the `./src
 
 The code adds a [matcher](https://nextjs.org/docs/app/api-reference/file-conventions/proxy#matcher) so the Proxy doesn't run on routes that don't access Supabase.
 
-Return the same response object the cookies were written to. `setAll` builds a new `supabaseResponse` every time the library writes cookies, so any response you created earlier is already stale. Returning a stale one leaves the browser on the old token after the server has rotated it, and the user is signed out on the next request. When you need a different response, copy the cookies onto it first:
+Return the same response object the cookies were written to. `setAll` builds a new `supabaseResponse` every time the library writes cookies, so any response you created earlier is already stale. Returning a stale one leaves the browser on the old token after the server has rotated it, and the user is signed out on the next request. When you need a different response, copy the cookies and the cache headers onto it first:
 
 ```ts
 const myNewResponse = NextResponse.next({ request })
 myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
+for (const header of ['cache-control', 'expires', 'pragma']) {
+  const value = supabaseResponse.headers.get(header)
+  if (value) myNewResponse.headers.set(header, value)
+}
 return myNewResponse
 ```
+
+The cache headers matter as much as the cookies. They are what stops a CDN caching a response that carries someone's refreshed token.
 
 <Admonition type="danger">
 
