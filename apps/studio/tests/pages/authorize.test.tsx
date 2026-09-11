@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { describe, expect, test, vi } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 
 import type { ProfileContextType } from '@/lib/profile'
 import APIAuthorizationPage from '@/pages/authorize'
@@ -8,6 +8,17 @@ import { customRender } from '@/tests/lib/custom-render'
 vi.mock('@/hooks/misc/withAuth', () => ({
   withAuth: (Component: React.ComponentType) => Component,
 }))
+
+const flags = vi.hoisted(() => ({ scopedGrants: false }))
+
+vi.mock('common', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('common')>()
+  return {
+    ...actual,
+    useParams: () => ({}),
+    useFlag: () => flags.scopedGrants,
+  }
+})
 
 const routerPushMock = vi.fn()
 const useRouterMock = vi.fn(() => ({
@@ -42,6 +53,10 @@ const DEFAULT_PROFILE_CONTEXT: ProfileContextType = {
 }
 
 describe('APIAuthorizationPage', () => {
+  afterEach(() => {
+    flags.scopedGrants = false
+  })
+
   test('renders loading interstitial while router is not ready', () => {
     customRender(<APIAuthorizationPage dehydratedState={{}} />, {
       profileContext: DEFAULT_PROFILE_CONTEXT,
@@ -58,5 +73,37 @@ describe('APIAuthorizationPage', () => {
 
     expect(screen.getByText('Missing authorization link')).toBeInTheDocument()
     expect(screen.queryByText(/is connected/)).not.toBeInTheDocument()
+  })
+
+  test('preselects projects from repeated project_ref params', async () => {
+    flags.scopedGrants = true
+    useRouterMock.mockReturnValue({
+      isReady: true,
+      push: routerPushMock,
+      query: { project_ref: ['northwindstorefront1', 'northwindcms1'] },
+    })
+
+    customRender(<APIAuthorizationPage dehydratedState={{}} />, {
+      profileContext: DEFAULT_PROFILE_CONTEXT,
+    })
+
+    expect(await screen.findByText('northwind-storefront')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
+  })
+
+  test('normalises a single project_ref param to a one-item preselection', async () => {
+    flags.scopedGrants = true
+    useRouterMock.mockReturnValue({
+      isReady: true,
+      push: routerPushMock,
+      query: { project_ref: 'northwindcms1' },
+    })
+
+    customRender(<APIAuthorizationPage dehydratedState={{}} />, {
+      profileContext: DEFAULT_PROFILE_CONTEXT,
+    })
+
+    expect(await screen.findByText('northwind-cms')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
   })
 })
