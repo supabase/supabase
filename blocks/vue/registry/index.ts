@@ -3,6 +3,7 @@ import { currentUserAvatar } from './current-user-avatar'
 import { dropzone } from './dropzone'
 import { infiniteQuery } from './infinite-query'
 import { passwordBasedAuth } from './password-based-auth'
+import { profileSettings } from './profile-settings'
 import { realtimeAvatarStack } from './realtime-avatar-stack'
 import { realtimeChat } from './realtime-chat'
 import { realtimeCursor } from './realtime-cursor'
@@ -18,6 +19,7 @@ const blocks = [
   ...realtimeAvatarStack,
   ...realtimeChat,
   ...infiniteQuery,
+  ...profileSettings,
 ]
 
 export { blocks }
