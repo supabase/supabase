@@ -13,7 +13,7 @@ For example, the schema path `metadata.request.cf.country` is queried as `log_at
     <Tabs scrollable size="small" type="underlined" defaultActiveId="edge_logs" queryGroup="source">
       {logConstants.schemas.map((schema) => (
         <TabPanel id={schema.reference} key={schema.reference} label={schema.name}>
-          <table>
+          <Table>
             <thead>
               <tr>
                 <th className="font-bold">Schema path</th>
@@ -36,7 +36,7 @@ For example, the schema path `metadata.request.cf.country` is queried as `log_at
                   </tr>
                 ))}
             </tbody>
-          </table>
+          </Table>
         </TabPanel>
       ))}
     </Tabs>

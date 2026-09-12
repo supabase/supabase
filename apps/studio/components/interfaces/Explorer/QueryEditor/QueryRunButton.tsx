@@ -26,7 +26,7 @@ export const QueryRunButton = ({
   onRunSelected,
 }: QueryRunButtonProps) => {
   return (
-    <div className="flex w-fit">
+    <div className="ml-1 flex w-fit">
       <ButtonTooltip
         type="button"
         size="tiny"

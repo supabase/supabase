@@ -107,13 +107,63 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/storage/security',
+    destination: '/docs/guides/storage/security/ownership',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/serving',
+    destination: '/docs/guides/storage/serving/downloads',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/management',
+    destination: '/docs/guides/storage/management/copy-move-objects',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/s3',
+    destination: '/docs/guides/storage/s3/authentication',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/debugging',
+    destination: '/docs/guides/storage/debugging/logs',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/schema',
+    destination: '/docs/guides/storage/schema/design',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/production',
+    destination: '/docs/guides/storage/production/scaling',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/vector',
+    destination: '/docs/guides/storage/vector/introduction',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/analytics/examples',
+    destination: '/docs/guides/storage/analytics/examples/duckdb',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/postgrest',
+    destination: '/docs/guides/api',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/storage/image-transformations',
     destination: '/docs/guides/storage/serving/image-transformations',
   },
   {
     permanent: true,
     source: '/docs/guides/storage/access-control',
-    destination: 'docs/guides/storage/security/access-control',
+    destination: '/docs/guides/storage/security/access-control',
   },
   {
     permanent: true,

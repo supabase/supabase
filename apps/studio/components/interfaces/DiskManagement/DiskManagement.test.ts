@@ -70,13 +70,17 @@ describe('DiskManagement utils', () => {
 
 describe('calculateMaxIopsAllowedForDiskSizeWithGp3', () => {
   // Regression: old code returned `3000 * size`, letting a 2 GB disk request 6000 IOPS
-  // which the platform rejects. The real ceiling is 500 IOPS/GB capped at 16 000.
+  // which the platform rejects. The real ceiling is 500 IOPS/GB capped at DISK_LIMITS.gp3.maxIops.
   test('caps a sub-6 GB disk at the 3000 IOPS floor (not 3000 × size)', () => {
     expect(calculateMaxIopsAllowedForDiskSizeWithGp3(2)).toBe(3000)
   })
 
-  test('caps large disks at 16 000 IOPS', () => {
-    expect(calculateMaxIopsAllowedForDiskSizeWithGp3(100)).toBe(16000)
+  test('scales linearly with disk size below the gp3 max IOPS ceiling', () => {
+    expect(calculateMaxIopsAllowedForDiskSizeWithGp3(100)).toBe(50000)
+  })
+
+  test('caps large disks at the gp3 max IOPS ceiling (80 000)', () => {
+    expect(calculateMaxIopsAllowedForDiskSizeWithGp3(1000)).toBe(80000)
   })
 })
 

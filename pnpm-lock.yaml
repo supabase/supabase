@@ -1841,6 +1841,9 @@ importers:
       icons:
         specifier: workspace:*
         version: link:../../packages/icons
+      js-yaml:
+        specifier: ^3.15.1
+        version: 3.15.1
       lucide-react:
         specifier: '*'
         version: 0.436.0(react@19.2.6)
