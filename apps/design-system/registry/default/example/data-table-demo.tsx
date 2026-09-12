@@ -139,7 +139,7 @@ export const columns: ColumnDef<Payment>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="default" className="px-1.5" icon={<MoreVertical />} />
+            <Button className="px-1.5" icon={<MoreVertical />} />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="max-w-48">
             <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>
@@ -200,7 +200,7 @@ export default function DataTableDemo() {
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="default" className="ml-auto" size="tiny" iconRight={<ChevronDown />}>
+            <Button className="ml-auto" size="tiny" iconRight={<ChevronDown />}>
               Columns
             </Button>
           </DropdownMenuTrigger>
@@ -303,19 +303,13 @@ export default function DataTableDemo() {
         </div>
         <div className="space-x-2">
           <Button
-            variant="default"
             size="tiny"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
             Previous
           </Button>
-          <Button
-            variant="default"
-            size="tiny"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
+          <Button size="tiny" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
             Next
           </Button>
         </div>

@@ -269,7 +269,7 @@ export const PipelineCostDialog = ({
         )}
 
         <DialogFooter>
-          <Button variant="default" disabled={isConfirming} onClick={() => onOpenChange(false)}>
+          <Button disabled={isConfirming} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button

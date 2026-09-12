@@ -138,7 +138,7 @@ export const StripeProjectsLoginPage: NextPageWithLayout = () => {
                   </>
                 }
               />
-              <Button variant="default" block onClick={() => signOut()}>
+              <Button block onClick={() => signOut()}>
                 Sign out
               </Button>
             </div>
@@ -215,7 +215,7 @@ export const StripeProjectsLoginPage: NextPageWithLayout = () => {
                 title="Unable to load authorization"
                 description={error?.message}
               />
-              <Button variant="default" block onClick={() => signOut()}>
+              <Button block onClick={() => signOut()}>
                 Sign out
               </Button>
             </div>

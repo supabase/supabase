@@ -74,7 +74,7 @@ export function HighlightsSection() {
                 </ul>
               </div>
               <div className="mt-6">
-                <Button variant="default" size="small" asChild>
+                <Button size="small" asChild>
                   <Link href={highlight.cta.href}>{highlight.cta.label}</Link>
                 </Button>
               </div>

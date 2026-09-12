@@ -138,7 +138,6 @@ export const QueueTab = () => {
               {queuePolicies.length === 0 ? (
                 <ButtonTooltip
                   asChild
-                  variant="default"
                   className="group"
                   icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
                   tooltip={{
@@ -159,7 +158,6 @@ export const QueueTab = () => {
               ) : (
                 <Button
                   asChild
-                  variant="default"
                   className="group"
                   icon={
                     <div
@@ -210,7 +208,6 @@ export const QueueTab = () => {
                       </p>
                       <p>With RLS enabled, anonymous users will not have access to this queue.</p>
                       <Button
-                        variant="default"
                         className="w-min"
                         onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
                       >
@@ -227,7 +224,6 @@ RLS for queues is only relevant if exposure through PostgREST has been enabled, 
 You may opt to manage your queues via any Supabase client libraries or PostgREST endpoints by enabling this in the [queues settings](/project/${project?.ref}/integrations/queues/settings).`}
                       />
                       <Button
-                        variant="default"
                         className="w-min"
                         onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
                       >

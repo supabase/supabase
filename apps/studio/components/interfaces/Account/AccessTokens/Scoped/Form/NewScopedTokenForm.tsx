@@ -232,12 +232,12 @@ export const NewScopedTokenForm = forwardRef<
         )}
         <div className="flex items-center gap-2">
           {step === 'review' && (
-            <Button variant="default" disabled={isPending} onClick={() => setStep('form')}>
+            <Button disabled={isPending} onClick={() => setStep('form')}>
               Back
             </Button>
           )}
           <SheetClose asChild disabled={isPending}>
-            <Button variant="default">Cancel</Button>
+            <Button>Cancel</Button>
           </SheetClose>
           {step === 'form' && isClassicMode && (
             <Button variant="primary" type="submit" form={FORM_ID} loading={isPending}>

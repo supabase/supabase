@@ -67,7 +67,7 @@ const ProductHeader = (props: Types) => {
               </Link>
             </Button>
             {props.documentation_url && (
-              <Button asChild variant="default" size="medium" icon={<BookOpen />}>
+              <Button asChild size="medium" icon={<BookOpen />}>
                 <Link
                   href={props.documentation_url}
                   as={props.documentation_url}

@@ -17,7 +17,7 @@ export default function NotFound() {
           </p>
           <div className="flex flex-wrap gap-4 pt-4">
             <SearchButton />
-            <Button variant="default" size="small" className="p-4" asChild>
+            <Button size="small" className="p-4" asChild>
               <Link href="/" className="no-underline">
                 Return to homepage
               </Link>

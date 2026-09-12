@@ -56,7 +56,7 @@ export const PolicyEditorModalTitle = ({
       </h4>
       <div className="flex items-center gap-x-2 pr-6">
         {showAssistantPreview && view === POLICY_MODAL_VIEWS.EDITOR && (
-          <Button variant="default" icon={<FlaskConical />} onClick={onToggleFeaturePreviewModal}>
+          <Button icon={<FlaskConical />} onClick={onToggleFeaturePreviewModal}>
             Try Supabase Assistant
           </Button>
         )}

@@ -160,7 +160,7 @@ export const CreateWorkOSIntegrationDialog = ({
             </div>
           )}
 
-          <Button disabled={isPending} variant="default" onClick={() => onClose()}>
+          <Button disabled={isPending} onClick={() => onClose()}>
             Cancel
           </Button>
           <Button
