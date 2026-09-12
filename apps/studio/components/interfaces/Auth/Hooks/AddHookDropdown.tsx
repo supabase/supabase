@@ -20,6 +20,7 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
 
 interface AddHookDropdownProps {
   buttonText?: string
@@ -56,13 +57,12 @@ export const AddHookDropdown = ({
       ),
     }))
 
-    const availableHooks: Hook[] = allHooks.filter(
-      (h) => !isValidHook(h) && entitledHookSet.includes(h.entitlementKey)
-    )
+    const isHookEntitled = (hook: Hook) =>
+      !IS_PLATFORM || entitledHookSet.includes(hook.entitlementKey)
 
-    const nonAvailableHooks: Hook[] = allHooks.filter(
-      (h) => !isValidHook(h) && !entitledHookSet.includes(h.entitlementKey)
-    )
+    const availableHooks: Hook[] = allHooks.filter((h) => !isValidHook(h) && isHookEntitled(h))
+
+    const nonAvailableHooks: Hook[] = allHooks.filter((h) => !isValidHook(h) && !isHookEntitled(h))
 
     return { availableHooks, nonAvailableHooks }
   }, [entitledHookSet, authConfig])

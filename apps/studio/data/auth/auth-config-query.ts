@@ -3,6 +3,7 @@ import { useCallback } from 'react'
 
 import { authKeys } from './keys'
 import type { components } from '@/data/api'
+import { useIsManagementApiEnabled } from '@/data/config/deployment-mode-query'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -37,13 +38,20 @@ export const useAuthConfigQuery = <TData = ProjectAuthConfigData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<ProjectAuthConfigData, ProjectAuthConfigError, TData> = {}
-) =>
-  useQuery<ProjectAuthConfigData, ProjectAuthConfigError, TData>({
+) => {
+  const isManagementApiEnabled = useIsManagementApiEnabled()
+
+  return useQuery<ProjectAuthConfigData, ProjectAuthConfigError, TData>({
     queryKey: authKeys.authConfig(projectRef),
     queryFn: ({ signal }) => getProjectAuthConfig({ projectRef }, signal),
-    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined' && projectRef !== '_',
+    enabled:
+      enabled &&
+      (IS_PLATFORM || isManagementApiEnabled) &&
+      typeof projectRef !== 'undefined' &&
+      projectRef !== '_',
     ...options,
   })
+}
 
 export const useAuthConfigPrefetch = ({ projectRef }: AuthConfigVariables) => {
   const client = useQueryClient()

@@ -18,6 +18,7 @@ import {
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -124,7 +125,7 @@ export function useCreateCommandsConfig() {
     }))
 
     const nonAvailableHooks: string[] = allHooks
-      .filter((h) => !isValidHook(h) && !entitledHookSet.includes(h.entitlementKey))
+      .filter((h) => !isValidHook(h) && IS_PLATFORM && !entitledHookSet.includes(h.entitlementKey))
       .map((h) => h.entitlementKey)
 
     return { nonAvailableHooks }
