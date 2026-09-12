@@ -2,6 +2,7 @@ import staticContent from '.generated/staticContent/_index.json'
 import { data as DevelopersData } from 'data/Developers'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import { isCrossAppLink } from 'lib/crossAppLink'
 
 type LinkProps = {
   text: string
@@ -11,6 +12,9 @@ type LinkProps = {
   svg?: any
 }
 
+/**
+ * Developers navigation dropdown showing documentation links, resources, and latest blog posts.
+ */
 export const DevelopersDropdown = () => {
   const { jobsCount, latestBlogPosts } = staticContent
 
@@ -23,26 +27,30 @@ export const DevelopersDropdown = () => {
               {column.label}
             </label>
             <ul className="flex flex-col gap-4">
-              {column.links.map(({ icon: Icon, ...link }: LinkProps) => (
-                <li key={link.text}>
-                  <Link
-                    href={link.url!}
-                    className="flex group items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-ring rounded-sm"
-                  >
-                    {Icon && <Icon size={16} strokeWidth={1.3} />}
-                    <span>{link.text}</span>
-                    {link.text === 'Careers' && jobsCount > 0 && (
-                      <span className="text-xs flex items-center justify-center text-foreground-lighter -ml-1">
-                        ({jobsCount})
-                      </span>
-                    )}
-                    <ChevronRight
-                      strokeWidth={2}
-                      className="w-3 -ml-1 transition-all will-change-transform -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
-                    />
-                  </Link>
-                </li>
-              ))}
+              {column.links.map(({ icon: Icon, ...link }: LinkProps) => {
+                const LinkComponent = isCrossAppLink(link.url) ? 'a' : Link
+
+                return (
+                  <li key={link.text}>
+                    <LinkComponent
+                      href={link.url!}
+                      className="flex group items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-ring rounded-sm"
+                    >
+                      {Icon && <Icon size={16} strokeWidth={1.3} />}
+                      <span>{link.text}</span>
+                      {link.text === 'Careers' && jobsCount > 0 && (
+                        <span className="text-xs flex items-center justify-center text-foreground-lighter -ml-1">
+                          ({jobsCount})
+                        </span>
+                      )}
+                      <ChevronRight
+                        strokeWidth={2}
+                        className="w-3 -ml-1 transition-all will-change-transform -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
+                      />
+                    </LinkComponent>
+                  </li>
+                )
+              })}
             </ul>
           </div>
         ))}

@@ -2,7 +2,11 @@ import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 import { cn } from 'ui'
+import { isCrossAppLink } from 'lib/crossAppLink'
 
+/**
+ * Navigation dropdown menu item with optional icon, description, and chevron.
+ */
 const MenuItem = React.forwardRef<
   React.ElementRef<'a'>,
   React.ComponentPropsWithoutRef<'a'> & {
@@ -26,8 +30,10 @@ const MenuItem = React.forwardRef<
     },
     ref
   ) => {
+    const Component = isCrossAppLink(href) ? 'a' : Link
+
     return (
-      <Link
+      <Component
         href={href}
         ref={ref}
         className={cn(
@@ -83,7 +89,7 @@ const MenuItem = React.forwardRef<
             </div>
           </>
         )}
-      </Link>
+      </Component>
     )
   }
 )
