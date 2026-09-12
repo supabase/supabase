@@ -33,6 +33,7 @@ const IconBackground = ({
       'shrink-0',
       showIconBg ? 'bg-surface-75 border w-8 h-8 flex items-center justify-center rounded-sm' : ''
     )}
+    aria-hidden="true"
   >
     {children}
   </div>

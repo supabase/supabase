@@ -214,6 +214,7 @@ const CodePage = () => {
           {IS_PLATFORM && (
             <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
               <ButtonTooltip
+                variant="primary"
                 loading={isDeploying}
                 size="medium"
                 disabled={!canDeployFunction || files.length === 0 || isLoadingFiles}

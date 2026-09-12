@@ -165,7 +165,6 @@ export const KeyValueFieldArray = <
             />
 
             <Button
-              variant="default"
               size="tiny"
               type="button"
               icon={<Trash size={12} />}
@@ -180,13 +179,16 @@ export const KeyValueFieldArray = <
 
       <div className="flex items-center">
         <Button
-          variant="default"
           size="tiny"
           type="button"
           icon={<Plus />}
           disabled={disabled}
           onClick={() => append(createEmptyRow())}
-          className={cn(hasAddActions && 'rounded-r-none border-r-0 px-3', addButtonClassName)}
+          className={cn(
+            hasAddActions &&
+              'rounded-r-none px-3 hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm',
+            addButtonClassName
+          )}
         >
           {addLabel}
         </Button>
@@ -195,13 +197,12 @@ export const KeyValueFieldArray = <
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                variant="default"
                 size="tiny"
                 type="button"
                 icon={<ChevronDown size={14} />}
                 aria-label={addActionsLabel}
                 disabled={disabled}
-                className="rounded-l-none px-[4px] py-[5px]"
+                className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" side="bottom">

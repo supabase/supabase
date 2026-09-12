@@ -150,6 +150,58 @@ function PluginInstructions({ client }: { client: PluginClient }) {
     )
   }
 
+  if (client.key === 'grok') {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-foreground-light">
+          Install the Supabase plugin by running the following command in your terminal.
+        </p>
+        <CodeBlock
+          value="grok plugin install supabase-community/supabase-plugin"
+          language="bash"
+          focusable={false}
+          className="block"
+        />
+        <p className="text-xs text-foreground-lighter">
+          Browse and install plugins in a session: run <code>grok</code>, then <code>/plugins</code>{' '}
+          or <code>/marketplace</code>.
+        </p>
+      </div>
+    )
+  }
+  if (client.key === 'omp') {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-foreground-light">
+          omp reads the Claude Code plugin format, so install the Supabase plugin from the{' '}
+          <a
+            href="https://github.com/anthropics/claude-plugins-official"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-link hover:underline"
+          >
+            official Anthropic marketplace
+          </a>
+          :
+        </p>
+        <CodeBlock
+          value={`omp plugin marketplace add anthropics/claude-plugins-official\nomp plugin install supabase@claude-plugins-official`}
+          language="bash"
+          focusable={false}
+          className="block"
+        />
+        <p className="text-xs text-foreground-lighter">
+          Installs with <code>--scope user</code> by default, making it available across all your
+          projects. Use <code>--scope project</code> to install it for the current project only.
+        </p>
+        <p className="text-xs text-foreground-lighter">
+          Inside a session, run <code>/marketplace</code> to browse plugins, then{' '}
+          <code>/reload-plugins</code> after installing to load the skills and MCP server.
+        </p>
+      </div>
+    )
+  }
+
   if (client.key === 'vscode') {
     return (
       <div className="space-y-3">
@@ -240,7 +292,7 @@ export function AgentPluginsPanel() {
               rel="noopener noreferrer"
               className="text-brand-link hover:underline inline-flex items-center"
             >
-              View {selectedClient.label} extensions docs
+              {selectedClient.docsLinkText ?? `View ${selectedClient.label} extensions docs`}
               <ExternalLink className="h-3 w-3 ml-1" />
             </a>
           </div>

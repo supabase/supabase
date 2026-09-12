@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 
 import type { IntegrationConnectionsCreateVariables } from './integrations.types'
 import { integrationKeys } from './keys'
@@ -67,11 +66,7 @@ export const useIntegrationVercelConnectionsCreateMutation = ({
     },
     async onError(data, variables, context) {
       snapshot.setLoading(false)
-      if (onError === undefined) {
-        toast.error(`Failed to create connection: ${data.message}`)
-      } else {
-        onError(data, variables, context)
-      }
+      await onError?.(data, variables, context)
     },
     ...options,
   })

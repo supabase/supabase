@@ -34,6 +34,7 @@
 
   "dashboard_auth:sign_up": true,
   "dashboard_auth:sign_in_with_github": true,
+  "dashboard_auth:sign_in_with_chatgpt": true,
   "dashboard_auth:sign_in_with_sso": true,
   "dashboard_auth:sign_in_with_email": true,
   "dashboard_auth:show_testimonial": true,
@@ -98,6 +99,7 @@
   "project_connection:show_app_frameworks": true,
   "project_connection:show_mobile_frameworks": true,
   "project_connection:show_orms": true,
+  "project_connection:show_warehouse": true,
 
   "project_creation:show_advanced_config": true,
 

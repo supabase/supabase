@@ -2,7 +2,6 @@ import { useParams } from 'common'
 import { keyBy } from 'lodash'
 import Head from 'next/head'
 import { useCallback, useMemo } from 'react'
-import { toast } from 'sonner'
 import { Card, CardContent } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -101,25 +100,29 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
 
   const snapshot = useIntegrationInstallationSnapshot()
 
-  const { mutate: createConnections, isPending: isCreatingConnection } =
-    useIntegrationVercelConnectionsCreateMutation({
-      onSuccess() {
-        if (next && isVercelUrl(next)) {
-          snapshot.setLoading(false)
-          window.location.href = next
-        }
-      },
-      onMutate() {
-        snapshot.setLoading(true)
-      },
-      onError(error) {
+  const {
+    mutate: createConnections,
+    isPending: isCreatingConnection,
+    error: createConnectionsError,
+    reset: resetCreateConnectionsError,
+  } = useIntegrationVercelConnectionsCreateMutation({
+    onSuccess() {
+      if (next && isVercelUrl(next)) {
         snapshot.setLoading(false)
-        toast.error(`Creating connection failed: ${error.message}`)
-      },
-    })
+        window.location.href = next
+      }
+    },
+    onMutate() {
+      snapshot.setLoading(true)
+    },
+  })
+  const actionError = createConnectionsError
+    ? `Creating connection failed: ${createConnectionsError.message}`
+    : undefined
 
   const onCreateConnections = useCallback(
     (vars: Parameters<typeof createConnections>[0]) => {
+      resetCreateConnectionsError()
       createConnections({
         ...vars,
         connection: {
@@ -135,7 +138,7 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
         },
       })
     },
-    [createConnections]
+    [createConnections, resetCreateConnectionsError]
   )
 
   const showLoadingState =
@@ -212,6 +215,8 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
                 }
                 loadingForeignProjects={isLoadingVercelProjectsData}
                 mode="Vercel"
+                actionError={actionError}
+                onSelectionChange={resetCreateConnectionsError}
               />
             </div>
           )}

@@ -36,8 +36,6 @@ const renderSiteUrl = () => customRender(<SiteUrl />)
 
 describe('SiteUrl', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
     addAPIMock({
       method: 'get',
       path: '/platform/auth/:ref/config',

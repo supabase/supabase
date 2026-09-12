@@ -1,5 +1,6 @@
-import { Link, redirect, useFetcher, type ActionFunctionArgs } from 'react-router'
+import { Link, redirect, useFetcher, useSearchParams, type ActionFunctionArgs } from 'react-router'
 
+import { safeNextPath } from '@/registry/default/blocks/safe-next-path/lib/safe-next-path'
 import { createClient } from '@/registry/default/clients/react-router/lib/supabase/server'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -14,6 +15,7 @@ import { Label } from '@/registry/default/components/ui/label'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase, headers } = createClient(request)
+  const origin = new URL(request.url).origin
 
   const formData = await request.formData()
 
@@ -32,11 +34,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   // Update this route to redirect to an authenticated route. The user already has an active session.
-  return redirect('/protected', { headers })
+  return redirect(safeNextPath(formData.get('next'), '/protected', origin), { headers })
 }
 
 export default function Login() {
   const fetcher = useFetcher<typeof action>()
+  const [searchParams] = useSearchParams()
 
   const error = fetcher.data?.error
   const loading = fetcher.state === 'submitting'
@@ -47,11 +50,12 @@ export default function Login() {
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl">Login</CardTitle>
-              <CardDescription>Enter your email below to login to your account</CardDescription>
+              <CardTitle className="text-2xl">Sign in</CardTitle>
+              <CardDescription>Enter your email below to sign in to your account</CardDescription>
             </CardHeader>
             <CardContent>
               <fetcher.Form method="post">
+                <input type="hidden" name="next" value={searchParams.get('next') ?? ''} />
                 <div className="flex flex-col gap-6">
                   <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
@@ -77,7 +81,7 @@ export default function Login() {
                   </div>
                   {error && <p className="text-sm text-red-500">{error}</p>}
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'Logging in...' : 'Login'}
+                    {loading ? 'Signing in...' : 'Sign in'}
                   </Button>
                 </div>
                 <div className="mt-4 text-center text-sm">

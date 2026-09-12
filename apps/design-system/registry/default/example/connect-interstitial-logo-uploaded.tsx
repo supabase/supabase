@@ -8,6 +8,7 @@ import {
   SignOutButton,
   SupabaseLogo,
 } from './connect-interstitial-shared'
+import { BASE_PATH } from '@/lib/constants'
 
 /** Stand-in uploaded OAuth icon: checked-in solid-colour bitmap (not a real brand). */
 function UploadedAppLogo() {
@@ -15,7 +16,7 @@ function UploadedAppLogo() {
     <LogoBox className="border-black/10 bg-white">
       <img
         alt="Acme"
-        src={`${process.env.NEXT_PUBLIC_BASE_PATH || '/design-system'}/img/icons/acme-oauth-icon.png`}
+        src={`${BASE_PATH}/img/icons/acme-oauth-icon.png`}
         className="size-full object-cover"
       />
     </LogoBox>

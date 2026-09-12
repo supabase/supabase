@@ -10,9 +10,9 @@ import {
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
-import { Badge } from 'ui'
+import ReactMarkdown from 'react-markdown'
+import { Badge, Heading } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
-import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 import { resolveContentListingIcon } from './iconChip'
 
@@ -66,7 +66,11 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
     <section className="space-y-4">
       <ContentListingGroupHeading group={group} />
       <div className="not-prose space-y-4">
-        {group.description && <p className="text-foreground-light">{group.description}</p>}
+        {group.description && (
+          <div className="text-foreground-light [&_a]:text-foreground [&_a]:underline [&_p]:m-0">
+            <ReactMarkdown>{group.description}</ReactMarkdown>
+          </div>
+        )}
         <ul className={listClassName}>
           {items.map((item) => {
             const external = isExternalContentListingHref(item.href)
@@ -97,6 +101,9 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
                         <Badge variant="success" className="mb-3 block w-fit">
                           {item.badge}
                         </Badge>
+                      )}
+                      {item.subtitle && (
+                        <span className="mb-2 block text-tertiary-foreground">{item.subtitle}</span>
                       )}
                       {item.description}
                     </GlassPanel>

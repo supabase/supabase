@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { MCP_CLIENTS } from 'ui-patterns/McpUrlBuilder'
 
 import {
+  CONNECTION_SOURCE_LOAD_BALANCER,
   connectionStringMethodOptions,
   DATABASE_CONNECTION_TYPES,
   FRAMEWORKS,
@@ -50,11 +51,15 @@ function getFieldOptionsFromSource({
   state,
   databases,
   deploymentMode,
+  isHighAvailability,
+  projectRef,
 }: {
   source: string
   state: ConnectState
   databases: Database[]
   deploymentMode: DeploymentMode
+  isHighAvailability: boolean
+  projectRef?: string
 }): FieldOption[] {
   switch (source) {
     case 'frameworks':
@@ -135,15 +140,23 @@ function getFieldOptionsFromSource({
       }))
     }
 
-    case 'connectionSources':
-      return databases.map((db) => {
+    case 'connectionSources': {
+      const options = databases.map((db) => {
         const region = formatDatabaseRegion(db?.region ?? '')
         const id = formatDatabaseID(db.identifier ?? '')
         const label = db.identifier.includes('-rr-')
-          ? `Read Replica (${region} - ${id})`
-          : 'Primary Database'
+          ? `Read replica (${region} - ${id})`
+          : 'Primary database'
         return { value: db.identifier, label }
       })
+      if (!isHighAvailability) return options
+      // Multigres replicas are only reachable through the read-only load
+      // balancer, so the sources are the primary and the load balancer.
+      return [
+        ...options.filter((option) => option.value === projectRef),
+        { value: CONNECTION_SOURCE_LOAD_BALANCER, label: 'Replica (read-only)' },
+      ]
+    }
 
     case 'connectionTypes':
       return DATABASE_CONNECTION_TYPES.map((t) => ({
@@ -185,11 +198,15 @@ function resolveFieldOptionsWithSource({
   state,
   databases,
   deploymentMode,
+  isHighAvailability,
+  projectRef,
 }: {
   field: ResolvedField
   state: ConnectState
   databases: Database[]
   deploymentMode: DeploymentMode
+  isHighAvailability: boolean
+  projectRef?: string
 }): FieldOption[] {
   // If already resolved (from conditional resolution)
   if (field.resolvedOptions.length > 0) {
@@ -204,6 +221,8 @@ function resolveFieldOptionsWithSource({
       state,
       databases,
       deploymentMode,
+      isHighAvailability,
+      projectRef,
     })
   }
 
@@ -361,12 +380,21 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
 
   // Multigres has no pooler, so pooler-flavored selections restored from the
   // URL or localStorage (shared across projects) must never leak into an HA
-  // project — every consumer sees the direct connection method.
-  const resolvedState = useMemo(
-    () =>
-      isHighAvailability ? { ...state, connectionMethod: 'direct', useSharedPooler: false } : state,
-    [state, isHighAvailability]
-  )
+  // project — every consumer sees the direct connection method. Likewise a
+  // stale connection source (e.g. a replica identifier restored from the URL)
+  // falls back to the primary, since HA sources are only the primary and the
+  // load balancer.
+  const resolvedState = useMemo(() => {
+    if (!isHighAvailability) return state
+
+    const next: ConnectState = { ...state, connectionMethod: 'direct', useSharedPooler: false }
+    const hasValidSource =
+      state.connectionSource === undefined ||
+      state.connectionSource === projectRef ||
+      state.connectionSource === CONNECTION_SOURCE_LOAD_BALANCER
+    if (!hasValidSource) next.connectionSource = projectRef ?? '_'
+    return next
+  }, [state, isHighAvailability, projectRef])
 
   const activeFields = useMemo(() => {
     let fields = getActiveFields(connectSchema, resolvedState)
@@ -394,9 +422,11 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
         state: resolvedState,
         databases,
         deploymentMode,
+        isHighAvailability,
+        projectRef,
       })
     },
-    [activeFields, resolvedState, databases, deploymentMode]
+    [activeFields, resolvedState, databases, deploymentMode, isHighAvailability, projectRef]
   )
 
   return {

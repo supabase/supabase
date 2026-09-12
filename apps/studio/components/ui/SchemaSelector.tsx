@@ -1,11 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { Check, Plus } from 'lucide-react'
 import { ComponentPropsWithoutRef, forwardRef, useMemo, useState } from 'react'
 import {
   Alert,
   AlertDescription,
   AlertTitle,
   Button,
+  ComboboxTrigger,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -20,6 +21,7 @@ import {
   Skeleton,
 } from 'ui'
 
+import { RestartProjectDialog } from '@/components/interfaces/ErrorHandling/RestartProjectDialog'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
@@ -33,7 +35,6 @@ type SchemaSelectorProps = Omit<ComponentPropsWithoutRef<'div'>, 'onSelect'> & {
   placeholderLabel?: string
   supportSelectAll?: boolean
   excludedSchemas?: string[]
-  stopScrollPropagation?: boolean
   onSelectSchema: (name: string) => void
   onSelectCreateSchema?: () => void
   align?: 'start' | 'end'
@@ -54,7 +55,6 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
       placeholderLabel = 'Choose a schema...',
       supportSelectAll = false,
       excludedSchemas = DEFAULT_EXCLUDED_SCHEMAS,
-      stopScrollPropagation = false,
       onSelectSchema,
       onSelectCreateSchema,
       align = 'start',
@@ -65,6 +65,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
     ref
   ) => {
     const [internalOpen, setInternalOpen] = useState(false)
+    const [isRestartDialogVisible, setIsRestartDialogVisible] = useState(false)
     const isControlled = openProp !== undefined
     const open = isControlled ? openProp : internalOpen
     const setOpen = (next: boolean) => {
@@ -103,7 +104,6 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
       <div ref={ref} className={className} {...rest}>
         {isSchemasLoading && (
           <Button
-            variant="default"
             key="schema-selector-skeleton"
             className="w-full [&>span]:w-full"
             size={size}
@@ -119,38 +119,51 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
             <AlertDescription className="text-xs mb-2 wrap-break-word">
               Error: {(schemasError as any)?.message}
             </AlertDescription>
-            <Button variant="default" size="tiny" onClick={() => refetchSchemas()}>
-              Reload schemas
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button size="tiny" onClick={() => refetchSchemas()}>
+                Reload schemas
+              </Button>
+              <Button size="tiny" onClick={() => setIsRestartDialogVisible(true)}>
+                Restart database
+              </Button>
+            </div>
+            <RestartProjectDialog
+              visible={isRestartDialogVisible}
+              onClose={() => setIsRestartDialogVisible(false)}
+              restartType="database"
+            />
           </Alert>
         )}
 
         {isSchemasSuccess && (
           <Popover open={open} onOpenChange={setOpen} modal={false}>
             <PopoverTrigger asChild>
-              <Button
+              <ComboboxTrigger
                 size={size}
                 disabled={disabled}
-                variant="default"
                 data-testid="schema-selector"
-                className={`w-full [&>span]:w-full pr-1! space-x-1`}
-                iconRight={
-                  <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+                aria-label={
+                  selectedSchemaName
+                    ? `Schema ${selectedSchemaName === '*' ? 'All schemas' : selectedSchemaName}`
+                    : placeholderLabel
                 }
+                aria-expanded={open}
+                data-state={open ? 'open' : 'closed'}
+                className={size === 'tiny' ? 'w-full pr-1.5!' : 'w-full'}
               >
                 {selectedSchemaName ? (
-                  <div className="w-full flex gap-1">
-                    <p className="text-foreground-lighter">schema</p>
-                    <p className="text-foreground">
+                  <span className="flex w-full gap-1">
+                    <span className="text-foreground-lighter">schema</span>
+                    <span className="text-foreground">
                       {selectedSchemaName === '*' ? 'All schemas' : selectedSchemaName}
-                    </p>
-                  </div>
+                    </span>
+                  </span>
                 ) : (
-                  <div className="w-full flex gap-1">
-                    <p className="text-foreground-lighter">{placeholderLabel}</p>
-                  </div>
+                  <span className="flex w-full gap-1 text-foreground-lighter">
+                    {placeholderLabel}
+                  </span>
                 )}
-              </Button>
+              </ComboboxTrigger>
             </PopoverTrigger>
             <PopoverContent
               className="p-0 min-w-[200px] pointer-events-auto"
@@ -160,9 +173,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
             >
               <Command>
                 <CommandInput className="text-xs" placeholder="Find schema..." />
-                <CommandList
-                  onWheel={stopScrollPropagation ? (event) => event.stopPropagation() : undefined}
-                >
+                <CommandList>
                   <CommandEmpty>No schemas found</CommandEmpty>
                   <CommandGroup>
                     <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>

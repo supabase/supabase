@@ -3,8 +3,7 @@
 import React from 'react'
 import ReactMarkdown, { type Components, type Options } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { cn } from 'ui'
-import { Heading } from 'ui/src/components/CustomHTMLElements'
+import { cn, Heading } from 'ui'
 
 import {
   Avatar,

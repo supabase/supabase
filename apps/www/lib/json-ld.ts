@@ -41,6 +41,19 @@ export function organizationSchema(input: OrganizationSchemaInput = {}) {
       url: ORG_LOGO_URL,
     },
     description: input.description ?? DEFAULT_META_DESCRIPTION,
+    legalName: 'Supabase Pte. Ltd.',
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      url: `${CANONICAL_ORIGIN}/support`,
+    },
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '65 Chulia Street #38-02/03, OCBC Centre',
+      addressLocality: 'Singapore',
+      postalCode: '049513',
+      addressCountry: 'SG',
+    },
     sameAs: ORG_SAMEAS,
   }
 }
@@ -83,6 +96,38 @@ export function softwareApplicationSchema(input: SoftwareApplicationSchemaInput)
   }
 }
 
+interface ServiceSchemaInput {
+  name: string
+  description: string
+  url: string
+  serviceType: string
+  offerings: Array<{ name: string; url: string }>
+}
+
+export function serviceSchema(input: ServiceSchemaInput) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: input.name,
+    description: input.description,
+    url: input.url,
+    serviceType: input.serviceType,
+    provider: { '@id': ORG_ID },
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: `${input.name} products`,
+      itemListElement: input.offerings.map((offering) => ({
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: offering.name,
+          url: offering.url,
+        },
+      })),
+    },
+  }
+}
+
 export interface BreadcrumbItem {
   name: string
   url: string
@@ -107,6 +152,7 @@ interface BlogPostingSchemaInput {
   description?: string
   image: string
   datePublished: string
+  dateModified: string
   authors: Array<{ name: string; url?: string }>
 }
 
@@ -122,6 +168,7 @@ export function blogPostingSchema(input: BlogPostingSchemaInput) {
     description: input.description,
     image: input.image,
     datePublished: input.datePublished,
+    dateModified: input.dateModified,
     author: input.authors.map((a) => ({
       '@type': 'Person',
       name: a.name,

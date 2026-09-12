@@ -134,7 +134,7 @@ export function PolicySearchResults({ query }: PolicySearchResultsProps) {
 
   return (
     <div className="relative h-full flex flex-col">
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-y-auto pb-9">
         <ResultsList
           results={policyResults}
           icon={Auth}
@@ -150,7 +150,6 @@ export function PolicySearchResults({ query }: PolicySearchResultsProps) {
             }
             return `/project/${projectRef}/database/policies?${params.toString()}` as `/${string}`
           }}
-          className="pb-9"
         />
       </div>
       {renderFooter()}

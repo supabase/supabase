@@ -190,7 +190,6 @@ const PreviewFilterPanel = ({
         <ShortcutTooltip shortcutId={SHORTCUT_IDS.LOGS_PREVIEW_REFRESH} side="bottom">
           <Button
             title="refresh"
-            variant="default"
             className="px-1.5"
             icon={
               <div className="relative">
@@ -257,7 +256,6 @@ const PreviewFilterPanel = ({
         <div className="flex items-center space-x-2">
           <ShortcutTooltip shortcutId={SHORTCUT_IDS.LOGS_PREVIEW_TOGGLE_CHART} side="bottom">
             <Button
-              variant="default"
               onClick={() => onToggleEventChart()}
               icon={isShowingEventChart ? <Eye /> : <EyeOff />}
             >
@@ -280,7 +278,7 @@ const PreviewFilterPanel = ({
         <div className="flex items-center justify-center gap-x-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button asChild className="px-1.5" variant="default" icon={<Terminal />}>
+              <Button asChild className="px-1.5" icon={<Terminal />}>
                 <Link href={queryUrl} />
               </Button>
             </TooltipTrigger>
@@ -300,7 +298,7 @@ const PreviewFilterPanel = ({
           />
         </div>
       ) : (
-        <Button asChild variant="default" onClick={onExploreClick}>
+        <Button asChild onClick={onExploreClick}>
           <Link href={queryUrl}>Explore via query</Link>
         </Button>
       )}

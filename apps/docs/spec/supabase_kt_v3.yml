@@ -35,7 +35,7 @@ functions:
 
       The following will explain how each target handles OAuth and OTP link verification, if supported.
 
-      **On Desktop platforms (JVM, MacOS\*, Linux, Windows)**, it uses a HTTP Callback Server to receive the session data from a successful OAuth login. The success page can be customized via `AuthConfig#httpCallbackConfig` \
+      **On Desktop platforms (JVM, MacOS\*, Linux, Windows)**, it uses a HTTP Callback Server to receive the session data from a successful OAuth sign-in. The success page can be customized via `AuthConfig#httpCallbackConfig` \
       \* If no deeplinks are being used. This works as-is, by default.
 
       *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your email. To send the token, rather than a redirect url, change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`*
@@ -71,7 +71,7 @@ functions:
       If you don't want a separate activity, just call this function at the top of your `onCreate` function in your MainActivity. \
       On iOS/MacOS: `supabase.handleDeeplinks(url)`
 
-      Then you can log in using OAuth:
+      Then you can sign in using OAuth:
       ```kotlin
       supabase.auth.signInWith(Google)
       ```
@@ -187,15 +187,15 @@ functions:
 
           **Desktop:**
 
-          `httpPort`: The port the web server is running on, when logging in with OAuth. Default: `0` (random port).
+          `httpPort`: The port the web server is running on, when signing in with OAuth. Default: `0` (random port).
 
-          `timeout`: The timeout for the web server, when logging in with OAuth. Default: `1.minutes`.
+          `timeout`: The timeout for the web server, when signing in with OAuth. Default: `1.minutes`.
 
-          `htmlTitle`: The title of the redirect page, when logging in with OAuth. Default: `"Supabase Auth"`.
+          `htmlTitle`: The title of the redirect page, when signing in with OAuth. Default: `"Supabase Auth"`.
 
-          `htmlText`: The text of the redirect page, when logging in with OAuth. Default: `"Logged in. You may continue in your app."`.
+          `htmlText`: The text of the redirect page, when signing in with OAuth. Default: `"Logged in. You may continue in your app."`.
 
-          `htmlIconUrl`: The icon of the redirect page, when logging in with OAuth. Default: `"https://supabase.com/brand-assets/supabase-logo-icon.png"`.
+          `htmlIconUrl`: The icon of the redirect page, when signing in with OAuth. Default: `"https://supabase.com/brand-assets/supabase-logo-icon.png"`.
       - id: configure-postgrest
         name: Configure PostgREST module
         code: |
@@ -1633,6 +1633,34 @@ functions:
           }
           ```
 
+  - id: notin
+    title: notIn()
+    description: |
+      Finds all rows whose value on the stated `column` is not found on the specified `values`. The negation of `in_()`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: List<Any>
+        description: The values to exclude.
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```kotlin
+          supabase.from("cities").select(columns = Columns.list("name")) {
+              filter {
+                 City::name notIn listOf("Hobbiton", "Edoras")
+                 //or
+                 notIn("name", listOf("Hobbiton", "Edoras"))
+              }
+          }
+          ```
+
   - id: contains
     title: contains()
     description: |
@@ -2776,6 +2804,69 @@ functions:
         hideCodeBlock: true
         isSpotlight: true
 
+  - id: maybe-single
+    title: maybeSingle()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.maybeSingle'
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val result = supabase.from("characters").select(Columns.list("name")) {
+              limit(1)
+              maybeSingle()
+          }
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              characters (id int8 primary key, name text);
+
+            insert into
+              characters (id, name)
+            values
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
+            ```
+        response: |
+          ```json
+          {
+            "data": {
+              "name": "Luke"
+            },
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+
+  - id: dry-run
+    title: dryRun()
+    description: |
+      Executes the mutation but rolls back the transaction instead of committing it, so no changes are persisted.
+    notes: |
+      - The mutation runs and its result (including side effects such as triggers) is returned in the response, but the transaction is rolled back afterward.
+      - Useful for testing mutations without touching real data.
+      - Requires PostgREST's `db-tx-end` setting to allow client-controlled transaction rollback.
+    examples:
+      - id: with-update
+        name: With `update()`
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val toUpdate = City(name = "Mordor")
+          supabase.from("cities").update(toUpdate) {
+              filter {
+                 City::name eq "Gondor"
+              }
+              dryRun()
+          }
+          // Row is not actually updated in the database.
+          ```
+
   - id: csv
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.csv'
     title: csv()
@@ -2919,10 +3010,10 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
       Creates a new user.
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
+      - By default, the user needs to verify their email address before signing in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
-        - If **Confirm email** is enabled, the return value is the user and you won't be logged in automatically.
-        - If **Confirm email** is disabled, the return value is null and you will be logged in instead.
+        - If **Confirm email** is enabled, the return value is the user and you won't be signed in automatically.
+        - If **Confirm email** is disabled, the return value is null and you will be signed in instead.
       - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/guides/auth/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - If signUpWith() is called for an existing confirmed user:
@@ -3537,7 +3628,7 @@ functions:
         description: The JWT token.
     examples:
       - id: get-the-logged-in-user-with-the-current-existing-session
-        name: Get the logged in user with the current session
+        name: Get the signed-in user with the current session
         isSpotlight: true
         code: |
           ```kotlin
@@ -3840,7 +3931,7 @@ functions:
     title: 'Send a password reset request'
     notes: |
       Sends a password reset request to the given email address.
-      - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
+      - The password reset flow consists of 2 broad steps: (i) Allow the user to sign in via the password reset link; (ii) Update the user's password.
       - The `resetPasswordForEmail()` only sends a password reset link to the user's email.
       To update the user's password, see [`updateUser()`](/docs/reference/kotlin/auth-updateuser).
       - The user gets redirected back to your app, assuming you setup [OTP handling](/docs/reference/kotlin/initializing)
@@ -4106,7 +4197,7 @@ functions:
           val statusFlow = supabase.auth.mfa.statusFlow
           ```
       - id: aal-enabled-for-current-session
-        name: Check whether the user is logged in using AAL2
+        name: Check whether the user is signed in using AAL2
         isSpotlight: true
         code: |
           ```kotlin

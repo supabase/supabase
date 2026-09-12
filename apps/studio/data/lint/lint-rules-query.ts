@@ -10,7 +10,7 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 type ProjectLintRulesVariables = {
   projectRef?: string
 }
-type LintDismissalResponse = components['schemas']['ListNotificationExceptionsResponse']
+type LintDismissalResponse = components['schemas']['ListNotificationExceptionsResponse_Output']
 export type LintException = LintDismissalResponse['exceptions'][0]
 
 export async function getProjectLintRules(

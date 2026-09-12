@@ -17,9 +17,10 @@ import { useDiskAutoscaleCustomConfigQuery } from '@/data/config/disk-autoscale-
 
 type AutoScaleFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
+  disableInput?: boolean
 }
 
-export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
+export const AutoScaleFields = ({ form, disableInput = false }: AutoScaleFieldProps) => {
   const { ref: projectRef } = useParams()
   const {
     control,
@@ -76,7 +77,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                     id={field.name}
                     type="number"
                     value={field.value ?? undefined}
-                    disabled={isError}
+                    disabled={disableInput || isError}
                     onChange={(e) => {
                       setValue(
                         'growthPercent',
@@ -123,7 +124,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                     id={field.name}
                     type="number"
                     value={field.value ?? undefined}
-                    disabled={isError}
+                    disabled={disableInput || isError}
                     onChange={(e) => {
                       setValue(
                         'minIncrementGb',
@@ -165,7 +166,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                     id={field.name}
                     type="number"
                     value={field.value ?? undefined}
-                    disabled={isError}
+                    disabled={disableInput || isError}
                     onChange={(e) => {
                       setValue('maxSizeGb', e.target.value === '' ? null : e.target.valueAsNumber, {
                         shouldDirty: true,

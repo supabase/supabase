@@ -4,7 +4,9 @@
 
 import * as Sentry from '@sentry/nextjs'
 import { hasConsented, IS_PLATFORM } from 'common'
+
 import { IS_DEV } from './lib/constants'
+import { filterSentryEvent } from './lib/sentry-client'
 
 if (!IS_DEV) {
   Sentry.init({
@@ -12,6 +14,14 @@ if (!IS_DEV) {
 
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,
+
+    integrations: (defaultIntegrations) => [
+      ...defaultIntegrations,
+      Sentry.thirdPartyErrorFilterIntegration({
+        filterKeys: ['supabase-docs'],
+        behaviour: 'apply-tag-if-exclusively-contains-third-party-frames',
+      }),
+    ],
 
     ignoreErrors: [
       // [Charis 2025-05-05]
@@ -21,37 +31,8 @@ if (!IS_DEV) {
     ],
 
     beforeSend(event) {
-      if (!IS_PLATFORM || !hasConsented()) {
-        return null
-      }
-
-      const frames = event.exception?.values?.[0].stacktrace?.frames || []
-      if (isThirdPartyError(frames)) {
-        return null
-      }
-
-      return event
+      return filterSentryEvent(event, { isPlatform: IS_PLATFORM, hasConsent: hasConsented() })
     },
-  })
-}
-
-// We want to ignore errors not originating from docs app static files
-// (such as errors from browser extensions). Those errors come from files
-// not starting with 'app:///_next'.
-//
-// However, there is a complication because the Sentry code that sends
-// the error shows up in the stack trace, and that _does_ start with
-// 'app:///_next'. It is always the first frame in the stack trace,
-// and has a specific pre_context comment that we can use for filtering.
-function isThirdPartyError(frames: Sentry.StackFrame[] | undefined) {
-  if (!frames) return false
-
-  function isSentryFrame(frame: Sentry.StackFrame, index: number) {
-    return index === 0 && frame.pre_context?.[0]?.includes('sentry.javascript')
-  }
-
-  return !frames.some((frame, index) => {
-    frame.abs_path?.startsWith('app:///_next') && !isSentryFrame(frame, index)
   })
 }
 

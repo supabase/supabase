@@ -74,7 +74,7 @@ const genFaviconData = (basePath: string): Metadata['icons'] => ({
     },
     {
       rel: 'icon',
-      url: `${basePath}/favicon/favicon-128x128.png`,
+      url: `${basePath}/favicon/favicon-128.png`,
       type: 'image/png',
       sizes: '128x128',
     },

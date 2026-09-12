@@ -26,6 +26,7 @@ export interface MessageActions {
 
   onDelete: (id: string) => void
   onEdit: (id: string) => void
+  onBranch: (id: string) => void
   onCancelEdit: () => void
   onRate?: (id: string, rating: 'positive' | 'negative', reason?: string) => void
 }

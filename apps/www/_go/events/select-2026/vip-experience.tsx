@@ -1,11 +1,15 @@
 import type { GoPageInput } from 'marketing'
 import Image from 'next/image'
+import { cn } from 'ui'
 
 import authors from '@/lib/authors.json'
 
 const sugu = authors.find((a) => a.author_id === 'sugu_sougoumarane')
 const paul = authors.find((a) => a.author_id === 'paul_copplestone')
 const ant = authors.find((a) => a.author_id === 'ant_wilson')
+const deepthi = authors.find((a) => a.author_id === 'deepthi_sigireddi')
+
+const hosts = [paul, ant, sugu, deepthi]
 
 const page: GoPageInput = {
   template: 'lead-gen',
@@ -56,58 +60,34 @@ const page: GoPageInput = {
       title: 'Your hosts',
       children: (
         <div className="border border-muted rounded-xl overflow-hidden">
-          <div className="grid grid-cols-1 md:grid-cols-3">
-            <div className="flex flex-col items-center gap-4 p-6 sm:p-8 md:border-r border-muted max-md:border-b text-center">
-              {sugu?.author_image_url && (
-                <Image
-                  src={sugu.author_image_url}
-                  alt={sugu.author}
-                  width={192}
-                  height={192}
-                  className="rounded-full object-cover aspect-square w-48 h-48"
-                />
-              )}
-              <div className="flex flex-col items-center gap-0">
-                <p className="text-foreground font-medium text-base">{sugu?.author}</p>
-                <p className="text-foreground-lighter text-sm mt-2 leading-relaxed">
-                  {sugu?.position && `${sugu.position}, `}Supabase
-                </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2">
+            {hosts.map((host, i) => (
+              <div
+                key={host?.author_id ?? i}
+                className={cn(
+                  'flex flex-col items-center gap-4 p-6 sm:p-8 text-center',
+                  i % 2 === 0 && 'sm:border-r border-muted',
+                  i < 2 && 'sm:border-b border-muted',
+                  i < hosts.length - 1 && 'max-sm:border-b max-sm:border-muted'
+                )}
+              >
+                {host?.author_image_url && (
+                  <Image
+                    src={host.author_image_url}
+                    alt={host.author}
+                    width={192}
+                    height={192}
+                    className="rounded-full object-cover aspect-square w-48 h-48"
+                  />
+                )}
+                <div className="flex flex-col items-center gap-0">
+                  <p className="text-foreground font-medium text-base">{host?.author}</p>
+                  <p className="text-foreground-lighter text-sm mt-2 leading-relaxed">
+                    {host?.position && `${host.position}, `}Supabase
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="flex flex-col items-center gap-4 p-6 sm:p-8 md:border-r border-muted max-md:border-b text-center">
-              {paul?.author_image_url && (
-                <Image
-                  src={paul.author_image_url}
-                  alt={paul.author}
-                  width={192}
-                  height={192}
-                  className="rounded-full object-cover aspect-square w-48 h-48"
-                />
-              )}
-              <div className="flex flex-col items-center gap-0">
-                <p className="text-foreground font-medium text-base">{paul?.author}</p>
-                <p className="text-foreground-lighter text-sm mt-2 leading-relaxed">
-                  {paul?.position && `${paul.position}, `}Supabase
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-col items-center gap-4 p-6 sm:p-8 text-center">
-              {ant?.author_image_url && (
-                <Image
-                  src={ant.author_image_url}
-                  alt={ant.author}
-                  width={192}
-                  height={192}
-                  className="rounded-full object-cover aspect-square w-48 h-48"
-                />
-              )}
-              <div className="flex flex-col items-center gap-0">
-                <p className="text-foreground font-medium text-base">{ant?.author}</p>
-                <p className="text-foreground-lighter text-sm mt-2 leading-relaxed">
-                  {ant?.position && `${ant.position}, `}Supabase
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       ),

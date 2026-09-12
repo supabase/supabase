@@ -299,7 +299,7 @@ docs.query(
         target: '_blank',
         quote:
           'We store embeddings in a PostgreSQL database, hosted by Supabase, to perform a similarity search to identify the most relevant sections within the MDN.',
-        image: '/images/customers/logos/mozilla.png',
+        image: '/images/customers/logos/on-light/mozilla.png',
         abstract:
           'MDN introduces an AI assistant powered by Supabase Vector to answer all web development questions in real time.',
         url: 'https://developer.mozilla.org/en-US/blog/introducing-ai-help/',
@@ -312,7 +312,7 @@ docs.query(
         role: 'Founder of Quivr',
         quote:
           'Supabase Vector powered by pgvector allowed us to create a simple and efficient product. We are storing over 1.6 million embeddings and the performance and results are great. Open source develop can easily contribute thanks to the SQL syntax known by millions of developers.',
-        image: '/images/customers/logos/quivr.png',
+        image: '/images/customers/logos/on-light/quivr.png',
         abstract: 'Quivr launch 5,000 Vector databases on Supabase.',
         url: '/customers/quivr',
       },
@@ -324,7 +324,7 @@ docs.query(
         role: 'CEO at Firecrawl',
         quote:
           'We tried other vector databases - we tried Faiss, we tried Weaviate, we tried Pinecone. If you’re just doing vector search they’re great, but if you need to store a bunch of metadata that becomes a huge pain.',
-        image: '/images/customers/logos/firecrawl.png',
+        image: '/images/customers/logos/on-light/firecrawl.png',
         abstract: 'Firecrawl switches from Pinecone to Supabase for PostgreSQL vector embeddings.',
         url: '/customers/firecrawl',
       },

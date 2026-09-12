@@ -12,10 +12,14 @@ type DeleteContext = { snapshots: [QueryKey, ContentData | undefined][] }
 
 export async function deleteContents(
   { projectRef, ids }: DeleteContentVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ) {
+  const headers = new Headers(headersInit)
+  headers.set('Version', '2')
+
   const { data, error } = await del('/platform/projects/{ref}/content', {
-    headers: { Version: '2' },
+    headers,
     params: {
       path: { ref: projectRef },
       query: { ids: ids.join(',') },

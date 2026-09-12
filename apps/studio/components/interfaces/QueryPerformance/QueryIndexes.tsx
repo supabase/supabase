@@ -1,10 +1,10 @@
-import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { Check, Lightbulb, Table2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
+  AccordionTrigger,
   Alert,
   AlertDescription,
   AlertTitle,

@@ -49,7 +49,7 @@ export default function MultiSelectDemo() {
           <div>
             <Label htmlFor="fruits">Fruits</Label>
             <MultiSelector id="fruits" values={selectedValues} onValuesChange={setSelectedValues}>
-              <MultiSelectorTrigger label="Select fruits" badgeLimit="wrap" showIcon={false} />
+              <MultiSelectorTrigger label="Select fruits" badgeLimit="wrap" />
               <MultiSelectorContent>
                 <MultiSelectorList>
                   {fruits.map(({ value, isDisabled }) => (
@@ -63,7 +63,7 @@ export default function MultiSelectDemo() {
           </div>
         </DialogSection>
         <DialogFooter>
-          <Button>Save changes</Button>
+          <Button variant="primary">Save changes</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

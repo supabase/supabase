@@ -99,7 +99,7 @@ module.exports = defineConfig([
   // Analytics SQL wire boundary: every call to a SQL-bearing analytics
   // endpoint (`logs.all` / `logs.all.otel`) must go through
   // `executeAnalyticsSql` so the `SafeLogSqlFragment` brand is enforced at the
-  // type level. See .claude/skills/safe-sql-execution/SKILL.md.
+  // type level. See .agents/skills/safe-sql-execution/SKILL.md.
   {
     files: ['**/*.ts', '**/*.tsx'],
     ignores: ['data/logs/execute-analytics-sql.ts'],

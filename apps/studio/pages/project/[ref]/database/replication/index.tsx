@@ -9,11 +9,12 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { ReadReplicasMovedCallout } from '@/components/interfaces/Database/Replication/DestinationPanel/ReadReplicasMovedCallout'
 import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
+import { InstanceConfiguration } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -32,12 +33,26 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
   if (isHighAvailability) {
     return (
-      <div className="flex h-full w-full items-center justify-center p-6">
-        <HighAvailabilityDisabledEmptyState
-          title="Replication unavailable on High Availability projects"
-          description="We're working to bring replication to High Availability projects. Contact support if this is blocking your work."
-        />
-      </div>
+      <>
+        <PageHeader size="large">
+          <PageHeaderMeta>
+            <PageHeaderSummary>
+              <PageHeaderTitle>Replication</PageHeaderTitle>
+              <PageHeaderDescription>High Availability cluster topology</PageHeaderDescription>
+            </PageHeaderSummary>
+          </PageHeaderMeta>
+        </PageHeader>
+
+        <PageContainer size="large">
+          <PageSection>
+            <PageSectionContent>
+              <div className="relative h-[500px] w-full overflow-hidden rounded-md border border-muted">
+                <InstanceConfiguration />
+              </div>
+            </PageSectionContent>
+          </PageSection>
+        </PageContainer>
+      </>
     )
   }
 
@@ -47,7 +62,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Replication</PageHeaderTitle>
-            <PageHeaderDescription>Read replicas and analytics pipelines</PageHeaderDescription>
+            <PageHeaderDescription>Send data to external destinations</PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
@@ -58,6 +73,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
         ) : (
           <PageSection>
             <PageSectionContent className="flex flex-col gap-12">
+              <ReadReplicasMovedCallout />
               <ReplicationDiagram />
               <Destinations />
             </PageSectionContent>

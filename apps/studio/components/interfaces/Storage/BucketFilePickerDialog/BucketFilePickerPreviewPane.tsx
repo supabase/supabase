@@ -130,6 +130,7 @@ export const PreviewPane = ({ onSelect }: { onSelect: (url: string) => void }) =
       {/* Preview Header */}
       <div className="flex w-full justify-end items-center gap-2 sticky top-0 bg-surface-100 p-4 border-b">
         <Button
+          variant="primary"
           size="tiny"
           onClick={() => onSelect(previewUrl!)}
           disabled={!previewUrl}

@@ -28,14 +28,17 @@ export function shouldShowIpv4AddonNotice({
   connectionMethod,
   useSharedPooler,
   hasIpv4Addon,
+  isHighAvailability,
 }: {
   isPlatform: boolean
   mode: ConnectMode
   connectionMethod: FieldValue
   useSharedPooler: FieldValue
   hasIpv4Addon: boolean
+  isHighAvailability: boolean
 }): boolean {
-  if (!isPlatform || mode !== 'direct' || hasIpv4Addon) return false
+  // The IPv4 add-on does not apply to Multigres connections
+  if (!isPlatform || mode !== 'direct' || hasIpv4Addon || isHighAvailability) return false
   return connectionMethod === 'direct' || (connectionMethod === 'transaction' && !useSharedPooler)
 }
 

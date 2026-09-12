@@ -340,7 +340,6 @@ export default function FormPatternsPageLayout() {
                             </Button>
                             <div className="flex gap-2 items-center">
                               <Button
-                                variant="default"
                                 size="tiny"
                                 icon={<Upload size={14} />}
                                 onClick={() => uploadButtonRef.current?.click()}
@@ -349,7 +348,6 @@ export default function FormPatternsPageLayout() {
                               </Button>
                               {logoUrl && (
                                 <Button
-                                  variant="default"
                                   size="tiny"
                                   icon={<Trash size={12} />}
                                   onClick={() => {
@@ -454,7 +452,6 @@ export default function FormPatternsPageLayout() {
                                         {file.name}
                                       </span>
                                       <Button
-                                        variant="default"
                                         size="tiny"
                                         icon={<Trash size={12} />}
                                         onClick={() => {
@@ -580,18 +577,18 @@ export default function FormPatternsPageLayout() {
                         label="Select (Dropdown)"
                         description="Single selection from a list of options"
                       >
-                        <FormControl>
-                          <Select value={field.value} onValueChange={field.onChange}>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select an option" />
                             </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
-                              <SelectItem value="us-west-2">US West (Oregon)</SelectItem>
-                              <SelectItem value="eu-west-1">EU West (Ireland)</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
+                            <SelectItem value="us-west-2">US West (Oregon)</SelectItem>
+                            <SelectItem value="eu-west-1">EU West (Ireland)</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormItemLayout>
                     )}
                   />
@@ -613,14 +610,16 @@ export default function FormPatternsPageLayout() {
                           values={field.value}
                           size="small"
                         >
-                          <MultiSelectorTrigger
-                            mode="inline-combobox"
-                            label="Select options..."
-                            badgeLimit="wrap"
-                            showIcon={false}
-                            deletableBadge
-                            className="w-full"
-                          />
+                          <FormControl>
+                            <MultiSelectorTrigger
+                              mode="inline-combobox"
+                              label="Select options..."
+                              badgeLimit="wrap"
+                              showIcon={false}
+                              deletableBadge
+                              className="w-full"
+                            />
+                          </FormControl>
                           <MultiSelectorContent>
                             <MultiSelectorList>
                               <MultiSelectorItem value="public">public</MultiSelectorItem>
@@ -675,23 +674,23 @@ export default function FormPatternsPageLayout() {
                         label="Date Picker"
                         description="Date selection with calendar popover"
                       >
-                        <FormControl>
-                          <DatePicker>
+                        <DatePicker>
+                          <FormControl>
                             <DatePickerTrigger asChild>
                               <DatePickerButton block isInvalid={fieldState.invalid}>
                                 {field.value ? format(field.value, 'PPP') : 'Pick a date'}
                               </DatePickerButton>
                             </DatePickerTrigger>
-                            <DatePickerContent>
-                              <Calendar
-                                mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                initialFocus
-                              />
-                            </DatePickerContent>
-                          </DatePicker>
-                        </FormControl>
+                          </FormControl>
+                          <DatePickerContent>
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              initialFocus
+                            />
+                          </DatePickerContent>
+                        </DatePicker>
                       </FormItemLayout>
                     )}
                   />
@@ -758,24 +757,17 @@ export default function FormPatternsPageLayout() {
                   >
                     <div className="flex gap-2 items-center justify-end">
                       <Button
-                        variant="default"
                         icon={<ExternalLink size={14} />}
                         onClick={() => console.log('Action performed')}
                       >
                         View documentation
                       </Button>
-                      <Button variant="default" onClick={() => console.log('Reset action')}>
-                        Reset API key
-                      </Button>
+                      <Button onClick={() => console.log('Reset action')}>Reset API key</Button>
                     </div>
                   </FormItemLayout>
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
-                  {form.formState.isDirty && (
-                    <Button variant="default" onClick={() => form.reset()}>
-                      Cancel
-                    </Button>
-                  )}
+                  {form.formState.isDirty && <Button onClick={() => form.reset()}>Cancel</Button>}
                   <Button variant="primary" type="submit" disabled={!form.formState.isDirty}>
                     Save changes
                   </Button>

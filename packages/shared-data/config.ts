@@ -40,10 +40,23 @@ const config = {
           value: 1,
           unit: 'hour',
         },
+      },
+      sms: {
         /**
-         * How many OTPs can be requested per hour.
+         * The number of SMS messages that can be sent per hour.
          */
         requests_per_hour: {
+          value: 30,
+        },
+      },
+      sign_in_sign_ups: {
+        /**
+         * The number of sign-up and sign-in requests allowed per IP address every five minutes.
+         */
+        requests_per_five_minutes: {
+          value: 30,
+        },
+        requests_burst: {
           value: 30,
         },
       },
@@ -66,24 +79,35 @@ const config = {
         },
       },
       verification: {
-        requests_per_hour: {
-          value: 360,
+        requests_per_five_minutes: {
+          value: 30,
         },
         requests_burst: {
           value: 30,
         },
       },
       token_refresh: {
-        requests_per_hour: {
-          value: 1800,
+        requests_per_five_minutes: {
+          value: 150,
         },
         requests_burst: {
           value: 30,
         },
       },
       mfa: {
-        requests_per_hour: {
+        requests_per_minute: {
           value: 15,
+        },
+        requests_burst: {
+          value: 30,
+        },
+      },
+      web3: {
+        /**
+         * The number of Web3 sign-up and sign-in requests allowed per IP address every five minutes.
+         */
+        requests_per_five_minutes: {
+          value: 30,
         },
         requests_burst: {
           value: 30,

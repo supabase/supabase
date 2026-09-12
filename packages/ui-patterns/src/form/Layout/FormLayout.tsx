@@ -1,7 +1,6 @@
 import { cva } from 'class-variance-authority'
 import React from 'react'
-import { cn, FormDescription, FormLabel, FormMessage, Label } from 'ui'
-import { SIZE } from 'ui/src/lib/constants'
+import { cn, FormDescription, FormLabel, FormMessage, Label, SIZE } from 'ui'
 
 type Props = {
   align?: 'left' | 'right'
@@ -334,7 +333,6 @@ export const FormLayout = React.forwardRef<
         <FormDescription
           className={cn(DescriptionVariants({ size, layout }))}
           data-formlayout-id={'description'}
-          id={`${id}-description`}
         >
           {description}
         </FormDescription>
@@ -342,7 +340,7 @@ export const FormLayout = React.forwardRef<
         // Rendered as a div rather than a p as descriptions can be arbitrary JSX
         // which may contain block-level elements (invalid HTML inside a p)
         <div
-          className={cn(DescriptionVariants({ size, layout }), 'text-sm text-foreground-light')}
+          className={cn(DescriptionVariants({ size, layout }))}
           data-formlayout-id={'description'}
         >
           {description}
@@ -398,7 +396,7 @@ export const FormLayout = React.forwardRef<
                 <FormLabel
                   className="text-foreground flex gap-2 items-center wrap-break-word"
                   data-formlayout-id="formLabel"
-                  htmlFor={props.name || id}
+                  htmlFor={id}
                 >
                   <LabelContents />
                 </FormLabel>

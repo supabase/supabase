@@ -50,7 +50,6 @@ export const CreateTriggerButtons = ({
 
       {hasTables && (
         <ButtonTooltip
-          variant="default"
           disabled={!hasTables || !canCreateTriggers}
           className="px-1 pointer-events-auto"
           icon={<AiIconAnimation size={16} />}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "safe-next-path",
+  "type": "registry:lib",
+  "title": "Safe next path",
+  "description": "Validates same-origin paths before redirecting.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/default/blocks/safe-next-path/lib/safe-next-path.ts",
+      "content": "export const safeNextPath = (path: unknown, fallback = '/', origin?: string) => {\n  if (typeof path !== 'string' || !path.startsWith('/')) return fallback\n\n  const currentOrigin = origin ?? window.location.origin\n\n  try {\n    const url = new URL(path, currentOrigin)\n    return url.origin === currentOrigin ? `${url.pathname}${url.search}${url.hash}` : fallback\n  } catch {\n    return fallback\n  }\n}\n",
+      "type": "registry:lib",
+      "target": "lib/safe-next-path.ts"
+    }
+  ]
+}

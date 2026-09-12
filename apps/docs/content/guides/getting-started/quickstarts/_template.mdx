@@ -1,0 +1,154 @@
+This file is a reference contract for framework quickstarts in this directory. It is
+not a rendered page (filenames starting with `_` are excluded from the docs build
+and from `supa-mdx-lint`) — it exists so every quickstart conforms to the same shape,
+and so Phase 3's lint rule has a single source to check against.
+
+## Required frontmatter
+
+```yaml
+---
+title: 'Use Supabase with <Framework>'
+subtitle: '<one sentence: what the reader builds>'
+breadcrumb: 'Framework Quickstarts'
+---
+```
+
+## Required section order
+
+Before the numbered steps, and before any heading:
+
+- `<AiPrompt id="<slug>" />` — always first. Every id must exist as a key in
+  `apps/docs/data/ai-prompts.data.ts`.
+- An optional `## Prerequisites` section, for guides whose toolchain isn't implied
+  by the framework itself. `spring-boot.mdx` is the current example: Java 17,
+  `curl`, `unzip`. Don't add one to restate the obvious.
+
+The list below is the canonical order, not the literal heading numbers.
+`quickstart_db_setup.mdx` supplies headings 1 and 2, so guides that use it start
+their own headings at 3. Guides that use `quickstart_create_project.mdx` alone get
+heading 1 from the partial and start at 2. A guide may also insert a
+framework-specific step — `astrojs.mdx` adds **Configure Astro for SSR** between the
+client library and the environment variables — so number each guide's headings
+sequentially from where its partial leaves off rather than copying numbers from here.
+
+1. **Create a Supabase project** — via `<$Partial path="quickstart_create_project.mdx" />`,
+   either directly or nested inside `quickstart_db_setup.mdx` (see below).
+   - **Set up your database** (also numbered step 2, replacing the above) — only
+     for guides that query the shared `instruments` sample table through a
+     Supabase client library. Use `<$Partial path="quickstart_db_setup.mdx" />`
+     instead (it nests the project-creation partial). Guides that connect
+     directly to Postgres with their own ORM (Laravel, Rails, RedwoodJS, Spring
+     Boot) skip this and use `quickstart_create_project.mdx` alone — add a
+     one-line note stating the guide uses the framework's own tables instead, so
+     the omission reads as deliberate rather than a gap.
+2. **Create a `<framework>` app**
+3. **Set up AI tooling (optional)** — `<$Partial path="quickstart_ai_tooling.mdx" />`.
+   Covers both Agent Skills and the MCP server in one step. Keep them together:
+   two adjacent optional AI steps push the first real Supabase code further down
+   the page for no reader benefit, and the prose is identical across all 19 guides,
+   so it lives in the partial rather than being copied per guide.
+4. **Install the Supabase client library**
+   - Guides that start from a scaffold which already depends on `supabase-js`
+     keep the step but retitle it to what the reader actually does. `hono.mdx`
+     uses **Install dependencies**, because `npx supabase bootstrap hono` already
+     lists the packages in `package.json` and the reader only runs `npm install`.
+     `nextjs.mdx` drops the step entirely, because the `with-supabase` template
+     installs them as part of step 3.
+5. **Declare Supabase environment variables** — env vars only, never literal
+   credentials in code. Mobile guides (Flutter, iOS SwiftUI, Kotlin) are the
+   documented exception — they use `YOUR_SUPABASE_URL` / `YOUR_SUPABASE_PUBLISHABLE_KEY`
+   placeholder substitution instead of a `.env` file, with
+   `<$Partial path="quickstart_mobile_env_note.mdx" />` explaining why. Include the
+   `<Button>` "Open Connect panel" link and `<$Partial path="api_settings.mdx" />`
+   (or, for direct-Postgres guides, `<$Partial path="quickstart_connection_string.mdx" />`).
+6. **Create the Supabase client** — its own step, not inlined into the query
+   sample. `reactjs.mdx`, `vue.mdx`, `solidjs.mdx`, and `sveltekit.mdx` export a
+   shared client from `src/lib/supabaseClient.*`; Nuxt uses a composable in
+   `app/composables/` because `useRuntimeConfig()` requires a Nuxt context.
+   - Guides whose scaffold already creates the client omit this step rather than
+     telling the reader to write a file that exists. `nextjs.mdx` (the
+     `with-supabase` template's `lib/supabase/{client,server}.ts`), `hono.mdx`
+     (`src/middleware/auth.middleware.ts`), and `refine.mdx` (the
+     `refine-supabase` preset's `src/providers/supabase-client.ts`) all do this.
+     When you omit it, say where the client lives at the point the query sample
+     first imports it. Otherwise the import arrives unexplained, and an agent
+     reading the page has no signal the file exists.
+7. **Query data from the app** — every inline query sample must handle the error
+   branch. `reactjs.mdx`'s `getInstruments` (destructure `error`, check it, log/render
+   before touching `data`) is the reference implementation; adapt to the language's
+   idiom (`try`/`catch` for Kotlin/Flask, `snapshot.hasError` for Flutter's
+   `FutureBuilder`, Solid's `resource.error`, etc.) rather than copying JS syntax
+   verbatim.
+   - If the guide's UI also writes, it must add the matching grants and RLS
+     policies before telling the reader to try them. `quickstart_db_setup.mdx`
+     grants `select` to `anon` only, so an insert or update through a Supabase
+     client library fails with `permission denied for table instruments`.
+     `refine.mdx` (scaffolded create and edit pages) and `hono.mdx` (anonymous
+     sign-ins use the `authenticated` role) each carry their own policy step for
+     this reason. Guides that reach Postgres directly through their own ORM bypass
+     RLS and don't need one.
+
+8. **Start the app** — exact local URL and what the reader should see.
+9. **Production requirements** — `<$Partial path="quickstart_going_to_production.mdx" />`,
+   which supplies the `##` heading itself, so don't add one in the host file. Every
+   guide gets this, immediately before Next steps. Its wording is deliberately neutral
+   about which tables the guide uses, so it stays true for both the `instruments`
+   guides and the direct-Postgres ones. `flutter.mdx` is the one guide that appends a
+   framework-specific `###` subsection under it, for the Android `INTERNET`
+   permission.
+10. **Next steps** — canonical order: framework-specific Auth pointer (or the
+    generic `Set up [Auth](/docs/guides/auth) for your app` if there's no
+    framework-specific one) → Insert more data → Storage → Supabase Library (`/ui`).
+    - Only link `/ui` from a framework Supabase Library actually ships blocks for.
+      The supported list is `supportedFrameworks` in
+      `apps/ui-library/config/docs.ts`, currently Next.js, Nuxt, React, React
+      Router, TanStack, and Vue. Check it rather than assuming — Astro, SolidJS,
+      and SvelteKit are **not** supported, so those guides omit the link even
+      though they render a component-based frontend.
+    - `/ui` and `/ui/docs/*` are permanent redirects to `/library` and
+      `/library/docs/*`. Existing guides still link `/ui`; point new links at
+      `/library` directly, and use `/library/docs/<framework>/<block>` for
+      individual blocks.
+    - Also omit it from mobile-native and backend-only guides, and from RedwoodJS
+      and Refine, which ship their own component and Inferencer story.
+
+## Direct-Postgres guides (Laravel, Rails, RedwoodJS, Spring Boot)
+
+Use `<$Partial path="quickstart_connection_string.mdx" />` for the session-pooler
+rationale, IPv6/IPv4 note, percent-encoding, and `sslmode` guidance. Laravel, Rails,
+and Spring Boot all use it. Keep the actual connection-string code block in the host
+file — the URI format differs (`postgres://` vs `jdbc:postgresql://`).
+
+RedwoodJS is the exception and doesn't use the partial: Prisma needs a Transaction-mode
+string for app queries and a Session-mode string for migrations, so the guide walks
+through both connection modes itself rather than the single session-pooler string the
+partial describes.
+
+## Discovery surfaces
+
+A new quickstart must appear in the navigation menu, and optionally in the content
+listing and the framework grid:
+
+- `apps/docs/components/Navigation/NavigationMenu/NavigationMenu.constants.ts` — required
+- `apps/docs/data/content-listings/getting-started.data.ts` — optional
+- `apps/docs/components/FrameworkQuickstarts.tsx` — optional
+
+Both optional surfaces need an icon in `apps/docs/public/img/icons/`, so a guide stays
+out of them until the framework's icon is one Supabase can use. Spring Boot is the
+current example. The content listing also accepts an icon chip
+(`{ kind: 'server', color: '#64748B', bg: 'rgba(100,116,139,0.1)' }`) in place of a
+brand icon.
+
+Icons must be square and readable on both themes. `FrameworkQuickstarts.tsx` renders
+them at a fixed width in a `bg-surface-100` tile, so a wide wordmark renders small and
+an icon with no explicit `fill` defaults to black and disappears in dark mode. Set the
+brand color explicitly, and pad the `viewBox` to a square if the source asset isn't
+one. Icons that ship a `-light.svg` variant set `hasLightIcon: true`, which uses the
+light file in light mode and the base file in dark mode.
+
+## What's deliberately not in this contract yet
+
+- A machine-checked version of this list (Phase 3 — a `supa-mdx-lint` rule or a
+  vitest over the MDX AST).
+- A "last verified" date, pinned framework versions, or a time-to-value label per
+  guide (Phase 4).

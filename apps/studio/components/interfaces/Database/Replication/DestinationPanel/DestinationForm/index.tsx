@@ -5,25 +5,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 import { RefObject, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
-import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
-import {
-  Button,
-  DialogSectionSeparator,
-  Form,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SheetFooter,
-  SheetSection,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import {
@@ -37,7 +21,10 @@ import { type DestinationType, type ExistingDestination } from '../DestinationPa
 import { AdvancedSettings } from './AdvancedSettings'
 import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
 import { AnalyticsBucketFields } from './AnalyticsBucket/Fields'
-import { getBigQueryValidationIssues } from './BigQuery/BigQuery.utils'
+import {
+  BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE,
+  getBigQueryValidationIssues,
+} from './BigQuery/BigQuery.utils'
 import { BigQueryFields } from './BigQuery/Fields'
 import { getClickHouseValidationIssues } from './ClickHouse/ClickHouse.utils'
 import { ClickHouseFields } from './ClickHouse/Fields'
@@ -47,6 +34,7 @@ import {
   buildTableSyncCopyConfig,
   generateDefaultValues,
   pruneStaleSelectedTableIds,
+  pruneStaleTableOptions,
 } from './DestinationForm.utils'
 import { DestinationNameInput } from './DestinationNameInput'
 import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
@@ -54,6 +42,7 @@ import { DuckLakeFields } from './DuckLake/Fields'
 import { NewPublicationPanel } from './NewPublicationPanel'
 import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PipelineCostDialog } from './PipelineCostDialog'
+import { PipelineRegionField } from './PipelineRegionField'
 import { PublicationSelection } from './PublicationSelection'
 import { SnowflakeFields } from './Snowflake/Fields'
 import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
@@ -62,21 +51,16 @@ import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
-import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
-import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
+import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
+import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { BASE_PATH, IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
 const formId = 'destination-editor'
-
-// Pipelines always run out of a single fixed region per environment, regardless of the source
-// project's region.
-const PIPELINE_REGION = IS_STAGING_OR_LOCAL ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.CENTRAL_EU
 
 interface DestinationFormProps {
   selectedType: DestinationType
@@ -139,11 +123,8 @@ export const DestinationForm = ({
 
   const sourceId = useReplicationSourceId({ projectRef })
 
-  const {
-    data: publications = [],
-    isSuccess: isSuccessPublications,
-    refetch: refetchPublications,
-  } = useReplicationPublicationsQuery({ projectRef, sourceId })
+  const { data: publicationNames = [], isSuccess: isSuccessPublicationNames } =
+    useReplicationPublicationNamesQuery({ projectRef, sourceId })
 
   const {
     data: destinationData,
@@ -200,9 +181,8 @@ export const DestinationForm = ({
       }),
     [destinationData, pipelineData, catalogToken, projectSettings, projectRef, editMode]
   )
-
   const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onChange',
+    mode: 'onSubmit',
     reValidateMode: 'onChange',
     resolver: zodResolver(
       FormSchema.superRefine((data, ctx) => {
@@ -214,28 +194,21 @@ export const DestinationForm = ({
           })
         }
 
-        const selectedPublicationTableIds = pruneStaleSelectedTableIds({
-          mode: data.tableSyncCopyMode,
-          selectedTableIds: data.tableSyncCopyTableIds,
-          publications,
-          publicationName: data.publicationName,
-        })
-
         if (
-          isSuccessPublications &&
           (data.tableSyncCopyMode === 'include_tables' ||
             data.tableSyncCopyMode === 'skip_tables') &&
-          selectedPublicationTableIds.length === 0
+          data.tableSyncCopyTableIds.length === 0
         ) {
           addRequiredFieldError('tableSyncCopyTableIds', 'Select at least one table')
         }
 
         if (selectedType === 'BigQuery') {
-          getBigQueryValidationIssues(data, { secretsOptional: editMode }).forEach(
-            ({ path, message }) => {
-              addRequiredFieldError(path, message)
-            }
-          )
+          getBigQueryValidationIssues(data, {
+            secretsOptional: editMode,
+            validateJson: false,
+          }).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
         } else if (selectedType === 'Analytics Bucket') {
           getAnalyticsBucketValidationIssues(data, {
             secretsOptional: editMode,
@@ -270,10 +243,13 @@ export const DestinationForm = ({
   const { isDirty } = form.formState
 
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
+  const { data: selectedPublication, isSuccess: isSuccessPublication } =
+    useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
 
-  const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
   const isSelectedPublicationMissing =
-    isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
+    isSuccessPublicationNames &&
+    !!publicationName &&
+    !publicationNames.some(({ name }) => name === publicationName)
 
   const allValidationFailures = [...destinationValidationFailures, ...pipelineValidationFailures]
   const hasValidationFailures = allValidationFailures.some((f) => f.failure_type === 'critical')
@@ -289,16 +265,16 @@ export const DestinationForm = ({
           }),
     [pendingFormValues]
   )
-  const pendingPublicationTables = useMemo(
-    () =>
-      publications.find(({ name }) => name === pendingFormValues?.publicationName)?.tables ?? [],
-    [pendingFormValues?.publicationName, publications]
-  )
+  const pendingPublicationTables =
+    selectedPublication && selectedPublication.name === pendingFormValues?.publicationName
+      ? selectedPublication.tables
+      : []
 
   const isSubmitDisabled =
     isSaving ||
     !isExistingConfigReady ||
-    !isSuccessPublications ||
+    !isSuccessPublicationNames ||
+    (!!publicationName && !isSuccessPublication) ||
     isSelectedPublicationMissing ||
     (!editMode && hasNoAvailableDestinations)
 
@@ -324,7 +300,7 @@ export const DestinationForm = ({
   }
 
   const onSubmit = async (rawData: z.infer<typeof FormSchema>) => {
-    if (!isSuccessPublications) {
+    if (!isSuccessPublication || !selectedPublication) {
       toast.error('Publication tables are unavailable. Refresh and try again.')
       return
     }
@@ -336,9 +312,32 @@ export const DestinationForm = ({
       tableSyncCopyTableIds: pruneStaleSelectedTableIds({
         mode: rawData.tableSyncCopyMode,
         selectedTableIds: rawData.tableSyncCopyTableIds,
-        publications,
+        publication: selectedPublication,
         publicationName: rawData.publicationName,
       }),
+      tableOptions: pruneStaleTableOptions({
+        tableOptions: rawData.tableOptions,
+        publication: selectedPublication,
+        publicationName: rawData.publicationName,
+      }),
+    }
+
+    if (
+      (data.tableSyncCopyMode === 'include_tables' || data.tableSyncCopyMode === 'skip_tables') &&
+      data.tableSyncCopyTableIds.length === 0
+    ) {
+      form.setError('tableSyncCopyTableIds', { message: 'Select at least one table' })
+      return
+    }
+
+    if (selectedType === 'BigQuery') {
+      const jsonIssue = getBigQueryValidationIssues(data, { secretsOptional: editMode }).find(
+        (issue) => issue.message === BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE
+      )
+      if (jsonIssue) {
+        form.setError(jsonIssue.path, { message: jsonIssue.message })
+        return
+      }
     }
 
     // Pipeline prerequisite validation models a new pipeline and cannot
@@ -434,12 +433,6 @@ export const DestinationForm = ({
     }
   }, [visible, defaultValues, form, isDirty, resetValidation])
 
-  useEffect(() => {
-    if (visible && projectRef && sourceId) {
-      refetchPublications()
-    }
-  }, [visible, projectRef, sourceId, refetchPublications])
-
   return (
     <>
       <SheetSection className="grow overflow-auto px-0 py-0">
@@ -468,46 +461,7 @@ export const DestinationForm = ({
                       onSelectNewPublication={() => setPublicationPanelVisible(true)}
                     />
                     <TableCopySelection form={form} editMode={editMode} />
-                    <FormItemLayout
-                      isReactForm={false}
-                      layout="horizontal"
-                      label="Region"
-                      description={
-                        <span className="text-foreground-lighter">
-                          Pipelines run in{' '}
-                          <Tooltip>
-                            <TooltipTrigger className={InlineLinkClassName}>
-                              {PIPELINE_REGION.displayName}
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">{PIPELINE_REGION.code}</TooltipContent>
-                          </Tooltip>
-                          . In your destination provider, choose the closest available region.
-                        </span>
-                      }
-                    >
-                      <Select disabled value={PIPELINE_REGION.code}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a region" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value={PIPELINE_REGION.code}>
-                            <div className="flex gap-x-3 items-center">
-                              <img
-                                alt="region icon"
-                                className="w-5 rounded-xs"
-                                src={`${BASE_PATH}/img/regions/${PIPELINE_REGION.code}.svg`}
-                              />
-                              <p className="flex items-center gap-x-2">
-                                <span>{PIPELINE_REGION.displayName}</span>
-                                <span className="text-xs text-foreground-lighter font-mono">
-                                  {PIPELINE_REGION.code}
-                                </span>
-                              </p>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormItemLayout>
+                    <PipelineRegionField destinationType={selectedType} />
                   </div>
                 </div>
 
@@ -524,18 +478,9 @@ export const DestinationForm = ({
                 ) : selectedType === 'DuckLake' && etlEnableDucklake ? (
                   <DuckLakeFields form={form} editMode={editMode} />
                 ) : selectedType === 'Snowflake' && etlEnableSnowflake ? (
-                  <SnowflakeFields
-                    form={form}
-                    editMode={editMode}
-                    hasStoredPrivateKeyPassphrase={
-                      editMode && !!defaultValues.snowflakePrivateKeyPassphrase
-                    }
-                  />
+                  <SnowflakeFields form={form} editMode={editMode} />
                 ) : selectedType === 'ClickHouse' && etlEnableClickHouse ? (
-                  <ClickHouseFields
-                    form={form}
-                    hasStoredPassword={editMode && !!defaultValues.clickhousePassword}
-                  />
+                  <ClickHouseFields form={form} editMode={editMode} />
                 ) : null}
 
                 <DialogSectionSeparator />
@@ -586,10 +531,16 @@ export const DestinationForm = ({
           )}
         </AnimatePresence>
         <div className="flex items-center gap-x-2">
-          <Button disabled={isSaving} variant="default" onClick={onCancel}>
+          <Button disabled={isSaving} onClick={onCancel}>
             Cancel
           </Button>
-          <Button disabled={isSubmitDisabled} loading={isSaving} form={formId} type="submit">
+          <Button
+            variant="primary"
+            disabled={isSubmitDisabled}
+            loading={isSaving}
+            form={formId}
+            type="submit"
+          >
             {getSubmitButtonText()}
           </Button>
         </div>
@@ -599,7 +550,15 @@ export const DestinationForm = ({
         visible={publicationPanelVisible}
         onClose={(newPublication?: string) => {
           if (newPublication) {
+            form.setValue('tableSyncCopyMode', 'include_all_tables', {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
             form.setValue('tableSyncCopyTableIds', [], {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
+            form.setValue('tableOptions', [], {
               shouldDirty: true,
               shouldValidate: true,
             })

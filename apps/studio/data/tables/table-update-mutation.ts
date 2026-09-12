@@ -2,11 +2,9 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { tableKeys } from './keys'
 import { CreateTableBody } from './table-create-mutation'
-import { lintKeys } from '@/data/lint/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { tableEditorKeys } from '@/data/table-editor/keys'
+import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type UpdateTableBody = Partial<CreateTableBody> & {
@@ -61,12 +59,17 @@ export const useTableUpdateMutation = ({
   return useMutation<TableUpdateData, ResponseError, TableUpdateVariables>({
     mutationFn: (vars) => updateTable(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef, schema, id } = variables
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: tableEditorKeys.tableEditor(projectRef, id) }),
-        queryClient.invalidateQueries({ queryKey: tableKeys.list(projectRef, schema) }),
-        queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
-      ])
+      const { projectRef, schema, id, name, payload } = variables
+      await invalidateTableMetadata(queryClient, {
+        projectRef,
+        schema,
+        tableId: id,
+        tableName: name,
+        newSchema: payload.schema,
+        newTableName: payload.name,
+        includeRows: true,
+        includeLint: true,
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

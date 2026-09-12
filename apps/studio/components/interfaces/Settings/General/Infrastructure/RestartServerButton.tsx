@@ -20,11 +20,7 @@ import { useProjectRestartMutation } from '@/data/projects/project-restart-mutat
 import { useProjectRestartServicesMutation } from '@/data/projects/project-restart-services-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import {
-  useIsAwsK8sCloudProvider,
-  useIsProjectActive,
-  useSelectedProjectQuery,
-} from '@/hooks/misc/useSelectedProject'
+import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { type ResponseError } from '@/types'
 
@@ -37,7 +33,6 @@ export const RestartServerButton = () => {
   const entityLabel = isBranch ? 'branch' : 'project'
   const entityLabelCapitalized = entityLabel.charAt(0).toUpperCase() + entityLabel.slice(1)
   const canRestart = isProjectActive || project?.status === PROJECT_STATUS.ACTIVE_UNHEALTHY
-  const isAwsK8s = useIsAwsK8sCloudProvider()
   const { setProjectStatus } = useSetProjectStatus()
 
   const [serviceToRestart, setServiceToRestart] = useState<'project' | 'branch' | 'database'>()
@@ -107,17 +102,13 @@ export const RestartServerButton = () => {
       {projectSettingsRestartProject ? (
         <div className="flex w-full @lg:w-auto">
           <ButtonTooltip
-            variant="default"
+            type="button"
             className={cn(
-              'flex-1 px-3 hover:z-10 @lg:flex-none',
-              canRestartProject && canRestart ? 'rounded-r-none' : ''
+              'flex-1 px-3 hover:z-10 focus-visible:z-10 @lg:flex-none',
+              canRestartProject && canRestart ? 'rounded-r-none focus-visible:rounded-r-sm' : ''
             )}
             disabled={
-              project === undefined ||
-              !canRestartProject ||
-              !canRestart ||
-              projectRestartDisabled ||
-              isAwsK8s
+              project === undefined || !canRestartProject || !canRestart || projectRestartDisabled
             }
             onClick={() => setServiceToRestart(entityLabel)}
             tooltip={{
@@ -129,9 +120,7 @@ export const RestartServerButton = () => {
                     ? `You need additional permissions to restart this ${entityLabel}`
                     : !canRestart
                       ? `Unable to restart ${entityLabel} as ${entityLabel} is not active`
-                      : isAwsK8s
-                        ? `${entityLabelCapitalized} restart is not supported for AWS (Revamped) projects`
-                        : undefined,
+                      : undefined,
               },
             }}
           >
@@ -141,9 +130,9 @@ export const RestartServerButton = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant="default"
-                  aria-label={`Restart ${entityLabel}`}
-                  className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px"
+                  type="button"
+                  aria-label="Choose restart type"
+                  className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                   icon={<ChevronDown />}
                   disabled={!canRestartProject}
                 />
@@ -158,9 +147,9 @@ export const RestartServerButton = () => {
                 >
                   <div className="space-y-0.5">
                     <p className="block text-foreground">Fast database reboot</p>
-                    <p className="block text-foreground-light">
-                      Restarts only the database. Faster, but may not be able to recover from all
-                      failure modes.
+                    <p className="block text-foreground-lighter">
+                      Restarts only the database service, with less downtime than a full project
+                      restart. Other project services remain running.
                     </p>
                   </div>
                 </DropdownMenuItem>
@@ -170,7 +159,6 @@ export const RestartServerButton = () => {
         </div>
       ) : (
         <Button
-          variant="default"
           icon={<RefreshCw />}
           className="w-full @lg:w-auto"
           disabled={isLoading}

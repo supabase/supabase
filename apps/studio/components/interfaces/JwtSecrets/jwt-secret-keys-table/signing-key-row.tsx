@@ -30,7 +30,7 @@ import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip
 import { JWTSigningKey } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
 
 interface SigningKeyRowProps {
-  signingKey: components['schemas']['SigningKeyResponse']
+  signingKey: components['schemas']['SigningKeyResponse_Output']
   setSelectedKey: (key?: JWTSigningKey) => void
   setShownDialog: (dialog?: 'key-details' | 'revoke' | 'delete') => void
   handlePreviouslyUsedKey: (keyId: string) => void

@@ -2,7 +2,7 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
 import { toast } from 'sonner'
-import { beforeEach, expect, test, vi } from 'vitest'
+import { expect, test, vi } from 'vitest'
 
 import { StripeProjectsLoginPage } from '@/pages/partners/stripe/projects/login'
 import { customRender } from '@/tests/lib/custom-render'
@@ -54,10 +54,6 @@ vi.mock('@/lib/profile', () => ({
     avatarUrl: undefined,
   }),
 }))
-
-beforeEach(() => {
-  vi.clearAllMocks()
-})
 
 test('shows confirmation failures inline and keeps authorization available', async () => {
   const user = userEvent.setup()

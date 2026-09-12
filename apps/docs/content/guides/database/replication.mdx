@@ -39,13 +39,16 @@ Supabase Pipelines is a managed CDC product for moving data from Supabase Postgr
 #### Supported destinations
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-Pipelines currently supports BigQuery as the managed destination. You can [request early access to ClickHouse, Snowflake, and DuckLake](/go/supabase-pipelines-new-destinations) while we expand destination support.
+BigQuery is currently available as a managed destination. ClickHouse, DuckLake, and Snowflake are in Early Access. [Request access](/go/supabase-pipelines-new-destinations) to these destinations.
 
 Managed Pipelines run in **AWS `eu-central-1` (Frankfurt)**. Choose destination resources as close as possible to Frankfurt to reduce network latency and replication lag.
 
-| Destination                                            | Insert       | Update       | Delete       | Truncate     | Schema change  | Description                                                         |
-| ------------------------------------------------------ | ------------ | ------------ | ------------ | ------------ | -------------- | ------------------------------------------------------------------- |
-| [BigQuery](/docs/guides/database/replication/bigquery) | ✅ Supported | ✅ Supported | ✅ Supported | ✅ Supported | Beta (limited) | Managed replication to Google BigQuery for analytics and reporting. |
+| Destination                                                | Insert       | Update                  | Delete                       | Truncate     | Schema change          | Data model                                                                       |
+| ---------------------------------------------------------- | ------------ | ----------------------- | ---------------------------- | ------------ | ---------------------- | -------------------------------------------------------------------------------- |
+| [BigQuery](/docs/guides/database/replication/bigquery)     | ✅ Supported | ✅ Supported            | ✅ Supported                 | ✅ Supported | Beta (limited)         | Current-state tables.                                                            |
+| [ClickHouse](/docs/guides/database/replication/clickhouse) | ✅ Supported | `REPLICA IDENTITY FULL` | Primary-key or full identity | ✅ Supported | Early Access (limited) | Current-state tables (default) or append-only CDC history.                       |
+| [DuckLake](/docs/guides/database/replication/ducklake)     | ✅ Supported | Row identity required   | Row identity required        | ✅ Supported | Early Access (limited) | Current-state lakehouse tables backed by a SQL catalog and object storage.       |
+| [Snowflake](/docs/guides/database/replication/snowflake)   | ✅ Supported | `REPLICA IDENTITY FULL` | Row identity required        | ✅ Supported | Early Access (limited) | Append-only CDC history. Source `TRUNCATE` operations and table resets erase it. |
 
 ### Manual replication
 

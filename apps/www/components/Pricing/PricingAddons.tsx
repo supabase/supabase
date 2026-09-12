@@ -96,12 +96,7 @@ const AddonCard = ({ addon }: any) => {
           </p>
         </div>
         <div className="flex items-center gap-4 mt-4">
-          <Button
-            asChild
-            size="tiny"
-            variant="default"
-            iconRight={<ArrowUpRight className="w-4 h-4" />}
-          >
+          <Button asChild size="tiny" iconRight={<ArrowUpRight className="w-4 h-4" />}>
             <Link href={addon.ctaLink} target={addon.ctaTarget}>
               {addon.ctaText}
             </Link>

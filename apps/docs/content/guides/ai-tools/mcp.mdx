@@ -24,9 +24,9 @@ Choose your Supabase platform, project, and MCP client and follow the installati
 
 ### Next steps
 
-Your MCP client automatically redirects you to log in to Supabase during setup. This opens a browser window where you can log in to your Supabase account and grant access to the MCP client. Be sure to choose the organization that contains the project you wish to work with.
+Your MCP client automatically redirects you to sign in to Supabase during setup. This opens a browser window where you can sign in to your Supabase account and grant access to the MCP client. Be sure to choose the organization that contains the project you wish to work with.
 
-After you log in, check that the MCP server is connected. For instance, in Cursor, navigate to **Settings > Cursor Settings > Tools & MCP**. Depending on the client, you may need to restart it to connect and detect all tools after authorization.
+After you sign in, check that the MCP server is connected. For instance, in Cursor, navigate to **Settings > Cursor Settings > Tools & MCP**. Depending on the client, you may need to restart it to connect and detect all tools after authorization.
 
 To verify the client has access to the MCP server tools, try asking it to query your project or database using natural language. For example: "What tables are there in the database? Use MCP tools."
 
@@ -56,7 +56,7 @@ The Supabase MCP server provides tools organized into feature groups. All groups
 
 ### Debugging
 
-- `get_logs` - Retrieve service logs (API, Postgres, Edge Functions, Auth, Storage, Realtime)
+- `query_logs` - Run a read-only SQL query against project logs to filter, aggregate, or join across log fields. See [Query and filter logs](/docs/guides/observability/advanced-log-filtering).
 - `get_advisors` - Get security and performance advisors
 
 ### Development
@@ -135,7 +135,7 @@ There are some situations where you might want to manually authenticate the MCP 
 
 To authenticate the MCP server in a CI environment, you can create a personal access token (PAT) with the necessary scopes and pass it as a header to the MCP server.
 
-1. Remember to never connect the MCP server to production data. Supabase MCP is only designed for development and testing purposes. See [Security risks](#security-risks).
+1. Production projects can contain sensitive data. Before connecting one, scope the server to that project, enable [read-only mode](#configuration-options), restrict the available feature groups, and review the [security risks](#security-risks).
 
 1. Navigate to your Supabase [access tokens](/dashboard/account/tokens) and generate a new token. Name the token based on its purpose, e.g. "Example App MCP CI token".
 
@@ -151,7 +151,7 @@ To authenticate the MCP server in a CI environment, you can create a personal ac
 
 If your MCP client requires an OAuth client ID and secret (e.g. Azure API Center), you can manually create an OAuth app in your Supabase account and pass the credentials to the MCP client.
 
-1. Remember to never connect the MCP server to production data. Supabase MCP is only designed for development and testing purposes. See [Security risks](#security-risks).
+1. Production projects can contain sensitive data. Before connecting one, scope the server to that project, enable [read-only mode](#configuration-options), restrict the available feature groups, and review the [security risks](#security-risks).
 
 1. Navigate to your Supabase organization's [OAuth apps](/dashboard/org/_/apps) and add a new application. Name the app based on its purpose, e.g. "Example App MCP".
 
@@ -176,7 +176,9 @@ The primary attack vector unique to LLMs is prompt injection, which might trick 
 
 <Admonition type="caution" title="Manual approval of tool calls">
 
-Most MCP clients like Cursor ask you to manually accept each tool call before they run. We recommend you always keep this setting enabled and always review the details of the tool calls before executing them.
+Most MCP clients ask you to accept each tool call before it runs. Keep manual approval enabled for interactive work, and review each tool call before you run it.
+
+An unattended monitoring routine cannot request approval during each run. Approve in advance only the project-scoped, read-only tools that the routine needs. The routine must stop and report a recommendation instead of running a write operation.
 
 To lower this risk further, Supabase MCP wraps SQL results with additional instructions to discourage LLMs from following instructions or commands that might be present in the data. This is not foolproof though, so you should always review the output before proceeding with further actions.
 
@@ -186,9 +188,9 @@ To lower this risk further, Supabase MCP wraps SQL results with additional instr
 
 We recommend the following best practices to mitigate security risks when using the Supabase MCP server:
 
-- **Don't connect to production**: Use the MCP server with a development project, not production. LLMs are great at helping design and test applications, so leverage them in a safe environment without exposing real data. Be sure that your development environment contains non-production data (or obfuscated data).
+- **Protect production data**: Connect to a production project only when the task requires production evidence. Use project scoping, read-only mode, restricted feature groups, and the narrowest data query that can answer the question. Do not include secrets or unrelated personal data in prompts or reports.
 - **Don't give to your customers**: The MCP server operates under the context of your developer permissions, so you should not give it to your customers or end users. Instead, use it internally as a developer tool to help you build and test your applications.
-- **Read-only mode**: If you must connect to real data, set the server to [read-only](#configuration-options) mode, which executes all queries as a read-only Postgres user.
+- **Read-only mode**: Set unattended monitoring and diagnostic routines to [read-only](#configuration-options) mode, which executes SQL queries as a read-only Postgres user.
 - **Project scoping**: Scope your MCP server to a [specific project](#configuration-options), limiting access to only that project's resources. This prevents LLMs from accessing data from other projects in your Supabase account.
 - **Branching**: Use Supabase's [branching feature](/docs/guides/deployment/branching) to create a development branch for your database. This allows you to test changes in a safe environment before merging them to production.
 - **Feature groups**: Restrict which [tool groups](#available-tools) are available using the `features` [configuration option](#configuration-options). This helps reduce the attack surface and limits the actions that LLMs can perform to only those that you need.

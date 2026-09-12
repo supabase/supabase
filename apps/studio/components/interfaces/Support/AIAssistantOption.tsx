@@ -64,7 +64,6 @@ export const AIAssistantOption = ({
                 {onClick ? (
                   <Button
                     size="tiny"
-                    variant="default"
                     icon={<AiIconAnimation size={14} />}
                     onClick={onAiAssistantClicked}
                   >
@@ -72,7 +71,7 @@ export const AIAssistantOption = ({
                   </Button>
                 ) : (
                   <Link href={aiLink} onClick={onAiAssistantClicked}>
-                    <Button size="tiny" variant="default" icon={<AiIconAnimation size={14} />}>
+                    <Button size="tiny" icon={<AiIconAnimation size={14} />}>
                       Ask the Assistant
                     </Button>
                   </Link>

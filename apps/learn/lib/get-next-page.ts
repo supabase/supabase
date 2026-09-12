@@ -1,4 +1,4 @@
-import { allDocs } from 'contentlayer/generated'
+import { allDocs } from '@/.velite'
 import { courses } from '@/config/docs'
 import { SidebarNavItem } from '@/types/nav'
 
@@ -65,8 +65,7 @@ export function getNextPage(
   const description = doc?.description || nextPage.title
 
   // Get chapterNumber from frontmatter first, then fallback to parsing from title
-  // Using type assertion since contentlayer types may need regeneration
-  let chapterNumber: number | undefined = (doc as any)?.chapterNumber
+  let chapterNumber: number | undefined = doc?.chapterNumber
   if (!chapterNumber) {
     // Try to extract chapter number from title (e.g., "2: CSS Styling" -> 2)
     const chapterMatch = nextPage.title.match(/^(\d+):/)

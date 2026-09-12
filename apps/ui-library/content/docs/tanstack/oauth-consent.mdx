@@ -1,0 +1,69 @@
+---
+title: OAuth Consent
+description: OAuth 2.1 consent block for TanStack Start
+---
+
+<BlockPreview name="oauth-consent" />
+
+## Installation
+
+<BlockItem
+  name="oauth-consent-tanstack"
+  description="OAuth 2.1 consent screen and the /oauth/consent route"
+/>
+
+## Folder structure
+
+This block includes the [Supabase client](/library/docs/tanstack/client). If you already have one installed, you can skip overwriting it.
+
+<RegistryBlock itemName="oauth-consent-tanstack" />
+
+## Usage
+
+This block installs an OAuth 2.1 consent route at `/oauth/consent`. It is designed for an app that already has authentication: it does not install sign-in, sign-up, or callback routes.
+
+When the visitor has no session, the consent screen redirects to `/auth/login` and preserves the original consent URL in the `next` query parameter. Update the `signInPath` prop in `routes/oauth/consent.tsx` if your sign-in route is different.
+
+After sign-in, your login page must send the visitor back to the path in `next`; otherwise the OAuth flow stops at your login screen. The password-based auth and social auth blocks follow `next` automatically. For a custom login page, validate that `next` is a relative path before redirecting to it:
+
+```ts
+// After sign-in succeeds:
+const next = new URLSearchParams(window.location.search).get('next')
+if (next?.startsWith('/') && !next.startsWith('//')) {
+  // `next` may point outside the typed route tree, so use a full navigation.
+  window.location.assign(next)
+}
+```
+
+Set the `productName` prop to replace the `Your product` placeholder in the consent header.
+
+### Getting started
+
+After installing the block, you'll have the following environment variables in your `.env.local` file:
+
+```env
+VITE_SUPABASE_URL=
+VITE_SUPABASE_PUBLISHABLE_KEY=
+```
+
+- If you're using supabase.com, you can find these values in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=react&using=vite&with=supabasejs) under App Frameworks or in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api).
+- If you're using a local instance of Supabase, you can find these values by running `supabase start` or `supabase status` (if you already have it running).
+
+### Configure the OAuth server
+
+Enable the OAuth server in the Supabase Dashboard under **Authentication** > **OAuth Server**, then set its authorization URL path to `/oauth/consent`. For local development, set the following in `supabase/config.toml`:
+
+```toml
+[auth.oauth_server]
+enabled = true
+authorization_url_path = "/oauth/consent"
+```
+
+Recent CLI versions already write an `[auth.oauth_server]` section with `enabled = false`. Edit that section rather than adding a second one, which fails with `table oauth_server already exists`.
+
+The route expects the `authorization_id` query parameter that Supabase Auth supplies during the authorization flow.
+
+## Further reading
+
+- [OAuth Server](https://supabase.com/docs/guides/auth/oauth-server)
+- [Supabase Auth](https://supabase.com/docs/guides/auth)

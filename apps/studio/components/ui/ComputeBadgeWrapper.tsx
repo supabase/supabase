@@ -185,7 +185,6 @@ export const ComputeBadgeWrapper = ({
               <div>
                 <Button
                   asChild
-                  variant="default"
                   onClick={() => {
                     track('compute_badge_upgrade_clicked', {
                       computeSize: computeSize ?? 'unknown',

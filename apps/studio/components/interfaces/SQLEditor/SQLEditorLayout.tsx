@@ -73,7 +73,7 @@ const SQLEditorToolbar = () => {
   // Run gesture from the toolbar button — promote here, at the user action.
   const runQuery = useCallback(() => {
     markRefocusAfterRun()
-    if (runSource.type === 'logs') {
+    if (runSource._tag === 'logs') {
       const sql = readEditorLogsSql()
       if (sql === undefined) return clearPendingRunRefocus()
       void executeLogsQuery(acceptUntrustedLogsSql(sql))
@@ -89,7 +89,7 @@ const SQLEditorToolbar = () => {
     markRefocusAfterRun,
     readEditorLogsSql,
     readEditorSql,
-    runSource.type,
+    runSource._tag,
   ])
 
   return (

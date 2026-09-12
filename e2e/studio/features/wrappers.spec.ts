@@ -18,7 +18,7 @@ testRunner('Stripe', () => {
 
           create extension if not exists wrappers
             schema extensions
-            version '0.5.7'
+            version '0.6.2'
             cascade;
         `)
       },
@@ -59,7 +59,7 @@ testRunner('Stripe', () => {
 
           create extension if not exists wrappers
             schema extensions
-            version '0.5.7'
+            version '0.6.2'
             cascade;
         `)
       },
@@ -102,7 +102,7 @@ testRunner('S3 Wrapper', () => {
 
           create extension if not exists wrappers
             schema extensions
-            version '0.5.7'
+            version '0.6.2'
             cascade;
         `)
       },

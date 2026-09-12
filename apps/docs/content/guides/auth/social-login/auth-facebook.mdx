@@ -1,6 +1,6 @@
 ---
 id: 'auth-facebook'
-title: 'Login with Facebook'
+title: 'Sign in with Facebook'
 description: 'Add Facebook OAuth to your Supabase project'
 ---
 
@@ -8,17 +8,17 @@ To enable Facebook Auth for your project, you need to set up a Facebook OAuth ap
 
 ## Overview
 
-Setting up Facebook logins for your application consists of 4 parts:
+Setting up Facebook sign-in for your application consists of 4 parts:
 
 - Create and configure a Facebook Application on the [Facebook Developers Site](https://developers.facebook.com)
 - **Configure email permissions** in your Facebook app (required for Supabase Auth)
 - Add your Facebook keys to your [Supabase Project](/dashboard)
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+- Add the sign-in code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
 ## Access your Facebook Developer account
 
 - Go to [developers.facebook.com](https://developers.facebook.com).
-- Click on `Log In` at the top right to log in.
+- Click on `Log In` at the top right to sign in.
 
 ![Facebook Developer Portal.](/docs/img/guides/auth-facebook/facebook-portal.png)
 
@@ -32,7 +32,7 @@ Setting up Facebook logins for your application consists of 4 parts:
 
 <$Partial path="social_provider_setup.mdx" variables={{ "provider": "Facebook" }} />
 
-## Set up Facebook login for your Facebook app
+## Set up Facebook sign-in for your Facebook app
 
 From the `Add Products to your App` screen:
 
@@ -99,7 +99,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
   }'
 ```
 
-## Add login code to your client app
+## Add sign-in code to your client app
 
 <Tabs
   scrollable
@@ -362,7 +362,7 @@ await supabase.Auth.SignOut();
 Facebook apps start in **Development** mode, which has the following limitations:
 
 - Only users with a role on the app (administrators, developers, testers) can authenticate
-- Other users will see an "App Not Setup" error when trying to log in
+- Other users will see an "App Not Setup" error when trying to sign in
 
 To add test users:
 
@@ -392,7 +392,7 @@ Before your app can be used by the general public, you need to complete Facebook
    - `email` - Requires verification that your app needs email access
 
 3. **Submit for Review**: Click **Submit for Review** and provide:
-   - Detailed instructions for how Facebook reviewers should test your login flow
+   - Detailed instructions for how Facebook reviewers should test your sign-in flow
    - A screencast video demonstrating the Facebook Login feature
    - Explanation of how user data will be used
 
@@ -410,7 +410,7 @@ For more details, see the [Facebook App Review documentation](https://developers
 
 ### "App not setup" error
 
-This error occurs when a user without a role on your app tries to log in while the app is in Development mode.
+This error occurs when a user without a role on your app tries to sign in while the app is in Development mode.
 
 **Solution**: Either add the user as a tester in your Facebook app settings, or complete the App Review process to make your app available to all users.
 
@@ -430,9 +430,9 @@ This error indicates the callback URL configured in Facebook doesn't match the o
 
 **Solution**: Verify that the **Valid OAuth Redirect URIs** in your Facebook app settings exactly matches `https://<project-ref>.supabase.co/auth/v1/callback`. Make sure there are no trailing slashes or typos.
 
-### Login works in development but not production
+### Sign-in works in development but not production
 
-If login works locally but fails in production, check:
+If sign-in works locally but fails in production, check:
 
 - Your production URL is added to **Valid OAuth Redirect URIs** in Facebook
 - The App ID and Secret in your Supabase dashboard match your Facebook app

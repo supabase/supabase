@@ -16,17 +16,9 @@ Create a minimal Expo app using the `create-expo-app` command with the blank Typ
 npx create-expo-app my-app --template blank-typescript
 ```
 
-## 4. Install Supabase's Agent Skills (optional)
+## 4. Set up AI tooling (optional)
 
-Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
-
-Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
-
-To install, run the following command in the root of your project:
-
-```bash
-npx skills add supabase/agent-skills
-```
+<$Partial path="quickstart_ai_tooling.mdx" />
 
 ## 5. Install the Supabase client library
 
@@ -70,8 +62,8 @@ import { createClient } from '@supabase/supabase-js'
 
 import 'expo-sqlite/localStorage/install'
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL
-const supabasePublishableKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!
+const supabasePublishableKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
 
 export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
   auth: {
@@ -95,16 +87,36 @@ import { FlatList, StyleSheet, Text, View } from 'react-native'
 
 import { supabase } from './lib/supabase'
 
+type Instrument = {
+  id: number
+  name: string
+}
+
 export default function App() {
-  const [instruments, setInstruments] = useState([])
+  const [instruments, setInstruments] = useState<Instrument[]>([])
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     getInstruments()
   }, [])
 
   async function getInstruments() {
-    const { data } = await supabase.from('instruments').select()
-    setInstruments(data)
+    const { data, error } = await supabase.from('instruments').select()
+
+    if (error) {
+      setError(error.message)
+      return
+    }
+
+    setInstruments(data ?? [])
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text>Error loading instruments: {error}</Text>
+      </View>
+    )
   }
 
   return (
@@ -140,6 +152,8 @@ Run the development server and scan the QR code with the Expo Go app on your pho
 ```bash
 npx expo start
 ```
+
+<$Partial path="quickstart_going_to_production.mdx" />
 
 ## Next steps
 

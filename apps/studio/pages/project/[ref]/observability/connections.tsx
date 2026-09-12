@@ -43,7 +43,10 @@ export const DatabaseConnections: NextPageWithLayout = () => {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { refetchOnWindowFocus: live, refetchInterval: live ? 3000 : false }
+    {
+      refetchOnWindowFocus: live,
+      refetchInterval: live ? 3000 : false,
+    }
   )
 
   function handleToggleLive() {
@@ -90,7 +93,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
           <h1 className="w-max">Database Connections</h1>
           {live && (
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger className="flex items-center">
                 <Badge variant="success">
                   <span className="h-1.5 w-1.5 bg-brand rounded-full animate-pulse" />
                   <span>Live</span>
@@ -100,6 +103,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
             </Tooltip>
           )}
         </div>
+
         <div className="flex items-center gap-x-2">
           <ShortcutTooltip
             shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE}

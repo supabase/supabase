@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { cn } from 'ui'
 
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { BASE_PATH } from '@/lib/constants'
 
 type ForgotPasswordLayoutProps = {
@@ -23,6 +24,8 @@ export const ForgotPasswordLayout = ({
   children,
 }: PropsWithChildren<ForgotPasswordLayoutProps>) => {
   const { resolvedTheme } = useTheme()
+  const { dashboardAuthLogoLinkUrl } = useCustomContent(['dashboard_auth:logo_link_url'])
+  const marketingSiteUrl = dashboardAuthLogoLinkUrl ?? 'https://supabase.com'
 
   // Addresses hydration issue with `resolvedTheme` as its undefined during SSR and the first (hydrating) client render
   const [mounted, setMounted] = useState(false)
@@ -39,7 +42,7 @@ export const ForgotPasswordLayout = ({
         <nav className="relative flex items-center justify-between sm:h-10">
           <div className="flex shrink-0 grow items-center lg:grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
-              <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/organizations'}>
+              <Link href={logoLinkToMarketingSite ? marketingSiteUrl : '/organizations'}>
                 <Image
                   src={
                     mounted && resolvedTheme?.includes('dark')

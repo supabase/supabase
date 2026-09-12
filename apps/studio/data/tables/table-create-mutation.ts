@@ -2,9 +2,9 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { tableKeys } from './keys'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type CreateTableBody = {
@@ -51,11 +51,11 @@ export const useTableCreateMutation = ({
       const { projectRef, payload } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: tableKeys.list(projectRef, payload.schema, { includeColumns: true }),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: tableKeys.list(projectRef, payload.schema, { includeColumns: false }),
+        invalidateTableMetadata(queryClient, {
+          projectRef,
+          schema: payload.schema,
+          tableName: payload.name,
+          includeLint: true,
         }),
         queryClient.invalidateQueries({
           queryKey: privilegeKeys.tablePrivilegesList(projectRef),

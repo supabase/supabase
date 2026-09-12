@@ -77,7 +77,11 @@ export interface Permission {
   organization_slug: string
   resources: string[]
   restrictive?: boolean
-  project_refs: string[]
+  /**
+   * Projects the row is limited to. Organization-wide rows arrive as [] or null — the API
+   * contract is nullable and some view-synthesized rows serialize as null.
+   */
+  project_refs: string[] | null
 }
 
 export interface ResponseFailure {

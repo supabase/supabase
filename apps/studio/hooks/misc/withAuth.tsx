@@ -17,10 +17,9 @@ export function withAuth<T>(
   options: {
     /**
      * The auth level used to check the user credentials. In most cases, if the user has MFA enabled
-     * we want the highest level (which is 2) for all pages. For certain pages, the user should be
-     * able to access them even if he didn't finished his login (typed in his MFA code), for example
-     * the support page: We want the user to be able to submit a ticket even if he's not fully
-     * signed in.
+     * we want the highest level (which is 2) for all pages, as the platform API rejects sessions
+     * that haven't completed the MFA challenge. Only opt out for pages that don't read from the
+     * platform API and are meant to be reachable before the user has finished signing in.
      * @default true
      */
     useHighestAAL: boolean
@@ -43,8 +42,11 @@ export function withAuth<T>(
       isPending: isAALLoading,
       data: aalData,
       isError: isErrorAAL,
+      isSuccess: isSuccessAAL,
       error: errorAAL,
     } = useAuthenticatorAssuranceLevelQuery()
+
+    const isAtHighestAAL = isSuccessAAL && aalData.currentLevel === aalData.nextLevel
 
     useEffect(() => {
       if (isErrorAAL) {
@@ -57,19 +59,17 @@ export function withAuth<T>(
     const { isError: isErrorPermissions, error: errorPermissions } = usePermissionsQuery()
 
     useEffect(() => {
-      if (isErrorPermissions) {
+      if (isErrorPermissions && isAtHighestAAL) {
         toast.error(
           `Failed to fetch permissions: ${errorPermissions?.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
         )
       }
-    }, [isErrorPermissions, errorPermissions])
+    }, [isErrorPermissions, errorPermissions, isAtHighestAAL])
 
     const isLoggedIn = Boolean(session)
     const isFinishedLoading = !isLoading && !isAALLoading
 
-    const isCorrectLevel = options.useHighestAAL
-      ? aalData?.currentLevel === aalData?.nextLevel
-      : true
+    const isCorrectLevel = options.useHighestAAL ? isAtHighestAAL : true
     const needsMfaElevation = isLoggedIn && !isCorrectLevel
 
     const redirectToSignIn = useCallback(() => {

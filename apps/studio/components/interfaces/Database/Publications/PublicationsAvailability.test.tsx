@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { PublicationsAvailability } from './PublicationsAvailability'
 
@@ -12,10 +12,6 @@ vi.mock('@/hooks/misc/useHighAvailability', () => ({
 }))
 
 describe('PublicationsAvailability', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('shows the disabled empty state instead of page content for High Availability projects', () => {
     mockUseHighAvailability.mockReturnValue({ isHighAvailability: true })
 

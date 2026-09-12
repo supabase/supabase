@@ -140,6 +140,9 @@ After the affected table finishes copying and catches up, the temporary slot is 
 - Avoid leaving pipelines stopped for long periods while the source database is still receiving writes.
 - Schedule bulk updates, imports, and migrations during lower-traffic windows when possible.
 - For BigQuery, verify that service account permissions, table requirements, and replica identity settings match the [BigQuery destination guide](/docs/guides/database/replication/bigquery).
+- For ClickHouse, check the HTTPS endpoint, target-database permissions, selected table engine, server version, and source table requirements against the [ClickHouse destination guide](/docs/guides/database/replication/clickhouse).
+- For DuckLake, check catalog connectivity, object-storage permissions, catalog and storage latency, and source row identity against the [DuckLake destination guide](/docs/guides/database/replication/ducklake).
+- For Snowflake, check the service user's default role, schema privileges, key pair, row limits, and replica identity against the [Snowflake destination guide](/docs/guides/database/replication/snowflake).
 - If the initial sync is the bottleneck, review **Table sync workers** and **Copy connections per table** in the pipeline's advanced settings. Increasing either can use more source database connections; increasing table sync workers can also use more temporary replication slots.
 
 ## Handling errors
@@ -158,7 +161,7 @@ Table errors occur during the initial sync and affect individual tables. These e
 
 **Recovering from table errors:**
 
-When a table encounters an error during the initial sync, you can reset the table state. This restarts that table's initial sync from the beginning.
+When a table encounters an error during the initial sync, you can reset the table state. This deletes the table's existing destination data and restarts its initial sync from the beginning. For ClickHouse, the reset drops and recreates the table and any generated current-state view. For DuckLake, it drops and recreates the table in the catalog; managed maintenance later cleans up unreferenced files. For Snowflake, it drops and recreates the append-only history table and its managed streaming channel.
 
 ### Pipeline errors
 

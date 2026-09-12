@@ -16,6 +16,7 @@ export const contentKeys = {
   sqlSnippets: (
     projectRef: string | undefined,
     options?: {
+      type?: 'sql' | 'log_sql'
       sort?: 'inserted_at' | 'name'
       name?: string
       visibility?: string

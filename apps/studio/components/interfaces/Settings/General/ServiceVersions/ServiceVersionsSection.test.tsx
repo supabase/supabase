@@ -122,7 +122,6 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
 
 describe('ServiceVersionsSection', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockUseFeatures.mockReturnValue({
       projectAuthAll: true,
       projectSettingsDatabaseUpgrades: true,

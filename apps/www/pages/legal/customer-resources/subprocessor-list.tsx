@@ -45,7 +45,7 @@ export default function SubprocessorListPage() {
       <SectionContainer className="prose">
         <div className="flex flex-col gap-4">
           <div className="not-prose">
-            <Button asChild variant="default" icon={<Download />}>
+            <Button asChild icon={<Download />}>
               <a href={PDF_PATH} download target="_blank" rel="noopener noreferrer">
                 Subprocessor List - Updated {CURRENT_PDF.displayDate}
               </a>

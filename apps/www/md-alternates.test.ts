@@ -36,7 +36,7 @@ async function collectAppRouterPages(
       const nested = await collectAppRouterPages(path.join(dir, dirent.name), nextSegments)
       nested.forEach((filePath, slug) => pages.set(slug, filePath))
     } else if (dirent.name === 'page.tsx') {
-      pages.set(segments.join('/') || 'homepage', path.join(dir, dirent.name))
+      pages.set(segments.join('/') || 'index', path.join(dir, dirent.name))
     }
   }
   return pages
@@ -65,9 +65,10 @@ describe('markdown alternate drift', () => {
       const appPagePath = appPages.get(slug)
       if (appPagePath) {
         const source = await fs.readFile(appPagePath, 'utf-8')
+        const wiringShapes = [`alternates: mdAlternates('${slug}')`, `...mdAlternates('${slug}')`]
         expect(
-          source.includes(`alternates: mdAlternates('${slug}')`),
-          `${path.relative(process.cwd(), appPagePath)} must contain "alternates: mdAlternates('${slug}')" in its metadata export`
+          wiringShapes.some((shape) => source.includes(shape)),
+          `${path.relative(process.cwd(), appPagePath)} must wire mdAlternates('${slug}') into its metadata export, either as "alternates: mdAlternates('${slug}')" or spread into a wider alternates object as "...mdAlternates('${slug}')"`
         ).toBe(true)
       } else {
         expect(
@@ -87,6 +88,25 @@ describe('markdown alternate drift', () => {
     expect(
       source.includes('rel="alternate" type="text/markdown"'),
       'pages/_app.tsx must render the text/markdown alternate link for markdown-served slugs'
+    ).toBe(true)
+  })
+
+  it('changelog entry page gates its .md alternate on CHANGELOG_PAGES membership', async () => {
+    const source = await fs.readFile(
+      path.join(process.cwd(), 'pages', 'changelog', '[slug].tsx'),
+      'utf-8'
+    )
+    expect(
+      source.includes('CHANGELOG_PAGES.has(`changelog/${entry.slug}`)'),
+      'pages/changelog/[slug].tsx must compute the markdown alternate flag from CHANGELOG_PAGES membership using the changelog/-prefixed key the generator emits'
+    ).toBe(true)
+    expect(
+      source.includes('hasMarkdownVariant &&'),
+      'pages/changelog/[slug].tsx must render the markdown alternate link only when hasMarkdownVariant is true'
+    ).toBe(true)
+    expect(
+      source.includes('rel="alternate" type="text/markdown"'),
+      'pages/changelog/[slug].tsx must advertise the text/markdown alternate for published slugs'
     ).toBe(true)
   })
 

@@ -95,7 +95,7 @@ export const LintDetail = ({
           <Link
             href={
               lintInfoMap.find((item) => item.name === lint.name)?.docsLink ||
-              `${DOCS_URL}/guides/database/database-linter`
+              `${DOCS_URL}/guides/observability/advisors`
             }
             target="_blank"
             rel="noreferrer"

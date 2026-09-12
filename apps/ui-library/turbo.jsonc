@@ -25,7 +25,13 @@
         "SUPABASE_MANAGEMENT_API_TOKEN",
         "OPENAI_API_KEY",
       ],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".contentlayer/**"],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "!.next/dev/**/*",
+        ".velite/**",
+        "public/markdown/**",
+      ],
     },
   },
 }

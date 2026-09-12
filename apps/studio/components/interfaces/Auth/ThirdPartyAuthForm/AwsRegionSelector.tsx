@@ -1,8 +1,8 @@
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { Check } from 'lucide-react'
 import { useId, useState } from 'react'
 import {
-  Button,
   cn,
+  ComboboxTrigger,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -62,19 +62,15 @@ export const AwsRegionSelector = ({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <FormControl>
-          <Button
-            variant="default"
-            role="combobox"
+          <ComboboxTrigger
             aria-expanded={open}
             aria-controls={listboxId}
-            className={cn('w-full justify-between', !value && 'text-muted-foreground')}
+            data-state={open ? 'open' : 'closed'}
+            className={cn(!value && 'text-muted-foreground')}
             size="small"
-            iconRight={
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" strokeWidth={1} />
-            }
           >
             {value ?? 'Select a region'}
-          </Button>
+          </ComboboxTrigger>
         </FormControl>
       </PopoverTrigger>
       <PopoverContent id={listboxId} className="p-0" sameWidthAsTrigger>

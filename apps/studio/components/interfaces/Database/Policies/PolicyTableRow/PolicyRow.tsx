@@ -125,7 +125,6 @@ export const PolicyRow = ({
               <TooltipTrigger asChild>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    variant="default"
                     className="px-1.5"
                     icon={<MoreVertical />}
                     data-testid={`policy-${policy.name}-actions-button`}

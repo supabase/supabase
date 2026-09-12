@@ -6,14 +6,19 @@ import type { components } from '@/data/api'
 import { handleError, patch } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
+export type RealtimeConfigurationUpdateBody = components['schemas']['UpdateRealtimeConfigBody'] & {
+  postgres_changes_pool?: number
+}
+
 export type RealtimeConfigurationUpdateVariables = {
   ref: string
-} & components['schemas']['UpdateRealtimeConfigBody']
+} & RealtimeConfigurationUpdateBody
 
 export async function updateRealtimeConfiguration({
   ref,
   private_only,
   connection_pool,
+  postgres_changes_pool,
   max_concurrent_users,
   max_events_per_second,
   max_bytes_per_second,
@@ -30,6 +35,7 @@ export async function updateRealtimeConfiguration({
     body: {
       private_only,
       connection_pool,
+      postgres_changes_pool,
       max_concurrent_users,
       max_events_per_second,
       max_bytes_per_second,

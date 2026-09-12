@@ -9,7 +9,7 @@ import { PROJECT_STATUS } from '@/lib/constants'
 import { EMPTY_ARR } from '@/lib/void'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-export type DatabaseExtension = components['schemas']['PostgresExtension'] & {
+export type DatabaseExtension = components['schemas']['PostgresExtension_Output'] & {
   default_version_schema: string | null
 }
 

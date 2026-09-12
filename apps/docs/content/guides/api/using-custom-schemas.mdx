@@ -45,6 +45,7 @@ Now you can access these schemas from data APIs:
 ```js
 // Initialize the JS client
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   db: { schema: 'myschema' },
 })
@@ -55,6 +56,12 @@ const { data: todos, error } = await supabase.from('todos').select('*')
 // You can also change the target schema on a per-query basis
 const { data: todos, error } = await supabase.schema('myschema').from('todos').select('*')
 ```
+
+<Admonition type="note">
+
+With generated `Database` types that include `public`, `createClient<Database>(...)` type-checks `db.schema` against `public` only, unless the schema name is also passed as the second generic: `createClient<Database, 'myschema'>(...)`. `supabase.schema('myschema').from(...)` infers its schema per call and needs no second generic. In both cases `myschema` has to be present in the generated `Database` type.
+
+</Admonition>
 
 </TabPanel>
 <$Show if="sdk:dart">

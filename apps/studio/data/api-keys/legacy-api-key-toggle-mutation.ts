@@ -16,7 +16,7 @@ export async function toggleLegacyAPIKeys(payload: ToggleLegacyAPIKeysVariables)
   const { data, error } = await put('/v1/projects/{ref}/api-keys/legacy', {
     params: {
       path: { ref: payload.projectRef },
-      query: { enabled: payload.enabled },
+      query: { enabled: payload.enabled ? 'true' : 'false' },
     },
   })
 

@@ -40,8 +40,6 @@ vi.mock('@/data/subscriptions/org-subscription-query', () => ({
 
 describe('Usage', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true, isLoading: false })
     mockUseProjectDetailQuery.mockReturnValue({
       data: {

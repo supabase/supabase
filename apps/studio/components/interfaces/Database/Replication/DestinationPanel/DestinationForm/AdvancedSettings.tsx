@@ -5,7 +5,6 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  Badge,
   FormControl,
   FormField,
   FormInputGroupInput,
@@ -20,6 +19,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationType } from '../DestinationPanel.types'
+import { TableOptions } from './BigQuery/TableOptions'
 import {
   DEFAULT_CONNECTION_POOL_SIZE,
   DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
@@ -27,6 +27,11 @@ import {
   DEFAULT_MAX_TABLE_SYNC_WORKERS,
 } from './DestinationForm.constants'
 import { type DestinationPanelSchemaType } from './DestinationForm.schema'
+
+const INVALIDATED_SLOT_BEHAVIOR_LABELS = {
+  error: 'Block startup',
+  recreate: 'Recreate slot',
+}
 
 export const AdvancedSettings = ({
   type,
@@ -36,16 +41,16 @@ export const AdvancedSettings = ({
   form: UseFormReturn<DestinationPanelSchemaType>
 }) => {
   const handleNumberChange =
-    (field: { onChange: (value?: number) => void }) => (e: ChangeEvent<HTMLInputElement>) => {
-      const val = e.target.value
-      field.onChange(val === '' ? undefined : Number(val))
+    (field: { onChange: (value: number | '') => void }) => (e: ChangeEvent<HTMLInputElement>) => {
+      const parsed = e.target.valueAsNumber
+      field.onChange(e.target.value === '' || Number.isNaN(parsed) ? '' : parsed)
     }
 
   return (
-    <div className="px-5">
+    <div className="w-full">
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1" className="border-none">
-          <AccordionTrigger className="font-normal gap-2 justify-between text-sm py-3 hover:no-underline">
+          <AccordionTrigger className="font-normal gap-2 justify-between px-5 py-3 text-sm hover:no-underline">
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">
@@ -53,8 +58,7 @@ export const AdvancedSettings = ({
               </span>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
-            {/* Batch wait time - applies to all destinations */}
+          <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4 [&>div]:px-5">
             <FormField
               control={form.control}
               name="maxFillMs"
@@ -153,16 +157,18 @@ export const AdvancedSettings = ({
                 >
                   <FormControl>
                     <Select value={field.value ?? 'error'} onValueChange={field.onChange}>
-                      <SelectTrigger className="capitalize">{field.value ?? 'error'}</SelectTrigger>
-                      <SelectContent>
+                      <SelectTrigger>
+                        {INVALIDATED_SLOT_BEHAVIOR_LABELS[field.value ?? 'error']}
+                      </SelectTrigger>
+                      <SelectContent side="bottom" collisionPadding={16}>
                         <SelectItem value="error" className="[&>span]:top-2.5">
-                          <p>Error</p>
+                          <p>Block startup</p>
                           <p className="text-foreground-lighter">
                             Blocks startup for manual recovery.
                           </p>
                         </SelectItem>
                         <SelectItem value="recreate" className="[&>span]:top-2.5">
-                          <p>Recreate</p>
+                          <p>Recreate slot</p>
                           <p className="text-foreground-lighter">
                             Replaces destination tables and runs a new, billable initial sync.
                           </p>
@@ -181,12 +187,7 @@ export const AdvancedSettings = ({
                   name="connectionPoolSize"
                   render={({ field }) => (
                     <FormItemLayout
-                      label={
-                        <div className="flex flex-col gap-y-2">
-                          <span>Connection pool size</span>
-                          <Badge className="w-min">BigQuery only</Badge>
-                        </div>
-                      }
+                      label="Connection pool size"
                       layout="horizontal"
                       description="Number of BigQuery connections used for destination writes."
                     >
@@ -215,14 +216,9 @@ export const AdvancedSettings = ({
                   name="maxStalenessMins"
                   render={({ field }) => (
                     <FormItemLayout
-                      label={
-                        <div className="flex flex-col gap-y-2">
-                          <span>Maximum staleness</span>
-                          <Badge className="w-min">BigQuery only</Badge>
-                        </div>
-                      }
+                      label="Maximum staleness"
                       layout="horizontal"
-                      description="How old query results can be while BigQuery applies ongoing changes."
+                      description="Set the maximum age of query results while BigQuery applies ongoing changes, or leave blank for the freshest results."
                     >
                       <FormControl>
                         <InputGroup>
@@ -233,7 +229,6 @@ export const AdvancedSettings = ({
                             step={1}
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
-                            placeholder="Default: None (Freshest results)"
                           />
                           <InputGroupAddon align="inline-end">
                             <InputGroupText>minutes</InputGroupText>
@@ -243,6 +238,17 @@ export const AdvancedSettings = ({
                     </FormItemLayout>
                   )}
                 />
+
+                <div className="flex flex-col gap-y-3">
+                  <div className="flex flex-col gap-y-1">
+                    <span className="text-sm text-foreground">Table layout</span>
+                    <p className="text-sm text-foreground-lighter">
+                      Partitioning and clustering for each BigQuery table. Applied when a
+                      destination table is first created or reset.
+                    </p>
+                  </div>
+                  <TableOptions control={form.control} />
+                </div>
               </>
             )}
           </AccordionContent>

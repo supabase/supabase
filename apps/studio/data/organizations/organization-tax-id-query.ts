@@ -23,7 +23,7 @@ export async function getOrganizationTaxId(
   })
   if (error) throw handleError(error)
 
-  return (data as components['schemas']['TaxIdResponse']).tax_id
+  return (data as components['schemas']['TaxIdResponse_Output']).tax_id
 }
 
 export type OrganizationTaxIdData = Awaited<ReturnType<typeof getOrganizationTaxId>>

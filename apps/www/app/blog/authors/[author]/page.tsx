@@ -34,7 +34,7 @@ export async function generateMetadata({
 
   return {
     title: author ? `Blog | ${author.author}` : 'Blog | Author',
-    description: author ? `Blog posts by ${author.author}` : 'Latest news from the Supabase team.',
+    description: author ? `Blog posts by ${author.author}.` : 'Latest news from the Supabase team.',
   }
 }
 

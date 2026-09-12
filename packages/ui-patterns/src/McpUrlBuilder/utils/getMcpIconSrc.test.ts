@@ -49,6 +49,22 @@ describe('getMcpClientIconSrc', () => {
     expect(darkSrc).not.toBe(lightSrc)
   })
 
+  it('returns the dark icon for fx when requested as a distinct variant', () => {
+    const lightSrc = getMcpClientIconSrc({
+      icon: 'fx',
+      useDarkVariant: false,
+      hasDistinctDarkIcon: true,
+    })
+    const darkSrc = getMcpClientIconSrc({
+      icon: 'fx',
+      useDarkVariant: true,
+      hasDistinctDarkIcon: true,
+    })
+
+    expect(darkSrc).toBeTruthy()
+    expect(darkSrc).not.toBe(lightSrc)
+  })
+
   it('falls back to the default icon when no distinct dark variant should be used', () => {
     const lightSrc = getMcpClientIconSrc({
       icon: 'factory',

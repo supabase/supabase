@@ -9,7 +9,7 @@ export type OrganizationMembersVariables = {
   slug?: string
 }
 
-export type Member = components['schemas']['Member']
+export type Member = components['schemas']['Member_Output']
 export interface OrganizationMember extends Member {
   invited_at?: string
   invited_id?: number

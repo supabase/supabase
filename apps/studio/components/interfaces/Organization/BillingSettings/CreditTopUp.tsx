@@ -259,7 +259,6 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
     <Dialog open={topUpModalVisible} onOpenChange={(open) => onTopUpDialogVisibilityChange(open)}>
       <DialogTrigger asChild>
         <ButtonTooltip
-          variant="default"
           className="pointer-events-auto"
           disabled={!canTopUpCredits || !isPermissionsLoaded}
           tooltip={{

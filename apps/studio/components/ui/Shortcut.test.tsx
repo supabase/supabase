@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { Shortcut } from './Shortcut'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -20,10 +20,6 @@ vi.mock('./ShortcutTooltip', () => ({
 }))
 
 describe('Shortcut', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   describe('rendering', () => {
     it('renders the wrapped child', () => {
       render(

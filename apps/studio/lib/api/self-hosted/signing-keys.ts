@@ -2,7 +2,7 @@ import { components } from 'api-types'
 
 import { assertSelfHosted } from './util'
 
-type SigningKeyResponse = components['schemas']['SigningKeyResponse']
+type SigningKeyResponse = components['schemas']['SigningKeyResponse_Output']
 
 const LEGACY_KEY_ID = '00000000-0000-0000-0000-000000000000'
 const LEGACY_KEY_CREATED_AT = '1970-01-01T00:00:00.000Z'
@@ -24,6 +24,7 @@ export function getLegacySigningKey(): SigningKeyResponse {
   return {
     id: LEGACY_KEY_ID,
     algorithm: 'HS256',
+    public_jwk: '',
     status: 'in_use',
     created_at: LEGACY_KEY_CREATED_AT,
     updated_at: LEGACY_KEY_CREATED_AT,

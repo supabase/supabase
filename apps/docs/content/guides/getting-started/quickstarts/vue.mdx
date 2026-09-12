@@ -16,17 +16,9 @@ Create a Vue app using the `npm init` command.
 npm init vue@latest my-app
 ```
 
-## 4. Install Supabase's Agent Skills (optional)
+## 4. Set up AI tooling (optional)
 
-Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
-
-Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
-
-To install, run the following command in the root of your project:
-
-```bash
-npx skills add supabase/agent-skills
-```
+<$Partial path="quickstart_ai_tooling.mdx" />
 
 ## 5. Install the Supabase client library
 
@@ -57,9 +49,15 @@ VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 
 ## 7. Create the Supabase client
 
-Create a `/src/lib` directory in your Vue app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client:
+Create a `/src/lib` directory in your Vue app, create a file called `supabaseClient.ts` and add the following code to initialize the Supabase client:
 
-```js name=src/lib/supabaseClient.js
+<Admonition type="note">
+
+`npm init vue@latest` scaffolds a TypeScript project by default. If you chose a JavaScript-only project, use a `.js` extension instead and drop the type import.
+
+</Admonition>
+
+```ts name=src/lib/supabaseClient.ts
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
@@ -73,15 +71,27 @@ export const supabase = createClient(supabaseUrl, supabasePublishableKey)
 Replace the existing content in your `App.vue` file with the following code.
 
 ```vue name=src/App.vue
-<script setup>
+<script setup lang="ts">
 import { onMounted, ref } from 'vue'
 
 import { supabase } from './lib/supabaseClient'
 
-const instruments = ref([])
+type Instrument = {
+  id: number
+  name: string
+}
+
+const instruments = ref<Instrument[]>([])
+const error = ref<string | null>(null)
 
 async function getInstruments() {
-  const { data } = await supabase.from('instruments').select()
+  const { data, error: fetchError } = await supabase.from('instruments').select()
+
+  if (fetchError) {
+    error.value = fetchError.message
+    return
+  }
+
   instruments.value = data
 }
 
@@ -91,7 +101,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <ul>
+  <p v-if="error">Error loading instruments: {{ error }}</p>
+  <ul v-else>
     <li v-for="instrument in instruments" :key="instrument.id">{{ instrument.name }}</li>
   </ul>
 </template>
@@ -105,9 +116,11 @@ Start the app and go to http://localhost:5173 in a browser and you should see th
 npm run dev
 ```
 
+<$Partial path="quickstart_going_to_production.mdx" />
+
 ## Next steps
 
-- Explore [drop-in UI components](/ui) for your Supabase app
 - Set up [Auth](/docs/guides/auth) for your app
 - [Insert more data](/docs/guides/database/import-data) into your database
 - Upload and serve static files using [Storage](/docs/guides/storage)
+- Explore [drop-in UI components](/ui) for your Supabase app

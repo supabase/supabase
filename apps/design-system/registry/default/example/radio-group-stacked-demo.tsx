@@ -2,7 +2,7 @@ import { RadioGroupStacked, RadioGroupStackedItem } from 'ui'
 
 export default function RadioGroupDemo() {
   return (
-    <RadioGroupStacked defaultValue="comfortable">
+    <RadioGroupStacked defaultValue="comfortable" aria-label="Size">
       <RadioGroupStackedItem
         value="default"
         id="r1"

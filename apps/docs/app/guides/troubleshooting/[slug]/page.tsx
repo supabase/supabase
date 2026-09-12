@@ -1,9 +1,9 @@
-import { notFound } from 'next/navigation'
-
 import TroubleshootingPage from '~/features/docs/Troubleshooting.page'
 import { getAllTroubleshootingEntries, getArticleSlug } from '~/features/docs/Troubleshooting.utils'
 import { PROD_URL } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+import { mdAlternate } from '~/lib/md-alternates'
+import { notFound } from 'next/navigation'
 
 export const dynamicParams = false
 
@@ -38,6 +38,7 @@ export const generateMetadata = async (props: { params: Promise<{ slug: string }
     title: `${metadataTitle || 'Supabase'} | Troubleshooting${entry ? ` | ${entry.data.title}` : ''}`,
     alternates: {
       canonical: `${PROD_URL}/guides/troubleshooting/${slug}`,
+      types: mdAlternate(`troubleshooting/${slug}`),
     },
   }
 }

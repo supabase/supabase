@@ -187,7 +187,7 @@ export const CreateNewProjectDialog = ({
               <Button type="reset" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button type="submit" loading={cloneMutationLoading}>
+              <Button variant="primary" type="submit" loading={cloneMutationLoading}>
                 Restore to new project
               </Button>
             </DialogFooter>

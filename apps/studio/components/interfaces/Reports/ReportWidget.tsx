@@ -60,18 +60,14 @@ const ReportWidget = (props: ReportWidgetProps) => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant="default"
                   icon={<ExternalLink />}
                   className="px-1"
                   onClick={() => {
                     const isDbQueryType = props.queryType === 'db'
-
                     const pathname = isDbQueryType
                       ? `/project/${projectRef}/sql/new`
                       : `/project/${projectRef}/logs/explorer`
-
                     const query: Record<string, string | undefined> = {}
-
                     if (isDbQueryType) {
                       query.content = props.resolvedSql
                     } else {
@@ -79,7 +75,6 @@ const ReportWidget = (props: ReportWidgetProps) => {
                       query.its = props.params?.iso_timestamp_start || ''
                       query.ite = props.params?.iso_timestamp_end || ''
                     }
-
                     router.push({ pathname, query })
                   }}
                 />

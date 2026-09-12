@@ -215,7 +215,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                     disabled={!hasAccessToLogDrains || !canManageLogDrains}
                     onClick={handleAddDestinationClick}
                     variant="primary"
-                    className="rounded-r-none px-3"
+                    className="rounded-r-none px-3 hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
                   >
                     Add destination
                   </Button>
@@ -224,8 +224,8 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="primary"
-                      title="Choose token scope"
-                      className="rounded-l-none px-[4px] py-[5px]"
+                      aria-label="Choose destination type"
+                      className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                       icon={<ChevronDown />}
                     />
                   </DropdownMenuTrigger>

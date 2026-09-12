@@ -13,20 +13,12 @@ breadcrumb: 'Framework Quickstarts'
 Use the `create-next-app` command and the `with-supabase` template, to create a Next.js app pre-configured with [Cookie-based Auth](/docs/guides/auth/server-side/creating-a-client?queryGroups=package-manager&package-manager=npm&queryGroups=framework&framework=nextjs&queryGroups=environment&environment=server), [TypeScript](https://www.typescriptlang.org/), and [Tailwind CSS](https://tailwindcss.com/).
 
 ```bash
-npx create-next-app -e with-supabase
+npx create-next-app@latest my-app -e with-supabase
 ```
 
-## 4. Install Supabase's Agent Skills (optional)
+## 4. Set up AI tooling (optional)
 
-Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
-
-Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
-
-To install, run the following command in the root of your project:
-
-```bash
-npx skills add supabase/agent-skills
-```
+<$Partial path="quickstart_ai_tooling.mdx" />
 
 ## 5. Declare Supabase environment variables
 
@@ -45,7 +37,37 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "nextjs", "tab": "frameworks" }} />
 
-## 6. Query Supabase data from Next.js
+## 6. Allow public access to the instruments page
+
+The `with-supabase` template redirects unauthenticated visitors to the sign-in page for most routes. The `instruments` table is publicly readable, so update `lib/supabase/proxy.ts` to skip that redirect for `/instruments`.
+
+Find this `if` statement:
+
+```ts name=lib/supabase/proxy.ts
+  if (
+    request.nextUrl.pathname !== "/" &&
+    !user &&
+    !request.nextUrl.pathname.startsWith("/login") &&
+    !request.nextUrl.pathname.startsWith("/auth")
+  ) {
+```
+
+Add a condition for `/instruments`:
+
+```ts name=lib/supabase/proxy.ts
+  if (
+    request.nextUrl.pathname !== "/" &&
+    !user &&
+    !request.nextUrl.pathname.startsWith("/login") &&
+    !request.nextUrl.pathname.startsWith("/auth") &&
+    request.nextUrl.pathname !== "/instruments" &&
+    !request.nextUrl.pathname.startsWith("/instruments/")
+  ) {
+```
+
+## 7. Query Supabase data from Next.js
+
+The `with-supabase` template already installs `@supabase/supabase-js` and `@supabase/ssr` and creates the clients for you, in `lib/supabase/client.ts` for the browser and `lib/supabase/server.ts` for Server Components. The code below imports the server client from there.
 
 Create a new file at `app/instruments/page.tsx` and populate with the following.
 
@@ -59,7 +81,11 @@ import { Suspense } from "react";
 
 async function InstrumentsData() {
   const supabase = await createClient();
-  const { data: instruments } = await supabase.from("instruments").select();
+  const { data: instruments, error } = await supabase.from("instruments").select();
+
+  if (error) {
+    return <p>Error loading instruments: {error.message}</p>;
+  }
 
   return <pre>{JSON.stringify(instruments, null, 2)}</pre>;
 }
@@ -75,7 +101,7 @@ export default function Instruments() {
 
 </$CodeTabs>
 
-## 7. Start the app
+## 8. Start the app
 
 Run the development server, go to http://localhost:3000/instruments in a browser and you should see the list of instruments.
 
@@ -83,9 +109,11 @@ Run the development server, go to http://localhost:3000/instruments in a browser
 npm run dev
 ```
 
+<$Partial path="quickstart_going_to_production.mdx" />
+
 ## Next steps
 
-- Explore [drop-in UI components](/ui) for your Supabase app
 - Set up [Auth](/docs/guides/auth) for your app
 - [Insert more data](/docs/guides/database/import-data) into your database
 - Upload and serve static files using [Storage](/docs/guides/storage)
+- Explore [drop-in UI components](/ui) for your Supabase app

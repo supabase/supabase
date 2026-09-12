@@ -342,7 +342,7 @@ Be aware that a single 'restrictive' RLS policy alone will fail unless combined 
 
 ## Resolving identity conflicts
 
-Depending on your application requirements, data conflicts can arise when an anonymous user is converted to a permanent user. For example, in the context of an e-commerce application, an anonymous user would be allowed to add items to the shopping cart without signing up / signing in. When they decide to sign-in to an existing account, you will need to decide how you want to resolve data conflicts in the shopping cart:
+Depending on your application requirements, data conflicts can arise when an anonymous user is converted to a permanent user. For example, in the context of an e-commerce application, an anonymous user would be allowed to add items to the shopping cart without signing up / signing in. When they decide to sign in to an existing account, you will need to decide how you want to resolve data conflicts in the shopping cart:
 
 1. Overwrite the items in the cart with those in the existing account
 2. Overwrite the items in the cart with those from the anonymous user

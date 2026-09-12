@@ -26,5 +26,14 @@
       "API_EXTERNAL_URL now includes the /auth/v1 path prefix, and SAML SSO endpoints moved to /auth/v1/sso/saml/*. Update custom OAuth provider callback URLs and any SAML configuration accordingly.",
       "Anon (publishable) key access to the OpenAPI spec at /rest/v1/ has been removed. Use the service role or secret API key if you relied on it; normal data access via /rest/v1/<table> is unaffected."
     ]
+  },
+  "0.8.0": {
+    "breaking": true,
+    "gate": null,
+    "migration_guide_url": "https://github.com/orgs/supabase/discussions/48048",
+    "requires": [
+      "Envoy is now the default API gateway, replacing Kong. The gateway service is renamed from 'kong' to 'api-gw' (container 'supabase-envoy'); the 'kong' network alias still resolves, so internal service references keep working.",
+      "If you customized volumes/api/kong.yml or the gateway service, enable the Kong override with 'sh run.sh config add kong' to keep running Kong; otherwise the merge switches you to Envoy."
+    ]
   }
 }

@@ -42,7 +42,6 @@ vi.mock('@/state/shortcuts/useShortcut', () => ({
 
 describe('useConnectSheetShortcut', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockUseSelectedProjectQuery.mockReturnValue({
       data: { status: PROJECT_STATUS.ACTIVE_HEALTHY },
     })

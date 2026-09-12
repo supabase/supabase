@@ -117,6 +117,13 @@ const REFERENCES: Ref[] = [
     contentDir: path.join(process.cwd(), 'content/reference/server/v1'),
   },
   {
+    kind: 'sdk-new',
+    title: 'Supabase Middleware SDK Reference',
+    outFile: 'middleware.md',
+    mdxDir: path.join(MDX_ROOT, 'middleware'),
+    contentDir: path.join(process.cwd(), 'content/reference/middleware/v1'),
+  },
+  {
     kind: 'sdk-legacy',
     title: 'Kotlin Client Library Reference',
     outFile: 'kotlin.md',

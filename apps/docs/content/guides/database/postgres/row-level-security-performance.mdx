@@ -1,0 +1,155 @@
+---
+id: 'row-level-security-performance'
+title: 'Row Level Security performance'
+description: 'Measure and tune Postgres Row Level Security policies.'
+subtitle: 'Measure and tune Postgres Row Level Security policies.'
+---
+
+Measure the cost of Row Level Security (RLS) and tune policies that are already correct. To learn how to write correct policies, see [Row Level Security](/docs/guides/database/postgres/row-level-security).
+
+Postgres evaluates a policy expression against each candidate row, so the cost scales with the rows a query scans. This matters most for queries that scan every row in a table, like many `select` operations, including those using limit, offset, and ordering.
+
+Three policy rules affect performance enough that they belong with the policy itself rather than here. Apply them first:
+
+- [Index the columns your policies filter on](/docs/guides/database/postgres/row-level-security#add-indexes)
+- [Call functions with `select`](/docs/guides/database/postgres/row-level-security#call-functions-with-select)
+- [Specify roles in your policies](/docs/guides/database/postgres/row-level-security#specify-roles-in-your-policies)
+
+## Diagnose whether RLS is the bottleneck
+
+Confirm that policies are the cost before you rewrite one. Run the query with RLS enabled, then again with it disabled, and compare. If the times are similar, the query itself is the problem.
+
+<Admonition type="caution">
+
+Disabling RLS exposes every row in the table to any role with a matching grant. Only do this in a non-production environment.
+
+</Admonition>
+
+To reproduce an API request, set the JWT claims and switch to the role the request runs as:
+
+```sql
+set session role authenticated;
+set request.jwt.claims to '{"role":"authenticated", "sub":"5950b438-b07c-4012-8190-6ce79e4bd8e5"}';
+
+explain analyze select count(*) from rlstest;
+
+set session role postgres;
+```
+
+The output shows the policy expression as a filter, and the execution time is the number to compare:
+
+```
+Seq Scan on rlstest  (cost=0.00..4334.00 rows=1 width=35) (actual time=170.999..170.999 rows=0 loops=1)
+  Filter: ((COALESCE(NULLIF(current_setting('request.jwt.claim.sub'::text, true), ''::text), ((NULLIF(current_setting('request.jwt.claims'::text, true), ''::text))::jsonb ->> 'sub'::text)))::uuid = user_id)
+  Rows Removed by Filter: 100000
+Planning Time: 0.216 ms
+Execution Time: 171.033 ms
+```
+
+`Rows Removed by Filter` is the signal to watch. A policy that removes most of the table on every read is a policy whose filter column needs an index.
+
+### Measure through the Data API
+
+PostgREST can return the query plan to a Supabase client. Enable it first:
+
+```sql
+alter role authenticator set pgrst.db_plan_enabled to true;
+notify pgrst, 'reload config';
+```
+
+<Admonition type="caution">
+
+`pgrst.db_plan_enabled` exposes query plans over your Data API. Don't enable it in production.
+
+</Admonition>
+
+Then add the `.explain()` modifier to a query:
+
+```js
+const { data, error } = await supabase
+  .from('projects')
+  .select('*')
+  .eq('id', 1)
+  .explain({ analyze: true })
+
+console.log(data)
+```
+
+```
+Aggregate  (cost=8.18..8.20 rows=1 width=112) (actual time=0.017..0.018 rows=1 loops=1)
+  ->  Index Scan using projects_pkey on projects  (cost=0.15..8.17 rows=1 width=40) (actual time=0.012..0.012 rows=0 loops=1)
+        Index Cond: (id = 1)
+        Filter: false
+        Rows Removed by Filter: 1
+Planning Time: 0.092 ms
+Execution Time: 0.046 ms
+```
+
+## Filter in the client query too
+
+Policies are implicit `where` clauses, so it's common to run `select` statements without any filters. That's a bad pattern for performance. Instead of this:
+
+{/* prettier-ignore */}
+```js
+const { data } = await supabase
+  .from('table')
+  .select()
+```
+
+Always add a filter:
+
+{/* prettier-ignore */}
+```js
+const { data } = await supabase
+  .from('table')
+  .select()
+  .eq('user_id', userId)
+```
+
+Even though this duplicates the contents of the policy, Postgres can use the filter to construct a better query plan.
+
+## Avoid joins in policy expressions
+
+You can often rewrite a policy to avoid a join between the source and the target table. Fetch the relevant data from the target table into an array or set instead, then use an `in` or `any` operation in your filter.
+
+This policy joins the source `test_table` to the target `team_user`:
+
+```sql
+create policy "rls_test_select" on test_table
+to authenticated
+using (
+  (select auth.uid()) in (
+    select user_id
+    from team_user
+    where team_user.team_id = test_table.team_id -- joins to the source table
+  )
+);
+```
+
+Rewriting it selects the filter criteria into a set instead:
+
+```sql
+create policy "rls_test_select" on test_table
+to authenticated
+using (
+  team_id in (
+    select team_id
+    from team_user
+    where user_id = (select auth.uid()) -- no join
+  )
+);
+```
+
+You can also use a [security definer function](/docs/guides/database/postgres/row-level-security#use-security-definer-functions) to bypass RLS on the join table.
+
+<Admonition type="note">
+
+If the list exceeds 1000 items, a different approach may be needed, or you may need to analyze the approach to ensure that the performance is acceptable.
+
+</Admonition>
+
+## More resources
+
+- [Row Level Security](/docs/guides/database/postgres/row-level-security)
+- [Managing indexes in Postgres](/docs/guides/database/postgres/indexes)
+- [Query optimization](/docs/guides/database/query-optimization)

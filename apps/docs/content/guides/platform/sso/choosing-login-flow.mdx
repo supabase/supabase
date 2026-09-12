@@ -1,9 +1,9 @@
 ---
-title: 'Choosing the Right SSO Login Flow'
-description: 'Quick reference guide to help you choose between IdP-initiated, SP-initiated, or both login flows based on your use case.'
+title: 'Choosing the Right SSO Sign-in Flow'
+description: 'Quick reference guide to help you choose between IdP-initiated, SP-initiated, or both sign-in flows based on your use case.'
 ---
 
-Not sure which single sign-on (SSO) login flow to enable? This guide maps common enterprise scenarios to the recommended configuration.
+Not sure which single sign-on (SSO) sign-in flow to enable? This guide maps common enterprise scenarios to the recommended configuration.
 
 <Admonition type="note">
 
@@ -92,7 +92,7 @@ Do users need to start login at supabase.com?
 3. Configure identity provider metadata
 4. Create Supabase app tile in your IdP
 
-**Result:** One-click SSO login for all users.
+**Result:** One-click SSO sign-in for all users.
 
 ---
 
@@ -101,7 +101,7 @@ Do users need to start login at supabase.com?
 **Your situation:**
 
 - Users frequently bookmark supabase.com directly
-- You want to support starting login from Supabase
+- You want to support starting sign-in from Supabase
 - Single domain, single organization
 
 **Recommended configuration:** Enable both flows ✅
@@ -120,7 +120,7 @@ Do users need to start login at supabase.com?
 4. Configure identity provider metadata
 5. Create Supabase app tile in your IdP (optional but recommended)
 
-**Result:** Users can start login from either Supabase or IdP.
+**Result:** Users can start sign-in from either Supabase or IdP.
 
 ---
 
@@ -128,7 +128,7 @@ Do users need to start login at supabase.com?
 
 **Your situation:**
 
-- Currently using password-based login
+- Currently using password-based sign-in
 - Transitioning to SSO
 - Users are used to starting at supabase.com
 
@@ -136,7 +136,7 @@ Do users need to start login at supabase.com?
 
 **Why:**
 
-- Familiar login starting point for existing users
+- Familiar sign-in starting point for existing users
 - Gradual transition to IdP-based access
 - Can promote IdP tiles after users adapt
 
@@ -267,7 +267,7 @@ Communicate clearly which authentication method each user should use.
 
 ## Testing your configuration
 
-After choosing your login flow, thoroughly test:
+After choosing your sign-in flow, thoroughly test:
 
 1. **IdP-initiated:** Click app tile in IdP → Verify redirect to Supabase
 2. **SP-initiated:** Go to supabase.com/sign-in-sso → Enter email → Verify IdP redirect
@@ -278,7 +278,7 @@ See our comprehensive [SSO Testing and Best Practices guide](/docs/guides/platfo
 
 ## When to change configuration
 
-You can safely change login flow configuration at any time:
+You can safely change sign-in flow configuration at any time:
 
 ### Adding SP-initiated to IdP-only
 
@@ -314,7 +314,7 @@ If you need help choosing the right configuration for your organization, contact
 
 ## Next steps
 
-- **Understand the technical details:** Read [Understanding SSO Login Flows](/docs/guides/platform/sso/login-flows)
+- **Understand the technical details:** Read [Understanding SSO Sign-in Flows](/docs/guides/platform/sso/login-flows)
 - **Configure your provider:** Follow our [provider-specific guides](/docs/guides/platform/sso#supported-providers)
 - **Test your setup:** Review [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices)
 - **Enable auto-join:** Configure [auto-join settings](/docs/guides/platform/sso#key-configuration-options)

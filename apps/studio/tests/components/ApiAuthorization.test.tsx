@@ -17,10 +17,10 @@ import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type GetOAuthAuthorizationResponse = components['schemas']['GetOAuthAuthorizationResponse']
-type ApproveAuthorizationResponse = components['schemas']['ApproveAuthorizationResponse']
-type DeclineAuthorizationResponse = components['schemas']['DeclineAuthorizationResponse']
+type ApproveAuthorizationResponse = components['schemas']['ApproveAuthorizationResponse_Output']
+type DeclineAuthorizationResponse = components['schemas']['DeclineAuthorizationResponse_Output']
 
 // --- Fixtures ---
 
@@ -325,6 +325,16 @@ describe('ApiAuthorizationScreen', () => {
           expect(
             screen.queryByRole('button', { name: /Authorize Test App/ })
           ).not.toBeInTheDocument()
+        })
+
+        test('empty state links back to this authorize request via returnTo', async () => {
+          mockBothEndpoints(createMockAuthResponse(), [])
+          renderScreen()
+          const link = await screen.findByRole('link', { name: 'Create an organization' })
+          expect(link).toHaveAttribute(
+            'href',
+            `/new?returnTo=${encodeURIComponent('/authorize?auth_id=test-auth-id')}`
+          )
         })
 
         test('shows not_member notice when organization_slug does not match any user organization', async () => {

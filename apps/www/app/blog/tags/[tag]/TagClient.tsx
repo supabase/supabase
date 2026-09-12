@@ -18,13 +18,13 @@ export default function TagClient({ posts, initialView, tag }: Props) {
     <>
       <SectionContainerWithCn height="narrow" className="space-y-6">
         <div className="text-foreground-lighter flex space-x-1">
-          <h1>
+          <nav aria-label="Breadcrumb" className="font-heading font-medium tracking-normal">
             <Link href="/blog">Blog</Link>
             <span className="px-2">/</span>
             <span>Tags</span>
             <span className="px-2">/</span>
             <span className="text-foreground">{tag}</span>
-          </h1>
+          </nav>
         </div>
       </SectionContainerWithCn>
       <BlogListingClient posts={posts} initialView={initialView} />

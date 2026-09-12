@@ -1,0 +1,81 @@
+---
+id: 'logs'
+title: 'Logs'
+description: 'Inspect project log events in the unified Logs view in Studio'
+---
+
+This guide explains how to inspect project logs in Studio. Log retention is based on your [project's pricing plan](/pricing). For details on how Logs usage is billed, see [Manage Logs usage](/docs/guides/platform/manage-your-usage/logs).
+
+Use this page to filter and inspect events in [Logs](#product-logs). To query the same data with SQL from Studio, MCP, the API, or a script, or to record extra Postgres, API, and Realtime events, see [Query and filter logs](/docs/guides/observability/advanced-log-filtering).
+
+<Admonition type="note">
+
+If you already have a specific error, start at [Diagnosing](/docs/guides/troubleshooting). To pick up a signal from these events, see [Detecting](/docs/guides/observability/detecting).
+
+</Admonition>
+
+## Filter and inspect events [#product-logs]
+
+Open [Logs](/dashboard/project/_/logs). The page shows a timeline of success, warning, and error events, a filterable table, and a detail panel when you select a row.
+
+If you don't select a log type, Logs queries **Postgres** and **API Gateway** events. Selecting log types replaces that default set.
+
+<Admonition type="note">
+
+For regular expression filtering, structured-field queries, and field discovery, see [Query and filter logs](/docs/guides/observability/advanced-log-filtering).
+
+</Admonition>
+
+### Filter logs
+
+1. Open [Logs](/dashboard/project/_/logs).
+2. Set the **Time Range** in the sidebar.
+3. Select one or more **Log Type** values. Nested toggles under API Gateway include or exclude Auth, Storage, and PostgREST request paths. The nested toggle under Postgres shows or hides connection logs.
+4. Optionally filter by **Level**, **Status**, **Method**, **Pathname**, or **Event message**. Type in the filter bar to search event messages.
+5. Optionally filter by **User**. This filter only matches Auth and Postgres events.
+
+Refresh the table, hide columns, download matching rows as CSV or JSON, or turn on live mode to stream new events.
+
+### Log types
+
+Selecting a log type in Studio queries the matching ClickHouse `source`. For the `source` names to use in SQL, see [Sources](/docs/guides/observability/advanced-log-filtering#logs-explorer).
+
+| Log type      | Events                                                            |
+| ------------- | ----------------------------------------------------------------- |
+| API Gateway   | HTTP requests through the API gateway, including REST and GraphQL |
+| Postgres      | Database queries and activity                                     |
+| PostgREST     | PostgREST server logs                                             |
+| Auth          | Auth server logs                                                  |
+| Storage       | Storage API server logs                                           |
+| Edge Function | Edge Function HTTP invocations and `console` output               |
+| Realtime      | Realtime server logs                                              |
+| Supavisor     | Connection pooler logs                                            |
+| PgBouncer     | PgBouncer logs                                                    |
+
+Selecting **API Gateway** is not the same as selecting **Auth**, **Storage**, or **PostgREST**. The nested API Gateway toggles filter HTTP paths on the gateway. The Auth, Storage, and PostgREST log types query those services' own logs.
+
+### Postgres [#postgres]
+
+Postgres logs show queries and activity for your database. Connection lifecycle events appear here when [connection logging](/docs/guides/observability/advanced-log-filtering#logging-postgres-connections) is enabled. They are included by default; clear **Connection logs** under the Postgres log type to hide them.
+
+To record additional statement classes, see [Logging Postgres queries](/docs/guides/observability/advanced-log-filtering#logging-postgres-queries).
+
+### Inspect a log
+
+1. Select a row in the table.
+2. Open **Overview** to follow the request through the services that handled it. Open **Raw JSON** for the full event.
+3. Dock the panel at the bottom or on the right.
+
+Edge Function rows include console output from that invocation. In SQL, the HTTP request is `function_edge_logs` and console output is `function_logs`. Function log messages longer than 10,000 characters are truncated.
+
+### Expanding results [#expanding-results]
+
+In the [Logs Explorer](/dashboard/project/_/logs/explorer), query results can be hard to read in the table. Double-click a row to expand it as JSON:
+
+![Expanding log results](/docs/img/guides/platform/expanded-log-results.png)
+
+### Single-service collections [#single-service-collections]
+
+The Logs sidebar still lists collections for one service at a time, such as [API Gateway](/dashboard/project/_/logs/edge-logs) or [Postgres](/dashboard/project/_/logs/postgres-logs). Use a collection when you want a dedicated view.
+
+If [Read Replicas](/docs/guides/platform/read-replicas) are enabled, collections can filter by database with the **Source** control. For API logs from the [API Load Balancer](/docs/guides/platform/read-replicas#api-load-balancer), the upstream database is the Redirect Identifier field (`log_attributes['load_balancer_redirect_identifier']` in SQL).

@@ -1,0 +1,26 @@
+---
+id: introduction
+title: Introduction
+---
+
+`@supabase/middleware` is a framework-agnostic engine for composing server-side request middleware. You write small units with `defineMiddleware`, compose them with `pipeline`, and run the result as a standard Fetch handler on Node, Deno, Bun, and Cloudflare Workers.
+
+Each middleware can guard the request, edit the response, or contribute typed values to a shared context that later middleware and your handler read. TypeScript checks the composition: a middleware that needs a value from an earlier middleware will not compile unless that middleware runs first.
+
+<Admonition type="caution" title="Alpha">
+
+`@supabase/middleware` is in alpha. APIs may change between 0.x releases. The `middleware` option on `withSupabase` in `@supabase/server` is also alpha.
+
+</Admonition>
+
+This package contains the engine and the framework-neutral middleware: `withCors` and `withFeatureFlag`. Supabase-specific middleware such as `withClaims`, `withSupabaseClient`, `withSupabaseAdminClient`, `withPostgresClient`, and `withPostgresAdminClient` ships in [`@supabase/server`](/docs/reference/server/introduction).
+
+### Trust model
+
+A middleware in your pipeline runs with the same access as your own handler code. It sees the full request, everything earlier middleware put on the context, and every response on the way out. Nothing sandboxes it. Only compose middleware you trust as much as your own code.
+
+Ordering is your permission boundary. A middleware can only read context values that earlier entries contributed, so place third-party middleware as early as possible and sensitive contributions as late as possible.
+
+### Environment access
+
+Middleware reads configuration through `getEnv` instead of `process.env`. On Node, Deno, and Bun, `getEnv` reads the process environment. Cloudflare Workers pass env bindings per request instead of exposing a global environment; the pipeline seeds each request's bindings, and `getEnv` reads the ones for the current request.

@@ -202,6 +202,7 @@ export const PublicationsList = () => {
                     {publicationEvents.map((event) => (
                       <TableCell key={event.key}>
                         <Switch
+                          aria-label={`${event.event} for ${x.name}`}
                           size="small"
                           checked={(x as any)[event.key]}
                           disabled={!canUpdatePublications}
@@ -217,11 +218,7 @@ export const PublicationsList = () => {
                     ))}
                     <TableCell>
                       <div className="flex justify-end">
-                        <Button
-                          asChild
-                          variant="default"
-                          style={{ paddingTop: 3, paddingBottom: 3 }}
-                        >
+                        <Button asChild style={{ paddingTop: 3, paddingBottom: 3 }}>
                           <Link href={`/project/${ref}/database/publications/${x.id}`}>
                             {x.tables === null
                               ? 'All tables'

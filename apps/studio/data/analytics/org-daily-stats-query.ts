@@ -124,7 +124,7 @@ export type OrgDailyStatsVariables = {
   projectRef?: string
 }
 
-export type OrgDailyUsageResponse = components['schemas']['OrgDailyUsageResponse']
+export type OrgDailyUsageResponse = components['schemas']['OrgDailyUsageResponse_Output']
 
 export async function getOrgDailyStats(
   { orgSlug, startDate, endDate, projectRef }: OrgDailyStatsVariables,

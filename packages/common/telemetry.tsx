@@ -4,11 +4,12 @@ import { components } from 'api-types'
 import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
 import Script from 'next/script'
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLatest } from 'react-use'
 
 import { useUser } from './auth'
 import { hasConsented, useConsentState } from './consent-state'
+import { createConsentedUrlCookieSync } from './consented-url-cookie'
 import { IS_PLATFORM } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
@@ -46,10 +47,17 @@ export {
 
 export const TelemetryTagManager = () => {
   const { hasAccepted } = useConsentState()
+  const [syncCookie] = useState(createConsentedUrlCookieSync)
 
   const isGTMEnabled = Boolean(
     IS_PLATFORM && process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID && hasAccepted
   )
+
+  // Ad attribution capture is independent of GTM, so this runs even when the
+  // container is not configured.
+  useEffect(() => {
+    syncCookie(hasAccepted)
+  }, [hasAccepted, syncCookie])
 
   if (!isGTMEnabled) return null
 
@@ -95,6 +103,7 @@ function getFirstTouchAttributionProps(telemetryData: SharedTelemetryData) {
       ...(getParam('ttclid') && { ttclid: getParam('ttclid') }), // TikTok Ads
       ...(getParam('twclid') && { twclid: getParam('twclid') }), // X Ads (Twitter)
       ...(getParam('li_fat_id') && { li_fat_id: getParam('li_fat_id') }), // LinkedIn Ads
+      ...(getParam('bfcid') && { bfcid: getParam('bfcid') }), // Freebuff Ads
     }
 
     return {
@@ -428,8 +437,16 @@ export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathn
     }
   }
 
+  // keepalive lets the request survive the same-tick OAuth redirect after
+  // sign_in_submitted, but keepalive requests share a ~64KB in-flight quota
+  // page-wide, so it stays scoped to that event. Callers like useTrack
+  // fire-and-forget, so rejections are handled here rather than surfacing
+  // as unhandled promise rejections.
   return post(`${ensurePlatformSuffix(API_URL)}/telemetry/event`, body, {
     headers: { Version: '2' },
+    keepalive: event.action === 'sign_in_submitted',
+  }).catch((error) => {
+    console.error('Problem sending telemetry event:', error)
   })
 }
 

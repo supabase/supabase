@@ -214,7 +214,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
       toast.success('Successfully updated permissions')
       setOpen(false)
     } catch (error: unknown) {
-      toast.error(`Failed to update permissions: ${getErrorMessage(error)}`)
+      toast.error(`Failed to update permissions: ${getErrorMessage(error, 'unknown error')}`)
     } finally {
       setIsSaving(false)
     }
@@ -372,7 +372,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
           </Table>
         </SheetSection>
         <SheetFooter>
-          <Button variant="default" disabled={isSaving} onClick={() => setOpen(false)}>
+          <Button disabled={isSaving} onClick={() => setOpen(false)}>
             Cancel
           </Button>
           <Button variant="primary" loading={isSaving} onClick={onSaveConfiguration}>

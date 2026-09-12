@@ -65,7 +65,7 @@ const AlertDescription = React.forwardRef<HTMLDivElement, React.HTMLAttributes<H
         ref={ref}
         data-slot="alert-description"
         className={cn(
-          'text-sm text-foreground-light font-normal text-balance md:text-pretty',
+          'text-sm text-foreground-light font-normal',
           // Optically align text in container
           'mb-0.5',
           // Handle paragraphs (keep Studio density; shadcn uses mb-4)

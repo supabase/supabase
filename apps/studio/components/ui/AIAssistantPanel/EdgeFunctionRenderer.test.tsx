@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { type ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
@@ -70,17 +71,22 @@ vi.mock('../EdgeFunctionBlock/EdgeFunctionBlock', () => ({
   ),
 }))
 
-vi.mock('./ConfirmFooter', () => ({
-  ConfirmFooter: ({
+vi.mock('./Confirm', () => ({
+  Confirm: ({
+    children,
     confirmLabel,
     onConfirm,
   }: {
+    children?: ReactNode
     confirmLabel?: string
     onConfirm?: () => void
   }) => (
-    <button tabIndex={0} onClick={onConfirm}>
-      {confirmLabel ?? 'Confirm'}
-    </button>
+    <div>
+      {children}
+      <button tabIndex={0} onClick={onConfirm}>
+        {confirmLabel ?? 'Confirm'}
+      </button>
+    </div>
   ),
 }))
 
@@ -104,6 +110,7 @@ describe('EdgeFunctionRenderer', () => {
         label="Deploy Edge Function"
         code="Deno.serve(() => new Response('ok'))"
         functionName="hello-world"
+        confirmState="approval-requested"
         onApprove={onApprove}
       />
     )
@@ -132,6 +139,7 @@ describe('EdgeFunctionRenderer', () => {
         label="Deploy Edge Function"
         code="Deno.serve(() => new Response('ok'))"
         functionName="hello-world"
+        confirmState="approval-requested"
         onApprove={onApprove}
       />
     )

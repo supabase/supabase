@@ -1,4 +1,5 @@
 import { getImpersonationSQL, type SafeSqlFragment } from '@supabase/pg-meta'
+import { z } from 'zod'
 
 import { uuidv4 } from './helpers'
 import type { User } from '@/data/auth/users-infinite-query'
@@ -39,6 +40,58 @@ type CustomImpersonationRole = {
 }
 
 export type ImpersonationRole = PostgrestImpersonationRole | CustomImpersonationRole
+
+/**
+ * The impersonated `user` is the same generated `User` shape already persisted verbatim to
+ * localStorage elsewhere (see `USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES`) — trusted
+ * as-is rather than re-validated field-by-field, since it only ever round-trips our own
+ * writes and its shape tracks a generated API type this schema shouldn't have to mirror.
+ */
+const impersonatedUserSchema = z
+  .record(z.string(), z.unknown())
+  .transform((value) => value as unknown as User)
+
+const aalSchema = z.enum(['aal1', 'aal2'])
+
+const postgrestImpersonationRoleSchema = z.union([
+  z.object({ type: z.literal('postgrest'), role: z.literal('anon') }).strict(),
+  z.object({ type: z.literal('postgrest'), role: z.literal('service_role') }).strict(),
+  z
+    .object({
+      type: z.literal('postgrest'),
+      role: z.literal('authenticated'),
+      userType: z.literal('native'),
+      user: impersonatedUserSchema.optional(),
+      aal: aalSchema.optional(),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal('postgrest'),
+      role: z.literal('authenticated'),
+      userType: z.literal('external'),
+      externalAuth: z
+        .object({
+          sub: z.string(),
+          additionalClaims: z.record(z.string(), z.unknown()).optional(),
+        })
+        .optional(),
+      aal: aalSchema.optional(),
+    })
+    .strict(),
+])
+
+const customImpersonationRoleSchema = z
+  .object({ type: z.literal('custom'), role: z.string() })
+  .strict()
+
+/** Parses to `ImpersonationRole` — verified at the `role` field assignment in `toDraft`
+ *  (`state/explorer-query.ts`), since annotating the schema type directly here would also
+ *  constrain its *input* type, which is narrower than `ImpersonationRole` pre-transform. */
+export const impersonationRoleSchema = z.union([
+  postgrestImpersonationRoleSchema,
+  customImpersonationRoleSchema,
+])
 
 export function getExp1HourFromNow() {
   return Math.floor((Date.now() + 60 * 60 * 1000) / 1000)

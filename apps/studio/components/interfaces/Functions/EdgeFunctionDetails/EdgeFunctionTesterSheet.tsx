@@ -1,16 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { BookOpen, Loader2, Plus, Send, X } from 'lucide-react'
+import { BookOpen, Loader2, Send } from 'lucide-react'
 import { useState } from 'react'
-import { useFieldArray, useForm, useWatch } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import {
   Badge,
   Button,
   Form,
   FormControl,
   FormField,
-  Input,
   Label,
   ResizableHandle,
   ResizablePanel,
@@ -33,27 +32,21 @@ import {
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 import * as z from 'zod'
 
 import { HTTP_METHODS } from './EdgeFunctionDetails.constants'
 import { ErrorWithStatus, ResponseData } from './EdgeFunctionDetails.types'
 import { getEdgeFunctionErrorDocs } from './EdgeFunctionDetails.utils'
-import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
+import { buildEdgeFunctionTestHeaders } from './EdgeFunctionTesterSheet.utils'
+import { buildEdgeFunctionHeaderAddActions } from '@/components/interfaces/Functions/httpHeaderAddActions'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
-import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-query'
-import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useEdgeFunctionTestMutation } from '@/data/edge-functions/edge-function-test-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { IS_PLATFORM } from '@/lib/constants'
 import { prettifyJSON } from '@/lib/helpers'
-import { getRoleImpersonationJWT } from '@/lib/role-impersonation'
 import { useTrack } from '@/lib/telemetry/track'
-import {
-  RoleImpersonationStateContextProvider,
-  useGetImpersonatedRoleState,
-} from '@/state/role-impersonation-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -84,31 +77,33 @@ const FormSchema = z.object({
 
 type FormValues = z.infer<typeof FormSchema>
 
-export const EdgeFunctionTesterSheet = (props: EdgeFunctionTesterSheetProps) => {
-  const { ref: projectRef } = useParams()
-
-  // [Alaister]: We're using a fresh context here as edge functions don't allow impersonating users.
-  return (
-    <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
-      <EdgeFunctionTesterSheetContent {...props} />
-    </RoleImpersonationStateContextProvider>
-  )
-}
-
-const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
+export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
   const { ref: projectRef, functionSlug } = useParams()
-  const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const [response, setResponse] = useState<ResponseData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const errorDocs = response ? getEdgeFunctionErrorDocs(response.headers) : undefined
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeysData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
-  const { serviceKey } = apiKeysData ?? {}
-  const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
+  const { data: apiKeysData } = useAPIKeys(
+    { projectRef, reveal: true },
+    { enabled: canReadAPIKeys }
+  )
+  const { anonKey, publishableKey, secretKey, serviceKey } = apiKeysData ?? {}
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
+
+  // Sent on the `apikey` header. Defaults to the least privileged key available, matching what the
+  // function details page shows in its example snippets.
+  const clientApiKey = publishableKey?.api_key ?? anonKey?.api_key
+  const secretApiKey = secretKey?.api_key ?? serviceKey?.api_key
+
+  // Both keys are offered so the user can swap the request's credential without looking one up.
+  // The webhook specific action the helper also builds is not relevant here.
+  const headerAddActions = buildEdgeFunctionHeaderAddActions({
+    apiKey: secretApiKey ?? '[YOUR API KEY]',
+    publishableKey: clientApiKey,
+    createRow: (key: string, value: string) => ({ key, value }),
+  }).filter(({ key }) => key !== 'add-source-header')
 
   const track = useTrack()
   const { mutate: testEdgeFunction, isPending } = useEdgeFunctionTestMutation({
@@ -141,40 +136,6 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
   })
   const method = useWatch({ control: form.control, name: 'method' })
 
-  const {
-    fields: headerFields,
-    append: appendHeader,
-    remove: removeHeader,
-  } = useFieldArray({
-    control: form.control,
-    name: 'headers',
-  })
-
-  const {
-    fields: queryParamFields,
-    append: appendQueryParam,
-    remove: removeQueryParam,
-  } = useFieldArray({
-    control: form.control,
-    name: 'queryParams',
-  })
-
-  const addKeyValuePair = (type: 'headers' | 'queryParams') => {
-    if (type === 'headers') {
-      appendHeader({ key: '', value: '' })
-    } else {
-      appendQueryParam({ key: '', value: '' })
-    }
-  }
-
-  const removeKeyValuePair = (index: number, type: 'headers' | 'queryParams') => {
-    if (type === 'headers') {
-      removeHeader(index)
-    } else {
-      removeQueryParam(index)
-    }
-  }
-
   useShortcut(
     SHORTCUT_IDS.FUNCTION_DETAIL_SUBMIT_TEST,
     () => {
@@ -195,34 +156,6 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
       return
     }
 
-    let testAuthorization: string | undefined
-    const role = getImpersonatedRoleState().role
-
-    if (
-      projectRef !== undefined &&
-      config?.jwt_secret !== undefined &&
-      role !== undefined &&
-      role.type === 'postgrest'
-    ) {
-      try {
-        const token = await getRoleImpersonationJWT(projectRef, config.jwt_secret, role)
-        testAuthorization = 'Bearer ' + token
-      } catch (err: any) {
-        console.error('Failed to generate JWT:', {
-          error: err.message,
-          roleDetails: role,
-        })
-      }
-    }
-
-    // Construct custom headers
-    const customHeaders: Record<string, string> = {}
-    values.headers.forEach(({ key, value }) => {
-      if (key && value) {
-        customHeaders[key] = value
-      }
-    })
-
     // Construct query parameters
     const queryString = values.queryParams
       .filter(({ key, value }) => key && value)
@@ -235,79 +168,12 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
       url: finalUrl,
       method: values.method,
       body: values.body,
-      headers: {
-        ...(accessToken && {
-          Authorization: `Bearer ${accessToken}`,
-        }),
-        'x-test-authorization': testAuthorization ?? `Bearer ${serviceKey?.api_key}`,
-        'Content-Type': 'application/json',
-        ...customHeaders,
-      },
+      headers: buildEdgeFunctionTestHeaders({
+        apiKey: clientApiKey,
+        customHeaders: values.headers,
+      }),
     })
   }
-
-  const renderKeyValuePairs = (type: 'headers' | 'queryParams', label: string) => (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <Label className="text-foreground text-sm">{label}</Label>
-        <Button
-          variant="default"
-          size="tiny"
-          icon={<Plus size={14} />}
-          onClick={() => addKeyValuePair(type)}
-        >
-          Add {label}
-        </Button>
-      </div>
-      <div className="border rounded-md bg-surface-200">
-        {(type === 'headers' ? headerFields : queryParamFields).map((field, index) => (
-          <div key={field.id} className="grid grid-cols-[1fr_1fr_32px] border-b last:border-b-0">
-            <FormField
-              control={form.control}
-              name={`${type}.${index}.key`}
-              render={({ field }) => (
-                <FormControl>
-                  <Input
-                    {...field}
-                    size="tiny"
-                    placeholder="Enter key..."
-                    disabled={isPending}
-                    className="h-auto py-2 font-mono rounded-none shadow-none bg-transparent border-l-0 border-r border-t-0 border-b-0 border-border"
-                  />
-                </FormControl>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name={`${type}.${index}.value`}
-              render={({ field }) => (
-                <FormControl>
-                  <Input
-                    {...field}
-                    size="tiny"
-                    placeholder="Enter value..."
-                    disabled={isPending}
-                    className="h-auto py-2 font-mono rounded-none shadow-none bg-transparent border-none"
-                  />
-                </FormControl>
-              )}
-            />
-            <div className="flex items-center justify-center">
-              {(type === 'headers' ? headerFields : queryParamFields).length > 1 && (
-                <Button
-                  variant="text"
-                  size="tiny"
-                  icon={<X strokeWidth={1.5} size={14} />}
-                  className="w-6 h-6"
-                  onClick={() => removeKeyValuePair(index, type)}
-                />
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
 
   return (
     <Sheet open={visible} onOpenChange={onClose}>
@@ -392,8 +258,35 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
                     />
                   )}
 
-                  {renderKeyValuePairs('headers', 'Headers')}
-                  {renderKeyValuePairs('queryParams', 'Query Parameters')}
+                  <div className="space-y-2">
+                    <Label className="text-foreground text-sm">Headers</Label>
+                    <KeyValueFieldArray
+                      control={form.control}
+                      name="headers"
+                      keyFieldName="key"
+                      valueFieldName="value"
+                      createEmptyRow={() => ({ key: '', value: '' })}
+                      keyPlaceholder="Header name"
+                      valuePlaceholder="Header value"
+                      addLabel="Add header"
+                      addActions={headerAddActions}
+                      disabled={isPending}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-foreground text-sm">Query Parameters</Label>
+                    <KeyValueFieldArray
+                      control={form.control}
+                      name="queryParams"
+                      keyFieldName="key"
+                      valueFieldName="value"
+                      createEmptyRow={() => ({ key: '', value: '' })}
+                      keyPlaceholder="Parameter name"
+                      valuePlaceholder="Parameter value"
+                      addLabel="Add parameter"
+                      disabled={isPending}
+                    />
+                  </div>
                 </div>
               </ResizablePanel>
               <ResizableHandle withHandle />
@@ -484,10 +377,6 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
 
             <SheetFooter className="px-5 py-3 border-t">
               <div className="flex items-center gap-2">
-                <RoleImpersonationPopover
-                  disallowAuthenticatedOption
-                  header="Run edge function as a role"
-                />
                 <ShortcutTooltip shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_SUBMIT_TEST} side="top">
                   <Button
                     variant="primary"

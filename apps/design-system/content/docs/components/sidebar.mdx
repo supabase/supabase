@@ -4,19 +4,6 @@ description: A composable, themeable and customizable sidebar component.
 component: true
 ---
 
-<figure className="flex flex-col gap-4">
-  <ComponentPreview
-    name="sidebar-07"
-    title="Sidebar"
-    type="block"
-    description="A composable, themeable and customizable sidebar component built using shadcn/ui"
-    className="w-full"
-  />
-  <figcaption className="text-center text-sm text-gray-500">
-    A sidebar that collapses to icons.
-  </figcaption>
-</figure>
-
 Sidebars are one of the most complex components to build. They are central
 to any application and often contain a lot of moving parts.
 
@@ -331,17 +318,6 @@ export function AppSidebar() {
 
 <Step>You've created your first sidebar.</Step>
 
-<figure className="flex flex-col gap-4">
-  <ComponentPreview
-    name="sidebar-demo"
-    title="Sidebar"
-    type="block"
-    description="Your first sidebar."
-    className="w-full"
-  />
-  <figcaption className="text-center text-sm text-gray-500">Your first sidebar.</figcaption>
-</figure>
-
 </Steps>
 
 ## Components
@@ -546,19 +522,6 @@ Use the `SidebarHeader` component to add a sticky header to the sidebar.
 
 The following example adds a `<DropdownMenu>` to the `SidebarHeader`.
 
-<figure className="flex flex-col gap-4 mt-6">
-  <ComponentPreview
-    name="sidebar-header"
-    title="Sidebar"
-    type="block"
-    description="A sidebar header with a dropdown menu."
-    className="w-full"
-  />
-  <figcaption className="text-center text-sm text-gray-500">
-    A sidebar header with a dropdown menu.
-  </figcaption>
-</figure>
-
 ```tsx showLineNumbers title="components/app-sidebar.tsx"
 <Sidebar>
   <SidebarHeader>
@@ -591,19 +554,6 @@ The following example adds a `<DropdownMenu>` to the `SidebarHeader`.
 Use the `SidebarFooter` component to add a sticky footer to the sidebar.
 
 The following example adds a `<DropdownMenu>` to the `SidebarFooter`.
-
-<figure className="flex flex-col gap-4 mt-6">
-  <ComponentPreview
-    name="sidebar-footer"
-    title="Sidebar"
-    type="block"
-    description="A sidebar footer with a dropdown menu."
-    className="w-full"
-  />
-  <figcaption className="text-center text-sm text-gray-500">
-    A sidebar footer with a dropdown menu.
-  </figcaption>
-</figure>
 
 ```tsx showLineNumbers title="components/app-sidebar.tsx"
 export function AppSidebar() {
@@ -668,17 +618,6 @@ Use the `SidebarGroup` component to create a section within the sidebar.
 
 A `SidebarGroup` has a `SidebarGroupLabel`, a `SidebarGroupContent` and an optional `SidebarGroupAction`.
 
-<figure className="flex flex-col gap-4 mt-6">
-  <ComponentPreview
-    name="sidebar-group"
-    title="Sidebar Group"
-    type="block"
-    description="A sidebar group."
-    className="w-full"
-  />
-  <figcaption className="text-center text-sm text-gray-500">A sidebar group.</figcaption>
-</figure>
-
 ```tsx showLineNumbers
 import { Sidebar, SidebarContent, SidebarGroup } from '@/components/ui/sidebar'
 
@@ -702,19 +641,6 @@ export function AppSidebar() {
 ## Collapsible SidebarGroup
 
 To make a `SidebarGroup` collapsible, wrap it in a `Collapsible`.
-
-<figure className="flex flex-col gap-4 mt-6">
-  <ComponentPreview
-    name="sidebar-group-collapsible"
-    title="Sidebar Group"
-    type="block"
-    description="A collapsible sidebar group."
-    className="w-full"
-  />
-  <figcaption className="text-center text-sm text-gray-500">
-    A collapsible sidebar group.
-  </figcaption>
-</figure>
 
 ```tsx showLineNumbers
 export function AppSidebar() {
@@ -758,19 +684,6 @@ export function AppSidebar() {
 }
 ```
 
-<figure className="flex flex-col gap-4">
-  <ComponentPreview
-    name="sidebar-group-action"
-    title="Sidebar Group"
-    type="block"
-    description="A sidebar group with an action button."
-    className="w-full"
-  />
-  <figcaption className="text-center text-sm text-gray-500">
-    A sidebar group with an action button.
-  </figcaption>
-</figure>
-
 ## SidebarMenu
 
 The `SidebarMenu` component is used for building a menu within a `SidebarGroup`.
@@ -793,19 +706,6 @@ A `SidebarMenu` component is composed of `SidebarMenuItem`, `SidebarMenuButton`,
 />
 
 Here's an example of a `SidebarMenu` component rendering a list of projects.
-
-<figure className="flex flex-col gap-4 mt-6">
-  <ComponentPreview
-    name="sidebar-menu"
-    title="Sidebar Menu"
-    type="block"
-    description="A sidebar menu with a list of projects."
-    className="w-full"
-  />
-  <figcaption className="text-center text-sm text-gray-500">
-    A sidebar menu with a list of projects.
-  </figcaption>
-</figure>
 
 ```tsx showLineNumbers
 <Sidebar>
@@ -892,19 +792,6 @@ This button works independently of the `SidebarMenuButton` i.e you can have the 
 
 Here's an example of a `SidebarMenuAction` component rendering a `DropdownMenu`.
 
-<figure className="flex flex-col gap-4 mt-6">
-  <ComponentPreview
-    name="sidebar-menu-action"
-    title="Sidebar Menu Action"
-    type="block"
-    description="A sidebar menu action with a dropdown menu."
-    className="w-full"
-  />
-  <figcaption className="text-center text-sm text-gray-500">
-    A sidebar menu action with a dropdown menu.
-  </figcaption>
-</figure>
-
 ```tsx showLineNumbers
 <SidebarMenuItem>
   <SidebarMenuButton asChild>
@@ -937,19 +824,6 @@ The `SidebarMenuSub` component is used to render a submenu within a `SidebarMenu
 
 Use `<SidebarMenuSubItem />` and `<SidebarMenuSubButton />` to render a submenu item.
 
-<figure className="flex flex-col gap-4 mt-6">
-  <ComponentPreview
-    name="sidebar-menu-sub"
-    title="Sidebar Menu Sub"
-    type="block"
-    description="A sidebar menu sub."
-    className="w-full"
-  />
-  <figcaption className="text-center text-sm text-gray-500">
-    A sidebar menu with a submenu.
-  </figcaption>
-</figure>
-
 ```tsx showLineNumbers
 <SidebarMenuItem>
   <SidebarMenuButton />
@@ -967,17 +841,6 @@ Use `<SidebarMenuSubItem />` and `<SidebarMenuSubButton />` to render a submenu 
 ## Collapsible SidebarMenu
 
 To make a `SidebarMenu` component collapsible, wrap it and the `SidebarMenuSub` components in a `Collapsible`.
-
-<figure className="flex flex-col gap-4 mt-6">
-  <ComponentPreview
-    name="sidebar-menu-collapsible"
-    title="Sidebar Menu"
-    type="block"
-    description="A collapsible sidebar menu."
-    className="w-full"
-  />
-  <figcaption className="text-center text-sm text-gray-500">A collapsible sidebar menu.</figcaption>
-</figure>
 
 ```tsx showLineNumbers
 <SidebarMenu>
@@ -999,19 +862,6 @@ To make a `SidebarMenu` component collapsible, wrap it and the `SidebarMenuSub` 
 ## SidebarMenuBadge
 
 The `SidebarMenuBadge` component is used to render a badge within a `SidebarMenuItem`.
-
-<figure className="flex flex-col gap-4 mt-6">
-  <ComponentPreview
-    name="sidebar-menu-badge"
-    title="Sidebar Menu Badge"
-    type="block"
-    description="A sidebar menu badge."
-    className="w-full"
-  />
-  <figcaption className="text-center text-sm text-gray-500">
-    A sidebar menu with a badge.
-  </figcaption>
-</figure>
 
 ```tsx showLineNumbers
 <SidebarMenuItem>
@@ -1103,19 +953,6 @@ The `SidebarRail` component is used to render a rail within a `Sidebar`. This ra
 ### React Server Components
 
 Here's an example of a `SidebarMenu` component rendering a list of projects using React Server Components.
-
-<figure className="flex flex-col gap-4 mt-6">
-  <ComponentPreview
-    name="sidebar-rsc"
-    title="Sidebar Menu RSC"
-    type="block"
-    description="A sidebar menu using React Server Components."
-    className="w-full"
-  />
-  <figcaption className="text-center text-sm text-gray-500">
-    A sidebar menu using React Server Components.
-  </figcaption>
-</figure>
 
 ```tsx showLineNumbers {6} title="Skeleton to show loading state."
 function NavProjectsSkeleton() {
@@ -1252,17 +1089,6 @@ function NavProjects() {
 ## Controlled Sidebar
 
 Use the `open` and `onOpenChange` props to control the sidebar.
-
-<figure className="flex flex-col gap-4 mt-6">
-  <ComponentPreview
-    name="sidebar-controlled"
-    title="Sidebar Controlled"
-    type="block"
-    description="A controlled sidebar."
-    className="w-full"
-  />
-  <figcaption className="text-center text-sm text-gray-500">A controlled sidebar.</figcaption>
-</figure>
 
 ```tsx showLineNumbers
 export function AppSidebar() {

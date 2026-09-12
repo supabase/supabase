@@ -1,12 +1,15 @@
 'use client'
 
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { useIsLoggedIn } from 'common'
 import Link from 'next/link'
 import { Button } from 'ui'
 
 import SectionContainer from '@/components/Layouts/SectionContainer'
+import { getDashboardCtaHref } from '@/lib/dashboard-links'
 
 export function Hero() {
+  const isLoggedIn = useIsLoggedIn()
   const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
@@ -23,9 +26,9 @@ export function Hero() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button asChild size="medium">
+          <Button variant="primary" asChild size="medium">
             <Link
-              href="https://supabase.com/dashboard"
+              href={getDashboardCtaHref(isLoggedIn)}
               onClick={() =>
                 sendTelemetryEvent({
                   action: 'start_project_button_clicked',
@@ -36,7 +39,7 @@ export function Hero() {
               Start your project
             </Link>
           </Button>
-          <Button asChild size="medium" variant="default">
+          <Button asChild size="medium">
             <Link
               href="/contact/sales"
               onClick={() =>

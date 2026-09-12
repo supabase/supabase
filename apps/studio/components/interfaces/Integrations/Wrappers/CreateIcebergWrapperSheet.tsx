@@ -387,7 +387,6 @@ export const CreateIcebergWrapperSheet = ({
             <SheetFooter>
               <Button
                 size="tiny"
-                variant="default"
                 type="button"
                 onClick={onCloseWithConfirmation}
                 disabled={isLoading}

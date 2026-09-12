@@ -1489,7 +1489,7 @@ parameters:
     required: false
     default: ''
     description: |
-      Force log out after the specified duration. Sample values include: '50m', '20h'.
+      Force sign out after the specified duration. Sample values include: '50m', '20h'.
     links:
       - name: 'Auth Sessions'
         link: 'https://supabase.com/docs/guides/auth/sessions'
@@ -1500,7 +1500,7 @@ parameters:
     required: false
     default: ''
     description: |
-      Force log out if the user has been inactive longer than the specified duration. Sample values include: '50m', '20h'.
+      Force sign out if the user has been inactive longer than the specified duration. Sample values include: '50m', '20h'.
     links:
       - name: 'Auth Sessions'
         link: 'https://supabase.com/docs/guides/auth/sessions'

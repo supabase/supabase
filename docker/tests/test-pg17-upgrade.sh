@@ -306,7 +306,7 @@ if [ -n "$anon_key" ]; then
     check "PostgREST connectivity" "200" "$rest_status"
 fi
 
-# Auth health (needs apikey header through Kong)
+# Auth health (needs apikey header through the API gateway)
 if [ -n "$anon_key" ]; then
     auth_status=$(curl -s -o /dev/null -w "%{http_code}" \
         -H "apikey: $anon_key" \

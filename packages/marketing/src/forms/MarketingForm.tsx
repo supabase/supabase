@@ -169,7 +169,10 @@ function Field({
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-sm text-foreground font-medium">{field.label}</label>
+      <div className="flex flex-col gap-0.5">
+        <label className="text-sm text-foreground font-medium">{field.label}</label>
+        {field.hint && <p className="text-xs text-foreground-lighter italic">{field.hint}</p>}
+      </div>
       <FieldInput field={field} value={value} onChange={onChange} />
       {field.description && (
         <p className="text-xs text-foreground-lighter leading-relaxed">{field.description}</p>

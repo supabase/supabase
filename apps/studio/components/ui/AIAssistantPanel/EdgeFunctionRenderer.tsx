@@ -1,8 +1,9 @@
 import { useParams } from 'common'
-import { useMemo, useState, type PropsWithChildren } from 'react'
+import { useMemo, useState } from 'react'
 
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
-import { ConfirmFooter } from './ConfirmFooter'
+import { Confirm } from './Confirm'
+import { type ConfirmFooterApprovalState } from './Confirm.utils'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useTrack } from '@/lib/telemetry/track'
@@ -15,7 +16,8 @@ interface EdgeFunctionRendererProps {
   onDeny?: () => void
   isDeploying?: boolean
   initialIsDeployed?: boolean
-  showConfirmFooter?: boolean
+  errorText?: string
+  confirmState?: ConfirmFooterApprovalState
 }
 
 export const EdgeFunctionRenderer = ({
@@ -26,8 +28,9 @@ export const EdgeFunctionRenderer = ({
   onDeny,
   isDeploying = false,
   initialIsDeployed,
-  showConfirmFooter = true,
-}: PropsWithChildren<EdgeFunctionRendererProps>) => {
+  errorText,
+  confirmState,
+}: EdgeFunctionRendererProps) => {
   const { ref } = useParams()
   const track = useTrack()
   const [showReplaceWarning, setShowReplaceWarning] = useState(false)
@@ -74,36 +77,40 @@ export const EdgeFunctionRenderer = ({
     approveDeploy()
   }
 
+  const isConfirming = confirmState !== undefined
+
   return (
-    <div className="w-auto overflow-x-hidden my-4">
+    <Confirm
+      className="my-4"
+      state={confirmState}
+      message="Assistant wants to deploy this Edge Function"
+      cancelLabel="Skip"
+      confirmLabel="Deploy"
+      confirmLabelLoading="Deploying..."
+      successMessage="Edge Function deployed"
+      errorMessage="Failed to deploy Edge Function"
+      deniedMessage="Skipped Edge Function deployment"
+      isLoading={isDeploying}
+      onCancel={onDeny}
+      onConfirm={handleDeploy}
+    >
       <EdgeFunctionBlock
+        className="rounded-none border-0 shadow-none"
         label={label}
         code={code}
         functionName={functionName}
-        disabled={showConfirmFooter}
+        disabled={isConfirming}
         isDeploying={isDeploying}
         isDeployed={initialIsDeployed}
+        errorText={errorText}
         functionUrl={functionUrl}
         deploymentDetailsUrl={deploymentDetailsUrl}
         downloadCommand={downloadCommand}
-        hideDeployButton={showConfirmFooter || initialIsDeployed}
+        hideDeployButton={isConfirming || initialIsDeployed}
         showReplaceWarning={showReplaceWarning}
         onCancelReplace={() => setShowReplaceWarning(false)}
         onConfirmReplace={approveDeploy}
       />
-      {showConfirmFooter && (
-        <div className="mx-4">
-          <ConfirmFooter
-            message="Assistant wants to deploy this Edge Function"
-            cancelLabel="Skip"
-            confirmLabel="Deploy"
-            confirmLabelLoading="Deploying..."
-            isLoading={isDeploying}
-            onCancel={() => onDeny?.()}
-            onConfirm={handleDeploy}
-          />
-        </div>
-      )}
-    </div>
+    </Confirm>
   )
 }

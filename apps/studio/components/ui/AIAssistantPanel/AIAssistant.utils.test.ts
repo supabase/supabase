@@ -2,6 +2,8 @@ import type { UIMessage } from 'ai'
 import { describe, expect, test } from 'vitest'
 
 import {
+  containsLogsSnippets,
+  formatAttachedSnippets,
   hasPendingToolApproval,
   isReadOnlySelect,
   resolvePendingToolApprovalsAsDenied,
@@ -125,6 +127,18 @@ describe('AIAssistant.utils.ts:hasPendingToolApproval', () => {
 
     expect(hasPendingToolApproval(messages)).toBe(true)
   })
+
+  test('Should ignore automatic approvals', () => {
+    const messages = createMessageWithPart({
+      type: 'tool-execute_sql',
+      toolCallId: 'call-1',
+      state: 'approval-requested',
+      input: { sql: 'select 1', label: 'Test query' },
+      approval: { id: 'approval-1', isAutomatic: true },
+    } as UIMessage['parts'][number])
+
+    expect(hasPendingToolApproval(messages)).toBe(false)
+  })
 })
 
 describe('AIAssistant.utils.ts:resolvePendingToolApprovalsAsDenied', () => {
@@ -155,5 +169,74 @@ describe('AIAssistant.utils.ts:resolvePendingToolApprovalsAsDenied', () => {
     })
 
     expect(resolvePendingToolApprovalsAsDenied(messages)).toEqual(messages)
+  })
+})
+
+describe('containsLogsSnippets', () => {
+  test('is true when an attached query is a logs query', () => {
+    expect(
+      containsLogsSnippets([{ label: 'Current Query', content: 'select 1', source: 'logs' }])
+    ).toBe(true)
+  })
+
+  test('is false for a database query', () => {
+    expect(
+      containsLogsSnippets([{ label: 'Current Query', content: 'select 1', source: 'database' }])
+    ).toBe(false)
+  })
+
+  test('is false once nothing is attached', () => {
+    expect(containsLogsSnippets([])).toBe(false)
+    expect(containsLogsSnippets(undefined)).toBe(false)
+  })
+
+  test('ignores plain string attachments, which carry no source', () => {
+    expect(containsLogsSnippets(['select 1'])).toBe(false)
+  })
+
+  test('is true when only some of several attachments are logs queries', () => {
+    expect(
+      containsLogsSnippets([
+        'select 1',
+        { label: 'Current Query', content: 'select 2', source: 'database' },
+        { label: 'Other', content: 'select 3', source: 'logs' },
+      ])
+    ).toBe(true)
+  })
+})
+
+describe('formatAttachedSnippets', () => {
+  test('fences a database query as sql', () => {
+    expect(
+      formatAttachedSnippets([{ label: 'Current Query', content: 'select 1', source: 'database' }])
+    ).toBe('```sql\nselect 1\n```')
+  })
+
+  // The fence is how the model tells which attachment is ClickHouse. It also keeps a
+  // logs query out of MessageMarkdown's `sql` branch, which offers to run the block
+  // against Postgres and brands it with untrustedSql.
+  test('fences a logs query as clickhouse', () => {
+    expect(
+      formatAttachedSnippets([
+        {
+          label: 'Current Query',
+          content: "select count() from logs where source = 'edge_logs'",
+          source: 'logs',
+        },
+      ])
+    ).toBe("```clickhouse\nselect count() from logs where source = 'edge_logs'\n```")
+  })
+
+  test('labels each attachment with its own dialect', () => {
+    expect(
+      formatAttachedSnippets([
+        { label: 'A', content: 'select 1', source: 'database' },
+        { label: 'B', content: 'select 2', source: 'logs' },
+      ])
+    ).toBe('```sql\nselect 1\n```\n```clickhouse\nselect 2\n```')
+  })
+
+  test('falls back to sql for a plain string attachment', () => {
+    expect(formatAttachedSnippets(['select 1'])).toBe('```sql\nselect 1\n```')
   })
 })

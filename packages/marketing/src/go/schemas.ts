@@ -134,6 +134,8 @@ export const showWhenSchema = z
 const formFieldBase = z.object({
   name: z.string().min(1),
   label: z.string().min(1),
+  /** Small italicized note rendered directly beneath the label, above the input. */
+  hint: z.string().optional(),
   /** Helper text rendered beneath the input. */
   description: z.string().optional(),
   placeholder: z.string().optional(),

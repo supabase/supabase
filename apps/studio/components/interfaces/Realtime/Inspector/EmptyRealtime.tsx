@@ -32,11 +32,7 @@ export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
           <p className="text-foreground-light mb-6">
             Send your first realtime message from your database, application code or edge function
           </p>
-          <Button
-            variant="default"
-            icon={<AiIconAnimation />}
-            onClick={handleCreateTriggerWithAssistant}
-          >
+          <Button icon={<AiIconAnimation />} onClick={handleCreateTriggerWithAssistant}>
             Set up realtime for me
           </Button>
         </div>
@@ -56,7 +52,7 @@ export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
             <p className="text-foreground-light text-sm mb-4 flex-1">
               Send messages to a channel from your client application or database via triggers.
             </p>
-            <Button variant="default" className="w-full">
+            <Button className="w-full">
               <Link href={`/project/${projectRef}/database/triggers`}>Create a trigger</Link>
             </Button>
           </div>
@@ -75,7 +71,7 @@ export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
             <p className="text-foreground-light text-sm mb-4 flex-1">
               Set up Row Level Security policies to control who can see messages within a channel
             </p>
-            <Button variant="default">
+            <Button>
               <Link href={`/project/${projectRef}/realtime/policies`}>Write a policy</Link>
             </Button>
           </div>

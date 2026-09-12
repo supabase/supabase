@@ -7,6 +7,8 @@
 
   "dashboard_auth:custom_providers": ["Nimbus"],
 
+  "dashboard_auth:logo_link_url": "https://example.com",
+
   "docs:row_level_security_guide_path": "/guides/database/postgres/row-level-security",
 
   "organization:legal_documents": [

@@ -5,18 +5,21 @@ import { ExploreMore } from '@/components/explore-more'
 import { Mdx } from '@/components/mdx-components'
 import { NextUp } from '@/components/next-up'
 import { DashboardTableOfContents } from '@/components/toc'
-import { getTableOfContents } from '@/lib/toc'
 import { getCurrentChapter } from '@/lib/get-current-chapter'
 import { getNextPage } from '@/lib/get-next-page'
+import { getTableOfContents } from '@/lib/toc'
 import { absoluteUrl, cn } from '@/lib/utils'
+
 import '@/styles/code-block-variables.css'
 import '@/styles/mdx.css'
-import { allDocs } from 'contentlayer/generated'
+
 import { ChevronRight } from 'lucide-react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Balancer from 'react-wrap-balancer'
 import { ScrollArea } from 'ui'
+
+import { allDocs } from '@/.velite'
 
 interface DocPageProps {
   params: Promise<{
@@ -75,17 +78,13 @@ export default async function DocPage(props: DocPageProps) {
     notFound()
   }
 
-  const toc = await getTableOfContents(doc.body.raw)
+  const toc = await getTableOfContents(doc.raw)
   const nextPage = getNextPage(doc.slugAsParams)
   const currentChapter = getCurrentChapter(doc.slugAsParams)
   const slugSegments = doc.slugAsParams.split('/')
   const isIntroductionPage = slugSegments[slugSegments.length - 1] === 'introduction'
 
-  const exploreItems = (
-    doc as {
-      explore?: Array<{ title: string; link: string; itemType?: string; description?: string }>
-    }
-  ).explore
+  const exploreItems = doc.explore
 
   return (
     <div className={cn('relative')}>
@@ -121,7 +120,7 @@ export default async function DocPage(props: DocPageProps) {
             </div>
           </div>
           <div className="pb-12">
-            <Mdx code={doc.body.code} />
+            <Mdx code={doc.code} />
           </div>
           {exploreItems && exploreItems.length > 0 && <ExploreMore items={exploreItems} />}
           {currentChapter && nextPage && (

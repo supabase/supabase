@@ -22,7 +22,7 @@ You need:
 - A running self-hosted Supabase instance (see the [setup guide](/docs/guides/self-hosting/docker))
 - Open SSL installed (for key generation)
 - Your IdP's SAML metadata URL or metadata XML
-- The `SERVICE_ROLE_KEY` from your `.env` file (needed for admin API calls)
+- Your project's secret key, `SUPABASE_SECRET_KEY`, from your `.env` file (needed for admin API calls)
 - `API_EXTERNAL_URL` set to the publicly-accessible URL of your Supabase Auth service (e.g., `https://<your-domain>/auth/v1`). Used as the base for constructing the SAML Service Provider entity ID and ACS endpoint URL
 
 ## How SAML SSO works in Supabase
@@ -32,7 +32,7 @@ SAML SSO is configured in two layers:
 1. **Global SAML enable (environment variables)** - a small set of env vars that enable the SAML engine and provide a signing key. These go in `.env` and `docker-compose.yml`.
 2. **Per-IdP configuration (admin API)** - individual Identity Providers are registered, updated, and deleted at runtime via the Auth admin API. No restart is needed when adding or removing providers.
 
-The login flow works as follows:
+The sign-in flow works as follows:
 
 1. Your app calls `POST /auth/v1/sso` with a domain or provider_id
 2. Auth generates a SAML `AuthnRequest` and returns a redirect URL to the IdP
@@ -156,7 +156,7 @@ Key values in the metadata:
 
 ## Step 6: Register an identity provider
 
-Use the Auth admin API to register your IdP. You need the `SERVICE_ROLE_KEY` for authentication.
+Use the Auth admin API to register your IdP. You need your project's secret key, `SUPABASE_SECRET_KEY`, for authentication.
 
 ### Option A: Register with a metadata URL (recommended)
 
@@ -164,9 +164,8 @@ If your IdP provides a metadata URL, Auth will fetch and cache the metadata auto
 
 ```sh
 curl -X POST 'http://<your-domain>/auth/v1/admin/sso/providers' \
-  -H 'Authorization: Bearer your-service-role-key' \
   -H 'Content-Type: application/json' \
-  -H 'apikey: your-service-role-key' \
+  -H 'apikey: your-supabase-secret-key' \
   -d '{
     "type": "saml",
     "metadata_url": "https://idp.example.com/saml/metadata",
@@ -190,9 +189,8 @@ If you have the IdP metadata as an XML string:
 
 ```sh
 curl -X POST 'http://<your-domain>/auth/v1/admin/sso/providers' \
-  -H 'Authorization: Bearer your-service-role-key' \
   -H 'Content-Type: application/json' \
-  -H 'apikey: your-service-role-key' \
+  -H 'apikey: your-supabase-secret-key' \
   -d '{
     "type": "saml",
     "metadata_xml": "<EntityDescriptor ...>...</EntityDescriptor>",
@@ -384,41 +382,36 @@ Mapped attributes are stored in the user's `raw_user_meta_data` and are availabl
 
 ```sh
 curl 'http://<your-domain>/auth/v1/admin/sso/providers' \
-  -H 'Authorization: Bearer your-service-role-key' \
-  -H 'apikey: your-service-role-key'
+  -H 'apikey: your-supabase-secret-key'
 ```
 
 Filter by resource ID using exact match:
 
 ```sh
 curl 'http://<your-domain>/auth/v1/admin/sso/providers?resource_id=my-idp' \
-  -H 'Authorization: Bearer your-service-role-key' \
-  -H 'apikey: your-service-role-key'
+  -H 'apikey: your-supabase-secret-key'
 ```
 
 or prefix match:
 
 ```sh
 curl 'http://<your-domain>/auth/v1/admin/sso/providers?resource_id_prefix=prod-' \
-  -H 'Authorization: Bearer your-service-role-key' \
-  -H 'apikey: your-service-role-key'
+  -H 'apikey: your-supabase-secret-key'
 ```
 
 ### Get a specific provider
 
 ```sh
 curl 'http://<your-domain>/auth/v1/admin/sso/providers/{provider_id}' \
-  -H 'Authorization: Bearer your-service-role-key' \
-  -H 'apikey: your-service-role-key'
+  -H 'apikey: your-supabase-secret-key'
 ```
 
 ### Update a provider
 
 ```sh
 curl -X PUT 'http://<your-domain>/auth/v1/admin/sso/providers/{provider_id}' \
-  -H 'Authorization: Bearer your-service-role-key' \
   -H 'Content-Type: application/json' \
-  -H 'apikey: your-service-role-key' \
+  -H 'apikey: your-supabase-secret-key' \
   -d '{
     "domains": ["example.com", "subsidiary.com"],
     "attribute_mapping": {
@@ -435,9 +428,8 @@ curl -X PUT 'http://<your-domain>/auth/v1/admin/sso/providers/{provider_id}' \
 
 ```sh
 curl -X PUT 'http://<your-domain>/auth/v1/admin/sso/providers/{provider_id}' \
-  -H 'Authorization: Bearer your-service-role-key' \
   -H 'Content-Type: application/json' \
-  -H 'apikey: your-service-role-key' \
+  -H 'apikey: your-supabase-secret-key' \
   -d '{ "disabled": true }'
 ```
 
@@ -445,8 +437,7 @@ curl -X PUT 'http://<your-domain>/auth/v1/admin/sso/providers/{provider_id}' \
 
 ```sh
 curl -X DELETE 'http://<your-domain>/auth/v1/admin/sso/providers/{provider_id}' \
-  -H 'Authorization: Bearer your-service-role-key' \
-  -H 'apikey: your-service-role-key'
+  -H 'apikey: your-supabase-secret-key'
 ```
 
 ## Client-side integration
@@ -456,7 +447,7 @@ curl -X DELETE 'http://<your-domain>/auth/v1/admin/sso/providers/{provider_id}' 
 ```js
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('http://<your-domain>', 'your-anon-key')
+const supabase = createClient('http://<your-domain>', 'your-supabase-publishable-key')
 
 // Option 1: SSO by email domain
 const { data, error } = await supabase.auth.signInWithSSO({
@@ -483,7 +474,7 @@ By domain:
 ```sh
 curl -X POST 'http://<your-domain>/auth/v1/sso' \
   -H 'Content-Type: application/json' \
-  -H 'apikey: your-anon-key' \
+  -H 'apikey: your-supabase-publishable-key' \
   -d '{
     "domain": "example.com",
     "skip_http_redirect": true
@@ -495,7 +486,7 @@ By provider ID:
 ```sh
 curl -X POST 'http://<your-domain>/auth/v1/sso' \
   -H 'Content-Type: application/json' \
-  -H 'apikey: your-anon-key' \
+  -H 'apikey: your-supabase-publishable-key' \
   -d '{
     "provider_id": "d3f5a1b2-...",
     "skip_http_redirect": true
@@ -506,15 +497,15 @@ Both return `{ "url": "https://idp.example.com/sso?SAMLRequest=..." }`.
 
 ### Domain-based vs provider-based lookup
 
-| Method       | Use case                                                                                                                                |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `domain`     | Extract the domain from the user's email and let Auth find the right IdP. Best for login forms where the user enters their email first. |
-| `providerId` | Use when you know the exact provider - for example, a dedicated "Sign in with Okta" button.                                             |
+| Method       | Use case                                                                                                                                  |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `domain`     | Extract the domain from the user's email and let Auth find the right IdP. Best for sign-in forms where the user enters their email first. |
+| `providerId` | Use when you know the exact provider - for example, a dedicated "Sign in with Okta" button.                                               |
 
-## Test the login flow
+## Test the sign-in flow
 
-1. Open your application and trigger SSO login (or use the curl command above)
-2. You should be redirected to your IdP's login page
+1. Open your application and trigger SSO sign-in (or use the curl command above)
+2. You should be redirected to your IdP's sign-in page
 3. After authenticating, the IdP posts back to the ACS endpoint
 4. Auth processes the assertion and redirects you back to your `SITE_URL` (or `redirect_to` URL) with session tokens
 
@@ -523,7 +514,7 @@ To verify the session was created:
 ```sh
 curl 'http://<your-domain>/auth/v1/user' \
   -H 'Authorization: Bearer user-session-token' \
-  -H 'apikey: your-anon-key'
+  -H 'apikey: your-supabase-publishable-key'
 ```
 
 The response should include `app_metadata.provider: "sso:saml"` and any mapped attributes in `user_metadata`.

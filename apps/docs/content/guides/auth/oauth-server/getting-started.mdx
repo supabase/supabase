@@ -163,7 +163,7 @@ This is where you build the **frontend** for your authorization flow. When third
 Your authorization UI should:
 
 1. **Extract authorization_id** - Get the `authorization_id` from the URL query parameters
-2. **Authenticate the user** - If not already logged in, redirect to your login page (preserving the authorization_id)
+2. **Authenticate the user** - If not already signed in, redirect to your sign-in page (preserving the authorization_id)
 3. **Retrieve authorization details** - Use `supabase.auth.oauth.getAuthorizationDetails(authorization_id)` to get client information including requested scopes
 4. **Display consent screen** - Show the user what app is requesting access and what scopes/permissions are being requested
 5. **Handle user decision** - Call either `approveAuthorization(authorization_id)` or `denyAuthorization(authorization_id)` based on user choice
@@ -455,7 +455,7 @@ export function OAuthConsent() {
 
 1. **User navigates to your authorization path** - When a third-party app initiates OAuth, Supabase Auth redirects the user to your configured authorization path (e.g., `https://example.com/oauth/consent?authorization_id=<id>`)
 2. **Extract authorization_id** - Your page extracts the `authorization_id` from the URL query parameters
-3. **Check authentication** - Your page checks if the user is logged in, redirecting to login if not (preserving the authorization_id)
+3. **Check authentication** - Your page checks if the user is signed in, redirecting to sign in if not (preserving the authorization_id)
 4. **Retrieve details** - Call `supabase.auth.oauth.getAuthorizationDetails(authorization_id)` to get information about the requesting client
 5. **Show consent screen** - Display a UI asking the user to approve or deny access
 6. **Handle decision** - When the user clicks approve/deny:

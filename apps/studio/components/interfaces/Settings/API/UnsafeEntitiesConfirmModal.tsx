@@ -21,28 +21,28 @@ const ENTITY_TYPE_META: Record<
     heading: 'Tables without Row Level Security',
     recommendation: 'Enable RLS on these tables to control access per-row.',
     docsUrl:
-      'https://supabase.com/docs/guides/database/database-linter?lint=0013_rls_disabled_in_public',
+      'https://supabase.com/docs/guides/observability/advisors?lint=0013_rls_disabled_in_public',
   },
   'foreign table': {
     heading: 'Foreign tables',
     recommendation:
       'Foreign tables do not support RLS. Revoke access from the anon and authenticated roles.',
     docsUrl:
-      'https://supabase.com/docs/guides/database/database-linter?lint=0017_foreign_table_in_api',
+      'https://supabase.com/docs/guides/observability/advisors?lint=0017_foreign_table_in_api',
   },
   'materialized view': {
     heading: 'Materialized views',
     recommendation:
       'Materialized views do not support RLS. Revoke access from the anon and authenticated roles.',
     docsUrl:
-      'https://supabase.com/docs/guides/database/database-linter?lint=0016_materialized_view_in_api',
+      'https://supabase.com/docs/guides/observability/advisors?lint=0016_materialized_view_in_api',
   },
   view: {
     heading: 'Views without SECURITY INVOKER',
     recommendation:
       'These views run with the permissions of the view creator, not the querying user. Set SECURITY INVOKER to enforce caller permissions.',
     docsUrl:
-      'https://supabase.com/docs/guides/database/database-linter?lint=0010_security_definer_view',
+      'https://supabase.com/docs/guides/observability/advisors?lint=0010_security_definer_view',
   },
 }
 
