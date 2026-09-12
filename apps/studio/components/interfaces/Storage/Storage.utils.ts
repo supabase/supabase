@@ -140,22 +140,30 @@ export const getPolicyBucketNames = (policy: {
  * Whether a policy applies to `bucketName` and to nothing else — the only case where it is
  * safe to remove the policy along with the bucket.
  *
- * Naming exactly one bucket is necessary but not sufficient: `(bucket_id = 'avatars') OR
- * (owner = auth.uid())` names only `avatars` yet still grants access to the caller's objects
- * in every other bucket. Rather than parse the expression, anything carrying an `OR`, a
- * `NOT` or a subquery is treated as non-exclusive. The bias is deliberate — leaving a stale
- * policy behind is recoverable, deleting a live one is not.
+ * Every clause the policy actually has must independently confine it to the bucket, because
+ * USING and WITH CHECK govern different operations. `using (owner = auth.uid()) with check
+ * (bucket_id = 'avatars')` mentions one bucket between the two, yet its USING half still
+ * grants the caller access to their objects in every other bucket.
+ *
+ * Naming one bucket is not sufficient either: `(bucket_id = 'avatars') OR (owner =
+ * auth.uid())` names only `avatars` and still reaches beyond it. Rather than parse the
+ * expression, any clause carrying an `OR`, a `NOT` or a subquery is treated as
+ * non-exclusive. The bias is deliberate — leaving a stale policy behind is recoverable,
+ * deleting a live one is not.
  */
 export const isPolicyExclusiveToBucket = (
   policy: { definition: string | null; check: string | null },
   bucketName: string
 ): boolean => {
-  const names = getPolicyBucketNames(policy)
-  if (names.length !== 1 || names[0] !== bucketName) return false
+  const clauses = [policy.definition, policy.check].filter((clause): clause is string => !!clause)
+  if (clauses.length === 0) return false
 
-  return [policy.definition, policy.check].every(
-    (clause) => !clause || !NON_EXCLUSIVE_CLAUSE_REGEX.test(clause)
-  )
+  return clauses.every((clause) => {
+    if (NON_EXCLUSIVE_CLAUSE_REGEX.test(clause)) return false
+
+    const names = getPolicyBucketNames({ definition: clause, check: null })
+    return names.length === 1 && names[0] === bucketName
+  })
 }
 
 const groupPoliciesByBucket = (policies: (Policy & { buckets: (string | Symbol)[] })[]) => {

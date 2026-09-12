@@ -176,6 +176,36 @@ describe('isPolicyExclusiveToBucket', () => {
     expect(isPolicyExclusiveToBucket(policy('(owner = auth.uid())'), 'avatars')).toBe(false)
   })
 
+  test('rejects a policy whose other clause is unrestricted', () => {
+    // `using (owner = auth.uid()) with check (bucket_id = 'avatars')` still lets the caller
+    // read their own objects in every other bucket, so the bucket does not own it
+    expect(
+      isPolicyExclusiveToBucket(
+        policy('(owner = auth.uid())', "(bucket_id = 'avatars'::text)"),
+        'avatars'
+      )
+    ).toBe(false)
+    expect(
+      isPolicyExclusiveToBucket(
+        policy("(bucket_id = 'avatars'::text)", '(owner = auth.uid())'),
+        'avatars'
+      )
+    ).toBe(false)
+  })
+
+  test('accepts a policy whose every clause is confined to the bucket', () => {
+    expect(
+      isPolicyExclusiveToBucket(
+        policy("(bucket_id = 'avatars'::text)", "(bucket_id = 'avatars'::text)"),
+        'avatars'
+      )
+    ).toBe(true)
+  })
+
+  test('rejects a policy with no clauses at all', () => {
+    expect(isPolicyExclusiveToBucket(policy(null, null), 'avatars')).toBe(false)
+  })
+
   test('checks the WITH CHECK clause too', () => {
     expect(
       isPolicyExclusiveToBucket(
