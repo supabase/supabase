@@ -46,6 +46,7 @@ interface AdvisorFiltersProps {
   onStatusFiltersChange: (filters: string[]) => void
   onClose: () => void
   isPlatform?: boolean
+  isHealthAdvisorEnabled?: boolean
 }
 
 export const AdvisorFilters = ({
@@ -57,10 +58,11 @@ export const AdvisorFilters = ({
   onStatusFiltersChange,
   onClose,
   isPlatform = false,
+  isHealthAdvisorEnabled = false,
 }: AdvisorFiltersProps) => {
-  const categoryOptions = (isPlatform ? platformCategories : selfHostedCategories).map(
-    (category) => ({ label: advisorCategoryLabels[category], value: category })
-  )
+  const categoryOptions = (isPlatform ? platformCategories : selfHostedCategories)
+    .filter((category) => isHealthAdvisorEnabled || category !== 'health')
+    .map((category) => ({ label: advisorCategoryLabels[category], value: category }))
 
   return (
     <div className="border-b overflow-x-auto">
