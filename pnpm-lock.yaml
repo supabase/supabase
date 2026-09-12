@@ -1155,6 +1155,9 @@ importers:
       generate-password-browser:
         specifier: ^1.1.0
         version: 1.1.0
+      gqlmin:
+        specifier: ^0.3.1
+        version: 0.3.1
       graphiql:
         specifier: ^5.2.2
         version: 5.2.2(@emotion/is-prop-valid@1.4.0)(@types/node@22.13.14)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(graphql-ws@5.14.1(graphql@16.11.0))(graphql@16.11.0)(immer@10.1.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(use-sync-external-store@1.6.0(react@19.2.6))
