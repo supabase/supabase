@@ -4,9 +4,11 @@ import { useSyncExternalStore } from 'react'
 import type * as React from 'react'
 
 export const detectBrowser = () => {
-  if (!navigator) return undefined
+  if (typeof navigator === 'undefined') return undefined
 
-  if (navigator.userAgent.indexOf('Chrome') !== -1) {
+  if (navigator.userAgent.indexOf('Edg') !== -1) {
+    return 'Edge'
+  } else if (navigator.userAgent.indexOf('Chrome') !== -1) {
     return 'Chrome'
   } else if (navigator.userAgent.indexOf('Firefox') !== -1) {
     return 'Firefox'
@@ -46,10 +48,8 @@ export function mergeRefs<T>(...refs: React.Ref<T>[]): React.RefCallback<T> {
     refs.forEach((ref) => {
       if (typeof ref === 'function') {
         ref(value)
-      } else if (ref !== null) {
-        if (typeof ref === 'object' && ref !== null && 'current' in ref) {
-          ;(ref as any).current = value
-        }
+      } else if (ref != null && typeof ref === 'object' && 'current' in ref) {
+        ;(ref as any).current = value
       }
     })
   }
