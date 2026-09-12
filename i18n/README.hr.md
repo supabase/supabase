@@ -31,7 +31,7 @@ Pratite "izdanja" ovog repozitorija da bi bili obaviješteni o većim ažuriranj
 
 Za cjelovitu dokumentaciju, posjetite [supabase.com/docs](https://supabase.com/docs)
 
-Za informacije kako doprinijeti razvoju, posjetite [Početak rada](./DEVELOPERS.md)
+Za informacije kako doprinijeti razvoju, posjetite [Početak rada](../DEVELOPERS.md)
 
 ## Zajednica & Podrška
 
@@ -49,7 +49,7 @@ Supabase je kombinacija alata otvorenog koda. Izgrađujemo funkcionalnosti Fireb
 Supabase je [hostana platforma](https://supabase.com/dashboard). Možete se registrirati i odmah počet koristiti Supabase bez ikakvih instalacija.
 Također možete ju [samostalno hostati](https://supabase.com/docs/guides/hosting/overview) i [razvijati lokalno](https://supabase.com/docs/guides/local-development).
 
-![Arhitektura](apps/docs/public/img/supabase-architecture.svg)
+![Arhitektura](../apps/docs/public/img/supabase-architecture.svg)
 
 - [Postgres](https://www.postgresql.org/) je objektno-relacijska baza podataka koja je aktivno u razvoju preko 30 godina i na glasu je kao jako pouzdana, robusna i performantna.
 - [Realtime](https://github.com/supabase/realtime) je Elixir server koji vam dopušta da prisluškujete unose, ažuriranja i brisanja u PostgreSQL bazi koristeći websockete. Realtime prati Postgres-ovu funkcionalnost repliciranja i osluškuje promjene u bazi podataka, te iste upakira u JSON, na kraju emitira taj JSON preko websocketa do autoriziranih klijenata.

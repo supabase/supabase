@@ -34,7 +34,7 @@
 
 للحصول على الشرح الكامل، قم بزيارة [supabase.com/docs](https://supabase.com/docs).
 
-لمعرفه كيفية دعم المشروع قم بزيارة [Getting Started](./DEVELOPERS.md).
+لمعرفه كيفية دعم المشروع قم بزيارة [Getting Started](../DEVELOPERS.md).
 
 ## المجتمع والدعم
 
