@@ -128,6 +128,9 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     Object.keys(values).map((x: string) => {
       if (doubleNegativeKeys.includes(x)) payload[x] = !values[x]
       if (payload[x] === '') payload[x] = null
+      if (x === 'SMS_TEMPLATE' && typeof payload[x] === 'string') {
+        payload[x] = payload[x].replace(/\\n/g, '\n')
+      }
     })
 
     // The backend uses empty string to represent no required characters in the password
