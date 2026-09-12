@@ -142,6 +142,10 @@ For Flutter applications, you can link an identity using an ID token obtained fr
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+/// TODO: update the client IDs with the ones you registered with Google Cloud.
+const webClientId = 'my-web.apps.googleusercontent.com';
+const iosClientId = 'my-ios.apps.googleusercontent.com';
+
 // First, obtain the ID token from the native provider
 final scopes = ['email', 'profile'];
 final googleSignIn = GoogleSignIn.instance;
@@ -156,11 +160,16 @@ final googleUser = await googleSignIn.authenticate();
 final authorization =
     await googleUser.authorizationClient.authorizationForScopes(scopes) ??
     await googleUser.authorizationClient.authorizeScopes(scopes);
+final idToken = googleUser.authentication.idToken;
+
+if (idToken == null) {
+  throw AuthException('No ID Token found.');
+}
 
 // Link the Google identity to the current user
 final response = await supabase.auth.linkIdentityWithIdToken(
   provider: OAuthProvider.google,
-  idToken: googleUser.authentication.idToken!,
+  idToken: idToken,
   accessToken: authorization.accessToken,
 );
 ```
