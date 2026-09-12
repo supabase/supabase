@@ -1,0 +1,34 @@
+---
+title = "Cost confirmations do not appear in your MCP client"
+topics = [ "ai" ]
+keywords = [
+"mcp",
+"elicitation",
+"cost",
+"confirmation",
+"get_cost",
+"confirm_cost",
+"create_project",
+"create_branch",
+]
+---
+
+The Supabase MCP server asks for [confirmation through your MCP client](/docs/guides/ai-tools/mcp#cost-confirmation) before `create_project` or `create_branch` creates a resource that incurs charges. If you expect a confirmation dialog and don't see one, work through these checks.
+
+## Your client uses the `get_cost` and `confirm_cost` flow
+
+Cost confirmation dialogs appear in clients that connect using MCP specification revision 2026-07-28 or later and support form elicitations. Clients on older revisions of the specification use the `get_cost` and `confirm_cost` tools instead. On that flow, the agent quotes the cost in chat and asks you before creating the resource. No dialog appears, and this is the expected behavior for these clients.
+
+To check which flow your connection uses, ask your client to list the available Supabase tools. If `get_cost` and `confirm_cost` are in the list, your connection uses that flow.
+
+## The creation has no cost
+
+When a creation is free, for example a project that is covered by your plan, no confirmation is requested and the resource is created directly.
+
+## Your client answers elicitations automatically
+
+Some clients support hooks or rules that respond to elicitations without showing a dialog. If resources are created without a visible confirmation on a client that supports the dialog, check your client's elicitation or hook configuration.
+
+## Still stuck?
+
+If none of these explain what you're seeing, open an issue on the [Supabase MCP repository](https://github.com/supabase/mcp) with your client name and version.
