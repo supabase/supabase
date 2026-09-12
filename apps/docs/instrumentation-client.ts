@@ -4,9 +4,9 @@
 
 import * as Sentry from '@sentry/nextjs'
 import { hasConsented, IS_PLATFORM } from 'common'
+import { filterSentryEvent } from 'common/sentry'
 
 import { IS_DEV } from './lib/constants'
-import { filterSentryEvent } from './lib/sentry-client'
 
 if (!IS_DEV) {
   Sentry.init({
