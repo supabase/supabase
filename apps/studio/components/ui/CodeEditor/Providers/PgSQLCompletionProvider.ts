@@ -1,27 +1,59 @@
+import type { Monaco } from '@monaco-editor/react'
+import type { editor, languages, Position } from 'monaco-editor'
 import type { RefObject } from 'react'
 
 import BackwardIterator from './BackwardIterator'
-import type { DatabaseFunction } from '@/data/database-functions/database-functions-query'
+import {
+  filterTablesByReferences,
+  getFromClauseTables,
+  getStatementAtOffset,
+  parseTrailingDotIdent,
+  resolveTablesForIdent,
+} from './PgSQLCompletionProvider.utils'
+import type { PgInfo } from './Providers.types'
+import type { SavedDatabaseFunction } from '@/data/database-functions/database-functions-query'
 import type { Schema } from '@/data/database/schemas-query'
 import type { TableColumn } from '@/data/database/table-columns-query'
 
-// [Joshen] Needs to be fixed
+type TableColumnField = {
+  attname: string
+  data_type: string
+}
 
-export default function getPgsqlCompletionProvider(monaco: any, pgInfoRef: RefObject<any>) {
+type QuotableIdent = {
+  isQuoted: boolean
+  name: string
+}
+
+const EMPTY_IDENT: QuotableIdent = { isQuoted: false, name: '' }
+
+export function getPgsqlCompletionProvider(
+  monaco: Monaco,
+  pgInfoRef: RefObject<PgInfo | null>
+): languages.CompletionItemProvider {
   return {
     triggerCharacters: [' ', '.', '"'],
-    provideCompletionItems: function (model: any, position: any, context: any) {
+    provideCompletionItems: function (
+      model: editor.ITextModel,
+      position: Position,
+      context: languages.CompletionContext
+    ) {
       try {
+        const pgInfo = pgInfoRef.current
+        if (!pgInfo) return { suggestions: [] }
+
         // position.column should minus 2 as it returns 2 for first char
         // position.lineNumber should minus 1
-        let iterator = new BackwardIterator(model, position.column - 2, position.lineNumber - 1)
+        const iterator = new BackwardIterator(model, position.column - 2, position.lineNumber - 1)
+        const { range, isQuoted } = getReplacementRange(model, position)
+        const statement = getStatementAtOffset(model.getValue(), model.getOffsetAt(position))
 
         if (context.triggerCharacter === '"') {
-          return startingQuoteScenarioSuggestions(monaco, pgInfoRef, iterator)
+          return startingQuoteScenarioSuggestions(monaco, pgInfo, iterator, range, isQuoted)
         } else if (context.triggerCharacter === '.') {
-          return dotScenarioSuggestions(monaco, pgInfoRef, iterator)
+          return dotScenarioSuggestions(monaco, pgInfo, iterator, range, statement, isQuoted)
         } else {
-          return defaultScenarioSuggestions(monaco, pgInfoRef)
+          return defaultScenarioSuggestions(monaco, pgInfo, statement, range, isQuoted)
         }
       } catch (_) {
         // any error, returns empty suggestion
@@ -31,10 +63,44 @@ export default function getPgsqlCompletionProvider(monaco: any, pgInfoRef: RefOb
   }
 }
 
-function startingQuoteScenarioSuggestions(monaco: any, pgInfoRef: RefObject<any>, iterator: any) {
-  const items: any[] = []
+// Monaco requires a range on every completion item; when one isn't supplied it falls back to
+// replacing the current word anyway, so we compute that explicitly rather than leave it implicit.
+//
+// `"` is a word separator for Monaco, so `getWordUntilPosition` never includes surrounding double
+// quotes in the word it finds. When the identifier being completed already sits between a pair of
+// them (typed by hand, or auto-closed by the editor as you type the opening quote), we expand the
+// range to swallow both quotes and flag `isQuoted` so callers always emit fully-quoted insertText —
+// otherwise a quoted insertText lands inside the untouched existing quotes and doubles them up.
+function getReplacementRange(
+  model: editor.ITextModel,
+  position: Position
+): { range: languages.CompletionItem['range']; isQuoted: boolean } {
+  const word = model.getWordUntilPosition(position)
+  const line = model.getLineContent(position.lineNumber)
+  const isQuoted =
+    line.charAt(word.startColumn - 2) === '"' && line.charAt(word.endColumn - 1) === '"'
 
-  let startingQuotedIdent = iterator.isFowardDQuote()
+  return {
+    range: {
+      startLineNumber: position.lineNumber,
+      endLineNumber: position.lineNumber,
+      startColumn: isQuoted ? word.startColumn - 1 : word.startColumn,
+      endColumn: isQuoted ? word.endColumn + 1 : word.endColumn,
+    },
+    isQuoted,
+  }
+}
+
+function startingQuoteScenarioSuggestions(
+  monaco: Monaco,
+  pgInfo: PgInfo,
+  iterator: BackwardIterator,
+  range: languages.CompletionItem['range'],
+  isQuoted: boolean
+) {
+  const items: languages.CompletionItem[] = []
+
+  const startingQuotedIdent = iterator.isFowardDQuote()
   if (!startingQuotedIdent) return { suggestions: items }
 
   iterator.next() // get passed the starting quote
@@ -46,7 +112,7 @@ function startingQuoteScenarioSuggestions(monaco: any, pgInfoRef: RefObject<any>
       isQuotedIdent = true
       ident = fixQuotedIdent(ident)
     }
-    let table = pgInfoRef.current.tableColumns.find((tbl: TableColumn) => {
+    const table = pgInfo.tableColumns.find((tbl: TableColumn) => {
       return (
         (isQuotedIdent && tbl.tablename === ident) ||
         (!isQuotedIdent && tbl.tablename.toLocaleLowerCase() == ident.toLocaleLowerCase())
@@ -54,21 +120,24 @@ function startingQuoteScenarioSuggestions(monaco: any, pgInfoRef: RefObject<any>
     })
 
     if (!table) return { suggestions: items }
-    table.columns.forEach((field: any) => {
+    table.columns.forEach((field: TableColumnField | null) => {
+      if (!field) return
       items.push({
         label: field.attname,
         kind: monaco.languages.CompletionItemKind.Property,
         detail: field.data_type,
-        insertText: field.attname,
+        insertText: formatInsertText(field.attname, isQuoted),
+        range,
       })
     })
   } else {
     // probably a table - list the tables
-    pgInfoRef.current.tableColumns.forEach((table: TableColumn) => {
+    pgInfo.tableColumns.forEach((table: TableColumn) => {
       items.push({
         label: table.tablename,
         kind: monaco.languages.CompletionItemKind.Class,
-        insertText: table.tablename,
+        insertText: formatInsertText(table.tablename, isQuoted),
+        range,
       })
     })
   }
@@ -76,58 +145,96 @@ function startingQuoteScenarioSuggestions(monaco: any, pgInfoRef: RefObject<any>
   return { suggestions: items }
 }
 
-function dotScenarioSuggestions(monaco: any, pgInfoRef: RefObject<any>, iterator: any) {
-  const items: any[] = []
+function dotScenarioSuggestions(
+  monaco: Monaco,
+  pgInfo: PgInfo,
+  iterator: BackwardIterator,
+  range: languages.CompletionItem['range'],
+  statement: string,
+  isQuoted: boolean
+) {
+  const items: languages.CompletionItem[] = []
 
-  let idents = readIdents(iterator, 3)
+  const idents = readIdents(iterator, 3)
   let pos = 0
 
-  let schema = pgInfoRef.current.schemas.find((sch: Schema) => {
-    const _ident = idents && idents.length > pos ? idents[pos] : {}
+  let schema = pgInfo.schemas.find((sch: Schema) => {
+    const _ident = idents.length > pos ? idents[pos] : EMPTY_IDENT
     return (
       (_ident.isQuoted && sch.name === _ident.name) ||
-      (!_ident.isQuoted && sch.name?.toLocaleLowerCase() == _ident.name?.toLocaleLowerCase())
+      (!_ident.isQuoted && sch.name.toLocaleLowerCase() == _ident.name.toLocaleLowerCase())
     )
   })
 
+  // A schema can't be part of an alias (`myschema.c.id` isn't valid SQL), so only
+  // attempt alias resolution when nothing before this ident was consumed as a schema.
+  // This must happen before the `public`-schema fallback/early-return below, so `c.`
+  // resolves via the FROM/JOIN alias even in a database with no `public` schema.
   if (!schema) {
-    schema = pgInfoRef.current.schemas.find((sch: Schema) => {
-      return sch.name == 'public'
-    })
+    const tableIdent = idents.length > pos ? idents[pos] : EMPTY_IDENT
+    const aliasedTables = resolveTablesForIdent(
+      pgInfo.tableColumns,
+      getFromClauseTables(statement),
+      tableIdent
+    )
+    if (aliasedTables.length > 0) {
+      aliasedTables[0].columns.forEach((field: TableColumnField | null) => {
+        if (!field) return
+        items.push({
+          label: field.attname,
+          kind: monaco.languages.CompletionItemKind.Property,
+          detail: field.data_type,
+          insertText: formatInsertText(field.attname, isQuoted),
+          range,
+        })
+      })
+      return { suggestions: items }
+    }
   } else {
     pos++
   }
 
+  if (!schema) {
+    schema = pgInfo.schemas.find((sch: Schema) => sch.name == 'public')
+  }
+
+  // No custom schema and no `public` schema either — nothing sensible to suggest.
+  if (!schema) return { suggestions: items }
+
   if (idents.length == pos) {
-    pgInfoRef.current.tableColumns.forEach((tbl: TableColumn) => {
+    pgInfo.tableColumns.forEach((tbl: TableColumn) => {
       if (tbl.schemaname != schema.name) {
         return
       }
       items.push({
         label: tbl.tablename,
         kind: monaco.languages.CompletionItemKind.Class,
-        detail: tbl.schemaname !== 'public' ? tbl.schemaname : null,
-        insertText: formatInsertText(tbl.tablename),
+        detail: tbl.schemaname !== 'public' ? tbl.schemaname : undefined,
+        insertText: formatInsertText(tbl.tablename, isQuoted),
+        range,
       })
     })
     return { suggestions: items }
   }
 
-  let table = pgInfoRef.current.tableColumns.find((tbl: TableColumn) => {
-    const _ident = idents && idents.length > pos ? idents[pos] : {}
-    return (
-      (tbl.schemaname == schema.name && _ident.isQuoted && tbl.tablename === _ident.name) ||
-      (!_ident.isQuoted && tbl.tablename?.toLocaleLowerCase() == _ident.name?.toLocaleLowerCase())
-    )
+  const tableIdent = idents.length > pos ? idents[pos] : EMPTY_IDENT
+
+  const table = pgInfo.tableColumns.find((tbl: TableColumn) => {
+    if (tbl.schemaname !== schema.name) return false
+    return tableIdent.isQuoted
+      ? tbl.tablename === tableIdent.name
+      : tbl.tablename.toLocaleLowerCase() == tableIdent.name.toLocaleLowerCase()
   })
 
   if (table) {
-    table.columns.forEach((field: any) => {
+    table.columns.forEach((field: TableColumnField | null) => {
+      if (!field) return
       items.push({
         label: field.attname,
         kind: monaco.languages.CompletionItemKind.Property,
         detail: field.data_type,
-        insertText: formatInsertText(field.attname),
+        insertText: formatInsertText(field.attname, isQuoted),
+        range,
       })
     })
   }
@@ -135,77 +242,113 @@ function dotScenarioSuggestions(monaco: any, pgInfoRef: RefObject<any>, iterator
   return { suggestions: items }
 }
 
-function defaultScenarioSuggestions(monaco: any, pgInfoRef: RefObject<any>) {
-  const items: any = []
+function defaultScenarioSuggestions(
+  monaco: Monaco,
+  pgInfo: PgInfo,
+  statement: string,
+  range: languages.CompletionItem['range'],
+  isQuoted: boolean
+) {
+  const items: languages.CompletionItem[] = []
 
-  if (pgInfoRef.current.keywords?.length > 0) {
-    pgInfoRef.current.keywords.forEach((x: string) => {
-      items.push({
-        label: x,
-        kind: monaco.languages.CompletionItemKind.Keyword,
-        insertText: x,
-      })
+  pgInfo.keywords.forEach((x: string) => {
+    items.push({
+      label: x,
+      kind: monaco.languages.CompletionItemKind.Keyword,
+      insertText: x,
+      range,
     })
-  }
+  })
 
-  if (pgInfoRef.current.schemas?.length > 0) {
-    pgInfoRef.current.schemas.forEach((x: Schema) => {
-      items.push({
-        label: x.name,
-        kind: monaco.languages.CompletionItemKind.Keyword,
-        insertText: x.name,
-      })
+  pgInfo.schemas.forEach((x: Schema) => {
+    items.push({
+      label: x.name,
+      kind: monaco.languages.CompletionItemKind.Keyword,
+      insertText: x.name,
+      range,
     })
-  }
+  })
 
-  if (pgInfoRef.current.tableColumns?.length > 0) {
-    pgInfoRef.current.tableColumns.forEach((x: TableColumn) => {
-      const insertText = x.schemaname == 'public' ? x.tablename : x.schemaname + '.' + x.tablename
-      items.push({
-        label: x.tablename,
-        detail: x.schemaname !== 'public' ? x.schemaname : null,
-        kind: x.is_table
-          ? monaco.languages.CompletionItemKind.Class
-          : monaco.languages.CompletionItemKind.Interface,
-        insertText: formatInsertText(insertText),
-      })
-      x.columns.forEach((field: any) => {
-        if (!field) return
+  const allTableColumns = pgInfo.tableColumns
 
-        let foundItem = items.find(
-          (i: any) =>
-            i.label === field?.attname &&
-            i.kind === monaco.languages.CompletionItemKind.Field &&
-            i.detail === field?.data_type
-        )
-        if (foundItem) {
-          foundItem.tables.push(x.tablename)
-          foundItem.tables.sort()
-          foundItem.documentation = foundItem.tables.join(', ')
-        } else {
-          items.push({
-            label: field.attname,
-            kind: monaco.languages.CompletionItemKind.Field,
-            detail: field.data_type,
-            documentation: x.tablename,
-            tables: [x.tablename],
-            insertText: formatInsertText(field.attname),
-          })
+  allTableColumns.forEach((x: TableColumn) => {
+    const insertText = x.schemaname == 'public' ? x.tablename : x.schemaname + '.' + x.tablename
+    items.push({
+      label: x.tablename,
+      detail: x.schemaname !== 'public' ? x.schemaname : undefined,
+      kind: x.is_table
+        ? monaco.languages.CompletionItemKind.Class
+        : monaco.languages.CompletionItemKind.Interface,
+      insertText: formatInsertText(insertText, isQuoted),
+      range,
+    })
+  })
+
+  // Narrow column suggestions down to the table(s) referenced in the current
+  // statement's FROM/JOIN clauses (e.g. `select * from colors where |` should
+  // only suggest colors' columns). Falls back to every table's columns when
+  // none can be resolved, e.g. before a FROM clause has been typed.
+  const fromClauseTables = getFromClauseTables(statement)
+
+  // If the statement ends with `alias.` (Monaco can re-request suggestions this way
+  // right after the dot, without going through the dot-trigger scenario), scope
+  // strictly to that one alias/table instead of every FROM/JOIN table — otherwise
+  // e.g. `c.` after `orders o join customers c` would suggest orders' columns too.
+  const trailingDotIdent = parseTrailingDotIdent(statement)
+  const aliasScopedTableColumns = trailingDotIdent
+    ? resolveTablesForIdent(allTableColumns, fromClauseTables, trailingDotIdent)
+    : []
+
+  const inScopeTableColumns =
+    aliasScopedTableColumns.length > 0
+      ? aliasScopedTableColumns
+      : filterTablesByReferences(allTableColumns, fromClauseTables)
+  const hasResolvedFromTables = inScopeTableColumns.length > 0
+  const relevantTableColumns = hasResolvedFromTables ? inScopeTableColumns : allTableColumns
+
+  // Monaco sorts suggestions by sortText (falling back to label) when nothing has been typed
+  // yet, so without this, columns get buried alphabetically amongst keywords/functions. Rank
+  // them first once we know which table(s) are in scope; leave sorting untouched otherwise
+  // (e.g. before FROM is typed). Columns sharing a name+type across in-scope tables are merged
+  // into one suggestion, tracked here rather than on the item itself so the item stays a plain
+  // Monaco CompletionItem.
+  const columnItemsByKey = new Map<string, { item: languages.CompletionItem; tables: string[] }>()
+
+  relevantTableColumns.forEach((x: TableColumn) => {
+    x.columns.forEach((field: TableColumnField | null) => {
+      if (!field) return
+
+      const key = `${field.attname}::${field.data_type}`
+      const existing = columnItemsByKey.get(key)
+      if (existing) {
+        existing.tables.push(x.tablename)
+        existing.tables.sort()
+        existing.item.documentation = existing.tables.join(', ')
+      } else {
+        const item: languages.CompletionItem = {
+          label: field.attname,
+          kind: monaco.languages.CompletionItemKind.Field,
+          detail: field.data_type,
+          documentation: x.tablename,
+          insertText: formatInsertText(field.attname, isQuoted),
+          range,
+          sortText: hasResolvedFromTables ? `0_${field.attname}` : undefined,
         }
-      })
+        columnItemsByKey.set(key, { item, tables: [x.tablename] })
+        items.push(item)
+      }
     })
-  }
+  })
 
-  if (pgInfoRef.current.functions?.length > 0) {
-    pgInfoRef.current.functions.forEach((x: DatabaseFunction) => {
-      items.push({
-        label: x.name,
-        kind: monaco.languages.CompletionItemKind.Function,
-        detail: x.return_type,
-        insertText: x.name,
-      })
+  pgInfo.functions.forEach((x: SavedDatabaseFunction) => {
+    items.push({
+      label: x.name,
+      kind: monaco.languages.CompletionItemKind.Function,
+      detail: x.return_type,
+      insertText: x.name,
+      range,
     })
-  }
+  })
 
   return { suggestions: items }
 }
@@ -214,18 +357,18 @@ function fixQuotedIdent(str: string) {
   return str.replace(/^\"/, '').replace(/\"$/, '').replace(/\"\"/, '"')
 }
 
-function readIdents(iterator: any, maxlvl: number) {
+function readIdents(iterator: BackwardIterator, maxlvl: number): QuotableIdent[] {
   return iterator.readIdents(maxlvl).map((name: string) => {
     let isQuoted = false
     if (name.match(/^\".*?\"$/)) {
       isQuoted = true
       name = fixQuotedIdent(name)
     }
-    return { isQuoted: isQuoted, name: name }
+    return { isQuoted, name }
   })
 }
 
-function formatInsertText(value: string) {
+function formatInsertText(value: string, forceQuote = false) {
   const hasUpperCase = !(value == value.toLowerCase())
-  return hasUpperCase ? `"${value}"` : value
+  return hasUpperCase || forceQuote ? `"${value}"` : value
 }
