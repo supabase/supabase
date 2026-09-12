@@ -31,24 +31,59 @@ await supabase.auth.signInWithOAuth({
 
 In the server, you need to handle the redirect to the OAuth provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to.
 
-```js
-import { createClient, type Provider } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
-const provider = 'provider' as Provider
-const redirect = (url: string) => {}
+**Important:** use a [server client](/docs/guides/auth/server-side/creating-a-client) from `@supabase/ssr` so the PKCE code verifier is written to cookies, and pass those `Set-Cookie` headers on the redirect. Without them, the callback cannot exchange the code for a session.
 
-// ---cut---
-const { data, error } = await supabase.auth.signInWithOAuth({
-  provider,
-  options: {
-    redirectTo: 'http://example.com/auth/callback',
-  },
-})
+```ts
+import { redirect } from '@remix-run/node' // or your framework's redirect helper
+import {
+  createServerClient,
+  parseCookieHeader,
+  serializeCookieHeader,
+} from '@supabase/ssr'
+import type { Provider } from '@supabase/supabase-js'
 
-if (data.url) {
-  redirect(data.url) // use the redirect API for your server framework
+// Inside a loader or action that receives the Request:
+export async function action({ request }: { request: Request }) {
+  const headers = new Headers()
+  const provider = 'github' as Provider
+
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(request.headers.get('Cookie') ?? '')
+        },
+        setAll(cookiesToSet, cacheHeaders) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+          )
+          Object.entries(cacheHeaders).forEach(([key, value]) => headers.set(key, value))
+        },
+      },
+    }
+  )
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: 'http://example.com/auth/callback',
+    },
+  })
+
+  if (data.url) {
+    // Pass headers so the PKCE verifier cookie is set in the browser
+    return redirect(data.url, { headers })
+  }
+
+  if (error) {
+    throw error
+  }
 }
 ```
+
+Adapt `redirect` and how you apply `headers` to your framework (for example `NextResponse.redirect(url, { headers })` in Next.js, or `throw redirect(303, url)` after setting cookies on the response in SvelteKit).
 
 </TabPanel>
 
