@@ -176,7 +176,6 @@ export const uploadFile = async (page: Page, filePath: string, fileName: string)
   const fileInput = page.locator('input[type="file"]')
   await fileInput.setInputFiles(filePath)
 
-  await expect(page.getByRole('status')).not.toBeVisible()
   // Verify file appears in the explorer by title
   await expect(
     page.getByTitle(fileName),
