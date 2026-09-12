@@ -1187,6 +1187,10 @@ export const database: NavMenuConstant = {
           name: 'Customizing Postgres config',
           url: '/guides/database/custom-postgres-config' as `/${string}`,
         },
+        {
+          name: 'Postgres log configuration',
+          url: '/guides/database/postgres/postgres-log-config' as `/${string}`,
+        },
       ],
     },
     {
