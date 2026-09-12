@@ -75,26 +75,43 @@ const formatStoragePolicies = (buckets: Bucket[], policies: Policy[]) => {
   return formattedPolicies
 }
 
-/** `bucket_id = 'avatars'`, as Postgres renders a single-bucket policy. */
-const BUCKET_ID_EQUALS_REGEX = /bucket_id\s*=\s*'((?:[^']|'')*)'/g
+/**
+ * `bucket_id = 'avatars'`, as Postgres renders a single-bucket policy. The `\b` guards keep
+ * `archive_bucket_id` from reading as `bucket_id`, while still allowing a qualified
+ * `o.bucket_id`. A `NOT (` prefix is captured so negated matches can be discarded.
+ */
+const BUCKET_ID_EQUALS_REGEX = /(NOT\s*\(\s*)?\bbucket_id\b\s*=\s*'((?:[^']|'')*)'/gi
 /** `bucket_id = ANY (ARRAY['avatars'::text, 'logos'::text])`, how Postgres renders `bucket_id in (...)`. */
-const BUCKET_ID_IN_ARRAY_REGEX = /bucket_id\s*=\s*ANY\s*\(\s*ARRAY\s*\[([^\]]*)\]/gi
+const BUCKET_ID_IN_ARRAY_REGEX =
+  /(NOT\s*\(\s*)?\bbucket_id\b\s*=\s*ANY\s*\(\s*ARRAY\s*\[([^\]]*)\]/gi
 const QUOTED_LITERAL_REGEX = /'((?:[^']|'')*)'/g
+
+/**
+ * Constructs that let a policy keep applying outside the buckets it names: an alternative
+ * satisfying branch (`OR`), a negation (`NOT`, beyond the simple `<>` we already drop), or a
+ * subquery whose `bucket_id` belongs to some other table.
+ */
+const NON_EXCLUSIVE_CLAUSE_REGEX = /\b(?:OR|NOT|SELECT)\b/i
 
 const unquote = (literal: string) => literal.replace(/''/g, "'")
 
 /**
- * Collects every bucket a storage policy grants access to, across both its USING
- * (`definition`) and WITH CHECK (`check`) clauses.
+ * Collects every bucket a storage policy *references*, across both its USING (`definition`)
+ * and WITH CHECK (`check`) clauses.
  *
- * Postgres normalizes policy expressions before storing them, so the shapes we read back
- * are predictable: `bucket_id in ('avatars', 'logos')` comes back as
+ * Postgres normalizes policy expressions before storing them, so the shapes we read back are
+ * predictable: `bucket_id in ('avatars', 'logos')` comes back as
  * `bucket_id = ANY (ARRAY['avatars'::text, 'logos'::text])`, and both that form and plain
  * equality are collected.
  *
- * Negated conditions (`bucket_id <> 'avatars'`) deliberately contribute no buckets. Such a
- * policy applies to every bucket *except* the named one, so attributing it to that bucket
- * would be exactly backwards. Callers treat an empty result as "not tied to any one bucket".
+ * Negated conditions contribute no buckets, since such a policy applies to every bucket
+ * *except* the named one and attributing it there would be exactly backwards. That covers
+ * both `bucket_id <> 'avatars'` and the `NOT (bucket_id = 'avatars')` form, which Postgres
+ * stores verbatim rather than folding into `<>`.
+ *
+ * This is a lexical read of a normalized expression, not a Boolean proof: a policy may
+ * reference `avatars` and still apply elsewhere. Use it to decide where a policy is *shown*;
+ * for destructive actions use {@link isPolicyExclusiveToBucket}.
  */
 export const getPolicyBucketNames = (policy: {
   definition: string | null
@@ -103,17 +120,42 @@ export const getPolicyBucketNames = (policy: {
   const names = [policy.definition, policy.check].flatMap((clause) => {
     if (!clause) return []
 
-    const equality = Array.from(clause.matchAll(BUCKET_ID_EQUALS_REGEX), (match) =>
-      unquote(match[1])
-    )
-    const membership = Array.from(clause.matchAll(BUCKET_ID_IN_ARRAY_REGEX)).flatMap((match) =>
-      Array.from(match[1].matchAll(QUOTED_LITERAL_REGEX), (literal) => unquote(literal[1]))
-    )
+    const equality = Array.from(clause.matchAll(BUCKET_ID_EQUALS_REGEX))
+      .filter(([, negation]) => !negation)
+      .map(([, , name]) => unquote(name))
+
+    const membership = Array.from(clause.matchAll(BUCKET_ID_IN_ARRAY_REGEX))
+      .filter(([, negation]) => !negation)
+      .flatMap(([, , array]) =>
+        Array.from(array.matchAll(QUOTED_LITERAL_REGEX), (literal) => unquote(literal[1]))
+      )
 
     return [...equality, ...membership]
   })
 
   return Array.from(new Set(names))
+}
+
+/**
+ * Whether a policy applies to `bucketName` and to nothing else — the only case where it is
+ * safe to remove the policy along with the bucket.
+ *
+ * Naming exactly one bucket is necessary but not sufficient: `(bucket_id = 'avatars') OR
+ * (owner = auth.uid())` names only `avatars` yet still grants access to the caller's objects
+ * in every other bucket. Rather than parse the expression, anything carrying an `OR`, a
+ * `NOT` or a subquery is treated as non-exclusive. The bias is deliberate — leaving a stale
+ * policy behind is recoverable, deleting a live one is not.
+ */
+export const isPolicyExclusiveToBucket = (
+  policy: { definition: string | null; check: string | null },
+  bucketName: string
+): boolean => {
+  const names = getPolicyBucketNames(policy)
+  if (names.length !== 1 || names[0] !== bucketName) return false
+
+  return [policy.definition, policy.check].every(
+    (clause) => !clause || !NON_EXCLUSIVE_CLAUSE_REGEX.test(clause)
+  )
 }
 
 const groupPoliciesByBucket = (policies: (Policy & { buckets: (string | Symbol)[] })[]) => {

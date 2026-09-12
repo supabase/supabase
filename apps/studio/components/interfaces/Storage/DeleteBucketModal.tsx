@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
-import { getPolicyBucketNames } from './Storage.utils'
+import { isPolicyExclusiveToBucket } from './Storage.utils'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/database-policy-delete-mutation'
@@ -44,10 +44,9 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
       const bucketPolicies = (policies ?? []).filter((policy) => {
         if (policy.table !== 'objects') return false
 
-        // Only clean up policies that exclusively guard this bucket. A policy shared with
-        // other buckets, or one that names no bucket at all, must keep protecting them.
-        const policyBuckets = getPolicyBucketNames(policy)
-        return policyBuckets.length === 1 && policyBuckets[0] === bucket.name
+        // Only clean up policies that exclusively guard this bucket. Anything shared with
+        // other buckets, or that might still apply beyond them, must be left in place.
+        return isPolicyExclusiveToBucket(policy, bucket.name)
       })
 
       if (bucketPolicies.length === 0) return
