@@ -180,12 +180,12 @@ For further information, see [Authorization headers](/docs/guides/functions/auth
 
 ### UNAUTHORIZED_NO_AUTH_HEADER
 
-**Cause:** The Edge Function has JWT verification enabled, but the request is missing the `Authorization` or `apikey` header.
+**Cause:** The Edge Function has JWT verification enabled, but the request is missing a JWT in the `Authorization` header. An `apikey` header on its own does not satisfy JWT verification.
 
 **Solution:**
 
 - Ensure you are passing a valid JWT token in the `Authorization` header
-- Check that you are sending an API key in the `apikey` header
+- Check that the credential you are passing is a JWT. Publishable and secret keys (`sb_publishable_...`, `sb_secret_...`) are not JWTs, so they never satisfy JWT verification
 - For webhooks or public endpoints, consider disabling JWT verification
 
 ### UNAUTHORIZED_ASYMMETRIC_JWT
