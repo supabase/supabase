@@ -78,7 +78,9 @@ export const generateCreatePolicyQuery = ({
     return safeSql`${skeleton} with check (${check ?? safeSql``});`
   }
   const withUsing = safeSql`${skeleton} using (${using ?? safeSql``})`
-  if ((check ?? '').length > 0) {
+  // Postgres only accepts WITH CHECK for UPDATE and ALL here, and an empty
+  // expression is a syntax error, so a blank editor must not emit the clause
+  if (['update', 'all'].includes(command) && (check ?? '').trim().length > 0) {
     return safeSql`${withUsing} with check (${check ?? safeSql``});`
   }
   return safeSql`${withUsing};`
@@ -91,6 +93,11 @@ export const generateCreatePolicyQuery = ({
  * empty, so typing an expression into a previously empty editor is a change.
  * Empty form values never produce a payload field, because ALTER POLICY can
  * only replace an expression, not remove it.
+ *
+ * The check field is gated on the stored command, mirroring the create path:
+ * Postgres only accepts WITH CHECK for UPDATE and ALL (and INSERT, where the
+ * panel keeps the expression in the using editor), and ALTER POLICY cannot
+ * change a policy's command, so the form's command is irrelevant here.
  *
  * Expressions are returned as UntrustedSqlFragment — the caller promotes them
  * with acceptUntrustedSql in the submit handler.
@@ -121,13 +128,16 @@ export const generateUpdatePolicyPayload = (
   if (policyForm.name !== selectedPolicy.name) payload.name = policyForm.name
   if (!isEqual(selectedPolicy.roles, policyForm.roles)) payload.roles = policyForm.roles
 
+  const supportsWithCheck = ['UPDATE', 'ALL'].includes(selectedPolicy.command)
+
   if (selectedPolicy.command === 'INSERT') {
     // For INSERT policies editor one holds the with check expression
     if (!!usingVal && usingVal !== selectedPolicy.check) payload.check = untrustedSql(usingVal)
   } else {
     if (!!usingVal && usingVal !== selectedPolicy.definition)
       payload.definition = untrustedSql(usingVal)
-    if (!!checkVal && checkVal !== selectedPolicy.check) payload.check = untrustedSql(checkVal)
+    if (supportsWithCheck && !!checkVal && checkVal !== selectedPolicy.check)
+      payload.check = untrustedSql(checkVal)
   }
 
   return payload
