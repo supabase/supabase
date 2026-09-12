@@ -209,11 +209,19 @@ To access Supabase from a Next.js app, you need 2 types of Supabase clients:
 
 Since Next.js Server Components can't write cookies, you need a [Proxy](https://nextjs.org/docs/app/getting-started/proxy) to refresh expired Auth tokens and store them.
 
+<Admonition type="note">
+
+On Next.js 15 and earlier, a `proxy.ts` file is never called, so sessions never refresh and users get signed out. Next.js renamed this file in version 16. Before that, it's `middleware.ts` and the function is `export async function middleware`. The Supabase code inside it is the same either way.
+
+</Admonition>
+
 The Proxy is responsible for:
 
 1. Refreshing the Auth token by calling `supabase.auth.getClaims()`.
 2. Passing the refreshed Auth token to Server Components, so they don't attempt to refresh the same token themselves. This is accomplished with `request.cookies.set`.
 3. Passing the refreshed Auth token to the browser, so it replaces the old token. This is accomplished with `response.cookies.set`.
+
+Step 2 is what keeps users signed in. A refresh token can only be used once. Supabase allows a short window in which the same token can be presented again, which covers the normal SSR round trip, but a second refresh outside that window revokes the whole session. If the Proxy refreshes and a Server Component then refreshes again on the same request, users get signed out at random and the cause is hard to trace. Leave the refresh to the Proxy. See [refresh token reuse detection](/docs/guides/auth/sessions#what-is-refresh-token-reuse-detection-and-what-does-it-protect-from).
 
 <Accordion>
 
@@ -264,6 +272,20 @@ Create a `lib/supabase` folder at the root of your project, or inside the `./src
 ### Hook up proxy
 
 The code adds a [matcher](https://nextjs.org/docs/app/api-reference/file-conventions/proxy#matcher) so the Proxy doesn't run on routes that don't access Supabase.
+
+Return the same response object the cookies were written to. `setAll` builds a new `supabaseResponse` every time the library writes cookies, so any response you created earlier is already stale. Returning a stale one leaves the browser on the old token after the server has rotated it, and the user is signed out on the next request. When you need a different response, copy the cookies and the cache headers onto it first:
+
+```ts
+const myNewResponse = NextResponse.next({ request })
+myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
+for (const header of ['cache-control', 'expires', 'pragma']) {
+  const value = supabaseResponse.headers.get(header)
+  if (value) myNewResponse.headers.set(header, value)
+}
+return myNewResponse
+```
+
+The cache headers matter as much as the cookies. They are what stops a CDN caching a response that carries someone's refreshed token.
 
 <Admonition type="danger">
 
