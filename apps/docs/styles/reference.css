@@ -1,0 +1,19 @@
+@utility reference-details-trigger {
+  @apply w-fit rounded-full px-5 py-1 border border-default;
+  @apply flex items-center gap-2 text-left text-sm text-foreground-light;
+  @apply hover:bg-surface-100;
+  @apply data-open:w-full data-open:rounded-b-none data-open:rounded-tl-lg data-open:rounded-tr-lg;
+  @apply transition [transition-property:width,background-color];
+}
+
+@utility reference-details-trigger-icon {
+  @apply text-foreground-muted group-data-closed:rotate-45 transition-transform;
+}
+
+@utility reference-details-panel {
+  @apply border-b border-x border-default rounded-b-lg;
+}
+
+@utility reference-details-item {
+  @apply px-5 py-3 border-t border-default first:border-t-0 flex flex-col gap-3;
+}

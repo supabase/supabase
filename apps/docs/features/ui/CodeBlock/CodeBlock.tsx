@@ -1,23 +1,23 @@
 import { type PropsWithChildren } from 'react'
-import { bundledLanguages, createHighlighter, type BundledLanguage } from 'shiki'
+import { bundledLanguages, type BundledLanguage } from 'shiki'
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
 import { cn } from 'ui'
 
 import { CodeBlockControls, CodeBlockTokens, type CodeToken } from './CodeBlock.client'
-import { getCodeBlockLabel } from './CodeBlock.utils'
-import theme from './supabase-2.json' with { type: 'json' }
+import { highlightCode } from './CodeBlock.highlight'
+import { getCodeBlockLabel, getTokenClassName } from './CodeBlock.utils'
 import denoTypes from './types/lib.deno.d.ts.include'
 
 const extraFiles: ExtraFiles = { 'deno.d.ts': denoTypes }
 
-const twoslasher = createTwoslasher({ extraFiles })
+const twoslasher = createTwoslasher({
+  extraFiles,
+  // todo: remove once Twoslash stops using deprecated baseUrl and node10 resolution
+  compilerOptions: { ignoreDeprecations: '6.0' },
+})
 const TWOSLASHABLE_LANGS: ReadonlyArray<string> = ['js', 'ts', 'javascript', 'typescript']
 
 const BUNDLED_LANGUAGES = Object.keys(bundledLanguages)
-const highlighter = await createHighlighter({
-  themes: [theme],
-  langs: BUNDLED_LANGUAGES,
-})
 
 export async function CodeBlock({
   className,
@@ -52,10 +52,7 @@ export async function CodeBlock({
     }
   }
 
-  const { tokens } = highlighter.codeToTokens(code, {
-    lang: lang || undefined,
-    theme: 'Supabase Theme',
-  })
+  const { tokens } = await highlightCode(code, lang)
 
   return (
     <div
@@ -87,15 +84,15 @@ export async function CodeBlock({
           lineNumbers={lineNumbers}
           lines={tokens.map((line, lineIndex) => {
             let offset = 0
-            return line.map(({ content, color, fontStyle, htmlStyle }): CodeToken => {
+            return line.map(({ content, color, fontStyle }): CodeToken => {
               const annotations = twoslashed
                 ?.get(lineIndex)
                 ?.get(offset)
                 ?.map(({ text, docs, tags }) => ({ text, docs, tags }))
               offset += content.length
-              return annotations
-                ? [content, color, fontStyle || 0, { annotations, htmlStyle }]
-                : [content, color, fontStyle || 0]
+              const className = getTokenClassName(color, fontStyle)
+
+              return annotations ? [content, className, annotations] : [content, className]
             })
           })}
         />
