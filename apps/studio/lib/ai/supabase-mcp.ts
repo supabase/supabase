@@ -60,9 +60,6 @@ export async function createSupabaseMCPClient({
   accessToken: string
   projectRef: string
 }) {
-  // Identifies the deployed build in the MCP server's `source_version` log field.
-  const sourceVersion = process.env.VERCEL_GIT_COMMIT_SHA
-
   const client = await createMCPClient({
     name: SOURCE_NAME,
     transport: {
@@ -72,7 +69,6 @@ export async function createSupabaseMCPClient({
         Authorization: `Bearer ${accessToken}`,
         // Identify assistant traffic in the remote MCP server's logs
         'x-source-name': SOURCE_NAME,
-        ...(sourceVersion ? { 'x-source-version': sourceVersion } : {}),
       },
     },
   })
