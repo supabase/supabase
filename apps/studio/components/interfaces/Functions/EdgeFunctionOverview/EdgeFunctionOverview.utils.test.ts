@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
   EDGE_FUNCTION_CHART_INTERVALS,
@@ -21,8 +21,28 @@ import {
   toEdgeFunctionChartData,
   type EdgeFunctionChartRawDatum,
 } from './EdgeFunctionOverview.utils'
+import type { ChartIntervals } from '@/types'
+
+/**
+ * Runs `assertions` with the process timezone pinned, so a case can prove that a helper ignores
+ * the host timezone. Node re-reads the `TZ` variable on assignment, so stubbing it changes what
+ * `Date` (and therefore dayjs) treats as local time for the duration of the call.
+ */
+const runInTimeZone = (timeZone: string, assertions: () => void) => {
+  vi.stubEnv('TZ', timeZone)
+
+  try {
+    assertions()
+  } finally {
+    vi.unstubAllEnvs()
+  }
+}
 
 describe('EdgeFunctionOverview.utils', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
   it('uses a full day interval for the 1 day option', () => {
     expect(
       EDGE_FUNCTION_CHART_INTERVALS.find((interval) => interval.key === '1day')?.startUnit
@@ -196,24 +216,39 @@ describe('EdgeFunctionOverview.utils', () => {
     expect(rollingEnd.toISOString()).toBe('2026-03-20T10:37:00.000Z')
   })
 
-  it('anchors bucketed windows to UTC boundaries for every interval unit', () => {
-    const dayInterval = EDGE_FUNCTION_CHART_INTERVALS.find((item) => item.key === '1day')
-    const minuteInterval = EDGE_FUNCTION_CHART_INTERVALS.find((item) => item.key === '15min')
-    expect(dayInterval).toBeDefined()
-    expect(minuteInterval).toBeDefined()
+  // The analytics endpoint returns UTC-truncated buckets, so these boundaries must not follow the
+  // host timezone. The non-UTC zones carry the regression: under UTC alone, local-time truncation
+  // and UTC truncation agree, so a UTC-only case would still pass against the broken helper.
+  it.each(['UTC', 'Asia/Kolkata', 'Asia/Kathmandu', 'Pacific/Chatham', 'America/New_York'])(
+    'anchors bucketed windows to UTC boundaries in %s',
+    (timeZone) => {
+      const dayInterval = EDGE_FUNCTION_CHART_INTERVALS.find((item) => item.key === '1day')
+      const hourInterval = EDGE_FUNCTION_CHART_INTERVALS.find((item) => item.key === '1hr')
+      const minuteInterval = EDGE_FUNCTION_CHART_INTERVALS.find((item) => item.key === '15min')
+      expect(dayInterval).toBeDefined()
+      expect(hourInterval).toBeDefined()
+      expect(minuteInterval).toBeDefined()
 
-    // The analytics endpoint returns UTC-truncated buckets, so these boundaries must not follow
-    // the host timezone -- a local truncation would shift them in zones offset by 5:30 or 5:45.
-    const now = new Date('2026-03-20T10:37:42.500Z')
+      const now = new Date('2026-03-20T10:37:42.500Z')
+      const toRange = (interval: ChartIntervals) =>
+        getBucketedTimeRange(interval, now).map((boundary) => boundary.toISOString())
 
-    const [dayStart, dayEnd] = getBucketedTimeRange(dayInterval!, now)
-    expect(dayStart.toISOString()).toBe('2026-03-19T00:00:00.000Z')
-    expect(dayEnd.toISOString()).toBe('2026-03-20T00:00:00.000Z')
-
-    const [minuteStart, minuteEnd] = getBucketedTimeRange(minuteInterval!, now)
-    expect(minuteStart.toISOString()).toBe('2026-03-20T10:22:00.000Z')
-    expect(minuteEnd.toISOString()).toBe('2026-03-20T10:37:00.000Z')
-  })
+      runInTimeZone(timeZone, () => {
+        expect(toRange(dayInterval!)).toEqual([
+          '2026-03-19T00:00:00.000Z',
+          '2026-03-20T00:00:00.000Z',
+        ])
+        expect(toRange(hourInterval!)).toEqual([
+          '2026-03-20T09:00:00.000Z',
+          '2026-03-20T10:00:00.000Z',
+        ])
+        expect(toRange(minuteInterval!)).toEqual([
+          '2026-03-20T10:22:00.000Z',
+          '2026-03-20T10:37:00.000Z',
+        ])
+      })
+    }
+  )
 
   it('formats metric, rate, and reference deltas consistently', () => {
     expect(formatMetric(12.34, 'MB')).toBe('12.3MB')
