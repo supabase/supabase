@@ -1,9 +1,9 @@
 // see apps/www/components/LaunchWeek/13/Releases/data/lw13_build_stage.tsx for reference
 
-import { type ClassValue } from 'clsx'
 import { AppWindow, Database, Globe } from 'lucide-react'
 import { ReactNode } from 'react'
 import { PRODUCT_MODULES } from 'shared-data/products'
+import type { ClassValue } from 'ui'
 
 export interface AdventDay {
   icon?: ReactNode // use svg jsx with 34x34px viewport

@@ -109,7 +109,6 @@ export const SSOMetadata = ({
                       onChange={handleFileChange}
                     />
                     <Button
-                      variant="default"
                       icon={<Upload className="w-4 h-4" />}
                       onClick={() => fileInputRef.current?.click()}
                     >

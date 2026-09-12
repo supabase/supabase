@@ -28,10 +28,11 @@ export const NavigationItem: React.FC<{ item: SidebarNavItem }> = React.memo(({ 
         'items-center',
         'h-6',
         'text-sm',
-        'text-foreground-lighter px-6',
-        !isActive && 'hover:bg-surface-100 hover:text-foreground',
-        isActive && 'bg-surface-200 text-foreground',
-        'transition-all'
+        'px-6',
+        'transition-all',
+        isActive
+          ? 'bg-selection text-foreground'
+          : 'text-foreground-light hover:bg-surface-200 hover:text-foreground'
       )}
     >
       <div

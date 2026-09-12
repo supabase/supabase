@@ -184,7 +184,6 @@ export const SignInForm = () => {
                     />
                   </FormControl>
                   <Button
-                    variant="default"
                     title={passwordHidden ? `Show password` : `Hide password`}
                     aria-label={passwordHidden ? `Show password` : `Hide password`}
                     className="absolute right-1 top-1 px-1.5"
@@ -221,7 +220,14 @@ export const SignInForm = () => {
         </div>
 
         <LastSignInWrapper type="email">
-          <Button block form={formId} type="submit" size="large" loading={isSubmitting}>
+          <Button
+            variant="primary"
+            block
+            form={formId}
+            type="submit"
+            size="large"
+            loading={isSubmitting}
+          >
             Sign in
           </Button>
         </LastSignInWrapper>

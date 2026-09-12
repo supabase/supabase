@@ -136,7 +136,6 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
               {readReplicaError && (
                 <Button
                   className="py-2"
-                  variant="default"
                   onClick={() => {
                     state.setSelectedDatabaseId(ref)
                     sessionSnap.resetResult(id)

@@ -195,7 +195,6 @@ export const TableEditorMenu = () => {
                 disabled={!canCreateTables}
                 size="tiny"
                 icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
-                variant="default"
                 className="justify-start"
                 onClick={() => snap.onAddTable()}
                 tooltip={{
@@ -278,7 +277,6 @@ export const TableEditorMenu = () => {
                         </div>
                         <Button
                           size="tiny"
-                          variant="default"
                           onClick={() => setVisibleTypes([value])}
                           className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
                         >

@@ -17,7 +17,7 @@ export default function DialogDemo() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="default">Edit profile</Button>
+        <Button>Edit profile</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]" centered={false}>
         <DialogHeader>
@@ -40,7 +40,9 @@ export default function DialogDemo() {
           </div>
         </DialogSection>
         <DialogFooter>
-          <Button type="submit">Save changes</Button>
+          <Button variant="primary" type="submit">
+            Save changes
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

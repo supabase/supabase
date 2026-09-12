@@ -42,7 +42,6 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
 
 describe('RestartServerButton', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockUseFlag.mockReturnValue(false)
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true })
     mockUseIsFeatureEnabled.mockReturnValue({ projectSettingsRestartProject: true })

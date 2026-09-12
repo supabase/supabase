@@ -345,6 +345,10 @@
       "type": "boolean",
       "description": "Show the orms tab in the connect modal"
     },
+    "project_connection:show_warehouse": {
+      "type": "boolean",
+      "description": "Show the warehouse tab in the connect modal"
+    },
 
     "project_creation:show_advanced_config": {
       "type": "boolean",
@@ -531,6 +535,7 @@
     "project_connection:show_app_frameworks",
     "project_connection:show_mobile_frameworks",
     "project_connection:show_orms",
+    "project_connection:show_warehouse",
     "quickstarts:hide_nimbus",
     "reports:all",
     "sdk:auth",

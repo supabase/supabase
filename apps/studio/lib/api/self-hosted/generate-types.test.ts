@@ -27,8 +27,6 @@ describe('api/self-hosted/generate-types', () => {
   let mockAssertSelfHosted: ReturnType<typeof vi.fn>
 
   beforeEach(async () => {
-    vi.clearAllMocks()
-
     const fetchers = await import('@/data/fetchers')
     const util = await import('./util')
 

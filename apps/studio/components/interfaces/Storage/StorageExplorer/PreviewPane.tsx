@@ -187,7 +187,6 @@ export const PreviewPane = () => {
         {/* Actions */}
         <div className="flex space-x-2 border-b border-overlay pb-4">
           <Button
-            variant="default"
             icon={<Download />}
             disabled={file.isCorrupted}
             onClick={() => downloadFile(file)}

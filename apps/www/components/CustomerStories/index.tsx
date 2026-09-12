@@ -31,7 +31,7 @@ const CustomerStories = () => (
         <Button asChild>
           <Link href="/customers">View all stories</Link>
         </Button>
-        <Button asChild variant="default">
+        <Button asChild>
           <Link href="/events">View events</Link>
         </Button>
       </div>

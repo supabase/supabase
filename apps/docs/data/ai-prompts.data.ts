@@ -179,6 +179,20 @@ database.new and run the instruments table SQL. Then:
 
 REFERENCE
 https://supabase.com/docs/guides/getting-started/quickstarts/refine.md`,
+  reflex: `Help me add Supabase to my Reflex project. Create a Supabase project at
+database.new and run the instruments table SQL. Then:
+1. Run \`uv init\` and \`uv add reflex\`, then \`uv run reflex init --template blank\`
+   to scaffold the app.
+2. Run \`uv add supabase python-dotenv\`.
+3. Create \`.env\` and set \`SUPABASE_URL\` and \`SUPABASE_PUBLISHABLE_KEY\`.
+4. In \`my_app/my_app.py\`, create a single async Supabase client with
+   \`acreate_client\` (one client per process, not recreated per request) and an
+   \`rx.State\` event handler that queries and renders the instruments table,
+   handling \`postgrest.APIError\`.
+5. Run \`uv run reflex run\` and open http://localhost:3000.
+
+REFERENCE
+https://supabase.com/docs/guides/getting-started/quickstarts/reflex.md`,
   'ruby-on-rails': `Help me add Supabase to my Ruby on Rails project. Create a Supabase project at
 database.new. Then:
 1. Run \`rails new blog -d=postgresql\` to scaffold a new Rails project.

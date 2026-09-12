@@ -73,8 +73,6 @@ const expectEveryQueryCall = (queryMock: ReturnType<typeof vi.fn>, enabled: bool
 
 describe('ConnectionPooling', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
     mockUseSelectedProjectQuery.mockReturnValue({
       data: {
         id: 1,

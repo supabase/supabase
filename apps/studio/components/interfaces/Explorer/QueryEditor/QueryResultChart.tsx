@@ -80,8 +80,7 @@ export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
   if (!result || (result?.rows && result.rows.length === 0)) {
     return (
       <NoDataPlaceholder
-        isFullHeight
-        className="border-0"
+        className="border-0 min-h-0! py-8"
         size="normal"
         message="No results"
         description="Your query returned no rows"
@@ -92,8 +91,7 @@ export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
   if (!hasConfig) {
     return (
       <NoDataPlaceholder
-        isFullHeight
-        className="border-0"
+        className="border-0 min-h-0! py-8"
         size="normal"
         message="Configure your chart"
         description="Select your X and Y axis in the display settings"

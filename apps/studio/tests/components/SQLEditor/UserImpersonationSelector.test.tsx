@@ -43,8 +43,6 @@ const AUTH_CONFIG_WITHOUT_CUSTOM_ACCESS_TOKEN_HOOK = {
 
 describe('UserImpersonationSelector', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',

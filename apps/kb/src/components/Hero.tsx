@@ -3,7 +3,7 @@
 // prompt panel (docs-specific, feature-flagged, and not something kb has yet).
 function Hero() {
   return (
-    <div className="w-full border-b bg-muted/10">
+    <div className="w-full border-b border-default bg-muted/10">
       <div className="mx-auto max-w-7xl px-6 py-16">
         <h1 className="m-0 text-3xl text-foreground sm:text-4xl">Supabase Knowledge Base</h1>
         <p className="m-0 mt-2 text-base leading-7 text-foreground-light sm:mt-3 sm:text-xl">

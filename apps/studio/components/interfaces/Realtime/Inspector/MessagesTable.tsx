@@ -41,11 +41,7 @@ const NoResultAlert = ({
     'service_api_keys'
   )
 
-  const broadcastButton = (
-    <Button variant="default" onClick={showSendMessage}>
-      Broadcast a message
-    </Button>
-  )
+  const broadcastButton = <Button onClick={showSendMessage}>Broadcast a message</Button>
 
   return (
     <div className="w-full max-w-md flex items-center flex-col">
@@ -90,9 +86,7 @@ const NoResultAlert = ({
                 </p>
               </div>
               <Link href={`/project/${ref}/realtime/inspector`} target="_blank" rel="noreferrer">
-                <Button variant="default" iconRight={<ExternalLink />}>
-                  Open inspector
-                </Button>
+                <Button iconRight={<ExternalLink />}>Open inspector</Button>
               </Link>
             </div>
 
@@ -106,9 +100,7 @@ const NoResultAlert = ({
                 <p className="text-foreground-lighter text-xs">Tables must have realtime enabled</p>
               </div>
               <Link href={`/project/${ref}/database/publications`} target="_blank" rel="noreferrer">
-                <Button variant="default" iconRight={<ExternalLink />}>
-                  Publications settings
-                </Button>
+                <Button iconRight={<ExternalLink />}>Publications settings</Button>
               </Link>
             </div>
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex rounded-b-md bg-studio">
@@ -183,11 +175,7 @@ const MessagesTable = ({
                     </div>
                   </div>
                   <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_BROADCAST} side="bottom">
-                    <Button
-                      variant="default"
-                      onClick={showSendMessage}
-                      icon={<Megaphone strokeWidth={1.5} />}
-                    >
+                    <Button onClick={showSendMessage} icon={<Megaphone strokeWidth={1.5} />}>
                       <span>Broadcast a message</span>
                     </Button>
                   </ShortcutTooltip>

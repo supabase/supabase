@@ -2,7 +2,7 @@
 import type * as SupabaseMcp from '@supabase/mcp-server-supabase'
 import type { ToolSet } from 'ai'
 
-import { createInProcessSupabaseMCPClient, createSupabaseMCPClient } from '../supabase-mcp'
+import { createSupabaseMCPClient } from '../supabase-mcp'
 import { filterToolsByOptInLevel, toolSetValidationSchema } from '../tool-filter'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
@@ -50,22 +50,12 @@ export const getMcpTools = async ({
   // when the request ends. The caller owns that lifecycle via this signal.
   signal: AbortSignal
 }) => {
-  // Connect to the MCP server and fetch its tools, which replace the old local
-  // tools. `USE_REMOTE_MCP` gates the transport: the remote HTTP server (target
-  // state) or the legacy in-process server (fallback during the migration),
-  // defaulting to in-process until an environment opts in. Flip it per
-  // environment (staging → prod → Nimbus) once each one's prerequisites are met
-  // (dashboard-token support on the MCP API, remote MCP enabled for Nimbus);
-  // unset to roll back on the next deploy. Both transports expose the same tool
-  // surface, so the filtering, drift detection, and lifecycle handling below are
-  // transport-agnostic.
-  //
-  // TODO(AI-897): remove in process mcp — once every environment has been
-  // flipped and is stable, delete `createInProcessSupabaseMCPClient` and this
-  // fallback branch.
-  const useRemoteMcp = process.env.USE_REMOTE_MCP === 'true'
-  const createClient = useRemoteMcp ? createSupabaseMCPClient : createInProcessSupabaseMCPClient
-  const mcpClient = await createClient({
+  // Connect to the remote MCP server over HTTP and fetch its tools, which
+  // replace the old local tools. The legacy in-process server is no longer a
+  // production transport (eval-only now, see `createInProcessSupabaseMCPClient`),
+  // so this is unconditional. A remote failure (outage, timeout, auth) degrades
+  // to the remaining tools in `getTools` rather than breaking the assistant.
+  const mcpClient = await createSupabaseMCPClient({
     accessToken,
     projectRef,
   })

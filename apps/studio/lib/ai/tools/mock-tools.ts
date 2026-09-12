@@ -599,10 +599,10 @@ export async function getMockTools(overrides: MockToolOverrides | undefined, sig
 
   // Every tool here is a deterministic mock except `search_docs`, which uses the
   // real implementation. We source it from an in-process MCP server directly
-  // (rather than `getMcpTools`) so the eval harness stays hermetic and decoupled
-  // from the assistant's transport gate (`USE_REMOTE_MCP`): the in-process server
-  // needs no live remote endpoint or real access token. See AI-897 for how to
-  // point evals at the remote MCP server instead.
+  // (rather than `getMcpTools`, which always talks to the remote server) so the
+  // eval harness stays hermetic: the in-process server needs no live remote
+  // endpoint or real access token. See AI-897 for how to point evals at the
+  // remote MCP server instead.
   const mcpClient = await createInProcessSupabaseMCPClient({
     accessToken: 'mock-access-token',
     projectRef: 'mock-project-ref',

@@ -148,7 +148,6 @@ function ConfigurationDriftItem({ row }: { row: ConfigurationDriftRow }) {
         <Button
           asChild
           type="button"
-          variant="default"
           size="tiny"
           className="w-full shrink-0 sm:w-auto"
           icon={<ArrowRight className="h-3.5 w-3.5" />}
@@ -285,7 +284,7 @@ export function ConfigurationDriftPage() {
         description="Refresh to compare the supported settings with the selected GitHub branch again."
         error={error}
         additionalActions={
-          <Button variant="default" size="small" loading={isFetching} onClick={() => refetch()}>
+          <Button size="small" loading={isFetching} onClick={() => refetch()}>
             Refresh
           </Button>
         }

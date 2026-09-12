@@ -337,6 +337,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/contributing' as `/${string}`,
             enabled: contributionEnabled,
           },
+          {
+            label: 'Troubleshooting',
+            icon: 'troubleshooting',
+            href: '/guides/troubleshooting' as `/${string}`,
+            level: 'troubleshooting',
+          },
         ],
       ],
     },
@@ -361,36 +367,48 @@ export const gettingstarted: NavMenuConstant = {
       enabled: frameworkQuickstartsEnabled,
       items: [
         {
+          name: 'React',
+          url: '/guides/getting-started/quickstarts/reactjs',
+        },
+        {
           name: 'Next.js',
           url: '/guides/getting-started/quickstarts/nextjs',
         },
         {
-          name: 'React',
-          url: '/guides/getting-started/quickstarts/reactjs',
+          name: 'TanStack Start',
+          url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
         },
         {
           name: 'Astro',
           url: '/guides/getting-started/quickstarts/astrojs',
         },
         {
-          name: 'Nuxt',
-          url: '/guides/getting-started/quickstarts/nuxtjs',
-        },
-        {
           name: 'Vue',
           url: '/guides/getting-started/quickstarts/vue',
         },
         {
+          name: 'Nuxt',
+          url: '/guides/getting-started/quickstarts/nuxtjs',
+        },
+        {
+          name: 'SvelteKit',
+          url: '/guides/getting-started/quickstarts/sveltekit' as `/${string}`,
+        },
+        {
+          name: 'SolidJS',
+          url: '/guides/getting-started/quickstarts/solidjs',
+        },
+        {
+          name: 'RedwoodJS',
+          url: '/guides/getting-started/quickstarts/redwoodjs' as `/${string}`,
+        },
+        {
+          name: 'Refine',
+          url: '/guides/getting-started/quickstarts/refine',
+        },
+        {
           name: 'Hono',
           url: '/guides/getting-started/quickstarts/hono',
-        },
-        {
-          name: 'Expo React Native',
-          url: '/guides/getting-started/quickstarts/expo-react-native',
-        },
-        {
-          name: 'Flutter',
-          url: '/guides/getting-started/quickstarts/flutter',
         },
         {
           name: 'iOS SwiftUI',
@@ -401,8 +419,12 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/kotlin' as `/${string}`,
         },
         {
-          name: 'SvelteKit',
-          url: '/guides/getting-started/quickstarts/sveltekit' as `/${string}`,
+          name: 'Expo React Native',
+          url: '/guides/getting-started/quickstarts/expo-react-native',
+        },
+        {
+          name: 'Flutter',
+          url: '/guides/getting-started/quickstarts/flutter',
         },
         {
           name: 'Flask (Python)',
@@ -410,8 +432,9 @@ export const gettingstarted: NavMenuConstant = {
           enabled: !jsOnly,
         },
         {
-          name: 'TanStack Start',
-          url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
+          name: 'Reflex (Python)',
+          url: '/guides/getting-started/quickstarts/reflex' as `/${string}`,
+          enabled: !jsOnly,
         },
         {
           name: 'Laravel PHP',
@@ -427,18 +450,6 @@ export const gettingstarted: NavMenuConstant = {
           name: 'Spring Boot',
           url: '/guides/getting-started/quickstarts/spring-boot' as `/${string}`,
           enabled: !jsOnly,
-        },
-        {
-          name: 'SolidJS',
-          url: '/guides/getting-started/quickstarts/solidjs',
-        },
-        {
-          name: 'RedwoodJS',
-          url: '/guides/getting-started/quickstarts/redwoodjs' as `/${string}`,
-        },
-        {
-          name: 'Refine',
-          url: '/guides/getting-started/quickstarts/refine',
         },
       ],
     },
@@ -1028,6 +1039,20 @@ export const database: NavMenuConstant = {
         {
           name: 'Connecting to your database',
           url: '/guides/database/connecting-to-postgres' as `/${string}`,
+          items: [
+            {
+              name: 'Connecting to your database',
+              url: '/guides/database/connecting-to-postgres' as `/${string}`,
+            },
+            {
+              name: 'Connection pooling and limits',
+              url: '/guides/database/connecting-to-postgres/pooling-and-limits' as `/${string}`,
+            },
+            {
+              name: 'Serverless drivers',
+              url: '/guides/database/connecting-to-postgres/serverless-drivers' as `/${string}`,
+            },
+          ],
         },
         { name: 'Importing data', url: '/guides/database/import-data' },
         { name: 'Securing your data', url: '/guides/database/secure-data' },

@@ -82,7 +82,6 @@ export function BranchDropdownCommandContent({
             </a>
           </Button>
           <Button
-            variant="default"
             size="small"
             block
             className="col-span-full text-xs text-foreground-light hover:text-foreground"

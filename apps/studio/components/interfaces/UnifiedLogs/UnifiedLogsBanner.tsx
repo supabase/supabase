@@ -55,7 +55,6 @@ export function UnifiedLogsBanner({ className = 'mx-4 mt-4' }: UnifiedLogsBanner
             Go back to old logs
           </p>
           <ButtonTooltip
-            variant="default"
             className="shrink-0 px-1.5"
             icon={<Undo2 />}
             onClick={onSwitchBack}
@@ -83,7 +82,6 @@ export function UnifiedLogsBanner({ className = 'mx-4 mt-4' }: UnifiedLogsBanner
       <div className="flex justify-start items-start gap-x-2">
         {isDefaultOptIn ? (
           <Button
-            variant="default"
             icon={<CircleHelpIcon />}
             onClick={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}
           >
@@ -91,11 +89,8 @@ export function UnifiedLogsBanner({ className = 'mx-4 mt-4' }: UnifiedLogsBanner
           </Button>
         ) : (
           <>
-            <Button variant="default" onClick={onEnable}>
-              Enable preview
-            </Button>
+            <Button onClick={onEnable}>Enable preview</Button>
             <ButtonTooltip
-              variant="default"
               className="px-1.5"
               icon={<CircleHelpIcon />}
               onClick={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}

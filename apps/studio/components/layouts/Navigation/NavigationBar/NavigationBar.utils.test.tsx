@@ -85,9 +85,9 @@ describe('generateProductRoutes', () => {
     expect(keys(routes)).toEqual(['database', 'auth', 'storage', 'functions', 'realtime'])
   })
 
-  it('includes workers only when the workers flag is enabled', () => {
-    expect(keys(generateProductRoutes(REF, activeProject))).not.toContain('workers')
-    expect(keys(generateProductRoutes(REF, activeProject, { workers: true }))).toContain('workers')
+  it('includes compute only when the compute flag is enabled', () => {
+    expect(keys(generateProductRoutes(REF, activeProject))).not.toContain('compute')
+    expect(keys(generateProductRoutes(REF, activeProject, { compute: true }))).toContain('compute')
   })
 
   it('excludes auth when auth feature is disabled', () => {

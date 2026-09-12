@@ -286,9 +286,7 @@ const EdgeFunctionDetailsLayout = ({
                       open={isDownloadOpen ? false : undefined}
                     >
                       <PopoverTrigger asChild>
-                        <Button variant="default" icon={<Download />}>
-                          Download
-                        </Button>
+                        <Button icon={<Download />}>Download</Button>
                       </PopoverTrigger>
                     </ShortcutTooltip>
                     <PopoverContent align="end" className="p-0">
@@ -325,7 +323,7 @@ const EdgeFunctionDetailsLayout = ({
                       shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_TEST}
                       side="bottom"
                     >
-                      <Button variant="default" icon={<Send />} onClick={openTestSheet}>
+                      <Button icon={<Send />} onClick={openTestSheet}>
                         Test
                       </Button>
                     </ShortcutTooltip>

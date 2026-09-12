@@ -122,7 +122,6 @@ const InfrastructureReadReplicaPage: NextPageWithLayout = () => {
       ]}
       secondaryActions={
         <ButtonTooltip
-          variant="default"
           className="w-7"
           icon={<Trash />}
           disabled={!replica}
@@ -133,7 +132,7 @@ const InfrastructureReadReplicaPage: NextPageWithLayout = () => {
         />
       }
       primaryActions={[
-        <Button asChild key="logs" variant="default">
+        <Button asChild key="logs">
           <Link
             href={`/project/${ref}/logs/postgres-logs${!!identifier ? `?db=${identifier}` : ''}`}
           >
@@ -142,7 +141,6 @@ const InfrastructureReadReplicaPage: NextPageWithLayout = () => {
         </Button>,
         <Button
           key="restart"
-          variant="default"
           disabled={status !== 'ACTIVE_HEALTHY'}
           onClick={() => setShowConfirmRestart(true)}
         >

@@ -475,12 +475,7 @@ export function SurveyChart({
             !dataError &&
             chartData.length > 3 && (
               <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-linear-to-b from-transparent to-background">
-                <Button
-                  variant="default"
-                  size="tiny"
-                  onClick={() => setIsExpanded(true)}
-                  className="shadow-xs"
-                >
+                <Button size="tiny" onClick={() => setIsExpanded(true)} className="shadow-xs">
                   Show more
                 </Button>
               </div>
@@ -529,7 +524,6 @@ function SurveyFilter({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="default"
           size="tiny"
           iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
         >

@@ -14,7 +14,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:2026.08.03-sha-022b374
+    image: supabase/studio:2026.09.07-sha-7996410
     restart: unless-stopped
     healthcheck:
       test:
@@ -69,7 +69,7 @@ services:
   # See: https://github.com/orgs/supabase/discussions/48048
   api-gw:
     container_name: supabase-envoy
-    image: envoyproxy/envoy:v1.39.0
+    image: envoyproxy/envoy:v1.39.1
     restart: unless-stopped
     networks:
       default:
@@ -108,7 +108,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.189.0
+    image: supabase/gotrue:v2.196.0
     restart: unless-stopped
     healthcheck:
       test:
@@ -248,7 +248,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v14.12
+    image: postgrest/postgrest:v14.17
     restart: unless-stopped
     depends_on:
       db:
@@ -285,7 +285,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.102.3
+    image: supabase/realtime:v2.134.10
     restart: unless-stopped
     depends_on:
       db:
@@ -331,7 +331,7 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.60.4
+    image: supabase/storage-api:v1.74.0
     restart: unless-stopped
     depends_on:
       db:
@@ -394,7 +394,7 @@ services:
 
   imgproxy:
     container_name: supabase-imgproxy
-    image: darthsim/imgproxy:v3.30.1
+    image: darthsim/imgproxy:v3.31.4
     restart: unless-stopped
     volumes:
       - ./volumes/storage:/var/lib/storage:z
@@ -417,7 +417,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.96.6
+    image: supabase/postgres-meta:v0.99.0
     restart: unless-stopped
     depends_on:
       db:
@@ -434,7 +434,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.74.0
+    image: supabase/edge-runtime:v1.76.2
     restart: unless-stopped
     volumes:
       - ./volumes/functions:/home/deno/functions:z
@@ -531,7 +531,7 @@ services:
   # Update the DATABASE_URL if you are using an external Postgres database
   supavisor:
     container_name: supabase-pooler
-    image: supabase/supavisor:2.9.5
+    image: supabase/supavisor:2.9.12
     restart: unless-stopped
     ports:
       - ${POSTGRES_PORT}:5432

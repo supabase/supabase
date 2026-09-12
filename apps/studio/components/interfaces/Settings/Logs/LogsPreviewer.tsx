@@ -375,7 +375,6 @@ export const LogsPreviewer = ({
             <Button
               onClick={loadOlder}
               icon={<Rewind />}
-              variant="default"
               loading={isLoadingOlder}
               disabled={isLoadingOlder}
             >

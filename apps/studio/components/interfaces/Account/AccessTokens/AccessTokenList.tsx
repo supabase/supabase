@@ -150,12 +150,7 @@ export const AccessTokenList = ({
               <div className="flex items-center justify-end gap-x-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="default"
-                      aria-label="More options"
-                      className="w-7"
-                      icon={<MoreVertical />}
-                    />
+                    <Button aria-label="More options" className="w-7" icon={<MoreVertical />} />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent side="bottom" align="end" className="w-40">
                     {x.kind === 'scoped' && (

@@ -24,8 +24,6 @@ vi.mock('./PartnerIcon', () => ({
 
 describe('PartnerManagedResource', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
     mockUseVercelRedirectQuery.mockReturnValue({
       data: undefined,
       isLoading: false,

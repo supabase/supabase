@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { Button } from './Button'
 
@@ -26,6 +26,22 @@ describe('#Button', () => {
     expect(() => wrapper.unmount()).not.toThrow()
   })
 
+  it('should default to the neutral default variant', () => {
+    render(<Button>Neutral</Button>)
+
+    const button = screen.getByRole('button', { name: 'Neutral' })
+    expect(button.className).toContain('bg-background')
+    expect(button.className).toContain('hover:bg-popover')
+    expect(button.className).not.toContain('bg-brand-400')
+  })
+
+  it('should allow an explicit primary variant override', () => {
+    render(<Button variant="primary">Primary</Button>)
+
+    const button = screen.getByRole('button', { name: 'Primary' })
+    expect(button.className).toContain('bg-brand-400')
+  })
+
   it('should render different text', () => {
     const wrapper = render(<Button>Button</Button>)
 
@@ -34,6 +50,73 @@ describe('#Button', () => {
     wrapper.rerender(<Button>按钮</Button>)
 
     expect(screen.getByText('按钮')).toBeInTheDocument()
+  })
+
+  it('should use native disabled when loading by default', () => {
+    render(<Button loading>Button</Button>)
+
+    const button = screen.getByRole('button')
+    expect(button).toBeDisabled()
+    expect(button).not.toHaveAttribute('aria-disabled', 'true')
+  })
+
+  it('should remain focusable and ignore events when disabled with focusableWhenDisabled', () => {
+    const WrapperButton = () => {
+      const [state, setState] = React.useState('state1')
+      return (
+        <Button disabled focusableWhenDisabled onClick={() => setState('state2')}>
+          {state}
+        </Button>
+      )
+    }
+
+    render(<WrapperButton />)
+    const button = screen.getByRole('button', { name: 'state1' })
+
+    expect(button).toHaveAttribute('aria-disabled', 'true')
+    expect(button).not.toBeDisabled()
+    expect(button).toHaveAttribute('tabIndex', '0')
+
+    fireEvent.click(button)
+
+    expect(screen.getByText('state1')).toBeInTheDocument()
+    expect(screen.queryByText('state2')).not.toBeInTheDocument()
+  })
+
+  it('should ignore child onClick when focusably disabled with asChild', () => {
+    const childOnClick = vi.fn()
+    const buttonOnClick = vi.fn()
+
+    render(
+      <Button asChild disabled focusableWhenDisabled onClick={buttonOnClick}>
+        <a href="/foo" onClick={childOnClick}>
+          Link
+        </a>
+      </Button>
+    )
+
+    fireEvent.click(screen.getByRole('link'))
+
+    expect(childOnClick).not.toHaveBeenCalled()
+    expect(buttonOnClick).not.toHaveBeenCalled()
+  })
+
+  it('should not call Button onClick when asChild child calls preventDefault', () => {
+    const childOnClick = vi.fn((e: React.MouseEvent) => e.preventDefault())
+    const buttonOnClick = vi.fn()
+
+    render(
+      <Button asChild onClick={buttonOnClick}>
+        <a href="/foo" onClick={childOnClick}>
+          Link
+        </a>
+      </Button>
+    )
+
+    fireEvent.click(screen.getByRole('link'))
+
+    expect(childOnClick).toHaveBeenCalled()
+    expect(buttonOnClick).not.toHaveBeenCalled()
   })
 
   it('should ignore events when disabled', () => {

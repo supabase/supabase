@@ -116,7 +116,6 @@ function setSignedInDefaults() {
 
 describe('OrganizationInvite', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     setSignedInDefaults()
   })
 

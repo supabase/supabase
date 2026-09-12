@@ -170,7 +170,6 @@ describe('ProjectNeedsSecuring', () => {
   })
 
   afterEach(() => {
-    vi.clearAllMocks()
     window.localStorage.clear()
   })
 

@@ -238,7 +238,6 @@ const ReportFilterBar = ({
             side="bottom"
           >
             <Button
-              variant="default"
               disabled={isLoading}
               icon={<RefreshCw className={isLoading ? 'animate-spin' : ''} />}
               className="w-7"
@@ -265,7 +264,6 @@ const ReportFilterBar = ({
             >
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant="default"
                   className="inline-flex flex-row gap-2"
                   iconRight={<ChevronDown size={14} />}
                 >
@@ -344,11 +342,7 @@ const ReportFilterBar = ({
             open={showAdder ? false : undefined}
           >
             <PopoverTrigger asChild>
-              <Button
-                variant="default"
-                size="tiny"
-                icon={<Plus className={`text-foreground-light `} />}
-              >
+              <Button size="tiny" icon={<Plus className={`text-foreground-light `} />}>
                 Add filter
               </Button>
             </PopoverTrigger>

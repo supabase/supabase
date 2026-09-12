@@ -551,7 +551,6 @@ export const UsersV2 = () => {
                 icon={<WandSparklesIcon />}
                 onClick={() => setShowCreateIndexesModal(true)}
                 loading={isUpdatingAuthConfig}
-                variant="default"
               >
                 Upgrade search
               </Button>
@@ -584,11 +583,10 @@ export const UsersV2 = () => {
         <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
-              <Button variant="default" icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
+              <Button icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
                 Delete {selectedUsers.size} users
               </Button>
               <ButtonTooltip
-                variant="default"
                 icon={<X />}
                 className="px-1.5"
                 onClick={() => setSelectedUsers(new Set([]))}
@@ -757,7 +755,6 @@ export const UsersV2 = () => {
                 <ButtonTooltip
                   size="tiny"
                   icon={<RefreshCw />}
-                  variant="default"
                   className="w-7"
                   loading={isRefetching && !isFetchingNextPage}
                   onClick={handleRefresh}

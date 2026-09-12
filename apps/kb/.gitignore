@@ -1,6 +1,9 @@
 # build output
 dist/
 
+# generated markdown export (scripts/generate-markdown.mjs)
+public/markdown/
+
 # generated types
 .astro/
 

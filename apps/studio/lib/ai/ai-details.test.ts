@@ -45,8 +45,6 @@ describe('getAIDetails', () => {
   let mockCheckEntitlement: ReturnType<typeof vi.fn>
 
   beforeEach(async () => {
-    vi.clearAllMocks()
-
     const orgsQuery = await import('@/data/organizations/organizations-query')
     const subscriptionQuery = await import('@/data/subscriptions/org-subscription-query')
     const projectQuery = await import('@/data/projects/project-detail-query')

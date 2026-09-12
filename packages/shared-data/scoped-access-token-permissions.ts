@@ -364,6 +364,14 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
     allowsRead: ['Read project API keys'],
     allowsWrite: ['Create and revoke API keys'],
   },
+  'project:api_gateway_keys_secret': {
+    category: 'appsvc',
+    name: 'API Key Secrets',
+    description: 'Secret values of project API keys.',
+    risk: 'high',
+    riskReason: 'Read reveals the secret values of project API keys.',
+    allowsRead: ['Reveal project API key secrets'],
+  },
   'project:edge_functions': {
     category: 'appsvc',
     name: 'Edge Functions',
@@ -381,6 +389,15 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
     riskReason: 'Read exposes function secrets; read-write can set new secret values.',
     allowsRead: ['Read edge function secrets'],
     allowsWrite: ['Set edge function secrets'],
+  },
+  'project:workers': {
+    category: 'appsvc',
+    name: 'Compute',
+    description: 'Compute workers deployed to the project.',
+    risk: 'medium',
+    riskReason: 'Read-write can deploy or delete compute workers.',
+    allowsRead: ['List compute workers'],
+    allowsWrite: ['Deploy and delete compute workers'],
   },
   'project:realtime_config': {
     category: 'appsvc',
@@ -412,11 +429,19 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   'project:data_api_config': {
     category: 'appsvc',
     name: 'Data API Config',
-    description: 'PostgREST behavior and settings.',
+    description: 'Data API behavior and settings.',
     risk: 'medium',
     riskReason: 'Read-write can change how the auto-generated Data API behaves.',
     allowsRead: ['Read Data API configuration'],
     allowsWrite: ['Update Data API configuration'],
+  },
+  'project:data_api_config_secret': {
+    category: 'appsvc',
+    name: 'Data API JWT Secret',
+    description: 'JWT secret used by the Data API.',
+    risk: 'high',
+    riskReason: 'Read exposes the JWT secret, which can be used to mint tokens for any role.',
+    allowsRead: ['Read Data API JWT secret'],
   },
 
   // --- Infrastructure and delivery ---

@@ -91,7 +91,7 @@ export const Migrations = () => {
               </>
             }
           >
-            <Button key="contact-support" asChild variant="default">
+            <Button key="contact-support" asChild>
               <SupportLink
                 queryParams={{
                   projectRef: project?.ref,
@@ -176,10 +176,7 @@ export const Migrations = () => {
                                 </Tooltip>
                               </TableCell>
                               <TableCell align="right">
-                                <Button
-                                  variant="default"
-                                  onClick={() => setSelectedMigration(migration)}
-                                >
+                                <Button onClick={() => setSelectedMigration(migration)}>
                                   View migration SQL
                                 </Button>
                               </TableCell>
@@ -212,9 +209,7 @@ export const Migrations = () => {
         onCancel={() => setSelectedMigration(undefined)}
         customFooter={
           <div className="flex items-center justify-end p-4 border-t border-overlay-border">
-            <Button variant="default" onClick={() => setSelectedMigration(undefined)}>
-              Close
-            </Button>
+            <Button onClick={() => setSelectedMigration(undefined)}>Close</Button>
           </div>
         }
       >

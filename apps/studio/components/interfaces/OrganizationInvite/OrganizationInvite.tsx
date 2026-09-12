@@ -116,7 +116,7 @@ export const OrganizationInvite = () => {
           <Link href={loginRedirectLink}>Sign in</Link>
         </Button>
         {isSignUpEnabled && (
-          <Button asChild variant="default" block>
+          <Button asChild block>
             <Link href={signupRedirectLink}>Sign up</Link>
           </Button>
         )}
@@ -151,7 +151,7 @@ export const OrganizationInvite = () => {
           type="warning"
           description="This invite has already been accepted or declined."
         />
-        <Button variant="default" block asChild>
+        <Button block asChild>
           <Link href="/">Back to dashboard</Link>
         </Button>
       </div>
@@ -161,7 +161,7 @@ export const OrganizationInvite = () => {
   if (mfaRequiredError) {
     return withLayout(
       <div className="flex flex-col gap-3">
-        <Button variant="default" block asChild>
+        <Button block asChild>
           <Link href="/account/security">Go to account settings</Link>
         </Button>
       </div>

@@ -48,7 +48,7 @@ export const ChartIntervalDropdown = ({
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button variant="default" iconRight={<ChevronDown size={14} />}>
+        <Button iconRight={<ChevronDown size={14} />}>
           <span>{selectedInterval.label}</span>
         </Button>
       </DropdownMenuTrigger>

@@ -31,7 +31,7 @@ export type ReadReplicasVariables = {
   projectRef?: string
 }
 
-export type Database = components['schemas']['DatabaseDetailResponse']
+export type Database = components['schemas']['DatabaseDetailResponse_Output']
 
 export async function getReadReplicas(
   { projectRef }: ReadReplicasVariables,

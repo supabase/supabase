@@ -60,7 +60,6 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large', planId }: Up
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
-                variant="default"
                 role="combobox"
                 size={'small'}
                 aria-expanded={open}
@@ -141,7 +140,7 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large', planId }: Up
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button disabled={!value} asChild>
+          <Button variant="primary" disabled={!value} asChild>
             <Link
               href={
                 value === 'new-organization'

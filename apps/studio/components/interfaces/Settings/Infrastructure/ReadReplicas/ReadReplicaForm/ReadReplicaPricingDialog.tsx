@@ -50,18 +50,12 @@ export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDial
         className="mb-0 rounded-none border-x-0"
         actions={
           isError ? (
-            <Button
-              type="button"
-              variant="default"
-              size="tiny"
-              disabled={isLoading}
-              onClick={retry}
-            >
+            <Button type="button" size="tiny" disabled={isLoading} onClick={retry}>
               Retry
             </Button>
           ) : (
             <DialogTrigger asChild>
-              <Button type="button" variant="default" size="tiny" disabled={isLoading}>
+              <Button type="button" size="tiny" disabled={isLoading}>
                 View breakdown
               </Button>
             </DialogTrigger>

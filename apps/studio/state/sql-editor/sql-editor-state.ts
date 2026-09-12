@@ -252,11 +252,14 @@ export const sqlEditorState = proxy({
 
   addNeedsSaving: (id: string) => sqlEditorState.needsSaving.set(id, true),
 
+  /**
+   * Mark a snippet as favorite. Favoriting persists immediately regardless of
+   * save mode (see `SqlEditorSaveCoordinatorProvider.saveFavorite`)
+   */
   addFavorite: (id: string) => {
     const storeSnippet = sqlEditorState.snippets[id]
     if (storeSnippet) {
       storeSnippet.snippet.favorite = true
-      sqlEditorState.needsSaving.set(id, true)
     }
   },
 
@@ -264,7 +267,6 @@ export const sqlEditorState = proxy({
     const storeSnippet = sqlEditorState.snippets[id]
     if (storeSnippet) {
       storeSnippet.snippet.favorite = false
-      sqlEditorState.needsSaving.set(id, true)
     }
   },
 })

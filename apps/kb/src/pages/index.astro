@@ -1,8 +1,79 @@
 ---
+import { getCollection } from 'astro:content'
+
+import Card from '../components/Card.astro'
 import { Hero } from '../components/Hero'
 import Layout from '../layouts/Layout.astro'
+import { TOPICS, topicToSlug } from '../lib/topics'
+
+const guides = await getCollection('guides')
+const pinnedTopics = TOPICS.filter((topic) => topic.pinned)
+const featuredGuides = guides.filter((guide) => guide.data.pinned)
 ---
 
 <Layout title="Home" description="In-depth guides, tutorials, and explainers for best practices for Supabase databases.">
 	<Hero />
+
+	<div class="mx-auto flex max-w-7xl flex-col gap-16 px-6 py-16">
+		{
+			pinnedTopics.length > 0 && (
+				<section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					{pinnedTopics.map((topic) => (
+						<Card
+							href={`${import.meta.env.BASE_URL}/topics/${topicToSlug(topic.name)}`}
+							title={topic.name}
+							description={topic.description}
+						/>
+					))}
+				</section>
+			)
+		}
+
+		{
+			featuredGuides.length > 0 && (
+				<section>
+					<h2 class="mb-6 text-2xl font-medium text-foreground">Featured Guides</h2>
+					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+						{featuredGuides.map((guide) => (
+							<Card
+								href={`${import.meta.env.BASE_URL}/guides/${guide.id}`}
+								title={guide.data.title}
+								description={guide.data.description}
+								topics={guide.data.topics}
+							/>
+						))}
+					</div>
+				</section>
+			)
+		}
+
+		<section>
+			<h2 class="mb-6 text-2xl font-medium text-foreground">All Guides</h2>
+			<ul class="flex flex-col gap-2">
+				{guides.map((guide) => (
+					<li>
+						<a href={`${import.meta.env.BASE_URL}/guides/${guide.id}`} class="text-brand-link hover:underline">
+							{guide.data.title}
+						</a>
+					</li>
+				))}
+			</ul>
+		</section>
+
+		<section>
+			<h2 class="mb-6 text-2xl font-medium text-foreground">All Topics</h2>
+			<ul class="flex flex-col gap-2">
+				{TOPICS.map((topic) => (
+					<li>
+						<a
+							href={`${import.meta.env.BASE_URL}/topics/${topicToSlug(topic.name)}`}
+							class="text-brand-link hover:underline"
+						>
+							{topic.name}
+						</a>
+					</li>
+				))}
+			</ul>
+		</section>
+	</div>
 </Layout>

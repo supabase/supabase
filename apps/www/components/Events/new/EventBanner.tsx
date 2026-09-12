@@ -61,7 +61,12 @@ export function EventBanner() {
               </Button>
             )}
             {featuredEvent.link && (
-              <Button size="medium" asChild iconRight={<ArrowRightIcon size={14} />}>
+              <Button
+                variant="primary"
+                size="medium"
+                asChild
+                iconRight={<ArrowRightIcon size={14} />}
+              >
                 <Link
                   href={featuredEvent.link.href}
                   target={featuredEvent.link.target}

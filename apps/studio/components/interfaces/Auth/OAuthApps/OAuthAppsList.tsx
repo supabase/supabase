@@ -241,7 +241,7 @@ export const OAuthAppsList = () => {
             title="OAuth Server is disabled"
             description="Enable OAuth Server to make your project act as an identity provider for third-party applications."
             actions={
-              <Button asChild variant="default">
+              <Button asChild>
                 <Link href={`/project/${projectRef}/auth/oauth-server`}>OAuth Server Settings</Link>
               </Button>
             }
@@ -287,13 +287,7 @@ export const OAuthAppsList = () => {
               onSaveFilters={setFilteredClientTypes}
             />
             {hasActiveFilters && (
-              <Button
-                variant="default"
-                size="tiny"
-                className="px-1"
-                icon={<X />}
-                onClick={handleResetFilters}
-              />
+              <Button size="tiny" className="px-1" icon={<X />} onClick={handleResetFilters} />
             )}
           </div>
           <div className="flex items-center gap-x-2">
@@ -315,6 +309,7 @@ export const OAuthAppsList = () => {
               </Shortcut>
             ) : (
               <ButtonTooltip
+                variant="primary"
                 disabled
                 icon={<Plus />}
                 onClick={() => setShowCreateSheet(true)}
@@ -412,7 +407,7 @@ export const OAuthAppsList = () => {
                         <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l @[944px]:border-l-0">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="default" className="px-1" icon={<MoreVertical />} />
+                              <Button className="px-1" icon={<MoreVertical />} />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent side="bottom" align="end" className="w-48">
                               <DropdownMenuItem

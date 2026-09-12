@@ -426,7 +426,7 @@ export const RealtimeSettings = () => {
                                   </p>
                                 }
                                 actions={
-                                  <Button asChild variant="default">
+                                  <Button asChild>
                                     <Link href={`/project/${projectRef}/realtime/policies`}>
                                       Create policy
                                     </Link>
@@ -718,9 +718,7 @@ export const RealtimeSettings = () => {
                 </div>
                 <div className="flex items-center gap-x-2">
                   {form.formState.isDirty && (
-                    <Button variant="default" onClick={() => form.reset(formValues)}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => form.reset(formValues)}>Cancel</Button>
                   )}
                   <Button
                     variant="primary"

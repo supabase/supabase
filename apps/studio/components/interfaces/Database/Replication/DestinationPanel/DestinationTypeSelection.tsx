@@ -157,7 +157,7 @@ export const DestinationTypeSelection = () => {
       >
         <Select
           disabled={editMode}
-          value={destinationType ?? undefined}
+          value={destinationType ?? ''}
           onValueChange={(value) => setDestinationType(value as DestinationType)}
         >
           <SelectTrigger className="h-auto py-2">

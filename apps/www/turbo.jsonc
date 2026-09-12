@@ -76,6 +76,7 @@
         "FORCE_ASSET_CDN",
         "ASSET_CDN_S3_ENDPOINT",
         "SITE_NAME",
+        "AGENT_SKILLS_GITHUB_TOKEN",
         "LUMA_API_KEY",
         "LUMA_HACKATHONS_API_KEY",
         "NEXT_RUNTIME",

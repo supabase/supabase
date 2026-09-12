@@ -10,6 +10,57 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
+## [0.8.1](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.8.1) - 2026-09-09
+
+### Configuration
+- Added an optional [PgBouncer](https://www.pgbouncer.org/) override (requires `docker-compose.pgbouncer.yml`) as an alternative to the default Supavisor pooler - PR [#49052](https://github.com/supabase/supabase/pull/49052) (via [@singh-inder](https://github.com/singh-inder/))
+
+### Documentation
+- Added a new guide [Accessing Postgres](https://supabase.com/docs/guides/self-hosting/accessing-postgres) - PR [#49303](https://github.com/supabase/supabase/pull/49303)
+- Added new how-to guides (configuring [auth hooks](https://supabase.com/docs/guides/self-hosting/self-hosted-auth-hooks), [passkeys](https://supabase.com/docs/guides/self-hosting/self-hosted-passkeys)) - PR [#43372](https://github.com/supabase/supabase/pull/43372), PR [#48954](https://github.com/supabase/supabase/pull/48954) (via [@singh-inder](https://github.com/singh-inder/))
+
+### API gateway
+- Updated Envoy to `v1.39.1` - [Release](https://github.com/envoyproxy/envoy/releases/tag/v1.39.1)
+- Changed CORS configuration for `/pg` route (requires `docker-compose.yml`, `volumes/api/envoy/docker-entrypoint.sh`, `volumes/api/envoy/lds.template.yaml` update) - PR [#49136](https://github.com/supabase/supabase/pull/49136)
+- Updated [nginx-certbot](https://github.com/JonasAlfredsson/docker-nginx-certbot) to `6.2.0-nginx1.31.5` (requires `docker-compose.nginx.yml` update)
+
+### Studio
+- Updated to `2026.09.07-sha-7996410`
+
+### MCP Server
+- Updated to `v0.11.0` - [Release](https://github.com/supabase/mcp/releases/tag/mcp-server-supabase-v0.11.0)
+
+### Auth
+- Updated to `v2.196.0` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md) | [Release](https://github.com/supabase/auth/releases/tag/v2.196.0)
+
+### PostgREST
+- Updated to `v14.17` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.17)
+
+### Realtime
+- Updated to `v2.134.10` - [Release](https://github.com/supabase/realtime/releases/tag/v2.134.10)
+
+### Storage
+- Updated to `v1.74.0` - [Release](https://github.com/supabase/storage/releases/tag/v1.74.0)
+- Updated RustFS to `v1.0.0-rc.5` (requires `docker-compose.rustfs.yml` update)
+
+### imgproxy
+- Updated to `v3.31.4` - [Changelog](https://github.com/imgproxy/imgproxy/blob/master/CHANGELOG.md) | [Release](https://github.com/imgproxy/imgproxy/releases/tag/v3.31.4)
+
+### Postgres Meta
+- Updated to `v0.99.0` - [Release](https://github.com/supabase/postgres-meta/releases/tag/v0.99.0)
+
+### Edge Runtime
+- Updated to `v1.76.2` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.76.2)
+- Changed the main worker to use `@supabase/server` (requires `volumes/functions/deno.jsonc` and `volumes/functions/main/index.ts` update) - PR [#48996](https://github.com/supabase/supabase/pull/48996)
+
+### Supavisor
+- Updated to `2.9.12` - [Release](https://github.com/supabase/supavisor/releases/tag/v2.9.12)
+
+### Analytics (Logflare)
+- Updated to `1.50.10` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.50.10)
+
+---
+
 ## [0.8.0](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.8.0) - 2026-08-11
 
 ⚠️ **Note:** This update contains **breaking changes**. Make sure to read the **important** details below:
@@ -60,7 +111,7 @@ See per-service updates below for details. Only the most important changes relev
 ### API gateway
 - Updated Kong to `3.9.3`
 - Added `KONG_DNS_VALID_TTL` configuration environment variable (requires `docker-compose.yml` update) - PR [#47846](https://github.com/supabase/supabase/pull/47846)
-- Updated Envoy to `1.39.0` (requires `docker-compose.envoy.yml` update)
+- Updated Envoy to `v1.39.0` (requires `docker-compose.envoy.yml` update) - [Release](https://github.com/envoyproxy/envoy/releases/tag/v1.39.0)
 - Updated [nginx-certbot](https://github.com/JonasAlfredsson/docker-nginx-certbot) to `6.2.0-nginx1.31.3` (requires `docker-compose.nginx.yml` update)
 
 ### Studio
@@ -69,7 +120,7 @@ See per-service updates below for details. Only the most important changes relev
 - Fixed the Logs tab visibility in **Auth > Users** - PR [#48122](https://github.com/supabase/supabase/pull/48122) (via [@luizfelmach](https://github.com/luizfelmach/))
 
 ### Storage
-- Changed RustFS image to `1.0.0-beta.11` temporarily (requires `docker-compose.rustfs.yml` update) - PR [#48500](https://github.com/supabase/supabase/pull/48500)
+- Changed RustFS image to `v1.0.0-beta.11` temporarily (requires `docker-compose.rustfs.yml` update) - PR [#48500](https://github.com/supabase/supabase/pull/48500)
 
 ### Edge Runtime
 - Changed JWKS configuration mechanism for main worker (requires `docker-compose.yml` and `volumes/functions/main/index.ts` update) - PR [#45635](https://github.com/supabase/supabase/pull/45635)
@@ -176,8 +227,8 @@ See per-service updates below for details. Only the most important changes relev
 - Updated `tests/test-container-logs.sh` to skip checks for `kong`, `analytics` and `vector` when the services are not running - PR [#46099](https://github.com/supabase/supabase/pull/46099)
 
 ### API gateway
-- Updated Envoy version to `1.38.0` (see `docker-compose.envoy.yml`) - PR [#46023](https://github.com/supabase/supabase/pull/46023)
-- Updated Envoy configuration to address a discrepancy in API key checking (requires `volumes/api/envoy` update) - PR [#46023](https://github.com/supabase/supabase/pull/46023)
+- Updated Envoy to `v1.38.0` (requires `docker-compose.envoy.yml` update) - [Release](https://github.com/envoyproxy/envoy/releases/tag/v1.38.0)
+- Changed Envoy configuration to address a discrepancy in API key checking (requires `volumes/api/envoy` update) - PR [#46023](https://github.com/supabase/supabase/pull/46023)
 
 ### Studio
 - Updated to `2026.06.03-sha-0bca601`

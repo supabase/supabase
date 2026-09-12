@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { getReportTools } from './report-tools'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type GetUserContentByIdResponse = components['schemas']['GetUserContentByIdResponse']
+type GetUserContentByIdResponse = components['schemas']['GetUserContentByIdResponse_Output']
 
 describe('ai/tools/report-tools', () => {
   describe('getReportTools', () => {

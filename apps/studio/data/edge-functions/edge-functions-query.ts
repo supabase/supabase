@@ -7,7 +7,7 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type EdgeFunctionsVariables = { projectRef?: string }
 
-export type EdgeFunctionsResponse = components['schemas']['FunctionResponse']
+export type EdgeFunctionsResponse = components['schemas']['FunctionResponse_Output']
 
 export async function getEdgeFunctions(
   { projectRef }: EdgeFunctionsVariables,

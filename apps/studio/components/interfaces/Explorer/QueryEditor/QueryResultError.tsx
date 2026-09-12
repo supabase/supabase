@@ -84,8 +84,8 @@ export const QueryResultError = ({
   )
 
   return (
-    <div className="w-full bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
-      <div className="flex flex-row justify-between items-start py-4 px-6 gap-x-4">
+    <div className="w-full overflow-y-auto">
+      <div className="flex flex-row justify-between items-start p-3 gap-x-4">
         {isTimeout ? (
           <div className="flex flex-col gap-y-1">
             <p className="font-mono text-sm tracking-tight">
@@ -159,7 +159,6 @@ export const QueryResultError = ({
           {readReplicaError && (
             <Button
               className="py-2"
-              variant="default"
               // [Joshen] TODO
               onClick={() => {}}
             >

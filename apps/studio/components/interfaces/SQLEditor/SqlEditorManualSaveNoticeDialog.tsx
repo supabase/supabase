@@ -77,7 +77,9 @@ export const SqlEditorManualSaveNoticeDialog = () => {
         </DialogSection>
 
         <DialogFooter>
-          <Button onClick={() => setIsNoticeDismissed(true)}>Understood</Button>
+          <Button variant="primary" onClick={() => setIsNoticeDismissed(true)}>
+            Understood
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

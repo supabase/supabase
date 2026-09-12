@@ -277,7 +277,7 @@ export const Activity = ({ live }: ActivityProps) => {
                       There are no sessions that match the selected filters. Try adjusting or
                       clearing them.
                     </p>
-                    <Button variant="default" className="mt-2" onClick={onResetFilters}>
+                    <Button className="mt-2" onClick={onResetFilters}>
                       Reset filters
                     </Button>
                   </TableCell>

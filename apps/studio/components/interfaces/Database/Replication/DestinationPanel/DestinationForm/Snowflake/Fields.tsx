@@ -171,7 +171,6 @@ export const SnowflakeFields = ({
                   actions={
                     <div className="flex items-center justify-center">
                       <Button
-                        variant="default"
                         className="w-7"
                         title={showPrivateKeyPassphrase ? 'Hide passphrase' : 'Show passphrase'}
                         aria-label={

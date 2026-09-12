@@ -12,11 +12,11 @@ export type OAuthAppCreateVariables = {
   name: string
   website: string
   icon?: string
-  scopes?: OAuthScope[]
+  scopes: OAuthScope[]
   redirect_uris: string[]
 }
 
-export type OAuthAppCreateResponse = components['schemas']['CreateOAuthAppResponse']
+export type OAuthAppCreateResponse = components['schemas']['CreateOAuthAppResponse_Output']
 
 export async function createOAuthApp({
   slug,

@@ -171,6 +171,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
             </DialogSection>
             <DialogFooter>
               <Button
+                variant="primary"
                 block
                 type="submit"
                 size="small"

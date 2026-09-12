@@ -13,7 +13,6 @@ import {
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
 import { EMPTY_OBJ } from '@/lib/void'
 
@@ -150,25 +149,16 @@ export const useIsMarketplaceEnabled = () => {
   return isMarketplaceEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]
 }
 
-export const useIsDatabaseConnectionsEnabled = () => {
-  const { flags, isInitialized } = useFeaturePreviewContext()
-  const [localStorageFlag] = useLocalStorageQuery<boolean | null>(
-    LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS,
-    null
-  )
-  const previouslyToggled = localStorageFlag !== null
-
-  return {
-    enabled: flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS],
-    isInitialized,
-    previouslyToggled,
-  }
-}
-
 export const useIsExplorerEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   const isExplorerEnabled = useFlag('explorer')
   return isExplorerEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]
+}
+
+export const useIsStorageVersioningEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const isStorageVersioningEnabled = useFlag('storageVersioningPrivateAlpha')
+  return isStorageVersioningEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING]
 }
 
 export const useFeaturePreviewModal = () => {

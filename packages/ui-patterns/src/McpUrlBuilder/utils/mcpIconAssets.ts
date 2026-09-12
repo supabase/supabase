@@ -20,6 +20,7 @@ import grokIcon from '../assets/grok-icon.svg'
 import kimiDarkIcon from '../assets/kimi-icon-dark.svg'
 import kimiIcon from '../assets/kimi-icon.svg'
 import kiroIcon from '../assets/kiro-icon.svg'
+import ompIcon from '../assets/omp-icon.svg'
 import openaiDarkIcon from '../assets/openai-icon-dark.svg'
 import openaiIcon from '../assets/openai-icon.svg'
 import opencodeDarkIcon from '../assets/opencode-icon-dark.svg'
@@ -52,6 +53,7 @@ const MCP_CLIENT_ICON_ASSETS = {
   grok: { light: grokIcon, dark: grokDarkIcon },
   kimi: { light: kimiIcon, dark: kimiDarkIcon },
   kiro: { light: kiroIcon, dark: kiroIcon },
+  omp: { light: ompIcon, dark: ompIcon },
   openai: { light: openaiIcon, dark: openaiDarkIcon },
   opencode: { light: opencodeIcon, dark: opencodeDarkIcon },
   perplexity: { light: perplexityIcon, dark: perplexityDarkIcon },

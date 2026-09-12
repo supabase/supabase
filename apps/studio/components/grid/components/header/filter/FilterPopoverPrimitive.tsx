@@ -115,7 +115,6 @@ export const FilterPopoverPrimitive = ({
             </Button>
             <Button
               disabled={isEqual(localFilters, filters)}
-              variant="default"
               onClick={() => onSelectApplyFilters()}
             >
               Apply filter

@@ -383,7 +383,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                 ))}
               </div>
               <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-3">
-                <Button variant="default" size="tiny" onClick={() => append({ value: '' })}>
+                <Button size="tiny" onClick={() => append({ value: '' })}>
                   Add metadata key
                 </Button>
               </div>
@@ -392,10 +392,11 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
         </Form>
 
         <SheetFooter>
-          <Button variant="default" disabled={isCreating} onClick={() => setVisible(false)}>
+          <Button disabled={isCreating} onClick={() => setVisible(false)}>
             Cancel
           </Button>
           <Button
+            variant="primary"
             form={formId}
             type="submit"
             loading={isCreating}

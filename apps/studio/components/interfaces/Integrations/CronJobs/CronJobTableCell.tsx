@@ -239,9 +239,7 @@ export const CronJobTableCell = ({
               </p>
             </DialogSection>
             <DialogFooter>
-              <Button variant="default" onClick={() => setShowToggleModal(false)}>
-                Cancel
-              </Button>
+              <Button onClick={() => setShowToggleModal(false)}>Cancel</Button>
               <Button
                 variant={active ? 'warning' : 'primary'}
                 loading={isToggling}

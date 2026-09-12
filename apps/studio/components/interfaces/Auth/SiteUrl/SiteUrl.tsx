@@ -125,11 +125,7 @@ const SiteUrl = () => {
               </CardContent>
 
               <CardFooter className="justify-end space-x-2">
-                {isDirty && (
-                  <Button variant="default" onClick={() => siteUrlForm.reset()}>
-                    Cancel
-                  </Button>
-                )}
+                {isDirty && <Button onClick={() => siteUrlForm.reset()}>Cancel</Button>}
                 <Button
                   variant="primary"
                   type="submit"

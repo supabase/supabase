@@ -9,7 +9,7 @@ export type OAuthAppsVariables = {
   slug?: string
 }
 
-export type OAuthApp = components['schemas']['OAuthAppResponse']
+export type OAuthApp = components['schemas']['OAuthAppResponse_Output']
 
 export async function getOAuthApps({ slug }: OAuthAppsVariables) {
   if (!slug) throw new Error('Organization slug is required')

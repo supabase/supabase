@@ -136,7 +136,12 @@ export const IndexSuggestionIcon = ({
           >
             View details
           </Button>
-          <Button onClick={handleCreateIndex} loading={isCreatingIndex} disabled={isCreatingIndex}>
+          <Button
+            variant="primary"
+            onClick={handleCreateIndex}
+            loading={isCreatingIndex}
+            disabled={isCreatingIndex}
+          >
             Create index
           </Button>
         </div>

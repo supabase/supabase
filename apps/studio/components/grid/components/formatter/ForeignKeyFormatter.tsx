@@ -84,7 +84,6 @@ export const ForeignKeyFormatter = (props: Props) => {
             <Popover>
               <PopoverTrigger asChild>
                 <ButtonTooltip
-                  variant="default"
                   className="w-6 h-6"
                   aria-label="View referencing record"
                   icon={<ArrowRight />}

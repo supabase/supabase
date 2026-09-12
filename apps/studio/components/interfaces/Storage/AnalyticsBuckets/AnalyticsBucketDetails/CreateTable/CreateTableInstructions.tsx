@@ -208,7 +208,6 @@ export const CreateTableInstructions = ({
                   }}
                 />
                 <ButtonTooltip
-                  variant="default"
                   className="w-7"
                   loading={isFetchingSecretValues}
                   onClick={() => setShowKeys(!showKeys)}

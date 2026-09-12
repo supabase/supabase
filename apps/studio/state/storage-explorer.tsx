@@ -1788,12 +1788,7 @@ function createStorageExplorerState({
           progressPrefix={`${remainingTime && !isNaN(remainingTime) && isFinite(remainingTime) && remainingTime !== 0 ? `${formatTime(remainingTime)} remaining – ` : ''}`}
           action={
             toastId && (
-              <Button
-                size="tiny"
-                variant="default"
-                className="ml-6"
-                onClick={() => state.abortUploads(toastId)}
-              >
+              <Button size="tiny" className="ml-6" onClick={() => state.abortUploads(toastId)}>
                 Cancel
               </Button>
             )

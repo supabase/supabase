@@ -79,12 +79,7 @@ export const SOC2 = () => {
           </div>
         ) : (
           <div className="@lg:flex items-center justify-center h-full">
-            <Button
-              variant="default"
-              icon={<Download />}
-              onClick={handleDownloadClick}
-              disabled={!slug}
-            >
+            <Button icon={<Download />} onClick={handleDownloadClick} disabled={!slug}>
               Download SOC2 Type 2 Report
             </Button>
           </div>

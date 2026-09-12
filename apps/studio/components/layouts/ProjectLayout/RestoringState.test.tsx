@@ -9,7 +9,7 @@ import { POLL_INTERVAL_MS, RestoringState } from './RestoringState'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type ProjectDetailResponse = components['schemas']['ProjectDetailResponse']
+type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
 type ProjectStatus = ProjectDetailResponse['status']
 type DownloadableBackupsResponse = components['schemas']['DownloadableBackupsResponse']
 

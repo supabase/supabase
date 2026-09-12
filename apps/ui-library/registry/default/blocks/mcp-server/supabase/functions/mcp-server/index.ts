@@ -5,7 +5,7 @@ import {
   withOAuthProtectedResource,
   withSupabase,
   type SupabaseContext,
-} from 'npm:@supabase/server@1.5.1'
+} from 'npm:@supabase/server@1.6.0'
 
 import { registerTools, type ToolContext } from './tools/index.ts'
 

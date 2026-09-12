@@ -30,7 +30,7 @@ const CTABanner = ({ darkerBg, className }: Props) => {
         </h2>
       </div>
       <div className="flex items-center justify-center gap-2 col-span-12 mt-4">
-        <Button asChild size="medium">
+        <Button variant="primary" asChild size="medium">
           <Link
             href={getDashboardCtaHref(isLoggedIn)}
             onClick={() =>
@@ -43,7 +43,7 @@ const CTABanner = ({ darkerBg, className }: Props) => {
             Start your project
           </Link>
         </Button>
-        <Button asChild size="medium" variant="default">
+        <Button asChild size="medium">
           <Link
             href="/contact/sales"
             onClick={() =>

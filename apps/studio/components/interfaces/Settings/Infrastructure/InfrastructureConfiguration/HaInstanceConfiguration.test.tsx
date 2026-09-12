@@ -9,7 +9,7 @@ import type { ProfileContextType } from '@/lib/profile'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 
-type ProjectDetailResponse = components['schemas']['ProjectDetailResponse']
+type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
 
 vi.mock('@/lib/constants', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/constants')>()

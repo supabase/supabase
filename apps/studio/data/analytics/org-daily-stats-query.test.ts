@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { getOrgDailyStats } from './org-daily-stats-query'
 
@@ -10,10 +10,6 @@ vi.mock('@/data/fetchers', () => ({
 }))
 
 describe('org-daily-stats-query', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   describe('getOrgDailyStats', () => {
     it('throws error when orgSlug is not provided', async () => {
       await expect(
