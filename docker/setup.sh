@@ -479,7 +479,14 @@ else
 fi
 
 if [ "$pull_failed" = "1" ]; then
-    warn "docker compose pull failed; you can pull images later with 'sh run.sh pull'."
+    warn "docker compose pull failed; images were not downloaded."
+    echo ""
+    echo "Setup did not complete. To pull images and start manually:"
+    echo "  cd $(pwd)"
+    echo "  sh run.sh pull"
+    echo "  sh run.sh start"
+    echo ""
+    exit 1
 fi
 
 echo ""
@@ -489,9 +496,6 @@ echo "Next steps:"
 echo "  cd $(pwd)"
 echo "  sh run.sh config"
 echo "  sh run.sh secrets"
-if [ "$pull_failed" = "1" ]; then
-    echo "  sh run.sh pull"
-fi
 echo "  sh run.sh start"
 echo ""
 echo "To enable docker-compose overrides (caddy, nginx, logs, rustfs, s3, kong):"

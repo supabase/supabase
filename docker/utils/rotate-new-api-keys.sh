@@ -37,8 +37,9 @@ else
     fi
 
     if ! docker_err=$(docker info 2>&1 >/dev/null); then
-        case "$docker_err" in
-            *"permission denied"*)
+        err_lower=$(printf '%s\n' "$docker_err" | tr '[:upper:]' '[:lower:]')
+        case "$err_lower" in
+            *"permission denied"*"docker.sock"*|*"docker.sock"*"permission denied"*)
                 current_user="${USER:-$(id -un 2>/dev/null || echo user)}"
                 echo "Error: permission denied connecting to the Docker daemon at unix:///var/run/docker.sock." >&2
                 echo "User '$current_user' is not in the 'docker' group. To fix:" >&2
