@@ -179,9 +179,7 @@ export const ConnectSheet = () => {
           </div>
 
           {state.mode === 'warehouse' ? (
-            <div className="p-8">
-              <WarehouseModePanel />
-            </div>
+            <WarehouseModePanel />
           ) : (
             <>
               {activeFields.length > 0 && (
