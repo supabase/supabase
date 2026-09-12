@@ -88,7 +88,7 @@ export const renderPageInputSchema = z
       .min(1)
       .max(MAX_GENERATED_PAGE_HTML_LENGTH)
       .describe(
-        'Self-contained HTML for the page body, including inline <style> and <script> tags. Studio color variables and heading/text styles are already injected. Use var(--background), var(--foreground), var(--card), var(--border), etc. for all UI colors; do not hardcode colors or literal fallbacks. Audit CSS, SVG, and JavaScript before submitting. Only use custom colors when explicitly requested by the user or necessary for data visualization without a suitable token.'
+        'Self-contained HTML for the page body, including inline <style> and <script> tags. Studio color variables, heading/text styles, and an optional studio-* CSS UI kit are already injected. Reuse kit classes where they fit and add CSS to refine the design; override or omit them for a custom design. For the default Studio design, use var(--background), var(--foreground), var(--card), var(--border), etc. instead of hardcoded colors or literal fallbacks. Audit CSS, SVG, and JavaScript before submitting. Custom colors are allowed when the user requests them or a completely different design, or when necessary for data visualization without a suitable token.'
       ),
     database_queries: z
       .array(generatedPageDatabaseQuerySchema)

@@ -10,6 +10,7 @@ import {
   SUPABASE_JS_CDN_URL,
 } from './generated-page-document'
 import { GENERATED_PAGE_TYPOGRAPHY_STYLES } from './generated-page-typography'
+import { GENERATED_PAGE_UI_STYLES } from './generated-page-ui'
 
 const baseOptions = {
   html: '<h1>Hello</h1>',
@@ -18,6 +19,20 @@ const baseOptions = {
 }
 
 describe('buildGeneratedPageDocument', () => {
+  it('provides the optional UI kit before custom markup without adding a wrapper or dependencies', () => {
+    const html = '<style>button { border-radius: 0; }</style><button>Custom interface</button>'
+    const doc = buildGeneratedPageDocument({ ...baseOptions, html })
+
+    expect(doc).toContain(`<style>${GENERATED_PAGE_UI_STYLES}</style>`)
+    expect(doc.indexOf(GENERATED_PAGE_UI_STYLES)).toBeLessThan(doc.indexOf(html))
+    const { body } = new DOMParser().parseFromString(doc, 'text/html')
+    expect(body.className).toBe('')
+    expect(body.querySelector('button')?.parentElement).toBe(body)
+    expect(doc).toContain(html)
+    expect(doc).not.toContain('<link')
+    expect(doc).not.toContain('<script src=')
+  })
+
   it('provides typography without Tailwind and lets generated CSS override it', () => {
     const html = '<style>h1 { font-size: 48px; }</style><h1>Custom title</h1>'
     const doc = buildGeneratedPageDocument({ ...baseOptions, html })

@@ -27,6 +27,7 @@
 import { z } from 'zod'
 
 import { GENERATED_PAGE_TYPOGRAPHY_STYLES } from './generated-page-typography'
+import { GENERATED_PAGE_UI_STYLES } from './generated-page-ui'
 
 /**
  * Pinned to the workspace catalog version of `@supabase/supabase-js` so the client running
@@ -349,6 +350,7 @@ export function buildGeneratedPageDocument(options: BuildGeneratedPageDocumentOp
     <meta http-equiv="Content-Security-Policy" content="${csp}" />
     <style>${BASE_STYLES}</style>
     <style>${GENERATED_PAGE_TYPOGRAPHY_STYLES}</style>
+    <style>${GENERATED_PAGE_UI_STYLES}</style>
     <style>${options.themeStyles ?? ''}</style>
     ${supabaseScript}
     <script>${buildBootstrapScript(options)}</script>

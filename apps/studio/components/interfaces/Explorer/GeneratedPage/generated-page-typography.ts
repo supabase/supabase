@@ -10,6 +10,8 @@ export const GENERATED_PAGE_TYPOGRAPHY_STYLES = `
   }
   html, body {
     font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   button, input, select, textarea {
     font-family: inherit;

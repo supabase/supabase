@@ -63,6 +63,8 @@ const GENERATED_PAGE_TYPOGRAPHY_VARIABLES = [
   '--font-source-code-pro',
   '--tracking-tight',
   '--tracking-wider',
+  '--radius-md',
+  '--radius-lg',
 ] as const
 
 // Font faces loaded in Studio are not inherited by the sandbox. Keep each font

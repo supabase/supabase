@@ -45,6 +45,8 @@ describe('buildGeneratedPageThemeStyles', () => {
         '--font-weight-medium': '500',
         '--tracking-tight': '-0.025em',
         '--spacing': '0.25rem',
+        '--radius-md': '0.375rem',
+        '--radius-lg': '0.5rem',
       })
     )
 
@@ -54,6 +56,8 @@ describe('buildGeneratedPageThemeStyles', () => {
     expect(css).toContain('--font-weight-medium: 500;')
     expect(css).toContain('--tracking-tight: -0.025em;')
     expect(css).toContain('--spacing: 0.25rem;')
+    expect(css).toContain('--radius-md: 0.375rem;')
+    expect(css).toContain('--radius-lg: 0.5rem;')
   })
 
   it('omits absent variables and uses a light fallback when styles are unavailable', () => {
