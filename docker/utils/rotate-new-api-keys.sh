@@ -32,12 +32,25 @@ else
     fi
 
     if ! command -v docker >/dev/null 2>&1; then
-        echo "Error: requires either node (>= 16) or docker."
+        echo "Error: requires either node (>= 16) or docker." >&2
         exit 1
     fi
 
-    if ! docker info >/dev/null 2>&1; then
-        echo "Error: docker is installed but the daemon is not running."
+    if ! docker_err=$(docker info 2>&1 >/dev/null); then
+        err_lower=$(printf '%s\n' "$docker_err" | tr '[:upper:]' '[:lower:]')
+        case "$err_lower" in
+            *"permission denied"*"docker.sock"*|*"docker.sock"*"permission denied"*)
+                current_user="${USER:-$(id -un 2>/dev/null || echo user)}"
+                echo "Error: permission denied connecting to the Docker daemon at unix:///var/run/docker.sock." >&2
+                echo "User '$current_user' is not in the 'docker' group. To fix:" >&2
+                echo "  sudo usermod -aG docker \"$current_user\"" >&2
+                echo "  newgrp docker  (or log out and back in)" >&2
+                ;;
+            *)
+                echo "Error: could not query the Docker daemon:" >&2
+                printf '%s\n' "$docker_err" >&2
+                ;;
+        esac
         exit 1
     fi
 
