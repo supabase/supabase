@@ -113,21 +113,21 @@ create function public.hook_mfa_verification_attempt(event jsonb)
   language plpgsql
 as $$
   declare
-    last_failed_at timestamp;
+    _last_failed_at timestamp;
   begin
-    if event->'valid' is true then
+    if (event->>'valid')::boolean is true then
       -- code is valid, accept it
       return jsonb_build_object('decision', 'continue');
     end if;
 
-    select last_failed_at into last_failed_at
+    select last_failed_at into _last_failed_at
       from public.mfa_failed_verification_attempts
       where
-        user_id = event->'user_id'
+        user_id = (event->>'user_id')::uuid
           and
-        factor_id = event->'factor_id';
+        factor_id = (event->>'factor_id')::uuid;
 
-    if last_failed_at is not null and now() - last_failed_at < interval '2 seconds' then
+    if _last_failed_at is not null and now() - _last_failed_at < interval '2 seconds' then
       -- last attempt was done too quickly
       return jsonb_build_object(
         'error', jsonb_build_object(
@@ -146,11 +146,11 @@ as $$
       )
       values
       (
-        event->'user_id',
-        event->'factor_id',
+        (event->>'user_id')::uuid,
+        (event->>'factor_id')::uuid,
         now()
       )
-      on conflict do update
+      on conflict (user_id, factor_id) do update
         set last_failed_at = now();
 
     -- finally let Supabase Auth do the default behavior for a failed attempt
@@ -165,6 +165,14 @@ grant all
 
 revoke all
   on table public.mfa_failed_verification_attempts
+  from authenticated, anon, public;
+
+grant execute
+  on function public.hook_mfa_verification_attempt
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.hook_mfa_verification_attempt
   from authenticated, anon, public;
 ```
 
