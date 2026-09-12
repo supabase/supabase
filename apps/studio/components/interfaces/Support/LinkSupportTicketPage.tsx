@@ -2,7 +2,7 @@ import { Check, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Button, cn, DialogSectionSeparator } from 'ui'
+import { Button, Card, CardContent, DialogSectionSeparator } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { LinkSupportTicketForm } from './LinkSupportTicketForm'
@@ -36,20 +36,18 @@ function LinkSupportTicketPageContent() {
   }
 
   return (
-    <div
-      className={cn(
-        'min-w-full w-full space-y-12 rounded-sm border bg-panel-body-light shadow-md border-default'
-      )}
-    >
-      {isSuccess ? (
-        <LinkSupportTicketSuccess />
-      ) : (
-        <LinkSupportTicketForm
-          conversationId={conversationId}
-          onSuccess={() => setIsSuccess(true)}
-        />
-      )}
-    </div>
+    <Card className="min-w-full w-full">
+      <CardContent className="space-y-12 border-none py-8 px-0">
+        {isSuccess ? (
+          <LinkSupportTicketSuccess />
+        ) : (
+          <LinkSupportTicketForm
+            conversationId={conversationId}
+            onSuccess={() => setIsSuccess(true)}
+          />
+        )}
+      </CardContent>
+    </Card>
   )
 }
 
