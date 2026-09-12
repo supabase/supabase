@@ -40,7 +40,9 @@ export const pgFunctionZod = z.object({
   argument_types: z.string(),
   identity_argument_types: z.string(),
   return_type_id: z.number(),
-  return_type: z.string(),
+  // `pg_get_function_result()` returns NULL for procedures, which the list query
+  // includes via `prokind in ('f', 'p')`.
+  return_type: z.union([z.string(), z.null()]),
   return_type_relation_id: z.union([z.number(), z.null()]),
   is_set_returning_function: z.boolean(),
   behavior: z.union([z.literal('IMMUTABLE'), z.literal('STABLE'), z.literal('VOLATILE')]),
