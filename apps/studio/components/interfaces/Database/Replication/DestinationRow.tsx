@@ -15,7 +15,7 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteDestination } from './DeleteDestination'
-import { DestinationIcon } from './DestinationIcon'
+import { DestinationLogo } from './DestinationLogo'
 import { PipelineStatus } from './PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { getFormattedLagValue } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
@@ -149,11 +149,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       )}
       {isPipelineSuccess && (
         <TableRow>
-          <TableCell>
-            {type ? (
-              <DestinationIcon type={type} size={18} className="text-foreground-light" />
-            ) : null}
-          </TableCell>
+          <TableCell>{type ? <DestinationLogo type={type} /> : null}</TableCell>
 
           <TableCell className="max-w-[180px]">
             {isPipelineLoading ? (
