@@ -1,5 +1,6 @@
 import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
 import { tool } from 'ai'
+import { isFeatureEnabled } from 'common/enabled-features'
 import { z } from 'zod'
 
 import { deployEdgeFunction } from '@/data/edge-functions/edge-functions-deploy-mutation'
@@ -104,7 +105,9 @@ export const getStudioTools = (ctx: StudioToolsContext = {}) => {
           metadata: {
             entrypoint_path: 'index.ts',
             name,
-            verify_jwt: true,
+            // The legacy JWT gate can't be satisfied where legacy JWT keys are turned off, so
+            // deploying with it on would produce a function that rejects every request.
+            verify_jwt: isFeatureEnabled('project_settings:legacy_jwt_keys'),
           },
           files: [{ name: 'index.ts', content: code }],
           authorization,

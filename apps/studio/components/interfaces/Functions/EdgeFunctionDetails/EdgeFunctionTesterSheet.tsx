@@ -30,6 +30,7 @@ import {
   TabsTrigger,
   Textarea,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
@@ -40,9 +41,12 @@ import { ErrorWithStatus, ResponseData } from './EdgeFunctionDetails.types'
 import { getEdgeFunctionErrorDocs } from './EdgeFunctionDetails.utils'
 import { buildEdgeFunctionTestHeaders } from './EdgeFunctionTesterSheet.utils'
 import { buildEdgeFunctionHeaderAddActions } from '@/components/interfaces/Functions/httpHeaderAddActions'
+import { getJwtVerificationState } from '@/components/interfaces/Functions/jwtVerification.utils'
+import { useIsJwtVerificationAvailable } from '@/components/interfaces/Functions/useIsJwtVerificationAvailable'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionTestMutation } from '@/data/edge-functions/edge-function-test-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { prettifyJSON } from '@/lib/helpers'
@@ -91,6 +95,15 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
   )
   const { anonKey, publishableKey, secretKey, serviceKey } = apiKeysData ?? {}
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
+
+  const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
+  const isJwtVerificationAvailable = useIsJwtVerificationAvailable()
+  // Nothing the tester can send passes the legacy JWT gate on a deployment without legacy JWT keys,
+  // so say so up front rather than letting the request come back as a bare 401.
+  const { isUnsatisfiable: isJwtVerificationUnsatisfiable } = getJwtVerificationState({
+    isAvailable: isJwtVerificationAvailable,
+    isEnforced: selectedFunction?.verify_jwt ?? false,
+  })
 
   // Sent on the `apikey` header. Defaults to the least privileged key available, matching what the
   // function details page shows in its example snippets.
@@ -212,6 +225,13 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
             <ResizablePanelGroup orientation="vertical">
               <ResizablePanel>
                 <div className="flex flex-col gap-y-4 p-5 h-full overflow-y-auto">
+                  {isJwtVerificationUnsatisfiable && (
+                    <Admonition
+                      type="warning"
+                      title="This function rejects every request"
+                      description="It verifies JWTs with the legacy secret, but legacy JWT keys are disabled on this project, so no key satisfies that check. Turn off JWT verification in the function's configuration to test it."
+                    />
+                  )}
                   <FormField
                     control={form.control}
                     name="method"

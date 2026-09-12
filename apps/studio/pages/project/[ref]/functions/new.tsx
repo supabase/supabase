@@ -32,6 +32,7 @@ import {
 import * as z from 'zod'
 
 import { EDGE_FUNCTION_TEMPLATES } from '@/components/interfaces/Functions/Functions.templates'
+import { useIsJwtVerificationAvailable } from '@/components/interfaces/Functions/useIsJwtVerificationAvailable'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
@@ -119,6 +120,9 @@ const NewFunctionPage = () => {
   const snap = useAiAssistantStateSnapshot()
   const track = useTrack()
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
+  // Where the legacy JWT gate can't be satisfied, deploying with it on produces a function that
+  // rejects every request, so deploy with it off and let the template authenticate its own callers.
+  const isJwtVerificationAvailable = useIsJwtVerificationAvailable()
   const { openSidebar } = useSidebarManagerSnapshot()
 
   const [files, setFiles] = useState<FileData[]>(INITIAL_FILES)
@@ -168,7 +172,7 @@ const NewFunctionPage = () => {
     deployFunction({
       projectRef: ref,
       slug: values.functionName,
-      metadata: { name: values.functionName, verify_jwt: true },
+      metadata: { name: values.functionName, verify_jwt: isJwtVerificationAvailable },
       files: files.map(({ name, content }) => ({ name, content })),
     })
 
