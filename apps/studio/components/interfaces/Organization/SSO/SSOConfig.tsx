@@ -381,11 +381,7 @@ export const SSOConfig = () => {
                     </div>
                     <div className="flex space-x-2">
                       {form.formState.isDirty && (
-                        <Button
-                          variant="default"
-                          disabled={isCreating || isUpdating}
-                          onClick={() => form.reset()}
-                        >
+                        <Button disabled={isCreating || isUpdating} onClick={() => form.reset()}>
                           Cancel
                         </Button>
                       )}

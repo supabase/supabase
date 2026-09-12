@@ -511,7 +511,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="default" size="tiny" onClick={() => setPendingProposal(null)}>
+                <Button size="tiny" onClick={() => setPendingProposal(null)}>
                   Discard
                 </Button>
                 <Button variant="primary" size="tiny" onClick={acceptSqlProposal}>

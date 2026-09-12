@@ -517,7 +517,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
                     Review the ClickHouse SQL rewrite before accepting it
                   </span>
                   <div className="flex items-center gap-2">
-                    <Button variant="default" size="tiny" onClick={discardRewrite}>
+                    <Button size="tiny" onClick={discardRewrite}>
                       Discard
                     </Button>
                     <Button variant="primary" size="tiny" onClick={acceptRewrite}>

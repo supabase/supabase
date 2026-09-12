@@ -82,7 +82,6 @@ export const PolicyTableRowHeader = ({
           <div className="flex flex-row justify-end gap-x-2">
             {!isRealtimeMessagesTable && (
               <ButtonTooltip
-                variant="default"
                 disabled={!canToggleRLS}
                 onClick={() => onSelectToggleRLS(table)}
                 data-testid={`${table.name}-toggle-rls`}
@@ -99,7 +98,6 @@ export const PolicyTableRowHeader = ({
               </ButtonTooltip>
             )}
             <ButtonTooltip
-              variant="default"
               disabled={!canToggleRLS || !canCreatePolicies}
               onClick={() => onSelectCreatePolicy(table)}
               data-testid={`${table.name}-create-policy`}
@@ -118,7 +116,6 @@ export const PolicyTableRowHeader = ({
             </ButtonTooltip>
 
             <ButtonTooltip
-              variant="default"
               className="px-1"
               onClick={() => {
                 openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)

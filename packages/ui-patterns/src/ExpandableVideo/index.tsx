@@ -10,6 +10,7 @@ interface ExpandableVideoProps {
   imgOverlayText?: string
   triggerContainerClassName?: string
   imgAltText?: string
+  videoTitle?: string
   trigger?: ReactNode
   onOpenCallback?: any
   priority?: boolean
@@ -21,6 +22,7 @@ export function ExpandableVideo({
   imgOverlayText,
   triggerContainerClassName = '',
   imgAltText,
+  videoTitle,
   trigger,
   onOpenCallback,
   priority = false,
@@ -55,7 +57,8 @@ export function ExpandableVideo({
       </div>
       <Image
         src={imgUrl ?? '/images/blur.png'}
-        alt={imgAltText ?? 'Video guide preview'}
+        // no fallback as alt text here would repeat it
+        alt={imgAltText ?? ''}
         fill
         sizes="100%"
         priority={priority}
@@ -74,6 +77,7 @@ export function ExpandableVideo({
               setExpandVideo(true)
             }}
             className={['w-full', triggerContainerClassName].join(' ').trim()}
+            aria-label={videoTitle ? `Play video: ${videoTitle}` : undefined}
           >
             {trigger ?? <CliccablePreview />}
           </button>
@@ -90,6 +94,7 @@ export function ExpandableVideo({
               <div className="video-container rounded-lg! border-none! overflow-hidden!">
                 <iframe
                   src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+                  title={videoTitle ?? 'Video player'}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
