@@ -91,6 +91,25 @@ Before deploying to production, you must:
 
 See the [main installation guide](https://supabase.com/docs/guides/self-hosting/docker) and the how-tos in the documentation.
 
+### File storage permissions
+
+Uploads are written to `volumes/storage`, which is bind-mounted into the Storage and imgproxy
+containers. The directory ships with this repository so that it belongs to whoever cloned it.
+
+If you are running rootless Docker and uploads fail with a 500 while Storage reports healthy,
+check who owns that directory:
+
+```sh
+ls -ld volumes/storage
+```
+
+On an install created before this directory was tracked, Docker will have created it as `root`,
+which the container cannot write to once the daemon runs as your user. Hand it back:
+
+```sh
+sudo chown -R "$(id -u):$(id -g)" volumes/storage
+```
+
 ## License
 
 This repository is licensed under the Apache 2.0 License. See the main [Supabase repository](https://github.com/supabase/supabase) for details.
