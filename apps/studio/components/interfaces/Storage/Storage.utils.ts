@@ -61,45 +61,70 @@ export const UNGROUPED_POLICY_SYMBOL = createWrappedSymbol('ungrouped-policy', '
 const formatStoragePolicies = (buckets: Bucket[], policies: Policy[]) => {
   const availableBuckets = buckets.map((bucket) => bucket.name)
   const formattedPolicies = policies.map((policy) => {
-    const { definition: policyDefinition, check: policyCheck } = policy
+    const bucketNames = getPolicyBucketNames(policy)
 
-    const bucketName =
-      policyDefinition !== null
-        ? extractBucketNameFromDefinition(policyDefinition)
-        : extractBucketNameFromDefinition(policyCheck)
+    if (bucketNames.length === 0) return { ...policy, buckets: [UNGROUPED_POLICY_SYMBOL] }
 
-    if (bucketName) {
-      const isBucketLoaded = availableBuckets.includes(bucketName)
+    const groups = bucketNames.map((name) =>
+      availableBuckets.includes(name) ? name : UNKNOWN_BUCKET_SYMBOL
+    )
 
-      return {
-        ...policy,
-        bucket: isBucketLoaded ? bucketName : UNKNOWN_BUCKET_SYMBOL,
-      }
-    }
-
-    return { ...policy, bucket: UNGROUPED_POLICY_SYMBOL }
+    return { ...policy, buckets: Array.from(new Set(groups)) }
   })
 
   return formattedPolicies
 }
 
-export const extractBucketNameFromDefinition = (definition: string | null) => {
-  if (!definition) return null
+/** `bucket_id = 'avatars'`, as Postgres renders a single-bucket policy. */
+const BUCKET_ID_EQUALS_REGEX = /bucket_id\s*=\s*'((?:[^']|'')*)'/g
+/** `bucket_id = ANY (ARRAY['avatars'::text, 'logos'::text])`, how Postgres renders `bucket_id in (...)`. */
+const BUCKET_ID_IN_ARRAY_REGEX = /bucket_id\s*=\s*ANY\s*\(\s*ARRAY\s*\[([^\]]*)\]/gi
+const QUOTED_LITERAL_REGEX = /'((?:[^']|'')*)'/g
 
-  const definitionSegments = definition?.split(' AND ') ?? []
-  const [bucketDefinition] = definitionSegments.filter((segment: string) =>
-    segment.includes('bucket_id')
-  )
-  return bucketDefinition ? bucketDefinition.split("'")[1] : null
+const unquote = (literal: string) => literal.replace(/''/g, "'")
+
+/**
+ * Collects every bucket a storage policy grants access to, across both its USING
+ * (`definition`) and WITH CHECK (`check`) clauses.
+ *
+ * Postgres normalizes policy expressions before storing them, so the shapes we read back
+ * are predictable: `bucket_id in ('avatars', 'logos')` comes back as
+ * `bucket_id = ANY (ARRAY['avatars'::text, 'logos'::text])`, and both that form and plain
+ * equality are collected.
+ *
+ * Negated conditions (`bucket_id <> 'avatars'`) deliberately contribute no buckets. Such a
+ * policy applies to every bucket *except* the named one, so attributing it to that bucket
+ * would be exactly backwards. Callers treat an empty result as "not tied to any one bucket".
+ */
+export const getPolicyBucketNames = (policy: {
+  definition: string | null
+  check: string | null
+}): string[] => {
+  const names = [policy.definition, policy.check].flatMap((clause) => {
+    if (!clause) return []
+
+    const equality = Array.from(clause.matchAll(BUCKET_ID_EQUALS_REGEX), (match) =>
+      unquote(match[1])
+    )
+    const membership = Array.from(clause.matchAll(BUCKET_ID_IN_ARRAY_REGEX)).flatMap((match) =>
+      Array.from(match[1].matchAll(QUOTED_LITERAL_REGEX), (literal) => unquote(literal[1]))
+    )
+
+    return [...equality, ...membership]
+  })
+
+  return Array.from(new Set(names))
 }
 
-const groupPoliciesByBucket = (policies: (Policy & { bucket: string | Symbol })[]) => {
+const groupPoliciesByBucket = (policies: (Policy & { buckets: (string | Symbol)[] })[]) => {
   const policiesByBucket = new Map<string | Symbol, Policy[]>()
-  policies.forEach((policy) => {
-    if (!policiesByBucket.has(policy.bucket)) {
-      policiesByBucket.set(policy.bucket, [])
-    }
-    policiesByBucket.get(policy.bucket)?.push(policy)
+  policies.forEach(({ buckets, ...policy }) => {
+    buckets.forEach((bucket) => {
+      if (!policiesByBucket.has(bucket)) {
+        policiesByBucket.set(bucket, [])
+      }
+      policiesByBucket.get(bucket)?.push(policy)
+    })
   })
   return Array.from(policiesByBucket).map(([bucketName, policies]) => ({
     name: bucketName,
