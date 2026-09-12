@@ -10,6 +10,7 @@ import { blogPostingSchema, serializeJsonLd } from './lib/json-ld'
 const GENERATOR = path.join(process.cwd(), 'internals', 'generate-sitemap.mjs')
 const LEGACY_LINK = 'https://supabase.com/changelog/12345-legacy-entry'
 const TIMED_LINK = 'https://supabase.com/changelog/23456-timed-entry'
+const TEXT_SLUG_LINK = 'https://supabase.com/changelog/text-slug-entry'
 const SPAWN_TIMEOUT_MS = 30_000
 
 const createdDirs: string[] = []
@@ -57,7 +58,15 @@ function rssItem(link: string, pubDate: string): string {
 }
 
 function rss(items: string[]): string {
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0"><channel>\n${items.join('\n')}\n</channel></rss>\n`
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel>',
+    '<link>https://supabase.com/changelog</link>',
+    '<atom:link href="https://supabase.com/changelog-rss.xml" rel="self" type="application/rss+xml"/>',
+    ...items,
+    '</channel></rss>',
+    '',
+  ].join('\n')
 }
 
 function urlEntries(xml: string): UrlEntry[] {
@@ -91,8 +100,9 @@ describe('generate-sitemap lastmod', () => {
       '_events/2026-02-01-webinar.mdx': mdx("date: '2026-02-01T19:00:00.000-07:00'"),
       'pages/company.tsx': '',
       'public/changelog-rss.xml': rss([
-        rssItem(LEGACY_LINK, 'Tue, 03 Feb 2026 00:00:00 +0000'),
         rssItem(TIMED_LINK, 'Wed, 04 Feb 2026 20:15:00 -0700'),
+        rssItem(TEXT_SLUG_LINK, 'Thu, 05 Feb 2026 00:00:00 +0000'),
+        rssItem(LEGACY_LINK, 'Tue, 03 Feb 2026 00:00:00 +0000'),
       ]),
     })
     result = runGenerator(fixtureDir)
@@ -155,9 +165,20 @@ describe('generate-sitemap lastmod', () => {
     expect(entryFor(TIMED_LINK)?.lastmod).toBe('2026-02-05')
   })
 
+  it('includes changelog entries whose slug has no numeric prefix', () => {
+    expect(entryFor(TEXT_SLUG_LINK)?.lastmod).toBe('2026-02-05')
+  })
+
+  it('emits exactly the RSS item links as changelog URLs', () => {
+    const changelogLocs = entries
+      .filter((entry) => entry.loc.startsWith('https://supabase.com/changelog'))
+      .map((entry) => entry.loc)
+    expect(changelogLocs).toEqual([TIMED_LINK, TEXT_SLUG_LINK, LEGACY_LINK])
+  })
+
   it('emits only day-precision lastmod values, one per dated source', () => {
     const lastmods = entries.map((entry) => entry.lastmod).filter(Boolean)
-    expect(lastmods).toHaveLength(9)
+    expect(lastmods).toHaveLength(10)
     for (const lastmod of lastmods) expect(lastmod).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   })
 
@@ -266,6 +287,11 @@ describe('generate-sitemap rejects dates it cannot trust', () => {
       name: 'an unparseable changelog pubDate',
       files: { 'public/changelog-rss.xml': rss([rssItem(LEGACY_LINK, 'Invalid Date +0000')]) },
       stderrIncludes: [`changelog-rss ${LEGACY_LINK}`, '"Invalid Date +0000"'],
+    },
+    {
+      name: 'an unparseable changelog pubDate on a text-slug entry',
+      files: { 'public/changelog-rss.xml': rss([rssItem(TEXT_SLUG_LINK, 'Invalid Date +0000')]) },
+      stderrIncludes: [`changelog-rss ${TEXT_SLUG_LINK}`, '"Invalid Date +0000"'],
     },
   ]
 

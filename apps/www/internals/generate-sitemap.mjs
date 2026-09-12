@@ -180,7 +180,7 @@ async function generate() {
 
     const lastmodByUrl = new Map()
     for (const [, item] of rss.matchAll(/<item>([\s\S]*?)<\/item>/g)) {
-      const link = item.match(/<link>(https:\/\/supabase\.com\/changelog\/\d+[^<]*)<\/link>/)?.[1]
+      const link = item.match(/<link>(https:\/\/supabase\.com\/changelog\/[^<]+)<\/link>/)?.[1]
       if (!link || lastmodByUrl.has(link)) continue
       const pubDate = item.match(/<pubDate>([^<]*)<\/pubDate>/)?.[1]
       lastmodByUrl.set(link, pubDate ? changelogLastmod(pubDate, link) : undefined)

@@ -3,6 +3,7 @@
 import GuidesTableOfContents from '~/components/GuidesSidebar'
 import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { type GuideFrontmatter } from '~/lib/docs'
+import { mdToPlainText } from '~/lib/md-to-plain-text'
 import { createContext, useContext, type ReactNode } from 'react'
 import { cn } from 'ui'
 
@@ -46,6 +47,7 @@ export function Guide({ meta, children, className }: GuideProps) {
           {!hideToc && (
             <GuidesTableOfContents
               video={meta?.tocVideo}
+              videoTitle={meta?.title ? mdToPlainText(meta.title) : undefined}
               className={cn(
                 'hidden md:flex',
                 'md:col-span-3 md:col-start-10',
