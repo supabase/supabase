@@ -1,0 +1,112 @@
+---
+title: 'Getting data in and out of Supabase'
+description: 'A decision guide for choosing the right tool when moving rows, files, and data in and out of your Supabase project.'
+author: gerardo_estaba
+date: '2026-07-08'
+imgSocial: 'https://zhfonblqamxferhoguzj.supabase.co/functions/v1/generate-og?template=announcement&layout=text-only&copy=Getting+%5Bdata+in%5D+and+%5Bout%5D%0Aof+Supabase'
+imgThumb: 'https://zhfonblqamxferhoguzj.supabase.co/functions/v1/generate-og?template=announcement&layout=text-only&copy=Getting+%5Bdata+in%5D+and+%5Bout%5D%0Aof+Supabase'
+categories:
+  - engineering
+tags:
+  - supabase
+  - postgres
+  - storage
+  - data-engineering
+toc_depth: 3
+---
+
+Most data movement questions start with a tool: "Should I use the API?", "Can I use S3?", "Do I need an ETL tool?"
+
+Start with the job instead.
+
+What are you moving? Where does it need to go? Is it a one-time migration, a user-facing app request, a scheduled sync, or a reaction to a change? Does the job need retries, replay, backfills, or long-running compute?
+
+This guide covers the common ways to move data on the Supabase platform: moving rows, moving files, reading from external systems, writing to external systems, and syncing data for analytics.
+
+## Choose the right path
+
+Before choosing a tool, answer four questions:
+
+1. Are you moving rows, files, or both?
+2. Is this one-time, app-driven, scheduled, or event-driven?
+3. Is the destination Supabase, an external system, or an analytical destination?
+4. Does the job need retries, replay, backfills, or long-running compute?
+
+| Area             | Job                                                      | Use                                                                                                                                                                    |
+| ---------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Rows             | Import a small CSV                                       | Dashboard CSV import                                                                                                                                                   |
+| Rows             | Import a large table                                     | `COPY`                                                                                                                                                                 |
+| Rows             | Move from another Postgres database                      | `pg_dump`, `pg_restore`, or `COPY`                                                                                                                                     |
+| Rows             | Move from another database engine                        | `pgloader` or ETL tooling                                                                                                                                              |
+| Rows             | Export rows from Supabase Database                       | SQL, `COPY`, or `pg_dump`                                                                                                                                              |
+| Files            | Upload or download files from an app                     | Supabase Storage API                                                                                                                                                   |
+| Files            | Move many files                                          | S3-compatible tools                                                                                                                                                    |
+| External systems | Read from external Postgres                              | `postgres_fdw`                                                                                                                                                         |
+| External systems | Read from external S3 files                              | S3 Wrapper                                                                                                                                                             |
+| External systems | Write to an external API                                 | Supabase Edge Functions for short jobs, external workers for longer jobs                                                                                               |
+| External systems | Write to external S3                                     | App code, Edge Functions, or external workers                                                                                                                          |
+| Jobs and sync    | Run a scheduled job                                      | Supabase Cron plus SQL, Edge Functions, or external workers                                                                                                            |
+| Jobs and sync    | React when rows change                                   | Supabase Database Webhooks, triggers, Supabase Realtime, Supabase Queue, Edge Functions, or workers                                                                    |
+| Jobs and sync    | Run longer background jobs                               | External workers. Supabase doesn't have a first-party long-running compute product today.                                                                              |
+| Analytics        | Move operational data into an analytical destination     | Supabase Pipelines (built on the open source Supabase ETL engine) for BigQuery today, more destinations planned. ETL tooling for anything Pipelines doesn't cover yet. |
+| Analytics        | Query analytical data without affecting the app workload | Analytics Buckets today, with your own ingestion pipeline. Supabase Warehouse is in development to replace Analytics Buckets.                                          |
+
+### Move rows
+
+Use database tools when the job is about rows.
+
+For small manual imports, use CSV import in the Dashboard. For large tables, use `COPY`. For project moves or backups where schema matters, use `pg_dump` and `pg_restore`. For migrations from another database engine, use `pgloader` or ETL tooling.
+
+Use the Supabase client libraries or auto-generated APIs when your application creates or updates data as part of a normal user flow.
+
+Do not loop through API inserts for large imports. Use bulk database tools.
+
+For large imports, stage the data before writing into production tables and validate row counts before and after the move.
+
+For recurring data movement, choose based on the failure mode. If the job needs retries, backfills, transformations, monitoring, or multiple connectors, use ETL tooling or an external worker.
+
+Test restore and export paths before you need them.
+
+### Move files
+
+Use Supabase Storage when your app needs to manage uploads, downloads, access control, and file metadata.
+
+Use the Storage API for uploads and downloads from your app. Use resumable uploads for larger files or unreliable networks. Use S3-compatible tools when you need to move many objects.
+
+Store file metadata in the Database when your app needs ownership, status, relationships, audit state, or sync state. Keep object bytes in Storage and app state in the Database.
+
+Supabase Storage stores objects in Supabase-managed storage. There is no documented setting that makes Storage write directly into a customer-owned external S3 bucket. If you need to write to external S3, use app code, an Edge Function, or an external worker.
+
+Edge Functions fit short object workflows. External workers fit long-running copies, transformations, retries, and multi-step file processing.
+
+Do not assume Database backups and Storage objects roll back together.
+
+### Connect and sync
+
+Use `postgres_fdw` when the source is another Postgres database. Use Supabase Wrappers when the external source is supported and SQL access is the right fit. Use Edge Functions or external workers when the source is a custom API, a SaaS platform, or a system that needs vendor-specific SDKs.
+
+Use Database Webhooks when a row change should call an HTTP endpoint. Use Queue or external workers when the job needs long runtimes, durable retries, replay, or operational controls. Supabase doesn't have a first-party long-running compute product today, so external workers are the path for that.
+
+Use Cron to start scheduled jobs. Use ETL tooling when the sync spans several systems or needs monitoring, replay, and backfills.
+
+Make scheduled and recurring jobs idempotent. Store sync cursors or high-water marks, and design exports so they can be replayed.
+
+Remote reads are not always a replacement for sync. If the workflow needs local joins, historical backfills, or predictable query performance, copy the data into Supabase or into an analytical destination.
+
+Keep secrets out of SQL where possible. Prefer Edge Functions or external workers when external credentials, vendor SDKs, or retry logic are part of the workflow.
+
+### Move data for analytics
+
+Do not treat analytics movement as an app export.
+
+If operational data needs to move into an analytical destination, use pipeline-oriented tooling. Supabase Pipelines, built on the open source Supabase ETL engine, is available today from the Dashboard under Database > Replication, with BigQuery as the current managed destination and more destinations planned. For sources or destinations Pipelines doesn't cover yet, use ETL tooling.
+
+If analytical queries should not affect the app workload, use Analytics Buckets. Managed replication into Analytics Buckets through Supabase ETL is no longer supported, so you'll need your own ingestion pipeline today. Supabase Warehouse is in development to replace Analytics Buckets.
+
+## Start with the failure mode
+
+Data movement breaks in different ways depending on the shape of the job.
+
+A failed manual import can usually be fixed by truncating a staging table and trying again. A failed app request needs a clear response to the user. A failed sync needs a cursor, a retry path, and a way to replay missed records. A failed analytics pipeline needs monitoring and backfill support.
+
+That is why the best tool is not always the one closest to your app. Use postgres tools for database work. Use Supabase Storage for app-managed files. Use Supabase Edge Functions for short external work. Use workers, queues, or ETL tooling when the job needs time, retries, replay, or operational control.
