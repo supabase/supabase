@@ -113,6 +113,7 @@ export * from './src/components/ShadowScrollArea'
 export * from './src/components/shadcn/ui/collapsible'
 
 export * from './src/components/shadcn/ui/tabs'
+export * from './src/components/shadcn/ui/useTabIndicator'
 
 export * from './src/components/shadcn/ui/tooltip'
 
