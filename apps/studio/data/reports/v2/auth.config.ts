@@ -306,9 +306,9 @@ const AUTH_REPORT_SQL: Record<
 
 // fillTimeseries/isUnixMicro expects a 16-digit unix-microsecond timestamp, matching BigQuery's timestamp_trunc.
 const OTEL_TIMESTAMP: Record<Granularity, SafeLogSqlFragment> = {
-  minute: safeSql`toUnixTimestamp(toStartOfMinute(timestamp)) * 1000000`,
-  hour: safeSql`toUnixTimestamp(toStartOfHour(timestamp)) * 1000000`,
-  day: safeSql`toUnixTimestamp(toStartOfDay(timestamp)) * 1000000`,
+  minute: safeSql`toUnixTimestamp(toStartOfMinute(logs.timestamp)) * 1000000`,
+  hour: safeSql`toUnixTimestamp(toStartOfHour(logs.timestamp)) * 1000000`,
+  day: safeSql`toUnixTimestamp(toStartOfDay(logs.timestamp)) * 1000000`,
 }
 
 const PROVIDER_SELECT_FRAGMENT_OTEL = safeSql`coalesce(nullIf(JSONExtractString(event_message, 'provider'), ''), 'unknown') as provider,`
@@ -527,7 +527,7 @@ export const AUTH_REPORT_SQL_OTEL: Record<
         select
           ${ts} as timestamp,
           count() as count,
-          log_attributes['response.headers.x_sb_error_code'] as error_code
+          nullIf(log_attributes['response.headers.x_sb_error_code'], '') as error_code
         from logs
         where source = 'edge_logs'
           and log_attributes['request.path'] like '%auth/v1%'
