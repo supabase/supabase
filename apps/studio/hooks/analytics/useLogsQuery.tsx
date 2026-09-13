@@ -16,7 +16,9 @@ import {
   checkForWithClause,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import { get } from '@/data/fetchers'
+import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
 import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
+import type { SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -35,17 +37,19 @@ export interface LogsQueryHook {
 export const useLogsQuery = ({
   projectRef,
   initialParams = {},
+  sql,
   enabled = true,
   options = {},
 }: {
   projectRef?: string
   initialParams?: Partial<LogsEndpointParams>
+  sql?: SafeLogSqlFragment
   enabled?: boolean
   options?: { useOtel?: boolean }
 }): LogsQueryHook => {
   const { useOtel = false } = options
   const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
-  const [params, setParams] = useState<LogsEndpointParams>({
+  const [storedParams, setParams] = useState<LogsEndpointParams>({
     sql: initialParams?.sql || '',
     iso_timestamp_start: initialParams.iso_timestamp_start
       ? initialParams.iso_timestamp_start
@@ -67,6 +71,8 @@ export const useLogsQuery = ({
     }))
   }, [initialParams.sql, initialParams.iso_timestamp_start, initialParams.iso_timestamp_end])
 
+  const params = { ...storedParams, sql: sql ?? storedParams.sql }
+
   const _enabled = enabled && typeof projectRef !== 'undefined' && Boolean(params.sql)
 
   const usesWith = checkForWithClause(params.sql || '')
@@ -81,13 +87,29 @@ export const useLogsQuery = ({
   } = useQuery({
     queryKey: ['projects', projectRef, 'logs', params, { otel: useOtel }],
     queryFn: async ({ signal }) => {
-      const { data, error } = await get(logsAllEndpointUrl(useOtel), {
-        params: {
-          path: { ref: projectRef! },
-          query: params,
-        },
-        signal,
-      })
+      if (!projectRef) throw new Error('projectRef is required')
+      const { iso_timestamp_start, iso_timestamp_end } = params
+      const { data, error } =
+        sql !== undefined
+          ? {
+              data: await executeAnalyticsSql({
+                projectRef,
+                endpoint: logsAllEndpointUrl(useOtel),
+                sql,
+                iso_timestamp_start: iso_timestamp_start ?? '',
+                iso_timestamp_end: iso_timestamp_end ?? '',
+                method: 'get',
+                signal,
+              }),
+              error: undefined,
+            }
+          : await get(logsAllEndpointUrl(useOtel), {
+              params: {
+                path: { ref: projectRef },
+                query: params,
+              },
+              signal,
+            })
       if (error) {
         throw error
       }

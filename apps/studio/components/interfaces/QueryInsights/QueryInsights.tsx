@@ -1,10 +1,10 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useMemo, useState } from 'react'
 
 import { useSupamonitorIndexAdvisor } from './hooks/useSupamonitorIndexAdvisor'
-import { getSupamonitorLogsQuery } from './QueryInsights.constants'
+import { getSupamonitorLogsQuery, getSupamonitorLogsQueryOtel } from './QueryInsights.constants'
 import { QueryInsightsChart } from './QueryInsightsChart/QueryInsightsChart'
 import { QueryInsightsHealth } from './QueryInsightsHealth/QueryInsightsHealth'
 import { QueryInsightsTable } from './QueryInsightsTable/QueryInsightsTable'
@@ -14,6 +14,7 @@ import {
   parseSupamonitorLogs,
   transformLogsToChartData,
 } from './utils/supamonitor.utils'
+import { pickLogsQueryBuilder } from '@/data/logs/logs-endpoint'
 import { useLogsQuery } from '@/hooks/analytics/useLogsQuery'
 
 dayjs.extend(utc)
@@ -28,6 +29,7 @@ interface QueryInsightsProps {
 
 export const QueryInsights = ({ dateRange }: QueryInsightsProps) => {
   const { ref } = useParams()
+  const useOtel = useFlag('otelLegacyLogs')
 
   const effectiveDateRange = useMemo(() => {
     if (dateRange) {
@@ -46,17 +48,19 @@ export const QueryInsights = ({ dateRange }: QueryInsightsProps) => {
 
   const sql = useMemo(
     () =>
-      getSupamonitorLogsQuery(
-        effectiveDateRange.iso_timestamp_start,
-        effectiveDateRange.iso_timestamp_end
-      ),
-    [effectiveDateRange]
+      pickLogsQueryBuilder(
+        useOtel,
+        getSupamonitorLogsQueryOtel,
+        getSupamonitorLogsQuery
+      )(effectiveDateRange.iso_timestamp_start, effectiveDateRange.iso_timestamp_end),
+    [effectiveDateRange, useOtel]
   )
 
   const { logData, isLoading } = useLogsQuery({
     projectRef: ref as string,
+    options: { useOtel },
+    sql,
     initialParams: {
-      sql,
       iso_timestamp_start: effectiveDateRange.iso_timestamp_start,
       iso_timestamp_end: effectiveDateRange.iso_timestamp_end,
     },
