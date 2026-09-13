@@ -343,6 +343,10 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       snapV2.removeFolder(ids[0])
       setSelectedFolderToDelete(undefined)
     },
+    onError: (error) => {
+      setSelectedFolderToDelete(undefined)
+      toast.error(`Failed to delete folder: ${error.message}`)
+    },
   })
 
   // ===============
@@ -381,15 +385,18 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       deleteContent(
         { projectRef, ids },
         {
+          onError: () => {
+            setSelectedFolderToDelete(undefined)
+          },
           onSuccess: () => {
             ids.forEach((id) => snapV2.removeSnippet(id))
             postDeleteCleanup(ids)
-            deleteFolder({ projectRef, ids: [selectedFolderToDelete?.id] })
+            deleteFolder({ projectRef, ids: [selectedFolderToDelete.id] })
           },
         }
       )
     } else {
-      deleteFolder({ projectRef, ids: [selectedFolderToDelete?.id] })
+      deleteFolder({ projectRef, ids: [selectedFolderToDelete.id] })
     }
   }
 
