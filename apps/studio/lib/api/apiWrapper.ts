@@ -54,6 +54,7 @@ export async function apiWrapper(
     return await handler(req, res, claims)
   } catch (error) {
     Sentry.captureException(error)
-    return res.status(500).json({ error })
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+    return res.status(500).json({ error: { message: errorMessage } })
   }
 }

@@ -477,7 +477,7 @@ export async function createFolder(_folderName: string): Promise<Folder> {
 
 /**
  * Deletes a folder directory from the filesystem
- * @throws {Error} If the folder doesn't exist
+ * @throws {Error} If the folder doesn't exist or deletion fails
  */
 export async function deleteFolder(id: string): Promise<void> {
   const entries = await getFilesystemEntries()
@@ -491,10 +491,12 @@ export async function deleteFolder(id: string): Promise<void> {
   try {
     await fs.rm(folderPath, { recursive: true, force: true })
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-      throw error
+    const err = error as NodeJS.ErrnoException
+    if (err.code === 'ENOENT') {
+      // If folder doesn't exist, still throw a not found error
+      throw new Error(`Folder with id ${id} not found`)
     }
-    // If folder doesn't exist, still throw the original error
-    throw new Error(`Folder with id ${id} not found`)
+    // For other errors, provide more context
+    throw new Error(`Failed to delete project's content folders: ${err.message || 'Unknown error'}`)
   }
 }

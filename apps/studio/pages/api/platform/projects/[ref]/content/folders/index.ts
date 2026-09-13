@@ -62,13 +62,17 @@ const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ids } = req.query
 
   if (!ids || typeof ids !== 'string') {
-    return res.status(400).json({ error: 'Folder IDs are required' })
+    return res.status(400).json({ error: { message: 'Folder IDs are required' } })
   }
-  const folderIds = ids.split(',').map((id) => id.trim())
 
-  await Promise.all(folderIds.map((id) => deleteFolder(id)))
-
-  return res.status(200).json({})
+  try {
+    const folderIds = ids.split(',').map((id) => id.trim())
+    await Promise.all(folderIds.map((id) => deleteFolder(id)))
+    return res.status(200).json({})
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to delete folder'
+    return res.status(500).json({ error: { message: errorMessage } })
+  }
 }
 
 export default wrappedHandler
