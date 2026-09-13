@@ -11,7 +11,7 @@ This guide explains how connections impact your Supabase database's performance 
 
 ## Installing Supabase Grafana
 
-Supabase has an [open-source Grafana Repo](https://github.com/supabase/supabase-grafana) that displays real-time metrics of your database. Although the [Reports Dashboard ](/dashboard/project/_/reports) provides similar metrics, it averages the data by the hour or day. Having visuals of your connection usage can help you better allocate resources.
+Supabase has an [open-source Grafana Repo](https://github.com/supabase/supabase-grafana) that displays real-time metrics of your database. Although the [Observability Dashboard](/dashboard/project/_/observability) provides similar metrics, it averages the data by the hour or day. Having visuals of your connection usage can help you better allocate resources.
 
 _Visual of Grafana Dashboard_
 
@@ -19,7 +19,7 @@ _Visual of Grafana Dashboard_
 
 It can be run locally within Docker. Alternatively, you can deploy it to fly.io or Grafana Cloud, which are better for long-term data collection.
 
-Installation instructions can be found in it the [metrics docs ](/docs/guides/platform/metrics#deploying-supabase-grafana)
+Installation instructions can be found in it the [metrics docs ](/docs/guides/observability/metrics/grafana-self-hosted)
 
 ## Observing connections
 
@@ -106,5 +106,5 @@ They're all intertwined to some extent. If IO, CPU, or Memory are constrained, t
 - [Using SQLAlchemy with Supabase](https://github.com/orgs/supabase/discussions/27071)
 - [Supabase and IPv4/IPv6 compatibility ](https://github.com/orgs/supabase/discussions/27034)
 - [Addressing Max Client Errors](https://github.com/orgs/supabase/discussions/22305)
-- [Connecting to your database](/docs/guides/database/connecting-to-postgres#integrations)
+- [Connecting to your database](/docs/guides/database/connecting-to-postgres#quickstarts)
 - [How to Change Max Database Connections](https://github.com/orgs/supabase/discussions/27197)

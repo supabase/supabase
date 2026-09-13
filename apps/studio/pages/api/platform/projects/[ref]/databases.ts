@@ -1,8 +1,9 @@
+import { paths } from 'api-types'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { paths } from 'api-types'
-import apiWrapper from 'lib/api/apiWrapper'
-import { PROJECT_REST_URL } from 'lib/constants/api'
+import { apiWrapper } from '@/lib/api/apiWrapper'
+import { POSTGRES_PORT } from '@/lib/api/self-hosted/constants'
+import { PROJECT_DB_HOST, PROJECT_REST_URL } from '@/lib/constants/api'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -21,15 +22,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 type ResponseData =
   paths['/platform/projects/{ref}/databases']['get']['responses']['200']['content']['application/json']
 
-const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
+const handleGet = async (_req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
   return res.status(200).json([
     {
       cloud_provider: 'localhost' as any,
       connectionString: '',
       connection_string_read_only: '',
-      db_host: '127.0.0.1',
+      db_host: PROJECT_DB_HOST,
       db_name: 'postgres',
-      db_port: 5432,
+      db_port: POSTGRES_PORT,
       db_user: 'postgres',
       identifier: 'default',
       inserted_at: '',

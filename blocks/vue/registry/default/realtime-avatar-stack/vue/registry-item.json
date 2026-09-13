@@ -1,0 +1,35 @@
+{
+  "name": "realtime-avatar-stack-vue",
+  "type": "registry:block",
+  "title": "Realtime Avatar Stack",
+  "description": "Component which stack of avatars, tracked by realtime presence.",
+  "registryDependencies": ["avatar", "tooltip"],
+  "files": [
+    {
+      "path": "registry/default/realtime-avatar-stack/vue/components/realtime-avatar-stack.vue",
+      "type": "registry:component",
+      "target": "components/realtime-avatar-stack.vue"
+    },
+    {
+      "path": "registry/default/realtime-avatar-stack/vue/components/avatar-stack.vue",
+      "type": "registry:component",
+      "target": "components/avatar-stack.vue"
+    },
+    {
+      "path": "registry/default/realtime-avatar-stack/vue/composables/useCurrentUserImage.ts",
+      "type": "registry:component",
+      "target": "composables/useCurrentUserImage.ts"
+    },
+    {
+      "path": "registry/default/realtime-avatar-stack/vue/composables/useCurrentUserName.ts",
+      "type": "registry:component",
+      "target": "composables/useCurrentUserName.ts"
+    },
+    {
+      "path": "registry/default/realtime-avatar-stack/vue/composables/useRealtimePresenceRoom.ts",
+      "type": "registry:component",
+      "target": "composables/useRealtimePresenceRoom.ts"
+    }
+  ],
+  "dependencies": ["@supabase/supabase-js@latest"]
+}

@@ -1,23 +1,20 @@
 import { noop } from 'lodash'
-import { DragEvent, useEffect, useRef } from 'react'
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
-
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import { useEffect, useRef } from 'react'
 import { cn } from 'ui'
-import { CONTEXT_MENU_KEYS, STORAGE_VIEWS } from '../Storage.constants'
+
+import { STORAGE_ROW_STATUS, STORAGE_VIEWS } from '../Storage.constants'
 import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
-import { ColumnContextMenu } from './ColumnContextMenu'
-import { CustomDragLayer } from './CustomDragLayer'
 import { FileExplorerColumn } from './FileExplorerColumn'
-import { FolderContextMenu } from './FolderContextMenu'
-import { ItemContextMenu } from './ItemContextMenu'
+import { FileExplorerDndProvider } from './FileExplorerDnd'
+import { useStoragePreference } from './useStoragePreference'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export interface FileExplorerProps {
   columns: StorageColumn[]
   selectedItems: StorageItemWithColumn[]
   itemSearchString: string
-  onFilesUpload: (event: DragEvent<HTMLDivElement>, index: number) => void
+  isLoading?: boolean
+  onFilesUpload: (event: any, index: number) => void
   onSelectAllItemsInColumn: (index: number) => void
   onSelectColumnEmptySpace: (index: number) => void
   onColumnLoadMore: (index: number, column: StorageColumn) => void
@@ -27,6 +24,7 @@ export const FileExplorer = ({
   columns = [],
   selectedItems = [],
   itemSearchString,
+  isLoading = false,
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,
   onSelectColumnEmptySpace = noop,
@@ -34,6 +32,7 @@ export const FileExplorer = ({
 }: FileExplorerProps) => {
   const fileExplorerRef = useRef<any>(null)
   const snap = useStorageExplorerStateSnapshot()
+  const { view } = useStoragePreference(snap.projectRef)
 
   useEffect(() => {
     if (fileExplorerRef) {
@@ -45,19 +44,19 @@ export const FileExplorer = ({
   }, [columns])
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <FileExplorerDndProvider>
       <div
         ref={fileExplorerRef}
         className={cn(
-          'file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full relative',
-          snap.view === STORAGE_VIEWS.LIST && 'flex-col'
+          'file-explorer flex grow overflow-x-auto justify-between h-full w-full relative',
+          view === STORAGE_VIEWS.LIST && 'flex-col'
         )}
       >
-        <CustomDragLayer />
-        <ColumnContextMenu id={CONTEXT_MENU_KEYS.STORAGE_COLUMN} />
-        <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} />
-        <FolderContextMenu id={CONTEXT_MENU_KEYS.STORAGE_FOLDER} />
-        {snap.view === STORAGE_VIEWS.COLUMNS ? (
+        {isLoading ? (
+          <FileExplorerColumn
+            column={{ id: '', name: '', path: '', items: [], status: STORAGE_ROW_STATUS.LOADING }}
+          />
+        ) : view === STORAGE_VIEWS.COLUMNS ? (
           <div className="flex">
             {columns.map((column, index) => (
               <FileExplorerColumn
@@ -73,7 +72,7 @@ export const FileExplorer = ({
               />
             ))}
           </div>
-        ) : snap.view === STORAGE_VIEWS.LIST ? (
+        ) : view === STORAGE_VIEWS.LIST ? (
           <>
             {columns.length > 0 && (
               <FileExplorerColumn
@@ -90,9 +89,9 @@ export const FileExplorer = ({
             )}
           </>
         ) : (
-          <div>Unknown view: {snap.view}</div>
+          <div>Unknown view: {view}</div>
         )}
       </div>
-    </DndProvider>
+    </FileExplorerDndProvider>
   )
 }

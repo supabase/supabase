@@ -1,10 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import type { components } from 'api-types'
 import { toast } from 'sonner'
 
-import type { components } from 'api-types'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type BranchCreateVariables = {
   projectRef: string
@@ -48,26 +48,24 @@ export const useBranchCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BranchCreateData, ResponseError, BranchCreateVariables>,
+  UseCustomMutationOptions<BranchCreateData, ResponseError, BranchCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<BranchCreateData, ResponseError, BranchCreateVariables>(
-    (vars) => createBranch(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(branchKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create branch: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BranchCreateData, ResponseError, BranchCreateVariables>({
+    mutationFn: (vars) => createBranch(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: branchKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create branch: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

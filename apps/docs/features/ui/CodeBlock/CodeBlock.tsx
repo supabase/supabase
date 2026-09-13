@@ -1,10 +1,10 @@
 import { type PropsWithChildren } from 'react'
-import { bundledLanguages, createHighlighter, type BundledLanguage, type ThemedToken } from 'shiki'
+import { bundledLanguages, createHighlighter, type BundledLanguage } from 'shiki'
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
 import { cn } from 'ui'
 
-import { AnnotatedSpan, CodeCopyButton } from './CodeBlock.client'
-import { getFontStyle } from './CodeBlock.utils'
+import { CodeBlockControls, CodeBlockTokens, type CodeToken } from './CodeBlock.client'
+import { getCodeBlockLabel } from './CodeBlock.utils'
 import theme from './supabase-2.json' with { type: 'json' }
 import denoTypes from './types/lib.deno.d.ts.include'
 
@@ -26,12 +26,16 @@ export async function CodeBlock({
   contents,
   children,
   skipTypeGeneration,
+  hideControls = false,
+  compact = false,
 }: PropsWithChildren<{
   className?: string
   lang?: string
   lineNumbers?: boolean
   contents?: string
   skipTypeGeneration?: boolean
+  hideControls?: boolean
+  compact?: boolean
 }>) {
   let code = (contents || extractCode(children)).trim()
   const lang = tryToBundledLanguage(langSetting || '') || extractLang(children)
@@ -44,11 +48,7 @@ export async function CodeBlock({
       twoslashed = annotationsByLine(hoverNodes)
       code = editedCode
     } catch (_err) {
-      // Silently ignore, if imports aren't defined type compilation fails
-      // Uncomment lines below to debug in dev
-      // console.log('\n==========CODE==========\n')
-      // console.log(code)
-      // console.error(_err.recommendation)
+      // Type compilation fails when imports aren't defined
     }
   }
 
@@ -64,72 +64,45 @@ export async function CodeBlock({
         'group',
         'relative',
         'not-prose',
-        'w-full overflow-hidden',
-        'border border-default rounded-lg',
+        'w-full',
+        compact ? 'border-0 my-0!' : 'border border-default rounded-lg shadow-codeblock',
         'bg-200',
         'text-sm',
         className
       )}
     >
-      <pre>
-        <code className={lineNumbers ? 'flex' : ''}>
-          {lineNumbers && (
-            <div className="flex-shrink-0 select-none text-right text-muted bg-control py-6 px-2">
-              {tokens.map((_, idx) => (
-                <div key={idx} className="w-full">
-                  {idx + 1}
-                </div>
-              ))}
-            </div>
-          )}
-          <div className={cn('p-6 overflow-x-auto', lineNumbers ? 'flex-grow' : '')}>
-            {tokens.map((line, idx) => (
-              <CodeLine key={idx} tokens={line} twoslash={twoslashed?.get(idx)} />
-            ))}
-          </div>
-        </code>
-      </pre>
-      <CodeCopyButton
-        content={code.trim()}
-        className="hidden group-hover:block absolute top-2 right-2"
-      />
+      <div
+        className={cn(
+          'code-scroll',
+          'w-full overflow-x-auto overscroll-x-none',
+          !compact && 'rounded-lg',
+          'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring'
+        )}
+        role="group"
+        aria-roledescription="code block"
+        aria-label={getCodeBlockLabel(lang, tokens.length)}
+        tabIndex={0}
+      >
+        <CodeBlockTokens
+          lineNumbers={lineNumbers}
+          lines={tokens.map((line, lineIndex) => {
+            let offset = 0
+            return line.map(({ content, color, fontStyle, htmlStyle }): CodeToken => {
+              const annotations = twoslashed
+                ?.get(lineIndex)
+                ?.get(offset)
+                ?.map(({ text, docs, tags }) => ({ text, docs, tags }))
+              offset += content.length
+              return annotations
+                ? [content, color, fontStyle || 0, { annotations, htmlStyle }]
+                : [content, color, fontStyle || 0]
+            })
+          })}
+        />
+      </div>
+      {/* After the code so the block is named before its controls, and outside the scroller so they stay pinned */}
+      {!hideControls && <CodeBlockControls content={code.trim()} />}
     </div>
-  )
-}
-
-function CodeLine({
-  tokens: rawTokens,
-  twoslash,
-}: {
-  tokens: Array<ThemedToken>
-  twoslash?: Map<number, Array<NodeHover>>
-}) {
-  let offset = 0
-  const tokens = rawTokens.map((token) => {
-    const newToken = { ...token, offset }
-    offset += token.content.length
-    return newToken
-  })
-
-  return (
-    <span className="block h-5">
-      {tokens.map((token) =>
-        twoslash?.has(token.offset) ? (
-          <AnnotatedSpan
-            key={token.offset}
-            token={token}
-            annotations={twoslash.get(token.offset)!}
-          />
-        ) : (
-          <span
-            key={token.offset}
-            style={{ color: token.color, ...getFontStyle(token.fontStyle || 0) }}
-          >
-            {token.content}
-          </span>
-        )
-      )}
-    </span>
   )
 }
 

@@ -5,7 +5,7 @@ subtitle: 'Create, manage, review, and merge branches directly in the dashboard'
 
 You can create, manage, review, and merge Supabase branches directly via the dashboard. This is useful for quick testing, prototyping, or when you prefer to work in a no-code way. You can also connect a Supabase branch to a GitHub branch at a later time if needed.
 
-<Admonition type="note" label="Public Alpha">
+<Admonition type="note" title="Public Alpha">
 
 Branch management via the dashboard is currently in public alpha. Features and functionality may change.
 
@@ -30,10 +30,34 @@ This functionality is currently in beta and requires opting in. To opt in you mu
 
 ## Creating a branch
 
+<Admonition type="note">
+
+When using dashboard branching without a GitHub integration, the branch dropdown displays `main / PRODUCTION` on every project, but on a brand-new project the production branch hasn't been registered yet. The first "Create branch" click populates this row behind the scenes — technically enabling branching on the project — and requires Owner/Administrator access. After that one-time step, anyone with the Developer role can create, update, and delete preview branches.
+
+</Admonition>
+
 Once you've enabled the feature, you can create a new branch:
 
 1. Click the arrows next to the branch name in the top menu bar. (The top menu bar has the format `YOUR_ORGANIZATION / YOUR_PROJECT / CURRENT_BRANCH_NAME`.)
 2. Click `Create branch`.
+
+The new branch is a clone of your base project. It starts with the project's schema, Edge Functions, and the configuration set.
+
+### Include production data
+
+By default, a branch starts without any of your production data or storage objects. If your project has the Point-in-Time Recovery add-on, you can turn on **Include data** when you create the branch to copy your production data into it.
+
+<Admonition type="caution">
+
+A branch created with **Include data** holds a copy of your production data, treat it with the same care as production.
+
+</Admonition>
+
+<Admonition type="note">
+
+A branch uses a larger disk and matches the compute size of your project, which increases its cost.
+
+</Admonition>
 
 ## Making changes to a branch
 

@@ -1,0 +1,281 @@
+---
+title: Infinite Query Composable
+description: Vue Composable for infinite lists, fetching data from Supabase.
+---
+
+<BlockPreview name="infinite-list-demo" />
+
+## Installation
+
+<BlockItem
+  name="infinite-query-composable"
+  description="Installs the Infinite List component and necessary Supabase client setup."
+/>
+
+## Folder structure
+
+<RegistryBlock itemName="infinite-query-composable" />
+
+## Introduction
+
+The Infinite Query Composable provides a single Vue Composable which will make it easier to load data progressively from your Supabase database. It handles data fetching and pagination state, It is meant to be used with infinite lists or tables.
+The Composable is fully typed, provided you have generated and setup your database types.
+
+## Adding types
+
+Before using this composable, we **highly** recommend you setup database types in your project. This will make the composable fully-typesafe. More info about generating Typescript types from database schema [here](https://supabase.com/docs/guides/api/rest/generating-types)
+
+## Props
+
+| Prop            | Type                                                      | Description                                                      |
+| --------------- | --------------------------------------------------------- | ---------------------------------------------------------------- |
+| `tableName`     | `string`                                                  | **Required.** The name of the Supabase table to fetch data from. |
+| `columns`       | `string`                                                  | Columns to select from the table. Defaults to `'*'`.             |
+| `pageSize`      | `number`                                                  | Number of items to fetch per page. Defaults to `20`.             |
+| `trailingQuery` | `(query: SupabaseSelectBuilder) => SupabaseSelectBuilder` | Function to apply filters or sorting to the Supabase query.      |
+
+## Return type
+
+data, count, isSuccess, isLoading, isFetching, error, hasMore, fetchNextPage
+
+| Prop            | Type          | Description                                                                         |
+| --------------- | ------------- | ----------------------------------------------------------------------------------- |
+| `data`          | `TableData[]` | An array of fetched items.                                                          |
+| `count`         | `number`      | Number of total items in the database. It takes `trailingQuery` into consideration. |
+| `isSuccess`     | `boolean`     | It's true if the last API call succeeded.                                           |
+| `isLoading`     | `boolean`     | It's true only for the initial fetch.                                               |
+| `isFetching`    | `boolean`     | It's true for the initial and all incremental fetches.                              |
+| `error`         | `any`         | The error from the last fetch.                                                      |
+| `hasMore`       | `boolean`     | Whether the query has finished fetching all items from the database                 |
+| `fetchNextPage` | `() => void`  | Sends a new request for the next items                                              |
+
+## Type safety
+
+The hook will use the typed defined on your Supabase client if they're setup ([more info](https://supabase.com/docs/reference/javascript/typescript-support)).
+
+The hook also supports an custom defined result type by using `useInfiniteQuery<T>`. For example, if you have a custom type for `Product`, you can use it like this `useInfiniteQuery<Product>`.
+
+## Usage
+
+### With sorting
+
+```vue
+<script setup lang="ts">
+import { useInfiniteQuery } from '@/composables/useInfiniteQuery.ts'
+
+const { data, fetchNextPage } = useInfiniteQuery({
+  tableName: 'products',
+  columns: '*',
+  pageSize: 10,
+  trailingQuery: (query) => query.order('created_at', { ascending: false }),
+})
+</script>
+
+<template>
+  <div>
+    <div v-for="item in data" :key="item.id">
+      <ProductCard :product="item" />
+    </div>
+    <Button @click="fetchNextPage">Load more products</Button>
+  </div>
+</template>
+```
+
+### With filtering on search params
+
+This example will filter based on a search param like `example.com/?q=hello`.
+
+```vue
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+import { useInfiniteQuery } from '@/hooks/use-infinite-query'
+
+const route = useRoute()
+const searchQuery = computed(() => route.query.q as string | undefined)
+
+const { data, isLoading, isFetching, fetchNextPage, count, isSuccess } = useInfiniteQuery({
+  tableName: 'products',
+  columns: '*',
+  pageSize: 10,
+  trailingQuery: (query) => {
+    if (searchQuery.value && searchQuery.value.length > 0) {
+      query = query.ilike('name', `%${searchQuery.value}%`)
+    }
+    return query
+  },
+})
+</script>
+
+<template>
+  <div>
+    <div v-for="item in data" :key="item.id">
+      <ProductCard :product="item" />
+    </div>
+    <Button @click="fetchNextPage">Load more products</Button>
+  </div>
+</template>
+```
+
+## Reusable components
+
+### Infinite list (fetches as you scroll)
+
+The following component abstracts the composable into a component. It includes few utility components for no results and end of the list.
+
+```vue
+<script setup lang="ts">
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+
+import {
+  SupabaseQueryHandler,
+  SupabaseTableData,
+  SupabaseTableName,
+  useInfiniteQuery,
+} from '@/hooks/use-infinite-query'
+import { cn } from '@/lib/utils'
+
+interface InfiniteListProps<TableName extends SupabaseTableName> {
+  tableName: TableName
+  columns?: string
+  pageSize?: number
+  trailingQuery?: SupabaseQueryHandler<TableName>
+  renderItem: (item: SupabaseTableData<TableName>, index: number) => any
+  className?: string
+  renderNoResults?: () => any
+  renderEndMessage?: () => any
+  renderSkeleton?: (count: number) => any
+}
+
+const props = defineProps<InfiniteListProps<any>>()
+
+const { data, isFetching, hasMore, fetchNextPage, isSuccess } = useInfiniteQuery({
+  tableName: props.tableName,
+  columns: props.columns,
+  pageSize: props.pageSize,
+  trailingQuery: props.trailingQuery,
+})
+
+const scrollContainerRef = ref<HTMLElement | null>(null)
+const loadMoreSentinelRef = ref<HTMLElement | null>(null)
+
+let observer: IntersectionObserver | null = null
+
+onMounted(() => {
+  observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting && hasMore && !isFetching) {
+        fetchNextPage()
+      }
+    },
+    {
+      root: scrollContainerRef.value,
+      threshold: 0.1,
+      rootMargin: '0px 0px 100px 0px',
+    }
+  )
+
+  if (loadMoreSentinelRef.value) {
+    observer.observe(loadMoreSentinelRef.value)
+  }
+})
+
+onBeforeUnmount(() => {
+  observer?.disconnect()
+})
+</script>
+
+<template>
+  <div ref="scrollContainerRef" :class="cn('relative h-full overflow-auto', className)">
+    <div>
+      <template v-if="isSuccess && data.length === 0">
+        <slot name="no-results">
+          <div class="text-center text-muted-foreground py-10">No results.</div>
+        </slot>
+      </template>
+
+      <template v-for="(item, index) in data" :key="index">
+        <slot :item="item" :index="index" />
+      </template>
+
+      <template v-if="isFetching">
+        <slot name="skeleton" :count="pageSize" />
+      </template>
+
+      <div ref="loadMoreSentinelRef" style="height: 1px" />
+
+      <template v-if="!hasMore && data.length > 0">
+        <slot name="end">
+          <div class="text-center text-muted-foreground py-4 text-sm">You've reached the end.</div>
+        </slot>
+      </template>
+    </div>
+  </div>
+</template>
+```
+
+Use the `InfiniteList` component with the [Todo List](https://supabase.com/dashboard/project/_/sql/quickstarts) quickstart.
+
+Add `<InfiniteListDemo />` to a page to see it in action.
+Ensure the [Checkbox](https://ui.shadcn.com/docs/components/checkbox) component from shadcn/ui is installed, and [regenerate/download](https://supabase.com/docs/guides/api/rest/generating-types) types after running the quickstart.
+
+```vue
+<script setup lang="ts">
+import { InfiniteList } from './infinite-component'
+import { Checkbox } from '@/components/ui/checkbox'
+import { SupabaseQueryHandler } from '@/hooks/use-infinite-query'
+import { Database } from '@/lib/supabase.types'
+
+type TodoTask = Database['public']['Tables']['todos']['Row']
+
+const renderTodoItem = (todo: TodoTask) => {
+  return (
+    <div
+      key={todo.id}
+      className="border-b py-3 px-4 hover:bg-muted flex items-center justify-between"
+    >
+      <div className="flex items-center gap-3">
+        <Checkbox modelValue={todo.is_complete ?? false} />
+        <div>
+          <span className="font-medium text-sm text-foreground">{todo.task}</span>
+          <div className="text-sm text-muted-foreground">
+            {new Date(todo.inserted_at).toLocaleDateString()}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const orderByInsertedAt: SupabaseQueryHandler<'todos'> = (query) => {
+  return query.order('inserted_at', { ascending: false })
+}
+</script>
+
+<template>
+  <div class="bg-background h-[600px]">
+    <InfiniteList
+      tableName="todos"
+      :renderItem="renderTodoItem"
+      :pageSize="3"
+      :trailingQuery="orderByInsertedAt"
+    />
+  </div>
+</template>
+```
+
+<Callout>
+  The Todo List table has Row Level Security (RLS) enabled by default. Feel free disable it
+  temporarily while testing. With RLS enabled, you will get an [empty
+  array](https://supabase.com/docs/guides/troubleshooting/why-is-my-select-returning-an-empty-data-array-and-i-have-data-in-the-table-xvOPgx)
+  of results by default. [Read
+  more](https://supabase.com/docs/guides/database/postgres/row-level-security) about RLS.
+</Callout>
+
+## Further reading
+
+- [Generating Typescript types from the database](https://supabase.com/docs/reference/javascript/typescript-support)
+- [Supabase Database API](https://supabase.com/docs/reference/javascript/select)
+- [Supabase Pagination](https://supabase.com/docs/reference/javascript/select#pagination)
+- [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)

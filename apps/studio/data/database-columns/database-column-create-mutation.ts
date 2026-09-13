@@ -1,14 +1,25 @@
-import pgMeta from '@supabase/pg-meta'
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import pgMeta, { type SafeSqlFragment } from '@supabase/pg-meta'
+import type { ColumnTypeRef } from '@supabase/pg-meta/src/pg-meta-columns'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
-export type CreateColumnBody = Omit<components['schemas']['CreateColumnBody'], 'tableId'> & {
+export type CreateColumnBody = {
   schema: string
   table: string
+  name: string
+  type: ColumnTypeRef
+  check?: SafeSqlFragment
+  comment?: string
+  defaultValue?: any
+  defaultValueFormat?: 'expression' | 'literal'
+  identityGeneration?: 'BY DEFAULT' | 'ALWAYS'
+  isIdentity?: boolean
+  isNullable?: boolean
+  isPrimaryKey?: boolean
+  isUnique?: boolean
 }
 
 export type DatabaseColumnCreateVariables = {
@@ -55,23 +66,21 @@ export const useDatabaseColumnCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseColumnCreateData, ResponseError, DatabaseColumnCreateVariables>,
+  UseCustomMutationOptions<DatabaseColumnCreateData, ResponseError, DatabaseColumnCreateVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<DatabaseColumnCreateData, ResponseError, DatabaseColumnCreateVariables>(
-    (vars) => createDatabaseColumn(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create database column: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseColumnCreateData, ResponseError, DatabaseColumnCreateVariables>({
+    mutationFn: (vars) => createDatabaseColumn(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create database column: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

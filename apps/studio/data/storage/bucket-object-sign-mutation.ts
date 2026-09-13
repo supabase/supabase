@@ -1,9 +1,9 @@
-import { UseMutationOptions, useMutation } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { components } from 'data/api'
-import { handleError, post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { components } from '@/data/api'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type SignBucketObjectParams = {
   projectRef: string
@@ -35,28 +35,53 @@ export const signBucketObject = async (
 
 type SignBucketObjectData = Awaited<ReturnType<typeof signBucketObject>>
 
+type SignBucketObjectsParams = {
+  projectRef: string
+  bucketId?: string
+  paths: Array<string>
+  expiresIn: number
+}
+export const signBucketObjects = async (
+  { projectRef, bucketId, paths, expiresIn }: SignBucketObjectsParams,
+  signal?: AbortSignal
+) => {
+  if (!bucketId) throw new Error('bucketId is required')
+
+  const { data, error } = await post('/platform/storage/{ref}/buckets/{id}/objects/sign-multi', {
+    params: {
+      path: {
+        ref: projectRef,
+        id: bucketId,
+      },
+    },
+    body: { path: paths, expiresIn },
+    signal,
+  })
+
+  if (error) handleError(error)
+  return data ?? []
+}
+
 export const useGetSignBucketObjectMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SignBucketObjectData, ResponseError, SignBucketObjectParams>,
+  UseCustomMutationOptions<SignBucketObjectData, ResponseError, SignBucketObjectParams>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SignBucketObjectData, ResponseError, SignBucketObjectParams>(
-    (vars) => signBucketObject(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to get sign bucket object: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SignBucketObjectData, ResponseError, SignBucketObjectParams>({
+    mutationFn: (vars) => signBucketObject(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to get sign bucket object: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

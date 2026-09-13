@@ -1,14 +1,41 @@
 import dayjs from 'dayjs'
 
-import useDbQuery, { DbQueryHook } from 'hooks/analytics/useDbQuery'
-import useLogsQuery, { LogsQueryHook } from 'hooks/analytics/useLogsQuery'
-import type { BaseQueries, PresetConfig, ReportQuery } from './Reports.types'
+import {
+  type BaseQueries,
+  type PresetConfig,
+  type ReportFilterItem,
+  type ReportQuery,
+} from './Reports.types'
+import {
+  isUnixMicro,
+  unixMicroToIsoTimestamp,
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
+import type { SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+import { REPORT_STATUS_CODE_COLORS } from '@/data/reports/report.utils'
+import useDbQuery, { DbQueryHook } from '@/hooks/analytics/useDbQuery'
+import { useLogsQuery, type LogsQueryHook } from '@/hooks/analytics/useLogsQuery'
+import { getHttpStatusCodeInfo } from '@/lib/http-status-codes'
 
 /**
  * Converts a query params string to an object
  */
 export const queryParamsToObject = (params: string) => {
   return Object.fromEntries(new URLSearchParams(params))
+}
+
+/**
+ * Decodes a URI component, returning the original string if it is malformed.
+ *
+ * `decodeURIComponent` throws a `URIError` on invalid percent-encoding (e.g. a
+ * literal `%` such as `?discount=100%`). Request paths are user-controlled, so
+ * decoding inline during render can crash the page.
+ */
+export const safeDecodeURIComponent = (value: string) => {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
 }
 
 export type PresetHookResult = LogsQueryHook | DbQueryHook
@@ -22,23 +49,27 @@ export const queriesFactory = <T extends string>(
   queries: BaseQueries<T>,
   projectRef: string
 ): PresetHooks => {
-  const hooks: PresetHooks = Object.entries<ReportQuery>(queries).reduce(
-    (acc, [k, { sql, queryType }]) => {
-      if (queryType === 'db') {
-        return {
-          ...acc,
-          [k]: () => useDbQuery({ sql }),
-        }
-      } else {
-        return {
-          ...acc,
-          [k]: () => useLogsQuery(projectRef),
-        }
+  const hooks: PresetHooks = Object.entries<ReportQuery>(queries).reduce((acc, [k, query]) => {
+    if (query.queryType === 'db') {
+      return {
+        ...acc,
+        [k]: () => useDbQuery({ sql: query.safeSql }),
       }
-    },
-    {}
-  )
+    } else {
+      return {
+        ...acc,
+        [k]: () => useLogsQuery({ projectRef }),
+      }
+    }
+  }, {})
   return hooks
+}
+
+export function getLogsSql(query: ReportQuery, filters: ReportFilterItem[]): SafeLogSqlFragment {
+  if (query.queryType !== 'logs') {
+    throw new Error(`Expected logs query, got ${query.queryType}`)
+  }
+  return query.safeSql(filters)
 }
 
 /**
@@ -72,4 +103,109 @@ export const formatTimestamp = (
     console.error(error)
     return 'Invalid Date'
   }
+}
+
+/**
+ * Extracts distinct status codes from log data rows
+ */
+export function extractStatusCodesFromData(data: any[]): string[] {
+  const statusCodes = new Set<string>()
+
+  data.forEach((item: any) => {
+    if (item.status_code !== undefined && item.status_code !== null) {
+      statusCodes.add(String(item.status_code))
+    }
+  })
+
+  return Array.from(statusCodes).sort()
+}
+
+/**
+ * Generates chart attributes for status codes with labels and colors
+ */
+export function generateStatusCodeAttributes(statusCodes: string[]) {
+  return statusCodes.map((code) => ({
+    attribute: code,
+    label: `${code} ${getHttpStatusCodeInfo(parseInt(code, 10)).label}`,
+    color: REPORT_STATUS_CODE_COLORS[code] || REPORT_STATUS_CODE_COLORS.default,
+  }))
+}
+
+/**
+ * Pivots rows of { timestamp, status_code, count } into { timestamp, [status_code]: count }
+ * and normalizes timestamps to ISO strings (UTC), filling missing codes with 0 per timestamp
+ */
+export function transformStatusCodeData(data: any[], statusCodes: string[]) {
+  const pivotedData = data.reduce((acc: Record<string, any>, d: any) => {
+    const timestamp = isUnixMicro(d.timestamp)
+      ? unixMicroToIsoTimestamp(d.timestamp)
+      : dayjs.utc(d.timestamp).toISOString()
+    if (!acc[timestamp]) {
+      acc[timestamp] = { timestamp }
+      statusCodes.forEach((code) => {
+        acc[timestamp][code] = 0
+      })
+    }
+    const codeKey = String(d.status_code)
+    if (codeKey in acc[timestamp]) {
+      acc[timestamp][codeKey] = d.count
+    }
+    return acc
+  }, {})
+
+  return Object.values(pivotedData)
+}
+
+/**
+ * Extract distinct string values for a given field from data rows
+ */
+export function extractDistinctValuesFromData(data: any[], field: string): string[] {
+  const values = new Set<string>()
+  data.forEach((item: any) => {
+    if (item[field] !== undefined && item[field] !== null) {
+      values.add(String(item[field]))
+    }
+  })
+  return Array.from(values).sort()
+}
+
+/**
+ * Generates chart attributes from a list of category values
+ */
+export function generateCategoryAttributes(
+  values: string[],
+  labelResolver?: (v: string) => string
+) {
+  return values.map((v) => ({
+    attribute: v,
+    label: labelResolver ? labelResolver(v) : v,
+  }))
+}
+
+/**
+ * Pivot rows of { timestamp, [categoryField], count } into { timestamp, [category]: count }
+ */
+export function transformCategoricalCountData(
+  data: any[],
+  categoryField: string,
+  categories: string[]
+) {
+  const pivotedData = data.reduce((acc: Record<string, any>, d: any) => {
+    const timestamp = isUnixMicro(d.timestamp)
+      ? unixMicroToIsoTimestamp(d.timestamp)
+      : dayjs.utc(d.timestamp).toISOString()
+    if (!acc[timestamp]) {
+      acc[timestamp] = { timestamp }
+      categories.forEach((c) => {
+        acc[timestamp][c] = 0
+      })
+    }
+    const key = String(d[categoryField])
+    if (key in acc[timestamp]) {
+      acc[timestamp][key] = d.count
+    }
+    return acc
+  }, {})
+
+  return Object.values(pivotedData)
 }

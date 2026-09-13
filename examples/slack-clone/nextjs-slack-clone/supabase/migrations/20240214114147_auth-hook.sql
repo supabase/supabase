@@ -4,7 +4,7 @@
  */
 
 -- Create the auth hook function
--- https://supabase.com/docs/guides/auth/auth-hooks#hook-custom-access-token
+-- https://supabase.com/docs/guides/auth/auth-hooks/custom-access-token-hook
 create or replace function public.custom_access_token_hook(event jsonb)
 returns jsonb
 language plpgsql

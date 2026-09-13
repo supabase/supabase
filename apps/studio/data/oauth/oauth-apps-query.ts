@@ -1,17 +1,17 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-
+import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+
 import { oauthAppKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OAuthAppsVariables = {
   slug?: string
 }
 
-export type OAuthApp = components['schemas']['OAuthAppResponse']
+export type OAuthApp = components['schemas']['OAuthAppResponse_Output']
 
-export async function getOAuthApps({ slug }: OAuthAppsVariables, signal?: AbortSignal) {
+export async function getOAuthApps({ slug }: OAuthAppsVariables) {
   if (!slug) throw new Error('Organization slug is required')
 
   const { data, error } = await get('/platform/organizations/{slug}/oauth/apps', {
@@ -27,13 +27,11 @@ export type OAuthAppsError = ResponseError
 
 export const useOAuthAppsQuery = <TData = OAuthAppsData>(
   { slug }: OAuthAppsVariables,
-  { enabled = true, ...options }: UseQueryOptions<OAuthAppsData, OAuthAppsError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<OAuthAppsData, OAuthAppsError, TData> = {}
 ) =>
-  useQuery<OAuthAppsData, OAuthAppsError, TData>(
-    oauthAppKeys.oauthApps(slug),
-    ({ signal }) => getOAuthApps({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<OAuthAppsData, OAuthAppsError, TData>({
+    queryKey: oauthAppKeys.oauthApps(slug),
+    queryFn: () => getOAuthApps({ slug }),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

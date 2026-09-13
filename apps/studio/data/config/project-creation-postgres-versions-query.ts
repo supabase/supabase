@@ -1,9 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-
-import { handleError, post } from 'data/fetchers'
+import { useQuery } from '@tanstack/react-query'
 import { CloudProvider } from 'shared-data'
-import type { ResponseError } from 'types'
+
 import { configKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ProjectCreationPostgresVersionsVariables = {
   cloudProvider: CloudProvider
@@ -37,30 +37,25 @@ export const useProjectCreationPostgresVersionsQuery = <TData = ProjectCreationP
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<
+  }: UseCustomQueryOptions<
     ProjectCreationPostgresVersionData,
     ProjectCreationPostgresVersionError,
     TData
   > = {}
 ) => {
-  return useQuery<ProjectCreationPostgresVersionData, ProjectCreationPostgresVersionError, TData>(
-    configKeys.projectCreationPostgresVersions(organizationSlug, cloudProvider, dbRegion),
-    ({ signal }) =>
+  return useQuery<ProjectCreationPostgresVersionData, ProjectCreationPostgresVersionError, TData>({
+    queryKey: configKeys.projectCreationPostgresVersions(organizationSlug, cloudProvider, dbRegion),
+    queryFn: ({ signal }) =>
       getPostgresCreationVersions({ organizationSlug, cloudProvider, dbRegion }, signal),
-    {
-      enabled:
-        enabled &&
-        typeof organizationSlug !== 'undefined' &&
-        organizationSlug !== '_' &&
-        typeof dbRegion !== 'undefined',
-      ...options,
-    }
-  )
+    enabled:
+      enabled && typeof organizationSlug !== 'undefined' && organizationSlug !== '_' && !!dbRegion,
+    ...options,
+  })
 }
 
 export const useAvailableOrioleImageVersion = (
   { cloudProvider, dbRegion, organizationSlug }: ProjectCreationPostgresVersionsVariables,
-  { enabled }: { enabled?: boolean }
+  { enabled = true }: { enabled?: boolean } = {}
 ) => {
   const { data } = useProjectCreationPostgresVersionsQuery(
     {
@@ -68,7 +63,13 @@ export const useAvailableOrioleImageVersion = (
       dbRegion,
       organizationSlug,
     },
-    { enabled }
+    {
+      enabled,
+      select(data) {
+        return (data?.available_versions ?? []).find((x) => x.postgres_engine === '17-oriole')
+      },
+    }
   )
-  return (data?.available_versions ?? []).find((x) => x.postgres_engine === '17-oriole')
+
+  return data
 }

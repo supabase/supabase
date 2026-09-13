@@ -1,73 +1,163 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Plus, Search } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-
 import { useParams } from 'common'
-import Table from 'components/to-be-cleaned/Table'
-import { AlertError } from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
-import { replicationKeys } from 'data/replication/keys'
-import { fetchReplicationPipelineVersion } from 'data/replication/pipeline-version-query'
-import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
-import { useReplicationSourcesQuery } from 'data/replication/sources-query'
-import { Button, cn, Input_Shadcn_ } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
-import { DestinationPanel } from './DestinationPanel'
+import { MessageSquare, MoreVertical, Plus, Search, Workflow, X } from 'lucide-react'
+import Link from 'next/link'
+import { parseAsStringEnum, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  Button,
+  Card,
+  CardContent,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { DestinationPanel } from './DestinationPanel/DestinationPanel'
+import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
-import { EnableReplicationModal } from './EnableReplicationModal'
-import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import { DisablePipelinesDialog } from './DisablePipelinesDialog'
+import { EnablePipelinesModal } from './EnablePipelinesCallout'
+import { PIPELINES_FEEDBACK_URL } from './Replication.constants'
+import {
+  useIsETLBigQueryPrivateAlpha,
+  useIsETLClickHousePrivateAlpha,
+  useIsETLDucklakePrivateAlpha,
+  useIsETLIcebergPrivateAlpha,
+  useIsETLSnowflakePrivateAlpha,
+} from './useIsETLPrivateAlpha'
+import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
+import { AlertError } from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
+import { replicationKeys } from '@/data/replication/keys'
+import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
+import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { checkLocalETLNotSetUp } from '@/data/replication/utils'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const Destinations = () => {
-  const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
-  const [filterString, setFilterString] = useState<string>('')
+  const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
+  const { data: organization } = useSelectedOrganizationQuery()
 
-  const {
-    data: sourcesData,
-    error: sourcesError,
-    isLoading: isSourcesLoading,
-    isError: isSourcesError,
-    isSuccess: isSourcesSuccess,
-  } = useReplicationSourcesQuery({
-    projectRef,
-  })
+  useRedirectLegacyReadReplicaDestination()
 
-  const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
-  const replicationNotEnabled = isSourcesSuccess && !sourceId
+  const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
+  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
+  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
+  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
+  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
+
+  const newDestinationDefaultType: DestinationType | null = etlEnableBigQuery
+    ? 'BigQuery'
+    : etlEnableIceberg
+      ? 'Analytics Bucket'
+      : etlEnableDucklake
+        ? 'DuckLake'
+        : etlEnableSnowflake
+          ? 'Snowflake'
+          : etlEnableClickHouse
+            ? 'ClickHouse'
+            : null
+
+  const prefetchedRef = useRef(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const [filterString, setFilterString] = useState<string>('')
+  const [showEnablePipelinesDialog, setShowEnablePipelinesDialog] = useState(false)
+  const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
+
+  const [, setDestinationType] = useQueryState(
+    'destinationType',
+    parseAsStringEnum<DestinationType>([
+      'BigQuery',
+      'Analytics Bucket',
+      'DuckLake',
+      'Snowflake',
+      'ClickHouse',
+    ]).withOptions({
+      history: 'push',
+      clearOnDefault: true,
+    })
+  )
 
   const {
     data: destinationsData,
     error: destinationsError,
-    isLoading: isDestinationsLoading,
+    isPending: isDestinationsLoading,
     isError: isDestinationsError,
     isSuccess: isDestinationsSuccess,
   } = useReplicationDestinationsQuery({
     projectRef,
   })
-
-  const {
-    data: pipelinesData,
-    error: pipelinesError,
-    isLoading: isPipelinesLoading,
-    isError: isPipelinesError,
-    isSuccess: isPipelinesSuccess,
-  } = useReplicationPipelinesQuery({
-    projectRef,
-  })
-
-  const hasDestinations = isDestinationsSuccess && destinationsData.destinations.length > 0
-
+  const destinations = destinationsData?.destinations ?? []
+  const hasDestinations = isDestinationsSuccess && destinationsData?.destinations.length > 0
   const filteredDestinations =
     filterString.length === 0
-      ? destinationsData?.destinations ?? []
-      : (destinationsData?.destinations ?? []).filter((destination) =>
+      ? (destinations ?? [])
+      : (destinations ?? []).filter((destination) =>
           destination.name.toLowerCase().includes(filterString.toLowerCase())
         )
 
-  // Prefetch pipeline version info for all destinations on first load only
-  const queryClient = useQueryClient()
-  const prefetchedRef = useRef(false)
+  const { data: pipelinesData, isSuccess: isPipelinesSuccess } = useReplicationPipelinesQuery({
+    projectRef,
+  })
+  const pipelines = pipelinesData?.pipelines ?? []
+
+  const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
+    projectRef,
+  })
+  const externalReplicationSource = useMemo(
+    () => sourcesData?.sources.find((source) => source.name === projectRef),
+    [projectRef, sourcesData?.sources]
+  )
+  const replicationNotEnabled = isSourcesSuccess && !externalReplicationSource
+
+  const canDisablePipelines =
+    isSourcesSuccess &&
+    isDestinationsSuccess &&
+    isPipelinesSuccess &&
+    !!externalReplicationSource &&
+    destinations.length === 0 &&
+    pipelines.length === 0
+
+  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
+  const hasErrorsFetchingData = !isLocalETLNotSetUp && isDestinationsError
+
+  const openDestinationPanel = () => {
+    if (!newDestinationDefaultType) return
+    setDestinationType(newDestinationDefaultType)
+  }
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search destinations' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setFilterString(''))
+
   useEffect(() => {
     if (
       projectRef &&
@@ -90,127 +180,169 @@ export const Destinations = () => {
   }, [projectRef, pipelinesData?.pipelines, isPipelinesSuccess, queryClient])
 
   return (
-    <>
-      <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="relative">
-              <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
-                size={14}
-              />
-              <Input_Shadcn_
-                className="pl-9 h-7"
-                placeholder={'Filter destinations'}
-                value={filterString}
-                onChange={(e) => setFilterString(e.target.value)}
-              />
-            </div>
-          </div>
-          {!!sourceId && (
-            <Button type="default" icon={<Plus />} onClick={() => setShowNewDestinationPanel(true)}>
+    <div className="w-full space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <Input
+            ref={searchInputRef}
+            placeholder="Filter destinations"
+            size="tiny"
+            icon={<Search />}
+            value={filterString}
+            className="w-full lg:w-52"
+            onChange={(e) => setFilterString(e.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+            actions={
+              filterString.length > 0 && (
+                <Button
+                  aria-label="Clear filter"
+                  variant="text"
+                  icon={<X />}
+                  className="p-0 h-5 w-5"
+                  onClick={() => setFilterString('')}
+                />
+              )
+            }
+          />
+        </div>
+        <div className="flex items-center gap-x-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button aria-label="More actions" icon={<MoreVertical />} className="px-1" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuItem asChild>
+                <Link href={`/org/${organization?.slug}/usage#pipeline-initial-sync-data`}>
+                  View Pipelines usage
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {replicationNotEnabled ? (
+                <DropdownMenuItem onClick={() => setShowEnablePipelinesDialog(true)}>
+                  Enable Pipelines
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItemTooltip
+                  disabled={!canDisablePipelines}
+                  tooltip={{
+                    content: {
+                      side: 'left',
+                      text: 'Remove all existing destinations before disabling Pipelines',
+                    },
+                  }}
+                  onClick={() => setShowDisablePipelinesDialog(true)}
+                >
+                  Disable Pipelines
+                </DropdownMenuItemTooltip>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Button asChild icon={<MessageSquare />}>
+            <a href={PIPELINES_FEEDBACK_URL} target="_blank" rel="noreferrer noopener">
+              Leave feedback
+            </a>
+          </Button>
+          <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
+
+          <Shortcut
+            id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+            label="Add destination"
+            onTrigger={openDestinationPanel}
+            options={{ enabled: !!newDestinationDefaultType }}
+            side="bottom"
+          >
+            <Button
+              variant="primary"
+              icon={<Plus />}
+              disabled={!newDestinationDefaultType}
+              onClick={openDestinationPanel}
+            >
               Add destination
             </Button>
-          )}
+          </Shortcut>
         </div>
       </div>
 
-      <div className="w-full overflow-hidden overflow-x-auto">
-        {(isSourcesLoading || isDestinationsLoading) && <GenericSkeletonLoader />}
-
-        {(isSourcesError || isDestinationsError) && (
-          <AlertError
-            error={sourcesError || destinationsError}
-            subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_DESTINATIONS}
-          />
+      <div className="w-full overflow-hidden overflow-x-auto flex flex-col gap-y-4">
+        {hasErrorsFetchingData && (
+          <AlertError error={destinationsError} subject="Failed to retrieve destinations" />
         )}
 
-        {replicationNotEnabled ? (
-          <div className="border rounded-md p-4 md:p-12 flex flex-col gap-y-4">
-            <div className="flex flex-col gap-y-1">
-              <h3>Run analysis on your data via integrations with Replication</h3>
-              <p className="text-sm text-foreground-light">
-                Enable replication on your project to send data to your first destination
-              </p>
-            </div>
-            <div className="flex gap-x-2">
-              <EnableReplicationModal />
-              {/* [Joshen] Placeholder for when we have documentation */}
-              <DocsButton href="https://supabase.com/docs" />
-            </div>
-          </div>
+        {isDestinationsLoading ? (
+          <GenericSkeletonLoader />
         ) : hasDestinations ? (
-          <Table
-            head={[
-              <Table.th key="name">Name</Table.th>,
-              <Table.th key="type">Type</Table.th>,
-              <Table.th key="status">Status</Table.th>,
-              <Table.th key="publication">Publication</Table.th>,
-              <Table.th key="actions"></Table.th>,
-            ]}
-            body={filteredDestinations.map((destination) => {
-              const pipeline = pipelinesData?.pipelines.find(
-                (p) => p.destination_id === destination.id
-              )
-              return (
-                <DestinationRow
-                  key={destination.id}
-                  sourceId={sourceId}
-                  destinationId={destination.id}
-                  destinationName={destination.name}
-                  type={destination.config.big_query ? 'BigQuery' : 'Other'}
-                  pipeline={pipeline}
-                  error={pipelinesError}
-                  isLoading={isPipelinesLoading}
-                  isError={isPipelinesError}
-                  isSuccess={isPipelinesSuccess}
-                />
-              )
-            })}
-          />
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead key="type" className="w-[20px]" />
+                    <TableHead key="name" className="w-[250px]">
+                      Name
+                    </TableHead>
+                    <TableHead key="status" className="w-[150px]">
+                      Status
+                    </TableHead>
+                    <TableHead key="lag" className="w-[150px]">
+                      Lag
+                    </TableHead>
+                    <TableHead key="publication">Publication</TableHead>
+                    <TableHead key="actions" />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredDestinations.map((destination) => (
+                    <DestinationRow key={destination.id} destinationId={destination.id} />
+                  ))}
+
+                  {!isDestinationsLoading &&
+                    filteredDestinations.length === 0 &&
+                    hasDestinations && (
+                      <TableRow>
+                        <TableCell colSpan={6}>
+                          <p>No results found</p>
+                          <p className="text-foreground-light">
+                            Your search for "{filterString}" did not return any results.
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         ) : (
-          !isSourcesLoading &&
           !isDestinationsLoading &&
-          !isSourcesError &&
-          !isDestinationsError && (
-            <div
-              className={cn(
-                'w-full',
-                'border border-dashed bg-surface-100 border-overlay',
-                'flex flex-col px-10 rounded-lg justify-center items-center py-8 mt-4'
-              )}
+          !hasErrorsFetchingData && (
+            <EmptyStatePresentational
+              icon={Workflow}
+              title="Add a destination"
+              description="Connect an external destination for analytics workloads."
             >
-              <h4>Send data to your first destination</h4>
-              <p className="prose text-sm text-center mt-1 max-w-full">
-                Use destinations to improve performance or run analysis on your data via
-                integrations like BigQuery
-              </p>
               <Button
                 icon={<Plus />}
-                onClick={() => setShowNewDestinationPanel(true)}
-                className="mt-4"
+                disabled={!newDestinationDefaultType}
+                onClick={openDestinationPanel}
               >
                 Add destination
               </Button>
-            </div>
+            </EmptyStatePresentational>
           )
         )}
       </div>
 
-      {!isSourcesLoading &&
-        !isDestinationsLoading &&
-        filteredDestinations.length === 0 &&
-        hasDestinations && (
-          <div className="text-center py-8 text-foreground-light">
-            <p>No destinations match "{filterString}"</p>
-          </div>
-        )}
+      <DestinationPanel />
 
-      <DestinationPanel
-        visible={showNewDestinationPanel}
-        sourceId={sourceId}
-        onClose={() => setShowNewDestinationPanel(false)}
+      <EnablePipelinesModal
+        open={showEnablePipelinesDialog}
+        onOpenChange={setShowEnablePipelinesDialog}
       />
-    </>
+
+      <DisablePipelinesDialog
+        open={showDisablePipelinesDialog}
+        setOpen={setShowDisablePipelinesDialog}
+      />
+    </div>
   )
 }

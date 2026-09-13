@@ -1,30 +1,64 @@
-import { useParams } from 'common'
-import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { CommandOptions } from 'ui-patterns/CommandMenu'
-import { useRegisterCommands } from 'ui-patterns/CommandMenu'
+import { useFlag, useParams } from 'common'
+import { useRouter } from 'next/router'
+import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
+import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
 
-export function useProjectSettingsGotoCommands(options?: CommandOptions) {
-  let { ref } = useParams()
-  ref ||= '_'
+import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
 
-  const { projectSettingsLogDrains, projectSettingsCustomDomains, authenticationSignInProviders } =
-    useIsFeatureEnabled([
-      'project_settings:log_drains',
-      'project_settings:custom_domains',
-      'authentication:sign_in_providers',
-    ])
+export function useProjectSettingsGotoCommands(options?: CommandOptions) {
+  const router = useRouter()
+  const setIsOpen = useSetCommandMenuOpen()
+  let { ref, slug } = useParams()
+  const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
+  const showConfigDrift = useFlag('ConfigDrift')
+  ref ||= '_'
+  const hasOrgSlug = typeof slug === 'string' && slug.length > 0 && slug !== '_'
+
+  const {
+    logsAll,
+    projectSettingsLogDrains,
+    projectSettingsCustomDomains,
+    authenticationSignInProviders,
+  } = useIsFeatureEnabled([
+    'logs:all',
+    'project_settings:log_drains',
+    'project_settings:custom_domains',
+    'authentication:sign_in_providers',
+  ])
+
+  // Log drains depend on the analytics backend, gated by logs:all (see SettingsMenu.utils).
+  const showLogDrains = logsAll && projectSettingsLogDrains
 
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.NAVIGATE,
     [
+      {
+        id: 'nav-project-settings-add-ons',
+        name: 'Add-ons',
+        value: 'Add-ons addons add ons add on add-on',
+        route: `/project/${ref}/settings/addons`,
+        defaultHidden: true,
+      },
       {
         id: 'nav-project-settings-general',
         name: 'General Settings',
         route: `/project/${ref}/settings/general`,
         defaultHidden: true,
       },
+      ...(IS_PLATFORM && showConfigDrift
+        ? [
+            {
+              id: 'nav-project-settings-code-configuration',
+              name: 'Code configuration',
+              route: `/project/${ref}/settings/code-configuration`,
+              defaultHidden: true,
+            } as IRouteCommand,
+          ]
+        : []),
       {
         id: 'nav-project-settings-database',
         name: 'Database Settings',
@@ -36,13 +70,33 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         name: 'Auth Settings',
         route: authenticationSignInProviders
           ? `/project/${ref}/auth/providers`
-          : `/project/${ref}/auth/policies`,
+          : `/project/${ref}/database/policies`,
         defaultHidden: true,
       },
+      ...(platformWebhooksEnabled
+        ? [
+            {
+              id: 'nav-project-settings-webhooks',
+              name: 'Project Webhooks',
+              route: `/project/${ref}/settings/webhooks`,
+              defaultHidden: true,
+            } as IRouteCommand,
+            ...(hasOrgSlug
+              ? [
+                  {
+                    id: 'nav-organization-settings-webhooks',
+                    name: 'Organization Webhooks',
+                    route: `/org/${slug}/webhooks`,
+                    defaultHidden: true,
+                  } as IRouteCommand,
+                ]
+              : []),
+          ]
+        : []),
       {
         id: 'nav-project-settings-api',
         name: 'API Settings',
-        route: `/project/${ref}/settings/api`,
+        route: `/project/${ref}/integrations/data_api/settings`,
         defaultHidden: true,
       },
       {
@@ -63,7 +117,8 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         : []),
       {
         id: 'nav-project-settings-restart-project',
-        name: 'Restart project',
+        name: 'Project availability',
+        value: 'project availability restart project pause project resume project',
         route: `/project/${ref}/settings/general#restart-project`,
         defaultHidden: true,
       },
@@ -88,25 +143,41 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-project-settings-database-password',
         name: 'Database password',
-        route: `/project/${ref}/settings/general#database-password`,
+        route: `/project/${ref}/database/settings#database-password`,
+        defaultHidden: true,
+      },
+      {
+        id: 'nav-project-settings-reset-database-password',
+        name: 'Reset database password',
+        route: `/project/${ref}/database/settings#database-password`,
         defaultHidden: true,
       },
       {
         id: 'nav-project-settings-connection-string',
         name: 'Connection string',
-        route: `/project/${ref}/settings/general#connection-string`,
+        action: () => {
+          router.push(
+            {
+              pathname: router.pathname,
+              query: { ...router.query, showConnect: 'true' },
+            },
+            undefined,
+            { shallow: true }
+          )
+          setIsOpen(false)
+        },
         defaultHidden: true,
-      },
+      } as ICommand,
       {
         id: 'nav-project-settings-connection-pooling',
         name: 'Connection pooling',
-        route: `/project/${ref}/settings/general#connection-pooling`,
+        route: `/project/${ref}/database/settings#connection-pooler`,
         defaultHidden: true,
       },
       {
         id: 'nav-project-settings-ssl-configuration',
         name: 'SSL configuration',
-        route: `/project/${ref}/settings/general#ssl-configuration`,
+        route: `/project/${ref}/database/settings#ssl-configuration`,
         defaultHidden: true,
       },
       {
@@ -121,7 +192,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/database/settings#banned-ips`,
         defaultHidden: true,
       },
-      ...(projectSettingsLogDrains
+      ...(showLogDrains
         ? [
             {
               id: 'nav-project-settings-log-drains',
@@ -132,6 +203,6 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
           ]
         : []),
     ],
-    { ...options, deps: [ref] }
+    { ...options, deps: [platformWebhooksEnabled, showLogDrains, showConfigDrift, ref, slug] }
   )
 }

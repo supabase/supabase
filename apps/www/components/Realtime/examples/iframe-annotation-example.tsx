@@ -263,7 +263,7 @@ export default function App() {
                 >
                   <div 
                     data-comment-bubble
-                    className="max-w-[400px] min-w-32 bg-neutral-800 rounded shadow p-3 pt-2 mb-2"
+                    className="max-w-[400px] min-w-32 bg-neutral-800 rounded-sm shadow-sm p-3 pt-2 mb-2"
                   >
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-xs text-neutral-400">{comment.username}</span>
@@ -275,9 +275,9 @@ export default function App() {
                         <X strokeWidth={1.5} size={14} />
                       </button>
                     </div>
-                    <div className="text-xs  text-neutral-200 break-words">{comment.text}</div>
+                    <div className="text-xs  text-neutral-200 wrap-break-word">{comment.text}</div>
                   </div>
-                  <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-neutral-900/90 mx-auto"></div>
+                  <div className="w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-neutral-900/90 mx-auto"></div>
                 </div>
               ))}
               
@@ -295,7 +295,7 @@ export default function App() {
                 >
                   <div 
                     data-comment-bubble
-                    className="bg-neutral-800 rounded shadow p-2 mb-2 w-64"
+                    className="bg-neutral-800 rounded-sm shadow-sm p-2 mb-2 w-64"
                   >
                     <form onSubmit={handleCommentSubmit}>
                       <input
@@ -306,20 +306,20 @@ export default function App() {
                         onKeyDown={handleInputKeyDown}
                         placeholder="Type your comment..."
                         data-comment-input
-                        className="w-full px-2 py-1.5 bg-neutral-800 border border-neutral-700 rounded text-xs text-neutral-200 placeholder-neutral-500 mb-2"
+                        className="w-full px-2 py-1.5 bg-neutral-800 border border-neutral-700 rounded-sm text-xs text-neutral-200 placeholder-neutral-500 mb-2"
                         autoFocus
                       />
                       <div className="flex justify-end gap-2">
                         <button 
                           type="button" 
                           onClick={handleCancelComment}
-                          className="px-3 py-1 text-xs bg-neutral-800 text-neutral-300 rounded hover:bg-neutral-700"
+                          className="px-3 py-1 text-xs bg-neutral-800 text-neutral-300 rounded-sm hover:bg-neutral-700"
                         >
                           Cancel
                         </button>
                         <button 
                           type="submit" 
-                          className="px-3 py-1 text-xs bg-neutral-300 text-neutral-900 rounded hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-3 py-1 text-xs bg-neutral-300 text-neutral-900 rounded-sm hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed"
                           disabled={!newComment.trim()}
                         >
                           Add

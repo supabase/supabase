@@ -2,10 +2,11 @@
 
 import { forwardRef, useCallback, type HTMLAttributes } from 'react'
 import { useInView } from 'react-intersection-observer'
+
 import {
   getAnchor,
-  removeAnchor,
   highlightSelectedTocItem,
+  removeAnchor,
   unHighlightSelectedTocItems,
 } from './CustomHTMLElements.utils'
 
@@ -57,10 +58,9 @@ const Heading = forwardRef(
         {anchor && (
           <a
             href={link}
-            aria-hidden="true"
-            className="ml-2 opacity-0 group-hover:opacity-100 transition"
+            className="ml-2 opacity-0 focus:opacity-100 group-hover:opacity-100 transition"
           >
-            <span aria-hidden="true">#</span>
+            #
           </a>
         )}
       </HeadingTag>

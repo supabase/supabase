@@ -24,7 +24,7 @@ enabled = false
 
 [functions.llamafile]
 enabled = true
-# verify_jwt = true
+verify_jwt = false
 # import_map = "./functions/llamafile/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -32,7 +32,7 @@ enabled = true
 
 [functions.llamafile-stream]
 enabled = true
-# verify_jwt = true
+verify_jwt = false
 # import_map = "./functions/llamafile-stream/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -40,7 +40,7 @@ enabled = true
 
 [functions.openai-sdk]
 enabled = true
-# verify_jwt = true
+verify_jwt = false
 # import_map = "./functions/openai-sdk/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx

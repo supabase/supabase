@@ -1,10 +1,12 @@
 import { noop } from 'lodash'
-import { Badge, Button, Checkbox, Modal } from 'ui'
+import { Button, Checkbox, cn, DialogSection, DialogSectionSeparator } from 'ui'
 
-import { PolicyName, PolicyRoles } from 'components/interfaces/Auth/Policies/PolicyEditor'
-import SqlEditor from 'components/ui/SqlEditor'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
 import { deriveAllowedClientLibraryMethods } from '../Storage.utils'
+import { PolicyName } from './PolicyEditor/PolicyName'
+import { PolicyRoles } from './PolicyEditor/PolicyRoles'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { DOCS_URL } from '@/lib/constants'
 
 const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {} }) => {
   return (
@@ -18,7 +20,11 @@ const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {}
         </p>
       </div>
       <div className="h-56 md:w-2/3">
-        <SqlEditor defaultValue={definition} onInputChange={onUpdatePolicyDefinition} />
+        <CodeEditor
+          language="pgsql"
+          defaultValue={definition}
+          onInputChange={onUpdatePolicyDefinition}
+        />
       </div>
     </div>
   )
@@ -26,6 +32,9 @@ const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {}
 
 const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = () => {} }: any) => {
   const allowedClientLibraryMethods = deriveAllowedClientLibraryMethods(allowedOperations)
+  const hasUpdateOrDelete =
+    allowedOperations.includes('UPDATE') || allowedOperations.includes('DELETE')
+
   return (
     <div className="flex flex-col md:flex-row justify-between gap-4 md:gap-12">
       <div className="flex md:w-1/3 flex-col space-y-2">
@@ -35,7 +44,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
         <p className="text-sm text-foreground-lighter">
           Based on the operations you have selected, you can use the highlighted functions in the{' '}
           <a
-            href="https://supabase.com/docs/reference/javascript/storage-from-list"
+            href={`${DOCS_URL}/reference/javascript/storage-from-list`}
             target="_blank"
             rel="noreferrer"
             className="underline"
@@ -45,36 +54,81 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
           .
         </p>
       </div>
-      <div className="md:w-2/3">
+      <div className="md:w-2/3 flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-          <Checkbox
-            label="SELECT"
-            onChange={() => onToggleOperation('SELECT')}
-            checked={allowedOperations.includes('SELECT')}
-          />
-          <Checkbox
-            label="INSERT"
-            onChange={() => onToggleOperation('INSERT')}
-            checked={allowedOperations.includes('INSERT')}
-          />
-          <Checkbox
-            label="UPDATE"
-            onChange={() => onToggleOperation('UPDATE')}
-            checked={allowedOperations.includes('UPDATE')}
-          />
-          <Checkbox
-            label="DELETE"
-            onChange={() => onToggleOperation('DELETE')}
-            checked={allowedOperations.includes('DELETE')}
-          />
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="checkbox-select"
+              onCheckedChange={() => onToggleOperation('SELECT')}
+              checked={allowedOperations.includes('SELECT')}
+            />
+            <label
+              htmlFor="checkbox-select"
+              className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              SELECT
+            </label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="checkbox-insert"
+              onCheckedChange={() => onToggleOperation('INSERT')}
+              checked={allowedOperations.includes('INSERT')}
+            />
+            <label
+              htmlFor="checkbox-insert"
+              className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              INSERT
+            </label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="checkbox-update"
+              onCheckedChange={() => onToggleOperation('UPDATE')}
+              checked={allowedOperations.includes('UPDATE')}
+            />
+            <label
+              htmlFor="checkbox-update"
+              className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              UPDATE
+            </label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="checkbox-delete"
+              onCheckedChange={() => onToggleOperation('DELETE')}
+              checked={allowedOperations.includes('DELETE')}
+            />
+            <label
+              htmlFor="checkbox-delete"
+              className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              DELETE
+            </label>
+          </div>
         </div>
+        {hasUpdateOrDelete && (
+          <p className="text-sm text-foreground-light mt-3 prose [&>code]:text-xs">
+            <code>SELECT</code> has been auto selected as <code>UPDATE</code> and{' '}
+            <code>DELETE</code> require it
+          </p>
+        )}
         <div className="flex w-5/6 flex-wrap">
           {Object.keys(STORAGE_CLIENT_LIBRARY_MAPPINGS).map((method) => (
-            <div key={method} className="mr-2 mt-2 font-mono">
-              <Badge variant={allowedClientLibraryMethods.includes(method) ? 'brand' : 'default'}>
+            <ul key={method} className="mr-2 mt-2 list-none">
+              <li
+                className={cn(
+                  'text-xs font-mono leading-[1.1] px-2 py-1 rounded-full border font-normal whitespace-nowrap transition-colors duration-200',
+                  allowedClientLibraryMethods.includes(method)
+                    ? 'bg-brand/10 text-brand-600 border-brand-500'
+                    : 'bg-surface-75 text-foreground-lighter border-muted'
+                )}
+              >
                 {method}
-              </Badge>
-            </div>
+              </li>
+            </ul>
           ))}
         </div>
       </div>
@@ -84,10 +138,8 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
 
 const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () => {} }) => (
   <div className="flex w-full items-center justify-end gap-x-2 border-t px-6 py-3 border-default">
-    <Button type="default" onClick={onViewTemplates}>
-      View templates
-    </Button>
-    <Button type="primary" onClick={onReviewPolicy}>
+    <Button onClick={onViewTemplates}>View templates</Button>
+    <Button variant="primary" onClick={onReviewPolicy}>
       Review
     </Button>
   </div>
@@ -95,7 +147,7 @@ const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () =>
 
 // [Refactor] All these update methods could be summarised into one single function probably
 
-const StoragePoliciesEditor = ({
+export const StoragePoliciesEditor = ({
   policyFormFields = {},
   onViewTemplates = noop,
   onUpdatePolicyName = noop,
@@ -110,35 +162,33 @@ const StoragePoliciesEditor = ({
   return (
     <>
       <div className="space-y-4 py-4">
-        <Modal.Content>
+        <DialogSection>
           <PolicyName
             name={policyFormFields.name}
             limit={50}
             onUpdatePolicyName={onUpdatePolicyName}
           />
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content>
+        </DialogSection>
+        <DialogSectionSeparator />
+        <DialogSection>
           <PolicyAllowedOperations
             allowedOperations={policyFormFields.allowedOperations}
             onToggleOperation={onToggleOperation}
           />
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content>
+        </DialogSection>
+        <DialogSectionSeparator />
+        <DialogSection>
           <PolicyRoles selectedRoles={selectedRoles} onUpdateSelectedRoles={onUpdatePolicyRoles} />
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content>
+        </DialogSection>
+        <DialogSectionSeparator />
+        <DialogSection>
           <PolicyDefinition
             definition={definition}
             onUpdatePolicyDefinition={onUpdatePolicyDefinition}
           />
-        </Modal.Content>
+        </DialogSection>
       </div>
       <PolicyEditorFooter onViewTemplates={onViewTemplates} onReviewPolicy={onReviewPolicy} />
     </>
   )
 }
-
-export default StoragePoliciesEditor

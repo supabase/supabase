@@ -28,7 +28,6 @@ async function constructHeaders(headersInit?: HeadersInit | undefined) {
       headers.set('Authorization', `Bearer ${accessToken}`)
     }
   }
-
   return headers
 }
 

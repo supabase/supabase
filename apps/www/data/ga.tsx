@@ -1,7 +1,7 @@
 import { KeyIcon, RewindIcon, ShieldCheckIcon, UserGroupIcon } from '@heroicons/react/outline'
+import { companyStats } from 'data/company-stats'
 import { Activity } from 'lucide-react'
 import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
-import { companyStats } from 'data/company-stats'
 
 export const data = (isDark: boolean) => ({
   hero: {
@@ -88,7 +88,7 @@ We're committed to our Free Plan - we know the importance of this for testing ho
       {
         number: '25,000',
         text: 'Discord members',
-        url: 'https://discord.com/invite/R7bSpeBSJE',
+        url: 'https://discord.supabase.com',
         icon: <IconDiscord />,
       },
       {
@@ -152,7 +152,7 @@ We're committed to our Free Plan - we know the importance of this for testing ho
                   strokeLinecap: 'butt',
                   strokeLinejoin: 'miter',
                   strokeMiterlimit: 10,
-                  fill: 'hsl(var(--background-default) / 1)',
+                  fill: 'oklch(from var(--background-default) l c h / 1)',
                   fillRule: 'nonzero',
                   opacity: 1,
                 }}

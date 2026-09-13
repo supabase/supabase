@@ -1,8 +1,10 @@
+'use client'
+
+import days from '~/components/LaunchWeek/7/lw7_days'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import days from '~/components/LaunchWeek/7/lw7_days'
 
 const BlogLinks = () => {
   const activeDays = days.filter((day) => Date.parse(day.publishedAt) <= Date.now())
@@ -49,7 +51,7 @@ before:border-[#1f3536] before:-z-10
       <div className="relative z-10 flex items-center text-lg flex-col-reverse lg:flex-row lg:justify-start gap-2 text-foreground">
         <div
           className={[
-            'text-transparent bg-clip-text bg-gradient-to-r text-base from-[#F4FFFA] to-[#B7B2C9] drop-shadow-lg',
+            'text-transparent bg-clip-text bg-linear-to-r text-base from-[#F4FFFA] to-[#B7B2C9] drop-shadow-lg',
             step.break_thumb_title && 'max-w-[240px]',
           ].join(' ')}
         >

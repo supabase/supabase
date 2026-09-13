@@ -1,0 +1,132 @@
+---
+title: 'Sentry integration'
+subtitle: 'Integrate Sentry to monitor errors from a Supabase client'
+---
+
+You can use [Sentry](https://sentry.io/welcome/) to monitor errors thrown from a Supabase JavaScript client. Support for Supabase is built directly into the Sentry JavaScript SDK.
+
+The integration instruments database queries and authentication calls made through `supabase-js`, creating spans for performance monitoring and capturing errors. It supports browser, Node, and edge environments.
+
+<Admonition type='note'>
+
+The built-in integration requires Sentry JavaScript SDK **v9.14.0 or later**. If you're on an older SDK (including v7), use the community [`@supabase/sentry-js-integration`](https://github.com/supabase-community/sentry-integration-js) package instead, which the built-in integration is based on.
+
+</Admonition>
+
+## Use
+
+There are two ways to enable the integration. Both take an initialized Supabase client instance.
+
+<Tabs scrollable defaultActiveId="integration" type="underlined" size="small">
+
+<TabPanel id="integration" label="Via Sentry.init">
+
+Add `supabaseIntegration` to the `integrations` list when you initialize Sentry. Use this when your `Sentry.init` call and your Supabase client live in the same place.
+
+```ts
+import * as Sentry from '@sentry/browser'
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  tracesSampleRate: 1.0,
+  integrations: [
+    Sentry.browserTracingIntegration(),
+    Sentry.supabaseIntegration({ supabaseClient }),
+  ],
+})
+```
+
+</TabPanel>
+
+<TabPanel id="instrument" label="Via instrumentSupabaseClient">
+
+Call `Sentry.instrumentSupabaseClient` where you create the client. This is the better fit for frameworks (like Next.js) where `Sentry.init` runs in a separate config file. Instrument each client you create: it patches database calls per runtime (browser, server, edge) and auth calls per client instance, so setups that create a client per request (like `@supabase/ssr`) must instrument each one. See the Next.js example below.
+
+```ts
+import * as Sentry from '@sentry/browser'
+import { createClient } from '@supabase/supabase-js'
+
+export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+Sentry.instrumentSupabaseClient(supabaseClient)
+```
+
+</TabPanel>
+
+</Tabs>
+
+<Admonition type='note'>
+
+By default, query filters and mutation bodies are redacted from spans and breadcrumbs. To capture them, pass `sendOperationData: true` where you set up instrumentation (`Sentry.supabaseIntegration({ supabaseClient, sendOperationData: true })` or `Sentry.instrumentSupabaseClient(client, { sendOperationData: true })`), or enable `dataCollection: { userInfo: true }` in your `Sentry.init` options, which applies to every client in that runtime.
+
+</Admonition>
+
+## Deduplicating spans
+
+Sentry's HTTP and Fetch tracing integrations are enabled by default in the Node and Next.js SDKs, so the underlying Supabase REST calls are traced as `http.client` spans in addition to the `db` spans from the Supabase integration. This is optional cleanup: if you'd rather not see both, skip the Supabase REST requests in your other integration.
+
+```ts
+import * as Sentry from '@sentry/browser'
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  tracesSampleRate: 1.0,
+  integrations: [
+    Sentry.supabaseIntegration({ supabaseClient }),
+
+    // @sentry/browser
+    Sentry.browserTracingIntegration({
+      shouldCreateSpanForRequest: (url) => {
+        return !url.startsWith(`${SUPABASE_URL}/rest`)
+      },
+    }),
+
+    // or @sentry/node (supabase-js uses fetch, so filter the Fetch integration)
+    Sentry.nativeNodeFetchIntegration({
+      ignoreOutgoingRequests: (url) => {
+        return url.startsWith(`${SUPABASE_URL}/rest`)
+      },
+    }),
+
+    // or @sentry/nextjs for Proxy & Edge Functions
+    Sentry.winterCGFetchIntegration({
+      breadcrumbs: true,
+      shouldCreateSpanForRequest: (url) => {
+        return !url.startsWith(`${SUPABASE_URL}/rest`)
+      },
+    }),
+  ],
+})
+```
+
+## Configuration for Next.js
+
+Next.js runs Sentry across browser, server, and edge runtimes, and auth-aware setups (like `@supabase/ssr`) create a Supabase client per request. Since `instrumentSupabaseClient` patches database calls per runtime and auth calls per client instance, call it inside each of your client factories rather than on a single shared instance.
+
+1. Run through the [Sentry Next.js wizard](https://docs.sentry.io/platforms/javascript/guides/nextjs/#install) to set up the base Sentry configuration.
+
+2. Add `Sentry.instrumentSupabaseClient` to each factory. For example, the server client with `@supabase/ssr`:
+
+```ts utils/supabase/server.ts
+import * as Sentry from '@sentry/nextjs'
+import { createServerClient } from '@supabase/ssr'
+
+export async function createClient() {
+  const client = createServerClient(/* your usual URL, key, and cookie config */)
+
+  Sentry.instrumentSupabaseClient(client)
+  return client
+}
+```
+
+3. Apply the same in your browser client using (`createBrowserClient`) and middleware client so every runtime is covered.
+
+4. To include query filters and mutation bodies, enable `dataCollection: { userInfo: true }` in each runtime's Sentry config, or pass `Sentry.instrumentSupabaseClient(client, { sendOperationData: true })` at the call site.
+
+5. Build and run your application (`npm run build && npm run start`). Supabase queries now appear as `db` spans in your Sentry traces.

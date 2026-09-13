@@ -1,18 +1,11 @@
-import { Command, FlaskConical, Loader2, Settings } from 'lucide-react'
+import { useDevToolbar } from 'dev-tools'
+import { FlaskConical, Loader2, ScrollText, User2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
-import { ProfileImage } from 'components/ui/ProfileImage'
-import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSignOut } from 'lib/auth'
-import { IS_PLATFORM } from 'lib/constants'
-import { getGitHubProfileImgUrl } from 'lib/github'
-import { useProfile } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useState } from 'react'
 import {
-  Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -22,75 +15,101 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Theme,
   singleThemes,
 } from 'ui'
-import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
-import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 
-export function UserDropdown() {
+import { ButtonTooltip } from '../ui/ButtonTooltip'
+import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+import { DevToolbarMenuGroup } from './DevToolbarMenuGroup'
+import { TimezoneDropdown } from './UserDropdown/TimezoneDropdown'
+import { ProfileImage } from '@/components/ui/ProfileImage'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useShowUpgradeCta } from '@/hooks/misc/useShowUpgradeCta'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useProfileNameAndPicture } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAppStateSnapshot } from '@/state/app-state'
+
+export function UserDropdown({
+  triggerClassName,
+  contentClassName,
+}: {
+  triggerClassName?: string
+  contentClassName?: string
+}) {
   const router = useRouter()
-  const signOut = useSignOut()
-  const { profile, isLoading: isLoadingProfile } = useProfile()
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
-  const setCommandMenuOpen = useSetCommandMenuOpen()
-  const { openFeaturePreviewModal } = useFeaturePreviewModal()
   const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
+  const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
 
-  const { username, primary_email } = profile ?? {}
+  const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
+  const track = useTrack()
+  const { isAvailable: isDevToolbarAvailable } = useDevToolbar()
+  const shouldShowSectionSeparator = IS_PLATFORM || isDevToolbarAvailable
 
-  const { data, isLoading: isLoadingIdentities } = useProfileIdentitiesQuery()
-  const isGitHubProfile = profile?.auth0_id.startsWith('github')
-  const gitHubUsername = isGitHubProfile
-    ? (data?.identities ?? []).find((x) => x.provider === 'github')?.identity_data?.user_name
-    : undefined
-  const profileImageUrl = isGitHubProfile ? getGitHubProfileImgUrl(gitHubUsername) : undefined
+  // The upgrade CTA is org-scoped, so only enable it on routes where an org is in scope.
+  // Excludes /account/*, /organizations, /new, marketing routes, etc. Gating the hook here
+  // also skips fetching organization data on routes where the CTA can't render.
+  const isOrgScopedRoute =
+    router.pathname.startsWith('/project/') || router.pathname.startsWith('/org/')
+  const { showUpgradeCta } = useShowUpgradeCta({ enabled: isOrgScopedRoute })
+
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="border flex-shrink-0 px-3" asChild>
-        <Button
-          type="default"
+    <DropdownMenu
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open)
+        if (open) track('header_user_dropdown_opened')
+      }}
+    >
+      <DropdownMenuTrigger asChild className={cn('border shrink-0 px-3', triggerClassName)}>
+        <ButtonTooltip
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
+          tooltip={{ content: { text: 'Account settings' } }}
         >
-          {isLoadingProfile || isLoadingIdentities ? (
+          {isLoading ? (
             <div className="w-full h-full flex items-center justify-center">
               <Loader2 className="animate-spin text-foreground-lighter" size={16} />
             </div>
           ) : (
-            <ProfileImage
-              alt={profile?.username}
-              src={profileImageUrl}
-              className="w-8 h-8 rounded-md"
-            />
+            <ProfileImage alt={username} src={avatarUrl} className="w-8 h-8 rounded-md" />
           )}
-        </Button>
+        </ButtonTooltip>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent side="bottom" align="end">
+      <DropdownMenuContent side="bottom" align="end" className={contentClassName}>
         {IS_PLATFORM && (
           <>
             <div className="px-2 py-1 flex flex-col gap-0 text-sm">
-              {profile && (
+              {!!username ? (
                 <>
                   <span title={username} className="w-full text-left text-foreground truncate">
                     {username}
                   </span>
-                  {primary_email !== username && profileShowEmailEnabled && (
+                  {primaryEmail !== username && profileShowEmailEnabled && (
                     <span
-                      title={primary_email}
+                      title={primaryEmail}
                       className="w-full text-left text-foreground-light text-xs truncate"
                     >
-                      {primary_email}
+                      {primaryEmail}
                     </span>
                   )}
                 </>
+              ) : (
+                <span title={primaryEmail} className="w-full text-left text-foreground truncate">
+                  {primaryEmail}
+                </span>
               )}
             </div>
+
             <DropdownMenuSeparator />
+
             <DropdownMenuGroup>
-              <DropdownMenuItem className="flex gap-2" asChild>
+              <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
                 <Link
                   href="/account/me"
                   onClick={() => {
@@ -99,26 +118,35 @@ export function UserDropdown() {
                     }
                   }}
                 >
-                  <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                  Account preferences
+                  <User2 size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  Account
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="flex gap-2"
-                onClick={openFeaturePreviewModal}
-                onSelect={openFeaturePreviewModal}
+                className="flex gap-2 cursor-pointer"
+                onClick={() => toggleFeaturePreviewModal(true)}
               >
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex gap-2" onClick={() => setCommandMenuOpen(true)}>
-                <Command size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                Command menu
+              <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
+                <Link
+                  href="https://supabase.com/changelog"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ScrollText size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  Changelog
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
             </DropdownMenuGroup>
           </>
         )}
+
+        {shouldShowSectionSeparator && <DropdownMenuSeparator />}
+
+        <DevToolbarMenuGroup />
+
         <DropdownMenuGroup>
           <DropdownMenuLabel>Theme</DropdownMenuLabel>
           <DropdownMenuRadioGroup
@@ -127,23 +155,51 @@ export function UserDropdown() {
               setTheme(value)
             }}
           >
-            {singleThemes.map((theme: Theme) => (
-              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+            {singleThemes.map((theme) => (
+              <DropdownMenuRadioItem
+                key={theme.value}
+                value={theme.value}
+                className="cursor-pointer"
+              >
                 {theme.name}
               </DropdownMenuRadioItem>
             ))}
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuGroup>
+          <TimezoneDropdown />
+        </DropdownMenuGroup>
+
+        {showUpgradeCta && (
+          <>
+            <DropdownMenuSeparator />
+            <div className="p-1">
+              <UpgradePlanButton
+                source="user_dropdown"
+                plan="Pro"
+                className="w-full justify-center"
+                onClick={() => {
+                  track('upgrade_cta_clicked', { placement: 'user_dropdown' })
+                  setIsOpen(false)
+                }}
+              />
+            </div>
+          </>
+        )}
         {IS_PLATFORM && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem
-                onSelect={async () => {
-                  await signOut()
+                className="cursor-pointer"
+                onSelect={() => {
+                  router.push('/logout')
                 }}
               >
-                Log out
+                Sign out
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </>

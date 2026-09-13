@@ -60,7 +60,7 @@ const ImageFadeStack = ({
       <div className="absolute bottom-4 right-4 flex gap-3">
         {showNavigation &&
           images.map((_, index) => (
-            <button className="text-white" onClick={() => handleNavClick(index)}>
+            <button tabIndex={0} className="text-white" onClick={() => handleNavClick(index)}>
               <div
                 className={cn(
                   'w-2 h-2 rounded-full bg-foreground-muted hover:bg-surface-100 transition-colors',
@@ -70,6 +70,7 @@ const ImageFadeStack = ({
             </button>
           ))}
         <button
+          tabIndex={0}
           onClick={() => setIsPlaying(!isPlaying)}
           className="text-white bg-foreground-light hover:bg-overlay rounded-full p-0.5 transition-colors"
         >

@@ -1,5 +1,5 @@
-/* eslint-disable */
-import { ResultOf, DocumentTypeDecoration } from '@graphql-typed-document-node/core'
+import { DocumentTypeDecoration, ResultOf } from '@graphql-typed-document-node/core'
+
 import { Incremental, TypedDocumentString } from './graphql'
 
 export type FragmentType<TDocumentType extends DocumentTypeDecoration<any, any>> =

@@ -1,4 +1,4 @@
-import { PROJECT_STATUS } from 'lib/constants'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 export const inferProjectStatus = (projectStatus: string) => {
   let status = undefined

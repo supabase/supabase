@@ -2,19 +2,19 @@ import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
-import { addAPIMock } from 'tests/lib/msw'
-
-import { render } from 'tests/helpers'
-import { routerMock } from 'tests/lib/route-mock'
 import { CreateBucketModal } from '../CreateBucketModal'
+import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
+import { routerMock } from '@/tests/lib/route-mock'
+
+vi.mock(`hooks/misc/useCheckPermissions`, () => ({
+  useCheckPermissions: vi.fn(),
+  useAsyncCheckPermissions: vi.fn().mockImplementation(() => ({ can: true })),
+}))
 
 describe(`CreateBucketModal`, () => {
   beforeEach(() => {
-    vi.mock(`hooks/misc/useCheckPermissions`, () => ({
-      useCheckPermissions: vi.fn(),
-      useAsyncCheckPermissions: vi.fn().mockImplementation(() => ({ can: true })),
-    }))
     // useParams
     routerMock.setCurrentUrl(`/project/default/storage/buckets`)
     // useSelectedProject -> Project
@@ -41,24 +41,25 @@ describe(`CreateBucketModal`, () => {
   })
 
   it(`renders a dialog with a form`, async () => {
-    render(
+    customRender(
       <ProjectContextProvider projectRef="default">
-        <CreateBucketModal />
-      </ProjectContextProvider>
+        <CreateBucketModal open={true} onOpenChange={() => {}} />
+      </ProjectContextProvider>,
+      {
+        nuqs: {
+          searchParams: {
+            new: 'true',
+          },
+        },
+      }
     )
-
-    const dialogTrigger = screen.getByRole(`button`, { name: `New bucket` })
-    await userEvent.click(dialogTrigger)
 
     await waitFor(() => {
       expect(screen.getByRole(`dialog`)).toBeInTheDocument()
     })
 
-    const nameInput = screen.getByLabelText(`Name of bucket`)
+    const nameInput = screen.getByLabelText(`Bucket name`)
     await userEvent.type(nameInput, `test`)
-
-    const standardOption = screen.getByLabelText(`Standard bucket`)
-    await userEvent.click(standardOption)
 
     const publicToggle = screen.getByLabelText(`Public bucket`)
     expect(publicToggle).not.toBeChecked()
@@ -93,9 +94,5 @@ describe(`CreateBucketModal`, () => {
     const submitButton = screen.getByRole(`button`, { name: `Create` })
 
     fireEvent.click(submitButton)
-
-    await waitFor(() =>
-      expect(routerMock.asPath).toStrictEqual(`/project/default/storage/buckets/test`)
-    )
   })
 })

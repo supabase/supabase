@@ -2,18 +2,18 @@
 
 import Editor, { useMonaco } from '@monaco-editor/react'
 import {
+  formatCurl,
+  formatHttp,
   HttpRequest,
   ParsingError,
+  processSql,
   RenderError,
+  renderHttp,
+  renderSupabaseJs,
   Statement,
   SupabaseJsQuery,
   UnimplementedError,
   UnsupportedError,
-  formatCurl,
-  formatHttp,
-  processSql,
-  renderHttp,
-  renderSupabaseJs,
 } from '@supabase/sql-to-rest'
 import { ChevronUp, GitPullRequest } from 'lucide-react'
 import type { editor } from 'monaco-editor'
@@ -28,8 +28,19 @@ import {
 } from 'react'
 import Markdown from 'react-markdown'
 import { format } from 'sql-formatter'
-import { CodeBlock, Collapsible, Tabs, cn } from 'ui'
-import { Alert } from 'ui/src/components/shadcn/ui/alert'
+import {
+  Alert,
+  cn,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+
 import { assumptions } from './assumptions'
 import { BaseUrlDialog } from './base-url-dialog'
 import { faqs } from './faqs'
@@ -314,7 +325,7 @@ export default function SqlToRest({
             </div>
             <div className="prose text-sm mt-2">
               PostgREST doesn't support this query. If you're sure the syntax is correct and are
-              unable to modify it, wrap it in a stored procedure and call it using the{' '}
+              unable to modify it, wrap it in a database function and call it using the{' '}
               <a href="https://postgrest.org/en/v12/references/api/stored_procedures.html#stored-procedures">
                 RPC
               </a>{' '}
@@ -354,8 +365,13 @@ export default function SqlToRest({
         )}
       >
         <div className="font-medium">Choose language to translate to</div>
-        <Tabs activeId={currentLanguage} onChange={(id: string) => setCurrentLanguage(id)}>
-          <Tabs.Panel id="curl" label="cURL" className="flex flex-col gap-4">
+        <Tabs value={currentLanguage} onValueChange={(id: string) => setCurrentLanguage(id)}>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="curl">cURL</TabsTrigger>
+            <TabsTrigger value="http">HTTP</TabsTrigger>
+            <TabsTrigger value="js">JavaScript</TabsTrigger>
+          </TabsList>
+          <TabsContent value="curl" className="flex flex-col gap-4">
             {httpRenderError && <Alert className="text-red-900">{httpRenderError.message}</Alert>}
             <CodeBlock
               language="curl"
@@ -368,8 +384,8 @@ export default function SqlToRest({
             >
               {curlCommand}
             </CodeBlock>
-          </Tabs.Panel>
-          <Tabs.Panel id="http" label="HTTP" className="flex flex-col gap-4">
+          </TabsContent>
+          <TabsContent value="http" className="flex flex-col gap-4">
             {httpRenderError && <Alert className="text-red-900">{httpRenderError.message}</Alert>}
             <CodeBlock
               language="http"
@@ -382,8 +398,8 @@ export default function SqlToRest({
             >
               {rawHttp}
             </CodeBlock>
-          </Tabs.Panel>
-          <Tabs.Panel id="js" label="JavaScript" className="flex flex-col gap-4">
+          </TabsContent>
+          <TabsContent value="js" className="flex flex-col gap-4">
             {supabaseJsRenderError && (
               <Alert className="text-red-900">{supabaseJsRenderError.message}</Alert>
             )}
@@ -398,7 +414,7 @@ export default function SqlToRest({
             >
               {jsCommand}
             </CodeBlock>
-          </Tabs.Panel>
+          </TabsContent>
         </Tabs>
         <div
           className={cn(
@@ -411,11 +427,13 @@ export default function SqlToRest({
         >
           {relevantAssumptions.length > 0 && (
             <div>
-              <h3 className="my-1 text-base text-inherit">Assumptions</h3>
+              <span className="block my-1 text-base text-inherit font-heading font-semibold">
+                Assumptions
+              </span>
               <ol className="my-0 text-foreground">
                 {relevantAssumptions.map((assumption) => (
-                  <li>
-                    <Markdown className="text-sm">{assumption}</Markdown>
+                  <li key={assumption} className="text-sm">
+                    <Markdown>{assumption}</Markdown>
                   </li>
                 ))}
               </ol>
@@ -424,16 +442,20 @@ export default function SqlToRest({
 
           {relevantFaqs.length > 0 && (
             <>
-              <h3 className="my-1 text-base text-inherit">FAQs</h3>
+              <span className="block my-1 text-base text-inherit font-heading font-semibold">
+                FAQs
+              </span>
               {relevantFaqs.map((faq) => (
                 <Collapsible
                   key={faq.id}
-                  className="flex flex-col items-stretch justify-start bg-surface-100 rounded border border-default px-4"
+                  className="flex flex-col items-stretch justify-start bg-surface-100 rounded-sm border border-default px-4"
                 >
-                  <Collapsible.Trigger asChild>
-                    <button type="button" className="flex justify-between items-center p-3">
+                  <CollapsibleTrigger asChild>
+                    <button
+                      type="button"
+                      className="flex justify-between items-center p-3 text-sm text-left"
+                    >
                       <Markdown
-                        className="text-sm text-left"
                         components={{
                           p: ({ children }: PropsWithChildren) => <p className="m-0">{children}</p>,
                         }}
@@ -442,11 +464,10 @@ export default function SqlToRest({
                       </Markdown>
                       <ChevronUp className="transition data-open-parent:rotate-0 data-closed-parent:rotate-180" />
                     </button>
-                  </Collapsible.Trigger>
-                  <Collapsible.Content>
-                    <div className="text-foreground flex flex-col justify-start items-center px-3 pb-4">
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="text-foreground flex flex-col justify-start items-start px-3 pb-4 text-sm">
                       <Markdown
-                        className="text-sm"
                         components={{
                           code: (props: any) => <CodeBlock hideLineNumbers {...props} />,
                         }}
@@ -454,7 +475,7 @@ export default function SqlToRest({
                         {faq.answer}
                       </Markdown>
                     </div>
-                  </Collapsible.Content>
+                  </CollapsibleContent>
                 </Collapsible>
               ))}
             </>

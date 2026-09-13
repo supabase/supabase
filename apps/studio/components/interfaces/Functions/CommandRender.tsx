@@ -1,6 +1,5 @@
-import { Check, Clipboard } from 'lucide-react'
+import { Check, Copy } from 'lucide-react'
 import { forwardRef, useState } from 'react'
-
 import { cn, copyToClipboard } from 'ui'
 
 const CommandRender = forwardRef<HTMLDivElement, { commands: any[]; className?: string }>(
@@ -32,6 +31,7 @@ const Command = ({ item }: any) => {
             <span>{item.jsx ? item.jsx() : null} </span>
             <button
               type="button"
+              tabIndex={0}
               className="text-foreground-lighter hover:text-foreground"
               onClick={() => {
                 function onCopy(value: any) {
@@ -45,7 +45,7 @@ const Command = ({ item }: any) => {
               {isCopied ? (
                 <Check size={14} strokeWidth={3} className="text-brand" />
               ) : (
-                <Clipboard size={14} />
+                <Copy size={14} />
               )}
             </button>
           </span>

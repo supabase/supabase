@@ -1,5 +1,6 @@
 import { ElementRef, forwardRef } from 'react'
-import { FormItem_Shadcn_ } from 'ui'
+import { FormItem } from 'ui'
+
 import { FormLayout } from '../Layout/FormLayout'
 
 const FormItemLayout = forwardRef<
@@ -7,11 +8,11 @@ const FormItemLayout = forwardRef<
   React.ComponentPropsWithoutRef<typeof FormLayout> // Use any as placeholder types
 >(({ ...props }, ref) => {
   return (
-    <FormItem_Shadcn_>
+    <FormItem>
       <FormLayout ref={ref} isReactForm {...props}>
         {props.children}
       </FormLayout>
-    </FormItem_Shadcn_>
+    </FormItem>
   )
 })
 

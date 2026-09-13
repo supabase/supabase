@@ -1,7 +1,29 @@
-import { describe, it, expect, beforeEach } from 'vitest'
 import { createMocks } from 'node-mocks-http'
-import { mswServer } from 'tests/lib/msw'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import handler from '../../../../pages/api/mcp/index'
+import { mswServer } from '@/tests/lib/msw'
+
+// Mock the MCP SDK and Supabase MCP server to avoid Hono/node-mocks-http compatibility issues.
+//
+// Starting with MCP SDK v1.25.x (required by @supabase/mcp-server-supabase@0.6.2), the SDK
+// uses @hono/node-server for converting between Node.js HTTP and Web Standard APIs. This is
+// incompatible with the node-mocks-http library used in these tests.
+//
+// Since these tests focus on query parameter validation in the API handler rather than
+// testing the MCP transport implementation, we mock both packages to avoid hitting the
+// incompatible Hono code paths.
+vi.mock('@modelcontextprotocol/sdk/server/streamableHttp.js', () => ({
+  StreamableHTTPServerTransport: vi.fn().mockImplementation(function () {
+    return { handleRequest: vi.fn().mockResolvedValue(undefined) }
+  }),
+}))
+
+vi.mock('@supabase/mcp-server-supabase', () => ({
+  createSupabaseMcpServer: vi.fn().mockReturnValue({
+    connect: vi.fn().mockResolvedValue(undefined),
+  }),
+}))
 
 describe('/api/mcp', () => {
   beforeEach(() => {

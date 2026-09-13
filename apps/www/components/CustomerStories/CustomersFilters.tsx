@@ -1,21 +1,21 @@
 'use client'
 
-import { useRouter } from 'next/compat/router'
-import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
 import type PostTypes from '~/types/post'
+import { useBreakpoint } from 'common'
+import { AnimatePresence, motion } from 'framer-motion'
+import { startCase } from 'lib/helpers'
+import { ChevronDown, X as CloseIcon } from 'lucide-react'
+import { useRouter } from 'next/compat/router'
+import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  cn,
 } from 'ui'
-import { ChevronDown, X as CloseIcon } from 'lucide-react'
-import { startCase } from 'lib/helpers'
-import { useBreakpoint } from 'common'
-import { usePathname } from 'next/navigation'
 
 interface Props {
   allCustomers: PostTypes[]
@@ -124,7 +124,7 @@ function CustomerFilters({ allCustomers, setCustomers, industries, products }: P
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="outline"
+                variant="outline"
                 size="medium"
                 iconRight={<ChevronDown />}
                 className="w-full min-w-[150px] flex [&_span]:flex [&_span]:items-center [&_span]:gap-2 justify-between items-center py-2"
@@ -153,7 +153,7 @@ function CustomerFilters({ allCustomers, setCustomers, industries, products }: P
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="outline"
+                variant="outline"
                 size="medium"
                 iconRight={<ChevronDown />}
                 className="w-full min-w-[200px] flex [&_span]:flex [&_span]:items-center [&_span]:gap-2 justify-between items-center py-2"
@@ -187,7 +187,7 @@ function CustomerFilters({ allCustomers, setCustomers, industries, products }: P
                 ? 'opacity-100 visible'
                 : 'opacity-0 invisible'
             )}
-            type={isMobile ? 'default' : 'text'}
+            variant={isMobile ? 'default' : 'text'}
             block={isMobile}
             iconRight={<CloseIcon />}
           >
@@ -218,6 +218,8 @@ const getProductLabel = (product: string) => {
       return 'All Products'
     case 'functions':
       return 'Edge Functions'
+    case 'platforms':
+      return 'Supabase for Platforms'
     default:
       return startCase(product.replaceAll('-', ' '))
   }

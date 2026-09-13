@@ -1,35 +1,45 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
-import { ChevronDown } from 'lucide-react'
+import { useFlag } from 'common'
+import { ChevronDown, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useFlag } from 'common'
-import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useProjectRestartMutation } from 'data/projects/project-restart-mutation'
-import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
-import { setProjectStatus } from 'data/projects/projects-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  cn,
 } from 'ui'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-const RestartServerButton = () => {
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useSetProjectStatus } from '@/data/projects/project-detail-query'
+import { useProjectRestartMutation } from '@/data/projects/project-restart-mutation'
+import { useProjectRestartServicesMutation } from '@/data/projects/project-restart-services-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
+import { type ResponseError } from '@/types'
+
+export const RestartServerButton = () => {
   const router = useRouter()
-  const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const isProjectActive = useIsProjectActive()
-  const isAwsK8s = useIsAwsK8sCloudProvider()
-  const [serviceToRestart, setServiceToRestart] = useState<'project' | 'database'>()
+
+  const isBranch = Boolean(project?.parent_project_ref)
+  const entityLabel = isBranch ? 'branch' : 'project'
+  const entityLabelCapitalized = entityLabel.charAt(0).toUpperCase() + entityLabel.slice(1)
+  const canRestart = isProjectActive || project?.status === PROJECT_STATUS.ACTIVE_UNHEALTHY
+  const { setProjectStatus } = useSetProjectStatus()
+
+  const [serviceToRestart, setServiceToRestart] = useState<'project' | 'branch' | 'database'>()
+
+  const { projectSettingsRestartProject } = useIsFeatureEnabled([
+    'project_settings:restart_project',
+  ])
 
   const projectRef = project?.ref ?? ''
   const projectRegion = project?.region ?? ''
@@ -40,7 +50,7 @@ const RestartServerButton = () => {
     'reboot'
   )
 
-  const { mutate: restartProject, isLoading: isRestartingProject } = useProjectRestartMutation({
+  const { mutate: restartProject, isPending: isRestartingProject } = useProjectRestartMutation({
     onSuccess: () => {
       onRestartSuccess()
     },
@@ -48,7 +58,7 @@ const RestartServerButton = () => {
       onRestartFailed(error, 'project')
     },
   })
-  const { mutate: restartProjectServices, isLoading: isRestartingServices } =
+  const { mutate: restartProjectServices, isPending: isRestartingServices } =
     useProjectRestartServicesMutation({
       onSuccess: () => {
         onRestartSuccess()
@@ -59,6 +69,7 @@ const RestartServerButton = () => {
     })
 
   const isLoading = isRestartingProject || isRestartingServices
+  const hasRestartDropdown = canRestartProject && canRestart && !projectRestartDisabled
 
   const requestProjectRestart = () => {
     if (!canRestartProject) {
@@ -67,20 +78,20 @@ const RestartServerButton = () => {
     restartProject({ ref: projectRef })
   }
 
-  const requestDatabaseRestart = async () => {
+  const requestDatabaseRestart = () => {
     if (!canRestartProject) {
       return toast.error('You do not have the required permissions to restart this project')
     }
     restartProjectServices({ ref: projectRef, region: projectRegion, services: ['postgresql'] })
   }
 
-  const onRestartFailed = (error: any, type: string) => {
+  const onRestartFailed = (error: ResponseError, type: string) => {
     toast.error(`Unable to restart ${type}: ${error.message}`)
     setServiceToRestart(undefined)
   }
 
   const onRestartSuccess = () => {
-    setProjectStatus(queryClient, projectRef, 'RESTARTING')
+    setProjectStatus({ ref: projectRef, status: PROJECT_STATUS.RESTARTING })
     toast.success('Restarting server...')
     router.push(`/project/${projectRef}`)
     setServiceToRestart(undefined)
@@ -88,94 +99,99 @@ const RestartServerButton = () => {
 
   return (
     <>
-      <div className="flex">
-        <ButtonTooltip
-          type="default"
-          className={cn(
-            'px-3 hover:z-10',
-            canRestartProject && isProjectActive ? 'rounded-r-none' : ''
-          )}
-          disabled={
-            project === undefined ||
-            !canRestartProject ||
-            !isProjectActive ||
-            projectRestartDisabled ||
-            isAwsK8s
-          }
-          onClick={() => setServiceToRestart('project')}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: projectRestartDisabled
-                ? 'Project restart is currently disabled'
-                : !canRestartProject
-                  ? 'You need additional permissions to restart this project'
-                  : !isProjectActive
-                    ? 'Unable to restart project as project is not active'
-                    : isAwsK8s
-                      ? 'Project restart is not supported for AWS (Revamped) projects'
+      {projectSettingsRestartProject ? (
+        <div className="flex w-full @lg:w-auto">
+          <ButtonTooltip
+            type="button"
+            className={cn(
+              'flex-1 px-3 hover:z-10 focus-visible:z-10 @lg:flex-none',
+              canRestartProject && canRestart ? 'rounded-r-none focus-visible:rounded-r-sm' : ''
+            )}
+            disabled={
+              project === undefined || !canRestartProject || !canRestart || projectRestartDisabled
+            }
+            onClick={() => setServiceToRestart(entityLabel)}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: projectRestartDisabled
+                  ? `${entityLabelCapitalized} restart is currently disabled`
+                  : !canRestartProject
+                    ? `You need additional permissions to restart this ${entityLabel}`
+                    : !canRestart
+                      ? `Unable to restart ${entityLabel} as ${entityLabel} is not active`
                       : undefined,
-            },
+              },
+            }}
+          >
+            Restart {entityLabel}
+          </ButtonTooltip>
+          {hasRestartDropdown && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  aria-label="Choose restart type"
+                  className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+                  icon={<ChevronDown />}
+                  disabled={!canRestartProject}
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" side="bottom">
+                <DropdownMenuItem
+                  key="database"
+                  disabled={isLoading}
+                  onClick={() => {
+                    setServiceToRestart('database')
+                  }}
+                >
+                  <div className="space-y-0.5">
+                    <p className="block text-foreground">Fast database reboot</p>
+                    <p className="block text-foreground-lighter">
+                      Restarts only the database service, with less downtime than a full project
+                      restart. Other project services remain running.
+                    </p>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+      ) : (
+        <Button
+          icon={<RefreshCw />}
+          className="w-full @lg:w-auto"
+          disabled={isLoading}
+          onClick={() => {
+            setServiceToRestart('database')
           }}
         >
-          Restart project
-        </ButtonTooltip>
-        {canRestartProject && isProjectActive && !projectRestartDisabled && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="default"
-                className="rounded-l-none px-[4px] py-[5px] -ml-[1px]"
-                icon={<ChevronDown />}
-                disabled={!canRestartProject}
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" side="bottom">
-              <DropdownMenuItem
-                key="database"
-                disabled={isLoading}
-                onClick={() => {
-                  setServiceToRestart('database')
-                }}
-              >
-                <div className="space-y-1">
-                  <p className="block text-foreground">Fast database reboot</p>
-                  <p className="block text-foreground-light">
-                    Restarts only the database - faster but may not be able to recover from all
-                    failure modes
-                  </p>
-                </div>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
+          Restart database
+        </Button>
+      )}
 
-      <ConfirmModal
-        danger
+      <ConfirmationModal
         visible={serviceToRestart !== undefined}
+        variant="destructive"
         title={`Restart ${serviceToRestart}`}
-        // @ts-ignore
         description={
           <>
-            Are you sure you want to restart the{' '}
-            <span className="text-foreground">{serviceToRestart}</span>? There will be a few minutes
-            of downtime.
+            Are you sure you want to restart your {serviceToRestart}? There will be a few minutes of
+            downtime.
           </>
         }
-        buttonLabel="Restart"
-        buttonLoadingLabel="Restarting"
-        onSelectCancel={() => setServiceToRestart(undefined)}
-        onSelectConfirm={async () => {
-          if (serviceToRestart === 'project') {
-            await requestProjectRestart()
+        confirmLabel="Restart"
+        confirmLabelLoading="Restarting"
+        loading={isLoading}
+        onCancel={() => setServiceToRestart(undefined)}
+        onConfirm={() => {
+          if (serviceToRestart === 'project' || serviceToRestart === 'branch') {
+            requestProjectRestart()
           } else if (serviceToRestart === 'database') {
-            await requestDatabaseRestart()
+            requestDatabaseRestart()
           }
         }}
       />
     </>
   )
 }
-
-export default RestartServerButton

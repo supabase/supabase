@@ -1,8 +1,9 @@
-import type { Datum } from 'components/ui/Charts/Charts.types'
+import type { SafeSqlFragment } from '@supabase/pg-meta'
 import React from 'react'
-import type { PlanId } from 'data/subscriptions/types'
 
-interface Metadata {
+import type { Datum } from '@/components/ui/Charts/Charts.types'
+
+export interface Metadata {
   [key: string]: string | number | Object | Object[] | any
 }
 
@@ -27,6 +28,7 @@ export interface LogsEndpointParams {
 }
 
 export interface CustomLogData {
+  query?: SafeSqlFragment | undefined
   [other: string]: unknown
 }
 
@@ -94,6 +96,7 @@ export type QueryType =
   | 'pg_cron'
   | 'pgbouncer'
   | 'etl'
+  | 'multigres'
 
 export type Mode = 'simple' | 'custom'
 
@@ -143,5 +146,4 @@ export interface DatetimeHelper {
   calcFrom: () => string
   default?: boolean
   disabled?: boolean
-  availableIn?: PlanId[]
 }

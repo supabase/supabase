@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ProjectStatusVariables = {
   projectRef?: string
@@ -28,10 +28,14 @@ export type ProjectStatusError = ResponseError
 
 export const useProjectStatusQuery = <TData = ProjectStatusData>(
   { projectRef }: ProjectStatusVariables,
-  { enabled = true, ...options }: UseQueryOptions<ProjectStatusData, ProjectStatusError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<ProjectStatusData, ProjectStatusError, TData> = {}
 ) =>
-  useQuery<ProjectStatusData, ProjectStatusError, TData>(
-    projectKeys.status(projectRef),
-    ({ signal }) => getProjectStatus({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<ProjectStatusData, ProjectStatusError, TData>({
+    queryKey: projectKeys.status(projectRef),
+    queryFn: ({ signal }) => getProjectStatus({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

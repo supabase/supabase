@@ -1,52 +1,27 @@
-import { NextPageWithLayout } from '../types'
-import {
-  ScaffoldContainer,
-  ScaffoldDivider,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from '../components/layouts/Scaffold'
-import LinkAwsMarketplaceLayout from '../components/layouts/LinkAwsMarketplaceLayout'
-import { useOrganizationsQuery } from '../data/organizations/organizations-query'
-import AwsMarketplaceLinkExistingOrg from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceLinkExistingOrg'
-import AwsMarketplaceCreateNewOrg from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceCreateNewOrg'
-import { useCloudMarketplaceOnboardingInfoQuery } from '../components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
+import Head from 'next/head'
 import { useRouter } from 'next/router'
-import AwsMarketplaceOnboardingPlaceholder from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboardingPlaceholder'
 
-const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
-  const {
-    query: { buyer_id: buyerId },
-  } = useRouter()
+import { AwsMarketplaceOnboardingScreen } from '@/components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboarding'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { buildStudioPageTitle } from '@/lib/page-title'
+import type { NextPageWithLayout } from '@/types'
 
-  const { data: organizations, isFetched: isOrganizationsFetched } = useOrganizationsQuery()
-  const { data: onboardingInfo, isLoading: isLoadingOnboardingInfo } =
-    useCloudMarketplaceOnboardingInfoQuery({
-      buyerId: buyerId as string,
-    })
+const PAGE_TITLE = buildStudioPageTitle({ section: 'Link AWS Marketplace', brand: 'Supabase' })
+
+const AwsMarketplaceOnboardingPage: NextPageWithLayout = () => {
+  const router = useRouter()
+  const buyerId = typeof router.query.buyer_id === 'string' ? router.query.buyer_id : undefined
+
+  if (!router.isReady) return null
 
   return (
-    <ScaffoldContainer>
-      <ScaffoldHeader>
-        <ScaffoldTitle>AWS Marketplace Setup</ScaffoldTitle>
-      </ScaffoldHeader>
-      <ScaffoldDivider />
-      {!isOrganizationsFetched ? (
-        <AwsMarketplaceOnboardingPlaceholder />
-      ) : organizations?.length ? (
-        <AwsMarketplaceLinkExistingOrg
-          organizations={organizations}
-          onboardingInfo={onboardingInfo}
-          isLoadingOnboardingInfo={isLoadingOnboardingInfo}
-        />
-      ) : (
-        <AwsMarketplaceCreateNewOrg onboardingInfo={onboardingInfo} />
-      )}
-    </ScaffoldContainer>
+    <>
+      <Head>
+        <title>{PAGE_TITLE}</title>
+      </Head>
+      <AwsMarketplaceOnboardingScreen buyerId={buyerId} />
+    </>
   )
 }
 
-AwsMarketplaceOnboarding.getLayout = (page) => (
-  <LinkAwsMarketplaceLayout>{page}</LinkAwsMarketplaceLayout>
-)
-
-export default AwsMarketplaceOnboarding
+export default withAuth(AwsMarketplaceOnboardingPage)

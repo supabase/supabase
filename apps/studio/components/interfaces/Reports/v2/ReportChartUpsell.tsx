@@ -1,24 +1,22 @@
 import Link from 'next/link'
 import { useRef, useState } from 'react'
-
-import { LogChartHandler } from 'components/ui/Charts/LogChartHandler'
-import { ReportConfig } from 'data/reports/v2/reports.types'
 import { Button, Card, cn } from 'ui'
 
-export function ReportChartUpsell({
-  report,
-  orgSlug,
-}: {
+import { LazyComposedChartHandler } from '@/components/ui/Charts/ComposedChartHandler'
+
+interface ReportsChartUpsellProps {
   report: {
     label: string
-    availableIn: string[]
+    requiredPlan?: string
   }
   orgSlug: string
-}) {
-  const [isHoveringUpgrade, setIsHoveringUpgrade] = useState(false)
+}
 
+export const ReportChartUpsell = ({ report, orgSlug }: ReportsChartUpsellProps) => {
   const startDate = '2025-01-01'
   const endDate = '2025-01-02'
+
+  const [isHoveringUpgrade, setIsHoveringUpgrade] = useState(false)
 
   const getExpDemoChartData = () =>
     new Array(20).fill(0).map((_, index) => ({
@@ -40,33 +38,28 @@ export function ReportChartUpsell({
   const demoData = isHoveringUpgrade ? exponentialChartData.current : demoChartData.current
 
   return (
-    <Card className={cn('h-[260px] relative')}>
+    <Card className={cn('h-[280px] relative')}>
       <div className="z-10 flex flex-col items-center justify-center space-y-2 h-full absolute top-0 left-0 w-full bg-surface-100/70 backdrop-blur-md">
         <h2 className="text-sm">{report.label}</h2>
         <p className="text-sm text-foreground-light">
-          This chart is available from{' '}
-          <span className="capitalize">
-            {!!report.availableIn?.length ? report.availableIn[0] : 'Pro'}
-          </span>{' '}
-          plan and above
+          {report.requiredPlan
+            ? `Available on the ${report.requiredPlan} Plan and above`
+            : `Your plan does not include access to ${report.label}`}
         </p>
         <Button
           asChild
-          type="primary"
+          variant="primary"
           onMouseEnter={() => setIsHoveringUpgrade(true)}
           onMouseLeave={() => setIsHoveringUpgrade(false)}
           className="mt-4"
         >
           <Link href={`/org/${orgSlug || '_'}/billing?panel=subscriptionPlan&source=reports`}>
-            Upgrade to{' '}
-            <span className="capitalize">
-              {!!report.availableIn?.length ? report.availableIn[0] : 'Pro'}
-            </span>
+            {report.requiredPlan ? `Upgrade to ${report.requiredPlan}` : 'Upgrade'}
           </Link>
         </Button>
       </div>
       <div className="absolute top-0 left-0 w-full h-full z-0">
-        <LogChartHandler
+        <LazyComposedChartHandler
           attributes={[
             {
               attribute: 'demo',
@@ -75,10 +68,9 @@ export function ReportChartUpsell({
               provider: 'logs',
             },
           ]}
-          label={''}
+          label="Sample Report"
           startDate={startDate}
           endDate={endDate}
-          interval={'1d'}
           data={demoData as any}
           isLoading={false}
           highlightedValue={0}

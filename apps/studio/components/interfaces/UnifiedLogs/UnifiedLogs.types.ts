@@ -1,23 +1,9 @@
-import { type inferParserType } from 'nuqs'
+import type { inferParserType } from 'nuqs'
+import type { ReactNode } from 'react'
 
-import { LOG_TYPES, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 
 type Percentile = 50 | 75 | 90 | 95 | 99
-
-export type LogType = (typeof LOG_TYPES)[number]
-
-export type UnifiedLogSchema = {
-  id: string
-  timestamp: Date
-  log_type: LogType
-  code: string
-  level: string
-  path: string | null
-  event_message: string
-  method: string
-  api_role: string
-  auth_user: string | null
-}
 
 export type LogsMeta = {
   currentPercentiles: Record<Percentile, number>
@@ -27,10 +13,6 @@ export type PageParam = { cursor: number; direction: 'next' | 'prev' } | undefin
 
 export type SearchParamsType = inferParserType<typeof SEARCH_PARAMS_PARSER>
 export type QuerySearchParamsType = Omit<SearchParamsType, 'uuid' | 'live'>
-
-export type SearchParams = {
-  [key: string]: string | string[] | undefined
-}
 
 /** ----------------------------------------- */
 
@@ -50,7 +32,7 @@ export type SheetField<TData, TMeta = Record<string, unknown>> = {
         totalRowsFetched: number
       } & TMeta
     }
-  ) => JSX.Element | null | string
+  ) => ReactNode
   condition?: (props: TData) => boolean
   className?: string
   skeletonClassName?: string

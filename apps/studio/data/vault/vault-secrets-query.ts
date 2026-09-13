@@ -1,13 +1,15 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { safeSql } from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
-import type { VaultSecret } from 'types'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { useQuery } from '@tanstack/react-query'
+
 import { vaultSecretsKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomQueryOptions, VaultSecret } from '@/types'
 
 export const getVaultSecretsSql = () => {
   const sql = new Query()
     .from('secrets', 'vault')
-    .select('id,name,description,secret,created_at,updated_at')
+    .select(safeSql`id,name,description,secret,created_at,updated_at`)
     .toSql()
 
   return sql
@@ -33,17 +35,18 @@ export async function getVaultSecrets(
 }
 
 export type VaultSecretsData = Awaited<ReturnType<typeof getVaultSecrets>>
-export type VaultSecretsError = ExecuteSqlError
+export type VaultSecretsError = ResponseError
 
 export const useVaultSecretsQuery = <TData = VaultSecretsData>(
   { projectRef, connectionString }: VaultSecretsVariables,
-  { enabled = true, ...options }: UseQueryOptions<VaultSecretsData, VaultSecretsError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<VaultSecretsData, VaultSecretsError, TData> = {}
 ) =>
-  useQuery<VaultSecretsData, VaultSecretsError, TData>(
-    vaultSecretsKeys.list(projectRef),
-    ({ signal }) => getVaultSecrets({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<VaultSecretsData, VaultSecretsError, TData>({
+    queryKey: vaultSecretsKeys.list(projectRef),
+    queryFn: ({ signal }) => getVaultSecrets({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

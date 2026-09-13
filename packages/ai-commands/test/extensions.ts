@@ -1,6 +1,6 @@
-import { expect } from 'vitest'
 import { codeBlock } from 'common-tags'
 import OpenAI from 'openai'
+import { expect } from 'vitest'
 
 expect.extend({
   async toMatchCriteria(received: string, criteria: string) {

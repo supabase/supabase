@@ -3,19 +3,18 @@
 import Link, { LinkProps } from 'next/link'
 import { usePathname } from 'next/navigation'
 import React from 'react'
+import { Badge, cn } from 'ui'
 
 import { useFramework } from '@/context/framework-context'
 import { useMobileMenu } from '@/hooks/use-mobile-menu'
 import { SidebarNavItem } from '@/types/nav'
-import { Badge, cn } from 'ui'
 
 // We extend:
 // 1. LinkProps - for Next.js Link component props (prefetch, etc)
 // 2. AnchorHTMLAttributes - for standard HTML anchor props (className, etc)
 // We omit href from both since we compute it internally from item.href
 interface NavigationItemProps
-  extends Omit<LinkProps, 'href'>,
-    Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
+  extends Omit<LinkProps, 'href'>, Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
   item: SidebarNavItem
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void
 }
@@ -92,10 +91,11 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props
         'items-center justify-between',
         'h-6',
         'text-sm',
-        'text-foreground-lighter px-6',
-        !isActive && 'hover:bg-surface-100 hover:text-foreground',
-        isActive && 'bg-surface-200 text-foreground',
+        'px-6',
         'transition-all',
+        isActive
+          ? 'bg-selection text-foreground'
+          : 'text-foreground-light hover:bg-surface-200 hover:text-foreground',
         props.className
       )}
     >
@@ -108,11 +108,7 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props
         )}
       />
       {item.title}
-      {item.new && (
-        <Badge variant="brand" className="capitalize">
-          NEW
-        </Badge>
-      )}
+      {item.new && <Badge variant="success">New</Badge>}
     </Link>
   )
 }

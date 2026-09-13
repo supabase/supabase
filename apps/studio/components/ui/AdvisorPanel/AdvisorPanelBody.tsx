@@ -1,0 +1,175 @@
+import { AlertTriangle, ChevronRight, Inbox } from 'lucide-react'
+import { Badge, Button, cn } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import type { AdvisorItem } from './AdvisorPanel.types'
+import {
+  advisorCategoryIcons,
+  formatItemDate,
+  getAdvisorItemSecondaryText,
+  getAdvisorPanelItemDisplayTitle,
+  severityBadgeVariants,
+  severityColorClasses,
+  severityLabels,
+} from './AdvisorPanel.utils'
+import { EmptyAdvisor } from './EmptyAdvisor'
+import type { Notification } from '@/data/notifications/notifications-v2-query'
+import type { AdvisorCategory, AdvisorSeverity } from '@/state/advisor-state'
+
+const NoProjectNotice = () => {
+  return (
+    <div className="absolute top-28 px-6 flex flex-col items-center justify-center w-full gap-y-2">
+      <Inbox className="text-foreground-muted" strokeWidth={1} />
+      <div className="text-center">
+        <p className="heading-default">Project required</p>
+        <p className="text-foreground-light text-sm">
+          Select a project to view its security, performance and health advisories
+        </p>
+      </div>
+    </div>
+  )
+}
+
+interface AdvisorPanelBodyProps {
+  isLoading: boolean
+  isError: boolean
+  filteredItems: AdvisorItem[]
+  categoryFilters: AdvisorCategory[]
+  severityFilters: AdvisorSeverity[]
+  onItemClick: (item: AdvisorItem) => void
+  onClearFilters: () => void
+  onShowHiddenItems: () => void
+  hiddenItemsCount: number
+  hasAnyFilters: boolean
+  hasProjectRef?: boolean
+  projectNameByRef?: ReadonlyMap<string, string>
+}
+
+export const AdvisorPanelBody = ({
+  isLoading,
+  isError,
+  filteredItems,
+  categoryFilters,
+  severityFilters,
+  onItemClick,
+  onClearFilters,
+  onShowHiddenItems,
+  hiddenItemsCount,
+  hasAnyFilters,
+  hasProjectRef = true,
+  projectNameByRef,
+}: AdvisorPanelBodyProps) => {
+  // Notifications are the only items that exist without a project, so the notice replaces
+  // the list whenever the user has narrowed to categories that need one.
+  const needsProject =
+    categoryFilters.length > 0 && categoryFilters.every((category) => category !== 'messages')
+  if (!hasProjectRef && needsProject) {
+    return <NoProjectNotice />
+  }
+
+  if (isLoading) {
+    return (
+      <div>
+        <GenericSkeletonLoader className="w-full p-4" />
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="h-full mx-4 flex flex-col items-center justify-center gap-y-2">
+        <AlertTriangle className="text-destructive" />
+        <div className="flex flex-col items-center justify-center">
+          <h4 className="text-base font-normal text-foreground-light">Error loading advisories</h4>
+          <p className="text-sm text-foreground-lighter">Please try again later.</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (filteredItems.length === 0) {
+    return (
+      <EmptyAdvisor
+        categoryFilters={categoryFilters}
+        hasFilters={hasAnyFilters}
+        onClearFilters={onClearFilters}
+      />
+    )
+  }
+
+  return (
+    <>
+      <div className="flex flex-col">
+        {filteredItems.map((item) => {
+          const CategoryIcon = advisorCategoryIcons[item.category]
+          const severityClass = severityColorClasses[item.severity]
+          const isNotification = item.source === 'notification'
+          const notification = isNotification ? (item.original as Notification) : null
+          const isUnread = notification?.status === 'new'
+
+          const primaryText = getAdvisorPanelItemDisplayTitle(item)
+          const secondaryText = getAdvisorItemSecondaryText(item, projectNameByRef)
+          const metadataText =
+            secondaryText ?? (item.createdAt ? formatItemDate(item.createdAt) : undefined)
+          // Date strings (e.g. "a few seconds ago") come from formatItemDate and
+          // need sentence-case capitalisation; entity strings (lint / signal) don't.
+          const metadataCapitalize = secondaryText === undefined && item.createdAt !== undefined
+
+          return (
+            <div key={`${item.source}-${item.id}`} className="border-b">
+              <Button
+                variant="text"
+                className={cn(
+                  'justify-start w-full block rounded-none h-auto py-3 px-4 hover:text-foreground',
+                  isUnread && 'bg-surface-100/50'
+                )}
+                onClick={() => onItemClick(item)}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <CategoryIcon
+                      size={16}
+                      strokeWidth={1.5}
+                      className={cn('shrink-0', severityClass)}
+                    />
+                    <div className="text-left flex flex-col gap-0.5 truncate flex-1 min-w-0">
+                      <div className="truncate">{primaryText}</div>
+                      {metadataText && (
+                        <div className="flex items-center gap-1 text-xs text-foreground-light">
+                          <span
+                            className={cn('truncate', metadataCapitalize && 'capitalize-sentence')}
+                          >
+                            {metadataText}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {item.severity === 'critical' && (
+                      <Badge variant={severityBadgeVariants[item.severity]}>
+                        {severityLabels[item.severity]}
+                      </Badge>
+                    )}
+                    <ChevronRight
+                      size={16}
+                      strokeWidth={1.5}
+                      className="shrink-0 text-foreground-lighter"
+                    />
+                  </div>
+                </div>
+              </Button>
+            </div>
+          )
+        })}
+      </div>
+      {severityFilters.length > 0 && hiddenItemsCount > 0 && (
+        <div className="px-4 py-3">
+          <Button variant="text" className="w-full" onClick={onShowHiddenItems}>
+            Show {hiddenItemsCount} more issue{hiddenItemsCount !== 1 ? 's' : ''}
+          </Button>
+        </div>
+      )}
+    </>
+  )
+}

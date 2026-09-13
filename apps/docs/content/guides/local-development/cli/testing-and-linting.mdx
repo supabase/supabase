@@ -5,7 +5,7 @@ description: 'Using the CLI to test your Supabase project.'
 subtitle: 'Using the CLI to test your Supabase project.'
 ---
 
-The Supabase CLI provides a set of tools to help you test and lint your Postgres database and Edge` Functions.
+The Supabase CLI provides a set of tools to help you test and lint your Postgres database and Edge Functions.
 
 ## Testing your database
 
@@ -28,7 +28,7 @@ Our friends at [Basejump](https://usebasejump.com/) have created a useful set of
 
 ### Running database tests in CI
 
-Use our GitHub Action to [automate your database tests](/docs/guides/cli/github-action/testing#testing-your-database).
+Use our GitHub Action to [automate your database tests](/docs/guides/deployment/ci/testing).
 
 ## Testing your Edge Functions
 
@@ -44,7 +44,7 @@ By default, Mailpit is available at [localhost:54324](http://localhost:54324) wh
 
 ### Going into production
 
-The "default" email provided by Supabase is only for development purposes. It is [heavily restricted](/docs/guides/platform/going-into-prod#auth-rate-limits) to ensure that it is not used for spam. Before going into production, you must configure your own email provider. This is as simple as enabling a new SMTP credentials in your [project settings](/dashboard/project/_/auth/smtp).
+The "default" email provided by Supabase is only for development purposes. It is [heavily restricted](/docs/guides/deployment/going-into-prod#auth-rate-limits) to ensure that it is not used for spam. Before going into production, configure your own email provider by enabling SMTP credentials in your [project settings](/dashboard/project/_/auth/smtp).
 
 ## Linting your database
 

@@ -16,11 +16,11 @@ Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`,
 
 **Inputs**
 
-| Field                   | Type     | Description                                                                                                                                                                                                                           |
-| ----------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `user_id`               | `string` | Unique identifier for the user attempting to sign in.                                                                                                                                                                                 |
-| `claims`                | `object` | Claims which are included in the access token.                                                                                                                                                                                        |
-| `authentication_method` | `string` | The authentication method used to request the access token. Possible values include: `oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`, `anonymous`. |
+| Field                   | Type     | Description                                                                                                                                                                                                                                                                |
+| ----------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `user_id`               | `string` | Unique identifier for the user attempting to sign in.                                                                                                                                                                                                                      |
+| `claims`                | `object` | Claims which are included in the access token.                                                                                                                                                                                                                             |
+| `authentication_method` | `string` | The authentication method used to request the access token. Possible values include: `oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`, `oauth_provider/authorization_code`, `anonymous`. |
 
 <Tabs
   scrollable
@@ -45,7 +45,8 @@ Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`,
     "aal": "aal1",
     "amr": [ { "method": "anonymous", "timestamp": 1715686621 } ],
     "session_id": "4b938a09-5372-4177-a314-cfa292099ea2",
-    "is_anonymous": true
+    "is_anonymous": true,
+    "client_id": "oauth-client-id-if-oauth-flow"
   },
   "authentication_method": "anonymous"
 }
@@ -143,6 +144,10 @@ Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`,
         "is_anonymous": {
           "type": "boolean",
           "x-faker": "random.boolean"
+        },
+        "client_id": {
+          "type": "string",
+          "x-faker": "random.uuid"
         }
       },
       "required": [
@@ -175,6 +180,7 @@ Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`,
         "email/signup",
         "email_change",
         "token_refresh",
+        "oauth_provider/authorization_code",
         "anonymous"
       ]
     }
@@ -320,7 +326,7 @@ revoke all
 
 </TabPanel>
 <TabPanel id="restrict-access-to-sso-users" label="Restrict access to SSO users">
-You can restrict access to internal applications with a hook. For example, you can require that employees log in via [SAML Single Sign On (SSO)](/docs/guides/auth/sso/auth-sso-saml). You can exempt select employees from the policy via an allowlist.
+You can restrict access to internal applications with a hook. For example, you can require that employees sign in via [SAML Single Sign On (SSO)](/docs/guides/auth/enterprise-sso/auth-sso-saml). You can exempt select employees from the policy via an allowlist.
 
 ```sql
 create or replace function public.restrict_application_access(event jsonb)
@@ -377,9 +383,9 @@ revoke execute
 Your company wishes to add assign permissions via the role claim on the `app_metadata` field. Add the role claim to the token via a Hook.
 
 ```javascript
-import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { readAll } from 'https://deno.land/std/io/read_all.ts'
 import * as base64 from 'https://denopkg.com/chiefbiiko/base64/mod.ts'
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 
 Deno.serve(async (req) => {
   const payload = await req.text()
@@ -420,12 +426,12 @@ Deno.serve(async (req) => {
 
 </TabPanel>
 <TabPanel id="http-restrict-access-to-sso-users" label="Restrict access to SSO users">
-You can restrict access to internal applications with a hook. For example, you can require that employees log in via [SAML Single Sign On (SSO)](/docs/guides/auth/sso/auth-sso-saml). You can exempt select employees from the policy via an allowlist.
+You can restrict access to internal applications with a hook. For example, you can require that employees sign in via [SAML Single Sign On (SSO)](/docs/guides/auth/enterprise-sso/auth-sso-saml). You can exempt select employees from the policy via an allowlist.
 
 ```javascript
-import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { readAll } from 'https://deno.land/std/io/read_all.ts'
 import * as base64 from 'https://denopkg.com/chiefbiiko/base64/mod.ts'
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 
 Deno.serve(async (req) => {
   const payload = await req.text()

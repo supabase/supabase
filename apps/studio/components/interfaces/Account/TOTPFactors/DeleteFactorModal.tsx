@@ -1,11 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { organizationKeys } from 'data/organizations/keys'
-import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { organizationKeys } from '@/data/organizations/keys'
+import { useMfaUnenrollMutation } from '@/data/profile/mfa-unenroll-mutation'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 
 interface DeleteFactorModalProps {
   visible: boolean
@@ -21,15 +20,14 @@ const DeleteFactorModal = ({
   onClose,
 }: DeleteFactorModalProps) => {
   const queryClient = useQueryClient()
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
 
-  const { mutate: unenroll, isLoading } = useMfaUnenrollMutation({
+  const { mutate: unenroll, isPending } = useMfaUnenrollMutation({
     onSuccess: async () => {
       if (lastVisitedOrganization) {
-        await queryClient.invalidateQueries(organizationKeys.members(lastVisitedOrganization))
+        await queryClient.invalidateQueries({
+          queryKey: organizationKeys.members(lastVisitedOrganization),
+        })
       }
       toast.success(`Successfully deleted factor`)
       onClose()
@@ -44,7 +42,7 @@ const DeleteFactorModal = ({
       title="Confirm to delete factor"
       confirmLabel="Delete"
       confirmLabelLoading="Deleting"
-      loading={isLoading}
+      loading={isPending}
       onCancel={onClose}
       onConfirm={() => factorId && unenroll({ factorId })}
       alert={{

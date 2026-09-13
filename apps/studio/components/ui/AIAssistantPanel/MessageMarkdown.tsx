@@ -1,31 +1,10 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useRouter } from 'next/router'
-import {
-  DragEvent,
-  memo,
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react'
-
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProfile } from 'lib/profile'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { Dashboards } from 'types'
+import React, { isValidElement, memo, ReactNode, useMemo, type ReactElement } from 'react'
+import type { StreamdownProps } from 'streamdown'
 import {
-  Badge,
   Button,
   cn,
-  CodeBlock,
-  CodeBlockLang,
   Dialog,
   DialogClose,
   DialogContent,
@@ -35,38 +14,54 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
-import { DebouncedComponent } from '../DebouncedComponent'
-import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
-import { QueryBlock } from '../QueryBlock/QueryBlock'
-import { AssistantSnippetProps } from './AIAssistant.types'
-import { identifyQueryType } from './AIAssistant.utils'
-import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
-import { MessageContext } from './Message'
-import { defaultUrlTransform } from './Message.utils'
+import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
+import { markdownComponents } from 'ui-patterns/Markdown'
 
-export const OrderedList = memo(({ children }: { children: ReactNode }) => (
-  <ol className="flex flex-col gap-y-4">{children}</ol>
+import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
+import { AssistantSnippetProps } from './AIAssistant.types'
+import { AssistantQueryCell } from './AssistantQueryCell'
+import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
+import { defaultUrlTransform, wrapPlaceholderUrls } from './Message.utils'
+
+const Streamdown = dynamic<StreamdownProps>(
+  () => import('streamdown').then((mod) => mod.Streamdown),
+  { ssr: false }
+)
+
+// Streamdown splits ordered lists with complex content (e.g. code blocks) into
+// separate <ol> elements. The `start` attribute preserves semantics for screen
+// readers, while `counterReset` is what actually fixes the visible numbering —
+// the prose config (tailwind.config.ts) uses a custom CSS counter named "item"
+// with `listStyleType: 'none'`, so the `start` attribute alone has no visual effect.
+export const OrderedList = memo(({ children, start }: { children?: ReactNode; start?: number }) => (
+  <ol
+    className="flex flex-col gap-y-4"
+    start={start}
+    style={start !== undefined ? { counterReset: `item ${start - 1}` } : undefined}
+  >
+    {children}
+  </ol>
 ))
 OrderedList.displayName = 'OrderedList'
 
-export const ListItem = memo(({ children }: { children: ReactNode }) => (
+export const ListItem = memo(({ children }: { children?: ReactNode }) => (
   <li className="[&>pre]:mt-2">{children}</li>
 ))
 ListItem.displayName = 'ListItem'
 
-export const Heading3 = memo(({ children }: { children: ReactNode }) => (
+export const Heading3 = memo(({ children }: { children?: ReactNode }) => (
   <h3 className="underline">{children}</h3>
 ))
 Heading3.displayName = 'Heading3'
 
 export const InlineCode = memo(
-  ({ className, children }: { className?: string; children: ReactNode }) => (
+  ({ className, children }: { className?: string; children?: ReactNode }) => (
     <code className={cn('text-xs', className)}>{children}</code>
   )
 )
 InlineCode.displayName = 'InlineCode'
 
-export const Hyperlink = memo(({ href, children }: { href?: string; children: ReactNode }) => {
+export const Hyperlink = memo(({ href, children }: { href?: string; children?: ReactNode }) => {
   const isExternalURL = !href?.startsWith('https://supabase.com/dashboard')
   const safeUrl = defaultUrlTransform(href ?? '')
   const isSafeUrl = safeUrl.length > 0
@@ -80,7 +75,7 @@ export const Hyperlink = memo(({ href, children }: { href?: string; children: Re
       <DialogTrigger asChild>
         <span
           className={cn(
-            '!m-0 text-foreground cursor-pointer transition',
+            'm-0! text-foreground cursor-pointer transition',
             'underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground-lighter'
           )}
         >
@@ -102,12 +97,10 @@ export const Hyperlink = memo(({ href, children }: { href?: string; children: Re
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="default" className="opacity-100">
-              Cancel
-            </Button>
+            <Button className="opacity-100">Cancel</Button>
           </DialogClose>
           <DialogClose asChild>
-            <Button asChild type="primary" className="opacity-100">
+            <Button asChild variant="primary" className="opacity-100">
               {isExternalURL ? (
                 <a href={safeUrl} target="_blank" rel="noreferrer noopener">
                   Head to link
@@ -124,134 +117,86 @@ export const Hyperlink = memo(({ href, children }: { href?: string; children: Re
 })
 Hyperlink.displayName = 'Hyperlink'
 
-const MemoizedQueryBlock = memo(
-  ({
-    sql,
-    title,
-    xAxis,
-    yAxis,
-    isChart,
-    isLoading,
-    isDraggable,
-    runQuery,
-    results,
-    onRunQuery,
-    onResults,
-    onDragStart,
-    onUpdateChartConfig,
-  }: {
-    sql: string
-    title: string
-    xAxis?: string
-    yAxis?: string
-    isChart: boolean
-    isLoading: boolean
-    isDraggable: boolean
-    runQuery: boolean
-    results?: any[]
-    onRunQuery: (queryType: 'select' | 'mutation') => void
-    onResults: (results: any[]) => void
-    onDragStart: (e: DragEvent<Element>) => void
-    onUpdateChartConfig?: ({
-      chart,
-      chartConfig,
-    }: {
-      chart?: Partial<Dashboards.Chart>
-      chartConfig: Partial<ChartConfig>
-    }) => void
-  }) => (
-    <DebouncedComponent
-      delay={isLoading ? 500 : 0}
-      value={sql}
-      fallback={
-        <div className="bg-surface-100 border-overlay rounded border shadow-sm px-3 py-2 text-xs">
-          Writing SQL...
-        </div>
-      }
-    >
-      <QueryBlock
-        lockColumns
-        showRunButtonIfNotReadOnly
-        label={title}
-        sql={sql}
-        chartConfig={{
-          type: 'bar',
-          cumulative: false,
-          xKey: xAxis ?? '',
-          yKey: yAxis ?? '',
-          view: isChart ? 'chart' : 'table',
-        }}
-        tooltip={
-          isDraggable ? (
-            <div className="flex items-center gap-x-2">
-              <Badge variant="success" className="text-xs rounded px-1">
-                NEW
-              </Badge>
-              <p>Drag to add this chart into your custom report</p>
-            </div>
-          ) : undefined
-        }
-        showSql={!isChart}
-        isChart={isChart}
-        isLoading={isLoading}
-        draggable={isDraggable}
-        runQuery={runQuery}
-        results={results}
-        onRunQuery={onRunQuery}
-        onResults={onResults}
-        onDragStart={onDragStart}
-        onUpdateChartConfig={onUpdateChartConfig}
-      />
-    </DebouncedComponent>
+const baseMarkdownComponents = {
+  ol: OrderedList,
+  li: ListItem,
+  h3: Heading3,
+  code: InlineCode,
+  a: Hyperlink,
+  img: ({ src }: React.JSX.IntrinsicElements['img']) => (
+    <span className="text-foreground-light font-mono">[Image: {src?.toString()}]</span>
+  ),
+}
+
+export function MessageMarkdown({
+  id,
+  isLoading,
+  readOnly,
+  className,
+  children,
+}: {
+  id: string
+  isLoading: boolean
+  readOnly?: boolean
+  className?: string
+  children: ReactNode
+}) {
+  const markdownSource = useMemo(() => {
+    if (typeof children === 'string') {
+      return wrapPlaceholderUrls(children)
+    }
+    if (Array.isArray(children)) {
+      return wrapPlaceholderUrls(
+        children.filter((child): child is string => typeof child === 'string').join('')
+      )
+    }
+    return ''
+  }, [children])
+
+  const allMarkdownComponents = useMemo(
+    () => ({
+      ...markdownComponents,
+      ...baseMarkdownComponents,
+      pre: (props: React.JSX.IntrinsicElements['pre']) => (
+        <MarkdownPre id={id} isLoading={isLoading} readOnly={readOnly}>
+          {props.children}
+        </MarkdownPre>
+      ),
+    }),
+    [id, isLoading, readOnly]
   )
-)
-MemoizedQueryBlock.displayName = 'MemoizedQueryBlock'
+
+  return (
+    <Streamdown className={className} components={allMarkdownComponents}>
+      {markdownSource}
+    </Streamdown>
+  )
+}
 
 export const MarkdownPre = ({
   children,
   id,
-  onResults,
+  isLoading,
+  readOnly,
 }: {
   children: any
   id: string
-  onResults: ({
-    messageId,
-    resultId,
-    results,
-  }: {
-    messageId: string
-    resultId?: string
-    results: any[]
-  }) => void
+  isLoading: boolean
+  readOnly?: boolean
 }) => {
-  const router = useRouter()
-  const { profile } = useProfile()
-  const { isLoading, readOnly } = useContext(MessageContext)
-  const { mutate: sendEvent } = useSendEventMutation()
-  const snap = useAiAssistantStateSnapshot()
-  const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
-
-  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
-    {
-      resource: { type: 'sql', owner_id: profile?.id },
-      subject: { id: profile?.id },
-    }
+  const childArray = Array.isArray(children) ? children : [children]
+  const codeElement = childArray.find(
+    (child): child is ReactElement<{ className?: string; children: ReactNode }> =>
+      isValidElement<{ className?: string; children: ReactNode }>(child)
   )
-
-  // [Joshen] Using a ref as this data doesn't need to trigger a re-render
-  const chartConfig = useRef<ChartConfig>({
-    view: 'table',
-    type: 'bar',
-    xKey: '',
-    yKey: '',
-    cumulative: false,
-  })
-
-  const language = children[0].props.className?.replace('language-', '') || 'sql'
-  const rawContent = children[0].props.children[0]
+  const codeProps = codeElement?.props || ({} as { className?: string; children: ReactNode })
+  const language = codeProps.className?.replace('language-', '') || 'sql'
+  const codeChildren = codeProps.children
+  const rawContent = Array.isArray(codeChildren)
+    ? codeChildren.map((node) => (typeof node === 'string' ? node : '')).join('')
+    : typeof codeChildren === 'string'
+      ? codeChildren
+      : ''
   const propsMatch = rawContent.match(/(?:--|\/\/)\s*props:\s*(\{[^}]+\})/)
 
   const snippetProps: AssistantSnippetProps = useMemo(() => {
@@ -265,47 +210,15 @@ export const MarkdownPre = ({
 
   const { xAxis, yAxis } = snippetProps
   const snippetId = snippetProps.id
-  const title = snippetProps.title || (language === 'edge' ? 'Edge Function' : 'SQL Query')
+  const title = snippetProps.title || (language === 'edge' ? 'Edge Function' : 'SQL query')
   const isChart = snippetProps.isChart === 'true'
-  const runQuery = snippetProps.runQuery === 'true'
-  const results = snap.getCachedSQLResults({ messageId: id, snippetId })
-
   // Strip props from the content for both SQL and edge functions
   const cleanContent = rawContent.replace(/(?:--|\/\/)\s*props:\s*\{[^}]+\}/, '').trim()
 
-  const isDraggableToReports = canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
+  const toolCallId = String(snippetId ?? id)
 
-  useEffect(() => {
-    chartConfig.current = {
-      ...chartConfig.current,
-      view: isChart ? 'chart' : 'table',
-      xKey: xAxis ?? '',
-      yKey: yAxis ?? '',
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [snippetProps])
-
-  const onResultsReturned = useCallback(
-    (results: any[]) => {
-      onResults({ messageId: id, resultId: snippetProps.id, results })
-    },
-    [onResults, snippetProps.id]
-  )
-
-  const onRunQuery = async (queryType: 'select' | 'mutation') => {
-    sendEvent({
-      action: 'assistant_suggestion_run_query_clicked',
-      properties: {
-        queryType,
-        ...(queryType === 'mutation'
-          ? { category: identifyQueryType(cleanContent) ?? 'unknown' }
-          : {}),
-      },
-      groups: {
-        project: project?.ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+  if (!codeElement) {
+    return <pre className="w-auto overflow-x-auto not-prose my-4">{children}</pre>
   }
 
   return (
@@ -321,27 +234,14 @@ export const MarkdownPre = ({
         readOnly ? (
           <CollapsibleCodeBlock value={cleanContent} language="sql" hideLineNumbers />
         ) : (
-          <MemoizedQueryBlock
+          <AssistantQueryCell
+            id={toolCallId}
             sql={cleanContent}
             title={title}
+            view={isChart ? 'chart' : 'table'}
             xAxis={xAxis}
             yAxis={yAxis}
-            isChart={isChart}
-            isLoading={isLoading}
-            isDraggable={isDraggableToReports}
-            runQuery={!results && runQuery}
-            results={results}
-            onRunQuery={onRunQuery}
-            onResults={onResultsReturned}
-            onUpdateChartConfig={({ chartConfig: config }) => {
-              chartConfig.current = { ...chartConfig.current, ...config }
-            }}
-            onDragStart={(e: DragEvent<Element>) => {
-              e.dataTransfer.setData(
-                'application/json',
-                JSON.stringify({ label: title, sql: cleanContent, config: chartConfig.current })
-              )
-            }}
+            isStreaming={isLoading}
           />
         )
       ) : (
@@ -350,7 +250,7 @@ export const MarkdownPre = ({
           value={cleanContent}
           language={language as CodeBlockLang}
           className={cn(
-            'my-4 max-h-96 max-w-none block border rounded !bg-transparent !py-3 !px-3.5 prose dark:prose-dark text-foreground',
+            'my-4 max-h-96 max-w-none block border rounded-sm bg-transparent! py-3! px-3.5! prose dark:prose-dark text-foreground',
             '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
           )}
         />

@@ -1,9 +1,10 @@
 import ProductIcon from 'components/ProductIcon'
-import { Fragment, ReactNode } from 'react'
-import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { FeatureKey } from 'shared-data/pricing'
 import Link from 'next/link'
+import { Fragment, ReactNode } from 'react'
+import { FeatureKey } from 'shared-data/pricing'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
+import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
 
 type PricingTooltips = {
   [key in FeatureKey]?: {
@@ -38,8 +39,11 @@ export const pricingTooltips: PricingTooltips = {
   'database.egress': {
     main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor, Log Drains) in GB throughout your billing period. Excludes cache hits.',
   },
-  'database.cachedEgress': {
-    main: 'Billing is based on the total sum of any outgoing traffic (includes Database, Storage, API, Edge Functions) in GB throughout your billing period that is served from our CDN cache.',
+  'database.replication': {
+    main: 'Supabase Pipelines replicates Postgres tables to analytical destinations.\nBilling is based on configured pipeline hours and Postgres row data processed during initial sync and ongoing replication. Pipeline-hour billing ends when the pipeline is deleted.',
+  },
+  'storage.cachedEgress': {
+    main: 'Billing is based on the total sum of outgoing Storage traffic in GB throughout your billing period that is served from our CDN cache.',
   },
   'auth.totalUsers': {
     main: 'The maximum number of users your project can have',
@@ -63,6 +67,7 @@ export const pricingTooltips: PricingTooltips = {
   'auth.thirdPartyMAUs': {
     main: 'Users who use the Supabase platform through a third-party authentication provider (Firebase Auth, Auth0 or Cognito).\nBilling is based on the sum of distinct third-party users requesting your API through the billing period. Resets every billing cycle.',
   },
+
   'storage.size': {
     main: "The sum of all objects' size in your storage buckets.\nBilling is prorated down to the hour and will be displayed as GB-Hrs on your invoice.",
   },
@@ -91,6 +96,18 @@ export const pricingTooltips: PricingTooltips = {
   'security.hipaa': {
     main: 'Available as a paid add-on on Team Plan and above.',
   },
+  'security.privateLink': {
+    main: (
+      <span className="prose text-xs">
+        AWS PrivateLink enables private connectivity between your AWS VPC and Supabase, keeping
+        traffic within the AWS network. Read more in our{' '}
+        <Link href="/docs/guides/platform/privatelink" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
+  },
 
   'security.accessRoles': {
     main: (
@@ -108,6 +125,35 @@ export const pricingTooltips: PricingTooltips = {
   'security.customDomains': {
     enterprise: 'Volume discounts available.',
   },
+
+  'auth.auditLogs': {
+    main: (
+      <span className="prose text-xs">
+        Auth Audit Logs provide comprehensive tracking of authentication events. Audit logs are
+        automatically captured for all authentication events and help you monitor user
+        authentication activities, detect suspicious behavior, and maintain compliance with security
+        requirements. Read more in our{' '}
+        <Link href="/docs/guides/auth/audit-logs" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
+  },
+
+  'security.platformAuditLogs': {
+    main: (
+      <span className="prose text-xs">
+        Any Platform API/Dashboard actions performed by organization members are logged
+        automatically for auditing and security purposes. Includes actions such as creating a new
+        project, inviting members or changing project settings. Read more in our{' '}
+        <Link href="/docs/guides/security/platform-audit-logs" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
+  },
 }
 
 export const PricingTableRowDesktop = (props: any) => {
@@ -120,8 +166,10 @@ export const PricingTableRowDesktop = (props: any) => {
         style={{ borderTop: 'none' }}
         id={`${props.sectionId}-desktop`}
       >
+        {/* 108px/84px are pre-hydration fallbacks only; after mount PricingComparisonTable
+            measures the sticky thead into --pricing-category-top and that value wins */}
         <th
-          className="bg-background text-foreground sticky top-[108px] xl:top-[84px] z-10 py-3 pl-6 text-left text-sm font-medium"
+          className="bg-background text-foreground sticky top-[var(--pricing-category-top,108px)] xl:top-[var(--pricing-category-top,84px)] z-10 py-3 pl-6 text-left text-sm font-medium"
           scope="colgroup"
         >
           <div className="flex items-center gap-4">
@@ -147,7 +195,7 @@ export const PricingTableRowDesktop = (props: any) => {
               >
                 <span className="mr-1">{feat.title}</span>
                 {tooltips?.main && (
-                  <InfoTooltip side="top" className="max-w-[250px]">
+                  <InfoTooltip side="top" className="max-w-[250px]" label={`About ${feat.title}`}>
                     {tooltips.main}
                   </InfoTooltip>
                 )}
@@ -161,7 +209,7 @@ export const PricingTableRowDesktop = (props: any) => {
                   <td
                     key={i}
                     className={[
-                      `pl-6 pr-2 tier-${planName}`,
+                      `pl-6 pr-2 py-5 tier-${planName}`,
                       typeof planValue === 'boolean' ? 'text-center' : '',
                     ].join(' ')}
                   >
@@ -172,10 +220,14 @@ export const PricingTableRowDesktop = (props: any) => {
                         <IconPricingMinus plan={planValue} />
                       </div>
                     ) : (
-                      <div className="text-foreground text-xs flex flex-col justify-center">
+                      <div className="text-foreground text-xs flex flex-col justify-center gap-2">
                         <span className="flex items-center gap-2">
                           {tooltips?.[planName] && (
-                            <InfoTooltip side="top" className="max-w-[250px]">
+                            <InfoTooltip
+                              side="top"
+                              className="max-w-[250px]"
+                              label={`About ${feat.title} on the ${planName} plan`}
+                            >
                               {tooltips[planName]}
                             </InfoTooltip>
                           )}

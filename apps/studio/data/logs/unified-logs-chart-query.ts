@@ -1,13 +1,17 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useFlag } from 'common'
 
-import { getLogsChartQuery } from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
-import { handleError, post } from 'data/fetchers'
-import { ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
+import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import { UNIFIED_LOGS_QUERY_OPTIONS, UnifiedLogsVariables } from './unified-logs-infinite-query'
+import { parseLogsFilterUrlParams } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
+import { getLogsChartQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import { getLogsChartQuery as getLogsChartQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export async function getUnifiedLogsChart(
-  { projectRef, search }: UnifiedLogsVariables,
+  { projectRef, search, useOtel = false }: UnifiedLogsVariables & { useOtel?: boolean },
   signal?: AbortSignal,
   headersInit?: HeadersInit
 ) {
@@ -36,18 +40,18 @@ export async function getUnifiedLogsChart(
   }
 
   // Get SQL query from utility function (with dynamic bucketing)
-  const sql = getLogsChartQuery(search)
+  const sql = pickLogsQueryBuilder(useOtel, getLogsChartQuery, getLogsChartQueryBq)(search)
 
-  let headers = new Headers(headersInit)
-
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-    params: { path: { ref: projectRef } },
-    body: { sql, iso_timestamp_start: dateStart, iso_timestamp_end: dateEnd },
+  const endpoint = logsAllEndpointUrl(useOtel)
+  const data = await executeAnalyticsSql({
+    projectRef,
+    endpoint,
+    sql,
+    iso_timestamp_start: dateStart,
+    iso_timestamp_end: dateEnd,
     signal,
-    headers,
+    headers: headersInit,
   })
-
-  if (error) handleError(error)
 
   const chartData: Array<{
     timestamp: number
@@ -68,9 +72,13 @@ export async function getUnifiedLogsChart(
 
   if (data?.result) {
     data.result.forEach((row: any) => {
-      // The API returns timestamps in microseconds (needs to be converted to milliseconds for JS Date)
-      const microseconds = Number(row.time_bucket)
-      const milliseconds = Math.floor(microseconds / 1000)
+      // Disambiguate by format rather than Number.isFinite — see
+      // unified-logs-infinite-query.ts for the reasoning.
+      const ts = String(row.time_bucket ?? '')
+      const looksLikeIso = /[T-]/.test(ts)
+      const milliseconds = looksLikeIso
+        ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`).getTime()
+        : Math.floor(Number(ts) / 1000)
 
       // Create chart data point
       const dataPoint = {
@@ -80,13 +88,21 @@ export async function getUnifiedLogsChart(
         error: Number(row.error) || 0,
       }
 
-      // Filter levels if needed
-      const levelFilter = search.level
-      if (levelFilter && levelFilter.length > 0) {
-        // Reset levels not in the filter
-        if (!levelFilter.includes('success')) dataPoint.success = 0
-        if (!levelFilter.includes('warning')) dataPoint.warning = 0
-        if (!levelFilter.includes('error')) dataPoint.error = 0
+      // Zero out levels excluded by the active filter set.
+      // `=` filters narrow to an allow-list; `<>` filters carve out a deny-list.
+      const levelFilters = parseLogsFilterUrlParams(search.filter).filter(
+        (f) => f.column === 'level'
+      )
+      if (levelFilters.length > 0) {
+        const included = levelFilters.filter((f) => f.operator === '=').map((f) => f.value)
+        const excluded = new Set(
+          levelFilters.filter((f) => f.operator === '<>').map((f) => f.value)
+        )
+        const isActive = (lvl: 'success' | 'warning' | 'error') =>
+          (included.length === 0 || included.includes(lvl)) && !excluded.has(lvl)
+        if (!isActive('success')) dataPoint.success = 0
+        if (!isActive('warning')) dataPoint.warning = 0
+        if (!isActive('error')) dataPoint.error = 0
       }
 
       dataByTimestamp.set(milliseconds, dataPoint)
@@ -102,14 +118,11 @@ export async function getUnifiedLogsChart(
   const timeRangeHours = (endTimeMs - startTimeMs) / (1000 * 60 * 60)
 
   let bucketSizeMs: number
-  if (timeRangeHours > 72) {
-    // Day-level bucketing (for ranges > 3 days)
+  if (timeRangeHours >= 48) {
     bucketSizeMs = 24 * 60 * 60 * 1000
   } else if (timeRangeHours > 12) {
-    // Hour-level bucketing (for ranges > 12 hours)
     bucketSizeMs = 60 * 60 * 1000
   } else {
-    // Minute-level bucketing (for shorter ranges)
     bucketSizeMs = 60 * 1000
   }
 
@@ -141,22 +154,22 @@ export async function getUnifiedLogsChart(
 }
 
 export type UnifiedLogsChartData = Awaited<ReturnType<typeof getUnifiedLogsChart>>
-export type UnifiedLogsChartError = ExecuteSqlError
+export type UnifiedLogsChartError = ResponseError
 
 export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
   { projectRef, search }: UnifiedLogsVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<UnifiedLogsChartData, UnifiedLogsChartError, TData> = {}
-) =>
-  useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>(
-    logsKeys.unifiedLogsChart(projectRef, search),
-    ({ signal }) => getUnifiedLogsChart({ projectRef, search }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      keepPreviousData: true,
-      ...UNIFIED_LOGS_QUERY_OPTIONS,
-      ...options,
-    }
-  )
+  }: UseCustomQueryOptions<UnifiedLogsChartData, UnifiedLogsChartError, TData> = {}
+) => {
+  const useOtel = useFlag('otelUnifiedLogs')
+  return useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>({
+    queryKey: [...logsKeys.unifiedLogsChart(projectRef, search), { otel: useOtel }],
+    queryFn: ({ signal }) => getUnifiedLogsChart({ projectRef, search, useOtel }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    placeholderData: keepPreviousData,
+    ...UNIFIED_LOGS_QUERY_OPTIONS,
+    ...options,
+  })
+}

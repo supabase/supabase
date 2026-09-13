@@ -1,18 +1,19 @@
+import { useIsLoggedIn, useIsMFAEnabled, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { toast } from 'sonner'
 
-import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsMFAEnabled, useParams } from 'common'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
-import useLatest from 'hooks/misc/useLatest'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
+import { MCP_SECRETS_ROUTE } from '@/components/interfaces/MCP/Secrets/McpSecrets.constants'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
+import { useLatest } from '@/hooks/misc/useLatest'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
 
 // Ideally these could all be within a _middleware when we use Next 12
-const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
+export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { ref, slug, id } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -21,12 +22,13 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const isUserMFAEnabled = useIsMFAEnabled()
 
   const { setLastVisitedSnippet, setLastVisitedTable } = useDashboardHistory()
-  const [__, setLastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization, setLastVisitedOrganization } = useLastVisitedOrganization()
 
-  const DEFAULT_HOME = IS_PLATFORM ? '/organizations' : '/project/default'
+  const DEFAULT_HOME = IS_PLATFORM
+    ? !!lastVisitedOrganization
+      ? `/org/${lastVisitedOrganization}`
+      : '/organizations'
+    : '/project/default'
 
   /**
    * Array of urls/routes that should be ignored
@@ -37,6 +39,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     // this is used by database.dev, usually as /new/new-project
     '/new/[slug]',
     '/join',
+    MCP_SECRETS_ROUTE,
   ]
 
   /**
@@ -48,6 +51,8 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   function isExceptUrl() {
     return excemptUrls.includes(router?.pathname)
   }
+
+  const { isError: isErrorProject, error: projectError } = useProjectDetailQuery({ ref })
 
   const { data: organizations, isSuccess: orgsInitialized } = useOrganizationsQuery({
     enabled: isLoggedIn,
@@ -64,38 +69,27 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       const isValidOrg = organizations.some((org) => org.slug === slug)
 
       if (!isValidOrg) {
-        toast.error("We couldn't find that organization")
-        router.push(`${DEFAULT_HOME}?error=org_not_found&org=${slug}`)
+        toast.error('You do not have access to this organization')
+        router.push(DEFAULT_HOME)
         return
       }
     }
   }, [orgsInitialized])
 
-  const { data, isSuccess: projectsInitialized } = useProjectsQuery({
-    enabled: isLoggedIn,
-  })
-  const projects = data?.projects ?? []
-  const projectsRef = useLatest(projects)
-
   useEffect(() => {
     // check if current route is excempted from route validation check
     if (isExceptUrl() || !isLoggedIn) return
 
-    if (projectsInitialized && ref) {
-      // Check validity of project that the user is trying to access
-      const projects = projectsRef.current ?? []
-      const isValidProject = projects.some((project) => project.ref === ref)
-      const isValidBranch = IS_PLATFORM
-        ? projects.some((project) => project.preview_branch_refs.includes(ref))
-        : true
-
-      if (!isValidProject && !isValidBranch) {
-        toast.error('This project does not exist')
-        router.push(DEFAULT_HOME)
-        return
+    // A successful request to project details will validate access to both project and branches
+    if (!!ref && isErrorProject) {
+      // 404 means the project no longer exists (e.g. was deleted), not an access error
+      if (projectError?.code !== 404) {
+        toast.error('You do not have access to this project')
       }
+      router.push(DEFAULT_HOME)
+      return
     }
-  }, [projectsInitialized])
+  }, [isErrorProject])
 
   useEffect(() => {
     if (ref !== undefined && id !== undefined) {
@@ -125,5 +119,3 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   return <>{children}</>
 }
-
-export default RouteValidationWrapper

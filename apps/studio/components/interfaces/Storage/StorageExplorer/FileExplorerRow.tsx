@@ -2,24 +2,15 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { find, isEmpty, isEqual } from 'lodash'
 import {
   AlertCircle,
-  Clipboard,
+  Copy,
   Download,
   Edit,
-  Loader,
+  LoaderCircle,
   MoreVertical,
   Move,
   Trash2,
 } from 'lucide-react'
-import { useEffect, useRef } from 'react'
-import { useContextMenu } from 'react-contexify'
-import { useDrag, useDragLayer, useDrop } from 'react-dnd'
-
-import { useParams } from 'common'
-import type { ItemRenderer } from 'components/ui/InfiniteList'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { BASE_PATH } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import type { CSSProperties } from 'react'
 import {
   Checkbox,
   cn,
@@ -36,36 +27,41 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
 import {
-  CONTEXT_MENU_KEYS,
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
   STORAGE_VIEWS,
   URL_EXPIRY_DURATION,
 } from '../Storage.constants'
-import { StorageItem, StorageItemWithColumn } from '../Storage.types'
+import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
+import { StorageRowIcon } from '../StorageRowIcon'
+import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
-import { RowIcon } from './RowIcon'
-import { copyPathToFolder, downloadFile } from './StorageExplorer.utils'
+import { copyPathToFolder } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
+import { useFileExplorerRowDnd } from './useFileExplorerRowDnd'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { formatBytes } from '@/lib/helpers'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 interface FileExplorerRowProps {
+  index: number
+  item: StorageItem
   view: STORAGE_VIEWS
   columnIndex: number
   selectedItems: StorageItemWithColumn[]
+  style?: CSSProperties
 }
 
-export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
+export const FileExplorerRow = ({
   index: itemIndex,
   item,
   view = STORAGE_VIEWS.COLUMNS,
   columnIndex = 0,
   selectedItems = [],
-}) => {
-  const { ref: projectRef, bucketId } = useParams()
-  const ref = useRef<HTMLDivElement>(null)
-
-  const snap = useStorageExplorerStateSnapshot()
+  style,
+}: FileExplorerRowProps) => {
   const {
     selectedBucket,
     selectedFilePreview,
@@ -77,21 +73,15 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
     setSelectedFileCustomExpiry,
     setSelectedItems,
     setSelectedItemsToDelete,
+    downloadFile,
     setSelectedItemToRename,
     setSelectedItemsToMove,
     openFolder,
     downloadFolder,
     selectRangeItems,
-    foldersBeingMoved,
-  } = snap
-
-  // Track global drag state to show/hide items across all components
-  const { isDragging: isAnyItemDragging, draggedItem } = useDragLayer((monitor) => ({
-    isDragging: monitor.isDragging(),
-    draggedItem: monitor.getItem(),
-  }))
-  const { show } = useContextMenu()
+  } = useStorageExplorerStateSnapshot()
   const { onCopyUrl } = useCopyUrl()
+  const ctx = useFileExplorerContextMenu()
 
   const isPublic = selectedBucket.public
   const itemWithColumnIndex = { ...item, columnIndex }
@@ -101,250 +91,14 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
-  const pathToFolder = openedFolders
-    .slice(0, columnIndex)
-    .map((folder) => folder.name)
-    .concat(item.name)
-    .join('/')
-  // Check if this folder is currently being moved
-  const isBeingMoved = item.type === STORAGE_ROW_TYPES.FOLDER && foldersBeingMoved.has(pathToFolder)
-
-  // Drag source for files and folders
-  const [{ isDragging }, drag, preview] = useDrag(
-    () => ({
-      type: 'storage-item',
-      item: () => {
-        // If this item is selected and there are multiple selected items, drag all selected items
-        if (isSelected && selectedItems.length > 1) {
-          // Get the element's position in the viewport for the custom drag layer
-          const elementRect = ref.current?.getBoundingClientRect()
-
-          return {
-            type: 'multi-item',
-            items: selectedItems,
-            sourceColumnIndex: columnIndex,
-            draggedFromElement: {
-              rect: elementRect,
-              itemId: item.id,
-            },
-          }
-        }
-        // Otherwise, drag just this item
-        return {
-          ...itemWithColumnIndex,
-          sourceColumnIndex: columnIndex,
-        }
-      },
-      canDrag: () => canUpdateFiles && item.type !== STORAGE_ROW_TYPES.BUCKET,
-      collect: (monitor) => ({
-        isDragging: monitor.isDragging(),
-      }),
-    }),
-    [
-      isSelected,
-      selectedItems,
-      columnIndex,
-      itemWithColumnIndex,
-      canUpdateFiles,
-      item.type,
-      item.id,
-    ]
-  )
-
-  // Drop target for folders
-  const [{ isOver }, drop] = useDrop({
-    accept: 'storage-item',
-    canDrop: (draggedItem: any) => {
-      // Only allow drops on folders
-      if (item.type !== STORAGE_ROW_TYPES.FOLDER) return false
-
-      // Handle multi-item drops
-      if (draggedItem.type === 'multi-item') {
-        const items = draggedItem.items || []
-
-        // Check all items in the selection for drop validity
-        for (const draggedSubItem of items) {
-          // Don't allow dropping on itself - compare paths instead of IDs
-          const draggedItemPath = snap.openedFolders
-            .slice(0, draggedSubItem.columnIndex)
-            .map((folder) => folder.name)
-            .join('/')
-          const targetItemPath = snap.openedFolders
-            .slice(0, columnIndex)
-            .map((folder) => folder.name)
-            .join('/')
-
-          const draggedItemFullPath =
-            draggedItemPath.length > 0
-              ? `${draggedItemPath}/${draggedSubItem.name}`
-              : draggedSubItem.name
-          const targetItemFullPath =
-            targetItemPath.length > 0 ? `${targetItemPath}/${item.name}` : item.name
-
-          if (draggedItemFullPath === targetItemFullPath) {
-            // Can't drop on itself (same path)
-            return false
-          }
-
-          // Don't allow dropping a folder into itself or any of its subdirectories (circular reference)
-          if (draggedSubItem.type === STORAGE_ROW_TYPES.FOLDER) {
-            // For folder drops, the target is the folder itself
-            // When dropping on a folder item, we want to move INTO that folder
-            const targetPath = snap.openedFolders
-              .slice(0, columnIndex)
-              .map((folder) => folder.name)
-              .concat(item.name)
-              .join('/')
-
-            // Check if target path is the same as dragged item path (dropping on itself)
-            if (targetPath === draggedItemFullPath) {
-              return false
-            }
-
-            // Check if target path is a subdirectory of the dragged item (would create circular reference)
-            const droppedOnOwnSubdir = targetPath.startsWith(draggedItemFullPath + '/')
-
-            if (droppedOnOwnSubdir) {
-              // Can't drop in own subdirectory
-              return false
-            }
-
-            // Check if target path is the IMMEDIATE parent of the dragged item
-            // This prevents dropping a folder into its direct parent, but allows moving to ancestor directories
-            const draggedItemImmediateParent = draggedItemFullPath.split('/').slice(0, -1).join('/')
-            const isDroppingOnImmediateParent = targetPath === draggedItemImmediateParent
-
-            if (isDroppingOnImmediateParent) {
-              // Cannot drop folder into its immediate parent directory (same directory)
-              return false
-            }
-          }
-        }
-
-        return true
-      }
-
-      // Handle single-item drops (existing logic)
-      const draggedItemPath = snap.openedFolders
-        .slice(0, draggedItem.columnIndex || draggedItem.sourceColumnIndex)
-        .map((folder) => folder.name)
-        .join('/')
-      const targetItemPath = snap.openedFolders
-        .slice(0, columnIndex)
-        .map((folder) => folder.name)
-        .join('/')
-
-      const draggedItemFullPath =
-        draggedItemPath.length > 0 ? `${draggedItemPath}/${draggedItem.name}` : draggedItem.name
-      const targetItemFullPath =
-        targetItemPath.length > 0 ? `${targetItemPath}/${item.name}` : item.name
-
-      if (draggedItemFullPath === targetItemFullPath) {
-        // Can't drop on itself (same path)
-        return false
-      }
-
-      // Don't allow dropping a folder into itself or any of its subdirectories (circular reference)
-      if (draggedItem.type === STORAGE_ROW_TYPES.FOLDER) {
-        // For folder drops, the target is the folder itself
-        // When dropping on a folder item, we want to move INTO that folder
-        const targetPath = snap.openedFolders
-          .slice(0, columnIndex)
-          .map((folder) => folder.name)
-          .concat(item.name)
-          .join('/')
-
-        // Check if target path is the same as dragged item path (dropping on itself)
-        if (targetPath === draggedItemFullPath) {
-          return false
-        }
-
-        // Check if target path is a subdirectory of the dragged item (would create circular reference)
-        const droppedOnOwnSubdir = targetPath.startsWith(draggedItemFullPath + '/')
-
-        if (droppedOnOwnSubdir) {
-          // Can't drop in own subdirectory
-          return false
-        }
-
-        // Check if target path is the IMMEDIATE parent of the dragged item
-        // This prevents dropping a folder into its direct parent, but allows moving to ancestor directories
-        const draggedItemImmediateParent = draggedItemFullPath.split('/').slice(0, -1).join('/')
-        const isDroppingOnImmediateParent = targetPath === draggedItemImmediateParent
-
-        if (isDroppingOnImmediateParent) {
-          // Cannot drop folder into its immediate parent directory (same directory)
-          return false
-        }
-      }
-
-      return true
-    },
-    drop: (draggedItem) => {
-      if (item.type === STORAGE_ROW_TYPES.FOLDER && canUpdateFiles) {
-        // Calculate target directory path - for folder drops, target is the folder itself
-        const targetDirectory = snap.openedFolders
-          .slice(0, columnIndex)
-          .map((folder) => folder.name)
-          .concat(item.name)
-          .join('/')
-
-        // Handle multi-item drops
-        if (draggedItem.type === 'multi-item') {
-          const items = draggedItem.items || []
-
-          // Check if any item is being dropped to the same location
-          const shouldSkip = items.some((subItem: any) => {
-            const draggedItemPath = snap.openedFolders
-              .slice(0, subItem.columnIndex)
-              .map((folder) => folder.name)
-              .join('/')
-            return draggedItemPath === targetDirectory
-          })
-
-          if (shouldSkip) {
-            // Some items would be dropped to same location, ignoring move operation
-            return
-          }
-
-          // Move all selected items
-          snap.moveFilesDragAndDrop(items, targetDirectory)
-        } else {
-          // Handle single-item drops (existing logic)
-          const draggedItemPath = snap.openedFolders
-            .slice(0, draggedItem.columnIndex || draggedItem.sourceColumnIndex)
-            .map((folder) => folder.name)
-            .join('/')
-
-          if (draggedItemPath === targetDirectory) {
-            // Same location drop detected on folder, ignoring move operation
-            return
-          }
-
-          // Use the drag & drop function that doesn't interfere with the modal
-          snap.moveFilesDragAndDrop([draggedItem], targetDirectory)
-        }
-      } else {
-        // Drop conditions not met
-      }
-    },
-    collect: (monitor) => ({
-      isOver: monitor.isOver({ shallow: false }),
-    }),
+  const { setNodeRef, dragListeners, isDragging, isDropTarget } = useFileExplorerRowDnd({
+    item: itemWithColumnIndex,
+    selectedItems,
+    isSelected,
+    canMoveItems: canUpdateFiles,
   })
 
-  // Apply drag and drop refs
-  if (canUpdateFiles && item.type !== STORAGE_ROW_TYPES.BUCKET) {
-    // Always apply drag ref
-    drag(ref)
-
-    // Only apply drop ref for folders
-    if (item.type === STORAGE_ROW_TYPES.FOLDER) {
-      drop(ref)
-    }
-  }
-
-  const onSelectFile = async (columnIndex: number, file: StorageItem) => {
+  const onSelectFile = async (columnIndex: number) => {
     popColumnAtIndex(columnIndex)
     popOpenedFoldersAtIndex(columnIndex - 1)
     setSelectedFilePreview(itemWithColumnIndex)
@@ -367,12 +121,6 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
     setSelectedFilePreview(undefined)
   }
 
-  const onDoubleClickName = () => {
-    if (canUpdateFiles && item.type !== STORAGE_ROW_TYPES.BUCKET) {
-      setSelectedItemToRename(itemWithColumnIndex)
-    }
-  }
-
   const rowOptions =
     item.type === STORAGE_ROW_TYPES.FOLDER
       ? [
@@ -380,19 +128,19 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
             ? [
                 {
                   name: 'Rename',
-                  icon: <Edit size={14} strokeWidth={1} />,
+                  icon: <Edit size={12} className="text-foreground-light" />,
                   onClick: () => setSelectedItemToRename(itemWithColumnIndex),
                 },
               ]
             : []),
           {
             name: 'Download',
-            icon: <Download size={14} strokeWidth={1} />,
+            icon: <Download size={12} className="text-foreground-light" />,
             onClick: () => downloadFolder(itemWithColumnIndex),
           },
           {
             name: 'Copy path to folder',
-            icon: <Clipboard size={14} strokeWidth={1} />,
+            icon: <Copy size={12} className="text-foreground-light" />,
             onClick: () => copyPathToFolder(openedFolders, itemWithColumnIndex),
           },
           ...(canUpdateFiles
@@ -400,7 +148,7 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
                 { name: 'Separator', icon: undefined, onClick: undefined },
                 {
                   name: 'Delete',
-                  icon: <Trash2 size={14} strokeWidth={1} />,
+                  icon: <Trash2 size={12} className="text-foreground-light" />,
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
               ]
@@ -413,29 +161,31 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
                   ? [
                       {
                         name: 'Get URL',
-                        icon: <Clipboard size={14} strokeWidth={1} />,
-                        onClick: () => onCopyUrl(itemWithColumnIndex.name),
+                        icon: <Copy size={12} className="text-foreground-light" />,
+                        onClick: () => {
+                          onCopyUrl(itemWithColumnIndex.path!)
+                        },
                       },
                     ]
                   : [
                       {
                         name: 'Get URL',
-                        icon: <Clipboard size={14} strokeWidth={1} />,
+                        icon: <Copy size={12} className="text-foreground-light" />,
                         children: [
                           {
                             name: 'Expire in 1 week',
                             onClick: () =>
-                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.WEEK),
+                              onCopyUrl(itemWithColumnIndex.path!, URL_EXPIRY_DURATION.WEEK),
                           },
                           {
                             name: 'Expire in 1 month',
                             onClick: () =>
-                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.MONTH),
+                              onCopyUrl(itemWithColumnIndex.path!, URL_EXPIRY_DURATION.MONTH),
                           },
                           {
                             name: 'Expire in 1 year',
                             onClick: () =>
-                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.YEAR),
+                              onCopyUrl(itemWithColumnIndex.path!, URL_EXPIRY_DURATION.YEAR),
                           },
                           {
                             name: 'Custom expiry',
@@ -444,28 +194,22 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
                         ],
                       },
                     ]),
+                {
+                  name: 'Download',
+                  icon: <Download size={12} className="text-foreground-light" />,
+                  onClick: () => downloadFile(itemWithColumnIndex),
+                },
                 ...(canUpdateFiles
                   ? [
                       {
                         name: 'Rename',
-                        icon: <Edit size={14} strokeWidth={1} />,
+                        icon: <Edit size={12} className="text-foreground-light" />,
                         onClick: () => setSelectedItemToRename(itemWithColumnIndex),
                       },
                       {
                         name: 'Move',
-                        icon: <Move size={14} strokeWidth={1} />,
+                        icon: <Move size={12} className="text-foreground-light" />,
                         onClick: () => setSelectedItemsToMove([itemWithColumnIndex]),
-                      },
-                      {
-                        name: 'Download',
-                        icon: <Download size={14} strokeWidth={1} />,
-                        onClick: async () => {
-                          await downloadFile({
-                            projectRef,
-                            bucketId,
-                            file: itemWithColumnIndex,
-                          })
-                        },
                       },
                       { name: 'Separator', icon: undefined, onClick: undefined },
                     ]
@@ -476,7 +220,7 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
             ? [
                 {
                   name: 'Delete',
-                  icon: <Trash2 size={14} strokeWidth={1} />,
+                  icon: <Trash2 size={12} className="text-foreground-light" />,
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
               ]
@@ -487,18 +231,10 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
   const mimeType = item.metadata ? item.metadata.mimetype : '-'
   const createdAt = item.created_at ? new Date(item.created_at).toLocaleString() : '-'
   const updatedAt = item.updated_at ? new Date(item.updated_at).toLocaleString() : '-'
-
-  const displayMenu = (event: any, rowType: STORAGE_ROW_TYPES) => {
-    show(event, {
-      id:
-        rowType === STORAGE_ROW_TYPES.FILE
-          ? CONTEXT_MENU_KEYS.STORAGE_ITEM
-          : CONTEXT_MENU_KEYS.STORAGE_FOLDER,
-      props: {
-        item: itemWithColumnIndex,
-      },
-    })
-  }
+  const isFile = item.type === STORAGE_ROW_TYPES.FILE
+  // Files: checkbox replaces icon on hover, keyboard focus, and when selected.
+  // Folders: icon only (no selection checkbox).
+  const showRowIcon = !isFile || !isSelected
 
   const nameWidth =
     view === STORAGE_VIEWS.LIST && item.isCorrupted
@@ -507,81 +243,41 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
         ? `calc(100% - 50px)`
         : '100%'
 
-  // Always hide default preview for multi-item drags and set empty preview early
-  useEffect(() => {
-    if (isSelected && selectedItems.length > 1) {
-      // Create a completely transparent 1x1 pixel image
-      const emptyImage = document.createElement('img')
-      emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
-      emptyImage.onload = () => {
-        preview(emptyImage, { captureDraggingState: true })
-      }
-      // Set it immediately as well
-      preview(emptyImage, { captureDraggingState: true })
-    }
-  }, [isSelected, selectedItems.length, preview])
-
   if (item.status === STORAGE_ROW_STATUS.EDITING) {
-    return <FileExplorerRowEditing view={view} item={item} columnIndex={columnIndex} />
+    return (
+      <FileExplorerRowEditing style={style} view={view} item={item} columnIndex={columnIndex} />
+    )
   }
 
   return (
     <div
-      ref={ref}
-      className={cn(
-        'h-full border-b border-default',
-        isDragging && 'opacity-50',
-        isBeingMoved && 'opacity-50',
-        // Add visual feedback for selected items being dragged
-        isDragging && isSelected && selectedItems.length > 1 && 'ring-2 ring-brand-500/50'
-      )}
-      data-item-type={item.type.toLowerCase()}
-      data-item-name={item.name}
-      onContextMenu={(event) => {
-        event.stopPropagation()
-        item.type === STORAGE_ROW_TYPES.FILE
-          ? displayMenu(event, STORAGE_ROW_TYPES.FILE)
-          : displayMenu(event, STORAGE_ROW_TYPES.FOLDER)
-      }}
+      ref={setNodeRef}
+      style={style}
+      className={cn('h-full border-b border-default', isDragging && 'opacity-50')}
+      onContextMenu={(e) => ctx?.onRowContextMenu(e, rowOptions)}
+      {...dragListeners}
     >
       <div
         className={cn(
-          'storage-row group flex h-full items-center px-2.5',
-          'hover:bg-panel-footer-light [[data-theme*=dark]_&]:hover:bg-panel-footer-dark',
-          `${isOpened ? 'bg-surface-200' : ''}`,
-          `${isPreviewed ? 'bg-green-500 hover:bg-green-500' : ''}`,
-          `${isOver ? 'bg-selection' : ''}`,
-          `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`,
-          // Add subtle highlight for all selected items when multiple items are selected
-          `${isSelected && selectedItems.length > 1 && 'bg-surface-200/50'}`,
-          // Hide selected items during multi-item drag (they'll be shown in custom drag layer)
-          `${
-            isAnyItemDragging &&
-            draggedItem?.type === 'multi-item' &&
-            draggedItem?.items?.some((draggedSubItem: any) => draggedSubItem.id === item.id) &&
-            'opacity-20'
-          }`
+          'storage-row group flex h-full items-center px-2.5 rounded-sm',
+          'hover:bg-panel-footer-light in-data-[theme*=dark]:hover:bg-panel-footer-dark',
+          isOpened && 'bg-selection',
+          isSelected && 'bg-selection',
+          isPreviewed && 'bg-selection hover:bg-selection',
+          isDropTarget && 'bg-selection ring-1 ring-inset ring-brand',
+          item.status !== STORAGE_ROW_STATUS.LOADING && 'cursor-pointer',
+          // Keyboard focus on the checkbox: ring the whole row
+          'has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-[-2px] has-[:focus-visible]:outline-[var(--ring)]'
         )}
         onClick={(event) => {
           event.stopPropagation()
           event.preventDefault()
           if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
-            item.type === STORAGE_ROW_TYPES.FOLDER || item.type === STORAGE_ROW_TYPES.BUCKET
+            item.type === STORAGE_ROW_TYPES.FOLDER
               ? openFolder(columnIndex, item)
-              : onSelectFile(columnIndex, item)
+              : onSelectFile(columnIndex)
           }
         }}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault()
-            if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
-              item.type === STORAGE_ROW_TYPES.FOLDER || item.type === STORAGE_ROW_TYPES.BUCKET
-                ? openFolder(columnIndex, item)
-                : onSelectFile(columnIndex, item)
-            }
-          }
-        }}
-        tabIndex={item.status !== STORAGE_ROW_STATUS.LOADING ? 0 : -1}
       >
         <div
           className={cn(
@@ -590,67 +286,54 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
           )}
         >
           <div
-            className="relative w-[30px]"
-            onClick={(event) => event.stopPropagation()}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault()
-                event.stopPropagation()
-              }
-            }}
+            className="relative flex h-4 w-[30px] shrink-0 items-center"
+            onPointerDown={(event) => event.stopPropagation()}
           >
-            {!isSelected && (
+            {showRowIcon && (
               <div
-                className={`absolute ${
-                  item.type === STORAGE_ROW_TYPES.FILE ? 'group-hover:hidden' : ''
-                }`}
+                className={cn(
+                  'absolute',
+                  // Swap icon → checkbox on hover / keyboard focus (files only)
+                  isFile && 'group-hover:hidden group-focus-within:hidden'
+                )}
                 style={{ top: '2px' }}
               >
-                <RowIcon
+                <StorageRowIcon
                   view={view}
                   status={item.status}
                   fileType={item.type}
+                  isOpened={isOpened}
                   mimeType={item.metadata?.mimetype}
                 />
               </div>
             )}
-            <Checkbox
-              label={''}
-              className={`w-full ${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${
-                isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-              }`}
-              checked={isSelected}
-              onChange={(event) => {
-                event.stopPropagation()
-                onCheckItem((event.nativeEvent as KeyboardEvent).shiftKey)
-              }}
-            />
-          </div>
-          <p
-            title={item.name}
-            className="truncate text-sm cursor-pointer hover:text-foreground relative"
-            style={{ width: nameWidth }}
-            onDoubleClick={onDoubleClickName}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault()
-                onDoubleClickName()
-              }
-            }}
-            tabIndex={canUpdateFiles && item.type !== STORAGE_ROW_TYPES.BUCKET ? 0 : -1}
-          >
-            {item.name}
-            {/* Show badge for multi-item drag operations */}
-            {isDragging && isSelected && selectedItems.length > 1 && (
-              <span className="absolute -top-1 -right-1 bg-brand-500 text-foreground text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 font-medium shadow-md">
-                {selectedItems.length}
-              </span>
+            {isFile ? (
+              <Checkbox
+                className={
+                  isSelected
+                    ? 'opacity-100'
+                    : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100'
+                }
+                checked={isSelected}
+                // use onClick instead of onCheckedChange to handle shift-key selection
+                onClick={(event) => {
+                  event.stopPropagation()
+                  onCheckItem(event.nativeEvent.shiftKey)
+                }}
+                aria-label="Check to select this item"
+              />
+            ) : (
+              // Reserve the same slot as the file checkbox without a focusable control
+              <span aria-hidden className="h-4 w-4 shrink-0" />
             )}
+          </div>
+          <p title={item.name} className="truncate text-sm" style={{ width: nameWidth }}>
+            {item.name}
           </p>
           {item.isCorrupted && (
             <Tooltip>
               <TooltipTrigger>
-                <AlertCircle size={18} strokeWidth={2} className="text-foreground-light" />
+                <AlertCircle size={18} className="text-foreground-light" />
               </TooltipTrigger>
               <TooltipContent side="bottom">
                 File is corrupted, please delete and reupload again.
@@ -670,30 +353,25 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
 
         <div
           className={`flex items-center justify-end ${
-            view === STORAGE_VIEWS.LIST ? 'flex-grow' : 'w-[10%]'
+            view === STORAGE_VIEWS.LIST ? 'grow' : 'w-[10%]'
           }`}
           onClick={(event) =>
             // Stops click event from this div, to resolve an issue with menu item's click event triggering unexpected row select
             event.stopPropagation()
           }
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault()
-              event.stopPropagation()
-            }
-          }}
+          onPointerDown={(event) => event.stopPropagation()}
         >
           {item.status === STORAGE_ROW_STATUS.LOADING ? (
-            <Loader
-              className={`animate-spin ${view === STORAGE_VIEWS.LIST ? 'invisible' : ''}`}
-              size={16}
-              strokeWidth={2}
+            <LoaderCircle
+              className={`animate-spin text-foreground-lighter ${view === STORAGE_VIEWS.LIST ? 'invisible' : ''}`}
+              size={14}
             />
           ) : (
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger className="focus-ring rounded-sm">
                 <div className="storage-row-menu opacity-0">
-                  <MoreVertical size={16} strokeWidth={2} />
+                  <MoreVertical size={16} />
+                  <span className="sr-only">{item.name} actions</span>
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="end">

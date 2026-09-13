@@ -1,12 +1,13 @@
-import { notFound } from 'next/navigation'
-
 import TroubleshootingPage from '~/features/docs/Troubleshooting.page'
 import { getAllTroubleshootingEntries, getArticleSlug } from '~/features/docs/Troubleshooting.utils'
 import { PROD_URL } from '~/lib/constants'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+import { mdAlternate } from '~/lib/md-alternates'
+import { notFound } from 'next/navigation'
 
-// 60 seconds/minute * 60 minutes/hour * 24 hours/day
-// export const revalidate = 86_400
 export const dynamicParams = false
+
+const { metadataTitle } = getCustomContent(['metadata:title'])
 
 export default async function TroubleshootingEntryPage(props: {
   params: Promise<{ slug: string }>
@@ -34,9 +35,10 @@ export const generateMetadata = async (props: { params: Promise<{ slug: string }
   const entry = allTroubleshootingEntries.find((entry) => getArticleSlug(entry) === slug)
 
   return {
-    title: 'Supabase Docs | Troubleshooting' + (entry ? ` | ${entry.data.title}` : ''),
+    title: `${metadataTitle || 'Supabase'} | Troubleshooting${entry ? ` | ${entry.data.title}` : ''}`,
     alternates: {
       canonical: `${PROD_URL}/guides/troubleshooting/${slug}`,
+      types: mdAlternate(`troubleshooting/${slug}`),
     },
   }
 }

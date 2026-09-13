@@ -1,0 +1,53 @@
+{
+  "name": "learn",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "dev:content": "velite dev",
+    "dev:next": "next dev --port 3007",
+    "dev": "pnpm run build:content && run-p dev:content dev:next",
+    "build": "pnpm run build:content && next build --turbopack",
+    "build:content": "velite build --strict",
+    "internal:sync": "tsx ./scripts/sync-internal-content.mts",
+    "start": "next start",
+    "lint": "eslint .",
+    "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
+    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo .contentlayer .velite tsconfig.tsbuildinfo",
+    "typecheck": "pnpm build:content && tsc --noEmit"
+  },
+  "dependencies": {
+    "common": "workspace:*",
+    "framer-motion": "^11.18.2",
+    "jotai": "^2.8.0",
+    "lucide-react": "*",
+    "next": "catalog:",
+    "next-themes": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-wrap-balancer": "^1.1.0",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-pretty-code": "^0.9.0",
+    "rehype-slug": "^6.0.0",
+    "remark": "^14.0.3",
+    "remark-code-import": "^1.2.0",
+    "remark-gfm": "^4.0.0",
+    "ui": "workspace:*",
+    "ui-patterns": "workspace:*",
+    "unist-util-visit": "^5.0.0",
+    "velite": "catalog:"
+  },
+  "devDependencies": {
+    "@shikijs/compat": "^1.1.7",
+    "@supabase/supa-mdx-lint": "0.3.1",
+    "@types/react": "catalog:",
+    "config": "workspace:^",
+    "mdast-util-toc": "^6.1.1",
+    "npm-run-all": "^4.1.5",
+    "shiki": "^1.1.7",
+    "tailwindcss": "catalog:",
+    "tsconfig": "workspace:*",
+    "tsx": "catalog:"
+  }
+}

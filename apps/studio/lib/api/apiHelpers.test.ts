@@ -1,5 +1,6 @@
 import type { IncomingHttpHeaders } from 'node:http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   commaSeparatedStringIntoArray,
   constructHeaders,
@@ -8,14 +9,13 @@ import {
   zBooleanString,
 } from './apiHelpers'
 
-vi.mock('lib/constants', () => ({
+vi.mock('@/lib/constants', () => ({
   IS_PLATFORM: false,
 }))
 
 describe('apiHelpers', () => {
   describe('constructHeaders', () => {
     beforeEach(() => {
-      process.env.READ_ONLY_API_KEY = 'test-readonly-key'
       process.env.SUPABASE_SERVICE_KEY = 'test-service-key'
     })
 

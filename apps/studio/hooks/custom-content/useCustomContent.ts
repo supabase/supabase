@@ -24,21 +24,15 @@ function contentToCamelCase(feature: CustomContent) {
     .join('') as CustomContentToCamelCase<typeof feature>
 }
 
-const useCustomContent = <T extends CustomContent[]>(
+export const useCustomContent = <T extends CustomContent[]>(
   contents: T
 ): {
-  [key in CustomContentToCamelCase<T[number]>]:
-    | CustomContentTypes[CustomContentToCamelCase<T[number]>]
-    | null
+  [key in CustomContentToCamelCase<T[number]>]: CustomContentTypes[key] | null
 } => {
   // [Joshen] Running into some TS errors without the `as` here - must be overlooking something super simple
   return Object.fromEntries(
     contents.map((content) => [contentToCamelCase(content), customContentStaticObj[content]])
   ) as {
-    [key in CustomContentToCamelCase<T[number]>]:
-      | CustomContentTypes[CustomContentToCamelCase<T[number]>]
-      | null
+    [key in CustomContentToCamelCase<T[number]>]: CustomContentTypes[key] | null
   }
 }
-
-export { useCustomContent }

@@ -1,60 +1,41 @@
-import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
-
 import { useParams } from 'common'
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { withAuth } from 'hooks/misc/withAuth'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
-import { generateAuthMenu } from './AuthLayout.utils'
+import { useRouter } from 'next/router'
+import type { PropsWithChildren } from 'react'
 
-const AuthProductMenu = () => {
+import { ProjectLayout } from '../ProjectLayout'
+import { useGenerateAuthMenu } from './AuthLayout.utils'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
+import { useAuthConfigPrefetch } from '@/data/auth/auth-config-query'
+import { withAuth } from '@/hooks/misc/withAuth'
+
+export const AuthProductMenu = () => {
   const router = useRouter()
   const { ref: projectRef = 'default' } = useParams()
 
-  const {
-    authenticationSignInProviders,
-    authenticationRateLimits,
-    authenticationEmails,
-    authenticationMultiFactor,
-    authenticationAttackProtection,
-    authenticationAdvanced,
-  } = useIsFeatureEnabled([
-    'authentication:sign_in_providers',
-    'authentication:rate_limits',
-    'authentication:emails',
-    'authentication:multi_factor',
-    'authentication:attack_protection',
-    'authentication:advanced',
-  ])
+  useAuthConfigPrefetch({ projectRef })
+  const page = router.pathname.split('/')[4]
+  const menu = useGenerateAuthMenu()
+
+  return <ProductMenu page={page} menu={menu} />
+}
+
+const AuthLayout = ({ title, children }: PropsWithChildren<{ title: string }>) => {
+  const router = useRouter()
+  const { ref: projectRef = 'default' } = useParams()
 
   useAuthConfigPrefetch({ projectRef })
   const page = router.pathname.split('/')[4]
+  const menu = useGenerateAuthMenu()
 
-  return (
-    <ProductMenu
-      page={page}
-      menu={generateAuthMenu(projectRef, {
-        authenticationSignInProviders,
-        authenticationRateLimits,
-        authenticationEmails,
-        authenticationMultiFactor,
-        authenticationAttackProtection,
-        authenticationAdvanced,
-      })}
-    />
-  )
-}
-
-const AuthLayout = ({ children }: PropsWithChildren<{}>) => {
   return (
     <ProjectLayout
-      title="Authentication"
       product="Authentication"
-      productMenu={<AuthProductMenu />}
+      browserTitle={{ section: title }}
+      productMenu={<ProductMenu page={page} menu={menu} />}
       isBlocking={false}
     >
+      <ProductMenuShortcuts menu={menu} />
       {children}
     </ProjectLayout>
   )

@@ -2,7 +2,6 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { Pool } from 'postgres'
 import {
   Generated,
   Kysely,
@@ -10,6 +9,9 @@ import {
   PostgresIntrospector,
   PostgresQueryCompiler,
 } from 'kysely'
+import { withSupabase } from 'npm:@supabase/server@^1'
+import { Pool } from 'postgres'
+
 import { PostgresDriver } from './DenoPostgresDriver.ts'
 
 console.log(`Function "kysely-postgres" up and running!`)
@@ -58,32 +60,42 @@ const db = new Kysely<Database>({
   },
 })
 
-Deno.serve(async (_req) => {
-  try {
-    // Run a query
-    const animals = await db.selectFrom('animals').select(['id', 'animal', 'created_at']).execute()
+// Authenticated endpoint, so deploy with verify_jwt = true.
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (_req, _ctx) => {
+    try {
+      // Run a query
+      const animals = await db
+        .selectFrom('animals')
+        .select(['id', 'animal', 'created_at'])
+        .execute()
 
-    // Neat, it's properly typed \o/
-    console.log(animals[0].created_at.getFullYear())
+      // Neat, it's properly typed \o/
+      if (animals[0]) {
+        console.log(animals[0].created_at.getFullYear())
+      }
 
-    // Encode the result as pretty printed JSON
-    const body = JSON.stringify(
-      animals,
-      (key, value) => (typeof value === 'bigint' ? value.toString() : value),
-      2
-    )
+      // Encode the result as pretty printed JSON
+      const body = JSON.stringify(
+        animals,
+        (key, value) => (typeof value === 'bigint' ? value.toString() : value),
+        2
+      )
 
-    // Return the response with the correct content type header
-    return new Response(body, {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-    })
-  } catch (err) {
-    console.error(err)
-    return new Response(String(err?.message ?? err), { status: 500 })
-  }
-})
+      // Return the response with the correct content type header
+      return new Response(body, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      })
+    } catch (err) {
+      console.error(err)
+      return new Response('Internal Server Error', { status: 500 })
+    }
+  }),
+}
 
-// To invoke: navigate to http://localhost:54321/functions/v1/kysely-postgres
+// To invoke:
+// curl -i --location --request GET 'http://localhost:54321/functions/v1/kysely-postgres' \
+//   --header 'Authorization: Bearer <USER_ACCESS_TOKEN>'

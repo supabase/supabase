@@ -32,8 +32,8 @@ on storage.objects
 for delete
 to authenticated
 using (
-    owner_id = (select auth.uid())
+    owner_id = (select auth.uid()::text)
 );
 ```
 
-The use of RLS policies is just one way to enforce access control. You can also implement access control in your server code by following the same pattern.
+The use of RLS policies is one way to enforce access control. You can also implement access control in your server code by following the same pattern.

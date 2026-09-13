@@ -1,7 +1,14 @@
 export const navigateToSection = (key: string) => {
   if (typeof window !== 'undefined') {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
     const el = document.getElementById(key)
-    if (el) el.scrollIntoView({ behavior: 'smooth' })
+    if (el) {
+      el.scrollIntoView({ behavior: prefersReducedMotion ? 'instant' : 'smooth' })
+      // Timeout needed to make sure  the focus behavior doesn't interrupt the
+      // scrolling. Timing selected by trial and error.
+      setTimeout(() => el.focus(), 300)
+    }
   }
 }
 

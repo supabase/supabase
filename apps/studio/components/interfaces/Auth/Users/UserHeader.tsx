@@ -1,10 +1,10 @@
 import { Copy } from 'lucide-react'
-
-import CopyButton from 'components/ui/CopyButton'
-import { User } from 'data/auth/users-infinite-query'
 import { cn } from 'ui'
+
 import { PANEL_PADDING } from './Users.constants'
 import { getDisplayName } from './Users.utils'
+import CopyButton from '@/components/ui/CopyButton'
+import { User } from '@/data/auth/users-infinite-query'
 
 export const UserHeader = ({ user }: { user: User }) => {
   const displayName = getDisplayName(user)
@@ -20,7 +20,7 @@ export const UserHeader = ({ user }: { user: User }) => {
           <p>{user.phone}</p>
           <CopyButton
             iconOnly
-            type="text"
+            variant="text"
             icon={<Copy />}
             className="px-1"
             text={user?.phone ?? ''}
@@ -33,7 +33,7 @@ export const UserHeader = ({ user }: { user: User }) => {
             <p className="text-foreground-light text-sm">{user.id}</p>
             <CopyButton
               iconOnly
-              type="text"
+              variant="text"
               icon={<Copy />}
               className="px-1"
               text={user?.id ?? ''}
@@ -49,7 +49,7 @@ export const UserHeader = ({ user }: { user: User }) => {
             </p>
             <CopyButton
               iconOnly
-              type="text"
+              variant="text"
               icon={<Copy />}
               className="px-1"
               text={user?.email ?? ''}

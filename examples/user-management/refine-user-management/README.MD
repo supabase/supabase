@@ -1,15 +1,15 @@
-# Supabase refine User Management
+# Supabase Refine User Management
 
-This repo is a quick sample of how you can get started building apps using [refine](https://github.com/refinedev/refine) and Supabase: users can sign up with a magic link and then update their account with public profile information, including a profile image.
+This repo is a quick sample of how you can get started building apps using [Refine](https://github.com/refinedev/refine) and Supabase: users can sign up with a magic link and then update their account with public profile information, including a profile image.
 
-## About refine
+## About Refine
 
-[refine](https://github.com/refinedev/refine) is a React-based framework for building data-intensive applications in no time ✨
+[Refine](https://github.com/refinedev/refine) is a React-based framework for building data-intensive applications in no time ✨
 
-refine offers lots of out-of-the box functionality for rapid development, without compromising extreme customizability. Use-cases include, but are not limited to admin panels, B2B applications and dashboards.
+Refine offers lots of out-of-the box functionality for rapid development, without compromising extreme customizability. Use-cases include, but are not limited to admin panels, B2B applications and dashboards.
 
 - To learn more about **refine**, please check out the [Documentation](https://refine.dev/docs)
-- [Step up to refine tutorials.](https://refine.dev/docs/tutorial/introduction/index/)
+- [Step up to Refine tutorials.](https://refine.dev/docs/tutorial/introduction/index/)
 
 ## Available Scripts
 
@@ -43,7 +43,7 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 
 ![image](https://user-images.githubusercontent.com/10214025/88916245-528c2680-d298-11ea-8a71-708f93e1ce4f.png)
 
-**_NOTE_**: The `service_role` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
+**_NOTE_**: The `secret` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
 
 ### 4. Env vars
 
@@ -51,7 +51,7 @@ Create a file in this folder `.env.local`
 
 ```
 VITE_SUPABASE_URL=YOUR_SUPABASE_URL
-VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 ```
 
 Populate this file with your URL and Key.

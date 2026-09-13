@@ -1,4 +1,4 @@
-import { IPv4CidrRange, IPv6CidrRange, Validator, collapseIPv6Number } from 'ip-num'
+import { collapseIPv6Number, IPv4CidrRange, IPv6CidrRange, Validator } from 'ip-num'
 
 const privateIPv4Ranges = [
   IPv4CidrRange.fromCidr('10.0.0.0/8'),
@@ -16,8 +16,9 @@ export const isValidAddress = (address: string) => {
   return isIpv4 || isIpv6
 }
 
-export const checkIfPrivate = (type: 'IPv4' | 'IPv6', cidr: string) => {
+export const checkIfPrivate = (type: 'IPv4' | 'IPv6' | undefined, cidr: string) => {
   try {
+    if (type === undefined) return false
     if (type === 'IPv4') {
       const address = IPv4CidrRange.fromCidr(`${cidr}/32`)
       const res = privateIPv4Ranges.map((range) => address.inside(range))
@@ -57,7 +58,7 @@ export const getAddressEndRange = (type: 'IPv4' | 'IPv6', address: string) => {
 }
 
 // [Joshen] Using same logic as worker
-// https://github.com/supabase/infrastructure/blob/840c9596e8bf9e9090ec94de1756bd511e67393a/worker/src/tasks/db/add_as_pooler_tenant.ts#L176C15-L176C15
+// https://github.com/supabase/platform/blob/840c9596e8bf9e9090ec94de1756bd511e67393a/worker/src/tasks/db/add_as_pooler_tenant.ts#L176C15-L176C15
 export const normalize = (address: string) => {
   const [isIpV4] = Validator.isValidIPv4String(address.split('/')[0])
   if (isIpV4) {

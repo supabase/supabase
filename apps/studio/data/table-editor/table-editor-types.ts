@@ -1,37 +1,43 @@
-import type {
-  PostgresColumn,
-  PostgresMaterializedView,
-  PostgresRelationship,
-  PostgresTable,
-  PostgresView,
-} from '@supabase/postgres-meta'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import type { PGMaterializedView, PGTable, PGTableRelationship, PGView } from '@supabase/pg-meta'
 
-interface TableRelationship extends PostgresRelationship {
+import { WRAPPER_HANDLERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import type { SafePostgresColumn, SafePostgresTable } from '@/lib/postgres-types'
+
+interface TableRelationship extends PGTableRelationship {
   deletion_action: 'a' | 'r' | 'c' | 'n' | 'd'
   update_action: 'a' | 'r' | 'c' | 'n' | 'd'
 }
 
-export interface Table extends PostgresTable {
+interface TableUniqueIndex {
+  schema: string
+  table_name: string
+  table_id: number
+  columns: string[]
+}
+
+export interface Table extends Omit<PGTable, 'columns'> {
   entity_type: ENTITY_TYPE.TABLE
-  columns: PostgresColumn[]
+  columns: SafePostgresColumn[]
   relationships: TableRelationship[]
+  unique_indexes?: TableUniqueIndex[]
 }
 
-export interface PartitionedTable extends PostgresTable {
+export interface PartitionedTable extends Omit<PGTable, 'columns'> {
   entity_type: ENTITY_TYPE.PARTITIONED_TABLE
-  columns: PostgresColumn[]
+  columns: SafePostgresColumn[]
   relationships: TableRelationship[]
+  unique_indexes?: TableUniqueIndex[]
 }
 
-export interface View extends PostgresView {
+export interface View extends PGView {
   entity_type: ENTITY_TYPE.VIEW
-  columns: PostgresColumn[]
+  columns: SafePostgresColumn[]
 }
 
-export interface MaterializedView extends PostgresMaterializedView {
+export interface MaterializedView extends PGMaterializedView {
   entity_type: ENTITY_TYPE.MATERIALIZED_VIEW
-  columns: PostgresColumn[]
+  columns: SafePostgresColumn[]
 }
 
 export interface ForeignTable {
@@ -40,7 +46,10 @@ export interface ForeignTable {
   schema: string
   name: string
   comment: string | null
-  columns: PostgresColumn[]
+  foreign_server_name: string
+  foreign_data_wrapper_name: string
+  foreign_data_wrapper_handler: string
+  columns: SafePostgresColumn[]
 }
 
 export type Entity = Table | PartitionedTable | View | MaterializedView | ForeignTable
@@ -67,6 +76,10 @@ export function isForeignTable(entity?: Entity): entity is ForeignTable {
   return entity?.entity_type === ENTITY_TYPE.FOREIGN_TABLE
 }
 
+export function isMsSqlForeignTable(entity?: Entity): entity is ForeignTable {
+  return isForeignTable(entity) && entity.foreign_data_wrapper_handler === WRAPPER_HANDLERS.MSSQL
+}
+
 export function isView(entity?: Entity): entity is View {
   return entity?.entity_type === ENTITY_TYPE.VIEW
 }
@@ -82,10 +95,10 @@ export function isViewLike(entity?: Entity): entity is View | MaterializedView {
   return isView(entity) || isMaterializedView(entity)
 }
 
-export function postgresTableToEntity(table: PostgresTable): Entity | undefined {
+export function postgresTableToEntity(table: SafePostgresTable): Entity | undefined {
   if (table.columns === undefined || table.relationships === undefined) {
     console.error(
-      'Unable to convert PostgresTable to Entity type: columns and relationships must not be undefined.'
+      'Unable to convert PGTable to Entity type: columns and relationships must not be undefined.'
     )
     return undefined
   }

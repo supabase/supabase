@@ -3,51 +3,55 @@
  *
  * If Elements is on a higher level, we risk losing all form state in case a payment fails.
  */
-
+import { zodResolver } from '@hookform/resolvers/zod'
 import { AddressElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import type { PaymentMethod } from '@stripe/stripe-js'
 import {
   StripeAddressElementChangeEvent,
   StripeAddressElementOptions,
   type SetupIntent,
 } from '@stripe/stripe-js'
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react'
+import { Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
+import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
-  Command_Shadcn_ as Command,
-  CommandEmpty_Shadcn_ as CommandEmpty,
-  CommandGroup_Shadcn_ as CommandGroup,
-  CommandInput_Shadcn_ as CommandInput,
-  CommandItem_Shadcn_ as CommandItem,
-  CommandList_Shadcn_ as CommandList,
-  FormControl_Shadcn_ as FormControl,
-  FormField_Shadcn_ as FormField,
-  FormItem_Shadcn_,
-  FormMessage_Shadcn_ as FormMessage,
-  Input_Shadcn_ as Input,
-  Popover_Shadcn_ as Popover,
-  PopoverContent_Shadcn_ as PopoverContent,
-  PopoverTrigger_Shadcn_ as PopoverTrigger,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-import {
-  TAX_IDS,
-  type TaxId,
-} from '../../../Organization/BillingSettings/BillingCustomerData/TaxID.constants'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { Form } from '@ui/components/shadcn/ui/form'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { Check, ChevronsUpDown } from 'lucide-react'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { getURL } from 'lib/helpers'
-import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
-import type { PaymentMethod } from '@stripe/stripe-js'
+import { z } from 'zod'
+
+import { TAX_IDS } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
+import {
+  getEffectiveTaxCountry,
+  resolveStoredTaxId,
+} from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.utils'
+import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
+import { getURL } from '@/lib/helpers'
 
 export const BillingCustomerDataSchema = z.object({
   tax_id_type: z.string(),
-  tax_id_value: z.string().min(2, {
+  tax_id_value: z.string().trim().min(2, {
     message: 'Tax ID needs to be set.',
   }),
   tax_id_name: z.string(),
@@ -74,9 +78,17 @@ export type PaymentMethodElementRef = {
       }
     | undefined
   >
+  getFormValues: () => Promise<
+    | {
+        address: CustomerAddress
+        customerName: string
+        taxId: CustomerTaxId | null
+      }
+    | undefined
+  >
 }
 
-const NewPaymentMethodElement = forwardRef(
+export const NewPaymentMethodElement = forwardRef(
   (
     {
       email,
@@ -84,12 +96,18 @@ const NewPaymentMethodElement = forwardRef(
       currentAddress,
       currentTaxId,
       customerName,
+      onAddressChange,
+      onAddressIncomplete,
+      onTaxIdChange,
     }: {
       email?: string | null | undefined
       readOnly: boolean
       currentAddress?: CustomerAddress | null
       currentTaxId?: CustomerTaxId | null
       customerName?: string | undefined
+      onAddressChange?: (address: CustomerAddress) => void
+      onAddressIncomplete?: () => void
+      onTaxIdChange?: (taxId: CustomerTaxId | null) => void
     },
     ref
   ) => {
@@ -100,10 +118,8 @@ const NewPaymentMethodElement = forwardRef(
       resolver: zodResolver(BillingCustomerDataSchema),
       defaultValues: {
         tax_id_name: currentTaxId
-          ? TAX_IDS.find(
-              (option) =>
-                option.type === currentTaxId.type && option.countryIso2 === currentTaxId.country
-            )?.name || ''
+          ? (resolveStoredTaxId(currentTaxId.type, currentTaxId.country, currentAddress?.country)
+              ?.name ?? '')
           : '',
         tax_id_type: currentTaxId ? currentTaxId.type : '',
         tax_id_value: currentTaxId ? currentTaxId.value : '',
@@ -114,6 +130,7 @@ const NewPaymentMethodElement = forwardRef(
     const [fullyLoaded, setFullyLoaded] = useState(false)
 
     const [showTaxIDsPopover, setShowTaxIDsPopover] = useState(false)
+    const taxIdListboxId = useId()
 
     const onSelectTaxIdType = (name: string) => {
       const selectedTaxIdOption = TAX_IDS.find((option) => option.name === name)
@@ -123,29 +140,50 @@ const NewPaymentMethodElement = forwardRef(
       form.setValue('tax_id_name', name)
     }
 
-    const { tax_id_name } = form.watch()
+    const [tax_id_name, rawTaxIdValue] = useWatch({
+      control: form.control,
+      name: ['tax_id_name', 'tax_id_value'],
+    })
+    const taxIdValue = rawTaxIdValue?.trim() ?? ''
     const selectedTaxId = TAX_IDS.find((option) => option.name === tax_id_name)
 
     const [purchasingAsBusiness, setPurchasingAsBusiness] = useState(currentTaxId != null)
     const [stripeAddress, setStripeAddress] = useState<
       StripeAddressElementChangeEvent['value'] | undefined
     >(undefined)
+    useEffect(() => {
+      if (!onTaxIdChange) return
+      if (purchasingAsBusiness && selectedTaxId && taxIdValue) {
+        onTaxIdChange({
+          country: getEffectiveTaxCountry(selectedTaxId),
+          type: selectedTaxId.type,
+          value: taxIdValue,
+        })
+      } else {
+        onTaxIdChange(null)
+      }
+    }, [purchasingAsBusiness, selectedTaxId, taxIdValue, onTaxIdChange])
 
+    const addressCountry = stripeAddress?.address.country
     const availableTaxIds = useMemo(() => {
-      const country = stripeAddress?.address.country || null
+      const country = addressCountry || null
 
       return TAX_IDS.filter((taxId) => country == null || taxId.countryIso2 === country).sort(
         (a, b) => a.country.localeCompare(b.country)
       )
-    }, [stripeAddress])
+    }, [addressCountry])
 
     const createPaymentMethod = async (): ReturnType<
       PaymentMethodElementRef['createPaymentMethod']
     > => {
       if (!stripe || !elements) return
-      await form.trigger()
+      const isValid = await form.trigger()
 
-      if (purchasingAsBusiness && availableTaxIds.length > 0 && !form.getValues('tax_id_value')) {
+      if (
+        purchasingAsBusiness &&
+        availableTaxIds.length > 0 &&
+        (!isValid || !form.getValues('tax_id_value'))
+      ) {
         return
       }
 
@@ -173,11 +211,12 @@ const NewPaymentMethodElement = forwardRef(
     }
 
     function getConfiguredTaxId(): CustomerTaxId | null {
-      return purchasingAsBusiness && selectedTaxId
+      const isValidForCountry = selectedTaxId && availableTaxIds.includes(selectedTaxId)
+      return purchasingAsBusiness && isValidForCountry
         ? {
-            country: selectedTaxId.countryIso2,
+            country: getEffectiveTaxCountry(selectedTaxId),
             type: selectedTaxId.type,
-            value: form.getValues('tax_id_value'),
+            value: form.getValues('tax_id_value').trim(),
           }
         : null
     }
@@ -210,9 +249,37 @@ const NewPaymentMethodElement = forwardRef(
       }
     }
 
+    const getFormValues = async (): ReturnType<PaymentMethodElementRef['getFormValues']> => {
+      if (!elements) return
+
+      const isValid = await form.trigger()
+      if (
+        purchasingAsBusiness &&
+        availableTaxIds.length > 0 &&
+        (!isValid || !form.getValues('tax_id_value'))
+      ) {
+        return
+      }
+
+      const { error: submitError } = await elements.submit()
+      if (submitError) return
+
+      const addressElement = await elements.getElement('address')!.getValue()
+
+      return {
+        address: {
+          ...addressElement.value.address,
+          line2: addressElement.value.address.line2 || undefined,
+        },
+        customerName: addressElement.value.name,
+        taxId: getConfiguredTaxId(),
+      }
+    }
+
     useImperativeHandle(ref, () => ({
       createPaymentMethod,
       confirmSetup,
+      getFormValues,
     }))
 
     const addressOptions: StripeAddressElementOptions = useMemo(
@@ -223,28 +290,48 @@ const NewPaymentMethodElement = forwardRef(
           mode: 'google_maps_api',
         },
         display: { name: purchasingAsBusiness ? 'organization' : 'full' },
+        // Use live form state (stripeAddress) so the address survives remounts triggered
+        // by the purchasingAsBusiness toggle (which changes the key prop). Without this,
+        // the element resets to the original currentAddress prop, causing the country to
+        // revert and the tax ID selector to fall out of sync.
         defaultValues: {
-          address: currentAddress ?? undefined,
-          name: customerName,
+          address: stripeAddress?.address ?? currentAddress ?? undefined,
+          name: stripeAddress?.name ?? customerName,
         },
       }),
       [purchasingAsBusiness]
     )
 
-    // Preselect tax id if there is no more than 2 available tax ids (even if there are two options, first one in the list is likely to be it)
+    // Reset tax ID fields when the billing country changes and preselect the
+    // first available tax ID for the new country.
+    const prevCountryRef = useRef(addressCountry)
     useEffect(() => {
-      if (availableTaxIds.length && stripeAddress?.address.country && !currentTaxId) {
-        const taxIdOption = availableTaxIds[0]
-        form.setValue('tax_id_type', taxIdOption.type)
-        form.setValue('tax_id_value', '')
-        form.setValue('tax_id_name', taxIdOption.name)
+      if (!addressCountry) return
+
+      const isCountryChange =
+        prevCountryRef.current !== undefined && prevCountryRef.current !== addressCountry
+      prevCountryRef.current = addressCountry
+
+      // On country change: always reset to the new country's default
+      // On initial load: only preselect if there's no existing tax id
+      if (isCountryChange || !currentTaxId) {
+        if (availableTaxIds.length) {
+          const taxIdOption = availableTaxIds[0]
+          form.setValue('tax_id_type', taxIdOption.type)
+          form.setValue('tax_id_value', '')
+          form.setValue('tax_id_name', taxIdOption.name)
+        } else {
+          form.setValue('tax_id_type', '')
+          form.setValue('tax_id_value', '')
+          form.setValue('tax_id_name', '')
+        }
       }
-    }, [availableTaxIds, stripeAddress])
+    }, [availableTaxIds, addressCountry, currentTaxId, form])
 
     return (
-      <div className="space-y-4">
-        <p className="text-sm text-foreground-light mb-2">
-          Please ensure CVC and postal codes match what is on file for your card.
+      <div className="space-y-2">
+        <p className="text-sm text-foreground-lighter">
+          Please ensure CVC and postal codes match what’s on file for your card.
         </p>
 
         <PaymentElement
@@ -256,15 +343,29 @@ const NewPaymentMethodElement = forwardRef(
         />
 
         {fullyLoaded && (
-          <div className="flex items-center space-x-2">
-            <Checkbox_Shadcn_
+          <div className="flex items-center space-x-2 py-4">
+            <Checkbox
               id="business"
               checked={purchasingAsBusiness}
               onCheckedChange={() => setPurchasingAsBusiness(!purchasingAsBusiness)}
             />
-            <label htmlFor="business" className="text-foreground-light text-sm leading-none">
-              I'm purchasing as a business
+            <label htmlFor="business" className="text-foreground text-sm leading-none">
+              I’m purchasing as a business
             </label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle
+                  size={14}
+                  className="text-foreground-lighter hover:text-foreground transition"
+                />
+              </TooltipTrigger>
+              <TooltipContent side="top" className="w-72">
+                Check this only if you need a tax ID (e.g. US EIN, VAT, GST) on your invoice. You’ll
+                be asked to enter it, and it’ll appear on a compliant business invoice. If you don’t
+                have a tax ID, or don’t need one shown, leave this unchecked. You’ll still receive a
+                receipt.
+              </TooltipContent>
+            </Tooltip>
           </div>
         )}
 
@@ -272,7 +373,17 @@ const NewPaymentMethodElement = forwardRef(
           options={addressOptions}
           // Force reload after changing purchasingAsBusiness setting, it seems like the element does not reload otherwise
           key={`address-elements-${purchasingAsBusiness}`}
-          onChange={(evt) => setStripeAddress(evt.value)}
+          onChange={(evt) => {
+            setStripeAddress(evt.value)
+            if (evt.complete) {
+              onAddressChange?.({
+                ...evt.value.address,
+                line2: evt.value.address.line2 || undefined,
+              })
+            } else {
+              onAddressIncomplete?.()
+            }
+          }}
           onReady={() => setFullyLoaded(true)}
         />
 
@@ -282,15 +393,16 @@ const NewPaymentMethodElement = forwardRef(
               <FormField
                 name="tax_id_name"
                 control={form.control}
-                render={({ field }) => (
+                render={() => (
                   <FormItemLayout hideMessage layout="vertical">
                     <Popover open={showTaxIDsPopover} onOpenChange={setShowTaxIDsPopover}>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
-                            type="default"
                             role="combobox"
                             size="medium"
+                            aria-expanded={showTaxIDsPopover}
+                            aria-controls={taxIdListboxId}
                             className={cn(
                               'w-full justify-between h-[34px]',
                               !selectedTaxId && 'text-muted'
@@ -308,7 +420,12 @@ const NewPaymentMethodElement = forwardRef(
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent sameWidthAsTrigger className="p-0" align="start">
+                      <PopoverContent
+                        id={taxIdListboxId}
+                        sameWidthAsTrigger
+                        className="p-0"
+                        align="start"
+                      >
                         <Command>
                           <CommandInput placeholder="Search tax ID..." />
                           <CommandList>
@@ -349,12 +466,12 @@ const NewPaymentMethodElement = forwardRef(
                   name="tax_id_value"
                   control={form.control}
                   render={({ field }) => (
-                    <FormItem_Shadcn_>
+                    <FormItem>
                       <FormControl>
                         <Input {...field} placeholder={selectedTaxId?.placeholder} />
                       </FormControl>
                       <FormMessage />
-                    </FormItem_Shadcn_>
+                    </FormItem>
                   )}
                 />
               )}
@@ -367,5 +484,3 @@ const NewPaymentMethodElement = forwardRef(
 )
 
 NewPaymentMethodElement.displayName = 'NewPaymentMethodElement'
-
-export { NewPaymentMethodElement }

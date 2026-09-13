@@ -1,35 +1,37 @@
-import { Clock, Heart, Server, SquareStack, Telescope } from 'lucide-react'
+import { Clock, Heart, ScrollText, Server, SquareStack, Telescope } from 'lucide-react'
 
 import {
   IconBranching,
+  IconGitBranch,
   IconGitHub,
+  IconMenuAI,
   IconMenuApi,
   IconMenuAuth,
   IconMenuCli,
   IconMenuCsharp,
   IconMenuDatabase,
-  IconMenuGraphQL,
+  IconMenuDevCli,
   IconMenuEdgeFunctions,
   IconMenuFlutter,
   IconMenuGettingStarted,
+  IconMenuGraphQL,
   IconMenuHome,
   IconMenuIntegrations,
   IconMenuJavascript,
+  IconMenuKotlin,
   IconMenuPlatform,
   IconMenuPython,
   IconMenuRealtime,
   IconMenuResources,
-  IconMenuSelfHosting,
   IconMenuRestApis,
+  IconMenuSelfHosting,
+  IconMenuStatus,
   IconMenuStorage,
   IconMenuSwift,
-  IconMenuStatus,
-  IconMenuKotlin,
-  IconMenuAI,
-  IconMenuDevCli,
   IconSecurity,
   IconSupport,
   IconTroubleshooting,
+  IconUI,
 } from './MenuIcons'
 
 function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, className?: string) {
@@ -84,6 +86,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <IconMenuCli width={width} height={height} className={className} />
     case 'status':
       return <IconMenuStatus width={width} height={height} className={className} />
+    case 'git-branch':
+      return <IconGitBranch width={width} height={height} className={className} />
     case 'github':
       return <IconGitHub width={width} height={height} className={className} />
     case 'support':
@@ -94,6 +98,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <Telescope width={width} height={height} className={className} />
     case 'troubleshooting':
       return <IconTroubleshooting width={width} height={height} className={className} />
+    case 'changelog':
+      return <ScrollText width={width} height={height} className={className} />
     case 'contributing':
       return <Heart width={width} height={height} className={className} />
     case 'deployment':
@@ -102,6 +108,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <Clock width={width} height={height} className={className} />
     case 'queues':
       return <SquareStack width={width} height={height} className={className} />
+    case 'ui':
+      return <IconUI width={width} height={height} className={className} />
     default:
       return <IconMenuPlatform width={width} height={height} className={className} />
   }

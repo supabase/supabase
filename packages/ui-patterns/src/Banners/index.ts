@@ -1,4 +1,4 @@
-import { AnnouncementBanner, announcement } from './AnnouncementBanner'
+import { announcement, AnnouncementBanner } from './AnnouncementBanner'
 
 export { AnnouncementBanner, announcement }
 

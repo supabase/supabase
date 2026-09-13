@@ -2,20 +2,22 @@
 
 import { Check, Copy, File, Terminal } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
+import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
 import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import yaml from 'react-syntax-highlighter/dist/cjs/languages/hljs/yaml'
-import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import { Button, cn } from 'ui'
-import monokaiCustomTheme from './CodeBlock.utils'
+
+import monokaiCustomTheme, { codeHikeTheme } from './CodeBlock.utils'
 
 export type LANG = 'js' | 'sql' | 'py' | 'bash' | 'ts' | 'tsx' | 'kotlin' | 'yaml' | 'json'
+
 export interface CodeBlockProps {
   lang: LANG
   startingLineNumber?: number
@@ -25,11 +27,13 @@ export interface CodeBlockProps {
   children?: string
   size?: 'small' | 'medium' | 'large'
   background?: string
+  filename?: string
+  theme?: 'monokai' | 'code-hike'
 }
 
 function CodeBlock(props: CodeBlockProps) {
   const { resolvedTheme } = useTheme()
-  const isDarkTheme = resolvedTheme?.includes('dark')!
+  const isDarkTheme = resolvedTheme?.includes('dark') ?? false
   const [copied, setCopied] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -50,6 +54,8 @@ function CodeBlock(props: CodeBlockProps) {
       setCopied(false)
     }, 1000)
   }
+
+  const isCodeHikeTheme = props.theme === 'code-hike'
 
   let lang = props.lang
     ? props.lang
@@ -108,10 +114,17 @@ function CodeBlock(props: CodeBlockProps) {
         </div>
       )}
       <div className="relative">
-        {/* @ts-ignore */}
         <SyntaxHighlighter
           language={lang}
-          style={isDarkTheme ? monokaiCustomTheme.dark : monokaiCustomTheme.light}
+          style={
+            (isCodeHikeTheme
+              ? isDarkTheme
+                ? codeHikeTheme.dark
+                : codeHikeTheme.light
+              : isDarkTheme
+                ? monokaiCustomTheme.dark
+                : monokaiCustomTheme.light) as Record<string, CSSProperties>
+          }
           className={cn(
             'synthax-highlighter border border-default/15 rounded-lg',
             !filename && 'rounded-t-lg',
@@ -132,19 +145,19 @@ function CodeBlock(props: CodeBlockProps) {
           showLineNumbers={props.showLineNumbers}
           lineNumberStyle={{
             padding: '0px',
-            marginRight: '21px',
+            marginRight: isCodeHikeTheme ? '16px' : '21px',
             minWidth: '1.5em',
-            opacity: '0.3',
+            opacity: isCodeHikeTheme ? '0.7' : '0.3',
             fontSize: large ? 14 : '0.75rem',
           }}
         >
-          {content}
+          {content ?? ''}
         </SyntaxHighlighter>
         {!props.hideCopy && props.children ? (
           <div className="absolute right-2 top-2">
             <CopyToClipboard text={props.children}>
               <Button
-                type="text"
+                variant="text"
                 icon={
                   copied ? (
                     <span className="text-brand">

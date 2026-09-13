@@ -1,122 +1,171 @@
-// hackery to fix Terry accidentally deleting
-// a bunch of releases and their associted discussions in Dec 2023
-// checks if titles match and grabs this original createdAt timestamp
-export const deletedDiscussions = [
-  {
-    title: 'Platform updates: October 2023',
-    oldNumber: 18759,
-    newNumber: 19705,
-    createdAt: '2023-11-06T16:25:12Z',
-  },
-  {
-    title: 'Platform update September 2023',
-    oldNumber: 17975,
-    newNumber: 19706,
-    createdAt: '2023-10-06T09:23:56Z',
-  },
-  {
-    title: 'Platform updates: August 2023',
-    oldNumber: 17274,
-    newNumber: 19704,
-    createdAt: '2023-09-08T13:00:39Z',
-  },
-  {
-    title: 'Platform updates June 2023',
-    oldNumber: 15623,
-    newNumber: 19703,
-    createdAt: '2023-07-07T16:09:32Z',
-  },
-  {
-    title: 'Platform updates: May 2023',
-    oldNumber: 14941,
-    newNumber: 19702,
-    createdAt: '2023-06-09T16:40:16Z',
-  },
-  {
-    title: 'Platform updates: April 2023',
-    oldNumber: 14271,
-    newNumber: 19701,
-    createdAt: '2023-05-10T18:40:02Z',
-  },
-  {
-    title: 'Platform Update February 2023',
-    oldNumber: 12915,
-    newNumber: 19700,
-    createdAt: '2023-03-09T12:06:01Z',
-  },
-  {
-    title: 'Platform update January 2023',
-    oldNumber: 12268,
-    newNumber: 19699,
-    createdAt: '2023-02-08T18:29:41Z',
-  },
-  {
-    title: 'Platform Updates November 2022',
-    oldNumber: 10803,
-    newNumber: 19698,
-    createdAt: '2022-12-08T12:00:48Z',
-  },
-  {
-    title: 'Platform updates: October 2022',
-    oldNumber: 10036,
-    newNumber: 19697,
-    createdAt: '2022-11-02T16:07:47Z',
-  },
-  {
-    title: 'Platform Update September 2022',
-    oldNumber: 9388,
-    newNumber: 19696,
-    createdAt: '2022-10-07T10:18:21Z',
-  },
-  {
-    title: 'Platform Update August 2022',
-  },
-  {
-    title: 'Platform updates: 30 Nov 2021',
-    oldNumber: 4169,
-    newNumber: 19695,
-    createdAt: '2021-11-30T10:06:55Z',
-  },
-  {
-    title: 'October Beta 2021',
-    oldNumber: 3830,
-    newNumber: 19694,
-    createdAt: '2021-11-08T13:14:35Z',
-  },
-  {
-    title: 'September Beta 2021',
-    oldNumber: 3417,
-    newNumber: 19693,
-    createdAt: '2021-10-04T18:10:57Z',
-  },
-  {
-    title: 'August Beta 2021',
-    oldNumber: 3184,
-    newNumber: 19692,
-    createdAt: '2021-09-13T09:47:18Z',
-  },
-  {
-    title: 'July Beta 2021',
-    oldNumber: 2815,
-    newNumber: 19691,
-    createdAt: '2021-08-12T13:46:14Z',
-  },
-  {
-    title: 'June Beta 2021',
-    oldNumber: 2216,
-    newNumber: 19690,
-    createdAt: '2021-07-04T13:23:35Z',
-  },
-  {
-    title: 'May Beta 2021',
-    oldNumber: 1912,
-    newNumber: 19689,
-    createdAt: '2021-06-10T11:53:14Z',
-  },
-  {
-    title: 'April Beta 2021',
-    oldNumber: 1433,
-    newNumber: 19688,
-    createdAt: '2021-05-05T05:17:27Z',
-  },
-]
+import changelogProductTags from '~/data/changelog-product-tags.json'
+
+import { CHANGE_TYPE_LABELS } from './changelog-entries-core.mjs'
+import type { ChangelogEntry, ChangeType } from './changelog-repo'
+
+export type ChangelogTimelineIndexItem = {
+  slug: string
+  title: string
+  summary: string
+  sortDate: string
+  changeType: ChangeType
+  affectedProducts: string[]
+  productStage: string | null
+  affectsSelfHosted: boolean | null
+}
+
+export function toChangelogTimelineIndexItem(entry: ChangelogEntry): ChangelogTimelineIndexItem {
+  return {
+    slug: entry.slug,
+    title: entry.frontmatter.title,
+    summary: entry.summary,
+    sortDate: entry.sortDate,
+    changeType: entry.frontmatter.change_type,
+    affectedProducts: entry.frontmatter.affected_products ?? [],
+    productStage: entry.frontmatter.product_stage ?? null,
+    affectsSelfHosted: entry.frontmatter.affects_self_hosted ?? null,
+  }
+}
+
+/** Strips inline markdown from a title for plain-text contexts (`<title>`, meta, Open Graph). */
+export function stripTitleMarkdown(title: string) {
+  return title
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1') // links / images
+    .replace(/(\*\*|__)(.*?)\1/g, '$2')
+    .replace(/(\*|_)(.*?)\1/g, '$2')
+    .replace(/~~(.*?)~~/g, '$1')
+    .replace(/`+([^`]*)`+/g, '$1') // inline code
+    .trim()
+}
+
+const CHANGE_TYPE_BADGE_VARIANT: Record<
+  ChangeType,
+  'default' | 'warning' | 'success' | 'destructive'
+> = {
+  'breaking-change': 'destructive',
+  deprecation: 'warning',
+  'new-feature': 'success',
+  improvement: 'default',
+  'bug-fix': 'warning',
+  security: 'destructive',
+  policy: 'default',
+}
+
+export const CHANGE_TYPE_DISPLAY: Record<
+  ChangeType,
+  { label: string; badgeVariant: 'default' | 'warning' | 'success' | 'destructive' }
+> = Object.fromEntries(
+  (Object.keys(CHANGE_TYPE_LABELS) as ChangeType[]).map((type) => [
+    type,
+    { label: CHANGE_TYPE_LABELS[type], badgeVariant: CHANGE_TYPE_BADGE_VARIANT[type] },
+  ])
+) as Record<
+  ChangeType,
+  { label: string; badgeVariant: 'default' | 'warning' | 'success' | 'destructive' }
+>
+
+/** Internal changelog index URL with preselected tag filter (nuqs `tags` param). */
+export function changelogTagFilterUrl(productSlug: string) {
+  return `/changelog?tags=${encodeURIComponent(productSlug.toLowerCase())}`
+}
+
+/** Internal changelog index URL with preselected change-type filter (nuqs `types` param). */
+export function changelogTypeFilterUrl(changeType: ChangeType) {
+  return `/changelog?types=${encodeURIComponent(changeType)}`
+}
+
+export const CHANGE_TYPES = Object.keys(CHANGE_TYPE_DISPLAY) as ChangeType[]
+
+export const CHANGELOG_PRODUCT_TAGS = changelogProductTags as Array<{
+  slug: string
+  label: string
+}>
+
+const CHANGELOG_PRODUCT_SLUG_SET = new Set<string>(CHANGELOG_PRODUCT_TAGS.map((tag) => tag.slug))
+
+export function isChangelogProductSlug(value: string) {
+  return CHANGELOG_PRODUCT_SLUG_SET.has(value)
+}
+
+export function isChangelogChangeType(value: string): value is ChangeType {
+  return Object.prototype.hasOwnProperty.call(CHANGE_TYPE_DISPLAY, value)
+}
+
+/** Matches the `product_stage` enum in supabase/changelog's entry schema. */
+export const CHANGELOG_PRODUCT_STAGES = [
+  { slug: 'private-alpha', label: 'Private Alpha' },
+  { slug: 'public-alpha', label: 'Public Alpha' },
+  { slug: 'beta', label: 'Beta' },
+  { slug: 'public-beta', label: 'Public Beta' },
+  { slug: 'general-availability', label: 'General Availability' },
+] as const
+
+const CHANGELOG_PRODUCT_STAGE_SLUG_SET = new Set<string>(
+  CHANGELOG_PRODUCT_STAGES.map((stage) => stage.slug)
+)
+
+export function isChangelogProductStageSlug(value: string) {
+  return CHANGELOG_PRODUCT_STAGE_SLUG_SET.has(value)
+}
+
+function productStageToSlug(productStage: string) {
+  return productStage.toLowerCase().replace(/\s+/g, '-')
+}
+
+export const CHANGELOG_SELF_HOSTED_OPTIONS = [
+  { slug: 'yes', label: 'Affects self-hosted' },
+  { slug: 'no', label: "Doesn't affect self-hosted" },
+] as const
+
+const CHANGELOG_SELF_HOSTED_SLUG_SET = new Set<string>(
+  CHANGELOG_SELF_HOSTED_OPTIONS.map((option) => option.slug)
+)
+
+export function isChangelogSelfHostedSlug(value: string) {
+  return CHANGELOG_SELF_HOSTED_SLUG_SET.has(value)
+}
+
+export function itemMatchesChangelogSearch(item: ChangelogTimelineIndexItem, query: string) {
+  const normalizedQuery = query.trim().toLowerCase()
+  if (!normalizedQuery) return true
+  if (item.title.toLowerCase().includes(normalizedQuery)) return true
+  return item.affectedProducts.some((product) => product.toLowerCase().includes(normalizedQuery))
+}
+
+export function itemMatchesChangelogSelectedTags(
+  item: ChangelogTimelineIndexItem,
+  selectedTags: Set<string>
+) {
+  if (selectedTags.size === 0) return true
+  const productSlugs = new Set(item.affectedProducts.map((product) => product.toLowerCase()))
+  for (const slug of selectedTags) {
+    if (productSlugs.has(slug.toLowerCase())) return true
+  }
+  return false
+}
+
+export function itemMatchesChangelogSelectedTypes(
+  item: ChangelogTimelineIndexItem,
+  selectedTypes: Set<ChangeType>
+) {
+  if (selectedTypes.size === 0) return true
+  return selectedTypes.has(item.changeType)
+}
+
+export function itemMatchesChangelogSelectedStages(
+  item: ChangelogTimelineIndexItem,
+  selectedStages: Set<string>
+) {
+  if (selectedStages.size === 0) return true
+  if (!item.productStage) return false
+  return selectedStages.has(productStageToSlug(item.productStage))
+}
+
+export function itemMatchesChangelogSelectedSelfHosted(
+  item: ChangelogTimelineIndexItem,
+  selectedSelfHosted: Set<string>
+) {
+  if (selectedSelfHosted.size === 0) return true
+  const key = item.affectsSelfHosted === true ? 'yes' : 'no'
+  return selectedSelfHosted.has(key)
+}

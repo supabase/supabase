@@ -1,0 +1,156 @@
+---
+title: Layout
+description: Guidelines to create consistent layouts across Studio pages using a set of page components.
+---
+
+Build every Studio page with [PageContainer](../fragments/page-container), optional page chrome ([Page Breadcrumbs](../fragments/page-breadcrumbs), [Page Nav](../fragments/page-nav)), [PageHeader](../fragments/page-header) when you need a title block, and [PageSection](../fragments/page-section). These components handle width, spacing, and content structure so pages feel consistent across the app.
+
+## Core rules
+
+<div className="text-foreground-light">
+
+1. <span className="font-medium text-foreground">Breadcrumbs first.</span> Every page starts with a
+   bordered breadcrumb row (`PageBreadcrumbs`) at the top. Place it as a sibling above `PageHeader`
+   or page content — not inside `PageHeader`.
+2. <span className="font-medium text-foreground">Sub navigation below breadcrumbs.</span> When a
+   page has tabs or section links, place `PageNav` directly under the breadcrumb row, aligned top
+   left. Also a sibling — not inside `PageHeader`.
+3. <span className="font-medium text-foreground">
+     Parent pages with sub navigation stay compact.
+   </span>
+   The parent omits `PageHeader` (no title or description). Breadcrumbs name the parent; child
+   routes render their own `PageHeader` with meta.
+4. <span className="font-medium text-foreground">Pick width by content, not page type.</span>
+
+| Width     | Use when                                                                                   |
+| --------- | ------------------------------------------------------------------------------------------ |
+| `small`   | Settings, forms, and focused configuration (including child pages under a settings parent) |
+| `default` | Lists, tables, and detail pages that stay readable without full viewport width             |
+| `full`    | Dense horizontal content: logs, code, editors, charts, or tables that need the viewport    |
+
+A route can mix widths across child pages (for example, a full-width parent with a `small` settings tab and a `full` logs tab).
+
+5. <span className="font-medium text-foreground">Page header meta is optional.</span> Add
+   `PageHeader` with `PageHeaderMeta` (icon, title, description, aside) only when that context helps
+   the user. Skip it when the work area is self-explanatory (for example, logs with filters and a
+   table).
+6. <span className="font-medium text-foreground">
+     Put actions where the user is already looking.
+   </span>
+
+| Situation                                          | Where actions go                                             |
+| -------------------------------------------------- | ------------------------------------------------------------ |
+| Parent with sub navigation                         | `PageBreadcrumbsActions` on the breadcrumb row               |
+| Child page with `PageHeaderMeta` and no filter row | `PageHeaderAside`                                            |
+| Table or list with a filter/search row             | Right side of that row (not header aside)                    |
+| Simple list with no filter row                     | `PageHeaderAside` or `PageSectionAside`                      |
+| Compact chrome, no meta (for example logs)         | Breadcrumb row **or** in-page controls (filter bar, toolbar) |
+
+7. <span className="font-medium text-foreground">Section titles for multiple sections.</span> When a
+   page has no `PageHeader` title and the content is split into multiple `PageSection`s, use
+   `PageSectionTitle` and `PageSectionDescription` to label each section (see [Page
+   Section](../fragments/page-section)).
+
+</div>
+
+## Patterns
+
+### Settings
+
+Single-column configuration. Use `size="small"` or `size="default"` for both header and container. Group fields with `PageSection`.
+
+<ComponentPreview
+  name="page-layout-settings"
+  description="Settings page with default width"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
+
+Page sub navigation sits below page breadcrumbs.
+
+<ComponentPreview
+  name="page-layout-auth-emails"
+  description="Settings parent with sub navigation and child page headers"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
+
+### List
+
+Collections of objects (tables, triggers, functions). Default to `size="default"`; use `full` when columns need the width.
+
+<ComponentPreview
+  name="page-layout-list"
+  description="List with filters — actions aligned with the filter row"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
+
+<ComponentPreview
+  name="page-layout-list-simple"
+  description="Simple list without filters — actions in PageHeaderAside"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
+
+### Detail
+
+Dense content split into sections. Use `size="default"` and `PageSection` with `orientation="horizontal"` where a summary sits beside content.
+
+<ComponentPreview
+  name="page-layout-detail"
+  description="Detail page with horizontal sections"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
+
+### Full width
+
+Logs, code, editors, and other dense views. Use `size="full"`. Keep the top compact: breadcrumbs, optional breadcrumb-row actions, then sub navigation when needed. Omit `PageHeader` when there is no title block. Page-level actions live on the breadcrumb row or in the content (filter bar, toolbar).
+
+<ComponentPreview
+  name="page-layout-full-width"
+  description="Full-width logs layout without page title or description"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
+
+### Parent with mixed child widths
+
+Some parents are full width because a child needs it. The parent chrome stays compact (breadcrumbs, actions, sub navigation). Each child picks its own container width: overview charts in `full`, settings in `small`, logs and code in `full` without extra outer padding.
+
+<ComponentPreview
+  name="page-layout-edge-function"
+  description="Full-width parent with small and full child containers"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
+
+## Components
+
+- **[Page Breadcrumbs](../fragments/page-breadcrumbs)** — full-width breadcrumb row
+- **[Page Nav](../fragments/page-nav)** — full-width sub-navigation row
+- **[Page Container](../fragments/page-container)** — max-width and padding (`small`, `default`, `full`, …)
+- **[Page Header](../fragments/page-header)** — optional title block (meta, icon, aside)
+- **[Page Section](../fragments/page-section)** — titled content blocks and section-level actions

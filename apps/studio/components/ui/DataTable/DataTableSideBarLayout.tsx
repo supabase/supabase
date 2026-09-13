@@ -1,6 +1,6 @@
 import { CSSProperties, ReactNode, useMemo } from 'react'
-
 import { cn } from 'ui'
+
 import { useDataTable } from './providers/DataTableProvider'
 
 interface DataTableSideBarLayoutProps {

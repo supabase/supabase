@@ -1,13 +1,13 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
-import { organizationKeys } from './keys'
+import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
+
+import { organizationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrganizationInviteTokenVariables = { slug?: string; token?: string }
 
-export type OrganizationInviteByToken = components['schemas']['InvitationByTokenResponse']
+export type OrganizationInviteByToken = components['schemas']['InvitationByTokenResponse_Output']
 
 export async function getOrganizationInviteByToken(
   { slug, token }: OrganizationInviteTokenVariables,
@@ -33,14 +33,12 @@ export const useOrganizationInvitationTokenQuery = <TData = OrganizationInviteTo
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrganizationInviteTokenData, OrganizationInviteTokenError, TData> = {}
+  }: UseCustomQueryOptions<OrganizationInviteTokenData, OrganizationInviteTokenError, TData> = {}
 ) => {
-  return useQuery<OrganizationInviteTokenData, OrganizationInviteTokenError, TData>(
-    organizationKeys.token(slug, token),
-    ({ signal }) => getOrganizationInviteByToken({ slug, token }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined' && typeof token !== 'undefined',
-      ...options,
-    }
-  )
+  return useQuery<OrganizationInviteTokenData, OrganizationInviteTokenError, TData>({
+    queryKey: organizationKeys.token(slug, token),
+    queryFn: ({ signal }) => getOrganizationInviteByToken({ slug, token }, signal),
+    enabled: enabled && typeof slug !== 'undefined' && typeof token !== 'undefined',
+    ...options,
+  })
 }

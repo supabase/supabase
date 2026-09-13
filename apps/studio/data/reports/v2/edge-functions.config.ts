@@ -1,20 +1,32 @@
 import dayjs from 'dayjs'
 
+import { ReportConfig } from './reports.types'
+import {
+  extractStatusCodesFromData,
+  generateStatusCodeAttributes,
+  transformStatusCodeData,
+} from '@/components/interfaces/Reports/Reports.utils'
+import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
+import { SelectFilters } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import {
   isUnixMicro,
   unixMicroToIsoTimestamp,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
-import type { AnalyticsInterval } from 'data/analytics/constants'
-import { get } from 'data/fetchers'
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { millisecondFormatter } from '@/components/ui/Charts/Charts.utils'
+import type { AnalyticsInterval } from '@/data/analytics/constants'
+import {
+  analyticsLiteral,
+  joinSqlFragments,
+  safeSql,
+  type SafeLogSqlFragment,
+} from '@/data/logs/safe-analytics-sql'
 import {
   analyticsIntervalToGranularity,
-  REPORT_STATUS_CODE_COLORS,
-} from 'data/reports/report.utils'
-import { getHttpStatusCodeInfo } from 'lib/http-status-codes'
-import { ReportConfig } from './reports.types'
-import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
-import { SelectFilters } from 'components/interfaces/Reports/v2/ReportsSelectFilter'
-import { fetchLogs } from 'data/reports/report.utils'
+  fetchLogs,
+  SAFE_COMPARISON_OPERATOR_SQL,
+  SAFE_GRANULARITY_SQL,
+  type Granularity,
+} from '@/data/reports/report.utils'
 
 type EdgeFunctionReportFilters = {
   status_code: NumericFilter | null
@@ -23,44 +35,48 @@ type EdgeFunctionReportFilters = {
   functions: SelectFilters
 }
 
-export function filterToWhereClause(filters?: EdgeFunctionReportFilters): string {
-  const whereClauses: string[] = []
+export function filterToWhereClause(filters?: EdgeFunctionReportFilters): SafeLogSqlFragment {
+  const whereClauses: SafeLogSqlFragment[] = []
 
   if (filters?.functions && filters.functions.length > 0) {
-    whereClauses.push(`function_id IN (${filters.functions.map((id) => `'${id}'`).join(',')})`)
+    const ids = joinSqlFragments(filters.functions.map(analyticsLiteral), ',')
+    whereClauses.push(safeSql`function_id IN (${ids})`)
   }
 
   if (filters?.status_code) {
+    const op = SAFE_COMPARISON_OPERATOR_SQL[filters.status_code.operator]
     whereClauses.push(
-      `response.status_code ${filters.status_code.operator} ${filters.status_code.value}`
+      safeSql`response.status_code ${op} ${analyticsLiteral(filters.status_code.value)}`
     )
   }
 
   if (filters?.region && filters.region.length > 0) {
-    whereClauses.push(
-      `h.x_sb_edge_region IN (${filters.region.map((region) => `'${region}'`).join(',')})`
-    )
+    const regions = joinSqlFragments(filters.region.map(analyticsLiteral), ',')
+    whereClauses.push(safeSql`h.x_sb_edge_region IN (${regions})`)
   }
 
   if (filters?.execution_time) {
+    const op = SAFE_COMPARISON_OPERATOR_SQL[filters.execution_time.operator]
     whereClauses.push(
-      `m.execution_time_ms ${filters.execution_time.operator} ${filters.execution_time.value}`
+      safeSql`m.execution_time_ms ${op} ${analyticsLiteral(filters.execution_time.value)}`
     )
   }
 
-  return whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : ''
+  if (whereClauses.length === 0) return safeSql``
+  return safeSql`WHERE ${joinSqlFragments(whereClauses, ' AND ')}`
 }
 
 const METRIC_SQL: Record<
   string,
-  (interval: AnalyticsInterval, filters?: EdgeFunctionReportFilters) => string
+  (interval: AnalyticsInterval, filters?: EdgeFunctionReportFilters) => SafeLogSqlFragment
 > = {
   TotalInvocations: (interval, filters) => {
+    const granularity = SAFE_GRANULARITY_SQL[analyticsIntervalToGranularity(interval)]
     const whereClause = filterToWhereClause(filters)
-    return `
+    return safeSql`
 --edgefn-report-invocations
 select
-  timestamp_trunc(timestamp, ${analyticsIntervalToGranularity(interval)}) as timestamp,
+  timestamp_trunc(timestamp, ${granularity}) as timestamp,
   function_id,
   count(*) as count
 from
@@ -78,11 +94,12 @@ order by
 `
   },
   ExecutionStatusCodes: (interval, filters) => {
+    const granularity = SAFE_GRANULARITY_SQL[analyticsIntervalToGranularity(interval)]
     const whereClause = filterToWhereClause(filters)
-    return `
+    return safeSql`
 --edgefn-report-execution-status-codes
 select
-  timestamp_trunc(timestamp, ${analyticsIntervalToGranularity(interval)}) as timestamp,
+  timestamp_trunc(timestamp, ${granularity}) as timestamp,
   response.status_code as status_code,
   count(response.status_code) as count
 from
@@ -99,14 +116,14 @@ order by
 `
   },
   InvocationsByRegion: (interval, filters) => {
-    const granularity = analyticsIntervalToGranularity(interval)
+    const granularity = SAFE_GRANULARITY_SQL[analyticsIntervalToGranularity(interval)]
     const whereClause = filterToWhereClause(filters)
-    const hasWhere = whereClause.includes('WHERE')
-    const regionCondition = hasWhere
-      ? 'AND h.x_sb_edge_region is not null'
-      : 'WHERE h.x_sb_edge_region is not null'
+    const regionCondition =
+      whereClause.length > 0
+        ? safeSql`AND h.x_sb_edge_region is not null`
+        : safeSql`WHERE h.x_sb_edge_region is not null`
 
-    return `
+    return safeSql`
 --edgefn-report-invocations-by-region
 select
   timestamp_trunc(timestamp, ${granularity}) as timestamp,
@@ -127,10 +144,10 @@ order by
 `
   },
   ExecutionTime: (interval, filters) => {
-    const granularity = analyticsIntervalToGranularity(interval)
+    const granularity = SAFE_GRANULARITY_SQL[analyticsIntervalToGranularity(interval)]
     const whereClause = filterToWhereClause(filters)
 
-    return `
+    return safeSql`
 --edgefn-report-execution-time
 select
   timestamp_trunc(timestamp, ${granularity}) as timestamp,
@@ -152,47 +169,120 @@ order by
   },
 }
 
-export function extractStatusCodesFromData(data: any[]): string[] {
-  const statusCodes = new Set<string>()
-
-  data.forEach((item: any) => {
-    if (item.status_code) {
-      statusCodes.add(String(item.status_code))
-    }
-  })
-
-  return Array.from(statusCodes).sort()
+// fillTimeseries/isUnixMicro expects a 16-digit unix-microsecond timestamp, matching BigQuery's timestamp_trunc.
+const OTEL_TIMESTAMP: Record<Granularity, SafeLogSqlFragment> = {
+  minute: safeSql`toUnixTimestamp(toStartOfMinute(timestamp)) * 1000000`,
+  hour: safeSql`toUnixTimestamp(toStartOfHour(timestamp)) * 1000000`,
+  day: safeSql`toUnixTimestamp(toStartOfDay(timestamp)) * 1000000`,
 }
 
-export function generateStatusCodeAttributes(statusCodes: string[]) {
-  return statusCodes.map((code) => ({
-    attribute: code,
-    label: `${code} ${getHttpStatusCodeInfo(parseInt(code)).label}`,
-    color: REPORT_STATUS_CODE_COLORS[code] || REPORT_STATUS_CODE_COLORS.default,
-  }))
+function filterToWhereClauseOtel(filters?: EdgeFunctionReportFilters): SafeLogSqlFragment {
+  const whereClauses: SafeLogSqlFragment[] = [safeSql`source = 'function_edge_logs'`]
+
+  if (filters?.functions && filters.functions.length > 0) {
+    const ids = joinSqlFragments(filters.functions.map(analyticsLiteral), ',')
+    whereClauses.push(safeSql`log_attributes['function_id'] IN (${ids})`)
+  }
+
+  if (filters?.status_code) {
+    const op = SAFE_COMPARISON_OPERATOR_SQL[filters.status_code.operator]
+    whereClauses.push(
+      safeSql`toInt32OrZero(log_attributes['response.status_code']) ${op} ${analyticsLiteral(filters.status_code.value)}`
+    )
+  }
+
+  if (filters?.region && filters.region.length > 0) {
+    const regions = joinSqlFragments(filters.region.map(analyticsLiteral), ',')
+    whereClauses.push(safeSql`log_attributes['response.headers.x_sb_edge_region'] IN (${regions})`)
+  }
+
+  if (filters?.execution_time) {
+    const op = SAFE_COMPARISON_OPERATOR_SQL[filters.execution_time.operator]
+    whereClauses.push(
+      safeSql`toFloat64OrZero(log_attributes['execution_time_ms']) ${op} ${analyticsLiteral(filters.execution_time.value)}`
+    )
+  }
+
+  return safeSql`WHERE ${joinSqlFragments(whereClauses, ' AND ')}`
 }
 
-/**
- * Converts a list of { timestamp, status_code, count }
- * to a list of { timestamp, [status_code]: count }
- * That we can pass to the chart for rendering
- */
-export function transformStatusCodeData(data: any[], statusCodes: string[]) {
-  const pivotedData = data.reduce((acc: Record<string, any>, d: any) => {
-    const timestamp = isUnixMicro(d.timestamp)
-      ? unixMicroToIsoTimestamp(d.timestamp)
-      : dayjs.utc(d.timestamp).toISOString()
-    if (!acc[timestamp]) {
-      acc[timestamp] = { timestamp }
-      statusCodes.forEach((code) => {
-        acc[timestamp][code] = 0
-      })
-    }
-    acc[timestamp][d.status_code] = d.count
-    return acc
-  }, {})
-
-  return Object.values(pivotedData)
+export const METRIC_SQL_OTEL: Record<
+  string,
+  (interval: AnalyticsInterval, filters?: EdgeFunctionReportFilters) => SafeLogSqlFragment
+> = {
+  TotalInvocations: (interval, filters) => {
+    const ts = OTEL_TIMESTAMP[analyticsIntervalToGranularity(interval)]
+    const whereClause = filterToWhereClauseOtel(filters)
+    return safeSql`
+--edgefn-report-invocations (otel)
+select
+  ${ts} as timestamp,
+  log_attributes['function_id'] as function_id,
+  count() as count
+from logs
+${whereClause}
+group by
+  timestamp,
+  function_id
+order by
+  timestamp desc
+`
+  },
+  ExecutionStatusCodes: (interval, filters) => {
+    const ts = OTEL_TIMESTAMP[analyticsIntervalToGranularity(interval)]
+    const whereClause = filterToWhereClauseOtel(filters)
+    return safeSql`
+--edgefn-report-execution-status-codes (otel)
+select
+  ${ts} as timestamp,
+  toInt32OrZero(log_attributes['response.status_code']) as status_code,
+  count() as count
+from logs
+${whereClause}
+group by
+  timestamp,
+  status_code
+order by
+  timestamp desc
+`
+  },
+  InvocationsByRegion: (interval, filters) => {
+    const ts = OTEL_TIMESTAMP[analyticsIntervalToGranularity(interval)]
+    const whereClause = filterToWhereClauseOtel(filters)
+    return safeSql`
+--edgefn-report-invocations-by-region (otel)
+select
+  ${ts} as timestamp,
+  log_attributes['response.headers.x_sb_edge_region'] as region,
+  count() as count
+from logs
+${whereClause}
+  AND log_attributes['response.headers.x_sb_edge_region'] != ''
+group by
+  timestamp,
+  region
+order by
+  timestamp desc
+`
+  },
+  ExecutionTime: (interval, filters) => {
+    const ts = OTEL_TIMESTAMP[analyticsIntervalToGranularity(interval)]
+    const whereClause = filterToWhereClauseOtel(filters)
+    return safeSql`
+--edgefn-report-execution-time (otel)
+select
+  ${ts} as timestamp,
+  log_attributes['function_id'] as function_id,
+  avg(toFloat64OrZero(log_attributes['execution_time_ms'])) as avg_execution_time
+from logs
+${whereClause}
+group by
+  timestamp,
+  function_id
+order by
+  timestamp desc
+`
+  },
 }
 
 /**
@@ -236,6 +326,7 @@ export const edgeFunctionReports = ({
   endDate,
   interval,
   filters,
+  useOtel = false,
 }: {
   projectRef: string
   functions: { id: string; name: string }[]
@@ -243,6 +334,7 @@ export const edgeFunctionReports = ({
   endDate: string
   interval: AnalyticsInterval
   filters: EdgeFunctionReportFilters
+  useOtel?: boolean
 }): ReportConfig<EdgeFunctionReportFilters>[] => [
   {
     id: 'total-invocations',
@@ -255,10 +347,9 @@ export const edgeFunctionReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function invocations over time.',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
     dataProvider: async () => {
-      const sql = METRIC_SQL.TotalInvocations(interval, filters)
-      const response = await fetchLogs(projectRef, sql, startDate, endDate)
+      const sql = (useOtel ? METRIC_SQL_OTEL : METRIC_SQL).TotalInvocations(interval, filters)
+      const response = await fetchLogs(projectRef, sql, startDate, endDate, useOtel)
 
       if (!response?.result) return { data: [] }
 
@@ -287,10 +378,9 @@ export const edgeFunctionReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function executions by status code.',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
     dataProvider: async () => {
-      const sql = METRIC_SQL.ExecutionStatusCodes(interval, filters)
-      const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
+      const sql = (useOtel ? METRIC_SQL_OTEL : METRIC_SQL).ExecutionStatusCodes(interval, filters)
+      const rawData = await fetchLogs(projectRef, sql, startDate, endDate, useOtel)
 
       if (!rawData?.result) return { data: [] }
 
@@ -319,15 +409,14 @@ export const edgeFunctionReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'Average execution time for edge functions.',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
     YAxisProps: {
-      width: 50,
-      tickFormatter: (value: number) => `${value}ms`,
+      width: 68,
+      tickFormatter: (value: number) => millisecondFormatter(value),
     },
-    format: (value: unknown) => `${Number(value).toFixed(0)}ms`,
+    format: (value: unknown) => millisecondFormatter(Number(value)),
     dataProvider: async () => {
-      const sql = METRIC_SQL.ExecutionTime(interval, filters)
-      const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
+      const sql = (useOtel ? METRIC_SQL_OTEL : METRIC_SQL).ExecutionTime(interval, filters)
+      const rawData = await fetchLogs(projectRef, sql, startDate, endDate, useOtel)
 
       if (!rawData?.result) return { data: [] }
 
@@ -381,10 +470,11 @@ export const edgeFunctionReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function invocations by region.',
-    availableIn: ['pro', 'team', 'enterprise'],
+    entitlement: 'edge_functions',
+    requiredPlan: 'Pro',
     dataProvider: async () => {
-      const sql = METRIC_SQL.InvocationsByRegion(interval, filters)
-      const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
+      const sql = (useOtel ? METRIC_SQL_OTEL : METRIC_SQL).InvocationsByRegion(interval, filters)
+      const rawData = await fetchLogs(projectRef, sql, startDate, endDate, useOtel)
       const data = rawData.result?.map((point: any) => ({
         ...point,
         timestamp: isUnixMicro(point.timestamp)

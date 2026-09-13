@@ -30,13 +30,13 @@ Supabase provides several [tools](https://github.com/supabase-community/firebase
    }
    ```
 
-1. On your project dashboard, click [Connect](/dashboard/project/_?showConnect=true)
+1. On your project dashboard, click [Connect](/dashboard/project/_?showConnect=true&method=session)
 1. Under the Session pooler, click on the View parameters under the connect string. Replace the `Host` and `User` fields with the values shown.
 1. Enter the password you used when you created your Supabase project in the `password` entry in the `supabase-service.json` file.
 
 ## Generate a Firebase private key [#generate-firebase-private-key]
 
-1. Log in to your [Firebase Console](https://console.firebase.google.com/project) and open your project.
+1. Sign in to your [Firebase Console](https://console.firebase.google.com/project) and open your project.
 1. Click the gear icon next to **Project Overview** in the sidebar and select **Project Settings**.
 1. Click **Service Accounts** and select **Firebase Admin SDK**.
 1. Click **Generate new private key**.
@@ -44,7 +44,7 @@ Supabase provides several [tools](https://github.com/supabase-community/firebase
 
 ## Save your Firebase password hash parameters [#save-firebase-hash-parameters]
 
-1. Log in to your [Firebase Console](https://console.firebase.google.com/project) and open your project.
+1. Sign in to your [Firebase Console](https://console.firebase.google.com/project) and open your project.
 1. Select **Authentication** (Build section) in the sidebar.
 1. Select **Users** in the top menu.
 1. At the top right of the users list, open the menu (3 dots) and click **Password hash parameters**.
@@ -83,8 +83,8 @@ For more advanced migrations, including the use of a middleware server component
 ## Resources
 
 - [Supabase vs Firebase](/alternatives/supabase-vs-firebase)
-- [Firestore Data Migration](/docs/guides/migrations/firestore-data)
-- [Firestore Storage Migration](/docs/guides/migrations/firebase-storage)
+- [Firestore Data Migration](/docs/guides/platform/migrating-to-supabase/firestore-data)
+- [Firestore Storage Migration](/docs/guides/platform/migrating-to-supabase/firebase-storage)
 
 ## Migrate to Supabase
 

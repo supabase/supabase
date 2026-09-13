@@ -1,62 +1,60 @@
-import { writeFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
 import { globby } from 'globby'
 import prettier from 'prettier'
 
-/*
- * kudos to leerob from vercel
- * https://leerob.io/blog/nextjs-sitemap-robots
- */
+import { parseFrontmatter } from '../lib/frontmatter.mjs'
 
-// Constants for CMS integration
-const CMS_SITE_ORIGIN =
-  process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
-    ? 'https://cms.supabase.com'
-    : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL &&
-        typeof process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL === 'string'
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL?.replace('zone-www-dot-com-git-', 'cms-git-')}`
-      : 'http://localhost:3030'
-const CMS_API_KEY = process.env.CMS_API_KEY
+const DATED_COLLECTIONS = ['_blog/', '_alternatives/', '_customers/']
+const ISO_DATE_SHAPE =
+  /^(\d{4}-\d{2}-\d{2})(?:T(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|[+-](?:[01]\d|2[0-3]):?[0-5]\d)?)?$/
+const RSS_PUB_DATE_SHAPE =
+  /^[A-Z][a-z]{2}, \d{2} [A-Z][a-z]{2} \d{4} \d{2}:\d{2}:\d{2} (?:[+-]\d{4}|GMT|UTC)$/
 
-/**
- * Get CMS blog posts for sitemap
- */
-const getCMSBlogPosts = async () => {
-  try {
-    const response = await fetch(
-      `${CMS_SITE_ORIGIN}/api/posts?depth=0&draft=false&where[_status][equals]=published&limit=1000`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          ...(CMS_API_KEY && { Authorization: `Bearer ${CMS_API_KEY}` }),
-        },
-      }
-    )
+function lastmodError(source, value, hint = '') {
+  return new Error(
+    `${source}: cannot derive lastmod from date value ${JSON.stringify(value)}${hint}`
+  )
+}
 
-    if (!response.ok) {
-      console.warn(`[getCMSBlogPosts] HTTP error! status: ${response.status}`)
-      return []
-    }
-
-    const contentType = response.headers.get('content-type') || ''
-    if (!contentType.toLowerCase().includes('application/json')) {
-      console.warn(`[getCMSBlogPosts] Non-JSON response from CMS`)
-      return []
-    }
-
-    const data = await response.json()
-
-    const posts = data.docs
-      .filter((post) => post.slug && post.title && post._status === 'published')
-      .map((post) => ({
-        slug: post.slug,
-        updatedAt: post.updatedAt || new Date().toISOString(),
-      }))
-
-    return posts
-  } catch (error) {
-    console.warn('Error fetching CMS blog posts for sitemap:', error)
-    return []
+function toIsoDate(value, source) {
+  if (typeof value !== 'string') throw lastmodError(source, value)
+  const match = ISO_DATE_SHAPE.exec(value)
+  if (!match) throw lastmodError(source, value)
+  const candidate = match[1]
+  const roundTrip = new Date(`${candidate}T00:00:00Z`)
+  if (Number.isNaN(roundTrip.getTime()) || roundTrip.toISOString().slice(0, 10) !== candidate) {
+    throw lastmodError(source, value, '; not a real calendar day')
   }
+  return candidate
+}
+
+function contentLastmod(filePath) {
+  const { data } = parseFrontmatter(readFileSync(filePath, 'utf-8'))
+  const published = data.date == null ? undefined : toIsoDate(data.date, filePath)
+  const updated = data.updated == null ? undefined : toIsoDate(data.updated, filePath)
+  if (published && updated && updated < published) {
+    throw lastmodError(filePath, data.updated, '; updated is earlier than date')
+  }
+  return updated ?? published
+}
+
+function changelogLastmod(pubDate, link) {
+  const source = `changelog-rss ${link}`
+  if (!RSS_PUB_DATE_SHAPE.test(pubDate)) throw lastmodError(source, pubDate)
+  const instant = new Date(pubDate)
+  if (Number.isNaN(instant.getTime())) throw lastmodError(source, pubDate)
+  return instant.toISOString().slice(0, 10)
+}
+
+function urlEntry(loc, lastmod) {
+  return `
+        <url>
+            <loc>${loc}</loc>
+            ${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}
+            <changefreq>weekly</changefreq>
+            <priority>0.5</priority>
+        </url>
+      `
 }
 
 async function generate() {
@@ -67,27 +65,22 @@ async function generate() {
     'pages/*.tsx',
     'pages/*.mdx',
     'pages/**/*.tsx',
-    'data/**/*.mdx',
     '_blog/*.mdx',
     '_case-studies/*.mdx',
     '_customers/*.mdx',
     '_events/*.mdx',
     '_alternatives/*.mdx',
-    '!data/*.mdx',
     '!pages/_*.js',
     '!pages/_*.tsx',
     '!pages/api',
     '!pages/404.tsx',
     '.next/server/pages/partners/integrations/*.html',
+    '.next/server/pages/partners/catalog/*.html',
     '.next/server/pages/partners/experts/*.html',
     '.next/server/pages/features/*.html',
   ])
 
   const pages = unsortedPages.sort((a, b) => a.localeCompare(b))
-
-  // Fetch CMS blog posts
-  const cmsBlogPosts = await getCMSBlogPosts()
-  console.log(`Found ${cmsBlogPosts.length} CMS blog posts for sitemap`)
 
   const blogUrl = 'blog'
   const caseStudiesUrl = 'case-studies'
@@ -99,7 +92,7 @@ async function generate() {
     .map((page) => {
       const path = page
         .replace('.next/server/pages', '')
-        .replace('pages', '')
+        .replace(/^pages/, '')
         .replace('.html', '')
         // add a `/` for blog posts
         .replace('_blog', `/${blogUrl}`)
@@ -123,8 +116,10 @@ async function generate() {
       if (route === '/blog/categories/[category]') return null
       if (route === '/partners/experts/[slug]') return null
       if (route === '/partners/integrations/[slug]') return null
+      if (route === '/partners/catalog/[slug]') return null
       if (route === '/launch-week/ticket-image') return null
       if (route === '/launch-week/tickets/[username]') return null
+      if (route === '/changelog/[slug]') return null
 
       /**
        * Blog based urls
@@ -166,33 +161,42 @@ async function generate() {
         route = `/${eventsUrl}/` + substring
       }
 
-      return `
-        <url>
-            <loc>${`https://supabase.com${route}`}</loc>
-            <changefreq>weekly</changefreq>
-            <priority>0.5</priority>
-        </url>
-      `
+      const lastmod = DATED_COLLECTIONS.some((prefix) => page.startsWith(prefix))
+        ? contentLastmod(page)
+        : undefined
+
+      return urlEntry(`https://supabase.com${route}`, lastmod)
     })
     .filter(Boolean)
 
-  // Generate URLs for CMS blog posts
-  const cmsBlogUrls = cmsBlogPosts.map((post) => {
-    const lastmod = new Date(post.updatedAt).toISOString().split('T')[0]
-    return `
-      <url>
-          <loc>https://supabase.com/blog/${post.slug}</loc>
-          <lastmod>${lastmod}</lastmod>
-          <changefreq>weekly</changefreq>
-          <priority>0.7</priority>
-      </url>
-    `
-  })
+  // Changelog detail pages are dynamic routes; include them from generated changelog RSS links.
+  const changelogDetailUrls = (() => {
+    let rss
+    try {
+      rss = readFileSync('public/changelog-rss.xml', 'utf-8')
+    } catch {
+      return []
+    }
+
+    const lastmodByUrl = new Map()
+    for (const [, item] of rss.matchAll(/<item>([\s\S]*?)<\/item>/g)) {
+      const link = item.match(/<link>(https:\/\/supabase\.com\/changelog\/[^<]+)<\/link>/)?.[1]
+      if (!link || lastmodByUrl.has(link)) continue
+      const pubDate = item.match(/<pubDate>([^<]*)<\/pubDate>/)?.[1]
+      lastmodByUrl.set(link, pubDate ? changelogLastmod(pubDate, link) : undefined)
+    }
+
+    return [...lastmodByUrl].map(([url, lastmod]) => urlEntry(url, lastmod))
+  })()
+
+  // /evals is a separate app proxied onto supabase.com via a rewrite in lib/rewrites.js,
+  // so it has no page file for the globs above to find. Hardcode it here.
+  const proxiedAppUrls = [urlEntry('https://supabase.com/evals')]
 
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-        ${[...staticUrls, ...cmsBlogUrls].join('')}
+        ${[...staticUrls, ...changelogDetailUrls, ...proxiedAppUrls].join('')}
     </urlset>
     `
 
@@ -220,9 +224,7 @@ async function generate() {
   /**
    * write sitemaps
    */
-  // eslint-disable-next-line no-sync
   writeFileSync('public/sitemap.xml', sitemapRouter)
-  // eslint-disable-next-line no-sync
   writeFileSync('public/sitemap_www.xml', formatted)
 }
 

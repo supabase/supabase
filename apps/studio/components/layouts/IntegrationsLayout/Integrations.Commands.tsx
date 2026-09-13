@@ -1,25 +1,24 @@
 import { useParams } from 'common'
-import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
+import type { CommandOptions } from 'ui-patterns/CommandMenu'
+import { useRegisterCommands } from 'ui-patterns/CommandMenu'
+
+import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { orderCommandSectionsByPriority } from '@/components/interfaces/App/CommandMenu/ordering'
 import {
   IntegrationDefinition,
   INTEGRATIONS,
-} from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { CommandOptions } from 'ui-patterns/CommandMenu'
-import { useRegisterCommands } from 'ui-patterns/CommandMenu'
+} from '@/components/interfaces/Integrations/Landing/Integrations.constants'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export function useIntegrationsGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
   ref ||= '_'
 
-  const { integrationsShowStripeWrapper } = useIsFeatureEnabled([
-    'integrations:show_stripe_wrapper',
-  ])
+  const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
 
-  const allIntegrations = integrationsShowStripeWrapper
+  const allIntegrations = integrationsWrappers
     ? INTEGRATIONS
-    : INTEGRATIONS.filter((x) => x.id !== 'stripe_wrapper')
+    : INTEGRATIONS.filter((x) => !x.id.endsWith('_wrapper'))
 
   const getName = (integration: IntegrationDefinition) => {
     switch (integration.id) {
@@ -56,7 +55,7 @@ export function useIntegrationsGotoCommands(options?: CommandOptions) {
         name: getName(x),
         route: `/project/${ref}/integrations/${x.id}/overview`,
         icon: () => (
-          <div className="w-6 h-6 relative bg-white border rounded-md flex items-center justify-center [&>img]:!p-1 [&>svg]:!p-1">
+          <div className="w-6 h-6 relative bg-white border rounded-md flex items-center justify-center [&>img]:p-1! [&>svg]:p-1!">
             {x.icon()}
           </div>
         ),

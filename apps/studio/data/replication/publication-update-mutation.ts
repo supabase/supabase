@@ -1,0 +1,67 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { components } from 'api-types'
+import { toast } from 'sonner'
+
+import { replicationKeys } from './keys'
+import { handleError, put } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+export type UpdatePublicationParams = {
+  projectRef: string
+  sourceId: number
+  publicationName: string
+  config: components['schemas']['PutPublicationBody']
+}
+
+async function updatePublication(
+  { projectRef, sourceId, publicationName, config }: UpdatePublicationParams,
+  signal?: AbortSignal
+) {
+  if (!projectRef) throw new Error('projectRef is required')
+
+  const { data, error } = await put(
+    '/platform/replication/v2/{ref}/sources/{source_id}/publications/{publication_name}',
+    {
+      params: { path: { ref: projectRef, source_id: sourceId, publication_name: publicationName } },
+      body: config,
+      signal,
+    }
+  )
+  if (error) {
+    handleError(error)
+  }
+
+  return data
+}
+
+type UpdatePublicationData = Awaited<ReturnType<typeof updatePublication>>
+
+export const useUpdatePublicationMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<UpdatePublicationData, ResponseError, UpdatePublicationParams>,
+  'mutationFn'
+> = {}) => {
+  const queryClient = useQueryClient()
+
+  return useMutation<UpdatePublicationData, ResponseError, UpdatePublicationParams>({
+    mutationFn: (vars) => updatePublication(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, sourceId } = variables
+      await queryClient.invalidateQueries({
+        queryKey: replicationKeys.publications(projectRef, sourceId),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update publication: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}

@@ -7,14 +7,14 @@ To use Server-Side Rendering (SSR) with Supabase, you need to configure your Sup
 
 ## Install
 
-Install the `@supabase/ssr` and `@supabase/supabase-js` packages:
+Install the `@supabase/supabase-js` and `@supabase/ssr` helper packages:
 
 <Tabs size="small" type="underlined" queryGroup="package-manager" defaultActiveId="npm">
 
 <TabPanel id="npm" label="npm">
 
 ```bash
-npm install @supabase/ssr @supabase/supabase-js
+npm install @supabase/supabase-js @supabase/ssr
 ```
 
 </TabPanel>
@@ -22,7 +22,7 @@ npm install @supabase/ssr @supabase/supabase-js
 <TabPanel id="yarn" label="yarn">
 
 ```bash
-yarn add @supabase/ssr @supabase/supabase-js
+yarn add @supabase/supabase-js @supabase/ssr
 ```
 
 </TabPanel>
@@ -30,7 +30,7 @@ yarn add @supabase/ssr @supabase/supabase-js
 <TabPanel id="pnpm" label="pnpm">
 
 ```bash
-pnpm add @supabase/ssr @supabase/supabase-js
+pnpm add @supabase/supabase-js @supabase/ssr
 ```
 
 </TabPanel>
@@ -39,58 +39,80 @@ pnpm add @supabase/ssr @supabase/supabase-js
 
 ## Set environment variables
 
-In your environment variables file, set your Supabase URL and Supabase Anon Key:
+Create a `.env.local` file in the project root directory. In the file, set the project's Supabase URL and Key:
 
-<ProjectConfigVariables variable="url" />
-<ProjectConfigVariables variable="publishableKey" />
+<$Partial path="api_settings.mdx" variables={{ "framework": "nextjs", "tab": "frameworks" }} />
 
 <Tabs scrollable size="small" type="underlined" defaultActiveId="nextjs" queryGroup="framework">
 
 <TabPanel id="nextjs" label="Next.js">
 
 ```bash .env.local
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_... or anon keyY
+NEXT_PUBLIC_SUPABASE_URL=supabase_project_url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
 ```
 
 </TabPanel>
 <TabPanel id="sveltekit" label="SvelteKit">
 
 ```bash .env.local
-PUBLIC_SUPABASE_URL=your_supabase_project_url
-PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_... or anon keyY
+PUBLIC_SUPABASE_URL=supabase_project_url
+PUBLIC_SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
 ```
 
 </TabPanel>
 <TabPanel id="astro" label="Astro">
 
 ```bash .env
-PUBLIC_SUPABASE_URL=your_supabase_project_url
-PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_... or anon keyY
+PUBLIC_SUPABASE_URL=supabase_project_url
+PUBLIC_SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
 ```
 
 </TabPanel>
 <TabPanel id="remix" label="Remix">
 
 ```bash .env
-SUPABASE_URL=your_supabase_project_url
-SUPABASE_PUBLISHABLE_KEY=sb_publishable_... or anon keyY
+SUPABASE_URL=supabase_project_url
+SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
+```
+
+</TabPanel>
+<TabPanel id="nuxt" label="Nuxt">
+
+```bash .env
+NUXT_PUBLIC_SUPABASE_URL=supabase_project_url
+NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
+```
+
+In `nuxt.config.ts`, map these public env vars into runtime config keys used by the examples below:
+
+```ts nuxt.config.ts
+export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      // These defaults will be overridden by NUXT_PUBLIC_SUPABASE_URL and
+      // NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY environment variables at runtime.
+      supabaseUrl: '',
+      supabasePublishableKey: '',
+    },
+  },
+})
 ```
 
 </TabPanel>
 <TabPanel id="react-router" label="React Router">
 
 ```bash .env
-SUPABASE_URL=your_supabase_project_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_URL=supabase_project_url
+SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
 ```
 
 </TabPanel>
 <TabPanel id="express" label="Express">
 
 ```bash .env
-SUPABASE_URL=your_supabase_project_url
-SUPABASE_PUBLISHABLE_KEY=sb_publishable_... or anon keyY
+SUPABASE_URL=supabase_project_url
+SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
 ```
 
 Install [dotenv](https://www.npmjs.com/package/dotenv):
@@ -133,8 +155,16 @@ pnpm add dotenv
 <TabPanel id="hono" label="Hono">
 
 ```bash .env
-SUPABASE_URL=your_supabase_project_url
-SUPABASE_PUBLISHABLE_KEY=sb_publishable_... or anon keyY
+SUPABASE_URL=supabase_project_url
+SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
+```
+
+</TabPanel>
+<TabPanel id="tanstack" label="TanStack Start">
+
+```bash .env.local
+VITE_SUPABASE_URL=supabase_project_url
+VITE_SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
 ```
 
 </TabPanel>
@@ -142,9 +172,12 @@ SUPABASE_PUBLISHABLE_KEY=sb_publishable_... or anon keyY
 
 ## Create a client
 
-You'll need some one-time setup code to configure your Supabase client to use cookies. Once your utility code is set up, you can use your new `createClient` utility functions to get a properly configured Supabase client.
+{/* TODO: Can this be consolidated? */}
+You need setup code to configure a Supabase client to use cookies. Once you have the utility code, you can use the `createClient` utility functions to get a properly configured Supabase client.
 
 Use the browser client in code that runs on the browser, and the server client in code that runs on the server.
+
+<$Partial path="auth_methods.mdx" />
 
 <Tabs
   scrollable
@@ -155,297 +188,164 @@ Use the browser client in code that runs on the browser, and the server client i
 >
 <TabPanel id="nextjs" label="Next.js">
 
-The following code samples are for App Router. For help with Pages Router, see the [Next.js Server-Side Auth guide](/docs/guides/auth/server-side/nextjs?queryGroups=router&router=pages).
+### Write utility functions to create Supabase clients
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="client-component"
-  queryGroup="environment"
->
-<TabPanel id="client" label="Client-side">
+To access Supabase from a Next.js app, you need 2 types of Supabase clients:
 
-```ts utils/supabase/client.ts
-import { createBrowserClient } from '@supabase/ssr'
+1. **Client Component client** - To access Supabase from Client Components, which run in the browser.
+2. **Server Component client** - To access Supabase from Server Components, Server Actions, and Route Handlers, which run only on the server.
 
-export function createClient() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
-  )
-}
-```
+Since Next.js Server Components can't write cookies, you need a [Proxy](https://nextjs.org/docs/app/getting-started/proxy) to refresh expired Auth tokens and store them.
 
-</TabPanel>
+The Proxy is responsible for:
 
-<TabPanel id="server" label="Server-side">
+1. Refreshing the Auth token by calling `supabase.auth.getClaims()`.
+2. Passing the refreshed Auth token to Server Components, so they don't attempt to refresh the same token themselves. This is accomplished with `request.cookies.set`.
+3. Passing the refreshed Auth token to the browser, so it replaces the old token. This is accomplished with `response.cookies.set`.
 
-```ts utils/supabase/server.ts
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+<$Partial path="auth_methods.mdx" />
 
-export async function createClient() {
-  const cookieStore = await cookies()
+<Accordion>
 
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
-          } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
-          }
-        },
-      },
-    }
-  )
-}
-```
+    <AccordionItem
+      header="What does the `cookies` object do?"
+      id="utility-cookies"
+    >
 
-</TabPanel>
+    The cookies object lets the Supabase client know how to access the cookies, so it can read and write the user session data. To make `@supabase/ssr` framework-agnostic, the cookies methods aren't hard-coded. These utility functions adapt `@supabase/ssr`'s cookie handling for Next.js.
 
-<TabPanel id="middleware" label="Middleware">
+    `setAll` is called whenever the library needs to write cookies, for example after a token refresh. It receives two arguments: the array of cookies to set, and a `headers` object containing cache headers (`Cache-Control`, `Expires`, `Pragma`) that must be applied to the HTTP response to prevent CDNs from caching the response and leaking the session to other users. In the Proxy, apply these headers to the response. In Server Components, the headers cannot be set, which is why the `setAll` call is wrapped in a try/catch and the error is ignored. The Proxy handles writing cookies and headers on every request.
 
-In Next.js, because Server Components cannot set cookies, you'll also need a middleware client to handle cookie refreshes. The middleware should run before every route that needs access to Supabase, or that is protected by Supabase Auth.
+    The cookie is named `sb-<project_ref>-auth-token` by default.
 
-```ts middleware.ts
-import { type NextRequest } from 'next/server'
-import { updateSession } from '@/utils/supabase/middleware'
+    </AccordionItem>
 
-export async function middleware(request: NextRequest) {
-  return await updateSession(request)
-}
+    <AccordionItem
+      header="Do I need to create a new client for every route?"
+      id="client-deduplication"
+    >
 
-export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
-}
-```
+        Yes! Creating a Supabase client is lightweight.
 
-```ts utils/supabase/middleware.ts
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+        - On the server, it basically configures a `fetch` call. You need to reconfigure the fetch call anew for every request to your server, because you need the cookies from the request.
+        - On the client, `createBrowserClient` already uses a singleton pattern, so you only ever create one instance, no matter how many times you call your `createClient` function.
 
-export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  })
+    </AccordionItem>
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({
-            request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
+</Accordion>
 
-  // IMPORTANT: Avoid writing any logic between createServerClient and
-  // supabase.auth.getClaims(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
+Create a `lib/supabase` folder at the root of your project, or inside the `./src` folder if you are using one, with a file for each type of client. Then copy the lib utility functions for each client type.
 
-  // IMPORTANT: Don't remove getClaims()
-  const { data } = await supabase.auth.getClaims()
+<div className="mt-12">
+  <$CodeTabs>
+    <$CodeSample
+      path="/auth/nextjs/lib/supabase/client.ts"
+      meta="name=lib/supabase/client.ts"
+      language="typescript"
+    />
+    <$CodeSample
+      path="/auth/nextjs/lib/supabase/server.ts"
+      meta="name=lib/supabase/server.ts"
+      language="typescript"
+    />
+  </$CodeTabs>
+</div>
 
-  const user = data?.claims
+### Hook up proxy
 
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth')
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
-  }
+The code adds a [matcher](https://nextjs.org/docs/app/api-reference/file-conventions/proxy#matcher) so the Proxy doesn't run on routes that don't access Supabase.
 
-  // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
-  // creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object to fit your needs, but avoid changing
-  //    the cookies!
-  // 4. Finally:
-  //    return myNewResponse
-  // If this is not done, you may be causing the browser and server to go out
-  // of sync and terminate the user's session prematurely!
+<Admonition type="danger">
 
-  return supabaseResponse
-}
-```
+Be careful when protecting pages. The server gets the user session from the cookies, which can be spoofed by anyone.
 
-</TabPanel>
-</Tabs>
+Always use `supabase.auth.getClaims()` to protect pages and user data.
+
+_Never_ trust `supabase.auth.getSession()` inside server code such as Proxy. It isn't guaranteed to revalidate the Auth token.
+
+It's safe to trust `getClaims()` because it validates the JWT signature against the project's published public keys every time.
+
+</Admonition>
+
+<$Partial path="auth_methods.mdx" />
+
+<div className="mt-12">
+  <$CodeTabs>
+    <$CodeSample path="/auth/nextjs/proxy.ts" meta="name=proxy.ts" language="typescript" />
+    <$CodeSample
+      path="/auth/nextjs/lib/supabase/proxy.ts"
+      meta="name=lib/supabase/proxy.ts"
+      language="typescript"
+    />
+  </$CodeTabs>
+</div>
+
+## Congratulations
+
+You're done! To recap, you've successfully:
+
+- Called Supabase from a Server Action.
+- Called Supabase from a Server Component.
+- Set up a Supabase client utility to call Supabase from a Client Component. You can use this if you need to call Supabase from a Client Component, for example to set up a realtime subscription.
+- Set up Proxy to automatically refresh the Supabase Auth session.
+
+You can now use any Supabase features from your client or server code!
 
 </TabPanel>
 <TabPanel id="sveltekit" label="SvelteKit">
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="hooks"
-  queryGroup="environment"
->
-<TabPanel id="hooks" label="Hooks">
+### Set up server-side hooks
 
-```ts hooks.server.ts
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public'
-import { createServerClient } from '@supabase/ssr'
-import type { Handle } from '@sveltejs/kit'
+Set up server-side hooks in `src/hooks.server.ts`. The hooks:
 
-export const handle: Handle = async ({ event, resolve }) => {
-  event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
-    cookies: {
-      getAll() {
-        return event.cookies.getAll()
-      },
-      setAll(cookiesToSet) {
-        /**
-         * Note: You have to add the `path` variable to the
-         * set and remove method due to sveltekit's cookie API
-         * requiring this to be set, setting the path to an empty string
-         * will replicate previous/standard behavior (https://kit.svelte.dev/docs/types#public-types-cookies)
-         */
-        cookiesToSet.forEach(({ name, value, options }) =>
-          event.cookies.set(name, value, { ...options, path: '/' })
-        )
-      },
-    },
-  })
+- Create a request-specific Supabase client, using the user credentials from the request cookie. This client is used for server-only code.
+- Check user authentication.
+- Guard protected pages.
 
-  /**
-   * Unlike `supabase.auth.getSession()`, which returns the session _without_
-   * validating the JWT, this function also calls `getUser()` to validate the
-   * JWT before returning the session.
-   */
-  event.locals.safeGetSession = async () => {
-    const {
-      data: { session },
-    } = await event.locals.supabase.auth.getSession()
-    if (!session) {
-      return { session: null, user: null }
-    }
+<$Partial path="auth_methods.mdx" />
 
-    const {
-      data: { user },
-      error,
-    } = await event.locals.supabase.auth.getUser()
-    if (error) {
-      // JWT validation has failed
-      return { session: null, user: null }
-    }
+<$CodeSample
+path="/auth/sveltekit/src/hooks.server.ts"
+meta="name=src/hooks.server.ts"
+language="typescript"
+/>
 
-    return { session, user }
-  }
+To prevent TypeScript errors, add type definitions for the new event.locals properties.
 
-  return resolve(event, {
-    filterSerializedResponseHeaders(name) {
-      return name === 'content-range' || name === 'x-supabase-api-version'
-    },
-  })
-}
-```
+<$CodeSample
+path="/auth/sveltekit/src/app.d.ts"
+meta="name=src/app.d.ts"
+language="typescript"
+/>
 
-</TabPanel>
+### Create a Supabase client in your root layout
 
-<TabPanel id="layout" label="Root Layout Load">
+Create a Supabase client in your root `+layout.ts`. This client can be used to access Supabase from the client or the server. In order to get access to the Auth token on the server, use a `+layout.server.ts` file to pass in the session from event.locals.
 
-Page components can get access to the Supabase client from the `data` object due to this load function.
+Page components can access the Supabase client from the `data` object using the `load` function.
 
-```ts +layout.ts
-import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
-import type { LayoutLoad } from './$types'
-import { createBrowserClient, createServerClient, isBrowser } from '@supabase/ssr'
+<$CodeTabs>
+<$CodeSample
+path="/auth/sveltekit/src/routes/+layout.ts"
+meta="name=src/routes/+layout.ts"
+language="typescript"
+/>
 
-export const load: LayoutLoad = async ({ fetch, data, depends }) => {
-  depends('supabase:auth')
+<$CodeSample
+path="/auth/sveltekit/src/routes/+layout.server.ts"
+meta="name=src/routes/+layout.server.ts"
+language="typescript"
+/>
+</$CodeTabs>
 
-  const supabase = isBrowser()
-    ? createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
-        global: {
-          fetch,
-        },
-      })
-    : createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
-        global: {
-          fetch,
-        },
-        cookies: {
-          getAll() {
-            return data.cookies
-          },
-        },
-      })
+## Congratulations
 
-  /**
-   * It's fine to use `getSession` here, because on the client, `getSession` is
-   * safe, and on the server, it reads `session` from the `LayoutData`, which
-   * safely checked the session using `safeGetSession`.
-   */
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+You're done! To recap, you've successfully:
 
-  return { supabase, session }
-}
-```
+- Set up server-side hooks to create a request-specific Supabase client and guard protected pages.
+- Created a Supabase client in your root layout to use on both the client and server.
 
-</TabPanel>
-
-<TabPanel id="layout-server" label="Root Server Layout">
-
-```ts +layout.server.ts
-import type { LayoutServerLoad } from './$types'
-
-export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cookies }) => {
-  const { session, user } = await safeGetSession()
-
-  return {
-    session,
-    user,
-    cookies: cookies.getAll(),
-  }
-}
-```
-
-</TabPanel>
-
-</Tabs>
+You can now use any Supabase features from your client or server code!
 
 </TabPanel>
 <TabPanel id="astro" label="Astro">
@@ -481,9 +381,12 @@ const supabase = createServerClient(
       getAll() {
         return parseCookieHeader(Astro.request.headers.get('Cookie') ?? '')
       },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) =>
-          Astro.cookies.set(name, value, options))
+      setAll(cookiesToSet, headers) {
+        cookiesToSet.forEach(({ name, value }) =>
+          Astro.cookies.set(name, value))
+        Object.entries(headers).forEach(([key, value]) =>
+          Astro.response.headers.set(key, value)
+        )
       },
     },
   }
@@ -523,9 +426,9 @@ export async function GET(context: APIContext) {
         getAll() {
           return parseCookieHeader(context.request.headers.get('Cookie') ?? '')
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            context.cookies.set(name, value, options))
+        setAll(cookiesToSet, _headers) {
+          cookiesToSet.forEach(({ name, value }) =>
+            context.cookies.set(name, value))
         },
       },
     }
@@ -552,10 +455,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
         getAll() {
           return parseCookieHeader(context.request.headers.get('Cookie') ?? '')
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            context.cookies.set(name, value, options)
-          )
+        setAll(cookiesToSet, _headers) {
+          cookiesToSet.forEach(({ name, value }) => context.cookies.set(name, value))
         },
       },
     }
@@ -568,210 +469,271 @@ export const onRequest = defineMiddleware(async (context, next) => {
 </TabPanel>
 </Tabs>
 
+## Congratulations
+
+You can now use any Supabase features from your client or server code!
+
 </TabPanel>
 <TabPanel id="remix" label="Remix">
+
+With Remix, in a route module such as `_index.tsx`, you can export a `loader`, an `action`, and a default component.
+
+Configure Supabase clients as follows:
+
+1. **Create a server client in the `loader`.** Use it to load data and manage the user session on the server. Return your Supabase URL and publishable key so the browser can create a client.
+2. **Create a server client in the `action`.** Use it to handle form submissions and other mutations on the server.
+3. **Create a browser client in the default component.** Call `useLoaderData` to read the URL and key, then call `createBrowserClient`.
+
+The following example shows all three exports in one route module:
+
+```ts _index.tsx
+import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node'
+import { useLoaderData } from '@remix-run/react'
+import {
+  createBrowserClient,
+  createServerClient,
+  parseCookieHeader,
+  serializeCookieHeader,
+} from '@supabase/ssr'
+
+// Server: load data and manage the user's session.
+export async function loader({ request }: LoaderFunctionArgs) {
+  const responseHeaders = new Headers()
+
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(request.headers.get('Cookie') ?? '')
+        },
+        setAll(cookiesToSet, cacheHeaders) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value, options))
+          )
+          Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
+        },
+      },
+    }
+  )
+
+  // Use `supabase` here for server-side work, e.g. await supabase.auth.getClaims()
+
+  // Return the environment variables so the browser can create its own client.
+  return json(
+    {
+      env: {
+        SUPABASE_URL: process.env.SUPABASE_URL!,
+        SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY!,
+      },
+    },
+    { headers: responseHeaders }
+  )
+}
+
+// Server: handle form submissions and mutations.
+export async function action({ request }: ActionFunctionArgs) {
+  const responseHeaders = new Headers()
+
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(request.headers.get('Cookie') ?? '')
+        },
+        setAll(cookiesToSet, cacheHeaders) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value, options))
+          )
+          Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
+        },
+      },
+    }
+  )
+
+  return json(null, { headers: responseHeaders })
+}
+
+// Browser: create a client using the env vars returned by the loader.
+export default function Index() {
+  const { env } = useLoaderData<typeof loader>()
+
+  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY)
+
+  return <div>...</div>
+}
+```
+
+## Congratulations
+
+You can now use any Supabase features from your client or server code!
+
+</TabPanel>
+
+<TabPanel id="nuxt" label="Nuxt">
 
 <Tabs
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="remix-loader"
+  defaultActiveId="nuxt-server"
   queryGroup="environment"
 >
-<TabPanel id="remix-loader" label="Loader">
+<TabPanel id="nuxt-server" label="Server route">
 
-```ts _index.tsx
-import { type LoaderFunctionArgs } from '@remix-run/node'
+```ts server/api/hello.ts
 import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+import { appendHeader, defineEventHandler, getHeader } from 'h3'
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const headers = new Headers()
+export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig()
 
   const supabase = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    config.public.supabaseUrl,
+    config.public.supabasePublishableKey,
     {
       cookies: {
         getAll() {
-          return parseCookieHeader(request.headers.get('Cookie') ?? '')
+          return parseCookieHeader(getHeader(event, 'Cookie') ?? '')
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
-          )
+          cookiesToSet.forEach(({ name, value, options }) => {
+            appendHeader(event, 'Set-Cookie', serializeCookieHeader(name, value, options))
+          })
         },
       },
     }
   )
 
-  return new Response('...', {
-    headers,
-  })
-}
+  await supabase.auth.getClaims()
+
+  return { ok: true }
+})
 ```
 
 </TabPanel>
 
-<TabPanel id="remix-action" label="Action">
+<TabPanel id="nuxt-browser" label="Browser plugin">
 
-```ts _index.tsx
-import { type ActionFunctionArgs } from '@remix-run/node'
-import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+```ts plugins/supabase.client.ts
+import { createBrowserClient } from '@supabase/ssr'
 
-export async function action({ request }: ActionFunctionArgs) {
-  const headers = new Headers()
+export default defineNuxtPlugin(() => {
+  const config = useRuntimeConfig()
 
-  const supabase = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return parseCookieHeader(request.headers.get('Cookie') ?? '')
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
-          )
-        },
-      },
-    }
+  const supabase = createBrowserClient(
+    config.public.supabaseUrl,
+    config.public.supabasePublishableKey
   )
 
-  return new Response('...', {
-    headers,
-  })
-}
-```
-
-</TabPanel>
-
-<TabPanel id="remix-component" label="Component">
-
-```ts _index.tsx
-import { type LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import { createBrowserClient } from "@supabase/ssr";
-
-export async function loader({}: LoaderFunctionArgs) {
   return {
-    env: {
-      SUPABASE_URL: process.env.SUPABASE_URL!,
-      SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY!,
+    provide: {
+      supabase,
     },
-  };
-}
-
-export default function Index() {
-  const { env } = useLoaderData<typeof loader>();
-
-  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY);
-
-  return ...
-}
+  }
+})
 ```
 
 </TabPanel>
 </Tabs>
+
+## Congratulations
+
+You can now use any Supabase features from your client or server code!
 
 </TabPanel>
 
 <TabPanel id="react-router" label="React Router">
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="react-router-loader"
-  queryGroup="environment"
->
-<TabPanel id="react-router-loader" label="Loader">
+In React Router, a route module (`_index.tsx`) can export a `loader`, an `action`, and a default component. Create a server client inside the `loader` and `action`, and a browser client inside the component, passing the env vars through the `loader`.
 
 ```ts _index.tsx
-import { LoaderFunctionArgs } from 'react-router'
-import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+import { data, type ActionFunctionArgs, type LoaderFunctionArgs } from 'react-router'
+import { useLoaderData } from 'react-router'
+import {
+  createBrowserClient,
+  createServerClient,
+  parseCookieHeader,
+  serializeCookieHeader,
+} from '@supabase/ssr'
 
+// Server: load data and manage the user's session.
 export async function loader({ request }: LoaderFunctionArgs) {
-  const headers = new Headers()
+  const responseHeaders = new Headers()
 
-  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
-    cookies: {
-      getAll() {
-        return parseCookieHeader(request.headers.get('Cookie') ?? '')
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(request.headers.get('Cookie') ?? '')
+        },
+        setAll(cookiesToSet, cacheHeaders) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value, options))
+          )
+          Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
+        },
       },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) =>
-          headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
-        )
+    }
+  )
+
+  // Use `supabase` here for server-side work, e.g. await supabase.auth.getClaims()
+
+  // Return the env vars so the browser can create its own client.
+  return data(
+    {
+      env: {
+        SUPABASE_URL: process.env.SUPABASE_URL!,
+        SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY!,
       },
     },
-  })
-
-  return new Response('...', {
-    headers,
-  })
+    { headers: responseHeaders }
+  )
 }
-```
 
-</TabPanel>
-
-<TabPanel id="react-router-action" label="Action">
-
-```ts _index.tsx
-import { type ActionFunctionArgs } from '@react-router'
-import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
-
+// Server: handle form submissions and mutations.
 export async function action({ request }: ActionFunctionArgs) {
-  const headers = new Headers()
+  const responseHeaders = new Headers()
 
-  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
-    cookies: {
-      getAll() {
-        return parseCookieHeader(request.headers.get('Cookie') ?? '')
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(request.headers.get('Cookie') ?? '')
+        },
+        setAll(cookiesToSet, cacheHeaders) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value, options))
+          )
+          Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
+        },
       },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) =>
-          headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
-        )
-      },
-    },
-  })
+    }
+  )
 
-  return new Response('...', {
-    headers,
-  })
-}
-```
-
-</TabPanel>
-
-<TabPanel id="react-router-component" label="Component">
-
-```ts _index.tsx
-import { type LoaderFunctionArgs } from "react-router";
-import { useLoaderData } from "react-router";
-import { createBrowserClient } from "@supabase/ssr";
-
-export async function loader({}: LoaderFunctionArgs) {
-  return {
-    env: {
-      SUPABASE_URL: process.env.SUPABASE_URL!,
-      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
-    },
-  };
+  return data(null, { headers: responseHeaders })
 }
 
+// Browser: create a client using the env vars returned by the loader.
 export default function Index() {
-  const { env } = useLoaderData<typeof loader>();
+  const { env } = useLoaderData<typeof loader>()
 
-  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY)
 
-  return ...
+  return <div>...</div>
 }
 ```
 
-</TabPanel>
-</Tabs>
+## Congratulations
+
+You can now use any Supabase features from your client or server code!
 
 </TabPanel>
 
@@ -795,10 +757,11 @@ exports.createClient = (context) => {
       getAll() {
         return parseCookieHeader(context.req.headers.cookie ?? '')
       },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) =>
-          context.res.appendHeader('Set-Cookie', serializeCookieHeader(name, value, options))
+      setAll(cookiesToSet, headers) {
+        cookiesToSet.forEach(({ name, value }) =>
+          context.res.appendHeader('Set-Cookie', serializeCookieHeader(name, value))
         )
+        Object.entries(headers).forEach(([key, value]) => context.res.setHeader(key, value))
       },
     },
   })
@@ -827,6 +790,10 @@ app.post("/hello-world", async function (req, res, next) {
 </TabPanel>
 </Tabs>
 
+## Congratulations
+
+You can now use any Supabase features from your client or server code!
+
 </TabPanel>
 
 <TabPanel id="hono" label="Hono">
@@ -842,116 +809,114 @@ app.post("/hello-world", async function (req, res, next) {
 
 Create a Hono middleware that creates a Supabase client.
 
-```ts middleware/auth.middleware.ts
-import { createServerClient, parseCookieHeader } from '@supabase/ssr'
-import { SupabaseClient } from '@supabase/supabase-js'
-import type { Context, MiddlewareHandler } from 'hono'
-import { env } from 'hono/adapter'
-import { setCookie } from 'hono/cookie'
-
-declare module 'hono' {
-  interface ContextVariableMap {
-    supabase: SupabaseClient
-  }
-}
-
-export const getSupabase = (c: Context) => {
-  return c.get('supabase')
-}
-
-type SupabaseEnv = {
-  SUPABASE_URL: string
-  SUPABASE_PUBLISHABLE_KEY: string
-}
-
-export const supabaseMiddleware = (): MiddlewareHandler => {
-  return async (c, next) => {
-    const supabaseEnv = env<SupabaseEnv>(c)
-    const supabaseUrl = supabaseEnv.SUPABASE_URL
-    const supabaseAnonKey = supabaseEnv.SUPABASE_PUBLISHABLE_KEY
-
-    if (!supabaseUrl) {
-      throw new Error('SUPABASE_URL missing!')
-    }
-
-    if (!supabaseAnonKey) {
-      throw new Error('SUPABASE_PUBLISHABLE_KEY missing!')
-    }
-
-    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-      cookies: {
-        getAll() {
-          return parseCookieHeader(c.req.header('Cookie') ?? '')
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => setCookie(c, name, value, options))
-        },
-      },
-    })
-
-    c.set('supabase', supabase)
-
-    await next()
-  }
-}
-```
+<$CodeSample
+path="/auth/hono/src/middleware/auth.middleware.ts"
+meta="name=src/middleware/auth.middleware.ts"
+language="typescript"
+/>
 
 </TabPanel>
 <TabPanel id="hono-route" label="Route">
 
 You can now use this middleware in your Hono application to create a server Supabase client that can be used to make authenticated requests.
 
-```ts index.tsx
-import { Hono } from 'hono'
-import { getSupabase, supabaseMiddleware } from './middleware/auth.middleware'
+<$Partial path="auth_methods.mdx" />
 
-const app = new Hono()
-app.use('*', supabaseMiddleware())
-
-app.get('/api/user', async (c) => {
-  const supabase = getSupabase(c)
-  const { data, error } = await supabase.auth.getUser()
-
-  if (error) console.log('error', error)
-
-  if (!data?.user) {
-    return c.json({
-      message: 'You are not logged in.',
-    })
-  }
-
-  return c.json({
-    message: 'You are logged in!',
-    userId: data.user,
-  })
-})
-
-app.get('/signout', async (c) => {
-  const supabase = getSupabase(c)
-  await supabase.auth.signOut()
-  console.log('Signed out server-side!')
-  return c.redirect('/')
-})
-
-// Retrieve data with RLS enabled. The signed in user's auth token is automatically sent.
-app.get('/countries', async (c) => {
-  const supabase = getSupabase(c)
-  const { data, error } = await supabase.from('countries').select('*')
-  if (error) console.log(error)
-  return c.json(data)
-})
-
-export default app
-```
+<$CodeSample
+path="/auth/hono/src/index.tsx"
+meta="name=src/index.tsx"
+language="typescript"
+/>
 
 </TabPanel>
 </Tabs>
 
 </TabPanel>
+<TabPanel id="tanstack" label="TanStack Start">
+
+### Write utility functions to create Supabase clients
+
+TanStack Start renders matched routes on the server by default, so `beforeLoad` and `loader` run server-side on the initial request. Unlike Next.js, this means you don't need a proxy or middleware layer to keep sessions fresh — the server client reads and writes the session cookie directly on each request.
+
+Create a `lib/supabase` folder at the root of your project, or inside the `./src` folder if you are using one, then add a file for each type of client:
+
+1. **Create a browser client in `lib/supabase/client.ts`.** Use it to access Supabase from components that run in the browser.
+2. **Create a server client in `lib/supabase/server.ts`.** Use it to access Supabase from loaders, server functions, and other code that runs only on the server.
+
+<$Partial path="auth_methods.mdx" />
+
+Copy the lib utility functions below into each file:
+
+<div className="mt-12">
+  <$CodeTabs>
+    <$CodeSample
+      path="/auth/tanstack/lib/supabase/client.ts"
+      meta="name=lib/supabase/client.ts"
+      language="typescript"
+    />
+    <$CodeSample
+      path="/auth/tanstack/lib/supabase/server.ts"
+      meta="name=lib/supabase/server.ts"
+      language="typescript"
+    />
+  </$CodeTabs>
+</div>
+
+### Protecting routes
+
+TanStack Start has no global middleware layer, so protect each route explicitly.
+
+To protect your routes:
+
+1. Write a server function, `fetchClaims`, that calls `supabase.auth.getClaims()` and returns the claims, or `null` if the session isn't valid.
+1. Call `fetchClaims` from a layout route's `beforeLoad` hook — for example, `_protected.tsx` — before any nested route renders, and redirect to `/login` when it returns `null`.
+
+<Admonition type="danger">
+
+Skipping the check inside the server function exposes private data to unauthenticated users. `beforeLoad` runs on the server for the initial request and on the client for later navigation, but either way it only gates the route's render — it doesn't stop the server function from being called directly. Because there's no proxy re-checking every request, the server function is the only checkpoint that always runs, so it must call `supabase.auth.getClaims()` to authorize the request itself.
+
+</Admonition>
+
+`getClaims()` validates the JWT signature on every call, the same check the Next.js Proxy relies on. Calling it inside the server function gives TanStack Start's per-route check that same guarantee, because the function runs on every request to a protected route.
+
+<div className="mt-12">
+  <$CodeTabs>
+    <$CodeSample
+      path="/auth/tanstack/lib/supabase/fetch-claims-server-fn.ts"
+      meta="name=lib/supabase/fetch-claims-server-fn.ts"
+      language="typescript"
+    />
+    <$CodeSample
+      path="/auth/tanstack/routes/_protected.tsx"
+      meta="name=routes/_protected.tsx"
+      language="typescript"
+    />
+  </$CodeTabs>
+</div>
+
+Any other server function that returns or mutates private data needs this same check. Don't rely on a route being nested under `_protected` alone.
+
+## Congratulations
+
+You're done! To recap, you've successfully:
+
+- Set up a Supabase client utility to call Supabase from a browser component. You can use this if you need to call Supabase from the browser, for example to set up a realtime subscription.
+- Set up a server client utility to call Supabase from loaders and server functions.
+- Protected a route with `beforeLoad`, backed by a server function that authorizes the request itself.
+
+You can now use any Supabase features from your client or server code!
+
+</TabPanel>
 </Tabs>
+
+## Caching considerations
+
+If your app uses ISR (Incremental Static Regeneration) or is deployed behind a CDN, caching of HTTP responses can cause users to receive another user's session. When a session is refreshed, the new token is written to the response via `Set-Cookie`. If that response is cached and served to a different user, that user will be signed in as the wrong person.
+
+See the [advanced Auth server-side rendering guide](/docs/guides/auth/server-side/advanced-guide#can-i-use-server-side-rendering-with-a-cdn-or-cache) for details and framework-specific examples.
 
 ## Next steps
 
-- Implement [Authentication using Email and Password](/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr)
-- Implement [Authentication using OAuth](/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr)
-- [Learn more about SSR](/docs/guides/auth/server-side-rendering)
+- Implement [Authentication using Email and Password](/docs/guides/auth/passwords)
+- Implement [Authentication using OAuth](/docs/guides/auth/social-login)
+- [Learn more about SSR](/docs/guides/auth/server-side/advanced-guide)

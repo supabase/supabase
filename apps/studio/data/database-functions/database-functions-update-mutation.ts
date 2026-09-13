@@ -1,18 +1,19 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import pgMeta from '@supabase/pg-meta'
+import type { PGFunctionUpdate } from '@supabase/pg-meta/src/pg-meta-functions'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import pgMeta from '@supabase/pg-meta'
-import { databaseKeys } from 'data/database/keys'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
-import type { DatabaseFunction } from './database-functions-query'
+import type { SavedDatabaseFunction } from './database-functions-query'
+import { databaseKeys } from '@/data/database/keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseFunctionUpdateVariables = {
   projectRef: string
   connectionString?: string | null
-  func: DatabaseFunction
-  payload: z.infer<typeof pgMeta.functions.pgFunctionCreateZod>
+  func: SavedDatabaseFunction
+  payload: PGFunctionUpdate
 }
 
 export async function updateDatabaseFunction({
@@ -40,27 +41,29 @@ export const useDatabaseFunctionUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseFunctionUpdateData, ResponseError, DatabaseFunctionUpdateVariables>,
+  UseCustomMutationOptions<
+    DatabaseFunctionUpdateData,
+    ResponseError,
+    DatabaseFunctionUpdateVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseFunctionUpdateData, ResponseError, DatabaseFunctionUpdateVariables>(
-    (vars) => updateDatabaseFunction(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseKeys.databaseFunctions(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update database function: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseFunctionUpdateData, ResponseError, DatabaseFunctionUpdateVariables>({
+    mutationFn: (vars) => updateDatabaseFunction(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: databaseKeys.databaseFunctions(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update database function: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

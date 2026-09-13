@@ -12,10 +12,10 @@ const LWHeader = ({ className }: { className?: string }) => {
       )}
     >
       <div className="absolute z-0 inset-0 w-full h-full">
-        <div className="absolute z-0 inset-0 w-full !pointer-events-none"></div>
-        <div className="absolute inset-0 w-full h-full bg-gradient-to-t from-background to-transparent !pointer-events-none" />
+        <div className="absolute z-0 inset-0 w-full pointer-events-none!"></div>
+        <div className="absolute inset-0 w-full h-full bg-linear-to-t from-background to-transparent pointer-events-none!" />
       </div>
-      <SectionContainer className="h-full flex flex-col items-start justify-end gap-3 !max-w-none lg:!container !pb-4 md:!pb-10 !pointer-events-none">
+      <SectionContainer className="h-full flex flex-col items-start justify-end gap-3 max-w-none! lg:container! pb-4! md:pb-10! pointer-events-none!">
         <h1 className="text-4xl uppercase tracking-wide pointer-events-none">
           <span className="flex gap-1 items-center">
             <Image

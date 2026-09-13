@@ -1,6 +1,7 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import LogsFilterPopover from 'components/interfaces/Settings/Logs/LogsFilterPopover'
-import { describe, it, expect, vi } from 'vitest'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+
+import LogsFilterPopover from '@/components/interfaces/Settings/Logs/LogsFilterPopover'
 
 describe('LogsFilterPopover', () => {
   const mockOptions = {
@@ -75,18 +76,14 @@ describe('LogsFilterPopover', () => {
     fireEvent.click(screen.getByText('Severity'))
 
     await waitFor(() => {
-      const errorButton = screen.getByRole('checkbox', {
-        name: /error error level logs/i,
-      })
-      const warningButton = screen.getByRole('checkbox', {
-        name: /warning warning level logs/i,
-      })
-
-      //   screen.logTestingPlaygroundURL()
-
-      expect(errorButton).toHaveAttribute('aria-checked', 'true')
-      expect(warningButton).toHaveAttribute('aria-checked', 'false')
+      expect(screen.getByText('Error level logs')).toBeInTheDocument()
     })
+
+    const errorCheckbox = document.getElementById('severity.error')!
+    const warningCheckbox = document.getElementById('severity.warn')!
+
+    expect(errorCheckbox).toHaveAttribute('aria-checked', 'true')
+    expect(warningCheckbox).toHaveAttribute('aria-checked', 'false')
   })
 
   it('calls onFiltersChange when applying filters', async () => {

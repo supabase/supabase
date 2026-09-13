@@ -1,3 +1,6 @@
+import { Link } from '@tanstack/react-router'
+import { useState } from 'react'
+
 import { cn } from '@/lib/utils'
 import { createClient } from '@/registry/default/clients/tanstack/lib/supabase/client'
 import { Button } from '@/registry/default/components/ui/button'
@@ -10,8 +13,6 @@ import {
 } from '@/registry/default/components/ui/card'
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
-import { Link } from '@tanstack/react-router'
-import { useState } from 'react'
 
 export function ForgotPasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [email, setEmail] = useState('')
@@ -84,7 +85,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
               <div className="mt-4 text-center text-sm">
                 Already have an account?{' '}
                 <Link to="/login" className="underline underline-offset-4">
-                  Login
+                  Sign in
                 </Link>
               </div>
             </form>

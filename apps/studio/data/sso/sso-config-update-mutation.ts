@@ -1,20 +1,23 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import type { operations } from 'api-types'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { handleError, put } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { orgSSOKeys } from './keys'
+import { handleError, put } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+type UpdateSSOProviderBody =
+  operations['SSOProvidersController_updateSSOProvider']['requestBody']['content']['application/json']
 
 export type SSOConfigUpdateVariables = {
   slug: string
-  config: Partial<components['schemas']['UpdateSSOProviderBody']>
+  config: Partial<UpdateSSOProviderBody>
 }
 
 export async function updateSSOConfig({ slug, config }: SSOConfigUpdateVariables) {
   const { data, error } = await put('/platform/organizations/{slug}/sso', {
     params: { path: { slug } },
-    body: config as components['schemas']['UpdateSSOProviderBody'],
+    body: config as UpdateSSOProviderBody,
   })
 
   if (error) handleError(error)
@@ -28,31 +31,29 @@ export const useSSOConfigUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SSOConfigUpdateData, ResponseError, SSOConfigUpdateVariables>,
+  UseCustomMutationOptions<SSOConfigUpdateData, ResponseError, SSOConfigUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<SSOConfigUpdateData, ResponseError, SSOConfigUpdateVariables>(
-    (vars) => updateSSOConfig(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { slug } = variables
-        await queryClient.invalidateQueries(orgSSOKeys.orgSSOConfig(slug))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          if (data.message === '') {
-            toast.error(`Failed to update SSO configuration.`)
-          } else {
-            toast.error(`${data.message}`)
-          }
+  return useMutation<SSOConfigUpdateData, ResponseError, SSOConfigUpdateVariables>({
+    mutationFn: (vars) => updateSSOConfig(vars),
+    async onSuccess(data, variables, context) {
+      const { slug } = variables
+      await queryClient.invalidateQueries({ queryKey: orgSSOKeys.orgSSOConfig(slug) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        if (data.message === '') {
+          toast.error(`Failed to update SSO configuration.`)
         } else {
-          onError(data, variables, context)
+          toast.error(`${data.message}`)
         }
-      },
-      ...options,
-    }
-  )
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

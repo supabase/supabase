@@ -1,8 +1,9 @@
 'use client'
 
-import { listTablesSql } from '@/registry/default/platform/platform-kit-nextjs/lib/pg-meta'
-import { runQuery } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-run-query'
 import { useQuery } from '@tanstack/react-query'
+
+import { runQuery } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-run-query'
+import { listTablesSql } from '@/registry/default/platform/platform-kit-nextjs/lib/pg-meta'
 
 // LIST Tables
 const listTables = ({ projectRef, schemas }: { projectRef: string; schemas?: string[] }) => {

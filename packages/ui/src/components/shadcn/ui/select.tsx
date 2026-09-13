@@ -1,12 +1,13 @@
 'use client'
 
-import * as SelectPrimitive from '@radix-ui/react-select'
+import { type VariantProps } from 'class-variance-authority'
 import { Check, ChevronDown, ChevronUp } from 'lucide-react'
+import { Select as SelectPrimitive } from 'radix-ui'
 import * as React from 'react'
 
-import { VariantProps, cva } from 'class-variance-authority'
-import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../../lib/constants'
 import { cn } from '../../../lib/utils/cn'
+import { ComboboxTrigger } from './combobox-trigger'
+import { selectTriggerVariants } from './select-trigger'
 
 const Select = SelectPrimitive.Root
 
@@ -16,8 +17,7 @@ const SelectGroup = SelectPrimitive.Group
 // https://github.com/radix-ui/primitives/issues/2578#issuecomment-1890801041 for more info.
 const SelectValue = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Value>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Value> &
-    VariantProps<typeof SelectTriggerVariants>
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Value>
 >(({ placeholder, ...props }, ref) => (
   <SelectPrimitive.Value
     placeholder={typeof placeholder === 'string' ? <span>{placeholder}</span> : placeholder}
@@ -28,37 +28,23 @@ const SelectValue = React.forwardRef<
 
 SelectValue.displayName = SelectPrimitive.Value.displayName
 
-const SelectTriggerVariants = cva('', {
-  variants: {
-    size: {
-      ...SIZE_VARIANTS,
-    },
-  },
-  defaultVariants: {
-    size: SIZE_VARIANTS_DEFAULT,
-  },
-})
+type SelectTriggerSize = NonNullable<VariantProps<typeof selectTriggerVariants>['size']>
 
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> &
-    VariantProps<typeof SelectTriggerVariants>
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
+    size?: SelectTriggerSize
+  }
 >(({ className, children, size, ...props }, ref) => (
   <SelectPrimitive.Trigger
     ref={ref}
-    className={cn(
-      'flex w-full items-center justify-between rounded-md border border-strong hover:border-stronger bg-alternative dark:bg-muted hover:bg-selection text-xs ring-offset-background-control data-[placeholder]:text-foreground-lighter focus:outline-none ring-border-control focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200',
-      'data-[state=open]:bg-selection data-[state=open]:border-stronger',
-      'gap-2',
-      '[&>span]:truncate text-left', // [kemal] This is to prevent double lines rendering when a string is particularly long.
-      SelectTriggerVariants({ size }),
-      className
-    )}
+    className={cn(selectTriggerVariants({ size }), className)}
+    tabIndex={0}
     {...props}
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <ChevronDown className="h-4 w-4 text-foreground-lighter flex-shrink-0" strokeWidth={1.5} />
+      <ChevronDown className="h-4 w-4 text-foreground-lighter shrink-0" strokeWidth={1.5} />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ))
@@ -106,7 +92,7 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        'relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-overlay text-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+        'relative z-50 max-h-96 min-w-32 overflow-hidden rounded-md border bg-overlay text-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
         position === 'popper' &&
           'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
         className
@@ -119,7 +105,7 @@ const SelectContent = React.forwardRef<
         className={cn(
           'p-1',
           position === 'popper' &&
-            'h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]'
+            'h-(--radix-select-trigger-height) w-full min-w-(--radix-select-trigger-width)'
         )}
       >
         {children}
@@ -155,7 +141,7 @@ const SelectItem = React.forwardRef<
     ref={ref}
     className={cn(
       'group',
-      'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-overlay-hover text-foreground-light focus:text-foreground data-[state=checked]:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'relative flex w-full cursor-default select-none items-center rounded-xs py-1.5 pl-8 pr-2 text-sm outline-hidden focus:bg-overlay-hover text-foreground-light focus:text-foreground data-[state=checked]:text-foreground data-disabled:pointer-events-none data-disabled:opacity-50',
       className
     )}
     {...props}
@@ -186,6 +172,7 @@ const SelectSeparator = React.forwardRef<
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName
 
 export {
+  ComboboxTrigger,
   Select,
   SelectContent,
   SelectGroup,

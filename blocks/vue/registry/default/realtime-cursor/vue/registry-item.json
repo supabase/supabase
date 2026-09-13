@@ -1,0 +1,24 @@
+{
+  "name": "realtime-cursor-vue",
+  "type": "registry:component",
+  "title": "Realtime Cursor for Vue and Supabase",
+  "description": "Component which renders realtime cursors from other users in a room.",
+  "files": [
+    {
+      "path": "registry/default/realtime-cursor/vue/components/cursor.vue",
+      "type": "registry:component",
+      "target": "components/cursor.vue"
+    },
+    {
+      "path": "registry/default/realtime-cursor/vue/components/realtime-cursors.vue",
+      "type": "registry:component",
+      "target": "components/realtime-cursors.vue"
+    },
+    {
+      "path": "registry/default/realtime-cursor/vue/composables/useRealtimeCursors.ts",
+      "type": "registry:component",
+      "target": "composables/useRealtimeCursors.ts"
+    }
+  ],
+  "dependencies": ["@supabase/supabase-js@latest", "@vueuse/core", "lucide-vue-next"]
+}

@@ -1,8 +1,10 @@
+import { SupabaseClient } from '@supabase/supabase-js'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
-import { TextLink, cn } from 'ui'
+import { cn } from 'ui'
+import { TextLink } from 'ui-patterns/TextLink'
+
 import useConfData from '../hooks/use-conf-data'
-import { SupabaseClient } from '@supabase/supabase-js'
 
 export interface Meetup {
   id?: any
@@ -106,7 +108,7 @@ const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
                   title={liveNow ? 'Live now' : undefined}
                   className={cn(
                     'h-10 group inline-flex items-center flex-wrap text-4xl',
-                    'hover:text-[#EDEDED] !leading-none transition-colors',
+                    'hover:text-[#EDEDED] leading-none! transition-colors',
                     meetup.id === activeMeetup.id ? 'text-[#EDEDED]' : 'text-[#575E61]',
                     liveNow && 'text-[#B0B0B0]'
                   )}

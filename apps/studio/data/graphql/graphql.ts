@@ -1,5 +1,5 @@
-/* eslint-disable */
 import { DocumentTypeDecoration } from '@graphql-typed-document-node/core'
+
 export type Maybe<T> = T | null
 export type InputMaybe<T> = Maybe<T>
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }

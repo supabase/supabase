@@ -1,8 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { integrationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type GitHubConnectionsVariables = {
   organizationId?: number
@@ -37,15 +38,24 @@ export const useGitHubConnectionsQuery = <TData = GitHubConnectionsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<GitHubConnectionsData, GitHubConnectionsError, TData> = {}
+  }: UseCustomQueryOptions<GitHubConnectionsData, GitHubConnectionsError, TData> = {}
 ) => {
-  return useQuery<GitHubConnectionsData, GitHubConnectionsError, TData>(
-    integrationKeys.githubConnectionsList(organizationId),
-    ({ signal }) => getGitHubConnections({ organizationId }, signal),
+  return useQuery<GitHubConnectionsData, GitHubConnectionsError, TData>({
+    queryKey: integrationKeys.githubConnectionsList(organizationId),
+    queryFn: ({ signal }) => getGitHubConnections({ organizationId }, signal),
+    enabled: enabled && typeof organizationId !== 'undefined',
+    staleTime: 30 * 60 * 1000,
+    ...options,
+  })
+}
+
+export const useProjectGitHubConnectionQuery = ({ ref }: { ref?: string }) => {
+  const { data: organization } = useSelectedOrganizationQuery()
+  return useGitHubConnectionsQuery(
+    { organizationId: organization?.id },
     {
-      enabled: enabled && typeof organizationId !== 'undefined',
-      staleTime: 30 * 60 * 1000, // 30 minutes
-      ...options,
+      enabled: !!ref && !!organization?.id,
+      select: (data) => data?.find((c) => c.project.ref === ref),
     }
   )
 }

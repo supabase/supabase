@@ -1,13 +1,15 @@
 'use client'
 
-import { Fragment } from 'react'
+import type { User } from '@supabase/supabase-js'
+import type { LucideIcon } from 'icons/src/createSupabaseIcon'
+import { UserIcon } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useTheme } from 'next-themes'
-import { UserIcon } from 'lucide-react'
+import { Fragment } from 'react'
 import {
-  cn,
   buttonVariants,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -17,12 +19,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
+  singleThemes,
 } from 'ui'
-import { themes } from 'ui/src/components/ThemeProvider/themes'
-
-import type { User } from '@supabase/supabase-js'
-import type { LucideIcon } from 'icons/src/createSupabaseIcon'
-import type { Theme } from 'ui/src/components/ThemeProvider/themes'
 
 interface Props {
   menu: menuItem[][]
@@ -54,7 +52,7 @@ export const AuthenticatedDropdownMenu = ({ user, menu, site }: Props) => {
         <button
           title="Menu dropdown button"
           className={cn(
-            buttonVariants({ type: 'default' }),
+            buttonVariants({ variant: 'default' }),
             'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30 hover:border-strong data-[state=open]:border-stronger hover:!bg-overlay-hover/50 bg-transparent',
             'rounded-full overflow-hidden opacity-0 transition-opacity animate-fade-in'
           )}
@@ -86,7 +84,7 @@ export const AuthenticatedDropdownMenu = ({ user, menu, site }: Props) => {
                   return (
                     <div
                       key={`${site}-auth-dropdown-${sectionItem.label}-${sectionIdx}-${itemIdx}`}
-                      className="flex cursor-text items-center text-foreground rounded-sm px-2 py-1.5 text-xs outline-none space-x-2"
+                      className="flex cursor-text items-center text-foreground rounded-xs px-2 py-1.5 text-xs outline-hidden space-x-2"
                       {...sectionItem.otherProps}
                     >
                       <DropdownItemContent {...sectionItem} />
@@ -117,11 +115,11 @@ export const AuthenticatedDropdownMenu = ({ user, menu, site }: Props) => {
                           setTheme(value)
                         }}
                       >
-                        {themes
+                        {singleThemes
                           .filter(
                             (x) => x.value === 'light' || x.value === 'dark' || x.value === 'system'
                           )
-                          .map((theme: Theme) => (
+                          .map((theme) => (
                             <DropdownMenuRadioItem
                               key={`${site}-auth-dropdown-theme-${theme.value}`}
                               value={theme.value}

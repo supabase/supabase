@@ -21,7 +21,6 @@ export const integrationKeys = {
   ],
   githubAuthorization: () => ['github-authorization'] as const,
   githubRepositoriesList: () => ['github-repositories'] as const,
-  githubBranchesList: (connectionId: number | undefined) => ['github-branches', connectionId],
   githubConnectionsList: (organizationId: number | undefined) =>
     ['organizations', organizationId, 'github-connections'] as const,
   vercelRedirect: (installationId?: string) => ['vercel-redirect', installationId] as const,

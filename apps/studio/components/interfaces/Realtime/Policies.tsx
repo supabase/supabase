@@ -1,22 +1,24 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { Policies } from 'components/interfaces/Auth/Policies/Policies'
-import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
-import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Policies } from '@/components/interfaces/Database/Policies/Policies'
+import { PoliciesDataProvider } from '@/components/interfaces/Database/Policies/PoliciesDataContext'
+import { PolicyEditorPanel } from '@/components/interfaces/Database/Policies/PolicyEditorPanel'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { AlertError } from '@/components/ui/AlertError'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const RealtimePolicies = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const [showPolicyEditor, setShowPolicyEditor] = useState(false)
-  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
+  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<Policy>()
 
   const {
     data: tables,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
     error,
@@ -26,7 +28,25 @@ export const RealtimePolicies = () => {
     schema: 'realtime',
   })
 
-  const filteredTables = (tables ?? []).filter((table) => table.name === 'messages')
+  const filteredTables = useMemo(
+    () => (tables ?? []).filter((table) => table.name === 'messages'),
+    [tables]
+  )
+  const visibleTableIds = useMemo(
+    () => new Set(filteredTables.map((table) => table.id)),
+    [filteredTables]
+  )
+  const {
+    data: policies,
+    isPending: isLoadingPolicies,
+    isError: isPoliciesError,
+    error: policiesError,
+  } = useDatabasePoliciesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  // realtime is never in PostgREST's db_schema — skip the config query to avoid a false warning
+  const exposedSchemas = useMemo(() => ['realtime'], [])
 
   return (
     <>
@@ -35,20 +55,29 @@ export const RealtimePolicies = () => {
       {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
 
       {isSuccess && (
-        <Policies
-          schema="realtime"
-          tables={filteredTables}
-          hasTables
-          isLocked={false}
-          onSelectCreatePolicy={() => {
-            setSelectedPolicyToEdit(undefined)
-            setShowPolicyEditor(true)
-          }}
-          onSelectEditPolicy={(policy) => {
-            setSelectedPolicyToEdit(policy)
-            setShowPolicyEditor(true)
-          }}
-        />
+        <PoliciesDataProvider
+          policies={policies ?? []}
+          isPoliciesLoading={isLoadingPolicies}
+          isPoliciesError={isPoliciesError}
+          policiesError={policiesError ?? undefined}
+          exposedSchemas={exposedSchemas}
+        >
+          <Policies
+            schema="realtime"
+            tables={filteredTables}
+            hasTables
+            isLocked={false}
+            visibleTableIds={visibleTableIds}
+            onSelectCreatePolicy={(_tableName) => {
+              setSelectedPolicyToEdit(undefined)
+              setShowPolicyEditor(true)
+            }}
+            onSelectEditPolicy={(policy) => {
+              setSelectedPolicyToEdit(policy)
+              setShowPolicyEditor(true)
+            }}
+          />
+        </PoliciesDataProvider>
       )}
 
       <PolicyEditorPanel

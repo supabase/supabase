@@ -1,10 +1,10 @@
-import { Filter, Sort } from '@supabase/pg-meta/src/query'
 import { CalculatedColumn, RenderHeaderCellProps } from 'react-data-grid'
 
 export interface SavedState {
   filters?: string[]
   sorts?: string[]
   gridColumns: CalculatedColumn<any, any>[]
+  sensitiveDataColumns?: string[]
 }
 
 export interface DragItem {
@@ -42,4 +42,5 @@ export interface ColumnHeaderProps<R> extends RenderHeaderCellProps<R> {
   isEncrypted: boolean | undefined
   format: string
   foreignKey?: GridForeignKey
+  comment?: string | null
 }

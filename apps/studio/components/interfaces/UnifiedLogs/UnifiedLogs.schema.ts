@@ -1,25 +1,26 @@
 import { z } from 'zod'
 
+import { LOG_TYPES, METHODS, REGIONS } from './UnifiedLogs.constants'
 import {
   ARRAY_DELIMITER,
   LEVELS,
   RANGE_DELIMITER,
-} from 'components/ui/DataTable/DataTable.constants'
-import { LOG_TYPES, METHODS, REGIONS } from './UnifiedLogs.constants'
+} from '@/components/ui/DataTable/DataTable.constants'
 
 export const columnSchema = z.object({
   id: z.string(),
   log_type: z.enum(LOG_TYPES),
-  method: z.enum(METHODS),
-  pathname: z.string(),
-  level: z.enum(LEVELS),
-  status: z.number(),
+  method: z.enum(METHODS).nullable(),
+  pathname: z.string().nullable(),
+  level: z.enum(LEVELS).nullable(),
+  status: z.number().nullable(),
   date: z.date(),
   timestamp: z.number(),
   event_message: z.string().optional(),
   log_count: z.number().optional(), // used to count function logs for a given execution_id
   logs: z.array(z.any()).optional(), // array of function logs
-  auth_user: z.string().optional(),
+  auth_user: z.string().nullable().optional(),
+  metadata: z.record(z.string(), z.unknown()).nullable().optional(),
 })
 
 export type ColumnSchema = z.infer<typeof columnSchema>

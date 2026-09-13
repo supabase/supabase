@@ -21,27 +21,27 @@ The styling and layout of these components can be customized by passing in the c
 The components that can be replaced in `react-hook-form` atoms are highlighted below:
 
 ```tsx showLineNumbers {1-2,6-8}
-<FormItem_Shadcn_>
-  <FormLabel_Shadcn_>Username</FormLabel_Shadcn_>
-  <FormControl_Shadcn_>
+<FormItem>
+  <FormLabel>Username</FormLabel>
+  <FormControl>
     <Input placeholder="shadcn" {...field} />
-  </FormControl_Shadcn_>
-  <FormDescription_Shadcn_>This is your public display name.</FormDescription_Shadcn_>
-  <FormMessage_Shadcn_ />
-</FormItem_Shadcn_>
+  </FormControl>
+  <FormDescription>This is your public display name.</FormDescription>
+  <FormMessage />
+</FormItem>
 ```
 
 Using `FormItemLayout` it can look like this:
 
 ```tsx
 <FormItemLayout label="Username" description="This is your public display name">
-  <FormControl_Shadcn_>
+  <FormControl>
     <Input placeholder="mildtomato" {...field} />
-  </FormControl_Shadcn_>
+  </FormControl>
 </FormItemLayout>
 ```
 
-Please note that you must still use `FormControl_Shadcn_` to wrap input fields.
+Please note that you must still use `FormControl` to wrap input fields.
 
 ## Examples
 

@@ -1,5 +1,3 @@
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Dialog,
@@ -10,8 +8,11 @@ import {
   DialogSection,
   DialogTitle,
 } from 'ui'
+
 import { AdditionalMonthlySpend } from './AdditionalMonthlySpend'
 import { NewProjectPrice } from './RestoreToNewProject.utils'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface ConfirmRestoreDialogProps {
   open: boolean
@@ -68,10 +69,12 @@ export const ConfirmRestoreDialog = ({
         </DialogSection>
         <AdditionalMonthlySpend additionalMonthlySpend={additionalMonthlySpend} />
         <DialogFooter>
-          <Button type="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={() => onSelectContinue()}>Continue</Button>
+          <Button variant="primary" onClick={() => onSelectContinue()}>
+            Continue
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

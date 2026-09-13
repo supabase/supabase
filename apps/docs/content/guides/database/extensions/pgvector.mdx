@@ -1,7 +1,7 @@
 ---
 id: 'pgvector'
 title: 'pgvector: Embeddings and vector similarity'
-description: 'pgvector: a PostgreSQL extension for storing embeddings and performing vector similarity search.'
+description: 'pgvector: a Postgres extension for storing embeddings and performing vector similarity search.'
 ---
 
 [pgvector](https://github.com/pgvector/pgvector/) is a Postgres extension for vector similarity search. It can also be used for storing [embeddings](/blog/openai-embeddings-postgres-vector).
@@ -22,7 +22,7 @@ Vector similarity refers to a measure of the similarity between two related item
 
 ### Embeddings
 
-This is particularly useful if you're building on top of OpenAI's [GPT-3](https://openai.com/blog/gpt-3-apps/). You can create and store [embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings) for retrieval augmented generation.
+This is particularly useful if you're building AI applications with large language models. You can create and store [embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings) for retrieval augmented generation (RAG).
 
 ## Usage
 
@@ -70,7 +70,7 @@ create table posts (
   id serial primary key,
   title text not null,
   body text not null,
-  embedding vector(384)
+  embedding extensions.vector(384)
 );
 ```
 
@@ -80,6 +80,7 @@ In this example we'll generate a vector using Transformer.js, then store it in t
 
 ```js
 import { pipeline } from '@xenova/transformers'
+
 const generateEmbedding = await pipeline('feature-extraction', 'Supabase/gte-small')
 
 const title = 'First post!'

@@ -1,5 +1,6 @@
-import { ForgotPasswordForm } from '@/registry/default/blocks/password-based-auth-tanstack/components/forgot-password-form'
 import { createFileRoute } from '@tanstack/react-router'
+
+import { ForgotPasswordForm } from '@/registry/default/blocks/password-based-auth-tanstack/components/forgot-password-form'
 
 export const Route = createFileRoute('/forgot-password')({
   component: ForgotPassword,

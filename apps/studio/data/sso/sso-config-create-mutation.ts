@@ -1,14 +1,17 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import type { operations } from 'api-types'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { orgSSOKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+type CreateSSOProviderBody =
+  operations['SSOProvidersController_createSSOProvider']['requestBody']['content']['application/json']
 
 export type SSOConfigCreateVariables = {
   slug: string
-  config: components['schemas']['CreateSSOProviderBody']
+  config: CreateSSOProviderBody
 }
 
 export async function createSSOConfig({ slug, config }: SSOConfigCreateVariables) {
@@ -28,27 +31,25 @@ export const useSSOConfigCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SSOConfigCreateData, ResponseError, SSOConfigCreateVariables>,
+  UseCustomMutationOptions<SSOConfigCreateData, ResponseError, SSOConfigCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<SSOConfigCreateData, ResponseError, SSOConfigCreateVariables>(
-    (vars) => createSSOConfig(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { slug } = variables
-        await queryClient.invalidateQueries(orgSSOKeys.orgSSOConfig(slug))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create SSO configuration: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SSOConfigCreateData, ResponseError, SSOConfigCreateVariables>({
+    mutationFn: (vars) => createSSOConfig(vars),
+    async onSuccess(data, variables, context) {
+      const { slug } = variables
+      await queryClient.invalidateQueries({ queryKey: orgSSOKeys.orgSSOConfig(slug) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create SSO configuration: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

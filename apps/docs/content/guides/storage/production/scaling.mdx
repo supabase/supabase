@@ -12,19 +12,19 @@ Here are some optimizations that you can consider to improve performance and red
 
 If your project has high egress, these optimizations can help reducing it.
 
-#### Resize images
+### Resize images
 
 Images typically make up most of your egress. By keeping them as small as possible, you can cut down on egress and boost your application's performance. You can take advantage of our [Image Transformation](/docs/guides/storage/serving/image-transformations) service to optimize any image on the fly.
 
-#### Set a high cache-control value
+### Set a high cache-control value
 
 Using the browser cache can effectively lower your egress since the asset remains stored in the user's browser after the initial download. Setting a high `cache-control` value ensures the asset stays in the user's browser for an extended period, decreasing the need to download it from the server repeatedly. Read more [here](/docs/guides/storage/cdn/smart-cdn#cache-duration)
 
-#### Limit the upload size
+### Limit the upload size
 
 You have the option to set a maximum upload size for your bucket. Doing this can prevent users from uploading and then downloading excessively large files. You can control the maximum file size by configuring this option at the [bucket level](/docs/guides/storage/buckets/creating-buckets).
 
-#### Smart CDN
+### Smart CDN
 
 By leveraging our [Smart CDN](/docs/guides/storage/cdn/smart-cdn), you can achieve a higher cache hit rate and therefore lower your egress cached, as we charge less for cached egress (see [egress pricing](/docs/guides/platform/manage-your-usage/egress#pricing)).
 

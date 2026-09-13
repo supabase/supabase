@@ -1,5 +1,10 @@
-import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
+import {
+  normalizeRedirectUrl,
+  parseRedirectUrls,
+  urlRegex,
+} from '@/components/interfaces/Auth/Auth.constants'
 
 describe('Auth.constants: urlRegex', () => {
   it('should match valid URLs', () => {
@@ -47,5 +52,17 @@ describe('Auth.constants: urlRegex', () => {
   it('should match simple domain URLs when excludeSimpleDomains is false', () => {
     const simpleDomainUrl = 'smtp-pulse.com'
     expect(urlRegex({ excludeSimpleDomains: false }).test(simpleDomainUrl)).toBe(true)
+  })
+
+  it('normalizes redirect URLs before saving', () => {
+    expect(normalizeRedirectUrl('  https://example.com/path ,   ')).toBe('https://example.com/path')
+  })
+
+  it('parses stored redirect URLs into trimmed unique values', () => {
+    expect(
+      parseRedirectUrls(
+        'https://example.com/callback, https://example.com/callback  ,  https://example.com/next'
+      )
+    ).toEqual(['https://example.com/callback', 'https://example.com/next'])
   })
 })

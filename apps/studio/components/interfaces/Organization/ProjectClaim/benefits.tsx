@@ -1,9 +1,9 @@
 import { CheckCircle2 } from 'lucide-react'
-
-import { ApiAuthorizationResponse } from 'data/api-authorization/api-authorization-query'
-import { OrganizationProjectClaimResponse } from 'data/organizations/organization-project-claim-query'
 import { Button } from 'ui'
+
 import { ProjectClaimLayout } from './layout'
+import { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
+import { OrganizationProjectClaimResponse } from '@/data/organizations/organization-project-claim-query'
 
 export const ProjectClaimBenefits = ({
   projectClaim,
@@ -81,7 +81,7 @@ export const ProjectClaimBenefits = ({
           </ul>
         </div>
         <div className="flex justify-center sticky bottom-0">
-          <Button size="medium" onClick={onContinue}>
+          <Button variant="primary" size="medium" onClick={onContinue}>
             Continue connection
           </Button>
         </div>

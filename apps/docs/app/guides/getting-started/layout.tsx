@@ -3,7 +3,9 @@ import Layout from '~/layouts/guides'
 import { getAiPrompts } from '../getting-started/ai-prompts/[slug]/AiPrompts.utils'
 
 export default async function GettingStartedLayout({ children }: { children: React.ReactNode }) {
-  const additionalNavItems = { prompts: await getPrompts() }
+  const additionalNavItems = {
+    prompts: await getPrompts(),
+  }
 
   return <Layout additionalNavItems={additionalNavItems}>{children}</Layout>
 }

@@ -1,8 +1,9 @@
 import { source } from 'common-tags'
-import { makeRandomString } from 'lib/helpers'
+
 import { executeQuery } from './query'
 import { PgMetaDatabaseError, WrappedResult } from './types'
 import { assertSelfHosted } from './util'
+import { makeRandomString } from '@/lib/helpers'
 
 export type ListMigrationsResult = {
   version: string
@@ -34,7 +35,7 @@ const applyAndTrackMigrationsQuery = (query: string, name?: string) => {
     -- track statements in history table
     insert into supabase_migrations.schema_migrations (version, name, statements)
     values (
-      to_char(current_timestamp, 'YYYYMMDDHHMISS'),
+      to_char(current_timestamp, 'YYYYMMDDHH24MISS'),
       ${quote(name)},
       array[${quote(query)}]
     );

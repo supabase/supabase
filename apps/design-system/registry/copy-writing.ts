@@ -1,0 +1,68 @@
+import { Registry } from './schema'
+
+export const copyWriting: Registry = [
+  {
+    name: 'copy-button-verbs',
+    type: 'components:example',
+    files: ['example/copy-button-verbs.tsx'],
+    registryDependencies: ['button'],
+    category: 'Getting Started',
+    subcategory: 'Copywriting',
+  },
+  {
+    name: 'copy-form-labels',
+    type: 'components:example',
+    files: ['example/copy-form-labels.tsx'],
+    registryDependencies: ['form'],
+    category: 'Getting Started',
+    subcategory: 'Copywriting',
+  },
+  {
+    name: 'copy-error-messages',
+    type: 'components:example',
+    files: ['example/copy-error-messages.tsx'],
+    registryDependencies: ['form'],
+    category: 'Getting Started',
+    subcategory: 'Copywriting',
+  },
+  {
+    name: 'copy-success-messages',
+    type: 'components:example',
+    files: ['example/copy-success-messages.tsx'],
+    registryDependencies: ['form'],
+    category: 'Getting Started',
+    subcategory: 'Copywriting',
+  },
+  {
+    name: 'copy-tooltips',
+    type: 'components:example',
+    files: ['example/copy-tooltips.tsx'],
+    registryDependencies: ['tooltip'],
+    category: 'Getting Started',
+    subcategory: 'Copywriting',
+  },
+  {
+    name: 'copy-loading-states',
+    type: 'components:example',
+    files: ['example/copy-loading-states.tsx'],
+    registryDependencies: ['loading-state'],
+    category: 'Getting Started',
+    subcategory: 'Copywriting',
+  },
+  {
+    name: 'copy-empty-states',
+    type: 'components:example',
+    files: ['example/copy-empty-states.tsx'],
+    registryDependencies: ['empty-state'],
+    category: 'Getting Started',
+    subcategory: 'Copywriting',
+  },
+  {
+    name: 'copy-confirmations',
+    type: 'components:example',
+    files: ['example/copy-confirmations.tsx'],
+    registryDependencies: ['confirmation'],
+    category: 'Getting Started',
+    subcategory: 'Copywriting',
+  },
+]

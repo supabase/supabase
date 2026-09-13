@@ -1,0 +1,57 @@
+---
+title: NavMenu
+description: A horizontal list of related views within a consistent context.
+component: true
+---
+
+<Admonition type="warning" title="Consider renaming">
+  This component is titled very similarly to the [Navigation Menu](../components/navigation-menu)
+  component. Consider renaming it to something like TabMenu or
+  [UnderlineNav](https://primer.style/product/components/underline-nav/).
+</Admonition>
+
+<ComponentPreview
+  name="nav-menu-demo"
+  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
+  peekCode
+  wide
+/>
+
+## Usage
+
+NavBar is exclusively used as sub-navigation within PageLayout.
+
+```tsx
+import { NavMenu, NavMenuItem } from 'ui'
+```
+
+```tsx
+<NavMenu>
+  <NavMenuItem active={true}>
+    <Link href="#">Overview</Link>
+  </NavMenuItem>
+  <NavMenuItem active={false}>
+    <Link href="#">Documentation</Link>
+  </NavMenuItem>
+</NavMenu>
+```
+
+## Examples
+
+### With counter badges
+
+You may include counter badges to indicate the number of items within a tab, for example the amount of buckets in storage.
+
+<ComponentPreview
+  name="nav-menu-badges"
+  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
+/>
+
+### With icons
+
+You may include icons to more clearly represent the content of each tab. Every tab should have an icon (or no icon).
+
+<ComponentPreview
+  name="nav-menu-icons"
+  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
+/>

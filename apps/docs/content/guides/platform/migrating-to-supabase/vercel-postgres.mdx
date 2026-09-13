@@ -8,7 +8,7 @@ This guide demonstrates how to migrate your Vercel Postgres database to Supabase
 
 ## Retrieve your Vercel Postgres database credentials [#retrieve-credentials]
 
-1. Log in to your Vercel Dashboard [https://vercel.com/login](https://vercel.com/login).
+1. Sign in to your Vercel Dashboard [https://vercel.com/login](https://vercel.com/login).
 1. Click on the **Storage** tab.
 1. Click on your Postgres Database.
 1. Under the **Quickstart** section, select **psql** then click **Show Secret** to reveal your database password.
@@ -41,7 +41,7 @@ export OLD_DB_URL="postgres://default:xxxxxxxxxxxx@yy-yyyyy-yyyyyy-yyyyyyy.us-we
 1. If you're new to Supabase, [create a project](/dashboard).
    Make a note of your password, you will need this later. If you forget it, you can [reset it here](/dashboard/project/_/database/settings).
 
-1. On your project dashboard, click [Connect](/dashboard/project/_?showConnect=true)
+1. On your project dashboard, click [Connect](/dashboard/project/_?showConnect=true&method=session)
 1. Under the Session pooler, click the **Copy** button to the right of your connection string to copy it to the clipboard.
 
 ## Set your `NEW_DB_URL` environment variable

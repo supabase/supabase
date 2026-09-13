@@ -1,19 +1,33 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-
-import { Markdown } from 'components/interfaces/Markdown'
 import { cn } from 'ui'
+
+import { Markdown } from '@/components/interfaces/Markdown'
+import { loadIntegrationOverview } from '@/static-data/integrations/overviews'
 
 const CHAR_LIMIT = 500 // Adjust this number as needed
 
-export const MarkdownContent = ({ integrationId }: { integrationId: string }) => {
+export const MarkdownContent = ({
+  integrationId,
+  initiallyExpanded,
+}: {
+  integrationId: string
+  initiallyExpanded?: boolean
+}) => {
   const [content, setContent] = useState<string>('')
-  const [isExpanded, setIsExpanded] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(initiallyExpanded ?? false)
 
   useEffect(() => {
-    import(`static-data/integrations/${integrationId}/overview.md`)
-      .then((module) => setContent(String(module.default)))
+    let cancelled = false
+    loadIntegrationOverview(integrationId)
+      .then((markdown) => {
+        if (!cancelled && markdown !== null) setContent(markdown)
+      })
       .catch((error) => console.error('Error loading markdown:', error))
+
+    return () => {
+      cancelled = true
+    }
   }, [integrationId])
 
   const displayContent = isExpanded ? content : content.slice(0, CHAR_LIMIT)
@@ -30,13 +44,13 @@ export const MarkdownContent = ({ integrationId }: { integrationId: string }) =>
           className="overflow-hidden"
           transition={{ duration: 0.4 }}
         >
-          <Markdown content={displayContent} className="!max-w-3xl" />
+          <Markdown content={displayContent} className="max-w-3xl!" />
         </motion.div>
         {!isExpanded && (
           <div
             className={cn(
               'bottom-0 left-0 right-0 h-24',
-              supportExpanding && 'bg-gradient-to-t from-background-200 to-transparent',
+              supportExpanding && 'bg-linear-to-t from-background-200 to-transparent',
               !isExpanded ? 'absolute' : 'relative'
             )}
           />
@@ -44,6 +58,8 @@ export const MarkdownContent = ({ integrationId }: { integrationId: string }) =>
         {supportExpanding && (
           <div className={cn('bottom-0', !isExpanded ? 'absolute' : 'relative mt-3')}>
             <button
+              type="button"
+              tabIndex={0}
               className="text-foreground-light hover:text-foreground underline text-sm"
               onClick={() => setIsExpanded(!isExpanded)}
             >

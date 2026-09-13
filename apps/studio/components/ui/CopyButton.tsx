@@ -1,6 +1,5 @@
-import { Check, Clipboard } from 'lucide-react'
+import { Check, Copy } from 'lucide-react'
 import { ComponentProps, forwardRef, useEffect, useState } from 'react'
-
 import { Button, cn, copyToClipboard } from 'ui'
 
 type CopyButtonBaseProps = {
@@ -32,6 +31,9 @@ const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
       onClick,
       copyLabel = 'Copy',
       copiedLabel = 'Copied',
+      variant = 'primary',
+      icon,
+      className,
       ...props
     },
     ref
@@ -47,25 +49,23 @@ const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
     return (
       <Button
         ref={ref}
-        onClick={async (e) => {
-          const textToCopy = asyncText ? await asyncText() : text
+        onClick={(e) => {
+          const textToCopy = asyncText ? asyncText() : text
           setShowCopied(true)
           copyToClipboard(textToCopy)
           onClick?.(e)
         }}
         {...props}
-        className={cn(
-          {
-            'px-1': iconOnly,
-            // '!pointer-events-auto': props.disabled,
-          },
-          props.className
-        )}
+        variant={variant}
+        className={cn({ 'px-1.5': iconOnly }, className)}
         icon={
           showCopied ? (
-            <Check strokeWidth={2} className="text-brand" />
+            <Check
+              strokeWidth={2}
+              className={cn(variant === 'primary' ? 'text-inherit' : 'text-brand')}
+            />
           ) : (
-            props.icon ?? <Clipboard />
+            (icon ?? <Copy />)
           )
         }
       >

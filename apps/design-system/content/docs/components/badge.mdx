@@ -1,44 +1,12 @@
 ---
 title: Badge
-description: Displays a badge or a component that looks like a badge.
+description: Add contextual metadata to another item.
 component: true
-source:
-  shadcn: true
 ---
 
-<ComponentPreview name="badge-demo" peekCode wide />
+Badge displays contextual information such as surrounding state or product category. Its purpose should be be self-evident based on surrounding context.
 
-## Installation
-
-<Tabs defaultValue="cli">
-
-<TabsList>
-  <TabsTrigger value="cli">CLI</TabsTrigger>
-  <TabsTrigger value="manual">Manual</TabsTrigger>
-</TabsList>
-<TabsContent value="cli">
-
-```bash
-npx shadcn-ui@latest add badge
-```
-
-</TabsContent>
-
-<TabsContent value="manual">
-
-<Steps>
-
-<Step>Copy and paste the following code into your project.</Step>
-
-<ComponentSource name="badge" />
-
-<Step>Update the import paths to match your project setup.</Step>
-
-</Steps>
-
-</TabsContent>
-
-</Tabs>
+<ComponentPreview name="badge-demo" peekCode />
 
 ## Usage
 
@@ -47,41 +15,23 @@ import { Badge } from '@/components/ui/badge'
 ```
 
 ```tsx
-<Badge variant="outline">Badge</Badge>
+<Badge variant="default">Default</Badge>
 ```
 
-### Link
+Avoid altering the Badge style, such as text case or roundedness. Consistent implementation makes Badge immediately recognizable throughout Supabase for denoting state or category. Use or create another component for other use cases, such as compute size and status.
 
-You can use the `badgeVariants` helper to create a link that looks like a badge.
+Keep Badge text to one or two words as it is designed to support other elements, not as a primary communication aid.
 
-```tsx
-import { badgeVariants } from '@/components/ui/badge'
-```
-
-```tsx
-<Link className={badgeVariants({ variant: 'outline' })}>Badge</Link>
-```
+Badge is designed to stand out, so should be used sparingly.
 
 ## Examples
 
-### Default
+### States
 
-<ComponentPreview name="badge-demo" peekCode wide />
-
----
+<ComponentPreview name="badge-state" peekCode />
 
 ### Secondary
 
-<ComponentPreview name="badge-secondary" />
+A content-only variant similar to the `text` variant of [Button](../components/button#types).
 
----
-
-### Outline
-
-<ComponentPreview name="badge-outline" />
-
----
-
-### Destructive
-
-<ComponentPreview name="badge-destructive" />
+<ComponentPreview name="badge-secondary" peekCode />

@@ -2,9 +2,17 @@
 
 import * as React from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'ui'
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from 'ui'
 
 export const description = 'An interactive bar chart'
 
@@ -139,6 +147,7 @@ export default function Component() {
             const chart = key as keyof typeof chartConfig
             return (
               <button
+                tabIndex={0}
                 key={chart}
                 data-active={activeChart === chart}
                 className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-surface-100 sm:border-l sm:border-t-0 sm:px-8 sm:py-6"

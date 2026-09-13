@@ -1,5 +1,4 @@
 import { useState } from 'react'
-
 import {
   Button,
   Dialog,
@@ -10,11 +9,10 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  cn,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
-import { INTERNAL_SCHEMAS, useIsProtectedSchema } from 'hooks/useProtectedSchemas'
-import { Admonition } from 'ui-patterns'
+import { INTERNAL_SCHEMAS, useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 
 export const ProtectedSchemaDialog = ({ onClose }: { onClose: () => void }) => {
   return (
@@ -35,7 +33,7 @@ export const ProtectedSchemaDialog = ({ onClose }: { onClose: () => void }) => {
             </code>
           ))}
         </div>
-        <p className="text-sm !mt-4">
+        <p className="text-sm mt-4!">
           These schemas are critical to the functionality of your Supabase project and hence we
           highly recommend not altering them.
         </p>
@@ -46,9 +44,7 @@ export const ProtectedSchemaDialog = ({ onClose }: { onClose: () => void }) => {
       </DialogSection>
       <DialogFooter>
         <div className="flex items-center justify-end space-x-2">
-          <Button type="default" onClick={onClose}>
-            Understood
-          </Button>
+          <Button onClick={onClose}>Understood</Button>
         </div>
       </DialogFooter>
     </>
@@ -65,36 +61,44 @@ export const ProtectedSchemaWarning = ({
   entity: string
 }) => {
   const [showModal, setShowModal] = useState(false)
-  const { isSchemaLocked, reason } = useIsProtectedSchema({ schema })
+  const { isSchemaLocked, reason, fdwType } = useIsProtectedSchema({ schema })
 
   if (!isSchemaLocked) return null
 
+  const showLearnMoreDialog =
+    reason !== 'fdw' || (fdwType !== 'iceberg' && fdwType !== 's3_vectors')
+
   return (
     <Admonition
-      showIcon={false}
+      showIcon={size === 'sm' ? false : true}
+      layout={size === 'sm' ? 'vertical' : 'horizontal'}
       type="note"
       title={
         size === 'sm' ? `Viewing protected schema` : `Viewing ${entity} from a protected schema`
       }
-      className={cn(
-        '[&>div>p]:prose [&>div>p]:max-w-full [&>div>p]:!leading-normal',
-        size === 'sm' ? '[&>div>p]:text-xs' : '[&>div>p]:text-sm'
-      )}
-    >
-      {reason === 'fdw' ? (
-        <p>
-          The <code className="text-xs">{schema}</code> schema is used by Supabase to connect to
-          analytics buckets and is read-only through the dashboard.
-        </p>
-      ) : (
-        <>
-          <p className="mb-2">
-            The <code className="text-xs">{schema}</code> schema is managed by Supabase and is
-            read-only through the dashboard.
+      description={
+        reason === 'fdw' && fdwType === 'iceberg' ? (
+          <p>
+            The <code className="text-code-inline">{schema}</code> schema is used by Supabase to
+            connect to analytics buckets and is read-only through the dashboard.
           </p>
+        ) : reason === 'fdw' && fdwType === 's3_vectors' ? (
+          <p>
+            The <code className="text-code-inline">{schema}</code> schema is used by Supabase to
+            connect to vector buckets and is read-only through the dashboard.
+          </p>
+        ) : (
+          <p>
+            The <code className="text-code-inline">{schema}</code> schema is managed by Supabase and
+            is read-only through the dashboard.
+          </p>
+        )
+      }
+      actions={
+        showLearnMoreDialog && (
           <Dialog open={showModal} onOpenChange={setShowModal}>
             <DialogTrigger asChild>
-              <Button type="default" size="tiny" onClick={() => setShowModal(true)}>
+              <Button size="tiny" onClick={() => setShowModal(true)}>
                 Learn more
               </Button>
             </DialogTrigger>
@@ -102,8 +106,8 @@ export const ProtectedSchemaWarning = ({
               <ProtectedSchemaDialog onClose={() => setShowModal(false)} />
             </DialogContent>
           </Dialog>
-        </>
-      )}
-    </Admonition>
+        )
+      }
+    />
   )
 }

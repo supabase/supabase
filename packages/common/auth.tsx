@@ -10,6 +10,7 @@ import {
   useMemo,
   useState,
 } from 'react'
+
 import { clearLocalStorage } from './constants/local-storage'
 import { gotrueClient, type User } from './gotrue'
 
@@ -127,7 +128,16 @@ export const useAuth = () => useContext(AuthContext)
 
 export const useSession = () => useAuth().session
 
-export const useUser = () => useSession()?.user ?? null
+export const useUser = () => {
+  const user = useSession()?.user ?? null
+
+  // auth-js substitutes a throwing proxy for `user` when it was configured with
+  // `userStorage` and hasn't migrated the user into storage yet. Treat that as
+  // "no user" instead of crashing whenever a property on it is read.
+  if (user && (user as any).__isUserNotAvailableProxy) return null
+
+  return user
+}
 
 export const useIsUserLoading = () => useAuth().isLoading
 
@@ -152,34 +162,24 @@ export const logOut = async () => {
   clearLocalStorage()
 }
 
-let currentSession: Session | null = null
-
-gotrueClient.onAuthStateChange((event, session) => {
-  currentSession = session
-})
+gotrueClient.onAuthStateChange((_event, _session) => {})
 
 /**
- * Grabs the currently available access token, or calls getSession.
+ * Gets a current access token.
+ *
+ * Calls getSession, which will refresh the token if needed.
  */
 export async function getAccessToken() {
   // ignore if server-side
   if (typeof window === 'undefined') return undefined
 
-  const aboutToExpire = currentSession?.expires_at
-    ? currentSession.expires_at - Math.ceil(Date.now() / 1000) < 30
-    : false
-
-  if (!currentSession || aboutToExpire) {
-    const {
-      data: { session },
-      error,
-    } = await gotrueClient.getSession()
-    if (error) {
-      throw error
-    }
-
-    return session?.access_token
+  const {
+    data: { session },
+    error,
+  } = await gotrueClient.getSession()
+  if (error) {
+    throw error
   }
 
-  return currentSession.access_token
+  return session?.access_token
 }

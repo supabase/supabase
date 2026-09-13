@@ -37,6 +37,7 @@ The following regions are supported:
 **Europe:**
 
 - `eu-central-1` (Frankfurt)
+- `eu-central-2` (Zurich)
 - `eu-west-1` (Ireland)
 - `eu-west-2` (London)
 - `eu-west-3` (Paris)
@@ -76,6 +77,16 @@ In case you cannot add the `x-region` header to the request (e.g.: CORS requests
 You can verify the execution region by looking at the `x-sb-edge-region` HTTP header in the response. You can also find it as metadata in [Edge Function Logs](/docs/guides/functions/logging).
 
 </Admonition>
+
+---
+
+## Region runtime information
+
+Functions have access to the following environment variables:
+
+SB_REGION: The AWS region function was invoked
+
+This is useful if you have read replicate and want to Postgres connect to a different replicate according of the Region.
 
 ---
 

@@ -1,10 +1,9 @@
-import React from 'react'
-import { cn, IconDocumentation } from 'ui'
-import Link from 'next/link'
-import { PRODUCT_MODULES_NAMES } from 'shared-data/products'
-
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductModules from '~/data/ProductModules'
+import Link from 'next/link'
+import React from 'react'
+import { PRODUCT_MODULES_NAMES } from 'shared-data/products'
+import { cn, IconDocumentation } from 'ui'
 
 interface Props {
   activePage: PRODUCT_MODULES_NAMES
@@ -14,7 +13,7 @@ interface Props {
 function ModulesNav({ activePage, docsUrl }: Props) {
   return (
     <nav className="sticky top-0 mb-4 z-30 flex flex-nowrap items-center bg-alternative/90 backdrop-blur-md w-full border-b border-muted">
-      <SectionContainer className="!py-0 flex gap-3 items-center justify-between">
+      <SectionContainer className="w-full py-0! flex gap-3 items-center justify-between">
         <div className="w-max flex gap-3 items-center">
           {Object.entries(ProductModules).map((obj) => {
             const currentModule = obj[1]
@@ -24,7 +23,7 @@ function ModulesNav({ activePage, docsUrl }: Props) {
                 key={currentModule.name}
                 className={cn(
                   'flex items-center gap-1.5 px-2 first:-ml-2 py-3 border-b border-transparent text-sm text-foreground-lighter hover:text-foreground',
-                  'focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground focus-visible:outline-brand-600',
+                  'focus-ring focus-visible:text-foreground',
                   currentModule.name === activePage && 'border-foreground-light text-foreground'
                 )}
                 href={currentModule.url ?? ''}
@@ -53,7 +52,7 @@ function ModulesNav({ activePage, docsUrl }: Props) {
             <Link
               className={cn(
                 'flex items-center gap-1.5 py-3 border-b border-transparent text-sm text-foreground-lighter hover:text-foreground',
-                'focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground focus-visible:outline-brand-600'
+                'focus-ring focus-visible:text-foreground'
               )}
               href={docsUrl}
             >
