@@ -385,6 +385,9 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       deleteContent(
         { projectRef, ids },
         {
+          onError: () => {
+            setSelectedFolderToDelete(undefined)
+          },
           onSuccess: () => {
             ids.forEach((id) => snapV2.removeSnippet(id))
             postDeleteCleanup(ids)
