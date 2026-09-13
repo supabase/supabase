@@ -32,6 +32,7 @@ import {
   canMoveItemsTo,
   getColumnDropId,
   getColumnPath,
+  isWithinMoveLimit,
   toMoveCandidates,
 } from './FileExplorerDnd.utils'
 import { FileExplorerRow } from './FileExplorerRow'
@@ -117,7 +118,9 @@ export const FileExplorerColumn = ({
     data: { path: columnPath },
   })
   const isDropTarget =
-    isOver && canMoveItemsTo(toMoveCandidates(snap.openedFolders, draggedItems), columnPath)
+    isOver &&
+    isWithinMoveLimit(draggedItems.length) &&
+    canMoveItemsTo(toMoveCandidates(snap.openedFolders, draggedItems), columnPath)
 
   // Memoized because dnd-kit re-registers the node whenever the ref callback identity changes
   const setColumnNodeRef = useCallback(

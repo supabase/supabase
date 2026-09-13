@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { MAX_ITEMS_PER_MOVE } from '@/components/interfaces/Storage/Storage.constants'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -51,7 +52,10 @@ export function useStorageExplorerShortcuts({ onClearSearch }: UseStorageExplore
   useShortcut(
     SHORTCUT_IDS.STORAGE_EXPLORER_MOVE_SELECTED,
     () => setSelectedItemsToMove(selectedItems),
-    { enabled: selectedItems.length > 0 && canUpdateFiles }
+    {
+      enabled:
+        selectedItems.length > 0 && selectedItems.length <= MAX_ITEMS_PER_MOVE && canUpdateFiles,
+    }
   )
 
   useShortcut(

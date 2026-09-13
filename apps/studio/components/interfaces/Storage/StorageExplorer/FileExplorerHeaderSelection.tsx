@@ -2,12 +2,25 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Download, Move, Trash2, X } from 'lucide-react'
 import { Button } from 'ui'
 
+import { MAX_ITEMS_PER_MOVE } from '../Storage.constants'
 import { bulkActionBarClassName } from './storageExplorerChrome'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
+
+const getMoveTooltipText = ({
+  canUpdateFiles,
+  isOverMoveLimit,
+}: {
+  canUpdateFiles: boolean
+  isOverMoveLimit: boolean
+}) => {
+  if (!canUpdateFiles) return 'You need additional permissions to move files'
+  if (isOverMoveLimit) return `Move up to ${MAX_ITEMS_PER_MOVE} items at a time`
+  return undefined
+}
 
 export const FileExplorerHeaderSelection = () => {
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
@@ -22,6 +35,8 @@ export const FileExplorerHeaderSelection = () => {
   } = useStorageExplorerStateSnapshot()
 
   const count = selectedItems.length
+  const isOverMoveLimit = count > MAX_ITEMS_PER_MOVE
+  const canMoveSelection = canUpdateFiles && !isOverMoveLimit
 
   return (
     <div className={bulkActionBarClassName}>
@@ -72,17 +87,17 @@ export const FileExplorerHeaderSelection = () => {
         <ShortcutTooltip
           shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_MOVE_SELECTED}
           side="bottom"
-          open={!canUpdateFiles ? false : undefined}
+          open={!canMoveSelection ? false : undefined}
         >
           <ButtonTooltip
             size="tiny"
             icon={<Move size={12} />}
-            disabled={!canUpdateFiles}
+            disabled={!canMoveSelection}
             onClick={() => setSelectedItemsToMove(selectedItems)}
             tooltip={{
               content: {
                 side: 'bottom',
-                text: !canUpdateFiles ? 'You need additional permissions to move files' : undefined,
+                text: getMoveTooltipText({ canUpdateFiles, isOverMoveLimit }),
               },
             }}
           >

@@ -9,6 +9,7 @@ import {
   getItemPath,
   getRowDragId,
   getRowDropId,
+  isWithinMoveLimit,
   toMoveCandidates,
 } from './FileExplorerDnd.utils'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
@@ -55,7 +56,8 @@ export const useFileExplorerRowDnd = ({
   })
 
   const draggedItemPaths = toMoveCandidates(openedFolders, draggedItems)
-  const canAcceptDraggedItems = canMoveItemsTo(draggedItemPaths, itemPath)
+  const canAcceptDraggedItems =
+    isWithinMoveLimit(draggedItems.length) && canMoveItemsTo(draggedItemPaths, itemPath)
   const isPartOfDrag = draggedItemPaths.some((dragged) => dragged.path === itemPath)
 
   // The row is both the drag handle and the drop target, so both refs point at the same element.

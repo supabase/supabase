@@ -1,4 +1,4 @@
-import { STORAGE_ROW_TYPES } from '../Storage.constants'
+import { MAX_ITEMS_PER_MOVE, STORAGE_ROW_TYPES } from '../Storage.constants'
 import type { StorageItem, StorageItemWithColumn } from '../Storage.types'
 
 /** A single object move, with both paths relative to the bucket root */
@@ -54,6 +54,9 @@ export const canMoveItemTo = (item: MoveCandidate, destinationPath: string) => {
 
 export const canMoveItemsTo = (items: MoveCandidate[], destinationPath: string) =>
   items.length > 0 && items.every((item) => canMoveItemTo(item, destinationPath))
+
+/** Folders count as one item here — what they hold is only known once they're expanded */
+export const isWithinMoveLimit = (count: number) => count <= MAX_ITEMS_PER_MOVE
 
 /**
  * Maps every object within a folder to its destination, preserving the structure beneath it.

@@ -10,6 +10,7 @@ import { proxy, useSnapshot } from 'valtio'
 
 import { useSelectedBucket } from '@/components/interfaces/Storage/FilesBuckets/useSelectedBucket'
 import {
+  MAX_ITEMS_PER_MOVE,
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
 } from '@/components/interfaces/Storage/Storage.constants'
@@ -23,6 +24,7 @@ import {
   getColumnPath,
   getFolderObjectMoves,
   getItemPath,
+  isWithinMoveLimit,
   joinPaths,
   type ObjectMove,
 } from '@/components/interfaces/Storage/StorageExplorer/FileExplorerDnd.utils'
@@ -1424,60 +1426,11 @@ function createStorageExplorerState({
       )
     },
 
+    /** Entry point for the "Move" dialog — drag and drop calls moveItems directly */
     moveFiles: async (newPathToFile: string) => {
-      const newPaths = compact(newPathToFile.split('/'))
-      const formattedNewPathToFile = newPaths.join('/')
-      let numberOfFilesMovedFail = 0
-      state.clearSelectedItems()
-
-      const toastId = toast(
-        `Moving ${state.selectedItemsToMove.length} file${state.selectedItemsToMove.length > 1 ? 's' : ''}...`,
-        {
-          description: STORAGE_PROGRESS_INFO_TEXT,
-          duration: Infinity,
-        }
-      )
-
-      await Promise.all(
-        state.selectedItemsToMove.map(async (item) => {
-          const pathToFile = state.openedFolders
-            .slice(0, item.columnIndex)
-            .map((folder) => folder.name)
-            .join('/')
-
-          const fromPath = pathToFile.length > 0 ? `${pathToFile}/${item.name}` : item.name
-          const toPath =
-            newPathToFile.length > 0 ? `${formattedNewPathToFile}/${item.name}` : item.name
-
-          try {
-            await moveStorageObject({
-              projectRef: state.projectRef,
-              bucketId: state.selectedBucket.id,
-              from: fromPath,
-              to: toPath,
-            })
-          } catch (error: any) {
-            numberOfFilesMovedFail += 1
-            toast.error(error.message)
-          }
-        })
-      )
-
-      if (numberOfFilesMovedFail === state.selectedItemsToMove.length) {
-        toast.error('Failed to move files')
-      } else {
-        toast(
-          `Successfully moved ${
-            state.selectedItemsToMove.length - numberOfFilesMovedFail
-          } files to ${formattedNewPathToFile.length > 0 ? formattedNewPathToFile : 'the root of your bucket'}`
-        )
-      }
-
-      toast.dismiss(toastId)
-
-      // TODO: invalidate the file preview cache when moving files
-      await state.refetchAllOpenedFolders()
+      const items = [...state.selectedItemsToMove]
       state.setSelectedItemsToMove([])
+      await state.moveItems(items, compact(newPathToFile.split('/')).join('/'))
     },
 
     /**
@@ -1514,7 +1467,6 @@ function createStorageExplorerState({
       if (movedOpenFolders.length === 0) return
 
       const columnIndex = Math.min(...movedOpenFolders.map((item) => item.columnIndex))
-      state.setSelectedFilePreview(undefined)
       state.popOpenedFoldersAtIndex(columnIndex - 1)
     },
 
@@ -1527,10 +1479,22 @@ function createStorageExplorerState({
       await Promise.all(sourceFolderPaths.map((path) => state.validateParentFolderEmpty(path)))
     },
 
-    /** Moves files and folders into another folder of the same bucket. Used by drag and drop */
+    /**
+     * Moves files and folders into another folder of the same bucket.
+     *
+     * Every object moves in its own request, so the batch is capped twice: once on the items the
+     * user picked, and again on the objects those items expand into — a single folder can hold
+     * far more files than the cap allows.
+     */
     moveItems: async (items: StorageItemWithColumn[], destinationPath: string) => {
+      if (!isWithinMoveLimit(items.length)) {
+        return toast.error(
+          `Can't move ${items.length} items at once. Select up to ${MAX_ITEMS_PER_MOVE} items and try again.`
+        )
+      }
+
       const destinationLabel = destinationPath.length > 0 ? destinationPath : 'the bucket root'
-      const toastId = toast.loading('Preparing to move items...')
+      const toastId = toast.loading('Preparing to move items...', { position: 'top-right' })
 
       let objectsToMove: ObjectMove[] = []
       try {
@@ -1545,11 +1509,20 @@ function createStorageExplorerState({
 
       if (objectsToMove.length === 0) return toast.dismiss(toastId)
 
+      if (!isWithinMoveLimit(objectsToMove.length)) {
+        return toast.error(`Can't move ${objectsToMove.length} files at once`, {
+          id: toastId,
+          closeButton: true,
+          duration: SONNER_DEFAULT_DURATION,
+          description: `Moves are limited to ${MAX_ITEMS_PER_MOVE} files. Move this folder's contents in smaller batches instead.`,
+        })
+      }
+
       state.clearSelectedItems()
       state.setSelectedFilePreview(undefined)
 
       const message = `Moving ${objectsToMove.length} file${objectsToMove.length > 1 ? 's' : ''} to ${destinationLabel}`
-      const showProgress = (progress: number, description?: string) =>
+      const showProgress = (progress: number, description: string = STORAGE_PROGRESS_INFO_TEXT) =>
         toast(<SonnerProgress progress={progress} message={message} description={description} />, {
           id: toastId,
           closeButton: false,
@@ -1594,6 +1567,8 @@ function createStorageExplorerState({
 
       await state.restoreEmptiedSourceFolders(items)
       state.closeMovedFolders(items)
+
+      // TODO: invalidate the file preview cache when moving files
       await state.refetchAllOpenedFolders()
     },
 

@@ -13,10 +13,15 @@ import {
 } from '@dnd-kit/core'
 import { createContext, useContext, useState, type PropsWithChildren } from 'react'
 
-import { STORAGE_VIEWS } from '../Storage.constants'
+import { MAX_ITEMS_PER_MOVE, STORAGE_VIEWS } from '../Storage.constants'
 import type { StorageItemWithColumn } from '../Storage.types'
 import { StorageRowIcon } from '../StorageRowIcon'
-import { canMoveItemsTo, isRowDropId, toMoveCandidates } from './FileExplorerDnd.utils'
+import {
+  canMoveItemsTo,
+  isRowDropId,
+  isWithinMoveLimit,
+  toMoveCandidates,
+} from './FileExplorerDnd.utils'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 /**
@@ -57,16 +62,23 @@ const DragPreview = ({ items }: { items: StorageItemWithColumn[] }) => {
   if (!firstItem) return null
 
   return (
-    <div className="flex w-fit items-center gap-x-2 rounded-md border border-strong bg-surface-200 px-2.5 py-1.5 shadow-md">
-      <StorageRowIcon
-        view={STORAGE_VIEWS.COLUMNS}
-        status={firstItem.status}
-        fileType={firstItem.type}
-        mimeType={firstItem.metadata?.mimetype}
-      />
-      <span className="max-w-60 truncate text-sm">
-        {items.length > 1 ? `${items.length} items` : firstItem.name}
-      </span>
+    <div className="w-fit rounded-md border border-strong bg-surface-200 px-2.5 py-1.5 shadow-md">
+      <div className="flex items-center gap-x-2">
+        <StorageRowIcon
+          view={STORAGE_VIEWS.COLUMNS}
+          status={firstItem.status}
+          fileType={firstItem.type}
+          mimeType={firstItem.metadata?.mimetype}
+        />
+        <span className="max-w-60 truncate text-sm">
+          {items.length > 1 ? `${items.length} items` : firstItem.name}
+        </span>
+      </div>
+      {!isWithinMoveLimit(items.length) && (
+        <p className="mt-0.5 text-xs text-destructive-600">
+          Move up to {MAX_ITEMS_PER_MOVE} items at a time
+        </p>
+      )}
     </div>
   )
 }

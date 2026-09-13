@@ -41,6 +41,13 @@ export enum STORAGE_ROW_STATUS {
   EDITING = 'EDITING',
 }
 
+/**
+ * Storage has no bulk move endpoint, so every item in a move costs its own request. Larger
+ * batches run into rate limits part way through, which leaves a move half finished and its items
+ * split across two folders. Keeping batches small avoids that.
+ */
+export const MAX_ITEMS_PER_MOVE = 25
+
 export const STORAGE_CLIENT_LIBRARY_MAPPINGS = {
   upload: ['INSERT'],
   download: ['SELECT'],
