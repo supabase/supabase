@@ -121,7 +121,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                   value={activeDropdown}
                   onValueChange={setActiveDropdown}
                   renderViewport={false}
-                  className="static hidden pl-8 lg:flex h-16"
+                  className="static hidden pl-8 lg:flex h-16 items-stretch"
                 >
                   <NavigationMenuList className="h-full space-x-0 items-stretch">
                     {menu.primaryNav.map((menuItem) =>
