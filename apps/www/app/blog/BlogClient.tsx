@@ -41,7 +41,7 @@ function BlogListItemSkeleton() {
 
 function BlogGridItemSkeleton() {
   return (
-    <div className="flex flex-col gap-2 p-6">
+    <div className="flex flex-col gap-2 p-5">
       <div className="relative w-full aspect-[1.91/1] overflow-hidden bg-foreground-muted/20 animate-pulse" />
       <div className="flex items-center space-x-1.5 mt-2">
         <div className="h-4 w-24 bg-foreground-muted/20 rounded animate-pulse" />
