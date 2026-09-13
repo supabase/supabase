@@ -444,6 +444,23 @@ describe('Query.utils', () => {
         expect(result).toBe('select * from public.users where active is true;')
       })
 
+      test('should handle "is" operator values case-insensitively', () => {
+        const cases: Array<[string, string]> = [
+          ['NULL', 'email is null'],
+          ['Null', 'email is null'],
+          ['NOT NULL', 'email is not null'],
+          ['Not Null', 'email is not null'],
+          ['TRUE', 'active is true'],
+          ['FALSE', 'active is false'],
+        ]
+        for (const [value, expectedWhere] of cases) {
+          const column = expectedWhere.split(' ')[0]
+          const filters: Filter[] = [{ column, operator: 'is', value }]
+          const result = QueryUtils.selectQuery(table, safeSql`*`, { filters: filters })
+          expect(result).toBe(`select * from public.users where ${expectedWhere};`)
+        }
+      })
+
       test('should correctly escape string values in filters', () => {
         const filters: Filter[] = [{ column: 'name', operator: '=', value: "O'Reilly" }]
         const result = QueryUtils.selectQuery(table, safeSql`*`, { filters: filters })
