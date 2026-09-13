@@ -41,6 +41,12 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState('')
+  const [isSwitchingDropdown, setIsSwitchingDropdown] = useState(false)
+  const handleDropdownChange = (value: string) => {
+    // animate card height between two open menus only
+    setIsSwitchingDropdown(value !== '' && activeDropdown !== '')
+    setActiveDropdown(value)
+  }
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const user = useUser()
@@ -119,7 +125,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                 <NavigationMenu
                   delayDuration={0}
                   value={activeDropdown}
-                  onValueChange={setActiveDropdown}
+                  onValueChange={handleDropdownChange}
                   renderViewport={false}
                   className="static hidden pl-8 lg:flex h-16 items-stretch"
                 >
@@ -163,8 +169,9 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                   <NavigationMenuViewport
                     forceMount
                     data-open={activeDropdown !== ''}
+                    data-switching={isSwitchingDropdown}
                     containerProps={{ className: 'inset-x-0' }}
-                    className="rounded-xl bg-surface-75 md:w-[960px] data-[state=open]:animate-none data-[state=closed]:animate-none data-[state=open]:duration-200 data-[state=open]:ease-out data-[state=closed]:duration-200 data-[open=false]:invisible data-[open=false]:opacity-0 data-[open=false]:pointer-events-none motion-safe:transition-[opacity,visibility] motion-reduce:transition-none"
+                    className="rounded-xl bg-surface-75 md:w-[960px] data-[state=open]:animate-none data-[state=closed]:animate-none data-[state=open]:duration-200 data-[state=open]:ease-out data-[state=closed]:duration-200 data-[open=false]:invisible data-[open=false]:opacity-0 data-[open=false]:pointer-events-none motion-safe:transition-[opacity,visibility] motion-safe:data-[switching=true]:transition-[height,opacity] motion-reduce:transition-none"
                   />
                 </NavigationMenu>
               </div>
