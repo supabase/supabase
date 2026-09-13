@@ -50,4 +50,32 @@ describe('buildConnectPrompt', () => {
     expect(prompt).toContain('Set environment variables')
     expect(prompt).not.toContain('temporary-secret')
   })
+
+  test('omits inline code marked as sensitive', () => {
+    const container = document.createElement('div')
+    container.innerHTML = `
+      <div
+        data-connect-step
+        data-step-title="Set environment variables"
+        data-step-description="Add these credentials to your environment."
+      >
+        <div data-step-content>
+          <div class="font-mono" data-connect-prompt-ignore>
+            <code>DUCKLAKE_S3_SECRET=temporary-secret</code>
+          </div>
+          <div data-connect-tab-content data-tab-label="Shell">
+            <div class="font-mono" data-connect-prompt-ignore>
+              <code>DUCKLAKE_METADATA_PASSWORD=temporary-password</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    `
+
+    const prompt = buildConnectPrompt(container)
+
+    expect(prompt).toContain('Set environment variables')
+    expect(prompt).not.toContain('temporary-secret')
+    expect(prompt).not.toContain('temporary-password')
+  })
 })

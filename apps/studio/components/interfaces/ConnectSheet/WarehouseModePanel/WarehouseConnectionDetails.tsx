@@ -308,9 +308,7 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
             {isCatalogError && (
               <AlertError subject="Failed to load DuckLake catalog access" error={catalogError} />
             )}
-            {!isCatalogPending && !isCatalogError && catalog !== undefined && (
-              <CatalogAccessToggle projectRef={projectRef} isEnabled={catalog.enabled} />
-            )}
+            {catalog && <CatalogAccessToggle projectRef={projectRef} isEnabled={catalog.enabled} />}
           </>
         )}
         <span className="sr-only" role="status" aria-live="polite">
@@ -318,11 +316,9 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
         </span>
       </div>
 
-      {engine === 'duckdb' &&
-        !isCatalogPending &&
-        !isCatalogError &&
-        catalog?.enabled &&
-        catalog.credentials && <DuckLakeSetup credentials={catalog.credentials} />}
+      {engine === 'duckdb' && catalog?.enabled && catalog.credentials && (
+        <DuckLakeSetup credentials={catalog.credentials} />
+      )}
     </div>
   )
 }

@@ -65,7 +65,7 @@ const getStepCodeSnippets = (contentElement: HTMLElement) => {
     if (tabSnippets.length === 0) {
       const inlineSnippets = Array.from(tabContent.querySelectorAll('code'))
         .filter((code) => !code.closest('pre') && code.closest('.font-mono'))
-        .map((code) => code.textContent?.trim())
+        .map(getSnippet)
         .filter((snippet): snippet is string => Boolean(snippet))
       inlineSnippets.forEach((snippet, index) => {
         const inlineLabel = inlineSnippets.length > 1 ? `${label} (part ${index + 1})` : label
@@ -90,7 +90,7 @@ const getStepCodeSnippets = (contentElement: HTMLElement) => {
     if (code.closest('pre')) return
     if (code.closest('[data-connect-tab-content]')) return
     if (!code.closest('.font-mono')) return
-    const snippet = code.textContent?.trim()
+    const snippet = getSnippet(code)
     if (snippet) addSnippet('Code', snippet)
   })
 
