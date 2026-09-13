@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeftRight, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { useWindowSize } from 'react-use'
+import { useMedia, useWindowSize } from 'react-use'
 
 type LinkProps = {
   text: string
@@ -69,22 +69,27 @@ const LinksGroup = ({ links, label }: { links: LinkProps[]; label: string }) => 
 const MotionLink = motion(Link)
 
 const MigrationLinkCard = ({ link }: { link: LinkProps }) => {
-  const [hovered, setHovered] = useState(false)
+  const [isHighlighted, setIsHighlighted] = useState(false)
   const { width } = useWindowSize()
+  const canHover = useMedia('(hover: hover)', true)
   const reduceMotion = useReducedMotion()
   const isDesktop = width >= 1024
   const duration = isDesktop && !reduceMotion ? 0.2 : 0
+  const isIconVisible = isHighlighted || !isDesktop || !canHover
 
   return (
     <MotionLink
       href={link.url!}
       className="bg-background p-3 rounded-md border flex items-center gap-4 group overflow-hidden"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={() => setIsHighlighted(true)}
+      onMouseLeave={() => setIsHighlighted(false)}
+      onFocus={() => setIsHighlighted(true)}
+      onBlur={() => setIsHighlighted(false)}
       layout
+      transition={{ duration, ease: 'easeInOut' }}
     >
       <AnimatePresence mode="popLayout">
-        {(hovered || !isDesktop) && (
+        {isIconVisible && (
           <motion.div
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
