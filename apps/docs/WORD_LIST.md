@@ -529,6 +529,24 @@ _platform-specific_, or _compiled_. Don't use _native_ to describe people.
 Write an explicit comparison, such as _version 3.0 or later_. Don't use _newer_,
 _older_, _higher_, _lower_, or a trailing `+`.
 
+### numbers of steps and items
+
+Don't tell the reader how many steps or items are coming, and don't refer to a step
+or section by its number. A count goes stale when someone adds or removes an item,
+and a numbered reference points at the wrong content after a reorder. Omit the
+count or generalize it. Name the action or link the heading instead of citing a
+number, the same way you do for _above_ and _below_.
+
+- Recommended: To connect to your database:
+- Recommended: Setting up email login takes several steps.
+- Recommended: After you create the project, copy the project URL.
+- Not recommended: Follow these three steps to connect to your database.
+- Not recommended: Repeat step 2.
+
+Keep numbers that carry information the reader acts on, such as versions, limits,
+sizes, ports, and prices. See
+[CONTRIBUTING.md](./CONTRIBUTING.md#counts-and-numbered-references).
+
 ## O
 
 ### OAuth 2.0
@@ -725,6 +743,20 @@ Add a noun after _this_ or _that_ when the reference could be unclear.
 
 - Recommended: This setting controls connection pooling.
 - Not recommended: This controls connection pooling.
+
+### this guide
+
+Don't open a page by referring to the page. Write a value statement that names what
+the reader can do and why it matters. The same applies to _this page_, _this
+document_, _this tutorial_, and _in this guide_.
+
+- Recommended: Learn how to set up email login.
+- Recommended: Restrict access to a shared table so each user reads only their own
+  rows.
+- Not recommended: This guide explains how to set up email login.
+- Not recommended: In this guide, you learn about Row Level Security.
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md#guides).
 
 ### timeout and time out
 

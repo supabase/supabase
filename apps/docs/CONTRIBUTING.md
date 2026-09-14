@@ -15,9 +15,65 @@ To make docs as clear as possible:
 - Write for the user. Think about what task they want to complete by reading your doc. Tell them what, and only what, they need to know.
 - Write like you talk. Conversational English is easier for a global audience to understand and localize. Many readers who use English as an additional language learn conversational rather than academic English. Use words and sentences that sound natural when speaking. Cut unnecessary words. Read your writing out loud to help you choose the clearest and simplest phrases.
 - Prefer short, direct sentences. Express one relationship at a time, and avoid unnecessary compound structures. This makes each sentence easier to understand, localize, and interpret consistently.
-- Cover one topic in each paragraph. Start a new paragraph whenever you change the topic. Don't worry about paragraphs being too short.
+- Cover one topic and one information type in each paragraph. Start a new paragraph whenever either changes. Don't worry about paragraphs being too short. See [Information types](#information-types).
 - Avoid using idioms and colloquialisms, such as `piece of cake`. These phrases are often specific to a region or culture.
 - Refer to the reader as `you`. Don't use `we` to refer to the reader. Use `we` only to refer to the Supabase team.
+
+## Information types
+
+Every sentence you write is one of these types:
+
+| Type | Answers | Example |
+| --- | --- | --- |
+| Concept | What is it? Why does it matter? | Row Level Security restricts which rows a user can read or write. |
+| Procedure | What do I do? | Run `alter table profiles enable row level security`. |
+| Reference | What are the exact values and options? | The `using` clause accepts any expression that returns a boolean. |
+| Caveat | What goes wrong, and what do I do about it? | A table with Row Level Security enabled and no policy returns no rows. |
+
+**Never mix information types inside a paragraph.** One paragraph carries one type. When the type changes, start a new paragraph. When it changes across a larger span, start a new section, and put an admonition or a procedure in its own block.
+
+Mixing types is what produces a paragraph a reader has to parse twice. A reader who wants the steps has to read past the concept to find them, and a reader who wants the concept has to read past a warning that doesn't apply yet.
+
+**A long paragraph is a smell.** Once a paragraph runs past three or four sentences, it has almost always absorbed a second information type. Reread it, label each sentence with its type, and split wherever the label changes. Apply the same check to a long list item and to a step that has grown a trailing explanation.
+
+Not recommended, because a single paragraph carries every type:
+
+```md
+Row Level Security is a Postgres feature that restricts which rows a user can read
+or write, and it's the main way to secure a table that several users share. Enable
+it by running `alter table profiles enable row level security`, which takes effect
+immediately. Be careful, because a table with Row Level Security enabled and no
+policy returns no rows to every client, so write a policy before you deploy. The
+`using` clause of a policy accepts any expression that returns a boolean.
+```
+
+Recommended, with each type in its own block:
+
+```md
+## Row Level Security
+
+Row Level Security restricts which rows a user can read or write. It's the main way
+to secure a table that several users share.
+
+### Enable Row Level Security
+
+1. Run `alter table profiles enable row level security`. The change takes effect
+   immediately.
+2. Write a policy that grants the access your app needs.
+
+<Admonition type="caution">
+
+A table with Row Level Security enabled and no policy returns no rows to every
+client. Write a policy before you deploy.
+
+</Admonition>
+
+### Policy reference
+
+The `using` clause accepts any expression that returns a boolean.
+```
+
+The recommended version is longer in lines and shorter to read. A reader who wants the command finds it under a heading that names the task, and a reader who wants the concept stops after the first paragraph.
 
 ## AI agent skills for docs authoring
 
@@ -41,7 +97,7 @@ Use [`edit-the-docs`](../../.agents/skills/edit-the-docs/SKILL.md) for style, st
 
 ## Document types
 
-Supabase docs contain 4 types of documents. Before you start writing, think about what type of doc you need.
+Supabase docs contain several types of documents. Before you start writing, think about what type of doc you need.
 
 ### Explainers
 
@@ -70,18 +126,65 @@ Guides are also goal-oriented, but they focus on shorter, more targeted tasks. F
 
 Guides contain mostly procedures: concise steps that readers can follow in sequence.
 
-Begin each guide with a sentence that declares its intent, such as `This guide explains how to set up email login.` This helps readers and agents confirm that the guide matches their goal and expected outcome.
+Begin each guide with a value statement: name what the reader can do, and why it matters to them. Don't refer to the page itself. A self-referential opener spends the reader's first sentence describing the document rather than the outcome, and it repeats what the title already told them. Readers and agents still get what they need from a value statement, which is confirmation that the page matches their goal.
+
+- Recommended: `Learn how to set up email login.`
+- Recommended: `Set up email login so users can sign in without a password.`
+- Recommended: `Give users a passwordless sign-in option with email login.`
+- Recommended: `Restrict access to a shared table so each user reads only their own rows.`
+- Not recommended: `This guide explains how to set up email login.`
+- Not recommended: `In this guide, you learn about email login.`
+- Not recommended: `This page covers email login and its configuration options.`
 
 Keep procedures focused on what the reader must do. Move substantial background or conceptual explanations into a separate section or an explainer. Cross-reference the authoritative explanation instead of repeating it in the procedure. This keeps the action path scannable, gives readers optional depth, and maintains one source of truth.
 
-- Recommended: `This guide explains how to enable Row Level Security. To learn how Row Level Security controls access, see [Row Level Security](...).`
-- Not recommended: Begin with several paragraphs about how Row Level Security works before stating what the guide helps the reader do.
+- Recommended: `Restrict access to a shared table with Row Level Security. To learn how a policy is evaluated, see [Row Level Security](...).`
+- Not recommended: Begin with several paragraphs about how Row Level Security works before stating what the reader can do.
 
-**Mixed information types:** When a guide contains substantial context or reference material, group sections by information type. Keep contextual and reference sections separate from the procedure group so that background information doesn't interrupt the action path.
+**Mixed information types:** Apply [Information types](#information-types) at the page level too. Classify every section as procedure, concept, reference, or caveat, then group the sections of each type together. Keep the procedure group unbroken so that background never interrupts the action path.
+
+Classify a section by what the reader is doing in it, not by what it's about. On a page about tables, every section is about tables, so subject matter tells you nothing. A reader opens a section on schemas to understand something, so it's a concept section no matter how much it mentions tables.
+
+A section that serves two types gets split, not filed under the larger half. Give the new half its own heading and cross-reference the two.
+
+Order the groups: a short concept opener when the page serves newcomers, then procedures, then concepts, then reference.
+
+```text
+## What is a table?                    <- short concept opener
+## Creating and managing tables        <- procedures
+### Creating tables
+### Securing your tables
+### Loading data
+## How tables are organized            <- concepts
+### Primary keys
+### Relationships between tables
+### Schemas
+## Reference
+### Data types
+```
 
 **Navigation:** Begin a long guide with a short outline of its major section groups. Link to each group and state when a reader should use it. Don't add section navigation to a short guide when the headings are already easy to scan.
 
+For example, an introduction to a long guide that mixes information types:
+
+```md
+Connect your app to Postgres through a connection pooler, a direct connection, or a
+Supabase client library.
+
+- [Choose a connection method](#choose-a-connection-method) compares the options and
+  their trade-offs. Start here if you aren't sure which one fits your app.
+- [Connect your app](#connect-your-app) has the steps for each method.
+- [Connection parameters](#connection-parameters) lists every parameter and its
+  default.
+```
+
+The opening sentence is a value statement, and each link says what the reader gets from that group. A reader who already knows which method they want goes straight to the procedures.
+
 **Cross-references and glue:** Connect contextual sections to their corresponding procedures when the relationship helps readers navigate. Add a brief introduction to each section group, a transition when the information type changes, and an outcome after a procedure. Add links selectively rather than linking every adjacent section.
+
+- Group introduction: `The following sections cover each connection method in turn. Every method needs your project reference, which you find on the project settings page.`
+- Transition where the type changes: `Those are the mechanics of opening a connection. To understand why a pooled connection behaves differently under load, see [Connection pooling](...).`
+- Outcome after a procedure: `Your app now connects through the pooler. Queries that used to fail at the connection limit queue instead.`
 
 For inspiration, see [an example of a guide](/docs/guides/auth/auth-email-passwordless).
 
@@ -363,6 +466,8 @@ Use a procedure when a human or agent must perform actions to reach an outcome. 
 
 Write sequential actions as an ordered list. Begin each step with an imperative verb, and include one action or a closely related set of actions per step. Give the reader enough context to know where to act.
 
+Don't tell the reader how many steps are coming, and don't refer back to a step by its number. See [Counts and numbered references](#counts-and-numbered-references).
+
 Apply the [Information Mapping chunking principle](https://informationmapping.com/blogs/news/writing-for-the-web-the-magical-number-seven-plus-or-minus-two) to procedures. Present 7 ± 2 related steps at a time. This gives readers a manageable chunk of five to nine actions. Aim for the lower end of the range when the task is complex or unfamiliar.
 
 If a procedure has more than nine steps, group related steps into named phases or smaller procedures. If one step contains multiple distinct actions, split it into separate steps. Don't add steps to reach a minimum. The range is a guideline for organizing information, not a required procedure length.
@@ -446,6 +551,30 @@ That said, a few rules help keep the docs concise, consistent, and clear:
 - Format headings in sentence case. Capitalize the first word and any proper nouns. All other words are lowercase. For example, `Set up authentication` rather than `Set Up Authentication`.
 - Use the Oxford comma. Place a comma before the `and` that marks the last item in a list. For example, use `functions, tables, and indexes` rather than `functions, tables and indexes`.
 - Use the present tense as much as possible. For example, `the AI assistant answers your question` rather than `the AI assistant will answer your question`.
+
+### Counts and numbered references
+
+Don't count your own content for the reader, and don't point at a step or section by its number.
+
+Both forms drift. A count goes stale the moment someone adds or removes an item, and a numbered reference points at the wrong content the moment someone reorders a list. Neither failure shows up in review or in CI, because the sentence still reads correctly while pointing at the wrong thing.
+
+Numbered references are also weaker for accessibility. A reader using a screen reader moves through a page by heading, link, and landmark, not by counting list markers. A number gives them nothing to navigate to, and `step 2` fails the same test as `here` in the [Links](#links) section: it doesn't describe its destination. That rule already applies to _above_ and _below_ in the [word list](./WORD_LIST.md#above): link to or name the section instead of describing where it sits.
+
+**Don't announce a count.** Omit it, or generalize it.
+
+- Recommended: `To connect to your database:`
+- Recommended: `Setting up email login takes several steps.`
+- Not recommended: `Follow these three steps to connect to your database.`
+- Not recommended: `There are 4 types of documents.`
+
+**Don't refer to a step or section by number.** Name the action, or link the heading. Don't reach for a footnote, because [footnotes](#footnotes) aren't used in Supabase docs.
+
+- Recommended: `After you create the project, copy the project URL.`
+- Recommended: `If the connection fails, repeat [Configure the connection pooler](#configure-the-connection-pooler).`
+- Not recommended: `Repeat step 2.`
+- Not recommended: `See section 3 above.`
+
+Keep numbers that carry information the reader acts on, such as versions, limits, sizes, ports, thresholds, and prices. `Postgres 15 or later`, `a 500 MB limit`, and the 7 ± 2 range in [Procedures](#procedures) are facts about the product or the guidance, not counts of your own prose.
 
 ## Word usage and spelling
 
