@@ -33,6 +33,7 @@
 |                                  | Read-write      | [Update action run status](/docs/reference/api/v1-update-action-run-status)                                         |
 | Advisors                         | Read            | [Get performance advisors](/docs/reference/api/v1-get-performance-advisors)                                         |
 |                                  |                 | [Get security advisors](/docs/reference/api/v1-get-security-advisors)                                               |
+|                                  |                 | [Run project advisors](/docs/reference/api/v2-run-project-advisors)                                                 |
 | Analytics Config                 | Read            | [List log drains](/docs/reference/api/v2-list-log-drains)                                                           |
 |                                  | Read-write      | [Create log drain](/docs/reference/api/v2-create-log-drain)                                                         |
 |                                  |                 | [Delete log drain](/docs/reference/api/v2-delete-log-drain)                                                         |
@@ -111,6 +112,8 @@
 |                                  |                 | [Delete project API key](/docs/reference/api/v1-delete-project-api-key)                                             |
 |                                  |                 | [Update project API key](/docs/reference/api/v1-update-project-api-key)                                             |
 |                                  |                 | [Update project legacy API keys](/docs/reference/api/v1-update-project-legacy-api-keys)                             |
+| API Key Secrets                  | Read            | [Get project API key](/docs/reference/api/v1-get-project-api-key)[^6]                                               |
+|                                  |                 | [Get project API keys](/docs/reference/api/v1-get-project-api-keys)[^6]                                             |
 | Auth Config                      | Read            | [Get a SSO provider](/docs/reference/api/v1-get-a-sso-provider)                                                     |
 |                                  |                 | [Get auth service config](/docs/reference/api/v1-get-auth-service-config)                                           |
 |                                  |                 | [Get project config](/docs/reference/api/v2-get-project-config)[^5]                                                 |
@@ -133,6 +136,7 @@
 | Data API Config                  | Read            | [Get PostgREST service config](/docs/reference/api/v1-get-postgrest-service-config)                                 |
 |                                  |                 | [Get project config](/docs/reference/api/v2-get-project-config)[^5]                                                 |
 |                                  | Read-write      | [Update PostgREST service config](/docs/reference/api/v1-update-postgrest-service-config)                           |
+| Data API JWT Secret              | Read            | [Get PostgREST service config](/docs/reference/api/v1-get-postgrest-service-config)[^7]                             |
 | Edge Functions                   | Read            | [Get a function](/docs/reference/api/v1-get-a-function)                                                             |
 |                                  |                 | [Get a function body](/docs/reference/api/v1-get-a-function-body)                                                   |
 |                                  |                 | [List all functions](/docs/reference/api/v1-list-all-functions)                                                     |
@@ -152,11 +156,17 @@
 | Storage Config                   | Read            | [Get project config](/docs/reference/api/v2-get-project-config)[^5]                                                 |
 |                                  |                 | [Get storage config](/docs/reference/api/v1-get-storage-config)                                                     |
 |                                  | Read-write      | [Update storage config](/docs/reference/api/v1-update-storage-config)                                               |
+| Compute                          | Read            | [Get a worker](/docs/reference/api/v2-get-a-worker)                                                                 |
+|                                  |                 | [List all workers](/docs/reference/api/v2-list-all-workers)                                                         |
+|                                  | Read-write      | [Create worker upload](/docs/reference/api/v2-create-worker-upload)                                                 |
+|                                  |                 | [Delete a worker](/docs/reference/api/v2-delete-a-worker)                                                           |
+|                                  |                 | [Deploy a worker](/docs/reference/api/v2-deploy-a-worker)                                                           |
 | **Infrastructure and delivery**  |                 |                                                                                                                     |
 | Development Branches             | Read            | [Get a branch](/docs/reference/api/v1-get-a-branch)                                                                 |
 |                                  |                 | [Get a branch config](/docs/reference/api/v1-get-a-branch-config)                                                   |
 |                                  |                 | [List all branches](/docs/reference/api/v1-list-all-branches)                                                       |
 |                                  | Read-write      | [Create a branch](/docs/reference/api/v1-create-a-branch)                                                           |
+|                                  |                 | [Create a branch](/docs/reference/api/v2-create-a-branch)                                                           |
 |                                  |                 | [Delete a branch](/docs/reference/api/v1-delete-a-branch)                                                           |
 |                                  |                 | [Diff a branch](/docs/reference/api/v1-diff-a-branch)                                                               |
 |                                  |                 | [Merge a branch](/docs/reference/api/v1-merge-a-branch)                                                             |
@@ -168,6 +178,7 @@
 |                                  |                 | [Get a branch config](/docs/reference/api/v1-get-a-branch-config)                                                   |
 |                                  |                 | [List all branches](/docs/reference/api/v1-list-all-branches)                                                       |
 |                                  | Read-write      | [Create a branch](/docs/reference/api/v1-create-a-branch)                                                           |
+|                                  |                 | [Create a branch](/docs/reference/api/v2-create-a-branch)                                                           |
 |                                  |                 | [Delete a branch](/docs/reference/api/v1-delete-a-branch)                                                           |
 |                                  |                 | [Diff a branch](/docs/reference/api/v1-diff-a-branch)                                                               |
 |                                  |                 | [Disable preview branching](/docs/reference/api/v1-disable-preview-branching)                                       |
@@ -234,3 +245,7 @@
 [^4]: Requires **Project Settings** (Read-write) and **Database** (Read-write).
 
 [^5]: Requires **Database Config** (Read), **Database** (Read), **SSL Enforcement** (Read), **Network Restrictions** (Read), **Auth Config** (Read), **Data API Config** (Read), **Realtime Config** (Read), and **Storage Config** (Read).
+
+[^6]: Requires **API Keys** (Read) and **API Key Secrets** (Read).
+
+[^7]: Requires **Data API Config** (Read) and **Data API JWT Secret** (Read).

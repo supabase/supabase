@@ -22,7 +22,7 @@ import {
 
 export type BucketsVariables = { projectRef?: string }
 
-export type Bucket = components['schemas']['StorageBucketResponse']
+export type Bucket = components['schemas']['StorageBucketResponse_Output']
 
 export type BucketType = Bucket['type']
 

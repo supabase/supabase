@@ -76,6 +76,10 @@ export const useRollbackTablesMutation = ({
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
+      await queryClient.invalidateQueries({
+        queryKey: replicationKeys.pipelinesStatus(variables.projectRef, variables.pipelineId),
+      })
+
       if (onError === undefined) {
         toast.error(`Failed to restart table replication: ${data.message}`)
       } else {

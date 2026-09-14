@@ -1,3 +1,5 @@
+import { literal } from '@supabase/pg-meta'
+
 import { PASSWORD_PLACEHOLDER } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
@@ -8,6 +10,15 @@ const WAREHOUSE_TLD = IS_STAGING_OR_LOCAL ? 'red' : 'io'
  * list is the source of truth for what's currently replicated.
  */
 export const WAREHOUSE_PUBLICATION_NAME = 'supabase_warehouse'
+
+/**
+ * Postgres schema the managed Warehouse destination keeps its DuckLake catalog in.
+ * `WAREHOUSE_METADATA_SCHEMA` in the platform repo, where it's a hardcoded constant: the schema is
+ * always provisioned under this name, the destination config is always built with it, and no
+ * request body accepts an override. Mirrored here so the schema picker can exclude it; the platform
+ * also rejects it server-side.
+ */
+export const WAREHOUSE_METADATA_SCHEMA = 'ducklake'
 
 export function getWarehouseFlightSqlEndpoint(projectRef: string): string {
   return `${projectRef}.warehouse.supabase.${WAREHOUSE_TLD}`
@@ -31,6 +42,7 @@ export const DUCKLAKE_METADATA_PASSWORD_ENV_VAR = 'DUCKLAKE_METADATA_PASSWORD'
 
 export interface WarehouseCatalogConnection {
   host: string
+  hostaddr?: string
   port: string
   database: string
   user: string
@@ -47,8 +59,11 @@ export function parseWarehouseCatalogUrl(catalogUrl: string): WarehouseCatalogCo
     const url = new URL(catalogUrl)
     if (!url.hostname) return null
 
+    const hostaddr = url.searchParams.get('hostaddr')
+
     return {
-      host: url.hostname,
+      host: url.hostname.replace(/^\[|\]$/g, ''),
+      ...(hostaddr ? { hostaddr } : {}),
       port: url.port || '5432',
       database: url.pathname.replace(/^\//, '') || 'postgres',
       user: decodeURIComponent(url.username) || 'postgres',
@@ -64,7 +79,7 @@ export function parseWarehouseCatalogUrl(catalogUrl: string): WarehouseCatalogCo
  * Postgres secret for the metadata catalog, a DuckLake secret binding the two, then the attach.
  *
  * Both passwords are read via `getenv()` rather than inlined, so the script is safe to copy into a
- * shared file — the values themselves are surfaced separately in the UI.
+ * shared file. The values themselves are surfaced separately in the UI.
  *
  * `METADATA_SCHEMA` is set explicitly because DuckLake defaults it to `main`, not to the schema the
  * platform provisions.
@@ -82,7 +97,7 @@ export function getDuckLakeSetupScript({
   }
   connection: WarehouseCatalogConnection
 }): string {
-  return `-- 1. S3 credentials for reading the Warehouse data files
+  return `-- S3 credentials for reading the Warehouse data files
 CREATE OR REPLACE SECRET ducklake_s3 (
   TYPE s3,
   KEY_ID '${credentials.s3_access_key_id}',
@@ -92,17 +107,17 @@ CREATE OR REPLACE SECRET ducklake_s3 (
   URL_STYLE 'path'
 );
 
--- 2. Postgres credentials for the DuckLake metadata catalog
+-- Postgres credentials for the DuckLake metadata catalog
 CREATE OR REPLACE SECRET ducklake_metadata (
   TYPE postgres,
-  HOST '${connection.host}',
+  HOST ${literal(connection.host)},${connection.hostaddr ? `\n  HOSTADDR ${literal(connection.hostaddr)},` : ''}
   PORT ${connection.port},
   DATABASE '${connection.database}',
   USER '${connection.user}',
   PASSWORD getenv('${DUCKLAKE_METADATA_PASSWORD_ENV_VAR}')
 );
 
--- 3. Bind the metadata secret into a DuckLake secret configuration
+-- Bind the metadata secret into a DuckLake secret configuration
 CREATE OR REPLACE SECRET ducklake_warehouse (
   TYPE ducklake,
   METADATA_PATH '',
@@ -114,6 +129,6 @@ CREATE OR REPLACE SECRET ducklake_warehouse (
   }
 );
 
--- 4. Clean attach using only the secret identifier
+-- Attach Warehouse using only the secret identifier
 ATTACH 'ducklake:ducklake_warehouse' AS warehouse;`
 }

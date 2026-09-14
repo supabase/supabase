@@ -1,4 +1,7 @@
 import type {
+  BigQueryPartitionBy,
+  BigQueryTableOption,
+  CompleteBigQueryPartitionBy,
   CreatePipelineApiConfig,
   DucklakeDestinationConfig,
   DucklakeSupabaseDestinationConfig,
@@ -70,3 +73,55 @@ export const buildPipelineApiConfig = ({
       }
     : undefined,
 })
+
+const hasClusteringColumns = (clusterBy: string[] | undefined) => (clusterBy?.length ?? 0) > 0
+
+const isCompleteBigQueryPartition = (
+  partitionBy: BigQueryPartitionBy | undefined
+): partitionBy is CompleteBigQueryPartitionBy => {
+  if (!partitionBy) return false
+  if (partitionBy.kind === 'ingestion_time') return true
+  if (!('column' in partitionBy) || partitionBy.column.trim().length === 0) return false
+  if (partitionBy.kind !== 'integer_range') return true
+  return (
+    typeof partitionBy.start === 'number' &&
+    typeof partitionBy.end === 'number' &&
+    typeof partitionBy.interval === 'number'
+  )
+}
+
+const buildBigQueryPartitionByApiConfig = (partitionBy: CompleteBigQueryPartitionBy) => {
+  switch (partitionBy.kind) {
+    case 'time_column':
+      return {
+        kind: partitionBy.kind,
+        column: partitionBy.column,
+        granularity: partitionBy.granularity,
+      }
+    case 'integer_range':
+      return {
+        kind: partitionBy.kind,
+        column: partitionBy.column,
+        start: partitionBy.start,
+        end: partitionBy.end,
+        interval: partitionBy.interval,
+      }
+    case 'ingestion_time':
+      return { kind: partitionBy.kind, granularity: partitionBy.granularity }
+  }
+}
+
+export const buildBigQueryTableOptionApiConfig = (option: BigQueryTableOption) => ({
+  table_id: option.tableId,
+  partition_by: isCompleteBigQueryPartition(option.partitionBy)
+    ? buildBigQueryPartitionByApiConfig(option.partitionBy)
+    : undefined,
+  cluster_by: hasClusteringColumns(option.clusterBy) ? option.clusterBy : undefined,
+})
+
+const isBigQueryTableOptionConfigured = (option: BigQueryTableOption) =>
+  isCompleteBigQueryPartition(option.partitionBy) || hasClusteringColumns(option.clusterBy)
+
+export const getConfiguredBigQueryTableOptions = (
+  tableOptions: BigQueryTableOption[] | undefined
+) => (tableOptions ?? []).filter(isBigQueryTableOptionConfigured)

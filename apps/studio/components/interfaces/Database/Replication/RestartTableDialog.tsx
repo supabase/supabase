@@ -44,7 +44,7 @@ export const RestartTableDialog = ({
 
   const { mutateAsync: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: () => {
-      toast.success(`"${tableName}" will replicate from scratch.`)
+      toast.success(`Replication will restart for "${tableName}".`)
     },
     onSettled: () => {
       onRestartComplete?.()
@@ -74,14 +74,13 @@ export const RestartTableDialog = ({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Restart replication from scratch for{' '}
-            <code className="text-code-inline">{tableName}</code>
+            Restart replication for <code className="text-code-inline">{tableName}</code>
           </AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div className="space-y-3 text-sm">
               <p>
                 This will restart replication for{' '}
-                <code className="text-code-inline">{tableName}</code> from scratch:
+                <code className="text-code-inline">{tableName}</code>:
               </p>
               <ul className="list-disc list-inside space-y-1.5 pl-2">
                 {willCopyTable ? (
@@ -102,7 +101,7 @@ export const RestartTableDialog = ({
                 </li>
                 <li>
                   <strong>Other tables keep their replication progress.</strong> Only this table
-                  restarts from scratch.
+                  restarts.
                 </li>
                 <li>
                   <strong>Running pipelines restart automatically.</strong> Stopped pipelines remain
@@ -122,7 +121,7 @@ export const RestartTableDialog = ({
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
           <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="warning">
-            {isResetting ? 'Preparing to replicate from scratch...' : 'Restart from scratch'}
+            {isResetting ? 'Preparing to restart replication...' : 'Restart'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

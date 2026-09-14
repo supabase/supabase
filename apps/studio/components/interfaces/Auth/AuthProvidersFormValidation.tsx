@@ -3,6 +3,7 @@ import * as z from 'zod'
 import { NO_REQUIRED_CHARACTERS, urlRegex } from '@/components/interfaces/Auth/Auth.constants'
 import { ProjectAuthConfigData } from '@/data/auth/auth-config-query'
 import { DOCS_URL } from '@/lib/constants'
+import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
 
 const parseBase64URL = (b64url: string) => {
   return atob(b64url.replace(/[-]/g, '+').replace(/[_]/g, '/'))
@@ -96,22 +97,19 @@ const PROVIDER_EMAIL = {
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: z.boolean(),
       SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: z.boolean(),
       PASSWORD_HIBP_ENABLED: z.boolean(),
-      MAILER_OTP_EXP: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
+      MAILER_OTP_EXP: preprocessEmptyNumberInput(
         z.coerce
           .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
           .min(0, 'Must be greater or equal to 0')
           .max(86400, 'Must be no more than 86400')
       ),
-      MAILER_OTP_LENGTH: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
+      MAILER_OTP_LENGTH: preprocessEmptyNumberInput(
         z.coerce
           .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
           .min(6, 'Must be greater or equal to 6')
           .max(10, 'Must be no more than 10')
       ),
-      PASSWORD_MIN_LENGTH: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
+      PASSWORD_MIN_LENGTH: preprocessEmptyNumberInput(
         z.coerce
           .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
           .min(6, 'Must be greater or equal to 6')
@@ -124,18 +122,9 @@ const PROVIDER_EMAIL = {
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: z.boolean().optional(),
       PASSWORD_HIBP_ENABLED: z.boolean().optional(),
       SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: z.boolean().optional(),
-      MAILER_OTP_EXP: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
-        z.coerce.number().optional()
-      ),
-      MAILER_OTP_LENGTH: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
-        z.coerce.number().optional()
-      ),
-      PASSWORD_MIN_LENGTH: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
-        z.coerce.number().optional()
-      ),
+      MAILER_OTP_EXP: preprocessEmptyNumberInput(z.coerce.number().optional()),
+      MAILER_OTP_LENGTH: preprocessEmptyNumberInput(z.coerce.number().optional()),
+      PASSWORD_MIN_LENGTH: preprocessEmptyNumberInput(z.coerce.number().optional()),
       PASSWORD_REQUIRED_CHARACTERS: z.string().optional(),
     }),
   ]),
@@ -169,14 +158,12 @@ const smsProviderBaseSchema = z.object({
 
 const getSmsOtpPhoneProviderSchema = (optional = false) =>
   z.object({
-    SMS_OTP_EXP: z.preprocess(
-      (val) => (val === '' || val == null ? undefined : val),
+    SMS_OTP_EXP: preprocessEmptyNumberInput(
       z.coerce
         .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
         .min(0, 'Must be 0 or larger')
     ),
-    SMS_OTP_LENGTH: z.preprocess(
-      (val) => (val === '' || val == null ? undefined : val),
+    SMS_OTP_LENGTH: preprocessEmptyNumberInput(
       z.coerce
         .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
         .min(6, 'Must be 6 or larger')

@@ -135,9 +135,15 @@ export const ReplicationPipelineStatus = () => {
   })
   const hasUpdate = Boolean(versionData?.new_version)
 
-  const { mutateAsync: startPipeline, isPending: isStartingPipeline } = useStartPipelineMutation()
-  const { mutateAsync: stopPipeline, isPending: isStoppingPipeline } = useStopPipelineMutation()
-  const { mutateAsync: restartPipeline } = useRestartPipelineMutation()
+  // The action handler displays errors for these mutations.
+  const { mutateAsync: startPipeline, isPending: isStartingPipeline } = useStartPipelineMutation({
+    onError: () => {},
+  })
+  const { mutateAsync: stopPipeline, isPending: isStoppingPipeline } = useStopPipelineMutation({
+    onError: () => {},
+  })
+  const { mutateAsync: restartPipeline, isPending: isRestartingPipeline } =
+    useRestartPipelineMutation()
 
   const destinationName = pipeline?.destination_name
   const statusName = getStatusName(pipelineStatusData?.status)
@@ -188,7 +194,12 @@ export const ReplicationPipelineStatus = () => {
     requestStatus === PipelineStatusRequestStatus.StartRequested ||
     requestStatus === PipelineStatusRequestStatus.StopRequested ||
     requestStatus === PipelineStatusRequestStatus.RestartRequested
-  const isPipelineBusy = isEnablingDisabling || isAnyRestartInProgress
+  const isPipelineBusy =
+    isEnablingDisabling ||
+    isAnyRestartInProgress ||
+    isStartingPipeline ||
+    isStoppingPipeline ||
+    isRestartingPipeline
   const showDisabledState = isPipelineBusy || !isPipelineActionable
   const lastKnownStateMessage =
     statusName === PipelineStatusName.STOPPED
@@ -248,8 +259,9 @@ export const ReplicationPipelineStatus = () => {
         await restartPipeline({ projectRef, pipelineId: pipeline.id })
       }
     } catch (error) {
-      setRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
       toast.error(`Failed to ${action} pipeline: ${(error as ResponseError).message}`)
+    } finally {
+      setRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
     }
   }
 
@@ -290,21 +302,14 @@ export const ReplicationPipelineStatus = () => {
               </Button>
             )}
 
-            <Button asChild variant="default">
+            <Button asChild>
               <Link href={logsUrl}>View logs</Link>
             </Button>
 
             <Button
               variant={statusName === PipelineStatusName.STOPPED ? 'primary' : 'default'}
               onClick={onPrimaryAction}
-              loading={
-                isPipelineError ||
-                displayState.type === 'loading' ||
-                isEnablingDisabling ||
-                isStartingPipeline ||
-                isStoppingPipeline ||
-                isAnyRestartInProgress
-              }
+              loading={isPipelineError || displayState.type === 'loading' || isPipelineBusy}
               disabled={
                 isPipelineBusy ||
                 !PIPELINE_ACTIONABLE_STATES.includes(statusName as PipelineStatusName)
@@ -418,7 +423,6 @@ export const ReplicationPipelineStatus = () => {
               <div className="flex items-center">
                 <Button
                   size="tiny"
-                  variant="default"
                   className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
                   icon={<RotateCcw />}
                   disabled={isAnyRestartInProgress || showDisabledState || isPipelineError}
@@ -428,12 +432,11 @@ export const ReplicationPipelineStatus = () => {
                     setShowBatchRestartDialog(true)
                   }}
                 >
-                  Restart all tables from scratch
+                  Restart all tables
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      variant="default"
                       aria-label="More restart options"
                       icon={<ChevronDown />}
                       className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
@@ -454,7 +457,7 @@ export const ReplicationPipelineStatus = () => {
                         },
                       }}
                     >
-                      Restart failed tables from scratch
+                      Restart failed tables
                     </DropdownMenuItemTooltip>
                   </DropdownMenuContent>
                 </DropdownMenu>

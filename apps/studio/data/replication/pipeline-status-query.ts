@@ -36,6 +36,7 @@ export const useReplicationPipelineStatusQuery = <TData = ReplicationPipelineSta
   { projectRef, pipelineId }: ReplicationPipelinesStatusParams,
   {
     enabled = true,
+    refetchInterval = 10_000,
     ...options
   }: UseCustomQueryOptions<ReplicationPipelineStatusData, ResponseError, TData> = {}
 ) =>
@@ -43,5 +44,14 @@ export const useReplicationPipelineStatusQuery = <TData = ReplicationPipelineSta
     queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
     queryFn: ({ signal }) => fetchReplicationPipelineStatus({ projectRef, pipelineId }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && typeof pipelineId !== 'undefined',
+    refetchInterval: (query) => {
+      const interval =
+        typeof refetchInterval === 'function' ? refetchInterval(query) : refetchInterval
+      const status = query.state.data?.status.name
+      if (typeof interval === 'number' && (status === 'starting' || status === 'stopping')) {
+        return Math.min(interval, 1_000)
+      }
+      return interval
+    },
     ...options,
   })

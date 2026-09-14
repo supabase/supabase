@@ -192,11 +192,7 @@ export const ProfileInformation = () => {
                 />
               </CardContent>
               <CardFooter className="justify-end space-x-2">
-                {form.formState.isDirty && (
-                  <Button variant="default" onClick={() => form.reset()}>
-                    Cancel
-                  </Button>
-                )}
+                {form.formState.isDirty && <Button onClick={() => form.reset()}>Cancel</Button>}
                 <Button
                   variant="primary"
                   type="submit"

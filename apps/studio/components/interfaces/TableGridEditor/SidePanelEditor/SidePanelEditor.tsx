@@ -63,6 +63,7 @@ import { isObjectContainingKeys } from '@/lib/helpers'
 import type { SafePostgresTable } from '@/lib/postgres-types'
 import { useTrack } from '@/lib/telemetry/track'
 import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
+import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
 import { useTableEditorStateSnapshot, type TableEditorState } from '@/state/table-editor'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 import type { Dictionary } from '@/types'
@@ -191,6 +192,7 @@ export const SidePanelEditor = ({
   const { data: project } = useSelectedProjectQuery()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { updateRow, addRow, isEditPending } = useTableRowOperations()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
@@ -824,6 +826,7 @@ export const SidePanelEditor = ({
         table: selectedTable,
         selectedHeaders,
         emptyStringAsNullHeaders,
+        roleImpersonationState: getImpersonatedRoleState(),
         onProgressUpdate: (progress: number) => {
           toast.loading(
             <SonnerProgress
@@ -849,6 +852,7 @@ export const SidePanelEditor = ({
         rows: importContent.rows,
         selectedHeaders,
         emptyStringAsNullHeaders,
+        roleImpersonationState: getImpersonatedRoleState(),
         onProgressUpdate: (progress: number) => {
           toast.loading(
             <SonnerProgress

@@ -9,13 +9,13 @@ import {
 const CREDENTIALS = {
   data_path: 's3://warehouse/',
   metadata_schema: 'ducklake',
-  s3_access_key_id: '9bca431b472accc23f8eb6de9f36259b',
-  s3_endpoint: 'fcdidtxgcaijqkrrngdt.storage.supabase.red/storage/v1/s3',
+  s3_access_key_id: 'test-s3-access-key-id',
+  s3_endpoint: 'test-project-ref.storage.supabase.red/storage/v1/s3',
   s3_region: 'ap-southeast-1',
 }
 
 const CONNECTION: WarehouseCatalogConnection = {
-  host: 'db.fcdidtxgcaijqkrrngdt.supabase.co',
+  host: 'db.test-project-ref.supabase.co',
   port: '5432',
   database: 'postgres',
   user: 'postgres',
@@ -43,6 +43,51 @@ describe('parseWarehouseCatalogUrl', () => {
       user: 'postgres',
       password: 'pwd',
     })
+  })
+
+  test('preserves the hostname and decodes the IPv6 hostaddr', () => {
+    const connection = parseWarehouseCatalogUrl(
+      'postgres://postgres:pwd@db.example.supabase.co:5432/postgres?sslmode=require&hostaddr=2001%3Adb8%3A%3A1'
+    )
+
+    expect(connection).toMatchObject({
+      host: 'db.example.supabase.co',
+      hostaddr: '2001:db8::1',
+    })
+    expect(connection).not.toBeNull()
+    if (connection === null) return
+
+    const script = getDuckLakeSetupScript({ credentials: CREDENTIALS, connection })
+    expect(script).toContain("HOST 'db.example.supabase.co',")
+    expect(script).toContain("HOSTADDR '2001:db8::1',")
+  })
+
+  test('removes URI brackets from legacy IPv6 hosts', () => {
+    const connection = parseWarehouseCatalogUrl(
+      'postgres://postgres:pwd@[2001:db8::1]:5432/postgres'
+    )
+
+    expect(connection?.host).toBe('2001:db8::1')
+    expect(connection).not.toBeNull()
+    if (connection === null) return
+
+    const script = getDuckLakeSetupScript({ credentials: CREDENTIALS, connection })
+    expect(script).toContain("HOST '2001:db8::1',")
+    expect(script).not.toContain('HOSTADDR')
+    expect(script).not.toContain('[2001:db8::1]')
+  })
+
+  test('preserves IPv4 catalog hosts', () => {
+    expect(parseWarehouseCatalogUrl('postgres://postgres:pwd@192.0.2.1:5432/postgres')?.host).toBe(
+      '192.0.2.1'
+    )
+  })
+
+  test('ignores an empty hostaddr', () => {
+    const connection = parseWarehouseCatalogUrl(
+      'postgres://postgres:pwd@db.example.supabase.co/postgres?hostaddr='
+    )
+    expect(connection?.hostaddr).toBeUndefined()
   })
 
   test('decodes percent-encoded credentials', () => {
@@ -86,6 +131,7 @@ describe('getDuckLakeSetupScript', () => {
     expect(script).toContain(`REGION '${CREDENTIALS.s3_region}'`)
     expect(script).toContain(`ENDPOINT '${CREDENTIALS.s3_endpoint}'`)
     expect(script).toContain(`HOST '${CONNECTION.host}'`)
+    expect(script).not.toContain('HOSTADDR')
     expect(script).toContain(`PORT ${CONNECTION.port}`)
     expect(script).toContain(`DATABASE '${CONNECTION.database}'`)
     expect(script).toContain(`USER '${CONNECTION.user}'`)

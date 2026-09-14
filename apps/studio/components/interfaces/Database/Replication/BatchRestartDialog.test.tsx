@@ -66,7 +66,7 @@ describe('BatchRestartDialog', () => {
     expect(screen.getByTestId('copy-targets')).toHaveTextContent('public.table_1,public.table_2')
 
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: 'Restart from scratch' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Restart' }))
     })
 
     expect(onRestartStart).toHaveBeenCalledWith([1, 2, 3])

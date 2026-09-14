@@ -9,7 +9,7 @@ export type PlatformAppsVariables = {
   slug?: string
 }
 
-export type PlatformApp = components['schemas']['ListPlatformAppsResponse']['apps'][number]
+export type PlatformApp = components['schemas']['ListPlatformAppsResponse_Output']['apps'][number]
 
 export async function getPlatformApps({ slug }: PlatformAppsVariables, signal?: AbortSignal) {
   if (!slug) throw new Error('slug is required')

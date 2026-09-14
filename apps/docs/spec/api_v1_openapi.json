@@ -37,10 +37,13 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/BranchDetailResponse" }
+                "schema": { "$ref": "#/components/schemas/BranchDetailResponse_Output" }
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -91,9 +94,14 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BranchResponse_Output" }
+              }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -146,10 +154,13 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/BranchDeleteResponse" }
+                "schema": { "$ref": "#/components/schemas/BranchDeleteResponse_Output" }
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to delete database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -203,10 +214,13 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/BranchUpdateResponse" }
+                "schema": { "$ref": "#/components/schemas/BranchUpdateResponse_Output" }
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to push database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -260,10 +274,13 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/BranchUpdateResponse" }
+                "schema": { "$ref": "#/components/schemas/BranchUpdateResponse_Output" }
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to merge database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -317,10 +334,13 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/BranchUpdateResponse" }
+                "schema": { "$ref": "#/components/schemas/BranchUpdateResponse_Output" }
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to reset database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -364,14 +384,17 @@
           }
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/BranchRestoreResponse" }
+                "schema": { "$ref": "#/components/schemas/BranchRestoreResponse_Output" }
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to restore database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -432,6 +455,9 @@
             "content": { "text/plain": { "schema": { "type": "string" } } },
             "description": ""
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to diff database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -455,7 +481,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/V1ProjectWithDatabaseResponse" }
+                  "items": { "$ref": "#/components/schemas/V1ProjectWithDatabaseResponse_Output" }
                 }
               }
             }
@@ -485,7 +511,9 @@
           "201": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/V1ProjectResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1ProjectResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -558,7 +586,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/RegionsInfo" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RegionsInfo_Output" }
+              }
             }
           }
         },
@@ -582,7 +612,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/OrganizationResponseV1" }
+                  "items": { "$ref": "#/components/schemas/OrganizationResponseV1_Output" }
                 }
               }
             }
@@ -616,7 +646,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/OrganizationResponseV1" }
+                "schema": { "$ref": "#/components/schemas/OrganizationResponseV1_Output" }
               }
             }
           },
@@ -722,7 +752,12 @@
             }
           }
         ],
-        "responses": { "204": { "description": "" } },
+        "responses": {
+          "204": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "summary": "[Beta] Authorize user through oauth",
         "tags": ["OAuth"],
         "x-endpoint-owners": ["auth", "control-plane"]
@@ -746,10 +781,13 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/OAuthTokenResponse" }
+                "schema": { "$ref": "#/components/schemas/OAuthTokenResponse_Output" }
               }
             }
-          }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "summary": "[Beta] Exchange auth code for user's access and refresh token",
         "tags": ["OAuth"],
@@ -768,7 +806,12 @@
             }
           }
         },
-        "responses": { "204": { "description": "" } },
+        "responses": {
+          "204": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "summary": "[Beta] Revoke oauth app authorization and it's corresponding tokens",
         "tags": ["OAuth"],
         "x-endpoint-owners": ["auth", "control-plane"]
@@ -898,7 +941,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/SnippetList" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SnippetList_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -935,7 +980,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/SnippetResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SnippetResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -960,7 +1007,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/V1ProfileResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1ProfileResponse_Output" }
+              }
             }
           }
         },
@@ -1046,7 +1095,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ListActionRunResponse" }
+                "schema": { "$ref": "#/components/schemas/ListActionRunResponse_Output" }
               }
             }
           },
@@ -1094,7 +1143,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ActionRunResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ActionRunResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -1148,7 +1199,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UpdateRunStatusResponse" }
+                "schema": { "$ref": "#/components/schemas/UpdateRunStatusResponse_Output" }
               }
             }
           },
@@ -1243,7 +1294,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/ApiKeyResponse" }
+                  "items": { "$ref": "#/components/schemas/ApiKeyResponse_Output" }
                 }
               }
             }
@@ -1257,7 +1308,10 @@
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
         "x-endpoint-owners": ["auth", "control-plane"],
-        "x-fga-permissions": [["api_gateway_keys_read"]],
+        "x-fga-permissions": [
+          ["api_gateway_keys_read"],
+          ["api_gateway_keys_read", "api_gateway_keys_secret_read"]
+        ],
         "x-oauth-scope": "secrets:read"
       },
       "post": {
@@ -1294,7 +1348,9 @@
           "201": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiKeyResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -1333,7 +1389,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/LegacyApiKeysResponse" }
+                "schema": { "$ref": "#/components/schemas/LegacyApiKeysResponse_Output" }
               }
             }
           },
@@ -1378,7 +1434,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/LegacyApiKeysResponse" }
+                "schema": { "$ref": "#/components/schemas/LegacyApiKeysResponse_Output" }
               }
             }
           },
@@ -1441,7 +1497,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiKeyResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -1495,7 +1553,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiKeyResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -1507,7 +1567,10 @@
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
         "x-endpoint-owners": ["auth", "control-plane"],
-        "x-fga-permissions": [["api_gateway_keys_read"]],
+        "x-fga-permissions": [
+          ["api_gateway_keys_read"],
+          ["api_gateway_keys_read", "api_gateway_keys_secret_read"]
+        ],
         "x-oauth-scope": "secrets:read"
       },
       "delete": {
@@ -1562,7 +1625,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiKeyResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -1604,11 +1669,14 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/BranchResponse" }
+                  "items": { "$ref": "#/components/schemas/BranchResponse_Output" }
                 }
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve database branches" }
         },
         "security": [{ "bearer": [] }],
@@ -1647,9 +1715,14 @@
           "201": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BranchResponse_Output" }
+              }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -1723,9 +1796,14 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BranchResponse_Output" }
+              }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to fetch database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -1760,7 +1838,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse_Output" }
               }
             }
           },
@@ -1848,7 +1926,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse_Output" }
               }
             }
           },
@@ -1889,7 +1967,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse_Output" }
               }
             }
           },
@@ -1930,7 +2008,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse_Output" }
               }
             }
           },
@@ -1980,8 +2058,7 @@
                         "state": { "type": "string", "enum": ["enabled", "disabled"] },
                         "appliedSuccessfully": { "type": "boolean" }
                       },
-                      "required": ["state"],
-                      "additionalProperties": false
+                      "required": ["state"]
                     },
                     {
                       "type": "object",
@@ -1990,14 +2067,14 @@
                         "unavailableReason": {
                           "type": "string",
                           "enum": [
+                            "platform_unsupported",
                             "postgres_upgrade_required",
                             "ssl_enforcement_required",
                             "temporarily_unavailable"
                           ]
                         }
                       },
-                      "required": ["state", "unavailableReason"],
-                      "additionalProperties": false
+                      "required": ["state", "unavailableReason"]
                     }
                   ]
                 }
@@ -2056,8 +2133,7 @@
                         "state": { "type": "string", "enum": ["enabled", "disabled"] },
                         "appliedSuccessfully": { "type": "boolean" }
                       },
-                      "required": ["state"],
-                      "additionalProperties": false
+                      "required": ["state"]
                     },
                     {
                       "type": "object",
@@ -2066,14 +2142,14 @@
                         "unavailableReason": {
                           "type": "string",
                           "enum": [
+                            "platform_unsupported",
                             "postgres_upgrade_required",
                             "ssl_enforcement_required",
                             "temporarily_unavailable"
                           ]
                         }
                       },
-                      "required": ["state", "unavailableReason"],
-                      "additionalProperties": false
+                      "required": ["state", "unavailableReason"]
                     }
                   ]
                 }
@@ -2117,7 +2193,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/NetworkBanResponse" }
+                "schema": { "$ref": "#/components/schemas/NetworkBanResponse_Output" }
               }
             }
           },
@@ -2158,7 +2234,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/NetworkBanResponseEnriched" }
+                "schema": { "$ref": "#/components/schemas/NetworkBanResponseEnriched_Output" }
               }
             }
           },
@@ -2241,7 +2317,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/NetworkRestrictionsResponse" }
+                "schema": { "$ref": "#/components/schemas/NetworkRestrictionsResponse_Output" }
               }
             }
           },
@@ -2288,7 +2364,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/NetworkRestrictionsV2Response" }
+                "schema": { "$ref": "#/components/schemas/NetworkRestrictionsV2Response_Output" }
               }
             }
           },
@@ -2337,7 +2413,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/NetworkRestrictionsResponse" }
+                "schema": { "$ref": "#/components/schemas/NetworkRestrictionsResponse_Output" }
               }
             }
           },
@@ -2378,7 +2454,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PgsodiumConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/PgsodiumConfigResponse_Output" }
               }
             }
           },
@@ -2425,7 +2501,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PgsodiumConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/PgsodiumConfigResponse_Output" }
               }
             }
           },
@@ -2466,7 +2542,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PostgrestConfigWithJWTSecretResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/PostgrestConfigWithJWTSecretResponse_Output"
+                }
               }
             }
           },
@@ -2480,7 +2558,10 @@
         "tags": ["Rest"],
         "x-badges": [{ "name": "OAuth scope: rest:read", "position": "after" }],
         "x-endpoint-owners": ["control-plane", "infra"],
-        "x-fga-permissions": [["data_api_config_read"]],
+        "x-fga-permissions": [
+          ["data_api_config_read"],
+          ["data_api_config_read", "data_api_config_secret_read"]
+        ],
         "x-oauth-scope": "rest:read"
       },
       "patch": {
@@ -2513,7 +2594,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1PostgrestConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/V1PostgrestConfigResponse_Output" }
               }
             }
           },
@@ -2554,7 +2635,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1ProjectWithDatabaseResponse" }
+                "schema": { "$ref": "#/components/schemas/V1ProjectWithDatabaseResponse_Output" }
               }
             }
           },
@@ -2593,7 +2674,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1ProjectRefResponse" }
+                "schema": { "$ref": "#/components/schemas/V1ProjectRefResponse_Output" }
               }
             }
           },
@@ -2637,7 +2718,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1ProjectRefResponse" }
+                "schema": { "$ref": "#/components/schemas/V1ProjectRefResponse_Output" }
               }
             }
           },
@@ -2681,7 +2762,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/SecretResponse" }
+                  "items": { "$ref": "#/components/schemas/SecretResponse_Output" }
                 }
               }
             }
@@ -2801,7 +2882,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SslEnforcementResponse" }
+                "schema": { "$ref": "#/components/schemas/SslEnforcementResponse_Output" }
               }
             }
           },
@@ -2848,7 +2929,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SslEnforcementResponse" }
+                "schema": { "$ref": "#/components/schemas/SslEnforcementResponse_Output" }
               }
             }
           },
@@ -2896,7 +2977,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/TypescriptResponse" }
+                "schema": { "$ref": "#/components/schemas/TypescriptResponse_Output" }
               }
             }
           },
@@ -2937,7 +3018,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/VanitySubdomainConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/VanitySubdomainConfigResponse_Output" }
               }
             }
           },
@@ -3026,7 +3107,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SubdomainAvailabilityResponse" }
+                "schema": { "$ref": "#/components/schemas/SubdomainAvailabilityResponse_Output" }
               }
             }
           },
@@ -3083,7 +3164,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ActivateVanitySubdomainResponse" }
+                "schema": { "$ref": "#/components/schemas/ActivateVanitySubdomainResponse_Output" }
               }
             }
           },
@@ -3140,7 +3221,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ProjectUpgradeInitiateResponse" }
+                "schema": { "$ref": "#/components/schemas/ProjectUpgradeInitiateResponse_Output" }
               }
             }
           },
@@ -3181,7 +3262,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ProjectUpgradeEligibilityResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectUpgradeEligibilityResponse_Output"
+                }
               }
             }
           },
@@ -3228,7 +3311,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/DatabaseUpgradeStatusResponse" }
+                "schema": { "$ref": "#/components/schemas/DatabaseUpgradeStatusResponse_Output" }
               }
             }
           },
@@ -3269,7 +3352,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ReadOnlyStatusResponse" }
+                "schema": { "$ref": "#/components/schemas/ReadOnlyStatusResponse_Output" }
               }
             }
           },
@@ -3474,7 +3557,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/V1ServiceHealthResponse" }
+                  "items": { "$ref": "#/components/schemas/V1ServiceHealthResponse_Output" }
                 }
               }
             }
@@ -3516,7 +3599,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse_Output" }
               }
             }
           },
@@ -3554,7 +3637,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse_Output" }
               }
             }
           },
@@ -3602,7 +3685,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse_Output" }
               }
             }
           },
@@ -3640,7 +3723,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SigningKeysResponse" }
+                "schema": { "$ref": "#/components/schemas/SigningKeysResponse_Output" }
               }
             }
           },
@@ -3691,7 +3774,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse_Output" }
               }
             }
           },
@@ -3738,7 +3821,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse_Output" }
               }
             }
           },
@@ -3795,7 +3878,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse_Output" }
               }
             }
           },
@@ -3835,7 +3918,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/AuthConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/AuthConfigResponse_Output" }
               }
             }
           },
@@ -3882,7 +3965,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/AuthConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/AuthConfigResponse_Output" }
               }
             }
           },
@@ -3930,7 +4013,9 @@
           "201": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ThirdPartyAuth" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ThirdPartyAuth_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -3969,7 +4054,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/ThirdPartyAuth" }
+                  "items": { "$ref": "#/components/schemas/ThirdPartyAuth_Output" }
                 }
               }
             }
@@ -4020,7 +4105,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ThirdPartyAuth" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ThirdPartyAuth_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -4067,7 +4154,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ThirdPartyAuth" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ThirdPartyAuth_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -4173,7 +4262,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetProjectAvailableRestoreVersionsResponse"
+                  "$ref": "#/components/schemas/GetProjectAvailableRestoreVersionsResponse_Output"
                 }
               }
             }
@@ -4279,7 +4368,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ListProjectAddonsResponse" }
+                "schema": { "$ref": "#/components/schemas/ListProjectAddonsResponse_Output" }
               }
             }
           },
@@ -4426,7 +4515,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ProjectClaimTokenResponse" }
+                "schema": { "$ref": "#/components/schemas/ProjectClaimTokenResponse_Output" }
               }
             }
           },
@@ -4463,7 +4552,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/CreateProjectClaimTokenResponse" }
+                "schema": { "$ref": "#/components/schemas/CreateProjectClaimTokenResponse_Output" }
               }
             }
           },
@@ -4534,7 +4623,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1ProjectAdvisorsResponse" }
+                "schema": { "$ref": "#/components/schemas/V1ProjectAdvisorsResponse_Output" }
               }
             }
           },
@@ -4582,7 +4671,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1ProjectAdvisorsResponse" }
+                "schema": { "$ref": "#/components/schemas/V1ProjectAdvisorsResponse_Output" }
               }
             }
           },
@@ -4655,7 +4744,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnalyticsResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -4667,7 +4758,7 @@
         "summary": "Gets project's logs",
         "tags": ["Analytics"],
         "x-badges": [{ "name": "OAuth scope: analytics:read", "position": "after" }],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_logs_read"]],
         "x-oauth-scope": "analytics:read"
       }
@@ -4728,7 +4819,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnalyticsResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -4740,7 +4833,7 @@
         "summary": "Gets all project's logs in a single log stream",
         "tags": ["Analytics"],
         "x-badges": [{ "name": "OAuth scope: analytics:read", "position": "after" }],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_logs_read"]],
         "x-oauth-scope": "analytics:read"
       }
@@ -4778,7 +4871,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1GetUsageApiCountResponse" }
+                "schema": { "$ref": "#/components/schemas/V1GetUsageApiCountResponse_Output" }
               }
             }
           },
@@ -4790,7 +4883,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets project's usage api counts",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_usage_read"]]
       }
     },
@@ -4817,7 +4910,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1GetUsageApiRequestsCountResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/V1GetUsageApiRequestsCountResponse_Output"
+                }
               }
             }
           },
@@ -4829,7 +4924,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets project's usage api requests count",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_usage_read"]]
       }
     },
@@ -4871,7 +4966,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnalyticsResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -4882,7 +4979,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets a project's function combined statistics",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_usage_read"]]
       }
     },
@@ -4925,7 +5022,7 @@
         "summary": "Scrape a project's metrics",
         "tags": ["Analytics"],
         "x-badges": [{ "name": "OAuth scope: analytics:read", "position": "after" }],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_logs_read"]],
         "x-oauth-scope": "analytics:read"
       }
@@ -4959,7 +5056,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/CreateRoleResponse" }
+                "schema": { "$ref": "#/components/schemas/CreateRoleResponse_Output" }
               }
             }
           },
@@ -4998,7 +5095,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/DeleteRolesResponse" }
+                "schema": { "$ref": "#/components/schemas/DeleteRolesResponse_Output" }
               }
             }
           },
@@ -5039,7 +5136,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1ListMigrationsResponse" }
+                "schema": { "$ref": "#/components/schemas/V1ListMigrationsResponse_Output" }
               }
             }
           },
@@ -5219,7 +5316,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1GetMigrationResponse" }
+                "schema": { "$ref": "#/components/schemas/V1GetMigrationResponse_Output" }
               }
             }
           },
@@ -5423,7 +5520,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/GetProjectDbMetadataResponse" }
+                "schema": { "$ref": "#/components/schemas/GetProjectDbMetadataResponse_Output" }
               }
             }
           },
@@ -5471,7 +5568,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1UpdatePasswordResponse" }
+                "schema": { "$ref": "#/components/schemas/V1UpdatePasswordResponse_Output" }
               }
             }
           },
@@ -5512,7 +5609,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/JitAccessResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/JitAccessResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -5559,7 +5658,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/JitAuthorizeAccessResponse" }
+                "schema": { "$ref": "#/components/schemas/JitAuthorizeAccessResponse_Output" }
               }
             }
           },
@@ -5604,7 +5703,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/JitAccessResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/JitAccessResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -5643,7 +5744,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/JitListAccessResponse" }
+                "schema": { "$ref": "#/components/schemas/JitListAccessResponse_Output" }
               }
             }
           },
@@ -5691,7 +5792,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/InviteExternalUserJitResponse" }
+                "schema": { "$ref": "#/components/schemas/InviteExternalUserJitResponse_Output" }
               }
             }
           },
@@ -5738,7 +5839,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/JitAccessResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/JitAccessResponse_Output" }
+              }
             }
           },
           "500": { "description": "Failed to accept invitation" }
@@ -5908,7 +6011,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/FunctionResponse" }
+                  "items": { "$ref": "#/components/schemas/FunctionResponse_Output" }
                 }
               }
             }
@@ -6005,7 +6108,9 @@
           "201": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/FunctionResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FunctionResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -6053,7 +6158,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/BulkUpdateFunctionResponse" }
+                "schema": { "$ref": "#/components/schemas/BulkUpdateFunctionResponse_Output" }
               }
             }
           },
@@ -6120,7 +6225,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/DeployFunctionResponse" }
+                "schema": { "$ref": "#/components/schemas/DeployFunctionResponse_Output" }
               }
             }
           },
@@ -6170,7 +6275,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/FunctionSlugResponse" }
+                "schema": { "$ref": "#/components/schemas/FunctionSlugResponse_Output" }
               }
             }
           },
@@ -6272,7 +6377,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/FunctionResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FunctionSlugResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -6401,7 +6508,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/V1StorageBucketResponse" }
+                  "items": { "$ref": "#/components/schemas/V1StorageBucketResponse_Output" }
                 }
               }
             }
@@ -6442,7 +6549,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/DiskResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DiskResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -6516,7 +6625,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/DiskUtilMetricsResponse" }
+                "schema": { "$ref": "#/components/schemas/DiskUtilMetricsResponse_Output" }
               }
             }
           },
@@ -6555,7 +6664,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/DiskAutoscaleConfig" }
+                "schema": { "$ref": "#/components/schemas/DiskAutoscaleConfig_Output" }
               }
             }
           },
@@ -6594,7 +6703,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/StorageConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/StorageConfigResponse_Output" }
               }
             }
           },
@@ -6671,7 +6780,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1PgbouncerConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/V1PgbouncerConfigResponse_Output" }
               }
             }
           },
@@ -6713,7 +6822,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/SupavisorConfigResponse" }
+                  "items": { "$ref": "#/components/schemas/SupavisorConfigResponse_Output" }
                 }
               }
             }
@@ -6761,7 +6870,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UpdateSupavisorConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/UpdateSupavisorConfigResponse_Output" }
               }
             }
           },
@@ -6802,7 +6911,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse_Output" }
               }
             }
           },
@@ -6849,7 +6958,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse_Output" }
               }
             }
           },
@@ -6890,7 +6999,7 @@
             "description": "Gets project's realtime configuration",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/RealtimeConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/RealtimeConfigResponse_Output" }
               }
             }
           },
@@ -7003,7 +7112,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/CreateProviderResponse" }
+                "schema": { "$ref": "#/components/schemas/CreateProviderResponse_Output" }
               }
             }
           },
@@ -7042,7 +7151,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ListProvidersResponse" }
+                "schema": { "$ref": "#/components/schemas/ListProvidersResponse_Output" }
               }
             }
           },
@@ -7094,7 +7203,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/GetProviderResponse" }
+                "schema": { "$ref": "#/components/schemas/GetProviderResponse_Output" }
               }
             }
           },
@@ -7152,7 +7261,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UpdateProviderResponse" }
+                "schema": { "$ref": "#/components/schemas/UpdateProviderResponse_Output" }
               }
             }
           },
@@ -7204,7 +7313,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/DeleteProviderResponse" }
+                "schema": { "$ref": "#/components/schemas/DeleteProviderResponse_Output" }
               }
             }
           },
@@ -7246,7 +7355,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/V1BackupsResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1BackupsResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -7460,7 +7571,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1BackupScheduleResponse" }
+                "schema": { "$ref": "#/components/schemas/V1BackupScheduleResponse_Output" }
               }
             }
           },
@@ -7519,7 +7630,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1BackupScheduleResponse" }
+                "schema": { "$ref": "#/components/schemas/V1BackupScheduleResponse_Output" }
               }
             }
           },
@@ -7611,7 +7722,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1ListEntitlementsResponse" }
+                "schema": { "$ref": "#/components/schemas/V1ListEntitlementsResponse_Output" }
               }
             }
           },
@@ -7651,11 +7762,14 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/V1OrganizationMemberResponse" }
+                  "items": { "$ref": "#/components/schemas/V1OrganizationMemberResponse_Output" }
                 }
               }
             }
-          }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "List members of an organization",
@@ -7687,7 +7801,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1OrganizationSlugResponse" }
+                "schema": { "$ref": "#/components/schemas/V1OrganizationSlugResponse_Output" }
               }
             }
           },
@@ -7731,7 +7845,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/OrganizationProjectClaimResponse" }
+                "schema": { "$ref": "#/components/schemas/OrganizationProjectClaimResponse_Output" }
               }
             }
           },
@@ -7855,7 +7969,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/OrganizationProjectsResponse" }
+                "schema": { "$ref": "#/components/schemas/OrganizationProjectsResponse_Output" }
               }
             }
           },
@@ -7899,11 +8013,49 @@
       "description": "Visit [https://supabase.github.io/storage/](https://supabase.github.io/storage/) for complete documentation."
     }
   ],
-  "servers": [],
+  "servers": [{ "url": "https://api.supabase.com" }],
   "components": {
-    "securitySchemes": { "bearer": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" } },
+    "securitySchemes": {
+      "bearer": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" },
+      "oauth2": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://api.supabase.com/v1/oauth/authorize",
+            "tokenUrl": "https://api.supabase.com/v1/oauth/token",
+            "scopes": {
+              "analytics:read": "Read access to analytics",
+              "analytics:write": "Write access to analytics",
+              "analytics_config:read": "Read access to analytics config",
+              "analytics_config:write": "Write access to analytics config",
+              "auth:read": "Read access to auth",
+              "auth:write": "Write access to auth",
+              "database:read": "Read access to database",
+              "database:write": "Write access to database",
+              "domains:read": "Read access to domains",
+              "domains:write": "Write access to domains",
+              "edge_functions:read": "Read access to edge functions",
+              "edge_functions:write": "Write access to edge functions",
+              "environment:read": "Read access to environment",
+              "environment:write": "Write access to environment",
+              "organizations:read": "Read access to organizations",
+              "organizations:write": "Write access to organizations",
+              "projects:read": "Read access to projects",
+              "projects:write": "Write access to projects",
+              "rest:read": "Read access to rest",
+              "rest:write": "Write access to rest",
+              "secrets:read": "Read access to secrets",
+              "secrets:write": "Write access to secrets",
+              "storage:read": "Read access to storage",
+              "storage:write": "Write access to storage"
+            }
+          }
+        },
+        "description": "OAuth 2.0 authorization code flow for Supabase OAuth apps. Tokens carry the scopes approved for the app by the organization."
+      }
+    },
     "schemas": {
-      "BranchDetailResponse": {
+      "BranchDetailResponse_Output": {
         "type": "object",
         "properties": {
           "ref": { "type": "string" },
@@ -7988,7 +8140,7 @@
           "notify_url": "https://example.com/webhooks/branches"
         }
       },
-      "BranchResponse": {
+      "BranchResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -8029,24 +8181,24 @@
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "review_requested_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "with_data": { "type": "boolean" },
           "notify_url": { "type": "string", "format": "uri" },
           "deletion_scheduled_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "preview_project_status": {
             "type": "string",
@@ -8082,7 +8234,7 @@
           "with_data"
         ]
       },
-      "BranchDeleteResponse": {
+      "BranchDeleteResponse_Output": {
         "type": "object",
         "properties": { "message": { "type": "string", "enum": ["ok"] } },
         "required": ["message"]
@@ -8092,7 +8244,7 @@
         "properties": { "migration_version": { "type": "string" } },
         "example": { "migration_version": "20250312000000" }
       },
-      "BranchUpdateResponse": {
+      "BranchUpdateResponse_Output": {
         "type": "object",
         "properties": {
           "workflow_run_id": { "type": "string" },
@@ -8100,12 +8252,12 @@
         },
         "required": ["workflow_run_id", "message"]
       },
-      "BranchRestoreResponse": {
+      "BranchRestoreResponse_Output": {
         "type": "object",
         "properties": { "message": { "type": "string", "enum": ["Branch restoration initiated"] } },
         "required": ["message"]
       },
-      "V1ProjectWithDatabaseResponse": {
+      "V1ProjectWithDatabaseResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -8324,7 +8476,7 @@
         },
         "additionalProperties": false
       },
-      "V1ProjectResponse": {
+      "V1ProjectResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -8386,7 +8538,7 @@
           "status"
         ]
       },
-      "RegionsInfo": {
+      "RegionsInfo_Output": {
         "type": "object",
         "properties": {
           "recommendations": {
@@ -8497,7 +8649,7 @@
         },
         "required": ["recommendations", "all"]
       },
-      "OrganizationResponseV1": {
+      "OrganizationResponseV1_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -8565,7 +8717,7 @@
         },
         "additionalProperties": false
       },
-      "OAuthTokenResponse": {
+      "OAuthTokenResponse_Output": {
         "type": "object",
         "properties": {
           "access_token": { "type": "string" },
@@ -8580,8 +8732,7 @@
           },
           "token_type": { "type": "string", "enum": ["Bearer"] }
         },
-        "required": ["access_token", "expires_in", "token_type"],
-        "additionalProperties": false
+        "required": ["access_token", "expires_in", "token_type"]
       },
       "OAuthRevokeTokenBody": {
         "type": "object",
@@ -8602,7 +8753,7 @@
         },
         "additionalProperties": false
       },
-      "SnippetList": {
+      "SnippetList_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -8653,7 +8804,7 @@
         },
         "required": ["data"]
       },
-      "SnippetResponse": {
+      "SnippetResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -8708,7 +8859,7 @@
           "content"
         ]
       },
-      "V1ProfileResponse": {
+      "V1ProfileResponse_Output": {
         "type": "object",
         "properties": {
           "gotrue_id": { "type": "string" },
@@ -8717,7 +8868,7 @@
         },
         "required": ["gotrue_id", "primary_email", "username"]
       },
-      "ListActionRunResponse": {
+      "ListActionRunResponse_Output": {
         "type": "array",
         "items": {
           "type": "object",
@@ -8768,7 +8919,7 @@
           ]
         }
       },
-      "ActionRunResponse": {
+      "ActionRunResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -8855,12 +9006,12 @@
           "deploy": "CREATED"
         }
       },
-      "UpdateRunStatusResponse": {
+      "UpdateRunStatusResponse_Output": {
         "type": "object",
         "properties": { "message": { "type": "string", "enum": ["ok"] } },
         "required": ["message"]
       },
-      "ApiKeyResponse": {
+      "ApiKeyResponse_Output": {
         "type": "object",
         "properties": {
           "api_key": { "type": "string", "nullable": true },
@@ -8883,19 +9034,19 @@
           "inserted_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
             "nullable": true
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
             "nullable": true
           }
         },
         "required": ["name"]
       },
-      "LegacyApiKeysResponse": {
+      "LegacyApiKeysResponse_Output": {
         "type": "object",
         "properties": { "enabled": { "type": "boolean" } },
         "required": ["enabled"]
@@ -9000,26 +9151,21 @@
           "notify_url": "https://example.com/webhooks/branches"
         }
       },
-      "UpdateCustomHostnameResponseJsonValue": {
+      "JsonValue_Output": {
         "description": "Any JSON-serializable value",
         "anyOf": [
           {
             "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }],
             "nullable": true
           },
-          {
-            "type": "array",
-            "items": { "$ref": "#/components/schemas/UpdateCustomHostnameResponseJsonValue" }
-          },
+          { "type": "array", "items": { "$ref": "#/components/schemas/JsonValue_Output" } },
           {
             "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/UpdateCustomHostnameResponseJsonValue"
-            }
+            "additionalProperties": { "$ref": "#/components/schemas/JsonValue_Output" }
           }
         ]
       },
-      "UpdateCustomHostnameResponse": {
+      "UpdateCustomHostnameResponse_Output": {
         "type": "object",
         "properties": {
           "status": {
@@ -9039,11 +9185,11 @@
               "success": { "type": "boolean" },
               "errors": {
                 "type": "array",
-                "items": { "$ref": "#/components/schemas/UpdateCustomHostnameResponseJsonValue" }
+                "items": { "$ref": "#/components/schemas/JsonValue_Output" }
               },
               "messages": {
                 "type": "array",
-                "items": { "$ref": "#/components/schemas/UpdateCustomHostnameResponseJsonValue" }
+                "items": { "$ref": "#/components/schemas/JsonValue_Output" }
               },
               "result": {
                 "type": "object",
@@ -9061,8 +9207,7 @@
                           "properties": {
                             "txt_name": { "type": "string" },
                             "txt_value": { "type": "string" }
-                          },
-                          "required": ["txt_name", "txt_value"]
+                          }
                         }
                       },
                       "validation_errors": {
@@ -9073,8 +9218,7 @@
                           "required": ["message"]
                         }
                       }
-                    },
-                    "required": ["status", "validation_records"]
+                    }
                   },
                   "ownership_verification": {
                     "type": "object",
@@ -9082,27 +9226,19 @@
                       "type": { "type": "string" },
                       "name": { "type": "string" },
                       "value": { "type": "string" }
-                    },
-                    "required": ["type", "name", "value"]
+                    }
                   },
                   "custom_origin_server": { "type": "string" },
                   "verification_errors": { "type": "array", "items": { "type": "string" } },
                   "status": { "type": "string" }
                 },
-                "required": [
-                  "id",
-                  "hostname",
-                  "ssl",
-                  "ownership_verification",
-                  "custom_origin_server",
-                  "status"
-                ]
+                "required": ["id", "hostname"]
               }
             },
             "required": ["success", "errors", "messages", "result"]
           }
         },
-        "required": ["status", "custom_hostname", "data"]
+        "required": ["status", "data"]
       },
       "UpdateCustomHostnameBody": {
         "type": "object",
@@ -9116,14 +9252,14 @@
         "required": ["state"],
         "example": { "state": "enabled" }
       },
-      "NetworkBanResponse": {
+      "NetworkBanResponse_Output": {
         "type": "object",
         "properties": {
           "banned_ipv4_addresses": { "type": "array", "items": { "type": "string" } }
         },
         "required": ["banned_ipv4_addresses"]
       },
-      "NetworkBanResponseEnriched": {
+      "NetworkBanResponseEnriched_Output": {
         "type": "object",
         "properties": {
           "banned_ipv4_addresses": {
@@ -9159,7 +9295,7 @@
         "required": ["ipv4_addresses"],
         "example": { "ipv4_addresses": ["203.0.113.10"], "requester_ip": false }
       },
-      "NetworkRestrictionsResponse": {
+      "NetworkRestrictionsResponse_Output": {
         "type": "object",
         "properties": {
           "entitlement": { "type": "string", "enum": ["disallowed", "allowed"] },
@@ -9191,12 +9327,12 @@
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "applied_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           }
         },
         "required": ["entitlement", "config", "status"]
@@ -9232,7 +9368,7 @@
           "remove": { "dbAllowedCidrs": ["198.51.100.0/24"] }
         }
       },
-      "NetworkRestrictionsV2Response": {
+      "NetworkRestrictionsV2Response_Output": {
         "type": "object",
         "properties": {
           "entitlement": { "type": "string", "enum": ["disallowed", "allowed"] },
@@ -9273,18 +9409,18 @@
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "applied_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "status": { "type": "string", "enum": ["stored", "applied"] }
         },
         "required": ["entitlement", "config", "status"]
       },
-      "PgsodiumConfigResponse": {
+      "PgsodiumConfigResponse_Output": {
         "type": "object",
         "properties": {
           "root_key": {
@@ -9310,7 +9446,7 @@
           "root_key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
         }
       },
-      "PostgrestConfigWithJWTSecretResponse": {
+      "PostgrestConfigWithJWTSecretResponse_Output": {
         "type": "object",
         "properties": {
           "db_schema": { "type": "string" },
@@ -9355,7 +9491,7 @@
         },
         "example": { "db_schema": "public,storage", "db_pool": 20, "max_rows": 1000 }
       },
-      "V1PostgrestConfigResponse": {
+      "V1PostgrestConfigResponse_Output": {
         "type": "object",
         "properties": {
           "db_schema": { "type": "string" },
@@ -9388,7 +9524,7 @@
           "db_pool_acquisition_timeout"
         ]
       },
-      "V1ProjectRefResponse": {
+      "V1ProjectRefResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "integer", "minimum": -9007199254740991, "maximum": 9007199254740991 },
@@ -9403,7 +9539,7 @@
         "required": ["name"],
         "example": { "name": "Acme Platform" }
       },
-      "SecretResponse": {
+      "SecretResponse_Output": {
         "type": "object",
         "properties": {
           "name": { "type": "string" },
@@ -9438,7 +9574,7 @@
         "items": { "type": "string" },
         "example": ["OPENAI_API_KEY"]
       },
-      "SslEnforcementResponse": {
+      "SslEnforcementResponse_Output": {
         "type": "object",
         "properties": {
           "currentConfig": {
@@ -9462,12 +9598,12 @@
         "required": ["requestedConfig"],
         "example": { "requestedConfig": { "database": true } }
       },
-      "TypescriptResponse": {
+      "TypescriptResponse_Output": {
         "type": "object",
         "properties": { "types": { "type": "string" } },
         "required": ["types"]
       },
-      "VanitySubdomainConfigResponse": {
+      "VanitySubdomainConfigResponse_Output": {
         "type": "object",
         "properties": {
           "status": { "type": "string", "enum": ["not-used", "custom-domain-used", "active"] },
@@ -9511,12 +9647,12 @@
         "required": ["vanity_subdomain"],
         "example": { "vanity_subdomain": "acme-prod" }
       },
-      "SubdomainAvailabilityResponse": {
+      "SubdomainAvailabilityResponse_Output": {
         "type": "object",
         "properties": { "available": { "type": "boolean" } },
         "required": ["available"]
       },
-      "ActivateVanitySubdomainResponse": {
+      "ActivateVanitySubdomainResponse_Output": {
         "type": "object",
         "properties": { "custom_domain": { "type": "string" } },
         "required": ["custom_domain"]
@@ -9533,12 +9669,12 @@
         "required": ["target_version"],
         "example": { "target_version": "17", "release_channel": "ga" }
       },
-      "ProjectUpgradeInitiateResponse": {
+      "ProjectUpgradeInitiateResponse_Output": {
         "type": "object",
         "properties": { "tracking_id": { "type": "string" } },
         "required": ["tracking_id"]
       },
-      "ProjectUpgradeEligibilityResponse": {
+      "ProjectUpgradeEligibilityResponse_Output": {
         "type": "object",
         "properties": {
           "eligible": { "type": "boolean" },
@@ -9711,6 +9847,13 @@
                     "type": { "type": "string", "enum": ["operator_estimator_gate"] }
                   },
                   "required": ["type"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string", "enum": ["btree_gist_nan_reindex"] }
+                  },
+                  "required": ["type"]
                 }
               ]
             }
@@ -9731,7 +9874,7 @@
           "warnings"
         ]
       },
-      "DatabaseUpgradeStatusResponse": {
+      "DatabaseUpgradeStatusResponse_Output": {
         "type": "object",
         "properties": {
           "databaseUpgradeStatus": {
@@ -9739,7 +9882,7 @@
             "properties": {
               "initiated_at": { "type": "string" },
               "latest_status_at": { "type": "string" },
-              "target_version": { "type": "number" },
+              "target_version": { "type": "string" },
               "error": {
                 "type": "string",
                 "enum": [
@@ -9778,7 +9921,7 @@
         },
         "required": ["databaseUpgradeStatus"]
       },
-      "ReadOnlyStatusResponse": {
+      "ReadOnlyStatusResponse_Output": {
         "type": "object",
         "properties": {
           "enabled": { "type": "boolean" },
@@ -9824,7 +9967,7 @@
         "required": ["database_identifier"],
         "example": { "database_identifier": "abcdefghijklmnopqrst-rr-us-west-1-abcde" }
       },
-      "V1ServiceHealthResponse": {
+      "V1ServiceHealthResponse_Output": {
         "type": "object",
         "properties": {
           "name": {
@@ -9891,7 +10034,7 @@
         },
         "required": ["name", "healthy", "status"]
       },
-      "SigningKeyResponse": {
+      "SigningKeyResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -9908,16 +10051,15 @@
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           }
         },
-        "required": ["id", "algorithm", "status", "public_jwk", "created_at", "updated_at"],
-        "additionalProperties": false
+        "required": ["id", "algorithm", "status", "public_jwk", "created_at", "updated_at"]
       },
       "CreateSigningKeyBody": {
         "type": "object",
@@ -10037,7 +10179,7 @@
         "example": { "algorithm": "RS256", "status": "standby" },
         "additionalProperties": false
       },
-      "SigningKeysResponse": {
+      "SigningKeysResponse_Output": {
         "type": "object",
         "properties": {
           "keys": {
@@ -10059,21 +10201,19 @@
                 "created_at": {
                   "type": "string",
                   "format": "date-time",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
                 },
                 "updated_at": {
                   "type": "string",
                   "format": "date-time",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
                 }
               },
-              "required": ["id", "algorithm", "status", "public_jwk", "created_at", "updated_at"],
-              "additionalProperties": false
+              "required": ["id", "algorithm", "status", "public_jwk", "created_at", "updated_at"]
             }
           }
         },
-        "required": ["keys"],
-        "additionalProperties": false
+        "required": ["keys"]
       },
       "UpdateSigningKeyBody": {
         "type": "object",
@@ -10087,7 +10227,7 @@
         "example": { "status": "standby" },
         "additionalProperties": false
       },
-      "AuthConfigResponse": {
+      "AuthConfigResponse_Output": {
         "type": "object",
         "properties": {
           "api_max_request_duration": {
@@ -10420,6 +10560,10 @@
             "maximum": 9007199254740991,
             "nullable": true
           },
+          "security_update_password_require_current_password": {
+            "type": "boolean",
+            "nullable": true
+          },
           "security_update_password_require_reauthentication": {
             "type": "boolean",
             "nullable": true
@@ -10699,6 +10843,7 @@
           "security_captcha_secret",
           "security_manual_linking_enabled",
           "security_refresh_token_reuse_interval",
+          "security_update_password_require_current_password",
           "security_update_password_require_reauthentication",
           "sessions_inactivity_timeout",
           "sessions_single_per_user",
@@ -10853,8 +10998,18 @@
             "nullable": true
           },
           "security_captcha_secret": { "type": "string", "nullable": true },
-          "sessions_timebox": { "type": "number", "minimum": 0, "nullable": true },
-          "sessions_inactivity_timeout": { "type": "number", "minimum": 0, "nullable": true },
+          "sessions_timebox": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Session timebox in hours. Maximum 8760 hours (1 year).",
+            "nullable": true
+          },
+          "sessions_inactivity_timeout": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Session inactivity timeout in hours. Maximum 8760 hours (1 year).",
+            "nullable": true
+          },
           "sessions_single_per_user": { "type": "boolean", "nullable": true },
           "sessions_tags": {
             "type": "string",
@@ -10928,10 +11083,16 @@
             "type": "boolean",
             "nullable": true
           },
+          "security_update_password_require_current_password": {
+            "type": "boolean",
+            "description": "Require the user's current password when updating their password.",
+            "nullable": true
+          },
           "security_refresh_token_reuse_interval": {
             "type": "integer",
             "minimum": 0,
             "maximum": 2147483647,
+            "description": "Refresh token reuse interval in seconds. Maximum 300 seconds (5 minutes).",
             "nullable": true
           },
           "mailer_otp_exp": { "type": "integer", "minimum": 0, "maximum": 2147483647 },
@@ -11159,7 +11320,7 @@
           "jwks_url": "https://login.acme.com/.well-known/jwks.json"
         }
       },
-      "ThirdPartyAuth": {
+      "ThirdPartyAuth_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -11178,7 +11339,7 @@
         },
         "required": ["id", "type", "inserted_at", "updated_at"]
       },
-      "GetProjectAvailableRestoreVersionsResponse": {
+      "GetProjectAvailableRestoreVersionsResponse_Output": {
         "type": "object",
         "properties": {
           "available_versions": {
@@ -11202,26 +11363,7 @@
         },
         "required": ["available_versions"]
       },
-      "ListProjectAddonsResponseJsonValue": {
-        "description": "Any JSON-serializable value",
-        "anyOf": [
-          {
-            "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }],
-            "nullable": true
-          },
-          {
-            "type": "array",
-            "items": { "$ref": "#/components/schemas/ListProjectAddonsResponseJsonValue" }
-          },
-          {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/ListProjectAddonsResponseJsonValue"
-            }
-          }
-        ]
-      },
-      "ListProjectAddonsResponse": {
+      "ListProjectAddonsResponse_Output": {
         "type": "object",
         "properties": {
           "selected_addons": {
@@ -11290,7 +11432,7 @@
                       },
                       "required": ["description", "type", "interval", "amount"]
                     },
-                    "meta": { "$ref": "#/components/schemas/ListProjectAddonsResponseJsonValue" }
+                    "meta": { "$ref": "#/components/schemas/JsonValue_Output" }
                   },
                   "required": ["id", "name", "price"]
                 }
@@ -11367,7 +11509,7 @@
                         },
                         "required": ["description", "type", "interval", "amount"]
                       },
-                      "meta": { "$ref": "#/components/schemas/ListProjectAddonsResponseJsonValue" }
+                      "meta": { "$ref": "#/components/schemas/JsonValue_Output" }
                     },
                     "required": ["id", "name", "price"]
                   }
@@ -11429,7 +11571,7 @@
         "required": ["addon_variant", "addon_type"],
         "example": { "addon_variant": "pitr_7", "addon_type": "pitr" }
       },
-      "ProjectClaimTokenResponse": {
+      "ProjectClaimTokenResponse_Output": {
         "type": "object",
         "properties": {
           "token_alias": { "type": "string" },
@@ -11443,7 +11585,7 @@
         },
         "required": ["token_alias", "expires_at", "created_at", "created_by"]
       },
-      "CreateProjectClaimTokenResponse": {
+      "CreateProjectClaimTokenResponse_Output": {
         "type": "object",
         "properties": {
           "token": { "type": "string" },
@@ -11458,7 +11600,7 @@
         },
         "required": ["token", "token_alias", "expires_at", "created_at", "created_by"]
       },
-      "V1ProjectAdvisorsResponse": {
+      "V1ProjectAdvisorsResponse_Output": {
         "type": "object",
         "properties": {
           "lints": {
@@ -11467,6 +11609,7 @@
               "type": "object",
               "properties": {
                 "name": {
+                  "type": "string",
                   "enum": [
                     "unindexed_foreign_keys",
                     "auth_users_exposed",
@@ -11488,6 +11631,7 @@
                     "auth_otp_long_expiry",
                     "auth_otp_short_length",
                     "ssl_not_enforced",
+                    "log_connections_not_enabled",
                     "network_restrictions_not_set",
                     "password_requirements_min_length",
                     "pitr_not_enabled",
@@ -11496,16 +11640,28 @@
                     "auth_password_policy_missing",
                     "leaked_service_key",
                     "no_backup_admin",
-                    "vulnerable_postgres_version"
-                  ],
-                  "type": "string"
+                    "vulnerable_postgres_version",
+                    "db_not_reachable",
+                    "db_connection_failing",
+                    "db_connection_limit_reached",
+                    "instance_telemetry_lost",
+                    "instance_db_down",
+                    "instance_alert_firing",
+                    "log_data_api_error_rate_high",
+                    "log_auth_error_rate_high",
+                    "log_storage_error_rate_high",
+                    "log_edge_function_error_rate_high",
+                    "project_not_active",
+                    "advisor_check_unavailable"
+                  ]
                 },
                 "title": { "type": "string" },
                 "level": { "type": "string", "enum": ["ERROR", "WARN", "INFO"] },
                 "facing": { "type": "string", "enum": ["EXTERNAL"] },
                 "categories": {
                   "type": "array",
-                  "items": { "type": "string", "enum": ["PERFORMANCE", "SECURITY"] }
+                  "items": { "type": "string", "enum": ["PERFORMANCE", "SECURITY", "HEALTH"] },
+                  "x-ignore-array-items-must-be-objects": true
                 },
                 "description": { "type": "string" },
                 "detail": { "type": "string" },
@@ -11518,13 +11674,32 @@
                     "entity": { "type": "string" },
                     "type": {
                       "type": "string",
-                      "enum": ["table", "view", "auth", "function", "extension", "compliance"]
+                      "enum": [
+                        "table",
+                        "view",
+                        "materialized view",
+                        "foreign table",
+                        "auth",
+                        "function",
+                        "extension",
+                        "compliance",
+                        "health"
+                      ]
                     },
                     "fkey_name": { "type": "string" },
-                    "fkey_columns": { "type": "array", "items": { "type": "number" } }
+                    "fkey_columns": {
+                      "x-ignore-array-items-must-be-objects": true,
+                      "type": "array",
+                      "items": { "type": "number" }
+                    }
                   }
                 },
-                "cache_key": { "type": "string" }
+                "cache_key": { "type": "string" },
+                "observed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                }
               },
               "required": [
                 "name",
@@ -11542,7 +11717,7 @@
         },
         "required": ["lints"]
       },
-      "AnalyticsResponse": {
+      "AnalyticsResponse_Output": {
         "type": "object",
         "properties": {
           "result": { "type": "array", "items": {} },
@@ -11576,7 +11751,7 @@
           }
         }
       },
-      "V1GetUsageApiCountResponse": {
+      "V1GetUsageApiCountResponse_Output": {
         "type": "object",
         "properties": {
           "result": {
@@ -11633,7 +11808,7 @@
           }
         }
       },
-      "V1GetUsageApiRequestsCountResponse": {
+      "V1GetUsageApiRequestsCountResponse_Output": {
         "type": "object",
         "properties": {
           "result": {
@@ -11680,7 +11855,7 @@
         "required": ["read_only"],
         "example": { "read_only": true }
       },
-      "CreateRoleResponse": {
+      "CreateRoleResponse_Output": {
         "type": "object",
         "properties": {
           "role": { "type": "string", "minLength": 1 },
@@ -11694,19 +11869,16 @@
         },
         "required": ["role", "password", "ttl_seconds"]
       },
-      "DeleteRolesResponse": {
+      "DeleteRolesResponse_Output": {
         "type": "object",
         "properties": { "message": { "type": "string", "enum": ["ok"] } },
         "required": ["message"]
       },
-      "V1ListMigrationsResponse": {
+      "V1ListMigrationsResponse_Output": {
         "type": "array",
         "items": {
           "type": "object",
-          "properties": {
-            "version": { "type": "string", "minLength": 1 },
-            "name": { "type": "string" }
-          },
+          "properties": { "version": { "type": "string" }, "name": { "type": "string" } },
           "required": ["version"]
         }
       },
@@ -11738,10 +11910,10 @@
           "rollback": "drop table if exists public.widgets;"
         }
       },
-      "V1GetMigrationResponse": {
+      "V1GetMigrationResponse_Output": {
         "type": "object",
         "properties": {
-          "version": { "type": "string", "minLength": 1 },
+          "version": { "type": "string" },
           "name": { "type": "string" },
           "statements": { "type": "array", "items": { "type": "string" } },
           "rollback": { "type": "array", "items": { "type": "string" } },
@@ -11777,7 +11949,7 @@
         "required": ["query"],
         "example": { "query": "select * from pg_stat_activity limit 1;" }
       },
-      "GetProjectDbMetadataResponse": {
+      "GetProjectDbMetadataResponse_Output": {
         "type": "object",
         "properties": {
           "databases": {
@@ -11791,13 +11963,11 @@
                   "items": {
                     "type": "object",
                     "properties": { "name": { "type": "string" } },
-                    "required": ["name"],
-                    "additionalProperties": {}
+                    "required": ["name"]
                   }
                 }
               },
-              "required": ["name", "schemas"],
-              "additionalProperties": {}
+              "required": ["name", "schemas"]
             }
           }
         },
@@ -11809,12 +11979,12 @@
         "required": ["password"],
         "example": { "password": "correct-horse-battery-staple" }
       },
-      "V1UpdatePasswordResponse": {
+      "V1UpdatePasswordResponse_Output": {
         "type": "object",
         "properties": { "message": { "type": "string" } },
         "required": ["message"]
       },
-      "JitAccessResponse": {
+      "JitAccessResponse_Output": {
         "type": "object",
         "properties": {
           "user_id": {
@@ -11827,7 +11997,7 @@
             "items": {
               "type": "object",
               "properties": {
-                "role": { "type": "string", "minLength": 1 },
+                "role": { "type": "string" },
                 "expires_at": { "type": "number" },
                 "allowed_networks": {
                   "type": "object",
@@ -11892,7 +12062,7 @@
         "required": ["role", "rhost"],
         "example": { "role": "postgres", "rhost": "203.0.113.10" }
       },
-      "JitAuthorizeAccessResponse": {
+      "JitAuthorizeAccessResponse_Output": {
         "type": "object",
         "properties": {
           "user_id": {
@@ -11903,7 +12073,7 @@
           "user_role": {
             "type": "object",
             "properties": {
-              "role": { "type": "string", "minLength": 1 },
+              "role": { "type": "string" },
               "expires_at": { "type": "number" },
               "allowed_networks": {
                 "type": "object",
@@ -11945,7 +12115,7 @@
         },
         "required": ["user_id", "user_role"]
       },
-      "JitListAccessResponse": {
+      "JitListAccessResponse_Output": {
         "type": "object",
         "properties": {
           "items": {
@@ -11968,7 +12138,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "role": { "type": "string", "minLength": 1 },
+                          "role": { "type": "string" },
                           "expires_at": { "type": "number" },
                           "allowed_networks": {
                             "type": "object",
@@ -12027,7 +12197,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "role": { "type": "string", "minLength": 1 },
+                          "role": { "type": "string" },
                           "expires_at": { "type": "number" },
                           "allowed_networks": {
                             "type": "object",
@@ -12212,7 +12382,7 @@
           ]
         }
       },
-      "InviteExternalUserJitResponse": {
+      "InviteExternalUserJitResponse_Output": {
         "type": "object",
         "properties": {
           "email": {
@@ -12230,7 +12400,7 @@
             "items": {
               "type": "object",
               "properties": {
-                "role": { "type": "string", "minLength": 1 },
+                "role": { "type": "string" },
                 "expires_at": { "type": "number" },
                 "allowed_networks": {
                   "type": "object",
@@ -12287,7 +12457,7 @@
         "required": ["email", "token"],
         "example": { "email": "external-user@somedomain.xyz", "token": "" }
       },
-      "FunctionResponse": {
+      "FunctionResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -12375,7 +12545,7 @@
           }
         ]
       },
-      "BulkUpdateFunctionResponse": {
+      "BulkUpdateFunctionResponse_Output": {
         "type": "object",
         "properties": {
           "functions": {
@@ -12438,7 +12608,7 @@
           "metadata": { "entrypoint_path": "index.ts", "verify_jwt": true, "name": "Hello World" }
         }
       },
-      "DeployFunctionResponse": {
+      "DeployFunctionResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -12470,7 +12640,7 @@
         },
         "required": ["id", "slug", "name", "status", "version"]
       },
-      "FunctionSlugResponse": {
+      "FunctionSlugResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -12516,7 +12686,7 @@
           "verify_jwt": true
         }
       },
-      "V1StorageBucketResponse": {
+      "V1StorageBucketResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -12528,7 +12698,7 @@
         },
         "required": ["id", "name", "owner", "created_at", "updated_at", "public"]
       },
-      "DiskResponse": {
+      "DiskResponse_Output": {
         "type": "object",
         "properties": {
           "attributes": {
@@ -12640,7 +12810,7 @@
           "attributes": { "type": "gp3", "size_gb": 100, "iops": 3000, "throughput_mibps": 125 }
         }
       },
-      "DiskUtilMetricsResponse": {
+      "DiskUtilMetricsResponse_Output": {
         "type": "object",
         "properties": {
           "timestamp": { "type": "string" },
@@ -12656,7 +12826,7 @@
         },
         "required": ["timestamp", "metrics"]
       },
-      "DiskAutoscaleConfig": {
+      "DiskAutoscaleConfig_Output": {
         "type": "object",
         "properties": {
           "growth_percent": {
@@ -12683,7 +12853,7 @@
         },
         "required": ["growth_percent", "min_increment_gb", "max_size_gb"]
       },
-      "StorageConfigResponse": {
+      "StorageConfigResponse_Output": {
         "type": "object",
         "properties": {
           "fileSizeLimit": {
@@ -12742,26 +12912,19 @@
             "type": "object",
             "properties": {
               "list_v2": { "type": "boolean" },
-              "iceberg_catalog": { "type": "boolean" }
+              "iceberg_catalog": { "type": "boolean" },
+              "object_versioning": { "type": "boolean" }
             },
-            "required": ["list_v2", "iceberg_catalog"]
+            "required": ["list_v2", "iceberg_catalog", "object_versioning"]
           },
           "external": {
             "type": "object",
             "properties": { "upstreamTarget": { "type": "string", "enum": ["main", "canary"] } },
             "required": ["upstreamTarget"]
           },
-          "migrationVersion": { "type": "string" },
-          "databasePoolMode": { "type": "string" }
+          "migrationVersion": { "type": "string", "nullable": true }
         },
-        "required": [
-          "fileSizeLimit",
-          "features",
-          "capabilities",
-          "external",
-          "migrationVersion",
-          "databasePoolMode"
-        ]
+        "required": ["fileSizeLimit", "features", "capabilities", "external", "migrationVersion"]
       },
       "UpdateStorageConfigBody": {
         "type": "object",
@@ -12823,7 +12986,7 @@
         },
         "additionalProperties": false
       },
-      "V1PgbouncerConfigResponse": {
+      "V1PgbouncerConfigResponse_Output": {
         "type": "object",
         "properties": {
           "default_pool_size": {
@@ -12861,7 +13024,7 @@
           }
         }
       },
-      "SupavisorConfigResponse": {
+      "SupavisorConfigResponse_Output": {
         "type": "object",
         "properties": {
           "identifier": { "type": "string" },
@@ -12923,7 +13086,7 @@
         },
         "example": { "default_pool_size": 25, "pool_mode": "transaction" }
       },
-      "UpdateSupavisorConfigResponse": {
+      "UpdateSupavisorConfigResponse_Output": {
         "type": "object",
         "properties": {
           "default_pool_size": {
@@ -12936,7 +13099,7 @@
         },
         "required": ["default_pool_size", "pool_mode"]
       },
-      "PostgresConfigResponse": {
+      "PostgresConfigResponse_Output": {
         "type": "object",
         "properties": {
           "effective_cache_size": { "type": "string" },
@@ -13094,7 +13257,7 @@
         },
         "additionalProperties": false
       },
-      "RealtimeConfigResponse": {
+      "RealtimeConfigResponse_Output": {
         "type": "object",
         "properties": {
           "private_only": {
@@ -13282,6 +13445,7 @@
                   "properties": {
                     "name": { "type": "string" },
                     "names": { "type": "array", "items": { "type": "string" } },
+                    "array": { "type": "boolean" },
                     "default": {
                       "anyOf": [
                         { "type": "object", "properties": {} },
@@ -13289,8 +13453,7 @@
                         { "type": "string" },
                         { "type": "boolean" }
                       ]
-                    },
-                    "array": { "type": "boolean" }
+                    }
                   }
                 }
               }
@@ -13321,7 +13484,7 @@
           }
         }
       },
-      "CreateProviderResponse": {
+      "CreateProviderResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -13341,6 +13504,7 @@
                       "properties": {
                         "name": { "type": "string" },
                         "names": { "type": "array", "items": { "type": "string" } },
+                        "array": { "type": "boolean" },
                         "default": {
                           "anyOf": [
                             { "type": "object", "properties": {} },
@@ -13348,8 +13512,7 @@
                             { "type": "string" },
                             { "type": "boolean" }
                           ]
-                        },
-                        "array": { "type": "boolean" }
+                        }
                       }
                     }
                   }
@@ -13384,7 +13547,7 @@
         },
         "required": ["id"]
       },
-      "ListProvidersResponse": {
+      "ListProvidersResponse_Output": {
         "type": "object",
         "properties": {
           "items": {
@@ -13409,6 +13572,7 @@
                             "properties": {
                               "name": { "type": "string" },
                               "names": { "type": "array", "items": { "type": "string" } },
+                              "array": { "type": "boolean" },
                               "default": {
                                 "anyOf": [
                                   { "type": "object", "properties": {} },
@@ -13416,8 +13580,7 @@
                                   { "type": "string" },
                                   { "type": "boolean" }
                                 ]
-                              },
-                              "array": { "type": "boolean" }
+                              }
                             }
                           }
                         }
@@ -13456,7 +13619,7 @@
         },
         "required": ["items"]
       },
-      "GetProviderResponse": {
+      "GetProviderResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -13476,6 +13639,7 @@
                       "properties": {
                         "name": { "type": "string" },
                         "names": { "type": "array", "items": { "type": "string" } },
+                        "array": { "type": "boolean" },
                         "default": {
                           "anyOf": [
                             { "type": "object", "properties": {} },
@@ -13483,8 +13647,7 @@
                             { "type": "string" },
                             { "type": "boolean" }
                           ]
-                        },
-                        "array": { "type": "boolean" }
+                        }
                       }
                     }
                   }
@@ -13535,6 +13698,7 @@
                   "properties": {
                     "name": { "type": "string" },
                     "names": { "type": "array", "items": { "type": "string" } },
+                    "array": { "type": "boolean" },
                     "default": {
                       "anyOf": [
                         { "type": "object", "properties": {} },
@@ -13542,8 +13706,7 @@
                         { "type": "string" },
                         { "type": "boolean" }
                       ]
-                    },
-                    "array": { "type": "boolean" }
+                    }
                   }
                 }
               }
@@ -13565,7 +13728,7 @@
           "domains": ["acme.com", "contractors.acme.com"]
         }
       },
-      "UpdateProviderResponse": {
+      "UpdateProviderResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -13585,6 +13748,7 @@
                       "properties": {
                         "name": { "type": "string" },
                         "names": { "type": "array", "items": { "type": "string" } },
+                        "array": { "type": "boolean" },
                         "default": {
                           "anyOf": [
                             { "type": "object", "properties": {} },
@@ -13592,8 +13756,7 @@
                             { "type": "string" },
                             { "type": "boolean" }
                           ]
-                        },
-                        "array": { "type": "boolean" }
+                        }
                       }
                     }
                   }
@@ -13628,7 +13791,7 @@
         },
         "required": ["id"]
       },
-      "DeleteProviderResponse": {
+      "DeleteProviderResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -13648,6 +13811,7 @@
                       "properties": {
                         "name": { "type": "string" },
                         "names": { "type": "array", "items": { "type": "string" } },
+                        "array": { "type": "boolean" },
                         "default": {
                           "anyOf": [
                             { "type": "object", "properties": {} },
@@ -13655,8 +13819,7 @@
                             { "type": "string" },
                             { "type": "boolean" }
                           ]
-                        },
-                        "array": { "type": "boolean" }
+                        }
                       }
                     }
                   }
@@ -13691,7 +13854,7 @@
         },
         "required": ["id"]
       },
-      "V1BackupsResponse": {
+      "V1BackupsResponse_Output": {
         "type": "object",
         "properties": {
           "region": { "type": "string" },
@@ -13762,7 +13925,7 @@
           "completed_on": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
             "nullable": true
           }
         },
@@ -13776,7 +13939,7 @@
         "required": ["id"],
         "example": { "id": 12345 }
       },
-      "V1BackupScheduleResponse": {
+      "V1BackupScheduleResponse_Output": {
         "type": "object",
         "properties": {
           "schedule_for": {
@@ -13814,7 +13977,7 @@
         "required": ["name"],
         "example": { "name": "before-upgrade" }
       },
-      "V1ListEntitlementsResponse": {
+      "V1ListEntitlementsResponse_Output": {
         "type": "object",
         "properties": {
           "entitlements": {
@@ -13934,7 +14097,7 @@
         },
         "required": ["entitlements"]
       },
-      "V1OrganizationMemberResponse": {
+      "V1OrganizationMemberResponse_Output": {
         "type": "object",
         "properties": {
           "user_id": { "type": "string" },
@@ -13944,9 +14107,9 @@
           "mfa_enabled": { "type": "boolean" },
           "avatar_url": { "type": "string", "nullable": true }
         },
-        "required": ["user_id", "user_name", "role_name", "mfa_enabled", "avatar_url"]
+        "required": ["user_id", "user_name", "mfa_enabled", "avatar_url"]
       },
-      "V1OrganizationSlugResponse": {
+      "V1OrganizationSlugResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -13972,7 +14135,7 @@
         },
         "required": ["id", "name", "opt_in_tags", "allowed_release_channels"]
       },
-      "OrganizationProjectClaimResponse": {
+      "OrganizationProjectClaimResponse_Output": {
         "type": "object",
         "properties": {
           "project": {
@@ -14046,7 +14209,7 @@
         },
         "required": ["project", "preview", "expires_at", "created_at", "created_by"]
       },
-      "OrganizationProjectsResponse": {
+      "OrganizationProjectsResponse_Output": {
         "type": "object",
         "properties": {
           "projects": {

@@ -75,7 +75,7 @@ export const ProjectAPIDocs = () => {
             <div className="flex items-center space-x-1">
               {!isEntityDocs && <LanguageSelector simplifiedVersion />}
               {isIntroduction && (
-                <Button variant="default" onClick={() => setShowKeys(!showKeys)}>
+                <Button onClick={() => setShowKeys(!showKeys)}>
                   {showKeys ? 'Hide keys' : 'Show keys'}
                 </Button>
               )}

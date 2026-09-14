@@ -87,7 +87,7 @@ export const BatchRestartDialog = ({
   const { mutateAsync: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: (data) => {
       const count = data.tables.length
-      toast.success(`${count} table${count > 1 ? 's' : ''} will replicate from scratch.`)
+      toast.success(`Replication will restart for ${count} table${count > 1 ? 's' : ''}.`)
     },
     onSettled: () => {
       onRestartComplete?.(affectedTableIds)
@@ -115,12 +115,12 @@ export const BatchRestartDialog = ({
   const dialogContent =
     mode === 'all'
       ? {
-          title: 'Restart all tables from scratch',
+          title: 'Restart all tables',
           description: (
             <div className="space-y-3 text-sm">
               <p>
                 This will restart replication for all {affectedTables.length} table
-                {affectedTables.length === 1 ? '' : 's'} in this pipeline from scratch:
+                {affectedTables.length === 1 ? '' : 's'} in this pipeline:
               </p>
               <ul className="list-disc list-inside space-y-1.5 pl-2">
                 {initialSyncDescription}
@@ -135,15 +135,15 @@ export const BatchRestartDialog = ({
               </ul>
             </div>
           ),
-          action: 'Restart from scratch',
+          action: 'Restart',
         }
       : {
-          title: 'Restart failed tables from scratch',
+          title: 'Restart failed tables',
           description: (
             <div className="space-y-3 text-sm">
               <p>
                 This will restart replication for all{' '}
-                <strong>{affectedTables.length} currently failed tables</strong> from scratch:
+                <strong>{affectedTables.length} currently failed tables</strong>:
               </p>
               <ul className="list-disc list-inside space-y-1.5 pl-2">
                 {initialSyncDescription}
@@ -153,7 +153,7 @@ export const BatchRestartDialog = ({
                 </li>
                 <li>
                   <strong>Tables that are not failed remain untouched.</strong> Replication restarts
-                  for every table that is failed when the request runs.
+                  for every table that's currently failed.
                 </li>
                 <li>
                   <strong>Running pipelines restart automatically.</strong> Stopped pipelines remain
@@ -162,7 +162,7 @@ export const BatchRestartDialog = ({
               </ul>
             </div>
           ),
-          action: 'Restart from scratch',
+          action: 'Restart',
         }
 
   return (
@@ -182,7 +182,7 @@ export const BatchRestartDialog = ({
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
           <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="warning">
-            {isResetting ? 'Preparing to replicate from scratch...' : dialogContent.action}
+            {isResetting ? 'Preparing to restart replication...' : dialogContent.action}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

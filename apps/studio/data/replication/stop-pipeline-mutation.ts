@@ -49,6 +49,10 @@ export const useStopPipelineMutation = ({
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
+      await queryClient.invalidateQueries({
+        queryKey: replicationKeys.pipelinesStatus(variables.projectRef, variables.pipelineId),
+      })
+
       if (onError === undefined) {
         toast.error(`Failed to stop pipeline: ${data.message}`)
       } else {

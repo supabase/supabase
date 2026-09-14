@@ -35,15 +35,15 @@ export const ErroredTableDetails = ({ table }: ErroredTableDetailsProps) => {
       {retryPolicy === 'no_retry' ? (
         <div className="flex flex-col gap-y-3">
           <p className="text-xs text-foreground-lighter">
-            Resolve the reported error before restarting replication from scratch. If you need help,
-            contact{' '}
+            View the reported error from the row actions and resolve it before restarting
+            replication. If you need help, contact{' '}
             <InlineLink
               className="text-foreground-lighter hover:text-foreground"
               href={`/support?projectRef=${projectRef}&category=dashboard_bug&subject=Database%20replication%20error&error=${encodeURIComponent(state.reason ?? '')}`}
             >
               support
             </InlineLink>
-            . Use the row controls to view the error details or restart replication from scratch.
+            .
           </p>
         </div>
       ) : retryPolicy === 'manual_retry' ? (
@@ -58,9 +58,8 @@ export const ErroredTableDetails = ({ table }: ErroredTableDetailsProps) => {
                   {state.solution && !/[.!?]$/.test(state.solution.trim()) && '.'}
                 </p>
                 <p className="text-foreground-light mt-2">
-                  Restart table replication from scratch using the restart button on the right. An
-                  active pipeline restarts automatically. A stopped pipeline requires a manual
-                  start.
+                  Restart table replication using the button on the right. An active pipeline
+                  restarts automatically. A stopped pipeline requires a manual start.
                 </p>
               </div>
             </div>
