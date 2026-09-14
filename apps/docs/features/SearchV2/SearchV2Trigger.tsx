@@ -1,7 +1,7 @@
 'use client'
 
 import { Search } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { cn, KeyboardShortcut } from 'ui'
 
 import { SearchV2Dialog } from './SearchV2Dialog'
@@ -13,6 +13,27 @@ interface SearchV2TriggerProps {
 
 export function SearchV2Trigger({ className, placeholder = 'Search...' }: SearchV2TriggerProps) {
   const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    function openOnKeyDown(event) {
+      if (event.key === 'k' && event.metaKey) {
+        /**
+         * This two methods prevent, first search V1 dialog to open and second
+         * browser propietary search commands to be fired, repectively.
+         */
+        event.stopImmediatePropagation()
+        event.preventDefault()
+        
+        setOpen(true)
+      }
+    }
+
+    window.addEventListener('keydown', openOnKeyDown, { capture: true })
+
+    return () => {
+      window.removeEventListener('keydown', openOnKeyDown, { capture: true })
+    }
+  }, [])
 
   return (
     <>

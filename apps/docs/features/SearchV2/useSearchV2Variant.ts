@@ -21,6 +21,5 @@ export function useSearchV2Variant(): SearchV2Variant {
     return override as SearchV2Variant
   }
 
-
   return posthog[SEARCH_V2_FLAG] === 'search-v2-active' ? 'search-v2-active' : 'control'
 }
