@@ -181,7 +181,6 @@ const InstanceConfigurationUI = () => {
                 {isAws && (
                   <div className="flex items-center justify-center">
                     <Button
-                      variant="default"
                       icon={<Network size={15} />}
                       className={`rounded-r-none transition ${
                         view === 'flow' ? 'opacity-100' : 'opacity-50'
@@ -189,7 +188,6 @@ const InstanceConfigurationUI = () => {
                       onClick={() => setView('flow')}
                     />
                     <Button
-                      variant="default"
                       icon={<Globe2 size={15} />}
                       className={`rounded-l-none transition ${
                         view === 'map' ? 'opacity-100' : 'opacity-50'

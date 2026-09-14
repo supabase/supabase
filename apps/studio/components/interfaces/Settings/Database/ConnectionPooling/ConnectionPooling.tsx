@@ -194,7 +194,7 @@ export const ConnectionPooling = () => {
             title="Dedicated pooler uses IPv6 by default"
             description="Connections from IPv4-only networks require enabling the IPv4 add-on on your project instance."
             actions={
-              <Button variant="default" asChild>
+              <Button asChild>
                 <Link href={`/project/${projectRef}/settings/addons?panel=ipv4`}>
                   Enable IPv4 add-on
                 </Link>

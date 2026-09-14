@@ -82,11 +82,11 @@ const UseCase = ({
           </div>
           {useCase.cta &&
             (useCase.cta.isDisabled ? (
-              <Button size="tiny" variant="default" disabled className="justify-end">
+              <Button size="tiny" disabled className="justify-end">
                 {useCase.cta.label ?? 'View example'}
               </Button>
             ) : (
-              <Button asChild size="tiny" variant="default" iconRight={<ArrowUpRight />}>
+              <Button asChild size="tiny" iconRight={<ArrowUpRight />}>
                 <Link href={useCase.cta.link} target="_blank">
                   {useCase.cta.label ?? 'View example'}
                 </Link>

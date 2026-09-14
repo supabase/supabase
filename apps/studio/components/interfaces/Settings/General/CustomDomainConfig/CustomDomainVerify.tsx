@@ -175,12 +175,7 @@ export const CustomDomainVerify = () => {
         <div className="flex items-center justify-between">
           <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
           <div className="flex items-center space-x-2">
-            <Button
-              variant="default"
-              onClick={onCancelCustomDomain}
-              loading={isDeleting}
-              className="self-end"
-            >
+            <Button onClick={onCancelCustomDomain} loading={isDeleting} className="self-end">
               Cancel
             </Button>
             <Button

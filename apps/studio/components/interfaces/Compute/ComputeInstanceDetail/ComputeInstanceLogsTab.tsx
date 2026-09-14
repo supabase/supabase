@@ -89,12 +89,7 @@ export const ComputeInstanceLogsTab = ({ instanceName, stream }: ComputeInstance
             </InputGroupAddon>
           </InputGroup>
         </div>
-        <Button
-          variant="default"
-          icon={<RefreshCw />}
-          loading={isFetching}
-          onClick={() => refetch()}
-        >
+        <Button icon={<RefreshCw />} loading={isFetching} onClick={() => refetch()}>
           Refresh
         </Button>
       </div>

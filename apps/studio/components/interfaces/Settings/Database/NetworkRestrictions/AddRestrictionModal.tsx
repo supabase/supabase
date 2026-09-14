@@ -264,7 +264,7 @@ const AddRestrictionModal = ({
             </DialogSection>
           )}
           <DialogFooter>
-            <Button variant="default" disabled={isApplying} onClick={() => onClose()}>
+            <Button disabled={isApplying} onClick={() => onClose()}>
               Cancel
             </Button>
             <Button
