@@ -143,8 +143,8 @@ For example:
 
 Keep procedures focused on what the reader must do. Move substantial background or conceptual explanations into a separate section or an explainer. Cross-reference the authoritative explanation instead of repeating it in the procedure. This keeps the action path scannable, gives readers optional depth, and maintains one source of truth.
 
-- Recommended: `Restrict access to a shared table with Row Level Security. To learn how a policy is evaluated, see [Row Level Security](...).`
-- Not recommended: Begin with several paragraphs about how Row Level Security works before stating what the reader can do.
+- **Recommended**: `Restrict access to a shared table with Row Level Security. To learn how a policy is evaluated, see [Row Level Security](...).`
+- **Not recommended**: Begin with several paragraphs about how Row Level Security works before stating what the reader can do.
 
 **Mixed information types:** [Information types](#information-types) apply at the page level too. Group sections of related types together, and try to keep the procedure group unbroken so context doesn't interrupt the action path. A section serving two types can be split, with a cross-reference between the halves.
 
@@ -309,8 +309,8 @@ Begin every admonition with its impact and purpose: the "so what." Use the first
 
 For example:
 
-- Recommended: `Deleting this project permanently removes its database and backups. Export any data that you want to keep before you continue.`
-- Not recommended: `Before you continue, there are a few things that you should know about project deletion.`
+- **Recommended**: `Deleting this project permanently removes its database and backups. Export any data that you want to keep before you continue.`
+- **Not recommended**: `Before you continue, there are a few things that you should know about project deletion.`
 
 Choose the appropriate `type` for your admonition:
 
@@ -373,7 +373,7 @@ Optionally highlight lines by using `mark=${lineNumber}`.
 
 Use **bold**, _italics_, and `code` formatting for distinct purposes. Don't use them interchangeably or to add visual emphasis alone.
 
-- **Bold**: Mark UI labels the reader interacts with, such as buttons, menu items, and field names. For example, `Click **Save**.` Also use bold for a term the reader must not miss, such as `**Never** commit your service role key.`
+- **Bold**: Mark UI labels the reader interacts with, such as buttons, menu items, and field names. For example, `Click **Save**.` Also use bold for a term the reader must not miss, such as `**Never** commit your service role key.` Bold is also the convention for an inline label that opens a paragraph or a list item, such as `**Recommended**:` or `**Navigation:**`.
 - _Italics_: Introduce a new term the first time you define it, or reference a title, such as a book or a third-party product name written in italics by convention. Use italics sparingly. Don't use italics for UI labels or for general emphasis.
 - `Code`: Mark anything the reader types or copies verbatim, or anything the system reads literally. This includes filenames, paths, commands, flags, environment variables, function and parameter names, configuration keys, and literal values. For example, `` Set `SUPABASE_URL` in your `.env` file. ``
 
