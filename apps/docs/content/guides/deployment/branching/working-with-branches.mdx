@@ -177,6 +177,12 @@ Deno.serve(async (request) => {
 
 After completing the steps above, you should receive a Slack message whenever an action run completes on your target branch.
 
+<Admonition type="warning" title="Known limitation: cross-project notify URLs">
+  The `--notify-url` option currently works best when the Edge Function is hosted on the **same** Supabase project as the branch. If you point the notify URL to an Edge Function on a **different** Supabase project, the webhook may fail with a `401 UNAUTHORIZED_INVALID_API_KEY` error because the source project's API key is automatically included in the request.
+
+  As a workaround, deploy your webhook processor Edge Function on the same project as the branch, or use a non-Supabase endpoint (such as a third-party webhook service) that does not require a Supabase API key.
+</Admonition>
+
 ## Migration and seeding behavior
 
 Migrations are run in sequential order. Each migration builds upon the previous one.
