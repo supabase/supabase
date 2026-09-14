@@ -68,7 +68,9 @@ export const DetailRow = ({
           <Filter size={12} className="text-foreground-lighter" />
         )}
       </div>
-      <div className={cn('flex items-center gap-x-2 min-w-0 flex-1 justify-end', isEmpty && 'pr-2')}>
+      <div
+        className={cn('flex items-center gap-x-2 min-w-0 flex-1 justify-end', isEmpty && 'pr-2')}
+      >
         {valueEl}
         {!isEmpty && (
           <DataTableSheetRowAction
