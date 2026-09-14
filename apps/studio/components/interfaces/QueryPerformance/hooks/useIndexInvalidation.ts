@@ -30,9 +30,8 @@ export function useIndexInvalidation() {
 
   const { invalidate: invalidateTableIndexAdvisor } = useTableIndexAdvisor()
 
-  // An unrecognized `preset` param (stale bookmark, hand-edited URL, renamed
-  // preset) would otherwise resolve to `undefined` and crash the report
-  // (`generateQueryPerformanceSql` reads `.queryType` off the missing preset).
+  // Falls back to UNIFIED so an unrecognized preset param doesn't resolve to
+  // undefined and crash generateQueryPerformanceSql.
   const preset =
     QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES] ??
     QUERY_PERFORMANCE_PRESET_MAP[QUERY_PERFORMANCE_REPORT_TYPES.UNIFIED]
