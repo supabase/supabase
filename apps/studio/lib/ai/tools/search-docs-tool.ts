@@ -77,23 +77,15 @@ async function loadContentApiSchema(): Promise<string> {
 /**
  * Builds the tool description with the live GraphQL schema embedded, so the
  * model has the same schema context production's `search_docs` gives it (see
- * `@supabase/mcp-server-supabase`'s `docs-tools.ts`). Falls back to the
- * static description if the schema fetch fails — this is only the eval
- * harness, so a flaky docs API must not break tool construction.
+ * `@supabase/mcp-server-supabase`'s `docs-tools.ts`).
+ *
+ * Schema loading is required: running an eval without the schema makes the
+ * model's GraphQL queries untrustworthy and can hide a real docs-search
+ * regression behind fallback results.
  */
 async function buildDescription(): Promise<string> {
-  try {
-    const schema = await loadContentApiSchema()
-    return `${STATIC_DESCRIPTION}\n\nBelow is the GraphQL schema for this tool:\n\n${schema}`
-  } catch (error) {
-    console.error(
-      '[search-docs-tool] Failed to fetch Content API schema for the tool description; ' +
-        'falling back to the static description. The model may issue malformed GraphQL ' +
-        'queries without the schema.',
-      error
-    )
-    return STATIC_DESCRIPTION
-  }
+  const schema = await loadContentApiSchema()
+  return `${STATIC_DESCRIPTION}\n\nBelow is the GraphQL schema for this tool:\n\n${schema}`
 }
 
 /**
