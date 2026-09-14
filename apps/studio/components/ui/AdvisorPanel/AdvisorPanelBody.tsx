@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import { AlertTriangle, ChevronRight, Inbox } from 'lucide-react'
 import { Badge, Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -14,16 +15,20 @@ import {
 } from './AdvisorPanel.utils'
 import { EmptyAdvisor } from './EmptyAdvisor'
 import type { Notification } from '@/data/notifications/notifications-v2-query'
+import { IS_PLATFORM } from '@/lib/constants'
 import type { AdvisorCategory, AdvisorSeverity } from '@/state/advisor-state'
 
 const NoProjectNotice = () => {
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor') === true && IS_PLATFORM
   return (
     <div className="absolute top-28 px-6 flex flex-col items-center justify-center w-full gap-y-2">
       <Inbox className="text-foreground-muted" strokeWidth={1} />
       <div className="text-center">
         <p className="heading-default">Project required</p>
         <p className="text-foreground-light text-sm">
-          Select a project to view its security, performance and health advisories
+          {isHealthAdvisorEnabled
+            ? 'Select a project to view its security, performance and health advisories'
+            : 'Select a project to view its security and performance advisories'}
         </p>
       </div>
     </div>

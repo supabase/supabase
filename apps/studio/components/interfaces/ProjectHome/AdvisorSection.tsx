@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { Shield } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
 import { AiIconAnimation, Badge, Button, Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
@@ -24,6 +24,7 @@ import { useAdvisorSignals } from '@/components/ui/AdvisorPanel/useAdvisorSignal
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import { useProjectHealthLintsQuery } from '@/data/lint/health-lints-query'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
+import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAdvisorStateSnapshot } from '@/state/advisor-state'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -31,6 +32,7 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: boolean }) => {
   const { ref: projectRef } = useParams()
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor') === true && IS_PLATFORM
   const track = useTrack()
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
@@ -51,11 +53,11 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
   const advisorItems = useMemo<AdvisorItem[]>(() => {
     const criticalLintItems = createAdvisorLintItems([
       ...(lints ?? []),
-      ...(healthLints ?? []),
+      ...(isHealthAdvisorEnabled ? (healthLints ?? []) : []),
     ]).filter((item) => item.source === 'lint' && item.original.level === LINTER_LEVELS.ERROR)
 
     return sortAdvisorItems([...criticalLintItems, ...signalItems])
-  }, [lints, healthLints, signalItems])
+  }, [lints, healthLints, signalItems, isHealthAdvisorEnabled])
 
   const visibleAdvisorItems = useMemo(
     () => advisorItems.slice(0, MAX_HOMEPAGE_ADVISOR_ITEMS),
@@ -110,7 +112,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
   )
 
   if (showEmptyState) {
-    return <EmptyState />
+    return <EmptyState isHealthAdvisorEnabled={isHealthAdvisorEnabled} />
   }
 
   // [Joshen] Note that we're intentionally (for now) not waiting for advisor signals to load
@@ -229,19 +231,21 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
           )}
         </>
       ) : (
-        <EmptyState />
+        <EmptyState isHealthAdvisorEnabled={isHealthAdvisorEnabled} />
       )}
     </div>
   )
 }
 
-function EmptyState() {
+function EmptyState({ isHealthAdvisorEnabled }: { isHealthAdvisorEnabled: boolean }) {
   return (
     <Card className="bg-transparent h-64">
       <CardContent className="flex flex-col items-center justify-center gap-2 p-16 h-full">
         <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
         <p className="text-sm text-foreground-light text-center">
-          No security, performance or health issues found
+          {isHealthAdvisorEnabled
+            ? 'No security, performance or health issues found'
+            : 'No security or performance issues found'}
         </p>
       </CardContent>
     </Card>

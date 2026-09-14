@@ -7,6 +7,7 @@ describe('generateAdvisorsMenu', () => {
     const [advisors] = generateAdvisorsMenu({
       ref: 'abc',
       isAdvisorRulesEnabled: false,
+      isHealthAdvisorEnabled: true,
       isPlatform: true,
     })
 
@@ -19,11 +20,16 @@ describe('generateAdvisorsMenu', () => {
     expect(advisors.items[0].url).toBe('/project/abc/advisors/health')
   })
 
-  it('omits Health Advisor when not on platform', () => {
+  it.each([
+    { isPlatform: false, isHealthAdvisorEnabled: true },
+    { isPlatform: true, isHealthAdvisorEnabled: false },
+    { isPlatform: false, isHealthAdvisorEnabled: false },
+  ])('omits Health Advisor with %o', ({ isPlatform, isHealthAdvisorEnabled }) => {
     const [advisors] = generateAdvisorsMenu({
       ref: 'abc',
       isAdvisorRulesEnabled: false,
-      isPlatform: false,
+      isHealthAdvisorEnabled,
+      isPlatform,
     })
 
     expect(advisors.items.map((item) => item.key)).toEqual([
