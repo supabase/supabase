@@ -27,11 +27,16 @@ During the Public Alpha:
 
 {/* gap-fill: the "up to two" figure matches the shipped project-creation UI copy (apps/studio/components/interfaces/ProjectCreation/HighAvailabilityInput.tsx, merged in PR #48375), not the "one free project per org" figure in this ticket's (MUL-452) acceptance criteria or MUL-1071 (still Backlog, open question: "current assumption is one"). Per the write-the-docs skill's rule that code wins for behavior claims, and per explicit confirmation from the requester, this page states "two." Reconcile before Phase 2 ships if MUL-1071 resolves differently. */}
 
-## Enabling it
+## Enabling
 
-For eligible organizations, an administrator can turn on Multigres when creating a new project. A full walkthrough of the creation flow, including what happens for organizations that aren't eligible or have reached their free project limit, is coming once that experience is finalized.
+You enable high availability during project creation:
 
-{/* gap-fill: full "Enabling it" content is Phase 2 of MUL-452, explicitly blocked on MUL-1071 (Backlog as of this draft), which still has open questions on eligibility gating, the Alpha warning/acknowledgment flow, and where Alpha/pricing status stays visible after creation. Don't expand this section until that spec resolves. */}
+1. Open [Create a new project](/dashboard/new/_) in the Dashboard.
+2. Under **High availability**, turn on **Enable high availability**.
+3. Finish the remaining fields such as database password, region, and compute size, if shown.
+4. Click **Create new project**.
+
+If your organization isn't eligible or hasn't been rolled out yet, **High availability** won't appear.
 
 ## What's not included in the alpha
 
