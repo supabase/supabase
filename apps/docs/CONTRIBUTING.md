@@ -21,24 +21,26 @@ To make docs as clear as possible:
 
 ## Information types
 
-Every sentence that tells the reader something about the product is one of these types:
+Supabase docs use the information types from the [Information Mapping](https://ivacheung.com/2012/11/introduction-to-information-mapping/) method. Every sentence that tells the reader something about the product is one of these types:
 
 | Type | Answers | Example |
 | --- | --- | --- |
-| Concept | What is it? Why does it matter? | Row Level Security restricts which rows a user can read or write. |
-| Procedure | What do I do? | Run `alter table profiles enable row level security`. |
-| Reference | What are the exact values and options? | The `using` clause accepts any expression that returns a boolean. |
-| Caveat | What goes wrong, and what do I do about it? | A table with Row Level Security enabled and no policy returns no rows. |
+| Procedure | How do I do it? | Run `alter table profiles enable row level security`. |
+| Process | How does it work? | When a query runs, Postgres checks the policies on the table and returns only the rows that a policy allows. |
+| Principle | What's the rule or convention? | Enable Row Level Security on every table in an exposed schema. |
+| Concept | What is it? | Row Level Security restricts which rows a user can read or write. |
+| Structure | What are its parts? | A policy has a name, a command, a role, a `using` expression, and a `with check` expression. |
+| Fact | What's the specific value or behavior? | A table with Row Level Security enabled and no policy returns no rows. |
 
 **Never mix information types inside a paragraph.** One paragraph carries one type. When the type changes, start a new paragraph. When it changes across a larger span, start a new section, and put an admonition or a procedure in its own block.
 
 Mixing types is what produces a paragraph a reader has to parse twice. A reader who wants the steps has to read past the concept to find them, and a reader who wants the concept has to read past a warning that doesn't apply yet.
 
-**Structural prose is exempt.** An introduction, a transition, an outcome, and a navigation outline describe the page rather than the product, so they don't carry an information type and the no-mixing rule doesn't apply to them. A transition names the type it's leaving and the type it's moving to, which is its job. Keep structural prose to a sentence or two, and don't let it grow into the content type it introduces. For where each kind belongs, see [Guides](#guides).
+**Connective prose is exempt.** An introduction, a transition, an outcome, and a navigation outline describe the page rather than the product, so they don't carry an information type and the no-mixing rule doesn't apply to them. A transition names the type it's leaving and the type it's moving to, which is its job. Keep connective prose to a sentence or two, and don't let it grow into the content type it introduces. For where each kind belongs, see [Guides](#guides).
 
 **A long paragraph is a smell.** Once a paragraph runs past three or four sentences, it has almost always absorbed a second information type. Reread it, label each sentence with its type, and split wherever the label changes. Apply the same check to a long list item and to a step that has grown a trailing explanation.
 
-Not recommended, because a single paragraph carries every type:
+Not recommended, because a single paragraph carries a concept, a procedure, a fact, a principle, and a structure:
 
 ```md
 Row Level Security is a Postgres feature that restricts which rows a user can read
@@ -74,6 +76,8 @@ client. Write a policy before you deploy.
 
 The `using` clause accepts any expression that returns a boolean.
 ```
+
+Each block holds one type: concept, then procedure, then structure. The admonition pairs a fact with the action it requires, which is what the [Admonitions](#admonitions) section asks for.
 
 The recommended version is longer in lines and shorter to read. A reader who wants the command finds it under a heading that names the task, and a reader who wants the concept stops after the first paragraph.
 
@@ -143,25 +147,25 @@ Keep procedures focused on what the reader must do. Move substantial background 
 - Recommended: `Restrict access to a shared table with Row Level Security. To learn how a policy is evaluated, see [Row Level Security](...).`
 - Not recommended: Begin with several paragraphs about how Row Level Security works before stating what the reader can do.
 
-**Mixed information types:** Apply [Information types](#information-types) at the page level too. Classify every section as procedure, concept, reference, or caveat, then group the sections of each type together. Keep the procedure group unbroken so that background never interrupts the action path.
+**Mixed information types:** Apply [Information types](#information-types) at the page level too. Classify every section by its information type, then group the sections of related types together. Procedure sections form the action path. Concept and process sections explain it. Principle, structure, and fact sections are what a reader looks up. Keep the procedure group unbroken so that background never interrupts the action path.
 
 Classify a section by what the reader is doing in it, not by what it's about. On a page about tables, every section is about tables, so subject matter tells you nothing. A reader opens a section on schemas to understand something, so it's a concept section no matter how much it mentions tables.
 
 A section that serves two types gets split, not filed under the larger half. Give the new half its own heading and cross-reference the two.
 
-Order the groups: a short concept opener when the page serves newcomers, then procedures, then concepts, then reference.
+Order the groups: a short concept opener when the page serves newcomers, then procedures, then concept and process, then structure and fact.
 
 ```text
-## What is a table?                    <- short concept opener
+## What is a table?                    <- concept opener
 ## Creating and managing tables        <- procedures
 ### Creating tables
 ### Securing your tables
 ### Loading data
-## How tables are organized            <- concepts
+## How tables are organized            <- concept and process
 ### Primary keys
 ### Relationships between tables
 ### Schemas
-## Reference
+## Reference                           <- structure and fact
 ### Data types
 ```
 
