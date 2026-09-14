@@ -41,10 +41,28 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState('')
+  const [visibleDropdown, setVisibleDropdown] = useState('')
+  const [isSwitchingDropdown, setIsSwitchingDropdown] = useState(false)
+  const [openedDropdowns, setOpenedDropdowns] = useState<string[]>([])
+  const handleDropdownChange = (value: string) => {
+    // animate card height between two open menus only
+    setIsSwitchingDropdown(value !== '' && activeDropdown !== '')
+    setActiveDropdown(value)
+    if (value === '') return
+    setVisibleDropdown(value)
+    if (!openedDropdowns.includes(value)) setOpenedDropdowns([...openedDropdowns, value])
+  }
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const user = useUser()
   const menu = getMenu()
+  const dropdownTitles: string[] = menu.primaryNav
+    .filter((menuItem) => menuItem.hasDropdown)
+    .map((menuItem) => menuItem.title)
+  const getDropdownSide = (title: string) => {
+    if (title === visibleDropdown) return 'active'
+    return dropdownTitles.indexOf(title) < dropdownTitles.indexOf(visibleDropdown) ? 'start' : 'end'
+  }
   const sendTelemetryEvent = useSendTelemetryEvent()
   const userMenu = useDropdownMenu(user)
 
@@ -119,7 +137,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                 <NavigationMenu
                   delayDuration={0}
                   value={activeDropdown}
-                  onValueChange={setActiveDropdown}
+                  onValueChange={handleDropdownChange}
                   renderViewport={false}
                   className="static hidden pl-8 lg:flex h-16 items-stretch"
                 >
@@ -140,10 +158,20 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                             {menuItem.title}
                           </NavigationMenuTrigger>
                           <NavigationMenuContent
-                            data-active={activeDropdown === menuItem.title}
-                            className="md:w-full data-[motion^=from-]:animate-none data-[motion^=to-]:animate-none data-[active=false]:pointer-events-none data-[active=false]:opacity-0 motion-safe:data-[active=true]:animate-menu-fade-in motion-safe:data-[active=true]:data-[motion=from-end]:animate-menu-enter-right motion-safe:data-[active=true]:data-[motion=from-start]:animate-menu-enter-left motion-safe:data-[active=false]:animate-menu-fade-out"
+                            forceMount
+                            inert={visibleDropdown !== menuItem.title}
+                            data-active={visibleDropdown === menuItem.title}
+                            data-side={getDropdownSide(menuItem.title)}
+                            className={cn(
+                              'md:w-full data-[motion^=from-]:animate-none! data-[motion^=to-]:animate-none!',
+                              'data-[active=false]:pointer-events-none data-[active=false]:opacity-0',
+                              'data-[side=start]:-translate-x-4 data-[side=end]:translate-x-4',
+                              'motion-safe:group-data-[switching=true]/viewport:transition-[opacity,translate]',
+                              'motion-safe:group-data-[switching=true]/viewport:duration-250',
+                              'motion-safe:group-data-[switching=true]/viewport:ease-in-out'
+                            )}
                           >
-                            {menuItem.dropdown}
+                            {openedDropdowns.includes(menuItem.title) ? menuItem.dropdown : null}
                           </NavigationMenuContent>
                         </NavigationMenuItem>
                       ) : (
@@ -163,8 +191,18 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                   <NavigationMenuViewport
                     forceMount
                     data-open={activeDropdown !== ''}
+                    data-switching={isSwitchingDropdown}
                     containerProps={{ className: 'inset-x-0' }}
-                    className="rounded-xl bg-surface-75 md:w-[960px] data-[state=open]:animate-none data-[state=closed]:animate-none data-[state=open]:duration-200 data-[state=open]:ease-out data-[state=closed]:duration-200 data-[open=false]:invisible data-[open=false]:opacity-0 data-[open=false]:pointer-events-none motion-safe:transition-[opacity,visibility] motion-reduce:transition-none"
+                    className={cn(
+                      'group/viewport origin-top scale-100 rounded-xl bg-surface-75 md:w-[960px]',
+                      'data-[state=open]:animate-none! data-[state=closed]:animate-none!',
+                      'data-[state=open]:duration-200 data-[state=open]:ease-out data-[state=closed]:duration-200',
+                      'data-[open=false]:invisible data-[open=false]:scale-[0.97] data-[open=false]:opacity-0',
+                      'data-[open=false]:pointer-events-none',
+                      'motion-safe:transition-[opacity,scale,visibility]',
+                      'motion-safe:data-[switching=true]:transition-[height,opacity,scale,visibility]',
+                      'motion-reduce:transition-none'
+                    )}
                   />
                 </NavigationMenu>
               </div>

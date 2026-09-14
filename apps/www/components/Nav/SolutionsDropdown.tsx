@@ -1,10 +1,10 @@
-import { useReducedMotion } from 'common'
+import { useBreakpoint, useReducedMotion } from 'common'
 import { navData as DevelopersData } from 'data/Solutions'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeftRight, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { useMedia, useWindowSize } from 'react-use'
+import { useMedia } from 'react-use'
 
 type LinkProps = {
   text: string
@@ -70,10 +70,9 @@ const MotionLink = motion(Link)
 
 const MigrationLinkCard = ({ link }: { link: LinkProps }) => {
   const [isHighlighted, setIsHighlighted] = useState(false)
-  const { width } = useWindowSize()
   const canHover = useMedia('(hover: hover)', true)
   const reduceMotion = useReducedMotion()
-  const isDesktop = width >= 1024
+  const isDesktop = !useBreakpoint('lg')
   const duration = isDesktop && !reduceMotion ? 0.2 : 0
   const isIconVisible = isHighlighted || !isDesktop || !canHover
 
@@ -86,6 +85,7 @@ const MigrationLinkCard = ({ link }: { link: LinkProps }) => {
       onFocus={() => setIsHighlighted(true)}
       onBlur={() => setIsHighlighted(false)}
       layout
+      layoutDependency={isHighlighted}
       transition={{ duration, ease: 'easeInOut' }}
     >
       <AnimatePresence mode="popLayout">
@@ -96,6 +96,7 @@ const MigrationLinkCard = ({ link }: { link: LinkProps }) => {
             exit={{ opacity: 0, x: -10 }}
             transition={{ duration, ease: 'easeInOut' }}
             layout
+            layoutDependency={isHighlighted}
           >
             {link.icon && <link.icon className="size-6" />}
           </motion.div>
@@ -105,6 +106,7 @@ const MigrationLinkCard = ({ link }: { link: LinkProps }) => {
       <motion.div
         className="size-6 flex items-center justify-center"
         layout
+        layoutDependency={isHighlighted}
         transition={{ duration, ease: 'easeInOut' }}
       >
         <ArrowLeftRight className="size-4 text-foreground-light" strokeWidth={1.3} />
@@ -113,12 +115,18 @@ const MigrationLinkCard = ({ link }: { link: LinkProps }) => {
       <motion.div
         className="flex items-center gap-1"
         layout
+        layoutDependency={isHighlighted}
         transition={{ duration, ease: 'easeInOut' }}
       >
         <span className="text-base font-medium">{link.text}</span>
       </motion.div>
 
-      <motion.div layout transition={{ duration, ease: 'easeInOut' }} className="ml-auto">
+      <motion.div
+        layout
+        layoutDependency={isHighlighted}
+        transition={{ duration, ease: 'easeInOut' }}
+        className="ml-auto"
+      >
         <ChevronRight
           strokeWidth={2}
           className="w-3 transition-all will-change-transform -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
