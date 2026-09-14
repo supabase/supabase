@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useEffectEvent } from 'react'
+import { Fragment, useEffect, useEffectEvent, useState } from 'react'
 import { Control } from 'react-hook-form'
 import {
   cn,
@@ -32,28 +32,36 @@ export const PermissionRow = ({
   onChange,
   entryAccess,
 }: PermissionRowProps) => {
-  const isMissingDependencies = useWatch({
+  const [wasSelectedByUser, setWasSelectedByUser] = useState(false)
+  const [showIsMissingDependenciesStatus, setShowIsMissingDependenciesStatus] = useState(false)
+  const missingDependencies = useWatch({
     control,
     name: 'permissions',
     disabled: entry.dependencies.length === 0,
-    compute: (permissions) => {
-      let isMissingDependencies = false
-
-      for (const dependency of entry.dependencies) {
-        if (permissions[dependency.key] == null || permissions[dependency.key] == 'none') {
-          isMissingDependencies = true
-        }
-      }
-      return isMissingDependencies
-    },
+    compute: (permissions) =>
+      entry.dependencies.flatMap((dependency) =>
+        permissions[dependency.key] == null || permissions[dependency.key] == 'none'
+          ? [dependency.label]
+          : []
+      ),
   })
+  const isMissingDependencies = missingDependencies.length > 0
 
   const onChangeEvent = useEffectEvent(onChange)
   useEffect(() => {
     if (isMissingDependencies && mode !== 'none') {
       onChangeEvent('none')
+      if (wasSelectedByUser) {
+        setShowIsMissingDependenciesStatus(true)
+      }
     }
-  }, [isMissingDependencies, mode])
+  }, [isMissingDependencies, mode, wasSelectedByUser])
+
+  const handleChange = (value: string) => {
+    const newMode = value as PermissionMode
+    onChange(newMode)
+    setWasSelectedByUser(newMode !== 'none')
+  }
 
   return (
     <div className="flex items-center justify-between gap-4 py-4">
@@ -87,15 +95,16 @@ export const PermissionRow = ({
               .
             </b>
           ) : null}
+          <span role="status" className="sr-only">
+            {showIsMissingDependenciesStatus
+              ? `${entry.name} permission was reset to none because ${getDependenciesList(missingDependencies)}.`
+              : ''}
+          </span>
         </p>
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
-        <Select
-          disabled={isMissingDependencies}
-          value={mode}
-          onValueChange={(value) => onChange(value as PermissionMode)}
-        >
+        <Select disabled={isMissingDependencies} value={mode} onValueChange={handleChange}>
           <SelectTrigger
             className="w-36 shrink-0"
             id={`${entry.key}-permissions`}
@@ -112,4 +121,30 @@ export const PermissionRow = ({
       </div>
     </div>
   )
+}
+
+const getDependenciesList = (dependencies: Array<string>) => {
+  return dependencies
+    .flatMap((dependency, index) => {
+      let separator = ''
+      let end = ''
+
+      if (index < dependencies.length - 1) {
+        separator = ', '
+      }
+
+      // Only one dependency
+      if (dependencies.length === 1) {
+        end = ' is missing'
+      }
+
+      // More than one dependency
+      if (index === dependencies.length - 1 && dependencies.length > 1) {
+        separator = ' and '
+        end = ' are missing'
+      }
+
+      return [dependency, separator, end]
+    })
+    .join('')
 }
