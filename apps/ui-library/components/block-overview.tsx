@@ -29,7 +29,8 @@ export function BlockOverview({
         showFiles ? (
           <div className="flex h-full flex-col">
             {resolved && (
-              <p className="border-b px-4 py-3 text-xs text-foreground-light">
+              // px-6 lines this up with the tab labels, which the list and trigger each inset by 12px.
+              <p className="border-b px-6 py-3 text-xs text-foreground-light">
                 Supabase files
                 {resolved.firstPartyDependencies.length > 0
                   ? ', including registry dependencies'

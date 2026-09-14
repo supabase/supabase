@@ -208,7 +208,8 @@ export function BlockArchitectureDiagram({ architecture }: { architecture: Block
           </div>
         </>
       )}
-      <div className="space-y-2 border-t px-4 py-3 text-xs text-foreground-lighter">
+      {/* px-6 lines this up with the tab labels, which the list and trigger each inset by 12px. */}
+      <div className="space-y-2 border-t px-6 py-3 text-xs text-foreground-lighter">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
           <span>
             {resourceCount} {resourceCount === 1 ? 'resource' : 'resources'} detected
