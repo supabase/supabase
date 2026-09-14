@@ -55,7 +55,7 @@ policy returns no rows to every client, so write a policy before you deploy. The
 `using` clause of a policy accepts any expression that returns a boolean.
 ```
 
-Recommended, with each type in its own block:
+Recommended, with each large type in its own block:
 
 ```md
 ## Row Level Security
