@@ -157,15 +157,11 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     ```ts
     async function signIn() {
       try {
-        // Generate a nonce for security
-        const nonce = crypto.randomUUID() // or use your preferred nonce generation method
-
         const data = await AppleID.auth.signIn()
 
         const { data: authData, error } = await supabase.auth.signInWithIdToken({
           provider: 'apple',
-          token: data.id_token,
-          nonce: nonce,
+          token: data.id_token
         })
 
         if (error) {
@@ -200,16 +196,20 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     Alternatively, you can use the `AppleIDSignInOnSuccess` event with the `usePopup` option:
 
     ```ts
-    // Generate and store nonce for verification
-    const nonce = crypto.randomUUID()
 
-    // Initialize Apple ID with nonce
+// Generate raw nonce and hash it for Apple
+const rawNonce = crypto.randomUUID()
+const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(rawNonce))
+const hashedNonce = Array.from(new Uint8Array(buf))
+.map((b) => b.toString(16).padStart(2, '0'))
+.join('')
+
     AppleID.auth.init({
       clientId: 'your-services-id',
       scope: 'name email',
       redirectURI: 'https://your-domain.com/auth/callback',
       usePopup: true,
-      nonce: nonce,
+      nonce: hashedNonce,  // ← hashed goes to Apple
     })
 
     // Listen for authorization success
@@ -218,7 +218,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
         const { data: authData, error } = await supabase.auth.signInWithIdToken({
           provider: 'apple',
           token: event.detail.authorization.id_token,
-          nonce: nonce,
+          nonce: rawNonce,   // ← raw goes to Supabase 
         })
 
         if (error) {
