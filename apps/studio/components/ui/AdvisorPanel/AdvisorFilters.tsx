@@ -24,8 +24,7 @@ const parseFilterValues = <T extends string>(schema: z.ZodType<T>, values: strin
   })
 
 const platformCategories: AdvisorCategory[] = ['security', 'performance', 'health', 'messages']
-// Health runs against platform infrastructure and messages are platform notifications
-const selfHostedCategories: AdvisorCategory[] = ['security', 'performance']
+const selfHostedCategories: AdvisorCategory[] = ['security', 'performance', 'health']
 
 const severityOptions = [
   { label: 'Critical', value: 'critical' },
@@ -59,7 +58,7 @@ export const AdvisorFilters = ({
   onClose,
   isPlatform = false,
 }: AdvisorFiltersProps) => {
-  const isHealthAdvisorEnabled = useFlag('healthAdvisor') === true
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
   const categoryOptions = (isPlatform ? platformCategories : selfHostedCategories)
     .filter((category) => category !== 'health' || isHealthAdvisorEnabled)
     .map((category) => ({ label: advisorCategoryLabels[category], value: category }))

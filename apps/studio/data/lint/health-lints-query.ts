@@ -6,7 +6,7 @@ import { lintKeys } from './keys'
 import type { Lint } from './lint-query'
 import { handleError, post } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
+import { PROJECT_STATUS } from '@/lib/constants'
 import { EMPTY_ARR } from '@/lib/void'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -76,18 +76,13 @@ export const useProjectHealthLintsQuery = <TData = ProjectHealthLintsData>(
   }: UseCustomQueryOptions<ProjectHealthLintsData, ProjectHealthLintsError, TData> = {}
 ) => {
   const { data: project } = useSelectedProjectQuery()
-  const isHealthAdvisorEnabled = useFlag('healthAdvisor') === true
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   return useQuery<ProjectHealthLintsData, ProjectHealthLintsError, TData>({
     queryKey: lintKeys.healthLints(projectRef),
     queryFn: ({ signal }) => getProjectHealthLints({ projectRef }, signal),
-    enabled:
-      enabled &&
-      isHealthAdvisorEnabled &&
-      IS_PLATFORM &&
-      typeof projectRef !== 'undefined' &&
-      isActive,
+    enabled: enabled && isHealthAdvisorEnabled && typeof projectRef !== 'undefined' && isActive,
     // Every run costs a live database connection plus a metrics and a logs query, so keep
     // repeat mounts (homepage row, advisor panel) on one result and don't retry failures.
     staleTime: 60_000,

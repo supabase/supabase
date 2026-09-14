@@ -21,7 +21,7 @@ export const generateAdvisorsMenu = ({
   isPlatform: boolean
 }): ProductMenuGroup[] => {
   const advisorItems: ProductMenuGroupItem[] = [
-    ...(isPlatform && isHealthAdvisorEnabled
+    ...(isHealthAdvisorEnabled
       ? [
           {
             name: 'Health Advisor',
@@ -82,7 +82,7 @@ export const generateAdvisorsMenu = ({
 export const useGenerateAdvisorsMenu = (): ProductMenuGroup[] => {
   const { ref } = useParams()
   const isAdvisorRulesEnabled = useIsAdvisorRulesEnabled()
-  const isHealthAdvisorEnabled = useFlag('healthAdvisor') === true
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
 
   return generateAdvisorsMenu({
     ref,

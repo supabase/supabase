@@ -15,13 +15,12 @@ import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import { useProjectHealthLintsQuery } from '@/data/lint/health-lints-query'
 import { Lint } from '@/data/lint/lint-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const ProjectHealthLints: NextPageWithLayout = () => {
-  const isHealthAdvisorEnabled = useFlag('healthAdvisor') === true
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
 
-  if (!IS_PLATFORM || !isHealthAdvisorEnabled) {
+  if (!isHealthAdvisorEnabled) {
     return (
       <div className="flex items-center justify-center w-full h-full">
         <Admonition type="default" title="Health Advisor is not available for this project" />
