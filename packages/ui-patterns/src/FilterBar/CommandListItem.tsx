@@ -23,11 +23,15 @@ export function CommandListItem({
     <div
       ref={setRef}
       role="option"
-      onClick={() => onSelect(item)}
+      aria-disabled={item.disabled}
+      onClick={() => {
+        if (!item.disabled) onSelect(item)
+      }}
       className={cn(
-        'relative flex items-center justify-between gap-2 px-2 h-[28px] text-xs cursor-pointer select-none outline-hidden text-foreground',
-        isHighlighted && 'bg-overlay-hover',
-        !isHighlighted && 'hover:bg-surface-200'
+        'relative flex items-center justify-between gap-2 px-2 h-[28px] text-xs select-none outline-hidden text-foreground',
+        item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+        !item.disabled && isHighlighted && 'bg-overlay-hover',
+        !item.disabled && !isHighlighted && 'hover:bg-surface-200'
       )}
       data-testid={`filter-menu-item-${item.value}`}
     >
