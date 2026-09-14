@@ -21,10 +21,23 @@ const NestedProperties = s.object({
   reactAccessibleTreeview: s.boolean().optional(),
 })
 
+// The MDX is the only reliable source for which registry item v0 can open: doc
+// slugs don't map onto registry names, and pages that install a client first
+// list it as an extra BlockItem that opts out. Take the first item still opted in.
+const getV0RegistryName = (raw) => {
+  for (const [, attributes] of raw.matchAll(/<BlockItem\b([^>]*?)\/?>/g)) {
+    if (/showOpenInV0=\{false\}/.test(attributes)) continue
+    const name = attributes.match(/name="([^"]+)"/)
+    if (name) return name[1]
+  }
+  return undefined
+}
+
 const docs = s
   .object({
     title: s.string(),
     description: s.string(),
+    preview: s.mdx({ copyLinkedFiles: false }).optional(),
     published: s.boolean().default(true),
     links: LinksProperties.optional(),
     featured: s.boolean().default(false),
@@ -45,6 +58,7 @@ const docs = s
     ...data,
     slug: `/${flattenedPath}`,
     slugAsParams: flattenedPath.split('/').slice(1).join('/'),
+    v0Name: getV0RegistryName(data.raw),
   }))
 
 export default defineConfig({

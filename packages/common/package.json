@@ -9,7 +9,8 @@
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf .turbo tsconfig.tsbuildinfo",
     "gen:types": "supabase gen types typescript --local >| ./database-types.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:project-resources": "node --import tsx --test project-resources/*.test.ts"
   },
   "dependencies": {
     "@types/dat.gui": "^0.7.12",
@@ -19,10 +20,12 @@
     "configcat-js": "^9.5.1",
     "dat.gui": "^0.7.9",
     "flags": "^4.0.0",
+    "libpg-query": "17.6.0",
     "lodash": "catalog:",
     "next-themes": "catalog:",
     "posthog-js": "^1.391.2",
     "react-use": "^17.4.0",
+    "smol-toml": "1.8.0",
     "valtio": "catalog:"
   },
   "devDependencies": {

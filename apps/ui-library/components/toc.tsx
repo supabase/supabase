@@ -1,9 +1,7 @@
-// @ts-nocheck
 'use client'
 
 import * as React from 'react'
 
-import { useMounted } from '@/hooks/use-mounted'
 import { TableOfContents } from '@/lib/toc'
 import { cn } from '@/lib/utils'
 
@@ -11,63 +9,44 @@ interface TocProps {
   toc: TableOfContents
 }
 
-export function DashboardTableOfContents({ toc }: TocProps) {
-  const itemIds = React.useMemo(
-    () =>
-      toc.items
-        ? toc.items
-            .flatMap((item) => [item.url, item?.items?.map((item) => item.url)])
-            .flat()
-            .filter(Boolean)
-            .map((id) => id?.split('#')[1])
-        : [],
-    [toc]
-  )
-  const activeHeading = useActiveItem(itemIds)
-  const mounted = useMounted()
+type TocItem = NonNullable<TableOfContents['items']>[number]
 
-  if (!toc?.items || !mounted) {
-    return null
-  }
+function getHeadingIds(items: TocItem[]): string[] {
+  return items.flatMap((item) => [item.url.split('#')[1], ...getHeadingIds(item.items ?? [])])
+}
+
+export function DashboardTableOfContents({ toc }: TocProps) {
+  const itemIds = React.useMemo(() => getHeadingIds(toc.items ?? []).filter(Boolean), [toc])
+  const activeHeading = useActiveItem(itemIds)
+
+  if (!toc.items?.length) return null
 
   return (
-    <div className="space-y-2">
-      <p className="font-medium text-foreground-light">On This Page</p>
+    <nav aria-label="On this page" className="text-xs">
       <Tree tree={toc} activeItem={activeHeading} />
-    </div>
+    </nav>
   )
 }
 
 function useActiveItem(itemIds: string[]) {
-  const [activeId, setActiveId] = React.useState(null)
+  const [activeId, setActiveId] = React.useState<string>()
 
   React.useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id)
-          }
+          if (entry.isIntersecting) setActiveId(entry.target.id)
         })
       },
-      { rootMargin: `0% 0% -80% 0%` }
+      { rootMargin: '0% 0% -80% 0%' }
     )
 
-    itemIds?.forEach((id) => {
+    itemIds.forEach((id) => {
       const element = document.getElementById(id)
-      if (element) {
-        observer.observe(element)
-      }
+      if (element) observer.observe(element)
     })
 
-    return () => {
-      itemIds?.forEach((id) => {
-        const element = document.getElementById(id)
-        if (element) {
-          observer.unobserve(element)
-        }
-      })
-    }
+    return () => observer.disconnect()
   }, [itemIds])
 
   return activeId
@@ -80,28 +59,27 @@ interface TreeProps {
 }
 
 function Tree({ tree, level = 1, activeItem }: TreeProps) {
-  return tree?.items?.length && level < 3 ? (
-    <ul className={cn('m-0 list-none', { 'pl-4': level !== 1 })}>
-      {tree.items.map((item, index) => {
-        return (
-          <li key={index} className={cn('mt-0 pt-2')}>
-            <a
-              href={item.url}
-              className={cn(
-                'inline-block no-underline transition-colors hover:text-foreground',
-                item.url === `#${activeItem}`
-                  ? 'font-medium text-foreground'
-                  : 'text-foreground-muted'
-              )}
-            >
-              {item.title}
-            </a>
-            {item.items?.length ? (
-              <Tree tree={item} level={level + 1} activeItem={activeItem} />
-            ) : null}
-          </li>
-        )
-      })}
+  if (!tree.items?.length) return null
+
+  return (
+    <ul className={cn('m-0 list-none space-y-1', level !== 1 && 'mt-1 border-l pl-3')}>
+      {tree.items.map((item) => (
+        <li key={item.url}>
+          <a
+            href={item.url}
+            aria-current={item.url === `#${activeItem}` ? 'location' : undefined}
+            className={cn(
+              'block py-1.5 leading-5 no-underline transition-colors hover:text-foreground',
+              item.url === `#${activeItem}`
+                ? 'font-medium text-foreground'
+                : 'text-foreground-lighter'
+            )}
+          >
+            {item.title}
+          </a>
+          <Tree tree={item} level={level + 1} activeItem={activeItem} />
+        </li>
+      ))}
     </ul>
-  ) : null
+  )
 }

@@ -3,10 +3,18 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { registrySchema } from 'shadcn/schema'
+
+import { resolveRegistryItem } from '../lib/registry-resolution'
 import { registry } from '../registry/index'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const registryPath = path.join(__dirname, '..', 'public', 'r', 'registry.json')
+
+registrySchema.parse(registry)
+for (const item of registry.items) {
+  resolveRegistryItem(registry, item.name)
+}
 
 const cleanedRegistry = {
   $schema: 'https://ui.shadcn.com/schema/registry.json',
