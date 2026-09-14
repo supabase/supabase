@@ -39,6 +39,8 @@ Last updated: ${generatedAt.toISOString()}
 ## Overview
 Library of components for your project. The components integrate with Supabase and are shadcn compatible. Each docs page is also available as markdown for agents (append .md to the URL).
 
+Block catalog: https://supabase.com/library/index.md
+
 ## Docs
 ${entries.join('\n')}
 `
