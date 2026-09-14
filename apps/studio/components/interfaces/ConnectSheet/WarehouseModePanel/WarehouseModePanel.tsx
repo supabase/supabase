@@ -1,6 +1,5 @@
 import { useParams } from 'common'
 import { useState } from 'react'
-import { toast } from 'sonner'
 import { Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -9,7 +8,6 @@ import { WarehouseEnablingProgress } from './WarehouseEnablingProgress'
 import type { WarehouseSetupTarget } from './WarehouseModePanel.utils'
 import { WarehouseSchemaTablePicker } from './WarehouseSchemaTablePicker'
 import { AlertError } from '@/components/ui/AlertError'
-import { useUpdateWarehouseCatalogMutation } from '@/data/warehouse/warehouse-catalog-mutation'
 import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
 
@@ -25,11 +23,13 @@ const WarehouseSetupComplete = ({ onSubmit, isSubmitting }: WarehouseSetupComple
 
   if (isEditingTables) {
     return (
-      <WarehouseSchemaTablePicker
-        onSubmit={onSubmit}
-        isSubmitting={isSubmitting}
-        onBack={() => setIsEditingTables(false)}
-      />
+      <div className="p-8">
+        <WarehouseSchemaTablePicker
+          onSubmit={onSubmit}
+          isSubmitting={isSubmitting}
+          onBack={() => setIsEditingTables(false)}
+        />
+      </div>
     )
   }
 
@@ -49,44 +49,52 @@ export const WarehouseModePanel = () => {
     }
   )
 
-  const catalogMutation = useUpdateWarehouseCatalogMutation({
-    onError: (error) => {
-      toast.error(
-        `Warehouse was enabled, but DuckLake catalog access could not be enabled automatically: ${error.message}. You can retry this from the connection details.`
-      )
-    },
-  })
   const setupMutation = useWarehouseSetupMutation()
 
   const handleSetup = (targets: WarehouseSetupTarget[]) => {
     if (!projectRef || targets.length === 0) return
 
-    setupMutation.mutate(
-      { projectRef, body: { targets } },
-      {
-        onSuccess: () => {
-          // Fire-and-forget: setup itself should proceed even if enabling catalog access fails.
-          // The connection details panel offers a manual "Enable catalog access" fallback.
-          catalogMutation.mutate({ projectRef, body: { enabled: true } })
-        },
-      }
-    )
+    setupMutation.mutate({ projectRef, body: { targets } })
   }
 
-  if (isPending) return <GenericSkeletonLoader />
-  if (isError) return <AlertError subject="Failed to load Warehouse status" error={error} />
-  if (!data) return <GenericSkeletonLoader />
+  if (isPending) {
+    return (
+      <div className="p-8">
+        <GenericSkeletonLoader />
+      </div>
+    )
+  }
+  if (isError) {
+    return (
+      <div className="p-8">
+        <AlertError subject="Failed to load Warehouse status" error={error} />
+      </div>
+    )
+  }
+  if (!data) {
+    return (
+      <div className="p-8">
+        <GenericSkeletonLoader />
+      </div>
+    )
+  }
 
   const status = data.setup_status
 
   if (status === 'not_started') {
     return (
-      <WarehouseSchemaTablePicker onSubmit={handleSetup} isSubmitting={setupMutation.isPending} />
+      <div className="p-8">
+        <WarehouseSchemaTablePicker onSubmit={handleSetup} isSubmitting={setupMutation.isPending} />
+      </div>
     )
   }
 
   if (status === 'setting_up' || status === 'copying') {
-    return <WarehouseEnablingProgress status={data} />
+    return (
+      <div className="p-8">
+        <WarehouseEnablingProgress status={data} />
+      </div>
+    )
   }
 
   if (status === 'error') {
@@ -98,19 +106,22 @@ export const WarehouseModePanel = () => {
     const failingStep = data.steps.find((step) => step.status === 'error')
 
     return (
-      <AlertError
-        subject="Warehouse setup failed"
-        error={{
-          message: failingStep?.message ?? 'An unknown error occurred while setting up Warehouse.',
-        }}
-        additionalActions={
-          retryTargets.length > 0 ? (
-            <Button loading={setupMutation.isPending} onClick={() => handleSetup(retryTargets)}>
-              Retry
-            </Button>
-          ) : undefined
-        }
-      />
+      <div className="p-8">
+        <AlertError
+          subject="Warehouse setup failed"
+          error={{
+            message:
+              failingStep?.message ?? 'An unknown error occurred while setting up Warehouse.',
+          }}
+          additionalActions={
+            retryTargets.length > 0 ? (
+              <Button loading={setupMutation.isPending} onClick={() => handleSetup(retryTargets)}>
+                Retry
+              </Button>
+            ) : undefined
+          }
+        />
+      </div>
     )
   }
 

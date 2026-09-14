@@ -3582,6 +3582,17 @@ export const reference_csharp_v1 = {
   },
 }
 
+export const reference_csharp_v8 = {
+  icon: 'reference-csharp',
+  title: 'C#',
+  url: 'guides/reference/csharp',
+  parent: '/reference',
+  pkg: {
+    name: 'supabase',
+    repo: 'https://github.com/supabase-community/supabase-csharp',
+  },
+}
+
 export const reference_python_v2 = {
   icon: 'reference-python',
   title: 'Python',
