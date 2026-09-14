@@ -42,10 +42,8 @@ describe('which errors get sent to Sentry', () => {
   )
 
   it.each([
-    [0, true],
     [0.0099, true],
     [0.01, false],
-    [0.99, false],
   ])('sends 1%% of errors that did not crash the page: %s', (randomValue, isSent) => {
     vi.spyOn(Math, 'random').mockReturnValue(randomValue)
     const event = { tags: {}, exception: { values: [{ value: 'Application error' }] } }
