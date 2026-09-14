@@ -475,7 +475,7 @@ Use a procedure when a human or agent must perform actions to reach an outcome. 
 
 Write sequential actions as an ordered list. Begin each step with an imperative verb, and include one action or a closely related set of actions per step. Give the reader enough context to know where to act.
 
-Don't tell the reader how many steps are coming, and don't refer back to a step by its number. See [Counts and numbered references](#counts-and-numbered-references).
+Leave out the number of steps and any back-reference to a step number when they aren't doing work. See [Counts and numbered references](#counts-and-numbered-references).
 
 Apply the [Information Mapping chunking principle](https://informationmapping.com/blogs/news/writing-for-the-web-the-magical-number-seven-plus-or-minus-two) to procedures. Present 7 ± 2 related steps at a time. This gives readers a manageable chunk of five to nine actions. Aim for the lower end of the range when the task is complex or unfamiliar.
 
@@ -563,27 +563,16 @@ That said, a few rules help keep the docs concise, consistent, and clear:
 
 ### Counts and numbered references
 
-Don't count your own content for the reader, and don't point at a step or section by its number.
+**Leave out a count or a step number when it isn't doing work, which is most of the time.** `To connect to your database:` says everything that `Follow these three steps to connect to your database:` says.
 
-Both forms drift. A count goes stale the moment someone adds or removes an item, and a numbered reference points at the wrong content the moment someone reorders a list. Neither failure shows up in review or in CI, because the sentence still reads correctly while pointing at the wrong thing.
+**Naming usually reads better than numbering.** A named action survives a reorder, and it gives a reader using a screen reader something to navigate to, the way `here` doesn't in the [Links](#links) section. Linking a heading does the same. Footnotes aren't an option here, because the [Footnotes](#footnotes) section rules them out.
 
-Numbered references are also weaker for accessibility. A reader using a screen reader moves through a page by heading, link, and landmark, not by counting list markers. A number gives them nothing to navigate to, and `step 2` fails the same test as `here` in the [Links](#links) section: it doesn't describe its destination. That rule already applies to _above_ and _below_ in the [word list](./WORD_LIST.md#above): link to or name the section instead of describing where it sits.
+- `After you create the project, copy the project URL.`
+- `If the connection fails, repeat [Configure the connection pooler](#configure-the-connection-pooler).`
 
-**Don't announce a count.** Omit it, or generalize it.
+**Use a number where it earns its place.** `Step 2` is fine in a long procedure the reader is working through, and `Three steps:` is fine when knowing the count helps them plan. Numbers that carry information the reader acts on always stay, such as versions, limits, sizes, ports, thresholds, and prices.
 
-- Recommended: `To connect to your database:`
-- Recommended: `Setting up email login takes several steps.`
-- Not recommended: `Follow these three steps to connect to your database.`
-- Not recommended: `There are 4 types of documents.`
-
-**Don't refer to a step or section by number.** Name the action, or link the heading. Don't reach for a footnote, because [footnotes](#footnotes) aren't used in Supabase docs.
-
-- Recommended: `After you create the project, copy the project URL.`
-- Recommended: `If the connection fails, repeat [Configure the connection pooler](#configure-the-connection-pooler).`
-- Not recommended: `Repeat step 2.`
-- Not recommended: `See section 3 above.`
-
-Keep numbers that carry information the reader acts on, such as versions, limits, sizes, ports, thresholds, and prices. `Postgres 15 or later`, `a 500 MB limit`, and the 7 ± 2 range in [Procedures](#procedures) are facts about the product or the guidance, not counts of your own prose.
+A number you keep does need maintenance. A count goes stale when someone adds or removes an item, and a step reference points elsewhere after a reorder. Neither failure shows up in review or in CI, because the sentence still reads correctly. That's the reason to leave one out when it adds nothing, not a reason to avoid numbers.
 
 ## Word usage and spelling
 

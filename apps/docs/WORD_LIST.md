@@ -531,17 +531,14 @@ _older_, _higher_, _lower_, or a trailing `+`.
 
 ### numbers of steps and items
 
-Don't tell the reader how many steps or items are coming, and don't refer to a step
-or section by its number. A count goes stale when someone adds or removes an item,
-and a numbered reference points at the wrong content after a reorder. Omit the
-count or generalize it. Name the action or link the heading instead of citing a
-number, the same way you do for _above_ and _below_.
+Leave out a count or a step number when it isn't doing work, which is most of the
+time. Naming the action or linking the heading survives a reorder and gives a
+reader using a screen reader something to navigate to. A number is fine where it
+earns its place, such as _step 2_ in a long procedure, or a count that helps the
+reader plan.
 
-- Recommended: To connect to your database:
-- Recommended: Setting up email login takes several steps.
-- Recommended: After you create the project, copy the project URL.
-- Not recommended: Follow these three steps to connect to your database.
-- Not recommended: Repeat step 2.
+- Preferred: To connect to your database:
+- Preferred: After you create the project, copy the project URL.
 
 Keep numbers that carry information the reader acts on, such as versions, limits,
 sizes, ports, and prices. See
