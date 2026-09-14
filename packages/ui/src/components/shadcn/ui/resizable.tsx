@@ -16,7 +16,14 @@ const serverCompatibleLocalStorage = {
   getItem: (k: string) => {
     if (typeof window === 'undefined') return null
     try {
-      return localStorage.getItem(transformLayoutKey(k))
+      const value = localStorage.getItem(transformLayoutKey(k))
+      if (value === null) return null
+      // react-resizable-panels JSON.parses this value itself with no guard, so a
+      // stored value that isn't valid JSON (e.g. overwritten by another script or
+      // browser extension sharing localStorage) would otherwise crash the whole
+      // panel group. Validate here and fall back to the default layout instead.
+      JSON.parse(value)
+      return value
     } catch {
       return null
     }
