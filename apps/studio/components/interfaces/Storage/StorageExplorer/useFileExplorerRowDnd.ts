@@ -26,21 +26,23 @@ interface UseFileExplorerRowDndParams {
  * Makes a file explorer row draggable, and — when it's a folder — a target for other rows.
  *
  * Dragging a row that's part of the current selection drags the whole selection along with it.
+ * Dragging is off while a move is running: only one batch goes to the API at a time.
  */
 export const useFileExplorerRowDnd = ({
   item,
   selectedItems,
   canMoveItems,
 }: UseFileExplorerRowDndParams) => {
-  const { openedFolders } = useStorageExplorerStateSnapshot()
+  const { openedFolders, isMovingItems } = useStorageExplorerStateSnapshot()
   const { draggedItems } = useFileExplorerDnd()
 
   const itemPath = getItemPath(openedFolders, item)
   const isFolder = item.type === STORAGE_ROW_TYPES.FOLDER
   const isReady = item.status === STORAGE_ROW_STATUS.READY
 
+  const canStartMove = canMoveItems && !isMovingItems
   const itemsToDrag = getItemsToDrag(openedFolders, item, selectedItems)
-  const isDraggable = canMoveItems && isReady && item.type !== STORAGE_ROW_TYPES.BUCKET
+  const isDraggable = canStartMove && isReady && item.type !== STORAGE_ROW_TYPES.BUCKET
 
   const { listeners, setNodeRef, isDragging } = useDraggable({
     id: getRowDragId(itemPath),
@@ -50,7 +52,7 @@ export const useFileExplorerRowDnd = ({
 
   const { setNodeRef: setDropNodeRef, isOver } = useDroppable({
     id: getRowDropId(itemPath),
-    disabled: !(canMoveItems && isFolder && isReady),
+    disabled: !(canStartMove && isFolder && isReady),
     data: { path: itemPath },
   })
 

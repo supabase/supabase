@@ -31,8 +31,9 @@ const createSelection = (count: number) =>
     columnIndex: 0,
   }))
 
-const createSnapshot = (selectedItemsCount: number) => ({
+const createSnapshot = (selectedItemsCount: number, isMovingItems = false) => ({
   selectedItems: createSelection(selectedItemsCount),
+  isMovingItems,
   downloadFile: vi.fn(),
   downloadSelectedFiles: vi.fn(),
   clearSelectedItems: vi.fn(),
@@ -61,6 +62,14 @@ describe('FileExplorerHeaderSelection', () => {
 
   it('disables moving a selection over the limit', () => {
     mockUseStorageExplorerStateSnapshot.mockReturnValue(createSnapshot(MAX_ITEMS_PER_MOVE + 1))
+
+    render(<FileExplorerHeaderSelection />)
+
+    expect(screen.getByRole('button', { name: 'Move' })).toHaveAttribute('aria-disabled', 'true')
+  })
+
+  it('disables moving while another move is still running', () => {
+    mockUseStorageExplorerStateSnapshot.mockReturnValue(createSnapshot(1, true))
 
     render(<FileExplorerHeaderSelection />)
 

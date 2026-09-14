@@ -13,11 +13,14 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 const getMoveTooltipText = ({
   canUpdateFiles,
   isOverMoveLimit,
+  isMovingItems,
 }: {
   canUpdateFiles: boolean
   isOverMoveLimit: boolean
+  isMovingItems: boolean
 }) => {
   if (!canUpdateFiles) return 'You need additional permissions to move files'
+  if (isMovingItems) return 'A move is already in progress'
   if (isOverMoveLimit) return `Move up to ${MAX_ITEMS_PER_MOVE} items at a time`
   return undefined
 }
@@ -27,6 +30,7 @@ export const FileExplorerHeaderSelection = () => {
 
   const {
     selectedItems,
+    isMovingItems,
     downloadFile,
     downloadSelectedFiles,
     clearSelectedItems,
@@ -36,7 +40,7 @@ export const FileExplorerHeaderSelection = () => {
 
   const count = selectedItems.length
   const isOverMoveLimit = count > MAX_ITEMS_PER_MOVE
-  const canMoveSelection = canUpdateFiles && !isOverMoveLimit
+  const canMoveSelection = canUpdateFiles && !isOverMoveLimit && !isMovingItems
 
   return (
     <div className={bulkActionBarClassName}>
@@ -97,7 +101,7 @@ export const FileExplorerHeaderSelection = () => {
             tooltip={{
               content: {
                 side: 'bottom',
-                text: getMoveTooltipText({ canUpdateFiles, isOverMoveLimit }),
+                text: getMoveTooltipText({ canUpdateFiles, isOverMoveLimit, isMovingItems }),
               },
             }}
           >

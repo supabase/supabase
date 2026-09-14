@@ -114,7 +114,7 @@ export const FileExplorerColumn = ({
   const columnPath = getColumnPath(snap.openedFolders, index)
   const { setNodeRef: setDropNodeRef, isOver } = useDroppable({
     id: getColumnDropId(index),
-    disabled: !canUpdateStorage,
+    disabled: !canUpdateStorage || snap.isMovingItems,
     data: { path: columnPath },
   })
   const isDropTarget =

@@ -29,6 +29,7 @@ export function useStorageExplorerShortcuts({ onClearSearch }: UseStorageExplore
     downloadFile,
     downloadSelectedFiles,
     refreshAll,
+    isMovingItems,
   } = useStorageExplorerStateSnapshot()
 
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
@@ -54,7 +55,10 @@ export function useStorageExplorerShortcuts({ onClearSearch }: UseStorageExplore
     () => setSelectedItemsToMove(selectedItems),
     {
       enabled:
-        selectedItems.length > 0 && selectedItems.length <= MAX_ITEMS_PER_MOVE && canUpdateFiles,
+        selectedItems.length > 0 &&
+        selectedItems.length <= MAX_ITEMS_PER_MOVE &&
+        canUpdateFiles &&
+        !isMovingItems,
     }
   )
 

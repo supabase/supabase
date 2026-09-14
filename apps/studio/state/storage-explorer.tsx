@@ -1479,20 +1479,43 @@ function createStorageExplorerState({
       await Promise.all(sourceFolderPaths.map((path) => state.validateParentFolderEmpty(path)))
     },
 
+    /** True while a move is running, so nothing can queue a second batch on top of it */
+    isMovingItems: false,
+
     /**
      * Moves files and folders into another folder of the same bucket.
      *
      * Every object moves in its own request, so the batch is capped twice: once on the items the
      * user picked, and again on the objects those items expand into — a single folder can hold
-     * far more files than the cap allows.
+     * far more files than the cap allows. One move runs at a time for the same reason: batches
+     * started back to back would put the load on the API that the cap exists to avoid.
      */
     moveItems: async (items: StorageItemWithColumn[], destinationPath: string) => {
+      if (state.isMovingItems) {
+        return toast.error('Wait for the current move to finish before starting another')
+      }
+
       if (!isWithinMoveLimit(items.length)) {
         return toast.error(
           `Can't move ${items.length} items at once. Select up to ${MAX_ITEMS_PER_MOVE} items and try again.`
         )
       }
 
+      state.isMovingItems = true
+      try {
+        await state.runMove(items, destinationPath)
+      } catch (error) {
+        toast.error(`Failed to move items: ${(error as ResponseError).message}`)
+      } finally {
+        state.isMovingItems = false
+      }
+    },
+
+    /** The move itself. Go through moveItems, which guards the batch size and concurrency */
+    runMove: async (items: StorageItemWithColumn[], destinationPath: string) => {
+      // Pinned up front: the explorer reuses one state object across buckets, so switching
+      // bucket part way through a move would otherwise retarget the remaining requests.
+      const bucketId = state.selectedBucket.id
       const destinationLabel = destinationPath.length > 0 ? destinationPath : 'the bucket root'
       const toastId = toast.loading('Preparing to move items...', { position: 'top-right' })
 
@@ -1538,7 +1561,7 @@ function createStorageExplorerState({
       for (const { from, to } of objectsToMove) {
         const hasMoved = await moveObjectWithRetry({
           projectRef: state.projectRef,
-          bucketId: state.selectedBucket.id,
+          bucketId,
           from,
           to,
           onRetry: ({ attempt, secondsLeft, isRateLimited }) =>
