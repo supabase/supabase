@@ -74,7 +74,7 @@ export const GenerateRecoveryCodesModal = () => {
                     Codes copied to your clipboard.
                   </span>
                 ) : null}
-                {copied ? (
+                {copied || recoveryCodesGenerateMutation.isError ? (
                   <DialogClose asChild>
                     <Button>Close</Button>
                   </DialogClose>
