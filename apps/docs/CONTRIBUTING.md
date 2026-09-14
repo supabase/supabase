@@ -32,15 +32,15 @@ Separating kinds of information is a useful way to keep a paragraph readable. Th
 | Concept | What is it? | Text, a list, or a diagram |
 | Fact | What are the facts? | Text, a list, or a table |
 
-A procedure, a process, a structure, or a concept usually reads better in a block of its own. Procedure and process get blended most often, because both answer a question about how, and a reader following steps can't act on the process sentences.
+### Recommendations
 
-Context is worth keeping out of the action path. A concept or a process tends to work better before the procedure or after it than threaded through the steps.
+- **Separate blocks**: A procedure, a process, a structure, or a concept usually reads better in a block of its own. Procedure and process get blended most often, because both answer a question about how, and a reader following steps can't act on the process sentences.
+- **Context**: A concept or a process tends to work better before the procedure or after it than threaded through the steps.
+- **Principles and facts**: Either is often a single sentence, so it can sit in the block it qualifies. A fact about timing fits in the step it describes, and a principle can close the concept paragraph that motivates it.
+- **Long paragraphs**: Past three or four sentences, a paragraph has often picked up a second kind of information. Label each sentence and see where the labels change.
+- **Connective prose**: An introduction, a transition, an outcome, and a navigation outline describe the page rather than the product, so none of this applies to them.
 
-A principle or a fact is often a single sentence, so it can sit in the block it qualifies. A fact about timing fits in the step it describes, and a principle can close the concept paragraph that motivates it.
-
-A long paragraph is worth a second look. Past three or four sentences, it has often picked up a second kind of information. Label each sentence and see where the labels change.
-
-None of this applies to connective prose. An introduction, a transition, an outcome, and a navigation outline describe the page rather than the product, so let them do their job.
+### Examples
 
 Not recommended, because one paragraph blends a concept, a procedure, and a structure:
 
