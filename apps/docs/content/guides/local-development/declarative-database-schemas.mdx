@@ -52,13 +52,13 @@ create table "employees" (
 
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Generate a migration file">
-      Generate a migration file by diffing against your declared schema. The command also offers to apply the migration to your local database. Pass `--no-apply` to only generate the file. Both `--apply` and the global `--yes` flag apply it without prompting. Without one of those flags, a non-interactive run writes the file and silently skips the apply step.
+      Generate a migration file by diffing against your declared schema. This walkthrough passes `--no-apply` so the command only writes the file and the next step applies it. Without that flag, the command offers to apply the migration to your local database. Both `--apply` and the global `--yes` flag apply it without prompting, and a non-interactive run writes the file and silently skips the apply step.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
 ```bash name=Terminal
-supabase db schema declarative sync -f create_employees_table
+supabase db schema declarative sync -f create_employees_table --no-apply
 ```
 
     </StepHikeCompact.Code>
@@ -133,7 +133,7 @@ Some entities like views and enums expect columns to be declared in a specific o
     <StepHikeCompact.Code>
 
 ```bash name=Terminal
-supabase db schema declarative sync -f add_age
+supabase db schema declarative sync -f add_age --no-apply
 ```
 
     </StepHikeCompact.Code>
@@ -281,7 +281,7 @@ To set up declarative schemas on an existing project, export your production sch
 supabase db schema declarative generate --linked
 ```
 
-This writes per-object SQL files under `supabase/schemas/`, organized by database schema. In scripts, pass the target explicitly (`--local`, `--linked`, or `--db-url`) and add `--overwrite` to replace an existing tree without prompting. To later refresh the declarative tree from the remote database (for example, after a change was deployed outside your local workflow), run `supabase db pull --declarative`. It replaces the schema files without creating a migration or touching migration history.
+This writes per-object SQL files under `supabase/schemas/` (or the directory set by `experimental.pgdelta.declarative_schema_path`), organized by database schema. In scripts, pass the target explicitly (`--local`, `--linked`, or `--db-url`) and add `--overwrite` to replace an existing tree without prompting. To later refresh the declarative tree from the remote database (for example, after a change was deployed outside your local workflow), run `supabase db pull --declarative`. It replaces the schema files without creating a migration or touching migration history.
 
 `generate` writes schema files only. Because `sync` diffs your schema files against your migration history, that history must describe the same database before your first `sync`. If your project has no migrations yet, run `supabase db pull` first to create a baseline migration. Without a baseline, the first `sync` regenerates the entire schema as one migration. That migration can apply cleanly to an empty local database and still fail on `db push`, because the remote database already has those objects.
 
