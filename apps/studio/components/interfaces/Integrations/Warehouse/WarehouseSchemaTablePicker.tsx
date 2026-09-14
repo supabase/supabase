@@ -27,6 +27,7 @@ import {
   getSchemaCheckedState,
   getSchemaTableKey,
   getSelectedTableCount,
+  hasSelectionChanged,
   isSelectableWarehouseSchema,
   type SchemaTableSelection,
   type SchemaWithTables,
@@ -122,6 +123,7 @@ export const WarehouseSchemaTablePicker = ({
   }, [schemas, tables])
 
   const selectedCount = getSelectedTableCount(selection)
+  const hasChanges = hasSelectionChanged(selection, initialSelection)
 
   const updateSelection = (updater: (current: SchemaTableSelection) => SchemaTableSelection) => {
     setSelectionOverride((prev) => updater(prev ?? initialSelection))
@@ -297,14 +299,17 @@ export const WarehouseSchemaTablePicker = ({
             <span className="text-sm text-foreground-lighter">
               {selectedCount} table{selectedCount === 1 ? '' : 's'} selected
             </span>
-            <Button
-              variant="primary"
-              disabled={selectedCount === 0}
-              loading={isSubmitting}
-              onClick={handleSubmit}
-            >
-              {isEditing ? 'Add replicated tables' : 'Enable Warehouse'}
-            </Button>
+            <div className="flex items-center gap-x-2">
+              {hasChanges && <Button onClick={() => setSelectionOverride(null)}>Cancel</Button>}
+              <Button
+                variant="primary"
+                disabled={selectedCount === 0 || !hasChanges}
+                loading={isSubmitting}
+                onClick={handleSubmit}
+              >
+                {isEditing ? 'Add replicated tables' : 'Enable Warehouse'}
+              </Button>
+            </div>
           </CardFooter>
         </Card>
       </PageSectionContent>

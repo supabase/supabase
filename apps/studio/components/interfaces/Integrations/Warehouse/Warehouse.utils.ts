@@ -60,6 +60,22 @@ export function getSelectedTableCount(selection: SchemaTableSelection): number {
 }
 
 /**
+ * Compares two selections by their effective selected keys rather than by reference or raw
+ * object shape, since `toggleTable`/`toggleSchema` can write explicit `false` entries that
+ * shouldn't count as a difference from a key simply being absent.
+ */
+export function hasSelectionChanged(
+  selection: SchemaTableSelection,
+  initialSelection: SchemaTableSelection
+): boolean {
+  const currentKeys = Object.keys(selection).filter((key) => selection[key])
+  const initialKeys = Object.keys(initialSelection).filter((key) => initialSelection[key])
+  if (currentKeys.length !== initialKeys.length) return true
+  const initialKeySet = new Set(initialKeys)
+  return currentKeys.some((key) => !initialKeySet.has(key))
+}
+
+/**
  * Seeds the picker's selection from the tables already in the `supabase_warehouse` publication, so
  * editing an existing setup starts from what's actually replicated instead of an empty selection.
  * Schema-level checkboxes derive from these per-table entries, so a schema whose every table is in
