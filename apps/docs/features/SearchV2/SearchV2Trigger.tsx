@@ -15,7 +15,7 @@ export function SearchV2Trigger({ className, placeholder = 'Search...' }: Search
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    function openOnKeyDown(event) {
+    function openOnKeyDown(event: globalThis.KeyboardEvent) {
       if (event.key === 'k' && event.metaKey) {
         /**
          * This two methods prevent, first search V1 dialog to open and second
