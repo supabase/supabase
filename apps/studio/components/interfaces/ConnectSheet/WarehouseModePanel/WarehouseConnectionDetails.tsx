@@ -246,7 +246,7 @@ const CatalogAccessToggle = ({
       label="Enable DuckDB catalog access"
       description="Creates the credentials DuckDB needs to attach Warehouse. Not required for FlightSQL."
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-end gap-2">
         {catalogMutation.isPending && (
           <span role="status" aria-label="Updating DuckDB catalog access">
             <Loader2 size={16} className="animate-spin text-foreground-muted" aria-hidden />
