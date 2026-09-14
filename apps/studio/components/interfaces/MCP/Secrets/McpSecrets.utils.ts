@@ -14,7 +14,7 @@ import type {
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
 
-const RETURN_TO_CLIENT_STEP = `Go back to ${UNKNOWN_CLIENT_LABEL} and choose "I've completed it" to finish the tool call.`
+const RETURN_TO_CLIENT_STEP = `Head back to your agent and let it know you're finished.`
 
 const CLOSE_TAB_FOOTER = 'You can close this tab.'
 
