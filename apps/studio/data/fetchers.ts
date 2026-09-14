@@ -27,12 +27,10 @@ export const fetchHandler: typeof fetch = async (input, init) => {
   }
 }
 
-// [Joshen] Just FYI, the replace is temporary until we update env vars API_URL to remove /platform or /v1 - should just be the base URL
-export const API_BASE_URL = API_URL?.replace('/platform', '')
-
 export const client = createClient<paths>({
   fetch: fetchHandler,
-  baseUrl: API_BASE_URL,
+  // [Joshen] Just FYI, the replace is temporary until we update env vars API_URL to remove /platform or /v1 - should just be the base URL
+  baseUrl: API_URL?.replace('/platform', ''),
   referrerPolicy: 'no-referrer-when-downgrade',
   headers: DEFAULT_HEADERS,
   credentials: 'include',
