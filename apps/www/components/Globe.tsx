@@ -2,11 +2,8 @@ import createGlobe from 'cobe'
 import { useTheme } from 'next-themes'
 import { useEffect, useRef } from 'react'
 
-// cobe falls back to the (now unsupported by most browsers) 'experimental-webgl'
-// context name when both 'webgl2' and 'webgl' are unavailable, which still
-// resolves to a null context and crashes cobe internally (reading 'enable' on
-// null) instead of failing gracefully. Detect that case ourselves so we can
-// skip mounting the globe rather than crashing the whole page.
+// cobe crashes internally when neither webgl2 nor webgl is available instead
+// of failing gracefully, so we check ourselves before mounting it.
 const isWebGLAvailable = (canvas: HTMLCanvasElement) => {
   try {
     return !!(canvas.getContext('webgl2') || canvas.getContext('webgl'))
