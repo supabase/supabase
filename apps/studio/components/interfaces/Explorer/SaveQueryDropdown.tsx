@@ -36,7 +36,7 @@ export const SaveQueryDropdown = ({
   query,
 }: PropsWithChildren<SaveQueryDropdownProps>) => {
   const router = useRouter()
-  const { id, ref } = useParams()
+  const { ref } = useParams()
   const { createNotebook } = useCreateNotebook()
   const notebooksSnap = useNotebooksStateSnapshot()
 

@@ -313,6 +313,7 @@ export const EditorPanel = () => {
         {isEditingTitle ? (
           <input
             ref={titleInputRef}
+            aria-label="Query title"
             value={titleInput}
             onChange={(e) => setTitleInput(e.target.value)}
             onBlur={commitRename}

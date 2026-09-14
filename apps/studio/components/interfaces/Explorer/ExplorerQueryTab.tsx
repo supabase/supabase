@@ -1,63 +1,36 @@
 import { type Hotkey } from '@tanstack/react-hotkeys'
-import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { AlignLeft, Check, Keyboard, Loader2, MoreVertical, Save, SquareCode } from 'lucide-react'
+import { AlignLeft, Check, Keyboard, Loader2, MoreVertical, SquareCode } from 'lucide-react'
 import { useRouter } from 'next/router'
-import {
-  PropsWithChildren,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
-import { toast } from 'sonner'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import {
   Button,
-  Command,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   KeyboardShortcut,
 } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ExplorerToolbarAction } from './ExplorerToolbar'
-import { useCreateNotebook } from './hooks'
 import { QueryEditor, type ExplorerQueryModel, type QueryEditorHandle } from './QueryEditor'
 import { SaveQueryDropdown } from './SaveQueryDropdown'
 import { type QueryDisplay, type QueryResult } from './types'
-import { createQueryCellSkeleton } from './utils'
-import { getNotebook } from '@/data/content/notebooks/notebook-query'
-import { useNotebooksInfiniteQuery } from '@/data/content/notebooks/notebooks-infinite-query'
 import { toQuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { explorerQueryState, useExplorerQueryStateSnapshot } from '@/state/explorer-query'
-import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { useControlledRoleImpersonationState } from '@/state/role-impersonation-state'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { createTabId, TabsStateContext } from '@/state/tabs'
 
 /** Query-tab lifecycle adapter around the shared QueryEditor. */
-export const ExplorerQueryTab = ({ children }: PropsWithChildren) => {
+export const ExplorerQueryTab = () => {
   const router = useRouter()
   const { id, ref } = useParams()
   const tabs = useContext(TabsStateContext)
   const querySnap = useExplorerQueryStateSnapshot()
-
-  const { createNotebook } = useCreateNotebook()
-  const notebooksSnap = useNotebooksStateSnapshot()
 
   const [isIntellisenseEnabled, setIsIntellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
@@ -72,18 +45,6 @@ export const ExplorerQueryTab = ({ children }: PropsWithChildren) => {
 
   const [restoredQueryKey, setRestoredQueryKey] = useState<string>()
   const [showQuery, setShowQuery] = useState(true)
-  const [search, setSearch] = useState('')
-  const debouncedSearch = useDebounce(search, 500)
-
-  const { data: notebooksData, isPending } = useNotebooksInfiniteQuery({
-    projectRef: ref,
-    limit: 100,
-    name: search.length === 0 ? search : debouncedSearch,
-  })
-  const notebooks = useMemo(() => {
-    const items = notebooksData?.pages.flatMap((page) => page.content) ?? []
-    return items
-  }, [notebooksData?.pages])
 
   const stateDraft = id ? querySnap.drafts[id] : undefined
   const draft = stateDraft?.projectRef === ref ? stateDraft : undefined
@@ -166,32 +127,6 @@ export const ExplorerQueryTab = ({ children }: PropsWithChildren) => {
       id,
       result: { ...nextResult, executedAt: Date.now() },
     })
-  }
-
-  const onAddToNewNotebook = () => {
-    createNotebook({
-      cells: [createQueryCellSkeleton({ title: draft.name, sql: draft.uncheckedSql })],
-    })
-  }
-
-  const onAddToExistingNotebook = async (notebookId: string) => {
-    if (!ref) return
-    try {
-      if (!notebooksSnap.notebooks[notebookId]?.notebook.content) {
-        const notebook = await getNotebook({ projectRef: ref, id: notebookId })
-        notebooksSnap.setNotebook({ projectRef: ref, notebook })
-      }
-
-      notebooksSnap.insertCellAfter({
-        id: notebookId,
-        cell: createQueryCellSkeleton({ title: draft.name, sql: draft.uncheckedSql }),
-      })
-      notebooksSnap.requestScrollToBottom(notebookId)
-
-      router.push(`/project/${ref}/explorer/notebook/${notebookId}`)
-    } catch (error) {
-      toast.error('Failed to add query to notebook')
-    }
   }
 
   return (
