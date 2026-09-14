@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import { ArrowLeft, Search, X } from 'lucide-react'
+import { ArrowLeft, CircleCheck, Search, X } from 'lucide-react'
 import { Fragment, useMemo, useState } from 'react'
 import {
   Breadcrumb,
@@ -15,9 +15,8 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants'
-import { FolderPickerBrowseRow, FolderPickerSearchRow } from './MoveItemsFolderPickerRow'
-import { filterFoldersBySearch, sortFoldersFirst } from './MoveItemsModal.utils'
-import { formatFolderItems } from './StorageExplorer.utils'
+import { FolderPickerRow } from './MoveItemsFolderPickerRow'
+import { filterFoldersBySearch, getDestinationLabel, toFolders } from './MoveItemsModal.utils'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
 import { bucketFoldersQueryOptions } from '@/data/storage/bucket-folders-query'
 import { useBucketObjectsInfiniteQuery } from '@/data/storage/bucket-objects-infinite-query'
@@ -69,9 +68,9 @@ export const MoveItemsFolderPicker = ({
     enabled: isSearching,
   })
 
-  const items = useMemo(
-    () => sortFoldersFirst(formatFolderItems(objectsData?.pages.flat() ?? [])),
-    [objectsData]
+  const folders = useMemo(
+    () => toFolders(objectsData?.pages.flat() ?? [], path),
+    [objectsData, path]
   )
 
   const searchResults = useMemo(
@@ -81,6 +80,8 @@ export const MoveItemsFolderPicker = ({
 
   const isRoot = pathSegments.length === 0
   const currentFolderName = isRoot ? bucketName : pathSegments[pathSegments.length - 1]
+  // Pages hold files as well as folders, so a page of pure files leaves nothing to render yet
+  const isDrainingPages = folders.length === 0 && hasNextPage
 
   // Navigating always leaves search mode, so that the listing shown matches the destination
   const handleNavigate = (segments: string[]) => {
@@ -88,9 +89,7 @@ export const MoveItemsFolderPicker = ({
     onChangePath(segments)
   }
 
-  const handleOpenFolder = (name: string) => handleNavigate([...pathSegments, name])
-
-  const handleOpenSearchResult = (folderPath: string) => handleNavigate(folderPath.split('/'))
+  const handleSelectFolder = (folderPath: string) => handleNavigate(folderPath.split('/'))
 
   return (
     <div className="flex h-[360px] flex-col overflow-hidden rounded-md border border-overlay bg-studio">
@@ -159,6 +158,16 @@ export const MoveItemsFolderPicker = ({
         </Breadcrumb>
       </div>
 
+      <div className="flex shrink-0 items-center gap-x-2 border-b border-default bg-surface-75 px-2.5 py-2">
+        <CircleCheck size={16} className="shrink-0 text-brand" />
+        <p className="min-w-0 truncate text-xs text-foreground-light">
+          Moving to{' '}
+          <span className="font-mono text-foreground">
+            {getDestinationLabel(bucketName, pathSegments)}
+          </span>
+        </p>
+      </div>
+
       <div className="min-h-0 flex-1 overflow-hidden">
         {isSearching && isPendingFolders && (
           <div className="flex flex-col gap-y-2 p-2.5">
@@ -181,10 +190,15 @@ export const MoveItemsFolderPicker = ({
           <InfiniteListDefault
             className="h-full"
             items={searchResults}
-            itemProps={{ bucketName, onSelectFolder: handleOpenSearchResult }}
+            itemProps={{
+              selectedPath: path,
+              showLocation: true,
+              bucketName,
+              onSelectFolder: handleSelectFolder,
+            }}
             getItemKey={(index) => searchResults[index]?.path ?? `folder-${index}`}
             getItemSize={() => ROW_HEIGHT}
-            ItemComponent={FolderPickerSearchRow}
+            ItemComponent={FolderPickerRow}
             LoaderComponent={LoaderForIconMenuItems}
           />
         )}
@@ -197,23 +211,28 @@ export const MoveItemsFolderPicker = ({
           </div>
         )}
 
-        {!isSearching && !isPendingObjects && items.length === 0 && (
+        {!isSearching && !isPendingObjects && folders.length === 0 && !isDrainingPages && (
           <div className="flex h-full flex-col items-center justify-center gap-y-1 px-6">
-            <p className="text-sm text-foreground">{currentFolderName} is empty</p>
+            <p className="text-sm text-foreground">No folders in {currentFolderName}</p>
             <p className="text-center text-sm text-foreground-light">
               Move the files here, or go back to choose another folder.
             </p>
           </div>
         )}
 
-        {!isSearching && items.length > 0 && (
+        {!isSearching && !isPendingObjects && (folders.length > 0 || isDrainingPages) && (
           <InfiniteListDefault
             className="h-full"
-            items={items}
-            itemProps={{ onSelectFolder: handleOpenFolder }}
-            getItemKey={(index) => items[index]?.id ?? `item-${index}`}
+            items={folders}
+            itemProps={{
+              selectedPath: path,
+              showLocation: false,
+              bucketName,
+              onSelectFolder: handleSelectFolder,
+            }}
+            getItemKey={(index) => folders[index]?.path ?? `folder-${index}`}
             getItemSize={() => ROW_HEIGHT}
-            ItemComponent={FolderPickerBrowseRow}
+            ItemComponent={FolderPickerRow}
             LoaderComponent={LoaderForIconMenuItems}
             hasNextPage={hasNextPage}
             isLoadingNextPage={isFetchingObjects}

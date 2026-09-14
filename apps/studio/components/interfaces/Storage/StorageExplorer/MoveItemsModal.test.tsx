@@ -109,12 +109,42 @@ describe('MoveItemsModal', () => {
     expect(screen.getByText('avatars', { selector: 'span.font-mono' })).toBeInTheDocument()
   })
 
-  it('lists files without making them selectable', async () => {
+  it('lists folders only, leaving files out entirely', async () => {
     renderModal()
 
     await screen.findByRole('button', { name: 'photos' })
-    expect(screen.getByText('avatar.png')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'avatar.png' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'invoices' })).toBeInTheDocument()
+    expect(screen.queryByText('avatar.png')).not.toBeInTheDocument()
+  })
+
+  it('marks the destination folder in the search results', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    await user.click(await screen.findByRole('button', { name: 'photos' }))
+    await screen.findByRole('button', { name: 'Move to photos' })
+
+    await user.type(screen.getByPlaceholderText('Search folders in avatars...'), 'photos')
+
+    const selectedRow = await screen.findByRole('button', { name: /^photos/ })
+    expect(within(selectedRow).getByLabelText('Current destination')).toBeInTheDocument()
+  })
+
+  it('keeps paging until it finds folders hidden behind a page of files', async () => {
+    const files = Array.from({ length: 200 }, (_, index) => createFile(`file-${index}.png`))
+    addAPIMock({
+      method: 'post',
+      path: '/platform/storage/:ref/buckets/:id/objects/list',
+      response: async ({ request }) => {
+        const body = (await request.json()) as { options?: { offset?: number } }
+        const isFirstPage = (body.options?.offset ?? 0) === 0
+        return HttpResponse.json(isFirstPage ? files : [createFolder('buried')])
+      },
+    })
+
+    renderModal()
+
+    expect(await screen.findByRole('button', { name: 'buried' })).toBeInTheDocument()
   })
 
   it('blocks moving items into the folder they are already in', async () => {
@@ -159,7 +189,7 @@ describe('MoveItemsModal', () => {
     await user.type(screen.getByPlaceholderText('Search folders in avatars...'), '2024')
 
     expect(await screen.findByRole('button', { name: /2024/ })).toBeInTheDocument()
-    await waitFor(() => expect(screen.queryByText('avatar.png')).not.toBeInTheDocument())
+    await waitFor(() => expect(screen.queryByText('invoices')).not.toBeInTheDocument())
   })
 
   it('selects a searched folder as the destination', async () => {

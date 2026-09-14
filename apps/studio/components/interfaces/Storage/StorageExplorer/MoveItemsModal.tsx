@@ -14,7 +14,6 @@ import {
 import { StorageItem, StorageItemWithColumn } from '../Storage.types'
 import { MoveItemsFolderPicker } from './MoveItemsFolderPicker'
 import {
-  getDestinationLabel,
   getDestinationName,
   getMoveItemsTitle,
   getSourcePaths,
@@ -67,7 +66,7 @@ const MoveItemsDialogBody = ({
         <DialogDescription>Select a destination folder in {bucketName}.</DialogDescription>
       </DialogHeader>
       <DialogSectionSeparator />
-      <DialogSection className="flex flex-col gap-y-2">
+      <DialogSection>
         <MoveItemsFolderPicker
           projectRef={projectRef}
           bucketId={bucketId}
@@ -75,12 +74,6 @@ const MoveItemsDialogBody = ({
           pathSegments={pathSegments}
           onChangePath={setPathSegments}
         />
-        <p className="truncate text-xs text-foreground-light">
-          Destination:{' '}
-          <span className="font-mono text-foreground">
-            {getDestinationLabel(bucketName, pathSegments)}
-          </span>
-        </p>
       </DialogSection>
       <DialogFooter>
         <Button disabled={isMoving} onClick={onSelectCancel}>

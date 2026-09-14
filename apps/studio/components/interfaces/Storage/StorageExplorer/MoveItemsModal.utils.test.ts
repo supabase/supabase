@@ -7,10 +7,11 @@ import {
   getDestinationLabel,
   getDestinationName,
   getMoveItemsTitle,
+  getParentPathLabel,
   getSourcePaths,
   isSameAsSourcePath,
   MAX_FOLDER_SEARCH_RESULTS,
-  sortFoldersFirst,
+  toFolders,
 } from './MoveItemsModal.utils'
 
 const createItem = (name: string, type = STORAGE_ROW_TYPES.FILE): StorageItem => ({
@@ -139,20 +140,41 @@ describe('filterFoldersBySearch', () => {
   })
 })
 
-describe('sortFoldersFirst', () => {
-  it('moves folders ahead of files while keeping relative order', () => {
-    const items = [
-      createItem('a.png'),
-      createItem('photos', STORAGE_ROW_TYPES.FOLDER),
-      createItem('b.png'),
-      createItem('videos', STORAGE_ROW_TYPES.FOLDER),
-    ]
-    expect(sortFoldersFirst(items).map((item) => item.name)).toEqual([
-      'photos',
-      'videos',
-      'a.png',
-      'b.png',
+describe('toFolders', () => {
+  // Objects without an id are prefixes (folders); the rest are files
+  const objects = [
+    { id: null, name: 'photos' },
+    { id: 'id-a', name: 'a.png' },
+    { id: null, name: 'videos' },
+  ] as Parameters<typeof toFolders>[0]
+
+  it('drops files and keeps folders in order', () => {
+    expect(toFolders(objects, '').map((folder) => folder.name)).toEqual(['photos', 'videos'])
+  })
+
+  it('builds paths relative to the bucket root', () => {
+    expect(toFolders(objects, '').map((folder) => folder.path)).toEqual(['photos', 'videos'])
+  })
+
+  it('prefixes paths with the parent folder', () => {
+    expect(toFolders(objects, 'archive/2024').map((folder) => folder.path)).toEqual([
+      'archive/2024/photos',
+      'archive/2024/videos',
     ])
+  })
+
+  it('returns nothing for a folder of only files', () => {
+    expect(toFolders([{ id: 'id-a', name: 'a.png' }] as typeof objects, '')).toEqual([])
+  })
+})
+
+describe('getParentPathLabel', () => {
+  it('falls back to the bucket name for a top level folder', () => {
+    expect(getParentPathLabel('photos', 'avatars')).toBe('avatars')
+  })
+
+  it('joins the parent segments for a nested folder', () => {
+    expect(getParentPathLabel('archive/2024/photos', 'avatars')).toBe('archive/2024')
   })
 })
 

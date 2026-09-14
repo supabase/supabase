@@ -1,6 +1,6 @@
-import { STORAGE_ROW_TYPES } from '../Storage.constants'
 import type { StorageItem, StorageItemWithColumn } from '../Storage.types'
 import type { StorageFolder } from '@/data/storage/bucket-folders-query'
+import type { StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 
 /** Maximum number of folders rendered in the search results list */
 export const MAX_FOLDER_SEARCH_RESULTS = 100
@@ -75,13 +75,25 @@ export function filterFoldersBySearch(
 }
 
 /**
- * Sorts folders ahead of files so that the folders you can navigate into are always at the top
- * of the picker, and files (which are only there for context) sink to the bottom.
+ * Narrows a listing to the folders in it. The picker only offers folders, so files are dropped
+ * rather than shown as unselectable rows. Objects without an id are prefixes (folders).
  */
-export function sortFoldersFirst<T extends { type: STORAGE_ROW_TYPES }>(items: T[]): T[] {
-  const folders = items.filter((item) => item.type === STORAGE_ROW_TYPES.FOLDER)
-  const rest = items.filter((item) => item.type !== STORAGE_ROW_TYPES.FOLDER)
-  return [...folders, ...rest]
+export function toFolders(objects: StorageObject[], parentPath: string): StorageFolder[] {
+  return objects
+    .filter((object) => !object.id)
+    .map((object) => ({
+      name: object.name,
+      path: parentPath.length > 0 ? `${parentPath}/${object.name}` : object.name,
+    }))
+}
+
+/**
+ * Where a folder lives, for search results that span the whole bucket. The bucket name stands in
+ * for the root, which has no path of its own.
+ */
+export function getParentPathLabel(folderPath: string, bucketName: string): string {
+  const parentSegments = folderPath.split('/').slice(0, -1)
+  return parentSegments.length > 0 ? parentSegments.join('/') : bucketName
 }
 
 /**
