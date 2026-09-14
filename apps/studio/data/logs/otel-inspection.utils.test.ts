@@ -108,6 +108,20 @@ describe('flattenOtelInspectionRow', () => {
     expect(e.level).toBe('success')
   })
 
+  it('derives level from severity for a postgres warning, not the SQL state code', () => {
+    const row: OtelLogRow = {
+      ...pgRow,
+      event_message: 'warning: there is already a transaction in progress',
+      log_attributes: {
+        ...pgRow.log_attributes,
+        'parsed.error_severity': 'WARNING',
+        'parsed.sql_state_code': '25001',
+      },
+    }
+    const e = flattenOtelInspectionRow(row) as unknown as Record<string, unknown>
+    expect(e.level).toBe('warning')
+  })
+
   it('derives level=error for 5xx responses', () => {
     const row: OtelLogRow = {
       ...edgeRow,
