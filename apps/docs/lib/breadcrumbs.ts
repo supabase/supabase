@@ -26,7 +26,7 @@ const SECTION_PATH_TO_KEY: Record<string, keyof typeof NavItems> = {
   security: 'security',
   'self-hosting': 'self_hosting',
   storage: 'storage',
-  'monitoring-and-debugging': 'telemetry',
+  observability: 'telemetry',
 }
 
 function getSectionMenu(pathname: string) {
@@ -55,7 +55,14 @@ function findMenuItemByUrl(
 
 export function resolveBreadcrumbs(pathname: string): BreadcrumbItem[] {
   if (pathname.startsWith('/guides/troubleshooting')) {
-    return [{ name: 'Troubleshooting', url: '/guides/troubleshooting' }]
+    return [
+      {
+        name: 'Observability',
+        url: '/guides/observability',
+      },
+      { name: 'Detect and diagnose' },
+      { name: 'Diagnosing', url: '/guides/troubleshooting' },
+    ]
   }
   if (pathname.startsWith('/guides/getting-started/ai-prompts')) {
     return [

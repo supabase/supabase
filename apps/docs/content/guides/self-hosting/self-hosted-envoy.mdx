@@ -19,7 +19,7 @@ Envoy is registered as the `api-gw` service and also exposes `envoy` and `kong` 
 Confirm the gateway is routing requests and enforcing API keys:
 
 ```sh
-curl -i -H "apikey: your-service-role-key" http://<your-domain>/rest/v1/
+curl -i -H "apikey: your-supabase-secret-key" http://<your-domain>/rest/v1/
 ```
 
 A `200 OK` response from PostgREST confirms the gateway is up. A `401 Unauthorized` without the `apikey` header confirms enforcement is active.
@@ -198,6 +198,8 @@ The gateway applies a permissive CORS policy at the virtual-host level:
 - Preflight max-age: 3600 seconds
 
 This matches both the current Supabase platform behavior and the previous Kong-based gateway. The auth boundary for Supabase APIs is the `apikey` header rather than the request origin.
+
+The `/pg/` route (direct Postgres introspection via `meta`, gated by the service role key) is the exception: it carries its own stricter per-route CORS override, restricted to `SUPABASE_PUBLIC_URL` and `localhost`/`127.0.0.1` origins, since there's no legitimate reason for this route to be called from an arbitrary third-party origin.
 
 <Admonition type="note">
 

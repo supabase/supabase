@@ -134,9 +134,7 @@ const FilterError = ({ removeAllFilters }: { removeAllFilters: () => void }) => 
         One or more of your filters may have a value or operator that doesn't match the column's
         data type. Try updating or removing the filter.
       </p>
-      <Button variant="default" onClick={removeAllFilters}>
-        Remove filters
-      </Button>
+      <Button onClick={removeAllFilters}>Remove filters</Button>
     </Admonition>
   )
 }
@@ -167,9 +165,7 @@ const InvalidOrderingOperatorError = ({ error }: { error: ResponseError }) => {
         Error: <code className="text-code-inline">{error.message}</code>
       </p>
 
-      <Button variant="default" onClick={() => onApplySorts([])}>
-        Remove sorts
-      </Button>
+      <Button onClick={() => onApplySorts([])}>Remove sorts</Button>
     </Admonition>
   )
 }

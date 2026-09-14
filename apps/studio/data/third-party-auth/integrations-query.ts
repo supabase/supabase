@@ -11,7 +11,7 @@ export type ThirdPartyAuthIntegrationsVariables = {
 
 export type ThirdPartyAuthIntegrationsError = ResponseError
 
-export type ThirdPartyAuthIntegration = components['schemas']['ThirdPartyAuth']
+export type ThirdPartyAuthIntegration = components['schemas']['ThirdPartyAuth_Output']
 
 async function getThirdPartyAuthIntegrations(
   { projectRef }: ThirdPartyAuthIntegrationsVariables,

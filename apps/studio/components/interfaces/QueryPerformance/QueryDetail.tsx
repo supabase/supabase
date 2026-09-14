@@ -112,7 +112,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
                 Adding an index will help this query execute faster
               </AlertDescription>
               <AlertDescription>
-                <Button className="mt-3" onClick={() => onClickViewSuggestion()}>
+                <Button variant="primary" className="mt-3" onClick={() => onClickViewSuggestion()}>
                   View suggestion
                 </Button>
               </AlertDescription>
@@ -127,7 +127,6 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
         />
         <div className="absolute bottom-[-13px] left-0 right-0 w-full flex items-center justify-center z-10">
           <Button
-            variant="default"
             className="rounded-full"
             icon={<ChevronsUpDown />}
             onClick={() => setIsExpanded(!isExpanded)}

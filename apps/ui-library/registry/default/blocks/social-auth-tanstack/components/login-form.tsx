@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import { cn } from '@/lib/utils'
+import { safeNextPath } from '@/registry/default/blocks/safe-next-path/lib/safe-next-path'
 import { createClient } from '@/registry/default/clients/tanstack/lib/supabase/client'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -22,10 +23,11 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     setError(null)
 
     try {
+      const next = new URLSearchParams(window.location.search).get('next')
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${window.location.origin}/auth/oauth?next=/protected`,
+          redirectTo: `${window.location.origin}/auth/confirm?next=${encodeURIComponent(safeNextPath(next, '/protected'))}`,
         },
       })
 
@@ -48,7 +50,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
             <div className="flex flex-col gap-6">
               {error && <p className="text-sm text-destructive-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Logging in...' : 'Continue with GitHub'}
+                {isLoading ? 'Signing in...' : 'Continue with GitHub'}
               </Button>
             </div>
           </form>

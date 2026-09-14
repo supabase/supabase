@@ -27,10 +27,11 @@ describe('next.config.mjs', () => {
 
   it('routes the library and permanently redirects the legacy UI URLs', async () => {
     const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
-    const rewrites = (await config.rewrites?.()) || []
+    const rewrites = await config.rewrites?.()
+    const afterFiles = (rewrites && 'afterFiles' in rewrites && rewrites.afterFiles) || []
     const redirects = (await config.redirects?.()) || []
 
-    expect(rewrites).toEqual(
+    expect(afterFiles).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ source: '/library' }),
         expect.objectContaining({ source: '/library/:path*' }),
@@ -59,6 +60,56 @@ describe('next.config.mjs', () => {
     expect(
       redirects.findIndex((redirect) => redirect.source === '/ui/docs/ai-editors-rules/prompts')
     ).toBeLessThan(redirects.findIndex((redirect) => redirect.source === '/ui/:path*'))
+  })
+
+  it('routes unmatched markdown-negotiated paths to the md-404 handler via fallback rewrites', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const rewrites = await config.rewrites?.()
+    const fallback = (rewrites && 'fallback' in rewrites && rewrites.fallback) || []
+
+    const mdSuffixRule = fallback.find((rule) => rule.destination === '/api-v2/md-404/:path')
+    const acceptRule = fallback.find((rule) => rule.destination === '/api-v2/md-404/:path*')
+
+    expect(mdSuffixRule).toBeDefined()
+    expect(acceptRule?.has).toEqual([
+      { type: 'header', key: 'accept', value: '.*text/(markdown|\\*).*' },
+    ])
+
+    expect(getPathMatch(mdSuffixRule!.source)('/definitely-not-a-page.md')).toBeTruthy()
+    expect(getPathMatch(mdSuffixRule!.source)('/nested/definitely/not-a-page.md')).toBeTruthy()
+    expect(getPathMatch(mdSuffixRule!.source)('/definitely-not-a-page')).toBe(false)
+    expect(getPathMatch(acceptRule!.source)('/definitely-not-a-page')).toBeTruthy()
+
+    const acceptHeaderRegex = new RegExp(`^${acceptRule!.has![0].value}$`)
+    expect(acceptHeaderRegex.test('text/markdown')).toBe(true)
+    expect(acceptHeaderRegex.test('text/html, text/markdown;q=0.9')).toBe(true)
+    expect(acceptHeaderRegex.test('text/*')).toBe(true)
+    expect(
+      acceptHeaderRegex.test('text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
+    ).toBe(false)
+  })
+
+  it('permanently redirects the legacy root markdown aliases to /index.md', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const redirects = (await config.redirects?.()) || []
+
+    for (const source of ['/.md', '/homepage.md', '/llms/homepage.txt']) {
+      expect(redirects).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ source, destination: '/index.md', permanent: true }),
+        ])
+      )
+    }
+
+    expect(getPathMatch('/.md')('/.md')).toBeTruthy()
+    expect(getPathMatch('/.md')('/foo.md')).toBe(false)
+
+    expect(redirects).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ source: '/index', destination: '/', permanent: true }),
+      ])
+    )
+    expect(getPathMatch('/index')('/index.md')).toBe(false)
   })
 
   it('preserves the filename when redirecting legacy customer logos', async () => {

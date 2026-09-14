@@ -188,9 +188,9 @@ function CommandMenuTriggerInput({
           'grow md:min-w-44 xl:min-w-56 h-[30px] rounded-md',
           'pl-1.5 md:pl-2 pr-1',
           'flex items-center justify-between',
-          // Match Button default (Connect): opaque popover hover fill, stronger border.
+          // Match Button default (Connect): opaque popover hover fill, shared control-hover border.
           'bg-transparent text-foreground-lighter border border-strong',
-          'hover:bg-popover hover:border-stronger',
+          'hover:bg-popover hover:border-control-hover',
           'focus-ring',
           'transition-colors',
           className

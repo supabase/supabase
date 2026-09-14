@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronRight, Loader2, MinusCircle } from 'lucide-react'
 import Link from 'next/link'
 import { cn, HoverCard, HoverCardContent, HoverCardTrigger, InfoIcon } from 'ui'
 
@@ -21,6 +21,9 @@ import { DOCS_URL } from '@/lib/constants'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
+const SERVICE_ROW_CLASS =
+  'px-3 py-2 text-xs flex items-center justify-between border-b last:border-none'
+
 const iconProps = {
   size: 18,
   strokeWidth: 1.5,
@@ -28,6 +31,7 @@ const iconProps = {
 const LoaderIcon = () => <Loader2 {...iconProps} className="animate-spin" />
 const AlertIcon = () => <AlertTriangle {...iconProps} />
 const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
+const DisabledIcon = () => <MinusCircle {...iconProps} className="text-foreground-lighter" />
 
 export const StatusIcon = ({
   isLoading,
@@ -40,7 +44,7 @@ export const StatusIcon = ({
 }) => {
   //
   if (projectStatus === 'ACTIVE_HEALTHY') return <CheckIcon />
-  if (projectStatus === 'DISABLED') return <AlertIcon />
+  if (projectStatus === 'DISABLED') return <DisabledIcon />
   if (projectStatus === 'COMING_UP') return <LoaderIcon />
   if (isLoading) return <LoaderIcon />
   // isProjectNew has to be above UNHEALTHY because in the first few minutes, some services might be starting up and show as UNHEALTHY
@@ -341,12 +345,8 @@ export const ServiceStatus = () => {
         />
       </HoverCardTrigger>
       <HoverCardContent className="p-0 w-60" side="bottom" align="start">
-        {services.map((service) => (
-          <Link
-            href={`/project/${ref}${service.logsUrl}`}
-            key={service.name}
-            className="transition px-3 py-2 text-xs flex items-center justify-between border-b last:border-none group relative hover:bg-surface-300"
-          >
+        {services.map((service) => {
+          const serviceInfo = (
             <div className="flex gap-x-2">
               <StatusIcon
                 isLoading={service.isLoading}
@@ -368,12 +368,31 @@ export const ServiceStatus = () => {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-x-1 transition opacity-0 group-hover:opacity-100">
-              <span className="text-xs text-foreground">View logs</span>
-              <ChevronRight size={14} className="text-foreground" />
-            </div>
-          </Link>
-        ))}
+          )
+
+          // Disabled services have no logs to link out to
+          if (service.status === 'DISABLED') {
+            return (
+              <div key={service.name} className={SERVICE_ROW_CLASS}>
+                {serviceInfo}
+              </div>
+            )
+          }
+
+          return (
+            <Link
+              href={`/project/${ref}${service.logsUrl}`}
+              key={service.name}
+              className={cn(SERVICE_ROW_CLASS, 'transition group relative hover:bg-surface-300')}
+            >
+              {serviceInfo}
+              <div className="flex items-center gap-x-1 transition opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100">
+                <span className="text-xs text-foreground">View logs</span>
+                <ChevronRight size={14} className="text-foreground" />
+              </div>
+            </Link>
+          )
+        })}
         {!allServicesOperational && (
           <div className="flex gap-2 text-xs text-foreground-light px-3 py-2">
             <div className="mt-0.5">

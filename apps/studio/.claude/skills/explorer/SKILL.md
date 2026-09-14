@@ -31,13 +31,13 @@ Compose the toolbar from slots rather than adding resource-specific props:
   <ExplorerToolbarTitle>{/* static or editable title */}</ExplorerToolbarTitle>
   <ExplorerToolbarActions>
     {/* badges, source controls, display controls, and direct actions */}
-    <ExplorerToolbarAction aria-label="Run query" icon={<Play />} />
+    <ExplorerToolbarAction aria-label="Run query" icon={<Play size={16} strokeWidth={2} />} />
   </ExplorerToolbarActions>
 </ExplorerToolbar>
 ```
 
 - The row defaults to 40px and follows `--header-height` at the `md` breakpoint.
-- Use `ExplorerToolbarAction` for compact direct actions. Icon-only actions are 28px wide automatically.
+- Use `ExplorerToolbarAction` for compact direct actions. Icon-only actions are 28px wide automatically. It defaults to `text-tertiary-foreground` and `hover:text-foreground`. Pass `size={16} strokeWidth={2}` on Lucide icons.
 - Keep execution, persistence, source selection, and other resource state in the consuming Explorer surface.
 - Extend layouts with children and `className`; avoid boolean props for resource-specific variants.
 

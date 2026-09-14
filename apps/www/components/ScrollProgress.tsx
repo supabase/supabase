@@ -33,9 +33,9 @@ const ScrollProgress = () => {
   let isActive = progressPercentage <= 100
 
   return (
-    <div className="h-[2px] w-full flex justify-start relative">
+    <div className="relative h-[2px] w-full overflow-hidden">
       <div
-        className="h-full top-0 bottom-0 right-0 absolute w-screen bg-brand will-change-transform transition-opacity"
+        className="absolute inset-y-0 left-0 right-0 h-full bg-brand will-change-transform transition-opacity"
         style={{
           display: isActive ? 'absolute' : 'relative',
           transform: `translate3d(${isActive ? progressPercentage - 100 + '%' : '0'},0,0)`,

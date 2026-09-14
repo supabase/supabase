@@ -1,12 +1,15 @@
 import { useParams } from 'common'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { ComponentProps, ReactNode } from 'react'
 import { cn } from 'ui'
 
+import { EditorNavigationButton } from '../EditorNavigationButton'
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { CollapseButton } from '../Tabs/CollapseButton'
 import { EditorTabs } from '../Tabs/Tabs'
 import { useEditorType } from './EditorsLayout.hooks'
+import { useIsTemporarySqlEditorVisit } from '@/hooks/misc/useIsTemporarySqlEditorVisit'
+import { useTrack } from '@/lib/telemetry/track'
 import { useTabsStateSnapshot } from '@/state/tabs'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
@@ -62,6 +65,7 @@ export const EditorBaseLayout = ({
       resizableSidebar
       product={product}
       browserTitle={mergedBrowserTitle}
+      productMenuBadge={editor === 'sql' ? <BackToExplorerButton /> : undefined}
       productMenuClassName={productMenuClassName}
       productMenu={productMenu}
     >
@@ -77,5 +81,25 @@ export const EditorBaseLayout = ({
         <div className="h-full">{children}</div>
       </div>
     </ProjectLayoutWithAuth>
+  )
+}
+
+const BackToExplorerButton = () => {
+  const { ref } = useParams()
+  const router = useRouter()
+  const track = useTrack()
+  const { isTemporary, setIsTemporary } = useIsTemporarySqlEditorVisit(ref)
+
+  if (!ref || !isTemporary) return null
+
+  return (
+    <EditorNavigationButton
+      tooltip="Back to Explorer"
+      onClick={() => {
+        setIsTemporary(false)
+        track('sql_editor_back_explorer_clicked')
+        router.push(`/project/${ref}/explorer`)
+      }}
+    />
   )
 }

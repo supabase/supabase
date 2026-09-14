@@ -12,17 +12,9 @@ breadcrumb: 'Framework Quickstarts'
 
 Select the **Xcode > New Project > iOS > App** menu item.
 
-## 4. Install Supabase's Agent Skills (optional)
+## 4. Set up AI tooling (optional)
 
-Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
-
-Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
-
-To install, run the following command in the root of your project:
-
-```bash
-npx skills add supabase/agent-skills
-```
+<$Partial path="quickstart_ai_tooling.mdx" />
 
 ## 5. Install the Supabase client library
 
@@ -34,7 +26,7 @@ Make sure to add `Supabase` product package as a dependency to your application 
 
 ## 6. Initialize the Supabase client
 
-Create a new `Supabase.swift` file add a new Supabase instance using your project URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=swift&connectTab=mobiles):
+Create a new `Supabase.swift` file and initialize a Supabase client using your project URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=swift&connectTab=mobiles):
 
 <Button variant="primary" asChild>
   <a href="/dashboard/project/_?showConnect=true&connectTab=mobiles&framework=swift">
@@ -52,6 +44,8 @@ let supabase = SupabaseClient(
 ```
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "swift", "tab": "mobiles" }} />
+
+<$Partial path="quickstart_mobile_env_note.mdx" />
 
 ## 7. Create a data model for instruments
 
@@ -78,13 +72,17 @@ import SwiftUI
 struct ContentView: View {
 
   @State var instruments: [Instrument] = []
+  @State var errorMessage: String?
+  @State var isLoading = true
 
   var body: some View {
     List(instruments) { instrument in
       Text(instrument.name)
     }
     .overlay {
-      if instruments.isEmpty {
+      if let errorMessage {
+        Text("Error loading instruments: \(errorMessage)")
+      } else if isLoading {
         ProgressView()
       }
     }
@@ -92,8 +90,10 @@ struct ContentView: View {
       do {
         instruments = try await supabase.from("instruments").select().execute().value
       } catch {
-        dump(error)
+        errorMessage = error.localizedDescription
       }
+
+      isLoading = false
     }
   }
 }
@@ -106,6 +106,8 @@ Run the app on a simulator or a physical device by hitting `Cmd + R` on Xcode.
 ## 10. Setting up deep links (optional)
 
 If you want to implement authentication features like magic links or OAuth, you need to set up deep links to redirect users back to your app. For instructions on configuring custom URL schemes for your iOS app, see the [deep linking guide](/docs/guides/auth/native-mobile-deep-linking?platform=swift).
+
+<$Partial path="quickstart_going_to_production.mdx" />
 
 ## Next steps
 

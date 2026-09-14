@@ -245,15 +245,9 @@ const SecondStep = ({
                 name="code"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItemLayout name="code" label="Authentication code">
+                  <FormItemLayout label="Authentication code">
                     <FormControl>
-                      <Input
-                        id="code"
-                        autoFocus
-                        {...field}
-                        placeholder="XXXXXX"
-                        className="font-mono"
-                      />
+                      <Input autoFocus {...field} placeholder="XXXXXX" className="font-mono" />
                     </FormControl>
                   </FormItemLayout>
                 )}

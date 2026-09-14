@@ -2,13 +2,13 @@ import { useState } from 'react'
 
 import { customDateRangeToLogTimeRange } from './LogTimeRange.utils'
 import { maybeShowUpgradePromptIfNotEntitled } from '@/components/interfaces/Settings/Logs/Logs.utils'
-import type { LogTimeRange } from '@/data/query-sources/query-source-registry'
+import type { TimeRange } from '@/data/content/notebooks/notebook-schema'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
 export function useLogsCustomRange({
   onRangeChange,
 }: {
-  onRangeChange: (range: LogTimeRange) => void
+  onRangeChange: (range: TimeRange) => void
 }) {
   const [isCustomRangeOpen, setIsCustomRangeOpen] = useState(false)
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
@@ -17,7 +17,7 @@ export function useLogsCustomRange({
 
   const handleApplyCustomRange = ({ from, to }: { from: Date; to: Date }) => {
     const range = customDateRangeToLogTimeRange({ from, to })
-    if (maybeShowUpgradePromptIfNotEntitled(range.from, entitledToLogDays)) {
+    if (maybeShowUpgradePromptIfNotEntitled(range.start, entitledToLogDays)) {
       setShowUpgradePrompt(true)
       return
     }

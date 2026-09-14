@@ -1,0 +1,22 @@
+---
+id: 'advisors'
+title: 'Advisors'
+description: 'Deterministic security and performance findings you or an agent can pull as part of ongoing observability.'
+---
+
+Advisors are programmatic checks that ship with the platform. They inspect the live schema and return deterministic findings, such as missing indexes or incorrectly configured RLS policies.
+
+Use them as part of ongoing observability, together with [logs](/docs/guides/observability/advanced-log-filtering). A finding is not a fix. Confirm it against recent log evidence, then search [Diagnosing](/docs/guides/troubleshooting) for the check name or the object it names.
+
+You or an agent can pull the same checks from:
+
+- Studio: [Security Advisor](/dashboard/project/_/advisors/security) and [Performance Advisor](/dashboard/project/_/advisors/performance)
+- MCP: `get_advisors`
+- CLI: [`supabase db advisors`](/docs/reference/cli/supabase-db-advisors)
+- Management API: [security advisors](/docs/reference/api/v1-get-security-advisors) and [performance advisors](/docs/reference/api/v1-get-performance-advisors)
+
+The advisors run automatically in Studio. Rerun them after you resolve an issue.
+
+## Available checks
+
+<DatabaseAdvisorsIndex />

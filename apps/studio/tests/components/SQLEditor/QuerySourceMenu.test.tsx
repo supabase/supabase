@@ -43,7 +43,7 @@ describe('QuerySourceMenu', () => {
     customRender(
       <QuerySourceMenu
         id="database-snippet"
-        runSource={{ type: 'database' }}
+        runSource={{ _tag: 'database' }}
         canCreateLogsSnippet={false}
       />
     )
@@ -60,7 +60,7 @@ describe('QuerySourceMenu', () => {
     // that navigation, so the test observes exactly what the user does: does the
     // dropdown have to be reopened to see the newly-available controls?
     const { rerender } = customRender(
-      <QuerySourceMenu id="new-snippet" runSource={{ type: 'database' }} canCreateLogsSnippet />
+      <QuerySourceMenu id="new-snippet" runSource={{ _tag: 'database' }} canCreateLogsSnippet />
     )
 
     await userEvent.click(screen.getByRole('button', { name: 'Query source: Database' }))
@@ -73,7 +73,7 @@ describe('QuerySourceMenu', () => {
     rerender(
       <QuerySourceMenu
         id="new-snippet"
-        runSource={{ type: 'logs', dateRange: DEFAULT_LOG_TIME_RANGE }}
+        runSource={{ _tag: 'logs', time_range: DEFAULT_LOG_TIME_RANGE }}
         canCreateLogsSnippet
       />
     )

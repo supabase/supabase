@@ -22,7 +22,7 @@ describe('useRunSource', () => {
 
     const { result } = renderSqlEditorHook(() => useRunSource(id))
 
-    expect(result.current).toEqual({ type: 'database' })
+    expect(result.current).toEqual({ _tag: 'database' })
   })
 
   it('resolves a logs snippet with no session range to the default range', () => {
@@ -31,23 +31,19 @@ describe('useRunSource', () => {
 
     const { result } = renderSqlEditorHook(() => useRunSource(id))
 
-    expect(result.current).toEqual({ type: 'logs', dateRange: DEFAULT_LOG_TIME_RANGE })
+    expect(result.current).toEqual({ _tag: 'logs', time_range: DEFAULT_LOG_TIME_RANGE })
   })
 
   it('resolves a logs snippet to its session-stored range when one is set', () => {
     const id = 'logs-snippet-custom-range'
     seedSnippet({ id, source: 'logs' })
-    sqlEditorSessionState.setLogRange(id, {
-      type: 'relative',
-      amount: 2,
-      unit: 'hour',
-    })
+    sqlEditorSessionState.setLogRange(id, { _tag: 'relative_time_range', amount: 2, unit: 'hour' })
 
     const { result } = renderSqlEditorHook(() => useRunSource(id))
 
     expect(result.current).toEqual({
-      type: 'logs',
-      dateRange: { type: 'relative', amount: 2, unit: 'hour' },
+      _tag: 'logs',
+      time_range: { _tag: 'relative_time_range', amount: 2, unit: 'hour' },
     })
   })
 })

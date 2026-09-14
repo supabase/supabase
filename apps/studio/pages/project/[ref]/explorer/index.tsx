@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent } from 'react'
 
-import { ExplorerHome } from '@/components/interfaces/Explorer/ExplorerHome'
+import { ExplorerHomeTab } from '@/components/interfaces/Explorer/ExplorerHomeTab'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { ExplorerLayout } from '@/components/layouts/ExplorerLayout/ExplorerLayout'
 import { EXPLORER_HOME_TAB, useTabsStateSnapshot } from '@/state/tabs'
@@ -15,7 +15,7 @@ const ProjectExplorerPage: NextPageWithLayout = () => {
 
   useEffect(() => activateHomeTab(), [])
 
-  return <ExplorerHome />
+  return <ExplorerHomeTab />
 }
 
 ProjectExplorerPage.getLayout = (page) => (

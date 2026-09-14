@@ -127,6 +127,18 @@ describe('AIAssistant.utils.ts:hasPendingToolApproval', () => {
 
     expect(hasPendingToolApproval(messages)).toBe(true)
   })
+
+  test('Should ignore automatic approvals', () => {
+    const messages = createMessageWithPart({
+      type: 'tool-execute_sql',
+      toolCallId: 'call-1',
+      state: 'approval-requested',
+      input: { sql: 'select 1', label: 'Test query' },
+      approval: { id: 'approval-1', isAutomatic: true },
+    } as UIMessage['parts'][number])
+
+    expect(hasPendingToolApproval(messages)).toBe(false)
+  })
 })
 
 describe('AIAssistant.utils.ts:resolvePendingToolApprovalsAsDenied', () => {

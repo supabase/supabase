@@ -36,34 +36,27 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       })
     }
 
-    // Remove any undefined or null values from custom headers
-    const sanitizedCustomHeaders = Object.entries(customHeaders || {}).reduce(
-      (acc, [key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-          acc[key] = value as string
-        }
-        return acc
-      },
-      {} as Record<string, string>
+    // Forward the supplied headers as given, dropping empty values. Header names are case
+    // insensitive, so they are merged on their lowercased name: a supplied `content-type` replaces
+    // the default rather than sitting beside it and being comma joined by `fetch`.
+    const suppliedHeaders = new Map<string, { name: string; value: string }>([
+      ['content-type', { name: 'Content-Type', value: 'application/json' }],
+    ])
+
+    Object.entries(customHeaders || {}).forEach(([key, value]) => {
+      const name = key.trim()
+      if (name.length === 0 || value === undefined || value === null || value === '') return
+      suppliedHeaders.set(name.toLowerCase(), { name, value: value as string })
+    })
+
+    const requestHeaders: Record<string, string> = Object.fromEntries(
+      [...suppliedHeaders.values()].map(({ name, value }) => [name, value])
     )
-
-    // Only use custom headers and ensure Content-Type is set
-    const requestHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...sanitizedCustomHeaders,
-    }
-
-    // Use the test authorization header if provided
-    if (sanitizedCustomHeaders['x-test-authorization']) {
-      requestHeaders['Authorization'] = sanitizedCustomHeaders['x-test-authorization']
-      // Remove the x-test-authorization header as we've moved it to Authorization
-      delete requestHeaders['x-test-authorization']
-    }
 
     // Prepare the request body based on method and Content-Type
     let finalBody = undefined
     if (method !== 'GET' && method !== 'HEAD') {
-      if (requestHeaders['Content-Type'] === 'application/json') {
+      if (suppliedHeaders.get('content-type')?.value === 'application/json') {
         finalBody = typeof requestBody === 'string' ? requestBody : JSON.stringify(requestBody)
       } else {
         finalBody = requestBody

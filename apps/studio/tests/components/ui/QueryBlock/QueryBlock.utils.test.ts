@@ -109,6 +109,22 @@ describe('getCumulativeResults', () => {
     ])
   })
 
+  it('accumulates each key independently when yKey is an array', () => {
+    const results = {
+      rows: [
+        { x: 'a', y1: 10, y2: 1 },
+        { x: 'b', y1: 20, y2: 2 },
+        { x: 'c', y1: 5, y2: 3 },
+      ],
+    }
+    const output = getCumulativeResults(results, { yKey: ['y1', 'y2'] })
+    expect(output).toEqual([
+      { x: 'a', y1: 10, y2: 1 },
+      { x: 'b', y1: 30, y2: 3 },
+      { x: 'c', y1: 35, y2: 6 },
+    ])
+  })
+
   it('preserves other keys on each row', () => {
     const results = {
       rows: [

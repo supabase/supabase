@@ -374,4 +374,57 @@ describe('explorer query tabs', () => {
 
     expect(router.push).toHaveBeenCalledWith('/project/default/explorer/query/query-1')
   })
+
+  it('keeps Explorer tabs open when closing all table editor tabs', () => {
+    const store = createTabsState('default')
+    const router = fakeRouter()
+    store.addTab({
+      id: 'r-1',
+      type: ENTITY_TYPE.TABLE,
+      label: 'users',
+      metadata: { tableId: 1, schema: 'public' },
+      isPreview: false,
+    })
+    store.addTab({
+      id: 'query-query-1',
+      type: 'query',
+      label: 'Untitled query',
+      metadata: { queryId: 'query-1' },
+      isPreview: false,
+    })
+
+    store.handleTabCloseAll({
+      editor: 'table',
+      router,
+      onClearDashboardHistory: vi.fn(),
+    })
+
+    expect(store.openTabs).toEqual(['query-query-1'])
+    expect(store.tabsMap['query-query-1']).toBeDefined()
+  })
+
+  it('runs query cleanup for every query closed in bulk', () => {
+    const store = createTabsState('default')
+    store.addTab({
+      id: 'query-query-1',
+      type: 'query',
+      label: 'Query 1',
+      metadata: { queryId: 'query-1' },
+      isPreview: false,
+    })
+    store.addTab({
+      id: 'query-query-2',
+      type: 'query',
+      label: 'Query 2',
+      metadata: { queryId: 'query-2' },
+      isPreview: false,
+    })
+    const onClose = vi.fn()
+    store.registerTabTypeHandler('query', { onClose })
+
+    store.closeTabs(['query-query-1', 'query-query-2'])
+
+    expect(onClose).toHaveBeenCalledTimes(2)
+    expect(onClose.mock.calls.map(([tab]) => tab.metadata?.queryId)).toEqual(['query-1', 'query-2'])
+  })
 })

@@ -10,7 +10,7 @@ export type EdgeFunctionVariables = {
   slug?: string
 }
 
-export type EdgeFunction = components['schemas']['FunctionSlugResponse']
+export type EdgeFunction = components['schemas']['FunctionSlugResponse_Output']
 
 export async function getEdgeFunction(
   { projectRef, slug }: EdgeFunctionVariables,

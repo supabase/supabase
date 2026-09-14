@@ -17,6 +17,12 @@ Before you begin, make sure you have:
 
 Save your database password securely. You need it for the connection string.
 
+<Admonition type="note">
+
+This guide uses Spring Boot's own JPA entities and generated schema, not the shared `instruments` sample table used by other quickstarts.
+
+</Admonition>
+
 ## 2. Create a Spring Boot project
 
 Use [Spring Initializr](https://start.spring.io) to scaffold a new project with the Web, Spring Data JPA, and Postgres Driver dependencies. Run the following from the directory where you keep your projects.
@@ -33,43 +39,21 @@ curl https://start.spring.io/starter.zip \
 unzip instruments.zip -d instruments && cd instruments
 ```
 
-## 3. Install Supabase's Agent Skills (optional)
+## 3. Set up AI tooling (optional)
 
-Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
-
-Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
-
-To install, run the following command in the root of your project:
-
-```bash
-npx skills add supabase/agent-skills
-```
+<$Partial path="quickstart_ai_tooling.mdx" />
 
 ## 4. Set up the Postgres connection details
 
-Navigate to your project dashboard and click on [Connect](/dashboard/project/_?showConnect=true&connectTab=direct&method=session).
+<$Partial path="quickstart_connection_string.mdx" />
 
-<Admonition type="caution">
-
-The Transaction pooler (port `6543`) doesn't work as your app's main data source, because Spring Data JPA uses Hibernate, which relies on server-side prepared statements. Use the Session pooler, or the direct connection string if you're in an [IPv6 environment](/docs/guides/troubleshooting/supabase--your-network-ipv4-and-ipv6-compatibility-cHe3BP) or have the [IPv4 Add-On](/docs/guides/platform/ipv4-address).
-
-</Admonition>
-
-Under the **Session pooler** (port `5432`), select the **JDBC** tab and copy the connection string. Replace the password placeholder with your saved database password, and [percent-encode](https://en.wikipedia.org/wiki/Percent-encoding) any reserved characters it contains, such as `&`, `#`, `?`, or a space.
-
-<Admonition type="note">
-
-You can reset your database password in your [Database Settings](/dashboard/project/_/database/settings) if you do not have it.
-
-</Admonition>
+Select the **JDBC** tab to copy the connection string in the right format for Spring Boot.
 
 The connection string contains your database password, and `application.properties` is committed with your project. Set the string as an environment variable instead, and set it the same way on whatever platform you deploy to.
 
 ```bash
-export SUPABASE_DB_URL='jdbc:postgresql://aws-[REGION].pooler.supabase.com:5432/postgres?user=postgres.[PROJECT-REF]&password=[YOUR-PASSWORD]&sslmode=require'
+export SUPABASE_DB_URL='jdbc:postgresql://[POOLER-HOST]:5432/postgres?user=postgres.[PROJECT-REF]&password=[YOUR-PASSWORD]&sslmode=require'
 ```
-
-The string you copied doesn't set `sslmode`, so add it. The driver defaults to `prefer`, which falls back to sending your data in plaintext if the encrypted attempt fails. You can also [enforce SSL](/docs/guides/platform/ssl-enforcement) on the database side.
 
 Then reference the variable, along with the driver, in `src/main/resources/application.properties`.
 
@@ -85,7 +69,13 @@ If the app fails to start with `Unable to determine Dialect without JDBC metadat
 
 By default Hibernate creates tables in the `public` schema. We recommend changing this as Supabase exposes the `public` schema as a [data API](/docs/guides/api).
 
-Create the schema from the [Table Editor](/dashboard/project/_/editor) as your app will need it before start. Then point **Hibernate** at it in `application.properties`.
+Create the `app` schema before you start the app. Hibernate creates tables in that schema on startup, but it does not create the schema itself. Run the following in the [SQL Editor](/dashboard/project/_/sql/new):
+
+```sql SQL_EDITOR
+create schema if not exists app;
+```
+
+Then point Hibernate at the schema in `application.properties`.
 
 ```text name=src/main/resources/application.properties
 spring.jpa.properties.hibernate.default_schema=app
@@ -212,9 +202,11 @@ Run the Spring Boot app, and go to http://localhost:8080/instruments in your bro
 ./mvnw spring-boot:run
 ```
 
+<$Partial path="quickstart_going_to_production.mdx" />
+
 ## Next steps
 
 - Set up [Auth](/docs/guides/auth) for your app
-- Replace `ddl-auto` with [database migrations](/docs/guides/deployment/database-migrations) before going to production
 - [Insert more data](/docs/guides/database/import-data) into your database
 - Upload and serve static files using [Storage](/docs/guides/storage)
+- Replace `ddl-auto` with [database migrations](/docs/guides/deployment/database-migrations) before going to production

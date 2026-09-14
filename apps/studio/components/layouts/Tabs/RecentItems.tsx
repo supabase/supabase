@@ -17,6 +17,8 @@ export function getRecentItemHref(item: RecentItem, projectRef: string) {
       return `/project/${projectRef}/explorer/notebook/${item.metadata?.notebookId}`
     case 'chat':
       return `/project/${projectRef}/explorer/chat/${item.metadata?.chatId}`
+    case 'query':
+      return `/project/${projectRef}/explorer/query/${item.metadata?.queryId}`
     case 'r':
     case 'v':
     case 'm':

@@ -11,6 +11,7 @@ interface ReportBlockContainerProps {
   draggable?: boolean
   showDragHandle?: boolean
   tooltip?: ReactNode
+  className?: string
   onDragStart?: (e: DragEvent) => void
 }
 
@@ -23,6 +24,7 @@ export const ReportBlockContainer = ({
   draggable = false,
   showDragHandle = false,
   tooltip,
+  className,
   onDragStart,
   children,
 }: PropsWithChildren<ReportBlockContainerProps>) => {
@@ -35,7 +37,10 @@ export const ReportBlockContainer = ({
       draggable={draggable}
       unselectable={draggable ? 'on' : undefined}
       onDragStart={onDragStart}
-      className="h-full flex flex-col overflow-hidden bg-surface-100 border-overlay relative rounded-sm border shadow-xs"
+      className={cn(
+        'h-full flex flex-col overflow-hidden bg-surface-100 border-overlay relative rounded-sm border shadow-xs',
+        className
+      )}
     >
       <Tooltip>
         <TooltipTrigger asChild>

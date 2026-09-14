@@ -15,12 +15,14 @@ export const ExplorerQueryTabCoordinator = () => {
   useEffect(() => {
     return tabs.registerTabTypeHandler('query', {
       confirmClose: (queryTabs) => {
+        for (const tab of queryTabs) {
+          const queryId = tab.metadata?.queryId
+          if (ref && queryId) explorerQueryState.restoreDraft({ id: queryId, projectRef: ref })
+        }
+
         const populatedDraftCount = queryTabs.filter((tab) => {
           const queryId = tab.metadata?.queryId
-          if (!ref || !queryId) return false
-
-          explorerQueryState.restoreDraft({ id: queryId, projectRef: ref })
-
+          if (!queryId) return false
           return explorerQueryState.drafts[queryId]?.uncheckedSql.trim().length > 0
         }).length
 
@@ -40,6 +42,23 @@ export const ExplorerQueryTabCoordinator = () => {
       },
     })
   }, [ref, tabs])
+
+  useEffect(() => {
+    if (!ref) return
+
+    const flushProjectDrafts = () => explorerQueryState.flushPendingPersistence({ projectRef: ref })
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') flushProjectDrafts()
+    }
+
+    window.addEventListener('pagehide', flushProjectDrafts)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      window.removeEventListener('pagehide', flushProjectDrafts)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [ref])
 
   return null
 }

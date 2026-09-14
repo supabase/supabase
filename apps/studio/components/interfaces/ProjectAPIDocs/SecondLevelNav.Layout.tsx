@@ -116,7 +116,6 @@ const ResourcePicker = ({ category, resource, renderResourceList }: ResourcePick
     <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger asChild>
         <Button
-          variant="default"
           size="small"
           className="w-full justify-between gap-2"
           iconRight={<Code className="rotate-90" />}

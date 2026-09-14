@@ -25,7 +25,6 @@ const BASE_PARAMS = {
 
 describe('ai/tools getTools', () => {
   beforeEach(async () => {
-    vi.clearAllMocks()
     vi.mocked(getMcpTools).mockResolvedValue({ list_tables: {} } as any)
     // Reset to platform each test; the self-hosted test overrides to false.
     // Done here (not afterEach) so the spy can't leak across tests via order.
@@ -89,6 +88,7 @@ describe('ai/tools getTools', () => {
 
     expect(tools).not.toHaveProperty('list_notebooks')
     expect(tools).not.toHaveProperty('get_notebook')
+    expect(tools).not.toHaveProperty('run_notebook')
   })
 
   it('includes notebook tools only when isExplorerEnabled is true', async () => {
@@ -96,5 +96,6 @@ describe('ai/tools getTools', () => {
 
     expect(tools).toHaveProperty('list_notebooks')
     expect(tools).toHaveProperty('get_notebook')
+    expect(tools).toHaveProperty('run_notebook')
   })
 })

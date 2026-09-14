@@ -225,7 +225,6 @@ export const VectorBucketDetails = () => {
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
-                                      variant="default"
                                       className="w-7"
                                       icon={<MoreVertical />}
                                       onClick={(e) => e.stopPropagation()}

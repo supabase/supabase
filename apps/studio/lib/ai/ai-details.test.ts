@@ -45,8 +45,6 @@ describe('getAIDetails', () => {
   let mockCheckEntitlement: ReturnType<typeof vi.fn>
 
   beforeEach(async () => {
-    vi.clearAllMocks()
-
     const orgsQuery = await import('@/data/organizations/organizations-query')
     const subscriptionQuery = await import('@/data/subscriptions/org-subscription-query')
     const projectQuery = await import('@/data/projects/project-detail-query')
@@ -91,6 +89,7 @@ describe('getAIDetails', () => {
       hasAccessToAdvanceModel: false,
       hasHipaaAddon: false,
       orgId: 1,
+      orgSlug: ORG_SLUG,
       planId: 'pro',
       region: 'us-east-1',
       isSensitive: false,
@@ -189,6 +188,7 @@ describe('getAIDetails', () => {
       expect(result.aiOptInLevel).toBe('disabled')
       expect(result.hasAccessToAdvanceModel).toBe(false)
       expect(result.orgId).toBeUndefined()
+      expect(result.orgSlug).toBeUndefined()
       expect(result.planId).toBeUndefined()
     })
 
@@ -216,6 +216,7 @@ describe('getAIDetails', () => {
 
     expect(result.aiOptInLevel).toBe('disabled')
     expect(result.orgId).toBeUndefined()
+    expect(result.orgSlug).toBeUndefined()
   })
 
   it('falls back to the most restrictive posture when project detail is unavailable', async () => {

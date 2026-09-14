@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { ChatEditor } from '@/components/interfaces/Explorer/ChatEditor'
+import ChatPage from '@/pages/project/[ref]/explorer/chat/[id]'
 
 export const Route = createFileRoute('/project/$ref/explorer/chat/$id')({
   component: ProjectExplorerChatRoute,
 })
 
 function ProjectExplorerChatRoute() {
-  return <ChatEditor />
+  return <ChatPage dehydratedState={undefined} />
 }

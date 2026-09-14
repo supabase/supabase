@@ -1,116 +1,109 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  cellSourceSchema,
-  createDefaultCellSource,
+  createDefaultSourceBinding,
   getQuerySource,
-  logTimeRangeSchema,
+  getQuerySourceBinding,
   QUERY_SOURCES,
+  querySourceBindingSchema,
+  toQuerySourceBinding,
 } from './query-source-registry'
+import { timeRangeSchema } from '@/data/content/notebooks/notebook-schema'
 
 describe('query source registry', () => {
   it('registers database and logs sources with their execution endpoints', () => {
-    expect(QUERY_SOURCES.map(({ id }) => id)).toEqual(['database', 'logs'])
+    expect(QUERY_SOURCES.map(({ _tag }) => _tag)).toEqual(['database', 'logs'])
     expect(getQuerySource('database').endpoint).toBe('/platform/pg-meta/{ref}/query')
     expect(getQuerySource('logs').endpoint).toBe(
       '/platform/projects/{ref}/analytics/endpoints/logs.all.otel'
     )
   })
 
-  it('creates independent, valid default cell bindings', () => {
-    const first = createDefaultCellSource('logs')
-    const second = createDefaultCellSource('logs')
+  it('creates independent, valid default bindings', () => {
+    const first = createDefaultSourceBinding('logs')
+    const second = createDefaultSourceBinding('logs')
 
-    expect(cellSourceSchema.parse(first)).toEqual({
-      id: 'logs',
-      type: 'logs',
-      parameters: {
-        time_range: { type: 'relative', amount: 1, unit: 'hour' },
-      },
+    expect(querySourceBindingSchema.parse(first)).toEqual({
+      _tag: 'logs',
+      time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' },
     })
-    expect(first.parameters.time_range).not.toBe(second.parameters.time_range)
-    expect(cellSourceSchema.parse(createDefaultCellSource('database'))).toEqual({
-      id: 'database',
-      type: 'database',
-      parameters: {},
+    expect(first.time_range).not.toBe(second.time_range)
+    expect(querySourceBindingSchema.parse(createDefaultSourceBinding('database'))).toEqual({
+      _tag: 'database',
     })
   })
 
-  it('rejects parameters that do not match the selected source type', () => {
+  it('rejects parameters that do not match the selected source', () => {
     expect(() =>
-      cellSourceSchema.parse({
-        id: 'logs',
-        type: 'logs',
-        parameters: { identifier: 'replica-1' },
+      querySourceBindingSchema.parse({ _tag: 'logs', database_identifier: 'replica-1' })
+    ).toThrow()
+
+    expect(() =>
+      querySourceBindingSchema.parse({
+        _tag: 'database',
+        time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' },
       })
     ).toThrow()
 
     expect(() =>
-      cellSourceSchema.parse({
-        id: 'database',
-        type: 'database',
-        parameters: { time_range: { type: 'relative', amount: 1, unit: 'hour' } },
-      })
-    ).toThrow()
-
-    expect(() =>
-      cellSourceSchema.parse({
-        id: 'logs',
-        type: 'logs',
-        parameters: { time_range: { type: 'relative', amount: 2, unit: 'week' } },
+      querySourceBindingSchema.parse({
+        _tag: 'logs',
+        time_range: { _tag: 'relative_time_range', amount: 2, unit: 'fortnight' },
       })
     ).toThrow()
   })
+})
 
-  it('rejects absolute ranges that do not move forward in time', () => {
+describe('getQuerySourceBinding', () => {
+  it('projects a database cell onto its binding', () => {
     expect(
-      logTimeRangeSchema.safeParse({
-        type: 'absolute',
-        from: '2025-01-01T00:00:00.000Z',
-        to: '2025-01-02T00:00:00.000Z',
-      }).success
-    ).toBe(true)
-
-    const equal = logTimeRangeSchema.safeParse({
-      type: 'absolute',
-      from: '2025-01-01T00:00:00.000Z',
-      to: '2025-01-01T00:00:00.000Z',
-    })
-    expect(equal.success).toBe(false)
-    expect(equal.error?.issues[0].path).toEqual(['to'])
-
-    expect(
-      logTimeRangeSchema.safeParse({
-        type: 'absolute',
-        from: '2025-01-02T00:00:00.000Z',
-        to: '2025-01-01T00:00:00.000Z',
-      }).success
-    ).toBe(false)
-
-    expect(() =>
-      cellSourceSchema.parse({
-        id: 'logs',
-        type: 'logs',
-        parameters: {
-          time_range: {
-            type: 'absolute',
-            from: '2025-01-02T00:00:00.000Z',
-            to: '2025-01-01T00:00:00.000Z',
-          },
-        },
-      })
-    ).toThrow()
+      getQuerySourceBinding({ _tag: 'database_cell', database_identifier: 'replica-1' })
+    ).toEqual({ _tag: 'database', database_identifier: 'replica-1' })
   })
 
-  it('reports an invalid endpoint against its own field rather than the ordering rule', () => {
-    const result = logTimeRangeSchema.safeParse({
-      type: 'absolute',
-      from: 'not-a-date',
-      to: '2025-01-01T00:00:00.000Z',
+  it('projects a log cell onto its binding', () => {
+    expect(
+      getQuerySourceBinding({
+        _tag: 'log_cell',
+        time_range: { _tag: 'relative_time_range', unit: 'day', amount: 3 },
+      })
+    ).toEqual({ _tag: 'logs', time_range: { _tag: 'relative_time_range', unit: 'day', amount: 3 } })
+  })
+
+  it('copies the time range rather than aliasing the cell it came from', () => {
+    const time_range = { _tag: 'relative_time_range', unit: 'hour', amount: 6 } as const
+    const binding = getQuerySourceBinding({ _tag: 'log_cell', time_range })
+
+    expect(binding).toEqual({ _tag: 'logs', time_range })
+    if (binding._tag !== 'logs') throw new Error('expected a logs binding')
+    expect(binding.time_range).not.toBe(time_range)
+  })
+
+  it('accepts the coarser relative units the wire schema allows', () => {
+    expect(
+      getQuerySourceBinding({
+        _tag: 'log_cell',
+        time_range: { _tag: 'relative_time_range', unit: 'month', amount: 2 },
+      })
+    ).toEqual({
+      _tag: 'logs',
+      time_range: { _tag: 'relative_time_range', unit: 'month', amount: 2 },
+    })
+  })
+})
+
+describe('toQuerySourceBinding', () => {
+  it('projects a backend-tagged carrier such as a query draft', () => {
+    expect(toQuerySourceBinding({ _tag: 'database', database_identifier: 'replica-1' })).toEqual({
+      _tag: 'database',
+      database_identifier: 'replica-1',
     })
 
-    expect(result.success).toBe(false)
-    expect(result.error?.issues).toHaveLength(1)
-    expect(result.error?.issues[0].path).toEqual(['from'])
+    const time_range = timeRangeSchema.parse({
+      _tag: 'absolute_time_range',
+      start: '2025-01-01T00:00:00.000Z',
+      end: '2025-01-02T00:00:00.000Z',
+    })
+    expect(toQuerySourceBinding({ _tag: 'logs', time_range })).toEqual({ _tag: 'logs', time_range })
   })
 })
