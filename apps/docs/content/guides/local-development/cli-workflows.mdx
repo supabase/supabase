@@ -109,7 +109,7 @@ supabase/migrations/<timestamp>_remote_schema.sql
 
 On this initial pull, the whole migration comes from that diff, which captures your remote schema as executable SQL. This migration is your baseline. All future changes build on top of it. `db pull` also offers to record this migration as already applied in the remote migration history (the `supabase_migrations.schema_migrations` table). Accept it (non-interactive runs accept automatically) so a later `db push` won't try to reapply it.
 
-If a change crosses a transaction boundary, `db pull` may write more than one ordered migration file instead of a single file. Commit all of them. On the legacy `migra` engine, this initial pull uses `pg_dump` instead of a diff.
+If a change crosses a transaction boundary, `db pull` may write more than one ordered migration file instead of a single file. Commit all of them. On the legacy `migra` engine, this initial pull seeds the migration with `pg_dump` and appends a diff of what the dump skips.
 
 When connecting with `--db-url`, the connection pooler in session mode is the safe default. Direct connections (`db.<project-ref>.supabase.co:5432`) require IPv6 (or the IPv4 add-on), so on IPv4-only networks they fail outright.
 
@@ -123,7 +123,7 @@ The generated file can include statements you didn't expect. The engine excludes
 
 <$Partial path="managed_schemas_diff_capture.mdx" />
 
-Manage those objects with [hand-written migrations](/docs/guides/deployment/database-migrations). On the legacy `migra` engine, the initial `pg_dump` baseline includes your customizations in these schemas on recent CLI versions. If an older CLI prints a message that `auth` and `storage` were excluded, run `supabase db pull --schema auth,storage` once.
+Manage those objects with [hand-written migrations](/docs/guides/deployment/database-migrations). On later pulls, `--schema` limits the diff to the schemas you list, so leave it off (or include `auth` and `storage`) to keep capturing these customizations. On the legacy `migra` engine, the initial pull's `pg_dump` skips these schemas, but the diff pass that follows appends your triggers and RLS policies in them to the same migration. If an older CLI prints a message that `auth` and `storage` were excluded, run `supabase db pull --schema auth,storage` once.
 
 </Admonition>
 
