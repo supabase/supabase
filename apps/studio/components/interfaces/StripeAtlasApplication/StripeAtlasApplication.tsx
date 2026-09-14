@@ -55,7 +55,6 @@ export const StripeAtlasApplicationScreen = () => {
   }
 
   const decoded = params.data ? decodeBase64Param(params.data) : null
-  console.log(decoded)
 
   return (
     <InterstitialLayout
