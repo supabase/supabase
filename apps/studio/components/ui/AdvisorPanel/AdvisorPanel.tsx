@@ -27,7 +27,7 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const AdvisorPanel = () => {
   const track = useTrack()
-  const isHealthAdvisorEnabled = useFlag('healthAdvisor') === true && IS_PLATFORM
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
   const {
     categoryFilters: savedCategoryFilters,
     severityFilters,
