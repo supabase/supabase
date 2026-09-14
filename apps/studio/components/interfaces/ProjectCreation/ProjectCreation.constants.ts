@@ -8,6 +8,8 @@ export const HIGH_AVAILABILITY_POSTGRES_ENGINE = '17' satisfies PostgresEngine
 export const HIGH_AVAILABILITY_RELEASE_CHANNEL = 'ga' satisfies ReleaseChannel
 export const HIGH_AVAILABILITY_INSTANCE_SIZE: DesiredInstanceSize = 'large'
 
+export const HIGH_AVAILABILITY_SUPPORTED_PROVIDERS = new Set(['AWS_K8S'])
+
 // [Joshen] Obtained from https://gist.github.com/tadast/8827699
 export const COUNTRY_LAT_LON = {
   AF: { lat: 33, lon: 65 },

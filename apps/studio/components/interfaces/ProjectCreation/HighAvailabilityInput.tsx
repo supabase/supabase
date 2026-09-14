@@ -4,7 +4,7 @@ import { type CloudProvider } from 'shared-data'
 import { Badge, FormControl, FormField, Switch, useWatch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { HIGH_AVAILABILITY_INSTANCE_SIZE } from './ProjectCreation.constants'
+import { HIGH_AVAILABILITY_INSTANCE_SIZE, HIGH_AVAILABILITY_SUPPORTED_PROVIDERS } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import Panel from '@/components/ui/Panel'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
@@ -106,7 +106,7 @@ export const HighAvailabilityInput = ({
     setValue('dbRegion', highAvailabilityRegionName)
   }, [highAvailability, highAvailabilityRegionName, getValues, setValue])
 
-  if (!hasAccess || cloudProvider === 'AWS_NIMBUS') return null
+  if (!hasAccess || !HIGH_AVAILABILITY_SUPPORTED_PROVIDERS.has(cloudProvider)) return null
 
   return (
     <Panel.Content>
