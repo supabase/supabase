@@ -197,7 +197,7 @@ export const WarehouseSchemaTablePicker = ({
   }
 
   return (
-    <PageSection className="first:pt-0">
+    <PageSection className="pt-0!">
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>Tables</PageSectionTitle>
