@@ -2,14 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
-import {
-  ident,
-  joinSqlFragments,
-  keyword,
-  literal,
-  safeSql,
-  type SafeSqlFragment,
-} from './pg-format'
+import { joinSqlFragments, keyword, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { getScopedTablePrivilegesSql, TABLE_PRIVILEGES_SQL } from './sql/table-privileges'
 
 const pgTablePrivilegesZod = z.object({
@@ -186,20 +179,46 @@ type TablePrivilegesGrant = {
     | 'MAINTAIN'
   isGrantable?: boolean
 }
+
+function getGranteeFormat(grantee: string): {
+  format: SafeSqlFragment
+  value: SafeSqlFragment
+} {
+  if (grantee === 'public') {
+    return { format: safeSql`public`, value: safeSql`` }
+  }
+
+  // Keep the role name as a format argument rather than embedding its quoted
+  // identifier in the format string. This preserves names containing apostrophes.
+  return { format: safeSql`%I`, value: safeSql`, ${literal(grantee)}` }
+}
+
+function getDoBlockDelimiter(grantees: string[]): SafeSqlFragment {
+  let suffix = 0
+  while (true) {
+    const delimiter = suffix === 0 ? safeSql`$pg_meta$` : safeSql`$pg_meta_${literal(suffix)}$`
+    if (grantees.every((grantee) => !grantee.includes(delimiter))) {
+      return delimiter
+    }
+    suffix += 1
+  }
+}
+
 function grant(grants: TablePrivilegesGrant[]): { sql: SafeSqlFragment } {
+  const doBlockDelimiter = getDoBlockDelimiter(grants.map(({ grantee }) => grantee))
   const sql = safeSql`
-do $$
+do ${doBlockDelimiter}
 begin
 ${joinSqlFragments(
-  grants.map(
-    ({ privilegeType, relationId, grantee, isGrantable }) =>
-      safeSql`execute format('grant ${keyword(privilegeType)} on table %s to ${
-        grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
-      } ${isGrantable ? safeSql`with grant option` : safeSql``}', ${literal(relationId)}::regclass);`
-  ),
+  grants.map(({ privilegeType, relationId, grantee, isGrantable }) => {
+    const granteeFormat = getGranteeFormat(grantee)
+    return safeSql`execute format('grant ${keyword(privilegeType)} on table %s to ${granteeFormat.format} ${
+      isGrantable ? safeSql`with grant option` : safeSql``
+    }', ${literal(relationId)}::regclass${granteeFormat.value});`
+  }),
   '\n'
 )}
-end $$;
+end ${doBlockDelimiter};
 `
   return { sql }
 }
@@ -219,19 +238,20 @@ type TablePrivilegesRevoke = {
     | 'MAINTAIN'
 }
 function revoke(revokes: TablePrivilegesRevoke[]): { sql: SafeSqlFragment } {
+  const doBlockDelimiter = getDoBlockDelimiter(revokes.map(({ grantee }) => grantee))
   const sql = safeSql`
-do $$
+do ${doBlockDelimiter}
 begin
 ${joinSqlFragments(
-  revokes.map(
-    ({ privilegeType, relationId, grantee }) =>
-      safeSql`execute format('revoke ${keyword(privilegeType)} on table %s from ${
-        grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
-      }', ${literal(relationId)}::regclass);`
-  ),
+  revokes.map(({ privilegeType, relationId, grantee }) => {
+    const granteeFormat = getGranteeFormat(grantee)
+    return safeSql`execute format('revoke ${keyword(privilegeType)} on table %s from ${granteeFormat.format}', ${literal(
+      relationId
+    )}::regclass${granteeFormat.value});`
+  }),
   '\n'
 )}
-end $$;
+end ${doBlockDelimiter};
 `
   return { sql }
 }
