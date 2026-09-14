@@ -13,10 +13,7 @@ export const blockChunkSchema = z.object({
     .optional(),
 })
 
-const backendProviderValues = ['next-auth', 'supabase', 'auth0']
-
-const isBackendProvider = (value: unknown): value is (typeof backendProviderValues)[number] =>
-  backendProviderValues.includes(value as string)
+const backendProviderValues = ['next-auth', 'supabase', 'auth0'] as const
 
 export const registryEntrySchema = z.object({
   name: z.string(),
@@ -35,7 +32,7 @@ export const registryEntrySchema = z.object({
     'docs:example',
   ]),
   category: z.string().optional(),
-  backendProviders: z.array(z.string()).optional(),
+  backendProviders: z.array(z.enum(backendProviderValues)).optional(),
   subcategory: z.string().optional(),
   chunks: z.array(blockChunkSchema).optional(),
   // Optional path of file that is exported from a package
