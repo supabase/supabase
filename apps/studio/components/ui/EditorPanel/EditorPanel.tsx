@@ -621,7 +621,9 @@ export const EditorPanel = () => {
           )}
 
           {isExplorerEnabled ? (
-            <SaveQueryDropdown query={{ title: 'Run SQL', sql: currentValue }}>
+            <SaveQueryDropdown
+              query={{ title: activeSnippet?.name ?? 'Run SQL', sql: currentValue }}
+            >
               <Button size="tiny">Save</Button>
             </SaveQueryDropdown>
           ) : (
