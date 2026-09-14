@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { FilePlus, FolderPlus, Plus, ScrollText, X } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -24,6 +25,7 @@ import {
 
 import { SearchList } from './SQLEditorNavV2/SearchList'
 import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
+import { useIsDatabaseConnectionsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { type SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
@@ -39,7 +41,7 @@ export const SQLEditorMenu = () => {
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const topForPostgres = useFlag('topForPostgres')
+  const isDatabaseConnectionsEnabled = useIsDatabaseConnectionsEnabled()
   const sqlEditorLogsSource = useFlag('sqlEditorLogsSource')
   const otelLegacyLogs = useFlag('otelLegacyLogs')
   const canCreateLogsSnippet = sqlEditorLogsSource && otelLegacyLogs
@@ -178,13 +180,17 @@ export const SQLEditorMenu = () => {
         {showSearch ? <SearchList search={debouncedSearch} /> : <SQLEditorNav sort={sort} />}
       </div>
 
-      {!topForPostgres && (
-        <div className="p-4 border-t sticky bottom-0 bg-studio">
+      <div className="p-4 border-t sticky bottom-0 bg-studio">
+        {isDatabaseConnectionsEnabled ? (
+          <Button asChild block variant="default">
+            <Link href={`/project/${ref}/observability/connections`}>View running queries</Link>
+          </Button>
+        ) : (
           <Button block variant="default" onClick={() => appState.setOnGoingQueriesPanelOpen(true)}>
             View running queries
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

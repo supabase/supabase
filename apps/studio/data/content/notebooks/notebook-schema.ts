@@ -14,9 +14,12 @@ const isoDateTimeSchema = z.string().transform((raw, ctx) => {
 })
 
 const chartConfigSchema = z.object({
+  type: z.enum(['bar', 'line']),
   x_column: z.string(),
-  y_column: z.string(),
+  y_columns: z.array(z.string()),
   cumulative: z.boolean(),
+  scale: z.enum(['linear', 'log']).default('linear'),
+  show_labels: z.boolean(),
 })
 
 const absoluteTimeRangeSchema = z.object({
@@ -48,6 +51,7 @@ const databaseCellSchema = z.object({
   title: z.string().optional(),
   sql: z.string(),
   row_limit: z.number(),
+  view: z.enum(['table', 'chart']).optional(),
   chart: chartConfigSchema.optional(),
 })
 
@@ -57,6 +61,7 @@ const logCellSchema = z.object({
   title: z.string().optional(),
   sql: z.string(),
   time_range: timeRangeSchema,
+  view: z.enum(['table', 'chart']).optional(),
   chart: chartConfigSchema.optional(),
 })
 
@@ -122,19 +127,19 @@ export const agentNotebookSchema = z.object({
 export type AgentNotebook = z.infer<typeof agentNotebookSchema>
 export type AgentCell = z.infer<typeof agentCellSchema>
 
-// The domain shape: parses the same wire cell (`cellSchema`) and transforms `sql` into a
-// branded `unchecked_sql`.
+// The domain shape: parses the same wire cell (`cellSchema`), transforms `sql` into a
+// branded `unchecked_sql`, and defaults `view` to 'table'
 const cellDomainSchema = cellSchema.transform((cell) => {
   switch (cell._tag) {
     case 'markdown_cell':
       return cell
     case 'database_cell': {
-      const { sql, ...rest } = cell
-      return { ...rest, unchecked_sql: untrustedSql(sql) }
+      const { sql, view, ...rest } = cell
+      return { ...rest, view: view ?? 'table', unchecked_sql: untrustedSql(sql) }
     }
     case 'log_cell': {
-      const { sql, ...rest } = cell
-      return { ...rest, unchecked_sql: untrustedLogSql(sql) }
+      const { sql, view, ...rest } = cell
+      return { ...rest, view: view ?? 'table', unchecked_sql: untrustedLogSql(sql) }
     }
   }
 })

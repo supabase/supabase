@@ -30,7 +30,9 @@ export const CreateTableInstructionsDialog = () => {
         <Button
           variant="primary"
           icon={<Plus />}
-          className={cn(enableCreationOfTablesFromDashboard && 'rounded-r-none hover:z-10')}
+          className={cn(
+            enableCreationOfTablesFromDashboard && 'rounded-r-none hover:z-10 focus-visible:z-10'
+          )}
           onClick={() => {
             if (enableCreationOfTablesFromDashboard) setShowSheet(true)
             else setShowModal(true)
@@ -43,7 +45,7 @@ export const CreateTableInstructionsDialog = () => {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="primary"
-                className="w-7 rounded-l-none -ml-px"
+                className="w-7 rounded-l-none -ml-px focus-visible:z-10"
                 icon={<ChevronDown />}
               />
             </DropdownMenuTrigger>

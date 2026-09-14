@@ -16,7 +16,7 @@ export async function deleteAPIKey(payload: APIKeyDeleteVariables) {
   const { data, error } = await del('/v1/projects/{ref}/api-keys/{id}', {
     params: {
       path: { ref: payload.projectRef, id: payload.id },
-      query: { reveal: false },
+      query: { reveal: 'false' },
     },
   })
 

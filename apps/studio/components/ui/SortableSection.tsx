@@ -1,16 +1,43 @@
+import { useDndMonitor } from '@dnd-kit/core'
 import { useSortable } from '@dnd-kit/sortable'
 import { GripVertical } from 'lucide-react'
-import type { CSSProperties, PropsWithChildren } from 'react'
-import { cn } from 'ui'
+import type { CSSProperties, PropsWithChildren, ReactNode } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { Button, cn, DropdownMenu, DropdownMenuTrigger } from 'ui'
 
 export const SortableSection = ({
   id,
   children,
+  actions,
   gripClassName,
-}: PropsWithChildren<{ id: string; gripClassName?: string }>) => {
+  gripDropdownContent,
+}: PropsWithChildren<{
+  id: string
+  gripClassName?: string
+  actions?: ReactNode
+  gripDropdownContent?: ReactNode
+}>) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
   })
+
+  const [menuOpen, setMenuOpen] = useState(false)
+  const isDraggingRef = useRef(false)
+  const openTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+
+  useDndMonitor({
+    onDragStart: (event) => {
+      if (event.active.id === id) isDraggingRef.current = true
+    },
+    onDragEnd: (event) => {
+      if (event.active.id === id) isDraggingRef.current = false
+    },
+    onDragCancel: (event) => {
+      if (event.active.id === id) isDraggingRef.current = false
+    },
+  })
+
+  useEffect(() => () => clearTimeout(openTimeoutRef.current), [])
 
   const style: CSSProperties = {
     transform: transform
@@ -23,22 +50,43 @@ export const SortableSection = ({
     <div
       ref={setNodeRef}
       style={style}
-      className="relative will-change-transform flex items-start gap-x-2"
+      className="group relative will-change-transform flex items-start gap-x-4"
     >
-      <button
-        type="button"
-        aria-label="Drag to reorder section"
-        className={cn(
-          'text-foreground-muted hover:text-foreground cursor-grab active:cursor-grabbing',
-          'rounded-sm focus-ring',
-          gripClassName
-        )}
-        {...attributes}
-        {...listeners}
-        tabIndex={0}
-      >
-        <GripVertical size={14} />
-      </button>
+      <div className={cn('flex items-center', gripClassName)}>
+        {actions}
+        <DropdownMenu
+          open={menuOpen}
+          onOpenChange={(open) => {
+            clearTimeout(openTimeoutRef.current)
+
+            if (!open) {
+              setMenuOpen(false)
+              return
+            }
+
+            openTimeoutRef.current = setTimeout(() => {
+              if (!isDraggingRef.current) setMenuOpen(true)
+            }, 150)
+          }}
+        >
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="text"
+              aria-label="Drag to reorder section"
+              className={cn(
+                'w-6 text-foreground-muted hover:text-foreground cursor-grab active:cursor-grabbing',
+                'rounded-sm focus-ring'
+              )}
+              {...attributes}
+              {...listeners}
+              tabIndex={0}
+              icon={<GripVertical />}
+            />
+          </DropdownMenuTrigger>
+          {gripDropdownContent}
+        </DropdownMenu>
+      </div>
       <div className={cn('w-full', isDragging && 'opacity-70')}>{children}</div>
     </div>
   )

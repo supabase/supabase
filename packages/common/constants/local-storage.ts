@@ -52,6 +52,8 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_SORT: (ref: string) => `sql-editor-sort-${ref}`,
   SQL_EDITOR_MANUAL_SAVE_NOTICE_DISMISSED: 'sql-editor-manual-save-notice-dismissed',
 
+  EXPLORER_QUERY_DRAFTS: (ref: string) => `explorer-query-drafts-${ref}`,
+
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
   GRAPHQL_INTROSPECTION_NOTICE_COLLAPSED: (ref: string) =>
     `graphql-introspection-notice-collapsed-${ref}`,

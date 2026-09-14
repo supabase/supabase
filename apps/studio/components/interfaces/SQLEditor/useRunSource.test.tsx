@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { DEFAULT_LOG_DATE_RANGE } from './querySource'
 import { useRunSource } from './useRunSource'
+import { DEFAULT_LOG_TIME_RANGE } from '@/data/query-sources/query-source-registry'
 import { sqlEditorSessionState } from '@/state/sql-editor/sql-editor-session-state'
 import {
   renderSqlEditorHook,
@@ -31,22 +31,23 @@ describe('useRunSource', () => {
 
     const { result } = renderSqlEditorHook(() => useRunSource(id))
 
-    expect(result.current).toEqual({ type: 'logs', dateRange: DEFAULT_LOG_DATE_RANGE })
+    expect(result.current).toEqual({ type: 'logs', dateRange: DEFAULT_LOG_TIME_RANGE })
   })
 
   it('resolves a logs snippet to its session-stored range when one is set', () => {
     const id = 'logs-snippet-custom-range'
     seedSnippet({ id, source: 'logs' })
     sqlEditorSessionState.setLogRange(id, {
-      kind: 'relative',
-      last: { amount: 2, unit: 'hour' },
+      type: 'relative',
+      amount: 2,
+      unit: 'hour',
     })
 
     const { result } = renderSqlEditorHook(() => useRunSource(id))
 
     expect(result.current).toEqual({
       type: 'logs',
-      dateRange: { kind: 'relative', last: { amount: 2, unit: 'hour' } },
+      dateRange: { type: 'relative', amount: 2, unit: 'hour' },
     })
   })
 })

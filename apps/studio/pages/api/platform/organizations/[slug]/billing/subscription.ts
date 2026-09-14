@@ -35,7 +35,7 @@ const handleGet = async (_req: NextApiRequest, res: NextApiResponse<ResponseData
     project_addons: [],
     payment_method_type: '',
     billing_via_partner: false,
-    billing_partner: 'fly',
+    billing_partner: 'aws_marketplace',
     scheduled_plan_change: null,
     customer_balance: 0,
   }

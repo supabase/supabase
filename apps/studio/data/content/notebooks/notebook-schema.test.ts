@@ -225,6 +225,7 @@ describe('notebookDomainSchema', () => {
       _tag: 'database_cell',
       id: FULL_NOTEBOOK.cells[1].id,
       row_limit: 100,
+      view: 'table',
       unchecked_sql: untrustedSql('select * from auth.users limit 100'),
     })
     expect(databaseCell).not.toHaveProperty('sql')

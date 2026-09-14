@@ -78,25 +78,11 @@ describe('formatLogTick', () => {
 
 describe('getCumulativeResults', () => {
   it('returns empty array when results are empty', () => {
-    expect(
-      getCumulativeResults(
-        { rows: [] },
-        { type: 'bar', xKey: 'x', yKey: 'y', cumulative: false, showLabels: false, showGrid: false }
-      )
-    ).toEqual([])
+    expect(getCumulativeResults({ rows: [] }, { yKey: 'y' })).toEqual([])
   })
 
   it('returns empty array when results are undefined', () => {
-    expect(
-      getCumulativeResults(undefined as any, {
-        type: 'bar',
-        xKey: 'x',
-        yKey: 'y',
-        cumulative: false,
-        showLabels: false,
-        showGrid: false,
-      })
-    ).toEqual([])
+    expect(getCumulativeResults(undefined as any, { yKey: 'y' })).toEqual([])
   })
 
   it('accumulates yKey values across rows', () => {

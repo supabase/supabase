@@ -8,42 +8,37 @@ import {
   DropdownMenuSubTrigger,
 } from 'ui'
 
-import {
-  datePickerValueToLogDateRange,
-  logDateRangesEqual,
-  type LogDateRange,
-} from '../../querySource'
+import { datePickerValueToLogTimeRange, logTimeRangesEqual } from './LogTimeRange.utils'
 import { EXPLORER_DATEPICKER_HELPERS } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import { maybeShowUpgradePromptIfNotEntitled } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import type { LogTimeRange } from '@/data/query-sources/query-source-registry'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
 
-export const TimeRangeSubMenu = ({
-  id,
+export const LogsTimeRangeSubMenu = ({
   range,
+  onRangeChange,
   onOpenCustomRange,
   onShowUpgrade,
 }: {
-  id: string
-  range: LogDateRange
+  range: LogTimeRange
+  onRangeChange: (range: LogTimeRange) => void
   onOpenCustomRange: () => void
   onShowUpgrade: () => void
 }) => {
-  const sessionSnap = useSqlEditorSessionSnapshot()
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToLogDays = getEntitlementNumericValue()
 
-  const isCustomRange = range.kind === 'absolute'
+  const isCustomRange = range.type === 'absolute'
   const presets = EXPLORER_DATEPICKER_HELPERS.map((helper) => ({
     helper,
-    range: datePickerValueToLogDateRange({
+    range: datePickerValueToLogTimeRange({
       from: helper.calcFrom(),
       to: helper.calcTo(),
       isHelper: true,
       text: helper.text,
     }),
   }))
-  const selectedPreset = presets.find((preset) => logDateRangesEqual(range, preset.range))
+  const selectedPreset = presets.find((preset) => logTimeRangesEqual(range, preset.range))
 
   return (
     <DropdownMenuSub>
@@ -59,7 +54,7 @@ export const TimeRangeSubMenu = ({
       </DropdownMenuSubTrigger>
       <DropdownMenuSubContent className="w-52">
         {presets.map(({ helper, range: presetRange }) => {
-          const isSelected = !isCustomRange && logDateRangesEqual(range, presetRange)
+          const isSelected = !isCustomRange && logTimeRangesEqual(range, presetRange)
           const isLocked = maybeShowUpgradePromptIfNotEntitled(helper.calcFrom(), entitledToLogDays)
 
           return (
@@ -68,7 +63,7 @@ export const TimeRangeSubMenu = ({
               className="justify-between"
               onClick={() => {
                 if (isLocked) return onShowUpgrade()
-                sessionSnap.setLogRange(id, presetRange)
+                onRangeChange(presetRange)
               }}
             >
               <span>{helper.text}</span>

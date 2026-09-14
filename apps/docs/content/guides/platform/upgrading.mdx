@@ -18,7 +18,7 @@ Free projects will move to the latest minor version when their paused project is
 
 The upgrade process is as follows:
 
-1. Use the "Upgrade project" button on the [Infrastructure](/dashboard/project/_/settings/infrastructure) section of your dashboard.
+1. Use the "Upgrade project" button on the [General settings](/dashboard/project/_/settings/general) page of your dashboard.
 2. An estimate of the time to upgrade is shown and anything that needs to be addressed before you are eligible to upgrade is shown as a warning. Ensure you have reviewed the [caveats](#caveats) section of this document before executing the upgrade.
 3. Your project is taken offline and the Dashboard shows the upgrade status.
 4. Behind the scenes, a new instance is created running the latest version of Supabase.
@@ -39,7 +39,7 @@ When upgrading, a notification will inform you about what is blocking the upgrad
 3. Logical replication slots must be dropped.
 4. Deprecated/unsupported extensions must be dropped. Extensions can have dependencies, make sure you backup that data to restore it after the upgrade, with the updated extension version.
 
-Newer versions of services can break functionality or change the performance characteristics you rely on. If your project is eligible for an upgrade, you will be able to find your current service versions from within [the Supabase dashboard](/dashboard/project/_/settings/infrastructure).
+Newer versions of services can break functionality or change the performance characteristics you rely on. If your project is eligible for an upgrade, you will be able to find your current service versions from within [the Supabase dashboard](/dashboard/project/_/settings/general).
 
 Breaking changes are generally only present in major version upgrades of Postgres and PostgREST. You can find their respective release notes at:
 

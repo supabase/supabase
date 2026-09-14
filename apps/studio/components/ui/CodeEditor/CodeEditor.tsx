@@ -42,6 +42,7 @@ interface CodeEditorProps {
   hideLineNumbers?: boolean
   className?: string
   wrapperClassName?: string
+  placeholderClassName?: string
   loading?: boolean
   options?: EditorProps['options']
   value?: string
@@ -71,6 +72,7 @@ export const CodeEditor = ({
   hideLineNumbers = false,
   className,
   wrapperClassName,
+  placeholderClassName,
   loading,
   options,
   value,
@@ -273,9 +275,10 @@ export const CodeEditor = ({
       {placeholder !== undefined && (
         <div
           className={cn(
-            'monaco-placeholder absolute top-[3px] left-[57px] text-sm pointer-events-none font-mono',
+            'monaco-placeholder absolute top-[5px] left-[57px] text-sm pointer-events-none font-mono',
             '[&>div>p]:text-foreground-lighter [&>div>p]:m-0! tracking-tighter',
-            showPlaceholder ? 'block' : 'hidden'
+            showPlaceholder ? 'block' : 'hidden',
+            placeholderClassName
           )}
         >
           <Markdown content={placeholder} />

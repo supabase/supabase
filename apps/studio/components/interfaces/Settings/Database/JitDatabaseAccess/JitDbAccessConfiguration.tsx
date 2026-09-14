@@ -318,19 +318,15 @@ export const JitDbAccessConfiguration = () => {
   const unavailableTitle =
     unavailableReason === 'postgres_upgrade_required'
       ? 'Postgres upgrade required'
-      : unavailableReason === 'manual_migration_required'
-        ? 'Migration required'
-        : unavailableReason === 'ssl_enforcement_required'
-          ? 'SSL enforcement required'
-          : 'Temporary access unavailable'
+      : unavailableReason === 'ssl_enforcement_required'
+        ? 'SSL enforcement required'
+        : 'Temporary access unavailable'
   const unavailableDescription =
     unavailableReason === 'postgres_upgrade_required'
       ? 'must be upgraded to Postgres 17 or later before temporary access can be enabled.'
-      : unavailableReason === 'manual_migration_required'
-        ? 'must be migrated before temporary access can be enabled. Contact support to migrate this project.'
-        : unavailableReason === 'ssl_enforcement_required'
-          ? 'must have SSL enforcement enabled before temporary access can be enabled.'
-          : 'This feature is currently unavailable for this project. Contact support if you need help enabling it.'
+      : unavailableReason === 'ssl_enforcement_required'
+        ? 'must have SSL enforcement enabled before temporary access can be enabled.'
+        : 'This feature is currently unavailable for this project. Contact support if you need help enabling it.'
 
   useEffect(() => {
     if (!isLoadingConfiguration && jitDbAccessConfiguration) {
@@ -386,12 +382,13 @@ export const JitDbAccessConfiguration = () => {
               layout="responsive"
               title={unavailableTitle}
               description={
-                unavailableReason === 'temporarily_unavailable' ? (
-                  unavailableDescription
-                ) : (
+                unavailableReason === 'postgres_upgrade_required' ||
+                unavailableReason === 'ssl_enforcement_required' ? (
                   <>
                     {projectReference} {unavailableDescription}
                   </>
+                ) : (
+                  unavailableDescription
                 )
               }
               actions={

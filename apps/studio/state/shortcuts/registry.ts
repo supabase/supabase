@@ -266,7 +266,7 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   },
   [SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE]: {
     id: SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE,
-    label: 'Maximize assistant',
+    label: 'Open chat in Explorer',
     sequence: ['A', '='],
     showInSettings: false,
   },
