@@ -8,6 +8,7 @@ import {
   getColumnPath,
   getFolderObjectMoves,
   getItemPath,
+  getItemsToDrag,
   getParentPath,
   isWithinMoveLimit,
   joinPaths,
@@ -142,6 +143,38 @@ describe('toMoveCandidates', () => {
     expect(toMoveCandidates(openedFolders, items)).toEqual([
       { path: 'photos/beach.png', isFolder: false },
       { path: 'photos/holiday', isFolder: true },
+    ])
+  })
+})
+
+describe('getItemsToDrag', () => {
+  const beach = createItem('beach.png', STORAGE_ROW_TYPES.FILE, 0)
+  const sunset = createItem('sunset.png', STORAGE_ROW_TYPES.FILE, 0)
+
+  it('drags only the grabbed row when nothing else is selected', () => {
+    expect(getItemsToDrag([], beach, [])).toEqual([beach])
+    expect(getItemsToDrag([], beach, [beach])).toEqual([beach])
+  })
+
+  it('drags the whole selection when the grabbed row is part of it', () => {
+    expect(getItemsToDrag([], beach, [beach, sunset])).toEqual([beach, sunset])
+  })
+
+  it('drags only the grabbed row when it sits outside the selection', () => {
+    const outside = createItem('outside.png', STORAGE_ROW_TYPES.FILE, 0)
+
+    expect(getItemsToDrag([], outside, [beach, sunset])).toEqual([outside])
+  })
+
+  it('does not treat every folder as selected when one folder is in the selection', () => {
+    // Folders carry a null id, so an id comparison would match both of these
+    const selectedFolder = { ...createItem('archive', STORAGE_ROW_TYPES.FOLDER, 0), id: null }
+    const otherFolder = { ...createItem('photos', STORAGE_ROW_TYPES.FOLDER, 0), id: null }
+
+    expect(getItemsToDrag([], otherFolder, [selectedFolder, beach])).toEqual([otherFolder])
+    expect(getItemsToDrag([], selectedFolder, [selectedFolder, beach])).toEqual([
+      selectedFolder,
+      beach,
     ])
   })
 })

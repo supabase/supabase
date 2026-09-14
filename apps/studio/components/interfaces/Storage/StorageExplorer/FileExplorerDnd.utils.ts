@@ -33,6 +33,27 @@ export const getColumnPath = (openedFolders: StorageItem[], columnIndex: number)
 export const getItemPath = (openedFolders: StorageItem[], item: StorageItemWithColumn) =>
   joinPaths(getColumnPath(openedFolders, item.columnIndex), item.name)
 
+/**
+ * Dragging a row that belongs to the current selection drags the whole selection with it.
+ *
+ * Membership goes by path rather than by id: folders carry a null id, so an id comparison
+ * matches every folder row in a column as soon as one folder is in the selection.
+ */
+export const getItemsToDrag = (
+  openedFolders: StorageItem[],
+  item: StorageItemWithColumn,
+  selectedItems: StorageItemWithColumn[]
+): StorageItemWithColumn[] => {
+  if (selectedItems.length < 2) return [item]
+
+  const itemPath = getItemPath(openedFolders, item)
+  const isInSelection = selectedItems.some(
+    (selected) => getItemPath(openedFolders, selected) === itemPath
+  )
+
+  return isInSelection ? [...selectedItems] : [item]
+}
+
 export const toMoveCandidates = (
   openedFolders: StorageItem[],
   items: StorageItemWithColumn[]

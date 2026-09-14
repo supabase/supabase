@@ -7,6 +7,7 @@ import { useFileExplorerDnd } from './FileExplorerDnd'
 import {
   canMoveItemsTo,
   getItemPath,
+  getItemsToDrag,
   getRowDragId,
   getRowDropId,
   isWithinMoveLimit,
@@ -17,7 +18,6 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 interface UseFileExplorerRowDndParams {
   item: StorageItemWithColumn
   selectedItems: StorageItemWithColumn[]
-  isSelected: boolean
   /** Whether the user is allowed to move items in this bucket */
   canMoveItems: boolean
 }
@@ -30,7 +30,6 @@ interface UseFileExplorerRowDndParams {
 export const useFileExplorerRowDnd = ({
   item,
   selectedItems,
-  isSelected,
   canMoveItems,
 }: UseFileExplorerRowDndParams) => {
   const { openedFolders } = useStorageExplorerStateSnapshot()
@@ -40,7 +39,7 @@ export const useFileExplorerRowDnd = ({
   const isFolder = item.type === STORAGE_ROW_TYPES.FOLDER
   const isReady = item.status === STORAGE_ROW_STATUS.READY
 
-  const itemsToDrag = isSelected && selectedItems.length > 1 ? [...selectedItems] : [item]
+  const itemsToDrag = getItemsToDrag(openedFolders, item, selectedItems)
   const isDraggable = canMoveItems && isReady && item.type !== STORAGE_ROW_TYPES.BUCKET
 
   const { listeners, setNodeRef, isDragging } = useDraggable({

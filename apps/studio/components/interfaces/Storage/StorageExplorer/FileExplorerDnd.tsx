@@ -1,6 +1,7 @@
 import {
   DndContext,
   DragOverlay,
+  getClientRect,
   PointerSensor,
   pointerWithin,
   useSensor,
@@ -9,6 +10,7 @@ import {
   type CollisionDetection,
   type DragEndEvent,
   type DragStartEvent,
+  type MeasuringConfiguration,
   type Over,
 } from '@dnd-kit/core'
 import { createContext, useContext, useState, type PropsWithChildren } from 'react'
@@ -29,6 +31,18 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
  * or previews a file.
  */
 const DRAG_ACTIVATION_DISTANCE = 5
+
+/**
+ * Rows live in a virtualized list that positions each one with `transform: translateY(...)`.
+ * dnd-kit measures with `getTransformAgnosticClientRect` by default, which subtracts an
+ * element's own transform — that collapses every row onto the top of the list, so the drag
+ * preview starts in the wrong place and every row reports the same drop area. `getClientRect`
+ * keeps the transform, which is the position the row actually occupies on screen.
+ */
+const MEASURING: MeasuringConfiguration = {
+  draggable: { measure: getClientRect },
+  droppable: { measure: getClientRect },
+}
 
 const FileExplorerDndContext = createContext<{ draggedItems: StorageItemWithColumn[] }>({
   draggedItems: [],
@@ -61,23 +75,22 @@ const DragPreview = ({ items }: { items: StorageItemWithColumn[] }) => {
   const [firstItem] = items
   if (!firstItem) return null
 
+  // The overlay is sized to the row being dragged, so the preview fills it to read as a copy
   return (
-    <div className="w-fit rounded-md border border-strong bg-surface-200 px-2.5 py-1.5 shadow-md">
-      <div className="flex items-center gap-x-2">
-        <StorageRowIcon
-          view={STORAGE_VIEWS.COLUMNS}
-          status={firstItem.status}
-          fileType={firstItem.type}
-          mimeType={firstItem.metadata?.mimetype}
-        />
-        <span className="max-w-60 truncate text-sm">
-          {items.length > 1 ? `${items.length} items` : firstItem.name}
-        </span>
-      </div>
+    <div className="flex h-full w-full items-center gap-x-2 rounded-md border border-strong bg-surface-200 px-2.5 opacity-90 shadow-md">
+      <StorageRowIcon
+        view={STORAGE_VIEWS.COLUMNS}
+        status={firstItem.status}
+        fileType={firstItem.type}
+        mimeType={firstItem.metadata?.mimetype}
+      />
+      <span className="truncate text-sm">
+        {items.length > 1 ? `${items.length} items` : firstItem.name}
+      </span>
       {!isWithinMoveLimit(items.length) && (
-        <p className="mt-0.5 text-xs text-destructive-600">
-          Move up to {MAX_ITEMS_PER_MOVE} items at a time
-        </p>
+        <span className="ml-auto shrink-0 text-xs text-destructive-600">
+          Max {MAX_ITEMS_PER_MOVE} items
+        </span>
       )}
     </div>
   )
@@ -116,6 +129,7 @@ export const FileExplorerDndProvider = ({ children }: PropsWithChildren) => {
   return (
     <DndContext
       sensors={sensors}
+      measuring={MEASURING}
       collisionDetection={preferRowOverColumn}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
@@ -123,7 +137,7 @@ export const FileExplorerDndProvider = ({ children }: PropsWithChildren) => {
     >
       <FileExplorerDndContext.Provider value={{ draggedItems }}>
         {children}
-        <DragOverlay dropAnimation={null}>
+        <DragOverlay dropAnimation={null} className="pointer-events-none">
           {draggedItems.length > 0 && <DragPreview items={draggedItems} />}
         </DragOverlay>
       </FileExplorerDndContext.Provider>

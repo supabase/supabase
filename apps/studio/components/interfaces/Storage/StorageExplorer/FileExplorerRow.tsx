@@ -94,7 +94,6 @@ export const FileExplorerRow = ({
   const { setNodeRef, dragListeners, isDragging, isDropTarget } = useFileExplorerRowDnd({
     item: itemWithColumnIndex,
     selectedItems,
-    isSelected,
     canMoveItems: canUpdateFiles,
   })
 
