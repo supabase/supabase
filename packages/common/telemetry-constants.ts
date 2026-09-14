@@ -3669,6 +3669,8 @@ export interface UnifiedLogsRowClickedEvent {
      * Service that produced the log row. Mirrors `LOG_TYPES` in UnifiedLogs.constants.tsx.
      * Server values are validated against this set by zod (UnifiedLogs.schema.ts) before
      * reaching the table; anything else is rejected upstream so the union here is exhaustive.
+     *
+     * @cutover 'workers' renamed to 'compute' on 2026-09-10 (#50208); historical data before that date uses 'workers'.
      */
     logType:
       | 'edge'
