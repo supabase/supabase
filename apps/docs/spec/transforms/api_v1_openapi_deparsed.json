@@ -17938,6 +17938,9 @@
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           },
+          "act": {
+            "type": "string"
+          },
           "user_role": {
             "type": "object",
             "properties": {
@@ -17987,7 +17990,7 @@
             "required": ["role"]
           }
         },
-        "required": ["user_id", "user_role"]
+        "required": ["user_role"]
       },
       "JitListAccessResponse_Output": {
         "type": "object",
