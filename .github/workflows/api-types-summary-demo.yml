@@ -1,0 +1,63 @@
+name: API types diff summary demo
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/api-types-summary-demo.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  demonstrate-type-mismatch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Demonstrate an intentional API type mismatch
+        run: |
+          node --input-type=module <<'NODE'
+          import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+          import { tmpdir } from 'node:os'
+          import { join } from 'node:path'
+          import { reportTypeDifferences } from './packages/api-types/scripts/verify-production-types.mjs'
+
+          const directory = await mkdtemp(join(tmpdir(), 'api-types-demo-'))
+          const typesDirectory = join(directory, 'committed')
+          const generatedTypesDirectory = join(directory, 'production')
+
+          try {
+            await mkdir(typesDirectory)
+            await mkdir(generatedTypesDirectory)
+            await writeFile(join(typesDirectory, 'api-v1.d.ts'), [
+              'export interface DemoProject {',
+              '  id: string',
+              '  name: string',
+              '  status: string',
+              '}',
+              '',
+            ].join('\n'))
+            await writeFile(join(generatedTypesDirectory, 'api-v1.d.ts'), [
+              'export interface DemoProject {',
+              '  id: string',
+              '  name: string',
+              "  status: 'active' | 'paused'",
+              '  region: string',
+              '}',
+              '',
+            ].join('\n'))
+            await reportTypeDifferences(['api-v1.d.ts'], {
+              typesDirectory,
+              generatedTypesDirectory,
+            })
+            throw new Error('Intentional demo failure: committed API types do not match production fixture.')
+          } finally {
+            await rm(directory, { recursive: true, force: true })
+          }
+          NODE
