@@ -164,7 +164,7 @@ export const WarehouseSchemaTablePicker = ({
   // start toggling (an early toggle would otherwise pin an override that omits existing tables).
   if (isSchemasPending || isTablesPending || isSelectionPending) {
     return (
-      <PageSection className="first:pt-0">
+      <PageSection className="pt-0!">
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>Tables</PageSectionTitle>
