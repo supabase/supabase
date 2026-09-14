@@ -11,7 +11,7 @@
   "registryDependencies": [],
   "files": [
     {
-      "path": "registry/default/clients/nuxtjs/lib/supabase/client.ts",
+      "path": "lib/supabase/client.ts",
       "content": "import { createBrowserClient } from '@supabase/ssr'\n\nexport function createClient() {\n  return createBrowserClient(\n    process.env.NUXT_PUBLIC_SUPABASE_URL!,\n    process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!\n  )\n}\n",
       "type": "registry:lib"
     },
