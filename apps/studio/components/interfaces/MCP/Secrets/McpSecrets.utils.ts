@@ -3,7 +3,6 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
 
 import type { InterstitialTerminalCopy } from '../InterstitialTerminalScreen'
-import { UNKNOWN_CLIENT_LABEL } from './McpSecrets.constants'
 import type {
   SecretProviderHint,
   SecretRequest,
