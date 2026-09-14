@@ -15,11 +15,10 @@ import {
 } from './AdvisorPanel.utils'
 import { EmptyAdvisor } from './EmptyAdvisor'
 import type { Notification } from '@/data/notifications/notifications-v2-query'
-import { IS_PLATFORM } from '@/lib/constants'
 import type { AdvisorCategory, AdvisorSeverity } from '@/state/advisor-state'
 
 const NoProjectNotice = () => {
-  const isHealthAdvisorEnabled = useFlag('healthAdvisor') === true && IS_PLATFORM
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
   return (
     <div className="absolute top-28 px-6 flex flex-col items-center justify-center w-full gap-y-2">
       <Inbox className="text-foreground-muted" strokeWidth={1} />
