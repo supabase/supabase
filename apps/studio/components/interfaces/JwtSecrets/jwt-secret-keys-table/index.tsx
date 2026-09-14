@@ -412,6 +412,7 @@ export const JWTSecretKeysTable = () => {
           </DialogSection>
           <DialogFooter>
             <Button
+              variant="primary"
               loading={isMigrating}
               onClick={() => migrateJWTSecret({ projectRef: projectRef! })}
             >

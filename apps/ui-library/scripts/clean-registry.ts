@@ -40,6 +40,13 @@ function processJsonFile(filePath: string) {
       }
     }
 
+    // Registry source routes are absent from this app's generated TanStack tree.
+    // Consumers generate their own tree, where this suppression would be unused.
+    stringified = stringified.replaceAll(
+      '// @ts-expect-error The local generated route tree does not include this block route.\\n',
+      ''
+    )
+
     // Write back to file
     fs.writeFileSync(filePath, stringified)
     console.log(`✓ Updated ${filePath}`)

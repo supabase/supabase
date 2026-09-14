@@ -54,10 +54,9 @@ export const getTools = async ({
     }
   } else if (accessToken) {
     // If platform, fetch MCP and other platform specific tools. The MCP tools
-    // may be fetched from the remote MCP server over the network (see
-    // `USE_REMOTE_MCP`), so a failure there (outage, timeout, auth) should
-    // degrade gracefully to the remaining tools rather than break the entire
-    // assistant.
+    // are fetched from the remote MCP server over the network, so a failure
+    // there (outage, timeout, auth) should degrade gracefully to the remaining
+    // tools rather than break the entire assistant.
     let mcpTools: ToolSet = {}
     try {
       mcpTools = await getMcpTools({

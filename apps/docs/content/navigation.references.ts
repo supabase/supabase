@@ -44,6 +44,20 @@ export const REFERENCES = {
       },
     },
   },
+  middleware: {
+    type: 'sdk',
+    name: 'Middleware',
+    library: '@supabase/middleware',
+    libPath: 'middleware',
+    versions: ['v1'],
+    typeSpec: true,
+    icon: 'reference-javascript',
+    meta: {
+      v1: {
+        libId: 'reference_middleware_v1',
+      },
+    },
+  },
   dart: {
     type: 'sdk',
     name: 'Flutter',

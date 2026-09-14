@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ContextMenuContent } from '@ui/components/shadcn/ui/context-menu'
 import { IS_PLATFORM, useParams } from 'common'
 import { Copy, Eye, EyeOff, Play } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -10,6 +9,7 @@ import {
   Checkbox,
   cn,
   ContextMenu,
+  ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
   copyToClipboard,
@@ -486,11 +486,7 @@ export const LogTable = ({
 
       {showHistogramToggle && (
         <div className="flex items-center gap-2">
-          <Button
-            variant="default"
-            icon={isHistogramShowing ? <Eye /> : <EyeOff />}
-            onClick={onHistogramToggle}
-          >
+          <Button icon={isHistogramShowing ? <Eye /> : <EyeOff />} onClick={onHistogramToggle}>
             Histogram
           </Button>
         </div>
@@ -499,7 +495,6 @@ export const LogTable = ({
       <div className="gap-x-2 flex items-center">
         {IS_PLATFORM && (
           <ButtonTooltip
-            variant="default"
             onClick={onSave}
             loading={isSaving}
             disabled={!canCreateLogQuery || !hasEditorValue}

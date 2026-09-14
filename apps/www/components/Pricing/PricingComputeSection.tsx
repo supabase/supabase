@@ -5,8 +5,7 @@ import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
 import { useWindowSize } from 'react-use'
 import { plans as allPlans } from 'shared-data/plans'
-import { Button, cn } from 'ui'
-import { ToggleGroup, ToggleGroupItem } from 'ui/src/components/shadcn/ui/toggle-group'
+import { Button, cn, ToggleGroup, ToggleGroupItem } from 'ui'
 
 import Panel from '../Panel'
 import ComputePricingCalculator from './ComputePricingCalculator'
@@ -129,7 +128,7 @@ const PricingComputeSection = () => {
             </h3>
           </div>
 
-          <Button asChild size="tiny" variant="default">
+          <Button asChild size="tiny">
             <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
               Learn about Compute add-ons
             </Link>

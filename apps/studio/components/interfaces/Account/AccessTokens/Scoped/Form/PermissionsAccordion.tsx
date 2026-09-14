@@ -13,8 +13,6 @@ import { getActivePreset, type PermissionPreset } from '../../AccessToken.preset
 import type { TokenAccessEvaluation } from '../../AccessToken.roles'
 import { PermissionPresetSelect } from './PermissionPresetSelect'
 import { PermissionRow } from './PermissionRow'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { DOCS_URL } from '@/lib/constants'
 
 interface PermissionsAccordionProps {
   selection: PermissionSelection
@@ -42,11 +40,7 @@ export const PermissionsAccordion = ({
         description={
           <p className="text-foreground-lighter text-sm">
             Grant the minimum access this token needs. Everything defaults to None. Permissions
-            follow your role in the organizations and projects you're a member of — see{' '}
-            <InlineLink href={`${DOCS_URL}/guides/platform/access-control`}>
-              access control
-            </InlineLink>{' '}
-            for how roles work.
+            follow your role in the organizations and projects you're a member of.
           </p>
         }
       >

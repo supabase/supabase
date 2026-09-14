@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { Realtime } from 'icons'
 import { BookOpenText, Lightbulb, Lock, MoreVertical, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
@@ -23,6 +24,7 @@ import {
 
 import { EnableIndexAdvisorDialog } from '../QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
+import { ExposedMaterializedViewDialog } from './ExposedMaterializedViewDialog'
 import { InsertButton } from './InsertButton'
 import { RealtimeToggleDialog } from './RealtimeToggleDialog'
 import { SecurityDefinerViewPopover } from './SecurityDefinerViewPopover'
@@ -60,6 +62,7 @@ export interface GridHeaderActionsProps {
   isRefetching: boolean
 }
 export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProps) => {
+  const { ref } = useParams()
   const track = useTrack()
   const appSnap = useAppStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
@@ -69,6 +72,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const [realtimeDialogOpen, setRealtimeDialogOpen] = useState(false)
   const [indexAdvisorDialogOpen, setIndexAdvisorDialogOpen] = useState(false)
   const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
+  const [isExposedMaterializedViewDialogOpen, setIsExposedMaterializedViewDialogOpen] =
+    useState(false)
 
   const [showWarning, setShowWarning] = useQueryState(
     'showWarning',
@@ -204,7 +209,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                 {policies.length < 1 && !isSchemaLocked ? (
                   <ButtonTooltip
                     asChild
-                    variant="default"
                     className="group"
                     icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
                     tooltip={{
@@ -270,7 +274,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     </p>
                     {!isSchemaLocked && (
                       <Button
-                        variant="default"
                         className="mt-2 w-min"
                         onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
                       >
@@ -293,7 +296,49 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           )}
 
           {isMaterializedView && materializedViewHasLints && (
-            <SecurityDefinerViewPopover lint={matchingMaterializedViewLint} />
+            <Popover modal={false}>
+              <PopoverTrigger asChild>
+                <Button variant="warning" icon={<Unlock strokeWidth={1.5} />}>
+                  Materialized View in API
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="min-w-[395px] text-sm" align="end">
+                <h3 className="flex items-center gap-2">
+                  <Unlock size={16} /> Secure your Materialized View
+                </h3>
+                <div className="grid gap-2 mt-4 text-foreground-light text-sm">
+                  <p>
+                    Because materialized views do not automatically enforce RLS policies from their
+                    source tables, exposing them through the API may reveal data that would
+                    otherwise be protected.
+                  </p>
+
+                  <p>
+                    Since this materialized view is in a schema accessible to API roles, it can be
+                    queried through your project's APIs.
+                  </p>
+
+                  <div className="mt-2 flex items-center gap-2">
+                    <ExposedMaterializedViewDialog
+                      table={table}
+                      isExposedMaterializedViewDialogOpen={isExposedMaterializedViewDialogOpen}
+                      setIsExposedMaterializedViewDialogOpen={
+                        setIsExposedMaterializedViewDialogOpen
+                      }
+                    />
+
+                    <Button asChild>
+                      <Link
+                        target="_blank"
+                        href={`/project/${ref}/advisors/security?preset=${matchingMaterializedViewLint?.level}&id=${matchingMaterializedViewLint?.cache_key}`}
+                      >
+                        Learn more
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           )}
 
           {isForeignTable && table.schema === 'public' && (
@@ -315,7 +360,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   </p>
 
                   <div className="mt-2">
-                    <Button variant="default" asChild>
+                    <Button asChild>
                       <Link
                         target="_blank"
                         href={`${DOCS_URL}/guides/database/extensions/wrappers/overview#security`}
@@ -336,7 +381,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
               <TooltipTrigger asChild>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    variant="default"
                     icon={<MoreVertical />}
                     className="h-7 w-7"
                     aria-label={`More options for ${table.name}`}

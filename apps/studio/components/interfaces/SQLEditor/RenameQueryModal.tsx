@@ -169,7 +169,7 @@ const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItemLayout name="name" layout="vertical" label="Name">
+              <FormItemLayout layout="vertical" label="Name">
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -178,7 +178,6 @@ const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps
           />
           <div className="flex w-full justify-end mt-2">
             <ButtonTooltip
-              variant="default"
               onClick={() => generateTitle()}
               size="tiny"
               disabled={
@@ -209,11 +208,10 @@ const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps
             control={form.control}
             name="description"
             render={({ field }) => (
-              <FormItemLayout name="description" layout="vertical" label="Description">
+              <FormItemLayout layout="vertical" label="Description">
                 <FormControl>
                   <Textarea
                     {...field}
-                    id="description"
                     rows={4}
                     placeholder="Describe query"
                     className="resize-none"
@@ -224,10 +222,15 @@ const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps
           />
         </DialogSection>
         <DialogFooter>
-          <Button type="reset" variant="default" onClick={onCancel} disabled={isSubmitting}>
+          <Button type="reset" onClick={onCancel} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button type="submit" loading={isSubmitting} disabled={isSubmitting || !isDirty}>
+          <Button
+            variant="primary"
+            type="submit"
+            loading={isSubmitting}
+            disabled={isSubmitting || !isDirty}
+          >
             Rename query
           </Button>
         </DialogFooter>

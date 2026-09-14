@@ -23,7 +23,6 @@ export default function MultiSelectDemo() {
         label="Select fruits"
         persistLabel
         badgeLimit="wrap"
-        showIcon={false}
         deletableBadge={false}
       />
       <MultiSelectorContent>

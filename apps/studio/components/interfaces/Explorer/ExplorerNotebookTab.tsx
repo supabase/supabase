@@ -16,6 +16,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   Check,
+  Copy,
   FileText,
   Keyboard,
   Loader2,
@@ -33,8 +34,10 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   AiIconAnimation,
+  Badge,
   Button,
   Checkbox,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -45,7 +48,12 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { findMutatingQueryCells } from './ExplorerNotebookTab.utils'
+import {
+  findQueryCellsMatchingSql,
+  isMutatingSql,
+  notebookToMarkdown,
+  type QueryCellSummary,
+} from './ExplorerNotebookTab.utils'
 import {
   ExplorerToolbar,
   ExplorerToolbarAction,
@@ -58,6 +66,7 @@ import { MarkdownCell } from './MarkdownCell'
 import { QueryCell } from './QueryCell'
 import { type QueryEditorHandle } from './QueryEditor'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
+import { checkDestructiveQuery } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
 import {
@@ -102,18 +111,19 @@ export const ExplorerNotebookTab = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isSaveBeforeAnalyzeOpen, setIsSaveBeforeAnalyzeOpen] = useState(false)
   const [isSaveConflictOpen, setIsSaveConflictOpen] = useState(false)
-  const [pendingMutationCells, setPendingMutationCells] = useState<
-    { id: string; title: string }[] | null
-  >(null)
+  const [pendingQueryMatches, setPendingQueryMatches] = useState<{
+    destructiveQueries: QueryCellSummary[]
+    mutatingQueries: QueryCellSummary[]
+  } | null>(null)
   const [skipMutatingCells, setSkipMutatingCells] = useState(false)
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
   const savedContentRef = useRef<typeof content>(undefined)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       if (id && content === savedContentRef.current) {
-        snap.markSaved({ id })
+        snap.markSaved({ id, updatedAt: data?.updated_at })
         toast.success('Successfully saved notebook!')
         if (isSaveBeforeAnalyzeOpen) {
           setIsSaveBeforeAnalyzeOpen(false)
@@ -184,25 +194,33 @@ export const ExplorerNotebookTab = () => {
 
   const handleRunNotebook = () => {
     const freshCells = getFreshCells()
-    const mutatingCells = findMutatingQueryCells({
+    const { destructiveQueries, mutatingQueries } = findQueryCellsMatchingSql({
       cells: freshCells,
       getLiveSql: (cellId) => queryCellRefs.current.get(cellId)?.getSql(),
+      matchers: {
+        destructiveQueries: checkDestructiveQuery,
+        mutatingQueries: isMutatingSql,
+      },
     })
-    if (mutatingCells.length === 0) {
+    if (mutatingQueries.length === 0) {
       runNotebook({ cellIdsToRun: freshCells.filter(isQueryCell).map((cell) => cell._id) })
     } else {
       setSkipMutatingCells(false)
-      setPendingMutationCells(mutatingCells)
+      setPendingQueryMatches({ destructiveQueries, mutatingQueries })
     }
   }
 
   const handleConfirmRunNotebook = () => {
-    const mutatingCellIds = new Set((pendingMutationCells ?? []).map((cell) => cell.id))
+    const mutatingCellIds = new Set(
+      (pendingQueryMatches?.mutatingQueries ?? []).map((cell) => cell.id)
+    )
+    const freshCells = getFreshCells()
+    const freshQueryCellIds = freshCells.filter(isQueryCell).map((cell) => cell._id)
     const cellIdsToRun = skipMutatingCells
-      ? queryCellIds.filter((id) => !mutatingCellIds.has(id))
-      : queryCellIds
+      ? freshQueryCellIds.filter((id) => !mutatingCellIds.has(id))
+      : freshQueryCellIds
 
-    setPendingMutationCells(null)
+    setPendingQueryMatches(null)
     runNotebook({ cellIdsToRun, force: true })
   }
 
@@ -251,7 +269,7 @@ export const ExplorerNotebookTab = () => {
       projectRef: ref,
       id: notebookId,
       name,
-      description: currentNotebook?.notebook.description,
+      description: currentNotebook?.notebook.description ?? undefined,
       content: writableContent,
     })
   }
@@ -294,6 +312,22 @@ export const ExplorerNotebookTab = () => {
       setIsSaveBeforeAnalyzeOpen(true)
     } else {
       handleAnalyze()
+    }
+  }
+
+  const handleCopyAsMarkdown = async () => {
+    try {
+      await copyToClipboard(
+        notebookToMarkdown({
+          name: name ?? '',
+          cells,
+          getResult: (cellId) => queryCellRefs.current.get(cellId)?.getResult(),
+        }),
+        () => toast.success('Copied notebook as Markdown to clipboard')
+      )
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      toast.error('Failed to copy notebook as Markdown: ' + message)
     }
   }
 
@@ -404,6 +438,10 @@ export const ExplorerNotebookTab = () => {
                   </div>
                   {isIntellisenseEnabled && <Check className="text-brand" size={16} />}
                 </DropdownMenuItem>
+                <DropdownMenuItem className="gap-x-2" onClick={handleCopyAsMarkdown}>
+                  <Copy size={14} />
+                  <span>Copy as Markdown</span>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="gap-x-2" onClick={() => setIsDeleteModalOpen(true)}>
                   <Trash size={14} />
@@ -412,16 +450,20 @@ export const ExplorerNotebookTab = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </ExplorerToolbarActions>
-          <ExplorerToolbarAction
+          <ButtonTooltip
+            type="button"
+            variant="default"
+            size="tiny"
+            className="ml-1"
             aria-label="Run notebook"
             icon={<Play size={16} strokeWidth={2} />}
-            tooltip="Run notebook"
+            tooltip={{ content: { side: 'bottom', text: 'Run notebook' } }}
             loading={isRunningNotebook}
             disabled={queryCellIds.length === 0}
             onClick={handleRunNotebook}
           >
             Run
-          </ExplorerToolbarAction>
+          </ButtonTooltip>
         </ExplorerToolbarActions>
       </ExplorerToolbar>
 
@@ -435,12 +477,8 @@ export const ExplorerNotebookTab = () => {
               contentClassName="[&>h3]:text-sm [&>p]:text-xs"
             >
               <div className="flex items-center gap-x-2">
-                <Button variant="default" onClick={() => onSelectAddCell('query')}>
-                  Add query cell
-                </Button>
-                <Button variant="default" onClick={() => onSelectAddCell('markdown')}>
-                  Add markdown cell
-                </Button>
+                <Button onClick={() => onSelectAddCell('query')}>Add query cell</Button>
+                <Button onClick={() => onSelectAddCell('markdown')}>Add markdown cell</Button>
               </div>
             </EmptyStatePresentational>
           )}
@@ -528,7 +566,7 @@ export const ExplorerNotebookTab = () => {
       <ConfirmationModal
         size="small"
         visible={isSaveConflictOpen}
-        title="Assistant changes detected"
+        title="Notebook changed on the server"
         additionalActionLabel="Discard changes"
         confirmLabel={
           id && snap.serverDivergedWhileDirty.get(id) === 'deleted' ? 'Recreate' : 'Save anyway'
@@ -539,29 +577,34 @@ export const ExplorerNotebookTab = () => {
       >
         <p className="text-sm">
           {id && snap.serverDivergedWhileDirty.get(id) === 'deleted'
-            ? 'An assistant deleted this notebook after your local changes. Saving will recreate it.'
-            : "An assistant updated this notebook after your local changes. Saving will overwrite the assistant's update."}
+            ? 'This notebook was deleted on the server after your local changes. Saving will recreate it.'
+            : 'This notebook changed on the server after your local changes. Saving will overwrite those changes.'}
         </p>
       </ConfirmationModal>
 
       <ConfirmationModal
         size="small"
-        visible={pendingMutationCells !== null}
+        visible={pendingQueryMatches !== null}
         title="Confirm to run notebook"
         confirmLabel={skipMutatingCells ? 'Run read-only cells' : 'Run all cells'}
         variant="warning"
-        onCancel={() => setPendingMutationCells(null)}
+        onCancel={() => setPendingQueryMatches(null)}
         onConfirm={handleConfirmRunNotebook}
       >
         <p className="text-sm">
-          This notebook has {pendingMutationCells?.length ?? 0}{' '}
-          {pendingMutationCells?.length === 1 ? 'query' : 'queries'} that{' '}
-          {pendingMutationCells?.length === 1 ? 'modifies' : 'modify'} data or schema and cannot be
-          undone once run:
+          This notebook has {pendingQueryMatches?.mutatingQueries.length ?? 0}{' '}
+          {pendingQueryMatches?.mutatingQueries.length === 1 ? 'query' : 'queries'} that{' '}
+          {pendingQueryMatches?.mutatingQueries.length === 1 ? 'modifies' : 'modify'} data or schema
+          and cannot be undone once run:
         </p>
         <ul className="text-sm list-disc pl-4 mt-2">
-          {pendingMutationCells?.map((cell) => (
-            <li key={cell.id}>{cell.title}</li>
+          {pendingQueryMatches?.mutatingQueries.map((cell) => (
+            <li key={cell.id} className="flex items-center gap-2">
+              {cell.title}
+              {pendingQueryMatches.destructiveQueries.some(({ id }) => id === cell.id) && (
+                <Badge variant="destructive">Destructive</Badge>
+              )}
+            </li>
           ))}
         </ul>
         <FormItemLayout

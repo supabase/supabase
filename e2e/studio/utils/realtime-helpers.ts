@@ -36,7 +36,9 @@ export async function stopListening(page: Page) {
 }
 
 export async function openBroadcastModal(page: Page) {
-  const broadcastButton = page.getByRole('button', { name: 'Broadcast a message' })
+  const broadcastButton = page
+    .getByRole('status')
+    .getByRole('button', { name: 'Broadcast a message' })
   await expect(broadcastButton).toBeVisible({ timeout: 5000 })
   await broadcastButton.click()
   await expect(page.getByText('Broadcast a message to all clients')).toBeVisible({ timeout: 5000 })

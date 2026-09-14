@@ -1,10 +1,15 @@
 import { useMemo } from 'react'
-import { type ChartConfig as ChartSeriesConfig } from 'ui'
+import { cn, type ChartConfig as ChartSeriesConfig } from 'ui'
 import { Chart, ChartBar, ChartCard, ChartContent, ChartLine } from 'ui-patterns/Chart'
 
 import { type QueryResult } from '../types'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
-import { formatLogTick, getCumulativeResults } from '@/components/ui/QueryBlock/QueryBlock.utils'
+import {
+  computeYAxisWidth,
+  formatLogTick,
+  formatYAxisTick,
+  getCumulativeResults,
+} from '@/components/ui/QueryBlock/QueryBlock.utils'
 import { type ChartConfig } from '@/data/content/notebooks/notebook-schema'
 
 interface QueryResultChartProps {
@@ -58,11 +63,24 @@ export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
   )
   const resultToRender = cumulative ? cumulativeResults : chartRows
 
+  const yAxisWidth = Math.max(
+    36,
+    ...y_series.map((key) =>
+      computeYAxisWidth(resultToRender, key, { isLogScale: effectiveScale === 'log' })
+    )
+  )
+
+  const yAxisProps = {
+    ...(show_labels ? { width: yAxisWidth } : {}),
+    scale: effectiveScale === 'log' ? 'log' : 'auto',
+    domain: effectiveScale === 'log' ? ([1, 'auto'] as const) : undefined,
+    tickFormatter: effectiveScale === 'log' ? formatLogTick : formatYAxisTick,
+  }
+
   if (!result || (result?.rows && result.rows.length === 0)) {
     return (
       <NoDataPlaceholder
-        isFullHeight
-        className="border-0"
+        className="border-0 min-h-0! py-8"
         size="normal"
         message="No results"
         description="Your query returned no rows"
@@ -73,8 +91,7 @@ export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
   if (!hasConfig) {
     return (
       <NoDataPlaceholder
-        isFullHeight
-        className="border-0"
+        className="border-0 min-h-0! py-8"
         size="normal"
         message="Configure your chart"
         description="Select your X and Y axis in the display settings"
@@ -85,7 +102,7 @@ export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
   return (
     <Chart className="flex flex-grow min-h-0">
       <ChartCard className="flex flex-grow rounded-none border-0 min-h-0">
-        <ChartContent className="min-h-0 w-full">
+        <ChartContent className={cn('min-h-0 h-full w-full', show_labels && 'pl-2 pb-2')}>
           {type === 'bar' && (
             <ChartBar
               isFullHeight
@@ -96,11 +113,7 @@ export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
               showXAxis={show_labels}
               showYAxis={show_labels}
               data={resultToRender}
-              YAxisProps={{
-                scale: effectiveScale === 'log' ? 'log' : 'auto',
-                domain: effectiveScale === 'log' ? [1, 'auto'] : undefined,
-                tickFormatter: effectiveScale === 'log' ? formatLogTick : undefined,
-              }}
+              YAxisProps={yAxisProps}
             />
           )}
           {type === 'line' && (
@@ -113,11 +126,7 @@ export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
               showXAxis={show_labels}
               showYAxis={show_labels}
               data={resultToRender}
-              YAxisProps={{
-                scale: effectiveScale === 'log' ? 'log' : 'auto',
-                domain: effectiveScale === 'log' ? [1, 'auto'] : undefined,
-                tickFormatter: effectiveScale === 'log' ? formatLogTick : undefined,
-              }}
+              YAxisProps={yAxisProps}
             />
           )}
         </ChartContent>

@@ -9,7 +9,7 @@ import {
   CheckCircle2,
   FolderOpen,
   Loader2,
-  Maximize2,
+  Maximize,
   PlusIcon,
   X,
 } from 'lucide-react'
@@ -403,7 +403,6 @@ export const EditorPanel = () => {
               <PopoverTrigger asChild>
                 <Button
                   size="tiny"
-                  variant="default"
                   role="combobox"
                   className="mr-2"
                   aria-expanded={isTemplatesOpen}
@@ -461,12 +460,12 @@ export const EditorPanel = () => {
           <ButtonTooltip
             variant="text"
             className="w-7 h-7 p-0"
-            icon={<Maximize2 strokeWidth={1.5} />}
-            aria-label={isExplorerEnabled ? 'Open in Explorer' : 'Expand to SQL editor'}
+            icon={<Maximize strokeWidth={1.5} />}
+            aria-label={isExplorerEnabled ? 'Open in Explorer' : 'Open in SQL editor'}
             tooltip={{
               content: {
                 side: 'bottom',
-                text: isExplorerEnabled ? 'Open in Explorer' : 'Expand to SQL editor',
+                text: isExplorerEnabled ? 'Open in Explorer' : 'Open in SQL editor',
               },
             }}
             onClick={handleExpand}
@@ -583,12 +582,7 @@ export const EditorPanel = () => {
               <span className="font-mono">
                 {results.length} rows{results.length >= 100 && ` (Limited to only 100 rows)`}
               </span>
-              <Button
-                size="tiny"
-                variant="default"
-                className="ml-2"
-                onClick={() => setShowResults((prev) => !prev)}
-              >
+              <Button size="tiny" className="ml-2" onClick={() => setShowResults((prev) => !prev)}>
                 {showResults ? 'Hide Results' : 'Show Results'}
               </Button>
             </div>
@@ -624,7 +618,6 @@ export const EditorPanel = () => {
             </div>
           )}
           <Button
-            variant="default"
             size="tiny"
             disabled={
               !currentValue ||
@@ -636,7 +629,6 @@ export const EditorPanel = () => {
             }
             onClick={() => {
               if (!ref || !profile || !project) return
-
               if (activeSnippet) {
                 setSaveStatus('idle')
                 upsertContent({

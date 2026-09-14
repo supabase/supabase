@@ -80,6 +80,7 @@ In this example we'll generate a vector using Transformer.js, then store it in t
 
 ```js
 import { pipeline } from '@xenova/transformers'
+
 const generateEmbedding = await pipeline('feature-extraction', 'Supabase/gte-small')
 
 const title = 'First post!'

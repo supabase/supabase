@@ -92,7 +92,7 @@ const MOCK_ADVISORIES_DATA = [
     category: 'security',
     message: 'Materialized views in API schema can bypass RLS. Move them to private schema.',
     remediationUrl:
-      'https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0016_materialized_view_in_api',
+      'https://supabase.com/docs/guides/observability/advisors?queryGroups=lint&lint=0016_materialized_view_in_api',
   },
   {
     id: '0031_functions_no_rls_guard',
@@ -100,7 +100,7 @@ const MOCK_ADVISORIES_DATA = [
     category: 'security',
     message: 'Function api.health_check should verify auth context before querying tables.',
     remediationUrl:
-      'https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0031_functions_no_rls_guard',
+      'https://supabase.com/docs/guides/observability/advisors?queryGroups=lint&lint=0031_functions_no_rls_guard',
   },
   {
     id: '1012_slow_query',
@@ -599,10 +599,10 @@ export async function getMockTools(overrides: MockToolOverrides | undefined, sig
 
   // Every tool here is a deterministic mock except `search_docs`, which uses the
   // real implementation. We source it from an in-process MCP server directly
-  // (rather than `getMcpTools`) so the eval harness stays hermetic and decoupled
-  // from the assistant's transport gate (`USE_REMOTE_MCP`): the in-process server
-  // needs no live remote endpoint or real access token. See AI-897 for how to
-  // point evals at the remote MCP server instead.
+  // (rather than `getMcpTools`, which always talks to the remote server) so the
+  // eval harness stays hermetic: the in-process server needs no live remote
+  // endpoint or real access token. See AI-897 for how to point evals at the
+  // remote MCP server instead.
   const mcpClient = await createInProcessSupabaseMCPClient({
     accessToken: 'mock-access-token',
     projectRef: 'mock-project-ref',

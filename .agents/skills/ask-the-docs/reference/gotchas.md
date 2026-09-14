@@ -13,10 +13,10 @@ Specific traps to watch for. One-liner per item.
   decisions.
 - **`mdxFlowExpression` / `mdxTextExpression` / `mdxjsEsm` are skipped.**
   Anything wrapped in `{...}` won't appear in markdown output.
-- **`AiPrompt` prompts must be a `prompt={...}` prop, not children.** The
-  schema handler decodes the raw JS string literal from `propsFrom()`
-  (Prettier may emit single-quoted multiline forms). See
-  `internals/markdown-schema/AiPrompt.ts`.
+- **`<AiPrompt id="…" />` carries only an ID.** Prompt text lives in
+  `data/ai-prompts.data.ts`; don't inline prompt strings in MDX. Markdown
+  export handles the `PromptPanel` parts via
+  `internals/markdown-schema/PromptPanel.ts` (drops `PromptCopy`).
 - **`<$Partial>` recursion is silent.** A missing or unreadable partial is
   dropped without error. Check `partials/` paths when content seems missing
   from generated `.md`.

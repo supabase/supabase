@@ -114,7 +114,7 @@ module.exports = {
               border: '1px solid var(--border-default)',
               borderRadius: 'var(--radius-lg)',
             },
-            td: {
+            'tbody tr:not(:last-child) td': {
               borderBottom: '1px solid var(--background-surface-200)',
             },
             code: {

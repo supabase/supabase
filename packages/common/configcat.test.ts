@@ -23,7 +23,6 @@ describe('configcat', () => {
   }
 
   beforeEach(() => {
-    vi.clearAllMocks()
     vi.resetModules()
     vi.unstubAllEnvs()
     ;(configcat.getClient as any).mockReturnValue(mockClient)

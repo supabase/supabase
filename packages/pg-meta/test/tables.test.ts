@@ -38,7 +38,7 @@ const withTestDatabase = (name: string, fn: (db: TestDb) => Promise<void>) => {
 // Legacy relationships come out in plan-dependent order (frozen TABLES_SQL has
 // no ORDER BY; proven by the adversarial-FK test below), so canonicalize ONLY
 // the legacy side to the scoped ORDER BY: constraint_name, then the column names
-// (a composite FK expands to one entry per source×target column pair).
+// (a composite FK expands to one entry per ordinal column pair).
 const sortRels = (rels: any[]) =>
   [...rels].sort(
     (a, b) =>
@@ -145,31 +145,29 @@ withTestDatabase(
 )
 
 // Composite (multi-column) FK: the relationships subquery expands it to one
-// entry per source×target column pair, all sharing constraint_name, so the
+// entry per ordinal column pair, all sharing constraint_name, so the
 // scoped ORDER BY tie-breaks on the column names to stay deterministic.
 withTestDatabase(
   'scoped tables.retrieve orders composite-FK relationship entries deterministically',
   async ({ executeQuery }) => {
     await executeQuery(`
       create table public.ctgt (x int, y int, primary key (x, y));
-      create table public.csrc (a int, b int, foreign key (a, b) references public.ctgt (x, y));
+      create table public.csrc (a int, b int, foreign key (b, a) references public.ctgt (x, y));
     `)
     const scoped = pgMeta.tables.retrieve({ name: 'csrc', schema: 'public', scoped: true })
     const legacy = pgMeta.tables.retrieve({ name: 'csrc', schema: 'public' })
     const scopedRow: any = scoped.zod.parse((await executeQuery(scoped.sql))[0])
     const legacyRow: any = legacy.zod.parse((await executeQuery(legacy.sql))[0])
 
-    // Four entries (2 source cols × 2 target cols), all one constraint_name.
-    expect(scopedRow.relationships).toHaveLength(4)
+    // Two ordinal pairs, both sharing one constraint_name.
+    expect(scopedRow.relationships).toHaveLength(2)
     expect(new Set(scopedRow.relationships.map((r: any) => r.constraint_name)).size).toBe(1)
     // Scoped is already ordered by (name, source col, target col), raw.
     expect(
       scopedRow.relationships.map((r: any) => [r.source_column_name, r.target_column_name])
     ).toEqual([
-      ['a', 'x'],
       ['a', 'y'],
       ['b', 'x'],
-      ['b', 'y'],
     ])
     legacyRow.relationships = sortRels(legacyRow.relationships)
     expect(scopedRow).toEqual(legacyRow)

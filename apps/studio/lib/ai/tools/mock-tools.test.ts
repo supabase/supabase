@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getMockTools, MOCK_NOTEBOOKS_DATA } from './mock-tools'
 import { getNotebookTools } from './notebook-tools'
@@ -19,7 +19,6 @@ describe('ai/tools/mock-tools getMockTools', () => {
   let tools: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
-    vi.clearAllMocks()
     close = vi.fn().mockResolvedValue(undefined)
     tools = vi.fn().mockResolvedValue({ search_docs: SEARCH_DOCS })
     vi.mocked(createInProcessSupabaseMCPClient).mockResolvedValue({ tools, close } as any)
@@ -58,10 +57,6 @@ describe('ai/tools/mock-tools getMockTools', () => {
     controller.abort()
     await Promise.resolve()
     expect(close).toHaveBeenCalledTimes(1)
-  })
-
-  afterEach(() => {
-    vi.clearAllMocks()
   })
 
   describe('notebook tools', () => {

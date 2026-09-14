@@ -63,7 +63,7 @@ Fill out these service provider details on the next screen.
 
 ## Step 6: Configure attribute mapping [#configure-attribute-mapping]
 
-Attribute mappings allow Supabase to get information about your Google Workspace users on each login.
+Attribute mappings allow Supabase to get information about your Google Workspace users on each sign-in.
 
 **A _Primary email_ to `email` mapping is required.** Other mappings shown below are optional and configurable depending on your Google Workspace setup. If in doubt, replicate the same config as shown.
 
@@ -136,15 +136,15 @@ If you did not customize your settings you may save some time by clicking the **
 
 <Admonition type="note">
 
-**Recommended workflow:** Start with auto-join **disabled** to test your SSO configuration. Once SSO login is working correctly, enable auto-join if desired.
+**Recommended workflow:** Start with auto-join **disabled** to test your SSO configuration. Once SSO sign-in is working correctly, enable auto-join if desired.
 
 </Admonition>
 
-By default this setting is disabled, users logging in via SSO will not be added to your organization automatically.
+By default this setting is disabled, users signing in via SSO will not be added to your organization automatically.
 
 ![Auto-join disabled](/docs/img/sso-dashboard-configure-autojoin-disabled.png)
 
-Toggle this on if you want SSO-authenticated users to be **automatically added to your organization** when they log in via SSO. Auto-join applies on **every login**, not only on first signup - this makes it safe to test SSO before enabling this feature.
+Toggle this on if you want SSO-authenticated users to be **automatically added to your organization** when they sign in via SSO. Auto-join applies on **every sign-in**, not only on first signup - this makes it safe to test SSO before enabling this feature.
 
 ![Auto-join enable](/docs/img/sso-dashboard-configure-autojoin-enabled.png)
 

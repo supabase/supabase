@@ -233,28 +233,3 @@ group by hour, path
 order by hour desc
 limit 100;
 ```
-
-### Find data API request from specific authenticated user
-
-```sql
-select
-  timestamp,
-  event_message,
-  log_attributes['request.headers.cf_connecting_ip'] as requesters_ip,
-  log_attributes['request.url'] as request_url,
-  log_attributes['request.method'] as request_method,
-  log_attributes['request.sb.jwt.authorization.payload.subject'] as user_id,
-  log_attributes['request.sb.jwt.apikey.payload.role'] as apikey_role,
-  log_attributes['request.sb.jwt.authorization.payload.role'] as authorization_token_role,
-  log_attributes['request.headers.user_agent'] as user_agent,
-  log_attributes['request.cf.city'] as city,
-  log_attributes['request.cf.country'] as country,
-  log_attributes['request.cf.postalCode'] as postalCode
-from logs
-where
-  source = 'edge_logs'
-  and match(log_attributes['request.path'], '^/rest/v1/')
-  and log_attributes['request.sb.jwt.authorization.payload.subject'] = 'SOME_USER_ID' -- <---ADD USER_ID from auth.users table
-order by timestamp desc
-limit 100;
-```

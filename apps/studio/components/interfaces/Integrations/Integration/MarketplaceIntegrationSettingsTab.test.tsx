@@ -15,7 +15,7 @@ import { addAPIMock } from '@/tests/lib/msw'
 
 // The OAuth-apps query overrides its return type to `AuthorizedApp`, but the wire response (and so
 // the MSW resolver) is the raw OpenAPI `OAuthAppResponse`. Build fixtures against the API shape.
-type OAuthAppResponse = components['schemas']['OAuthAppResponse']
+type OAuthAppResponse = components['schemas']['OAuthAppResponse_Output']
 type PartnerIntegrationListResponse = components['schemas']['PartnerIntegrationListResponse']
 // Same story for permissions: the frontend `Permission` type narrows nullable wire fields, so build
 // the fixture against the raw `AccessControlPermission` shape the MSW resolver actually returns.

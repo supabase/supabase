@@ -92,6 +92,15 @@ the custom cycle-safe resolve remains required.
 | `apps/docs/features/docs/Reference.sections.tsx`        | `ApiEndpointSection` UI                      |
 | `apps/docs/internals/generate-reference-markdown.ts`    | agent markdown export                        |
 
+## Scoped personal access token permission tables
+
+The "Personal Access Tokens" guide's permission and MCP tables are generated
+from the Management API specs, MCP permission map, and the same shared catalog
+Studio uses. Regenerate `content/_partials/access-control/scoped_pat_*.mdx` with
+`make -C apps/docs/spec generate.partials.access-control`. Docs Tests runs this
+on relevant pull requests and fails if the partials drift; the weekly Management
+API update also runs it after refreshing the live inputs.
+
 ## Related
 
 - [`build-pipeline.md`](./build-pipeline.md) — where `codegen:references`

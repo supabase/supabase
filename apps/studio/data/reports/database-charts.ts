@@ -541,7 +541,8 @@ export const getReportAttributesV2: (
       valuePrecision: 0,
       entitlement: 'database',
       requiredPlan: 'Pro',
-      hide: !entitledFeatures.includes('database'),
+      // High Availability projects don't run Supavisor, so there's no data to show.
+      hide: !entitledFeatures.includes('database') || isHighAvailability,
       showTooltip: true,
       showLegend: false,
       showMaxValue: false,

@@ -26,7 +26,6 @@ describe('MCP advisor operations pass exposedSchemas to getLints', () => {
   const headers = { Authorization: 'Bearer test' }
 
   beforeEach(() => {
-    vi.clearAllMocks()
     mockGetLints.mockResolvedValue({
       data: [
         {
