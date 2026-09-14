@@ -421,6 +421,7 @@ export function FilterCondition({
             })
           ) : (
             <DefaultCommandList
+              showSelection
               items={valueItems}
               highlightedIndex={valHighlightedIndex}
               onSelect={(item) => {
