@@ -15,7 +15,7 @@ import type { RawAuthMetricsRow } from './OverviewUsage.schema'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type AnalyticsResponse = platformComponents['schemas']['AnalyticsResponse']
+type AnalyticsResponse = platformComponents['schemas']['AnalyticsResponse_Output']
 
 const flags = vi.hoisted(() => ({ otelLegacyLogs: false }))
 
