@@ -21,7 +21,7 @@ To make docs as clear as possible:
 
 ## Information types
 
-Every sentence you write is one of these types:
+Every sentence that tells the reader something about the product is one of these types:
 
 | Type | Answers | Example |
 | --- | --- | --- |
@@ -33,6 +33,8 @@ Every sentence you write is one of these types:
 **Never mix information types inside a paragraph.** One paragraph carries one type. When the type changes, start a new paragraph. When it changes across a larger span, start a new section, and put an admonition or a procedure in its own block.
 
 Mixing types is what produces a paragraph a reader has to parse twice. A reader who wants the steps has to read past the concept to find them, and a reader who wants the concept has to read past a warning that doesn't apply yet.
+
+**Structural prose is exempt.** An introduction, a transition, an outcome, and a navigation outline describe the page rather than the product, so they don't carry an information type and the no-mixing rule doesn't apply to them. A transition names the type it's leaving and the type it's moving to, which is its job. Keep structural prose to a sentence or two, and don't let it grow into the content type it introduces. For where each kind belongs, see [Guides](#guides).
 
 **A long paragraph is a smell.** Once a paragraph runs past three or four sentences, it has almost always absorbed a second information type. Reread it, label each sentence with its type, and split wherever the label changes. Apply the same check to a long list item and to a step that has grown a trailing explanation.
 
