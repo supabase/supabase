@@ -9,3 +9,8 @@ export const singleThemes = [
   { name: 'Light', value: 'light' }, // Classic Supabase light
   { name: 'Classic Dark', value: 'classic-dark' }, // Deep Dark Supabase dark
 ]
+
+export const studioThemes = singleThemes.filter(({ value }) => value !== 'classic-dark')
+export const studioThemeValues = studioThemes
+  .filter(({ value }) => value !== 'system')
+  .map(({ value }) => value)

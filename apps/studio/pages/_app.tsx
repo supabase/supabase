@@ -35,9 +35,11 @@ import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo, useCallback, useEffect, useState, type ComponentProps } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import { TooltipProvider } from 'ui'
+import { studioThemeValues, TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
+import { AppearanceSettingsProvider } from '@/components/interfaces/App/AppearanceSettingsProvider'
+import { AppearanceSettingsScript } from '@/components/interfaces/App/AppearanceSettingsScript'
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -45,7 +47,6 @@ import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/
 import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/IndirectTaxDeclarationModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
-import { ThemeOverridesProvider } from '@/components/interfaces/App/ThemeOverridesProvider'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
@@ -183,6 +184,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                     <TimestampInfoTimezoneBridge>
                       <Head>
                         <title>{appTitle ?? 'Supabase'}</title>
+                        <AppearanceSettingsScript />
                         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
                         <meta property="og:image" content={`${BASE_PATH}/img/supabase-og.png`} />
                         <meta name="googlebot" content="notranslate" />
@@ -208,7 +210,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       />
                       <TooltipProvider>
                         <RouteValidationWrapper>
-                          <ThemeProvider>
+                          <ThemeProvider themes={studioThemeValues}>
                             <DevToolbarProvider apiUrl={API_URL}>
                               <AiAssistantStateContextProvider>
                                 <CommandProvider>
@@ -225,7 +227,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                   </BannerStackProvider>
                                   <Toaster />
                                   <MonacoThemeProvider />
-                                  <ThemeOverridesProvider />
+                                  <AppearanceSettingsProvider />
                                 </CommandProvider>
                               </AiAssistantStateContextProvider>
                               <DevToolbar extraTabs={devToolbarExtraTabs} />

@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { useTheme } from 'next-themes'
 import { useCallback, useMemo } from 'react'
 
@@ -6,6 +6,7 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import {
   clearThemeOverridesForMode,
   mergeThemeOverride,
+  parseThemeOverridesByMode,
   resolveThemeOverrideMode,
   ThemeOverrideKey,
   ThemeOverrideMode,
@@ -14,6 +15,17 @@ import {
 } from '@/lib/theme-overrides'
 
 const EMPTY_OVERRIDES: ThemeOverrides = {}
+
+function readStoredThemeOverrides(): ThemeOverridesByMode {
+  const stored = safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.UI_THEME_OVERRIDES)
+  if (stored === null) return {}
+
+  try {
+    return parseThemeOverridesByMode(JSON.parse(stored))
+  } catch {
+    return {}
+  }
+}
 
 /**
  * Reads and writes the colour-system overrides for the currently resolved
@@ -24,23 +36,31 @@ export function useThemeOverrides() {
   const { resolvedTheme } = useTheme()
   const mode: ThemeOverrideMode = resolveThemeOverrideMode(resolvedTheme)
 
-  const [overridesByMode, setOverridesByMode] = useLocalStorageQuery<ThemeOverridesByMode>(
+  const [storedOverrides, setStoredOverrides] = useLocalStorageQuery<unknown>(
     LOCAL_STORAGE_KEYS.UI_THEME_OVERRIDES,
-    {}
+    readStoredThemeOverrides()
+  )
+  const overridesByMode = useMemo(
+    () => parseThemeOverridesByMode(storedOverrides),
+    [storedOverrides]
   )
 
   const overrides = overridesByMode[mode] ?? EMPTY_OVERRIDES
 
   const setOverride = useCallback(
     (key: ThemeOverrideKey, value: number) => {
-      setOverridesByMode((current) => mergeThemeOverride(current, mode, key, value))
+      setStoredOverrides((current: unknown) =>
+        mergeThemeOverride(parseThemeOverridesByMode(current), mode, key, value)
+      )
     },
-    [mode, setOverridesByMode]
+    [mode, setStoredOverrides]
   )
 
   const resetOverrides = useCallback(() => {
-    setOverridesByMode((current) => clearThemeOverridesForMode(current, mode))
-  }, [mode, setOverridesByMode])
+    setStoredOverrides((current: unknown) =>
+      clearThemeOverridesForMode(parseThemeOverridesByMode(current), mode)
+    )
+  }, [mode, setStoredOverrides])
 
   return useMemo(
     () => ({ mode, overrides, setOverride, resetOverrides }),

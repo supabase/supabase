@@ -57,9 +57,11 @@ import {
   type ReactNode,
 } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import { TooltipProvider } from 'ui'
+import { studioThemeValues, TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
+import { AppearanceSettingsProvider } from '@/components/interfaces/App/AppearanceSettingsProvider'
+import { AppearanceSettingsScript } from '@/components/interfaces/App/AppearanceSettingsScript'
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -68,7 +70,6 @@ import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/Indirec
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
 import { ShellFallback } from '@/components/interfaces/App/ShellFallback'
-import { ThemeOverridesProvider } from '@/components/interfaces/App/ThemeOverridesProvider'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
@@ -379,7 +380,7 @@ function RootComponent() {
                     <RouteValidationWrapper>
                       <ThemeProvider
                         defaultTheme="system"
-                        themes={['dark', 'light', 'classic-dark']}
+                        themes={studioThemeValues}
                         enableSystem
                         disableTransitionOnChange
                       >
@@ -402,7 +403,7 @@ function RootComponent() {
                               <Toaster />
                               <ToastErrorTracker />
                               <MonacoThemeProvider />
-                              <ThemeOverridesProvider />
+                              <AppearanceSettingsProvider />
                             </CommandProvider>
                           </AiAssistantStateContextProvider>
                           <DevToolbar extraTabs={devToolbarExtraTabs} />
@@ -430,6 +431,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
     // prerendered shell can't know. Scoped to this element only.
     <html lang="en" suppressHydrationWarning>
       <head>
+        <AppearanceSettingsScript />
         <HeadContent />
       </head>
       <body>
