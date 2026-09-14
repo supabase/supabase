@@ -48,7 +48,8 @@ const ThemeSwitcherDropdown = () => {
     )
   }
 
-  const iconClasses = 'text-muted-foreground group-hover:text-foreground group-data-open:text-foreground'
+  const iconClasses =
+    'text-muted-foreground group-hover:text-foreground group-data-open:text-foreground'
 
   return (
     <>

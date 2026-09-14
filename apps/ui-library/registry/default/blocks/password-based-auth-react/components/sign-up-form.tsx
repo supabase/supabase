@@ -51,7 +51,9 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
       {success ? (
         <Card>
           <CardHeader>
-            <CardTitle className="font-medium text-lg tracking-normal">Thank you for signing up!</CardTitle>
+            <CardTitle className="font-medium text-lg tracking-normal">
+              Thank you for signing up!
+            </CardTitle>
             <CardDescription>Check your email to confirm</CardDescription>
           </CardHeader>
           <CardContent>
