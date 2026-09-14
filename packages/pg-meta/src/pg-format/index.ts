@@ -79,7 +79,7 @@ function arrayToList<ElementType = unknown>(
 ): SafeSqlFragment {
   let sql = safeSql``
 
-  sql = useSpace ? safeSql`${sql} (` : safeSql`${sql} (`
+  sql = useSpace ? safeSql`${sql} (` : safeSql`${sql}(`
   for (const [index, element] of array.entries()) {
     sql = safeSql`${sql}${index === 0 ? safeSql`` : safeSql`, `}${formatter(element)}`
   }
