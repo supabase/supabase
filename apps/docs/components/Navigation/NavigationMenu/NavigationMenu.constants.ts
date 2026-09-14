@@ -3219,7 +3219,7 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
         { name: 'Configure Social Login (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
         {
-          name: 'Configure Custom OAuth/OIDC Providers',
+          name: 'Configure Custom OAuth/OIDC',
           url: '/guides/self-hosting/self-hosted-custom-oauth-providers',
         },
         { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },

@@ -1,18 +1,14 @@
 ---
 title: 'Configure Custom OAuth/OIDC Providers'
-description: 'Configure any OAuth2 or OIDC-compatible identity provider for self-hosted Supabase.'
-subtitle: 'Configure any OAuth2 or OIDC-compatible identity provider for self-hosted Supabase.'
+description: 'Configure any OAuth 2.0 or OIDC-compatible identity provider for self-hosted Supabase.'
+subtitle: 'Configure any OAuth 2.0 or OIDC-compatible identity provider for self-hosted Supabase.'
 ---
 
-## Overview
-
-Custom OAuth/OIDC providers let you integrate any standards-compliant identity provider with Supabase Auth, beyond the ones Supabase supports out of the box.
-
-Each custom provider uses a `custom:` prefix in its identifier. This prefix distinguishes custom providers from built-in providers.
+This guide explains how to add a custom OAuth 2.0 or OpenID Connect (OIDC) identity provider to a self-hosted Supabase instance and how to manage it through the Auth admin API. To learn how custom providers work and which advanced options they support, see [Custom OAuth/OIDC Providers](/docs/guides/auth/custom-oauth-providers).
 
 There are two provider types:
 
-- **OAuth2**: for generic OAuth2 providers where you supply the authorization, token, and userinfo endpoints manually.
+- **OAuth 2.0**: for generic OAuth 2.0 providers where you supply the authorization, token, and userinfo endpoints manually.
 - **OIDC**: for providers that support [OpenID Connect](https://openid.net/connect/) discovery. You supply only the issuer URL and endpoints are resolved automatically.
 
 ## Provider identifiers
@@ -26,17 +22,17 @@ Every custom provider identifier must start with the `custom:` prefix. Identifie
 
 You need:
 
-- A working self-hosted Supabase installation on release `0.8.0` or later. See [Self-Hosting with Docker](/docs/guides/self-hosting/docker) and [Update Your Self-Hosted Deployment](/docs/guides/self-hosting/updating).
-- Your project's secret key, `SUPABASE_SECRET_KEY`, from your `.env` file (needed for admin API calls)
-- `API_EXTERNAL_URL` set to the publicly reachable URL of your Auth service, ending in `/auth/v1` (e.g., `https://<your-domain>/auth/v1`). The Auth service derives the OAuth callback URL for custom providers from this value.
+- A working self-hosted Supabase installation on release `0.8.1` or later, which ships Supabase Auth `v2.196.0`. See [Self-Hosting with Docker](/docs/guides/self-hosting/docker) and [Update Your Self-Hosted Deployment](/docs/guides/self-hosting/updating).
+- Your project's secret key, `SUPABASE_SECRET_KEY`, from your `.env` file. Admin API calls require it.
+- `API_EXTERNAL_URL` set to the publicly reachable URL of your Auth service, ending in `/auth/v1`, for example `https://<your-domain>/auth/v1`. The Auth service derives the OAuth callback URL for custom providers from this value.
 
 <Admonition type="danger">
 
-HTTPS is required by most OAuth providers - `http://` callback URLs are rejected (except `localhost`). See the HTTPS [how-to guide](/docs/guides/self-hosting/self-hosted-proxy-https) for setup instructions.
+Most OAuth providers reject `http://` callback URLs other than `localhost`, so your instance needs HTTPS. See [Configure Reverse Proxy and HTTPS](/docs/guides/self-hosting/self-hosted-proxy-https) for setup instructions.
 
 </Admonition>
 
-When registering your application with an external identity provider, add the following URL as the redirect/callback URI in the provider's settings:
+When registering your application with an external identity provider, add the following URL as the redirect URI in the provider's settings:
 
 ```
 https://<your-domain>/auth/v1/callback
@@ -46,10 +42,10 @@ https://<your-domain>/auth/v1/callback
 
 Custom providers are enabled by default in the Auth service, so no changes to `docker-compose.yml` are required. The following environment variables adjust the defaults:
 
-| Env Variable                        | Description                                                                                                |
+| Variable                            | Description                                                                                                |
 | ----------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | `GOTRUE_CUSTOM_OAUTH_ENABLED`       | Set to `"false"` to disable custom OAuth/OIDC providers. Defaults to `true`.                               |
-| `GOTRUE_CUSTOM_OAUTH_MAX_PROVIDERS` | Maximum number of custom OAuth/OIDC providers allowed. Defaults to `0` (unlimited).                        |
+| `GOTRUE_CUSTOM_OAUTH_MAX_PROVIDERS` | Maximum number of custom OAuth/OIDC providers allowed. Defaults to `0`, which means unlimited.             |
 | `GOTRUE_CUSTOM_OAUTH_EXTERNAL_URL`  | Base URL used to build the callback URL for custom providers. Defaults to the value of `API_EXTERNAL_URL`. |
 
 To change any of these, add the variable to the `auth` service in your `docker-compose.yml`:
@@ -77,9 +73,11 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('http://<your-domain>', 'your-supabase-secret-key')
 ```
 
-### OAuth2 provider
+The Auth service fetches and validates the provider's endpoints when you create the provider, so the request fails if the issuer or endpoint URLs can't be reached.
 
-Use an OAuth2 provider when your identity provider does not support OpenID Connect discovery. You must supply the authorization, token, and userinfo endpoint URLs explicitly.
+### OAuth 2.0 provider
+
+Use an OAuth 2.0 provider when your identity provider does not support OpenID Connect discovery. You must supply the authorization, token, and userinfo endpoint URLs explicitly.
 
 <Tabs
   scrollable
@@ -179,9 +177,9 @@ curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
 
 OIDC providers have the following automatic behavior:
 
-- The discovery document is fetched from `{issuer}/.well-known/openid-configuration` (or from `discovery_url` if set).
+- The discovery document is fetched from `{issuer}/.well-known/openid-configuration`, or from `discovery_url` when it is set.
 - The `openid` scope is always included. It is automatically added if missing from the `scopes` array.
-- ID tokens are verified against the provider's JWKS (fetched from the discovery document's `jwks_uri`).
+- ID tokens are verified against the provider's JWKS, which is fetched from the discovery document's `jwks_uri`.
 
 ### Verify the provider
 
@@ -202,27 +200,30 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 
 ## Example: Telegram
 
-The following steps walk through setting up Telegram OAuth with Supabase Auth.
+The following steps walk through setting up Telegram sign-in with Supabase Auth.
 
 <Admonition type="note">
 
-Telegram OAuth requires Supabase Auth `v2.196.0` or later, shipped with self-hosted release `0.8.1` and later. Earlier versions are affected by [this issue](https://github.com/supabase/auth/issues/2534). To upgrade, see [Update Your Self-Hosted Deployment](/docs/guides/self-hosting/updating).
+Telegram sign-in fails on Supabase Auth versions before `v2.196.0` because of an [unsupported signing algorithm issue](https://github.com/supabase/auth/issues/2534). Release `0.8.1` of self-hosted Supabase ships a fixed version.
 
 </Admonition>
 
 ### Step 1: Create a Telegram bot
 
-Open [@BotFather](https://t.me/BotFather) on Telegram and send the command `/newbot`. Follow the prompts to choose a name and username for your bot.
+1. Open [@BotFather](https://t.me/BotFather) on Telegram and send the command `/newbot`.
+2. Follow the prompts to choose a name and username for your bot.
 
 ### Step 2: Register the redirect URL
 
-Open the [@BotFather mini app](https://t.me/botfather?startapp) on Telegram and select the bot you created in the previous step. Choose **Login Widget** to open the page where you configure redirect URIs. Click **Add a Redirect URI** and enter your self-hosted Supabase callback URL:
+1. Open the [@BotFather mini app](https://t.me/botfather?startapp) on Telegram and select the bot you created in the previous step.
+2. Select **Login Widget** to open the page where you configure redirect URIs.
+3. Click **Add a Redirect URI** and enter your self-hosted Supabase callback URL:
 
-```
-https://<your-domain>/auth/v1/callback
-```
+   ```
+   https://<your-domain>/auth/v1/callback
+   ```
 
-This screen also shows your Client ID and Client Secret, which will be used to create the provider in the next step.
+This screen also shows your Client ID and Client Secret. You use them to create the provider in the next step.
 
 ### Step 3: Create the Telegram provider
 
@@ -274,13 +275,13 @@ curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
 
 </Tabs>
 
-A few notes on the fields above:
+A few notes on these fields:
 
-- `identifier`: can be any value as long as it's prefixed with `custom:` and follows the [identifier rules](#provider-identifiers) - 2-50 characters, lowercase alphanumeric with hyphens and colons.
+- `identifier`: can be any value that starts with `custom:` and follows the [identifier rules](#provider-identifiers).
 - `name`: can be any value you want.
-- `email_optional`: must be set to `true`, since Telegram doesn't return an email field.
+- `email_optional`: must be `true` because Telegram doesn't return an email address.
 
-For the full list of available scopes, refer to the official [Telegram docs](https://core.telegram.org/bots/telegram-login#available-scopes).
+For the full list of available scopes, see the [Telegram Login docs](https://core.telegram.org/bots/telegram-login#available-scopes).
 
 ### Step 4: Sign in with Telegram
 
@@ -294,7 +295,7 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 
 ## Manage providers
 
-Self-hosted Supabase has no Dashboard UI for custom providers. Use the admin API to list, update, and delete them.
+Self-hosted Studio doesn't include a UI for custom providers. Use the admin API to list, update, and delete them.
 
 ### List providers
 
@@ -337,7 +338,7 @@ curl "http://<your-domain>/auth/v1/admin/custom-providers?type=oidc" \
 
 ### Update a provider
 
-Update any provider fields except `provider_type` and `identifier`. Only provided fields are changed (partial update). To rotate a client secret, update only the `client_secret` field.
+Update any provider fields except `provider_type` and `identifier`. Updates are partial: only the fields you send are changed. To rotate a client secret, update only the `client_secret` field.
 
 <Tabs
   scrollable
@@ -410,4 +411,4 @@ For PKCE, authorization parameters, and OIDC-specific options, see [Advanced con
 ## Additional resources
 
 - [Custom OAuth/OIDC Providers](/docs/guides/auth/custom-oauth-providers)
-- [Configure social login (OAuth) providers](/docs/guides/self-hosting/self-hosted-oauth) for the providers Supabase supports out of the box
+- [Configure Social Login (OAuth) Providers](/docs/guides/self-hosting/self-hosted-oauth) for the providers Supabase supports out of the box
