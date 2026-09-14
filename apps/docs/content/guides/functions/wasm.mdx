@@ -88,7 +88,18 @@ Follow this [guide on writing Wasm modules in Rust](https://developer.mozilla.or
         wasm-pack build --target deno
         ```
 
-        This will produce a Wasm binary file inside `add-wasm/pkg` directory.
+        This writes generated files to the `add-wasm/pkg` directory. It includes a JavaScript wrapper such as `add_wasm.js` and a Wasm binary such as `add_wasm_bg.wasm`.
+
+        Your Edge Function imports the generated JavaScript wrapper, and that wrapper still needs the generated `.wasm` file at runtime.
+
+        ```text
+        supabase/functions/wasm-add/
+        |-- add-wasm/
+        |   `-- pkg/
+        |       |-- add_wasm.js
+        |       `-- add_wasm_bg.wasm
+        `-- index.ts
+        ```
 
 
       </StepHikeCompact.Details>
@@ -118,11 +129,12 @@ Supabase Edge Functions currently use Deno 1.46. From [Deno 2.1, importing Wasm 
 
 ## Bundle and deploy
 
-Before deploying, ensure the Wasm module is bundled with your function by defining it in `supabase/config.toml`:
+Before deploying, ensure the generated files from `add-wasm/pkg` are bundled with your function by defining them in `supabase/config.toml`:
 
-<Admonition type="note">
+<Admonition type="caution">
 
-- You will need update Supabase CLI to 2.7.0 or higher for the `static_files` support.
+- The `static_files` pattern must include the generated `.wasm` file. Importing `add_wasm.js` alone is not enough, because it still loads the `.wasm` binary at runtime.
+- You need to update Supabase CLI to 2.7.0 or higher for `static_files` support.
 - Static files cannot be deployed using the `--use-api` API flag. You need to build them with [Docker on the CLI](/docs/guides/functions/quickstart#step-6-deploy-to-production).
 
 </Admonition>
@@ -131,6 +143,8 @@ Before deploying, ensure the Wasm module is bundled with your function by defini
 [functions.wasm-add]
 static_files = [ "./functions/wasm-add/add-wasm/pkg/*"]
 ```
+
+If you rebuild the Wasm package, make sure this pattern still matches the generated files in `add-wasm/pkg`.
 
 Deploy the function by running:
 
