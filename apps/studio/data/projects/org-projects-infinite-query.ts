@@ -21,7 +21,7 @@ interface GetOrgProjectsInfiniteVariables {
   statuses?: string[]
 }
 
-export type OrgProjectsResponse = components['schemas']['OrganizationProjectsResponse']
+export type OrgProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
 export type OrgProject = OrgProjectsResponse['projects'][number]
 
 export async function getOrganizationProjects(

@@ -27,7 +27,7 @@ export function PlanUpdateSheetShell({
       header={
         <div className="flex items-center justify-between w-full">
           <h4>Change subscription plan for {organizationName}</h4>
-          <Button asChild variant="default" icon={<ExternalLink />}>
+          <Button asChild icon={<ExternalLink />}>
             <a href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
               Pricing
             </a>
@@ -75,7 +75,7 @@ export function PlanUpdateFullScreenShell({
             Pricing FAQ
           </a>
         </Button>
-        <Button asChild variant="default" iconRight={<ExternalLink />}>
+        <Button asChild iconRight={<ExternalLink />}>
           <a href="https://supabase.com/pricing#compare-plans" target="_blank" rel="noreferrer">
             Compare plans
           </a>

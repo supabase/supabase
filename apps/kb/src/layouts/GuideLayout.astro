@@ -3,11 +3,12 @@ import { Github } from 'lucide-react'
 import { Badge } from 'ui'
 
 import Layout from './Layout.astro'
+import { getTopicDescription, type Topic, topicToSlug } from '../lib/topics'
 
 interface Props {
 	title: string
 	description?: string
-	topics?: string[]
+	topics?: Topic[]
 	github_url?: string
 }
 
@@ -21,7 +22,14 @@ const { title, description, topics = [], github_url } = Astro.props
 		{
 			topics.length > 0 && (
 				<div class="flex flex-wrap gap-2">
-					{topics.map((topic) => <Badge>{topic}</Badge>)}
+					{topics.map((topic) => (
+						<a
+							href={`${import.meta.env.BASE_URL}/topics/${topicToSlug(topic)}`}
+							title={getTopicDescription(topic)}
+						>
+							<Badge>{topic}</Badge>
+						</a>
+					))}
 				</div>
 			)
 		}

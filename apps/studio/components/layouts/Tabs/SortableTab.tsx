@@ -79,7 +79,7 @@ export const SortableTab = ({
       layoutId={tab.id}
       transition={{ duration: 0.045 }}
       animate={{ opacity: isDragging ? 0 : 1 }}
-      className={cn('flex items-center h-(--header-height) first-of-type:border-l')}
+      className={cn('flex items-center h-(--header-height)', index === 0 && 'border-l')}
     >
       <div className="group/tab relative flex h-full min-w-0 items-center">
         <TabsTrigger
@@ -128,7 +128,7 @@ export const SortableTab = ({
             aria-hidden
           >
             {StatusIndicator && (
-              <span className="absolute inset-0 flex items-center justify-center group-hover/tab:opacity-0 group-focus-within/tab:opacity-0">
+              <span className="absolute inset-0 flex items-center justify-center group-hover/tab:opacity-0 group-focus-visible/tab:opacity-0">
                 <StatusIndicator tab={tab} />
               </span>
             )}
@@ -159,7 +159,7 @@ export const SortableTab = ({
             className={cn(
               'absolute top-1/2 right-2.5 z-10 -translate-y-1/2',
               'flex size-5 items-center justify-center rounded-xs',
-              'opacity-0 group-hover/tab:opacity-100 group-focus-within/tab:opacity-100 focus-visible:opacity-100',
+              'opacity-0 group-hover/tab:opacity-100 group-focus-visible/tab:opacity-100 focus-visible:opacity-100',
               'hover:bg-200 focus-ring',
               'cursor-pointer'
             )}

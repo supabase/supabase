@@ -6,7 +6,7 @@ import { SkipToContent } from 'ui-patterns/SkipToContent'
 
 import { BannerStack } from '../ui/BannerStack/BannerStack'
 import { LayoutHeader } from './Navigation/LayoutHeader/LayoutHeader'
-import MobileNavigationBar from './Navigation/NavigationBar/MobileNavigationBar'
+import { MobileNavigationBar } from './Navigation/NavigationBar/MobileNavigationBar'
 import { MobileSheetProvider } from './Navigation/NavigationBar/MobileSheetContext'
 import { StudioMobileSheetNav } from './Navigation/NavigationBar/StudioMobileSheetNav'
 import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
@@ -52,6 +52,7 @@ export const DefaultLayout = ({
   const router = useRouter()
   const panelRef = usePanelRef()
   const isMobile = useBreakpoint('md')
+  const isSidebarOverlay = useBreakpoint('xl')
   const appSnap = useAppStateSnapshot()
   const { isMaximised, activeSidebar } = useSidebarManagerSnapshot()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
@@ -77,13 +78,13 @@ export const DefaultLayout = ({
   }, [])
 
   useEffect(() => {
-    if (!isMounted || !panelRef.current || !activeSidebar || isMobile) return
+    if (!isMounted || !panelRef.current || !activeSidebar || isMobile || isSidebarOverlay) return
     if (isMaximised) {
       panelRef.current.collapse()
     } else {
       panelRef.current.resize(`${contentMaxSizePercentage}%`)
     }
-  }, [isMounted, isMaximised, panelRef, activeSidebar, isMobile])
+  }, [isMounted, isMaximised, panelRef, activeSidebar, isMobile, isSidebarOverlay])
 
   // This is required to prevent layout shift when rendering resizable panels (they initially render at 50%, then shift
   // to whatever is specified).

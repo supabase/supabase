@@ -38,7 +38,7 @@ export const LegacyLogsRewriteAdmonition = ({
         description={state.message}
         actions={
           <div className="flex items-center gap-2">
-            <Button variant="default" size="tiny" onClick={onRewrite}>
+            <Button size="tiny" onClick={onRewrite}>
               Try again
             </Button>
             <Button variant="text" size="tiny" onClick={onDismiss}>
@@ -62,7 +62,7 @@ export const LegacyLogsRewriteAdmonition = ({
         title="No rewrite needed"
         description="The Assistant found nothing to change — this query already runs on ClickHouse."
         actions={
-          <Button variant="default" size="tiny" onClick={onDismiss}>
+          <Button size="tiny" onClick={onDismiss}>
             Dismiss
           </Button>
         }
@@ -81,7 +81,7 @@ export const LegacyLogsRewriteAdmonition = ({
       description="This query needs to be adjusted to ClickHouse SQL, which the Assistant can do for you."
       actions={
         <div className="flex items-center gap-2">
-          <Button variant="default" size="tiny" loading={isRewriting} onClick={onRewrite}>
+          <Button size="tiny" loading={isRewriting} onClick={onRewrite}>
             Rewrite with Assistant
           </Button>
           {/* Disabled mid-rewrite so the offer can't be dismissed out from under

@@ -52,7 +52,6 @@ vi.mock('@/data/config/project-settings-v2-query', () => ({
 
 describe('QueryResultError', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mocks.useParams.mockReturnValue({ ref: 'default' })
     mocks.useOrgSubscriptionQuery.mockReturnValue({ data: undefined, isSuccess: true })
     mocks.useProjectSettingsV2Query.mockReturnValue({ data: undefined, isSuccess: true })
@@ -103,6 +102,24 @@ describe('QueryResultError', () => {
     expect(mocks.createChat.mock.calls[0][0].initialMessage).toContain(
       'relation "foo" does not exist'
     )
+  })
+
+  it('calls onDebug with the prompt instead of opening a new chat when provided', () => {
+    const onDebug = vi.fn()
+
+    customRender(
+      <QueryResultError
+        error={{ message: 'relation "foo" does not exist' }}
+        sql="select * from foo;"
+        source="database"
+        onDebug={onDebug}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Debug with Assistant' }))
+
+    expect(onDebug).toHaveBeenCalledWith(expect.stringContaining('select * from foo;'))
+    expect(mocks.createChat).not.toHaveBeenCalled()
   })
 
   it('copies the same debug prompt text via the dropdown', async () => {

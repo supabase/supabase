@@ -2,9 +2,14 @@
 import { createRequire } from 'node:module'
 import path from 'node:path'
 
+import { unified } from '@astrojs/markdown-remark'
+import mdx from '@astrojs/mdx'
 import react from '@astrojs/react'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'astro/config'
+
+import rehypeAdmonitions from './src/lib/mdx/rehype-admonitions.js'
+import supabaseTheme from '../learn/lib/themes/supabase-2.json' with { type: 'json' }
 
 // Absolute dir of lodash-es, for the SSR-only lodash alias below (same fix
 // apps/studio/vite.config.ts uses). `packages/ui`'s clipboard util does
@@ -38,11 +43,39 @@ const ssrLodashEs = {
 export default defineConfig({
   base: '/kb',
   trailingSlash: 'ignore',
-  integrations: [react()],
+  integrations: [
+    react(),
+    // rehype-admonitions is a custom rehype plugin and Astro's default pipeline is
+    // satteri, so .mdx gets its own unified processor. Plain .md stays on satteri.
+    mdx({
+      processor: unified({
+        rehypePlugins: [rehypeAdmonitions],
+      }),
+    }),
+  ],
   vite: {
     ssr: {
       noExternal: ['lodash'],
     },
     plugins: [tailwindcss(), ssrLodashEs],
+  },
+  markdown: {
+    shikiConfig: {
+      theme: supabaseTheme,
+      // Match the docs app's CodeBlock component (border + rounded-lg on the
+      // outer element), since Astro's own markdown pipeline renders code
+      // blocks straight to a `<pre>` with no wrapper we can add classes to.
+      transformers: [
+        {
+          name: 'kb-code-block-classes',
+          pre(node) {
+            this.addClassToHast(node, 'border border-default rounded-lg')
+          },
+          code(node) {
+            this.addClassToHast(node, 'inline-block p-6')
+          },
+        },
+      ],
+    },
   },
 })

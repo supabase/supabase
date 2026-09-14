@@ -4,7 +4,7 @@ import { PropsWithChildren } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { DestinationIcon } from '../DestinationIcon'
+import { DestinationLogo } from '../DestinationLogo'
 import { getStatusName } from '../Pipeline.utils'
 import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
 import { getReplicationDestinationType } from './Nodes.utils'
@@ -75,8 +75,7 @@ export const ReplicationNode = ({ id }: { id: string }) => {
   const type = getReplicationDestinationType(destination?.config)
 
   return (
-    <NodeContainer className="justify-start gap-x-3">
-      {type ? <DestinationIcon type={type} size={20} className="text-foreground-light" /> : null}
+    <NodeContainer>
       <div className="text-sm flex flex-col gap-y-0.5">
         <div className="flex items-center">
           <p>{type}</p>
@@ -101,6 +100,7 @@ export const ReplicationNode = ({ id }: { id: string }) => {
         <p className="text-foreground-light">{destination?.name}</p>
         <p className="text-foreground-light">ID: {destination?.id}</p>
       </div>
+      {type ? <DestinationLogo type={type} /> : null}
       <Handle type="target" position={Position.Left} className="opacity-25" />
     </NodeContainer>
   )

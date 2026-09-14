@@ -7,7 +7,7 @@ subtitle: 'Manage your database schemas in one place and generate versioned migr
 
 ## Overview
 
-Declarative schemas provide a developer-friendly way to maintain <InfoTooltip tooltipContent={<><p>Files of SQL statements that track the evolution of your database schema over time.<br />They allow you to version control your database schema alongside your application code.</p><p>See the <Link href="/guides/deployment/database-migrations" className="underline">database migrations</Link> guide to learn more.</p></>}>schema migrations</InfoTooltip>.
+Declarative schemas provide a developer-friendly way to maintain [schema migrations](#schema-migrations).
 
 [Migrations](/docs/guides/deployment/database-migrations) are traditionally managed imperatively (you provide the instructions on how exactly to change the database). This can lead to related information being scattered over multiple migration files. With declarative schemas, you instead declare the state you want your database to be in, and the instructions are generated for you.
 
@@ -171,8 +171,8 @@ supabase migration up
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Log in to the Supabase CLI">
-      [Log in](/docs/reference/cli/supabase-login) via the Supabase CLI.
+    <StepHikeCompact.Details title="Sign in to the Supabase CLI">
+      [Sign in](/docs/reference/cli/supabase-login) via the Supabase CLI.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>

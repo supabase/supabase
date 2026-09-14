@@ -57,7 +57,7 @@ export const ProjectUpgradeFailedBanner = () => {
         title={`Postgres version upgrade was not successful (Initiated at ${initiatedAt})`}
         actions={
           <>
-            <Button asChild variant="default">
+            <Button asChild>
               <SupportLink
                 queryParams={{
                   category: SupportCategories.DATABASE_UNRESPONSIVE,

@@ -29,7 +29,7 @@ functions:
       ### OAuth and OTP link verification
 
       [supabase-kt](https://github.com/supabase-community/supabase-kt) provides several platform implementations for OAuth and OTP link verification. \
-      **On JVM**, it uses a HTTP Callback Server to receive the session data from a successful OAuth login.
+      **On JVM**, it uses a HTTP Callback Server to receive the session data from a successful OAuth sign-in.
 
       *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your E-Mail. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`*
 
@@ -63,7 +63,7 @@ functions:
       On Android: `supabase.handleDeeplinks(intent)` \
       On IOS/macOS: `supabase.handleDeeplinks(url)`
 
-      Then you can just login using OAuth:
+      Then you can just sign in using OAuth:
       ```kotlin
       supabase.gotrue.loginWith(Google)
       ```
@@ -140,15 +140,15 @@ functions:
 
           **Desktop:**
 
-          `httpPort`: The port the web server is running on, when logging in with OAuth. Default: `0` (random port).
+          `httpPort`: The port the web server is running on, when signing in with OAuth. Default: `0` (random port).
 
-          `timeout`: The timeout for the web server, when logging in with OAuth. Default: `1.minutes`.
+          `timeout`: The timeout for the web server, when signing in with OAuth. Default: `1.minutes`.
 
-          `htmlTitle`: The title of the redirect page, when logging in with OAuth. Default: `"Supabase Auth"`.
+          `htmlTitle`: The title of the redirect page, when signing in with OAuth. Default: `"Supabase Auth"`.
 
-          `htmlText`: The text of the redirect page, when logging in with OAuth. Default: `"Logged in. You may continue in your app."`.
+          `htmlText`: The text of the redirect page, when signing in with OAuth. Default: `"Logged in. You may continue in your app."`.
 
-          `htmlIconUrl`: The icon of the redirect page, when logging in with OAuth. Default: `"https://supabase.com/brand-assets/supabase-logo-icon.png"`.
+          `htmlIconUrl`: The icon of the redirect page, when signing in with OAuth. Default: `"https://supabase.com/brand-assets/supabase-logo-icon.png"`.
       - id: configure-postgrest
         name: Configure PostgREST module
         code: |
@@ -2094,10 +2094,10 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
       Creates a new user.
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
+      - By default, the user needs to verify their email address before signing in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
-        - If **Confirm email** is enabled, the return value is the user and you won't be logged in automatically.
-        - If **Confirm email** is disabled, the return value is null and you will be logged in instead.
+        - If **Confirm email** is enabled, the return value is the user and you won't be signed in automatically.
+        - If **Confirm email** is disabled, the return value is null and you will be signed in instead.
       - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/guides/auth/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - If signUpWith() is called for an existing confirmed user:
@@ -2345,7 +2345,7 @@ functions:
     title: 'Verify OTPs'
     $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
     notes: |
-      Log in a user given a User supplied OTP received via mobile.
+      Sign in a user given a User supplied OTP received via mobile.
     examples:
       - id: verify-email-otp(otp)
         name: Verify an Email OTP
@@ -2447,7 +2447,7 @@ functions:
       - Should be used only when you require the most current user data. For faster results, `getCurrentSessionOrNull()?.user` is recommended.
     examples:
       - id: get-the-logged-in-user-with-the-current-existing-session
-        name: Get the logged in user with the current session
+        name: Get the signed-in user with the current session
         isSpotlight: true
         code: |
           ```kotlin
@@ -2570,7 +2570,7 @@ functions:
     title: 'Send a password reset request'
     notes: |
       Sends a password reset request to the given email address.
-      - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
+      - The password reset flow consists of 2 broad steps: (i) Allow the user to sign in via the password reset link; (ii) Update the user's password.
       - The `sendRecoveryEmail()` only sends a password reset link to the user's email.
       To update the user's password, see [`modifyUser()`](/docs/reference/kotlin/auth-updateuser).
       - The user gets redirected back to your app, assuming you setup [OTP handling](/docs/reference/kotlin/initializing)
@@ -2737,7 +2737,7 @@ functions:
           val enabledFlow = supabase.gotrue.mfa.isMfaEnabledFlow
           ```
       - id: aal-enabled-for-current-session
-        name: Check whether the user is logged in using AAL2
+        name: Check whether the user is signed in using AAL2
         isSpotlight: true
         code: |
           ```kotlin

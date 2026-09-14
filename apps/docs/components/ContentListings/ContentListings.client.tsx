@@ -102,6 +102,9 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
                           {item.badge}
                         </Badge>
                       )}
+                      {item.subtitle && (
+                        <span className="mb-2 block text-tertiary-foreground">{item.subtitle}</span>
+                      )}
                       {item.description}
                     </GlassPanel>
                   </Link>

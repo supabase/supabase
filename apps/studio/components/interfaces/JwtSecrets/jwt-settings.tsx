@@ -196,7 +196,7 @@ export const JWTSettings = () => {
                       </p>
                     )}
 
-                    <Button asChild variant="default" icon={<ExternalLink />} className="mt-2">
+                    <Button asChild icon={<ExternalLink />} className="mt-2">
                       <Link href={`/project/${projectRef}/settings/api-keys`}>Go to API keys</Link>
                     </Button>
                   </Admonition>
@@ -364,7 +364,7 @@ export const JWTSettings = () => {
 
                   <div className="flex flex-row gap-x-2 mt-4">
                     {disableLegacyJwtSecretRotation ? (
-                      <Button variant="default" icon={<ExternalLink className="size-4" />} asChild>
+                      <Button icon={<ExternalLink className="size-4" />} asChild>
                         <Link
                           href={`${DOCS_URL}/guides/auth/signing-keys#getting-started`}
                           target="_blank"
@@ -378,7 +378,6 @@ export const JWTSettings = () => {
                         <DropdownMenuTrigger asChild>
                           <ButtonTooltip
                             disabled={!canGenerateNewJWTSecret}
-                            variant="default"
                             iconRight={<ChevronDown size={14} />}
                             loading={isUpdatingJwtSecret}
                             tooltip={{
@@ -562,7 +561,6 @@ export const JWTSettings = () => {
           </DialogSection>
           <DialogFooter>
             <Button
-              variant="default"
               onClick={() => {
                 setIsCreatingKey(false)
                 setCustomToken('')

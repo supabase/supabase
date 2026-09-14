@@ -56,7 +56,7 @@ export default {
 }
 ```
 
-Importing from the SDK keeps your allow-list aligned with the headers the client libraries send: when you upgrade the SDK version in your function and redeploy, newly added headers are picked up with it. As of `@supabase/supabase-js` v2.112.3 the list includes the trace context headers (`traceparent`, `tracestate`, `baggage`) used by [client-side tracing](/docs/guides/monitoring-and-debugging/client-side-tracing) — functions deployed with an older version need a redeploy before browsers can call them with trace propagation enabled.
+Importing from the SDK keeps your allow-list aligned with the headers the client libraries send: when you upgrade the SDK version in your function and redeploy, newly added headers are picked up with it. As of `@supabase/supabase-js` v2.112.3 the list includes the trace context headers (`traceparent`, `tracestate`, `baggage`) used by [client-side tracing](/docs/guides/observability/client-side-tracing) — functions deployed with an older version need a redeploy before browsers can call them with trace propagation enabled.
 
 <Admonition type="note">
 
@@ -66,14 +66,14 @@ The allow-list only states what a browser _may_ send — it doesn't change what 
 
 The full list, and when each header is sent:
 
-| Header                                 | Sent                                                                                                                                  |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `authorization`                        | Every request (session token or API key)                                                                                              |
-| `apikey`                               | Every request                                                                                                                         |
-| `x-client-info`                        | Every request (SDK name and version)                                                                                                  |
-| `content-type`                         | Requests with a body                                                                                                                  |
-| `x-retry-count`                        | Only on automatic retry attempts (`postgrest-js` retries failed idempotent requests by default)                                       |
-| `traceparent`, `tracestate`, `baggage` | **Only when [trace propagation](/docs/guides/monitoring-and-debugging/client-side-tracing) is explicitly enabled** — never by default |
+| Header                                 | Sent                                                                                                                       |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `authorization`                        | Every request (session token or API key)                                                                                   |
+| `apikey`                               | Every request                                                                                                              |
+| `x-client-info`                        | Every request (SDK name and version)                                                                                       |
+| `content-type`                         | Requests with a body                                                                                                       |
+| `x-retry-count`                        | Only on automatic retry attempts (`postgrest-js` retries failed idempotent requests by default)                            |
+| `traceparent`, `tracestate`, `baggage` | **Only when [trace propagation](/docs/guides/observability/client-side-tracing) is explicitly enabled** — never by default |
 
 ### For versions before 2.95.0
 
