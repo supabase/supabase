@@ -144,8 +144,6 @@
   --chart-4: 43 74% 66%;
   --chart-5: 27 87% 67%;
   --chart-blue: 217 91% 60%;
-  --chart-warning: hsl(var(--warning-500));
-  --chart-warning-muted: hsl(var(--warning-400));
   --chart-destructive: hsl(var(--destructive-default));
   --chart-success: color-mix(in oklch, var(--foreground-muted) 50%, white);
   --sidebar-background: var(--background-dash-sidebar);
@@ -167,8 +165,6 @@
   --chart-4: 280 65% 60%;
   --chart-5: 340 75% 55%;
   --chart-blue: 217 91% 65%;
-  --chart-warning: hsl(var(--warning-default));
-  --chart-warning-muted: hsl(var(--warning-500));
   --chart-destructive: hsl(var(--destructive-default));
   --chart-success: color-mix(in oklch, var(--foreground-muted) 55%, var(--background));
   --sidebar-background: var(--background-dash-sidebar);
