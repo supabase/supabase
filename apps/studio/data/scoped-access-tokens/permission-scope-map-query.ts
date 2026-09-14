@@ -155,27 +155,6 @@ export const getEnabledEndpointsForCapability = ({
 }
 
 /**
- * Informational lookup for the per-permission risk tooltip: the MCP tools associated with any of
- * the given scopes. Unlike getEnabledMcpTools this is not conjunctive — it surfaces every tool that
- * lists one of these scopes, so users can see what a capability relates to before granting it.
- */
-export const getMcpToolsForScopes = ({
-  scopeIds,
-  permissionScopeMap,
-}: {
-  scopeIds: Iterable<string>
-  permissionScopeMap: PermissionScopeMap | undefined
-}): string[] => {
-  if (permissionScopeMap == null) return []
-
-  const tools = new Set<string>()
-  for (const id of scopeIds) {
-    permissionScopeMap.scopes[id]?.mcp_tools.forEach((tool) => tools.add(tool))
-  }
-  return Array.from(tools)
-}
-
-/**
  * The endpoint's payload changed endpoint/tool requirements from a flat conjunctive scope list
  * (string[]) to alternative groups (string[][], ScopeGroupAlternatives) at the same URL, and the
  * response is CDN-cached (s-maxage + stale-while-revalidate). Right after a deploy a new client

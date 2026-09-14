@@ -27,7 +27,13 @@ import {
   selfHostingSupport,
 } from './self-hosting.data'
 import { storageExamples, storageGetStarted, storageResources } from './storage.data'
-import { telemetryDebugging, telemetryMonitoring } from './telemetry.data'
+import {
+  telemetryAccessWhat,
+  telemetryDetect,
+  telemetryDiagnose,
+  telemetryExport,
+  telemetryHireAgent,
+} from './telemetry.data'
 
 const ALL_GROUPS: readonly ContentListingGroup[] = [
   aiToolsSupportedAgents,
@@ -61,8 +67,11 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   storageGetStarted,
   storageExamples,
   storageResources,
-  telemetryDebugging,
-  telemetryMonitoring,
+  telemetryAccessWhat,
+  telemetryDetect,
+  telemetryDiagnose,
+  telemetryHireAgent,
+  telemetryExport,
 ]
 
 export const CONTENT_LISTINGS: Readonly<Record<string, ContentListingGroup>> = Object.fromEntries(

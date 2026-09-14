@@ -25,12 +25,7 @@ export default function MultiSelectDemo() {
 
   return (
     <MultiSelector values={selectedValues} onValuesChange={setSelectedValues}>
-      <MultiSelectorTrigger
-        className="w-72"
-        label="Select fruits"
-        badgeLimit="wrap"
-        showIcon={false}
-      />
+      <MultiSelectorTrigger className="w-72" label="Select fruits" badgeLimit="wrap" />
       <MultiSelectorContent>
         <MultiSelectorList>
           {fruits.map(({ value, isDisabled }) => (

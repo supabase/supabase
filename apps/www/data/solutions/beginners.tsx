@@ -21,6 +21,7 @@ import type { MPCSectionProps } from '@/components/Solutions/MPCSection'
 import type { PlatformSectionProps } from '@/components/Solutions/PlatformSection'
 import type { TwoColumnsSectionProps } from '@/components/Solutions/TwoColumnsSection'
 import type { TwitterSocialSectionProps } from '@/components/TwitterSocialSection'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
@@ -69,7 +70,7 @@ const data: () => {
       ctas: [
         {
           label: 'Start your project',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
           onClick: () =>
             sendTelemetryEvent({
@@ -479,7 +480,7 @@ const data: () => {
       heading: 'Fun projects built with Supabase',
       subheading: 'Discover what our community has to say about their Supabase experience.',
       ctas: (
-        <Button asChild variant="default" size="small" icon={<IconDiscord />}>
+        <Button asChild size="small" icon={<IconDiscord />}>
           <Link
             href={'https://discord.supabase.com/'}
             target="_blank"

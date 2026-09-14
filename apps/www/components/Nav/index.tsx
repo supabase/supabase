@@ -9,16 +9,20 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
-import { Button, buttonVariants, cn } from 'ui'
-import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
 import {
+  Button,
+  buttonVariants,
+  cn,
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from 'ui/src/components/shadcn/ui/navigation-menu'
+  NavigationMenuViewport,
+} from 'ui'
+import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
+import { AnnouncementBanner } from 'ui-patterns/Banners/AnnouncementBanner'
 
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
@@ -36,26 +40,36 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const pathname = usePathname()
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
+  const [activeDropdown, setActiveDropdown] = useState('')
+  const [visibleDropdown, setVisibleDropdown] = useState('')
+  const [isSwitchingDropdown, setIsSwitchingDropdown] = useState(false)
+  const [openedDropdowns, setOpenedDropdowns] = useState<string[]>([])
+  const handleDropdownChange = (value: string) => {
+    // animate card height between two open menus only
+    setIsSwitchingDropdown(value !== '' && activeDropdown !== '')
+    setActiveDropdown(value)
+    if (value === '') return
+    setVisibleDropdown(value)
+    if (!openedDropdowns.includes(value)) setOpenedDropdowns([...openedDropdowns, value])
+  }
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const user = useUser()
   const menu = getMenu()
+  const dropdownTitles: string[] = menu.primaryNav
+    .filter((menuItem) => menuItem.hasDropdown)
+    .map((menuItem) => menuItem.title)
+  const getDropdownSide = (title: string) => {
+    if (title === visibleDropdown) return 'active'
+    return dropdownTitles.indexOf(title) < dropdownTitles.indexOf(visibleDropdown) ? 'start' : 'end'
+  }
   const sendTelemetryEvent = useSendTelemetryEvent()
   const userMenu = useDropdownMenu(user)
 
-  const isLaunchWeekXPage = pathname === '/launch-week/x'
-  const isLaunchWeek12Page = pathname === '/launch-week/12'
-  const isLaunchWeek13Page = pathname === '/launch-week/13'
   const isGAWeekSection = pathname?.startsWith('/ga-week')
   const isStateOfStartupsPage = pathname?.startsWith('/state-of-startups')
-  const disableStickyNav =
-    isLaunchWeekXPage ||
-    isGAWeekSection ||
-    isLaunchWeekXPage ||
-    isLaunchWeek12Page ||
-    isLaunchWeek13Page ||
-    !stickyNavbar
-  const showLaunchWeekNavMode = (isGAWeekSection || isLaunchWeekXPage) && !open
+  const disableStickyNav = isGAWeekSection || !stickyNavbar
+  const showLaunchWeekNavMode = isGAWeekSection && !open
 
   const [scrolled, setScrolled] = React.useState(false)
   React.useEffect(() => {
@@ -87,6 +101,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
 
   return (
     <>
+      {!isStateOfStartupsPage && <AnnouncementBanner />}
       <div
         className={cn(
           'sticky top-0 z-40 transform',
@@ -96,6 +111,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
         style={{ transform: 'translate3d(0,0,999px)' }}
         data-nav-transparent={isTransparent ? '' : undefined}
       >
+        {isStateOfStartupsPage && <AnnouncementBanner />}
         <div
           className={cn(
             'absolute inset-0 h-full w-full bg-background/90 dark:bg-background/95 transition-all duration-300',
@@ -120,22 +136,43 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                 </div>
                 <NavigationMenu
                   delayDuration={0}
-                  className="hidden pl-8 sm:space-x-4 lg:flex h-16"
-                  viewportClassName="rounded-xl bg-background"
+                  value={activeDropdown}
+                  onValueChange={handleDropdownChange}
+                  renderViewport={false}
+                  className="static hidden pl-8 lg:flex h-16 items-stretch"
                 >
-                  <NavigationMenuList>
+                  <NavigationMenuList className="h-full space-x-0 items-stretch">
                     {menu.primaryNav.map((menuItem) =>
                       menuItem.hasDropdown ? (
-                        <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
+                        <NavigationMenuItem
+                          className="text-sm font-medium"
+                          key={menuItem.title}
+                          value={menuItem.title}
+                        >
                           <NavigationMenuTrigger
                             className={cn(
                               buttonVariants({ variant: 'text', size: 'small' }),
-                              'bg-transparent! hover:text-brand-link data-open:text-brand-link! focus-ring focus-visible:text-foreground px-2 h-auto'
+                              'bg-transparent! hover:text-brand-link data-open:text-brand-link! focus-ring focus-visible:text-foreground px-2.5 h-full'
                             )}
                           >
                             {menuItem.title}
                           </NavigationMenuTrigger>
-                          <NavigationMenuContent>{menuItem.dropdown}</NavigationMenuContent>
+                          <NavigationMenuContent
+                            forceMount
+                            inert={visibleDropdown !== menuItem.title}
+                            data-active={visibleDropdown === menuItem.title}
+                            data-side={getDropdownSide(menuItem.title)}
+                            className={cn(
+                              'md:w-full data-[motion^=from-]:animate-none! data-[motion^=to-]:animate-none!',
+                              'data-[active=false]:pointer-events-none data-[active=false]:opacity-0',
+                              'data-[side=start]:-translate-x-4 data-[side=end]:translate-x-4',
+                              'motion-safe:group-data-[switching=true]/viewport:transition-[opacity,translate]',
+                              'motion-safe:group-data-[switching=true]/viewport:duration-250',
+                              'motion-safe:group-data-[switching=true]/viewport:ease-in-out'
+                            )}
+                          >
+                            {openedDropdowns.includes(menuItem.title) ? menuItem.dropdown : null}
+                          </NavigationMenuContent>
                         </NavigationMenuItem>
                       ) : (
                         <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
@@ -143,7 +180,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                             <MenuItem
                               href={menuItem.url}
                               title={menuItem.title}
-                              className="group-hover:bg-transparent text-foreground focus-visible:text-brand-link"
+                              className="group-hover:bg-transparent text-foreground focus-visible:text-brand-link px-2.5 h-full"
                               hoverColor="brand"
                             />
                           </NavigationMenuLink>
@@ -151,6 +188,22 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                       )
                     )}
                   </NavigationMenuList>
+                  <NavigationMenuViewport
+                    forceMount
+                    data-open={activeDropdown !== ''}
+                    data-switching={isSwitchingDropdown}
+                    containerProps={{ className: 'inset-x-0' }}
+                    className={cn(
+                      'group/viewport origin-top scale-100 rounded-xl bg-surface-75 md:w-[960px]',
+                      'data-[state=open]:animate-none! data-[state=closed]:animate-none!',
+                      'data-[state=open]:duration-200 data-[state=open]:ease-out data-[state=closed]:duration-200',
+                      'data-[open=false]:invisible data-[open=false]:scale-[0.97] data-[open=false]:opacity-0',
+                      'data-[open=false]:pointer-events-none',
+                      'motion-safe:transition-[opacity,scale,visibility]',
+                      'motion-safe:data-[switching=true]:transition-[height,opacity,scale,visibility]',
+                      'motion-reduce:transition-none'
+                    )}
+                  />
                 </NavigationMenu>
               </div>
               <div className="flex items-center gap-2 opacity-0 animate-fade-in scale-100! delay-300">
@@ -171,7 +224,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                     </>
                   ) : (
                     <>
-                      <Button variant="default" className="hidden lg:block" asChild>
+                      <Button className="hidden lg:block" asChild>
                         <Link
                           href="https://supabase.com/dashboard"
                           onClick={() =>
@@ -184,7 +237,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                           Sign in
                         </Link>
                       </Button>
-                      <Button className="hidden lg:block" asChild>
+                      <Button variant="primary" className="hidden lg:block" asChild>
                         <Link
                           href="https://supabase.com/dashboard/sign-up"
                           onClick={() =>

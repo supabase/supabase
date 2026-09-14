@@ -1,9 +1,11 @@
 import { act, renderHook } from '@testing-library/react'
 import type { ReactNode } from 'react'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import { useSqlEditorTabsCleanup } from './Tabs.utils'
+import { sqlEditorState } from '@/state/sql-editor/sql-editor-state'
 import { createTabsState, TabsStateContext, type Tab } from '@/state/tabs'
+import { seedSnippet } from '@/tests/lib/sql-editor-test-utils'
 
 const dbTab = (id: string): Tab => ({
   id: `sql-${id}`,
@@ -29,6 +31,28 @@ function renderCleanup(store: ReturnType<typeof createTabsState>) {
 }
 
 describe('useSqlEditorTabsCleanup', () => {
+  afterEach(() => {
+    for (const key of Object.keys(sqlEditorState.snippets)) delete sqlEditorState.snippets[key]
+  })
+
+  it('keeps the tab of a locally-created snippet that has not been persisted yet', () => {
+    const store = createTabsState('default')
+    store.addTab(dbTab('existing'))
+    store.addTab(dbTab('brand-new'))
+
+    // A snippet created by typing in a new tab: it lives in the local store with
+    // a never-persisted status, but the server-fetched snippet list can't know
+    // about it yet.
+    seedSnippet({ id: 'brand-new', name: 'Untitled query', sql: 'select 1;' })
+
+    const cleanup = renderCleanup(store)
+    act(() => cleanup({ snippets: [{ id: 'existing', type: 'sql', name: 'existing' }] }))
+
+    expect(store.tabsMap['sql-brand-new']).toBeDefined()
+    expect(store.openTabs).toContain('sql-brand-new')
+    expect(store.activeTab).toEqual('sql-brand-new')
+  })
+
   it('prunes tabs for deleted snippets (database and logs) while keeping live ones', () => {
     const store = createTabsState('default')
     store.addTab(dbTab('db-stale'))

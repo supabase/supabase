@@ -6,7 +6,17 @@ import { useRouter } from 'next/compat/router'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useCallback, useEffect, useState, type ChangeEvent } from 'react'
-import { Badge, Button, Checkbox, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
+import {
+  Badge,
+  Button,
+  Checkbox,
+  cn,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  ToggleGroup,
+  ToggleGroupItem,
+} from 'ui'
 
 import {
   FeaturesMatrix,
@@ -192,7 +202,7 @@ function FeaturesPage() {
         </SectionContainer>
         <SectionContainer className="relative grid md:grid-cols-4 md:gap-4 pt-0!">
           <div className="relative w-full h-full">
-            <div className="mb-4 flex flex-col gap-4 sticky top-20">
+            <aside aria-label="Filters" className="mb-4 flex flex-col gap-4 sticky top-20">
               <InputGroup className="w-full">
                 <InputGroupAddon>
                   <Search />
@@ -207,101 +217,105 @@ function FeaturesPage() {
                 />
               </InputGroup>
               <div className="hidden md:flex flex-col gap-2.5">
-                <div className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! hover:cursor-pointer! transition-colors">
+                <label className="flex cursor-pointer items-center gap-2 text-foreground-light hover:text-foreground transition-colors">
                   <Checkbox
-                    id="self-hosted-filter"
                     checked={showSelfHostedOnly}
                     onCheckedChange={() => setShowSelfHostedOnly(!showSelfHostedOnly)}
                     className="[&_input]:m-0"
                   />
-                  <label
-                    htmlFor="self-hosted-filter"
-                    className="text-sm leading-none! flex-1 text-left"
-                  >
+                  <span className="text-sm leading-none! flex-1 text-left">
                     Show only self-hosted features
-                  </label>
-                </div>
+                  </span>
+                </label>
               </div>
               <div className="hidden md:flex flex-col gap-4">
-                <h2 className="text-sm text-foreground-lighter">Filter by tags:</h2>
-                <div className="flex flex-col gap-2.5">
+                <h2 id="feature-tag-filters" className="text-sm text-foreground-lighter">
+                  Filter by tags:
+                </h2>
+                <div
+                  role="group"
+                  aria-labelledby="feature-tag-filters"
+                  className="flex flex-col gap-2.5"
+                >
                   {products
                     .sort((a, b) => (a.toLowerCase() > b.toLowerCase() ? 1 : -1))
                     .map((product) => (
-                      <div
+                      <label
                         key={product}
-                        className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! hover:cursor-pointer! transition-colors"
+                        className="flex cursor-pointer items-center gap-2 text-foreground-light hover:text-foreground transition-colors"
                       >
                         <Checkbox
-                          id={product}
                           checked={selectedProducts.includes(product)}
                           onCheckedChange={() => handleProductChange(product)}
                           className="[&_input]:m-0"
                         />
-                        <label
-                          htmlFor={product}
-                          className="text-sm leading-none! capitalize flex-1 text-left"
-                        >
+                        <span className="text-sm leading-none! capitalize flex-1 text-left">
                           {product}
-                        </label>
-                      </div>
+                        </span>
+                      </label>
                     ))}
                 </div>
-                <div className="text-foreground-muted text-xs">
-                  Features selected: {filteredFeatures.length}
+                <div
+                  aria-live="polite"
+                  aria-atomic="true"
+                  className="text-foreground-muted text-xs"
+                >
+                  {`${filteredFeatures.length} features selected`}
                 </div>
               </div>
-              <Button
-                tabIndex={HAS_ACTIVE_FILTERS ? 0 : -1}
-                block
-                variant="dashed"
-                onClick={() => {
-                  setSelectedProducts([])
-                  setSearchTerm('')
-                  setShowSelfHostedOnly(false)
-                }}
-                className={cn(
-                  'opacity-0 transition-opacity hidden md:block',
-                  HAS_ACTIVE_FILTERS && 'block! opacity-100'
-                )}
-              >
-                Clear all filters
-              </Button>
-            </div>
+              {HAS_ACTIVE_FILTERS && (
+                <Button
+                  block
+                  variant="dashed"
+                  onClick={() => {
+                    setSelectedProducts([])
+                    setSearchTerm('')
+                    setShowSelfHostedOnly(false)
+                  }}
+                  className="hidden md:block"
+                >
+                  Clear all filters
+                </Button>
+              )}
+            </aside>
           </div>
           <div className="md:col-span-3 min-w-0 flex flex-col gap-4 md:gap-6">
             <div className="flex items-center justify-between gap-2">
               <span className="text-foreground-muted text-xs">
                 {filteredFeatures.length} feature{filteredFeatures.length !== 1 ? 's' : ''}
               </span>
-              <div className="flex items-center rounded-lg border border-muted">
-                <button
-                  tabIndex={0}
+              <ToggleGroup
+                type="single"
+                value={viewMode}
+                onValueChange={(value) => value && setViewMode(value as ViewMode)}
+                aria-label="Feature layout"
+                className="flex items-center gap-0 rounded-lg border border-muted"
+              >
+                <ToggleGroupItem
+                  value="grid"
                   title="Grid view"
-                  onClick={() => setViewMode('grid')}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 rounded-l-lg focus-visible:z-10 focus-ring',
-                    viewMode === 'grid'
-                      ? 'bg-surface-300 text-foreground'
-                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                    'relative flex items-center justify-center w-8 h-8 p-0 rounded-none rounded-l-lg focus-visible:z-10 focus-ring',
+                    'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200',
+                    'data-[state=on]:cursor-default data-[state=on]:bg-surface-400 data-[state=on]:text-foreground',
+                    'aria-checked:bg-surface-400 aria-checked:text-foreground'
                   )}
                 >
                   <LayoutGrid size={14} />
-                </button>
-                <button
-                  tabIndex={0}
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="matrix"
                   title="Matrix view"
-                  onClick={() => setViewMode('matrix')}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 border-l border-muted rounded-r-lg focus-visible:z-10 focus-ring',
-                    viewMode === 'matrix'
-                      ? 'bg-surface-300 text-foreground'
-                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                    'relative flex items-center justify-center w-8 h-8 p-0 rounded-none rounded-r-lg border-l border-muted focus-visible:z-10 focus-ring',
+                    'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200',
+                    'data-[state=on]:cursor-default data-[state=on]:bg-surface-400 data-[state=on]:text-foreground',
+                    'aria-checked:bg-surface-400 aria-checked:text-foreground'
                   )}
                 >
                   <Table2 size={14} />
-                </button>
-              </div>
+                </ToggleGroupItem>
+              </ToggleGroup>
             </div>
 
             {viewMode === 'matrix' ? (
@@ -311,61 +325,62 @@ function FeaturesPage() {
                 No features found with these filters
               </p>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
                 {filteredFeatures.map((feature) => (
-                  <Link
-                    key={`feat-${feature.title}`}
-                    href={`/features/${feature.slug}`}
-                    className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring"
-                  >
-                    <Panel
-                      hasActiveOnHover
-                      outerClassName="h-full"
-                      innerClassName="flex md:flex-col gap-3 sm:gap-2 h-full items-start p-2"
+                  <li key={`feat-${feature.title}`} className="flex">
+                    <Link
+                      href={`/features/${feature.slug}`}
+                      className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring w-full"
                     >
-                      <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:aspect-video! bg-alternative flex items-center justify-center shadow-inner border border-muted">
-                        <feature.icon className="w-5 h-5 text-foreground-light group-hover:text-foreground transition-colors" />
-                        {feature.status && (
-                          <div className="hidden md:block absolute bottom-1.5 left-1.5">
-                            <Badge
-                              variant={stageBadgeVariant(feature.status.stage)}
-                              className="text-[10px] py-0 px-1.5 h-4 rounded-sm"
-                            >
-                              {stageLabel(feature.status.stage)}
-                            </Badge>
-                          </div>
-                        )}
-                      </div>
-                      <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
-                        <h3 className="text-sm md:text-base text-foreground leading-5!">
-                          {feature.title}
-                        </h3>
-                        <p className="text-foreground-light text-sm line-clamp-2">
-                          {feature.subtitle}
-                        </p>
-                        <div className="flex flex-wrap items-center gap-1 mb-0.5">
+                      <Panel
+                        hasActiveOnHover
+                        outerClassName="h-full"
+                        innerClassName="flex md:flex-col gap-3 sm:gap-2 h-full items-start p-2"
+                      >
+                        <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:aspect-video! bg-alternative flex items-center justify-center shadow-inner border border-muted">
+                          <feature.icon className="w-5 h-5 text-foreground-light group-hover:text-foreground transition-colors" />
                           {feature.status && (
-                            <Badge
-                              variant={stageBadgeVariant(feature.status.stage)}
-                              className="md:hidden text-[10px] py-0 px-1.5 h-4 rounded-sm"
-                            >
-                              {stageLabel(feature.status.stage)}
-                            </Badge>
+                            <div className="hidden md:block absolute bottom-1.5 left-1.5">
+                              <Badge
+                                variant={stageBadgeVariant(feature.status.stage)}
+                                className="text-[10px] py-0 px-1.5 h-4 rounded-sm"
+                              >
+                                {stageLabel(feature.status.stage)}
+                              </Badge>
+                            </div>
                           )}
-                          {feature.products.map((product) => (
-                            <span
-                              key={product}
-                              className="inline-flex items-center text-[10px] font-medium px-1.5 py-0 h-4 rounded bg-surface-200 text-foreground-light border border-muted capitalize"
-                            >
-                              {productLabel(product)}
-                            </span>
-                          ))}
                         </div>
-                      </div>
-                    </Panel>
-                  </Link>
+                        <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
+                          <h3 className="text-sm md:text-base text-foreground leading-5!">
+                            {feature.title}
+                          </h3>
+                          <p className="text-foreground-light text-sm line-clamp-2">
+                            {feature.subtitle}
+                          </p>
+                          <div className="flex flex-wrap items-center gap-1 mb-0.5">
+                            {feature.status && (
+                              <Badge
+                                variant={stageBadgeVariant(feature.status.stage)}
+                                className="md:hidden text-[10px] py-0 px-1.5 h-4 rounded-sm"
+                              >
+                                {stageLabel(feature.status.stage)}
+                              </Badge>
+                            )}
+                            {feature.products.map((product) => (
+                              <span
+                                key={product}
+                                className="inline-flex items-center text-[10px] font-medium px-1.5 py-0 h-4 rounded bg-surface-200 text-foreground-light border border-muted capitalize"
+                              >
+                                {productLabel(product)}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </Panel>
+                    </Link>
+                  </li>
                 ))}
-              </div>
+              </ul>
             )}
           </div>
         </SectionContainer>

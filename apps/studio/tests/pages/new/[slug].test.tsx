@@ -16,14 +16,14 @@ import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 import { routerMock } from '@/tests/lib/route-mock'
 import type { Permission } from '@/types'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type CreateProjectBody = components['schemas']['CreateProjectBody']
-type CreateProjectResponse = components['schemas']['CreateProjectResponse']
-type RegionsInfo = components['schemas']['RegionsInfo']
-type MemberWithFreeProjectLimit = components['schemas']['MemberWithFreeProjectLimit']
-type OverdueInvoiceCount = components['schemas']['OverdueInvoiceCount']
-type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
-type Entitlement = components['schemas']['ListEntitlementsResponse']['entitlements'][number]
+type CreateProjectResponse = components['schemas']['CreateProjectResponse_Output']
+type RegionsInfo = components['schemas']['RegionsInfo_Output']
+type MemberWithFreeProjectLimit = components['schemas']['MemberWithFreeProjectLimit_Output']
+type OverdueInvoiceCount = components['schemas']['OverdueInvoiceCount_Output']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
+type Entitlement = components['schemas']['ListEntitlementsResponse_Output']['entitlements'][number]
 type AvailableVersion = {
   postgres_engine: '15' | '17' | '17-oriole'
   release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
@@ -341,7 +341,6 @@ const generateAndWaitForStrongPassword = async () => {
 
 describe('project creation wizard', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     user = userEvent.setup({ delay: null })
     routerMock.setCurrentUrl(`/new/${ORG_SLUG}`)
   })
@@ -790,6 +789,37 @@ describe('project creation wizard', () => {
       expect(body.postgres_engine).toBe('17')
       expect(body.release_channel).toBe('ga')
       expect(body.custom_supabase_internal_requests).toBeUndefined()
+    })
+
+    // Regression (FE-4174): in local dev, region choice isn't restricted to the fixed HA
+    // region (unlike staging), so a manual selection should be respected. onSubmit used to
+    // resolve the HA region purely from highAvailabilityRegionCode without that same
+    // exception, silently sending the fixed region regardless of what was displayed.
+    test('submits the manually selected region in local dev instead of the fixed HA default', async () => {
+      vi.stubEnv('NEXT_PUBLIC_ENVIRONMENT', 'local')
+      try {
+        mockWizardEndpoints({ availableRegions: AVAILABLE_REGIONS_WITH_FRANKFURT })
+        const onRequest = vi.fn()
+        mockCreateProject(onRequest)
+
+        await renderWizard()
+
+        await fillProjectName('Local HA Region Project')
+        await generateAndWaitForStrongPassword()
+
+        await user.click(await screen.findByRole('switch', { name: 'Enable high availability' }))
+        // Local dev stacks aren't restricted to the fixed HA region, so the user can still
+        // pick a different one from the (unrestricted) list.
+        await selectRegion(/East US/)
+        expect(getSelectTriggerByLabel('Region')).toHaveTextContent('East US (North Virginia)')
+
+        fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+        await waitFor(() => expect(onRequest).toHaveBeenCalled())
+        expect(onRequest.mock.calls[0][0].region_selection).toMatchObject({ code: 'us-east-1' })
+      } finally {
+        vi.unstubAllEnvs()
+      }
     })
 
     test('forces the high availability region over a manually selected region and restores it', async () => {

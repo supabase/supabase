@@ -234,9 +234,7 @@ export default function PageLayoutEdgeFunction() {
       <PageBreadcrumbs
         actions={
           <PageBreadcrumbsActions>
-            <Button variant="default" size="tiny">
-              Test
-            </Button>
+            <Button size="tiny">Test</Button>
             <Button variant="primary" size="tiny">
               Deploy
             </Button>
@@ -426,7 +424,7 @@ function OverviewPage() {
               <PageSectionTitle>Errors since last deploy</PageSectionTitle>
             </PageSectionSummary>
             <PageSectionAside>
-              <Button variant="default" size="tiny" icon={<ExternalLink size={14} />}>
+              <Button size="tiny" icon={<ExternalLink size={14} />}>
                 View logs
               </Button>
             </PageSectionAside>
@@ -704,7 +702,7 @@ function CodePage() {
             <h3 className="text-sm font-normal font-mono uppercase text-lighter tracking-wide">
               Files
             </h3>
-            <Button size="tiny" variant="default" icon={<Plus size={14} />} onClick={addNewFile}>
+            <Button size="tiny" icon={<Plus size={14} />} onClick={addNewFile}>
               Add File
             </Button>
           </div>

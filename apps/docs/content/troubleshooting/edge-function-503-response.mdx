@@ -28,26 +28,24 @@ If you received back a `BOOT_ERROR` message, like the one below, you can jump to
 }
 ```
 
-Otherwise, run the below query in your [Log Explorer](/dashboard/project/_/logs/explorer?q=SELECT%0A++++req.pathname+AS+function_name%2C%0A++++res.status_code%2C%0A++++CASE%0A++++++++WHEN+metadata.execution_id+IS+NOT+NULL+AND+metadata.function_id+IS+NOT+NULL+THEN+%27app_level%27%0A++++++++WHEN+metadata.execution_id+IS+NULL+++++AND+metadata.function_id+IS+NOT+NULL+THEN+%27boot_error%27%0A++++++++WHEN+metadata.execution_id+IS+NULL+++++AND+metadata.function_id+IS+NULL+++++THEN+%27internal_failure%27%0A++++END+AS+error_type%0AFROM+function_edge_logs%0ACROSS+JOIN+UNNEST%28metadata%29+AS+metadata+%0ACROSS+JOIN+UNNEST%28metadata.request%29+AS+req+%0ACROSS+JOIN+UNNEST%28metadata.response%29+AS+res+%0AWHERE+%0A++++status_code+%3D+503+%0ALIMIT+50%3B).
+Otherwise, run the below query in the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%0A%20%20log_attributes%5B%27request.pathname%27%5D%20as%20function_name%2C%0A%20%20log_attributes%5B%27response.status_code%27%5D%20as%20status_code%2C%0A%20%20case%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%21%3D%20%27%27%0A%20%20%20%20and%20log_attributes%5B%27function_id%27%5D%20%21%3D%20%27%27%20then%20%27app_level%27%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%3D%20%27%27%0A%20%20%20%20and%20log_attributes%5B%27function_id%27%5D%20%21%3D%20%27%27%20then%20%27boot_error%27%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%3D%20%27%27%0A%20%20%20%20and%20log_attributes%5B%27function_id%27%5D%20%3D%20%27%27%20then%20%27internal_failure%27%0A%20%20end%20as%20error_type%0Afrom%20logs%0Awhere%0A%20%20source%20%3D%20%27function_edge_logs%27%0A%20%20and%20toInt32OrZero%28log_attributes%5B%27response.status_code%27%5D%29%20%3D%20503%0Alimit%2050%3B).
 
 ```sql
 select
-  req.pathname as function_name,
-  res.status_code,
+  log_attributes['request.pathname'] as function_name,
+  log_attributes['response.status_code'] as status_code,
   case
-    when metadata.execution_id is not null
-    and metadata.function_id is not null then 'app_level'
-    when metadata.execution_id is null
-    and metadata.function_id is not null then 'boot_error'
-    when metadata.execution_id is null
-    and metadata.function_id is null then 'internal_failure'
+    when log_attributes['execution_id'] != ''
+    and log_attributes['function_id'] != '' then 'app_level'
+    when log_attributes['execution_id'] = ''
+    and log_attributes['function_id'] != '' then 'boot_error'
+    when log_attributes['execution_id'] = ''
+    and log_attributes['function_id'] = '' then 'internal_failure'
   end as error_type
-from
-  function_edge_logs
-  cross join UNNEST(metadata) as metadata
-  cross join UNNEST(metadata.request) as req
-  cross join UNNEST(metadata.response) as res
-where status_code = 503
+from logs
+where
+  source = 'function_edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) = 503
 limit 50;
 ```
 
@@ -94,32 +92,35 @@ In the [Function Dashboard](/dashboard/project/_/functions), under the affected 
 
 ![image](/docs/img/troubleshooting/filter_503.png)
 
-Alternatively, instead of using the Function Dashboard, you can programmatically find boot failure error messages in the [Log Explorer](</dashboard/project/_/logs/explorer?q=SELECT%0A++fl.event_message,%0A++content.timestamp,%0A++fel.function_name,%0A++fel.status_code%0AFROM+function_logs+fl%0ALEFT+JOIN+UNNEST(fl.metadata)+AS+content+ON+TRUE%0ALEFT+JOIN+(%0A++SELECT%0A++++em.function_id,%0A++++em.version,%0A++++req.pathname+AS+function_name,%0A++++res.status_code%0A++FROM+function_edge_logs%0A++LEFT+JOIN+UNNEST(metadata)+AS+em+ON+TRUE%0A++LEFT+JOIN+UNNEST(em.request)+AS+req+ON+TRUE%0A++LEFT+JOIN+UNNEST(em.response)+AS+res+ON+TRUE%0A)+fel+ON+content.function_id+=+fel.function_id%0A++AND+content.version+=+fel.version%0AWHERE+%0A++content.event_type+=+%27BootFailure%27%0AORDER+BY+timestamp,+function_name%0ALIMIT+20;&its=&ite=>) with the below query:
+Alternatively, instead of using the Function Dashboard, you can programmatically find boot failure error messages in the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%0A%20%20fl.event_message%2C%0A%20%20fl.timestamp%2C%0A%20%20fel.function_name%2C%0A%20%20fel.status_code%0Afrom%0A%20%20%28%0A%20%20%20%20select%0A%20%20%20%20%20%20timestamp%2C%0A%20%20%20%20%20%20event_message%2C%0A%20%20%20%20%20%20log_attributes%5B%27function_id%27%5D%20as%20function_id%2C%0A%20%20%20%20%20%20log_attributes%5B%27version%27%5D%20as%20version%0A%20%20%20%20from%20logs%0A%20%20%20%20where%20source%20%3D%20%27function_logs%27%0A%20%20%20%20%20%20and%20log_attributes%5B%27event_type%27%5D%20%3D%20%27BootFailure%27%0A%20%20%29%20as%20fl%0A%20%20left%20join%20%28%0A%20%20%20%20select%0A%20%20%20%20%20%20log_attributes%5B%27function_id%27%5D%20as%20function_id%2C%0A%20%20%20%20%20%20log_attributes%5B%27version%27%5D%20as%20version%2C%0A%20%20%20%20%20%20log_attributes%5B%27request.pathname%27%5D%20as%20function_name%2C%0A%20%20%20%20%20%20log_attributes%5B%27response.status_code%27%5D%20as%20status_code%0A%20%20%20%20from%20logs%0A%20%20%20%20where%20source%20%3D%20%27function_edge_logs%27%0A%20%20%29%20as%20fel%20on%20fl.function_id%20%3D%20fel.function_id%20and%20fl.version%20%3D%20fel.version%0Aorder%20by%20fl.timestamp%2C%20fel.function_name%0Alimit%2020%3B) with the below query:
 
 ```sql
 select
   fl.event_message,
-  content.timestamp,
+  fl.timestamp,
   fel.function_name,
   fel.status_code
 from
-  function_logs as fl
-  left join UNNEST(fl.metadata) as content on true
+  (
+    select
+      timestamp,
+      event_message,
+      log_attributes['function_id'] as function_id,
+      log_attributes['version'] as version
+    from logs
+    where source = 'function_logs'
+      and log_attributes['event_type'] = 'BootFailure'
+  ) as fl
   left join (
     select
-      em.function_id,
-      em.version,
-      req.pathname as function_name,
-      res.status_code
-    from
-      function_edge_logs
-      left join UNNEST(metadata) as em on true
-      left join UNNEST(em.request) as req on true
-      left join UNNEST(em.response) as res on true
-  ) as fel
-    on content.function_id = fel.function_id and content.version = fel.version
-where content.event_type = 'BootFailure'
-order by timestamp, function_name
+      log_attributes['function_id'] as function_id,
+      log_attributes['version'] as version,
+      log_attributes['request.pathname'] as function_name,
+      log_attributes['response.status_code'] as status_code
+    from logs
+    where source = 'function_edge_logs'
+  ) as fel on fl.function_id = fel.function_id and fl.version = fel.version
+order by fl.timestamp, fel.function_name
 limit 20;
 ```
 
@@ -165,7 +166,6 @@ Imports can cause errors if they're not available within the edge function:
 ```js name=bad_imports
 // importing non-existent module
 import supabase from 'does_not_exist'
-
 // or accessing non-existent export
 import { doesNotExist } from 'jsr:@supabase/functions-js'
 

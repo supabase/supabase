@@ -15,9 +15,11 @@ const env = process.env.NEXT_PUBLIC_ENVIRONMENT
 const isToolbarEnabled = env === 'local' || env === 'staging'
 
 const noopContext: DevTelemetryToolbarContextType = {
+  isAvailable: false,
   isEnabled: false,
   isOpen: false,
   setIsOpen: () => {},
+  enableToolbar: () => {},
   events: [],
   setEvents: () => {},
   dismissToolbar: () => {},

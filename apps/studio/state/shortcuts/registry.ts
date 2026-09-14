@@ -59,6 +59,7 @@ import { STORAGE_NAV_SHORTCUT_IDS, storageNavRegistry } from './registry/storage
 import { TABLE_EDITOR_SHORTCUT_IDS, tableEditorRegistry } from './registry/table-editor'
 import { UNIFIED_LOGS_SHORTCUT_IDS, unifiedLogsRegistry } from './registry/unified-logs'
 import { ShortcutDefinition } from './types'
+import { PRODUCT_NAME } from '@/lib/constants/compute'
 
 /**
  * The canonical list of shortcut IDs. Add new shortcuts here first, then
@@ -96,6 +97,7 @@ export const SHORTCUT_IDS = {
   NAV_AUTH: 'nav.auth',
   NAV_STORAGE: 'nav.storage',
   NAV_FUNCTIONS: 'nav.functions',
+  NAV_COMPUTE: 'nav.compute',
   NAV_REALTIME: 'nav.realtime',
   NAV_ADVISORS: 'nav.advisors',
   NAV_OBSERVABILITY: 'nav.observability',
@@ -266,7 +268,7 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   },
   [SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE]: {
     id: SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE,
-    label: 'Maximize assistant',
+    label: 'Open chat in Explorer',
     sequence: ['A', '='],
     showInSettings: false,
   },
@@ -388,6 +390,13 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     id: SHORTCUT_IDS.NAV_FUNCTIONS,
     label: 'Go to Edge Functions',
     sequence: ['G', 'F'],
+    showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
+  },
+  [SHORTCUT_IDS.NAV_COMPUTE]: {
+    id: SHORTCUT_IDS.NAV_COMPUTE,
+    label: `Go to ${PRODUCT_NAME}`,
+    sequence: ['G', 'C'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },

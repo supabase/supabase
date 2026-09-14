@@ -134,7 +134,6 @@ const renderTemplateEditor = ({
 
 describe('TemplateEditor reset to default', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     validateSpamMock.mockImplementation((_vars, callbacks) => callbacks?.onSuccess?.({ rules: [] }))
   })
 

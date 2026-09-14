@@ -1,30 +1,17 @@
 import { SnippetStatus } from '@/data/content/snippet-status'
-
-/** Start and end follows ISO8601 convention */
-type AbsoluteTimeRange = { start: string; end: string }
-type RelativeTimeRange = { unit: 'm' | 'h' | 'd' | 'w' | 'M' | 'y'; amount: number }
-type TimeRange = AbsoluteTimeRange | RelativeTimeRange
-
-type DatabaseQueryCell = { type: 'sql'; sql: string }
-type LogsQueryCell = { type: 'logs'; sql: string; range: TimeRange }
-type MarkdownCell = { type: 'markdown'; content: string }
-export type NotebookCell = DatabaseQueryCell | LogsQueryCell | MarkdownCell
-
-interface NotebookContent {
-  schema_version: string
-  cells: NotebookCell[]
-}
+import type { Notebooks } from '@/types'
 
 export interface Notebook {
   id: string
   type: 'notebook'
   name: string
-  description?: string
+  description?: string | null | undefined
   visibility: 'project'
   favorite: boolean
   owner_id: number
   project_id: number
-  content?: NotebookContent // Undefined until loaded
+  content?: Notebooks.Content // Undefined until loaded
+  updated_at?: string | null | undefined // Absent for a notebook that's never been saved
 }
 
 export interface StateNotebook {

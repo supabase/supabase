@@ -46,8 +46,6 @@ const expectEveryQueryCall = (queryMock: ReturnType<typeof vi.fn>, enabled: bool
 
 describe('PoolingModesModal', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
     mockUseDatabaseSettingsStateSnapshot.mockReturnValue({
       showPoolingModeHelper: true,
       setShowPoolingModeHelper: vi.fn(),

@@ -42,7 +42,7 @@ import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { DiffEditor } from '@/components/ui/DiffEditor'
 import LoadingOpacity from '@/components/ui/LoadingOpacity'
 import ShimmerLine from '@/components/ui/ShimmerLine'
-import { useContentQuery } from '@/data/content/content-query'
+import { ContentOfType, useContentQuery } from '@/data/content/content-query'
 import {
   UpsertContentPayload,
   useContentUpsertMutation,
@@ -150,7 +150,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const entitledToAuditLogDays = getEntitlementNumericValue()
 
   const { data: content } = useContentQuery({ projectRef, type: 'log_sql' })
-  const query = content?.content.find((x) => x.id === queryId)
+  const query = content?.content.find((x): x is ContentOfType<'log_sql'> => x.id === queryId)
 
   const resolvedRange = useMemo(() => {
     if (datePickerValue.isHelper) {
@@ -373,6 +373,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         projectRef: projectRef!,
         payload: {
           ...query,
+          description: query.description ?? undefined,
           content: {
             ...(query.content as LogSqlSnippets.Content),
             unchecked_sql: untrustedLogSql(currentSql),
@@ -516,7 +517,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
                     Review the ClickHouse SQL rewrite before accepting it
                   </span>
                   <div className="flex items-center gap-2">
-                    <Button variant="default" size="tiny" onClick={discardRewrite}>
+                    <Button size="tiny" onClick={discardRewrite}>
                       Discard
                     </Button>
                     <Button variant="primary" size="tiny" onClick={acceptRewrite}>

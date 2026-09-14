@@ -5,7 +5,6 @@ import { DestinationIcon } from './DestinationIcon'
 import type { DestinationType } from './DestinationPanel/DestinationPanel.types'
 
 const DESTINATION_TYPES: DestinationType[] = [
-  'Read Replica',
   'BigQuery',
   'Analytics Bucket',
   'DuckLake',

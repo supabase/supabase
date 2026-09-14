@@ -432,8 +432,7 @@ export const SchemaGraph = () => {
               <div className="flex items-center gap-x-2">
                 <div className="flex items-center gap-0">
                   <ButtonTooltip
-                    variant="default"
-                    className="rounded-r-none border-r-0"
+                    className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
                     icon={copied ? <Check data-testid="copy-sql-ready" /> : <Copy />}
                     onClick={copyAsSQL}
                     tooltip={{
@@ -456,13 +455,11 @@ export const SchemaGraph = () => {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
-                        variant="default"
                         size="tiny"
-                        className="rounded-l-none pl-1 pr-0"
+                        aria-label="Export options"
+                        className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                         icon={<ChevronDown size={12} />}
-                      >
-                        <span className="sr-only">Export options</span>
-                      </Button>
+                      />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-44">
                       <DropdownMenuItem
@@ -512,7 +509,7 @@ export const SchemaGraph = () => {
                     tooltipOpen={autoLayoutDialogOpen ? false : undefined}
                   >
                     <AlertDialogTrigger asChild>
-                      <Button variant="default">Auto layout</Button>
+                      <Button>Auto layout</Button>
                     </AlertDialogTrigger>
                   </Shortcut>
                   <AlertDialogContent>
@@ -562,7 +559,7 @@ export const SchemaGraph = () => {
                 }
               >
                 {canAddTables && (
-                  <Button asChild className="mt-2 w-min" variant="default" icon={<Plus />}>
+                  <Button asChild className="mt-2 w-min" icon={<Plus />}>
                     <Link href={`/project/${ref}/editor?create=table`}>New table</Link>
                   </Button>
                 )}
@@ -608,7 +605,6 @@ export const SchemaGraph = () => {
                   {hasNextPage && (
                     <Panel position="bottom-center" className="mb-11!">
                       <Button
-                        variant="default"
                         size="tiny"
                         loading={isFetchingNextPage}
                         onClick={() => {

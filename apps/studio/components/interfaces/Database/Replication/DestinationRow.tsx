@@ -15,7 +15,7 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteDestination } from './DeleteDestination'
-import { DestinationIcon } from './DestinationIcon'
+import { DestinationLogo } from './DestinationLogo'
 import { PipelineStatus } from './PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { getFormattedLagValue } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
@@ -149,13 +149,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       )}
       {isPipelineSuccess && (
         <TableRow>
-          <TableCell>
-            <DestinationIcon
-              type={type ?? 'Read Replica'}
-              size={18}
-              className="text-foreground-light"
-            />
-          </TableCell>
+          <TableCell>{type ? <DestinationLogo type={type} /> : null}</TableCell>
 
           <TableCell className="max-w-[180px]">
             {isPipelineLoading ? (
@@ -224,7 +218,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                   </TooltipContent>
                 </Tooltip>
               )}
-              <Button asChild variant="default" className="relative">
+              <Button asChild className="relative">
                 <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
                   View pipeline
                 </Link>

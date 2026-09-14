@@ -1,5 +1,4 @@
 import Heading from './Heading'
 
 export { Heading }
-
-export default Heading
+export { getAnchor, removeAnchor, highlightSelectedNavItem } from './CustomHTMLElements.utils'

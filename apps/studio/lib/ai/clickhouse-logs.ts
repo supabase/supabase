@@ -13,6 +13,8 @@ You are writing SQL for Supabase logs, which run on a ClickHouse-backed engine. 
 - All logs are in a single table named \`logs\`, keyed by a \`source\` column. There are no per-service tables (no \`edge_logs\`, \`postgres_logs\`, and so on) and no \`unnest\` joins.
 - Per-source fields live in the \`log_attributes\` Map(String, String), read as \`log_attributes['key']\`. Map values are strings, so wrap numeric ones in \`toInt32OrZero(...)\`.
 - Use ClickHouse functions, not Postgres or BigQuery ones. Use \`match(col, 'regex')\` or \`col ILIKE '%text%'\` instead of \`regexp_contains\`, \`count()\` instead of \`count(*)\`, and select the \`timestamp\` column directly instead of \`cast(timestamp as datetime)\`.
+- Do not filter on \`timestamp\` in SQL and do not wrap it in \`toDateTime64\`, \`toDateTime\`, or \`parseDateTime*\`. The editor applies the selected time range as a request parameter. A trailing \`Z\` inside those functions is invalid ClickHouse.
+- Filter by \`source\` to scope to one service; omit it to query across services.
 - Do not quote identifiers with double quotes and do not append a trailing semicolon.
 - Do not use \`select *\`, this is disallowed by the backend.
 `
@@ -27,7 +29,7 @@ const CLICKHOUSE_LOGS_COLUMN_REFERENCE = `The logs table has these columns:
 - timestamp (DateTime64, UTC) formatted like 2026-06-22T09:34:06.215000 (ISO 8601, microsecond precision, no trailing Z)
 - event_message (String): the raw log line
 - severity_text (String): log level when present
-- source (String): the service the log belongs to. Always filter by it, e.g. where source = 'edge_logs'.
+- source (String): the service the log belongs to. Filter by it to scope to one service, e.g. where source = 'edge_logs'. Omit it to query across services.
 - log_attributes (Map(String, String)): structured per-source fields, read as log_attributes['key']
 
 Sources and their common log_attributes keys:
@@ -39,7 +41,7 @@ Sources and their common log_attributes keys:
 - function_logs: event_type, function_id, execution_id, level
 - storage_logs, realtime_logs, postgrest_logs, supavisor_logs, pgbouncer_logs: mostly id, timestamp, event_message, with extra fields in log_attributes
 
-The editor applies the user's selected time range as a request parameter, so an explicit timestamp filter is usually unnecessary.`
+The editor or query_logs tool applies the user's selected time range as a request parameter, so do not add a timestamp filter in SQL.`
 
 function renderAvailableKeys(availableKeys?: string[]): string {
   if (!availableKeys || availableKeys.length === 0) return ''

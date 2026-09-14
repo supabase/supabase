@@ -97,7 +97,7 @@ export const ChooseChannelPopover = ({
 
   const channelPopoverTrigger = (
     <PopoverTrigger asChild>
-      <Button className="rounded-r-none" variant="default" size="tiny" iconRight={<ChevronDown />}>
+      <Button className="rounded-r-none" size="tiny" iconRight={<ChevronDown />}>
         <p
           className="max-w-[120px] truncate"
           title={config.channelName.length > 0 ? config.channelName : ''}
@@ -220,7 +220,6 @@ export const ChooseChannelPopover = ({
                 If you leave this channel, all of the messages populated on this page will disappear
               </p>
               <Button
-                variant="default"
                 onClick={() => onChangeConfig({ ...config, channelName: '', enabled: false })}
               >
                 Leave channel

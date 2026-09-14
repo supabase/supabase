@@ -97,15 +97,13 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
 }
 
 export const useUnifiedLogsPreview = () => {
-  const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
   const { flags, isInitialized, onUpdateFlag } = useFeaturePreviewContext()
 
   const isLoading = !isInitialized
   const isEnabled = IS_PLATFORM && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const hasToggledPreview = !!safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
-  const isDefaultOptIn =
-    IS_PLATFORM && isInitialized && unifiedLogsDefaultOptIn && !hasToggledPreview
+  const isDefaultOptIn = IS_PLATFORM && !hasToggledPreview
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
@@ -151,10 +149,16 @@ export const useIsMarketplaceEnabled = () => {
   return isMarketplaceEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]
 }
 
-export const useIsDatabaseConnectionsEnabled = () => {
+export const useIsExplorerEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const isDatabaseConnectionsEnabled = useFlag('topForPostgres')
-  return isDatabaseConnectionsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS]
+  const isExplorerEnabled = useFlag('explorer')
+  return isExplorerEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]
+}
+
+export const useIsStorageVersioningEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const isStorageVersioningEnabled = useFlag('storageVersioningPrivateAlpha')
+  return isStorageVersioningEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING]
 }
 
 export const useFeaturePreviewModal = () => {

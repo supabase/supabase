@@ -22,7 +22,6 @@ type ResponseData =
 
 const handleGet = async (_req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
   const response: ResponseData = {
-    billing_cycle_anchor: 0,
     current_period_end: 0,
     current_period_start: 0,
     next_invoice_at: 0,
@@ -35,8 +34,7 @@ const handleGet = async (_req: NextApiRequest, res: NextApiResponse<ResponseData
     project_addons: [],
     payment_method_type: '',
     billing_via_partner: false,
-    billing_partner: 'fly',
-    scheduled_plan_change: null,
+    billing_partner: 'aws_marketplace',
     customer_balance: 0,
   }
 

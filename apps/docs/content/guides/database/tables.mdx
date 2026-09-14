@@ -361,7 +361,7 @@ For example, if you wanted to load a CSV file into your movies table:
 "Return of the Jedi", "After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star."
 ```
 
-You would [connect](../../guides/database/connecting-to-postgres#direct-connections) to your database directly and load the file with the COPY command:
+You would [connect](../../guides/database/connecting-to-postgres#direct-connection) to your database directly and load the file with the COPY command:
 
 ```bash
 psql -h DATABASE_URL -p 5432 -d postgres -U postgres \
@@ -423,14 +423,7 @@ For example if you had the following situations:
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/TKwF3IGij5c"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+<YouTube id="TKwF3IGij5c" title="Joining tables with foreign keys in the dashboard" />
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
@@ -635,7 +628,7 @@ Views can restrict the amount and type of data presented to a user. Instead of a
 
 ### Materialized views
 
-A [materialized view](https://www.postgresql.org/docs/12/rules-materializedviews.html) is a form of view but it also stores the results to disk. In subsequent reads of a materialized view, the time taken to return its results would be much faster than a conventional view. This is because the data is readily available for a materialized view while the conventional view executes the underlying query each time it is called.
+A [materialized view](https://www.postgresql.org/docs/current/rules-materializedviews.html) is a form of view but it also stores the results to disk. In subsequent reads of a materialized view, the time taken to return its results would be much faster than a conventional view. This is because the data is readily available for a materialized view while the conventional view executes the underlying query each time it is called.
 
 Using our example above, a materialized view can be created like this:
 
@@ -678,7 +671,7 @@ Creating a materialized view is not a solution to inefficient queries. You shoul
 ## Resources
 
 - [Official Docs: Create table](https://www.postgresql.org/docs/current/sql-createtable.html)
-- [Official Docs: Create view](https://www.postgresql.org/docs/12/sql-createview.html)
+- [Official Docs: Create view](https://www.postgresql.org/docs/current/sql-createview.html)
 - [Postgres Tutorial: Create tables](https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-create-table/)
 - [Postgres Tutorial: Add column](https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-add-column/)
 - [Postgres Tutorial: Views](https://www.postgresqltutorial.com/postgresql-views/)

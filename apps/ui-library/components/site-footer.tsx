@@ -14,7 +14,7 @@ export function SiteFooter() {
           </a>
           . The source code is available on{' '}
           <a
-            href="https://github.com/supabase/supabase/tree/master/apps/ui-library"
+            href="https://github.com/supabase/supabase/tree/master/apps/library"
             target="_blank"
             rel="noreferrer"
             className="font-medium underline underline-offset-4 hover:text-foreground-lighter"

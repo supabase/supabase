@@ -5,7 +5,7 @@ featured: true
 component: true
 ---
 
-<ComponentPreview name="button-demo" peekCode wide />
+<ComponentPreview name="button-default" peekCode wide />
 
 ## Usage
 
@@ -47,22 +47,17 @@ Use the `size` prop to determine the size of the button.
 
 ### Variants
 
-These are all the different `variant` variations.
+#### Default
+
+Used when no `variant` is specified. Prefer this unless another variant fits better, as below.
+
+<ComponentPreview name="button-default" />
 
 #### Primary
 
-Used for data insertion actions, confirming purchases, strong positive actions.
+Use sparingly for data insertion, confirming purchases, and other strong positive actions. Because it is so prominent, aim for at most one primary button in a viewport.
 
 <ComponentPreview name="button-demo" />
-
-#### Default
-
-Used for opening dialogs, navigating to pages, and other non CRUD actions.
-
-This `variant` will probably be the most used button variant.
-It will probably be changed to be the default variant in future.
-
-<ComponentPreview name="button-default" />
 
 #### Secondary
 
@@ -125,25 +120,40 @@ Supports slot behavior with `asChild` prop.
 
 Pair a button with a chevron `DropdownMenu` trigger when there are variations of the same action, or alternative ways to accomplish the same goal. The default or most likely option should be used on the exposed button.
 
-When secondary actions are related but distinct—not alternatives to the primary action—display the primary action as a button and place the rest in an overflow menu instead. See [Table multiple actions](./table#multiple-actions).
+When secondary actions are related but distinct (not alternatives to the primary action) display the primary action as a button and place the rest in an overflow menu instead. See [Table multiple actions](./table#multiple-actions).
 
 <ComponentPreview name="button-split-dropdown" peekCode />
 
-The shared middle border is the tricky part. Do **not** use `border-l-0` on the chevron button — that drops the divider on hover/focus. Instead:
+Ensure the middle border is shared rather than doubled-up. Do not use `border-l-0` on the chevron button as that drops the divider on hover/focus. Instead:
 
-- Primary: `rounded-r-none` and `hover:z-10` so its border stacks above the chevron on hover.
+- Primary action: `rounded-r-none` and `hover:z-10` so its border stacks above the chevron on hover.
 - Chevron trigger: `rounded-l-none`, `shrink-0`, `px-[4px] py-[5px]`, and `-ml-px` to overlap the adjacent border by one pixel.
+- Both: `focus-visible:z-10` so the focus ring stacks above the neighbour, and `focus-visible:rounded-r-sm` / `focus-visible:rounded-l-sm` so the squared-off edge is slightly rounded while the ring is shown.
 - Chevron trigger only: `aria-label` describing the menu (the icon is decorative).
 
-Inside [Admonition](../fragments/admonition#split-button-with-dropdown) actions, also use `flex w-full @lg:w-auto` with `flex-1 @lg:flex-none` on the primary when `layout="responsive"`.
+Inside [Admonition](../fragments/admonition#split-button-with-dropdown) actions when `layout="responsive"`: also use `flex w-full @lg:w-auto` with `flex-1 @lg:flex-none` on the primary action.
 
 ## Accessibility
 
 [Keyboard focus](../accessibility#focus-management) is automatically handled:
 
 - Enabled buttons default to `tabIndex={0}` (keyboard accessible)
-- Disabled buttons default to `tabIndex={-1}` (removed from tab order)
+- Buttons with native `disabled` default to `tabIndex={-1}` (removed from tab order)
 - You can still override with an explicit `tabIndex` prop when needed
 - Keyboard focus uses the shared `focus-ring` utility; variants do not change ring colour
 
-You therefore don't need to manually set `tabIndex`, as Button handles it automatically based on its `disabled` state.
+You therefore don't need to manually set `tabIndex` for buttons using native `disabled`.
+
+When a disabled action has a non-obvious reason and needs a tooltip, add `focusableWhenDisabled` so keyboard users can still focus the control. See [Disabled controls](../accessibility#disabled-controls).
+
+### Focusable when disabled
+
+Use `focusableWhenDisabled` with `disabled` when the action is blocked for a non-obvious reason and you need a tooltip or other explanation. The control stays in the tab order and uses `aria-disabled` instead of native `disabled`.
+
+```tsx
+<Button disabled focusableWhenDisabled>
+  Pause project
+</Button>
+```
+
+In Studio, `ButtonTooltip` adds `focusableWhenDisabled` to disabled buttons with tooltip text automatically.

@@ -29,7 +29,7 @@ import { DEFAULT_CHART_CONFIG } from '@/components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from '@/data/analytics/constants'
 import { useInvalidateAnalyticsQuery } from '@/data/analytics/utils'
 import { useContentInfiniteQuery } from '@/data/content/content-infinite-query'
-import { Content } from '@/data/content/content-query'
+import { Content, ContentOfType } from '@/data/content/content-query'
 import {
   UpsertContentPayload,
   useContentUpsertMutation,
@@ -58,7 +58,7 @@ export function CustomReportSection() {
     { projectRef: ref, type: 'report', name: 'Home', limit: 1 },
     { placeholderData: keepPreviousData }
   )
-  const homeReport = reportsData?.pages?.[0]?.content?.[0] as Content | undefined
+  const homeReport = reportsData?.pages?.[0]?.content?.[0] as ContentOfType<'report'> | undefined
   const reportContent = homeReport?.content as Dashboards.Content | undefined
 
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
@@ -94,7 +94,14 @@ export function CustomReportSection() {
   const persistReport = useCallback(
     (updated: Dashboards.Content) => {
       if (!ref || !homeReport) return
-      upsertContent({ projectRef: ref, payload: { ...homeReport, content: updated } })
+      upsertContent({
+        projectRef: ref,
+        payload: {
+          ...homeReport,
+          description: homeReport.description ?? undefined,
+          content: updated,
+        },
+      })
     },
     [homeReport, ref, upsertContent]
   )
@@ -368,7 +375,6 @@ export function CustomReportSection() {
         <div className="flex items-center gap-x-2">
           {layout.length > 0 && (
             <ButtonTooltip
-              variant="default"
               icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
               className="w-7"
               disabled={isRefreshing}
@@ -380,11 +386,7 @@ export function CustomReportSection() {
             <SnippetDropdown
               projectRef={ref}
               onSelect={handleSelectSnippet}
-              trigger={
-                <Button variant="default" icon={<Plus />}>
-                  Add block
-                </Button>
-              }
+              trigger={<Button icon={<Plus />}>Add block</Button>}
               side="bottom"
               align="end"
               autoFocus
@@ -411,11 +413,7 @@ export function CustomReportSection() {
               <SnippetDropdown
                 projectRef={ref}
                 onSelect={handleSelectSnippet}
-                trigger={
-                  <Button variant="default" iconRight={<Plus size={14} />}>
-                    Add your first block
-                  </Button>
-                }
+                trigger={<Button iconRight={<Plus size={14} />}>Add your first block</Button>}
                 side="bottom"
                 align="center"
                 autoFocus

@@ -9,7 +9,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { Alert, AlertDescription, AlertTitle, Button, WarningIcon } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { filterByProjects, filterByUsers, sortAuditLogs } from './AuditLogs.utils'
+import {
+  filterByProjects,
+  filterByUsers,
+  formatPartnerIfExists,
+  sortAuditLogs,
+} from './AuditLogs.utils'
 import { LogDetailsPanel } from '@/components/interfaces/AuditLogs/LogDetailsPanel'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
@@ -236,7 +241,6 @@ export const AuditLogs = () => {
                   )}
                 </div>
                 <Button
-                  variant="default"
                   disabled={isLoading || isRefetching}
                   icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
                   onClick={() => refetch()}
@@ -351,6 +355,12 @@ export const AuditLogs = () => {
                             />
                           )
 
+                        const actorDisplayName =
+                          user?.username ||
+                          log.actor.email ||
+                          formatPartnerIfExists(log.actor.partner, log.actor.partner_user_email) ||
+                          '-'
+
                         return (
                           <Table.tr
                             key={log.request_id}
@@ -361,9 +371,7 @@ export const AuditLogs = () => {
                               <div className="flex items-center space-x-4">
                                 <div>{userIcon}</div>
                                 <div>
-                                  <p className="text-foreground-light">
-                                    {user?.username ?? log.actor.email ?? '-'}
-                                  </p>
+                                  <p className="text-foreground-light">{actorDisplayName}</p>
                                   {role && (
                                     <p className="mt-0.5 text-xs text-foreground-light">
                                       {role?.name}
@@ -413,7 +421,7 @@ export const AuditLogs = () => {
                               )}
                             </Table.td>
                             <Table.td align="right">
-                              <Button variant="default">View details</Button>
+                              <Button>View details</Button>
                             </Table.td>
                           </Table.tr>
                         )

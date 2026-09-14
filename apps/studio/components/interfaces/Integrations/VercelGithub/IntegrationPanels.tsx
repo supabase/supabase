@@ -118,7 +118,7 @@ export const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInst
           </div>
         </div>
 
-        <Button asChild disabled={disabled} variant="default" iconRight={<ExternalLink />}>
+        <Button asChild disabled={disabled} iconRight={<ExternalLink />}>
           {disabled ? (
             <p>Manage</p>
           ) : (
@@ -260,7 +260,7 @@ export const IntegrationConnectionOption = forwardRef<HTMLLIElement, Integration
           </span>
         </div>
 
-        <Button variant="default">Connect</Button>
+        <Button>Connect</Button>
       </li>
     )
   }
@@ -291,7 +291,7 @@ export const EmptyIntegrationConnection = forwardRef<
     },
     ref
   ) => {
-    const label = children ?? 'Add new project connection'
+    const label = children ?? 'Add connection'
 
     return (
       <div
@@ -315,7 +315,7 @@ export const EmptyIntegrationConnection = forwardRef<
           )}
         >
           {href && !disabled ? (
-            <Button icon={icon} asChild variant="default">
+            <Button icon={icon} asChild>
               <Link href={href} target="_blank" rel="noreferrer">
                 {label}
               </Link>
@@ -323,7 +323,6 @@ export const EmptyIntegrationConnection = forwardRef<
           ) : (
             <ButtonTooltip
               icon={icon}
-              variant="default"
               disabled={disabled}
               onClick={onClick ? () => onClick() : undefined}
               tooltip={{

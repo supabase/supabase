@@ -58,6 +58,7 @@ const PITRStatus = ({
               </span>
             </div>
             <ButtonTooltip
+              variant="primary"
               disabled={hasReadReplicas || !canTriggerPhysicalBackup}
               onClick={() => onSetConfiguration()}
               tooltip={{

@@ -23,8 +23,8 @@ interface Props {
 }
 
 const buttonClassName =
-  'relative z-10 flex items-center gap-1 px-2 pointer-events-auto overflow-hidden h-[30px]! min-w-[30px]! max-w-[30px]! py-1 justify-center rounded-full border bg-default hover:bg-surface-100 hover:text-foreground hover:border-foreground-lighter transition-all'
-const iconClassName = 'className="w-4 h-4 shrink-0'
+  'relative z-10 flex items-center gap-1 px-2 cursor-pointer pointer-events-auto overflow-hidden h-[30px]! min-w-[30px]! max-w-[30px]! py-1 justify-center rounded-full border bg-default hover:bg-surface-100 hover:text-foreground hover:border-foreground-lighter transition-all'
+const iconClassName = 'w-4 h-4 shrink-0'
 
 const PrevNextFeatureNav: React.FC<Props> = ({
   className,
@@ -69,6 +69,7 @@ const PrevNextFeatureNav: React.FC<Props> = ({
         <DropdownMenu open={open} onOpenChange={setOpen}>
           <DropdownMenuTrigger className={cn(buttonClassName, 'p-0')}>
             <List className={iconClassName} />
+            <span className="sr-only">Browse all features</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" alignOffset={-38} className="pb-0">
             <DropdownMenuItem asChild className="text-foreground-lighter p-0">

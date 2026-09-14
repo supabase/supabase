@@ -109,7 +109,7 @@ check "Legacy ANON_KEY" "200" \
     "$(http_status "$BASE_URL/storage/v1/bucket" -H "apikey: $ANON_KEY" -H "Authorization: Bearer $ANON_KEY")"
 
 if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
-    # With opaque key, Kong translates to asymmetric JWT in Authorization
+    # With opaque key, the API gateway translates to asymmetric JWT in Authorization
     check "New PUBLISHABLE_KEY" "200" \
         "$(http_status "$BASE_URL/storage/v1/bucket" -H "apikey: $SUPABASE_PUBLISHABLE_KEY")"
 fi

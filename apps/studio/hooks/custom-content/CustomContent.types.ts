@@ -7,6 +7,8 @@ export type CustomContentTypes = {
 
   dashboardAuthCustomProviders: string[]
 
+  dashboardAuthLogoLinkUrl: string
+
   docsRowLevelSecurityGuidePath: string
 
   organizationLegalDocuments: {
