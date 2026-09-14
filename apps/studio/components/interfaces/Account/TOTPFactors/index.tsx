@@ -62,15 +62,14 @@ export const TOTPFactors = () => {
         </PageSectionMeta>
         <PageSectionContent className="flex flex-col gap-4">
           {recoveryCodesStatus?.status === 'unenrolled' && <GenerateRecoveryCodesModal />}
-          {recoveryCodesStatus?.status === 'available' &&
-            !!recoveryCodesStatus?.data?.remaining && (
-              <Admonition
-                layout="responsive"
-                title={`${recoveryCodesStatus?.data?.remaining}/${recoveryCodesStatus?.data?.total} recovery codes available`}
-                description="Recovery codes allow you to recover your account in case you lost access to your MFA apps."
-                actions={IS_STAGING_OR_LOCAL && <UnenrollRecoveryCodesModal />}
-              />
-            )}
+          {recoveryCodesStatus?.status === 'available' && (
+            <Admonition
+              layout="responsive"
+              title={`${recoveryCodesStatus?.data?.remaining}/${recoveryCodesStatus?.data?.total} recovery codes available`}
+              description="Recovery codes allow you to recover your account in case you lost access to your MFA apps."
+              actions={IS_STAGING_OR_LOCAL && <UnenrollRecoveryCodesModal />}
+            />
+          )}
           {shouldShowLockoutWarning && (
             <Admonition
               type="danger"
