@@ -7,6 +7,7 @@ describe('generateAdvisorsMenu', () => {
     const [advisors] = generateAdvisorsMenu({
       ref: 'abc',
       isAdvisorRulesEnabled: false,
+      isHealthAdvisorEnabled: true,
       isPlatform: true,
     })
 
@@ -23,6 +24,7 @@ describe('generateAdvisorsMenu', () => {
     const [advisors] = generateAdvisorsMenu({
       ref: 'abc',
       isAdvisorRulesEnabled: false,
+      isHealthAdvisorEnabled: true,
       isPlatform: false,
     })
 
