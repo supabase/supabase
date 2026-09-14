@@ -136,15 +136,14 @@ Guides are also goal-oriented, but they focus on shorter, more targeted tasks. F
 
 Guides contain mostly procedures: concise steps that readers can follow in sequence.
 
-Begin each guide with a value statement: name what the reader can do, and why it matters to them. Don't refer to the page itself. A self-referential opener spends the reader's first sentence describing the document rather than the outcome, and it repeats what the title already told them. Readers and agents still get what they need from a value statement, which is confirmation that the page matches their goal.
+Begin each guide with a value statement: name what the reader can do, and why it matters to them. This is what tells a reader and an agent whether the page matches their goal.
 
-- Recommended: `Learn how to set up email login.`
-- Recommended: `Set up email login so users can sign in without a password.`
-- Recommended: `Give users a passwordless sign-in option with email login.`
-- Recommended: `Restrict access to a shared table so each user reads only their own rows.`
-- Not recommended: `This guide explains how to set up email login.`
-- Not recommended: `In this guide, you learn about email login.`
-- Not recommended: `This page covers email login and its configuration options.`
+For example:
+
+- `Learn how to set up email login.`
+- `Set up email login so users can sign in without a password.`
+- `Give users a passwordless sign-in option with email login.`
+- `Restrict access to a shared table so each user reads only their own rows.`
 
 Keep procedures focused on what the reader must do. Move substantial background or conceptual explanations into a separate section or an explainer. Cross-reference the authoritative explanation instead of repeating it in the procedure. This keeps the action path scannable, gives readers optional depth, and maintains one source of truth.
 

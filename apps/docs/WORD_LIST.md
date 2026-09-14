@@ -744,20 +744,6 @@ Add a noun after _this_ or _that_ when the reference could be unclear.
 - Recommended: This setting controls connection pooling.
 - Not recommended: This controls connection pooling.
 
-### this guide
-
-Don't open a page by referring to the page. Write a value statement that names what
-the reader can do and why it matters. The same applies to _this page_, _this
-document_, _this tutorial_, and _in this guide_.
-
-- Recommended: Learn how to set up email login.
-- Recommended: Restrict access to a shared table so each user reads only their own
-  rows.
-- Not recommended: This guide explains how to set up email login.
-- Not recommended: In this guide, you learn about Row Level Security.
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md#guides).
-
 ### timeout and time out
 
 Use _timeout_ as a noun or adjective and _time out_ as a verb.
