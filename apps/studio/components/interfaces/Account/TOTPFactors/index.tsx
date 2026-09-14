@@ -22,7 +22,7 @@ import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
 import { AlertError } from '@/components/ui/AlertError'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
 import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
-import { DATETIME_FORMAT } from '@/lib/constants'
+import { DATETIME_FORMAT, IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
 export const TOTPFactors = () => {
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
@@ -68,8 +68,7 @@ export const TOTPFactors = () => {
                 layout="responsive"
                 title={`${recoveryCodesStatus?.data?.remaining}/${recoveryCodesStatus?.data?.total} recovery codes available`}
                 description="Recovery codes allow you to recover your account in case you lost access to your MFA apps."
-                // TODO: Needed the Unenroll to ease working on recovery codes. Not sure we should keep it even though the API allows it
-                actions={<UnenrollRecoveryCodesModal />}
+                actions={IS_STAGING_OR_LOCAL && <UnenrollRecoveryCodesModal />}
               />
             )}
           {shouldShowLockoutWarning && (
