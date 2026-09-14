@@ -96,14 +96,21 @@ export const getTablesPaginatedSql = ({
             'table_name', c.relname,
             'name', a.attname
           )
-          order by array_position(i.indkey, a.attnum)
+          order by pk.ord
         ) as primary_keys
       from pg_index i
       join pg_class c on i.indrelid = c.oid
       join pg_namespace n on c.relnamespace = n.oid
-      join pg_attribute a on a.attrelid = c.oid and a.attnum = any(i.indkey)
+      -- Walk indkey positionally so (a) the emitted array is in index /
+      -- constraint-definition order (not pg_attribute scan order) and (b)
+      -- INCLUDE payload columns past indnkeyatts are excluded from the
+      -- key array. See the parallel "pair conkey/confkey by ordinal" join
+      -- in page_relationships below for the same pattern.
+      join lateral unnest(i.indkey) with ordinality as pk(attnum, ord) on true
+      join pg_attribute a on a.attrelid = c.oid and a.attnum = pk.attnum
       where i.indisprimary
         and c.oid in (select oid from page)
+        and pk.ord <= i.indnkeyatts
       group by c.oid
     ),
     -- Two-armed UNION ALL keyed by table_id so the downstream join is a plain
