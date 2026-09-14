@@ -1,5 +1,5 @@
+import { Heading } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
-import Heading from 'ui/src/components/CustomHTMLElements/Heading'
 
 import { getAiSkills } from './AiSkills.utils'
 

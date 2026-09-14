@@ -3,7 +3,7 @@ name: Update Mgmt Api Docs
 on:
   schedule:
     # Run at 00:00 UTC every Monday
-    - cron: "0 0 * * 1"
+    - cron: '0 0 * * 1'
   workflow_dispatch:
 
 permissions:
@@ -19,10 +19,13 @@ jobs:
         with:
           persist-credentials: false
           ref: ${{ github.ref }}
+          # The PAT tables generator imports the shared catalog and its base tsconfig.
           sparse-checkout: |
             apps/docs
             patches
             packages/generator
+            packages/shared-data
+            packages/tsconfig
 
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         name: Install pnpm
@@ -32,15 +35,15 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version-file: ".nvmrc"
-          cache: "pnpm"
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
 
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
-      - name: Change to apps/docs/spec directory and run make command
+      - name: Refresh Management API docs
         working-directory: apps/docs/spec
-        run: make download.api.v1 dereference.api.v1 generate.sections.api.v1 format
+        run: make download.api.v1 download.mcp-tools-permissions dereference.api.v1 generate.sections.api.v1 generate.partials.access-control format
 
       - name: Generate token
         id: app-token
@@ -55,8 +58,18 @@ jobs:
         uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
         with:
           token: ${{ steps.app-token.outputs.token }}
-          commit-message: "feat: update mgmt api docs"
-          title: "feat: update mgmt api docs"
-          body: "This PR updates mgmt api docs automatically."
-          branch: "gha/auto-update-mgmt-api-docs"
-          base: "master"
+          commit-message: 'feat: update mgmt api docs'
+          title: 'feat: update mgmt api docs'
+          body: |
+            This PR updates Management API docs automatically.
+
+            This regenerates:
+
+            - Management API specs and sections
+            - Personal Access Tokens permission-to-endpoint table
+            - Personal Access Tokens MCP tool permissions table
+
+            Sources include the live Management API specs, MCP permission map,
+            and Studio's shared permission catalog.
+          branch: 'gha/auto-update-mgmt-api-docs'
+          base: 'master'

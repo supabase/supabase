@@ -89,7 +89,6 @@ export const ClickHouseFields = ({
                   actions={
                     <div className="flex items-center justify-center">
                       <Button
-                        variant="default"
                         className="w-7"
                         title={showPassword ? 'Hide password' : 'Show password'}
                         aria-label={showPassword ? 'Hide password' : 'Show password'}

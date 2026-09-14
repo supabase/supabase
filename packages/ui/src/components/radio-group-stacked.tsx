@@ -4,7 +4,6 @@ import { Circle } from 'lucide-react'
 import { RadioGroup as RadioGroupPrimitive } from 'radix-ui'
 import * as React from 'react'
 
-import { Label } from '../components/shadcn/ui/label'
 import { cn } from '../lib/utils/cn'
 
 const RadioGroupStacked = React.forwardRef<
@@ -32,10 +31,14 @@ interface RadioGroupStackedItemProps {
 const RadioGroupStackedItem = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Item>,
   RadioGroupStackedItemProps & React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
->(({ image, label, showIndicator = true, ...props }, ref) => {
+>(({ id: idProp, image, label, showIndicator = true, ...props }, ref) => {
+  const generatedId = React.useId()
+  const id = idProp || generatedId
   return (
     <RadioGroupPrimitive.Item
       ref={ref}
+      id={id}
+      aria-labelledby={`${id}-label`}
       {...props}
       className={cn(
         // Base layout and sizing
@@ -78,8 +81,8 @@ const RadioGroupStackedItem = React.forwardRef<
           </div>
         )}
         <div className="flex flex-col gap-0.25 items-start">
-          <Label
-            htmlFor={props.value}
+          <div
+            id={`${id}-label`}
             className={cn(
               // Base styles
               'block mt-[-0.15rem] text-sm text-left text-light',
@@ -90,7 +93,7 @@ const RadioGroupStackedItem = React.forwardRef<
             )}
           >
             {label}
-          </Label>
+          </div>
           {props.description && (
             <p className="text-left text-sm text-foreground-lighter text-balance">
               {props.description}

@@ -150,6 +150,9 @@ export function DiskSection({
           <DocsButton href={`${DOCS_URL}/guides/platform/database-size`} />
         </PageSectionAside>
       </PageSectionMeta>
+
+      <HighAvailabilityDisabledSectionNotice title="Disk management is unavailable for High Availability projects" />
+
       <PageSectionContent ref={settingsRef} className="flex flex-col gap-4 scroll-mt-24">
         {isAws && <DiskSpaceBar form={form} />}
 
@@ -255,7 +258,7 @@ export function AdvancedSection({
       <PageSectionContent className="flex flex-col gap-4">
         <Card ref={autoscaleSettingsRef} className="scroll-mt-24">
           <CardContent className="flex flex-col gap-y-8">
-            <AutoScaleFields form={form} />
+            <AutoScaleFields form={form} disableInput={disableDiskInputs && disableDiskSizeInput} />
           </CardContent>
         </Card>
 
@@ -269,7 +272,6 @@ export function AdvancedSection({
               actions={
                 canUpdateDiskConfiguration ? (
                   <Button
-                    variant="default"
                     onClick={() => {
                       form.setValue('computeSize', 'ci_large', {
                         shouldDirty: true,
@@ -299,7 +301,6 @@ export function AdvancedSection({
               actions={
                 !disableDiskSizeInput ? (
                   <Button
-                    variant="default"
                     onClick={() => {
                       form.setValue('totalSize', suggestedDiskSizeForCustomIops, {
                         shouldDirty: true,

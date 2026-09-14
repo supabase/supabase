@@ -19,7 +19,7 @@ Envoy is registered as the `api-gw` service and also exposes `envoy` and `kong` 
 Confirm the gateway is routing requests and enforcing API keys:
 
 ```sh
-curl -i -H "apikey: your-service-role-key" http://<your-domain>/rest/v1/
+curl -i -H "apikey: your-supabase-secret-key" http://<your-domain>/rest/v1/
 ```
 
 A `200 OK` response from PostgREST confirms the gateway is up. A `401 Unauthorized` without the `apikey` header confirms enforcement is active.

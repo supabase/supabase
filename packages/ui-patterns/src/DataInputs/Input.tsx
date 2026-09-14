@@ -91,7 +91,10 @@ const Input = forwardRef<
               <InputGroupButton
                 size="tiny"
                 variant="default"
-                className={cn(showCopyOnHover && 'opacity-0 group-hover:opacity-100 transition')}
+                className={cn(
+                  showCopyOnHover &&
+                    'opacity-0 group-hover/input-group:opacity-100 group-focus-within/input-group:opacity-100 transition'
+                )}
                 icon={<Copy size={16} className="text-foreground-muted" />}
                 onClick={() => _onCopy(props.value)}
               >

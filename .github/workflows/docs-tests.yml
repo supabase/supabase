@@ -6,8 +6,13 @@ on:
     paths:
       - 'apps/docs/**/*.ts*'
       - 'apps/docs/spec/**/*.json'
+      - 'apps/docs/spec/Makefile'
+      - 'apps/docs/spec/sections/generateAccessControlPartials.mts'
+      - 'apps/docs/content/_partials/access-control/**'
       - 'apps/docs/.env.development'
       - 'apps/docs/package.json'
+      - 'packages/shared-data/package.json'
+      - 'packages/shared-data/scoped-access-token-permissions.ts'
       - 'e2e/docs/local-smoke/**'
       - 'e2e/docs/playwright.local-smoke.config.ts'
       - 'e2e/docs/package.json'
@@ -51,6 +56,13 @@ jobs:
 
       - name: Install deps
         run: pnpm install --frozen-lockfile
+
+      - name: Check access-control partials
+        run: |
+          make -C apps/docs/spec generate.partials.access-control
+          git diff --exit-code -- \
+            apps/docs/content/_partials/access-control/scoped_pat_permissions.mdx \
+            apps/docs/content/_partials/access-control/scoped_pat_mcp_tools.mdx
 
       - name: Download JS reference TypeDoc dumps
         # The source dumps under apps/docs/spec/reference/<lib>/<ver>/*.json are

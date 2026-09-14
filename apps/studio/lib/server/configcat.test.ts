@@ -16,7 +16,6 @@ describe('lib/server/configcat getServerFlags', () => {
   }
 
   beforeEach(() => {
-    vi.clearAllMocks()
     vi.resetModules()
     vi.unstubAllEnvs()
     vi.mocked(configcat.getClient).mockReturnValue(mockClient as unknown as IConfigCatClient)

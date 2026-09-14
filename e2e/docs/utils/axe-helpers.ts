@@ -5,7 +5,7 @@ import { scan } from '../../shared/axe.ts'
 
 export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
 
-export const ENFORCED_RULES = ['heading-order', 'page-has-heading-one']
+export const ENFORCED_RULES = ['heading-order', 'page-has-heading-one', 'button-name']
 
 export const EXCLUDED_RULES = [
   'color-contrast',
@@ -40,7 +40,7 @@ export async function scanArticle(
   include: string
 ): Promise<A11yScanResult> {
   const reported = await scan(page, { tags: WCAG_TAGS, excludeRules: EXCLUDED_RULES, include })
-  const enforced = await scan(page, { rules: ENFORCED_RULES, include })
+  const enforced = await scan(page, { rules: ENFORCED_RULES })
 
   const byRule = new Map([...reported, ...enforced].map((violation) => [violation.id, violation]))
 

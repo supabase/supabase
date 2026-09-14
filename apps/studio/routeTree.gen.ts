@@ -24,6 +24,7 @@ import { Route as ProjectChar91_Char93RouteImport } from './routes/project.[_]'
 import { Route as ProjectRefRouteImport } from './routes/project/$ref'
 import { Route as OrgChar91_Char93RouteImport } from './routes/org.[_]'
 import { Route as NewSlugRouteImport } from './routes/new/$slug'
+import { Route as McpSecretsRouteImport } from './routes/mcp/secrets'
 import { Route as IntegrationsVercelRouteImport } from './routes/integrations/vercel'
 import { Route as ApiStatusOverrideRouteImport } from './routes/api/status-override'
 import { Route as ApiScopedAccessTokenPermissionsRouteImport } from './routes/api/scoped-access-token-permissions'
@@ -55,7 +56,6 @@ import { Route as ApiConnectIndexRouteImport } from './routes/api/connect/index'
 import { Route as AppOrgIndexRouteImport } from './routes/_app/org/index'
 import { Route as AppNewIndexRouteImport } from './routes/_app/new/index'
 import { Route as ProjectChar91_Char93SplatRouteImport } from './routes/project.[_].$'
-import { Route as ProjectRefWorkersRouteImport } from './routes/project/$ref/workers'
 import { Route as ProjectRefStorageRouteImport } from './routes/project/$ref/storage'
 import { Route as ProjectRefSqlRouteImport } from './routes/project/$ref/sql'
 import { Route as ProjectRefSettingsRouteImport } from './routes/project/$ref/settings'
@@ -68,6 +68,7 @@ import { Route as ProjectRefFunctionsRouteImport } from './routes/project/$ref/f
 import { Route as ProjectRefExplorerRouteImport } from './routes/project/$ref/explorer'
 import { Route as ProjectRefEditorRouteImport } from './routes/project/$ref/editor'
 import { Route as ProjectRefDatabaseRouteImport } from './routes/project/$ref/database'
+import { Route as ProjectRefComputeRouteImport } from './routes/project/$ref/compute'
 import { Route as ProjectRefBranchesRouteImport } from './routes/project/$ref/branches'
 import { Route as ProjectRefAuthRouteImport } from './routes/project/$ref/auth'
 import { Route as ProjectRefAdvisorsRouteImport } from './routes/project/$ref/advisors'
@@ -85,7 +86,6 @@ import { Route as AppSupportLinkRouteImport } from './routes/_app/support/link'
 import { Route as AppAccountSecurityRouteImport } from './routes/_app/account/security'
 import { Route as AppAccountMeRouteImport } from './routes/_app/account/me'
 import { Route as AppAccountAuditRouteImport } from './routes/_app/account/audit'
-import { Route as ProjectRefWorkersIndexRouteImport } from './routes/project/$ref/workers/index'
 import { Route as ProjectRefSqlIndexRouteImport } from './routes/project/$ref/sql/index'
 import { Route as ProjectRefObservabilityIndexRouteImport } from './routes/project/$ref/observability/index'
 import { Route as ProjectRefLogsIndexRouteImport } from './routes/project/$ref/logs/index'
@@ -93,6 +93,7 @@ import { Route as ProjectRefIntegrationsIndexRouteImport } from './routes/projec
 import { Route as ProjectRefFunctionsIndexRouteImport } from './routes/project/$ref/functions/index'
 import { Route as ProjectRefExplorerIndexRouteImport } from './routes/project/$ref/explorer/index'
 import { Route as ProjectRefEditorIndexRouteImport } from './routes/project/$ref/editor/index'
+import { Route as ProjectRefComputeIndexRouteImport } from './routes/project/$ref/compute/index'
 import { Route as ProjectRefBranchesIndexRouteImport } from './routes/project/$ref/branches/index'
 import { Route as ProjectRefApiIndexRouteImport } from './routes/project/$ref/api/index'
 import { Route as ApiPlatformProjectsIndexRouteImport } from './routes/api/platform/projects/index'
@@ -156,6 +157,8 @@ import { Route as ProjectRefDatabaseIndexesRouteImport } from './routes/project/
 import { Route as ProjectRefDatabaseFunctionsRouteImport } from './routes/project/$ref/database/functions'
 import { Route as ProjectRefDatabaseExtensionsRouteImport } from './routes/project/$ref/database/extensions'
 import { Route as ProjectRefDatabaseColumnPrivilegesRouteImport } from './routes/project/$ref/database/column-privileges'
+import { Route as ProjectRefComputeSecretsRouteImport } from './routes/project/$ref/compute/secrets'
+import { Route as ProjectRefComputeNameRouteImport } from './routes/project/$ref/compute/$name'
 import { Route as ProjectRefBranchesMergeRequestsRouteImport } from './routes/project/$ref/branches/merge-requests'
 import { Route as ProjectRefAuthUsersRouteImport } from './routes/project/$ref/auth/users'
 import { Route as ProjectRefAuthUrlConfigurationRouteImport } from './routes/project/$ref/auth/url-configuration'
@@ -176,6 +179,7 @@ import { Route as ProjectRefAuthAuditLogsRouteImport } from './routes/project/$r
 import { Route as ProjectRefAdvisorsSecurityRouteImport } from './routes/project/$ref/advisors/security'
 import { Route as ProjectRefAdvisorsRulesRouteImport } from './routes/project/$ref/advisors/rules'
 import { Route as ProjectRefAdvisorsPerformanceRouteImport } from './routes/project/$ref/advisors/performance'
+import { Route as ProjectRefAdvisorsHealthRouteImport } from './routes/project/$ref/advisors/health'
 import { Route as ApiPlatformTelemetryEventRouteImport } from './routes/api/platform/telemetry/event'
 import { Route as ApiPlatformIntegrationsSlugRouteImport } from './routes/api/platform/integrations/$slug'
 import { Route as ApiAiSqlTitleV2RouteImport } from './routes/api/ai/sql/title-v2'
@@ -400,6 +404,11 @@ const NewSlugRoute = NewSlugRouteImport.update({
   path: '/new/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpSecretsRoute = McpSecretsRouteImport.update({
+  id: '/mcp/secrets',
+  path: '/mcp/secrets',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IntegrationsVercelRoute = IntegrationsVercelRouteImport.update({
   id: '/integrations/vercel',
   path: '/integrations/vercel',
@@ -559,11 +568,6 @@ const ProjectChar91_Char93SplatRoute =
     path: '/$',
     getParentRoute: () => ProjectChar91_Char93Route,
   } as any)
-const ProjectRefWorkersRoute = ProjectRefWorkersRouteImport.update({
-  id: '/workers',
-  path: '/workers',
-  getParentRoute: () => ProjectRefRoute,
-} as any)
 const ProjectRefStorageRoute = ProjectRefStorageRouteImport.update({
   id: '/storage',
   path: '/storage',
@@ -622,6 +626,11 @@ const ProjectRefEditorRoute = ProjectRefEditorRouteImport.update({
 const ProjectRefDatabaseRoute = ProjectRefDatabaseRouteImport.update({
   id: '/database',
   path: '/database',
+  getParentRoute: () => ProjectRefRoute,
+} as any)
+const ProjectRefComputeRoute = ProjectRefComputeRouteImport.update({
+  id: '/compute',
+  path: '/compute',
   getParentRoute: () => ProjectRefRoute,
 } as any)
 const ProjectRefBranchesRoute = ProjectRefBranchesRouteImport.update({
@@ -713,11 +722,6 @@ const AppAccountAuditRoute = AppAccountAuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => AppAccountRoute,
 } as any)
-const ProjectRefWorkersIndexRoute = ProjectRefWorkersIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ProjectRefWorkersRoute,
-} as any)
 const ProjectRefSqlIndexRoute = ProjectRefSqlIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -755,6 +759,11 @@ const ProjectRefEditorIndexRoute = ProjectRefEditorIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ProjectRefEditorRoute,
+} as any)
+const ProjectRefComputeIndexRoute = ProjectRefComputeIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProjectRefComputeRoute,
 } as any)
 const ProjectRefBranchesIndexRoute = ProjectRefBranchesIndexRouteImport.update({
   id: '/',
@@ -1116,6 +1125,17 @@ const ProjectRefDatabaseColumnPrivilegesRoute =
     path: '/column-privileges',
     getParentRoute: () => ProjectRefDatabaseRoute,
   } as any)
+const ProjectRefComputeSecretsRoute =
+  ProjectRefComputeSecretsRouteImport.update({
+    id: '/secrets',
+    path: '/secrets',
+    getParentRoute: () => ProjectRefComputeRoute,
+  } as any)
+const ProjectRefComputeNameRoute = ProjectRefComputeNameRouteImport.update({
+  id: '/$name',
+  path: '/$name',
+  getParentRoute: () => ProjectRefComputeRoute,
+} as any)
 const ProjectRefBranchesMergeRequestsRoute =
   ProjectRefBranchesMergeRequestsRouteImport.update({
     id: '/merge-requests',
@@ -1223,6 +1243,12 @@ const ProjectRefAdvisorsPerformanceRoute =
   ProjectRefAdvisorsPerformanceRouteImport.update({
     id: '/performance',
     path: '/performance',
+    getParentRoute: () => ProjectRefAdvisorsRoute,
+  } as any)
+const ProjectRefAdvisorsHealthRoute =
+  ProjectRefAdvisorsHealthRouteImport.update({
+    id: '/health',
+    path: '/health',
     getParentRoute: () => ProjectRefAdvisorsRoute,
   } as any)
 const ApiPlatformTelemetryEventRoute =
@@ -2129,6 +2155,7 @@ export interface FileRoutesByFullPath {
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
+  '/mcp/secrets': typeof McpSecretsRoute
   '/new/$slug': typeof NewSlugRoute
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/$ref': typeof ProjectRefRouteWithChildren
@@ -2150,6 +2177,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/advisors': typeof ProjectRefAdvisorsRouteWithChildren
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/branches': typeof ProjectRefBranchesRouteWithChildren
+  '/project/$ref/compute': typeof ProjectRefComputeRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
   '/project/$ref/explorer': typeof ProjectRefExplorerRouteWithChildren
@@ -2162,7 +2190,6 @@ export interface FileRoutesByFullPath {
   '/project/$ref/settings': typeof ProjectRefSettingsRouteWithChildren
   '/project/$ref/sql': typeof ProjectRefSqlRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
-  '/project/$ref/workers': typeof ProjectRefWorkersRouteWithChildren
   '/project/_/$': typeof ProjectChar91_Char93SplatRoute
   '/new/': typeof AppNewIndexRoute
   '/org/': typeof AppOrgIndexRoute
@@ -2194,6 +2221,7 @@ export interface FileRoutesByFullPath {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/advisors/health': typeof ProjectRefAdvisorsHealthRoute
   '/project/$ref/advisors/performance': typeof ProjectRefAdvisorsPerformanceRoute
   '/project/$ref/advisors/rules': typeof ProjectRefAdvisorsRulesRouteWithChildren
   '/project/$ref/advisors/security': typeof ProjectRefAdvisorsSecurityRoute
@@ -2214,6 +2242,8 @@ export interface FileRoutesByFullPath {
   '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
   '/project/$ref/branches/merge-requests': typeof ProjectRefBranchesMergeRequestsRoute
+  '/project/$ref/compute/$name': typeof ProjectRefComputeNameRoute
+  '/project/$ref/compute/secrets': typeof ProjectRefComputeSecretsRoute
   '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
   '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
   '/project/$ref/database/functions': typeof ProjectRefDatabaseFunctionsRoute
@@ -2277,6 +2307,7 @@ export interface FileRoutesByFullPath {
   '/api/platform/projects/': typeof ApiPlatformProjectsIndexRoute
   '/project/$ref/api/': typeof ProjectRefApiIndexRoute
   '/project/$ref/branches/': typeof ProjectRefBranchesIndexRoute
+  '/project/$ref/compute/': typeof ProjectRefComputeIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
   '/project/$ref/explorer/': typeof ProjectRefExplorerIndexRoute
   '/project/$ref/functions/': typeof ProjectRefFunctionsIndexRoute
@@ -2284,7 +2315,6 @@ export interface FileRoutesByFullPath {
   '/project/$ref/logs/': typeof ProjectRefLogsIndexRoute
   '/project/$ref/observability/': typeof ProjectRefObservabilityIndexRoute
   '/project/$ref/sql/': typeof ProjectRefSqlIndexRoute
-  '/project/$ref/workers/': typeof ProjectRefWorkersIndexRoute
   '/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
   '/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
   '/api/platform/auth/$ref/invite': typeof ApiPlatformAuthRefInviteRoute
@@ -2444,6 +2474,7 @@ export interface FileRoutesByTo {
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
+  '/mcp/secrets': typeof McpSecretsRoute
   '/new/$slug': typeof NewSlugRoute
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/_': typeof ProjectChar91_Char93RouteWithChildren
@@ -2499,6 +2530,7 @@ export interface FileRoutesByTo {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/advisors/health': typeof ProjectRefAdvisorsHealthRoute
   '/project/$ref/advisors/performance': typeof ProjectRefAdvisorsPerformanceRoute
   '/project/$ref/advisors/rules': typeof ProjectRefAdvisorsRulesRouteWithChildren
   '/project/$ref/advisors/security': typeof ProjectRefAdvisorsSecurityRoute
@@ -2519,6 +2551,8 @@ export interface FileRoutesByTo {
   '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
   '/project/$ref/branches/merge-requests': typeof ProjectRefBranchesMergeRequestsRoute
+  '/project/$ref/compute/$name': typeof ProjectRefComputeNameRoute
+  '/project/$ref/compute/secrets': typeof ProjectRefComputeSecretsRoute
   '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
   '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
   '/project/$ref/database/functions': typeof ProjectRefDatabaseFunctionsRoute
@@ -2579,6 +2613,7 @@ export interface FileRoutesByTo {
   '/api/platform/projects': typeof ApiPlatformProjectsIndexRoute
   '/project/$ref/api': typeof ProjectRefApiIndexRoute
   '/project/$ref/branches': typeof ProjectRefBranchesIndexRoute
+  '/project/$ref/compute': typeof ProjectRefComputeIndexRoute
   '/project/$ref/editor': typeof ProjectRefEditorIndexRoute
   '/project/$ref/explorer': typeof ProjectRefExplorerIndexRoute
   '/project/$ref/functions': typeof ProjectRefFunctionsIndexRoute
@@ -2586,7 +2621,6 @@ export interface FileRoutesByTo {
   '/project/$ref/logs': typeof ProjectRefLogsIndexRoute
   '/project/$ref/observability': typeof ProjectRefObservabilityIndexRoute
   '/project/$ref/sql': typeof ProjectRefSqlIndexRoute
-  '/project/$ref/workers': typeof ProjectRefWorkersIndexRoute
   '/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
   '/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
   '/api/platform/auth/$ref/invite': typeof ApiPlatformAuthRefInviteRoute
@@ -2750,6 +2784,7 @@ export interface FileRoutesById {
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
+  '/mcp/secrets': typeof McpSecretsRoute
   '/new/$slug': typeof NewSlugRoute
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/$ref': typeof ProjectRefRouteWithChildren
@@ -2771,6 +2806,7 @@ export interface FileRoutesById {
   '/project/$ref/advisors': typeof ProjectRefAdvisorsRouteWithChildren
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/branches': typeof ProjectRefBranchesRouteWithChildren
+  '/project/$ref/compute': typeof ProjectRefComputeRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
   '/project/$ref/explorer': typeof ProjectRefExplorerRouteWithChildren
@@ -2783,7 +2819,6 @@ export interface FileRoutesById {
   '/project/$ref/settings': typeof ProjectRefSettingsRouteWithChildren
   '/project/$ref/sql': typeof ProjectRefSqlRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
-  '/project/$ref/workers': typeof ProjectRefWorkersRouteWithChildren
   '/project/_/$': typeof ProjectChar91_Char93SplatRoute
   '/_app/new/': typeof AppNewIndexRoute
   '/_app/org/': typeof AppOrgIndexRoute
@@ -2815,6 +2850,7 @@ export interface FileRoutesById {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/advisors/health': typeof ProjectRefAdvisorsHealthRoute
   '/project/$ref/advisors/performance': typeof ProjectRefAdvisorsPerformanceRoute
   '/project/$ref/advisors/rules': typeof ProjectRefAdvisorsRulesRouteWithChildren
   '/project/$ref/advisors/security': typeof ProjectRefAdvisorsSecurityRoute
@@ -2835,6 +2871,8 @@ export interface FileRoutesById {
   '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
   '/project/$ref/branches/merge-requests': typeof ProjectRefBranchesMergeRequestsRoute
+  '/project/$ref/compute/$name': typeof ProjectRefComputeNameRoute
+  '/project/$ref/compute/secrets': typeof ProjectRefComputeSecretsRoute
   '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
   '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
   '/project/$ref/database/functions': typeof ProjectRefDatabaseFunctionsRoute
@@ -2898,6 +2936,7 @@ export interface FileRoutesById {
   '/api/platform/projects/': typeof ApiPlatformProjectsIndexRoute
   '/project/$ref/api/': typeof ProjectRefApiIndexRoute
   '/project/$ref/branches/': typeof ProjectRefBranchesIndexRoute
+  '/project/$ref/compute/': typeof ProjectRefComputeIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
   '/project/$ref/explorer/': typeof ProjectRefExplorerIndexRoute
   '/project/$ref/functions/': typeof ProjectRefFunctionsIndexRoute
@@ -2905,7 +2944,6 @@ export interface FileRoutesById {
   '/project/$ref/logs/': typeof ProjectRefLogsIndexRoute
   '/project/$ref/observability/': typeof ProjectRefObservabilityIndexRoute
   '/project/$ref/sql/': typeof ProjectRefSqlIndexRoute
-  '/project/$ref/workers/': typeof ProjectRefWorkersIndexRoute
   '/_app/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
   '/_auth/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
   '/api/platform/auth/$ref/invite': typeof ApiPlatformAuthRefInviteRoute
@@ -3068,6 +3106,7 @@ export interface FileRouteTypes {
     | '/api/scoped-access-token-permissions'
     | '/api/status-override'
     | '/integrations/vercel'
+    | '/mcp/secrets'
     | '/new/$slug'
     | '/org/_'
     | '/project/$ref'
@@ -3089,6 +3128,7 @@ export interface FileRouteTypes {
     | '/project/$ref/advisors'
     | '/project/$ref/auth'
     | '/project/$ref/branches'
+    | '/project/$ref/compute'
     | '/project/$ref/database'
     | '/project/$ref/editor'
     | '/project/$ref/explorer'
@@ -3101,7 +3141,6 @@ export interface FileRouteTypes {
     | '/project/$ref/settings'
     | '/project/$ref/sql'
     | '/project/$ref/storage'
-    | '/project/$ref/workers'
     | '/project/_/$'
     | '/new/'
     | '/org/'
@@ -3133,6 +3172,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/advisors/health'
     | '/project/$ref/advisors/performance'
     | '/project/$ref/advisors/rules'
     | '/project/$ref/advisors/security'
@@ -3153,6 +3193,8 @@ export interface FileRouteTypes {
     | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
     | '/project/$ref/branches/merge-requests'
+    | '/project/$ref/compute/$name'
+    | '/project/$ref/compute/secrets'
     | '/project/$ref/database/column-privileges'
     | '/project/$ref/database/extensions'
     | '/project/$ref/database/functions'
@@ -3216,6 +3258,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects/'
     | '/project/$ref/api/'
     | '/project/$ref/branches/'
+    | '/project/$ref/compute/'
     | '/project/$ref/editor/'
     | '/project/$ref/explorer/'
     | '/project/$ref/functions/'
@@ -3223,7 +3266,6 @@ export interface FileRouteTypes {
     | '/project/$ref/logs/'
     | '/project/$ref/observability/'
     | '/project/$ref/sql/'
-    | '/project/$ref/workers/'
     | '/org/$slug/webhooks/$endpointId'
     | '/partners/stripe/projects/login'
     | '/api/platform/auth/$ref/invite'
@@ -3383,6 +3425,7 @@ export interface FileRouteTypes {
     | '/api/scoped-access-token-permissions'
     | '/api/status-override'
     | '/integrations/vercel'
+    | '/mcp/secrets'
     | '/new/$slug'
     | '/org/_'
     | '/project/_'
@@ -3438,6 +3481,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/advisors/health'
     | '/project/$ref/advisors/performance'
     | '/project/$ref/advisors/rules'
     | '/project/$ref/advisors/security'
@@ -3458,6 +3502,8 @@ export interface FileRouteTypes {
     | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
     | '/project/$ref/branches/merge-requests'
+    | '/project/$ref/compute/$name'
+    | '/project/$ref/compute/secrets'
     | '/project/$ref/database/column-privileges'
     | '/project/$ref/database/extensions'
     | '/project/$ref/database/functions'
@@ -3518,6 +3564,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects'
     | '/project/$ref/api'
     | '/project/$ref/branches'
+    | '/project/$ref/compute'
     | '/project/$ref/editor'
     | '/project/$ref/explorer'
     | '/project/$ref/functions'
@@ -3525,7 +3572,6 @@ export interface FileRouteTypes {
     | '/project/$ref/logs'
     | '/project/$ref/observability'
     | '/project/$ref/sql'
-    | '/project/$ref/workers'
     | '/org/$slug/webhooks/$endpointId'
     | '/partners/stripe/projects/login'
     | '/api/platform/auth/$ref/invite'
@@ -3688,6 +3734,7 @@ export interface FileRouteTypes {
     | '/api/scoped-access-token-permissions'
     | '/api/status-override'
     | '/integrations/vercel'
+    | '/mcp/secrets'
     | '/new/$slug'
     | '/org/_'
     | '/project/$ref'
@@ -3709,6 +3756,7 @@ export interface FileRouteTypes {
     | '/project/$ref/advisors'
     | '/project/$ref/auth'
     | '/project/$ref/branches'
+    | '/project/$ref/compute'
     | '/project/$ref/database'
     | '/project/$ref/editor'
     | '/project/$ref/explorer'
@@ -3721,7 +3769,6 @@ export interface FileRouteTypes {
     | '/project/$ref/settings'
     | '/project/$ref/sql'
     | '/project/$ref/storage'
-    | '/project/$ref/workers'
     | '/project/_/$'
     | '/_app/new/'
     | '/_app/org/'
@@ -3753,6 +3800,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/advisors/health'
     | '/project/$ref/advisors/performance'
     | '/project/$ref/advisors/rules'
     | '/project/$ref/advisors/security'
@@ -3773,6 +3821,8 @@ export interface FileRouteTypes {
     | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
     | '/project/$ref/branches/merge-requests'
+    | '/project/$ref/compute/$name'
+    | '/project/$ref/compute/secrets'
     | '/project/$ref/database/column-privileges'
     | '/project/$ref/database/extensions'
     | '/project/$ref/database/functions'
@@ -3836,6 +3886,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects/'
     | '/project/$ref/api/'
     | '/project/$ref/branches/'
+    | '/project/$ref/compute/'
     | '/project/$ref/editor/'
     | '/project/$ref/explorer/'
     | '/project/$ref/functions/'
@@ -3843,7 +3894,6 @@ export interface FileRouteTypes {
     | '/project/$ref/logs/'
     | '/project/$ref/observability/'
     | '/project/$ref/sql/'
-    | '/project/$ref/workers/'
     | '/_app/org/$slug/webhooks/$endpointId'
     | '/_auth/partners/stripe/projects/login'
     | '/api/platform/auth/$ref/invite'
@@ -3996,6 +4046,7 @@ export interface RootRouteChildren {
   ApiScopedAccessTokenPermissionsRoute: typeof ApiScopedAccessTokenPermissionsRoute
   ApiStatusOverrideRoute: typeof ApiStatusOverrideRoute
   IntegrationsVercelRoute: typeof IntegrationsVercelRouteWithChildren
+  McpSecretsRoute: typeof McpSecretsRoute
   NewSlugRoute: typeof NewSlugRoute
   OrgChar91_Char93Route: typeof OrgChar91_Char93RouteWithChildren
   ProjectRefRoute: typeof ProjectRefRouteWithChildren
@@ -4198,6 +4249,13 @@ declare module '@tanstack/react-router' {
       path: '/new/$slug'
       fullPath: '/new/$slug'
       preLoaderRoute: typeof NewSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp/secrets': {
+      id: '/mcp/secrets'
+      path: '/mcp/secrets'
+      fullPath: '/mcp/secrets'
+      preLoaderRoute: typeof McpSecretsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/integrations/vercel': {
@@ -4417,13 +4475,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectChar91_Char93SplatRouteImport
       parentRoute: typeof ProjectChar91_Char93Route
     }
-    '/project/$ref/workers': {
-      id: '/project/$ref/workers'
-      path: '/workers'
-      fullPath: '/project/$ref/workers'
-      preLoaderRoute: typeof ProjectRefWorkersRouteImport
-      parentRoute: typeof ProjectRefRoute
-    }
     '/project/$ref/storage': {
       id: '/project/$ref/storage'
       path: '/storage'
@@ -4506,6 +4557,13 @@ declare module '@tanstack/react-router' {
       path: '/database'
       fullPath: '/project/$ref/database'
       preLoaderRoute: typeof ProjectRefDatabaseRouteImport
+      parentRoute: typeof ProjectRefRoute
+    }
+    '/project/$ref/compute': {
+      id: '/project/$ref/compute'
+      path: '/compute'
+      fullPath: '/project/$ref/compute'
+      preLoaderRoute: typeof ProjectRefComputeRouteImport
       parentRoute: typeof ProjectRefRoute
     }
     '/project/$ref/branches': {
@@ -4627,13 +4685,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAccountAuditRouteImport
       parentRoute: typeof AppAccountRoute
     }
-    '/project/$ref/workers/': {
-      id: '/project/$ref/workers/'
-      path: '/'
-      fullPath: '/project/$ref/workers/'
-      preLoaderRoute: typeof ProjectRefWorkersIndexRouteImport
-      parentRoute: typeof ProjectRefWorkersRoute
-    }
     '/project/$ref/sql/': {
       id: '/project/$ref/sql/'
       path: '/'
@@ -4682,6 +4733,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/editor/'
       preLoaderRoute: typeof ProjectRefEditorIndexRouteImport
       parentRoute: typeof ProjectRefEditorRoute
+    }
+    '/project/$ref/compute/': {
+      id: '/project/$ref/compute/'
+      path: '/'
+      fullPath: '/project/$ref/compute/'
+      preLoaderRoute: typeof ProjectRefComputeIndexRouteImport
+      parentRoute: typeof ProjectRefComputeRoute
     }
     '/project/$ref/branches/': {
       id: '/project/$ref/branches/'
@@ -5124,6 +5182,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefDatabaseColumnPrivilegesRouteImport
       parentRoute: typeof ProjectRefDatabaseRoute
     }
+    '/project/$ref/compute/secrets': {
+      id: '/project/$ref/compute/secrets'
+      path: '/secrets'
+      fullPath: '/project/$ref/compute/secrets'
+      preLoaderRoute: typeof ProjectRefComputeSecretsRouteImport
+      parentRoute: typeof ProjectRefComputeRoute
+    }
+    '/project/$ref/compute/$name': {
+      id: '/project/$ref/compute/$name'
+      path: '/$name'
+      fullPath: '/project/$ref/compute/$name'
+      preLoaderRoute: typeof ProjectRefComputeNameRouteImport
+      parentRoute: typeof ProjectRefComputeRoute
+    }
     '/project/$ref/branches/merge-requests': {
       id: '/project/$ref/branches/merge-requests'
       path: '/merge-requests'
@@ -5262,6 +5334,13 @@ declare module '@tanstack/react-router' {
       path: '/performance'
       fullPath: '/project/$ref/advisors/performance'
       preLoaderRoute: typeof ProjectRefAdvisorsPerformanceRouteImport
+      parentRoute: typeof ProjectRefAdvisorsRoute
+    }
+    '/project/$ref/advisors/health': {
+      id: '/project/$ref/advisors/health'
+      path: '/health'
+      fullPath: '/project/$ref/advisors/health'
+      preLoaderRoute: typeof ProjectRefAdvisorsHealthRouteImport
       parentRoute: typeof ProjectRefAdvisorsRoute
     }
     '/api/platform/telemetry/event': {
@@ -6465,12 +6544,14 @@ const ProjectRefAdvisorsRulesRouteWithChildren =
   )
 
 interface ProjectRefAdvisorsRouteChildren {
+  ProjectRefAdvisorsHealthRoute: typeof ProjectRefAdvisorsHealthRoute
   ProjectRefAdvisorsPerformanceRoute: typeof ProjectRefAdvisorsPerformanceRoute
   ProjectRefAdvisorsRulesRoute: typeof ProjectRefAdvisorsRulesRouteWithChildren
   ProjectRefAdvisorsSecurityRoute: typeof ProjectRefAdvisorsSecurityRoute
 }
 
 const ProjectRefAdvisorsRouteChildren: ProjectRefAdvisorsRouteChildren = {
+  ProjectRefAdvisorsHealthRoute: ProjectRefAdvisorsHealthRoute,
   ProjectRefAdvisorsPerformanceRoute: ProjectRefAdvisorsPerformanceRoute,
   ProjectRefAdvisorsRulesRoute: ProjectRefAdvisorsRulesRouteWithChildren,
   ProjectRefAdvisorsSecurityRoute: ProjectRefAdvisorsSecurityRoute,
@@ -6538,6 +6619,21 @@ const ProjectRefBranchesRouteChildren: ProjectRefBranchesRouteChildren = {
 
 const ProjectRefBranchesRouteWithChildren =
   ProjectRefBranchesRoute._addFileChildren(ProjectRefBranchesRouteChildren)
+
+interface ProjectRefComputeRouteChildren {
+  ProjectRefComputeNameRoute: typeof ProjectRefComputeNameRoute
+  ProjectRefComputeSecretsRoute: typeof ProjectRefComputeSecretsRoute
+  ProjectRefComputeIndexRoute: typeof ProjectRefComputeIndexRoute
+}
+
+const ProjectRefComputeRouteChildren: ProjectRefComputeRouteChildren = {
+  ProjectRefComputeNameRoute: ProjectRefComputeNameRoute,
+  ProjectRefComputeSecretsRoute: ProjectRefComputeSecretsRoute,
+  ProjectRefComputeIndexRoute: ProjectRefComputeIndexRoute,
+}
+
+const ProjectRefComputeRouteWithChildren =
+  ProjectRefComputeRoute._addFileChildren(ProjectRefComputeRouteChildren)
 
 interface ProjectRefDatabaseTriggersRouteChildren {
   ProjectRefDatabaseTriggersDataRoute: typeof ProjectRefDatabaseTriggersDataRoute
@@ -6927,21 +7023,11 @@ const ProjectRefStorageRouteChildren: ProjectRefStorageRouteChildren = {
 const ProjectRefStorageRouteWithChildren =
   ProjectRefStorageRoute._addFileChildren(ProjectRefStorageRouteChildren)
 
-interface ProjectRefWorkersRouteChildren {
-  ProjectRefWorkersIndexRoute: typeof ProjectRefWorkersIndexRoute
-}
-
-const ProjectRefWorkersRouteChildren: ProjectRefWorkersRouteChildren = {
-  ProjectRefWorkersIndexRoute: ProjectRefWorkersIndexRoute,
-}
-
-const ProjectRefWorkersRouteWithChildren =
-  ProjectRefWorkersRoute._addFileChildren(ProjectRefWorkersRouteChildren)
-
 interface ProjectRefRouteChildren {
   ProjectRefAdvisorsRoute: typeof ProjectRefAdvisorsRouteWithChildren
   ProjectRefAuthRoute: typeof ProjectRefAuthRouteWithChildren
   ProjectRefBranchesRoute: typeof ProjectRefBranchesRouteWithChildren
+  ProjectRefComputeRoute: typeof ProjectRefComputeRouteWithChildren
   ProjectRefDatabaseRoute: typeof ProjectRefDatabaseRouteWithChildren
   ProjectRefEditorRoute: typeof ProjectRefEditorRouteWithChildren
   ProjectRefExplorerRoute: typeof ProjectRefExplorerRouteWithChildren
@@ -6954,7 +7040,6 @@ interface ProjectRefRouteChildren {
   ProjectRefSettingsRoute: typeof ProjectRefSettingsRouteWithChildren
   ProjectRefSqlRoute: typeof ProjectRefSqlRouteWithChildren
   ProjectRefStorageRoute: typeof ProjectRefStorageRouteWithChildren
-  ProjectRefWorkersRoute: typeof ProjectRefWorkersRouteWithChildren
   ProjectRefIndexRoute: typeof ProjectRefIndexRoute
   ProjectRefApiIndexRoute: typeof ProjectRefApiIndexRoute
 }
@@ -6963,6 +7048,7 @@ const ProjectRefRouteChildren: ProjectRefRouteChildren = {
   ProjectRefAdvisorsRoute: ProjectRefAdvisorsRouteWithChildren,
   ProjectRefAuthRoute: ProjectRefAuthRouteWithChildren,
   ProjectRefBranchesRoute: ProjectRefBranchesRouteWithChildren,
+  ProjectRefComputeRoute: ProjectRefComputeRouteWithChildren,
   ProjectRefDatabaseRoute: ProjectRefDatabaseRouteWithChildren,
   ProjectRefEditorRoute: ProjectRefEditorRouteWithChildren,
   ProjectRefExplorerRoute: ProjectRefExplorerRouteWithChildren,
@@ -6975,7 +7061,6 @@ const ProjectRefRouteChildren: ProjectRefRouteChildren = {
   ProjectRefSettingsRoute: ProjectRefSettingsRouteWithChildren,
   ProjectRefSqlRoute: ProjectRefSqlRouteWithChildren,
   ProjectRefStorageRoute: ProjectRefStorageRouteWithChildren,
-  ProjectRefWorkersRoute: ProjectRefWorkersRouteWithChildren,
   ProjectRefIndexRoute: ProjectRefIndexRoute,
   ProjectRefApiIndexRoute: ProjectRefApiIndexRoute,
 }
@@ -7050,6 +7135,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiScopedAccessTokenPermissionsRoute: ApiScopedAccessTokenPermissionsRoute,
   ApiStatusOverrideRoute: ApiStatusOverrideRoute,
   IntegrationsVercelRoute: IntegrationsVercelRouteWithChildren,
+  McpSecretsRoute: McpSecretsRoute,
   NewSlugRoute: NewSlugRoute,
   OrgChar91_Char93Route: OrgChar91_Char93RouteWithChildren,
   ProjectRefRoute: ProjectRefRouteWithChildren,

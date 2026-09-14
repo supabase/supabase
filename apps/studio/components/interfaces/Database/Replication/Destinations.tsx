@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { MoreVertical, Plus, Search, Workflow, X } from 'lucide-react'
+import { MessageSquare, MoreVertical, Plus, Search, Workflow, X } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -29,6 +29,7 @@ import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
 import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { EnablePipelinesModal } from './EnablePipelinesCallout'
+import { PIPELINES_FEEDBACK_URL } from './Replication.constants'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
@@ -138,7 +139,6 @@ export const Destinations = () => {
     destinations.length === 0 &&
     pipelines.length === 0
 
-  const isLoading = isDestinationsLoading
   const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
   const hasErrorsFetchingData = !isLocalETLNotSetUp && isDestinationsError
 
@@ -208,12 +208,7 @@ export const Destinations = () => {
         <div className="flex items-center gap-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                aria-label="More actions"
-                variant="default"
-                icon={<MoreVertical />}
-                className="px-1"
-              />
+              <Button aria-label="More actions" icon={<MoreVertical />} className="px-1" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
               <DropdownMenuItem asChild>
@@ -243,6 +238,11 @@ export const Destinations = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
+          <Button asChild icon={<MessageSquare />}>
+            <a href={PIPELINES_FEEDBACK_URL} target="_blank" rel="noreferrer noopener">
+              Leave feedback
+            </a>
+          </Button>
           <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
 
           <Shortcut
@@ -269,7 +269,7 @@ export const Destinations = () => {
           <AlertError error={destinationsError} subject="Failed to retrieve destinations" />
         )}
 
-        {isLoading ? (
+        {isDestinationsLoading ? (
           <GenericSkeletonLoader />
         ) : hasDestinations ? (
           <Card>
@@ -277,7 +277,7 @@ export const Destinations = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead key="type" className="w-[20px]" />
+                    <TableHead key="type" className="w-[40px]" />
                     <TableHead key="name" className="w-[250px]">
                       Name
                     </TableHead>
@@ -296,22 +296,24 @@ export const Destinations = () => {
                     <DestinationRow key={destination.id} destinationId={destination.id} />
                   ))}
 
-                  {!isLoading && filteredDestinations.length === 0 && hasDestinations && (
-                    <TableRow>
-                      <TableCell colSpan={6}>
-                        <p>No results found</p>
-                        <p className="text-foreground-light">
-                          Your search for "{filterString}" did not return any results.
-                        </p>
-                      </TableCell>
-                    </TableRow>
-                  )}
+                  {!isDestinationsLoading &&
+                    filteredDestinations.length === 0 &&
+                    hasDestinations && (
+                      <TableRow>
+                        <TableCell colSpan={6}>
+                          <p>No results found</p>
+                          <p className="text-foreground-light">
+                            Your search for "{filterString}" did not return any results.
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                    )}
                 </TableBody>
               </Table>
             </CardContent>
           </Card>
         ) : (
-          !isLoading &&
+          !isDestinationsLoading &&
           !hasErrorsFetchingData && (
             <EmptyStatePresentational
               icon={Workflow}
@@ -319,7 +321,6 @@ export const Destinations = () => {
               description="Connect an external destination for analytics workloads."
             >
               <Button
-                variant="default"
                 icon={<Plus />}
                 disabled={!newDestinationDefaultType}
                 onClick={openDestinationPanel}

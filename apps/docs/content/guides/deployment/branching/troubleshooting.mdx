@@ -27,7 +27,9 @@ You might want to roll back changes you've made in an earlier migration change. 
 
 To fix this, push the latest changes, then delete the preview branch in Supabase and reopen it.
 
-The new preview branch is reseeded from the `./supabase/seed.sql` file by default. Any additional data changes made on the old preview branch are lost. This is equivalent to running `supabase db reset` locally. All migrations are rerun in sequential order.
+The new preview branch is a fresh clone of your base project and is reseeded from the `./supabase/seed.sql` file by default. Any additional data changes made on the old preview branch are lost.
+
+To rerun migrations that your base project has already applied, reset the branch from the Supabase dashboard instead. A reset reruns all migrations in sequential order and drops existing data on the branch.
 
 ### Deployment failures
 
@@ -66,6 +68,12 @@ supabase db reset
 # Check migration logs in the dashboard
 # Navigate to Branches > Your Branch > View Logs
 ```
+
+### Permission denied errors on a new branch
+
+If the Data API returns `42501` permission denied errors on a branch for tables or functions that work on your base project, the branch is missing default privileges on the `public` schema. New branches are created without them, and only your migrations can grant them back.
+
+Check whether your initial migration contains `alter default privileges ... grant` statements for the `public` schema. If it doesn't, see [Default privileges on branches](/docs/guides/deployment/branching/working-with-branches#default-privileges-on-branches) for how to add them, or [grant access explicitly](/docs/guides/api/securing-your-api#grant-access-explicitly) in a migration.
 
 ### Migration order problems
 

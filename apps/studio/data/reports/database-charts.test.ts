@@ -77,6 +77,29 @@ describe('getReportAttributesV2 dedicated pooler chart', () => {
   })
 })
 
+const getSupavisorChart = (project: Project) =>
+  getReportAttributesV2(ENTITLED_FEATURES, project).find(
+    (chart) => chart.id === 'supavisor-connections-active'
+  )
+
+describe('getReportAttributesV2 shared pooler chart', () => {
+  it('shows the chart for standard projects', () => {
+    expect(getSupavisorChart(buildProject())?.hide).toBe(false)
+  })
+
+  it('hides the chart for high availability projects', () => {
+    expect(getSupavisorChart(buildProject({ high_availability: true }))?.hide).toBe(true)
+  })
+
+  it('hides the chart when the database entitlement is missing', () => {
+    expect(
+      getReportAttributesV2([], buildProject()).find(
+        (chart) => chart.id === 'supavisor-connections-active'
+      )?.hide
+    ).toBe(true)
+  })
+})
+
 describe('getReportAttributesV2 disk-io-burst-balance chart', () => {
   it('shows the chart for burstable non high availability projects', () => {
     expect(getBurstBalanceChart(buildProject())?.hide).toBe(false)

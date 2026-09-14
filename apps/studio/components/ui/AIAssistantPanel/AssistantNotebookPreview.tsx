@@ -86,7 +86,7 @@ export const AssistantNotebookPreview = ({
     <div className={cn('flex w-full min-w-0 max-w-6xl mx-auto flex-col', className)}>
       <ExplorerToolbar aria-label="Notebook toolbar">
         <ExplorerToolbarIcon>
-          <NotebookText />
+          <NotebookText size={16} strokeWidth={2} />
         </ExplorerToolbarIcon>
         <ExplorerToolbarTitle>{title ?? FALLBACK_TITLE[mode]}</ExplorerToolbarTitle>
         <ExplorerToolbarActions>

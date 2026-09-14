@@ -37,7 +37,7 @@ Before members can use enterprise-managed authentication:
 
 ## How it works
 
-1. **Member signs in to the MCP client via your IdP**, using the same SSO login your members already use, over OpenID Connect or SAML. The IdP returns an identity token to the MCP client.
+1. **Member signs in to the MCP client via your IdP**, using the same SSO sign-in your members already use, over OpenID Connect or SAML. The IdP returns an identity token to the MCP client.
 2. **MCP client exchanges that identity token for an ID-JAG, at the IdP.** This is a separate request the client makes to the IdP (an [RFC 8693](https://datatracker.ietf.org/doc/html/rfc8693) token exchange), asking for a token scoped specifically to Supabase. The IdP checks its own policy before issuing one.
 3. **IdP returns the ID-JAG to the MCP client.**
 4. **MCP client presents the ID-JAG to Supabase's OAuth server**, using it as a [JWT authorization grant](https://datatracker.ietf.org/doc/html/rfc7523), with no interactive consent screen.
@@ -54,7 +54,7 @@ Without it, every member has to manually connect and authorize the MCP client ag
 - **No central control**: admins can't see or revoke the MCP client's access at the organization level; it's spread across individual user approvals.
 - **Inconsistent access**: a member's access through the MCP client isn't guaranteed to stay in sync with the role your IdP already assigns them.
 
-With enterprise-managed authentication, an organization owner authorizes the MCP client once for the whole organization. From then on, access follows your existing SSO login, with no separate approval and no manual reconnection when a token expires.
+With enterprise-managed authentication, an organization owner authorizes the MCP client once for the whole organization. From then on, access follows your existing SSO sign-in, with no separate approval and no manual reconnection when a token expires.
 
 ## Configuring your ID-JAG issuer
 
