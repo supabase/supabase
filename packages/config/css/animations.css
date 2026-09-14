@@ -57,6 +57,11 @@
 
   --animate-collapsible-down: collapsible-down 0.1s ease-out;
   --animate-collapsible-up: collapsible-up 0.1s ease-out;
+
+  --animate-menu-fade-in: menu-fade-in 250ms ease both;
+  --animate-menu-fade-out: menu-fade-out 100ms ease-out both;
+  --animate-menu-enter-right: menu-enter-right 250ms ease both;
+  --animate-menu-enter-left: menu-enter-left 250ms ease both;
 }
 
 @keyframes fadeIn {
@@ -303,5 +308,45 @@
   }
   to {
     background-position: 0 0;
+  }
+}
+
+@keyframes menu-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes menu-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes menu-enter-right {
+  from {
+    opacity: 0;
+    transform: translateX(200px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes menu-enter-left {
+  from {
+    opacity: 0;
+    transform: translateX(-200px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
