@@ -24,7 +24,8 @@ const parseFilterValues = <T extends string>(schema: z.ZodType<T>, values: strin
   })
 
 const platformCategories: AdvisorCategory[] = ['security', 'performance', 'health', 'messages']
-const selfHostedCategories: AdvisorCategory[] = ['security', 'performance', 'health']
+// Health runs against platform infrastructure and messages are platform notifications
+const selfHostedCategories: AdvisorCategory[] = ['security', 'performance']
 
 const severityOptions = [
   { label: 'Critical', value: 'critical' },
