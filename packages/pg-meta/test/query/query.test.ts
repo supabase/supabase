@@ -420,6 +420,18 @@ describe('Query.utils', () => {
         expect(result).toBe('select * from public.users where id in (1,2,3);')
       })
 
+      test('should handle "in" operator with an empty array', () => {
+        const filters: Filter[] = [{ column: 'id', operator: 'in', value: [] }]
+        const result = QueryUtils.selectQuery(table, safeSql`*`, { filters })
+        expect(result).toBe('select * from public.users where false;')
+      })
+
+      test('should handle tuple "in" operator with an empty array', () => {
+        const filters: Filter[] = [{ column: ['id', 'version'], operator: 'in', value: [] }]
+        const result = QueryUtils.selectQuery(table, safeSql`*`, { filters })
+        expect(result).toBe('select * from public.users where false;')
+      })
+
       test('should correctly handle "in" operator with comma-separated string', () => {
         const filters: Filter[] = [{ column: 'id', operator: 'in', value: '1,2,3' }]
         const result = QueryUtils.selectQuery(table, safeSql`*`, { filters: filters })
