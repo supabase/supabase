@@ -346,7 +346,7 @@ export const WarehouseConnectionCard = ({ variant = 'default' }: WarehouseConnec
     <Card
       className={cn(
         isSheet &&
-          'space-y-4 rounded-none border-0 bg-transparent shadow-none [&>div]:border-0 [&>div]:p-0'
+          'relative space-y-4 rounded-none border-0 bg-transparent shadow-none [&>div]:border-0 [&>div]:p-0'
       )}
     >
       <CardContent className="border-none">
@@ -370,6 +370,7 @@ export const WarehouseConnectionCard = ({ variant = 'default' }: WarehouseConnec
           </Select>
         </FieldRow>
       </CardContent>
+
       {!isSheet && <Separator />}
 
       {engine === 'flightsql' && <FlightSqlContent projectRef={projectRef} />}
