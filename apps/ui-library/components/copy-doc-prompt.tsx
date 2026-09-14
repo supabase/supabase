@@ -40,7 +40,8 @@ export function CopyDocPrompt({ title, markdownPath, intent }: CopyDocPromptProp
       <Button
         variant="secondary"
         size="medium"
-        className="rounded-full border-0 px-4"
+        // Button's medium icon container forces 20px, overriding the icons' own size.
+        className="rounded-full border-0 px-4 [&_svg]:size-4!"
         icon={
           status === 'copied' ? (
             <Check size={16} strokeWidth={2} />
