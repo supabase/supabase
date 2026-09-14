@@ -3236,7 +3236,7 @@ commands:
 
       pg-delta is the default diff engine. To fall back to the legacy migra engine, set `enabled = false` under `[experimental.pgdelta]` in `config.toml`, or pass `--diff-engine migra` for a single run. Pass `--declarative` to replace the declarative schema tree under `supabase/schemas` from the selected database instead of creating a migration.
 
-      Under the pg-delta engine, your own customizations in Supabase-managed schemas are captured automatically, such as triggers on managed tables like `auth.users` and RLS policies on `storage.objects` and `storage.buckets`. Under the legacy migra engine, trigger and RLS policy changes in managed schemas are diffed, and recent CLI versions include them in the initial `pg_dump` baseline. If an older CLI reports that `auth` and `storage` were excluded, capture existing customizations there with `--schema auth,storage`.
+      Under the pg-delta engine, your own customizations in Supabase-managed schemas are captured automatically, such as triggers on managed tables like `auth.users` and RLS policies on `storage.objects` and `storage.buckets`. Under the legacy migra engine, the initial pull's `pg_dump` skips managed schemas, but the diff pass that follows appends your trigger and RLS policy changes there to the same migration. If an older CLI reports that `auth` and `storage` were excluded, capture existing customizations there with `--schema auth,storage`.
     examples:
       - id: basic-usage
         name: Basic usage
