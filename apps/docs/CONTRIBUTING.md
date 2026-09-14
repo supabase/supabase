@@ -79,8 +79,6 @@ client. Write a policy before you deploy.
 The `using` clause accepts any expression that returns a boolean.
 ```
 
-The concept, the procedure, and the structure each get their own section. The fact about timing rides along in the step it describes, and the admonition pairs a fact with the principle it implies. It's longer in lines and shorter to read.
-
 ## AI agent skills for docs authoring
 
 If you're using an AI coding agent that reads `.agents/skills/`, such as Claude Code, Cursor, or Codex, invoke skills with `/name`, for example `/write-the-docs`. The canonical files live in `.agents/skills/` (`.claude/skills` is a symlink).
