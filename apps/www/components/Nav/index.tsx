@@ -141,7 +141,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                           </NavigationMenuTrigger>
                           <NavigationMenuContent
                             data-active={activeDropdown === menuItem.title}
-                            className="data-[motion^=from-]:animate-none data-[motion^=to-]:animate-none data-[active=false]:pointer-events-none data-[active=false]:opacity-0 motion-safe:data-[active=true]:animate-menu-fade-in motion-safe:data-[active=true]:data-[motion=from-end]:animate-menu-enter-right motion-safe:data-[active=true]:data-[motion=from-start]:animate-menu-enter-left motion-safe:data-[active=false]:animate-menu-fade-out"
+                            className="md:w-full data-[motion^=from-]:animate-none data-[motion^=to-]:animate-none data-[active=false]:pointer-events-none data-[active=false]:opacity-0 motion-safe:data-[active=true]:animate-menu-fade-in motion-safe:data-[active=true]:data-[motion=from-end]:animate-menu-enter-right motion-safe:data-[active=true]:data-[motion=from-start]:animate-menu-enter-left motion-safe:data-[active=false]:animate-menu-fade-out"
                           >
                             {menuItem.dropdown}
                           </NavigationMenuContent>
@@ -164,7 +164,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                     forceMount
                     data-open={activeDropdown !== ''}
                     containerProps={{ className: 'inset-x-0' }}
-                    className="rounded-xl bg-background data-[state=open]:animate-none data-[state=closed]:animate-none data-[state=open]:duration-200 data-[state=open]:ease-out data-[state=closed]:duration-200 data-[open=false]:invisible data-[open=false]:opacity-0 data-[open=false]:pointer-events-none motion-safe:transition-[opacity,visibility] motion-reduce:transition-none"
+                    className="rounded-xl bg-surface-75 md:w-[960px] data-[state=open]:animate-none data-[state=closed]:animate-none data-[state=open]:duration-200 data-[state=open]:ease-out data-[state=closed]:duration-200 data-[open=false]:invisible data-[open=false]:opacity-0 data-[open=false]:pointer-events-none motion-safe:transition-[opacity,visibility] motion-reduce:transition-none"
                   />
                 </NavigationMenu>
               </div>

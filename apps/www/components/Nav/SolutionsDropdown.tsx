@@ -1,3 +1,4 @@
+import { useReducedMotion } from 'common'
 import { navData as DevelopersData } from 'data/Solutions'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeftRight, ChevronRight } from 'lucide-react'
@@ -14,16 +15,16 @@ type LinkProps = {
 }
 
 export const SolutionsDropdown = () => (
-  <div className="flex flex-col xl:flex-row">
-    <div className="w-[550px] xl:w-[600px] py-8 px-8 bg-background grid gap-3 grid-cols-2 xl:grid-cols-3">
+  <div className="bg-surface-75 flex flex-col lg:flex-row">
+    <div className="w-full lg:w-[600px] px-6 py-5 grid gap-3 grid-cols-2 lg:grid-cols-3">
       {/* Skill Level, Who it's for, App Type */}
       {DevelopersData['navigation'].slice(0, 3).map((column) => (
         <LinksGroup key={column.label} links={column.links} label={column.label} />
       ))}
     </div>
 
-    <div className="bg-surface-75 flex flex-col w-[550px] xl:w-[480px] border-t xl:border-t-0 xl:border-l">
-      <div className="flex flex-col gap-6 py-8 px-10">
+    <div className="flex flex-col w-full lg:flex-1 border-t lg:border-t-0 lg:border-l">
+      <div className="flex flex-col gap-6 p-5">
         <label className="text-foreground-lighter text-xs uppercase tracking-widest font-mono">
           {DevelopersData['navigation'][3].label}
         </label>
@@ -70,7 +71,9 @@ const MotionLink = motion(Link)
 const MigrationLinkCard = ({ link }: { link: LinkProps }) => {
   const [hovered, setHovered] = useState(false)
   const { width } = useWindowSize()
-  const isDesktop = width >= 1280
+  const reduceMotion = useReducedMotion()
+  const isDesktop = width >= 1024
+  const duration = isDesktop && !reduceMotion ? 0.2 : 0
 
   return (
     <MotionLink
@@ -86,7 +89,7 @@ const MigrationLinkCard = ({ link }: { link: LinkProps }) => {
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -10 }}
-            transition={{ duration: isDesktop ? 0.2 : 0, ease: 'easeInOut' }}
+            transition={{ duration, ease: 'easeInOut' }}
             layout
           >
             {link.icon && <link.icon className="size-6" />}
@@ -97,7 +100,7 @@ const MigrationLinkCard = ({ link }: { link: LinkProps }) => {
       <motion.div
         className="size-6 flex items-center justify-center"
         layout
-        transition={{ duration: isDesktop ? 0.2 : 0, ease: 'easeInOut' }}
+        transition={{ duration, ease: 'easeInOut' }}
       >
         <ArrowLeftRight className="size-4 text-foreground-light" strokeWidth={1.3} />
       </motion.div>
@@ -105,16 +108,12 @@ const MigrationLinkCard = ({ link }: { link: LinkProps }) => {
       <motion.div
         className="flex items-center gap-1"
         layout
-        transition={{ duration: isDesktop ? 0.2 : 0, ease: 'easeInOut' }}
+        transition={{ duration, ease: 'easeInOut' }}
       >
         <span className="text-base font-medium">{link.text}</span>
       </motion.div>
 
-      <motion.div
-        layout
-        transition={{ duration: isDesktop ? 0.2 : 0, ease: 'easeInOut' }}
-        className="ml-auto"
-      >
+      <motion.div layout transition={{ duration, ease: 'easeInOut' }} className="ml-auto">
         <ChevronRight
           strokeWidth={2}
           className="w-3 transition-all will-change-transform -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
