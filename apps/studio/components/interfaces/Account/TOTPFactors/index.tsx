@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import dayjs from 'dayjs'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
@@ -27,14 +28,16 @@ export const TOTPFactors = () => {
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
   const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
   const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
-  const shouldVerifyRecoveryCodes = !!data?.all.length
-  const { data: recoveryCodesStatus } = useRecoveryCodesStatusQuery({
-    enabled: shouldVerifyRecoveryCodes,
-  })
+  const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
 
   const totpFactors = data?.totp ?? []
   const canAddApp = isSuccess && totpFactors.length < 2
   const shouldShowLockoutWarning = isSuccess && totpFactors.length === 1
+  const shouldVerifyRecoveryCodes = enableAuthRecoveryCodes && totpFactors.length === 1
+
+  const { data: recoveryCodesStatus } = useRecoveryCodesStatusQuery({
+    enabled: shouldVerifyRecoveryCodes,
+  })
 
   const handleAddNewApp = () => setIsAddNewFactorOpen(true)
 

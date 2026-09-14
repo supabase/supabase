@@ -28,5 +28,6 @@ export const useRecoveryCodesStatusQuery = <TData = RecoveryCodesStatusData>({
     queryKey: recoveryCodeKeys.status(),
     queryFn: () => getRecoveryCodesStatus(),
     staleTime: 1000 * 60 * 30,
+    enabled,
     ...options,
   })
