@@ -549,8 +549,8 @@ export const storagePrimaryFields: BlockFieldConfig[] = [
     label: 'Response Time',
     getValue: (data, enrichedData) => {
       const time =
-        enrichedData?.response_origin_time || enrichedData?.responseTime || data?.response_time_ms
-      if (!time) return null
+        enrichedData?.response_origin_time ?? enrichedData?.responseTime ?? data?.response_time_ms
+      if (time === null || time === undefined || time === '') return null
       const numericTime = Number(time)
       return `${Number.isInteger(numericTime) ? numericTime : numericTime.toFixed(2)}ms`
     },

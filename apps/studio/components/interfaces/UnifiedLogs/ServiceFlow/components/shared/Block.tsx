@@ -64,8 +64,6 @@ export function createBlock(config: BlockConfig) {
       (x) => 'type' in x && x.type === 'fieldWithSeeMore'
     ) as [FieldWithSeeMoreSection[], BlockSection[]]
 
-    console.log({ config })
-
     /**
      * [Joshen] AFAICT, a lot of the fields do not apply for auth logs as the data is not present
      * Am opting to hide all the additional fields only for auth logs, but we can present them if
