@@ -28,7 +28,11 @@ import {
   AUTH_EMAIL_TEMPLATES_TERMINOLOGY_ANCHOR,
 } from './EmailTemplates.constants'
 import type { AuthTemplate } from './EmailTemplates.types'
-import { hasCustomEmailSender } from './EmailTemplates.utils'
+import {
+  getEmailTemplateIssues,
+  hasCustomEmailSender,
+  type EmailTemplateIssue,
+} from './EmailTemplates.utils'
 import { ResetTemplateDialog } from './ResetTemplateDialog'
 import { SpamValidation } from './SpamValidation'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
@@ -107,6 +111,10 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
   const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
   const previewSrcDoc = useMemo(() => getPreviewSrcDoc(bodyValue), [bodyValue])
+  const templateIssues = useMemo<EmailTemplateIssue[]>(
+    () => getEmailTemplateIssues(bodyValue),
+    [bodyValue]
+  )
 
   const { mutate: validateSpam } = useValidateSpamMutation()
 
@@ -396,8 +404,11 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                             {variable.name === 'Token' &&
                               template.variables.some((x) => x.name === 'ConfirmationURL') && (
                                 <>
-                                  , which can be used instead of{' '}
-                                  <code className="text-code-inline">ConfirmationURL</code>
+                                  , the one-time code users enter manually — it cannot form a
+                                  link on its own. Use{' '}
+                                  <code className="text-code-inline">ConfirmationURL</code> or{' '}
+                                  <code className="text-code-inline">TokenHash</code> to build a
+                                  custom link
                                 </>
                               )}
 
@@ -430,6 +441,42 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                     description="The preview shown here may differ slightly from how your email appears in the recipient’s email client."
                   />
                 </>
+              )}
+              {templateIssues.length > 0 && (
+                <Admonition
+                  type="warning"
+                  title="These template variables will not produce the expected link"
+                  description={
+                    <div className="space-y-2">
+                      {templateIssues.map((issue) => (
+                        <p key={issue.type}>
+                          {issue.type === 'appended-after-confirmation-url' ? (
+                            <>
+                              Auth generates{' '}
+                              <code className="text-code-inline">{'{{ .ConfirmationURL }}'}</code>{' '}
+                              itself at send time, including its query parameters, so anything
+                              written directly after it is ignored or creates a malformed URL.
+                              To add custom parameters, build the link yourself, e.g.{" "}
+                              <code className="text-code-inline">
+                                {
+                                  '{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery'
+                                }
+                              </code>
+                            </>
+                          ) : (
+                            <>
+                              Variable names are case-sensitive:{' '}
+                              <code className="text-code-inline">{issue.snippet}</code> renders as
+                              empty. Use{' '}
+                              <code className="text-code-inline">{'{{ .ConfirmationURL }}'}</code>{' '}
+                              exactly.
+                            </>
+                          )}
+                        </p>
+                      ))}
+                    </div>
+                  }
+                />
               )}
             </CardContent>
 
