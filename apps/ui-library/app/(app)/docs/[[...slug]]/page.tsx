@@ -107,7 +107,7 @@ export default async function DocPage(props: DocPageProps) {
             )}
           </div>
         )}
-        <h1 className="max-w-2xl scroll-m-24 text-balance font-heading text-4xl font-medium leading-tight tracking-tight sm:text-5xl sm:leading-none">
+        <h1 className="-mb-2 max-w-2xl scroll-m-24 text-balance font-heading text-4xl font-medium leading-tight tracking-tight sm:text-5xl sm:leading-none">
           {doc.title}
         </h1>
         {doc.description && (
