@@ -408,6 +408,7 @@ allow_list = [
     "SolidStart",
     "Spotify",
     "Sqitch",
+    "[Ss]ubfield(s)?",
     "Supabase",
     "[Ss]yslog(s)?",
     "mTLS",
