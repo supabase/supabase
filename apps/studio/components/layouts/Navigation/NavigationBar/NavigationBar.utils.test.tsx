@@ -90,6 +90,11 @@ describe('generateProductRoutes', () => {
     expect(keys(generateProductRoutes(REF, activeProject, { compute: true }))).toContain('compute')
   })
 
+  it('gives every product route a navigation shortcut', () => {
+    const routes = generateProductRoutes(REF, activeProject, { compute: true })
+    expect(routes.filter((r) => !r.shortcutId)).toEqual([])
+  })
+
   it('excludes auth when auth feature is disabled', () => {
     const routes = generateProductRoutes(REF, activeProject, { auth: false })
     expect(keys(routes)).not.toContain('auth')
