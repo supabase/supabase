@@ -10,7 +10,6 @@ import {
   SUPABASE_JS_CDN_URL,
 } from './generated-page-document'
 import { GENERATED_PAGE_TYPOGRAPHY_STYLES } from './generated-page-typography'
-import { GENERATED_PAGE_UI_STYLES } from './generated-page-ui'
 
 const baseOptions = {
   html: '<h1>Hello</h1>',
@@ -23,8 +22,6 @@ describe('buildGeneratedPageDocument', () => {
     const html = '<style>button { border-radius: 0; }</style><button>Custom interface</button>'
     const doc = buildGeneratedPageDocument({ ...baseOptions, html })
 
-    expect(doc).toContain(`<style>${GENERATED_PAGE_UI_STYLES}</style>`)
-    expect(doc.indexOf(GENERATED_PAGE_UI_STYLES)).toBeLessThan(doc.indexOf(html))
     const { body } = new DOMParser().parseFromString(doc, 'text/html')
     expect(body.className).toBe('')
     expect(body.querySelector('button')?.parentElement).toBe(body)

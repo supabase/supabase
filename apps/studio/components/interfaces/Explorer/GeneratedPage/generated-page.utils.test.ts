@@ -164,6 +164,9 @@ describe('selectPublicClientKey', () => {
 describe('summarizeGeneratedPageCapabilities', () => {
   const base: RenderPageInput = {
     title: 'Auth console',
+    design: 'studio',
+    layout: 'dashboard',
+    design_plan: 'Lead with the most recent rows, with nothing else on the page.',
     html: '<div></div>',
     database_queries: [],
     log_queries: [],

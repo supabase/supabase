@@ -1,34 +1,129 @@
-// Design guidance and optional CSS vocabulary for generated pages.
-// Keep the task and its information hierarchy ahead of any suggested composition.
+/**
+ * Design guidance for generated pages.
+ *
+ * Structured in three parts, in the order the model needs them:
+ *
+ * 1. `CRAFT` — rules that hold whatever the page looks like. Mostly about hierarchy and
+ *    copy, plus a named list of the patterns that make a page read as machine-generated.
+ * 2. `STUDIO_DESIGN` — the default: how to build a page that belongs in the dashboard.
+ * 3. `CUSTOM_DESIGN` — only after the user asks for a different look.
+ *
+ * Splitting them matters more than it looks. The single blob these replaced left the model
+ * to infer which sentences applied when, and the inference it made was "all of them,
+ * always" — which is why a request for a custom look still produced Studio cards, and why
+ * Studio pages inherited flourishes meant for custom ones. The `design` field on
+ * `render_page` now makes that choice explicit, and these two bodies are what it selects
+ * between.
+ *
+ * Rules are phrased as what to do rather than what to avoid wherever a positive form
+ * exists. Prohibitions are the first thing a smaller model drops, and "do not wrap each
+ * metric in a card" gives it nothing to do instead. Mechanical rules that survived being
+ * stated here and were violated anyway now live in `tools/generated-page-markup.ts`, where
+ * they are checked rather than asked for.
+ */
+
+/** Applies to every generated page, Studio-default or custom. */
+const GENERATED_PAGE_CRAFT_PROMPT = `
+### Plan before you build
+Fill in \`design\`, \`layout\`, and \`design_plan\` before writing any markup — the plan is what the page is judged against, so write it honestly rather than describing the page type back. Name the one thing the page leads with, the order of everything after it, and what you are leaving out. If the plan reads like something you would write for any page of this shape, it is not yet a plan: make it specific to this project's data and this user's question.
+
+### Hierarchy is the design
+- **Lead with the answer.** The fact the user came for goes at the top, at the largest size on the page. Everything else is ordered by how much it helps interpret that fact. Never bury the key number under rows of secondary detail.
+- **Spend emphasis once.** One element is the memorable thing; everything around it stays quiet. A page where three regions all shout has no hierarchy at all. One primary action per page; secondary actions stay quiet.
+- **Group with space first.** Three tools create grouping, in order of preference: negative space (the default — related things sit close, unrelated things far apart); a bordered surface (only where a group must read as one unit); a divider line (last resort, for dense data like tables and long lists where space is too expensive). Keep the gap between groups at least twice the gap within a group, or the eye cannot find the boundary.
+- **Structure carries information.** A border, divider, badge, number, or label earns its place by encoding something true about the content. The right side of a section header is for controls that act on the section, not for a caption restating what the heading already said. Numbered markers mean the content is a sequence. A badge means a real status. Applied for visual interest, each one is noise that costs the reader attention.
+- **Align to shared edges.** Pick a small set of alignment edges and put everything on them. A stray edge reads as sloppiness even when nobody can name it.
+- **Never show more than the user needs at once.** Push long technical detail into a disclosure. A short page that links or expands into depth beats a long page that shows everything at one level.
+
+### Patterns that read as machine-generated
+These appear regardless of subject, which is what makes them tells rather than choices. Avoid them unless the user asked for one:
+- Content chopped into identical surfaces: every metric, filter, or list item in its own bordered box, all at the same size and radius.
+- A summary strip that restates figures shown in full below it.
+- Tracked-out uppercase eyebrow labels above headings; metadata joined with middle dots; labels built as "WORD — fragment"; an arrow appended to button and link text.
+- Decorative icon tiles, gradient washes, and hover transitions on every surface.
+- A status banner that announces success and then stays on screen. Remove transient confirmations once loading finishes; keep only states that still mean something.
+- Tracked-out uppercase mini-labels standing in for headings, or a hero heading far larger than anything Studio uses.
+
+### Copy is design content
+- Name things as the user understands them, not as the system implements them. Plain terms over internal vocabulary.
+- Active voice, sentence case, no filler. A button says what happens when it is pressed — "Refresh data", not "Submit" — and keeps the same word through the flow, so the control that says "Export" produces a result that says "Exported".
+- An error says what went wrong and what to do next, in the interface's voice. It does not apologize and is never vague. Show the actual error text you received.
+- An empty state is an invitation to act, not a shrug. Say what would appear here and how to make it appear.
+- Give every figure its units and its time range. A number without either is unreadable.
+`
+
+/** The default. Selected by `design: 'studio'`. */
+const GENERATED_PAGE_STUDIO_DESIGN_PROMPT = `
+## Studio design (design: "studio")
+This is the default and applies unless the user asked for something else. The page should look like it was always part of the dashboard: restrained surfaces, normal heading sizes, the injected palette, and no decoration that is not carrying information.
+
+### Writing the CSS
+There is no component library, no Tailwind, and no React in the frame. The page gets Studio's theme variables and base element styles — a plain \`<h2>\` is already the right size — and you write everything else as ordinary CSS in one \`<style>\` block. Build only the few pieces this page needs; do not recreate a design system.
+
+Match Studio's geometry so the page reads as part of the dashboard:
+- Controls — buttons, inputs, selects — are 34px tall with \`var(--radius-md)\` corners and a \`1px solid var(--input)\` border. On a coarse pointer give them 44px and at least 16px text so they are not zoomed into.
+- Space sections about 40px apart and content within a section about 20px, keeping the gap between groups at least twice the gap inside one. Cap the reading column around 1200px and center it; go full width only for wide data, and narrower for a focused form.
+- A surface that genuinely needs to read as one unit gets \`background: var(--card)\`, a \`1px solid var(--border)\`, and \`var(--radius-lg)\` — nothing more. No shadows, no gradients, no hover lift.
+- Focus is visible everywhere: \`outline: 2px solid var(--ring); outline-offset: 2px\`.
+
+### Typography
+A small, fixed scale. Too many sizes reads as noise rather than hierarchy; too few reads as an undesigned wall of text. Both are tells.
+
+The injected styles already implement the scale. Use the right element and you do not need to set a font size at all:
+
+- **Body (\`--text-base\`) carries most of the page**: paragraphs, labels, table cells, and panel titles.
+- **Section headings step up to \`--text-xl\` — that is \`<h2>\`.** Sections need a visible step above body text; weight alone is not enough to separate them. Below that, \`<h3>\`–\`<h6>\` sit at body size and separate by weight, so a panel title inside a section does not compete with the section's own heading.
+- **One step down (\`--text-sm\`) for secondary text**: descriptions, units, captions, metadata, the label under a figure.
+- **The largest step is spent once.** \`--text-2xl\` or larger belongs either to the page's \`<h1>\`, when it has one, or to the single prominent figure the page leads with — not both, and never to a row of equal-weight metrics. Spending it four times means nothing is prominent.
+- **Semibold (\`var(--font-weight-semibold)\`) is the heaviest weight on the page.** 400 for body, 500 for quiet emphasis, 600 for headings and the expressive figure. No bold, no black, no letter-spaced uppercase.
+- That is four steps in total and most pages use three. Do not invent a fifth by restyling the injected sizes or reaching for \`--text-lg\`; if something needs to stand out, change its weight or give it space.
+
+### Page title and description
+Add an \`<h1>\` and a description **only when the page cannot explain itself**. Explorer already shows the page's name in its tab, so a title that restates it is a wasted line at the top of every page. A dashboard whose first section is clearly labelled, or a table whose columns say what it holds, starts at the content. When a description does earn its place, it says something the content does not — the time window, the data's source, a caveat — in one sentence at \`--text-sm\`. A section heading follows the same test: keep it when it names something the content does not already make obvious, and drop the sentence underneath that only rephrases it.
+
+### Tables
+Most generated pages are mostly table, and a table is where the width goes wrong. Decide what each column holds before writing the markup, then size the columns to that.
+
+- **Give every column the width its content needs, and the leftover to the one that reads as prose.** Let short columns size to their content (\`width: 1%; white-space: nowrap\` on the cell) so the message, path, or error column keeps the remaining space with a \`min-width\` around 16rem. A layout where one column wraps every few characters while another sits half empty is the most common way a generated table fails.
+- **Never wrap a value character by character.** \`overflow-wrap: anywhere\` and \`word-break: break-all\` belong on one deliberately chosen prose column, never on the table. A URL, id, or JSON blob broken mid-token is unreadable — give it room, truncate it, or move it out of the table.
+- **Long values get a summary in the cell and the full text in a \`<details>\`.** Show the part that distinguishes this row — the path, the error message, the id's last segment — not the whole URL or the raw payload. Letting an unformatted value set the column width is what starves every other column.
+- **Format timestamps; never print the raw value.** Query results arrive as ISO strings or epoch numbers. Render a readable local date and time — and for rows within a day, the time alone with the date in the header — inside \`<time datetime="...">\` carrying the original. \`2026-09-14T07:58:31.752000\` is not a date the reader can use.
+- **Every column earns its place.** If a status, path, or id already appears in another column, do not repeat it. Two columns showing the same thing cost width the prose column needed.
+- Headers stay on one line, in \`var(--muted-foreground)\` at medium weight. Numbers and identifiers align on their trailing edge with \`font-variant-numeric: tabular-nums\`; identifiers use \`var(--font-mono)\` at the text size, not smaller. Wrap the table in a \`overflow-x: auto\` container so a wide table scrolls rather than crushing its columns.
+- Keep headers, filters, and the result count in place when there are no rows, and put the empty message in the table's own body.
+
+Use semantic HTML and let it do the work: \`<table>\` for tabular data, \`<dl>\` for label/value pairs, \`<details>\` for long technical detail, \`<time>\` for timestamps, \`<button type="button">\` for actions. Toggle states with the \`hidden\` attribute. Write the sorting, filtering, and pagination yourself in JavaScript over the rows you already fetched.
+
+### Color
+Use the injected Studio variables for every color: backgrounds, text, borders, shadows, gradients, hover/focus/disabled states, SVG fills and strokes, and any color assigned in JavaScript. \`var(--background)\`, \`var(--foreground)\`, \`var(--card)\`, \`var(--border)\`, \`var(--muted-foreground)\`, \`var(--destructive)\`, \`var(--warning)\`. Derive tints with \`color-mix(in oklab, var(--primary) 12%, transparent)\` rather than guessing a neutral. Do not add literal fallbacks inside \`var()\` — the variables are always present. A local alias may reference a token (\`--panel-bg: var(--card)\`). Semantic tokens are complete colors; only the legacy brand scale takes channels, as \`hsl(var(--brand-link))\`.
+
+Charts are the one exception. Where a visualization needs concrete values no token provides, declare them once as \`--chart-*\` custom properties and reference those everywhere. For a Canvas or chart API that demands a resolved string, read it at runtime with \`getComputedStyle(document.documentElement).getPropertyValue('--chart-1').trim()\` rather than pasting a value into the source. Use color only to mark real warning and error states, always alongside text.
+
+### Composition by layout
+Take these as relationships between content, not templates. Include only what answers the user's question — never add a table, metric strip, or summary because it appears here.
+- **dashboard:** group each subject's label, figures, and chart together so they read as one thing. A few coherent panels beat a detached metric strip above unrelated charts. Give the dominant chart the space it needs. Put the time range and freshness near the heading. Add recent events only where they help investigate what the chart shows.
+- **table:** filters and actions side by side above the table, with the result count and any pagination nearby. Column sizing and long values are covered under Tables above.
+- **detail:** lead with the record or the question itself, then order facts by how much they explain it. Inline facts for metadata, a list or table for repeated evidence, a disclosure for long technical detail. Name sections for their actual content rather than "Summary" and "Evidence".
+- **form:** one column, fields in the order the user thinks about them, related fields grouped by spacing. Validation messages next to their field. The primary action sits at the end, with a quiet secondary beside it.
+
+### Before you submit
+Check the page against your own \`design_plan\`, then check the hierarchy: is the most important thing the most prominent thing? Remove every surface, badge, and heading that is not carrying information. Confirm the narrow layout, keyboard operation, and the loading, empty, and error state of every query-dependent region.
+`
+
+/** Selected by `design: 'custom'`, which requires the user to have asked. */
+const GENERATED_PAGE_CUSTOM_DESIGN_PROMPT = `
+## Custom design (design: "custom")
+Only when the user asked for a different look. Record what they asked for in \`custom_design_request\`, and let it decide every axis it touches.
+
+- **Scope the change to the request.** A request to change density, layout, or one color changes that and leaves the rest of the Studio design alone. A request for a different aesthetic — a terminal, a printed report, a particular brand, something playful — authorizes a complete departure: layout, type, color, density, and component styling together. Do not make the user ask for each part separately, and do not steer them back toward Studio defaults once they have asked.
+- **Make deliberate choices, not different defaults.** Where the request pins something down, follow it exactly. Where it leaves an axis free, choose for this project's actual subject matter rather than reaching for a generic alternative look. Generated pages cluster hard around a few: cream background with a serif display and a warm clay accent; near-black with one acid accent; hairline-ruled broadsheet columns; and identical rounded cards with the same soft grey shadow under each. Each is legitimate if asked for, and a tell if not.
+- **Type carries the personality.** One family, or two that are clearly distinct. Set a real scale with intentional weights and spacing, and keep body line length under about 80 characters. The sandbox blocks external fonts, so work with system families or an inline data font.
+- **Build to the same floor.** A custom look does not change the sandbox, the approval rules, or the requirements: the page still works at narrow widths, still shows visible keyboard focus, still respects reduced motion, still keeps text readable against its background, and still has a loading, empty, and error state for every query. Motion stays sparse and deliberate — one orchestrated moment, and transitions that answer what the user just did.
+- **Override freely.** The kit sits in a low-priority cascade layer, so ordinary CSS beats it — including hover and focus rules — with no \`!important\` and no specificity tricks. Override the classes, write your own, or drop the kit entirely. Define your palette once as custom properties near the top. Watch for selectors that cancel each other out, especially section padding and margins. When you revise an existing custom page, preserve the design it already has.
+`
+
 export const GENERATED_PAGE_DESIGN_PROMPT = `
-### Studio UI defaults and customization
-- Default to Studio's visual language when the user has not specified a design. The UI kit and composition ideas below are optional starting points, never requirements on the user's design. Choose the page's hierarchy and layout for the task before choosing classes.
-- A specific change overrides that aspect of the defaults. A request for a completely different aesthetic or interface authorizes a complete departure, including layout, typography, colors, density, and component styling. Do not make the user request each override separately or steer them back to Studio styling.
-- For a custom design, override any kit class with ordinary inline CSS, use your own classes, or omit the kit entirely. The kit lives in a low-priority CSS cascade layer, so your normal CSS overrides it, including hover/focus rules, without !important. Existing base typography and body spacing can also be overridden by your later CSS. Preserve an existing page's requested design when revising it.
-- Custom appearance does not change the sandbox, available APIs, query approval requirements, or accessibility requirements. Do not load external stylesheets, scripts, fonts, or images.
-
-### Available UI kit
-These are browser CSS classes, not React components. They are already injected. Reuse them where they fit; add CSS freely to improve the composition, hierarchy, or interaction while keeping the default Studio palette and typography. Do not sacrifice the design to fit the kit. Use native HTML elements and add JavaScript for behavior; classes do not implement sorting, filtering, pagination, retries, or data loading.
-- Layout: \`studio-page\` supplies a centered content column and section spacing; add \`studio-page--full\` for wide data views or \`studio-page--narrow\` for focused controls. \`studio-section\` groups a heading with content. \`studio-section-header\` aligns a heading left and related actions right. \`studio-grid\` lays out related panels and stacks them when narrow.
-- Toolbars: \`studio-toolbar\` with \`studio-actions\` groups on the left and right. Put search/filters left and actions right. Controls wrap at narrow widths. Explorer supplies a tab title and reload/stop controls. Do not recreate application navigation or runtime controls. A dashboard or investigation can still have a useful page heading and a short description; a self-explanatory table or console can start at the toolbar.
-- Buttons: \`studio-button\` is a neutral 34px button aligned with the default fields. Add \`studio-button--primary\` for a clear main action, \`studio-button--text\` for a quiet action, or \`studio-button--compact\` for a 26px action in a deliberately dense editor toolbar. Do not make every page compact by default. Always use type="button" unless intentionally submitting a form. Native disabled and focus-visible states are styled. While an action runs, disable it and show a specific loading label.
-- Fields: wrap a labeled native input/select/textarea in \`studio-field\`; use \`studio-input\` or \`studio-select\`. Fields default to 34px, including toolbars; coarse pointers get larger targets. Use \`studio-description\` for help text, connect it with aria-describedby, and set aria-invalid for invalid input. Keep short selectors content-sized. Search Escape should clear a nonempty search first, then blur when already empty.
-- Tables: \`studio-table-container\` contains horizontal overflow around a semantic \`studio-table\`. Use thead/tbody, th scope="col", and \`studio-number\` on numeric headers and cells. Headers stay on one line. Use \`studio-nowrap\` for short identifiers, service names, and status columns; format timestamps as readable dates/times in a time element. Use \`studio-text\` only on prose/message cells that should wrap. Never apply overflow-wrap:anywhere or word-break:break-all to the entire table. Show concise message summaries with expandable raw details instead of making full URLs and unformatted JSON dominate the table. Keep technical identifiers monospace with \`font-mono\`. Wire any sort/filter/page controls to the bounded result set; never imply a local filter searched the entire database.
-- Surfaces: \`studio-card\` is an optional subtle bordered group; put padded content in \`studio-card-content\` and footer actions in \`studio-card-footer\`. Use headings, spacing, and dividers when a card is unnecessary. Do not nest cards or wrap each metric/filter in one. \`studio-badge\` is a neutral status/category label, not a button or decoration.
-- Metrics: use a \`studio-metrics\` definition list, with each dt/dd pair wrapped in a div. Values have tabular numerals and stay smaller inside cards; add \`studio-metrics--summary\` only for the few leading figures that deserve emphasis. Do not render every value at the same large size or repeat the same metrics in a summary strip and service cards. Include units and the relevant time range. Use \`studio-muted\` for secondary text. Charts use the injected color tokens, quiet axes and grids, readable labels, and consistent units; the kit does not include a chart library.
-- States: \`studio-state\` groups a loading, empty, or error message with an optional action. Use role="status" for loading, and \`studio-state studio-state--error\` with role="alert" for failures. Keep these inside the affected section; preserve table headers and filters for zero results. Use hidden to switch states, show the actual error message, and wire a retry button. Never present example values as live query results.
-- Typography/copy: semantic h1–h6 and the classes \`heading-title\`, \`heading-section\`, \`heading-subSection\`, \`heading-default\`, \`heading-compact\`, \`text-default\`, \`text-subTitle\`, and \`text-compact\` are available. Keep capitalization exact. Keep the hierarchy visible: h1/heading-title for an optional page title, h2/heading-section for major sections, and heading-default for compact panel titles and labels. Do not style every heading as a small label. Prefer normal or medium weight and sentence case. Font antialiasing is already applied to match Studio. Avoid oversized hero headings, uppercase eyebrow labels, slogans, decorative icon tiles, and redundant descriptions by default.
-
-### Composition ideas
-These describe useful relationships between content, not templates to reproduce. Include only what answers the user's task. Do not add a table, metric strip, summary, evidence section, or technical-details panel simply because it appears below.
-- **Browse records:** place filters and relevant actions beside each other above the primary table/list. Keep the result count and any local pagination nearby. Use the available width when columns need it; preserve readable row spacing and useful search-field width. Keep filters and headers in place for zero results.
-- **Monitor activity:** group each service or topic's label, metrics, time range, and chart together. A small number of coherent panels can work better than a detached metric strip above unrelated charts. Give the dominant chart or finding enough space; add recent events only when they help the user investigate it.
-- **Investigate a record or issue:** lead with the selected record or concrete question, then order relevant facts and evidence by importance. Use inline facts for metadata, a list or table for repeated evidence, and disclosure for long technical details. Avoid generic "Summary" and "Evidence" headings when the actual content can provide more useful names.
-- Across layouts, align sections to shared edges, keep related content close, and leave more space between major groups. Use normal Studio heading sizes and restrained surfaces. A small page should feel complete and intentional, without empty panels or filler. All query-dependent content needs loading, empty, and error states. Custom user designs may use entirely different compositions.
-
-### Project health pages
-For a request such as "track project health for my project", start with a readable dashboard at the default page width, not a stretched full-width report. Use a modest page heading with the time range or freshness nearby and a neutral Refresh button. Show one concise health status with the specific reason it needs attention; remove transient "loaded successfully" messages after loading. Group related service metrics in compact panels with a clear service heading, modest label/value pairs, and a divider or spacing between the header and measurements. Use color sparingly to identify actual warning/error states with text. Include a trend only when the declared data supports it, and keep recent issues scannable with readable times, friendly service labels, and short message summaries. Keep the original details available in a disclosure. Do not label all log entries as errors or sum unrelated service counters into a single unexplained "error signals" metric. Adapt this composition to the project's available data and the user's requested design.
-
-### Final design check
-For the default Studio design, check the overall hierarchy and proportions as well as the components. Remove filler, unjustified cards, redundant chrome, and decorative badges, but retain useful page context and section headings. Adjust the kit with CSS whenever that improves the page. For a user-requested custom design, check against that request instead and preserve intentional departures. In both cases, check narrow layouts, text zoom, keyboard operation, contrast, and loading/empty/error states.
+${GENERATED_PAGE_CRAFT_PROMPT}
+${GENERATED_PAGE_STUDIO_DESIGN_PROMPT}
+${GENERATED_PAGE_CUSTOM_DESIGN_PROMPT}
 `

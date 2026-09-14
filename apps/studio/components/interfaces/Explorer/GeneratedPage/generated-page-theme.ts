@@ -57,6 +57,7 @@ const GENERATED_PAGE_TYPOGRAPHY_VARIABLES = [
   '--text-2xl',
   '--text-2xl--line-height',
   '--font-weight-medium',
+  '--font-weight-semibold',
   '--font-sans',
   '--font-heading',
   '--font-mono',

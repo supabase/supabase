@@ -21,7 +21,10 @@ const PROJECT_REF = 'default'
 
 const input = {
   title: 'Auth debugging console',
-  html: '<h1 id="page-heading">Auth console</h1>',
+  design: 'studio',
+  layout: 'detail',
+  design_plan: 'Lead with the most recent sign-ins, then the auth errors behind them.',
+  html: '<h1 id="page-heading">Auth console</h1><p role="status">Loading…</p><p role="alert" hidden></p>',
   database_queries: [
     { id: 'recent_users', title: 'Recent users', sql: 'select id from auth.users', row_limit: 25 },
   ],
@@ -265,7 +268,7 @@ describe('GeneratedPageRenderer', () => {
         input={{
           ...input,
           enable_supabase_client: false,
-          html: '<script>window.supabase.from("x")</script>',
+          html: '<p role="status">Loading…</p><p role="alert" hidden></p><script>window.supabase.from("x")</script>',
         }}
         confirmState="approval-requested"
       />

@@ -6,9 +6,20 @@ import {
   renderPageInputSchema,
 } from './generated-page-schema'
 
+const validHtml = [
+  '<main>',
+  '<p role="status">Loading…</p>',
+  '<p role="alert" hidden></p>',
+  '<table></table>',
+  '</main>',
+].join('')
+
 const validInput = {
   title: 'Auth debugging console',
-  html: '<h1>Console</h1>',
+  design: 'studio',
+  layout: 'dashboard',
+  design_plan: 'Lead with failed sign-ins over the last hour, then the errors behind them.',
+  html: validHtml,
   database_queries: [
     { id: 'recent_users', title: 'Recent users', sql: 'select id from auth.users', row_limit: 50 },
   ],
@@ -85,6 +96,91 @@ describe('renderPageInputSchema', () => {
     })
 
     expect(result.success).toBe(false)
+  })
+})
+
+describe('renderPageInputSchema design mode', () => {
+  it('requires custom_design_request when the design is custom', () => {
+    const result = renderPageInputSchema.safeParse({ ...validInput, design: 'custom' })
+
+    expect(result.success).toBe(false)
+    expect(JSON.stringify(result.error?.issues)).toContain('custom_design_request is missing')
+  })
+
+  it('exempts a custom design from the Studio markup checks', () => {
+    const result = renderPageInputSchema.safeParse({
+      ...validInput,
+      design: 'custom',
+      custom_design_request: 'make it look like an old terminal',
+      html: `<div style="color:#33ff66">${validHtml}</div>`,
+    })
+
+    expect(result.success).toBe(true)
+  })
+
+  it('still requires query states on a custom design', () => {
+    const result = renderPageInputSchema.safeParse({
+      ...validInput,
+      design: 'custom',
+      custom_design_request: 'make it look like an old terminal',
+      html: '<pre>rows</pre>',
+    })
+
+    expect(result.success).toBe(false)
+    expect(JSON.stringify(result.error?.issues)).toContain('role=\\"status\\"')
+  })
+})
+
+describe('renderPageInputSchema Studio markup checks', () => {
+  const parseHtml = (html: string) => renderPageInputSchema.safeParse({ ...validInput, html })
+
+  it('rejects literal colors but allows declared chart tokens', () => {
+    expect(parseHtml(`<div style="color:#0f0f0f">x</div>${validHtml}`).success).toBe(false)
+    expect(parseHtml(`<div style="color:rgb(1,2,3)">x</div>${validHtml}`).success).toBe(false)
+    expect(
+      parseHtml(`<style>:root{--chart-1:#2a9d63;}.bar{fill:var(--chart-1)}</style>${validHtml}`)
+        .success
+    ).toBe(true)
+  })
+
+  it('allows hsl() wrapping a legacy brand token', () => {
+    expect(parseHtml(`<div style="color:hsl(var(--brand-link))">x</div>${validHtml}`).success).toBe(
+      true
+    )
+  })
+
+  it('ignores a literal color inside a comment', () => {
+    expect(parseHtml(`<!-- was #ff0000 -->${validHtml}`).success).toBe(true)
+  })
+
+  it('rejects character-level wrapping applied to every cell', () => {
+    expect(parseHtml(`<style>td { overflow-wrap: anywhere; }</style>${validHtml}`).success).toBe(
+      false
+    )
+    expect(
+      parseHtml(`<style>table, th, td { word-break: break-all; }</style>${validHtml}`).success
+    ).toBe(false)
+    expect(
+      parseHtml(`<style>.log-message { overflow-wrap: anywhere; }</style>${validHtml}`).success
+    ).toBe(true)
+  })
+
+  it('rejects a page with queries but no loading or error state', () => {
+    const result = parseHtml('<main><table></table></main>')
+
+    expect(result.success).toBe(false)
+    expect(JSON.stringify(result.error?.issues)).toContain('declared quer')
+  })
+
+  it('allows a page with no queries and no states', () => {
+    const result = renderPageInputSchema.safeParse({
+      ...validInput,
+      html: '<h1>Static</h1>',
+      database_queries: [],
+      log_queries: [],
+    })
+
+    expect(result.success).toBe(true)
   })
 })
 
