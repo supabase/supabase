@@ -23,7 +23,7 @@ export function SearchV2Trigger({ className, placeholder = 'Search...' }: Search
          */
         event.stopImmediatePropagation()
         event.preventDefault()
-        
+
         setOpen(true)
       }
     }
