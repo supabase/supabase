@@ -8,6 +8,7 @@ import { HIGH_AVAILABILITY_INSTANCE_SIZE } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import Panel from '@/components/ui/Panel'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface HighAvailabilityInputProps {
   form: UseFormReturn<CreateProjectForm>
@@ -22,6 +23,7 @@ export const HighAvailabilityInput = ({
 }: HighAvailabilityInputProps) => {
   const { getValues, setValue } = form
   const { hasAccess } = useCheckEntitlements('instances.high_availability')
+  const showHighAvailability = useIsFeatureEnabled('project_creation:show_high_availability')
   const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
 
   // Fields to revert to when toggling off HA, so previously selected values aren't lost.
@@ -105,7 +107,7 @@ export const HighAvailabilityInput = ({
     setValue('dbRegion', highAvailabilityRegionName)
   }, [highAvailability, highAvailabilityRegionName, getValues, setValue])
 
-  if (!hasAccess) return null
+  if (!hasAccess || !showHighAvailability) return null
 
   return (
     <Panel.Content>
