@@ -190,7 +190,7 @@ export function SiteHeader() {
             asChild
             variant="text"
             size="small"
-            className="hidden h-8 px-3 text-sm text-muted-foreground hover:text-foreground sm:inline-flex"
+            className="hidden h-8 px-3 text-sm font-medium text-muted-foreground hover:text-foreground sm:inline-flex"
             iconRight={<ArrowUpRight size={14} />}
           >
             <a href="https://supabase.com/docs">Docs</a>
