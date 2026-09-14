@@ -103,3 +103,4 @@ To remove all network restrictions:
 
 - Network restrictions apply to Postgres and the database pooler. They don't apply to HTTPS APIs such as PostgREST, Storage, and Auth, or to Supabase client libraries like [supabase-js](/docs/reference/javascript/introduction).
 - With network restrictions applied, Edge functions lose direct access to the database. Use [supabase-js](/docs/reference/javascript/introduction) to connect to the database from Edge Functions instead.
+- Updating network restrictions may temporarily interrupt existing connections through the shared connection pooler (Supavisor). Existing pooled connections can be closed while the new configuration is applied. Clients should reconnect automatically if their IP address is permitted by the updated restrictions.
