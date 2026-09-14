@@ -7,7 +7,7 @@ import { cn, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } fr
 import type { ConnectMode, ProjectKeys } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
 import {
-  getClearedConnectSheetQueryParams,
+  CLEARED_CONNECT_SHEET_QUERY_PARAMS,
   resolveConnectSheetHydration,
 } from './ConnectSheet.utils'
 import { ConnectStepsSection } from './ConnectStepsSection'
@@ -97,7 +97,7 @@ export const ConnectSheet = () => {
   ])
 
   const clearAllQueryParams = () => {
-    setQueryParams(getClearedConnectSheetQueryParams())
+    setQueryParams(CLEARED_CONNECT_SHEET_QUERY_PARAMS)
   }
 
   const handleOpenChange = (sheetOpen: boolean) => {

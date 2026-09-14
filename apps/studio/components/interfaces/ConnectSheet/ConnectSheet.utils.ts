@@ -22,16 +22,14 @@ export type ConnectSheetHydration = {
   urlUpdates: ConnectSheetUrlUpdates
 }
 
-export function getClearedConnectSheetQueryParams(): ConnectSheetQueryParams {
-  return {
-    connectTab: null,
-    framework: null,
-    using: null,
-    method: null,
-    type: null,
-    mcpClient: null,
-    warehouseQueryEngine: null,
-  }
+export const CLEARED_CONNECT_SHEET_QUERY_PARAMS = {
+  connectTab: null,
+  framework: null,
+  using: null,
+  method: null,
+  type: null,
+  mcpClient: null,
+  warehouseQueryEngine: null,
 }
 
 function isConnectMode(value: string): value is ConnectMode {

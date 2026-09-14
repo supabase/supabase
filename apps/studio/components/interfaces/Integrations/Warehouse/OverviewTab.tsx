@@ -1,13 +1,20 @@
+import { useParams } from 'common'
 import { Badge } from 'ui'
 
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
+import { isWarehouseProvisioned } from './Warehouse.utils'
 import { WarehouseSetupPanel } from './WarehouseSetupPanel'
 import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useIsWarehouseProvisioned } from '@/hooks/misc/useIsWarehouseProvisioned'
+import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
 
 export const WarehouseOverviewTab = () => {
+  const { ref } = useParams()
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
-  const { isProvisioned } = useIsWarehouseProvisioned()
+
+  const { data: isProvisioned } = useWarehouseSetupStatusQuery(
+    { projectRef: ref },
+    { select: (data) => isWarehouseProvisioned(data?.setup_status) }
+  )
 
   // The marketplace shell supplies its own padding, so returning the content bare avoids
   // double-padding it.

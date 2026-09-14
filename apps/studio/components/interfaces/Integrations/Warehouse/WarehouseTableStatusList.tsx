@@ -54,11 +54,11 @@ const TableLag = ({ table }: { table: WarehouseSetupTable }) => {
   )
 }
 
-export interface WarehouseTableStatusListProps {
+interface WarehouseTableStatusListProps {
   tables: WarehouseSetupTable[]
 }
 
-export const WarehouseTableStatusList = ({ tables }: WarehouseTableStatusListProps) => {
+const WarehouseTableStatusList = ({ tables }: WarehouseTableStatusListProps) => {
   return (
     <Card>
       <CardContent className="p-0 divide-y">
@@ -107,7 +107,7 @@ export const WarehouseReplicatedTablesSection = ({ tables }: WarehouseTableStatu
   </PageSection>
 )
 
-export interface WarehouseEnablingProgressProps {
+interface WarehouseEnablingProgressProps {
   status: WarehouseSetupStatusResponse
 }
 
