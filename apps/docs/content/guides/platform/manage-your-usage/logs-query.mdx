@@ -19,11 +19,11 @@ Logs Query usage isn't billed directly. Instead, your organization gets a log qu
 
 | Monthly ingest | Ingest overage (billed) | Query allowance |
 | -------------- | ----------------------- | --------------- |
-| 5 GB           | — (included)            | 500 GB          |
-| 6 GB           | 1 GB                    | 600 GB          |
-| 10 GB          | 5 GB                    | 1,000 GB        |
-| 25 GB          | 20 GB                   | 2,500 GB        |
-| 100 GB         | 95 GB                   | 10,000 GB       |
+| 20 GB          | — (included)            | 2,000 GB        |
+| 21 GB          | 1 GB                    | 2,100 GB        |
+| 25 GB          | 5 GB                    | 2,500 GB        |
+| 40 GB          | 20 GB                   | 4,000 GB        |
+| 100 GB         | 80 GB                   | 10,000 GB       |
 
 There's no separate per-GB price for Logs Query. Your allowance is always 100 times your ingest usage for the same month.
 
@@ -57,7 +57,7 @@ If you exceed your allowance again the next month, while still in that degraded 
 
 ### A concrete walkthrough
 
-- January: You use 5 GB of ingest and 612 GB of query, more volume than your allowance covers.
+- January: You use 20 GB of ingest and 2,450 GB of query, more volume than your allowance covers.
 - February: Degraded — 10 queries/min, retention shrunk to 24 hours on paid tiers, 1 hour on the Free Plan.
 - March: If February also went over, that's two consecutive months, so this month is a full cutoff.
 - April: Billing cycle resets, access returns to normal. This allows you to make continued efforts to optimize your log query usage.
