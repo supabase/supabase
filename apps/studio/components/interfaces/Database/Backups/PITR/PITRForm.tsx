@@ -39,6 +39,13 @@ export function PITRForm({
   const [selectedUnix, setSelectedUnix] = useState(latestAvailableBackupUnix ?? 0)
 
   const selectedDate = dayjs.unix(selectedUnix).tz(selectedTimezone)
+  const calendarRangeKey = `${selectedTimezone}:${earliestAvailableBackupUnix}:${latestAvailableBackupUnix}`
+  const [calendarView, setCalendarView] = useState(() => ({
+    rangeKey: calendarRangeKey,
+    month: toCalendarDate(selectedDate),
+  }))
+  const calendarMonth =
+    calendarView.rangeKey === calendarRangeKey ? calendarView.month : toCalendarDate(selectedDate)
   const isSelectedOnEarliestDay = selectedDate.isSame(earliestAvailableBackup, 'day')
   const isSelectedOnLatestDay = selectedDate.isSame(latestAvailableBackup, 'day')
   const availableDates = getDatesBetweenRange(earliestAvailableBackup, latestAvailableBackup)
@@ -107,7 +114,8 @@ export function PITRForm({
               onSelect={(date) =>
                 setSelectedUnix(withCalendarDate(selectedDate, date, selectedTimezone).unix())
               }
-              defaultMonth={toCalendarDate(latestAvailableBackup)}
+              month={calendarMonth}
+              onMonthChange={(month) => setCalendarView({ rangeKey: calendarRangeKey, month })}
               startMonth={toCalendarDate(earliestAvailableBackup)}
               endMonth={toCalendarDate(latestAvailableBackup)}
               disabled={[
@@ -166,7 +174,9 @@ export function PITRForm({
                         isSelectedOnEarliestDay ? earliestAvailableBackupTime : undefined
                       }
                       maximumTime={isSelectedOnLatestDay ? latestAvailableBackupTime : undefined}
-                      onChange={(time) => setSelectedUnix(withTime(selectedDate, time).unix())}
+                      onChange={(time) =>
+                        setSelectedUnix(withTime(selectedDate, time, selectedTimezone).unix())
+                      }
                     />
                   </div>
                 </div>

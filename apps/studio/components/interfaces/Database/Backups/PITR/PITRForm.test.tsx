@@ -34,13 +34,17 @@ afterEach(() => {
 const EARLIEST_BACKUP_UNIX = dayjs.utc('2026-08-05T14:00:00Z').unix()
 const LATEST_BACKUP_UNIX = dayjs.utc('2026-08-10T02:30:00Z').unix()
 
-const renderForm = ({ withTimezoneProvider = false } = {}) => {
+const renderForm = ({
+  withTimezoneProvider = false,
+  earliestAvailableBackupUnix = EARLIEST_BACKUP_UNIX,
+  latestAvailableBackupUnix = LATEST_BACKUP_UNIX,
+} = {}) => {
   const onSubmit = vi.fn()
   const form = (
     <PITRForm
       onSubmit={onSubmit}
-      earliestAvailableBackupUnix={EARLIEST_BACKUP_UNIX}
-      latestAvailableBackupUnix={LATEST_BACKUP_UNIX}
+      earliestAvailableBackupUnix={earliestAvailableBackupUnix}
+      latestAvailableBackupUnix={latestAvailableBackupUnix}
     />
   )
   customRender(withTimezoneProvider ? <TimezoneProvider>{form}</TimezoneProvider> : form)
@@ -94,6 +98,50 @@ describe('PITRForm', () => {
     await waitFor(() => expect(getRestorePoint()).toBe('10 Aug 2026, 02:30:00'))
   })
 
+  test('shows the available month when the timezone moves the range across a month boundary', async () => {
+    renderForm({
+      earliestAvailableBackupUnix: dayjs.utc('2026-08-01T01:00:00Z').unix(),
+      latestAvailableBackupUnix: dayjs.utc('2026-08-01T02:30:00Z').unix(),
+    })
+
+    expect(screen.getByText('July 2026')).toBeInTheDocument()
+
+    await selectTimezone('(UTC+00:00) Coordinated Universal Time')
+
+    await waitFor(() => expect(screen.getByText('August 2026')).toBeInTheDocument())
+  })
+
+  test('keeps the selected month visible when the timezone changes', async () => {
+    renderForm({
+      earliestAvailableBackupUnix: dayjs.utc('2026-07-01T14:00:00Z').unix(),
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /previous month/i }))
+    clickDay('2026-07-15')
+
+    await selectTimezone('(UTC+00:00) Coordinated Universal Time')
+
+    await waitFor(() => expect(screen.getByText('July 2026')).toBeInTheDocument())
+  })
+
+  test('submits the correct instant when editing time across a daylight-saving transition', async () => {
+    const { onSubmit } = renderForm({
+      earliestAvailableBackupUnix: dayjs.utc('2026-11-01T04:00:00Z').unix(),
+      latestAvailableBackupUnix: dayjs.utc('2026-11-01T07:30:00Z').unix(),
+    })
+
+    setHours('00')
+    fireEvent.click(getContinueButton())
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recoveryTimeTargetUnix: dayjs.utc('2026-11-01T04:30:00Z').unix(),
+        recoveryTimeString: '01 Nov 2026 00:30:00',
+        recoveryTimeStringUtc: '01 Nov 2026 04:30:00',
+      })
+    )
+  })
+
   test('keeps the time of day when another date is picked', async () => {
     const { onSubmit } = renderForm()
 
@@ -113,7 +161,7 @@ describe('PITRForm', () => {
   })
 
   test('blocks a time that falls outside the available range', async () => {
-    renderForm()
+    const { onSubmit } = renderForm()
 
     // The earliest backup is 10:00 in New York, so 09:00 on that day is out of range
     clickDay('2026-08-05')
@@ -122,7 +170,9 @@ describe('PITRForm', () => {
     expect(
       await screen.findByText('Selected time is before the minimum time allowed')
     ).toBeInTheDocument()
-    expect(getContinueButton()).toBeDisabled()
+    expect(getContinueButton()).toHaveAttribute('aria-disabled', 'true')
+    fireEvent.click(getContinueButton())
+    expect(onSubmit).not.toHaveBeenCalled()
   })
 
   test('allows a time within the available range on the earliest date', async () => {

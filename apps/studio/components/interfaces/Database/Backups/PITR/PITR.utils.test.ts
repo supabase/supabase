@@ -53,9 +53,41 @@ describe('withCalendarDate', () => {
 describe('withTime', () => {
   it('sets the wall clock in the timezone the date is rendered in', () => {
     const current = dayjs.unix(1786000000).tz('Asia/Tokyo')
-    const updated = withTime(current, { h: 1, m: 2, s: 3 })
+    const updated = withTime(current, { h: 1, m: 2, s: 3 }, 'Asia/Tokyo')
 
     expect(updated.format('YYYY-MM-DD HH:mm:ss')).toBe(`${current.format('YYYY-MM-DD')} 01:02:03`)
     expect(updated.utc().format('HH:mm:ss')).toBe('16:02:03')
+  })
+
+  it('uses the earlier offset when moving before the fall transition', () => {
+    const current = dayjs.tz('2026-11-01 02:30:00', 'America/New_York')
+    const updated = withTime(current, { h: 0, m: 30, s: 0 }, 'America/New_York')
+
+    expect(updated.format('YYYY-MM-DD HH:mm:ss Z')).toBe('2026-11-01 00:30:00 -04:00')
+    expect(updated.utc().format('YYYY-MM-DD HH:mm:ss')).toBe('2026-11-01 04:30:00')
+  })
+
+  it('uses the earlier offset when moving before the spring transition', () => {
+    const current = dayjs.tz('2026-03-08 03:30:00', 'America/New_York')
+    const updated = withTime(current, { h: 1, m: 30, s: 0 }, 'America/New_York')
+
+    expect(updated.format('YYYY-MM-DD HH:mm:ss Z')).toBe('2026-03-08 01:30:00 -05:00')
+    expect(updated.utc().format('YYYY-MM-DD HH:mm:ss')).toBe('2026-03-08 06:30:00')
+  })
+
+  it('keeps the daylight-time occurrence of an ambiguous fall time', () => {
+    const current = dayjs('2026-11-01T01:15:00-04:00').tz('America/New_York')
+    const updated = withTime(current, { h: 1, m: 30, s: 0 }, 'America/New_York')
+
+    expect(updated.format('YYYY-MM-DD HH:mm:ss Z')).toBe('2026-11-01 01:30:00 -04:00')
+    expect(updated.utc().format('YYYY-MM-DD HH:mm:ss')).toBe('2026-11-01 05:30:00')
+  })
+
+  it('keeps the standard-time occurrence of an ambiguous fall time', () => {
+    const current = dayjs('2026-11-01T01:15:00-05:00').tz('America/New_York')
+    const updated = withTime(current, { h: 1, m: 30, s: 0 }, 'America/New_York')
+
+    expect(updated.format('YYYY-MM-DD HH:mm:ss Z')).toBe('2026-11-01 01:30:00 -05:00')
+    expect(updated.utc().format('YYYY-MM-DD HH:mm:ss')).toBe('2026-11-01 06:30:00')
   })
 })

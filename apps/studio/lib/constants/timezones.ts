@@ -1196,13 +1196,6 @@ export const ALL_TIMEZONES: Timezone[] = [
   },
 ]
 
-/**
- * Deduplicated view of `ALL_TIMEZONES`, keyed by the entry's primary IANA
- * name (`utc[0]`). Several catalog rows share an IANA target — e.g. PDT and
- * PST both point to `America/Los_Angeles` — which would render duplicate UI
- * rows that all store the same value when picked. We prefer the standard-time
- * (`isdst: false`) row when both are present.
- */
 export const TIMEZONES_BY_IANA: Timezone[] = (() => {
   const seen = new Map<string, Timezone>()
   for (const entry of ALL_TIMEZONES) {
@@ -1216,21 +1209,42 @@ export const TIMEZONES_BY_IANA: Timezone[] = (() => {
   return Array.from(seen.values())
 })()
 
-/** Look up the catalog entry that owns the given IANA name (any of `utc[]`). */
-export const findTimezoneByIana = (iana: string): Timezone | undefined =>
-  ALL_TIMEZONES.find((entry) => entry.utc.includes(iana))
+const REPRESENTATIVE_IANA_OVERRIDES: Record<string, string> = {
+  'Central Asia Standard Time': 'Asia/Almaty',
+  'Central Pacific Standard Time': 'Pacific/Guadalcanal',
+  UTC: 'UTC',
+}
 
-/**
- * Current UTC offset of an IANA zone, e.g. `UTC-05:00`. The catalog's own
- * `offset`/`text` fields are standard-time only, so they read an hour off for
- * every zone that is currently observing daylight saving time.
- */
-export const getTimezoneOffsetLabel = (iana: string) => {
+const getTimezoneRegion = (entry: Timezone) => entry.text.replace(/^\(UTC[^)]*\)\s*/, '')
+
+const getRepresentativeIana = (entry: Timezone) => {
+  const override = REPRESENTATIVE_IANA_OVERRIDES[entry.value]
+  if (override) return override
+
+  const region = getTimezoneRegion(entry).toLocaleLowerCase('en-US')
+  return (
+    entry.utc.find((iana) => {
+      const city = iana.split('/').at(-1)?.replaceAll('_', ' ').toLocaleLowerCase('en-US')
+      return city ? region.includes(city) : false
+    }) ?? entry.utc[0]
+  )
+}
+
+const TIMEZONE_OPTION_ENTRIES = TIMEZONES_BY_IANA.map((entry) => ({
+  entry,
+  iana: getRepresentativeIana(entry),
+}))
+
+export const findTimezoneByIana = (iana: string): Timezone | undefined =>
+  TIMEZONE_OPTION_ENTRIES.find((option) => option.iana === iana)?.entry ??
+  TIMEZONES_BY_IANA.find((entry) => entry.utc.includes(iana))
+
+export const getTimezoneOffsetLabel = (iana: string, date = new Date()) => {
   try {
     const parts = new Intl.DateTimeFormat('en-US', {
       timeZone: iana,
       timeZoneName: 'longOffset',
-    }).formatToParts(new Date())
+    }).formatToParts(date)
     const offset = parts.find((part) => part.type === 'timeZoneName')?.value ?? 'GMT'
     return offset === 'GMT' ? 'UTC+00:00' : offset.replace('GMT', 'UTC')
   } catch {
@@ -1238,8 +1252,17 @@ export const getTimezoneOffsetLabel = (iana: string) => {
   }
 }
 
-/** Catalog label for an IANA zone, with its offset resolved for today's date. */
-export const formatTimezoneLabel = (iana: string) => {
-  const region = findTimezoneByIana(iana)?.text.replace(/^\(UTC[^)]*\)\s*/, '') ?? iana
-  return `(${getTimezoneOffsetLabel(iana)}) ${region}`
+const formatTimezoneEntryLabel = (entry: Timezone, iana: string, date: Date) =>
+  `(${getTimezoneOffsetLabel(iana, date)}) ${getTimezoneRegion(entry)}`
+
+export const formatTimezoneLabel = (iana: string, date = new Date()) => {
+  const entry = findTimezoneByIana(iana)
+  if (!entry) return `(${getTimezoneOffsetLabel(iana, date)}) ${iana}`
+  return formatTimezoneEntryLabel(entry, iana, date)
 }
+
+export const getTimezoneOptions = (date = new Date()) =>
+  TIMEZONE_OPTION_ENTRIES.map(({ entry, iana }) => ({
+    iana,
+    label: formatTimezoneEntryLabel(entry, iana, date),
+  }))

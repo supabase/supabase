@@ -42,5 +42,11 @@ export const withCalendarDate = (
 ): dayjs.Dayjs =>
   dayjs.tz(`${dayjs(calendarDate).format('YYYY-MM-DD')} ${current.format('HH:mm:ss')}`, timezone)
 
-export const withTime = (current: dayjs.Dayjs, { h, m, s }: Time): dayjs.Dayjs =>
-  current.set('hour', h).set('minute', m).set('second', s)
+export const withTime = (current: dayjs.Dayjs, time: Time, timezone: string): dayjs.Dayjs => {
+  const wallTime = `${current.format('YYYY-MM-DD')} ${formatTimeToTimeString(time)}`
+  const matchingOffset = dayjs.utc(wallTime).subtract(current.utcOffset(), 'minute').tz(timezone)
+
+  return matchingOffset.format('YYYY-MM-DD HH:mm:ss') === wallTime
+    ? matchingOffset
+    : dayjs.tz(wallTime, timezone)
+}

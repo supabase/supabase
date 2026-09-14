@@ -138,7 +138,10 @@ export const PITRSelection = () => {
                   <div>
                     <p className="text-sm font-mono text-foreground-lighter">
                       {selectedRecoveryPoint
-                        ? formatTimezoneLabel(selectedRecoveryPoint.selectedTimezone)
+                        ? formatTimezoneLabel(
+                            selectedRecoveryPoint.selectedTimezone,
+                            new Date(selectedRecoveryPoint.recoveryTimeTargetUnix * 1000)
+                          )
                         : null}
                     </p>
                     <p className="text-2xl">{selectedRecoveryPoint?.recoveryTimeString}</p>

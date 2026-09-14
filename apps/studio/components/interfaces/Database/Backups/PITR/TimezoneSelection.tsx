@@ -15,7 +15,7 @@ import {
   ScrollArea,
 } from 'ui'
 
-import { formatTimezoneLabel, TIMEZONES_BY_IANA } from '@/lib/constants/timezones'
+import { formatTimezoneLabel, getTimezoneOptions } from '@/lib/constants/timezones'
 
 interface TimezoneSelectionProps {
   selectedTimezone: string
@@ -30,13 +30,14 @@ export const TimezoneSelection = ({
   const listboxId = useId()
 
   const options = useMemo(() => {
-    const catalogNames = TIMEZONES_BY_IANA.map((entry) => entry.utc[0])
-    // The selected zone is often an alias of a catalog entry rather than its
-    // primary name, so it needs adding explicitly to stay selectable
-    const ianaNames = catalogNames.includes(selectedTimezone)
-      ? catalogNames
-      : [selectedTimezone, ...catalogNames]
-    return ianaNames.map((iana) => ({ iana, label: formatTimezoneLabel(iana) }))
+    const timezoneOptions = getTimezoneOptions()
+    if (timezoneOptions.some((option) => option.iana === selectedTimezone)) {
+      return timezoneOptions
+    }
+    return [
+      { iana: selectedTimezone, label: formatTimezoneLabel(selectedTimezone) },
+      ...timezoneOptions,
+    ]
   }, [selectedTimezone])
 
   const selectedLabel = formatTimezoneLabel(selectedTimezone)
@@ -68,7 +69,6 @@ export const TimezoneSelection = ({
                   {options.map(({ iana, label }) => (
                     <CommandItem
                       key={iana}
-                      // CommandItem filters on `value`, so include the IANA name to make it searchable
                       value={`${label} ${iana}`}
                       onSelect={() => {
                         onSelectTimezone(iana)
