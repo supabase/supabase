@@ -32,9 +32,12 @@ series folds into "Other", becomes small multiples, or gets a second encoding. E
 
 Slots point at the Radix scales in `colors.css` and resolve per theme, so chart code passes
 `var(--chart-series-n)` and never branches on light/dark. Hue families alternate (brand, blue,
-pink, violet, tomato, indigo, green, purple) so adjacent series never share a family. Every
-adjacent pair clears colorblind and normal-vision separation in both themes; only slot 1 sits
-below 3:1 against the surface, which is why charts using it always carry a legend.
+pink, violet, tomato, indigo, green, purple) so adjacent series never share a family. Light mode
+uses the 900 and 1000 steps; dark mode overrides every slot with the brighter 1100 tier so the
+palette sits at the same lightness as brand green instead of sinking into the surface. Every
+adjacent pair clears colorblind and normal-vision separation in both themes. Only slot 1 in
+light mode sits below 3:1 against the surface, which is why charts using it always carry a
+legend.
 
 Reference lines and "absence of data" (headroom, idle, unused capacity) use
 `--chart-reference` and `--chart-muted` / `--chart-muted-fill`. Directional series use the pinned

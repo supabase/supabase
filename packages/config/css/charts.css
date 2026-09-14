@@ -38,6 +38,14 @@
 }
 
 [data-theme*='dark'] {
-  --chart-series-4: var(--color-violet-1000);
-  --chart-series-7: var(--color-green-900);
+  --chart-series-1: var(--color-brand-900);
+  --chart-series-2: var(--color-blue-1100);
+  --chart-series-3: var(--color-pink-1100);
+  --chart-series-4: var(--color-violet-1100);
+  --chart-series-5: var(--color-tomato-1100);
+  --chart-series-6: var(--color-indigo-1100);
+  --chart-series-7: var(--color-green-1100);
+  --chart-series-8: var(--color-purple-1100);
+
+  --chart-muted: var(--color-scale-800);
 }

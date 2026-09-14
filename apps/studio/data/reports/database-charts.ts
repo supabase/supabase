@@ -111,6 +111,7 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'Swap',
           omitFromTotal: true,
+          color: 'var(--chart-warning)',
           tooltip:
             'Swap space in use by the operating system. Sustained swap usage indicates memory pressure and may degrade database performance',
         },
