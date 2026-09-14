@@ -3,9 +3,11 @@ import { describe, expect, it } from 'vitest'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
 import type { StorageItem, StorageItemWithColumn } from '../Storage.types'
 import {
+  BREADCRUMB_ITEMS_TO_DISPLAY,
   filterFoldersBySearch,
   getDestinationLabel,
   getDestinationName,
+  getMoveBreadcrumbs,
   getMoveItemsTitle,
   getParentPathLabel,
   getSourcePaths,
@@ -175,6 +177,62 @@ describe('getParentPathLabel', () => {
 
   it('joins the parent segments for a nested folder', () => {
     expect(getParentPathLabel('archive/2024/photos', 'avatars')).toBe('archive/2024')
+  })
+})
+
+describe('getMoveBreadcrumbs', () => {
+  const labels = (crumbs: { label: string }[]) => crumbs.map((crumb) => crumb.label)
+
+  it('shows only the bucket at the root, marked as current', () => {
+    const { first, collapsed, tail } = getMoveBreadcrumbs('avatars', [])
+    expect(first).toEqual({ label: 'avatars', pathSegments: [], isCurrent: true })
+    expect(collapsed).toEqual([])
+    expect(tail).toEqual([])
+  })
+
+  it('keeps every crumb visible up to the display limit', () => {
+    const { first, collapsed, tail } = getMoveBreadcrumbs('avatars', ['a', 'b'])
+    expect(first.label).toBe('avatars')
+    expect(collapsed).toEqual([])
+    expect(labels(tail)).toEqual(['a', 'b'])
+  })
+
+  it('collapses the middle once the path exceeds the display limit', () => {
+    const { first, collapsed, tail } = getMoveBreadcrumbs('avatars', ['a', 'b', 'c'])
+    expect(first.label).toBe('avatars')
+    expect(labels(collapsed)).toEqual(['a'])
+    expect(labels(tail)).toEqual(['b', 'c'])
+  })
+
+  it('collapses everything between the bucket and the last two folders', () => {
+    const { first, collapsed, tail } = getMoveBreadcrumbs('avatars', ['a', 'b', 'c', 'd', 'e'])
+    expect(first.label).toBe('avatars')
+    expect(labels(collapsed)).toEqual(['a', 'b', 'c'])
+    expect(labels(tail)).toEqual(['d', 'e'])
+  })
+
+  it('never renders more than the display limit of visible crumbs', () => {
+    const deep = Array.from({ length: 20 }, (_, index) => `folder-${index}`)
+    const { collapsed, tail } = getMoveBreadcrumbs('avatars', deep)
+    expect(1 + tail.length).toBe(BREADCRUMB_ITEMS_TO_DISPLAY)
+    expect(collapsed).toHaveLength(deep.length - tail.length)
+  })
+
+  it('points each crumb at the path it should navigate to', () => {
+    const { first, collapsed, tail } = getMoveBreadcrumbs('avatars', ['a', 'b', 'c', 'd'])
+    expect(first.pathSegments).toEqual([])
+    expect(collapsed.map((crumb) => crumb.pathSegments)).toEqual([['a'], ['a', 'b']])
+    expect(tail.map((crumb) => crumb.pathSegments)).toEqual([
+      ['a', 'b', 'c'],
+      ['a', 'b', 'c', 'd'],
+    ])
+  })
+
+  it('marks only the deepest folder as current', () => {
+    const { first, collapsed, tail } = getMoveBreadcrumbs('avatars', ['a', 'b', 'c', 'd'])
+    expect(first.isCurrent).toBe(false)
+    expect(collapsed.some((crumb) => crumb.isCurrent)).toBe(false)
+    expect(tail.map((crumb) => crumb.isCurrent)).toEqual([false, true])
   })
 })
 

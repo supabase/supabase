@@ -1,20 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { ArrowLeft, Search, X } from 'lucide-react'
-import { Fragment, useMemo, useState } from 'react'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-  Button,
-} from 'ui'
+import { useMemo, useState } from 'react'
+import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants'
+import { MoveItemsFolderPickerBreadcrumb } from './MoveItemsFolderPickerBreadcrumb'
 import { FolderPickerRow } from './MoveItemsFolderPickerRow'
 import { filterFoldersBySearch, getDestinationLabel, toFolders } from './MoveItemsModal.utils'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
@@ -128,34 +121,11 @@ export const MoveItemsFolderPicker = ({
               : undefined
           }
         />
-        <Breadcrumb className="min-w-0 flex-1 overflow-hidden">
-          <BreadcrumbList className="flex-nowrap gap-1 sm:gap-1">
-            {[bucketName, ...pathSegments].map((segment, index) => {
-              const isCurrent = index === pathSegments.length
-              return (
-                <Fragment key={`${segment}-${index}`}>
-                  {index > 0 && <BreadcrumbSeparator className="shrink-0" />}
-                  <BreadcrumbItem className="min-w-0">
-                    {isCurrent ? (
-                      <BreadcrumbPage className="truncate text-xs">{segment}</BreadcrumbPage>
-                    ) : (
-                      <BreadcrumbLink asChild>
-                        <button
-                          type="button"
-                          tabIndex={0}
-                          className="truncate text-xs"
-                          onClick={() => handleNavigate(pathSegments.slice(0, index))}
-                        >
-                          {segment}
-                        </button>
-                      </BreadcrumbLink>
-                    )}
-                  </BreadcrumbItem>
-                </Fragment>
-              )
-            })}
-          </BreadcrumbList>
-        </Breadcrumb>
+        <MoveItemsFolderPickerBreadcrumb
+          bucketName={bucketName}
+          pathSegments={pathSegments}
+          onNavigate={handleNavigate}
+        />
       </div>
 
       <div className="flex shrink-0 items-center border-b border-default bg-surface-75 px-2.5 py-2">

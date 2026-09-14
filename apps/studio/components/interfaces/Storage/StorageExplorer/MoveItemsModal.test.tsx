@@ -7,6 +7,7 @@ import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
 import type { StorageItemWithColumn } from '../Storage.types'
 import { MoveItemsModal } from './MoveItemsModal'
 import type { components } from '@/data/api'
+import { clickDropdown } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -39,7 +40,8 @@ const BUCKET_CONTENTS: Record<string, StorageObject[]> = {
     createFile('avatar.png'),
   ],
   photos: [createFolder('2024'), createFile('beach.png')],
-  'photos/2024': [],
+  'photos/2024': [createFolder('q1')],
+  'photos/2024/q1': [],
   invoices: [],
 }
 
@@ -157,6 +159,44 @@ describe('MoveItemsModal', () => {
     expect(await screen.findByRole('button', { name: 'buried' })).toBeInTheDocument()
   })
 
+  it('collapses the middle of a deep path into a dropdown', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    await user.click(await screen.findByRole('button', { name: 'photos' }))
+    await user.click(await screen.findByRole('button', { name: '2024' }))
+    await user.click(await screen.findByRole('button', { name: 'q1' }))
+    await screen.findByRole('button', { name: 'Move to q1' })
+
+    // The bucket and the last two folders stay visible, so only "photos" collapses
+    const breadcrumb = screen.getByRole('navigation', { name: 'breadcrumb' })
+    expect(within(breadcrumb).getByText('avatars')).toBeInTheDocument()
+    expect(within(breadcrumb).getByText('2024')).toBeInTheDocument()
+    expect(within(breadcrumb).getByText('q1')).toBeInTheDocument()
+    expect(within(breadcrumb).queryByText('photos')).not.toBeInTheDocument()
+
+    clickDropdown(within(breadcrumb).getByLabelText('Show the folders in between'))
+
+    const collapsedItem = await screen.findByRole('menuitem', { name: 'photos' })
+    await user.click(collapsedItem)
+
+    expect(await screen.findByRole('button', { name: 'Move to photos' })).toBeInTheDocument()
+  })
+
+  it('keeps a shallow path fully visible', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    await user.click(await screen.findByRole('button', { name: 'photos' }))
+    await screen.findByRole('button', { name: 'Move to photos' })
+
+    const breadcrumb = screen.getByRole('navigation', { name: 'breadcrumb' })
+    expect(within(breadcrumb).getByText('photos')).toBeInTheDocument()
+    expect(
+      within(breadcrumb).queryByLabelText('Show the folders in between')
+    ).not.toBeInTheDocument()
+  })
+
   it('blocks moving items into the folder they are already in', async () => {
     renderModal()
 
@@ -198,7 +238,7 @@ describe('MoveItemsModal', () => {
     await screen.findByRole('button', { name: 'photos' })
     await user.type(screen.getByPlaceholderText('Search folders in avatars...'), '2024')
 
-    expect(await screen.findByRole('button', { name: /2024/ })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: '2024 in photos' })).toBeInTheDocument()
     await waitFor(() => expect(screen.queryByText('invoices')).not.toBeInTheDocument())
   })
 
@@ -209,7 +249,7 @@ describe('MoveItemsModal', () => {
     await screen.findByRole('button', { name: 'photos' })
     await user.type(screen.getByPlaceholderText('Search folders in avatars...'), '2024')
 
-    await user.click(await screen.findByRole('button', { name: /2024/ }))
+    await user.click(await screen.findByRole('button', { name: '2024 in photos' }))
     await user.click(await screen.findByRole('button', { name: 'Move to 2024' }))
 
     expect(onSelectMove).toHaveBeenCalledWith('photos/2024')

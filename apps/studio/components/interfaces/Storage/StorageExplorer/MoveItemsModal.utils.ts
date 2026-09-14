@@ -96,6 +96,42 @@ export function getParentPathLabel(folderPath: string, bucketName: string): stri
   return parentSegments.length > 0 ? parentSegments.join('/') : bucketName
 }
 
+/** Breadcrumb items shown before the middle of the path collapses into an ellipsis */
+export const BREADCRUMB_ITEMS_TO_DISPLAY = 3
+
+export type MoveBreadcrumb = {
+  label: string
+  /** Path the picker navigates to when this crumb is chosen */
+  pathSegments: string[]
+  isCurrent: boolean
+}
+
+/**
+ * Splits the path into the breadcrumb shape the design system prescribes: the bucket always
+ * stays visible, the deepest folders stay visible, and everything between them collapses behind
+ * an ellipsis so a deeply nested path stays readable.
+ */
+export function getMoveBreadcrumbs(
+  bucketName: string,
+  pathSegments: string[]
+): { first: MoveBreadcrumb; collapsed: MoveBreadcrumb[]; tail: MoveBreadcrumb[] } {
+  const crumbs: MoveBreadcrumb[] = [bucketName, ...pathSegments].map((label, index) => ({
+    label,
+    pathSegments: pathSegments.slice(0, index),
+    isCurrent: index === pathSegments.length,
+  }))
+
+  const [first, ...rest] = crumbs
+  const tailLength = BREADCRUMB_ITEMS_TO_DISPLAY - 1
+  const shouldCollapse = crumbs.length > BREADCRUMB_ITEMS_TO_DISPLAY
+
+  return {
+    first,
+    collapsed: shouldCollapse ? rest.slice(0, -tailLength) : [],
+    tail: shouldCollapse ? rest.slice(-tailLength) : rest,
+  }
+}
+
 /**
  * Copy for the dialog title, which names what is being moved rather than where it's going.
  */
