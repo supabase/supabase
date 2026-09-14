@@ -171,7 +171,9 @@ export const checkboxFieldSchema = formFieldBase.extend({
   /**
    * Optional group identifier for related checkboxes. When any visible checkbox
    * in a group has `groupRequired: true`, at least one checkbox in that group
-   * must be selected.
+   * must be selected — any member counts, including members that leave
+   * `groupRequired` unset. Grouping is independent of `required`: a grouped
+   * checkbox marked `required` must still be checked on its own.
    */
   group: z.string().optional(),
   groupRequired: z.boolean().optional().default(false),
