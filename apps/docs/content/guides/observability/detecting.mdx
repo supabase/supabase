@@ -1,283 +1,216 @@
 ---
 id: 'detecting'
-title: 'Detecting issues'
-description: 'Run Health, Security, Performance, and Usage checks against logs and database statistics to pick up actionable signals.'
+title: 'Detection checks'
+description: 'Repeatable health, security, performance, and capacity checks with explicit inputs and outcomes'
 ---
 
-Detection is the step between accessing project data and troubleshooting a specific problem. Use the sources in [Observability](/docs/guides/observability) to produce a count, rate, trend, or named finding. Do not try to prove the root cause yet.
+Use these checks to identify evidence worth investigating. A finding does not establish a cause. The specialist [monitoring agents](/docs/guides/observability/automate-with-agents) use these same checks.
 
-This guide provides starting checks for [Health](#health), [Security](#security), [Performance](#performance), and [Usage](#usage). The log examples use ClickHouse SQL in the [Explorer](/dashboard/project/_/explorer) with query source **Logs** or MCP `query_logs`. The database examples use Postgres SQL in the [Explorer](/dashboard/project/_/explorer) with query source **Database** or MCP `execute_sql`.
+## Before running checks
 
-Use a time range that represents normal traffic, then compare it with the same period after a deployment or configuration change. When a check returns a spike, error code, SQLSTATE, object name, or advisor finding, take that evidence to [Diagnosing](/docs/guides/troubleshooting).
+- Identify the project and database instance. Use project-scoped [Supabase MCP](/docs/guides/ai-tools/mcp) with `read_only=true`.
+- Run ClickHouse SQL with `query_logs`; supply an explicit UTC time range using the tool's input schema. Run Postgres SQL with `execute_sql`. In [Explorer](/dashboard/project/_/explorer), select **Run SQL**, then query source **Logs** or **Database**, respectively.
+- Record observation time, windows, thresholds, and saved baseline. Defaults below are starting alert policies, not Supabase service guarantees. Record operator overrides before running.
+- Failed tools, missing permissions or required fields, incomplete windows, and unavailable history make the affected check **unable to assess**. Continue independent checks. Zero recorded events alone does not prove service health.
+
+Each check returns **finding**, **clear** (completed, no threshold crossed), or **unable to assess** with the missing input. Preserve this result even when a clear run sends no notification.
 
 ## Health
 
-Health checks answer whether a service is available and behaving within its normal error and resource envelope.
+### Measure API and Auth server errors
 
-### Measure API server-error rate
-
-Count requests and 5xx responses by hour. A rate is more useful than a raw error count when traffic changes.
+**Input:** the last complete UTC hour and preceding complete hour, queried separately. Evaluate each source separately; API Gateway and Auth events are different observations, not unique requests to add together.
 
 ```sql
-select
-  toStartOfHour(timestamp) as hour,
-  count() as requests,
-  countIf(toInt32OrZero(log_attributes['response.status_code']) >= 500) as server_errors,
-  round(
-    100.0 * countIf(toInt32OrZero(log_attributes['response.status_code']) >= 500) /
-      nullIf(count(), 0),
-    2
-  ) as server_error_percent
-from logs
-where source = 'edge_logs'
-group by hour
-order by hour desc
-limit 24;
+select source,
+  count() as events,
+  countIf(status between 100 and 599) as responses,
+  countIf(status between 500 and 599) as server_errors,
+  countIf(status in (401, 403)) as access_failures,
+  countIf(status is null or status < 100 or status > 599) as unknown_status
+from (
+  select source,
+    toInt32OrNull(if(source = 'edge_logs',
+      log_attributes['response.status_code'], log_attributes['status'])) as status
+  from logs
+  where source in ('edge_logs', 'auth_logs')
+)
+group by source
+order by source
+limit 2;
 ```
 
-### Find failing API paths
+**Signal:** compute `100 * server_errors / responses` per source. Report at least 20 server errors, a rate of at least 1%, and at least twice the preceding rate. When the preceding rate is zero, use the count and 1% conditions. Both windows need at least 100 responses; otherwise the comparison is unable to assess.
 
-Use the rate check to find an affected window, then identify the paths and status codes producing the errors.
+Rates use valid statuses only. Report `unknown_status` separately; no valid statuses makes the check unable to assess. Auth events without response statuses are not successful requests. A missing source row requires a capture/traffic check, not an assumed zero error rate.
 
-```sql
-select
-  log_attributes['request.path'] as path,
-  toInt32OrZero(log_attributes['response.status_code']) as status,
-  count() as errors
-from logs
-where source = 'edge_logs'
-  and toInt32OrZero(log_attributes['response.status_code']) >= 500
-group by path, status
-order by errors desc
-limit 20;
-```
+**Next:** narrow to the source and hour. Collect at most five event IDs with timestamps and status, then follow [API error troubleshooting](/docs/guides/troubleshooting/discovering-and-interpreting-api-errors-in-the-logs-7xREI9). Redact paths and messages. After a fix, rerun on a comparable window.
 
-### Check Postgres connection pressure
+### Check connection pressure
 
-Compare active and waiting connections with the configured limit. A high percentage is a signal to inspect pooler settings, long-running transactions, and traffic before changing the limit.
+**Input:** a current Postgres snapshot with permission to read all sessions.
 
 ```sql
 select
-  count(*) as current_connections,
-  count(*) filter (where state = 'active') as active_connections,
-  count(*) filter (where wait_event_type is not null) as waiting_connections,
-  current_setting('max_connections')::int as max_connections,
-  round(
-    100.0 * count(*) / nullif(current_setting('max_connections')::int, 0),
-    2
-  ) as connection_percent
+  count(*) filter (where backend_type = 'client backend') as client_connections,
+  count(*) filter (where backend_type = 'client backend' and state = 'active') as active_connections,
+  current_setting('max_connections')::int as max_connections
 from pg_stat_activity;
 ```
 
-You can read API response errors and service availability in [Reports](/docs/guides/observability/reports), or use the [Metrics API](/docs/guides/observability/metrics) for CPU and connection series. Once you have a failing path, status, or saturated resource, continue in [Diagnosing](/docs/guides/troubleshooting).
+**Signal:** report client connections at 80% of `max_connections`. This is an instance-wide pressure indicator. Reserved slots, role limits, and pooler limits can constrain a client sooner; this does not measure slots available to an application.
+
+**Next:** inspect [connection management](/docs/guides/database/connection-management) and [role counts](#collect-size-and-connection-measurements). Rerun after the workload or pooling change.
 
 ## Security
 
-Security checks look for access-control findings and changes in authentication or authorization failures. Treat them as review signals, not proof of an attack.
+### Review advisor findings
 
-### Measure authorization failures
+**Action:** call `get_advisors` with `type: "security"`, using the tool's project scope. Report `WARN` and `ERROR` findings with the lint name, affected object, and documentation link. Keep `INFO` as context without alerting by default.
 
-Count 401 and 403 responses by hour and status. Compare the rate with a known-good window so normal unauthenticated traffic does not become an alert by itself.
+**Next:** follow the check documentation and verify the intended access model before proposing a change. Rerun the advisor after a fix. No findings does not prove the project is secure. See [Advisors](/docs/guides/observability/advisors) for other execution paths.
 
-```sql
-select
-  toStartOfHour(timestamp) as hour,
-  toInt32OrZero(log_attributes['response.status_code']) as status,
-  count() as failures
-from logs
-where source = 'edge_logs'
-  and toInt32OrZero(log_attributes['response.status_code']) in (401, 403)
-group by hour, status
-order by hour desc, status
-limit 48;
-```
+### Measure authentication and authorization failures
 
-### Find affected paths and methods
+**Input/action:** run the [status-count query](#measure-api-and-auth-server-errors) for the last complete UTC day and preceding complete day, in separate requests of at most 24 hours. Evaluate each source separately.
 
-After detecting a spike, group failures by route and method. This separates a broken client flow from failures spread across the API.
+**Signal:** compute `100 * access_failures / responses`. Apply the Health minimum of 100 responses in both windows. Report at least 20 failures, a rate of at least 1%, and at least twice the preceding rate. When the preceding rate is zero, use the count and 1% conditions. Apply the same unknown-status and missing-source rules.
 
-```sql
-select
-  log_attributes['request.method'] as method,
-  log_attributes['request.path'] as path,
-  toInt32OrZero(log_attributes['response.status_code']) as status,
-  count() as failures
-from logs
-where source = 'edge_logs'
-  and toInt32OrZero(log_attributes['response.status_code']) in (401, 403)
-group by method, path, status
-order by failures desc
-limit 20;
-```
-
-### Find public-schema tables without RLS
-
-This database query is a focused inventory check. Confirm each result against the project's intended access model; a result is not evidence that data was exposed.
-
-```sql
-select
-  n.nspname as schema_name,
-  c.relname as table_name
-from
-  pg_class as c
-  join pg_namespace as n on n.oid = c.relnamespace
-where n.nspname = 'public' and c.relkind in ('r', 'p') and not c.relrowsecurity
-order by table_name;
-```
-
-Run [Security Advisor](/docs/guides/observability/advisors) from Studio, MCP `get_advisors`, the CLI, or the Management API for the full catalog of deterministic checks. Take a lint name, table, policy, path, or status pattern to [Diagnosing](/docs/guides/troubleshooting) before changing policies, grants, or keys.
+**Next:** group failures by status and sanitized path, not by user, email, or IP. Investigate the client flow and [Auth error codes](/docs/guides/auth/debugging/error-codes). A spike is a review signal, not proof of an attack. Verify against a comparable window.
 
 ## Performance
 
-Performance checks identify expensive work, contention, and cache misses. They narrow the investigation to a query, relation, session, or resource.
+### Find long-running sessions and blockers
 
-### Find long-running sessions
-
-Look for sessions that have been active or idle in a transaction for more than 30 seconds.
+**Input:** a current Postgres snapshot with permission to read all sessions. This cannot reconstruct sessions that ended between scheduled runs.
 
 ```sql
-select
-  pid,
-  usename as role,
-  state,
-  now() - query_start as duration,
-  wait_event_type,
-  wait_event,
-  left(query, 120) as query
+select pid, usename as role, state,
+  now() - query_start as query_age,
+  now() - xact_start as transaction_age,
+  wait_event_type, wait_event,
+  pg_blocking_pids(pid) as blocking_pids
 from pg_stat_activity
 where datname = current_database()
-  and pid != pg_backend_pid()
-  and state in ('active', 'idle in transaction')
-  and now() - query_start > interval '30 seconds'
-order by duration desc
+  and pid <> pg_backend_pid()
+  and (
+    (state = 'active' and now() - query_start > interval '30 seconds')
+    or (state like 'idle in transaction%' and now() - xact_start > interval '30 seconds')
+    or cardinality(pg_blocking_pids(pid)) > 0
+  )
+order by query_start
 limit 20;
 ```
 
-### Find blocked sessions
+**Signal:** each row needs review. Nonempty `blocking_pids` identifies blockers; a long query or wait event alone does not. Query age is not lock-wait duration. Twenty returned rows may indicate truncation.
 
-Use `pg_blocking_pids` to name the blocked and blocking processes. Do not cancel either process until you understand the transaction and its impact.
+**Next:** inspect the PIDs using [database inspection](/docs/guides/observability/inspect#using-sql) and establish the transaction's purpose and impact. Do not recommend cancellation from age alone. Rerun to verify resolution.
+
+### Compare query execution time
+
+**Input:** enabled [pg_stat_statements](/docs/guides/database/extensions/pg_stat_statements), query-identifier visibility, and three saved snapshots spaced one hour apart. They define the preceding and current hour.
 
 ```sql
 select
-  blocked.pid as blocked_pid,
-  blocked.usename as blocked_role,
-  blocker.pid as blocking_pid,
-  blocker.usename as blocking_role,
-  now() - blocked.query_start as blocked_for,
-  left(blocked.query, 120) as blocked_query,
-  left(blocker.query, 120) as blocking_query
-from pg_stat_activity as blocked
-cross join lateral unnest(pg_blocking_pids(blocked.pid)) as blocking_pid
-join pg_stat_activity as blocker on blocker.pid = blocking_pid
-order by blocked_for desc;
+  now() as observed_at,
+  s.dbid,
+  s.userid,
+  s.queryid,
+  s.toplevel,
+  s.calls,
+  s.total_exec_time,
+  i.stats_reset,
+  i.dealloc,
+  to_jsonb(s) ->> 'stats_since' as statement_stats_since
+from
+  pg_stat_statements as s
+  cross join pg_stat_statements_info as i
+where s.dbid = (select oid from pg_database where datname = current_database())
+order by s.total_exec_time desc
+limit 100;
 ```
 
-### Find expensive query patterns
+**Signal:** match `(dbid, userid, queryid, toplevel)` within the same project instance. For each interval, compute `delta(total_exec_time) / delta(calls)` in milliseconds. Report a current mean of at least 100 ms and twice the preceding mean, with at least 20 calls in each interval.
 
-`pg_stat_statements` aggregates normalized queries over time. Rank by total execution time, then inspect mean time and calls before deciding whether a frequent query is inefficient.
+Compare rows present in all snapshots with unchanged reset/start markers and counters that have not decreased. Discard comparisons after an upgrade, reset, or change to `dealloc` (entry eviction). If `statement_stats_since` is unavailable, require confirmation that no per-statement reset occurred. Missing history or reset provenance means unable to assess; start collecting snapshots. The top 100 rows are a sample, not full query coverage. Do not reset statistics to collect a baseline. See [Postgres statistics semantics](https://www.postgresql.org/docs/current/pgstatstatements.html).
 
-```sql
-select
-  calls,
-  round(total_exec_time::numeric, 2) as total_time_ms,
-  round(mean_exec_time::numeric, 2) as mean_time_ms,
-  rows,
-  left(query, 160) as query
-from pg_stat_statements
-order by total_exec_time desc
-limit 20;
-```
+**Next:** inspect the statement and its [query plan](/docs/guides/database/query-optimization#analyze-the-query-plan). Preserve a comparison window to verify any change.
 
-### Measure shared-buffer hit rate
+### Review performance advisors
 
-A ratio below 99% means more than 1% of observed block accesses missed `shared_buffers`. Postgres cannot tell whether a miss was served by the operating system cache or physical disk.
+Call `get_advisors` with `type: "performance"`. Apply the Security severity policy: report `WARN` and `ERROR`; retain `INFO` as context. Follow the returned documentation, verify relevance to the workload, and rerun after a fix.
+
+### Inspect cache misses
+
+This optional diagnostic is cumulative, not an hourly alert or a measurement of physical disk reads:
 
 ```sql
 select
-  'index hit rate' as name,
-  round(100.0 * sum(idx_blks_hit) / nullif(sum(idx_blks_hit) + sum(idx_blks_read), 0), 2) as ratio
-from pg_statio_user_indexes
-union all
-select
-  'table hit rate' as name,
+  sum(heap_blks_hit) as heap_hits,
+  sum(heap_blks_read) as heap_reads,
   round(
     100.0 * sum(heap_blks_hit) / nullif(sum(heap_blks_hit) + sum(heap_blks_read), 0),
     2
-  ) as ratio
+  ) as heap_hit_percent
 from pg_statio_user_tables;
 ```
 
-Pull [Performance Advisor](/docs/guides/observability/advisors) findings and compare the same window with [Reports](/docs/guides/observability/reports) or the [Metrics API](/docs/guides/observability/metrics). The full command and SQL catalog is in [Inspect the database](/docs/guides/observability/inspect).
+Use a workload-specific baseline before alerting. A null ratio means no observed accesses. The operating system cache may serve a Postgres buffer miss. See [cache inspection](/docs/reference/cli/supabase-inspect-db-cache-hit).
 
-## Usage
+## Capacity [#usage]
 
-Usage checks identify growth in traffic, data, and connections before it becomes a capacity problem. They do not calculate billing totals.
+### Collect size and connection measurements
 
-### Trend API requests
-
-Count requests by hour to establish a baseline and spot step changes.
+**Input/action:** read the same database instance daily at the same UTC time. Save numeric values and timestamps in authorized persistent harness state, or use an authorized historical metrics source. Do not create monitoring tables in the project.
 
 ```sql
 select
-  toStartOfHour(timestamp) as hour,
-  count() as requests
-from logs
-where source = 'edge_logs'
-group by hour
-order by hour desc
-limit 168;
+  now() as observed_at,
+  current_database() as database_name,
+  pg_database_size(current_database()) as database_bytes;
 ```
 
-### Find high-volume API paths
-
-Group by method and path to identify which workload accounts for the growth.
-
 ```sql
 select
-  log_attributes['request.method'] as method,
-  log_attributes['request.path'] as path,
-  count() as requests
-from logs
-where source = 'edge_logs'
-group by method, path
-order by requests desc
-limit 20;
-```
-
-### Find the largest relations
-
-Measure tables and their indexes together. Save the result on a regular cadence to establish a growth trend.
-
-```sql
-select
+  now() as observed_at,
   schemaname,
   relname as table_name,
-  pg_total_relation_size(relid) as total_bytes,
-  pg_size_pretty(pg_total_relation_size(relid)) as total_size
+  pg_total_relation_size(relid) as total_bytes
 from pg_catalog.pg_statio_user_tables
 order by total_bytes desc
 limit 20;
 ```
 
-### Count connections by role and state
-
-Connection growth can reveal a new workload or a client that is not pooling correctly.
-
 ```sql
-select
-  usename as role,
-  state,
-  count(*) as connections
+select now() as observed_at, usename as role, state, count(*) as connections
 from pg_stat_activity
-where datname = current_database()
+where datname = current_database() and backend_type = 'client backend'
 group by role, state
-order by connections desc;
+order by connections desc
+limit 100;
 ```
 
-[Reports](/docs/guides/observability/reports) show request, disk, and database-size trends without SQL. The [Management API usage endpoint](/docs/reference/api/v1-get-project-usage-api-count) returns request counts for authorized scripts. Use [`supabase inspect db table-sizes`](/docs/reference/cli/supabase-inspect-db-table-sizes) and [`bloat`](/docs/reference/cli/supabase-inspect-db-bloat) to run related database checks from the CLI.
+**Interpretation:** sizes are bytes, connections are a snapshot count, and table totals include indexes. A relation missing from the top 20 has not necessarily shrunk. Snapshots do not establish peak connection demand; use the [Metrics API](/docs/guides/observability/metrics) for a time series.
+
+### Forecast a resource limit
+
+**Input:** at least seven daily measurements of the same metric and scope, plus a confirmed limit in the same units. Record the limit's source and retrieval time. Database size is not total disk usage: a disk forecast needs disk-used bytes and disk capacity. Never compare table bytes or request counts with an unrelated plan limit.
+
+**Signal:** when growth is positive, calculate:
+
+```text
+growth_per_day = (latest_value - earliest_value) / elapsed_days
+days_remaining = (confirmed_limit - latest_value) / growth_per_day
+```
+
+Report when the current value already meets the confirmed limit, regardless of history. Otherwise, report a supported projection at most 14 days away, labeled as a linear estimate. Missing history, unknown limits, changed scope, or discontinuous measurements make the forecast unable to assess. Flat or falling values do not support an exhaustion date.
+
+**Next:** carry the metric, units, history, limit source, and calculation to [compute and disk guidance](/docs/guides/platform/compute-and-disk). Measure again after a capacity change and update the stored limit.
+
+### Compare request volume
+
+Run the Health query for two separate complete UTC days. Compare API Gateway `events`; report at least 1,000 events and twice the preceding count. If the preceding count is zero, report new observed traffic without a growth percentage. Apply the missing-source rules. Request growth is workload context, not a capacity limit or billing total.
 
 ## Turn a detection into a diagnosis
 
-A detection result should name an affected time window and at least one concrete anchor: a path, status, SQLSTATE, request ID, query, relation, PID, policy, or advisor lint. Take that evidence to [Diagnosing](/docs/guides/troubleshooting), identify the cause, apply the smallest relevant solution, and rerun the same detection check to verify the result.
-
-After a check is useful and repeatable, [automate monitoring](/docs/guides/observability/automate-with-agents) to run it on a schedule.
+Report the check, outcome, project, observation time, window or snapshot, threshold, measured values and units, and an evidence identifier. Include one investigation link and a verification step. Separate observations from hypotheses; do not invent a cause or remediation SQL. Use the [troubleshooting guides](/docs/guides/troubleshooting) to investigate the evidence.
