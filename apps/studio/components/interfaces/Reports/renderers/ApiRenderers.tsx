@@ -97,7 +97,9 @@ export const NetworkTrafficRenderer = (
       />
 
       {organization && (
-        <div className="flex items-center justify-between gap-4 rounded border border-default bg-surface-200 px-4 py-3">
+        <div
+          className="flex items-center justify-between gap-4 rounded border border-default bg-surface-200 px-4 py-3"
+        >
           <div>
             <p className="text-sm text-foreground">Billable egress</p>
             <p className="text-sm text-foreground-light">
