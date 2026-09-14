@@ -1815,10 +1815,10 @@ parameters:
     title: 'experimental.pgdelta.enabled'
     tags: ['experimental']
     required: false
-    default: 'false'
+    default: 'true'
     description: |
-      Enables the `pg-delta` diff engine for `db diff`, `db pull`, and the `db schema declarative` commands.
-      Projects created with a recent `supabase init` have this set to `true` in the generated `config.toml`. Existing projects keep the legacy `migra` engine until they opt in by adding this setting. Set to `false` to fall back to `migra`.
+      Selects the `pg-delta` diff engine for `db diff`, `db pull`, and the `db schema declarative` commands.
+      `pg-delta` is the default, so an absent section or an omitted key resolves to `true`. `supabase init` writes `true` explicitly into the generated `config.toml`. Set to `false` to fall back to the legacy `migra` engine.
       Note: This is an experimental feature and may change in future releases.
     links:
       - name: 'Declarative database schemas'

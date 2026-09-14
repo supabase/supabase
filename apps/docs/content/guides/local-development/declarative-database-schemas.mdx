@@ -17,7 +17,7 @@ Because the schema files are the source of truth, make every change by editing t
 
 <$Partial path="diff_engine_check.mdx" />
 
-This guide describes the workflow on `pg-delta`. The `db schema declarative` commands require it and won't run on the legacy engine. For a single run of `sync` or `generate` without changing `config.toml`, pass the `--experimental` flag. `db pull --declarative` runs regardless of the `[experimental.pgdelta]` setting, but only use it on `pg-delta`. On the legacy engine it leaves `db diff` unable to run. If your project is still on `migra`, follow [Declarative schemas on the legacy `migra` engine](#declarative-schemas-on-the-legacy-migra-engine) instead.
+This guide describes the workflow on `pg-delta`, the default engine. The `db schema declarative` commands require it. If you've opted out with `enabled = false`, they refuse to run unless you pass the `--experimental` flag for a single run. `db pull --declarative` runs regardless of the setting, but don't use it on a project that opted out, because it leaves `db diff` unable to run on `migra`. If your project has opted out, follow [Declarative schemas on the legacy `migra` engine](#declarative-schemas-on-the-legacy-migra-engine) instead.
 
 </Admonition>
 
@@ -269,7 +269,7 @@ Or the per-schema layout that `supabase db schema declarative generate` produces
 
 <Admonition type="note">
 
-Under the `pg-delta` engine, the `[db.migrations].schema_paths` setting from earlier CLI versions no longer controls declarative file ordering, because ordering is automatic. The CLI warns while the setting is present. On the legacy `migra` engine, `schema_paths` still controls the order in which declarative files are applied. See [Ordering schema files](#ordering-schema-files-on-the-legacy-engine).
+Under the `pg-delta` engine, the `[db.migrations].schema_paths` setting from earlier CLI versions no longer controls declarative file ordering, because ordering is automatic. The CLI warns when the setting lists any paths. On the legacy `migra` engine, `schema_paths` still controls the order in which declarative files are applied. See [Ordering schema files](#ordering-schema-files-on-the-legacy-engine).
 
 </Admonition>
 
@@ -340,7 +340,7 @@ Two checks gate `sync` on a schema tree the CLI didn't generate:
 
 ## Declarative schemas on the legacy `migra` engine [#declarative-schemas-on-the-legacy-migra-engine]
 
-Projects that haven't enabled `pg-delta` can still use declarative schemas. The workflow has the same shape, but the commands differ, and the `db schema declarative` commands aren't available. See [Diff engines](/docs/guides/local-development/diff-engines) for how to check which engine you're on and how the engines compare.
+Projects that opted out of `pg-delta` with `[experimental.pgdelta] enabled = false` can still use declarative schemas. The workflow has the same shape, but the commands differ, and the `db schema declarative` commands aren't available. See [Diff engines](/docs/guides/local-development/diff-engines) for how to check which engine you're on and how the engines compare.
 
 <Admonition type="caution">
 
@@ -393,6 +393,6 @@ supabase db dump > supabase/schemas/prod.sql
 
 In addition to the caveats above, the legacy [`migra`](https://github.com/djrobstep/migra) engine has these limitations: [view owner and grants](https://github.com/djrobstep/migra/issues/160#issuecomment-1702983833), [security invoker on views](https://github.com/djrobstep/migra/issues/234) (the setting is silently dropped from the view definition), [indexes on a materialized view aren't restored when the view is recreated](https://github.com/djrobstep/migra/issues/194), [alter policy statements](https://github.com/djrobstep/schemainspect/blob/master/schemainspect/pg/obj.py#L228), [column privileges](https://github.com/djrobstep/schemainspect/pull/67), [comments](https://github.com/djrobstep/migra/issues/69), [roles](https://github.com/djrobstep/migra/issues/240), [`alter publication ... add table`](https://github.com/supabase/cli/issues/883), and [`create domain` statements](https://github.com/supabase/cli/issues/2137). Add those entities through versioned migrations instead.
 
-### Switching to `pg-delta` [#switching-to-pg-delta]
+### Moving back to `pg-delta` [#switching-to-pg-delta]
 
-Follow [Switch an existing project to `pg-delta`](/docs/guides/local-development/diff-engines#switch-an-existing-project-to-pg-delta). For a declarative project, the steps that change your day-to-day work are removing `schema_paths`, replacing `db diff` with `db schema declarative sync` in scripts and CI, and dropping the `supabase stop` step.
+Remove `enabled = false` from `[experimental.pgdelta]` in `config.toml`, or set it to `true`, then follow [Upgrade an existing project to `pg-delta`](/docs/guides/local-development/diff-engines#switch-an-existing-project-to-pg-delta). For a declarative project, the steps that change your day-to-day work are removing `schema_paths`, replacing `db diff` with `db schema declarative sync` in scripts and CI, and dropping the `supabase stop` step.
