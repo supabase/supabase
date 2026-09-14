@@ -47,6 +47,20 @@ Every example here is written as `supabase <command>`. Translate it to whichever
 
 </Admonition>
 
+## Key commands at a glance
+
+| Command                                    | What it does                                                       |
+| ------------------------------------------ | ------------------------------------------------------------------ |
+| `supabase config diff`                     | Shows differences between `config.toml` and a project (read-only)  |
+| `supabase config diff --exit-code`         | Same, but exits `2` on drift (for CI)                              |
+| `supabase config pull`                     | Writes a project's settings into `config.toml`                     |
+| `supabase config pull --dry-run`           | Previews a pull without writing                                    |
+| `supabase config push`                     | Applies the settings your file declares to a project (sparse)      |
+| `supabase config diff --project-ref <ref>` | Targets a specific project or branch (works on all three commands) |
+| `supabase link <branch>`                   | Links the CLI to a branch of the current project by name           |
+
+The rest of this guide covers each command in detail.
+
 ## See what differs
 
 `supabase config diff` compares your `config.toml` against a remote project and reports the differences. It is read-only: it never changes your file or the project.
@@ -180,17 +194,5 @@ Secret values do not live in `config.toml`. The file declares that a provider is
 
 For local development, reference environment variables with `env()`, as described in [Managing config and secrets](/docs/guides/local-development/managing-config). For branch deployments, see [Managing secrets for branches](/docs/guides/deployment/branching/configuration#managing-secrets-for-branches).
 {/* NEEDS REVIEW: A first-class secrets experience for remote config is explicitly OUT of scope for this launch (PRFAQ: "nothing ships on secrets for Select, including documentation"). This section only points at the existing env()/branching secrets paths and must not imply a new secrets feature. Keep scoped to what ships. */}
-
-## Key commands at a glance
-
-| Command                                    | What it does                                                       |
-| ------------------------------------------ | ------------------------------------------------------------------ |
-| `supabase config diff`                     | Shows differences between `config.toml` and a project (read-only)  |
-| `supabase config diff --exit-code`         | Same, but exits `2` on drift (for CI)                              |
-| `supabase config pull`                     | Writes a project's settings into `config.toml`                     |
-| `supabase config pull --dry-run`           | Previews a pull without writing                                    |
-| `supabase config push`                     | Applies the settings your file declares to a project (sparse)      |
-| `supabase config diff --project-ref <ref>` | Targets a specific project or branch (works on all three commands) |
-| `supabase link <branch>`                   | Links the CLI to a branch of the current project by name           |
 
 For every attribute the file supports, see the [CLI config reference](/docs/guides/local-development/cli/config). For the full command reference, see the [CLI reference](/docs/reference/cli).
