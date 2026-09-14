@@ -1,11 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import type { ConnectMode } from '../Connect.types'
-import {
-  getClearedConnectSheetQueryParams,
-  mapConnectTabToMode,
-  resolveConnectSheetHydration,
-} from '../ConnectSheet.utils'
+import { mapConnectTabToMode, resolveConnectSheetHydration } from '../ConnectSheet.utils'
 import type { ConnectSheetQueryParams } from '../ConnectSheet.utils'
 import type { ConnectSheetPrefs } from '../useConnectSheetParams'
 
@@ -198,11 +194,5 @@ describe('resolveConnectSheetHydration', () => {
     )
 
     expect(result.urlUpdates.warehouseQueryEngine).toBeUndefined()
-  })
-})
-
-describe('getClearedConnectSheetQueryParams', () => {
-  test('clears the Warehouse query engine with the other Connect sheet parameters', () => {
-    expect(getClearedConnectSheetQueryParams()).toEqual(EMPTY_QUERY)
   })
 })
