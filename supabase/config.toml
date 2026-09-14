@@ -71,6 +71,8 @@ enable_signup = true
 double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
 enable_confirmations = false
+# If enabled, users must supply their current password when changing their password.
+require_current_password = true
 
 [remotes.prod.auth.email]
 enable_signup = false
