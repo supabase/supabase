@@ -527,24 +527,25 @@ _platform-specific_, or _compiled_. Don't use _native_ to describe people.
 ### numbers
 
 Spell out zero through nine. Use numerals for 10 and greater. Use numerals
-regardless for versions, technical quantities, step numbers, prices, and
-percentages. Spell out ordinals. Group digits in large numbers with commas. Use a
-hyphen with no spaces for a range.
+regardless for versions, technical quantities, step and page numbers, prices, and
+percentages, and throughout a sentence that mixes a number under 10 with a larger
+one.
 
 - Recommended: four options, 24 hours, version 3, 128 bits, step 2, 40%
-- Recommended: first, forty-third, 1,532,784 bytes, 2012-2016
-- Not recommended: 4 options, twenty-four hours, 1st, 1532784 bytes
+- Not recommended: 4 options, twenty-four hours
+
+Spell out ordinals. Group digits in large numbers with commas, counting left from
+the decimal point. Write fractions as decimals where practical. Use a hyphen with
+no spaces for a range.
+
+- Recommended: first, forty-third, 1,532,784 bytes, 0.75, 2012-2016
+- Not recommended: 1st, 1532784 bytes, three-quarters, 2012 - 2016
 
 Omit a count of steps or items unless the count helps the reader plan. Name the
 action or link the heading rather than citing a step or section number.
 
 - Recommended: To connect to your database:
 - Recommended: After you create the project, copy the project URL.
-
-See the
-[Google developer documentation style guide](https://developers.google.com/style/numbers)
-for the full formatting guidance, and
-[CONTRIBUTING.md](./CONTRIBUTING.md#numbers).
 
 ### numbers in product versions
 
