@@ -1,7 +1,7 @@
 ---
-title: 'Custom OAuth/OIDC Providers'
-description: 'Configure any OAuth2 or OIDC-compatible identity provider for self-hosted Supabase'
-subtitle: 'Configure any OAuth2 or OIDC-compatible identity provider for self-hosted Supabase'
+title: 'Configure Custom OAuth/OIDC Providers'
+description: 'Configure any OAuth2 or OIDC-compatible identity provider for self-hosted Supabase.'
+subtitle: 'Configure any OAuth2 or OIDC-compatible identity provider for self-hosted Supabase.'
 ---
 
 ## Overview
@@ -22,47 +22,55 @@ Every custom provider identifier must start with the `custom:` prefix. Identifie
 - `custom:my-provider`
 - `custom:github-enterprise`
 
-## Enable Custom OAuth
+## Before you begin
 
-Custom OAuth/OIDC providers must first be enabled in your self-hosted Supabase instance. The following env variables can be used to configure custom OAuth:
+You need:
 
-| Env Variable                        | Description                                                                                       |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `GOTRUE_CUSTOM_OAUTH_ENABLED`       | Enables custom OAuth/OIDC providers. Set to `"true"` to enable the feature.                       |
-| `GOTRUE_CUSTOM_OAUTH_MAX_PROVIDERS` | **Optional.** Maximum number of custom OAuth/OIDC providers allowed. Defaults to `0` (unlimited). |
+- A working self-hosted Supabase installation on release `0.8.0` or later. See [Self-Hosting with Docker](/docs/guides/self-hosting/docker) and [Update Your Self-Hosted Deployment](/docs/guides/self-hosting/updating).
+- `API_EXTERNAL_URL` set to the publicly reachable URL of your Auth service, ending in `/auth/v1` (e.g., `https://<your-domain>/auth/v1`). The Auth service derives the OAuth callback URL for custom providers from this value.
 
-### Configure Auth service
+<Admonition type="danger">
 
-Add the following environment variables to the auth service in your `docker-compose.yml`:
+HTTPS is required by most OAuth providers - `http://` callback URLs are rejected (except `localhost`). See the HTTPS [how-to guide](/docs/guides/self-hosting/self-hosted-proxy-https) for setup instructions.
 
-```yml
-services:
-  auth:
-    environment:
-      # ... existing variables ...
-      GOTRUE_CUSTOM_OAUTH_ENABLED: 'true'
-      GOTRUE_CUSTOM_OAUTH_MAX_PROVIDERS: 0 # optional - Default is 0 (unlimited)
-```
+</Admonition>
 
-### Relaunch the Auth service
-
-After updating the environment variables, relaunch the auth service for the changes to take effect:
-
-```sh
-sh run.sh recreate auth
-```
-
-## Creating a Provider
-
-### Callback URL
-
-When registering your application with an external identity provider, make sure to configure the Supabase Auth callback URL. Copy the URL below and add it as the redirect/callback URI in your identity provider's settings.
+When registering your application with an external identity provider, add the following URL as the redirect/callback URI in the provider's settings:
 
 ```
 https://<your-domain>/auth/v1/callback
 ```
 
-### OAuth provider
+## Optional Auth configuration
+
+Custom providers are enabled by default in the Auth service, so no changes to `docker-compose.yml` are required. The following environment variables adjust the defaults:
+
+| Env Variable                        | Description                                                                                                |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `GOTRUE_CUSTOM_OAUTH_ENABLED`       | Set to `"false"` to disable custom OAuth/OIDC providers. Defaults to `true`.                               |
+| `GOTRUE_CUSTOM_OAUTH_MAX_PROVIDERS` | Maximum number of custom OAuth/OIDC providers allowed. Defaults to `0` (unlimited).                        |
+| `GOTRUE_CUSTOM_OAUTH_EXTERNAL_URL`  | Base URL used to build the callback URL for custom providers. Defaults to the value of `API_EXTERNAL_URL`. |
+
+To change any of these, add the variable to the `auth` service in your `docker-compose.yml`:
+
+```yaml name=docker-compose.yml
+auth:
+  environment:
+    # ... existing variables ...
+    GOTRUE_CUSTOM_OAUTH_MAX_PROVIDERS: 5
+```
+
+Then recreate the Auth service for the change to take effect:
+
+```sh
+sh run.sh recreate auth
+```
+
+## Create a provider
+
+Providers are created through the Auth admin API. The JavaScript examples below use `supabase.auth.admin`, which requires a client created with your secret key. Never use this client in browser code.
+
+### OAuth2 provider
 
 Use an OAuth2 provider when your identity provider does not support OpenID Connect discovery. You must supply the authorization, token, and userinfo endpoint URLs explicitly.
 
@@ -94,8 +102,9 @@ const { data, error } = await supabase.auth.admin.customProviders.createProvider
 <TabPanel id="curl" label="cURL">
 
 ```sh
-curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
+curl -X POST "https://<your-domain>/auth/v1/admin/custom-providers" \
   -H "apikey: your-supabase-secret-key" \
+  -H "Authorization: Bearer your-supabase-secret-key" \
   -H "Content-Type: application/json" \
   -d '{
     "provider_type": "oauth2",
@@ -144,8 +153,9 @@ const { data, error } = await supabase.auth.admin.customProviders.createProvider
 <TabPanel id="curl" label="cURL">
 
 ```sh
-curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
+curl -X POST "https://<your-domain>/auth/v1/admin/custom-providers" \
   -H "apikey: your-supabase-secret-key" \
+  -H "Authorization: Bearer your-supabase-secret-key" \
   -H "Content-Type: application/json" \
   -d '{
     "provider_type": "oidc",
@@ -168,23 +178,41 @@ OIDC providers have the following automatic behavior:
 - The `openid` scope is always included. It is automatically added if missing from the `scopes` array.
 - ID tokens are verified against the provider's JWKS (fetched from the discovery document's `jwks_uri`).
 
+### Verify the provider
+
+List the configured providers to confirm the new provider was saved:
+
+```sh
+curl "https://<your-domain>/auth/v1/admin/custom-providers" \
+  -H "apikey: your-supabase-secret-key" \
+  -H "Authorization: Bearer your-supabase-secret-key"
+```
+
+The response includes the provider you created. Users can now sign in with it from your app:
+
+```js
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider: 'custom:my-oidc-provider',
+})
+```
+
 ## Example: Telegram
 
-The following steps walk through setting up Telegram OAuth with Supabase Auth. Before you begin, make sure you've enabled Custom OAuth in your self-hosted Supabase instance.
+The following steps walk through setting up Telegram OAuth with Supabase Auth.
 
 <Admonition type="note">
 
-Telegram OAuth requires Supabase Auth version >= `v2.196.0`. Earlier versions are affected by [this issue](https://github.com/supabase/auth/issues/2534), which was fixed in `v2.196.0`.
+Telegram OAuth requires Supabase Auth `v2.196.0` or later, shipped with self-hosted release `0.8.1` and later. Earlier versions are affected by [this issue](https://github.com/supabase/auth/issues/2534). To upgrade, see [Update Your Self-Hosted Deployment](/docs/guides/self-hosting/updating).
 
 </Admonition>
 
-### Step 1: Create a Telegram Bot
+### Step 1: Create a Telegram bot
 
 Open [@BotFather](https://t.me/BotFather) on Telegram and send the command `/newbot`. Follow the prompts to choose a name and username for your bot.
 
-### Step 2: Register Redirect URL
+### Step 2: Register the redirect URL
 
-Open the [@BotFather mini app](https://t.me/botfather?startapp) on Telegram and select the bot you created in the previous step. Choose **Login Widget** to open the page where you configure redirect URIs. Click **Add a Redirect URI** and enter your self-hosted Supabase URL:
+Open the [@BotFather mini app](https://t.me/botfather?startapp) on Telegram and select the bot you created in the previous step. Choose **Login Widget** to open the page where you configure redirect URIs. Click **Add a Redirect URI** and enter your self-hosted Supabase callback URL:
 
 ```
 https://<your-domain>/auth/v1/callback
@@ -192,7 +220,7 @@ https://<your-domain>/auth/v1/callback
 
 This screen also shows your Client ID and Client Secret, which will be used to create the provider in the next step.
 
-### Step 3: Create Telegram Provider
+### Step 3: Create the Telegram provider
 
 Copy the Client ID and Client Secret from the **Login Widget** screen, then use them to create a custom Telegram OAuth provider:
 
@@ -210,8 +238,8 @@ const { data, error } = await supabase.auth.admin.customProviders.createProvider
   provider_type: 'oidc',
   identifier: 'custom:telegram',
   name: 'Telegram',
-  client_id: '<YOUR-CLIENT-ID>',
-  client_secret: '<YOUR-CLIENT-SECRET>',
+  client_id: 'your-client-id',
+  client_secret: 'your-client-secret',
   issuer: 'https://oauth.telegram.org',
   scopes: ['openid', 'profile'],
   email_optional: true,
@@ -223,8 +251,9 @@ const { data, error } = await supabase.auth.admin.customProviders.createProvider
 <TabPanel id="curl" label="cURL">
 
 ```sh
-curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
+curl -X POST "https://<your-domain>/auth/v1/admin/custom-providers" \
   -H "apikey: your-supabase-secret-key" \
+  -H "Authorization: Bearer your-supabase-secret-key" \
   -H "Content-Type: application/json" \
   -d '{
     "provider_type": "oidc",
@@ -260,7 +289,9 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 })
 ```
 
-## Managing Providers
+## Manage providers
+
+Self-hosted Supabase has no Dashboard UI for custom providers. Use the admin API to list, update, and delete them.
 
 ### List providers
 
@@ -289,15 +320,14 @@ const { data, error } = await supabase.auth.admin.customProviders.listProviders(
 
 ```sh
 # List all custom providers
-
-curl "http://<your-domain>/auth/v1/admin/custom-providers" \
- -H "apikey: your-supabase-secret-key"
+curl "https://<your-domain>/auth/v1/admin/custom-providers" \
+  -H "apikey: your-supabase-secret-key" \
+  -H "Authorization: Bearer your-supabase-secret-key"
 
 # Filter by provider type
-
-curl "http://<your-domain>/auth/v1/admin/custom-providers?type=oidc" \
- -H "apikey: your-supabase-secret-key"
-
+curl "https://<your-domain>/auth/v1/admin/custom-providers?type=oidc" \
+  -H "apikey: your-supabase-secret-key" \
+  -H "Authorization: Bearer your-supabase-secret-key"
 ```
 
 </TabPanel>
@@ -309,11 +339,12 @@ curl "http://<your-domain>/auth/v1/admin/custom-providers?type=oidc" \
 Update any provider fields except `provider_type` and `identifier`. Only provided fields are changed (partial update). To rotate a client secret, update only the `client_secret` field.
 
 <Tabs
-scrollable
-size="small"
-type="underlined"
-defaultActiveId="js"
-queryGroup="provider-management">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="provider-management"
+>
 <TabPanel id="js" label="JavaScript">
 
 ```js
@@ -331,8 +362,9 @@ const { data, error } = await supabase.auth.admin.customProviders.updateProvider
 <TabPanel id="curl" label="cURL">
 
 ```sh
-curl -X PUT "http://<your-domain>/auth/v1/admin/custom-providers/custom:my-provider" \
+curl -X PUT "https://<your-domain>/auth/v1/admin/custom-providers/custom:my-provider" \
   -H "apikey: your-supabase-secret-key" \
+  -H "Authorization: Bearer your-supabase-secret-key" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Updated Provider Name",
@@ -341,17 +373,18 @@ curl -X PUT "http://<your-domain>/auth/v1/admin/custom-providers/custom:my-provi
 ```
 
 </TabPanel>
+
 </Tabs>
 
 ### Delete a provider
 
 <Tabs
-scrollable
-size="small"
-type="underlined"
-defaultActiveId="js"
-queryGroup="provider-management">
-
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="provider-management"
+>
 <TabPanel id="js" label="JavaScript">
 
 ```js
@@ -364,14 +397,18 @@ const { data, error } =
 <TabPanel id="curl" label="cURL">
 
 ```sh
-curl -X DELETE "http://<your-domain>/auth/v1/admin/custom-providers/custom:my-provider" \
-  -H "apikey: your-supabase-secret-key"
+curl -X DELETE "https://<your-domain>/auth/v1/admin/custom-providers/custom:my-provider" \
+  -H "apikey: your-supabase-secret-key" \
+  -H "Authorization: Bearer your-supabase-secret-key"
 ```
 
 </TabPanel>
 
 </Tabs>
 
-## Additional Resources
+For PKCE, authorization parameters, and OIDC-specific options, see [Advanced configuration](/docs/guides/auth/custom-oauth-providers#advanced-configuration).
+
+## Additional resources
 
 - [Custom OAuth/OIDC Providers](/docs/guides/auth/custom-oauth-providers)
+- [Configure Social Login (OAuth) Providers](/docs/guides/self-hosting/self-hosted-oauth) for the providers Supabase supports out of the box
