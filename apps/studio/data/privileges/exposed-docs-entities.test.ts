@@ -70,4 +70,20 @@ describe('partitionExposedDocsEntities', () => {
     expect(result.visibleEntities).toEqual([])
     expect(result.excludedCount).toBe(0)
   })
+
+  it('matches schema-qualified entities without cross-schema collisions', () => {
+    const result = partitionExposedDocsEntities(
+      [
+        { name: 'users', schema: 'public' },
+        { name: 'users', schema: 'api' },
+      ],
+      [
+        { name: 'users', schema: 'public', status: 'granted' },
+        { name: 'users', schema: 'api', status: 'revoked' },
+      ]
+    )
+
+    expect(result.visibleEntities).toEqual([{ name: 'users', schema: 'public' }])
+    expect(result.excludedCount).toBe(1)
+  })
 })

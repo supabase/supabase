@@ -9,7 +9,9 @@ import { DataApiDisabledState } from '@/components/interfaces/Integrations/DataA
 import { DocsMenu } from '@/components/interfaces/Integrations/DataApi/DocsMenu'
 import { DocsMobileNav } from '@/components/interfaces/Integrations/DataApi/DocsMobileNav'
 import { DocView } from '@/components/interfaces/Integrations/DataApi/DocView'
+import { DocViewError } from '@/components/interfaces/Integrations/DataApi/DocViewError'
 import { NotExposedEntitiesIndicator } from '@/components/ui/NotExposedEntitiesIndicator'
+import { useExposedSchemasQuery } from '@/data/config/project-postgrest-config-query'
 import { useOpenAPISpecQuery } from '@/data/open-api/api-spec-query'
 import { partitionExposedDocsEntities } from '@/data/privileges/exposed-docs-entities'
 import { useExposedFunctionsQuery } from '@/data/privileges/exposed-functions-query'
@@ -32,8 +34,18 @@ export const DataApiDocsTab = () => {
   const { isEnabled, isPending: isConfigLoading } = useIsDataApiEnabled({ projectRef })
 
   const dataApiEnabled = !!projectRef && !isPaused && isEnabled
+  const {
+    data: exposedSchemas,
+    error: exposedSchemasError,
+    isPending: isExposedSchemasPending,
+    isSuccess: areSchemasReady,
+  } = useExposedSchemasQuery({ projectRef }, { enabled: dataApiEnabled })
+  const isSchemasLoading = dataApiEnabled && isExposedSchemasPending
 
-  const { data: openApiSpec } = useOpenAPISpecQuery({ projectRef }, { enabled: dataApiEnabled })
+  const { data: openApiSpec } = useOpenAPISpecQuery(
+    { projectRef, schemas: exposedSchemas },
+    { enabled: dataApiEnabled && areSchemasReady }
+  )
 
   // Cross-reference the spec against grant status so tables/functions that exist
   // in the spec but aren't actually exposed to the Data API are hidden + counted.
@@ -120,7 +132,7 @@ export const DataApiDocsTab = () => {
     excludedFunctionsCount,
   ])
 
-  if (isConfigLoading) {
+  if (isConfigLoading || isSchemasLoading) {
     return (
       <div className="flex w-full bg-surface-100 flex-1 items-stretch p-10">
         <ShimmeringLoader className="w-full h-full" />
@@ -128,8 +140,12 @@ export const DataApiDocsTab = () => {
     )
   }
 
-  if (!isEnabled) {
+  if (!dataApiEnabled) {
     return <DataApiDisabledState description="view the documentation" />
+  }
+
+  if (exposedSchemasError) {
+    return <DocViewError error={exposedSchemasError} />
   }
 
   return (
