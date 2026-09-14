@@ -75,7 +75,7 @@ const MoveItemsDialogBody = ({
           onChangePath={setPathSegments}
         />
       </DialogSection>
-      <DialogFooter>
+      <DialogFooter className="gap-y-2">
         <Button disabled={isMoving} onClick={onSelectCancel}>
           Cancel
         </Button>

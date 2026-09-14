@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import { ArrowLeft, CircleCheck, Search, X } from 'lucide-react'
+import { ArrowLeft, Search, X } from 'lucide-react'
 import { Fragment, useMemo, useState } from 'react'
 import {
   Breadcrumb,
@@ -158,8 +158,7 @@ export const MoveItemsFolderPicker = ({
         </Breadcrumb>
       </div>
 
-      <div className="flex shrink-0 items-center gap-x-2 border-b border-default bg-surface-75 px-2.5 py-2">
-        <CircleCheck size={16} className="shrink-0 text-brand" />
+      <div className="flex shrink-0 items-center border-b border-default bg-surface-75 px-2.5 py-2">
         <p className="min-w-0 truncate text-xs text-foreground-light">
           Moving to{' '}
           <span className="font-mono text-foreground">

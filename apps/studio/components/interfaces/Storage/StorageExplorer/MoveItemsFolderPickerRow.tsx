@@ -1,4 +1,4 @@
-import { ChevronRight, CircleCheck } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { cn } from 'ui'
 
@@ -28,6 +28,7 @@ export const FolderPickerRow = ({
   style,
 }: FolderPickerRowProps) => {
   const isSelected = item.path === selectedPath
+  const location = getParentPathLabel(item.path, bucketName)
 
   return (
     <div style={style} className="border-b border-default">
@@ -35,6 +36,8 @@ export const FolderPickerRow = ({
         type="button"
         tabIndex={0}
         onClick={() => onSelectFolder(item.path)}
+        aria-label={showLocation ? `${item.name} in ${location}` : item.name}
+        aria-current={isSelected ? 'true' : undefined}
         className={cn(
           'flex h-full w-full cursor-pointer items-center gap-x-2 px-2.5 text-left',
           'focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--ring)]',
@@ -56,17 +59,13 @@ export const FolderPickerRow = ({
         </span>
         {showLocation && (
           <span
-            title={getParentPathLabel(item.path, bucketName)}
+            title={location}
             className="max-w-[45%] shrink-0 truncate text-xs text-foreground-lighter"
           >
-            {getParentPathLabel(item.path, bucketName)}
+            {location}
           </span>
         )}
-        {isSelected ? (
-          <CircleCheck size={14} className="shrink-0 text-brand" aria-label="Current destination" />
-        ) : (
-          <ChevronRight size={14} className="shrink-0 text-foreground-lighter" />
-        )}
+        <ChevronRight size={14} className="shrink-0 text-foreground-lighter" />
       </button>
     </div>
   )

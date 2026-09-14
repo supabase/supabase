@@ -32,7 +32,12 @@ const createFile = (name: string): StorageObject => ({
 
 /** Contents of the fake bucket the picker browses, keyed by folder path */
 const BUCKET_CONTENTS: Record<string, StorageObject[]> = {
-  '': [createFolder('photos'), createFolder('invoices'), createFile('avatar.png')],
+  '': [
+    createFolder('photos'),
+    createFolder('photos-old'),
+    createFolder('invoices'),
+    createFile('avatar.png'),
+  ],
   photos: [createFolder('2024'), createFile('beach.png')],
   'photos/2024': [],
   invoices: [],
@@ -126,8 +131,13 @@ describe('MoveItemsModal', () => {
 
     await user.type(screen.getByPlaceholderText('Search folders in avatars...'), 'photos')
 
-    const selectedRow = await screen.findByRole('button', { name: /^photos/ })
-    expect(within(selectedRow).getByLabelText('Current destination')).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'photos in avatars' })).toHaveAttribute(
+      'aria-current',
+      'true'
+    )
+    expect(screen.getByRole('button', { name: 'photos-old in avatars' })).not.toHaveAttribute(
+      'aria-current'
+    )
   })
 
   it('keeps paging until it finds folders hidden behind a page of files', async () => {
