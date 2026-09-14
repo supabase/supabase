@@ -105,11 +105,7 @@ export const WarehouseModePanel = () => {
         }}
         additionalActions={
           retryTargets.length > 0 ? (
-            <Button
-              variant="default"
-              loading={setupMutation.isPending}
-              onClick={() => handleSetup(retryTargets)}
-            >
+            <Button loading={setupMutation.isPending} onClick={() => handleSetup(retryTargets)}>
               Retry
             </Button>
           ) : undefined

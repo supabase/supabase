@@ -116,6 +116,8 @@ export type QueryEditorHandle = {
   getSql: () => string
   /** Formats the editor's SQL in place and commits the result, same as the SQL Editor's Prettify SQL action. */
   prettify: () => Promise<void>
+  /** The last result this cell produced in this session, or undefined if it hasn't been run. */
+  getResult: () => QueryResult | undefined
 }
 
 type QueryEditorProps = {
@@ -188,9 +190,6 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const columns = Object.keys(result?.rows?.[0] ?? {})
   const rowLimit = query._tag === 'database' ? query.rowLimit : undefined
   const databaseIdentifier = query._tag === 'database' ? query.database_identifier : undefined
-
-  const { x_column, y_series } = display?.chart ?? {}
-  const hasConfig = !!x_column && (y_series ?? []).length > 0
 
   const [promptInput, setPromptInput] = useState('')
   const [pendingRun, setPendingRun] = useState<{ sql: string; issues: PotentialIssues }>()
@@ -382,6 +381,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     run: (force = false) => handleRunQuery({ shouldForce: force }),
     getSql: () => sqlRef.current,
     prettify: handlePrettify,
+    getResult: () => result,
   }))
 
   useEffect(() => {
@@ -392,16 +392,8 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     return () => node.removeEventListener('keydown', handleEscapeKey)
   }, [promptState?.isOpen])
 
-  const shouldCenterResults =
-    !result?.error && ((result?.rows ?? []).length === 0 || (view === 'chart' && !hasConfig))
-
   const queryResults = (
-    <ExplorerQueryResults
-      className={cn(
-        variant === 'embedded' ? 'max-h-80' : 'h-full',
-        shouldCenterResults ? 'items-center justify-center' : 'overflow-x-auto'
-      )}
-    >
+    <ExplorerQueryResults className={cn(variant === 'embedded' ? 'max-h-80' : 'h-full')}>
       <QueryResultRenderer
         view={view}
         result={result}
@@ -519,7 +511,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="default" size="tiny" onClick={() => setPendingProposal(null)}>
+                <Button size="tiny" onClick={() => setPendingProposal(null)}>
                   Discard
                 </Button>
                 <Button variant="primary" size="tiny" onClick={acceptSqlProposal}>

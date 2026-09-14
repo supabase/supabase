@@ -2,6 +2,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { cn } from '@/lib/utils'
+import { safeNextPath } from '@/registry/default/blocks/safe-next-path/lib/safe-next-path'
 import { createClient } from '@/registry/default/clients/tanstack/lib/supabase/client'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -34,15 +35,23 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
     setIsLoading(true)
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const next = safeNextPath(
+        new URLSearchParams(window.location.search).get('next'),
+        '/protected'
+      )
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/protected`,
+          emailRedirectTo: `${window.location.origin}${next}`,
         },
       })
       if (error) throw error
-      await navigate({ to: '/sign-up-success' })
+      if (data.session) {
+        window.location.assign(next)
+      } else {
+        await navigate({ to: '/sign-up-success' })
+      }
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
@@ -102,7 +111,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
             </div>
             <div className="mt-4 text-center text-sm">
               Already have an account?{' '}
-              <Link to="/login" className="underline underline-offset-4">
+              <Link to="/login" search className="underline underline-offset-4">
                 Sign in
               </Link>
             </div>

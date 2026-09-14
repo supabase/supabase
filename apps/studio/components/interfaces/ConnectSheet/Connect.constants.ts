@@ -369,7 +369,7 @@ export const ORMS: ConnectionType[] = [
     key: 'drizzle',
     label: 'Drizzle',
     icon: 'drizzle',
-    guideLink: `${DOCS_URL}/guides/database/connecting-to-postgres#connecting-with-drizzle`,
+    guideLink: `${DOCS_URL}/guides/database/drizzle`,
     children: [],
   },
 ]

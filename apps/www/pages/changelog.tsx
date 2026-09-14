@@ -261,7 +261,6 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
               <div className="w-full lg:w-auto flex flex-wrap items-center gap-1">
                 <div className="flex-1">
                   <Button
-                    variant="default"
                     size="tiny"
                     className={cn('shrink-0', !filterPanelOpen && 'px-1.5')}
                     aria-expanded={filterPanelOpen}
@@ -284,7 +283,6 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                 </div>
                 <Button
                   asChild
-                  variant="default"
                   className="shrink-0"
                   icon={<Rss className="h-4 w-4" strokeWidth={2} aria-hidden />}
                 >

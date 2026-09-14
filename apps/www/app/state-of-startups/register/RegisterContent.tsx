@@ -105,7 +105,12 @@ export function RegisterContent() {
                   We want to know what building at startups looks like from where you sit.
                 </p>
 
-                <Button asChild size="medium" iconRight={<ArrowRight size={12} />}>
+                <Button
+                  variant="primary"
+                  asChild
+                  size="medium"
+                  iconRight={<ArrowRight size={12} />}
+                >
                   <Link href="https://supabase.typeform.com/to/p2XiROl8" target="_blank">
                     Take the Survey
                   </Link>

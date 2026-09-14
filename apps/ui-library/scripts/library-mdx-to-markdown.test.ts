@@ -241,7 +241,7 @@ description: Vue dropzone
         )
       }
     }
-    assert.equal(fileTrees, 65)
+    assert.equal(fileTrees, 66)
   })
 
   it('includes first-party dependency source files in the authentication file inventory', () => {

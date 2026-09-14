@@ -41,6 +41,7 @@ export type CatalogPreviewKind =
   | 'avatars'
   | 'chat'
   | 'mcp'
+  | 'agents'
   | 'dashboard'
   | 'client'
 
@@ -117,6 +118,11 @@ const blockMetadata: Record<string, Pick<LibraryBlock, 'description' | 'category
     description: 'Add a user-scoped MCP server to your product.',
     category: 'AI & APIs',
     preview: 'mcp',
+  },
+  'headless-app': {
+    description: 'Combine auth, consent, and MCP tools into an agent-driven app.',
+    category: 'AI & APIs',
+    preview: 'agents',
   },
   client: {
     description: 'Set up a Supabase client for your framework.',

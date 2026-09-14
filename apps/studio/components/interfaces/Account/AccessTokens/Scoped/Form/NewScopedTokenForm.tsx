@@ -232,27 +232,31 @@ export const NewScopedTokenForm = forwardRef<
         )}
         <div className="flex items-center gap-2">
           {step === 'review' && (
-            <Button variant="default" disabled={isPending} onClick={() => setStep('form')}>
+            <Button disabled={isPending} onClick={() => setStep('form')}>
               Back
             </Button>
           )}
           <SheetClose asChild disabled={isPending}>
-            <Button variant="default">Cancel</Button>
+            <Button>Cancel</Button>
           </SheetClose>
           {step === 'form' && isClassicMode && (
-            <Button type="submit" form={FORM_ID} loading={isPending}>
+            <Button variant="primary" type="submit" form={FORM_ID} loading={isPending}>
               Generate token
             </Button>
           )}
           {step === 'form' && !isClassicMode && (
-            <Button type="submit" form={FORM_ID} iconRight={<ChevronRight />}>
+            <Button variant="primary" type="submit" form={FORM_ID} iconRight={<ChevronRight />}>
               Review access
             </Button>
           )}
           {step === 'review' && (
             <Popover open={!isCreateHintDismissed}>
               <PopoverAnchor asChild>
-                <Button loading={isPending} onClick={() => onCreateToken(formValues)}>
+                <Button
+                  variant="primary"
+                  loading={isPending}
+                  onClick={() => onCreateToken(formValues)}
+                >
                   Create token
                 </Button>
               </PopoverAnchor>

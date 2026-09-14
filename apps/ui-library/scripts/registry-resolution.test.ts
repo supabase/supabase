@@ -145,6 +145,14 @@ describe('registry composition and resolution', () => {
       getInstalledPath({ path: 'some/source.ts', target: './app/client.ts' }),
       'app/client.ts'
     )
+    // `~/` keeps backend files out of the installing project's src directory.
+    assert.equal(
+      getInstalledPath({
+        path: 'registry/default/blocks/mcp-server/supabase/functions/mcp-server/index.ts',
+        target: '~/supabase/functions/mcp-server/index.ts',
+      }),
+      'supabase/functions/mcp-server/index.ts'
+    )
     assert.throws(
       () => getInstalledPath({ path: 'source.ts', target: '../outside.ts' }),
       /Invalid installed path/

@@ -61,7 +61,6 @@ export const BackupItem = ({
       return (
         <div className="flex space-x-4">
           <ButtonTooltip
-            variant="default"
             disabled={!isHealthy || !canTriggerScheduledBackups || isHighAvailability}
             onClick={onSelectBackup}
             tooltip={{
@@ -76,7 +75,6 @@ export const BackupItem = ({
 
           {!backup.isPhysicalBackup && (
             <ButtonTooltip
-              variant="default"
               icon={<Download />}
               loading={isDownloading}
               disabled={!canTriggerScheduledBackups || isDownloading}

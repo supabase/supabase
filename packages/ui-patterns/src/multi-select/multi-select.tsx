@@ -262,11 +262,11 @@ const MultiSelectorBadgesVariants = cva('flex overflow-hidden flex-1 min-w-0', {
 })
 
 const MultiSelectorBadgeVariants = cva(
-  'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5 normal-case tracking-normal text-xs',
+  'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5 normal-case tracking-normal text-xs/none',
   {
     variants: {
       size: {
-        tiny: 'h-full py-0 leading-none',
+        tiny: 'h-full py-0',
         small: '',
         medium: '',
         large: '',
@@ -285,10 +285,10 @@ const MultiSelectorLabelVariants = cva(
     variants: {
       size: {
         tiny: 'leading-none',
-        small: 'ml-1 leading-5.5',
-        medium: 'ml-1 leading-5.5',
-        large: 'ml-1 leading-5.5',
-        xlarge: 'ml-1 leading-5.5',
+        small: 'ml-1 leading-5',
+        medium: 'ml-1 leading-5',
+        large: 'ml-1 leading-5',
+        xlarge: 'ml-1 leading-5',
       },
     },
     defaultVariants: {

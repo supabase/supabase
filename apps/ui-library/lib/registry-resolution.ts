@@ -4,7 +4,11 @@ export type RegistryFile = NonNullable<RegistryItem['files']>[number]
 
 /** Canonical folders before the installing project's aliases or src directory are applied. */
 export function getInstalledPath(file: { path: string; target?: string }): string {
-  const source = (file.target || file.path).replace(/\\/g, '/').replace(/^\.\//, '')
+  // A `~/` target opts a file out of the project's src directory, so it is already project-relative.
+  const source = (file.target || file.path)
+    .replace(/\\/g, '/')
+    .replace(/^\.\//, '')
+    .replace(/^~\//, '')
   const installedPath = file.target
     ? source
     : source

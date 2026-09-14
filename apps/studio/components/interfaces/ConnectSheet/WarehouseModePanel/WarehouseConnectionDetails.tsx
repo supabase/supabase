@@ -143,13 +143,7 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
             <span className="text-sm text-foreground-light">
               Same password as your primary database.
             </span>
-            <Button
-              asChild
-              variant="default"
-              size="tiny"
-              icon={<KeyRound size={14} />}
-              className="ml-auto"
-            >
+            <Button asChild size="tiny" icon={<KeyRound size={14} />} className="ml-auto">
               <Link href={`/project/${projectRef}/settings/database`}>Reset database password</Link>
             </Button>
           </div>
@@ -193,7 +187,6 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
             Enable catalog access to attach this project's Warehouse directly from DuckDB.
           </p>
           <Button
-            variant="default"
             className="ml-auto shrink-0"
             loading={catalogMutation.isPending}
             onClick={() => catalogMutation.mutate({ projectRef, body: { enabled: true } })}

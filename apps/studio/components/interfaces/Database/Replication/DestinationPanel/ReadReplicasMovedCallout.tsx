@@ -31,7 +31,7 @@ export const ReadReplicasMovedCallout = ({ className }: { className?: string }) 
         description="Manage read replicas on the Infrastructure page, alongside compute and disk."
         actions={
           <>
-            <Button asChild variant="default" size="tiny">
+            <Button asChild size="tiny">
               <Link href={getInfrastructurePath(projectRef)}>Go to Infrastructure</Link>
             </Button>
             <ButtonTooltip

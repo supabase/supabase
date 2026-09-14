@@ -22,6 +22,7 @@ const previewTitles: Partial<Record<CatalogPreviewKind, string>> = {
   chat: 'team chat',
   editor: 'index.ts',
   mcp: 'mcp-server',
+  agents: 'connected agents',
   dashboard: 'acme workspace',
   client: 'supabase.ts',
   flow: 'shared canvas',
@@ -230,6 +231,23 @@ export function CatalogPreview({ kind }: { kind: CatalogPreviewKind }) {
                   <span className="ml-auto text-foreground-lighter">tool</span>
                 </div>
               ))}
+            {kind === 'agents' && (
+              <>
+                {['Claude Code', 'Codex'].map((client, index) => (
+                  <div key={client} className="flex items-center gap-2 rounded border p-2">
+                    <Bot
+                      className={`size-3.5 ${index === 0 ? 'text-brand' : 'text-foreground-light'}`}
+                    />
+                    <span>{client}</span>
+                    <span className="ml-auto text-foreground-lighter">Revoke</span>
+                  </div>
+                ))}
+                <div className="flex items-center gap-2 rounded-md border border-dashed px-2 py-1.5 text-foreground-light">
+                  <LockKeyhole className="size-3" />
+                  Connect an agent
+                </div>
+              </>
+            )}
             {kind === 'flow' && (
               <div className="flex flex-col items-center">
                 <div className="flex items-center gap-2 rounded border px-3 py-2">

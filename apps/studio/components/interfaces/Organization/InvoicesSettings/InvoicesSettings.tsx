@@ -261,7 +261,6 @@ export const InvoicesSettings = () => {
             <Button
               icon={<ChevronLeft />}
               aria-label="Previous page"
-              variant="default"
               size="tiny"
               disabled={page === 1}
               onClick={async () => setPage(page - 1)}
@@ -269,7 +268,6 @@ export const InvoicesSettings = () => {
             <Button
               icon={<ChevronRight />}
               aria-label="Next page"
-              variant="default"
               size="tiny"
               disabled={page * PAGE_LIMIT >= (count ?? 0)}
               onClick={async () => setPage(page + 1)}

@@ -94,10 +94,11 @@ export const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, .
         'items-center justify-between',
         'min-h-8 rounded-md py-1.5',
         'text-sm',
-        'text-foreground-light px-3',
-        !isActive && 'hover:bg-surface-100 hover:text-foreground',
-        isActive && 'bg-surface-200 text-foreground',
+        'px-3',
         'transition-all',
+        isActive
+          ? 'bg-selection text-foreground'
+          : 'text-foreground-light hover:bg-surface-200 hover:text-foreground',
         props.className
       )}
     >

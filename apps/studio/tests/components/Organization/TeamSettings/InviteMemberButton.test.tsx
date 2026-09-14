@@ -118,7 +118,6 @@ async function submitForm(emailValue: string) {
 // Tests
 describe('InviteMemberButton', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockInvite.mockResolvedValue({ succeeded: [], failed: [] })
   })
 

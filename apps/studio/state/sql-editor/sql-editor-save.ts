@@ -81,21 +81,34 @@ export function createSaveMechanism(deps: SaveMechanismDeps) {
     debounceMs = 1000,
   } = deps
 
-  async function saveSnippet({ id, projectRef, shouldInvalidate }: SaveSnippetArgs) {
+  type PersistResult = { status: 'skipped' | 'success' } | { status: 'error'; error: unknown }
+
+  /**
+   * Upsert a snippet's full current state and reflect the outcome in its
+   * `status`. Shared by the debounced content save and the immediate favorite
+   * save — the endpoint has no partial update, so both send the whole snippet.
+   */
+  async function persistSnippet(id: string, projectRef: string): Promise<PersistResult> {
     const snippet = state.snippets[id]?.snippet
     // Only persist a snippet whose content has been loaded — otherwise we would
     // PUT an empty content body and clobber the stored SQL.
-    if (snippet === undefined || !isLoadedSnippet(snippet)) return
+    if (snippet === undefined || !isLoadedSnippet(snippet)) return { status: 'skipped' }
 
     const payload = buildPayload(snippet, id)
     try {
       snippet.status = statusOnSaveStart(snippet.status)
       await upsertContent({ projectRef, payload })
-      if (shouldInvalidate) await invalidate(projectRef)
       snippet.status = statusOnSaveSuccess()
+      return { status: 'success' }
     } catch (error) {
       snippet.status = statusOnSaveError(snippet.status)
+      return { status: 'error', error }
     }
+  }
+
+  async function saveSnippet({ id, projectRef, shouldInvalidate }: SaveSnippetArgs) {
+    const result = await persistSnippet(id, projectRef)
+    if (result.status === 'success' && shouldInvalidate) await invalidate(projectRef)
   }
 
   const memoizedSaveSnippet = memoize((_id: string) => debounce(saveSnippet, debounceMs))
@@ -103,6 +116,41 @@ export function createSaveMechanism(deps: SaveMechanismDeps) {
   /** Debounced per snippet id; rapid edits to one snippet coalesce to one save. */
   function scheduleSaveSnippet(args: SaveSnippetArgs) {
     memoizedSaveSnippet(args.id)(args)
+  }
+
+  /**
+   * Persist a snippet's favorite flag immediately, bypassing the debounce and
+   * save-mode policy that content edits go through. Any pending debounced
+   * content save for this id is cancelled since it would otherwise duplicate
+   * this request. `previousFavorite` is the value the caller applied the
+   * optimistic change over, so a failed save can roll back to exactly that —
+   * rather than inverting whatever the field happens to hold once the request
+   * settles, which could be wrong if the flag was toggled again in the meantime.
+   * Always invalidates on success — the Favorites nav section is backed by its
+   * own `favorite: true` query, not a live filter over this store, so it won't
+   * otherwise notice the flag changed.
+   */
+  async function saveFavorite({
+    id,
+    projectRef,
+    previousFavorite,
+  }: {
+    id: string
+    projectRef: string
+    previousFavorite: boolean
+  }) {
+    memoizedSaveSnippet(id).cancel()
+
+    const result = await persistSnippet(id, projectRef)
+    if (result.status === 'success') {
+      await invalidate(projectRef)
+    } else if (result.status === 'error') {
+      notify.error(
+        `Failed to update favorite: ${getErrorMessage(result.error) ?? GENERIC_ERROR_MESSAGE}`
+      )
+      const snippet = state.snippets[id]?.snippet
+      if (snippet) snippet.favorite = previousFavorite
+    }
   }
 
   async function createFolder({ projectRef, name, placeholderId }: CreateFolderArgs) {
@@ -141,6 +189,8 @@ export function createSaveMechanism(deps: SaveMechanismDeps) {
   return {
     /** Schedule a debounced save of the snippet with the given id. */
     saveSnippet: scheduleSaveSnippet,
+    /** Persist a snippet's favorite flag immediately. */
+    saveFavorite,
     /** Persist a new folder, swapping out its local placeholder. */
     createFolder,
     /** Persist a folder rename. */

@@ -21,7 +21,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-type EdgeFunctionsResponse = components['schemas']['FunctionResponse']
+type EdgeFunctionsResponse = components['schemas']['FunctionResponse_Output']
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   const slugParam = req.query.slug

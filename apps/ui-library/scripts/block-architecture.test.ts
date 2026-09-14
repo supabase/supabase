@@ -63,12 +63,12 @@ describe('generated block architecture', () => {
 
   it('groups MCP source evidence into one Edge Function and keeps the full installed file count', () => {
     const architecture = getBlockArchitecture('mcp-server')
-    assert.equal(architecture.fileCount, 7)
+    assert.equal(architecture.fileCount, 8)
     assert.equal(architecture.resources.length, 1)
     const resource = architecture.resources[0]
     assert.equal(resource.kind, 'edge-function')
     assert.equal(resource.name, 'mcp-server')
-    assert.equal(resource.files.length, 6)
+    assert.equal(resource.files.length, 7)
     assert.ok(resource.files.every((file) => file.startsWith('supabase/functions/mcp-server/')))
     assert.ok(resource.files.includes('supabase/functions/mcp-server/index.ts'))
     assert.ok(!resource.files.includes('supabase/functions/mcp-server/.env.example'))

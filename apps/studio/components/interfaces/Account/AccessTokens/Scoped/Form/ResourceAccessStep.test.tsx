@@ -19,7 +19,7 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 
 // Disabling orgs for project-scoped members reads /platform/profile/permissions, which only
 // fires on the platform for a logged-in user — neither is true in the default test environment.

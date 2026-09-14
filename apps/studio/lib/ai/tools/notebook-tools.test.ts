@@ -12,7 +12,7 @@ import {
 import type { AgentNotebook } from '@/data/content/notebooks/notebook-schema'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type DatabaseDetailResponse = components['schemas']['DatabaseDetailResponse']
+type DatabaseDetailResponse = components['schemas']['DatabaseDetailResponse_Output']
 
 function mockDatabases(identifiers: string[]) {
   addAPIMock({
@@ -32,6 +32,8 @@ function mockDatabases(identifiers: string[]) {
           inserted_at: '2026-01-01T00:00:00.000Z',
           restUrl: `https://${identifier}.supabase.co/rest/v1`,
           size: 't4g.micro',
+          connectionString: '',
+          connection_string_read_only: '',
         }))
       ),
   })
@@ -62,8 +64,8 @@ const VALID_AGENT_CONTENT: AgentNotebook = {
   ],
 }
 
-type GetUserContentByIdResponse = components['schemas']['GetUserContentByIdResponse']
-type GetUserContentResponse = components['schemas']['GetUserContentResponse']
+type GetUserContentByIdResponse = components['schemas']['GetUserContentByIdResponse_Output']
+type GetUserContentResponse = components['schemas']['GetUserContentResponse_Output']
 
 const NOTEBOOK_CONTENT = {
   schema_version: 1,
@@ -147,7 +149,7 @@ describe('ai/tools/notebook-tools', () => {
         method: 'get',
         path: '/platform/projects/:ref/databases',
         response: () =>
-          HttpResponse.json<components['schemas']['DatabaseDetailResponse'][]>([
+          HttpResponse.json<components['schemas']['DatabaseDetailResponse_Output'][]>([
             {
               identifier: 'test-project',
               region: 'us-east-1',
@@ -160,6 +162,8 @@ describe('ai/tools/notebook-tools', () => {
               inserted_at: '2026-01-01T00:00:00.000Z',
               restUrl: 'https://test-project.supabase.co/rest/v1',
               size: 't4g.micro',
+              connectionString: '',
+              connection_string_read_only: '',
             },
             {
               identifier: 'test-project-replica-1',
@@ -173,6 +177,8 @@ describe('ai/tools/notebook-tools', () => {
               inserted_at: '2026-01-01T00:00:00.000Z',
               restUrl: 'https://test-project-replica-1.supabase.co/rest/v1',
               size: 't4g.micro',
+              connectionString: '',
+              connection_string_read_only: '',
             },
           ]),
       })

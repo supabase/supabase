@@ -212,6 +212,127 @@
     ],
     "diagnostics": []
   },
+  "headless-app-tanstack": {
+    "name": "headless-app-tanstack",
+    "title": "Headless App for TanStack Start",
+    "fileCount": 34,
+    "resources": [
+      {
+        "id": "edge-function:mcp-server",
+        "kind": "edge-function",
+        "name": "mcp-server",
+        "files": [
+          "supabase/functions/mcp-server/deno.json",
+          "supabase/functions/mcp-server/deno.lock",
+          "supabase/functions/mcp-server/index.ts",
+          "supabase/functions/mcp-server/tools/index.ts",
+          "supabase/functions/mcp-server/tools/result.ts",
+          "supabase/functions/mcp-server/tools/tasks.ts",
+          "supabase/functions/mcp-server/tools/types.ts",
+          "supabase/functions/mcp-server/tools/whoami.ts"
+        ]
+      },
+      {
+        "id": "page:/agents",
+        "kind": "page",
+        "name": "/agents",
+        "route": "/agents",
+        "files": [
+          "routes/_protected/agents.tsx"
+        ]
+      },
+      {
+        "id": "page:/auth/error",
+        "kind": "page",
+        "name": "/auth/error",
+        "route": "/auth/error",
+        "files": [
+          "routes/auth/error.tsx"
+        ]
+      },
+      {
+        "id": "page:/forgot-password",
+        "kind": "page",
+        "name": "/forgot-password",
+        "route": "/forgot-password",
+        "files": [
+          "routes/forgot-password.tsx"
+        ]
+      },
+      {
+        "id": "page:/login",
+        "kind": "page",
+        "name": "/login",
+        "route": "/login",
+        "files": [
+          "routes/login.tsx"
+        ]
+      },
+      {
+        "id": "page:/oauth/consent",
+        "kind": "page",
+        "name": "/oauth/consent",
+        "route": "/oauth/consent",
+        "files": [
+          "routes/oauth/consent.tsx"
+        ]
+      },
+      {
+        "id": "page:/protected",
+        "kind": "page",
+        "name": "/protected",
+        "route": "/protected",
+        "files": [
+          "routes/_protected/protected.tsx"
+        ]
+      },
+      {
+        "id": "page:/sign-up",
+        "kind": "page",
+        "name": "/sign-up",
+        "route": "/sign-up",
+        "files": [
+          "routes/sign-up.tsx"
+        ]
+      },
+      {
+        "id": "page:/sign-up-success",
+        "kind": "page",
+        "name": "/sign-up-success",
+        "route": "/sign-up-success",
+        "files": [
+          "routes/sign-up-success.tsx"
+        ]
+      },
+      {
+        "id": "page:/update-password",
+        "kind": "page",
+        "name": "/update-password",
+        "route": "/update-password",
+        "files": [
+          "routes/update-password.tsx"
+        ]
+      },
+      {
+        "name": "tasks",
+        "schema": "public",
+        "id": "table:[\"public\",\"tasks\"]",
+        "kind": "table",
+        "files": [
+          "supabase/schemas/public/tables/tasks.sql"
+        ]
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "ambiguous-route",
+        "message": "A route loader alone does not identify a page component or an API handler.",
+        "files": [
+          "routes/auth/confirm.ts"
+        ]
+      }
+    ]
+  },
   "infinite-query-composable": {
     "name": "infinite-query-composable",
     "title": "Infinite Query for Vue and Supabase",
@@ -229,7 +350,7 @@
   "mcp-server": {
     "name": "mcp-server",
     "title": "MCP Server",
-    "fileCount": 7,
+    "fileCount": 8,
     "resources": [
       {
         "id": "edge-function:mcp-server",
@@ -237,6 +358,7 @@
         "name": "mcp-server",
         "files": [
           "supabase/functions/mcp-server/deno.json",
+          "supabase/functions/mcp-server/deno.lock",
           "supabase/functions/mcp-server/index.ts",
           "supabase/functions/mcp-server/tools/index.ts",
           "supabase/functions/mcp-server/tools/result.ts",
