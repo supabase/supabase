@@ -7,6 +7,7 @@ describe('generateAdvisorsMenu', () => {
     const [advisors] = generateAdvisorsMenu({
       ref: 'abc',
       isAdvisorRulesEnabled: false,
+      isHealthAdvisorEnabled: true,
       isPlatform: true,
     })
 
@@ -23,7 +24,23 @@ describe('generateAdvisorsMenu', () => {
     const [advisors] = generateAdvisorsMenu({
       ref: 'abc',
       isAdvisorRulesEnabled: false,
+      isHealthAdvisorEnabled: false,
       isPlatform: false,
+    })
+
+    expect(advisors.items.map((item) => item.key)).toEqual([
+      'security',
+      'performance',
+      'query-performance',
+    ])
+  })
+
+  it('omits Health Advisor when the flag is disabled', () => {
+    const [advisors] = generateAdvisorsMenu({
+      ref: 'abc',
+      isAdvisorRulesEnabled: false,
+      isHealthAdvisorEnabled: false,
+      isPlatform: true,
     })
 
     expect(advisors.items.map((item) => item.key)).toEqual([

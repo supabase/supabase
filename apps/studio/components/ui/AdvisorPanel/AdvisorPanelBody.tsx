@@ -16,14 +16,18 @@ import { EmptyAdvisor } from './EmptyAdvisor'
 import type { Notification } from '@/data/notifications/notifications-v2-query'
 import type { AdvisorCategory, AdvisorSeverity } from '@/state/advisor-state'
 
-const NoProjectNotice = () => {
+const NoProjectNotice = ({ isHealthAdvisorEnabled }: { isHealthAdvisorEnabled: boolean }) => {
+  const advisorCategories = isHealthAdvisorEnabled
+    ? 'security, performance and health'
+    : 'security and performance'
+
   return (
     <div className="absolute top-28 px-6 flex flex-col items-center justify-center w-full gap-y-2">
       <Inbox className="text-foreground-muted" strokeWidth={1} />
       <div className="text-center">
         <p className="heading-default">Project required</p>
         <p className="text-foreground-light text-sm">
-          Select a project to view its security, performance and health advisories
+          Select a project to view its {advisorCategories} advisories
         </p>
       </div>
     </div>
@@ -43,6 +47,7 @@ interface AdvisorPanelBodyProps {
   hasAnyFilters: boolean
   hasProjectRef?: boolean
   projectNameByRef?: ReadonlyMap<string, string>
+  isHealthAdvisorEnabled: boolean
 }
 
 export const AdvisorPanelBody = ({
@@ -58,13 +63,14 @@ export const AdvisorPanelBody = ({
   hasAnyFilters,
   hasProjectRef = true,
   projectNameByRef,
+  isHealthAdvisorEnabled,
 }: AdvisorPanelBodyProps) => {
   // Notifications are the only items that exist without a project, so the notice replaces
   // the list whenever the user has narrowed to categories that need one.
   const needsProject =
     categoryFilters.length > 0 && categoryFilters.every((category) => category !== 'messages')
   if (!hasProjectRef && needsProject) {
-    return <NoProjectNotice />
+    return <NoProjectNotice isHealthAdvisorEnabled={isHealthAdvisorEnabled} />
   }
 
   if (isLoading) {

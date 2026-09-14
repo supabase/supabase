@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import { useMemo, useRef } from 'react'
 
 import { AdvisorDetail } from './AdvisorDetail'
@@ -42,19 +43,24 @@ export const AdvisorPanel = () => {
   } = useAdvisorStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
   const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor') === true
 
   const isSidebarOpen = activeSidebar?.id === SIDEBAR_KEYS.ADVISOR_PANEL
   const markedRead = useRef<string[]>([])
   const hasProjectRef = !!project?.ref
+  const visibleCategoryFilters = isHealthAdvisorEnabled
+    ? categoryFilters
+    : categoryFilters.filter((category) => category !== 'health')
   const isCategorySelected = (category: AdvisorCategory) =>
-    categoryFilters.length === 0 || categoryFilters.includes(category)
+    visibleCategoryFilters.length === 0 || visibleCategoryFilters.includes(category)
   // Each source is fetched only when a category it can produce items for is selected, so
   // filtering down to one category doesn't run the checks behind the others. Health in
   // particular hits live infrastructure, and signals only ever produce security items.
   const canLoadProjectData = isSidebarOpen && hasProjectRef
   const shouldLoadLints =
     canLoadProjectData && (isCategorySelected('security') || isCategorySelected('performance'))
-  const shouldLoadHealthLints = canLoadProjectData && isCategorySelected('health')
+  const shouldLoadHealthLints =
+    isHealthAdvisorEnabled && canLoadProjectData && isCategorySelected('health')
   const shouldLoadSignals = canLoadProjectData && isCategorySelected('security')
 
   const {
@@ -132,8 +138,11 @@ export const AdvisorPanel = () => {
   }
 
   const lintItems = useMemo<AdvisorItem[]>(() => {
-    return createAdvisorLintItems([...(lintData ?? []), ...(healthLintData ?? [])])
-  }, [lintData, healthLintData])
+    return createAdvisorLintItems([
+      ...(lintData ?? []),
+      ...(isHealthAdvisorEnabled ? (healthLintData ?? []) : []),
+    ])
+  }, [lintData, healthLintData, isHealthAdvisorEnabled])
 
   const notificationItems = useMemo<AdvisorItem[]>(() => {
     if (!IS_PLATFORM) return []
@@ -149,9 +158,11 @@ export const AdvisorPanel = () => {
       // Notifications are the only items that exist without a project
       if (!hasProjectRef && item.source !== 'notification') return false
 
-      return categoryFilters.length === 0 || categoryFilters.includes(item.category)
+      return (
+        visibleCategoryFilters.length === 0 || visibleCategoryFilters.includes(item.category)
+      )
     })
-  }, [combinedItems, categoryFilters, hasProjectRef])
+  }, [combinedItems, visibleCategoryFilters, hasProjectRef])
 
   const filteredItems = useMemo<AdvisorItem[]>(() => {
     if (severityFilters.length === 0) return itemsFilteredByCategory
@@ -171,7 +182,10 @@ export const AdvisorPanel = () => {
   // Health checks hit live infrastructure and are the slowest of the three. They only block
   // the list when health is all the user asked for — otherwise health items just fill in
   // once they arrive, rather than holding up everything else.
-  const isShowingHealthOnly = categoryFilters.length === 1 && categoryFilters[0] === 'health'
+  const isShowingHealthOnly =
+    isHealthAdvisorEnabled &&
+    visibleCategoryFilters.length === 1 &&
+    visibleCategoryFilters[0] === 'health'
   const isHealthLintsActuallyLoading =
     shouldLoadHealthLints && isHealthLintsLoading && isShowingHealthOnly
 
@@ -256,7 +270,7 @@ export const AdvisorPanel = () => {
       ) : (
         <>
           <AdvisorFilters
-            categoryFilters={[...categoryFilters]}
+            categoryFilters={[...visibleCategoryFilters]}
             onCategoryFiltersChange={(categories) => {
               setCategoryFilters(categories)
               setSelectedItem(undefined)
@@ -274,13 +288,14 @@ export const AdvisorPanel = () => {
             }}
             onClose={handleClose}
             isPlatform={IS_PLATFORM}
+            isHealthAdvisorEnabled={isHealthAdvisorEnabled}
           />
           <div className="flex-1 overflow-y-auto">
             <AdvisorPanelBody
               isLoading={isLoading}
               isError={isError}
               filteredItems={filteredItems}
-              categoryFilters={[...categoryFilters]}
+              categoryFilters={[...visibleCategoryFilters]}
               severityFilters={[...severityFilters]}
               onItemClick={handleItemClick}
               onClearFilters={clearFilters}
@@ -289,6 +304,7 @@ export const AdvisorPanel = () => {
               hasAnyFilters={hasNarrowingFilters}
               hasProjectRef={hasProjectRef}
               projectNameByRef={projectNameByRef}
+              isHealthAdvisorEnabled={isHealthAdvisorEnabled}
             />
           </div>
         </>

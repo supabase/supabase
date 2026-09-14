@@ -1,5 +1,6 @@
-import { useParams } from 'common'
-import { useMemo, useState } from 'react'
+import { useFeatureFlags, useFlag, useParams } from 'common'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo, useState } from 'react'
 import { LoadingLine } from 'ui'
 
 import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
@@ -18,6 +19,25 @@ import { IS_PLATFORM } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const ProjectHealthLints: NextPageWithLayout = () => {
+  const router = useRouter()
+  const { ref } = useParams()
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor') === true
+
+  const isFlagLoading = IS_PLATFORM && !flagsLoaded
+
+  useEffect(() => {
+    if (!isFlagLoading && !isHealthAdvisorEnabled && ref) {
+      router.replace(`/project/${ref}/advisors/security`)
+    }
+  }, [isFlagLoading, isHealthAdvisorEnabled, ref, router])
+
+  if (isFlagLoading || !isHealthAdvisorEnabled) return null
+
+  return <ProjectHealthLintsContent />
+}
+
+const ProjectHealthLintsContent = () => {
   const { preset, id } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
