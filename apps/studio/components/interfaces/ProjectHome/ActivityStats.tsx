@@ -172,7 +172,9 @@ export const ActivityStats = () => {
               ) : (
                 <p className="text-foreground-lighter">Unknown</p>
               )}
-              {project?.high_availability && <HighAvailabilityBadge />}
+              {project?.high_availability && project?.cloud_provider !== 'AWS_NIMBUS' && (
+                <HighAvailabilityBadge />
+              )}
             </div>
           }
         />

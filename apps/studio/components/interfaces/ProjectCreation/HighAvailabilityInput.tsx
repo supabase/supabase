@@ -23,6 +23,7 @@ export const HighAvailabilityInput = ({
   const { getValues, setValue } = form
   const { hasAccess } = useCheckEntitlements('instances.high_availability')
   const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
+  const cloudProvider = useWatch({ control: form.control, name: 'cloudProvider' })
 
   // Fields to revert to when toggling off HA, so previously selected values aren't lost.
   const beforeHighAvailability = useRef<{
@@ -105,7 +106,7 @@ export const HighAvailabilityInput = ({
     setValue('dbRegion', highAvailabilityRegionName)
   }, [highAvailability, highAvailabilityRegionName, getValues, setValue])
 
-  if (!hasAccess) return null
+  if (!hasAccess || cloudProvider === 'AWS_NIMBUS') return null
 
   return (
     <Panel.Content>
