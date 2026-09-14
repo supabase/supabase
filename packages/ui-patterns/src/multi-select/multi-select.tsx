@@ -1,7 +1,7 @@
 'use client'
 
 import { cva, VariantProps } from 'class-variance-authority'
-import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
+import { Check, ChevronDown, X as RemoveIcon } from 'lucide-react'
 // @ts-ignore Required to avoid TS error: The inferred type of MultiSelectorContent cannot be named without a reference to @radix-ui
 import type { Popover as PopoverPrimitive } from 'radix-ui'
 import React, { Children, useEffect } from 'react'
@@ -262,11 +262,11 @@ const MultiSelectorBadgesVariants = cva('flex overflow-hidden flex-1 min-w-0', {
 })
 
 const MultiSelectorBadgeVariants = cva(
-  'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5 normal-case tracking-normal text-xs',
+  'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5 normal-case tracking-normal text-xs/none',
   {
     variants: {
       size: {
-        tiny: 'h-full py-0 leading-none',
+        tiny: 'h-full py-0',
         small: '',
         medium: '',
         large: '',
@@ -285,10 +285,10 @@ const MultiSelectorLabelVariants = cva(
     variants: {
       size: {
         tiny: 'leading-none',
-        small: 'ml-1 leading-5.5',
-        medium: 'ml-1 leading-5.5',
-        large: 'ml-1 leading-5.5',
-        xlarge: 'ml-1 leading-5.5',
+        small: 'ml-1 leading-5',
+        medium: 'ml-1 leading-5',
+        large: 'ml-1 leading-5',
+        xlarge: 'ml-1 leading-5',
       },
     },
     defaultVariants: {
@@ -489,7 +489,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           </div>
 
           {showIcon && (
-            <ChevronsUpDown
+            <ChevronDown
+              aria-hidden="true"
               size={16}
               strokeWidth={1.5}
               className="text-foreground-lighter shrink-0 ml-1.5 self-center"

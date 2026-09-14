@@ -149,14 +149,14 @@
     opacity: 0;
   }
   100% {
-    height: var(--radix-accordion-content-height);
+    height: var(--radix-accordion-content-height, var(--radix-collapsible-content-height));
     opacity: 1;
   }
 }
 
 @keyframes slideUp {
   0% {
-    height: var(--radix-accordion-content-height);
+    height: var(--radix-accordion-content-height, var(--radix-collapsible-content-height));
     opacity: 1;
   }
   100% {

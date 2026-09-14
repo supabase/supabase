@@ -89,6 +89,7 @@ interface ResourceMeta {
   riskReason: string
   allowsRead?: string[]
   allowsWrite?: string[]
+  dependencies?: string[]
 }
 
 /**
@@ -364,6 +365,15 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
     allowsRead: ['Read project API keys'],
     allowsWrite: ['Create and revoke API keys'],
   },
+  'project:api_gateway_keys_secret': {
+    category: 'appsvc',
+    name: 'API Key Secrets',
+    description: 'Secret values of project API keys.',
+    risk: 'high',
+    riskReason: 'Read reveals the secret values of project API keys.',
+    allowsRead: ['Reveal project API key secrets'],
+    dependencies: ['project:api_gateway_keys'],
+  },
   'project:edge_functions': {
     category: 'appsvc',
     name: 'Edge Functions',
@@ -381,6 +391,15 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
     riskReason: 'Read exposes function secrets; read-write can set new secret values.',
     allowsRead: ['Read edge function secrets'],
     allowsWrite: ['Set edge function secrets'],
+  },
+  'project:workers': {
+    category: 'appsvc',
+    name: 'Compute',
+    description: 'Compute workers deployed to the project.',
+    risk: 'medium',
+    riskReason: 'Read-write can deploy or delete compute workers.',
+    allowsRead: ['List compute workers'],
+    allowsWrite: ['Deploy and delete compute workers'],
   },
   'project:realtime_config': {
     category: 'appsvc',
@@ -412,11 +431,20 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   'project:data_api_config': {
     category: 'appsvc',
     name: 'Data API Config',
-    description: 'PostgREST behavior and settings.',
+    description: 'Data API behavior and settings.',
     risk: 'medium',
     riskReason: 'Read-write can change how the auto-generated Data API behaves.',
     allowsRead: ['Read Data API configuration'],
     allowsWrite: ['Update Data API configuration'],
+  },
+  'project:data_api_config_secret': {
+    category: 'appsvc',
+    name: 'Data API JWT Secret',
+    description: 'JWT secret used by the Data API.',
+    risk: 'high',
+    riskReason: 'Read exposes the JWT secret, which can be used to mint tokens for any role.',
+    allowsRead: ['Read Data API JWT secret'],
+    dependencies: ['project:data_api_config'],
   },
 
   // --- Infrastructure and delivery ---
@@ -520,6 +548,8 @@ const toPermissionLevel = (scope: string): PermissionLevel => {
   return match
 }
 
+type PermissionDependency = { key: string; label: string; permissions: 'read' | 'read-write' }
+
 export interface PermissionCatalogEntry {
   /** Derived resource key, e.g. "project:database" */
   key: string
@@ -538,6 +568,7 @@ export interface PermissionCatalogEntry {
   readScopes: FgaScopeId[]
   /** Additional FGA scope ids granted at Read-write (write / create / delete). */
   writeScopes: FgaScopeId[]
+  dependencies: Array<PermissionDependency>
 }
 
 /** Action classes an FGA permission key's suffix can map to. */
@@ -587,6 +618,17 @@ const buildCatalog = (): PermissionCatalogEntry[] => {
   for (const [key, { level, title, readScopes, writeScopes }] of byResource.entries()) {
     const meta =
       RESOURCE_METADATA[key] ?? RESOURCE_METADATA_FALLBACK(key, title, writeScopes.length > 0)
+    const dependencies = (meta.dependencies ?? []).map((dependency) => {
+      return {
+        key: dependency,
+        label: RESOURCE_METADATA[dependency].name,
+        permissions:
+          RESOURCE_METADATA[dependency].allowsRead?.length &&
+          RESOURCE_METADATA[dependency].allowsWrite?.length
+            ? ('read-write' as const)
+            : ('read' as const),
+      }
+    })
     catalog.push({
       key,
       level,
@@ -601,6 +643,7 @@ const buildCatalog = (): PermissionCatalogEntry[] => {
       writable: writeScopes.length > 0,
       readScopes: readScopes as FgaScopeId[],
       writeScopes: writeScopes as FgaScopeId[],
+      dependencies,
     })
   }
   return catalog

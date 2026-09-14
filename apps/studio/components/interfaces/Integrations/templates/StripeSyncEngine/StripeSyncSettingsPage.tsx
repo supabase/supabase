@@ -115,7 +115,7 @@ export const StripeSyncSettingsPage = () => {
                   </p>
                 </div>
 
-                <Button asChild variant="default" className="ml-8 @md:ml-0">
+                <Button asChild className="ml-8 @md:ml-0">
                   <Link href={`/project/${ref}/editor?schema=stripe`}>Open Table Editor</Link>
                 </Button>
               </div>

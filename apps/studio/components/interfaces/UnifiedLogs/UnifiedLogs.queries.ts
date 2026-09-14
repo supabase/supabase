@@ -13,7 +13,7 @@ import {
   safeSql,
   type SafeLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
-import { WORKER_LOG_SOURCES } from '@/lib/constants/workers'
+import { WORKER_LOG_SOURCES } from '@/lib/constants/compute'
 
 // Operator fragments for SQL emission. `safeSql` rejects plain strings, so we
 // pre-brand the keywords we want to switch between.
@@ -68,7 +68,7 @@ const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = {
       safeSql`source = ${lit(source)}`,
     ])
   ),
-  workers: WORKER_LOG_SOURCE_CONDITION,
+  compute: WORKER_LOG_SOURCE_CONDITION,
 }
 
 // Derived `log_type` column for SELECT / GROUP BY / countIf use.
@@ -85,7 +85,7 @@ const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN source = 'supavisor_logs' THEN 'supavisor'
       WHEN source = 'pgbouncer_logs' THEN 'pgbouncer'
       WHEN source = 'multigres_logs' THEN 'multigres'
-      WHEN ${WORKER_LOG_SOURCE_CONDITION} THEN 'workers'
+      WHEN ${WORKER_LOG_SOURCE_CONDITION} THEN 'compute'
       ELSE source
     END`
 

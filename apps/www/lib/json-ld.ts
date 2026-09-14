@@ -152,6 +152,7 @@ interface BlogPostingSchemaInput {
   description?: string
   image: string
   datePublished: string
+  dateModified: string
   authors: Array<{ name: string; url?: string }>
 }
 
@@ -167,6 +168,7 @@ export function blogPostingSchema(input: BlogPostingSchemaInput) {
     description: input.description,
     image: input.image,
     datePublished: input.datePublished,
+    dateModified: input.dateModified,
     author: input.authors.map((a) => ({
       '@type': 'Person',
       name: a.name,

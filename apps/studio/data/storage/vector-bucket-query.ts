@@ -8,7 +8,7 @@ import { PROJECT_STATUS } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 // [Joshen] JFYI typed incorrectly in API, to fix by adding creationTime to APi
-export type VectorBucket = components['schemas']['StorageVectorBucketResponse'] & {
+export type VectorBucket = components['schemas']['StorageVectorBucketResponse_Output'] & {
   creationTime: string
 }
 
