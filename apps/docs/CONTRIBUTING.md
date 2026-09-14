@@ -23,14 +23,14 @@ To make docs as clear as possible:
 
 Separating kinds of information is a useful way to keep a paragraph readable. The [Information Mapping](https://support.informationmapping.com/hc/en-us/articles/213446789-Present-your-information-in-a-clear-and-consistent-way) method names six, each answering a different reader question:
 
-| Type | Answers | Present with | Example |
-| --- | --- | --- | --- |
-| Procedure | How do I do it? | Numbered steps, or an if/then table | Run `alter table profiles enable row level security`. |
-| Process | What is happening? How does it work? | A stage-by-stage description, or a when/then table | When a query runs, Postgres checks the policies on the table and returns only the rows that a policy allows. |
-| Structure | What are its parts? | A part and description table, or a labeled diagram | A policy has a name, a command, a role, a `using` expression, and a `with check` expression. |
-| Principle | What should I do or not do? | Text, a list, or an admonition | Enable Row Level Security on every table in an exposed schema. |
-| Concept | What is it? | Text, a list, or a diagram | Row Level Security restricts which rows a user can read or write. |
-| Fact | What are the facts? | Text, a list, or a table | A table with Row Level Security enabled and no policy returns no rows. |
+| Type | Answers | Present with |
+| --- | --- | --- |
+| Procedure | How do I do it? | Numbered steps, or an if/then table |
+| Process | What is happening? How does it work? | A stage-by-stage description, or a when/then table |
+| Structure | What are its parts? | A part and description table, or a labeled diagram |
+| Principle | What should I do or not do? | Text, a list, or an admonition |
+| Concept | What is it? | Text, a list, or a diagram |
+| Fact | What are the facts? | Text, a list, or a table |
 
 A procedure, a process, a structure, or a concept usually reads better in a block of its own. Procedure and process get blended most often, because both answer a question about how, and a reader following steps can't act on the process sentences.
 
