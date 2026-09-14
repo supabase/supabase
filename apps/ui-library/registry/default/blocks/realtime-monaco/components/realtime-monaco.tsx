@@ -1,7 +1,7 @@
 'use client'
 
 import { Editor } from '@monaco-editor/react'
-import { SupabasePersistenceOptions } from '@supabase-labs/y-supabase'
+import type { SupabasePersistenceOptions } from '@supabase-labs/y-supabase'
 import { Awareness } from 'y-protocols/awareness.js'
 
 import { useConnectOnMount } from '../hooks/use-connect-on-mount'
