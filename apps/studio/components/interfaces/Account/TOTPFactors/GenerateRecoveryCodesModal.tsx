@@ -37,7 +37,7 @@ export const GenerateRecoveryCodesModal = () => {
           open={open}
           onOpenChange={(open) => {
             // Prevent users from closing the dialog until they copied the codes
-            if (!open && !copied) return
+            if (!open && !copied && recoveryCodesGenerateMutation.isSuccess) return
 
             setOpen(open)
             queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status() })
