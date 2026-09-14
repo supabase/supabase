@@ -73,7 +73,7 @@ export function LibraryOverview() {
   return (
     <main>
       <section className="mx-auto flex max-w-7xl flex-col gap-6 px-4 pb-10 pt-16 md:px-8 md:pb-12 md:pt-24">
-        <h1 className="max-w-2xl text-balance font-heading text-4xl font-normal tracking-normal sm:text-5xl sm:leading-none">
+        <h1 className="max-w-2xl text-balance font-heading text-4xl font-medium tracking-normal sm:text-5xl sm:leading-none">
           Building blocks for your next backend.
         </h1>
       </section>

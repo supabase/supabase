@@ -106,11 +106,11 @@ export default async function DocPage(props: DocPageProps) {
             )}
           </div>
         )}
-        <h1 className="max-w-2xl scroll-m-24 text-balance font-heading text-4xl font-normal leading-tight tracking-tight sm:text-5xl sm:leading-none">
+        <h1 className="max-w-2xl scroll-m-24 text-balance font-heading text-4xl font-medium leading-tight tracking-tight sm:text-5xl sm:leading-none">
           {doc.title}
         </h1>
         {doc.description && (
-          <p className="max-w-xl text-balance text-lg text-foreground-muted">
+          <p className="max-w-xl text-balance text-lg font-medium text-foreground-muted">
             <Balancer>{doc.description}</Balancer>
           </p>
         )}
