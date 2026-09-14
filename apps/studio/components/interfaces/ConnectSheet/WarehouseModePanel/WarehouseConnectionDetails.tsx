@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Eye, EyeOff, KeyRound } from 'lucide-react'
+import { Eye, EyeOff, KeyRound, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -246,12 +246,20 @@ const CatalogAccessToggle = ({
       label="Enable DuckDB catalog access"
       description="Creates the credentials DuckDB needs to attach Warehouse. Not required for FlightSQL."
     >
-      <Switch
-        aria-label="Enable DuckDB catalog access"
-        checked={isEnabled}
-        disabled={catalogMutation.isPending}
-        onCheckedChange={(enabled) => catalogMutation.mutate({ projectRef, body: { enabled } })}
-      />
+      <div className="flex items-center gap-2">
+        {catalogMutation.isPending && (
+          <span role="status" aria-label="Updating DuckDB catalog access">
+            <Loader2 size={16} className="animate-spin text-foreground-muted" aria-hidden />
+          </span>
+        )}
+        <Switch
+          aria-label="Enable DuckDB catalog access"
+          aria-busy={catalogMutation.isPending}
+          checked={isEnabled}
+          disabled={catalogMutation.isPending}
+          onCheckedChange={(enabled) => catalogMutation.mutate({ projectRef, body: { enabled } })}
+        />
+      </div>
     </FormLayout>
   )
 }

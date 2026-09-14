@@ -99,6 +99,10 @@ describe('WarehouseConnectionDetails', () => {
   test('enables and disables DuckDB catalog access', async () => {
     let catalog: WarehouseCatalogResponse = { enabled: false }
     const requestBodies: UpdateWarehouseCatalogBody[] = []
+    let finishUpdatingCatalog: (() => void) | undefined
+    const updatingCatalog = new Promise<void>((resolve) => {
+      finishUpdatingCatalog = resolve
+    })
 
     addAPIMock({
       method: 'get',
@@ -111,6 +115,7 @@ describe('WarehouseConnectionDetails', () => {
       response: async ({ request }) => {
         const body = (await request.json()) as UpdateWarehouseCatalogBody
         requestBodies.push(body)
+        await updatingCatalog
         catalog = { enabled: body.enabled }
         return HttpResponse.json<WarehouseCatalogResponse>(catalog)
       },
@@ -127,7 +132,17 @@ describe('WarehouseConnectionDetails', () => {
     expect(catalogSwitch).not.toBeChecked()
 
     await userEvent.click(catalogSwitch)
+    expect(
+      await screen.findByRole('status', { name: 'Updating DuckDB catalog access' })
+    ).toBeInTheDocument()
+    expect(catalogSwitch).toBeDisabled()
+    expect(catalogSwitch).toHaveAttribute('aria-busy', 'true')
+
+    finishUpdatingCatalog?.()
     await waitFor(() => expect(catalogSwitch).toBeChecked())
+    expect(
+      screen.queryByRole('status', { name: 'Updating DuckDB catalog access' })
+    ).not.toBeInTheDocument()
 
     await userEvent.click(catalogSwitch)
     await waitFor(() => expect(catalogSwitch).not.toBeChecked())
