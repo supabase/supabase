@@ -10,11 +10,35 @@ import {
   type LoadedSnippet,
 } from './sql-editor-rules'
 import type { SnippetWithContent } from '@/data/content/sql-folders-query'
+import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 
-function makeSnippet(overrides: Omit<Partial<SnippetWithContent>, 'content'> = {}): LoadedSnippet {
+function makeLogSnippet(): LoadedSnippet {
+  return {
+    id: 'log-snippet-1',
+    name: 'My Logs Query',
+    description: '',
+    visibility: 'user',
+    project_id: 42,
+    owner_id: 7,
+    folder_id: null,
+    favorite: false,
+    status: 'saved',
+    inserted_at: '2024-01-01T00:00:00.000Z',
+    updated_at: '2024-01-01T00:00:00.000Z',
+    type: 'log_sql',
+    content: {
+      content_id: 'log-snippet-1',
+      schema_version: '1',
+      unchecked_sql: untrustedLogSql('select * from logs'),
+    },
+  }
+}
+
+function makeSnippet(
+  overrides: Omit<Partial<SnippetWithContent>, 'content' | 'type'> = {}
+): LoadedSnippet {
   return {
     id: 'snippet-1',
-    type: 'sql',
     name: 'My Query',
     description: 'A description',
     visibility: 'user',
@@ -26,6 +50,7 @@ function makeSnippet(overrides: Omit<Partial<SnippetWithContent>, 'content'> = {
     inserted_at: '2024-01-01T00:00:00.000Z',
     updated_at: '2024-01-01T00:00:00.000Z',
     ...overrides,
+    type: 'sql',
     content: {
       content_id: 'snippet-1',
       schema_version: '1',
@@ -96,6 +121,17 @@ describe('validateMoveToFolder', () => {
 })
 
 describe('buildUpsertPayload', () => {
+  it('emits the snippet type — sql for a database snippet', () => {
+    const payload = buildUpsertPayload(makeSnippet(), 'snippet-1')
+    expect(payload.type).toBe('sql')
+  })
+
+  it('emits the snippet type — log_sql for a logs snippet (not silently rewritten to sql)', () => {
+    const payload = buildUpsertPayload(makeLogSnippet(), 'log-snippet-1')
+    expect(payload.type).toBe('log_sql')
+    expect((payload.content as { content_id: string }).content_id).toBe('log-snippet-1')
+  })
+
   it('passes through provided values', () => {
     const snippet = makeSnippet()
     const payload = buildUpsertPayload(snippet, 'snippet-1')

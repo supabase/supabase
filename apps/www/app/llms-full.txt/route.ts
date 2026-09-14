@@ -2,7 +2,6 @@ import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import { isFeatureEnabled } from 'common/enabled-features'
 
-import { MD_CONTENT } from '@/app/api-v2/md/content.generated'
 import { generatePricingContent } from '@/lib/llms'
 
 export const dynamic = 'force-dynamic'
@@ -53,15 +52,6 @@ async function readAllGuideMarkdown(): Promise<string> {
   return contents.join('\n\n---\n\n')
 }
 
-// Order is set by scripts/generateMdContent.mjs (homepage first, rest
-// alphabetical). pricing is appended here since it's dynamic.
-async function readProductOverviews(): Promise<string> {
-  const staticContents = [...MD_CONTENT.values()]
-  const pricingContent = generatePricingContent()
-
-  return [...staticContents, pricingContent].join('\n\n---\n\n')
-}
-
 async function fetchSourceContent(slug: string): Promise<string | null> {
   const docsUrl = process.env.NEXT_PUBLIC_DOCS_URL
   if (!docsUrl) return null
@@ -76,8 +66,9 @@ export async function GET() {
   const sources = getSources()
   const enabledSources = sources.filter((source) => source.enabled)
 
-  const [productContent, guidesContent, ...sourceContents] = await Promise.all([
-    readProductOverviews(),
+  const pricingContent = generatePricingContent()
+
+  const [guidesContent, ...sourceContents] = await Promise.all([
     readAllGuideMarkdown(),
     ...enabledSources.map(async (source) => {
       const text = await fetchSourceContent(source.slug)
@@ -97,9 +88,9 @@ export async function GET() {
   const content = [
     '# Supabase',
     '',
-    '## Product Overview',
+    '## Pricing',
     '',
-    productContent,
+    pricingContent,
     '',
     '---',
     '',

@@ -1,4 +1,5 @@
 import { TriangleAlert } from 'lucide-react'
+
 import { Callout } from './callout'
 
 export default function TanStackBeta() {
@@ -10,8 +11,8 @@ export default function TanStackBeta() {
             <TriangleAlert />
             Heads up: TanStack Start is in beta.
           </div>
-          We&apos;re excited to support TanStack Start in our UI library! But since it&apos;s still
-          in beta, things may change quickly — expect breaking changes and some rough edges.
+          We&apos;re excited to support TanStack Start in Supabase Library! But since it&apos;s
+          still in beta, things may change quickly — expect breaking changes and some rough edges.
           We&apos;ll do our best to keep up and make integration with Supabase as smooth as
           possible. If you run into issues, have a look at the TanStack docs.
           <a

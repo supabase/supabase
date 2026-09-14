@@ -1,7 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { FilePlus, FolderPlus, Plus, X } from 'lucide-react'
+import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
+import { FilePlus, FolderPlus, Plus, ScrollText, X } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -24,11 +25,12 @@ import {
 
 import { SearchList } from './SQLEditorNavV2/SearchList'
 import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
+import { type SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getErrorMessage } from '@/lib/get-error-message'
 import { useProfile } from '@/lib/profile'
-import { getAppStateSnapshot } from '@/state/app-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export const SQLEditorMenu = () => {
@@ -38,6 +40,10 @@ export const SQLEditorMenu = () => {
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
+  const sqlEditorLogsSource = useFlag('sqlEditorLogsSource')
+  const otelLegacyLogs = useFlag('otelLegacyLogs')
+  const canCreateLogsSnippet = sqlEditorLogsSource && otelLegacyLogs
+
   const [search, setSearch] = useState('')
   const [showSearch, setShowSearch] = useState(false)
   const [sort, setSort] = useLocalStorage<'name' | 'inserted_at'>(
@@ -45,7 +51,6 @@ export const SQLEditorMenu = () => {
     'inserted_at'
   )
 
-  const appState = getAppStateSnapshot()
   const debouncedSearch = useDebounce(search, 500)
 
   const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
@@ -64,7 +69,7 @@ export const SQLEditorMenu = () => {
     snapV2.addNewFolder({ projectRef: ref })
   }
 
-  const handleNewQuery = async () => {
+  const handleNewQuery = async (source: SqlSnippetSource = 'database') => {
     if (!ref) return console.error('Project ref is required')
     if (!project) return console.error('Project is required')
     if (!profile) return console.error('Profile is required')
@@ -72,11 +77,12 @@ export const SQLEditorMenu = () => {
       return toast('Your queries will not be saved as you do not have sufficient permissions')
     }
     try {
-      router.push(`/project/${ref}/sql/new?skip=true`)
+      const suffix = source === 'logs' ? '&source=logs' : ''
+      router.push(`/project/${ref}/sql/new?skip=true${suffix}`)
       setSearch('')
       setShowSearch(false)
-    } catch (error: any) {
-      toast.error(`Failed to create new query: ${error.message}`)
+    } catch (error) {
+      toast.error(`Failed to create new query: ${getErrorMessage(error)}`)
     }
   }
 
@@ -122,7 +128,7 @@ export const SQLEditorMenu = () => {
               ) : (
                 <InnerSideBarFilterSortDropdown
                   value={sort}
-                  onValueChange={(value: any) => setSort(value)}
+                  onValueChange={(value) => setSort(value as 'name' | 'inserted_at')}
                 >
                   <InnerSideBarFilterSortDropdownItem key="name" value="name">
                     Alphabetical
@@ -140,7 +146,6 @@ export const SQLEditorMenu = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     data-testid="sql-editor-new-query-button"
-                    variant="default"
                     icon={<Plus className="text-foreground" />}
                     className="w-[26px]"
                     aria-label="Create a new query"
@@ -154,6 +159,12 @@ export const SQLEditorMenu = () => {
                 <FilePlus size={14} />
                 Create a new snippet
               </DropdownMenuItem>
+              {canCreateLogsSnippet && (
+                <DropdownMenuItem className="gap-x-2" onClick={() => handleNewQuery('logs')}>
+                  <ScrollText size={14} />
+                  Create a new logs query
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem className="gap-x-2" onClick={() => createNewFolder()}>
                 <FolderPlus size={14} />
                 Create a new folder
@@ -166,8 +177,8 @@ export const SQLEditorMenu = () => {
       </div>
 
       <div className="p-4 border-t sticky bottom-0 bg-studio">
-        <Button block variant="default" onClick={() => appState.setOnGoingQueriesPanelOpen(true)}>
-          View running queries
+        <Button asChild block>
+          <Link href={`/project/${ref}/observability/connections`}>View running queries</Link>
         </Button>
       </div>
     </div>

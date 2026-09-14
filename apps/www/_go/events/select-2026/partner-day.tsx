@@ -1,39 +1,34 @@
 import type { GoPageInput } from 'marketing'
 
-const agenda: { time: string; session: string; notes?: string }[] = [
+const whatToExpect: { title: string; description: string }[] = [
   {
-    time: '2:00 - 2:30pm',
-    session: 'Arrival + light snacks',
-    notes: 'Casual opportunity to meet your fellow partners',
+    title: 'A founder welcome',
+    description:
+      'Hear directly from Supabase leadership on the momentum behind the ecosystem and why this room matters.',
   },
   {
-    time: '2:30 - 2:45pm',
-    session: 'Welcome',
-    notes: 'Ecosystem momentum and why partners are so critical to the success of Supabase.',
+    title: 'Where partnerships are headed',
+    description:
+      "A look ahead at the Supabase partner ecosystem and how we're investing in the people who build with us.",
   },
   {
-    time: '2:45 - 3:15pm',
-    session: 'Business update + Roadmap preview',
-    notes: 'An early look at what\u2019s coming at Select',
+    title: 'A product sneak peek',
+    description:
+      "A preview of what we're building, with a focus on the things that matter most to partners.",
   },
   {
-    time: '3:15 - 3:45pm',
-    session: 'Partner demos / \u201cwins\u201d',
-    notes: 'Demos by some partners on what they\u2019ve built / building.',
+    title: 'Open conversation',
+    description: 'Bring your questions, ideas, and hot takes straight to the Supabase team.',
   },
   {
-    time: '3:45 - 4:15pm',
-    session: 'Partner panel',
-    notes: 'Challenges and opportunities for partners in the Supabase ecosystem.',
+    title: 'Meet the ecosystem',
+    description:
+      "You'll be standing next to the builders, founders, and partner teams behind some of your favorite tools.",
   },
   {
-    time: '4:15 - 4:30pm',
-    session: 'Ecosystem announcements roundup + partner awards',
-    notes: 'Celebrate the organizations that have delivered innovative results through the year.',
-  },
-  {
-    time: '4:30pm and beyond',
-    session: 'Happy hour',
+    title: 'Happy hour',
+    description:
+      'We close out the afternoon with food and drinks with the wider Supabase community.',
   },
 ]
 
@@ -43,13 +38,13 @@ const page: GoPageInput = {
   metadata: {
     title: 'Partner Day | Supabase Select 2026',
     description:
-      'Join the Supabase partner community for an afternoon of business updates, partner demos, panels, and ecosystem announcements, followed by a happy hour.',
+      'Join the Supabase team and your fellow partners for our first ever Partner Day: an intimate afternoon of real talk, sneak peeks, and good company on October 1, 2026, the day before Select.',
   },
   hero: {
     title: 'Supabase Partner Day',
-    subtitle: 'Celebrating the Supabase ecosystem',
+    subtitle: 'Supabase Select 2026',
     description:
-      'Spend the afternoon with the Supabase team and fellow partners. Hear a business update and roadmap preview, watch lightning demos of what partners are building, join a partner panel, and celebrate the latest ecosystem announcements and partner awards -- capped off with a happy hour.',
+      "You're helping us build this ecosystem, so come celebrate it with us. Join the Supabase team and your fellow partners for our first ever Partner Day: an intimate afternoon of real talk, sneak peeks, and good company.",
     ctas: [
       {
         label: 'Reserve your spot',
@@ -66,84 +61,50 @@ const page: GoPageInput = {
         <div className="flex flex-col items-center gap-2 text-foreground-light">
           <p className="text-lg font-medium text-foreground">Date</p>
           <p>October 1, 2026</p>
+          <p className="text-sm text-foreground-lighter italic">
+            The day before Supabase Select 2026
+          </p>
           <p className="mt-4 text-lg font-medium text-foreground">Location</p>
           <p>San Francisco, CA</p>
-          <p className="mt-4 text-lg font-medium text-foreground">Schedule</p>
-          <p>2:00 PM — Arrival and light snacks</p>
-          <p>4:30 PM — Happy hour</p>
-        </div>
-      ),
-    },
-    {
-      type: 'single-column',
-      title: 'Agenda',
-      children: (
-        <div className="border border-muted rounded-xl overflow-hidden text-left">
-          <table className="w-full border-collapse text-sm">
-            <thead>
-              <tr className="bg-surface-100 text-foreground">
-                <th className="w-40 align-top p-4 font-medium border-b border-muted">Time</th>
-                <th className="align-top p-4 font-medium border-b border-muted">Session</th>
-                <th className="align-top p-4 font-medium border-b border-muted">Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {agenda.map((item, index) => (
-                <tr key={item.time} className={index > 0 ? 'border-t border-muted' : undefined}>
-                  <td className="w-40 align-top p-4 font-medium text-foreground whitespace-nowrap">
-                    {item.time}
-                  </td>
-                  <td className="align-top p-4 text-foreground">{item.session}</td>
-                  <td className="align-top p-4 text-foreground-light">{item.notes ?? ''}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <p className="text-sm text-foreground-lighter italic">
+            Venue details will be shared soon
+          </p>
+          <p className="mt-4 text-lg font-medium text-foreground">Time</p>
+          <p>Doors open at 2:30 PM</p>
+          <p>Happy hour from 4:30 PM</p>
         </div>
       ),
     },
     {
       type: 'feature-grid',
-      title: "What you'll gain",
+      title: 'What to expect',
+      description:
+        'The plan is simple: a couple of hours with the people building the Supabase ecosystem.',
       columns: 3,
-      items: [
-        {
-          title: 'Strengthen key relationships',
-          description:
-            "Join Supabase's inaugural Partner Summit and build deeper connections with the Supabase team and the wider partner community in one room.",
-        },
-        {
-          title: 'Get recognized for your work',
-          description:
-            'Top-performing partners are celebrated with Partner Awards, recognizing your impact across product integrations and go-to-market.',
-        },
-        {
-          title: 'See where Supabase is heading',
-          description:
-            'Get a business update and an early look at the product roadmap, giving you forward-looking context to plan your own bets.',
-        },
-        {
-          title: 'Unlock new opportunities',
-          description:
-            'Be first to hear about new partner programs, partner benefits, and product integration opportunities you can take advantage of.',
-        },
-        {
-          title: 'Shape the partnership',
-          description:
-            "Meet the team in person to share what's working, surface points of friction, and give feedback that directly informs how we collaborate.",
-        },
-        {
-          title: 'Grow your visibility',
-          description:
-            "Be part of the partner ecosystem spotlight and get featured across Supabase's social channels.",
-        },
-      ],
+      items: whatToExpect,
+    },
+    {
+      type: 'single-column',
+      title: "Why we're doing this",
+      children: (
+        <div className="max-w-2xl mx-auto flex flex-col gap-4 text-foreground-light text-lg text-center text-balance">
+          <p>
+            This is Supabase's inaugural Partner Day: the partnerships we're shipping together have
+            become a real part of what makes Supabase work, and we want to celebrate that IRL.
+          </p>
+          <p>
+            <span className="text-foreground font-medium">And then there's Select.</span> Partner
+            Day flows straight into Select the next day. If you haven't sorted your pass yet, your
+            Partner Day invite has you covered.
+          </p>
+        </div>
+      ),
     },
     {
       type: 'form',
       id: 'rsvp',
       title: 'Reserve your spot',
-      description: "Space is limited. Let us know you're coming.",
+      description: "Space is limited and this one's invite-only, so let us know you're coming.",
       fields: [
         {
           type: 'text',
@@ -192,7 +153,8 @@ const page: GoPageInput = {
         {
           type: 'select',
           name: 'attending',
-          label: 'Are you attending Select 2026?',
+          label: 'Would you like to attend Supabase Select on October 2?',
+          hint: 'Your Partner Day invite covers it',
           placeholder: 'Select an option',
           required: true,
           options: [

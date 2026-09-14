@@ -1,6 +1,6 @@
 import type Usercentrics from '@usercentrics/cmp-browser-sdk'
 import type { BaseCategory, UserDecision } from '@usercentrics/cmp-browser-sdk'
-import { proxy, snapshot, useSnapshot } from 'valtio'
+import { proxy, ref, snapshot, useSnapshot } from 'valtio'
 
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from './constants'
 
@@ -131,6 +131,14 @@ export const consentState = proxy({
   UC: null as Usercentrics | null,
   categories: null as BaseCategory[] | null,
 
+  /**
+   * Whether the consent decision has settled, either from the SDK or from a
+   * failure to load it. Consumers that must act on a decision need to tell
+   * "not decided yet" apart from "decided against", which `hasConsented`
+   * alone cannot express.
+   */
+  isResolved: false,
+
   showConsentToast: false,
   hasConsented: false,
   acceptAll: () => {
@@ -191,8 +199,10 @@ export function applyPriorDecisionToSDK(
   UC: Usercentrics,
   initialUIValues: { initialLayer: number },
   priorDecision: PriorConsentDecision
-): void {
-  consentState.UC = UC
+): void | Promise<void> {
+  // ref() prevents valtio from recursively proxying the SDK instance's internals in place,
+  // which would corrupt them the same way it once corrupted the AI Assistant's message array
+  consentState.UC = ref(UC)
   const hasConsented = UC.areAllConsentsAccepted()
 
   // If the SDK wants to show the banner but the user previously made a
@@ -209,7 +219,7 @@ export function applyPriorDecisionToSDK(
       // including any added to the ruleset since the user's decision was
       // stored — acceptAllServices applies to all current services.
       consentState.hasConsented = true
-      UC.acceptAllServices()
+      return UC.acceptAllServices()
         .then(() => {
           consentState.categories = UC.getCategoriesBaseInfo()
         })
@@ -217,7 +227,6 @@ export function applyPriorDecisionToSDK(
           consentState.hasConsented = false
           consentState.showConsentToast = true
         })
-      return
     }
 
     // priorDecision.kind === 'decisions'. Only suppress the banner if the
@@ -244,7 +253,7 @@ export function applyPriorDecisionToSDK(
     // partial/category-level decision made via Privacy Settings. hasConsented
     // is computed from SDK state after the restore resolves (will be false
     // unless every service was accepted).
-    UC.updateServices(priorDecision.decisions)
+    return UC.updateServices(priorDecision.decisions)
       .then(() => {
         consentState.hasConsented = UC.areAllConsentsAccepted()
         consentState.categories = UC.getCategoriesBaseInfo()
@@ -254,7 +263,6 @@ export function applyPriorDecisionToSDK(
         // uniform state the user didn't choose.
         consentState.showConsentToast = true
       })
-    return
   }
 
   // 0 = first layer, aka show consent toast
@@ -280,6 +288,7 @@ async function initUserCentrics() {
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
   ) {
     consentState.hasConsented = true
+    consentState.isResolved = true
     return
   }
 
@@ -296,7 +305,7 @@ async function initUserCentrics() {
     })
 
     const initialUIValues = await UC.init()
-    applyPriorDecisionToSDK(UC, initialUIValues, priorDecision)
+    await applyPriorDecisionToSDK(UC, initialUIValues, priorDecision)
   } catch (error) {
     console.error('Failed to initialize Usercentrics:', error)
     // If SDK fails but user previously accepted uniformly, honor that.
@@ -305,6 +314,8 @@ async function initUserCentrics() {
     if (priorDecision?.kind === 'uniform-accept') {
       consentState.hasConsented = true
     }
+  } finally {
+    consentState.isResolved = true
   }
 }
 

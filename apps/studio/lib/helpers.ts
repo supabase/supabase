@@ -351,6 +351,9 @@ const formatSemver = (version: string) => {
   return formattedSemver
 }
 
+// Windows of a year or more read better as years than day counts
+export const formatRestoreWindow = (days: number) => (days >= 365 ? '1 year' : `${days} days`)
+
 export const getSemanticVersion = (version: string) => {
   if (!version) return 0
 

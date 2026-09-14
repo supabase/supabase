@@ -1,6 +1,6 @@
 import { ExternalLink } from 'lucide-react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
@@ -75,7 +75,7 @@ export function StripePaymentConnection({
           </p>
         )}
       </div>
-      <Button asChild variant="default" iconRight={<ExternalLink size={14} />}>
+      <Button asChild iconRight={<ExternalLink size={14} />}>
         <a
           href={`${STRIPE_PROJECTS_DOCS_URL}#manage-billing`}
           target="_blank"

@@ -55,6 +55,7 @@ const Index = () => {
             <p className="h1 tracking-[-1px]">{data.hero.title}</p>
             <CommandMenuTrigger>
               <button
+                tabIndex={0}
                 className="
                   mx-auto
                   w-full

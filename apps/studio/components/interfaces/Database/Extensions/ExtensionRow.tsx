@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { extensions } from 'shared-data'
 import { toast } from 'sonner'
 import { Button, Switch, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { EnableExtensionModal } from './EnableExtensionModal'
@@ -122,7 +122,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
         <TableCell>
           <div className="flex gap-2 items-center">
             {extensionMeta?.github_url && (
-              <Button asChild variant="default" icon={<Github />} className="rounded-full">
+              <Button asChild icon={<Github />} className="rounded-full">
                 <a
                   target="_blank"
                   rel="noreferrer"
@@ -134,7 +134,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
               </Button>
             )}
             {docsUrl !== undefined && (
-              <Button asChild variant="default" icon={<Book />} className="rounded-full">
+              <Button asChild icon={<Book />} className="rounded-full">
                 <a
                   target="_blank"
                   rel="noreferrer"

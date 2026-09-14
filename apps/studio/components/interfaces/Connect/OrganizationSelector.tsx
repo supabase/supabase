@@ -193,6 +193,7 @@ const ConnectOrganizationButton = ({
 }) => (
   <button
     type="button"
+    tabIndex={disabled ? -1 : 0}
     disabled={disabled}
     onClick={onClick}
     aria-pressed={selected}

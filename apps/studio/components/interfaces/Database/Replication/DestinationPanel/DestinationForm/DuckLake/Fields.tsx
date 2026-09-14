@@ -1,6 +1,6 @@
-import { Check, Database, Eye, EyeOff, Loader2, Plus, SlidersHorizontal } from 'lucide-react'
+import { Check, Database, Eye, EyeOff, Plus, SlidersHorizontal } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import type { UseFormReturn } from 'react-hook-form'
+import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -20,14 +20,19 @@ import {
   SelectGroup,
   SelectItem,
   SelectTrigger,
-  WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { SelectionListState } from 'ui-patterns/SelectionListState'
 
 import { DEFAULT_DUCKLAKE_POOL_SIZE, STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
+import {
+  isMetadataListErrorVisible,
+  isMetadataListLoading,
+  useRefreshOnOpen,
+} from '../useRefreshOnOpen'
 import {
   DUCKLAKE_MODE_CUSTOM,
   DUCKLAKE_MODE_SUPABASE,
@@ -76,15 +81,14 @@ const DuckLakeModeSelector = ({
           <button
             key={option.value}
             type="button"
+            tabIndex={0}
             role="radio"
             aria-checked={selected}
             onClick={() => onChange(option.value)}
             className={cn(
               'relative flex flex-col gap-y-3 rounded-md border p-4 text-left transition',
-              'hover:border-foreground-muted',
-              selected
-                ? 'border-foreground-muted bg-surface-300 ring-1 ring-border'
-                : 'border-default bg-surface-100'
+              'hover:border-control-hover',
+              selected ? 'border-control-hover bg-surface-300' : 'border-default bg-surface-100'
             )}
           >
             <div className="flex items-start justify-between">
@@ -107,7 +111,10 @@ const DuckLakeModeSelector = ({
 }
 
 const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
-  const { ducklakeStorageProjectRef } = form.watch()
+  const ducklakeStorageProjectRef = useWatch({
+    control: form.control,
+    name: 'ducklakeStorageProjectRef',
+  })
 
   const [showNewBucketDialog, setShowNewBucketDialog] = useState(false)
   const [newBucketName, setNewBucketName] = useState('')
@@ -152,7 +159,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
     const name = newBucketName.trim()
     if (!name || !ducklakeStorageProjectRef) return
     if (name.includes('/')) {
-      return toast.error('Bucket name cannot contain "/"')
+      return toast.error('Bucket name cannot contain "/".')
     }
 
     createBucket({
@@ -195,7 +202,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
               <div className="flex flex-col gap-y-2">
                 {renderRegionWarning(field.value)}
                 <span>
-                  Warehouse connects to this project's Postgres instance to store the DuckLake
+                  Pipelines connects to this project's Postgres instance to store the DuckLake
                   catalog
                 </span>
               </div>
@@ -306,7 +313,6 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
               </div>
               <Button
                 type="button"
-                variant="default"
                 icon={<Plus />}
                 disabled={!ducklakeStorageProjectRef}
                 onClick={() => setShowNewBucketDialog(true)}
@@ -338,13 +344,13 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
           <DialogFooter>
             <Button
               type="button"
-              variant="default"
               disabled={isCreatingBucket}
               onClick={() => setShowNewBucketDialog(false)}
             >
               Cancel
             </Button>
             <Button
+              variant="primary"
               type="button"
               loading={isCreatingBucket}
               disabled={!newBucketName.trim()}
@@ -405,7 +411,6 @@ const DuckLakeCustomFields = ({
                   actions={
                     <div className="flex items-center justify-center">
                       <Button
-                        variant="default"
                         className="w-7"
                         icon={showCatalogUrl ? <Eye /> : <EyeOff />}
                         onClick={() => setShowCatalogUrl(!showCatalogUrl)}
@@ -517,7 +522,6 @@ const DuckLakeCustomFields = ({
                 />
               </FormControl>
               <Button
-                variant="default"
                 icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
                 className="w-7 absolute right-6 top-[4px]"
                 onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
@@ -641,7 +645,8 @@ export const DuckLakeFields = ({
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
 }) => {
-  const ducklakeMode = (form.watch('ducklakeMode') ?? DUCKLAKE_MODE_SUPABASE) as DucklakeMode
+  const ducklakeMode = (useWatch({ control: form.control, name: 'ducklakeMode' }) ??
+    DUCKLAKE_MODE_SUPABASE) as DucklakeMode
   // The platform API resolves "Use Supabase" config into a flat catalog URL + provisioned S3
   // credentials before persisting, so an existing destination can only be edited as custom
   // parameters — the original project selections aren't recoverable.
@@ -687,8 +692,10 @@ const ProjectSelection = ({
 
   const {
     data: projectsData,
-    isPending: isLoadingProjects,
+    isPending: isPendingProjects,
+    isFetching: isFetchingProjects,
     isError: isErrorProjects,
+    refetch: refetchProjects,
   } = useOrgProjectsInfiniteQuery(
     { slug: organization?.slug, statuses: [PROJECT_STATUS.ACTIVE_HEALTHY] },
     { enabled: !!organization?.slug }
@@ -701,6 +708,7 @@ const ProjectSelection = ({
       ),
     [projectsData]
   )
+  const isProjectsErrorVisible = isMetadataListErrorVisible(isErrorProjects, projects.length)
 
   const projectsByRef = useMemo(
     () => new Map(projects.map((project) => [project.ref, project])),
@@ -712,54 +720,40 @@ const ProjectSelection = ({
     const project = projectsByRef.get(ref)
     return project ? `${project.name} · ${project.ref}` : ref
   }
+  const { handleOpenChange: handleRefreshProjectsOnOpen } = useRefreshOnOpen({
+    isEnabled: !!organization?.slug,
+    refetch: refetchProjects,
+  })
 
-  if (isLoadingProjects) {
-    return (
-      <Button
-        disabled
-        variant="default"
-        className="w-full justify-between"
-        size="small"
-        iconRight={<Loader2 className="animate-spin" />}
-      >
-        Retrieving projects
-      </Button>
-    )
-  }
-  if (isErrorProjects) {
-    return (
-      <Button
-        disabled
-        variant="default"
-        className="w-full justify-start"
-        size="small"
-        icon={<WarningIcon />}
-      >
-        Failed to retrieve projects
-      </Button>
-    )
-  }
   return (
-    <Select value={value || ''} onValueChange={onChange}>
+    <Select value={value || ''} onValueChange={onChange} onOpenChange={handleRefreshProjectsOnOpen}>
       <SelectTrigger>{projectLabel(value) ?? placeholder}</SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {projects.length === 0 ? (
-            <SelectItem value="__no_projects__" disabled>
-              No active projects available
+          <SelectionListState
+            isLoading={isMetadataListLoading(
+              isPendingProjects || isFetchingProjects,
+              projects.length
+            )}
+            isError={isProjectsErrorVisible}
+            isEmpty={
+              !isMetadataListLoading(isPendingProjects || isFetchingProjects, projects.length) &&
+              !isProjectsErrorVisible &&
+              projects.length === 0
+            }
+            emptyLabel="No active projects available"
+            errorLabel="Unable to load projects"
+          />
+          {projects.map((project) => (
+            <SelectItem key={project.ref} value={project.ref}>
+              <div className="flex flex-col">
+                <span>{project.name}</span>
+                <span className="text-foreground-lighter">
+                  {project.ref} · {project.region}
+                </span>
+              </div>
             </SelectItem>
-          ) : (
-            projects.map((project) => (
-              <SelectItem key={project.ref} value={project.ref}>
-                <div className="flex flex-col">
-                  <span>{project.name}</span>
-                  <span className="text-foreground-lighter">
-                    {project.ref} · {project.region}
-                  </span>
-                </div>
-              </SelectItem>
-            ))
-          )}
+          ))}
         </SelectGroup>
       </SelectContent>
     </Select>
@@ -775,12 +769,17 @@ const BucketSelection = ({
   value: string | undefined
   onChange: (value: string) => void
 }) => {
-  const { ducklakeStorageProjectRef } = form.watch()
+  const ducklakeStorageProjectRef = useWatch({
+    control: form.control,
+    name: 'ducklakeStorageProjectRef',
+  })
 
   const {
     data: bucketsData,
-    isPending: isLoadingBuckets,
+    isPending: isPendingBuckets,
+    isFetching: isFetchingBuckets,
     isError: isErrorBuckets,
+    refetch: refetchBuckets,
   } = usePaginatedBucketsQuery(
     { projectRef: ducklakeStorageProjectRef },
     { enabled: !!ducklakeStorageProjectRef }
@@ -793,44 +792,24 @@ const BucketSelection = ({
       ),
     [bucketsData]
   )
+  const isBucketsErrorVisible = isMetadataListErrorVisible(isErrorBuckets, buckets.length)
+  const { handleOpenChange: handleRefreshBucketsOnOpen } = useRefreshOnOpen({
+    isEnabled: !!ducklakeStorageProjectRef,
+    refetch: refetchBuckets,
+  })
 
   if (!ducklakeStorageProjectRef) {
     return (
-      <Button disabled variant="default" className="w-full justify-start" size="small">
-        Select a storage project first
-      </Button>
-    )
-  }
-  if (isLoadingBuckets) {
-    return (
-      <Button
-        disabled
-        variant="default"
-        className="w-full justify-between"
-        size="small"
-        iconRight={<Loader2 className="animate-spin" />}
-      >
-        Retrieving buckets
-      </Button>
-    )
-  }
-  if (isErrorBuckets) {
-    return (
-      <Button
-        disabled
-        variant="default"
-        className="w-full justify-start"
-        size="small"
-        icon={<WarningIcon />}
-      >
-        Failed to retrieve buckets
-      </Button>
+      <Select disabled>
+        <SelectTrigger>Select a storage project first</SelectTrigger>
+      </Select>
     )
   }
 
   return (
     <Select
       value={value || ''}
+      onOpenChange={handleRefreshBucketsOnOpen}
       onValueChange={(e) => {
         if (e) onChange(e)
       }}
@@ -838,17 +817,22 @@ const BucketSelection = ({
       <SelectTrigger>{value || 'Select a bucket'}</SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {buckets.length === 0 ? (
-            <SelectItem value="__no_buckets__" disabled>
-              No buckets available
+          <SelectionListState
+            isLoading={isMetadataListLoading(isPendingBuckets || isFetchingBuckets, buckets.length)}
+            isError={isBucketsErrorVisible}
+            isEmpty={
+              !isMetadataListLoading(isPendingBuckets || isFetchingBuckets, buckets.length) &&
+              !isBucketsErrorVisible &&
+              buckets.length === 0
+            }
+            emptyLabel="No buckets available"
+            errorLabel="Unable to load buckets"
+          />
+          {buckets.map((bucket) => (
+            <SelectItem key={bucket.id} value={bucket.id}>
+              {bucket.name}
             </SelectItem>
-          ) : (
-            buckets.map((bucket) => (
-              <SelectItem key={bucket.id} value={bucket.id}>
-                {bucket.name}
-              </SelectItem>
-            ))
-          )}
+          ))}
         </SelectGroup>
       </SelectContent>
     </Select>

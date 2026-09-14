@@ -75,7 +75,7 @@ export const ProjectTableRow = ({
   return (
     <>
       <TableRow
-        className="cursor-pointer hover:bg-surface-200 inset-focus"
+        className="cursor-pointer hover:bg-surface-200 focus-inset"
         onClick={handleNavigation}
         onAuxClick={handleNavigation}
         onKeyDown={handleNavigation}
@@ -181,7 +181,6 @@ export const ProjectTableRow = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant="default"
                   icon={<MoreVertical />}
                   aria-label={`Project ${name} actions`}
                   className="w-7"

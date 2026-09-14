@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { useMemo } from 'react'
 
 import { generateSnippetTitle } from './SQLEditor.constants'
+import { deriveSnippetIdentity } from './SQLEditor.utils'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
@@ -23,13 +24,11 @@ export function useSnippetIdentity() {
     return [name, generateUuid([`${name}.sql`])]
   }, [urlId])
 
-  // the id is stable across renders - it depends either on the url or on the memoized generated id
-  const id = !urlId || urlId === 'new' ? generatedId : urlId
-
-  const snippetIsLoading = !(
-    id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined
-  )
-  const isLoading = urlId === 'new' ? false : snippetIsLoading
+  const { id, isLoading } = deriveSnippetIdentity({
+    urlId,
+    generatedId,
+    snippets: snapV2.snippets,
+  })
 
   return { id, urlId, generatedNewSnippetName, isLoading }
 }

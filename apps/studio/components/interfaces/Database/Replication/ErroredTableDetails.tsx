@@ -14,7 +14,7 @@ export const ErroredTableDetails = ({ table }: ErroredTableDetailsProps) => {
   const { ref: projectRef } = useParams()
 
   const state = table.state as Extract<ReplicationPipelineTableStatus['state'], { name: 'error' }>
-  const tableName = table.table_name
+  const tableName = `${table.schema}.${table.name}`
   const retryPolicy = state.retry_policy.policy
 
   if (!isValidRetryPolicy(state.retry_policy)) {

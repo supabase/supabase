@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -22,7 +23,7 @@ const ProjectBillingUsage: NextPageWithLayout = () => {
     let redirectUrl
 
     if (['cpu', 'ram', 'disk_io'].includes(hash)) {
-      redirectUrl = `/project/${ref}/settings/infrastructure#${hash}`
+      redirectUrl = `${getInfrastructurePath(ref)}#${hash}`
     } else {
       redirectUrl = `/org/${organization.slug}/usage?projectRef=${ref}`
     }

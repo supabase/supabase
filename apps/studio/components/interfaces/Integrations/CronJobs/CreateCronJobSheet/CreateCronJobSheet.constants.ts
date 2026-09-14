@@ -38,11 +38,13 @@ const addHttpHeaderIssues = (
   })
 }
 
+export const DEFAULT_TIMEOUT = 1000
+
 const edgeFunctionSchema = z.object({
   type: z.literal('edge_function'),
   method: z.enum(['GET', 'POST']),
   edgeFunctionName: z.string().trim().min(1, 'Please select one of the listed Edge Functions'),
-  timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
+  timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(DEFAULT_TIMEOUT),
   httpHeaders: httpHeadersSchema,
   httpBody: z
     .string()
@@ -69,7 +71,7 @@ const httpRequestSchema = z.object({
     invalidMessage: 'Please provide a valid URL',
     prefixMessage: 'Please prefix your URL with http:// or https://',
   }),
-  timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
+  timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(DEFAULT_TIMEOUT),
   httpHeaders: httpHeadersSchema,
   httpBody: z
     .string()

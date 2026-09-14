@@ -3,6 +3,7 @@ import type { KeyboardEvent, Ref } from 'react'
 import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
+import { EnableCleanupButton } from './CronJobsTab.EnableCleanupButton'
 import { onSearchInputEscape } from '@/lib/keyboard'
 
 interface CronJobsTabHeaderProps {
@@ -59,10 +60,13 @@ export const CronJobsTabHeader = ({
       />
 
       <div className="flex items-center gap-x-2">
-        <Button variant="default" icon={<RefreshCw />} loading={isRefreshing} onClick={onRefresh}>
+        <EnableCleanupButton onScheduled={onRefresh} />
+        <Button icon={<RefreshCw />} loading={isRefreshing} onClick={onRefresh}>
           Refresh
         </Button>
-        <Button onClick={onCreateJob}>Create job</Button>
+        <Button variant="primary" onClick={onCreateJob}>
+          Create job
+        </Button>
       </div>
     </div>
   )

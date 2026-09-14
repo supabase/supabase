@@ -28,6 +28,7 @@ const FeedbackButton = forwardRef<
 
   return (
     <button
+      tabIndex={0}
       ref={ref}
       className={cn(
         'mt-0',
@@ -77,12 +78,11 @@ function Feedback({ className }: { className?: string }) {
 
   const pathname = usePathname() ?? ''
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   const supabase = useConstant(() =>
-    IS_PLATFORM
-      ? createClient<Database>(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        )
+    IS_PLATFORM && supabaseUrl && supabaseAnonKey
+      ? createClient<Database>(supabaseUrl, supabaseAnonKey)
       : undefined
   )
 
@@ -141,9 +141,9 @@ function Feedback({ className }: { className?: string }) {
 
   return (
     <section className={cn('@container', className)} aria-labelledby="feedback-title">
-      <h3 id="feedback-title" className="block font-mono text-xs text-foreground-light mb-3">
+      <h2 id="feedback-title" className="block font-mono text-xs text-foreground-light mb-3">
         Is this helpful?
-      </h3>
+      </h2>
       <div className="relative flex flex-col gap-2 @[12rem]:gap-4 @[12rem]:flex-row @[12rem]:items-center">
         <div
           style={{ '--container-flex-gap': '0.5rem' } as CSSProperties}

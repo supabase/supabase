@@ -4,8 +4,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createSaveMechanism, type SaveMechanismStore } from './sql-editor-save'
 import type { StateSnippet } from './types'
 import type { SnippetFolder } from '@/data/content/sql-folders-query'
+import type { SqlSnippets } from '@/types'
 
-function makeStateSnippet(overrides: Partial<StateSnippet['snippet']> = {}): StateSnippet {
+function makeStateSnippet(
+  overrides: Omit<Partial<StateSnippet['snippet']>, 'type' | 'content'> & {
+    content?: SqlSnippets.Content
+  } = {}
+): StateSnippet {
   return {
     projectRef: 'ref',
     splitSizes: [50, 50],
@@ -150,6 +155,65 @@ describe('save mechanism — saveSnippet', () => {
     await vi.runAllTimersAsync()
 
     expect(t.upsertContent).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('save mechanism — saveFavorite', () => {
+  it('persists the snippet immediately, without debouncing', async () => {
+    const t = setup({ snippets: { 'snippet-1': makeStateSnippet({ favorite: true }) } })
+
+    await t.mechanism.saveFavorite({ id: 'snippet-1', projectRef: 'ref', previousFavorite: false })
+
+    expect(t.upsertContent).toHaveBeenCalledTimes(1)
+    expect(t.upsertContent).toHaveBeenCalledWith({
+      projectRef: 'ref',
+      payload: expect.objectContaining({ id: 'snippet-1', favorite: true }),
+    })
+    expect(t.state.snippets['snippet-1']!.snippet.status).toBe('saved')
+  })
+
+  it('cancels a pending debounced content save for the same id', async () => {
+    vi.useFakeTimers()
+    const t = setup({ snippets: { 'snippet-1': makeStateSnippet({ favorite: true }) } })
+
+    t.mechanism.saveSnippet({ id: 'snippet-1', projectRef: 'ref', shouldInvalidate: false })
+    await t.mechanism.saveFavorite({ id: 'snippet-1', projectRef: 'ref', previousFavorite: false })
+    await vi.runAllTimersAsync()
+
+    // Only the immediate favorite save fired — the debounced one never ran.
+    expect(t.upsertContent).toHaveBeenCalledTimes(1)
+    vi.useRealTimers()
+  })
+
+  it('invalidates the lists on a successful save, so the Favorites nav section refetches', async () => {
+    const t = setup({ snippets: { 'snippet-1': makeStateSnippet({ favorite: true }) } })
+
+    await t.mechanism.saveFavorite({ id: 'snippet-1', projectRef: 'ref', previousFavorite: false })
+
+    expect(t.invalidate).toHaveBeenCalledWith('ref')
+  })
+
+  it('rolls back to previousFavorite, notifies, and does NOT invalidate when the save fails', async () => {
+    const t = setup({
+      snippets: { 'snippet-1': makeStateSnippet({ favorite: true, status: 'saved' }) },
+    })
+    t.upsertContent.mockRejectedValueOnce(new Error('network'))
+
+    await t.mechanism.saveFavorite({ id: 'snippet-1', projectRef: 'ref', previousFavorite: false })
+
+    expect(t.state.snippets['snippet-1']!.snippet.favorite).toBe(false)
+    expect(t.state.snippets['snippet-1']!.snippet.status).toBe('save_failed')
+    expect(t.notify.error).toHaveBeenCalled()
+    expect(t.invalidate).not.toHaveBeenCalled()
+  })
+
+  it('does NOT call upsertContent for a snippet whose content is not loaded', async () => {
+    const snippet = makeStateSnippet({ content: undefined })
+    const t = setup({ snippets: { 'snippet-1': snippet } })
+
+    await t.mechanism.saveFavorite({ id: 'snippet-1', projectRef: 'ref', previousFavorite: false })
+
+    expect(t.upsertContent).not.toHaveBeenCalled()
   })
 })
 

@@ -19,8 +19,7 @@ export const getIntervalGranularity = (from: string, to: string): AnalyticsInter
 
   if (diffInHours <= 1) return '1m'
   if (diffInHours <= 12) return '2m'
-  if (diffInHours <= 24) return '10m'
-  if (diffInDays <= 7) return '30m'
+  if (diffInDays <= 7) return '1h'
   return '1d'
 }
 

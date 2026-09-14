@@ -22,7 +22,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { useS3VectorsWrapperExtension } from '../useS3VectorsWrapper'
@@ -58,11 +58,11 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
     <Sheet open={open} onOpenChange={setOpen}>
       {/* Move into overflow menu after vectors added */}
       <SheetTrigger asChild>
-        <Button variant="default" icon={<ListPlus size={12} className="text-foreground-lighter" />}>
+        <Button icon={<ListPlus size={12} className="text-foreground-lighter" />}>
           Insert vectors
         </Button>
       </SheetTrigger>
-      <SheetContent tabIndex={undefined}>
+      <SheetContent>
         <div className="flex flex-col h-full" tabIndex={-1}>
           <SheetHeader>
             <SheetTitle>
@@ -219,7 +219,6 @@ const result = await index.putVectors({
                   Language
                 </span>
                 <Button
-                  variant="default"
                   iconRight={<ChevronDown size={14} strokeWidth={2} />}
                   className="rounded-l-none"
                 >
@@ -268,11 +267,7 @@ const result = await index.putVectors({
             type="default"
             title="Insert data via SQL with a Foreign Data Wrapper"
             description="Data from vector tables can be queried and inserted from Postgres with the S3 Vectors Wrapper as foreign tables."
-            actions={
-              <Button variant="default" onClick={onSelectQueryFromPostgres}>
-                Query from Postgres
-              </Button>
-            }
+            actions={<Button onClick={onSelectQueryFromPostgres}>Query from Postgres</Button>}
           />
         ) : (
           <>
@@ -284,11 +279,7 @@ const result = await index.putVectors({
               value={sqlCode}
             />
             <div className="flex justify-end">
-              <Button
-                variant="default"
-                asChild
-                icon={<SqlEditor size={12} className="text-foreground-lighter" />}
-              >
+              <Button asChild icon={<SqlEditor size={12} className="text-foreground-lighter" />}>
                 <Link
                   target="_blank"
                   rel="noreferrer"

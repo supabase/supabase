@@ -116,7 +116,6 @@ const ResourcePicker = ({ category, resource, renderResourceList }: ResourcePick
     <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger asChild>
         <Button
-          variant="default"
           size="small"
           className="w-full justify-between gap-2"
           iconRight={<Code className="rotate-90" />}
@@ -153,6 +152,7 @@ const MenuItems = ({ category, menuItemFilter }: MenuItemsProps) => {
       {menuItems.map((item) => (
         <button
           key={item.key}
+          tabIndex={0}
           className="w-full text-left text-sm text-foreground-light px-4 hover:text-foreground"
           onClick={() => navigateToSection(item.key)}
         >

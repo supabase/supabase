@@ -20,7 +20,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import BarChart from '@/components/ui/Charts/BarChart'
@@ -189,7 +189,7 @@ export const ChartConfig = ({
         </div>
 
         {!acknowledged && (
-          <Admonition showIcon={false} type="tip" className="p-2 relative group">
+          <Admonition showIcon={false} type="note" className="p-2 relative group">
             <Tooltip>
               <TooltipTrigger
                 onClick={() => setAcknowledged(true)}
@@ -206,7 +206,7 @@ export const ChartConfig = ({
             <p className="text-xs text-foreground-light mt-1!">
               SQL snippets can now be added and saved to your custom reports. Try it out now!
             </p>
-            <Button asChild size="tiny" variant="default" className="mt-1">
+            <Button asChild size="tiny" className="mt-1">
               <Link href={`/project/${ref}/reports`}>Head to Reports</Link>
             </Button>
           </Admonition>

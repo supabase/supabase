@@ -67,6 +67,7 @@ const TopNavDropdown = () => {
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild className="flex">
         <button
+          tabIndex={0}
           title="Menu dropdown button"
           className={cn(
             buttonVariants({ variant: 'default' }),

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { Button, cn, CriticalIcon, Separator } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
@@ -63,7 +63,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
           </p>
         </div>
 
-        <Button asChild variant="default" className="w-min">
+        <Button asChild className="w-min">
           <Link
             href={`/project/${ref}/logs/explorer?q=${encodeURIComponent(API_LOGS_QUERY(user.id ?? ''))}`}
           >
@@ -109,7 +109,6 @@ export const UserLogs = ({ user }: UserLogsProps) => {
             </Button>
           </div>
           <Button
-            variant="default"
             loading={isLoadingAuthLogs}
             disabled={isLoadingAuthLogs}
             icon={<RefreshCw />}

@@ -1,10 +1,10 @@
-import { type RefObject } from 'react'
-import { Admonition } from 'ui-patterns/admonition'
+import { Check, Copy } from 'lucide-react'
+import { useEffect, useState, type RefObject } from 'react'
+import { copyToClipboard } from 'ui'
 
-import CopyButton from '@/components/ui/CopyButton'
-import { BASE_PATH } from '@/lib/constants'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
-interface CopyPromptAdmonitionProps {
+interface CopyPromptButtonProps {
   stepsContainerRef: RefObject<HTMLDivElement | null>
   /** When set, the Copy prompt button uses this verbatim instead of scraping the steps. */
   customPrompt?: string
@@ -21,7 +21,9 @@ const normalizeTextLines = (value: string) => {
 const getStepTextContent = (contentElement: HTMLElement) => {
   const clone = contentElement.cloneNode(true) as HTMLElement
   clone
-    .querySelectorAll('pre, button, svg, input, textarea, select, [aria-hidden="true"]')
+    .querySelectorAll(
+      'pre, button, svg, input, textarea, select, [aria-hidden="true"], [data-connect-prompt-ignore]'
+    )
     .forEach((element) => {
       element.remove()
     })
@@ -45,6 +47,7 @@ const getStepCodeSnippets = (contentElement: HTMLElement) => {
   }
 
   const getSnippet = (element: Element) => {
+    if (element.closest('[data-connect-prompt-ignore]')) return undefined
     const copyValueElement = element.closest('[data-connect-copy-value]') as HTMLElement | null
     return copyValueElement?.dataset.connectCopyValue?.trim() || element.textContent?.trim()
   }
@@ -62,7 +65,7 @@ const getStepCodeSnippets = (contentElement: HTMLElement) => {
     if (tabSnippets.length === 0) {
       const inlineSnippets = Array.from(tabContent.querySelectorAll('code'))
         .filter((code) => !code.closest('pre') && code.closest('.font-mono'))
-        .map((code) => code.textContent?.trim())
+        .map(getSnippet)
         .filter((snippet): snippet is string => Boolean(snippet))
       inlineSnippets.forEach((snippet, index) => {
         const inlineLabel = inlineSnippets.length > 1 ? `${label} (part ${index + 1})` : label
@@ -87,7 +90,7 @@ const getStepCodeSnippets = (contentElement: HTMLElement) => {
     if (code.closest('pre')) return
     if (code.closest('[data-connect-tab-content]')) return
     if (!code.closest('.font-mono')) return
-    const snippet = code.textContent?.trim()
+    const snippet = getSnippet(code)
     if (snippet) addSnippet('Code', snippet)
   })
 
@@ -125,42 +128,35 @@ export const buildConnectPrompt = (stepsContainer: HTMLElement | null) => {
   return promptContent
 }
 
-export function CopyPromptAdmonition({
-  stepsContainerRef,
-  customPrompt,
-}: CopyPromptAdmonitionProps) {
-  const handleCopyPrompt = () => {
-    return customPrompt ?? buildConnectPrompt(stepsContainerRef.current)
-  }
+export function CopyPromptButton({ stepsContainerRef, customPrompt }: CopyPromptButtonProps) {
+  const [showCopied, setShowCopied] = useState(false)
+
+  useEffect(() => {
+    if (!showCopied) return
+    const timer = setTimeout(() => setShowCopied(false), 2000)
+    return () => clearTimeout(timer)
+  }, [showCopied])
 
   return (
-    <Admonition
-      type="tip"
-      showIcon={false}
-      layout="horizontal"
-      actions={
-        <CopyButton variant="default" copyLabel="Copy prompt" asyncText={handleCopyPrompt} />
-      }
-    >
-      <div className="absolute -inset-16 z-0 opacity-50">
-        <img
-          src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
-          alt="Supabase Grafana"
-          className="w-full h-full object-cover object-right hidden dark:block"
-        />
-        <img
-          src={`${BASE_PATH}/img/reports/bg-grafana-light.svg`}
-          alt="Supabase Grafana"
-          className="w-full h-full object-cover object-right dark:hidden"
-        />
-        <div className="absolute inset-0 bg-linear-to-r from-background-alternative to-transparent" />
-      </div>
-
-      <div className="relative flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between">
-        <div className="flex flex-col gap-y-0.5">
-          <p className="heading-default">Give your agent everything it needs</p>
-        </div>
-      </div>
-    </Admonition>
+    <>
+      <ButtonTooltip
+        icon={showCopied ? <Check strokeWidth={2} className="text-brand" /> : <Copy />}
+        onClick={() => {
+          const textToCopy = customPrompt ?? buildConnectPrompt(stepsContainerRef.current)
+          copyToClipboard(textToCopy, () => setShowCopied(true))
+        }}
+        tooltip={{
+          content: {
+            side: 'left',
+            text: 'Copy these steps for your coding agent',
+          },
+        }}
+      >
+        {showCopied ? 'Copied' : 'Copy prompt'}
+      </ButtonTooltip>
+      <span className="sr-only" role="status" aria-live="polite">
+        {showCopied ? 'Copied' : ''}
+      </span>
+    </>
   )
 }

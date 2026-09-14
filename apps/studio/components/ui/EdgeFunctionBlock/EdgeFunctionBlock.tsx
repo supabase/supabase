@@ -2,7 +2,7 @@ import { Code } from 'lucide-react'
 import Link from 'next/link'
 import type { DragEvent, ReactNode } from 'react'
 import { Button, cn } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
 import { ReportBlockContainer } from '@/components/interfaces/Reports/ReportBlock/ReportBlockContainer'
@@ -48,6 +48,7 @@ interface EdgeFunctionBlockProps {
   onConfirmReplace?: () => void
   /** Handler for triggering a deploy */
   onDeploy?: () => void
+  className?: string
 }
 
 export const EdgeFunctionBlock = ({
@@ -70,6 +71,7 @@ export const EdgeFunctionBlock = ({
   onDeploy,
   draggable = false,
   onDragStart,
+  className,
 }: EdgeFunctionBlockProps) => {
   const resolvedFunctionUrl = functionUrl ?? 'Function URL will be available after deployment'
   const resolvedDownloadCommand = downloadCommand ?? `supabase functions download ${functionName}`
@@ -84,6 +86,7 @@ export const EdgeFunctionBlock = ({
       loading={isDeploying}
       draggable={draggable}
       onDragStart={onDragStart}
+      className={className}
       actions={
         hideDeployButton || !onDeploy ? (
           (actions ?? null)

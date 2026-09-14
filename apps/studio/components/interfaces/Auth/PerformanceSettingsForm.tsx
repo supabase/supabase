@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -112,7 +112,7 @@ export const PerformanceSettingsForm = () => {
     },
   })
 
-  const chosenUnit = databaseForm.watch('DB_MAX_POOL_SIZE_UNIT')
+  const chosenUnit = useWatch({ control: databaseForm.control, name: 'DB_MAX_POOL_SIZE_UNIT' })
 
   const onSubmitRequestDurationForm = (values: any) => {
     if (!project?.ref) return console.error('Project ref is required')
@@ -267,9 +267,7 @@ export const PerformanceSettingsForm = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {requestDurationForm.formState.isDirty && (
-                  <Button variant="default" onClick={() => requestDurationForm.reset()}>
-                    Cancel
-                  </Button>
+                  <Button onClick={() => requestDurationForm.reset()}>Cancel</Button>
                 )}
                 <Button
                   variant={promptUpgrade ? 'default' : 'primary'}
@@ -411,9 +409,7 @@ export const PerformanceSettingsForm = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {databaseForm.formState.isDirty && (
-                  <Button variant="default" onClick={() => databaseForm.reset()}>
-                    Cancel
-                  </Button>
+                  <Button onClick={() => databaseForm.reset()}>Cancel</Button>
                 )}
                 <Button
                   variant={promptUpgrade ? 'default' : 'primary'}

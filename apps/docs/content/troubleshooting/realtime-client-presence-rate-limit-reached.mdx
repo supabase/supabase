@@ -1,0 +1,51 @@
+---
+title = "Realtime: ClientPresenceRateLimitReached error"
+date_created = "2026-07-30T00:00:00+00:00"
+topics = [ "realtime" ]
+keywords = [ "presence", "track", "untrack", "rate limit", "ClientPresenceRateLimitReached", "cursor", "high-frequency", "broadcast", "shutdown" ]
+
+[[errors]]
+code = "ClientPresenceRateLimitReached"
+message = "Client presence rate limit exceeded"
+---
+
+If a client sends Presence updates too frequently, you may see this error code in your [Realtime logs](/dashboard/project/_/logs/realtime-logs):
+
+```
+ClientPresenceRateLimitReached
+```
+
+On the client side, the channel receives a `system` error message and is then closed. Any Presence, Broadcast, or Postgres Changes subscriptions on that channel stop until the client reconnects.
+
+This error almost always means Presence is being used for high-frequency updates that it isn't designed for. This guide explains the limit, why it exists, and how to fix it.
+
+## Why the error occurs
+
+Each client has a per-connection limit on how often it can send Presence updates. By default, a client can send at most **5 Presence updates within a 30-second window**. Both `track()` and `untrack()` calls count toward this limit. When a client exceeds it, Realtime logs `ClientPresenceRateLimitReached` and shuts the channel down.
+
+This is a per-client safeguard, and it is separate from the project-wide presence events per second limit (logged as `PresenceRateLimitReached`). A single client can hit `ClientPresenceRateLimitReached` on its own, even when overall project usage is low.
+
+The limit exists because Presence syncs state through the server and notifies **every** subscriber on the channel on each change. A client that calls `track()` in a tight loop—for example, on every mouse move to share a cursor position—multiplies its updates across all subscribers and degrades the channel for everyone. The rate limit stops one client from doing this.
+
+## How to fix it
+
+The fix is to stop sending frequent Presence updates. Choose the option that matches your use case.
+
+### Use Broadcast for high-frequency updates
+
+Presence is meant for slow-changing state such as online/offline status, the document a user is viewing, or which page they're on. For high-frequency or fire-and-forget data—live cursors, typing indicators, pointer positions—use [Broadcast](/docs/guides/realtime/broadcast) instead. Broadcast relays messages through Realtime to connected clients without maintaining synced Presence state, so it handles rapid updates without triggering this limit.
+
+### Throttle your Presence updates
+
+If you do need Presence for state that changes often, throttle your `track()` and `untrack()` calls so the client sends at most a few Presence updates per window. Only update Presence when the shared state changes, and coalesce bursts into a single update rather than sending one on every event.
+
+## How to prevent it
+
+- Reserve Presence for slow-changing state, and reach for [Broadcast](/docs/guides/realtime/broadcast) for anything that updates rapidly. See the guidance in the [Presence guide](/docs/guides/realtime/presence).
+- Call `track()` only when the shared state changes, not on a timer or on every input event.
+
+## Related resources
+
+- [Presence](/docs/guides/realtime/presence) — when to use Presence and how it works
+- [Broadcast](/docs/guides/realtime/broadcast) — the right tool for high-frequency updates
+- [Realtime limits](/docs/guides/realtime/limits) — other limits that apply to your project

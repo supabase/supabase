@@ -85,6 +85,42 @@ Behind the scenes, the code exchange requires a code verifier. Both the code in 
 
 The code verifier is created and stored locally when the Auth flow is first initiated. That means the code exchange must be initiated on the same browser and device where the flow was started.
 
+## Overlapping flows
+
+If more than one PKCE flow is started on the same browser before either one completes (for example, `signInWithOAuth()` called in two tabs), the code verifier stored for the earlier flow is overwritten by the later one, and exchanging the first flow's code fails.
+
+<Admonition type="caution" title="Experimental">
+
+Support for overlapping flows is currently experimental and requires explicit opt-in as the API may change without notice.
+
+</Admonition>
+
+To keep each flow's verifier separate, set the `appendPkceFlowIdToRedirects` option when creating the client:
+
+```js
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    experimental: { appendPkceFlowIdToRedirects: true },
+  },
+})
+```
+
+With this enabled, the client library appends a `sb_flow_id` query parameter to `redirectTo`, so your OAuth callback page can read it back and use it to select the matching verifier. You can also get the flow ID directly from the response of `signInWithOAuth()`:
+
+```js
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider: 'github',
+})
+
+const flowId = data.flowId
+```
+
+Pass the flow ID to `exchangeCodeForSession()` to make sure the correct verifier is used, whether you read it from `data.flowId` or from the `sb_flow_id` query parameter in the redirect URL:
+
+```js
+const { data, error } = await supabase.auth.exchangeCodeForSession(authCode, { flowId })
+```
+
 ## Resources
 
 - [OAuth 2.0 guide](https://oauth.net/2/pkce/) to PKCE flow

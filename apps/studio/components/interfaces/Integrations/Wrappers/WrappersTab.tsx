@@ -84,7 +84,7 @@ export const WrappersTab = () => {
       )}
 
       <Sheet open={!!isCreating} onOpenChange={handleOpenChange}>
-        <SheetContent size="lg" tabIndex={undefined}>
+        <SheetContent size="lg">
           {wrapperMeta && (
             <CreateWrapperSheet
               wrapperMeta={wrapperMeta}

@@ -1,6 +1,5 @@
 import { useParams } from 'common'
-import { AnalyticsBucket, BigQuery, ClickHouse, Database } from 'icons'
-import { Minus, Snowflake } from 'lucide-react'
+import { Minus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -16,6 +15,7 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteDestination } from './DeleteDestination'
+import { DestinationLogo } from './DestinationLogo'
 import { PipelineStatus } from './PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { getFormattedLagValue } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
@@ -149,21 +149,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       )}
       {isPipelineSuccess && (
         <TableRow>
-          <TableCell>
-            {type === 'BigQuery' ? (
-              <BigQuery size={18} className="text-foreground-light" />
-            ) : type === 'Analytics Bucket' ? (
-              <AnalyticsBucket size={18} className="text-foreground-light" />
-            ) : type === 'DuckLake' ? (
-              <Database size={18} className="text-foreground-light" />
-            ) : type === 'Snowflake' ? (
-              <Snowflake size={18} className="text-foreground-light" />
-            ) : type === 'ClickHouse' ? (
-              <ClickHouse size={18} className="text-foreground-light" />
-            ) : (
-              <Database size={18} className="text-foreground-light" />
-            )}
-          </TableCell>
+          <TableCell>{type ? <DestinationLogo type={type} /> : null}</TableCell>
 
           <TableCell className="max-w-[180px]">
             {isPipelineLoading ? (
@@ -232,7 +218,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                   </TooltipContent>
                 </Tooltip>
               )}
-              <Button asChild variant="default" className="relative">
+              <Button asChild className="relative">
                 <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
                   View pipeline
                 </Link>

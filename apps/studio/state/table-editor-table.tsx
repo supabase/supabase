@@ -93,8 +93,10 @@ export const createTableEditorTableState = ({
 
       state.table = supaTable
       state.gridColumns = gridColumns
-      state.originalTable = table
+      // ref() must run before the assignment below — otherwise valtio's proxy() would wrap
+      // and mutate `table`'s nested properties in place, corrupting the shared react-query cache object
       state._originalTableRef = ref(table)
+      state.originalTable = table
     },
 
     /* Rows */

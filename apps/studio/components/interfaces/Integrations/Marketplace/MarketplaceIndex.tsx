@@ -229,7 +229,7 @@ export const MarketplaceIndex = () => {
             </PageHeaderDescription>
           </PageHeaderSummary>
           <div className="flex shrink-0 items-center gap-2">
-            <DocsButton href={`${DOCS_URL}/guides/integrations/partner-catalog`} />
+            <DocsButton href={`${DOCS_URL}/guides/integrations`} />
           </div>
         </PageHeaderMeta>
       </PageHeader>
@@ -281,9 +281,7 @@ export const MarketplaceIndex = () => {
 
             {filtered.length === 0 && (
               <EmptyStatePresentational title="No results found">
-                <Button variant="default" onClick={clearAll}>
-                  Clear filters
-                </Button>
+                <Button onClick={clearAll}>Clear filters</Button>
               </EmptyStatePresentational>
             )}
 

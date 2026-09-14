@@ -4,7 +4,7 @@ import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -174,7 +174,7 @@ function PublicBucketWarningView(props: PublicBucketWarningViewProps): ReactNode
         }
         actions={
           <div className="flex gap-2">
-            <Button variant="default" size="tiny" onClick={onDismiss}>
+            <Button size="tiny" onClick={onDismiss}>
               Dismiss
             </Button>
             <Button variant="warning" size="tiny" onClick={onShowModal}>

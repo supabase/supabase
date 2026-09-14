@@ -23,6 +23,29 @@
   @apply w-full mx-auto max-w-7xl px-6 lg:px-12 xl:px-24;
 }
 
+/**
+ * Legal documents must paint the exact characters that are in their source text.
+ *
+ * Manrope is `--font-heading`, which the base layer below applies to h1-h6. Its
+ * GSUB `liga` feature -- the *standard* ligature feature, which every browser
+ * enables by default -- maps the glyph sequence `parenleft c parenright` to a
+ * composite glyph built from `copyright`. So an MDX heading written as
+ * `#### (c) Security.` is a literal ASCII `(c)` in the DOM but paints as a
+ * copyright sign: the substitution happens at glyph-shaping time, not in the
+ * text. The same feature also folds `--`, `->`, `<-`, `(>)` and `<3`.
+ *
+ * Body copy is unaffected because it uses Inter (`--font-sans`), whose Google
+ * Fonts latin subset carries no such ligature -- hence headings break while
+ * paragraphs on the same page render `(c)` and `6.1(a)(iv)` correctly.
+ *
+ * Disabling common ligatures keeps legal prose character-exact. Scoped to the
+ * legal document container rather than `.prose`, which is shared with the blog
+ * and marketing pages where these ligatures are wanted.
+ */
+@utility legal-prose {
+  font-variant-ligatures: no-common-ligatures;
+}
+
 @theme {
   --color-purple-sos-100: hsl(293 80% 97%);
   --color-purple-sos-200: hsl(293 85% 91%);

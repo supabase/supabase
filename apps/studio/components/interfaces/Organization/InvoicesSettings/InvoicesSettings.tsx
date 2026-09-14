@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import { ChevronLeft, ChevronRight, FileText, Receipt, ScrollText } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 import {
   Button,
@@ -56,13 +57,16 @@ export const InvoicesSettings = () => {
   const isPartnerBilledOrganization = isPartnerBillingOrganization(
     selectedOrganization?.billing_partner
   )
+
+  const { ref, inView } = useInView({ triggerOnce: true })
+
   const offset = (page - 1) * PAGE_LIMIT
 
   const { data: count, isError: isErrorCount } = useInvoicesCountQuery(
     {
       slug,
     },
-    { enabled: !isPartnerBilledOrganization }
+    { enabled: !isPartnerBilledOrganization && inView }
   )
   const {
     data,
@@ -75,7 +79,7 @@ export const InvoicesSettings = () => {
       offset,
       limit: PAGE_LIMIT,
     },
-    { enabled: !isPartnerBilledOrganization }
+    { enabled: !isPartnerBilledOrganization && inView }
   )
   const invoices = data || []
 
@@ -86,7 +90,11 @@ export const InvoicesSettings = () => {
   const fetchInvoice = async (id: string) => {
     try {
       const invoice = await getInvoice({ invoiceId: id, slug })
-      if (invoice?.invoice_pdf) window.open(invoice.invoice_pdf, '_blank')
+      if (invoice?.invoice_pdf) {
+        window.open(invoice.invoice_pdf, '_blank')
+      } else {
+        toast.error('Invoice PDF is not available yet. Please try again later.')
+      }
     } catch (error: any) {
       toast.error(`Failed to fetch the selected invoice: ${error.message}`)
     }
@@ -118,7 +126,7 @@ export const InvoicesSettings = () => {
     isLoading || invoices.length === 0 ? 'text-foreground-muted' : undefined
 
   return (
-    <Card>
+    <Card ref={ref}>
       <Table>
         <TableHeader>
           <TableRow>
@@ -167,6 +175,10 @@ export const InvoicesSettings = () => {
           ) : (
             <>
               {invoices.map((x) => {
+                // invoice_pdf can be null. Not reflected in the generated schema yet, but will
+                // be soon
+                const hasInvoicePdf = Boolean(x.invoice_pdf)
+
                 return (
                   <TableRow key={x.id}>
                     <TableCell className="w-2">
@@ -204,8 +216,17 @@ export const InvoicesSettings = () => {
                           variant="outline"
                           className="w-7"
                           icon={<ScrollText size={16} strokeWidth={1.5} />}
+                          aria-label="Download invoice"
+                          disabled={!hasInvoicePdf}
                           onClick={() => fetchInvoice(x.id)}
-                          tooltip={{ content: { side: 'bottom', text: 'Download invoice' } }}
+                          tooltip={{
+                            content: {
+                              side: 'bottom',
+                              text: hasInvoicePdf
+                                ? 'Download invoice'
+                                : 'Invoice PDF is not available yet. Please try again later.',
+                            },
+                          }}
                         />
 
                         {x.status === InvoiceStatus.PAID && x.amount_due > 0 && (
@@ -213,6 +234,7 @@ export const InvoicesSettings = () => {
                             variant="outline"
                             className="w-7"
                             icon={<Receipt size={16} strokeWidth={1.5} />}
+                            aria-label="Download receipt"
                             onClick={() => fetchReceipt(x.id)}
                             tooltip={{ content: { side: 'bottom', text: 'Download receipt' } }}
                           />
@@ -239,7 +261,6 @@ export const InvoicesSettings = () => {
             <Button
               icon={<ChevronLeft />}
               aria-label="Previous page"
-              variant="default"
               size="tiny"
               disabled={page === 1}
               onClick={async () => setPage(page - 1)}
@@ -247,7 +268,6 @@ export const InvoicesSettings = () => {
             <Button
               icon={<ChevronRight />}
               aria-label="Next page"
-              variant="default"
               size="tiny"
               disabled={page * PAGE_LIMIT >= (count ?? 0)}
               onClick={async () => setPage(page + 1)}

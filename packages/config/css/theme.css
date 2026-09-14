@@ -23,6 +23,10 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-field: var(--field);
+  --color-control-raised: var(--control-raised);
+  /* --control aliases --control-raised. Do not add --color-control — it would
+     collide with border-control and the legacy bg-control (accent) utility. */
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
   --color-destructive: var(--destructive);
@@ -37,7 +41,7 @@
   --color-foreground-light: var(--muted-foreground);
   --color-foreground-lighter: var(--tertiary-foreground);
   --color-foreground-muted: var(--foreground-muted);
-  --color-foreground-contrast: var(--primary-foreground);
+  --color-foreground-contrast: var(--foreground-contrast);
   --color-background-200: var(--background-200);
   --color-background-alternative-200: var(--background-alternative-200);
   --color-background-alternative: var(--background-alternative-default);
@@ -300,6 +304,8 @@
   --background-color-alternative: var(--background-alternative-default);
   --background-color-selection: var(--background-selection);
   --background-color-control: var(--background-control);
+  --background-color-field: var(--field);
+  --background-color-control-raised: var(--control-raised);
   --background-color-surface-75: var(--background-surface-75);
   --background-color-surface-100: var(--background-surface-100);
   --background-color-surface-200: var(--background-surface-200);
@@ -322,6 +328,7 @@
   --color-border-control: var(--border-control);
   --color-border-strong: var(--border-strong);
   --color-border-stronger: var(--border-stronger);
+  --color-border-control-hover: var(--border-control-hover);
   --color-border-destructive: var(--border-destructive);
   --color-border-warning: var(--border-warning);
   --color-border-info: var(--border-info);
@@ -336,6 +343,7 @@
   --border-color-control: var(--border-control);
   --border-color-strong: var(--border-strong);
   --border-color-stronger: var(--border-stronger);
+  --border-color-control-hover: var(--border-control-hover);
   --border-color-secondary: var(--border-secondary);
   --border-color-alternative: var(--border-alternative);
   --border-color-button: var(--border-button-default);
@@ -346,7 +354,7 @@
   --text-color-light: var(--muted-foreground);
   --text-color-lighter: var(--tertiary-foreground);
   --text-color-muted: var(--foreground-muted);
-  --text-color-contrast: var(--primary-foreground);
+  --text-color-contrast: var(--foreground-contrast);
 
   /* misc theme tokens — typography, breakpoints, sizing, transform-origin */
   --font-sans: var(

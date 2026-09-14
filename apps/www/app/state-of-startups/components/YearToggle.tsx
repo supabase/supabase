@@ -22,6 +22,7 @@ export function YearToggle({ className }: { className?: string }) {
         const active = option === year
         return (
           <button
+            tabIndex={0}
             key={option}
             type="button"
             role="radio"

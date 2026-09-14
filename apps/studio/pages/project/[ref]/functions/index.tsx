@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import React, { useMemo, useRef, type PropsWithChildren } from 'react'
 import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -165,12 +165,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                         shortcutId={SHORTCUT_IDS.FUNCTIONS_LIST_REFRESH}
                         side="bottom"
                       >
-                        <Button
-                          variant="default"
-                          icon={<RefreshCw />}
-                          loading={isFetching}
-                          onClick={() => refetch()}
-                        >
+                        <Button icon={<RefreshCw />} loading={isFetching} onClick={() => refetch()}>
                           Refresh
                         </Button>
                       </ShortcutTooltip>
@@ -244,7 +239,7 @@ export const EdgeFunctionsIndexPageWrapper = ({ children }: PropsWithChildren) =
           </PageHeaderSummary>
           <PageHeaderAside>
             <DocsButton href={`${DOCS_URL}/guides/functions`} />
-            <Button asChild variant="default" icon={<ExternalLink />}>
+            <Button asChild icon={<ExternalLink />}>
               <a
                 target="_blank"
                 rel="noreferrer"

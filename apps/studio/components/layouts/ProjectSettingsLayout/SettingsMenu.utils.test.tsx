@@ -80,6 +80,26 @@ describe('useGenerateSettingsMenu', () => {
     expect(hasMembers).toBe(false)
   })
 
+  it('uses Infrastructure as the canonical compute and disk destination', () => {
+    const { result } = renderHook(() => useGenerateSettingsMenu())
+    const configurationGroup = result.current.find((group) => group.title === 'Configuration')
+
+    expect(configurationGroup?.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: 'infrastructure',
+          name: 'Infrastructure',
+          url: '/project/project-ref/settings/infrastructure',
+        }),
+      ])
+    )
+    expect(
+      configurationGroup?.items.some(
+        (item) => item.key === 'compute-and-disk' || item.name === 'Compute and Disk'
+      )
+    ).toBe(false)
+  })
+
   it('includes dashboard in configuration when flag is enabled', () => {
     vi.mocked(useFlag).mockReturnValue(true)
 
@@ -147,9 +167,6 @@ describe('useGenerateSettingsMenu', () => {
     )
 
     expect(shortcutByKey.get('general')).toBe(SHORTCUT_IDS.NAV_PROJECT_SETTINGS_GENERAL)
-    expect(shortcutByKey.get('compute-and-disk')).toBe(
-      SHORTCUT_IDS.NAV_PROJECT_SETTINGS_COMPUTE_AND_DISK
-    )
     expect(shortcutByKey.get('infrastructure')).toBe(
       SHORTCUT_IDS.NAV_PROJECT_SETTINGS_INFRASTRUCTURE
     )

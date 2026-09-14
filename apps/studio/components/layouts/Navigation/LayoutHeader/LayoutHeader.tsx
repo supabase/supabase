@@ -235,7 +235,7 @@ export const LayoutHeader = ({
                     showShortcut={commandMenuEnabled}
                     placeholder="Search..."
                     className={cn(
-                      'hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent',
+                      'hidden md:flex md:min-w-32 xl:min-w-32 rounded-full',
                       '[&_.command-shortcut]:border-none',
                       '[&_.command-shortcut]:pr-2',
                       '[&_.command-shortcut]:bg-transparent',
@@ -262,13 +262,14 @@ export const LayoutHeader = ({
                 <div className="flex items-center gap-1 md:gap-2">
                   <CommandMenuTriggerInput
                     placeholder="Search..."
-                    className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
-                        [&_.command-shortcut]:border-none
-                        [&_.command-shortcut]:pr-2
-                        [&_.command-shortcut]:bg-transparent
-                        [&_.command-shortcut]:text-foreground-lighter
-                        [&_.command-shortcut]:shadow-none
-                      "
+                    className={cn(
+                      'hidden md:flex md:min-w-32 xl:min-w-32 rounded-full',
+                      '[&_.command-shortcut]:border-none',
+                      '[&_.command-shortcut]:pr-2',
+                      '[&_.command-shortcut]:bg-transparent',
+                      '[&_.command-shortcut]:text-foreground-lighter',
+                      '[&_.command-shortcut]:shadow-none'
+                    )}
                   />
                   <HelpButton />
                   <AdvisorButton projectRef={projectRef} />

@@ -16,6 +16,7 @@ export const CONTENT_DIRECTORY = join(DOCS_DIRECTORY, 'content')
 export const EXAMPLES_DIRECTORY = join(DOCS_DIRECTORY, 'examples')
 export const GUIDES_DIRECTORY = join(CONTENT_DIRECTORY, 'guides')
 export const PARTIALS_DIRECTORY = join(CONTENT_DIRECTORY, '_partials')
+export const GENERATED_DIRECTORY = join(DOCS_DIRECTORY, 'features/docs/generated')
 export const REF_DOCS_DIRECTORY = join(DOCS_DIRECTORY, 'docs/ref')
 export const SPEC_DIRECTORY = join(DOCS_DIRECTORY, 'spec')
 

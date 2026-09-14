@@ -13,6 +13,7 @@
     "clean": {
       "outputs": [],
       "cache": false,
+      "outputLogs": "errors-only",
     },
     "dev": {
       "cache": false,

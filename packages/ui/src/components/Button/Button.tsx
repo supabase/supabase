@@ -20,12 +20,9 @@ const buttonVariants = cva(
   ease-out
   duration-200
   rounded-md
-  outline-hidden
-  transition-all
-  outline-0
-  focus-visible:outline-solid
-  focus-visible:outline-4
-  focus-visible:outline-offset-1
+  transition-[background-color,border-color,color,scale]
+  motion-safe:active:scale-[0.97]
+  focus-ring
   border
   `,
   {
@@ -37,45 +34,34 @@ const buttonVariants = cva(
           text-foreground
           border-brand-500/75 dark:border-brand/30
           hover:border-brand-600 dark:hover:border-brand
-          focus-visible:outline-brand-600
           data-[state=open]:bg-brand-400/80 dark:data-[state=open]:bg-brand-500/80
-          data-[state=open]:outline-brand-600
           `,
         default: `
           text-foreground
-          bg-alternative dark:bg-muted  hover:bg-selection
-          border-strong hover:border-stronger
-          focus-visible:outline-border-strong
-          data-[state=open]:bg-selection
-          data-[state=open]:outline-border-strong
-          data-[state=open]:border-button-hover
+          bg-background dark:bg-card hover:bg-popover
+          border-strong hover:border-control-hover
+          data-[state=open]:bg-popover
+          data-[state=open]:border-control-hover
           `,
         secondary: `
           bg-foreground
           text-background hover:text-background/80
-          focus-visible:text-border-control
           border-foreground-light hover:border-foreground-lighter
-          focus-visible:outline-border-strong
           data-[state=open]:border-foreground-lighter
-          data-[state=open]:outline-border-strong
         `,
         outline: `
           text-foreground
           bg-transparent
           border-strong hover:border-foreground-muted
-          focus-visible:outline-border-strong
           data-[state=open]:border-stronger
-          data-[state=open]:outline-border-strong
         `,
         dashed: `
           text-foreground
           border
           border-dashed
-          border-strong hover:border-stronger
+          border-strong hover:border-control-hover
           bg-transparent
-          focus-visible:outline-border-strong
-          data-[state=open]:border-stronger
-          data-[state=open]:outline-border-strong
+          data-[state=open]:border-control-hover
         `,
         link: `
           text-brand-600
@@ -83,17 +69,13 @@ const buttonVariants = cva(
           border-transparent/0
           hover:bg-brand-400
           shadow-none
-          focus-visible:outline-border-strong
           data-[state=open]:bg-brand-400
-          data-[state=open]:outline-border-strong
         `,
         text: `
           text-foreground
           hover:bg-accent
           shadow-none
-          focus-visible:outline-border-strong
           data-[state=open]:bg-accent
-          data-[state=open]:outline-border-strong
           border-transparent
         `,
         danger: `
@@ -101,20 +83,16 @@ const buttonVariants = cva(
           bg-destructive-300 dark:bg-destructive-400 hover:bg-destructive-400 dark:hover:bg-destructive/50
           border-border-destructive hover:border-destructive
           hover:text-hi-contrast
-          focus-visible:outline-destructive
           data-[state=open]:border-destructive
           data-[state=open]:bg-destructive-400 dark:data-[state=open]:bg-destructive/50
-          data-[state=open]:outline-destructive
         `,
         warning: `
           text-foreground
           bg-warning-300 dark:bg-warning-400 hover:bg-warning-400 dark:hover:bg-warning/50
           border-border-warning hover:border-warning
           hover:text-hi-contrast
-          focus-visible:outline-warning
           data-[state=open]:border-warning
           data-[state=open]:bg-warning-400 dark:data-[state=open]:bg-warning/50
-          data-[state=open]:outline-warning
         `,
       },
       block: {
@@ -129,6 +107,9 @@ const buttonVariants = cva(
       },
       disabled: {
         true: 'opacity-50 cursor-not-allowed pointer-events-none',
+      },
+      focusableWhenDisabled: {
+        true: 'opacity-50 cursor-not-allowed',
       },
       rounded: {
         true: 'rounded-full',
@@ -206,6 +187,12 @@ export interface ButtonProps
   iconLeft?: React.ReactNode
   iconRight?: React.ReactNode
   rounded?: boolean
+  /**
+   * Keeps a disabled button keyboard-focusable by using `aria-disabled`
+   * instead of native `disabled`. Use this when the control needs a tooltip
+   * or other explanation.
+   */
+  focusableWhenDisabled?: boolean
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -213,7 +200,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     {
       asChild = false,
       size = 'tiny',
-      variant = 'primary',
+      variant = 'default',
       children,
       loading,
       block,
@@ -222,19 +209,23 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       iconLeft,
       type = 'button',
       rounded,
+      focusableWhenDisabled: focusableWhenDisabledProp,
       ...props
     },
     ref
   ) => {
     const Comp = asChild ? Slot.Slot : 'button'
-    const { className, tabIndex } = props
+    const { className, tabIndex, disabled: disabledProp, onClick, ...rest } = props
     const showIcon = loading || icon
     // decrecating 'showIcon' for rightIcon
     const _iconLeft: React.ReactNode = icon ?? iconLeft
+    const isLoading = loading === true
     // if loading, button is disabled
-    const disabled = loading === true || props.disabled
+    const disabled = isLoading || disabledProp === true
+    const focusableWhenDisabled = disabled && focusableWhenDisabledProp === true
+    const nativeDisabled = disabled && !focusableWhenDisabled
 
-    const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
+    const computedTabIndex = getExplicitTabIndex(tabIndex, nativeDisabled)
 
     const renderIconContainer = (content: ReactNode) => (
       <div aria-hidden className={cn(IconContainerVariants({ size, variant }))}>
@@ -242,26 +233,48 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       </div>
     )
 
+    const handleActivation = (e: React.MouseEvent, childOnClick?: React.MouseEventHandler) => {
+      if (disabled) {
+        e.preventDefault()
+        e.stopPropagation()
+        return
+      }
+
+      childOnClick?.(e)
+      if (!e.defaultPrevented) {
+        onClick?.(e as React.MouseEvent<HTMLButtonElement>)
+      }
+    }
+
     return (
       <Comp
         ref={ref}
         data-size={size}
         type={type}
-        {...props}
-        disabled={disabled}
+        {...rest}
+        aria-disabled={focusableWhenDisabled || undefined}
+        disabled={nativeDisabled}
         tabIndex={computedTabIndex}
-        className={cn(buttonVariants({ variant, size, disabled, block, rounded }), className)}
-        onClick={(e) => {
-          // [Joshen] Prevents redirecting if Button is used with a link-based child element
-          if (disabled) return e.preventDefault()
-          else props?.onClick?.(e)
-        }}
+        className={cn(
+          buttonVariants({
+            variant,
+            size,
+            disabled: nativeDisabled,
+            focusableWhenDisabled,
+            block,
+            rounded,
+          }),
+          className
+        )}
+        onClick={asChild ? undefined : (e) => handleActivation(e)}
       >
         {asChild ? (
-          isValidElement<{ children: ReactNode }>(children) ? (
+          isValidElement<{ children: ReactNode; onClick?: React.MouseEventHandler }>(children) ? (
             cloneElement(
               children,
-              undefined,
+              {
+                onClick: (e) => handleActivation(e, children.props.onClick),
+              },
               showIcon &&
                 (loading
                   ? renderIconContainer(

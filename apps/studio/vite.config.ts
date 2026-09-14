@@ -538,11 +538,44 @@ export default defineConfig(({ command, mode }) => {
   if (command === 'build') {
     // Next's types declare NODE_ENV as read-only, so cast to assign it.
     ;(process.env as Record<string, string>).NODE_ENV = 'production'
+  } else if (process.env.NODE_ENV === 'test') {
+    // `pnpm dev:studio-local` runs with a shell NODE_ENV=test (the Next
+    // path needs it to load `.env.test`), and Vite's
+    // define plugin inlines `process.env.NODE_ENV || mode` into the client —
+    // which would bake 'test' in and trip the vitest-only API_URL path.
+    // `next dev` always runs the bundle at 'development' regardless of the
+    // shell NODE_ENV; mirror that. Env-file selection is unaffected — the
+    // vite dev path selects `.env.test` via MODE=test (see envMode below),
+    // not NODE_ENV.
+    ;(process.env as Record<string, string>).NODE_ENV = 'development'
   }
+
+  // `pnpm dev:studio-local` needs the `.env.test` cascade (self-hosted mode
+  // plus the supabase-cli keys that generateLocalEnv.js writes) — the Next
+  // path selects it via NODE_ENV=test, and the tanstack build via
+  // `--mode test` (e2e:setup:selfhosted). But `vite dev --mode test` is not
+  // an option: TanStack Start's dev-server plugin treats mode 'test' as
+  // "running under vitest" and skips installing its SSR middleware entirely,
+  // so every route 404s (see the `isTest` guard in devServerPlugin,
+  // @tanstack/start-plugin-core). So dev keeps mode 'development' and
+  // emulates the env cascade of the mode named by MODE instead: load it for
+  // the NEXT_PUBLIC_* defines below, and seed process.env for the SSR
+  // runtime. The seeding must not clobber shell-provided values (matching
+  // serve.js), and survives TanStack's own load-env plugin: that plugin
+  // Object.assigns loadEnv(mode) at configResolved — after this runs — and
+  // loadEnv gives existing process.env values priority over env-file values.
+  const envMode = command === 'serve' && process.env.MODE ? process.env.MODE : mode
 
   // Inline NEXT_PUBLIC_* env vars at build time so `process.env.NEXT_PUBLIC_*`
   // works in the browser bundle (mirrors Next.js behaviour).
-  const env = loadEnv(mode, rootDir, '')
+  const env = loadEnv(envMode, rootDir, '')
+
+  if (envMode !== mode) {
+    const processEnv = process.env as Record<string, string | undefined>
+    for (const [key, value] of Object.entries(env)) {
+      processEnv[key] ??= value
+    }
+  }
   const publicEnvDefines = Object.fromEntries(
     Object.entries(env)
       .filter(([key]) => key.startsWith('NEXT_PUBLIC_'))
@@ -568,6 +601,19 @@ export default defineConfig(({ command, mode }) => {
       publicEnvDefines[`process.env.NEXT_PUBLIC_${key}`] = JSON.stringify(value)
     }
   }
+
+  // `MAINTENANCE_MODE` gates the "redirect everything to /maintenance" rule.
+  // It's deliberately unprefixed, and the other two consumers both read it at
+  // BUILD time: `next.config.ts` reads it in `redirects()`, which Next bakes
+  // into `routes-manifest.json` during `next build`, and `vercel.ts` reads it
+  // while emitting `vercel.json`. So flipping maintenance has always meant a
+  // rebuild/redeploy, never just a server restart. Inline it here on the same
+  // terms so the isomorphic `beforeLoad` in `routes/__root.tsx` — which
+  // mirrors those rules for the TanStack runtime — can read it on the client
+  // too, without self-hosters having to set a second, NEXT_PUBLIC_-prefixed
+  // var. Falls back to `''` (not left undefined) so the browser bundle never
+  // ends up with a bare `process.env` reference.
+  publicEnvDefines['process.env.MAINTENANCE_MODE'] = JSON.stringify(env.MAINTENANCE_MODE ?? '')
 
   // Sentry init (lib/sentry-client-options.ts, reached via router.tsx) reads
   // these at runtime in the browser. When a var is unset it gets no define
@@ -636,6 +682,15 @@ export default defineConfig(({ command, mode }) => {
   return {
     server: {
       port: 3000,
+    },
+    preview: {
+      // The prerender step (@tanstack/start-plugin-core) boots `vite preview`
+      // on an ephemeral port and crawls the first resolved URL. With the
+      // default host (`localhost`) the server can bind the IPv6 loopback
+      // while the crawler's fetch connects to 127.0.0.1 — split name
+      // resolution that ECONNREFUSEDs the whole prerender inside docker
+      // build containers. Pin both sides to IPv4 loopback.
+      host: '127.0.0.1',
     },
     resolve: {
       tsconfigPaths: true,
@@ -715,6 +770,25 @@ export default defineConfig(({ command, mode }) => {
     //   with `c is not a function` because its `styleHandler` import
     //   came in through the now-too-large `lucide-react` chunk). Pin
     //   React explicitly so it stays a leaf vendor chunk.
+    //
+    //   `packages/ui/src/components/shadcn/ui/field.tsx` — its only
+    //   non-barrel importer is Storage's `FileExplorerHeader`, so
+    //   Rolldown pools it into the storage bucket page chunk while the
+    //   `ui` package barrel (`packages/ui/index.tsx`) re-exports it —
+    //   `ui` ends up importing `FieldDescription` back from the page
+    //   chunk it's itself imported by.
+    //
+    //   `packages/ui/src/components/shadcn/ui/drawer.tsx` — same shape,
+    //   its only non-barrel importer sits inside the Logs Explorer page
+    //   tree (`DataTableFilterControlsDrawer`), so it gets pooled into
+    //   the `logs` page chunk while `ui`'s barrel re-exports it too.
+    //
+    //   `packages/ui/src/components/shadcn/ui/form.tsx` and
+    //   `packages/ui/src/components/shadcn/ui/sidebar.tsx` (+
+    //   `use-mobile.tsx`) — same shape again: each gets pooled into
+    //   whichever page/feature chunk happens to be its only non-barrel
+    //   importer (a form page, `components/interfaces/Sidebar.tsx`)
+    //   while `ui`'s barrel re-exports them too.
     build: {
       rollupOptions: {
         output: {
@@ -736,6 +810,21 @@ export default defineConfig(({ command, mode }) => {
             if (id.includes('node_modules/lucide-react/')) {
               return 'lucide-react'
             }
+            if (id.includes('packages/ui/src/components/shadcn/ui/field.tsx')) {
+              return 'ui-field'
+            }
+            if (id.includes('packages/ui/src/components/shadcn/ui/drawer.tsx')) {
+              return 'ui-drawer'
+            }
+            if (id.includes('packages/ui/src/components/shadcn/ui/form.tsx')) {
+              return 'ui-form'
+            }
+            if (
+              id.includes('packages/ui/src/components/shadcn/ui/sidebar.tsx') ||
+              id.includes('packages/ui/src/components/hooks/use-mobile.tsx')
+            ) {
+              return 'ui-sidebar'
+            }
             return undefined
           },
         },
@@ -750,11 +839,11 @@ export default defineConfig(({ command, mode }) => {
       postcss: { plugins: [] },
     },
     ssr: {
-      // `lodash` must stay inlined so its ids flow through the plugin
-      // pipeline, where ssrLodashEs (above) rewrites them to lodash-es.
-      // Externalized bare ids skip user plugins in the dev module runner, so
-      // dropping this entry resurfaces Node's CJS named-export failure
-      // ("Named export 'debounce' not found") on every `from 'lodash'` import.
+      optimizeDeps: {
+        include: ['lodash'],
+      },
+
+      // `lodash` is CJS; its named-export interop fails in Node ESM unless bundled.
       // `next/*` must be bundled so our nextCompat shim wins — otherwise Vite's
       // SSR externalizer leaves `next/router` as a runtime package import and
       // Node resolves it to Next's real module.

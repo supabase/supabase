@@ -81,7 +81,11 @@
    * beneath (lightens in dark, darkens in light). Steps: muted (e1) → accent
    * (e2) → tertiary (e3).
    */
-  --surface-overlay-unit: calc(var(--elevation-step) / abs(var(--tone-span)));
+  /* max(span, -span) is equivalent to abs(span), but works across the browser
+     versions supported by Tailwind v4. */
+  --surface-overlay-unit: calc(
+    var(--elevation-step) / max(var(--tone-span), calc(var(--tone-span) * -1))
+  );
   --muted-alpha: calc(var(--surface-overlay-unit) * var(--elevation-1));
   --accent-alpha: calc(var(--surface-overlay-unit) * var(--elevation-2));
   --tertiary-alpha: calc(var(--surface-overlay-unit) * var(--elevation-3));
@@ -139,10 +143,15 @@
 
   /* shadcn semantic pairs */
   --background: oklch(var(--surface) calc(var(--chroma) * 0.5) var(--surface-hue));
+  --foreground-chroma: calc(var(--chroma) * 0.55);
   --foreground: oklch(
-    calc(var(--surface) + var(--tone-span) * var(--contrast-text)) calc(var(--chroma) * 0.55)
+    calc(var(--surface) + var(--tone-span) * var(--contrast-text)) var(--foreground-chroma)
       var(--surface-hue)
   );
+  /* Inverse of --foreground: canvas-coloured text for use on inverted fills
+     (bg-foreground, bg-black / dark:bg-white, etc). Not the same as
+     --primary-foreground, which stays dark for the vivid primary fill. */
+  --foreground-contrast: oklch(var(--surface) calc(var(--chroma) * 0.55) var(--surface-hue));
 
   --card: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-1)) c h);
   --card-foreground: var(--foreground);
@@ -170,8 +179,8 @@
       var(--tertiary-foreground-level) * 0.5 * var(--contrast-down)
   );
   --tertiary-foreground: oklch(
-    from var(--foreground) calc(var(--surface) + var(--tone-span) * var(--tertiary-foreground-mix))
-      c h
+    calc(var(--surface) + var(--tone-span) * var(--tertiary-foreground-mix))
+      var(--foreground-chroma) var(--surface-hue)
   );
   --muted: oklch(from var(--foreground) l c h / var(--muted-alpha));
   --muted-foreground-mix: calc(
@@ -179,10 +188,37 @@
       var(--muted-foreground-level) * 0.5 * var(--contrast-down)
   );
   --muted-foreground: oklch(
-    from var(--foreground) calc(var(--surface) + var(--tone-span) * var(--muted-foreground-mix)) c h
+    calc(var(--surface) + var(--tone-span) * var(--muted-foreground-mix)) var(--foreground-chroma)
+      var(--surface-hue)
   );
   --accent: oklch(from var(--foreground) l c h / var(--accent-alpha));
   --accent-foreground: var(--foreground);
+
+  /*
+   * Control surface roles (design sync: sunk fields + raised choosers):
+   *   --field          sunk text entry (Input, Textarea, filled MultiSelect)
+   *   --control-raised raised chooser plate (Select, empty MultiSelect)
+   *   --control        alias of --control-raised
+   *
+   * Alpha overlays relative to the local plate (page, sheet, card) — not solids
+   * from --background. Page-relative solids sit between canvas (e0) and Sheet
+   * (popover e2) and vanish on light near the white ceiling.
+   *
+   * Field soft always-sink via black. --field-alpha is a theme input (stronger in
+   * dark.css) because the same absolute opacity is obvious on light plates and
+   * near-invisible on dark ones. Default is softer than the old foreground/[.026]
+   * wash. Raised is a soft white lift so selects read button-like without stark
+   * wells. Borders carry most hover chrome (--border-control-hover). Light raises
+   * still have little headroom on sheets; sheets matching app background would
+   * widen that later.
+   *
+   * Default Button stays opaque card/popover for occluding chrome (DEPR-636).
+   * Floating clusters can wrap in a solid Popover as a follow-up.
+   */
+  --field-alpha: 0.015;
+  --field: oklch(0 0 0 / var(--field-alpha));
+  --control-raised: oklch(1 0 0 / calc(var(--muted-alpha) * 0.65));
+  --control: var(--control-raised);
 
   --warning: oklch(var(--warning-lightness) var(--expressive-chroma) var(--warning-hue));
   --destructive: oklch(
@@ -218,6 +254,14 @@
   );
   --input: oklch(
     from var(--foreground) l calc(c * 0.5) h / calc(3% + 38% * var(--contrast-border))
+  );
+  /*
+   * Shared interactive border for control chrome (inputs, selects, default /
+   * dashed Button, radio cards). Pairs with rest --border-control / --border-strong.
+   * Stronger than --border-stronger; softer than a full muted-foreground stroke.
+   */
+  --border-control-hover: oklch(
+    from var(--foreground) l calc(c * 0.5) h / calc(12% + 58% * var(--contrast-border))
   );
   --ring: oklch(from var(--primary) l c h / 55%);
 }

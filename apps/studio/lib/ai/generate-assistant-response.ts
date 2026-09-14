@@ -1,8 +1,7 @@
 import * as ai from 'ai'
 import {
   convertToModelMessages,
-  isToolUIPart,
-  stepCountIs,
+  isStepCount,
   type LanguageModel,
   type ModelMessage,
   type SystemModelMessage,
@@ -14,9 +13,16 @@ import { source } from 'common-tags'
 
 import type { AssistantEvalInput } from '@/evals/scorer'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { buildAssistantContextMessages, NO_SCHEMA_ACCESS_MESSAGE } from '@/lib/ai/assistant-context'
 import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
-import { CHAT_PROMPT, GENERAL_PROMPT, LIMITATIONS_PROMPT, SECURITY_PROMPT } from '@/lib/ai/prompts'
-import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
+import { prepareMessagesForModel } from '@/lib/ai/generate-assistant-response.utils'
+import {
+  CHAT_PROMPT,
+  GENERAL_PROMPT,
+  LIMITATIONS_PROMPT,
+  NOTEBOOKS_PROMPT,
+  SECURITY_PROMPT,
+} from '@/lib/ai/prompts'
 
 const { streamText: tracedStreamText } = wrapAISDK(ai)
 
@@ -33,7 +39,10 @@ export async function generateAssistantResponse({
   supportMode,
   userId,
   orgId,
+  orgSlug,
   planId,
+  includesLogsSnippets,
+  isExplorerEnabled,
   systemProviderOptions,
   providerOptions,
   requestedModel,
@@ -52,7 +61,11 @@ export async function generateAssistantResponse({
   supportMode?: boolean
   userId?: string
   orgId?: number
+  orgSlug?: string
   planId?: string
+  /** Whether any user message in the conversation attached a logs (ClickHouse) query. */
+  includesLogsSnippets?: boolean
+  isExplorerEnabled?: boolean
   requestedModel?: string
   systemProviderOptions?: Record<string, any>
   providerOptions?: Record<string, any>
@@ -62,48 +75,22 @@ export async function generateAssistantResponse({
   const shouldTrace = allowTracing ?? IS_TRACING_ENABLED
 
   const run = async (span?: Span) => {
-    // Only returns last 7 messages
-    // Filters out tools with invalid states
-    // Filters out tool outputs based on opt-in level
-    const messages = (rawMessages || []).slice(-7).map((msg) => {
-      if (msg && msg.role === 'assistant' && 'results' in msg) {
-        const cleanedMsg = { ...msg }
-        delete cleanedMsg.results
-        return cleanedMsg
-      }
-      if (msg && msg.role === 'assistant' && msg.parts) {
-        const cleanedParts = msg.parts
-          .filter((part) => {
-            if (isToolUIPart(part)) {
-              const invalidStates = [
-                'input-streaming',
-                'input-available',
-                'approval-requested',
-                'output-error',
-              ]
-              return !invalidStates.includes(part.state)
-            }
-            return true
-          })
-          .map((part) => {
-            return sanitizeMessagePart(part, aiOptInLevel)
-          })
-        return { ...msg, parts: cleanedParts }
-      }
-      return msg
-    })
+    const messages = prepareMessagesForModel(rawMessages, aiOptInLevel)
 
     const schemasString =
       aiOptInLevel !== 'disabled' && getSchemas
         ? shouldTrace
           ? await traced(async () => getSchemas(), { name: 'getSchemas', type: 'function' })
           : await getSchemas()
-        : "You don't have access to any schemas."
+        : NO_SCHEMA_ACCESS_MESSAGE
 
-    // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
+    // Important: do not use per-request dynamic content in the system prompt or Bedrock will
+    // not cache it. isExplorerEnabled is a per-user flag, not per-request, so it only produces
+    // two prompt variants (on/off) rather than defeating caching.
     const system = source`
       ${GENERAL_PROMPT}
       ${CHAT_PROMPT}
+      ${isExplorerEnabled ? NOTEBOOKS_PROMPT : ''}
       ${SECURITY_PROMPT}
       ${LIMITATIONS_PROMPT}
 
@@ -111,21 +98,12 @@ export async function generateAssistantResponse({
 
       Before writing SQL or answering questions about the following topics, call \`load_knowledge\` to load detailed knowledge:
       - \`pg_best_practices\` — PostgreSQL best practices. Always load before writing any SQL, even simple queries.
+      - \`logs\` — ClickHouse SQL against the project's logs table. Always load before calling \`query_logs\`.
       - \`rls\` — Row Level Security policies for database tables.
       - \`storage\` — Supabase Storage buckets, public/private bucket access, and \`storage.objects\` policies. Always load before creating Storage buckets or \`storage.objects\` policies.
       - \`edge_functions\` — Supabase Edge Functions
       - \`realtime\` — Supabase Realtime
     `
-
-    const hasProjectContext =
-      projectRef || chatName || schemasString !== "You don't have access to any schemas."
-
-    const assistantContent = hasProjectContext
-      ? `The user's current project is ${projectRef || 'unknown'}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName || 'unnamed'}.`
-      : undefined
-    const supportAssistantContent = supportMode
-      ? `This is an active support chat. Help the user while they wait for a human agent. Keep guidance practical and concise. If the user asks for a human, or if the issue cannot be safely resolved, call escalate_to_human with a short reason. Only call resolve_support_conversation after the user explicitly confirms the issue is resolved; otherwise keep helping.`
-      : undefined
 
     const systemMessage: SystemModelMessage = {
       role: 'system',
@@ -134,22 +112,13 @@ export async function generateAssistantResponse({
     }
 
     const coreMessages: ModelMessage[] = [
-      ...(assistantContent
-        ? [
-            {
-              role: 'assistant' as const,
-              content: assistantContent,
-            },
-          ]
-        : []),
-      ...(supportAssistantContent
-        ? [
-            {
-              role: 'assistant' as const,
-              content: supportAssistantContent,
-            },
-          ]
-        : []),
+      ...buildAssistantContextMessages({
+        projectRef,
+        chatName,
+        schemasString,
+        supportMode,
+        includesLogsSnippets,
+      }),
       ...(await convertToModelMessages(messages)),
     ]
 
@@ -157,14 +126,14 @@ export async function generateAssistantResponse({
 
     return streamTextFn({
       model,
-      system: systemMessage,
-      stopWhen: stepCountIs(10),
+      instructions: systemMessage,
+      stopWhen: isStepCount(10),
       messages: coreMessages,
       ...(providerOptions && { providerOptions }),
       tools,
       ...(abortSignal && { abortSignal }),
       ...(span && {
-        onFinish: ({ steps, finishReason }) => {
+        onEnd: ({ steps, finishReason }) => {
           const metadata: Record<string, unknown> = {
             isFinalStep: finishReason === 'stop',
           }
@@ -184,7 +153,7 @@ export async function generateAssistantResponse({
   }
 
   if (shouldTrace) {
-    // startSpan instead of traced() so we control when the span closes via onFinish.
+    // startSpan instead of traced() so we control when the span closes via onEnd.
     // Scorers read from child spans (LLM + tool) in the trace rather than a root span output field.
     const span = startSpan({ name: 'generateAssistantResponse', type: 'function' })
     onSpanCreated?.(span.id)
@@ -204,6 +173,7 @@ export async function generateAssistantResponse({
         aiOptInLevel,
         userId,
         orgId,
+        orgSlug,
         planId,
         requestedModel,
         gitBranch: process.env.VERCEL_GIT_COMMIT_REF,

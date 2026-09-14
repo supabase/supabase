@@ -2,7 +2,7 @@
     @supabase_api path /auth/v1/* /rest/v1/* /graphql/v1 /realtime/v1/* /storage/v1/* /functions/v1/* /mcp /sso/*
 
     handle @supabase_api {
-        reverse_proxy kong:8000
+        reverse_proxy api-gw:8000
     }
 
     handle {

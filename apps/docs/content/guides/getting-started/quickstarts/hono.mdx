@@ -4,6 +4,8 @@ subtitle: 'Learn how to create a Supabase project, add some sample data to your 
 breadcrumb: 'Framework Quickstarts'
 ---
 
+<AiPrompt id="hono" />
+
 <$Partial path="quickstart_db_setup.mdx" />
 
 ## 3. Create a Hono app
@@ -14,17 +16,11 @@ Bootstrap the Hono example app from the Supabase Samples using the CLI.
 npx supabase@latest bootstrap hono
 ```
 
-## 4. Install Agent Skills (optional)
+## 4. Set up AI tooling (optional)
 
-Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+<$Partial path="quickstart_ai_tooling.mdx" />
 
-To install, run the following command in the root of your project:
-
-```bash
-npx skills add supabase/agent-skills
-```
-
-## 5. Install the Supabase client library
+## 5. Install dependencies
 
 The `package.json` file in the project includes the necessary dependencies, including `@supabase/supabase-js` and `@supabase/ssr` to help with server-side auth.
 
@@ -32,28 +28,64 @@ The `package.json` file in the project includes the necessary dependencies, incl
 npm install
 ```
 
-## 6. Set up the required environment variables
+## 6. Declare Supabase environment variables
 
-Copy the `.env.example` file to `.env` and update the values with your Supabase project URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&tab=frameworks).
-
-Lastly, [enable anonymous sign-ins](/dashboard/project/_/auth/providers) in the Auth settings.
+Copy the `.env.example` file to `.env`.
 
 ```bash
 cp .env.example .env
 ```
 
-{/* TODO: Not ideal for frameworks that have no entry in Connect */}
-<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "frameworks" }} />
+Update the values with your Supabase project URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&connectTab=frameworks).
 
-## 7. Start the app
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true">Open Connect panel</a>
+</Button>
 
-Start the app, go to http://localhost:5173.
+<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
 
-Learn how [server side auth](/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=hono) works with Hono.
+## 7. Set up anonymous sign-ins
+
+This app signs users in anonymously, so [enable anonymous sign-ins](/dashboard/project/_/auth/providers) in the Auth settings.
+
+Anonymous sign-ins use the `authenticated` role, but the database setup in step 2 grants read access to the `anon` role only. Without the privilege and a matching policy for `authenticated`, the instruments query returns no rows. Run the following in the [SQL Editor](/dashboard/project/_/sql/new) to grant the privilege and add the policy:
+
+```sql SQL_EDITOR
+grant select on public.instruments to authenticated;
+
+create policy "authenticated can read instruments"
+on public.instruments
+for select to authenticated
+using (true);
+```
+
+## 8. Query data from the app
+
+The bootstrapped app already includes the route that reads your `instruments` table, in `src/index.tsx`. The middleware in `src/middleware/auth.middleware.ts` creates a request-scoped Supabase client, so `getSupabase(c)` returns a client that already carries the signed-in user's auth token. Your RLS policies apply to the query.
+
+```tsx name=src/index.tsx
+app.get('/instruments', async (c) => {
+  const supabase = getSupabase(c)
+  const { data, error } = await supabase.from('instruments').select('*')
+
+  if (error) {
+    console.error(error)
+    return c.json({ error: error.message }, 500)
+  }
+
+  return c.json(data)
+})
+```
+
+## 9. Start the app
+
+Start the app, go to http://localhost:5173, sign in anonymously, then open the instruments list.
 
 ```bash
 npm run dev
 ```
+
+<$Partial path="quickstart_going_to_production.mdx" />
 
 ## Next steps
 

@@ -110,7 +110,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
           if (!open) setIsClosingEditWrapper(true)
         }}
       >
-        <SheetContent size="lg" tabIndex={undefined}>
+        <SheetContent size="lg">
           {selectedWrapperToEdit && (
             <EditWrapperSheet
               wrapper={selectedWrapperToEdit}

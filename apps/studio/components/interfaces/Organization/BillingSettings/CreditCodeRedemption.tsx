@@ -22,7 +22,7 @@ import {
   Input,
   Separator,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
@@ -155,7 +155,6 @@ export const CreditCodeRedemption = ({
       {!modalVisible && (
         <DialogTrigger asChild>
           <ButtonTooltip
-            variant="default"
             className="pointer-events-auto"
             disabled={codeRedemptionDisabled}
             tooltip={{
@@ -237,7 +236,7 @@ export const CreditCodeRedemption = ({
                   )}
 
                   {!router.pathname.includes('/org/') && (
-                    <Button asChild variant="default">
+                    <Button asChild>
                       <Link href={`/org/${org?.slug}`}>Go to organization</Link>
                     </Button>
                   )}

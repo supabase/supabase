@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
@@ -117,13 +117,12 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
       <DialogTrigger asChild>
         {iconOnly ? (
           <ButtonTooltip
-            variant="default"
             icon={<ShieldCheck />}
             className="w-7"
             tooltip={{ content: { side: 'bottom', text: 'Auto-enable RLS for new tables' } }}
           />
         ) : (
-          <Button variant="default">Set up trigger</Button>
+          <Button>Set up trigger</Button>
         )}
       </DialogTrigger>
       <DialogContent size="large">
@@ -156,10 +155,11 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
         </CodeBlock>
 
         <DialogFooter>
-          <Button variant="default" disabled={isCreating} onClick={() => setOpen(false)}>
+          <Button disabled={isCreating} onClick={() => setOpen(false)}>
             Cancel
           </Button>
           <ButtonTooltip
+            variant="primary"
             disabled={!canCreateTriggers}
             loading={isCreating}
             onClick={handleCreateTrigger}

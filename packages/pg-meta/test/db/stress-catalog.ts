@@ -27,10 +27,12 @@ export const STRESS_TABLE_COUNT = Number(
  * non-table relations (a view, a materialized view, and a partitioned table
  * with one partition) so relkind-filtering queries have something to hit.
  *
- * Per table: a PK index, a unique constraint+index, a check constraint, and an
- * FK to the previous table. Every 10th table also FKs to t_0, making t_0 a hub
- * with many incoming FKs (the structurally unavoidable pg_constraint seq scan,
- * since there is no index on pg_constraint.confrelid).
+ * Per table: a composite PK index, a unique constraint+index, a check
+ * constraint, and a composite FK to the previous table. Every 10th table also
+ * has a composite FK to t_0, making t_0 a hub with many incoming FKs (the
+ * structurally unavoidable pg_constraint seq scan, since there is no index on
+ * pg_constraint.confrelid). Using composite FKs exercises ordinal column
+ * pairing across the full stress catalog.
  *
  * The catalog is built via a server-side procedure with batched commits every
  * 100 tables -- a single transaction creating thousands of tables/indexes/
@@ -48,10 +50,10 @@ export async function buildStressCatalog(
     begin
       for i in 0..n-1 loop
         execute format(
-          'create table stress.t_%s (id int primary key, u int unique, c int check (c > 0)%s%s)',
+          'create table stress.t_%s (id int, tenant_id int, u int unique, c int check (c > 0), primary key (id, tenant_id)%s%s)',
           i,
-          case when i > 0 then format(', fk int references stress.t_%s(id)', i - 1) else '' end,
-          case when i > 0 and i % 10 = 0 then ', hub int references stress.t_0(id)' else '' end
+          case when i > 0 then format(', fk_id int, fk_tenant_id int, foreign key (fk_id, fk_tenant_id) references stress.t_%s(id, tenant_id)', i - 1) else '' end,
+          case when i > 0 and i % 10 = 0 then ', hub_id int, hub_tenant_id int, foreign key (hub_id, hub_tenant_id) references stress.t_0(id, tenant_id)' else '' end
         );
         if i % 100 = 99 then commit; end if;
       end loop;
@@ -75,6 +77,30 @@ export async function buildStressCatalog(
       partition by list (region);
     create table stress.p_root_east partition of stress.p_root for values in ('east');
   `)
+
+  // Enums and composite types so the user-defined-types introspection query has
+  // non-trivial results at scale: multi-label enums with a deliberately
+  // NON-alphabetical label order (to exercise the enumsortorder ordering), plus
+  // composite types -- one of which has a dropped attribute (to exercise the
+  // `not attisdropped` filter). A bulk loop grows pg_type/pg_attribute/pg_enum
+  // so the scoped correlated subqueries are exercised against a large catalog.
+  await db.executeQuery(`
+    create type stress.mood as enum ('ecstatic', 'sad', 'happy', 'ok');
+    create type stress.priority as enum ('critical', 'low', 'high', 'medium');
+    create type stress.addr as (street text, city text, zip int);
+    create type stress.pair as (a int, dropme text, b text);
+    alter type stress.pair drop attribute dropme;
+
+    create procedure stress.build_types(n int) language plpgsql as $$
+    begin
+      for i in 0..n-1 loop
+        execute format('create type stress.e_%s as enum (''c'', ''a'', ''b'')', i);
+        execute format('create type stress.ct_%s as (x int, y text)', i);
+        if i % 100 = 99 then commit; end if;
+      end loop;
+    end $$;
+  `)
+  await db.executeQuery(`call stress.build_types(200);`)
 
   await db.executeQuery(`analyze;`)
 }

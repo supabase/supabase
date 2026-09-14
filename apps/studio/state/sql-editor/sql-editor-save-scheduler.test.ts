@@ -5,11 +5,16 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createSaveScheduler, type SaveMode } from './sql-editor-save-scheduler'
 import type { StateSnippet, StateSnippetFolder } from './types'
+import type { SqlSnippets } from '@/types'
 
 // Valtio notifies subscribers on a microtask; flush past it before asserting.
 const flush = () => new Promise<void>((resolve) => setTimeout(resolve, 0))
 
-function makeStateSnippet(overrides: Partial<StateSnippet['snippet']> = {}): StateSnippet {
+function makeStateSnippet(
+  overrides: Omit<Partial<StateSnippet['snippet']>, 'type' | 'content'> & {
+    content?: SqlSnippets.Content
+  } = {}
+): StateSnippet {
   return {
     projectRef: 'ref',
     splitSizes: [50, 50],

@@ -2,7 +2,7 @@ import { Monaco, OnMount } from '@monaco-editor/react'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { noop } from 'lodash'
 import { RefObject, useRef } from 'react'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { useSnippetEditor } from './useSnippetEditor'

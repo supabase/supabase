@@ -14,7 +14,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { DocsButton } from './DocsButton'
 import { InlineLinkClassName } from './InlineLink'
@@ -112,9 +112,7 @@ const HighQueryCostDialog = ({ error, suggestions = [] }: HighQueryCostErrorProp
             href={`${DOCS_URL}/guides/troubleshooting/understanding-postgresql-explain-output-Un9dqX`}
           />
           <DialogClose asChild>
-            <Button variant="default" className="opacity-100">
-              Understood
-            </Button>
+            <Button className="opacity-100">Understood</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
@@ -134,7 +132,7 @@ const LoadDataWarningDialog = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="default">Load data</Button>
+        <Button>Load data</Button>
       </DialogTrigger>
       <DialogContent onOpenAutoFocus={(event) => event.preventDefault()}>
         <DialogHeader>
@@ -167,9 +165,7 @@ const LoadDataWarningDialog = ({
         </DialogSection>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="default" className="opacity-100">
-              Cancel
-            </Button>
+            <Button className="opacity-100">Cancel</Button>
           </DialogClose>
           <DialogClose asChild>
             <Button variant="warning" onClick={() => onSelectLoadData()}>

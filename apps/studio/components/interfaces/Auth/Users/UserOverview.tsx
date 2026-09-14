@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, Separator } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
@@ -263,7 +263,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                     {providerName === 'SAML' ? 'SSO' : 'OAuth'}
                   </p>
                   {authenticationSignInProviders && (
-                    <Button asChild variant="default" className="mt-2">
+                    <Button asChild className="mt-2">
                       <Link
                         href={`/project/${projectRef}/auth/providers?provider=${provider.name === 'SAML' ? 'SAML 2.0' : provider.name}`}
                       >

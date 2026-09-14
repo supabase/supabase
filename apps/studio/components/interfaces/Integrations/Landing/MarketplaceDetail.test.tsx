@@ -11,7 +11,7 @@ import { routerMock } from '@/tests/lib/route-mock'
 
 // The OAuth-apps query overrides its return type to `AuthorizedApp`, but the wire response (and so
 // the MSW resolver) is the raw OpenAPI `OAuthAppResponse`. Build fixtures against the API shape.
-type OAuthAppResponse = components['schemas']['OAuthAppResponse']
+type OAuthAppResponse = components['schemas']['OAuthAppResponse_Output']
 type PartnerIntegrationListResponse = components['schemas']['PartnerIntegrationListResponse']
 
 const STABLE_PARAMS = { ref: 'default', id: 'grafana', pageId: 'overview' }
@@ -35,6 +35,21 @@ vi.mock('@/lib/constants', async (importOriginal) => {
 const STABLE_INTEGRATIONS = [
   {
     id: 'grafana',
+    name: 'Grafana',
+    type: 'oauth',
+    source: 'Partner',
+    description: 'Grafana',
+    content: 'Grafana overview content',
+    docsUrl: null,
+    siteUrl: null,
+    author: { name: 'Grafana Labs' },
+    oauthAppId: 'grafana-app',
+    icon: () => null,
+    navigate: () => null,
+    navigation: [{ route: 'overview', label: 'Overview' }],
+  },
+  {
+    id: 'grafana-cloud',
     name: 'Grafana',
     type: 'oauth',
     source: 'Partner',

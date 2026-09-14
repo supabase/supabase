@@ -33,7 +33,7 @@ const TopNavBar: FC = () => {
     <>
       <nav
         aria-label="top bar"
-        className="w-full z-40 flex flex-col border-b backdrop-blur-sm backdrop-filter bg-default/75"
+        className="w-full z-40 flex flex-col subhighlight-border backdrop-blur-sm backdrop-filter bg-default/75"
       >
         <div className="w-full px-5 lg:pl-10 flex justify-between h-(--header-height) gap-3">
           <div className="hidden lg:flex h-full items-center justify-center gap-2">
@@ -57,6 +57,7 @@ const TopNavBar: FC = () => {
                 }
               />
               <button
+                tabIndex={0}
                 title="Menu dropdown button"
                 className={cn(
                   buttonVariants({ variant: 'default' }),
@@ -70,7 +71,7 @@ const TopNavBar: FC = () => {
           </div>
           <div className="hidden lg:flex items-center justify-end gap-3">
             {!isUserLoading && (
-              <Button asChild>
+              <Button variant="primary" asChild>
                 <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
                   {isLoggedIn ? 'Dashboard' : 'Sign up'}
                 </a>

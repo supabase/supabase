@@ -58,6 +58,7 @@ export function FrameworksSectionClient({ frameworks }: { frameworks: Framework[
             >
               {frameworks.map((framework, index) => (
                 <button
+                  tabIndex={0}
                   key={framework.name}
                   role="tab"
                   aria-selected={index === activeIdx}

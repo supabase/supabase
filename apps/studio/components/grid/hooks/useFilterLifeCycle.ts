@@ -22,7 +22,6 @@ export function useInitializeFiltersFromUrl() {
 
   useEffect(() => {
     initializeFilters()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [])
 }
 

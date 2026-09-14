@@ -7,16 +7,23 @@ hideToc: true
 
 Self-hosting is a good fit if you need full control over your data, have compliance requirements that prevent you from using managed services, or want to run Supabase in an isolated environment.
 
-### How self-hosted Supabase differs
+<ContentListings id="self-hosting-get-started" />
 
-Self-hosted Supabase is different from:
+<ContentListings id="self-hosting-community" />
 
-- **Supabase CLI** (local development), which is intended for development and testing only.
-- **Managed Supabase** platform, which is fully hosted and operated by Supabase.
+## How self-hosted Supabase differs
 
-Self-hosted Supabase mimics a single project. Studio doesn't support multiple organizations or projects. Platform-only [features](/features) such as branching, advanced metrics beyond logs, managed backups and PITR, analytics and vector buckets, ETL, and the platform management API are **unavailable** in self-hosted configuration. Most settings are configured through [environment variables](https://github.com/supabase/supabase/blob/master/docker/.env.example).
+Self-hosted Supabase runs as a single project which means that Studio doesn't support multiple organizations or projects. Most settings are configured through [environment variables](https://github.com/supabase/supabase/blob/master/docker/.env.example).
 
-### Your responsibilities when self-hosting
+Unlike the managed platform, which is fully hosted and operated by Supabase, branching, advanced metrics beyond logs, managed backups and PITR, analytics and vector buckets, ETL, and the platform management API are **unavailable**.
+
+### Not the same as local development
+
+[Supabase CLI](/docs/guides/local-development/cli/getting-started) runs a local stack for development and testing. That stack is not a self-hosted deployment: it is not hardened for production and must not be exposed to external traffic.
+
+To self-host, use [Docker](/docs/guides/self-hosting/docker) or one of the community deployment options.
+
+## Your responsibilities when self-hosting
 
 When you self-host, **you are responsible for**:
 
@@ -28,25 +35,17 @@ When you self-host, **you are responsible for**:
 - Backups and disaster recovery
 - Monitoring and uptime
 
-### Telemetry
+## Telemetry
 
 Self-hosted Supabase (run via Docker Compose) **does not phone home or collect any telemetry**.
 
-The **Supabase CLI** is a [separate tool](/docs/guides/local-development/cli/getting-started) and collects usage telemetry to help improve the developer experience. See [CLI telemetry](/docs/guides/local-development/cli/getting-started#telemetry) for opt-out methods.
-
-<ContentListings id="self-hosting-get-started" />
-
-<ContentListings id="self-hosting-community" />
+The **Supabase CLI**, a separate tool also used for [local development](/docs/guides/local-development/cli/getting-started), collects usage telemetry to help improve the developer experience. See [CLI telemetry](/docs/guides/local-development/cli/getting-started#telemetry) for opt-out methods.
 
 ## Support and community
 
 Self-hosted Supabase is community-supported.
 
-<ContentListings id="self-hosting-resolve-issues" />
-
-<ContentListings id="self-hosting-get-help" />
-
-<ContentListings id="self-hosting-share-experience" />
+<ContentListings id="self-hosting-support" />
 
 ### Enterprise self-hosting
 

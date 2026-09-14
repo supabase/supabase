@@ -8,12 +8,32 @@
     "preinstall": "npx only-allow pnpm",
     "test": "vitest",
     "test:coverage": "vitest --run --coverage",
-    "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "gen:exports": "tsx ./scripts/update-exports.ts"
   },
   "exports": {
     "./package.json": "./package.json",
+    "./Admonition/Admonition.constants": {
+      "import": "./src/Admonition/Admonition.constants.ts",
+      "types": "./src/Admonition/Admonition.constants.ts"
+    },
+    "./Admonition/Admonition": {
+      "import": "./src/Admonition/Admonition.tsx",
+      "types": "./src/Admonition/Admonition.tsx"
+    },
+    "./Admonition/Admonition.types": {
+      "import": "./src/Admonition/Admonition.types.ts",
+      "types": "./src/Admonition/Admonition.types.ts"
+    },
+    "./Admonition/AdmonitionIcons": {
+      "import": "./src/Admonition/AdmonitionIcons.tsx",
+      "types": "./src/Admonition/AdmonitionIcons.tsx"
+    },
+    "./Admonition": {
+      "import": "./src/Admonition/index.tsx",
+      "types": "./src/Admonition/index.tsx"
+    },
     "./AssistantChat/AssistantChatForm": {
       "import": "./src/AssistantChat/AssistantChatForm.tsx",
       "types": "./src/AssistantChat/AssistantChatForm.tsx"
@@ -45,6 +65,18 @@
     "./Banners/LW15Banner": {
       "import": "./src/Banners/LW15Banner.tsx",
       "types": "./src/Banners/LW15Banner.tsx"
+    },
+    "./Banners/Select26Banner": {
+      "import": "./src/Banners/Select26Banner.tsx",
+      "types": "./src/Banners/Select26Banner.tsx"
+    },
+    "./Banners/Select26Promotion.module.css": {
+      "import": "./src/Banners/Select26Promotion.module.css",
+      "types": "./src/Banners/Select26Promotion.module.css"
+    },
+    "./Banners/Select26Promotion": {
+      "import": "./src/Banners/Select26Promotion.tsx",
+      "types": "./src/Banners/Select26Promotion.tsx"
     },
     "./Banners": {
       "import": "./src/Banners/index.ts",
@@ -374,10 +406,6 @@
       "import": "./src/GlassPanel/index.tsx",
       "types": "./src/GlassPanel/index.tsx"
     },
-    "./IconPanel": {
-      "import": "./src/IconPanel/index.tsx",
-      "types": "./src/IconPanel/index.tsx"
-    },
     "./Image/Image": {
       "import": "./src/Image/Image.tsx",
       "types": "./src/Image/Image.tsx"
@@ -554,6 +582,14 @@
       "import": "./src/Row/index.tsx",
       "types": "./src/Row/index.tsx"
     },
+    "./SelectionListState/SelectionListState": {
+      "import": "./src/SelectionListState/SelectionListState.tsx",
+      "types": "./src/SelectionListState/SelectionListState.tsx"
+    },
+    "./SelectionListState": {
+      "import": "./src/SelectionListState/index.ts",
+      "types": "./src/SelectionListState/index.ts"
+    },
     "./ShimmeringLoader/index.css": {
       "import": "./src/ShimmeringLoader/index.css",
       "types": "./src/ShimmeringLoader/index.css"
@@ -573,6 +609,14 @@
     "./SimpleCodeBlock/prism": {
       "import": "./src/SimpleCodeBlock/prism.ts",
       "types": "./src/SimpleCodeBlock/prism.ts"
+    },
+    "./SkipToContent/SkipToContent": {
+      "import": "./src/SkipToContent/SkipToContent.tsx",
+      "types": "./src/SkipToContent/SkipToContent.tsx"
+    },
+    "./SkipToContent": {
+      "import": "./src/SkipToContent/index.tsx",
+      "types": "./src/SkipToContent/index.tsx"
     },
     "./SqlToRest/assumptions": {
       "import": "./src/SqlToRest/assumptions.ts",
@@ -670,10 +714,6 @@
       "import": "./src/TweetCard/index.tsx",
       "types": "./src/TweetCard/index.tsx"
     },
-    "./admonition": {
-      "import": "./src/admonition.tsx",
-      "types": "./src/admonition.tsx"
-    },
     "./collapsible-alert": {
       "import": "./src/collapsible-alert.tsx",
       "types": "./src/collapsible-alert.tsx"
@@ -734,7 +774,6 @@
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-table": "catalog:",
     "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "common": "workspace:*",
     "common-tags": "^1.8.2",
@@ -780,8 +819,8 @@
   },
   "devDependencies": {
     "@testing-library/dom": "^10.0.0",
-    "@testing-library/jest-dom": "^6.6.0",
-    "@testing-library/react": "^16.0.0",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.0.0",
     "@types/common-tags": "^1.8.4",
     "@types/js-yaml": "^4.0.9",
@@ -791,13 +830,13 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "@typescript/native": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "api-types": "workspace:*",
     "config": "workspace:*",
     "next-router-mock": "^0.9.13",
     "tailwindcss": "^4.2.4",
     "tsx": "catalog:",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "unified": "^11.0.5",
     "vfile": "^6.0.3",

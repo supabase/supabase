@@ -117,6 +117,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
           <button
             id={`collapsible-trigger-${role.id}`}
             type="button"
+            tabIndex={0}
             className="group flex w-full items-center justify-between rounded-sm py-3 px-card text-foreground"
             onClick={(event) => {
               event.preventDefault()
@@ -161,7 +162,6 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               <TooltipTrigger asChild>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    variant="default"
                     className="px-1"
                     icon={<MoreVertical />}
                     aria-label={`${role.name} actions`}
@@ -222,7 +222,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
             </div>
             {!disabled && (
               <div className="py-4 flex items-center space-x-2 justify-end">
-                <Button variant="default" disabled={!isDirty || isUpdating} onClick={() => reset()}>
+                <Button disabled={!isDirty || isUpdating} onClick={() => reset()}>
                   Cancel
                 </Button>
                 <Button

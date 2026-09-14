@@ -552,6 +552,18 @@ export const examples: Registry = [
     files: ['example/dialog-centered-off.tsx'],
   },
   {
+    name: 'disabled-focusable',
+    type: 'components:example',
+    registryDependencies: ['button', 'tooltip'],
+    files: ['example/disabled-focusable.tsx'],
+  },
+  {
+    name: 'disabled-unavailable-with-notice',
+    type: 'components:example',
+    registryDependencies: ['admonition', 'button', 'card', 'tooltip'],
+    files: ['example/disabled-unavailable-with-notice.tsx'],
+  },
+  {
     name: 'drawer-demo',
     type: 'components:example',
     registryDependencies: ['drawer'],
@@ -1352,6 +1364,11 @@ export const examples: Registry = [
     files: ['example/info-tooltip-demo.tsx'],
   },
   {
+    name: 'skip-to-content-demo',
+    type: 'components:example',
+    files: ['example/skip-to-content-demo.tsx'],
+  },
+  {
     name: 'page-container-demo',
     type: 'components:example',
     files: ['example/page-container-demo.tsx'],
@@ -1397,6 +1414,36 @@ export const examples: Registry = [
     name: 'page-layout-settings',
     type: 'components:example',
     files: ['example/page-layout-settings.tsx'],
+  },
+  {
+    name: 'connect-interstitial-demo',
+    type: 'components:example',
+    files: ['example/connect-interstitial-demo.tsx'],
+  },
+  {
+    name: 'connect-interstitial-action-error',
+    type: 'components:example',
+    files: ['example/connect-interstitial-action-error.tsx'],
+  },
+  {
+    name: 'connect-interstitial-logo-pair',
+    type: 'components:example',
+    files: ['example/connect-interstitial-logo-pair.tsx'],
+  },
+  {
+    name: 'connect-interstitial-logo-single',
+    type: 'components:example',
+    files: ['example/connect-interstitial-logo-single.tsx'],
+  },
+  {
+    name: 'connect-interstitial-logo-unknown',
+    type: 'components:example',
+    files: ['example/connect-interstitial-logo-unknown.tsx'],
+  },
+  {
+    name: 'connect-interstitial-logo-uploaded',
+    type: 'components:example',
+    files: ['example/connect-interstitial-logo-uploaded.tsx'],
   },
   {
     name: 'page-layout-auth-emails',
@@ -1477,6 +1524,11 @@ export const examples: Registry = [
     name: 'multi-select-disabled',
     type: 'components:example',
     files: ['example/multi-select-disabled.tsx'],
+  },
+  {
+    name: 'multi-select-without-icon',
+    type: 'components:example',
+    files: ['example/multi-select-without-icon.tsx'],
   },
   {
     name: 'multi-select-badge-limit-wrap',

@@ -23,7 +23,7 @@ import {
   Switch,
   useWatch,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
@@ -603,7 +603,7 @@ export const PostgrestConfig = () => {
                 description="Expose a custom schema instead of the public schema"
               >
                 <div className="flex gap-2 items-center justify-end">
-                  <Button variant="default" icon={<Lock />} onClick={() => setShowModal(true)}>
+                  <Button icon={<Lock />} onClick={() => setShowModal(true)}>
                     Harden Data API
                   </Button>
                 </div>

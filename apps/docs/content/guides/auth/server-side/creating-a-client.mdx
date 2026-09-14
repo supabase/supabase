@@ -160,6 +160,14 @@ SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
 ```
 
 </TabPanel>
+<TabPanel id="tanstack" label="TanStack Start">
+
+```bash .env.local
+VITE_SUPABASE_URL=supabase_project_url
+VITE_SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
+```
+
+</TabPanel>
 </Tabs>
 
 ## Create a client
@@ -510,7 +518,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
   )
 
-  // Use `supabase` here for server-side work, e.g. await supabase.auth.getUser()
+  // Use `supabase` here for server-side work, e.g. await supabase.auth.getClaims()
 
   // Return the environment variables so the browser can create its own client.
   return json(
@@ -674,7 +682,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
   )
 
-  // Use `supabase` here for server-side work, e.g. await supabase.auth.getUser()
+  // Use `supabase` here for server-side work, e.g. await supabase.auth.getClaims()
 
   // Return the env vars so the browser can create its own client.
   return data(
@@ -822,6 +830,81 @@ language="typescript"
 
 </TabPanel>
 </Tabs>
+
+</TabPanel>
+<TabPanel id="tanstack" label="TanStack Start">
+
+### Write utility functions to create Supabase clients
+
+TanStack Start renders matched routes on the server by default, so `beforeLoad` and `loader` run server-side on the initial request. Unlike Next.js, this means you don't need a proxy or middleware layer to keep sessions fresh — the server client reads and writes the session cookie directly on each request.
+
+Create a `lib/supabase` folder at the root of your project, or inside the `./src` folder if you are using one, then add a file for each type of client:
+
+1. **Create a browser client in `lib/supabase/client.ts`.** Use it to access Supabase from components that run in the browser.
+2. **Create a server client in `lib/supabase/server.ts`.** Use it to access Supabase from loaders, server functions, and other code that runs only on the server.
+
+<$Partial path="auth_methods.mdx" />
+
+Copy the lib utility functions below into each file:
+
+<div className="mt-12">
+  <$CodeTabs>
+    <$CodeSample
+      path="/auth/tanstack/lib/supabase/client.ts"
+      meta="name=lib/supabase/client.ts"
+      language="typescript"
+    />
+    <$CodeSample
+      path="/auth/tanstack/lib/supabase/server.ts"
+      meta="name=lib/supabase/server.ts"
+      language="typescript"
+    />
+  </$CodeTabs>
+</div>
+
+### Protecting routes
+
+TanStack Start has no global middleware layer, so protect each route explicitly.
+
+To protect your routes:
+
+1. Write a server function, `fetchClaims`, that calls `supabase.auth.getClaims()` and returns the claims, or `null` if the session isn't valid.
+1. Call `fetchClaims` from a layout route's `beforeLoad` hook — for example, `_protected.tsx` — before any nested route renders, and redirect to `/login` when it returns `null`.
+
+<Admonition type="danger">
+
+Skipping the check inside the server function exposes private data to unauthenticated users. `beforeLoad` runs on the server for the initial request and on the client for later navigation, but either way it only gates the route's render — it doesn't stop the server function from being called directly. Because there's no proxy re-checking every request, the server function is the only checkpoint that always runs, so it must call `supabase.auth.getClaims()` to authorize the request itself.
+
+</Admonition>
+
+`getClaims()` validates the JWT signature on every call, the same check the Next.js Proxy relies on. Calling it inside the server function gives TanStack Start's per-route check that same guarantee, because the function runs on every request to a protected route.
+
+<div className="mt-12">
+  <$CodeTabs>
+    <$CodeSample
+      path="/auth/tanstack/lib/supabase/fetch-claims-server-fn.ts"
+      meta="name=lib/supabase/fetch-claims-server-fn.ts"
+      language="typescript"
+    />
+    <$CodeSample
+      path="/auth/tanstack/routes/_protected.tsx"
+      meta="name=routes/_protected.tsx"
+      language="typescript"
+    />
+  </$CodeTabs>
+</div>
+
+Any other server function that returns or mutates private data needs this same check. Don't rely on a route being nested under `_protected` alone.
+
+## Congratulations
+
+You're done! To recap, you've successfully:
+
+- Set up a Supabase client utility to call Supabase from a browser component. You can use this if you need to call Supabase from the browser, for example to set up a realtime subscription.
+- Set up a server client utility to call Supabase from loaders and server functions.
+- Protected a route with `beforeLoad`, backed by a server function that authorizes the request itself.
+
+You can now use any Supabase features from your client or server code!
 
 </TabPanel>
 </Tabs>

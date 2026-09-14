@@ -46,6 +46,41 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(where).not.toContain(`log_attributes['request.path'] LIKE '%/storage/%'`)
     })
 
+    it('routes the `compute` log type to every worker OTEL stream', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:compute'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(
+        `log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')`
+      )
+      expect(where).not.toContain(`source = 'compute'`)
+    })
+
+    it('classifies every worker OTEL stream as compute in the projected log type', () => {
+      const sql = getUnifiedLogsQuery(baseSearch)
+      expect(sql).toContain(
+        `WHEN log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs') THEN 'compute'`
+      )
+    })
+
+    it('excludes every worker OTEL stream when the compute log type is negated', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:neq:compute'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(
+        `NOT (log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs'))`
+      )
+    })
+
+    it('projects only Compute fields that exist on worker logs', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:compute'))
+      const workerCondition =
+        "log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
+
+      expect(sql).toContain(`WHEN ${workerCondition} THEN null`)
+      expect(sql).toContain(`if(${workerCondition}, null, log_attributes['request.method'])`)
+      expect(sql).toContain(`if(${workerCondition}, null, log_attributes['request.path'])`)
+      expect(sql).toContain(`if(${workerCondition}, log_attributes, map()) AS metadata`)
+    })
+
     it('escapes single quotes in filter values to prevent SQL injection', () => {
       const sql = getUnifiedLogsQuery(
         withFilters(`method:eq:G'ET`, `pathname:eq:/customers'; DROP TABLE logs --`)
@@ -262,6 +297,15 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
         `if(source = 'auth_logs', log_attributes['status'], log_attributes['response.status_code'])`
       )
     })
+
+    it('does not classify Compute rows into a severity bucket', () => {
+      const sql = getLogsChartQuery(withFilters('log_type:eq:compute'))
+      const workerCondition =
+        "log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
+
+      expect(sql).toContain(`WHEN ${workerCondition} THEN null`)
+      expect(sql).not.toContain(`WHEN ${workerCondition} THEN 'success'`)
+    })
   })
 
   describe('getFacetCountQuery', () => {
@@ -282,14 +326,18 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
   })
 
   describe('user filter', () => {
-    it('restricts to auth_logs/postgres_logs and skips the default postgres+edge restriction', () => {
+    it('restricts to auth_logs/edge_logs and skips the default postgres+edge restriction', () => {
       const sql = getUnifiedLogsQuery(withUser('user-123'))
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
-      expect(where).toContain(`log_attributes['auth_event.actor_id'] = 'user-123'`)
-      expect(where).toContain(`source = 'postgres_logs'`)
-      // The unfiltered default (postgres_logs OR edge_logs) would incorrectly exclude
+      expect(where).toContain(
+        `(source = 'auth_logs' AND log_attributes['auth_event.actor_id'] = 'user-123')`
+      )
+      expect(where).toContain(
+        `(source = 'edge_logs' AND log_attributes['request.sb.jwt.authorization.payload.subject'] = 'user-123')`
+      )
+      // The unfiltered default (edge_logs OR postgres_logs) would incorrectly exclude
       // auth_logs, the primary attributable source, so it must not appear here.
-      expect(where).not.toContain(`(source = 'postgres_logs') OR (source = 'edge_logs')`)
+      expect(where).not.toContain(`(source = 'edge_logs') OR (source = 'postgres_logs')`)
     })
 
     it('does not restrict sources when the user filter is inactive', () => {
@@ -321,8 +369,8 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:auth'))).toBe(false)
     })
 
-    it('is false when the explicit log_type filter includes an attributable source (postgres)', () => {
-      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:postgres'))).toBe(false)
+    it('is false when the explicit log_type filter includes an attributable source (edge)', () => {
+      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:edge'))).toBe(false)
     })
 
     it('is false when at least one of several selected log types is attributable', () => {
@@ -332,12 +380,12 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     })
 
     it('is true when the explicit log_type filter restricts to a single non-attributable source', () => {
-      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:edge'))).toBe(true)
+      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:storage'))).toBe(true)
     })
 
     it('is true when every selected log type is non-attributable', () => {
       expect(
-        isUserFilterUnreachable(withUser('user-123', 'log_type:eq:edge', 'log_type:eq:storage'))
+        isUserFilterUnreachable(withUser('user-123', 'log_type:eq:realtime', 'log_type:eq:storage'))
       ).toBe(true)
     })
 
@@ -347,7 +395,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
 
     it('(neq) is true only when both attributable sources are excluded', () => {
       expect(
-        isUserFilterUnreachable(withUser('user-123', 'log_type:neq:auth', 'log_type:neq:postgres'))
+        isUserFilterUnreachable(withUser('user-123', 'log_type:neq:auth', 'log_type:neq:edge'))
       ).toBe(true)
     })
   })

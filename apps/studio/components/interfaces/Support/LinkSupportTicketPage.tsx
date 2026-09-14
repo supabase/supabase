@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, cn, DialogSectionSeparator } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { LinkSupportTicketForm } from './LinkSupportTicketForm'
 
@@ -72,7 +72,7 @@ function LinkSupportTicketSuccess() {
       </div>
       <DialogSectionSeparator />
       <div className="w-full py-4 px-4 flex items-center justify-end">
-        <Button asChild variant="default">
+        <Button asChild>
           <Link href="/">Finish</Link>
         </Button>
       </div>

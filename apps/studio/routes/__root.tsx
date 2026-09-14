@@ -2,7 +2,6 @@
 
 import 'react-data-grid/lib/styles.css'
 import '@/styles/code.css'
-import '@/styles/focus.css'
 // Vite-only: defines @font-face for the custom fonts. The Next pipeline
 // (pages/_app.tsx) loads these via next/font instead, so this import has no
 // counterpart there — but dropping it under Vite makes the browser fall back
@@ -25,11 +24,13 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import {
+  ClientOnly,
   createRootRouteWithContext,
   HeadContent,
   Outlet,
   redirect,
   Scripts,
+  type AnyRouter,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import {
@@ -63,8 +64,10 @@ import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/IndirectTaxDeclarationModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
+import { ShellFallback } from '@/components/interfaces/App/ShellFallback'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
@@ -75,6 +78,7 @@ import { AuthProvider } from '@/lib/auth'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
+import { splitInternalUrl } from '@/lib/internal-url'
 // Custom adapter instead of `nuqs/adapters/tanstack-router` — the stock one
 // injects a trailing slash before the query on every nuqs write (see module).
 import { NuqsAdapter } from '@/lib/nuqs-tanstack-adapter'
@@ -135,6 +139,12 @@ const TimestampInfoTimezoneBridge = ({ children }: { children: ReactNode }) => {
 const IS_NON_PROD_ENV =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+
+// Mirrors the `MAINTENANCE_MODE` reads in `next.config.ts` and `vercel.ts`.
+// The var is unprefixed, so vite.config.ts inlines it explicitly (see the
+// define there) rather than it arriving via the NEXT_PUBLIC_ sweep — that
+// keeps the toggle a single build-time env var across all three runtimes.
+const IS_MAINTENANCE_MODE = process.env.MAINTENANCE_MODE === 'true'
 
 // Keep dev-only components out of the production bundle.
 const IS_DEV_TOOLBAR_ENABLED = IS_NON_PROD_ENV
@@ -326,11 +336,25 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       pathname: location.pathname,
       search: location.search as Record<string, string | string[] | undefined>,
       isPlatform: IS_PLATFORM,
+      maintenanceMode: IS_MAINTENANCE_MODE,
       hash: location.hash,
     })
     if (!match) return
-    const href = BASE_PATH ? `${BASE_PATH}${match.destination}` : match.destination
-    throw redirect({ href, statusCode: match.permanent ? 308 : 307 })
+    // `to`/`search`/`hash`, never `href`: the router treats `href` as an
+    // opaque (external) target, and preloading a Link whose beforeLoad
+    // throws `redirect({ href })` recurses forever — the preload retry
+    // rebuilds the origin location and re-runs this beforeLoad
+    // (https://github.com/TanStack/router/issues/7141). `to` is also
+    // basepath-relative, so no manual BASE_PATH prefix. The explicit
+    // `search`/`hash` fallbacks clear the incoming values rather than
+    // inherit them — `preserveQueryAndHash` already merged what carries over.
+    const { to, search, hash } = splitInternalUrl(match.destination)
+    throw redirect<AnyRouter, string>({
+      to,
+      search: search ?? {},
+      hash: hash ?? '',
+      statusCode: match.permanent ? 308 : 307,
+    })
   },
   component: RootComponent,
   shellComponent: RootDocument,
@@ -364,11 +388,14 @@ function RootComponent() {
                               <BannerStackProvider>
                                 <FeaturePreviewContextProvider>
                                   <MainScrollContainerProvider>
-                                    <Outlet />
+                                    <ClientOnly fallback={<ShellFallback />}>
+                                      <Outlet />
+                                    </ClientOnly>
                                   </MainScrollContainerProvider>
                                   <GlobalShortcuts />
                                   <StudioCommandMenu />
                                   <FeaturePreviewModal />
+                                  <IndirectTaxDeclarationModal />
                                 </FeaturePreviewContextProvider>
                               </BannerStackProvider>
                               <Toaster />

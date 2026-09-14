@@ -58,7 +58,7 @@ const DatabaseSettings: NextPageWithLayout = () => {
             <ConnectionPooling />
             <SSLConfiguration />
             {showNewDiskManagementUI ? (
-              // This form is hidden if Disk and Compute form is enabled, new form is on ./settings/compute-and-disk
+              // This form is hidden if Disk and Compute form is enabled, new form is on ./settings/infrastructure
               <DiskManagementPanelForm />
             ) : (
               <DiskSizeConfiguration />

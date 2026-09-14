@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { PowerOff } from 'lucide-react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -19,13 +19,7 @@ export const AutosaveStatus = ({ id }: AutosaveStatusProps) => {
   const isManualSaveEnabled = useIsSqlEditorManualSaveEnabled()
   const { selectFeaturePreview } = useFeaturePreviewModal()
 
-  // Whether the manual-save preview can actually be opted into. Mirrors the
-  // feature preview modal's own filter (platform-only + ConfigCat flag), so we
-  // don't offer to "disable autosave" when there's no preview to switch to.
-  // `isManualSaveEnabled` also being false for self-hosted / flag-off users is
-  // why it can't gate this affordance.
-  const sqlEditorManualSaveFlag = useFlag('sqlEditorManualSave')
-  const canEnableManualSave = IS_PLATFORM && sqlEditorManualSaveFlag
+  const canEnableManualSave = IS_PLATFORM
 
   if (isManualSaveEnabled) {
     const snippet = snapV2.snippets[id]

@@ -1,10 +1,10 @@
-import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { Check, Lightbulb, Table2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
+  AccordionTrigger,
   Alert,
   AlertDescription,
   AlertTitle,
@@ -14,7 +14,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 

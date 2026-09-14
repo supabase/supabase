@@ -169,7 +169,7 @@ If you are using an external email provider that enables "email tracking", the l
 
 ### Redirecting the user to a server-side endpoint
 
-If you intend to use [Server-side rendering](/docs/guides/auth/server-side-rendering), you might want the email link to redirect the user to a server-side endpoint to check if they are authenticated before returning the page. However, the default email link will redirect the user after verification to the redirect URL with the session in the query fragments. Since the session is returned in the query fragments by default, you won't be able to access it on the server-side.
+If you intend to use [Server-side rendering](/docs/guides/auth/server-side/advanced-guide), you might want the email link to redirect the user to a server-side endpoint to check if they are authenticated before returning the page. However, the default email link will redirect the user after verification to the redirect URL with the session in the query fragments. Since the session is returned in the query fragments by default, you won't be able to access it on the server-side.
 
 You can customize the email link in the email template to redirect the user to a server-side endpoint successfully. For example:
 

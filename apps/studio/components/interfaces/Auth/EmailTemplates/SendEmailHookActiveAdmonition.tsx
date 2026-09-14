@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { InlineLink } from '@/components/ui/InlineLink'
 import { DOCS_URL } from '@/lib/constants'
@@ -29,7 +29,7 @@ export const SendEmailHookActiveAdmonition = () => {
         </>
       }
       actions={
-        <Button asChild variant="default">
+        <Button asChild>
           <Link href={`/project/${projectRef}/auth/hooks?hook=send-email`}>Manage hook</Link>
         </Button>
       }

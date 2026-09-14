@@ -6,6 +6,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { SectionContent } from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import Panel from '@/components/ui/Panel'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
@@ -59,7 +60,6 @@ export const DiskUsage = ({
           })
           .filter((it) => it.ref === projectRef || !projectRef)
       : []
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess, projects, projectRef])
 
   const hasProjectsExceedingDiskSize = useMemo(() => {
@@ -199,10 +199,8 @@ export const DiskUsage = ({
                           </div>
                         </div>
 
-                        <Button asChild variant="default" size="tiny">
-                          <Link href={`/project/${project.ref}/settings/compute-and-disk`}>
-                            Manage Disk
-                          </Link>
+                        <Button asChild size="tiny">
+                          <Link href={getInfrastructurePath(project.ref)}>Manage Disk</Link>
                         </Button>
                       </div>
                     )

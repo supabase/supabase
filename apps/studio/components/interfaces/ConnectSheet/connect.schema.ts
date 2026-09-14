@@ -1,4 +1,31 @@
+import { FEATURE_GROUPS_NON_PLATFORM, FEATURE_GROUPS_PLATFORM } from 'ui-patterns/McpUrlBuilder'
+
 import type { ConnectSchema, StepDefinition } from './Connect.types'
+
+/**
+ * MCP feature groups enabled by default on platform (Storage is excluded to keep
+ * tool counts manageable).
+ */
+export const DEFAULT_MCP_FEATURES = FEATURE_GROUPS_PLATFORM.filter(
+  (group) => group.id !== 'storage'
+).map((group) => group.id)
+
+const NON_PLATFORM_MCP_FEATURE_IDS = new Set(FEATURE_GROUPS_NON_PLATFORM.map((group) => group.id))
+
+/** Defaults (and supported IDs) for the current deployment mode. */
+export function getDefaultMcpFeatures(isPlatform: boolean): string[] {
+  if (isPlatform) return DEFAULT_MCP_FEATURES
+  return DEFAULT_MCP_FEATURES.filter((id) => NON_PLATFORM_MCP_FEATURE_IDS.has(id))
+}
+
+export function getSupportedMcpFeatureGroups(isPlatform: boolean) {
+  return isPlatform ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
+}
+
+export function normalizeMcpFeatures(features: string[], isPlatform: boolean): string[] {
+  if (isPlatform) return features
+  return features.filter((id) => NON_PLATFORM_MCP_FEATURE_IDS.has(id))
+}
 
 /**
  * Base install commands for each library.
@@ -7,8 +34,7 @@ export const INSTALL_COMMANDS: Record<string, string> = {
   supabasejs: 'npm install @supabase/supabase-js',
   supabasepy: 'pip install supabase',
   supabaseflutter: 'flutter pub add supabase_flutter',
-  supabaseswift:
-    'swift package add-dependency https://github.com/supabase-community/supabase-swift',
+  supabaseswift: 'swift package add-dependency https://github.com/supabase/supabase-swift',
   supabasekt: 'implementation("io.github.jan-tennert.supabase:supabase-kt:VERSION")',
 }
 
@@ -68,8 +94,8 @@ const frameworkReactFilesStep: StepDefinition = {
 
 const frameworkShadcnStep: StepDefinition = {
   id: 'shadcn-add',
-  title: 'Add Supabase UI components',
-  description: 'Run this command to install the Supabase shadcn components.',
+  title: 'Add Supabase Library blocks',
+  description: 'Install Supabase Library blocks via the shadcn registry.',
   content: 'steps/shadcn/command',
 }
 
@@ -78,13 +104,6 @@ const frameworkShadcnEnvStep: StepDefinition = {
   title: 'Set env variables',
   description: 'Add the following values to your env file.',
   content: 'steps/shadcn/env',
-}
-
-const frameworkShadcnExploreStep: StepDefinition = {
-  id: 'shadcn-explore',
-  title: 'Check out more UI components',
-  description: 'Add auth, realtime and storage functionality to your project',
-  content: 'steps/shadcn/explore',
 }
 
 const directConnectionStep: StepDefinition = {
@@ -97,7 +116,7 @@ const directConnectionStep: StepDefinition = {
 const directInstallStep: StepDefinition = {
   id: 'direct-install',
   title: 'Install dependencies',
-  description: 'Run this command to install the required dependencies.',
+  description: 'Install the required dependencies.',
   content: 'steps/direct-install',
 }
 
@@ -133,7 +152,7 @@ const codexAuthenticateStep: StepDefinition = {
 const codexVerifyStep: StepDefinition = {
   id: 'codex-verify',
   title: 'Verify authentication',
-  description: 'Run /mcp inside Codex to verify.',
+  description: 'Confirm the MCP server is authenticated.',
   content: 'steps/mcp/codex/verify',
 }
 
@@ -148,7 +167,7 @@ const claudeAuthenticateStep: StepDefinition = {
   id: 'claude-authenticate',
   title: 'Authenticate',
   description:
-    'After configuring the MCP server, you need to authenticate. In a regular terminal (not the IDE extension) run:',
+    'After configuring the MCP server, you need to authenticate. Run this in a regular terminal, not an IDE extension.',
   content: 'steps/mcp/claude-code/authenticate',
 }
 
@@ -169,8 +188,7 @@ const ormConfigureStep: StepDefinition = {
 const serverInstallStep: StepDefinition = {
   id: 'server-install',
   title: 'Install package',
-  description:
-    'Add @supabase/server to your backend or API framework of choice. On Supabase Edge Functions you can import it directly, no install needed.',
+  description: 'Add @supabase/server to your backend.',
   content: 'server/install',
 }
 
@@ -178,13 +196,14 @@ const serverEnvStep: StepDefinition = {
   id: 'server-env',
   title: 'Set environment variables',
   description:
-    'Copy these into your environment so you can verify users and use the client/admin supabase-js library from the context of your handler. On Supabase Edge Functions they are injected automatically.',
+    'Copy these into your environment so your handler can verify users and use supabase-js.',
   content: 'server/env',
 }
 
 const skillsInstallStep: StepDefinition = {
   id: 'install-skills',
-  title: 'Install Agent Skills (Optional)',
+  title: 'Install Agent Skills',
+  optional: true,
   description:
     'Agent Skills give AI coding tools ready-made instructions, scripts, and resources for working with Supabase more accurately and efficiently.',
   content: 'steps/skills-install',
@@ -192,9 +211,9 @@ const skillsInstallStep: StepDefinition = {
 
 const serverSkillsInstallStep: StepDefinition = {
   id: 'install-skills',
-  title: 'Install the Supabase Server skill (Optional)',
-  description:
-    'Gives AI coding tools ready-made instructions for building APIs with @supabase/server.',
+  title: 'Install the Supabase Server skill',
+  optional: true,
+  description: 'Give AI coding tools instructions for building APIs with @supabase/server.',
   content: 'steps/skills-install',
 }
 
@@ -269,6 +288,12 @@ export const connectSchema: ConnectSchema = {
       description: 'Connect your agent',
       fields: ['mcpClient', 'mcpReadonly', 'mcpFeatures'],
     },
+    {
+      id: 'warehouse',
+      label: 'Warehouse',
+      description: 'Connect to Warehouse',
+      fields: [],
+    },
   ],
 
   // -------------------------------------------------------------------------
@@ -278,8 +303,13 @@ export const connectSchema: ConnectSchema = {
     // Framework fields
     framework: {
       id: 'framework',
-      type: 'select',
+      type: 'combobox',
       label: 'Framework',
+      combobox: {
+        placeholder: 'Select framework',
+        searchPlaceholder: 'Search frameworks...',
+        emptyMessage: 'No frameworks found',
+      },
       options: { source: 'frameworks' },
       defaultValue: 'nextjs',
     },
@@ -302,7 +332,7 @@ export const connectSchema: ConnectSchema = {
       id: 'frameworkUi',
       type: 'switch',
       label: 'Shadcn',
-      description: 'Install components via the Supabase shadcn registry.',
+      description: 'Install Supabase Library blocks with shadcn.',
       defaultValue: false,
       dependsOn: { framework: ['nextjs', 'react'] },
     },
@@ -326,8 +356,8 @@ export const connectSchema: ConnectSchema = {
     useSharedPooler: {
       id: 'useSharedPooler',
       type: 'switch',
-      label: 'Use IPv4 connection (Shared Pooler)',
-      description: 'Recommended when your network does not support IPv6',
+      label: 'Use IPv4 connection',
+      description: 'Uses the shared pooler. Recommended on networks that do not support IPv6.',
       defaultValue: false,
       dependsOn: { connectionMethod: ['transaction'] },
     },
@@ -351,9 +381,14 @@ export const connectSchema: ConnectSchema = {
     // MCP fields
     mcpClient: {
       id: 'mcpClient',
-      type: 'select',
+      type: 'combobox',
       label: 'Client',
-      description: 'Choose the MCP client you are using.',
+      description: 'The MCP client you are using.',
+      combobox: {
+        placeholder: 'Select client',
+        searchPlaceholder: 'Search clients...',
+        emptyMessage: 'No clients found',
+      },
       options: { source: 'mcpClients' },
       defaultValue: 'claude-code',
     },
@@ -361,7 +396,7 @@ export const connectSchema: ConnectSchema = {
       id: 'mcpReadonly',
       type: 'switch',
       label: 'Read-only',
-      description: 'Only allow read operations on your database',
+      description: 'Only allow read operations on your database.',
       defaultValue: false,
     },
     mcpFeatures: {
@@ -369,8 +404,9 @@ export const connectSchema: ConnectSchema = {
       type: 'multi-select',
       label: 'Feature groups',
       description:
-        'Only enable a subset of features. Helps keep the number of tools within MCP client limits.',
+        'Which MCP tools to include. Storage is off by default to keep tool counts manageable.',
       options: { source: 'mcpFeatures' },
+      defaultValue: DEFAULT_MCP_FEATURES,
     },
   },
 
@@ -390,7 +426,6 @@ export const connectSchema: ConnectSchema = {
                     frameworkInstallPackagesStep,
                     frameworkShadcnStep,
                     frameworkShadcnEnvStep,
-                    frameworkShadcnExploreStep,
                     skillsInstallStep,
                   ],
                   DEFAULT: [
@@ -406,7 +441,6 @@ export const connectSchema: ConnectSchema = {
                     frameworkInstallStep,
                     frameworkShadcnStep,
                     frameworkShadcnEnvStep,
-                    frameworkShadcnExploreStep,
                     skillsInstallStep,
                   ],
                   DEFAULT: [frameworkInstallStep, frameworkNextJsFilesStep, skillsInstallStep],
@@ -420,7 +454,6 @@ export const connectSchema: ConnectSchema = {
                 frameworkInstallStep,
                 frameworkShadcnStep,
                 frameworkShadcnEnvStep,
-                frameworkShadcnExploreStep,
                 skillsInstallStep,
               ],
               DEFAULT: [frameworkInstallStep, frameworkReactFilesStep, skillsInstallStep],
@@ -449,6 +482,9 @@ export const connectSchema: ConnectSchema = {
         },
       },
       server: [serverInstallStep, serverEnvStep, serverSkillsInstallStep],
+      // Warehouse renders its own fully custom panel (WarehouseModePanel) instead of the
+      // generic field/step abstraction, so it has no steps of its own here.
+      warehouse: [],
       DEFAULT: [skillsInstallStep],
     },
   },

@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { Trash } from 'lucide-react'
 import { useEffect } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -90,7 +90,7 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
     })
   }
 
-  const awsRegion = form.watch('awsRegion')
+  const awsRegion = useWatch({ control: form.control, name: 'awsRegion' })
 
   return (
     <Dialog open={visible} onOpenChange={() => onClose()}>
@@ -144,7 +144,6 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
                   <FormItemLayout label="Amazon Cognito User Pool ID">
                     <div className="flex flex-row">
                       <Button
-                        variant="default"
                         size="small"
                         className="px-2 text-foreground-light rounded-r-none"
                         onClick={() => form.setFocus('awsCognitoUserPoolId')}
@@ -179,10 +178,16 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
             </div>
           )}
 
-          <Button disabled={isPending} variant="default" onClick={() => onClose()}>
+          <Button disabled={isPending} onClick={() => onClose()}>
             Cancel
           </Button>
-          <Button form={FORM_ID} type="submit" disabled={isPending} loading={isPending}>
+          <Button
+            variant="primary"
+            form={FORM_ID}
+            type="submit"
+            disabled={isPending}
+            loading={isPending}
+          >
             {isCreating ? 'Create connection' : 'Update connection'}
           </Button>
         </DialogFooter>

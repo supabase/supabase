@@ -1,5 +1,13 @@
 [
   {
+    "author_id": "alex_hall",
+    "author": "Alex Hall",
+    "username": "alexhall",
+    "position": "Engineering",
+    "author_url": "https://github.com/alexhall",
+    "author_image_url": "https://github.com/alexhall.png"
+  },
+  {
     "author_id": "angelico_de_los_reyes",
     "author": "Angelico de los Reyes",
     "position": "Engineering",
@@ -28,6 +36,13 @@
     "position": "Engineering",
     "author_url": "https://github.com/darora",
     "author_image_url": "https://github.com/darora.png"
+  },
+  {
+    "author_id": "elsa_heffernan",
+    "author": "Elsa Heffernan",
+    "position": "Partnerships",
+    "author_url": "https://www.linkedin.com/in/elsaheffernan/",
+    "author_image_url": "/images/blog/avatars/elsa-heffernan.png"
   },
   {
     "author_id": "fracek",
@@ -89,6 +104,14 @@
     "position": "Head of Growth",
     "author_url": "https://github.com/roryw10",
     "author_image_url": "https://github.com/roryw10.png"
+  },
+  {
+    "author_id": "shaziya_bandukia",
+    "author": "Shaziya Bandukia",
+    "username": "shaziyabandukia",
+    "position": "Product + Partnerships",
+    "author_url": "https://github.com/shaziyabandukia",
+    "author_image_url": "https://github.com/shaziyabandukia.png"
   },
   {
     "author_id": "steve_chavez",
@@ -864,7 +887,7 @@
     "username": "deepthi",
     "position": "Head of Databases",
     "author_url": "https://github.com/deepthi",
-    "author_image_url": "https://github.com/deepthi.png"
+    "author_image_url": "/images/avatars/deepthi-sigireddi.jpg"
   },
   {
     "author_id": "joe_sciarrino",
@@ -926,7 +949,7 @@
     "author_id": "gregor_vand",
     "author": "Gregor Vand",
     "username": "gregorvand",
-    "position": "Technical Program Manager",
+    "position": "Product",
     "author_url": "https://www.linkedin.com/in/gregorvand/",
     "author_image_url": "https://github.com/gregorvand.png"
   },
@@ -1008,5 +1031,21 @@
     "position": "Growth",
     "author_url": "https://github.com/ekhar",
     "author_image_url": "/images/blog/avatars/eric-kharitonashvili.png"
+  },
+  {
+    "author_id": "miranda_limonczenko",
+    "author": "Miranda Limonczenko",
+    "username": "czenko",
+    "position": "Docs Engineer",
+    "author_url": "https://github.com/czenko",
+    "author_image_url": "https://github.com/czenko.png"
+  },
+  {
+    "author_id": "nik_richers",
+    "author": "Nik Richers",
+    "username": "nrichers",
+    "position": "Product Manager",
+    "author_url": "https://github.com/nrichers",
+    "author_image_url": "https://github.com/nrichers.png"
   }
 ]

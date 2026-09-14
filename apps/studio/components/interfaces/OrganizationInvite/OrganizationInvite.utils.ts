@@ -88,7 +88,7 @@ export function getOrganizationInviteContent({
 
   if (status === 'wrong-account') return { title: 'Wrong account' }
   if (status === 'expired') return { title: 'Invite expired' }
-  if (status === 'invalid') return { title: 'Invite invalid' }
+  if (status === 'invalid') return { title: 'Invalid invitation' }
   if (status === 'no-longer-valid') return { title: 'Invite no longer available' }
   if (status === 'error') {
     if (error?.message.includes('MFA required')) {

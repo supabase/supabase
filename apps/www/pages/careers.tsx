@@ -1,10 +1,16 @@
+import staticContent from '.generated/staticContent/_index.json'
 import { GlobeAltIcon } from '@heroicons/react/outline'
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import career from '~/data/career.json'
 import { breadcrumbs } from '~/lib/breadcrumbs'
-import { filterGenericJob, groupJobsByTeam, JobItemProps, PLACEHOLDER_JOB_ID } from '~/lib/careers'
+import {
+  filterGenericJob,
+  groupJobsByDepartment,
+  JobItemProps,
+  PLACEHOLDER_JOB_ID,
+} from '~/lib/careers'
 import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import Styles from '~/styles/career.module.css'
 import { GetServerSideProps } from 'next'
@@ -32,7 +38,7 @@ export const getServerSideProps: GetServerSideProps = (async ({ res }) => {
   const job_res = await fetch('https://api.ashbyhq.com/posting-api/job-board/supabase')
   const job_data = (await job_res.json()) as { jobs: JobItemProps[] }
 
-  const jobs = groupJobsByTeam(job_data.jobs.filter((job) => !filterGenericJob(job)))
+  const jobs = groupJobsByDepartment(job_data.jobs.filter((job) => !filterGenericJob(job)))
   const placeholderJob = job_data.jobs.find(filterGenericJob)
 
   const contributorResponse = await fetch(
@@ -90,8 +96,13 @@ interface CareersPageProps {
   contributors: { login: string; avatar_url: string; html_url: string }[]
 }
 
-const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) => {
+const CareerPage = ({
+  jobs = {},
+  placeholderJob = null,
+  contributors = [],
+}: Partial<CareersPageProps>) => {
   const { basePath } = useRouter()
+  const { jobsCount } = staticContent
 
   const meta_title = 'Careers | Supabase'
   const meta_description = 'Help build software developers love'
@@ -132,8 +143,8 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
             <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
               Explore remote opportunities and join our team to help us achieve it.
             </p>
-            <Button asChild variant="primary" className="mt-4">
-              <Link href="#positions">Open positions</Link>
+            <Button asChild variant="primary" size="medium" className="mt-4">
+              <Link href="#positions">Open positions ({jobsCount})</Link>
             </Button>
           </SectionContainer>
         </header>
@@ -420,11 +431,11 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
               <br /> We’d love to talk to you.
             </p>
             <div className="mt-10 flex flex-col gap-4">
-              {Object.entries(jobs).map(([team, teamJobs]) => (
-                <div key={team}>
-                  <h3 className="text-foreground-lighter text-sm">{team}</h3>
+              {Object.entries(jobs).map(([department, departmentJobs]) => (
+                <div key={department}>
+                  <h3 className="text-foreground-lighter text-sm">{department}</h3>
                   <div className="mt-2 -space-y-px">
-                    {teamJobs
+                    {departmentJobs
                       .filter((job) => !filterGenericJob(job))
                       .map((job) => (
                         <JobItem job={job} key={job.id} />
@@ -480,11 +491,11 @@ const JobItem = ({ job }: { job: JobItemProps }) => {
       <h4 className="text-base min-w-[240px] lg:min-w-[316px] grow sm:truncate mr-6">
         {job.title}
       </h4>
-      <div className="flex justify-between justify-[normal] pt-2 md:pt-0 lg:w-1/3 items-center">
-        <div className="flex items-center gap-4">
+      <div className="flex justify-between justify-[normal] pt-2 md:pt-0 items-center">
+        <div className="flex items-center gap-4 min-w-0">
           <Badge>
-            <GlobeAltIcon className="w-3 h-3" />
-            <span>{job.location}</span>
+            <GlobeAltIcon className="w-3 h-3 shrink-0" />
+            <span className="truncate">{job.location}</span>
           </Badge>
           <span className="hidden md:block">{job.employment}</span>
         </div>

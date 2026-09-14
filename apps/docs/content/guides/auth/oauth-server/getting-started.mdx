@@ -12,7 +12,7 @@ Before you begin, make sure you have:
 
 - A Supabase project (create one at [supabase.com](https://supabase.com))
 - Admin access to your project
-- (Optional) [Supabase CLI](/docs/guides/cli) v2.54.11 or higher for local development
+- (Optional) [Supabase CLI](/docs/guides/local-development) v2.54.11 or higher for local development
 
 ## Overview
 
@@ -115,7 +115,7 @@ This ensures that JWTs issued by your local instance use the correct issuer clai
 </TabPanel>
 </Tabs>
 
-<Admonition type="tip">
+<Admonition type="note">
 
 **Use asymmetric JWT signing keys for better security**
 
@@ -163,7 +163,7 @@ This is where you build the **frontend** for your authorization flow. When third
 Your authorization UI should:
 
 1. **Extract authorization_id** - Get the `authorization_id` from the URL query parameters
-2. **Authenticate the user** - If not already logged in, redirect to your login page (preserving the authorization_id)
+2. **Authenticate the user** - If not already signed in, redirect to your sign-in page (preserving the authorization_id)
 3. **Retrieve authorization details** - Use `supabase.auth.oauth.getAuthorizationDetails(authorization_id)` to get client information including requested scopes
 4. **Display consent screen** - Show the user what app is requesting access and what scopes/permissions are being requested
 5. **Handle user decision** - Call either `approveAuthorization(authorization_id)` or `denyAuthorization(authorization_id)` based on user choice
@@ -455,7 +455,7 @@ export function OAuthConsent() {
 
 1. **User navigates to your authorization path** - When a third-party app initiates OAuth, Supabase Auth redirects the user to your configured authorization path (e.g., `https://example.com/oauth/consent?authorization_id=<id>`)
 2. **Extract authorization_id** - Your page extracts the `authorization_id` from the URL query parameters
-3. **Check authentication** - Your page checks if the user is logged in, redirecting to login if not (preserving the authorization_id)
+3. **Check authentication** - Your page checks if the user is signed in, redirecting to sign in if not (preserving the authorization_id)
 4. **Retrieve details** - Call `supabase.auth.oauth.getAuthorizationDetails(authorization_id)` to get information about the requesting client
 5. **Show consent screen** - Display a UI asking the user to approve or deny access
 6. **Handle decision** - When the user clicks approve/deny:
@@ -498,7 +498,7 @@ Store the client secret securely. It will only be shown once. If you lose it, yo
 
 </Admonition>
 
-#### Token endpoint authentication method
+### Token endpoint authentication method
 
 When a client exchanges an authorization code or refreshes a token, it must authenticate with the token endpoint. The `token_endpoint_auth_method` controls how this authentication happens:
 

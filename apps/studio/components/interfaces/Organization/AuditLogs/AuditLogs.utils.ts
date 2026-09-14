@@ -50,3 +50,13 @@ export const formatSelectedDateRange = (value: DatePickerToFrom) => {
     return { from: from.utc().toISOString(), to: to.utc().toISOString() }
   }
 }
+
+export function formatPartnerIfExists(
+  partner: string | undefined,
+  partnerEmail: string | undefined
+) {
+  if (!partner) return undefined
+
+  const capitalized = `${partner[0].toUpperCase()}${partner.slice(1).toLowerCase()}`
+  return partnerEmail ? `${partnerEmail} (${capitalized})` : capitalized
+}

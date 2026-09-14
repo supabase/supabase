@@ -11,7 +11,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -118,7 +118,7 @@ export const BucketsPicker = ({
                   />
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="default" icon={<ArrowDownNarrowWide />}>
+                      <Button icon={<ArrowDownNarrowWide />}>
                         Sorted by {sortBucket === 'alphabetical' ? 'name' : 'created at'}
                       </Button>
                     </DropdownMenuTrigger>

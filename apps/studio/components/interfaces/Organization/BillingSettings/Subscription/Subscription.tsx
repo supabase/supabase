@@ -2,7 +2,7 @@ import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/
 import { useFlag, useParams } from 'common'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Restriction } from '../Restriction'
@@ -86,7 +86,6 @@ const Subscription = () => {
                     {canChangeTier && (
                       <div className="flex space-x-2">
                         <Button
-                          variant="default"
                           className="pointer-events-auto"
                           onClick={() => snap.setPanelKey('subscriptionPlan')}
                         >
@@ -118,7 +117,7 @@ const Subscription = () => {
                           title={`Unable to update plan from ${planName}`}
                           description="Please contact us if you'd like to change your plan."
                           actions={
-                            <Button asChild key="contact-support" variant="default">
+                            <Button asChild key="contact-support">
                               <SupportLink
                                 queryParams={{
                                   category: SupportCategories.SALES_ENQUIRY,

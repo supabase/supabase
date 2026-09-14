@@ -2,7 +2,7 @@ import { Label, RadioGroup, RadioGroupItem } from 'ui'
 
 export default function RadioGroupDemo() {
   return (
-    <RadioGroup defaultValue="comfortable">
+    <RadioGroup defaultValue="comfortable" aria-label="Size">
       <div className="flex items-center space-x-2">
         <RadioGroupItem value="default" id="r1" />
         <Label htmlFor="r1">Default</Label>

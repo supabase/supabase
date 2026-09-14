@@ -89,6 +89,19 @@ export const logsFiltersToColumnFilters = (
   )
 }
 
+// Seeds `date` too, so `logsFiltersToColumnFilters` (which only covers the `filter`
+// param) doesn't leave it out and get nulled by the debounced sync back to `search`.
+export const buildDefaultColumnFilters = (search: {
+  filter?: string[] | null
+  date?: Date[] | null
+}): { id: string; value: unknown }[] => {
+  const filters: { id: string; value: unknown }[] = logsFiltersToColumnFilters(
+    parseLogsFilterUrlParams(search.filter)
+  ).filter((f) => f.id !== 'date')
+  if (search.date?.length === 2) filters.push({ id: 'date', value: search.date })
+  return filters
+}
+
 export const columnFiltersToLogsFilters = (
   columnFilters: { id: string; value: unknown }[],
   filterableNames?: Set<string>

@@ -19,7 +19,7 @@ The `message` exposes the error reason, and `hint` gives you the literal SQL sta
 
 The same pattern shows up across many Postgres errors — missing column? `hint` suggests the column name you probably meant. Type mismatch? `hint` shows the expected type. Whenever Postgres knows the fix, it puts it in `hint`.
 
-<Admonition type="tip">Log the full `error` object, not only `error.message`.</Admonition>
+<Admonition type="note">Log the full `error` object, not only `error.message`.</Admonition>
 
 ## The recommended pattern
 

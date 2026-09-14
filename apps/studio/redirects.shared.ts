@@ -105,13 +105,23 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   },
   {
     source: '/project/:ref/auth/settings',
-    destination: '/project/:ref/auth/users',
+    destination: '/project/:ref/auth/providers',
     permanent: true,
   },
   {
     source: '/project/:ref/settings/billing/subscription',
     has: [{ type: 'query', key: 'panel', value: 'subscriptionPlan' }],
     destination: '/org/_/billing?panel=subscriptionPlan',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/settings/compute-and-disk',
+    destination: '/project/:ref/settings/infrastructure',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/database/replication/replica/:replicaId',
+    destination: '/project/:ref/settings/infrastructure/replica/:replicaId',
     permanent: true,
   },
   {
@@ -123,7 +133,7 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   {
     source: '/project/:ref/settings/billing/subscription',
     has: [{ type: 'query', key: 'panel', value: 'computeInstance' }],
-    destination: '/project/:ref/settings/compute-and-disk',
+    destination: '/project/:ref/settings/infrastructure#cpu',
     permanent: true,
   },
   {

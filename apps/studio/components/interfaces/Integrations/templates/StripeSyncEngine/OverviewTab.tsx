@@ -17,7 +17,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -248,7 +248,7 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
       )}
 
       <Sheet open={!!shouldShowInstallSheet} onOpenChange={handleCloseInstallSheet}>
-        <SheetContent size="lg" tabIndex={undefined} className="flex flex-col gap-0">
+        <SheetContent size="lg" className="flex flex-col gap-0">
           <Form {...form}>
             <form
               id={formId}
@@ -303,7 +303,7 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
                   />
 
                   <div className="flex items-center gap-x-2">
-                    <Button asChild variant="default" icon={<ExternalLink />}>
+                    <Button asChild icon={<ExternalLink />}>
                       <Link
                         target="_blank"
                         rel="noopener noreferrer"
@@ -312,7 +312,7 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
                         Get Stripe API key
                       </Link>
                     </Button>
-                    <Button asChild variant="default" icon={<ExternalLink />}>
+                    <Button asChild icon={<ExternalLink />}>
                       <Link
                         target="_blank"
                         rel="noopener noreferrer"
@@ -335,7 +335,6 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
 
               <SheetFooter>
                 <Button
-                  variant="default"
                   disabled={isInstallRequested}
                   onClick={() => handleCloseInstallSheet(false)}
                 >

@@ -3,7 +3,13 @@
   "type": "registry:block",
   "title": "Password Based Auth flow for Nextjs and Supabase",
   "description": "Password Based Auth flow for Nextjs and Supabase",
-  "registryDependencies": ["button", "card", "input", "label"],
+  "registryDependencies": [
+    "button",
+    "card",
+    "input",
+    "label",
+    "https://supabase.com/library/r/safe-next-path.json"
+  ],
   "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
   "files": [
     {

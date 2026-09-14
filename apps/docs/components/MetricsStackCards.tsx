@@ -1,4 +1,4 @@
-import { Datadog, Grafana } from 'icons'
+import { Datadog, Elastic, Grafana } from 'icons'
 import { Flame } from 'lucide-react'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
@@ -8,6 +8,7 @@ import { metricsStackOptions, type MetricsStackOption } from './MetricsStackCard
 const ICONS: Record<MetricsStackOption['iconKind'], ReactNode> = {
   grafana: <Grafana className="h-5 w-5" />,
   datadog: <Datadog className="h-5 w-5" />,
+  elastic: <Elastic className="h-5 w-5" />,
   flame: <Flame className="h-5 w-5" strokeWidth={1.5} />,
 }
 
