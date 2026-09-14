@@ -29,15 +29,12 @@ interface MoveItemsFolderPickerProps {
   projectRef: string
   bucketId: string
   bucketName: string
-  /** Folders opened so far, relative to the root of the bucket */
   pathSegments: string[]
   onChangePath: (pathSegments: string[]) => void
 }
 
 /**
- * A file explorer scoped down to picking a destination folder: folders open on click, files are
- * listed but inert, and searching swaps the listing for a flat list of matching folders from
- * anywhere in the bucket.
+ * A file explorer scoped down to picking a destination folder
  */
 export const MoveItemsFolderPicker = ({
   projectRef,
