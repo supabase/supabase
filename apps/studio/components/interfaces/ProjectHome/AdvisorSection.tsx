@@ -123,7 +123,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
       ) : (
         <div className="flex justify-between items-center mb-6">
           {titleContent}
-          <Button variant="default" icon={<AiIconAnimation />} onClick={handleAskAssistant}>
+          <Button icon={<AiIconAnimation />} onClick={handleAskAssistant}>
             Ask Assistant
           </Button>
         </div>

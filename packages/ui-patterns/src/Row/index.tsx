@@ -148,7 +148,6 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
       {showArrows && canScrollLeft && (
         <div className="absolute left-0 top-1/2 z-10 inline-flex -translate-y-1/2 rounded-full bg-background">
           <Button
-            variant="default"
             onClick={scrollLeft}
             className="w-8 h-8 rounded-full p-2"
             aria-label="Scroll left"
@@ -161,7 +160,6 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
       {showArrows && canScrollRight && hasContentToScroll && (
         <div className="absolute right-0 top-1/2 z-10 inline-flex -translate-y-1/2 rounded-full bg-background">
           <Button
-            variant="default"
             onClick={scrollRight}
             className="w-8 h-8 rounded-full p-2"
             aria-label="Scroll right"

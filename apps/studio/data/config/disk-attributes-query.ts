@@ -12,7 +12,7 @@ export type DiskAttributesVariables = {
   projectRef?: string
 }
 
-export type DiskAttribute = components['schemas']['DiskResponse']
+export type DiskAttribute = components['schemas']['DiskResponse_Output']
 
 export async function getDiskAttributes(
   { projectRef }: DiskAttributesVariables,

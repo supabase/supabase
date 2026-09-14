@@ -11,7 +11,7 @@ import { routerMock } from '@/tests/lib/route-mock'
 
 // The OAuth-apps query overrides its return type to `AuthorizedApp`, but the wire response (and so
 // the MSW resolver) is the raw OpenAPI `OAuthAppResponse`. Build fixtures against the API shape.
-type OAuthAppResponse = components['schemas']['OAuthAppResponse']
+type OAuthAppResponse = components['schemas']['OAuthAppResponse_Output']
 type PartnerIntegrationListResponse = components['schemas']['PartnerIntegrationListResponse']
 
 const STABLE_PARAMS = { ref: 'default', id: 'grafana', pageId: 'overview' }

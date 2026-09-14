@@ -49,7 +49,7 @@ export const QueryResultRenderer = ({
   }
 
   if ((rows ?? []).length === 0) {
-    return <p className="text-xs text-foreground-lighter py-8">Success. No rows returned</p>
+    return <p className="text-xs text-foreground-lighter p-3">Success. No rows returned</p>
   }
 
   if (rows && rows.length > 0) {

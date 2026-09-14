@@ -63,7 +63,7 @@ export default function MultiSelectDemo() {
           </div>
         </DialogSection>
         <DialogFooter>
-          <Button>Save changes</Button>
+          <Button variant="primary">Save changes</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

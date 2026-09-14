@@ -51,7 +51,6 @@ export const ConversationScrollButton = ({
           className={cn('rounded-full', className)}
           onClick={handleScrollToBottom}
           size="tiny"
-          variant="default"
           {...props}
         >
           <ArrowDownIcon className="size-4" />

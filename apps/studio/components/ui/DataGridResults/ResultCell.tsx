@@ -28,7 +28,6 @@ export const ResultCell = ({ column, value, onContextMenu, onExpand }: ResultCel
           <div className="absolute right-1 top-1/2 inline-flex -translate-y-1/2 rounded-lg bg-background opacity-0 group-hover/cell:opacity-100 focus-within:opacity-100">
             <TooltipTrigger asChild>
               <Button
-                variant="default"
                 size="tiny"
                 className="px-1"
                 icon={<Expand size={10} />}

@@ -80,6 +80,7 @@ export const ExplorerQueryTab = () => {
   const draft = stateDraft?.projectRef === ref ? stateDraft : undefined
   const result = draft && id ? querySnap.results[id] : undefined
   const queryKey = id && ref ? `${ref}:${id}` : undefined
+  const isDraftReady = !!queryKey && restoredQueryKey === queryKey
 
   const roleImpersonationState = useControlledRoleImpersonationState(
     draft?._tag === 'database' ? draft.role : undefined,
@@ -98,6 +99,13 @@ export const ExplorerQueryTab = () => {
     explorerQueryState.restoreDraft({ id, projectRef: ref })
     setRestoredQueryKey(`${ref}:${id}`)
   }, [id, ref])
+
+  useEffect(() => {
+    if (!id || !isDraftReady || !draft?.pendingAutoRun) return
+
+    queryEditorRef.current?.run()
+    explorerQueryState.clearPendingAutoRun({ id })
+  }, [id, isDraftReady, draft?.pendingAutoRun])
 
   if (!queryKey || restoredQueryKey !== queryKey) {
     return (
@@ -121,7 +129,9 @@ export const ExplorerQueryTab = () => {
             This local draft may have been closed or cleared from this browser.
           </p>
         </div>
-        <Button onClick={() => router.push(`/project/${ref}/explorer`)}>Back to Explorer</Button>
+        <Button variant="primary" onClick={() => router.push(`/project/${ref}/explorer`)}>
+          Back to Explorer
+        </Button>
       </div>
     )
   }

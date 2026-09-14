@@ -298,7 +298,6 @@ export const PasskeysSettingsForm = () => {
 
           <CardFooter className="justify-end space-x-2">
             <Button
-              variant="default"
               onClick={() => form.reset(buildPasskeysFormValues(authConfig, project))}
               disabled={isPending}
             >

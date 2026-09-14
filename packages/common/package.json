@@ -37,6 +37,7 @@
     "tsconfig": "workspace:*",
     "type-fest": "5.6.0",
     "typescript": "catalog:",
+    "vite": "catalog:",
     "vitest": "catalog:"
   },
   "peerDependencies": {

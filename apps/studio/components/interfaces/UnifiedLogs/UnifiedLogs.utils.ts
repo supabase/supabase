@@ -10,20 +10,20 @@ import type { UnifiedLogInspectionEntry } from '@/data/logs/unified-log-inspecti
 
 export type UnifiedLogType = keyof typeof LOG_TYPES_LABELS
 
-export function getWorkersLogsAvailability({
+export function getComputeLogsAvailability({
   isPlatform,
   flagsLoaded,
-  workersEnabled,
+  computeEnabled,
 }: {
   isPlatform: boolean
   flagsLoaded?: boolean
-  workersEnabled: boolean
+  computeEnabled: boolean
 }) {
   const flagsReady = flagsLoaded === true
 
   return {
-    canQueryWorkers: isPlatform && flagsReady && workersEnabled,
-    preserveWorkersFilter: isPlatform && (!flagsReady || workersEnabled),
+    canQueryCompute: isPlatform && flagsReady && computeEnabled,
+    preserveComputeFilter: isPlatform && (!flagsReady || computeEnabled),
     readyToSyncFilters: !isPlatform || flagsReady,
   }
 }
@@ -83,12 +83,12 @@ export function getRowTimestampMs(
   return null
 }
 
-type WorkersRawLogData = Pick<ColumnSchema, 'id' | 'timestamp' | 'event_message' | 'metadata'>
+type ComputeRawLogData = Pick<ColumnSchema, 'id' | 'timestamp' | 'event_message' | 'metadata'>
 
 export function getRawLogData(
   row: ColumnSchema | UnifiedLogInspectionEntry
-): ColumnSchema | UnifiedLogInspectionEntry | WorkersRawLogData {
-  if (!('log_type' in row) || row.log_type !== 'workers') return row
+): ColumnSchema | UnifiedLogInspectionEntry | ComputeRawLogData {
+  if (!('log_type' in row) || row.log_type !== 'compute') return row
 
   return {
     id: row.id,

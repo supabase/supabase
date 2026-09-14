@@ -9,7 +9,7 @@ import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { ProjectInfoInfinite } from '@/data/projects/projects-infinite-query'
 import type { Organization } from '@/types'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 
 interface SelectorOptions {
   container?: HTMLElement
