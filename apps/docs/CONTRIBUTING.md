@@ -15,36 +15,34 @@ To make docs as clear as possible:
 - Write for the user. Think about what task they want to complete by reading your doc. Tell them what, and only what, they need to know.
 - Write like you talk. Conversational English is easier for a global audience to understand and localize. Many readers who use English as an additional language learn conversational rather than academic English. Use words and sentences that sound natural when speaking. Cut unnecessary words. Read your writing out loud to help you choose the clearest and simplest phrases.
 - Prefer short, direct sentences. Express one relationship at a time, and avoid unnecessary compound structures. This makes each sentence easier to understand, localize, and interpret consistently.
-- Cover one topic and one large information type in each paragraph. Start a new paragraph whenever either changes. Don't worry about paragraphs being too short. See [Information types](#information-types).
+- Cover one topic in each paragraph, and don't blend a procedure, a process, a structure, or a concept into another one. Don't worry about paragraphs being too short. See [Information types](#information-types).
 - Avoid using idioms and colloquialisms, such as `piece of cake`. These phrases are often specific to a region or culture.
 - Refer to the reader as `you`. Don't use `we` to refer to the reader. Use `we` only to refer to the Supabase team.
 
 ## Information types
 
-Supabase docs use the information types from the [Information Mapping](https://ivacheung.com/2012/11/introduction-to-information-mapping/) method. Every sentence that tells the reader something about the product is one of these types:
+Supabase docs use the information types from the [Information Mapping](https://support.informationmapping.com/hc/en-us/articles/213446789-Present-your-information-in-a-clear-and-consistent-way) method. Each type answers a different reader question, and each has a presentation that suits it:
 
-| Type | Size | Answers | Example |
+| Type | Answers | Present with | Example |
 | --- | --- | --- | --- |
-| Procedure | Large | How do I do it? | Run `alter table profiles enable row level security`. |
-| Process | Large | How does it work? | When a query runs, Postgres checks the policies on the table and returns only the rows that a policy allows. |
-| Concept | Large | What is it? | Row Level Security restricts which rows a user can read or write. |
-| Principle | Small | What's the rule or convention? | Enable Row Level Security on every table in an exposed schema. |
-| Structure | Small | What are its parts? | A policy has a name, a command, a role, a `using` expression, and a `with check` expression. |
-| Fact | Small | What's the specific value or behavior? | A table with Row Level Security enabled and no policy returns no rows. |
+| Procedure | How do I do it? | Numbered steps, or an if/then table | Run `alter table profiles enable row level security`. |
+| Process | What is happening? How does it work? | A stage-by-stage description, or a when/then table | When a query runs, Postgres checks the policies on the table and returns only the rows that a policy allows. |
+| Structure | What are its parts? | A part and description table, or a labeled diagram | A policy has a name, a command, a role, a `using` expression, and a `with check` expression. |
+| Principle | What should I do or not do? | Text, a list, or an admonition | Enable Row Level Security on every table in an exposed schema. |
+| Concept | What is it? | Text, a list, or a diagram | Row Level Security restricts which rows a user can read or write. |
+| Fact | What are the facts? | Text, a list, or a table | A table with Row Level Security enabled and no policy returns no rows. |
 
-Separate the large types from each other. Let the small ones ride along.
-
-**Give every large type its own block.** A paragraph carries one large type. Procedure and process are the pair that gets blended most often, because both answer a question about how. A procedure tells the reader what to do, and a process tells them what the system does on its own. A reader following steps can't act on the process sentences, and a reader trying to understand the system has to pick the explanation out of the instructions.
+**Procedure, process, and structure each need their own block.** The method presents each one as its own table, so none of them fits inside another type's paragraph. Procedure and process are the pair that gets blended most often, because both answer a question about how. A procedure tells the reader what to do, and a process tells them what the system does on its own. A reader following steps can't act on the process sentences, and a reader trying to understand the system has to pick the explanation out of the instructions.
 
 **Keep context out of the action path.** Concept and process are context. Put them before the procedure or after it, in their own section, and link between them. Don't thread a definition through the steps.
 
-**Small types ride along.** A fact, a principle, or a structure is usually one sentence, so it can sit inside the block it qualifies. A fact about timing belongs in the step it describes, and a principle can close the concept paragraph that motivates it. Don't give a one-sentence fact its own section. Promote a small type to its own block when it runs past a sentence or two, when it applies to the whole page rather than to one step, or when it becomes a table the reader scans.
+**A principle or a fact can ride along.** Either one is often a single sentence, so it can sit inside the block it qualifies. A fact about timing belongs in the step it describes, and a principle can close the concept paragraph that motivates it. Don't give a one-sentence fact its own section. Promote it when it runs past a sentence or two, or when it applies to the whole page rather than to one step.
 
 **Connective prose is exempt.** An introduction, a transition, an outcome, and a navigation outline describe the page rather than the product, so they don't carry an information type and the separation rule doesn't apply to them. A transition names the type it's leaving and the type it's moving to, which is its job. Keep connective prose to a sentence or two, and don't let it grow into the type it introduces. For where each kind belongs, see [Guides](#guides).
 
-**A long paragraph is a smell.** Once a paragraph runs past three or four sentences, it has almost always absorbed a second large type. Reread it and label each sentence with its type. Split wherever one large type meets another, and leave the small types with whichever block they qualify. Apply the same check to a long list item and to a step that has grown a trailing explanation.
+**A long paragraph is a smell.** Once a paragraph runs past three or four sentences, it has almost always absorbed a type that needed its own block. Reread it and label each sentence with its type. Split wherever a procedure, a process, a structure, or a concept meets another one, and leave a principle or a fact with the block it qualifies. Apply the same check to a long list item and to a step that has grown a trailing explanation.
 
-Not recommended, because one paragraph blends a concept and a procedure, which are both large types:
+Not recommended, because one paragraph blends a concept, a procedure, and a structure:
 
 ```md
 Row Level Security is a Postgres feature that restricts which rows a user can read
@@ -55,7 +53,7 @@ policy returns no rows to every client, so write a policy before you deploy. The
 `using` clause of a policy accepts any expression that returns a boolean.
 ```
 
-Recommended, with each large type in its own block:
+Recommended, with each type in the presentation that suits it:
 
 ```md
 ## Row Level Security
@@ -81,9 +79,9 @@ client. Write a policy before you deploy.
 The `using` clause accepts any expression that returns a boolean.
 ```
 
-Each block holds one large type: the concept, then the procedure.
+The concept, the procedure, and the structure each get their own block, and each uses the presentation its type calls for.
 
-The small types ride along. The fact about timing sits in the step it describes, and the admonition pairs a fact with the principle it implies, which is what the [Admonitions](#admonitions) section asks for. The structure sentence gets its own heading because it applies to every policy rather than to one step.
+The principle and the fact ride along. The fact about timing sits in the step it describes, and the admonition pairs a fact with the principle it implies, which is what the [Admonitions](#admonitions) section asks for.
 
 The recommended version is longer in lines and shorter to read. A reader who wants the command finds it under a heading that names the task, and a reader who wants the concept stops after the first paragraph.
 
@@ -153,7 +151,7 @@ Keep procedures focused on what the reader must do. Move substantial background 
 - Recommended: `Restrict access to a shared table with Row Level Security. To learn how a policy is evaluated, see [Row Level Security](...).`
 - Not recommended: Begin with several paragraphs about how Row Level Security works before stating what the reader can do.
 
-**Mixed information types:** Apply [Information types](#information-types) at the page level too. A section carries one large type, so classify each one as procedure, process, or concept, then group the sections of related types together. Procedure sections form the action path, and concept and process sections explain it. Keep the procedure group unbroken so that context never interrupts the action path. Principle, structure, and fact get their own section only when they apply to the whole page rather than to one step, which is what a reference section collects.
+**Mixed information types:** Apply [Information types](#information-types) at the page level too. A section carries one information type, so classify each one, then group the sections of related types together. Procedure sections form the action path, and concept and process sections explain it. Keep the procedure group unbroken so that context never interrupts the action path. Structure sections, along with the principles and facts that apply to the whole page rather than to one step, are what a reference section collects.
 
 Classify a section by what the reader is doing in it, not by what it's about. On a page about tables, every section is about tables, so subject matter tells you nothing. A reader opens a section on schemas to understand something, so it's a concept section no matter how much it mentions tables.
 
