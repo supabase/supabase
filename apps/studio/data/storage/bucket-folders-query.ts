@@ -6,17 +6,15 @@ import type { ResponseError } from '@/types'
 
 /** Number of objects requested per folder listing */
 const PAGE_LIMIT = 1000
-/** Cap on how many listings the crawl issues, to bound the cost on very large buckets */
+/** Cap on how many listings the crawl issues */
 const MAX_LISTINGS = 200
-/** Cap on how many folders are collected, to bound the size of the result */
+/** Cap on how many folders are collected */
 const MAX_FOLDERS = 1000
 /** How many listings are issued at a time while crawling */
 const CONCURRENCY = 5
 
 export type StorageFolder = {
-  /** Folder name, without any of its parents */
   name: string
-  /** Full path to the folder from the root of the bucket, e.g. `photos/2024` */
   path: string
 }
 
@@ -52,7 +50,7 @@ const listFolderNames = async (
 
 /**
  * Crawls a bucket breadth first and returns every folder in it, so that folders can be
- * searched client side. Bounded by `MAX_LISTINGS` and `MAX_FOLDERS` — when either limit is
+ * searched client side. Limited by `MAX_LISTINGS` and `MAX_FOLDERS` — when either limit is
  * reached the crawl stops early and `isTruncated` is set.
  */
 async function getBucketFolders(

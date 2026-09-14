@@ -6,8 +6,7 @@ import type { StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 export const MAX_FOLDER_SEARCH_RESULTS = 100
 
 /**
- * Returns the folder each item currently lives in, derived from the folders that were opened
- * to reach it. Items selected across several columns can have different source folders.
+ * Returns the folder each item currently lives in
  */
 export function getSourcePaths(
   items: StorageItemWithColumn[],
@@ -29,18 +28,10 @@ export function isSameAsSourcePath(sourcePaths: string[], destinationPath: strin
   return sourcePaths.length === 1 && sourcePaths[0] === destinationPath
 }
 
-/**
- * Human readable name for the folder items are being moved into. The bucket name stands in for
- * the root of the bucket, which has no folder name of its own.
- */
 export function getDestinationName(bucketName: string, pathSegments: string[]): string {
   return pathSegments.length > 0 ? pathSegments[pathSegments.length - 1] : bucketName
 }
 
-/**
- * Full destination path including the bucket, for display only. Moves are relative to the
- * bucket, so the bucket name is never part of the path sent to the API.
- */
 export function getDestinationLabel(bucketName: string, pathSegments: string[]): string {
   return [bucketName, ...pathSegments].join('/')
 }
@@ -75,8 +66,7 @@ export function filterFoldersBySearch(
 }
 
 /**
- * Narrows a listing to the folders in it. The picker only offers folders, so files are dropped
- * rather than shown as unselectable rows. Objects without an id are prefixes (folders).
+ * Narrows a listing to the folders in it. The picker only offers folders, so files are dropped.
  */
 export function toFolders(objects: StorageObject[], parentPath: string): StorageFolder[] {
   return objects
@@ -87,30 +77,19 @@ export function toFolders(objects: StorageObject[], parentPath: string): Storage
     }))
 }
 
-/**
- * Where a folder lives, for search results that span the whole bucket. The bucket name stands in
- * for the root, which has no path of its own.
- */
 export function getParentPathLabel(folderPath: string, bucketName: string): string {
   const parentSegments = folderPath.split('/').slice(0, -1)
   return parentSegments.length > 0 ? parentSegments.join('/') : bucketName
 }
 
-/** Breadcrumb items shown before the middle of the path collapses into an ellipsis */
 export const BREADCRUMB_ITEMS_TO_DISPLAY = 3
 
 export type MoveBreadcrumb = {
   label: string
-  /** Path the picker navigates to when this crumb is chosen */
   pathSegments: string[]
   isCurrent: boolean
 }
 
-/**
- * Splits the path into the breadcrumb shape the design system prescribes: the bucket always
- * stays visible, the deepest folders stay visible, and everything between them collapses behind
- * an ellipsis so a deeply nested path stays readable.
- */
 export function getMoveBreadcrumbs(
   bucketName: string,
   pathSegments: string[]
@@ -132,9 +111,6 @@ export function getMoveBreadcrumbs(
   }
 }
 
-/**
- * Copy for the dialog title, which names what is being moved rather than where it's going.
- */
 export function getMoveItemsTitle(items: StorageItemWithColumn[]): string {
   if (items.length === 1) return `Move ${items[0].name}`
   return `Move ${items.length} items`

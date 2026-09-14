@@ -27,16 +27,11 @@ interface MoveItemsModalProps {
   bucketName: string
   visible: boolean
   selectedItemsToMove: StorageItemWithColumn[]
-  /** Folders opened in the explorer, used to work out where the items are being moved from */
   openedFolders: readonly StorageItem[]
   onSelectCancel: () => void
   onSelectMove: (path: string) => void
 }
 
-/**
- * Body of the move dialog. Kept separate from the dialog itself so that Radix unmounting the
- * content on close resets the chosen destination for the next move.
- */
 const MoveItemsDialogBody = ({
   projectRef,
   bucketId,
