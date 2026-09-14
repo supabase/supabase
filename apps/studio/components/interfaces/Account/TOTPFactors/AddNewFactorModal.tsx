@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
+import { useFlag } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -10,11 +11,14 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
+import { RecoveryCodesModal } from './RecoveryCodesModal'
 import InformationBox from '@/components/ui/InformationBox'
 import { organizationKeys } from '@/data/organizations/keys'
 import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaEnrollMutation } from '@/data/profile/mfa-enroll-mutation'
 import { useMfaUnenrollMutation } from '@/data/profile/mfa-unenroll-mutation'
+import { useRecoveryCodesGenerateMutation } from '@/data/recovery-codes/recovery-codes-generate-mutation'
+import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 
 type TOTP = { qr_code: string; secret: string; uri: string }
@@ -26,6 +30,14 @@ interface AddNewFactorModalProps {
 
 export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
   const { data, mutate: enroll, isPending: isEnrolling, reset } = useMfaEnrollMutation()
+  const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
+  const { data: recoveryCodesStatus } = useRecoveryCodesStatusQuery({
+    enabled: enableAuthRecoveryCodes,
+  })
+
+  const recoveryCodesGenerateMutation = useRecoveryCodesGenerateMutation()
+
+  const [isRecoveryCodesModalOpen, setIsRecoveryCodesModalOpen] = useState<boolean>(false)
 
   useEffect(() => {
     if (!visible) reset()
@@ -45,7 +57,21 @@ export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) 
         factorName={data?.friendly_name ?? ''}
         factor={data as Extract<typeof data, { type: 'totp' }>}
         isLoading={isEnrolling}
-        onClose={onClose}
+        onClose={() => {
+          const shouldGenerateRecoveryCodes =
+            enableAuthRecoveryCodes && recoveryCodesStatus?.status === 'unenrolled'
+
+          if (shouldGenerateRecoveryCodes) {
+            recoveryCodesGenerateMutation.mutate({})
+            setIsRecoveryCodesModalOpen(true)
+          }
+          onClose()
+        }}
+      />
+      <RecoveryCodesModal
+        open={isRecoveryCodesModalOpen}
+        onOpenChange={(open) => setIsRecoveryCodesModalOpen(open)}
+        mutation={recoveryCodesGenerateMutation}
       />
     </>
   )
