@@ -34,11 +34,11 @@ Separating kinds of information is a useful way to keep a paragraph readable. Th
 
 ### Recommendations
 
-- **Separate sections**: A procedure, a process, a structure, or a concept usually reads better in its own section. Procedure and process get blended most often, because both answer a question about how, and a reader following steps can't act on the process sentences.
-- **Context**: A concept or a process tends to work better before the procedure or after it than threaded through the steps.
-- **Principles and facts**: Either is often a single sentence, so it can sit in the section it qualifies rather than getting one of its own. A fact about timing fits in the step it describes, and a principle can close the concept paragraph that motivates it.
-- **Long paragraphs**: Past three or four sentences, a paragraph has often picked up a second kind of information. Label each sentence and see where the labels change.
-- **Connective prose**: An introduction, a transition, an outcome, and a navigation outline describe the page rather than the product, so none of this applies to them.
+- **Separate a procedure, a process, a structure, or a concept**: Each usually reads better in its own section. Procedure and process get blended most often, because both answer a question about how, and a reader following steps can't act on the process sentences.
+- **Keep context out of the action path**: A concept or a process tends to work better before the procedure or after it than threaded through the steps.
+- **Let a principle or a fact ride along**: Either is often a single sentence, so it can sit in the section it qualifies rather than getting one of its own. A fact about timing fits in the step it describes, and a principle can close the concept paragraph that motivates it.
+- **Look again at a long paragraph**: Past three or four sentences, it has often picked up a second kind of information. Label each sentence and see where the labels change.
+- **Leave connective prose alone**: An introduction, a transition, an outcome, and a navigation outline describe the page rather than the product, so none of this applies to them.
 
 ### Examples
 
