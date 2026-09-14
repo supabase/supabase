@@ -1,17 +1,15 @@
 import 'react-data-grid/lib/styles.css'
 import '@/styles/globals.css'
 
-import type { Metadata, Viewport } from 'next'
-
 import { genFaviconData } from 'common/MetaFavicons/app-router'
+import type { Metadata, Viewport } from 'next'
 
 import { Providers } from './Providers'
 import { Toaster } from './toaster'
+import { BASE_PATH } from '@/lib/constants'
 import { inter, manrope, sourceCodePro } from '@/lib/fonts'
 
 const className = `${inter.variable} ${manrope.variable} ${sourceCodePro.variable}`
-
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '/design-system'
 
 export const metadata: Metadata = {
   applicationName: 'Supabase Design System',

@@ -303,8 +303,13 @@ export const connectSchema: ConnectSchema = {
     // Framework fields
     framework: {
       id: 'framework',
-      type: 'select',
+      type: 'combobox',
       label: 'Framework',
+      combobox: {
+        placeholder: 'Select framework',
+        searchPlaceholder: 'Search frameworks...',
+        emptyMessage: 'No frameworks found',
+      },
       options: { source: 'frameworks' },
       defaultValue: 'nextjs',
     },
@@ -376,9 +381,14 @@ export const connectSchema: ConnectSchema = {
     // MCP fields
     mcpClient: {
       id: 'mcpClient',
-      type: 'select',
+      type: 'combobox',
       label: 'Client',
       description: 'The MCP client you are using.',
+      combobox: {
+        placeholder: 'Select client',
+        searchPlaceholder: 'Search clients...',
+        emptyMessage: 'No clients found',
+      },
       options: { source: 'mcpClients' },
       defaultValue: 'claude-code',
     },

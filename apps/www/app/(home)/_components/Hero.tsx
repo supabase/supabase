@@ -26,7 +26,7 @@ export function Hero() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button asChild size="medium">
+          <Button variant="primary" asChild size="medium">
             <Link
               href={getDashboardCtaHref(isLoggedIn)}
               onClick={() =>
@@ -39,7 +39,7 @@ export function Hero() {
               Start your project
             </Link>
           </Button>
-          <Button asChild size="medium" variant="default">
+          <Button asChild size="medium">
             <Link
               href="/contact/sales"
               onClick={() =>

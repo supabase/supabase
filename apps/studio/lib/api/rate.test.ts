@@ -9,6 +9,35 @@ vi.mock('../ai/tools/tool-sanitizer', () => ({
   sanitizeMessagePart: vi.fn((part) => part),
 }))
 
+vi.mock('@/lib/ai/ai-details', () => ({
+  getAIDetails: vi.fn().mockResolvedValue({
+    aiOptInLevel: 'schema_and_log_and_data',
+    hasAccessToAdvanceModel: true,
+    hasHipaaAddon: false,
+    region: 'us-east-1',
+    isSensitive: false,
+  }),
+}))
+
+vi.mock('@/lib/ai/model', () => ({
+  getModel: vi.fn().mockResolvedValue({
+    modelParams: { model: {} },
+  }),
+}))
+
+vi.mock('ai', () => ({
+  generateText: vi.fn().mockResolvedValue({
+    output: {
+      category: 'sql_generation',
+    },
+  }),
+  Output: { object: vi.fn() },
+}))
+
+vi.mock('@/components/ui/AIAssistantPanel/Message.utils', () => ({
+  rateMessageResponseSchema: {},
+}))
+
 test('rate calls the tool sanitizer', async () => {
   const mockReq = {
     method: 'POST',
@@ -42,35 +71,6 @@ test('rate calls the tool sanitizer', async () => {
     json: vi.fn(() => mockRes),
     setHeader: vi.fn(() => mockRes),
   }
-
-  vi.mock('@/lib/ai/ai-details', () => ({
-    getAIDetails: vi.fn().mockResolvedValue({
-      aiOptInLevel: 'schema_and_log_and_data',
-      hasAccessToAdvanceModel: true,
-      hasHipaaAddon: false,
-      region: 'us-east-1',
-      isSensitive: false,
-    }),
-  }))
-
-  vi.mock('@/lib/ai/model', () => ({
-    getModel: vi.fn().mockResolvedValue({
-      modelParams: { model: {} },
-    }),
-  }))
-
-  vi.mock('ai', () => ({
-    generateText: vi.fn().mockResolvedValue({
-      output: {
-        category: 'sql_generation',
-      },
-    }),
-    Output: { object: vi.fn() },
-  }))
-
-  vi.mock('@/components/ui/AIAssistantPanel/Message.utils', () => ({
-    rateMessageResponseSchema: {},
-  }))
 
   await rate(mockReq as any, mockRes as any)
 

@@ -45,10 +45,10 @@ export default function FieldResponsive() {
             </Field>
             <FieldSeparator />
             <Field orientation="responsive">
-              <Button type="submit">Submit</Button>
-              <Button type="button" variant="default">
-                Cancel
+              <Button variant="primary" type="submit">
+                Submit
               </Button>
+              <Button type="button">Cancel</Button>
             </Field>
           </FieldGroup>
         </FieldSet>

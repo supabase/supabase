@@ -38,7 +38,6 @@ vi.mock('@/data/api-keys/api-key-create-mutation', () => ({
 
 describe('API key create dialogs', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockUseQueryState.mockReturnValue(['', mockSetVisible])
   })
 

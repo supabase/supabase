@@ -96,7 +96,11 @@ interface CareersPageProps {
   contributors: { login: string; avatar_url: string; html_url: string }[]
 }
 
-const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) => {
+const CareerPage = ({
+  jobs = {},
+  placeholderJob = null,
+  contributors = [],
+}: Partial<CareersPageProps>) => {
   const { basePath } = useRouter()
   const { jobsCount } = staticContent
 

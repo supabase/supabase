@@ -67,7 +67,7 @@ export const TableDefinition = ({ entity }: TableDefinitionProps) => {
     <>
       <div className="grow overflow-y-auto border-t border-muted relative">
         <div className="absolute top-2 right-5 z-10 inline-flex rounded-lg bg-background">
-          <Button asChild variant="default">
+          <Button asChild>
             <Link
               href={`/project/${ref}/sql/new?content=${encodeURIComponent(
                 formattedDefinition ?? ''

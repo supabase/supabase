@@ -126,7 +126,6 @@ export function ComponentPreview({
                 <Button
                   className="rounded-full"
                   onClick={() => setExpandState(!expand)}
-                  variant="default"
                   icon={<Expand className="text-foreground-lighter" />}
                 >
                   {expand ? 'Collapse code' : 'Expand code'}

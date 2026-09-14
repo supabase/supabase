@@ -424,7 +424,6 @@ export const QueryInsightsTable = ({
         >
           <div className="inline-flex rounded-full bg-background">
             <Button
-              variant="default"
               size="tiny"
               className="rounded-full shadow-md"
               onClick={() => onCurrentSelectQuery?.(null)}

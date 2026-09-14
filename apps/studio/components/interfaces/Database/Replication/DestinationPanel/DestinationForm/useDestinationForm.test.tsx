@@ -85,7 +85,6 @@ const formData = {
 
 describe('useDestinationForm validation', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mocks.validateDestination.mockResolvedValue({ validation_failures: [] })
     mocks.validatePipeline.mockResolvedValue({ validation_failures: [] })
   })

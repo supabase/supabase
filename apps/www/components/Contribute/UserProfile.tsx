@@ -1,9 +1,9 @@
-import Link from 'next/link'
-import { notFound } from 'next/navigation'
-import { Badge, Button } from 'ui'
 import { DiscordIcon, GitHubIcon, RedditIcon } from '~/components/Contribute/Icons'
 import { getUserActivity } from '~/data/contribute'
 import type { ThreadRow } from '~/types/contribute'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { Badge, Button } from 'ui'
 
 function ThreadCard({ thread }: { thread: ThreadRow }) {
   return (
@@ -77,7 +77,7 @@ function ReplyCard({ reply, thread }: { reply: Reply; thread?: ThreadRow }) {
             </span>
           )}
           {reply.external_activity_url && (
-            <Button asChild variant="default" size="tiny">
+            <Button asChild size="tiny">
               <a
                 href={reply.external_activity_url}
                 target="_blank"

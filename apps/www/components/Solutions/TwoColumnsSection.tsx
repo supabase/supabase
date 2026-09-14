@@ -55,7 +55,6 @@ const CodeSnippet = ({ prompt }: { prompt: AIPrompt }) => {
             <div className="absolute top-2 right-2 inline-flex rounded-lg bg-background">
               <TooltipTrigger asChild>
                 <Button
-                  variant="default"
                   className="text-foreground-light hover:text-foreground w-7 h-7 p-1 shadow-lg"
                   onClick={async () => {
                     await navigator.clipboard.writeText(prompt.code)
