@@ -13,6 +13,7 @@ import { metadata as mainMetadata } from '@/app/layout'
 import { CopyDocPrompt } from '@/components/copy-doc-prompt'
 import { FrameworkSelector } from '@/components/framework-selector'
 import { Mdx } from '@/components/mdx-components'
+import { OpenInV0Button } from '@/components/open-in-v0-button'
 import { SourcePanel } from '@/components/source-panel'
 import { libraryBlocks } from '@/config/library'
 import { absoluteUrl, cn } from '@/lib/utils'
@@ -115,11 +116,14 @@ export default async function DocPage(props: DocPageProps) {
           </p>
         )}
         {!isGuide && (
-          <CopyDocPrompt
-            title={doc.title}
-            markdownPath={markdownPath}
-            intent={isStarter ? 'create-app' : 'add-to-project'}
-          />
+          <div className="flex flex-wrap items-start justify-center gap-2">
+            <CopyDocPrompt
+              title={doc.title}
+              markdownPath={markdownPath}
+              intent={isStarter ? 'create-app' : 'add-to-project'}
+            />
+            {doc.v0Name && <OpenInV0Button name={doc.v0Name} />}
+          </div>
         )}
       </header>
 
