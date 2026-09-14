@@ -289,10 +289,19 @@ const CatalogAccessToggle = ({
         description="Creates the credentials DuckDB needs to attach Warehouse. Not required for FlightSQL."
       >
         <div className="flex items-center justify-end gap-2">
+          <span
+            role="status"
+            aria-label={catalogMutation.isPending ? 'Updating DuckDB catalog access' : undefined}
+            className="sr-only"
+          >
+            {catalogMutation.isPending ? 'Updating DuckDB catalog access' : ''}
+          </span>
           {catalogMutation.isPending && (
-            <span role="status" aria-label="Updating DuckDB catalog access">
-              <Loader2 size={16} className="animate-spin text-foreground-muted" aria-hidden />
-            </span>
+            <Loader2
+              size={16}
+              className="animate-spin text-foreground-muted motion-reduce:animate-none"
+              aria-hidden
+            />
           )}
           <Switch
             aria-label="Enable DuckDB catalog access"

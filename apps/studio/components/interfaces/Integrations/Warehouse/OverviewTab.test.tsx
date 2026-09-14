@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
@@ -142,6 +143,28 @@ describe('WarehouseOverviewTab', () => {
     expect(await screen.findByText('Warehouse setup failed')).toBeInTheDocument()
     expect(screen.getByText('Failed to copy public.orders')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument()
+  })
+
+  test('shows the latest error when retrying setup fails', async () => {
+    mockProject()
+    mockSetupStatus({
+      setup_status: 'error',
+      steps: [{ name: 'warehouse_copy', status: 'error', message: 'Initial setup failed' }],
+      tables: [{ schema: 'public', name: 'orders', copy_name: 'public.orders', state: 'error' }],
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/warehouse/:ref/setup',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Retry could not be started' }, { status: 500 }),
+    })
+
+    customRender(<WarehouseOverviewTab />)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Retry' }))
+
+    expect(await screen.findByText('Retry could not be started')).toBeInTheDocument()
+    expect(screen.queryByText('Initial setup failed')).not.toBeInTheDocument()
   })
 
   test('shows Status, Tables, then Connect once setup is complete', async () => {

@@ -78,6 +78,21 @@ describe('WarehouseTab', () => {
     expect(screen.getByRole('link', { name: 'View progress' })).toBeInTheDocument()
   })
 
+  test('points to the integration when setup reports an error', async () => {
+    mockSetupStatus({ setup_status: 'error' })
+
+    customRender(<WarehouseTab />)
+
+    expect(await screen.findByText('Warehouse setup failed')).toBeInTheDocument()
+    expect(
+      screen.getByText('Review the error and retry setup to get connection details.')
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'View Warehouse' })).toHaveAttribute(
+      'href',
+      '/project/default/integrations/warehouse/overview'
+    )
+  })
+
   test('renders connection details and offers catalog access only for DuckDB', async () => {
     mockSetupStatus({ setup_status: 'complete' })
     mockCatalog({ enabled: false })

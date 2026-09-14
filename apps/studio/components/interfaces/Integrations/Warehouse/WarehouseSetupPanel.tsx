@@ -93,7 +93,10 @@ export const WarehouseSetupPanel = () => {
         subject="Warehouse setup failed"
         showErrorPrefix={false}
         error={{
-          message: failingStep?.message ?? 'An unknown error occurred while setting up Warehouse.',
+          message:
+            setupMutation.error?.message ??
+            failingStep?.message ??
+            'An unknown error occurred while setting up Warehouse.',
         }}
         additionalActions={
           retryTargets.length > 0 ? (

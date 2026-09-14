@@ -79,9 +79,12 @@ export const WarehouseSchemaTablePicker = ({
   // Reading the sources query directly (rather than via useReplicationSourceId) to get its
   // loading state: the publications query stays disabled until a source id exists, so without it
   // the list would render un-checked and then flash back to a loader once publications kick in.
-  const { data: sourcesData, isLoading: isSourcesLoading } = useReplicationSourcesQuery({
-    projectRef,
-  })
+  const {
+    data: sourcesData,
+    isLoading: isSourcesLoading,
+    isError: isSourcesError,
+    error: sourcesError,
+  } = useReplicationSourcesQuery({ projectRef })
   const sourceId = sourcesData?.sources.find((source) => source.name === projectRef)?.id
 
   const {
@@ -184,6 +187,9 @@ export const WarehouseSchemaTablePicker = ({
   }
   if (isSchemasError) return <AlertError subject="Failed to load schemas" error={schemasError} />
   if (isTablesError) return <AlertError subject="Failed to load tables" error={tablesError} />
+  if (isEditing && isSourcesError) {
+    return <AlertError subject="Failed to load replicated tables" error={sourcesError} />
+  }
   // Only blocking when editing: a first-time setup starts from an empty selection anyway, so a
   // failed publication lookup shouldn't stop the user from enabling Warehouse at all.
   if (isEditing && isPublicationsError) {
