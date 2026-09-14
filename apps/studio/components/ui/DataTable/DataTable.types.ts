@@ -1,10 +1,9 @@
 import type { ReactNode } from 'react'
 
-// TODO: we could type the value(!) especially when using enums
-export type Option = {
+export type Option<T = string> = {
   label: string
-  value: string
-  options?: Option[]
+  value: T
+  options?: Option<T>[]
 }
 
 export type DatePreset = {
