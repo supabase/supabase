@@ -91,11 +91,12 @@ export const FileExplorerRow = ({
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
-  const { setNodeRef, dragListeners, isDragging, isDropTarget } = useFileExplorerRowDnd({
-    item: itemWithColumnIndex,
-    selectedItems,
-    canMoveItems: canUpdateFiles,
-  })
+  const { setNodeRef, dragListeners, isDragging, isDropTarget, isDropBlocked } =
+    useFileExplorerRowDnd({
+      item: itemWithColumnIndex,
+      selectedItems,
+      canMoveItems: canUpdateFiles,
+    })
 
   const onSelectFile = async (columnIndex: number) => {
     popColumnAtIndex(columnIndex)
@@ -265,6 +266,7 @@ export const FileExplorerRow = ({
           isPreviewed && 'bg-selection hover:bg-selection',
           isDropTarget && 'bg-selection ring-1 ring-inset ring-brand',
           item.status !== STORAGE_ROW_STATUS.LOADING && 'cursor-pointer',
+          isDropBlocked && 'cursor-not-allowed',
           // Keyboard focus on the checkbox: ring the whole row
           'has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-[-2px] has-[:focus-visible]:outline-[var(--ring)]'
         )}

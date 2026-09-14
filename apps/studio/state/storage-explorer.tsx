@@ -1492,7 +1492,7 @@ function createStorageExplorerState({
      */
     moveItems: async (items: StorageItemWithColumn[], destinationPath: string) => {
       if (state.isMovingItems) {
-        return toast.error('Wait for the current move to finish before starting another')
+        return toast.warning('Another move is still running. Try again once it finishes.')
       }
 
       if (!isWithinMoveLimit(items.length)) {

@@ -80,6 +80,25 @@ export const canMoveItemsTo = (items: MoveCandidate[], destinationPath: string) 
 export const isWithinMoveLimit = (count: number) => count <= MAX_ITEMS_PER_MOVE
 
 /**
+ * Why the drag in progress can't be dropped, or undefined when it can. Short enough to sit in
+ * the drag preview — the toast on drop carries the full explanation.
+ *
+ * Returns undefined when nothing is being dragged, so callers can use it as "the drop is blocked".
+ */
+export const getDropBlockedReason = ({
+  draggedItemCount,
+  isMovingItems,
+}: {
+  draggedItemCount: number
+  isMovingItems: boolean
+}) => {
+  if (draggedItemCount === 0) return undefined
+  if (isMovingItems) return 'Move in progress'
+  if (!isWithinMoveLimit(draggedItemCount)) return `Max ${MAX_ITEMS_PER_MOVE} items`
+  return undefined
+}
+
+/**
  * Maps every object within a folder to its destination, preserving the structure beneath it.
  * Storage has no notion of a folder, so moving one means moving each object it holds.
  */

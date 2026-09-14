@@ -6,6 +6,7 @@ import {
   canMoveItemsTo,
   canMoveItemTo,
   getColumnPath,
+  getDropBlockedReason,
   getFolderObjectMoves,
   getItemPath,
   getItemsToDrag,
@@ -186,6 +187,36 @@ describe('isWithinMoveLimit', () => {
 
   it('rejects a batch over the limit', () => {
     expect(isWithinMoveLimit(MAX_ITEMS_PER_MOVE + 1)).toBe(false)
+  })
+})
+
+describe('getDropBlockedReason', () => {
+  it('returns nothing when no drag is in progress', () => {
+    expect(getDropBlockedReason({ draggedItemCount: 0, isMovingItems: true })).toBeUndefined()
+  })
+
+  it('returns nothing for a drag that can be dropped', () => {
+    expect(
+      getDropBlockedReason({ draggedItemCount: MAX_ITEMS_PER_MOVE, isMovingItems: false })
+    ).toBeUndefined()
+  })
+
+  it('blocks a drag while another move is running', () => {
+    expect(getDropBlockedReason({ draggedItemCount: 1, isMovingItems: true })).toBe(
+      'Move in progress'
+    )
+  })
+
+  it('blocks a drag over the batch cap', () => {
+    expect(
+      getDropBlockedReason({ draggedItemCount: MAX_ITEMS_PER_MOVE + 1, isMovingItems: false })
+    ).toBe(`Max ${MAX_ITEMS_PER_MOVE} items`)
+  })
+
+  it('reports the running move first when both apply', () => {
+    expect(
+      getDropBlockedReason({ draggedItemCount: MAX_ITEMS_PER_MOVE + 1, isMovingItems: true })
+    ).toBe('Move in progress')
   })
 })
 

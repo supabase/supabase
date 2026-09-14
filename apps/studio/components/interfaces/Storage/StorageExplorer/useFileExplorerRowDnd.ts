@@ -10,7 +10,6 @@ import {
   getItemsToDrag,
   getRowDragId,
   getRowDropId,
-  isWithinMoveLimit,
   toMoveCandidates,
 } from './FileExplorerDnd.utils'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
@@ -26,23 +25,25 @@ interface UseFileExplorerRowDndParams {
  * Makes a file explorer row draggable, and — when it's a folder — a target for other rows.
  *
  * Dragging a row that's part of the current selection drags the whole selection along with it.
- * Dragging is off while a move is running: only one batch goes to the API at a time.
+ *
+ * A drag that can't be dropped — over the batch cap, or a move already running — still starts
+ * and follows the pointer. It just refuses to highlight a target and reports itself blocked, so
+ * the row can show a not-allowed cursor and the drop can explain itself in a toast.
  */
 export const useFileExplorerRowDnd = ({
   item,
   selectedItems,
   canMoveItems,
 }: UseFileExplorerRowDndParams) => {
-  const { openedFolders, isMovingItems } = useStorageExplorerStateSnapshot()
-  const { draggedItems } = useFileExplorerDnd()
+  const { openedFolders } = useStorageExplorerStateSnapshot()
+  const { draggedItems, dropBlockedReason } = useFileExplorerDnd()
 
   const itemPath = getItemPath(openedFolders, item)
   const isFolder = item.type === STORAGE_ROW_TYPES.FOLDER
   const isReady = item.status === STORAGE_ROW_STATUS.READY
 
-  const canStartMove = canMoveItems && !isMovingItems
   const itemsToDrag = getItemsToDrag(openedFolders, item, selectedItems)
-  const isDraggable = canStartMove && isReady && item.type !== STORAGE_ROW_TYPES.BUCKET
+  const isDraggable = canMoveItems && isReady && item.type !== STORAGE_ROW_TYPES.BUCKET
 
   const { listeners, setNodeRef, isDragging } = useDraggable({
     id: getRowDragId(itemPath),
@@ -52,13 +53,12 @@ export const useFileExplorerRowDnd = ({
 
   const { setNodeRef: setDropNodeRef, isOver } = useDroppable({
     id: getRowDropId(itemPath),
-    disabled: !(canStartMove && isFolder && isReady),
+    disabled: !(canMoveItems && isFolder && isReady),
     data: { path: itemPath },
   })
 
   const draggedItemPaths = toMoveCandidates(openedFolders, draggedItems)
-  const canAcceptDraggedItems =
-    isWithinMoveLimit(draggedItems.length) && canMoveItemsTo(draggedItemPaths, itemPath)
+  const canAcceptDraggedItems = !dropBlockedReason && canMoveItemsTo(draggedItemPaths, itemPath)
   const isPartOfDrag = draggedItemPaths.some((dragged) => dragged.path === itemPath)
 
   // The row is both the drag handle and the drop target, so both refs point at the same element.
@@ -82,5 +82,7 @@ export const useFileExplorerRowDnd = ({
     isDragging: isDragging || isPartOfDrag,
     /** True while hovering a valid drop, so the folder can highlight itself */
     isDropTarget: isFolder && isOver && canAcceptDraggedItems,
+    /** True while a drag is in progress that can't land anywhere, for a not-allowed cursor */
+    isDropBlocked: !!dropBlockedReason,
   }
 }

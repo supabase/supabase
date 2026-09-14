@@ -15,13 +15,13 @@ import {
 } from '@dnd-kit/core'
 import { createContext, useContext, useState, type PropsWithChildren } from 'react'
 
-import { MAX_ITEMS_PER_MOVE, STORAGE_VIEWS } from '../Storage.constants'
+import { STORAGE_VIEWS } from '../Storage.constants'
 import type { StorageItemWithColumn } from '../Storage.types'
 import { StorageRowIcon } from '../StorageRowIcon'
 import {
   canMoveItemsTo,
+  getDropBlockedReason,
   isRowDropId,
-  isWithinMoveLimit,
   toMoveCandidates,
 } from './FileExplorerDnd.utils'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
@@ -44,11 +44,15 @@ const MEASURING: MeasuringConfiguration = {
   droppable: { measure: getClientRect },
 }
 
-const FileExplorerDndContext = createContext<{ draggedItems: StorageItemWithColumn[] }>({
-  draggedItems: [],
-})
+interface FileExplorerDndContextValue {
+  /** Items currently being dragged, so every row can reflect the drag, not just the grabbed one */
+  draggedItems: StorageItemWithColumn[]
+  /** Set while a drag is in progress that can't be dropped, whatever it's dropped on */
+  dropBlockedReason?: string
+}
 
-/** Items currently being dragged, so that every row can reflect the drag, not just the grabbed one */
+const FileExplorerDndContext = createContext<FileExplorerDndContextValue>({ draggedItems: [] })
+
 export const useFileExplorerDnd = () => useContext(FileExplorerDndContext)
 
 const getDraggedItems = (active: Active): StorageItemWithColumn[] => {
@@ -71,7 +75,13 @@ const preferRowOverColumn: CollisionDetection = (args) => {
   return rowCollision ? [rowCollision] : collisions
 }
 
-const DragPreview = ({ items }: { items: StorageItemWithColumn[] }) => {
+const DragPreview = ({
+  items,
+  blockedReason,
+}: {
+  items: StorageItemWithColumn[]
+  blockedReason?: string
+}) => {
   const [firstItem] = items
   if (!firstItem) return null
 
@@ -87,10 +97,8 @@ const DragPreview = ({ items }: { items: StorageItemWithColumn[] }) => {
       <span className="truncate text-sm">
         {items.length > 1 ? `${items.length} items` : firstItem.name}
       </span>
-      {!isWithinMoveLimit(items.length) && (
-        <span className="ml-auto shrink-0 text-xs text-destructive-600">
-          Max {MAX_ITEMS_PER_MOVE} items
-        </span>
+      {!!blockedReason && (
+        <span className="ml-auto shrink-0 text-xs text-destructive-600">{blockedReason}</span>
       )}
     </div>
   )
@@ -103,7 +111,7 @@ const DragPreview = ({ items }: { items: StorageItemWithColumn[] }) => {
  * There's no keyboard equivalent — the "Move" action in the row menu covers that.
  */
 export const FileExplorerDndProvider = ({ children }: PropsWithChildren) => {
-  const { openedFolders, moveItems } = useStorageExplorerStateSnapshot()
+  const { openedFolders, isMovingItems, moveItems } = useStorageExplorerStateSnapshot()
   const [draggedItems, setDraggedItems] = useState<StorageItemWithColumn[]>([])
 
   const sensors = useSensors(
@@ -113,6 +121,11 @@ export const FileExplorerDndProvider = ({ children }: PropsWithChildren) => {
   const onDragStart = (event: DragStartEvent) => {
     setDraggedItems(getDraggedItems(event.active))
   }
+
+  const dropBlockedReason = getDropBlockedReason({
+    draggedItemCount: draggedItems.length,
+    isMovingItems,
+  })
 
   const onDragEnd = ({ active, over }: DragEndEvent) => {
     setDraggedItems([])
@@ -135,10 +148,12 @@ export const FileExplorerDndProvider = ({ children }: PropsWithChildren) => {
       onDragEnd={onDragEnd}
       onDragCancel={() => setDraggedItems([])}
     >
-      <FileExplorerDndContext.Provider value={{ draggedItems }}>
+      <FileExplorerDndContext.Provider value={{ draggedItems, dropBlockedReason }}>
         {children}
         <DragOverlay dropAnimation={null} className="pointer-events-none">
-          {draggedItems.length > 0 && <DragPreview items={draggedItems} />}
+          {draggedItems.length > 0 && (
+            <DragPreview items={draggedItems} blockedReason={dropBlockedReason} />
+          )}
         </DragOverlay>
       </FileExplorerDndContext.Provider>
     </DndContext>

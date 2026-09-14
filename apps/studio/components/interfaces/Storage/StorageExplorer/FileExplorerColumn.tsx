@@ -32,7 +32,6 @@ import {
   canMoveItemsTo,
   getColumnDropId,
   getColumnPath,
-  isWithinMoveLimit,
   toMoveCandidates,
 } from './FileExplorerDnd.utils'
 import { FileExplorerRow } from './FileExplorerRow'
@@ -110,16 +109,16 @@ export const FileExplorerColumn = ({
   const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   // Dropping on the column's background moves items into the folder that the column lists
-  const { draggedItems } = useFileExplorerDnd()
+  const { draggedItems, dropBlockedReason } = useFileExplorerDnd()
   const columnPath = getColumnPath(snap.openedFolders, index)
   const { setNodeRef: setDropNodeRef, isOver } = useDroppable({
     id: getColumnDropId(index),
-    disabled: !canUpdateStorage || snap.isMovingItems,
+    disabled: !canUpdateStorage,
     data: { path: columnPath },
   })
   const isDropTarget =
     isOver &&
-    isWithinMoveLimit(draggedItems.length) &&
+    !dropBlockedReason &&
     canMoveItemsTo(toMoveCandidates(snap.openedFolders, draggedItems), columnPath)
 
   // Memoized because dnd-kit re-registers the node whenever the ref callback identity changes
@@ -220,7 +219,8 @@ export const FileExplorerColumn = ({
             fullWidth ? 'w-full' : 'w-64 border-r border-overlay',
             view === STORAGE_VIEWS.LIST && 'h-full',
             'hide-scrollbar relative flex shrink-0 flex-col overflow-auto',
-            isDropTarget && 'ring-1 ring-inset ring-brand'
+            isDropTarget && 'ring-1 ring-inset ring-brand',
+            !!dropBlockedReason && 'cursor-not-allowed'
           )}
           onDragOver={onDragOver}
           onDrop={onDrop}
