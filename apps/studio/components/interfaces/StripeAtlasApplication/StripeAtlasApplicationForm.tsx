@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { Form, FormControl, FormField, Input } from 'ui'
+import { Button, Form, FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -22,16 +22,27 @@ const FormSchema = z.object({
 
 type FormValues = z.infer<typeof FormSchema>
 
-/** Mockup only — nothing is submitted, so the form has no action. */
-export const StripeAtlasApplicationForm = () => {
+type StripeAtlasApplicationFormProps = {
+  stripeAtlasToken: string
+}
+
+/** Mockup only — submitting runs validation and stops there, nothing is sent. */
+export const StripeAtlasApplicationForm = (_props: StripeAtlasApplicationFormProps) => {
+  // todo(@juleswritescode): fetch data from API via props.stripeAtlasToken; currently just a mockup.
+
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
-    defaultValues: { firstname: '', lastname: '', companyName: '', email: '' },
+    defaultValues: {
+      firstname: 'Mockey',
+      lastname: 'Mockupson',
+      companyName: 'Acmo Ck.',
+      email: 'me@mo.ck',
+    },
   })
 
   return (
     <Form {...form}>
-      <form noValidate className="flex flex-col gap-4">
+      <form noValidate className="flex flex-col gap-4" onSubmit={form.handleSubmit(() => {})}>
         <div className="grid grid-cols-2 gap-3">
           <FormField
             control={form.control}
@@ -77,7 +88,7 @@ export const StripeAtlasApplicationForm = () => {
               layout="vertical"
               label="Email"
               id="email"
-              description="We'll email your credit code here."
+              description="The credit code will be sent to this email."
             >
               <FormControl>
                 <Input {...field} id="email" type="email" autoComplete="email" />
@@ -85,6 +96,10 @@ export const StripeAtlasApplicationForm = () => {
             </FormItemLayout>
           )}
         />
+
+        <Button block size="medium" type="submit">
+          Submit Application
+        </Button>
       </form>
     </Form>
   )

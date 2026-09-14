@@ -4,10 +4,13 @@ import { StripeAtlasApplicationScreen } from '@/components/interfaces/StripeAtla
 import { buildStudioPageTitle } from '@/lib/page-title'
 import type { NextPageWithLayout } from '@/types'
 
-const PAGE_TITLE = buildStudioPageTitle({ section: 'Stripe Atlas', brand: 'Supabase' })
+const PAGE_TITLE = buildStudioPageTitle({ section: 'Stripe Atlas Application', brand: 'Supabase' })
 
-// Intentionally not wrapped in withAuth — Stripe Atlas merchants land here straight from the Atlas
-// dashboard, so the page has to work without a Supabase session.
+/**
+ * Page needs to be pre-auth – customers will be redirected here from the
+ * Stripe Atlas dashboard, either directly via a static link or via a callbackURL from the mgmt API.
+ * The user's auth state doesn't matter for the application; what matters is the the query params of the callbackURL.
+ */
 const StripeAtlasApplicationPage: NextPageWithLayout = () => {
   return (
     <>
