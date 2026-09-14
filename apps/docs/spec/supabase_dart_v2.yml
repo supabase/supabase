@@ -4309,6 +4309,57 @@ functions:
           Postgres functions that return tables can also be combined with [Filters](/docs/reference/dart/using-filters) and [Modifiers](/docs/reference/dart/using-modifiers).
         hideCodeBlock: true
 
+  - id: get-openapi-spec
+    title: 'OpenAPI spec: getOpenApiSpec()'
+    description: |
+      Fetch the OpenAPI description PostgREST publishes for the client's schema.
+
+      The document lists only the tables, views and functions the caller's role holds privileges on.
+      The request carries the same `apikey` and `Authorization` headers as every other query, so the description is scoped to the signed-in user.
+    notes: |
+      - PostgREST emits OpenAPI 2.0 (Swagger), so the version of the document is in `swagger`.
+      - Only the top level of the document is typed: `swagger`, `info`, `paths`, `host`, `basePath`, `definitions` and `parameters`. The complete document is available through `toJson()`.
+      - Call `schema()` first to describe a schema other than the client default.
+    examples:
+      - id: fetch-the-openapi-spec
+        name: Fetch the OpenAPI spec
+        code: |
+          ```dart
+          final spec = await supabase.getOpenApiSpec();
+          print(spec.paths.keys);
+          ```
+        response: |
+          ```json
+          (/, /countries, /rpc/hello_world)
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: describe-a-different-schema
+        name: Describe a schema other than the client default
+        code: |
+          ```dart
+          final spec = await supabase
+            .schema('billing')
+            .getOpenApiSpec();
+          ```
+        hideCodeBlock: true
+      - id: read-the-table-definitions
+        name: Read the table definitions
+        code: |
+          ```dart
+          final spec = await supabase.getOpenApiSpec();
+          final countries = spec.definitions?['countries'];
+          print(countries?['properties']);
+          ```
+        response: |
+          ```json
+          {
+            "id": { "type": "integer", "format": "bigint" },
+            "name": { "type": "string", "format": "text" }
+          }
+          ```
+        hideCodeBlock: true
+
   - id: realtime-api
     title: 'Realtime'
     category: Realtime
