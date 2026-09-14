@@ -469,8 +469,6 @@ Use a procedure when a human or agent must perform actions to reach an outcome. 
 
 Write sequential actions as an ordered list. Begin each step with an imperative verb, and include one action or a closely related set of actions per step. Give the reader enough context to know where to act.
 
-See [Numbers](#numbers) for when a step count or a step reference is worth including.
-
 Apply the [Information Mapping chunking principle](https://informationmapping.com/blogs/news/writing-for-the-web-the-magical-number-seven-plus-or-minus-two) to procedures. Present 7 ± 2 related steps at a time. This gives readers a manageable chunk of five to nine actions. Aim for the lower end of the range when the task is complex or unfamiliar.
 
 If a procedure has more than nine steps, group related steps into named phases or smaller procedures. If one step contains multiple distinct actions, split it into separate steps. Don't add steps to reach a minimum. The range is a guideline for organizing information, not a required procedure length.
@@ -554,22 +552,6 @@ That said, a few rules help keep the docs concise, consistent, and clear:
 - Format headings in sentence case. Capitalize the first word and any proper nouns. All other words are lowercase. For example, `Set up authentication` rather than `Set Up Authentication`.
 - Use the Oxford comma. Place a comma before the `and` that marks the last item in a list. For example, use `functions, tables, and indexes` rather than `functions, tables and indexes`.
 - Use the present tense as much as possible. For example, `the AI assistant answers your question` rather than `the AI assistant will answer your question`.
-
-### Numbers
-
-For formatting, follow the [Google developer documentation style guide on numbers](https://developers.google.com/style/numbers):
-
-- Spell out zero through nine, and use numerals for 10 and greater. For example, `four options` and `24 hours`.
-- Use numerals anyway for versions, technical quantities, step numbers, prices, and percentages, such as `version 3`, `128 bits`, `step 2`, and `40%`.
-- Spell out ordinals, such as `first` and `forty-third`.
-- Use commas in large numbers, such as `1,532,784 bytes`.
-- Use a hyphen with no spaces for a range, such as `2012-2016`.
-
-A count or a step number often isn't doing any work, and the sentence reads the same without it. `To connect to your database:` says what `Follow these three steps to connect to your database:` says.
-
-Naming an action or linking a heading usually reads better than pointing at a number. It gives a reader using a screen reader something to navigate to, and it doesn't go stale when someone reorders the list. For example, `After you create the project, copy the project URL.`
-
-Where a number earns its place, use it. `Step 2` helps in a long procedure the reader is working through, and `Three steps:` helps when the count lets them plan.
 
 ## Word usage and spelling
 
