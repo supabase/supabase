@@ -27,6 +27,7 @@ Every custom provider identifier must start with the `custom:` prefix. Identifie
 You need:
 
 - A working self-hosted Supabase installation on release `0.8.0` or later. See [Self-Hosting with Docker](/docs/guides/self-hosting/docker) and [Update Your Self-Hosted Deployment](/docs/guides/self-hosting/updating).
+- Your project's secret key, `SUPABASE_SECRET_KEY`, from your `.env` file (needed for admin API calls)
 - `API_EXTERNAL_URL` set to the publicly reachable URL of your Auth service, ending in `/auth/v1` (e.g., `https://<your-domain>/auth/v1`). The Auth service derives the OAuth callback URL for custom providers from this value.
 
 <Admonition type="danger">
@@ -68,7 +69,13 @@ sh run.sh recreate auth
 
 ## Create a provider
 
-Providers are created through the Auth admin API. The JavaScript examples below use `supabase.auth.admin`, which requires a client created with your secret key. Never use this client in browser code.
+Use the Auth admin API to create providers. You need your project's secret key, `SUPABASE_SECRET_KEY`, for authentication. The JavaScript examples use a supabase-js client created with the secret key, which must only run in trusted server-side environments:
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('http://<your-domain>', 'your-supabase-secret-key')
+```
 
 ### OAuth2 provider
 
@@ -102,9 +109,8 @@ const { data, error } = await supabase.auth.admin.customProviders.createProvider
 <TabPanel id="curl" label="cURL">
 
 ```sh
-curl -X POST "https://<your-domain>/auth/v1/admin/custom-providers" \
+curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
   -H "apikey: your-supabase-secret-key" \
-  -H "Authorization: Bearer your-supabase-secret-key" \
   -H "Content-Type: application/json" \
   -d '{
     "provider_type": "oauth2",
@@ -153,9 +159,8 @@ const { data, error } = await supabase.auth.admin.customProviders.createProvider
 <TabPanel id="curl" label="cURL">
 
 ```sh
-curl -X POST "https://<your-domain>/auth/v1/admin/custom-providers" \
+curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
   -H "apikey: your-supabase-secret-key" \
-  -H "Authorization: Bearer your-supabase-secret-key" \
   -H "Content-Type: application/json" \
   -d '{
     "provider_type": "oidc",
@@ -183,9 +188,8 @@ OIDC providers have the following automatic behavior:
 List the configured providers to confirm the new provider was saved:
 
 ```sh
-curl "https://<your-domain>/auth/v1/admin/custom-providers" \
-  -H "apikey: your-supabase-secret-key" \
-  -H "Authorization: Bearer your-supabase-secret-key"
+curl "http://<your-domain>/auth/v1/admin/custom-providers" \
+  -H "apikey: your-supabase-secret-key"
 ```
 
 The response includes the provider you created. Users can now sign in with it from your app:
@@ -251,9 +255,8 @@ const { data, error } = await supabase.auth.admin.customProviders.createProvider
 <TabPanel id="curl" label="cURL">
 
 ```sh
-curl -X POST "https://<your-domain>/auth/v1/admin/custom-providers" \
+curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
   -H "apikey: your-supabase-secret-key" \
-  -H "Authorization: Bearer your-supabase-secret-key" \
   -H "Content-Type: application/json" \
   -d '{
     "provider_type": "oidc",
@@ -320,14 +323,12 @@ const { data, error } = await supabase.auth.admin.customProviders.listProviders(
 
 ```sh
 # List all custom providers
-curl "https://<your-domain>/auth/v1/admin/custom-providers" \
-  -H "apikey: your-supabase-secret-key" \
-  -H "Authorization: Bearer your-supabase-secret-key"
+curl "http://<your-domain>/auth/v1/admin/custom-providers" \
+  -H "apikey: your-supabase-secret-key"
 
 # Filter by provider type
-curl "https://<your-domain>/auth/v1/admin/custom-providers?type=oidc" \
-  -H "apikey: your-supabase-secret-key" \
-  -H "Authorization: Bearer your-supabase-secret-key"
+curl "http://<your-domain>/auth/v1/admin/custom-providers?type=oidc" \
+  -H "apikey: your-supabase-secret-key"
 ```
 
 </TabPanel>
@@ -362,9 +363,8 @@ const { data, error } = await supabase.auth.admin.customProviders.updateProvider
 <TabPanel id="curl" label="cURL">
 
 ```sh
-curl -X PUT "https://<your-domain>/auth/v1/admin/custom-providers/custom:my-provider" \
+curl -X PUT "http://<your-domain>/auth/v1/admin/custom-providers/custom:my-provider" \
   -H "apikey: your-supabase-secret-key" \
-  -H "Authorization: Bearer your-supabase-secret-key" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Updated Provider Name",
@@ -397,9 +397,8 @@ const { data, error } =
 <TabPanel id="curl" label="cURL">
 
 ```sh
-curl -X DELETE "https://<your-domain>/auth/v1/admin/custom-providers/custom:my-provider" \
-  -H "apikey: your-supabase-secret-key" \
-  -H "Authorization: Bearer your-supabase-secret-key"
+curl -X DELETE "http://<your-domain>/auth/v1/admin/custom-providers/custom:my-provider" \
+  -H "apikey: your-supabase-secret-key"
 ```
 
 </TabPanel>
@@ -411,4 +410,4 @@ For PKCE, authorization parameters, and OIDC-specific options, see [Advanced con
 ## Additional resources
 
 - [Custom OAuth/OIDC Providers](/docs/guides/auth/custom-oauth-providers)
-- [Configure Social Login (OAuth) Providers](/docs/guides/self-hosting/self-hosted-oauth) for the providers Supabase supports out of the box
+- [Configure social login (OAuth) providers](/docs/guides/self-hosting/self-hosted-oauth) for the providers Supabase supports out of the box
