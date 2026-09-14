@@ -34,9 +34,9 @@ Separating kinds of information is a useful way to keep a paragraph readable. Th
 
 ### Recommendations
 
-- **Separate blocks**: A procedure, a process, a structure, or a concept usually reads better in a block of its own. Procedure and process get blended most often, because both answer a question about how, and a reader following steps can't act on the process sentences.
+- **Separate sections**: A procedure, a process, a structure, or a concept usually reads better in its own section. Procedure and process get blended most often, because both answer a question about how, and a reader following steps can't act on the process sentences.
 - **Context**: A concept or a process tends to work better before the procedure or after it than threaded through the steps.
-- **Principles and facts**: Either is often a single sentence, so it can sit in the block it qualifies. A fact about timing fits in the step it describes, and a principle can close the concept paragraph that motivates it.
+- **Principles and facts**: Either is often a single sentence, so it can sit in the section it qualifies rather than getting one of its own. A fact about timing fits in the step it describes, and a principle can close the concept paragraph that motivates it.
 - **Long paragraphs**: Past three or four sentences, a paragraph has often picked up a second kind of information. Label each sentence and see where the labels change.
 - **Connective prose**: An introduction, a transition, an outcome, and a navigation outline describe the page rather than the product, so none of this applies to them.
 
@@ -79,7 +79,7 @@ client. Write a policy before you deploy.
 The `using` clause accepts any expression that returns a boolean.
 ```
 
-The concept, the procedure, and the structure each get a block. The fact about timing rides along in the step, and the admonition pairs a fact with the principle it implies. It's longer in lines and shorter to read.
+The concept, the procedure, and the structure each get their own section. The fact about timing rides along in the step it describes, and the admonition pairs a fact with the principle it implies. It's longer in lines and shorter to read.
 
 ## AI agent skills for docs authoring
 
