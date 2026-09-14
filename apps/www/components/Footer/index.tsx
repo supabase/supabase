@@ -4,6 +4,7 @@ import { CheckIcon } from '@heroicons/react/outline'
 import { REALTIME_CHANNEL_STATES } from '@supabase/supabase-js'
 import SupabaseWordmark from '~/components/Nav/SupabaseWordmark'
 import supabase from '~/lib/supabase'
+import { isCrossAppLink } from '~/lib/crossAppLink'
 import footerData from 'data/Footer'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -30,6 +31,9 @@ interface Props {
   hideFooter?: boolean
 }
 
+/**
+ * Main application footer component containing site-wide navigation links.
+ */
 const Footer = (props: Props) => {
   const pathname = usePathname()
 
@@ -231,7 +235,7 @@ const Footer = (props: Props) => {
                         return (
                           <li key={`${segment.title}_link_${idx}`}>
                             {link.url ? (
-                              link.url.startsWith('https') ? (
+                              link.url.startsWith('https') || isCrossAppLink(link.url) ? (
                                 <a href={link.url}>{children}</a>
                               ) : (
                                 <Link href={link.url}>{children}</Link>

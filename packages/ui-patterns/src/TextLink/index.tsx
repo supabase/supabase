@@ -4,6 +4,23 @@ import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from 'ui'
 
+// Paths owned by a different Next.js app on the same origin
+const CROSS_APP_PREFIXES = ['/docs', '/dashboard']
+
+/**
+ * Returns true when `href` points to a route owned by a different
+ * Next.js app on the same origin (e.g. /docs/* or /dashboard/*).
+ *
+ * Only handles relative paths — absolute URLs should use <a> directly.
+ */
+function isCrossAppLink(href?: string): boolean {
+  if (!href || !href.startsWith('/')) return false
+
+  const path = href.split(/[?#]/)[0]
+
+  return CROSS_APP_PREFIXES.some((prefix) => path === prefix || path.startsWith(prefix + '/'))
+}
+
 interface Props {
   label: string
   url?: string
@@ -15,6 +32,9 @@ interface Props {
   onClick?: () => void
 }
 
+/**
+ * Standard text link component with optional counter and animated chevron.
+ */
 export function TextLink({
   url = '',
   label,
@@ -25,8 +45,10 @@ export function TextLink({
   target = '_self',
   ...props
 }: Props) {
+  const Component = isCrossAppLink(url) ? 'a' : Link
+
   return (
-    <Link
+    <Component
       href={url}
       className={cn(
         'group/text-link text-foreground-light hover:text-foreground mt-3 block cursor-pointer text-sm focus-ring focus-visible:rounded-xs focus-visible:text-foreground',
@@ -54,6 +76,6 @@ export function TextLink({
           </div>
         )}
       </div>
-    </Link>
+    </Component>
   )
 }

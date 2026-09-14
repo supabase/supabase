@@ -3,9 +3,14 @@ import Examples from 'data/Examples'
 import Link from 'next/link'
 import { Button, cn, IconGitHubSolid } from 'ui'
 
+
+
 import ExampleCard from '../ExampleCard'
 import ExamplesMobile from './ExamplesMobile'
 
+/**
+ * Section displaying examples and starters built with Supabase.
+ */
 const BuiltWithSupabase = () => {
   return (
     <>
@@ -17,7 +22,7 @@ const BuiltWithSupabase = () => {
           </p>
           <div className="flex justify-center gap-2 py-4">
             <Button asChild size="small" className="h-full">
-              <Link href="/docs/guides/examples">View all examples</Link>
+              <a href="/docs/guides/examples">View all examples</a>
             </Button>
             <Button
               asChild
