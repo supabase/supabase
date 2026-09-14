@@ -25,7 +25,7 @@ export default {
       return Response.json(data)
     } catch (e) {
       Sentry.captureException(e)
-      return Response.json({ msg: 'error' }, { status: 500 })
+      return Response.json({ error: 'error' }, { status: 500 })
     }
   }),
 }
