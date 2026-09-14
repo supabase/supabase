@@ -263,7 +263,7 @@ export const Indexes = () => {
                           </TableCell>
                           <TableCell>
                             <div className="flex justify-end items-center space-x-2">
-                              <Button variant="default" onClick={() => setEditIndexId(index.name)}>
+                              <Button onClick={() => setEditIndexId(index.name)}>
                                 View definition
                               </Button>
                               {!isSchemaLocked && (

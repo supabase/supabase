@@ -92,11 +92,22 @@ export async function verifyProductionTypes() {
       { cwd: packageDirectory }
     )
 
+    // Prettier resolves its config from the formatted file's location. The generated files live
+    // in a temporary directory outside the repository, so pass the repository config explicitly
+    // or they are formatted with Prettier's defaults and never match the committed files.
+    const { stdout: prettierConfigPath } = await run(
+      'pnpm',
+      ['exec', 'prettier', '--find-config-path', join(packageDirectory, 'package.json')],
+      { cwd: packageDirectory }
+    )
+
     await run(
       'pnpm',
       [
         'exec',
         'prettier',
+        '--config',
+        prettierConfigPath.trim(),
         '--write',
         ...specifications.map(({ name }) => join(generatedTypesDirectory, `${name}.d.ts`)),
       ],

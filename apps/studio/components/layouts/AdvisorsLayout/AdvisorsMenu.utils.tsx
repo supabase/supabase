@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { ArrowUpRight } from 'lucide-react'
 
 import { useIsAdvisorRulesEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -12,14 +12,16 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 export const generateAdvisorsMenu = ({
   ref,
   isAdvisorRulesEnabled,
+  isHealthAdvisorEnabled,
   isPlatform,
 }: {
   ref: string | undefined
   isAdvisorRulesEnabled: boolean
+  isHealthAdvisorEnabled: boolean
   isPlatform: boolean
 }): ProductMenuGroup[] => {
   const advisorItems: ProductMenuGroupItem[] = [
-    ...(isPlatform
+    ...(isPlatform && isHealthAdvisorEnabled
       ? [
           {
             name: 'Health Advisor',
@@ -80,10 +82,12 @@ export const generateAdvisorsMenu = ({
 export const useGenerateAdvisorsMenu = (): ProductMenuGroup[] => {
   const { ref } = useParams()
   const isAdvisorRulesEnabled = useIsAdvisorRulesEnabled()
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor') === true
 
   return generateAdvisorsMenu({
     ref,
     isAdvisorRulesEnabled,
+    isHealthAdvisorEnabled,
     isPlatform: IS_PLATFORM,
   })
 }

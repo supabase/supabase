@@ -38,7 +38,6 @@ export function DataTableViewOptions() {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <ButtonTooltip
-          variant="default"
           size="tiny"
           role="combobox"
           aria-expanded={open}

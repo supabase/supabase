@@ -4,7 +4,7 @@ import { cn } from 'ui'
 
 interface ComputeBadgeProps extends HTMLAttributes<HTMLDivElement> {
   infraComputeSize:
-    | components['schemas']['ProjectDetailResponse']['infra_compute_size']
+    | components['schemas']['ProjectDetailResponse_Output']['infra_compute_size']
     | '>16XL'
     | undefined
   icon?: ReactNode

@@ -5,13 +5,13 @@ export interface Notebook {
   id: string
   type: 'notebook'
   name: string
-  description?: string
+  description?: string | null | undefined
   visibility: 'project'
   favorite: boolean
   owner_id: number
   project_id: number
   content?: Notebooks.Content // Undefined until loaded
-  updated_at?: string // Absent for a notebook that's never been saved
+  updated_at?: string | null | undefined // Absent for a notebook that's never been saved
 }
 
 export interface StateNotebook {

@@ -525,7 +525,6 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                           <div className="flex flex-row">
                             <Input {...field} className="rounded-r-none border-r-0" />
                             <Button
-                              variant="default"
                               className="rounded-l-none text-xs h-auto"
                               onClick={() => {
                                 const authHookSecret = generateAuthHookSecret()
@@ -555,7 +554,7 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
             </div>
           )}
 
-          <Button disabled={isUpdatingAuthHooks} variant="default" onClick={confirmOnClose}>
+          <Button disabled={isUpdatingAuthHooks} onClick={confirmOnClose}>
             Cancel
           </Button>
           <Button

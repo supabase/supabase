@@ -86,7 +86,7 @@ export const CreatePublishableAPIKeyDialog = () => {
         side="bottom"
         tooltipOpen={visible === 'publishable' ? false : undefined}
       >
-        <Button variant="default" icon={<Plus />} onClick={openDialog}>
+        <Button icon={<Plus />} onClick={openDialog}>
           New publishable key
         </Button>
       </Shortcut>

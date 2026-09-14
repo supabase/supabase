@@ -456,10 +456,7 @@ export const TriggerSheet = ({
                                     <span className="text-sm text-foreground">{function_name}</span>
                                   </p>
                                 </div>
-                                <Button
-                                  variant="default"
-                                  onClick={() => setShowFunctionSelector(true)}
-                                >
+                                <Button onClick={() => setShowFunctionSelector(true)}>
                                   Change function
                                 </Button>
                               </div>
@@ -475,12 +472,7 @@ export const TriggerSheet = ({
           </Form>
 
           <SheetFooter className="shrink-0">
-            <Button
-              variant="default"
-              type="reset"
-              disabled={isCreating || isUpdating}
-              onClick={confirmOnClose}
-            >
+            <Button type="reset" disabled={isCreating || isUpdating} onClick={confirmOnClose}>
               Cancel
             </Button>
             <Button

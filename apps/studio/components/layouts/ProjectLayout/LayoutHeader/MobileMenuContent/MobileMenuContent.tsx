@@ -65,7 +65,7 @@ export function MobileMenuContent({
     'realtime:all',
   ])
   const authOverviewPageEnabled = useFlag('authOverviewPage')
-  const workersEnabled = useFlag('workers')
+  const computeEnabled = useFlag('compute')
 
   const toolRoutes = useGenerateToolRoutes()
   const productRoutes = useMemo(
@@ -76,7 +76,7 @@ export function MobileMenuContent({
         storage: storageEnabled,
         realtime: realtimeEnabled,
         authOverviewPage: authOverviewPageEnabled,
-        workers: workersEnabled,
+        compute: computeEnabled,
       }),
     [
       ref,
@@ -86,7 +86,7 @@ export function MobileMenuContent({
       storageEnabled,
       realtimeEnabled,
       authOverviewPageEnabled,
-      workersEnabled,
+      computeEnabled,
     ]
   )
   const otherRoutes = useGenerateOtherRoutes()

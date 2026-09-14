@@ -57,7 +57,6 @@ export default function CalendarForm() {
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
-                      variant="default"
                       size="small"
                       className={cn(
                         'w-[240px] justify-start',

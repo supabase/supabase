@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import { X } from 'lucide-react'
 import { z } from 'zod'
 
@@ -58,9 +59,10 @@ export const AdvisorFilters = ({
   onClose,
   isPlatform = false,
 }: AdvisorFiltersProps) => {
-  const categoryOptions = (isPlatform ? platformCategories : selfHostedCategories).map(
-    (category) => ({ label: advisorCategoryLabels[category], value: category })
-  )
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor') === true
+  const categoryOptions = (isPlatform ? platformCategories : selfHostedCategories)
+    .filter((category) => category !== 'health' || isHealthAdvisorEnabled)
+    .map((category) => ({ label: advisorCategoryLabels[category], value: category }))
 
   return (
     <div className="border-b overflow-x-auto">

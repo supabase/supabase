@@ -219,7 +219,7 @@ function OrganizationsEmptyState({ authId }: OrganizationsEmptyStateProps): Reac
       title="No organizations found"
       description="Create an organization before authorizing this request."
       actions={[
-        <Button asChild key="new-org" variant="default">
+        <Button asChild key="new-org">
           <Link href={`/new?returnTo=${encodeURIComponent(returnTo)}`}>Create an organization</Link>
         </Button>,
       ]}

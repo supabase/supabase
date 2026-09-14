@@ -4,11 +4,11 @@ import { AUTH_JWT_SECRET, POSTGRES_PORT } from './constants'
 import { assertSelfHosted } from './util'
 import { PROJECT_DB_HOST, PROJECT_ENDPOINT, PROJECT_ENDPOINT_PROTOCOL } from '@/lib/constants/api'
 
-type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_config'] & {
+type ProjectAppConfig = components['schemas']['ProjectSettingsResponse_Output']['app_config'] & {
   protocol?: string
 }
 
-export type ProjectSettings = components['schemas']['ProjectSettingsResponse'] & {
+export type ProjectSettings = components['schemas']['ProjectSettingsResponse_Output'] & {
   app_config?: ProjectAppConfig
 }
 
