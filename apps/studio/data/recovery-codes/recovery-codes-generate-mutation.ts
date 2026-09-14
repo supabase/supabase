@@ -39,11 +39,11 @@ export const useRecoveryCodesGenerateMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to sign in: ${data.message}`)
+        toast.error(`Failed to get recovery codes: ${data.message}`)
       } else {
         onError(data, variables, context)
       }
-      captureCriticalError(data, 'sign in via MFA')
+      captureCriticalError(data, 'recovery codes status')
     },
     ...options,
   })
