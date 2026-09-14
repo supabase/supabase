@@ -1,6 +1,12 @@
 import type { Suggestion } from './ColumnEditor.types'
 import type { Dictionary } from '@/types'
 
+export const nullSuggestion: Suggestion = {
+  name: 'Set as NULL',
+  value: null,
+  description: 'Set the default value as NULL value',
+}
+
 const defaultTimeBasedExpressions: Suggestion[] = [
   {
     name: 'now()',
@@ -15,11 +21,6 @@ const defaultTimeBasedExpressions: Suggestion[] = [
 ]
 
 const defaultTextBasedValues: Suggestion[] = [
-  {
-    name: 'Set as NULL',
-    value: null,
-    description: 'Set the default value as NULL value',
-  },
   {
     name: 'Set as empty string',
     value: '',

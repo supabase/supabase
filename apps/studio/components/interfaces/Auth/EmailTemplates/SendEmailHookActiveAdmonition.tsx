@@ -29,7 +29,7 @@ export const SendEmailHookActiveAdmonition = () => {
         </>
       }
       actions={
-        <Button asChild variant="default">
+        <Button asChild>
           <Link href={`/project/${projectRef}/auth/hooks?hook=send-email`}>Manage hook</Link>
         </Button>
       }

@@ -214,6 +214,19 @@ export interface KimiMcpConfig extends McpClientBaseConfig {
     }
   }
 }
+/**
+ * Configuration format for the omp CLI MCP client.
+ * omp keys servers under `mcpServers` and requires an explicit `type: "http"`:
+ * an entry with a `url` but no `type` is validated as stdio and rejected.
+ */
+export interface OmpMcpConfig extends McpClientBaseConfig {
+  mcpServers: {
+    supabase: {
+      type: 'http'
+      url: string
+    }
+  }
+}
 
 // Union of all possible config types
 export type McpClientConfig =
@@ -230,6 +243,7 @@ export type McpClientConfig =
   | GrokMcpConfig
   | KimiMcpConfig
   | McpClientBaseConfig
+  | OmpMcpConfig
   | OpenCodeMcpConfig
   | OtherMcpConfig
   | VSCodeMcpConfig

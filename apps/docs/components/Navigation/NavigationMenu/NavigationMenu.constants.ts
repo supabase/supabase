@@ -210,16 +210,10 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'security',
           },
           {
-            label: 'Monitoring and Debugging',
+            label: 'Observability',
             icon: 'telemetry',
-            href: '/guides/monitoring-and-debugging' as `/${string}`,
+            href: '/guides/observability' as `/${string}`,
             level: 'telemetry',
-          },
-          {
-            label: 'Troubleshooting',
-            icon: 'troubleshooting',
-            href: '/guides/troubleshooting' as `/${string}`,
-            level: 'troubleshooting',
           },
         ],
       ],
@@ -343,6 +337,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/contributing' as `/${string}`,
             enabled: contributionEnabled,
           },
+          {
+            label: 'Troubleshooting',
+            icon: 'troubleshooting',
+            href: '/guides/troubleshooting' as `/${string}`,
+            level: 'troubleshooting',
+          },
         ],
       ],
     },
@@ -367,36 +367,48 @@ export const gettingstarted: NavMenuConstant = {
       enabled: frameworkQuickstartsEnabled,
       items: [
         {
+          name: 'React',
+          url: '/guides/getting-started/quickstarts/reactjs',
+        },
+        {
           name: 'Next.js',
           url: '/guides/getting-started/quickstarts/nextjs',
         },
         {
-          name: 'React',
-          url: '/guides/getting-started/quickstarts/reactjs',
+          name: 'TanStack Start',
+          url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
         },
         {
           name: 'Astro',
           url: '/guides/getting-started/quickstarts/astrojs',
         },
         {
-          name: 'Nuxt',
-          url: '/guides/getting-started/quickstarts/nuxtjs',
-        },
-        {
           name: 'Vue',
           url: '/guides/getting-started/quickstarts/vue',
         },
         {
+          name: 'Nuxt',
+          url: '/guides/getting-started/quickstarts/nuxtjs',
+        },
+        {
+          name: 'SvelteKit',
+          url: '/guides/getting-started/quickstarts/sveltekit' as `/${string}`,
+        },
+        {
+          name: 'SolidJS',
+          url: '/guides/getting-started/quickstarts/solidjs',
+        },
+        {
+          name: 'RedwoodJS',
+          url: '/guides/getting-started/quickstarts/redwoodjs' as `/${string}`,
+        },
+        {
+          name: 'Refine',
+          url: '/guides/getting-started/quickstarts/refine',
+        },
+        {
           name: 'Hono',
           url: '/guides/getting-started/quickstarts/hono',
-        },
-        {
-          name: 'Expo React Native',
-          url: '/guides/getting-started/quickstarts/expo-react-native',
-        },
-        {
-          name: 'Flutter',
-          url: '/guides/getting-started/quickstarts/flutter',
         },
         {
           name: 'iOS SwiftUI',
@@ -407,8 +419,12 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/kotlin' as `/${string}`,
         },
         {
-          name: 'SvelteKit',
-          url: '/guides/getting-started/quickstarts/sveltekit' as `/${string}`,
+          name: 'Expo React Native',
+          url: '/guides/getting-started/quickstarts/expo-react-native',
+        },
+        {
+          name: 'Flutter',
+          url: '/guides/getting-started/quickstarts/flutter',
         },
         {
           name: 'Flask (Python)',
@@ -416,8 +432,9 @@ export const gettingstarted: NavMenuConstant = {
           enabled: !jsOnly,
         },
         {
-          name: 'TanStack Start',
-          url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
+          name: 'Reflex (Python)',
+          url: '/guides/getting-started/quickstarts/reflex' as `/${string}`,
+          enabled: !jsOnly,
         },
         {
           name: 'Laravel PHP',
@@ -433,18 +450,6 @@ export const gettingstarted: NavMenuConstant = {
           name: 'Spring Boot',
           url: '/guides/getting-started/quickstarts/spring-boot' as `/${string}`,
           enabled: !jsOnly,
-        },
-        {
-          name: 'SolidJS',
-          url: '/guides/getting-started/quickstarts/solidjs',
-        },
-        {
-          name: 'RedwoodJS',
-          url: '/guides/getting-started/quickstarts/redwoodjs' as `/${string}`,
-        },
-        {
-          name: 'Refine',
-          url: '/guides/getting-started/quickstarts/refine',
         },
       ],
     },
@@ -1034,6 +1039,20 @@ export const database: NavMenuConstant = {
         {
           name: 'Connecting to your database',
           url: '/guides/database/connecting-to-postgres' as `/${string}`,
+          items: [
+            {
+              name: 'Connecting to your database',
+              url: '/guides/database/connecting-to-postgres' as `/${string}`,
+            },
+            {
+              name: 'Connection pooling and limits',
+              url: '/guides/database/connecting-to-postgres/pooling-and-limits' as `/${string}`,
+            },
+            {
+              name: 'Serverless drivers',
+              url: '/guides/database/connecting-to-postgres/serverless-drivers' as `/${string}`,
+            },
+          ],
         },
         { name: 'Importing data', url: '/guides/database/import-data' },
         { name: 'Securing your data', url: '/guides/database/secure-data' },
@@ -1161,7 +1180,7 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'Database Advisors',
-          url: '/guides/database/database-advisors' as `/${string}`,
+          url: '/guides/observability/advisors' as `/${string}`,
         },
         { name: 'Testing your database', url: '/guides/database/testing' },
         {
@@ -1179,8 +1198,8 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/timeouts' as `/${string}`,
         },
         {
-          name: 'Debugging and monitoring',
-          url: '/guides/database/inspect' as `/${string}`,
+          name: 'Inspect the database',
+          url: '/guides/observability/inspect' as `/${string}`,
         },
         {
           name: 'Debugging performance issues',
@@ -3021,81 +3040,147 @@ export const platform: NavMenuConstant = {
 
 export const telemetry: NavMenuConstant = {
   icon: 'telemetry',
-  title: 'Monitoring and Debugging',
-  url: '/guides/monitoring-and-debugging',
+  title: 'Observability',
+  url: '/guides/observability',
   items: [
-    { name: 'Overview', url: '/guides/monitoring-and-debugging' },
+    { name: 'Overview', url: '/guides/observability' },
     {
-      name: 'Debugging',
-      url: undefined,
+      name: 'Observe the data',
+      url: '/guides/observability/access-data' as `/${string}`,
       items: [
         {
-          name: 'Debugging guide',
-          url: '/guides/monitoring-and-debugging/debugging' as `/${string}`,
-        },
-        {
-          name: 'Logging',
-          url: '/guides/monitoring-and-debugging/logs' as `/${string}`,
-        },
-        {
-          name: 'Advanced log filtering',
-          url: '/guides/monitoring-and-debugging/advanced-log-filtering' as `/${string}`,
-        },
-        {
-          name: 'Logs field reference',
-          url: '/guides/monitoring-and-debugging/log-field-reference' as `/${string}`,
-        },
-      ],
-    },
-    {
-      name: 'Monitoring',
-      url: undefined,
-      items: [
-        {
-          name: 'Log drains',
-          url: '/guides/monitoring-and-debugging/log-drains' as `/${string}`,
-        },
-        {
-          name: 'Reports',
-          url: '/guides/monitoring-and-debugging/reports' as `/${string}`,
-        },
-        {
-          name: 'Metrics',
-          url: '/guides/monitoring-and-debugging/metrics' as `/${string}`,
+          name: 'Logs',
+          url: '/guides/observability/advanced-log-filtering' as `/${string}`,
           items: [
             {
-              name: 'Overview',
-              url: '/guides/monitoring-and-debugging/metrics' as `/${string}`,
+              name: 'Query and filter logs',
+              url: '/guides/observability/advanced-log-filtering' as `/${string}`,
             },
             {
-              name: 'Grafana Cloud',
-              url: '/guides/monitoring-and-debugging/metrics/grafana-cloud' as `/${string}`,
+              name: 'Sources',
+              url: '/guides/observability/advanced-log-filtering#logs-explorer' as `/${string}`,
             },
             {
-              name: 'Grafana self-hosted',
-              url: '/guides/monitoring-and-debugging/metrics/grafana-self-hosted' as `/${string}`,
+              name: 'Logs field reference',
+              url: '/guides/observability/log-field-reference' as `/${string}`,
             },
             {
-              name: 'Datadog',
-              url: 'https://docs.datadoghq.com/integrations/supabase/' as `/${string}`,
-            },
-            {
-              name: 'Elastic',
-              url: 'https://www.elastic.co/docs/reference/integrations/supabase' as `/${string}`,
-            },
-            {
-              name: 'Vendor-agnostic setup',
-              url: '/guides/monitoring-and-debugging/metrics/vendor-agnostic' as `/${string}`,
+              name: 'Logs in Studio',
+              url: '/guides/observability/logs' as `/${string}`,
             },
           ],
         },
         {
-          name: 'Sentry integration',
-          url: '/guides/monitoring-and-debugging/sentry-monitoring' as `/${string}`,
+          name: 'Metrics API',
+          url: '/guides/observability/metrics' as `/${string}`,
+          items: [
+            {
+              name: 'Grafana Cloud',
+              url: '/guides/observability/metrics/grafana-cloud' as `/${string}`,
+            },
+            {
+              name: 'Grafana self-hosted',
+              url: '/guides/observability/metrics/grafana-self-hosted' as `/${string}`,
+            },
+            {
+              name: 'Datadog',
+              url: 'https://docs.datadoghq.com/integrations/supabase/',
+            },
+            {
+              name: 'Elastic',
+              url: 'https://www.elastic.co/docs/reference/integrations/supabase',
+            },
+            {
+              name: 'Vendor-agnostic setup',
+              url: '/guides/observability/metrics/vendor-agnostic' as `/${string}`,
+            },
+          ],
         },
         {
-          name: 'Tracing with the client SDKs',
-          url: '/guides/monitoring-and-debugging/client-side-tracing' as `/${string}`,
+          name: 'Database',
+          url: '/guides/observability/inspect' as `/${string}`,
+          items: [
+            {
+              name: 'CLI commands',
+              url: '/guides/observability/inspect#using-the-cli' as `/${string}`,
+            },
+            {
+              name: 'SQL',
+              url: '/guides/observability/inspect#using-sql' as `/${string}`,
+            },
+          ],
+        },
+        {
+          name: 'Advisors',
+          url: '/guides/observability/advisors' as `/${string}`,
+        },
+        {
+          name: 'Reports',
+          url: '/guides/observability/reports' as `/${string}`,
+        },
+      ],
+    },
+    {
+      name: 'Detect issues',
+      url: '/guides/observability/detecting' as `/${string}`,
+      items: [
+        {
+          name: 'Detection checks',
+          url: '/guides/observability/detecting' as `/${string}`,
+        },
+      ],
+    },
+    {
+      name: 'Diagnose and resolve',
+      url: '/guides/troubleshooting' as `/${string}`,
+      items: [
+        {
+          name: 'Troubleshooting',
+          url: '/guides/troubleshooting' as `/${string}`,
+        },
+      ],
+    },
+    {
+      name: 'Hire an agent',
+      url: '/guides/observability/automate-with-agents' as `/${string}`,
+      items: [
+        {
+          name: 'Generalist',
+          url: '/guides/observability/automate-with-agents/all' as `/${string}`,
+        },
+        {
+          name: 'Health monitor',
+          url: '/guides/observability/automate-with-agents/health' as `/${string}`,
+        },
+        {
+          name: 'Security monitor',
+          url: '/guides/observability/automate-with-agents/security' as `/${string}`,
+        },
+        {
+          name: 'Performance monitor',
+          url: '/guides/observability/automate-with-agents/performance' as `/${string}`,
+        },
+        {
+          name: 'Capacity monitor',
+          url: '/guides/observability/automate-with-agents/usage' as `/${string}`,
+        },
+      ],
+    },
+    {
+      name: 'Export',
+      url: undefined,
+      items: [
+        {
+          name: 'Log drains',
+          url: '/guides/observability/log-drains' as `/${string}`,
+        },
+        {
+          name: 'Client-side tracing',
+          url: '/guides/observability/client-side-tracing' as `/${string}`,
+        },
+        {
+          name: 'Sentry integration',
+          url: '/guides/observability/sentry-monitoring' as `/${string}`,
         },
       ],
     },
@@ -3491,6 +3576,17 @@ export const reference_csharp_v0 = {
 }
 
 export const reference_csharp_v1 = {
+  icon: 'reference-csharp',
+  title: 'C#',
+  url: 'guides/reference/csharp',
+  parent: '/reference',
+  pkg: {
+    name: 'supabase',
+    repo: 'https://github.com/supabase-community/supabase-csharp',
+  },
+}
+
+export const reference_csharp_v8 = {
   icon: 'reference-csharp',
   title: 'C#',
   url: 'guides/reference/csharp',

@@ -43,12 +43,7 @@ export const AuthorizedAppRow = ({ app, onSelectRevoke }: AuthorizedAppRowProps)
         />
       </TableCell>
       <TableCell className="text-right">
-        <Button
-          variant="default"
-          icon={<Trash />}
-          className="px-1"
-          onClick={() => onSelectRevoke()}
-        />
+        <Button icon={<Trash />} className="px-1" onClick={() => onSelectRevoke()} />
       </TableCell>
     </TableRow>
   )

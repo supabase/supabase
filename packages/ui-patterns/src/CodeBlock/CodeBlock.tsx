@@ -269,12 +269,11 @@ export const CodeBlock = ({
             <div
               className={[
                 'absolute right-2 top-2',
-                'opacity-0 group-hover:opacity-100 transition',
+                'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition',
                 `${isDarkTheme ? 'dark' : ''}`,
               ].join(' ')}
             >
               <Button
-                variant="default"
                 className="px-1.5 dark:bg-200! dark:hover:bg-button! hover:bg-alternative!"
                 icon={copied ? <Check /> : <Copy />}
                 onClick={() => onSelectCopy(value || children)}

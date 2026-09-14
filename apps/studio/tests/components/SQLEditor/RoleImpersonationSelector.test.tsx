@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { toast } from 'sonner'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { RoleImpersonationSelectorInterface } from '@/components/interfaces/RoleImpersonationSelector'
 import type { ImpersonationRole } from '@/lib/role-impersonation'
@@ -21,10 +21,6 @@ vi.mock('@/components/interfaces/RoleImpersonationSelector/UserImpersonationSele
 }))
 
 describe('RoleImpersonationSelectorInterface', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('enables user settings for authenticated queries and summarizes each role', async () => {
     const user = userEvent.setup()
     let currentRole: ImpersonationRole | undefined

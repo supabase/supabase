@@ -45,6 +45,7 @@ Now you can access these schemas from data APIs:
 ```js
 // Initialize the JS client
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   db: { schema: 'myschema' },
 })

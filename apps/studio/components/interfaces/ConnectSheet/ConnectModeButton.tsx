@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import { Box, Cable, Database, Server, Sparkles } from 'lucide-react'
+import { Box, Cable, Database, Server, Sparkles, Warehouse } from 'lucide-react'
 import type { ComponentPropsWithoutRef, ReactNode } from 'react'
 import { cn } from 'ui'
 
@@ -11,6 +11,7 @@ const MODE_ICONS: Record<string, ReactNode> = {
   orm: <Cable size={16} strokeWidth={1.5} />,
   mcp: <Sparkles size={16} strokeWidth={1.5} />,
   server: <Server size={16} strokeWidth={1.5} />,
+  warehouse: <Warehouse size={16} strokeWidth={1.5} />,
 }
 
 /** Maps mode count → container-query breakpoint used when collapsing to a single row. */

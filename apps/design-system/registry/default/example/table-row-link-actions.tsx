@@ -103,7 +103,6 @@ export default function TableRowLinkActions() {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
-                        variant="default"
                         icon={<EllipsisVertical />}
                         aria-label="More actions"
                         className="w-7 hit-area-2"

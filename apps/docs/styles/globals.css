@@ -34,6 +34,19 @@
   --font-weight-normal: 450;
 }
 
+@utility code-line-number {
+  @apply select-none text-right text-muted/70 pl-3 pr-2 min-h-5 leading-5;
+  @apply bg-[var(--row-rest)] sticky left-0 z-10;
+  @apply group-hover/row:text-muted group-hover/row:bg-[var(--row-hover)];
+  @apply after:pointer-events-none after:absolute after:inset-y-0 after:left-full after:w-4;
+  @apply [--gutter-fade:var(--row-rest)] group-hover/row:[--gutter-fade:var(--row-hover)];
+  @apply after:bg-[image:linear-gradient(to_right,var(--gutter-fade)_0%,color-mix(in_srgb,var(--gutter-fade)_85%,transparent)_25%,color-mix(in_srgb,var(--gutter-fade)_50%,transparent)_50%,color-mix(in_srgb,var(--gutter-fade)_15%,transparent)_75%,transparent_100%)];
+}
+
+@utility code-line-content {
+  @apply min-h-5 leading-5 pl-3 pr-18 group-hover/row:bg-[var(--row-hover)];
+}
+
 @layer utilities {
   .prose--remove-p-margin p {
     margin: 0;
@@ -160,11 +173,16 @@ h6:not(.font-mono),
   @apply font-heading font-semibold;
 }
 
+/* Alert set its own type scale to prevent drift in docs */
 .prose
   :where(p, li, a, figcaption):not(:where([class~='not-prose'], [class~='not-prose'] *)):not(
     :where(h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6) *
-  ) {
+  ):not(:where([data-slot='alert'] *)) {
   @apply text-base leading-7;
+}
+
+.prose :where([data-slot='alert'] ol > li)::before {
+  top: 0;
 }
 
 .prose :where(h1, .h1):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
@@ -276,10 +294,6 @@ pre[class*='language-'] {
   }
 }
 
-.admonition-content > p {
-  @apply m-0;
-}
-
 /* format <code> inside <p> */
 h2 code,
 h3 code,
@@ -294,13 +308,6 @@ h4 code {
   &::after {
     display: none;
   }
-}
-
-/* code inside admonitions */
-.admonition-content p code {
-  @apply bg-control;
-  word-break: keep-all !important;
-  white-space: nowrap !important;
 }
 
 article p strong {
@@ -433,6 +440,8 @@ th code {
   --code-token-number: #ffffff;
   --code-token-property: #3ecf8e;
   --code-highlight-color: #232323;
+  --shadow-codeblock:
+    0 0 0 0 var(--border-default), 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 0 rgba(0, 0, 0, 0.3);
 }
 [data-theme='light'],
 .light {
@@ -459,4 +468,8 @@ th code {
 .shiki[data-wrapped='true'] .code-content {
   white-space: pre-wrap !important;
   word-break: break-word !important;
+}
+
+.shadow-codeblock {
+  box-shadow: var(--shadow-codeblock, none);
 }

@@ -311,7 +311,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
             </DialogSection>
 
             <DialogFooter padding="medium">
-              <Button disabled={isUpdating} variant="default" onClick={onClose}>
+              <Button disabled={isUpdating} onClick={onClose}>
                 Cancel
               </Button>
               <Button
