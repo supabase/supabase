@@ -169,7 +169,7 @@ Your project now has a fully reproducible local development environment.
 
 <Admonition type="note" title="What about declarative schemas?">
 
-For an existing project, the pulled migration is already your schema baseline. You don't need to also create a `schemas/` directory, because that would mean maintaining two representations of the same schema. If you want to adopt declarative schemas later, `supabase db schema declarative generate` bootstraps the `supabase/schemas/` directory from your live database. See [Declarative database schemas](/docs/guides/local-development/declarative-database-schemas). For day-to-day changes, see [The daily workflow](#the-daily-workflow).
+For an existing project, the pulled migration is already your schema baseline. You don't need to also create a `schemas/` directory, because that would mean maintaining two representations of the same schema. If you want to adopt declarative schemas later, `supabase db schema declarative generate` bootstraps the `supabase/schemas/` directory (or the directory set by `experimental.pgdelta.declarative_schema_path`) from your live database. See [Declarative database schemas](/docs/guides/local-development/declarative-database-schemas). For day-to-day changes, see [The daily workflow](#the-daily-workflow).
 
 </Admonition>
 
