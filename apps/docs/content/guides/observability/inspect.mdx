@@ -78,19 +78,11 @@ These commands are handy if you are running low on disk storage:
 
 - [bloat](/docs/reference/cli/supabase-inspect-db-bloat) - estimates the amount of wasted space
 - [vacuum-stats](/docs/reference/cli/supabase-inspect-db-vacuum-stats) - gives information on waste collection routines
-- [table-record-counts](/docs/reference/cli/supabase-inspect-db-table-record-counts) - estimates the number of records per table
-- [table-sizes](/docs/reference/cli/supabase-inspect-db-table-sizes) - shows the sizes of tables
-- [index-sizes](/docs/reference/cli/supabase-inspect-db-index-sizes) - shows the sizes of individual index
-- [table-index-sizes](/docs/reference/cli/supabase-inspect-db-table-index-sizes) - shows the sizes of indexes for each table
 
 #### Query performance
 
 The commands below are useful if your Postgres database consumes a lot of resources like CPU, RAM or Disk IO. You can also use them to investigate slow queries.
 
-- [cache-hit](/docs/reference/cli/supabase-inspect-db-cache-hit) - shows how efficient your cache usage is overall
-- [unused-indexes](/docs/reference/cli/supabase-inspect-db-unused-indexes) - shows indexes with low index scans
-- [index-usage](/docs/reference/cli/supabase-inspect-db-index-usage) - shows information about the efficiency of indexes
-- [seq-scans](/docs/reference/cli/supabase-inspect-db-seq-scans) - show number of sequential scans recorded against all tables
 - [long-running-queries](/docs/reference/cli/supabase-inspect-db-long-running-queries) - shows long running queries that are executing right now
 - [outliers](/docs/reference/cli/supabase-inspect-db-outliers) - shows queries with high execution time but low call count and queries with high proportion of execution time spent on synchronous I/O
 
@@ -106,7 +98,7 @@ The commands below are useful if your Postgres database consumes a lot of resour
 
 ### Notes on `pg_stat_statements`
 
-Following commands require `pg_stat_statements` to be enabled: calls, locks, cache-hit, blocking, unused-indexes, index-usage, bloat, outliers, table-record-counts, replication-slots, seq-scans, vacuum-stats, long-running-queries.
+Following commands require `pg_stat_statements` to be enabled: calls, locks, blocking, bloat, outliers, replication-slots, vacuum-stats, long-running-queries.
 
 When using `pg_stat_statements` also take note that it only stores the latest 5,000 statements. Moreover, consider resetting the analysis after optimizing any queries by running `select pg_stat_statements_reset();`
 
@@ -245,3 +237,4 @@ This shows the ratio of data blocks fetched from the Postgres [shared_buffers](h
 A ratio below 99% means more than 1% of observed block accesses missed `shared_buffers`. Postgres cannot distinguish whether those reads were served by the operating system cache or physical disk. Treat that as a [Performance](/docs/guides/observability/detecting#performance) signal, then search [Diagnosing](/docs/guides/troubleshooting).
 
 When a check names a slow statement, get a query plan with [`explain`](/docs/guides/database/query-optimization#analyze-the-query-plan) in SQL, or [`explain()`](/docs/guides/database/debugging-performance) on the Data API. Pair `pg_stat_statements` with the [Metrics API](/docs/guides/observability/metrics) to read the same window from Postgres stats and host metrics.
+
