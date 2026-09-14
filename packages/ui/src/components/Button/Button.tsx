@@ -39,8 +39,8 @@ const buttonVariants = cva(
           bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
           text-primary-foreground
           shadow-[0_1px_3px_0_hsl(var(--colors-black)/var(--button-shadow-opacity)),inset_0_1px_0_0_hsl(var(--button-edge-color)/calc(0.04*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.06*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.1*var(--button-edge-strength)))]
-          hover:bg-primary/90
-          data-[state=open]:bg-primary/90
+          hover:bg-[var(--primary-hover)]
+          data-[state=open]:bg-[var(--primary-hover)]
           `,
         default: `
           text-foreground

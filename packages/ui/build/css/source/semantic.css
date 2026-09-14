@@ -159,6 +159,11 @@
 
   /* Preserve the original dark button fill's lightness and chroma, with semantic hue. */
   --primary: oklch(0.43627 0.10433 var(--primary-hue));
+  --primary-hover: color-mix(
+    in oklch,
+    var(--primary),
+    oklch(from var(--foreground) l c var(--primary-hue)) 8%
+  );
   --primary-foreground: oklch(0.95 0.00275 var(--primary-hue));
 
   --secondary: oklch(
