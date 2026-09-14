@@ -4,6 +4,27 @@ import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { SCHEMAS_SQL } from './sql/schemas'
 
+// Pick a `$$…$$` delimiter for a `DO` block that is absent from every
+// string in `values`. See the matching helper in `pg-meta-tables.ts`
+// for the full rationale; the same dollar-quote-collision bug exists
+// in the two DO blocks below (the `update` path and the `remove` path),
+// both of which embed the `name` parameter via `${literal(name)}` and
+// the `newName` / `owner` parameters via `${literal(...)}`, then run
+// the resolved values through `format('alter schema %I ...', ...)`.
+function getDoBlockDelimiter(values: string[]): SafeSqlFragment {
+  let suffix = 0
+  while (true) {
+    const delimiter =
+      suffix === 0
+        ? (safeSql`$pg_meta$` as SafeSqlFragment)
+        : (safeSql`$pg_meta_${literal(suffix)}$` as SafeSqlFragment)
+    if (values.every((value) => !value.includes(delimiter))) {
+      return delimiter
+    }
+    suffix += 1
+  }
+}
+
 const pgSchemaZod = z.object({
   id: z.number(),
   name: z.string(),
@@ -94,8 +115,19 @@ function update(
   },
   { name: newName, owner }: SchemaUpdateParams
 ): { sql: SafeSqlFragment } {
+  // The body of this DO block embeds the `name` parameter via
+  // `${literal(name)}` (which renders to e.g. `'App$$x'::regnamespace`)
+  // and the `newName` / `owner` parameters via `${literal(...)}`. The
+  // resolved schema name (from `old.nspname`) and the new owner /
+  // new name are then passed through
+  // `format('alter schema %I ...', ...)`. If any of those values
+  // contains the literal sequence `$$` the body is parsed as
+  // truncated and the statement fails with a syntax error. Pick a
+  // delimiter that is absent from every value that flows into the
+  // body.
+  const doBlockDelimiter = getDoBlockDelimiter([name ?? '', newName ?? '', owner ?? ''])
   const sql = safeSql`
-do $$
+do ${doBlockDelimiter}
 declare
   id oid := ${id === undefined ? safeSql`${literal(name)}::regnamespace` : literal(id)};
   old record;
@@ -116,7 +148,7 @@ begin
     execute(format('alter schema %I rename to %I;', old.nspname, new_name));
   end if;
 end
-$$;
+${doBlockDelimiter};
 `
   return { sql }
 }
@@ -136,8 +168,15 @@ function remove(
   },
   { cascade = false }: SchemaRemoveParams = {}
 ): { sql: SafeSqlFragment } {
+  // Same dollar-quote-collision rationale as `update` above: the
+  // `name` parameter is embedded via `${literal(name)}`, the
+  // resolved schema name is then passed through
+  // `format('drop schema %I %s;', old.nspname, ...)` inside the
+  // body. If `name` contains `$$` the body is parsed as
+  // truncated. Pick a delimiter that is absent from `name`.
+  const doBlockDelimiter = getDoBlockDelimiter([name ?? ''])
   const sql = safeSql`
-do $$
+do ${doBlockDelimiter}
 declare
   id oid := ${id === undefined ? safeSql`${literal(name)}::regnamespace` : literal(id)};
   old record;
@@ -150,7 +189,7 @@ begin
 
   execute(format('drop schema %I %s;', old.nspname, case when cascade then 'cascade' else 'restrict' end));
 end
-$$;
+${doBlockDelimiter};
 `
   return { sql }
 }
