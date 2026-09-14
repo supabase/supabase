@@ -34,16 +34,19 @@ description: Auth block
     )
   })
 
-  it('uses shadcn-vue for Vue and Nuxt blocks', () => {
+  it('uses an explicit Vue CLI family and a production URL without a configured namespace', () => {
     const output = transformLibraryMdx(`---
 title: Dropzone
 description: Vue dropzone
 ---
 
-<BlockItem name="dropzone-vue" />
+<BlockItem name="dropzone-vue" framework="vue" />
 `)
 
-    assert.match(output, /npx shadcn-vue@latest add @supabase\/dropzone-vue/)
+    assert.match(
+      output,
+      /npx shadcn-vue@latest add https:\/\/supabase\.com\/library\/r\/dropzone-vue.json/
+    )
   })
 
   it('keeps usage copy and omits interactive previews', () => {
