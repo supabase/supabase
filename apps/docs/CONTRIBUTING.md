@@ -21,7 +21,9 @@ To make docs as clear as possible:
 
 ## Information types
 
-Separating kinds of information is a useful way to keep a paragraph readable. The [Information Mapping](https://support.informationmapping.com/hc/en-us/articles/213446789-Present-your-information-in-a-clear-and-consistent-way) method names six, each answering a different reader question:
+Separating kinds of information helps a reader reach what they came for and retain it afterward. Someone scanning for a command shouldn't have to read past a definition to find it, and someone reading to understand shouldn't have to step around instructions. Blended prose slows down both, along with an AI agent trying to answer a question from the page, and little of it sticks.
+
+The [Information Mapping](https://support.informationmapping.com/hc/en-us/articles/213446789-Present-your-information-in-a-clear-and-consistent-way) method names six kinds, each answering a different reader question:
 
 | Type | Answers | Present with |
 | --- | --- | --- |
