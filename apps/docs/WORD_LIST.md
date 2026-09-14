@@ -524,25 +524,22 @@ Use _must_ or _need to_ for a requirement. Don't use _must_ for a recommendation
 Use a more precise term when possible, such as _built-in_,
 _platform-specific_, or _compiled_. Don't use _native_ to describe people.
 
+### numbers
+
+Follow the [Google developer documentation style guide](https://developers.google.com/style/numbers)
+for formatting: spell out zero through nine, use numerals for 10 and greater, and
+use numerals for versions, technical quantities, step numbers, prices, and
+percentages.
+
+A count or a step number often isn't doing any work, and the sentence reads the
+same without it. Naming the action or linking the heading reads well and doesn't go
+stale after a reorder. Where a number earns its place, use it. See
+[CONTRIBUTING.md](./CONTRIBUTING.md#numbers).
+
 ### numbers in product versions
 
 Write an explicit comparison, such as _version 3.0 or later_. Don't use _newer_,
 _older_, _higher_, _lower_, or a trailing `+`.
-
-### numbers of steps and items
-
-Leave out a count or a step number when it isn't doing work, which is most of the
-time. Naming the action or linking the heading survives a reorder and gives a
-reader using a screen reader something to navigate to. A number is fine where it
-earns its place, such as _step 2_ in a long procedure, or a count that helps the
-reader plan.
-
-- Preferred: To connect to your database:
-- Preferred: After you create the project, copy the project URL.
-
-Keep numbers that carry information the reader acts on, such as versions, limits,
-sizes, ports, and prices. See
-[CONTRIBUTING.md](./CONTRIBUTING.md#counts-and-numbered-references).
 
 ## O
 

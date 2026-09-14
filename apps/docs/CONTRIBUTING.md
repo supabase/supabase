@@ -15,13 +15,13 @@ To make docs as clear as possible:
 - Write for the user. Think about what task they want to complete by reading your doc. Tell them what, and only what, they need to know.
 - Write like you talk. Conversational English is easier for a global audience to understand and localize. Many readers who use English as an additional language learn conversational rather than academic English. Use words and sentences that sound natural when speaking. Cut unnecessary words. Read your writing out loud to help you choose the clearest and simplest phrases.
 - Prefer short, direct sentences. Express one relationship at a time, and avoid unnecessary compound structures. This makes each sentence easier to understand, localize, and interpret consistently.
-- Cover one topic in each paragraph, and don't blend a procedure, a process, a structure, or a concept into another one. Don't worry about paragraphs being too short. See [Information types](#information-types).
+- Cover one topic in each paragraph. Start a new paragraph whenever you change the topic, or when you move between [information types](#information-types). Don't worry about paragraphs being too short.
 - Avoid using idioms and colloquialisms, such as `piece of cake`. These phrases are often specific to a region or culture.
 - Refer to the reader as `you`. Don't use `we` to refer to the reader. Use `we` only to refer to the Supabase team.
 
 ## Information types
 
-Supabase docs use the information types from the [Information Mapping](https://support.informationmapping.com/hc/en-us/articles/213446789-Present-your-information-in-a-clear-and-consistent-way) method. Each type answers a different reader question, and each has a presentation that suits it:
+Separating kinds of information is a useful way to keep a paragraph readable. The [Information Mapping](https://support.informationmapping.com/hc/en-us/articles/213446789-Present-your-information-in-a-clear-and-consistent-way) method names six, each answering a different reader question:
 
 | Type | Answers | Present with | Example |
 | --- | --- | --- | --- |
@@ -32,15 +32,15 @@ Supabase docs use the information types from the [Information Mapping](https://s
 | Concept | What is it? | Text, a list, or a diagram | Row Level Security restricts which rows a user can read or write. |
 | Fact | What are the facts? | Text, a list, or a table | A table with Row Level Security enabled and no policy returns no rows. |
 
-**Procedure, process, and structure each need their own block.** The method presents each one as its own table, so none of them fits inside another type's paragraph. Procedure and process are the pair that gets blended most often, because both answer a question about how. A procedure tells the reader what to do, and a process tells them what the system does on its own. A reader following steps can't act on the process sentences, and a reader trying to understand the system has to pick the explanation out of the instructions.
+A procedure, a process, a structure, or a concept usually reads better in a block of its own. Procedure and process get blended most often, because both answer a question about how, and a reader following steps can't act on the process sentences.
 
-**Keep context out of the action path.** Concept and process are context. Put them before the procedure or after it, in their own section, and link between them. Don't thread a definition through the steps.
+Context is worth keeping out of the action path. A concept or a process tends to work better before the procedure or after it than threaded through the steps.
 
-**A principle or a fact can ride along.** Either one is often a single sentence, so it can sit inside the block it qualifies. A fact about timing belongs in the step it describes, and a principle can close the concept paragraph that motivates it. Don't give a one-sentence fact its own section. Promote it when it runs past a sentence or two, or when it applies to the whole page rather than to one step.
+A principle or a fact is often a single sentence, so it can sit in the block it qualifies. A fact about timing fits in the step it describes, and a principle can close the concept paragraph that motivates it.
 
-**Connective prose is exempt.** An introduction, a transition, an outcome, and a navigation outline describe the page rather than the product, so they don't carry an information type and the separation rule doesn't apply to them. A transition names the type it's leaving and the type it's moving to, which is its job. Keep connective prose to a sentence or two, and don't let it grow into the type it introduces. For where each kind belongs, see [Guides](#guides).
+A long paragraph is worth a second look. Past three or four sentences, it has often picked up a second kind of information. Label each sentence and see where the labels change.
 
-**A long paragraph is a smell.** Once a paragraph runs past three or four sentences, it has almost always absorbed a type that needed its own block. Reread it and label each sentence with its type. Split wherever a procedure, a process, a structure, or a concept meets another one, and leave a principle or a fact with the block it qualifies. Apply the same check to a long list item and to a step that has grown a trailing explanation.
+None of this applies to connective prose. An introduction, a transition, an outcome, and a navigation outline describe the page rather than the product, so let them do their job.
 
 Not recommended, because one paragraph blends a concept, a procedure, and a structure:
 
@@ -79,11 +79,7 @@ client. Write a policy before you deploy.
 The `using` clause accepts any expression that returns a boolean.
 ```
 
-The concept, the procedure, and the structure each get their own block, and each uses the presentation its type calls for.
-
-The principle and the fact ride along. The fact about timing sits in the step it describes, and the admonition pairs a fact with the principle it implies, which is what the [Admonitions](#admonitions) section asks for.
-
-The recommended version is longer in lines and shorter to read. A reader who wants the command finds it under a heading that names the task, and a reader who wants the concept stops after the first paragraph.
+The concept, the procedure, and the structure each get a block. The fact about timing rides along in the step, and the admonition pairs a fact with the principle it implies. It's longer in lines and shorter to read.
 
 ## AI agent skills for docs authoring
 
@@ -107,7 +103,7 @@ Use [`edit-the-docs`](../../.agents/skills/edit-the-docs/SKILL.md) for style, st
 
 ## Document types
 
-Supabase docs contain several types of documents. Before you start writing, think about what type of doc you need.
+Supabase docs contain four types of documents. Before you start writing, think about what type of doc you need.
 
 ### Explainers
 
@@ -136,7 +132,7 @@ Guides are also goal-oriented, but they focus on shorter, more targeted tasks. F
 
 Guides contain mostly procedures: concise steps that readers can follow in sequence.
 
-Begin each guide with a value statement: name what the reader can do, and why it matters to them. This is what tells a reader and an agent whether the page matches their goal.
+A value statement makes a good opener: name what the reader can do, and why it matters to them. That's what tells a reader or an agent whether the page matches their goal.
 
 For example:
 
@@ -150,13 +146,11 @@ Keep procedures focused on what the reader must do. Move substantial background 
 - Recommended: `Restrict access to a shared table with Row Level Security. To learn how a policy is evaluated, see [Row Level Security](...).`
 - Not recommended: Begin with several paragraphs about how Row Level Security works before stating what the reader can do.
 
-**Mixed information types:** Apply [Information types](#information-types) at the page level too. A section carries one information type, so classify each one, then group the sections of related types together. Procedure sections form the action path, and concept and process sections explain it. Keep the procedure group unbroken so that context never interrupts the action path. Structure sections, along with the principles and facts that apply to the whole page rather than to one step, are what a reference section collects.
+**Mixed information types:** [Information types](#information-types) apply at the page level too. Group sections of related types together, and try to keep the procedure group unbroken so context doesn't interrupt the action path. A section serving two types can be split, with a cross-reference between the halves.
 
-Classify a section by what the reader is doing in it, not by what it's about. On a page about tables, every section is about tables, so subject matter tells you nothing. A reader opens a section on schemas to understand something, so it's a concept section no matter how much it mentions tables.
+Classify a section by what the reader is doing in it, not by what it's about. On a page about tables every section is about tables, so subject matter tells you nothing. A reader opens a section on schemas to understand something, so it's context.
 
-A section that serves two types gets split, not filed under the larger half. Give the new half its own heading and cross-reference the two.
-
-Order the groups: a short concept opener when the page serves newcomers, then procedures, then concept and process, then structure and fact.
+One order that works: a short concept opener, then procedures, then concept and process, then structure and fact.
 
 ```text
 ## What is a table?                    <- concept opener
@@ -187,7 +181,7 @@ Supabase client library.
   default.
 ```
 
-The opening sentence is a value statement, and each link says what the reader gets from that group. A reader who already knows which method they want goes straight to the procedures.
+Each link says what the reader gets from that group, so someone who already knows which method they want goes straight to the procedures.
 
 **Cross-references and glue:** Connect contextual sections to their corresponding procedures when the relationship helps readers navigate. Add a brief introduction to each section group, a transition when the information type changes, and an outcome after a procedure. Add links selectively rather than linking every adjacent section.
 
@@ -475,7 +469,7 @@ Use a procedure when a human or agent must perform actions to reach an outcome. 
 
 Write sequential actions as an ordered list. Begin each step with an imperative verb, and include one action or a closely related set of actions per step. Give the reader enough context to know where to act.
 
-Leave out the number of steps and any back-reference to a step number when they aren't doing work. See [Counts and numbered references](#counts-and-numbered-references).
+See [Numbers](#numbers) for when a step count or a step reference is worth including.
 
 Apply the [Information Mapping chunking principle](https://informationmapping.com/blogs/news/writing-for-the-web-the-magical-number-seven-plus-or-minus-two) to procedures. Present 7 ± 2 related steps at a time. This gives readers a manageable chunk of five to nine actions. Aim for the lower end of the range when the task is complex or unfamiliar.
 
@@ -561,18 +555,21 @@ That said, a few rules help keep the docs concise, consistent, and clear:
 - Use the Oxford comma. Place a comma before the `and` that marks the last item in a list. For example, use `functions, tables, and indexes` rather than `functions, tables and indexes`.
 - Use the present tense as much as possible. For example, `the AI assistant answers your question` rather than `the AI assistant will answer your question`.
 
-### Counts and numbered references
+### Numbers
 
-**Leave out a count or a step number when it isn't doing work, which is most of the time.** `To connect to your database:` says everything that `Follow these three steps to connect to your database:` says.
+For formatting, follow the [Google developer documentation style guide on numbers](https://developers.google.com/style/numbers):
 
-**Naming usually reads better than numbering.** A named action survives a reorder, and it gives a reader using a screen reader something to navigate to, the way `here` doesn't in the [Links](#links) section. Linking a heading does the same. Footnotes aren't an option here, because the [Footnotes](#footnotes) section rules them out.
+- Spell out zero through nine, and use numerals for 10 and greater. For example, `four options` and `24 hours`.
+- Use numerals anyway for versions, technical quantities, step numbers, prices, and percentages, such as `version 3`, `128 bits`, `step 2`, and `40%`.
+- Spell out ordinals, such as `first` and `forty-third`.
+- Use commas in large numbers, such as `1,532,784 bytes`.
+- Use a hyphen with no spaces for a range, such as `2012-2016`.
 
-- `After you create the project, copy the project URL.`
-- `If the connection fails, repeat [Configure the connection pooler](#configure-the-connection-pooler).`
+A count or a step number often isn't doing any work, and the sentence reads the same without it. `To connect to your database:` says what `Follow these three steps to connect to your database:` says.
 
-**Use a number where it earns its place.** `Step 2` is fine in a long procedure the reader is working through, and `Three steps:` is fine when knowing the count helps them plan. Numbers that carry information the reader acts on always stay, such as versions, limits, sizes, ports, thresholds, and prices.
+Naming an action or linking a heading usually reads better than pointing at a number. It gives a reader using a screen reader something to navigate to, and it doesn't go stale when someone reorders the list. For example, `After you create the project, copy the project URL.`
 
-A number you keep does need maintenance. A count goes stale when someone adds or removes an item, and a step reference points elsewhere after a reorder. Neither failure shows up in review or in CI, because the sentence still reads correctly. That's the reason to leave one out when it adds nothing, not a reason to avoid numbers.
+Where a number earns its place, use it. `Step 2` helps in a long procedure the reader is working through, and `Three steps:` helps when the count lets them plan.
 
 ## Word usage and spelling
 
