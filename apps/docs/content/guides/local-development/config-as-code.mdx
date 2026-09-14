@@ -47,6 +47,13 @@ Every example here is written as `supabase <command>`. Translate it to whichever
 
 </Admonition>
 
+### Secrets and environment variables
+
+Secret values do not live in `config.toml`. The file declares that a provider is enabled; the value is set elsewhere. `config pull` and `config diff` never read secret values back, and `config push` never sends them in plaintext.
+
+For local development, reference environment variables with `env()`, as described in [Managing config and secrets](/docs/guides/local-development/managing-config). For branch deployments, see [Managing secrets for branches](/docs/guides/deployment/branching/configuration#managing-secrets-for-branches).
+{/* NEEDS REVIEW: A first-class secrets experience for remote config is explicitly OUT of scope for this launch (PRFAQ: "nothing ships on secrets for Select, including documentation"). This section only points at the existing env()/branching secrets paths and must not imply a new secrets feature. Keep scoped to what ships. */}
+
 ## Key commands at a glance
 
 | Command                                    | What it does                                                       |
@@ -185,12 +192,5 @@ When `push` infers a preview-branch target (rather than you naming it explicitly
 
 If you use [Branching](/docs/guides/deployment/branching), you don't have to run `config push` by hand for every change. The settings in `config.toml` are applied to the corresponding Supabase branch when you push to git, and `config push` is discouraged in that setup because merges already carry the change. See [Branch configuration](/docs/guides/deployment/branching/configuration) and the [GitHub integration](/docs/guides/deployment/branching/github-integration).
 {/* NEEDS REVIEW: the "config push is discouraged when using the GitHub integration" guidance comes from the eng project decisions (Linear), not from a code check of the branching apply path. Confirm phrasing before merge. */}
-
-## Secrets and environment variables
-
-Secret values do not live in `config.toml`. The file declares that a provider is enabled; the value is set elsewhere. `config pull` and `config diff` never read secret values back, and `config push` never sends them in plaintext.
-
-For local development, reference environment variables with `env()`, as described in [Managing config and secrets](/docs/guides/local-development/managing-config). For branch deployments, see [Managing secrets for branches](/docs/guides/deployment/branching/configuration#managing-secrets-for-branches).
-{/* NEEDS REVIEW: A first-class secrets experience for remote config is explicitly OUT of scope for this launch (PRFAQ: "nothing ships on secrets for Select, including documentation"). This section only points at the existing env()/branching secrets paths and must not imply a new secrets feature. Keep scoped to what ships. */}
 
 For every attribute the file supports, see the [CLI config reference](/docs/guides/local-development/cli/config). For the full command reference, see the [CLI reference](/docs/reference/cli).
