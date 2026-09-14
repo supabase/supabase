@@ -1,8 +1,8 @@
 ---
 id: 'multigres'
 title: 'Multigres'
-subtitle: 'Multi-node high availability for your Postgres database'
-description: 'Run your Supabase project across multiple Postgres nodes with automatic failover, using the Multigres integration.'
+subtitle: 'Horizontally scalable Postgres for high availability'
+description: 'Run high availability Postgres across multiple nodes with automatic failover, using Multigres.'
 ---
 
 <Admonition type="caution">
@@ -11,7 +11,7 @@ Multigres is in [Public Alpha](/docs/guides/getting-started/features#feature-sta
 
 </Admonition>
 
-Multigres runs your Postgres database across multiple nodes instead of one, so your project keeps serving reads and writes if a node fails. It's Supabase's integration of [Multigres](https://multigres.com), an open-source project that brings the same distributed-systems approach the Vitess project brought to MySQL to Postgres instead.
+Multigres gives your project high availability by running Postgres across multiple nodes instead of one, so reads and writes continue if a node fails. It is Supabase's integration of [Multigres](https://multigres.com), an open-source project that brings the same distributed-systems approach Vitess brought to MySQL to Postgres.
 
 <ContentListings id="database-multigres-what-you-get" />
 
@@ -25,16 +25,14 @@ During the Public Alpha:
 
 ## Enabling Multigres
 
-## Enabling
-
-You enable high availability during project creation:
+In the Dashboard, Multigres appears as **High availability** during project creation:
 
 1. Open [Create a new project](/dashboard/new/_) in the Dashboard.
 2. Under **High availability**, turn on **Enable high availability**.
 3. Finish the remaining fields such as database password, region, and compute size, if shown.
 4. Click **Create new project**.
 
-If your organization isn't eligible or hasn't been rolled out yet, **High availability** won't appear. For eligible organizations, an administrator can turn it on when creating a new project.
+If your organization isn't eligible or hasn't been rolled out yet, **High availability** won't appear.
 
 ## What's not included in the alpha
 
