@@ -16,8 +16,6 @@ dayjs.extend(utc)
 
 const RETURN_TO_CLIENT_STEP = `Head back to your agent and let it know you're finished.`
 
-const CLOSE_TAB_FOOTER = 'You can close this tab.'
-
 const UNVERIFIED_KEY_FOOTER =
   "Supabase doesn't verify keys. You can view or replace this one in Edge Functions secrets."
 
@@ -35,6 +33,7 @@ export function getSecretsCopy(state: SecretsOutcomeState): InterstitialTerminal
           calloutBody:
             'Ask your agent to store the key again. It will find the saved key and finish without sending you back here.',
           footer: UNVERIFIED_KEY_FOOTER,
+          projectRef: state.request.ref,
         }
       }
 
@@ -44,6 +43,7 @@ export function getSecretsCopy(state: SecretsOutcomeState): InterstitialTerminal
         calloutTitle: 'Next step',
         calloutBody: RETURN_TO_CLIENT_STEP,
         footer: UNVERIFIED_KEY_FOOTER,
+        projectRef: state.request.ref,
       }
     }
 
@@ -53,7 +53,7 @@ export function getSecretsCopy(state: SecretsOutcomeState): InterstitialTerminal
         subtitle: `${state.request.keyName} was saved for ${state.request.project}. Nothing further to do here.`,
         calloutTitle: 'Next step',
         calloutBody: RETURN_TO_CLIENT_STEP,
-        footer: CLOSE_TAB_FOOTER,
+        projectRef: state.request.ref,
       }
 
     case 'expired':
@@ -62,7 +62,6 @@ export function getSecretsCopy(state: SecretsOutcomeState): InterstitialTerminal
         subtitle: 'Nothing was stored. Your key is still safe where you copied it from.',
         calloutTitle: 'Next step',
         calloutBody: "Ask your agent to store your API key again. You'll get a fresh link.",
-        footer: CLOSE_TAB_FOOTER,
       }
 
     case 'cancelled':
@@ -71,7 +70,6 @@ export function getSecretsCopy(state: SecretsOutcomeState): InterstitialTerminal
         subtitle: 'Nothing was stored.',
         calloutTitle: 'Next step',
         calloutBody: 'Ask your agent to run the tool again if you still need to store the key.',
-        footer: CLOSE_TAB_FOOTER,
       }
 
     case 'paused':
@@ -80,7 +78,6 @@ export function getSecretsCopy(state: SecretsOutcomeState): InterstitialTerminal
         subtitle: 'Supabase has turned this off for now. Nothing was stored.',
         calloutTitle: 'Next step',
         calloutBody: 'Try again later, or set the key in Edge Functions secrets instead.',
-        footer: CLOSE_TAB_FOOTER,
       }
 
     case 'error':
@@ -90,7 +87,6 @@ export function getSecretsCopy(state: SecretsOutcomeState): InterstitialTerminal
         calloutTitle: 'Next step',
         calloutBody:
           'Ask your agent to run the tool again, or set the key in Edge Functions secrets instead.',
-        footer: CLOSE_TAB_FOOTER,
       }
   }
 }

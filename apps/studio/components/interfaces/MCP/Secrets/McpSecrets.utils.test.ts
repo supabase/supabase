@@ -81,7 +81,13 @@ describe('getSecretsCopy', () => {
 
       expect(copy.calloutTitle).toBe('Next step')
       expect(copy.calloutBody.length).toBeGreaterThan(0)
-      expect(copy.footer.length).toBeGreaterThan(0)
+      // Only 'stored' still needs a footer (the unverified-key note); the close/return-to-client
+      // path is now a CTA button instead of footer text.
+      if (state.status === 'stored') {
+        expect(copy.footer?.length).toBeGreaterThan(0)
+      } else {
+        expect(copy.footer).toBeUndefined()
+      }
       expect(Object.values(copy).join(' ')).not.toMatch(/valid|verified|works? correctly/i)
     }
   })
