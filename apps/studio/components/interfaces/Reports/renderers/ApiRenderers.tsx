@@ -1,8 +1,8 @@
 import { geoCentroid } from 'd3-geo'
 import sumBy from 'lodash/sumBy'
 import { ChevronRight } from 'lucide-react'
-import Link from 'next/link'
 import { useTheme } from 'next-themes'
+import Link from 'next/link'
 import { Fragment, useRef, useState, type ReactNode } from 'react'
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
 import {
@@ -97,9 +97,7 @@ export const NetworkTrafficRenderer = (
       />
 
       {organization && (
-        <div
-          className="flex items-center justify-between gap-4 rounded border border-default bg-surface-200 px-4 py-3"
-        >
+        <div className="flex items-center justify-between gap-4 rounded border border-default bg-surface-200 px-4 py-3">
           <div>
             <p className="text-sm text-foreground">Billable egress</p>
             <p className="text-sm text-foreground-light">
