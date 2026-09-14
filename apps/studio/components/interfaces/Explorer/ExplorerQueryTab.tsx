@@ -3,7 +3,15 @@ import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { AlignLeft, Check, Keyboard, Loader2, MoreVertical, Save, SquareCode } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -27,6 +35,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { ExplorerToolbarAction } from './ExplorerToolbar'
 import { useCreateNotebook } from './hooks'
 import { QueryEditor, type ExplorerQueryModel, type QueryEditorHandle } from './QueryEditor'
+import { SaveQueryDropdown } from './SaveQueryDropdown'
 import { type QueryDisplay, type QueryResult } from './types'
 import { createQueryCellSkeleton } from './utils'
 import { getNotebook } from '@/data/content/notebooks/notebook-query'
@@ -41,7 +50,7 @@ import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { createTabId, TabsStateContext } from '@/state/tabs'
 
 /** Query-tab lifecycle adapter around the shared QueryEditor. */
-export const ExplorerQueryTab = () => {
+export const ExplorerQueryTab = ({ children }: PropsWithChildren) => {
   const router = useRouter()
   const { id, ref } = useParams()
   const tabs = useContext(TabsStateContext)
@@ -222,57 +231,7 @@ export const ExplorerQueryTab = () => {
       }}
       toolbarActions={
         <>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <ExplorerToolbarAction
-                icon={<Save size={16} strokeWidth={2} />}
-                tooltip="Save query"
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-52" align="end">
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>Add to existing notebook</DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="p-0">
-                  <Command shouldFilter={false}>
-                    <CommandInput
-                      autoFocus
-                      placeholder="Search notebooks..."
-                      className="text-xs"
-                      value={search}
-                      onValueChange={setSearch}
-                    />
-                    <CommandList>
-                      <CommandGroup>
-                        {isPending ? (
-                          <div className="flex flex-col p-1 gap-y-1">
-                            <ShimmeringLoader />
-                            <ShimmeringLoader className="w-3/4" />
-                          </div>
-                        ) : !notebooks?.length ? (
-                          <p className="text-xs text-center text-foreground-lighter py-3">
-                            No notebooks found
-                          </p>
-                        ) : null}
-                        {notebooks?.map((notebook) => (
-                          <CommandItem
-                            key={notebook.id}
-                            value={notebook.id}
-                            className="cursor-pointer"
-                            onSelect={() => onAddToExistingNotebook(notebook.id)}
-                          >
-                            {notebook.name}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-              <DropdownMenuItem onClick={onAddToNewNotebook}>
-                Create a new notebook
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <SaveQueryDropdown query={{ title: draft.name, sql: draft.uncheckedSql }} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <ExplorerToolbarAction icon={<MoreVertical size={16} strokeWidth={2} />} />
