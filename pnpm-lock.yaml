@@ -442,7 +442,7 @@ importers:
         version: 5.1.2
       js-yaml:
         specifier: ^3.14.2
-        version: 3.15.1
+        version: 3.15.2
       jsrsasign:
         specifier: ^11.0.0
         version: 11.1.1
@@ -1849,7 +1849,7 @@ importers:
         version: link:../../packages/icons
       js-yaml:
         specifier: ^3.15.1
-        version: 3.15.1
+        version: 3.15.2
       lucide-react:
         specifier: '*'
         version: 0.436.0(react@19.2.6)
@@ -2814,7 +2814,7 @@ importers:
         version: link:../icons
       js-yaml:
         specifier: ^3.14.1
-        version: 3.15.1
+        version: 3.15.2
       lodash:
         specifier: ^4.18.1
         version: 4.18.1
@@ -13318,12 +13318,12 @@ packages:
   js-yaml-loader@1.2.2:
     resolution: {integrity: sha512-H+NeuNrG6uOs/WMjna2SjkaCw13rMWiT/D7l9+9x5n8aq88BDsh2sRmdfxckWPIHtViYHWRG6XiCKYvS1dfyLg==}
 
-  js-yaml@3.15.1:
-    resolution: {integrity: sha512-S99WuO3HlhO3XN41EtYUNl9zzXjoJx7QvmipxsJVxtCBT0YHEFy+iOJhjSvrmV12nYhWpZaM8lPHkJm0yUMbag==}
+  js-yaml@3.15.2:
+    resolution: {integrity: sha512-6EuL879VkRA+1Cz578mKMiKvjPNEuk6+r1JaFzoSWejZmtf7xWbIyw1e3KkxlkzTIt9Taw6JBhEppG7utc1P+w==}
     hasBin: true
 
-  js-yaml@4.3.1:
-    resolution: {integrity: sha512-CY6crGq313MX8GkwvB7tzgp99vjQxY1++5y10/BKN/GUfHqWaOGQMNZkBvqSzsZKWk/ijwHlWzzkLulsGHhjWQ==}
+  js-yaml@4.3.2:
+    resolution: {integrity: sha512-SFNOvSJ+Dgf/9An904Yx+CgSlIPCkIpao4qo51lpee25TIRejdH3rhR4EZMGoNx3/TP3O+wzWuiTFl4sqbltzA==}
     hasBin: true
 
   jsdom-testing-mocks@1.13.1:
@@ -18819,7 +18819,7 @@ snapshots:
     dependencies:
       '@types/hast': 3.0.5
       '@types/mdast': 4.0.4
-      js-yaml: 4.3.1
+      js-yaml: 4.3.2
       picomatch: 4.0.7
       retext-smartypants: 6.2.0
       shiki: 4.2.0
@@ -20305,7 +20305,7 @@ snapshots:
       globals: 14.0.0
       ignore: 5.3.2
       import-fresh: 3.3.0
-      js-yaml: 4.3.1
+      js-yaml: 4.3.2
       minimatch: 3.1.4
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
@@ -20888,7 +20888,7 @@ snapshots:
       http-proxy-agent: 7.0.2(supports-color@8.1.1)
       https-proxy-agent: 7.0.6(supports-color@8.1.1)
       jose: 5.9.6
-      js-yaml: 4.3.1
+      js-yaml: 4.3.2
       lodash: 4.18.1
       scuid: 1.1.0
       tslib: 2.8.1
@@ -20964,7 +20964,7 @@ snapshots:
 
   '@har-sdk/core@1.4.5':
     dependencies:
-      js-yaml: 4.3.1
+      js-yaml: 4.3.2
       openapi-types: 10.0.0
       tslib: 2.8.1
 
@@ -23546,7 +23546,7 @@ snapshots:
       colorette: 1.4.0
       https-proxy-agent: 7.0.6(supports-color@9.4.0)
       js-levenshtein: 1.1.6
-      js-yaml: 4.3.1
+      js-yaml: 4.3.2
       minimatch: 5.1.8
       node-fetch: 2.7.0(encoding@0.1.13)
       pluralize: 8.0.0
@@ -26806,7 +26806,7 @@ snapshots:
       github-slugger: 2.0.0
       html-escaper: 3.0.3
       http-cache-semantics: 4.2.0
-      js-yaml: 4.3.1
+      js-yaml: 4.3.2
       jsonc-parser: 3.3.1
       magic-string: 1.1.0
       magicast: 0.5.4
@@ -26885,7 +26885,7 @@ snapshots:
       ajv: 8.18.0
       compute-cosine-similarity: 1.1.0
       js-levenshtein: 1.1.6
-      js-yaml: 4.3.1
+      js-yaml: 4.3.2
       linear-sum-assignment: 1.0.9
       mustache: 4.2.0
       openai: 6.22.0(ws@8.21.0)(zod@3.25.76)
@@ -27663,7 +27663,7 @@ snapshots:
   cosmiconfig@8.3.6(typescript@6.0.2):
     dependencies:
       import-fresh: 3.3.0
-      js-yaml: 4.3.1
+      js-yaml: 4.3.2
       parse-json: 5.2.0
       path-type: 4.0.0
     optionalDependencies:
@@ -27673,7 +27673,7 @@ snapshots:
     dependencies:
       env-paths: 2.2.1
       import-fresh: 3.3.0
-      js-yaml: 4.3.1
+      js-yaml: 4.3.2
       parse-json: 5.2.0
     optionalDependencies:
       typescript: 6.0.2
@@ -29761,12 +29761,12 @@ snapshots:
       ansi-red: 0.1.1
       coffee-script: 1.12.7
       extend-shallow: 2.0.1
-      js-yaml: 3.15.1
+      js-yaml: 3.15.2
       toml: 2.3.6
 
   gray-matter@4.0.3:
     dependencies:
-      js-yaml: 3.15.1
+      js-yaml: 3.15.2
       kind-of: 6.0.3
       section-matter: 1.0.0
       strip-bom-string: 1.0.0
@@ -30656,16 +30656,16 @@ snapshots:
 
   js-yaml-loader@1.2.2:
     dependencies:
-      js-yaml: 3.15.1
+      js-yaml: 3.15.2
       loader-utils: 1.4.2
       un-eval: 1.2.0
 
-  js-yaml@3.15.1:
+  js-yaml@3.15.2:
     dependencies:
       argparse: 1.0.10
       esprima: 4.0.1
 
-  js-yaml@4.3.1:
+  js-yaml@4.3.2:
     dependencies:
       argparse: 2.0.1
 
@@ -37103,7 +37103,7 @@ snapshots:
       '@oozcitak/dom': 2.0.2
       '@oozcitak/infra': 2.0.2
       '@oozcitak/util': 10.0.0
-      js-yaml: 4.3.1
+      js-yaml: 4.3.2
 
   xmlchars@2.2.0: {}
 
