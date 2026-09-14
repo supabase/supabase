@@ -6,6 +6,7 @@ import { cn, Skeleton } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { HighAvailabilityBadge } from './HighAvailabilityBadge'
+import { HIGH_AVAILABILITY_SUPPORTED_PROVIDERS } from '@/components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { ServiceStatus } from './ServiceStatus'
 import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
 import { DisableInteraction } from '@/components/ui/DisableInteraction'
@@ -150,6 +151,7 @@ export const ActivityStats = () => {
   const integrationsPath = parentProjectRef
     ? `/project/${parentProjectRef}/settings/integrations`
     : undefined
+  const highAvailabilityBadgeToggle = project?.high_availability && HIGH_AVAILABILITY_SUPPORTED_PROVIDERS.has(project?.cloud_provider ?? '');
 
   return (
     <div className="@container">
@@ -172,9 +174,7 @@ export const ActivityStats = () => {
               ) : (
                 <p className="text-foreground-lighter">Unknown</p>
               )}
-              {project?.high_availability && project?.cloud_provider !== 'AWS_NIMBUS' && (
-                <HighAvailabilityBadge />
-              )}
+              {highAvailabilityBadgeToggle && (<HighAvailabilityBadge />)}
             </div>
           }
         />
