@@ -260,6 +260,8 @@ You can develop with branches using either local or remote development workflows
 5. Commit and push to GitHub
 6. Open a pull request to create a preview branch
 
+If your project uses [declarative schemas](/docs/guides/local-development/declarative-database-schemas), edit your files in `supabase/schemas/` and generate migrations with `supabase db schema declarative sync` instead of `supabase db diff`, which never uses your schema files as its baseline. Branching applies only committed migration files, so commit the schema files and the generated migrations together.
+
 ### Remote development workflow
 
 1. Create a preview branch in the Supabase dashboard

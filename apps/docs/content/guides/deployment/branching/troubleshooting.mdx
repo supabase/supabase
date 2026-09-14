@@ -45,6 +45,8 @@ When a preview branch is merged into the production branch, it creates a schema 
 
 These conflicts can be resolved in the same way as normal Git Conflicts: merge or rebase from the production Git branch to the preview Git branch. Since migrations are applied sequentially, ensure that migration files are timestamped correctly after the rebase. Changes that build on top of earlier changes should always have later timestamps.
 
+If you manage your schema with [declarative schema files](/docs/guides/local-development/declarative-database-schemas), resolve the drift in the schema files instead. Delete the migrations your branch generated, then run `supabase db schema declarative sync` to regenerate them. The regenerated migration gets a new timestamp, so it orders after existing migrations without renaming files by hand.
+
 ### Changing production branch
 
 You cannot change which project branch serves as the production branch — the base project that all branches are created from will always remain the production branch. However, you can update which GitHub branch is linked to your production branch. To do this, go to the [Integrations page](/dashboard/project/_/settings/integrations) and change the production branch name.
@@ -86,6 +88,8 @@ mv 20240101000000_old.sql 20240102000000_old.sql
 # Reset local database to test
 supabase db reset
 ```
+
+Migrations generated on the [`pg-delta`](/docs/guides/local-development/diff-engines) engine (`supabase db diff` or `db schema declarative sync`) don't need manual reordering because the engine orders statements by dependency. A single sync can write split files that share a name (`_1`/`_2` suffixes) with timestamps one second apart. The CLI applies them in timestamp order, so renaming one file of a split pair in a way that changes that order breaks the sequence. Regenerate the migration instead. See [Cleaning up generated migrations](/docs/guides/local-development/cli-workflows#cleaning-up-generated-migrations).
 
 ## Connection issues
 
