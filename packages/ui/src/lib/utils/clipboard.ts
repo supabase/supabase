@@ -30,14 +30,9 @@ export const copyToClipboard = async (str: ClipboardText, callback = noop) => {
         'text/plain': Promise.resolve(str).then((text) => new Blob([text], { type: 'text/plain' })),
       })
 
-      // Safari also seems to require that the promise resolve soon after the
-      // clipboard write call, adding a setTimeout with 0 delay seems to work.
-      // Returning the promise to ensure the caller can await the clipboard
-      // copy operation intuitively.
-      //
-      // The write happens after this function returns, so the outer try/catch
-      // cannot see it. Handle failure here instead, matching the writeText
-      // branch below: report it and resolve, never reject.
+      // Safari needs the write deferred to a zero-delay setTimeout, otherwise the
+      // copy fails silently. The returned promise lets callers await it, and the
+      // write escapes the outer try/catch so it reports its own failure.
       return new Promise<void>((resolve) => {
         setTimeout(() => {
           navigator.clipboard
