@@ -36,6 +36,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ConnectSheetStep } from '../../ConnectSheet/ConnectSheetStep'
 import { EnvRow } from '../../ConnectSheet/content/server/common/EnvRow'
 import { CopyPromptButton } from '../../ConnectSheet/CopyPromptAdmonition'
+import { useConnectSheetParams } from '../../ConnectSheet/useConnectSheetParams'
 import type { WarehouseCatalogCredentials } from './Warehouse.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import CopyButton from '@/components/ui/CopyButton'
@@ -312,7 +313,8 @@ interface WarehouseConnectionCardProps {
 
 export const WarehouseConnectionCard = ({ variant = 'default' }: WarehouseConnectionCardProps) => {
   const { ref: projectRef } = useParams()
-  const [engine, setEngine] = useState<QueryEngine>('flightsql')
+  const { params, setConnectParams } = useConnectSheetParams()
+  const engine: QueryEngine = params.warehouseQueryEngine === 'duckdb' ? 'duckdb' : 'flightsql'
 
   const {
     data: catalog,
@@ -340,7 +342,12 @@ export const WarehouseConnectionCard = ({ variant = 'default' }: WarehouseConnec
     >
       <CardContent className="border-none">
         <FieldRow id="warehouse-query-engine" label="Query engine">
-          <Select value={engine} onValueChange={(value) => setEngine(value as QueryEngine)}>
+          <Select
+            value={engine}
+            onValueChange={(value) =>
+              setConnectParams({ warehouseQueryEngine: value as QueryEngine })
+            }
+          >
             <SelectTrigger id="warehouse-query-engine" className="ml-auto w-48">
               <SelectValue />
             </SelectTrigger>

@@ -47,56 +47,54 @@ const getNotProvisionedContent = (setupStatus?: WarehouseSetupStatus) => {
  */
 export const WarehouseTab = () => {
   const { ref: projectRef } = useParams()
-  const { data, isPending, isError, error } = useWarehouseSetupStatusQuery({ projectRef })
+  const { data, isPending, isFetching, isError, error, refetch } = useWarehouseSetupStatusQuery({
+    projectRef,
+  })
 
-  if (isPending) {
-    return (
-      <div className="p-8">
-        <GenericSkeletonLoader />
-      </div>
-    )
-  }
+  let content: React.ReactNode
 
+  if (isPending) content = <GenericSkeletonLoader />
   // Warehouse rides on the replication API, which isn't wired up in local development. Same
   // treatment Pipelines gives it, so a local dev doesn't read this as a broken build.
-  if (isError && checkLocalETLNotSetUp(error)) {
-    return (
-      <div className="p-8">
-        <Admonition
-          type="default"
-          title="Warehouse is unavailable locally"
-          description="Configure the replication API to set up Warehouse in local development."
-        />
-      </div>
+  else if (isError && checkLocalETLNotSetUp(error)) {
+    content = (
+      <Admonition
+        type="default"
+        title="Warehouse is unavailable locally"
+        description="Configure the replication API to set up Warehouse in local development."
+      />
     )
-  }
-  if (isError) {
-    return (
-      <div className="p-8">
-        <AlertError subject="Failed to load Warehouse status" error={error} />
-      </div>
+  } else if (isError) {
+    content = (
+      <AlertError
+        subject="Failed to load Warehouse status"
+        error={error}
+        additionalActions={
+          <Button variant="default" loading={isFetching} onClick={() => refetch()}>
+            Retry
+          </Button>
+        }
+      />
     )
-  }
-
-  if (!isWarehouseProvisioned(data?.setup_status)) {
+  } else if (!isWarehouseProvisioned(data?.setup_status)) {
     const { type, title, description, action } = getNotProvisionedContent(data?.setup_status)
 
-    return (
-      <div className="p-8">
-        <Admonition
-          type={type}
-          layout="responsive"
-          title={title}
-          description={description}
-          actions={[
-            <Button key="open-warehouse" asChild variant="default">
-              <Link href={`/project/${projectRef}/integrations/warehouse/overview`}>{action}</Link>
-            </Button>,
-          ]}
-        />
-      </div>
+    content = (
+      <Admonition
+        type={type}
+        layout="responsive"
+        title={title}
+        description={description}
+        actions={[
+          <Button key="open-warehouse" asChild variant="default">
+            <Link href={`/project/${projectRef}/integrations/warehouse/overview`}>{action}</Link>
+          </Button>,
+        ]}
+      />
     )
+  } else {
+    return <WarehouseConnectionCard variant="sheet" />
   }
 
-  return <WarehouseConnectionCard variant="sheet" />
+  return <div className="p-8">{content}</div>
 }

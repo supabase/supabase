@@ -6,7 +6,10 @@ import { cn, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } fr
 
 import type { ConnectMode, ProjectKeys } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
-import { resolveConnectSheetHydration } from './ConnectSheet.utils'
+import {
+  getClearedConnectSheetQueryParams,
+  resolveConnectSheetHydration,
+} from './ConnectSheet.utils'
 import { ConnectStepsSection } from './ConnectStepsSection'
 import { useAvailableConnectModes } from './useAvailableConnectModes'
 import { useConnectSheetParams } from './useConnectSheetParams'
@@ -45,6 +48,7 @@ export const ConnectSheet = () => {
     method: queryMethod,
     type: queryType,
     mcpClient: queryMcpClient,
+    warehouseQueryEngine: queryWarehouseQueryEngine,
   } = params
 
   useEffect(() => {
@@ -64,6 +68,7 @@ export const ConnectSheet = () => {
         method: queryMethod,
         type: queryType,
         mcpClient: queryMcpClient,
+        warehouseQueryEngine: queryWarehouseQueryEngine,
       },
       storedPrefs,
       availableModeIds
@@ -81,6 +86,7 @@ export const ConnectSheet = () => {
     queryMethod,
     queryType,
     queryMcpClient,
+    queryWarehouseQueryEngine,
     storedPrefs,
     availableModeIds,
     track,
@@ -91,14 +97,7 @@ export const ConnectSheet = () => {
   ])
 
   const clearAllQueryParams = () => {
-    setQueryParams({
-      connectTab: null,
-      framework: null,
-      using: null,
-      method: null,
-      type: null,
-      mcpClient: null,
-    })
+    setQueryParams(getClearedConnectSheetQueryParams())
   }
 
   const handleOpenChange = (sheetOpen: boolean) => {
@@ -137,6 +136,7 @@ export const ConnectSheet = () => {
       method: null,
       type: null,
       mcpClient: null,
+      warehouseQueryEngine: null,
     })
   }
 

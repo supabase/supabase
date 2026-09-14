@@ -22,7 +22,7 @@ import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-s
 export const WarehouseSetupPanel = () => {
   const { ref: projectRef } = useParams()
 
-  const { data, isPending, isError, error } = useWarehouseSetupStatusQuery(
+  const { data, isPending, isFetching, isError, error, refetch } = useWarehouseSetupStatusQuery(
     { projectRef },
     {
       refetchInterval: (query) =>
@@ -53,7 +53,19 @@ export const WarehouseSetupPanel = () => {
       />
     )
   }
-  if (isError) return <AlertError subject="Failed to load Warehouse status" error={error} />
+  if (isError) {
+    return (
+      <AlertError
+        subject="Failed to load Warehouse status"
+        error={error}
+        additionalActions={
+          <Button variant="default" loading={isFetching} onClick={() => refetch()}>
+            Retry
+          </Button>
+        }
+      />
+    )
+  }
   if (!data) return <GenericSkeletonLoader />
 
   const status = data.setup_status

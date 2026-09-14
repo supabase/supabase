@@ -1,9 +1,10 @@
+import { QueryClient } from '@tanstack/react-query'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { WarehouseTab } from './WarehouseTab'
 import { customRender } from '@/tests/lib/custom-render'
@@ -80,8 +81,11 @@ describe('WarehouseTab', () => {
   test('renders connection details and offers catalog access only for DuckDB', async () => {
     mockSetupStatus({ setup_status: 'complete' })
     mockCatalog({ enabled: false })
+    const onUrlUpdate = vi.fn()
 
-    const { container } = customRender(<WarehouseTab />)
+    const { container } = customRender(<WarehouseTab />, {
+      nuqs: { hasMemory: true, onUrlUpdate },
+    })
 
     expect(await screen.findByRole('combobox', { name: 'Query engine' })).toBeInTheDocument()
     expect(container.querySelector('.border-0.shadow-none')).toBeInTheDocument()
@@ -102,6 +106,25 @@ describe('WarehouseTab', () => {
     expect(
       await screen.findByRole('switch', { name: 'Enable DuckDB catalog access' })
     ).not.toBeChecked()
+    expect(onUrlUpdate).toHaveBeenLastCalledWith(
+      expect.objectContaining({ queryString: '?warehouseQueryEngine=duckdb' })
+    )
+  })
+
+  test('hydrates the selected query engine from the URL', async () => {
+    mockSetupStatus({ setup_status: 'complete' })
+    mockCatalog({ enabled: false })
+
+    customRender(<WarehouseTab />, {
+      nuqs: { searchParams: { warehouseQueryEngine: 'duckdb' } },
+    })
+
+    expect(await screen.findByRole('combobox', { name: 'Query engine' })).toHaveTextContent(
+      'DuckDB'
+    )
+    expect(
+      await screen.findByRole('switch', { name: 'Enable DuckDB catalog access' })
+    ).not.toBeChecked()
   })
 
   test('renders the DuckLake attach script when catalog access is on', async () => {
@@ -119,7 +142,7 @@ describe('WarehouseTab', () => {
       },
     })
 
-    customRender(<WarehouseTab />)
+    customRender(<WarehouseTab />, { nuqs: { hasMemory: true } })
 
     await userEvent.click(await screen.findByRole('combobox', { name: 'Query engine' }))
     await userEvent.click(await screen.findByRole('option', { name: 'DuckDB' }))
@@ -181,7 +204,7 @@ describe('WarehouseTab', () => {
       },
     })
 
-    customRender(<WarehouseTab />)
+    customRender(<WarehouseTab />, { nuqs: { hasMemory: true } })
 
     await userEvent.click(await screen.findByRole('combobox', { name: 'Query engine' }))
     await userEvent.click(screen.getByRole('option', { name: 'DuckDB' }))
@@ -205,11 +228,27 @@ describe('WarehouseTab', () => {
     expect(requestBodies).toEqual([{ enabled: true }])
   })
 
-  test('surfaces a failure to load the status', async () => {
+  test('surfaces a 544 status failure without retrying indefinitely and allows retrying', async () => {
+    let requestCount = 0
     addAPIMock({
       method: 'get',
       path: '/platform/warehouse/:ref/setup-status',
-      response: () => HttpResponse.json<APIErrorBody>({ message: 'Boom' }, { status: 500 }),
+      response: () => {
+        requestCount += 1
+        if (requestCount === 1) {
+          return HttpResponse.json<APIErrorBody>(
+            { message: 'Warehouse status request timed out' },
+            { status: 544 }
+          )
+        }
+
+        return HttpResponse.json<WarehouseSetupStatusResponse>({
+          fdw_status: FDW_STATUS,
+          setup_status: 'not_started',
+          steps: [],
+          tables: [],
+        })
+      },
     })
     // AlertError renders a project-scoped link to the AI assistant.
     addAPIMock({
@@ -228,8 +267,17 @@ describe('WarehouseTab', () => {
       },
     })
 
-    customRender(<WarehouseTab />)
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: 3, retryDelay: 0 } },
+    })
+    customRender(<WarehouseTab />, { queryClient })
 
     expect(await screen.findByText('Failed to load Warehouse status')).toBeInTheDocument()
+    expect(requestCount).toBe(1)
+
+    await userEvent.click(screen.getByRole('button', { name: 'Retry' }))
+
+    expect(await screen.findByText('Warehouse is not set up')).toBeInTheDocument()
+    expect(requestCount).toBe(2)
   })
 })
