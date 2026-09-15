@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { ChevronRight, Minus } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { TableCell, TableRow } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -63,7 +63,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
     projectRef,
     pipelineId: pipeline?.id,
   })
-  const { getRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
+  const { getRequestStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
@@ -92,10 +92,10 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   const { syncingCount } = getInitialSyncProgress(tableStatuses)
   const isInitialSyncRunning = syncingCount > 0
   const isCaughtUp = lagBytes === 0
-  // Only show errors when pipeline is running (not when stopped or restarting)
+  // Hide old table errors while an optimistic lifecycle action is displayed.
   const isPipelineStopped = statusName === PipelineStatusName.STOPPED
-  const isRestarting = requestStatus === PipelineStatusRequestStatus.RestartRequested
-  const hasTableErrors = errorCount > 0 && !isPipelineStopped && !isRestarting
+  const isTransitioning = requestStatus !== PipelineStatusRequestStatus.None
+  const hasTableErrors = errorCount > 0 && !isPipelineStopped && !isTransitioning
 
   // Check if a newer pipeline version is available (one-time check cached for session)
   const { data: versionData } = useReplicationPipelineVersionQuery({
@@ -133,12 +133,6 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       setIsDeleting(false)
     }
   }
-
-  useEffect(() => {
-    if (pipeline?.id) {
-      updatePipelineStatus(pipeline.id, statusName)
-    }
-  }, [pipeline?.id, statusName, updatePipelineStatus])
 
   // Five distinct states, so early returns rather than a ternary chain. The row only renders once
   // a pipeline exists, so there is no "no pipeline" case to handle here.
@@ -281,11 +275,6 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
         visible={showUpdateVersionModal}
         pipeline={pipeline}
         onClose={() => setShowUpdateVersionModal(false)}
-        confirmLabel={
-          statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
-            ? 'Update and restart'
-            : 'Update version'
-        }
       />
     </>
   )

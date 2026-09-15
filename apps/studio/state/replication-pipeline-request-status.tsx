@@ -1,47 +1,27 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from 'react'
-import { toast } from 'sonner'
+import { hashKey, useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+
+import { replicationKeys } from '@/data/replication/keys'
 
 export enum PipelineStatusRequestStatus {
   None = 'None',
   StartRequested = 'StartRequested',
   StopRequested = 'StopRequested',
-  RestartRequested = 'RestartRequested',
 }
 
 type PipelineRequest = {
+  id: symbol
   status: PipelineStatusRequestStatus
-  snapshot?: string
-  latestStatus?: string
-  hasTransitioned: boolean
   isPending: boolean
-}
-
-const REQUEST_SETTLE_TIMEOUT_MS = 30_000
-
-const hasCompleted = (request: PipelineRequest) => {
-  if (request.isPending) return false
-  if (request.status === PipelineStatusRequestStatus.StopRequested) {
-    return request.latestStatus === 'stopped'
-  }
-  if (request.latestStatus !== 'started' && request.latestStatus !== 'failed') return false
-  return request.latestStatus !== request.snapshot || request.hasTransitioned
 }
 
 interface PipelineRequestStatusContextType {
   getRequestStatus: (pipelineId: number) => PipelineStatusRequestStatus
-  updatePipelineStatus: (pipelineId: number, backendStatus: string | undefined) => void
+  isRequestPending: (pipelineId: number) => boolean
   runWithRequestStatus: <T>(
     pipelineId: number,
     status: PipelineStatusRequestStatus,
-    snapshotStatus: string | undefined,
     action: () => Promise<T>
   ) => Promise<T>
 }
@@ -51,87 +31,74 @@ const PipelineRequestStatusContext = createContext<PipelineRequestStatusContextT
 )
 
 export const PipelineRequestStatusProvider = ({ children }: { children: ReactNode }) => {
-  const [statuses, setStatuses] = useState<Record<number, PipelineStatusRequestStatus>>({})
-  const requests = useRef<Record<number, PipelineRequest>>({})
-  const timers = useRef<Record<number, ReturnType<typeof setTimeout>>>({})
+  const { ref: projectRef } = useParams()
+  const queryClient = useQueryClient()
+  const [requests, setRequests] = useState<Record<number, PipelineRequest>>({})
 
-  const clearRequest = useCallback((pipelineId: number) => {
-    clearTimeout(timers.current[pipelineId])
-    delete timers.current[pipelineId]
-    delete requests.current[pipelineId]
-    setStatuses((previous) => {
-      const { [pipelineId]: _removed, ...rest } = previous
-      return rest
-    })
-  }, [])
+  useEffect(
+    () =>
+      queryClient.getQueryCache().subscribe((event) => {
+        if (event.type !== 'updated') return
+        // Only network results end the optimistic display, not cached data or invalidation.
+        if (
+          event.action.type !== 'error' &&
+          (event.action.type !== 'success' || event.action.manual)
+        )
+          return
 
-  const awaitBackend = (pipelineId: number) => {
-    // Start the fallback only after HTTP completion; slow requests remain visibly pending.
-    timers.current[pipelineId] = setTimeout(() => {
-      clearRequest(pipelineId)
-      toast.info('The pipeline update is taking longer than expected. Showing the latest status.')
-    }, REQUEST_SETTLE_TIMEOUT_MS)
-  }
-
-  const beginRequest = (
-    pipelineId: number,
-    status: PipelineStatusRequestStatus,
-    snapshot: string | undefined
-  ) => {
-    clearTimeout(timers.current[pipelineId])
-    const request: PipelineRequest = { status, snapshot, isPending: true, hasTransitioned: false }
-    requests.current[pipelineId] = request
-    setStatuses((previous) => ({ ...previous, [pipelineId]: status }))
-    return request
-  }
+        setRequests((previous) => {
+          const entry = Object.entries(previous).find(
+            ([pipelineId]) =>
+              event.query.queryHash ===
+              hashKey(replicationKeys.pipelinesStatus(projectRef, Number(pipelineId)))
+          )
+          if (!entry) return previous
+          const [pipelineId, request] = entry
+          if (!request.isPending) {
+            const { [Number(pipelineId)]: _removed, ...rest } = previous
+            return rest
+          }
+          if (request.status === PipelineStatusRequestStatus.None) return previous
+          return {
+            ...previous,
+            [pipelineId]: { ...request, status: PipelineStatusRequestStatus.None },
+          }
+        })
+      }),
+    [projectRef, queryClient]
+  )
 
   const runWithRequestStatus: PipelineRequestStatusContextType['runWithRequestStatus'] = async (
     pipelineId,
     status,
-    snapshot,
     action
   ) => {
-    const request = beginRequest(pipelineId, status, snapshot)
+    const id = Symbol('pipeline request')
+    setRequests((previous) => ({ ...previous, [pipelineId]: { id, status, isPending: true } }))
+    let hasSucceeded = false
     try {
       const result = await action()
-      if (requests.current[pipelineId] === request) {
-        request.isPending = false
-        if (hasCompleted(request)) clearRequest(pipelineId)
-        else awaitBackend(pipelineId)
-      }
+      hasSucceeded = true
       return result
-    } catch (error) {
-      if (requests.current[pipelineId] === request) clearRequest(pipelineId)
-      throw error
+    } finally {
+      setRequests((previous) => {
+        const request = previous[pipelineId]
+        if (request?.id !== id) return previous
+        if (!hasSucceeded || request.status === PipelineStatusRequestStatus.None) {
+          const { [pipelineId]: _removed, ...rest } = previous
+          return rest
+        }
+        return { ...previous, [pipelineId]: { ...request, isPending: false } }
+      })
     }
   }
-
-  const updatePipelineStatus = useCallback(
-    (pipelineId: number, backendStatus: string | undefined) => {
-      const request = requests.current[pipelineId]
-      if (!request || backendStatus === undefined) return
-      request.latestStatus = backendStatus
-      request.hasTransitioned ||= backendStatus !== request.snapshot
-      // A restart passes through stopping/stopped/starting. Keep its intent until a final state.
-      if (hasCompleted(request)) clearRequest(pipelineId)
-    },
-    [clearRequest]
-  )
-
-  useEffect(
-    () => () => {
-      Object.values(timers.current).forEach(clearTimeout)
-      requests.current = {}
-      timers.current = {}
-    },
-    []
-  )
 
   return (
     <PipelineRequestStatusContext.Provider
       value={{
-        getRequestStatus: (pipelineId) => statuses[pipelineId] ?? PipelineStatusRequestStatus.None,
-        updatePipelineStatus,
+        getRequestStatus: (pipelineId) =>
+          requests[pipelineId]?.status ?? PipelineStatusRequestStatus.None,
+        isRequestPending: (pipelineId) => requests[pipelineId]?.isPending ?? false,
         runWithRequestStatus,
       }}
     >

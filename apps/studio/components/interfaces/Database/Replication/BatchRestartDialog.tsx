@@ -12,13 +12,17 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
+import { getRestartRequestStatus } from './Pipeline.utils'
+import type { PipelineStatusName } from './Replication.constants'
 import { RestartCostEstimate } from './RestartCostEstimate'
 import { getTableCopyTargets } from './TableSyncCopy.utils'
 import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
 import type { TableSyncCopyConfig } from '@/data/replication/types'
+import { usePipelineRequestStatus } from '@/state/replication-pipeline-request-status'
 
 interface BatchRestartDialogProps {
+  pipelineStatusName?: PipelineStatusName
   open: boolean
   onOpenChange: (open: boolean) => void
   mode: 'all' | 'errored'
@@ -26,8 +30,6 @@ interface BatchRestartDialogProps {
   sourceId?: number
   publicationName?: string
   tableSyncCopy?: TableSyncCopyConfig | null
-  onRestartStart?: (tableIds: number[]) => void
-  onRestartComplete?: (tableIds: number[]) => void
 }
 
 export const BatchRestartDialog = ({
@@ -38,11 +40,11 @@ export const BatchRestartDialog = ({
   sourceId,
   publicationName,
   tableSyncCopy,
-  onRestartStart,
-  onRestartComplete,
+  pipelineStatusName,
 }: BatchRestartDialogProps) => {
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const pipelineId = Number(_pipelineId)
+  const { runWithRequestStatus } = usePipelineRequestStatus()
   const affectedTables = useMemo(() => {
     if (mode === 'all') {
       return tables
@@ -50,7 +52,6 @@ export const BatchRestartDialog = ({
       return tables.filter((table) => table.state.name === 'error')
     }
   }, [mode, tables])
-  const affectedTableIds = useMemo(() => affectedTables.map((table) => table.id), [affectedTables])
   const copiedTables = useMemo(
     () => getTableCopyTargets(affectedTables, tableSyncCopy),
     [affectedTables, tableSyncCopy]
@@ -61,7 +62,6 @@ export const BatchRestartDialog = ({
       toast.success(`Resetting ${count} table${count > 1 ? 's' : ''}`)
     },
     onSettled: () => {
-      onRestartComplete?.(affectedTableIds)
       onOpenChange(false)
     },
     onError: (error) => {
@@ -71,14 +71,14 @@ export const BatchRestartDialog = ({
 
   const handleReset = async () => {
     if (!projectRef) return toast.error('Project ref is required')
-    onRestartStart?.(affectedTableIds)
-
     try {
-      await rollbackTables({
-        projectRef,
-        pipelineId,
-        target: mode === 'all' ? { type: 'all_tables' } : { type: 'all_errored_tables' },
-      })
+      await runWithRequestStatus(pipelineId, getRestartRequestStatus(pipelineStatusName), () =>
+        rollbackTables({
+          projectRef,
+          pipelineId,
+          target: mode === 'all' ? { type: 'all_tables' } : { type: 'all_errored_tables' },
+        })
+      )
     } catch (error) {}
   }
 
