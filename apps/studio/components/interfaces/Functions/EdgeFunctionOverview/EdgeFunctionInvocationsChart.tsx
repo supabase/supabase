@@ -8,7 +8,14 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import {
   formatChartTimestamp,
@@ -98,13 +105,25 @@ export const EdgeFunctionInvocationsChart = ({
           </RechartBarChart>
         </ChartContainer>
         {updateAnnotation && (
-          <span
-            className="pointer-events-none absolute bottom-0 z-10 flex h-6 w-6 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border border-foreground/20 bg-background text-foreground shadow-xs"
-            style={{ left: `${updateAnnotation.position}%` }}
-            title={`Updated ${formatChartTimestamp(updateAnnotation.updatedAt, dateTimeFormat)}`}
-          >
-            <Rocket size={12} strokeWidth={1.75} />
-          </span>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span
+                className="pointer-events-auto absolute bottom-0 z-10 flex h-6 w-6 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border border-foreground/20 bg-background text-foreground shadow-xs"
+                style={{ left: `${updateAnnotation.position}%` }}
+                role="img"
+                tabIndex={0}
+                aria-label={`Deployment at ${formatChartTimestamp(
+                  updateAnnotation.updatedAt,
+                  dateTimeFormat
+                )}`}
+              >
+                <Rocket size={12} strokeWidth={1.75} aria-hidden />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="top" align="center">
+              Deployment at {formatChartTimestamp(updateAnnotation.updatedAt, dateTimeFormat)}
+            </TooltipContent>
+          </Tooltip>
         )}
       </div>
       {timeRangeLabels && (

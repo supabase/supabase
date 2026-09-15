@@ -246,12 +246,12 @@ export const getInvocationUpdateAnnotation = ({
   windowStart,
   windowEnd,
 }: {
-  updatedAt?: string
+  updatedAt?: number | string
   invocationChartData: InvocationChartDatum[]
   windowStart: Date
   windowEnd: Date
 }): InvocationUpdateAnnotation | undefined => {
-  if (!updatedAt || invocationChartData.length === 0) return undefined
+  if (updatedAt === undefined || invocationChartData.length === 0) return undefined
 
   const updatedAtDate = new Date(updatedAt)
   const updatedAtValue = updatedAtDate.valueOf()

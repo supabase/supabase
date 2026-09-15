@@ -131,10 +131,7 @@ export const EdgeFunctionOverview = () => {
   const invocationUpdateAnnotation = useMemo(
     () =>
       getInvocationUpdateAnnotation({
-        updatedAt:
-          selectedFunction?.updated_at === undefined
-            ? undefined
-            : String(selectedFunction.updated_at),
+        updatedAt: selectedFunction?.updated_at,
         invocationChartData,
         windowStart: selectedWindowStart,
         windowEnd: selectedWindowEnd,
