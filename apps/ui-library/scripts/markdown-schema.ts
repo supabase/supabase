@@ -1,5 +1,6 @@
 import path from 'node:path'
 
+import { getBlockArchitecture, type BlockArchitecture } from '../lib/block-architecture'
 import { getInstallCommands } from '../lib/install-command'
 import { generateRegistryTree, type RegistryNode } from '../lib/process-registry'
 import { resolveRegistryItem } from '../lib/registry-resolution'
@@ -71,15 +72,57 @@ function RegistryBlock({ props, options }: HandlerContext): string {
   return [scope, formatTree(tree), external, sources.join('\n')].filter(Boolean).join('\n\n')
 }
 
+function formatArchitecture(architecture: BlockArchitecture): string {
+  const sections = ["## What's added"]
+  const labels = {
+    table: 'Tables',
+    'edge-function': 'Edge Functions',
+    'api-route': 'API routes',
+    page: 'Pages',
+  } as const
+  for (const [kind, label] of Object.entries(labels)) {
+    const resources = architecture.resources.filter((resource) => resource.kind === kind)
+    if (!resources.length) continue
+    sections.push(`### ${label}`)
+    sections.push(
+      resources
+        .map((resource) => {
+          const name = resource.schema ? `${resource.schema}.${resource.name}` : resource.name
+          const route =
+            resource.route && resource.route !== resource.name ? ` — \`${resource.route}\`` : ''
+          return `- **${name}**${route}`
+        })
+        .join('\n')
+    )
+  }
+  if (!architecture.resources.length) {
+    sections.push(
+      'No tables, Edge Functions, API routes, or pages were detected in the supplied files.'
+    )
+  }
+  if (architecture.diagnostics.length) {
+    sections.push(
+      'Some resources could not be determined from the supplied files. Follow the complete setup guide for details.'
+    )
+  }
+  if (architecture.source) {
+    sections.push(
+      `Template source: [${architecture.source.revision.slice(0, 7)}](${architecture.source.url}).`
+    )
+  }
+  return sections.join('\n\n')
+}
+
 function BlockOverview({ props, children, options }: HandlerContext): string {
   const name = requiredName(props, 'name')
+  const architecture = formatArchitecture(getBlockArchitecture(name))
   const files =
     props.showFiles === true || props.showFiles === 'true'
       ? ['## Files', RegistryBlock({ props: { itemName: name }, children: '', options })].join(
           '\n\n'
         )
       : ''
-  return [children, files].filter(Boolean).join('\n\n')
+  return [children, architecture, files].filter(Boolean).join('\n\n')
 }
 
 function formatTree(nodes: RegistryNode[], indent = 0): string {

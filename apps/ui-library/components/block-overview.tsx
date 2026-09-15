@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 
 import { BlockItemCode } from './block-item-code'
 import { BlockOverviewTabs } from './block-overview-tabs'
+import { getBlockArchitecture } from '@/lib/block-architecture'
 import { generateRegistryTree } from '@/lib/process-registry'
 import { resolveRegistryItem } from '@/lib/registry-resolution'
 import { registry } from '@/registry'
@@ -19,9 +20,11 @@ export function BlockOverview({
   const resolved = registry.items.some((item) => item.name === name)
     ? resolveRegistryItem(registry, name)
     : undefined
+  const architecture = getBlockArchitecture(name)
 
   return (
     <BlockOverviewTabs
+      architecture={architecture}
       files={
         showFiles ? (
           <div className="flex h-full flex-col">
