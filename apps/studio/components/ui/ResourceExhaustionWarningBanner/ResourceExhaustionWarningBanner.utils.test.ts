@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
+import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
 import {
+  applyResourceList,
+  formatResourceList,
+  getResourceWarningAiPrompt,
   getResourceWarningCorrectionUrl,
+  getResourceWarningLabels,
+  getResourceWarningMetricsHref,
+  getTroubleshootItems,
   isComputeUpgradeWarning,
 } from './ResourceExhaustionWarningBanner.utils'
 
@@ -75,5 +82,143 @@ describe('resource warning correction routes', () => {
         isFreePlan: false,
       })
     ).toBe('/project/project-ref/settings/infrastructure#custom_metric')
+  })
+})
+
+describe('formatResourceList', () => {
+  it('returns a single label as is', () => {
+    expect(formatResourceList(['CPU'])).toBe('CPU')
+  })
+
+  it('joins two labels with and', () => {
+    expect(formatResourceList(['CPU', 'Disk IO'])).toBe('CPU and Disk IO')
+  })
+
+  it('joins three labels with an Oxford comma', () => {
+    expect(formatResourceList(['CPU', 'Disk IO', 'Memory'])).toBe('CPU, Disk IO, and Memory')
+  })
+})
+
+describe('getResourceWarningLabels', () => {
+  it('drops response keys that have no config entry', () => {
+    expect(getResourceWarningLabels(['cpu_exhaustion', 'need_pitr'])).toEqual(['CPU'])
+  })
+})
+
+describe('getResourceWarningMetricsHref', () => {
+  it('links a warning to its chart over the last 3 hours', () => {
+    expect(getResourceWarningMetricsHref('cpu_exhaustion', 'abc')).toBe(
+      '/project/abc/observability/database?chart=cpu-usage&isHelper=true&helperText=Last+3+hours'
+    )
+  })
+
+  it('defaults disk IO to the always-rendered throughput chart', () => {
+    expect(getResourceWarningMetricsHref('disk_io_exhaustion', 'abc')).toContain(
+      'chart=disk-throughput'
+    )
+  })
+
+  it('targets the burst balance chart for disk IO when that chart is shown', () => {
+    expect(getResourceWarningMetricsHref('disk_io_exhaustion', 'abc', true)).toContain(
+      'chart=disk-io-burst-balance'
+    )
+  })
+
+  it('leaves other warnings alone when the burst balance chart is shown', () => {
+    expect(getResourceWarningMetricsHref('cpu_exhaustion', 'abc', true)).toContain(
+      'chart=cpu-usage'
+    )
+  })
+
+  it.each(['auth_rate_limit_exhaustion', 'is_readonly_mode_enabled'])(
+    'returns undefined for %s, which has no chart',
+    (warningType) => {
+      expect(getResourceWarningMetricsHref(warningType, 'abc')).toBeUndefined()
+    }
+  )
+})
+
+describe('applyResourceList', () => {
+  it('fills the multi-resource title with the tripped resources', () => {
+    expect(
+      applyResourceList(
+        RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent.warning.title,
+        ['cpu_exhaustion', 'disk_space_exhaustion']
+      )
+    ).toBe('Your project is exhausting CPU and Disk space, which is affecting its performance')
+  })
+})
+
+describe('getTroubleshootItems', () => {
+  const kindsOf = (items: ReturnType<typeof getTroubleshootItems>) => items.map((item) => item.kind)
+
+  it('lists metrics, then docs, then AI for a multi-resource banner', () => {
+    const items = getTroubleshootItems({
+      activeWarnings: ['cpu_exhaustion', 'disk_space_exhaustion'],
+      projectRef: 'abc',
+      aiPrompt: 'prompt',
+    })
+    expect(kindsOf(items)).toEqual(['metrics', 'metrics', 'docs', 'docs', 'ai'])
+    expect(items[0].menuLabel).toBe('View CPU metrics')
+    expect(items[2].menuLabel).toBe('CPU documentation')
+    expect(items[3].menuLabel).toBe('Disk space documentation')
+  })
+
+  it('keeps the generic labels for a single-resource banner', () => {
+    const items = getTroubleshootItems({
+      activeWarnings: ['cpu_exhaustion'],
+      projectRef: 'abc',
+      aiPrompt: 'prompt',
+    })
+    expect(kindsOf(items)).toEqual(['metrics', 'docs', 'ai'])
+    expect(items[0].menuLabel).toBe('View metrics')
+  })
+
+  it('skips the metrics item for warnings without a chart', () => {
+    const items = getTroubleshootItems({
+      activeWarnings: ['auth_rate_limit_exhaustion'],
+      projectRef: 'abc',
+      aiPrompt: 'prompt',
+    })
+    expect(kindsOf(items)).toEqual(['docs', 'ai'])
+  })
+
+  it('leaves read-only mode with a single Learn more button', () => {
+    const items = getTroubleshootItems({
+      activeWarnings: ['is_readonly_mode_enabled'],
+      projectRef: 'abc',
+      aiPrompt: undefined,
+    })
+    expect(kindsOf(items)).toEqual(['docs'])
+    expect(items[0].buttonLabel).toBe('Learn more')
+  })
+
+  it('gives disk space a metrics and a docs item without an AI prompt', () => {
+    const items = getTroubleshootItems({
+      activeWarnings: ['disk_space_exhaustion'],
+      projectRef: 'abc',
+      aiPrompt: undefined,
+    })
+    expect(kindsOf(items)).toEqual(['metrics', 'docs'])
+  })
+})
+
+describe('getResourceWarningAiPrompt', () => {
+  it('uses the entry prompt for a single warning', () => {
+    expect(getResourceWarningAiPrompt(['cpu_exhaustion'])).toBe(
+      RESOURCE_WARNING_MESSAGES.cpu_exhaustion.aiPrompt
+    )
+  })
+
+  it('names the tripped resources for multiple warnings', () => {
+    expect(getResourceWarningAiPrompt(['cpu_exhaustion', 'disk_space_exhaustion'])).toContain(
+      '(CPU and Disk space)'
+    )
+  })
+
+  it('offers no prompt when none of the tripped resources is a compute resource', () => {
+    expect(
+      getResourceWarningAiPrompt(['disk_space_exhaustion', 'auth_rate_limit_exhaustion'])
+    ).toBeUndefined()
   })
 })
