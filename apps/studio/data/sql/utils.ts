@@ -17,7 +17,7 @@ const postgresNoticeSchema = z.object({
 })
 export type PostgresNotice = z.infer<typeof postgresNoticeSchema>
 
-/** Response shape of pg-meta's `POST /query?includeNotices=true`. */
+/** Response shape of pg-meta's `POST /query?withnotice=1`. */
 const queryResponseWithNoticesSchema = z.object({
   data: z.array(z.unknown()),
   notices: z.array(postgresNoticeSchema),

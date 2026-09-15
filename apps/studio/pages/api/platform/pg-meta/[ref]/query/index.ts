@@ -23,8 +23,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { query } = req.body
   const headers = constructHeaders(req.headers)
-  // Same opt-in as pg-meta's `/query?includeNotices=true`; keeps the bare rows array otherwise
-  const includeNotices = req.query.includeNotices === 'true'
+  // Same opt-in as pg-meta's `/query?withnotice=1`; keeps the bare rows array otherwise
+  const includeNotices = req.query.withnotice === '1'
   const { data, error } = await executeQuery({ query, headers, includeNotices })
 
   if (error) {

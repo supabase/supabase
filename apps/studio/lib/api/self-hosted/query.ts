@@ -52,7 +52,7 @@ export async function executeQuery<T = unknown>({
   }
 
   return await Sentry.startSpan({ name: 'pg-meta.query', op: 'db.query' }, async (span) => {
-    const url = `${PG_META_URL}/query${includeNotices ? '?includeNotices=true' : ''}`
+    const url = `${PG_META_URL}/query${includeNotices ? '?withnotice=1' : ''}`
     const response = await fetch(url, {
       method: 'POST',
       headers: constructHeaders({

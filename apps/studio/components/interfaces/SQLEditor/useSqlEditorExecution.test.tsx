@@ -135,9 +135,9 @@ describe('useSqlEditorExecution', () => {
     await waitFor(() => expect(sqlEditorSessionState.results[SNIPPET_ID]).toBeDefined())
     expect(sqlEditorSessionState.results[SNIPPET_ID][0].rows).toEqual([])
     expect(sqlEditorSessionState.results[SNIPPET_ID][0].notices).toEqual([notice])
-    expect(
-      requestUrls.some((url) => new URL(url).searchParams.get('includeNotices') === 'true')
-    ).toBe(true)
+    expect(requestUrls.some((url) => new URL(url).searchParams.get('withnotice') === '1')).toBe(
+      true
+    )
   })
 
   it('appends the auto-limit to a bare SELECT and records it on the result', async () => {

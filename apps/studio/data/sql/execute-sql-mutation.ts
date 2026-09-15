@@ -175,8 +175,8 @@ export async function executeSql<T = any>(
       params: {
         ...options.params,
         // @ts-expect-error: `key` is just a client side thing to identify queries better, and
-        // `includeNotices` is forwarded to pg-meta's `/query?includeNotices=true`
-        query: includeNotices ? { key, includeNotices: true } : { key },
+        // `withnotice=1` is pg-meta's opt-in flag for `/query` to return `{ data, notices }`
+        query: includeNotices ? { key, withnotice: 1 } : { key },
       },
     })
 
