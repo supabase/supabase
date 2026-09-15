@@ -225,7 +225,7 @@ describe('useDestinationForm', () => {
       expect(startRequests).not.toHaveBeenCalled()
       expect(onClose).toHaveBeenCalledOnce()
       expect(result.current.requestStatus).toBe(
-        enabled ? PipelineStatusRequestStatus.RestartRequested : PipelineStatusRequestStatus.None
+        enabled ? PipelineStatusRequestStatus.StopRequested : PipelineStatusRequestStatus.None
       )
     }
   )

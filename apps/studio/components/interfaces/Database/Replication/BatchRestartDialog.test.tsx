@@ -1,11 +1,23 @@
+import { QueryClient } from '@tanstack/react-query'
 import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
 
 import { BatchRestartDialog } from './BatchRestartDialog'
+import { getStatusName } from './Pipeline.utils'
+import { PipelineStatus } from './PipelineStatus'
 import { RestartTableDialog } from './RestartTableDialog'
+import { replicationKeys } from '@/data/replication/keys'
 import type { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
+import {
+  useReplicationPipelineStatusQuery,
+  type ReplicationPipelineStatusResponse,
+} from '@/data/replication/pipeline-status-query'
+import {
+  PipelineRequestStatusProvider,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -35,7 +47,6 @@ const table = (
 
 describe('BatchRestartDialog', () => {
   it('describes every table reset by the all-errored backend target', async () => {
-    const onRestartStart = vi.fn()
     const tables = [
       table(1, { name: 'error', reason: 'manual', retry_policy: { policy: 'manual_retry' } }),
       table(2, { name: 'error', reason: 'terminal', retry_policy: { policy: 'no_retry' } }),
@@ -62,14 +73,15 @@ describe('BatchRestartDialog', () => {
     })
 
     customRender(
-      <BatchRestartDialog
-        open
-        onOpenChange={onOpenChange}
-        mode="errored"
-        tables={tables}
-        tableSyncCopy={{ type: 'include_tables', table_ids: [1, 2] }}
-        onRestartStart={onRestartStart}
-      />
+      <PipelineRequestStatusProvider>
+        <BatchRestartDialog
+          open
+          onOpenChange={onOpenChange}
+          mode="errored"
+          tables={tables}
+          tableSyncCopy={{ type: 'include_tables', table_ids: [1, 2] }}
+        />
+      </PipelineRequestStatusProvider>
     )
 
     expect(screen.getByText(/3 currently failed tables/)).toBeInTheDocument()
@@ -79,45 +91,143 @@ describe('BatchRestartDialog', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Restart' }))
     })
 
-    expect(onRestartStart).toHaveBeenCalledWith([1, 2, 3])
     await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
     expect(requests).toEqual([{ target: { type: 'all_errored_tables' } }])
   })
 
-  it.each(['all', 'single'] as const)('sends only the %s reset target', async (target) => {
-    const onOpenChange = vi.fn()
-    const requests: unknown[] = []
-    addAPIMock({
-      method: 'post',
-      path: '/platform/replication/:ref/pipelines/:pipeline_id/rollback-tables',
-      response: async ({ request }) => {
-        requests.push(await request.json())
-        return HttpResponse.json<components['schemas']['RollbackTablesResponse_Output']>({
-          pipeline_id: 9,
-          tables: [{ table_id: 1, new_state: { name: 'queued' } }],
-        })
-      },
-    })
-    customRender(
-      target === 'all' ? (
+  it.each([
+    {
+      target: 'all',
+      initialStatus: 'started',
+      optimisticLabel: 'Stopping',
+      nextStatus: 'starting',
+      nextLabel: 'Starting',
+    },
+    {
+      target: 'single',
+      initialStatus: 'started',
+      optimisticLabel: 'Stopping',
+      nextStatus: 'starting',
+      nextLabel: 'Starting',
+    },
+    {
+      target: 'all',
+      initialStatus: 'stopped',
+      optimisticLabel: 'Stopped',
+      nextStatus: 'stopped',
+      nextLabel: 'Stopped',
+    },
+    {
+      target: 'single',
+      initialStatus: 'stopped',
+      optimisticLabel: 'Stopped',
+      nextStatus: 'stopped',
+      nextLabel: 'Stopped',
+    },
+  ] as const)(
+    'resets $target tables while honoring a $initialStatus pipeline',
+    async ({ target, initialStatus, optimisticLabel, nextStatus, nextLabel }) => {
+      const onOpenChange = vi.fn()
+      const requests: unknown[] = []
+      const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+      let backendStatus: ReplicationPipelineStatusResponse['status']['name'] = initialStatus
+      let complete = () => {}
+      const response = new Promise<void>((resolve) => {
+        complete = resolve
+      })
+      addAPIMock({
+        method: 'get',
+        path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
+        response: () =>
+          HttpResponse.json<ReplicationPipelineStatusResponse>({
+            pipeline_id: 9,
+            status: { name: backendStatus },
+          }),
+      })
+      addAPIMock({
+        method: 'post',
+        path: '/platform/replication/:ref/pipelines/:pipeline_id/rollback-tables',
+        response: async ({ request }) => {
+          requests.push(await request.json())
+          await response
+          return HttpResponse.json<components['schemas']['RollbackTablesResponse_Output']>({
+            pipeline_id: 9,
+            tables: [{ table_id: 1, new_state: { name: 'queued' } }],
+          })
+        },
+      })
+      customRender(
+        <PipelineRequestStatusProvider>
+          <RestartDialogWithStatus target={target} onOpenChange={onOpenChange} />
+        </PipelineRequestStatusProvider>,
+        { queryClient }
+      )
+      await screen.findByText(initialStatus === 'started' ? 'Running' : 'Stopped')
+      fireEvent.click(screen.getByRole('button', { name: 'Restart' }))
+      expect(screen.getByText(optimisticLabel)).toBeInTheDocument()
+      backendStatus = nextStatus
+      await act(async () => {
+        await queryClient.invalidateQueries(
+          { queryKey: replicationKeys.pipelinesStatus('default', 9) },
+          { cancelRefetch: false }
+        )
+      })
+      expect(screen.getByText(nextLabel)).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: 'Preparing to restart replication...' })
+      ).toBeDisabled()
+      await act(async () => {
+        complete()
+      })
+      await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
+      expect(requests).toEqual([
+        {
+          target: target === 'all' ? { type: 'all_tables' } : { type: 'single_table', table_id: 1 },
+        },
+      ])
+    }
+  )
+})
+
+const RestartDialogWithStatus = ({
+  target,
+  onOpenChange,
+}: {
+  target: 'single' | 'all'
+  onOpenChange: (open: boolean) => void
+}) => {
+  const { data, error, isPending, isError, isSuccess } = useReplicationPipelineStatusQuery({
+    projectRef: 'default',
+    pipelineId: 9,
+  })
+  const { getRequestStatus } = usePipelineRequestStatus()
+  const pipelineStatusName = getStatusName(data?.status)
+  return (
+    <>
+      <PipelineStatus
+        pipelineStatus={data?.status}
+        error={error}
+        isLoading={isPending}
+        isError={isError}
+        isSuccess={isSuccess}
+        requestStatus={getRequestStatus(9)}
+      />
+      {target === 'all' ? (
         <BatchRestartDialog
           open
           mode="all"
           tables={[table(1, { name: 'following_wal' })]}
+          pipelineStatusName={pipelineStatusName}
           onOpenChange={onOpenChange}
         />
       ) : (
         <RestartTableDialog
           open
           table={table(1, { name: 'following_wal' })}
+          pipelineStatusName={pipelineStatusName}
           onOpenChange={onOpenChange}
         />
-      )
-    )
-    fireEvent.click(screen.getByRole('button', { name: 'Restart' }))
-    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
-    expect(requests).toEqual([
-      { target: target === 'all' ? { type: 'all_tables' } : { type: 'single_table', table_id: 1 } },
-    ])
-  })
-})
+      )}
+    </>
+  )
+}

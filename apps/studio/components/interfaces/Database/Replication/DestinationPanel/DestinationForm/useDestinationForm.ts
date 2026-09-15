@@ -267,18 +267,18 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
             { onSuccess }
           )
 
-        if (existingDestination.enabled) {
-          await runWithRequestStatus(
-            pipelineId,
-            PipelineStatusRequestStatus.RestartRequested,
-            existingDestination.statusName ?? 'started',
-            update
-          )
-          toast.success('Settings applied.')
-        } else {
-          await update()
-          toast.success('Settings applied. The pipeline remains stopped.')
-        }
+        await runWithRequestStatus(
+          pipelineId,
+          existingDestination.enabled
+            ? PipelineStatusRequestStatus.StopRequested
+            : PipelineStatusRequestStatus.None,
+          update
+        )
+        toast.success(
+          existingDestination.enabled
+            ? 'Settings applied.'
+            : 'Settings applied. The pipeline remains stopped.'
+        )
         onClose()
       } else {
         const { pipeline_id: pipelineId } = await createDestinationPipeline(
@@ -294,11 +294,8 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
         // Creation has committed. Close the form even if starting fails, so retrying cannot
         // create a duplicate pipeline; the new row offers its own start action.
         onClose()
-        await runWithRequestStatus(
-          pipelineId,
-          PipelineStatusRequestStatus.StartRequested,
-          'stopped',
-          () => startPipeline({ projectRef, pipelineId })
+        await runWithRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, () =>
+          startPipeline({ projectRef, pipelineId })
         )
         toast.success('Pipeline created. Start requested.')
       }

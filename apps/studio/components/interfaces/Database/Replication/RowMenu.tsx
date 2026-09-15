@@ -73,14 +73,18 @@ export const RowMenu = ({
   const { mutateAsync: startPipeline } = useStartPipelineMutation({ onError: () => {} })
   const { mutateAsync: stopPipeline } = useStopPipelineMutation({ onError: () => {} })
   const { mutateAsync: restartPipeline } = useRestartPipelineMutation()
-  const { getRequestStatus, runWithRequestStatus } = usePipelineRequestStatus()
+  const { getRequestStatus, isRequestPending, runWithRequestStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
 
+  const isPipelineRequestPending = !!pipeline && isRequestPending(pipeline.id)
+
   // Show actions when not in a transitional state
   const canPerformActions =
     !isError &&
+    !!pipeline &&
+    !isPipelineRequestPending &&
     requestStatus === PipelineStatusRequestStatus.None &&
     statusName !== PipelineStatusName.STARTING &&
     [PipelineStatusName.STOPPED, PipelineStatusName.STARTED, PipelineStatusName.FAILED].includes(
@@ -100,11 +104,8 @@ export const RowMenu = ({
     if (!pipeline) return toast.error('No pipeline found')
 
     try {
-      await runWithRequestStatus(
-        pipeline.id,
-        PipelineStatusRequestStatus.StartRequested,
-        statusName,
-        () => startPipeline({ projectRef, pipelineId: pipeline.id })
+      await runWithRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, () =>
+        startPipeline({ projectRef, pipelineId: pipeline.id })
       )
     } catch (error) {
       toast.error(`Failed to start pipeline: ${(error as ResponseError).message}`)
@@ -116,11 +117,8 @@ export const RowMenu = ({
     if (!pipeline) return toast.error('No pipeline found')
 
     try {
-      await runWithRequestStatus(
-        pipeline.id,
-        PipelineStatusRequestStatus.StopRequested,
-        statusName,
-        () => stopPipeline({ projectRef, pipelineId: pipeline.id })
+      await runWithRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, () =>
+        stopPipeline({ projectRef, pipelineId: pipeline.id })
       )
     } catch (error) {
       toast.error(`Failed to stop pipeline: ${(error as ResponseError).message}`)
@@ -132,11 +130,8 @@ export const RowMenu = ({
     if (!pipeline) return toast.error('No pipeline found')
 
     try {
-      await runWithRequestStatus(
-        pipeline.id,
-        PipelineStatusRequestStatus.RestartRequested,
-        statusName,
-        () => restartPipeline({ projectRef, pipelineId: pipeline.id })
+      await runWithRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, () =>
+        restartPipeline({ projectRef, pipelineId: pipeline.id })
       )
     } catch (error) {
       toast.error(`Failed to restart pipeline: ${(error as ResponseError).message}`)
@@ -188,7 +183,11 @@ export const RowMenu = ({
           <DropdownMenuSeparator />
           {hasUpdate && (
             <>
-              <DropdownMenuItem className="space-x-2" onClick={() => onUpdateClick?.()}>
+              <DropdownMenuItem
+                className="space-x-2"
+                onClick={() => onUpdateClick?.()}
+                disabled={isPipelineRequestPending}
+              >
                 <ArrowUpCircle size={14} />
                 <p>Update available</p>
               </DropdownMenuItem>
@@ -218,11 +217,19 @@ export const RowMenu = ({
             </>
           )}
 
-          <DropdownMenuItem className="space-x-2" onClick={() => setEdit(destinationId)}>
+          <DropdownMenuItem
+            className="space-x-2"
+            onClick={() => setEdit(destinationId)}
+            disabled={isPipelineRequestPending}
+          >
             <Edit size={14} />
             <p>Edit pipeline</p>
           </DropdownMenuItem>
-          <DropdownMenuItem className="space-x-2" onClick={onDeleteClick}>
+          <DropdownMenuItem
+            className="space-x-2"
+            onClick={onDeleteClick}
+            disabled={isPipelineRequestPending}
+          >
             <Trash size={14} />
             <p>Delete pipeline</p>
           </DropdownMenuItem>

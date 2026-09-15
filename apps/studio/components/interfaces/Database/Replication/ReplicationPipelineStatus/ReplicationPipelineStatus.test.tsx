@@ -36,7 +36,7 @@ const operations = [
   {
     action: 'restart',
     initialStatus: 'failed',
-    pendingLabel: 'Restarting',
+    pendingLabel: 'Stopping',
     finalStatus: 'started',
     nextLabel: 'Stop',
   },
@@ -134,22 +134,38 @@ describe('pipeline primary action', () => {
   })
 
   test.each(operations)(
-    '$action stays disabled after success until the backend status changes',
+    '$action shows immediate feedback then follows the next backend status',
     async ({ action, initialStatus, pendingLabel, finalStatus, nextLabel }) => {
+      let complete = () => {}
+      const response = new Promise<void>((resolve) => {
+        complete = resolve
+      })
       addAPIMock({
         method: 'post',
         path: `/platform/replication/:ref/pipelines/:pipeline_id/${action}`,
-        response: () => HttpResponse.json<{ pipeline_id: number }>({ pipeline_id: 1 }),
+        response: async () => {
+          await response
+          return HttpResponse.json<{ pipeline_id: number }>({ pipeline_id: 1 })
+        },
       })
       const { queryClient, status } = setup(initialStatus)
       const button = await screen.findByRole('button', { name: new RegExp(`^${action}$`, 'i') })
       await waitFor(() => expect(button).toBeEnabled())
       fireEvent.click(button)
 
-      await waitFor(() =>
-        expect(queryClient.getMutationCache().getAll()[0]?.state.status).toBe('success')
-      )
       expect(screen.getByRole('button', { name: pendingLabel })).toBeDisabled()
+      // A new response may legitimately still report the previous backend state.
+      await act(async () => {
+        await queryClient.invalidateQueries({
+          queryKey: replicationKeys.pipelinesStatus('default', 1),
+        })
+      })
+      expect(screen.queryByText('Restarting')).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: new RegExp(`^${action}$`, 'i') })).toBeDisabled()
+      await act(async () => {
+        complete()
+      })
+      await waitFor(() => expect(button).toBeEnabled())
 
       status.status.name = finalStatus
       await act(async () => {

@@ -11,20 +11,22 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
+import { getRestartRequestStatus } from './Pipeline.utils'
+import type { PipelineStatusName } from './Replication.constants'
 import { RestartCostEstimate } from './RestartCostEstimate'
 import { shouldCopyTable, type ReplicationTableIdentity } from './TableSyncCopy.utils'
 import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
 import type { TableSyncCopyConfig } from '@/data/replication/types'
+import { usePipelineRequestStatus } from '@/state/replication-pipeline-request-status'
 
 interface RestartTableDialogProps {
+  pipelineStatusName?: PipelineStatusName
   open: boolean
   onOpenChange: (open: boolean) => void
   table: ReplicationTableIdentity
   tableSyncCopy?: TableSyncCopyConfig | null
   sourceId?: number
   publicationName?: string
-  onRestartStart?: () => void
-  onRestartComplete?: () => void
 }
 
 export const RestartTableDialog = ({
@@ -34,11 +36,11 @@ export const RestartTableDialog = ({
   tableSyncCopy,
   sourceId,
   publicationName,
-  onRestartStart,
-  onRestartComplete,
+  pipelineStatusName,
 }: RestartTableDialogProps) => {
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const pipelineId = Number(_pipelineId)
+  const { runWithRequestStatus } = usePipelineRequestStatus()
   const tableName = `${table.schema}.${table.name}`
   const willCopyTable = shouldCopyTable(tableSyncCopy, table.id)
 
@@ -47,7 +49,6 @@ export const RestartTableDialog = ({
       toast.success(`Replication will restart for "${tableName}".`)
     },
     onSettled: () => {
-      onRestartComplete?.()
       onOpenChange(false)
     },
     onError: (error) => {
@@ -59,13 +60,14 @@ export const RestartTableDialog = ({
     if (!projectRef) return toast.error('Project ref is required')
     if (!pipelineId) return toast.error('Pipeline ID is required')
 
-    onRestartStart?.()
     try {
-      await rollbackTables({
-        projectRef,
-        pipelineId,
-        target: { type: 'single_table', table_id: table.id },
-      })
+      await runWithRequestStatus(pipelineId, getRestartRequestStatus(pipelineStatusName), () =>
+        rollbackTables({
+          projectRef,
+          pipelineId,
+          target: { type: 'single_table', table_id: table.id },
+        })
+      )
     } catch (error) {}
   }
 
