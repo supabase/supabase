@@ -6,7 +6,6 @@ import {
   useRef,
   type PropsWithChildren,
 } from 'react'
-import { toast } from 'sonner'
 
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
 import type { StorageItem, StorageItemWithColumn } from '../Storage.types'
@@ -67,7 +66,7 @@ export const StorageExplorerNavigationProvider = ({
   children,
 }: PropsWithChildren<StorageExplorerNavigationProviderProps>) => {
   const snap = useStorageExplorerStateSnapshot()
-  const { urlPath, urlFolderPaths, urlFile, setUrlLocation, setUrlFile } =
+  const { urlPath, urlFolderPaths, urlPreview, setUrlLocation, setUrlPreview } =
     useStorageExplorerUrlState()
 
   const storePath = getPathAlongOpenedFolders(snap, false)
@@ -84,6 +83,7 @@ export const StorageExplorerNavigationProvider = ({
    * deliberate user navigation (push) rather than the side effect of a mutation (replace).
    */
   const navigationHistoryModeRef = useRef<'push' | null>(null)
+  const previousPreviewRef = useRef(previewedFileName)
   /**
    * `fetchFoldersByPath` swaps in placeholder columns before it resolves, but only
    * updates `openedFolders` at the very end — so mid-flight the store still reports the
@@ -101,7 +101,12 @@ export const StorageExplorerNavigationProvider = ({
         showLoading: true,
       })
       if (missingPaths.length > 0) {
-        toast.info(`"${missingPaths.join('/')}" no longer exists in this bucket`)
+        // The link points at a folder that no longer exists. Fall back to the bucket
+        // root and correct the URL together, so the store and the URL stay in step —
+        // rewriting the URL alone would leave the store on the dead path and the
+        // reconcile effect would immediately write it back.
+        await snap.fetchFoldersByPath({ paths: [], searchString, showLoading: true })
+        setUrlLocation({ paths: [], preview: null }, { history: 'replace' })
       }
     } finally {
       isRestoringRef.current = false
@@ -125,7 +130,7 @@ export const StorageExplorerNavigationProvider = ({
 
   const reconcileUrlToStore = useEffectEvent((history: 'push' | 'replace') => {
     setUrlLocation(
-      { paths: parseStoragePath(storePath), file: snap.selectedFilePreview?.name ?? null },
+      { paths: parseStoragePath(storePath), preview: snap.selectedFilePreview?.name ?? null },
       { history }
     )
   })
@@ -175,27 +180,46 @@ export const StorageExplorerNavigationProvider = ({
     snap.columns.length,
   ])
 
-  // Restoring `?file` needs the full item, which only exists once its column has loaded.
+  // Restoring `?preview` needs the full item, which only exists once its column has loaded.
   useEffect(() => {
     if (!isBucketReady || !isLastColumnReady) return
 
-    if (!urlFile) {
+    // Same "which side moved" rule the path sync uses. Clicking a row mutates the store
+    // synchronously while the URL is written a render later, so without this the effect
+    // would compare a stale `?preview` against an already-truncated column stack and
+    // mistake the lag for a deleted file. When the store moved, the reconcile effect
+    // owns writing the URL; this effect only adopts changes that came from the URL.
+    const hasPreviewChangedInStore = previewedFileName !== previousPreviewRef.current
+    previousPreviewRef.current = previewedFileName
+    if (hasPreviewChangedInStore) return
+
+    if (!urlPreview) {
       if (previewedFileName) snap.setSelectedFilePreview(undefined)
       return
     }
-    if (previewedFileName === urlFile) return
+    if (previewedFileName === urlPreview) return
 
     const item = lastColumn.items.find(
-      (columnItem) => columnItem.name === urlFile && columnItem.type === STORAGE_ROW_TYPES.FILE
+      (columnItem) => columnItem.name === urlPreview && columnItem.type === STORAGE_ROW_TYPES.FILE
     )
     if (!item) {
-      toast.info(`"${urlFile}" is no longer in this folder`)
-      setUrlFile(null)
+      // Absent from `items` doesn't always mean deleted: a search filters the listing,
+      // and the listing is capped at LIMIT. Only drop the param when this listing is
+      // complete and unfiltered, otherwise the file may simply not be loaded yet.
+      const isListingComplete = !searchString && !lastColumn.hasMoreItems
+      if (isListingComplete) setUrlPreview(null)
       return
     }
     snap.setSelectedFilePreview({ ...item, columnIndex: snap.columns.length - 1 })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isBucketReady, isLastColumnReady, urlFile, previewedFileName, lastColumn?.path])
+  }, [
+    isBucketReady,
+    isLastColumnReady,
+    urlPreview,
+    previewedFileName,
+    lastColumn?.path,
+    searchString,
+  ])
 
   const openFolderAtIndex = async (columnIndex: number, folder: StorageItem) => {
     navigationHistoryModeRef.current = 'push'
@@ -218,17 +242,17 @@ export const StorageExplorerNavigationProvider = ({
   }
 
   const navigateToPath = (paths: string[]) => {
-    setUrlLocation({ paths, file: null }, { history: 'push' })
+    setUrlLocation({ paths, preview: null }, { history: 'push' })
   }
 
   const setPreviewedFile = (item: StorageItemWithColumn) => {
     snap.setSelectedFilePreview(item)
-    setUrlFile(item.name)
+    setUrlPreview(item.name)
   }
 
   const clearPreviewedFile = () => {
     snap.setSelectedFilePreview(undefined)
-    setUrlFile(null)
+    setUrlPreview(null)
   }
 
   return (

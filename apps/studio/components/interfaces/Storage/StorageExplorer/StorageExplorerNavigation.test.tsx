@@ -10,15 +10,13 @@ import {
   useStorageExplorerNavigation,
 } from './StorageExplorerNavigation'
 
-const { mockUseStorageExplorerStateSnapshot, mockToastInfo } = vi.hoisted(() => ({
+const { mockUseStorageExplorerStateSnapshot } = vi.hoisted(() => ({
   mockUseStorageExplorerStateSnapshot: vi.fn(),
-  mockToastInfo: vi.fn(),
 }))
 
 vi.mock('@/state/storage-explorer', () => ({
   useStorageExplorerStateSnapshot: () => mockUseStorageExplorerStateSnapshot(),
 }))
-vi.mock('sonner', () => ({ toast: { info: mockToastInfo } }))
 
 function makeFolder(name: string): StorageItem {
   return {
@@ -38,8 +36,8 @@ function makeFile(name: string): StorageItem {
   return { ...makeFolder(name), id: name, type: STORAGE_ROW_TYPES.FILE }
 }
 
-function makeColumn(name: string, items: StorageItem[] = []) {
-  return { id: name, name, path: '', status: STORAGE_ROW_STATUS.READY, items }
+function makeColumn(name: string, items: StorageItem[] = [], hasMoreItems = false) {
+  return { id: name, name, path: '', status: STORAGE_ROW_STATUS.READY, items, hasMoreItems }
 }
 
 /**
@@ -97,7 +95,6 @@ function renderWithProvider({
 describe('StorageExplorerNavigation', () => {
   beforeEach(() => {
     mockUseStorageExplorerStateSnapshot.mockReset()
-    mockToastInfo.mockReset()
   })
 
   it('restores the column stack from ?path on mount', async () => {
@@ -179,19 +176,58 @@ describe('StorageExplorerNavigation', () => {
     expect(update.options.history).toBe('push')
   })
 
-  it('surfaces a stale deep link rather than silently showing an empty folder', async () => {
+  it('falls back to the bucket root when a path segment no longer exists', async () => {
     const snapshot = createSnapshot({ columns: [] })
-    snapshot.fetchFoldersByPath.mockResolvedValue({ missingPaths: ['2024'] })
+    snapshot.fetchFoldersByPath
+      .mockResolvedValueOnce({ missingPaths: ['2024'] })
+      .mockResolvedValue({ missingPaths: [] })
     mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
 
-    renderWithProvider({ searchParams: '?path=images/2024' })
+    const { onUrlUpdate } = renderWithProvider({ searchParams: '?path=images/2024' })
 
+    // Re-fetches the root rather than leaving the store on the dead path
     await waitFor(() => {
-      expect(mockToastInfo).toHaveBeenCalledWith('"2024" no longer exists in this bucket')
+      expect(snapshot.fetchFoldersByPath).toHaveBeenCalledWith({
+        paths: [],
+        searchString: '',
+        showLoading: true,
+      })
     })
+    // ...and corrects the URL to match, without a history entry
+    await waitFor(() => expect(onUrlUpdate).toHaveBeenCalled())
+    const [update] = onUrlUpdate.mock.calls.at(-1)!
+    expect(update.queryString).not.toContain('path=')
+    expect(update.options.history).toBe('replace')
   })
 
-  it('records an opened preview in ?file without adding a history entry', async () => {
+  it('leaves ?preview alone when the listing is incomplete', async () => {
+    // The file may simply be on a later page — dropping the param would lose the deep link.
+    const snapshot = createSnapshot({
+      columns: [makeColumn('my-bucket', [makeFile('other.png')], true)],
+    })
+    mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
+
+    const { onUrlUpdate } = renderWithProvider({ searchParams: '?preview=a.png' })
+
+    await Promise.resolve()
+    expect(onUrlUpdate).not.toHaveBeenCalled()
+    expect(snapshot.setSelectedFilePreview).not.toHaveBeenCalled()
+  })
+
+  it('drops ?preview when the file is gone from a complete listing', async () => {
+    const snapshot = createSnapshot({
+      columns: [makeColumn('my-bucket', [makeFile('other.png')])],
+    })
+    mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
+
+    const { onUrlUpdate } = renderWithProvider({ searchParams: '?preview=a.png' })
+
+    await waitFor(() => expect(onUrlUpdate).toHaveBeenCalled())
+    const [update] = onUrlUpdate.mock.calls.at(-1)!
+    expect(update.queryString).not.toContain('preview=')
+  })
+
+  it('records an opened preview in ?preview without adding a history entry', async () => {
     const snapshot = createSnapshot({
       columns: [makeColumn('my-bucket', [makeFile('a.png')])],
     })
@@ -206,23 +242,50 @@ describe('StorageExplorerNavigation', () => {
     expect(snapshot.setSelectedFilePreview).toHaveBeenCalled()
     await waitFor(() => expect(onUrlUpdate).toHaveBeenCalled())
     const [update] = onUrlUpdate.mock.calls.at(-1)!
-    expect(update.queryString).toContain('file=a.png')
+    expect(update.queryString).toContain('preview=a.png')
     expect(update.options.history).toBe('replace')
   })
 
-  it('restores a previewed file from ?file once its column has loaded', async () => {
+  it('restores a previewed file from ?preview once its column has loaded', async () => {
     const snapshot = createSnapshot({
       columns: [makeColumn('my-bucket', [makeFile('a.png')])],
     })
     mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
 
-    renderWithProvider({ searchParams: '?file=a.png' })
+    renderWithProvider({ searchParams: '?preview=a.png' })
 
     await waitFor(() => {
       expect(snapshot.setSelectedFilePreview).toHaveBeenCalledWith(
         expect.objectContaining({ name: 'a.png', columnIndex: 0 })
       )
     })
+  })
+
+  it('does not let a stale ?preview revert a freshly previewed file', async () => {
+    // Clicking a file mutates the store synchronously; the URL is written a render later.
+    // On that in-between render `?preview` still names the *previous* file, which is very
+    // much still in the column — so without a "which side moved" guard this effect finds
+    // it and pushes the preview back, undoing the click.
+    const columns = [makeColumn('my-bucket', [makeFile('a.png'), makeFile('b.png')])]
+    const snapshot = createSnapshot({
+      columns,
+      selectedFilePreview: { ...makeFile('a.png'), columnIndex: 0 },
+    })
+    mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
+
+    const { rerender } = renderWithProvider({ searchParams: '?preview=a.png' })
+    snapshot.setSelectedFilePreview.mockClear()
+
+    // Store now previews b.png while the URL still says a.png
+    mockUseStorageExplorerStateSnapshot.mockReturnValue({
+      ...snapshot,
+      selectedFilePreview: { ...makeFile('b.png'), columnIndex: 0 },
+    })
+    await act(async () => {
+      rerender()
+    })
+
+    expect(snapshot.setSelectedFilePreview).not.toHaveBeenCalled()
   })
 
   it('refetches the bucket root when switching buckets without a path', async () => {

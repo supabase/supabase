@@ -87,7 +87,7 @@ describe('FileExplorerRow', () => {
     )
     await userEvent.click(screen.getByRole('button', { name: 'avatars actions' }))
     expect(await screen.findByText('Copy relative path')).toBeInTheDocument()
-    expect(screen.getByText('Copy link')).toBeInTheDocument()
+    expect(screen.getByText('Copy URL')).toBeInTheDocument()
     expect(screen.queryByText('Copy path to folder')).not.toBeInTheDocument()
   })
 })

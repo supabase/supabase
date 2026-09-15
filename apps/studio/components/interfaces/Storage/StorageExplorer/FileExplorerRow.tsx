@@ -118,6 +118,11 @@ export const FileExplorerRow = ({
     clearPreviewedFile()
   }
 
+  // Two ways to address the same item:
+  // - "Copy relative path" gives the path within the bucket, e.g. `avatars/2024/photo.png`
+  //   — what `storage.from(bucket)` takes.
+  // - "Copy URL" gives the dashboard URL that reopens the item in this explorer. This is
+  //   NOT the object's serving URL — that's the separate "Get URL" action.
   const copyPathOptions: RowOption[] = [
     {
       name: 'Copy relative path',
@@ -125,7 +130,7 @@ export const FileExplorerRow = ({
       onClick: () => copyStoragePath(openedFolders, itemWithColumnIndex),
     },
     {
-      name: 'Copy link',
+      name: 'Copy URL',
       icon: <Link2 size={12} className="text-foreground-light" />,
       onClick: () =>
         copyStorageExplorerUrl({

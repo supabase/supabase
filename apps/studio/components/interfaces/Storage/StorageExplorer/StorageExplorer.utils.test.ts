@@ -369,7 +369,7 @@ describe('getStorageExplorerUrlForItem', () => {
 
     expect(url.pathname).toContain(`/project/${projectRef}/storage/files/buckets/${bucketId}`)
     expect(url.searchParams.get('path')).toBe('avatars/2024')
-    expect(url.searchParams.get('file')).toBeNull()
+    expect(url.searchParams.get('preview')).toBeNull()
   })
 
   it('points a file link at its parent folder plus the file', () => {
@@ -383,7 +383,7 @@ describe('getStorageExplorerUrlForItem', () => {
     )
 
     expect(url.searchParams.get('path')).toBe('avatars/2024')
-    expect(url.searchParams.get('file')).toBe('photo.png')
+    expect(url.searchParams.get('preview')).toBe('photo.png')
   })
 
   it('omits path at the bucket root', () => {
@@ -397,7 +397,7 @@ describe('getStorageExplorerUrlForItem', () => {
     )
 
     expect(url.searchParams.get('path')).toBeNull()
-    expect(url.searchParams.get('file')).toBe('photo.png')
+    expect(url.searchParams.get('preview')).toBe('photo.png')
   })
 
   it('escapes a bucket id that needs encoding', () => {

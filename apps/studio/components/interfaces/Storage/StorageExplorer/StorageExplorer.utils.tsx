@@ -172,7 +172,7 @@ export function getStorageExplorerUrlForItem({
   )
   const path = serializeStoragePath(isFolder ? [...folders, item.name] : folders)
   if (path.length > 0) url.searchParams.set('path', path)
-  if (!isFolder) url.searchParams.set('file', item.name)
+  if (!isFolder) url.searchParams.set('preview', item.name)
 
   return url.toString()
 }

@@ -212,7 +212,7 @@ test.describe('Storage', () => {
     // Opening the file records it in the URL alongside the folder
     await page.getByTitle(fileName).click()
     await expect(page).toHaveURL(new RegExp(`path=${folderName}`))
-    await expect(page).toHaveURL(new RegExp(`file=${fileName}`))
+    await expect(page).toHaveURL(new RegExp(`preview=${fileName}`))
 
     // A reload restores the same location rather than dropping back to bucket root
     const deepLink = page.url()
