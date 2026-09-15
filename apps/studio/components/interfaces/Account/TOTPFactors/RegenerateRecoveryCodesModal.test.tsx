@@ -19,7 +19,7 @@ vi.mock('ui', async (importOriginal) => ({
 
 const codes = Array.from(Array(10).keys()).map((i) => `code_${i}`)
 
-describe.only('RegenerateRecoveryCodesModal', () => {
+describe('RegenerateRecoveryCodesModal', () => {
   test('regenerate the recovery codes after confirmation and allow users to copy them', async () => {
     vi.spyOn(auth.mfa.recoveryCodes, 'regenerate').mockResolvedValue({
       data: {
