@@ -7,7 +7,8 @@ import {
   parseRevealQuery,
 } from '@/lib/api/self-hosted/api-keys'
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+const route = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+export default route
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
