@@ -31,9 +31,10 @@ interface AddNewFactorModalProps {
 export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
   const { data, mutate: enroll, isPending: isEnrolling, reset } = useMfaEnrollMutation()
   const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
-  const { data: recoveryCodesStatus } = useRecoveryCodesStatusQuery({
-    enabled: enableAuthRecoveryCodes,
-  })
+  const { isPending: isRecoveryCodesStatusPending, refetch: refetchRecoveryCodesStatus } =
+    useRecoveryCodesStatusQuery({
+      enabled: enableAuthRecoveryCodes,
+    })
 
   const recoveryCodesGenerateMutation = useRecoveryCodesGenerateMutation()
 
@@ -47,7 +48,7 @@ export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) 
     <>
       <FirstStep
         visible={visible && !Boolean(data)}
-        isEnrolling={isEnrolling}
+        isEnrolling={isEnrolling || (enableAuthRecoveryCodes && isRecoveryCodesStatusPending)}
         enroll={enroll}
         reset={reset}
         onClose={onClose}
@@ -56,14 +57,16 @@ export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) 
         visible={visible && Boolean(data)}
         factorName={data?.friendly_name ?? ''}
         factor={data as Extract<typeof data, { type: 'totp' }>}
-        isLoading={isEnrolling}
-        onClose={() => {
-          const shouldGenerateRecoveryCodes =
-            enableAuthRecoveryCodes && recoveryCodesStatus?.status === 'unenrolled'
+        isLoading={isEnrolling || (enableAuthRecoveryCodes && isRecoveryCodesStatusPending)}
+        onClose={async () => {
+          if (enableAuthRecoveryCodes) {
+            const { data: currentRecoveryCodesStatus } = await refetchRecoveryCodesStatus()
+            const shouldGenerateRecoveryCodes = currentRecoveryCodesStatus?.status === 'unenrolled'
 
-          if (shouldGenerateRecoveryCodes) {
-            recoveryCodesGenerateMutation.mutate({})
-            setIsRecoveryCodesModalOpen(true)
+            if (shouldGenerateRecoveryCodes) {
+              recoveryCodesGenerateMutation.mutate({})
+              setIsRecoveryCodesModalOpen(true)
+            }
           }
           onClose()
         }}
