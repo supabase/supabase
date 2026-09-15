@@ -3622,7 +3622,7 @@ export interface PricingPanelPlanPresentationExperimentExposedEvent {
   action: 'pricing_panel_plan_presentation_experiment_exposed'
   properties: {
     /** The experiment variant the user is enrolled in */
-    variant: 'control' | 'parity' | 'gaps'
+    variant: 'control' | 'parity' | 'gaps' | 'fullscreen' | 'fullscreen-gaps'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
