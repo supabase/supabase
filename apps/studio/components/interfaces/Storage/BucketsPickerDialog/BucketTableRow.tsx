@@ -12,27 +12,6 @@ import { formatBytes } from '@/lib/helpers'
 
 type BucketTableMode = 'standard' | 'virtualized'
 
-type BucketTableEmptyStateProps = {
-  mode: BucketTableMode
-  filterString: string
-}
-
-export const BucketTableEmptyState = ({ mode, filterString }: BucketTableEmptyStateProps) => {
-  const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
-  const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
-
-  return (
-    <BucketTableRow className="[&>td]:hover:bg-inherit">
-      <BucketTableCell colSpan={5}>
-        <p className="text-sm text-foreground">No results found</p>
-        <p className="text-sm text-foreground-lighter">
-          Your search for “{filterString}” did not return any results
-        </p>
-      </BucketTableCell>
-    </BucketTableRow>
-  )
-}
-
 type BucketTableRowProps = {
   mode: BucketTableMode
   bucket: Bucket

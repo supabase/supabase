@@ -15,7 +15,6 @@ import {
   DropdownMenuTrigger,
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableHeadSort,
@@ -42,6 +41,7 @@ import {
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
 import { AlertError } from '@/components/ui/AlertError'
 import { Shortcut } from '@/components/ui/Shortcut'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { replicationKeys } from '@/data/replication/keys'
 import {
@@ -404,16 +404,7 @@ export const Destinations = () => {
 
                   {!isDestinationsLoading &&
                     filteredDestinations.length === 0 &&
-                    hasDestinations && (
-                      <TableRow>
-                        <TableCell colSpan={6}>
-                          <p>No results found</p>
-                          <p className="text-foreground-light">
-                            Your search for “{filterString}” did not return any results.
-                          </p>
-                        </TableCell>
-                      </TableRow>
-                    )}
+                    hasDestinations && <TableRowNoResults colSpan={6} search={filterString} />}
                 </TableBody>
               </Table>
             </CardContent>
