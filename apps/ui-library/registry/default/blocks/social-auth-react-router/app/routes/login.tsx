@@ -58,7 +58,7 @@ export default function Login() {
                 <div className="flex flex-col gap-6">
                   {error && <p className="text-sm text-destructive-500">{error}</p>}
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'Logging in...' : 'Continue with GitHub'}
+                    {loading ? 'Signing in...' : 'Continue with GitHub'}
                   </Button>
                 </div>
               </fetcher.Form>

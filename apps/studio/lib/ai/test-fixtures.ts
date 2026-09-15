@@ -73,6 +73,50 @@ export function createAssistantMessageWithUpdateNotebookTool(
   }
 }
 
+export function createAssistantMessageWithCreateNotebookTool(
+  output: Record<string, unknown> = {
+    id: 'notebook-1',
+    name: 'Signup funnel',
+  },
+  id = 'assistant-notebook-msg-1'
+): UIMessage {
+  return {
+    id,
+    role: 'assistant',
+    parts: [
+      {
+        type: 'tool-create_notebook',
+        state: 'output-available',
+        toolCallId: 'call-notebook-1',
+        input: { name: 'Signup funnel', content: { schema_version: 1, cells: [] } },
+        output,
+      } satisfies ToolUIPart,
+    ],
+  }
+}
+
+export function createAssistantMessageWithDeleteNotebookTool(
+  output: Record<string, unknown> = {
+    id: 'notebook-1',
+    name: 'Signup funnel',
+  },
+  id = 'assistant-notebook-msg-1'
+): UIMessage {
+  return {
+    id,
+    role: 'assistant',
+    parts: [
+      {
+        type: 'tool-delete_notebook',
+        state: 'output-available',
+        toolCallId: 'call-notebook-1',
+        input: { id: 'notebook-1' },
+        output,
+      } satisfies ToolUIPart,
+    ],
+  }
+}
+
 export function createAssistantMessageWithMultipleTools(
   id = 'assistant-multi-tool-msg-1'
 ): UIMessage {

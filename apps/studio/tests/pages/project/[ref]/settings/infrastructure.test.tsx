@@ -12,8 +12,8 @@ import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type ProjectDetailResponse = components['schemas']['ProjectDetailResponse']
-type ProjectAddonsResponse = components['schemas']['ProjectAddonsResponse']
+type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
+type ProjectAddonsResponse = components['schemas']['ProjectAddonsResponse_Output']
 type PermissionResponse = components['schemas']['AccessControlPermission']
 
 const PROJECT_REF = 'project-ref'
@@ -306,7 +306,6 @@ function renderInfrastructurePage() {
 
 describe('/project/[ref]/settings/infrastructure', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockInfrastructureEndpoints()
     window.HTMLElement.prototype.scrollIntoView = vi.fn()
   })
@@ -339,12 +338,12 @@ describe('/project/[ref]/settings/infrastructure', () => {
     })
   })
 
-  test('focuses the recommended compute option after closing the add replica sheet', async () => {
+  test('focuses the recommended compute option after closing the add replica dialog', async () => {
     const user = userEvent.setup()
     renderInfrastructurePage()
 
     await user.click(await screen.findByRole('button', { name: 'Add read replica' }))
-    await user.click(await screen.findByRole('button', { name: 'Change to Small compute' }))
+    await user.click(await screen.findByRole('button', { name: 'Change compute' }))
 
     const smallCompute = await screen.findByRole('radio', { name: /Small/ })
     await waitFor(() => expect(smallCompute).toHaveFocus())

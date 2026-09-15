@@ -2,7 +2,7 @@ import throughputTable from '~/data/realtime/throughput.json'
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import {
-  Button,
+  cn,
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
@@ -138,22 +138,17 @@ export default function RealtimeLimitsEstimater({}) {
       )}
 
       <Collapsible open={expandPreview} onOpenChange={setExpandPreview}>
-        <CollapsibleTrigger asChild>
-          <div className="py-1 flex items-center">
-            <p className="text-sm">View raw throughput table</p>
-            <Button
-              variant="text"
-              icon={
-                <ChevronDown
-                  size={18}
-                  strokeWidth={2}
-                  className={expandPreview ? 'rotate-180' : undefined}
-                />
-              }
-              className="px-1"
-              onClick={() => setExpandPreview(!expandPreview)}
-            />
-          </div>
+        <CollapsibleTrigger className="group text-base py-1 flex items-center gap-1 cursor-pointer select-none mb-10 text-foreground-light hover:text-foreground transition-colors">
+          View raw throughput table
+          <ChevronDown
+            size={14}
+            strokeWidth={2}
+            aria-hidden
+            className={cn(
+              'text-foreground-lighter group-hover:text-foreground transition-colors',
+              expandPreview && 'rotate-180'
+            )}
+          />
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div>

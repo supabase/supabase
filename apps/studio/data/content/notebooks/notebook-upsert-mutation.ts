@@ -17,15 +17,13 @@ function buildNotebookUpsertPayload({
   description?: string
   content: WritableNotebook
 }): UpsertContentPayload {
-  writableNotebookSchema.parse(content)
-
   return {
     id,
     name,
     description,
     type: 'notebook',
     visibility: 'project',
-    content,
+    content: writableNotebookSchema.parse(content),
   }
 }
 

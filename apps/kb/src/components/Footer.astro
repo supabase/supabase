@@ -1,0 +1,79 @@
+---
+import { CheckCircle, FlaskConical, LifeBuoy } from 'lucide-react'
+import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
+
+const primaryLinks = [
+	{
+		Icon: LifeBuoy,
+		text: 'Need some help?',
+		ctaLabel: 'Contact support',
+		url: 'https://supabase.com/support',
+	},
+	{
+		Icon: FlaskConical,
+		text: 'Latest product updates?',
+		ctaLabel: 'See Changelog',
+		url: 'https://supabase.com/changelog',
+	},
+	{
+		Icon: CheckCircle,
+		text: "Something's not right?",
+		ctaLabel: 'Check system status',
+		url: 'https://status.supabase.com/',
+	},
+]
+
+const secondaryLinks = [
+	{ title: 'Open Source', url: 'https://supabase.com/open-source' },
+	{ title: 'SupaSquad', url: 'https://supabase.com/supasquad' },
+	{ title: 'Privacy', url: 'https://supabase.com/privacy' },
+]
+---
+
+<footer role="contentinfo" aria-label="footer" class="max-w-6xl px-6 mx-auto pt-12 pb-6">
+	<ul class="flex flex-col gap-2">
+		{
+			primaryLinks.map(({ Icon, text, ctaLabel, url }) => (
+				<li class="flex items-center gap-1 text-xs text-foreground-lighter">
+					<Icon aria-hidden="true" size={16} strokeWidth={1} />
+					<p>{text}</p>
+					<a href={url} class="text-brand-link hover:underline" target="_blank" rel="noreferrer noopener">
+						{ctaLabel}
+					</a>
+				</li>
+			))
+		}
+	</ul>
+	<hr class="border-default my-6" />
+	<div class="flex gap-4 items-center justify-between flex-wrap">
+		<div class="flex flex-col lg:flex-row gap-3">
+			<a href="https://supabase.com/" class="text-xs text-foreground-lighter">&copy; Supabase Inc</a>
+			<span class="text-xs text-foreground-lighter">—</span>
+			{
+				secondaryLinks.map(({ title, url }) => (
+					<a href={url} class="text-xs text-foreground-lighter hover:underline">
+						{title}
+					</a>
+				))
+			}
+		</div>
+		<div class="flex items-center gap-4">
+			<a href="https://twitter.com/supabase" class="text-foreground-muted hover:text-foreground transition">
+				<span class="sr-only">Twitter</span>
+				<IconTwitterX size={14} />
+			</a>
+			<a href="https://github.com/supabase" class="text-foreground-muted hover:text-foreground transition">
+				<span class="sr-only">GitHub</span>
+				<IconGitHubSolid size={14} />
+			</a>
+			<a href="https://discord.supabase.com/" class="text-foreground-muted hover:text-foreground transition">
+				<span class="sr-only">Discord</span>
+				<IconDiscord size={14} />
+			</a>
+			<a href="https://youtube.com/c/supabase" class="text-foreground-muted hover:text-foreground transition">
+				<span class="sr-only">Youtube</span>
+				<IconYoutubeSolid size={14} />
+			</a>
+		</div>
+	</div>
+</footer>

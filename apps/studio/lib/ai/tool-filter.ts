@@ -40,6 +40,7 @@ export const toolSetValidationSchema = z.record(
     'list_databases',
     'list_notebooks',
     'get_notebook',
+    'run_notebook',
     'create_notebook',
     'update_notebook',
     'delete_notebook',
@@ -97,6 +98,7 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   list_databases: TOOL_CATEGORIES.SCHEMA,
   list_notebooks: TOOL_CATEGORIES.SCHEMA,
   get_notebook: TOOL_CATEGORIES.SCHEMA,
+  run_notebook: TOOL_CATEGORIES.SCHEMA,
   create_notebook: TOOL_CATEGORIES.SCHEMA,
   update_notebook: TOOL_CATEGORIES.SCHEMA,
   delete_notebook: TOOL_CATEGORIES.SCHEMA,
@@ -178,6 +180,9 @@ export function createPrivacyMessageTool(toolInstance: Tool<any, any>) {
     ...toolInstance,
     description,
     execute: async (_args: any, _context: any) => ({ status: privacyMessage }),
+    // The original transformer expects the original tool's output shape. The privacy
+    // stub returns only a status message, so retaining it can crash the response stream.
+    toModelOutput: undefined,
   }
 }
 

@@ -473,11 +473,8 @@ Write _lifecycle_, not _life cycle_ or _life-cycle_.
 
 ### login and log in
 
-Use _login_ as a noun or adjective and _log in_ as a verb. Follow the terminology
-in the product UI when it uses _sign in_.
-
-- Recommended: Open the login page, and then log in.
-- Not recommended: Login to the Dashboard.
+Don't use _login_ or _log in_ in prose. Use _sign in_. See
+[sign in and sign-in](#sign-in-and-sign-in).
 
 ## M
 
@@ -519,6 +516,10 @@ Use _might_ for possibility or an uncertain outcome.
 ### must
 
 Use _must_ or _need to_ for a requirement. Don't use _must_ for a recommendation.
+
+### Multigres
+
+Use _Multigres_ for the product name. Don't write _multi-gres_ or _MultiGres_.
 
 ## N
 
@@ -655,6 +656,21 @@ Use _setup_ as a noun or adjective and _set up_ as a verb.
 - Recommended: Complete the setup to set up authentication.
 - Not recommended: Setup authentication.
 
+### shard
+
+Use _shard_ as a noun and _sharding_ for the practice of splitting data across
+nodes.
+
+### sign in and sign-in
+
+Use _sign in_, _sign out_, and _sign up_ as verbs. Use the hyphenated forms
+_sign-in_, _sign-out_, and _sign-up_ as nouns or adjectives. Match the product UI
+labels **Sign in**, **Sign out**, and **Sign up**.
+
+Keep _login_, _log in_, _logout_, _log out_, and `logOut` when quoting
+third-party UI or when they are part of code, routes, URL slugs, CLI commands, or
+established feature names such as _social login_.
+
 ### singular they
 
 Use _they_, _them_, and _their_ as gender-neutral singular pronouns. Don't use
@@ -780,6 +796,10 @@ actual operation.
 
 Write _versus_ in prose, not _vs._ Use `vs` only when it is part of a literal name
 or when space is constrained.
+
+### Vitess
+
+Use _Vitess_ for the product name.
 
 ## W
 

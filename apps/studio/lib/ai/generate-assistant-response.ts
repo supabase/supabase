@@ -39,6 +39,7 @@ export async function generateAssistantResponse({
   supportMode,
   userId,
   orgId,
+  orgSlug,
   planId,
   includesLogsSnippets,
   isExplorerEnabled,
@@ -60,6 +61,7 @@ export async function generateAssistantResponse({
   supportMode?: boolean
   userId?: string
   orgId?: number
+  orgSlug?: string
   planId?: string
   /** Whether any user message in the conversation attached a logs (ClickHouse) query. */
   includesLogsSnippets?: boolean
@@ -171,6 +173,7 @@ export async function generateAssistantResponse({
         aiOptInLevel,
         userId,
         orgId,
+        orgSlug,
         planId,
         requestedModel,
         gitBranch: process.env.VERCEL_GIT_COMMIT_REF,

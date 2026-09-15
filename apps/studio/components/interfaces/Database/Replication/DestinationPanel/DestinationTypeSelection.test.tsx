@@ -8,9 +8,9 @@ import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type ReplicationSourcesResponse = components['schemas']['ReplicationSourcesResponse']
-type ReplicationPipelinesResponse = components['schemas']['ReplicationPipelinesResponse']
-type ReplicationDestinationResponse = components['schemas']['ReplicationDestinationResponse']
+type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
+type ReplicationPipelinesResponse = components['schemas']['PipelinesResponse_Output']
+type ReplicationDestinationResponse = components['schemas']['DestinationResponse_Output']
 
 mockAnimationsApi()
 
@@ -76,10 +76,10 @@ describe('DestinationTypeSelection', () => {
     expect(await screen.findByText('Select a destination type')).toBeInTheDocument()
   })
 
-  test('renders the Pipelines group with BigQuery when the flag is enabled', async () => {
+  test('groups destinations by release stage', async () => {
     mockBigQueryEnabled.mockReturnValue(true)
-    mockIcebergEnabled.mockReturnValue(false)
-    mockDucklakeEnabled.mockReturnValue(false)
+    mockIcebergEnabled.mockReturnValue(true)
+    mockDucklakeEnabled.mockReturnValue(true)
     mockSnowflakeEnabled.mockReturnValue(false)
     mockClickHouseEnabled.mockReturnValue(false)
     addBackgroundMocks()
@@ -88,8 +88,13 @@ describe('DestinationTypeSelection', () => {
 
     fireEvent.click(await screen.findByRole('combobox'))
 
-    expect(await screen.findByText('Pipelines')).toBeInTheDocument()
+    expect(await screen.findByText('Public Alpha')).toBeInTheDocument()
+    expect(screen.getByText('Early Access')).toBeInTheDocument()
+    expect(screen.getByText('Deprecated')).toBeInTheDocument()
     expect(screen.getByText('BigQuery')).toBeInTheDocument()
+    expect(screen.getByText('DuckLake')).toBeInTheDocument()
+    expect(screen.getByText('Analytics Bucket')).toBeInTheDocument()
+    expect(screen.queryByText('Pipelines')).not.toBeInTheDocument()
   })
 
   test('hides destinations behind disabled feature flags', async () => {

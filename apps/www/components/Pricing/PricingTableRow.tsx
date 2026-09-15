@@ -166,8 +166,10 @@ export const PricingTableRowDesktop = (props: any) => {
         style={{ borderTop: 'none' }}
         id={`${props.sectionId}-desktop`}
       >
+        {/* 108px/84px are pre-hydration fallbacks only; after mount PricingComparisonTable
+            measures the sticky thead into --pricing-category-top and that value wins */}
         <th
-          className="bg-background text-foreground sticky top-[108px] xl:top-[84px] z-10 py-3 pl-6 text-left text-sm font-medium"
+          className="bg-background text-foreground sticky top-[var(--pricing-category-top,108px)] xl:top-[var(--pricing-category-top,84px)] z-10 py-3 pl-6 text-left text-sm font-medium"
           scope="colgroup"
         >
           <div className="flex items-center gap-4">
@@ -207,7 +209,7 @@ export const PricingTableRowDesktop = (props: any) => {
                   <td
                     key={i}
                     className={[
-                      `pl-6 pr-2 tier-${planName}`,
+                      `pl-6 pr-2 py-5 tier-${planName}`,
                       typeof planValue === 'boolean' ? 'text-center' : '',
                     ].join(' ')}
                   >
@@ -218,7 +220,7 @@ export const PricingTableRowDesktop = (props: any) => {
                         <IconPricingMinus plan={planValue} />
                       </div>
                     ) : (
-                      <div className="text-foreground text-xs flex flex-col justify-center">
+                      <div className="text-foreground text-xs flex flex-col justify-center gap-2">
                         <span className="flex items-center gap-2">
                           {tooltips?.[planName] && (
                             <InfoTooltip

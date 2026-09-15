@@ -106,7 +106,6 @@ vi.mock('@/components/ui/PartnerManagedResource', () => ({
 
 describe('BillingCustomerData', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
         slug: 'stripe-org',

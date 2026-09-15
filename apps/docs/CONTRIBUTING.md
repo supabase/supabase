@@ -21,18 +21,23 @@ To make docs as clear as possible:
 
 ## AI agent skills for docs authoring
 
-If you're using Claude Code or Cursor, this repo ships four skills that back the [Write the docs](../../.agents/skills/pm-the-docs/reference/write-the-docs-checklist.md) authoring checklist.
+If you're using an AI coding agent that reads `.agents/skills/`, such as Claude Code, Cursor, or Codex, invoke skills with `/name`, for example `/write-the-docs`. The canonical files live in `.agents/skills/` (`.claude/skills` is a symlink).
 
-Invoke a skill by name: `/write-the-docs`, `/ask-the-docs`, `/pm-the-docs`, `/review-the-docs`.
+### Write the docs skills
+
+Use the [Write the docs](../../.agents/skills/pm-the-docs/reference/write-the-docs-checklist.md) checklist when product intent and code drive the change: net-new pages, or revising/restructuring existing ones.
 
 | Skill | Checklist stage | Use for |
 | --- | --- | --- |
-| [`pm-the-docs`](../../.agents/skills/pm-the-docs/SKILL.md) | Frame / Shape | Audience, product-stage, and cross-cutting scope calls |
-| [`ask-the-docs`](../../.agents/skills/ask-the-docs/SKILL.md) | Frame / Shape | `apps/docs` architecture, IA placement, and where content lives |
-| [`write-the-docs`](../../.agents/skills/write-the-docs/SKILL.md) | Draft | Drafting net-new content grounded in the code |
-| [`review-the-docs`](../../.agents/skills/review-the-docs/SKILL.md) | Self-review / PR review | Checking a draft and PR triage/verification |
+| [`pm-the-docs`](../../.agents/skills/pm-the-docs/SKILL.md) | Frame / shape | Audience, stage, why, content type, cross-repo scope (universe when you have Supabase org access, else OSS path) |
+| [`ask-the-docs`](../../.agents/skills/ask-the-docs/SKILL.md) | Frame / shape | Docs-app architecture, IA placement, where content lives |
+| [`write-the-docs`](../../.agents/skills/write-the-docs/SKILL.md) | Draft | Draft or revise content grounded in intent and code |
+| [`test-the-docs`](../../.agents/skills/test-the-docs/SKILL.md) | Draft / self-review | Run snippets in a Docker-isolated stack; verification report |
+| [`review-the-docs`](../../.agents/skills/review-the-docs/SKILL.md) | Self-review / PR review | Checking a draft; verify a PR |
 
-The canonical files live in `.agents/skills/`, with Git symlinks in `.claude/skills/` and `.cursor/skills/`.
+### Edit existing pages
+
+Use [`edit-the-docs`](../../.agents/skills/edit-the-docs/SKILL.md) for style, structure, or brevity on an existing page when you are not changing the product story. 
 
 ## Document types
 

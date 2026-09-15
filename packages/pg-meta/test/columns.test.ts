@@ -294,6 +294,43 @@ withTestDatabase('retrieve, create, update, delete column', async ({ executeQuer
   expect(removedColumn).toBeUndefined()
 })
 
+withTestDatabase(
+  'update column default value to NULL via expression format',
+  async ({ executeQuery }) => {
+    // Create test table using pure SQL
+    await executeQuery('CREATE TABLE t ()')
+
+    // Create column with a non-null default
+    const { sql: createColumnSql } = pgMeta.columns.create({
+      schema: 'public',
+      table: 't',
+      name: 'c',
+      type: { name: 'text' },
+      default_value_format: 'literal',
+      default_value: 'a',
+    })
+    await executeQuery(createColumnSql)
+
+    const { sql: retrieveSql, zod: retrieveZod } = pgMeta.columns.retrieve({
+      schema: 'public',
+      table: 't',
+      name: 'c',
+    })
+    const column = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+
+    // Mirrors the Studio Table Editor "Set as NULL" default value suggestion,
+    // which sets defaultValueFormat to 'expression' with a null value.
+    const { sql: updateSql } = pgMeta.columns.update(column!, {
+      default_value_format: 'expression',
+      default_value: null,
+    })
+    await executeQuery(updateSql)
+
+    const updated = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+    expect(updated!.default_value).toBeNull()
+  }
+)
+
 withTestDatabase('enum column with quoted name', async ({ executeQuery }) => {
   await executeQuery('CREATE TYPE "T" AS ENUM (\'v\'); CREATE TABLE t ( c "T" );')
 

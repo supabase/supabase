@@ -2,6 +2,10 @@ import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import dayjs from 'dayjs'
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import {
+  SELECT_26_STUDIO_DISMISSAL_KEY,
+  useSelect26PromotionActive,
+} from 'ui-patterns/Banners/Select26Promotion'
 
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
 import { isLogsOrObservabilityPath } from './AppBannerWrapper.utils'
@@ -9,6 +13,11 @@ import { ClockSkewBanner } from '@/components/layouts/AppLayout/ClockSkewBanner'
 import { NoticeBanner } from '@/components/layouts/AppLayout/NoticeBanner'
 import { StatusPageBanner } from '@/components/layouts/AppLayout/StatusPageBanner'
 import { BannerLogsAllDeprecation } from '@/components/ui/BannerStack/Banners/BannerLogsAllDeprecation'
+import { BannerSelect2026 } from '@/components/ui/BannerStack/Banners/BannerSelect2026'
+import {
+  SELECT_26_BANNER_PRIORITY,
+  shouldShowSelect26Banner,
+} from '@/components/ui/BannerStack/Banners/BannerSelect2026.utils'
 import { BannerTOSUpdate } from '@/components/ui/BannerStack/Banners/BannerTOSUpdate'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
@@ -35,6 +44,38 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
     LOCAL_STORAGE_KEYS.TERMS_OF_SERVICE_UPDATE,
     false
   )
+
+  const [isSelect26BannerDismissed, , { isSuccess: isSelect26DismissalLoaded }] =
+    useLocalStorageQuery(SELECT_26_STUDIO_DISMISSAL_KEY, false)
+  const isSelect26PromotionActive = useSelect26PromotionActive()
+
+  useEffect(() => {
+    if (!isSelect26DismissalLoaded) return
+
+    const shouldShow = shouldShowSelect26Banner({
+      isPlatform: IS_PLATFORM,
+      dismissalLoaded: isSelect26DismissalLoaded,
+      isActive: isSelect26PromotionActive,
+      isDismissed: isSelect26BannerDismissed,
+    })
+
+    if (shouldShow) {
+      addBanner({
+        id: BANNER_ID.SELECT_26,
+        isDismissed: false,
+        content: <BannerSelect2026 />,
+        priority: SELECT_26_BANNER_PRIORITY,
+      })
+    } else {
+      dismissBanner(BANNER_ID.SELECT_26)
+    }
+  }, [
+    isSelect26DismissalLoaded,
+    isSelect26PromotionActive,
+    isSelect26BannerDismissed,
+    addBanner,
+    dismissBanner,
+  ])
 
   useEffect(() => {
     if (Date.now() >= TOSUpdateExpiry.getTime()) return

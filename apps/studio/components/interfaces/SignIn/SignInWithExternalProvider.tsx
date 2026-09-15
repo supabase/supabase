@@ -14,6 +14,9 @@ import {
 } from '@/lib/external-identity-providers'
 import { getErrorMessage } from '@/lib/get-error-message'
 import { auth, buildPathWithParams } from '@/lib/gotrue'
+import { classifyApiError } from '@/lib/telemetry/funnel-errors'
+import { useTrack } from '@/lib/telemetry/track'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 interface SignInWithExternalProviderProps {
   provider: ExternalIdentityProviderConfig
@@ -22,9 +25,12 @@ interface SignInWithExternalProviderProps {
 export const SignInWithExternalProvider = ({ provider }: SignInWithExternalProviderProps) => {
   const [loading, setLoading] = useState(false)
   const [, setLastSignInUsed] = useLastSignIn()
+  const track = useTrack()
+  const trackFunnelError = useTrackFunnelError()
 
   async function handleSignIn() {
     setLoading(true)
+    track('sign_in_submitted', { category: 'account', method: provider.id })
 
     try {
       // Redirects to /sign-in-mfa to check if the user has MFA set up before entering the dashboard
@@ -40,7 +46,8 @@ export const SignInWithExternalProvider = ({ provider }: SignInWithExternalProvi
       setLastSignInUsed(provider.id)
     } catch (error: unknown) {
       const message = getErrorMessage(error) ?? 'Unknown error'
-      toast.error(`Failed to sign in via ${provider.displayName}: ${message}`)
+      const toastId = toast.error(`Failed to sign in via ${provider.displayName}: ${message}`)
+      trackFunnelError('signin', classifyApiError('signin', error), 'toast', toastId)
       captureCriticalError(
         error instanceof Error ? error : new Error(message),
         `sign in via ${provider.displayName}`

@@ -186,7 +186,6 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
           <DropdownMenuTrigger asChild>
             <Button
               size="tiny"
-              variant="default"
               iconRight={
                 <ChevronDown
                   size={14}
@@ -243,7 +242,6 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
             <DropdownMenuSeparator />
             <div className="p-1">
               <Button
-                variant="default"
                 size="tiny"
                 className="w-full"
                 onClick={() => {

@@ -37,7 +37,12 @@ export const MakeReportSnippetPublicModal = ({
       upsertContent(
         {
           projectRef,
-          payload: { ...item, visibility: 'project', folder_id: null },
+          payload: {
+            ...item,
+            description: item.description ?? undefined,
+            visibility: 'project',
+            folder_id: null,
+          },
         },
         {
           onSuccess: () => {

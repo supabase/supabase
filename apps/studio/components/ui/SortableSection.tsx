@@ -27,7 +27,11 @@ export const SortableSection = ({
 
   useDndMonitor({
     onDragStart: (event) => {
-      if (event.active.id === id) isDraggingRef.current = true
+      if (event.active.id === id) {
+        isDraggingRef.current = true
+        clearTimeout(openTimeoutRef.current)
+        setMenuOpen(false)
+      }
     },
     onDragEnd: (event) => {
       if (event.active.id === id) isDraggingRef.current = false

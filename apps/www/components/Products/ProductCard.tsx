@@ -1,7 +1,9 @@
+'use client'
+
 import Panel from '~/components/Panel'
-import { detectBrowser, isBrowser } from 'common'
+import { detectBrowser } from 'common'
 import Link from 'next/link'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { cn } from 'ui'
 
 const ProductCard = ({
@@ -26,73 +28,82 @@ const ProductCard = ({
   onClick?: any
   alignLeft?: boolean
   isDatabase?: boolean
-}) => (
-  <Link
-    href={url}
-    className={cn(
-      'group relative w-full sm:h-[400px] flex flex-col gap-5 lg:flex-row focus-ring rounded-xl',
-      className
-    )}
-    onClick={onClick}
-  >
-    <Panel
-      hasShimmer={isBrowser && detectBrowser() !== 'Safari'}
-      hasActiveOnHover
-      hasMotion={title.includes('Edge Functions')}
-      outerClassName="relative w-full h-full"
-      innerClassName={cn(
-        'relative overflow-hidden flex-1 flex flex-row sm:flex-col gap-4 items-start sm:items-center lg:items-start justify-between',
-        'bg-surface-75 w-full h-full text-foreground-lighter [&_strong]:font-normal! [&_strong]:text-foreground!',
-        'p-4 sm:py-6'
+}) => {
+  // Enable cursor shimmer after mount so SSR HTML matches the first client paint.
+  // (isBrowser during render caused a className hydration mismatch on Panel.)
+  const [hasShimmer, setHasShimmer] = useState(false)
+  useEffect(() => {
+    setHasShimmer(detectBrowser() !== 'Safari')
+  }, [])
+
+  return (
+    <Link
+      href={url}
+      className={cn(
+        'group relative w-full sm:h-[400px] flex flex-col gap-5 lg:flex-row focus-ring rounded-xl',
+        className
       )}
+      onClick={onClick}
     >
-      <div
-        className={cn(
-          'relative z-10',
-          'h-full w-full',
-          'mx-auto gap-2 sm:gap-4',
-          'flex flex-col items-start sm:items-center',
-          'text-left sm:text-center',
-          alignLeft && !isDatabase && 'lg:mx-0 lg:pl-2 lg:items-start lg:text-left',
-          alignLeft &&
-            isDatabase &&
-            'md:ml-2 md:mt-2 lg:pl-0 md:justify-start md:max-w-[250px] md:text-left md:items-start'
+      <Panel
+        hasShimmer={hasShimmer}
+        hasActiveOnHover
+        hasMotion={title.includes('Edge Functions')}
+        outerClassName="relative w-full h-full"
+        innerClassName={cn(
+          'relative overflow-hidden flex-1 flex flex-row sm:flex-col gap-4 items-start sm:items-center lg:items-start justify-between',
+          'bg-surface-75 w-full h-full text-foreground-lighter [&_strong]:font-normal! [&_strong]:text-foreground!',
+          'p-4 sm:py-6'
         )}
       >
-        <div className="flex items-center gap-2 text-foreground">
-          {icon && (
-            <svg
-              aria-hidden="true"
-              width="18"
-              height="18"
-              viewBox="0 0 25 25"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d={icon}
-                stroke="currentColor"
-                strokeMiterlimit="10"
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                strokeWidth="1.5"
-              />
-            </svg>
+        <div
+          className={cn(
+            'relative z-10',
+            'h-full w-full',
+            'mx-auto gap-2 sm:gap-4',
+            'flex flex-col items-start sm:items-center',
+            'text-left sm:text-center',
+            alignLeft && !isDatabase && 'lg:mx-0 lg:pl-2 lg:items-start lg:text-left',
+            alignLeft &&
+              isDatabase &&
+              'md:ml-2 md:mt-2 lg:pl-0 md:justify-start md:max-w-[250px] md:text-left md:items-start'
           )}
-          <h2 className="">{title}</h2>
+        >
+          <div className="flex items-center gap-2 text-foreground">
+            {icon && (
+              <svg
+                aria-hidden="true"
+                width="18"
+                height="18"
+                viewBox="0 0 25 25"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d={icon}
+                  stroke="currentColor"
+                  strokeMiterlimit="10"
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  strokeWidth="1.5"
+                />
+              </svg>
+            )}
+            <h2 className="">{title}</h2>
+          </div>
+          <div className="flex-1 flex flex-col justify-between gap-2">
+            <p className="text-sm [&_strong]:text-foreground!">{subtitle}</p>
+            {highlights && (
+              <span className={cn('hidden lg:block text-foreground', isDatabase && 'md:block')}>
+                {highlights}
+              </span>
+            )}
+          </div>
         </div>
-        <div className="flex-1 flex flex-col justify-between gap-2">
-          <p className="text-sm [&_strong]:text-foreground!">{subtitle}</p>
-          {highlights && (
-            <span className={cn('hidden lg:block text-foreground', isDatabase && 'md:block')}>
-              {highlights}
-            </span>
-          )}
-        </div>
-      </div>
-      {image && <span aria-hidden="true">{image}</span>}
-    </Panel>
-  </Link>
-)
+        {image && <span aria-hidden="true">{image}</span>}
+      </Panel>
+    </Link>
+  )
+}
 
 export default ProductCard

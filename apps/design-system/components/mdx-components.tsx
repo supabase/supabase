@@ -1,6 +1,5 @@
 'use client'
 
-import { useMDXComponent } from 'next-contentlayer2/hooks'
 import Image from 'next/image'
 import Link from 'next/link'
 import * as React from 'react'
@@ -43,6 +42,7 @@ import {
 import { Icons } from '@/components/icons'
 import { ThemeSettings } from '@/components/theme-settings'
 import { useConfig } from '@/hooks/use-config'
+import { useMDXComponent } from '@/lib/use-mdx-component'
 import { Style } from '@/registry/styles'
 
 const components = {

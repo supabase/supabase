@@ -242,7 +242,6 @@ export const EnumeratedTypes = () => {
                                 <TooltipTrigger asChild>
                                   <DropdownMenuTrigger asChild>
                                     <Button
-                                      variant="default"
                                       className="px-1"
                                       icon={<MoreVertical />}
                                       aria-label={`${type.name} actions`}
