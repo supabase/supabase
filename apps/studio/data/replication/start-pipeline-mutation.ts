@@ -44,16 +44,22 @@ export const useStartPipelineMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables
 
-      await queryClient.invalidateQueries({
-        queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
-      })
+      await queryClient.invalidateQueries(
+        {
+          queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
+        },
+        { cancelRefetch: false }
+      )
 
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
-      await queryClient.invalidateQueries({
-        queryKey: replicationKeys.pipelinesStatus(variables.projectRef, variables.pipelineId),
-      })
+      await queryClient.invalidateQueries(
+        {
+          queryKey: replicationKeys.pipelinesStatus(variables.projectRef, variables.pipelineId),
+        },
+        { cancelRefetch: false }
+      )
 
       if (onError === undefined) {
         toast.error(`Failed to start pipeline: ${data.message}`)

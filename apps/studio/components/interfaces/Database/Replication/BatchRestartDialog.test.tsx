@@ -1,21 +1,17 @@
-import { act, fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
+import type { components } from 'api-types'
+import { HttpResponse } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
 
 import { BatchRestartDialog } from './BatchRestartDialog'
+import { RestartTableDialog } from './RestartTableDialog'
 import type { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
 
-const mocks = vi.hoisted(() => ({
-  rollbackTables: vi.fn().mockResolvedValue({ pipeline_id: 9, tables: [] }),
-}))
-
-vi.mock('common', () => ({
-  useParams: () => ({ ref: 'project-ref', pipelineId: '9' }),
-}))
-vi.mock('@/data/replication/rollback-tables-mutation', () => ({
-  useRollbackTablesMutation: () => ({
-    mutateAsync: mocks.rollbackTables,
-    isPending: false,
-  }),
+vi.mock('common', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('common')>()),
+  useParams: () => ({ ref: 'default', pipelineId: '9' }),
 }))
 vi.mock('./RestartCostEstimate', () => ({
   RestartCostEstimate: ({ tables }: { tables: { schema: string; name: string }[] }) => (
@@ -51,10 +47,24 @@ describe('BatchRestartDialog', () => {
       table(4, { name: 'following_wal' }),
     ]
 
-    render(
+    const requests: unknown[] = []
+    const onOpenChange = vi.fn()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/rollback-tables',
+      response: async ({ request }) => {
+        requests.push(await request.json())
+        return HttpResponse.json<components['schemas']['RollbackTablesResponse_Output']>({
+          pipeline_id: 9,
+          tables: [1, 2, 3].map((table_id) => ({ table_id, new_state: { name: 'queued' } })),
+        })
+      },
+    })
+
+    customRender(
       <BatchRestartDialog
         open
-        onOpenChange={vi.fn()}
+        onOpenChange={onOpenChange}
         mode="errored"
         tables={tables}
         tableSyncCopy={{ type: 'include_tables', table_ids: [1, 2] }}
@@ -70,11 +80,44 @@ describe('BatchRestartDialog', () => {
     })
 
     expect(onRestartStart).toHaveBeenCalledWith([1, 2, 3])
-    expect(mocks.rollbackTables).toHaveBeenCalledWith(
-      expect.objectContaining({
-        pipelineId: 9,
-        target: { type: 'all_errored_tables' },
-      })
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
+    expect(requests).toEqual([{ target: { type: 'all_errored_tables' } }])
+  })
+
+  it.each(['all', 'single'] as const)('sends only the %s reset target', async (target) => {
+    const onOpenChange = vi.fn()
+    const requests: unknown[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/rollback-tables',
+      response: async ({ request }) => {
+        requests.push(await request.json())
+        return HttpResponse.json<components['schemas']['RollbackTablesResponse_Output']>({
+          pipeline_id: 9,
+          tables: [{ table_id: 1, new_state: { name: 'queued' } }],
+        })
+      },
+    })
+    customRender(
+      target === 'all' ? (
+        <BatchRestartDialog
+          open
+          mode="all"
+          tables={[table(1, { name: 'following_wal' })]}
+          onOpenChange={onOpenChange}
+        />
+      ) : (
+        <RestartTableDialog
+          open
+          table={table(1, { name: 'following_wal' })}
+          onOpenChange={onOpenChange}
+        />
+      )
     )
+    fireEvent.click(screen.getByRole('button', { name: 'Restart' }))
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
+    expect(requests).toEqual([
+      { target: target === 'all' ? { type: 'all_tables' } : { type: 'single_table', table_id: 1 } },
+    ])
   })
 })

@@ -228,24 +228,33 @@ export const useUpdateDestinationPipelineMutation = ({
     {
       mutationFn: (vars) => updateDestinationPipeline(vars),
       async onSuccess(data, variables, context) {
-        const { projectRef, destinationId, pipelineId } = variables
-
+        const { projectRef } = variables
+        // These prefixes include list, editor, pipeline status, and table metrics caches.
         await Promise.all([
-          // Invalidate lists
-          queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
-          queryClient.invalidateQueries({ queryKey: replicationKeys.pipelines(projectRef) }),
-          // Invalidate item-level caches used by the editor panel
-          queryClient.invalidateQueries({
-            queryKey: replicationKeys.destinationById(projectRef, destinationId),
-          }),
-          queryClient.invalidateQueries({
-            queryKey: replicationKeys.pipelineById(projectRef, pipelineId),
-          }),
+          queryClient.invalidateQueries(
+            { queryKey: replicationKeys.destinations(projectRef) },
+            { cancelRefetch: false }
+          ),
+          queryClient.invalidateQueries(
+            { queryKey: replicationKeys.pipelines(projectRef) },
+            { cancelRefetch: false }
+          ),
         ])
 
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
+        // Settings may commit before runtime recreation fails.
+        await Promise.all([
+          queryClient.invalidateQueries(
+            { queryKey: replicationKeys.destinations(variables.projectRef) },
+            { cancelRefetch: false }
+          ),
+          queryClient.invalidateQueries(
+            { queryKey: replicationKeys.pipelines(variables.projectRef) },
+            { cancelRefetch: false }
+          ),
+        ])
         if (onError === undefined) {
           toast.error(`Failed to update destination or pipeline: ${data.message}`)
         } else {

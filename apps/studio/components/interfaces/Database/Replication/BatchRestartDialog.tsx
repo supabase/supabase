@@ -57,24 +57,28 @@ export const BatchRestartDialog = ({
     [affectedTables, tableSyncCopy]
   )
 
-  const initialSyncDescription =
-    copiedTables.length === 0 ? (
-      <li>
-        <strong>No table will run an initial sync.</strong> Replication will resume with new changes
-        only, without syncing existing rows in your database. There is no additional initial sync
-        charge.
-      </li>
-    ) : copiedTables.length === affectedTables.length ? (
-      <li>
-        <strong>
-          {copiedTables.length === 1
-            ? 'The table will run its initial sync again.'
-            : `All ${copiedTables.length} tables will run initial sync again.`}
-        </strong>{' '}
-        Existing rows in your database will be synced again. Data successfully processed during this
-        initial sync is billed again.
-      </li>
-    ) : (
+  const renderInitialSyncDescription = () => {
+    if (copiedTables.length === 0)
+      return (
+        <li>
+          <strong>No table will run an initial sync.</strong> Replication will resume with new
+          changes only, without syncing existing rows in your database. There is no additional
+          initial sync charge.
+        </li>
+      )
+    if (copiedTables.length === affectedTables.length)
+      return (
+        <li>
+          <strong>
+            {copiedTables.length === 1
+              ? 'The table will run its initial sync again.'
+              : `All ${copiedTables.length} tables will run initial sync again.`}
+          </strong>{' '}
+          Existing rows in your database will be synced again. Data successfully processed during
+          this initial sync is billed again.
+        </li>
+      )
+    return (
       <li>
         <strong>
           {copiedTables.length} of {affectedTables.length} tables will run initial sync again.
@@ -83,6 +87,7 @@ export const BatchRestartDialog = ({
         remaining tables will resume replication with new changes only.
       </li>
     )
+  }
 
   const { mutateAsync: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: (data) => {
@@ -123,7 +128,7 @@ export const BatchRestartDialog = ({
                 {affectedTables.length === 1 ? '' : 's'} in this pipeline:
               </p>
               <ul className="list-disc list-inside space-y-1.5 pl-2">
-                {initialSyncDescription}
+                {renderInitialSyncDescription()}
                 <li>
                   <strong>All downstream data will be deleted.</strong> All replicated data will be
                   removed.
@@ -146,7 +151,7 @@ export const BatchRestartDialog = ({
                 <strong>{affectedTables.length} currently failed tables</strong>:
               </p>
               <ul className="list-disc list-inside space-y-1.5 pl-2">
-                {initialSyncDescription}
+                {renderInitialSyncDescription()}
                 <li>
                   <strong>Existing downstream data will be deleted.</strong> Replicated data for
                   these tables will be removed.

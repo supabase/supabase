@@ -46,18 +46,24 @@ export const useRestartPipelineMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables
 
-      await queryClient.invalidateQueries({
-        queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
-      })
+      await queryClient.invalidateQueries(
+        {
+          queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
+        },
+        { cancelRefetch: false }
+      )
 
       await onSuccess?.(data, variables, context)
     },
     // No default error toast here: callers already show one from their try/catch around
     // mutateAsync, so a default here would double up. onError is only for opt-in callers.
     async onError(data, variables, context) {
-      await queryClient.invalidateQueries({
-        queryKey: replicationKeys.pipelinesStatus(variables.projectRef, variables.pipelineId),
-      })
+      await queryClient.invalidateQueries(
+        {
+          queryKey: replicationKeys.pipelinesStatus(variables.projectRef, variables.pipelineId),
+        },
+        { cancelRefetch: false }
+      )
 
       await onError?.(data, variables, context)
     },

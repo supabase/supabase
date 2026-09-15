@@ -1,14 +1,22 @@
 import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
+import type { ComponentProps } from 'react'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { getPipelineDisplayState, getStatusName } from './Pipeline.utils'
+import { getPipelineDisplayState, getStatusName, type PipelineDisplayType } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
 import type { ResponseError } from '@/types'
+
+const BADGE_VARIANTS: Record<PipelineDisplayType, ComponentProps<typeof Badge>['variant']> = {
+  failure: 'destructive',
+  success: 'success',
+  loading: 'default',
+  idle: 'default',
+}
 
 interface PipelineStatusProps {
   pipelineStatus: ReplicationPipelineStatusData['status'] | undefined
@@ -34,6 +42,8 @@ export const PipelineStatus = ({
   const statusName = getStatusName(pipelineStatus)
   const displayState = getPipelineDisplayState(requestStatus, statusName)
   const { type, message, label } = displayState
+  const isRequestPending =
+    requestStatus !== undefined && requestStatus !== PipelineStatusRequestStatus.None
 
   const pipelineLogsUrl = pipelineId
     ? `/project/${ref}/logs/replication-logs?f=${encodeURIComponent(
@@ -41,15 +51,15 @@ export const PipelineStatus = ({
       )}`
     : `/project/${ref}/logs/replication-logs`
 
-  const showLogsCTA = [PipelineStatusName.UNKNOWN, PipelineStatusName.FAILED].includes(
+  const shouldShowLogsCTA = [PipelineStatusName.UNKNOWN, PipelineStatusName.FAILED].includes(
     statusName as PipelineStatusName
   )
 
   return (
-    <>
-      {isLoading && <ShimmeringLoader />}
+    <div aria-live="polite" aria-atomic="true">
+      {isLoading && !isRequestPending && <ShimmeringLoader />}
 
-      {isError && (
+      {isError && !isRequestPending && (
         <Tooltip>
           <TooltipTrigger>
             <Badge variant="default">Unknown</Badge>
@@ -60,23 +70,17 @@ export const PipelineStatus = ({
         </Tooltip>
       )}
 
-      {isSuccess && (
+      {(isSuccess || isRequestPending) && (
         <Tooltip>
           <TooltipTrigger asChild>
             <div className="flex items-center gap-x-2">
-              <Badge
-                variant={
-                  type === 'failure' ? 'destructive' : type === 'success' ? 'success' : 'default'
-                }
-              >
-                {label}
-              </Badge>
+              <Badge variant={BADGE_VARIANTS[type]}>{label}</Badge>
               {type === 'loading' && <Loader2 className="animate-spin w-3 h-3" />}
             </div>
           </TooltipTrigger>
           <TooltipContent side="bottom">
-            {message}{' '}
-            {showLogsCTA && (
+            {message} {isError && `Unable to refresh status: ${error?.message}.`}{' '}
+            {shouldShowLogsCTA && !isRequestPending && (
               <>
                 Check the <InlineLink href={pipelineLogsUrl}>logs</InlineLink> for more information.
               </>
@@ -84,6 +88,6 @@ export const PipelineStatus = ({
           </TooltipContent>
         </Tooltip>
       )}
-    </>
+    </div>
   )
 }

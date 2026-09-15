@@ -5,6 +5,10 @@ import { describe, expect, test } from 'vitest'
 
 import { replicationKeys } from './keys'
 import {
+  useReplicationPipelineReplicationStatusQuery,
+  type ReplicationPipelineReplicationStatusData,
+} from './pipeline-replication-status-query'
+import {
   useReplicationPipelineStatusQuery,
   type ReplicationPipelineStatusResponse,
 } from './pipeline-status-query'
@@ -26,6 +30,61 @@ const operations = [
 ] as const
 
 describe('pipeline lifecycle status', () => {
+  test('refreshes committed table resets when runtime recreation fails', async () => {
+    let hasReset = false
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
+      response: () =>
+        HttpResponse.json<ReplicationPipelineStatusResponse>({
+          pipeline_id: 1,
+          status: { name: 'stopped' },
+        }),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/replication-status',
+      response: () =>
+        HttpResponse.json<ReplicationPipelineReplicationStatusData>({
+          pipeline_id: 1,
+          apply_lag: null,
+          table_statuses: [
+            {
+              id: 1,
+              schema: 'public',
+              name: 'orders',
+              table_id: 1,
+              table_name: 'public.orders',
+              state: { name: hasReset ? 'queued' : 'following_wal' },
+            },
+          ],
+        }),
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/rollback-tables',
+      response: () => {
+        hasReset = true
+        return HttpResponse.json<APIErrorBody>({ message: 'Runtime unavailable' }, { status: 503 })
+      },
+    })
+    const { result } = customRenderHook(() => ({
+      tables: useReplicationPipelineReplicationStatusQuery(variables, { refetchInterval: false }),
+      rollback: useRollbackTablesMutation({ onError: () => {} }),
+    }))
+    await waitFor(() =>
+      expect(result.current.tables.data?.table_statuses[0].state.name).toBe('following_wal')
+    )
+    await act(async () => {
+      await expect(result.current.rollback.mutateAsync(variables)).rejects.toMatchObject({
+        message: 'Runtime unavailable',
+      })
+    })
+    await waitFor(() =>
+      expect(result.current.tables.data?.table_statuses[0].state.name).toBe('queued')
+    )
+  })
+
   test.each(['starting', 'stopping'] as const)('polls promptly while %s', async (initialStatus) => {
     let hasResponded = false
     addAPIMock({
