@@ -39,5 +39,6 @@ export const useWarehouseSetupStatusQuery = <TData = WarehouseSetupStatusData>(
     queryKey: warehouseKeys.setupStatus(projectRef),
     queryFn: ({ signal }) => getWarehouseSetupStatus({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
+    retry: false,
     ...options,
   })

@@ -108,6 +108,7 @@
     "framer-motion": "^11.18.2",
     "fuse.js": "^7.4.0",
     "generate-password-browser": "^1.1.0",
+    "gqlmin": "^0.3.1",
     "graphiql": "^5.2.2",
     "html-to-image": "^1.11.13",
     "http-status": "^2.1.0",
