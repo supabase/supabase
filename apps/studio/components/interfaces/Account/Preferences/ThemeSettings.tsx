@@ -103,7 +103,7 @@ export const ThemeSettings = () => {
               <Label htmlFor="theme" className="text-foreground">
                 Theme mode
               </Label>
-              <p className="text-sm text-foreground-light">
+              <p className="text-sm text-foreground-lighter">
                 Choose how Supabase looks to you. Select a single theme, or sync with your system.
               </p>
             </div>
