@@ -234,6 +234,25 @@ describe('createPrivacyMessageTool', () => {
 
     const result = await privacyTool.execute({}, {})
     expect(result.status).toContain("You don't have permission to use this tool")
+    expect(result.status).toContain('third-party AI providers')
+    expect(result.status).not.toContain('Bedrock')
+  })
+
+  it('uses HIPAA copy when the project is HIPAA-restricted', async () => {
+    const originalTool = {
+      description: 'Original description',
+      inputSchema: z.object({}),
+      execute: vitest.fn(),
+    }
+
+    const privacyTool = createPrivacyMessageTool(originalTool, true)
+
+    expect(privacyTool.description).toContain('marked as HIPAA')
+
+    const result = await privacyTool.execute({}, {})
+    expect(result.status).toContain('marked as HIPAA')
+    // The user cannot act on the opt-in advice, so it must not appear
+    expect(result.status).not.toContain('choose your preferred data sharing level')
   })
 })
 
