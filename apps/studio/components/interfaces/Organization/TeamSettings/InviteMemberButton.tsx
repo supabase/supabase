@@ -130,6 +130,7 @@ export const InviteMemberButton = () => {
     : !canInviteMembers
       ? 'You need additional permissions to invite members to this organization'
       : undefined
+  const isInviteDisabled = inviteDisabledReason !== undefined
 
   const { mutateAsync: inviteMemberAsync, isPending: isInviting } =
     useOrganizationCreateInvitationMutation()
@@ -279,15 +280,14 @@ export const InviteMemberButton = () => {
       <SheetTrigger asChild>
         <Shortcut
           id={SHORTCUT_IDS.ORG_TEAM_INVITE}
-          onTrigger={() => {
-            if (canInviteMembers) setIsOpen(true)
-          }}
+          onTrigger={() => setIsOpen(true)}
+          options={{ enabled: !isInviteDisabled }}
           side="bottom"
-          tooltipOpen={isOpen || inviteDisabledReason !== undefined ? false : undefined}
+          tooltipOpen={isOpen || isInviteDisabled ? false : undefined}
         >
           <ButtonTooltip
             variant="primary"
-            disabled={!canInviteMembers}
+            disabled={isInviteDisabled}
             icon={<UserPlus size={14} />}
             className="pointer-events-auto grow md:grow-0"
             onClick={() => setIsOpen(true)}

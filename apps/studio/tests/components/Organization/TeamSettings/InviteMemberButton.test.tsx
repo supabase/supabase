@@ -32,7 +32,7 @@ vi.mock('@/hooks/misc/useCheckPermissions', () => ({
 }))
 
 vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
-  useIsFeatureEnabled: () => ({ organizationMembersCreate: true }),
+  useIsFeatureEnabled: mockIsFeatureEnabled,
 }))
 
 vi.mock('@/data/organizations/organization-members-query', () => ({
@@ -76,8 +76,9 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
   useCheckEntitlements: () => ({ hasAccess: false }),
 }))
 
-const { mockRolesManagementPermissions } = vi.hoisted(() => ({
+const { mockRolesManagementPermissions, mockIsFeatureEnabled } = vi.hoisted(() => ({
   mockRolesManagementPermissions: vi.fn(),
+  mockIsFeatureEnabled: vi.fn(),
 }))
 
 vi.mock('@/components/interfaces/Organization/TeamSettings/TeamSettings.utils', () => ({
@@ -127,6 +128,22 @@ describe('InviteMemberButton', () => {
       rolesAddable: [1, 2, 3, 4],
       rolesRemovable: [1, 2, 3, 4],
     })
+    mockIsFeatureEnabled.mockReturnValue({ organizationMembersCreate: true })
+  })
+
+  it('disables the button when member creation is turned off despite sufficient permissions', async () => {
+    mockIsFeatureEnabled.mockReturnValue({ organizationMembersCreate: false })
+    customRender(<InviteMemberButton />)
+
+    const button = screen.getByRole('button', { name: /invite members/i })
+    expect(button).toHaveAttribute('aria-disabled', 'true')
+
+    await userEvent.click(button)
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+
+    await userEvent.hover(button)
+    expect(await screen.findAllByText('Inviting members is currently disabled')).not.toHaveLength(0)
+    expect(screen.queryAllByText(/shift|⇧/i)).toHaveLength(0)
   })
 
   describe('when the user cannot invite members', () => {
