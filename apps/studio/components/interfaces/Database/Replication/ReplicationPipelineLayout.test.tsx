@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { ReactNode } from 'react'
+import { ReactNode, type AnchorHTMLAttributes } from 'react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { ReplicationPipelineLayout } from './ReplicationPipelineLayout'
@@ -25,6 +25,18 @@ vi.mock('common', async (importOriginal) => ({
 
 vi.mock('@/compat/next/router', () => ({
   useRouter: () => ({ push: vi.fn() }),
+}))
+
+vi.mock('@/compat/next/link', () => ({
+  default: ({
+    href,
+    children,
+    ...props
+  }: AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
 }))
 
 const renderLayout = (children?: ReactNode) =>
