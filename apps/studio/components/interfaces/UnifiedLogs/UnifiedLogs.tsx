@@ -521,7 +521,7 @@ export const UnifiedLogs = () => {
                         <div className="text-sm flex flex-col gap-y-1">
                           <p className="text-foreground-light">No results found</p>
                           <p className="text-foreground-lighter">
-                            Filtering by user is only supported for Auth and Postgres log types
+                            Filtering by user is only supported for Auth and API Gateway log types
                           </p>
                         </div>
                       ) : undefined
