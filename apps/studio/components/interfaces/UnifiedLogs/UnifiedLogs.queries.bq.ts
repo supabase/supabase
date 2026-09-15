@@ -73,7 +73,10 @@ const buildConditions = (
       const likeOp = isNeq ? NOT_LIKE_OP : LIKE_OP
       const joinAndOr = isNeq ? ' AND ' : ' OR '
 
-      if (key === 'event_message' && (operator === '~~*' || operator === '!~~*')) {
+      if (
+        (key === 'event_message' || key === 'pathname') &&
+        (operator === '~~*' || operator === '!~~*')
+      ) {
         // BigQuery has no ILIKE; emulate via LOWER(col) (NOT) LIKE LOWER('%v%').
         // Auto-wrap with `%…%` unless the user already included one. Multiple
         // ILIKE values join with OR; NOT ILIKE joins with AND (row must contain

@@ -179,11 +179,20 @@ const translateFilter = (
       // Postgres SQLSTATE for postgres rows. Inline STATUS_EXPR so e.g.
       // filtering on '00000' picks up postgres success rows.
       return safeSql`(${STATUS_EXPR}) ${inOp} ${inList(values)}`
-    case 'pathname':
+    case 'pathname': {
+      if (operator === '~~*' || operator === '!~~*') {
+        const op = operator === '~~*' ? ILIKE_OP : NOT_ILIKE_OP
+        const join = operator === '!~~*' ? ' AND ' : ' OR '
+        return safeSql`(${joinSqlFragments(
+          values.map((v) => safeSql`${ATTR.path} ${op} ${lit('%' + v + '%')}`),
+          join
+        )})`
+      }
       return safeSql`(${joinSqlFragments(
         values.map((v) => safeSql`${ATTR.path} ${likeOp} ${lit('%' + v + '%')}`),
         joinAndOr
       )})`
+    }
     case 'host':
       // Best-effort: use full request URL since `host` isn't a top-level field.
       return safeSql`(${joinSqlFragments(

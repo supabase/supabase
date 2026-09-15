@@ -126,6 +126,25 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toContain(`log_attributes['request.url'] NOT LIKE '%cdn.foo%'`)
     })
 
+    it('emits ILIKE for pathname `~~*`, case-insensitive unlike the `=` LIKE behavior', () => {
+      const sql = getUnifiedLogsQuery(withFilters('pathname:ilike:Customers'))
+      expect(sql).toContain(`log_attributes['request.path'] ILIKE '%Customers%'`)
+    })
+
+    it('emits NOT ILIKE for pathname `!~~*` so rows matching the term are excluded', () => {
+      const sql = getUnifiedLogsQuery(withFilters('pathname:notilike:health'))
+      expect(sql).toContain(`log_attributes['request.path'] NOT ILIKE '%health%'`)
+    })
+
+    it('joins multiple pathname NOT ILIKE values with AND (row must match none)', () => {
+      const sql = getUnifiedLogsQuery(
+        withFilters('pathname:notilike:health', 'pathname:notilike:metrics')
+      )
+      expect(sql).toMatch(
+        /log_attributes\['request\.path'\] NOT ILIKE '%health%' AND log_attributes\['request\.path'\] NOT ILIKE '%metrics%'/
+      )
+    })
+
     it('emits ILIKE with auto-wrapped `%…%` for event_message `~~*`', () => {
       const sql = getUnifiedLogsQuery(withFilters('event_message:ilike:Permission Denied'))
       expect(sql).toContain(`event_message ILIKE '%Permission Denied%'`)
@@ -455,6 +474,18 @@ describe('UnifiedLogs.queries.bq', () => {
   it('emulates NOT ILIKE with LOWER()/NOT LIKE/LOWER() for event_message `!~~*`', () => {
     const sql = getUnifiedLogsQueryBQ(withFilters('event_message:notilike:cron'))
     expect(sql).toContain("LOWER(`event_message`) NOT LIKE LOWER('%cron%')")
+    expect(sql).not.toMatch(/\bILIKE\b/)
+  })
+
+  it('emulates ILIKE with LOWER()/LOWER() for pathname `~~*`', () => {
+    const sql = getUnifiedLogsQueryBQ(withFilters('pathname:ilike:Customers'))
+    expect(sql).toContain("LOWER(`pathname`) LIKE LOWER('%Customers%')")
+    expect(sql).not.toMatch(/\bILIKE\b/)
+  })
+
+  it('emulates NOT ILIKE with LOWER()/NOT LIKE/LOWER() for pathname `!~~*`', () => {
+    const sql = getUnifiedLogsQueryBQ(withFilters('pathname:notilike:health'))
+    expect(sql).toContain("LOWER(`pathname`) NOT LIKE LOWER('%health%')")
     expect(sql).not.toMatch(/\bILIKE\b/)
   })
 })
