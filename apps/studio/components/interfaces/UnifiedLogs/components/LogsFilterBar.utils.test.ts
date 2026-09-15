@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 
 import {
+  buildColumnFilterValues,
   buildFilterProperties,
   filterPropertySchema,
   getUserFilterValue,
@@ -113,5 +114,60 @@ describe('getUserFilterValue', () => {
       { propertyName: USER_PROPERTY, value: 'second', operator: '=' },
     ])
     expect(result).toBe('first')
+  })
+})
+
+describe('buildColumnFilterValues', () => {
+  it('unwraps an `=` condition to a bare array, so sidebar checkboxes render ticked', () => {
+    const result = buildColumnFilterValues([
+      { propertyName: 'log_type', value: 'postgres', operator: '=' },
+    ])
+    expect(result.get('log_type')).toEqual(['postgres'])
+  })
+
+  it('accumulates multiple `=` conditions on the same column into one bare array', () => {
+    const result = buildColumnFilterValues([
+      { propertyName: 'log_type', value: 'postgres', operator: '=' },
+      { propertyName: 'log_type', value: 'auth', operator: '=' },
+    ])
+    expect(result.get('log_type')).toEqual(['postgres', 'auth'])
+  })
+
+  it('keeps a `<>` condition wrapped, since checkboxes have no way to render exclusion', () => {
+    const result = buildColumnFilterValues([
+      { propertyName: 'log_type', value: 'postgres', operator: '<>' },
+    ])
+    expect(result.get('log_type')).toEqual({ operator: '<>', values: ['postgres'] })
+  })
+
+  it('coerces non-string condition values to strings', () => {
+    const result = buildColumnFilterValues([
+      { propertyName: 'status_code', value: 500, operator: '=' },
+    ])
+    expect(result.get('status_code')).toEqual(['500'])
+  })
+
+  it('keeps separate columns independent', () => {
+    const result = buildColumnFilterValues([
+      { propertyName: 'log_type', value: 'postgres', operator: '=' },
+      { propertyName: 'event_message', value: 'error', operator: '~~*' },
+    ])
+    expect(result.get('log_type')).toEqual(['postgres'])
+    expect(result.get('event_message')).toEqual({ operator: '~~*', values: ['error'] })
+  })
+
+  it('lets the last operator win when a column mixes operators', () => {
+    const result = buildColumnFilterValues([
+      { propertyName: 'log_type', value: 'postgres', operator: '=' },
+      { propertyName: 'log_type', value: 'auth', operator: '<>' },
+    ])
+    expect(result.get('log_type')).toEqual({ operator: '<>', values: ['postgres', 'auth'] })
+  })
+
+  it('excludes the synthetic user condition', () => {
+    const result = buildColumnFilterValues([
+      { propertyName: USER_PROPERTY, value: 'abc@example.com', operator: '=' },
+    ])
+    expect(result.has(USER_PROPERTY)).toBe(false)
   })
 })
