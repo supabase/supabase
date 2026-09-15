@@ -38,7 +38,7 @@ describe('tool allowance by opt-in level', () => {
       query_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     } as unknown as ToolSet
 
-    const filtered = filterToolsByOptInLevel(mockTools, optInLevel as any)
+    const filtered = filterToolsByOptInLevel(mockTools, optInLevel as any, false)
     const allowedTools: string[] = []
 
     Object.entries(filtered).forEach(([toolName, tool]) => {
@@ -163,14 +163,14 @@ describe('filterToolsByOptInLevel', () => {
   }
 
   it('should filter out unknown tools entirely', async () => {
-    const tools = filterToolsByOptInLevel(mockTools, 'disabled')
+    const tools = filterToolsByOptInLevel(mockTools, 'disabled', false)
 
     // Unknown tools should be completely filtered out (not present in result)
     expect(tools).not.toHaveProperty('some_other_tool')
   })
 
   it('should always allow UI tools regardless of opt-in level', async () => {
-    const tools = filterToolsByOptInLevel(mockTools, 'disabled')
+    const tools = filterToolsByOptInLevel(mockTools, 'disabled', false)
 
     expect(tools).toHaveProperty('execute_sql')
     expect(tools).toHaveProperty('deploy_edge_function')
@@ -189,7 +189,7 @@ describe('filterToolsByOptInLevel', () => {
   })
 
   it('should stub all managed tools for disabled opt-in level', async () => {
-    const tools = filterToolsByOptInLevel(mockTools, 'disabled')
+    const tools = filterToolsByOptInLevel(mockTools, 'disabled', false)
 
     await expectStubsFor(tools, [
       'list_tables',
@@ -203,7 +203,7 @@ describe('filterToolsByOptInLevel', () => {
   })
 
   it('should stub log tools for schema opt-in level', async () => {
-    const tools = filterToolsByOptInLevel(mockTools, 'schema')
+    const tools = filterToolsByOptInLevel(mockTools, 'schema', false)
 
     await expectStubsFor(tools, ['get_advisors', 'query_logs'])
   })
@@ -211,7 +211,7 @@ describe('filterToolsByOptInLevel', () => {
   // No execute_sql tool, so nothing additional to stub for schema_and_log opt-in level
 
   it('should not stub any tools for schema_and_log_and_data opt-in level', async () => {
-    const tools = filterToolsByOptInLevel(mockTools, 'schema_and_log_and_data')
+    const tools = filterToolsByOptInLevel(mockTools, 'schema_and_log_and_data', false)
 
     await expectStubsFor(tools, [])
   })
@@ -226,7 +226,7 @@ describe('createPrivacyMessageTool', () => {
       toModelOutput: vitest.fn(),
     }
 
-    const privacyTool = createPrivacyMessageTool(originalTool)
+    const privacyTool = createPrivacyMessageTool(originalTool, false)
 
     expect(privacyTool.description).toContain('Original description')
     expect(privacyTool.description).toContain('Requires opting in')

@@ -47,7 +47,7 @@ export const getMcpTools = async ({
   accessToken: string
   projectRef: string
   aiOptInLevel: AiOptInLevel
-  isRestrictedByHipaa?: boolean
+  isRestrictedByHipaa: boolean
   // Required: the remote client holds an HTTP connection that must be torn down
   // when the request ends. The caller owns that lifecycle via this signal.
   signal: AbortSignal

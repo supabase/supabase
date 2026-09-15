@@ -169,7 +169,7 @@ function isToolAllowed(toolName: string, aiOptInLevel: AiOptInLevel): boolean {
  */
 export function createPrivacyMessageTool(
   toolInstance: Tool<any, any>,
-  isRestrictedByHipaa: boolean = false
+  isRestrictedByHipaa: boolean
 ) {
   const privacyMessage = isRestrictedByHipaa
     ? "You don't have permission to use this tool. This project is marked as HIPAA and your organization has the HIPAA addon, so Supabase does not send project metadata with your prompts. This is not something the user can change in their organization's AI settings, so continue without project metadata rather than asking them to opt in."
@@ -200,7 +200,7 @@ export function createPrivacyMessageTool(
 export function filterToolsByOptInLevel(
   tools: ToolSet,
   aiOptInLevel: AiOptInLevel,
-  isRestrictedByHipaa: boolean = false
+  isRestrictedByHipaa: boolean
 ): ToolSet {
   return Object.fromEntries(
     Object.entries(tools)
