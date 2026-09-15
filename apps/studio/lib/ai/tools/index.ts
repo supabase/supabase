@@ -28,8 +28,7 @@ export const getTools = async ({
   connectionString: string
   authorization?: string
   aiOptInLevel: AiOptInLevel
-  // Only changes the blocked-tool wording. A HIPAA-restricted project already arrives with
-  // aiOptInLevel forced to 'disabled'.
+  // Only changes the blocked-tool wording.
   isRestrictedByHipaa: boolean
   accessToken?: string
   baseUrl?: string
