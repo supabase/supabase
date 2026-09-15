@@ -202,7 +202,13 @@ describe('ReplicationPipelineLayout', () => {
     expect(screen.getAllByRole('button', { name: 'Start' })).toHaveLength(1)
 
     const content = await screen.findByRole('heading', { name: 'Pipeline stopped' })
-    expect(content.closest('.mx-auto')).toHaveClass('px-6', 'xl:px-10', 'py-6')
+    const contentContainer = content.closest('.mx-auto')
+    const headerContainer = screen
+      .getByRole('heading', { name: 'Analytics warehouse' })
+      .closest('.mx-auto')
+
+    expect(contentContainer).toHaveClass('max-w-[1600px]', 'px-6', 'xl:px-10', 'py-6')
+    expect(headerContainer).toHaveClass('max-w-[1600px]', 'px-6', 'xl:px-10')
   })
 
   test('shows the pipeline state as a labelled dot', async () => {

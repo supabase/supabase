@@ -249,8 +249,8 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
           </BreadcrumbList>
         </PageBreadcrumbs>
 
-        <PageHeader size="full" className="border-b py-4 [&>div]:px-4 [&>div]:xl:px-4">
-          <PageHeaderMeta className="px-0 xl:px-0">
+        <PageHeader size="large" className="border-b py-4">
+          <PageHeaderMeta>
             <PageHeaderIcon>
               {isPipelineIdentityLoading ? (
                 <ShimmeringLoader className="h-14 w-14 rounded-lg py-0" />
