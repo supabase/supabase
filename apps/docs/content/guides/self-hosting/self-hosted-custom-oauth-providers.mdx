@@ -354,7 +354,7 @@ To test a different custom provider, change the `provider` value to its identifi
 
 ## Manage providers
 
-Self-hosted Studio doesn't include a UI for custom providers. Use the admin API to list, update, and delete them. The examples use `custom:my-provider` as the identifier. Replace it with the identifier of your provider.
+Use the admin API to list, update, and delete custom providers. Self-hosted Studio doesn't include a UI for them. The examples use `custom:my-provider` as the identifier. Replace it with the identifier of your provider.
 
 ### List providers
 
@@ -397,7 +397,7 @@ curl "http://<your-domain>/auth/v1/admin/custom-providers?type=oidc" \
 
 ### Update a provider
 
-Update any provider fields except `provider_type` and `identifier`. Updates are partial: only the fields you send are changed. To rotate a client secret, update only the `client_secret` field.
+Send only the fields you want to change. Fields you leave out keep their current values, so you can rotate a client secret by sending `client_secret` alone. The `provider_type` and `identifier` fields are fixed when the provider is created and can't be updated.
 
 <Tabs
   scrollable
