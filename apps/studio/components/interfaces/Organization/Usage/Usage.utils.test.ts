@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { dailyUsageToDataPoints } from './Usage.utils'
+import {
+  dailyUsageToDataPoints,
+  getUsageBranchOptions,
+  resolveUsageProjectRef,
+} from './Usage.utils'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import type { OrgDailyUsageResponse } from '@/data/analytics/org-daily-stats-query'
+import { createTestBranch } from '@/tests/lib/branch-test-utils'
 
 describe('dailyUsageToDataPoints', () => {
   it('returns empty array when dailyUsage is undefined', () => {
@@ -247,5 +252,79 @@ describe('dailyUsageToDataPoints', () => {
       periodStartFormatted: '01 Oct',
       egress: 0,
     })
+  })
+})
+
+describe('getUsageBranchOptions', () => {
+  it('returns no options when there are no branches', () => {
+    expect(getUsageBranchOptions(undefined)).toEqual([])
+    expect(getUsageBranchOptions([])).toEqual([])
+  })
+
+  it('returns no options when the project only has a main branch', () => {
+    const branches = [createTestBranch({ name: 'main', project_ref: 'parent', is_default: true })]
+    expect(getUsageBranchOptions(branches)).toEqual([])
+  })
+
+  it('puts the main branch first, then the newest branches', () => {
+    const branches = [
+      createTestBranch({
+        name: 'older',
+        project_ref: 'older-ref',
+        created_at: '2026-01-01T00:00:00Z',
+      }),
+      createTestBranch({ name: 'main', project_ref: 'parent', is_default: true }),
+      createTestBranch({
+        name: 'newer',
+        project_ref: 'newer-ref',
+        created_at: '2026-02-01T00:00:00Z',
+      }),
+    ]
+
+    expect(getUsageBranchOptions(branches).map((branch) => branch.name)).toEqual([
+      'main',
+      'newer',
+      'older',
+    ])
+  })
+
+  it('returns branches without a main branch', () => {
+    const branches = [
+      createTestBranch({ name: 'one', project_ref: 'one-ref' }),
+      createTestBranch({ name: 'two', project_ref: 'two-ref' }),
+    ]
+
+    expect(getUsageBranchOptions(branches).map((branch) => branch.name)).toEqual(['one', 'two'])
+  })
+
+  it('returns a lone branch that is not the main branch', () => {
+    const branches = [createTestBranch({ name: 'only', project_ref: 'only-ref' })]
+
+    expect(getUsageBranchOptions(branches).map((branch) => branch.name)).toEqual(['only'])
+  })
+})
+
+describe('resolveUsageProjectRef', () => {
+  const branchOptions = [
+    createTestBranch({ name: 'main', project_ref: 'parent-ref', is_default: true }),
+    createTestBranch({ name: 'preview', project_ref: 'branch-ref' }),
+  ]
+
+  it('returns null when no project is selected', () => {
+    expect(resolveUsageProjectRef(null, [], 'branch-ref')).toBe(null)
+  })
+
+  it('returns the selected branch ref', () => {
+    expect(resolveUsageProjectRef('parent-ref', branchOptions, 'branch-ref')).toBe('branch-ref')
+  })
+
+  it('falls back to the project when the branch ref is not one of its branches', () => {
+    expect(resolveUsageProjectRef('parent-ref', branchOptions, 'other-org-branch-ref')).toBe(
+      'parent-ref'
+    )
+  })
+
+  it('falls back to the project while its branches are still unknown', () => {
+    expect(resolveUsageProjectRef('parent-ref', [], 'branch-ref')).toBe('parent-ref')
   })
 })

@@ -3,6 +3,7 @@ import { groupBy } from 'lodash'
 
 import { DataPoint } from '@/data/analytics/constants'
 import type { OrgDailyUsageResponse, PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import type { Branch } from '@/data/branches/branches-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
@@ -16,6 +17,28 @@ export const generateUsageData = (attribute: string, days: number): DataPoint[] 
       [attribute]: Math.floor(Math.random() * 100).toString(),
     }
   })
+}
+
+// Usage is recorded against each branch's own project ref, so a branch is only visible when selected
+export function getUsageBranchOptions(branches: Branch[] | undefined) {
+  const previewBranches = (branches ?? [])
+    .filter((branch) => !branch.is_default)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+  if (previewBranches.length === 0) return []
+
+  const mainBranch = branches?.find((branch) => branch.is_default)
+
+  return mainBranch ? [mainBranch, ...previewBranches] : previewBranches
+}
+
+export function resolveUsageProjectRef(
+  selectedProjectRef: string | null,
+  branchOptions: Branch[],
+  selectedBranchRef: string | null
+) {
+  const selectedBranch = branchOptions.find((branch) => branch.project_ref === selectedBranchRef)
+  return selectedBranch?.project_ref ?? selectedProjectRef
 }
 
 export function useGetUpgradeUrl(slug: string, subscription?: OrgSubscription, source?: string) {
