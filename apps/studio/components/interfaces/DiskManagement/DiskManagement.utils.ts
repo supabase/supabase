@@ -248,8 +248,6 @@ export function getAvailableComputeOptions(
       price_interval: 'hourly',
       price_type: 'usage',
       meta: {
-        cpu_cores: INSTANCE_MICRO_SPECS.cpu_cores,
-        cpu_dedicated: INSTANCE_MICRO_SPECS.cpu_dedicated,
         memory_gb: INSTANCE_MICRO_SPECS.memory_gb,
         baseline_disk_io_mbs: INSTANCE_MICRO_SPECS.baseline_disk_io_mbs,
         max_disk_io_mbs: INSTANCE_MICRO_SPECS.max_disk_io_mbs,
@@ -268,8 +266,6 @@ export function getAvailableComputeOptions(
     price_type: 'usage',
     // @ts-ignore API types it as Record<string, never>
     meta: {
-      cpu_cores: INSTANCE_NANO_SPECS.cpu_cores,
-      cpu_dedicated: INSTANCE_NANO_SPECS.cpu_dedicated,
       memory_gb: INSTANCE_NANO_SPECS.memory_gb,
       baseline_disk_io_mbs: INSTANCE_NANO_SPECS.baseline_disk_io_mbs,
       max_disk_io_mbs: INSTANCE_NANO_SPECS.max_disk_io_mbs,
