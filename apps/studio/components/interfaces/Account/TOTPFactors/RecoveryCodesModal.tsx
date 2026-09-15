@@ -16,7 +16,10 @@ import {
 
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
 
-interface RecoveryCodesModalProps<T> extends ComponentProps<typeof Dialog> {
+interface RecoveryCodesModalProps<T>
+  extends
+    Omit<ComponentProps<typeof Dialog>, 'onOpenChange'>,
+    Required<Pick<ComponentProps<typeof Dialog>, 'onOpenChange'>> {
   mutation: UseMutationResult<AuthMFARecoveryCodesGenerateResponseData, AuthError, T>
 }
 
@@ -35,9 +38,17 @@ export const RecoveryCodesModal = <T = unknown,>({
       onOpenChange={(open) => {
         // Prevent users from closing the dialog until they copied the codes
         if (!open && !copied && mutation.isSuccess) return
+        // Prevent users from closing the dialog while the mutation is running
+        if (mutation.isPending) return
 
-        onOpenChange?.(open)
-        queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status() })
+        onOpenChange(open)
+        if (!open) {
+          // Reset state
+          setCopied(false)
+          setCopiedToClipboard(false)
+          mutation.reset()
+          queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status() })
+        }
       }}
     >
       <DialogContent>

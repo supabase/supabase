@@ -8,6 +8,7 @@ import {
   calculateIOPSPrice,
   calculateMaxIopsAllowedForDiskSizeWithGp3,
   calculateMaxIopsForComputeSize,
+  calculateMaxThroughput,
   calculateThroughputPrice,
   mapAddOnVariantIdToComputeSize,
   mapComputeSizeNameToAddonVariantId,
@@ -81,6 +82,18 @@ describe('calculateMaxIopsAllowedForDiskSizeWithGp3', () => {
 
   test('caps large disks at the gp3 max IOPS ceiling (80 000)', () => {
     expect(calculateMaxIopsAllowedForDiskSizeWithGp3(1000)).toBe(80000)
+  })
+})
+
+describe('calculateMaxThroughput', () => {
+  // Regression: the ceiling was hardcoded to 1000 MB/s while DISK_LIMITS.gp3.maxThroughput moved
+  // to 2000, so large gp3 disks were rejected with a misleading "need more IOPS" error.
+  test('scales with provisioned IOPS below the gp3 max throughput ceiling', () => {
+    expect(calculateMaxThroughput(4000)).toBe(1024)
+  })
+
+  test('caps at the gp3 max throughput ceiling (2000 MB/s)', () => {
+    expect(calculateMaxThroughput(80000)).toBe(2000)
   })
 })
 
@@ -231,6 +244,24 @@ describe('CreateDiskStorageSchema', () => {
         message: 'Larger Disk size of at least 12 GB required. Current max is 4,000 IOPS.',
       })
     )
+  })
+
+  test('allows gp3 throughput above 1000 MB/s when IOPS and compute support it', () => {
+    const schema = CreateDiskStorageSchema({
+      defaultTotalSize: 4096,
+      cloudProvider: 'AWS',
+      isSpendCapEnabled: false,
+    })
+
+    const result = schema.safeParse({
+      ...validGp3Config,
+      totalSize: 4096,
+      provisionedIOPS: 80000,
+      throughput: 2000,
+      computeSize: 'ci_16xlarge' as const,
+    })
+
+    expect(result.error?.issues ?? []).toEqual([])
   })
 
   test('allows a legacy disk below 8 GB when its size is unchanged', () => {

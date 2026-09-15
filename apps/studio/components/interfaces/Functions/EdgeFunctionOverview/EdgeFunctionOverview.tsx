@@ -10,6 +10,7 @@ import {
   getBucketedTimeRange,
   getExecutionMetrics,
   getInvocationChartData,
+  getInvocationChartNavigationUrl,
   getInvocationTotals,
   getInvocationUpdateAnnotation,
   getRollingTimeRange,
@@ -204,11 +205,18 @@ export const EdgeFunctionOverview = () => {
         isErrorChart={isErrorCombinedStats}
         chartErrorMessage={combinedStatsError?.message ?? 'Unknown error'}
         chartData={invocationChartData}
-        onChartClick={() => {
+        onChartClick={(timestamp) => {
+          if (!projectRef || !functionSlug) return
+
           router.push(
-            `/project/${projectRef}/functions/${functionSlug}/${
-              isUnifiedLogsEnabled ? 'logs' : 'invocations'
-            }${isUnifiedLogsEnabled ? '' : `?its=${startDate.toISOString()}`}`
+            getInvocationChartNavigationUrl({
+              projectRef,
+              functionSlug,
+              isUnifiedLogsEnabled,
+              rangeStart: startDate.toISOString(),
+              rangeEnd: endDate.toISOString(),
+              clickedTimestamp: timestamp,
+            })
           )
         }}
         updateAnnotation={invocationUpdateAnnotation}
