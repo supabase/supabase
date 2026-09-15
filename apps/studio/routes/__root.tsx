@@ -57,7 +57,7 @@ import {
   type ReactNode,
 } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import { studioThemeValues, TooltipProvider } from 'ui'
+import { TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
 import { AppearanceSettingsProvider } from '@/components/interfaces/App/AppearanceSettingsProvider'
@@ -378,12 +378,7 @@ function RootComponent() {
                   <DynamicTitle />
                   <TooltipProvider>
                     <RouteValidationWrapper>
-                      <ThemeProvider
-                        defaultTheme="system"
-                        themes={studioThemeValues}
-                        enableSystem
-                        disableTransitionOnChange
-                      >
+                      <ThemeProvider>
                         <DevToolbarProvider apiUrl={API_URL}>
                           <AiAssistantStateContextProvider>
                             <CommandProvider>

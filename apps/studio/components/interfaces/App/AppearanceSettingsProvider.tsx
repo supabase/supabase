@@ -7,17 +7,18 @@ import { applyTextSize } from '@/lib/text-size'
 import { applyThemeOverrides } from '@/lib/theme-overrides'
 
 export const AppearanceSettingsProvider = () => {
-  const { resolvedTheme, theme, setTheme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const { mode, overrides } = useThemeOverrides()
   const { textSize } = useTextSize()
 
   useIsomorphicLayoutEffect(() => {
-    if (theme === 'classic-dark') setTheme('dark')
-    if (resolvedTheme !== undefined) {
+    if (resolvedTheme === 'classic-dark') {
+      applyThemeOverrides(document.documentElement, 'dark', {})
+    } else if (resolvedTheme !== undefined) {
       applyThemeOverrides(document.documentElement, mode, overrides)
     }
     applyTextSize(document.documentElement, textSize)
-  }, [mode, overrides, resolvedTheme, setTheme, textSize, theme])
+  }, [mode, overrides, resolvedTheme, textSize])
 
   return null
 }
