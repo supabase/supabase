@@ -43,6 +43,9 @@ export const useAuthTemplateResetMutation = ({
         queryKey: authKeys.authConfig(projectRef),
         refetchType: 'none',
       })
+      await queryClient.invalidateQueries({
+        queryKey: authKeys.reactTemplate(projectRef, variables.template.toLowerCase()),
+      })
       await onSuccess?.(data, variables, context)
 
       void queryClient
