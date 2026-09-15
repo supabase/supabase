@@ -1214,6 +1214,125 @@ describe('Table Row Query', () => {
       expect(xItemIndex).toBeLessThan(zItemIndex)
     })
 
+    withTestDatabase('should drop sorts referencing columns that no longer exist', async (db) => {
+      // Reproduces the case where a column used in a persisted sort (e.g. from
+      // the URL or local storage) has since been dropped from the table. The
+      // generated query must not reference the missing column.
+      await db.executeQuery(`
+        CREATE TABLE test_stale_sort (
+          id SERIAL PRIMARY KEY,
+          name TEXT
+        );
+
+        INSERT INTO test_stale_sort (name) VALUES
+          ('B Item'),
+          ('A Item'),
+          ('C Item');
+      `)
+
+      const { sql: tablesSql, zod: tablesZod } = pgMeta.tables.list()
+      const tables = tablesZod.parse(await db.executeQuery(tablesSql))
+      const testTable = tables.find((table) => table.name === 'test_stale_sort')
+
+      expect(testTable).toBeDefined()
+
+      // 'key' no longer exists; 'name' is still valid.
+      const sorts: Sort[] = [
+        { column: 'key', table: 'test_stale_sort', ascending: true, nullsFirst: false },
+        { column: 'name', table: 'test_stale_sort', ascending: true, nullsFirst: false },
+      ]
+
+      const sql = getTableRowsSql({
+        table: testTable!,
+        sorts,
+        page: 1,
+        limit: 10,
+      })
+
+      // The stale 'key' sort is dropped; only the valid 'name' sort remains.
+      expect(sql).not.toContain('test_stale_sort.key')
+      expect(sql).toContain('order by test_stale_sort.name asc nulls last')
+
+      // The query executes successfully instead of erroring on the missing column.
+      const queryResult = await db.executeQuery(sql)
+      expect(queryResult.map((row: any) => row.name)).toEqual(['A Item', 'B Item', 'C Item'])
+    })
+
+    withTestDatabase(
+      'should fall back to default ordering when all sorts reference missing columns',
+      async (db) => {
+        await db.executeQuery(`
+          CREATE TABLE test_all_stale_sort (
+            id SERIAL PRIMARY KEY,
+            name TEXT
+          );
+
+          INSERT INTO test_all_stale_sort (name) VALUES ('first'), ('second');
+        `)
+
+        const { sql: tablesSql, zod: tablesZod } = pgMeta.tables.list()
+        const tables = tablesZod.parse(await db.executeQuery(tablesSql))
+        const testTable = tables.find((table) => table.name === 'test_all_stale_sort')
+
+        expect(testTable).toBeDefined()
+
+        const sorts: Sort[] = [
+          { column: 'key', table: 'test_all_stale_sort', ascending: true, nullsFirst: false },
+        ]
+
+        const sql = getTableRowsSql({
+          table: testTable!,
+          sorts,
+          page: 1,
+          limit: 10,
+        })
+
+        // With no valid sorts left, it falls back to the default primary-key ordering.
+        expect(sql).not.toContain('test_all_stale_sort.key')
+        expect(sql).toContain('order by test_all_stale_sort.id asc nulls last')
+
+        const queryResult = await db.executeQuery(sql)
+        expect(queryResult.length).toBe(2)
+      }
+    )
+
+    withTestDatabase('should drop filters referencing columns that no longer exist', async (db) => {
+      await db.executeQuery(`
+        CREATE TABLE test_stale_filter (
+          id SERIAL PRIMARY KEY,
+          name TEXT
+        );
+
+        INSERT INTO test_stale_filter (name) VALUES ('keep'), ('keep'), ('other');
+      `)
+
+      const { sql: tablesSql, zod: tablesZod } = pgMeta.tables.list()
+      const tables = tablesZod.parse(await db.executeQuery(tablesSql))
+      const testTable = tables.find((table) => table.name === 'test_stale_filter')
+
+      expect(testTable).toBeDefined()
+
+      const filters: Filter[] = [
+        { column: 'key', operator: '=', value: 'whatever' },
+        { column: 'name', operator: '=', value: 'keep' },
+      ]
+
+      const sql = getTableRowsSql({
+        table: testTable!,
+        filters,
+        page: 1,
+        limit: 10,
+      })
+
+      // The stale 'key' filter is dropped; only the valid 'name' filter remains.
+      expect(sql).not.toContain('whatever')
+      expect(sql).toContain("name = 'keep'")
+
+      const queryResult = await db.executeQuery(sql)
+      expect(queryResult.length).toBe(2)
+      expect(queryResult.every((row: any) => row.name === 'keep')).toBe(true)
+    })
+
     withTestDatabase('should generate SQL for special/quoted column names', async (db) => {
       // Create test table with quoted names and insert data
       await db.executeQuery(`
