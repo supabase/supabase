@@ -582,26 +582,15 @@ export const AssistantChat = ({
                     additionalActions={
                       <div className="flex items-center gap-x-2 mr-auto">
                         {isContextExceededError ? (
-                          <Button
-                            variant="default"
-                            size="tiny"
-                            onClick={onNewChat}
-                            className="text-xs"
-                          >
+                          <Button size="tiny" onClick={onNewChat} className="text-xs">
                             New chat
                           </Button>
                         ) : (
                           <>
-                            <Button
-                              variant="default"
-                              size="tiny"
-                              onClick={() => regenerate()}
-                              className="text-xs"
-                            >
+                            <Button size="tiny" onClick={() => regenerate()} className="text-xs">
                               Retry
                             </Button>
                             <ButtonTooltip
-                              variant="default"
                               size="tiny"
                               onClick={handleClearMessages}
                               className="w-7 h-7"

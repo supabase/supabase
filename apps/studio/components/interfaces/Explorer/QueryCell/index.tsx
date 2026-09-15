@@ -15,6 +15,7 @@ import {
   getCellDisplay,
   setCellRowLimit,
   setCellSql,
+  shouldInvalidateResultOnSourceChange,
   toQueryModel,
 } from './QueryCell.utils'
 import { SortableSection } from '@/components/ui/SortableSection'
@@ -77,11 +78,8 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
 
   const handleSourceChange = (source: QuerySourceBinding) => {
     // The query text carries over (see `changeCellSource`), so the editor's buffer stays
-    // valid — but a result the old backend produced does not, since another engine
-    // returns unrelated columns.
-    const isBackendChange = (source._tag === 'logs') !== (cell._tag === 'log_cell')
-    if (isBackendChange) setResult(undefined)
-
+    // valid — but a result run against the old source (backend or time range) does not.
+    if (shouldInvalidateResultOnSourceChange(cell, source)) setResult(undefined)
     updateQueryCell((candidate) => changeCellSource(candidate, source))
   }
 

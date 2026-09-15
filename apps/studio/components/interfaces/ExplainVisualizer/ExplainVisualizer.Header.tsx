@@ -133,7 +133,6 @@ export function ExplainHeader({ mode, onToggleMode, summary, id, rows }: Explain
             />
           )}
           <Button
-            variant="default"
             size="tiny"
             icon={isVisual ? <Code size={14} /> : <Eye size={14} />}
             onClick={onToggleMode}

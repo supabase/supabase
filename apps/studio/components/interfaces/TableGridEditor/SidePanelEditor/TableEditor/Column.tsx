@@ -212,7 +212,7 @@ export const Column = ({
           ) : (
             <Popover open={open} onOpenChange={setOpen} modal={false}>
               <PopoverTrigger asChild>
-                <Button variant="default" className="rounded-l-none h-[30px] py-0 px-2">
+                <Button className="rounded-l-none h-[30px] py-0 px-2">
                   <Link size={12} />
                 </Button>
               </PopoverTrigger>

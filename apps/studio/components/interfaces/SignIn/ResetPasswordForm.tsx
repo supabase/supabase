@@ -81,7 +81,6 @@ export const ResetPasswordForm = () => {
                     actions={
                       <Button
                         icon={currentPasswordHidden ? <Eye /> : <EyeOff />}
-                        variant="default"
                         className="w-7"
                         onClick={() => setCurrentPasswordHidden((prev) => !prev)}
                       />
@@ -113,7 +112,6 @@ export const ResetPasswordForm = () => {
                   actions={
                     <Button
                       icon={passwordHidden ? <Eye /> : <EyeOff />}
-                      variant="default"
                       className="w-7"
                       onClick={() => setPasswordHidden((prev) => !prev)}
                     />

@@ -209,7 +209,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                 {policies.length < 1 && !isSchemaLocked ? (
                   <ButtonTooltip
                     asChild
-                    variant="default"
                     className="group"
                     icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
                     tooltip={{
@@ -275,7 +274,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     </p>
                     {!isSchemaLocked && (
                       <Button
-                        variant="default"
                         className="mt-2 w-min"
                         onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
                       >
@@ -329,7 +327,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                       }
                     />
 
-                    <Button variant="default" asChild>
+                    <Button asChild>
                       <Link
                         target="_blank"
                         href={`/project/${ref}/advisors/security?preset=${matchingMaterializedViewLint?.level}&id=${matchingMaterializedViewLint?.cache_key}`}
@@ -362,7 +360,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   </p>
 
                   <div className="mt-2">
-                    <Button variant="default" asChild>
+                    <Button asChild>
                       <Link
                         target="_blank"
                         href={`${DOCS_URL}/guides/database/extensions/wrappers/overview#security`}
@@ -383,7 +381,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
               <TooltipTrigger asChild>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    variant="default"
                     icon={<MoreVertical />}
                     className="h-7 w-7"
                     aria-label={`More options for ${table.name}`}

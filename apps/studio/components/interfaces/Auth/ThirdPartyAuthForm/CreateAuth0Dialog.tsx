@@ -132,7 +132,6 @@ export const CreateAuth0IntegrationDialog = ({
                   <FormItemLayout label="Auth0 domain name">
                     <div className="flex flex-row">
                       <Button
-                        variant="default"
                         size="small"
                         className="px-2 text-foreground-light rounded-r-none"
                         onClick={() => form.setFocus('auth0DomainName')}
@@ -143,7 +142,6 @@ export const CreateAuth0IntegrationDialog = ({
                         <Input className="border-l-0 rounded-none border-r-0 z-50" {...field} />
                       </FormControl>
                       <Button
-                        variant="default"
                         size="small"
                         className="px-2 text-foreground-light rounded-l-none"
                         onClick={() => form.setFocus('auth0DomainName')}
@@ -166,7 +164,7 @@ export const CreateAuth0IntegrationDialog = ({
             </div>
           )}
 
-          <Button disabled={isPending} variant="default" onClick={() => onClose()}>
+          <Button disabled={isPending} onClick={() => onClose()}>
             Cancel
           </Button>
           <Button

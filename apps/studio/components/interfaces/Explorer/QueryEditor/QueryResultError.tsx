@@ -159,7 +159,6 @@ export const QueryResultError = ({
           {readReplicaError && (
             <Button
               className="py-2"
-              variant="default"
               // [Joshen] TODO
               onClick={() => {}}
             >

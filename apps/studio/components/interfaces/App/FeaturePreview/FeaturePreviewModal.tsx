@@ -217,7 +217,7 @@ export const FeaturePreviewModal = () => {
                   <p>{selectedFeature?.name}</p>
                   <div className="flex items-center gap-x-2">
                     {selectedFeature?.discussionsUrl !== undefined && (
-                      <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                      <Button asChild icon={<ExternalLink strokeWidth={1.5} />}>
                         <Link
                           href={selectedFeature.discussionsUrl}
                           target="_blank"
@@ -229,7 +229,6 @@ export const FeaturePreviewModal = () => {
                     )}
                     {isSelectedFeatureEnabled && (
                       <ButtonTooltip
-                        variant="default"
                         disabled={!canDisableSelectedFeature}
                         onClick={() => toggleFeature()}
                         tooltip={{
@@ -248,9 +247,7 @@ export const FeaturePreviewModal = () => {
                     {!isSelectedFeatureEnabled && (
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button variant="default" onClick={() => toggleFeature()}>
-                            Enable feature
-                          </Button>
+                          <Button onClick={() => toggleFeature()}>Enable feature</Button>
                         </TooltipTrigger>
                         <TooltipContent side="bottom" className="max-w-64 text-center">
                           {hasRoute
@@ -275,7 +272,7 @@ export const FeaturePreviewModal = () => {
                   Have an idea for the dashboard? Let us know via GitHub Discussions!
                 </p>
               </div>
-              <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
+              <Button asChild icon={<ExternalLink strokeWidth={1.5} />}>
                 <Link
                   href="https://github.com/orgs/supabase/discussions/categories/feature-requests"
                   target="_blank"

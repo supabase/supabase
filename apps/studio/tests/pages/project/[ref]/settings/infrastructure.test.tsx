@@ -12,8 +12,8 @@ import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type ProjectDetailResponse = components['schemas']['ProjectDetailResponse']
-type ProjectAddonsResponse = components['schemas']['ProjectAddonsResponse']
+type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
+type ProjectAddonsResponse = components['schemas']['ProjectAddonsResponse_Output']
 type PermissionResponse = components['schemas']['AccessControlPermission']
 
 const PROJECT_REF = 'project-ref'

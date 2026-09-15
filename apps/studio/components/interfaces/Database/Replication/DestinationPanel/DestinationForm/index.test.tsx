@@ -14,7 +14,7 @@ type DestinationResponse = components['schemas']['DestinationResponse_Output']
 type PipelineResponse = components['schemas']['PipelineResponse_Output']
 type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
 type PublicationNamesResponse = components['schemas']['ReadPublicationsResponse_Output']
-type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse']
+type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse_Output']
 type SourcesResponse = components['schemas']['SourcesResponse_Output']
 
 const mocks = vi.hoisted(() => ({

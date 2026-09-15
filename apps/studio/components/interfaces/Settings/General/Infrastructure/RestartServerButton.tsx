@@ -103,7 +103,6 @@ export const RestartServerButton = () => {
         <div className="flex w-full @lg:w-auto">
           <ButtonTooltip
             type="button"
-            variant="default"
             className={cn(
               'flex-1 px-3 hover:z-10 focus-visible:z-10 @lg:flex-none',
               canRestartProject && canRestart ? 'rounded-r-none focus-visible:rounded-r-sm' : ''
@@ -132,7 +131,6 @@ export const RestartServerButton = () => {
               <DropdownMenuTrigger asChild>
                 <Button
                   type="button"
-                  variant="default"
                   aria-label="Choose restart type"
                   className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                   icon={<ChevronDown />}
@@ -161,7 +159,6 @@ export const RestartServerButton = () => {
         </div>
       ) : (
         <Button
-          variant="default"
           icon={<RefreshCw />}
           className="w-full @lg:w-auto"
           disabled={isLoading}
