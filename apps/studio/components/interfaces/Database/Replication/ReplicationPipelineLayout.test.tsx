@@ -23,11 +23,11 @@ vi.mock('common', async (importOriginal) => ({
   useParams: () => ({ ref: 'default', pipelineId: '42' }),
 }))
 
-vi.mock('@/compat/next/router', () => ({
+vi.mock('next/router', () => ({
   useRouter: () => ({ push: vi.fn() }),
 }))
 
-vi.mock('@/compat/next/link', () => ({
+vi.mock('next/link', () => ({
   default: ({
     href,
     children,

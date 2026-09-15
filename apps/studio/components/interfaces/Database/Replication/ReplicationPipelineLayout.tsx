@@ -9,6 +9,8 @@ import {
   RotateCcw,
   Trash,
 } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { PropsWithChildren, useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
@@ -49,8 +51,6 @@ import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { getReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
 import { UpdateVersionModal } from './UpdateVersionModal'
-import Link from '@/compat/next/link'
-import { useRouter } from '@/compat/next/router'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
