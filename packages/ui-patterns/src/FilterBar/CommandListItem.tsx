@@ -31,9 +31,10 @@ export function CommandListItem({
         if (!item.disabled) onSelect(item)
       }}
       className={cn(
-        'relative flex items-center justify-between gap-2 px-2 h-[28px] text-xs select-none outline-hidden text-foreground cursor-pointer',
+        'relative flex items-center justify-between gap-2 px-2 h-[28px] text-xs select-none outline-hidden',
+        item.disabled ? 'text-muted' : 'text-foreground cursor-pointer',
         isHighlighted && 'bg-overlay-hover',
-        !isHighlighted && 'hover:bg-surface-200'
+        !isHighlighted && !item.disabled && 'hover:bg-surface-200'
       )}
       data-testid={`filter-menu-item-${item.value}`}
     >
