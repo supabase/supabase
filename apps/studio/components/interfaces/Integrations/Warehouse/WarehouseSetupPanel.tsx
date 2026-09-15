@@ -39,15 +39,18 @@ export const WarehouseSetupPanel = () => {
 
   const handleSetup = (targets: WarehouseSetupTarget[]) => {
     if (!projectRef || targets.length === 0) return
+    const isInitialSetup = data?.setup_status !== 'complete'
 
     setupMutation.mutate(
       { projectRef, body: { targets } },
       {
         onSuccess: () => {
-          track('warehouse_enabled', {
-            schemaTargetCount: targets.filter((target) => target.type === 'schema').length,
-            tableTargetCount: targets.filter((target) => target.type === 'table').length,
-          })
+          if (isInitialSetup) {
+            track('warehouse_enabled', {
+              schemaTargetCount: targets.filter((target) => target.type === 'schema').length,
+              tableTargetCount: targets.filter((target) => target.type === 'table').length,
+            })
+          }
         },
       }
     )

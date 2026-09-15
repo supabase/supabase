@@ -80,28 +80,32 @@ export const WarehouseSchemaTablePicker = ({
     isLoading: isSourcesLoading,
     isError: isSourcesError,
     error: sourcesError,
-  } = useReplicationSourcesQuery({ projectRef })
+  } = useReplicationSourcesQuery({ projectRef }, { enabled: isEditing })
   const sourceId = sourcesData?.sources.find((source) => source.name === projectRef)?.id
 
   const {
     data: publication,
     isError: isPublicationsError,
     error: publicationsError,
-  } = useReplicationPublicationQuery({
-    projectRef,
-    sourceId,
-    publicationName: WAREHOUSE_PUBLICATION_NAME,
-  })
+  } = useReplicationPublicationQuery(
+    {
+      projectRef,
+      sourceId,
+      publicationName: WAREHOUSE_PUBLICATION_NAME,
+    },
+    { enabled: isEditing }
+  )
 
   // Derived from data presence rather than fetch status, so there's no render gap between the
   // publication query becoming enabled and it actually starting to fetch.
   const isSelectionPending =
-    isSourcesLoading ||
-    (sourceId !== undefined && publication === undefined && !isPublicationsError)
+    isEditing &&
+    (isSourcesLoading ||
+      (sourceId !== undefined && publication === undefined && !isPublicationsError))
 
   const initialSelection = useMemo(
-    () => buildSelectionFromPublicationTables(publication?.tables ?? []),
-    [publication]
+    () => (isEditing ? buildSelectionFromPublicationTables(publication?.tables ?? []) : {}),
+    [isEditing, publication]
   )
 
   const schemasWithTables: SchemaWithTables[] = useMemo(() => {
@@ -143,8 +147,8 @@ export const WarehouseSchemaTablePicker = ({
     onSubmit(targets)
   }
 
-  // Waiting on the publication too, so the pre-checked selection is in place before the user can
-  // start toggling (an early toggle would otherwise pin an override that omits existing tables).
+  // When editing, wait for the publication so its selection is in place before the user can
+  // start toggling. First-time setup always starts empty and does not need to wait for it.
   if (isSchemasPending || isTablesPending || isSelectionPending) {
     return (
       <PageSection className="first:pt-0">
@@ -168,15 +172,35 @@ export const WarehouseSchemaTablePicker = ({
       </PageSection>
     )
   }
-  if (isSchemasError) return <AlertError subject="Failed to load schemas" error={schemasError} />
-  if (isTablesError) return <AlertError subject="Failed to load tables" error={tablesError} />
+  if (isSchemasError) {
+    return (
+      <AlertError projectRef={projectRef} subject="Failed to load schemas" error={schemasError} />
+    )
+  }
+  if (isTablesError) {
+    return (
+      <AlertError projectRef={projectRef} subject="Failed to load tables" error={tablesError} />
+    )
+  }
   if (isEditing && isSourcesError) {
-    return <AlertError subject="Failed to load replicated tables" error={sourcesError} />
+    return (
+      <AlertError
+        projectRef={projectRef}
+        subject="Failed to load replicated tables"
+        error={sourcesError}
+      />
+    )
   }
   // Only blocking when editing: a first-time setup starts from an empty selection anyway, so a
   // failed publication lookup shouldn't stop the user from enabling Warehouse at all.
   if (isEditing && isPublicationsError) {
-    return <AlertError subject="Failed to load replicated tables" error={publicationsError} />
+    return (
+      <AlertError
+        projectRef={projectRef}
+        subject="Failed to load replicated tables"
+        error={publicationsError}
+      />
+    )
   }
 
   return (
@@ -202,6 +226,7 @@ export const WarehouseSchemaTablePicker = ({
                   : 'Failed to enable Warehouse'
             }
             error={error}
+            projectRef={projectRef}
           >
             {isPipelineLimitError(error.message) && (
               <p className="text-sm">
@@ -219,7 +244,11 @@ export const WarehouseSchemaTablePicker = ({
             <FormLayout
               layout="horizontal"
               label="Tables to replicate"
-              description={`${selectedCount} table${selectedCount === 1 ? '' : 's'} selected`}
+              description={
+                <span aria-live="polite">
+                  {selectedCount} table{selectedCount === 1 ? '' : 's'} selected
+                </span>
+              }
             >
               <MultiSelector
                 values={selectedTableKeys}

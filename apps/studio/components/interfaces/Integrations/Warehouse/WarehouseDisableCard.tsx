@@ -32,6 +32,7 @@ export const WarehouseDisableCard = () => {
       setIsConfirming(false)
       toast.success('Warehouse disabled')
     },
+    onError: (error) => toast.error(`Failed to disable Warehouse: ${error.message}`),
   })
 
   return (
