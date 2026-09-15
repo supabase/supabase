@@ -1,8 +1,8 @@
+import { formatPatternMatchFilterValue } from '@supabase/pg-meta/src/query/table-row-query'
+
 import type { Filter, ServiceError } from '@/components/grid/types'
 import { isNumericalColumn } from '@/components/grid/utils/types'
 import { Entity, isTableLike } from '@/data/table-editor/table-editor-types'
-
-const PATTERN_MATCH_OPERATORS: Filter['operator'][] = ['~~', '~~*', '!~~', '!~~*']
 
 /**
  * temporary fix until we implement a better filter UI
@@ -24,15 +24,7 @@ export function formatFilterValue(
       return filter.value
     else return numberValue
   }
-  if (
-    PATTERN_MATCH_OPERATORS.includes(filter.operator) &&
-    typeof filter.value === 'string' &&
-    !filter.value.includes('%') &&
-    !filter.value.includes('_')
-  ) {
-    return `%${filter.value}%`
-  }
-  return filter.value
+  return formatPatternMatchFilterValue(filter.value, filter.operator)
 }
 
 export function getPrimaryKeys({ table }: { table: Entity }): {
