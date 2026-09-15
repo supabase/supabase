@@ -1666,7 +1666,7 @@ describe('snippets.utils', () => {
       mockedFS.rm.mockRejectedValue(error)
       mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
-      await expect(deleteFolder(folderId)).rejects.toThrow('Permission denied')
+      await expect(deleteFolder(folderId)).rejects.toThrow('Failed to delete project\'s content folders: Permission denied')
     })
 
     it('should throw original error when directory does not exist during deletion', async () => {

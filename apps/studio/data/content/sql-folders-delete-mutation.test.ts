@@ -24,4 +24,24 @@ describe('deleteSQLSnippetFolders', () => {
 
     expect(ids).toBe('folder-one,folder-two')
   })
+
+  it('properly handles error messages from the API', async () => {
+    addAPIMock({
+      method: 'delete',
+      path: '/platform/projects/:ref/content/folders',
+      response: () => {
+        return HttpResponse.json(
+          { error: { message: 'Failed to delete project\'s content folders' } },
+          { status: 500 }
+        )
+      },
+    })
+
+    await expect(
+      deleteSQLSnippetFolders({
+        projectRef: 'default',
+        ids: ['folder-id'],
+      })
+    ).rejects.toThrow('Failed to delete project\'s content folders')
+  })
 })
