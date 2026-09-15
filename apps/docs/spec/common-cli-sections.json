@@ -58,6 +58,30 @@
         "title": "Retrieve container status",
         "slug": "supabase-status",
         "type": "cli-command"
+      },
+      {
+        "id": "supabase-stack",
+        "title": "Run multiple local projects (experimental)",
+        "slug": "supabase-stack",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-stack-start",
+        "title": "Start a local project",
+        "slug": "supabase-stack-start",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-stack-stop",
+        "title": "Stop a local project",
+        "slug": "supabase-stack-stop",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-stack-destroy",
+        "title": "Destroy a local project",
+        "slug": "supabase-stack-destroy",
+        "type": "cli-command"
       }
     ]
   },

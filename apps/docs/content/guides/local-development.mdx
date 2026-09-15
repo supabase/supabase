@@ -7,12 +7,14 @@ To develop your applications using the locally running Supabase stack, you'll ne
 
 <Admonition type="note">
 
-A container manager compatible with Docker APIs is a prerequisite:
+A container manager compatible with Docker APIs is a prerequisite for `supabase start`:
 
 - [Docker Desktop](https://docs.docker.com/desktop/) (macOS, Windows, Linux) - preferred option
 - [Rancher Desktop](https://rancherdesktop.io/) (macOS, Windows, Linux)
 - [Podman](https://podman.io/) (macOS, Windows, Linux)
 - [OrbStack](https://orbstack.dev/) (macOS)
+
+The experimental `supabase stack start` command can also run a local project as processes on your machine without Docker on Linux and on macOS on Apple silicon. See [Docker and native runtimes](/docs/guides/local-development/runtimes).
 
 </Admonition>
 
@@ -144,6 +146,8 @@ Local development with Supabase allows you to work on your projects in a self-co
 5. Safe testing: You can experiment with different configurations and features without affecting your production environment.
 
 Once set up, you can initialize a new Supabase project, start the local stack, and begin developing your application using local Supabase services. This includes access to a local Postgres database, Auth, Storage, and other Supabase features.
+
+`supabase start` runs one local project per machine. To run a local project for each app or git worktree at the same time, use the experimental `supabase stack` commands described in [Running multiple local projects](/docs/guides/local-development/parallel-projects).
 
 ## CLI
 

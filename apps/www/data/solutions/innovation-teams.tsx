@@ -204,7 +204,7 @@ const data: () => {
         },
         {
           name: 'Claude & Cursor',
-          description: 'AI-powered local development',
+          description: 'AI-powered local development, one local project per agent',
         },
         {
           name: 'Figma',
