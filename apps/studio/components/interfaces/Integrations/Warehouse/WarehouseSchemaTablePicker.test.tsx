@@ -17,7 +17,7 @@ type PublicationDetailsResponse = components['schemas']['PublicationDetailsRespo
 type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
 type RunQueryBody = components['schemas']['RunQueryBody']
 type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
-type WarehouseSetupResponse = components['schemas']['WarehouseSetupResponse']
+type WarehouseSetupResponse = components['schemas']['WarehouseSetupResponse_Output']
 
 mockAnimationsApi()
 
@@ -212,5 +212,18 @@ describe('WarehouseSchemaTablePicker', () => {
     await waitFor(() =>
       expect(requests).toEqual([{ targets: [{ type: 'table', schema: 'public', name: 'orders' }] }])
     )
+  })
+
+  test('filters tables by schema name', async () => {
+    mockPickerQueries({ isEditing: false })
+
+    customRender(<WarehousePickerHarness />)
+
+    fireEvent.click(await screen.findByRole('combobox', { name: 'Select tables to replicate' }))
+    await userEvent.type(screen.getByPlaceholderText('Search tables...'), 'analytics')
+
+    expect(screen.getByText('events')).toBeInTheDocument()
+    expect(screen.queryByText('orders')).not.toBeInTheDocument()
+    expect(screen.queryByText('customers')).not.toBeInTheDocument()
   })
 })

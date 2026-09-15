@@ -149,7 +149,7 @@ export const WarehouseSchemaTablePicker = ({
   // start toggling. First-time setup always starts empty and does not need to wait for it.
   if (isSchemasPending || isTablesPending || isSelectionPending) {
     return (
-      <PageSection className="first:pt-0">
+      <PageSection className="pt-0!">
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>Tables</PageSectionTitle>
@@ -202,7 +202,7 @@ export const WarehouseSchemaTablePicker = ({
   }
 
   return (
-    <PageSection className="first:pt-0">
+    <PageSection className="pt-0!">
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>Tables</PageSectionTitle>
@@ -247,7 +247,7 @@ export const WarehouseSchemaTablePicker = ({
                 <MultiSelector.Trigger
                   aria-label="Select tables to replicate"
                   label="Select tables..."
-                  badgeLimit={3}
+                  badgeLimit={6}
                   className="w-full"
                 />
                 <MultiSelector.Content>
@@ -282,7 +282,11 @@ export const WarehouseSchemaTablePicker = ({
                             {schema.tables.map((table) => {
                               const key = getSchemaTableKey(schema.schema, table)
                               return (
-                                <MultiSelector.Item key={key} value={key}>
+                                <MultiSelector.Item
+                                  key={key}
+                                  value={key}
+                                  keywords={[schema.schema]}
+                                >
                                   {table}
                                 </MultiSelector.Item>
                               )

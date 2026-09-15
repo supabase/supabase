@@ -48,7 +48,17 @@ export const WarehouseDisableCard = () => {
             <FormLayout
               layout="flex-row-reverse"
               label="Disable Warehouse for this project"
-              description="Stops replication and removes the Warehouse pipeline, publication, catalog access, and foreign tables. Copied data stays in DuckLake storage until you delete it."
+              description={
+                <>
+                  <span className="block">
+                    Stops replication and removes the Warehouse pipeline, publication, catalog
+                    access, and foreign tables.
+                  </span>
+                  <span className="mt-1 block">
+                    Copied data stays in DuckLake storage until you delete it.
+                  </span>
+                </>
+              }
             >
               <Button variant="danger" onClick={() => setIsConfirming(true)}>
                 Disable Warehouse
@@ -58,26 +68,26 @@ export const WarehouseDisableCard = () => {
         </Card>
       </PageSectionContent>
 
-      {/*
-        A plain confirmation rather than type-to-confirm: no data is destroyed. Re-enabling the
-        same tables rebuilds their DuckLake data from scratch, and anything not re-enabled is left
-        in storage for the user to remove themselves.
-      */}
       <ConfirmationModal
         variant="destructive"
         visible={isConfirming}
         loading={setupMutation.isPending}
         title="Disable Warehouse"
         confirmLabel="Disable Warehouse"
-        description="Replication stops. The Warehouse pipeline, publication, catalog access, and foreign tables are removed, and anything connected to the Warehouse endpoint stops working."
-        alert={{
-          title: 'Copied data stays in storage',
-          description:
-            'Re-enabling the same tables replaces it. Data for tables you do not re-enable stays in storage until you delete it.',
-        }}
+        description="Replication stops and connections to the Warehouse endpoint stop working."
         onCancel={() => setIsConfirming(false)}
         onConfirm={() => projectRef && setupMutation.mutate({ projectRef, body: { targets: [] } })}
-      />
+      >
+        <div className="space-y-2 text-sm text-foreground-light">
+          <p>
+            The Warehouse pipeline, publication, catalog access, and foreign tables are removed.
+          </p>
+          <p>
+            Copied data stays in storage until you delete it. Re-enabling the same tables replaces
+            their copied data.
+          </p>
+        </div>
+      </ConfirmationModal>
     </PageSection>
   )
 }
