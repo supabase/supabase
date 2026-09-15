@@ -145,6 +145,53 @@ describe('buildValueItems', () => {
       { value: 'bob', label: 'Bob' },
     ])
   })
+
+  it('disables options already used by another condition on the same property', () => {
+    const filters: FilterGroup = {
+      logicalOperator: 'AND',
+      conditions: [
+        { propertyName: 'name', operator: '=', value: 'alice' },
+        { propertyName: 'name', operator: '=', value: '' },
+      ],
+    }
+
+    const items = buildValueItems(
+      { type: 'value', path: [1] },
+      filters,
+      filterProperties,
+      {},
+      {},
+      '',
+      false
+    )
+
+    expect(items).toEqual([
+      { value: 'alice', label: 'Alice', disabled: true },
+      { value: 'bob', label: 'Bob' },
+    ])
+  })
+
+  it('does not disable the current condition’s own value', () => {
+    const filters: FilterGroup = {
+      logicalOperator: 'AND',
+      conditions: [{ propertyName: 'name', operator: '=', value: 'alice' }],
+    }
+
+    const items = buildValueItems(
+      { type: 'value', path: [0] },
+      filters,
+      filterProperties,
+      {},
+      {},
+      '',
+      false
+    )
+
+    expect(items).toEqual([
+      { value: 'alice', label: 'Alice' },
+      { value: 'bob', label: 'Bob' },
+    ])
+  })
 })
 
 describe('buildPropertyItems', () => {
