@@ -40,11 +40,13 @@ export const GenerateRecoveryCodesModal = () => {
             if (!open && !copied && recoveryCodesGenerateMutation.isSuccess) return
 
             setOpen(open)
-            // Reset state
-            setCopied(false)
-            setCopiedToClipboard(false)
-            recoveryCodesGenerateMutation.reset()
-            queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status() })
+            if (!open) {
+              // Reset state
+              setCopied(false)
+              setCopiedToClipboard(false)
+              recoveryCodesGenerateMutation.reset()
+              queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status() })
+            }
           }}
         >
           <DialogTrigger asChild>
@@ -66,6 +68,7 @@ export const GenerateRecoveryCodesModal = () => {
                   <GenerateRecoveryCodesModalContent
                     status={recoveryCodesGenerateMutation.status}
                     codes={recoveryCodesGenerateMutation.data?.codes}
+                    copied={copied}
                     onCodesCopied={(copied) => setCopied(copied)}
                   />
                 </div>
@@ -90,6 +93,7 @@ export const GenerateRecoveryCodesModal = () => {
                     copyToClipboard(
                       recoveryCodesGenerateMutation.data?.codes.join('\n') ?? '',
                       () => {
+                        setCopied(true)
                         setCopiedToClipboard(true)
                       }
                     )
@@ -119,10 +123,12 @@ const GenerateRecoveryCodesModalTitle = ({ status }: { status: MutationStatus })
 
 const GenerateRecoveryCodesModalContent = ({
   codes,
+  copied,
   status,
   onCodesCopied,
 }: {
   codes: AuthMFARecoveryCodesGenerateResponseData['codes'] | undefined
+  copied: boolean
   status: MutationStatus
   onCodesCopied: (copied: boolean) => void
 }) => {
@@ -149,6 +155,7 @@ const GenerateRecoveryCodesModalContent = ({
         <div className="flex items-center space-x-2">
           <Checkbox
             id="codeCopied"
+            checked={copied}
             onCheckedChange={(checked) => onCodesCopied(checked === true)}
           />
           <label
