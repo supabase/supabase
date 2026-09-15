@@ -43,7 +43,7 @@ For SQL source names, see the [Log field reference](/docs/guides/observability/l
 
 Postgres logs contain database activity and errors. Connection events appear when [connection logging](/docs/guides/platform/postgres-connection-logging) is enabled. Clear **Connection logs** under **Postgres** to hide them.
 
-To record additional statement classes, see [Logging Postgres queries](/docs/guides/observability/advanced-log-filtering#logging-postgres-queries).
+To record additional statement classes, see [Configure statement logging](/docs/guides/observability/configure-logging#postgres-statements).
 
 ## Inspect an event [#expanding-results]
 
@@ -63,6 +63,6 @@ For continuous export, use [Log drains](/docs/guides/observability/log-drains).
 
 Check the time range, selected log types, and exclusions first. **User** combined with only Postgres or another unsupported type returns no matches. An empty result does not establish that the user had no activity.
 
-Events must be recorded before they can appear in Logs. See [Logging configuration](/docs/guides/observability/advanced-log-filtering#logging-postgres-connections) and the [source limitations](/docs/guides/observability/log-field-reference#capture-limits).
+Events must be recorded before they can appear in Logs. See [Configure logging](/docs/guides/observability/configure-logging) and the [source limitations](/docs/guides/observability/log-field-reference#capture-limits).
 
 Retention depends on your [pricing plan](/pricing). See [Manage Logs usage](/docs/guides/platform/manage-your-usage/logs) for billing details.

@@ -408,6 +408,9 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           disabled={disabled}
           type="button"
           role="combobox"
+          // A combobox takes its name from the author, not its contents, so the badges
+          // and the label span inside leave it nameless without this.
+          aria-label={label}
           className={cn(
             'flex w-full min-w-[200px] justify-between rounded-md border',
             'border-strong',
