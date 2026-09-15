@@ -44,9 +44,9 @@ You can view Logs Ingest usage on the [organization's usage page](/dashboard/org
 
 ## Optimize usage
 
-Every service in your Supabase project generates logs automatically — you don't write them directly. Log volume scales with your application's traffic and behavior. Your project's database (Postgres) can also be configured to record different kinds of activity, such as every query it runs, every time an app connects, and how long things take.
+Every service in your Supabase project generates logs automatically. Log volume scales with your application's traffic and behavior. 
 
-Most projects don't need to log everything, all the time. However, turning off a log type means you won't have that information if something goes wrong later, for example a slow query, a security incident, or a connection storm. If your team relies on these logs for debugging, security audits, or compliance requirements, check with them before you change a setting. When in doubt, reduce the volume of a log type rather than turning it off completely — for example, raise a threshold rather than disabling logging outright.
+Reduce the volume of a log type rather than turning it off completely. Raise a threshold rather than disabling logging outright as this prevents you from having information if something goes wrong later. For example a security incident or a slow query may be completely missed.
 
 You change all of the Postgres settings below through [Custom Postgres Configuration](/guides/database/custom-postgres-config), either from the SQL Editor or the Supabase CLI. Some changes take effect immediately; others require a database restart. The CLI has a `--no-restart` option if you want to batch several changes together before restarting. See [Postgres log configuration](/guides/database/postgres/postgres-log-config) for the full list of configurable log settings and what each one does.
 
