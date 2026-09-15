@@ -2,8 +2,10 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useCallback, useMemo } from 'react'
 
-import { convertProjectConfigToGitHubConfig } from '@/components/interfaces/ConfigDrift/github-config-convert'
-import { getConfigDriftSummary } from '@/components/interfaces/ConfigDrift/github-config-drift'
+import {
+  fromDashboardProjectConfig,
+  getConfigDriftSummary,
+} from '@/components/interfaces/ConfigDrift/github-config-drift'
 import type { Branch } from '@/data/branches/branches-query'
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useGitHubConfigQuery } from '@/data/config/github-config-query'
@@ -60,12 +62,8 @@ export function useSelectedGitHubConfigDrift() {
   )
 
   const summary = useMemo(() => {
-    const dashboardConfig = convertProjectConfigToGitHubConfig(projectConfigQuery.data?.attributes)
-
-    return getConfigDriftSummary({
-      dashboardConfig: dashboardConfig,
-      githubConfig: githubConfigQuery.data?.config,
-    })
+    const dashboardConfig = fromDashboardProjectConfig(projectConfigQuery.data?.attributes)
+    return getConfigDriftSummary({ dashboardConfig, githubConfig: githubConfigQuery.data?.config })
   }, [projectConfigQuery.data?.attributes, githubConfigQuery.data?.config])
 
   const activeQueries = [
@@ -86,7 +84,6 @@ export function useSelectedGitHubConfigDrift() {
     isError: activeQueries.some((query) => query.isError),
     error: activeQueries.find((query) => query.error)?.error,
     hasConfigurationIssues: isReady && issueCount > 0,
-    unmanagedFields: summary.unmanagedFields,
     summary,
     refetch,
   }

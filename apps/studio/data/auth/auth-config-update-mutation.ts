@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { configKeys } from '../config/keys'
 import { authKeys } from './keys'
 import type { components } from '@/data/api'
 import { handleError, patch } from '@/data/fetchers'
@@ -52,8 +53,10 @@ export const useAuthConfigUpdateMutation = ({
 
       await onSuccess?.(data, variables, context)
 
-      queryClient
-        .invalidateQueries({ queryKey: lintKeys.lint(projectRef) })
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: configKeys.projectConfig(projectRef) }),
+      ])
         .then(() =>
           queryClient.refetchQueries({
             queryKey: lintKeys.lint(projectRef),
