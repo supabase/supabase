@@ -18,7 +18,7 @@ You can enable the [IPv4 add-on](/docs/guides/platform/ipv4-address) for your pr
 
 ## What is XMIN and should it be used?
 
-Xmin is a different form of replication from logical replication and should only be used if logical replication is not available for your database (i.e. older versions of Postgres).
+Xmin is a different form of replication from logical replication and should only be used if logical replication is not available for your database, such as with older versions of Postgres.
 
 Xmin performs replication by checking the [xmin system column](https://www.postgresql.org/docs/current/ddl-system-columns.html) and determining if that row has already been synchronized.
 
@@ -36,9 +36,9 @@ Using the Supabase CLI, you can [configure database settings](/docs/guides/datab
 
 Some of the more important options to be aware of are:
 
-- `max_wal_size` - Maximum size the WAL can grow between automatic WAL checkpoints
-- `max_slot_wal_keep_size` - Maximum size of WAL files that replication slots are allowed to retain
-- `wal_keep_size` - Minimum number of past WAL files to keep for standby servers
-- `max_wal_senders` - Maximum number of concurrent connections from standby servers or streaming backup clients
+- `max_wal_size`: Soft limit for WAL written between automatic checkpoints. Postgres can exceed it under some conditions.
+- `max_slot_wal_keep_size`: Per-slot limit on retained WAL at checkpoint time. `-1` lets replication slots retain unlimited WAL. A finite limit can cause a lagging slot to lose required WAL.
+- `wal_keep_size`: Minimum amount of old WAL retained for standby servers. It does not replace the per-slot limit.
+- `max_wal_senders`: Maximum number of concurrent WAL sender processes for standby servers, logical replication consumers, and streaming backups.
 
-These settings help ensure your replication slots don't run out of space and that replicas can reconnect without requiring a full re-sync.
+Size WAL retention for the consumer's maximum expected lag or downtime and the database's WAL generation rate. Higher values reduce the risk that a consumer needs a new initial sync, but can use more database storage. Monitor each slot's retained WAL and `wal_status` instead of treating a configured limit as a guarantee.
