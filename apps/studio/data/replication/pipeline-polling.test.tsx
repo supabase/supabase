@@ -34,6 +34,57 @@ afterEach(() => {
 })
 
 describe('pipeline polling', () => {
+  test.each([
+    { endpoint: 'status', retryAfter: '30', delay: 30_000 },
+    { endpoint: 'replication-status', retryAfter: '60', delay: 60_000 },
+    { endpoint: 'status', retryAfter: undefined, delay: 30_000 },
+  ] as const)(
+    '$endpoint respects rate-limit backoff ($retryAfter) and resumes normal polling after recovery',
+    async ({ endpoint, retryAfter, delay }) => {
+      let requests = 0
+      addAPIMock({
+        method: 'get',
+        path: `/platform/replication/:ref/pipelines/:pipeline_id/${endpoint}`,
+        response: () => {
+          requests += 1
+          if (requests === 1) {
+            return HttpResponse.json<APIErrorBody>(
+              { message: 'Rate limited' },
+              { status: 429, headers: retryAfter ? { 'Retry-After': retryAfter } : undefined }
+            )
+          }
+          return endpoint === 'status'
+            ? HttpResponse.json<StatusResponse>(stopped)
+            : HttpResponse.json<MetricsResponse>({ pipeline_id: 1, table_statuses: [] })
+        },
+      })
+      const useResource =
+        endpoint === 'status'
+          ? useReplicationPipelineStatusQuery
+          : useReplicationPipelineReplicationStatusQuery
+      vi.useFakeTimers()
+      const { result, unmount } = customRenderHook(() => useResource(variables))
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0)
+      })
+      expect(result.current.isError).toBe(true)
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(delay - 1)
+      })
+      expect(requests).toBe(1)
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1)
+      })
+      expect(requests).toBe(2)
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1_000)
+      })
+      expect(result.current.isSuccess).toBe(true)
+      expect(requests).toBe(3)
+      unmount()
+    }
+  )
+
   test.each(['status', 'replication-status'] as const)(
     'shares slow %s requests and polls one second after completion',
     async (endpoint) => {

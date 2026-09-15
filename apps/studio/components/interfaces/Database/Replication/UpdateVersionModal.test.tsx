@@ -128,7 +128,7 @@ describe('pipeline version updates', () => {
           { cancelRefetch: false }
         )
       })
-      expect(screen.getByText(initialLabel)).toBeInTheDocument()
+      expect(screen.getByText(pendingLabel)).toBeInTheDocument()
       expect(screen.getByText('Another action').closest('button')).toBeDisabled()
       await act(async () => {
         complete()

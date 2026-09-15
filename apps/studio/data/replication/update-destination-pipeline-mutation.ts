@@ -3,6 +3,7 @@ import { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { optionalSecret } from './destination-secret-utils'
+import { invalidateReplicationPipelineQueries } from './invalidate-pipeline-queries'
 import { replicationKeys } from './keys'
 import type {
   BigQueryDestinationConfig,
@@ -231,14 +232,8 @@ export const useUpdateDestinationPipelineMutation = ({
         const { projectRef } = variables
         // These prefixes include list, editor, pipeline status, and table metrics caches.
         await Promise.all([
-          queryClient.invalidateQueries(
-            { queryKey: replicationKeys.destinations(projectRef) },
-            { cancelRefetch: false }
-          ),
-          queryClient.invalidateQueries(
-            { queryKey: replicationKeys.pipelines(projectRef) },
-            { cancelRefetch: false }
-          ),
+          queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
+          invalidateReplicationPipelineQueries(queryClient, projectRef),
         ])
 
         await onSuccess?.(data, variables, context)
@@ -246,14 +241,10 @@ export const useUpdateDestinationPipelineMutation = ({
       async onError(data, variables, context) {
         // Settings may commit before runtime recreation fails.
         await Promise.all([
-          queryClient.invalidateQueries(
-            { queryKey: replicationKeys.destinations(variables.projectRef) },
-            { cancelRefetch: false }
-          ),
-          queryClient.invalidateQueries(
-            { queryKey: replicationKeys.pipelines(variables.projectRef) },
-            { cancelRefetch: false }
-          ),
+          queryClient.invalidateQueries({
+            queryKey: replicationKeys.destinations(variables.projectRef),
+          }),
+          invalidateReplicationPipelineQueries(queryClient, variables.projectRef),
         ])
         if (onError === undefined) {
           toast.error(`Failed to update destination or pipeline: ${data.message}`)
