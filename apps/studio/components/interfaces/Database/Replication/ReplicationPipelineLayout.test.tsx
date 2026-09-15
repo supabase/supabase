@@ -8,7 +8,10 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { ReplicationPipelineLayout } from './ReplicationPipelineLayout'
 import { ReplicationPipelineStatus } from './ReplicationPipelineStatus/ReplicationPipelineStatus'
-import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
+import {
+  PipelineRequestStatusProvider,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -26,6 +29,17 @@ const renderLayout = (children?: ReactNode) =>
       <ReplicationPipelineLayout>{children}</ReplicationPipelineLayout>
     </PipelineRequestStatusProvider>
   )
+
+const TableResetFixture = () => {
+  const { setTableResetting } = usePipelineRequestStatus()
+
+  return (
+    <>
+      <button onClick={() => setTableResetting(42, true)}>Begin table reset</button>
+      <button onClick={() => setTableResetting(42, false)}>Finish table reset</button>
+    </>
+  )
+}
 
 type PipelineResponse = components['schemas']['PipelineResponse_Output']
 type PipelineStatusResponse = components['schemas']['PipelineStatusResponse_Output']
@@ -251,6 +265,29 @@ describe('ReplicationPipelineLayout', () => {
     expect(screen.queryByRole('menuitem', { name: 'Stop pipeline' })).not.toBeInTheDocument()
     expect(screen.getByRole('menuitem', { name: 'Edit pipeline' })).toBeVisible()
     expect(screen.getByRole('menuitem', { name: 'Delete pipeline' })).toBeVisible()
+  })
+
+  test('blocks pipeline actions while a table reset is running', async () => {
+    mockStatus('started')
+    mockVersion(true)
+    renderLayout(<TableResetFixture />)
+
+    const lifecycleAction = await screen.findByRole('button', { name: 'Stop' })
+    const options = screen.getByRole('button', { name: 'Pipeline options' })
+    const update = await screen.findByRole('button', { name: 'Update available' })
+    expect(lifecycleAction).toBeEnabled()
+    expect(options).toBeEnabled()
+    expect(update).toBeEnabled()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Begin table reset' }))
+    expect(lifecycleAction).toBeDisabled()
+    expect(options).toBeDisabled()
+    expect(update).toBeDisabled()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Finish table reset' }))
+    expect(lifecycleAction).toBeEnabled()
+    expect(options).toBeEnabled()
+    expect(update).toBeEnabled()
   })
 
   test('offers Stop from the menu when the primary button is Restart', async () => {

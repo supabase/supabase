@@ -88,8 +88,10 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     'edit',
     parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
   )
-  const { getRequestStatus, setRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
+  const { getRequestStatus, getIsTableResetting, setRequestStatus, updatePipelineStatus } =
+    usePipelineRequestStatus()
   const requestStatus = getRequestStatus(pipelineId)
+  const isTableResetting = getIsTableResetting(pipelineId)
 
   const {
     data: pipeline,
@@ -160,8 +162,8 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const isRunningOrFailed =
     statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
   const canUseMenuActions = isRunningOrFailed && !isTransitioning && !!pipeline
-  const canRestart = canUseMenuActions && primaryAction !== 'restart'
-  const canStop = canUseMenuActions && primaryAction !== 'stop'
+  const canRestart = canUseMenuActions && !isTableResetting && primaryAction !== 'restart'
+  const canStop = canUseMenuActions && !isTableResetting && primaryAction !== 'stop'
 
   const onLifecycleAction = async (action?: LifecycleAction) => {
     const resolvedAction = action ?? primaryAction
@@ -307,6 +309,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                     variant="primary"
                     icon={<ArrowUpCircle />}
                     onClick={() => setShowUpdateVersionModal(true)}
+                    disabled={isTableResetting}
                   >
                     Update available
                   </Button>
@@ -324,7 +327,13 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                     isStoppingPipeline ||
                     isRestartingPipeline
                   }
-                  disabled={Boolean(pipelineError) || !pipeline || isTransitioning || !isActionable}
+                  disabled={
+                    Boolean(pipelineError) ||
+                    !pipeline ||
+                    isTransitioning ||
+                    isTableResetting ||
+                    !isActionable
+                  }
                 >
                   {lifecycleLabel}
                 </Button>
@@ -335,6 +344,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                       className="px-1.25 hit-area-2"
                       aria-label="Pipeline options"
                       icon={<MoreVertical />}
+                      disabled={isTableResetting}
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent side="bottom" align="end" className="w-52">

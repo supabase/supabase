@@ -1,13 +1,5 @@
 import { useParams } from 'common'
-import {
-  Activity,
-  ChevronDown,
-  Info,
-  RotateCcw,
-  Search,
-  WifiOff,
-  X,
-} from 'lucide-react'
+import { Activity, ChevronDown, Info, RotateCcw, Search, WifiOff, X } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import {
@@ -72,7 +64,7 @@ export const ReplicationPipelineStatus = () => {
   const [restartingTableIds, setRestartingTableIds] = useState<Set<number>>(new Set())
 
   const pipelineId = Number(_pipelineId)
-  const { getRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
+  const { getRequestStatus, setTableResetting, updatePipelineStatus } = usePipelineRequestStatus()
   const requestStatus = getRequestStatus(pipelineId)
 
   const {
@@ -429,9 +421,11 @@ export const ReplicationPipelineStatus = () => {
           publicationName={pipeline?.config.publication_name}
           pipelineStatusName={statusName}
           onRestartStart={() => {
+            setTableResetting(pipelineId, true)
             setRestartingTableIds((prev) => new Set(prev).add(selectedTableForRestart.id))
           }}
           onRestartComplete={() => {
+            setTableResetting(pipelineId, false)
             setRestartingTableIds((prev) => {
               const next = new Set(prev)
               next.delete(selectedTableForRestart.id)
@@ -464,9 +458,11 @@ export const ReplicationPipelineStatus = () => {
           tableSyncCopy={pipeline?.config.table_sync_copy}
           pipelineStatusName={statusName}
           onRestartStart={(tableIds) => {
+            setTableResetting(pipelineId, true)
             setRestartingTableIds((prev) => new Set([...prev, ...tableIds]))
           }}
           onRestartComplete={(tableIds) => {
+            setTableResetting(pipelineId, false)
             setRestartingTableIds((prev) => {
               const next = new Set(prev)
               tableIds.forEach((id) => next.delete(id))
