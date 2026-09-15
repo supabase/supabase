@@ -5,6 +5,7 @@ import {
 } from 'ui-patterns/FilterBar'
 import { z } from 'zod'
 
+import type { LogsColumnFilterValue, LogsFilterOperator } from '../UnifiedLogs.filters'
 import type { Option } from '@/components/ui/DataTable/DataTable.types'
 
 export const USER_PROPERTY = 'user'
@@ -71,4 +72,26 @@ export const buildFilterProperties = ({
 export const getUserFilterValue = (conditions: FilterCondition[]): string | undefined => {
   const userCondition = conditions.find((condition) => condition.propertyName === USER_PROPERTY)
   return userCondition ? String(userCondition.value) : undefined
+}
+
+// Groups filter bar conditions by column into the wrapped `{ operator, values }` shape —
+// the one shape every column filter value uses, matching logsFiltersToColumnFilters.
+export const buildColumnFilterValues = (
+  conditions: FilterCondition[]
+): Map<string, LogsColumnFilterValue> => {
+  const wrappedByColumn = new Map<string, LogsColumnFilterValue>()
+  for (const condition of conditions) {
+    if (condition.propertyName === USER_PROPERTY) continue
+    const operator = condition.operator as LogsFilterOperator
+    const existing = wrappedByColumn.get(condition.propertyName)
+    if (!existing) {
+      wrappedByColumn.set(condition.propertyName, { operator, values: [String(condition.value)] })
+    } else {
+      existing.values.push(String(condition.value))
+      // Mixed operators on the same column aren't expressible in the column-filter
+      // shape (one operator per column). Last write wins.
+      if (existing.operator !== operator) existing.operator = operator
+    }
+  }
+  return wrappedByColumn
 }
