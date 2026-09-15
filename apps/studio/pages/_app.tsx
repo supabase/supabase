@@ -39,7 +39,6 @@ import { studioThemeValues, TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
 import { AppearanceSettingsProvider } from '@/components/interfaces/App/AppearanceSettingsProvider'
-import { AppearanceSettingsScript } from '@/components/interfaces/App/AppearanceSettingsScript'
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -184,7 +183,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                     <TimestampInfoTimezoneBridge>
                       <Head>
                         <title>{appTitle ?? 'Supabase'}</title>
-                        <AppearanceSettingsScript />
                         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
                         <meta property="og:image" content={`${BASE_PATH}/img/supabase-og.png`} />
                         <meta name="googlebot" content="notranslate" />
