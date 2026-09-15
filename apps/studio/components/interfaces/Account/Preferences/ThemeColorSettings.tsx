@@ -63,8 +63,8 @@ export const ThemeColorSettings = () => {
 
           return (
             <div key={knob.key} className="flex flex-col gap-2">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex flex-col gap-1">
+              <div className="grid grid-cols-[minmax(0,1fr)_2rem] items-start gap-4">
+                <div className="min-w-0 flex flex-col gap-1">
                   <span
                     id={`theme-color-${knob.key}-label`}
                     className="text-sm font-medium text-foreground"
@@ -73,7 +73,7 @@ export const ThemeColorSettings = () => {
                   </span>
                   <span className="text-sm text-foreground-light">{knob.description}</span>
                 </div>
-                <span className="text-sm font-mono text-foreground-light tabular-nums">
+                <span className="text-right text-sm text-foreground-light tabular-nums">
                   {sliderValue}
                 </span>
               </div>
