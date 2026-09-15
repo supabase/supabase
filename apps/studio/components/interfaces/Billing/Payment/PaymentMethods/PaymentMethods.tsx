@@ -69,7 +69,7 @@ const PaymentMethods = () => {
             <p className="text-foreground text-base m-0">Payment Methods</p>
             <p className="text-sm text-foreground-light mb-2 pr-4 m-0">
               {isStripeManagedOrganization
-                ? 'Billing for this organisation is handled through Stripe Projects.'
+                ? 'Billing for this organization is handled through Stripe Projects.'
                 : 'Payments for your subscription are made using the default card.'}
             </p>
           </div>

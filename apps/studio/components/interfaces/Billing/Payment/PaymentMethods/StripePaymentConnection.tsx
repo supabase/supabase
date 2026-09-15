@@ -35,7 +35,7 @@ export function StripePaymentConnection({
       <Admonition
         type="warning"
         title="Stripe payment connection needs attention"
-        description="The payment token linked to this organisation may be invalid or expired. To keep billing active, review and update it in your Stripe Dashboard."
+        description="The payment token linked to this organization may be invalid or expired. To keep billing active, review and update it in your Stripe Dashboard."
         actions={
           <Button asChild variant="warning" iconRight={<ExternalLink size={14} />}>
             <a href={STRIPE_DASHBOARD_URL} target="_blank" rel="noopener noreferrer">
