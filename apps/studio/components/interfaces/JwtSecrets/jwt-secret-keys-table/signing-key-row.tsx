@@ -138,7 +138,7 @@ export const SigningKeyRow = ({
                 />
               </DropdownMenuTrigger>
             </TooltipTrigger>
-            <TooltipContent side='bottom'>Manage key</TooltipContent>
+            <TooltipContent side="bottom">Manage key</TooltipContent>
           </Tooltip>
           <DropdownMenuContent align="end" className="w-52">
             {signingKey.algorithm !== 'HS256' && (

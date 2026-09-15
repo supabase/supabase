@@ -144,9 +144,9 @@ export const QueryPerformanceGrid = ({
                         // Tooltip repeats the label; the description would read the name twice
                         aria-describedby={undefined}
                       />
-                  </DropdownMenuTrigger>
-                </TooltipTrigger>
-                <TooltipContent side='bottom'>Sort options</TooltipContent>
+                    </DropdownMenuTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Sort options</TooltipContent>
                 </Tooltip>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem

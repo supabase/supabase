@@ -38,9 +38,9 @@ export const FilterInput = ({ value, onChange, placeholder, className }: FilterI
                 aria-label="Clear search"
                 // Tooltip repeats the label; the description would read the name twice
                 aria-describedby={undefined}
-            />
+              />
             </TooltipTrigger>
-            <TooltipContent side='bottom'>Clear search</TooltipContent>
+            <TooltipContent side="bottom">Clear search</TooltipContent>
           </Tooltip>
         ),
       ]}
