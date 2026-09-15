@@ -4,6 +4,7 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { forwardRef } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { SqlNotices } from './SqlNotices'
 import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import CopyButton from '@/components/ui/CopyButton'
@@ -176,15 +177,26 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
           </p>
         </div>
       )
-    } else if (result.rows.length <= 0) {
+    }
+
+    const notices = result.notices ?? []
+
+    if (result.rows.length <= 0) {
       return (
         <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
+          <SqlNotices notices={notices} />
           <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
         </div>
       )
     }
 
-    return <DataGridResults rows={result.rows} />
+    // Siblings on purpose: the grid relies on being a direct flex child of the panel to grow.
+    return (
+      <>
+        <SqlNotices notices={notices} />
+        <DataGridResults rows={result.rows} />
+      </>
+    )
   }
 )
 

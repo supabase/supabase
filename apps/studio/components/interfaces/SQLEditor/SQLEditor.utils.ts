@@ -311,6 +311,8 @@ export function buildExecuteParams({
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
     isStatementTimeoutDisabled: true as const,
     contextualInvalidation: true as const,
+    // The SQL editor is the one place that shows what psql would print, warnings included
+    includeNotices: true as const,
   }
 }
 

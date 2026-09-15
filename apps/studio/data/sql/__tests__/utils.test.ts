@@ -1,7 +1,13 @@
 import { safeSql } from '@supabase/pg-meta'
 import { describe, expect, it, test } from 'vitest'
 
-import { applyAutoLimit, getSqlErrorLines, trimTrailingSemicolons } from '../utils'
+import {
+  applyAutoLimit,
+  getSqlErrorLines,
+  getSqlNoticeLines,
+  parseExecuteSqlResponse,
+  trimTrailingSemicolons,
+} from '../utils'
 
 describe('getSqlErrorLines', () => {
   it('returns formattedError lines when present', () => {
@@ -237,5 +243,67 @@ select * from cities`
     const sql = safeSql`select * from countries limit 10;`
     const { sql: formattedSql } = applyAutoLimit(sql, 100)
     expect(formattedSql).toBe(sql)
+  })
+})
+
+describe('parseExecuteSqlResponse', () => {
+  it('treats a bare rows array as rows with no notices', () => {
+    const rows = [{ id: 1 }, { id: 2 }]
+    expect(parseExecuteSqlResponse(rows)).toEqual({ rows, notices: [] })
+  })
+
+  it('splits a { data, notices } response into rows and notices', () => {
+    const notice = { severity: 'WARNING', code: '01000', message: 'no privileges were granted' }
+    expect(parseExecuteSqlResponse({ data: [], notices: [notice] })).toEqual({
+      rows: [],
+      notices: [notice],
+    })
+  })
+
+  it('keeps rows from a { data, notices } response when there are no notices', () => {
+    const rows = [{ one: 1 }]
+    expect(parseExecuteSqlResponse({ data: rows, notices: [] })).toEqual({ rows, notices: [] })
+  })
+
+  it('passes through anything else untouched with no notices', () => {
+    expect(parseExecuteSqlResponse(undefined)).toEqual({ rows: undefined, notices: [] })
+    expect(parseExecuteSqlResponse({ data: 'not-rows' })).toEqual({
+      rows: { data: 'not-rows' },
+      notices: [],
+    })
+  })
+})
+
+describe('getSqlNoticeLines', () => {
+  it('prints severity and message like psql', () => {
+    expect(
+      getSqlNoticeLines({
+        severity: 'WARNING',
+        code: '01000',
+        message: 'no privileges were granted for "messages"',
+      })
+    ).toEqual(['WARNING:  no privileges were granted for "messages"'])
+  })
+
+  it('adds DETAIL, HINT and CONTEXT lines when present', () => {
+    expect(
+      getSqlNoticeLines({
+        severity: 'NOTICE',
+        message: 'careful',
+        detail: 'some detail',
+        hint: 'a hint',
+        where: 'PL/pgSQL function inline_code_block line 1 at RAISE',
+      })
+    ).toEqual([
+      'NOTICE:  careful',
+      'DETAIL:  some detail',
+      'HINT:  a hint',
+      'CONTEXT:  PL/pgSQL function inline_code_block line 1 at RAISE',
+    ])
+  })
+
+  it('falls back to NOTICE when the severity is missing', () => {
+    expect(getSqlNoticeLines({ message: 'hello' })).toEqual(['NOTICE:  hello'])
+    expect(getSqlNoticeLines({})).toEqual(['NOTICE:'])
   })
 })

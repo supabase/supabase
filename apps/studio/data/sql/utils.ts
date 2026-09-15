@@ -1,4 +1,60 @@
 import { literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
+import { z } from 'zod'
+
+/**
+ * A NOTICE/WARNING/INFO message Postgres emitted while a query ran, e.g.
+ * `WARNING:  no privileges were granted for "messages"`. The query still succeeded, so this is
+ * not an error, but psql prints these and users expect to see them. Mirrors `PostgresNotice`
+ * in postgres-meta.
+ */
+const postgresNoticeSchema = z.object({
+  severity: z.string().optional(),
+  code: z.string().optional(),
+  message: z.string().optional(),
+  detail: z.string().optional(),
+  hint: z.string().optional(),
+  where: z.string().optional(),
+})
+export type PostgresNotice = z.infer<typeof postgresNoticeSchema>
+
+/** Response shape of pg-meta's `POST /query?includeNotices=true`. */
+const queryResponseWithNoticesSchema = z.object({
+  data: z.array(z.unknown()),
+  notices: z.array(postgresNoticeSchema),
+})
+
+/**
+ * Normalizes the two response shapes of the pg-meta query endpoint: the bare rows array it
+ * has always returned, and the `{ data, notices }` object it returns when notices are
+ * requested. Callers only ever see rows plus a (possibly empty) notices list, so a backend
+ * that does not forward notices yet degrades to "no notices" instead of breaking.
+ */
+export function parseExecuteSqlResponse<T = unknown>(
+  response: unknown
+): { rows: T; notices: PostgresNotice[] } {
+  if (Array.isArray(response)) return { rows: response as T, notices: [] }
+
+  const parsed = queryResponseWithNoticesSchema.safeParse(response)
+  if (parsed.success) return { rows: parsed.data.data as T, notices: parsed.data.notices }
+
+  return { rows: response as T, notices: [] }
+}
+
+/**
+ * Formats a notice the way psql prints it, one line per field:
+ *
+ *     WARNING:  no privileges were granted for "messages"
+ *     DETAIL:  ...
+ *     HINT:  ...
+ *     CONTEXT:  ...
+ */
+export function getSqlNoticeLines(notice: PostgresNotice): string[] {
+  const lines = [`${notice.severity ?? 'NOTICE'}:  ${notice.message ?? ''}`.trimEnd()]
+  if (notice.detail) lines.push(`DETAIL:  ${notice.detail}`)
+  if (notice.hint) lines.push(`HINT:  ${notice.hint}`)
+  if (notice.where) lines.push(`CONTEXT:  ${notice.where}`)
+  return lines
+}
 
 /**
  * Pick which lines to render for a SQL editor error.

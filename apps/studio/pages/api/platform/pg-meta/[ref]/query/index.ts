@@ -23,7 +23,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { query } = req.body
   const headers = constructHeaders(req.headers)
-  const { data, error } = await executeQuery({ query, headers })
+  // Same opt-in as pg-meta's `/query?includeNotices=true`; keeps the bare rows array otherwise
+  const includeNotices = req.query.includeNotices === 'true'
+  const { data, error } = await executeQuery({ query, headers, includeNotices })
 
   if (error) {
     if (error instanceof PgMetaDatabaseError) {

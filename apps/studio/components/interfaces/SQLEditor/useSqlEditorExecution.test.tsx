@@ -102,6 +102,44 @@ describe('useSqlEditorExecution', () => {
     expect(queries.some((q) => /select 1/i.test(q))).toBe(true)
   })
 
+  it('asks for Postgres notices and records them alongside the rows', async () => {
+    const notice = {
+      severity: 'WARNING',
+      code: '01000',
+      message: 'no privileges were granted for "messages"',
+    }
+    const requestUrls: string[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async ({ request }) => {
+        const body = (await request.json()) as { query: string }
+        // The event-triggers probe shares this endpoint; only answer the real run with notices.
+        if (/grant select/i.test(body.query)) {
+          requestUrls.push(request.url)
+          return HttpResponse.json<any>({ data: [], notices: [notice] })
+        }
+        return HttpResponse.json<any>([])
+      },
+    })
+
+    const { result } = renderExecution()
+    await waitFor(() => expect(result.current.isReady).toBe(true))
+
+    await act(async () => {
+      await result.current.execution.executeQuery(
+        sql('grant select on realtime.messages to role_test;')
+      )
+    })
+
+    await waitFor(() => expect(sqlEditorSessionState.results[SNIPPET_ID]).toBeDefined())
+    expect(sqlEditorSessionState.results[SNIPPET_ID][0].rows).toEqual([])
+    expect(sqlEditorSessionState.results[SNIPPET_ID][0].notices).toEqual([notice])
+    expect(
+      requestUrls.some((url) => new URL(url).searchParams.get('includeNotices') === 'true')
+    ).toBe(true)
+  })
+
   it('appends the auto-limit to a bare SELECT and records it on the result', async () => {
     const queries = captureExecutedQueries([])
 

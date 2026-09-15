@@ -1,6 +1,7 @@
 import { proxy, ref, snapshot, useSnapshot } from 'valtio'
 
 import type { TimeRange } from '@/data/content/notebooks/notebook-schema'
+import type { PostgresNotice } from '@/data/sql/utils'
 
 /**
  * Ephemeral, per-session SQL editor state that is NOT persisted: query results,
@@ -19,6 +20,8 @@ export const sqlEditorSessionState = proxy({
       rows: any[]
       error?: any
       autoLimit?: number
+      /** NOTICE/WARNING messages Postgres emitted while the query ran; see `PostgresNotice`. */
+      notices?: PostgresNotice[]
     }[]
   },
 
@@ -43,13 +46,13 @@ export const sqlEditorSessionState = proxy({
     sqlEditorSessionState.logRange[id] = range
   },
 
-  addResult: (id: string, results: any[], autoLimit?: number) => {
+  addResult: (id: string, results: any[], autoLimit?: number, notices?: PostgresNotice[]) => {
     // Use ref() to prevent Valtio from creating proxies for each row object.
     // This is critical for large result sets - without ref(), Valtio wraps every
     // row and nested property in a Proxy, causing massive memory overhead.
     // Alright to use ref() in this case as the data is meant to be read-only and we
     // don't need to track changes to the underlying data
-    sqlEditorSessionState.results[id] = [{ rows: ref(results), autoLimit }]
+    sqlEditorSessionState.results[id] = [{ rows: ref(results), autoLimit, notices }]
   },
 
   addResultError: (id: string, error: any, autoLimit?: number) => {

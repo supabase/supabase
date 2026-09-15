@@ -13,6 +13,7 @@ import {
 } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
 import { handleError as handleErrorFetchers, post } from '@/data/fetchers'
 import { QUERY_SOURCE_REGISTRY } from '@/data/query-sources/query-source-registry'
+import { parseExecuteSqlResponse, type PostgresNotice } from '@/data/sql/utils'
 import { MB } from '@/lib/constants'
 import { sqlEventParser } from '@/lib/sql-event-parser'
 import { useTrack } from '@/lib/telemetry/track'
@@ -61,6 +62,12 @@ type ExecuteSqlVariables = {
    * Intended to be used for interfaces that heavily rely on queries on the DB
    * */
   preflightCheck?: boolean
+  /**
+   * Asks pg-meta to return the NOTICE/WARNING messages Postgres emitted while running the query
+   * (e.g. `no privileges were granted for "messages"`) in `notices`. Backends that do not
+   * support it keep returning the bare rows, in which case `notices` is empty.
+   */
+  includeNotices?: boolean
 }
 
 type ExecuteSqlMutationVariables = ExecuteSqlVariables & {
@@ -83,6 +90,7 @@ export async function executeSql<T = any>(
     isRoleImpersonationEnabled = false,
     isStatementTimeoutDisabled = false,
     preflightCheck = false,
+    includeNotices = false,
   }: ExecuteSqlVariables,
   signal?: AbortSignal,
   headersInit?: HeadersInit,
@@ -90,7 +98,7 @@ export async function executeSql<T = any>(
     query: string
     headers?: HeadersInit
   }) => Promise<{ data: T } | { error: ResponseError }>
-): Promise<{ result: T }> {
+): Promise<{ result: T; notices?: PostgresNotice[] }> {
   if (!projectRef) throw new Error('projectRef is required')
 
   const sqlSize = new Blob([sql]).size
@@ -104,6 +112,7 @@ export async function executeSql<T = any>(
 
   let data
   let error
+  let notices: PostgresNotice[] = []
 
   if (fetcherOverride) {
     const result = await fetcherOverride({ query: sql, headers })
@@ -165,12 +174,15 @@ export async function executeSql<T = any>(
       body: { query: sql, disable_statement_timeout: isStatementTimeoutDisabled },
       params: {
         ...options.params,
-        // @ts-expect-error: This is just a client side thing to identify queries better
-        query: { key },
+        // @ts-expect-error: `key` is just a client side thing to identify queries better, and
+        // `includeNotices` is forwarded to pg-meta's `/query?includeNotices=true`
+        query: includeNotices ? { key, includeNotices: true } : { key },
       },
     })
 
-    data = result.data
+    const parsed = parseExecuteSqlResponse<T>(result.data)
+    data = parsed.rows
+    notices = parsed.notices
     error = result.error
   }
 
@@ -213,10 +225,10 @@ export async function executeSql<T = any>(
     Array.isArray(data) &&
     data?.[0]?.[ROLE_IMPERSONATION_NO_RESULTS] === 1
   ) {
-    return { result: [] as T }
+    return { result: [] as T, notices }
   }
 
-  return { result: data as T }
+  return { result: data as T, notices }
 }
 
 type ExecuteSqlData = Awaited<ReturnType<typeof executeSql<any[]>>>
