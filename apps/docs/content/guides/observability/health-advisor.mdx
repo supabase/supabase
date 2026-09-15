@@ -1,0 +1,70 @@
+---
+id: 'health-advisor'
+title: 'Health Advisor'
+description: 'On-demand runtime checks across all Supabase services — database connectivity, instance health, and per-service error rates.'
+---
+
+The Health Advisor runs on-demand checks against your live project. Unlike the [security and performance advisors](/docs/guides/observability/advisors), which inspect the database schema for configuration issues, health checks measure live service availability and error rates across all Supabase services.
+
+Open the Health Advisor in Studio at [**Advisors → Health**](/dashboard/project/_/advisors/health).
+
+## How checks run
+
+Health checks are on-demand. Each check queries a live source — a database connection, instance metrics, or request logs — so results reflect current state at the moment you refresh. Findings clear automatically when the underlying condition resolves.
+
+## Available checks
+
+| Check                                                                            | Category        | Severity |
+| -------------------------------------------------------------------------------- | --------------- | -------- |
+| [Database not usable](#db_not_reachable)                                         | DB connectivity | Error    |
+| [Database connection limit reached](#db_connection_limit_reached)                | DB connectivity | Error    |
+| [Database process is down](#instance_db_down)                                    | Instance        | Error    |
+| [Infrastructure alerts firing](#instance_alert_firing)                           | Instance        | Warning  |
+| [Data API error rate persistently high](#log_data_api_error_rate_high)           | Service errors  | Warning  |
+| [Auth error rate persistently high](#log_auth_error_rate_high)                   | Service errors  | Warning  |
+| [Storage error rate persistently high](#log_storage_error_rate_high)             | Service errors  | Warning  |
+| [Edge Function error rate persistently high](#log_edge_function_error_rate_high) | Service errors  | Warning  |
+
+### DB connectivity
+
+These checks attempt a live connection and report the specific layer where it fails. When a finding fires, check [Database settings](https://supabase.com/dashboard/project/_/settings/database) to confirm the database is running. If connections are exhausted, review pooler mode and pool size in [Connection Pooling](/dashboard/project/_/settings/database).
+
+#### db_not_reachable
+
+**Database not usable.** A connection cannot be established at the DNS or TCP layer, or the server is rejecting connections before authentication completes.
+
+#### db_connection_limit_reached
+
+**Database connection limit reached.** Active connections leave no usable connections free. New clients cannot connect until existing connections are released. Consider switching to Transaction mode or upgrading your plan.
+
+### Instance monitoring
+
+These checks query infrastructure metrics for your project's compute instance. When a finding fires, go to [Infrastructure](https://supabase.com/dashboard/project/_/settings/infrastructure). If the condition persists, [contact support](https://supabase.com/support).
+
+#### instance_db_down
+
+**Database process is down.** The instance is reporting metrics but the on-host Postgres process check is failing. Postgres has stopped or crashed while the underlying instance remains reachable.
+
+#### instance_alert_firing
+
+**Infrastructure alerts firing.** Monitoring rules for disk usage, I/O budget, or compute resource pressure are active. Persistent pressure may require a compute upgrade.
+
+### Service error rates
+
+These checks analyze request logs across two consecutive five-minute windows. A single spike does not trigger a finding. When one fires, open the [Logs Explorer](https://supabase.com/dashboard/project/_/logs/explorer) in Studio and filter by the affected service.
+
+#### log_data_api_error_rate_high
+
+**Data API error rate is persistently high.** The Data API is returning 5xx responses across both windows.
+
+#### log_auth_error_rate_high
+
+**Auth error rate is persistently high.** Auth is returning 5xx responses across both windows.
+
+#### log_storage_error_rate_high
+
+**Storage error rate is persistently high.** Storage is returning 5xx responses across both windows.
+
+#### log_edge_function_error_rate_high
+
+**Edge Function error rate is persistently high.** Edge Functions are returning 5xx responses across both windows.

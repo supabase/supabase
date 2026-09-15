@@ -3139,6 +3139,12 @@ export const telemetry: NavMenuConstant = {
         {
           name: 'Advisors',
           url: '/guides/observability/advisors' as `/${string}`,
+          items: [
+            {
+              name: 'Health Advisor',
+              url: '/guides/observability/health-advisor' as `/${string}`,
+            },
+          ],
         },
         {
           name: 'Reports',
