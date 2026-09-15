@@ -125,6 +125,12 @@ export const InviteMemberButton = () => {
       )
     )
 
+  const inviteDisabledReason = !organizationMembersCreationEnabled
+    ? 'Inviting members is currently disabled'
+    : !canInviteMembers
+      ? 'You need additional permissions to invite members to this organization'
+      : undefined
+
   const { mutateAsync: inviteMemberAsync, isPending: isInviting } =
     useOrganizationCreateInvitationMutation()
 
@@ -277,7 +283,7 @@ export const InviteMemberButton = () => {
             if (canInviteMembers) setIsOpen(true)
           }}
           side="bottom"
-          tooltipOpen={isOpen ? false : undefined}
+          tooltipOpen={isOpen || inviteDisabledReason !== undefined ? false : undefined}
         >
           <ButtonTooltip
             variant="primary"
@@ -288,11 +294,7 @@ export const InviteMemberButton = () => {
             tooltip={{
               content: {
                 side: 'bottom',
-                text: !organizationMembersCreationEnabled
-                  ? 'Inviting members is currently disabled'
-                  : !canInviteMembers
-                    ? 'You need additional permissions to invite members to this organization'
-                    : undefined,
+                text: inviteDisabledReason,
               },
             }}
           >

@@ -76,11 +76,12 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
   useCheckEntitlements: () => ({ hasAccess: false }),
 }))
 
+const { mockRolesManagementPermissions } = vi.hoisted(() => ({
+  mockRolesManagementPermissions: vi.fn(),
+}))
+
 vi.mock('@/components/interfaces/Organization/TeamSettings/TeamSettings.utils', () => ({
-  useGetRolesManagementPermissions: () => ({
-    rolesAddable: [1, 2, 3, 4],
-    rolesRemovable: [1, 2, 3, 4],
-  }),
+  useGetRolesManagementPermissions: mockRolesManagementPermissions,
 }))
 
 const mockInvite = vi.fn().mockResolvedValue({ succeeded: [], failed: [] })
@@ -122,6 +123,31 @@ async function submitForm(emailValue: string) {
 describe('InviteMemberButton', () => {
   beforeEach(() => {
     mockInvite.mockResolvedValue({ succeeded: [], failed: [] })
+    mockRolesManagementPermissions.mockReturnValue({
+      rolesAddable: [1, 2, 3, 4],
+      rolesRemovable: [1, 2, 3, 4],
+    })
+  })
+
+  describe('when the user cannot invite members', () => {
+    beforeEach(() => {
+      mockRolesManagementPermissions.mockReturnValue({ rolesAddable: [], rolesRemovable: [] })
+    })
+
+    it('shows only the permission warning, not the shortcut tooltip', async () => {
+      customRender(<InviteMemberButton />)
+      const button = screen.getByRole('button', { name: /invite members/i })
+      expect(button).toHaveAttribute('aria-disabled', 'true')
+
+      await userEvent.hover(button)
+
+      expect(
+        await screen.findAllByText(
+          'You need additional permissions to invite members to this organization'
+        )
+      ).not.toHaveLength(0)
+      expect(screen.queryAllByText(/shift|⇧/i)).toHaveLength(0)
+    })
   })
 
   it('renders an enabled Invite members button', () => {
