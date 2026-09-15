@@ -10,6 +10,7 @@ import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants'
 import { MoveItemsFolderPickerBreadcrumb } from './MoveItemsFolderPickerBreadcrumb'
 import { FolderPickerRow } from './MoveItemsFolderPickerRow'
 import { filterFoldersBySearch, getDestinationLabel, toFolders } from './MoveItemsModal.utils'
+import { AlertError } from '@/components/ui/AlertError'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
 import { bucketFoldersQueryOptions } from '@/data/storage/bucket-folders-query'
 import { useBucketObjectsInfiniteQuery } from '@/data/storage/bucket-objects-infinite-query'
@@ -45,8 +46,11 @@ export const MoveItemsFolderPicker = ({
     data: objectsData,
     isPending: isPendingObjects,
     isFetching: isFetchingObjects,
+    isError: isErrorObjects,
+    error: objectsError,
     hasNextPage,
     fetchNextPage,
+    refetch: refetchObjects,
   } = useBucketObjectsInfiniteQuery({
     projectRef,
     bucketId,
@@ -56,7 +60,13 @@ export const MoveItemsFolderPicker = ({
     },
   })
 
-  const { data: foldersData, isPending: isPendingFolders } = useQuery({
+  const {
+    data: foldersData,
+    isPending: isPendingFolders,
+    isError: isErrorFolders,
+    error: foldersError,
+    refetch: refetchFolders,
+  } = useQuery({
     ...bucketFoldersQueryOptions({ projectRef, bucketId }),
     enabled: isSearching,
   })
@@ -73,10 +83,10 @@ export const MoveItemsFolderPicker = ({
 
   const isRoot = pathSegments.length === 0
   const currentFolderName = isRoot ? bucketName : pathSegments[pathSegments.length - 1]
-  // Pages hold files as well as folders, so a page of pure files leaves nothing to render yet
+  // A page of pure files leaves nothing to render yet
   const isDrainingPages = folders.length === 0 && hasNextPage
 
-  // Navigating always leaves search mode, so that the listing shown matches the destination
+  // Navigating always leaves search mode
   const handleNavigate = (segments: string[]) => {
     setSearchString('')
     onChangePath(segments)
@@ -146,7 +156,21 @@ export const MoveItemsFolderPicker = ({
           </div>
         )}
 
-        {isSearching && !isPendingFolders && searchResults.length === 0 && (
+        {isSearching && isErrorFolders && (
+          <div className="flex h-full items-center justify-center p-2.5">
+            <AlertError
+              error={foldersError}
+              subject="Failed to search folders"
+              additionalActions={
+                <Button size="tiny" variant="outline" onClick={() => refetchFolders()}>
+                  Try again
+                </Button>
+              }
+            />
+          </div>
+        )}
+
+        {isSearching && !isPendingFolders && !isErrorFolders && searchResults.length === 0 && (
           <div className="flex h-full flex-col items-center justify-center gap-y-1 px-6">
             <p className="text-sm text-foreground">No folders match "{debouncedSearchString}"</p>
             <p className="text-center text-sm text-foreground-light">
@@ -155,7 +179,7 @@ export const MoveItemsFolderPicker = ({
           </div>
         )}
 
-        {isSearching && searchResults.length > 0 && (
+        {isSearching && !isErrorFolders && searchResults.length > 0 && (
           <InfiniteListDefault
             className="h-full"
             items={searchResults}
@@ -180,34 +204,55 @@ export const MoveItemsFolderPicker = ({
           </div>
         )}
 
-        {!isSearching && !isPendingObjects && folders.length === 0 && !isDrainingPages && (
-          <div className="flex h-full flex-col items-center justify-center gap-y-1 px-6">
-            <p className="text-sm text-foreground">No folders in {currentFolderName}</p>
-            <p className="text-center text-sm text-foreground-light">
-              Move the files here, or go back to choose another folder.
-            </p>
+        {!isSearching && isErrorObjects && (
+          <div className="flex h-full items-center justify-center p-2.5">
+            <AlertError
+              error={objectsError}
+              subject="Failed to load folder contents"
+              additionalActions={
+                <Button size="tiny" variant="outline" onClick={() => refetchObjects()}>
+                  Try again
+                </Button>
+              }
+            />
           </div>
         )}
 
-        {!isSearching && !isPendingObjects && (folders.length > 0 || isDrainingPages) && (
-          <InfiniteListDefault
-            className="h-full"
-            items={folders}
-            itemProps={{
-              selectedPath: path,
-              showLocation: false,
-              bucketName,
-              onSelectFolder: handleSelectFolder,
-            }}
-            getItemKey={(index) => folders[index]?.path ?? `folder-${index}`}
-            getItemSize={() => ROW_HEIGHT}
-            ItemComponent={FolderPickerRow}
-            LoaderComponent={LoaderForIconMenuItems}
-            hasNextPage={hasNextPage}
-            isLoadingNextPage={isFetchingObjects}
-            onLoadNextPage={fetchNextPage}
-          />
-        )}
+        {!isSearching &&
+          !isPendingObjects &&
+          !isErrorObjects &&
+          folders.length === 0 &&
+          !isDrainingPages && (
+            <div className="flex h-full flex-col items-center justify-center gap-y-1 px-6">
+              <p className="text-sm text-foreground">No folders in {currentFolderName}</p>
+              <p className="text-center text-sm text-foreground-light">
+                Move the files here, or go back to choose another folder.
+              </p>
+            </div>
+          )}
+
+        {!isSearching &&
+          !isPendingObjects &&
+          !isErrorObjects &&
+          (folders.length > 0 || isDrainingPages) && (
+            <InfiniteListDefault
+              className="h-full"
+              items={folders}
+              itemProps={{
+                selectedPath: path,
+                showLocation: false,
+                bucketName,
+                onSelectFolder: handleSelectFolder,
+              }}
+              getItemKey={(index) => folders[index]?.path ?? `folder-${index}`}
+              getItemSize={() => ROW_HEIGHT}
+              ItemComponent={FolderPickerRow}
+              LoaderComponent={LoaderForIconMenuItems}
+              hasNextPage={hasNextPage}
+              isLoadingNextPage={isFetchingObjects}
+              onLoadNextPage={fetchNextPage}
+            />
+          )}
       </div>
 
       {isSearching && !!foldersData?.isTruncated && (

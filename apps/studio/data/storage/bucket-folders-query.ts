@@ -31,28 +31,41 @@ export type BucketFoldersData = {
 
 export type BucketFoldersError = ResponseError
 
+/** Pages through a single folder, counting each page fetched against the shared `listingsState` */
 const listFolderNames = async (
   { projectRef, bucketId, path }: { projectRef: string; bucketId: string; path: string },
+  listingsState: { count: number },
   signal?: AbortSignal
-) => {
-  const objects = await listBucketObjects(
-    {
-      projectRef,
-      bucketId,
-      path,
-      options: { limit: PAGE_LIMIT, offset: 0, sortBy: { column: 'name', order: 'asc' } },
-    },
-    signal
-  )
-  // Objects without an id are prefixes (folders) rather than files
-  return (objects ?? []).filter((object) => !object.id).map((object) => object.name)
+): Promise<{ names: string[]; isTruncated: boolean }> => {
+  const names: string[] = []
+  let offset = 0
+
+  while (true) {
+    if (listingsState.count >= MAX_LISTINGS) {
+      return { names, isTruncated: true }
+    }
+
+    listingsState.count++
+    const objects = await listBucketObjects(
+      {
+        projectRef,
+        bucketId,
+        path,
+        options: { limit: PAGE_LIMIT, offset, sortBy: { column: 'name', order: 'asc' } },
+      },
+      signal
+    )
+
+    const page = objects ?? []
+    // Objects without an id are prefixes (folders) rather than files
+    names.push(...page.filter((object) => !object.id).map((object) => object.name))
+
+    if (page.length < PAGE_LIMIT) return { names, isTruncated: false }
+    offset += PAGE_LIMIT
+  }
 }
 
-/**
- * Crawls a bucket breadth first and returns every folder in it, so that folders can be
- * searched client side. Limited by `MAX_LISTINGS` and `MAX_FOLDERS` — when either limit is
- * reached the crawl stops early and `isTruncated` is set.
- */
+/** Crawls a bucket breadth first for every folder, stopping early once `MAX_LISTINGS`/`MAX_FOLDERS` is hit */
 async function getBucketFolders(
   { projectRef, bucketId }: BucketFoldersVariables,
   signal?: AbortSignal
@@ -62,27 +75,31 @@ async function getBucketFolders(
 
   const folders: StorageFolder[] = []
   let queue = ['']
-  let listings = 0
+  const listingsState = { count: 0 }
   let isTruncated = false
 
   while (queue.length > 0) {
-    if (listings >= MAX_LISTINGS || folders.length >= MAX_FOLDERS) {
+    if (listingsState.count >= MAX_LISTINGS || folders.length >= MAX_FOLDERS) {
       isTruncated = true
       break
     }
 
     const batch = queue.slice(0, CONCURRENCY)
     queue = queue.slice(CONCURRENCY)
-    listings += batch.length
 
     const results = await Promise.all(
-      batch.map(async (path) => ({
-        path,
-        names: await listFolderNames({ projectRef, bucketId, path }, signal),
-      }))
+      batch.map(async (path) => {
+        const { names, isTruncated: isPathTruncated } = await listFolderNames(
+          { projectRef, bucketId, path },
+          listingsState,
+          signal
+        )
+        return { path, names, isTruncated: isPathTruncated }
+      })
     )
 
-    for (const { path, names } of results) {
+    for (const { path, names, isTruncated: isPathTruncated } of results) {
+      if (isPathTruncated) isTruncated = true
       for (const name of names) {
         const folderPath = path.length > 0 ? `${path}/${name}` : name
         folders.push({ name, path: folderPath })
