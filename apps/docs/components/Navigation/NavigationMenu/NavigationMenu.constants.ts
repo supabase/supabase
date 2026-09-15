@@ -2534,6 +2534,14 @@ export const local_development: NavMenuConstant = {
       items: [
         { name: 'Database migrations', url: '/guides/local-development/database-migrations' },
         {
+          name: 'Running multiple local projects',
+          url: '/guides/local-development/parallel-projects' as `/${string}`,
+        },
+        {
+          name: 'Docker and native runtimes',
+          url: '/guides/local-development/runtimes' as `/${string}`,
+        },
+        {
           name: 'Declarative database schemas',
           url: '/guides/local-development/declarative-database-schemas' as `/${string}`,
         },

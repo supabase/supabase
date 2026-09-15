@@ -272,7 +272,8 @@ const data: () => {
           description: (
             <>
               Version-control your schema and run the full stack locally with{' '}
-              <code className="text-xs">supabase start</code>.
+              <code className="text-xs">supabase start</code>, or one local project per app and
+              worktree with <code className="text-xs">supabase stack start</code>.
             </>
           ),
           icon: SquareTerminal,
