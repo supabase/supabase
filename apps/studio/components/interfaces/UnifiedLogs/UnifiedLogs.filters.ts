@@ -16,13 +16,6 @@ export interface LogsColumnFilterValue {
   values: string[]
 }
 
-export const LOGS_FILTER_OPERATORS = [
-  '=',
-  '<>',
-  '~~*',
-  '!~~*',
-] as const satisfies readonly LogsFilterOperator[]
-
 const OPERATOR_TO_ABBREV: Record<LogsFilterOperator, string> = {
   '=': 'eq',
   '<>': 'neq',
