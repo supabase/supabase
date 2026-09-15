@@ -289,5 +289,4 @@ describe('ReplicationPipelineLayout', () => {
     // The trigger button shares this name, so match the dialog's heading specifically
     expect(await screen.findByRole('heading', { name: 'Update available' })).toBeVisible()
   })
-
 })
