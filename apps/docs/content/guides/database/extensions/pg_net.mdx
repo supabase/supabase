@@ -446,6 +446,29 @@ This doesn't expose request data to unauthenticated or client-side users, for tw
   access or modify its objects through the API.
 - `anon` and `authenticated` are `NOLOGIN` roles, so they can't establish a direct database connection.
 
+## Troubleshooting
+
+The Security Advisor might report that `pg_net` is installed in the `public` schema. Postgres defines the extension as non-relocatable, so `alter extension pg_net set schema extensions` can't move it. Instead, drop the extension and create it in the `extensions` schema:
+
+<Admonition type="danger">
+
+Dropping `pg_net` removes its extension-owned objects, including `net.http_request_queue` and `net._http_response`. If the request queue is empty, no pending requests are lost. If the queue contains pending HTTP requests, those requests are deleted and aren't sent. Stored responses are also deleted. Preserve any response data you need before continuing.
+
+</Admonition>
+
+Run the following commands in the [SQL Editor](/dashboard/project/_/sql/new):
+
+```sql
+-- Ensure the target schema exists
+create schema if not exists extensions;
+
+-- Drop the existing extension
+drop extension pg_net;
+
+-- Re-create the extension in the extensions schema
+create extension pg_net with schema extensions;
+```
+
 ## Limitations
 
 - To improve speed and performance, the requests and responses are stored in [unlogged tables](https://pgpedia.info/u/unlogged-table.html), which are not preserved during a crash or unclean shutdown.
