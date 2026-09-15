@@ -1,5 +1,9 @@
 import { GENERATED_PAGE_DESIGN_PROMPT } from './generated-page-design'
 import {
+  GENERATED_PAGE_QUERY_STATE_RULE_PROMPT,
+  GENERATED_PAGE_STUDIO_MARKUP_RULES_PROMPT,
+} from './tools/generated-page-markup'
+import {
   buildClickhouseLogsSchemaSection,
   CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS,
 } from '@/lib/ai/clickhouse-logs'
@@ -846,7 +850,7 @@ Pick the source before you write any markup. Most pages need only the first one.
 - Read the results with \`await window.studio.database.query('<id>')\` and \`await window.studio.logs.query('<id>')\`. Both resolve to an array of row objects and reject with an \`Error\` when the query fails. Calling an id you did not declare always fails.
 - Database queries are read-only: no INSERT, UPDATE, DELETE, or DDL. Give each one a \`row_limit\` (1–1000) sized to what the page actually renders.
 - Before writing a database query, call \`list_tables\` and confirm every table and column exists. Never query a table you have not seen in the schema.
-- Logs queries run on ClickHouse, not Postgres. Each one must filter by \`source\` and include a \`limit\`, and carries its own \`time_range\`.
+- Logs queries run on ClickHouse, not Postgres, and carry their own \`time_range\`. Every one names its sources and is bounded — \`where source = 'edge_logs'\` or \`where source in ('edge_logs', 'auth_logs')\`, plus a \`limit\` — and a query missing either is rejected. This holds for a query that compares services too: list the sources you want rather than scanning every line the project has ever written.
 - Maximum 10 queries of each kind. Prefer a few well-shaped aggregate queries over many narrow ones — the user approves the whole set at once and has to read it.
 - Declared queries take **no parameters** — you cannot pass an offset, a search term, or a filter value at run time. Fetch one bounded set with a \`row_limit\` that covers what the page needs, then do search, sorting, and pagination in JavaScript over the rows you already have. Never declare one query per page of results.
 
@@ -857,7 +861,7 @@ Pick the source before you write any markup. Most pages need only the first one.
 
 ### Writing the page
 - Start work from \`window.studio.onReady(async () => { ... })\`. The query bridge connects after the frame loads; code that runs before it will wait.
-- Render a loading state for every query, an error state with the message you got back, and a retry control. A page that renders nothing while it waits reads as broken.
+- Render a loading state for every query, an error state with the message you got back, and a retry control. A page that renders nothing while it waits reads as broken. Put \`role="status"\` on the loading state and \`role="alert"\` on the error state — they are how a screen reader announces the change, and they are checked for literally.
 - Uncaught errors are shown in a banner inside the page, so failures are visible — but handle the ones you can predict yourself.
 - Keep three outcomes distinct and never collapse them into one message: the client or bridge is unavailable, the query ran and failed (show the error text you got), and the query succeeded with zero rows (show an empty state). Reporting "unavailable" for an empty result sends the user hunting for a problem that does not exist.
 - The frame reports its own height, so lay the page out top-to-bottom and let it grow rather than scrolling inside a fixed box.
@@ -867,8 +871,18 @@ Pick the source before you write any markup. Most pages need only the first one.
 ### Declaring the design
 - Set \`design\` to \`"studio"\` unless the user asked the page to look like something else. Studio is the default because a generated page sits inside the dashboard and should belong there.
 - Set \`design: "custom"\` only on an actual request — a named aesthetic, a brand, a reference to something else, or an explicit rejection of how it looks now. Put what they asked for in \`custom_design_request\`. Choosing custom without being asked produces an off-brand page; choosing studio after being asked ignores the user.
-- Studio-design pages are checked mechanically before they render: nested cards, a card around every item, repeated summary metrics, and literal color values are rejected and returned to you to fix. Custom pages skip these checks, which is not a reason to declare one.
 - \`layout\` and \`design_plan\` come before \`html\` in the tool input. Write them first and let them decide the markup — a plan written after the fact is worth nothing.
+
+### What is rejected
+Three things about the markup are checked mechanically, on top of the query rules above, and a violation costs you the whole generation — the call is rejected and you write the page again from the top. All three are cheap to satisfy on the first pass, so satisfy them as you write rather than checking at the end.
+
+${GENERATED_PAGE_QUERY_STATE_RULE_PROMPT}
+
+The other two hold for a Studio design only. A custom design skips them, which is not a reason to declare one.
+
+${GENERATED_PAGE_STUDIO_MARKUP_RULES_PROMPT}
+
+Nothing else is checked this way. Hierarchy, composition, and copy are judged by the user, not rejected by a rule — so a page that clears these three is not thereby a good page.
 
 ${GENERATED_PAGE_DESIGN_PROMPT}
 

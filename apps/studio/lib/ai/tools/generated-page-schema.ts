@@ -40,7 +40,9 @@ const queryTitleSchema = z.string().trim().min(1).max(120)
 
 const generatedPageDatabaseQuerySchema = z
   .object({
-    id: queryIdSchema.describe('Identifier the page passes to window.studio.database.query().'),
+    id: queryIdSchema.describe(
+      'Identifier the page passes to window.studio.database.query(). snake_case only — lowercase letters, digits, and underscores, starting with a letter. A kebab-case id is rejected.'
+    ),
     title: queryTitleSchema.describe('Short human-readable name shown in the approval preview.'),
     sql: z.string().trim().min(1).describe('Read-only Postgres SQL. No mutations.'),
     row_limit: z
@@ -54,13 +56,17 @@ const generatedPageDatabaseQuerySchema = z
 
 const generatedPageLogQuerySchema = z
   .object({
-    id: queryIdSchema.describe('Identifier the page passes to window.studio.logs.query().'),
+    id: queryIdSchema.describe(
+      'Identifier the page passes to window.studio.logs.query(). snake_case only — lowercase letters, digits, and underscores, starting with a letter. A kebab-case id is rejected.'
+    ),
     title: queryTitleSchema.describe('Short human-readable name shown in the approval preview.'),
     sql: z
       .string()
       .trim()
       .min(1)
-      .describe('ClickHouse logs SQL. Must filter by `source` and include a `limit`.'),
+      .describe(
+        "ClickHouse logs SQL. Rejected without both a `source` filter naming the services it reads — `where source = 'edge_logs'`, or `where source in (...)` to compare several — and a `limit`."
+      ),
     time_range: timeRangeSchema.describe('Time range resolved at each run.'),
   })
   .strict()
@@ -122,7 +128,7 @@ export const renderPageInputSchema = z
       .min(1)
       .max(MAX_GENERATED_PAGE_HTML_LENGTH)
       .describe(
-        'Self-contained HTML for the page body, including inline <style> and <script> tags, written to carry out design_plan. Studio theme variables and base element styles are injected; there is no component library and no Tailwind, so write your own CSS against the tokens. For design "studio", use var(--background), var(--foreground), var(--card), var(--border) etc. rather than literal colors — literal colors are rejected, so declare any unavoidable chart color once as a --chart-* custom property. For design "custom", use whatever palette the request calls for.'
+        'Self-contained HTML for the page body, including inline <style> and <script> tags, written to carry out design_plan. Studio theme variables and base element styles are injected; there is no component library and no Tailwind, so write your own CSS against the tokens. Rejected on submission, so get them right the first time: (1) if this page declares any query, the markup must contain the literal attributes role="status" on its loading state and role="alert" on its error state; (2) for design "studio", any hex or rgb()/hsl() literal — use var(--background), var(--foreground), var(--card), var(--border) etc., and declare an unavoidable chart color once as a --chart-* custom property; (3) for design "studio", word-break: break-all or overflow-wrap: anywhere on a bare table/td/th selector — scope it to the one prose column instead. For design "custom", use whatever palette the request calls for; only the role attributes still apply.'
       ),
     database_queries: z
       .array(generatedPageDatabaseQuerySchema)

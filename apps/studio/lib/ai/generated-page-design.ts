@@ -107,7 +107,7 @@ Take these as relationships between content, not templates. Include only what an
 - **form:** one column, fields in the order the user thinks about them, related fields grouped by spacing. Validation messages next to their field. The primary action sits at the end, with a quiet secondary beside it.
 
 ### Before you submit
-Check the page against your own \`design_plan\`, then check the hierarchy: is the most important thing the most prominent thing? Remove every surface, badge, and heading that is not carrying information. Confirm the narrow layout, keyboard operation, and the loading, empty, and error state of every query-dependent region.
+Check the page against your own \`design_plan\`, then check the hierarchy: is the most important thing the most prominent thing? Remove every surface, badge, and heading that is not carrying information. Confirm the narrow layout, keyboard operation, and the loading, empty, and error state of every query-dependent region — the loading state carrying \`role="status"\` and the error state \`role="alert"\`.
 `
 
 /** Selected by `design: 'custom'`, which requires the user to have asked. */

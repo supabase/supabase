@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  GENERATED_PAGE_QUERY_STATE_RULE_PROMPT,
+  GENERATED_PAGE_STUDIO_MARKUP_RULES_PROMPT,
+} from './generated-page-markup'
+import {
   findGeneratedLogsSqlIssue,
   MAX_GENERATED_PAGE_QUERIES,
   renderPageInputSchema,
@@ -153,6 +157,15 @@ describe('renderPageInputSchema Studio markup checks', () => {
     expect(parseHtml(`<!-- was #ff0000 -->${validHtml}`).success).toBe(true)
   })
 
+  it('ignores a numeric character reference that reads as a hex color', () => {
+    expect(parseHtml(`<p>1,204 rows &#8212; last hour</p>${validHtml}`).success).toBe(true)
+    expect(parseHtml(`<p>&#8226; failed</p>${validHtml}`).success).toBe(true)
+  })
+
+  it('ignores a fragment link whose target reads as a hex color', () => {
+    expect(parseHtml(`<a href="#feed">Jump</a>${validHtml}`).success).toBe(true)
+  })
+
   it('rejects character-level wrapping applied to every cell', () => {
     expect(parseHtml(`<style>td { overflow-wrap: anywhere; }</style>${validHtml}`).success).toBe(
       false
@@ -202,5 +215,32 @@ describe('findGeneratedLogsSqlIssue', () => {
     expect(
       findGeneratedLogsSqlIssue("select count() from logs where source = 'edge_logs'")
     ).toContain('limit')
+  })
+})
+
+/**
+ * The prompt lines exist so the model meets each rule before it writes a page rather than
+ * as a rejection afterwards, which costs it the whole generation. These assert the two
+ * halves still say the same thing — the previous split let the prompt drift into
+ * advertising three checks that no longer existed and none of the ones that did.
+ */
+describe('mechanical checks stated in the prompt', () => {
+  it('states every Studio markup rule', () => {
+    const { issues } = renderPageInputSchema.safeParse({
+      ...validInput,
+      html: `<style>td { word-break: break-all; }</style><div style="color:#0f0f0f">x</div>${validHtml}`,
+    }).error!
+
+    for (const rule of ['literal-color', 'table-wide-break']) {
+      expect(JSON.stringify(issues)).toContain(rule)
+    }
+    expect(GENERATED_PAGE_STUDIO_MARKUP_RULES_PROMPT).toContain('--chart-')
+    expect(GENERATED_PAGE_STUDIO_MARKUP_RULES_PROMPT).toContain('word-break: break-all')
+    expect(GENERATED_PAGE_STUDIO_MARKUP_RULES_PROMPT.split('\n')).toHaveLength(2)
+  })
+
+  it('asks for the two roles the query-state check looks for literally', () => {
+    expect(GENERATED_PAGE_QUERY_STATE_RULE_PROMPT).toContain('role="status"')
+    expect(GENERATED_PAGE_QUERY_STATE_RULE_PROMPT).toContain('role="alert"')
   })
 })
