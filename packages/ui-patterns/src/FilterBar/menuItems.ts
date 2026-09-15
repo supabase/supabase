@@ -150,7 +150,9 @@ export function buildValueItems(
   // value, so a dropdown of exact-value suggestions would be misleading — let the
   // user type freely instead.
   const activeOperator = property.operators?.find((op) =>
-    isFilterOperatorObject(op) ? op.value === activeCondition?.operator : op === activeCondition?.operator
+    isFilterOperatorObject(op)
+      ? op.value === activeCondition?.operator
+      : op === activeCondition?.operator
   )
   if (isFilterOperatorObject(activeOperator) && activeOperator.group === 'pattern') {
     return items
