@@ -348,7 +348,7 @@ Only the Supabase callback URL needs to be public and served over HTTPS, because
 
 Clicking the button sends the browser to your Auth service, which redirects to Telegram. After you confirm the sign-in in the Telegram app, Telegram sends the browser back to `https://<your-domain>/auth/v1/callback`. The Auth service completes the exchange and redirects to `SITE_URL`, where `supabase-js` picks up the session and the page prints the signed-in user.
 
-Telegram doesn't return an email address, so `email` is empty in the user object. The profile claims that Telegram returns, `name`, `given_name`, `family_name`, and `picture`, are in `user_metadata` together with the ID token claims, and `app_metadata.provider` is `custom:telegram`. The Telegram user ID is the `sub` claim.
+Telegram doesn't return an email address, so `email` is empty in the user object. The profile claims that Telegram returns, `name`, `given_name`, `family_name`, and `picture`, are in `user_metadata` together with the ID token claims, and `app_metadata.provider` is `custom:telegram`. The `sub` claim is the stable identifier that Auth uses to match the user on later sign-ins.
 
 To test a different custom provider, change the `provider` value to its identifier.
 
