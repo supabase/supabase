@@ -172,10 +172,10 @@ export function createPrivacyMessageTool(
   isRestrictedByHipaa: boolean
 ) {
   const privacyMessage = isRestrictedByHipaa
-    ? "You don't have permission to use this tool. This project is marked as HIPAA and your organization has the HIPAA addon, so Supabase does not send project metadata with your prompts. This is not something the user can change in their organization's AI settings, so continue without project metadata rather than asking them to opt in."
+    ? "You don't have permission to use this tool. This project is configured as High Compliance and your organization has the HIPAA add-on, so Supabase does not send project metadata with your prompts. The user cannot change this in their organization's AI settings, so continue without project metadata rather than asking them to opt in."
     : "You don't have permission to use this tool. This is an organization-wide setting requiring you to opt-in. Please choose your preferred data sharing level in your organization's settings. By default, no data is shared. Granting permission allows Supabase to send information (like schema, logs, or data, depending on your chosen level) to third-party AI providers solely to generate responses."
   const condensedPrivacyMessage = isRestrictedByHipaa
-    ? 'Unavailable because this project is marked as HIPAA, which prevents project metadata from being shared. This cannot be changed in organization settings.'
+    ? 'Unavailable because this project is configured as High Compliance, which prevents project metadata from being shared. This cannot be changed in organization settings.'
     : 'Requires opting in to sharing data with third-party AI providers. You can opt in via organization settings.'
   const toolDescription = toolInstance.description
   const description =
