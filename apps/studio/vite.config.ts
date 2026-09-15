@@ -789,6 +789,11 @@ export default defineConfig(({ command, mode }) => {
     //   whichever page/feature chunk happens to be its only non-barrel
     //   importer (a form page, `components/interfaces/Sidebar.tsx`)
     //   while `ui`'s barrel re-exports them too.
+    //
+    //   `packages/ui/src/components/shadcn/ui/slider.tsx` — same shape
+    //   again: its only non-barrel importer is the Appearance settings'
+    //   `ThemeColorSettings`, so Rolldown pools it into the `/account/me`
+    //   page chunk while `ui`'s barrel re-exports it too.
     build: {
       rollupOptions: {
         output: {
@@ -824,6 +829,9 @@ export default defineConfig(({ command, mode }) => {
               id.includes('packages/ui/src/components/hooks/use-mobile.tsx')
             ) {
               return 'ui-sidebar'
+            }
+            if (id.includes('packages/ui/src/components/shadcn/ui/slider.tsx')) {
+              return 'ui-slider'
             }
             return undefined
           },
