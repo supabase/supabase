@@ -151,6 +151,12 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).not.toContain(`'%foo%%'`)
     })
 
+    it('passes through user-supplied `_` wildcards on pathname ILIKE without wrapping', () => {
+      const sql = getUnifiedLogsQuery(withFilters('pathname:ilike:fo_bar'))
+      expect(sql).toContain(`log_attributes['request.path'] ILIKE 'fo_bar'`)
+      expect(sql).not.toContain(`'%fo_bar%'`)
+    })
+
     it('emits ILIKE with auto-wrapped `%…%` for event_message `~~*`', () => {
       const sql = getUnifiedLogsQuery(withFilters('event_message:ilike:Permission Denied'))
       expect(sql).toContain(`event_message ILIKE '%Permission Denied%'`)
@@ -174,6 +180,12 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       const sql = getUnifiedLogsQuery(withFilters('event_message:ilike:error%'))
       expect(sql).toContain(`event_message ILIKE 'error%'`)
       expect(sql).not.toContain(`'%error%%'`)
+    })
+
+    it('passes through user-supplied `_` wildcards on event_message ILIKE without wrapping', () => {
+      const sql = getUnifiedLogsQuery(withFilters('event_message:ilike:foo_bar'))
+      expect(sql).toContain(`event_message ILIKE 'foo_bar'`)
+      expect(sql).not.toContain(`'%foo_bar%'`)
     })
 
     it('excludes connection log messages when show_connection_logs=false', () => {
@@ -499,6 +511,12 @@ describe('UnifiedLogs.queries.bq', () => {
     const sql = getUnifiedLogsQueryBQ(withFilters('pathname:ilike:foo%'))
     expect(sql).toContain("LOWER(`pathname`) LIKE LOWER('foo%')")
     expect(sql).not.toContain("LOWER('%foo%%')")
+  })
+
+  it('passes through user-supplied `_` wildcards on pathname ILIKE without wrapping', () => {
+    const sql = getUnifiedLogsQueryBQ(withFilters('pathname:ilike:fo_bar'))
+    expect(sql).toContain("LOWER(`pathname`) LIKE LOWER('fo_bar')")
+    expect(sql).not.toContain("LOWER('%fo_bar%')")
   })
 })
 
