@@ -1,6 +1,8 @@
 {
   "imports": {
     "@modelcontextprotocol/server": "npm:@modelcontextprotocol/server@^2.0.0",
+    "@supabase/middleware": "npm:@supabase/middleware@^0.5.0",
+    "@supabase/server": "npm:@supabase/server@^1.6.0",
     "zod": "npm:zod@^4.3.6"
   }
 }
