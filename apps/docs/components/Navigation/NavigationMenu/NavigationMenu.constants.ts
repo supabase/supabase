@@ -3171,10 +3171,6 @@ export const telemetry: NavMenuConstant = {
       url: '/guides/observability/automate-with-agents' as `/${string}`,
       items: [
         {
-          name: 'Generalist',
-          url: '/guides/observability/automate-with-agents/all' as `/${string}`,
-        },
-        {
           name: 'Health monitor',
           url: '/guides/observability/automate-with-agents/health' as `/${string}`,
         },
