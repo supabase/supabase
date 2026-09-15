@@ -9,6 +9,7 @@ import {
   type WarehouseSetupTarget,
 } from './Warehouse.utils'
 import { WarehouseConnectSection } from './WarehouseConnectSection'
+import { WarehouseDisableCard } from './WarehouseDisableCard'
 import { WarehouseSchemaTablePicker } from './WarehouseSchemaTablePicker'
 import {
   WarehouseEnablingProgress,
@@ -18,9 +19,11 @@ import { AlertError } from '@/components/ui/AlertError'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const WarehouseSetupPanel = () => {
   const { ref: projectRef } = useParams()
+  const track = useTrack()
 
   const { data, isPending, isFetching, isError, error, refetch } = useWarehouseSetupStatusQuery(
     { projectRef },
@@ -37,7 +40,17 @@ export const WarehouseSetupPanel = () => {
   const handleSetup = (targets: WarehouseSetupTarget[]) => {
     if (!projectRef || targets.length === 0) return
 
-    setupMutation.mutate({ projectRef, body: { targets } })
+    setupMutation.mutate(
+      { projectRef, body: { targets } },
+      {
+        onSuccess: () => {
+          track('warehouse_enabled', {
+            schemaTargetCount: targets.filter((target) => target.type === 'schema').length,
+            tableTargetCount: targets.filter((target) => target.type === 'table').length,
+          })
+        },
+      }
+    )
   }
 
   if (isPending) return <GenericSkeletonLoader />
@@ -123,6 +136,7 @@ export const WarehouseSetupPanel = () => {
         error={setupMutation.error}
       />
       <WarehouseConnectSection />
+      <WarehouseDisableCard />
     </>
   )
 }

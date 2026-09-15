@@ -145,3 +145,8 @@ export function buildRetryTargets(
 export type WarehouseCatalogCredentials = NonNullable<
   components['schemas']['WarehouseCatalogResponse']['credentials']
 >
+
+export function isPipelineLimitError(message?: string): boolean {
+  if (!message) return false
+  return /maximum of \d+ pipelines/i.test(message)
+}

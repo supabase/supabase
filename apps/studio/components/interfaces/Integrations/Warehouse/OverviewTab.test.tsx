@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import dayjs from 'dayjs'
@@ -12,6 +12,7 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type WarehouseSetupStatusResponse = components['schemas']['WarehouseSetupStatusResponse']
+type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
 
 // Both integration shells are live, and the flag reads a context plus ConfigCat that
 // `customRender` doesn't provide.
@@ -167,7 +168,7 @@ describe('WarehouseOverviewTab', () => {
     expect(screen.queryByText('Initial setup failed')).not.toBeInTheDocument()
   })
 
-  test('shows Status, Tables, then Connect once setup is complete', async () => {
+  test('shows Status, Tables, Connect, then Disable once setup is complete', async () => {
     mockSetupStatus({
       setup_status: 'complete',
       tables: [
@@ -192,7 +193,7 @@ describe('WarehouseOverviewTab', () => {
     customRender(<WarehouseOverviewTab />)
 
     // findByRole throws on duplicates, so this also guards the section titles staying distinct.
-    for (const name of ['Status', 'Tables', 'Connect']) {
+    for (const name of ['Status', 'Tables', 'Connect', 'Disable']) {
       expect(await screen.findByRole('heading', { name })).toBeInTheDocument()
     }
     expect(screen.getByText('Replicated tables picker')).toBeInTheDocument()
@@ -203,10 +204,35 @@ describe('WarehouseOverviewTab', () => {
     const headings = screen
       .getAllByRole('heading')
       .map((heading) => heading.textContent)
-      .filter((heading) => ['Status', 'Tables', 'Connect'].includes(heading ?? ''))
+      .filter((heading) => ['Status', 'Tables', 'Connect', 'Disable'].includes(heading ?? ''))
 
-    expect(headings).toEqual(['Status', 'Tables', 'Connect'])
-    expect(screen.queryByRole('button', { name: 'Disable Warehouse' })).not.toBeInTheDocument()
+    expect(headings).toEqual(['Status', 'Tables', 'Connect', 'Disable'])
+  })
+
+  test('disables Warehouse with an empty target list after confirmation', async () => {
+    mockSetupStatus({ setup_status: 'complete' })
+    const setupRequests: WarehouseSetupBody[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/warehouse/:ref/setup',
+      response: async ({ request }) => {
+        setupRequests.push((await request.json()) as WarehouseSetupBody)
+        return HttpResponse.json({})
+      },
+    })
+
+    customRender(<WarehouseOverviewTab />)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Disable Warehouse' }))
+    expect(setupRequests).toEqual([])
+
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog).toHaveTextContent('Copied data stays in storage')
+    expect(screen.queryByPlaceholderText('Type the project ref to confirm')).not.toBeInTheDocument()
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Disable Warehouse' }))
+
+    await waitFor(() => expect(setupRequests).toEqual([{ targets: [] }]))
   })
 
   test('shows a status query failure without blocking an unrelated route', async () => {

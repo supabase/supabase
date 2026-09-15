@@ -7,6 +7,7 @@ import {
   getSchemaTableKey,
   getSelectedTableCount,
   hasSelectionChanged,
+  isPipelineLimitError,
   isSelectableWarehouseSchema,
   type SchemaTableSelection,
   type SchemaWithTables,
@@ -53,6 +54,17 @@ describe('WarehouseModePanel.utils:isSelectableWarehouseSchema', () => {
   test('includes schemas whose names merely resemble the catalog schema', () => {
     expect(isSelectableWarehouseSchema('ducklake_staging')).toBe(true)
     expect(isSelectableWarehouseSchema('my_ducklake')).toBe(true)
+  })
+})
+
+describe('Warehouse.utils:isPipelineLimitError', () => {
+  test('recognises the replication pipeline cap response', () => {
+    expect(isPipelineLimitError('This project has reached its maximum of 1 pipelines')).toBe(true)
+  })
+
+  test('does not classify unrelated setup failures', () => {
+    expect(isPipelineLimitError('Failed to copy public.orders')).toBe(false)
+    expect(isPipelineLimitError()).toBe(false)
   })
 })
 

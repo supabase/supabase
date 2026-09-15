@@ -1,16 +1,8 @@
 import { useParams } from 'common'
-import { ChevronRight } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  Checkbox,
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from 'ui'
+import { Button, Card, CardContent, CardFooter, CommandGroup } from 'ui'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+import { MultiSelector } from 'ui-patterns/multi-select'
 import {
   PageSection,
   PageSectionContent,
@@ -24,28 +16,32 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import {
   buildSelectionFromPublicationTables,
   buildWarehouseSetupTargets,
-  getSchemaCheckedState,
   getSchemaTableKey,
   getSelectedTableCount,
   hasSelectionChanged,
+  isPipelineLimitError,
   isSelectableWarehouseSchema,
   type SchemaTableSelection,
   type SchemaWithTables,
   type WarehouseSetupTarget,
 } from './Warehouse.utils'
 import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { WAREHOUSE_PUBLICATION_NAME } from '@/lib/warehouse'
+import type { ResponseError } from '@/types'
 
 export interface WarehouseSchemaTablePickerProps {
   onSubmit: (targets: WarehouseSetupTarget[]) => void
   isSubmitting: boolean
+  /** Set when editing an already-enabled Warehouse rather than setting one up for the first time. */
   isEditing?: boolean
-  error?: { message: string } | null
+  /** Failure from the submit itself, rendered inline rather than as a toast the user can lose. */
+  error?: ResponseError | null
 }
 
 export const WarehouseSchemaTablePicker = ({
@@ -60,7 +56,6 @@ export const WarehouseSchemaTablePicker = ({
   // `null` until the user touches a checkbox, so the selection seeded from the existing
   // publication can arrive asynchronously without an effect syncing it into state.
   const [selectionOverride, setSelectionOverride] = useState<SchemaTableSelection | null>(null)
-  const [expandedOverrides, setExpandedOverrides] = useState<Record<string, boolean>>({})
 
   const {
     data: schemas,
@@ -109,8 +104,6 @@ export const WarehouseSchemaTablePicker = ({
     [publication]
   )
 
-  const selection = selectionOverride ?? initialSelection
-
   const schemasWithTables: SchemaWithTables[] = useMemo(() => {
     if (!schemas || !tables) return []
     return schemas
@@ -122,38 +115,26 @@ export const WarehouseSchemaTablePicker = ({
       .sort((a, b) => a.schema.localeCompare(b.schema))
   }, [schemas, tables])
 
+  const tableKeys = schemasWithTables.flatMap(({ schema, tables }) =>
+    tables.map((table) => getSchemaTableKey(schema, table))
+  )
+  const selection = selectionOverride ?? initialSelection
   const selectedCount = getSelectedTableCount(selection)
+  const selectedTableKeys = tableKeys.filter((key) => selection[key])
   const hasChanges = hasSelectionChanged(selection, initialSelection)
 
   const updateSelection = (updater: (current: SchemaTableSelection) => SchemaTableSelection) => {
     setSelectionOverride((prev) => updater(prev ?? initialSelection))
   }
 
-  const toggleTable = (schema: string, table: string) => {
-    const key = getSchemaTableKey(schema, table)
-    if (isEditing && initialSelection[key]) return
-    updateSelection((current) => ({ ...current, [key]: !current[key] }))
-  }
+  const handleSchemaSelection = (schema: SchemaWithTables) => {
+    const keys = schema.tables.map((table) => getSchemaTableKey(schema.schema, table))
+    const areAllSelected = keys.every((key) => selection[key])
 
-  const toggleSchema = (schema: SchemaWithTables) => {
-    const selectableTables = schema.tables.filter(
-      (table) => !isEditing || !initialSelection[getSchemaTableKey(schema.schema, table)]
-    )
-    const areAllSelectableTablesSelected =
-      selectableTables.length > 0 &&
-      selectableTables.every((table) => selection[getSchemaTableKey(schema.schema, table)])
-
-    updateSelection((current) => {
-      const next = { ...current }
-      selectableTables.forEach((table) => {
-        next[getSchemaTableKey(schema.schema, table)] = !areAllSelectableTablesSelected
-      })
-      return next
-    })
-  }
-
-  const setExpanded = (schemaName: string, isOpen: boolean) => {
-    setExpandedOverrides((prev) => ({ ...prev, [schemaName]: isOpen }))
+    updateSelection((current) => ({
+      ...current,
+      ...Object.fromEntries(keys.map((key) => [key, !areAllSelected])),
+    }))
   }
 
   const handleSubmit = () => {
@@ -166,14 +147,14 @@ export const WarehouseSchemaTablePicker = ({
   // start toggling (an early toggle would otherwise pin an override that omits existing tables).
   if (isSchemasPending || isTablesPending || isSelectionPending) {
     return (
-      <PageSection className="pt-0!">
+      <PageSection className="first:pt-0">
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>Tables</PageSectionTitle>
             <PageSectionDescription>
               {isEditing
-                ? 'Add more schemas or tables to Warehouse.'
-                : 'Choose which schemas or tables to replicate.'}
+                ? 'Tables currently replicating are selected. Changes apply on save.'
+                : 'Choose which schemas or tables to replicate. You can change this at any time.'}
             </PageSectionDescription>
           </PageSectionSummary>
         </PageSectionMeta>
@@ -199,117 +180,122 @@ export const WarehouseSchemaTablePicker = ({
   }
 
   return (
-    <PageSection className="pt-0!">
+    <PageSection className="first:pt-0">
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>Tables</PageSectionTitle>
           <PageSectionDescription>
             {isEditing
-              ? 'Add more schemas or tables to Warehouse. Tables already replicating cannot be removed yet.'
-              : 'Choose which schemas or tables to replicate.'}
+              ? 'Tables currently replicating are selected. Changes apply on save.'
+              : 'Choose which schemas or tables to replicate. You can change this at any time.'}
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent className="space-y-4">
         {!!error && (
           <AlertError
-            subject={isEditing ? 'Failed to add replicated tables' : 'Failed to enable Warehouse'}
+            subject={
+              isPipelineLimitError(error.message)
+                ? 'This project has no replication pipeline available'
+                : isEditing
+                  ? 'Failed to update replicated tables'
+                  : 'Failed to enable Warehouse'
+            }
             error={error}
-          />
+          >
+            {isPipelineLimitError(error.message) && (
+              <p className="text-sm">
+                Warehouse needs a replication pipeline of its own. Remove an existing pipeline in{' '}
+                <InlineLink href={`/project/${projectRef}/database/replication`}>
+                  Database Replication
+                </InlineLink>{' '}
+                and try again.
+              </p>
+            )}
+          </AlertError>
         )}
         <Card>
-          <CardContent className="space-y-3">
-            <p className="text-sm font-medium text-foreground-light">
-              Schemas and tables to replicate
-            </p>
-            <div className="overflow-hidden rounded-md border divide-y">
-              {schemasWithTables.map((schema) => {
-                const keys = schema.tables.map((table) => getSchemaTableKey(schema.schema, table))
-                const checkedCount = keys.filter((key) => selection[key]).length
-                const checkedState = getSchemaCheckedState({
-                  selectedCount: checkedCount,
-                  totalCount: keys.length,
-                })
-                const isOpen = expandedOverrides[schema.schema] ?? checkedCount > 0
-                const selectableTableCount = schema.tables.filter(
-                  (table) =>
-                    !isEditing || !initialSelection[getSchemaTableKey(schema.schema, table)]
-                ).length
+          <CardContent>
+            <FormLayout
+              layout="horizontal"
+              label="Tables to replicate"
+              description={`${selectedCount} table${selectedCount === 1 ? '' : 's'} selected`}
+            >
+              <MultiSelector
+                values={selectedTableKeys}
+                onValuesChange={(values) => {
+                  const nextValues = new Set(values)
+                  updateSelection(() =>
+                    Object.fromEntries(tableKeys.map((key) => [key, nextValues.has(key)]))
+                  )
+                }}
+                className="w-full"
+              >
+                <MultiSelector.Trigger
+                  aria-label="Select tables to replicate"
+                  label="Select tables..."
+                  badgeLimit={3}
+                  className="w-full"
+                />
+                <MultiSelector.Content>
+                  <MultiSelector.Input placeholder="Search tables..." showResetIcon />
+                  <MultiSelector.List emptyLabel="No tables available">
+                    {schemasWithTables
+                      .filter((schema) => schema.tables.length > 0)
+                      .map((schema) => {
+                        const keys = schema.tables.map((table) =>
+                          getSchemaTableKey(schema.schema, table)
+                        )
+                        const areAllSelected = keys.every((key) => selection[key])
 
-                return (
-                  <Collapsible
-                    key={schema.schema}
-                    open={isOpen}
-                    onOpenChange={(open) => setExpanded(schema.schema, open)}
-                  >
-                    <div className="flex items-center gap-2 px-3 py-2 bg-surface-75">
-                      <CollapsibleTrigger
-                        aria-label={
-                          isOpen ? `Collapse ${schema.schema}` : `Expand ${schema.schema}`
-                        }
-                        className="group text-foreground-lighter"
-                      >
-                        <ChevronRight
-                          size={14}
-                          className="transition-transform group-data-[state=open]:rotate-90"
-                        />
-                      </CollapsibleTrigger>
-                      <Checkbox
-                        checked={checkedState}
-                        onCheckedChange={() => toggleSchema(schema)}
-                        disabled={selectableTableCount === 0}
-                        aria-label={`Select all tables in ${schema.schema}`}
-                        // The shared Checkbox only fills itself for `data-state=checked`, so a partial
-                        // selection would otherwise render identically to an empty one. A muted fill
-                        // keeps all three states visually distinct.
-                        className="data-[state=indeterminate]:border-foreground-lighter data-[state=indeterminate]:bg-foreground-lighter"
-                      />
-                      <span className="text-sm font-mono text-foreground">{schema.schema}</span>
-                      <span className="text-xs text-foreground-lighter ml-auto">
-                        {checkedCount}/{keys.length} tables
-                      </span>
-                    </div>
-                    <CollapsibleContent>
-                      {schema.tables.map((table) => {
-                        const key = getSchemaTableKey(schema.schema, table)
                         return (
-                          <div key={key} className="flex items-center gap-2 pl-10 pr-3 py-2">
-                            <Checkbox
-                              checked={!!selection[key]}
-                              disabled={isEditing && !!initialSelection[key]}
-                              onCheckedChange={() => toggleTable(schema.schema, table)}
-                              aria-label={`Select ${schema.schema}.${table}`}
-                            />
-                            <span className="text-sm font-mono text-foreground-light">{table}</span>
-                          </div>
+                          <CommandGroup
+                            key={schema.schema}
+                            heading={
+                              <div className="flex items-center justify-between">
+                                <span>{schema.schema}</span>
+                                <Button
+                                  type="button"
+                                  variant="text"
+                                  size="tiny"
+                                  className="font-sans! normal-case! tracking-normal!"
+                                  onClick={() => handleSchemaSelection(schema)}
+                                >
+                                  {areAllSelected ? 'Clear' : 'Select all'}
+                                </Button>
+                              </div>
+                            }
+                          >
+                            {schema.tables.map((table) => {
+                              const key = getSchemaTableKey(schema.schema, table)
+                              return (
+                                <MultiSelector.Item key={key} value={key}>
+                                  {table}
+                                </MultiSelector.Item>
+                              )
+                            })}
+                          </CommandGroup>
                         )
                       })}
-                      {schema.tables.length === 0 && (
-                        <p className="pl-10 pr-3 py-2 text-sm text-foreground-lighter">
-                          No tables in this schema.
-                        </p>
-                      )}
-                    </CollapsibleContent>
-                  </Collapsible>
-                )
-              })}
-            </div>
+                  </MultiSelector.List>
+                </MultiSelector.Content>
+              </MultiSelector>
+            </FormLayout>
           </CardContent>
-          <CardFooter className="justify-between">
-            <span className="text-sm text-foreground-lighter">
-              {selectedCount} table{selectedCount === 1 ? '' : 's'} selected
-            </span>
-            <div className="flex items-center gap-x-2">
-              {hasChanges && <Button onClick={() => setSelectionOverride(null)}>Cancel</Button>}
-              <Button
-                variant="primary"
-                disabled={selectedCount === 0 || !hasChanges}
-                loading={isSubmitting}
-                onClick={handleSubmit}
-              >
-                {isEditing ? 'Add replicated tables' : 'Enable Warehouse'}
-              </Button>
-            </div>
+          <CardFooter className="justify-end">
+            {/*
+              An empty selection is a valid request that tears Warehouse down, so submitting one
+              from here would destroy a project's Warehouse with no confirmation. Disabling keeps
+              teardown on the dedicated action, which asks first.
+            */}
+            <Button
+              variant="primary"
+              disabled={selectedCount === 0 || !hasChanges}
+              loading={isSubmitting}
+              onClick={handleSubmit}
+            >
+              {isEditing ? 'Update replicated tables' : 'Enable Warehouse'}
+            </Button>
           </CardFooter>
         </Card>
       </PageSectionContent>
