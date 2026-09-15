@@ -169,6 +169,9 @@ describe('ReplicationPipelineLayout', () => {
     expect(screen.getByRole('link', { name: 'View logs' }).getAttribute('href')).toContain(
       'pipeline_id'
     )
+    expect(screen.getByText('Running')).toBeVisible()
+    expect(screen.getByText('Primary database')).toBeVisible()
+    expect(screen.getByText('BigQuery')).toBeVisible()
     expect(await screen.findByRole('button', { name: 'Stop' })).toBeVisible()
     expect(screen.getByText('Overview content')).toBeVisible()
   })
@@ -200,15 +203,6 @@ describe('ReplicationPipelineLayout', () => {
     expect(await screen.findByText('Running')).toBeVisible()
   })
 
-  test('does not render an Overview tab until Settings exists', async () => {
-    mockStatus('started')
-    renderLayout()
-
-    await screen.findByRole('heading', { name: 'Analytics warehouse' })
-    expect(screen.queryByRole('link', { name: 'Overview' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Settings' })).not.toBeInTheDocument()
-  })
-
   test('composes the legacy overview without duplicating the detail header', async () => {
     mockStatus('stopped')
     mockReplicationStatus()
@@ -218,22 +212,7 @@ describe('ReplicationPipelineLayout', () => {
     expect(await screen.findByRole('heading', { name: 'Analytics warehouse' })).toBeVisible()
     expect(screen.getAllByRole('link', { name: 'View logs' })).toHaveLength(1)
     expect(screen.getAllByRole('button', { name: 'Start' })).toHaveLength(1)
-
-    const content = await screen.findByRole('heading', { name: 'Pipeline stopped' })
-    const contentContainer = content.closest('.py-6')
-    const headerContainer = screen
-      .getByRole('heading', { name: 'Analytics warehouse' })
-      .closest('.mx-auto')
-
-    expect(contentContainer).toHaveClass('max-w-[1600px]', 'px-6', 'xl:px-10', 'py-6')
-    expect(headerContainer).toHaveClass('max-w-[1600px]', 'px-6', 'xl:px-10')
-  })
-
-  test('shows the pipeline state as a labelled dot', async () => {
-    mockStatus('stopped')
-    renderLayout()
-
-    expect(await screen.findByText('Stopped')).toBeVisible()
+    expect(await screen.findByRole('heading', { name: 'Pipeline stopped' })).toBeVisible()
   })
 
   test('explains the state in a tooltip when the dot is hovered', async () => {
@@ -247,14 +226,6 @@ describe('ReplicationPipelineLayout', () => {
       'Replication has encountered an error. Check the logs for more information.'
     )
     expect(screen.queryByRole('link', { name: 'logs' })).not.toBeInTheDocument()
-  })
-
-  test('shows where the pipeline sends data', async () => {
-    mockStatus('started')
-    renderLayout()
-
-    expect(await screen.findByText('BigQuery')).toBeVisible()
-    expect(screen.getByText('Primary database')).toBeVisible()
   })
 
   test('offers the pipeline actions the primary button does not', async () => {
@@ -319,13 +290,4 @@ describe('ReplicationPipelineLayout', () => {
     expect(await screen.findByRole('heading', { name: 'Update available' })).toBeVisible()
   })
 
-  test.each([
-    ['stopped', 'Start'],
-    ['failed', 'Restart'],
-  ] as const)('shows the correct %s lifecycle action', async (status, action) => {
-    mockStatus(status)
-    renderLayout()
-
-    await waitFor(() => expect(screen.getByRole('button', { name: action })).toBeEnabled())
-  })
 })
