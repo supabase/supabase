@@ -16,10 +16,13 @@ With TypeScript, `supabase-js` detects things like `not null` constraints and [g
 
     You can use the Supabase CLI to [generate the types](/docs/reference/cli/supabase-gen-types). You can also generate the types [from the dashboard](https://supabase.com/dashboard/project/_/api?page=tables-intro).
 
+    Sign in first with your Personal Access Token, or set the `SUPABASE_ACCESS_TOKEN` environment variable.
+
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
 
     ```bash Terminal
+    supabase login
     supabase gen types typescript --project-id abcdefghijklmnopqrst > database.types.ts
     ```
 
