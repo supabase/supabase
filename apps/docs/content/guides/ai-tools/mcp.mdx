@@ -82,7 +82,7 @@ Disabled when using project-scoped mode (`project_ref` parameter).
 - `list_projects` / `get_project` - List or get project details
 - `create_project` / `pause_project` / `restore_project` - Manage projects
 - `list_organizations` / `get_organization` - Organization management
-- `get_cost` / `confirm_cost` - Cost information
+- `get_cost` / `confirm_cost` - Cost information for clients that don't support [cost confirmation](#cost-confirmation)
 
 ### Docs
 
@@ -103,6 +103,34 @@ Requires a paid plan.
 
 - `list_storage_buckets` - List storage buckets
 - `get_storage_config` / `update_storage_config` - Storage configuration
+
+## Cost confirmation
+
+Before your agent takes an action that incurs additional charges, the Supabase MCP server sends an _elicitation_: your MCP client shows the expected cost, and the action proceeds only on explicit approval. [Elicitations](https://modelcontextprotocol.io/specification/2026-07-28/client/elicitation) are the MCP standard's way for a server to pause a tool call and request your input.
+
+Cost confirmation applies to `create_project` and `create_branch`. When your agent calls one of these tools, the tool call pauses and your client displays the resource, the standard rate, and the billing interval, along with controls to accept or decline. The exact labels vary by client.
+
+- Accepting resumes the same tool call and creates exactly one resource.
+- Declining or dismissing the confirmation creates nothing, and the agent receives a result that it can relay to you.
+- Confirmations are valid for a short time. If one expires, nothing is created. The agent can call the tool again to request a fresh confirmation.
+- The rate is checked again immediately before creation. If it has changed since you confirmed, nothing is created at the confirmed rate. Instead, you receive a fresh confirmation that shows the updated cost.
+
+If a creation has no cost, for example a project that is covered by your plan, no confirmation is requested.
+
+### Client support
+
+Clients that connect using MCP specification revision [2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28) or later, and that support form elicitations, receive cost confirmations. Clients on older revisions of the specification use the `get_cost` and `confirm_cost` flow instead: the agent quotes the cost in chat before creating the resource.
+
+{/* Verify this table against the launch verification results before publishing. */}
+
+| Client                               | Cost confirmation                |
+| ------------------------------------ | -------------------------------- |
+| Claude Code version 2.1.232 or later | Confirmation dialog              |
+| Other clients                        | `get_cost` / `confirm_cost` flow |
+
+To check which flow your connection uses, ask your client to list the available Supabase tools. If `get_cost` and `confirm_cost` are in the list, your connection uses that flow. On connections that support cost confirmation, these two tools are hidden and a supplied `confirm_cost_id` is ignored.
+
+Your MCP client controls how the confirmation is collected. Some clients support hooks or rules that answer elicitations automatically, so treat cost confirmation as a guardrail rather than proof that a person approved each action.
 
 ## Configuration options
 
@@ -193,6 +221,7 @@ We recommend the following best practices to mitigate security risks when using 
 - **Read-only mode**: Set unattended monitoring and diagnostic routines to [read-only](#configuration-options) mode, which executes SQL queries as a read-only Postgres user.
 - **Project scoping**: Scope your MCP server to a [specific project](#configuration-options), limiting access to only that project's resources. This prevents LLMs from accessing data from other projects in your Supabase account.
 - **Branching**: Use Supabase's [branching feature](/docs/guides/deployment/branching) to create a development branch for your database. This allows you to test changes in a safe environment before merging them to production.
+- **Cost confirmation**: The server asks for [confirmation through your client](#cost-confirmation) before it creates resources that incur charges. This is a guardrail on top of authentication and authorization, not a replacement for them.
 - **Feature groups**: Restrict which [tool groups](#available-tools) are available using the `features` [configuration option](#configuration-options). This helps reduce the attack surface and limits the actions that LLMs can perform to only those that you need.
 
 ## On GitHub
