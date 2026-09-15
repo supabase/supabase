@@ -178,11 +178,11 @@ export const PreviewPane = ({ onSelect }: { onSelect: (url: string) => void }) =
         {/* Preview Metadata */}
         <div className="space-y-2">
           <div>
-            <label className="mb-1 text-xs text-foreground-lighter">Added on</label>
+            <span className="mb-1 text-xs text-foreground-lighter">Added on</span>
             <p className="text-sm text-foreground-light">{createdAt}</p>
           </div>
           <div>
-            <label className="mb-1 text-xs text-foreground-lighter">Last modified</label>
+            <span className="mb-1 text-xs text-foreground-lighter">Last modified</span>
             <p className="text-sm text-foreground-light">{updatedAt}</p>
           </div>
         </div>

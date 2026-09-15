@@ -14,12 +14,12 @@ export const DNSTableHeaders = ({ display }: DNSTableHeaderProps) => {
         </div>
         <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4 input-mono flex-1">
           <div className="flex flex-row space-x-2 justify-between col-span-12">
-            <label className="block text-foreground-light text-sm break-all">Name</label>
+            <span className="block text-foreground-light text-sm break-all">Name</span>
           </div>
         </div>
         <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4 input-mono flex-1">
           <div className="flex flex-row space-x-2 justify-between col-span-12">
-            <label className="block text-foreground-light text-sm break-all">Content</label>
+            <span className="block text-foreground-light text-sm break-all">Content</span>
           </div>
         </div>
       </div>

@@ -61,9 +61,9 @@ export const ResourceContent = ({
         }
         content={
           <>
-            <label className="font-mono text-xs uppercase text-foreground-lighter inline-block mb-2">
+            <span className="font-mono text-xs uppercase text-foreground-lighter inline-block mb-2">
               Description
-            </label>
+            </span>
             <Description
               content={description}
               metadata={{ table: resourceId }}
