@@ -1,18 +1,17 @@
-import assert from 'node:assert/strict'
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { describe, it } from 'node:test'
 import { registrySchema, type RegistryItem } from 'shadcn/schema'
+import { describe, expect, it } from 'vitest'
 
-import { generateRegistryTree, type RegistryNode } from '../lib/process-registry'
+import { registry } from '../registry'
+import { registryItemAppend } from '../registry/utils'
+import { generateRegistryTree, type RegistryNode } from './process-registry'
 import {
   getInstalledPath,
   normalizeVueRegistryFiles,
   resolveRegistryItem,
-} from '../lib/registry-resolution'
-import { registry } from '../registry'
-import { registryItemAppend } from '../registry/utils'
+} from './registry-resolution'
 
 function item(name: string, overrides: Partial<RegistryItem> = {}): RegistryItem {
   return {
@@ -37,9 +36,9 @@ describe('registry composition and resolution', () => {
       item('client', { docs: 'Set the client environment variables.' }),
       item('utility'),
     ])
-    assert.equal(composed.docs, 'Configure the block.\n\nSet the client environment variables.')
-    assert.deepEqual(composed.dependencies, [])
-    assert.deepEqual(composed.registryDependencies, [])
+    expect(composed.docs).toBe('Configure the block.\n\nSet the client environment variables.')
+    expect(composed.dependencies).toEqual([])
+    expect(composed.registryDependencies).toEqual([])
   })
 
   it('resolves local dependency diamonds once and lists external UI dependencies separately', () => {
@@ -59,36 +58,31 @@ describe('registry composition and resolution', () => {
     }
     const before = JSON.stringify(definitions)
     const resolved = resolveRegistryItem(definitions, 'root')
-    assert.deepEqual(resolved.firstPartyDependencies, ['first', 'shared', 'second'])
-    assert.deepEqual(resolved.externalRegistryDependencies, ['card', 'button'])
-    assert.equal(resolved.files.length, 4)
-    assert.equal(JSON.stringify(definitions), before)
+    expect(resolved.firstPartyDependencies).toEqual(['first', 'shared', 'second'])
+    expect(resolved.externalRegistryDependencies).toEqual(['card', 'button'])
+    expect(resolved.files.length).toBe(4)
+    expect(JSON.stringify(definitions)).toBe(before)
   })
 
   it('fails with context for missing local dependencies and cycles', () => {
-    assert.throws(
-      () =>
-        resolveRegistryItem(
-          { items: [item('root', { registryDependencies: ['@supabase/missing'] })] },
-          'root'
-        ),
-      /"root" references missing dependency "missing"/
-    )
-    assert.throws(
-      () =>
-        resolveRegistryItem(
-          {
-            items: [
-              item('root', { registryDependencies: ['@supabase/child'] }),
-              item('child', { registryDependencies: ['@supabase/root'] }),
-            ],
-          },
-          'root'
-        ),
-      /Registry dependency cycle: root -> child -> root/
-    )
-    assert.throws(
-      () => resolveRegistryItem({ items: [item('root'), item('root')] }, 'root'),
+    expect(() =>
+      resolveRegistryItem(
+        { items: [item('root', { registryDependencies: ['@supabase/missing'] })] },
+        'root'
+      )
+    ).toThrow(/"root" references missing dependency "missing"/)
+    expect(() =>
+      resolveRegistryItem(
+        {
+          items: [
+            item('root', { registryDependencies: ['@supabase/child'] }),
+            item('child', { registryDependencies: ['@supabase/root'] }),
+          ],
+        },
+        'root'
+      )
+    ).toThrow(/Registry dependency cycle: root -> child -> root/)
+    expect(() => resolveRegistryItem({ items: [item('root'), item('root')] }, 'root')).toThrow(
       /Duplicate registry item "root"/
     )
   })
@@ -97,64 +91,54 @@ describe('registry composition and resolution', () => {
     const conflicting = item('dependency', {
       files: [{ path: 'other.ts', target: 'lib/root.ts', type: 'registry:lib' }],
     })
-    assert.throws(
-      () => registryItemAppend(item('root'), [conflicting]),
+    expect(() => registryItemAppend(item('root'), [conflicting])).toThrow(
       /conflicting destination "lib\/root.ts"/
     )
-    assert.throws(
-      () =>
-        resolveRegistryItem(
-          {
-            items: [item('root', { registryDependencies: ['@supabase/dependency'] }), conflicting],
-          },
-          'root'
-        ),
-      /conflicting destination "lib\/root.ts"/
-    )
-    assert.throws(
-      () =>
-        resolveRegistryItem(
-          {
-            items: [
-              item('root', {
-                files: [
-                  { path: 'lib', target: 'lib', type: 'registry:file' },
-                  { path: 'lib/client.ts', type: 'registry:lib' },
-                ],
-              }),
-            ],
-          },
-          'root'
-        ),
-      /file "lib" conflicts with directory/
-    )
+    expect(() =>
+      resolveRegistryItem(
+        {
+          items: [item('root', { registryDependencies: ['@supabase/dependency'] }), conflicting],
+        },
+        'root'
+      )
+    ).toThrow(/conflicting destination "lib\/root.ts"/)
+    expect(() =>
+      resolveRegistryItem(
+        {
+          items: [
+            item('root', {
+              files: [
+                { path: 'lib', target: 'lib', type: 'registry:file' },
+                { path: 'lib/client.ts', type: 'registry:lib' },
+              ],
+            }),
+          ],
+        },
+        'root'
+      )
+    ).toThrow(/file "lib" conflicts with directory/)
   })
 
   it('normalizes source packaging and explicit targets consistently', () => {
-    assert.equal(
-      getInstalledPath({ path: 'registry/default/platform/example/lib/client.ts' }),
+    expect(getInstalledPath({ path: 'registry/default/platform/example/lib/client.ts' })).toBe(
       'lib/client.ts'
     )
-    assert.equal(
+    expect(
       getInstalledPath({
         path: 'node_modules/@supabase/vue-blocks/registry/default/clients/vue/lib/supabase/client.ts',
-      }),
-      'lib/supabase/client.ts'
-    )
-    assert.equal(
-      getInstalledPath({ path: 'some/source.ts', target: './app/client.ts' }),
+      })
+    ).toBe('lib/supabase/client.ts')
+    expect(getInstalledPath({ path: 'some/source.ts', target: './app/client.ts' })).toBe(
       'app/client.ts'
     )
     // `~/` keeps backend files out of the installing project's src directory.
-    assert.equal(
+    expect(
       getInstalledPath({
         path: 'registry/default/blocks/mcp-server/supabase/functions/mcp-server/index.ts',
         target: '~/supabase/functions/mcp-server/index.ts',
-      }),
-      'supabase/functions/mcp-server/index.ts'
-    )
-    assert.throws(
-      () => getInstalledPath({ path: 'source.ts', target: '../outside.ts' }),
+      })
+    ).toBe('supabase/functions/mcp-server/index.ts')
+    expect(() => getInstalledPath({ path: 'source.ts', target: '../outside.ts' })).toThrow(
       /Invalid installed path/
     )
   })
@@ -163,11 +147,11 @@ describe('registry composition and resolution', () => {
     const source = registry.items.find((item) => item.name === 'supabase-client-nuxtjs')!
     const before = JSON.stringify(source.files)
     const files = normalizeVueRegistryFiles(source.files ?? [])
-    assert.equal(files[0].path, 'lib/supabase/client.ts')
-    assert.equal(files[0].target, undefined)
-    assert.deepEqual(files.slice(1), source.files?.slice(1))
-    assert.equal(JSON.stringify(source.files), before)
-    assert.deepEqual(normalizeVueRegistryFiles(files), files)
+    expect(files[0].path).toBe('lib/supabase/client.ts')
+    expect(files[0].target).toBeUndefined()
+    expect(files.slice(1)).toEqual(source.files?.slice(1))
+    expect(JSON.stringify(source.files)).toBe(before)
+    expect(normalizeVueRegistryFiles(files)).toEqual(files)
   })
 
   it('validates the published registry definitions and includes safe-next-path in auth inventory', () => {
@@ -176,32 +160,37 @@ describe('registry composition and resolution', () => {
       resolveRegistryItem(registry, definition.name)
     }
     const auth = resolveRegistryItem(registry, 'password-based-auth-nextjs')
-    assert.ok(auth.files.some((file) => getInstalledPath(file) === 'lib/safe-next-path.ts'))
-    assert.deepEqual(auth.firstPartyDependencies, ['safe-next-path'])
-    assert.deepEqual(auth.externalRegistryDependencies, ['button', 'card', 'input', 'label'])
+    expect(auth.files.some((file) => getInstalledPath(file) === 'lib/safe-next-path.ts')).toBe(true)
+    expect(auth.firstPartyDependencies).toEqual(['safe-next-path'])
+    expect(auth.externalRegistryDependencies).toEqual(['button', 'card', 'input', 'label'])
     const tree = generateRegistryTree(
       new URL('../public/r/password-based-auth-nextjs.json', import.meta.url).pathname
     )
-    assert.deepEqual(treePaths(tree).sort(), auth.files.map(getInstalledPath).sort())
+    expect(treePaths(tree).sort()).toEqual(auth.files.map(getInstalledPath).sort())
   })
 
-  it('requires valid root and local dependency artifacts with source content', (t) => {
+  it('requires valid root and local dependency artifacts with source content', ({
+    onTestFinished,
+  }) => {
     const directory = mkdtempSync(path.join(os.tmpdir(), 'library-registry-test-'))
-    t.after(() => rmSync(directory, { recursive: true, force: true }))
+    onTestFinished(() => rmSync(directory, { recursive: true, force: true }))
     const registryPath = path.join(directory, 'root.json')
-    assert.throws(() => generateRegistryTree(registryPath), /required registry artifact.*root.json/)
+    expect(() => generateRegistryTree(registryPath)).toThrow(
+      /required registry artifact.*root.json/
+    )
     writeFileSync(registryPath, '{')
-    assert.throws(() => generateRegistryTree(registryPath), /required registry artifact.*root.json/)
+    expect(() => generateRegistryTree(registryPath)).toThrow(
+      /required registry artifact.*root.json/
+    )
     writeFileSync(
       registryPath,
       JSON.stringify(item('root', { registryDependencies: ['@supabase/child'] }))
     )
-    assert.throws(
-      () => generateRegistryTree(registryPath),
+    expect(() => generateRegistryTree(registryPath)).toThrow(
       /Registry item "root" requires dependency "child"/
     )
     writeFileSync(path.join(directory, 'child.json'), JSON.stringify(item('child')))
-    assert.deepEqual(treePaths(generateRegistryTree(registryPath)).sort(), [
+    expect(treePaths(generateRegistryTree(registryPath)).sort()).toEqual([
       'lib/child.ts',
       'lib/root.ts',
     ])
@@ -209,8 +198,7 @@ describe('registry composition and resolution', () => {
       path.join(directory, 'child.json'),
       JSON.stringify(item('child', { files: [{ path: 'lib/child.ts', type: 'registry:lib' }] }))
     )
-    assert.throws(
-      () => generateRegistryTree(registryPath),
+    expect(() => generateRegistryTree(registryPath)).toThrow(
       /Registry item "root" requires dependency "child"/
     )
   })
