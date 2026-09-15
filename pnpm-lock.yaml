@@ -1582,9 +1582,6 @@ importers:
       rehype-slug:
         specifier: ^6.0.0
         version: 6.0.0
-      remark:
-        specifier: ^14.0.3
-        version: 14.0.3(supports-color@8.1.1)
       remark-code-import:
         specifier: ^1.2.0
         version: 1.2.0
@@ -1685,9 +1682,6 @@ importers:
       mdast-util-to-markdown:
         specifier: ^1.5.0
         version: 1.5.0
-      mdast-util-toc:
-        specifier: ^6.1.1
-        version: 6.1.1
       micromark-extension-gfm:
         specifier: ^2.0.3
         version: 2.0.3
