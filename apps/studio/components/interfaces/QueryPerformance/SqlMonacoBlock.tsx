@@ -36,7 +36,7 @@ export const SqlMonacoBlock = ({ value, wrapperClassName }: SqlMonacoBlockProps)
         options={{ padding: { top: 12, bottom: 12 } }}
       />
 
-      <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute right-2 top-2 inline-flex rounded-lg bg-background opacity-0 group-hover:opacity-100 transition-opacity">
         <Button
           className="px-1.5"
           icon={copied ? <Check /> : <Copy />}

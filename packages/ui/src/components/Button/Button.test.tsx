@@ -30,16 +30,16 @@ describe('#Button', () => {
     render(<Button>Neutral</Button>)
 
     const button = screen.getByRole('button', { name: 'Neutral' })
-    expect(button.className).toContain('bg-background')
-    expect(button.className).toContain('hover:bg-popover')
-    expect(button.className).not.toContain('bg-brand-400')
+    expect(button.className).toContain('bg-card')
+    expect(button.className).toContain('hover:bg-accent')
+    expect(button.className).not.toContain('bg-primary')
   })
 
   it('should allow an explicit primary variant override', () => {
     render(<Button variant="primary">Primary</Button>)
 
     const button = screen.getByRole('button', { name: 'Primary' })
-    expect(button.className).toContain('bg-brand-400')
+    expect(button.className).toContain('bg-primary')
   })
 
   it('should render different text', () => {

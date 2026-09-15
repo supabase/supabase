@@ -122,13 +122,15 @@ export function ComponentPreview({
           >
             {Code}
             <div className="absolute bottom-0 w-full flex justify-center mb-4">
-              <Button
-                className="rounded-full"
-                onClick={() => setExpandState(!expand)}
-                icon={<Expand className="text-foreground-lighter" />}
-              >
-                {expand ? 'Collapse code' : 'Expand code'}
-              </Button>
+              <div className="inline-flex rounded-full bg-background">
+                <Button
+                  className="rounded-full"
+                  onClick={() => setExpandState(!expand)}
+                  icon={<Expand className="text-foreground-lighter" />}
+                >
+                  {expand ? 'Collapse code' : 'Expand code'}
+                </Button>
+              </div>
             </div>
           </div>
         </div>

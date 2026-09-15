@@ -52,17 +52,19 @@ const CodeSnippet = ({ prompt }: { prompt: AIPrompt }) => {
       <div className="p-4 relative">
         {prompt.copyable && (
           <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                className="text-foreground-light hover:text-foreground absolute top-2 right-2 w-7 h-7 p-1 shadow-lg"
-                onClick={async () => {
-                  await navigator.clipboard.writeText(prompt.code)
-                  updateCopyStatus()
-                }}
-              >
-                {text === 'copy' ? <Copy className="w-3 h-3" /> : <Check className="w-3 h-3" />}
-              </Button>
-            </TooltipTrigger>
+            <div className="absolute top-2 right-2 inline-flex rounded-lg bg-background">
+              <TooltipTrigger asChild>
+                <Button
+                  className="text-foreground-light hover:text-foreground w-7 h-7 p-1 shadow-lg"
+                  onClick={async () => {
+                    await navigator.clipboard.writeText(prompt.code)
+                    updateCopyStatus()
+                  }}
+                >
+                  {text === 'copy' ? <Copy className="w-3 h-3" /> : <Check className="w-3 h-3" />}
+                </Button>
+              </TooltipTrigger>
+            </div>
             <TooltipContent>Copy to clipboard</TooltipContent>
           </Tooltip>
         )}
