@@ -10,7 +10,8 @@ import {
   PROJECT_REST_URL,
 } from '@/lib/constants/api'
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+const route = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+export default route
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
