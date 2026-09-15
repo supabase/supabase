@@ -40,7 +40,7 @@ export const THEME_OVERRIDE_KNOBS: readonly ThemeOverrideKnob[] = [
     cssVar: '--elevation-step',
     label: 'Layer contrast',
     description: 'Controls the difference between stacked surfaces.',
-    ranges: { dark: { min: 0, max: 0.04 }, light: { min: 0, max: 0.024 } },
+    ranges: { dark: { min: 0, max: 0.24 }, light: { min: 0, max: 0.024 } },
   },
 ]
 
