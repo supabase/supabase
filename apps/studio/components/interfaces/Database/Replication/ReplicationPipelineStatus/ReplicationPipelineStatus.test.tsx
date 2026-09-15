@@ -134,7 +134,7 @@ describe('pipeline primary action', () => {
   })
 
   test.each(operations)(
-    '$action shows immediate feedback then follows the next backend status',
+    '$action keeps feedback until the operation completes and status is refreshed',
     async ({ action, initialStatus, pendingLabel, finalStatus, nextLabel }) => {
       let complete = () => {}
       const response = new Promise<void>((resolve) => {
@@ -161,7 +161,7 @@ describe('pipeline primary action', () => {
         })
       })
       expect(screen.queryByText('Restarting')).not.toBeInTheDocument()
-      expect(screen.getByRole('button', { name: new RegExp(`^${action}$`, 'i') })).toBeDisabled()
+      expect(screen.getByRole('button', { name: pendingLabel })).toBeDisabled()
       await act(async () => {
         complete()
       })

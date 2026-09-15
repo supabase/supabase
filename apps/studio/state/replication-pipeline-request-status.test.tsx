@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { act, renderHook } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { HttpResponse } from 'msw'
 import { describe, expect, test } from 'vitest'
 
@@ -8,18 +8,26 @@ import {
   PipelineStatusRequestStatus as Status,
   usePipelineRequestStatus,
 } from './replication-pipeline-request-status'
-import { replicationKeys } from '@/data/replication/keys'
 import {
   replicationPipelineStatusQueryOptions,
   type ReplicationPipelineStatusResponse,
 } from '@/data/replication/pipeline-status-query'
 import { CustomWrapper } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-const setup = () => {
+const setup = (initialStatus: ReplicationPipelineStatusResponse['status']['name'] = 'started') => {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
+    response: () =>
+      HttpResponse.json<ReplicationPipelineStatusResponse>({
+        pipeline_id: 1,
+        status: { name: initialStatus },
+      }),
+  })
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const options = replicationPipelineStatusQueryOptions({ projectRef: 'default', pipelineId: 1 })
-  queryClient.setQueryData(options.queryKey, { pipeline_id: 1, status: { name: 'started' } })
+  queryClient.setQueryData(options.queryKey, { pipeline_id: 1, status: { name: initialStatus } })
   const hook = renderHook(usePipelineRequestStatus, {
     wrapper: ({ children }) => (
       <CustomWrapper queryClient={queryClient}>
@@ -51,7 +59,7 @@ const deferred = () => {
 
 describe('pipeline request state', () => {
   test.each(['started', 'stopping', 'stopped', 'starting', 'failed', 'unknown'] as const)(
-    'hands over to the next backend response, including an unchanged status: %s',
+    'keeps feedback during the operation, then accepts a fresh status: %s',
     async (backendStatus) => {
       const { result, refresh } = setup()
       const action = deferred()
@@ -65,47 +73,71 @@ describe('pipeline request state', () => {
       })
       expect(result.current.getRequestStatus(1)).toBe(Status.StopRequested)
       await refresh(backendStatus)
-      expect(result.current.getRequestStatus(1)).toBe(Status.None)
-      // Displaying backend truth must not allow another action while the request is in flight.
+      expect(result.current.getRequestStatus(1)).toBe(Status.StopRequested)
+      // A read during the operation cannot acknowledge that the operation has completed.
       expect(result.current.isRequestPending(1)).toBe(true)
       await act(async () => {
         action.resolve()
         await operation
       })
       expect(result.current.isRequestPending(1)).toBe(false)
+      expect(result.current.getRequestStatus(1)).toBe(Status.None)
     }
   )
 
-  test('keeps immediate start feedback until a network response arrives', async () => {
-    const { result, queryClient, refresh } = setup()
-    await act(async () => {
-      await result.current.runWithRequestStatus(1, Status.StartRequested, async () => {})
-    })
-    act(() => {
-      queryClient.setQueryData(replicationKeys.pipelinesStatus('default', 1), {
-        pipeline_id: 1,
-        status: { name: 'stopped' },
-      })
-    })
-    expect(result.current.getRequestStatus(1)).toBe(Status.StartRequested)
-    await refresh('starting')
-    expect(result.current.getRequestStatus(1)).toBe(Status.None)
-  })
-
-  test('does not let another pipeline response clear the pending display', async () => {
+  test('waits for an older in-flight read, then fetches afresh without overlapping requests', async () => {
     const { result, queryClient } = setup()
-    await act(async () => {
-      await result.current.runWithRequestStatus(1, Status.StopRequested, async () => {})
-      await queryClient.fetchQuery({
-        queryKey: replicationKeys.pipelinesStatus('default', 2),
-        queryFn: async () => ({ pipeline_id: 2, status: { name: 'started' } }),
-      })
+    const action = deferred()
+    const oldRead = deferred()
+    const freshRead = deferred()
+    let reads = 0
+    let activeReads = 0
+    let maxActiveReads = 0
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
+      response: async () => {
+        reads += 1
+        activeReads += 1
+        maxActiveReads = Math.max(maxActiveReads, activeReads)
+        const isOldRead = reads === 1
+        await (isOldRead ? oldRead.promise : freshRead.promise)
+        activeReads -= 1
+        return HttpResponse.json<ReplicationPipelineStatusResponse>({
+          pipeline_id: 1,
+          status: { name: isOldRead ? 'started' : 'starting' },
+        })
+      },
     })
+    const options = replicationPipelineStatusQueryOptions({ projectRef: 'default', pipelineId: 1 })
+    const oldFetch = queryClient.fetchQuery(options)
+    await waitFor(() => expect(reads).toBe(1))
+    let operation: Promise<void>
+    act(() => {
+      operation = result.current.runWithRequestStatus(1, Status.StopRequested, () => action.promise)
+    })
+    await act(async () => {
+      action.resolve()
+    })
+    expect(reads).toBe(1)
     expect(result.current.getRequestStatus(1)).toBe(Status.StopRequested)
+    await act(async () => {
+      oldRead.resolve()
+      await oldFetch
+    })
+    await waitFor(() => expect(reads).toBe(2))
+    expect(result.current.getRequestStatus(1)).toBe(Status.StopRequested)
+    await act(async () => {
+      freshRead.resolve()
+      await operation
+    })
+    expect(result.current.getRequestStatus(1)).toBe(Status.None)
+    expect(queryClient.getQueryData(options.queryKey)?.status.name).toBe('starting')
+    expect(maxActiveReads).toBe(1)
   })
 
   test('keeps a stopped pipeline unchanged while guarding its table reset', async () => {
-    const { result } = setup()
+    const { result } = setup('stopped')
     const action = deferred()
     let operation: Promise<void>
     act(() => {
@@ -120,8 +152,14 @@ describe('pipeline request state', () => {
     expect(result.current.isRequestPending(1)).toBe(false)
   })
 
-  test('allows retry immediately after a request error', async () => {
+  test('preserves the operation error even when refreshing status also fails', async () => {
     const { result } = setup()
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Status unavailable' }, { status: 503 }),
+    })
     await act(async () => {
       await expect(
         result.current.runWithRequestStatus(1, Status.StopRequested, async () => {

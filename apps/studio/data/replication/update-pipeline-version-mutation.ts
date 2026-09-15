@@ -49,10 +49,9 @@ export const useUpdatePipelineVersionMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables
       await Promise.all([
-        queryClient.invalidateQueries(
-          { queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId) },
-          { cancelRefetch: false }
-        ),
+        queryClient.invalidateQueries({
+          queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId),
+        }),
         queryClient.invalidateQueries(
           { queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId) },
           { cancelRefetch: false }
@@ -64,12 +63,9 @@ export const useUpdatePipelineVersionMutation = ({
       const { projectRef, pipelineId } = variables
       if (error?.code === 404) {
         // Default image changed meanwhile. Refresh version info so UI reflects latest state.
-        await queryClient.invalidateQueries(
-          {
-            queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId),
-          },
-          { cancelRefetch: false }
-        )
+        await queryClient.invalidateQueries({
+          queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId),
+        })
       } else if (onError === undefined) {
         toast.error(`Failed to update pipeline version: ${error.message}`)
       } else {

@@ -58,6 +58,15 @@ describe('BatchRestartDialog', () => {
       table(4, { name: 'following_wal' }),
     ]
 
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
+      response: () =>
+        HttpResponse.json<ReplicationPipelineStatusResponse>({
+          pipeline_id: 9,
+          status: { name: 'stopped' },
+        }),
+    })
     const requests: unknown[] = []
     const onOpenChange = vi.fn()
     addAPIMock({
@@ -172,7 +181,7 @@ describe('BatchRestartDialog', () => {
           { cancelRefetch: false }
         )
       })
-      expect(screen.getByText(nextLabel)).toBeInTheDocument()
+      expect(screen.getByText(optimisticLabel)).toBeInTheDocument()
       expect(
         screen.getByRole('button', { name: 'Preparing to restart replication...' })
       ).toBeDisabled()
@@ -180,6 +189,7 @@ describe('BatchRestartDialog', () => {
         complete()
       })
       await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
+      await waitFor(() => expect(screen.getByText(nextLabel)).toBeInTheDocument())
       expect(requests).toEqual([
         {
           target: target === 'all' ? { type: 'all_tables' } : { type: 'single_table', table_id: 1 },

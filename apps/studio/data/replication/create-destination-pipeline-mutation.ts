@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { components } from 'api-types'
 import { toast } from 'sonner'
 
+import { invalidateReplicationPipelineQueries } from './invalidate-pipeline-queries'
 import { replicationKeys } from './keys'
 import type {
   BigQueryDestinationConfig,
@@ -215,14 +216,8 @@ export const useCreateDestinationPipelineMutation = ({
         const { projectRef } = variables
 
         await Promise.all([
-          queryClient.invalidateQueries(
-            { queryKey: replicationKeys.destinations(projectRef) },
-            { cancelRefetch: false }
-          ),
-          queryClient.invalidateQueries(
-            { queryKey: replicationKeys.pipelines(projectRef) },
-            { cancelRefetch: false }
-          ),
+          queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
+          invalidateReplicationPipelineQueries(queryClient, projectRef),
         ])
 
         await onSuccess?.(data, variables, context)

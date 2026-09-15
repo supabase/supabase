@@ -60,6 +60,15 @@ const renderDestinationForm = async () => {
 
 describe('useDestinationForm', () => {
   beforeEach(() => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
+      response: ({ params }) =>
+        HttpResponse.json<components['schemas']['PipelineStatusResponse_Output']>({
+          pipeline_id: Number(params.pipeline_id),
+          status: { name: 'stopped' },
+        }),
+    })
     updateRequests.length = 0
     validationRequests.length = 0
     startRequests.mockClear()
@@ -224,9 +233,7 @@ describe('useDestinationForm', () => {
       expect(createRequests).not.toHaveBeenCalled()
       expect(startRequests).not.toHaveBeenCalled()
       expect(onClose).toHaveBeenCalledOnce()
-      expect(result.current.requestStatus).toBe(
-        enabled ? PipelineStatusRequestStatus.StopRequested : PipelineStatusRequestStatus.None
-      )
+      expect(result.current.requestStatus).toBe(PipelineStatusRequestStatus.None)
     }
   )
 
