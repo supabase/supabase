@@ -39,6 +39,7 @@ import { StorageRowIcon } from '../StorageRowIcon'
 import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { copyPathToFolder } from './StorageExplorer.utils'
+import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useCopyUrl } from './useCopyUrl'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
@@ -65,20 +66,17 @@ export const FileExplorerRow = ({
     selectedBucket,
     selectedFilePreview,
     openedFolders,
-    popColumnAtIndex,
-    popOpenedFoldersAtIndex,
-    clearSelectedItems,
-    setSelectedFilePreview,
     setSelectedFileCustomExpiry,
     setSelectedItems,
     setSelectedItemsToDelete,
     downloadFile,
     setSelectedItemToRename,
     setSelectedItemsToMove,
-    openFolder,
     downloadFolder,
     selectRangeItems,
   } = useStorageExplorerStateSnapshot()
+  const { openFolderAtIndex, truncateToColumn, setPreviewedFile, clearPreviewedFile } =
+    useStorageExplorerNavigation()
   const { onCopyUrl } = useCopyUrl()
   const ctx = useFileExplorerContextMenu()
 
@@ -90,11 +88,9 @@ export const FileExplorerRow = ({
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
-  const onSelectFile = async (columnIndex: number) => {
-    popColumnAtIndex(columnIndex)
-    popOpenedFoldersAtIndex(columnIndex - 1)
-    setSelectedFilePreview(itemWithColumnIndex)
-    clearSelectedItems()
+  const onSelectFile = (columnIndex: number) => {
+    truncateToColumn(columnIndex)
+    setPreviewedFile(itemWithColumnIndex)
   }
 
   const onCheckItem = (isShiftKeyHeld: boolean) => {
@@ -110,7 +106,7 @@ export const FileExplorerRow = ({
     } else {
       setSelectedItems([...selectedItems, itemWithColumnIndex])
     }
-    setSelectedFilePreview(undefined)
+    clearPreviewedFile()
   }
 
   const rowOptions =
@@ -263,7 +259,7 @@ export const FileExplorerRow = ({
           event.preventDefault()
           if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
             item.type === STORAGE_ROW_TYPES.FOLDER
-              ? openFolder(columnIndex, item)
+              ? openFolderAtIndex(columnIndex, item)
               : onSelectFile(columnIndex)
           }
         }}

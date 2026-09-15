@@ -409,6 +409,11 @@ function createStorageExplorerState({
       }
     },
 
+    /**
+     * Rebuilds the entire column stack (and `openedFolders`) from an absolute folder
+     * path. Returns the path segments that could not be found, so callers restoring
+     * from a URL can tell the user their link is stale.
+     */
     fetchFoldersByPath: async ({
       paths,
       searchString = '',
@@ -417,8 +422,8 @@ function createStorageExplorerState({
       paths: string[]
       searchString?: string
       showLoading?: boolean
-    }) => {
-      if (state.selectedBucket.id === undefined) return
+    }): Promise<{ missingPaths: string[] }> => {
+      if (state.selectedBucket.id === undefined) return { missingPaths: [] }
 
       const pathsWithEmptyPrefix = [''].concat(paths)
 
@@ -471,10 +476,17 @@ function createStorageExplorerState({
       state.columns = formattedFolders
 
       // Update openedFolders as well
+      const missingPaths: string[] = []
       const updatedOpenedFolders: StorageItem[] = paths.map((path, idx) => {
-        const folderInfo = find(formattedFolders[idx].items, { name: path })
+        const parentColumn = formattedFolders[idx]
+        const folderInfo = find(parentColumn.items, { name: path })
         // Folder doesnt exist, FE just scaffolds a "fake" folder
         if (!folderInfo) {
+          // Only report a segment as genuinely missing when the parent listing is
+          // complete and unfiltered. A search narrows the listing, and the listing is
+          // capped at LIMIT — in both cases a folder that does exist can be absent
+          // from `items` without having been deleted.
+          if (!searchString && !parentColumn.hasMoreItems) missingPaths.push(path)
           return {
             id: null,
             name: path,
@@ -490,6 +502,8 @@ function createStorageExplorerState({
         return folderInfo
       })
       state.openedFolders = updatedOpenedFolders
+
+      return { missingPaths }
     },
 
     /**

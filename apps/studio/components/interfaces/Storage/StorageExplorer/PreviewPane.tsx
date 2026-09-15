@@ -12,6 +12,7 @@ import {
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
 import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
+import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useCopyUrl } from './useCopyUrl'
 import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -119,10 +120,10 @@ export const PreviewPane = () => {
     selectedBucket,
     selectedFilePreview: file,
     setSelectedItemsToDelete,
-    setSelectedFilePreview,
     setSelectedFileCustomExpiry,
     downloadFile,
   } = useStorageExplorerStateSnapshot()
+  const { clearPreviewedFile } = useStorageExplorerNavigation()
   const { onCopyUrl } = useCopyUrl()
 
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
@@ -142,7 +143,7 @@ export const PreviewPane = () => {
     >
       {/* Preview Header */}
       <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
-        <X className="cursor-pointer" size={14} onClick={() => setSelectedFilePreview(undefined)} />
+        <X className="cursor-pointer" size={14} onClick={clearPreviewedFile} />
       </div>
 
       {/* Preview Thumbnail*/}

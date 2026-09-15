@@ -48,6 +48,26 @@ export function getPathAlongFoldersToIndex(
 }
 
 /**
+ * Splits a `?path` query param value into folder segments.
+ *
+ * Folder names can never contain a "/" — a "/" within an object key *is* the folder
+ * separator — so a slash-joined string is unambiguous. Leading, trailing and repeated
+ * slashes are tolerated so hand-edited URLs still resolve.
+ */
+export function parseStoragePath(value: string | null | undefined): string[] {
+  if (!value) return []
+  return value.split('/').filter((segment) => segment.length > 0)
+}
+
+/**
+ * Joins folder segments into a `?path` query param value. Returns an empty string for
+ * the bucket root so that nuqs' `clearOnDefault` strips the param entirely.
+ */
+export function serializeStoragePath(paths: string[]): string {
+  return paths.filter((segment) => segment.length > 0).join('/')
+}
+
+/**
  * Returns an error message string if the folder name contains invalid characters,
  * or null if the name is valid.
  */
