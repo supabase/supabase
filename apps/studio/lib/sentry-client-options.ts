@@ -23,14 +23,6 @@ import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from '@/lib/sanitize'
 
 type Integration = Parameters<typeof Sentry.addIntegration>[0]
 
-const DEFAULT_ERROR_SAMPLE_RATE = 1.0
-const LOW_PRIORITY_ERROR_SAMPLE_RATE = 0.01
-const CHUNK_LOAD_ERROR_PATTERNS = [
-  /ChunkLoadError/i,
-  /Loading chunk [\d]+ failed/i,
-  /Loading CSS chunk [\d]+ failed/i,
-]
-
 // This is a workaround to ignore hCaptcha related errors.
 function isHCaptchaRelatedError(event: Sentry.Event): boolean {
   const errors = event.exception?.values ?? []
@@ -89,17 +81,6 @@ export function isChallengeExpiredError(error: unknown, event: Sentry.Event): bo
   const message = errorMessage || eventMessage
 
   return message.includes('challenge-expired')
-}
-
-function isChunkLoadError(error: unknown, event: Sentry.Event): boolean {
-  const errorMessage = error instanceof Error ? error.message : ''
-  const eventMessage = event.message || ''
-  const exceptionMessages = event.exception?.values?.map((ex) => ex.value ?? '') ?? []
-  const combinedMessages = [errorMessage, eventMessage, ...exceptionMessages].filter(Boolean)
-
-  return CHUNK_LOAD_ERROR_PATTERNS.some((pattern) =>
-    combinedMessages.some((message) => pattern.test(message))
-  )
 }
 
 // Tag errors whose stack trace only contains third-party frames (browser extensions,
@@ -201,29 +182,6 @@ export function buildSentryClientOptions({
       }
 
       const isErrorBoundaryCrash = isSentryErrorBoundaryCrash(event)
-
-      // Downsample only known high-noise classes; keep all other errors at full rate.
-      const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
-        `Failed to construct 'URL': Invalid URL`
-      )
-      const isSessionTimeoutEvent = (hint.originalException as any)?.message?.includes(
-        'Session error detected'
-      )
-      const isChunkLoadFailure = isChunkLoadError(hint.originalException, event)
-
-      const codeSampleRate =
-        isInvalidUrlEvent || isSessionTimeoutEvent || isChunkLoadFailure
-          ? LOW_PRIORITY_ERROR_SAMPLE_RATE
-          : DEFAULT_ERROR_SAMPLE_RATE
-
-      if (Math.random() > codeSampleRate) {
-        return null
-      }
-
-      event.tags = {
-        ...event.tags,
-        codeSampleRate: codeSampleRate.toString(),
-      }
 
       if (isHCaptchaRelatedError(event)) {
         return null
