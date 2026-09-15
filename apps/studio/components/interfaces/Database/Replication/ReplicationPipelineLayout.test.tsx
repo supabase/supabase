@@ -220,7 +220,7 @@ describe('ReplicationPipelineLayout', () => {
     expect(screen.getAllByRole('button', { name: 'Start' })).toHaveLength(1)
 
     const content = await screen.findByRole('heading', { name: 'Pipeline stopped' })
-    const contentContainer = content.closest('.mx-auto')
+    const contentContainer = content.closest('.py-6')
     const headerContainer = screen
       .getByRole('heading', { name: 'Analytics warehouse' })
       .closest('.mx-auto')
