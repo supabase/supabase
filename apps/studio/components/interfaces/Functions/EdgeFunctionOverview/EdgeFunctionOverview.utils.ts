@@ -1,10 +1,13 @@
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import maxBy from 'lodash/maxBy'
 import meanBy from 'lodash/meanBy'
 import sumBy from 'lodash/sumBy'
 import type { ChartConfig } from 'ui'
 
 import type { ChartIntervals } from '@/types'
+
+dayjs.extend(utc)
 
 export type EdgeFunctionChartRawDatum = {
   timestamp: string | number
@@ -127,7 +130,12 @@ export const getBucketedTimeRange = (
   interval: ChartIntervals,
   now: Date = new Date()
 ): [Date, Date] => {
-  const currentTime = dayjs(now)
+  // Bucket boundaries are truncated in UTC, not in the viewer's local time: the analytics
+  // endpoint returns UTC-truncated buckets, and `fillTimeseries` matches the gap-filled points
+  // it generates from this range against those timestamps in UTC. Truncating locally shifts the
+  // whole grid in zones with a sub-hour offset (UTC+5:30, UTC+5:45, ...), so no filled point
+  // would ever line up with a real bucket.
+  const currentTime = dayjs.utc(now)
   const unit = toManipulateUnit(interval.startUnit)
   const start = currentTime.subtract(interval.startValue, unit).startOf(unit)
   const end = currentTime.startOf(unit)
