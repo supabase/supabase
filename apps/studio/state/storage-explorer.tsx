@@ -26,6 +26,7 @@ import {
   formatTime,
   getFilesDataTransferItems,
   getPathAlongFoldersToIndex,
+  getUndeletedPaths,
   sanitizeNameForDuplicateInColumn,
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
@@ -1462,11 +1463,15 @@ function createStorageExplorerState({
       const toastId = toast.loading(`Deleting ${prefixes.length} file(s)...`)
 
       try {
-        await deleteBucketObject({
+        const deletedObjects = await deleteBucketObject({
           projectRef: state.projectRef,
           bucketId: state.selectedBucket.id,
           paths: prefixes,
         })
+
+        // Storage answers 200 even when a policy stops it from removing an object, so compare
+        // what came back against what we asked for rather than assuming the delete went through.
+        const undeletedPaths = getUndeletedPaths(prefixes, deletedObjects)
 
         if (!isDeleteFolder) {
           // If parent folders are empty, reinstate .emptyFolderPlaceholder to persist them
@@ -1480,16 +1485,38 @@ function createStorageExplorerState({
             parentFolderPrefixes.map((prefix) => state.validateParentFolderEmpty(prefix))
           )
 
-          toast.success(`Successfully deleted ${prefixes.length} file(s)`, {
-            id: toastId,
-            closeButton: true,
-            duration: SONNER_DEFAULT_DURATION,
-            description: undefined,
-          })
+          if (undeletedPaths.length > 0) {
+            toast.error(
+              undeletedPaths.length === prefixes.length
+                ? `Failed to delete ${prefixes.length} file(s)`
+                : `Failed to delete ${undeletedPaths.length} of ${prefixes.length} file(s)`,
+              {
+                id: toastId,
+                closeButton: true,
+                duration: SONNER_DEFAULT_DURATION,
+                description: "Check that this bucket's policies allow deleting them.",
+              }
+            )
+          } else {
+            toast.success(`Successfully deleted ${prefixes.length} file(s)`, {
+              id: toastId,
+              closeButton: true,
+              duration: SONNER_DEFAULT_DURATION,
+              description: undefined,
+            })
+          }
+
           await state.refetchAllOpenedFolders()
           state.setSelectedItemsToDelete([])
         } else {
           toast.dismiss(toastId)
+
+          // Surfaced by deleteFolder, which reports the folder as failed rather than deleted
+          if (undeletedPaths.length > 0) {
+            throw new Error(
+              `${undeletedPaths.length} of ${prefixes.length} file(s) could not be deleted. Check that this bucket's policies allow deleting them.`
+            )
+          }
         }
       } catch (err) {
         if (!isDeleteFolder) {

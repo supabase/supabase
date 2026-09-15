@@ -9,6 +9,7 @@ import type { StorageItem } from '@/components/interfaces/Storage/Storage.types'
 import {
   getPathAlongFoldersToIndex,
   getPathAlongOpenedFolders,
+  getUndeletedPaths,
   sanitizeNameForDuplicateInColumn,
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
@@ -274,5 +275,77 @@ describe('sanitizeNameForDuplicateInColumn', () => {
         ' (1).myfile'
       )
     })
+  })
+})
+
+describe('getUndeletedPaths', () => {
+  // Shaped like a real storage.objects row so the assertions don't quietly depend on a
+  // trimmed-down payload that the API never actually sends.
+  function makeDeletedObject(name: string) {
+    return {
+      name,
+      id: 'b9e8a1f2-0000-4000-8000-000000000000',
+      bucket_id: 'bucket-1',
+      owner: 'owner',
+      version: '1',
+      created_at: '2024-01-01T00:00:00Z',
+      updated_at: '2024-01-01T00:00:00Z',
+      last_accessed_at: '2024-01-01T00:00:00Z',
+      metadata: { size: 1, mimetype: 'text/plain' },
+    }
+  }
+
+  it('reports nothing when every requested path came back as deleted', () => {
+    expect(
+      getUndeletedPaths(
+        ['docs/a.txt', 'docs/b.txt'],
+        [makeDeletedObject('docs/a.txt'), makeDeletedObject('docs/b.txt')]
+      )
+    ).toEqual([])
+  })
+
+  it('reports every path when the delete removed nothing', () => {
+    expect(getUndeletedPaths(['docs/a.txt', 'docs/b.txt'], [])).toEqual([
+      'docs/a.txt',
+      'docs/b.txt',
+    ])
+  })
+
+  it('reports only the paths missing from a partial delete', () => {
+    expect(
+      getUndeletedPaths(
+        ['docs/a.txt', 'docs/b.txt', 'docs/c.txt'],
+        [makeDeletedObject('docs/b.txt')]
+      )
+    ).toEqual(['docs/a.txt', 'docs/c.txt'])
+  })
+
+  it('matches on the full path, not just the file name', () => {
+    expect(getUndeletedPaths(['docs/a.txt'], [makeDeletedObject('images/a.txt')])).toEqual([
+      'docs/a.txt',
+    ])
+  })
+
+  it('ignores deleted objects that were never requested', () => {
+    expect(
+      getUndeletedPaths(['docs/a.txt'], [makeDeletedObject('docs/a.txt'), makeDeletedObject('x')])
+    ).toEqual([])
+  })
+
+  it('reports nothing when no paths were requested', () => {
+    expect(getUndeletedPaths([], [])).toEqual([])
+  })
+
+  // Anything we can't read as a list of deleted objects has to fall back to the previous
+  // "assume it worked" behavior — a false failure toast is worse than the bug being fixed.
+  it.each([
+    ['undefined', undefined],
+    ['null', null],
+    ['a message-only body', { message: 'Successfully deleted' }],
+    ['a bare string', 'Successfully deleted'],
+    ['objects without a name', [{ id: 'abc' }]],
+    ['objects with a non-string name', [{ name: 42 }]],
+  ])('reports nothing for %s', (_label, response) => {
+    expect(getUndeletedPaths(['docs/a.txt'], response)).toEqual([])
   })
 })
