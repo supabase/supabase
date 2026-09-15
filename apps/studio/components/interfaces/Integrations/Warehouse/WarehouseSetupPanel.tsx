@@ -47,6 +47,7 @@ export const WarehouseSetupPanel = () => {
         onSuccess: () => {
           if (isInitialSetup) {
             track('warehouse_enabled', {
+              source: 'integrations_overview',
               schemaTargetCount: targets.filter((target) => target.type === 'schema').length,
               tableTargetCount: targets.filter((target) => target.type === 'table').length,
             })

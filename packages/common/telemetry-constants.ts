@@ -3867,6 +3867,8 @@ export interface HeaderLocalVersionPopoverOpenedEvent {
 export interface WarehouseEnabledEvent {
   action: 'warehouse_enabled'
   properties: {
+    /** Where the user initiated Warehouse setup. */
+    source: 'integrations_overview'
     /** Number of schemas replicated in full. */
     schemaTargetCount: number
     /** Number of tables replicated individually. */

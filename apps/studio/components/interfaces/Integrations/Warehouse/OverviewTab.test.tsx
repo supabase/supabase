@@ -245,6 +245,7 @@ describe('WarehouseOverviewTab', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Submit initial tables' }))
     await waitFor(() =>
       expect(mockTrack).toHaveBeenCalledWith('warehouse_enabled', {
+        source: 'integrations_overview',
         schemaTargetCount: 0,
         tableTargetCount: 1,
       })
