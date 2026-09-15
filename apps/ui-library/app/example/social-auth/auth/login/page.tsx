@@ -15,7 +15,7 @@ const SocialAuthDemo = () => {
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Welcome!</CardTitle>
+          <CardTitle className="font-medium text-lg tracking-normal">Welcome!</CardTitle>
           <CardDescription>Sign in to your account to continue</CardDescription>
         </CardHeader>
         <CardContent>
