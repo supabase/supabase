@@ -93,11 +93,7 @@ server {
         proxy_pass http://api_gw_upstream;
     }
 
-    location /.well-known/ {
-        proxy_pass http://api_gw_upstream;
-    }
-
-    location /pg/ {
+    location = /.well-known/oauth-authorization-server {
         proxy_pass http://api_gw_upstream;
     }
 }
