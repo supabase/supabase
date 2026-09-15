@@ -409,6 +409,10 @@ function createStorageExplorerState({
       }
     },
 
+    /**
+     * Rebuilds the column stack (and `openedFolders`) from an absolute folder path,
+     * returning the segments it could not find so a URL restore can recover.
+     */
     fetchFoldersByPath: async ({
       paths,
       searchString = '',
@@ -417,8 +421,8 @@ function createStorageExplorerState({
       paths: string[]
       searchString?: string
       showLoading?: boolean
-    }) => {
-      if (state.selectedBucket.id === undefined) return
+    }): Promise<{ missingPaths: string[] }> => {
+      if (state.selectedBucket.id === undefined) return { missingPaths: [] }
 
       const pathsWithEmptyPrefix = [''].concat(paths)
 
@@ -445,17 +449,18 @@ function createStorageExplorerState({
               path: prefix,
               options,
             })
-            return data
+            return { items: data, isComplete: true }
           } catch (error: any) {
             toast.error(`Failed to fetch folders: ${error.message}`)
-            return []
+            // Flagged so an empty listing isn't read as "the folder has nothing in it"
+            return { items: [], isComplete: false }
           }
         })
       )
 
-      const formattedFolders = foldersItems.map((folderItems, idx) => {
+      const formattedFolders = foldersItems.map(({ items }, idx) => {
         const prefix = paths.slice(0, idx).join('/')
-        const formattedItems = formatFolderItems(folderItems, prefix)
+        const formattedItems = formatFolderItems(items, prefix)
         return {
           id: null,
           status: STORAGE_ROW_STATUS.READY,
@@ -471,10 +476,17 @@ function createStorageExplorerState({
       state.columns = formattedFolders
 
       // Update openedFolders as well
+      const missingPaths: string[] = []
       const updatedOpenedFolders: StorageItem[] = paths.map((path, idx) => {
-        const folderInfo = find(formattedFolders[idx].items, { name: path })
+        const parentColumn = formattedFolders[idx]
+        const folderInfo = find(parentColumn.items, { name: path })
         // Folder doesnt exist, FE just scaffolds a "fake" folder
         if (!folderInfo) {
+          // Only report a missing segment when the parent listing proves it: a failed
+          // request, a search filter, or a LIMIT cap can all drop a folder that exists.
+          const isParentListingExhaustive =
+            foldersItems[idx].isComplete && !searchString && !parentColumn.hasMoreItems
+          if (isParentListingExhaustive) missingPaths.push(path)
           return {
             id: null,
             name: path,
@@ -490,6 +502,8 @@ function createStorageExplorerState({
         return folderInfo
       })
       state.openedFolders = updatedOpenedFolders
+
+      return { missingPaths }
     },
 
     /**
