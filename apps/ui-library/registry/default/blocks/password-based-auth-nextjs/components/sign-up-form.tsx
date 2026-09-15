@@ -58,7 +58,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Sign up</CardTitle>
+          <CardTitle className="font-medium text-lg tracking-normal">Sign up</CardTitle>
           <CardDescription>Create a new account</CardDescription>
         </CardHeader>
         <CardContent>
