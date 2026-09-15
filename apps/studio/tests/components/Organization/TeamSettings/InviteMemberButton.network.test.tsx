@@ -233,6 +233,7 @@ describe('InviteMemberButton (network)', () => {
     fireEvent.click(screen.getByRole('button', { name: /send invitation/i }))
 
     const confirmation = await screen.findByRole('dialog', { name: 'Invite as Administrator?' })
+    expect(invitePayloads).toHaveLength(0)
     fireEvent.click(within(confirmation).getByRole('button', { name: /send invitation/i }))
 
     await waitFor(() => expect(invitePayloads).toHaveLength(1))
