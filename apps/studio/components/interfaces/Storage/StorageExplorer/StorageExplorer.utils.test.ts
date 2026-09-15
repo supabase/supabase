@@ -9,6 +9,8 @@ import type { StorageItem } from '@/components/interfaces/Storage/Storage.types'
 import {
   getPathAlongFoldersToIndex,
   getPathAlongOpenedFolders,
+  getStorageExplorerUrlForItem,
+  getStoragePathForItem,
   parseStoragePath,
   sanitizeNameForDuplicateInColumn,
   serializeStoragePath,
@@ -316,5 +318,98 @@ describe('serializeStoragePath', () => {
   it('round-trips with parseStoragePath', () => {
     const segments = ['images', 'my folder', '2024']
     expect(parseStoragePath(serializeStoragePath(segments))).toEqual(segments)
+  })
+})
+
+function makeFile(name: string): StorageItem {
+  return { ...makeFolder(name), id: name, type: STORAGE_ROW_TYPES.FILE }
+}
+
+describe('getStoragePathForItem', () => {
+  it('returns just the name at the bucket root', () => {
+    expect(getStoragePathForItem([], { ...makeFile('photo.png'), columnIndex: 0 })).toBe(
+      'photo.png'
+    )
+  })
+
+  it('joins the opened folder chain above the item', () => {
+    const openedFolders = [makeFolder('avatars'), makeFolder('2024')]
+    expect(getStoragePathForItem(openedFolders, { ...makeFile('photo.png'), columnIndex: 2 })).toBe(
+      'avatars/2024/photo.png'
+    )
+  })
+
+  it('uses the same shape for folders', () => {
+    const openedFolders = [makeFolder('avatars')]
+    expect(getStoragePathForItem(openedFolders, { ...makeFolder('2024'), columnIndex: 1 })).toBe(
+      'avatars/2024'
+    )
+  })
+
+  it('omits the bucket name so the value works with storage.from(bucket)', () => {
+    const openedFolders = [makeFolder('avatars')]
+    const path = getStoragePathForItem(openedFolders, { ...makeFile('a.png'), columnIndex: 1 })
+    expect(path.startsWith('my-bucket')).toBe(false)
+  })
+})
+
+describe('getStorageExplorerUrlForItem', () => {
+  const projectRef = 'abcdef'
+  const bucketId = 'my-bucket'
+
+  it('points a folder link at the folder itself', () => {
+    const url = new URL(
+      getStorageExplorerUrlForItem({
+        openedFolders: [makeFolder('avatars')],
+        item: { ...makeFolder('2024'), columnIndex: 1 },
+        projectRef,
+        bucketId,
+      })
+    )
+
+    expect(url.pathname).toContain(`/project/${projectRef}/storage/files/buckets/${bucketId}`)
+    expect(url.searchParams.get('path')).toBe('avatars/2024')
+    expect(url.searchParams.get('file')).toBeNull()
+  })
+
+  it('points a file link at its parent folder plus the file', () => {
+    const url = new URL(
+      getStorageExplorerUrlForItem({
+        openedFolders: [makeFolder('avatars'), makeFolder('2024')],
+        item: { ...makeFile('photo.png'), columnIndex: 2 },
+        projectRef,
+        bucketId,
+      })
+    )
+
+    expect(url.searchParams.get('path')).toBe('avatars/2024')
+    expect(url.searchParams.get('file')).toBe('photo.png')
+  })
+
+  it('omits path at the bucket root', () => {
+    const url = new URL(
+      getStorageExplorerUrlForItem({
+        openedFolders: [],
+        item: { ...makeFile('photo.png'), columnIndex: 0 },
+        projectRef,
+        bucketId,
+      })
+    )
+
+    expect(url.searchParams.get('path')).toBeNull()
+    expect(url.searchParams.get('file')).toBe('photo.png')
+  })
+
+  it('escapes a bucket id that needs encoding', () => {
+    const url = new URL(
+      getStorageExplorerUrlForItem({
+        openedFolders: [],
+        item: { ...makeFolder('a'), columnIndex: 0 },
+        projectRef,
+        bucketId: 'a b/c',
+      })
+    )
+
+    expect(url.pathname).toContain('a%20b%2Fc')
   })
 })
