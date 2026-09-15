@@ -1,19 +1,29 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Globe, Trash } from 'lucide-react'
-import { Button, Checkbox } from 'ui'
+import { MoreVertical, Trash } from 'lucide-react'
+import {
+  Button,
+  Card,
+  Checkbox,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 
-import { ValueContainer } from './ValueContainer'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { EmptyListState } from '@/components/ui/EmptyListState'
-import { Shortcut } from '@/components/ui/Shortcut'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface RedirectUrlListProps {
   allowList: string[]
   selectedUrls: string[]
   onSelectUrl: (urls: string[]) => void
-  onSelectAddURL: () => void
   onSelectRemoveURLs: () => void
   onSelectClearSelection: () => void
 }
@@ -22,7 +32,6 @@ export const RedirectUrlList = ({
   allowList,
   selectedUrls,
   onSelectUrl,
-  onSelectAddURL,
   onSelectRemoveURLs,
   onSelectClearSelection,
 }: RedirectUrlListProps) => {
@@ -31,46 +40,31 @@ export const RedirectUrlList = ({
     'custom_config_gotrue'
   )
 
-  // [Joshen] One for next time: maybe shift this into a reusable logic since it
-  // seems like we can use this in multiple places for future
-  const onClickUrl = (event: any, url: string) => {
-    if (event.shiftKey) {
-      const urlIdx = allowList.indexOf(url)
-      const idxLatest = allowList.indexOf(selectedUrls[selectedUrls.length - 1])
+  const isAllSelected = allowList.length > 0 && selectedUrls.length === allowList.length
 
-      const newSelectedUrls =
-        urlIdx > idxLatest
-          ? allowList.slice(idxLatest + 1, urlIdx + 1)
-          : allowList.slice(urlIdx, idxLatest)
-
-      const urlsNotSelectedYet = newSelectedUrls.filter((x) => !selectedUrls.includes(x))
-
-      if (urlsNotSelectedYet.length > 0) {
-        onSelectUrl([
-          ...selectedUrls,
-          ...(urlIdx > idxLatest ? newSelectedUrls : newSelectedUrls.reverse()),
-        ])
-      } else {
-        const urlsToRemove = newSelectedUrls.concat([selectedUrls[selectedUrls.length - 1]])
-        onSelectUrl(selectedUrls.filter((x) => !urlsToRemove.includes(x)))
-      }
-    } else {
-      const isSelected = selectedUrls.includes(url)
-      const newSelectedUrls = isSelected
+  const handleToggleUrl = (url: string) => {
+    onSelectUrl(
+      selectedUrls.includes(url)
         ? selectedUrls.filter((selectedUrl) => selectedUrl !== url)
         : [...selectedUrls, url]
-      onSelectUrl(newSelectedUrls)
-    }
+    )
+  }
+
+  const handleRemoveSingleUrl = (url: string) => {
+    onSelectUrl([url])
+    onSelectRemoveURLs()
   }
 
   return (
-    <div className="-space-y-px">
-      <ValueContainer className="py-3 flex items-center justify-end">
-        {selectedUrls.length > 0 ? (
+    <div className="flex flex-col gap-y-2">
+      {selectedUrls.length > 0 && (
+        <div className="flex items-center justify-between gap-x-2">
+          <p className="text-sm text-foreground-light">{selectedUrls.length} selected</p>
           <div className="flex items-center gap-x-2">
             <Button onClick={() => onSelectClearSelection()}>Clear selection</Button>
             <ButtonTooltip
               disabled={!canUpdateConfig}
+              icon={<Trash />}
               tooltip={{
                 content: {
                   side: 'bottom',
@@ -79,73 +73,85 @@ export const RedirectUrlList = ({
                     : undefined,
                 },
               }}
-              icon={<Trash />}
-              onClick={() => (selectedUrls.length > 0 ? onSelectRemoveURLs() : null)}
+              onClick={() => onSelectRemoveURLs()}
             >
               Remove ({selectedUrls.length})
             </ButtonTooltip>
           </div>
-        ) : (
-          <Shortcut
-            id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
-            label="Add redirect URL"
-            onTrigger={() => onSelectAddURL()}
-            options={{ enabled: canUpdateConfig }}
-            side="bottom"
-          >
-            <ButtonTooltip
-              variant="primary"
-              disabled={!canUpdateConfig}
-              onClick={() => onSelectAddURL()}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: !canUpdateConfig
-                    ? 'You need additional permissions to update redirect URLs'
-                    : undefined,
-                },
-              }}
-            >
-              Add URL
-            </ButtonTooltip>
-          </Shortcut>
-        )}
-      </ValueContainer>
-      {allowList.length > 0 ? (
-        <>
-          {allowList.map((url) => {
-            const isSelected = selectedUrls.includes(url)
-            return (
-              <ValueContainer key={url} isSelected={isSelected} onClick={(e) => onClickUrl(e, url)}>
-                <div className={`flex items-center gap-4 font-mono group w-full`}>
-                  <div className="w-5 h-5 flex items-center justify-center">
-                    <Checkbox checked={isSelected} onChange={(e) => onClickUrl(e, url)} />
-                  </div>
-                  <Globe strokeWidth={2} size={14} className="text-foreground-lighter" />
-                  <span className="text-sm grow">{url}</span>
-                </div>
-              </ValueContainer>
-            )
-          })}
-        </>
-      ) : (
-        <div
-          className={[
-            'flex items-center border-overlay bg-studio text-foreground',
-            'justify-center gap-2 rounded-b border px-6 py-8 text-sm',
-          ].join(' ')}
-        >
-          <EmptyListState
-            title="No Redirect URLs"
-            description="Auth providers may need a URL to redirect back to"
-          />
         </div>
       )}
-      {allowList.length > 0 && (
-        <ValueContainer className="py-3 flex items-center justify-between">
-          <p className="pl-9 text-foreground-muted text-sm">Total URLs: {allowList.length}</p>
-        </ValueContainer>
-      )}
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-10">
+                <Checkbox
+                  checked={isAllSelected}
+                  disabled={allowList.length === 0}
+                  aria-label="Select all redirect URLs"
+                  onCheckedChange={(checked) => onSelectUrl(checked ? allowList : [])}
+                />
+              </TableHead>
+              <TableHead>URL</TableHead>
+              <TableHead className="w-10" />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {allowList.length === 0 ? (
+              <TableRow className="[&>td]:hover:bg-inherit">
+                <TableCell colSpan={3}>
+                  <p className="text-sm text-foreground">No redirect URLs</p>
+                  <p className="text-sm text-foreground-lighter">
+                    Add a URL that auth providers can redirect to after authentication
+                  </p>
+                </TableCell>
+              </TableRow>
+            ) : (
+              allowList.map((url) => {
+                const isSelected = selectedUrls.includes(url)
+                return (
+                  <TableRow key={url} data-state={isSelected ? 'selected' : undefined}>
+                    <TableCell>
+                      <Checkbox
+                        checked={isSelected}
+                        aria-label={`Select ${url}`}
+                        onCheckedChange={() => handleToggleUrl(url)}
+                      />
+                    </TableCell>
+                    <TableCell className="font-mono text-foreground break-all">{url}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            className="px-1"
+                            icon={<MoreVertical />}
+                            aria-label={`Actions for ${url}`}
+                          />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent side="bottom" align="end" className="w-40">
+                          <DropdownMenuItem
+                            className="space-x-2"
+                            disabled={!canUpdateConfig}
+                            onClick={() => handleRemoveSingleUrl(url)}
+                          >
+                            <Trash size={12} />
+                            <p>Remove URL</p>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                )
+              })
+            )}
+          </TableBody>
+          {allowList.length > 0 && (
+            <TableCaption>
+              {allowList.length} redirect URL{allowList.length > 1 ? 's' : ''}
+            </TableCaption>
+          )}
+        </Table>
+      </Card>
     </div>
   )
 }
