@@ -62,4 +62,25 @@ describe('buildSpaRoutes', () => {
       /catch-all .* was not found/
     )
   })
+
+  it.each([
+    [`/dashboard${IMMUTABLE}/old-chunk.js`, `${IMMUTABLE}/old-chunk.js`],
+    [`/dashboard${IMMUTABLE}/editor.worker.js`, `${IMMUTABLE}/editor.worker.js`],
+    [`/dashboard${IMMUTABLE}/styles.css`, `${IMMUTABLE}/styles.css`],
+    ['/dashboard/img/logo.svg', '/img/logo.svg'],
+    ['/dashboard/api/export.json', '/__server'],
+    ['/dashboard/_serverFn/function-id', '/__server'],
+    ['/dashboard/project/example/editor', '/_shell.html'],
+  ])('routes %s to %s after the filesystem misses', (pathname, destination) => {
+    const routes = buildSpaRoutes(
+      [filesystem, functionCatchAll],
+      '/__server',
+      IMMUTABLE,
+      '/dashboard'
+    )
+    const rule = routes.find(({ src }) => src && new RegExp(`^${src}$`).test(pathname))
+
+    expect(rule?.dest).toBeDefined()
+    expect(pathname.replace(new RegExp(`^${rule!.src}$`), rule!.dest!)).toBe(destination)
+  })
 })

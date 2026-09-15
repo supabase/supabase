@@ -465,6 +465,13 @@ export default defineConfig(({ command, mode }) => {
     }
   }
 
+  // Pin server-function calls to the build that created them, without a
+  // session cookie that also pins document reloads and the update check.
+  publicEnvDefines['process.env.NEXT_PUBLIC_VERCEL_DEPLOYMENT_ID'] =
+    JSON.stringify(
+      env.VERCEL_SKEW_PROTECTION_ENABLED === '1' ? env.VERCEL_DEPLOYMENT_ID : undefined
+    ) ?? 'undefined'
+
   // `MAINTENANCE_MODE` gates the "redirect everything to /maintenance" rule.
   // It's deliberately unprefixed, and the other two consumers both read it at
   // BUILD time: `next.config.ts` reads it in `redirects()`, which Next bakes
@@ -492,12 +499,10 @@ export default defineConfig(({ command, mode }) => {
     publicEnvDefines[`process.env.${key}`] ??= 'undefined'
   }
 
-  // NEXT_PUBLIC_BASE_PATH (the platform serves Studio under `/dashboard`)
-  // only sets the ROUTER basepath, here and in router.tsx: pages, API routes
-  // and server functions (`<basePath>/_serverFn/*`) live under it. Vite `base`
-  // stays `/` so hashed chunks are served from the root, which Vercel's
-  // immutable store requires; `public/` files requested under the prefix are
-  // rewritten to the root by scripts/vercel-spa-routes.ts.
+  // Vite's public base keeps asset requests under www's `/dashboard` proxy.
+  // Nitro's baseURL stays `/`: its immutable manifest must use the reserved
+  // root path. vercel-spa-routes rewrites the browser's prefixed asset URLs
+  // to that root path, including assets retained from older deployments.
   const basePath = env.NEXT_PUBLIC_BASE_PATH || undefined
 
   // Self-hosted responses get next.config.ts's security headers via Nitro
@@ -560,6 +565,7 @@ export default defineConfig(({ command, mode }) => {
         },
       ],
     },
+    ...(basePath && { base: basePath }),
     optimizeDeps: {
       // graphiql's Vite worker setup (swapped in for the webpack one by the
       // `graphiqlViteWorkers` plugin above) imports Monaco's workers with
@@ -737,9 +743,11 @@ export default defineConfig(({ command, mode }) => {
         vercel: {
           // Content-addressed chunks under `/_vercel/immutable/`, shared
           // across deployments, so a tab opened before a redeploy keeps
-          // loading its lazy chunks. Server-function pinning is Nitro's
-          // `__vdpl` cookie route, emitted when Skew Protection is enabled.
+          // loading its lazy chunks.
           immutableStaticFiles: true,
+          // Nitro uses a session-wide __vdpl cookie, which pins reloads too.
+          // start.ts pins only server functions using Vercel's request header.
+          skewProtection: false,
           // One function serves every API route, so the timeout must cover
           // the longest one (integrations/stripe-sync).
           functions: { maxDuration: 300 },

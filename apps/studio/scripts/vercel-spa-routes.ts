@@ -35,9 +35,9 @@ type Route = Record<string, unknown> & {
  * @param assetsPrefix `/assets`, or `/_vercel/immutable/<salt>/nitro` with
  * `vercel.immutableStaticFiles`.
  * @param basePath `NEXT_PUBLIC_BASE_PATH` (e.g. `/dashboard`). Pages, API
- * routes and server functions live under it while static files stay at the
- * root, so prefixed rules come first and `public/` files requested under the
- * prefix are rewritten to the root.
+ * routes, server functions and browser asset URLs live under it while the
+ * static files and immutable store stay at the root. Prefixed rules come
+ * first and asset requests under the prefix are rewritten to the root.
  */
 export function buildSpaRoutes(
   generated: Route[],

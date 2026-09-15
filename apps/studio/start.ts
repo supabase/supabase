@@ -31,6 +31,14 @@ const platformApiGuard = createMiddleware({ type: 'request' }).server(({ request
   return next()
 })
 
+// Vercel's standard request pin keeps server functions compatible with the
+// current tab. Documents and the deployment check stay unpinned, so a reload
+// gets the latest version. Vite only defines the ID when protection is enabled.
+const deploymentMiddleware = createMiddleware({ type: 'function' }).client(({ next }) => {
+  const deploymentId = process.env.NEXT_PUBLIC_VERCEL_DEPLOYMENT_ID
+  return next({ headers: deploymentId ? { 'x-deployment-id': deploymentId } : {} })
+})
+
 // Sentry's global middlewares go at the FRONT so they wrap the whole request /
 // server-function lifecycle — including errors that downstream code swallows
 // into a 500, which the manual `@sentry/nextjs` approach never sees. The SDK's
@@ -39,5 +47,5 @@ const platformApiGuard = createMiddleware({ type: 'request' }).server(({ request
 // explicitly so the instrumentation is visible in source.
 export const startInstance = createStart(() => ({
   requestMiddleware: [sentryGlobalRequestMiddleware, platformApiGuard],
-  functionMiddleware: [sentryGlobalFunctionMiddleware],
+  functionMiddleware: [sentryGlobalFunctionMiddleware, deploymentMiddleware],
 }))

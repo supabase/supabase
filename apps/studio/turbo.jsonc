@@ -123,7 +123,7 @@
         "SSR",
       ],
       "passThroughEnv": [
-        // Nitro's vercel preset bakes this into the skew cookie route. Passed
+        // Vite bakes this into TanStack's server-function request header. Passed
         // through rather than hashed so Next's same-commit redeploys keep
         // hitting the turbo cache as before; a TanStack cache hit reuses the
         // earlier deployment's id, which is the same code and falls back to
