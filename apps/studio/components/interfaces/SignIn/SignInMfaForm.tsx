@@ -230,7 +230,9 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
         <ul className="list-disc pl-6">
           {factors?.totp.length === 2 && (
             <li>
-              <a
+              <button
+                type="button"
+                tabIndex={0}
                 className="text-sm text-foreground-light hover:text-foreground cursor-pointer"
                 onClick={() =>
                   setSelectedFactor(factors.totp.find((f) => f.id !== selectedFactor?.id)!)
@@ -241,7 +243,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                   {getFactorDisplayName(factors.totp.find((f) => f.id !== selectedFactor?.id))}
                 </strong>
                 ?
-              </a>
+              </button>
             </li>
           )}
           <li>

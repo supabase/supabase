@@ -41,8 +41,9 @@ export const DatabaseReadOnlyAlert = () => {
                 <li>
                   <Link
                     href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=databaseReadOnlyAlertUpgradePlan`}
+                    className="text underline"
                   >
-                    <a className="text underline">Upgrade to the Pro Plan</a>
+                    Upgrade to the Pro Plan
                   </Link>{' '}
                   to increase your database size limit to 8GB.
                 </li>
@@ -50,8 +51,9 @@ export const DatabaseReadOnlyAlert = () => {
                 <li>
                   <Link
                     href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=databaseReadOnlyAlertSpendCap`}
+                    className="text-foreground underline"
                   >
-                    <a className="text-foreground underline">Disable your Spend Cap</a>
+                    Disable your Spend Cap
                   </Link>{' '}
                   to allow your project to auto-scale and expand beyond the 8GB database size limit
                 </li>

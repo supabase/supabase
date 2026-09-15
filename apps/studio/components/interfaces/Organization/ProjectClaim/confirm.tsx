@@ -122,13 +122,14 @@ export const ProjectClaimConfirm = ({
               <span>
                 The project will be transferred to your Supabase organization{' '}
                 <span className="text-foreground">{selectedOrganization.name}.</span>{' '}
-                <a
-                  href="#"
+                <button
+                  type="button"
+                  tabIndex={0}
                   onClick={() => setStep('choose-org')}
                   className="text-foreground-light underline"
                 >
                   Choose another organization?
-                </a>
+                </button>
               </span>
             </li>
             <li className="flex space-x-2">

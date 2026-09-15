@@ -28,14 +28,20 @@ export const BreadcrumbsView = ({ defaultValue: breadcrumbs }: BreadcrumbsViewPr
                 </span>
               )}
 
-              <a
-                onClick={breadcrumb.onClick || (() => {})}
-                className={`text-gray-1100 block px-2 py-1 text-xs leading-5 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden ${
-                  breadcrumb.onClick ? 'cursor-pointer hover:text-white' : ''
-                }`}
-              >
-                {breadcrumb.label}
-              </a>
+              {breadcrumb.onClick ? (
+                <button
+                  type="button"
+                  tabIndex={0}
+                  onClick={breadcrumb.onClick}
+                  className="text-gray-1100 block px-2 py-1 text-xs leading-5 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden cursor-pointer hover:text-white"
+                >
+                  {breadcrumb.label}
+                </button>
+              ) : (
+                <span className="text-gray-1100 block px-2 py-1 text-xs leading-5 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden">
+                  {breadcrumb.label}
+                </span>
+              )}
             </Fragment>
           ))
         : null}
