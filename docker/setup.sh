@@ -177,6 +177,39 @@ docker_present() {
     command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1
 }
 
+docker_accessible() {
+    command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1
+}
+
+ensure_docker_accessible() {
+    if docker_accessible; then
+        return 0
+    fi
+
+    # Check if the daemon is running but the current user lacks socket permissions
+    if [ -n "$SUDO" ] && $SUDO docker info >/dev/null 2>&1; then
+        current_user="${USER:-$(id -un 2>/dev/null || echo "")}"
+        warn "Docker daemon is running, but user '${current_user}' cannot access /var/run/docker.sock."
+        if [ -n "$current_user" ]; then
+            log "Adding user '${current_user}' to the 'docker' group"
+            $SUDO groupadd -f docker 2>/dev/null || true
+            $SUDO usermod -aG docker "$current_user" 2>/dev/null || true
+        fi
+        echo ""
+        echo "===> Group membership changes require a new login session to take effect."
+        echo "===> To continue setup, please run:"
+        echo ""
+        echo "       newgrp docker"
+        echo "       sh setup.sh"
+        echo ""
+        echo "     (Or log out and log back in, then re-run setup.sh)"
+        echo ""
+        exit 0
+    fi
+
+    die "Cannot connect to the Docker daemon. Please ensure the docker service is running."
+}
+
 install_docker() {
     if docker_present; then
         log "Docker already installed: $(docker --version)"
@@ -359,6 +392,9 @@ if [ "$WITH_AWS" = "1" ]; then
     install_aws
 fi
 
+# Ensure the Docker daemon is accessible to the invoking user before creating project files
+ensure_docker_accessible
+
 # Idempotent re-run: if CWD is already a set-up project, skip bootstrap.
 # A clone has docker-compose.yml + utils/ but only .env.example;
 # a set-up project also has a real .env.
@@ -435,10 +471,22 @@ sh utils/add-new-auth-keys.sh --update-env
 write_version_stamp "$RESOLVED_REF"
 
 log "Pulling Docker images"
+pull_failed=0
 if [ "$NON_INTERACTIVE" = "1" ]; then
-    docker compose --progress quiet pull || warn "docker compose pull failed; you can retry later."
+    docker compose --progress quiet pull || pull_failed=1
 else
-    docker compose pull || warn "docker compose pull failed; you can retry later."
+    docker compose pull || pull_failed=1
+fi
+
+if [ "$pull_failed" = "1" ]; then
+    warn "docker compose pull failed; images were not downloaded."
+    echo ""
+    echo "Setup did not complete. To pull images and start manually:"
+    echo "  cd $(pwd)"
+    echo "  sh run.sh pull"
+    echo "  sh run.sh start"
+    echo ""
+    exit 1
 fi
 
 echo ""
