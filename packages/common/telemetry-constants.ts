@@ -289,9 +289,11 @@ export interface CronJobCleanupEnableButtonClickedEvent {
 }
 
 /**
- * A feature preview was enabled by the user through the FeaturePreviewModal.
+ * A feature preview was enabled by the user, either through the
+ * FeaturePreviewModal or the Cmd+K "Feature previews" page.
  *
  * The FeaturePreviewModal can be opened clicking at the profile icon at the bottom left corner of the project sidebar.
+ * The Cmd+K page is opened via the "Feature previews..." command.
  *
  * @group Events
  * @source studio
@@ -303,14 +305,20 @@ export interface FeaturePreviewEnabledEvent {
      * Feature key of the preview that was enabled. e.g. supabase-ui-api-side-panel
      */
     feature: string
+    /**
+     * Where the toggle was triggered from.
+     */
+    origin: 'modal' | 'command_menu'
   }
   groups: TelemetryGroups
 }
 
 /**
- * A feature preview was disabled by the user through the FeaturePreviewModal.
+ * A feature preview was disabled by the user, either through the
+ * FeaturePreviewModal or the Cmd+K "Feature previews" page.
  *
  * The FeaturePreviewModal can be opened clicking at the profile icon at the bottom left corner of the project sidebar.
+ * The Cmd+K page is opened via the "Feature previews..." command.
  *
  * @group Events
  * @source studio
@@ -322,6 +330,10 @@ export interface FeaturePreviewDisabledEvent {
      * Feature key of the preview that was disabled. e.g. supabase-ui-api-side-panel
      */
     feature: string
+    /**
+     * Where the toggle was triggered from.
+     */
+    origin: 'modal' | 'command_menu'
   }
   groups: TelemetryGroups
 }

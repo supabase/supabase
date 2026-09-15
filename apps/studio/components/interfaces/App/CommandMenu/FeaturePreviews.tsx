@@ -23,6 +23,7 @@ import {
   useVisibleFeaturePreviewsByCategory,
 } from '@/components/interfaces/App/FeaturePreview/useFeaturePreviews'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
+import { useTrack } from '@/lib/telemetry/track'
 
 const FEATURE_PREVIEWS_PAGE_NAME = 'Feature previews'
 
@@ -34,6 +35,7 @@ export function useFeaturePreviewCommands() {
   const setIsOpen = useSetCommandMenuOpen()
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
   const { selectFeaturePreview, toggleFeaturePreviewModal } = useFeaturePreviewModal()
+  const track = useTrack()
 
   const openFeaturePreviewDetails = (key: string) => {
     selectFeaturePreview(key)
@@ -61,6 +63,10 @@ export function useFeaturePreviewCommands() {
 
     const isEnabling = !flagsRef.current[preview.key]
     onUpdateFlag(preview.key, isEnabling)
+    track(isEnabling ? 'feature_preview_enabled' : 'feature_preview_disabled', {
+      feature: preview.key,
+      origin: 'command_menu',
+    })
 
     if (!isEnabling) {
       toast(`${preview.name} disabled`)
