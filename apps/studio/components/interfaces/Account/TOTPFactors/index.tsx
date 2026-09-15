@@ -18,6 +18,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { AddNewFactorModal } from './AddNewFactorModal'
 import DeleteFactorModal from './DeleteFactorModal'
 import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
+import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
 import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
 import { AlertError } from '@/components/ui/AlertError'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
@@ -67,7 +68,12 @@ export const TOTPFactors = () => {
               layout="responsive"
               title={`${recoveryCodesStatus?.data?.remaining}/${recoveryCodesStatus?.data?.total} recovery codes available`}
               description="Recovery codes allow you to recover your account in case you lost access to your MFA apps."
-              actions={IS_STAGING_OR_LOCAL && <UnenrollRecoveryCodesModal />}
+              actions={
+                <div className="flex flex-col gap-2">
+                  <RegenerateRecoveryCodesModal />
+                  {IS_STAGING_OR_LOCAL && <UnenrollRecoveryCodesModal />}
+                </div>
+              }
             />
           )}
           {shouldShowLockoutWarning && (
