@@ -5,6 +5,8 @@ breadcrumb: 'Auth Quickstarts'
 hideToc: true
 ---
 
+## Quickstart
+
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
@@ -65,10 +67,7 @@ hideToc: true
 
         Rename `.env.example` to `.env.local` and populate with your Supabase connection variables:
 
-        <ProjectConfigVariables variable="url" />
-        <ProjectConfigVariables variable="publishable" />
-
-
+        <$Partial path="api_settings.mdx" variables={{ "framework": "react", "tab": "frameworks" }} />
 
     </StepHikeCompact.Details>
 
@@ -79,13 +78,12 @@ hideToc: true
         lines={[[1, -1]]}
         meta="name=.env.local"
       />
-      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "react", "tab": "frameworks" }} />
 
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
   <StepHikeCompact.Step step={5}>
-    <StepHikeCompact.Details title="Set up your login component">
+    <StepHikeCompact.Details title="Set up your sign-in component">
 
     <$Partial path="uiLibCta.mdx" />
 
@@ -109,7 +107,7 @@ hideToc: true
   <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Customize email template">
 
-    Before proceeding, change the email template to support support a server-side authentication flow that sends a token hash:
+    Before proceeding, change the email template to support a server-side authentication flow that sends a token hash:
 
     - Go to the [Auth templates](/dashboard/project/_/auth/templates) page in your dashboard.
     - Select the Confirm sign up template.
@@ -123,7 +121,7 @@ hideToc: true
   <StepHikeCompact.Step step={7}>
     <StepHikeCompact.Details title="Start the app">
 
-      Start the app, go to http://localhost:5173 in a browser, and open the browser console and you should be able to register and log in.
+      Start the app, go to http://localhost:5173 in a browser, and open the browser console and you should be able to register and sign in.
 
       </StepHikeCompact.Details>
 

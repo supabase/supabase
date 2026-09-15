@@ -1,22 +1,6 @@
 description = "Prefer '%r' to '%s'."
-level = "ERROR"
+level = "WARNING"
 words = [
-    [
-        "eg.",
-        "e.g.",
-    ],
-    [
-        "eg",
-        "e.g.",
-    ],
-    [
-        "ie.",
-        "i.e.",
-    ],
-    [
-        "ie",
-        "i.e.",
-    ],
     [
         "PostgreSQL",
         "Postgres",
@@ -24,5 +8,29 @@ words = [
     [
         "concurrent clients",
         "concurrent connections",
+    ],
+    [
+        "utilize",
+        "use",
+    ],
+    [
+        "utilise",
+        "use",
+    ],
+    [
+        "utilizes",
+        "uses",
+    ],
+    [
+        "utilises",
+        "uses",
+    ],
+    [
+        "utilizing",
+        "using",
+    ],
+    [
+        "utilising",
+        "using",
     ],
 ]

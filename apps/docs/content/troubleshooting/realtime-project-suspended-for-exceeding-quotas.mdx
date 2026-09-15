@@ -29,7 +29,7 @@ Suspension is not automatic and is applied after review. The goal is to protect 
 In most cases, quota overages are accidental rather than intentional:
 
 - **Reconnection loops**: A client that fails to authenticate or subscribe may retry rapidly, creating thousands of short-lived connections
-- **Uncontrolled channels**: Creating channels without cleaning them up leads to resource exhaustion (see [Fixing the TooManyChannels Error](/docs/troubleshooting/realtime-too-many-channels-error))
+- **Uncontrolled channels**: Creating channels without cleaning them up leads to resource exhaustion (see [Fixing the TooManyChannels Error](/docs/guides/troubleshooting/realtime-too-many-channels-error))
 - **Missing cleanup on component tear down**: Single-page applications that don't unsubscribe when components are removed can accumulate connections over time
 - **Unexpected traffic spikes**: A viral event or bot traffic can push usage well beyond normal levels
 - **Development or testing misconfiguration**: Load tests or staging environments accidentally pointed at a production project
@@ -56,15 +56,15 @@ The Supabase team will review your case to understand whether the usage was acci
 
 - Monitor your usage regularly through the [Realtime reports](/dashboard/project/_/database/realtime-logs) page
 - Set up alerts if your connections or messages approach your plan limits
-- Follow the [channel management best practices](/docs/troubleshooting/realtime-too-many-channels-error#best-practices-for-channel-management) to avoid resource leaks
+- Follow the [channel management best practices](/docs/guides/troubleshooting/realtime-too-many-channels-error#best-practices-for-channel-management) to avoid resource leaks
 - Review the [Realtime limits](/docs/guides/realtime/limits) for your plan and upgrade before you outgrow them
 - Use the [Realtime Inspector](https://realtime.supabase.com/inspector/new) to test and debug connections before deploying
 
 ## Related troubleshooting guides
 
-- [Fixing the TooManyChannels Error](/docs/troubleshooting/realtime-too-many-channels-error) — channel lifecycle management and cleanup best practices
-- [Concurrent Peak Connections quota](/docs/troubleshooting/realtime-concurrent-peak-connections-quota-jdDqcp) — understanding the concurrent connections quota and how to adjust it
-- [Handling Silent Disconnections in Background Applications](/docs/troubleshooting/realtime-handling-silent-disconnections-in-backgrounded-applications-592794) — fixing WebSocket drops caused by browser or OS background mode
-- [TIMED_OUT connection errors](/docs/troubleshooting/realtime-connections-timed_out-status) — resolving Node.js version incompatibilities
-- [Debug Realtime with Logger and Log Levels](/docs/troubleshooting/realtime-debugging-with-logger) — enabling client-side logging to diagnose connection and message issues
-- [Realtime Heartbeat Messages](/docs/troubleshooting/realtime-heartbeat-messages) — monitoring connection health with heartbeat callbacks
+- [Fixing the TooManyChannels Error](/docs/guides/troubleshooting/realtime-too-many-channels-error) — channel lifecycle management and cleanup best practices
+- [Concurrent Peak Connections quota](/docs/guides/troubleshooting/realtime-concurrent-peak-connections-quota-jdDqcp) — understanding the concurrent connections quota and how to adjust it
+- [Handling Silent Disconnections in Background Applications](/docs/guides/troubleshooting/realtime-handling-silent-disconnections-in-backgrounded-applications-592794) — fixing WebSocket drops caused by browser or OS background mode
+- [TIMED_OUT connection errors](/docs/guides/troubleshooting/realtime-connections-timed_out-status) — resolving Node.js version incompatibilities
+- [Debug Realtime with Logger and Log Levels](/docs/guides/troubleshooting/realtime-debugging-with-logger) — enabling client-side logging to diagnose connection and message issues
+- [Realtime Heartbeat Messages](/docs/guides/troubleshooting/realtime-heartbeat-messages) — monitoring connection health with heartbeat callbacks

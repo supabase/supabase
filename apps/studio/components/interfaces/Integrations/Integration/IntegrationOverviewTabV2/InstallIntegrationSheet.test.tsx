@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta'
 import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -14,6 +15,7 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useSelectedProjectQuery: () => ({
     data: { ref: 'default', connectionString: 'postgres://localhost' },
   }),
+  useIsHighAvailability: () => false,
 }))
 
 vi.mock('@/hooks/useProtectedSchemas', () => ({
@@ -43,7 +45,7 @@ vi.mock('@/components/interfaces/Database/Extensions/Extensions.constants', () =
 }))
 
 vi.mock('./IntegrationOverviewTabV2.utils', () => ({
-  getEnableExtensionsSQL: () => 'CREATE EXTENSION IF NOT EXISTS pg_net;',
+  getEnableExtensionsSQL: () => safeSql`CREATE EXTENSION IF NOT EXISTS pg_net;`,
   getExtensionDefaultSchema: () => 'extensions',
 }))
 

@@ -14,6 +14,8 @@ export const authKeys = {
       column?: OptimizedSearchColumns
     }
   ) => ['projects', projectRef, 'users-infinite', params].filter(Boolean),
+  usersSearch: (projectRef: string | undefined, keywords: string) =>
+    ['projects', projectRef, 'users-search', keywords] as const,
   usersCount: (
     projectRef: string | undefined,
     params?: {

@@ -4,11 +4,16 @@ description: A modal dialog for confirmations that require additional context or
 component: true
 ---
 
-Confirmation Modal is a convenience wrapper for confirmation flows that are more complex than a single paragraph but do not warrant a full custom dialog. It is built on top of [Dialog](../components/dialog) and provides a prop-based API for consistent confirmation patterns.
+Confirmation Modal is a convenience wrapper for confirmation flows that need more body structure
+than a concise Alert Dialog but do not warrant a full custom dialog. It is built on top of
+[Dialog](../components/dialog) and provides a prop-based API for consistent confirmation patterns.
 
 Use Confirmation Modal when the user needs extra context to make a decision, such as explanatory copy, callouts, or small form elements, and the action is not so destructive that it requires typed confirmation.
 
-If the confirmation can be expressed as a single short paragraph, use [Alert Dialog](../components/alert-dialog). If the action is highly destructive and requires explicit typed intent, use [Text Confirm Dialog](../fragments/text-confirm-dialog). See [Modality](../ui-patterns/modality) for broader guidance on choosing the appropriate pattern.
+If a critical confirmation can be expressed as a single short paragraph, start with
+[Alert Dialog](../components/alert-dialog). If the action is highly destructive and requires
+explicit typed intent, use [Text Confirm Dialog](../fragments/text-confirm-dialog). See
+[Modality](../ui-patterns/modality) for broader guidance on choosing the appropriate pattern.
 
 For dirty-form dismissal in dialogs/sheets, use the dedicated discard-confirmation pattern (`DiscardChangesConfirmationDialog` + `useConfirmOnClose`) instead of `ConfirmationModal`. Avoid creating custom wrapper components for this flow; wire `modalProps` from `useConfirmOnClose` directly into `DiscardChangesConfirmationDialog`.
 
@@ -55,7 +60,8 @@ export default function ConfirmationModalDemo() {
 
 ## Guidelines
 
-- **Use for moderate complexity:** Suitable when the confirmation requires more than a single sentence but does not need typed intent.
+- **Use for moderate complexity:** Suitable when the confirmation needs extra body content, such as multiple paragraphs, callouts, or simple supporting controls, but does not need typed intent.
+- **Do not use as the default critical confirmation:** Prefer [Alert Dialog](../components/alert-dialog) for short, critical confirmations with a clear confirm/cancel decision.
 - **Do not use for standard dirty-form dismissal:** Prefer `DiscardChangesConfirmationDialog` for unsaved-changes prompts so copy, behavior, and wiring stay consistent across dialogs/sheets.
 - **Avoid critical destruction:** Do not use for irreversible or high-risk actions that could benefit from stronger safeguards.
 - **Keep content focused:** Include only the context needed to make the decision. If the dialog becomes a full flow, use a custom [Dialog](../components/dialog) instead.

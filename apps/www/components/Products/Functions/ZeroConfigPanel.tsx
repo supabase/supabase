@@ -7,7 +7,7 @@ const code = `const supabase = createClient(
 )`
 
 const ZeroConfigPanel = () => (
-  <CodeWindow className="[&_.synthax-highlighter]:md:!min-h-[300px]" code={code} showLineNumbers />
+  <CodeWindow className="[&_.synthax-highlighter]:md:min-h-[300px]!" code={code} showLineNumbers />
 )
 
 export default ZeroConfigPanel

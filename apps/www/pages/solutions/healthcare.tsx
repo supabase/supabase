@@ -40,7 +40,7 @@ const HealthcarePage: NextPage = () => {
         <SolutionsStickyNav activeItem={Solutions.healthcare} type="app-type" />
         <ProductHeader
           {...content.heroSection}
-          className="[&_h1]:2xl:!text-5xl bg-default border-0 lg:pb-8 [&_.ph-footer]:mt-0 [&_.ph-footer]:lg:mt-16 [&_.ph-footer]:xl:mt-32"
+          className="[&_h1]:2xl:text-5xl! bg-default border-0 lg:pb-8 [&_.ph-footer]:mt-0 [&_.ph-footer]:lg:mt-16 [&_.ph-footer]:xl:mt-32"
           sectionContainerClassName="lg:gap-4"
         />
         <SingleQuote
@@ -52,7 +52,7 @@ const HealthcarePage: NextPage = () => {
             link: content.singleQuote.quote.link,
             logo: content.singleQuote.quote.logo,
           }}
-          className="!pb-8 md:!pb-12 [&_q]:max-w-2xl"
+          className="pb-8! md:pb-12! [&_q]:max-w-2xl"
         />
         <WhySupabase {...content.why} />
         <PlatformSection {...content.platform} />

@@ -85,7 +85,7 @@ export function generateSheetContent(tableName: string, definition: OpenAPIDefin
               type="checkbox"
               checked={${stateName}}
               onChange={(e) => ${setterName}(e.target.checked)}
-              className="h-4 w-4 rounded border"
+              className="h-4 w-4 rounded-sm border"
             />
             <Label htmlFor="${singularName}-${name}">${label}</Label>
           </div>`

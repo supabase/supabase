@@ -103,7 +103,7 @@ const channel = supabase.channel(`admin:${orgId}:alerts`)
 
 ```javascript
 // Basic setup
-const supabase = createClient('URL', 'ANON_KEY')
+const supabase = createClient('SUPABASE_URL', 'SUPABASE_PUBLISHABLE_KEY')
 
 // Channel configuration
 const channel = supabase.channel('room:123:messages', {
@@ -341,7 +341,7 @@ The client automatically manages these states:
 
 ```javascript
 // Client automatically reconnects with built-in logic
-const supabase = createClient('URL', 'ANON_KEY', {
+const supabase = createClient('SUPABASE_URL', 'SUPABASE_PUBLISHABLE_KEY', {
   realtime: {
     params: {
       log_level: 'info',

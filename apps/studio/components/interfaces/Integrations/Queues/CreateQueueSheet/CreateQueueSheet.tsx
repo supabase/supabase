@@ -5,7 +5,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
+  Form,
   Separator,
   Sheet,
   SheetContent,
@@ -109,17 +109,17 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
 
   return (
     <Sheet open={visible} onOpenChange={handleOpenChange}>
-      <SheetContent size="default" className="w-[35%]" tabIndex={undefined}>
+      <SheetContent size="default" className="w-[35%]">
         <div className="flex flex-col h-full" tabIndex={-1}>
           <SheetHeader>
             <SheetTitle>Create a new queue</SheetTitle>
           </SheetHeader>
 
-          <div className="overflow-auto flex-grow">
-            <Form_Shadcn_ {...form}>
+          <div className="overflow-auto grow">
+            <Form {...form}>
               <form
                 id={FORM_ID}
-                className="flex-grow overflow-auto"
+                className="grow overflow-auto"
                 onSubmit={form.handleSubmit(onSubmit)}
               >
                 <QueueNameField form={form} />
@@ -130,23 +130,17 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
                 <PartitionConfigFields form={form} />
                 <RlsSection form={form} isExposed={isExposed} projectRef={project?.ref} />
               </form>
-            </Form_Shadcn_>
+            </Form>
           </div>
           <SheetFooter>
-            <Button
-              size="tiny"
-              type="default"
-              htmlType="button"
-              onClick={confirmOnClose}
-              disabled={isPending}
-            >
+            <Button size="tiny" type="button" onClick={confirmOnClose} disabled={isPending}>
               Cancel
             </Button>
             <Button
               size="tiny"
-              type="primary"
+              variant="primary"
               form={FORM_ID}
-              htmlType="submit"
+              type="submit"
               loading={isPending}
               disabled={!project?.ref}
             >

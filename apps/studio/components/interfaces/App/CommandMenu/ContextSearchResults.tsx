@@ -45,6 +45,7 @@ const StorageSearchResults = dynamic(
 interface ContextSearchResultsProps {
   context: SearchContextValue
   query: string
+  debouncedFilterString: string
 }
 
 const CONTEXT_CONFIG: Record<
@@ -77,13 +78,17 @@ const CONTEXT_CONFIG: Record<
   },
 }
 
-export function ContextSearchResults({ context, query }: ContextSearchResultsProps) {
+export function ContextSearchResults({
+  context,
+  query,
+  debouncedFilterString,
+}: ContextSearchResultsProps) {
   const config = CONTEXT_CONFIG[context]
 
   if (context === 'database-tables') {
     return (
       <div className="flex-1 min-h-0 flex flex-col">
-        <TableSearchResults query={query} />
+        <TableSearchResults debouncedFilterString={debouncedFilterString} />
       </div>
     )
   }

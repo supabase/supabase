@@ -12,8 +12,7 @@ export function ApiAuthorizationScreen({
   organization_slug,
   navigate,
 }: ApiAuthorizationScreenProps) {
-  const valid = !!auth_id
-  if (!valid) {
+  if (!auth_id) {
     return <ApiAuthorizationInvalidScreen missingParameters={['auth_id']} />
   }
 

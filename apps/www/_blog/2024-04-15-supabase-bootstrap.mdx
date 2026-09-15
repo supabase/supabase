@@ -45,7 +45,7 @@ The template repository typically includes the full frontend code, following the
 
 After selecting a starter, the Supabase CLI downloads all files from the template repository to your chosen local directory.
 
-<Admonition type="note" label="GitHub rate limits">
+<Admonition type="note" title="GitHub rate limits">
 
 You may run into GitHub rate limit when downloading too frequently from template repository. This can be avoided by setting `GITHUB_TOKEN` environment variable locally to your GitHub personal access token.
 
@@ -59,7 +59,7 @@ During the `supabase bootstrap` process, a new project will be created on the Su
 
 ![Bootstrap getting started](/images/blog/ga-week/bootstrap/deploying-to-production.jpg)
 
-<Admonition type="note" label="Some patience required">
+<Admonition type="note" title="Some patience required">
 
 Linking to your new hosted project may take a short while as it needs to spin up a new database in the cloud.
 
@@ -78,7 +78,7 @@ After pushing the migrations, your project credentials will be exported to a `.e
 
 Other custom variables from `.env.example` file defined by your chosen template will also be merged to your local `.env` file.
 
-<Admonition type="caution" label="Store credentials securely">
+<Admonition type="caution" title="Store credentials securely">
 
 It is important to store these credentials securely as anyone can connect to your remote database using the `POSTGRES_URL`.
 

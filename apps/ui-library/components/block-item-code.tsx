@@ -3,7 +3,7 @@
 import { File } from 'lucide-react'
 import { useState } from 'react'
 import { flattenTree, TreeView, TreeViewItem } from 'ui'
-import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
 import { RegistryNode } from '@/lib/process-registry'
 
@@ -25,6 +25,27 @@ const flattenChildren = (files: RegistryNode[]): TreeNode[] => {
       metadata: { path: node.path },
     })
   )
+}
+
+const LANGUAGES: Record<string, CodeBlockLang> = {
+  bash: 'bash',
+  html: 'html',
+  js: 'js',
+  json: 'json',
+  jsx: 'jsx',
+  sh: 'bash',
+  sql: 'sql',
+  toml: 'toml',
+  yaml: 'yaml',
+  yml: 'yaml',
+}
+
+const languageFor = (fileName: string | undefined): CodeBlockLang => {
+  const normalized = fileName?.toLowerCase() ?? ''
+  if (normalized.startsWith('.env')) return 'bash'
+  if (normalized === 'deno.lock') return 'json'
+
+  return LANGUAGES[normalized.split('.').pop() ?? ''] ?? 'ts'
 }
 
 const findFirstFile = (nodes: RegistryNode[]): RegistryNode | null => {
@@ -75,7 +96,7 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
   return (
     <div className="flex mt-4 border rounded-lg overflow-hidden h-[652px] not-prose">
       {/* File browser sidebar */}
-      <div className="w-64 grow-0 shrink-0 flex-0 py-2 border-r bg-muted/30 overflow-y-auto">
+      <div className="w-64 py-2 border-r bg-muted/30 overflow-y-auto">
         <TreeView
           data={flattenedData}
           aria-label="file browser"
@@ -104,8 +125,8 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
       {selectedFile?.content ? (
         <CodeBlock
           wrapperClassName="w-full"
-          className="h-full max-w-none !w-full flex-1 font-mono text-xs rounded-none border-none"
-          language="ts"
+          className="h-full max-w-none w-full! flex-1 font-mono text-xs rounded-none border-none"
+          language={languageFor(selectedFile.name)}
         >
           {selectedFile?.content}
         </CodeBlock>

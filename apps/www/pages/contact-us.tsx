@@ -16,7 +16,7 @@ const ContactSection = ({
   description: string | React.ReactNode
 }) => (
   <div className="">
-    <div className="border-t-[1px] border-brand-500 w-[32px] mb-1"></div>
+    <div className="border-t border-brand-500 w-[32px] mb-1"></div>
     <h2 className="text-xl md:text-2xl lg:text-3xl pt-1.5 lg:pt-3 tracking-[-1px] text-foreground">
       {title}
     </h2>
@@ -71,19 +71,19 @@ const ContactUs = ({}: Props) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 lg:gap-12">
               <ContactSection
                 title="Legal"
-                email="legal@supabase.io"
+                email="legal@supabase.com"
                 description="For general legal inquiries."
               />
 
               <ContactSection
                 title="Privacy"
-                email="privacy@supabase.io"
+                email="privacy@supabase.com"
                 description="For questions about personal data, data subject rights requests, GDPR/CCPA inquiries, or how Supabase processes personal information."
               />
 
               <ContactSection
                 title="Abuse & Acceptable Use"
-                email="abuse@supabase.io"
+                email="abuse@supabase.com"
                 description={
                   <>
                     To report suspected violations of our{' '}
@@ -98,7 +98,7 @@ const ContactUs = ({}: Props) => {
 
               <ContactSection
                 title="Security"
-                email="security@supabase.io"
+                email="security@supabase.com"
                 description="To responsibly disclose potential security vulnerabilities or report suspected security incidents involving Supabase infrastructure or services."
               />
 
@@ -109,16 +109,16 @@ const ContactUs = ({}: Props) => {
               />
 
               <div className="">
-                <div className="border-t-[1px] border-brand-500 w-[32px] mb-1"></div>
+                <div className="border-t border-brand-500 w-[32px] mb-1"></div>
                 <h2 className="text-xl md:text-2xl lg:text-3xl pt-1.5 lg:pt-3 tracking-[-1px] text-foreground">
                   Grievance Officer
                 </h2>
                 <div className="mt-2 lg:mt-3">
                   <a
-                    href="mailto:legal@supabase.io"
+                    href="mailto:legal@supabase.com"
                     className="inline-block font-mono text-base lg:text-lg text-brand-link hover:underline"
                   >
-                    legal@supabase.io
+                    legal@supabase.com
                   </a>
                   <p className="text-sm text-foreground-lighter mt-1">Attn: Tracy Lane</p>
                 </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { animate, motion, useInView, useMotionValue, useTransform } from 'framer-motion'
-import React, { FC, useEffect, useRef } from 'react'
+import { FC, useEffect, useRef } from 'react'
 
 import { cn } from '../../lib/utils/cn'
 

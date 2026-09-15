@@ -19,14 +19,14 @@ export const LABELS: Record<string, string> = {
 export const DESCRIPTIONS: Record<string, string> = {
   vault_aws_access_key_id: 'Matches the AWS access key ID from an S3 access key.',
   vault_aws_secret_access_key: 'Matches the AWS secret access from an S3 access key.',
-  vault_token: 'Corresponds to the service role key.',
+  vault_token: 'Corresponds to the secret or service role key.',
   warehouse: 'Matches the name of this bucket.',
   's3.endpoint': '',
   catalog_uri: '',
 }
 
 // [Joshen] For context we've decided to decouple ETL from Analytics Buckets for now
-// So this flag just hides all "connect table" ETL flow related UI
+// So this flag just hides all ETL-related user flows in Analytics Buckets
 // Depending on future decision if we intend to keep it that way, then we might be able
-// to clean up + deprecate ConnectTablesDialog and other ETL related UI within Analytics Buckets
+// to clean up + deprecate the remaining ETL-related UI within Analytics Buckets
 export const HIDE_REPLICATION_USER_FLOW = true

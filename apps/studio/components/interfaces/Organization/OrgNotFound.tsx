@@ -1,5 +1,5 @@
 import { Skeleton } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { OrganizationCard } from './OrganizationCard'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'

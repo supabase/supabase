@@ -38,10 +38,10 @@ npx wrangler secret put SUPABASE_URL
 npx wrangler dev
 ```
 
-**Add a secret for SUPABASE_ANON_KEY**
+**Add a secret for SUPABASE_PUBLISHABLE_KEY**
 
 ```bash
-npx wrangler secret put SUPABASE_ANON_KEY
+npx wrangler secret put SUPABASE_PUBLISHABLE_KEY
 ```
 
 **Query data from Supabase**

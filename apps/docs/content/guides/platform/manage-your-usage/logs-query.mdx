@@ -1,0 +1,51 @@
+---
+id: 'manage-usage-logs-query'
+title: 'Manage Logs Query usage'
+---
+
+<Admonition type="caution" title="Coming soon">
+
+Logs pricing is being rolled out. Pricing details and included quotas on this page are subject to change. This page will be updated when billing enforcement goes live.
+
+</Admonition>
+
+## What you are charged for
+
+You are charged for the volume of log data scanned when you read logs via the Studio UI, the Management API, the CLI, or any other interface, measured in GB.
+
+## How charges are calculated
+
+Logs Query is charged per GB of log data scanned during the billing cycle.
+
+### Usage on your invoice
+
+Usage is shown as "Logs Query" on your invoice.
+
+## Pricing
+
+<$Partial path="billing/pricing/pricing_logs_query.mdx" />
+
+## Billing examples
+
+Billing examples will be published here when pricing is finalized.
+
+## View usage
+
+You can view Logs Query usage on the [organization's usage page](/dashboard/org/_/usage) of the Dashboard. The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
+
+{/* TODO: Add screenshots once Studio surfaces are live */}
+
+## Optimize usage
+
+Logs Query usage scales directly with the time range and data volume you scan. Keep usage low by:
+
+- **Using the Logs Explorer** in the [Dashboard](/dashboard/project/_/logs-explorer) for ad-hoc queries — it surfaces the most relevant log data without over-scanning.
+- **Keeping time ranges narrow.** A 1-day window scans 7× less data than a 7-day window.
+- **Applying service and endpoint filters early** to reduce the volume scanned per query.
+- **Avoiding frequent programmatic polling.** Repeated API or CLI log queries accumulate GB rapidly. For continuous log streaming, [Log Drains](/docs/guides/platform/manage-your-usage/log-drains) are more cost-effective.
+
+{/* TODO: add MCP/skill guidance link when available */}
+
+## Exceeding Quotas
+
+<$Partial path="billing/exceeding_usage_quotas.mdx" />

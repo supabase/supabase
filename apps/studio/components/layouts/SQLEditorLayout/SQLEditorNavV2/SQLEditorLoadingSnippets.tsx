@@ -1,6 +1,6 @@
 import { Skeleton } from 'ui'
 
-const SQLEditorLoadingSnippets = () => {
+export const SQLEditorLoadingSnippets = () => {
   return (
     <>
       <div className="flex flex-row h-6 px-3 items-center gap-3">
@@ -26,5 +26,3 @@ const SQLEditorLoadingSnippets = () => {
     </>
   )
 }
-
-export default SQLEditorLoadingSnippets

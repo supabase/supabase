@@ -22,7 +22,7 @@ export const QueryInsightsHealthMetric = ({
     >
       <span className="text-foreground-lighter tracking-wider truncate uppercase">{label}</span>
       {isLoading ? (
-        <div className="h-3 w-12 rounded bg-surface-300 animate-pulse" />
+        <div className="h-3 w-12 rounded-sm bg-surface-300 animate-pulse" />
       ) : (
         <span className="text-foreground font-medium tabular-nums">{value}</span>
       )}

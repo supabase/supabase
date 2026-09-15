@@ -2,9 +2,11 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useCallback } from 'react'
 import { Button } from 'ui'
-import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
 import { SidePanelEditor } from './SidePanelEditor/SidePanelEditor'
@@ -22,7 +24,6 @@ import {
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
-import { useUrlState } from '@/hooks/ui/useUrlState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { TableEditorTableStateContextProvider } from '@/state/table-editor-table'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
@@ -48,7 +49,8 @@ export const TableGridEditor = ({
     table: selectedTable,
   })
 
-  const [{ view: selectedView = 'data' }] = useUrlState()
+  const [selectedView] = useQueryState('view', parseAsString.withDefault('data'))
+
   const { can: canEditTables } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'
@@ -67,7 +69,7 @@ export const TableGridEditor = ({
         `/project/${projectRef}/editor/${table.id}${!!selectedSchema ? `?schema=${selectedSchema}` : ''}`
       )
     },
-    [projectRef, router]
+    [projectRef, router, selectedSchema]
   )
 
   const onTableDeleted = useCallback(async () => {
@@ -82,7 +84,7 @@ export const TableGridEditor = ({
         onClearDashboardHistory: () => setLastVisitedTable(undefined),
       })
     }
-  }, [router, selectedTable, tabs])
+  }, [router, selectedTable, setLastVisitedTable, tabs])
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })
 
@@ -128,7 +130,6 @@ export const TableGridEditor = ({
             >
               {!!tabId ? (
                 <Button
-                  type="default"
                   className="mt-2"
                   onClick={() => {
                     tabs.handleTabClose({
@@ -142,23 +143,13 @@ export const TableGridEditor = ({
                   Close tab
                 </Button>
               ) : openTabs.length > 0 ? (
-                <Button
-                  asChild
-                  type="default"
-                  className="mt-2"
-                  onClick={() => setLastVisitedTable(undefined)}
-                >
+                <Button asChild className="mt-2" onClick={() => setLastVisitedTable(undefined)}>
                   <Link href={`/project/${projectRef}/editor/${openTabs[0].split('-')[1]}`}>
                     Close tab
                   </Link>
                 </Button>
               ) : (
-                <Button
-                  asChild
-                  type="default"
-                  className="mt-2"
-                  onClick={() => setLastVisitedTable(undefined)}
-                >
+                <Button asChild className="mt-2" onClick={() => setLastVisitedTable(undefined)}>
                   <Link href={`/project/${projectRef}/editor`}>Head back</Link>
                 </Button>
               )}
@@ -177,7 +168,7 @@ export const TableGridEditor = ({
             gridProps={{ height: '100%' }}
             customHeader={
               (isViewSelected || isTableSelected) && selectedView === 'definition' ? (
-                <div className="flex items-center space-x-2">
+                <div className="px-2 flex items-center gap-x-2">
                   <p>
                     SQL Definition of <code className="text-sm">{selectedTable.name}</code>{' '}
                   </p>
@@ -192,7 +183,7 @@ export const TableGridEditor = ({
           </SupabaseGrid>
 
           <DeleteConfirmationDialogs
-            selectedTable={isTableSelected ? selectedTable : undefined}
+            selectedTable={selectedTable}
             onTableDeleted={onTableDeleted}
           />
         </TableEditorTableStateContextProvider>

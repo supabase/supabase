@@ -16,7 +16,7 @@ export class SupabaseService {
   private supabase: SupabaseClient
 
   constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey)
+    this.supabase = createClient(environment.supabaseUrl, environment.supabasePublishableKey)
   }
 
   async getUser(): Promise<User | null> {

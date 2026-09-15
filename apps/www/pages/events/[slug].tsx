@@ -13,8 +13,9 @@ import utc from 'dayjs/plugin/utc'
 import matter from 'gray-matter'
 import { ChevronLeft, X as XIcon } from 'lucide-react'
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
-import { MDXRemote } from 'next-mdx-remote'
+import { MDXClient } from 'next-mdx-remote-client/csr'
 import { NextSeo } from 'next-seo'
+import Head from 'next/head'
 import NextImage from 'next/image'
 import Link from 'next/link'
 import { Button } from 'ui'
@@ -23,8 +24,11 @@ import { Image } from 'ui-patterns/Image'
 import ShareArticleActions from '@/components/Blog/ShareArticleActions'
 import DefaultLayout from '@/components/Layouts/Default'
 import SectionContainer from '@/components/Layouts/SectionContainer'
+import { MarkdownActions } from '@/components/MarkdownActions'
 import authors from '@/lib/authors.json'
+import { breadcrumbs } from '@/lib/breadcrumbs'
 import { capitalize, isNotNullOrUndefined } from '@/lib/helpers'
+import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 import mdxComponents from '@/lib/mdx/mdxComponents'
 import { mdxSerialize } from '@/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata } from '@/lib/posts'
@@ -58,6 +62,7 @@ interface EventData {
   main_cta?: CTA
   description: string
   type: EventType
+  type_label?: string
   company?: CompanyType
   onDemand?: boolean
   disable_page_build?: boolean
@@ -221,12 +226,28 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
           },
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(
+              breadcrumbListSchema([
+                ...breadcrumbs.eventsIndex,
+                {
+                  name: event.meta_title ?? event.title,
+                  url: `https://supabase.com/events/${event.slug}`,
+                },
+              ])
+            ),
+          }}
+        />
+      </Head>
       <DefaultLayout>
         <div className="flex flex-col w-full bg-alternative border-b border-muted">
-          <SectionContainer className="!py-2 flex items-start">
+          <SectionContainer className="py-2! flex items-start">
             <Link
               href="/events"
-              className="text-foreground-lighter hover:text-foreground flex !m-0 !p-0 !leading-3 gap-1 cursor-pointer items-center text-sm transition"
+              className="text-foreground-lighter hover:text-foreground flex m-0! p-0! leading-3! gap-1 cursor-pointer items-center text-sm transition"
             >
               <ChevronLeft className="w-4 h-4" />
               All Events
@@ -257,14 +278,16 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 grid grid-cols-1 xl:grid-cols-2
                 gap-8
                 text-foreground-light
-                !py-10 md:!py-16
+                py-10! md:py-16!
               "
             >
               <div className="h-full flex flex-col justify-between">
                 <div className="flex flex-col gap-2 md:gap-3 items-start mb-8">
                   <div className="flex flex-row text-sm items-center flex-wrap">
                     <Icon className="hidden sm:inline-block w-4 h-4 text-brand mr-2" />
-                    <span className="uppercase text-brand font-mono">{event.type}</span>
+                    <span className="uppercase text-brand font-mono">
+                      {event.type_label ?? event.type}
+                    </span>
                     <span className="mx-3 px-3 border-x">
                       {dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY [at] hA z`)}
                     </span>
@@ -274,7 +297,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                   <h1 className="text-foreground text-3xl md:text-4xl xl:pr-9">{event.title}</h1>
                   <p>{event.subtitle}</p>
                   <Button
-                    type="primary"
+                    variant="primary"
                     size="medium"
                     className="mt-2"
                     disabled={
@@ -287,7 +310,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                       target={event.main_cta?.target ? event.main_cta?.target : undefined}
                       onClick={() =>
                         sendTelemetryEvent({
-                          action: 'www_pricing_plan_cta_clicked',
+                          action: 'www_event_page_cta_clicked',
                           properties: { eventTitle: event.title },
                         })
                       }
@@ -302,13 +325,18 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     </Link>
                   </Button>
                 </div>
+                <MarkdownActions
+                  pagePath={`/events/${event.slug}`}
+                  pageType="events"
+                  className="mb-4"
+                />
                 <div className="flex flex-col text-sm">
                   <span>Share on</span>
                   <ShareArticleActions title={meta.title} slug={meta.url} basePath="" />
                 </div>
               </div>
               {!!event.thumb && (
-                <div className="relative w-full aspect-[5/3] lg:aspect-[3/2] overflow-hidden border shadow-lg rounded-lg z-10">
+                <div className="relative w-full aspect-5/3 lg:aspect-3/2 overflow-hidden border shadow-lg rounded-lg z-10">
                   <Image
                     src={{
                       dark: `/images/events/` + event.thumb,
@@ -321,8 +349,8 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     quality={100}
                     containerClassName="
                       h-full
-                      [&.next-image--dynamic-fill_img]:!h-full
-                      [&.next-image--dynamic-fill_img]:!object-cover
+                      [&.next-image--dynamic-fill_img]:h-full!
+                      [&.next-image--dynamic-fill_img]:object-cover!
                       "
                     alt={`${event.title} thumbnail`}
                   />
@@ -330,18 +358,18 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
               )}
             </SectionContainer>
           </header>
-          <SectionContainer className="grid lg:grid-cols-3 gap-12 !py-10 md:!py-16">
+          <SectionContainer className="grid lg:grid-cols-3 gap-12 py-10! md:py-16!">
             {event.company && (
               <div className="order-first lg:col-span-full flex items-center gap-4 md:gap-6 lg:mb-4">
-                <figure className="h-6 [&_.next-image--dynamic-fill_img]:!h-full">
+                <figure className="h-6 [&_.next-image--dynamic-fill_img]:h-full!">
                   <Image
                     src={{ dark: supabaseLogoWordmarkDark, light: supabaseLogoWordmarkLight }}
                     alt="Supabase Logo"
                     width={160}
                     height={30}
                     sizes="100%"
-                    className="!relative object-contain object-left"
-                    containerClassName="h-full object-contain object-left !rounded-none !border-none"
+                    className="relative! object-contain object-left"
+                    containerClassName="h-full object-contain object-left rounded-none! border-none!"
                     priority
                   />
                 </figure>
@@ -349,7 +377,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 <Link
                   href={event.company?.website_url ?? '#'}
                   target="_blank"
-                  className="h-5 aspect-[9/1] transition-opacity opacity-100 hover:opacity-90 [&_.next-image--dynamic-fill_img]:!h-full"
+                  className="h-5 aspect-9/1 transition-opacity opacity-100 hover:opacity-90 [&_.next-image--dynamic-fill_img]:h-full!"
                 >
                   <Image
                     src={{ dark: event.company?.logo, light: event.company?.logo_light }}
@@ -357,8 +385,8 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     width={160}
                     height={30}
                     sizes="100%"
-                    className="!relative object-contain object-left"
-                    containerClassName="h-full object-contain object-left !rounded-none !border-none"
+                    className="relative! object-contain object-left"
+                    containerClassName="h-full object-contain object-left rounded-none! border-none!"
                     priority
                   />
                 </Link>
@@ -369,11 +397,11 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 <h2 className="text-foreground-light text-sm font-mono uppercase">
                   About this event
                 </h2>
-                <MDXRemote {...content} components={mdxComponents()} />
+                <MDXClient {...content} components={mdxComponents()} />
               </div>
               <aside className="mt-8">
                 <Button
-                  type="primary"
+                  variant="primary"
                   size="medium"
                   className="mt-2"
                   disabled={!IS_REGISTRATION_OPEN || event.main_cta?.disabled}

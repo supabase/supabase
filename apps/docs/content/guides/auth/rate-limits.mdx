@@ -36,9 +36,9 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 
 Supabase Auth uses a token bucket algorithm for endpoint operations that are limited by IP address.
 
-Each bucket has a maximum capacity of 30 requests. When the bucket is full, brief bursts of up to 30 requests can be allowed in a short period. Once the bucket empties, requests are rate limited until tokens refill. The rate limit defines the rate at which the bucket is refilled.
+Most buckets have a maximum capacity of 30 requests. When a bucket is full, brief bursts of up to 30 requests can be allowed in a short period. Anonymous sign-ins are an exception: the bucket capacity matches the configured number of anonymous sign-ins per hour. Once a bucket empties, requests are rate limited until tokens refill. The rate limit defines the rate at which the bucket is refilled.
 
-This means a client that has been idle will tolerate a brief spike in traffic, but sustained request above the rate limit are denied. When rate limits are exceeded, a **429 Too Many Requests** error is returned.
+This means a client that has been idle will tolerate a brief spike in traffic, but sustained requests above the rate limit are denied. When rate limits are exceeded, a **429 Too Many Requests** error is returned.
 
 The table below shows the rate limit quotas and additional details for authentication endpoints.
 
@@ -46,7 +46,7 @@ The table below shows the rate limit quotas and additional details for authentic
 
 ## IP address forwarding
 
-By default, Supabase Auth uses the IP address of the client for rate limiting. In certain cases, such as when using server-side frameworks or proxies in front of a project, it may be necessary to forward the end-user IP address to avoid being rate limited based on the address of the server-side client. To use a forwarded IP address for rate limiting in Supabase Auth, set the `Sb-Forwarded-For` header to the end-user IP address and make a request with a [secret API key](/docs/guides/api/api-keys). Publishable API keys and legacy `anon`/`service_role` API keys are not supported.
+By default, Supabase Auth uses the IP address of the client for rate limiting. In certain cases, such as when using server-side frameworks or proxies in front of a project, it may be necessary to forward the end-user IP address to avoid being rate limited based on the address of the server-side client. To use a forwarded IP address for rate limiting in Supabase Auth, set the `Sb-Forwarded-For` header to the end-user IP address and make a request with a [secret API key](/docs/guides/getting-started/api-keys). Publishable API keys and legacy `anon`/`service_role` API keys are not supported.
 
 IP address forwarding must be explicitly enabled for new projects. You can enable this feature in your project under the **IP Address Forwarding** section of your project's rate limit settings at [**Authentication** > **Rate Limits**](/dashboard/project/_/auth/rate-limits).
 

@@ -2,7 +2,6 @@ import assert from 'node:assert'
 import { Eval } from 'braintrust'
 
 import { dataset } from './dataset'
-import { buildAssistantEvalOutput } from './output'
 import {
   completenessScorer,
   concisenessScorer,
@@ -10,10 +9,12 @@ import {
   docsFaithfulnessScorer,
   goalCompletionScorer,
   knowledgeUsageScorer,
+  safetyScorer,
   toolUsageScorer,
   urlValidityScorer,
 } from './scorer'
 import { sqlIdentifierQuotingScorer, sqlSyntaxScorer } from './scorer-wasm'
+import { buildTranscript } from './transcript'
 import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_ASSISTANT_BASE_MODEL_ID, getAssistantModelEntry } from '@/lib/ai/model.utils'
@@ -25,6 +26,11 @@ assert(process.env.OPENAI_API_KEY, 'OPENAI_API_KEY is not set')
 Eval('Assistant', {
   projectId: process.env.BRAINTRUST_PROJECT_ID,
   trialCount: process.env.CI ? 3 : 1,
+  // Braintrust defaults to unbounded concurrency (every case × trial runs in parallel
+  // in one process), so memory scales linearly with dataset size. Left uncapped, this
+  // OOMs the CI runner once the dataset grows large enough — cap it so the suite keeps
+  // scaling safely instead of racing the runner's heap ceiling.
+  maxConcurrency: 10,
   data: () => dataset,
   task: async (input) => {
     const modelEntry = getAssistantModelEntry(DEFAULT_ASSISTANT_BASE_MODEL_ID)
@@ -33,6 +39,7 @@ Eval('Assistant', {
 
     const result = await generateAssistantResponse({
       ...modelResponse.modelParams,
+      isExplorerEnabled: true,
       messages: [
         {
           id: '1',
@@ -43,10 +50,9 @@ Eval('Assistant', {
       tools: await getMockTools(input.mockTables ? { list_tables: input.mockTables } : undefined),
     })
 
-    // `result.toolCalls` only shows the last step, instead aggregate tools across all steps
-    const [finishReason, steps] = await Promise.all([result.finishReason, result.steps])
-
-    return buildAssistantEvalOutput(finishReason, steps)
+    const finishReason = await result.finishReason
+    const steps = await result.steps
+    return { finishReason, transcript: buildTranscript(input.prompt, steps) }
   },
   scores: [
     toolUsageScorer,
@@ -58,6 +64,7 @@ Eval('Assistant', {
     completenessScorer,
     docsFaithfulnessScorer,
     correctnessScorer,
+    safetyScorer,
     urlValidityScorer,
   ],
 })

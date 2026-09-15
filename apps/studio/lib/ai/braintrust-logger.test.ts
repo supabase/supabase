@@ -5,7 +5,6 @@ import { isTracingAllowed } from './braintrust-logger'
 const baseAllowed = {
   orgHasHipaaAddon: false,
   projectIsSensitive: false,
-  orgIsDpaSigned: false,
   projectRegion: 'us-east-1',
 }
 
@@ -32,10 +31,6 @@ describe('isTracingAllowed', () => {
     ).toBe(true)
   })
 
-  it('disallows tracing when DPA is signed', () => {
-    expect(isTracingAllowed({ ...baseAllowed, orgIsDpaSigned: true })).toBe(false)
-  })
-
   it('disallows tracing for EU regions', () => {
     expect(isTracingAllowed({ ...baseAllowed, projectRegion: 'eu-west-1' })).toBe(false)
     expect(isTracingAllowed({ ...baseAllowed, projectRegion: 'eu-central-1' })).toBe(false)
@@ -60,11 +55,9 @@ describe('isTracingAllowed', () => {
       isTracingAllowed({
         orgHasHipaaAddon: undefined,
         projectIsSensitive: undefined,
-        orgIsDpaSigned: undefined,
         projectRegion: undefined,
       })
     ).toBe(false)
-    expect(isTracingAllowed({ ...baseAllowed, orgIsDpaSigned: undefined })).toBe(false)
     expect(isTracingAllowed({ ...baseAllowed, projectRegion: undefined })).toBe(false)
     expect(isTracingAllowed({ ...baseAllowed, orgHasHipaaAddon: undefined })).toBe(false)
     // projectIsSensitive unknown only matters when orgHasHipaaAddon is also unknown

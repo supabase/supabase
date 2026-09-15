@@ -15,7 +15,9 @@ import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
 import CardButton from '@/components/ui/CardButton'
 import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
+import PartnerIcon from '@/components/ui/PartnerIcon'
 import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
+import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
@@ -58,25 +60,30 @@ export const ProjectCard = ({
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined
+  const projectManagedBy = getManagedByFromOrganizationPartner(
+    undefined,
+    project.integration_source
+  )
   const projectStatus = inferProjectStatus(project.status)
 
   return (
     <>
       <li className="list-none h-min">
         <CardButton
+          tabIndex={0}
           linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
-          className="h-44 !px-0 group pt-5 pb-0 overflow-hidden relative"
+          className="h-44 px-0! group pt-5 pb-0 overflow-hidden relative"
           hideChevron
           title={
             <div className="w-full flex flex-col gap-y-4 justify-between px-5">
               <div className="flex flex-col gap-y-0.5 relative">
                 <div className="flex items-center justify-between">
-                  <h5 className="text-sm flex-shrink truncate pr-5">{name}</h5>
+                  <h2 className="text-sm shrink truncate pr-5">{name}</h2>
                   <div onClick={(e) => e.preventDefault()}>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
-                          type="text"
+                          variant="text"
                           icon={<MoreVertical size={14} />}
                           className="w-6 h-6 px-0"
                           onClick={(e) => {
@@ -84,6 +91,7 @@ export const ProjectCard = ({
                             e.preventDefault()
                           }}
                           onPointerDown={(e) => e.stopPropagation()}
+                          aria-label={`Project ${name} actions`}
                         />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
@@ -134,6 +142,7 @@ export const ProjectCard = ({
                     />
                   </div>
                 )}
+                <PartnerIcon organization={{ managed_by: projectManagedBy }} />
                 {isGithubIntegrated && (
                   <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md min-w-0">
                     <div className="w-5 h-5 p-1 flex items-center justify-center shrink-0">

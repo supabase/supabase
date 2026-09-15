@@ -1,4 +1,5 @@
 import { useBreakpoint } from 'common'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import { Check, CheckCircle, Sparkles, Timer, Zap } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
@@ -62,7 +63,7 @@ const useVibeCodersContent: () => {
       ctas: [
         {
           label: 'Start Your Project',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
         },
       ],
@@ -217,7 +218,7 @@ const useVibeCodersContent: () => {
                 absolute pointer-events-none
                 w-full h-full
                 inset-0 top-auto
-                bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background-default))_100%)]
+                bg-[linear-gradient(to_bottom,transparent_0%,var(--background-default)_100%)]
               "
               />
             </div>
@@ -249,8 +250,8 @@ const useVibeCodersContent: () => {
               . Secure and trusted.
             </>
           ),
-          className: '!border-l-0 sm:!border-l sm:!border-t-0',
-          image: <AuthVisual className="2xl:!-bottom-20" />,
+          className: 'border-l-0! sm:border-l! sm:border-t-0!',
+          image: <AuthVisual className="2xl:-bottom-20!" />,
         },
         {
           id: 'realtime',
@@ -262,9 +263,9 @@ const useVibeCodersContent: () => {
               <span className="text-foreground">multi-player, collaborative experiences</span>.
             </>
           ),
-          className: '!border-l-0',
+          className: 'border-l-0!',
           image: (
-            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]" />
+            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]" />
           ),
         },
         {
@@ -272,7 +273,7 @@ const useVibeCodersContent: () => {
           title: 'Edge Functions',
           icon: MainProducts[PRODUCT_SHORTNAMES.FUNCTIONS].icon,
           subheading: <>Custom backend logic when you want to dive into code.</>,
-          className: '!border-l-0 sm:!border-l',
+          className: 'border-l-0! sm:border-l!',
           image: <FunctionsVisual className="" />,
         },
         {
@@ -285,7 +286,7 @@ const useVibeCodersContent: () => {
               images you need in your app.
             </>
           ),
-          className: '!border-l-0 lg:!border-l',
+          className: 'border-l-0! lg:border-l!',
           image: (
             <Image
               draggable={false}
@@ -316,7 +317,7 @@ const useVibeCodersContent: () => {
               industry-standard tools to guide you.
             </>
           ),
-          className: '!border-l lg:!border-l-0',
+          className: 'border-l! lg:border-l-0!',
           image: (
             <Image
               draggable={false}

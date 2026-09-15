@@ -14,7 +14,7 @@ export const ErroredTableDetails = ({ table }: ErroredTableDetailsProps) => {
   const { ref: projectRef } = useParams()
 
   const state = table.state as Extract<ReplicationPipelineTableStatus['state'], { name: 'error' }>
-  const tableName = table.table_name
+  const tableName = `${table.schema}.${table.name}`
   const retryPolicy = state.retry_policy.policy
 
   if (!isValidRetryPolicy(state.retry_policy)) {
@@ -38,7 +38,7 @@ export const ErroredTableDetails = ({ table }: ErroredTableDetailsProps) => {
             This error requires manual intervention from our{' '}
             <InlineLink
               className="text-foreground-lighter hover:text-foreground"
-              href={`/support?projectRef=${projectRef}&category=dashboard_bug&subject=Database%20replication%20error&error=${state.reason}`}
+              href={`/support?projectRef=${projectRef}&category=dashboard_bug&subject=Database%20replication%20error&error=${encodeURIComponent(state.reason ?? '')}`}
             >
               support
             </InlineLink>

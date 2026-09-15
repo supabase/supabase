@@ -3,9 +3,12 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 
 import { ApiAuthorizationScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization'
-import { APIAuthorizationLayout } from '@/components/layouts/APIAuthorizationLayout'
+import { ApiAuthorizationLoadingScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization.Loading'
 import { withAuth } from '@/hooks/misc/withAuth'
+import { buildStudioPageTitle } from '@/lib/page-title'
 import type { NextPageWithLayout } from '@/types'
+
+const PAGE_TITLE = buildStudioPageTitle({ section: 'Authorize API Access', brand: 'Supabase' })
 
 const APIAuthorizationPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -13,20 +16,28 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const { auth_id, organization_slug } = useParams()
 
   if (!routerReady) {
-    return null
+    return (
+      <>
+        <Head>
+          <title>{PAGE_TITLE}</title>
+        </Head>
+        <ApiAuthorizationLoadingScreen />
+      </>
+    )
   }
 
   return (
-    <ApiAuthorizationScreen
-      auth_id={auth_id}
-      organization_slug={organization_slug}
-      navigate={(destination) => router.push(destination)}
-    />
+    <>
+      <Head>
+        <title>{PAGE_TITLE}</title>
+      </Head>
+      <ApiAuthorizationScreen
+        auth_id={auth_id}
+        organization_slug={organization_slug}
+        navigate={(destination) => router.push(destination)}
+      />
+    </>
   )
 }
-
-APIAuthorizationPage.getLayout = (page) => (
-  <APIAuthorizationLayout HeadProvider={Head}>{page}</APIAuthorizationLayout>
-)
 
 export default withAuth(APIAuthorizationPage)

@@ -21,7 +21,7 @@ describe('getEdgeFunctionsLastHourStats', () => {
     vi.useRealTimers()
   })
 
-  it('requests last-hour function stats from logs.all', async () => {
+  it('requests last-hour function stats from logs.all by default', async () => {
     vi.mocked(post).mockResolvedValue({ data: { result: [] }, error: null } as PostResponse)
 
     await getEdgeFunctionsLastHourStats({
@@ -47,6 +47,42 @@ describe('getEdgeFunctionsLastHourStats', () => {
     >
 
     expect(postCalls[0]?.[1]?.body?.sql).toContain('from\n  function_edge_logs')
+  })
+
+  it('requests last-hour function stats from logs.all.otel when useOtel is set', async () => {
+    vi.mocked(post).mockResolvedValue({ data: { result: [] }, error: null } as PostResponse)
+
+    await getEdgeFunctionsLastHourStats({
+      projectRef: 'project-ref',
+      functionIds: ['fn_1', 'fn_2'],
+      useOtel: true,
+    })
+
+    expect(post).toHaveBeenCalledWith(
+      '/platform/projects/{ref}/analytics/endpoints/logs.all.otel',
+      {
+        params: {
+          path: { ref: 'project-ref' },
+          query: { key: 'last-hour-stats' },
+        },
+        body: expect.objectContaining({
+          sql: expect.stringContaining(`and log_attributes['function_id'] in ('fn_1', 'fn_2')`),
+          iso_timestamp_start: '2024-01-15T11:00:00.000Z',
+          iso_timestamp_end: '2024-01-15T12:00:00.000Z',
+        }),
+        signal: undefined,
+      }
+    )
+
+    const postCalls = vi.mocked(post).mock.calls as Array<
+      [string, { body?: { sql?: string } } | undefined]
+    >
+    const sql = postCalls[0]?.[1]?.body?.sql ?? ''
+
+    expect(sql).toContain('from logs')
+    expect(sql).toContain("source = 'function_edge_logs'")
+    expect(sql).toContain("case when toInt32OrZero(log_attributes['response.status_code']) >= 500")
+    expect(sql).not.toContain('cross join unnest')
   })
 
   it('coerces counts to numbers and computes error rates per function', async () => {

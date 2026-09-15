@@ -3,7 +3,6 @@ import { components } from 'api-types'
 
 import { edgeFunctionsKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type EdgeFunctionVariables = {
@@ -11,7 +10,7 @@ export type EdgeFunctionVariables = {
   slug?: string
 }
 
-export type EdgeFunction = components['schemas']['FunctionSlugResponse']
+export type EdgeFunction = components['schemas']['FunctionSlugResponse_Output']
 
 export async function getEdgeFunction(
   { projectRef, slug }: EdgeFunctionVariables,

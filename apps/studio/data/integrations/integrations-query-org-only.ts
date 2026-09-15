@@ -9,7 +9,7 @@ type IntegrationsVariables = {
   orgSlug?: string
 }
 
-export async function getIntegrations({ orgSlug }: IntegrationsVariables, signal?: AbortSignal) {
+export async function getIntegrations({ orgSlug }: IntegrationsVariables) {
   if (!orgSlug) throw new Error('orgSlug is required')
 
   const { data, error } = await get('/platform/integrations/{slug}', {
@@ -32,7 +32,7 @@ export const useOrgIntegrationsQuery = <TData = IntegrationsData>(
 ) =>
   useQuery<IntegrationsData, IntegrationsError, TData>({
     queryKey: integrationKeys.integrationsListWithOrg(orgSlug),
-    queryFn: ({ signal }) => getIntegrations({ orgSlug }, signal),
+    queryFn: () => getIntegrations({ orgSlug }),
     enabled: enabled && typeof orgSlug !== 'undefined',
     staleTime: 30 * 60 * 1000,
     ...options,

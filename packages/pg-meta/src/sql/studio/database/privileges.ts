@@ -1,3 +1,5 @@
+import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
+
 /**
  * Builds the shared `table_privileges` and `table_grants` CTEs used by
  * both the exposed-tables list query and the counts-only query.
@@ -8,10 +10,13 @@
 function getTableGrantsCTEs({
   search,
   ignoredSchemas = [],
-}: { search?: string; ignoredSchemas?: string[] } = {}) {
-  const IGNORED_SCHEMAS_LIST = ignoredSchemas.map((s) => `'${s}'`).join(', ')
+}: { search?: string; ignoredSchemas?: string[] } = {}): SafeSqlFragment {
+  const IGNORED_SCHEMAS_LIST = joinSqlFragments(
+    ignoredSchemas.map((s) => literal(s)),
+    ', '
+  )
 
-  return /* SQL */ `
+  return safeSql`
     table_privileges as (
       select
         c.oid::int as id,
@@ -45,8 +50,8 @@ function getTableGrantsCTEs({
       left join pg_roles pr
         on pr.oid = acl.grantee
       where c.relkind in ('r', 'p', 'v', 'm', 'f')
-        ${IGNORED_SCHEMAS_LIST ? `and n.nspname not in (${IGNORED_SCHEMAS_LIST})` : ''}
-        ${search ? `and (n.nspname || '.' || c.relname) ilike '%${search}%'` : ''}
+        ${IGNORED_SCHEMAS_LIST ? safeSql`and n.nspname not in (${IGNORED_SCHEMAS_LIST})` : safeSql``}
+        ${search ? safeSql`and (n.nspname || '.' || c.relname) ilike ${literal(`%${search}%`)}` : safeSql``}
       group by c.oid, n.nspname, c.relname, c.relkind
     ),
     table_grants as (
@@ -88,8 +93,8 @@ export function getExposedTablesSql({
   offset: number
   limit: number
   ignoredSchemas?: string[]
-}) {
-  return /* SQL */ `
+}): SafeSqlFragment {
+  return safeSql`
     with ${getTableGrantsCTEs({ search, ignoredSchemas })}
     select
       (select count(*)::int from table_grants) as total_count,
@@ -107,8 +112,8 @@ export function getExposedTablesSql({
             select *
             from table_grants
             order by schema_name, name
-            offset ${offset}
-            limit ${limit}
+            offset ${literal(offset)}
+            limit ${literal(limit)}
           ) tg
         ),
         '[]'::jsonb
@@ -124,9 +129,14 @@ export function getExposedTableCountsSql({
   ignoredSchemas?: string[]
 }) {
   const schemasList =
-    selectedSchemas.length > 0 ? selectedSchemas.map((s) => `'${s}'`).join(', ') : "''"
+    selectedSchemas.length > 0
+      ? joinSqlFragments(
+          selectedSchemas.map((s) => literal(s)),
+          ', '
+        )
+      : safeSql`''`
 
-  return /* SQL */ `
+  return safeSql`
     with ${getTableGrantsCTEs({ ignoredSchemas })}
     select
       count(*)::int as total_count,
@@ -145,10 +155,13 @@ export function getExposedTableCountsSql({
 function getFunctionGrantsCTEs({
   search,
   ignoredSchemas = [],
-}: { search?: string; ignoredSchemas?: string[] } = {}) {
-  const IGNORED_SCHEMAS_LIST = ignoredSchemas.map((s) => `'${s}'`).join(', ')
+}: { search?: string; ignoredSchemas?: string[] } = {}): SafeSqlFragment {
+  const IGNORED_SCHEMAS_LIST = joinSqlFragments(
+    ignoredSchemas.map((s) => literal(s)),
+    ', '
+  )
 
-  return /* SQL */ `
+  return safeSql`
     function_privileges as (
       select
         n.nspname as schema_name,
@@ -167,8 +180,8 @@ function getFunctionGrantsCTEs({
       left join pg_roles pr
         on pr.oid = acl.grantee
       where p.prokind in ('f', 'w')
-        ${IGNORED_SCHEMAS_LIST ? `and n.nspname not in (${IGNORED_SCHEMAS_LIST})` : ''}
-        ${search ? `and (n.nspname || '.' || p.proname) ilike '%${search}%'` : ''}
+        ${IGNORED_SCHEMAS_LIST ? safeSql`and n.nspname not in (${IGNORED_SCHEMAS_LIST})` : safeSql``}
+        ${search ? safeSql`and (n.nspname || '.' || p.proname) ilike ${literal(`%${search}%`)}` : safeSql``}
       group by n.nspname, p.proname
     ),
     function_grants as (
@@ -195,8 +208,8 @@ export function getExposedFunctionsSql({
   offset: number
   limit: number
   ignoredSchemas?: string[]
-}) {
-  return /* SQL */ `
+}): SafeSqlFragment {
+  return safeSql`
     with ${getFunctionGrantsCTEs({ search, ignoredSchemas })}
     select
       (select count(*)::int from function_grants) as total_count,
@@ -213,8 +226,8 @@ export function getExposedFunctionsSql({
             select *
             from function_grants
             order by schema_name, name
-            offset ${offset}
-            limit ${limit}
+            offset ${literal(offset)}
+            limit ${literal(limit)}
           ) fg
         ),
         '[]'::jsonb
@@ -228,11 +241,16 @@ export function getExposedFunctionCountsSql({
 }: {
   selectedSchemas: string[]
   ignoredSchemas?: string[]
-}) {
+}): SafeSqlFragment {
   const schemasList =
-    selectedSchemas.length > 0 ? selectedSchemas.map((s) => `'${s}'`).join(', ') : "''"
+    selectedSchemas.length > 0
+      ? joinSqlFragments(
+          selectedSchemas.map((s) => literal(s)),
+          ', '
+        )
+      : safeSql`''`
 
-  return /* SQL */ `
+  return safeSql`
     with ${getFunctionGrantsCTEs({ ignoredSchemas })}
     select
       count(*)::int as total_count,
@@ -241,14 +259,16 @@ export function getExposedFunctionCountsSql({
   `
 }
 
-export function getDefaultPrivilegesStateSql({ schema = 'public' }: { schema?: string } = {}) {
-  return /* SQL */ `
+export function getDefaultPrivilegesStateSql({
+  schema = 'public',
+}: { schema?: string } = {}): SafeSqlFragment {
+  return safeSql`
     select
       count(*)::int as grant_count
     from pg_default_acl d
     join pg_namespace n on n.oid = d.defaclnamespace
     join pg_roles r on r.oid = d.defaclrole
-    where n.nspname = '${schema}'
+    where n.nspname = ${literal(schema)}
       and r.rolname = 'postgres'
       and d.defaclobjtype in ('r', 'f', 'S')
       and exists (
@@ -260,48 +280,51 @@ export function getDefaultPrivilegesStateSql({ schema = 'public' }: { schema?: s
   `
 }
 
-export function buildDefaultPrivilegesSql(action: 'grant' | 'revoke') {
+export function buildDefaultPrivilegesSql(action: 'grant' | 'revoke'): SafeSqlFragment {
   const roles = ['anon', 'authenticated', 'service_role']
-  const statements: string[] = []
+  const statements: SafeSqlFragment[] = []
 
   for (const role of roles) {
     if (action === 'grant') {
       statements.push(
-        `alter default privileges for role postgres in schema public grant select, insert, update, delete on tables to ${role}`,
-        `alter default privileges for role postgres in schema public grant execute on functions to ${role}`,
-        `alter default privileges for role postgres in schema public grant usage, select on sequences to ${role}`
+        safeSql`alter default privileges for role postgres in schema public grant select, insert, update, delete on tables to ${ident(role)}`,
+        safeSql`alter default privileges for role postgres in schema public grant execute on functions to ${ident(role)}`,
+        safeSql`alter default privileges for role postgres in schema public grant usage, select on sequences to ${ident(role)}`
       )
     } else {
       statements.push(
-        `alter default privileges for role postgres in schema public revoke select, insert, update, delete on tables from ${role}`,
-        `alter default privileges for role postgres in schema public revoke execute on functions from ${role}`,
-        `alter default privileges for role postgres in schema public revoke usage, select on sequences from ${role}`
+        safeSql`alter default privileges for role postgres in schema public revoke select, insert, update, delete on tables from ${ident(role)}`,
+        safeSql`alter default privileges for role postgres in schema public revoke execute on functions from ${ident(role)}`,
+        safeSql`alter default privileges for role postgres in schema public revoke usage, select on sequences from ${ident(role)}`
       )
     }
   }
 
   if (action === 'revoke') {
     statements.push(
-      `alter default privileges for role postgres in schema public revoke execute on functions from public`
+      safeSql`alter default privileges for role postgres in schema public revoke execute on functions from public`
     )
   } else {
     statements.push(
-      `alter default privileges for role postgres in schema public grant execute on functions to public`
+      safeSql`alter default privileges for role postgres in schema public grant execute on functions to public`
     )
   }
 
-  return statements.join(';\n') + ';'
+  return safeSql`${joinSqlFragments(statements, ';\n')};`
 }
 
-export const buildTablePrivilegesSql = (oids: number[], action: 'grant' | 'revoke') => {
-  if (oids.length === 0) return ''
+export const buildTablePrivilegesSql = (
+  oids: number[],
+  action: 'grant' | 'revoke'
+): SafeSqlFragment => {
+  if (oids.length === 0) return safeSql``
 
   const privilegeClause =
     action === 'grant'
-      ? 'grant select, insert, update, delete on table %I.%I to anon, authenticated, service_role'
-      : 'revoke all on table %I.%I from anon, authenticated, service_role'
+      ? safeSql`grant select, insert, update, delete on table %I.%I to anon, authenticated, service_role`
+      : safeSql`revoke all on table %I.%I from anon, authenticated, service_role`
 
-  return /* SQL */ `
+  return safeSql`
     do $$
     declare
       nspname name;
@@ -311,7 +334,10 @@ export const buildTablePrivilegesSql = (oids: number[], action: 'grant' | 'revok
         select n.nspname, c.relname
         from pg_class c
         join pg_namespace n on n.oid = c.relnamespace
-        where c.oid in (${oids.join(', ')})
+        where c.oid in (${joinSqlFragments(
+          oids.map((oid) => literal(oid)),
+          ', '
+        )})
       loop
         execute format('${privilegeClause}', nspname, relname);
       end loop;
@@ -319,24 +345,28 @@ export const buildTablePrivilegesSql = (oids: number[], action: 'grant' | 'revok
   `
 }
 
-export const buildFunctionPrivilegesSql = (schemaNames: string[], action: 'grant' | 'revoke') => {
-  if (schemaNames.length === 0) return ''
+export const buildFunctionPrivilegesSql = (
+  schemaNames: string[],
+  action: 'grant' | 'revoke'
+): SafeSqlFragment => {
+  if (schemaNames.length === 0) return safeSql``
 
-  const tuples = schemaNames
-    .map((sn) => {
+  const tuples = joinSqlFragments(
+    schemaNames.map((sn) => {
       const dotIdx = sn.indexOf('.')
       const schema = sn.slice(0, dotIdx)
       const name = sn.slice(dotIdx + 1)
-      return `('${schema}','${name}')`
-    })
-    .join(', ')
+      return safeSql`(${literal(schema)},${literal(name)})`
+    }),
+    ', '
+  )
 
   const privilegeClause =
     action === 'grant'
-      ? 'grant execute on function %I.%I(%s) to anon, authenticated, service_role'
-      : 'revoke all on function %I.%I(%s) from anon, authenticated, service_role'
+      ? safeSql`grant execute on function %I.%I(%s) to anon, authenticated, service_role`
+      : safeSql`revoke all on function %I.%I(%s) from anon, authenticated, service_role`
 
-  return /* SQL */ `
+  return safeSql`
     do $$
     declare
       nspname name;

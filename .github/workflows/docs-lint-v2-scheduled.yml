@@ -15,9 +15,10 @@ jobs:
   lint-all:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
-      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
+          persist-credentials: true
           sparse-checkout: |
             supa-mdx-lint.config.toml
             supa-mdx-lint
@@ -31,10 +32,10 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: 6b08233ff8bca855f6a38246b2a8049332219188
+          key: da6838d8d6898f28ec9ab432353b2707db9df8f5
       - name: install linter
         if: steps.cache-cargo.outputs.cache-hit != 'true'
-        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev 6b08233ff8bca855f6a38246b2a8049332219188
+        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev da6838d8d6898f28ec9ab432353b2707db9df8f5
       - name: run linter
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -122,6 +122,11 @@ async function main() {
 
   // Process each authorization-required status
   for (const status of authRequiredStatuses) {
+    if (status.context === 'Vercel - studio') {
+      console.log(`\nSkipping status: ${status.context}`)
+      continue
+    }
+
     try {
       console.log(`\nProcessing status: ${status.context}`)
       console.log(`Target URL: ${status.target_url}`)

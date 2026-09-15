@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useConsentState } from 'common'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Card, CardContent, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Switch } from 'ui'
+import { Card, CardContent, Form, FormControl, FormField, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -61,10 +61,10 @@ export const AnalyticsSettings = () => {
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <Card>
             <CardContent>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="telemetryEnabled"
                 render={({ field }) => (
@@ -72,22 +72,24 @@ export const AnalyticsSettings = () => {
                     layout="flex-row-reverse"
                     label="Send telemetry data from Supabase services"
                     description="By opting in to sharing telemetry data, Supabase can analyze usage patterns to enhance user experience and use it for marketing and advertising purposes"
+                    id="telemetry"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Switch
                         checked={field.value}
                         onCheckedChange={(value) => {
                           field.onChange(value)
                           handleToggle(value)
                         }}
+                        id="telemetry"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </CardContent>
           </Card>
-        </Form_Shadcn_>
+        </Form>
       </PageSectionContent>
     </PageSection>
   )

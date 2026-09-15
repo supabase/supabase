@@ -3,7 +3,6 @@ import { Card, CardContent } from 'ui'
 import {
   PageSection,
   PageSectionContent,
-  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,

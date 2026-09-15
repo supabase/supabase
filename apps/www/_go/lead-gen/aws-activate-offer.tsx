@@ -1,6 +1,5 @@
+import { HubSpotFormEmbed } from 'marketing'
 import type { GoPageInput } from 'marketing'
-
-import HubSpotFormEmbed from './components/HubSpotFormEmbed'
 
 const page: GoPageInput = {
   template: 'lead-gen',
@@ -110,7 +109,7 @@ const page: GoPageInput = {
       id: 'form',
       title: 'Apply for your credits',
       children: (
-        <div className="mx-auto w-full max-w-2xl border border-muted rounded-2xl p-6 sm:p-8">
+        <div className="mx-auto w-full max-w-2xl border border-muted rounded-2xl overflow-hidden">
           <HubSpotFormEmbed portalId="19953346" formId="db2718f8-1f23-4fe1-aaab-b4924dc4ca54" />
         </div>
       ),

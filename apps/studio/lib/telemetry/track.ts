@@ -3,6 +3,7 @@ import { TelemetryEvent, TelemetryGroups } from 'common/telemetry-constants'
 import { useRouter } from 'next/router'
 import { useCallback } from 'react'
 
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { API_URL } from '@/lib/constants'
@@ -32,6 +33,12 @@ export const useTrack = () => {
   const { data: org } = useSelectedOrganizationQuery()
   const router = useRouter()
 
+  const latest = useLatest({
+    projectRef: project?.ref,
+    orgSlug: org?.slug,
+    pathname: router.pathname,
+  })
+
   const track = useCallback(
     <A extends keyof EventMap>(
       action: A,
@@ -39,11 +46,12 @@ export const useTrack = () => {
         ? [properties: PropertiesForAction<A>, groupOverrides?: Partial<TelemetryGroups>]
         : [properties?: undefined, groupOverrides?: Partial<TelemetryGroups>]
     ) => {
+      const { projectRef, orgSlug, pathname } = latest.current
       const [properties, groupOverrides] = args
 
       const groups = {
-        ...(project?.ref && { project: project.ref }),
-        ...(org?.slug && { organization: org.slug }),
+        ...(projectRef && { project: projectRef }),
+        ...(orgSlug && { organization: orgSlug }),
         ...groupOverrides,
       }
 
@@ -53,9 +61,9 @@ export const useTrack = () => {
         ...(groups && { groups }),
       } as EventMap[A]
 
-      sendTelemetryEvent(API_URL, event, router.pathname)
+      sendTelemetryEvent(API_URL, event, pathname)
     },
-    [project?.ref, org?.slug, router.pathname]
+    []
   )
 
   return track

@@ -5,7 +5,7 @@ import { Blocks, Boxes, ChartArea, ChevronLeft, Receipt, Settings, Users } from 
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
 import { Button, cn, SidebarGroup, SidebarMenu } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getOrgMenuComponent } from './mobileOrgMenuRegistry'
 import type { OrgNavItem } from './OrgMenuContent.utils'
@@ -117,12 +117,12 @@ export function OrgMenuContent({ onCloseSheet }: OrgMenuContentProps) {
       <div className="flex flex-col h-full">
         <div
           className={cn(
-            'flex-shrink-0 flex items-center gap-2 border-b border-default px-3 min-h-[var(--header-height)]'
+            'shrink-0 flex items-center gap-2 border-b border-default px-3 min-h-(--header-height)'
           )}
         >
           <Button
-            type="text"
-            className="!p-1 justify-start"
+            variant="text"
+            className="p-1! justify-start"
             icon={<ChevronLeft size={20} />}
             onClick={handleBackToTop}
             aria-label="Back to menu"

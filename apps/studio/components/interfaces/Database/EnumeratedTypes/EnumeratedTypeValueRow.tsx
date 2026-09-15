@@ -4,12 +4,15 @@ import { GripVertical, Trash } from 'lucide-react'
 import type { Control, FieldPath, FieldValues } from 'react-hook-form'
 import {
   Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
-  Input_Shadcn_,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 interface EnumeratedTypeValueRowProps<
@@ -44,39 +47,47 @@ const EnumeratedTypeValueRow = <TFieldValues extends FieldValues>({
   }
 
   return (
-    <FormField_Shadcn_
+    <FormField
       control={control}
       name={name}
       render={({ field: inputField }) => (
-        <FormItem_Shadcn_ ref={setNodeRef} style={style}>
-          <FormLabel_Shadcn_ className="sr-only">Value {index}</FormLabel_Shadcn_>
-          <FormControl_Shadcn_>
+        <FormItem ref={setNodeRef} style={style}>
+          <FormLabel className="sr-only">Value {index}</FormLabel>
+          <FormControl>
             <div className="flex items-center space-x-2 space-y-2">
               <button
                 ref={setActivatorNodeRef}
                 {...attributes}
                 {...listeners}
                 className={`opacity-50 hover:opacity-100 disabled:hover:opacity-50 transition cursor-grab ${
-                  isDisabled ? 'text-foreground-lighter !cursor-default' : 'text-foreground'
+                  isDisabled ? 'text-foreground-lighter cursor-default!' : 'text-foreground'
                 }`}
                 type="button"
+                tabIndex={isDisabled ? -1 : 0}
                 disabled={isDisabled}
               >
                 <GripVertical size={16} strokeWidth={1.5} />
               </button>
-              <Input_Shadcn_ {...inputField} className="w-full" />
-              <Button
-                type="default"
-                size="small"
-                disabled={isDisabled}
-                icon={<Trash strokeWidth={1.5} size={16} />}
-                className="px-2"
-                onClick={() => onRemoveValue()}
-              />
+              <Input {...inputField} className="w-full" />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="small"
+                    disabled={isDisabled}
+                    icon={<Trash strokeWidth={1.5} size={16} />}
+                    className="px-2"
+                    onClick={() => onRemoveValue()}
+                    aria-label="Remove value"
+                    // Tooltip repeats the label; the description would read the name twice
+                    aria-describedby={undefined}
+                  />
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Remove value</TooltipContent>
+              </Tooltip>
             </div>
-          </FormControl_Shadcn_>
-          <FormMessage_Shadcn_ className="ml-6" />
-        </FormItem_Shadcn_>
+          </FormControl>
+          <FormMessage className="ml-6" />
+        </FormItem>
       )}
     />
   )

@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { cn } from 'ui'
 import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
+  CONNECTION_SOURCE_LOAD_BALANCER,
   type ConnectionStringMethod,
   type DatabaseConnectionType,
 } from '@/components/interfaces/ConnectSheet/Connect.constants'
@@ -11,14 +12,16 @@ import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Conn
 import { ConnectionParameters } from '@/components/interfaces/ConnectSheet/ConnectionParameters'
 import {
   buildConnectionParameters,
+  buildDotnetConnectionString,
   buildSafeConnectionString,
   parseConnectionParams,
   PASSWORD_PLACEHOLDER,
   resolveConnectionString,
+  withRequiredSslmode,
 } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
-
-const DOTNET_CONFIG_COMMAND =
-  'dotnet add package Microsoft.Extensions.Configuration.Json --version YOUR_DOTNET_VERSION'
+import { PasswordEncodingNote } from '@/components/interfaces/ConnectSheet/PasswordEncodingNote'
+import { useConnectionStringDatabases } from '@/components/interfaces/ConnectSheet/useConnectionStringDatabases'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 
 type DirectFilesConfig = {
   files: {
@@ -27,13 +30,23 @@ type DirectFilesConfig = {
     code: string
   }[]
   connectionStringFile?: string
-  postCommands?: { label: string; command: string }[]
+  /** The password ends up inside a connection URL, so special characters must be percent-encoded */
+  passwordInUrl?: boolean
 }
 
-function DirectFilesContent({ state, connectionStringPooler }: StepContentProps) {
+function DirectFilesContent({ state, deploymentMode }: StepContentProps) {
+  const isHighAvailability = useIsHighAvailability()
+
+  const connectionSource = state.connectionSource
+  const isLoadBalancerSelected =
+    isHighAvailability && connectionSource === CONNECTION_SOURCE_LOAD_BALANCER
   const connectionType = (state.connectionType as DatabaseConnectionType) ?? 'uri'
   const connectionMethod = (state.connectionMethod as ConnectionStringMethod) ?? 'direct'
   const useSharedPooler = Boolean(state.useSharedPooler)
+
+  const connectionStrings = useConnectionStringDatabases(deploymentMode)
+  const connectionStringPooler =
+    connectionStrings[connectionSource as keyof typeof connectionStrings]
 
   const resolvedConnectionString = useMemo(
     () =>
@@ -79,6 +92,7 @@ export default sql`,
             envFile,
           ],
           connectionStringFile: envFile.name,
+          passwordInUrl: true,
         }
 
       case 'golang':
@@ -115,6 +129,7 @@ func main() {
             envFile,
           ],
           connectionStringFile: envFile.name,
+          passwordInUrl: true,
         }
 
       case 'dotnet':
@@ -125,18 +140,12 @@ func main() {
               language: 'json',
               code: `{
   "ConnectionStrings": {
-    "DefaultConnection": "Host=${connectionParams.host};Database=${connectionParams.database};Username=${connectionParams.user};Password=${PASSWORD_PLACEHOLDER};SSL Mode=Require;Trust Server Certificate=true"
+    "DefaultConnection": "${buildDotnetConnectionString(connectionParams)}"
   }
 }`,
             },
           ],
           connectionStringFile: 'appsettings.json',
-          postCommands: [
-            {
-              label: 'Add the configuration package to read the settings.',
-              command: DOTNET_CONFIG_COMMAND,
-            },
-          ],
         }
 
       case 'python':
@@ -161,6 +170,7 @@ connection = psycopg2.connect(DATABASE_URL)`,
             envFile,
           ],
           connectionStringFile: envFile.name,
+          passwordInUrl: true,
         }
 
       case 'sqlalchemy':
@@ -185,7 +195,7 @@ PORT = os.getenv("port")
 DBNAME = os.getenv("dbname")
 
 # Construct the SQLAlchemy connection string
-DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}?sslmode=require"
+DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}${withRequiredSslmode(connectionParams.search)}"
 
 # Create the SQLAlchemy engine
 engine = create_engine(DATABASE_URL)
@@ -213,6 +223,7 @@ except Exception as e:
             },
           ],
           connectionStringFile: '.env',
+          passwordInUrl: true,
         }
 
       default:
@@ -239,24 +250,38 @@ except Exception as e:
     return null
   }
 
+  const codeBlock = (
+    <MultipleCodeBlock
+      files={config.files}
+      value={activeFile}
+      onValueChange={setActiveFile}
+      className={isLoadBalancerSelected ? 'rounded-none border-0' : undefined}
+    />
+  )
+
   return (
     <div className="flex flex-col gap-3">
-      <MultipleCodeBlock files={config.files} value={activeFile} onValueChange={setActiveFile} />
-      <ConnectionParameters parameters={buildConnectionParameters(connectionParams)} />
-      {(config.postCommands ?? []).map((command) => (
-        <div key={command.command} className="flex flex-col gap-2">
-          <p className="text-sm text-foreground-light">{command.label}</p>
-          <CodeBlock
-            className="[&_code]:text-foreground"
-            wrapperClassName="lg:col-span-2"
-            value={command.command}
-            hideLineNumbers
-            language="bash"
-          >
-            {command.command}
-          </CodeBlock>
+      {isLoadBalancerSelected ? (
+        <div className="overflow-hidden rounded-lg border">
+          <div className="flex items-center border-b bg-surface-100 py-2 pl-4 pr-2">
+            <span className="text-xs text-foreground-light">Read-only</span>
+          </div>
+          {codeBlock}
         </div>
-      ))}
+      ) : (
+        codeBlock
+      )}
+      {config.passwordInUrl && <PasswordEncodingNote />}
+      {/* Persistent live region so screen readers announce the read-only state
+          when the load balancer is selected */}
+      <p
+        role="status"
+        className={cn('text-sm text-foreground-lighter', !isLoadBalancerSelected && 'sr-only')}
+      >
+        {isLoadBalancerSelected &&
+          'Replica connections are read-only. Connect to the primary database for writes.'}
+      </p>
+      <ConnectionParameters parameters={buildConnectionParameters(connectionParams)} />
     </div>
   )
 }

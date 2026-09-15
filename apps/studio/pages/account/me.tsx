@@ -25,6 +25,7 @@ import { DashboardSettings } from '@/components/interfaces/Account/Preferences/D
 import { HotkeySettings } from '@/components/interfaces/Account/Preferences/HotkeySettings'
 import { ProfileInformation } from '@/components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from '@/components/interfaces/Account/Preferences/ThemeSettings'
+import { TimezoneSettings } from '@/components/interfaces/Account/Preferences/TimezoneSettings'
 import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
 import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -95,6 +96,8 @@ const PlatformPreferences = () => {
 
             <ThemeSettings />
 
+            <TimezoneSettings />
+
             <HotkeySettings />
 
             <DashboardSettings />
@@ -147,7 +150,7 @@ const ProfileLoadingSections = ({
     <PageSection>
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>Account identities</PageSectionTitle>
+          <PageSectionTitle>Sign-in methods</PageSectionTitle>
           <PageSectionDescription>
             Manage the providers linked to your Supabase account and update their details.
           </PageSectionDescription>
@@ -175,7 +178,7 @@ const ProfileFieldLoadingRow = ({
     <div className="flex flex-col justify-center items-start md:items-end shrink-0 md:w-1/2 xl:w-2/5 md:min-w-100">
       <ShimmeringLoader className="h-8 w-full rounded-md py-0" />
     </div>
-    <div className="flex flex-col min-w-0 flex-grow">
+    <div className="flex flex-col min-w-0 grow">
       <ShimmeringLoader className={`${labelWidth} h-4 py-0`} />
       {descriptionWidth !== undefined && (
         <ShimmeringLoader className={`${descriptionWidth} mt-2 h-3 py-0`} />
@@ -190,6 +193,8 @@ const SelfHostedPreferences = () => {
       <PreferencesPageHeader description="Manage how the dashboard looks and behaves on this browser and device." />
       <PageContainer size="small">
         <ThemeSettings />
+
+        <TimezoneSettings />
 
         <HotkeySettings />
 

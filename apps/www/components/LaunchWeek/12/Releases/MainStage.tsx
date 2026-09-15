@@ -13,7 +13,7 @@ const MainStage = ({ className }: { className?: string }) => {
 
   return (
     <SectionContainer
-      className={cn('relative !max-w-none !py-0 lg:!container', className)}
+      className={cn('relative max-w-none! py-0! lg:container!', className)}
       id="main-stage"
     >
       <div>

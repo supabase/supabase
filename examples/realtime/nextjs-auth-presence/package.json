@@ -10,7 +10,6 @@
     "format": "prettier --cache --write \"pages/**/*.{js,jsx,ts,tsx,css,md,json}\""
   },
   "dependencies": {
-    "@supabase/auth-ui-react": "^0.4.7",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "^2",
     "next": "^13.1.6",

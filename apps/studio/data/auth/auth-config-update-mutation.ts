@@ -43,16 +43,24 @@ export const useAuthConfigUpdateMutation = ({
     mutationFn: (vars) => updateAuthConfig(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, skipInvalidation = false } = variables
-      await Promise.all([
-        !skipInvalidation &&
-          queryClient.invalidateQueries({ queryKey: authKeys.authConfig(projectRef) }),
-        queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
-      ])
-      await queryClient.refetchQueries({
-        queryKey: lintKeys.lint(projectRef),
-        type: 'active',
-      })
+
+      if (!skipInvalidation) {
+        await queryClient.invalidateQueries({
+          queryKey: authKeys.authConfig(projectRef),
+        })
+      }
+
       await onSuccess?.(data, variables, context)
+
+      queryClient
+        .invalidateQueries({ queryKey: lintKeys.lint(projectRef) })
+        .then(() =>
+          queryClient.refetchQueries({
+            queryKey: lintKeys.lint(projectRef),
+            type: 'active',
+          })
+        )
+        .catch(() => undefined)
     },
     async onError(data, variables, context) {
       if (onError === undefined) {

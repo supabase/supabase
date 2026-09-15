@@ -1,4 +1,8 @@
+import { untrustedSql } from '@supabase/pg-meta'
 import { z, type SafeParseReturnType } from 'zod'
+
+import { notebookOperationsSchema } from '@/data/content/notebooks/notebook-operations'
+import { agentNotebookSchema, notebookSchema } from '@/data/content/notebooks/notebook-schema'
 
 // Splits markdown into alternating [plain, code, plain, code, ...] segments.
 // Odd-indexed segments are already inside code spans/fences and should be left alone.
@@ -81,7 +85,7 @@ const executeSqlChartResultSchema = z
     const chartArgs = chartConfig ?? config
 
     return {
-      sql: sql ?? '',
+      sql: untrustedSql(sql ?? ''),
       label,
       isWriteQuery,
       view: chartArgs?.view,
@@ -124,6 +128,33 @@ export const deployEdgeFunctionInputSchema = z
 export const deployEdgeFunctionOutputSchema = z
   .object({ success: z.boolean().optional() })
   .passthrough()
+
+export const createNotebookInputSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  content: agentNotebookSchema,
+})
+
+export const updateNotebookInputSchema = z.object({
+  id: z.string(),
+  expected_updated_at: z.string(),
+  operations: notebookOperationsSchema,
+})
+
+export const deleteNotebookInputSchema = z.object({
+  id: z.string(),
+})
+
+export const runNotebookInputSchema = z.object({
+  id: z.string(),
+  expected_updated_at: z.string(),
+})
+
+export const notebookToolOutputSchema = z.object({ id: z.string(), name: z.string() })
+
+export const updateNotebookToolOutputSchema = notebookToolOutputSchema.extend({
+  previous_content: notebookSchema.optional(),
+})
 
 export const rateMessageResponseSchema = z.object({
   category: z.enum([

@@ -30,6 +30,7 @@
       "reference_python_v2",
       "reference_csharp_v0",
       "reference_csharp_v1",
+      "reference_csharp_v8",
       "reference_swift_v1",
       "reference_swift_v2",
       "reference_kotlin_v1",
@@ -48,6 +49,7 @@
       "reference_python_v2",
       "reference_csharp_v0",
       "reference_csharp_v1",
+      "reference_csharp_v8",
       "reference_swift_v1",
       "reference_swift_v2",
       "reference_kotlin_v1",
@@ -185,6 +187,14 @@
             "id": "in",
             "title": "Column is in an array",
             "slug": "in",
+            "product": "database",
+            "parent": "filters",
+            "type": "function"
+          },
+          {
+            "id": "notin",
+            "title": "Column is not in an array",
+            "slug": "notin",
             "product": "database",
             "parent": "filters",
             "type": "function"
@@ -399,6 +409,14 @@
             "product": "database",
             "parent": "modifiers",
             "type": "function"
+          },
+          {
+            "id": "dry-run",
+            "title": "Test a mutation without committing it",
+            "slug": "dryrun",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function"
           }
         ]
       }
@@ -502,6 +520,20 @@
         "id": "sign-in-with-web3",
         "title": "Sign in a user through Web3 (Solana, Ethereum)",
         "slug": "auth-signinwithweb3",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "sign-in-with-passkey",
+        "title": "Sign in with a passkey",
+        "slug": "auth-signinwithpasskey",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "register-passkey",
+        "title": "Register a passkey",
+        "slug": "auth-registerpasskey",
         "product": "auth",
         "type": "function"
       },
@@ -731,6 +763,65 @@
         ]
       },
       {
+        "id": "passkey-api",
+        "isFunc": false,
+        "title": "Auth Passkey",
+        "slug": "auth-passkey-api",
+        "product": "auth",
+        "type": "function",
+        "items": [
+          {
+            "id": "passkey-list",
+            "title": "List passkeys",
+            "slug": "auth-passkey-list",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-update",
+            "title": "Update a passkey",
+            "slug": "auth-passkey-update",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-delete",
+            "title": "Delete a passkey",
+            "slug": "auth-passkey-delete",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-start-registration",
+            "title": "Start passkey registration",
+            "slug": "auth-passkey-startregistration",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-verify-registration",
+            "title": "Verify passkey registration",
+            "slug": "auth-passkey-verifyregistration",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-start-authentication",
+            "title": "Start passkey authentication",
+            "slug": "auth-passkey-startauthentication",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-verify-authentication",
+            "title": "Verify passkey authentication",
+            "slug": "auth-passkey-verifyauthentication",
+            "product": "auth",
+            "type": "function"
+          }
+        ]
+      },
+      {
         "id": "oauth-server-api",
         "isFunc": false,
         "title": "OAuth Server",
@@ -851,7 +942,30 @@
             "product": "auth-admin",
             "type": "function"
           },
-
+          {
+            "id": "admin-passkey-api",
+            "isFunc": false,
+            "title": "Passkey Admin",
+            "slug": "auth-admin-passkey-api",
+            "product": "auth-admin",
+            "type": "function",
+            "items": [
+              {
+                "id": "admin-list-passkeys",
+                "title": "List passkeys for a user",
+                "slug": "auth-admin-passkey-listpasskeys",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-delete-passkey",
+                "title": "Delete a passkey",
+                "slug": "auth-admin-passkey-deletepasskey",
+                "product": "auth-admin",
+                "type": "function"
+              }
+            ]
+          },
           {
             "id": "oauth-admin-api",
             "isFunc": false,

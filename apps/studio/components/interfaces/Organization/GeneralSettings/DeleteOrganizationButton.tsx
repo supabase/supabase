@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -11,7 +10,7 @@ import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useOrganizationDeleteMutation } from '@/data/organizations/organization-delete-mutation'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 const MAX_PROJECT_ACKNOWLEDGEMENTS = 10
@@ -90,10 +89,7 @@ export const DeleteOrganizationButton = () => {
 
   const allChecked = isDeletionConfirmed()
 
-  const [_, setLastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { setLastVisitedOrganization } = useLastVisitedOrganization()
 
   const { can: canDeleteOrganization } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -141,7 +137,7 @@ export const DeleteOrganizationButton = () => {
     <>
       <div className="mt-2">
         <ButtonTooltip
-          type="danger"
+          variant="danger"
           disabled={!canDeleteOrganization || !orgSlug}
           loading={!orgSlug}
           onClick={() => {

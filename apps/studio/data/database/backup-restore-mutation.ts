@@ -11,13 +11,13 @@ export type BackupRestoreVariables = {
 }
 
 // [Joshen] Shift to backups RQ query once created
-export type Backup = components['schemas']['BackupsResponse']['backups'][number]
+export type Backup = components['schemas']['BackupsResponse_Output']['backups'][number]
 
 export async function restoreFromBackup({ ref, backup }: BackupRestoreVariables) {
   if (backup.isPhysicalBackup) {
     const { data, error } = await post('/platform/database/{ref}/backups/restore-physical', {
       params: { path: { ref } },
-      body: { id: backup.id, recovery_time_target: backup.inserted_at },
+      body: { id: backup.id },
     })
     if (error) throw error
     return data

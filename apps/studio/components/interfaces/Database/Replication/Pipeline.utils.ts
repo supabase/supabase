@@ -2,18 +2,6 @@ import { PipelineStatusName } from './Replication.constants'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
 
-export const PIPELINE_ERROR_MESSAGES = {
-  RETRIEVE_PIPELINE: 'Failed to retrieve pipeline information',
-  RETRIEVE_PIPELINE_STATUS: 'Failed to retrieve pipeline status',
-  RETRIEVE_REPLICATION_STATUS: 'Failed to retrieve table replication status',
-  RETRIEVE_DESTINATIONS: 'Failed to retrieve destinations',
-  ENABLE_DESTINATION: 'Failed to enable destination',
-  DISABLE_DESTINATION: 'Failed to disable destination',
-  DELETE_DESTINATION: 'Failed to delete destination',
-  NO_PIPELINE_FOUND: 'No pipeline found',
-  COPY_TABLE_STATUS: 'Failed to copy table status',
-} as const
-
 export const getStatusName = (
   status: ReplicationPipelineStatusData['status'] | undefined
 ): PipelineStatusName | undefined => {
@@ -71,7 +59,7 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     key: 'stopping',
     label: 'Stopping',
     title: 'Stopping pipeline',
-    message: 'Stopping replication. Data transfer will be paused once stopped.',
+    message: 'Stopping replication. Data transfer will stop after in-flight work finishes.',
     badge: 'Stopping',
     type: 'loading',
   },
@@ -79,7 +67,7 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     key: 'restarting',
     label: 'Restarting',
     title: 'Restarting pipeline',
-    message: 'Applying settings and restarting the pipeline.',
+    message: 'Applying settings and restarting the pipeline',
     badge: 'Restarting',
     type: 'loading',
   },
@@ -87,7 +75,7 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     key: 'failed',
     label: 'Failed',
     title: 'Pipeline failed',
-    message: 'Replication has encountered an error.',
+    message: 'Replication has encountered an error',
     badge: 'Failed',
     type: 'failure',
   },
@@ -95,7 +83,7 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     key: 'stopped',
     label: 'Stopped',
     title: 'Pipeline stopped',
-    message: 'Replication is paused. Start the pipeline to resume data synchronization.',
+    message: 'Replication is stopped. Start the pipeline to resume data synchronization.',
     badge: 'Stopped',
     type: 'idle',
   },
@@ -103,7 +91,7 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     key: 'running',
     label: 'Running',
     title: 'Pipeline running',
-    message: 'Replication is active and processing changes.',
+    message: 'Replication is active and processing changes',
     badge: 'Running',
     type: 'success',
   },
@@ -111,7 +99,7 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     key: 'unknown',
     label: 'Unknown',
     title: 'Pipeline status unknown',
-    message: 'Unable to determine pipeline status.',
+    message: 'Unable to determine pipeline status',
     badge: 'Unknown',
     type: 'idle',
   },

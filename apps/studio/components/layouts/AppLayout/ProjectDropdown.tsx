@@ -2,21 +2,27 @@ import { useParams } from 'common'
 import { Box, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 import type { ComponentProps } from 'react'
-import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { useState } from 'react'
+import { Button, CommandGroup } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AppLayoutDropdownTriggerButton } from './AppLayoutDropdown'
 import { sanitizeRoute } from './ProjectDropdown.utils'
 import { ProjectRowLink } from './ProjectRowLink'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
+import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
+import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import type { ManagedBy } from '@/lib/constants/infrastructure'
+import { useTrack } from '@/lib/telemetry/track'
 
 // --- Sub-components ---
 
@@ -24,20 +30,18 @@ interface ProjectDropdownNewProjectActionsProps {
   organizationSlug: string | undefined
   embedded: boolean
   onClose: () => void
-  onNavigate: (href: string) => void
 }
 
 function ProjectDropdownNewProjectActions({
   organizationSlug,
   embedded,
   onClose,
-  onNavigate,
 }: ProjectDropdownNewProjectActionsProps) {
   const href = `/new/${organizationSlug}`
 
   if (embedded) {
     return (
-      <Button type="default" block size="small" asChild icon={<Plus size={14} strokeWidth={1.5} />}>
+      <Button block size="small" asChild icon={<Plus size={14} strokeWidth={1.5} />}>
         <Link
           href={href}
           onClick={onClose}
@@ -50,35 +54,23 @@ function ProjectDropdownNewProjectActions({
   }
 
   return (
-    <CommandGroup_Shadcn_>
-      <CommandItem_Shadcn_
-        className="cursor-pointer w-full"
-        onSelect={() => {
-          onClose()
-          onNavigate(href)
-        }}
-        onClick={onClose}
-      >
-        <Link href={href} onClick={onClose} className="w-full flex items-center gap-2">
-          <Plus size={14} strokeWidth={1.5} />
-          <p>New project</p>
-        </Link>
-      </CommandItem_Shadcn_>
-    </CommandGroup_Shadcn_>
+    <CommandGroup>
+      <CommandItemLink href={href} className="cursor-pointer w-full gap-2" onSelect={onClose}>
+        <Plus size={14} strokeWidth={1.5} />
+        <p>New project</p>
+      </CommandItemLink>
+    </CommandGroup>
   )
 }
 
-function ProjectDropdownNonPlatformView({ projectName }: { projectName: string }) {
-  return (
-    <Button type="text">
-      <span className="text-sm">{projectName}</span>
-    </Button>
-  )
+const ProjectDropdownNonPlatformView = ({ projectName }: { projectName: string }) => {
+  return <div className="text-sm px-3 py-1">{projectName}</div>
 }
 
 interface ProjectDropdownPlatformViewProps {
   projectRef: string | undefined
   projectName: string
+  projectManagedBy?: ManagedBy
   selectorProps: Omit<
     ComponentProps<typeof OrganizationProjectSelector>,
     'renderTrigger' | 'embedded'
@@ -88,23 +80,27 @@ interface ProjectDropdownPlatformViewProps {
 function ProjectDropdownPlatformView({
   projectRef,
   projectName,
+  projectManagedBy,
   selectorProps,
 }: ProjectDropdownPlatformViewProps) {
   return (
-    <div className="flex items-center flex-shrink-0">
-      <Link
-        href={`/project/${projectRef}`}
-        className="flex items-center gap-2 flex-shrink-0 text-sm"
-      >
+    <div className="flex items-center shrink-0">
+      <Link href={`/project/${projectRef}`} className="flex items-center gap-2 shrink-0 text-sm">
         <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />
         <span title={projectName} className="text-foreground max-w-32 lg:max-w-64 truncate">
           {projectName}
         </span>
+        {projectManagedBy && <PartnerIcon organization={{ managed_by: projectManagedBy }} />}
       </Link>
 
       <OrganizationProjectSelector
         {...selectorProps}
-        renderTrigger={() => <AppLayoutDropdownTriggerButton className="flex-shrink-0" />}
+        renderTrigger={() => (
+          <AppLayoutDropdownTriggerButton
+            className="shrink-0"
+            aria-label="Show organization projects"
+          />
+        )}
       />
     </div>
   )
@@ -136,33 +132,37 @@ export const ProjectDropdown = ({
   const selectedProject = parentProject ?? project
 
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
+  const track = useTrack()
 
   const [open, setOpen] = useState(false)
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
+  const selectedProjectManagedBy = selectedProject?.integration_source
+    ? getManagedByFromOrganizationPartner(undefined, selectedProject.integration_source)
+    : selectedOrganization?.billing_partner
+      ? selectedOrganization.managed_by
+      : undefined
 
   if (isLoadingProject || (isBranch && isLoadingParentProject) || !selectedProject) {
     if (!embedded) return <ShimmeringLoader className="p-2 md:mr-2 md:w-[90px]" />
   }
 
-  const handleSetOpen = embedded ? (_value: boolean) => onClose?.() : setOpen
+  const handleSetOpen = embedded
+    ? (_value: boolean) => onClose?.()
+    : (next: boolean) => {
+        if (next) track('header_project_dropdown_opened')
+        setOpen(next)
+      }
 
   const selectorProps = {
     open,
     setOpen: handleSetOpen,
     selectedRef: ref,
-    onSelect: (project: { ref: string }) => {
+    getItemHref: (project: { ref: string }) => {
       const sanitizedRoute = sanitizeRoute(router.route, router.query)
-      const href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
-      close()
-      router.push(href)
+      return sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
     },
-    renderRow: (project: { ref: string; name: string; status?: string }) => (
-      <ProjectRowLink
-        project={project}
-        selectedRef={ref}
-        route={router.route}
-        routerQueries={router.query}
-      />
+    renderRow: (project: Pick<OrgProject, 'ref' | 'name' | 'status' | 'integration_source'>) => (
+      <ProjectRowLink project={project} selectedRef={ref} />
     ),
     renderActions: (_setOpen: (value: boolean) => void, options?: { embedded?: boolean }) =>
       projectCreationEnabled ? (
@@ -170,7 +170,6 @@ export const ProjectDropdown = ({
           organizationSlug={selectedOrganization?.slug}
           embedded={options?.embedded ?? false}
           onClose={close}
-          onNavigate={(href) => router.push(href)}
         />
       ) : null,
   }
@@ -184,6 +183,7 @@ export const ProjectDropdown = ({
     <ProjectDropdownPlatformView
       projectRef={project?.ref}
       projectName={selectedProject?.name ?? ''}
+      projectManagedBy={selectedProjectManagedBy}
       selectorProps={selectorProps}
     />
   ) : (

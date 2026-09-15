@@ -3,6 +3,10 @@ export type CustomContentTypes = {
   metadataApplicationName: string
   metadataTitle: string
   cliProfile: string
+  mcpServers: {
+    local: string
+    remote: string
+  }
   navigationLogo: {
     light: string
     dark: string

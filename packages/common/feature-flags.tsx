@@ -4,7 +4,7 @@ import { components } from 'api-types'
 import { FlagValues } from 'flags/react'
 import { createContext, PropsWithChildren, useContext, useEffect, useRef, useState } from 'react'
 
-import { useAuth } from './auth'
+import { useAuth, useUser } from './auth'
 import { getFlags as getDefaultConfigCatFlags } from './configcat'
 import { hasConsented } from './consent-state'
 import { get, post } from './fetchWrappers'
@@ -12,7 +12,8 @@ import { ensurePlatformSuffix } from './helpers'
 import { useParams } from './hooks'
 
 type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBody']
-export type CallFeatureFlagsResponse = components['schemas']['TelemetryCallFeatureFlagsResponse']
+export type CallFeatureFlagsResponse =
+  components['schemas']['TelemetryCallFeatureFlagsResponse_Output']
 
 export async function getFeatureFlags(
   API_URL: string,
@@ -90,8 +91,9 @@ export const FeatureFlagProvider = ({
     userEmail?: string
   ) => Promise<{ settingKey: string; settingValue: boolean | number | string | null | undefined }[]>
 }>) => {
-  const { session, isLoading } = useAuth()
-  const userEmail = session?.user?.email
+  const { isLoading } = useAuth()
+  const user = useUser()
+  const userEmail = user?.user_metadata?.email ?? user?.email
   const params = useParams()
   const resolvedOrganizationSlug = organizationSlug ?? params.slug
   const resolvedProjectRef = projectRef ?? params.ref
@@ -110,7 +112,7 @@ export const FeatureFlagProvider = ({
     async function ensureGroupContext() {
       if (!API_URL) return
 
-      const userId = session?.user?.id
+      const userId = user?.id
       if (!userId) return
       if (!hasConsented()) return
 
@@ -245,7 +247,7 @@ export const FeatureFlagProvider = ({
     isLoading,
     userEmail,
     API_URL,
-    session?.user?.id,
+    user?.id,
     resolvedOrganizationSlug,
     resolvedProjectRef,
     getConfigCatFlags,

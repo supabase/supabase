@@ -14,6 +14,7 @@ export type ApiAuthorizationResponse = {
   website: string
   icon: string | null
   domain: string
+  redirect_uri?: string
   scopes: OAuthScope[]
   expires_at: string
   approved_at: string | null

@@ -1,5 +1,15 @@
 import { useParams } from 'common'
-import { ArrowUpCircle, Edit, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
+import {
+  ArrowUpCircle,
+  CircleStop,
+  Edit,
+  Eye,
+  MoreVertical,
+  Play,
+  RotateCcw,
+  Trash,
+} from 'lucide-react'
+import Link from 'next/link'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { toast } from 'sonner'
 import {
@@ -9,6 +19,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  WarningIcon,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -16,13 +30,11 @@ import {
   getStatusName,
   PIPELINE_DISABLE_ALLOWED_FROM,
   PIPELINE_ENABLE_ALLOWED_FROM,
-  PIPELINE_ERROR_MESSAGES,
 } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
-import AlertError from '@/components/ui/AlertError'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { Pipeline } from '@/data/replication/pipelines-query'
-import { useRestartPipelineHelper } from '@/data/replication/restart-pipeline-helper'
+import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-mutation'
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
 import {
@@ -64,7 +76,7 @@ export const RowMenu = ({
 
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
-  const { restartPipeline } = useRestartPipelineHelper()
+  const { mutateAsync: restartPipeline } = useRestartPipelineMutation()
   const { getRequestStatus, setRequestStatus: setGlobalRequestStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
@@ -88,46 +100,46 @@ export const RowMenu = ({
 
   const onEnablePipeline = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!pipeline) return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+    if (!pipeline) return toast.error('No pipeline found')
 
     try {
       // Only show 'enabling' when transitioning from allowed states
-      if (PIPELINE_ENABLE_ALLOWED_FROM.includes(statusName as any)) {
+      if (PIPELINE_ENABLE_ALLOWED_FROM.includes(statusName as PipelineStatusName)) {
         setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, statusName)
       }
       await startPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-      toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
+      toast.error(`Failed to start pipeline: ${(error as ResponseError).message}`)
     }
   }
 
   const onDisablePipeline = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!pipeline) return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+    if (!pipeline) return toast.error('No pipeline found')
 
     try {
       // Only show 'disabling' when transitioning from allowed states
-      if (PIPELINE_DISABLE_ALLOWED_FROM.includes(statusName as any)) {
+      if (PIPELINE_DISABLE_ALLOWED_FROM.includes(statusName as PipelineStatusName)) {
         setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, statusName)
       }
       await stopPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-      toast.error(PIPELINE_ERROR_MESSAGES.DISABLE_DESTINATION)
+      toast.error(`Failed to stop pipeline: ${(error as ResponseError).message}`)
     }
   }
 
   const onRestartPipeline = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!pipeline) return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+    if (!pipeline) return toast.error('No pipeline found')
 
     try {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
       await restartPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-      toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
+      toast.error(`Failed to restart pipeline: ${(error as ResponseError).message}`)
     }
   }
 
@@ -136,20 +148,44 @@ export const RowMenu = ({
       {isLoading && <ShimmeringLoader />}
 
       {isError && (
-        <AlertError error={error} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE_STATUS} />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="flex items-center" tabIndex={0}>
+              <WarningIcon />
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-xs">
+            Couldn't load status{error?.message ? `: ${error.message}` : '.'}
+          </TooltipContent>
+        </Tooltip>
       )}
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="relative">
-            <Button type="default" className="px-1.5" icon={<MoreVertical />} />
+            <Button
+              variant="default"
+              className="px-1.25 hit-area-2"
+              aria-label={hasUpdate ? 'Pipeline options, update available' : 'Pipeline options'}
+              icon={<MoreVertical />}
+            />
             {hasUpdate && (
-              <span className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-brand rounded-full" />
+              <span
+                className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-brand rounded-full"
+                aria-hidden
+              />
             )}
           </div>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent side="bottom" align="end" className="w-52">
+          <DropdownMenuItem className="space-x-2" asChild disabled={!pipeline}>
+            <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
+              <Eye size={14} />
+              <p>View details</p>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           {hasUpdate && (
             <>
               <DropdownMenuItem className="space-x-2" onClick={() => onUpdateClick?.()}>
@@ -175,7 +211,7 @@ export const RowMenu = ({
                 <p>Restart pipeline</p>
               </DropdownMenuItem>
               <DropdownMenuItem className="space-x-2" onClick={onDisablePipeline}>
-                <Pause size={14} />
+                <CircleStop size={14} />
                 <p>Stop pipeline</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -184,11 +220,11 @@ export const RowMenu = ({
 
           <DropdownMenuItem className="space-x-2" onClick={() => setEdit(destinationId)}>
             <Edit size={14} />
-            <p>Edit destination</p>
+            <p>Edit pipeline</p>
           </DropdownMenuItem>
           <DropdownMenuItem className="space-x-2" onClick={onDeleteClick}>
             <Trash size={14} />
-            <p>Delete destination</p>
+            <p>Delete pipeline</p>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -57,7 +57,9 @@ export default function NavigationMenuDemo() {
       <NavigationMenu className="w-fit">
         <NavigationMenuList>
           <NavigationMenuItem>
-            <NavigationMenuTrigger className={cn(buttonVariants({ type: 'text', size: 'small' }))}>
+            <NavigationMenuTrigger
+              className={cn(buttonVariants({ variant: 'text', size: 'small' }))}
+            >
               Getting started
             </NavigationMenuTrigger>
             <NavigationMenuContent>
@@ -65,7 +67,7 @@ export default function NavigationMenuDemo() {
                 <li className="row-span-3">
                   <NavigationMenuLink asChild>
                     <a
-                      className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b border from-background-surface-100/20 to-background-surface-100 p-6 no-underline outline-none focus:shadow-md"
+                      className="flex h-full w-full select-none flex-col justify-end rounded-md bg-linear-to-b border from-background-surface-100/20 to-background-surface-100 p-6 no-underline outline-hidden focus:shadow-md"
                       href="/"
                     >
                       {/* <Icons.logo className="h-6 w-6" /> */}
@@ -90,7 +92,9 @@ export default function NavigationMenuDemo() {
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <NavigationMenuTrigger className={cn(buttonVariants({ type: 'text', size: 'small' }))}>
+            <NavigationMenuTrigger
+              className={cn(buttonVariants({ variant: 'text', size: 'small' }))}
+            >
               Components
             </NavigationMenuTrigger>
             <NavigationMenuContent>
@@ -106,7 +110,7 @@ export default function NavigationMenuDemo() {
           <NavigationMenuItem>
             <NavigationMenuLink
               href="/docs"
-              className={buttonVariants({ type: 'text', size: 'small' })}
+              className={buttonVariants({ variant: 'text', size: 'small' })}
             >
               Documentation
             </NavigationMenuLink>
@@ -125,7 +129,7 @@ const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWit
           <a
             ref={ref}
             className={cn(
-              'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-surface-100/50 hover:text-foreground focus:bg-surface-100/50 focus:text-foreground',
+              'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-hidden transition-colors hover:bg-surface-100/50 hover:text-foreground focus:bg-surface-100/50 focus:text-foreground',
               className
             )}
             {...props}

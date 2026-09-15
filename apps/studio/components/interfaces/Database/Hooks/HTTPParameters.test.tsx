@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useForm } from 'react-hook-form'
-import { Form_Shadcn_ } from 'ui'
+import { Form } from 'ui'
 import { describe, expect, it } from 'vitest'
 
 import { type WebhookFormValues } from './EditHookPanel.constants'
@@ -23,9 +23,9 @@ const HTTPParametersHarness = () => {
   })
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <HTTPParameters form={form} />
-    </Form_Shadcn_>
+    </Form>
   )
 }
 
@@ -35,7 +35,7 @@ describe('HTTPParameters', () => {
 
     render(<HTTPParametersHarness />)
 
-    await user.click(screen.getByRole('button', { name: 'Add a new parameter' }))
+    await user.click(screen.getByRole('button', { name: 'Add parameter' }))
 
     expect(screen.getAllByPlaceholderText('Parameter name')).toHaveLength(2)
     expect(screen.getAllByPlaceholderText('Parameter value')).toHaveLength(2)

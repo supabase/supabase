@@ -18,7 +18,7 @@ export type AuthorizedApp = {
   authorized_at: string
 }
 
-export async function getAuthorizedApps({ slug }: AuthorizedAppsVariables, signal?: AbortSignal) {
+export async function getAuthorizedApps({ slug }: AuthorizedAppsVariables) {
   if (!slug) throw new Error('Organization slug is required')
 
   const { data, error } = await get('/platform/organizations/{slug}/oauth/apps', {
@@ -41,7 +41,7 @@ export const useAuthorizedAppsQuery = <TData = AuthorizedAppsData>(
 ) =>
   useQuery<AuthorizedAppsData, AuthorizedAppsError, TData>({
     queryKey: oauthAppKeys.authorizedApps(slug),
-    queryFn: ({ signal }) => getAuthorizedApps({ slug }, signal),
+    queryFn: () => getAuthorizedApps({ slug }),
     enabled: enabled && typeof slug !== 'undefined',
     ...options,
   })

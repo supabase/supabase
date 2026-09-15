@@ -3,16 +3,16 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
@@ -35,9 +35,9 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -70,7 +70,9 @@ export const RateLimits = () => {
     },
   })
 
-  const canUpdateEmailLimit = authConfig?.EXTERNAL_EMAIL_ENABLED && isSmtpEnabled(authConfig)
+  const canUpdateEmailLimit =
+    authConfig?.EXTERNAL_EMAIL_ENABLED &&
+    (isSmtpEnabled(authConfig) || authConfig?.HOOK_SEND_EMAIL_ENABLED)
   const canUpdateSMSRateLimit = authConfig?.EXTERNAL_PHONE_ENABLED
   const canUpdateAnonymousUsersRateLimit = authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED
   const canUpdateWeb3RateLimit = authConfig?.EXTERNAL_WEB3_SOLANA_ENABLED
@@ -105,31 +107,31 @@ export const RateLimits = () => {
     RATE_LIMIT_TOKEN_REFRESH: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an 5 minutes'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 in 5 minutes'),
     RATE_LIMIT_VERIFY: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an 5 minutes'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 in 5 minutes'),
     RATE_LIMIT_EMAIL_SENT: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
     RATE_LIMIT_SMS_SENT: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
     RATE_LIMIT_ANONYMOUS_USERS: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
     RATE_LIMIT_OTP: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
     RATE_LIMIT_WEB3: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
   })
 
   const rateLimitForm = useForm<z.infer<typeof RateLimitFormSchema>>({
@@ -144,6 +146,13 @@ export const RateLimits = () => {
       RATE_LIMIT_WEB3: 0,
     },
   })
+
+  const rateLimitTokenRefresh = useWatch({
+    control: rateLimitForm.control,
+    name: 'RATE_LIMIT_TOKEN_REFRESH',
+  })
+  const rateLimitVerify = useWatch({ control: rateLimitForm.control, name: 'RATE_LIMIT_VERIFY' })
+  const rateLimitOtp = useWatch({ control: rateLimitForm.control, name: 'RATE_LIMIT_OTP' })
 
   const onSubmitRateLimitForm = (data: z.infer<typeof RateLimitFormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -221,11 +230,11 @@ export const RateLimits = () => {
     <>
       <PageSection>
         <PageSectionContent>
-          <Form_Shadcn_ {...rateLimitForm}>
+          <Form {...rateLimitForm}>
             <form onSubmit={rateLimitForm.handleSubmit(onSubmitRateLimitForm)}>
               <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={rateLimitForm.control}
                     name="RATE_LIMIT_EMAIL_SENT"
                     render={({ field }) => (
@@ -236,7 +245,7 @@ export const RateLimits = () => {
                       >
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <InputGroup>
                                 <FormInputGroupInput
                                   type="number"
@@ -248,7 +257,7 @@ export const RateLimits = () => {
                                   <InputGroupText>emails/h</InputGroupText>
                                 </InputGroupAddon>
                               </InputGroup>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </TooltipTrigger>
                           {!canUpdateConfig || !canUpdateEmailLimit ? (
                             <TooltipContent side="left" className="w-80 p-4">
@@ -261,7 +270,7 @@ export const RateLimits = () => {
                                     Enable email-based logins to update this rate limit
                                   </p>
                                   <div className="mt-3">
-                                    <Button asChild type="default" size="tiny">
+                                    <Button asChild size="tiny">
                                       <Link href={`/project/${projectRef}/auth/providers`}>
                                         View auth providers
                                       </Link>
@@ -271,17 +280,23 @@ export const RateLimits = () => {
                               ) : (
                                 <>
                                   <p className="font-medium">
-                                    Custom SMTP provider is required to update this configuration
+                                    Custom SMTP or Send Email hook is required to update this
+                                    configuration
                                   </p>
                                   <p className="mt-1">
-                                    The built-in email service has a fixed rate limit. You will need
-                                    to set up your own custom SMTP provider to update your email
-                                    rate limit
+                                    The built-in email service has a fixed rate limit. Set up a
+                                    custom SMTP provider or enable the Send Email hook to update
+                                    your email rate limit
                                   </p>
-                                  <div className="mt-3">
-                                    <Button asChild type="default" size="tiny">
+                                  <div className="mt-3 flex gap-2">
+                                    <Button asChild size="tiny">
                                       <Link href={`/project/${projectRef}/auth/smtp`}>
                                         View SMTP settings
+                                      </Link>
+                                    </Button>
+                                    <Button asChild size="tiny">
+                                      <Link href={`/project/${projectRef}/auth/hooks`}>
+                                        View hooks
                                       </Link>
                                     </Button>
                                   </div>
@@ -296,7 +311,7 @@ export const RateLimits = () => {
                 </CardContent>
 
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={rateLimitForm.control}
                     name="RATE_LIMIT_SMS_SENT"
                     render={({ field }) => (
@@ -307,7 +322,7 @@ export const RateLimits = () => {
                       >
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <InputGroup>
                                 <FormInputGroupInput
                                   type="number"
@@ -319,7 +334,7 @@ export const RateLimits = () => {
                                   <InputGroupText>sms/h</InputGroupText>
                                 </InputGroupAddon>
                               </InputGroup>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </TooltipTrigger>
                           {!canUpdateConfig || !canUpdateSMSRateLimit ? (
                             <TooltipContent side="left" className="w-80 p-4">
@@ -330,7 +345,7 @@ export const RateLimits = () => {
                                 Enable phone-based logins to update this rate limit
                               </p>
                               <div className="mt-3">
-                                <Button asChild type="default" size="tiny">
+                                <Button asChild size="tiny">
                                   <Link href={`/project/${projectRef}/auth/providers`}>
                                     View auth providers
                                   </Link>
@@ -345,7 +360,7 @@ export const RateLimits = () => {
                 </CardContent>
 
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={rateLimitForm.control}
                     name="RATE_LIMIT_TOKEN_REFRESH"
                     render={({ field }) => (
@@ -356,7 +371,7 @@ export const RateLimits = () => {
                       >
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <InputGroup>
                                 <FormInputGroupInput
                                   type="number"
@@ -368,7 +383,7 @@ export const RateLimits = () => {
                                   <InputGroupText>requests/5 min</InputGroupText>
                                 </InputGroupAddon>
                               </InputGroup>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </TooltipTrigger>
                           {!canUpdateConfig && (
                             <TooltipContent side="left" className="w-80 p-4">
@@ -382,9 +397,9 @@ export const RateLimits = () => {
                             </TooltipContent>
                           )}
                         </Tooltip>
-                        {rateLimitForm.watch('RATE_LIMIT_TOKEN_REFRESH') > 0 && (
+                        {rateLimitTokenRefresh > 0 && (
                           <p className="text-foreground-lighter text-sm mt-2">
-                            {rateLimitForm.watch('RATE_LIMIT_TOKEN_REFRESH') * 12} requests per hour
+                            {rateLimitTokenRefresh * 12} requests per hour
                           </p>
                         )}
                       </FormItemLayout>
@@ -393,18 +408,18 @@ export const RateLimits = () => {
                 </CardContent>
 
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={rateLimitForm.control}
                     name="RATE_LIMIT_VERIFY"
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Rate limit for token verifications"
-                        description="Number of OTP/Magic link verifications that can be made in a 5 minute interval per IP address"
+                        description="Number of OTP and magic link verifications that can be made in a 5 minute interval per IP address"
                       >
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <InputGroup>
                                 <FormInputGroupInput
                                   type="number"
@@ -416,7 +431,7 @@ export const RateLimits = () => {
                                   <InputGroupText>requests/5 min</InputGroupText>
                                 </InputGroupAddon>
                               </InputGroup>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </TooltipTrigger>
                           {!canUpdateConfig && (
                             <TooltipContent side="left" className="w-80 p-4">
@@ -430,9 +445,9 @@ export const RateLimits = () => {
                             </TooltipContent>
                           )}
                         </Tooltip>
-                        {rateLimitForm.watch('RATE_LIMIT_VERIFY') > 0 && (
+                        {rateLimitVerify > 0 && (
                           <p className="text-foreground-lighter text-sm mt-2">
-                            {rateLimitForm.watch('RATE_LIMIT_VERIFY') * 12} requests per hour
+                            {rateLimitVerify * 12} requests per hour
                           </p>
                         )}
                       </FormItemLayout>
@@ -441,7 +456,7 @@ export const RateLimits = () => {
                 </CardContent>
 
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={rateLimitForm.control}
                     name="RATE_LIMIT_ANONYMOUS_USERS"
                     render={({ field }) => (
@@ -452,7 +467,7 @@ export const RateLimits = () => {
                       >
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <InputGroup>
                                 <FormInputGroupInput
                                   type="number"
@@ -464,7 +479,7 @@ export const RateLimits = () => {
                                   <InputGroupText>requests/h</InputGroupText>
                                 </InputGroupAddon>
                               </InputGroup>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </TooltipTrigger>
                           {!canUpdateConfig || !canUpdateAnonymousUsersRateLimit ? (
                             <TooltipContent side="left" className="w-80 p-4">
@@ -473,7 +488,7 @@ export const RateLimits = () => {
                                 control this rate limit.
                               </p>
                               <div className="mt-3">
-                                <Button asChild type="default" size="tiny">
+                                <Button asChild size="tiny">
                                   <Link href={`/project/${projectRef}/auth/providers`}>
                                     View auth settings
                                   </Link>
@@ -488,7 +503,7 @@ export const RateLimits = () => {
                 </CardContent>
 
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={rateLimitForm.control}
                     name="RATE_LIMIT_OTP"
                     render={({ field }) => (
@@ -499,7 +514,7 @@ export const RateLimits = () => {
                       >
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <InputGroup>
                                 <FormInputGroupInput
                                   type="number"
@@ -511,7 +526,7 @@ export const RateLimits = () => {
                                   <InputGroupText>requests/5 min</InputGroupText>
                                 </InputGroupAddon>
                               </InputGroup>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </TooltipTrigger>
                           {!canUpdateConfig && (
                             <TooltipContent side="left" className="w-80 p-4">
@@ -525,9 +540,9 @@ export const RateLimits = () => {
                             </TooltipContent>
                           )}
                         </Tooltip>
-                        {rateLimitForm.watch('RATE_LIMIT_OTP') > 0 && (
+                        {rateLimitOtp > 0 && (
                           <p className="text-foreground-lighter text-sm mt-2">
-                            {rateLimitForm.watch('RATE_LIMIT_OTP') * 12} requests per hour
+                            {rateLimitOtp * 12} requests per hour
                           </p>
                         )}
                       </FormItemLayout>
@@ -536,7 +551,7 @@ export const RateLimits = () => {
                 </CardContent>
 
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={rateLimitForm.control}
                     name="RATE_LIMIT_WEB3"
                     render={({ field }) => (
@@ -547,7 +562,7 @@ export const RateLimits = () => {
                       >
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <InputGroup>
                                 <FormInputGroupInput
                                   type="number"
@@ -559,7 +574,7 @@ export const RateLimits = () => {
                                   <InputGroupText>requests/5 min</InputGroupText>
                                 </InputGroupAddon>
                               </InputGroup>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </TooltipTrigger>
                           {!canUpdateConfig || !canUpdateWeb3RateLimit ? (
                             <TooltipContent side="left" className="w-80 p-4">
@@ -568,7 +583,7 @@ export const RateLimits = () => {
                                 control this rate limit.
                               </p>
                               <div className="mt-3">
-                                <Button asChild type="default" size="tiny">
+                                <Button asChild size="tiny">
                                   <Link href={`/project/${projectRef}/auth/providers`}>
                                     View Auth provider settings
                                   </Link>
@@ -584,13 +599,11 @@ export const RateLimits = () => {
 
                 <CardFooter className="justify-end space-x-2">
                   {rateLimitForm.formState.isDirty && (
-                    <Button type="default" onClick={() => rateLimitForm.reset()}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => rateLimitForm.reset()}>Cancel</Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={
                       !canUpdateConfig || isUpdatingConfig || !rateLimitForm.formState.isDirty
                     }
@@ -601,7 +614,7 @@ export const RateLimits = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </PageSectionContent>
       </PageSection>
 
@@ -615,11 +628,11 @@ export const RateLimits = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Form_Shadcn_ {...ipForwardingForm}>
+          <Form {...ipForwardingForm}>
             <form onSubmit={ipForwardingForm.handleSubmit(onSubmitIPForwardingForm)}>
               <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={ipForwardingForm.control}
                     name="SECURITY_SB_FORWARDED_FOR_ENABLED"
                     render={({ field }) => (
@@ -636,26 +649,24 @@ export const RateLimits = () => {
                           </InlineLink>
                         </>
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             checked={field.value}
                             onCheckedChange={(value) => field.onChange(value)}
                             disabled={!canUpdateConfig}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {ipForwardingForm.formState.isDirty && (
-                    <Button type="default" onClick={() => ipForwardingForm.reset()}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => ipForwardingForm.reset()}>Cancel</Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={
                       !canUpdateConfig || isUpdatingConfig || !ipForwardingForm.formState.isDirty
                     }
@@ -666,7 +677,7 @@ export const RateLimits = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </PageSectionContent>
       </PageSection>
     </>

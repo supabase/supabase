@@ -1,13 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import {
-  cn,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
-} from 'ui'
+import { cn, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
 import {
   // CopyButton,
@@ -30,11 +24,17 @@ export function ComponentExample({
   src: _,
   ...props
 }: ComponentExampleProps) {
-  const [Example, Code, ...Children] = React.Children.toArray(children) as React.ReactElement[]
+  const [Example, Code, ...Children] = React.Children.toArray(children) as React.ReactElement<{
+    children: React.ReactNode
+    'data-rehype-pretty-code-fragment'?: unknown
+  }>[]
 
   const codeString = React.useMemo(() => {
     if (typeof Code?.props['data-rehype-pretty-code-fragment'] !== 'undefined') {
-      const [, Button] = React.Children.toArray(Code.props.children) as React.ReactElement[]
+      const [, Button] = React.Children.toArray(Code.props.children) as React.ReactElement<{
+        value?: string
+        __rawString__?: string
+      }>[]
       return Button?.props?.value || Button?.props?.__rawString__ || null
     }
   }, [Code])
@@ -58,7 +58,7 @@ export function ComponentExample({
             </TabsTrigger>
           </TabsList>
           {
-            extractedClassNames ? (
+            extractedClassNames && codeString ? (
               <CopyWithClassNames
                 value={codeString}
                 classNames={extractedClassNames}

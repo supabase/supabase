@@ -25,6 +25,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
 
   return (
     <button
+      tabIndex={0}
       onClick={onClick}
       className={cn(
         'hover:text-foreground w-full text-left text-lg flex flex-col group transition-all',
@@ -47,7 +48,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
           </p>
         </div>
       </div>
-      <div className="relative w-full h-[1px] bg-border-strong opacity-80 group-hover:opacity-100 rounded-full overflow-hidden">
+      <div className="relative w-full h-px bg-border-strong opacity-80 group-hover:opacity-100 rounded-full overflow-hidden">
         <LazyMotion features={domAnimation}>
           {isActive && (
             <m.div

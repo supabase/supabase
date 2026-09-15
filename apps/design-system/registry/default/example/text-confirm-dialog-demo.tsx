@@ -10,7 +10,7 @@ export default function TextConfirmDialogDemo() {
 
   return (
     <>
-      <Button type="danger" onClick={() => setVisible(true)}>
+      <Button variant="danger" onClick={() => setVisible(true)}>
         Show Text Confirm Dialog
       </Button>
 

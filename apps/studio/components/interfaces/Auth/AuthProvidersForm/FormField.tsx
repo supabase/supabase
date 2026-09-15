@@ -6,25 +6,25 @@ import ReactMarkdown from 'react-markdown'
 import {
   Button,
   Calendar,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
   FormInputGroupInput,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
   SheetSection,
   Switch,
   Textarea,
-  useWatch_Shadcn_,
+  FormField as UIFormField,
+  useWatch,
 } from 'ui'
 import { Input as DataInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -65,7 +65,7 @@ const FormField = ({
     )
   }
 
-  const fieldValue = useWatch_Shadcn_({ control, name })
+  const fieldValue = useWatch({ control, name })
   if (!hasAccess) {
     const planMessage = organizationSlug
       ? `Only available on [Pro plan](/org/${organizationSlug}/billing?panel=subscriptionPlan) and above.`
@@ -75,7 +75,7 @@ const FormField = ({
   const disabled =
     disabledProp || (properties.type === 'boolean' ? !hasAccess && !fieldValue : !hasAccess)
 
-  const showValue = useWatch_Shadcn_({
+  const showValue = useWatch({
     control,
     name: properties.show?.key,
     disabled: properties.show == null,
@@ -102,7 +102,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
               disabled={disabled || readOnly}
@@ -118,30 +118,30 @@ const FormField = ({
                     ) : null
                   }
                 >
-                  <FormControl_Shadcn_>
-                    <Popover_Shadcn_>
-                      <PopoverTrigger_Shadcn_ asChild>
+                  <Popover>
+                    <FormControl>
+                      <PopoverTrigger asChild>
                         <Button
-                          type="outline"
+                          variant="outline"
                           className="w-full justify-start text-left font-normal px-3 py-4"
                           icon={<CalendarIcon className="h-4 w-4" />}
                           size="small"
                         >
                           {field.value ? format(new Date(field.value), 'PPP') : 'Pick a date'}
                         </Button>
-                      </PopoverTrigger_Shadcn_>
-                      <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={(date) => {
-                            field.onChange(date?.toISOString())
-                          }}
-                          initialFocus
-                        />
-                      </PopoverContent_Shadcn_>
-                    </Popover_Shadcn_>
-                  </FormControl_Shadcn_>
+                      </PopoverTrigger>
+                    </FormControl>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={(date) => {
+                          field.onChange(date?.toISOString())
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </FormItemLayout>
               )}
             />
@@ -154,7 +154,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
               disabled={disabled}
@@ -168,20 +168,13 @@ const FormField = ({
                     ) : null
                   }
                 >
-                  <FormControl_Shadcn_ className="col-span-6">
+                  <FormControl className="col-span-6">
                     {properties.isSecret ? (
-                      <DataInput
-                        {...field}
-                        id={name}
-                        size="small"
-                        copy
-                        reveal
-                        readOnly={readOnly}
-                      />
+                      <DataInput {...field} size="small" copy reveal readOnly={readOnly} />
                     ) : (
-                      <Input_Shadcn_ {...field} id={name} readOnly={readOnly} />
+                      <Input {...field} readOnly={readOnly} />
                     )}
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -194,7 +187,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
               disabled={disabled}
@@ -208,16 +201,15 @@ const FormField = ({
                     ) : null
                   }
                 >
-                  <FormControl_Shadcn_ className="col-span-6">
+                  <FormControl className="col-span-6">
                     <Textarea
                       {...field}
-                      id={name}
                       rows={4}
                       placeholder="Enter multi-line text"
                       className="resize-none"
                       readOnly={readOnly}
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -230,7 +222,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
               disabled={disabled}
@@ -244,12 +236,11 @@ const FormField = ({
                     ) : null
                   }
                 >
-                  <FormControl_Shadcn_ className="col-span-6">
-                    {properties.units ? (
+                  {properties.units ? (
+                    <FormControl className="col-span-6">
                       <InputGroup>
                         <FormInputGroupInput
                           {...field}
-                          id={name}
                           type="number"
                           onChange={(e) =>
                             field.onChange(e.target.value === '' ? '' : Number(e.target.value))
@@ -262,18 +253,19 @@ const FormField = ({
                           </ReactMarkdown>
                         </InputGroupAddon>
                       </InputGroup>
-                    ) : (
-                      <Input_Shadcn_
+                    </FormControl>
+                  ) : (
+                    <FormControl className="col-span-6">
+                      <Input
                         {...field}
-                        id={name}
                         type="number"
                         onChange={(e) =>
                           field.onChange(e.target.value === '' ? '' : Number(e.target.value))
                         }
                         readOnly={readOnly}
                       />
-                    )}
-                  </FormControl_Shadcn_>
+                    </FormControl>
+                  )}
                 </FormItemLayout>
               )}
             />
@@ -286,7 +278,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
               disabled={disabled || readOnly}
@@ -299,7 +291,7 @@ const FormField = ({
                       {description ? <Markdown content={description} /> : null}
                       {properties.link && (
                         <span>
-                          <Button asChild type="default" size="tiny" icon={<ExternalLink />}>
+                          <Button asChild size="tiny" icon={<ExternalLink />}>
                             <a href={properties.link} target="_blank" rel="noreferrer noopener">
                               Documentation
                             </a>
@@ -309,14 +301,9 @@ const FormField = ({
                     </div>
                   }
                 >
-                  <FormControl_Shadcn_ className="col-span-6">
-                    <Switch
-                      id={name}
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      size="small"
-                    />
-                  </FormControl_Shadcn_>
+                  <FormControl className="col-span-6">
+                    <Switch checked={field.value} onCheckedChange={field.onChange} size="small" />
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -329,7 +316,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
               disabled={disabled || readOnly}
@@ -347,33 +334,33 @@ const FormField = ({
                     ) : null
                   }
                 >
-                  <FormControl_Shadcn_ className="col-span-6">
-                    <Select_Shadcn_
-                      defaultValue={properties.enum[0]?.value}
-                      value={field.value}
-                      onValueChange={field.onChange}
-                    >
-                      <SelectTrigger_Shadcn_>
-                        <SelectValue_Shadcn_ placeholder="Select an option" />
-                      </SelectTrigger_Shadcn_>
-                      <SelectContent_Shadcn_>
-                        {properties.enum.map((option: Enum) => (
-                          <SelectItem_Shadcn_ key={option.value} value={option.value}>
-                            <span className="flex gap-2 items-center">
-                              {option.icon ? (
-                                <img
-                                  alt={`${option.label} icon`}
-                                  className="h-6 w-6"
-                                  src={`${BASE_PATH}/img/icons/${option.icon}`}
-                                />
-                              ) : null}
-                              {option.label}
-                            </span>
-                          </SelectItem_Shadcn_>
-                        ))}
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
-                  </FormControl_Shadcn_>
+                  <Select
+                    defaultValue={properties.enum[0]?.value}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <FormControl className="col-span-6">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select an option" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {properties.enum.map((option: Enum) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          <span className="flex gap-2 items-center">
+                            {option.icon ? (
+                              <img
+                                alt={`${option.label} icon`}
+                                className="h-6 w-6"
+                                src={`${BASE_PATH}/img/icons/${option.icon}`}
+                              />
+                            ) : null}
+                            {option.label}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FormItemLayout>
               )}
             />

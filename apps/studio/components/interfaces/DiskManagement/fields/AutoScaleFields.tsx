@@ -1,16 +1,14 @@
-import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
-import { UseFormReturn } from 'react-hook-form'
+import { UseFormReturn, useWatch } from 'react-hook-form'
 import {
-  cn,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
@@ -19,18 +17,22 @@ import { useDiskAutoscaleCustomConfigQuery } from '@/data/config/disk-autoscale-
 
 type AutoScaleFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
+  disableInput?: boolean
 }
 
-export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
+export const AutoScaleFields = ({ form, disableInput = false }: AutoScaleFieldProps) => {
   const { ref: projectRef } = useParams()
   const {
     control,
     setValue,
     formState: { errors },
   } = form
-  const { totalSize, growthPercent, maxSizeGb, minIncrementGb } = form.watch()
+  const [totalSize, growthPercent, maxSizeGb, minIncrementGb] = useWatch({
+    control,
+    name: ['totalSize', 'growthPercent', 'maxSizeGb', 'minIncrementGb'],
+  })
 
-  const { error, isPending: isLoading, isError } = useDiskAutoscaleCustomConfigQuery({ projectRef })
+  const { isError } = useDiskAutoscaleCustomConfigQuery({ projectRef })
 
   const _growthPercent = growthPercent ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
   const _minIncrementGb = minIncrementGb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
@@ -44,20 +46,20 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
     200
   )
 
-  const totalSizeAfterGrowth = autoscaleGrowValue + totalSize
+  const totalSizeAfterGrowth = Math.max(autoscaleGrowValue + totalSize, 8)
   const formattedTotalSizeAfterGrowth =
     totalSizeAfterGrowth < _maxSizeGb ? totalSizeAfterGrowth : _maxSizeGb
   const formattedGrowValue = formattedTotalSizeAfterGrowth - totalSize
 
   return (
     <>
-      <FormField_Shadcn_
+      <FormField
         name="growthPercent"
         control={control}
         render={({ field }) => {
           return (
             <FormItemLayout
-              layout="horizontal"
+              layout="flex-row-reverse"
               label="Autoscale growth percent"
               id={field.name}
               labelOptional="Percentage of current disk size to grow"
@@ -68,13 +70,14 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
               }
               className="[&>div>span]:text-foreground-lighter"
             >
-              <FormControl_Shadcn_ className="max-w-20">
+              <FormControl className="max-w-20">
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
+                    id={field.name}
                     type="number"
                     value={field.value ?? undefined}
-                    disabled={isError}
+                    disabled={disableInput || isError}
                     onChange={(e) => {
                       setValue(
                         'growthPercent',
@@ -91,19 +94,19 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                     <InputGroupText>%</InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )
         }}
       />
 
-      <FormField_Shadcn_
+      <FormField
         name="minIncrementGb"
         control={control}
         render={({ field }) => {
           return (
             <FormItemLayout
-              layout="horizontal"
+              layout="flex-row-reverse"
               label="Minimum increment"
               id={field.name}
               labelOptional="Minimum value to autoscale disk size by"
@@ -114,13 +117,14 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
               }
               className="[&>div>span]:text-foreground-lighter"
             >
-              <FormControl_Shadcn_ className="max-w-32">
+              <FormControl className="max-w-32">
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
+                    id={field.name}
                     type="number"
                     value={field.value ?? undefined}
-                    disabled={isError}
+                    disabled={disableInput || isError}
                     onChange={(e) => {
                       setValue(
                         'minIncrementGb',
@@ -137,31 +141,32 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                     <InputGroupText>GB</InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )
         }}
       />
 
-      <FormField_Shadcn_
+      <FormField
         name="maxSizeGb"
         control={control}
         render={({ field }) => {
           return (
             <FormItemLayout
-              layout="horizontal"
+              layout="flex-row-reverse"
               label="Maximum disk size"
               id={field.name}
               labelOptional="Maximum size that the disk can grow to"
               className="[&>div>span]:text-foreground-lighter"
             >
-              <FormControl_Shadcn_ className="max-w-32">
+              <FormControl className="max-w-32">
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
+                    id={field.name}
                     type="number"
                     value={field.value ?? undefined}
-                    disabled={isError}
+                    disabled={disableInput || isError}
                     onChange={(e) => {
                       setValue('maxSizeGb', e.target.value === '' ? null : e.target.valueAsNumber, {
                         shouldDirty: true,
@@ -174,7 +179,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                     <InputGroupText>GB</InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )
         }}

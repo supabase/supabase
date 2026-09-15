@@ -1,7 +1,6 @@
 <svg
-    stroke="currentColor"
+    stroke="none"
     fill="currentColor"
-    stroke-width="0"
     role="img"
     viewBox="0 0 24 24"
     height="24"

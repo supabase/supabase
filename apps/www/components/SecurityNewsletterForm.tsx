@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Input_Shadcn_, Label_Shadcn_ } from 'ui'
+import { Button, Input, Label } from 'ui'
 
 const isValidEmail = (email: string): boolean => {
   const emailPattern = /^[\w-\.+]+@([\w-]+\.)+[\w-]{2,8}$/
@@ -66,8 +66,8 @@ const SecurityNewsletterForm = () => {
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
-                <Label_Shadcn_ htmlFor="security-first-name">First Name</Label_Shadcn_>
-                <Input_Shadcn_
+                <Label htmlFor="security-first-name">First Name</Label>
+                <Input
                   id="security-first-name"
                   type="text"
                   value={firstName}
@@ -77,8 +77,8 @@ const SecurityNewsletterForm = () => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <Label_Shadcn_ htmlFor="security-last-name">Last Name</Label_Shadcn_>
-                <Input_Shadcn_
+                <Label htmlFor="security-last-name">Last Name</Label>
+                <Input
                   id="security-last-name"
                   type="text"
                   value={lastName}
@@ -89,8 +89,8 @@ const SecurityNewsletterForm = () => {
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <Label_Shadcn_ htmlFor="security-email">Email Address</Label_Shadcn_>
-              <Input_Shadcn_
+              <Label htmlFor="security-email">Email Address</Label>
+              <Input
                 id="security-email"
                 type="email"
                 value={email}
@@ -100,7 +100,7 @@ const SecurityNewsletterForm = () => {
               />
             </div>
             {errorMessage && <p className="text-destructive text-sm">{errorMessage}</p>}
-            <Button type="primary" size="large" htmlType="submit" loading={status === 'loading'}>
+            <Button variant="primary" size="large" type="submit" loading={status === 'loading'}>
               Subscribe
             </Button>
           </form>

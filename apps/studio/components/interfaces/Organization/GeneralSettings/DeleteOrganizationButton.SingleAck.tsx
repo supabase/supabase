@@ -1,4 +1,4 @@
-import { Checkbox_Shadcn_ } from 'ui'
+import { Checkbox } from 'ui'
 
 type Props = {
   acknowledgedAll: boolean
@@ -21,7 +21,7 @@ export const DeleteOrganizationButtonSingleAck = ({
         className="mt-3 flex cursor-pointer items-center gap-2 text-sm text-foreground"
         onClick={() => setAcknowledgedAll(!acknowledgedAll)}
       >
-        <Checkbox_Shadcn_
+        <Checkbox
           checked={acknowledgedAll}
           onCheckedChange={(checked) => setAcknowledgedAll(checked === true)}
           onClick={(e) => e.stopPropagation()}

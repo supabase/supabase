@@ -177,7 +177,7 @@ export const ERROR_CODES: Record<ErrorCodeService, Record<string, ErrorCodeDefin
         'Further MFA verification is rejected. Only returned if the MFA verification attempt hook returns a reject decision.',
       references: [
         {
-          href: 'https://supabase.com/docs/guides/auth/auth-hooks?language=add-admin-role#hook-mfa-verification-attempt',
+          href: 'https://supabase.com/docs/guides/auth/auth-hooks/mfa-verification-hook',
           description: 'MFA verification hook',
         },
       ],
@@ -433,7 +433,7 @@ export const ERROR_CODES: Record<ErrorCodeService, Record<string, ErrorCodeDefin
         'Your project may have been suspended for exceeding usage quotas. Contact support with your project reference ID and a description of your Realtime use case.',
       references: [
         {
-          href: 'https://supabase.com/docs/troubleshooting/realtime-project-suspended-for-exceeding-quotas',
+          href: 'https://supabase.com/docs/guides/troubleshooting/realtime-project-suspended-for-exceeding-quotas',
           description: 'Troubleshooting guide for suspended projects',
         },
       ],

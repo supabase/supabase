@@ -1,13 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  Checkbox,
+  Form,
+  FormControl,
+  FormField,
+  Input,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -20,137 +22,220 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
+import {
+  isMetadataListErrorVisible,
+  isMetadataListLoading,
+  useRefreshOnOpen,
+} from './useRefreshOnOpen'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useCreatePublicationMutation } from '@/data/replication/publication-create-mutation'
+import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 interface NewPublicationPanelProps {
   visible: boolean
-  sourceId?: number
-  onClose: () => void
+  onClose: (newPublication?: string) => void
 }
 
-export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanelProps) => {
+const FORM_ID = 'publication-editor'
+
+const FormSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  tableIds: z.array(z.string()).min(1, 'At least one table is required'),
+  publishViaPartitionRoot: z.boolean(),
+})
+type FormValues = z.infer<typeof FormSchema>
+
+const defaultValues: FormValues = {
+  name: '',
+  tableIds: [],
+  publishViaPartitionRoot: true,
+}
+
+export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelProps) => {
   const { ref: projectRef } = useParams()
-  const { mutateAsync: createPublication, isPending: creatingPublication } =
-    useCreatePublicationMutation()
-  const { data: tables } = useReplicationTablesQuery({
-    projectRef,
-    sourceId,
+  const sourceId = useReplicationSourceId({ projectRef })
+  const [shouldLoadTables, setShouldLoadTables] = useState(false)
+
+  const {
+    data: tables = [],
+    isPending,
+    isFetching,
+    isError,
+    refetch: refetchTables,
+  } = useReplicationTablesQuery({ projectRef, sourceId }, { enabled: visible && shouldLoadTables })
+  const isLoadingTables = isMetadataListLoading(isPending || isFetching, tables.length)
+  const { handleOpenChange: handleRefreshTablesOnOpen } = useRefreshOnOpen({
+    isEnabled: shouldLoadTables,
+    refetch: refetchTables,
   })
-  const formId = 'publication-editor'
-  const FormSchema = z.object({
-    name: z.string().min(1, 'Name is required'),
-    tables: z.array(z.string()).min(1, 'At least one table is required'),
-  })
-  const defaultValues = {
-    name: '',
-    tables: [],
-  }
-  const form = useForm<z.infer<typeof FormSchema>>({
+  const tableLabelsById = new Map(
+    tables.map((table) => [String(table.id), `${table.schema}.${table.name}`] as const)
+  )
+
+  const form = useForm<FormValues>({
     mode: 'onBlur',
     reValidateMode: 'onBlur',
     resolver: zodResolver(FormSchema),
     defaultValues,
   })
 
-  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+  // Always destructure formState values otherwise they won't be updated
+  // See https://react-hook-form.com/docs/useform/formstate
+  const { isDirty } = form.formState
+
+  const closePanel = (newPublication?: string) => {
+    setShouldLoadTables(false)
+    form.reset(defaultValues)
+    onClose(newPublication)
+  }
+
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
+    checkIsDirty: () => isDirty,
+    onClose: () => closePanel(),
+  })
+
+  const { mutate: createPublication, isPending: isCreatingPublication } =
+    useCreatePublicationMutation({
+      onSuccess: (_, vars) => {
+        toast.success('Successfully created publication')
+        closePanel(vars.name)
+      },
+    })
+
+  const onSubmit = async (data: FormValues) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!sourceId) return console.error('Source id is required')
-    try {
-      await createPublication({
-        projectRef,
-        sourceId,
-        name: data.name,
-        tables: data.tables.map((table) => {
-          const [schema, name] = table.split('.')
-          return { schema, name }
-        }),
-      })
-      toast.success('Successfully created publication')
-      onClose()
-    } catch (error) {
-      toast.error('Failed to create publication')
-    }
-    form.reset(defaultValues)
+
+    createPublication({
+      projectRef,
+      sourceId,
+      name: data.name,
+      tableIds: data.tableIds.map(Number),
+      publishViaPartitionRoot: data.publishViaPartitionRoot,
+    })
   }
 
   return (
     <>
-      <Sheet open={visible} onOpenChange={onClose}>
+      <Sheet open={visible} onOpenChange={handleOpenChange}>
         <SheetContent size="default">
           <div className="flex flex-col h-full">
             <SheetHeader>
-              <SheetTitle>Create a new Publication</SheetTitle>
-              <SheetDescription>Replicate table changes to destinations</SheetDescription>
+              <SheetTitle>Create a new publication</SheetTitle>
+              <SheetDescription>Choose which tables to replicate to destinations.</SheetDescription>
             </SheetHeader>
-            <SheetSection className="flex-grow overflow-auto">
-              <Form_Shadcn_ {...form}>
+            <SheetSection className="grow overflow-auto">
+              <Form {...form}>
                 <form
-                  id={formId}
+                  id={FORM_ID}
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="flex flex-col gap-y-4"
                 >
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
-                      <FormItemLayout label="Name" layout="vertical">
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_ {...field} placeholder="Name" />
-                        </FormControl_Shadcn_>
+                      <FormItemLayout label="Name" layout="horizontal">
+                        <FormControl>
+                          <Input {...field} placeholder="Name" />
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
-                    name="tables"
+                    name="tableIds"
                     render={({ field }) => (
                       <FormItemLayout
                         label="Tables"
-                        description="Which tables to replicate to destinations"
+                        layout="horizontal"
+                        description={
+                          field.value.length === 0
+                            ? 'Select at least one table to include in the publication.'
+                            : undefined
+                        }
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <MultiSelector
                             values={field.value}
                             onValuesChange={field.onChange}
-                            disabled={creatingPublication}
+                            disabled={isCreatingPublication}
+                            onOpenChange={(isOpen) => {
+                              if (isOpen && !shouldLoadTables) {
+                                setShouldLoadTables(true)
+                                return
+                              }
+                              handleRefreshTablesOnOpen(isOpen)
+                            }}
                           >
                             <MultiSelector.Trigger
+                              aria-label="Select publication tables"
                               badgeLimit="wrap"
                               label="Select tables..."
-                              mode="inline-combobox"
+                              renderValue={(id) => tableLabelsById.get(id) ?? 'Unavailable table'}
                             />
                             <MultiSelector.Content>
-                              <MultiSelector.List>
-                                {tables?.map((table) => (
-                                  <MultiSelector.Item
-                                    key={`${table.schema}.${table.name}`}
-                                    value={`${table.schema}.${table.name}`}
-                                  >
+                              <MultiSelector.Input placeholder="Search tables..." />
+                              <MultiSelector.List
+                                emptyLabel="No tables available"
+                                error={isMetadataListErrorVisible(isError, tables.length)}
+                                errorLabel="Unable to load tables"
+                                loading={isLoadingTables}
+                              >
+                                {tables.map((table) => (
+                                  <MultiSelector.Item key={table.id} value={String(table.id)}>
                                     {`${table.schema}.${table.name}`}
                                   </MultiSelector.Item>
                                 ))}
                               </MultiSelector.List>
                             </MultiSelector.Content>
                           </MultiSelector>
-                        </FormControl_Shadcn_>
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="publishViaPartitionRoot"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        hideMessage
+                        label="Publish partitions as the parent table"
+                        description="Changes from partitioned tables appear in one destination table. Turn off to create a table for each partition."
+                        layout="flex"
+                      >
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            aria-label="Publish partitions as the parent table"
+                            onCheckedChange={(checked) => field.onChange(checked === true)}
+                          />
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </form>
-              </Form_Shadcn_>
+              </Form>
             </SheetSection>
             <SheetFooter>
-              <Button type="default" disabled={creatingPublication} onClick={onClose}>
+              <Button disabled={isCreatingPublication} onClick={confirmOnClose}>
                 Cancel
               </Button>
-              <Button type="primary" disabled={creatingPublication} form={formId} htmlType="submit">
+              <Button
+                variant="primary"
+                loading={isCreatingPublication}
+                form={FORM_ID}
+                type="submit"
+              >
                 Create publication
               </Button>
             </SheetFooter>
           </div>
         </SheetContent>
       </Sheet>
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )
 }

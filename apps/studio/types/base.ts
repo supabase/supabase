@@ -77,7 +77,11 @@ export interface Permission {
   organization_slug: string
   resources: string[]
   restrictive?: boolean
-  project_refs: string[]
+  /**
+   * Projects the row is limited to. Organization-wide rows arrive as [] or null — the API
+   * contract is nullable and some view-synthesized rows serialize as null.
+   */
+  project_refs: string[] | null
 }
 
 export interface ResponseFailure {
@@ -102,6 +106,7 @@ export class ResponseError extends Error {
   requestPathname?: string
   metadata?: CostMetadata
   errorType?: string
+  formattedError?: string
 
   constructor(
     message: string | undefined,
@@ -109,7 +114,8 @@ export class ResponseError extends Error {
     requestId?: string,
     retryAfter?: number,
     requestPathname?: string,
-    metadata?: CostMetadata
+    metadata?: CostMetadata,
+    formattedError?: string
   ) {
     super(message || 'API error happened while trying to communicate with the server.')
     this.code = code
@@ -117,6 +123,7 @@ export class ResponseError extends Error {
     this.retryAfter = retryAfter
     this.requestPathname = requestPathname
     this.metadata = metadata
+    this.formattedError = formattedError
   }
 }
 

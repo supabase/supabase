@@ -123,9 +123,10 @@ export const ValidateSizeLimit = ({
           <TooltipTrigger asChild>
             <button
               type="button"
+              tabIndex={isValidating ? -1 : 0}
               className={cn(
                 'mt-2 ml-auto text-foreground-lighter',
-                '!w-fit text-xs',
+                'w-fit! text-xs',
                 isValidating ? 'cursor-wait' : 'hover:text-foreground'
               )}
               onClick={() => setShowModal(true)}

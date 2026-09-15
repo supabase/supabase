@@ -1,9 +1,8 @@
-import React, { useRef, useState } from 'react'
-import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
-import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
-
-import Panel from '~/components/Panel'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import Panel from '~/components/Panel'
+import { getAnimation, INITIAL_BOTTOM } from '~/lib/animations'
+import { domAnimation, LazyMotion, m, useInView } from 'framer-motion'
+import React, { useRef, useState } from 'react'
 
 interface Highlight {
   image?: React.ReactNode
@@ -52,13 +51,13 @@ const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: numb
       animate={isInView ? animate : initial}
       className="will-change-transform h-full highlight-card"
     >
-      <Panel innerClassName="flex flex-col !bg-alternative" outerClassName="h-full">
+      <Panel innerClassName="flex flex-col bg-alternative!" outerClassName="h-full">
         {highlight.image && (
           <div className="relative w-full aspect-[1.35/1] mb-4">
             <div
               className="absolute inset-0 w-full h-full z-10"
               style={{
-                background: `radial-gradient(100% 50% at 50% 50%, transparent, hsl(var(--background-alternative-default)))`,
+                background: `radial-gradient(100% 50% at 50% 50%, transparent, var(--background-alternative-default))`,
               }}
             />
             {highlight.image && <Img isHovered={isHovered} />}

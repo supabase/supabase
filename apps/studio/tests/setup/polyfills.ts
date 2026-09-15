@@ -36,4 +36,34 @@ Object.defineProperties(globalThis, {
   TransformStream: { value: TransformStream },
 })
 
+if (typeof window.localStorage?.getItem !== 'function') {
+  const storage = new Map<string, string>()
+  const localStoragePolyfill = {
+    getItem: vi.fn((key: string) => storage.get(key) ?? null),
+    setItem: vi.fn((key: string, value: string) => {
+      storage.set(key, value)
+    }),
+    removeItem: vi.fn((key: string) => {
+      storage.delete(key)
+    }),
+    clear: vi.fn(() => {
+      storage.clear()
+    }),
+    key: vi.fn((index: number) => Array.from(storage.keys())[index] ?? null),
+    get length() {
+      return storage.size
+    },
+  }
+
+  Object.defineProperty(window, 'localStorage', {
+    configurable: true,
+    value: localStoragePolyfill,
+  })
+
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    value: localStoragePolyfill,
+  })
+}
+
 window.HTMLElement.prototype.hasPointerCapture = vi.fn()

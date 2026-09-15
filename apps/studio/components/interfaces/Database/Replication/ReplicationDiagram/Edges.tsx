@@ -1,18 +1,24 @@
 import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath, type EdgeProps } from '@xyflow/react'
-import { useParams } from 'common'
-import { Loader2, X } from 'lucide-react'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { useParams, useReducedMotion } from 'common'
+import { useMemo } from 'react'
 
-import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
-import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getStatusName } from '../Pipeline.utils'
+import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
+import {
+  EdgeVisualChip,
+  getEdgeVisual,
+  type ReplicationState,
+} from '@/components/ui/ReactFlow/EdgeVisual'
+import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
+import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
 
 type EdgeData = {
   type: string
   identifier: string
-  isComingUp: boolean
-  isReplicating: boolean
-  isFailed: boolean
   shiftEdgeEnd: boolean
 }
 
@@ -27,85 +33,73 @@ export const SmoothstepEdge = ({
   markerEnd,
   data,
 }: EdgeProps) => {
-  const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
+  const { ref: projectRef = 'default' } = useParams()
+  const prefersReducedMotion = useReducedMotion()
+  const { identifier, shiftEdgeEnd } = (data || {}) as EdgeData
 
-  const { type, identifier, isComingUp, isReplicating, isFailed, shiftEdgeEnd } = (data ||
-    {}) as EdgeData
-  const formattedId = type === 'replica' ? formatDatabaseID(identifier ?? '') : identifier
+  const { data: pipelinesData } = useReplicationPipelinesQuery({ projectRef })
+  const pipeline = (pipelinesData?.pipelines ?? []).find(
+    (p) => p.destination_id.toString() === identifier
+  )
+  const { data: pipelineStatusData } = useReplicationPipelineStatusQuery(
+    { projectRef, pipelineId: pipeline?.id },
+    { enabled: !!pipeline?.id, refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
+  )
+  const { getRequestStatus } = usePipelineRequestStatus()
+  const requestStatus = pipeline?.id
+    ? getRequestStatus(pipeline.id)
+    : PipelineStatusRequestStatus.None
+
+  const replicationState = useMemo<ReplicationState>(() => {
+    const isTransitioning = requestStatus !== PipelineStatusRequestStatus.None
+    const statusName = getStatusName(pipelineStatusData?.status)
+    return {
+      isReplicating: statusName === 'started' && !isTransitioning,
+      isComingUp: isTransitioning || statusName === 'starting' || statusName === 'stopping',
+      isFailed: statusName === 'failed',
+    }
+  }, [pipelineStatusData?.status, requestStatus])
 
   const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
     sourceY,
     sourcePosition,
-    targetX,
+    targetX: shiftEdgeEnd ? targetX - 8 : targetX,
     targetY,
     targetPosition,
   })
 
-  const {
-    data: lagDuration,
-    isPending: isLoading,
-    isError,
-  } = useReplicationLagQuery(
-    {
-      id: identifier,
-      projectRef: ref,
-      connectionString: project?.connectionString,
-    },
-    { enabled: type === 'replica' && isReplicating, refetchInterval: 10000 }
-  )
-  const lagValue = Number(lagDuration?.toFixed(2) ?? 0).toLocaleString()
-  const hasReplicationLagData = data !== undefined && !isError && isReplicating
+  const visual = getEdgeVisual(replicationState)
 
   return (
     <>
-      <BaseEdge path={edgePath} markerEnd={markerEnd} style={style} />
-
-      {isFailed && (
-        <EdgeLabelRenderer>
-          <div
-            className={cn('bg-surface-100 p-1 rounded absolute nodrag nopan border')}
-            style={{
-              transform: `translate(-50%, -50%) translate(${targetX - 30}px,${targetY}px)`,
-            }}
-          >
-            <X size={12} strokeWidth={4} className="text-destructive" />
-          </div>
-        </EdgeLabelRenderer>
-      )}
-
-      {(isComingUp || hasReplicationLagData) && (
-        <EdgeLabelRenderer>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div
-                className={cn(
-                  'bg-surface-100 py-1 rounded absolute nodrag nopan border',
-                  isLoading || isComingUp ? 'px-1' : 'px-1.5'
-                )}
-                style={{
-                  transform: `translate(-50%, -50%) translate(${shiftEdgeEnd ? targetX - 30 : labelX}px,${shiftEdgeEnd ? targetY : labelY}px)`,
-                  pointerEvents: 'all',
-                }}
-              >
-                {isLoading || isComingUp ? (
-                  <Loader2 size={12} className="animate-spin" />
-                ) : (
-                  <p className="font-mono text-xs">{lagValue}s</p>
-                )}
-              </div>
-            </TooltipTrigger>
-            {!isComingUp && (
-              <TooltipContent side="bottom" align="center">
-                {isLoading
-                  ? `Checking replication lag for replica ID: ${formattedId}`
-                  : `Replication lag (seconds) for replica ID: ${formattedId}`}
-              </TooltipContent>
-            )}
-          </Tooltip>
-        </EdgeLabelRenderer>
-      )}
+      <BaseEdge
+        path={edgePath}
+        markerEnd={markerEnd}
+        style={{
+          ...style,
+          stroke: visual.color,
+          strokeWidth: visual.strokeWidth,
+          opacity: visual.opacity,
+          strokeDasharray: visual.dashArray,
+          animation:
+            visual.shouldAnimate && !prefersReducedMotion
+              ? 'dashdraw 0.5s linear infinite'
+              : undefined,
+        }}
+      />
+      <EdgeLabelRenderer>
+        <div
+          style={{
+            position: 'absolute',
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+            pointerEvents: 'all',
+          }}
+          className="nodrag nopan"
+        >
+          <EdgeVisualChip visual={visual} />
+        </div>
+      </EdgeLabelRenderer>
     </>
   )
 }

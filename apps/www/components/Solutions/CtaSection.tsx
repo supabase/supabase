@@ -4,7 +4,7 @@ import { Button, cn } from 'ui'
 
 import SectionContainer from '@/components/Layouts/SectionContainer'
 
-interface Props {
+export interface CtaSectionProps {
   id: string
   title: string | React.ReactNode
   subtitle?: string
@@ -25,7 +25,14 @@ interface Props {
   className?: string
 }
 
-const CtaSection = ({ id, title, subtitle, primaryCta, secondaryCta, className }: Props) => {
+const CtaSection = ({
+  id,
+  title,
+  subtitle,
+  primaryCta,
+  secondaryCta,
+  className,
+}: CtaSectionProps) => {
   return (
     <SectionContainer
       id={id}
@@ -36,13 +43,13 @@ const CtaSection = ({ id, title, subtitle, primaryCta, secondaryCta, className }
           <h2 className="text-foreground-light text-2xl lg:text-3xl leading-tight">{title}</h2>
           {subtitle && <p className="text-foreground-light text-lg">{subtitle}</p>}
           <div className="flex flex-wrap gap-3 pt-4">
-            <Button asChild size="medium" icon={primaryCta.icon}>
+            <Button variant="primary" asChild size="medium" icon={primaryCta.icon}>
               <Link href={primaryCta.url} target={primaryCta.target}>
                 {primaryCta.label}
               </Link>
             </Button>
             {secondaryCta && (
-              <Button asChild size="medium" type="default">
+              <Button asChild size="medium">
                 <Link href={secondaryCta.url}>{secondaryCta.label}</Link>
               </Button>
             )}
@@ -50,7 +57,7 @@ const CtaSection = ({ id, title, subtitle, primaryCta, secondaryCta, className }
         </div>
       </div>
 
-      <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-transparent to-background opacity-80 z-0"></div>
+      <div className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-transparent to-background opacity-80 z-0"></div>
     </SectionContainer>
   )
 }

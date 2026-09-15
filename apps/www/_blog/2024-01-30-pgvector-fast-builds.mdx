@@ -134,7 +134,7 @@ You can further improve index build performance using a more powerful instance (
 
 The index build time is not linearly proportional to the number of cores used. A sensible default for `max_parallel_maintenance_workers` is `CPU count / 2` , the default we set on the Supabase platform. Accuracy and QPS are not affected by `max_parallel_maintenance_workers`.
 
-<Admonition type="note" label="Pro tip: optimizing your bills">
+<Admonition type="note" title="Pro tip: optimizing your bills">
 
 The trick is to use a large database while you build the index and then switch back to a cheaper instance after the index is built.
 

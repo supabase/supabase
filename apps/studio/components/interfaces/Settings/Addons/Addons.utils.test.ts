@@ -8,6 +8,19 @@ import {
 } from './Addons.utils'
 
 describe('getIPv4DisabledReason', () => {
+  it('returns the High Availability message before other checks', () => {
+    expect(
+      getIPv4DisabledReason({
+        isAws: false,
+        isProjectActive: false,
+        projectUpdateDisabled: true,
+        canUpdateIPv4: false,
+        ipv4Enabled: false,
+        isHighAvailability: true,
+      })
+    ).toBe('Dedicated IPv4 address is unavailable on High Availability projects')
+  })
+
   it('returns the AWS-only message for non-AWS projects', () => {
     expect(
       getIPv4DisabledReason({
@@ -16,6 +29,7 @@ describe('getIPv4DisabledReason', () => {
         projectUpdateDisabled: false,
         canUpdateIPv4: true,
         ipv4Enabled: false,
+        isHighAvailability: false,
       })
     ).toBe('Dedicated IPv4 address is only available for AWS projects')
   })
@@ -28,6 +42,7 @@ describe('getIPv4DisabledReason', () => {
         projectUpdateDisabled: true,
         canUpdateIPv4: false,
         ipv4Enabled: false,
+        isHighAvailability: false,
       })
     ).toBe('Project must be active to update IPv4')
   })
@@ -40,6 +55,7 @@ describe('getIPv4DisabledReason', () => {
         projectUpdateDisabled: true,
         canUpdateIPv4: true,
         ipv4Enabled: false,
+        isHighAvailability: false,
       })
     ).toBe('Project updates are currently disabled')
   })
@@ -52,6 +68,7 @@ describe('getIPv4DisabledReason', () => {
         projectUpdateDisabled: false,
         canUpdateIPv4: false,
         ipv4Enabled: false,
+        isHighAvailability: false,
       })
     ).toBe('You can only add IPv4 when your project network configuration is set to IPv6')
   })
@@ -64,12 +81,26 @@ describe('getIPv4DisabledReason', () => {
         projectUpdateDisabled: false,
         canUpdateIPv4: false,
         ipv4Enabled: true,
+        isHighAvailability: false,
       })
     ).toBeUndefined()
   })
 })
 
 describe('getPitrDisabledReason', () => {
+  it('returns the High Availability message before other checks', () => {
+    expect(
+      getPitrDisabledReason({
+        isProjectActive: false,
+        projectUpdateDisabled: true,
+        hasHipaaAddon: true,
+        sufficientPgVersion: false,
+        isOrioleDbInAws: true,
+        isHighAvailability: true,
+      })
+    ).toBe('Point in time recovery is unavailable on High Availability projects')
+  })
+
   it('returns the inactive-project message first', () => {
     expect(
       getPitrDisabledReason({
@@ -78,6 +109,7 @@ describe('getPitrDisabledReason', () => {
         hasHipaaAddon: true,
         sufficientPgVersion: false,
         isOrioleDbInAws: true,
+        isHighAvailability: false,
       })
     ).toBe('Project must be active to update PITR')
   })
@@ -90,6 +122,7 @@ describe('getPitrDisabledReason', () => {
         hasHipaaAddon: true,
         sufficientPgVersion: false,
         isOrioleDbInAws: true,
+        isHighAvailability: false,
       })
     ).toBe('Project updates are currently disabled')
   })
@@ -102,6 +135,7 @@ describe('getPitrDisabledReason', () => {
         hasHipaaAddon: true,
         sufficientPgVersion: true,
         isOrioleDbInAws: false,
+        isHighAvailability: false,
       })
     ).toBe('PITR cannot be changed with HIPAA enabled')
   })
@@ -114,6 +148,7 @@ describe('getPitrDisabledReason', () => {
         hasHipaaAddon: false,
         sufficientPgVersion: false,
         isOrioleDbInAws: false,
+        isHighAvailability: false,
       })
     ).toBe('Your project is too old to enable PITR')
   })
@@ -126,6 +161,7 @@ describe('getPitrDisabledReason', () => {
         hasHipaaAddon: false,
         sufficientPgVersion: true,
         isOrioleDbInAws: true,
+        isHighAvailability: false,
       })
     ).toBe('Point in time recovery is not supported with OrioleDB')
   })
@@ -138,17 +174,29 @@ describe('getPitrDisabledReason', () => {
         hasHipaaAddon: false,
         sufficientPgVersion: true,
         isOrioleDbInAws: false,
+        isHighAvailability: false,
       })
     ).toBeUndefined()
   })
 })
 
 describe('getCustomDomainDisabledReason', () => {
+  it('returns the High Availability message before other checks', () => {
+    expect(
+      getCustomDomainDisabledReason({
+        isProjectActive: false,
+        projectUpdateDisabled: true,
+        isHighAvailability: true,
+      })
+    ).toBe('Custom domain is unavailable on High Availability projects')
+  })
+
   it('returns the inactive-project message', () => {
     expect(
       getCustomDomainDisabledReason({
         isProjectActive: false,
         projectUpdateDisabled: true,
+        isHighAvailability: false,
       })
     ).toBe('Project must be active to update custom domain')
   })
@@ -158,6 +206,7 @@ describe('getCustomDomainDisabledReason', () => {
       getCustomDomainDisabledReason({
         isProjectActive: true,
         projectUpdateDisabled: true,
+        isHighAvailability: false,
       })
     ).toBe('Project updates are currently disabled')
   })
@@ -167,6 +216,7 @@ describe('getCustomDomainDisabledReason', () => {
       getCustomDomainDisabledReason({
         isProjectActive: true,
         projectUpdateDisabled: false,
+        isHighAvailability: false,
       })
     ).toBeUndefined()
   })

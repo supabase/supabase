@@ -3,6 +3,7 @@ import * as z from 'zod'
 import { NO_REQUIRED_CHARACTERS, urlRegex } from '@/components/interfaces/Auth/Auth.constants'
 import { ProjectAuthConfigData } from '@/data/auth/auth-config-query'
 import { DOCS_URL } from '@/lib/constants'
+import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
 
 const parseBase64URL = (b64url: string) => {
   return atob(b64url.replace(/[-]/g, '+').replace(/[_]/g, '/'))
@@ -96,22 +97,19 @@ const PROVIDER_EMAIL = {
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: z.boolean(),
       SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: z.boolean(),
       PASSWORD_HIBP_ENABLED: z.boolean(),
-      MAILER_OTP_EXP: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
+      MAILER_OTP_EXP: preprocessEmptyNumberInput(
         z.coerce
           .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
           .min(0, 'Must be greater or equal to 0')
           .max(86400, 'Must be no more than 86400')
       ),
-      MAILER_OTP_LENGTH: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
+      MAILER_OTP_LENGTH: preprocessEmptyNumberInput(
         z.coerce
           .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
           .min(6, 'Must be greater or equal to 6')
           .max(10, 'Must be no more than 10')
       ),
-      PASSWORD_MIN_LENGTH: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
+      PASSWORD_MIN_LENGTH: preprocessEmptyNumberInput(
         z.coerce
           .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
           .min(6, 'Must be greater or equal to 6')
@@ -124,18 +122,9 @@ const PROVIDER_EMAIL = {
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: z.boolean().optional(),
       PASSWORD_HIBP_ENABLED: z.boolean().optional(),
       SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: z.boolean().optional(),
-      MAILER_OTP_EXP: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
-        z.coerce.number().optional()
-      ),
-      MAILER_OTP_LENGTH: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
-        z.coerce.number().optional()
-      ),
-      PASSWORD_MIN_LENGTH: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
-        z.coerce.number().optional()
-      ),
+      MAILER_OTP_EXP: preprocessEmptyNumberInput(z.coerce.number().optional()),
+      MAILER_OTP_LENGTH: preprocessEmptyNumberInput(z.coerce.number().optional()),
+      PASSWORD_MIN_LENGTH: preprocessEmptyNumberInput(z.coerce.number().optional()),
       PASSWORD_REQUIRED_CHARACTERS: z.string().optional(),
     }),
   ]),
@@ -169,14 +158,12 @@ const smsProviderBaseSchema = z.object({
 
 const getSmsOtpPhoneProviderSchema = (optional = false) =>
   z.object({
-    SMS_OTP_EXP: z.preprocess(
-      (val) => (val === '' || val == null ? undefined : val),
+    SMS_OTP_EXP: preprocessEmptyNumberInput(
       z.coerce
         .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
         .min(0, 'Must be 0 or larger')
     ),
-    SMS_OTP_LENGTH: z.preprocess(
-      (val) => (val === '' || val == null ? undefined : val),
+    SMS_OTP_LENGTH: preprocessEmptyNumberInput(
       z.coerce
         .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
         .min(6, 'Must be 6 or larger')
@@ -261,18 +248,15 @@ const smsProviderDisabledSchema = z
 // as the SMS hook will be used in place of the configured SMS provider
 const makeProviderOptionalWhenSMSHookEnabled = (
   config: ProjectAuthConfigData,
-  schema: z.ZodObject<z.ZodRawShape>
+  getSchema: (optional?: boolean) => z.ZodObject<z.ZodRawShape>
 ) => {
-  return config.HOOK_SEND_SMS_ENABLED ? schema.partial() : schema
+  return config.HOOK_SEND_SMS_ENABLED ? getSchema(true).partial() : getSchema()
 }
 
 // getPhoneProviderValidationSchema generate the validation schema for the SMS providers
 // based on whether the SMS hook is enabled
 export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) => {
-  const twilioSchema = makeProviderOptionalWhenSMSHookEnabled(
-    config,
-    getTwilioPhoneProviderSchema()
-  )
+  const twilioSchema = makeProviderOptionalWhenSMSHookEnabled(config, getTwilioPhoneProviderSchema)
     .merge(
       z.object({
         SMS_PROVIDER: z.literal('twilio'),
@@ -287,7 +271,7 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
 
   const twilioVerifySchema = makeProviderOptionalWhenSMSHookEnabled(
     config,
-    getTwilioVerifyPhoneProviderSchema()
+    getTwilioVerifyPhoneProviderSchema
   )
     .merge(
       z.object({
@@ -302,7 +286,7 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
 
   const messagebirdSchema = makeProviderOptionalWhenSMSHookEnabled(
     config,
-    getMessagebirdPhoneProviderSchema()
+    getMessagebirdPhoneProviderSchema
   )
     .merge(
       z.object({
@@ -316,10 +300,7 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
     .merge(getVonagePhoneProviderSchema(true).partial())
     .merge(getTextlocalPhoneProviderSchema(true).partial())
 
-  const vonageSchema = makeProviderOptionalWhenSMSHookEnabled(
-    config,
-    getVonagePhoneProviderSchema()
-  )
+  const vonageSchema = makeProviderOptionalWhenSMSHookEnabled(config, getVonagePhoneProviderSchema)
     .merge(
       z.object({
         SMS_PROVIDER: z.literal('vonage'),
@@ -334,7 +315,7 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
 
   const textlocalSchema = makeProviderOptionalWhenSMSHookEnabled(
     config,
-    getTextlocalPhoneProviderSchema()
+    getTextlocalPhoneProviderSchema
   )
     .merge(
       z.object({

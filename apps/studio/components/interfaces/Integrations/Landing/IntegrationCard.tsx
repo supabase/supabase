@@ -6,7 +6,6 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { IntegrationDefinition } from './Integrations.constants'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { BASE_PATH } from '@/lib/constants'
 
 type IntegrationCardProps = IntegrationDefinition & {
   isInstalled?: boolean
@@ -23,7 +22,7 @@ export const IntegrationLoadingCard = () => {
   return (
     <div className={cn(INTEGRATION_CARD_STYLE, 'pl-5 pr-6 py-3 gap-3 inline-flex h-[110px]')}>
       <div className="w-10 h-10 relative">
-        <ShimmeringLoader className="w-full h-full bg-white border rounded-md" />
+        <ShimmeringLoader className="w-full h-full bg-foreground-light border rounded-md" />
       </div>
       <div className="grow basis-0 w-full flex flex-col justify-between items-start gap-y-2">
         <div className="w-full flex-col justify-start items-start gap-y-1 flex">
@@ -58,10 +57,9 @@ export const IntegrationCard = ({
             {image ? (
               <Image
                 fill
-                src={`${BASE_PATH}/${image}`}
+                src={image}
                 alt={`${name} integration`}
-                className="w-full h-full object-cover invert dark:invert-0"
-                objectFit="cover"
+                className="w-full h-full object-cover"
               />
             ) : (
               <div className="w-12 h-12 text-foreground relative">
@@ -72,7 +70,7 @@ export const IntegrationCard = ({
           <CardContent className="p-6 px-4">
             <div className="flex-col justify-start items-center text-center gap-y-0.5 flex">
               <h3>{name}</h3>
-              <p className="text-foreground-light text-sm">{description}</p>
+              <p className="text-foreground-light text-sm line-clamp-3">{description}</p>
               <div className="flex items-center gap-x-1 mt-4">
                 {status && <Badge variant="warning">{status}</Badge>}
                 {shouldShowOfficialBadge && <Badge>Official</Badge>}

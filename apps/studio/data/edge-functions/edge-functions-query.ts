@@ -3,12 +3,11 @@ import { components } from 'api-types'
 
 import { edgeFunctionsKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type EdgeFunctionsVariables = { projectRef?: string }
 
-export type EdgeFunctionsResponse = components['schemas']['FunctionResponse']
+export type EdgeFunctionsResponse = components['schemas']['FunctionResponse_Output']
 
 export async function getEdgeFunctions(
   { projectRef }: EdgeFunctionsVariables,

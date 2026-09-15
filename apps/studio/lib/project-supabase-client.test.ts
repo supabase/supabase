@@ -1,5 +1,5 @@
 import * as supabaseJs from '@supabase/supabase-js'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { createProjectSupabaseClient } from './project-supabase-client'
 import * as apiKeysUtils from '@/data/api-keys/temp-api-keys-utils'
@@ -13,13 +13,9 @@ vi.mock('@/data/api-keys/temp-api-keys-utils', () => ({
 }))
 
 describe('project-supabase-client', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   describe('createProjectSupabaseClient', () => {
     it('should create a Supabase client with temporary API key', async () => {
-      const mockApiKey = 'test-api-key-123'
+      const mockApiKey = 'sb_temp_nonce1234567890ab_payload1'
       const mockClient = { from: vi.fn() }
       const projectRef = 'test-project-ref'
       const clientEndpoint = 'https://test.supabase.co'
@@ -49,7 +45,7 @@ describe('project-supabase-client', () => {
     })
 
     it('should configure storage to not persist session', async () => {
-      const mockApiKey = 'test-api-key-456'
+      const mockApiKey = 'sb_temp_nonce1234567890ab_payload2'
       const mockClient = { from: vi.fn() }
 
       vi.mocked(apiKeysUtils.getOrRefreshTemporaryApiKey).mockResolvedValue({
@@ -82,7 +78,7 @@ describe('project-supabase-client', () => {
     })
 
     it('should pass through different project refs and endpoints', async () => {
-      const mockApiKey = 'api-key'
+      const mockApiKey = 'sb_temp_nonce1234567890ab_payload3'
       const mockClient = { from: vi.fn() }
 
       vi.mocked(apiKeysUtils.getOrRefreshTemporaryApiKey).mockResolvedValue({
@@ -102,7 +98,7 @@ describe('project-supabase-client', () => {
     })
 
     it('should disable session persistence options', async () => {
-      const mockApiKey = 'api-key'
+      const mockApiKey = 'sb_temp_nonce1234567890ab_payload4'
       const mockClient = { from: vi.fn() }
 
       vi.mocked(apiKeysUtils.getOrRefreshTemporaryApiKey).mockResolvedValue({

@@ -10,11 +10,7 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf node_modules"
-  },
-  "devDependencies": {
-    "tsconfig": "workspace:",
-    "typescript": "catalog:"
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo"
   },
   "dependencies": {
     "@types/react": "catalog:",
@@ -24,6 +20,13 @@
     "shiki": "^4.0.1",
     "ui": "workspace:*",
     "zod": "catalog:"
+  },
+  "devDependencies": {
+    "config": "workspace:*",
+    "tailwindcss": "^4.2.4",
+    "tsconfig": "workspace:",
+    "@typescript/native": "catalog:",
+    "typescript": "catalog:"
   },
   "license": "MIT"
 }

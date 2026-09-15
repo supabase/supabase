@@ -1,14 +1,19 @@
 import { useParams } from 'common'
 import { useState } from 'react'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { AppLayoutDropdownError, AppLayoutDropdownWithPopover } from './AppLayoutDropdown'
+import {
+  AppLayoutDropdownError,
+  AppLayoutDropdownTriggerButton,
+  AppLayoutDropdownWithPopover,
+} from './AppLayoutDropdown'
 import { BranchBadge } from './BranchBadge'
 import { BranchDropdownCommandContent } from './BranchDropdownCommandContent'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import type { Branch } from '@/data/branches/branches-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 interface BranchDropdownProps {
@@ -28,6 +33,12 @@ export const BranchDropdown = ({
 
   const [open, setOpen] = useState(false)
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
+  const track = useTrack()
+
+  const handleOpenChange = (next: boolean) => {
+    if (next) track('header_branch_dropdown_opened')
+    setOpen(next)
+  }
 
   const projectRef = projectDetails?.parent_project_ref || ref
 
@@ -97,10 +108,11 @@ export const BranchDropdown = ({
           <BranchBadge branch={selectedBranch} isBranchingEnabled={isBranchingEnabled} />
         </>
       }
-      linkClassName="flex items-center gap-2 flex-shrink-0"
+      linkClassName="flex items-center gap-2 shrink-0"
       commandContent={commandContent}
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={handleOpenChange}
+      triggerButton={<AppLayoutDropdownTriggerButton aria-label="Show project branches" />}
     />
   )
 }

@@ -6,25 +6,26 @@ breadcrumb: 'Migrations'
 
 ## Before you begin
 
+<Admonition type="note">
+
+Dashboard backups are only available for older projects that still use logical backups. Projects that use physical backups should follow steps in [Backup and Restore using the CLI](/docs/guides/platform/migrating-within-supabase/backup-restore).
+
+</Admonition>
+
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="medium"
   className="text-foreground-light mt-8 mb-6"
 >
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
+  <AccordionItem
       header="Install Postgres and psql"
       id="install-postgres"
     >
       <$Partial path="postgres_installation.mdx" />
     </AccordionItem>
-
-  </div>
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
+  <AccordionItem
       header="Create and configure a new project"
       id="create-project"
     >
@@ -46,7 +47,6 @@ breadcrumb: 'Migrations'
       </StepHikeCompact>
     </AccordionItem>
 
-  </div>
 </Accordion>
 
 ## Things to keep in mind

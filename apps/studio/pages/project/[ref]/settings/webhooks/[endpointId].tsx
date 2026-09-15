@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 
 import { PlatformWebhooksPage } from '@/components/interfaces/Platform/Webhooks'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import type { NextPageWithLayout } from '@/types'
 

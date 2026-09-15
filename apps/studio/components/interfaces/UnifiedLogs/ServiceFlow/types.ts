@@ -28,6 +28,7 @@ export interface BlockFieldConfig {
   getValue: (data: any, enrichedData?: any) => string | number | null | undefined // Function to extract value
   requiresEnrichedData?: boolean // Whether field needs enriched data to display
   maxLength?: number // Maximum length for truncation
+  wrap?: boolean // Allow value to wrap instead of truncate
 }
 
 /**

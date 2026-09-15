@@ -8,6 +8,7 @@ import {
   extractUrls,
   formatBytes,
   formatCurrency,
+  formatRestoreWindow,
   getDatabaseMajorVersion,
   getDistanceLatLonKM,
   getSemanticVersion,
@@ -139,7 +140,7 @@ describe('propsAreEqual', () => {
   })
 
   it('should return false if the props are not equal', () => {
-    const result = propsAreEqual({ a: 1, b: 2 }, { a: 1, b: 3 })
+    propsAreEqual({ a: 1, b: 2 }, { a: 1, b: 3 })
   })
 })
 
@@ -220,15 +221,14 @@ describe('copyToClipboard', () => {
 })
 
 describe('detectBrowser', () => {
-  const originalNavigator = global.navigator
-
   const setUserAgent = (ua: string) => {
     vi.stubGlobal('navigator', { userAgent: ua })
   }
 
   afterEach(() => {
+    // `global.navigator` can't be assigned directly (jsdom defines it as a getter),
+    // so restore it by unstubbing.
     vi.unstubAllGlobals()
-    global.navigator = originalNavigator
   })
 
   it('detects Chrome', () => {
@@ -700,5 +700,17 @@ describe('tablesToSQL', () => {
 
     expect(result).toContain('-- WARNING: This schema is for context only')
     expect(result).not.toContain('CREATE TABLE')
+  })
+})
+
+describe('formatRestoreWindow', () => {
+  it('renders windows under a year in days', () => {
+    expect(formatRestoreWindow(90)).toBe('90 days')
+    expect(formatRestoreWindow(364)).toBe('364 days')
+  })
+
+  it('renders windows of a year or more as 1 year', () => {
+    expect(formatRestoreWindow(365)).toBe('1 year')
+    expect(formatRestoreWindow(400)).toBe('1 year')
   })
 })

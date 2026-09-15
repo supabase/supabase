@@ -1,7 +1,7 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react'
-import { SupabaseEvent, SUPABASE_HOST } from '~/lib/eventsTypes'
+import { SUPABASE_HOST, SupabaseEvent } from '~/lib/eventsTypes'
+import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react'
 
 interface EventsContextValue {
   allEvents: SupabaseEvent[]
@@ -15,14 +15,29 @@ interface EventsContextValue {
   categories: { [key: string]: number }
 }
 
+// Maps Luma event tags to the app's category vocabulary. Keys are lowercased
+// for case-insensitive matching against the tag names returned by Luma.
+const LUMA_TAG_CATEGORY_MAP: Record<string, string> = {
+  hackathons: 'hackathon',
+  meetups: 'meetup',
+  events: 'conference',
+}
+
 const EventsContext = createContext<EventsContextValue | undefined>(undefined)
 
 interface EventsProviderProps {
   children: ReactNode
   notionEvents: SupabaseEvent[]
+  mdxEvents: SupabaseEvent[]
+  onDemandMdxEvents: SupabaseEvent[]
 }
 
-export function EventsProvider({ children, notionEvents }: EventsProviderProps) {
+export function EventsProvider({
+  children,
+  notionEvents,
+  mdxEvents,
+  onDemandMdxEvents,
+}: EventsProviderProps) {
   const [lumaEvents, setLumaEvents] = useState<SupabaseEvent[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -42,9 +57,14 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
 
         if (data.success) {
           const transformedEvents: SupabaseEvent[] = data.events.map((event: any) => {
-            let categories: string[] = []
-            const isMeetup = event.name.toLowerCase().includes('meetup')
-            if (isMeetup) categories.push('meetup')
+            // Categorize by the event's Luma tags: `Hackathons` → hackathon,
+            // `Meetups` → meetup, `Events` → conference. Untagged or unrecognized
+            // events fall back to the generic `conference` bucket.
+            const mappedCategories: string[] = (Array.isArray(event?.tags) ? event.tags : [])
+              .map((tag: string) => LUMA_TAG_CATEGORY_MAP[String(tag).trim().toLowerCase()])
+              .filter(Boolean)
+            const categories: string[] =
+              mappedCategories.length > 0 ? Array.from(new Set(mappedCategories)) : ['conference']
 
             const rawUrl = event?.url || ''
             let safeUrl: string | undefined
@@ -73,7 +93,8 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
               location: new Intl.ListFormat('en', { style: 'narrow', type: 'unit' }).format(
                 [event?.city, event?.country].filter(Boolean)
               ),
-              hosts: isMeetup || event?.hosts?.length === 0 ? [SUPABASE_HOST] : event?.hosts || [],
+              // All Luma events are Supabase-hosted regardless of which calendar they're from.
+              hosts: [SUPABASE_HOST],
               source: 'luma' as const,
               disable_page_build: true,
               link: safeUrl ? { href: safeUrl, target: '_blank' as const } : undefined,
@@ -91,10 +112,19 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
     fetchLumaEvents()
   }, [])
 
-  // Merge Notion (server) + Luma (client) events
+  // Merge Notion (server) + mdx (server) + Luma (client) events, showing only today and future.
   const allEvents = useMemo(() => {
-    return [...notionEvents, ...lumaEvents]
-  }, [notionEvents, lumaEvents])
+    const now = new Date()
+    const startOfToday = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+    )
+    return [...notionEvents, ...mdxEvents, ...lumaEvents].filter((event) => {
+      const eventDate = new Date(event.end_date || event.date)
+      return eventDate >= startOfToday
+    })
+  }, [notionEvents, mdxEvents, lumaEvents])
+
+  const isOnDemandView = selectedCategories.includes('on-demand')
 
   const categories = useMemo(() => {
     const counts: { [key: string]: number } = { all: 0 }
@@ -106,17 +136,26 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
       })
     })
 
+    if (onDemandMdxEvents.length > 0) {
+      counts['on-demand'] = onDemandMdxEvents.length
+    }
+
     return counts
-  }, [allEvents])
+  }, [allEvents, onDemandMdxEvents.length])
 
   const toggleCategory = (category: string) => {
+    if (category === 'on-demand') {
+      setSelectedCategories((prev) => (prev.includes('on-demand') ? ['all'] : ['on-demand']))
+      return
+    }
+
     if (category === 'all') {
       setSelectedCategories(['all'])
       return
     }
 
     setSelectedCategories((prev) => {
-      const withoutAll = prev.filter((c) => c !== 'all')
+      const withoutAll = prev.filter((c) => c !== 'all' && c !== 'on-demand')
 
       if (withoutAll.includes(category)) {
         const updated = withoutAll.filter((c) => c !== category)
@@ -128,9 +167,9 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
   }
 
   const filteredEvents = useMemo(() => {
-    let filtered = allEvents
+    let filtered = isOnDemandView ? onDemandMdxEvents : allEvents
 
-    if (!selectedCategories.includes('all')) {
+    if (!isOnDemandView && !selectedCategories.includes('all')) {
       filtered = filtered.filter((event) =>
         event.categories?.some((cat) => selectedCategories.includes(cat))
       )
@@ -151,36 +190,14 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
     return [...filtered].sort((a, b) => {
       const dateA = new Date(a.date).getTime()
       const dateB = new Date(b.date).getTime()
-      return dateB - dateA
+      return isOnDemandView ? dateB - dateA : dateA - dateB
     })
-  }, [allEvents, selectedCategories, searchQuery])
+  }, [allEvents, onDemandMdxEvents, isOnDemandView, selectedCategories, searchQuery])
 
   const featuredEvent = useMemo(() => {
     if (allEvents.length === 0) return undefined
 
-    const now = new Date()
-
-    const upcomingEvents = allEvents.filter((event) => {
-      const eventDate = new Date(event.end_date || event.date)
-      return eventDate >= now
-    })
-
-    const pastEvents = allEvents.filter((event) => {
-      const eventDate = new Date(event.end_date || event.date)
-      return eventDate < now
-    })
-
-    if (upcomingEvents.length > 0) {
-      return upcomingEvents.sort(
-        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-      )[0]
-    }
-
-    if (pastEvents.length > 0) {
-      return pastEvents.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]
-    }
-
-    return undefined
+    return [...allEvents].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0]
   }, [allEvents])
 
   const value: EventsContextValue = {

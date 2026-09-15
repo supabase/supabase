@@ -10,6 +10,14 @@ vi.mock('@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode', (
   DataTableColumnStatusCode: ({ value }: { value: number }) => <span>{value}</span>,
 }))
 
+vi.mock('@/components/ui/ShortcutTooltip', () => ({
+  ShortcutTooltip: ({ children }: { children: unknown }) => <>{children}</>,
+}))
+
+vi.mock('@/state/shortcuts/useShortcut', () => ({
+  useShortcut: vi.fn(),
+}))
+
 vi.mock('@/components/ui/ButtonTooltip', () => ({
   ButtonTooltip: ({
     icon,
@@ -19,18 +27,15 @@ vi.mock('@/components/ui/ButtonTooltip', () => ({
     type: _type,
     ...props
   }: any) => (
-    <button type="button" {...props}>
+    <button tabIndex={0} type="button" {...props}>
       {icon}
       {children}
     </button>
   ),
 }))
 
-vi.mock('ui-patterns', async () => {
-  const actual = await vi.importActual<typeof import('ui-patterns')>('ui-patterns')
-
+vi.mock('ui-patterns/TimestampInfo', async () => {
   return {
-    ...actual,
     TimestampInfo: ({ utcTimestamp, className }: { utcTimestamp: string; className?: string }) => (
       <span className={className}>{utcTimestamp}</span>
     ),
@@ -51,6 +56,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
         deliverySearch=""
         filteredDeliveries={allDeliveries}
         selectedEndpoint={selectedEndpoint}
+        onCopyUrl={vi.fn()}
         onDeliverySearchChange={vi.fn()}
         onOpenDelivery={vi.fn()}
         onRetryDelivery={vi.fn()}
@@ -106,6 +112,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
         deliverySearch="project"
         filteredDeliveries={projectDeliveries}
         selectedEndpoint={selectedEndpoint}
+        onCopyUrl={vi.fn()}
         onDeliverySearchChange={vi.fn()}
         onOpenDelivery={vi.fn()}
         onRetryDelivery={vi.fn()}

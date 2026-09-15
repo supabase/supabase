@@ -19,7 +19,7 @@ const platformRankings = [
 export const YearOfAI = () => {
   return (
     <>
-      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x border-b w-[95%] md:w-full">
+      <section className="relative max-w-240 h-[240px] md:h-[360px] mx-auto border-x border-b w-[95%] md:w-full">
         {/* Grid background */}
         <AnimatedGridBackground
           cols={5}
@@ -42,7 +42,7 @@ export const YearOfAI = () => {
         </div>
       </section>
 
-      <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12 grid md:grid-cols-2 gap-8 items-start w-[95%] md:w-full">
+      <div className="relative max-w-240 mx-auto border-x border-b px-4 lg:px-8 py-12 grid md:grid-cols-2 gap-8 items-start w-[95%] md:w-full">
         <h3 className="text-lg">
           Developers are not just writing code. They're talking to their databases.
         </h3>
@@ -53,7 +53,7 @@ export const YearOfAI = () => {
         </p>
       </div>
 
-      <div className="relative max-w-[60rem] mx-auto border-x border-b w-[95%] md:w-full">
+      <div className="relative max-w-240 mx-auto border-x border-b w-[95%] md:w-full">
         <div className="px-4 lg:px-8 py-4">
           <h3 className="text-base text-foreground-light">Top MCP Tools by Usage</h3>
         </div>
@@ -62,7 +62,7 @@ export const YearOfAI = () => {
           {toolRankings.map((item, index) => (
             <div
               key={item.tool}
-              className="border-r border-muted last:border-r-0 [&:nth-child(2n)]:border-r-0 lg:[&:nth-child(2n)]:border-r lg:[&:nth-child(4n)]:border-r-0 [&:nth-child(-n+2)]:border-b lg:[&:nth-child(-n+2)]:border-b-0"
+              className="border-r border-muted last:border-r-0 nth-[2n]:border-r-0 lg:nth-[2n]:border-r lg:nth-[4n]:border-r-0 nth-[-n+2]:border-b lg:nth-[-n+2]:border-b-0"
             >
               <SurveyStatCard label={item.tool} percent={item.share} />
             </div>
@@ -70,7 +70,7 @@ export const YearOfAI = () => {
         </div>
       </div>
 
-      <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12 grid md:grid-cols-2 gap-8 w-[95%] md:w-full">
+      <div className="relative max-w-240 mx-auto border-x border-b px-4 lg:px-8 py-12 grid md:grid-cols-2 gap-8 w-[95%] md:w-full">
         <h3 className="text-lg">The tools developers use have changed, dramatically.</h3>
 
         <p className="text-base text-foreground-lighter">
@@ -79,7 +79,7 @@ export const YearOfAI = () => {
         </p>
       </div>
 
-      <div className="relative max-w-[60rem] mx-auto border-x border-b w-[95%] md:w-full">
+      <div className="relative max-w-240 mx-auto border-x border-b w-[95%] md:w-full">
         <div className="px-4 lg:px-8 py-4">
           <h3 className="text-base text-foreground-light">Top Platforms by Users</h3>
         </div>
@@ -87,7 +87,7 @@ export const YearOfAI = () => {
           {platformRankings.map((item, index) => (
             <div
               key={item.client}
-              className="border-r border-muted last:border-r-0 [&:nth-child(2n)]:border-r-0 lg:[&:nth-child(2n)]:border-r lg:[&:nth-child(4n)]:border-r-0 [&:nth-child(-n+2)]:border-b lg:[&:nth-child(-n+2)]:border-b-0"
+              className="border-r border-muted last:border-r-0 nth-[2n]:border-r-0 lg:nth-[2n]:border-r lg:nth-[4n]:border-r-0 nth-[-n+2]:border-b lg:nth-[-n+2]:border-b-0"
             >
               <SurveyStatCard label={item.client} percent={item.share} />
             </div>

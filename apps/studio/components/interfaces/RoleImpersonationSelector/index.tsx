@@ -1,135 +1,125 @@
-import { useState } from 'react'
-import { cn, DropdownMenuSeparator } from 'ui'
+import { Check, Database, UserCheck, UserX } from 'lucide-react'
+import { Separator, ToggleGroup, ToggleGroupItem } from 'ui'
 
-import { AnonIcon, AuthenticatedIcon, ServiceRoleIcon } from './Icons'
-import RoleImpersonationRadio from './RoleImpersonationRadio'
-import UserImpersonationSelector from './UserImpersonationSelector'
-import { PostgrestRole } from '@/lib/role-impersonation'
-import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
+import { UserImpersonationSelector } from './UserImpersonationSelector'
+import { useRoleImpersonationSelection } from './useRoleImpersonationSelection'
+import {
+  useRoleImpersonationStateSnapshot,
+  type RoleImpersonationController,
+} from '@/state/role-impersonation-state'
 
 export interface RoleImpersonationSelectorProps {
+  header?: string
   serviceRoleLabel?: string
-  padded?: boolean
   disallowAuthenticatedOption?: boolean
+  title?: string
 }
 
-export const RoleImpersonationSelector = ({
-  serviceRoleLabel,
-  padded = true,
-  disallowAuthenticatedOption = false,
-}: RoleImpersonationSelectorProps) => {
-  const state = useRoleImpersonationStateSnapshot()
+/**
+ * Tightly coupled with the global role impersonation store.
+ * Use RoleImpersonationSelectorInterface to control the logic externally.
+ */
+export const RoleImpersonationSelector = (props: RoleImpersonationSelectorProps) => {
+  const state = useRoleImpersonationStateSnapshot() as unknown as RoleImpersonationController
 
-  const [selectedOption, setSelectedOption] = useState<PostgrestRole | undefined>(() => {
-    if (
-      state.role?.type === 'postgrest' &&
-      (state.role.role === 'anon' || state.role.role === 'authenticated')
-    ) {
-      return state.role.role
-    }
+  return <RoleImpersonationSelectorInterface {...props} state={state} />
+}
 
-    return 'service_role'
-  })
+type RoleImpersonationSelectorInterfaceProps = RoleImpersonationSelectorProps & {
+  state: RoleImpersonationController
+}
 
-  const isAuthenticatedOptionFullySelected = Boolean(
-    selectedOption === 'authenticated' &&
-    state.role?.type === 'postgrest' &&
-    state.role.role === 'authenticated' &&
-    (('user' in state.role && state.role.user) ||
-      ('externalAuth' in state.role && state.role.externalAuth)) // Check for either auth type
-  )
+export const RoleImpersonationSelectorInterface = (
+  props: RoleImpersonationSelectorInterfaceProps
+) => {
+  const { state } = props
+  const serviceRoleLabel = props.serviceRoleLabel ?? 'Postgres'
+  const disallowAuthenticatedOption = props.disallowAuthenticatedOption ?? false
+  const { selectedOption, onSelectedChange, keepAuthenticatedSelected } =
+    useRoleImpersonationSelection(state)
 
-  function onSelectedChange(value: PostgrestRole) {
-    if (value === 'service_role') {
-      // do not set a role for service role
-      // as the default role is the "service role"
-      state.setRole(undefined)
-    }
-
-    if (value === 'anon') {
-      state.setRole({
-        type: 'postgrest',
-        role: value,
-      })
-    }
-
-    setSelectedOption(value)
-  }
+  const roleSummary = {
+    service_role: 'Bypasses RLS and can return all rows.',
+    anon: 'Returns rows available to anonymous users.',
+    authenticated: 'Returns rows available to the selected user.',
+  }[selectedOption]
 
   return (
-    <>
-      <div className={cn('flex flex-col gap-3', padded ? 'p-5' : 'pb-5')}>
-        <p className="text-foreground text-base">Database role settings</p>
-
-        <form
-          onSubmit={(e) => {
-            // don't allow form submission
-            e.preventDefault()
+    <div className="flex w-80 flex-col">
+      <form
+        className="p-3"
+        onSubmit={(event) => {
+          event.preventDefault()
+        }}
+      >
+        <ToggleGroup
+          type="single"
+          orientation="vertical"
+          value={selectedOption}
+          onValueChange={(value) => {
+            if (value === 'service_role' || value === 'anon' || value === 'authenticated') {
+              void onSelectedChange(value)
+            }
           }}
+          variant="default"
+          aria-label={props.header ?? props.title ?? 'Run query as role'}
+          className="w-full flex-col items-stretch gap-0.5"
         >
-          <fieldset className="flex gap-3">
-            <RoleImpersonationRadio
-              value="service_role"
-              isSelected={selectedOption === 'service_role'}
-              onSelectedChange={onSelectedChange}
-              label={serviceRoleLabel}
-              icon={<ServiceRoleIcon isSelected={selectedOption === 'service_role'} />}
+          <ToggleGroupItem value="service_role" className="w-full justify-between text-left">
+            <span className="flex min-w-0 items-center gap-3">
+              <Database size={16} strokeWidth={1.5} className="shrink-0" />
+              <span className="flex min-w-0 flex-col items-start">
+                <span>{serviceRoleLabel}</span>
+                <span className="text-xs font-normal text-foreground-lighter">Superuser</span>
+              </span>
+            </span>
+            {selectedOption === 'service_role' && <Check size={14} />}
+          </ToggleGroupItem>
+
+          <ToggleGroupItem value="anon" className="w-full justify-between text-left">
+            <span className="flex min-w-0 items-center gap-3">
+              <UserX size={16} strokeWidth={1.5} className="shrink-0" />
+              <span className="flex min-w-0 flex-col items-start">
+                <span>Anonymous</span>
+                <span className="text-xs font-normal text-foreground-lighter">Not logged in</span>
+              </span>
+            </span>
+            {selectedOption === 'anon' && <Check size={14} />}
+          </ToggleGroupItem>
+
+          {!disallowAuthenticatedOption && (
+            <ToggleGroupItem value="authenticated" className="w-full justify-between text-left">
+              <span className="flex min-w-0 items-center gap-3">
+                <UserCheck size={16} strokeWidth={1.5} className="shrink-0" />
+                <span className="flex min-w-0 flex-col items-start">
+                  <span>Authenticated</span>
+                  <span className="text-xs font-normal text-foreground-lighter">
+                    Logged-in user
+                  </span>
+                </span>
+              </span>
+              {selectedOption === 'authenticated' && <Check size={14} />}
+            </ToggleGroupItem>
+          )}
+        </ToggleGroup>
+
+        {!disallowAuthenticatedOption && (
+          <>
+            <Separator className="my-2.5" />
+            <UserImpersonationSelector
+              state={state}
+              disabled={selectedOption !== 'authenticated'}
+              onUserImpersonationCleared={keepAuthenticatedSelected}
             />
-
-            <RoleImpersonationRadio
-              value="anon"
-              isSelected={selectedOption === 'anon'}
-              onSelectedChange={onSelectedChange}
-              icon={<AnonIcon isSelected={selectedOption === 'anon'} />}
-            />
-
-            {!disallowAuthenticatedOption && (
-              <RoleImpersonationRadio
-                value="authenticated"
-                isSelected={
-                  selectedOption === 'authenticated' &&
-                  (isAuthenticatedOptionFullySelected || 'partially')
-                }
-                onSelectedChange={onSelectedChange}
-                icon={<AuthenticatedIcon isSelected={selectedOption === 'authenticated'} />}
-              />
-            )}
-          </fieldset>
-        </form>
-
-        {selectedOption === 'service_role' && (
-          <p className="text-foreground-light text-sm">
-            <span className="text-foreground">The default Postgres/superuser role</span>
-            <br />
-            This has admin privileges and will bypass Row Level Security (RLS) policies.
-          </p>
+          </>
         )}
-
-        {selectedOption === 'anon' && (
-          <p className="text-foreground-light text-sm">
-            <span className="text-foreground">For "anonymous access"</span>
-            <br />
-            This is the role which the API (PostgREST) will use when a user is not logged in. <br />
-            It will respect Row Level Security (RLS) policies.
-          </p>
-        )}
-
-        {selectedOption === 'authenticated' && (
-          <p className="text-foreground-light text-sm">
-            <span className="text-foreground">For "authenticated access"</span>
-            <br />
-            This is the role which the API (PostgREST) will use when a user is logged in. <br />
-            It will respect Row Level Security (RLS) policies.
-          </p>
-        )}
-      </div>
-
-      {selectedOption === 'authenticated' && (
-        <>
-          <DropdownMenuSeparator />
-          <UserImpersonationSelector />
-        </>
-      )}
-    </>
+      </form>
+      <Separator />
+      <footer className="px-3 py-2">
+        <p aria-live="polite" className="text-xs text-foreground-lighter">
+          {roleSummary}
+        </p>
+      </footer>
+    </div>
   )
 }

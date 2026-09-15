@@ -52,7 +52,7 @@ export function useCommandMenu({
 
       if (supportsOperators) {
         items.push({
-          value: 'group',
+          value: '__new_group__',
           label: 'New Group',
         })
       }

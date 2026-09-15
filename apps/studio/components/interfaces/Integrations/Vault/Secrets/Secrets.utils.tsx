@@ -33,7 +33,7 @@ export const formatSecretColumns = (): Column<VaultSecret>[] => {
               col.id === 'secret' && 'ml-8'
             )}
           >
-            <p className="!text-foreground">{col.name}</p>
+            <p className="text-foreground!">{col.name}</p>
           </div>
         )
       },

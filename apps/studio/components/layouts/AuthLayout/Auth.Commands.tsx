@@ -38,13 +38,6 @@ export function useAuthGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/auth/users`,
         defaultHidden: true,
       },
-      {
-        id: 'nav-auth-policies',
-        name: 'Policies',
-        value: 'Auth: Policies (RLS)',
-        route: `/project/${ref}/auth/policies`,
-        defaultHidden: true,
-      },
       ...(authenticationSignInProviders
         ? [
             {
@@ -59,7 +52,7 @@ export function useAuthGotoCommands(options?: CommandOptions) {
       ...(authenticationThirdPartyAuth
         ? [
             {
-              id: 'nav-auth-providers',
+              id: 'nav-auth-providers-third-party',
               name: 'Providers (Third Party)',
               value: 'Auth: Providers (Third Party)',
               route: `/project/${ref}/auth/third-party`,

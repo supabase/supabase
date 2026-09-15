@@ -5,8 +5,9 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
-import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
+import { Button, Card, CardFooter, Form } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BillingCustomerDataForm } from './BillingCustomerDataForm'
@@ -20,10 +21,11 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
-import NoPermission from '@/components/ui/NoPermission'
+import { AlertError } from '@/components/ui/AlertError'
+import { NoPermission } from '@/components/ui/NoPermission'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
 import { organizationKeys } from '@/data/organizations/keys'
+import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax-id-query'
@@ -46,19 +48,27 @@ export const BillingCustomerData = () => {
     'stripe.customer'
   )
 
+  const { ref, inView } = useInView({ triggerOnce: true })
+
   const {
     data: customerProfile,
     error,
     isPending: isLoading,
     isSuccess,
-  } = useOrganizationCustomerProfileQuery({ slug }, { enabled: canReadBillingCustomerData })
+  } = useOrganizationCustomerProfileQuery(
+    { slug },
+    {
+      enabled: canReadBillingCustomerData && inView,
+      select: (data) => (data ? { address: data.address, billing_name: data.billing_name } : data),
+    }
+  )
 
   const {
     data: taxId,
     error: errorLoadingTaxId,
     isPending: isLoadingTaxId,
     isSuccess: loadedTaxId,
-  } = useOrganizationTaxIdQuery({ slug })
+  } = useOrganizationTaxIdQuery({ slug }, { enabled: inView })
 
   const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation({
     onError: () => {},
@@ -159,9 +169,12 @@ export const BillingCustomerData = () => {
       }) as any,
     [resolvedTheme]
   )
+  const isPartnerBilledOrganization = isPartnerBillingOrganization(
+    selectedOrganization?.billing_partner
+  )
 
   return (
-    <ScaffoldSection>
+    <ScaffoldSection ref={ref}>
       <ScaffoldSectionDetail>
         <div className="sticky space-y-2 top-12 pr-3">
           <p className="text-foreground text-base m-0">Billing Address &amp; Tax ID</p>
@@ -174,8 +187,7 @@ export const BillingCustomerData = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {selectedOrganization?.managed_by !== undefined &&
-        selectedOrganization?.managed_by !== 'supabase' ? (
+        {selectedOrganization && isPartnerBilledOrganization ? (
           <PartnerManagedResource
             managedBy={selectedOrganization?.managed_by}
             resource="Billing Addresses"
@@ -227,12 +239,12 @@ export const BillingCustomerData = () => {
                           </span>
                         )}
                         <div className="flex items-center gap-2">
-                          <Button type="default" onClick={handleReset} disabled={isSubmitDisabled}>
+                          <Button onClick={handleReset} disabled={isSubmitDisabled}>
                             Cancel
                           </Button>
                           <Button
-                            type="primary"
-                            htmlType="submit"
+                            variant="primary"
+                            type="submit"
                             disabled={isSubmitDisabled}
                             loading={isSubmitting}
                           >

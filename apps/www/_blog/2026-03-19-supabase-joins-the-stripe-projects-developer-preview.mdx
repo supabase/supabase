@@ -1,5 +1,5 @@
 ---
-title: 'Supabase joins the Stripe Projects developer preview'
+title: 'Supabase Joins the Stripe Projects Developer Preview'
 description: 'Supabase is a co-design partner in the Stripe Projects developer preview.'
 author: gregor_vand, ana_mogul
 date: '2026-03-19'
@@ -29,7 +29,7 @@ Install the Stripe CLI, then run:
 ```bash
 stripe plugin install projects
 stripe projects init my-app
-stripe projects add supabase/supabase:free
+stripe projects add supabase/project
 stripe projects env --sync
 ```
 
@@ -60,7 +60,7 @@ The database lives in your own Supabase account. You keep full access to the Sup
 You can rotate your database credentials at any time:
 
 ```bash
-stripe projects rotate supabase-supabase:free
+stripe projects rotate supabase/project
 ```
 
 This updates the stored secrets in your Stripe Project automatically.
@@ -71,7 +71,7 @@ This is a developer preview. Install the Stripe CLI, then run:
 
 ```bash
 stripe projects init my-app
-stripe projects add supabase/supabase:free
+stripe projects add supabase/project
 ```
 
 [Install the Stripe CLI](https://docs.stripe.com/stripe-cli/install)

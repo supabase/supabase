@@ -1,6 +1,6 @@
 ---
 id: 'auth-keycloak'
-title: 'Login with Keycloak'
+title: 'Sign in with Keycloak'
 description: 'Add Keycloak OAuth to your Supabase project'
 ---
 
@@ -23,11 +23,11 @@ Keycloak OAuth consists of five broad steps:
 
 ## Access your Keycloak admin console
 
-- Login by visiting [`http://localhost:8080`](http://localhost:8080) and clicking on "Administration Console".
+- Sign in by visiting [`http://localhost:8080`](http://localhost:8080) and clicking on "Administration Console".
 
 ## Create a Keycloak realm
 
-- Once you've logged in to the Keycloak console, you can add a realm from the side panel. The default realm should be named "Master".
+- Once you've signed in to the Keycloak console, you can add a realm from the side panel. The default realm should be named "Master".
 - After you've added a new realm, you can retrieve the `issuer` from the "OpenID Endpoint Configuration" endpoint. The `issuer` will be used as the `Keycloak URL`.
 - You can find this endpoint from the realm settings under the "General Tab" or visit [`http://localhost:8080/realms/my_realm_name/.well-known/openid-configuration`](http://localhost:8080/realms/my_realm_name/.well-known/openid-configuration)
 
@@ -57,7 +57,7 @@ Under the "Credentials" tab, the `Secret` value will be used as the `client secr
 
 ![Obtain the client secret](/docs/img/guides/auth-keycloak/keycloak-client-secret.png)
 
-## Add login code to your client app
+## Add sign-in code to your client app
 
 Since Keycloak version 22, the `openid` scope must be passed. Add this to the [`supabase.auth.signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) method.
 
@@ -122,6 +122,18 @@ suspend fun signInWithKeycloak() {
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.KeyCloak` as the provider:
+
+```c#
+var state = await supabase.Auth.SignIn(Provider.KeyCloak, new SignInOptions { Scopes = "openid" });
+var signInUrl = state.Uri;
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 <$Partial path="oauth_pkce_flow.mdx" />
@@ -168,6 +180,17 @@ const supabase = createClient('https://your-project-id.supabase.co', 'sb_publish
 suspend fun signOut() {
 	supabase.auth.signOut()
 }
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs out, call [SignOut()](/docs/reference/csharp/sign-out) to remove them from the browser session and any objects from local storage:
+
+```c#
+await supabase.Auth.SignOut();
 ```
 
 </TabPanel>

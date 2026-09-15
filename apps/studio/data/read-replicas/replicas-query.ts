@@ -7,6 +7,7 @@ import type { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { EMPTY_ARR } from '@/lib/void'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 /**
@@ -31,18 +32,23 @@ export type ReadReplicasVariables = {
   projectRef?: string
 }
 
-export type Database = components['schemas']['DatabaseDetailResponse']
+export type Database = components['schemas']['DatabaseDetailResponse_Output']
 
-export async function getReadReplicas({ projectRef }: ReadReplicasVariables, signal?: AbortSignal) {
+export async function getReadReplicas(
+  { projectRef }: ReadReplicasVariables,
+  signal?: AbortSignal,
+  headers?: HeadersInit
+) {
   if (!projectRef) throw new Error('Project ref is required')
 
   const { data, error } = await get(`/platform/projects/{ref}/databases`, {
     params: { path: { ref: projectRef } },
+    headers,
     signal,
   })
 
   if (error) handleError(error)
-  return data
+  return Array.isArray(data) ? data : EMPTY_ARR
 }
 
 export type ReadReplicasData = Awaited<ReturnType<typeof getReadReplicas>>

@@ -9,6 +9,7 @@ import {
   deleteBucket,
   deleteItem,
   downloadFile,
+  getStorageRowNameInput,
   navigateToBucket,
   navigateToStorageFiles,
   renameItem,
@@ -320,7 +321,7 @@ test.describe('Storage', () => {
     await page.getByRole('menuitem', { name: 'Rename' }).click()
 
     // Clear the input and press Enter with empty name
-    const nameInput = page.getByRole('textbox')
+    const nameInput = getStorageRowNameInput(page)
     await expect(nameInput, 'Rename input should be visible').toBeVisible()
     await nameInput.clear()
     await nameInput.press('Enter')
@@ -355,7 +356,7 @@ test.describe('Storage', () => {
     await page.getByRole('menuitem', { name: 'Rename' }).click()
 
     // Clear the input and click outside to blur
-    const nameInput = page.getByRole('textbox')
+    const nameInput = getStorageRowNameInput(page)
     await expect(nameInput, 'Rename input should be visible').toBeVisible()
     await nameInput.clear()
 

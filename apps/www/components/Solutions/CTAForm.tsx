@@ -15,7 +15,7 @@ const UseCases: FC<Props> = () => {
     >
       <div className="md:h-full w-full flex flex-col justify-between gap-4 lg:gap-8">
         <div className="flex flex-col gap-2 md:max-w-md">
-          <h1 className="h1 !m-0">
+          <h1 className="h1 m-0!">
             Talk to our
             <br className="hidden md:block" /> Partnerships team
           </h1>

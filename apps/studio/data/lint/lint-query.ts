@@ -5,12 +5,13 @@ import { lintKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { EMPTY_ARR } from '@/lib/void'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type ProjectLintsVariables = {
   projectRef?: string
 }
-type ProjectLintResponse = components['schemas']['GetProjectLintsResponse']
+type ProjectLintResponse = components['schemas']['GetProjectLintsResponse_Output']
 export type Lint = ProjectLintResponse[0]
 export type LINT_TYPES = ProjectLintResponse[0]['name']
 
@@ -24,7 +25,7 @@ export async function getProjectLints({ projectRef }: ProjectLintsVariables, sig
 
   if (error) handleError(error)
 
-  return data
+  return Array.isArray(data) ? data : EMPTY_ARR
 }
 
 export type ProjectLintsData = Awaited<ReturnType<typeof getProjectLints>>

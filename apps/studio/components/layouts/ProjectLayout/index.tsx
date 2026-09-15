@@ -1,16 +1,22 @@
-import { LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, mergeRefs, useFlag, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
+import { XIcon } from 'lucide-react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import {
   forwardRef,
   Fragment,
+  isValidElement,
   useEffect,
   useLayoutEffect,
+  useRef,
   type PropsWithChildren,
   type ReactNode,
 } from 'react'
 import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
   cn,
   LogoLoader,
   ResizableHandle,
@@ -21,13 +27,12 @@ import {
 } from 'ui'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
-import { useSetMainScrollContainer } from '../MainScrollContainerContext'
+import { useMainScrollContainer, useSetMainScrollContainer } from '../MainScrollContainerContext'
 import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
-import ProductMenuBar from '../Navigation/ProductMenuBar'
+import { ProductMenuBar } from '../Navigation/ProductMenuBar'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import { getSectionKeyFromPathname, MobileMenuContent } from './LayoutHeader/MobileMenuContent'
-import { LoadingState } from './LoadingState'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import { PauseFailedState } from './PauseFailedState'
 import { PausingState } from './PausingState'
@@ -39,8 +44,11 @@ import { UnhealthyState } from './UnhealthyState'
 import { UpgradingState } from './UpgradingState'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
+import { BannerExplorer } from '@/components/ui/BannerStack/Banners/BannerExplorer'
 import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import PartnerIcon from '@/components/ui/PartnerIcon'
 import { ResourceExhaustionWarningBanner } from '@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
@@ -49,6 +57,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { getPathnameWithoutQuery } from '@/lib/pathname.utils'
 import { useAppStateSnapshot } from '@/state/app-state'
@@ -80,10 +89,27 @@ const routesToIgnorePostgrestConnection = [
   '/project/[ref]/reports',
 ]
 
+const DEFAULT_PROJECT_INTEGRATION_BANNER_DISMISS_KEY =
+  LOCAL_STORAGE_KEYS.PROJECT_INTEGRATION_BANNER_DISMISSED('unknown', 'unknown')
+
+function getProjectIntegrationBannerDismissKey({
+  projectRef,
+  integrationSource,
+}: {
+  projectRef?: string
+  integrationSource?: string | null
+}) {
+  if (!projectRef || !integrationSource) return DEFAULT_PROJECT_INTEGRATION_BANNER_DISMISS_KEY
+
+  return LOCAL_STORAGE_KEYS.PROJECT_INTEGRATION_BANNER_DISMISSED(projectRef, integrationSource)
+}
+
 export interface ProjectLayoutProps {
   isLoading?: boolean
   isBlocking?: boolean
   product?: string
+  productMenuBadge?: ReactNode
+  productMenuHeader?: ReactNode
   productMenu?: ReactNode
   browserTitle?: {
     entity?: string
@@ -102,6 +128,8 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       isLoading = false,
       isBlocking = true,
       product = '',
+      productMenuBadge,
+      productMenuHeader,
       productMenu,
       browserTitle,
       children,
@@ -119,7 +147,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const { data: resourceWarnings } = useResourceWarningsQuery({
       slug: selectedOrganization?.slug,
     })
-    const projectResourceWarnings = resourceWarnings?.find(
+    const projectResourceWarnings = (Array.isArray(resourceWarnings) ? resourceWarnings : []).find(
       (w) => w.project === selectedProject?.ref
     )
     const isComputeNearExhaustion =
@@ -129,16 +157,37 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       !!projectResourceWarnings?.disk_io_exhaustion
     const isNanoCompute = selectedProject?.infra_compute_size === 'nano'
     const showUpgradeBanner = isNanoCompute && isComputeNearExhaustion
+
+    const isExplorerEnabled = useFlag('explorer')
+
     const [isFreeMicroUpgradeBannerDismissed] = useLocalStorageQuery(
       LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED(selectedProject?.ref ?? ''),
       false
     )
+    const [isProjectIntegrationBannerDismissed, setIsProjectIntegrationBannerDismissed] =
+      useLocalStorageQuery(
+        getProjectIntegrationBannerDismissKey({
+          projectRef: selectedProject?.ref,
+          integrationSource: selectedProject?.integration_source,
+        }),
+        false
+      )
+    const [isExplorerBannerDismissed, , { isSuccess: isLocalStorageReady }] = useLocalStorageQuery(
+      LOCAL_STORAGE_KEYS.EXPLORER_BANNER_DISMISSED,
+      false
+    )
+
     const { showSidebar } = useAppStateSnapshot()
-    const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
+    const {
+      content: mobileSheetContent,
+      setContent: setMobileSheetContent,
+      registerOpenMenu,
+    } = useMobileSheet()
 
     const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
     const currentSectionKey = getSectionKeyFromPathname(pathname)
 
+    const mainScrollContainer = useMainScrollContainer()
     const setMainScrollContainer = useSetMainScrollContainer()
     const combinedRef = mergeRefs(ref, setMainScrollContainer)
 
@@ -175,6 +224,9 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       router.pathname.includes('/project/[ref]/functions') ||
       router.pathname.includes('/project/[ref]/logs')
     const showPausedState = isPaused && !ignorePausedState
+    const showStripeProjectBanner =
+      selectedProject?.integration_source === 'stripe_projects' &&
+      !isProjectIntegrationBannerDismissed
 
     useEffect(() => {
       if (!selectedProject?.ref) return
@@ -198,19 +250,51 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       dismissBanner,
     ])
 
-    useLayoutEffect(() => {
-      const unregister = registerOpenMenu(() => {
-        setMobileSheetContent(
-          <MobileMenuContent
-            currentProductMenu={productMenu ?? null}
-            currentProduct={product}
-            currentSectionKey={currentSectionKey}
-            onCloseSheet={() => setMobileSheetContent(null)}
-          />
-        )
+    useEffect(() => {
+      if (!isExplorerEnabled || !isLocalStorageReady || isExplorerBannerDismissed) return
+
+      addBanner({
+        id: 'explorer-banner',
+        priority: 2,
+        isDismissed: false,
+        content: <BannerExplorer />,
       })
+    }, [addBanner, isExplorerEnabled, isExplorerBannerDismissed, isLocalStorageReady])
+
+    const mobileSheetContentRef = useRef(mobileSheetContent)
+    useLayoutEffect(() => {
+      mobileSheetContentRef.current = mobileSheetContent
+    }, [mobileSheetContent])
+
+    useLayoutEffect(() => {
+      const menu = (
+        <MobileMenuContent
+          currentProductMenu={productMenu ?? null}
+          currentProductMenuHeader={productMenuHeader}
+          currentProduct={product}
+          currentSectionKey={currentSectionKey}
+          onCloseSheet={() => setMobileSheetContent(null)}
+        />
+      )
+      const unregister = registerOpenMenu(() => setMobileSheetContent(menu))
+      // Keep resource navigation in an already open sheet in sync with the layout.
+      const currentContent = mobileSheetContentRef.current
+      if (isValidElement(currentContent) && currentContent.type === MobileMenuContent) {
+        setMobileSheetContent(menu)
+      }
       return unregister
-    }, [registerOpenMenu, productMenu, product, currentSectionKey, setMobileSheetContent])
+    }, [
+      registerOpenMenu,
+      productMenu,
+      productMenuHeader,
+      product,
+      currentSectionKey,
+      setMobileSheetContent,
+    ])
+
+    useLayoutEffect(() => {
+      mainScrollContainer?.scrollTo({ top: 0, left: 0 })
+    }, [pathname, mainScrollContainer])
 
     return (
       <>
@@ -242,7 +326,12 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                       isBlocking={isBlocking}
                       productMenu={productMenu}
                     >
-                      <ProductMenuBar title={product} className={productMenuClassName}>
+                      <ProductMenuBar
+                        title={product}
+                        titleBadge={productMenuBadge}
+                        header={productMenuHeader}
+                        className={productMenuClassName}
+                      >
                         {productMenu}
                       </ProductMenuBar>
                     </MenuBarWrapper>
@@ -265,14 +354,40 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container"
                 ref={combinedRef}
               >
+                {showStripeProjectBanner && (
+                  <Alert
+                    variant="default"
+                    className="flex items-center gap-4 border-t-0 border-x-0 rounded-none"
+                  >
+                    <PartnerIcon
+                      organization={{ managed_by: MANAGED_BY.STRIPE_PROJECTS }}
+                      showTooltip={false}
+                      size="medium"
+                    />
+                    <div className="flex-1">
+                      <AlertTitle>This project is connected to Stripe</AlertTitle>
+                      <AlertDescription>
+                        Changes made here may affect your connected Stripe project.
+                      </AlertDescription>
+                    </div>
+                    <ButtonTooltip
+                      variant="text"
+                      icon={<XIcon size={14} />}
+                      className="h-7 w-7 p-0"
+                      onClick={() => setIsProjectIntegrationBannerDismissed(true)}
+                      aria-label="Dismiss project integration banner"
+                      tooltip={{ content: { text: 'Dismiss' } }}
+                    />
+                  </Alert>
+                )}
                 {showPausedState ? (
-                  <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                  <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center px-4">
                     <div className="w-full">
                       <ProjectPausedState product={product} />
                     </div>
                   </div>
                 ) : (
-                  <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
+                  <ContentWrapper>
                     <ResourceExhaustionWarningBanner />
                     {children}
                   </ContentWrapper>
@@ -320,8 +435,6 @@ const MenuBarWrapper = ({
 }
 
 interface ContentWrapperProps {
-  isLoading: boolean
-  isBlocking?: boolean
   children: ReactNode
 }
 
@@ -337,7 +450,7 @@ interface ContentWrapperProps {
  *
  * [TODO] Next iteration should scrape long polling and just listen to the project's status
  */
-const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapperProps) => {
+const ContentWrapper = ({ children }: ContentWrapperProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
@@ -347,7 +460,6 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   const requiresDbConnection = !routesToIgnoreDBConnection.some((x) => router.pathname.includes(x))
   const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
-  const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
   const isRestarting = selectedProject?.status === PROJECT_STATUS.RESTARTING
   const isResizing = selectedProject?.status === PROJECT_STATUS.RESIZING
@@ -381,10 +493,6 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   useEffect(() => {
     if (ref) state.setSelectedDatabaseId(ref)
   }, [ref])
-
-  if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
-    return router.pathname.endsWith('[ref]') ? <LoadingState /> : <LogoLoader />
-  }
 
   if (isRestarting && !isBackupsPage) {
     return <RestartingState />

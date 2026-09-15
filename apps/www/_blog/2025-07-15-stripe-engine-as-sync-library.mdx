@@ -7,7 +7,7 @@ categories:
 tags:
   - launch-week
   - stripe
-date: '2025-07-15:15:00'
+date: '2025-07-15T15:00'
 toc_depth: 3
 author: kevcodez
 imgSocial: launch-week-15/day-2-stripe-engine/og.png
@@ -83,6 +83,7 @@ Once the schema and tables are in place, you can start syncing your Stripe data 
 
 ```tsx
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+
 import { StripeSync } from 'npm:@supabase/stripe-sync-engine@0.39.0'
 
 // Load secrets from environment variables

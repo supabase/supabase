@@ -82,7 +82,7 @@ export const UsersFooter = ({
                   <TooltipTrigger asChild>
                     <Button
                       size="tiny"
-                      type="text"
+                      variant="text"
                       className="px-1.5"
                       icon={<HelpCircle />}
                       onClick={() => {

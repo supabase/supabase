@@ -56,12 +56,12 @@ const DotGrid: React.FC<DotGridProps> = ({ rows, columns, count }) => {
             <motion.div
               key={index}
               variants={isHighlighted ? highlightedVariants : item}
-              className="w-[2px] h-[2px] dark:w-[1px] dark:h-[1px] rounded-full bg-foreground-lighter"
+              className="w-[2px] h-[2px] dark:w-px dark:h-px rounded-full bg-foreground-lighter"
             />
           )
         })}
-        <div className="absolute bg-gradient-to-b lg:bg-gradient-to-r inset-0 w-full h-full from-background to-transparent to-40%" />
-        <div className="absolute bg-gradient-to-t lg:bg-gradient-to-l inset-0 w-full h-full from-background to-transparent to-20%" />
+        <div className="absolute bg-linear-to-b lg:bg-linear-to-r inset-0 w-full h-full from-background to-transparent to-40%" />
+        <div className="absolute bg-linear-to-t lg:bg-linear-to-l inset-0 w-full h-full from-background to-transparent to-20%" />
       </motion.div>
     </div>
   )

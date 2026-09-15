@@ -1,4 +1,7 @@
+import { type SafeSqlFragment } from '@supabase/pg-meta'
+
 import type { QueryPerformanceRow } from '../../QueryPerformance/QueryPerformance.types'
+import type { Logs } from '../../Settings/Logs/Logs.types'
 import {
   SCHEMA_INTROSPECTION_REGEX,
   SUPAMONITOR_EXCLUDED_APP_NAMES,
@@ -26,29 +29,42 @@ export function filterSystemLogs(
   })
 }
 
-export function parseSupamonitorLogs(logData: any[]): ParsedLogEntry[] {
+function asString(unknown: unknown): string | undefined {
+  if (typeof unknown === 'string') return unknown
+  if (unknown === null || unknown === undefined) return undefined
+  return String(unknown)
+}
+
+function asNumber(unknown: unknown): number | undefined {
+  if (typeof unknown === 'number') return unknown
+  if (unknown === null || unknown === undefined) return undefined
+  const parsed = Number(unknown)
+  return Number.isNaN(parsed) ? undefined : parsed
+}
+
+export function parseSupamonitorLogs(logData: Logs['result']): ParsedLogEntry[] {
   if (!logData || logData.length === 0) return []
 
   return logData.map((log) => ({
-    timestamp: log.timestamp,
-    application_name: log.application_name,
-    calls: log.calls,
-    database_name: log.database_name,
+    timestamp: asString(log.timestamp),
+    application_name: asString(log.application_name),
+    calls: asNumber(log.calls),
+    database_name: asString(log.database_name),
     query: log.query,
-    query_id: log.query_id,
-    total_exec_time: log.total_exec_time,
-    total_plan_time: log.total_plan_time,
-    user_name: log.user_name,
-    mean_exec_time: log.mean_exec_time,
-    mean_plan_time: log.mean_plan_time,
-    min_exec_time: log.min_exec_time,
-    max_exec_time: log.max_exec_time,
-    min_plan_time: log.min_plan_time,
-    max_plan_time: log.max_plan_time,
-    p50_exec_time: log.p50_exec_time,
-    p95_exec_time: log.p95_exec_time,
-    p50_plan_time: log.p50_plan_time,
-    p95_plan_time: log.p95_plan_time,
+    query_id: asNumber(log.query_id),
+    total_exec_time: asNumber(log.total_exec_time),
+    total_plan_time: asNumber(log.total_plan_time),
+    user_name: asString(log.user_name),
+    mean_exec_time: asNumber(log.mean_exec_time),
+    mean_plan_time: asNumber(log.mean_plan_time),
+    min_exec_time: asNumber(log.min_exec_time),
+    max_exec_time: asNumber(log.max_exec_time),
+    min_plan_time: asNumber(log.min_plan_time),
+    max_plan_time: asNumber(log.max_plan_time),
+    p50_exec_time: asNumber(log.p50_exec_time),
+    p95_exec_time: asNumber(log.p95_exec_time),
+    p50_plan_time: asNumber(log.p50_plan_time),
+    p95_plan_time: asNumber(log.p95_plan_time),
   }))
 }
 
@@ -170,7 +186,7 @@ export function aggregateLogsByQuery(parsedLogs: ParsedLogEntry[]): QueryPerform
     const propTotalTime = totalExecutionTime > 0 ? (stats.totalTime / totalExecutionTime) * 100 : 0
 
     aggregatedData.push({
-      query: stats.query,
+      query: stats.query as SafeSqlFragment,
       rolname: stats.rolname,
       application_name: stats.applicationName,
       calls: stats.totalCalls,

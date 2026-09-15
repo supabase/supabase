@@ -1,4 +1,4 @@
-import { getImportForeignSchemaSql } from '@supabase/pg-meta'
+import { getImportForeignSchemaSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { fdwKeys } from './keys'
 import { entityTypeKeys } from '@/data/entity-types/keys'
 import { foreignTableKeys } from '@/data/foreign-tables/keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { vaultSecretsKeys } from '@/data/vault/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -16,7 +16,7 @@ export type FDWImportForeignSchemaVariables = {
   serverName: string
   sourceSchema: string
   targetSchema: string
-  schemaOptions?: string[]
+  schemaOptions?: SafeSqlFragment[]
 }
 
 export async function importForeignSchema({

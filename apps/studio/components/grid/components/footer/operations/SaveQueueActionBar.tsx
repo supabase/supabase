@@ -60,7 +60,7 @@ export const SaveQueueActionBar = () => {
                 <div className="flex items-center gap-x-2">
                   <Button
                     size="tiny"
-                    type="primary"
+                    variant="primary"
                     onClick={handleSave}
                     disabled={isSaving}
                     loading={isSaving}
@@ -75,7 +75,7 @@ export const SaveQueueActionBar = () => {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
-                        type="outline"
+                        variant="outline"
                         className="w-7"
                         icon={<MoreVertical />}
                         aria-label="More options"

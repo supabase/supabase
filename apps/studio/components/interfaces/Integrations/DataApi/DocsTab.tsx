@@ -1,15 +1,19 @@
 import { useParams } from 'common'
 import { useMemo, useState } from 'react'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { ShowApiKey } from '../../Docs/Docs.types'
 import { LangSelector } from '../../Docs/LangSelector'
+import { generateDocsMenu, getActivePage } from './DocsTabs.utils'
 import { DataApiDisabledState } from '@/components/interfaces/Integrations/DataApi/DataApiDisabledState'
 import { DocsMenu } from '@/components/interfaces/Integrations/DataApi/DocsMenu'
 import { DocsMobileNav } from '@/components/interfaces/Integrations/DataApi/DocsMobileNav'
 import { DocView } from '@/components/interfaces/Integrations/DataApi/DocView'
-import { generateDocsMenu, getActivePage } from '@/components/layouts/DocsLayout/DocsLayout.utils'
+import { NotExposedEntitiesIndicator } from '@/components/ui/NotExposedEntitiesIndicator'
 import { useOpenAPISpecQuery } from '@/data/open-api/api-spec-query'
+import { partitionExposedDocsEntities } from '@/data/privileges/exposed-docs-entities'
+import { useExposedFunctionsQuery } from '@/data/privileges/exposed-functions-query'
+import { useExposedTablesQuery } from '@/data/privileges/exposed-tables-query'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -27,21 +31,42 @@ export const DataApiDocsTab = () => {
 
   const { isEnabled, isPending: isConfigLoading } = useIsDataApiEnabled({ projectRef })
 
-  const { data: openApiSpec } = useOpenAPISpecQuery(
-    { projectRef },
-    {
-      enabled: !!projectRef && !isPaused && isEnabled,
-    }
+  const dataApiEnabled = !!projectRef && !isPaused && isEnabled
+
+  const { data: openApiSpec } = useOpenAPISpecQuery({ projectRef }, { enabled: dataApiEnabled })
+
+  // Cross-reference the spec against grant status so tables/functions that exist
+  // in the spec but aren't actually exposed to the Data API are hidden + counted.
+  const { data: exposedTables } = useExposedTablesQuery(
+    { projectRef, connectionString: project?.connectionString },
+    { enabled: dataApiEnabled }
+  )
+  const { data: exposedFunctions } = useExposedFunctionsQuery(
+    { projectRef, connectionString: project?.connectionString },
+    { enabled: dataApiEnabled }
   )
 
-  const tableNames = useMemo(
-    () => (openApiSpec?.tables ?? []).map((table) => table.name),
-    [openApiSpec]
-  )
-  const functionNames = useMemo(
-    () => (openApiSpec?.functions ?? []).map((fn) => fn.name),
-    [openApiSpec]
-  )
+  const { tableNames, excludedTablesCount } = useMemo(() => {
+    const { visibleEntities, excludedCount } = partitionExposedDocsEntities(
+      openApiSpec?.tables ?? [],
+      exposedTables
+    )
+    return {
+      tableNames: visibleEntities.map((table) => table.name),
+      excludedTablesCount: excludedCount,
+    }
+  }, [openApiSpec?.tables, exposedTables])
+
+  const { functionNames, excludedFunctionsCount } = useMemo(() => {
+    const { visibleEntities, excludedCount } = partitionExposedDocsEntities(
+      openApiSpec?.functions ?? [],
+      exposedFunctions
+    )
+    return {
+      functionNames: visibleEntities.map((fn) => fn.name),
+      excludedFunctionsCount: excludedCount,
+    }
+  }, [openApiSpec?.functions, exposedFunctions])
 
   const activePage = useMemo(() => getActivePage({ page, resource, rpc }), [page, resource, rpc])
 
@@ -49,8 +74,51 @@ export const DataApiDocsTab = () => {
 
   const menu = useMemo(() => {
     if (!projectRef) return []
-    return generateDocsMenu(projectRef, tableNames, functionNames, { authEnabled }, docsBasePath)
-  }, [projectRef, tableNames, functionNames, authEnabled, docsBasePath])
+    const groups = generateDocsMenu(
+      projectRef,
+      tableNames,
+      functionNames,
+      { authEnabled },
+      docsBasePath
+    )
+    return groups.map((group) => {
+      if (group.key === 'tables' && excludedTablesCount > 0) {
+        return {
+          ...group,
+          footer: (
+            <NotExposedEntitiesIndicator
+              count={excludedTablesCount}
+              entityNoun="table"
+              entityNounPlural="tables"
+              className="pt-1"
+            />
+          ),
+        }
+      }
+      if (group.key === 'functions' && excludedFunctionsCount > 0) {
+        return {
+          ...group,
+          footer: (
+            <NotExposedEntitiesIndicator
+              count={excludedFunctionsCount}
+              entityNoun="function"
+              entityNounPlural="functions"
+              className="pt-1"
+            />
+          ),
+        }
+      }
+      return group
+    })
+  }, [
+    projectRef,
+    tableNames,
+    functionNames,
+    authEnabled,
+    docsBasePath,
+    excludedTablesCount,
+    excludedFunctionsCount,
+  ])
 
   if (isConfigLoading) {
     return (

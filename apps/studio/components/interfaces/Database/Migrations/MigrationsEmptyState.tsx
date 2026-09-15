@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { Terminal } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import CommandRender from '@/components/interfaces/Functions/CommandRender'
 

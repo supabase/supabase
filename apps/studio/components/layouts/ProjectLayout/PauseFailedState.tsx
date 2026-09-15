@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
   DropdownMenu,
   DropdownMenuContent,
@@ -90,7 +91,7 @@ export const PauseFailedState = () => {
             </div>
 
             <div className="border-t border-overlay flex items-center justify-end gap-x-2 py-4 px-8">
-              <Button asChild type="default">
+              <Button asChild>
                 <SupportLink
                   queryParams={{
                     category: SupportCategories.DATABASE_UNRESPONSIVE,
@@ -102,7 +103,6 @@ export const PauseFailedState = () => {
                 </SupportLink>
               </Button>
               <ButtonTooltip
-                type="default"
                 icon={<Download />}
                 disabled={isLoadingBackups}
                 loading={isDownloading || isLoadingBackups}
@@ -117,8 +117,8 @@ export const PauseFailedState = () => {
                 Download backup
               </ButtonTooltip>
               <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Button type="default" className="px-1.5" icon={<MoreVertical />} />
+                <DropdownMenuTrigger asChild>
+                  <Button className="px-1.5" icon={<MoreVertical />} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-72" align="end">
                   <DropdownMenuItemTooltip
@@ -152,10 +152,13 @@ export const PauseFailedState = () => {
       </div>
 
       <Dialog open={showCliBackup} onOpenChange={setShowCliBackup}>
-        <DialogContent size="medium">
+        <DialogContent size="medium" onOpenAutoFocus={(e) => e.preventDefault()}>
           <DialogHeader>
-            <DialogTitle>Back up your database</DialogTitle>
+            <DialogTitle>Back up your database with the Supabase CLI</DialogTitle>
           </DialogHeader>
+
+          <DialogSectionSeparator />
+
           <DialogSection>
             <LogicalBackupCliInstructions showResetPassword={false} />
           </DialogSection>

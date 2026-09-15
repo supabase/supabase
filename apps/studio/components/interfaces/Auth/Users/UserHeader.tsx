@@ -20,7 +20,7 @@ export const UserHeader = ({ user }: { user: User }) => {
           <p>{user.phone}</p>
           <CopyButton
             iconOnly
-            type="text"
+            variant="text"
             icon={<Copy />}
             className="px-1"
             text={user?.phone ?? ''}
@@ -33,7 +33,7 @@ export const UserHeader = ({ user }: { user: User }) => {
             <p className="text-foreground-light text-sm">{user.id}</p>
             <CopyButton
               iconOnly
-              type="text"
+              variant="text"
               icon={<Copy />}
               className="px-1"
               text={user?.id ?? ''}
@@ -49,7 +49,7 @@ export const UserHeader = ({ user }: { user: User }) => {
             </p>
             <CopyButton
               iconOnly
-              type="text"
+              variant="text"
               icon={<Copy />}
               className="px-1"
               text={user?.email ?? ''}

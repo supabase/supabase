@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { assertSelfHosted, encryptString, getConnectionString } from './util'
+import { assertSelfHosted, encryptString } from './util'
 
 vi.mock('@/lib/constants', () => ({
   IS_PLATFORM: false,
@@ -21,10 +21,6 @@ vi.mock('crypto-js', () => {
 })
 
 describe('api/self-hosted/util', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   describe('assertSelfHosted', () => {
     it('should not throw when IS_PLATFORM is false', async () => {
       const constants = await import('@/lib/constants')

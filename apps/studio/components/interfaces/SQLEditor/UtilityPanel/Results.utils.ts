@@ -3,20 +3,6 @@ import Papa from 'papaparse'
 
 type ResultRow = Record<string, unknown>
 
-export function formatClipboardValue(value: unknown) {
-  if (value === null) return ''
-  if (typeof value == 'object' || Array.isArray(value)) {
-    return JSON.stringify(value)
-  }
-  return String(value)
-}
-
-export function formatCellValue(value: unknown) {
-  if (value === null) return 'NULL'
-  if (typeof value === 'string') return value
-  return JSON.stringify(value)
-}
-
 export function formatResults(
   results: ResultRow[]
 ): Record<string, string | number | boolean | null | undefined>[] {
@@ -36,8 +22,13 @@ export function convertResultsToMarkdown(results: ResultRow[]): string | undefin
   if (formatted.length === 0) return undefined
 
   const columns = Object.keys(formatted[0])
-  const rows = formatted.map((row) => columns.map((col) => String(row[col] ?? '')))
-  const table = [columns, ...rows]
+  const escapeCell = (value: string) =>
+    value
+      .replace(/\\/g, '\\\\')
+      .replace(/\|/g, '\\|')
+      .replace(/\r\n|\r|\n/g, '<br>')
+  const rows = formatted.map((row) => columns.map((col) => escapeCell(String(row[col] ?? ''))))
+  const table = [columns.map(escapeCell), ...rows]
   return markdownTable(table)
 }
 

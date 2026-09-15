@@ -1,6 +1,8 @@
-export const QUEUES_SCHEMA = 'pgmq_public'
+import { safeSql, type SafeSqlFragment } from '../../../pg-format'
 
-export const HIDE_QUEUES_FROM_POSTGREST_SQL = /* SQL */ `
+export const QUEUES_SCHEMA = safeSql`pgmq_public`
+
+export const HIDE_QUEUES_FROM_POSTGREST_SQL = safeSql`
   drop function if exists 
     ${QUEUES_SCHEMA}.pop(queue_name text),
     ${QUEUES_SCHEMA}.send(queue_name text, message jsonb, sleep_seconds integer),
@@ -27,11 +29,15 @@ export const HIDE_QUEUES_FROM_POSTGREST_SQL = /* SQL */ `
   drop schema if exists ${QUEUES_SCHEMA};
 `
 
-export const getExposeQueuesSQL = ({ isNewerPgmqversion }: { isNewerPgmqversion: boolean }) => {
-  const conditionalJsonb = isNewerPgmqversion ? `, conditional := '{}'::jsonb` : ''
-  const jsonBArg = isNewerPgmqversion ? `, jsonb` : ''
+export const getExposeQueuesSQL = ({
+  isNewerPgmqversion,
+}: {
+  isNewerPgmqversion: boolean
+}): SafeSqlFragment => {
+  const conditionalJsonb = isNewerPgmqversion ? safeSql`, conditional := '{}'::jsonb` : safeSql``
+  const jsonBArg = isNewerPgmqversion ? safeSql`, jsonb` : safeSql``
 
-  return /* SQL */ `
+  return safeSql`
   create schema if not exists ${QUEUES_SCHEMA};
   grant usage on schema ${QUEUES_SCHEMA} to postgres, anon, authenticated, service_role;
 
@@ -204,12 +210,12 @@ export const getExposeQueuesSQL = ({ isNewerPgmqversion }: { isNewerPgmqversion:
   grant usage, select, update
   on sequences
   to anon, authenticated, service_role;
-`.trim()
+`
 }
 
 // [Joshen] Check if all the relevant functions exist to indicate whether PGMQ has been exposed through PostgREST
-export const getQueuesExposePostgrestStatusSQL = () => {
-  return /**SQL */ `
+export const getQueuesExposePostgrestStatusSQL = (): SafeSqlFragment => {
+  return safeSql`
     SELECT exists (select schema_name FROM information_schema.schemata WHERE schema_name = '${QUEUES_SCHEMA}');
-  `.trim()
+  `
 }

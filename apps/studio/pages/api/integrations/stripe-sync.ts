@@ -1,7 +1,7 @@
+import { VERSION } from '@stripe/sync-engine'
+import { install, uninstall } from '@stripe/sync-engine/supabase'
 import { waitUntil } from '@vercel/functions'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { VERSION } from 'stripe-experiment-sync'
-import { install, uninstall } from 'stripe-experiment-sync/supabase'
 import { z } from 'zod'
 
 const InstallBodySchema = z.object({

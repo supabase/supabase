@@ -1,22 +1,42 @@
-import { EvalScorer } from 'braintrust'
+import { Trace } from 'braintrust'
 import { parse } from 'libpg-query'
 
-import { AssistantEvalInput, AssistantEvalOutput, Expected } from './scorer'
+import { AssistantEvalScorer } from './scorer'
+import { getParsedToolSpans } from './trace-utils'
+import { createNotebookInputSchema } from '@/components/ui/AIAssistantPanel/Message.utils'
+import { executeSqlInputSchema } from '@/lib/ai/tools/studio-tools'
 import { extractIdentifiers, isQuotedInSql, needsQuoting } from '@/lib/sql-identifier-quoting'
 
-export const sqlSyntaxScorer: EvalScorer<
-  AssistantEvalInput,
-  AssistantEvalOutput,
-  Expected
-> = async ({ output }) => {
-  if (output.sqlQueries === undefined || output.sqlQueries.length === 0) {
-    return null
-  }
+/**
+ * Extracts SQL strings from `execute_sql` tool spans and from every database cell inside
+ * `create_notebook` tool spans. Log cells are excluded — their SQL targets ClickHouse, and
+ * libpg-query only understands Postgres syntax.
+ */
+async function getSqlQueries(trace: Trace): Promise<string[]> {
+  const executeSqlSpans = await getParsedToolSpans(trace, 'execute_sql', {
+    inputSchema: executeSqlInputSchema,
+  })
+  const createNotebookSpans = await getParsedToolSpans(trace, 'create_notebook', {
+    inputSchema: createNotebookInputSchema,
+  })
+
+  const notebookCellSql = createNotebookSpans.flatMap((s) =>
+    s.input.content.cells.filter((cell) => cell._tag === 'database_cell').map((cell) => cell.sql)
+  )
+
+  return [...executeSqlSpans.map((s) => s.input.sql), ...notebookCellSql]
+}
+
+export const sqlSyntaxScorer: AssistantEvalScorer = async ({ trace }) => {
+  if (!trace) return null
+
+  const sqlQueries = await getSqlQueries(trace)
+  if (sqlQueries.length === 0) return null
 
   const errors: string[] = []
   let validQueries = 0
 
-  for (const sql of output.sqlQueries) {
+  for (const sql of sqlQueries) {
     try {
       await parse(sql)
       validQueries++
@@ -28,26 +48,22 @@ export const sqlSyntaxScorer: EvalScorer<
 
   return {
     name: 'SQL Validity',
-    score: validQueries / output.sqlQueries.length,
+    score: validQueries / sqlQueries.length,
     metadata: errors.length > 0 ? { errors } : undefined,
   }
 }
 
-export const sqlIdentifierQuotingScorer: EvalScorer<
-  AssistantEvalInput,
-  AssistantEvalOutput,
-  Expected
-> = async ({ output }) => {
-  // Skip if no SQL queries
-  if (!output.sqlQueries?.length) {
-    return null
-  }
+export const sqlIdentifierQuotingScorer: AssistantEvalScorer = async ({ trace }) => {
+  if (!trace) return null
+
+  const sqlQueries = await getSqlQueries(trace)
+  if (sqlQueries.length === 0) return null
 
   const errors: string[] = []
   let totalNeedingQuotes = 0
   let properlyQuoted = 0
 
-  for (const sql of output.sqlQueries) {
+  for (const sql of sqlQueries) {
     try {
       const ast = await parse(sql)
       const identifiers = extractIdentifiers(ast)

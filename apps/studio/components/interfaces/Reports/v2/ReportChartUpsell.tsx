@@ -48,7 +48,7 @@ export const ReportChartUpsell = ({ report, orgSlug }: ReportsChartUpsellProps) 
         </p>
         <Button
           asChild
-          type="primary"
+          variant="primary"
           onMouseEnter={() => setIsHoveringUpgrade(true)}
           onMouseLeave={() => setIsHoveringUpgrade(false)}
           className="mt-4"

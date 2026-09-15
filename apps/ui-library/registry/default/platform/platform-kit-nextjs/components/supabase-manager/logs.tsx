@@ -230,7 +230,7 @@ export function LogsManager({ projectRef }: { projectRef: string }) {
                     return (
                       <TableCell
                         key={key}
-                        className="first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8 text-xs text-muted-foreground group-hover:text-foreground min-w-[8rem]"
+                        className="first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8 text-xs text-muted-foreground group-hover:text-foreground min-w-32"
                       >
                         <HoverCard>
                           <HoverCardTrigger asChild>
@@ -239,7 +239,7 @@ export function LogsManager({ projectRef }: { projectRef: string }) {
                             </div>
                           </HoverCardTrigger>
                           <HoverCardContent className="w-96 max-h-96 overflow-auto p-3">
-                            <pre className="text-xs font-mono whitespace-pre-wrap break-words">
+                            <pre className="text-xs font-mono whitespace-pre-wrap wrap-break-word">
                               {formattedValue}
                             </pre>
                           </HoverCardContent>

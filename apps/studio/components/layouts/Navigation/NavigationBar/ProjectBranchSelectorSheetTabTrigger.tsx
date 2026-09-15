@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { cn, TabsTrigger_Shadcn_ } from 'ui'
+import { cn, TabsTrigger } from 'ui'
 
 export interface ProjectBranchSelectorSheetTabTriggerProps {
   value: 'organization' | 'project' | 'branch'
@@ -20,7 +20,7 @@ export function ProjectBranchSelectorSheetTabTrigger({
   const isProductionBranch = isBranch && isMainBranch
 
   return (
-    <TabsTrigger_Shadcn_
+    <TabsTrigger
       value={value}
       className={cn(
         'group relative text-xs flex flex-col items-center gap-1.5 px-4 py-3 data-[state=active]:bg-surface-200 data-[state=active]:border-foreground-light border-b duration-0',
@@ -45,11 +45,11 @@ export function ProjectBranchSelectorSheetTabTrigger({
         >
           <path
             d="M5.49365 31L0.493652 0V62L5.49365 31Z"
-            className="fill-[hsl(var(--background-dash-sidebar))] group-data-[state=active]:fill-[hsl(var(--background-surface-200))]"
+            className="fill-[var(--background-dash-sidebar)] group-data-[state=active]:fill-[var(--background-surface-200)]"
           />
-          <path d="M0.493652 0L5.49365 31L0.493652 62" stroke="hsl(var(--border-default))" />
+          <path d="M0.493652 0L5.49365 31L0.493652 62" stroke="var(--border-default)" />
         </svg>
       )}
-    </TabsTrigger_Shadcn_>
+    </TabsTrigger>
   )
 }

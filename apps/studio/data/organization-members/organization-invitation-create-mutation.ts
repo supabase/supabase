@@ -9,7 +9,7 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OrganizationCreateInvitationVariables = {
   slug: string
-  email: string
+  emails: string[]
   roleId: number
   projects?: string[]
   requireSso?: boolean
@@ -17,12 +17,12 @@ export type OrganizationCreateInvitationVariables = {
 
 export async function createOrganizationInvitation({
   slug,
-  email,
+  emails,
   roleId,
   projects,
   requireSso,
 }: OrganizationCreateInvitationVariables) {
-  const payload: components['schemas']['CreateInvitationBody'] = { email, role_id: roleId }
+  const payload: components['schemas']['CreateInvitationBody'] = { emails, role_id: roleId }
   if (projects !== undefined) payload.role_scoped_projects = projects
   if (requireSso !== undefined) payload.require_sso = requireSso
 
@@ -69,7 +69,7 @@ export const useOrganizationCreateInvitationMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to update member role: ${data.message}`)
+        toast.error(`Failed to send invitation${data.message ? ': ' + data.message : ''}`)
       } else {
         onError(data, variables, context)
       }
