@@ -177,6 +177,44 @@ test.describe('Storage', () => {
     await uploadFile(page, filePath, fileName)
   })
 
+  test('can upload a duplicate file after deleting an earlier copy', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_upload_gap`
+    const fileName = 'test-file.txt'
+    const firstCopy = 'test-file (1).txt'
+    const secondCopy = 'test-file (2).txt'
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
+
+    await deleteBucketViaApi(bucketName)
+    try {
+      await createBucketViaApi(bucketName, false)
+      await navigateToStorageFiles(page, ref)
+      await navigateToBucket(page, ref, bucketName)
+      await uploadFile(page, filePath, fileName)
+      await uploadFile(page, filePath, firstCopy)
+      await uploadFile(page, filePath, secondCopy)
+
+      await page.getByTitle(firstCopy, { exact: true }).click({ button: 'right' })
+      await page.getByRole('menuitem', { name: 'Delete', exact: true }).click()
+      const deletion = waitForApiResponse(page, 'storage', ref, `buckets/${bucketName}/objects`, {
+        method: 'DELETE',
+      })
+      await page.getByRole('button', { name: 'Submit', exact: true }).press('Enter')
+      await deletion
+      await expect(
+        page.getByTitle(firstCopy, { exact: true }),
+        'The earlier copy should be removed before uploading again'
+      ).not.toBeVisible()
+
+      await uploadFile(page, filePath, firstCopy)
+      await expect(
+        page.getByRole('button', { name: `${secondCopy} actions` }),
+        'The existing second copy should remain available'
+      ).toBeVisible()
+    } finally {
+      await deleteBucketViaApi(bucketName)
+    }
+  })
+
   test('can create a folder', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_newfolder`
     const folderName = 'test_folder'
