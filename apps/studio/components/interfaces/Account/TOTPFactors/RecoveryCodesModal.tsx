@@ -69,11 +69,9 @@ export const RecoveryCodesModal = <T = unknown,>({
         </DialogHeader>
         {!mutation.isPending ? (
           <DialogFooter className="items-center">
-            {copiedToClipboard ? (
-              <span role="status" className="text-sm text-lighter">
-                Codes copied to your clipboard.
-              </span>
-            ) : null}
+            <span role="status" className="text-sm text-lighter">
+              {copiedToClipboard ? 'Codes copied to your clipboard.' : null}
+            </span>
             {copied || mutation.isError ? (
               <DialogClose asChild>
                 <Button>Close</Button>
