@@ -118,12 +118,13 @@ describe('getUserFilterValue', () => {
 })
 
 describe('buildColumnFilterValues', () => {
-  it('wraps an `=` condition as { operator, values }, the one shape every column filter uses', () => {
-    const result = buildColumnFilterValues([
-      { propertyName: 'log_type', value: 'postgres', operator: '=' },
-    ])
-    expect(result.get('log_type')).toEqual({ operator: '=', values: ['postgres'] })
-  })
+  it.each(['=', '<>', '~~*', '!~~*'] as const)(
+    'wraps a `%s` condition as { operator, values }, the one shape every column filter uses',
+    (operator) => {
+      const result = buildColumnFilterValues([{ propertyName: 'log_type', value: 'postgres', operator }])
+      expect(result.get('log_type')).toEqual({ operator, values: ['postgres'] })
+    }
+  )
 
   it('accumulates multiple `=` conditions on the same column into one group', () => {
     const result = buildColumnFilterValues([
@@ -131,13 +132,6 @@ describe('buildColumnFilterValues', () => {
       { propertyName: 'log_type', value: 'auth', operator: '=' },
     ])
     expect(result.get('log_type')).toEqual({ operator: '=', values: ['postgres', 'auth'] })
-  })
-
-  it('wraps a `<>` condition the same way, preserving its operator', () => {
-    const result = buildColumnFilterValues([
-      { propertyName: 'log_type', value: 'postgres', operator: '<>' },
-    ])
-    expect(result.get('log_type')).toEqual({ operator: '<>', values: ['postgres'] })
   })
 
   it('coerces non-string condition values to strings', () => {

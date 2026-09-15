@@ -10,7 +10,7 @@ import {
 } from './UnifiedLogs.filters'
 
 describe('columnFiltersToLogsFilters', () => {
-  it('serializes a bare string[] (sidebar checkbox) using the default `=` operator', () => {
+  it('serializes a bare string[] (defensive fallback for un-wrapped input) using the default `=` operator', () => {
     const filters = columnFiltersToLogsFilters([
       { id: 'log_type', value: ['postgres', 'postgrest'] },
     ])
@@ -97,7 +97,7 @@ describe('buildFilterSearchUpdate', () => {
     { value: 'method', type: 'checkbox' },
   ]
 
-  it('serializes a bare sidebar checkbox into the `filter` param (the regression)', () => {
+  it('serializes a bare string[] into the `filter` param (defensive fallback for un-wrapped input)', () => {
     const update = buildFilterSearchUpdate([{ id: 'log_type', value: ['postgres'] }], fields)
     expect(update.filter).toEqual(['log_type:eq:postgres'])
   })
