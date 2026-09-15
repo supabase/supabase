@@ -2,6 +2,8 @@ import type { Filter, ServiceError } from '@/components/grid/types'
 import { isNumericalColumn } from '@/components/grid/utils/types'
 import { Entity, isTableLike } from '@/data/table-editor/table-editor-types'
 
+const PATTERN_MATCH_OPERATORS: Filter['operator'][] = ['~~', '~~*', '!~~', '!~~*']
+
 /**
  * temporary fix until we implement a better filter UI
  * which validate input value base on the column type
@@ -21,6 +23,14 @@ export function formatFilterValue(
     if (Number.isNaN(numberValue) || Math.abs(numberValue) > Number.MAX_SAFE_INTEGER)
       return filter.value
     else return numberValue
+  }
+  if (
+    PATTERN_MATCH_OPERATORS.includes(filter.operator) &&
+    typeof filter.value === 'string' &&
+    !filter.value.includes('%') &&
+    !filter.value.includes('_')
+  ) {
+    return `%${filter.value}%`
   }
   return filter.value
 }
