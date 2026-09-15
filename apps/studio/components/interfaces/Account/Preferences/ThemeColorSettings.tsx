@@ -46,7 +46,7 @@ export const ThemeColorSettings = () => {
     <CardContent className="grid grid-cols-12 gap-6">
       <div className="col-span-full md:col-span-4 flex flex-col gap-2">
         <h3 className="text-sm font-medium text-foreground">Theme colors</h3>
-        <p className="text-sm text-foreground-light">
+        <p className="text-sm text-foreground-lighter">
           Changes are saved separately for light and dark mode.
         </p>
         {hasThemeOverrides(overrides) && (
