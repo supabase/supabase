@@ -25,13 +25,13 @@ Our charts use a combination of our own presentational components and [Recharts]
 
 ## Color
 
-Series colors come from a fixed palette of eight categorical slots (`--chart-series-1` …
-`--chart-series-8`) defined in `packages/config/css/charts.css`. Slots are assigned in order and never cycled — a ninth
+Series colors come from a fixed palette of eight categorical slots (`--chart-1` …
+`--chart-8`) defined in `packages/config/css/charts.css`. Slots are assigned in order and never cycled — a ninth
 series folds into "Other", becomes small multiples, or gets a second encoding. Each slot has a matching
 `-fill` token for bar and area fills.
 
 Slots point at the Radix scales in `colors.css` and resolve per theme, so chart code passes
-`var(--chart-series-n)` and never branches on light/dark. Hue families alternate (brand, blue,
+`var(--chart-n)` and never branches on light/dark. Hue families alternate (brand, blue,
 pink, violet, tomato, indigo, green, purple) so adjacent series never share a family. Light mode
 uses the 900 and 1000 steps; dark mode overrides every slot with the brighter 1100 tier so the
 palette sits at the same lightness as brand green instead of sinking into the surface. Every

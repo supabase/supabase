@@ -23,7 +23,7 @@ const SERIES = [
 ]
 
 const config: ChartConfig = Object.fromEntries(
-  SERIES.map((s, i) => [s.key, { label: s.label, color: `var(--chart-series-${i + 1})` }])
+  SERIES.map((s, i) => [s.key, { label: s.label, color: `var(--chart-${i + 1})` }])
 )
 
 const data: ChartBarTick[] = Array.from({ length: 40 }, (_, i) => {

@@ -9,7 +9,7 @@ export const CHART_TABS = [
 
 export const LEGEND_ITEMS: Record<string, { label: string; color: string; dataKey: string }[]> = {
   query_latency: [
-    { label: 'P50', color: 'hsl(var(--chart-4))', dataKey: 'p50' },
+    { label: 'P50', color: 'var(--chart-4)', dataKey: 'p50' },
     { label: 'P95', color: CHART_COLORS.GREEN_1, dataKey: 'p95' },
   ],
   rows_read: [{ label: 'Rows Read', color: CHART_COLORS.GREEN_1, dataKey: 'rows_read' }],

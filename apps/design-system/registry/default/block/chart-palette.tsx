@@ -89,9 +89,9 @@ export default function ChartPalette() {
         className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
       >
         {SLOTS.map((n) => (
-          <TokenCard key={n} title={`Slot ${n}`} token={`--chart-series-${n}`}>
-            <Swatch token={`--chart-series-${n}`} label="Stroke" />
-            <Swatch token={`--chart-series-${n}-fill`} label="Fill" />
+          <TokenCard key={n} title={`Slot ${n}`} token={`--chart-${n}`}>
+            <Swatch token={`--chart-${n}`} label="Stroke" />
+            <Swatch token={`--chart-${n}-fill`} label="Fill" />
           </TokenCard>
         ))}
       </Section>
