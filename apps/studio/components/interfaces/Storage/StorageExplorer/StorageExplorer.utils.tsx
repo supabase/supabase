@@ -60,10 +60,7 @@ export function parseStoragePath(value: string | null | undefined): string[] {
   return value.split('/').filter((segment) => segment.length > 0)
 }
 
-/**
- * Joins folder segments into a `?path` query param value. Returns an empty string for
- * the bucket root so that nuqs' `clearOnDefault` strips the param entirely.
- */
+/** Joins folder segments into `?path`; empty at the root so nuqs' `clearOnDefault` strips it. */
 export function serializeStoragePath(paths: string[]): string {
   return paths.filter((segment) => segment.length > 0).join('/')
 }
@@ -138,9 +135,7 @@ export function sanitizeNameForDuplicateInColumn(
   return name
 }
 
-/**
- * Bucket-relative path to an item
- */
+/** Bucket-relative path to an item */
 export function getStoragePathForItem(
   openedFolders: readonly StorageItem[],
   item: StorageItem & { columnIndex: number }
@@ -149,9 +144,7 @@ export function getStoragePathForItem(
   return folders.length > 0 ? `${folders.join('/')}/${item.name}` : item.name
 }
 
-/**
- * Absolute dashboard URL that reopens the item in the storage explorer
- */
+/** Absolute dashboard URL that reopens the item in the storage explorer */
 export function getStorageExplorerUrlForItem({
   openedFolders,
   item,
@@ -181,8 +174,10 @@ export const copyStoragePath = (
   openedFolders: readonly StorageItem[],
   item: StorageItem & { columnIndex: number }
 ) => {
-  copyToClipboard(getStoragePathForItem(openedFolders, item))
-  toast.success(`Copied relative path for "${item.name}"`)
+  // Toast from the callback: the write is async and reports its own failures.
+  copyToClipboard(getStoragePathForItem(openedFolders, item), () =>
+    toast.success(`Copied relative path for "${item.name}"`)
+  )
 }
 
 export const copyStorageExplorerUrl = (params: {
@@ -191,8 +186,9 @@ export const copyStorageExplorerUrl = (params: {
   projectRef: string
   bucketId: string
 }) => {
-  copyToClipboard(getStorageExplorerUrlForItem(params))
-  toast.success(`Copied URL for "${params.item.name}"`)
+  copyToClipboard(getStorageExplorerUrlForItem(params), () =>
+    toast.success(`Copied URL for "${params.item.name}"`)
+  )
 }
 
 export const formatTime = (seconds: number) => {

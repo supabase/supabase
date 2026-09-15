@@ -1,4 +1,5 @@
 import { toast } from 'sonner'
+import { copyToClipboard } from 'ui'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -7,6 +8,8 @@ import {
 } from '@/components/interfaces/Storage/Storage.constants'
 import type { StorageItem } from '@/components/interfaces/Storage/Storage.types'
 import {
+  copyStorageExplorerUrl,
+  copyStoragePath,
   getPathAlongFoldersToIndex,
   getPathAlongOpenedFolders,
   getStorageExplorerUrlForItem,
@@ -161,7 +164,8 @@ describe('getPathAlongFoldersToIndex', () => {
   })
 })
 
-vi.mock('sonner', () => ({ toast: { error: vi.fn() } }))
+vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }))
+vi.mock('ui', () => ({ copyToClipboard: vi.fn() }))
 
 describe('sanitizeNameForDuplicateInColumn', () => {
   // Reset mock call counts between tests
@@ -411,5 +415,40 @@ describe('getStorageExplorerUrlForItem', () => {
     )
 
     expect(url.pathname).toContain('a%20b%2Fc')
+  })
+})
+
+describe('clipboard helpers', () => {
+  beforeEach(() => {
+    vi.mocked(copyToClipboard).mockClear()
+    vi.mocked(toast.success).mockClear()
+  })
+
+  it('announces a copied relative path only once the write has landed', () => {
+    copyStoragePath([makeFolder('images')], { ...makeFile('photo.png'), columnIndex: 1 })
+
+    const [text, onCopied] = vi.mocked(copyToClipboard).mock.calls[0]
+    expect(text).toBe('images/photo.png')
+    // The write is async and reports its own failure, so nothing is claimed up front
+    expect(toast.success).not.toHaveBeenCalled()
+
+    onCopied?.()
+    expect(toast.success).toHaveBeenCalledWith('Copied relative path for "photo.png"')
+  })
+
+  it('announces a copied URL only once the write has landed', () => {
+    copyStorageExplorerUrl({
+      openedFolders: [],
+      item: { ...makeFile('photo.png'), columnIndex: 0 },
+      projectRef: 'abcdefghijklmnopqrst',
+      bucketId: 'my-bucket',
+    })
+
+    const [text, onCopied] = vi.mocked(copyToClipboard).mock.calls[0]
+    expect(text).toContain('preview=photo.png')
+    expect(toast.success).not.toHaveBeenCalled()
+
+    onCopied?.()
+    expect(toast.success).toHaveBeenCalledWith('Copied URL for "photo.png"')
   })
 })

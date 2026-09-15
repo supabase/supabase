@@ -16,17 +16,19 @@ export const StorageExplorer = () => {
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { data: bucket, isLoading: isBucketQueryLoading } = useSelectedBucket()
 
-  // The bucket query and the effect that syncs it into the store both settle after the
-  // first render, so guard against showing the previous bucket's contents in between.
+  // Guards the gap where the query has settled but the store still holds another bucket.
   const isBucketReady = !isBucketQueryLoading && !!bucket && bucketId === selectedBucket.id
 
-  // Search results are deliberately transient — they aren't part of the URL, so a shared
-  // link points at a folder rather than at someone else's filter.
+  // Deliberately not in the URL, so a shared link points at a folder, not someone's filter.
   const [itemSearchString, setItemSearchString] = useState('')
   const debouncedSearchString = useDebounce(itemSearchString, 500)
 
   return (
     <div className="bg-studio flex h-full w-full flex-col">
+      {/* The skeleton swap is silent, and a live region must be mounted before it changes */}
+      <span role="status" aria-live="polite" className="sr-only">
+        {isBucketReady ? 'Bucket contents loaded' : 'Loading bucket contents'}
+      </span>
       <StorageExplorerNavigationProvider
         isBucketReady={isBucketReady}
         searchString={debouncedSearchString}

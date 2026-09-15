@@ -21,6 +21,7 @@ interface StorageExplorerNavigationContextValue {
   goUpOneLevel: () => void
   /** Collapses the column stack back to `columnIndex`. */
   truncateToColumn: (columnIndex: number) => void
+  /** Previews a file and collapses the stack back to the column holding it. */
   setPreviewedFile: (item: StorageItemWithColumn) => void
   clearPreviewedFile: () => void
 }
@@ -73,50 +74,53 @@ export const StorageExplorerNavigationProvider = ({
   const bucketName = snap.selectedBucket.name
   const rootColumnName = snap.columns[0]?.name
   const previewedFileName = snap.selectedFilePreview?.name
+  const previewedFileId = snap.selectedFilePreview?.id
   const lastColumn = snap.columns[snap.columns.length - 1]
   const isLastColumnReady = lastColumn?.status === STORAGE_ROW_STATUS.READY
 
   const previousStorePathRef = useRef(storePath)
   const previousSearchStringRef = useRef<string | null>(null)
-  /**
-   * Set by the navigation actions so the reconciliation below knows a store move was a
-   * deliberate user navigation (push) rather than the side effect of a mutation (replace).
-   */
+  /** Marks a store move as deliberate navigation (push), not a mutation side effect (replace). */
   const navigationHistoryModeRef = useRef<'push' | null>(null)
   const previousPreviewRef = useRef(previewedFileName)
   /**
-   * `fetchFoldersByPath` swaps in placeholder columns before it resolves, but only
-   * updates `openedFolders` at the very end — so mid-flight the store still reports the
-   * old path while the URL holds the new one. Without this flag that reads as another
-   * divergence and kicks off a second restore.
+   * The `?path` a restore is in flight for. `fetchFoldersByPath` only updates
+   * `openedFolders` at the very end, so mid-flight the store still reports the old path —
+   * without this that divergence reads as fresh and kicks off a second restore.
    */
-  const isRestoringRef = useRef(false)
+  const restoringPathRef = useRef<string | null>(null)
+  /**
+   * A `?path` change that landed mid-restore. Finishing that restore moves the store to the
+   * *older* path, which would otherwise read as the store having moved last and be written
+   * straight back over the newer URL.
+   */
+  const hasSupersededRestoreRef = useRef(false)
 
   const restoreFromUrl = useEffectEvent(async () => {
-    isRestoringRef.current = true
+    restoringPathRef.current = urlPath
+    hasSupersededRestoreRef.current = false
     try {
       const { missingPaths } = await snap.fetchFoldersByPath({
         paths: urlFolderPaths,
         searchString,
         showLoading: true,
       })
-      if (missingPaths.length > 0) {
-        // The link points at a folder that no longer exists. Fall back to the bucket
-        // root and correct the URL together, so the store and the URL stay in step —
-        // rewriting the URL alone would leave the store on the dead path and the
-        // reconcile effect would immediately write it back.
+      // Skip the fallback once a newer URL has superseded this pass; its own restore runs.
+      if (missingPaths.length > 0 && !hasSupersededRestoreRef.current) {
+        // The link points at a folder that no longer exists. Fall back to the bucket root
+        // and correct the URL together so the two stay in step — rewriting the URL alone
+        // would leave the store on the dead path for the reconcile effect to write back.
         await snap.fetchFoldersByPath({ paths: [], searchString, showLoading: true })
         setUrlLocation({ paths: [], preview: null }, { history: 'replace' })
       }
     } finally {
-      isRestoringRef.current = false
+      restoringPathRef.current = null
     }
   })
 
   const refetchForSearch = useEffectEvent(async () => {
-    // Search narrows the folder you are standing in, so only that level is refetched.
-    // Passing the term to every open column (which is what the old fetch did) made the
-    // current folder disappear from its own parent.
+    // Only the folder you are standing in is refetched — passing the term to every open
+    // column (as the old fetch did) made the current folder vanish from its own parent.
     const currentIndex = snap.openedFolders.length - 1
     const currentFolder = snap.openedFolders[currentIndex]
     await snap.fetchFolderContents({
@@ -136,7 +140,12 @@ export const StorageExplorerNavigationProvider = ({
   })
 
   useEffect(() => {
-    if (!isBucketReady || isRestoringRef.current) return
+    if (!isBucketReady) return
+    if (restoringPathRef.current !== null) {
+      // Hold on to a URL change that landed mid-restore; the pass after it is where it applies.
+      if (urlPath !== restoringPathRef.current) hasSupersededRestoreRef.current = true
+      return
+    }
 
     const hasStoreChanged = storePath !== previousStorePathRef.current
     previousStorePathRef.current = storePath
@@ -144,9 +153,12 @@ export const StorageExplorerNavigationProvider = ({
     const hasSearchChanged = searchString !== previousSearchStringRef.current
     previousSearchStringRef.current = searchString
 
-    // Nothing loaded yet, or the store still holds the bucket we just navigated away
-    // from — the provider is keyed per project, not per bucket, so it is not remounted
-    // on a bucket switch.
+    // A superseded restore means the URL, not the store, is the side that moved last.
+    const hasUrlSupersededStore = hasSupersededRestoreRef.current
+    hasSupersededRestoreRef.current = false
+
+    // Nothing loaded yet, or the store still holds the bucket we navigated away from —
+    // the provider is keyed per project, so a bucket switch does not remount it.
     const isStoreEmpty = snap.columns.length === 0
     const isStoreOnAnotherBucket = rootColumnName !== bucketName
     if (isStoreEmpty || isStoreOnAnotherBucket) {
@@ -155,7 +167,7 @@ export const StorageExplorerNavigationProvider = ({
     }
 
     if (storePath !== urlPath) {
-      if (hasStoreChanged) {
+      if (hasStoreChanged && !hasUrlSupersededStore) {
         const history = navigationHistoryModeRef.current ?? 'replace'
         navigationHistoryModeRef.current = null
         reconcileUrlToStore(history)
@@ -165,8 +177,8 @@ export const StorageExplorerNavigationProvider = ({
       return
     }
 
-    // Settled. Drop any intent that never turned into a path change — selecting a file
-    // in the deepest column, for instance — so it can't mislabel a later store mutation.
+    // Settled. Drop an intent that never became a path change (a preview in the deepest
+    // column, say) so it can't mislabel a later store mutation.
     navigationHistoryModeRef.current = null
 
     if (hasSearchChanged) refetchForSearch()
@@ -197,19 +209,20 @@ export const StorageExplorerNavigationProvider = ({
       if (previewedFileName) snap.setSelectedFilePreview(undefined)
       return
     }
-    if (previewedFileName === urlPreview) return
 
     const item = lastColumn.items.find(
       (columnItem) => columnItem.name === urlPreview && columnItem.type === STORAGE_ROW_TYPES.FILE
     )
     if (!item) {
-      // Absent from `items` doesn't always mean deleted: a search filters the listing,
-      // and the listing is capped at LIMIT. Only drop the param when this listing is
-      // complete and unfiltered, otherwise the file may simply not be loaded yet.
+      // Absent doesn't mean deleted: a search filters the listing and it is capped at
+      // LIMIT, so only drop the param once this listing is complete and unfiltered.
       const isListingComplete = !searchString && !lastColumn.hasMoreItems
       if (isListingComplete) setUrlPreview(null)
       return
     }
+    // Match on id, not name — the same name in a different folder is a different file.
+    if (previewedFileId === item.id) return
+
     snap.setSelectedFilePreview({ ...item, columnIndex: snap.columns.length - 1 })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -217,6 +230,7 @@ export const StorageExplorerNavigationProvider = ({
     isLastColumnReady,
     urlPreview,
     previewedFileName,
+    previewedFileId,
     lastColumn?.path,
     searchString,
   ])
@@ -246,8 +260,20 @@ export const StorageExplorerNavigationProvider = ({
   }
 
   const setPreviewedFile = (item: StorageItemWithColumn) => {
+    const paths = snap.openedFolders.slice(0, item.columnIndex).map((folder) => folder.name)
+    // Collapsing back to the file's own column is a navigation; previewing in place isn't.
+    const isCollapsingColumns = item.columnIndex < snap.openedFolders.length
+
+    snap.popColumnAtIndex(item.columnIndex)
+    snap.popOpenedFoldersAtIndex(item.columnIndex - 1)
+    snap.clearSelectedItems()
     snap.setSelectedFilePreview(item)
-    setUrlPreview(item.name)
+    // One write, so the URL never pairs the new file with the old, deeper path — a
+    // separate `preview` write would leave exactly that pairing behind in history.
+    setUrlLocation(
+      { paths, preview: item.name },
+      { history: isCollapsingColumns ? 'push' : 'replace' }
+    )
   }
 
   const clearPreviewedFile = () => {

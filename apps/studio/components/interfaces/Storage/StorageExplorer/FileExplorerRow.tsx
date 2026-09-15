@@ -84,8 +84,7 @@ export const FileExplorerRow = ({
     downloadFolder,
     selectRangeItems,
   } = useStorageExplorerStateSnapshot()
-  const { openFolderAtIndex, truncateToColumn, setPreviewedFile, clearPreviewedFile } =
-    useStorageExplorerNavigation()
+  const { openFolderAtIndex, setPreviewedFile, clearPreviewedFile } = useStorageExplorerNavigation()
   const { onCopyUrl } = useCopyUrl()
   const ctx = useFileExplorerContextMenu()
 
@@ -96,11 +95,6 @@ export const FileExplorerRow = ({
     openedFolders.length > columnIndex ? openedFolders[columnIndex].name === item.name : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
-
-  const onSelectFile = (columnIndex: number) => {
-    truncateToColumn(columnIndex)
-    setPreviewedFile(itemWithColumnIndex)
-  }
 
   const onCheckItem = (isShiftKeyHeld: boolean) => {
     // Select a range if shift is held down
@@ -290,7 +284,7 @@ export const FileExplorerRow = ({
           if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
             item.type === STORAGE_ROW_TYPES.FOLDER
               ? openFolderAtIndex(columnIndex, item)
-              : onSelectFile(columnIndex)
+              : setPreviewedFile(itemWithColumnIndex)
           }
         }}
       >

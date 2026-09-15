@@ -75,11 +75,23 @@ function renderWithProvider({
   searchParams = '',
   searchString = '',
   isBucketReady = true,
-}: { searchParams?: string; searchString?: string; isBucketReady?: boolean } = {}) {
+  hasMemory = false,
+}: {
+  searchParams?: string
+  searchString?: string
+  isBucketReady?: boolean
+  /** Lets `setSearchParams` stand in for Back/forward or a pasted link. */
+  hasMemory?: boolean
+} = {}) {
   const onUrlUpdate = vi.fn()
+  let currentSearchParams = searchParams
   const utils = renderHook(() => useStorageExplorerNavigation(), {
     wrapper: ({ children }: PropsWithChildren) => (
-      <NuqsTestingAdapter searchParams={searchParams} onUrlUpdate={onUrlUpdate}>
+      <NuqsTestingAdapter
+        searchParams={currentSearchParams}
+        onUrlUpdate={onUrlUpdate}
+        hasMemory={hasMemory}
+      >
         <StorageExplorerNavigationProvider
           isBucketReady={isBucketReady}
           searchString={searchString}
@@ -89,7 +101,14 @@ function renderWithProvider({
       </NuqsTestingAdapter>
     ),
   })
-  return { ...utils, onUrlUpdate }
+  return {
+    ...utils,
+    onUrlUpdate,
+    setSearchParams: (next: string) => {
+      currentSearchParams = next
+      utils.rerender()
+    },
+  }
 }
 
 describe('StorageExplorerNavigation', () => {
@@ -285,6 +304,109 @@ describe('StorageExplorerNavigation', () => {
       rerender()
     })
 
+    expect(snapshot.setSelectedFilePreview).not.toHaveBeenCalled()
+  })
+
+  it('collapses the stack and records the file in a single URL write', async () => {
+    // The file sits in the bucket root while the store is a level deeper, so selecting it
+    // has to drop `path` and add `preview` at once — two writes would leave `images`
+    // paired with a root-level file in history.
+    const snapshot = createSnapshot({
+      openedFolders: [makeFolder('images')],
+      columns: [makeColumn('my-bucket', [makeFile('a.png')]), makeColumn('images')],
+    })
+    snapshot.popColumnAtIndex.mockImplementation((index: number) => {
+      snapshot.columns = snapshot.columns.slice(0, index + 1)
+    })
+    snapshot.popOpenedFoldersAtIndex.mockImplementation((index: number) => {
+      snapshot.openedFolders = snapshot.openedFolders.slice(0, index + 1)
+    })
+    mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
+
+    const { result, onUrlUpdate } = renderWithProvider({ searchParams: '?path=images' })
+
+    act(() => {
+      result.current.setPreviewedFile({ ...makeFile('a.png'), columnIndex: 0 })
+    })
+
+    await waitFor(() => expect(onUrlUpdate).toHaveBeenCalled())
+    expect(onUrlUpdate).toHaveBeenCalledTimes(1)
+    const [update] = onUrlUpdate.mock.calls.at(-1)!
+    expect(update.queryString).toContain('preview=a.png')
+    expect(update.queryString).not.toContain('path=images')
+    // Collapsing columns is a navigation, so Back returns to the deeper folder
+    expect(update.options.history).toBe('push')
+    expect(snapshot.popColumnAtIndex).toHaveBeenCalledWith(0)
+  })
+
+  it('applies a ?path change that lands mid-restore instead of overwriting it', async () => {
+    const releases: (() => void)[] = []
+    const snapshot = createSnapshot({ columns: [] })
+    snapshot.fetchFoldersByPath.mockImplementation(async ({ paths }: { paths: string[] }) => {
+      await new Promise<void>((resolve) => releases.push(resolve))
+      // A restore always lands the store on the path it was started for
+      snapshot.openedFolders = paths.map(makeFolder)
+      snapshot.columns = [makeColumn('my-bucket'), ...paths.map((path) => makeColumn(path))]
+      return { missingPaths: [] }
+    })
+    mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
+
+    const { onUrlUpdate, rerender, setSearchParams } = renderWithProvider({
+      searchParams: '?path=images/2024',
+      hasMemory: true,
+    })
+    await waitFor(() => expect(snapshot.fetchFoldersByPath).toHaveBeenCalledTimes(1))
+
+    // Back, while the first restore is still in flight
+    act(() => setSearchParams('?path=images'))
+    await act(async () => {
+      releases.shift()!()
+    })
+    act(() => rerender())
+
+    // Finishing the first restore must not write `images/2024` back over the newer URL
+    expect(onUrlUpdate).not.toHaveBeenCalled()
+    await waitFor(() => expect(snapshot.fetchFoldersByPath).toHaveBeenCalledTimes(2))
+    expect(snapshot.fetchFoldersByPath).toHaveBeenLastCalledWith({
+      paths: ['images'],
+      searchString: '',
+      showLoading: true,
+    })
+  })
+
+  it('swaps the preview when ?preview names a same-named file in another folder', async () => {
+    const snapshot = createSnapshot({
+      openedFolders: [makeFolder('archive')],
+      columns: [
+        makeColumn('my-bucket'),
+        makeColumn('archive', [{ ...makeFile('photo.png'), id: 'archive/photo.png' }]),
+      ],
+      selectedFilePreview: { ...makeFile('photo.png'), id: 'images/photo.png', columnIndex: 1 },
+    })
+    mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
+
+    renderWithProvider({ searchParams: '?path=archive&preview=photo.png' })
+
+    await waitFor(() => {
+      expect(snapshot.setSelectedFilePreview).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'archive/photo.png', columnIndex: 1 })
+      )
+    })
+  })
+
+  it('leaves ?preview alone while a search is narrowing the folder listing', async () => {
+    const snapshot = createSnapshot({
+      columns: [makeColumn('my-bucket', [makeFile('other.png')])],
+    })
+    mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
+
+    const { onUrlUpdate } = renderWithProvider({
+      searchParams: '?preview=a.png',
+      searchString: 'other',
+    })
+
+    await act(async () => {})
+    expect(onUrlUpdate).not.toHaveBeenCalled()
     expect(snapshot.setSelectedFilePreview).not.toHaveBeenCalled()
   })
 

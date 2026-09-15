@@ -410,9 +410,8 @@ function createStorageExplorerState({
     },
 
     /**
-     * Rebuilds the entire column stack (and `openedFolders`) from an absolute folder
-     * path. Returns the path segments that could not be found, so callers restoring
-     * from a URL can tell the user their link is stale.
+     * Rebuilds the column stack (and `openedFolders`) from an absolute folder path,
+     * returning the segments it could not find so a URL restore can recover.
      */
     fetchFoldersByPath: async ({
       paths,
@@ -450,17 +449,18 @@ function createStorageExplorerState({
               path: prefix,
               options,
             })
-            return data
+            return { items: data, isComplete: true }
           } catch (error: any) {
             toast.error(`Failed to fetch folders: ${error.message}`)
-            return []
+            // Flagged so an empty listing isn't read as "the folder has nothing in it"
+            return { items: [], isComplete: false }
           }
         })
       )
 
-      const formattedFolders = foldersItems.map((folderItems, idx) => {
+      const formattedFolders = foldersItems.map(({ items }, idx) => {
         const prefix = paths.slice(0, idx).join('/')
-        const formattedItems = formatFolderItems(folderItems, prefix)
+        const formattedItems = formatFolderItems(items, prefix)
         return {
           id: null,
           status: STORAGE_ROW_STATUS.READY,
@@ -482,11 +482,11 @@ function createStorageExplorerState({
         const folderInfo = find(parentColumn.items, { name: path })
         // Folder doesnt exist, FE just scaffolds a "fake" folder
         if (!folderInfo) {
-          // Only report a segment as genuinely missing when the parent listing is
-          // complete and unfiltered. A search narrows the listing, and the listing is
-          // capped at LIMIT — in both cases a folder that does exist can be absent
-          // from `items` without having been deleted.
-          if (!searchString && !parentColumn.hasMoreItems) missingPaths.push(path)
+          // Only report a missing segment when the parent listing proves it: a failed
+          // request, a search filter, or a LIMIT cap can all drop a folder that exists.
+          const isParentListingExhaustive =
+            foldersItems[idx].isComplete && !searchString && !parentColumn.hasMoreItems
+          if (isParentListingExhaustive) missingPaths.push(path)
           return {
             id: null,
             name: path,

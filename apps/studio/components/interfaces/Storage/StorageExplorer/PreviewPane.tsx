@@ -142,8 +142,14 @@ export const PreviewPane = () => {
       style={{ width }}
     >
       {/* Preview Header */}
-      <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
-        <X className="cursor-pointer" size={14} onClick={clearPreviewedFile} />
+      <div className="flex w-full justify-end">
+        <Button
+          variant="text"
+          className="w-6 h-6 text-foreground-lighter hover:text-foreground"
+          icon={<X size={14} />}
+          aria-label="Close preview"
+          onClick={clearPreviewedFile}
+        />
       </div>
 
       {/* Preview Thumbnail*/}
