@@ -118,7 +118,6 @@ export const ChartLine = ({
   referenceLines,
 }: ChartLineProps) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
-  // useId contains colons, which are not valid in an SVG id referenced by url().
   const gradientPrefix = `chart-line-fill-${useId().replace(/:/g, '')}`
   const { resolvedTheme } = useTheme()
   const isDarkMode = resolvedTheme?.includes('dark')
@@ -159,9 +158,6 @@ export const ChartLine = ({
     ...XAxisProps,
   }
 
-  // Recharts reserves this much horizontal space for the y axis. The faux x axis
-  // below is plain HTML outside the SVG, so it has to be indented by the same
-  // amount to line up with where the plot actually starts.
   const yAxisWidth = showYAxis ? (YAxisProps?.width ?? 60) : 0
 
   const yAxisConfig = {
@@ -176,11 +172,6 @@ export const ChartLine = ({
     ...YAxisProps,
   }
 
-  // The faux x axis below sits outside the plot, in normal flow. Its 16px height
-  // plus the column's 12px gap is subtracted from the chart so the component's
-  // overall height is unchanged. Kept as a definite height rather than flex-1:
-  // Recharts' ResponsiveContainer measures its parent and renders nothing if it
-  // reads 0 before layout settles.
   const hasDateRangeFooter = xKey === 'timestamp' && data.length > 0
 
   const resolveSeriesColor = (key: string) => {
@@ -315,7 +306,6 @@ export const ChartLine = ({
               />
             }
           />
-          {/* Selection highlight area */}
           {showHighlightActions && (
             <ReferenceArea
               x1={chartHighlight?.coordinates.left}

@@ -15,9 +15,6 @@ import {
 import type { CategoricalChartState } from 'recharts/types/chart/types'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 
-// Applied to every bar outside the hovered column, matching the dimming
-// LogsBarChart does with its muted per-series colours. Opacity is used instead
-// so it works for any ChartConfig, not just hues with a hand-picked muted step.
 const DIMMED_FILL_OPACITY = 0.35
 
 const CHART_COLORS = {
@@ -155,9 +152,6 @@ export const ChartBar = ({
     ...XAxisProps,
   }
 
-  // Recharts reserves this much horizontal space for the y axis. The faux x axis
-  // below is plain HTML outside the SVG, so it has to be indented by the same
-  // amount to line up with where the plot actually starts.
   const yAxisWidth = showYAxis ? (YAxisProps?.width ?? 60) : 0
 
   const yAxisConfig = {
@@ -172,11 +166,6 @@ export const ChartBar = ({
     ...YAxisProps,
   }
 
-  // The faux x axis below sits outside the plot, in normal flow. Its 16px height
-  // plus the column's 12px gap is subtracted from the chart so the component's
-  // overall height is unchanged. Kept as a definite height rather than flex-1:
-  // Recharts' ResponsiveContainer measures its parent and renders nothing if it
-  // reads 0 before layout settles.
   const hasDateRangeFooter = xKey === 'timestamp' && data.length > 0
 
   const margin = {
@@ -255,7 +244,6 @@ export const ChartBar = ({
               />
             }
           />
-          {/* Selection highlight area */}
           {showHighlightActions && (
             <ReferenceArea
               x1={chartHighlight?.coordinates.left}
