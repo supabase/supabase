@@ -14,7 +14,7 @@
     "start:next": "next start -p 8082",
     "dev:tanstack": "NODE_OPTIONS=--max-old-space-size=8192 vite dev --port ${STUDIO_PORT:-8082}",
     "build:tanstack": "vite build --mode ${MODE:-production}",
-    "start:tanstack": "PORT=${PORT:-8082} node --env-file-if-exists=.env --env-file-if-exists=.env.local --env-file-if-exists=.env.${MODE:-production} --env-file-if-exists=.env.${MODE:-production}.local .output/server/index.mjs",
+    "start:tanstack": "node --env-file-if-exists=.env --env-file-if-exists=.env.local --env-file-if-exists=.env.${MODE:-production} --env-file-if-exists=.env.${MODE:-production}.local .output/server/index.mjs",
     "lint": "eslint .",
     "lint:ratchet": "tsx scripts/ratchet-eslint-rules.ts --rules-file scripts/ratchet-rules.json",
     "clean": "rimraf .next .turbo tsconfig.tsbuildinfo",
