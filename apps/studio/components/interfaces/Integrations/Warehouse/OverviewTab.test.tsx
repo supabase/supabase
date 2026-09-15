@@ -48,7 +48,10 @@ vi.mock('./WarehouseSchemaTablePicker', () => ({
       <h2>Tables</h2>
       <span>Replicated tables picker</span>
       {!!error && <span>Picker error: {error.message}</span>}
-      <button onClick={() => onSubmit([{ type: 'table', schema: 'public', name: 'orders' }])}>
+      <button
+        tabIndex={0}
+        onClick={() => onSubmit([{ type: 'table', schema: 'public', name: 'orders' }])}
+      >
         {isEditing ? 'Submit edited tables' : 'Submit initial tables'}
       </button>
     </section>

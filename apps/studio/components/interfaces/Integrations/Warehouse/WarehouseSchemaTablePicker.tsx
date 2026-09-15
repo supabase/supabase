@@ -19,14 +19,12 @@ import {
   getSchemaTableKey,
   getSelectedTableCount,
   hasSelectionChanged,
-  isPipelineLimitError,
   isSelectableWarehouseSchema,
   type SchemaTableSelection,
   type SchemaWithTables,
   type WarehouseSetupTarget,
 } from './Warehouse.utils'
 import { AlertError } from '@/components/ui/AlertError'
-import { InlineLink } from '@/components/ui/InlineLink'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
@@ -219,25 +217,11 @@ export const WarehouseSchemaTablePicker = ({
         {!!error && (
           <AlertError
             subject={
-              isPipelineLimitError(error.message)
-                ? 'This project has no replication pipeline available'
-                : isEditing
-                  ? 'Failed to update replicated tables'
-                  : 'Failed to enable Warehouse'
+              isEditing ? 'Failed to update replicated tables' : 'Failed to enable Warehouse'
             }
             error={error}
             projectRef={projectRef}
-          >
-            {isPipelineLimitError(error.message) && (
-              <p className="text-sm">
-                Warehouse needs a replication pipeline of its own. Remove an existing pipeline in{' '}
-                <InlineLink href={`/project/${projectRef}/database/replication`}>
-                  Database Replication
-                </InlineLink>{' '}
-                and try again.
-              </p>
-            )}
-          </AlertError>
+          />
         )}
         <Card>
           <CardContent>
