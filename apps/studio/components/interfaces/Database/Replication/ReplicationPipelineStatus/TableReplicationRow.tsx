@@ -12,10 +12,9 @@ import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-repl
 
 interface TableReplicationRowProps {
   table: ReplicationPipelineTableStatus
-  isRestarting: boolean
   showDisabledState: boolean
   disabledStateMessage: string
-  isAnyRestartInProgress: boolean
+  isActionPending: boolean
   isPipelineStopped: boolean
   onSelectRestart: () => void
   onSelectShowError: () => void
@@ -23,10 +22,9 @@ interface TableReplicationRowProps {
 
 export const TableReplicationRow = ({
   table,
-  isRestarting,
   showDisabledState,
   disabledStateMessage,
-  isAnyRestartInProgress,
+  isActionPending,
   isPipelineStopped,
   onSelectRestart,
   onSelectShowError,
@@ -62,23 +60,14 @@ export const TableReplicationRow = ({
       </TableCell>
 
       <TableCell className="align-top">
-        {isRestarting ? (
-          <Badge variant="default">Restarting</Badge>
-        ) : showDisabledState ? (
-          <Badge variant="default">Not Available</Badge>
-        ) : (
-          statusConfig.badge
-        )}
+        {showDisabledState ? <Badge variant="default">Not Available</Badge> : statusConfig.badge}
       </TableCell>
 
       <TableCell className="align-top">
-        {isRestarting ? (
-          <p className="text-sm text-foreground-lighter">
-            Replication is being restarted for this table. The pipeline will restart automatically.
-          </p>
-        ) : showDisabledState ? (
+        {showDisabledState && (
           <p className="text-sm text-foreground-lighter">{disabledStateMessage}</p>
-        ) : (
+        )}
+        {!showDisabledState && (
           <div className="flex flex-col gap-y-3">
             <div className="text-sm text-foreground">
               {statusConfig.description}{' '}
@@ -104,13 +93,15 @@ export const TableReplicationRow = ({
               <Button
                 className="w-7"
                 icon={<RotateCcw />}
-                disabled={showDisabledState || isRestarting || isAnyRestartInProgress}
+                disabled={showDisabledState || isActionPending}
                 aria-label={`Restart replication for ${table.schema}.${table.name}`}
                 onClick={onSelectRestart}
               />
             </TooltipTrigger>
             <TooltipContent side="bottom" align="center">
-              {isPipelineStopped ? 'Reset table and start pipeline' : 'Reset and restart pipeline'}
+              {isPipelineStopped
+                ? 'Restart replication when the pipeline is started'
+                : 'Restart replication'}
             </TooltipContent>
           </Tooltip>
         </div>

@@ -48,10 +48,15 @@ export const useUpdatePipelineVersionMutation = ({
     mutationFn: (vars) => updatePipelineVersion(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables
-      // Ensure the version dot updates promptly
-      await queryClient.invalidateQueries({
-        queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId),
-      })
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId),
+        }),
+        queryClient.invalidateQueries(
+          { queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId) },
+          { cancelRefetch: false }
+        ),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(error, variables, context) {

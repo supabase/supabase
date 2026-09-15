@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 
@@ -6,6 +7,7 @@ import { useGenerateDatabaseMenu } from './DatabaseMenu.utils'
 import { ProductMenu } from '@/components/ui/ProductMenu'
 import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
 import { withAuth } from '@/hooks/misc/withAuth'
+import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 
 export interface DatabaseLayoutProps {
   title: string
@@ -19,7 +21,8 @@ export const DatabaseProductMenu = () => {
   return <ProductMenu page={page} menu={menu} />
 }
 
-const DatabaseLayout = ({ children, title }: PropsWithChildren<DatabaseLayoutProps>) => {
+const DatabaseLayoutContent = ({ children, title }: PropsWithChildren<DatabaseLayoutProps>) => {
+  const { ref: projectRef } = useParams()
   const router = useRouter()
   const page = router.pathname.split('/')[4]
   const menu = useGenerateDatabaseMenu()
@@ -32,9 +35,9 @@ const DatabaseLayout = ({ children, title }: PropsWithChildren<DatabaseLayoutPro
       isBlocking={false}
     >
       <ProductMenuShortcuts menu={menu} />
-      {children}
+      <PipelineRequestStatusProvider key={projectRef}>{children}</PipelineRequestStatusProvider>
     </ProjectLayout>
   )
 }
 
-export default withAuth(DatabaseLayout)
+export const DatabaseLayout = withAuth(DatabaseLayoutContent)
