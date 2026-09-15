@@ -67,25 +67,30 @@ export function getPgsqlCompletionProvider(
 // replacing the current word anyway, so we compute that explicitly rather than leave it implicit.
 //
 // `"` is a word separator for Monaco, so `getWordUntilPosition` never includes surrounding double
-// quotes in the word it finds. When the identifier being completed already sits between a pair of
-// them (typed by hand, or auto-closed by the editor as you type the opening quote), we expand the
-// range to swallow both quotes and flag `isQuoted` so callers always emit fully-quoted insertText —
-// otherwise a quoted insertText lands inside the untouched existing quotes and doubles them up.
+// quotes in the word it finds. When the identifier being completed already sits next to one —
+// typed by hand, auto-closed by the editor as you type the opening quote, or with the closing
+// quote since deleted (e.g. `"OrderD` at end of line, no closing quote at all) — we expand the
+// range to swallow whichever quote(s) are actually there and flag `isQuoted` so callers always
+// emit fully-quoted insertText. Each side is checked independently: swallowing only the side that
+// has a quote (and leaving the other side's boundary untouched when there's nothing to swallow)
+// is what stops a quoted insertText from landing next to an untouched pre-existing quote and
+// doubling it up.
 function getReplacementRange(
   model: editor.ITextModel,
   position: Position
 ): { range: languages.CompletionItem['range']; isQuoted: boolean } {
   const word = model.getWordUntilPosition(position)
   const line = model.getLineContent(position.lineNumber)
-  const isQuoted =
-    line.charAt(word.startColumn - 2) === '"' && line.charAt(word.endColumn - 1) === '"'
+  const hasLeadingQuote = line.charAt(word.startColumn - 2) === '"'
+  const hasTrailingQuote = line.charAt(word.endColumn - 1) === '"'
+  const isQuoted = hasLeadingQuote || hasTrailingQuote
 
   return {
     range: {
       startLineNumber: position.lineNumber,
       endLineNumber: position.lineNumber,
-      startColumn: isQuoted ? word.startColumn - 1 : word.startColumn,
-      endColumn: isQuoted ? word.endColumn + 1 : word.endColumn,
+      startColumn: hasLeadingQuote ? word.startColumn - 1 : word.startColumn,
+      endColumn: hasTrailingQuote ? word.endColumn + 1 : word.endColumn,
     },
     isQuoted,
   }

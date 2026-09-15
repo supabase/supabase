@@ -309,4 +309,60 @@ describe('getPgsqlCompletionProvider - quoted identifiers', () => {
     const suggestion = result.suggestions.find((s) => s.label === 'OrderDate')
     expect(suggestion?.filterText).toBe('"OrderDate')
   })
+
+  it('replaces only the pre-existing opening quote instead of doubling it up when the closing quote has been deleted', () => {
+    // Regression test for: type `"OrderD` (auto-closed to `"OrderD|"`), delete the closing quote
+    // (leaving `"OrderD` with no closing quote at all), then accept the `OrderDate` suggestion —
+    // previously produced `""OrderDate` because `isQuoted` required both quotes to be present, so
+    // the range left the existing opening quote untouched while the quoted insertText added another.
+    const pgInfoRef = createQuotedPgInfoRef()
+    const line = 'select * from test_orders where "OrderD'
+    const word = 'OrderD'
+
+    const provider = getPgsqlCompletionProvider(monaco, pgInfoRef)
+    const context = { triggerCharacter: undefined } as unknown as ProvideCompletionItemsParams[2]
+    const token = {} as ProvideCompletionItemsParams[3]
+
+    const result = provider.provideCompletionItems(
+      createQuotedIdentModel(line, word),
+      createQuotedIdentPosition(line, word),
+      context,
+      token
+    ) as languages.CompletionList
+
+    const suggestion = result.suggestions.find((s) => s.label === 'OrderDate')
+    expect(suggestion?.insertText).toBe('"OrderDate"')
+    expect(suggestion?.filterText).toBe('"OrderDate')
+
+    // Only the opening quote gets swallowed — there's no closing quote to swallow, so the end
+    // boundary stays at the word's own end (the cursor position).
+    const quoteStart = line.indexOf('"')
+    const range = suggestion?.range as { startColumn: number; endColumn: number }
+    expect(range.startColumn).toBe(quoteStart + 1)
+    expect(range.endColumn).toBe(line.length + 1)
+  })
+
+  it('still quotes an all-lowercase column when the closing quote is missing', () => {
+    // formatInsertText only force-quotes on `isQuoted`, since a mixed-case column already forces
+    // quoting via its own `hasUpperCase` check regardless of `isQuoted`. An all-lowercase column
+    // has no such fallback, so this exercises `isQuoted` being detected from the opening quote alone.
+    const pgInfoRef = createQuotedPgInfoRef()
+    pgInfoRef.current.tableColumns[0].columns.push({ attname: 'orderdate', data_type: 'date' })
+    const line = 'select * from test_orders where "orderd'
+    const word = 'orderd'
+
+    const provider = getPgsqlCompletionProvider(monaco, pgInfoRef)
+    const context = { triggerCharacter: undefined } as unknown as ProvideCompletionItemsParams[2]
+    const token = {} as ProvideCompletionItemsParams[3]
+
+    const result = provider.provideCompletionItems(
+      createQuotedIdentModel(line, word),
+      createQuotedIdentPosition(line, word),
+      context,
+      token
+    ) as languages.CompletionList
+
+    const suggestion = result.suggestions.find((s) => s.label === 'orderdate')
+    expect(suggestion?.insertText).toBe('"orderdate"')
+  })
 })
