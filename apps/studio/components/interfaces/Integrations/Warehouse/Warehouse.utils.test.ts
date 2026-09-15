@@ -6,6 +6,7 @@ import {
   getSchemaCheckedState,
   getSchemaTableKey,
   getSelectedTableCount,
+  getWarehouseDestinationProjectRef,
   hasSelectionChanged,
   isSelectableWarehouseSchema,
   type SchemaTableSelection,
@@ -48,11 +49,46 @@ describe('WarehouseModePanel.utils:isSelectableWarehouseSchema', () => {
     // Replicating the catalog that describes the Warehouse would feed it its own metadata
     expect(isSelectableWarehouseSchema(WAREHOUSE_METADATA_SCHEMA)).toBe(false)
     expect(isSelectableWarehouseSchema('ducklake')).toBe(false)
+    expect(isSelectableWarehouseSchema('ducklake_aaaaaaaaaaaaaaaaaaaa')).toBe(false)
   })
 
   test('includes schemas whose names merely resemble the catalog schema', () => {
     expect(isSelectableWarehouseSchema('ducklake_staging')).toBe(true)
     expect(isSelectableWarehouseSchema('my_ducklake')).toBe(true)
+  })
+})
+
+describe('getWarehouseDestinationProjectRef', () => {
+  test.each(['co', 'green'])('reads the project from a managed %s Storage endpoint', (domain) => {
+    expect(
+      getWarehouseDestinationProjectRef({
+        ducklake: {
+          data_path: 's3://warehouse/',
+          s3_endpoint: `bbbbbbbbbbbbbbbbbbbb.storage.supabase.${domain}/storage/v1/s3`,
+        },
+      })
+    ).toBe('bbbbbbbbbbbbbbbbbbbb')
+  })
+
+  test.each([
+    null,
+    undefined,
+    '',
+    'https://bbbbbbbbbbbbbbbbbbbb.storage.supabase.co/storage/v1/s3',
+    'bbbbbbbbbbbbbbbbbbbb.storage.example.com/storage/v1/s3',
+    'bbbbbbbbbbbbbbbbbbbb.storage.supabase.co.attacker.example/storage/v1/s3',
+    'invalid.storage.supabase.co/storage/v1/s3',
+  ])('does not infer a project from an unsupported endpoint %s', (s3_endpoint) => {
+    expect(
+      getWarehouseDestinationProjectRef({ ducklake: { data_path: 's3://warehouse/', s3_endpoint } })
+    ).toBeUndefined()
+  })
+
+  test('returns no project before a destination exists', () => {
+    expect(getWarehouseDestinationProjectRef()).toBeUndefined()
+    expect(
+      getWarehouseDestinationProjectRef({ big_query: { project_id: 'test', dataset_id: 'test' } })
+    ).toBeUndefined()
   })
 })
 

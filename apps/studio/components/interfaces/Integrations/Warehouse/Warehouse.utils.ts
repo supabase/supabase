@@ -1,5 +1,6 @@
 import type { components } from 'api-types'
 
+import type { ReplicationDestinationsData } from '@/data/replication/destinations-query'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 import { WAREHOUSE_METADATA_SCHEMA } from '@/lib/warehouse'
 
@@ -51,8 +52,18 @@ export function isSelectableWarehouseSchema(schemaName: string): boolean {
   return (
     !schemaName.startsWith('pg_') &&
     !NON_SELECTABLE_SCHEMAS.has(schemaName) &&
-    schemaName !== WAREHOUSE_METADATA_SCHEMA
+    schemaName !== WAREHOUSE_METADATA_SCHEMA &&
+    !/^ducklake_[a-z]{20}$/.test(schemaName)
   )
+}
+
+export function getWarehouseDestinationProjectRef(
+  config?: ReplicationDestinationsData['destinations'][number]['config']
+): string | undefined {
+  if (!config || !('ducklake' in config)) return undefined
+  return config.ducklake.s3_endpoint?.match(
+    /^([a-z]{20})\.storage\.supabase\.(?:co|green)\/storage\/v1\/s3$/
+  )?.[1]
 }
 
 export function getSelectedTableCount(selection: SchemaTableSelection): number {

@@ -44,6 +44,7 @@ import { WAREHOUSE_PUBLICATION_NAME } from '@/lib/warehouse'
 export interface WarehouseSchemaTablePickerProps {
   onSubmit: (targets: WarehouseSetupTarget[]) => void
   isSubmitting: boolean
+  isSubmitDisabled?: boolean
   isEditing?: boolean
   error?: { message: string } | null
 }
@@ -51,6 +52,7 @@ export interface WarehouseSchemaTablePickerProps {
 export const WarehouseSchemaTablePicker = ({
   onSubmit,
   isSubmitting,
+  isSubmitDisabled = false,
   isEditing = false,
   error,
 }: WarehouseSchemaTablePickerProps) => {
@@ -157,6 +159,7 @@ export const WarehouseSchemaTablePicker = ({
   }
 
   const handleSubmit = () => {
+    if (isSubmitDisabled || isSubmitting) return
     const targets = buildWarehouseSetupTargets(selection, schemasWithTables)
     if (targets.length === 0) return
     onSubmit(targets)
@@ -303,7 +306,7 @@ export const WarehouseSchemaTablePicker = ({
               {hasChanges && <Button onClick={() => setSelectionOverride(null)}>Cancel</Button>}
               <Button
                 variant="primary"
-                disabled={selectedCount === 0 || !hasChanges}
+                disabled={selectedCount === 0 || !hasChanges || isSubmitDisabled}
                 loading={isSubmitting}
                 onClick={handleSubmit}
               >
