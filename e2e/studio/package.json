@@ -19,7 +19,7 @@
     "otpauth": "^9.4.1"
   },
   "devDependencies": {
-    "@faker-js/faker": "^9.9.0",
+    "@faker-js/faker": "^10.5.0",
     "api-types": "workspace:*",
     "tsx": "catalog:"
   }
