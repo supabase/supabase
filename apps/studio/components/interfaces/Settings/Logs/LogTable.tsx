@@ -216,7 +216,7 @@ export const LogTable = ({
             next.add(key)
           }
         }
-        selectionAnchorRef.current = key
+        selectionAnchorRef.current = next.size > 0 ? key : null
         setSelectedRows(next)
         if (next.size > 0) {
           setSelectedRow(null)
@@ -410,7 +410,7 @@ export const LogTable = ({
       } else {
         next.add(key)
       }
-      selectionAnchorRef.current = key
+      selectionAnchorRef.current = next.size > 0 ? key : null
       setSelectedRows(next)
     },
     { enabled: selectedRow !== null }
@@ -452,6 +452,7 @@ export const LogTable = ({
   useEffect(() => {
     if (isLoading) {
       setSelectedRows(new Set())
+      selectionAnchorRef.current = null
     }
   }, [isLoading])
 
