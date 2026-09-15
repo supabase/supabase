@@ -47,11 +47,18 @@ export function getConnectionStatusUi(status?: PrivateLinkConnectionStatus): Con
 }
 
 export function getConnectionTitle(
-  account: Pick<AWSAccount, 'account_name' | 'aws_account_id'>
+  account: Pick<AWSAccount, 'account_name' | 'aws_account_id' | 'partner'>
 ): string {
   const nickname = account.account_name?.trim()
   if (nickname) return nickname
+  if (account.partner === 'vercel') return 'Vercel'
   return account.aws_account_id
+}
+
+const IAM_ROLE_ARN_PATTERN = /^arn:aws:iam::\d{12}:role\/.+/
+
+export function isIamRoleArn(value: string) {
+  return IAM_ROLE_ARN_PATTERN.test(value.trim())
 }
 
 export type ConnectionsAttention = {
