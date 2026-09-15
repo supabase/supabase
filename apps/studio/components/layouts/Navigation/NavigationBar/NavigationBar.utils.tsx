@@ -178,6 +178,7 @@ export const generateProductRoutes = (
             icon: <Compute size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/compute`),
             isNew: true,
+            shortcutId: SHORTCUT_IDS.NAV_COMPUTE,
           },
         ]
       : []),

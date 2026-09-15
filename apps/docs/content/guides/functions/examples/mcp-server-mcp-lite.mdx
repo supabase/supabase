@@ -262,9 +262,9 @@ https://your-project-ref.supabase.co/functions/v1/mcp-server/mcp
 
 <Admonition type="caution">
 
-The template uses `--no-verify-jwt` for quick development. This means authentication is not enforced by Supabase's JWT layer.
+The template uses `--no-verify-jwt` for quick development. This means authentication is not enforced by Supabase's JWT layer, and anyone who finds the URL can call your tools.
 
-For production, you should implement authentication at the MCP server level following the [MCP Authorization specification](https://modelcontextprotocol.io/specification/draft/basic/authorization). This gives you control over who can access your MCP tools.
+For production, authenticate at the MCP server level following the [MCP Authorization specification](https://modelcontextprotocol.io/specification/draft/basic/authorization). On Supabase, `withOAuthProtectedResource` and `withSupabase` from `@supabase/server` do this with Supabase Auth as the OAuth 2.1 server, so each tool call runs as the signed-in user. They wrap any MCP library, including mcp-lite. See [Deploy MCP servers](/docs/guides/ai-tools/byo-mcp).
 
 </Admonition>
 

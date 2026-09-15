@@ -34,7 +34,7 @@ export const TOTPFactors = () => {
   const totpFactors = data?.totp ?? []
   const canAddApp = isSuccess && totpFactors.length < 2
   const shouldShowLockoutWarning = isSuccess && totpFactors.length === 1
-  const shouldVerifyRecoveryCodes = enableAuthRecoveryCodes && totpFactors.length > 0
+  const shouldVerifyRecoveryCodes = enableAuthRecoveryCodes && totpFactors.length === 1
 
   const { data: recoveryCodesStatus } = useRecoveryCodesStatusQuery({
     enabled: shouldVerifyRecoveryCodes,
@@ -62,9 +62,7 @@ export const TOTPFactors = () => {
           )}
         </PageSectionMeta>
         <PageSectionContent className="flex flex-col gap-4">
-          {shouldVerifyRecoveryCodes && recoveryCodesStatus?.status === 'unenrolled' && (
-            <GenerateRecoveryCodesModal />
-          )}
+          {recoveryCodesStatus?.status === 'unenrolled' && <GenerateRecoveryCodesModal />}
           {recoveryCodesStatus?.status === 'available' && (
             <Admonition
               layout="responsive"
