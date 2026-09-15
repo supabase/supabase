@@ -66,6 +66,14 @@
       "import": "./src/Banners/LW15Banner.tsx",
       "types": "./src/Banners/LW15Banner.tsx"
     },
+    "./Banners/PrivacyPolicyBanner": {
+      "import": "./src/Banners/PrivacyPolicyBanner.tsx",
+      "types": "./src/Banners/PrivacyPolicyBanner.tsx"
+    },
+    "./Banners/PrivacyPolicyPromotion": {
+      "import": "./src/Banners/PrivacyPolicyPromotion.tsx",
+      "types": "./src/Banners/PrivacyPolicyPromotion.tsx"
+    },
     "./Banners/Select26Banner": {
       "import": "./src/Banners/Select26Banner.tsx",
       "types": "./src/Banners/Select26Banner.tsx"
