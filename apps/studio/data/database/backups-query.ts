@@ -12,7 +12,7 @@ export type BackupsVariables = {
   projectStatus?: string
 }
 
-export type DatabaseBackup = components['schemas']['BackupsResponse']['backups'][number]
+export type DatabaseBackup = components['schemas']['BackupsResponse_Output']['backups'][number]
 
 export async function getBackups({ projectRef }: BackupsVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('Project ref is required')

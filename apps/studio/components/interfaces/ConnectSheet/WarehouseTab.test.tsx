@@ -10,8 +10,8 @@ import { WarehouseTab } from './WarehouseTab'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type WarehouseSetupStatusResponse = components['schemas']['WarehouseSetupStatusResponse']
-type WarehouseCatalogResponse = components['schemas']['WarehouseCatalogResponse']
+type WarehouseSetupStatusResponse = components['schemas']['WarehouseSetupStatusResponse_Output']
+type WarehouseCatalogResponse = components['schemas']['WarehouseCatalogResponse_Output']
 type UpdateWarehouseCatalogBody = components['schemas']['UpdateWarehouseCatalogBody']
 
 const FDW_STATUS: WarehouseSetupStatusResponse['fdw_status'] = {

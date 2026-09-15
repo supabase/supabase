@@ -11,7 +11,7 @@ import { WarehouseOverviewTab } from './OverviewTab'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type WarehouseSetupStatusResponse = components['schemas']['WarehouseSetupStatusResponse']
+type WarehouseSetupStatusResponse = components['schemas']['WarehouseSetupStatusResponse_Output']
 
 // Both integration shells are live, and the flag reads a context plus ConfigCat that
 // `customRender` doesn't provide.

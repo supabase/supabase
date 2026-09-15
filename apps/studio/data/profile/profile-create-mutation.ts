@@ -8,7 +8,7 @@ import { organizationKeys } from '@/data/organizations/keys'
 import { permissionKeys } from '@/data/permissions/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
-export type ProfileResponse = components['schemas']['ProfileResponse']
+export type ProfileResponse = components['schemas']['ProfileResponse_Output']
 
 export async function createProfile() {
   const { data, error } = await post('/platform/profile')

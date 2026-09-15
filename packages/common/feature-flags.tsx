@@ -12,7 +12,8 @@ import { ensurePlatformSuffix } from './helpers'
 import { useParams } from './hooks'
 
 type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBody']
-export type CallFeatureFlagsResponse = components['schemas']['TelemetryCallFeatureFlagsResponse']
+export type CallFeatureFlagsResponse =
+  components['schemas']['TelemetryCallFeatureFlagsResponse_Output']
 
 export async function getFeatureFlags(
   API_URL: string,
