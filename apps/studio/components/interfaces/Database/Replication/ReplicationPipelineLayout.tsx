@@ -120,11 +120,17 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     }
   )
 
-  const { mutateAsync: startPipeline, isPending: isStartingPipeline } = useStartPipelineMutation()
-  const { mutateAsync: stopPipeline, isPending: isStoppingPipeline } = useStopPipelineMutation()
+  const { mutateAsync: startPipeline, isPending: isStartingPipeline } = useStartPipelineMutation({
+    onError: () => {},
+  })
+  const { mutateAsync: stopPipeline, isPending: isStoppingPipeline } = useStopPipelineMutation({
+    onError: () => {},
+  })
   const { mutateAsync: restartPipeline, isPending: isRestartingPipeline } =
     useRestartPipelineMutation()
-  const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({})
+  const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({
+    onError: () => {},
+  })
 
   const statusName = getStatusName(pipelineStatusData?.status)
   const displayState = getPipelineDisplayState(requestStatus, statusName)
