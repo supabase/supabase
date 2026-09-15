@@ -12,15 +12,17 @@
     "build:registry": "rimraf -G public/r/* && tsx ./scripts/build-registry.mts && shadcn build public/r/registry.json && tsx scripts/clean-registry.ts",
     "build:markdown": "tsx ./scripts/build-markdown.ts",
     "build:llms": "tsx ./scripts/build-llms-txt.ts",
+    "build:index": "tsx ./scripts/build-index-md.ts",
     "build:next": "next build --turbopack",
-    "build": "run-p build:content build:registry build:llms build:markdown && pnpm build:next",
+    "build": "pnpm build:prepare && pnpm build:next",
+    "build:prepare": "pnpm build:registry && run-p build:content build:markdown build:llms build:index",
     "test": "pnpm build:markdown && vitest",
     "test:headless-tools": "tsx scripts/test-headless-tools.mts",
     "start": "next start",
     "lint": "eslint .",
     "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
     "clean": "rimraf .next .turbo tsconfig.tsbuildinfo .contentlayer .velite",
-    "typecheck": "run-p build:content build:markdown && tsc --noEmit -p tsconfig.json"
+    "typecheck": "run-p build:content build:markdown && next typegen && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
