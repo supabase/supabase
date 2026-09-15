@@ -746,6 +746,8 @@ export default defineConfig(({ command, mode }) => {
           // loading its lazy chunks.
           immutableStaticFiles: true,
           // Nitro uses a session-wide __vdpl cookie, which pins reloads too.
+          // Keep Skew Protection ENABLED in the Vercel dashboard: this flag
+          // only disables Nitro's cookie integration, not Vercel's routing.
           // start.ts pins only server functions using Vercel's request header.
           skewProtection: false,
           // One function serves every API route, so the timeout must cover
