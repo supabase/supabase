@@ -132,9 +132,9 @@ export function CollapsibleDetails({ title, content }: { title: string; content:
         className={cn(
           'group/trigger',
           'w-full min-h-8',
-          'px-2 py-1.5',
+          'pl-3 pr-2 py-1.5',
           'flex items-center gap-2',
-          'text-xs text-foreground-light',
+          'text-sm text-foreground-light',
           'cursor-pointer hover:bg-surface-200 hover:text-foreground',
           'focus-visible:outline-none',
           'transition-[background-color,color] duration-150 ease-out'
@@ -142,10 +142,10 @@ export function CollapsibleDetails({ title, content }: { title: string; content:
       >
         {title}
         <ChevronRight
-          size={12}
-          strokeWidth={2}
+          size={16}
+          strokeWidth={1.5}
           aria-hidden
-          className="ms-auto shrink-0 text-foreground-muted group-data-open/trigger:rotate-90 transition-transform duration-200 ease-out motion-reduce:transition-none"
+          className="ms-auto shrink-0 text-foreground-lighter group-data-open/trigger:rotate-90 transition-transform duration-200 ease-out motion-reduce:transition-none"
         />
       </CollapsibleTrigger>
       <CollapsibleContent
@@ -159,7 +159,7 @@ export function CollapsibleDetails({ title, content }: { title: string; content:
           className={cn(
             'border-t border-default',
             'prose max-w-none text-sm',
-            !isCodeOnly && 'px-4 py-3 [&_:where(p,li)]:text-sm [&_:where(p,li)]:leading-6'
+            !isCodeOnly && 'px-3 py-2 [&_:where(p,li)]:text-sm [&_:where(p,li)]:leading-6'
           )}
         >
           <MDXRemoteRefs
