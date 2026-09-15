@@ -138,9 +138,6 @@
 }
 
 :root {
-  --chart-blue: 217 91% 60%;
-  --chart-destructive: hsl(var(--destructive-default));
-  --chart-success: color-mix(in oklch, var(--foreground-muted) 50%, white);
   --sidebar-background: var(--background-dash-sidebar);
   --sidebar-foreground: var(--foreground-default);
   --sidebar-primary: var(--foreground-default);
@@ -154,9 +151,6 @@
 
 [data-theme='dark'],
 .dark {
-  --chart-blue: 217 91% 65%;
-  --chart-destructive: hsl(var(--destructive-default));
-  --chart-success: color-mix(in oklch, var(--foreground-muted) 55%, var(--background));
   --sidebar-background: var(--background-dash-sidebar);
   --sidebar-foreground: var(--foreground-default);
   --sidebar-primary: var(--foreground-default);

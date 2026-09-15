@@ -19,4 +19,4 @@ export const LEGEND_ITEMS: Record<string, { label: string; color: string; dataKe
 
 export const CHART_TYPE = 'linear'
 
-export const SEL_COLOR = 'hsl(var(--chart-blue))'
+export const SEL_COLOR = 'var(--chart-2)'

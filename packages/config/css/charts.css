@@ -26,13 +26,10 @@
   --chart-muted: var(--color-scale-700);
   --chart-muted-fill: var(--color-scale-400);
 
-  --chart-warning: var(--warning);
-  --chart-warning-muted: hsl(var(--warning-500));
-
   --chart-status-success: hsl(var(--brand-default));
   --chart-status-success-muted: hsl(var(--brand-500));
-  --chart-status-warning: var(--chart-warning);
-  --chart-status-warning-muted: var(--chart-warning-muted);
+  --chart-status-warning: var(--warning);
+  --chart-status-warning-muted: hsl(var(--warning-500));
   --chart-status-destructive: var(--destructive);
   --chart-status-destructive-muted: hsl(var(--destructive-500));
 }
