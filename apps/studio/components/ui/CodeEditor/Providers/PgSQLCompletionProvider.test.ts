@@ -284,4 +284,29 @@ describe('getPgsqlCompletionProvider - quoted identifiers', () => {
     expect(range.startColumn).toBe(quoteStart + 1)
     expect(range.endColumn).toBe(quoteEnd + 2)
   })
+
+  it('sets filterText with the leading quote so Monaco does not filter out every suggestion while typing inside an auto-closed quote pair', () => {
+    // Regression test for: with the range widened to swallow the opening quote (above), Monaco
+    // fuzzy-matches the typed prefix (e.g. `"OrderD`) against each item's filterText/label. A plain
+    // label like `OrderDate` has no leading quote to match, so every suggestion got filtered out —
+    // the widget showed no suggestions at all, even on an explicit Ctrl+Space re-invoke.
+    const pgInfoRef = createQuotedPgInfoRef()
+    // Only `OrderD` has been typed so far; the closing quote is auto-closed immediately after it.
+    const line = 'select * from test_orders where "OrderD"'
+    const word = 'OrderD'
+
+    const provider = getPgsqlCompletionProvider(monaco, pgInfoRef)
+    const context = { triggerCharacter: undefined } as unknown as ProvideCompletionItemsParams[2]
+    const token = {} as ProvideCompletionItemsParams[3]
+
+    const result = provider.provideCompletionItems(
+      createQuotedIdentModel(line, word),
+      createQuotedIdentPosition(line, word),
+      context,
+      token
+    ) as languages.CompletionList
+
+    const suggestion = result.suggestions.find((s) => s.label === 'OrderDate')
+    expect(suggestion?.filterText).toBe('"OrderDate')
+  })
 })

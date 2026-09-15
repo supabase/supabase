@@ -127,6 +127,7 @@ function startingQuoteScenarioSuggestions(
         kind: monaco.languages.CompletionItemKind.Property,
         detail: field.data_type,
         insertText: formatInsertText(field.attname, isQuoted),
+        filterText: formatFilterText(field.attname, isQuoted),
         range,
       })
     })
@@ -137,6 +138,7 @@ function startingQuoteScenarioSuggestions(
         label: table.tablename,
         kind: monaco.languages.CompletionItemKind.Class,
         insertText: formatInsertText(table.tablename, isQuoted),
+        filterText: formatFilterText(table.tablename, isQuoted),
         range,
       })
     })
@@ -185,6 +187,7 @@ function dotScenarioSuggestions(
           kind: monaco.languages.CompletionItemKind.Property,
           detail: field.data_type,
           insertText: formatInsertText(field.attname, isQuoted),
+          filterText: formatFilterText(field.attname, isQuoted),
           range,
         })
       })
@@ -211,6 +214,7 @@ function dotScenarioSuggestions(
         kind: monaco.languages.CompletionItemKind.Class,
         detail: tbl.schemaname !== 'public' ? tbl.schemaname : undefined,
         insertText: formatInsertText(tbl.tablename, isQuoted),
+        filterText: formatFilterText(tbl.tablename, isQuoted),
         range,
       })
     })
@@ -234,6 +238,7 @@ function dotScenarioSuggestions(
         kind: monaco.languages.CompletionItemKind.Property,
         detail: field.data_type,
         insertText: formatInsertText(field.attname, isQuoted),
+        filterText: formatFilterText(field.attname, isQuoted),
         range,
       })
     })
@@ -280,6 +285,7 @@ function defaultScenarioSuggestions(
         ? monaco.languages.CompletionItemKind.Class
         : monaco.languages.CompletionItemKind.Interface,
       insertText: formatInsertText(insertText, isQuoted),
+      filterText: formatFilterText(x.tablename, isQuoted),
       range,
     })
   })
@@ -331,6 +337,7 @@ function defaultScenarioSuggestions(
           detail: field.data_type,
           documentation: x.tablename,
           insertText: formatInsertText(field.attname, isQuoted),
+          filterText: formatFilterText(field.attname, isQuoted),
           range,
           sortText: hasResolvedFromTables ? `0_${field.attname}` : undefined,
         }
@@ -371,4 +378,14 @@ function readIdents(iterator: BackwardIterator, maxlvl: number): QuotableIdent[]
 function formatInsertText(value: string, forceQuote = false) {
   const hasUpperCase = !(value == value.toLowerCase())
   return hasUpperCase || forceQuote ? `"${value}"` : value
+}
+
+// Monaco filters/scores suggestions by fuzzy-matching the label against the text between the
+// completion item's range start and the cursor. When `isQuoted` is true that range start sits on
+// the literal opening `"` (see getReplacementRange), so the typed prefix looks like `"OrderD` while
+// a plain label like `OrderDate` has no quote to match — every suggestion gets filtered out, even
+// on an explicit Ctrl+Space re-invoke. Mirroring the leading quote into `filterText` keeps it aligned
+// with what's actually been typed.
+function formatFilterText(value: string, isQuoted: boolean) {
+  return isQuoted ? `"${value}` : value
 }
