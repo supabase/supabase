@@ -8,6 +8,15 @@ import { useTabIndicator } from './useTabIndicator'
 
 const Tabs = TabsPrimitive.Root
 
+const trackClasses = cn(
+  'has-[[data-tab-indicator]]:border-b-0',
+  'has-[[data-tab-indicator]]:after:pointer-events-none has-[[data-tab-indicator]]:after:absolute',
+  'has-[[data-tab-indicator]]:after:bottom-0 has-[[data-tab-indicator]]:after:h-px',
+  'has-[[data-tab-indicator]]:after:left-[var(--tab-track-inset,0px)]',
+  'has-[[data-tab-indicator]]:after:right-0',
+  'has-[[data-tab-indicator]]:after:bg-[var(--tab-track,var(--border-default))]'
+)
+
 const TabsList = ({
   className,
   children,
@@ -24,17 +33,7 @@ const TabsList = ({
         if (typeof ref === 'function') ref(node)
         else if (ref) ref.current = node
       }}
-      className={cn(
-        'group/list relative flex items-center border-b',
-        'has-[[data-tab-indicator]]:border-b-0',
-        'has-[[data-tab-indicator]]:after:absolute',
-        'has-[[data-tab-indicator]]:after:left-[var(--tab-track-inset,0px)]',
-        'has-[[data-tab-indicator]]:after:right-0',
-        'has-[[data-tab-indicator]]:after:bottom-0 has-[[data-tab-indicator]]:after:h-px',
-        'has-[[data-tab-indicator]]:after:bg-[var(--tab-track,var(--border-default))]',
-        'has-[[data-tab-indicator]]:after:pointer-events-none',
-        className
-      )}
+      className={cn('group/list relative flex items-center border-b', trackClasses, className)}
       {...props}
     >
       {children}
