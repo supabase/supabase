@@ -115,7 +115,8 @@ export const ProtectionAuthSettingsForm = () => {
   const { isDirty } = protectionForm.formState
 
   useEffect(() => {
-    if (authConfig && !isUpdatingConfig) {
+    // Background refetches (e.g. on window focus) must not overwrite edits in progress
+    if (authConfig && !isUpdatingConfig && !isDirty) {
       const SECURITY_CAPTCHA_PROVIDER = (authConfig.SECURITY_CAPTCHA_PROVIDER ||
         'hcaptcha') as CaptchaProviders
 
@@ -126,10 +127,13 @@ export const ProtectionAuthSettingsForm = () => {
         PASSWORD_HIBP_ENABLED: authConfig.PASSWORD_HIBP_ENABLED || false,
       })
     }
-  }, [authConfig, isUpdatingConfig])
+  }, [authConfig, isUpdatingConfig, isDirty])
 
   const onSubmitProtection: SubmitHandler<z.infer<typeof formSchema>> = (values) => {
-    updateAuthConfig({ projectRef: projectRef!, config: values })
+    updateAuthConfig(
+      { projectRef: projectRef!, config: values },
+      { onSuccess: () => protectionForm.reset(values) }
+    )
   }
 
   const SECURITY_CAPTCHA_ENABLED = useWatch({
