@@ -38,6 +38,8 @@ export const GenerateRecoveryCodesModal = () => {
           onOpenChange={(open) => {
             // Prevent users from closing the dialog until they copied the codes
             if (!open && !copied && recoveryCodesGenerateMutation.isSuccess) return
+            // Prevent users from closing the dialog while the mutation is running
+            if (recoveryCodesGenerateMutation.isPending) return
 
             setOpen(open)
             if (!open) {
