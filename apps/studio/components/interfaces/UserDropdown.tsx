@@ -15,7 +15,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  studioThemes,
+  singleThemes,
 } from 'ui'
 
 import { ButtonTooltip } from '../ui/ButtonTooltip'
@@ -155,7 +155,7 @@ export function UserDropdown({
               setTheme(value)
             }}
           >
-            {studioThemes.map((theme) => (
+            {singleThemes.map((theme) => (
               <DropdownMenuRadioItem
                 key={theme.value}
                 value={theme.value}

@@ -13,7 +13,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  studioThemes,
+  singleThemes,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -55,7 +55,7 @@ const SingleThemeSelection = memo(function SingleThemeSelection({
       value={theme}
       className="grid grid-cols-2 gap-4"
     >
-      {studioThemes.map((themeMode) => (
+      {singleThemes.map((themeMode) => (
         <RadioGroupLargeItem
           className="p-3 w-full"
           key={themeMode.value}

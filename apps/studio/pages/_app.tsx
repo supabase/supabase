@@ -35,7 +35,7 @@ import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo, useCallback, useEffect, useState, type ComponentProps } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import { studioThemeValues, TooltipProvider } from 'ui'
+import { TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
 import { AppearanceSettingsProvider } from '@/components/interfaces/App/AppearanceSettingsProvider'
@@ -208,7 +208,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       />
                       <TooltipProvider>
                         <RouteValidationWrapper>
-                          <ThemeProvider themes={studioThemeValues}>
+                          <ThemeProvider>
                             <DevToolbarProvider apiUrl={API_URL}>
                               <AiAssistantStateContextProvider>
                                 <CommandProvider>

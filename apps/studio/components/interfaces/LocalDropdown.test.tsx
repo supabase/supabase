@@ -173,8 +173,7 @@ vi.mock('ui', async () => {
     Tooltip: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     TooltipContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     TooltipTrigger: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-    studioThemes: [
-      { value: 'system', name: 'System' },
+    singleThemes: [
       { value: 'dark', name: 'Dark' },
       { value: 'light', name: 'Light' },
     ],
