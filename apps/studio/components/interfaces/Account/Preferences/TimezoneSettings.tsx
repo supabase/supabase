@@ -26,7 +26,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
-import { findTimezoneByIana, TIMEZONES_BY_IANA } from '@/lib/constants/timezones'
+import { formatTimezoneLabel, getTimezoneOptions } from '@/lib/constants/timezones'
 import { useTimezone } from '@/lib/datetime'
 import { guessLocalTimezone } from '@/lib/dayjs'
 import { useTrack } from '@/lib/telemetry/track'
@@ -44,7 +44,9 @@ export const TimezoneSettings = () => {
   // option will revert to.
   const browserTimezone = useMemo(() => guessLocalTimezone(), [])
 
-  const triggerLabel = useMemo(() => findTimezoneByIana(timezone)?.text ?? timezone, [timezone])
+  const triggerLabel = useMemo(() => formatTimezoneLabel(timezone), [timezone])
+
+  const options = useMemo(() => getTimezoneOptions(), [])
 
   const handleSelect = (nextStored: string) => {
     setTimezone(nextStored)
@@ -122,18 +124,15 @@ export const TimezoneSettings = () => {
                               )}
                             />
                           </CommandItem>
-                          {TIMEZONES_BY_IANA.map((entry) => {
-                            const ianaName = entry.utc[0]
+                          {options.map(({ iana: ianaName, label }) => {
                             const isSelected = !isAutoDetected && storedTimezone === ianaName
                             return (
                               <CommandItem
                                 key={ianaName}
-                                // CommandItem matches against the `value` prop for the input filter — include
-                                // both the human label and the IANA name so search works for either.
-                                value={`${entry.text} ${ianaName}`}
+                                value={`${label} ${ianaName}`}
                                 onSelect={() => handleSelect(ianaName)}
                               >
-                                {entry.text}
+                                {label}
                                 <CheckIcon
                                   className={cn(
                                     'ml-auto h-4 w-4',
