@@ -61,7 +61,7 @@ create index idx_persons_age on persons (age);
 
 <Admonition type="caution">
 
-It can take a long time to build indexes on large datasets and the default behaviour of `create index` is to lock the table from writes.
+It can take a long time to build indexes on large datasets and the default behavior of `create index` is to lock the table from writes.
 
 Luckily Postgres provides us with `create index concurrently` which prevents blocking writes on the table, but does take a bit longer to build.
 
