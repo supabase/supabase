@@ -97,7 +97,6 @@ export const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorPro
         </DialogSection>
         <DialogFooter>
           <Button
-            variant="default"
             onClick={() => {
               form.reset()
               closePanel()

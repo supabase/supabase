@@ -173,7 +173,6 @@ export const BigQueryFields = ({
                   />
                   <Button
                     type="button"
-                    variant="default"
                     size="tiny"
                     icon={<Upload size={14} />}
                     onClick={() => serviceAccountFileInputRef.current?.click()}

@@ -6,8 +6,10 @@ import { useRouter } from 'next/router'
 import {
   forwardRef,
   Fragment,
+  isValidElement,
   useEffect,
   useLayoutEffect,
+  useRef,
   type PropsWithChildren,
   type ReactNode,
 } from 'react'
@@ -107,6 +109,7 @@ export interface ProjectLayoutProps {
   isBlocking?: boolean
   product?: string
   productMenuBadge?: ReactNode
+  productMenuHeader?: ReactNode
   productMenu?: ReactNode
   browserTitle?: {
     entity?: string
@@ -126,6 +129,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       isBlocking = true,
       product = '',
       productMenuBadge,
+      productMenuHeader,
       productMenu,
       browserTitle,
       children,
@@ -174,7 +178,11 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     )
 
     const { showSidebar } = useAppStateSnapshot()
-    const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
+    const {
+      content: mobileSheetContent,
+      setContent: setMobileSheetContent,
+      registerOpenMenu,
+    } = useMobileSheet()
 
     const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
     const currentSectionKey = getSectionKeyFromPathname(pathname)
@@ -253,19 +261,36 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       })
     }, [addBanner, isExplorerEnabled, isExplorerBannerDismissed, isLocalStorageReady])
 
+    const mobileSheetContentRef = useRef(mobileSheetContent)
     useLayoutEffect(() => {
-      const unregister = registerOpenMenu(() => {
-        setMobileSheetContent(
-          <MobileMenuContent
-            currentProductMenu={productMenu ?? null}
-            currentProduct={product}
-            currentSectionKey={currentSectionKey}
-            onCloseSheet={() => setMobileSheetContent(null)}
-          />
-        )
-      })
+      mobileSheetContentRef.current = mobileSheetContent
+    }, [mobileSheetContent])
+
+    useLayoutEffect(() => {
+      const menu = (
+        <MobileMenuContent
+          currentProductMenu={productMenu ?? null}
+          currentProductMenuHeader={productMenuHeader}
+          currentProduct={product}
+          currentSectionKey={currentSectionKey}
+          onCloseSheet={() => setMobileSheetContent(null)}
+        />
+      )
+      const unregister = registerOpenMenu(() => setMobileSheetContent(menu))
+      // Keep resource navigation in an already open sheet in sync with the layout.
+      const currentContent = mobileSheetContentRef.current
+      if (isValidElement(currentContent) && currentContent.type === MobileMenuContent) {
+        setMobileSheetContent(menu)
+      }
       return unregister
-    }, [registerOpenMenu, productMenu, product, currentSectionKey, setMobileSheetContent])
+    }, [
+      registerOpenMenu,
+      productMenu,
+      productMenuHeader,
+      product,
+      currentSectionKey,
+      setMobileSheetContent,
+    ])
 
     useLayoutEffect(() => {
       mainScrollContainer?.scrollTo({ top: 0, left: 0 })
@@ -304,6 +329,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                       <ProductMenuBar
                         title={product}
                         titleBadge={productMenuBadge}
+                        header={productMenuHeader}
                         className={productMenuClassName}
                       >
                         {productMenu}

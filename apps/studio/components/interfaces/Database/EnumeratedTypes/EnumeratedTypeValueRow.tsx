@@ -72,7 +72,6 @@ const EnumeratedTypeValueRow = <TFieldValues extends FieldValues>({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    variant="default"
                     size="small"
                     disabled={isDisabled}
                     icon={<Trash strokeWidth={1.5} size={16} />}

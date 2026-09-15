@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from 'ui'
@@ -36,6 +37,12 @@ const METRICS: MetricConfig[] = [
     label: 'File storage',
     unit: 'gigabytes',
     anchor: 'storageSize',
+  },
+  {
+    key: PricingMetric.LOG_INGESTION,
+    label: 'Log Ingestion',
+    unit: 'gigabytes',
+    anchor: 'logIngestion',
   },
 ]
 
@@ -168,14 +175,22 @@ export const PlanUsageCard = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: usage, isSuccess, isError } = useOrgUsageQuery({ orgSlug: organization?.slug })
 
+  const logIngestionBillingEnabled = useFlag('logIngestionBillingEnabled')
+
+  const metricsIncludingLogIngestion = logIngestionBillingEnabled
+    ? METRICS
+    : METRICS.filter((m) => m.key !== PricingMetric.LOG_INGESTION)
+
   const visibleRows = isSuccess
-    ? METRICS.map((config) => {
-        const usageItem = usage.usages.find((u) => u.metric === config.key)
-        if (!usageItem) return null
-        if (!usageItem.available_in_plan) return null
-        if (!usageItem.pricing_free_units || usageItem.pricing_free_units <= 0) return null
-        return { config, usageItem }
-      }).filter((row): row is { config: MetricConfig; usageItem: OrgMetricsUsage } => row !== null)
+    ? metricsIncludingLogIngestion
+        .map((config) => {
+          const usageItem = usage.usages.find((u) => u.metric === config.key)
+          if (!usageItem) return null
+          if (!usageItem.available_in_plan) return null
+          if (!usageItem.pricing_free_units || usageItem.pricing_free_units <= 0) return null
+          return { config, usageItem }
+        })
+        .filter((row): row is { config: MetricConfig; usageItem: OrgMetricsUsage } => row !== null)
     : []
 
   if (isError) return null
@@ -208,7 +223,9 @@ export const PlanUsageCard = () => {
                   orgSlug={organization?.slug ?? '_'}
                 />
               ))
-            : METRICS.map((config) => <SkeletonMetricRow key={config.key} label={config.label} />)}
+            : metricsIncludingLogIngestion.map((config) => (
+                <SkeletonMetricRow key={config.key} label={config.label} />
+              ))}
         </div>
       </div>
     </li>

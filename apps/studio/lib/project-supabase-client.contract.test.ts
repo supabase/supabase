@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { createProjectSupabaseClient } from './project-supabase-client'
 import * as apiKeysUtils from '@/data/api-keys/temp-api-keys-utils'
@@ -18,10 +18,6 @@ const KEY_SHAPES = [
 ]
 
 describe('createProjectSupabaseClient key format contract', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   it.each(KEY_SHAPES)('constructs a client with a %s', async (_label, apiKey) => {
     vi.mocked(apiKeysUtils.getOrRefreshTemporaryApiKey).mockResolvedValue({
       apiKey,

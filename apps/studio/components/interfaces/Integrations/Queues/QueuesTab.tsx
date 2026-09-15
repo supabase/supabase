@@ -109,15 +109,12 @@ export const QueuesTab = () => {
             />
 
             <div className="flex items-center gap-x-2">
-              <Button
-                variant="default"
-                icon={<RefreshCw />}
-                loading={isRefetching}
-                onClick={() => refetch()}
-              >
+              <Button icon={<RefreshCw />} loading={isRefetching} onClick={() => refetch()}>
                 Refresh
               </Button>
-              <Button onClick={() => setCreateQueueSheetShown(true)}>Create queue</Button>
+              <Button variant="primary" onClick={() => setCreateQueueSheetShown(true)}>
+                Create queue
+              </Button>
             </div>
           </div>
 

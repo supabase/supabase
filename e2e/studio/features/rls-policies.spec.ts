@@ -36,7 +36,7 @@ test.describe('RLS Policies', () => {
       ).toBeVisible()
 
       // Check schema selector is present
-      await expect(page.getByRole('button', { name: 'schema public' })).toBeVisible()
+      await expect(page.getByRole('combobox', { name: 'Schema public' })).toBeVisible()
 
       // Check search/filter input is present
       await expect(page.getByPlaceholder('Filter tables and policies')).toBeVisible()
@@ -75,7 +75,7 @@ test.describe('RLS Policies', () => {
       await navigateToPoliciesPage(page, ref)
 
       // Click schema selector
-      await page.getByRole('button', { name: 'schema public' }).click()
+      await page.getByRole('combobox', { name: 'Schema public' }).click()
 
       // Select auth schema
       await page.getByRole('option', { name: 'auth' }).click()
@@ -85,7 +85,7 @@ test.describe('RLS Policies', () => {
       await expect(page.getByRole('heading', { name: 'users', exact: true })).toBeVisible()
 
       // Switch back to public
-      await page.getByRole('button', { name: 'schema auth' }).click()
+      await page.getByRole('combobox', { name: 'Schema auth' }).click()
       await page.getByRole('option', { name: 'public', exact: true }).click()
       await page.waitForTimeout(1000)
     })

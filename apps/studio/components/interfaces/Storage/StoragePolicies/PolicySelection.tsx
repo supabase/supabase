@@ -71,10 +71,8 @@ export const PolicySelection = ({
             Create RLS policies for your tables with the help of AI
           </AlertDescription>
           <div className="flex items-center gap-x-2 mt-3">
-            <Button variant="default" onClick={onToggleFeaturePreviewModal}>
-              Toggle feature preview
-            </Button>
-            <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
+            <Button onClick={onToggleFeaturePreviewModal}>Toggle feature preview</Button>
+            <Button asChild icon={<ExternalLink strokeWidth={1.5} />}>
               <a
                 href="https://supabase.com/blog/studio-introducing-assistant#introducing-the-supabase-assistant"
                 target="_blank"

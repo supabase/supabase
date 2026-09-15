@@ -52,7 +52,7 @@ export const DetailRow = ({
   const valueEl = isLoading ? (
     <Skeleton className="h-4 w-24" />
   ) : (
-    <FieldValue config={config} value={value} wrap={config.wrap} level={level} />
+    <FieldValue config={config} value={value} wrap={config.wrap} level={level ?? undefined} />
   )
 
   const rowClass = cn(
@@ -68,7 +68,9 @@ export const DetailRow = ({
           <Filter size={12} className="text-foreground-lighter" />
         )}
       </div>
-      <div className={cn('flex items-center gap-x-2', isEmpty && 'pr-2')}>
+      <div
+        className={cn('flex items-center gap-x-2 min-w-0 flex-1 justify-end', isEmpty && 'pr-2')}
+      >
         {valueEl}
         {!isEmpty && (
           <DataTableSheetRowAction
@@ -78,7 +80,12 @@ export const DetailRow = ({
             table={table!}
             label={label}
           >
-            <Button variant="text" className="px-1" icon={<MoreVertical />} />
+            <Button
+              aria-label="More options"
+              variant="text"
+              className="px-1"
+              icon={<MoreVertical />}
+            />
           </DataTableSheetRowAction>
         )}
       </div>
@@ -112,7 +119,7 @@ const FieldValue = ({ config, value, wrap, level }: FieldValueProps): ReactNode 
     return (
       <span
         className={cn(
-          'font-mono text-xs text-foreground',
+          'font-mono text-xs text-foreground min-w-0',
           wrap ? 'break-all text-right' : 'truncate text-right'
         )}
       >

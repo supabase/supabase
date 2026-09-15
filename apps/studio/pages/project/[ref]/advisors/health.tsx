@@ -1,6 +1,7 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useMemo, useState } from 'react'
 import { LoadingLine } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
 import { lintInfoMap, parseLinterLevel } from '@/components/interfaces/Linter/Linter.utils'
@@ -14,10 +15,23 @@ import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import { useProjectHealthLintsQuery } from '@/data/lint/health-lints-query'
 import { Lint } from '@/data/lint/lint-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const ProjectHealthLints: NextPageWithLayout = () => {
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
+
+  if (!isHealthAdvisorEnabled) {
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <Admonition type="default" title="Health Advisor is not available for this project" />
+      </div>
+    )
+  }
+
+  return <ProjectHealthLintsContent />
+}
+
+const ProjectHealthLintsContent = () => {
   const { preset, id } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -33,9 +47,7 @@ const ProjectHealthLints: NextPageWithLayout = () => {
     projectRef: project?.ref,
   })
 
-  // Health checks are platform-only. If this page is opened self-hosted the query stays
-  // disabled, and `isPending` would otherwise spin forever.
-  const isLoading = IS_PLATFORM && isPending
+  const isLoading = isPending
 
   const activeLints = (data ?? []).filter((lint) => lint.categories.includes('HEALTH'))
   const currentTabFilters = filters.find((filter) => filter.level === currentTab)?.filters ?? []

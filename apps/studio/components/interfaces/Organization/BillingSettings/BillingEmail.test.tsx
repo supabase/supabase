@@ -12,7 +12,7 @@ import { organizationKeys } from '@/data/organizations/keys'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type CustomerResponse = components['schemas']['CustomerResponse']
+type CustomerResponse = components['schemas']['CustomerResponse_Output']
 
 // The additional-emails control renders a Radix Popover when adding a recipient.
 mockAnimationsApi()
@@ -94,7 +94,6 @@ const removeRecipient = (email: string) => {
 
 describe('BillingEmail', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockCheckPermissions.mockImplementation(() => ({ can: true, isSuccess: true }))
   })
 

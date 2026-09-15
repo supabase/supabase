@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 import { RadioGroup, RadioGroupLargeItem, singleThemes } from 'ui'
 
+import { BASE_PATH } from '@/lib/constants'
+
 const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
@@ -35,7 +37,7 @@ const ThemeSettings = () => {
         >
           {singleThemes.map((theme) => (
             <RadioGroupLargeItem key={theme.value} value={theme.value} label={theme.name}>
-              <SVG src={`${process.env.NEXT_PUBLIC_BASE_PATH}/img/themes/${theme.value}.svg`} />
+              <SVG src={`${BASE_PATH}/img/themes/${theme.value}.svg`} />
             </RadioGroupLargeItem>
           ))}
         </RadioGroup>

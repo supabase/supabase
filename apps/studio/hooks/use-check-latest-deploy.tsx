@@ -25,6 +25,7 @@ const DeployCheckToast = ({ id }: { id: string | number }) => {
           Not now
         </Button>
         <Button
+          variant="primary"
           onClick={() => {
             // Vercel never pins document navigations to a deployment, so a
             // plain reload lands on the latest one.

@@ -34,7 +34,7 @@ import { useOnLogout } from '~/lib/userAuth'
 import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsUserLoading } from 'common'
 import { Check, Copy } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { withErrorBoundary } from 'react-error-boundary'
 import { Button_Shadcn_ as Button, cn, Input } from 'ui'
@@ -303,7 +303,15 @@ function BranchSelector() {
   ) : null
 }
 
-function VariableView({ variable, className }: { variable: Variable; className?: string }) {
+function VariableView({
+  variable,
+  inputId,
+  className,
+}: {
+  variable: Variable
+  inputId: string
+  className?: string
+}) {
   const isUserLoading = useIsUserLoading()
   const isLoggedIn = useIsLoggedIn()
 
@@ -397,6 +405,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
       <div className={cn('flex items-center gap-2', className)}>
         <Input
           readOnly
+          id={inputId}
           type="text"
           className="font-mono"
           value={
@@ -422,11 +431,14 @@ function VariableView({ variable, className }: { variable: Variable; className?:
                 properties: { variable },
               })
             }}
-            aria-label="Copy"
+            aria-label={`Copy ${prettyFormatVariable[variable]}`}
           >
-            {copied ? <Check size="18" /> : <Copy size="18" />}
+            {copied ? <Check size="18" aria-hidden /> : <Copy size="18" aria-hidden />}
           </Button>
         </CopyToClipboard>
+        <span className="sr-only" role="status">
+          {copied ? `${prettyFormatVariable[variable]} copied` : ''}
+        </span>
       </div>
       {stateSummary === 'loggedIn.selectedProject.dataError' && (
         <p className="text-foreground-muted text-sm mt-2 mb-0 ml-1">
@@ -472,16 +484,21 @@ function ProjectConfigVariablesInternal({ variable }: { variable: Variable }) {
   const { clear: clearSharedStoreData } = useSnapshot(projectsStore)
   useOnLogout(clearSharedStoreData)
 
+  const inputId = useId()
+
   return (
     <div className="max-w-[min(100%, 500px)] my-6">
-      <span className={cn('block mt-0 mb-1 font-heading font-semibold', 'text-foreground')}>
+      <label
+        htmlFor={inputId}
+        className={cn('block mt-0 mb-1 font-heading font-semibold', 'text-foreground')}
+      >
         {prettyFormatVariable[variable]}
-      </span>
+      </label>
       <div className="flex flex-wrap gap-x-6">
         <OrgProjectSelector />
         <BranchSelector />
       </div>
-      <VariableView variable={variable} className="mt-1" />
+      <VariableView variable={variable} inputId={inputId} className="mt-1" />
       <LoginHint variable={variable} />
     </div>
   )
