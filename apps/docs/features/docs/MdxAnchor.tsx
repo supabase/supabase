@@ -25,7 +25,7 @@ const flattenChildrenToText = (node: unknown): string => {
 
 /** Same resting/hover contract as Studio InlineLink (no brand/green link color). */
 const mdxAnchorClassName =
-  'underline transition underline-offset-2 decoration-inherit hover:decoration-foreground text-inherit hover:text-foreground'
+  'text-foreground underline underline-offset-fluid decoration-fluid decoration-foreground-subtle hover:decoration-foreground transition-colors duration-200'
 
 const relForTarget = (target?: string, rel?: string) => {
   if (target !== '_blank') return rel

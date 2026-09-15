@@ -182,6 +182,16 @@
     calc(var(--surface) + var(--tone-span) * var(--tertiary-foreground-mix))
       var(--foreground-chroma) var(--surface-hue)
   );
+  --subtle-foreground-level: calc(var(--tertiary-foreground-level) * 0.6);
+  --subtle-foreground-mix: calc(
+    var(--subtle-foreground-level) + (1 - var(--subtle-foreground-level)) * var(--contrast-up) -
+      var(--subtle-foreground-level) * 0.5 * var(--contrast-down)
+  );
+  --subtle-foreground: oklch(
+    calc(var(--surface) + var(--tone-span) * var(--subtle-foreground-mix)) var(--foreground-chroma)
+      var(--surface-hue)
+  );
+
   --muted: oklch(from var(--foreground) l c h / var(--muted-alpha));
   --muted-foreground-mix: calc(
     var(--muted-foreground-level) + (1 - var(--muted-foreground-level)) * var(--contrast-up) -

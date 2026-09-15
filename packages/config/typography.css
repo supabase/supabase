@@ -38,7 +38,7 @@
 
 /* Link */
 @utility text-link {
-  @apply text-foreground-light underline underline-offset-4 decoration-inherit hover:decoration-foreground transition-colors hover:text-foreground;
+  @apply text-foreground underline underline-offset-fluid decoration-fluid decoration-foreground-subtle hover:decoration-foreground transition-colors duration-200;
 }
 
 @utility text-link-table-cell {
