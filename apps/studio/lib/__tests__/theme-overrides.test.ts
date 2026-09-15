@@ -51,6 +51,17 @@ describe.each<ThemeOverrideMode>(['dark', 'light'])('%s theme slider mappings', 
   })
 })
 
+describe('dark theme surface elevation', () => {
+  it('keeps the base surface independent while giving raised layers meaningful contrast', () => {
+    const surface = getThemeOverrideRange(knob('surface'), 'dark').min
+    const elevationStep = getThemeOverrideRange(knob('elevationStep'), 'dark').max
+
+    expect(surface).toBe(0.12)
+    expect(surface + elevationStep).toBeCloseTo(0.36)
+    expect(surface + elevationStep * 1.5).toBeCloseTo(0.48)
+  })
+})
+
 describe('theme override storage', () => {
   it('keeps sibling settings and modes', () => {
     const merged = mergeThemeOverride(
