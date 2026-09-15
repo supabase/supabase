@@ -118,9 +118,7 @@ const NavigateDialog = ({
           </FieldDescription>
         </DialogSection>
         <DialogFooter>
-          <Button variant="default" onClick={onCancel}>
-            Cancel
-          </Button>
+          <Button onClick={onCancel}>Cancel</Button>
           <Button variant="primary" onClick={onSubmit}>
             Navigate
           </Button>

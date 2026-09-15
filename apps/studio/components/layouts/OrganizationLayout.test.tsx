@@ -65,8 +65,6 @@ const renderLayout = () =>
 
 describe('OrganizationLayout', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
     mockUseLocalStorageQuery.mockReturnValue([
       false,
       mockSetIsBannerDismissed,

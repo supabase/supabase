@@ -2956,7 +2956,7 @@ export interface AuditLogDrainRemovedEvent {
 }
 
 type AdvisorCategory =
-  components['schemas']['GetProjectLintsResponse'][number]['categories'][number]
+  components['schemas']['GetProjectLintsResponse_Output'][number]['categories'][number]
 type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
 
 /**
@@ -3622,7 +3622,7 @@ export interface PricingPanelPlanPresentationExperimentExposedEvent {
   action: 'pricing_panel_plan_presentation_experiment_exposed'
   properties: {
     /** The experiment variant the user is enrolled in */
-    variant: 'control' | 'parity' | 'gaps'
+    variant: 'control' | 'parity' | 'gaps' | 'fullscreen' | 'fullscreen-gaps'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -3681,7 +3681,7 @@ export interface UnifiedLogsRowClickedEvent {
       | 'supavisor'
       | 'pgbouncer'
       | 'multigres'
-      | 'workers'
+      | 'compute'
   }
   groups: TelemetryGroups
 }

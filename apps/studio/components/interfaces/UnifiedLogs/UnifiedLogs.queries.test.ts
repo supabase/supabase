@@ -46,32 +46,32 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(where).not.toContain(`log_attributes['request.path'] LIKE '%/storage/%'`)
     })
 
-    it('routes the `workers` log type to every worker OTEL stream', () => {
-      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:workers'))
+    it('routes the `compute` log type to every worker OTEL stream', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:compute'))
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
       expect(where).toContain(
         `log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')`
       )
-      expect(where).not.toContain(`source = 'workers'`)
+      expect(where).not.toContain(`source = 'compute'`)
     })
 
-    it('classifies every worker OTEL stream as workers in the projected log type', () => {
+    it('classifies every worker OTEL stream as compute in the projected log type', () => {
       const sql = getUnifiedLogsQuery(baseSearch)
       expect(sql).toContain(
-        `WHEN log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs') THEN 'workers'`
+        `WHEN log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs') THEN 'compute'`
       )
     })
 
-    it('excludes every worker OTEL stream when the workers log type is negated', () => {
-      const sql = getUnifiedLogsQuery(withFilters('log_type:neq:workers'))
+    it('excludes every worker OTEL stream when the compute log type is negated', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:neq:compute'))
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
       expect(where).toContain(
         `NOT (log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs'))`
       )
     })
 
-    it('projects only Workers fields that exist on worker logs', () => {
-      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:workers'))
+    it('projects only Compute fields that exist on worker logs', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:compute'))
       const workerCondition =
         "log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
 
@@ -298,8 +298,8 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       )
     })
 
-    it('does not classify Workers rows into a severity bucket', () => {
-      const sql = getLogsChartQuery(withFilters('log_type:eq:workers'))
+    it('does not classify Compute rows into a severity bucket', () => {
+      const sql = getLogsChartQuery(withFilters('log_type:eq:compute'))
       const workerCondition =
         "log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
 

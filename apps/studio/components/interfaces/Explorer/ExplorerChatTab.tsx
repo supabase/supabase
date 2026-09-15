@@ -65,9 +65,7 @@ export const ExplorerChatTab = () => {
             This chat may have been deleted or is no longer available.
           </p>
         </div>
-        <Button variant="default" onClick={() => router.push(`/project/${ref}/explorer`)}>
-          Back to Explorer
-        </Button>
+        <Button onClick={() => router.push(`/project/${ref}/explorer`)}>Back to Explorer</Button>
       </div>
     )
   }

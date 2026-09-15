@@ -103,9 +103,9 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
               yarn add prisma tsx @types/pg --save-dev
               yarn add @prisma/client @prisma/adapter-pg dotenv pg
 
-              npx tsc --init
+              yarn tsc --init
 
-              npx prisma init
+              yarn prisma init
               ```
             </TabPanel>
             <TabPanel id="bun_initiate" label="bun">
@@ -285,8 +285,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             </TabPanel>
             <TabPanel id="yarn_migrate" label="yarn">
             ```bash
-            npx prisma migrate dev --name first_prisma_migration
-            npx prisma generate
+            yarn prisma migrate dev --name first_prisma_migration
+            yarn prisma generate
             ```
             </TabPanel>
             <TabPanel id="bun_migrate" label="bun">
@@ -368,7 +368,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
           <TabPanel id="yarn_sync" label="yarn">
             ```bash
-            npx prisma db pull
+            yarn prisma db pull
             ```
 
             Create a migration file
@@ -378,7 +378,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
             Synchronize the migrations
             ```bash
-              npx prisma migrate diff \
+              yarn prisma migrate diff \
               --from-empty \
               --to-schema prisma/schema.prisma \
               --script > prisma/migrations/0_init_supabase/migration.sql
@@ -390,8 +390,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             </Admonition>
 
             ```bash
-            npx prisma migrate resolve --applied 0_init_supabase
-            npx prisma generate
+            yarn prisma migrate resolve --applied 0_init_supabase
+            yarn prisma generate
             ```
           </TabPanel>
 

@@ -22,7 +22,6 @@ export const SqlSaveButton = ({ id, className }: SqlSaveButtonProps) => {
     <Button
       onClick={() => requestSave(id)}
       disabled={!isDirty}
-      variant="default"
       size="tiny"
       data-testid="sql-save-button"
       iconRight={

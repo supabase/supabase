@@ -19,10 +19,10 @@ import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 // The project selector's infinite-scroll sentinel uses IntersectionObserver, which jsdom lacks
 mockIntersectionObserver()
 
-type ProjectDetailResponse = components['schemas']['ProjectDetailResponse']
-type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
+type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
 type OrganizationProjectsProject = OrganizationProjectsResponse['projects'][number]
-type SendFeedbackResponse = components['schemas']['SendFeedbackResponse']
+type SendFeedbackResponse = components['schemas']['SendFeedbackResponse_Output']
 
 // Builders that return shapes matching the OpenAPI contract for endpoints
 // the support form depends on. The test only exercises a few fields, but the
@@ -49,6 +49,7 @@ const toProjectDetailResponse = (project: {
   status: 'ACTIVE_HEALTHY',
   subscription_id: 'subscription-1',
   updated_at: new Date().toISOString(),
+  connectionString: '',
 })
 
 const toOrganizationProject = (project: {

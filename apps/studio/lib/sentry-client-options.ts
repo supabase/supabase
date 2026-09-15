@@ -16,19 +16,12 @@ import * as Sentry from '@sentry/react'
 import { thirdPartyErrorFilterIntegration } from '@sentry/react'
 import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
+import { filterSentryEvent, isSentryErrorBoundaryCrash } from 'common/sentry'
 
 import { MIRRORED_BREADCRUMBS } from '@/lib/breadcrumbs'
 import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from '@/lib/sanitize'
 
 type Integration = Parameters<typeof Sentry.addIntegration>[0]
-
-const DEFAULT_ERROR_SAMPLE_RATE = 1.0
-const LOW_PRIORITY_ERROR_SAMPLE_RATE = 0.01
-const CHUNK_LOAD_ERROR_PATTERNS = [
-  /ChunkLoadError/i,
-  /Loading chunk [\d]+ failed/i,
-  /Loading CSS chunk [\d]+ failed/i,
-]
 
 // This is a workaround to ignore hCaptcha related errors.
 function isHCaptchaRelatedError(event: Sentry.Event): boolean {
@@ -88,17 +81,6 @@ export function isChallengeExpiredError(error: unknown, event: Sentry.Event): bo
   const message = errorMessage || eventMessage
 
   return message.includes('challenge-expired')
-}
-
-function isChunkLoadError(error: unknown, event: Sentry.Event): boolean {
-  const errorMessage = error instanceof Error ? error.message : ''
-  const eventMessage = event.message || ''
-  const exceptionMessages = event.exception?.values?.map((ex) => ex.value ?? '') ?? []
-  const combinedMessages = [errorMessage, eventMessage, ...exceptionMessages].filter(Boolean)
-
-  return CHUNK_LOAD_ERROR_PATTERNS.some((pattern) =>
-    combinedMessages.some((message) => pattern.test(message))
-  )
 }
 
 // Tag errors whose stack trace only contains third-party frames (browser extensions,
@@ -195,51 +177,11 @@ export function buildSentryClientOptions({
       return cleanedBreadcrumb
     },
     beforeSend(event, hint) {
-      const consent = hasConsented()
-
-      if (!consent) {
+      if (!filterSentryEvent(event, { isPlatform: IS_PLATFORM, hasConsent: hasConsented() })) {
         return null
       }
 
-      if (!IS_PLATFORM) {
-        return null
-      }
-
-      const isErrorBoundaryCrash =
-        event.tags?.globalErrorBoundary === true || event.tags?.globalErrorBoundary === 'true'
-      const isThirdPartyOnly =
-        event.tags?.third_party_code === true || event.tags?.third_party_code === 'true'
-
-      // Drop third-party-only errors UNLESS they crashed the page via the global error boundary.
-      // This preserves noise reduction for browser extensions and injected scripts,
-      // while ensuring page-crashing errors from third-party libs (caused by first-party bugs)
-      // are always reported.
-      if (isThirdPartyOnly && !isErrorBoundaryCrash) {
-        return null
-      }
-
-      // Downsample only known high-noise classes; keep all other errors at full rate.
-      const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
-        `Failed to construct 'URL': Invalid URL`
-      )
-      const isSessionTimeoutEvent = (hint.originalException as any)?.message?.includes(
-        'Session error detected'
-      )
-      const isChunkLoadFailure = isChunkLoadError(hint.originalException, event)
-
-      const codeSampleRate =
-        isInvalidUrlEvent || isSessionTimeoutEvent || isChunkLoadFailure
-          ? LOW_PRIORITY_ERROR_SAMPLE_RATE
-          : DEFAULT_ERROR_SAMPLE_RATE
-
-      if (Math.random() > codeSampleRate) {
-        return null
-      }
-
-      event.tags = {
-        ...event.tags,
-        codeSampleRate: codeSampleRate.toString(),
-      }
+      const isErrorBoundaryCrash = isSentryErrorBoundaryCrash(event)
 
       if (isHCaptchaRelatedError(event)) {
         return null

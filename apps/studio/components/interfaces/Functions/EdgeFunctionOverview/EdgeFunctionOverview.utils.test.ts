@@ -12,6 +12,7 @@ import {
   getChartTimeRangeLabels,
   getExecutionMetrics,
   getInvocationChartData,
+  getInvocationChartNavigationUrl,
   getInvocationTotals,
   getInvocationUpdateAnnotation,
   getMemoryTooltipDetail,
@@ -169,6 +170,23 @@ describe('EdgeFunctionOverview.utils', () => {
     expect(annotation?.updatedAt.toISOString()).toBe('2026-03-20T10:16:30.000Z')
   })
 
+  it('returns a deploy annotation for a numeric updated_at timestamp', () => {
+    const annotation = getInvocationUpdateAnnotation({
+      updatedAt: new Date('2026-03-20T10:16:30.000Z').valueOf(),
+      invocationChartData: [
+        { timestamp: '2026-03-20T10:00:00.000Z', ok_count: 3, warning_count: 0, error_count: 0 },
+        { timestamp: '2026-03-20T10:15:00.000Z', ok_count: 5, warning_count: 1, error_count: 1 },
+        { timestamp: '2026-03-20T10:30:00.000Z', ok_count: 2, warning_count: 0, error_count: 0 },
+      ],
+      windowStart: new Date('2026-03-20T09:45:00.000Z'),
+      windowEnd: new Date('2026-03-20T10:45:00.000Z'),
+    })
+
+    expect(annotation?.timestamp).toBe('2026-03-20T10:15:00.000Z')
+    expect(annotation?.position).toBeCloseTo(50)
+    expect(annotation?.updatedAt.toISOString()).toBe('2026-03-20T10:16:30.000Z')
+  })
+
   it('hides the deploy annotation when updated_at is outside the selected window', () => {
     const annotation = getInvocationUpdateAnnotation({
       updatedAt: '2026-03-20T11:05:00.000Z',
@@ -181,6 +199,41 @@ describe('EdgeFunctionOverview.utils', () => {
 
     expect(annotation).toBeUndefined()
   })
+
+  it('hides the deploy annotation for an invalid updated_at timestamp', () => {
+    const annotation = getInvocationUpdateAnnotation({
+      updatedAt: 'invalid',
+      invocationChartData: [
+        { timestamp: '2026-03-20T10:00:00.000Z', ok_count: 3, warning_count: 0, error_count: 0 },
+      ],
+      windowStart: new Date('2026-03-20T09:45:00.000Z'),
+      windowEnd: new Date('2026-03-20T10:45:00.000Z'),
+    })
+
+    expect(annotation).toBeUndefined()
+  })
+
+  it.each([
+    {
+      updatedAt: undefined,
+      invocationChartData: [
+        { timestamp: '2026-03-20T10:00:00.000Z', ok_count: 3, warning_count: 0, error_count: 0 },
+      ],
+    },
+    { updatedAt: '2026-03-20T10:00:00.000Z', invocationChartData: [] },
+  ])(
+    'hides the deploy annotation when required data is missing',
+    ({ updatedAt, invocationChartData }) => {
+      const annotation = getInvocationUpdateAnnotation({
+        updatedAt,
+        invocationChartData,
+        windowStart: new Date('2026-03-20T09:45:00.000Z'),
+        windowEnd: new Date('2026-03-20T10:45:00.000Z'),
+      })
+
+      expect(annotation).toBeUndefined()
+    }
+  )
 
   it('builds bucketed and rolling time windows from the selected interval', () => {
     const interval = EDGE_FUNCTION_CHART_INTERVALS.find((item) => item.key === '1hr')
@@ -195,6 +248,27 @@ describe('EdgeFunctionOverview.utils', () => {
     expect(rollingStart.toISOString()).toBe('2026-03-20T09:37:00.000Z')
     expect(rollingEnd.toISOString()).toBe('2026-03-20T10:37:00.000Z')
   })
+
+  it.each([
+    { isUnifiedLogsEnabled: true, destination: 'logs' },
+    { isUnifiedLogsEnabled: false, destination: 'invocations' },
+  ])(
+    'builds a focused $destination URL from the clicked bar',
+    ({ isUnifiedLogsEnabled, destination }) => {
+      const url = getInvocationChartNavigationUrl({
+        projectRef: 'project-ref',
+        functionSlug: 'function-slug',
+        isUnifiedLogsEnabled,
+        rangeStart: '2026-03-20T10:00:00.000Z',
+        rangeEnd: '2026-03-20T11:00:00.000Z',
+        clickedTimestamp: '2026-03-20T10:30:00.000Z',
+      })
+
+      expect(url).toBe(
+        `/project/project-ref/functions/function-slug/${destination}?its=2026-03-20T10%3A27%3A30.000Z&ite=2026-03-20T10%3A32%3A30.000Z`
+      )
+    }
+  )
 
   it('formats metric, rate, and reference deltas consistently', () => {
     expect(formatMetric(12.34, 'MB')).toBe('12.3MB')
