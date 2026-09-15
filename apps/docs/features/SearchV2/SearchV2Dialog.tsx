@@ -52,6 +52,19 @@ export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
     onOpenChange(false)
   }
 
+  // Announced via the aria-live region below — a sighted user sees the spinner/list update,
+  // but a screen reader user gets no equivalent signal unless we say so explicitly. Also covers
+  // the result count, which isn't reliably announced by the listbox/option roles alone.
+  function getStatusMessage(): string {
+    if (searchState.status === 'loading') return 'Searching the docs…'
+    if (searchState.status === 'noResults') return 'No results found.'
+    if (searchState.status === 'error') return 'Something went wrong. Please try again.'
+    if (results.length > 0) {
+      return `${results.length} result${results.length === 1 ? '' : 's'} found.`
+    }
+    return ''
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {/* hideClose: this is a search box, not a form — closing is Escape/click-outside only, no "X" */}
@@ -63,14 +76,26 @@ export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
           </VisuallyHidden.VisuallyHidden>
           <CommandInput
             placeholder="Search docs..."
+            aria-label="Search the Supabase documentation"
             onValueChange={handleValueChange}
             wrapperClassName="[&_svg]:h-5 [&_svg]:w-5 border-0"
             className="h-14 text-base"
           />
-          <CommandList>
+          {/*
+            Screen-reader-only status announcement. Focus stays in the input as results come in
+            (that's what lets people keep typing), so nothing else here gets read aloud on its
+            own — this is what tells a screen reader user a search ran and how many results it found.
+          */}
+          <div role="status" aria-live="polite" className="sr-only">
+            {getStatusMessage()}
+          </div>
+          <CommandList label="Search results">
+            {searchState.status === 'initial' && (
+              <CommandEmpty>Start typing to search the docs.</CommandEmpty>
+            )}
             {searchState.status === 'loading' && results.length === 0 && (
               <div className="flex items-center justify-center gap-2 py-6 text-sm text-foreground-muted">
-                <Loader2 className="animate-spin" size={14} />
+                <Loader2 className="animate-spin" size={14} aria-hidden="true" />
                 Searching...
               </div>
             )}
