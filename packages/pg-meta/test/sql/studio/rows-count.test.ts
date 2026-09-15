@@ -8,6 +8,15 @@ type Db = Awaited<ReturnType<typeof createTestDatabase>>
 type CountRow = { count: number; is_estimate: boolean }
 type CountArgs = Parameters<typeof getTableRowsCountSql>[0]
 
+test('includes zero-valued filters in row count queries', () => {
+  const sql = getTableRowsCountSql({
+    table: { id: 1, schema: 'public', name: 'items' },
+    filters: [{ column: 'quantity', operator: '=', value: 0 }],
+  })
+
+  expect(sql).toContain('where quantity = 0')
+})
+
 afterAll(async () => {
   await cleanupRoot()
 })
