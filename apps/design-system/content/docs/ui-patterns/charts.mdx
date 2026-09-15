@@ -25,42 +25,24 @@ Our charts use a combination of our own presentational components and [Recharts]
 
 ## Color
 
-Series colors come from a fixed palette of eight categorical slots (`--chart-1` …
-`--chart-8`) defined in `packages/config/css/charts.css`. Slots are assigned in order and never cycled — a ninth
-series folds into "Other", becomes small multiples, or gets a second encoding. Each slot has a matching
-`-fill` token for bar and area fills.
+Series colors come from eight categorical slots, `--chart-1` through `--chart-8`, defined in
+`packages/config/css/charts.css`. Assign them in order and never cycle: a ninth series folds
+into "Other" or becomes small multiples. Each slot has a matching `-fill` token. Slots resolve
+per theme, so pass `var(--chart-n)` and never branch on light/dark in code. Adjacent slots
+alternate hue families and clear colorblind separation in both themes.
 
-Slots point at the Radix scales in `colors.css` and resolve per theme, so chart code passes
-`var(--chart-n)` and never branches on light/dark. Hue families alternate (brand, blue,
-pink, violet, tomato, indigo, green, purple) so adjacent series never share a family. Light mode
-uses the 900 and 1000 steps; dark mode overrides every slot with the brighter 1100 tier so the
-palette sits at the same lightness as brand green instead of sinking into the surface. Every
-adjacent pair clears colorblind and normal-vision separation in both themes. Only slot 1 in
-light mode sits below 3:1 against the surface, which is why charts using it always carry a
-legend.
+Reference lines use `--chart-reference`. Headroom, idle and unused capacity use `--chart-muted`.
+Directional pairs use `--chart-in` / `--chart-out` so read and write keep the same hue across
+charts.
 
-Reference lines and "absence of data" (headroom, idle, unused capacity) use
-`--chart-reference` and `--chart-muted` / `--chart-muted-fill`. Directional series use the pinned
-`--chart-in` / `--chart-out` pair (slots 2 and 5) so that read and write keep the same hue
-across every chart that plots them.
-
-Status colors — `--chart-status-success`, `--chart-status-warning`,
-`--chart-status-destructive`, each with a `-muted` tier — are reserved and resolve to the
-semantic `--warning` and `--destructive` tokens the rest of the UI uses. `--chart-warning` is
-the alias `LogsBarChart` and the report blocks read. Never assign a status color to a series
-just to get a color: amber reads as "warning", so spending it on "series 3" makes a neutral
-metric look like a problem. They always ship with an icon or a label, because state must
-never be carried by color alone.
-
-No amber, orange or yellow step in the Radix scales clears the dark-mode lightness band, so
-warm hues are limited to tomato (slot 5) and the reserved warning token.
+Status colors (`--chart-status-success`, `-warning`, `-destructive`, each with a `-muted` tier)
+are reserved for state and always ship with an icon or label. Never use one as a series color:
+amber on a neutral metric reads as a problem. Warm hues are otherwise limited to tomato, slot 5,
+because no amber or yellow step is legible on the dark surface.
 
 <ComponentPreview name="chart-palette" wide />
 
-### Eight series at once
-
-The case that breaks palettes: every slot stacked on screen together. Check it in both
-themes, and check that adjacent segments stay separable.
+Every slot stacked together, to check adjacent segments stay separable in both themes.
 
 <ComponentPreview name="chart-palette-stress" wide />
 
