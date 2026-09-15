@@ -5,9 +5,8 @@ import { useContext, useEffect } from 'react'
 import { ReplicationPipelineLayout } from '@/components/interfaces/Database/Replication/ReplicationPipelineLayout'
 import { ReplicationPipelineStatus } from '@/components/interfaces/Database/Replication/ReplicationPipelineStatus/ReplicationPipelineStatus'
 import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import type { NextPageWithLayout } from '@/types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
@@ -25,11 +24,9 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
   return (
     <>
       {enablePgReplicate && (
-        <PipelineRequestStatusProvider>
-          <ReplicationPipelineLayout>
-            <ReplicationPipelineStatus />
-          </ReplicationPipelineLayout>
-        </PipelineRequestStatusProvider>
+        <ReplicationPipelineLayout>
+          <ReplicationPipelineStatus />
+        </ReplicationPipelineLayout>
       )}
     </>
   )

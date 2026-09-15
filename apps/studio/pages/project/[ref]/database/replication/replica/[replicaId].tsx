@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getReadReplicaPath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import type { NextPageWithLayout } from '@/types'
 

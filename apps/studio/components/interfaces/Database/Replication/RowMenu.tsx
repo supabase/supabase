@@ -26,11 +26,7 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import {
-  getStatusName,
-  PIPELINE_DISABLE_ALLOWED_FROM,
-  PIPELINE_ENABLE_ALLOWED_FROM,
-} from './Pipeline.utils'
+import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { Pipeline } from '@/data/replication/pipelines-query'
@@ -74,16 +70,17 @@ export const RowMenu = ({
     parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const { mutateAsync: startPipeline } = useStartPipelineMutation()
-  const { mutateAsync: stopPipeline } = useStopPipelineMutation()
+  const { mutateAsync: startPipeline } = useStartPipelineMutation({ onError: () => {} })
+  const { mutateAsync: stopPipeline } = useStopPipelineMutation({ onError: () => {} })
   const { mutateAsync: restartPipeline } = useRestartPipelineMutation()
-  const { getRequestStatus, setRequestStatus: setGlobalRequestStatus } = usePipelineRequestStatus()
+  const { getRequestStatus, runWithRequestStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
 
   // Show actions when not in a transitional state
   const canPerformActions =
+    !isError &&
     requestStatus === PipelineStatusRequestStatus.None &&
     statusName !== PipelineStatusName.STARTING &&
     [PipelineStatusName.STOPPED, PipelineStatusName.STARTED, PipelineStatusName.FAILED].includes(
@@ -103,13 +100,13 @@ export const RowMenu = ({
     if (!pipeline) return toast.error('No pipeline found')
 
     try {
-      // Only show 'enabling' when transitioning from allowed states
-      if (PIPELINE_ENABLE_ALLOWED_FROM.includes(statusName as PipelineStatusName)) {
-        setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, statusName)
-      }
-      await startPipeline({ projectRef, pipelineId: pipeline.id })
+      await runWithRequestStatus(
+        pipeline.id,
+        PipelineStatusRequestStatus.StartRequested,
+        statusName,
+        () => startPipeline({ projectRef, pipelineId: pipeline.id })
+      )
     } catch (error) {
-      setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
       toast.error(`Failed to start pipeline: ${(error as ResponseError).message}`)
     }
   }
@@ -119,13 +116,13 @@ export const RowMenu = ({
     if (!pipeline) return toast.error('No pipeline found')
 
     try {
-      // Only show 'disabling' when transitioning from allowed states
-      if (PIPELINE_DISABLE_ALLOWED_FROM.includes(statusName as PipelineStatusName)) {
-        setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, statusName)
-      }
-      await stopPipeline({ projectRef, pipelineId: pipeline.id })
+      await runWithRequestStatus(
+        pipeline.id,
+        PipelineStatusRequestStatus.StopRequested,
+        statusName,
+        () => stopPipeline({ projectRef, pipelineId: pipeline.id })
+      )
     } catch (error) {
-      setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
       toast.error(`Failed to stop pipeline: ${(error as ResponseError).message}`)
     }
   }
@@ -135,10 +132,13 @@ export const RowMenu = ({
     if (!pipeline) return toast.error('No pipeline found')
 
     try {
-      setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
-      await restartPipeline({ projectRef, pipelineId: pipeline.id })
+      await runWithRequestStatus(
+        pipeline.id,
+        PipelineStatusRequestStatus.RestartRequested,
+        statusName,
+        () => restartPipeline({ projectRef, pipelineId: pipeline.id })
+      )
     } catch (error) {
-      setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
       toast.error(`Failed to restart pipeline: ${(error as ResponseError).message}`)
     }
   }

@@ -215,8 +215,14 @@ export const useCreateDestinationPipelineMutation = ({
         const { projectRef } = variables
 
         await Promise.all([
-          queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
-          queryClient.invalidateQueries({ queryKey: replicationKeys.pipelines(projectRef) }),
+          queryClient.invalidateQueries(
+            { queryKey: replicationKeys.destinations(projectRef) },
+            { cancelRefetch: false }
+          ),
+          queryClient.invalidateQueries(
+            { queryKey: replicationKeys.pipelines(projectRef) },
+            { cancelRefetch: false }
+          ),
         ])
 
         await onSuccess?.(data, variables, context)

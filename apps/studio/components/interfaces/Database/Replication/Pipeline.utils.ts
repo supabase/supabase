@@ -15,17 +15,6 @@ export const normalizePipelineStatusName = (statusName?: string): PipelineStatus
     ? (statusName as PipelineStatusName)
     : undefined
 
-export const PIPELINE_ENABLE_ALLOWED_FROM: PipelineStatusName[] = [PipelineStatusName.STOPPED]
-export const PIPELINE_DISABLE_ALLOWED_FROM: PipelineStatusName[] = [
-  PipelineStatusName.STARTED,
-  PipelineStatusName.FAILED,
-]
-export const PIPELINE_ACTIONABLE_STATES: PipelineStatusName[] = [
-  PipelineStatusName.FAILED,
-  PipelineStatusName.STARTED,
-  PipelineStatusName.STOPPED,
-]
-
 export type PipelineDisplayStateKey =
   | 'starting'
   | 'stopping'

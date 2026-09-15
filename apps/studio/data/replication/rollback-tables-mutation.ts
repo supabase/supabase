@@ -1,14 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import type { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
-export type RollbackTablesTarget =
-  | { type: 'single_table'; table_id: number }
-  | { type: 'all_tables' }
-  | { type: 'all_errored_tables' }
+export type RollbackTablesTarget = components['schemas']['RollbackTablesBody']['target']
 
 type RollbackTablesParams = {
   projectRef: string
@@ -16,18 +14,7 @@ type RollbackTablesParams = {
   target: RollbackTablesTarget
 }
 
-type RolledBackTable = {
-  table_id: number
-  new_state: {
-    name: string
-    [key: string]: unknown
-  }
-}
-
-type RollbackTablesResponse = {
-  pipeline_id: number
-  tables: RolledBackTable[]
-}
+type RollbackTablesResponse = components['schemas']['RollbackTablesResponse_Output']
 
 async function rollbackTables(
   { projectRef, pipelineId, target }: RollbackTablesParams,
@@ -66,16 +53,41 @@ export const useRollbackTablesMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables
       await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId),
-        }),
+        queryClient.invalidateQueries(
+          {
+            queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
+          },
+          { cancelRefetch: false }
+        ),
+        queryClient.invalidateQueries(
+          {
+            queryKey: replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId),
+          },
+          { cancelRefetch: false }
+        ),
       ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
+      // A reset can commit before runtime recreation fails. Refresh both views after errors.
+      await Promise.all([
+        queryClient.invalidateQueries(
+          {
+            queryKey: replicationKeys.pipelinesStatus(variables.projectRef, variables.pipelineId),
+          },
+          { cancelRefetch: false }
+        ),
+        queryClient.invalidateQueries(
+          {
+            queryKey: replicationKeys.pipelinesReplicationStatus(
+              variables.projectRef,
+              variables.pipelineId
+            ),
+          },
+          { cancelRefetch: false }
+        ),
+      ])
+
       if (onError === undefined) {
         toast.error(`Failed to restart table replication: ${data.message}`)
       } else {

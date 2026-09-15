@@ -10,7 +10,7 @@ import { DeleteDestination } from './DeleteDestination'
 import { DestinationLogo } from './DestinationLogo'
 import { DetailSubtext } from './DetailSubtext'
 import { PipelineStatePill } from './PipelineStatePill'
-import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
+import { PipelineStatusName } from './Replication.constants'
 import {
   getFormattedLagValue,
   getInitialSyncProgress,
@@ -59,30 +59,26 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
     isPending: isPipelineStatusLoading,
     isError: isPipelineStatusError,
     isSuccess: isPipelineStatusSuccess,
-  } = useReplicationPipelineStatusQuery(
-    {
-      projectRef,
-      pipelineId: pipeline?.id,
-    },
-    { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
-  )
+  } = useReplicationPipelineStatusQuery({
+    projectRef,
+    pipelineId: pipeline?.id,
+  })
   const { getRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
 
-  const { mutateAsync: stopPipeline } = useStopPipelineMutation()
-  const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({})
+  const { mutateAsync: stopPipeline } = useStopPipelineMutation({ onError: () => {} })
+  const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({
+    onError: () => {},
+  })
 
   // Fetch table-level replication status to surface errors in list view
   const {
     data: replicationStatusData,
     isPending: isReplicationStatusLoading,
     isError: isReplicationStatusError,
-  } = useReplicationPipelineReplicationStatusQuery(
-    { projectRef, pipelineId: pipeline?.id },
-    { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
-  )
+  } = useReplicationPipelineReplicationStatusQuery({ projectRef, pipelineId: pipeline?.id }, {})
   const tableStatuses = replicationStatusData?.table_statuses ?? []
   const errorCount = tableStatuses.filter((t) => t.state?.name === 'error').length
   const applyLag = replicationStatusData?.apply_lag
@@ -122,7 +118,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
 
     try {
       setIsDeleting(true)
-      await stopPipeline({ projectRef, pipelineId: pipeline.id })
+      await stopPipeline({ projectRef, pipelineId: pipeline.id, waitUntilStopped: true })
       await deleteDestinationPipeline({
         projectRef,
         destinationId: destinationId,

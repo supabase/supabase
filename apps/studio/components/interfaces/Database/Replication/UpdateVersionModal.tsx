@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { getStatusName } from './Pipeline.utils'
-import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
+import { PipelineStatusName } from './Replication.constants'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-version-query'
 import { Pipeline } from '@/data/replication/pipelines-query'
@@ -30,12 +30,12 @@ export const UpdateVersionModal = ({
   onClose,
 }: UpdateVersionModalProps) => {
   const { ref: projectRef } = useParams()
-  const { setRequestStatus } = usePipelineRequestStatus()
+  const { runWithRequestStatus } = usePipelineRequestStatus()
 
-  const { data: pipelineStatusData } = useReplicationPipelineStatusQuery(
-    { projectRef, pipelineId: pipeline?.id },
-    { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
-  )
+  const { data: pipelineStatusData } = useReplicationPipelineStatusQuery({
+    projectRef,
+    pipelineId: pipeline?.id,
+  })
   const pipelineStatus = pipelineStatusData?.status
   const statusName = getStatusName(pipelineStatus)
   // Treat an unresolved/unknown status as stopped so we don't optimistically claim a restart
@@ -58,7 +58,15 @@ export const UpdateVersionModal = ({
     if (!versionId) return
 
     try {
-      await updatePipelineVersion({ projectRef, pipelineId: pipeline.id, versionId })
+      const update = () => updatePipelineVersion({ projectRef, pipelineId: pipeline.id, versionId })
+      if (isStopped) await update()
+      else
+        await runWithRequestStatus(
+          pipeline.id,
+          PipelineStatusRequestStatus.RestartRequested,
+          statusName,
+          update
+        )
     } catch (e) {
       // 404: default changed; version cache will refresh via mutation onError. Keep dialog open.
       if ((e as ResponseError)?.code === 404) return
@@ -66,8 +74,7 @@ export const UpdateVersionModal = ({
     }
 
     if (!isStopped) {
-      setRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
-      toast.success('Pipeline successfully updated and is currently restarting')
+      toast.success('Pipeline version updated.')
     } else {
       toast.success('Pipeline successfully updated')
     }
