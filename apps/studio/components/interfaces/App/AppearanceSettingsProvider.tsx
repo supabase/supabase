@@ -10,6 +10,10 @@ export const AppearanceSettingsProvider = () => {
 
   useIsomorphicLayoutEffect(() => {
     if (resolvedTheme === undefined) return
+    if (resolvedTheme === 'classic-dark') {
+      applyThemeOverrides(document.documentElement, 'dark', {})
+      return
+    }
 
     applyThemeOverrides(document.documentElement, mode, overrides)
   }, [mode, overrides, resolvedTheme])

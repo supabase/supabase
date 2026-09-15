@@ -112,7 +112,7 @@ export const ThemeSettings = () => {
               <SingleThemeSelection theme={theme} setTheme={setTheme} />
             </div>
           </CardContent>
-          <ThemeColorSettings />
+          {theme !== 'classic-dark' && <ThemeColorSettings />}
           <CardContent>
             <FormItemLayout
               isReactForm={false}
