@@ -74,13 +74,11 @@ export const getUserFilterValue = (conditions: FilterCondition[]): string | unde
   return userCondition ? String(userCondition.value) : undefined
 }
 
-// Groups filter bar conditions by column, then shapes each group the same way
-// logsFiltersToColumnFilters does: `=` groups are bare string[] so sidebar checkboxes
-// (which only understand that shape) render ticked; other operators stay wrapped so
-// their operator survives the round trip.
+// Groups filter bar conditions by column into the wrapped `{ operator, values }` shape —
+// the one shape every column filter value uses, matching logsFiltersToColumnFilters.
 export const buildColumnFilterValues = (
   conditions: FilterCondition[]
-): Map<string, string[] | LogsColumnFilterValue> => {
+): Map<string, LogsColumnFilterValue> => {
   const wrappedByColumn = new Map<string, LogsColumnFilterValue>()
   for (const condition of conditions) {
     if (condition.propertyName === USER_PROPERTY) continue
@@ -95,10 +93,5 @@ export const buildColumnFilterValues = (
       if (existing.operator !== operator) existing.operator = operator
     }
   }
-
-  const result = new Map<string, string[] | LogsColumnFilterValue>()
-  for (const [name, wrapped] of wrappedByColumn) {
-    result.set(name, wrapped.operator === '=' ? wrapped.values : wrapped)
-  }
-  return result
+  return wrappedByColumn
 }

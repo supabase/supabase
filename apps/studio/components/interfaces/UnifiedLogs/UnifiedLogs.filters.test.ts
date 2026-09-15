@@ -58,12 +58,14 @@ describe('columnFiltersToLogsFilters', () => {
 })
 
 describe('logsFiltersToColumnFilters', () => {
-  it('seeds an `=` group as a bare string[] so sidebar checkboxes render ticked', () => {
+  it('seeds an `=` group as { operator, values }, the shape every column filter uses', () => {
     const columnFilters = logsFiltersToColumnFilters([
       { column: 'log_type', operator: '=', value: 'postgres' },
       { column: 'log_type', operator: '=', value: 'postgrest' },
     ])
-    expect(columnFilters).toEqual([{ id: 'log_type', value: ['postgres', 'postgrest'] }])
+    expect(columnFilters).toEqual([
+      { id: 'log_type', value: { operator: '=', values: ['postgres', 'postgrest'] } },
+    ])
   })
 
   it('keeps non-eq groups wrapped so the operator survives a round-trip', () => {
@@ -137,7 +139,7 @@ describe('buildDefaultColumnFilters', () => {
       date: range,
     })
     expect(columnFilters).toEqual([
-      { id: 'log_type', value: ['postgres'] },
+      { id: 'log_type', value: { operator: '=', values: ['postgres'] } },
       { id: 'date', value: range },
     ])
 
@@ -148,7 +150,7 @@ describe('buildDefaultColumnFilters', () => {
 
   it('omits `date` when no range is present, matching the pre-existing no-filter case', () => {
     expect(buildDefaultColumnFilters({ filter: ['log_type:eq:postgres'], date: null })).toEqual([
-      { id: 'log_type', value: ['postgres'] },
+      { id: 'log_type', value: { operator: '=', values: ['postgres'] } },
     ])
   })
 
@@ -157,7 +159,9 @@ describe('buildDefaultColumnFilters', () => {
       filter: ['log_type:eq:postgres'],
       date: [new Date('2026-05-08T00:00:00Z')],
     })
-    expect(columnFilters).toEqual([{ id: 'log_type', value: ['postgres'] }])
+    expect(columnFilters).toEqual([
+      { id: 'log_type', value: { operator: '=', values: ['postgres'] } },
+    ])
   })
 
   it('does not duplicate the `date` id when a hand-crafted `filter` param also targets it', () => {

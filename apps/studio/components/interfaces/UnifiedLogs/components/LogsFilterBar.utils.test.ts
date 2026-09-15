@@ -118,22 +118,22 @@ describe('getUserFilterValue', () => {
 })
 
 describe('buildColumnFilterValues', () => {
-  it('unwraps an `=` condition to a bare array, so sidebar checkboxes render ticked', () => {
+  it('wraps an `=` condition as { operator, values }, the one shape every column filter uses', () => {
     const result = buildColumnFilterValues([
       { propertyName: 'log_type', value: 'postgres', operator: '=' },
     ])
-    expect(result.get('log_type')).toEqual(['postgres'])
+    expect(result.get('log_type')).toEqual({ operator: '=', values: ['postgres'] })
   })
 
-  it('accumulates multiple `=` conditions on the same column into one bare array', () => {
+  it('accumulates multiple `=` conditions on the same column into one group', () => {
     const result = buildColumnFilterValues([
       { propertyName: 'log_type', value: 'postgres', operator: '=' },
       { propertyName: 'log_type', value: 'auth', operator: '=' },
     ])
-    expect(result.get('log_type')).toEqual(['postgres', 'auth'])
+    expect(result.get('log_type')).toEqual({ operator: '=', values: ['postgres', 'auth'] })
   })
 
-  it('keeps a `<>` condition wrapped, since checkboxes have no way to render exclusion', () => {
+  it('wraps a `<>` condition the same way, preserving its operator', () => {
     const result = buildColumnFilterValues([
       { propertyName: 'log_type', value: 'postgres', operator: '<>' },
     ])
@@ -144,7 +144,7 @@ describe('buildColumnFilterValues', () => {
     const result = buildColumnFilterValues([
       { propertyName: 'status_code', value: 500, operator: '=' },
     ])
-    expect(result.get('status_code')).toEqual(['500'])
+    expect(result.get('status_code')).toEqual({ operator: '=', values: ['500'] })
   })
 
   it('keeps separate columns independent', () => {
@@ -152,7 +152,7 @@ describe('buildColumnFilterValues', () => {
       { propertyName: 'log_type', value: 'postgres', operator: '=' },
       { propertyName: 'event_message', value: 'error', operator: '~~*' },
     ])
-    expect(result.get('log_type')).toEqual(['postgres'])
+    expect(result.get('log_type')).toEqual({ operator: '=', values: ['postgres'] })
     expect(result.get('event_message')).toEqual({ operator: '~~*', values: ['error'] })
   })
 

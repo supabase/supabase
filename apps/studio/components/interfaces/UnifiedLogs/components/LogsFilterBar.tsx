@@ -9,7 +9,7 @@ import {
   type FilterGroup,
 } from 'ui-patterns/FilterBar'
 
-import { isLogsFilterColumnValue, type LogsFilterOperator } from '../UnifiedLogs.filters'
+import { isLogsFilterColumnValue } from '../UnifiedLogs.filters'
 import {
   buildColumnFilterValues,
   buildFilterProperties,
@@ -29,17 +29,15 @@ const buildFilterGroup = (
 ): FilterGroup => {
   const conditions: FilterCondition[] = []
   for (const { id, value } of columnFilters) {
-    if (!filterableNames.has(id) || value === null || value === undefined) continue
-    // Equality filters carry their operator inside a wrapped value; range/slider
-    // filters arrive as plain arrays and default to `=`.
-    const { operator, values } = isLogsFilterColumnValue(value)
-      ? value
-      : { operator: '=' as LogsFilterOperator, values: Array.isArray(value) ? value : [value] }
-    for (const v of values) {
+    // Non-timerange column filter values are always the wrapped `{ operator, values }`
+    // shape; skip anything else (e.g. the `date` timerange brush, which isn't in
+    // filterableNames, or an unexpected shape).
+    if (!filterableNames.has(id) || !isLogsFilterColumnValue(value)) continue
+    for (const v of value.values) {
       conditions.push({
         propertyName: id,
         value: v as FilterCondition['value'],
-        operator,
+        operator: value.operator,
       })
     }
   }
