@@ -7,6 +7,7 @@ import { ReactNode } from 'react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { ReplicationPipelineLayout } from './ReplicationPipelineLayout'
+import { ReplicationPipelineStatus } from './ReplicationPipelineStatus/ReplicationPipelineStatus'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -28,6 +29,8 @@ const renderLayout = (children?: ReactNode) =>
 
 type PipelineResponse = components['schemas']['PipelineResponse_Output']
 type PipelineStatusResponse = components['schemas']['PipelineStatusResponse_Output']
+type PipelineReplicationStatusResponse =
+  components['schemas']['PipelineReplicationStatusResponse_Output']
 type PipelineVersionResponse = components['schemas']['PipelineVersionResponse_Output']
 type DestinationResponse = components['schemas']['DestinationResponse_Output']
 type DestinationsResponse = components['schemas']['DestinationsResponse_Output']
@@ -118,6 +121,17 @@ const mockVersion = (hasUpdate: boolean) =>
       }),
   })
 
+const mockReplicationStatus = () =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/pipelines/:pipeline_id/replication-status',
+    response: () =>
+      HttpResponse.json<PipelineReplicationStatusResponse>({
+        pipeline_id: 42,
+        table_statuses: [],
+      }),
+  })
+
 describe('ReplicationPipelineLayout', () => {
   beforeEach(() => {
     mockPipeline()
@@ -175,6 +189,20 @@ describe('ReplicationPipelineLayout', () => {
     await screen.findByRole('heading', { name: 'Analytics warehouse' })
     expect(screen.queryByRole('link', { name: 'Overview' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Settings' })).not.toBeInTheDocument()
+  })
+
+  test('composes the legacy overview without duplicating the detail header', async () => {
+    mockStatus('stopped')
+    mockReplicationStatus()
+
+    renderLayout(<ReplicationPipelineStatus />)
+
+    expect(await screen.findByRole('heading', { name: 'Analytics warehouse' })).toBeVisible()
+    expect(screen.getAllByRole('link', { name: 'View logs' })).toHaveLength(1)
+    expect(screen.getAllByRole('button', { name: 'Start' })).toHaveLength(1)
+
+    const content = await screen.findByRole('heading', { name: 'Pipeline stopped' })
+    expect(content.closest('.mx-auto')).toHaveClass('px-6', 'xl:px-10', 'py-6')
   })
 
   test('shows the pipeline state as a labelled dot', async () => {
