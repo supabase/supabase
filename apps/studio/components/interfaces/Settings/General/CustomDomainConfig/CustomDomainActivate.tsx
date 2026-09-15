@@ -34,7 +34,7 @@ export const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainA
   const { mutate: deleteCustomDomain, isPending: isDeleting } = useCustomDomainDeleteMutation({
     onSuccess: () => {
       toast.success(
-        'Custom domain setup cancelled successfully. It may take a few seconds before your custom domain is fully removed, so you may need to refresh your browser.'
+        'Custom domain setup canceled successfully. It may take a few seconds before your custom domain is fully removed, so you may need to refresh your browser.'
       )
     },
   })
