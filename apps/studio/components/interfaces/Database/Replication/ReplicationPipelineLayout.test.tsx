@@ -35,8 +35,12 @@ const TableResetFixture = () => {
 
   return (
     <>
-      <button onClick={() => setTableResetting(42, true)}>Begin table reset</button>
-      <button onClick={() => setTableResetting(42, false)}>Finish table reset</button>
+      <button tabIndex={0} onClick={() => setTableResetting(42, true)}>
+        Begin table reset
+      </button>
+      <button tabIndex={0} onClick={() => setTableResetting(42, false)}>
+        Finish table reset
+      </button>
     </>
   )
 }
