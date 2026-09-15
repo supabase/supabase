@@ -32,6 +32,7 @@ vi.mock('ui', async (importOriginal) => {
         role="slider"
         tabIndex={0}
         aria-labelledby={props['aria-labelledby']}
+        aria-valuenow={props.value?.[0]}
         onClick={() => props.onValueChange?.([100])}
         onKeyUp={() => props.onValueCommit?.([100])}
         onLostPointerCapture={props.onLostPointerCapture}
