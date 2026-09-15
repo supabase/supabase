@@ -171,7 +171,7 @@ describe('ReplicationPipelineLayout', () => {
     )
     expect(screen.getByText('Running')).toBeVisible()
     expect(screen.getByText('Primary database')).toBeVisible()
-    expect(screen.getByText('BigQuery')).toBeVisible()
+    expect(await screen.findByText('BigQuery')).toBeVisible()
     expect(await screen.findByRole('button', { name: 'Stop' })).toBeVisible()
     expect(screen.getByText('Overview content')).toBeVisible()
   })

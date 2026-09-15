@@ -9,8 +9,6 @@ import {
   RotateCcw,
   Trash,
 } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { PropsWithChildren, useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
@@ -52,6 +50,8 @@ import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.c
 import { getReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { DocsButton } from '@/components/ui/DocsButton'
+import Link from '@/compat/next/link'
+import { useRouter } from '@/compat/next/router'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
@@ -97,10 +97,10 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     data: pipeline,
     error: pipelineError,
     isPending: isPipelineLoading,
-  } = useReplicationPipelineByIdQuery({
-    projectRef,
-    pipelineId,
-  })
+  } = useReplicationPipelineByIdQuery(
+    { projectRef, pipelineId },
+    { enabled: Number.isSafeInteger(pipelineId) }
+  )
   const {
     data: pipelineStatusData,
     error: pipelineStatusError,
@@ -161,7 +161,8 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   // so the detail page has the same reach as the row menu on the list without repeating itself.
   const isRunningOrFailed =
     statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
-  const canUseMenuActions = isRunningOrFailed && !isTransitioning && !!pipeline
+  const canUseMenuActions =
+    isRunningOrFailed && !isTransitioning && !isPipelineStatusError && !!pipeline
   const canRestart = canUseMenuActions && !isTableResetting && primaryAction !== 'restart'
   const canStop = canUseMenuActions && !isTableResetting && primaryAction !== 'stop'
 
@@ -191,7 +192,9 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
 
     try {
       setIsDeleting(true)
-      await stopPipeline({ projectRef, pipelineId: pipeline.id })
+      if (statusName !== PipelineStatusName.STOPPED) {
+        await stopPipeline({ projectRef, pipelineId: pipeline.id })
+      }
       await deleteDestinationPipeline({
         projectRef,
         destinationId: pipeline.destination_id,
@@ -329,6 +332,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                   }
                   disabled={
                     Boolean(pipelineError) ||
+                    isPipelineStatusError ||
                     !pipeline ||
                     isTransitioning ||
                     isTableResetting ||
