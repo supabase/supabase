@@ -68,6 +68,40 @@
   --font-weight-normal: 450;
 }
 
+:root[data-text-size='small'] {
+  --text-grid: 12.22px;
+  --text-xs: 0.705rem;
+  --text-sm: 0.7638rem;
+  --text-base: 0.8813rem;
+  --text-lg: 0.94rem;
+  --text-xl: 1.0575rem;
+  --text-2xl: 1.2925rem;
+  --text-3xl: 1.645rem;
+  --text-4xl: 1.9975rem;
+  --text-5xl: 2.7025rem;
+  --text-6xl: 3.4075rem;
+  --text-7xl: 4.1125rem;
+  --text-8xl: 5.5225rem;
+  --text-9xl: 7.4025rem;
+}
+
+:root[data-text-size='large'] {
+  --text-grid: 13.78px;
+  --text-xs: 0.795rem;
+  --text-sm: 0.8613rem;
+  --text-base: 0.9938rem;
+  --text-lg: 1.06rem;
+  --text-xl: 1.1925rem;
+  --text-2xl: 1.4575rem;
+  --text-3xl: 1.855rem;
+  --text-4xl: 2.2525rem;
+  --text-5xl: 3.0475rem;
+  --text-6xl: 3.8425rem;
+  --text-7xl: 4.6375rem;
+  --text-8xl: 6.2275rem;
+  --text-9xl: 8.3475rem;
+}
+
 @keyframes shimmer {
   0% {
     background-position: -1000px 0;
