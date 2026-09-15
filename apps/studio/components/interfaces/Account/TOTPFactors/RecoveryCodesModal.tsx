@@ -78,17 +78,19 @@ export const RecoveryCodesModal = <T = unknown,>({
               </DialogClose>
             ) : null}
 
-            <Button
-              variant="primary"
-              onClick={() =>
-                copyToClipboard(mutation.data?.codes.join('\n') ?? '', () => {
-                  setCopiedToClipboard(true)
-                  setCopied(true)
-                })
-              }
-            >
-              Copy to clipboard
-            </Button>
+            {mutation.isSuccess ? (
+              <Button
+                variant="primary"
+                onClick={() =>
+                  copyToClipboard(mutation.data?.codes.join('\n') ?? '', () => {
+                    setCopiedToClipboard(true)
+                    setCopied(true)
+                  })
+                }
+              >
+                Copy to clipboard
+              </Button>
+            ) : null}
           </DialogFooter>
         ) : null}
       </DialogContent>
