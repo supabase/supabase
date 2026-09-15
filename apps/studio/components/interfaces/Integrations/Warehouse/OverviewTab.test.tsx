@@ -36,6 +36,9 @@ vi.mock('./WarehouseSchemaTablePicker', () => ({
 }))
 
 mockAnimationsApi()
+vi.mock('./WarehouseSetupForm', () => ({
+  WarehouseSetupForm: () => <section>Replicated tables picker</section>,
+}))
 dayjs.extend(duration)
 
 const FDW_STATUS: WarehouseSetupStatusResponse['fdw_status'] = {
