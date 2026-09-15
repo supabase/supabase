@@ -1,7 +1,7 @@
 ---
 title: 'Configure Custom OAuth/OIDC Providers'
-description: 'Configure any OAuth 2.0 or OIDC-compatible identity provider for self-hosted Supabase.'
-subtitle: 'Configure any OAuth 2.0 or OIDC-compatible identity provider for self-hosted Supabase.'
+description: 'Set up any OAuth 2.0 or OIDC-compatible identity provider for self-hosted Supabase.'
+subtitle: 'Set up any OAuth 2.0 or OIDC-compatible identity provider for self-hosted Supabase.'
 ---
 
 This guide explains how to add a custom OAuth 2.0 or OpenID Connect (OIDC) identity provider to a self-hosted Supabase instance and how to manage it through the Auth admin API. To learn how custom providers work and which advanced options they support, see [Custom OAuth/OIDC Providers](/docs/guides/auth/custom-oauth-providers).
@@ -22,8 +22,8 @@ Every custom provider identifier must start with the `custom:` prefix. Identifie
 
 You need:
 
-- A working self-hosted Supabase installation on release `0.8.1` or later, which ships Supabase Auth `v2.196.0`. See [Self-Hosting with Docker](/docs/guides/self-hosting/docker) and [Update Your Self-Hosted Deployment](/docs/guides/self-hosting/updating).
-- Your project's secret key, `SUPABASE_SECRET_KEY`, from your `.env` file. Admin API calls require it.
+- A working self-hosted Supabase instance on release `0.8.1` or later, which ships Supabase Auth `v2.196.0`. See [Self-Hosting with Docker](/docs/guides/self-hosting/docker) and [Update Your Self-Hosted Deployment](/docs/guides/self-hosting/updating).
+- Your project's secret key, `SUPABASE_SECRET_KEY`, from your `.env` file.
 - `API_EXTERNAL_URL` set to the publicly reachable URL of your Auth service, ending in `/auth/v1`, for example `https://<your-domain>/auth/v1`. The Auth service derives the OAuth callback URL for custom providers from this value.
 
 <Admonition type="danger">
@@ -65,7 +65,13 @@ sh run.sh recreate auth
 
 ## Create a provider
 
-Use the Auth admin API to create providers. You need your project's secret key, `SUPABASE_SECRET_KEY`, for authentication. The JavaScript examples use a supabase-js client created with the secret key, which must only run in trusted server-side environments:
+Use the Auth admin API to create providers. You need your project's secret key for authentication.
+
+<Admonition type="danger">
+
+The JavaScript examples use a [supabase-js](/docs/reference/javascript/start) client created with the secret key (`SUPABASE_SECRET_KEY`), which must only run in trusted server-side environments.
+
+</Admonition>
 
 ```js
 import { createClient } from '@supabase/supabase-js'
@@ -204,7 +210,7 @@ The following steps walk through setting up Telegram sign-in with Supabase Auth.
 
 <Admonition type="note">
 
-Telegram sign-in fails on Supabase Auth versions before `v2.196.0` because of an [unsupported signing algorithm issue](https://github.com/supabase/auth/issues/2534). Release `0.8.1` of self-hosted Supabase ships a fixed version.
+Telegram sign-in fails on Supabase Auth versions before `v2.196.0` because of an [unsupported signing algorithm issue](https://github.com/supabase/auth/issues/2534).
 
 </Admonition>
 
@@ -217,7 +223,8 @@ Telegram sign-in fails on Supabase Auth versions before `v2.196.0` because of an
 
 1. Open the [@BotFather mini app](https://t.me/botfather?startapp) on Telegram and select the bot you created in the previous step.
 2. Select **Login Widget** to open the page where you configure redirect URIs.
-3. Click **Add a Redirect URI** and enter your self-hosted Supabase callback URL:
+3. If you don't see OIDC settings, click on "Switch to OpenID Connect Login."
+4. Click **Add a Redirect URI** and enter your self-hosted Supabase callback URL:
 
    ```
    https://<your-domain>/auth/v1/callback
@@ -281,7 +288,7 @@ A few notes on these fields:
 - `name`: can be any value you want.
 - `email_optional`: must be `true` because Telegram doesn't return an email address.
 
-For the full list of available scopes, see the [Telegram Login docs](https://core.telegram.org/bots/telegram-login#available-scopes).
+The `profile` scope returns the user's name and picture. To also receive the phone number, add the `phone` scope. For the full list of available scopes, see the [Telegram Login docs](https://core.telegram.org/bots/telegram-login#available-scopes).
 
 ### Step 4: Sign in with Telegram
 
@@ -293,9 +300,61 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 })
 ```
 
+### Step 5: Test the sign-in flow
+
+Only the Supabase callback URL needs to be public and served over HTTPS, because that is where the identity provider redirects. The test page itself is a static HTML file that can run anywhere your browser can reach, including your local machine.
+
+1. Save the code below to `index.html`.
+2. Set `SITE_URL` in your self-hosted Supabase `.env` file to the URL where the page runs, for example `http://localhost:3000`, and recreate the Auth service with `sh run.sh recreate auth`. To allow more than one URL, add the others to `ADDITIONAL_REDIRECT_URLS`.
+3. Start a simple HTTP server via `python -m http.server 3000` to serve `index.html`.
+4. Open your browser and go to `http://localhost:3000`.
+
+```html
+<!doctype html>
+<html>
+  <body>
+    <h1>Supabase custom provider test</h1>
+    <button id="loginBtn">Sign in with Telegram</button>
+    <pre id="result"></pre>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const SUPABASE_URL = 'https://<your-domain>'
+        const SUPABASE_PUBLISHABLE_KEY = 'your-supabase-publishable-key'
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+          const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'custom:telegram',
+          })
+
+          if (error) {
+            document.getElementById('result').textContent = JSON.stringify(error, null, 2)
+          }
+        })
+
+        supabase.auth.onAuthStateChange((_event, session) => {
+          if (session) {
+            document.getElementById('result').textContent = JSON.stringify(session.user, null, 2)
+          }
+        })
+      })
+    </script>
+  </body>
+</html>
+```
+
+Clicking the button sends the browser to your Auth service, which redirects to Telegram. After you confirm the sign-in in the Telegram app, Telegram sends the browser back to `https://<your-domain>/auth/v1/callback`. The Auth service completes the exchange and redirects to `SITE_URL`, where `supabase-js` picks up the session and the page prints the signed-in user.
+
+Telegram doesn't return an email address, so `email` is empty in the user object. The profile claims that Telegram returns, `name`, `given_name`, `family_name`, and `picture`, are in `user_metadata` together with the ID token claims, and `app_metadata.provider` is `custom:telegram`. The Telegram user ID is the `sub` claim.
+
+To test a different custom provider, change the `provider` value to its identifier.
+
 ## Manage providers
 
-Self-hosted Studio doesn't include a UI for custom providers. Use the admin API to list, update, and delete them.
+Self-hosted Studio doesn't include a UI for custom providers. Use the admin API to list, update, and delete them. The examples use `custom:my-provider` as the identifier. Replace it with the identifier of your provider.
 
 ### List providers
 
@@ -411,4 +470,4 @@ For PKCE, authorization parameters, and OIDC-specific options, see [Advanced con
 ## Additional resources
 
 - [Custom OAuth/OIDC Providers](/docs/guides/auth/custom-oauth-providers)
-- [Configure Social Login (OAuth) Providers](/docs/guides/self-hosting/self-hosted-oauth) for the providers Supabase supports out of the box
+- [Configure Social Login (OAuth) Providers](/docs/guides/self-hosting/self-hosted-oauth)
