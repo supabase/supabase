@@ -35,19 +35,87 @@ The rest of this page writes examples as `supabase <command>`; translate them to
 
 Install the CLI as a project dev dependency. This adds it to a single project rather than installing a global command:
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="npm"
+  queryGroup="package-manager"
+>
+<TabPanel id="npm" label="npm">
+
 ```sh
 npm install supabase --save-dev
 ```
 
-If you use a different package manager, install with `pnpm add -D supabase`, `yarn add -D supabase`, or `bun add -D supabase`.
+</TabPanel>
+<TabPanel id="pnpm" label="pnpm">
+
+```sh
+pnpm add supabase --save-dev --allow-build=supabase
+```
+
+<Admonition type="note">
+
+The `--allow-build=supabase` flag is required on pnpm version 10 or higher. If you're using an older version of pnpm, omit this flag.
+
+</Admonition>
+
+</TabPanel>
+<TabPanel id="yarn" label="yarn">
+
+```sh
+NODE_OPTIONS=--no-experimental-fetch yarn add supabase --dev
+```
+
+</TabPanel>
+<TabPanel id="bun" label="bun">
+
+```sh
+bun add supabase --dev
+```
+
+</TabPanel>
+</Tabs>
 
 Pin the version in `package.json` so your whole team uses the same CLI version. Then run every command through your package runner:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="npm"
+  queryGroup="package-manager"
+>
+<TabPanel id="npm" label="npm">
 
 ```sh
 npx supabase --help
 ```
 
-With other package runners, use `pnpm supabase`, `yarn supabase`, or `bunx supabase`.
+</TabPanel>
+<TabPanel id="pnpm" label="pnpm">
+
+```sh
+pnpm supabase --help
+```
+
+</TabPanel>
+<TabPanel id="yarn" label="yarn">
+
+```sh
+yarn supabase --help
+```
+
+</TabPanel>
+<TabPanel id="bun" label="bun">
+
+```sh
+bunx supabase --help
+```
+
+</TabPanel>
+</Tabs>
 
 <Admonition type="caution">
 
