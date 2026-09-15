@@ -183,8 +183,11 @@ const translateFilter = (
       if (operator === '~~*' || operator === '!~~*') {
         const op = operator === '~~*' ? ILIKE_OP : NOT_ILIKE_OP
         const join = operator === '!~~*' ? ' AND ' : ' OR '
+        // Auto-wrap with `%…%` unless the user already included one, matching
+        // event_message's ILIKE/NOT ILIKE behavior below.
+        const pattern = (v: string) => (v.includes('%') ? v : '%' + v + '%')
         return safeSql`(${joinSqlFragments(
-          values.map((v) => safeSql`${ATTR.path} ${op} ${lit('%' + v + '%')}`),
+          values.map((v) => safeSql`${ATTR.path} ${op} ${lit(pattern(v))}`),
           join
         )})`
       }

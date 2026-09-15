@@ -145,6 +145,12 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       )
     })
 
+    it('passes through user-supplied `%` wildcards on pathname ILIKE without double-wrapping', () => {
+      const sql = getUnifiedLogsQuery(withFilters('pathname:ilike:foo%'))
+      expect(sql).toContain(`log_attributes['request.path'] ILIKE 'foo%'`)
+      expect(sql).not.toContain(`'%foo%%'`)
+    })
+
     it('emits ILIKE with auto-wrapped `%…%` for event_message `~~*`', () => {
       const sql = getUnifiedLogsQuery(withFilters('event_message:ilike:Permission Denied'))
       expect(sql).toContain(`event_message ILIKE '%Permission Denied%'`)
@@ -487,5 +493,30 @@ describe('UnifiedLogs.queries.bq', () => {
     const sql = getUnifiedLogsQueryBQ(withFilters('pathname:notilike:health'))
     expect(sql).toContain("LOWER(`pathname`) NOT LIKE LOWER('%health%')")
     expect(sql).not.toMatch(/\bILIKE\b/)
+  })
+
+  it('passes through user-supplied `%` wildcards on pathname ILIKE without double-wrapping', () => {
+    const sql = getUnifiedLogsQueryBQ(withFilters('pathname:ilike:foo%'))
+    expect(sql).toContain("LOWER(`pathname`) LIKE LOWER('foo%')")
+    expect(sql).not.toContain("LOWER('%foo%%')")
+  })
+})
+
+describe('pathname ILIKE prefix matching (cross-builder)', () => {
+  // Both query builders must treat an explicit `%` the same way — a value
+  // like `foo%` is a prefix match, not a "contains" search with a stray
+  // trailing wildcard — otherwise switching the `otelUnifiedLogs` flag would
+  // silently change what a saved/shared filter matches.
+  it('produces equivalent prefix-matching patterns for `pathname:ilike:foo%` on both backends', () => {
+    const clickhouseSql = getUnifiedLogsQuery(withFilters('pathname:ilike:foo%'))
+    const bqSql = getUnifiedLogsQueryBQ(withFilters('pathname:ilike:foo%'))
+
+    expect(clickhouseSql).toContain(`log_attributes['request.path'] ILIKE 'foo%'`)
+    expect(bqSql).toContain("LOWER(`pathname`) LIKE LOWER('foo%')")
+
+    // Neither backend should have double-wrapped the wildcard into a
+    // "contains" pattern.
+    expect(clickhouseSql).not.toContain(`'%foo%%'`)
+    expect(bqSql).not.toContain("LOWER('%foo%%')")
   })
 })
