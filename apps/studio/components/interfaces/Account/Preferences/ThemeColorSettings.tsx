@@ -3,6 +3,7 @@ import { Button, CardContent, Slider } from 'ui'
 
 import { useThemeOverrides } from '@/hooks/misc/useThemeOverrides'
 import {
+  applyThemeOverrides,
   getThemeOverrideValue,
   hasThemeOverrides,
   previewThemeOverride,
@@ -17,6 +18,11 @@ export const ThemeColorSettings = () => {
   const { mode, overrides, setOverride, resetOverrides } = useThemeOverrides()
   const [draft, setDraft] = useState<ThemeOverrides>({})
   const draftRef = useRef<ThemeOverrides>({})
+  const modeRef = useRef(mode)
+  const overridesRef = useRef(overrides)
+
+  modeRef.current = mode
+  overridesRef.current = overrides
 
   const writeDraft = useCallback((next: ThemeOverrides) => {
     draftRef.current = next
@@ -24,6 +30,13 @@ export const ThemeColorSettings = () => {
   }, [])
 
   useEffect(() => writeDraft({}), [mode, writeDraft])
+
+  useEffect(
+    () => () => {
+      applyThemeOverrides(document.documentElement, modeRef.current, overridesRef.current)
+    },
+    []
+  )
 
   const handleReset = useCallback(() => {
     writeDraft({})
@@ -78,6 +91,7 @@ export const ThemeColorSettings = () => {
                 </span>
               </div>
               <Slider
+                className="[&_[data-slot=slider-track]]:bg-input"
                 aria-labelledby={`theme-color-${knob.key}-label`}
                 aria-valuetext={`${sliderValue} out of 100`}
                 min={0}
