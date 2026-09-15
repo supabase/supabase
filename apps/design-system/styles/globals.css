@@ -1,5 +1,4 @@
 @import 'config/tailwind.config.css';
-@import './../../../packages/ui/build/css/themes/classic-dark.css';
 @import 'config/typography.css';
 
 @source '../app/**/*.{js,ts,jsx,tsx}';

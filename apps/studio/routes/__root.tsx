@@ -378,7 +378,7 @@ function RootComponent() {
                     <RouteValidationWrapper>
                       <ThemeProvider
                         defaultTheme="system"
-                        themes={['dark', 'light', 'classic-dark']}
+                        themes={['dark', 'light']}
                         enableSystem
                         disableTransitionOnChange
                       >
