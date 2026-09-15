@@ -1063,8 +1063,12 @@ export const database: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Managing tables, views, and data',
+          name: 'Managing tables and data',
           url: '/guides/database/tables' as `/${string}`,
+        },
+        {
+          name: 'Views',
+          url: '/guides/database/views' as `/${string}`,
         },
         {
           name: 'Working with arrays',
@@ -1132,6 +1136,20 @@ export const database: NavMenuConstant = {
         {
           name: 'Overview',
           url: '/guides/database/orioledb' as `/${string}`,
+        },
+      ],
+    },
+    {
+      name: 'Multigres',
+      url: undefined,
+      items: [
+        {
+          name: 'Overview',
+          url: '/guides/database/multigres' as `/${string}`,
+        },
+        {
+          name: 'Compatibility',
+          url: '/guides/database/multigres/compatibility' as `/${string}`,
         },
       ],
     },
@@ -1650,8 +1668,12 @@ export const api: NavMenuConstant = {
       url: '/guides/api/data-apis',
       items: [
         {
-          name: 'Managing tables, views, and data',
+          name: 'Managing tables and data',
           url: '/guides/database/tables' as `/${string}`,
+        },
+        {
+          name: 'Views',
+          url: '/guides/database/views' as `/${string}`,
         },
         {
           name: 'Querying joins and nested tables',

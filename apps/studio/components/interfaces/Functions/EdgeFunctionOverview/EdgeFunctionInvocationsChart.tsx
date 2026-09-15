@@ -27,7 +27,7 @@ import type { InvocationChartDatum, InvocationUpdateAnnotation } from './EdgeFun
 interface EdgeFunctionInvocationsChartProps {
   chartData: InvocationChartDatum[]
   dateTimeFormat: string
-  onChartClick: () => void
+  onChartClick: (timestamp: string) => void
   updateAnnotation?: InvocationUpdateAnnotation
 }
 
@@ -48,8 +48,12 @@ export const EdgeFunctionInvocationsChart = ({
         <ChartContainer config={INVOCATION_CHART_CONFIG} className="aspect-auto! h-full! w-full!">
           <RechartBarChart
             data={chartData}
+            className="cursor-pointer"
             margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
-            onClick={onChartClick}
+            onClick={(tooltipData) => {
+              const timestamp = tooltipData?.activePayload?.[0]?.payload?.timestamp
+              if (typeof timestamp === 'string') onChartClick(timestamp)
+            }}
           >
             <CartesianGrid vertical={false} />
             <YAxis hide width={0} />

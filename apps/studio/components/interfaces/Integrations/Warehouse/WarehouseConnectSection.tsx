@@ -4,13 +4,16 @@ import Link from 'next/link'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Badge,
   Button,
+  Card,
+  CardContent,
+  cn,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Separator,
   Switch,
   Tooltip,
   TooltipContent,
@@ -20,12 +23,21 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { ConnectSheetStep } from '../ConnectSheetStep'
-import { EnvRow } from '../content/server/common/EnvRow'
-import { CopyPromptButton } from '../CopyPromptAdmonition'
-import type { WarehouseCatalogCredentials } from './WarehouseModePanel.utils'
+import { ConnectSheetStep } from '../../ConnectSheet/ConnectSheetStep'
+import { EnvRow } from '../../ConnectSheet/content/server/common/EnvRow'
+import { CopyPromptButton } from '../../ConnectSheet/CopyPromptAdmonition'
+import { useConnectSheetParams } from '../../ConnectSheet/useConnectSheetParams'
+import type { WarehouseCatalogCredentials } from './Warehouse.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import CopyButton from '@/components/ui/CopyButton'
 import { useUpdateWarehouseCatalogMutation } from '@/data/warehouse/warehouse-catalog-mutation'
@@ -40,16 +52,16 @@ import {
   parseWarehouseCatalogUrl,
 } from '@/lib/warehouse'
 
+/**
+ * Only engines we can produce real configuration for. DuckLake exposes a Postgres catalog over S3
+ * rather than an Iceberg REST catalog, so Trino, Spark and PyIceberg need API support first.
+ */
 const QUERY_ENGINES = [
   { value: 'flightsql', label: 'FlightSQL' },
   { value: 'duckdb', label: 'DuckDB' },
 ] as const
 
 type QueryEngine = (typeof QUERY_ENGINES)[number]['value']
-
-export interface WarehouseConnectionDetailsProps {
-  onEditTables: () => void
-}
 
 function FieldRow({
   id,
@@ -68,7 +80,7 @@ function FieldRow({
 }
 
 const FlightSqlContent = ({ projectRef }: { projectRef: string }) => (
-  <div className="space-y-4">
+  <CardContent className="space-y-4">
     <FieldRow id="warehouse-flightsql-endpoint" label="Endpoint">
       <Input
         id="warehouse-flightsql-endpoint"
@@ -106,7 +118,7 @@ const FlightSqlContent = ({ projectRef }: { projectRef: string }) => (
         value={getWarehouseUsqlCommand(projectRef)}
       />
     </FieldRow>
-  </div>
+  </CardContent>
 )
 
 const DuckLakeSecretRow = ({ name, value }: { name: string; value: string }) => {
@@ -134,6 +146,10 @@ const DuckLakeSecretRow = ({ name, value }: { name: string; value: string }) => 
   )
 }
 
+/**
+ * The DuckDB setup script inlines everything except the two passwords, which it reads via
+ * `getenv()` -- so those are the only credential values surfaced as their own rows here.
+ */
 const DuckLakeEnvironmentVariables = ({
   credentials,
   password,
@@ -169,13 +185,19 @@ const DuckLakeEnvironmentVariables = ({
   )
 }
 
-const DuckLakeSetup = ({ credentials }: { credentials: WarehouseCatalogCredentials }) => {
+const DuckLakeSetup = ({
+  credentials,
+  variant,
+}: {
+  credentials: WarehouseCatalogCredentials
+  variant: 'default' | 'sheet'
+}) => {
   const connection = parseWarehouseCatalogUrl(credentials.catalog_url)
   const stepsContainerRef = useRef<HTMLDivElement | null>(null)
 
   if (connection === null) {
-    return (
-      <div className="space-y-4 border-t bg-muted/50 p-8">
+    const errorContent = (
+      <>
         <Admonition
           type="warning"
           title="Could not read the catalog connection details"
@@ -191,7 +213,31 @@ const DuckLakeSetup = ({ credentials }: { credentials: WarehouseCatalogCredentia
             value={credentials.catalog_url}
           />
         </FieldRow>
-      </div>
+      </>
+    )
+
+    return variant === 'sheet' ? (
+      <div className="space-y-4 border-t bg-muted/50 p-8">{errorContent}</div>
+    ) : (
+      <CardContent className="space-y-4">{errorContent}</CardContent>
+    )
+  }
+
+  const script = (
+    <CodeBlock
+      className="[&_code]:text-foreground"
+      language="sql"
+      hideLineNumbers
+      value={getDuckLakeSetupScript({ credentials, connection })}
+    />
+  )
+
+  if (variant === 'default') {
+    return (
+      <CardContent className="space-y-4">
+        <DuckLakeEnvironmentVariables credentials={credentials} password={connection.password} />
+        {script}
+      </CardContent>
     )
   }
 
@@ -214,12 +260,7 @@ const DuckLakeSetup = ({ credentials }: { credentials: WarehouseCatalogCredentia
           title="Attach Warehouse"
           description="Run this script in DuckDB to configure the secrets and attach Warehouse."
         >
-          <CodeBlock
-            className="[&_code]:text-foreground"
-            language="sql"
-            hideLineNumbers
-            value={getDuckLakeSetupScript({ credentials, connection })}
-          />
+          {script}
         </ConnectSheetStep>
       </div>
     </div>
@@ -241,32 +282,48 @@ const CatalogAccessToggle = ({
   })
 
   return (
-    <FormLayout
-      layout="flex-row-reverse"
-      label="Enable DuckDB catalog access"
-      description="Creates the credentials DuckDB needs to attach Warehouse. Not required for FlightSQL."
-    >
-      <div className="flex items-center justify-end gap-2">
-        {catalogMutation.isPending && (
-          <span role="status" aria-label="Updating DuckDB catalog access">
-            <Loader2 size={16} className="animate-spin text-foreground-muted" aria-hidden />
+    <CardContent>
+      <FormLayout
+        layout="flex-row-reverse"
+        label="Enable DuckDB catalog access"
+        description="Creates the credentials DuckDB needs to attach Warehouse. Not required for FlightSQL."
+      >
+        <div className="flex items-center justify-end gap-2">
+          <span
+            role="status"
+            aria-label={catalogMutation.isPending ? 'Updating DuckDB catalog access' : undefined}
+            className="sr-only"
+          >
+            {catalogMutation.isPending ? 'Updating DuckDB catalog access' : ''}
           </span>
-        )}
-        <Switch
-          aria-label="Enable DuckDB catalog access"
-          aria-busy={catalogMutation.isPending}
-          checked={isEnabled}
-          disabled={catalogMutation.isPending}
-          onCheckedChange={(enabled) => catalogMutation.mutate({ projectRef, body: { enabled } })}
-        />
-      </div>
-    </FormLayout>
+          {catalogMutation.isPending && (
+            <Loader2
+              size={16}
+              className="animate-spin text-foreground-muted motion-reduce:animate-none"
+              aria-hidden
+            />
+          )}
+          <Switch
+            aria-label="Enable DuckDB catalog access"
+            aria-busy={catalogMutation.isPending}
+            checked={isEnabled}
+            disabled={catalogMutation.isPending}
+            onCheckedChange={(enabled) => catalogMutation.mutate({ projectRef, body: { enabled } })}
+          />
+        </div>
+      </FormLayout>
+    </CardContent>
   )
 }
 
-export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnectionDetailsProps) => {
+interface WarehouseConnectionCardProps {
+  variant?: 'default' | 'sheet'
+}
+
+export const WarehouseConnectionCard = ({ variant = 'default' }: WarehouseConnectionCardProps) => {
   const { ref: projectRef } = useParams()
-  const [engine, setEngine] = useState<QueryEngine>('flightsql')
+  const { params, setConnectParams } = useConnectSheetParams()
+  const engine: QueryEngine = params.warehouseQueryEngine === 'duckdb' ? 'duckdb' : 'flightsql'
 
   const {
     data: catalog,
@@ -283,18 +340,23 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
     catalogStatus = 'DuckDB catalog access loaded'
   }
 
-  return (
-    <div>
-      <div className="space-y-4 p-8">
-        <div className="flex items-center gap-3">
-          <Badge variant="success">Warehouse enabled</Badge>
-          <Button className="ml-auto" variant="text" size="tiny" onClick={onEditTables}>
-            Edit replicated tables
-          </Button>
-        </div>
+  const isSheet = variant === 'sheet'
 
+  const connectionCard = (
+    <Card
+      className={cn(
+        isSheet &&
+          'relative space-y-4 rounded-none border-0 bg-transparent shadow-none [&>div]:border-0 [&>div]:p-0'
+      )}
+    >
+      <CardContent className="border-none">
         <FieldRow id="warehouse-query-engine" label="Query engine">
-          <Select value={engine} onValueChange={(value) => setEngine(value as QueryEngine)}>
+          <Select
+            value={engine}
+            onValueChange={(value) =>
+              setConnectParams({ warehouseQueryEngine: value as QueryEngine })
+            }
+          >
             <SelectTrigger id="warehouse-query-engine" className="ml-auto w-48">
               <SelectValue />
             </SelectTrigger>
@@ -307,26 +369,62 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
             </SelectContent>
           </Select>
         </FieldRow>
+      </CardContent>
 
-        {engine === 'flightsql' && <FlightSqlContent projectRef={projectRef} />}
+      {!isSheet && <Separator />}
 
-        {engine === 'duckdb' && (
-          <>
-            {isCatalogPending && <GenericSkeletonLoader />}
-            {isCatalogError && (
+      {engine === 'flightsql' && <FlightSqlContent projectRef={projectRef} />}
+
+      {engine === 'duckdb' && (
+        <>
+          {isCatalogPending && (
+            <CardContent>
+              <GenericSkeletonLoader />
+            </CardContent>
+          )}
+          {isCatalogError && (
+            <CardContent>
               <AlertError subject="Failed to load DuckLake catalog access" error={catalogError} />
-            )}
-            {catalog && <CatalogAccessToggle projectRef={projectRef} isEnabled={catalog.enabled} />}
-          </>
-        )}
-        <span className="sr-only" role="status" aria-live="polite">
-          {catalogStatus}
-        </span>
-      </div>
+            </CardContent>
+          )}
+          {catalog && <CatalogAccessToggle projectRef={projectRef} isEnabled={catalog.enabled} />}
+          {!isSheet && catalog?.enabled && catalog.credentials && (
+            <DuckLakeSetup credentials={catalog.credentials} variant="default" />
+          )}
+        </>
+      )}
+      <span className="sr-only" role="status" aria-live="polite">
+        {catalogStatus}
+      </span>
+    </Card>
+  )
 
+  if (!isSheet) return connectionCard
+
+  return (
+    <div>
+      <div className="p-8">{connectionCard}</div>
       {engine === 'duckdb' && catalog?.enabled && catalog.credentials && (
-        <DuckLakeSetup credentials={catalog.credentials} />
+        <DuckLakeSetup credentials={catalog.credentials} variant="sheet" />
       )}
     </div>
+  )
+}
+
+export const WarehouseConnectSection = () => {
+  return (
+    <PageSection className="pt-0!">
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Connect</PageSectionTitle>
+          <PageSectionDescription>
+            Point an analytical tool at Warehouse without querying your primary database.
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
+        <WarehouseConnectionCard />
+      </PageSectionContent>
+    </PageSection>
   )
 }

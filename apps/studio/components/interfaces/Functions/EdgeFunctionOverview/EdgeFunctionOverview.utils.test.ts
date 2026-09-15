@@ -12,6 +12,7 @@ import {
   getChartTimeRangeLabels,
   getExecutionMetrics,
   getInvocationChartData,
+  getInvocationChartNavigationUrl,
   getInvocationTotals,
   getInvocationUpdateAnnotation,
   getMemoryTooltipDetail,
@@ -247,6 +248,27 @@ describe('EdgeFunctionOverview.utils', () => {
     expect(rollingStart.toISOString()).toBe('2026-03-20T09:37:00.000Z')
     expect(rollingEnd.toISOString()).toBe('2026-03-20T10:37:00.000Z')
   })
+
+  it.each([
+    { isUnifiedLogsEnabled: true, destination: 'logs' },
+    { isUnifiedLogsEnabled: false, destination: 'invocations' },
+  ])(
+    'builds a focused $destination URL from the clicked bar',
+    ({ isUnifiedLogsEnabled, destination }) => {
+      const url = getInvocationChartNavigationUrl({
+        projectRef: 'project-ref',
+        functionSlug: 'function-slug',
+        isUnifiedLogsEnabled,
+        rangeStart: '2026-03-20T10:00:00.000Z',
+        rangeEnd: '2026-03-20T11:00:00.000Z',
+        clickedTimestamp: '2026-03-20T10:30:00.000Z',
+      })
+
+      expect(url).toBe(
+        `/project/project-ref/functions/function-slug/${destination}?its=2026-03-20T10%3A27%3A30.000Z&ite=2026-03-20T10%3A32%3A30.000Z`
+      )
+    }
+  )
 
   it('formats metric, rate, and reference deltas consistently', () => {
     expect(formatMetric(12.34, 'MB')).toBe('12.3MB')
