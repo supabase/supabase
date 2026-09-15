@@ -23,6 +23,10 @@ vi.mock('common', async (importOriginal) => ({
   useParams: () => ({ ref: 'default', pipelineId: '42' }),
 }))
 
+vi.mock('@/compat/next/router', () => ({
+  useRouter: () => ({ push: vi.fn() }),
+}))
+
 const renderLayout = (children?: ReactNode) =>
   customRender(
     <PipelineRequestStatusProvider>
