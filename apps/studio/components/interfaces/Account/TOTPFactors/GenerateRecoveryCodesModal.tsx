@@ -40,6 +40,10 @@ export const GenerateRecoveryCodesModal = () => {
             if (!open && !copied && recoveryCodesGenerateMutation.isSuccess) return
 
             setOpen(open)
+            // Reset state
+            setCopied(false)
+            setCopiedToClipboard(false)
+            recoveryCodesGenerateMutation.reset()
             queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status() })
           }}
         >
