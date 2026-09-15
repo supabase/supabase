@@ -121,7 +121,9 @@ describe('buildColumnFilterValues', () => {
   it.each(['=', '<>', '~~*', '!~~*'] as const)(
     'wraps a `%s` condition as { operator, values }, the one shape every column filter uses',
     (operator) => {
-      const result = buildColumnFilterValues([{ propertyName: 'log_type', value: 'postgres', operator }])
+      const result = buildColumnFilterValues([
+        { propertyName: 'log_type', value: 'postgres', operator },
+      ])
       expect(result.get('log_type')).toEqual({ operator, values: ['postgres'] })
     }
   )

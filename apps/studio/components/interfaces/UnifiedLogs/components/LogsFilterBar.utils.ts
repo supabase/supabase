@@ -5,8 +5,8 @@ import {
 } from 'ui-patterns/FilterBar'
 import { z } from 'zod'
 
-import type { Option } from '@/components/ui/DataTable/DataTable.types'
 import type { LogsColumnFilterValue, LogsFilterOperator } from '../UnifiedLogs.filters'
+import type { Option } from '@/components/ui/DataTable/DataTable.types'
 
 export const USER_PROPERTY = 'user'
 
