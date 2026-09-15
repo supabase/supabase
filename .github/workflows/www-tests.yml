@@ -5,6 +5,8 @@ on:
     branches: ['master']
     paths:
       - 'apps/www/**/*.ts*'
+      - 'packages/common/sentry.ts'
+      - 'packages/common/sentry.test.ts'
       - 'apps/www/next.config.mjs'
       - 'apps/www/next.config.js'
       - 'apps/www/lib/**/*.js'

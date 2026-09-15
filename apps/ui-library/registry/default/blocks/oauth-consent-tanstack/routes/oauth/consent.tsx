@@ -1,3 +1,4 @@
+/// <reference types="vite/types/importMeta.d.ts" />
 import { createFileRoute } from '@tanstack/react-router'
 
 import { OAuthConsent } from '@/registry/default/blocks/oauth-consent/components/oauth-consent'
@@ -8,7 +9,8 @@ import { OAuthConsent } from '@/registry/default/blocks/oauth-consent/components
 export const Route = createFileRoute('/oauth/consent')({
   component: ConsentPage,
   validateSearch: (search) => ({
-    authorization_id: typeof search.authorization_id === 'string' ? search.authorization_id : null,
+    authorization_id:
+      typeof search.authorization_id === 'string' ? search.authorization_id : undefined,
   }),
 })
 
@@ -17,7 +19,12 @@ function ConsentPage() {
 
   return (
     <main className="flex min-h-svh items-center justify-center p-6 md:p-10">
-      <OAuthConsent className="w-full max-w-lg" authorizationId={authorization_id} />
+      <OAuthConsent
+        className="w-full max-w-lg"
+        authorizationId={authorization_id}
+        signInPath="/login"
+        productName={import.meta.env.VITE_PRODUCT_NAME?.trim() || 'Your product'}
+      />
     </main>
   )
 }
