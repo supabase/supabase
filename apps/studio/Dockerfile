@@ -8,6 +8,12 @@
 # Clean build:
 #    docker builder prune
 #    docker build . -f apps/studio/Dockerfile --target production -t studio:latest --no-cache
+#
+# Build with Dependency Firewall (routes all registry fetches through
+# depthfirst's supply-chain-scanning npm proxy instead of the public
+# registry; falls back to the public registry if omitted):
+#    DF_FIREWALL_TOKEN=xxx docker build . -f apps/studio/Dockerfile --target production -t studio:latest \
+#      --secret id=df_firewall_token,env=DF_FIREWALL_TOKEN
 
 # Which framework's build ends up in the image. This is the same variable
 # scripts/dispatch.js keys on for the dev/build/start scripts, so
@@ -32,7 +38,26 @@ RUN apt-get update -qq && \
   rm -rf /var/lib/apt/lists/* && \
   update-ca-certificates
 
-RUN npm install -g pnpm@11.13.1
+# When a Dependency Firewall token is supplied at build time (`docker build
+# --secret id=df_firewall_token,env=DF_FIREWALL_TOKEN`), route this and every
+# later registry fetch through depthfirst's supply-chain-scanning npm proxy
+# instead of the public registry. The token is read from a BuildKit secret
+# mount (never an ARG/ENV, which bakes into `docker history` regardless of a
+# later unset) and the config it writes is reverted before this RUN
+# instruction ends, so the token itself never persists in the image. Every
+# stage that talks to the registry repeats this same set/run/revert dance for
+# the same reason — leaving the config set at the end of a layer would bake
+# the token into that layer.
+RUN --mount=type=secret,id=df_firewall_token \
+  if [ -s /run/secrets/df_firewall_token ]; then \
+  npm config set //firewall.depthfirst.com/npm/:_authToken "$(cat /run/secrets/df_firewall_token)" && \
+  npm config set registry https://firewall.depthfirst.com/npm/; \
+  fi && \
+  npm install -g pnpm@11.13.1 && \
+  if [ -s /run/secrets/df_firewall_token ]; then \
+  npm config delete //firewall.depthfirst.com/npm/:_authToken && \
+  npm config delete registry; \
+  fi
 
 WORKDIR /app
 
@@ -40,7 +65,17 @@ WORKDIR /app
 FROM base AS turbo
 COPY . .
 
-RUN pnpm dlx turbo@2.9.14 prune studio --docker
+# See the Dependency Firewall comment in the base stage above.
+RUN --mount=type=secret,id=df_firewall_token \
+  if [ -s /run/secrets/df_firewall_token ]; then \
+  pnpm config set //firewall.depthfirst.com/npm/:_authToken "$(cat /run/secrets/df_firewall_token)" && \
+  pnpm config set registry https://firewall.depthfirst.com/npm/; \
+  fi && \
+  pnpm dlx turbo@2.9.14 prune studio --docker && \
+  if [ -s /run/secrets/df_firewall_token ]; then \
+  pnpm config delete //firewall.depthfirst.com/npm/:_authToken && \
+  pnpm config delete registry; \
+  fi
 
 # Install dev dependencies (only if needed)
 FROM base AS deps
@@ -48,8 +83,18 @@ COPY --from=turbo /app/out/json ./
 COPY --from=turbo /app/out/pnpm-lock.yaml ./
 COPY ./patches/ ./patches
 
-# No need to clean cache because production uses standalone build
-RUN pnpm install --frozen-lockfile
+# No need to clean cache because production uses standalone build.
+# See the Dependency Firewall comment in the base stage above.
+RUN --mount=type=secret,id=df_firewall_token \
+  if [ -s /run/secrets/df_firewall_token ]; then \
+  pnpm config set //firewall.depthfirst.com/npm/:_authToken "$(cat /run/secrets/df_firewall_token)" && \
+  pnpm config set registry https://firewall.depthfirst.com/npm/; \
+  fi && \
+  pnpm install --frozen-lockfile && \
+  if [ -s /run/secrets/df_firewall_token ]; then \
+  pnpm config delete //firewall.depthfirst.com/npm/:_authToken && \
+  pnpm config delete registry; \
+  fi
 
 # dev contains dependencies and source code not compiled
 FROM deps AS dev
