@@ -29,6 +29,8 @@ export interface MessageActions {
   onBranch: (id: string) => void
   onCancelEdit: () => void
   onRate?: (id: string, rating: 'positive' | 'negative', reason?: string) => void
+  /** Sends a follow-up user message in the current chat. */
+  onSendMessage?: (text: string) => void
 }
 
 const MessageInfoContext = createContext<MessageInfo | null>(null)

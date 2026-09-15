@@ -29,9 +29,7 @@ export const QueryResultError = ({
   autoLimit?: QueryResult['autoLimit']
   sql?: string
   source?: SqlSnippetSource
-  /** Overrides the default "open a new debug chat" behavior — used when this query block
-   * is already rendered inside an open assistant conversation, so debugging should write
-   * into that conversation's composer instead of abandoning it for a new chat. */
+  /** Receives the "Debug with Assistant" prompt. Defaults to opening a new assistant chat. */
   onDebug?: (prompt: string) => void
 }) => {
   const { ref } = useParams()
@@ -65,10 +63,11 @@ export const QueryResultError = ({
     [canDebug, sql, error.message, source]
   )
 
-  const handleDebug = () =>
-    onDebug
-      ? onDebug(buildDebugPrompt())
-      : createChat({ name: 'Debug SQL snippet', initialMessage: buildDebugPrompt() })
+  const handleDebug = () => {
+    const prompt = buildDebugPrompt()
+    if (onDebug) return onDebug(prompt)
+    createChat({ name: 'Debug SQL snippet', initialMessage: prompt })
+  }
 
   const isTimeout =
     error.message?.includes('canceling statement due to statement timeout') ||

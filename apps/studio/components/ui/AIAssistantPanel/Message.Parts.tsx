@@ -36,6 +36,8 @@ function MessagePartText({ textPart }: { textPart: TextUIPart }) {
       readOnly={readOnly}
       className={cn(
         'max-w-none space-y-4 prose prose-sm prose-li:mt-1 [&>div]:my-4 prose-h1:text-xl prose-h1:mt-6 prose-h2:text-lg prose-h2:font-medium prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground prose-ol:space-y-3 prose-ul:space-y-3 prose-li:my-0 wrap-break-word [&>p:not(:last-child)]:mb-2! [&>*>p:first-child]:mt-0! [&>*>p:last-child]:mb-0! [&>*>*>p:first-child]:mt-0! [&>*>*>p:last-child]:mb-0! [&>ol>li]:pl-4!',
+        // Prose stays in the narrow column; only blocks flagged wide (query cells) use the full width.
+        '[&>*]:mx-auto [&>*]:max-w-3xl [&>[data-wide]]:max-w-none',
         isUserMessage && 'text-foreground [&>p]:font-medium',
         state === 'editing' && 'animate-pulse'
       )}
@@ -318,8 +320,9 @@ const isWideMessagePart = (part: NonNullable<VercelMessage['parts']>[number]) =>
   part.type === 'tool-update_notebook' ||
   part.type === 'tool-run_notebook' ||
   (part.type === 'dynamic-tool' && part.toolName === 'query_logs') ||
-  // Unlabelled code fences resolve to SQL in MessageMarkdown, too.
-  (part.type === 'text' && /```(?:sql)?(?:\s|$)/i.test(part.text))
+  // Text spans the wide column so a SQL fence can render as a full-width query cell;
+  // MessagePartText re-centers its prose blocks at the narrow width.
+  part.type === 'text'
 
 const isCompactToolPart = (part: NonNullable<VercelMessage['parts']>[number]) =>
   part.type === 'reasoning' ||
