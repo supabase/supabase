@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict'
-import { describe, it } from 'node:test'
+import { describe, expect, it } from 'vitest'
 
 import { transformLibraryMdx } from './library-mdx-to-markdown'
 
@@ -13,8 +12,7 @@ description: Password-based authentication block for Next.js
 Hello world.
 `)
 
-    assert.match(
-      output,
+    expect(output).toMatch(
       /^# Password-based Authentication\n\nPassword-based authentication block for Next.js\n\nHello world.\n$/
     )
   })
@@ -28,8 +26,7 @@ description: Auth block
 <BlockItem name="password-based-auth-nextjs" />
 `)
 
-    assert.match(
-      output,
+    expect(output).toMatch(
       /```bash\nnpx shadcn@latest add @supabase\/password-based-auth-nextjs\n```/
     )
   })
@@ -43,8 +40,7 @@ description: Vue dropzone
 <BlockItem name="dropzone-vue" framework="vue" />
 `)
 
-    assert.match(
-      output,
+    expect(output).toMatch(
       /npx shadcn-vue@latest add https:\/\/supabase\.com\/library\/r\/dropzone-vue.json/
     )
   })
@@ -64,10 +60,10 @@ Set \`NEXT_PUBLIC_SUPABASE_URL\` in \`.env.local\`.
 <Callout type="warning">This client is built for SSR.</Callout>
 `)
 
-    assert.doesNotMatch(output, /BlockPreview/)
-    assert.match(output, /## Usage/)
-    assert.match(output, /NEXT_PUBLIC_SUPABASE_URL/)
-    assert.match(output, /Warning: This client is built for SSR\./)
+    expect(output).not.toMatch(/BlockPreview/)
+    expect(output).toMatch(/## Usage/)
+    expect(output).toMatch(/NEXT_PUBLIC_SUPABASE_URL/)
+    expect(output).toMatch(/Warning: This client is built for SSR\./)
   })
 
   it('rewrites library docs links to absolute markdown URLs', () => {
@@ -79,7 +75,7 @@ description: Client
 See the [React client](/library/docs/react/client).
 `)
 
-    assert.match(output, /https:\/\/supabase\.com\/library\/docs\/react\/client\.md/)
+    expect(output).toMatch(/https:\/\/supabase\.com\/library\/docs\/react\/client\.md/)
   })
 
   it('rewrites documentation links nested inside components', () => {
@@ -93,8 +89,7 @@ See the [React client](/library/docs/react/client) before installing.
 </Callout>
 `)
 
-    assert.match(
-      output,
+    expect(output).toMatch(
       /Note: See the \[React client\]\(https:\/\/supabase\.com\/library\/docs\/react\/client\.md\) before installing\./
     )
   })
