@@ -26,6 +26,7 @@ const toAuthUrlConfigHref = (projectRef: string) => `/project/${projectRef}/auth
 const toAuthProvidersHref = (provider?: string) => (projectRef: string) =>
   `/project/${projectRef}/auth/providers${provider ? `/${provider}` : ''}`
 const toAuthProtectionHref = (projectRef: string) => `/project/${projectRef}/auth/protection`
+const toDatabaseSettingsHref = (projectRef: string) => `/project/${projectRef}/database/settings`
 const toDataApiSettingsHref = (projectRef: string) =>
   `/project/${projectRef}/integrations/data_api/settings`
 const toStorageSettingsHref = (projectRef: string) =>
@@ -837,8 +838,14 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toProjectHref,
     label: 'Network restrictions enabled',
   },
-  'db.pooler.default_pool_size': { settingHref: toProjectHref, label: 'Default pool size' },
-  'db.pooler.max_client_conn': { settingHref: toProjectHref, label: 'Max client connections' },
+  'db.pooler.default_pool_size': {
+    settingHref: toDatabaseSettingsHref,
+    label: 'Default pool size',
+  },
+  'db.pooler.max_client_conn': {
+    settingHref: toDatabaseSettingsHref,
+    label: 'Max client connections',
+  },
   'db.pooler.pool_mode': { settingHref: toProjectHref, label: 'Pool mode' },
   'db.settings.effective_cache_size': {
     settingHref: toProjectHref,
@@ -908,7 +915,10 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   'db.settings.wal_keep_size': { settingHref: toProjectHref, label: 'WAL keep size' },
   'db.settings.wal_sender_timeout': { settingHref: toProjectHref, label: 'WAL sender timeout' },
   'db.settings.work_mem': { settingHref: toProjectHref, label: 'Work mem' },
-  'db.ssl_enforcement.enabled': { settingHref: toProjectHref, label: 'SSL enforcement enabled' },
+  'db.ssl_enforcement.enabled': {
+    settingHref: toDatabaseSettingsHref,
+    label: 'SSL enforcement enabled',
+  },
   'experimental.webhooks.enabled': { settingHref: toProjectHref, label: 'Webhooks enabled' },
   'storage.analytics.buckets': {
     settingHref: toStorageAnalyticsBucketsHref,
