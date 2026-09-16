@@ -32,8 +32,12 @@ const pipeline: PipelineResponse = {
 describe('ReplicationPipelineStatus', () => {
   test('preserves the overview structure while pipeline details load', async () => {
     let resolvePipeline: (value: PipelineResponse) => void = () => {}
+    let resolvePipelineStatus: (value: PipelineStatusResponse) => void = () => {}
     const pipelineResponse = new Promise<PipelineResponse>((resolve) => {
       resolvePipeline = resolve
+    })
+    const pipelineStatusResponse = new Promise<PipelineStatusResponse>((resolve) => {
+      resolvePipelineStatus = resolve
     })
 
     addAPIMock({
@@ -44,11 +48,8 @@ describe('ReplicationPipelineStatus', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
-      response: () =>
-        HttpResponse.json<PipelineStatusResponse>({
-          pipeline_id: 42,
-          status: { name: 'started' },
-        }),
+      response: async () =>
+        HttpResponse.json<PipelineStatusResponse>(await pipelineStatusResponse),
     })
     addAPIMock({
       method: 'get',
@@ -81,6 +82,13 @@ describe('ReplicationPipelineStatus', () => {
     expect(screen.getByRole('columnheader', { name: 'Details' })).toBeVisible()
 
     resolvePipeline(pipeline)
+
+    expect(screen.getByRole('status')).toHaveTextContent('Loading pipeline details')
+
+    resolvePipelineStatus({
+      pipeline_id: 42,
+      status: { name: 'started' },
+    })
 
     expect(await screen.findByText('No table data yet')).toBeVisible()
     expect(screen.getByRole('status')).toHaveTextContent('')
