@@ -108,7 +108,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
           ref={formRef}
           {...props}
           onSubmit={handleSubmit}
-          className={cn('relative', className)}
+          className={cn('relative rounded-lg', className)}
         >
           {sqlSnippets && sqlSnippets.length > 0 && (
             <SnippetRow

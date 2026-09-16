@@ -1,6 +1,6 @@
 import { ArrowDownIcon } from 'lucide-react'
 import type { ComponentProps, ReactNode } from 'react'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Button, cn } from 'ui'
 import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom'
 
@@ -10,6 +10,39 @@ type ConversationProps = Omit<ComponentProps<typeof StickToBottom>, 'children'> 
 type ConversationContentProps = ComponentProps<typeof StickToBottom.Content>
 type ConversationScrollButtonProps = ComponentProps<typeof Button>
 
+/** `inset-x-0` spans the scrollbar gutter, so the fades stop short of the measured scrollbar. */
+const ConversationFade = () => {
+  const { scrollRef } = useStickToBottomContext()
+  const [scrollbarWidth, setScrollbarWidth] = useState(0)
+
+  useEffect(() => {
+    const element = scrollRef.current
+    if (!element) return
+
+    const measure = () => setScrollbarWidth(element.offsetWidth - element.clientWidth)
+    measure()
+
+    const observer = new ResizeObserver(measure)
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [scrollRef])
+
+  return (
+    <>
+      <div
+        aria-hidden
+        style={{ right: scrollbarWidth }}
+        className="pointer-events-none absolute inset-x-0 top-0 z-10 h-8 bg-linear-to-b from-card to-transparent"
+      />
+      <div
+        aria-hidden
+        style={{ right: scrollbarWidth }}
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-8 bg-linear-to-t from-card to-transparent"
+      />
+    </>
+  )
+}
+
 export const Conversation = ({ className, children, ...props }: ConversationProps) => (
   <StickToBottom
     className={cn('relative flex-1 overflow-y-auto', className)}
@@ -18,14 +51,7 @@ export const Conversation = ({ className, children, ...props }: ConversationProp
     role="log"
     {...props}
   >
-    <div
-      aria-hidden
-      className="pointer-events-none absolute inset-x-0 top-0 z-10 h-8 bg-linear-to-b from-card to-transparent"
-    />
-    <div
-      aria-hidden
-      className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-8 bg-linear-to-t from-card to-transparent"
-    />
+    <ConversationFade />
     {children}
   </StickToBottom>
 )

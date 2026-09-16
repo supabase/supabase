@@ -75,7 +75,7 @@ export const ExplorerNavNotebooks = () => {
 
   return (
     <ExplorerNavResourceWrapper type="notebook" search={search} setSearch={setSearch}>
-      <div className="flex flex-1 min-h-0 flex-col px-3 pb-3">
+      <div className="flex flex-1 min-h-0 flex-col p-3">
         {isPending ? (
           <GenericSkeletonLoader />
         ) : notebooks.length === 0 ? (

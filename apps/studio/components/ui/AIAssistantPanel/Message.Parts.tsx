@@ -301,25 +301,9 @@ const MessagePart = {
   NotebookRun: MessagePartNotebookRun,
 } as const
 
-function MessagePartContainer({
-  children,
-  isWide = false,
-}: {
-  children: ReactNode
-  isWide?: boolean
-}) {
-  return <div className={cn('w-full mx-auto', isWide ? 'max-w-6xl' : 'max-w-3xl')}>{children}</div>
+function MessagePartContainer({ children }: { children: ReactNode }) {
+  return <div className="w-full max-w-3xl mx-auto">{children}</div>
 }
-
-const isWideMessagePart = (part: NonNullable<VercelMessage['parts']>[number]) =>
-  part.type === 'tool-execute_sql' ||
-  part.type === 'tool-query_logs' ||
-  part.type === 'tool-create_notebook' ||
-  part.type === 'tool-update_notebook' ||
-  part.type === 'tool-run_notebook' ||
-  (part.type === 'dynamic-tool' && part.toolName === 'query_logs') ||
-  // Unlabelled code fences resolve to SQL in MessageMarkdown, too.
-  (part.type === 'text' && /```(?:sql)?(?:\s|$)/i.test(part.text))
 
 const isCompactToolPart = (part: NonNullable<VercelMessage['parts']>[number]) =>
   part.type === 'reasoning' ||
@@ -387,5 +371,5 @@ export function MessagePartSwitcher({
   // Tool rows depend on being direct siblings to share their compact spacing and dividers.
   if (isCompactToolPart(part)) return content
 
-  return <MessagePartContainer isWide={isWideMessagePart(part)}>{content}</MessagePartContainer>
+  return <MessagePartContainer>{content}</MessagePartContainer>
 }

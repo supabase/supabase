@@ -53,14 +53,13 @@ export const MarkdownCell = ({ cell, onEdit }: MarkdownCellProps) => {
   return (
     <SortableSection
       id={cell._id}
+      sectionWidth="48rem"
       actions={<AddCellDropdown cellId={cell._id} />}
       gripDropdownContent={<MoveCellDropdownContent cellId={cell._id} />}
       gripClassName="mt-1.5 sm:opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
     >
       {isEditing ? (
-        <div
-          className={cn('w-full max-w-3xl mx-auto transition', 'overflow-hidden border rounded-md')}
-        >
+        <div className={cn('w-full transition', 'overflow-hidden border rounded-md')}>
           <CodeEditor
             hideLineNumbers
             language="markdown"
@@ -113,7 +112,7 @@ export const MarkdownCell = ({ cell, onEdit }: MarkdownCellProps) => {
         <div
           onDoubleClick={handleStartEditing}
           className={cn(
-            'group/mdcell relative w-full max-w-3xl mx-auto px-3 py-2 transition',
+            'group/mdcell relative w-full px-3 py-2 transition',
             'hover:bg-alternative/50',
             'border border-transparent rounded-md hover:border-default'
           )}

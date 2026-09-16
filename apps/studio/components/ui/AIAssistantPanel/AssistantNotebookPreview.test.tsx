@@ -59,12 +59,11 @@ describe('AssistantNotebookPreview', () => {
       { _tag: 'unchanged', cell: wireMarkdownCell('b', 'two') },
     ]
 
-    const { container } = render(<AssistantNotebookPreview entries={entries} mode="create" />)
+    render(<AssistantNotebookPreview entries={entries} mode="create" />)
 
     expect(screen.getByRole('toolbar', { name: 'Notebook toolbar' })).toBeInTheDocument()
     expect(screen.getByText('2 cells')).toBeInTheDocument()
     expect(screen.getByText('New notebook')).toBeInTheDocument()
-    expect(container.firstElementChild).toHaveClass('max-w-6xl')
   })
 
   it('surfaces a metadata-only database change after resolving the target', async () => {
