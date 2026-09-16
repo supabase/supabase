@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Activity, ChevronDown, RotateCcw, Search, WifiOff, X } from 'lucide-react'
+import { Activity, ChevronDown, Info, RotateCcw, Search, WifiOff, X } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import {
