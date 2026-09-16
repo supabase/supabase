@@ -41,7 +41,7 @@ export const RestartCostEstimate = ({
     [estimate, tables]
   )
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 border-t px-5 py-4">
       {tables.length === 0 ? (
         <div className="flex items-center justify-between gap-x-6">
           <div className="min-w-0">
