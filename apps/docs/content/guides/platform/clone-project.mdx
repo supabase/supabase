@@ -73,4 +73,4 @@ Recovering deleted rows by manually inspecting dead tuples (for example with `pa
 
 </Admonition>
 
-Restoring to a new project is the safe way to get deleted rows back. Restore from a physical backup that predates the deletion, or, if the deletion happened too recently for your last backup to have captured it, enable PITR and restore to the exact point in time just before the deletion. Then copy the rows you need into your live project.
+Restoring to a new project is the safe way to get deleted rows back. Restore from a physical backup that predates the deletion, or, if the deletion happened too recently for your last backup to have captured it, enable PITR and restore to the exact point in time before the deletion. Then copy the rows you need into your live project.
