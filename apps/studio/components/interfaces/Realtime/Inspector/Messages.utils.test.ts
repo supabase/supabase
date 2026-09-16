@@ -1,6 +1,7 @@
 // Messages.utils.test.ts
 import { describe, expect, it } from 'vitest'
-import { unixMicroToIsoTimestamp, isUnixMicro } from './Messages.utils'
+
+import { isUnixMicro, unixMicroToIsoTimestamp } from './Messages.utils'
 
 describe('unixMicroToIsoTimestamp', () => {
   it('converts a 16-digit unix-microsecond timestamp to the correct ISO date', () => {
