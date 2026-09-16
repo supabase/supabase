@@ -2,8 +2,20 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Card, CardContent } from 'ui'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogBody,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  Button,
+  Card,
+  CardContent,
+} from 'ui'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import {
   PageSection,
@@ -48,17 +60,7 @@ export const WarehouseDisableCard = () => {
             <FormLayout
               layout="flex-row-reverse"
               label="Disable Warehouse for this project"
-              description={
-                <>
-                  <span className="block">
-                    Stops replication and removes the Warehouse pipeline, publication, catalog
-                    access, and foreign tables.
-                  </span>
-                  <span className="mt-1 block">
-                    Copied data stays in DuckLake storage until you delete it.
-                  </span>
-                </>
-              }
+              description="Stops replication and removes its pipeline, publication, catalog access, and foreign tables. Copied data remains in DuckLake storage until deleted."
             >
               <Button variant="danger" onClick={() => setIsConfirming(true)}>
                 Disable Warehouse
@@ -68,26 +70,35 @@ export const WarehouseDisableCard = () => {
         </Card>
       </PageSectionContent>
 
-      <ConfirmationModal
-        variant="destructive"
-        visible={isConfirming}
-        loading={setupMutation.isPending}
-        title="Disable Warehouse"
-        confirmLabel="Disable Warehouse"
-        description="Replication stops and connections to the Warehouse endpoint stop working."
-        onCancel={() => setIsConfirming(false)}
-        onConfirm={() => projectRef && setupMutation.mutate({ projectRef, body: { targets: [] } })}
-      >
-        <div className="space-y-2 text-sm text-foreground-light">
-          <p>
-            The Warehouse pipeline, publication, catalog access, and foreign tables are removed.
-          </p>
-          <p>
-            Copied data stays in storage until you delete it. Re-enabling the same tables replaces
-            their copied data.
-          </p>
-        </div>
-      </ConfirmationModal>
+      <AlertDialog open={isConfirming} onOpenChange={setIsConfirming}>
+        <AlertDialogContent size="small">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Disable Warehouse</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogBody>
+            <AlertDialogDescription>
+              Disabling Warehouse stops replication and connections to its endpoint. Its pipeline,
+              publication, catalog access, and foreign tables are removed. Copied data remains in
+              DuckLake storage until deleted.
+            </AlertDialogDescription>
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant="danger"
+              loading={setupMutation.isPending}
+              disabled={!projectRef}
+              onClick={() =>
+                projectRef
+                  ? setupMutation.mutateAsync({ projectRef, body: { targets: [] } })
+                  : undefined
+              }
+            >
+              Disable Warehouse
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </PageSection>
   )
 }

@@ -285,7 +285,7 @@ export const WarehouseSchemaTablePicker = ({
                                 <MultiSelector.Item
                                   key={key}
                                   value={key}
-                                  keywords={[schema.schema]}
+                                  keywords={[schema.schema, key]}
                                 >
                                   {table}
                                 </MultiSelector.Item>

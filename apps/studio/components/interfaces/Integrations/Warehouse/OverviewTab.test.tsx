@@ -284,8 +284,8 @@ describe('WarehouseOverviewTab', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Disable Warehouse' }))
     expect(setupRequests).toEqual([])
 
-    const dialog = await screen.findByRole('dialog')
-    expect(dialog).toHaveTextContent('Copied data stays in storage')
+    const dialog = await screen.findByRole('alertdialog')
+    expect(dialog).toHaveTextContent('Copied data remains in DuckLake storage until deleted')
     expect(screen.queryByPlaceholderText('Type the project ref to confirm')).not.toBeInTheDocument()
 
     fireEvent.click(within(dialog).getByRole('button', { name: 'Disable Warehouse' }))
@@ -314,7 +314,7 @@ describe('WarehouseOverviewTab', () => {
     customRender(<WarehouseOverviewTab />)
 
     await userEvent.click(await screen.findByRole('button', { name: 'Disable Warehouse' }))
-    const dialog = await screen.findByRole('dialog')
+    const dialog = await screen.findByRole('alertdialog')
     const confirm = within(dialog).getByRole('button', { name: 'Disable Warehouse' })
 
     fireEvent.click(confirm)
@@ -330,7 +330,7 @@ describe('WarehouseOverviewTab', () => {
     fireEvent.click(confirm)
 
     await waitFor(() => expect(attempts).toBe(2))
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument())
   })
 
   test('shows a status query failure without blocking an unrelated route', async () => {

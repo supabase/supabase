@@ -214,7 +214,7 @@ describe('WarehouseSchemaTablePicker', () => {
     )
   })
 
-  test('filters tables by schema name', async () => {
+  test('filters tables by schema name or qualified table name', async () => {
     mockPickerQueries({ isEditing: false })
 
     customRender(<WarehousePickerHarness />)
@@ -225,5 +225,12 @@ describe('WarehouseSchemaTablePicker', () => {
     expect(screen.getByText('events')).toBeInTheDocument()
     expect(screen.queryByText('orders')).not.toBeInTheDocument()
     expect(screen.queryByText('customers')).not.toBeInTheDocument()
+
+    await userEvent.clear(screen.getByPlaceholderText('Search tables...'))
+    await userEvent.type(screen.getByPlaceholderText('Search tables...'), 'public.ord')
+
+    expect(screen.getByText('orders')).toBeInTheDocument()
+    expect(screen.queryByText('customers')).not.toBeInTheDocument()
+    expect(screen.queryByText('events')).not.toBeInTheDocument()
   })
 })
