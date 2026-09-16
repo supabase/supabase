@@ -36,7 +36,7 @@ function AiPrompt({ id }: AiPromptProps) {
   return (
     <PromptPanel>
       <Prompt value="prompt" expandable>
-        <PromptTitle>AI Prompt</PromptTitle>
+        <PromptTitle>Agent Prompt</PromptTitle>
         <PromptCopy>{prompt}</PromptCopy>
         <PromptContent>
           <PromptMarkdown>{prompt}</PromptMarkdown>

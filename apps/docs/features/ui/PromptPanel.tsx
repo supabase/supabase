@@ -237,7 +237,7 @@ const tabTriggerClassName = cn(
  * ```tsx
  * <PromptPanel>
  *   <Prompt value="prompt" expandable>
- *     <PromptTitle>AI Prompt</PromptTitle>
+ *     <PromptTitle>Agent Prompt</PromptTitle>
  *     <PromptCopy>Plain text copied to the clipboard</PromptCopy>
  *     <PromptContent>Rich content shown in the panel</PromptContent>
  *   </Prompt>

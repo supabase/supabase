@@ -21,7 +21,7 @@ function SetupPrompt({ cliCode }: { cliCode: ReactNode }) {
   return (
     <PromptPanel>
       <Prompt value="prompt" expandable>
-        <PromptTitle>AI Prompt</PromptTitle>
+        <PromptTitle>Agent Prompt</PromptTitle>
         <PromptCopy>{setupPrompt}</PromptCopy>
         <PromptContent>
           <PromptMarkdown>{setupPrompt}</PromptMarkdown>
