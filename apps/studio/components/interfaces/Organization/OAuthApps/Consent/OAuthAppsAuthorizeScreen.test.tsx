@@ -107,7 +107,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     expect(
       await screen.findByText(
-        "This publisher isn't verified by Supabase. Only continue if you trust it."
+        'Publishers are currently not verified by Supabase. Only continue if you trust this entity.'
       )
     ).toBeInTheDocument()
   })
@@ -118,7 +118,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     await screen.findByText('Permissions requested')
     expect(
       screen.queryByText(
-        "This publisher isn't verified by Supabase. Only continue if you trust it."
+        'Publishers are currently not verified by Supabase. Only continue if you trust this entity.'
       )
     ).not.toBeInTheDocument()
     expect(screen.queryByRole('img', { name: 'Verified' })).not.toBeInTheDocument()

@@ -1,5 +1,6 @@
 export const CONSENT_COPY = {
-  unverifiedPublisher: "This publisher isn't verified by Supabase. Only continue if you trust it.",
+  unverifiedPublisher:
+    'Publishers are currently not verified by Supabase. Only continue if you trust this entity.',
   workspaceReuse:
     "Some clients may reuse one authorization across workspaces. Check your client's workspace or account settings if project access does not behave as expected.",
   dynamicClient: 'This client was registered automatically. Supabase sets its access settings.',
