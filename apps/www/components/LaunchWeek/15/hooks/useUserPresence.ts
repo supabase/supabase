@@ -9,14 +9,13 @@ const useUserPresence = () => {
   useEffect(() => {
     if (!supabase) return
 
-    // `supabase.channel()` returns an existing channel if one is already
-    // registered under this topic instead of creating a new one. If a
-    // previous mount of this hook (e.g. a fast client-side route change
-    // between two ticket pages, which remounts via `getStaticProps`'s `key`)
-    // left a channel behind that's still joined/joining, calling
-    // `.on('presence', ...)` on it below throws — presence callbacks can
-    // only be registered before `subscribe()`. Remove any such stale
-    // registration first so we always start from a fresh channel.
+    // The previous mount's channel is usually still registered here and
+    // mid-leave: this page remounts on every ticket-to-ticket route change
+    // (`getStaticProps` returns a `key`), and a channel only deregisters once
+    // its leave completes. Removing it again finishes that leave synchronously,
+    // so `channel()` below returns a fresh channel rather than the old one —
+    // presence callbacks can't be bound after `subscribe()`, and `subscribe()`
+    // no-ops while a channel is leaving.
     const staleChannel = supabase
       .getChannels()
       .find((channel) => channel.topic === `realtime:${LW15_PRESENCE_TOPIC}`)
