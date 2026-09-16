@@ -1,0 +1,100 @@
+import { act, renderHook } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+
+import { useDatabaseChartDeepLink } from '@/pages/project/[ref]/observability/database'
+
+class MockResizeObserver implements ResizeObserver {
+  static instances: MockResizeObserver[] = []
+
+  callback: ResizeObserverCallback
+  disconnect = vi.fn()
+  observe = vi.fn()
+  takeRecords = vi.fn(() => [])
+  unobserve = vi.fn()
+
+  constructor(callback: ResizeObserverCallback) {
+    this.callback = callback
+    MockResizeObserver.instances.push(this)
+  }
+}
+
+const bounds = (top: number, bottom: number): DOMRect =>
+  ({
+    bottom,
+    height: bottom - top,
+    left: 0,
+    right: 800,
+    top,
+    width: 800,
+    x: 0,
+    y: top,
+    toJSON: () => ({}),
+  }) as DOMRect
+
+const addChart = (id: string) => {
+  const target = document.createElement('div')
+  target.id = id
+  target.scrollIntoView = vi.fn()
+  document.querySelector('section')?.appendChild(target)
+  return target
+}
+
+beforeEach(() => {
+  vi.useFakeTimers()
+  vi.stubGlobal('ResizeObserver', MockResizeObserver)
+  MockResizeObserver.instances = []
+
+  const scrollContainer = document.createElement('main')
+  const chartList = document.createElement('section')
+  vi.spyOn(scrollContainer, 'getBoundingClientRect').mockReturnValue(bounds(50, 800))
+  scrollContainer.appendChild(chartList)
+  document.body.appendChild(scrollContainer)
+})
+
+afterEach(() => {
+  vi.useRealTimers()
+  vi.unstubAllGlobals()
+  document.body.replaceChildren()
+})
+
+describe('useDatabaseChartDeepLink', () => {
+  test('re-centers a chart when lazy loading pushes it outside the report viewport', () => {
+    const target = addChart('disk-size')
+    const targetBounds = vi.spyOn(target, 'getBoundingClientRect').mockReturnValue(bounds(300, 600))
+
+    const { unmount } = renderHook(() => useDatabaseChartDeepLink('disk-size'))
+
+    act(() => vi.advanceTimersByTime(200))
+    expect(target.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' })
+
+    act(() => MockResizeObserver.instances[0].callback([], MockResizeObserver.instances[0]))
+    expect(target.scrollIntoView).toHaveBeenCalledTimes(1)
+
+    targetBounds.mockReturnValue(bounds(850, 1_150))
+    act(() => MockResizeObserver.instances[0].callback([], MockResizeObserver.instances[0]))
+    expect(target.scrollIntoView).toHaveBeenLastCalledWith({ behavior: 'auto', block: 'center' })
+
+    unmount()
+    expect(MockResizeObserver.instances[0].disconnect).toHaveBeenCalled()
+  })
+
+  test('starts a fresh observer when the chart query parameter changes', () => {
+    const cpuTarget = addChart('cpu-usage')
+    const diskTarget = addChart('disk-size')
+    vi.spyOn(cpuTarget, 'getBoundingClientRect').mockReturnValue(bounds(200, 500))
+    vi.spyOn(diskTarget, 'getBoundingClientRect').mockReturnValue(bounds(300, 600))
+
+    const { rerender } = renderHook(({ chart }) => useDatabaseChartDeepLink(chart), {
+      initialProps: { chart: 'cpu-usage' },
+    })
+
+    act(() => vi.advanceTimersByTime(200))
+    rerender({ chart: 'disk-size' })
+    act(() => vi.advanceTimersByTime(200))
+
+    expect(cpuTarget.scrollIntoView).toHaveBeenCalledTimes(1)
+    expect(diskTarget.scrollIntoView).toHaveBeenCalledTimes(1)
+    expect(MockResizeObserver.instances[0].disconnect).toHaveBeenCalled()
+    expect(MockResizeObserver.instances[1].observe).toHaveBeenCalledWith(diskTarget.parentElement)
+  })
+})

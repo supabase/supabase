@@ -69,6 +69,61 @@ export type UpdateDateRange = (from: string, to: string) => void
 export default DatabaseReport
 
 const REPORT_TITLE = 'Database'
+const CHART_TARGET_POLL_INTERVAL = 200
+const CHART_TARGET_POLL_ATTEMPTS = 25
+const CHART_LAYOUT_OBSERVATION_DURATION = 10_000
+
+const isChartFullyVisible = (target: HTMLElement) => {
+  const targetBounds = target.getBoundingClientRect()
+  const scrollContainerBounds = target.closest('main')?.getBoundingClientRect()
+  const viewportTop = scrollContainerBounds?.top ?? 0
+  const viewportBottom = scrollContainerBounds?.bottom ?? window.innerHeight
+
+  return targetBounds.top >= viewportTop && targetBounds.bottom <= viewportBottom
+}
+
+export const useDatabaseChartDeepLink = (chart?: string) => {
+  useEffect(() => {
+    if (chart === undefined) return
+
+    let attempts = 0
+    let resizeObserver: ResizeObserver | undefined
+    let stopObservingTimer: number | undefined
+
+    const pollForChart = window.setInterval(() => {
+      attempts += 1
+      const target = document.getElementById(chart)
+
+      if (target === null) {
+        if (attempts >= CHART_TARGET_POLL_ATTEMPTS) window.clearInterval(pollForChart)
+        return
+      }
+
+      window.clearInterval(pollForChart)
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
+      const chartList = target.parentElement
+      if (chartList === null) return
+
+      resizeObserver = new ResizeObserver(() => {
+        if (!isChartFullyVisible(target)) {
+          target.scrollIntoView({ behavior: 'auto', block: 'center' })
+        }
+      })
+      resizeObserver.observe(chartList)
+      stopObservingTimer = window.setTimeout(
+        () => resizeObserver?.disconnect(),
+        CHART_LAYOUT_OBSERVATION_DURATION
+      )
+    }, CHART_TARGET_POLL_INTERVAL)
+
+    return () => {
+      window.clearInterval(pollForChart)
+      if (stopObservingTimer !== undefined) window.clearTimeout(stopObservingTimer)
+      resizeObserver?.disconnect()
+    }
+  }, [chart])
+}
 
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
@@ -222,25 +277,8 @@ const DatabaseUsage = () => {
     }
   }, [db, state])
 
-  // Charts below the fold mount lazily and the query string is empty on the first client render
-  // of a hard load, so the target can appear well after mount.
-  const hasScrolledToChartRef = useRef(false)
-  useEffect(() => {
-    if (chart === undefined || hasScrolledToChartRef.current) return
-
-    let attempts = 0
-    const pollForChart = window.setInterval(() => {
-      attempts += 1
-      const target = document.getElementById(chart)
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        hasScrolledToChartRef.current = true
-      }
-      if (target || attempts >= 25) window.clearInterval(pollForChart)
-    }, 200)
-
-    return () => window.clearInterval(pollForChart)
-  }, [chart])
+  // Loading charts above the target resize after the first scroll and can push it out of view.
+  useDatabaseChartDeepLink(chart)
 
   return (
     <>
