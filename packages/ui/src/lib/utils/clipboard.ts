@@ -30,18 +30,9 @@ export const copyToClipboard = async (str: ClipboardText, callback = noop) => {
         'text/plain': Promise.resolve(str).then((text) => new Blob([text], { type: 'text/plain' })),
       })
 
-      // Safari needs the write deferred to a zero-delay setTimeout, otherwise the
-      // copy fails silently. The returned promise lets callers await it, and the
-      // write escapes the outer try/catch so it reports its own failure.
-      return new Promise<void>((resolve) => {
-        setTimeout(() => {
-          navigator.clipboard
-            .write([text])
-            .then(callback)
-            .catch(() => toast.error('Unable to copy to clipboard'))
-            .then(() => resolve())
-        }, 0)
-      })
+      await navigator.clipboard.write([text])
+      callback()
+      return
     }
 
     // NOTE: Firefox has support for ClipboardItem and navigator.clipboard.write,
