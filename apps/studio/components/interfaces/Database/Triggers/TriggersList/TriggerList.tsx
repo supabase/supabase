@@ -27,6 +27,7 @@ import {
 import { selectFilterSchema } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useDatabaseTriggersQuery } from '@/data/database-triggers/database-triggers-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
@@ -92,16 +93,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
   }
 
   if (_triggers.length === 0 && filterString.length > 0) {
-    return (
-      <TableRow key={schema}>
-        <TableCell colSpan={7}>
-          <p className="text-sm text-foreground">No results found</p>
-          <p className="text-sm text-foreground-light">
-            Your search for "{filterString}" did not return any results
-          </p>
-        </TableCell>
-      </TableRow>
-    )
+    return <TableRowNoResults key={schema} colSpan={7} search={filterString} />
   }
 
   return (
