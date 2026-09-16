@@ -120,6 +120,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   const includesLogsSnippets = messagesIncludeLogsSnippets(messages)
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
+  let isRestrictedByHipaa = false
   let hasAccessToAdvanceModel = false
   let orgHasHipaaAddon: boolean | undefined
   let projectIsSensitive: boolean | null | undefined
@@ -138,6 +139,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       const aiDetails = await getAIDetails({ orgSlug: rawOrgSlug, projectRef, authorization })
 
       aiOptInLevel = aiDetails.aiOptInLevel
+      isRestrictedByHipaa = aiDetails.isRestrictedByHipaa
       hasAccessToAdvanceModel = aiDetails.hasAccessToAdvanceModel
       orgHasHipaaAddon = aiDetails.hasHipaaAddon
       orgId = aiDetails.orgId
@@ -187,6 +189,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       connectionString,
       authorization,
       aiOptInLevel,
+      isRestrictedByHipaa,
       accessToken,
       baseUrl: getURL(),
       supportMode,

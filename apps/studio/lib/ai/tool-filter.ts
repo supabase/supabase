@@ -162,13 +162,21 @@ function isToolAllowed(toolName: string, aiOptInLevel: AiOptInLevel): boolean {
 }
 
 /**
- * Create a privacy message tool that explains why the tool is not available
+ * Replaces a blocked tool with a stub that explains the opt-in instead of executing.
+ *
+ * Names no provider. Studio switches inference providers, and a stale name here becomes a
+ * false privacy claim shown to users.
  */
-export function createPrivacyMessageTool(toolInstance: Tool<any, any>) {
-  const privacyMessage =
-    "You don't have permission to use this tool. This is an organization-wide setting requiring you to opt-in. Please choose your preferred data sharing level in your organization's settings. Supabase Assistant uses Amazon Bedrock, which does not store or log your prompts and completions, use them to train AWS models, or distribute them to third parties. By default, no data is shared. Granting permission allows Supabase to send information (like schema, logs, or data, depending on your chosen level) to Bedrock solely to generate responses."
-  const condensedPrivacyMessage =
-    'Requires opting in to sending data to Bedrock which does not store, train on, or distribute it. You can opt in via organization settings.'
+export function createPrivacyMessageTool(
+  toolInstance: Tool<any, any>,
+  isRestrictedByHipaa: boolean
+) {
+  const privacyMessage = isRestrictedByHipaa
+    ? "You don't have permission to use this tool. This project is configured as High Compliance and your organization has the HIPAA add-on, so Supabase does not send project metadata with your prompts. The user cannot change this in their organization's AI settings, so continue without project metadata rather than asking them to opt in."
+    : "You don't have permission to use this tool. This is an organization-wide setting requiring you to opt-in. Please choose your preferred data sharing level in your organization's settings. By default, no data is shared. Granting permission allows Supabase to send information (like schema, logs, or data, depending on your chosen level) to third-party AI providers solely to generate responses."
+  const condensedPrivacyMessage = isRestrictedByHipaa
+    ? 'Unavailable because this project is configured as High Compliance, which prevents project metadata from being shared. This cannot be changed in organization settings.'
+    : 'Requires opting in to sharing data with third-party AI providers. You can opt in via organization settings.'
   const toolDescription = toolInstance.description
   const description =
     typeof toolDescription === 'function'
@@ -189,7 +197,11 @@ export function createPrivacyMessageTool(toolInstance: Tool<any, any>) {
 /**
  * Filter tools based on the AI opt-in level
  */
-export function filterToolsByOptInLevel(tools: ToolSet, aiOptInLevel: AiOptInLevel): ToolSet {
+export function filterToolsByOptInLevel(
+  tools: ToolSet,
+  aiOptInLevel: AiOptInLevel,
+  isRestrictedByHipaa: boolean
+): ToolSet {
   return Object.fromEntries(
     Object.entries(tools)
       .filter(([toolName]) => TOOL_CATEGORY_MAP[toolName] !== undefined)
@@ -199,7 +211,7 @@ export function filterToolsByOptInLevel(tools: ToolSet, aiOptInLevel: AiOptInLev
         }
 
         // If the tool is not allowed, provide a stub that returns a privacy message
-        return [toolName, createPrivacyMessageTool(toolInstance)]
+        return [toolName, createPrivacyMessageTool(toolInstance, isRestrictedByHipaa)]
       })
   )
 }

@@ -41,11 +41,13 @@ export const getMcpTools = async ({
   accessToken,
   projectRef,
   aiOptInLevel,
+  isRestrictedByHipaa,
   signal,
 }: {
   accessToken: string
   projectRef: string
   aiOptInLevel: AiOptInLevel
+  isRestrictedByHipaa: boolean
   // Required: the remote client holds an HTTP connection that must be torn down
   // when the request ends. The caller owns that lifecycle via this signal.
   signal: AbortSignal
@@ -99,7 +101,11 @@ export const getMcpTools = async ({
     // write/destructive tools (apply_migration, create_branch, ...) from reaching
     // the assistant. `read_only` is defense-in-depth (those tools throw at
     // runtime). Do not remove this filter on the assumption `read_only` suffices.
-    const allowedMcpTools = filterToolsByOptInLevel(availableMcpTools, aiOptInLevel)
+    const allowedMcpTools = filterToolsByOptInLevel(
+      availableMcpTools,
+      aiOptInLevel,
+      isRestrictedByHipaa
+    )
 
     // Remove UI-executed tools handled locally
     const filteredMcpTools: ToolSet = { ...allowedMcpTools }
