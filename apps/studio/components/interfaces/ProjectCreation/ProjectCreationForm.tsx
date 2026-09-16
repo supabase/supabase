@@ -482,8 +482,6 @@ export const ProjectCreationForm = ({
       )
     }
 
-    // Safety net for the picker: restricted options are disabled there, but a region selected
-    // before a restriction landed stays in the form value.
     const selectedSpecificRegion = specific.find((x) => x.name === dbRegion)
     const selectedRegionRestriction = resolveRegionRestriction({
       platformStatus: selectedSpecificRegion?.status,

@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { parseRestrictedRegions, resolveRegionRestriction } from './RegionSelector.utils'
+import {
+  parseRestrictedRegions,
+  resolveRegionRestriction,
+  SELECTABLE_RESTRICTIONS,
+} from './RegionSelector.utils'
 
 vi.mock('@/lib/error-reporting', () => ({ captureCriticalError: vi.fn() }))
 
@@ -96,4 +100,10 @@ describe('resolveRegionRestriction', () => {
       ).toBe('unavailable')
     }
   )
+})
+
+describe('SELECTABLE_RESTRICTIONS', () => {
+  it('keeps only paid_only selectable so capacity-style restrictions stay disabled', () => {
+    expect([...SELECTABLE_RESTRICTIONS]).toEqual(['paid_only'])
+  })
 })

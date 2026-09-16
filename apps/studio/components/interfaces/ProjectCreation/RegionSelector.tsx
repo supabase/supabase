@@ -50,7 +50,6 @@ import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
 interface RegionSelectorProps {
   form: UseFormReturn<CreateProjectForm>
   instanceSize?: DesiredInstanceSize
-  /** `undefined` while the organization is loading; paid-only restrictions then fail open */
   isFreePlan?: boolean
   layout?: 'vertical' | 'horizontal'
 }
@@ -96,7 +95,6 @@ export const RegionSelector = ({
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
 
-  // Memoized so an invalid payload is reported once per flag value, not on every render
   const restrictedRegionsFlag = useFlag<string | boolean>(RESTRICTED_REGIONS_FLAG_KEY)
   const restrictedRegions = useMemo(
     () => parseRestrictedRegions(restrictedRegionsFlag),
@@ -360,7 +358,10 @@ export const RegionSelector = ({
                                 {restriction !== undefined && (
                                   <Tooltip>
                                     <TooltipTrigger>
-                                      <Badge variant="warning" className="mr-1">
+                                      <Badge
+                                        variant={REGION_RESTRICTION_COPY[restriction].badgeVariant}
+                                        className="mr-1"
+                                      >
                                         {REGION_RESTRICTION_COPY[restriction].badge}
                                       </Badge>
                                     </TooltipTrigger>

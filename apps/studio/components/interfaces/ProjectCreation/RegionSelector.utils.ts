@@ -11,20 +11,10 @@ export type FlagRestriction = (typeof FLAG_RESTRICTIONS)[number]
 
 export type RegionRestriction = PlatformRegionStatus | FlagRestriction
 
-// Restrictions in this set stay selectable in the picker (badge + notice, blocked on submit)
-// instead of being disabled. Empty for now; the render and submit paths already read from it.
-export const SELECTABLE_RESTRICTIONS: ReadonlySet<RegionRestriction> = new Set()
+export const SELECTABLE_RESTRICTIONS: ReadonlySet<RegionRestriction> = new Set(['paid_only'])
 
 const RestrictedRegionsSchema = z.record(z.string(), z.enum(FLAG_RESTRICTIONS))
 
-/**
- * Parses the ConfigCat text flag payload `{ "<region code>": "unavailable" | "paid_only" }`.
- *
- * Fails open: anything other than a well-formed payload (the `false` that `useFlag` returns
- * when unresolved or errored, an empty string, invalid JSON, wrong shape, unknown status
- * values) yields no restrictions. A present-but-invalid payload is reported so a typo in
- * ConfigCat is visible rather than silently inert.
- */
 export function parseRestrictedRegions(flagValue: unknown): Record<string, FlagRestriction> {
   if (typeof flagValue !== 'string' || flagValue.trim() === '') return {}
 
@@ -55,15 +45,9 @@ function reportInvalidPayload(flagValue: string, reason: string) {
 type ResolveRegionRestrictionArgs = {
   platformStatus: PlatformRegionStatus | undefined
   flagRestriction: FlagRestriction | undefined
-  /** `undefined` while the organization is still loading, which fails open to paid */
   isFreePlan: boolean | undefined
 }
 
-/**
- * Platform status wins over the flag so enabling a platform-side block never produces two
- * competing messages on one option. `paid_only` only applies to organizations known to be
- * on the free plan.
- */
 export function resolveRegionRestriction({
   platformStatus,
   flagRestriction,
@@ -76,22 +60,26 @@ export function resolveRegionRestriction({
 
 export const REGION_RESTRICTION_COPY: Record<
   RegionRestriction,
-  { badge: string; tooltip: string }
+  { badge: string; badgeVariant: 'warning' | 'success'; tooltip: string }
 > = {
   capacity: {
     badge: 'Unavailable',
+    badgeVariant: 'warning',
     tooltip: 'Temporarily unavailable due to this region being at capacity.',
   },
   other: {
     badge: 'Unavailable',
+    badgeVariant: 'warning',
     tooltip: 'Temporarily unavailable for new projects.',
   },
   unavailable: {
     badge: 'Unavailable',
+    badgeVariant: 'warning',
     tooltip: 'Temporarily unavailable for new projects.',
   },
   paid_only: {
     badge: 'Paid plans',
+    badgeVariant: 'success',
     tooltip: 'Available on paid plans only.',
   },
 }

@@ -496,24 +496,46 @@ describe('project creation wizard', () => {
     describe('restricted regions flag', () => {
       const PAID_ONLY_SAO_PAULO = { projectCreationRestrictedRegions: '{"sa-east-1":"paid_only"}' }
 
-      test('disables a paid-only region with upgrade copy for a free-plan organization', async () => {
+      test('lets a free-plan user pick a paid-only region, then prompts to upgrade and blocks submission', async () => {
         mockWizardEndpoints({
           organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
           availableRegions: AVAILABLE_REGIONS_WITH_SAO_PAULO,
         })
+        addAPIMock({ method: 'get', path: '/platform/organizations/:slug/members', response: [] })
+        addAPIMock({
+          method: 'get',
+          path: '/platform/organizations/:slug/members/invitations',
+          response: { invitations: [] },
+        })
+        addAPIMock({
+          method: 'get',
+          path: '/platform/organizations/:slug/roles',
+          response: { org_scoped_roles: [], project_scoped_roles: [] },
+        })
+        const onRequest = vi.fn()
+        mockCreateProject(onRequest)
 
         await renderWizard({ flags: PAID_ONLY_SAO_PAULO })
 
-        await screen.findByPlaceholderText('Project name')
+        await fillProjectName('Paid Region Project')
+        await generateAndWaitForStrongPassword()
         await user.click(getSelectTriggerByLabel('Region'))
 
         const saoPaulo = await screen.findByRole('option', { name: /São Paulo/ })
-        expect(saoPaulo).toHaveAttribute('aria-disabled', 'true')
+        expect(saoPaulo).not.toHaveAttribute('aria-disabled', 'true')
         expect(within(saoPaulo).getByText('Paid plans')).toBeInTheDocument()
-        expect(screen.getByRole('option', { name: /North Virginia/ })).not.toHaveAttribute(
-          'aria-disabled',
-          'true'
+        await user.click(saoPaulo)
+
+        expect(await screen.findByText('Region available on paid plans only')).toBeInTheDocument()
+
+        fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+        await waitFor(() =>
+          expect(toast.error).toHaveBeenCalledWith(
+            `Select a different region. ${SAO_PAULO}: Available on paid plans only.`
+          )
         )
+        expect(onRequest).not.toHaveBeenCalled()
       })
 
       test('keeps a paid-only region selectable for a paid organization', async () => {
