@@ -2,7 +2,6 @@
 title = "Troubleshooting MIGRATIONS_FAILED: missing tables or an incomplete schema on your branch"
 topics = [ "branching" ]
 keywords = [ "branching", "migrations", "MIGRATIONS_FAILED", "failed" ]
-database_id = ""
 ---
 
 When a Preview Branch is created through the Dashboard, it's built by replaying the migration history from your `main` branch against a fresh database. If that replay fails partway through, the branch is left either empty or partly complete and its status shows `MIGRATIONS_FAILED`. This almost always means the migration history on `main` is out of sync with its actual live schema, commonly because a change was made directly in the SQL Editor or through another manual edit that was never captured as a migration file.
