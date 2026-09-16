@@ -496,16 +496,17 @@ describe('project creation wizard', () => {
     describe('restricted regions', () => {
       const CAPACITY_COPY = {
         title: 'Selected region is at capacity',
-        description: 'Temporarily unavailable due to this region being at capacity.',
+        notice:
+          'This region currently has capacity for Micro compute and above. Free plan projects run on Nano compute.',
       }
       const GENERIC_COPY = {
         title: 'Selected region is unavailable',
-        description: 'Temporarily unavailable for new projects.',
+        notice: 'This region is temporarily unavailable for new projects.',
       }
 
       const expectSelectableRestrictedRegion = async (
         onRequest: ReturnType<typeof vi.fn>,
-        copy: { title: string; description: string }
+        copy: { title: string; notice: string }
       ) => {
         await fillProjectName('Restricted Region Project')
         await generateAndWaitForStrongPassword()
@@ -520,7 +521,7 @@ describe('project creation wizard', () => {
         await user.click(saoPaulo)
 
         expect(await screen.findByText(copy.title)).toBeInTheDocument()
-        expect(screen.getByText(copy.description, { exact: false })).toBeInTheDocument()
+        expect(screen.getByText(copy.notice, { exact: false })).toBeInTheDocument()
 
         fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 

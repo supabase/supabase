@@ -363,7 +363,7 @@ export const RegionSelector = ({
                                         {restrictionCopy.badge}
                                       </Badge>
                                     </TooltipTrigger>
-                                    <TooltipContent>{restrictionCopy.description}</TooltipContent>
+                                    <TooltipContent>{restrictionCopy.tooltip}</TooltipContent>
                                   </Tooltip>
                                 )}
                               </div>
@@ -401,7 +401,7 @@ export const RegionSelector = ({
                   <Admonition
                     type="warning"
                     title={selectedRestrictionCopy.title}
-                    description={`${selectedRestrictionCopy.description} ${SELECT_DIFFERENT_REGION}`}
+                    description={`${selectedRestrictionCopy.notice} ${SELECT_DIFFERENT_REGION}`}
                     className="mt-3"
                   />
                 </FormItemLayout>

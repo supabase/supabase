@@ -14,20 +14,24 @@ export type RegionRestriction = PlatformRegionStatus | FlagRestriction
 export type RegionRestrictionCopy = {
   badge: string
   title: string
-  description: string
+  tooltip: string
+  notice: string
 }
 
 const GENERIC_RESTRICTION_COPY: RegionRestrictionCopy = {
   badge: 'Unavailable',
   title: 'Selected region is unavailable',
-  description: 'Temporarily unavailable for new projects.',
+  tooltip: 'Temporarily unavailable for new projects.',
+  notice: 'This region is temporarily unavailable for new projects.',
 }
 
 export const REGION_RESTRICTION_COPY: Record<RegionRestriction, RegionRestrictionCopy> = {
   capacity: {
     badge: 'Unavailable',
     title: 'Selected region is at capacity',
-    description: 'Temporarily unavailable due to this region being at capacity.',
+    tooltip: 'Temporarily unavailable due to this region being at capacity.',
+    notice:
+      'This region currently has capacity for Micro compute and above. Free plan projects run on Nano compute.',
   },
   other: GENERIC_RESTRICTION_COPY,
   unavailable: GENERIC_RESTRICTION_COPY,
