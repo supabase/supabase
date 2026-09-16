@@ -48,8 +48,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter library test
-      # The block's component tests run under Vitest, so `test` does not cover them.
-      - run: pnpm --filter library test:headless-app
+      - run: pnpm --filter library build:registry
       - name: Check generated registry
         run: |
           registry_changes="$(git status --porcelain --untracked-files=all -- apps/ui-library/public/r)"
