@@ -1,12 +1,66 @@
 ---
 id: 'logs-field-reference'
-title: 'Logs field reference'
+title: 'Log sources and fields'
 description: 'Log sources, ClickHouse fields, and event capture limits'
 ---
 
 Each event is a row in the ClickHouse `logs` table. Filter the `source` column to select a service. The tables below list its fields; a field is not necessarily populated on every event.
 
 `id`, `timestamp`, `event_message`, `severity_text`, and `source` are top-level columns. Service fields are string values in `log_attributes`, even when the original event contains a number or boolean. Use the **ClickHouse query field** column directly. See [Query logs with SQL](/docs/guides/observability/advanced-log-filtering) for casting and field discovery.
+
+## Sources
+
+| `source`             | Events                                                            |
+| -------------------- | ----------------------------------------------------------------- |
+| `edge_logs`          | HTTP requests through the API gateway, including REST and GraphQL |
+| `postgres_logs`      | Database activity, statements, and errors                         |
+| `postgrest_logs`     | PostgREST server logs                                             |
+| `auth_logs`          | Auth server: login, JWT, OAuth, email                             |
+| `auth_audit_logs`    | Auth audit events                                                 |
+| `storage_logs`       | Storage API: uploads and object access                            |
+| `realtime_logs`      | Realtime server: channels, presence, broadcast                    |
+| `function_edge_logs` | HTTP request and response for an Edge Function invocation         |
+| `function_logs`      | `console` output from inside an Edge Function                     |
+| `supavisor_logs`     | Shared pooler: pooling and timeouts                               |
+| `pgbouncer_logs`     | Dedicated pooler                                                  |
+| `pg_upgrade_logs`    | Database version upgrade                                          |
+
+For `postgres_logs`, statement text and error details can appear in `event_message`. A missing structured field does not mean the event has no detail.
+
+## Captured HTTP headers
+
+API Gateway logs capture only the headers below. Other headers still reach the application and client but are omitted from these logs.
+
+Request headers:
+
+- `accept`
+- `cf-connecting-ip`
+- `cf-ipcountry`
+- `host`
+- `user-agent`
+- `x-forwarded-proto`
+- `referer`
+- `content-length`
+- `x-real-ip`
+- `x-client-info`
+- `x-forwarded-user-agent`
+- `range`
+- `prefer`
+
+Response headers:
+
+- `cf-cache-status`
+- `cf-ray`
+- `content-location`
+- `content-range`
+- `content-type`
+- `content-length`
+- `date`
+- `transfer-encoding`
+- `x-kong-proxy-latency`
+- `x-kong-upstream-latency`
+- `sb-gateway-mode`
+- `sb-gateway-version`
 
 ## Capture limits
 
