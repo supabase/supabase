@@ -3,7 +3,7 @@ import { Button, CardContent, Slider } from 'ui'
 
 import { useThemeOverrides } from '@/hooks/misc/useThemeOverrides'
 import {
-  applyThemeOverrides,
+  applyResolvedThemeOverrides,
   getThemeOverrideValue,
   hasThemeOverrides,
   previewThemeOverride,
@@ -33,7 +33,8 @@ export const ThemeColorSettings = () => {
 
   useEffect(
     () => () => {
-      applyThemeOverrides(document.documentElement, modeRef.current, overridesRef.current)
+      const root = document.documentElement
+      applyResolvedThemeOverrides(root, root.dataset.theme, modeRef.current, overridesRef.current)
     },
     []
   )

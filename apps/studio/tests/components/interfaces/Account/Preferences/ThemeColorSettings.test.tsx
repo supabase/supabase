@@ -46,6 +46,7 @@ describe('ThemeColorSettings', () => {
     resetOverrides.mockReset()
     setOverride.mockReset()
     document.documentElement.style.removeProperty('--chroma')
+    document.documentElement.dataset.theme = 'dark'
   })
 
   it('persists a rapid pointer change for the active mode', () => {
@@ -85,5 +86,15 @@ describe('ThemeColorSettings', () => {
     unmount()
 
     expect(document.documentElement.style.getPropertyValue('--chroma')).toBe('0.02')
+  })
+
+  it('does not restore persisted Dark values when switching to Classic Dark', () => {
+    const { unmount } = customRender(<ThemeColorSettings />)
+
+    fireEvent.click(screen.getByRole('slider', { name: 'Color intensity' }))
+    document.documentElement.dataset.theme = 'classic-dark'
+    unmount()
+
+    expect(document.documentElement.style.getPropertyValue('--chroma')).toBe('')
   })
 })
