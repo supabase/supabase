@@ -1018,10 +1018,10 @@ export interface DocsAiPromptCopiedEvent {
      */
     source: DocsAiPromptSource
     /**
-     * Pane that was active when the copy happened. Omitted for panes outside the
-     * known set.
+     * `value` of the pane that was active when the copy happened. The shipped
+     * panels use `prompt` and `cli`.
      */
-    tab?: 'prompt' | 'cli'
+    tab: string
     /**
      * Prompt identifier, set when the panel comes from an `AiPrompt` block.
      */

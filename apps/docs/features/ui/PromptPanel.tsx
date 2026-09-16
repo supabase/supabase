@@ -132,13 +132,6 @@ function collectPrompts(children: ReactNode): CollectedPrompt[] {
     .map((prompt, index) => collectPrompt(prompt, index))
 }
 
-/** Prompt values reported as the `tab` property; anything else is omitted. */
-const telemetryTabs = ['prompt', 'cli'] as const
-
-function toTelemetryTab(value: string) {
-  return telemetryTabs.find((tab) => tab === value)
-}
-
 function ExpandableContent({ children }: { children: ReactNode }) {
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -278,13 +271,12 @@ function PromptPanel({ children, className, telemetry }: PromptPanelProps) {
 
   const handleCopied = telemetry
     ? () => {
-        const tab = toTelemetryTab(activePrompt.value)
         sendTelemetryEvent({
           action: 'docs_ai_prompt_copied',
           properties: {
             source: telemetry.source,
-            ...(tab && { tab }),
-            ...(telemetry.promptId && { promptId: telemetry.promptId }),
+            tab: activePrompt.value,
+            promptId: telemetry.promptId,
           },
         })
       }
