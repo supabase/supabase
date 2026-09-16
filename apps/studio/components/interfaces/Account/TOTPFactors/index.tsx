@@ -2,7 +2,7 @@ import { useFlag } from 'common'
 import dayjs from 'dayjs'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
-import { Button, Card, CardContent } from 'ui'
+import { Button, Card, CardContent, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import {
   PageSection,
@@ -47,6 +47,39 @@ export const TOTPFactors = () => {
       <PageSection>
         <PageSectionMeta>
           <PageSectionSummary>
+            <PageSectionTitle>Recovery codes</PageSectionTitle>
+            <PageSectionDescription>
+              Recovery codes allow you to recover your account in case you lost access to your MFA
+              apps.
+            </PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          {recoveryCodesStatus?.status === 'unenrolled' && <GenerateRecoveryCodesModal />}
+          {recoveryCodesStatus?.status === 'available' && recoveryCodesStatus?.data && (
+            <Card>
+              <CardContent className="flex flex-col gap-2">
+                <p
+                  className={cn(
+                    'text-sm',
+                    recoveryCodesStatus.data.remaining < 2 ? 'text-warning' : ''
+                  )}
+                >
+                  {recoveryCodesStatus.data.remaining}/{recoveryCodesStatus.data.total} recovery
+                  codes available
+                </p>
+                <div className="flex gap-2 ml-auto">
+                  <RegenerateRecoveryCodesModal />
+                  {IS_STAGING_OR_LOCAL && <UnenrollRecoveryCodesModal />}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </PageSectionContent>
+      </PageSection>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
             <PageSectionTitle>Multi-factor authentication</PageSectionTitle>
             <PageSectionDescription>
               Use an authenticator app (like Google Authenticator or 1Password) to protect your
@@ -62,20 +95,6 @@ export const TOTPFactors = () => {
           )}
         </PageSectionMeta>
         <PageSectionContent className="flex flex-col gap-4">
-          {recoveryCodesStatus?.status === 'unenrolled' && <GenerateRecoveryCodesModal />}
-          {recoveryCodesStatus?.status === 'available' && (
-            <Admonition
-              layout="responsive"
-              title={`${recoveryCodesStatus?.data?.remaining}/${recoveryCodesStatus?.data?.total} recovery codes available`}
-              description="Recovery codes allow you to recover your account in case you lost access to your MFA apps."
-              actions={
-                <div className="flex flex-col gap-2">
-                  <RegenerateRecoveryCodesModal />
-                  {IS_STAGING_OR_LOCAL && <UnenrollRecoveryCodesModal />}
-                </div>
-              }
-            />
-          )}
           {shouldShowLockoutWarning && (
             <Admonition
               type="danger"
