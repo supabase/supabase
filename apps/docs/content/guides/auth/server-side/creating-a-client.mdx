@@ -253,7 +253,7 @@ The Proxy is responsible for:
       id="double-refresh"
     >
 
-    A refresh token can only be used once. Supabase allows a short window in which the same token can be presented again, which covers the normal SSR round trip. A second refresh outside that window revokes the whole session.
+    A refresh token can generally be used only once, with two exceptions. Supabase allows a short window in which the same token can be presented again, which covers the normal SSR round trip. It also returns the active token when the parent of the active token is presented, which covers a client that never received the previous response. A reuse attempt that matches neither exception revokes the whole session.
 
     This is hard to trace, because it looks like users being signed out at random rather than an error in your code.
 
