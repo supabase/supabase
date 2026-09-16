@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  applyResolvedThemeOverrides,
   applyThemeOverrides,
   clearThemeOverridesForMode,
   getThemeOverrideRange,
@@ -139,6 +140,15 @@ describe('theme override application', () => {
 
     expect(root.style.getPropertyValue('--chroma')).toBe('0.02')
     expect(root.style.getPropertyValue('--contrast')).toBe('')
+  })
+
+  it('removes stored settings from Classic Dark', () => {
+    const root = document.createElement('html')
+    root.style.setProperty('--chroma', '0.04')
+
+    applyResolvedThemeOverrides(root, 'classic-dark', 'dark', { chroma: 0.02 })
+
+    expect(root.style.getPropertyValue('--chroma')).toBe('')
   })
 
   it('reports whether a mode has overrides', () => {

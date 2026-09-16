@@ -195,6 +195,15 @@ export function applyThemeOverrides(
   })
 }
 
+export function applyResolvedThemeOverrides(
+  root: HTMLElement,
+  resolvedTheme: string | undefined,
+  mode: ThemeOverrideMode,
+  overrides: ThemeOverrides
+) {
+  applyThemeOverrides(root, mode, resolvedTheme === 'classic-dark' ? {} : overrides)
+}
+
 export function previewThemeOverride(
   knob: ThemeOverrideKnob,
   mode: ThemeOverrideMode,
