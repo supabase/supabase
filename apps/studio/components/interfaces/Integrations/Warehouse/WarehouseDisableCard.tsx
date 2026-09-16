@@ -60,7 +60,7 @@ export const WarehouseDisableCard = () => {
             <FormLayout
               layout="flex-row-reverse"
               label="Disable Warehouse for this project"
-              description="Stops replication and removes Warehouse-managed resources. Copied data is kept."
+              description="Stops replication and removes Warehouse-managed resources."
             >
               <Button variant="danger" onClick={() => setIsConfirming(true)}>
                 Disable Warehouse
@@ -76,10 +76,14 @@ export const WarehouseDisableCard = () => {
             <AlertDialogTitle>Disable Warehouse</AlertDialogTitle>
           </AlertDialogHeader>
           <AlertDialogBody>
-            <AlertDialogDescription>
-              Disabling Warehouse stops replication and connections to its endpoint. Its pipeline,
-              publication, catalog access, and foreign tables are removed. Copied data remains in
-              DuckLake storage until deleted.
+            <AlertDialogDescription asChild>
+              <div className="space-y-2">
+                <p>
+                  Disabling Warehouse stops replication and connections to its endpoint. Its
+                  pipeline, publication, catalog access, and foreign tables are removed.
+                </p>
+                <p>Copied data remains in DuckLake storage until deleted.</p>
+              </div>
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>
