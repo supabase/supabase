@@ -15,7 +15,7 @@ Work through the following steps to diagnose and repair your migration history s
 1. Go to [Branches](/dashboard/project/_/branches) and find the affected branch.
 2. Click **View logs**. A dialog shows the branch's creation workflow, including the failed step.
 
-![Branch creation workflow logs showing the failed migration step for a branch in MIGRATIONS_FAILED status](/docs/img/troubleshooting/migrations-failed-status.png)
+![Branch creation workflow logs showing the failed migration step for a branch in MIGRATIONS_FAILED status](/kb/img/troubleshooting/migrations-failed-status.png)
 
 ---
 
@@ -25,7 +25,7 @@ Work through the following steps to diagnose and repair your migration history s
 2. Look for entries beginning with `execute <unnamed>:`. These are the individual migration statements being replayed.
 3. Find the entry marked as an **error**, which the Dashboard also highlights in red. This is the statement that failed, and its message explains why. Common messages include relation already exists, column not found, permission denied, and relation does not exist.
 
-![Postgres Logs with the failed migration statement marked as an error and its message expanded](/docs/img/troubleshooting/postgres-logs-migration-failed.png)
+![Postgres Logs with the failed migration statement marked as an error and its message expanded](/kb/img/troubleshooting/postgres-logs-migration-failed.png)
 
 ---
 
@@ -66,7 +66,7 @@ This retrieves the migration files currently recorded against your `main` branch
 
 After repairing the migration history, either create a new branch or **rebase** the existing affected branch.
 
-![The rebase branch button in the Dashboard branch details view](/docs/img/troubleshooting/rebase-image.png)
+![The rebase branch button in the Dashboard branch details view](/kb/img/troubleshooting/rebase-image.png)
 
 Check the branch's workflow logs again, as described in step 1, to confirm migrations now complete successfully.
 
