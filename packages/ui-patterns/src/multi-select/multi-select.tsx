@@ -428,7 +428,13 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
             )}
           >
             {visibleBadges.map((value) => (
-              <Badge key={value} className={badgeClasses}>
+              <Badge
+                key={value}
+                className={cn(
+                  badgeClasses,
+                  deletableBadge && (size === 'tiny' ? 'pr-px' : 'pr-0.5')
+                )}
+              >
                 {renderValue?.(value) ?? value}
                 {deletableBadge && (
                   <div
@@ -439,7 +445,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
                       toggleValue(value)
                       setIsDeleteHovered(false)
                     }}
-                    className="ml-1 text-foreground-lighter hover:text-foreground-light transition-colors pointer-events-auto"
+                    className="ml-1 p-0.5 rounded-xs cursor-pointer text-foreground-lighter hover:text-foreground-light hover:bg-surface-400 transition-colors pointer-events-auto"
                   >
                     <RemoveIcon size={12} />
                   </div>
