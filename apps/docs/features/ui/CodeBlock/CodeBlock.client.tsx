@@ -180,7 +180,17 @@ function CrossfadeIcon({
   )
 }
 
-export function CodeCopyButton({ className, content }: { className?: string; content: string }) {
+export function CodeCopyButton({
+  className,
+  content,
+  label = 'Copy code',
+  copiedLabel = 'Code copied',
+}: {
+  className?: string
+  content: string
+  label?: string
+  copiedLabel?: string
+}) {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -203,7 +213,7 @@ export function CodeCopyButton({ className, content }: { className?: string; con
   return (
     <>
       <span className="sr-only" aria-live="polite">
-        {copied ? 'Code copied' : ''}
+        {copied ? copiedLabel : ''}
       </span>
       <Tooltip>
         <TooltipTrigger asChild>
@@ -218,14 +228,14 @@ export function CodeCopyButton({ className, content }: { className?: string; con
               'hover:bg-[var(--btn-active)]',
               className
             )}
-            aria-label="Copy code"
+            aria-label={label}
             // Tooltip repeats the label; the description would read the name twice
             aria-describedby={undefined}
           >
             <CrossfadeIcon active={copied} activeIcon={Check} inactiveIcon={Copy} />
           </Button>
         </TooltipTrigger>
-        <TooltipContent>Copy code</TooltipContent>
+        <TooltipContent>{label}</TooltipContent>
       </Tooltip>
     </>
   )
