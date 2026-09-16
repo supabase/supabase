@@ -9,8 +9,9 @@ pipeline, same tools: `@supabase/middleware` for composition, `@supabase/server`
 for the auth gate and OAuth discovery, and an RLS-scoped client for every tool.
 
 Reach for this when the server needs more memory or a longer request than Edge
-Functions gives it. Reach for the Edge Function block otherwise: it needs no URL
-configuration.
+Functions gives it. Reach for the Edge Function block otherwise: it is the
+smaller deploy. Both read the same project environment, so neither needs the
+project URL or keys configured.
 
 ## Installation
 
@@ -179,8 +180,8 @@ Functions they cannot be: a Compute instance listens on an internal host and
 Edge Functions, so it declines to guess: with `resourceServer` unset, every
 request fails with `MISSING_RESOURCE_SERVER` rather than advertising a URL no
 client called. RFC 9728 §3.3 requires the advertised resource identifier to
-equal the URL the client called, so `main.ts` passes both options — required
-configuration here, not a workaround — resolving them in this order:
+equal the URL the client called, so `main.ts` passes both options explicitly,
+resolving them in this order:
 
 1. `MCP_RESOURCE_SERVER`, for a custom domain or a proxy in front of the service.
 2. `SUPABASE_PUBLIC_URL`, then `SUPABASE_URL`, joined with
@@ -188,6 +189,11 @@ configuration here, not a workaround — resolving them in this order:
    exactly, and it does not depend on what a gateway forwards.
 3. `X-Forwarded-Proto` and `X-Forwarded-Host` on the request, as a last resort.
 4. Otherwise the request fails with a message naming the variables to set.
+
+Step 2 is the normal case and needs no configuration: the platform injects
+`SUPABASE_URL`, so a default install resolves both URLs on its own. Passing the
+options explicitly is what the library requires off Edge Functions, not extra
+setup for you.
 
 `authorizationServer` follows the same precedence, with
 `MCP_AUTHORIZATION_SERVER` first and `fromSupabaseUrl()` on the project URL
@@ -207,21 +213,29 @@ function, and `tools/index.ts` is the single composition point.
 
 | Variable                   | Default          | Purpose                                            |
 | -------------------------- | ---------------- | -------------------------------------------------- |
-| `SUPABASE_URL`             | none             | Project URL, required                              |
-| `SUPABASE_PUBLISHABLE_KEY` | none             | Publishable key, required                          |
+| `SUPABASE_URL`             | injected         | Project URL, provided by the platform              |
+| `SUPABASE_PUBLISHABLE_KEY` | injected         | Publishable key, provided by the platform          |
 | `MCP_COMPUTE_SERVICE_NAME` | `mcp-server`     | Last segment of the public URL                     |
 | `MCP_RESOURCE_SERVER`      | derived          | Override the advertised resource URL               |
 | `MCP_AUTHORIZATION_SERVER` | project Auth     | Third-party OAuth 2.1 issuer                       |
 | `MCP_SERVER_NAME`          | `supabase-mcp`   | Server name shown to MCP clients                   |
 | `MCP_SERVER_DESCRIPTION`   | Generic sentence | Instructions shown to clients                      |
 
-A Compute instance is not given the project URL and API keys automatically, the
-way an Edge Function is. Set them yourself. The block includes
+A Compute instance reads the project's secrets as environment variables, and it
+is given the project URL and API keys automatically, the same way an Edge
+Function is. So the default install needs no environment configuration: nothing
+in the table above has to be set. `supabase secrets set` refuses a
+`SUPABASE_`-prefixed name for that reason.
+
+To override one of the `MCP_` variables, the block includes
 `supabase/compute/mcp-server/.env.example`:
 
 ```bash
 cp supabase/compute/mcp-server/.env.example supabase/compute/mcp-server/.env
+supabase secrets set --env-file supabase/compute/mcp-server/.env
 ```
+
+Running instances pick a secret change up within about a minute.
 
 The block's `.gitignore` already covers `supabase/compute/mcp-server/.env`,
 `node_modules/`, and `dist/`.
@@ -230,7 +244,6 @@ The block's `.gitignore` already covers `supabase/compute/mcp-server/.env`,
 
 ```bash
 supabase config push
-supabase secrets set --env-file supabase/compute/mcp-server/.env
 npm run build --prefix supabase/compute/mcp-server
 supabase compute push mcp-server --project-ref <project-ref>
 supabase compute status mcp-server --project-ref <project-ref>
@@ -266,8 +279,9 @@ curl https://<project-ref>.supabase.co/compute/v1/mcp-server/oauth-protected-res
 
 `resource` in the response must be
 `https://<project-ref>.supabase.co/compute/v1/mcp-server`. A `500` with
-`MISSING_RESOURCE_SERVER` means the environment is missing `SUPABASE_URL` and
-`MCP_RESOURCE_SERVER` both. Use `supabase compute logs mcp-server` for startup
+`MISSING_RESOURCE_SERVER` means neither `SUPABASE_URL` nor `MCP_RESOURCE_SERVER`
+reached the instance — unexpected on a deployed Compute instance, since
+`SUPABASE_URL` is injected. Use `supabase compute logs mcp-server` for startup
 and request errors.
 
 ## Further reading
