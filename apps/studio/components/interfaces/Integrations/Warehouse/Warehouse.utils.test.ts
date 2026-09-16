@@ -6,10 +6,11 @@ import {
   getSchemaCheckedState,
   getSchemaTableKey,
   getSelectedTableCount,
+  hasSelectionChanged,
   isSelectableWarehouseSchema,
   type SchemaTableSelection,
   type SchemaWithTables,
-} from '../WarehouseModePanel/WarehouseModePanel.utils'
+} from './Warehouse.utils'
 import { WAREHOUSE_METADATA_SCHEMA } from '@/lib/warehouse'
 
 describe('WarehouseModePanel.utils:isSelectableWarehouseSchema', () => {
@@ -140,6 +141,36 @@ describe('WarehouseModePanel.utils:getSelectedTableCount', () => {
       'public.events': true,
     }
     expect(getSelectedTableCount(selection)).toBe(2)
+  })
+})
+
+describe('WarehouseModePanel.utils:hasSelectionChanged', () => {
+  test('is false for two empty selections', () => {
+    expect(hasSelectionChanged({}, {})).toBe(false)
+  })
+
+  test('is false when the same tables are selected', () => {
+    const initial: SchemaTableSelection = { 'public.orders': true, 'public.customers': false }
+    const selection: SchemaTableSelection = { 'public.orders': true }
+    expect(hasSelectionChanged(selection, initial)).toBe(false)
+  })
+
+  test('is true when a table is added on top of the initial selection', () => {
+    const initial: SchemaTableSelection = { 'public.orders': true }
+    const selection: SchemaTableSelection = { 'public.orders': true, 'public.customers': true }
+    expect(hasSelectionChanged(selection, initial)).toBe(true)
+  })
+
+  test('is true when a table is removed from the initial selection', () => {
+    const initial: SchemaTableSelection = { 'public.orders': true, 'public.customers': true }
+    const selection: SchemaTableSelection = { 'public.orders': true, 'public.customers': false }
+    expect(hasSelectionChanged(selection, initial)).toBe(true)
+  })
+
+  test('ignores explicit false entries that mirror an absent key', () => {
+    const initial: SchemaTableSelection = {}
+    const selection: SchemaTableSelection = { 'public.orders': false }
+    expect(hasSelectionChanged(selection, initial)).toBe(false)
   })
 })
 

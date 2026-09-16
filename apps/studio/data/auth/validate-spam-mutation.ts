@@ -9,7 +9,7 @@ export type ValidateSpamVariables = {
   projectRef: string
   template: components['schemas']['ValidateSpamBody']
 }
-export type ValidateSpamResponse = components['schemas']['ValidateSpamResponse']
+export type ValidateSpamResponse = components['schemas']['ValidateSpamResponse_Output']
 
 export async function validateSpam({ projectRef, template }: ValidateSpamVariables) {
   const { data, error } = await post('/platform/auth/{ref}/validate/spam', {
