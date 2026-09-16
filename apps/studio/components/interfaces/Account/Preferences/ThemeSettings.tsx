@@ -25,6 +25,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
+import { TextSizeSettings } from './TextSizeSettings'
 import { ThemeColorSettings } from './ThemeColorSettings'
 import { DEFAULT_SIDEBAR_BEHAVIOR } from '@/components/interfaces/Sidebar'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
@@ -113,6 +114,7 @@ export const ThemeSettings = () => {
             </div>
           </CardContent>
           <ThemeColorSettings isVisible={theme !== 'classic-dark'} />
+          <TextSizeSettings />
           <CardContent>
             <FormItemLayout
               isReactForm={false}
