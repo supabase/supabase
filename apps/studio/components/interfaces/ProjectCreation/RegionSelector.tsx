@@ -1,6 +1,6 @@
-import { useFeatureFlags, useParams } from 'common'
+import { useFeatureFlags, useFlag, useParams } from 'common'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
@@ -30,10 +30,18 @@ import {
   getAvailableRegions,
   getHighAvailabilityRegionCode,
 } from './ProjectCreation.utils'
+import {
+  parseRestrictedRegions,
+  REGION_RESTRICTION_COPY,
+  resolveRegionRestriction,
+  RESTRICTED_REGIONS_FLAG_KEY,
+  SELECTABLE_RESTRICTIONS,
+} from './RegionSelector.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { RegionFlag } from '@/components/ui/RegionFlag'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
@@ -42,6 +50,8 @@ import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
 interface RegionSelectorProps {
   form: UseFormReturn<CreateProjectForm>
   instanceSize?: DesiredInstanceSize
+  /** `undefined` while the organization is loading; paid-only restrictions then fail open */
+  isFreePlan?: boolean
   layout?: 'vertical' | 'horizontal'
 }
 
@@ -74,6 +84,7 @@ const isLocal = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
 export const RegionSelector = ({
   form,
   instanceSize,
+  isFreePlan,
   layout = 'horizontal',
 }: RegionSelectorProps) => {
   const { slug } = useParams()
@@ -84,6 +95,13 @@ export const RegionSelector = ({
 
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
+
+  // Memoized so an invalid payload is reported once per flag value, not on every render
+  const restrictedRegionsFlag = useFlag<string | boolean>(RESTRICTED_REGIONS_FLAG_KEY)
+  const restrictedRegions = useMemo(
+    () => parseRestrictedRegions(restrictedRegionsFlag),
+    [restrictedRegionsFlag]
+  )
 
   const { data: statusData } = useIncidentStatusQuery()
   const { incidents = [] } = statusData ?? {}
@@ -131,6 +149,14 @@ export const RegionSelector = ({
     [...unfilteredRegionOptions],
     highAvailability
   )
+  const regionOptionsWithRestriction = regionOptions.map((region) => ({
+    ...region,
+    restriction: resolveRegionRestriction({
+      platformStatus: region.status,
+      flagRestriction: restrictedRegions[region.code],
+      isFreePlan,
+    }),
+  }))
   const isLoading = smartRegionEnabled ? isLoadingAvailableRegions : isLoadingDefaultRegion
 
   const isLocalEnvironment = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
@@ -181,6 +207,9 @@ export const RegionSelector = ({
           const selectedRegionLabel = selectedRegion?.name
             ? getDisplayNameForSmartRegion(selectedRegion.name)
             : dbRegion
+          const selectedRestrictedRegion = regionOptionsWithRestriction.find(
+            (region) => region.name === dbRegion && region.restriction !== undefined
+          )
           const triggerLabel = isLoading ? 'Loading available regions...' : selectedRegionLabel
 
           const affectingIncidents = incidents.filter((incident) => {
@@ -298,16 +327,19 @@ export const RegionSelector = ({
                         <SelectLabel>
                           {highAvailability ? 'High Availability Regions' : 'Specific regions'}
                         </SelectLabel>
-                        {regionOptions.map((value) => {
+                        {regionOptionsWithRestriction.map((value) => {
+                          const { restriction } = value
+                          const isDisabled =
+                            restriction !== undefined && !SELECTABLE_RESTRICTIONS.has(restriction)
                           return (
                             <SelectItem
                               key={value.code}
                               value={value.name}
                               className={cn(
                                 'w-full [&>:nth-child(2)]:w-full',
-                                value.status !== undefined && 'pointer-events-auto!'
+                                isDisabled && 'pointer-events-auto!'
                               )}
-                              disabled={value.status !== undefined}
+                              disabled={isDisabled}
                             >
                               <div className="flex flex-row items-center justify-between w-full gap-x-2">
                                 <div className="flex items-center gap-x-3">
@@ -325,15 +357,15 @@ export const RegionSelector = ({
                                     Recommended
                                   </Badge>
                                 )}
-                                {value.status !== undefined && value.status === 'capacity' && (
+                                {restriction !== undefined && (
                                   <Tooltip>
                                     <TooltipTrigger>
                                       <Badge variant="warning" className="mr-1">
-                                        Unavailable
+                                        {REGION_RESTRICTION_COPY[restriction].badge}
                                       </Badge>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                      Temporarily unavailable due to this region being at capacity.
+                                      {REGION_RESTRICTION_COPY[restriction].tooltip}
                                     </TooltipContent>
                                   </Tooltip>
                                 )}
@@ -362,6 +394,18 @@ export const RegionSelector = ({
                         .
                       </>
                     }
+                    className="mt-3"
+                  />
+                </FormItemLayout>
+              )}
+
+              {selectedRestrictedRegion?.restriction === 'paid_only' && (
+                <FormItemLayout layout="horizontal">
+                  <UpgradeToPro
+                    primaryText="Region available on paid plans only"
+                    secondaryText={`Upgrade this organization to create projects in ${selectedRestrictedRegion.name}.`}
+                    source="projectCreationRegion"
+                    featureProposition={`create projects in ${selectedRestrictedRegion.name}`}
                     className="mt-3"
                   />
                 </FormItemLayout>

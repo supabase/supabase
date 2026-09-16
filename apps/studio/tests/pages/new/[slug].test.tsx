@@ -103,6 +103,18 @@ const DEFAULT_AVAILABLE_REGIONS: RegionsInfo = {
 }
 
 const FRANKFURT = 'Central EU (Frankfurt)'
+const SAO_PAULO = 'South America (São Paulo)'
+
+const AVAILABLE_REGIONS_WITH_SAO_PAULO: RegionsInfo = {
+  ...DEFAULT_AVAILABLE_REGIONS,
+  all: {
+    ...DEFAULT_AVAILABLE_REGIONS.all,
+    specific: [
+      ...DEFAULT_AVAILABLE_REGIONS.all.specific,
+      { code: 'sa-east-1', name: SAO_PAULO, provider: 'AWS', type: 'specific' },
+    ],
+  },
+}
 
 const AVAILABLE_REGIONS_WITH_FRANKFURT: RegionsInfo = {
   ...DEFAULT_AVAILABLE_REGIONS,
@@ -262,9 +274,10 @@ const DEFAULT_FLAGS = {
   newProjectInternalOnlyConfiguration: false,
   disableOrioleProjectCreation: false,
   defaultRegionRestrictedPool: false,
+  projectCreationRestrictedRegions: false,
 }
 
-async function renderWizard(options: { flags?: Partial<typeof DEFAULT_FLAGS> } = {}) {
+async function renderWizard(options: { flags?: Record<string, boolean | string> } = {}) {
   const { default: Wizard } = await import('@/pages/new/[slug]')
   return customRender(
     <FeatureFlagContext.Provider
@@ -478,6 +491,58 @@ describe('project creation wizard', () => {
       await renderWizard()
 
       await screen.findByText('Error loading available regions')
+    })
+
+    describe('restricted regions flag', () => {
+      const PAID_ONLY_SAO_PAULO = { projectCreationRestrictedRegions: '{"sa-east-1":"paid_only"}' }
+
+      test('disables a paid-only region with upgrade copy for a free-plan organization', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+          availableRegions: AVAILABLE_REGIONS_WITH_SAO_PAULO,
+        })
+
+        await renderWizard({ flags: PAID_ONLY_SAO_PAULO })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        const saoPaulo = await screen.findByRole('option', { name: /São Paulo/ })
+        expect(saoPaulo).toHaveAttribute('aria-disabled', 'true')
+        expect(within(saoPaulo).getByText('Paid plans')).toBeInTheDocument()
+        expect(screen.getByRole('option', { name: /North Virginia/ })).not.toHaveAttribute(
+          'aria-disabled',
+          'true'
+        )
+      })
+
+      test('keeps a paid-only region selectable for a paid organization', async () => {
+        mockWizardEndpoints({ availableRegions: AVAILABLE_REGIONS_WITH_SAO_PAULO })
+
+        await renderWizard({ flags: PAID_ONLY_SAO_PAULO })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        const saoPaulo = await screen.findByRole('option', { name: /São Paulo/ })
+        expect(saoPaulo).not.toHaveAttribute('aria-disabled', 'true')
+        expect(within(saoPaulo).queryByText('Paid plans')).not.toBeInTheDocument()
+      })
+
+      test('leaves every region selectable when the flag is unresolved', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+          availableRegions: AVAILABLE_REGIONS_WITH_SAO_PAULO,
+        })
+
+        await renderWizard()
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        const saoPaulo = await screen.findByRole('option', { name: /São Paulo/ })
+        expect(saoPaulo).not.toHaveAttribute('aria-disabled', 'true')
+      })
     })
   })
 

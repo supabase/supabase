@@ -39,6 +39,12 @@ import {
 import { ProjectCreationFooter } from './ProjectCreationFooter'
 import { ProjectNameInput } from './ProjectNameInput'
 import { RegionSelector } from './RegionSelector'
+import {
+  parseRestrictedRegions,
+  REGION_RESTRICTION_COPY,
+  resolveRegionRestriction,
+  RESTRICTED_REGIONS_FLAG_KEY,
+} from './RegionSelector.utils'
 import { SecurityOptions } from './SecurityOptions'
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import {
@@ -136,6 +142,11 @@ export const ProjectCreationForm = ({
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showInternalOnlyConfiguration =
     useFlag('newProjectInternalOnlyConfiguration') && !isVercelIntegrationFlow
+  const restrictedRegionsFlag = useFlag<string | boolean>(RESTRICTED_REGIONS_FLAG_KEY)
+  const restrictedRegions = useMemo(
+    () => parseRestrictedRegions(restrictedRegionsFlag),
+    [restrictedRegionsFlag]
+  )
 
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
   // users whose flags haven't loaded yet. The raw value preserves undefined (omitted from
@@ -470,6 +481,30 @@ export const ProjectCreationForm = ({
         `High Availability projects are not available in the required region (${highAvailabilityRegionCode})`
       )
     }
+
+    // Safety net for the picker: restricted options are disabled there, but a region selected
+    // before a restriction landed stays in the form value.
+    const selectedSpecificRegion = specific.find((x) => x.name === dbRegion)
+    const selectedRegionRestriction = resolveRegionRestriction({
+      platformStatus: selectedSpecificRegion?.status,
+      flagRestriction:
+        selectedSpecificRegion !== undefined
+          ? restrictedRegions[selectedSpecificRegion.code]
+          : undefined,
+      isFreePlan,
+    })
+    if (selectedRegionRestriction !== undefined) {
+      const toastId = toast.error(
+        `Select a different region. ${dbRegion}: ${REGION_RESTRICTION_COPY[selectedRegionRestriction].tooltip}`
+      )
+      trackFunnelError(
+        'project_creation',
+        { errorCategory: 'validation', errorReason: 'region_unavailable' },
+        'toast',
+        toastId
+      )
+      return
+    }
     const parsedGitHubRepositoryId =
       githubRepositoryId.length > 0 ? Number(githubRepositoryId) : undefined
     const shouldIncludeGitHubFields =
@@ -746,6 +781,7 @@ export const ProjectCreationForm = ({
                     <RegionSelector
                       form={form}
                       instanceSize={instanceSize as DesiredInstanceSize}
+                      isFreePlan={isFreePlan}
                     />
 
                     {isVercelIntegrationFlow && !!externalId && <DataSeeding form={form} />}
