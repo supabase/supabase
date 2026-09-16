@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
 import { Badge } from 'ui'
 
 import { getPipelineDisplayState, normalizePipelineStatusName } from '../Pipeline.utils'
@@ -6,6 +7,8 @@ import { RetryPolicy, SlotWalStatus, TableState } from './ReplicationPipelineSta
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { formatBytes } from '@/lib/helpers'
 import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
+
+dayjs.extend(duration)
 
 export const getStatusConfig = (state: TableState['state']) => {
   switch (state.name) {
@@ -167,8 +170,7 @@ export const WAL_STATUS_META: Record<SlotWalStatus, WalStatusMeta> = {
     label: 'Reserved',
     variant: 'success',
     severity: 'normal',
-    description:
-      "Healthy. Your database is keeping the WAL files this pipeline's replication slot needs, and they are within the normal WAL size limit.",
+    description: 'Postgres will keep the WAL for every change until this pipeline sends it.',
     tableDescription:
       "Healthy. Your database is keeping the WAL files this table's replication slot needs, and they are within the normal WAL size limit.",
   },
@@ -177,7 +179,7 @@ export const WAL_STATUS_META: Record<SlotWalStatus, WalStatusMeta> = {
     variant: 'warning',
     severity: 'normal',
     description:
-      "Healthy, but growing. This pipeline's replication slot is holding on to more WAL than usual, but your database is still keeping everything it needs.",
+      'The pipeline is behind. Postgres is retaining more WAL than usual, but nothing is discarded yet.',
     tableDescription:
       "Healthy, but growing. This table's replication slot is holding on to more WAL than usual, but your database is still keeping everything it needs.",
   },
@@ -185,8 +187,7 @@ export const WAL_STATUS_META: Record<SlotWalStatus, WalStatusMeta> = {
     label: 'Unreserved',
     variant: 'warning',
     severity: 'warning',
-    description:
-      "At risk. Your database is no longer reserving all WAL files this pipeline's replication slot needs. If the pipeline does not catch up soon, those files may be removed.",
+    description: 'Postgres may discard WAL this pipeline has not sent yet.',
     tableDescription:
       "At risk. Your database is no longer reserving all WAL files this table's replication slot needs. If the pipeline does not catch up soon, those files may be removed.",
   },
@@ -195,7 +196,7 @@ export const WAL_STATUS_META: Record<SlotWalStatus, WalStatusMeta> = {
     variant: 'destructive',
     severity: 'critical',
     description:
-      "Broken. Some WAL files this pipeline's replication slot needs have already been removed. The pipeline can no longer continue from this slot. You can recreate a new pipeline, or set the invalidation behavior to recreate and restart the pipeline.",
+      'Postgres already discarded WAL this pipeline needed. Replication cannot continue from here.',
     tableDescription:
       "Broken. Some WAL files this table's replication slot needs have already been removed. The pipeline can no longer continue from this slot. You can recreate a new pipeline, or set the invalidation behavior to recreate and restart the pipeline.",
   },
@@ -203,8 +204,7 @@ export const WAL_STATUS_META: Record<SlotWalStatus, WalStatusMeta> = {
     label: 'Unknown',
     variant: 'default',
     severity: 'normal',
-    description:
-      "Unknown. Your database reported an unknown state for this pipeline's replication slot.",
+    description: 'Postgres did not report a status for this pipeline’s slot.',
     tableDescription:
       "Unknown. Your database reported an unknown state for this table's replication slot.",
   },
