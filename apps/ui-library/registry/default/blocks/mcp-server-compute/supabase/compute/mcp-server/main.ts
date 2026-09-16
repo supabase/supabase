@@ -1,11 +1,11 @@
-import { createMcpHandler, McpServer } from 'npm:@modelcontextprotocol/server@2.0.0'
-import { pipeline } from 'npm:@supabase/middleware@0.5.0'
+import { createMcpHandler, McpServer } from '@modelcontextprotocol/server'
+import { getEnv, pipeline } from '@supabase/middleware'
 import {
   fromSupabaseUrl,
   withOAuthProtectedResource,
   withSupabase,
   type SupabaseContext,
-} from 'npm:@supabase/server@1.6.0'
+} from '@supabase/server'
 
 import { registerTools, type ToolContext } from './tools/index.ts'
 
@@ -23,21 +23,26 @@ import { registerTools, type ToolContext } from './tools/index.ts'
 //
 // Same libraries and same pipeline as the Edge Function block. The one real
 // difference is the advertised URLs. `@supabase/server` derives them from the
-// request only on Edge Functions, and it treats any Deno runtime as Edge
-// Functions, so its defaults take that path here too: they either fail with
-// MISSING_RESOURCE_SERVER, on a request to the service root, or advertise a
-// `/functions/v1/...` URL for a service served at `/compute/v1/<service>`.
-// RFC 9728 §3.3 requires the advertised resource to equal the URL the client
-// called, so both URLs are passed explicitly below.
+// request only on Edge Functions, and a `node` Compute service is not Edge
+// Functions, so the library declines to guess: `resourceServer` is required
+// (unset, every request is answered `500` with `MISSING_RESOURCE_SERVER`) and
+// `authorizationServer` falls back to `SUPABASE_PUBLIC_URL`, then
+// `SUPABASE_URL`, with `/auth/v1` appended. RFC 9728 §3.3 requires the
+// advertised resource identifier to equal the URL the client called, and a
+// Compute instance's own origin is an internal host and `$PORT`, so both
+// options are passed explicitly below. That is the required configuration off
+// Edge Functions, not a workaround.
 
 const COMPUTE_PATH_PREFIX = '/compute/v1'
 
+// `getEnv` is `@supabase/middleware`'s runtime-agnostic environment read, the
+// same one `@supabase/server` uses internally.
 function readTextEnv(name: string, fallback: string): string {
-  return Deno.env.get(name)?.trim() || fallback
+  return getEnv(name)?.trim() || fallback
 }
 
 function readEnv(name: string): string | null {
-  return Deno.env.get(name)?.trim() || null
+  return getEnv(name)?.trim() || null
 }
 
 /** Strips a trailing slash so joining a path never produces `//`. */
@@ -162,7 +167,8 @@ const fetchHandler = pipeline(
   (request, ctx) => handleMcp(request, ctx)
 )
 
-// Compute owns the listener for a `deno` service: it imports this module and
-// serves the default export on $PORT. Everything above is module-level work, so
-// keep it cheap — an instance has to accept connections shortly after start.
+// Compute owns the listener: it imports this module and serves the default
+// export on $PORT. Everything above is module-level work, and a `node` service
+// pays a TypeScript strip on top of it, so keep it cheap — a public instance
+// has to accept connections shortly after start.
 export default { fetch: fetchHandler }

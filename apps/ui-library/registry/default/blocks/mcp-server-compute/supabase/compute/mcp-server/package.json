@@ -1,0 +1,18 @@
+{
+  "name": "mcp-server-compute",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "2.0.0",
+    "@supabase/middleware": "0.5.0",
+    "@supabase/server": "1.6.0",
+    "@supabase/supabase-js": "2.108.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "typescript": "^5.8.3"
+  }
+}

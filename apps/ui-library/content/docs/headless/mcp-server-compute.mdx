@@ -16,12 +16,30 @@ configuration.
 
 <BlockItem name="mcp-server-compute" showOpenInV0={false} />
 
-Installs Deno Compute files into a Supabase project or empty directory. No
+Installs Node Compute files into a Supabase project or empty directory. No
 `components.json` is required. Backend files stay in `supabase/` at the project
 root even when the frontend uses `src/`.
 
-The tool files are the same files the Edge Function block installs, written to
-`supabase/compute/mcp-server/tools/`. A tool written once works on both runtimes.
+Then install the service's dependencies, in the service directory:
+
+```bash
+cd supabase/compute/mcp-server
+npm install
+```
+
+The `node` runtime does no server-side install. `supabase compute push` uploads
+the directory as it stands, so `node_modules` has to already be there. The block
+ships a `.gitignore` that keeps `node_modules` and `.env` out of version
+control; re-run `npm install` on any machine that pushes.
+
+The tool files are a copy of the Edge Function block's, with the `npm:` prefixes
+removed from their imports. The Edge Function block resolves
+`npm:@modelcontextprotocol/server@2.0.0` at runtime; node resolves
+`@modelcontextprotocol/server` from `node_modules` and cannot read a `npm:`
+specifier, and node has no import map to bridge the two. So the two blocks hold
+the same four tool modules separately, and a tool added to one has to be added
+to the other. Relative imports carry their `.ts` extension in both: that is what
+Deno wants and what node's TypeScript stripping requires.
 
 ## Folder structure
 
@@ -37,16 +55,16 @@ Compute is experimental, so opt in and declare the service in
 compute = true
 
 [compute.mcp-server]
-runtime = "deno"
+runtime = "node"
 size = "2gb"
 exposure = "public"
 ```
 
-`runtime = "deno"` serves `main.ts`'s default-exported `fetch` handler with no
-build step, and resolves the `npm:` and `jsr:` specifiers at startup, so nothing
-is vendored into the repo. It is also what lets this block share the Edge
-Function block's tool files unchanged: those files import through `npm:`
-specifiers and explicit `.ts` paths. `exposure = "public"` publishes the service at
+`runtime = "node"` serves `main.ts`'s default-exported `fetch` handler with no
+build step: node runs the TypeScript directly, stripping the types. It does not
+resolve `npm:` or `jsr:` specifiers, and it installs nothing at deploy time, so
+dependencies come from the `node_modules` you install before pushing.
+`exposure = "public"` publishes the service at
 `https://<project-ref>.supabase.co/compute/v1/mcp-server`. The name in
 `[compute.<name>]` is the last segment of that URL.
 
@@ -137,13 +155,12 @@ On Edge Functions both advertised URLs are derived from the request. Off Edge
 Functions they cannot be: a Compute instance listens on an internal host and
 `$PORT`, and its own origin says nothing about the project's public origin.
 
-`@supabase/server` treats any Deno runtime as Edge Functions, so on Compute its
-defaults take the Edge Functions path instead of refusing to guess. Left to
-them, a request that arrives at the service root fails with
-`MISSING_RESOURCE_SERVER`, and one that arrives with its path intact advertises
-`https://<project-ref>.supabase.co/functions/v1/compute/v1/<name>`. RFC 9728
-§3.3 requires the advertised resource identifier to equal the URL the client
-called, so `main.ts` passes both options, resolving them in this order:
+`@supabase/server` decides this from the runtime, and on `node` it reads as off
+Edge Functions, so it declines to guess: with `resourceServer` unset, every
+request fails with `MISSING_RESOURCE_SERVER` rather than advertising a URL no
+client called. RFC 9728 §3.3 requires the advertised resource identifier to
+equal the URL the client called, so `main.ts` passes both options — required
+configuration here, not a workaround — resolving them in this order:
 
 1. `MCP_RESOURCE_SERVER`, for a custom domain or a proxy in front of the service.
 2. `SUPABASE_PUBLIC_URL`, then `SUPABASE_URL`, joined with
@@ -155,7 +172,10 @@ called, so `main.ts` passes both options, resolving them in this order:
 `authorizationServer` follows the same precedence, with
 `MCP_AUTHORIZATION_SERVER` first and `fromSupabaseUrl()` on the project URL
 after it. It needs no request, so it resolves at startup: a missing project URL
-fails the deploy rather than every request.
+fails the deploy rather than every request. Off Edge Functions the library's own
+default lands in the same place — `SUPABASE_PUBLIC_URL`, then `SUPABASE_URL`,
+each with `/auth/v1` appended — so passing it explicitly buys the
+`MCP_AUTHORIZATION_SERVER` override, not a different URL.
 
 ## Add tools
 
@@ -183,16 +203,21 @@ way an Edge Function is. Set them yourself. The block includes
 cp supabase/compute/mcp-server/.env.example supabase/compute/mcp-server/.env
 ```
 
-Add `supabase/compute/mcp-server/.env` to `.gitignore`.
+The block's `.gitignore` already covers `supabase/compute/mcp-server/.env` and
+`node_modules/`.
 
 ## Deploy
 
 ```bash
 supabase config push
 supabase secrets set --env-file supabase/compute/mcp-server/.env
+npm install --prefix supabase/compute/mcp-server
 supabase compute push mcp-server
 supabase compute status mcp-server
 ```
+
+`npm install` is not optional. Push a directory without `node_modules` and the
+instance fails to start on `import { createMcpHandler } from '@modelcontextprotocol/server'`.
 
 Then check the advertised metadata matches the URL clients call:
 
@@ -201,9 +226,10 @@ curl https://<project-ref>.supabase.co/compute/v1/mcp-server/oauth-protected-res
 ```
 
 `resource` in the response must be
-`https://<project-ref>.supabase.co/compute/v1/mcp-server`. If it carries
-`/functions/v1`, the environment is missing `SUPABASE_URL`. Use
-`supabase compute logs mcp-server` for startup and request errors.
+`https://<project-ref>.supabase.co/compute/v1/mcp-server`. A `500` with
+`MISSING_RESOURCE_SERVER` means the environment is missing `SUPABASE_URL` and
+`MCP_RESOURCE_SERVER` both. Use `supabase compute logs mcp-server` for startup
+and request errors.
 
 ## Further reading
 
