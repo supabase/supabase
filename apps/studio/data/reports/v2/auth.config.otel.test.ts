@@ -16,24 +16,35 @@ describe('AUTH_REPORT_SQL_OTEL', () => {
 
   it('emits 16-digit unix-microsecond timestamps bucketed by granularity', () => {
     expect(sql(AUTH_REPORT_SQL_OTEL.ActiveUsers('1h'))).toContain(
-      'toUnixTimestamp(toStartOfHour(timestamp)) * 1000000 as timestamp'
+      'toUnixTimestamp(toStartOfHour(logs.timestamp)) * 1000000 as timestamp'
     )
     expect(sql(AUTH_REPORT_SQL_OTEL.ActiveUsers('1d'))).toContain(
-      'toUnixTimestamp(toStartOfDay(timestamp)) * 1000000 as timestamp'
+      'toUnixTimestamp(toStartOfDay(logs.timestamp)) * 1000000 as timestamp'
     )
     expect(sql(AUTH_REPORT_SQL_OTEL.ActiveUsers('5m'))).toContain(
-      'toUnixTimestamp(toStartOfMinute(timestamp)) * 1000000 as timestamp'
+      'toUnixTimestamp(toStartOfMinute(logs.timestamp)) * 1000000 as timestamp'
     )
   })
 
   it('groups and orders by the full bucket expression, not the timestamp alias', () => {
     const out = sql(AUTH_REPORT_SQL_OTEL.ActiveUsers('1h'))
 
-    expect(out).toContain('group by toUnixTimestamp(toStartOfHour(timestamp)) * 1000000')
-    expect(out).toContain('order by toUnixTimestamp(toStartOfHour(timestamp)) * 1000000 desc')
+    expect(out).toContain('group by toUnixTimestamp(toStartOfHour(logs.timestamp)) * 1000000')
+    expect(out).toContain('order by toUnixTimestamp(toStartOfHour(logs.timestamp)) * 1000000 desc')
     expect(out).not.toContain('group by timestamp')
     expect(out).not.toContain('order by timestamp desc')
   })
+
+  it.each(Object.entries(AUTH_REPORT_SQL_OTEL))(
+    '%s qualifies timestamp inputs to avoid substituting the numeric output alias',
+    (_, builder) => {
+      for (const interval of ['5m', '1h', '1d'] as const) {
+        const out = sql(builder(interval))
+        expect(out).toMatch(/toStartOf(?:Minute|Hour|Day)\(logs\.timestamp\)/)
+        expect(out).not.toMatch(/toStartOf(?:Minute|Hour|Day)\(timestamp\)/)
+      }
+    }
+  )
 
   it('reads auth_logs fields from the raw JSON event_message, not BigQuery json_value', () => {
     const out = sql(AUTH_REPORT_SQL_OTEL.ActiveUsers('1h'))
@@ -128,9 +139,9 @@ describe('AUTH_REPORT_SQL_OTEL', () => {
     expect(out).toContain("toInt32OrZero(log_attributes['response.status_code']) as status_code")
   })
 
-  it('selects the x_sb_error_code attribute for the by-code breakdown', () => {
+  it('preserves missing error codes as null so the report excludes uncategorized failures', () => {
     expect(sql(AUTH_REPORT_SQL_OTEL.ErrorsByAuthCode('1h'))).toContain(
-      "log_attributes['response.headers.x_sb_error_code'] as error_code"
+      "nullIf(log_attributes['response.headers.x_sb_error_code'], '') as error_code"
     )
   })
 
