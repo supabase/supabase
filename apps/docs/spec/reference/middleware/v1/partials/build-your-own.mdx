@@ -1,0 +1,71 @@
+---
+id: build-your-own
+title: Build your own middleware
+---
+
+A middleware is a `withFoo` function built with `defineMiddleware`. It owns one key on `ctx` and runs once per request, before the handler. This page covers the shape. The [authoring guide](https://github.com/supabase/middleware/blob/main/docs/authoring-guide.md) in the repo covers tests, packaging, and the variants: requiring an upstream key, a config callback that reads upstream context, a hand-written signature, wrapping a vendor SDK, the response seam, and bundling several middleware into one.
+
+### Define it
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    `defineMiddleware` takes four type arguments and a spec object.
+
+    The type arguments are the key, the config type, the upstream context the middleware needs, and the contribution type. `void` config means the middleware takes no options. `Record<never, never>` means it needs nothing from earlier middleware.
+
+    `run` receives the config when the stack is built and returns the per-request function. That function contributes by returning an object with the key, or short-circuits by returning a `Response`.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```ts with-request-id.ts
+    import { defineMiddleware } from '@supabase/middleware'
+
+    export const withRequestId = defineMiddleware<
+      'requestId',
+      void,
+      Record<never, never>,
+      string
+    >({
+      key: 'requestId',
+      run: () => async (req) => ({
+        requestId: req.headers.get('x-request-id') ?? crypto.randomUUID(),
+      }),
+    })
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Compose it
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Your middleware drops into the same `pipeline` array as the built-in ones. The handler reads `ctx.requestId` as a `string`, inferred from the entries.
+
+    `pipeline` checks the array at compile time. Two entries that contribute the same key fail with an error naming the key. An entry whose prerequisite nothing before it supplies fails the same way. If you nest calls instead of using `pipeline`, keep `satisfies FetchHandler` on the outermost call; that anchor is what runs the same two checks on a nested stack. On a `pipeline` call it is optional.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```ts
+    import { pipeline } from '@supabase/middleware'
+    import type { FetchHandler } from '@supabase/middleware'
+    import { withCors } from '@supabase/middleware/cors'
+    import { withRequestId } from './with-request-id'
+
+    export default {
+      fetch: pipeline(
+        [withCors({}), withRequestId()],
+        async (_req, ctx) =>
+          Response.json({ ok: true }, { headers: { 'x-request-id': ctx.requestId } }),
+      ) satisfies FetchHandler,
+    }
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
