@@ -65,19 +65,6 @@ export const EventTriggerList = ({
     return sortBy(filteredEventTriggers, (trigger) => trigger.name.toLocaleLowerCase())
   }, [eventTriggers, ownerFilter, filterString])
 
-  if (orderedTriggers.length === 0 && filterString.length === 0 && ownerFilter.length === 0) {
-    return (
-      <TableRow>
-        <TableCell colSpan={6}>
-          <p className="text-sm text-foreground">No event triggers created yet</p>
-          <p className="text-sm text-foreground-light">
-            There are no event triggers configured for this database
-          </p>
-        </TableCell>
-      </TableRow>
-    )
-  }
-
   if (orderedTriggers.length === 0 && (filterString.length > 0 || ownerFilter.length > 0)) {
     return <TableRowNoResults colSpan={6} search={filterString} />
   }
