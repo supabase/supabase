@@ -54,6 +54,7 @@ export const BatchRestartDialog = ({
     }
   }, [mode, tables])
   const affectedTableIds = useMemo(() => affectedTables.map((table) => table.id), [affectedTables])
+  const isPipelineStatusUnavailable = pipelineStatusName === undefined
 
   const copiedTables = useMemo(
     () => getTableCopyTargets(affectedTables, tableSyncCopy),
@@ -79,6 +80,7 @@ export const BatchRestartDialog = ({
 
   const handleReset = async () => {
     if (!projectRef) return toast.error('Project ref is required')
+    if (isPipelineStatusUnavailable) return
 
     onRestartStart?.(affectedTableIds)
 
@@ -133,7 +135,11 @@ export const BatchRestartDialog = ({
         />
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
-          <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="warning">
+          <AlertDialogAction
+            disabled={isResetting || isPipelineStatusUnavailable}
+            onClick={handleReset}
+            variant="warning"
+          >
             {isResetting ? 'Resetting…' : dialogContent.action}
           </AlertDialogAction>
         </AlertDialogFooter>

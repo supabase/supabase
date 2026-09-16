@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { BatchRestartDialog } from './BatchRestartDialog'
+import { PipelineStatusName } from './Replication.constants'
 import type { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 
 const mocks = vi.hoisted(() => ({
@@ -58,6 +59,7 @@ describe('BatchRestartDialog', () => {
         mode="errored"
         tables={tables}
         tableSyncCopy={{ type: 'include_tables', table_ids: [1, 2] }}
+        pipelineStatusName={PipelineStatusName.STARTED}
         onRestartStart={onRestartStart}
       />
     )
@@ -82,5 +84,18 @@ describe('BatchRestartDialog', () => {
         rollbackType: 'full',
       })
     )
+  })
+
+  it('prevents a reset when the pipeline status is unavailable', () => {
+    render(
+      <BatchRestartDialog
+        open
+        onOpenChange={vi.fn()}
+        mode="all"
+        tables={[table(1, { name: 'following_wal' })]}
+      />
+    )
+
+    expect(screen.getByRole('button', { name: 'Reset all tables' })).toBeDisabled()
   })
 })
