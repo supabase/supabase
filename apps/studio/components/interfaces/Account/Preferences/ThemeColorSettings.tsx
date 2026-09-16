@@ -14,7 +14,7 @@ import {
   themeOverrideToSliderValue,
 } from '@/lib/theme-overrides'
 
-export const ThemeColorSettings = () => {
+export const ThemeColorSettings = ({ isVisible = true }: { isVisible?: boolean }) => {
   const { mode, overrides, setOverride, resetOverrides } = useThemeOverrides()
   const [draft, setDraft] = useState<ThemeOverrides>({})
   const draftRef = useRef<ThemeOverrides>({})
@@ -55,6 +55,8 @@ export const ThemeColorSettings = () => {
     },
     [setOverride, writeDraft]
   )
+
+  if (!isVisible) return null
 
   return (
     <CardContent className="grid grid-cols-12 gap-6">
