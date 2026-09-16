@@ -55,7 +55,7 @@ export const TOTPFactors = () => {
               </PageSectionDescription>
             </PageSectionSummary>
           </PageSectionMeta>
-          <PageSectionContent>
+          <PageSectionContent aria-live="polite">
             {recoveryCodesStatus?.status === 'unenrolled' && <GenerateRecoveryCodesModal />}
             {recoveryCodesStatus?.status === 'available' && recoveryCodesStatus?.data && (
               <Card>
