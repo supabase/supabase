@@ -48,8 +48,7 @@ describe('ReplicationPipelineStatus', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
-      response: async () =>
-        HttpResponse.json<PipelineStatusResponse>(await pipelineStatusResponse),
+      response: async () => HttpResponse.json<PipelineStatusResponse>(await pipelineStatusResponse),
     })
     addAPIMock({
       method: 'get',
