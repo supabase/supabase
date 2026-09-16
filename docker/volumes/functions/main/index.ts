@@ -55,9 +55,9 @@ function getAuthToken(req: Request): string | AuthFailure {
       message: 'Missing authorization header',
     }
   }
-  const tokenParts = authHeader.split(' ')
+  const tokenParts = authHeader.trim().split(/\s+/)
   const [bearer, token] = tokenParts
-  if (bearer !== 'Bearer' || tokenParts.length !== 2 || !token) {
+  if (bearer.toLowerCase() !== 'bearer' || tokenParts.length !== 2 || !token) {
     return {
       code: RequestErrors.InvalidTokenFormat,
       message: 'Invalid JWT format',
