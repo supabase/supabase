@@ -149,7 +149,7 @@ export const WarehouseSchemaTablePicker = ({
   // start toggling. First-time setup always starts empty and does not need to wait for it.
   if (isSchemasPending || isTablesPending || isSelectionPending) {
     return (
-      <PageSection className={isEditing ? undefined : 'pt-0!'}>
+      <PageSection className="pt-5!">
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>Tables</PageSectionTitle>
@@ -202,7 +202,7 @@ export const WarehouseSchemaTablePicker = ({
   }
 
   return (
-    <PageSection className={isEditing ? undefined : 'pt-0!'}>
+    <PageSection className="pt-5!">
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>Tables</PageSectionTitle>
