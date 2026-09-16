@@ -84,6 +84,20 @@ flags:
       - id: yaml
         name: yaml
         type: '[ env | pretty | json | toml | yaml ]'
+  - id: output-format
+    name: --output-format <[ text | json | stream-json ]>
+    description: output format of command results, such as the endpoints printed by supabase stack start
+    default_value: text
+    accepted_values:
+      - id: text
+        name: text
+        type: '[ text | json | stream-json ]'
+      - id: json
+        name: json
+        type: '[ text | json | stream-json ]'
+      - id: stream-json
+        name: stream-json
+        type: '[ text | json | stream-json ]'
   - id: profile
     name: --profile <string>
     description: use a specific profile for connecting to Supabase API
@@ -605,7 +619,7 @@ commands:
       - local-dev
     links:
       - name: Running multiple local projects
-        link: https://supabase.com/docs/guides/local-development/parallel-projects
+        link: https://supabase.com/docs/guides/local-development/running-multiple-local-projects
     subcommands:
       - supabase-stack-start
       - supabase-stack-stop
@@ -666,7 +680,7 @@ commands:
         default_value: ''
       - id: runtime
         name: --runtime <string>
-        description: Runtime to use for a new local project. [auto, docker, native]. auto uses Docker when the docker command is installed and native otherwise. See https://supabase.com/docs/guides/local-development/runtimes
+        description: Runtime to use for a new local project. [auto, docker, native]. auto uses Docker when the docker command is installed and native otherwise. See https://supabase.com/docs/guides/local-development/docker-and-native-runtimes
         default_value: 'auto'
       - id: preparation
         name: --preparation <string>
@@ -676,6 +690,10 @@ commands:
         name: --eager
         description: Activate all enabled capabilities before returning.
         default_value: 'false'
+      - id: output-format
+        name: --output-format <string>
+        description: Output format for the endpoints and status the command prints. [text, json, stream-json]. This is a global CLI flag and can be passed to any command.
+        default_value: 'text'
   - id: supabase-stack-stop
     title: supabase stack stop
     summary: Stop a local project started with supabase stack start, keeping its data

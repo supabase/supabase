@@ -1,13 +1,13 @@
 ---
-id: 'runtimes'
+id: 'docker-and-native-runtimes'
 title: 'Docker and native runtimes'
 description: 'How the experimental supabase stack commands run a local Supabase project in Docker or as native processes, how the CLI picks a runtime, and what the native runtime needs.'
 subtitle: 'Run a local Supabase project in containers or as processes on your machine without Docker'
 ---
 
-This guide explains the two runtimes the experimental `supabase stack start` command can use for a local Supabase project, how the CLI picks one, and which to choose. The Docker runtime runs each service in a container. The native runtime runs each service as a process on your machine, with no Docker daemon.
+This guide explains the two runtimes the experimental `supabase stack start` command can use for a local Supabase project, how the CLI picks one, and which to choose. The Docker runtime runs each service in a container. The native runtime runs each service as a process on your machine, with no Docker daemon, on Linux and on macOS on Apple silicon.
 
-Both runtimes run the same local Supabase project with the same services. The default `supabase start` command always uses Docker. The runtime choice only exists for local projects started with `supabase stack start` or with `supabase start` after you turn on the `[experimental] stack` setting. See [Running multiple local projects](/docs/guides/local-development/parallel-projects) for those commands.
+Both runtimes run the same local Supabase project with the same services. The default `supabase start` command always uses Docker. The runtime choice only exists for local projects started with `supabase stack start` or with `supabase start` after you turn on the `[experimental] stack` setting. See [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects) for those commands.
 
 <Admonition type="caution" title="Experimental">
 
@@ -89,8 +89,4 @@ The `runtime.kind` field is `native` or `container`.
 - The native runtime allows more time than Docker for Postgres to become ready on a cold start, because it loads the database from freshly extracted binaries.
 - Running several native local projects on one machine works, but they share host resources without the limits containers provide. Use Docker for that case.
 
-## Learn more
-
-- [Running multiple local projects](/docs/guides/local-development/parallel-projects)
-- [Install and run the CLI](/docs/guides/local-development/cli/getting-started)
-- [CLI configuration](/docs/guides/local-development/cli/config)
+<ContentListings id="local-development-runtimes-learn-more" />

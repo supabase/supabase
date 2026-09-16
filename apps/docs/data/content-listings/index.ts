@@ -18,6 +18,10 @@ import {
   gettingStartedUseCases,
   gettingStartedWebAppDemos,
 } from './getting-started.data'
+import {
+  localDevelopmentParallelProjectsLearnMore,
+  localDevelopmentRuntimesLearnMore,
+} from './local-development.data'
 import { logDrainsDestinations } from './log-drains.data'
 import { realtimeExamples, realtimeGetStarted, realtimeResources } from './realtime.data'
 import { resourcesMigrate, resourcesOverview, resourcesPostgres } from './resources.data'
@@ -55,6 +59,8 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   gettingStartedFrameworkQuickstarts,
   gettingStartedWebAppDemos,
   gettingStartedMobileTutorials,
+  localDevelopmentParallelProjectsLearnMore,
+  localDevelopmentRuntimesLearnMore,
   logDrainsDestinations,
   realtimeGetStarted,
   realtimeExamples,

@@ -2181,7 +2181,7 @@ The \`supabase stack\` commands are experimental and their interface can change 
     icon: Terminal,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/local-development/parallel-projects',
+    docsUrl: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects',
     slug: 'parallel-local-projects',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -2210,7 +2210,7 @@ The native runtime supports Linux on amd64 and arm64 and macOS on Apple silicon.
     icon: Terminal,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/local-development/runtimes',
+    docsUrl: 'https://supabase.com/docs/guides/local-development/docker-and-native-runtimes',
     slug: 'native-local-runtime',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,

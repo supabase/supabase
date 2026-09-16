@@ -1,5 +1,5 @@
 ---
-id: 'parallel-projects'
+id: 'running-multiple-local-projects'
 title: 'Running multiple local projects'
 description: 'Run more than one local Supabase project on the same machine, one per app, git worktree, or named environment, with the experimental supabase stack commands.'
 subtitle: 'Run a local Supabase project for every app, git worktree, or environment on one machine'
@@ -34,6 +34,7 @@ Each local project also records the runtime it started with, Docker or native. S
 
 You need:
 
+- Git. The current git branch is part of a local project's identity, so the CLI reads it from your app directory on every start.
 - The Supabase CLI from the beta channel. The `supabase stack` command isn't in the stable channel yet. Run `supabase stack --help` to confirm your install has it. See [Beta channel](/docs/guides/local-development/cli/getting-started#beta-channel) for how to install or switch to it.
 - Docker, or another Docker-compatible engine, for the Docker runtime. Docker is the recommended runtime for running several local projects at the same time. The native runtime needs no Docker but runs only on macOS on Apple silicon and on Linux for `amd64` and `arm64`. See [Choose a runtime](#choose-a-runtime).
 - An app directory initialized with `supabase init`, or a directory without a `supabase/config.toml`. Without a config file, the local project starts with default settings and doesn't create one.
@@ -132,7 +133,7 @@ A local project runs in the Docker runtime or the native runtime. Docker runs ea
 
 For several local projects on one machine, use Docker. Containers give each local project its own network namespace, file system, and resource limits, so a busy or crashing local project is less likely to affect its siblings. Native local projects share the host's process table and file locks, so use the native runtime where Docker isn't available, such as coding agent sandboxes and CI runners without a daemon.
 
-When you don't pass `--runtime`, the CLI picks Docker if the `docker` command is installed and native otherwise. The runtime is fixed for the life of a local project. For how the CLI picks a runtime, platform requirements, and what the native runtime downloads, see [Docker and native runtimes](/docs/guides/local-development/runtimes).
+When you don't pass `--runtime`, the CLI picks Docker if the `docker` command is installed and native otherwise. The runtime is fixed for the life of a local project. For how the CLI picks a runtime, platform requirements, and what the native runtime downloads, see [Docker and native runtimes](/docs/guides/local-development/docker-and-native-runtimes).
 
 ## Stop and destroy local projects
 
@@ -195,10 +196,4 @@ Keep these differences in mind when you turn the setting on:
 - Switching branches switches local projects. The git branch is part of the identity, so checking out another branch in the same directory and running `supabase stack start` creates or resumes a different local project with its own data. The first branch's local project keeps running until you stop it.
 - Moving an app directory creates a new local project. The identity includes the directory path. If you rename or move the directory, the next start creates a new local project, and the previous one's data stays under the old identity until you destroy it.
 
-## Learn more
-
-- [Install and run the CLI](/docs/guides/local-development/cli/getting-started)
-- [Local development workflow](/docs/guides/local-development/cli-workflows)
-- [Docker and native runtimes](/docs/guides/local-development/runtimes)
-- [Managing config and secrets](/docs/guides/local-development/managing-config)
-- [CLI configuration](/docs/guides/local-development/cli/config)
+<ContentListings id="local-development-parallel-projects-learn-more" />
