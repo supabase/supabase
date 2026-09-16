@@ -24,7 +24,7 @@ export type ResolvedConfigFieldDefinition = ConfigFieldDefinition & { configPath
 export const toProjectHomepageHref = (projectRef: string) => `/project/${projectRef}`
 const toAuthUrlConfigHref = (projectRef: string) => `/project/${projectRef}/auth/url-configuration`
 const toAuthProvidersHref = (provider?: string) => (projectRef: string) =>
-  `/project/${projectRef}/auth/providers${provider ? `/${provider}` : ''}`
+  `/project/${projectRef}/auth/providers${provider ? `?provider=${provider}` : ''}`
 const toAuthProtectionHref = (projectRef: string) => `/project/${projectRef}/auth/protection`
 const toDatabaseSettingsHref = (projectRef: string) => `/project/${projectRef}/database/settings`
 const toDataApiSettingsHref = (projectRef: string) =>
