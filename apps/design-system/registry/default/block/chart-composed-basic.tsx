@@ -52,11 +52,11 @@ export default function ComposedChartBasic() {
     },
     performance: {
       label: 'Performance',
-      color: 'hsl(var(--chart-2))',
+      color: 'var(--chart-2)',
     },
     efficiency: {
       label: 'Efficiency',
-      color: 'hsl(var(--chart-5))',
+      color: 'var(--chart-5)',
     },
   }
 

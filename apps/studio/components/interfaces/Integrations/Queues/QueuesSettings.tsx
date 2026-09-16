@@ -281,11 +281,7 @@ export const QueuesSettings = () => {
                             })}
                           </ul>
 
-                          <Button
-                            variant="default"
-                            className="mt-3"
-                            onClick={() => setRlsConfirmModalOpen(true)}
-                          >
+                          <Button className="mt-3" onClick={() => setRlsConfirmModalOpen(true)}>
                             Enable RLS on{' '}
                             {tablesWithoutRLS.length === 1
                               ? queueDisplayName(tablesWithoutRLS[0].name)
@@ -333,7 +329,6 @@ export const QueuesSettings = () => {
                 />
                 <div className="flex items-center gap-x-2">
                   <Button
-                    variant="default"
                     disabled={Object.keys(formState.dirtyFields).length === 0 || isToggling}
                     onClick={() => form.reset({ enable: false })}
                   >

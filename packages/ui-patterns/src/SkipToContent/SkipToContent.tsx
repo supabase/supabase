@@ -26,7 +26,7 @@ function SkipToContent({ href, children = 'Skip to content', className }: SkipTo
         className
       )}
     >
-      <Button size="tiny" variant="default" asChild>
+      <Button size="tiny" asChild>
         <a href={href}>{children}</a>
       </Button>
     </div>

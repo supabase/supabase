@@ -58,7 +58,7 @@ const CommandInput = React.forwardRef<
     ref
   ) => (
     <div className={cn('flex items-center border-b px-4', wrapperClassName)} cmdk-input-wrapper="">
-      {showSearchIcon && <Search className="h-4 w-4 shrink-0 opacity-50" />}
+      {showSearchIcon && <Search className="h-4 w-4 shrink-0 opacity-50" aria-hidden />}
       <CommandPrimitive.Input
         ref={ref}
         className={cn(
@@ -73,12 +73,13 @@ const CommandInput = React.forwardRef<
           tabIndex={props.disabled || !props.value?.length ? -1 : 0}
           disabled={props.disabled || !props.value?.length}
           onClick={handleReset}
+          aria-label="Clear search"
           className={cn(
             'text-foreground-lighter hover:text-foreground-light hover:cursor-pointer transition-all opacity-0 duration-100',
             !!props.value?.length && 'opacity-100'
           )}
         >
-          <RemoveIcon size={14} />
+          <RemoveIcon size={14} aria-hidden />
         </button>
       )}
     </div>

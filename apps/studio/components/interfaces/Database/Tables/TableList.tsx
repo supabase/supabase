@@ -54,6 +54,7 @@ import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { useForeignTablesQuery } from '@/data/foreign-tables/foreign-tables-query'
@@ -321,7 +322,6 @@ export const TableList = ({
                     </div>
                     <Button
                       size="tiny"
-                      variant="default"
                       onClick={() => setVisibleTypes([value])}
                       className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
                     >
@@ -342,12 +342,18 @@ export const TableList = ({
               onTrigger={() => onAddTable()}
               side="bottom"
             >
-              <Button className="w-auto ml-auto" icon={<Plus />} onClick={() => onAddTable()}>
+              <Button
+                variant="primary"
+                className="w-auto ml-auto"
+                icon={<Plus />}
+                onClick={() => onAddTable()}
+              >
                 New table
               </Button>
             </Shortcut>
           ) : (
             <ButtonTooltip
+              variant="primary"
               className="w-auto ml-auto"
               icon={<Plus />}
               disabled
@@ -424,14 +430,7 @@ export const TableList = ({
                     </TableRow>
                   )}
                   {entities.length === 0 && filterString.length > 0 && (
-                    <TableRow key={selectedSchema}>
-                      <TableCell colSpan={7}>
-                        <p className="text-sm text-foreground">No results found</p>
-                        <p className="text-sm text-foreground-light">
-                          Your search for "{filterString}" did not return any results
-                        </p>
-                      </TableCell>
-                    </TableRow>
+                    <TableRowNoResults key={selectedSchema} colSpan={7} search={filterString} />
                   )}
                   {entities.length > 0 &&
                     entities.map((x) => (
@@ -511,7 +510,7 @@ export const TableList = ({
                         </TableCell>
                         <TableCell>
                           <div className="flex justify-end gap-2">
-                            <Button asChild variant="default">
+                            <Button asChild>
                               <Link href={`/project/${ref}/database/tables/${x.id}`}>
                                 View columns
                               </Link>
@@ -523,7 +522,6 @@ export const TableList = ({
                                   <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
                                       <Button
-                                        variant="default"
                                         className="px-1"
                                         icon={<MoreVertical />}
                                         aria-label={`Table ${x.name} actions`}

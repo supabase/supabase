@@ -129,6 +129,10 @@ jobs:
 
       # Vercel skips the docs preview when a PR only changes the harness
       # (e2e/docs, workflow), so wait for a preview only when apps/docs changed.
+      # When apps/docs changed earlier in the PR but not in the head commit,
+      # Vercel skips the head build as not affected and its URL serves a
+      # placeholder page; the script then uses the newest READY preview from
+      # an earlier commit of the PR, which serves the same docs content.
       #
       # Vercel's GitHub App stopped writing GitHub Deployment objects on
       # 2026-02-17 (broken app auth), so vercel/wait-for-deployment-action
@@ -146,6 +150,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
           VERCEL_STATUS_CONTEXT: 'Vercel – docs'
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}

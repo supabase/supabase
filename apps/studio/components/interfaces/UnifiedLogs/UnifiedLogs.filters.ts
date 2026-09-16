@@ -16,13 +16,6 @@ export interface LogsColumnFilterValue {
   values: string[]
 }
 
-export const LOGS_FILTER_OPERATORS = [
-  '=',
-  '<>',
-  '~~*',
-  '!~~*',
-] as const satisfies readonly LogsFilterOperator[]
-
 const OPERATOR_TO_ABBREV: Record<LogsFilterOperator, string> = {
   '=': 'eq',
   '<>': 'neq',
@@ -83,10 +76,11 @@ export const groupLogsFiltersByColumn = (
 
 export const logsFiltersToColumnFilters = (
   filters: LogsFilter[]
-): { id: string; value: string[] | LogsColumnFilterValue }[] => {
-  return Object.entries(groupLogsFiltersByColumn(filters)).map(([id, group]) =>
-    group.operator === '=' ? { id, value: group.values } : { id, value: group }
-  )
+): { id: string; value: LogsColumnFilterValue }[] => {
+  return Object.entries(groupLogsFiltersByColumn(filters)).map(([id, group]) => ({
+    id,
+    value: group,
+  }))
 }
 
 // Seeds `date` too, so `logsFiltersToColumnFilters` (which only covers the `filter`

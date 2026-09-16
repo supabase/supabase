@@ -223,6 +223,7 @@ export interface MultiSelectorTriggerProps extends React.HTMLAttributes<HTMLButt
   persistLabel?: boolean
   className?: string
   badgeLimit?: number | 'wrap'
+  wrapBadges?: boolean
   deletableBadge?: boolean
   showIcon?: boolean
   mode?: MultiSelectorMode
@@ -335,6 +336,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
       className,
       deletableBadge = true,
       badgeLimit = 9999,
+      wrapBadges = false,
       showIcon = true,
       mode = 'combobox',
       renderValue,
@@ -357,7 +359,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     const [extraBadgesCount, setExtraBadgesCount] = React.useState(0)
     const [isDeleteHovered, setIsDeleteHovered] = React.useState(false)
 
-    const IS_BADGE_LIMIT_WRAP = badgeLimit === 'wrap'
+    const SHOULD_WRAP_BADGES = wrapBadges || badgeLimit === 'wrap'
     const IS_NUMERIC_LIMIT = typeof badgeLimit === 'number'
     const IS_INLINE_MODE = mode === 'inline-combobox'
     const HAS_TINY_PLACEHOLDER = size === 'tiny' && values.length === 0
@@ -365,12 +367,12 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     React.useEffect(() => {
       if (!inputRef?.current || !badgesRef.current) return
 
-      if (IS_BADGE_LIMIT_WRAP) {
-        setVisibleBadges(values)
-        setExtraBadgesCount(0)
-      } else {
+      if (IS_NUMERIC_LIMIT) {
         setVisibleBadges(values.slice(0, badgeLimit))
         setExtraBadgesCount(Math.max(0, values.length - badgeLimit))
+      } else {
+        setVisibleBadges(values)
+        setExtraBadgesCount(0)
       }
     }, [values, badgeLimit])
 
@@ -427,8 +429,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
             ref={badgesRef}
             className={cn(
               MultiSelectorBadgesVariants({ size }),
-              IS_BADGE_LIMIT_WRAP && 'flex-wrap',
-              !IS_BADGE_LIMIT_WRAP &&
+              SHOULD_WRAP_BADGES && 'flex-wrap',
+              !SHOULD_WRAP_BADGES &&
                 'overflow-x-auto scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg'
             )}
           >
@@ -478,7 +480,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
                 autoFocus={false}
                 wrapperClassName={cn(
                   MultiSelectorInlineInputWrapperVariants({ size }),
-                  IS_BADGE_LIMIT_WRAP && 'min-w-[85px]'
+                  SHOULD_WRAP_BADGES && 'min-w-[85px]'
                 )}
                 className={cn(
                   MultiSelectorInlineInputVariants({ size }),

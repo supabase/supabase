@@ -1,10 +1,9 @@
+import { API_URL } from '~/lib/constants'
+import { get } from '~/lib/fetchWrapper'
 import { components } from 'api-types'
 import { useEffect, useState } from 'react'
 
-import { API_URL } from '~/lib/constants'
-import { get } from '~/lib/fetchWrapper'
-
-export type Organization = components['schemas']['OrganizationResponse']
+export type Organization = components['schemas']['OrganizationResponse_Output']
 
 export function useOrganizations() {
   const [organizations, setOrganizations] = useState<Organization[]>([])

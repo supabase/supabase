@@ -453,7 +453,6 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                     </InputGroupAddon>
                   </InputGroup>
                   <Button
-                    variant="default"
                     onClick={() => setEvents([])}
                     className="text-foreground-lighter hover:text-foreground"
                   >

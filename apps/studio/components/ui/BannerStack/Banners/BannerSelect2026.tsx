@@ -50,7 +50,6 @@ export const BannerSelect2026 = () => {
         </div>
         <Button
           asChild
-          variant="default"
           size="tiny"
           className="relative z-[2] w-min"
           iconRight={<ArrowUpRight size={14} strokeWidth={1.5} />}

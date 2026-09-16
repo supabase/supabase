@@ -157,7 +157,7 @@ export const ColumnManagement = ({
         <div className="flex items-center justify-between w-full">
           <h5>Columns</h5>
           <div className="flex items-center gap-x-2">
-            <Button asChild variant="default" icon={<ExternalLink size={12} strokeWidth={2} />}>
+            <Button asChild icon={<ExternalLink size={12} strokeWidth={2} />}>
               <a
                 href={`${DOCS_URL}/guides/database/tables#data-types`}
                 target="_blank"
@@ -171,7 +171,7 @@ export const ColumnManagement = ({
                 <div className="py-3 border-r" />
                 {hasImportContent ? (
                   <div className="flex items-center gap-x-2">
-                    <Button variant="default" icon={<Edit />} onClick={onSelectImportData}>
+                    <Button icon={<Edit />} onClick={onSelectImportData}>
                       Edit content
                     </Button>
                     <Button variant="danger" icon={<Trash />} onClick={onClearImportContent}>
@@ -180,7 +180,6 @@ export const ColumnManagement = ({
                   </div>
                 ) : (
                   <Button
-                    variant="default"
                     onClick={() => {
                       onSelectImportData()
                       track('import_data_button_clicked', { tableType: 'New Table' })
@@ -336,9 +335,7 @@ export const ColumnManagement = ({
 
         {!hasImportContent && (
           <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-3">
-            <Button variant="default" onClick={() => onAddColumn()}>
-              Add column
-            </Button>
+            <Button onClick={() => onAddColumn()}>Add column</Button>
           </div>
         )}
       </div>

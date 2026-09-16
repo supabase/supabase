@@ -215,7 +215,7 @@ export function FilterCondition({
     valueItems.length,
     (index) => {
       const item = valueItems[index]
-      if (!item) return
+      if (!item || item.disabled) return
       if (item.isCustom) {
         setShowValueCustom(true)
       } else {
@@ -421,11 +421,13 @@ export function FilterCondition({
             })
           ) : (
             <DefaultCommandList
+              showSelection
               items={valueItems}
               highlightedIndex={valHighlightedIndex}
-              onSelect={(item) =>
+              onSelect={(item) => {
+                if (item.disabled) return
                 item.isCustom ? setShowValueCustom(true) : handleSelectMenuItem(item)
-              }
+              }}
               includeIcon
             />
           )}

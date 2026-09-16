@@ -11,7 +11,7 @@ import { get, handleError, isValidConnString, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type ProjectDetailVariables = { ref?: string; skipWake?: boolean }
-export type ProjectDetail = components['schemas']['ProjectDetailResponse']
+export type ProjectDetail = components['schemas']['ProjectDetailResponse_Output']
 export interface Project extends Omit<ProjectDetail, 'status'> {
   /**
    * postgrestStatus is available on client side only.

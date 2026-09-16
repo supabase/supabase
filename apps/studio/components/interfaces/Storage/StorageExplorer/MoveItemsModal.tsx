@@ -1,5 +1,4 @@
-import { noop } from 'lodash'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   Button,
   Dialog,
@@ -10,92 +9,95 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Input,
 } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { StorageItemWithColumn } from '../Storage.types'
+import { StorageItem, StorageItemWithColumn } from '../Storage.types'
+import { MoveItemsFolderPicker } from './MoveItemsFolderPicker'
+import {
+  getDestinationName,
+  getMoveItemsTitle,
+  getSourcePaths,
+  isSameAsSourcePath,
+} from './MoveItemsModal.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface MoveItemsModalProps {
+  projectRef: string
+  bucketId: string
   bucketName: string
   visible: boolean
   selectedItemsToMove: StorageItemWithColumn[]
+  openedFolders: readonly StorageItem[]
   onSelectCancel: () => void
   onSelectMove: (path: string) => void
 }
 
-export const MoveItemsModal = ({
-  bucketName = '',
-  visible = false,
-  selectedItemsToMove = [],
-  onSelectCancel = noop,
-  onSelectMove = noop,
-}: MoveItemsModalProps) => {
-  const [moving, setMoving] = useState(false)
-  const [newPath, setNewPath] = useState('')
+const MoveItemsDialogBody = ({
+  projectRef,
+  bucketId,
+  bucketName,
+  selectedItemsToMove,
+  openedFolders,
+  onSelectCancel,
+  onSelectMove,
+}: Omit<MoveItemsModalProps, 'visible'>) => {
+  const [isMoving, setIsMoving] = useState(false)
+  const [pathSegments, setPathSegments] = useState<string[]>([])
 
-  useEffect(() => {
-    setMoving(false)
-    setNewPath('')
-  }, [visible])
+  const destinationPath = pathSegments.join('/')
+  const destinationName = getDestinationName(bucketName, pathSegments)
+  const sourcePaths = getSourcePaths(selectedItemsToMove, openedFolders)
+  const isAlreadyInDestination = isSameAsSourcePath(sourcePaths, destinationPath)
 
-  const multipleFiles = selectedItemsToMove.length > 1
-
-  const title = multipleFiles
-    ? `Moving ${selectedItemsToMove.length} items within ${bucketName}`
-    : selectedItemsToMove.length === 1
-      ? `Moving ${selectedItemsToMove[0]?.name} within ${bucketName}`
-      : ``
-
-  const description = `Enter the path to where you'd like to move the file${
-    multipleFiles ? 's' : ''
-  } to.`
-
-  const onConfirmMove = (event: any) => {
-    if (event) {
-      event.preventDefault()
-    }
-    setMoving(true)
-    const formattedPath = newPath[0] === '/' ? newPath.slice(1) : newPath
-    onSelectMove(formattedPath)
+  const handleMove = () => {
+    setIsMoving(true)
+    onSelectMove(destinationPath)
   }
 
   return (
-    <Dialog open={visible} onOpenChange={onSelectCancel}>
-      <DialogContent size="medium">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
-        <DialogSectionSeparator />
-        <DialogSection>
-          <form>
-            <FormItemLayout
-              label={`Path to new directory in ${bucketName}`}
-              description="Leave blank to move items to the root of the bucket"
-              layout="vertical"
-              isReactForm={false}
-            >
-              <Input
-                autoFocus
-                type="text"
-                placeholder="e.g folder1/subfolder2"
-                value={newPath}
-                onChange={(event) => setNewPath(event.target.value)}
-              />
-            </FormItemLayout>
+    <>
+      <DialogHeader>
+        <DialogTitle>{getMoveItemsTitle(selectedItemsToMove)}</DialogTitle>
+        <DialogDescription>Select a destination folder in {bucketName}.</DialogDescription>
+      </DialogHeader>
+      <DialogSectionSeparator />
+      <DialogSection>
+        <MoveItemsFolderPicker
+          projectRef={projectRef}
+          bucketId={bucketId}
+          bucketName={bucketName}
+          pathSegments={pathSegments}
+          onChangePath={setPathSegments}
+        />
+      </DialogSection>
+      <DialogFooter className="gap-y-2">
+        <Button disabled={isMoving} onClick={onSelectCancel}>
+          Cancel
+        </Button>
+        <ButtonTooltip
+          variant="primary"
+          loading={isMoving}
+          disabled={isAlreadyInDestination}
+          onClick={handleMove}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: isAlreadyInDestination ? `Already in ${destinationName}` : undefined,
+            },
+          }}
+        >
+          {isMoving ? `Moving to ${destinationName}...` : `Move to ${destinationName}`}
+        </ButtonTooltip>
+      </DialogFooter>
+    </>
+  )
+}
 
-            <button tabIndex={-1} className="hidden" type="submit" onClick={onConfirmMove} />
-          </form>
-        </DialogSection>
-        <DialogFooter>
-          <Button variant="default" onClick={onSelectCancel}>
-            Cancel
-          </Button>
-          <Button variant="primary" loading={moving} onClick={onConfirmMove}>
-            {moving ? 'Moving files' : 'Move files'}
-          </Button>
-        </DialogFooter>
+export const MoveItemsModal = ({ visible, ...props }: MoveItemsModalProps) => {
+  return (
+    <Dialog open={visible} onOpenChange={props.onSelectCancel}>
+      <DialogContent size="xlarge">
+        <MoveItemsDialogBody {...props} />
       </DialogContent>
     </Dialog>
   )

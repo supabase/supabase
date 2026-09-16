@@ -10,6 +10,7 @@ export { default as BucketPlus } from './bucket-plus';
 export { default as Chatgpt } from './chatgpt';
 export { default as Claude } from './claude';
 export { default as ClickHouse } from './click-house';
+export { default as Compute } from './compute';
 export { default as Database } from './database';
 export { default as Datadog } from './datadog';
 export { default as EdgeFunctions } from './edge-functions';
@@ -34,5 +35,4 @@ export { default as Storage } from './storage';
 export { default as TableEditor } from './table-editor';
 export { default as User } from './user';
 export { default as VectorBucket } from './vector-bucket';
-export { default as Workers } from './workers';
 

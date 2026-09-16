@@ -32,7 +32,7 @@ export function generateRegistryTree(registryPath: string): RegistryNode[] {
   const sortedRegistry = [...registry.files].sort((a, b) => a.path.localeCompare(b.path))
 
   for (const file of sortedRegistry) {
-    const itemPath = file.target || getDefaultPath(file)
+    const itemPath = (file.target || getDefaultPath(file)).replace(/^~\//, '')
     const pathParts = itemPath.split('/').filter(Boolean)
     let currentLevel = tree
 

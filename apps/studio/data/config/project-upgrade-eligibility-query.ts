@@ -11,7 +11,7 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 export type ProjectUpgradeTargetVersion = { postgres_version: string; release_channel: string }
 export type ProjectUpgradeEligibilityVariables = { projectRef?: string }
 export type ProjectUpgradeEligibilityResponse =
-  components['schemas']['ProjectUpgradeEligibilityResponse']
+  components['schemas']['ProjectUpgradeEligibilityResponse_Output']
 export type ProjectUpgradeEligibilityValidationError =
   ProjectUpgradeEligibilityResponse['validation_errors'][number]
 export type ProjectUpgradeEligibilityWarning = ProjectUpgradeEligibilityResponse['warnings'][number]

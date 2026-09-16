@@ -359,7 +359,7 @@ describe('ExplorerNotebookTab', () => {
     renderNotebookTab()
 
     const runNotebookButton = await screen.findByRole('button', { name: 'Run notebook' })
-    expect(runNotebookButton).toBeDisabled()
+    expect(runNotebookButton).toBeAriaDisabled()
   })
 
   it('toggles and persists the Intellisense enabled preference from "More options"', async () => {

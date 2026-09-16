@@ -87,7 +87,6 @@ export const SecretRow = ({ secret, appId }: SecretRowProps) => {
         </div>
         <div className="flex items-center gap-2">
           <ButtonTooltip
-            variant="default"
             className="w-7"
             icon={<Trash />}
             disabled={!appId || !canManageSecrets || isLast}

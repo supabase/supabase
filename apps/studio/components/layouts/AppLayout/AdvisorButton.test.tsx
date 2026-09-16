@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AdvisorButton } from '@/components/layouts/AppLayout/AdvisorButton'
 import { render } from '@/tests/helpers'
@@ -54,10 +54,6 @@ describe('AdvisorButton', () => {
       isError: false,
       dismissSignal: vi.fn(),
     })
-  })
-
-  afterEach(() => {
-    vi.clearAllMocks()
   })
 
   it('shows a warning dot when advisor signals are present', () => {
