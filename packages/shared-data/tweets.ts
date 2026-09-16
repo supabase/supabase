@@ -24,6 +24,12 @@ const tweets = [
     img_url: '/images/twitter-profiles/5KvPPRZz_400x400.jpg',
   },
   {
+    text: 'Love @supabase custom domains\n\nmakes the auth so much better',
+    url: 'https://x.com/orlandopedro_/status/1958618806143578336',
+    handle: 'orlandopedro_',
+    img_url: '/images/twitter-profiles/ZjIOtCGg_400x400.jpg',
+  },
+  {
     text: 'Loving #Supabase MCP. Claude Code would not only plan what data we should save but also figure out a migration script by checking what the schema looks like on Supabase via MCP.',
     url: 'https://x.com/sdusteric/status/1957703488470921550',
     handle: 'sdusteric',
