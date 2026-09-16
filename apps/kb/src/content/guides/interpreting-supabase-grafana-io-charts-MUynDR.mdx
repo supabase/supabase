@@ -14,7 +14,29 @@ There are two primary values that matter for IO:
 
 Each compute instance has unique IO settings. The current baseline (sustained) and max (burst) limits are listed below.
 
-<ComputeDiskLimitsTable />
+| Compute Instance        | Baseline Throughput (MB/s) | Max Throughput (MB/s) | Baseline IOPS | Max IOPS     |
+| ----------------------- | -------------------------- | --------------------- | ------------- | ------------ |
+| Nano (free)             | 5 MB/s                     | 261 MB/s              | 250 IOPS      | 11,800 IOPS  |
+| Micro                   | 11 MB/s                    | 261 MB/s              | 500 IOPS      | 11,800 IOPS  |
+| Small                   | 22 MB/s                    | 261 MB/s              | 1,000 IOPS    | 11,800 IOPS  |
+| Medium                  | 43 MB/s                    | 261 MB/s              | 2,000 IOPS    | 11,800 IOPS  |
+| Large                   | 79 MB/s                    | 594 MB/s              | 3,600 IOPS    | 20,000 IOPS  |
+| XL                      | 149 MB/s                   | 594 MB/s              | 6,000 IOPS    | 20,000 IOPS  |
+| 2XL                     | 297 MB/s                   | 594 MB/s              | 12,000 IOPS   | 20,000 IOPS  |
+| 4XL                     | 594 MB/s                   | 594 MB/s              | 20,000 IOPS   | 20,000 IOPS  |
+| 8XL                     | 1,188 MB/s                 | 1,188 MB/s            | 40,000 IOPS   | 40,000 IOPS  |
+| 12XL                    | 1,781 MB/s                 | 1,781 MB/s            | 50,000 IOPS   | 50,000 IOPS  |
+| 16XL                    | 2,375 MB/s                 | 2,375 MB/s            | 80,000 IOPS   | 80,000 IOPS  |
+| 24XL                    | 3,750 MB/s                 | 3,750 MB/s            | 120,000 IOPS  | 120,000 IOPS |
+| 24XL - Optimized CPU    | 3,750 MB/s                 | 3,750 MB/s            | 120,000 IOPS  | 120,000 IOPS |
+| 24XL - Optimized Memory | 3,750 MB/s                 | 3,750 MB/s            | 120,000 IOPS  | 120,000 IOPS |
+| 24XL - High Memory      | 3,750 MB/s                 | 3,750 MB/s            | 120,000 IOPS  | 120,000 IOPS |
+| 48XL                    | 5,000 MB/s                 | 5,000 MB/s            | 240,000 IOPS  | 240,000 IOPS |
+| 48XL - Optimized CPU    | 5,000 MB/s                 | 5,000 MB/s            | 240,000 IOPS  | 240,000 IOPS |
+| 48XL - Optimized Memory | 5,000 MB/s                 | 5,000 MB/s            | 240,000 IOPS  | 240,000 IOPS |
+| 48XL - High Memory      | 5,000 MB/s                 | 5,000 MB/s            | 240,000 IOPS  | 240,000 IOPS |
+
+_Values as of Sep 16, 2026 — check the [compute add-ons](/docs/guides/platform/compute-and-disk) page for current limits._
 
 Compute sizes below XL can burst above baseline for short periods before returning back to their baseline behavior.
 

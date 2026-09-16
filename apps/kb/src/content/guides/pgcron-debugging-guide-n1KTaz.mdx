@@ -50,8 +50,6 @@ If the query does not return a row, the worker has died. To revive it, you must 
   src="https://github.com/user-attachments/assets/d7a2956c-08e0-4ebc-be08-d14a2383f36b"
 />
 
-<br />
-
 #### Check the `cron.job_run_details` table for more information
 
 pg_cron creates logs in its own table `cron.job_run_details`. The below query checks for issues from the past 5 days :
@@ -70,8 +68,6 @@ LIMIT 10;
 Respond to the errors exposed appropriately.
 
 > Long running jobs may show timeout errors. For jobs that are intended to execute for extended periods, consider wrapping their queries in functions with custom timeouts ([guide](/docs/guides/database/postgres/timeouts#function-level)).
-
-<br />
 
 #### Check if there are too many cron jobs running concurrently
 
@@ -104,8 +100,6 @@ FROM pg_stat_activity where application_name ilike 'pg_cron';
 
 You can view your concurrent peak connection usage throughout the day at the bottom of the [Observability Dashboard](/dashboard/project/_/observability/database)
 
-<br />
-
 #### Check for database strain
 
 Unfortunately, excessive resource strain can slow down or disrupt jobs.
@@ -118,8 +112,6 @@ Go to the [reports page](/dashboard/project/_/observability/database) (or [Supab
 - [CPU](https://github.com/orgs/supabase/discussions/27022)
 
 It is important to make sure you are running the latest release of pg_cron (1.6.4) if you're noticing strain. It is the most robust.
-
-<br />
 
 #### Check the logs for more information
 
@@ -147,8 +139,6 @@ limit 100;
 ```
 
 If you're interested in modifying the query, there is an advanced [guide](https://github.com/orgs/supabase/discussions/26224) for navigating the Postgres logs and a general-purpose [one](/docs/guides/observability/advanced-log-filtering) for applying filters.
-
-<br />
 
 #### Create custom logs within cron jobs
 
@@ -180,13 +170,9 @@ $$;
 
 You can then search for your custom messages in the [Logs Interface](/dashboard/project/_/logs/postgres-logs)
 
-<br />
-
 #### Upgrading pg_cron version
 
 The current version of `pg_cron` on Supabase is 1.6.4. It comes with a [few bug fixes](https://github.com/citusdata/pg_cron/releases/tag/v1.6.4). You should consider upgrading to Postgres v15.6.1.122+ in the [General Settings](/dashboard/project/_/settings/general) to get the latest extension.
-
-<br />
 
 #### Contacting support and the maintainers
 

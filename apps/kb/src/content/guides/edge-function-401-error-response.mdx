@@ -122,27 +122,13 @@ Your project uses the [new asymmetric keys](/blog/jwt-signing-keys) for authenti
 
 **Fix:** Disable the built-in JWT check using one of the below methods and optionally [handle auth in your function code](/docs/guides/functions/auth)
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-  <AccordionItem
-      header="Method A: Dashboard"
-      id="item-1"
-    >
+#### Method A: Dashboard
 
 In the [Functions Dashboard](/dashboard/project/_/functions/), open the affected function's `detail tab` and toggle off JWT verification.
 
 ![image](/docs/img/troubleshooting/401_edge_functions_toggle_off_JWT_check.png)
 
-  </AccordionItem>
-  <AccordionItem
-      header="Method B: Supabase CLI"
-      id="item-2"
-    >
+#### Method B: Supabase CLI
 
 Redeploy the edge function from the [Supabase CLI](/docs/guides/functions/quickstart) with the `--no-verify-jwt` flag
 
@@ -150,12 +136,8 @@ Redeploy the edge function from the [Supabase CLI](/docs/guides/functions/quicks
 supabase functions deploy YOUR_FUNCTION_NAME --no-verify-jwt
 ```
 
-    </AccordionItem>
+#### Method C: Management API
 
-  <AccordionItem
-      header="Method C: Management API"
-      id="item-3"
-    >
 Disable the legacy auth check with the [Supabase Management API](/docs/reference/api/introduction):
 
 1. Generate a token at [Account Preferences](/dashboard/account/tokens).
@@ -169,10 +151,6 @@ curl 'https://api.supabase.com/v1/projects/PROJECT_ID/functions/FUNCTION_NAME' \
   --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
   --data '{"verify_jwt": false}'
 ```
-
-    </AccordionItem>
-
-</Accordion>
 
 ### Invalid key
 

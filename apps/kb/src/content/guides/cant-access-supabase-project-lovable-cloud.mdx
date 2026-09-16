@@ -48,60 +48,26 @@ For more information, read [the Lovable Cloud FAQ](https://docs.lovable.dev/feat
 
 ## Frequently asked questions
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-  <AccordionItem
-      header="Can I get access to the Supabase SQL editor when using Lovable Cloud?"
-      id="sql-editor-access"
-    >
+### Can I get access to the Supabase SQL editor when using Lovable Cloud?
 
-    No. Projects running on **Lovable Cloud** use a managed Supabase backend that doesn't provide direct SQL editor access through [supabase.com/dashboard](/dashboard).
+No. Projects running on **Lovable Cloud** use a managed Supabase backend that doesn't provide direct SQL editor access through [supabase.com/dashboard](/dashboard).
 
-    </AccordionItem>
+### Why doesn't my Supabase project appear on my dashboard?
 
-  <AccordionItem
-      header="Why doesn't my Supabase project appear on my dashboard?"
-      id="project-not-showing"
-    >
+Lovable Cloud projects are owned and managed by **Lovable**, not by your personal Supabase account. They won't show up on your dashboard.
 
-    Lovable Cloud projects are owned and managed by **Lovable**, not by your personal Supabase account. They won't show up on your dashboard.
+### Can I disconnect my project from Lovable Cloud and connect it to my own Supabase account?
 
-    </AccordionItem>
+Once Lovable Cloud is enabled for a project, it **cannot be disconnected or switched** to an external Supabase connection.
 
-  <AccordionItem
-      header="Can I disconnect my project from Lovable Cloud and connect it to my own Supabase account?"
-      id="disconnect-project"
-    >
+However, you can **create a new Supabase project under your own account** and migrate your data by following Lovable's [Project Migration Guide](https://docs.lovable.dev/tips-tricks/self-hosting).
 
-    Once Lovable Cloud is enabled for a project, it **cannot be disconnected or switched** to an external Supabase connection.
+### I can't get my database URL to connect from an external tool (like BI tools or Postgres connectors).
 
-    However, you can **create a new Supabase project under your own account** and migrate your data by following Lovable's [Project Migration Guide](https://docs.lovable.dev/tips-tricks/self-hosting).
+External connections are **not supported** when your project runs on Lovable Cloud.
 
-    </AccordionItem>
+### I can't get my service role key to integrate an external service (like n8n or Make.com).
 
-  <AccordionItem
-      header="I can't get my database URL to connect from an external tool (like BI tools or Postgres connectors)."
-      id="database-url"
-    >
+Service role and API keys are **not accessible** for Lovable Cloud–managed projects.
 
-    External connections are **not supported** when your project runs on Lovable Cloud.
-
-    </AccordionItem>
-
-  <AccordionItem
-      header="I can't get my service role key to integrate an external service (like n8n or Make.com)."
-      id="service-role-key"
-    >
-
-    Service role and API keys are **not accessible** for Lovable Cloud–managed projects.
-
-    If you need to integrate with external automation or API-based tools, you'll need to **create and manage your own Supabase project**, then connect Lovable to it directly.
-
-    </AccordionItem>
-
-</Accordion>
+If you need to integrate with external automation or API-based tools, you'll need to **create and manage your own Supabase project**, then connect Lovable to it directly.

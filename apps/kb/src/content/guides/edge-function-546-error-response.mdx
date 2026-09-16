@@ -127,20 +127,11 @@ If you find a reliable way to induce the error, you may want to [log](/docs/guid
 
 There are a few other queries that may be useful for identifying patterns around 546 errors.
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="Checking if a specific version is an offender"
-      id="item-1"
-    >
-        Every time you update a function, its version number increments. It may be that you made an update and it's only a specific version that is problematic.
+#### Checking if a specific version is an offender
 
-        You can check error frequency by version with the below query:
+Every time you update a function, its version number increments. It may be that you made an update and it's only a specific version that is problematic.
+
+You can check error frequency by version with the below query:
 
 ```sql
 select
@@ -159,75 +150,60 @@ order by pct_546
 limit 100;
 ```
 
-    </AccordionItem>
+#### Check error frequency by time
 
-    <AccordionItem
-      header="Check error frequency by time"
-      id="item-2"
-    >
+You can check to see how frequent 546 errors are per hour with the below query:
 
-    You can check to see how frequent 546 errors are per hour with the below query:
+```sql
+select
+  formatDateTime(toStartOfHour(timestamp), '%Y-%m-%d %H:00', 'UTC') as hour,
+  count() as total_responses,
+  countIf(toInt32OrZero(log_attributes['response.status_code']) = 546) as total_546,
+  countIf(toInt32OrZero(log_attributes['response.status_code']) = 546) / count() * 100 as pct_546
+from logs
+where
+  source = 'function_edge_logs'
+  -- <--OPTIONAL FILTER: add specific function name to target query
+  and log_attributes['request.pathname'] = '/functions/v1/FUNCTION_NAME'
+group by hour
+order by hour desc
+limit 24;
+```
 
-    ```sql
-    select
-      formatDateTime(toStartOfHour(timestamp), '%Y-%m-%d %H:00', 'UTC') as hour,
-      count() as total_responses,
-      countIf(toInt32OrZero(log_attributes['response.status_code']) = 546) as total_546,
-      countIf(toInt32OrZero(log_attributes['response.status_code']) = 546) / count() * 100 as pct_546
+The output may look like:
+![image](/docs/img/troubleshooting/546_errors_by_hour.png)
+
+If the failures are concentrated to a specific time, you can check if you made any updates around that period or if users were engaging in atypical behavior, such as sending larger payloads.
+
+#### Check requests per isolate
+
+If your isolates are serving more than 2 requests before retiring, it suggests variability in how much processing each request needs. In that case, you may want to cross compare your successful requests with your failed ones. Maybe there's a query parameter or specific content-length header that makes failures more likely.
+
+```sql
+select
+  count() as requests_served,
+  fl.execution_id as isolate_id
+from
+  (
+    select log_attributes['execution_id'] as execution_id
     from logs
-    where
-      source = 'function_edge_logs'
-      -- <--OPTIONAL FILTER: add specific function name to target query
-      and log_attributes['request.pathname'] = '/functions/v1/FUNCTION_NAME'
-    group by hour
-    order by hour desc
-    limit 24;
-    ```
-
-    The output may look like:
-    ![image](/docs/img/troubleshooting/546_errors_by_hour.png)
-
-    If the failures are concentrated to a specific time, you can check if you made any updates around that period or if users were engaging in atypical behavior, such as sending larger payloads.
-
-
-    </AccordionItem>
-
-    <AccordionItem
-      header="Check requests per isolate"
-      id="item-3"
-    >
-
-    If your isolates are serving more than 2 requests before retiring, it suggests variability in how much processing each request needs. In that case, you may want to cross compare your successful requests with your failed ones. Maybe there's a query parameter or specific content-length header that makes failures more likely.
-
-    ```sql
+    where source = 'function_logs'
+      and log_attributes['reason'] in ('Memory', 'CPUTime')
+  ) as fl
+  inner join (
     select
-      count() as requests_served,
-      fl.execution_id as isolate_id
-    from
-      (
-        select log_attributes['execution_id'] as execution_id
-        from logs
-        where source = 'function_logs'
-          and log_attributes['reason'] in ('Memory', 'CPUTime')
-      ) as fl
-      inner join (
-        select
-          log_attributes['execution_id'] as execution_id,
-          log_attributes['request.pathname'] as pathname,
-          log_attributes['request.method'] as method
-        from logs
-        where source = 'function_edge_logs'
-          and log_attributes['request.method'] != 'OPTIONS' --ignore OPTION requests
-          -- <-- add your function name to inspect specific endpoints
-          and log_attributes['request.pathname'] = '/functions/v1/FUNCTION_NAME'
-      ) as fel on fl.execution_id = fel.execution_id
-    group by isolate_id
-    limit 100;
-    ```
-
-    </AccordionItem>
-
-</Accordion>
+      log_attributes['execution_id'] as execution_id,
+      log_attributes['request.pathname'] as pathname,
+      log_attributes['request.method'] as method
+    from logs
+    where source = 'function_edge_logs'
+      and log_attributes['request.method'] != 'OPTIONS' --ignore OPTION requests
+      -- <-- add your function name to inspect specific endpoints
+      and log_attributes['request.pathname'] = '/functions/v1/FUNCTION_NAME'
+  ) as fel on fl.execution_id = fel.execution_id
+group by isolate_id
+limit 100;
+```
 
 ## Step 3: Correcting the error
 

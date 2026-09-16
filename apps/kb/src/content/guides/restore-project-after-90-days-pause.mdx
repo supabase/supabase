@@ -70,17 +70,7 @@ Get your access token from the [Account Tokens page](/dashboard/account/tokens),
 chmod +x sync_supabase_config.sh
 ```
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-  <AccordionItem
-      header="Config sync script"
-      id="config-sync-script"
-    >
+### Config sync script
 
 ```bash
 #!/usr/bin/env bash
@@ -272,10 +262,6 @@ done
 
 echo "Done. Configs saved to ${OUTDIR}/"
 ```
-
-    </AccordionItem>
-
-</Accordion>
 
 The script saves both source and target configs to a local `config_sync_<timestamp>/` directory so you can review exactly what changed. Use `--dry-run` to preview differences without applying them.
 

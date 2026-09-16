@@ -40,8 +40,7 @@ For RLS like this:
 Use this instead:
 `(select is_admin()) OR (select auth.uid()) = user_id`
 
-<details>
-  <summary>is_admin() function:</summary>
+##### is_admin() function:
 
 ```sql
 CREATE OR REPLACE FUNCTION is_admin()
@@ -52,8 +51,6 @@ begin
 end;
 $$ language plpgsql security definer;
 ```
-
-</details>
 
 #### 3. Do not rely on RLS for filtering but only for security.
 
@@ -75,8 +72,7 @@ Remember functions you use in RLS can be called from the API.
 Secure your functions in an alternate schema if their results would be a security leak.
 Warning: If your security definer function uses row information as an input parameter be sure to test performance as you can't wrap the function as in 2.
 
-<details>
-  <summary>has_role() function:</summary>
+##### has_role() function:
 
 ```sql
 CREATE OR REPLACE FUNCTION has_role()
@@ -87,8 +83,6 @@ begin
 end;
 $$ language plpgsql security definer;
 ```
-
-</details>
 
 #### 5. Always optimize join queries to compare row columns to fixed join data.
 
@@ -206,8 +200,7 @@ This case times out with over 3 minutes as 1M rows must be searched and the func
 Changing to wrap the function (method 2) `team_id = ANY(ARRAY(select user_teams()))` is a big improvement but can still take seconds.
 Adding an index to team_id is the big win, but only with the second case. Without, the index case still times out.
 
-<details>
-  <summary>user_teams() function returning an array:</summary>
+##### user_teams() function returning an array:
 
 ```sql
 CREATE OR REPLACE FUNCTION user_teams()
@@ -218,8 +211,6 @@ begin
 end;
 $$ language plpgsql security definer;
 ```
-
-</details>
 
 Some results:
 
