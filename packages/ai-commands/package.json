@@ -29,7 +29,7 @@
     "@types/node": "catalog:",
     "api-types": "workspace:*",
     "chalk": "^5.3.0",
-    "dotenv": "^16.3.1",
+    "dotenv": "^17.4.2",
     "libpg-query": "15.2.0",
     "mdast-util-from-markdown": "^2.0.0",
     "sql-formatter": "^15.0.0",
