@@ -70,7 +70,7 @@ If inserts work but updates or deletes fail, the source probably isn't sending e
 
 ## Why is a pipeline failed or stopped?
 
-**Failed** means the pipeline encountered a non-retryable configuration, schema, or data error. **Stopped** means it was stopped manually, by an operation, because its project became inactive, or after repeated failures. Neither state restarts on its own.
+**Failed** means the pipeline currently reports a startup or runtime failure. It can recover automatically, so check its status and logs before restarting it. **Stopped** means the pipeline is no longer running, for example after a manual stop, project inactivity, or repeated failures. A stopped pipeline needs to be started manually.
 
 To recover:
 
@@ -96,7 +96,7 @@ See [Slot statuses](/docs/guides/database/replication/pipelines-monitoring#slot-
 
 ## Why is a table in error state?
 
-A table can enter an error state during initial sync or after an unsupported schema change. Open **View pipeline**, fix the reported problem, then restart the table. This deletes its existing destination data and runs a new, billable initial sync for that table. See [Table errors](/docs/guides/database/replication/pipelines-monitoring#table-errors) for the recovery flow.
+A table can enter an error state during initial sync or ongoing replication, including after an unsupported schema change. Open **View pipeline** and fix the reported problem. Some errors retry automatically; if a reset is required, restart the table's initial sync. This replaces its destination data and processes billable data again. See [Table errors](/docs/guides/database/replication/pipelines-monitoring#table-errors) for the recovery flow and its effect on other tables.
 
 ## What happens when a project becomes inactive or moves to the Free Plan?
 

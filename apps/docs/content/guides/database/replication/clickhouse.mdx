@@ -173,6 +173,10 @@ The following changes are not applied automatically:
 
 New scalar columns are made nullable when ClickHouse needs a value for historical rows and the source default cannot be represented safely. Some Postgres defaults cannot be translated to ClickHouse and are skipped with a warning.
 
+Changing the publication's column list for an already tracked table is supported while the pipeline runs. A previously excluded scalar column is added as nullable without a default, so historical rows remain `NULL`. Publishing a previously excluded array column requires a new initial sync because ClickHouse cannot represent a nullable array. Removing a published column drops its destination values; adding it again does not restore them.
+
+After changing a replicated column's type or type modifiers, restart the table's initial sync. Pipelines logs a warning and leaves the destination type unchanged, which can cause later schema changes or writes to fail. See [Table errors](/docs/guides/database/replication/pipelines-monitoring#table-errors) for the reset procedure and billing impact.
+
 ClickHouse DDL is not transactional. An interrupted multi-column schema change can leave a partially applied destination schema. Don't repair managed tables or views manually. If the pipeline remains failed after a restart, [contact support](/dashboard/support/new).
 
 ## Troubleshooting

@@ -243,8 +243,8 @@ Available actions:
 - **Start pipeline**: Begin replication for a stopped pipeline
 - **Update available**: Review and apply the latest managed pipeline version when an update is available
 - **Stop pipeline**: Request a graceful stop. The pipeline can remain **Stopping** for up to five minutes while in-flight work finishes. New changes queue in the WAL, and configured pipeline-hour billing continues while stopped.
-- **Restart pipeline**: Stop and start the pipeline (required after publication changes)
-- **Edit destination**: Modify destination settings like credentials or advanced options
+- **Restart pipeline**: Restart with the saved settings and replication progress. Required after adding or removing publication tables; this doesn't reset tables that have already synced.
+- **Edit destination**: Modify destination settings like credentials or advanced options. Saving changes restarts an active pipeline; a stopped pipeline stays stopped.
 - **Delete destination**: Remove the destination and permanently stop replication
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}

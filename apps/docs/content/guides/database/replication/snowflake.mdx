@@ -216,7 +216,11 @@ Unsupported or limited changes:
 - Changing a column type isn't supported.
 - Source table and schema renames aren't supported.
 - Changes to nullability or existing column defaults are ignored.
-- Initial table creation can copy compatible literal defaults. Added columns can copy string, numeric, or boolean literal defaults. Other defaults are omitted.
+- Initial table creation can copy compatible literal defaults. Columns added in Postgres can copy string, numeric, or boolean literal defaults. Other defaults are omitted.
+
+Changing the publication's column list for an already tracked table is supported while the pipeline runs. Previously excluded columns are added as nullable without defaults, leaving historical events `NULL` for those columns. Removing a published column drops its destination values; adding it again does not restore them.
+
+After changing a replicated column's type or type modifiers, restart the table's initial sync. Pipelines logs a warning and leaves the destination type unchanged, which can cause later schema changes or writes to fail. This replaces the destination history with a new initial sync and future changes; it cannot recover past events. See [Table errors](/docs/guides/database/replication/pipelines-monitoring#table-errors) for the reset procedure and billing impact.
 
 Snowflake DDL changes existing history. Adding a column with a default can populate older rows. Renaming a column changes the historical schema. Dropping a column removes it from old events. Snowflake DDL is not transactional, so an interrupted multi-column change can leave a partially applied schema. Do not alter managed destination objects manually. If the pipeline remains failed after a restart, [contact support](/dashboard/support/new).
 

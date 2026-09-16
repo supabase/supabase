@@ -175,7 +175,9 @@ alter table public.your_table replica identity full;
 
 Schema change support for BigQuery is in beta. Pipelines detects supported changes in Postgres and updates the BigQuery table before replicating rows that use the new schema.
 
-Pipelines is built around transactional consistency: an initial sync produces a consistent point-in-time copy of a table, and CDC keeps applying changes from that point on. When Pipelines detects a schema change it can't apply safely to BigQuery, it stops replicating the affected table rather than risk writing an inconsistent copy. This favors a temporarily stalled table over corrupted destination data. You fix the underlying issue and resynchronize only that table; other tables in the pipeline keep replicating. A resynchronization repeats the initial sync and processes billable data again, so keep Postgres schema changes within the [supported set](#supported-changes) to avoid unplanned resyncs.
+An initial sync copies a consistent snapshot of each table, then applies changes made during the copy. During ongoing replication, Pipelines applies supported schema changes before writing rows that use the new schema. Some unsupported changes stop the affected table; others leave the BigQuery schema unchanged, as described below.
+
+If a table needs resynchronization, fix the cause and [restart that table's initial sync](/docs/guides/database/replication/pipelines-monitoring#table-errors). This replaces its destination data and processes billable data again. The reset temporarily stops the whole pipeline, but other tables retain their replication progress.
 
 ### Supported changes
 
@@ -195,19 +197,17 @@ Removing a column from the publication also removes the BigQuery column and its 
 
 ### Changes that require extra action
 
-- **Data type changes:** Pipelines detects the change but doesn't update the BigQuery column's data type, and later writes to that column can start failing. Resynchronize the table after changing a replicated column's data type. Supabase is exploring how to support data type changes without a full resync, but this isn't implemented yet; we're gathering feedback on what behavior would be useful before building it.
+- **Data type changes:** Pipelines detects changes to a column's type or type modifiers, such as numeric precision, but leaves the BigQuery type unchanged and logs a warning. Later schema changes or writes can fail. Resynchronize the table after changing a replicated column's type.
 - **Adding `NOT NULL`:** BigQuery doesn't support adding `NOT NULL` to an existing column, so BigQuery keeps the column nullable. Postgres still prevents new `NULL` values from being written.
 - **Primary-key changes:** Changing which columns make up the primary key, their names, or their order isn't supported. Pipelines rejects the schema change instead of applying it.
-- **Publishing an existing array column:** This applies when an array column that already has data is added to the publication's column list for a table that's already replicating (for example, with `alter publication ... set table your_table (id, name, tags)` to start including a `tags` array that was previously excluded). BigQuery `REPEATED` fields (BigQuery's array type) can't represent `NULL`, so BigQuery would initialize existing rows with an empty array instead. Because Pipelines doesn't know what those historical values were, filling them with an empty array would fabricate data, so Pipelines blocks the change and requires a resynchronization instead. Adding a brand new array column (one that doesn't exist in Postgres yet) isn't affected, because every row legitimately starts with an empty array.
+- **Publishing an existing array column:** Adding a previously excluded array column to the publication requires a resynchronization. BigQuery arrays can't represent `NULL`, so adding the destination column would expose an empty array for historical rows whose values Pipelines doesn't know. This restriction applies even if the source table is empty. Adding a new array column in Postgres is allowed, but existing BigQuery rows expose an empty array until a later row change supplies the source value; Pipelines doesn't backfill them.
 - **Interrupted schema changes:** BigQuery doesn't support transactional DDL. If Pipelines is interrupted (for example, by a crash) while applying a schema change, it can't tell which parts of the change completed. Pipelines refuses further writes to that table until you resynchronize it, rather than guess and risk corrupting data.
-
-A resynchronization repeats the initial sync and processes billable data again.
 
 ### Column defaults
 
 Pipelines supports literal defaults such as strings, numbers, dates, timestamps, JSON values, and UUIDs. It skips defaults that depend on when or where they run, including `now()`, sequences, `random()`, and generated UUID functions.
 
-Skipping a BigQuery default doesn't lose values from Postgres. Postgres evaluates the default, and Pipelines replicates the resulting value with future row changes. Defaults don't fill existing BigQuery rows.
+Skipping a BigQuery default doesn't lose values from Postgres. Postgres evaluates the default, and Pipelines replicates the resulting value with future row changes. Pipelines adds a column before setting its default, so [defaults don't fill existing BigQuery rows](https://cloud.google.com/bigquery/docs/default-values#change_default_values).
 
 ### Publication changes
 
