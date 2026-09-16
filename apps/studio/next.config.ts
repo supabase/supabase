@@ -212,19 +212,21 @@ const nextConfig = {
   },
 } satisfies NextConfig
 
+// Make sure adding Sentry options is the last code to run before exporting, to
+// ensure that your source maps include changes from all other Webpack plugins
 const platformConfig =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? withBundleAnalyzer(nextConfig) : nextConfig
 
 export default process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
   ? withSentryConfig(platformConfig, {
-      silent: true,
-      sourcemaps: {
-        disable: true,
-      },
-      useRunAfterProductionCompileHook: false,
+      silent: false,
+      debug: true,
 
       // For all available options, see:
       // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+
+      // Upload a larger set of source maps for prettier stack traces (increases build time)
+      widenClientFileUpload: true,
 
       // Automatically annotate React components to show their full name in breadcrumbs and session replay
       reactComponentAnnotation: {
