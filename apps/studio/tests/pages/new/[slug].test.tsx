@@ -105,16 +105,16 @@ const DEFAULT_AVAILABLE_REGIONS: RegionsInfo = {
 const FRANKFURT = 'Central EU (Frankfurt)'
 const SAO_PAULO = 'South America (São Paulo)'
 
-const AVAILABLE_REGIONS_WITH_SAO_PAULO: RegionsInfo = {
+const availableRegionsWithSaoPaulo = (status?: 'capacity' | 'other'): RegionsInfo => ({
   ...DEFAULT_AVAILABLE_REGIONS,
   all: {
     ...DEFAULT_AVAILABLE_REGIONS.all,
     specific: [
       ...DEFAULT_AVAILABLE_REGIONS.all.specific,
-      { code: 'sa-east-1', name: SAO_PAULO, provider: 'AWS', type: 'specific' },
+      { code: 'sa-east-1', name: SAO_PAULO, provider: 'AWS', type: 'specific', status },
     ],
   },
-}
+})
 
 const AVAILABLE_REGIONS_WITH_FRANKFURT: RegionsInfo = {
   ...DEFAULT_AVAILABLE_REGIONS,
@@ -493,77 +493,76 @@ describe('project creation wizard', () => {
       await screen.findByText('Error loading available regions')
     })
 
-    describe('restricted regions flag', () => {
-      const PAID_ONLY_SAO_PAULO = { projectCreationRestrictedRegions: '{"sa-east-1":"paid_only"}' }
+    describe('restricted regions', () => {
+      const CAPACITY_COPY = {
+        title: 'Selected region is at capacity',
+        description: 'Temporarily unavailable due to this region being at capacity.',
+      }
+      const GENERIC_COPY = {
+        title: 'Selected region is unavailable',
+        description: 'Temporarily unavailable for new projects.',
+      }
 
-      test('lets a free-plan user pick a paid-only region, then prompts to upgrade and blocks submission', async () => {
-        mockWizardEndpoints({
-          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
-          availableRegions: AVAILABLE_REGIONS_WITH_SAO_PAULO,
-        })
-        addAPIMock({ method: 'get', path: '/platform/organizations/:slug/members', response: [] })
-        addAPIMock({
-          method: 'get',
-          path: '/platform/organizations/:slug/members/invitations',
-          response: { invitations: [] },
-        })
-        addAPIMock({
-          method: 'get',
-          path: '/platform/organizations/:slug/roles',
-          response: { org_scoped_roles: [], project_scoped_roles: [] },
-        })
-        const onRequest = vi.fn()
-        mockCreateProject(onRequest)
-
-        await renderWizard({ flags: PAID_ONLY_SAO_PAULO })
-
-        await fillProjectName('Paid Region Project')
+      const expectSelectableRestrictedRegion = async (
+        onRequest: ReturnType<typeof vi.fn>,
+        copy: { title: string; description: string }
+      ) => {
+        await fillProjectName('Restricted Region Project')
         await generateAndWaitForStrongPassword()
         await user.click(getSelectTriggerByLabel('Region'))
 
         const saoPaulo = await screen.findByRole('option', { name: /São Paulo/ })
         expect(saoPaulo).not.toHaveAttribute('aria-disabled', 'true')
-        expect(within(saoPaulo).getByText('Paid plans')).toBeInTheDocument()
+        expect(within(saoPaulo).getByText('Unavailable')).toBeInTheDocument()
+        expect(
+          within(screen.getByRole('option', { name: /North Virginia/ })).queryByText('Unavailable')
+        ).not.toBeInTheDocument()
         await user.click(saoPaulo)
 
-        expect(await screen.findByText('Region available on paid plans only')).toBeInTheDocument()
+        expect(await screen.findByText(copy.title)).toBeInTheDocument()
+        expect(screen.getByText(copy.description, { exact: false })).toBeInTheDocument()
 
         fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 
-        await waitFor(() =>
-          expect(toast.error).toHaveBeenCalledWith(
-            `Select a different region. ${SAO_PAULO}: Available on paid plans only.`
-          )
-        )
+        const message = `${copy.title}. Select a different region to continue.`
+        expect(await screen.findByText(message)).toBeInTheDocument()
         expect(onRequest).not.toHaveBeenCalled()
-      })
 
-      test('keeps a paid-only region selectable for a paid organization', async () => {
-        mockWizardEndpoints({ availableRegions: AVAILABLE_REGIONS_WITH_SAO_PAULO })
+        await selectRegion(/Americas/)
+        await waitFor(() => expect(screen.queryByText(message)).not.toBeInTheDocument())
+        expect(screen.queryByText(copy.title)).not.toBeInTheDocument()
+      }
 
-        await renderWizard({ flags: PAID_ONLY_SAO_PAULO })
-
-        await screen.findByPlaceholderText('Project name')
-        await user.click(getSelectTriggerByLabel('Region'))
-
-        const saoPaulo = await screen.findByRole('option', { name: /São Paulo/ })
-        expect(saoPaulo).not.toHaveAttribute('aria-disabled', 'true')
-        expect(within(saoPaulo).queryByText('Paid plans')).not.toBeInTheDocument()
-      })
-
-      test('leaves every region selectable when the flag is unresolved', async () => {
-        mockWizardEndpoints({
-          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
-          availableRegions: AVAILABLE_REGIONS_WITH_SAO_PAULO,
-        })
+      test('keeps a capacity-restricted region selectable, explains it, and blocks submission', async () => {
+        mockWizardEndpoints({ availableRegions: availableRegionsWithSaoPaulo('capacity') })
+        const onRequest = vi.fn()
+        mockCreateProject(onRequest)
 
         await renderWizard()
 
-        await screen.findByPlaceholderText('Project name')
-        await user.click(getSelectTriggerByLabel('Region'))
+        await expectSelectableRestrictedRegion(onRequest, CAPACITY_COPY)
+      })
 
-        const saoPaulo = await screen.findByRole('option', { name: /São Paulo/ })
-        expect(saoPaulo).not.toHaveAttribute('aria-disabled', 'true')
+      test('labels an "other" platform status with generic copy instead of greying it out silently', async () => {
+        mockWizardEndpoints({ availableRegions: availableRegionsWithSaoPaulo('other') })
+        const onRequest = vi.fn()
+        mockCreateProject(onRequest)
+
+        await renderWizard()
+
+        await expectSelectableRestrictedRegion(onRequest, GENERIC_COPY)
+      })
+
+      test('applies a flag-only restriction the same way when the platform reports no status', async () => {
+        mockWizardEndpoints({ availableRegions: availableRegionsWithSaoPaulo() })
+        const onRequest = vi.fn()
+        mockCreateProject(onRequest)
+
+        await renderWizard({
+          flags: { projectCreationRestrictedRegions: '{"sa-east-1":"unavailable"}' },
+        })
+
+        await expectSelectableRestrictedRegion(onRequest, GENERIC_COPY)
       })
     })
   })

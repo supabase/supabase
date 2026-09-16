@@ -31,17 +31,16 @@ import {
   getHighAvailabilityRegionCode,
 } from './ProjectCreation.utils'
 import {
+  getRegionRestrictionCopy,
   parseRestrictedRegions,
-  REGION_RESTRICTION_COPY,
   resolveRegionRestriction,
   RESTRICTED_REGIONS_FLAG_KEY,
-  SELECTABLE_RESTRICTIONS,
+  SELECT_DIFFERENT_REGION,
 } from './RegionSelector.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { RegionFlag } from '@/components/ui/RegionFlag'
-import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
@@ -50,7 +49,6 @@ import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
 interface RegionSelectorProps {
   form: UseFormReturn<CreateProjectForm>
   instanceSize?: DesiredInstanceSize
-  isFreePlan?: boolean
   layout?: 'vertical' | 'horizontal'
 }
 
@@ -83,7 +81,6 @@ const isLocal = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
 export const RegionSelector = ({
   form,
   instanceSize,
-  isFreePlan,
   layout = 'horizontal',
 }: RegionSelectorProps) => {
   const { slug } = useParams()
@@ -152,7 +149,6 @@ export const RegionSelector = ({
     restriction: resolveRegionRestriction({
       platformStatus: region.status,
       flagRestriction: restrictedRegions[region.code],
-      isFreePlan,
     }),
   }))
   const isLoading = smartRegionEnabled ? isLoadingAvailableRegions : isLoadingDefaultRegion
@@ -205,9 +201,13 @@ export const RegionSelector = ({
           const selectedRegionLabel = selectedRegion?.name
             ? getDisplayNameForSmartRegion(selectedRegion.name)
             : dbRegion
-          const selectedRestrictedRegion = regionOptionsWithRestriction.find(
-            (region) => region.name === dbRegion && region.restriction !== undefined
-          )
+          const selectedRestriction = regionOptionsWithRestriction.find(
+            (region) => region.name === dbRegion
+          )?.restriction
+          const selectedRestrictionCopy =
+            selectedRestriction !== undefined
+              ? getRegionRestrictionCopy(selectedRestriction)
+              : undefined
           const triggerLabel = isLoading ? 'Loading available regions...' : selectedRegionLabel
 
           const affectingIncidents = incidents.filter((incident) => {
@@ -264,6 +264,7 @@ export const RegionSelector = ({
                     disabled={isLoading}
                   >
                     <SelectTrigger
+                      ref={field.ref}
                       id="region"
                       className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start"
                     >
@@ -326,18 +327,18 @@ export const RegionSelector = ({
                           {highAvailability ? 'High Availability Regions' : 'Specific regions'}
                         </SelectLabel>
                         {regionOptionsWithRestriction.map((value) => {
-                          const { restriction } = value
-                          const isDisabled =
-                            restriction !== undefined && !SELECTABLE_RESTRICTIONS.has(restriction)
+                          const restrictionCopy =
+                            value.restriction !== undefined
+                              ? getRegionRestrictionCopy(value.restriction)
+                              : undefined
                           return (
                             <SelectItem
                               key={value.code}
                               value={value.name}
                               className={cn(
                                 'w-full [&>:nth-child(2)]:w-full',
-                                isDisabled && 'pointer-events-auto!'
+                                restrictionCopy !== undefined && 'pointer-events-auto!'
                               )}
-                              disabled={isDisabled}
                             >
                               <div className="flex flex-row items-center justify-between w-full gap-x-2">
                                 <div className="flex items-center gap-x-3">
@@ -355,19 +356,14 @@ export const RegionSelector = ({
                                     Recommended
                                   </Badge>
                                 )}
-                                {restriction !== undefined && (
+                                {restrictionCopy !== undefined && (
                                   <Tooltip>
                                     <TooltipTrigger>
-                                      <Badge
-                                        variant={REGION_RESTRICTION_COPY[restriction].badgeVariant}
-                                        className="mr-1"
-                                      >
-                                        {REGION_RESTRICTION_COPY[restriction].badge}
+                                      <Badge variant="warning" className="mr-1">
+                                        {restrictionCopy.badge}
                                       </Badge>
                                     </TooltipTrigger>
-                                    <TooltipContent>
-                                      {REGION_RESTRICTION_COPY[restriction].tooltip}
-                                    </TooltipContent>
+                                    <TooltipContent>{restrictionCopy.description}</TooltipContent>
                                   </Tooltip>
                                 )}
                               </div>
@@ -400,13 +396,12 @@ export const RegionSelector = ({
                 </FormItemLayout>
               )}
 
-              {selectedRestrictedRegion?.restriction === 'paid_only' && (
-                <FormItemLayout layout="horizontal">
-                  <UpgradeToPro
-                    primaryText="Region available on paid plans only"
-                    secondaryText={`Upgrade this organization to create projects in ${selectedRestrictedRegion.name}.`}
-                    source="projectCreationRegion"
-                    featureProposition={`create projects in ${selectedRestrictedRegion.name}`}
+              {selectedRestrictionCopy !== undefined && (
+                <FormItemLayout layout="horizontal" isReactForm={false}>
+                  <Admonition
+                    type="warning"
+                    title={selectedRestrictionCopy.title}
+                    description={`${selectedRestrictionCopy.description} ${SELECT_DIFFERENT_REGION}`}
                     className="mt-3"
                   />
                 </FormItemLayout>

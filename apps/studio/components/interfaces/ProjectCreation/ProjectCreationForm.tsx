@@ -40,8 +40,8 @@ import { ProjectCreationFooter } from './ProjectCreationFooter'
 import { ProjectNameInput } from './ProjectNameInput'
 import { RegionSelector } from './RegionSelector'
 import {
+  getRegionRestrictionMessage,
   parseRestrictedRegions,
-  REGION_RESTRICTION_COPY,
   resolveRegionRestriction,
   RESTRICTED_REGIONS_FLAG_KEY,
 } from './RegionSelector.utils'
@@ -192,7 +192,7 @@ export const ProjectCreationForm = ({
       shouldRunMigrations: true,
     },
   })
-  const { getFieldState, resetField, setValue } = form
+  const { getFieldState, resetField, setError, setValue } = form
   const {
     instanceSize: watchedInstanceSize,
     cloudProvider,
@@ -489,17 +489,17 @@ export const ProjectCreationForm = ({
         selectedSpecificRegion !== undefined
           ? restrictedRegions[selectedSpecificRegion.code]
           : undefined,
-      isFreePlan,
     })
     if (selectedRegionRestriction !== undefined) {
-      const toastId = toast.error(
-        `Select a different region. ${dbRegion}: ${REGION_RESTRICTION_COPY[selectedRegionRestriction].tooltip}`
+      setError(
+        'dbRegion',
+        { type: 'manual', message: getRegionRestrictionMessage(selectedRegionRestriction) },
+        { shouldFocus: true }
       )
       trackFunnelError(
         'project_creation',
         { errorCategory: 'validation', errorReason: 'region_unavailable' },
-        'toast',
-        toastId
+        'form'
       )
       return
     }
@@ -779,7 +779,6 @@ export const ProjectCreationForm = ({
                     <RegionSelector
                       form={form}
                       instanceSize={instanceSize as DesiredInstanceSize}
-                      isFreePlan={isFreePlan}
                     />
 
                     {isVercelIntegrationFlow && !!externalId && <DataSeeding form={form} />}

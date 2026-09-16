@@ -6,12 +6,48 @@ export const RESTRICTED_REGIONS_FLAG_KEY = 'projectCreationRestrictedRegions'
 
 export type PlatformRegionStatus = 'capacity' | 'other'
 
-const FLAG_RESTRICTIONS = ['unavailable', 'paid_only'] as const
+const FLAG_RESTRICTIONS = ['unavailable'] as const
 export type FlagRestriction = (typeof FLAG_RESTRICTIONS)[number]
 
 export type RegionRestriction = PlatformRegionStatus | FlagRestriction
 
-export const SELECTABLE_RESTRICTIONS: ReadonlySet<RegionRestriction> = new Set(['paid_only'])
+export type RegionRestrictionCopy = {
+  badge: string
+  title: string
+  description: string
+}
+
+const GENERIC_RESTRICTION_COPY: RegionRestrictionCopy = {
+  badge: 'Unavailable',
+  title: 'Selected region is unavailable',
+  description: 'Temporarily unavailable for new projects.',
+}
+
+export const REGION_RESTRICTION_COPY: Record<RegionRestriction, RegionRestrictionCopy> = {
+  capacity: {
+    badge: 'Unavailable',
+    title: 'Selected region is at capacity',
+    description: 'Temporarily unavailable due to this region being at capacity.',
+  },
+  other: GENERIC_RESTRICTION_COPY,
+  unavailable: GENERIC_RESTRICTION_COPY,
+}
+
+export const SELECT_DIFFERENT_REGION = 'Select a different region to continue.'
+
+function isKnownRestriction(value: string): value is RegionRestriction {
+  return Object.prototype.hasOwnProperty.call(REGION_RESTRICTION_COPY, value)
+}
+
+export function getRegionRestrictionCopy(restriction: string): RegionRestrictionCopy {
+  return isKnownRestriction(restriction)
+    ? REGION_RESTRICTION_COPY[restriction]
+    : GENERIC_RESTRICTION_COPY
+}
+
+export function getRegionRestrictionMessage(restriction: string) {
+  return `${getRegionRestrictionCopy(restriction).title}. ${SELECT_DIFFERENT_REGION}`
+}
 
 const RestrictedRegionsSchema = z.record(z.string(), z.enum(FLAG_RESTRICTIONS))
 
@@ -43,43 +79,13 @@ function reportInvalidPayload(flagValue: string, reason: string) {
 }
 
 type ResolveRegionRestrictionArgs = {
-  platformStatus: PlatformRegionStatus | undefined
+  platformStatus: string | undefined
   flagRestriction: FlagRestriction | undefined
-  isFreePlan: boolean | undefined
 }
 
 export function resolveRegionRestriction({
   platformStatus,
   flagRestriction,
-  isFreePlan,
-}: ResolveRegionRestrictionArgs): RegionRestriction | undefined {
-  if (platformStatus !== undefined) return platformStatus
-  if (flagRestriction === 'paid_only') return isFreePlan === true ? 'paid_only' : undefined
-  return flagRestriction
-}
-
-export const REGION_RESTRICTION_COPY: Record<
-  RegionRestriction,
-  { badge: string; badgeVariant: 'warning' | 'success'; tooltip: string }
-> = {
-  capacity: {
-    badge: 'Unavailable',
-    badgeVariant: 'warning',
-    tooltip: 'Temporarily unavailable due to this region being at capacity.',
-  },
-  other: {
-    badge: 'Unavailable',
-    badgeVariant: 'warning',
-    tooltip: 'Temporarily unavailable for new projects.',
-  },
-  unavailable: {
-    badge: 'Unavailable',
-    badgeVariant: 'warning',
-    tooltip: 'Temporarily unavailable for new projects.',
-  },
-  paid_only: {
-    badge: 'Paid plans',
-    badgeVariant: 'success',
-    tooltip: 'Available on paid plans only.',
-  },
+}: ResolveRegionRestrictionArgs): string | undefined {
+  return platformStatus ?? flagRestriction
 }
