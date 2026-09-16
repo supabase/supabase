@@ -1,7 +1,16 @@
 import { useParams } from 'common'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from 'ui'
 
 import { PipelineStatusName } from './Replication.constants'
 import { RestartCostEstimate } from './RestartCostEstimate'
@@ -50,12 +59,13 @@ export const BatchRestartDialog = ({
     () => getTableCopyTargets(affectedTables, tableSyncCopy),
     [affectedTables, tableSyncCopy]
   )
+  const pipelineAction = pipelineStatusName === PipelineStatusName.STOPPED ? 'start' : 'restart'
 
   const { mutateAsync: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: (data) => {
       const count = data.tables.length
       toast.success(
-        `Resetting ${count} table${count > 1 ? 's' : ''}. Pipeline will restart automatically.`
+        `Resetting ${count} table${count > 1 ? 's' : ''}. Pipeline will ${pipelineAction} automatically.`
       )
     },
     onSettled: () => {
@@ -85,40 +95,35 @@ export const BatchRestartDialog = ({
 
   const count = affectedTables.length
   const tableWord = count === 1 ? 'table' : 'tables'
+  const remainingTableCount = count - copiedTables.length
+  const remainingTableWord = remainingTableCount === 1 ? 'table' : 'tables'
+  const initialSyncDescription =
+    copiedTables.length === 0
+      ? 'Initial sync is skipped, so replication resumes with new changes only.'
+      : copiedTables.length === affectedTables.length
+        ? 'Existing rows will sync again.'
+        : `${copiedTables.length} of ${count} ${tableWord} will sync existing rows again. The remaining ${remainingTableCount} ${remainingTableWord} will skip initial sync and resume with new changes only.`
 
   const dialogContent =
     mode === 'all'
       ? {
           title: 'Reset all tables',
-          description:
-            copiedTables.length === 0
-              ? `This resets all ${count} ${tableWord}. Destination data will be deleted, initial sync is skipped, and the pipeline will restart automatically.`
-              : `This resets all ${count} ${tableWord}. Destination data will be deleted, existing rows will sync again, and the pipeline will restart automatically.`,
+          description: `This resets all ${count} ${tableWord}. Destination data will be deleted. ${initialSyncDescription} The pipeline will ${pipelineAction} automatically.`,
           action: 'Reset all tables',
         }
       : {
           title: 'Reset failed tables',
-          description:
-            copiedTables.length === 0
-              ? `This resets ${count} failed ${tableWord}. Destination data for those tables will be deleted, initial sync is skipped, and the pipeline will restart automatically. Other tables stay as they are.`
-              : `This resets ${count} failed ${tableWord}. Destination data for those tables will be deleted, existing rows will sync again, and the pipeline will restart automatically. Other tables stay as they are.`,
+          description: `This resets ${count} failed ${tableWord}. Destination data for those tables will be deleted. ${initialSyncDescription} The pipeline will ${pipelineAction} automatically. Other tables stay as they are.`,
           action: 'Reset failed tables',
         }
 
   return (
-    <ConfirmationModal
-      size="small"
-      variant="warning"
-      visible={open}
-      title={dialogContent.title}
-      confirmLabel={dialogContent.action}
-      confirmLabelLoading="Resetting…"
-      loading={isResetting}
-      onCancel={() => onOpenChange(false)}
-      onConfirm={handleReset}
-    >
-      <div className="flex flex-col gap-y-4">
-        <p className="text-sm text-foreground-light">{dialogContent.description}</p>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{dialogContent.title}</AlertDialogTitle>
+          <AlertDialogDescription>{dialogContent.description}</AlertDialogDescription>
+        </AlertDialogHeader>
         <RestartCostEstimate
           open={open}
           projectRef={projectRef}
@@ -126,7 +131,13 @@ export const BatchRestartDialog = ({
           publicationName={publicationName}
           tables={copiedTables}
         />
-      </div>
-    </ConfirmationModal>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
+          <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="warning">
+            {isResetting ? 'Resetting…' : dialogContent.action}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }

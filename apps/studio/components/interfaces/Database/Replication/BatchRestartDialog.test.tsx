@@ -63,6 +63,11 @@ describe('BatchRestartDialog', () => {
     )
 
     expect(screen.getByText(/This resets 3 failed tables/)).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        /2 of 3 tables will sync existing rows again. The remaining 1 table will skip initial sync/
+      )
+    ).toBeInTheDocument()
     expect(screen.getByTestId('copy-targets')).toHaveTextContent('public.table_1,public.table_2')
 
     await act(async () => {
