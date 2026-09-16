@@ -78,6 +78,18 @@ describe('useDatabaseChartDeepLink', () => {
     expect(MockResizeObserver.instances[0].disconnect).toHaveBeenCalled()
   })
 
+  test('stops re-centering after the user interacts with the page', () => {
+    const target = addChart('disk-size')
+    vi.spyOn(target, 'getBoundingClientRect').mockReturnValue(bounds(300, 600))
+
+    renderHook(() => useDatabaseChartDeepLink('disk-size'))
+
+    act(() => vi.advanceTimersByTime(200))
+    act(() => window.dispatchEvent(new Event('wheel')))
+
+    expect(MockResizeObserver.instances[0].disconnect).toHaveBeenCalled()
+  })
+
   test('starts a fresh observer when the chart query parameter changes', () => {
     const cpuTarget = addChart('cpu-usage')
     const diskTarget = addChart('disk-size')

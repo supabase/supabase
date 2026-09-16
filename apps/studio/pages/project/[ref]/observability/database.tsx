@@ -72,6 +72,12 @@ const REPORT_TITLE = 'Database'
 const CHART_TARGET_POLL_INTERVAL = 200
 const CHART_TARGET_POLL_ATTEMPTS = 25
 const CHART_LAYOUT_OBSERVATION_DURATION = 10_000
+const CHART_LAYOUT_OBSERVATION_CANCEL_EVENTS = [
+  'keydown',
+  'pointerdown',
+  'touchstart',
+  'wheel',
+] as const
 
 const isChartFullyVisible = (target: HTMLElement) => {
   const targetBounds = target.getBoundingClientRect()
@@ -89,6 +95,14 @@ export const useDatabaseChartDeepLink = (chart?: string) => {
     let attempts = 0
     let resizeObserver: ResizeObserver | undefined
     let stopObservingTimer: number | undefined
+
+    const stopObserving = () => {
+      if (stopObservingTimer !== undefined) window.clearTimeout(stopObservingTimer)
+      resizeObserver?.disconnect()
+      CHART_LAYOUT_OBSERVATION_CANCEL_EVENTS.forEach((eventName) =>
+        window.removeEventListener(eventName, stopObserving, true)
+      )
+    }
 
     const pollForChart = window.setInterval(() => {
       attempts += 1
@@ -111,16 +125,15 @@ export const useDatabaseChartDeepLink = (chart?: string) => {
         }
       })
       resizeObserver.observe(chartList)
-      stopObservingTimer = window.setTimeout(
-        () => resizeObserver?.disconnect(),
-        CHART_LAYOUT_OBSERVATION_DURATION
+      CHART_LAYOUT_OBSERVATION_CANCEL_EVENTS.forEach((eventName) =>
+        window.addEventListener(eventName, stopObserving, true)
       )
+      stopObservingTimer = window.setTimeout(stopObserving, CHART_LAYOUT_OBSERVATION_DURATION)
     }, CHART_TARGET_POLL_INTERVAL)
 
     return () => {
       window.clearInterval(pollForChart)
-      if (stopObservingTimer !== undefined) window.clearTimeout(stopObservingTimer)
-      resizeObserver?.disconnect()
+      stopObserving()
     }
   }, [chart])
 }
