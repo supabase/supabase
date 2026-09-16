@@ -21,7 +21,7 @@ const buttonVariants = cva(
   duration-200
   rounded-md
   transition-[background-color,border-color,color,scale]
-  motion-safe:active:scale-[0.97]
+  [&:not([aria-haspopup])]:motion-safe:active:scale-[0.97]
   focus-ring
   border
   `,
