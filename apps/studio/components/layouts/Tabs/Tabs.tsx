@@ -44,7 +44,7 @@ interface EditorTabsProps {
 }
 
 // [Joshen] Will be adjusting this component to support Explorer
-// Will require quite a bit of cleaning up once Explorer supercedes SQL Editor
+// Will require quite a bit of cleaning up once Explorer supersedes SQL Editor
 export const EditorTabs = ({
   customTabs,
   newTabButton,
