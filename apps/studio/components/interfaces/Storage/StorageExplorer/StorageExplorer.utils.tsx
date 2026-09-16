@@ -1,5 +1,6 @@
 import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
+import { z } from 'zod'
 
 import { inverseValidObjectKeyRegex, validObjectKeyRegex } from '../CreateBucketModal.utils'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
@@ -189,6 +190,29 @@ export const formatFolderItems = (items: StorageObject[] = [], prefix?: string):
         return itemObj
       }) ?? []
   return formattedItems
+}
+
+/**
+ * Storage's bulk delete endpoint responds 200 with the objects it actually removed, silently
+ * skipping any the caller's policies don't allow it to touch. Comparing what we asked it to
+ * delete against what came back is the only way to tell a real delete from a blocked one.
+ */
+const deletedStorageObjectsSchema = z.array(z.object({ name: z.string() }))
+
+/**
+ * Returns the paths that Storage did not delete, given the paths we asked it to delete and the
+ * response it sent back.
+ *
+ * Returns an empty array when the response isn't a readable list of deleted objects, so an
+ * unrecognized body shape keeps the previous "assume it worked" behavior instead of raising a
+ * false alarm.
+ */
+export function getUndeletedPaths(requestedPaths: string[], response: unknown): string[] {
+  const deletedObjects = deletedStorageObjectsSchema.safeParse(response)
+  if (!deletedObjects.success) return []
+
+  const deletedPaths = new Set(deletedObjects.data.map((object) => object.name))
+  return requestedPaths.filter((path) => !deletedPaths.has(path))
 }
 
 export const getFile = async (fileEntry: FileSystemFileEntry): Promise<File | undefined> => {
