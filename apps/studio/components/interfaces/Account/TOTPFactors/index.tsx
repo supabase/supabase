@@ -44,39 +44,41 @@ export const TOTPFactors = () => {
 
   return (
     <>
-      <PageSection>
-        <PageSectionMeta>
-          <PageSectionSummary>
-            <PageSectionTitle>Recovery codes</PageSectionTitle>
-            <PageSectionDescription>
-              Recovery codes allow you to recover your account in case you lost access to your MFA
-              apps.
-            </PageSectionDescription>
-          </PageSectionSummary>
-        </PageSectionMeta>
-        <PageSectionContent>
-          {recoveryCodesStatus?.status === 'unenrolled' && <GenerateRecoveryCodesModal />}
-          {recoveryCodesStatus?.status === 'available' && recoveryCodesStatus?.data && (
-            <Card>
-              <CardContent className="flex flex-col gap-2">
-                <p
-                  className={cn(
-                    'text-sm',
-                    recoveryCodesStatus.data.remaining < 2 ? 'text-warning' : ''
-                  )}
-                >
-                  {recoveryCodesStatus.data.remaining}/{recoveryCodesStatus.data.total} recovery
-                  codes available
-                </p>
-                <div className="flex gap-2 ml-auto">
-                  <RegenerateRecoveryCodesModal />
-                  {IS_STAGING_OR_LOCAL && <UnenrollRecoveryCodesModal />}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </PageSectionContent>
-      </PageSection>
+      {enableAuthRecoveryCodes && (
+        <PageSection>
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Recovery codes</PageSectionTitle>
+              <PageSectionDescription>
+                Recovery codes allow you to recover your account in case you lost access to your MFA
+                apps.
+              </PageSectionDescription>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
+            {recoveryCodesStatus?.status === 'unenrolled' && <GenerateRecoveryCodesModal />}
+            {recoveryCodesStatus?.status === 'available' && recoveryCodesStatus?.data && (
+              <Card>
+                <CardContent className="flex flex-col gap-2">
+                  <p
+                    className={cn(
+                      'text-sm',
+                      recoveryCodesStatus.data.remaining < 2 ? 'text-warning' : ''
+                    )}
+                  >
+                    {recoveryCodesStatus.data.remaining}/{recoveryCodesStatus.data.total} recovery
+                    codes available
+                  </p>
+                  <div className="flex gap-2 ml-auto">
+                    <RegenerateRecoveryCodesModal />
+                    {IS_STAGING_OR_LOCAL && <UnenrollRecoveryCodesModal />}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </PageSectionContent>
+        </PageSection>
+      )}
       <PageSection>
         <PageSectionMeta>
           <PageSectionSummary>
