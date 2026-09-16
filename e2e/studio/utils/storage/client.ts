@@ -1,4 +1,4 @@
-import { env } from "../../env.config.js";
+import { env } from '../../env.config.js'
 
 /**
  * Make an HTTP request to the local Supabase Storage API.
@@ -10,23 +10,32 @@ import { env } from "../../env.config.js";
  */
 export async function storageRequest<T>(
   path: string,
-  options?: { method?: 'GET' | 'POST' | 'PUT' | 'DELETE'; body?: Record<string, unknown> }
+  options?: {
+    method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
+    /** A JSON payload, or a string to send as a raw `text/plain` body (for object uploads) */
+    body?: Record<string, unknown> | string
+  }
 ): Promise<T> {
   const storageUrl = `${env.API_URL}/storage/v1`
-  
+
   const headers: Record<string, string> = {
     apikey: env.SERVICE_ROLE_KEY,
     Authorization: `Bearer ${env.SERVICE_ROLE_KEY}`,
   }
 
-  if (options?.body) {
-    headers['Content-Type'] = 'application/json'
+  const isRawBody = typeof options?.body === 'string'
+  if (options?.body !== undefined) {
+    headers['Content-Type'] = isRawBody ? 'text/plain' : 'application/json'
   }
 
   const response = await fetch(`${storageUrl}${path}`, {
     method: options?.method ?? 'GET',
     headers,
-    body: options?.body ? JSON.stringify(options.body) : undefined,
+    body: isRawBody
+      ? (options!.body as string)
+      : options?.body
+        ? JSON.stringify(options.body)
+        : undefined,
   })
 
   if (!response.ok) {

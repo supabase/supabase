@@ -88,17 +88,19 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     'edit',
     parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
   )
-  const { getRequestStatus, setRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
+  const { getRequestStatus, getIsTableResetting, setRequestStatus, updatePipelineStatus } =
+    usePipelineRequestStatus()
   const requestStatus = getRequestStatus(pipelineId)
+  const isTableResetting = getIsTableResetting(pipelineId)
 
   const {
     data: pipeline,
     error: pipelineError,
     isPending: isPipelineLoading,
-  } = useReplicationPipelineByIdQuery({
-    projectRef,
-    pipelineId,
-  })
+  } = useReplicationPipelineByIdQuery(
+    { projectRef, pipelineId },
+    { enabled: Number.isSafeInteger(pipelineId) }
+  )
   const {
     data: pipelineStatusData,
     error: pipelineStatusError,
@@ -120,11 +122,17 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     }
   )
 
-  const { mutateAsync: startPipeline, isPending: isStartingPipeline } = useStartPipelineMutation()
-  const { mutateAsync: stopPipeline, isPending: isStoppingPipeline } = useStopPipelineMutation()
+  const { mutateAsync: startPipeline, isPending: isStartingPipeline } = useStartPipelineMutation({
+    onError: () => {},
+  })
+  const { mutateAsync: stopPipeline, isPending: isStoppingPipeline } = useStopPipelineMutation({
+    onError: () => {},
+  })
   const { mutateAsync: restartPipeline, isPending: isRestartingPipeline } =
     useRestartPipelineMutation()
-  const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({})
+  const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({
+    onError: () => {},
+  })
 
   const statusName = getStatusName(pipelineStatusData?.status)
   const displayState = getPipelineDisplayState(requestStatus, statusName)
@@ -153,9 +161,10 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   // so the detail page has the same reach as the row menu on the list without repeating itself.
   const isRunningOrFailed =
     statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
-  const canUseMenuActions = isRunningOrFailed && !isTransitioning && !!pipeline
-  const canRestart = canUseMenuActions && primaryAction !== 'restart'
-  const canStop = canUseMenuActions && primaryAction !== 'stop'
+  const canUseMenuActions =
+    isRunningOrFailed && !isTransitioning && !isPipelineStatusError && !!pipeline
+  const canRestart = canUseMenuActions && !isTableResetting && primaryAction !== 'restart'
+  const canStop = canUseMenuActions && !isTableResetting && primaryAction !== 'stop'
 
   const onLifecycleAction = async (action?: LifecycleAction) => {
     const resolvedAction = action ?? primaryAction
@@ -183,7 +192,9 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
 
     try {
       setIsDeleting(true)
-      await stopPipeline({ projectRef, pipelineId: pipeline.id })
+      if (statusName !== PipelineStatusName.STOPPED) {
+        await stopPipeline({ projectRef, pipelineId: pipeline.id })
+      }
       await deleteDestinationPipeline({
         projectRef,
         destinationId: pipeline.destination_id,
@@ -243,8 +254,8 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
           </BreadcrumbList>
         </PageBreadcrumbs>
 
-        <PageHeader size="full" className="border-b py-4 [&>div]:px-4 [&>div]:xl:px-4">
-          <PageHeaderMeta className="px-0 xl:px-0">
+        <PageHeader size="large" className="border-b py-4">
+          <PageHeaderMeta>
             <PageHeaderIcon>
               {isPipelineIdentityLoading ? (
                 <ShimmeringLoader className="h-14 w-14 rounded-lg py-0" />
@@ -301,6 +312,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                     variant="primary"
                     icon={<ArrowUpCircle />}
                     onClick={() => setShowUpdateVersionModal(true)}
+                    disabled={isTableResetting}
                   >
                     Update available
                   </Button>
@@ -318,7 +330,14 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                     isStoppingPipeline ||
                     isRestartingPipeline
                   }
-                  disabled={Boolean(pipelineError) || !pipeline || isTransitioning || !isActionable}
+                  disabled={
+                    Boolean(pipelineError) ||
+                    isPipelineStatusError ||
+                    !pipeline ||
+                    isTransitioning ||
+                    isTableResetting ||
+                    !isActionable
+                  }
                 >
                   {lifecycleLabel}
                 </Button>
@@ -329,6 +348,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                       className="px-1.25 hit-area-2"
                       aria-label="Pipeline options"
                       icon={<MoreVertical />}
+                      disabled={isTableResetting}
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent side="bottom" align="end" className="w-52">

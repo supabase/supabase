@@ -15,6 +15,8 @@
     "build:next": "next build --turbopack",
     "build": "run-p build:content build:registry build:llms build:markdown && pnpm build:next",
     "test:markdown": "tsx --test scripts/library-mdx-to-markdown.test.ts",
+    "test:headless-app": "vitest run --config vitest.config.ts",
+    "test:headless-tools": "tsx scripts/test-headless-tools.mts",
     "test:middleware": "pnpm run build:markdown && tsx --test middleware.test.ts",
     "start": "next start",
     "lint": "eslint .",
@@ -108,6 +110,7 @@
     "tsconfig": "workspace:*",
     "tsx": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "catalog:"
   }
 }

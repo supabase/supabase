@@ -3,11 +3,15 @@ import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { ReactNode } from 'react'
+import { ReactNode, type AnchorHTMLAttributes } from 'react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { ReplicationPipelineLayout } from './ReplicationPipelineLayout'
-import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
+import { ReplicationPipelineStatus } from './ReplicationPipelineStatus/ReplicationPipelineStatus'
+import {
+  PipelineRequestStatusProvider,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -19,6 +23,22 @@ vi.mock('common', async (importOriginal) => ({
   useParams: () => ({ ref: 'default', pipelineId: '42' }),
 }))
 
+vi.mock('next/router', () => ({
+  useRouter: () => ({ push: vi.fn() }),
+}))
+
+vi.mock('next/link', () => ({
+  default: ({
+    href,
+    children,
+    ...props
+  }: AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
+}))
+
 const renderLayout = (children?: ReactNode) =>
   customRender(
     <PipelineRequestStatusProvider>
@@ -26,8 +46,25 @@ const renderLayout = (children?: ReactNode) =>
     </PipelineRequestStatusProvider>
   )
 
+const TableResetFixture = () => {
+  const { setTableResetting } = usePipelineRequestStatus()
+
+  return (
+    <>
+      <button tabIndex={0} onClick={() => setTableResetting(42, true)}>
+        Begin table reset
+      </button>
+      <button tabIndex={0} onClick={() => setTableResetting(42, false)}>
+        Finish table reset
+      </button>
+    </>
+  )
+}
+
 type PipelineResponse = components['schemas']['PipelineResponse_Output']
 type PipelineStatusResponse = components['schemas']['PipelineStatusResponse_Output']
+type PipelineReplicationStatusResponse =
+  components['schemas']['PipelineReplicationStatusResponse_Output']
 type PipelineVersionResponse = components['schemas']['PipelineVersionResponse_Output']
 type DestinationResponse = components['schemas']['DestinationResponse_Output']
 type DestinationsResponse = components['schemas']['DestinationsResponse_Output']
@@ -118,6 +155,17 @@ const mockVersion = (hasUpdate: boolean) =>
       }),
   })
 
+const mockReplicationStatus = () =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/pipelines/:pipeline_id/replication-status',
+    response: () =>
+      HttpResponse.json<PipelineReplicationStatusResponse>({
+        pipeline_id: 42,
+        table_statuses: [],
+      }),
+  })
+
 describe('ReplicationPipelineLayout', () => {
   beforeEach(() => {
     mockPipeline()
@@ -137,6 +185,9 @@ describe('ReplicationPipelineLayout', () => {
     expect(screen.getByRole('link', { name: 'View logs' }).getAttribute('href')).toContain(
       'pipeline_id'
     )
+    expect(screen.getByText('Running')).toBeVisible()
+    expect(screen.getByText('Primary database')).toBeVisible()
+    expect(await screen.findByText('BigQuery')).toBeVisible()
     expect(await screen.findByRole('button', { name: 'Stop' })).toBeVisible()
     expect(screen.getByText('Overview content')).toBeVisible()
   })
@@ -168,20 +219,16 @@ describe('ReplicationPipelineLayout', () => {
     expect(await screen.findByText('Running')).toBeVisible()
   })
 
-  test('does not render an Overview tab until Settings exists', async () => {
-    mockStatus('started')
-    renderLayout()
-
-    await screen.findByRole('heading', { name: 'Analytics warehouse' })
-    expect(screen.queryByRole('link', { name: 'Overview' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Settings' })).not.toBeInTheDocument()
-  })
-
-  test('shows the pipeline state as a labelled dot', async () => {
+  test('composes the legacy overview without duplicating the detail header', async () => {
     mockStatus('stopped')
-    renderLayout()
+    mockReplicationStatus()
 
-    expect(await screen.findByText('Stopped')).toBeVisible()
+    renderLayout(<ReplicationPipelineStatus />)
+
+    expect(await screen.findByRole('heading', { name: 'Analytics warehouse' })).toBeVisible()
+    expect(screen.getAllByRole('link', { name: 'View logs' })).toHaveLength(1)
+    expect(screen.getAllByRole('button', { name: 'Start' })).toHaveLength(1)
+    expect(await screen.findByRole('heading', { name: 'Pipeline stopped' })).toBeVisible()
   })
 
   test('explains the state in a tooltip when the dot is hovered', async () => {
@@ -197,14 +244,6 @@ describe('ReplicationPipelineLayout', () => {
     expect(screen.queryByRole('link', { name: 'logs' })).not.toBeInTheDocument()
   })
 
-  test('shows where the pipeline sends data', async () => {
-    mockStatus('started')
-    renderLayout()
-
-    expect(await screen.findByText('BigQuery')).toBeVisible()
-    expect(screen.getByText('Primary database')).toBeVisible()
-  })
-
   test('offers the pipeline actions the primary button does not', async () => {
     mockStatus('started')
     renderLayout()
@@ -217,6 +256,29 @@ describe('ReplicationPipelineLayout', () => {
     expect(screen.queryByRole('menuitem', { name: 'Stop pipeline' })).not.toBeInTheDocument()
     expect(screen.getByRole('menuitem', { name: 'Edit pipeline' })).toBeVisible()
     expect(screen.getByRole('menuitem', { name: 'Delete pipeline' })).toBeVisible()
+  })
+
+  test('blocks pipeline actions while a table reset is running', async () => {
+    mockStatus('started')
+    mockVersion(true)
+    renderLayout(<TableResetFixture />)
+
+    const lifecycleAction = await screen.findByRole('button', { name: 'Stop' })
+    const options = screen.getByRole('button', { name: 'Pipeline options' })
+    const update = await screen.findByRole('button', { name: 'Update available' })
+    expect(lifecycleAction).toBeEnabled()
+    expect(options).toBeEnabled()
+    expect(update).toBeEnabled()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Begin table reset' }))
+    expect(lifecycleAction).toBeDisabled()
+    expect(options).toBeDisabled()
+    expect(update).toBeDisabled()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Finish table reset' }))
+    expect(lifecycleAction).toBeEnabled()
+    expect(options).toBeEnabled()
+    expect(update).toBeEnabled()
   })
 
   test('offers Stop from the menu when the primary button is Restart', async () => {
@@ -242,15 +304,5 @@ describe('ReplicationPipelineLayout', () => {
     await userEvent.click(updateButton)
     // The trigger button shares this name, so match the dialog's heading specifically
     expect(await screen.findByRole('heading', { name: 'Update available' })).toBeVisible()
-  })
-
-  test.each([
-    ['stopped', 'Start'],
-    ['failed', 'Restart'],
-  ] as const)('shows the correct %s lifecycle action', async (status, action) => {
-    mockStatus(status)
-    renderLayout()
-
-    await waitFor(() => expect(screen.getByRole('button', { name: action })).toBeEnabled())
   })
 })

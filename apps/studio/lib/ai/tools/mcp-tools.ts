@@ -41,20 +41,20 @@ export const getMcpTools = async ({
   accessToken,
   projectRef,
   aiOptInLevel,
+  isRestrictedByHipaa,
   signal,
 }: {
   accessToken: string
   projectRef: string
   aiOptInLevel: AiOptInLevel
+  isRestrictedByHipaa: boolean
   // Required: the remote client holds an HTTP connection that must be torn down
   // when the request ends. The caller owns that lifecycle via this signal.
   signal: AbortSignal
 }) => {
-  // Connect to the remote MCP server over HTTP and fetch its tools, which
-  // replace the old local tools. The legacy in-process server is no longer a
-  // production transport (eval-only now, see `createInProcessSupabaseMCPClient`),
-  // so this is unconditional. A remote failure (outage, timeout, auth) degrades
-  // to the remaining tools in `getTools` rather than breaking the assistant.
+  // Connect to the remote MCP server over HTTP and fetch its tools, replacing
+  // the local tools. A remote failure (outage, timeout, auth) degrades to the
+  // remaining tools in `getTools` rather than breaking the assistant.
   const mcpClient = await createSupabaseMCPClient({
     accessToken,
     projectRef,
@@ -101,7 +101,11 @@ export const getMcpTools = async ({
     // write/destructive tools (apply_migration, create_branch, ...) from reaching
     // the assistant. `read_only` is defense-in-depth (those tools throw at
     // runtime). Do not remove this filter on the assumption `read_only` suffices.
-    const allowedMcpTools = filterToolsByOptInLevel(availableMcpTools, aiOptInLevel)
+    const allowedMcpTools = filterToolsByOptInLevel(
+      availableMcpTools,
+      aiOptInLevel,
+      isRestrictedByHipaa
+    )
 
     // Remove UI-executed tools handled locally
     const filteredMcpTools: ToolSet = { ...allowedMcpTools }

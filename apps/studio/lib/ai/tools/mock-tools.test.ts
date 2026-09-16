@@ -1,62 +1,48 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { getMockTools, MOCK_NOTEBOOKS_DATA } from './mock-tools'
 import { getNotebookTools } from './notebook-tools'
 import type { AgentNotebook } from '@/data/content/notebooks/notebook-schema'
-import { createInProcessSupabaseMCPClient } from '@/lib/ai/supabase-mcp'
+import { createSearchDocsTool } from '@/lib/ai/tools/search-docs-tool'
+import type * as SearchDocsToolModule from '@/lib/ai/tools/search-docs-tool'
 
-// The one real tool in the eval harness (search_docs) is sourced from an
-// in-process MCP client. Mock that client so this test stays hermetic and
-// guards the wiring, not a live connection.
-vi.mock('@/lib/ai/supabase-mcp', () => ({
-  createInProcessSupabaseMCPClient: vi.fn(),
+// search_docs normally fetches the live docs GraphQL schema on construction
+// (see search-docs-tool.ts), which would make every test in this file depend
+// on the public docs API. Mock it with a deterministic local fixture instead
+// — live connectivity (including the schema fetch) is covered separately by
+// evals/preflight.ts. The regression-guard test below overrides this default
+// to verify the missing-tool guard fires.
+vi.mock('@/lib/ai/tools/search-docs-tool', () => ({
+  createSearchDocsTool: vi.fn().mockResolvedValue({
+    description: 'Search the Supabase documentation using GraphQL.',
+    execute: async () => ({ content: [{ type: 'text' as const, text: '{}' }] }),
+  } as unknown as SearchDocsToolModule.SearchDocsTool),
 }))
 
-const SEARCH_DOCS = { description: 'search the docs' }
-
 describe('ai/tools/mock-tools getMockTools', () => {
-  let close: ReturnType<typeof vi.fn>
-  let tools: ReturnType<typeof vi.fn>
+  it('wires the mocked search_docs tool through from the shared module, alongside the deterministic mocks', async () => {
+    const result = await getMockTools(undefined)
 
-  beforeEach(() => {
-    close = vi.fn().mockResolvedValue(undefined)
-    tools = vi.fn().mockResolvedValue({ search_docs: SEARCH_DOCS })
-    vi.mocked(createInProcessSupabaseMCPClient).mockResolvedValue({ tools, close } as any)
-  })
-
-  it('sources the real search_docs from the in-process MCP server alongside the deterministic mocks', async () => {
-    const result = await getMockTools(undefined, new AbortController().signal)
-
-    expect(createInProcessSupabaseMCPClient).toHaveBeenCalledTimes(1)
-    // The real tool, wired through from the MCP client
-    expect(result).toHaveProperty('search_docs', SEARCH_DOCS)
+    // The mocked tool, wired through from the shared module
+    expect(result.search_docs).toBeDefined()
+    expect(result.search_docs.description).toContain('Search the Supabase documentation')
+    expect(typeof result.search_docs.execute).toBe('function')
     // A couple of the deterministic mocks, to confirm the merge
     expect(result).toHaveProperty('list_tables')
     expect(result).toHaveProperty('query_logs')
   })
 
-  // This is the regression guard: if the eval's MCP wiring breaks (contract
-  // drift, or a refactor that stops sourcing search_docs — e.g. the future
-  // AI-897 removal of the in-process client), fail loudly in normal CI instead
-  // of only surfacing during an opt-in Braintrust eval run.
-  it('throws a clear error when the MCP server does not expose search_docs', async () => {
-    tools.mockResolvedValueOnce({})
-
-    await expect(getMockTools(undefined, new AbortController().signal)).rejects.toThrow(
-      'search_docs tool not available from MCP server'
+  // This is the regression guard: if a refactor stops sourcing search_docs
+  // (drops it from getMockTools, or createSearchDocsTool breaks), fail loudly
+  // in normal CI instead of only surfacing during an opt-in Braintrust eval run.
+  it('throws a clear error when search_docs is missing from the harness tools', async () => {
+    vi.mocked(createSearchDocsTool).mockResolvedValueOnce(
+      undefined as unknown as SearchDocsToolModule.SearchDocsTool
     )
-  })
 
-  it('closes the MCP client when the caller aborts the signal', async () => {
-    const controller = new AbortController()
-
-    await getMockTools(undefined, controller.signal)
-    // Connection stays open until generation ends (search_docs runs during it)
-    expect(close).not.toHaveBeenCalled()
-
-    controller.abort()
-    await Promise.resolve()
-    expect(close).toHaveBeenCalledTimes(1)
+    await expect(getMockTools(undefined)).rejects.toThrow(
+      'search_docs tool is missing from the eval harness'
+    )
   })
 
   describe('notebook tools', () => {
@@ -64,7 +50,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
     const EDGE_FUNCTION_NOTEBOOK_ID = MOCK_NOTEBOOKS_DATA[1].id
 
     it('list_notebooks reflects the two seeded fixtures', async () => {
-      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      const mockTools = await getMockTools(undefined)
       if (!mockTools.list_notebooks.execute) throw new Error('execute is undefined')
 
       const result = await mockTools.list_notebooks.execute(
@@ -82,7 +68,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
     })
 
     it('get_notebook resolves cells in order and rejects an unknown id', async () => {
-      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      const mockTools = await getMockTools(undefined)
       if (!mockTools.get_notebook.execute) throw new Error('execute is undefined')
 
       const result = await mockTools.get_notebook.execute(
@@ -113,7 +99,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
     })
 
     it('shares deterministic run_notebook output with eval models', async () => {
-      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      const mockTools = await getMockTools(undefined)
       if (!mockTools.run_notebook.execute) throw new Error('execute is undefined')
       if (!mockTools.run_notebook.toModelOutput) throw new Error('toModelOutput is undefined')
 
@@ -136,14 +122,14 @@ describe('ai/tools/mock-tools getMockTools', () => {
     })
 
     it('overrides create_notebook needsApproval to false, unlike the real tool', async () => {
-      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      const mockTools = await getMockTools(undefined)
 
       expect(getNotebookTools().create_notebook.needsApproval).toBe(true)
       expect(mockTools.create_notebook.needsApproval).toBe(false)
     })
 
     it('create_notebook stores a new notebook visible via get_notebook and list_notebooks', async () => {
-      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      const mockTools = await getMockTools(undefined)
       if (!mockTools.create_notebook.execute) throw new Error('execute is undefined')
       if (!mockTools.get_notebook.execute) throw new Error('execute is undefined')
       if (!mockTools.list_notebooks.execute) throw new Error('execute is undefined')
@@ -179,14 +165,14 @@ describe('ai/tools/mock-tools getMockTools', () => {
     })
 
     it('overrides update_notebook needsApproval to false, unlike the real tool', async () => {
-      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      const mockTools = await getMockTools(undefined)
 
       expect(getNotebookTools().update_notebook.needsApproval).toBe(true)
       expect(mockTools.update_notebook.needsApproval).toBe(false)
     })
 
     it('update_notebook inserts and deletes cells, and list_notebooks reflects the new cell count', async () => {
-      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      const mockTools = await getMockTools(undefined)
       if (!mockTools.get_notebook.execute) throw new Error('execute is undefined')
       if (!mockTools.update_notebook.execute) throw new Error('execute is undefined')
       if (!mockTools.list_notebooks.execute) throw new Error('execute is undefined')
@@ -233,7 +219,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
     })
 
     it('update_notebook rejects an unknown cell_id without mutating the notebook', async () => {
-      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      const mockTools = await getMockTools(undefined)
       if (!mockTools.get_notebook.execute) throw new Error('execute is undefined')
       if (!mockTools.update_notebook.execute) throw new Error('execute is undefined')
 
@@ -261,14 +247,14 @@ describe('ai/tools/mock-tools getMockTools', () => {
     })
 
     it('overrides delete_notebook needsApproval to false, unlike the real tool', async () => {
-      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      const mockTools = await getMockTools(undefined)
 
       expect(getNotebookTools().delete_notebook.needsApproval).toBe(true)
       expect(mockTools.delete_notebook.needsApproval).toBe(false)
     })
 
     it('delete_notebook removes the notebook, and list_notebooks no longer returns it', async () => {
-      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      const mockTools = await getMockTools(undefined)
       if (!mockTools.delete_notebook.execute) throw new Error('execute is undefined')
       if (!mockTools.list_notebooks.execute) throw new Error('execute is undefined')
 
@@ -286,7 +272,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
     })
 
     it('delete_notebook rejects an unknown id', async () => {
-      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      const mockTools = await getMockTools(undefined)
       if (!mockTools.delete_notebook.execute) throw new Error('execute is undefined')
 
       await expect(
@@ -298,7 +284,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
     })
 
     it('is isolated per call to getMockTools', async () => {
-      const firstCall = await getMockTools(undefined, new AbortController().signal)
+      const firstCall = await getMockTools(undefined)
       if (!firstCall.create_notebook.execute) throw new Error('execute is undefined')
 
       await firstCall.create_notebook.execute(
@@ -309,7 +295,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
         { toolCallId: 'test', messages: [], context: {} }
       )
 
-      const secondCall = await getMockTools(undefined, new AbortController().signal)
+      const secondCall = await getMockTools(undefined)
       if (!secondCall.list_notebooks.execute) throw new Error('execute is undefined')
 
       const result = await secondCall.list_notebooks.execute(
