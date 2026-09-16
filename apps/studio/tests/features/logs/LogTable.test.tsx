@@ -1,11 +1,11 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import type { ComponentProps, ReactNode } from 'react'
+import type { ComponentProps, Key, ReactNode } from 'react'
 import { expect, test, vi } from 'vitest'
 
 import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
@@ -27,11 +27,23 @@ vi.mock('react-data-grid', async () => {
     renderCell?: (props: { row: MockRow; rowIdx: number; isCellSelected: boolean }) => ReactNode
     renderHeaderCell?: (props: object) => ReactNode
   }
+  // The subset of react-data-grid's `RenderRowProps` a custom row renderer reads, plus the
+  // DOM props (onClick, onContextMenu, className, ...) the renderer forwards to the row element
+  type MockRowProps = {
+    row: MockRow
+    rowIdx: number
+    viewportColumns: MockColumn[]
+    isRowSelected: boolean
+    selectedCellIdx?: number
+  } & ComponentProps<'div'>
   type SelectRowEvent = { row: MockRow; checked: boolean; isShiftClick: boolean }
   type MockDataGridProps = {
     columns: MockColumn[]
     rows: MockRow[]
-    renderers?: { noRowsFallback?: ReactNode }
+    renderers?: {
+      renderRow?: (key: Key, props: MockRowProps) => ReactNode
+      noRowsFallback?: ReactNode
+    }
     role?: string
     headerRowHeight?: number
     rowKeyGetter: (row: MockRow) => string
@@ -43,6 +55,25 @@ vi.mock('react-data-grid', async () => {
     isRowSelected: boolean
     onRowSelectionChange: (event: SelectRowEvent) => void
   }>({ isRowSelected: false, onRowSelectionChange: () => {} })
+
+  // Mirrors react-data-grid's `Row`: renders the viewport columns and spreads the rest of
+  // the props onto the row element, so only DOM props reach the DOM
+  const MockRowRenderer = ({
+    row,
+    rowIdx,
+    viewportColumns,
+    isRowSelected,
+    selectedCellIdx,
+    ...props
+  }: MockRowProps) => (
+    <div role="row" {...props}>
+      {viewportColumns.map((col, colIdx) => (
+        <div key={colIdx} role="cell">
+          {col.renderCell?.({ row, rowIdx, isCellSelected: false })}
+        </div>
+      ))}
+    </div>
+  )
 
   const MockDataGrid = ({
     columns,
@@ -95,31 +126,30 @@ vi.mock('react-data-grid', async () => {
             ))}
           </div>
         )}
-        {rows.map((row, rowIdx) => (
-          <RowSelectionContext.Provider
-            key={rowIdx}
-            value={{
-              isRowSelected: selectedRows?.has(rowKeyGetter(row)) ?? false,
-              onRowSelectionChange: selectRow,
-            }}
-          >
-            <div role="row">
-              {columns.map((col, colIdx) => (
-                <div key={colIdx} role="cell">
-                  {col.renderCell?.({ row, rowIdx, isCellSelected: false })}
-                </div>
-              ))}
-            </div>
-          </RowSelectionContext.Provider>
-        ))}
+        {rows.map((row, rowIdx) => {
+          const rowProps: MockRowProps = {
+            row,
+            rowIdx,
+            viewportColumns: columns,
+            isRowSelected: selectedRows?.has(rowKeyGetter(row)) ?? false,
+          }
+          return (
+            <RowSelectionContext.Provider
+              key={rowIdx}
+              value={{ isRowSelected: rowProps.isRowSelected, onRowSelectionChange: selectRow }}
+            >
+              {renderers?.renderRow ? (
+                renderers.renderRow(rowKeyGetter(row), rowProps)
+              ) : (
+                <MockRowRenderer {...rowProps} />
+              )}
+            </RowSelectionContext.Provider>
+          )
+        })}
         {rows.length === 0 && renderers?.noRowsFallback}
       </div>
     )
   }
-
-  const MockRowRenderer = ({ row, ...props }: { row: MockRow } & ComponentProps<'div'>) => (
-    <div role="row" {...props} />
-  )
 
   return {
     default: MockDataGrid,
@@ -466,6 +496,39 @@ test('clicking a checked row again clears the selection', async () => {
 
   await user.click(getRowCheckboxes()[2])
 
+  expectCheckedIndexes([])
+  await waitFor(() => expect(screen.queryByText(/rows? selected/)).toBeNull())
+})
+
+test('checkbox clicks stay inside the checkbox column while a row click clears the selection', async () => {
+  const user = userEvent.setup()
+  const onSelectedLogChange = vi.fn()
+  render(
+    <LogTable
+      projectRef="projectRef"
+      data={MULTI_SELECT_LOGS}
+      onSelectedLogChange={onSelectedLogChange}
+    />
+  )
+
+  await user.click(getRowCheckboxes()[1])
+  await shiftClick(user, getRowCheckboxes()[3])
+
+  expectCheckedIndexes([1, 2, 3])
+  await screen.findByText('3 rows selected')
+  // Checking rows only closes the side panel (`null`), it never opens one for a log
+  expect(onSelectedLogChange).not.toHaveBeenCalledWith(
+    expect.objectContaining({ id: expect.any(String) })
+  )
+
+  const dataRows = screen
+    .getAllByRole('row')
+    .filter((row) => within(row).queryByRole('checkbox') !== null)
+  await user.click(dataRows[4])
+
+  expect(onSelectedLogChange).toHaveBeenCalledWith(
+    expect.objectContaining({ id: MULTI_SELECT_LOGS[4].id })
+  )
   expectCheckedIndexes([])
   await waitFor(() => expect(screen.queryByText(/rows? selected/)).toBeNull())
 })
