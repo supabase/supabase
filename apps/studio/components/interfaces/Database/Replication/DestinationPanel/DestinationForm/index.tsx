@@ -34,6 +34,7 @@ import {
   buildTableSyncCopyConfig,
   generateDefaultValues,
   pruneStaleSelectedTableIds,
+  pruneStaleTableOptions,
 } from './DestinationForm.utils'
 import { DestinationNameInput } from './DestinationNameInput'
 import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
@@ -314,6 +315,11 @@ export const DestinationForm = ({
         publication: selectedPublication,
         publicationName: rawData.publicationName,
       }),
+      tableOptions: pruneStaleTableOptions({
+        tableOptions: rawData.tableOptions,
+        publication: selectedPublication,
+        publicationName: rawData.publicationName,
+      }),
     }
 
     if (
@@ -525,10 +531,16 @@ export const DestinationForm = ({
           )}
         </AnimatePresence>
         <div className="flex items-center gap-x-2">
-          <Button disabled={isSaving} variant="default" onClick={onCancel}>
+          <Button disabled={isSaving} onClick={onCancel}>
             Cancel
           </Button>
-          <Button disabled={isSubmitDisabled} loading={isSaving} form={formId} type="submit">
+          <Button
+            variant="primary"
+            disabled={isSubmitDisabled}
+            loading={isSaving}
+            form={formId}
+            type="submit"
+          >
             {getSubmitButtonText()}
           </Button>
         </div>
@@ -543,6 +555,10 @@ export const DestinationForm = ({
               shouldValidate: true,
             })
             form.setValue('tableSyncCopyTableIds', [], {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
+            form.setValue('tableOptions', [], {
               shouldDirty: true,
               shouldValidate: true,
             })

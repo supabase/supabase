@@ -275,6 +275,29 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
       </>
     ),
   },
+  cursor: {
+    alternate: () => (
+      <>
+        <paragraph>
+          To make the server available across all projects, place the configuration in{' '}
+          <inlineCode value="~/.cursor/mcp.json" /> instead.
+        </paragraph>
+        <heading depth={5}>Using Cursor CLI</heading>
+        <paragraph>
+          Cursor IDE and the Cursor CLI (<inlineCode value="agent" />) use the same MCP
+          configuration. After you add the configuration above or install with the one-click button,
+          manage the server from your terminal using the{' '}
+          <link url="https://cursor.com/docs/cli/mcp">Cursor CLI</link>.
+        </paragraph>
+        <paragraph>Approve the server locally:</paragraph>
+        <code lang="bash" value="agent mcp enable supabase" />
+        <paragraph>Authenticate with Supabase:</paragraph>
+        <code lang="bash" value={MCP_CLI_COMMANDS['cursor'].authenticate!} />
+        <paragraph>Check the server connection status:</paragraph>
+        <code lang="bash" value="agent mcp list" />
+      </>
+    ),
+  },
   omp: {
     primary: () => (
       <>

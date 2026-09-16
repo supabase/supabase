@@ -18,6 +18,7 @@ const BASE_PARAMS = {
   connectionString: 'postgresql://localhost',
   authorization: 'Bearer token',
   aiOptInLevel: 'schema_and_log_and_data' as const,
+  isRestrictedByHipaa: false,
   accessToken: 'access-token',
   baseUrl: 'https://supabase.com/dashboard',
   signal: new AbortController().signal,
@@ -25,7 +26,6 @@ const BASE_PARAMS = {
 
 describe('ai/tools getTools', () => {
   beforeEach(async () => {
-    vi.clearAllMocks()
     vi.mocked(getMcpTools).mockResolvedValue({ list_tables: {} } as any)
     // Reset to platform each test; the self-hosted test overrides to false.
     // Done here (not afterEach) so the spy can't leak across tests via order.
@@ -40,6 +40,7 @@ describe('ai/tools getTools', () => {
       accessToken: BASE_PARAMS.accessToken,
       projectRef: BASE_PARAMS.projectRef,
       aiOptInLevel: BASE_PARAMS.aiOptInLevel,
+      isRestrictedByHipaa: BASE_PARAMS.isRestrictedByHipaa,
       signal: BASE_PARAMS.signal,
     })
     expect(tools).toHaveProperty('studio_tool')

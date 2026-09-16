@@ -1,3 +1,5 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
+import { mkdir, rename, writeFile } from 'node:fs/promises'
 import path from 'path'
 import { getHighlighter, loadTheme } from '@shikijs/compat'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
@@ -9,6 +11,13 @@ import { visit } from 'unist-util-visit'
 import { defineConfig, s } from 'velite'
 
 import { rehypeComponent } from './lib/rehype-component'
+
+const CODE_OUTPUT_DIR = '.velite/codes'
+
+function toCodeId(slugAsParams) {
+  if (!slugAsParams) return 'index'
+  return Buffer.from(slugAsParams, 'utf8').toString('base64url')
+}
 
 const LinksProperties = s.object({
   doc: s.string().optional(),
@@ -46,16 +55,29 @@ const docs = s
     // real benefit for a dev-only content cache, and dominates build time.
     code: s.mdx({ copyLinkedFiles: false, minify: false }),
   })
-  .transform(({ path: flattenedPath, ...data }) => ({
-    ...data,
-    slug: `/${flattenedPath}`,
-    slugAsParams: flattenedPath.split('/').slice(1).join('/'),
-  }))
+  .transform(async ({ path: flattenedPath, code, ...data }) => {
+    const slugAsParams = flattenedPath.split('/').slice(1).join('/')
+    const codeId = toCodeId(slugAsParams)
+    const codesDir = path.join(process.cwd(), CODE_OUTPUT_DIR)
+
+    await mkdir(codesDir, { recursive: true })
+    const codePath = path.join(codesDir, `${codeId}.json`)
+    const tmpPath = `${codePath}.tmp`
+    await writeFile(tmpPath, JSON.stringify(code), 'utf8')
+    await rename(tmpPath, codePath)
+
+    return {
+      ...data,
+      slug: `/${flattenedPath}`,
+      slugAsParams,
+      codeId,
+    }
+  })
 
 export default defineConfig({
   root: './content',
   output: {
-    clean: true,
+    clean: process.env.NODE_ENV === 'production',
   },
   collections: {
     allDocs: {

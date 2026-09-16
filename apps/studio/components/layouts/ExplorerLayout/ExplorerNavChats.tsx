@@ -18,7 +18,7 @@ const getVisibleChats = (chats: ChatSession[], search: string): ChatSession[] =>
     .sort((a, b) => (b.updatedAt?.getTime() ?? 0) - (a.updatedAt?.getTime() ?? 0))
 }
 
-export const ExplorerNavChats = ({ onBack }: { onBack: () => void }) => {
+export const ExplorerNavChats = () => {
   const [search, setSearch] = useState('')
   const router = useRouter()
   const { id } = useParams()
@@ -28,7 +28,7 @@ export const ExplorerNavChats = ({ onBack }: { onBack: () => void }) => {
   const chats = getVisibleChats(chatList, search)
 
   return (
-    <ExplorerNavResourceWrapper type="chat" search={search} setSearch={setSearch} onBack={onBack}>
+    <ExplorerNavResourceWrapper type="chat" search={search} setSearch={setSearch}>
       <div className="flex flex-1 flex-col gap-px overflow-y-auto px-3 pb-3">
         {chats.length === 0 ? (
           <p className="px-2 py-2 text-xs text-foreground-lighter">

@@ -11,6 +11,7 @@ const BASE_PARAMS = {
   accessToken: 'token',
   projectRef: 'abcdefghijklmnopqrst',
   aiOptInLevel: 'schema_and_log_and_data' as const,
+  isRestrictedByHipaa: false,
   // A fresh, non-aborted signal by default; lifecycle tests override it
   signal: new AbortController().signal,
 }
@@ -34,7 +35,6 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
-    vi.clearAllMocks()
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     close = vi.fn().mockResolvedValue(undefined)
     tools = vi.fn().mockResolvedValue({ ...FULL_REMOTE_TOOLS })

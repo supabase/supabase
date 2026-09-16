@@ -11,6 +11,7 @@ import {
   buildTableSyncCopyConfig,
   generateDefaultValues,
   pruneStaleSelectedTableIds,
+  pruneStaleTableOptions,
 } from './DestinationForm.utils'
 import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
 import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
@@ -224,6 +225,50 @@ describe('DestinationForm.utils table copy selection', () => {
         publicationName: 'analytics',
       })
     ).toEqual(['202'])
+  })
+})
+
+describe('pruneStaleTableOptions', () => {
+  const publication: ReplicationPublicationData = {
+    name: 'analytics',
+    config: {
+      type: 'tables',
+      tables: [{ id: 101, schema: 'public', name: 'orders', columns: null, row_filter: null }],
+      operations: ['insert'],
+      publish_via_partition_root: false,
+    },
+    tables: [
+      {
+        id: 101,
+        schema: 'public',
+        name: 'orders',
+        kind: 'table',
+        partition_parent_id: null,
+      },
+    ],
+  }
+
+  it('drops table options whose ids are no longer in the publication', () => {
+    expect(
+      pruneStaleTableOptions({
+        tableOptions: [
+          { tableId: 101, clusterBy: ['region'] },
+          { tableId: 202, clusterBy: ['unused'] },
+        ],
+        publication,
+        publicationName: 'analytics',
+      })
+    ).toEqual([{ tableId: 101, clusterBy: ['region'] }])
+  })
+
+  it('returns undefined when table options were never set', () => {
+    expect(
+      pruneStaleTableOptions({
+        tableOptions: undefined,
+        publication,
+        publicationName: 'analytics',
+      })
+    ).toBeUndefined()
   })
 })
 

@@ -46,6 +46,8 @@ It is likely that the refresh token sent from the browser to your server is stal
 
 When you receive this error on the server-side, try to defer rendering to the browser where the client library can access an up-to-date refresh token and present the user with a better experience.
 
+A common cause is calling `supabase.auth.signOut()` without a `scope`. It defaults to `scope: 'global'`, which revokes the refresh token for every session that user has. That includes other tabs, devices, and any SSR context still holding the old token. See [Sign out and scopes](/docs/guides/auth/signout#sign-out-and-scopes). Pass `{ scope: 'local' }` if you only want to end the current session.
+
 ### Should I set a shorter `Max-Age` parameter on the cookies?
 
 The `Max-Age` or `Expires` cookie parameters only control whether the browser sends the value to the server. Since a refresh token represents the long-lived authentication session of the user on that browser, setting a short `Max-Age` or `Expires` parameter on the cookies only results in a degraded user experience.

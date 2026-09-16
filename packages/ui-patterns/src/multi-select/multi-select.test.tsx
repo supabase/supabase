@@ -58,6 +58,31 @@ describe('multi-select', () => {
     const trigger = screen.getByRole('combobox')
     expect(trigger).toHaveClass('h-[26px]', 'p-0.5')
     expect(trigger.firstElementChild).toHaveClass('gap-0.5')
+    expect(trigger.querySelector('.lucide-chevron-down')).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('keeps the default trigger height stable when the first value is selected', () => {
+    const { rerender } = render(
+      <MultiSelector values={[]} onValuesChange={() => undefined}>
+        <MultiSelectorTrigger label="Select fruits" />
+      </MultiSelector>
+    )
+
+    const trigger = screen.getByRole('combobox')
+    expect(trigger).toHaveClass('min-h-[34px]', 'py-1.5')
+    expect(screen.getByText('Select fruits')).toHaveClass('leading-5')
+
+    rerender(
+      <MultiSelector values={['Apple']} onValuesChange={() => undefined}>
+        <MultiSelectorTrigger label="Select fruits" />
+      </MultiSelector>
+    )
+
+    expect(screen.getByText('Apple').closest('[class*=rounded]')).toHaveClass(
+      'text-xs/none',
+      'py-[3px]'
+    )
+    expect(trigger).toHaveClass('min-h-[34px]', 'py-1.5')
   })
 
   it('renders selected values with a custom label', () => {
@@ -70,6 +95,24 @@ describe('multi-select', () => {
     const badge = screen.getByText('Public.MixedCase_101').closest('[class*=rounded]')
     expect(screen.getByRole('combobox')).toHaveTextContent('Public.MixedCase_101')
     expect(badge).toHaveClass('normal-case', 'tracking-normal')
+  })
+
+  it('supports wrapping badges with a numeric badge limit', () => {
+    render(
+      <MultiSelector
+        values={['Apple', 'Banana', 'Cherry', 'Date', 'Fig']}
+        onValuesChange={() => undefined}
+      >
+        <MultiSelectorTrigger badgeLimit={2} wrapBadges />
+      </MultiSelector>
+    )
+
+    const trigger = screen.getByRole('combobox')
+    expect(trigger.firstElementChild).toHaveClass('flex-wrap')
+    expect(trigger).toHaveTextContent('Apple')
+    expect(trigger).toHaveTextContent('Banana')
+    expect(trigger).toHaveTextContent('+3')
+    expect(trigger).not.toHaveTextContent('Cherry')
   })
 
   it('opens the dropdown when the MultiSelectorTrigger is clicked', () => {

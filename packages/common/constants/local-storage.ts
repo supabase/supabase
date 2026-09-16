@@ -56,6 +56,7 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_TEMPORARY_FROM_EXPLORER: (ref: string) => `sql-editor-temporary-from-explorer-${ref}`,
 
   EXPLORER_QUERY_DRAFTS: (ref: string) => `explorer-query-drafts-${ref}`,
+  NOTEBOOK_DRAFTS: (ref: string) => `notebook-drafts-${ref}`,
 
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
   GRAPHQL_INTROSPECTION_NOTICE_COLLAPSED: (ref: string) =>
@@ -79,6 +80,7 @@ export const LOCAL_STORAGE_KEYS = {
   // Notice banner keys
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
   TERMS_OF_SERVICE_UPDATE: 'terms-of-service-update-2026-08-01',
+  PRIVACY_POLICY_UPDATE: 'privacy-policy-update-2026-09-16-dismissed',
   SUPAVISOR_MAINTENANCE: (ref: string) => `supavisor-maintenance-2026-06-09-${ref}`,
   REPORT_DATERANGE: 'supabase-report-daterange',
   PROJECT_PAUSING_STARTED_AT: (ref: string) => `supabase-project-pausing-started-at-${ref}`,

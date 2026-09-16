@@ -40,7 +40,7 @@ describe('AiPrompt markdown schema', () => {
     })
 
     expect(markdown).toContain('Help me monitor and debug my Supabase project.')
-    expect(markdown).toContain('npm install -g supabase')
+    expect(markdown).toContain('npm install supabase --save-dev')
     expect(markdown).toContain('npx plugins add supabase-community/supabase-plugin')
     expect(markdown).toContain('read-only')
     expect(markdown).toContain('https://supabase.com/docs/guides/observability.md')

@@ -130,7 +130,6 @@ export const BannedIPs = () => {
                       {ip === userIPAddress && <Badge>Your IP address</Badge>}
                     </div>
                     <ButtonTooltip
-                      variant="default"
                       disabled={isSectionDisabled}
                       onClick={() => openConfirmationModal(ip)}
                       tooltip={{
