@@ -184,6 +184,32 @@ describe('ResourceExhaustionWarningBanner', () => {
     )
   })
 
+  test('filters unconfigured warning fields before rendering', async () => {
+    renderBanner({
+      auth_email_offender: 'warning',
+      auth_restricted_email_sending: 'critical',
+      cpu_exhaustion: 'warning',
+      need_pitr: 'warning',
+    })
+
+    expect(
+      await screen.findByText(
+        'Your project is currently facing high CPU usage, and its performance is affected'
+      )
+    ).toBeInTheDocument()
+
+    const menu = await openTroubleshootMenu()
+    const metricsItem = menu.getByRole('menuitem', { name: 'View metrics' })
+    await userEvent.click(metricsItem)
+
+    expect(trackSpy).toHaveBeenCalledWith('resource_exhaustion_banner_troubleshoot_clicked', {
+      troubleshootAction: 'metrics',
+      warningType: 'cpu_exhaustion',
+      warningTypes: ['cpu_exhaustion'],
+      destination: metricsHref('cpu-usage'),
+    })
+  })
+
   test('all-compute multi banner keeps Upgrade compute and falls back to the throughput chart', async () => {
     renderBanner({ cpu_exhaustion: 'warning', disk_io_exhaustion: 'warning' })
 

@@ -113,6 +113,7 @@ export const ResourceExhaustionWarningBanner = () => {
             (property) =>
               property !== 'project' &&
               property !== 'is_readonly_mode_enabled' &&
+              Object.hasOwn(RESOURCE_WARNING_MESSAGES, property) &&
               projectResourceWarnings[property as keyof typeof projectResourceWarnings] !== null
           )
       : []
