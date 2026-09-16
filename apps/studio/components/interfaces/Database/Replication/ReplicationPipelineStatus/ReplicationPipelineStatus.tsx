@@ -8,11 +8,14 @@ import {
   CardContent,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
+  TableHeadSort,
   TableRow,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -30,14 +33,33 @@ import { SlotLagMetricsInline, SlotLagMetricsList } from './SlotLagMetrics'
 import { SlotConnectionIndicator, SlotStatusBadge, SlotStatusLegend } from './SlotStatus'
 import { TableReplicationRow } from './TableReplicationRow'
 import { AlertError } from '@/components/ui/AlertError'
-import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
-import { useReplicationPipelineReplicationStatusQuery } from '@/data/replication/pipeline-replication-status-query'
+import {
+  useReplicationPipelineReplicationStatusQuery,
+  type ReplicationPipelineTableStatus,
+} from '@/data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
+import { onSearchInputEscape } from '@/lib/keyboard'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
+
+type TableSortColumn = 'table' | 'status'
+type TableSort = `${TableSortColumn}:${'asc' | 'desc'}`
+
+const TABLE_STATE_SORT_ORDER: ReplicationPipelineTableStatus['state']['name'][] = [
+  'error',
+  'copying_table',
+  'copied_table',
+  'following_wal',
+  'queued',
+]
+
+const compareTableStates = (
+  a: ReplicationPipelineTableStatus['state'],
+  b: ReplicationPipelineTableStatus['state']
+) => TABLE_STATE_SORT_ORDER.indexOf(a.name) - TABLE_STATE_SORT_ORDER.indexOf(b.name)
 
 /**
  * Component for displaying replication pipeline status and table replication details.
@@ -100,27 +122,44 @@ export const ReplicationPipelineStatus = () => {
   const statusName = getStatusName(pipelineStatusData?.status)
   const config = getDisabledStateConfig({ requestStatus, statusName })
 
-  // Sort tables by schema and name for consistent ordering (memoized)
   const tableStatuses = useMemo(
-    () =>
-      (replicationStatusData?.table_statuses || []).sort(
-        (a, b) => a.schema.localeCompare(b.schema) || a.name.localeCompare(b.name)
-      ),
+    () => replicationStatusData?.table_statuses ?? [],
     [replicationStatusData?.table_statuses]
   )
 
   const applyLagMetrics = replicationStatusData?.apply_lag
 
-  // Filter tables based on search (memoized)
-  const filteredTableStatuses = useMemo(
-    () =>
+  const [sort, setSort] = useState<TableSort>('status:asc')
+  const [sortColumn, sortDirection] = sort.split(':') as [TableSortColumn, 'asc' | 'desc']
+
+  const getAriaSort = (column: TableSortColumn) => {
+    if (sortColumn !== column) return 'none'
+    return sortDirection === 'asc' ? 'ascending' : 'descending'
+  }
+
+  const handleSortChange = (column: TableSortColumn) => {
+    if (sortColumn !== column) return setSort(`${column}:asc`)
+    setSort(`${column}:${sortDirection === 'asc' ? 'desc' : 'asc'}`)
+  }
+
+  const filteredTableStatuses = useMemo(() => {
+    const items =
       searchString.length === 0
-        ? tableStatuses
+        ? [...tableStatuses]
         : tableStatuses.filter((table) =>
             `${table.schema}.${table.name}`.toLowerCase().includes(searchString.toLowerCase())
-          ),
-    [tableStatuses, searchString]
-  )
+          )
+
+    items.sort((a, b) => {
+      const byName = a.schema.localeCompare(b.schema) || a.name.localeCompare(b.name)
+      const comparison =
+        sortColumn === 'table' ? byName : compareTableStates(a.state, b.state) || byName
+
+      return sortDirection === 'asc' ? comparison : -comparison
+    })
+
+    return items
+  }, [tableStatuses, searchString, sortColumn, sortDirection])
 
   const tablesWithLag = useMemo(
     () => tableStatuses.filter((table) => Boolean(table.table_sync_lag)),
@@ -146,6 +185,7 @@ export const ReplicationPipelineStatus = () => {
     requestStatus === PipelineStatusRequestStatus.RestartRequested
   const isPipelineBusy = isEnablingDisabling || isAnyRestartInProgress
   const showDisabledState = isPipelineBusy || !isPipelineActionable
+  const canResetErroredTables = hasErroredTables && !isAnyRestartInProgress && !showDisabledState
   const lastKnownStateMessage =
     statusName === PipelineStatusName.STOPPED
       ? 'Showing the last known table state before the pipeline was stopped.'
@@ -243,25 +283,27 @@ export const ReplicationPipelineStatus = () => {
                 icon={<Search />}
                 size="tiny"
                 className="text-xs w-52"
-                placeholder="Search for tables"
+                placeholder="Search tables"
                 value={searchString}
                 disabled={isPipelineError}
                 onChange={(e) => setSearchString(e.target.value)}
+                onKeyDown={onSearchInputEscape(searchString, setSearchString)}
                 actions={
-                  searchString.length > 0 && [
-                    <X
-                      key="close"
-                      className="mx-2 cursor-pointer text-foreground"
-                      size={14}
-                      strokeWidth={1.5}
+                  searchString.length > 0 && (
+                    <Button
+                      aria-label="Clear search"
+                      variant="text"
+                      icon={<X />}
+                      className="p-0 h-5 w-5"
                       onClick={() => setSearchString('')}
-                    />,
-                  ]
+                    />
+                  )
                 }
               />
               <div className="flex items-center">
                 <Button
                   size="tiny"
+                  variant="default"
                   className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
                   icon={<RotateCcw />}
                   disabled={isAnyRestartInProgress || showDisabledState || isPipelineError}
@@ -271,33 +313,35 @@ export const ReplicationPipelineStatus = () => {
                     setShowBatchRestartDialog(true)
                   }}
                 >
-                  Restart all tables
+                  Reset all tables
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      aria-label="More restart options"
+                      variant="default"
+                      aria-label="More reset options"
                       icon={<ChevronDown />}
                       className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                       disabled={showDisabledState || isPipelineError}
                     />
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-44">
-                    <DropdownMenuItemTooltip
-                      disabled={!hasErroredTables || isAnyRestartInProgress || showDisabledState}
+                  <DropdownMenuContent align="end" className="w-52">
+                    <DropdownMenuItem
+                      className="data-disabled:pointer-events-auto data-disabled:cursor-not-allowed"
+                      disabled={!canResetErroredTables}
                       onClick={() => {
+                        if (!canResetErroredTables) return
                         setBatchRestartMode('errored')
                         setShowBatchRestartDialog(true)
                       }}
-                      tooltip={{
-                        content: {
-                          side: 'left',
-                          text: !hasErroredTables ? 'No failed tables' : undefined,
-                        },
-                      }}
                     >
-                      Restart failed tables only
-                    </DropdownMenuItemTooltip>
+                      <div className="flex flex-col gap-y-0.5">
+                        <p>Reset failed tables only</p>
+                        {!hasErroredTables && (
+                          <p className="text-foreground-lighter">No failed tables</p>
+                        )}
+                      </div>
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -315,13 +359,46 @@ export const ReplicationPipelineStatus = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead key="table">Table</TableHead>
-                      <TableHead key="status">Status</TableHead>
+                      <TableHead key="table" aria-sort={getAriaSort('table')}>
+                        <TableHeadSort
+                          column="table"
+                          currentSort={sort}
+                          onSortChange={handleSortChange}
+                        >
+                          Table
+                        </TableHeadSort>
+                      </TableHead>
+                      <TableHead key="status" aria-sort={getAriaSort('status')}>
+                        <TableHeadSort
+                          column="status"
+                          currentSort={sort}
+                          onSortChange={handleSortChange}
+                        >
+                          Status
+                        </TableHeadSort>
+                      </TableHead>
                       <TableHead key="details">Details</TableHead>
                       <TableHead key="actions" />
                     </TableRow>
                   </TableHeader>
                   <TableBody>
+                    <tr className="sr-only" aria-live="polite" role="status">
+                      <td colSpan={4}>
+                        {filteredTableStatuses.length === 0 && searchString.length > 0
+                          ? `No results found for “${searchString}”`
+                          : ''}
+                      </td>
+                    </tr>
+                    {filteredTableStatuses.length === 0 && (
+                      <TableRow className="[&>td]:hover:bg-inherit">
+                        <TableCell colSpan={4}>
+                          <p className="text-sm text-foreground">No results found</p>
+                          <p className="text-sm text-foreground-lighter">
+                            Your search for “{searchString}” did not return any results.
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                    )}
                     {filteredTableStatuses.map((table) => {
                       const isRestarting = restartingTableIds.has(table.id)
                       const isErrorState = table.state.name === 'error'
