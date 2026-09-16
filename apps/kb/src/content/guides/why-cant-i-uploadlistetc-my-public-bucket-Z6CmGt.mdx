@@ -1,0 +1,10 @@
+---
+title: "Why can't I upload/list/etc my public bucket?"
+description: 'Clarifies that a public storage bucket only grants a public download URL, and other operations still require matching storage policies.'
+topics: ['Troubleshooting', 'Storage']
+github_url: 'https://github.com/orgs/supabase/discussions/19180'
+---
+
+A public bucket in the storage API only means there is a public URL available you can use to download the file.
+All other bucket or file operations require you to meet storage policies on that bucket.
+Note also you should use the normal path for all other operations and not the public URL path with 'public' in it.

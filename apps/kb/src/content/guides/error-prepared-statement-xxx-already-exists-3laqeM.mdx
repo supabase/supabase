@@ -1,0 +1,11 @@
+---
+title: 'Error: prepared statement "XXX" already exists'
+description: 'Explains that this error happens because PgBouncer does not support prepared statements, and how to work around it with a direct connection or a Prisma parameter.'
+topics: ['Troubleshooting', 'Database']
+github_url: 'https://github.com/orgs/supabase/discussions/17751'
+---
+
+This error occurs when you are trying to connect to the database using PgBouncer. PgBouncer does not support prepared statements. If you have prepared statements in use, you will need to use direct connections - port 5432.
+
+There is a special parameter in the query string for Prisma to work with PgBouncer
+https://www.prisma.io/docs/guides/performance-and-optimization/connection-management/configure-pg-bouncer
