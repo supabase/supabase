@@ -3,7 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "build": "node build.mjs",
+    "deploy": "npm run build && supabase compute push mcp-server"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.0.0",
@@ -13,6 +15,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.15.3",
+    "esbuild": "^0.25.10",
     "typescript": "^5.8.3"
   }
 }

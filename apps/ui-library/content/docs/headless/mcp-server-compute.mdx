@@ -20,26 +20,37 @@ Installs Node Compute files into a Supabase project or empty directory. No
 `components.json` is required. Backend files stay in `supabase/` at the project
 root even when the frontend uses `src/`.
 
-Then install the service's dependencies, in the service directory:
+The block ships sources and a build script, not a build. Install the
+dependencies and bundle them, in the service directory:
 
 ```bash
 cd supabase/compute/mcp-server
 npm install
+npm run build
 ```
 
-The `node` runtime does no server-side install. `supabase compute push` uploads
-the directory as it stands, so `node_modules` has to already be there. The block
-ships a `.gitignore` that keeps `node_modules` and `.env` out of version
-control; re-run `npm install` on any machine that pushes.
+`npm run build` writes `dist/index.mjs`: one ESM bundle with every dependency
+inlined. That bundle is what gets deployed, because `[compute.mcp-server]
+source` points at `dist/`.
+
+This is worth doing because the `node` runtime installs nothing server-side.
+`supabase compute push` uploads the source directory exactly as it stands, so
+the alternative is committing to keep a full `node_modules` in the directory you
+push. Bundling makes that upload two files instead.
+
+Build on every machine that pushes, and before every deploy: the block's
+`.gitignore` keeps `dist/`, `node_modules/`, and `.env` out of version control,
+so a fresh checkout has no bundle yet.
 
 The tool files are a copy of the Edge Function block's, with the `npm:` prefixes
 removed from their imports. The Edge Function block resolves
-`npm:@modelcontextprotocol/server@2.0.0` at runtime; node resolves
-`@modelcontextprotocol/server` from `node_modules` and cannot read a `npm:`
-specifier, and node has no import map to bridge the two. So the two blocks hold
-the same four tool modules separately, and a tool added to one has to be added
-to the other. Relative imports carry their `.ts` extension in both: that is what
-Deno wants and what node's TypeScript stripping requires.
+`npm:@modelcontextprotocol/server@2.0.0` at runtime; here esbuild resolves
+`@modelcontextprotocol/server` from `node_modules` at build time, and it cannot
+read a `npm:` specifier either. The two blocks also install separately, into
+different directories. So they hold the same four tool modules separately, and a
+tool added to one has to be added to the other. Relative imports carry their
+`.ts` extension in both: that is what Deno resolves at runtime and what esbuild
+resolves at build time.
 
 ## Folder structure
 
@@ -58,15 +69,24 @@ compute = true
 runtime = "node"
 size = "2gb"
 exposure = "public"
+source = "supabase/compute/mcp-server/dist"
 ```
 
-`runtime = "node"` serves `main.ts`'s default-exported `fetch` handler with no
-build step: node runs the TypeScript directly, stripping the types. It does not
-resolve `npm:` or `jsr:` specifiers, and it installs nothing at deploy time, so
-dependencies come from the `node_modules` you install before pushing.
+`source` is the directory that gets packaged and uploaded, relative to the
+project root. It defaults to `supabase/compute/<name>/`; pointing it at `dist/`
+is what deploys the bundle rather than the sources and a `node_modules` beside
+them.
+
+`runtime = "node"` serves `dist/index.mjs`'s default-exported `fetch` handler.
+Keep it set. With no `runtime` the CLI guesses from marker files in the source
+directory and defaults to `deno`, which will not run a bundle built for node.
+The build writes a `dist/package.json` so that guess lands on `node` anyway, but
+pinning `runtime` is what makes the deploy independent of the guess.
+
 `exposure = "public"` publishes the service at
 `https://<project-ref>.supabase.co/compute/v1/mcp-server`. The name in
-`[compute.<name>]` is the last segment of that URL.
+`[compute.<name>]` is the last segment of that URL; `source` does not change
+it.
 
 The project must sign JWTs with an asymmetric key. `withSupabase` verifies user
 tokens against the project JWKS and rejects legacy HS256 tokens, so a project
@@ -203,21 +223,40 @@ way an Edge Function is. Set them yourself. The block includes
 cp supabase/compute/mcp-server/.env.example supabase/compute/mcp-server/.env
 ```
 
-The block's `.gitignore` already covers `supabase/compute/mcp-server/.env` and
-`node_modules/`.
+The block's `.gitignore` already covers `supabase/compute/mcp-server/.env`,
+`node_modules/`, and `dist/`.
 
 ## Deploy
 
 ```bash
 supabase config push
 supabase secrets set --env-file supabase/compute/mcp-server/.env
-npm install --prefix supabase/compute/mcp-server
-supabase compute push mcp-server
-supabase compute status mcp-server
+npm run build --prefix supabase/compute/mcp-server
+supabase compute push mcp-server --project-ref <project-ref>
+supabase compute status mcp-server --project-ref <project-ref>
 ```
 
-`npm install` is not optional. Push a directory without `node_modules` and the
-instance fails to start on `import { createMcpHandler } from '@modelcontextprotocol/server'`.
+The block also ships a `deploy` script that runs the build and the push
+together:
+
+```bash
+cd supabase/compute/mcp-server
+npm run deploy -- --project-ref <project-ref>
+```
+
+`supabase compute push` needs a project either way: pass `--project-ref`, or run
+`supabase link` once in the repo and drop the flag. Arguments after `--` are
+forwarded to the push.
+
+Build before pushing. `push` refuses an empty `source` directory, so a first
+deploy with no build fails outright — but a stale `dist/` deploys the previous
+code without complaining.
+
+Running the two locally is fine, and it is why they are separate scripts. The
+setup worth aiming for is the same pair in CI, so the bundle is built from the
+committed sources and pushed on merge rather than from whatever is in someone's
+working tree. `SUPABASE_ACCESS_TOKEN` and `--project-ref` are all the push needs
+to run unattended.
 
 Then check the advertised metadata matches the URL clients call:
 

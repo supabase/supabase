@@ -3,7 +3,7 @@
   "type": "registry:item",
   "title": "MCP Server (Compute)",
   "description": "Add a user-scoped MCP server to your product, running on Supabase Compute.",
-  "docs": "Set `[compute.mcp-server]` with `runtime = \"node\"` in `supabase/config.toml`. The `node` runtime does no server-side install, so run `npm install` in `supabase/compute/mcp-server` before `supabase compute push` \u2014 the directory is uploaded as-is and `node_modules` has to be in it. Keep `node_modules` and `.env` out of version control. Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` as secrets: a Compute instance is not given them automatically. A trusted product backend can call it with the signed-in user's access token. For external clients, install the [OAuth Consent block](https://supabase.com/library/docs/nextjs/oauth-consent), enable OAuth and dynamic registration, and set the Auth Site URL to the consent app. Every call runs through the user's RLS-scoped client. OAuth tokens include `client_id`; product sessions do not, so define policies for both paths. See [MCP authentication](https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication) and [token security](https://supabase.com/docs/guides/auth/oauth-server/token-security).",
+  "docs": "Set `[compute.mcp-server]` in `supabase/config.toml` with `runtime = \"node\"` and `source = \"supabase/compute/mcp-server/dist\"`. The block ships sources and a build script, not a build: run `npm install` then `npm run build` in `supabase/compute/mcp-server` to write `dist/index.mjs`, a single ESM bundle with its dependencies inlined, then `supabase compute push mcp-server --project-ref <ref>` (or `npm run deploy -- --project-ref <ref>`, which does both). Nothing is installed server-side and the `source` directory is uploaded as-is, so the bundle is what removes the need for a vendored `node_modules`. Build on every machine that pushes: `dist`, `node_modules` and `.env` are git-ignored. Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` as secrets: a Compute instance is not given them automatically. A trusted product backend can call it with the signed-in user's access token. For external clients, install the [OAuth Consent block](https://supabase.com/library/docs/nextjs/oauth-consent), enable OAuth and dynamic registration, and set the Auth Site URL to the consent app. Every call runs through the user's RLS-scoped client. OAuth tokens include `client_id`; product sessions do not, so define policies for both paths. See [MCP authentication](https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication) and [token security](https://supabase.com/docs/guides/auth/oauth-server/token-security).",
   "files": [
     {
       "path": "registry/default/blocks/mcp-server-compute/supabase/compute/mcp-server/main.ts",
@@ -14,6 +14,11 @@
       "path": "registry/default/blocks/mcp-server-compute/supabase/compute/mcp-server/package.json",
       "type": "registry:file",
       "target": "~/supabase/compute/mcp-server/package.json"
+    },
+    {
+      "path": "registry/default/blocks/mcp-server-compute/supabase/compute/mcp-server/build.mjs",
+      "type": "registry:file",
+      "target": "~/supabase/compute/mcp-server/build.mjs"
     },
     {
       "path": "registry/default/blocks/mcp-server-compute/supabase/compute/mcp-server/tsconfig.json",
