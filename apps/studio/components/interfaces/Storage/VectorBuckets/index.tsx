@@ -16,6 +16,7 @@ import { CreateBucketButton } from '../NewBucketButton'
 import { CreateVectorBucketDialog } from './CreateVectorBucketDialog'
 import { VectorBucketsErrorState } from './VectorBucketsErrorState'
 import { AlphaNotice } from '@/components/ui/AlphaNotice'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useVectorBucketsQuery } from '@/data/storage/vector-buckets-query'
 import { createNavigationHandler } from '@/lib/navigation'
 
@@ -107,14 +108,11 @@ export const VectorsBuckets = () => {
                           </TableHeader>
                           <TableBody>
                             {filteredBuckets.length === 0 && filterString.length > 0 && (
-                              <TableRow className="[&>td]:hover:bg-inherit">
-                                <TableCell colSpan={3}>
-                                  <p className="text-sm text-foreground">No results found</p>
-                                  <p className="text-sm text-foreground-lighter">
-                                    Your search for "{filterString}" did not return any results
-                                  </p>
-                                </TableCell>
-                              </TableRow>
+                              <TableRowNoResults
+                                className="[&>td]:hover:bg-inherit"
+                                colSpan={3}
+                                search={filterString}
+                              />
                             )}
                             {filteredBuckets.map((bucket, idx: number) => {
                               const id = `bucket-${idx}`

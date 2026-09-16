@@ -307,3 +307,80 @@ test('custom error message: Resources exceeded during query execution', async ()
   await screen.findByText(/Avoid querying across a large datetime range/)
   await screen.findByText(/Please contact support if this error persists/)
 })
+
+const createLogRow = (index: number) => ({
+  id: `log-id-${index}`,
+  timestamp: fakeMicroTimestamp - index,
+  event_message: `event message ${index}`,
+})
+
+const MULTI_SELECT_LOGS = Array.from({ length: 6 }, (_, index) => createLogRow(index))
+
+const getRowCheckboxes = () => screen.getAllByRole('checkbox')
+
+const expectCheckedIndexes = (checkedIndexes: number[]) => {
+  const checkboxes = getRowCheckboxes()
+  checkboxes.forEach((checkbox, index) => {
+    expect(checkbox.getAttribute('aria-checked')).toBe(
+      checkedIndexes.includes(index) ? 'true' : 'false'
+    )
+  })
+}
+
+const shiftClick = async (user: ReturnType<typeof userEvent.setup>, element: Element) => {
+  await user.keyboard('{Shift>}')
+  await user.click(element)
+  await user.keyboard('{/Shift}')
+}
+
+test('shift-click selects the range between the anchor row and the clicked row', async () => {
+  const user = userEvent.setup()
+  render(<LogTable projectRef="projectRef" data={MULTI_SELECT_LOGS} />)
+
+  const checkboxes = getRowCheckboxes()
+  expect(checkboxes).toHaveLength(MULTI_SELECT_LOGS.length)
+
+  await user.click(checkboxes[1])
+  await shiftClick(user, getRowCheckboxes()[4])
+
+  expectCheckedIndexes([1, 2, 3, 4])
+  await screen.findByText('4 rows selected')
+})
+
+test('shift-click without an anchor toggles only the clicked row', async () => {
+  const user = userEvent.setup()
+  render(<LogTable projectRef="projectRef" data={MULTI_SELECT_LOGS} />)
+
+  await shiftClick(user, getRowCheckboxes()[3])
+
+  expectCheckedIndexes([3])
+  await screen.findByText('1 row selected')
+})
+
+test('clears the shift-click anchor once the selection becomes empty', async () => {
+  const user = userEvent.setup()
+  render(<LogTable projectRef="projectRef" data={MULTI_SELECT_LOGS} />)
+
+  await user.click(getRowCheckboxes()[1])
+  await user.click(getRowCheckboxes()[1])
+  expectCheckedIndexes([])
+
+  await shiftClick(user, getRowCheckboxes()[4])
+
+  expectCheckedIndexes([4])
+  await screen.findByText('1 row selected')
+})
+
+test('shift-click deselects a range that is already fully selected', async () => {
+  const user = userEvent.setup()
+  render(<LogTable projectRef="projectRef" data={MULTI_SELECT_LOGS} />)
+
+  await user.click(getRowCheckboxes()[1])
+  await shiftClick(user, getRowCheckboxes()[4])
+  expectCheckedIndexes([1, 2, 3, 4])
+
+  await shiftClick(user, getRowCheckboxes()[1])
+
+  expectCheckedIndexes([])
+  await waitFor(() => expect(screen.queryByText(/rows? selected/)).toBeNull())
+})

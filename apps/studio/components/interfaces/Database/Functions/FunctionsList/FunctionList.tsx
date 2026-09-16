@@ -24,6 +24,7 @@ import { stripInArgModePrefixes } from '../Functions.utils'
 import { getDatabaseTriggersHref, getFilteredFunctions } from './FunctionList.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import {
   useDatabaseFunctionsQuery,
   type SavedDatabaseFunction,
@@ -91,16 +92,7 @@ export const FunctionList = ({
   }
 
   if (_functions.length === 0 && filterString.length > 0) {
-    return (
-      <TableRow key={schema}>
-        <TableCell colSpan={5}>
-          <p className="text-sm text-foreground">No results found</p>
-          <p className="text-sm text-foreground-light">
-            Your search for "{filterString}" did not return any results
-          </p>
-        </TableCell>
-      </TableRow>
-    )
+    return <TableRowNoResults key={schema} colSpan={5} search={filterString} />
   }
 
   return (
@@ -168,7 +160,6 @@ export const FunctionList = ({
                           <DropdownMenuTrigger asChild>
                             <Button
                               aria-label={`${x.name} actions`}
-                              variant="default"
                               className="px-1"
                               icon={<MoreVertical />}
                             />
@@ -247,7 +238,6 @@ export const FunctionList = ({
                   ) : (
                     <ButtonTooltip
                       disabled
-                      variant="default"
                       icon={<MoreVertical />}
                       className="px-1"
                       tooltip={{

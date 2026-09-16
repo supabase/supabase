@@ -1756,38 +1756,142 @@
         {
           "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/index.ts",
           "type": "registry:file",
-          "target": "supabase/functions/mcp-server/index.ts"
+          "target": "~/supabase/functions/mcp-server/index.ts"
         },
         {
           "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/deno.json",
           "type": "registry:file",
-          "target": "supabase/functions/mcp-server/deno.json"
+          "target": "~/supabase/functions/mcp-server/deno.json"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/deno.lock",
+          "type": "registry:file",
+          "target": "~/supabase/functions/mcp-server/deno.lock"
         },
         {
           "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/.env.example",
           "type": "registry:file",
-          "target": "supabase/functions/mcp-server/.env.example"
+          "target": "~/supabase/functions/mcp-server/.env.example"
         },
         {
           "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/types.ts",
           "type": "registry:file",
-          "target": "supabase/functions/mcp-server/tools/types.ts"
+          "target": "~/supabase/functions/mcp-server/tools/types.ts"
         },
         {
           "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/result.ts",
           "type": "registry:file",
-          "target": "supabase/functions/mcp-server/tools/result.ts"
+          "target": "~/supabase/functions/mcp-server/tools/result.ts"
         },
         {
           "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/whoami.ts",
           "type": "registry:file",
-          "target": "supabase/functions/mcp-server/tools/whoami.ts"
+          "target": "~/supabase/functions/mcp-server/tools/whoami.ts"
         },
         {
           "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/index.ts",
           "type": "registry:file",
-          "target": "supabase/functions/mcp-server/tools/index.ts"
+          "target": "~/supabase/functions/mcp-server/tools/index.ts"
         }
+      ]
+    },
+    {
+      "name": "headless-app-tanstack",
+      "type": "registry:block",
+      "title": "Headless App for TanStack Start",
+      "description": "A backend with an agent as the primary interface, combining auth, OAuth consent, and an MCP server.",
+      "docs": "Follow https://supabase.com/library/docs/tanstack/headless-app for setup. Merge `supabase/config.toml` with existing project settings. Open `/agents` to connect your agent and approve access, then try the example task tools.\n\nYou'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "VITE_PRODUCT_NAME": "Your product",
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
+      },
+      "registryDependencies": [
+        "button",
+        "https://supabase.com/library/r/password-based-auth-tanstack.json",
+        "https://supabase.com/library/r/oauth-consent-tanstack.json"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/headless-app-tanstack/supabase/functions/mcp-server/tools/index.ts",
+          "type": "registry:file",
+          "target": "~/supabase/functions/mcp-server/tools/index.ts"
+        },
+        {
+          "path": "registry/default/blocks/headless-app-tanstack/supabase/functions/mcp-server/tools/tasks.ts",
+          "type": "registry:file",
+          "target": "~/supabase/functions/mcp-server/tools/tasks.ts"
+        },
+        {
+          "path": "registry/default/blocks/headless-app-tanstack/routes/_protected/agents.tsx",
+          "type": "registry:file",
+          "target": "routes/_protected/agents.tsx"
+        },
+        {
+          "path": "registry/default/blocks/headless-app-tanstack/components/connected-agents.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/headless-app-tanstack/hooks/use-oauth-grants.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/headless-app-tanstack/supabase/config.toml",
+          "type": "registry:file",
+          "target": "~/supabase/config.toml"
+        },
+        {
+          "path": "registry/default/blocks/headless-app-tanstack/supabase/schemas/public/tables/tasks.sql",
+          "type": "registry:file",
+          "target": "~/supabase/schemas/public/tables/tasks.sql"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/index.ts",
+          "type": "registry:file",
+          "target": "~/supabase/functions/mcp-server/index.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/deno.json",
+          "type": "registry:file",
+          "target": "~/supabase/functions/mcp-server/deno.json"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/deno.lock",
+          "type": "registry:file",
+          "target": "~/supabase/functions/mcp-server/deno.lock"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/.env.example",
+          "type": "registry:file",
+          "target": "~/supabase/functions/mcp-server/.env.example"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/types.ts",
+          "type": "registry:file",
+          "target": "~/supabase/functions/mcp-server/tools/types.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/result.ts",
+          "type": "registry:file",
+          "target": "~/supabase/functions/mcp-server/tools/result.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/whoami.ts",
+          "type": "registry:file",
+          "target": "~/supabase/functions/mcp-server/tools/whoami.ts"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
       ]
     },
     {

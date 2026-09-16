@@ -252,7 +252,7 @@ const PITRSidePanel = () => {
                 support for further assistance.
               </AlertDescription>
               <div className="mt-4">
-                <Button variant="default" asChild>
+                <Button asChild>
                   <SupportLink>Contact support</SupportLink>
                 </Button>
               </div>

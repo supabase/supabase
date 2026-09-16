@@ -91,7 +91,7 @@ export const RestoreFailedState = () => {
             </div>
 
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
-              <Button asChild variant="default">
+              <Button asChild>
                 <SupportLink
                   queryParams={{
                     category: SupportCategories.DATABASE_UNRESPONSIVE,
@@ -104,7 +104,6 @@ export const RestoreFailedState = () => {
               </Button>
 
               <ButtonTooltip
-                variant="default"
                 icon={<Download />}
                 disabled={isLoadingBackups}
                 loading={isDownloading || isLoadingBackups}
@@ -121,7 +120,7 @@ export const RestoreFailedState = () => {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="default" className="w-7" icon={<MoreVertical />} />
+                  <Button className="w-7" icon={<MoreVertical />} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-72" align="end">
                   <DropdownMenuItemTooltip

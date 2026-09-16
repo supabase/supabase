@@ -187,7 +187,6 @@ export const Usage = () => {
                       return (
                         <Button
                           block
-                          variant="default"
                           role="combobox"
                           size="tiny"
                           aria-expanded={open}

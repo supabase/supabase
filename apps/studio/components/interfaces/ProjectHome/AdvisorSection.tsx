@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { Shield } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
 import { AiIconAnimation, Badge, Button, Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
@@ -31,6 +31,9 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: boolean }) => {
   const { ref: projectRef } = useParams()
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
+  const isHealthAdvisorInHomepageEnabled = useFlag('healthAdvisorInHomepage')
+  const canShowHealthAdvisor = isHealthAdvisorEnabled && isHealthAdvisorInHomepageEnabled
   const track = useTrack()
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
@@ -43,7 +46,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
 
   const { data: healthLints } = useProjectHealthLintsQuery(
     { projectRef },
-    { enabled: !showEmptyState }
+    { enabled: !showEmptyState && canShowHealthAdvisor }
   )
 
   const { data: signalItems } = useAdvisorSignals({ projectRef, enabled: !showEmptyState })
@@ -51,11 +54,11 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
   const advisorItems = useMemo<AdvisorItem[]>(() => {
     const criticalLintItems = createAdvisorLintItems([
       ...(lints ?? []),
-      ...(healthLints ?? []),
+      ...(canShowHealthAdvisor ? (healthLints ?? []) : []),
     ]).filter((item) => item.source === 'lint' && item.original.level === LINTER_LEVELS.ERROR)
 
     return sortAdvisorItems([...criticalLintItems, ...signalItems])
-  }, [lints, healthLints, signalItems])
+  }, [lints, healthLints, signalItems, canShowHealthAdvisor])
 
   const visibleAdvisorItems = useMemo(
     () => advisorItems.slice(0, MAX_HOMEPAGE_ADVISOR_ITEMS),
@@ -110,7 +113,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
   )
 
   if (showEmptyState) {
-    return <EmptyState />
+    return <EmptyState canShowHealthAdvisor={canShowHealthAdvisor} />
   }
 
   // [Joshen] Note that we're intentionally (for now) not waiting for advisor signals to load
@@ -123,7 +126,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
       ) : (
         <div className="flex justify-between items-center mb-6">
           {titleContent}
-          <Button variant="default" icon={<AiIconAnimation />} onClick={handleAskAssistant}>
+          <Button icon={<AiIconAnimation />} onClick={handleAskAssistant}>
             Ask Assistant
           </Button>
         </div>
@@ -229,19 +232,21 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
           )}
         </>
       ) : (
-        <EmptyState />
+        <EmptyState canShowHealthAdvisor={canShowHealthAdvisor} />
       )}
     </div>
   )
 }
 
-function EmptyState() {
+function EmptyState({ canShowHealthAdvisor }: { canShowHealthAdvisor: boolean }) {
   return (
     <Card className="bg-transparent h-64">
       <CardContent className="flex flex-col items-center justify-center gap-2 p-16 h-full">
         <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
         <p className="text-sm text-foreground-light text-center">
-          No security, performance or health issues found
+          {canShowHealthAdvisor
+            ? 'No security, performance or health issues found'
+            : 'No security or performance issues found'}
         </p>
       </CardContent>
     </Card>

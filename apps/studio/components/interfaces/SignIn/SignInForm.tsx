@@ -184,7 +184,6 @@ export const SignInForm = () => {
                     />
                   </FormControl>
                   <Button
-                    variant="default"
                     title={passwordHidden ? `Show password` : `Hide password`}
                     aria-label={passwordHidden ? `Show password` : `Hide password`}
                     className="absolute right-1 top-1 px-1.5"

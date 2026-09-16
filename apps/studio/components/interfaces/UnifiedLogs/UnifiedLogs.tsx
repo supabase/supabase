@@ -77,11 +77,11 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const CHART_CONFIG = {
   success: {
     label: <TooltipLabel level="success" />,
-    color: 'var(--chart-success)',
+    color: 'var(--chart-muted)',
   },
   warning: {
     label: <TooltipLabel level="warning" />,
-    color: 'var(--chart-warning)',
+    color: 'var(--chart-status-warning)',
   },
   error: {
     label: <TooltipLabel level="error" />,
@@ -521,7 +521,7 @@ export const UnifiedLogs = () => {
                         <div className="text-sm flex flex-col gap-y-1">
                           <p className="text-foreground-light">No results found</p>
                           <p className="text-foreground-lighter">
-                            Filtering by user is only supported for Auth and Postgres log types
+                            Filtering by user is only supported for Auth and API Gateway log types
                           </p>
                         </div>
                       ) : undefined

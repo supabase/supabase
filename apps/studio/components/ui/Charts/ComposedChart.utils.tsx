@@ -40,18 +40,25 @@ export interface ReportAttributes {
 
 export type Provider = 'infra-monitoring' | 'daily-stats' | 'mock' | 'reference-line' | 'logs'
 
+export type ThemedColor = {
+  light?: string
+  dark?: string
+}
+
+export const resolveChartColor = (
+  color: string | ThemedColor | undefined,
+  isDarkMode: boolean | undefined
+) => {
+  if (typeof color === 'string') return color
+  return isDarkMode ? color?.dark : color?.light
+}
+
 export type MultiAttribute = {
   attribute: string
   provider?: Provider
   label?: string
-  color?: {
-    light: string
-    dark: string
-  }
-  fill?: {
-    light?: string
-    dark?: string
-  }
+  color?: string | { light: string; dark: string }
+  fill?: string | ThemedColor
   statusCode?: string
   grantType?: string
   providerType?: string

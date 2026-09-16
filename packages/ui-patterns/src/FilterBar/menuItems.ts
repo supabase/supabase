@@ -1,9 +1,11 @@
 import { ActiveInputState, FilterBarAction, FilterGroup, FilterProperty, MenuItem } from './types'
 import {
+  collectConditions,
   findConditionByPath,
   isCustomOptionObject,
   isFilterOperatorObject,
   isFilterOptionObject,
+  pathsEqual,
 } from './utils'
 
 export function buildOperatorItems(
@@ -142,8 +144,28 @@ export function buildValueItems(
 
   if (!property) return items
 
+  // Values already used by other conditions on this same property shouldn't be re-selectable.
+  const usedValues = new Set(
+    collectConditions(activeFilters)
+      .filter(({ path }) => !pathsEqual(path, activeInput.path))
+      .filter(({ condition }) => condition.propertyName === activeCondition?.propertyName)
+      .map(({ condition }) => String(condition.value))
+  )
+
   if (activeCondition?.operator === 'is') {
-    return getIsOperatorValueItems(property, inputValue, hasTypedSinceFocus)
+    return getIsOperatorValueItems(property, inputValue, hasTypedSinceFocus, usedValues)
+  }
+
+  // Pattern-matching operators (e.g. iLike) search for a substring, not an exact
+  // value, so a dropdown of exact-value suggestions would be misleading — let the
+  // user type freely instead.
+  const activeOperator = property.operators?.find((op) =>
+    isFilterOperatorObject(op)
+      ? op.value === activeCondition?.operator
+      : op === activeCondition?.operator
+  )
+  if (isFilterOperatorObject(activeOperator) && activeOperator.group === 'pattern') {
+    return items
   }
 
   if (!Array.isArray(property.options) && isCustomOptionObject(property.options)) {
@@ -162,10 +184,11 @@ export function buildValueItems(
         inputValue,
         hasTypedSinceFocus,
         showCount: activeCondition?.operator === '=',
+        usedValues,
       })
     )
   } else if (propertyOptionsCache[property.name]) {
-    items.push(...getCachedOptionItems(propertyOptionsCache[property.name].options))
+    items.push(...getCachedOptionItems(propertyOptionsCache[property.name].options, usedValues))
   }
 
   return items
@@ -176,11 +199,13 @@ function getArrayOptionItems({
   inputValue,
   hasTypedSinceFocus,
   showCount,
+  usedValues,
 }: {
   options: any[]
   inputValue: string
   hasTypedSinceFocus: boolean
   showCount?: boolean
+  usedValues?: Set<string>
 }): MenuItem[] {
   const items: MenuItem[] = []
   const normalizedInput = inputValue.toLowerCase()
@@ -191,7 +216,7 @@ function getArrayOptionItems({
   for (const option of options) {
     if (typeof option === 'string') {
       if (!shouldFilter || option.toLowerCase().includes(normalizedInput)) {
-        items.push({ value: option, label: option })
+        items.push({ value: option, label: option, disabled: usedValues?.has(option) || undefined })
       }
     } else if (isFilterOptionObject(option)) {
       if (!shouldFilter || option.label.toLowerCase().includes(normalizedInput)) {
@@ -199,6 +224,7 @@ function getArrayOptionItems({
           value: option.value,
           label: option.label,
           count: showCount ? option.count : undefined,
+          disabled: usedValues?.has(option.value) || undefined,
         })
       }
     } else if (isCustomOptionObject(option)) {
@@ -215,19 +241,24 @@ function getArrayOptionItems({
   return items
 }
 
-function getCachedOptionItems(options: any[]): MenuItem[] {
+function getCachedOptionItems(options: any[], usedValues?: Set<string>): MenuItem[] {
   return options.map((option) => {
     if (typeof option === 'string') {
-      return { value: option, label: option }
+      return { value: option, label: option, disabled: usedValues?.has(option) || undefined }
     }
-    return { value: option.value, label: option.label }
+    return {
+      value: option.value,
+      label: option.label,
+      disabled: usedValues?.has(option.value) || undefined,
+    }
   })
 }
 
 function getIsOperatorValueItems(
   property: FilterProperty,
   inputValue: string,
-  hasTypedSinceFocus: boolean
+  hasTypedSinceFocus: boolean,
+  usedValues?: Set<string>
 ): MenuItem[] {
   const options: { value: string; label: string }[] = [
     { value: 'null', label: 'NULL' },
@@ -239,11 +270,14 @@ function getIsOperatorValueItems(
   }
 
   const shouldFilter = hasTypedSinceFocus && inputValue.length > 0
-  if (!shouldFilter) return options
+  const filtered = shouldFilter
+    ? options.filter((opt) => {
+        const normalizedInput = inputValue.toLowerCase()
+        return (
+          opt.label.toLowerCase().includes(normalizedInput) || opt.value.includes(normalizedInput)
+        )
+      })
+    : options
 
-  const normalizedInput = inputValue.toLowerCase()
-  return options.filter(
-    (opt) =>
-      opt.label.toLowerCase().includes(normalizedInput) || opt.value.includes(normalizedInput)
-  )
+  return filtered.map((opt) => ({ ...opt, disabled: usedValues?.has(opt.value) || undefined }))
 }

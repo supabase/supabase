@@ -172,7 +172,7 @@ describe('UpdateRolesPanel (network)', () => {
     expect(screen.getByRole('option', { name: /Read-only/ })).toBeInTheDocument()
 
     // The key safety message from the ticket: Administrator can delete projects
-    expect(screen.getByText(/including deleting projects/i)).toBeInTheDocument()
+    expect(screen.getByText('deleting projects')).toBeInTheDocument()
   })
 
   test('renders a role description for every known role', async () => {

@@ -282,7 +282,7 @@ database.new and run the instruments table SQL. Then:
 REFERENCE
 https://supabase.com/docs/guides/getting-started/quickstarts/vue.md`,
   'monitoring-and-debugging': `Help me monitor and debug my Supabase project. Keep all access read-only. Do the following:
-1. Install the Supabase CLI globally with \`${setupCommand.installCli}\`.
+1. Install the Supabase CLI as a project dev dependency with \`${setupCommand.installCli}\`.
 2. Install the Supabase Plugin with \`${setupCommand.installPlugin}\`. The plugin includes the Supabase MCP server.
 3. Review my project and determine whether Supabase is already initialized. If it is not initialized, run \`${setupCommand.initialize}\`.
 4. Read https://supabase.com/docs/guides/observability.md and follow it.`,

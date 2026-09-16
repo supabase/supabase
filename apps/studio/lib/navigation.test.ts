@@ -190,8 +190,9 @@ describe('createNavigationHandler', () => {
 
       handler(event)
 
-      // Right click should trigger router.push (falls through to default case)
-      expect(mockRouter.push).toHaveBeenCalledWith('/test-url')
+      // Right click opens the context menu, so it must not navigate.
+      expect(mockRouter.push).not.toHaveBeenCalled()
+      expect(mockWindowOpen).not.toHaveBeenCalled()
     })
   })
 

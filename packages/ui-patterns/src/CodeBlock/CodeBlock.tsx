@@ -274,10 +274,10 @@ export const CodeBlock = ({
               ].join(' ')}
             >
               <Button
-                variant="default"
                 className="px-1.5 dark:bg-200! dark:hover:bg-button! hover:bg-alternative!"
                 icon={copied ? <Check /> : <Copy />}
                 onClick={() => onSelectCopy(value || children)}
+                aria-label={copied ? 'Copied' : 'Copy'}
               >
                 {copied ? 'Copied' : ''}
               </Button>

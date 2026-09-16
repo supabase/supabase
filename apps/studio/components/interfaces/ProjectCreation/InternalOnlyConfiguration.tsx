@@ -2,7 +2,16 @@ import { useParams } from 'common'
 import { useRef } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
-import { FormControl, FormField, Input, useWatch } from 'ui'
+import {
+  Checkbox,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  Input,
+  useWatch,
+} from 'ui'
 import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -19,6 +28,9 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
   const { slug } = useParams()
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
   const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
+  const cloudProvider = useWatch({ control: form.control, name: 'cloudProvider' })
+  const kubernetesClusterId = useWatch({ control: form.control, name: 'kubernetesClusterId' })
+  const isK8sProvider = cloudProvider === 'AWS_K8S' || cloudProvider === 'AWS_NIMBUS'
   // Held here (outside the collapsible content) so the selector's last valid
   // selection survives the section being collapsed and reopened.
   const lastValidPostgresVersionSelection = useRef('')
@@ -89,6 +101,60 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
                     </FormItemLayout>
                   )}
                 />
+
+                {isK8sProvider && (
+                  <FormField
+                    control={form.control}
+                    name="kubernetesClusterId"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label="Kubernetes cluster ID"
+                        layout="horizontal"
+                        description="Override the Kubernetes cluster this project is created on, bypassing load-balancing. Use the full cluster ID (e.g. dev-gbl-a001-c003-k001-0-eksCluster-038b450), not the short cluster name (e.g. dev-gbl-a001-c003-k001)."
+                      >
+                        <FormControl>
+                          {/* The backend matches against the kubernetes_clusters.id primary
+                              key, which is the full `<cluster-name>-eksCluster-<hash>` value —
+                              not the short cluster name shown elsewhere (e.g. admin_studio's
+                              project page). The short name alone won't match any cluster. */}
+                          <Input
+                            placeholder="e.g dev-gbl-a001-c003-k001-0-eksCluster-038b450"
+                            {...field}
+                            autoComplete="off"
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                )}
+
+                {isK8sProvider && !!kubernetesClusterId && (
+                  <FormField
+                    control={form.control}
+                    name="kubernetesClusterForce"
+                    render={({ field }) => (
+                      <FormItem className="flex items-start gap-3">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            disabled={field.disabled}
+                            onCheckedChange={(value) => field.onChange(value === true)}
+                          />
+                        </FormControl>
+                        <div className="space-y-1">
+                          <FormLabel className="text-sm text-foreground">
+                            Force-deploy to this cluster
+                          </FormLabel>
+                          <FormDescription className="text-foreground-lighter">
+                            Allows deliberately targeting a CORDONED cluster. PENDING and REMOVED
+                            clusters remain ineligible, and the cluster still needs a mapped
+                            filesystem to provision onto.
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                )}
               </div>
             </div>
           )}
