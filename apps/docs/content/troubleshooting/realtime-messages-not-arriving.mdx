@@ -55,7 +55,8 @@ Once you've ruled out the basics, [Realtime: Postgres Changes Troubleshooting](.
 ## Presence
 
 1. Something in your codebase may have set `presence: { enabled: false }` on the channel config. Worth grepping for it. Config shape reference: [phx_join config](/docs/guides/realtime/protocol#phx_join).
-2. `channel.track()` needs to wait for `SUBSCRIBED` — every example in the Presence guide gates it this way, and calling it earlier won't reliably register. Log the status callback and confirm `track()` only fires after `SUBSCRIBED` shows up. See [Sending state](/docs/guides/realtime/presence#sending-state) for the canonical pattern.
+2. Private channel? You'll need RLS policies on `realtime.messages` scoped to `extension = 'presence'` for the connecting role — a `select` policy to receive presence updates and an `insert` policy for `channel.track()` to publish your own. Missing either can silently drop presence even though the channel subscription itself succeeds. See [Realtime Authorization: Presence](/docs/guides/realtime/authorization#presence) for a working example.
+3. `channel.track()` needs to wait for `SUBSCRIBED` — every example in the Presence guide gates it this way, and calling it earlier won't reliably register. Log the status callback and confirm `track()` only fires after `SUBSCRIBED` shows up. See [Sending state](/docs/guides/realtime/presence#sending-state) for the canonical pattern.
 
 ## Still stuck?
 
