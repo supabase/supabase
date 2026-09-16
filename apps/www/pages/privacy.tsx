@@ -17,7 +17,7 @@ const meta = {
 }
 
 const versions: LegalDocVersion[] = [
-  { id: 'v4', label: 'Version 4', effectiveDate: 'TBD', Component: V4 },
+  { id: 'v4', label: 'Version 4', effectiveDate: 'September 16, 2026', Component: V4 },
   { id: 'v3', label: 'Version 3', effectiveDate: 'May 13, 2026', Component: V3 },
   { id: 'v2', label: 'Version 2', effectiveDate: 'March 16, 2026', Component: V2 },
   { id: 'v1', label: 'Version 1', effectiveDate: 'May 28, 2025', Component: V1 },
