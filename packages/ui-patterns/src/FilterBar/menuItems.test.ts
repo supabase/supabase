@@ -31,7 +31,22 @@ const booleanProperty: FilterProperty = {
   ],
 }
 
-const filterProperties: FilterProperty[] = [stringProperty, booleanProperty]
+const pathProperty: FilterProperty = {
+  label: 'Pathname',
+  name: 'pathname',
+  type: 'string',
+  options: [
+    { label: '/auth/v1/health', value: '/auth/v1/health' },
+    { label: '/rest-admin/v1/ready', value: '/rest-admin/v1/ready' },
+  ],
+  operators: [
+    { value: '=', label: 'Equals', group: 'comparison' as const },
+    { value: '~~*', label: 'iLike', group: 'pattern' as const },
+    { value: '!~~*', label: 'Not iLike', group: 'pattern' as const },
+  ],
+}
+
+const filterProperties: FilterProperty[] = [stringProperty, booleanProperty, pathProperty]
 
 describe('buildOperatorItems', () => {
   it('returns matching operators for operator draft text', () => {
@@ -171,10 +186,32 @@ describe('buildValueItems', () => {
     ])
   })
 
-  it('does not disable the current condition’s own value', () => {
+  it.each(['~~*', '!~~*'])(
+    'suppresses value suggestions for pattern-group operator `%s`',
+    (operator) => {
+      const filters: FilterGroup = {
+        logicalOperator: 'AND',
+        conditions: [{ propertyName: 'pathname', operator, value: '' }],
+      }
+
+      const items = buildValueItems(
+        { type: 'value', path: [0] },
+        filters,
+        filterProperties,
+        {},
+        {},
+        '',
+        false
+      )
+
+      expect(items).toEqual([])
+    }
+  )
+
+  it('still returns options for pathname with a comparison-group operator', () => {
     const filters: FilterGroup = {
       logicalOperator: 'AND',
-      conditions: [{ propertyName: 'name', operator: '=', value: 'alice' }],
+      conditions: [{ propertyName: 'pathname', operator: '=', value: '' }],
     }
 
     const items = buildValueItems(
@@ -188,8 +225,8 @@ describe('buildValueItems', () => {
     )
 
     expect(items).toEqual([
-      { value: 'alice', label: 'Alice' },
-      { value: 'bob', label: 'Bob' },
+      { value: '/auth/v1/health', label: '/auth/v1/health' },
+      { value: '/rest-admin/v1/ready', label: '/rest-admin/v1/ready' },
     ])
   })
 })

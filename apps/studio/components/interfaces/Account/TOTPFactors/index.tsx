@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import dayjs from 'dayjs'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
@@ -16,18 +17,28 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AddNewFactorModal } from './AddNewFactorModal'
 import DeleteFactorModal from './DeleteFactorModal'
+import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
+import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
+import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
 import { AlertError } from '@/components/ui/AlertError'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
-import { DATETIME_FORMAT } from '@/lib/constants'
+import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
+import { DATETIME_FORMAT, IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
 export const TOTPFactors = () => {
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
   const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
   const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
+  const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
 
   const totpFactors = data?.totp ?? []
   const canAddApp = isSuccess && totpFactors.length < 2
   const shouldShowLockoutWarning = isSuccess && totpFactors.length === 1
+  const shouldVerifyRecoveryCodes = enableAuthRecoveryCodes && totpFactors.length === 1
+
+  const { data: recoveryCodesStatus } = useRecoveryCodesStatusQuery({
+    enabled: shouldVerifyRecoveryCodes,
+  })
 
   const handleAddNewApp = () => setIsAddNewFactorOpen(true)
 
@@ -51,6 +62,20 @@ export const TOTPFactors = () => {
           )}
         </PageSectionMeta>
         <PageSectionContent className="flex flex-col gap-4">
+          {recoveryCodesStatus?.status === 'unenrolled' && <GenerateRecoveryCodesModal />}
+          {recoveryCodesStatus?.status === 'available' && (
+            <Admonition
+              layout="responsive"
+              title={`${recoveryCodesStatus?.data?.remaining}/${recoveryCodesStatus?.data?.total} recovery codes available`}
+              description="Recovery codes allow you to recover your account in case you lost access to your MFA apps."
+              actions={
+                <div className="flex flex-col gap-2">
+                  <RegenerateRecoveryCodesModal />
+                  {IS_STAGING_OR_LOCAL && <UnenrollRecoveryCodesModal />}
+                </div>
+              }
+            />
+          )}
           {shouldShowLockoutWarning && (
             <Admonition
               type="danger"
@@ -91,7 +116,7 @@ export const TOTPFactors = () => {
                         </p>
                       </div>
                       <Button size="tiny" onClick={() => setFactorToBeDeleted(factor.id)}>
-                        Delete{' '}
+                        Delete
                       </Button>
                     </CardContent>
                   ))}

@@ -59,7 +59,7 @@ export const AdvisorFilters = ({
   onClose,
   isPlatform = false,
 }: AdvisorFiltersProps) => {
-  const isHealthAdvisorEnabled = useFlag('healthAdvisor') === true
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
   const categoryOptions = (isPlatform ? platformCategories : selfHostedCategories)
     .filter((category) => category !== 'health' || isHealthAdvisorEnabled)
     .map((category) => ({ label: advisorCategoryLabels[category], value: category }))

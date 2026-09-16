@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -102,6 +102,9 @@ vi.mock('@/hooks/ui/useConfirmOnClose', () => ({
 }))
 
 // Helpers
+const getRoleDescription = (text: string) =>
+  screen.getByText((_, element) => element?.tagName === 'P' && element.textContent === text)
+
 async function openDialog() {
   await userEvent.click(screen.getByRole('button', { name: /invite members/i }))
   return screen.findByRole('dialog')
@@ -143,13 +146,13 @@ describe('InviteMemberButton', () => {
       'https://supabase.com/docs/guides/platform/access-control'
     )
     expect(
-      screen.getByText(
-        'Full access, including deleting the organization and transferring or deleting projects.'
+      getRoleDescription(
+        'Full access, including removing you or any other owner, deleting the organization, and transferring or deleting projects.'
       )
     ).toBeInTheDocument()
     expect(
-      screen.getByText(
-        'Manage members, billing, and project settings, including deleting projects. Cannot manage organization settings or owners.'
+      getRoleDescription(
+        'Manage members, billing, and project settings, including removing members and deleting projects. Cannot manage organization settings or owners.'
       )
     ).toBeInTheDocument()
     expect(
@@ -162,6 +165,26 @@ describe('InviteMemberButton', () => {
         'View resources without modifying or deleting them. SQL Editor access is limited to SELECT queries.'
       )
     ).toBeInTheDocument()
+  })
+
+  it('asks for confirmation before inviting as Owner', async () => {
+    customRender(<InviteMemberButton />)
+    await openDialog()
+    await userEvent.click(screen.getByRole('radio', { name: 'Owner' }))
+    fireEvent.change(screen.getByPlaceholderText(/name@example\.com/i), {
+      target: { value: 'new@example.com' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: /send invitation/i }))
+
+    const confirmation = await screen.findByRole('dialog', { name: 'Invite as Owner?' })
+    expect(mockInvite).not.toHaveBeenCalled()
+
+    fireEvent.click(within(confirmation).getByRole('button', { name: /send invitation/i }))
+    await waitFor(() => {
+      expect(mockInvite).toHaveBeenCalledWith(
+        expect.objectContaining({ emails: ['new@example.com'], roleId: 4 })
+      )
+    })
   })
 
   it('calls the mutation with a single email in an array', async () => {
