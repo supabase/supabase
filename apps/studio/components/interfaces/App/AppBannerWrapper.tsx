@@ -8,7 +8,7 @@ import {
 } from 'ui-patterns/Banners/Select26Promotion'
 
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
-import { isLogsOrObservabilityPath } from './AppBannerWrapper.utils'
+import { isLogsOrObservabilityPath, isOrganizationLandingPath } from './AppBannerWrapper.utils'
 import { ClockSkewBanner } from '@/components/layouts/AppLayout/ClockSkewBanner'
 import { NoticeBanner } from '@/components/layouts/AppLayout/NoticeBanner'
 import { StatusPageBanner } from '@/components/layouts/AppLayout/StatusPageBanner'
@@ -97,9 +97,9 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   }, [TOSUpdateAcknowledged, isSuccess, addBanner, dismissBanner])
 
   useEffect(() => {
-    if (!isPrivacyPolicyDismissalLoaded) return
+    if (!isPrivacyPolicyDismissalLoaded || pathname == null) return
 
-    if (!privacyPolicyUpdateAcknowledged) {
+    if (isOrganizationLandingPath(pathname) && !privacyPolicyUpdateAcknowledged) {
       addBanner({
         id: BANNER_ID.PRIVACY_POLICY_UPDATE,
         isDismissed: false,
@@ -109,7 +109,13 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
     } else {
       dismissBanner(BANNER_ID.PRIVACY_POLICY_UPDATE)
     }
-  }, [privacyPolicyUpdateAcknowledged, isPrivacyPolicyDismissalLoaded, addBanner, dismissBanner])
+  }, [
+    pathname,
+    privacyPolicyUpdateAcknowledged,
+    isPrivacyPolicyDismissalLoaded,
+    addBanner,
+    dismissBanner,
+  ])
 
   const [isLogsAllDeprecationDismissed, , { isSuccess: isLogsAllDeprecationLoaded }] =
     useLocalStorageQuery(LOCAL_STORAGE_KEYS.LOGS_ALL_DEPRECATION_2026_09_23, false)
