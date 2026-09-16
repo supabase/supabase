@@ -176,7 +176,9 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
         withFilters('pathname:notilike:health', 'pathname:notilike:metrics')
       )
       const pathExpr = `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path']))`
-      expect(sql).toContain(`${pathExpr} NOT ILIKE '%health%' AND ${pathExpr} NOT ILIKE '%metrics%'`)
+      expect(sql).toContain(
+        `${pathExpr} NOT ILIKE '%health%' AND ${pathExpr} NOT ILIKE '%metrics%'`
+      )
     })
 
     it('passes through user-supplied `%` wildcards on pathname ILIKE without double-wrapping', () => {

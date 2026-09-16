@@ -226,8 +226,6 @@ export const UnifiedLogs = () => {
   }, [rawFlatData])
   const liveMode = useLiveMode(flatData)
 
-  console.log(flatData)
-
   const totalDBRowCount = counts?.totalRowCount
   const filterDBRowCount = flatData.length
 
