@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { Card, CardContent } from 'ui'
+import { Card, CardContent, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -63,7 +63,12 @@ export const PipelineHealthSection = ({ metrics, children }: PipelineHealthSecti
                 </PipelineDetailItem>
 
                 {SLOT_LAG_FIELDS.map((field) => {
-                  const { display, detail } = getFieldDisplay(field, metrics[field.key])
+                  const rawValue = metrics[field.key]
+                  const { display, detail } = getFieldDisplay(field, rawValue)
+                  const valueTooltip =
+                    field.getValueTooltip && typeof rawValue === 'number'
+                      ? field.getValueTooltip(rawValue)
+                      : undefined
 
                   return (
                     <PipelineDetailItem
@@ -71,7 +76,18 @@ export const PipelineHealthSection = ({ metrics, children }: PipelineHealthSecti
                       label={field.label}
                       tooltip={field.description}
                     >
-                      {display}
+                      {valueTooltip !== undefined ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="w-fit cursor-default">{display}</span>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="text-xs">
+                            {valueTooltip}
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : (
+                        display
+                      )}
                       {detail !== undefined && (
                         <span className="block text-xs text-foreground-lighter">{detail}</span>
                       )}

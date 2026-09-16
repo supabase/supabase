@@ -204,7 +204,7 @@ export const WAL_STATUS_META: Record<SlotWalStatus, WalStatusMeta> = {
     label: 'Unknown',
     variant: 'default',
     severity: 'normal',
-    description: 'Postgres did not report a status for this pipeline’s slot.',
+    description: 'Postgres did not report a recognized status for this pipeline’s slot.',
     tableDescription:
       "Unknown. Your database reported an unknown state for this table's replication slot.",
   },

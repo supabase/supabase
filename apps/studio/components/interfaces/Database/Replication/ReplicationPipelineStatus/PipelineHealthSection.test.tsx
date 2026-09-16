@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
 import { PipelineHealthSection } from './PipelineHealthSection'
@@ -23,5 +24,13 @@ describe('PipelineHealthSection', () => {
     customRender(<PipelineHealthSection metrics={{ ...baseMetrics, safe_wal_size_bytes: 1024 }} />)
 
     expect(screen.getByText('1 KB')).toBeInTheDocument()
+  })
+
+  it('shows the absolute last check-in time on hover', async () => {
+    customRender(<PipelineHealthSection metrics={{ ...baseMetrics, safe_wal_size_bytes: null }} />)
+
+    await userEvent.hover(screen.getByText('Just now'))
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(/\w{3} \d{1,2}, \d{4}/)
   })
 })
