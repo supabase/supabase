@@ -163,14 +163,14 @@ export function ExamplesCombobox({
       )}
     >
       <Popover open={open} onOpenChange={setOpen}>
-        <div className="rounded-t-lg border border-default bg-200">
+        <div className="flex items-center rounded-t-lg border border-default bg-200 pl-1">
           <PopoverTrigger asChild>
-            <ComboboxTrigger className="rounded-lg border-0 bg-transparent focus-visible:ring-inset focus-visible:ring-offset-0">
+            <ComboboxTrigger className="w-auto max-w-full gap-1.5 rounded-lg border-0 bg-transparent px-2 text-sm text-foreground hover:text-foreground focus-visible:ring-inset focus-visible:ring-offset-0">
               {selected.name}
             </ComboboxTrigger>
           </PopoverTrigger>
         </div>
-        <PopoverContent align="start" className="z-40 w-(--radix-popover-trigger-width) p-0">
+        <PopoverContent align="start" className="z-40 w-max min-w-56 max-w-xs p-0">
           <Command>
             <CommandInput placeholder="Search examples…" />
             <CommandList>
