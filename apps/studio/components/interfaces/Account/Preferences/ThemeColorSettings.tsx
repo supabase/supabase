@@ -72,7 +72,7 @@ export const ThemeColorSettings = ({ isVisible = true }: { isVisible?: boolean }
         )}
       </div>
 
-      <div className="col-span-full md:col-span-8 flex flex-col gap-6">
+      <div className="col-span-full md:col-span-8 flex flex-col gap-6 pb-2">
         {THEME_OVERRIDE_KNOBS.map((knob) => {
           const rawValue = draft[knob.key] ?? getThemeOverrideValue(knob, mode, overrides)
           const sliderValue = themeOverrideToSliderValue(knob, mode, rawValue)
