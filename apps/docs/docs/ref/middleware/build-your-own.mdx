@@ -46,7 +46,7 @@ A middleware is a `withFoo` function built with `defineMiddleware`. It owns one 
 
     Your middleware drops into the same `pipeline` array as the built-in ones. The handler reads `ctx.requestId` as a `string`, inferred from the entries.
 
-    `pipeline` checks the array at compile time. Two entries that contribute the same key fail with an error naming the key. An entry whose prerequisite nothing before it supplies fails the same way. If you nest calls instead of using `pipeline`, keep `satisfies FetchHandler` on the outermost call; without that anchor, a nested stack with a duplicate key or a missing prerequisite compiles. `pipeline` already returns a `FetchHandler`, so the anchor adds nothing there.
+    `pipeline` checks the array at compile time. Two entries that contribute the same key fail with an error naming the key. An entry whose prerequisite no earlier entry supplies fails the same way. If you nest calls instead of using `pipeline`, keep `satisfies FetchHandler` on the outermost call; without that anchor, a nested stack with a duplicate key or a missing prerequisite compiles. `pipeline` already returns a `FetchHandler`, so the anchor adds nothing there.
 
   </RefSubLayout.Details>
 
