@@ -132,7 +132,10 @@ const GenerateRecoveryCodesModalContent = ({
   if (status === 'success') {
     return (
       <div className="flex flex-col gap-4">
-        <p>Save your recovery codes somewhere safe.</p>
+        <p>
+          Recovery codes allow you to recover your account in case you lost access to your MFA apps.
+          Save them somewhere safe.
+        </p>
         <pre className="relative bg-muted rounded-md py-2 px-4">
           <code className="flex gap-2 flex-wrap justify-between">
             {codes?.map((code) => (
