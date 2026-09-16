@@ -137,6 +137,10 @@ const levelsData = {
     icon: 'reference-csharp',
     name: 'C# Reference v1.0',
   },
+  reference_csharp_v8: {
+    icon: 'reference-csharp',
+    name: 'C# Reference v8.0',
+  },
   reference_python_v2: {
     icon: 'reference-python',
     name: 'Python Reference v2.0',
@@ -214,6 +218,8 @@ const MobileHeader = memo(function MobileHeader(props: MobileHeaderProps) {
           mobileMenuOpen && 'mt-0.5'
         )}
         onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
+        aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+        aria-expanded={mobileMenuOpen}
       >
         <div
           className={cn(

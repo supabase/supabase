@@ -7,6 +7,7 @@ Aaron Byrne
 Adam Mohammed
 Adam Mokan
 Adam Whitlock
+Aditya Maruvada
 AJ Matias
 Akash Manimaran
 Akilesh Sethu
@@ -39,10 +40,10 @@ Barry Roodt
 Beng Eu
 Benjamin Coenen
 Beth Long
-Bo Lu
 Bobbie Soedirgo
 Brad Gyger
 Brendan Stephens
+Brent Graveland
 Brent Newson
 Brian Cullen
 Brent Schroeter
@@ -103,7 +104,6 @@ Erfi Anugrah
 Eric Kharitonashvili
 Etienne Stalmans
 Evan Cummack
-Eyal Ehrlich
 Fabrizio Fenoglio
 Fady A
 Fatuma Abdullahi
@@ -138,8 +138,10 @@ Inian P
 Iryna Deans
 Ivan Vasilov
 Jamie Boyd
+Jake Ng
 Jared Patterson
 Jason Farber
+Jason Voegele
 Jean-Paul Argudo
 Jeff Smick
 Jefferson Venerando
@@ -284,7 +286,6 @@ Sean Thompson
 Sergio Cioban Filho
 Shaii O
 Shane Adams
-Shane E
 Shaun Newman
 Shardul Borhade
 Shreekar Shetty

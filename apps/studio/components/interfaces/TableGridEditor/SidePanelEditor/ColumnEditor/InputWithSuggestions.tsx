@@ -106,6 +106,7 @@ const InputWithSuggestions = ({
                   <ButtonTooltip
                     variant="text"
                     size="tiny"
+                    className="px-1 mr-0.5"
                     tooltip={{
                       content: { text: suggestionsTooltip || 'Suggestions', side: 'bottom' },
                     }}
@@ -119,12 +120,12 @@ const InputWithSuggestions = ({
                   <DropdownMenuSeparator />
                   {filteredSuggestions.map((suggestion: Suggestion) => (
                     <DropdownMenuItem
-                      className="space-x-2"
+                      className="flex flex-col items-start"
                       key={suggestion.name}
                       onClick={() => onSelectSuggestion(suggestion)}
                     >
-                      <div>{suggestion.name}</div>
-                      <div className="text-foreground-lighter">{suggestion.description}</div>
+                      <p>{suggestion.name}</p>
+                      <p className="text-foreground-lighter">{suggestion.description}</p>
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>

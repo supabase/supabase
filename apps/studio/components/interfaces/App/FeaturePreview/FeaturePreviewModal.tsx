@@ -31,7 +31,6 @@ import {
 
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
 import { CLSPreview } from './CLSPreview'
-import { DatabaseConnectionsPreview } from './DatabaseConnectionsPreview'
 import { ExplorerPreview } from './ExplorerPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
 import { IntegrationsLayoutPreview } from './IntegrationsLayoutPreview'
@@ -39,6 +38,7 @@ import { JitDbAccessPreview } from './JitDbAccessPreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { SqlEditorManualSavePreview } from './SqlEditorManualSavePreview'
+import { StorageVersioningPreview } from './StorageVersioningPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
@@ -57,8 +57,8 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]: <JitDbAccessPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]: <SqlEditorManualSavePreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]: <IntegrationsLayoutPreview />,
-  [LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS]: <DatabaseConnectionsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]: <ExplorerPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING]: <StorageVersioningPreview />,
 }
 
 export const FeaturePreviewModal = () => {
@@ -217,7 +217,7 @@ export const FeaturePreviewModal = () => {
                   <p>{selectedFeature?.name}</p>
                   <div className="flex items-center gap-x-2">
                     {selectedFeature?.discussionsUrl !== undefined && (
-                      <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                      <Button asChild icon={<ExternalLink strokeWidth={1.5} />}>
                         <Link
                           href={selectedFeature.discussionsUrl}
                           target="_blank"
@@ -229,7 +229,6 @@ export const FeaturePreviewModal = () => {
                     )}
                     {isSelectedFeatureEnabled && (
                       <ButtonTooltip
-                        variant="default"
                         disabled={!canDisableSelectedFeature}
                         onClick={() => toggleFeature()}
                         tooltip={{
@@ -248,9 +247,7 @@ export const FeaturePreviewModal = () => {
                     {!isSelectedFeatureEnabled && (
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button variant="default" onClick={() => toggleFeature()}>
-                            Enable feature
-                          </Button>
+                          <Button onClick={() => toggleFeature()}>Enable feature</Button>
                         </TooltipTrigger>
                         <TooltipContent side="bottom" className="max-w-64 text-center">
                           {hasRoute
@@ -275,7 +272,7 @@ export const FeaturePreviewModal = () => {
                   Have an idea for the dashboard? Let us know via GitHub Discussions!
                 </p>
               </div>
-              <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
+              <Button asChild icon={<ExternalLink strokeWidth={1.5} />}>
                 <Link
                   href="https://github.com/orgs/supabase/discussions/categories/feature-requests"
                   target="_blank"

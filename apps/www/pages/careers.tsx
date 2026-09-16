@@ -1,3 +1,4 @@
+import staticContent from '.generated/staticContent/_index.json'
 import { GlobeAltIcon } from '@heroicons/react/outline'
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -95,8 +96,13 @@ interface CareersPageProps {
   contributors: { login: string; avatar_url: string; html_url: string }[]
 }
 
-const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) => {
+const CareerPage = ({
+  jobs = {},
+  placeholderJob = null,
+  contributors = [],
+}: Partial<CareersPageProps>) => {
   const { basePath } = useRouter()
+  const { jobsCount } = staticContent
 
   const meta_title = 'Careers | Supabase'
   const meta_description = 'Help build software developers love'
@@ -137,8 +143,8 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
             <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
               Explore remote opportunities and join our team to help us achieve it.
             </p>
-            <Button asChild variant="primary" className="mt-4">
-              <Link href="#positions">Open positions</Link>
+            <Button asChild variant="primary" size="medium" className="mt-4">
+              <Link href="#positions">Open positions ({jobsCount})</Link>
             </Button>
           </SectionContainer>
         </header>

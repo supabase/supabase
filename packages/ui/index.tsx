@@ -13,7 +13,6 @@ export * from './src/components/NavMenu'
 export * from './src/components/SidePanel'
 
 // HTML
-
 export {
   Heading,
   getAnchor,
@@ -114,6 +113,7 @@ export * from './src/components/ShadowScrollArea'
 export * from './src/components/shadcn/ui/collapsible'
 
 export * from './src/components/shadcn/ui/tabs'
+export * from './src/components/shadcn/ui/useTabIndicator'
 
 export * from './src/components/shadcn/ui/tooltip'
 

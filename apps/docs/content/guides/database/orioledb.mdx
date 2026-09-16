@@ -18,7 +18,7 @@ OrioleDB addresses Postgres's scalability limitations by removing bottlenecks in
 
 <Admonition type="note">
 
-OrioleDB is in active development and currently has [certain limitations](https://www.orioledb.com/docs/usage/getting-started#current-limitations). Currently, only B-tree indexes are supported, so features like pg_vector's HNSW indexes are not yet available. An Index Access Method bridge to unlock support for all index types used with heap storage is under active development. In the Supabase OrioleDB image the default storage method has been updated to use OrioleDB, granting better performance out of the box.
+OrioleDB is in active development and has [certain limitations](https://www.orioledb.com/docs/usage/getting-started#current-limitations). Native B-tree indexes give the best performance, and an Index Access Method bridge provides experimental support for other index types built for heap storage, including pg_vector's HNSW indexes. In the Supabase OrioleDB image the default storage method has been updated to use OrioleDB, granting better performance out of the box.
 
 </Admonition>
 
@@ -83,7 +83,7 @@ Additionally you can create secondary indexes.
 
 <Admonition type="note">
 
-Currently, only B-tree indexes are supported, so features like pg_vector's HNSW indexes are not yet available.
+OrioleDB tables use native B-tree indexes by default. Other index types built for heap storage, such as pg_vector's HNSW indexes, have experimental support through an Index Access Method bridge.
 
 </Admonition>
 
@@ -99,10 +99,10 @@ create index blog_post_views on blog_post (views) where (views > 1000);
 You can query and modify data in OrioleDB tables using standard SQL statements, including `SELECT`, `INSERT`, `UPDATE`, `DELETE` and `INSERT ... ON CONFLICT`.
 
 ```sql
-INSERT INTO blog_post (id, title, body, author, views)
-VALUES (1, 'Hello, World!', 'This is my first blog post.', 'John Doe', 1000);
+insert into blog_post (id, title, body, author, views)
+values (1, 'Hello, World!', 'This is my first blog post.', 'John Doe', 1000);
 
-SELECT * FROM blog_post ORDER BY published_at DESC LIMIT 10;
+select * from blog_post order by published_at desc limit 10;
  id │     title     │            body             │  author  │         published_at          │ views
 ────┼───────────────┼─────────────────────────────┼──────────┼───────────────────────────────┼───────
   1 │ Hello, World! │ This is my first blog post. │ John Doe │ 2024-11-15 12:04:18.756824+01 │  1000
@@ -113,19 +113,19 @@ SELECT * FROM blog_post ORDER BY published_at DESC LIMIT 10;
 You can see the execution plan using standard `EXPLAIN` statement.
 
 ```sql
-EXPLAIN SELECT * FROM blog_post ORDER BY published_at DESC LIMIT 10;
+explain select * from blog_post order by published_at desc limit 10;
                                                  QUERY PLAN
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────
  Limit  (cost=0.15..1.67 rows=10 width=120)
    ->  Index Scan Backward using blog_post_published_at on blog_post  (cost=0.15..48.95 rows=320 width=120)
 
-EXPLAIN SELECT * FROM blog_post WHERE id = 1;
+explain select * from blog_post where id = 1;
                                     QUERY PLAN
 ──────────────────────────────────────────────────────────────────────────────────
  Index Scan using blog_post_pkey on blog_post  (cost=0.15..8.17 rows=1 width=120)
    Index Cond: (id = 1)
 
-EXPLAIN (ANALYZE, BUFFERS) SELECT * FROM blog_post ORDER BY published_at DESC LIMIT 10;
+explain (analyze, buffers) select * from blog_post order by published_at desc limit 10;
                                                                       QUERY PLAN
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
  Limit  (cost=0.15..1.67 rows=10 width=120) (actual time=0.052..0.054 rows=1 loops=1)
@@ -133,6 +133,56 @@ EXPLAIN (ANALYZE, BUFFERS) SELECT * FROM blog_post ORDER BY published_at DESC LI
  Planning Time: 0.186 ms
  Execution Time: 0.088 ms
 ```
+
+## Configuration
+
+### Automatic tuning by compute size
+
+Supabase automatically sizes OrioleDB's memory and worker settings based on your project's [compute add-on](/docs/guides/platform/compute-and-disk). These settings control the memory OrioleDB allocates for its internal page pools, undo log, and recovery workers, replacing the role that `shared_buffers` plays for the default heap storage engine. Supabase also reduces `shared_buffers` on OrioleDB projects, since OrioleDB tables use their own buffer pools instead.
+
+The following settings are tuned automatically and aren't configurable:
+
+- `orioledb.main_buffers`
+- `orioledb.free_tree_buffers`
+- `orioledb.catalog_buffers`
+- `orioledb.undo_buffers`
+- `orioledb.xid_buffers`
+- `orioledb.logical_xid_buffers`
+- `orioledb.recovery_queue_size`
+- `orioledb.recovery_pool_size`
+- `orioledb.recovery_idx_pool_size`
+- `orioledb.bgwriter_num_workers`
+
+To get larger pools and more recovery workers, [upgrade your project's compute add-on](/docs/guides/platform/compute-and-disk#upgrades). To see the values currently applied to your project, query `pg_settings`:
+
+```sql
+select name, setting
+from pg_settings
+where name like 'orioledb.%';
+```
+
+### User-configurable settings
+
+A smaller set of OrioleDB settings has a `user` [context](/docs/guides/database/custom-postgres-config#user-context-settings) and can be changed at the database or role level with SQL, the same way as other [customizable Postgres settings](/docs/guides/database/custom-postgres-config).
+
+| Setting                             | Description                                                                                                                                                                                                          | Default      |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| `orioledb.default_compress`         | Default compression level for OrioleDB tables. Set to `-1` to disable compression, or `0` or a positive integer to trade write speed for a smaller table on disk.                                                    | `-1`         |
+| `orioledb.default_primary_compress` | Default compression level for the primary index. Accepts the same values as `orioledb.default_compress`.                                                                                                             | `-1`         |
+| `orioledb.default_toast_compress`   | Default compression level for TOASTed values. Accepts the same values as `orioledb.default_compress`.                                                                                                                | `-1`         |
+| `orioledb.serializable`             | How OrioleDB handles `SERIALIZABLE` transactions. `table_lock` acquires a coarse lock per touched table, `repeatable_read` silently downgrades the isolation level, and `error` rejects `SERIALIZABLE` transactions. | `table_lock` |
+
+For example, to enable compression for new OrioleDB tables in a database:
+
+```sql
+alter database "postgres" set "orioledb.default_compress" to 1;
+```
+
+<Admonition type="note">
+
+Compression settings only affect tables and indexes created after you change the setting. Existing tables keep the compression level they were created with.
+
+</Admonition>
 
 ## Resources
 

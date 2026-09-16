@@ -1,3 +1,5 @@
+import { Play } from 'lucide-react'
+
 import { type SqlSnippetSource } from '../../SQLEditor/querySource'
 import { type QueryResult } from '../types'
 import { QueryResultChart } from './QueryResultChart'
@@ -12,6 +14,7 @@ interface QueryResultRendererProps {
   /** The query that produced `result`, used to build the "Debug with Assistant" prompt on error. */
   sql?: string
   source?: SqlSnippetSource
+  onDebug?: (prompt: string) => void
 }
 
 export const QueryResultRenderer = ({
@@ -20,19 +23,33 @@ export const QueryResultRenderer = ({
   chart,
   sql,
   source,
+  onDebug,
 }: QueryResultRendererProps) => {
   const { rows, error, autoLimit } = result ?? {}
 
   if (!result) {
-    return <p className="text-xs text-foreground-lighter py-8">Run the query to see results</p>
+    return (
+      <div className="flex items-center gap-x-2 p-3 w-full">
+        <Play size={12} className="text-foreground-lighter" />
+        <p className="text-xs text-foreground-lighter">Run the query to see results</p>
+      </div>
+    )
   }
 
   if (error) {
-    return <QueryResultError error={error} autoLimit={autoLimit} sql={sql} source={source} />
+    return (
+      <QueryResultError
+        error={error}
+        autoLimit={autoLimit}
+        sql={sql}
+        source={source}
+        onDebug={onDebug}
+      />
+    )
   }
 
   if ((rows ?? []).length === 0) {
-    return <p className="text-xs text-foreground-lighter py-8">Success. No rows returned</p>
+    return <p className="text-xs text-foreground-lighter p-3">Success. No rows returned</p>
   }
 
   if (rows && rows.length > 0) {

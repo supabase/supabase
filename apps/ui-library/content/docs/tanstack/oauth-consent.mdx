@@ -22,7 +22,7 @@ This block includes the [Supabase client](/library/docs/tanstack/client). If you
 
 This block installs an OAuth 2.1 consent route at `/oauth/consent`. It is designed for an app that already has authentication: it does not install sign-in, sign-up, or callback routes.
 
-When the visitor has no session, the consent screen redirects to `/auth/login` and preserves the original consent URL in the `next` query parameter. Update the `signInPath` prop in `routes/oauth/consent.tsx` if your sign-in route is different.
+When the visitor has no session, the consent screen redirects to `/login` and preserves the original consent URL in the `next` query parameter. Update the `signInPath` prop in `routes/oauth/consent.tsx` if your sign-in route is different.
 
 After sign-in, your login page must send the visitor back to the path in `next`; otherwise the OAuth flow stops at your login screen. The password-based auth and social auth blocks follow `next` automatically. For a custom login page, validate that `next` is a relative path before redirecting to it:
 
@@ -35,7 +35,10 @@ if (next?.startsWith('/') && !next.startsWith('//')) {
 }
 ```
 
-Set the `productName` prop to replace the `Your product` placeholder in the consent header.
+Set `VITE_PRODUCT_NAME` in `.env.local` to replace the `Your product` placeholder
+in the consent header. The [Headless App](/library/docs/tanstack/headless-app) uses
+the same value for its agents page. For a custom value in code, change the
+`productName` prop in `routes/oauth/consent.tsx`.
 
 ### Getting started
 

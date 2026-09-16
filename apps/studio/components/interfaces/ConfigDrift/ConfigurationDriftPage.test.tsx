@@ -9,12 +9,13 @@ import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type ProjectDetailResponse = platformComponents['schemas']['ProjectDetailResponse']
-type OrganizationResponse = platformComponents['schemas']['OrganizationResponse']
-type ListGitHubConnectionsResponse = platformComponents['schemas']['ListGitHubConnectionsResponse']
+type ProjectDetailResponse = platformComponents['schemas']['ProjectDetailResponse_Output']
+type OrganizationResponse = platformComponents['schemas']['OrganizationResponse_Output']
+type ListGitHubConnectionsResponse =
+  platformComponents['schemas']['ListGitHubConnectionsResponse_Output']
 type GetGitHubConnectionConfigResponse =
-  platformComponents['schemas']['GetGitHubConnectionConfigResponse']
-type BranchResponse = apiV1Components['schemas']['BranchResponse']
+  platformComponents['schemas']['GetGitHubConnectionConfigResponse_Output']
+type BranchResponse = apiV1Components['schemas']['BranchResponse_Output']
 type V2ProjectConfigResponse = apiV2Components['schemas']['V2ProjectConfigResponse_Output']
 
 const PROJECT_REF = 'default'
@@ -76,6 +77,7 @@ const PROJECT: ProjectDetailResponse = {
   status: 'ACTIVE_HEALTHY',
   subscription_id: 'subscription-1',
   updated_at: '2025-01-01T00:00:00Z',
+  connectionString: '',
 }
 
 const BRANCH: BranchResponse = {
@@ -154,8 +156,7 @@ function createProjectConfigResponse(auth: Record<string, unknown>): V2ProjectCo
           suspend: false,
         },
         storage: {
-          capabilities: { iceberg_catalog: false, list_v2: true },
-          database_pool_mode: 'transaction',
+          capabilities: { iceberg_catalog: false, list_v2: true, object_versioning: false },
           features: {
             iceberg_catalog: { enabled: false, max_catalogs: 0, max_namespaces: 0, max_tables: 0 },
             image_transformation: { enabled: true },

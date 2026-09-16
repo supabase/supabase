@@ -99,7 +99,7 @@ sh run.sh recreate auth
 Check that the provider is enabled:
 
 ```sh
-curl -H 'apikey: your-anon-key' https://<your-domain>/auth/v1/settings
+curl -H 'apikey: your-supabase-publishable-key' https://<your-domain>/auth/v1/settings
 ```
 
 The response should include your provider under `external`:
@@ -350,9 +350,9 @@ You can test OAuth with the following minimal HTML page:
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         const SUPABASE_URL = 'https://<your-domain>'
-        const SUPABASE_ANON_KEY = 'your-anon-key'
+        const SUPABASE_PUBLISHABLE_KEY = 'your-supabase-publishable-key'
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
 
         const button = document.getElementById('loginBtn')
 

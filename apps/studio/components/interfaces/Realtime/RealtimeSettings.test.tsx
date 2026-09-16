@@ -84,8 +84,6 @@ const REALTIME_ENTITLEMENTS: Entitlement[] = (
 
 describe('RealtimeSettings', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true, isSuccess: true })
     mockUseSelectedProjectQuery.mockReturnValue({
       data: { ref: 'default', connectionString: 'postgresql://example' },
@@ -123,7 +121,7 @@ describe('RealtimeSettings', () => {
       method: 'get',
       path: '/platform/projects/:ref/config/realtime',
       response: () =>
-        HttpResponse.json<components['schemas']['RealtimeConfigResponse']>(
+        HttpResponse.json<components['schemas']['RealtimeConfigResponse_Output']>(
           configWithoutPool as any
         ),
     })

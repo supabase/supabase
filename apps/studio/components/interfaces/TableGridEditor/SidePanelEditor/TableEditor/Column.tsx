@@ -22,10 +22,8 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
-import type { Suggestion } from '../ColumnEditor/ColumnEditor.types'
+import { ColumnDefaultValue } from '../ColumnEditor/ColumnDefaultValue'
 import ColumnType from '../ColumnEditor/ColumnType'
-import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
 import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { checkIfRelationChanged } from './ForeignKeysManagement/ForeignKeysManagement.utils'
@@ -79,7 +77,6 @@ export const Column = ({
 }: ColumnProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
-  const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
 
   const settingsCount = [
     column.isNullable ? 1 : 0,
@@ -215,7 +212,7 @@ export const Column = ({
           ) : (
             <Popover open={open} onOpenChange={setOpen} modal={false}>
               <PopoverTrigger asChild>
-                <Button variant="default" className="rounded-l-none h-[30px] py-0 px-2">
+                <Button className="rounded-l-none h-[30px] py-0 px-2">
                   <Link size={12} />
                 </Button>
               </PopoverTrigger>
@@ -318,27 +315,17 @@ export const Column = ({
       </div>
       <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'}`}>
         <div className="w-[95%]">
-          <InputWithSuggestions
-            aria-label="Column default value"
-            data-testid={`${column.name}-default-value`}
-            placeholder={
-              typeof column.defaultValue === 'string' && column.defaultValue.length === 0
-                ? 'EMPTY'
-                : 'NULL'
-            }
+          <ColumnDefaultValue
+            columnFields={column}
+            enumTypes={enumTypes}
+            showLabel={false}
             size="small"
-            value={column.defaultValue ?? ''}
-            disabled={column.format.includes('int') && column.isIdentity}
             className={`rounded-sm lg:gap-0 ${
               column.format.includes('int') && column.isIdentity ? 'opacity-50' : ''
             }`}
-            suggestions={suggestions}
-            suggestionsHeader="Suggested expressions"
-            suggestionsTooltip="Suggested expressions"
-            onChange={(event) => onUpdateColumn({ defaultValue: event.target.value })}
-            onSelectSuggestion={(suggestion: Suggestion) =>
-              onUpdateColumn({ defaultValue: suggestion.value })
-            }
+            data-testid={`${column.name}-default-value`}
+            aria-label="Column default value"
+            onUpdateField={onUpdateColumn}
           />
         </div>
       </div>

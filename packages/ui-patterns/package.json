@@ -774,7 +774,6 @@
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-table": "catalog:",
     "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "common": "workspace:*",
     "common-tags": "^1.8.2",
@@ -820,8 +819,8 @@
   },
   "devDependencies": {
     "@testing-library/dom": "^10.0.0",
-    "@testing-library/jest-dom": "^6.6.0",
-    "@testing-library/react": "^16.0.0",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.0.0",
     "@types/common-tags": "^1.8.4",
     "@types/js-yaml": "^4.0.9",

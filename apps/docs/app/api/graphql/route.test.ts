@@ -20,7 +20,6 @@ describe('/api/graphql POST basic error statuses', () => {
   })
 
   beforeEach(() => {
-    vi.clearAllMocks()
     vi.spyOn(console, 'error').mockImplementation(() => {})
   })
 
