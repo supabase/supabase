@@ -109,8 +109,6 @@ export const TextConfirmModal = forwardRef<
       },
     })
 
-    const isFormValid = form.formState.isValid
-
     // 2. Define a submit handler.
     function onSubmit(_values: z.infer<typeof formSchema>) {
       // Do something with the form values.
@@ -121,6 +119,10 @@ export const TextConfirmModal = forwardRef<
     useEffect(() => {
       if (confirmString) form.reset()
     }, [confirmString])
+
+    useEffect(() => {
+      if (visible) form.reset()
+    }, [visible])
 
     useEffect(() => {
       if (!showCopied) return
@@ -137,6 +139,7 @@ export const TextConfirmModal = forwardRef<
         {...props}
         onOpenChange={() => {
           if (visible) {
+            form.reset()
             onCancel()
           }
         }}
@@ -183,18 +186,27 @@ export const TextConfirmModal = forwardRef<
                     <FormLabel {...label} enableSelection={!enableCopy}>
                       Type{' '}
                       {enableCopy ? (
-                        <Button
-                          className="h-[23px] px-1.5 py-0 border-muted text-sm whitespace-pre break-all"
-                          iconRight={
-                            showCopied ? <Check strokeWidth={2} className="text-brand" /> : <Copy />
-                          }
-                          onClick={() => {
-                            setShowCopied(true)
-                            copyToClipboard(confirmString)
-                          }}
-                        >
-                          {confirmString}
-                        </Button>
+                        <>
+                          <Button
+                            className="h-[23px] px-1.5 py-0 border-muted text-sm whitespace-pre break-all"
+                            iconRight={
+                              showCopied ? (
+                                <Check strokeWidth={2} className="text-brand" />
+                              ) : (
+                                <Copy />
+                              )
+                            }
+                            onClick={() => {
+                              setShowCopied(true)
+                              copyToClipboard(confirmString)
+                            }}
+                          >
+                            {confirmString}
+                          </Button>
+                          <span className="sr-only" role="status">
+                            {showCopied ? `${confirmString} copied to clipboard` : ''}
+                          </span>
+                        </>
                       ) : (
                         <span className="text-foreground break-all whitespace-pre">
                           {confirmString}
@@ -233,7 +245,7 @@ export const TextConfirmModal = forwardRef<
                   }
                   type="submit"
                   loading={loading}
-                  disabled={!isFormValid || loading}
+                  disabled={loading}
                   className="truncate"
                 >
                   {confirmLabel}
