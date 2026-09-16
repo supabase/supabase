@@ -207,4 +207,18 @@ describe('ResourceExhaustionWarningBanner', () => {
       metricsHref('disk-io-burst-balance')
     )
   })
+
+  test('non-compute multi-resource warning points users to the available actions', async () => {
+    renderBanner({ disk_space_exhaustion: 'warning', auth_rate_limit_exhaustion: 'warning' })
+
+    expect(
+      await screen.findByText(
+        'Use the Troubleshoot menu to review the affected resources and resolve these warnings.'
+      )
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/AI Assistant/)).not.toBeInTheDocument()
+
+    const menu = await openTroubleshootMenu()
+    expect(menu.queryByRole('menuitem', { name: 'Ask AI Assistant' })).not.toBeInTheDocument()
+  })
 })

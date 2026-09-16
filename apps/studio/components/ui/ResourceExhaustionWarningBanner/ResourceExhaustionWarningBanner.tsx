@@ -37,6 +37,9 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 type LinkedTroubleshootItem = Extract<TroubleshootItem, { kind: 'metrics' | 'docs' }>
 
+const MULTIPLE_RESOURCE_WARNING_NO_AI_DESCRIPTION =
+  'Use the Troubleshoot menu to review the affected resources and resolve these warnings.'
+
 const TroubleshootMenuItem = ({
   item,
   onTroubleshootClick,
@@ -126,6 +129,13 @@ export const ResourceExhaustionWarningBanner = () => {
     projectResourceWarnings !== undefined
       ? getWarningContent(projectResourceWarnings, activeWarnings[0], 'bannerContent')
       : undefined
+  const aiPrompt = getResourceWarningAiPrompt(activeWarnings)
+  const multipleWarningDescription =
+    aiPrompt === undefined
+      ? MULTIPLE_RESOURCE_WARNING_NO_AI_DESCRIPTION
+      : RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
+          hasCriticalWarning ? 'critical' : 'warning'
+        ].description
 
   const title = applyDiskIoBaseline(
     applyResourceList(
@@ -140,11 +150,7 @@ export const ResourceExhaustionWarningBanner = () => {
 
   const description = applyDiskIoBaseline(
     applyResourceList(
-      activeWarnings.length > 1
-        ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
-            hasCriticalWarning ? 'critical' : 'warning'
-          ].description
-        : warningContent?.description,
+      activeWarnings.length > 1 ? multipleWarningDescription : warningContent?.description,
       activeWarnings
     )
   )
@@ -176,7 +182,6 @@ export const ResourceExhaustionWarningBanner = () => {
           ?.buttonText
   })()
 
-  const aiPrompt = getResourceWarningAiPrompt(activeWarnings)
   const troubleshootItems = getTroubleshootItems({
     activeWarnings,
     projectRef: ref ?? 'default',
