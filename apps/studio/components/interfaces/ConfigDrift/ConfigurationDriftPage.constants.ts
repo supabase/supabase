@@ -32,6 +32,15 @@ const toStorageSettingsHref = (projectRef: string) =>
   `/project/${projectRef}/storage/files/settings`
 const toProjectHref = (projectRef: string) => `/project/${projectRef}`
 const toAuthTemplatesHref = (projectRef: string) => `/project/${projectRef}/auth/templates`
+const toAuthHooksHref = (projectRef: string) => `/project/${projectRef}/auth/hooks`
+const toAuthSmtpHref = (projectRef: string) => `/project/${projectRef}/auth/smtp`
+const toAuthThirdPartyHref = (projectRef: string) => `/project/${projectRef}/auth/third-party`
+const toJwtKeysHref = (projectRef: string) => `/project/${projectRef}/settings/jwt`
+const toComputeHref = (projectRef: string) => `/project/${projectRef}/compute`
+const toStorageBucketsHref = (projectRef: string) => `/project/${projectRef}/storage/files`
+const toStorageAnalyticsBucketsHref = (projectRef: string) =>
+  `/project/${projectRef}/storage/analytics`
+const toStorageVectorBucketsHref = (projectRef: string) => `/project/${projectRef}/storage/vectors`
 
 /**
  * Every trackable field across every section, keyed by its config.toml dotted path — the same shape
@@ -39,12 +48,17 @@ const toAuthTemplatesHref = (projectRef: string) => `/project/${projectRef}/auth
  */
 // Entries with no dedicated Studio settings page fall back to `toProjectHref`.
 export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
+  'api.auto_expose_new_tables': {
+    settingHref: toDataApiSettingsHref,
+    label: 'Auto-expose new tables',
+  },
   'api.enabled': { settingHref: toDataApiSettingsHref, label: 'API enabled' },
   'api.extra_search_path': { settingHref: toDataApiSettingsHref, label: 'Extra search path' },
   'api.max_rows': { settingHref: toDataApiSettingsHref, label: 'Max rows' },
   'api.schemas': { settingHref: toDataApiSettingsHref, label: 'Exposed schemas' },
   'auth.additional_redirect_urls': { settingHref: toAuthUrlConfigHref, label: 'Redirect URLs' },
   'auth.captcha.enabled': { settingHref: toAuthProtectionHref, label: 'Captcha enabled' },
+  'auth.captcha.provider': { settingHref: toAuthProtectionHref, label: 'Captcha provider' },
   'auth.email.double_confirm_changes': {
     settingHref: toAuthTemplatesHref,
     label: 'Secure email change',
@@ -58,6 +72,7 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toAuthTemplatesHref,
     label: 'Email send frequency limit',
   },
+  'auth.email.notification': { settingHref: toAuthTemplatesHref, label: 'Email notifications' },
   'auth.email.notification.email_changed.enabled': {
     settingHref: toAuthTemplatesHref,
     label: 'Email changed notification enabled',
@@ -117,7 +132,13 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   'auth.email.otp_expiry': { settingHref: toAuthProvidersHref('email'), label: 'Email OTP expiry' },
   'auth.email.otp_length': { settingHref: toAuthProvidersHref(), label: 'Email OTP length' },
   'auth.email.secure_password_change': { settingHref: toProjectHref, label: 'Secure email change' },
+  'auth.email.smtp.admin_email': { settingHref: toAuthSmtpHref, label: 'SMTP admin email' },
   'auth.email.smtp.enabled': { settingHref: toProjectHref, label: 'Custom SMTP enabled' },
+  'auth.email.smtp.host': { settingHref: toAuthSmtpHref, label: 'SMTP host' },
+  'auth.email.smtp.port': { settingHref: toAuthSmtpHref, label: 'SMTP port' },
+  'auth.email.smtp.sender_name': { settingHref: toAuthSmtpHref, label: 'SMTP sender name' },
+  'auth.email.smtp.user': { settingHref: toAuthSmtpHref, label: 'SMTP user' },
+  'auth.email.template': { settingHref: toAuthTemplatesHref, label: 'Email templates' },
   'auth.email.template.confirmation.subject': {
     settingHref: toProjectHref,
     label: 'Confirmation email subject',
@@ -171,10 +192,15 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toAuthProvidersHref('apple'),
     label: 'Apple enabled',
   },
+  'auth.external.apple.redirect_uri': {
+    settingHref: toAuthProvidersHref('apple'),
+    label: 'Apple redirect URI',
+  },
   'auth.external.apple.skip_nonce_check': {
     settingHref: toAuthProvidersHref('apple'),
     label: 'Apple skip nonce check',
   },
+  'auth.external.apple.url': { settingHref: toAuthProvidersHref('apple'), label: 'Apple URL' },
   'auth.external.azure.client_id': {
     settingHref: toAuthProvidersHref('azure'),
     label: 'Azure client ID',
@@ -186,6 +212,10 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   'auth.external.azure.enabled': {
     settingHref: toAuthProvidersHref('azure'),
     label: 'Azure enabled',
+  },
+  'auth.external.azure.redirect_uri': {
+    settingHref: toAuthProvidersHref('azure'),
+    label: 'Azure redirect URI',
   },
   'auth.external.azure.skip_nonce_check': {
     settingHref: toAuthProvidersHref('azure'),
@@ -204,9 +234,17 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toAuthProvidersHref('bitbucket'),
     label: 'Bitbucket enabled',
   },
+  'auth.external.bitbucket.redirect_uri': {
+    settingHref: toAuthProvidersHref('bitbucket'),
+    label: 'Bitbucket redirect URI',
+  },
   'auth.external.bitbucket.skip_nonce_check': {
     settingHref: toAuthProvidersHref('bitbucket'),
     label: 'Bitbucket skip nonce check',
+  },
+  'auth.external.bitbucket.url': {
+    settingHref: toAuthProvidersHref('bitbucket'),
+    label: 'Bitbucket URL',
   },
   'auth.external.discord.client_id': {
     settingHref: toAuthProvidersHref('discord'),
@@ -220,9 +258,17 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toAuthProvidersHref('discord'),
     label: 'Discord enabled',
   },
+  'auth.external.discord.redirect_uri': {
+    settingHref: toAuthProvidersHref('discord'),
+    label: 'Discord redirect URI',
+  },
   'auth.external.discord.skip_nonce_check': {
     settingHref: toAuthProvidersHref('discord'),
     label: 'Discord skip nonce check',
+  },
+  'auth.external.discord.url': {
+    settingHref: toAuthProvidersHref('discord'),
+    label: 'Discord URL',
   },
   'auth.external.facebook.client_id': {
     settingHref: toAuthProvidersHref('facebook'),
@@ -236,9 +282,17 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toAuthProvidersHref('facebook'),
     label: 'Facebook enabled',
   },
+  'auth.external.facebook.redirect_uri': {
+    settingHref: toAuthProvidersHref('facebook'),
+    label: 'Facebook redirect URI',
+  },
   'auth.external.facebook.skip_nonce_check': {
     settingHref: toAuthProvidersHref('facebook'),
     label: 'Facebook skip nonce check',
+  },
+  'auth.external.facebook.url': {
+    settingHref: toAuthProvidersHref('facebook'),
+    label: 'Facebook URL',
   },
   'auth.external.figma.client_id': {
     settingHref: toAuthProvidersHref('figma'),
@@ -252,10 +306,15 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toAuthProvidersHref('figma'),
     label: 'Figma enabled',
   },
+  'auth.external.figma.redirect_uri': {
+    settingHref: toAuthProvidersHref('figma'),
+    label: 'Figma redirect URI',
+  },
   'auth.external.figma.skip_nonce_check': {
     settingHref: toAuthProvidersHref('figma'),
     label: 'Figma skip nonce check',
   },
+  'auth.external.figma.url': { settingHref: toAuthProvidersHref('figma'), label: 'Figma URL' },
   'auth.external.github.client_id': {
     settingHref: toAuthProvidersHref('github'),
     label: 'GitHub client ID',
@@ -268,10 +327,15 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toAuthProvidersHref('github'),
     label: 'GitHub enabled',
   },
+  'auth.external.github.redirect_uri': {
+    settingHref: toAuthProvidersHref('github'),
+    label: 'GitHub redirect URI',
+  },
   'auth.external.github.skip_nonce_check': {
     settingHref: toAuthProvidersHref('github'),
     label: 'GitHub skip nonce check',
   },
+  'auth.external.github.url': { settingHref: toAuthProvidersHref('github'), label: 'GitHub URL' },
   'auth.external.gitlab.client_id': {
     settingHref: toAuthProvidersHref('gitlab'),
     label: 'GitLab client ID',
@@ -283,6 +347,10 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   'auth.external.gitlab.enabled': {
     settingHref: toAuthProvidersHref('gitlab'),
     label: 'GitLab enabled',
+  },
+  'auth.external.gitlab.redirect_uri': {
+    settingHref: toAuthProvidersHref('gitlab'),
+    label: 'GitLab redirect URI',
   },
   'auth.external.gitlab.skip_nonce_check': {
     settingHref: toAuthProvidersHref('gitlab'),
@@ -301,10 +369,15 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toAuthProvidersHref('google'),
     label: 'Google enabled',
   },
+  'auth.external.google.redirect_uri': {
+    settingHref: toAuthProvidersHref('google'),
+    label: 'Google redirect URI',
+  },
   'auth.external.google.skip_nonce_check': {
     settingHref: toAuthProvidersHref('google'),
     label: 'Google skip nonce check',
   },
+  'auth.external.google.url': { settingHref: toAuthProvidersHref('google'), label: 'Google URL' },
   'auth.external.kakao.client_id': {
     settingHref: toAuthProvidersHref('kakao'),
     label: 'Kakao client ID',
@@ -317,10 +390,15 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toAuthProvidersHref('kakao'),
     label: 'Kakao enabled',
   },
+  'auth.external.kakao.redirect_uri': {
+    settingHref: toAuthProvidersHref('kakao'),
+    label: 'Kakao redirect URI',
+  },
   'auth.external.kakao.skip_nonce_check': {
     settingHref: toAuthProvidersHref('kakao'),
     label: 'Kakao skip nonce check',
   },
+  'auth.external.kakao.url': { settingHref: toAuthProvidersHref('kakao'), label: 'Kakao URL' },
   'auth.external.keycloak.client_id': {
     settingHref: toAuthProvidersHref('keycloak'),
     label: 'Keycloak client ID',
@@ -332,6 +410,10 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   'auth.external.keycloak.enabled': {
     settingHref: toAuthProvidersHref('keycloak'),
     label: 'Keycloak enabled',
+  },
+  'auth.external.keycloak.redirect_uri': {
+    settingHref: toAuthProvidersHref('keycloak'),
+    label: 'Keycloak redirect URI',
   },
   'auth.external.keycloak.skip_nonce_check': {
     settingHref: toAuthProvidersHref('keycloak'),
@@ -353,9 +435,17 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toAuthProvidersHref('LinkedIn+(OIDC)'),
     label: 'LinkedIn (OIDC) enabled',
   },
+  'auth.external.linkedin_oidc.redirect_uri': {
+    settingHref: toAuthProvidersHref('LinkedIn+(OIDC)'),
+    label: 'LinkedIn (OIDC) redirect URI',
+  },
   'auth.external.linkedin_oidc.skip_nonce_check': {
     settingHref: toAuthProvidersHref('LinkedIn+(OIDC)'),
     label: 'LinkedIn (OIDC) skip nonce check',
+  },
+  'auth.external.linkedin_oidc.url': {
+    settingHref: toAuthProvidersHref('LinkedIn+(OIDC)'),
+    label: 'LinkedIn (OIDC) URL',
   },
   'auth.external.notion.client_id': {
     settingHref: toAuthProvidersHref('notion'),
@@ -369,10 +459,15 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toAuthProvidersHref('notion'),
     label: 'Notion enabled',
   },
+  'auth.external.notion.redirect_uri': {
+    settingHref: toAuthProvidersHref('notion'),
+    label: 'Notion redirect URI',
+  },
   'auth.external.notion.skip_nonce_check': {
     settingHref: toAuthProvidersHref('notion'),
     label: 'Notion skip nonce check',
   },
+  'auth.external.notion.url': { settingHref: toAuthProvidersHref('notion'), label: 'Notion URL' },
   'auth.external.slack.client_id': {
     settingHref: toAuthProvidersHref('slack+(deprecated)'),
     label: 'Slack client ID',
@@ -401,9 +496,17 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toAuthProvidersHref('slack+(OIDC)'),
     label: 'Slack (OIDC) enabled',
   },
+  'auth.external.slack_oidc.redirect_uri': {
+    settingHref: toAuthProvidersHref('slack+(OIDC)'),
+    label: 'Slack (OIDC) redirect URI',
+  },
   'auth.external.slack_oidc.skip_nonce_check': {
     settingHref: toAuthProvidersHref('slack+(OIDC)'),
     label: 'Slack (OIDC) skip nonce check',
+  },
+  'auth.external.slack_oidc.url': {
+    settingHref: toAuthProvidersHref('slack+(OIDC)'),
+    label: 'Slack (OIDC) URL',
   },
   'auth.external.spotify.client_id': {
     settingHref: toAuthProvidersHref('spotify'),
@@ -417,9 +520,17 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toAuthProvidersHref('spotify'),
     label: 'Spotify enabled',
   },
+  'auth.external.spotify.redirect_uri': {
+    settingHref: toAuthProvidersHref('spotify'),
+    label: 'Spotify redirect URI',
+  },
   'auth.external.spotify.skip_nonce_check': {
     settingHref: toAuthProvidersHref('spotify'),
     label: 'Spotify skip nonce check',
+  },
+  'auth.external.spotify.url': {
+    settingHref: toAuthProvidersHref('spotify'),
+    label: 'Spotify URL',
   },
   'auth.external.twitch.client_id': {
     settingHref: toAuthProvidersHref('twitch'),
@@ -433,10 +544,15 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toAuthProvidersHref('twitch'),
     label: 'Twitch enabled',
   },
+  'auth.external.twitch.redirect_uri': {
+    settingHref: toAuthProvidersHref('twitch'),
+    label: 'Twitch redirect URI',
+  },
   'auth.external.twitch.skip_nonce_check': {
     settingHref: toAuthProvidersHref('twitch'),
     label: 'Twitch skip nonce check',
   },
+  'auth.external.twitch.url': { settingHref: toAuthProvidersHref('twitch'), label: 'Twitch URL' },
   'auth.external.twitter.client_id': {
     settingHref: toAuthProvidersHref('twitter+(deprecated)'),
     label: 'Twitter client ID',
@@ -449,9 +565,17 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toAuthProvidersHref('twitter+(deprecated)'),
     label: 'Twitter enabled',
   },
+  'auth.external.twitter.redirect_uri': {
+    settingHref: toAuthProvidersHref('twitter+(deprecated)'),
+    label: 'Twitter redirect URI',
+  },
   'auth.external.twitter.skip_nonce_check': {
     settingHref: toAuthProvidersHref('twitter+(deprecated)'),
     label: 'Twitter skip nonce check',
+  },
+  'auth.external.twitter.url': {
+    settingHref: toAuthProvidersHref('twitter+(deprecated)'),
+    label: 'Twitter URL',
   },
   'auth.external.x.enabled': {
     settingHref: toAuthProvidersHref('x+/+twitter+(oauth+2.0)'),
@@ -469,6 +593,14 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toAuthProvidersHref('x+/+twitter+(oauth+2.0)'),
     label: 'X skip nonce check',
   },
+  'auth.external.x.redirect_uri': {
+    settingHref: toAuthProvidersHref('x+/+twitter+(oauth+2.0)'),
+    label: 'X redirect URI',
+  },
+  'auth.external.x.url': {
+    settingHref: toAuthProvidersHref('x+/+twitter+(oauth+2.0)'),
+    label: 'X URL',
+  },
   'auth.external.workos.client_id': {
     settingHref: toAuthProvidersHref('workos'),
     label: 'WorkOS client ID',
@@ -480,6 +612,10 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   'auth.external.workos.enabled': {
     settingHref: toAuthProvidersHref('workos'),
     label: 'WorkOS enabled',
+  },
+  'auth.external.workos.redirect_uri': {
+    settingHref: toAuthProvidersHref('workos'),
+    label: 'WorkOS redirect URI',
   },
   'auth.external.workos.skip_nonce_check': {
     settingHref: toAuthProvidersHref('workos'),
@@ -495,29 +631,53 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     label: 'Zoom email optional',
   },
   'auth.external.zoom.enabled': { settingHref: toAuthProvidersHref('zoom'), label: 'Zoom enabled' },
+  'auth.external.zoom.redirect_uri': {
+    settingHref: toAuthProvidersHref('zoom'),
+    label: 'Zoom redirect URI',
+  },
   'auth.external.zoom.skip_nonce_check': {
     settingHref: toAuthProvidersHref('zoom'),
     label: 'Zoom skip nonce check',
   },
+  'auth.external.zoom.url': { settingHref: toAuthProvidersHref('zoom'), label: 'Zoom URL' },
   'auth.hook.before_user_created.enabled': {
     settingHref: toProjectHref,
     label: 'Before user created hook enabled',
+  },
+  'auth.hook.before_user_created.uri': {
+    settingHref: toAuthHooksHref,
+    label: 'Before user created hook URI',
   },
   'auth.hook.custom_access_token.enabled': {
     settingHref: toProjectHref,
     label: 'Custom access token hook enabled',
   },
+  'auth.hook.custom_access_token.uri': {
+    settingHref: toAuthHooksHref,
+    label: 'Custom access token hook URI',
+  },
   'auth.hook.mfa_verification_attempt.enabled': {
     settingHref: toProjectHref,
     label: 'MFA verification attempt hook enabled',
+  },
+  'auth.hook.mfa_verification_attempt.uri': {
+    settingHref: toAuthHooksHref,
+    label: 'MFA verification attempt hook URI',
   },
   'auth.hook.password_verification_attempt.enabled': {
     settingHref: toProjectHref,
     label: 'Password verification attempt hook enabled',
   },
+  'auth.hook.password_verification_attempt.uri': {
+    settingHref: toAuthHooksHref,
+    label: 'Password verification attempt hook URI',
+  },
   'auth.hook.send_email.enabled': { settingHref: toProjectHref, label: 'Send email hook enabled' },
+  'auth.hook.send_email.uri': { settingHref: toAuthHooksHref, label: 'Send email hook URI' },
   'auth.hook.send_sms.enabled': { settingHref: toProjectHref, label: 'Send SMS hook enabled' },
+  'auth.hook.send_sms.uri': { settingHref: toAuthHooksHref, label: 'Send SMS hook URI' },
   'auth.jwt_expiry': { settingHref: toProjectHref, label: 'JWT expiry' },
+  'auth.jwt_issuer': { settingHref: toJwtKeysHref, label: 'JWT issuer' },
   'auth.mfa.max_enrolled_factors': {
     settingHref: toProjectHref,
     label: 'Max enrolled MFA factors',
@@ -585,6 +745,7 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     label: 'Session inactivity timeout',
   },
   'auth.sessions.timebox': { settingHref: toProjectHref, label: 'Session timebox' },
+  'auth.signing_keys_path': { settingHref: toJwtKeysHref, label: 'Signing keys path' },
   'auth.site_url': { settingHref: toAuthUrlConfigHref, label: 'Site URL' },
   'auth.sms.enable_confirmations': {
     settingHref: toAuthProvidersHref(),
@@ -601,6 +762,7 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   'auth.sms.otp_length': { settingHref: toAuthProvidersHref(), label: 'SMS OTP length' },
   'auth.sms.provider': { settingHref: toAuthProvidersHref(), label: 'SMS provider' },
   'auth.sms.template': { settingHref: toAuthProvidersHref(), label: 'SMS template' },
+  'auth.sms.test_otp': { settingHref: toAuthProvidersHref(), label: 'Test OTP' },
   'auth.sms.textlocal.enabled': { settingHref: toProjectHref, label: 'Textlocal enabled' },
   'auth.sms.textlocal.sender': { settingHref: toAuthProvidersHref(), label: 'Textlocal sender' },
   'auth.sms.twilio.account_sid': {
@@ -625,18 +787,42 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toAuthProvidersHref(),
     label: 'Twilio Verify message service SID',
   },
+  'auth.sms.vonage.api_key': { settingHref: toAuthProvidersHref(), label: 'Vonage API key' },
   'auth.sms.vonage.enabled': { settingHref: toProjectHref, label: 'Vonage enabled' },
   'auth.sms.vonage.from': { settingHref: toAuthProvidersHref(), label: 'Vonage from' },
   'auth.third_party.auth0.enabled': { settingHref: toProjectHref, label: 'Auth0 enabled' },
+  'auth.third_party.auth0.tenant': { settingHref: toAuthThirdPartyHref, label: 'Auth0 tenant' },
+  'auth.third_party.auth0.tenant_region': {
+    settingHref: toAuthThirdPartyHref,
+    label: 'Auth0 tenant region',
+  },
   'auth.third_party.aws_cognito.enabled': {
     settingHref: toProjectHref,
     label: 'AWS Cognito enabled',
   },
+  'auth.third_party.aws_cognito.user_pool_id': {
+    settingHref: toAuthThirdPartyHref,
+    label: 'AWS Cognito user pool ID',
+  },
+  'auth.third_party.aws_cognito.user_pool_region': {
+    settingHref: toAuthThirdPartyHref,
+    label: 'AWS Cognito user pool region',
+  },
+  'auth.third_party.clerk.domain': { settingHref: toAuthThirdPartyHref, label: 'Clerk domain' },
   'auth.third_party.clerk.enabled': { settingHref: toProjectHref, label: 'Clerk enabled' },
   'auth.third_party.firebase.enabled': { settingHref: toProjectHref, label: 'Firebase enabled' },
+  'auth.third_party.firebase.project_id': {
+    settingHref: toAuthThirdPartyHref,
+    label: 'Firebase project ID',
+  },
   'auth.third_party.workos.enabled': { settingHref: toProjectHref, label: 'WorkOS enabled' },
+  'auth.third_party.workos.issuer_url': {
+    settingHref: toAuthThirdPartyHref,
+    label: 'WorkOS issuer URL',
+  },
   'auth.web3.ethereum.enabled': { settingHref: toProjectHref, label: 'Ethereum Web3 enabled' },
   'auth.web3.solana.enabled': { settingHref: toProjectHref, label: 'Solana Web3 enabled' },
+  compute: { settingHref: toComputeHref, label: 'Compute services' },
   'db.health_timeout': { settingHref: toProjectHref, label: 'Health check timeout' },
   'db.major_version': { settingHref: toProjectHref, label: 'Postgres major version' },
   'db.network_restrictions.allowed_cidrs': {
@@ -654,8 +840,80 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   'db.pooler.default_pool_size': { settingHref: toProjectHref, label: 'Default pool size' },
   'db.pooler.max_client_conn': { settingHref: toProjectHref, label: 'Max client connections' },
   'db.pooler.pool_mode': { settingHref: toProjectHref, label: 'Pool mode' },
+  'db.settings.effective_cache_size': {
+    settingHref: toProjectHref,
+    label: 'Effective cache size',
+  },
+  'db.settings.logical_decoding_work_mem': {
+    settingHref: toProjectHref,
+    label: 'Logical decoding work mem',
+  },
+  'db.settings.maintenance_work_mem': {
+    settingHref: toProjectHref,
+    label: 'Maintenance work mem',
+  },
+  'db.settings.max_connections': { settingHref: toProjectHref, label: 'Max connections' },
+  'db.settings.max_locks_per_transaction': {
+    settingHref: toProjectHref,
+    label: 'Max locks per transaction',
+  },
+  'db.settings.max_parallel_maintenance_workers': {
+    settingHref: toProjectHref,
+    label: 'Max parallel maintenance workers',
+  },
+  'db.settings.max_parallel_workers': {
+    settingHref: toProjectHref,
+    label: 'Max parallel workers',
+  },
+  'db.settings.max_parallel_workers_per_gather': {
+    settingHref: toProjectHref,
+    label: 'Max parallel workers per gather',
+  },
+  'db.settings.max_replication_slots': {
+    settingHref: toProjectHref,
+    label: 'Max replication slots',
+  },
+  'db.settings.max_slot_wal_keep_size': {
+    settingHref: toProjectHref,
+    label: 'Max slot WAL keep size',
+  },
+  'db.settings.max_standby_archive_delay': {
+    settingHref: toProjectHref,
+    label: 'Max standby archive delay',
+  },
+  'db.settings.max_standby_streaming_delay': {
+    settingHref: toProjectHref,
+    label: 'Max standby streaming delay',
+  },
+  'db.settings.max_wal_senders': { settingHref: toProjectHref, label: 'Max WAL senders' },
+  'db.settings.max_wal_size': { settingHref: toProjectHref, label: 'Max WAL size' },
+  'db.settings.max_worker_processes': {
+    settingHref: toProjectHref,
+    label: 'Max worker processes',
+  },
+  'db.settings.session_replication_role': {
+    settingHref: toProjectHref,
+    label: 'Session replication role',
+  },
+  'db.settings.shared_buffers': { settingHref: toProjectHref, label: 'Shared buffers' },
+  'db.settings.statement_timeout': { settingHref: toProjectHref, label: 'Statement timeout' },
+  'db.settings.track_activity_query_size': {
+    settingHref: toProjectHref,
+    label: 'Track activity query size',
+  },
+  'db.settings.track_commit_timestamp': {
+    settingHref: toProjectHref,
+    label: 'Track commit timestamp',
+  },
+  'db.settings.wal_keep_size': { settingHref: toProjectHref, label: 'WAL keep size' },
+  'db.settings.wal_sender_timeout': { settingHref: toProjectHref, label: 'WAL sender timeout' },
+  'db.settings.work_mem': { settingHref: toProjectHref, label: 'Work mem' },
   'db.ssl_enforcement.enabled': { settingHref: toProjectHref, label: 'SSL enforcement enabled' },
   'experimental.webhooks.enabled': { settingHref: toProjectHref, label: 'Webhooks enabled' },
+  'storage.analytics.buckets': {
+    settingHref: toStorageAnalyticsBucketsHref,
+    label: 'Analytics buckets',
+  },
   'storage.analytics.enabled': { settingHref: toProjectHref, label: 'Storage analytics enabled' },
   'storage.analytics.max_catalogs': { settingHref: toProjectHref, label: 'Max analytics catalogs' },
   'storage.analytics.max_namespaces': {
@@ -663,6 +921,7 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     label: 'Max analytics namespaces',
   },
   'storage.analytics.max_tables': { settingHref: toProjectHref, label: 'Max analytics tables' },
+  'storage.buckets': { settingHref: toStorageBucketsHref, label: 'Storage buckets' },
   'storage.enabled': { settingHref: toProjectHref, label: 'Storage enabled' },
   // Both sides now report this as a canonical string (e.g. "50MiB") via @supabase/config's
   // `fromApiProjectConfig`/`fromConfigDocument`, so no normalization is needed here anymore.
@@ -672,6 +931,7 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     label: 'Image transformation enabled',
   },
   'storage.s3_protocol.enabled': { settingHref: toProjectHref, label: 'S3 protocol enabled' },
+  'storage.vector.buckets': { settingHref: toStorageVectorBucketsHref, label: 'Vector buckets' },
   'storage.vector.enabled': { settingHref: toProjectHref, label: 'Storage vector enabled' },
   'storage.vector.max_buckets': { settingHref: toProjectHref, label: 'Max vector buckets' },
   'storage.vector.max_indexes': { settingHref: toProjectHref, label: 'Max vector indexes' },

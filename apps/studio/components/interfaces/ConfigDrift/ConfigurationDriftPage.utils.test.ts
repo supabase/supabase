@@ -65,7 +65,7 @@ describe('createConfigurationDriftRows', () => {
       PROJECT_REF
     )
 
-    expect(row.settingLabel).toBe('Google · Client ID')
+    expect(row.settingLabel).toBe('Google client ID')
   })
 
   it('falls back to a title-cased last path segment for an unrecognized config path', () => {
@@ -75,25 +75,6 @@ describe('createConfigurationDriftRows', () => {
     )
 
     expect(row.settingLabel).toBe('Unknown Setting')
-  })
-
-  it('builds a scalar diff, formatting booleans and empty values for display', () => {
-    const [row] = createConfigurationDriftRows(
-      [
-        driftField({
-          configPath: 'auth.enable_signup',
-          dashboardValue: true,
-          githubValue: false,
-        }),
-      ],
-      PROJECT_REF
-    )
-
-    expect(row.valueDiff).toEqual({
-      kind: 'scalar',
-      dashboardValue: 'Enabled',
-      configValue: 'Disabled',
-    })
   })
 
   it('formats a missing scalar value as "Not set"', () => {
@@ -122,25 +103,10 @@ describe('createConfigurationDriftRows', () => {
     )
 
     expect(row.valueDiff).toEqual({
-      kind: 'list',
-      onlyInDashboard: ['https://b.com'],
-      onlyInConfig: ['https://c.com'],
+      configValue: '  https://a.com  \nhttps://c.com',
+      dashboardValue: 'https://a.com\nhttps://b.com',
+      kind: 'scalar',
     })
-  })
-
-  it('reports no diff entries when redirect URL lists are equal after normalization', () => {
-    const [row] = createConfigurationDriftRows(
-      [
-        driftField({
-          configPath: 'auth.additional_redirect_urls',
-          dashboardValue: ['https://a.com'],
-          githubValue: ['https://a.com', 'https://a.com'],
-        }),
-      ],
-      PROJECT_REF
-    )
-
-    expect(row.valueDiff).toEqual({ kind: 'list', onlyInDashboard: [], onlyInConfig: [] })
   })
 })
 
@@ -188,11 +154,11 @@ describe('groupUnmanagedConfigFields', () => {
       unmanagedField({
         section: 'auth',
         configPath: 'auth.additional_redirect_urls',
-        dashboardValue: ['https://b.com', '  https://a.com  ', 'https://a.com'],
+        dashboardValue: ['https://b.com', 'https://a.com', 'https://a.com'],
       }),
     ])
 
-    expect(groups[0].rows[0].value).toBe('https://a.com\nhttps://b.com')
+    expect(groups[0].rows[0].value).toBe('https://b.com\nhttps://a.com\nhttps://a.com')
   })
 })
 

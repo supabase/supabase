@@ -40,7 +40,8 @@ describe('getConfigDriftSummary', () => {
       githubConfig: { auth: {} },
     })
     expect(drifted.driftedFields).toHaveLength(1)
-    expect(drifted.driftedFields[0].githubValue).toBeUndefined()
+    // site_url defaults to http://127.0.0.1:3000
+    expect(drifted.driftedFields[0].githubValue).toEqual('http://127.0.0.1:3000')
   })
 
   describe('auth.additional_redirect_urls', () => {
@@ -122,7 +123,9 @@ describe('getConfigDriftSummary', () => {
         githubConfig: { auth: {} },
       })
       expect(drifted.driftedFields).toHaveLength(1)
-      expect(drifted.driftedFields[0].githubValue).toBeUndefined()
+      // additional_redirect_urls defaults to ['https://127.0.0.1:3000']
+      expect(drifted.driftedFields[0].githubValue).toEqual(['https://127.0.0.1:3000'])
+      expect(drifted.driftedFields[0].dashboardValue).toEqual(['https://a.com'])
     })
   })
 })

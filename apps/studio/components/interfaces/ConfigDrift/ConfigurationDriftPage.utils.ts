@@ -15,9 +15,8 @@ const CONFIG_SECTION_LABELS: Record<ConfigSection, string> = {
   api: 'API',
   auth: 'Auth',
   db: 'Database',
-  realtime: 'Realtime',
   storage: 'Storage',
-  workers: 'Workers',
+  compute: 'Compute',
   experimental: 'Experimental',
 }
 
