@@ -46,16 +46,13 @@ interface GitHubConfigDriftSummary {
 
 /**
  * Converts a v2 project-config API response's `attributes` into the hosted-section shape both
- * sides of a drift comparison are normalized to. Returns `undefined` (rather than throwing) when
- * `attributes` isn't loaded yet or the API returned something @supabase/config can't map.
+ * sides of a drift comparison are normalized to. Returns `undefined` when `attributes` isn't
+ * loaded yet; throws if the API returned something @supabase/config can't map, so callers can
+ * surface it as an error rather than silently reporting no drift.
  */
 export function fromDashboardProjectConfig(attributes: unknown): ProjectConfig | undefined {
   if (attributes === undefined) return undefined
-  try {
-    return fromApiProjectConfig(attributes)
-  } catch {
-    return undefined
-  }
+  return fromApiProjectConfig(attributes)
 }
 
 /**
@@ -63,18 +60,15 @@ export function fromDashboardProjectConfig(attributes: unknown): ProjectConfig |
  * takes as its local operand. Keeping the raw `document` alongside the decoded `config` is what
  * unlocks raw-presence masking (distinguishing "the file wrote this value" from "the file inherited
  * a schema default") — see `DiffProjectConfigOptions.local`'s own docstring. Returns `undefined`
- * (rather than throwing) when `document` isn't loaded yet or fails to decode against the schema.
+ * when `document` isn't loaded yet; throws if it fails to decode against the schema, so callers
+ * can surface it as an error rather than silently reporting no drift.
  */
 export function decodeGithubConfigDocument(
   document: unknown
 ): { config: CliConfig; document: Record<string, unknown> } | undefined {
   if (!isRecord(document)) return undefined
-  try {
-    const config = Schema.decodeUnknownSync(CliConfigSchema)(document)
-    return { config, document }
-  } catch {
-    return undefined
-  }
+  const config = Schema.decodeUnknownSync(CliConfigSchema)(document)
+  return { config, document }
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

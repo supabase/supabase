@@ -61,9 +61,23 @@ export function useSelectedGitHubConfigDrift() {
     [branchesRefetch, connectionRefetch, projectConfigRefetch, githubConfigRefetch]
   )
 
-  const summary = useMemo(() => {
-    const dashboardConfig = fromDashboardProjectConfig(projectConfigQuery.data?.attributes)
-    return getConfigDriftSummary({ dashboardConfig, githubConfig: githubConfigQuery.data?.config })
+  const { summary, conversionError } = useMemo(() => {
+    try {
+      const dashboardConfig = fromDashboardProjectConfig(projectConfigQuery.data?.attributes)
+      const summary = getConfigDriftSummary({
+        dashboardConfig,
+        githubConfig: githubConfigQuery.data?.config,
+      })
+      return { summary, conversionError: undefined }
+    } catch (error) {
+      console.error('Failed to compare configuration drift:', error)
+      return {
+        summary: { driftedFields: [], matchedFields: [], unmanagedFields: [] },
+        conversionError: new Error(
+          'Could not compare configuration — the response was in an unexpected format.'
+        ),
+      }
+    }
   }, [projectConfigQuery.data?.attributes, githubConfigQuery.data?.config])
 
   const activeQueries = [
@@ -81,8 +95,8 @@ export function useSelectedGitHubConfigDrift() {
     isReady,
     isPending: activeQueries.some((query) => query.isPending),
     isFetching: activeQueries.some((query) => query.isFetching),
-    isError: activeQueries.some((query) => query.isError),
-    error: activeQueries.find((query) => query.error)?.error,
+    isError: activeQueries.some((query) => query.isError) || conversionError !== undefined,
+    error: activeQueries.find((query) => query.error)?.error ?? conversionError,
     hasConfigurationIssues: isReady && issueCount > 0,
     summary,
     refetch,
