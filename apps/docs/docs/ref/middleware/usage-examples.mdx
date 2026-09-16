@@ -10,11 +10,11 @@ Each example builds one Fetch handler with `pipeline`. Entries run in array orde
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-    `withCors` runs first. It answers the `OPTIONS` preflight with `204` before anything else runs, and it stamps `Access-Control-*` headers onto the response on the way out.
+    `withCors` runs first. It answers the CORS preflight (an `OPTIONS` request carrying `Access-Control-Request-Method`) with `204` before anything else runs. On the way out, it stamps `Access-Control-*` headers onto the response when the request's `Origin` is allowed.
 
-    `withFeatureFlag` runs second. `evaluate` receives the request and returns `true` to admit it or `false` to reject it. A rejected request gets a `404` and never reaches the handler. An admitted request reaches the handler with `ctx.featureFlag` set.
+    `withFeatureFlag` runs second. `evaluate` receives the request and decides: `true` admits it, `false` rejects it. It can be async, and it can return a verdict object instead of a boolean. A rejected request gets a `404` and never reaches the handler. An admitted request reaches the handler with `ctx.featureFlag` set.
 
-    Both middleware ship in `@supabase/middleware`. The stack runs unchanged on Node, Deno, Bun, and Cloudflare Workers.
+    Both middleware ship in `@supabase/middleware`. The handler is plain Fetch, so the same stack runs on Node, Deno, Bun, and Cloudflare Workers; only the host entry point differs.
 
   </RefSubLayout.Details>
 
@@ -47,11 +47,13 @@ Each example builds one Fetch handler with `pipeline`. Entries run in array orde
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-    Middleware from [`@supabase/server`](/docs/reference/server/introduction) drop into the same array. `withSupabase` runs first. It answers the CORS preflight, verifies the caller's JWT, and puts an RLS-scoped client on `ctx.supabase`. A request without valid credentials gets a `401` and never reaches the flag or the handler.
+    Middleware from [`@supabase/server`](/docs/reference/server/introduction) drop into the same array. `withCors` runs first, so the preflight is answered before the auth gate. `withSupabase` runs second with `cors: 'disabled'`, because `withCors` owns CORS here. It verifies the caller's JWT and puts an RLS-scoped client on `ctx.supabase`. A request without valid credentials gets a `401` and never reaches the flag or the handler.
 
-    The flag runs second. `evaluate` reads an environment variable through `getEnv`, so the endpoint returns `404` to every signed-in caller until `BETA_CHECKOUT` is set to `on`. Flip the variable to roll the endpoint out.
+    The flag runs last. `evaluate` reads an environment variable through `getEnv`, so the endpoint returns `404` to every signed-in caller until `BETA_CHECKOUT` is set to `on`. Flip the variable to roll the endpoint out.
 
-    `withSupabase` handles CORS on its own, so it does not need `withCors` in front of it. Pass `cors: 'disabled'` to `withSupabase` when another layer owns CORS.
+    Without `withCors`, `withSupabase` answers every `OPTIONS` request itself with `204` and wildcard CORS headers (`Access-Control-Allow-Origin: *`). That is enough when you do not need an origin allowlist. A layer that owns CORS must sit before `withSupabase` in the array. Placed after it, the preflight reaches the auth gate and gets a `401`.
+
+    The entry form of `withSupabase` is alpha. It needs `@supabase/server` 1.6.0 or later.
 
   </RefSubLayout.Details>
 
@@ -59,13 +61,15 @@ Each example builds one Fetch handler with `pipeline`. Entries run in array orde
 
     ```ts
     import { getEnv, pipeline } from '@supabase/middleware'
+    import { withCors } from '@supabase/middleware/cors'
     import { withFeatureFlag } from '@supabase/middleware/feature-flag'
     import { withSupabase } from '@supabase/server'
 
     export default {
       fetch: pipeline(
         [
-          withSupabase({ auth: 'user' }),
+          withCors({ origin: ['https://app.example.com'] }),
+          withSupabase({ auth: 'user', cors: 'disabled' }),
           withFeatureFlag({
             name: 'beta-checkout',
             evaluate: () => getEnv('BETA_CHECKOUT') === 'on',
@@ -73,7 +77,7 @@ Each example builds one Fetch handler with `pipeline`. Entries run in array orde
         ],
         async (_req, ctx) => {
           const { data, error } = await ctx.supabase.from('carts').select()
-          if (error) return Response.json({ error: error.message }, { status: 500 })
+          if (error) return Response.json({ error: 'query_failed' }, { status: 500 })
           return Response.json(data)
         },
       ),
