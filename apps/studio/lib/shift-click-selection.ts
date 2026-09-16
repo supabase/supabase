@@ -1,11 +1,12 @@
 import type { RowSelectionState } from '@tanstack/react-table'
 
 /**
- * Computes the next multi-select set after a shift-click on `targetKey`, extending
- * the selection from `anchorKey` (the last row the user clicked). Every key between
- * anchor and target (inclusive, in `orderedKeys` order) is added. If the whole range is
- * already selected, the range is removed instead. Falls back to a plain toggle of
- * `targetKey` when there is no usable anchor (null, or no longer in `orderedKeys`).
+ * Computes the next multi-select set after a shift-click on `targetKey`, matching
+ * react-data-grid's native behavior: the target's new checked state (the opposite of
+ * its current one) is applied to every key strictly between `anchorKey` (the last row
+ * the user clicked) and the target, plus the target itself. The anchor row is left
+ * untouched. Falls back to a plain toggle of `targetKey` when there is no usable anchor
+ * (null, no longer in `orderedKeys`, or the target itself).
  */
 export function getShiftClickSelection({
   orderedKeys,
@@ -19,32 +20,28 @@ export function getShiftClickSelection({
   targetKey: string
 }): Set<string> {
   const next = new Set(selectedKeys)
+  const isChecked = !selectedKeys.has(targetKey)
+
+  const applyCheckedState = (key: string) => {
+    if (isChecked) {
+      next.add(key)
+    } else {
+      next.delete(key)
+    }
+  }
+
+  applyCheckedState(targetKey)
 
   const anchorIndex = anchorKey === null ? -1 : orderedKeys.indexOf(anchorKey)
   const targetIndex = orderedKeys.indexOf(targetKey)
-  const hasUsableAnchor = anchorIndex !== -1 && targetIndex !== -1
+  const hasUsableAnchor = anchorIndex !== -1 && targetIndex !== -1 && anchorIndex !== targetIndex
 
-  if (!hasUsableAnchor) {
-    if (next.has(targetKey)) {
-      next.delete(targetKey)
-    } else {
-      next.add(targetKey)
-    }
-    return next
+  if (!hasUsableAnchor) return next
+
+  const step = anchorIndex < targetIndex ? 1 : -1
+  for (let index = anchorIndex + step; index !== targetIndex; index += step) {
+    applyCheckedState(orderedKeys[index])
   }
-
-  const startIndex = Math.min(anchorIndex, targetIndex)
-  const endIndex = Math.max(anchorIndex, targetIndex)
-  const rangeKeys = orderedKeys.slice(startIndex, endIndex + 1)
-  const isRangeFullySelected = rangeKeys.every((key) => selectedKeys.has(key))
-
-  rangeKeys.forEach((key) => {
-    if (isRangeFullySelected) {
-      next.delete(key)
-    } else {
-      next.add(key)
-    }
-  })
 
   return next
 }

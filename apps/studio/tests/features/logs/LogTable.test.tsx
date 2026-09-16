@@ -5,6 +5,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
+import type { ComponentProps, ReactNode } from 'react'
 import { expect, test, vi } from 'vitest'
 
 import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
@@ -17,32 +18,115 @@ dayjs.extend(relativeTime)
 
 vi.mock('next/router', () => import('next-router-mock'))
 
-vi.mock('react-data-grid', () => ({
-  default: ({ columns, rows, renderers, role, headerRowHeight }: any) => (
-    <div role={role ?? 'table'}>
-      {headerRowHeight !== 0 && (
-        <div role="row">
-          {columns.map((col: any, colIdx: number) => (
-            <div key={colIdx} role="columnheader">
-              {col.renderHeaderCell ? col.renderHeaderCell({}) : col.name}
+vi.mock('react-data-grid', async () => {
+  const { createContext, useContext, useRef } = await import('react')
+
+  type MockRow = Record<string, unknown>
+  type MockColumn = {
+    name?: string
+    renderCell?: (props: { row: MockRow; rowIdx: number; isCellSelected: boolean }) => ReactNode
+    renderHeaderCell?: (props: object) => ReactNode
+  }
+  type SelectRowEvent = { row: MockRow; checked: boolean; isShiftClick: boolean }
+  type MockDataGridProps = {
+    columns: MockColumn[]
+    rows: MockRow[]
+    renderers?: { noRowsFallback?: ReactNode }
+    role?: string
+    headerRowHeight?: number
+    rowKeyGetter: (row: MockRow) => string
+    selectedRows?: ReadonlySet<string>
+    onSelectedRowsChange?: (selectedRows: Set<string>) => void
+  }
+
+  const RowSelectionContext = createContext<{
+    isRowSelected: boolean
+    onRowSelectionChange: (event: SelectRowEvent) => void
+  }>({ isRowSelected: false, onRowSelectionChange: () => {} })
+
+  const MockDataGrid = ({
+    columns,
+    rows,
+    renderers,
+    role,
+    headerRowHeight,
+    rowKeyGetter,
+    selectedRows,
+    onSelectedRowsChange,
+  }: MockDataGridProps) => {
+    // Mirrors react-data-grid's own `selectRow`: the anchor is the last clicked row and a
+    // shift-click applies the clicked row's new state to every row between the two
+    const lastSelectedRowIdx = useRef(-1)
+
+    const selectRow = ({ row, checked, isShiftClick }: SelectRowEvent) => {
+      const nextSelectedRows = new Set<string>(selectedRows ?? [])
+      const previousRowIdx = lastSelectedRowIdx.current
+      const rowIdx = rows.indexOf(row)
+      lastSelectedRowIdx.current = rowIdx
+
+      const applyCheckedState = (targetRow: MockRow) => {
+        if (checked) {
+          nextSelectedRows.add(rowKeyGetter(targetRow))
+        } else {
+          nextSelectedRows.delete(rowKeyGetter(targetRow))
+        }
+      }
+
+      applyCheckedState(row)
+
+      if (isShiftClick && previousRowIdx !== -1 && previousRowIdx !== rowIdx) {
+        const step = previousRowIdx < rowIdx ? 1 : -1
+        for (let idx = previousRowIdx + step; idx !== rowIdx; idx += step) {
+          applyCheckedState(rows[idx])
+        }
+      }
+
+      onSelectedRowsChange?.(nextSelectedRows)
+    }
+
+    return (
+      <div role={role ?? 'table'}>
+        {headerRowHeight !== 0 && (
+          <div role="row">
+            {columns.map((col, colIdx) => (
+              <div key={colIdx} role="columnheader">
+                {col.renderHeaderCell ? col.renderHeaderCell({}) : col.name}
+              </div>
+            ))}
+          </div>
+        )}
+        {rows.map((row, rowIdx) => (
+          <RowSelectionContext.Provider
+            key={rowIdx}
+            value={{
+              isRowSelected: selectedRows?.has(rowKeyGetter(row)) ?? false,
+              onRowSelectionChange: selectRow,
+            }}
+          >
+            <div role="row">
+              {columns.map((col, colIdx) => (
+                <div key={colIdx} role="cell">
+                  {col.renderCell?.({ row, rowIdx, isCellSelected: false })}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
-      {rows.map((row: any, rowIdx: number) => (
-        <div key={rowIdx} role="row">
-          {columns.map((col: any, colIdx: number) => (
-            <div key={colIdx} role="cell">
-              {col.renderCell?.({ row, rowIdx, isCellSelected: false })}
-            </div>
-          ))}
-        </div>
-      ))}
-      {rows.length === 0 && renderers?.noRowsFallback}
-    </div>
-  ),
-  Row: ({ row, ...props }: any) => <div role="row" {...props} />,
-}))
+          </RowSelectionContext.Provider>
+        ))}
+        {rows.length === 0 && renderers?.noRowsFallback}
+      </div>
+    )
+  }
+
+  const MockRowRenderer = ({ row, ...props }: { row: MockRow } & ComponentProps<'div'>) => (
+    <div role="row" {...props} />
+  )
+
+  return {
+    default: MockDataGrid,
+    Row: MockRowRenderer,
+    useRowSelection: () => useContext(RowSelectionContext),
+  }
+})
 
 const fakeMicroTimestamp = dayjs().unix() * 1000
 
@@ -357,21 +441,7 @@ test('shift-click without an anchor toggles only the clicked row', async () => {
   await screen.findByText('1 row selected')
 })
 
-test('clears the shift-click anchor once the selection becomes empty', async () => {
-  const user = userEvent.setup()
-  render(<LogTable projectRef="projectRef" data={MULTI_SELECT_LOGS} />)
-
-  await user.click(getRowCheckboxes()[1])
-  await user.click(getRowCheckboxes()[1])
-  expectCheckedIndexes([])
-
-  await shiftClick(user, getRowCheckboxes()[4])
-
-  expectCheckedIndexes([4])
-  await screen.findByText('1 row selected')
-})
-
-test('shift-click deselects a range that is already fully selected', async () => {
+test('shift-click on a selected row deselects back to the anchor, leaving the anchor checked', async () => {
   const user = userEvent.setup()
   render(<LogTable projectRef="projectRef" data={MULTI_SELECT_LOGS} />)
 
@@ -379,7 +449,22 @@ test('shift-click deselects a range that is already fully selected', async () =>
   await shiftClick(user, getRowCheckboxes()[4])
   expectCheckedIndexes([1, 2, 3, 4])
 
+  // Row 4 is now the anchor and is never modified, so only it stays checked
   await shiftClick(user, getRowCheckboxes()[1])
+
+  expectCheckedIndexes([4])
+  await screen.findByText('1 row selected')
+})
+
+test('clicking a checked row again clears the selection', async () => {
+  const user = userEvent.setup()
+  render(<LogTable projectRef="projectRef" data={MULTI_SELECT_LOGS} />)
+
+  await user.click(getRowCheckboxes()[2])
+  expectCheckedIndexes([2])
+  await screen.findByText('1 row selected')
+
+  await user.click(getRowCheckboxes()[2])
 
   expectCheckedIndexes([])
   await waitFor(() => expect(screen.queryByText(/rows? selected/)).toBeNull())

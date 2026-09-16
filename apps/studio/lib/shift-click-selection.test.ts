@@ -25,7 +25,38 @@ describe('getShiftClickSelection', () => {
     expect([...result].sort()).toEqual(['b', 'c', 'd'])
   })
 
-  test('toggles just the anchor when it is also the target', () => {
+  test('deselects the range when the target is already selected', () => {
+    const result = getShiftClickSelection({
+      orderedKeys,
+      selectedKeys: new Set(['a', 'b', 'c', 'd']),
+      anchorKey: 'a',
+      targetKey: 'd',
+    })
+    // The anchor row itself is never modified, so 'a' stays selected
+    expect([...result].sort()).toEqual(['a'])
+  })
+
+  test('leaves the anchor row untouched when it is not selected', () => {
+    const result = getShiftClickSelection({
+      orderedKeys,
+      selectedKeys: new Set(),
+      anchorKey: 'b',
+      targetKey: 'd',
+    })
+    expect([...result].sort()).toEqual(['c', 'd'])
+  })
+
+  test('applies the target state to the whole range when it is partially selected', () => {
+    const result = getShiftClickSelection({
+      orderedKeys,
+      selectedKeys: new Set(['c']),
+      anchorKey: 'a',
+      targetKey: 'd',
+    })
+    expect([...result].sort()).toEqual(['b', 'c', 'd'])
+  })
+
+  test('toggles just the target when it is also the anchor', () => {
     const added = getShiftClickSelection({
       orderedKeys,
       selectedKeys: new Set(),
@@ -41,26 +72,6 @@ describe('getShiftClickSelection', () => {
       targetKey: 'c',
     })
     expect([...removed]).toEqual([])
-  })
-
-  test('removes the range when it is already fully selected, keeping keys outside it', () => {
-    const result = getShiftClickSelection({
-      orderedKeys,
-      selectedKeys: new Set(['a', 'b', 'c', 'd']),
-      anchorKey: 'b',
-      targetKey: 'd',
-    })
-    expect([...result].sort()).toEqual(['a'])
-  })
-
-  test('selects the whole range when it is only partially selected', () => {
-    const result = getShiftClickSelection({
-      orderedKeys,
-      selectedKeys: new Set(['c']),
-      anchorKey: 'b',
-      targetKey: 'd',
-    })
-    expect([...result].sort()).toEqual(['b', 'c', 'd'])
   })
 
   test('falls back to adding the target when there is no anchor', () => {
@@ -131,11 +142,11 @@ describe('getShiftClickRowSelection', () => {
     expect(result).toEqual({ b: true, c: true, d: true })
   })
 
-  test('deselects a range that is already fully selected', () => {
+  test('deselects the range when the target is already selected', () => {
     const result = getShiftClickRowSelection({
       orderedRowIds,
       rowSelection: { a: true, b: true, c: true, d: true },
-      anchorRowId: 'b',
+      anchorRowId: 'a',
       targetRowId: 'd',
     })
     expect(result).toEqual({ a: true })
