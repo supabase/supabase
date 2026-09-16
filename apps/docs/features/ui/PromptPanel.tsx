@@ -1,5 +1,7 @@
 'use client'
 
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { type DocsAiPromptSource } from 'common/telemetry-constants'
 import { Check, Copy } from 'lucide-react'
 import {
   Children,
@@ -36,9 +38,21 @@ type PromptProps = {
   expandable?: boolean
 }
 
+type PromptPanelTelemetry = {
+  /** Surface the panel renders on. */
+  source: DocsAiPromptSource
+  /** Prompt identifier, when the panel wraps a known prompt. */
+  promptId?: string
+}
+
 type PromptPanelProps = {
   children: ReactNode
   className?: string
+  /**
+   * Sends `docs_ai_prompt_copied` on a successful copy. Omit to leave the panel
+   * untracked.
+   */
+  telemetry?: PromptPanelTelemetry
 }
 
 type CollectedPrompt = {
@@ -118,6 +132,13 @@ function collectPrompts(children: ReactNode): CollectedPrompt[] {
     .map((prompt, index) => collectPrompt(prompt, index))
 }
 
+/** Prompt values reported as the `tab` property; anything else is omitted. */
+const telemetryTabs = ['prompt', 'cli'] as const
+
+function toTelemetryTab(value: string) {
+  return telemetryTabs.find((tab) => tab === value)
+}
+
 function ExpandableContent({ children }: { children: ReactNode }) {
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -173,7 +194,15 @@ function PromptBody({
   )
 }
 
-function CopyButton({ label, value }: { label: string; value: string }) {
+function CopyButton({
+  label,
+  value,
+  onCopied,
+}: {
+  label: string
+  value: string
+  onCopied?: () => void
+}) {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -190,6 +219,7 @@ function CopyButton({ label, value }: { label: string; value: string }) {
       onClick={() => {
         copyToClipboard(value, () => {
           setCopied(true)
+          onCopied?.()
         })
       }}
       className="cursor-pointer rounded-sm p-1.5 text-foreground-muted transition-colors hover:bg-surface-200 hover:text-foreground focus-ring"
@@ -232,18 +262,33 @@ const tabTriggerClassName = 'h-full px-0 py-0 text-xs shadow-none data-[state=ac
  * </PromptPanel>
  * ```
  */
-function PromptPanel({ children, className }: PromptPanelProps) {
+function PromptPanel({ children, className, telemetry }: PromptPanelProps) {
   const fallbackId = useId()
   const titleId = useId()
   const prompts = collectPrompts(children)
   const [activeTab, setActiveTab] = useState(prompts[0]?.value ?? fallbackId)
   const [shimmerEnabled, setShimmerEnabled] = useState(true)
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   if (prompts.length === 0) return null
 
   const activePrompt = prompts.find((prompt) => prompt.value === activeTab) ?? prompts[0]
   const hasTabs = prompts.length > 1
   const dismissShimmer = () => setShimmerEnabled(false)
+
+  const handleCopied = telemetry
+    ? () => {
+        const tab = toTelemetryTab(activePrompt.value)
+        sendTelemetryEvent({
+          action: 'docs_ai_prompt_copied',
+          properties: {
+            source: telemetry.source,
+            ...(tab && { tab }),
+            ...(telemetry.promptId && { promptId: telemetry.promptId }),
+          },
+        })
+      }
+    : undefined
 
   const header = (
     <div className="flex h-11 items-center justify-between border-b bg-surface-75 px-4">
@@ -271,6 +316,7 @@ function PromptPanel({ children, className }: PromptPanelProps) {
         key={activePrompt.value}
         label={typeof activePrompt.title === 'string' ? activePrompt.title : 'content'}
         value={activePrompt.copyValue}
+        onCopied={handleCopied}
       />
     </div>
   )
@@ -328,4 +374,11 @@ function PromptPanel({ children, className }: PromptPanelProps) {
 }
 
 export { Prompt, PromptContent, PromptCopy, PromptPanel, PromptTitle }
-export type { PromptContentProps, PromptCopyProps, PromptPanelProps, PromptProps, PromptTitleProps }
+export type {
+  PromptContentProps,
+  PromptCopyProps,
+  PromptPanelProps,
+  PromptPanelTelemetry,
+  PromptProps,
+  PromptTitleProps,
+}

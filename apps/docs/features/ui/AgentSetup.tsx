@@ -85,7 +85,7 @@ function AgentSetup({ id }: AgentSetupProps) {
       queryGroup="agent-setup"
     >
       <TabPanel id="prompt" label="Prompt" icon={<Sparkles size={14} />}>
-        <AiPrompt id={agent.promptId} />
+        <AiPrompt id={agent.promptId} source="agent_setup" />
       </TabPanel>
       {harnesses.map((harness) => (
         <TabPanel
