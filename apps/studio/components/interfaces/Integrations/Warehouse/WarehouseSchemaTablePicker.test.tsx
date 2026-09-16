@@ -220,21 +220,21 @@ describe('WarehouseSchemaTablePicker', () => {
     customRender(<WarehousePickerHarness />)
 
     fireEvent.click(await screen.findByRole('combobox', { name: 'Select tables to replicate' }))
-    await userEvent.type(screen.getByPlaceholderText('Search tables...'), 'analytics')
+    await userEvent.type(screen.getByPlaceholderText('Search schemas and tables...'), 'analytics')
 
     expect(screen.getByText('events')).toBeInTheDocument()
     expect(screen.queryByText('orders')).not.toBeInTheDocument()
     expect(screen.queryByText('customers')).not.toBeInTheDocument()
 
-    await userEvent.clear(screen.getByPlaceholderText('Search tables...'))
-    await userEvent.type(screen.getByPlaceholderText('Search tables...'), 'public.ord')
+    await userEvent.clear(screen.getByPlaceholderText('Search schemas and tables...'))
+    await userEvent.type(screen.getByPlaceholderText('Search schemas and tables...'), 'public.ord')
 
     expect(screen.getByText('orders')).toBeInTheDocument()
     expect(screen.queryByText('customers')).not.toBeInTheDocument()
     expect(screen.queryByText('events')).not.toBeInTheDocument()
 
-    await userEvent.clear(screen.getByPlaceholderText('Search tables...'))
-    await userEvent.type(screen.getByPlaceholderText('Search tables...'), 'orders')
+    await userEvent.clear(screen.getByPlaceholderText('Search schemas and tables...'))
+    await userEvent.type(screen.getByPlaceholderText('Search schemas and tables...'), 'orders')
 
     expect(screen.getByText('orders')).toBeInTheDocument()
     expect(screen.queryByText('customers')).not.toBeInTheDocument()

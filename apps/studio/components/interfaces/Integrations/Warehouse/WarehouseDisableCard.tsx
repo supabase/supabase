@@ -48,7 +48,7 @@ export const WarehouseDisableCard = () => {
   })
 
   return (
-    <PageSection className="pt-0!">
+    <PageSection>
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>Disable</PageSectionTitle>

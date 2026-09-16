@@ -413,7 +413,7 @@ export const WarehouseConnectionCard = ({ variant = 'default' }: WarehouseConnec
 
 export const WarehouseConnectSection = () => {
   return (
-    <PageSection className="pt-0!">
+    <PageSection>
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>Connect</PageSectionTitle>

@@ -149,7 +149,7 @@ export const WarehouseSchemaTablePicker = ({
   // start toggling. First-time setup always starts empty and does not need to wait for it.
   if (isSchemasPending || isTablesPending || isSelectionPending) {
     return (
-      <PageSection className="pt-0!">
+      <PageSection className={isEditing ? undefined : 'pt-0!'}>
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>Tables</PageSectionTitle>
@@ -202,7 +202,7 @@ export const WarehouseSchemaTablePicker = ({
   }
 
   return (
-    <PageSection className="pt-0!">
+    <PageSection className={isEditing ? undefined : 'pt-0!'}>
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>Tables</PageSectionTitle>
@@ -260,7 +260,7 @@ export const WarehouseSchemaTablePicker = ({
                   className="w-full"
                 />
                 <MultiSelector.Content>
-                  <MultiSelector.Input placeholder="Search tables..." showResetIcon />
+                  <MultiSelector.Input placeholder="Search schemas and tables..." showResetIcon />
                   <MultiSelector.List emptyLabel="No tables available">
                     {schemasWithTables
                       .filter((schema) => schema.tables.length > 0)
