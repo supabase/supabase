@@ -1,10 +1,11 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
+import { toast } from 'sonner'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { WarehouseOverviewTab } from './OverviewTab'
@@ -12,25 +13,47 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type WarehouseSetupStatusResponse = components['schemas']['WarehouseSetupStatusResponse_Output']
+type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
+type WarehouseSetupResponse = components['schemas']['WarehouseSetupResponse_Output']
 
 // Both integration shells are live, and the flag reads a context plus ConfigCat that
 // `customRender` doesn't provide.
 const mockIsMarketplaceEnabled = vi.fn(() => false)
+const mockTrack = vi.fn()
 vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
   useIsMarketplaceEnabled: () => mockIsMarketplaceEnabled(),
 }))
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
 
 vi.mock('../Integration/IntegrationOverviewTab', () => ({
   IntegrationOverviewTab: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }))
 
+vi.mock('sonner', () => ({
+  toast: { success: vi.fn(), error: vi.fn() },
+}))
+
 // Exercised by its own unit tests, and it fires four upstream queries of its own.
 vi.mock('./WarehouseSchemaTablePicker', () => ({
-  WarehouseSchemaTablePicker: ({ error }: { error?: { message: string } | null }) => (
+  WarehouseSchemaTablePicker: ({
+    error,
+    isEditing,
+    onSubmit,
+  }: {
+    error?: { message: string } | null
+    isEditing?: boolean
+    onSubmit: (targets: [{ type: 'table'; schema: string; name: string }]) => void
+  }) => (
     <section>
       <h2>Tables</h2>
       <span>Replicated tables picker</span>
       {!!error && <span>Picker error: {error.message}</span>}
+      <button
+        tabIndex={0}
+        onClick={() => onSubmit([{ type: 'table', schema: 'public', name: 'orders' }])}
+      >
+        {isEditing ? 'Submit edited tables' : 'Submit initial tables'}
+      </button>
     </section>
   ),
 }))
@@ -81,6 +104,7 @@ const mockProject = () =>
 describe('WarehouseOverviewTab', () => {
   beforeEach(() => {
     mockIsMarketplaceEnabled.mockReturnValue(true)
+    mockTrack.mockClear()
   })
 
   test.each([false, true])(
@@ -167,7 +191,7 @@ describe('WarehouseOverviewTab', () => {
     expect(screen.queryByText('Initial setup failed')).not.toBeInTheDocument()
   })
 
-  test('shows Status, Tables, then Connect once setup is complete', async () => {
+  test('shows Status, Tables, Connect, then Disable once setup is complete', async () => {
     mockSetupStatus({
       setup_status: 'complete',
       tables: [
@@ -192,7 +216,7 @@ describe('WarehouseOverviewTab', () => {
     customRender(<WarehouseOverviewTab />)
 
     // findByRole throws on duplicates, so this also guards the section titles staying distinct.
-    for (const name of ['Status', 'Tables', 'Connect']) {
+    for (const name of ['Status', 'Tables', 'Connect', 'Disable']) {
       expect(await screen.findByRole('heading', { name })).toBeInTheDocument()
     }
     expect(screen.getByText('Replicated tables picker')).toBeInTheDocument()
@@ -203,10 +227,110 @@ describe('WarehouseOverviewTab', () => {
     const headings = screen
       .getAllByRole('heading')
       .map((heading) => heading.textContent)
-      .filter((heading) => ['Status', 'Tables', 'Connect'].includes(heading ?? ''))
+      .filter((heading) => ['Status', 'Tables', 'Connect', 'Disable'].includes(heading ?? ''))
 
-    expect(headings).toEqual(['Status', 'Tables', 'Connect'])
-    expect(screen.queryByRole('button', { name: 'Disable Warehouse' })).not.toBeInTheDocument()
+    expect(headings).toEqual(['Status', 'Tables', 'Connect', 'Disable'])
+  })
+
+  test('tracks initial setup but not table selection edits as enablement', async () => {
+    mockSetupStatus({ setup_status: 'not_started' })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/warehouse/:ref/setup',
+      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: 1, tables: [] }),
+    })
+
+    customRender(<WarehouseOverviewTab />)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Submit initial tables' }))
+    await waitFor(() =>
+      expect(mockTrack).toHaveBeenCalledWith('warehouse_enabled', {
+        source: 'integrations_overview',
+        schemaTargetCount: 0,
+        tableTargetCount: 1,
+      })
+    )
+  })
+
+  test('does not track an edited table selection as enablement', async () => {
+    mockSetupStatus({ setup_status: 'complete' })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/warehouse/:ref/setup',
+      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: 1, tables: [] }),
+    })
+
+    customRender(<WarehouseOverviewTab />)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Submit edited tables' }))
+    await waitFor(() => expect(screen.getByText('Replicated tables picker')).toBeInTheDocument())
+    expect(mockTrack).not.toHaveBeenCalledWith('warehouse_enabled', expect.anything())
+  })
+
+  test('disables Warehouse with an empty target list after confirmation', async () => {
+    mockSetupStatus({ setup_status: 'complete' })
+    const setupRequests: WarehouseSetupBody[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/warehouse/:ref/setup',
+      response: async ({ request }) => {
+        setupRequests.push((await request.json()) as WarehouseSetupBody)
+        return HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: 1, tables: [] })
+      },
+    })
+
+    customRender(<WarehouseOverviewTab />)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Disable Warehouse' }))
+    expect(setupRequests).toEqual([])
+
+    const dialog = await screen.findByRole('alertdialog')
+    expect(dialog).toHaveTextContent('Copied data remains in DuckLake storage until deleted')
+    expect(screen.queryByPlaceholderText('Type the project ref to confirm')).not.toBeInTheDocument()
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Disable Warehouse' }))
+
+    await waitFor(() => expect(setupRequests).toEqual([{ targets: [] }]))
+  })
+
+  test('shows a disable error and allows retrying from the open confirmation', async () => {
+    mockSetupStatus({ setup_status: 'complete' })
+    let attempts = 0
+    addAPIMock({
+      method: 'post',
+      path: '/platform/warehouse/:ref/setup',
+      response: () => {
+        attempts += 1
+        if (attempts === 1) {
+          return HttpResponse.json<APIErrorBody>(
+            { message: 'Disable request failed' },
+            { status: 500 }
+          )
+        }
+        return HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: 1, tables: [] })
+      },
+    })
+
+    customRender(<WarehouseOverviewTab />)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Disable Warehouse' }))
+    const dialog = await screen.findByRole('alertdialog')
+    const confirm = within(dialog).getByRole('button', { name: 'Disable Warehouse' })
+
+    fireEvent.click(confirm)
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        'Failed to disable Warehouse: Disable request failed'
+      )
+    )
+    expect(dialog).toBeVisible()
+    expect(confirm).toBeEnabled()
+
+    fireEvent.click(confirm)
+
+    await waitFor(() => expect(attempts).toBe(2))
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument())
   })
 
   test('shows a status query failure without blocking an unrelated route', async () => {
