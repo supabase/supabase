@@ -48,7 +48,7 @@ export const WarehouseDisableCard = () => {
   })
 
   return (
-    <PageSection>
+    <PageSection className="pt-0!">
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>Disable</PageSectionTitle>
@@ -60,7 +60,7 @@ export const WarehouseDisableCard = () => {
             <FormLayout
               layout="flex-row-reverse"
               label="Disable Warehouse for this project"
-              description="Stops replication and removes its pipeline, publication, catalog access, and foreign tables. Copied data remains in DuckLake storage until deleted."
+              description="Stops replication and removes Warehouse-managed resources. Copied data is kept."
             >
               <Button variant="danger" onClick={() => setIsConfirming(true)}>
                 Disable Warehouse

@@ -236,6 +236,14 @@ export const WarehouseSchemaTablePicker = ({
             >
               <MultiSelector
                 values={selectedTableKeys}
+                filter={(value, search, keywords) => {
+                  const normalizedSearch = search.toLowerCase()
+                  return [value, ...(keywords ?? [])].some((candidate) =>
+                    candidate.toLowerCase().includes(normalizedSearch)
+                  )
+                    ? 1
+                    : 0
+                }}
                 onValuesChange={(values) => {
                   const nextValues = new Set(values)
                   updateSelection(() =>
@@ -247,7 +255,8 @@ export const WarehouseSchemaTablePicker = ({
                 <MultiSelector.Trigger
                   aria-label="Select tables to replicate"
                   label="Select tables..."
-                  badgeLimit={6}
+                  badgeLimit={2}
+                  renderValue={(value) => <span className="max-w-32 truncate">{value}</span>}
                   className="w-full"
                 />
                 <MultiSelector.Content>

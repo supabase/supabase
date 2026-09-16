@@ -232,5 +232,12 @@ describe('WarehouseSchemaTablePicker', () => {
     expect(screen.getByText('orders')).toBeInTheDocument()
     expect(screen.queryByText('customers')).not.toBeInTheDocument()
     expect(screen.queryByText('events')).not.toBeInTheDocument()
+
+    await userEvent.clear(screen.getByPlaceholderText('Search tables...'))
+    await userEvent.type(screen.getByPlaceholderText('Search tables...'), 'orders')
+
+    expect(screen.getByText('orders')).toBeInTheDocument()
+    expect(screen.queryByText('customers')).not.toBeInTheDocument()
+    expect(screen.queryByText('events')).not.toBeInTheDocument()
   })
 })
