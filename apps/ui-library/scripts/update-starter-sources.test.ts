@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 import { starterSources, type StarterSourceSnapshot } from '../config/starter-sources'
 import { createStarterSnapshot, includeStarterSourceFile } from './update-starter-sources'
