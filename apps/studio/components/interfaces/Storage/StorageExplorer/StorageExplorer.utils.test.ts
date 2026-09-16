@@ -9,7 +9,9 @@ import type { StorageItem } from '@/components/interfaces/Storage/Storage.types'
 import {
   getPathAlongFoldersToIndex,
   getPathAlongOpenedFolders,
+  parseStoragePath,
   sanitizeNameForDuplicateInColumn,
+  serializeStoragePath,
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
 
@@ -274,5 +276,45 @@ describe('sanitizeNameForDuplicateInColumn', () => {
         ' (1).myfile'
       )
     })
+  })
+})
+
+describe('parseStoragePath', () => {
+  it('returns an empty array for an absent or empty param', () => {
+    expect(parseStoragePath(null)).toEqual([])
+    expect(parseStoragePath(undefined)).toEqual([])
+    expect(parseStoragePath('')).toEqual([])
+  })
+
+  it('splits a slash-joined path into segments', () => {
+    expect(parseStoragePath('a/b/c')).toEqual(['a', 'b', 'c'])
+  })
+
+  it('tolerates leading, trailing and repeated slashes', () => {
+    expect(parseStoragePath('/a//b/')).toEqual(['a', 'b'])
+    expect(parseStoragePath('///')).toEqual([])
+  })
+
+  it('preserves spaces and unicode within a segment', () => {
+    expect(parseStoragePath('my folder/ünïcode 📁/x')).toEqual(['my folder', 'ünïcode 📁', 'x'])
+  })
+})
+
+describe('serializeStoragePath', () => {
+  it('returns an empty string for the bucket root so clearOnDefault strips the param', () => {
+    expect(serializeStoragePath([])).toBe('')
+  })
+
+  it('joins segments with a slash', () => {
+    expect(serializeStoragePath(['a', 'b', 'c'])).toBe('a/b/c')
+  })
+
+  it('drops empty segments', () => {
+    expect(serializeStoragePath(['a', '', 'b'])).toBe('a/b')
+  })
+
+  it('round-trips with parseStoragePath', () => {
+    const segments = ['images', 'my folder', '2024']
+    expect(parseStoragePath(serializeStoragePath(segments))).toEqual(segments)
   })
 })
