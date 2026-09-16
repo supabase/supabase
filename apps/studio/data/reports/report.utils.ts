@@ -35,6 +35,8 @@ export function analyticsIntervalToGranularity(interval: AnalyticsInterval): Gra
   switch (interval) {
     case '1m':
       return 'minute'
+    case '2m':
+      return 'minute'
     case '5m':
       return 'minute'
     case '10m':
