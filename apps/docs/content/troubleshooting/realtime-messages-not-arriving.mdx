@@ -41,6 +41,7 @@ This applies to `realtime.send()` and `realtime.broadcast_changes()`.
 
 1. Check your Postgres logs for a `WarnSendingBroadcastMessage` warning. `realtime.messages` is partitioned by day, and that partition only gets created once a client has connected over WebSocket. Broadcast before that happens, or after your clients stop connecting for a while, and the insert fails with this warning. Connecting a client first usually clears it up. Background: [Realtime: `WarnSendingBroadcastMessage`](./realtime-warn-sending-broadcast-message) and [Broadcast from Postgres](/docs/guides/realtime/architecture#broadcast-from-postgres).
 2. Is the trigger even firing? Add a `raise notice` inside it and check **Logs → Postgres Logs**. Nothing logged means the trigger isn't wired up right — wrong table, wrong event, or it was never created — and that's a problem upstream of Realtime entirely.
+3. Check that `is_private` (the last argument to `realtime.send()`, or the equivalent flag on `realtime.broadcast_changes()`) matches the client channel's `config.private` setting. It's the public/private flag on the topic itself, separate from the RLS checks above — a mismatch there means the client never receives the message even when the trigger fires and the topic name is right. See [Broadcast](/docs/guides/realtime/broadcast).
 
 ## `postgres_changes`
 
