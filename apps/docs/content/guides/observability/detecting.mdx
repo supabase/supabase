@@ -4,9 +4,9 @@ title: 'Detecting issues'
 description: 'Run Health, Security, Performance, and Usage checks against logs and database statistics to pick up actionable signals.'
 ---
 
-Detection is the step between accessing project data and troubleshooting a specific problem. Use the sources in [Observe the data](/docs/guides/observability/access-data) to produce a count, rate, trend, or named finding. Do not try to prove the root cause yet.
+Detection is the step between accessing project data and troubleshooting a specific problem. Use the sources in [Observability](/docs/guides/observability) to produce a count, rate, trend, or named finding. Do not try to prove the root cause yet.
 
-This guide provides starting checks for [Health](#health), [Security](#security), [Performance](#performance), and [Usage](#usage). The log examples use ClickHouse SQL in the [Logs Explorer](/dashboard/project/_/logs/explorer) or MCP `query_logs`. The database examples use Postgres SQL in the [SQL Editor](/dashboard/project/_/sql) or MCP `execute_sql`.
+This guide provides starting checks for [Health](#health), [Security](#security), [Performance](#performance), and [Usage](#usage). The log examples use ClickHouse SQL in the [Explorer](/dashboard/project/_/explorer) with query source **Logs** or MCP `query_logs`. The database examples use Postgres SQL in the [Explorer](/dashboard/project/_/explorer) with query source **Database** or MCP `execute_sql`.
 
 Use a time range that represents normal traffic, then compare it with the same period after a deployment or configuration change. When a check returns a spike, error code, SQLSTATE, object name, or advisor finding, take that evidence to [Diagnosing](/docs/guides/troubleshooting).
 
@@ -280,4 +280,4 @@ order by connections desc;
 
 A detection result should name an affected time window and at least one concrete anchor: a path, status, SQLSTATE, request ID, query, relation, PID, policy, or advisor lint. Take that evidence to [Diagnosing](/docs/guides/troubleshooting), identify the cause, apply the smallest relevant solution, and rerun the same detection check to verify the result.
 
-After a check is useful and repeatable, [hire an agent](/docs/guides/observability/automate-with-agents) to run it on a schedule.
+After a check is useful and repeatable, [automate monitoring](/docs/guides/observability/automate-with-agents) to run it on a schedule.

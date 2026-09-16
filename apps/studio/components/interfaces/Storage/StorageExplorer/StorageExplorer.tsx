@@ -182,9 +182,12 @@ export const StorageExplorer = () => {
       <ConfirmDeleteModal />
 
       <MoveItemsModal
-        bucketName={selectedBucket.name}
         visible={selectedItemsToMove.length > 0}
+        projectRef={projectRef}
+        bucketId={selectedBucket.id}
+        bucketName={selectedBucket.name}
         selectedItemsToMove={selectedItemsToMove}
+        openedFolders={openedFolders}
         onSelectCancel={() => setSelectedItemsToMove([])}
         onSelectMove={onMoveSelectedFiles}
       />

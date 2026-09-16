@@ -9,7 +9,7 @@ export type SetupIntentVariables = {
   hcaptchaToken: string
 }
 
-export type SetupIntentResponse = components['schemas']['SetupIntentResponse']
+export type SetupIntentResponse = components['schemas']['SetupIntentResponse_Output']
 
 export async function setupIntent({ hcaptchaToken }: SetupIntentVariables) {
   const { data, error } = await post('/platform/stripe/setup-intent', {
