@@ -17,6 +17,7 @@ import {
   PopoverAnchor,
   PopoverContent,
   PopoverContentProps,
+  SIZE,
   SIZE_VARIANTS,
   SIZE_VARIANTS_DEFAULT,
 } from 'ui'
@@ -232,14 +233,16 @@ export interface MultiSelectorTriggerProps extends React.HTMLAttributes<HTMLButt
 
 // The tiny control has no vertical padding to spare, so its children stretch to the
 // control height and drop their line-height; the larger sizes center normally.
+const asMinHeight = (height: string) => height.replace('h-', 'min-h-')
+
 const MultiSelectorTriggerVariants = cva('', {
   variants: {
     size: {
-      tiny: 'h-6.5 p-0.5 text-xs items-stretch',
-      small: 'min-h-8.5 p-1.5 text-sm items-center',
-      medium: 'min-h-9.5 px-4 py-2 text-sm items-center',
-      large: 'min-h-10.5 px-4 py-2 text-base items-center',
-      xlarge: 'min-h-12.5 px-6 py-3 text-base items-center',
+      tiny: `${SIZE.text.tiny} ${SIZE.height.tiny} p-0.5 items-stretch`,
+      small: `${SIZE.text.small} ${asMinHeight(SIZE.height.small)} p-1.5 items-center`,
+      medium: `${SIZE.text.medium} ${asMinHeight(SIZE.height.medium)} ${SIZE.padding.medium} items-center`,
+      large: `${SIZE.text.large} ${asMinHeight(SIZE.height.large)} ${SIZE.padding.large} items-center`,
+      xlarge: `${SIZE.text.xlarge} ${asMinHeight(SIZE.height.xlarge)} ${SIZE.padding.xlarge} items-center`,
     },
   },
   defaultVariants: {
