@@ -70,7 +70,7 @@
     "micromark-extension-mdxjs": "^1.0.1",
     "next": "^15.5.24",
     "next-mdx-remote-client": "^1.1.7",
-    "next-seo": "^6.5.0",
+    "next-seo": "^7.3.0",
     "next-themes": "catalog:",
     "nuqs": "^2.8.1",
     "ogl": "^1.0.11",
