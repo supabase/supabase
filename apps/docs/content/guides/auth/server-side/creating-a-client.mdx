@@ -130,12 +130,6 @@ SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
 
 Install [dotenv](https://www.npmjs.com/package/dotenv):
 
-```bash
-npm i dotenv
-```
-
-And initialize it:
-
 <Tabs size="small" type="underlined" queryGroup="package-manager" defaultActiveId="npm">
 
 <TabPanel id="npm" label="npm">
@@ -163,6 +157,12 @@ pnpm add dotenv
 </TabPanel>
 
 </Tabs>
+
+Then load the file before you read any variable from it. Put this on the first line of your entry point, above every other import:
+
+```js app.js
+require('dotenv').config()
+```
 
 </TabPanel>
 <TabPanel id="hono" label="Hono">
@@ -269,9 +269,9 @@ The code adds a [matcher](https://nextjs.org/docs/app/api-reference/file-convent
 
 Anyone can forge the session cookie, so trusting it without verification lets an attacker render another user's page. Always use `supabase.auth.getClaims()` to protect pages and user data.
 
-_Never_ trust `supabase.auth.getSession()` inside server code such as Proxy. It isn't guaranteed to revalidate the Auth token.
+_Never_ trust `supabase.auth.getSession()` inside server code such as Proxy. It reads the session out of the cookie without revalidating it.
 
-It's safe to trust `getClaims()` because it validates the JWT signature against the project's published public keys every time.
+`getClaims()` verifies the token's signature on every call. On projects with asymmetric signing keys, the default for new projects, it verifies locally against a cached copy of the project's public keys. On projects still using a symmetric secret, it calls the Auth server instead. Either way the claims come from a token the server has verified rather than from whatever the cookie says.
 
 </Admonition>
 
@@ -422,10 +422,12 @@ const supabase = createServerClient(
 <TabPanel id="astro-server-endpoint" label="Server Endpoint">
 
 ```ts route.ts
-import { createServerClient, parseCookieHeader } from "@supabase/ssr";
-import type { APIContext } from "astro";
+import { createServerClient, parseCookieHeader } from '@supabase/ssr'
+import type { APIContext } from 'astro'
 
 export async function GET(context: APIContext) {
+  const responseHeaders = new Headers()
+
   const supabase = createServerClient(
     import.meta.env.PUBLIC_SUPABASE_URL,
     import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
@@ -434,15 +436,17 @@ export async function GET(context: APIContext) {
         getAll() {
           return parseCookieHeader(context.request.headers.get('Cookie') ?? '')
         },
-        setAll(cookiesToSet, _headers) {
-          cookiesToSet.forEach(({ name, value }) =>
-            context.cookies.set(name, value))
+        setAll(cookiesToSet, headers) {
+          cookiesToSet.forEach(({ name, value }) => context.cookies.set(name, value))
+          Object.entries(headers).forEach(([key, value]) => responseHeaders.set(key, value))
         },
       },
     }
-  );
+  )
 
-  return ...
+  // Build your response here, and pass `responseHeaders` to it. Without them a
+  // shared cache can store this response along with its Set-Cookie header.
+  return new Response(null, { headers: responseHeaders })
 }
 ```
 
@@ -455,6 +459,8 @@ import { createServerClient, parseCookieHeader } from '@supabase/ssr'
 import { defineMiddleware } from 'astro:middleware'
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  const responseHeaders = new Headers()
+
   const supabase = createServerClient(
     import.meta.env.PUBLIC_SUPABASE_URL,
     import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
@@ -463,14 +469,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
         getAll() {
           return parseCookieHeader(context.request.headers.get('Cookie') ?? '')
         },
-        setAll(cookiesToSet, _headers) {
+        setAll(cookiesToSet, headers) {
           cookiesToSet.forEach(({ name, value }) => context.cookies.set(name, value))
+          Object.entries(headers).forEach(([key, value]) => responseHeaders.set(key, value))
         },
       },
     }
   )
 
-  return next()
+  const response = await next()
+  responseHeaders.forEach((value, key) => response.headers.set(key, value))
+  return response
 })
 ```
 
@@ -609,7 +618,7 @@ You can now use any Supabase feature from your client or server code.
 
 ```ts server/api/hello.ts
 import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
-import { appendHeader, defineEventHandler, getHeader } from 'h3'
+import { appendHeader, defineEventHandler, getHeader, setHeader } from 'h3'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -622,10 +631,11 @@ export default defineEventHandler(async (event) => {
         getAll() {
           return parseCookieHeader(getHeader(event, 'Cookie') ?? '')
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, cacheHeaders) {
           cookiesToSet.forEach(({ name, value, options }) => {
             appendHeader(event, 'Set-Cookie', serializeCookieHeader(name, value, options))
           })
+          Object.entries(cacheHeaders).forEach(([key, value]) => setHeader(event, key, value))
         },
       },
     }
@@ -785,7 +795,7 @@ You can now use any Supabase feature from your client or server code.
 >
 <TabPanel id="server-client" label="Server Client">
 
-```ts lib/supabase.js
+```js lib/supabase.js
 const { createServerClient, parseCookieHeader, serializeCookieHeader } = require('@supabase/ssr')
 
 exports.createClient = (context) => {
@@ -808,9 +818,10 @@ exports.createClient = (context) => {
 </TabPanel>
 <TabPanel id="express-route" label="Route">
 
-```ts app.js
+```js app.js
+require("dotenv").config()
+
 const express = require("express")
-const dotenv = require("dotenv")
 
 const { createClient } = require("./lib/supabase")
 
