@@ -810,6 +810,19 @@ export interface SqlEditorResultCopyCsvClickedEvent {
 }
 
 /**
+ * User clicked the "View logs" link in the SQL editor results panel, opening the
+ * Postgres logs for the window around the run.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorViewLogsClickedEvent {
+  action: 'sql_editor_view_logs_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User submitted a prompt to the assistant sidebar.
  *
  * @group Events
@@ -3904,6 +3917,7 @@ export type TelemetryEvent =
   | SqlEditorResultCopyMarkdownClickedEvent
   | SqlEditorResultCopyJsonClickedEvent
   | SqlEditorResultCopyCsvClickedEvent
+  | SqlEditorViewLogsClickedEvent
   | AssistantPromptSubmittedEvent
   | AssistantDebugSubmittedEvent
   | AssistantSuggestionRunQueryClickedEvent

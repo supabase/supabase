@@ -4,11 +4,13 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { forwardRef } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { useRunSource } from '../useRunSource'
 import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import CopyButton from '@/components/ui/CopyButton'
 import { DataGridResults } from '@/components/ui/DataGridResults'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
+import { SqlEditorLogsLink } from '@/components/ui/Logs/SqlEditorLogsLink'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { getSqlErrorLines } from '@/data/sql/utils'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
@@ -32,6 +34,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
     const state = useDatabaseSelectorStateSnapshot()
     const { data: organization } = useSelectedOrganizationQuery()
     const sessionSnap = useSqlEditorSessionSnapshot()
+    const runSource = useRunSource(id)
     const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
     const result = sessionSnap.results[id]?.[0]
@@ -177,9 +180,18 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
         </div>
       )
     } else if (result.rows.length <= 0) {
+      // A statement that raised a notice or warning lands here too — pg-meta
+      // returns rows only, so the panel can't tell the two apart.
+      const canShowLogsLink = runSource._tag === 'database' && !!ref
+
       return (
         <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
-          <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
+          <div className="flex flex-col gap-y-1 px-6 py-4">
+            <p className="m-0 border-0 font-mono text-sm">Success. No rows returned</p>
+            {canShowLogsLink && (
+              <SqlEditorLogsLink projectRef={ref} executedAt={result.executedAt} />
+            )}
+          </div>
         </div>
       )
     }

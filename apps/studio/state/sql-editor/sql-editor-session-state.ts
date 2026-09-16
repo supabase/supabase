@@ -19,6 +19,12 @@ export const sqlEditorSessionState = proxy({
       rows: any[]
       error?: any
       autoLimit?: number
+      /**
+       * When the run resolved, as epoch millis. Set by the writers below rather
+       * than by callers so every result carries one; used to window the logs
+       * link in the results panel around the run.
+       */
+      executedAt: number
     }[]
   },
 
@@ -49,11 +55,13 @@ export const sqlEditorSessionState = proxy({
     // row and nested property in a Proxy, causing massive memory overhead.
     // Alright to use ref() in this case as the data is meant to be read-only and we
     // don't need to track changes to the underlying data
-    sqlEditorSessionState.results[id] = [{ rows: ref(results), autoLimit }]
+    sqlEditorSessionState.results[id] = [{ rows: ref(results), autoLimit, executedAt: Date.now() }]
   },
 
   addResultError: (id: string, error: any, autoLimit?: number) => {
-    sqlEditorSessionState.results[id] = [{ rows: ref([]), error, autoLimit }]
+    sqlEditorSessionState.results[id] = [
+      { rows: ref([]), error, autoLimit, executedAt: Date.now() },
+    ]
   },
 
   resetResult: (id: string) => {
