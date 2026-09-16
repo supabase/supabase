@@ -255,7 +255,9 @@ export const WarehouseSchemaTablePicker = ({
                 <MultiSelector.Trigger
                   aria-label="Select tables to replicate"
                   label="Select tables..."
-                  badgeLimit={2}
+                  // Show plenty of selected tables; wrapBadges keeps the +n count visible when wrapping.
+                  badgeLimit={10}
+                  wrapBadges
                   renderValue={(value) => <span className="max-w-32 truncate">{value}</span>}
                   className="w-full"
                 />

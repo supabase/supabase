@@ -123,7 +123,15 @@ const PUBLICATION: PublicationDetailsResponse = {
   ],
 }
 
-const mockPickerQueries = ({ isEditing }: { isEditing: boolean }) => {
+const mockPickerQueries = ({
+  isEditing,
+  tables = TABLES,
+  schemas = SCHEMAS,
+}: {
+  isEditing: boolean
+  tables?: TablesData
+  schemas?: SchemasData
+}) => {
   addAPIMock({ method: 'get', path: '/platform/projects/:ref', response: PROJECT })
   addAPIMock({
     method: 'post',
@@ -131,8 +139,8 @@ const mockPickerQueries = ({ isEditing }: { isEditing: boolean }) => {
     response: async ({ request }) => {
       const body = (await request.json()) as RunQueryBody
       const result = body.query.includes("obj_description(n.oid, 'pg_namespace')")
-        ? SCHEMAS
-        : TABLES
+        ? schemas
+        : tables
       return HttpResponse.json<SchemasData | TablesData>(result)
     },
   })
@@ -239,5 +247,45 @@ describe('WarehouseSchemaTablePicker', () => {
     expect(screen.getByText('orders')).toBeInTheDocument()
     expect(screen.queryByText('customers')).not.toBeInTheDocument()
     expect(screen.queryByText('events')).not.toBeInTheDocument()
+  })
+
+  test('wraps selected table badges and shows an overflow count past the limit', async () => {
+    const manyTables: TablesData = Array.from({ length: 12 }, (_, index) => ({
+      id: index + 1,
+      schema: 'public',
+      name: `table_${String(index + 1).padStart(2, '0')}`,
+      rls_enabled: false,
+      rls_forced: false,
+      replica_identity: 'DEFAULT',
+      bytes: 1024,
+      size: '1024 bytes',
+      live_rows_estimate: 10,
+      dead_rows_estimate: 0,
+      comment: null,
+      primary_keys: [],
+      relationships: [],
+    }))
+
+    mockPickerQueries({
+      isEditing: false,
+      schemas: [{ id: 1, name: 'public', owner: 'postgres', comment: null }],
+      tables: manyTables,
+    })
+
+    customRender(<WarehousePickerHarness />)
+
+    const trigger = await screen.findByRole('combobox', { name: 'Select tables to replicate' })
+    fireEvent.click(trigger)
+    await userEvent.click(screen.getByText('Select all'))
+    // Close the list so trigger textContent is only the selected badges.
+    fireEvent.click(trigger)
+
+    expect(screen.getByText('12 tables selected')).toBeInTheDocument()
+    expect(trigger.firstElementChild).toHaveClass('flex-wrap')
+    expect(trigger).toHaveTextContent('public.table_01')
+    expect(trigger).toHaveTextContent('public.table_10')
+    expect(trigger).toHaveTextContent('+2')
+    expect(trigger).not.toHaveTextContent('public.table_11')
+    expect(trigger).not.toHaveTextContent('public.table_12')
   })
 })
