@@ -5,17 +5,19 @@ title: 'Manage Pipelines usage'
 
 ## What you are charged for
 
-You are charged for configured pipelines and pipeline data processed. Data processed is billed at different rates during initial sync and ongoing replication. Pipelines are charged by the hour for as long as they are configured, including while they are stopped.
+Pipelines has three charges:
 
-- **Pipeline hours** measure how long each pipeline remains configured. Delete a pipeline to end this charge.
+- **Pipeline hours** measure how long each pipeline remains configured, including while stopped. Delete the pipeline to end this charge.
 - **Initial sync data processed** is the Postgres row data accepted by the destination when a table is first synchronized or synchronized again.
 - **Ongoing replication data processed** is the Postgres row data accepted by the destination for subsequent database changes. It depends on how much your published data changes, not on the source table size, WAL size, or destination's compressed storage size.
+
+Tables excluded from **Initial sync** do not incur an initial sync data charge. Pipeline-hour charges and charges for ongoing changes still apply. See [Choosing which tables to copy](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy).
 
 Destination-provider charges are separate. For example, Google Cloud can charge for BigQuery ingestion, storage, and CDC compute.
 
 ## How data processed is measured
 
-Pipeline data processed is the amount of logical row data emitted by Postgres for replication, successfully processed by a pipeline, and accepted by its destination. It is not based on physical table storage or destination-specific encoding, making usage consistent across destinations.
+Data processed measures logical Postgres row data accepted by the destination, independent of physical storage size or destination encoding.
 
 The measurement includes:
 
@@ -28,17 +30,9 @@ Data successfully processed again as part of a user-requested resynchronization,
 
 ### Cost estimates
 
-The Dashboard provides a quick planning estimate of initial sync volume and cost using information already available about your source tables. It is designed to give you a useful indication before initial sync begins without first scanning and encoding all the data that the sync will process.
+The Dashboard estimates initial sync volume and cost from source table metadata without scanning all rows. You can create a pipeline or reset tables even if an estimate is unavailable.
 
-If an estimate is unavailable, you can still create the pipeline or restart tables.
-
-<Admonition type="note">
-
-Use this estimate as a planning guide rather than an exact quote. The final volume is measured from the data successfully processed during initial sync and can vary based on your published data and filters.
-
-</Admonition>
-
-Actual charges use the logical Postgres row data copied after publication column and row filters and accepted by the destination.
+Estimates are planning guidance, not exact quotes. Actual charges reflect row data copied after publication column and row filters and accepted by the destination.
 
 ### Usage on your invoice
 
@@ -88,7 +82,7 @@ Multiple projects had a configured pipeline for the entire month and processed d
 
 ### After deleting a pipeline after one day
 
-Pipeline hours are billed in arrears for as long as a pipeline is configured, including while it is stopped. After you delete the pipeline, pipeline-hour billing ends.
+Pipeline hours are billed in arrears. Deleting the pipeline after 24 hours ends that charge; other project charges continue.
 
 | Line Item                     | Hours | Costs                       |
 | ----------------------------- | ----- | --------------------------- |

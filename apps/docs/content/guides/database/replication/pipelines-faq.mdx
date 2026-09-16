@@ -10,104 +10,77 @@ sidebar_label: 'FAQ'
 
 ## What destinations are supported?
 
-**BigQuery** is currently available as a managed destination. **ClickHouse**, **DuckLake**, and **Snowflake** are in Early Access. See the [ClickHouse](/docs/guides/database/replication/clickhouse), [DuckLake](/docs/guides/database/replication/ducklake), and [Snowflake](/docs/guides/database/replication/snowflake) destination guides for setup instructions and data-model details.
-
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-[Request Early Access](/go/supabase-pipelines-new-destinations) for ClickHouse, DuckLake, or Snowflake. Supported destinations can be Supabase-managed or third-party systems as support expands.
+BigQuery is available. ClickHouse, DuckLake, and Snowflake require Early Access approval. See [supported destinations](/docs/guides/database/replication#supported-destinations) for the comparison and access request.
 
 ## Does the destination's region affect performance?
 
-Yes. The further apart your source database, the pipeline, and your destination are, the more network latency is added to replication, which increases replication lag and reduces throughput.
-
-Managed Pipelines run in **AWS `eu-central-1` (Frankfurt)**. Place the source and destination as close to Frankfurt as practical, prioritizing the destination if you can optimize only one side.
+Yes. Distance between the source, pipeline, and destination adds network latency and can reduce throughput. Choose resources near the [managed pipeline region](/docs/guides/database/replication/pipelines#region), prioritizing the destination if you can optimize only one side.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## Which plans support Pipelines?
 
-Pipelines requires a Pro, Team, or Enterprise plan. During public alpha, access is being rolled out gradually, so an eligible plan does not guarantee that Pipelines is enabled for every organization yet. If it is not available, request access from the **Database > Replication** page or contact your account manager.
+Pipelines requires a Pro, Team, or Enterprise plan. During public alpha, availability varies by organization; an eligible plan does not guarantee access. If unavailable, request access from **Database > Replication** or contact your account manager.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## What does Pipelines install in the database?
 
-Pipelines installs an event trigger to detect supported schema changes and tables in the `etl` schema to track replication state. These objects are removed when you disable Pipelines.
+An event trigger detects supported schema changes, and tables in the `etl` schema track replication state. Disabling Pipelines removes these objects.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## What does Pipelines check before creating a pipeline?
 
-When you click **Create and start pipeline**, the Dashboard checks source permissions, logical replication capacity, the publication and selected tables, destination connectivity, and destination-specific table requirements.
-
-A **Required** issue blocks pipeline creation. Fix the issue, then run the checks again. A **Warning** identifies a risk or a destination behavior that you should review, but you can confirm that you want to continue.
-
-One warning can recommend increasing `max_slot_wal_keep_size`. Pipelines needs Postgres to retain changes while it copies each table so that replication can continue consistently. Review the source database's available storage before applying the recommendation, then monitor [WAL retention and slot status](/docs/guides/database/replication/pipelines-monitoring#replication-lag-metrics) after startup.
+The Dashboard validates source access, replication capacity, publication tables, and destination connectivity and requirements. **Required** issues block creation; **Warnings** require review. See [creation checks](/docs/guides/database/replication/pipelines#creation-checks).
 
 ## What schema changes are supported?
 
-Support depends on the destination. Pipelines can generally add, rename, and remove columns, but restrictions differ for type, default, primary-key, and `NULL` constraint changes. Review the current schema-change table for [BigQuery](/docs/guides/database/replication/bigquery#schema-change-support), [ClickHouse](/docs/guides/database/replication/clickhouse#schema-change-support), [DuckLake](/docs/guides/database/replication/ducklake#schema-change-support), or [Snowflake](/docs/guides/database/replication/snowflake#schema-change-support) before changing a replicated table.
+Support differs by destination. Check the [schema-change guides](/docs/guides/database/replication/pipelines#schema-change-support) before changing column types, defaults, keys, or constraints.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## What happens when you disable Pipelines?
 
-Disabling Pipelines removes the database objects that were installed in your source database, including the replication state tables in the `etl` schema and the DDL event trigger.
-
-To remove Pipelines from a project, delete all Pipelines destinations first. After all destinations are deleted, the disable action becomes available. For the Dashboard steps, see [Disabling Pipelines](/docs/guides/database/replication/pipelines#disabling-pipelines).
-
-Disabling Pipelines stops Supabase from managing replication for the project. It does not delete tables or data that were already written to your destination.
+Pipelines removes its event trigger and replication state tables from Postgres. Existing destination data remains. Delete all destinations first, then follow [Disabling Pipelines](/docs/guides/database/replication/pipelines#disabling-pipelines).
 
 ## Why is a table not being replicated?
 
-Common reasons:
+Check that:
 
-- The table isn't in the publication. After changing the publication, restart the pipeline.
-- The table lacks the primary key or replica identity required by its destination.
-- The publication omits a primary-key or replica-identity column.
-- The column is generated. Pipelines doesn't replicate generated columns.
+- The table is published and the pipeline was [restarted after the publication change](/docs/guides/database/replication/pipelines#adding-or-removing-tables).
+- The table and published columns satisfy the destination's primary-key and replica-identity requirements.
+- Publication row filters include the expected rows.
+- Missing columns aren't generated; Pipelines skips generated columns.
 
-If inserts work but updates or deletes fail, the source probably isn't sending enough old-row identity. Requirements differ by destination; see [BigQuery](/docs/guides/database/replication/bigquery#source-table-requirements), [ClickHouse](/docs/guides/database/replication/clickhouse#source-table-requirements), [DuckLake](/docs/guides/database/replication/ducklake#source-table-requirements), or [Snowflake](/docs/guides/database/replication/snowflake#source-table-requirements).
+If new changes arrive but existing rows are missing, check the [initial sync selection](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy). If inserts work but updates or deletes fail, review the source table requirements for [BigQuery](/docs/guides/database/replication/bigquery#source-table-requirements), [ClickHouse](/docs/guides/database/replication/clickhouse#source-table-requirements), [DuckLake](/docs/guides/database/replication/ducklake#source-table-requirements), or [Snowflake](/docs/guides/database/replication/snowflake#source-table-requirements).
 
 ## Why is a pipeline failed or stopped?
 
-**Failed** means the pipeline currently reports a startup or runtime failure. It can recover automatically, so check its status and logs before restarting it. **Stopped** means the pipeline is no longer running, for example after a manual stop, project inactivity, or repeated failures. A stopped pipeline needs to be started manually.
-
-To recover:
-
-1. Open the pipeline and review its error details and [replication logs](/dashboard/project/_/logs/replication-logs).
-2. Fix the underlying connectivity, schema, permission, or rate-limit problem.
-3. Start or restart the pipeline from [**Database > Replication**](/dashboard/project/_/database/replication).
-
-See [Handling errors](/docs/guides/database/replication/pipelines-monitoring#handling-errors) for the complete troubleshooting flow.
+**Failed** reports a startup or runtime error and can recover automatically. **Stopped** requires a manual start. Follow [pipeline error recovery](/docs/guides/database/replication/pipelines-monitoring#pipeline-errors) to diagnose the cause before restarting.
 
 ## Why is replication lag increasing?
 
-Lag increases when Postgres produces WAL faster than the pipeline can confirm it has processed. Common causes include a slow or rate-limited destination, a pipeline issue, heavy source database activity, long transactions, network latency between the pipeline and source database, or a stopped/disconnected pipeline.
-
-Open [**Database > Replication**](/dashboard/project/_/database/replication), click **View pipeline**, and check **Waiting to sync**, **WAL retention remaining**, **Last check-in**, **Connected**, and **Slot status**. See [Dealing with replication lag](/docs/guides/database/replication/pipelines-monitoring#dealing-with-replication-lag) for the full investigation and response flow.
+Postgres is producing WAL faster than Pipelines confirms progress. Follow [Investigate the lag](/docs/guides/database/replication/pipelines-monitoring#investigate-the-lag) to distinguish source activity, destination throughput, and connectivity problems.
 
 ## What does a `Lost` slot status mean?
 
-`Lost` means Postgres has already removed WAL files that the pipeline's replication slot needed. The pipeline cannot continue from that slot.
-
-Recreate the pipeline, or set **Invalidated slot behavior** to **Recreate** and start it again. Recovery replaces the destination tables through a new, billable initial sync.
-
-See [Slot statuses](/docs/guides/database/replication/pipelines-monitoring#slot-statuses) for all slot states and what to do next.
+Required WAL is gone, so replication cannot continue from that slot. Follow [slot recovery](/docs/guides/database/replication/pipelines-monitoring#respond-based-on-the-slot-status); recovery scope depends on whether the main slot or a table-sync slot was lost.
 
 ## Why is a table in error state?
 
-A table can enter an error state during initial sync or ongoing replication, including after an unsupported schema change. Open **View pipeline** and fix the reported problem. Some errors retry automatically; if a reset is required, restart the table's initial sync. This replaces its destination data and processes billable data again. See [Table errors](/docs/guides/database/replication/pipelines-monitoring#table-errors) for the recovery flow and its effect on other tables.
+An initial sync or ongoing replication operation failed, for example after an unsupported schema change. Some errors retry automatically; others require a reset. See [Table errors](/docs/guides/database/replication/pipelines-monitoring#table-errors) for diagnosis and the effects of resetting.
 
 ## What happens when a project becomes inactive or moves to the Free Plan?
 
-When a project becomes inactive, Pipelines stops its pipelines. Restart them manually after restarting the project. Downgrading a project to the Free Plan deletes its pipelines.
+Project inactivity stops its pipelines. Start them manually after restarting the project. Downgrading to the Free Plan deletes its pipelines.
 
 ## What happens if a table is deleted at the destination?
 
-Don't delete or modify objects managed by Pipelines. Doing so can stop replication and require a new, billable initial sync. Remove the source table from the publication and restart the pipeline before deleting its destination table. To end all replication and pipeline-hour billing, delete the destination rather than only stopping its pipeline. See [Adding or removing tables](/docs/guides/database/replication/pipelines#adding-or-removing-tables) for the complete procedure.
+Deleting or modifying managed objects can stop replication and require a new initial sync. To remove one safely, [remove the source table from the publication](/docs/guides/database/replication/pipelines#removing-tables-from-replication) and restart the pipeline before deleting its destination table.
 
 ## Can data be processed more than once?
 
-Yes. Pipelines uses at-least-once processing, so recovery can occasionally process acknowledged data again. Each destination integration tries to deduplicate or protect against replay using the mechanisms available in that destination, but Pipelines doesn't guarantee exactly-once processing.
+Yes. Pipelines provides at-least-once processing: recovery can replay acknowledged data, and consumers of append-only histories must tolerate repeated events. Destination deduplication does not provide an exactly-once processing guarantee.
 
-The resulting behavior depends on the destination and its table model. See the replication details for [BigQuery](/docs/guides/database/replication/bigquery#how-it-works), [ClickHouse](/docs/guides/database/replication/clickhouse#choose-a-table-engine), [DuckLake](/docs/guides/database/replication/ducklake#how-replication-works), or [Snowflake](/docs/guides/database/replication/snowflake#append-only-change-history).
+See the data models for [BigQuery](/docs/guides/database/replication/bigquery#how-it-works), [ClickHouse](/docs/guides/database/replication/clickhouse#choose-a-table-engine), [DuckLake](/docs/guides/database/replication/ducklake#how-replication-works), and [Snowflake](/docs/guides/database/replication/snowflake#append-only-change-history), and the [billing implications](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
