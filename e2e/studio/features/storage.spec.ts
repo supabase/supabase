@@ -191,6 +191,56 @@ test.describe('Storage', () => {
     await createFolder(page, folderName)
   })
 
+  test('deep links to a nested folder and file via the URL', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_deeplink`
+    const folderName = 'deeplink_folder'
+    const fileName = 'test-file.txt'
+
+    await deleteBucketViaApi(bucketName)
+    await createBucketViaApi(bucketName, false)
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    // Creating a folder drills into it, so the upload lands inside the folder
+    await createFolder(page, folderName)
+    await expect(page.getByText('Drop your files here')).toBeVisible()
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
+    await uploadFile(page, filePath, fileName)
+
+    // Reload at the bucket root so opening the folder is a real navigation rather than
+    // the store drilling in on its own — only the former pushes a history entry
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+    await page.getByTitle(folderName).click()
+    // Compare the parsed params rather than regex-matching the URL, so dots and other
+    // regex metacharacters in file names are treated literally
+    await expect(page).toHaveURL((url) => url.searchParams.get('path') === folderName)
+
+    // Opening the file records it in the URL alongside the folder
+    await page.getByTitle(fileName).click()
+    await expect(page).toHaveURL((url) => url.searchParams.get('path') === folderName)
+    await expect(page).toHaveURL((url) => url.searchParams.get('preview') === fileName)
+
+    // A reload restores the same location rather than dropping back to bucket root
+    const deepLink = page.url()
+    await page.reload()
+    await expect(
+      page.getByTitle(fileName),
+      'File should still be visible after reloading the deep link'
+    ).toBeVisible()
+    expect(page.url()).toBe(deepLink)
+
+    // Back walks up out of the folder
+    await page.goBack()
+    await expect(page).toHaveURL((url) => url.searchParams.get('path') === null)
+    await expect(
+      page.getByTitle(folderName),
+      'Should be back at bucket root showing the folder'
+    ).toBeVisible()
+
+    await deleteBucketViaApi(bucketName)
+  })
+
   test('can rename a file', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_rename_file`
     const fileName = 'test-file.txt'
