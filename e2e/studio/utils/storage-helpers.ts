@@ -287,13 +287,12 @@ export const deleteAllBuckets = async (page: Page, ref: string) => {
  * @returns The move dialog locator, to scope assertions to the picker
  */
 export const openMoveDialog = async (page: Page, fileName: string) => {
-  await dismissToastsIfAny(page)
-
-  // The trigger only fades in on hover, so reveal it rather than forcing the click
-  await page.getByTitle(fileName).hover()
-  const actionsButton = page.getByRole('button', { name: `${fileName} actions` })
-  await expect(actionsButton, `Actions button for ${fileName} should be visible`).toBeVisible()
-  await actionsButton.click()
+  // Opened from the row's context menu rather than its actions button: the actions button sits at
+  // the row's right edge, where a top-right toast can cover it, while a right-click targets the
+  // row's center. Both menus are built from the same options.
+  const row = page.getByTitle(fileName)
+  await expect(row, `Row for ${fileName} should be visible`).toBeVisible()
+  await row.click({ button: 'right' })
   await page.getByRole('menuitem', { name: 'Move' }).click()
 
   const dialog = page.getByRole('dialog')

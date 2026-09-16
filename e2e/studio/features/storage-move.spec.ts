@@ -1,6 +1,5 @@
 import { expect, type Page } from '@playwright/test'
 
-import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
 import {
   confirmMove,
   navigateToBucket,
@@ -58,7 +57,6 @@ test.describe('Storage move file', () => {
     ).not.toBeVisible()
 
     // Open the destination folder and confirm the file landed there
-    await dismissToastsIfAny(page)
     await page.getByTitle('docs').click()
     await expect(
       page.getByTitle(fileName),
