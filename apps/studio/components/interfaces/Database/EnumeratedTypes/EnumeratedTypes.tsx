@@ -30,6 +30,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useEnumeratedTypeDeleteMutation } from '@/data/enumerated-types/enumerated-type-delete-mutation'
 import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
@@ -217,14 +218,7 @@ export const EnumeratedTypes = () => {
                   </TableRow>
                 )}
                 {filteredEnumeratedTypes.length === 0 && search.length > 0 && (
-                  <TableRow>
-                    <TableCell colSpan={4}>
-                      <p className="text-sm text-foreground">No results found</p>
-                      <p className="text-sm text-foreground-light">
-                        Your search for "{search}" did not return any results
-                      </p>
-                    </TableCell>
-                  </TableRow>
+                  <TableRowNoResults colSpan={4} search={search} />
                 )}
                 {filteredEnumeratedTypes.length > 0 &&
                   filteredEnumeratedTypes.map((type) => (

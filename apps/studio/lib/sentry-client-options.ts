@@ -16,7 +16,11 @@ import * as Sentry from '@sentry/react'
 import { thirdPartyErrorFilterIntegration } from '@sentry/react'
 import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
-import { filterSentryEvent, isSentryErrorBoundaryCrash } from 'common/sentry'
+import {
+  BROWSER_NOISE_IGNORE_ERRORS,
+  filterSentryEvent,
+  isSentryErrorBoundaryCrash,
+} from 'common/sentry'
 
 import { MIRRORED_BREADCRUMBS } from '@/lib/breadcrumbs'
 import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from '@/lib/sanitize'
@@ -256,34 +260,7 @@ export function buildSentryClientOptions({
       // sql-formatter lexer on invalid SQL input
       /^Parse error: Unexpected ".+" at line \d+ column \d+$/,
 
-      // === Network / infrastructure (not actionable on FE) ===
-      /504 Gateway Time-out/,
-      'Network request failed',
-      'Failed to fetch',
-      'Load failed',
-      'AbortError',
-      'TypeError: cancelled',
-      'TypeError: Cancelled',
-
-      // === Browser extensions & Google Translate DOM manipulation ===
-      'Node.insertBefore: Child to insert before is not a child of this node',
-      'Node.removeChild: The node to be removed is not a child of this node',
-      "NotFoundError: Failed to execute 'removeChild' on 'Node'",
-      "NotFoundError: Failed to execute 'insertBefore' on 'Node'",
-      'NotFoundError: The object can not be found here.',
-      "Cannot read properties of null (reading 'parentNode')",
-      "Cannot read properties of null (reading 'removeChild')",
-      "TypeError: can't access dead object",
-      /^NS_ERROR_/,
-
-      // === Non-Error throws (extensions, third-party libs throwing strings/objects) ===
-      'Non-Error exception captured',
-      'Non-Error promise rejection captured',
-      /^Object captured as exception with keys:/,
-
-      // === Cross-origin script errors (no useful info) ===
-      'Script error.',
-      'Script error',
+      ...BROWSER_NOISE_IGNORE_ERRORS,
 
       // === React hydration mismatches caused by extensions modifying DOM ===
       // Note: we only suppress the generic browser messages, NOT "Hydration failed because..."
