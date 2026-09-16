@@ -30,7 +30,6 @@ import {
   formatLogsAsCsv,
   formatLogsAsJson,
   formatLogsAsMarkdown,
-  getShiftClickSelection,
   isDefaultLogPreviewFormat,
 } from './Logs.utils'
 import LogSelection from './LogSelection'
@@ -44,6 +43,7 @@ import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useSelectedLog } from '@/hooks/analytics/useSelectedLog'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useProfile } from '@/lib/profile'
+import { getShiftClickSelection } from '@/lib/shift-click-selection'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { ResponseError } from '@/types'
