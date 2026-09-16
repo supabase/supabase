@@ -189,6 +189,46 @@ describe('generate-sitemap lastmod', () => {
   })
 })
 
+describe('generate-sitemap App Router pages', () => {
+  it.each(['app/page.tsx', 'app/(home)/page.tsx'])(
+    'includes only static page URLs without lastmod, with homepage at %s',
+    (homepage) => {
+      const dir = writeFixture({
+        [homepage]: '',
+        'app/(group)/example/page.tsx': '',
+        'app/(marketing)/guides/(topics)/start/page.tsx': '',
+        'app/blog/example/page.tsx': '',
+        'app/events/example/page.tsx': '',
+        'app/reference/index/page.tsx': '',
+        'app/things/[slug]/page.tsx': '',
+        'app/things/[slug]/details/page.tsx': '',
+        'app/(group)/[...slug]/page.tsx': '',
+        'app/optional/[[...slug]]/page.tsx': '',
+        'app/example/layout.tsx': '',
+        'app/api/route.ts': '',
+        'app/loading.tsx': '',
+        'pages/company.tsx': '',
+      })
+      const result = runGenerator(dir)
+      expect(result.status, result.stderr).toBe(0)
+      const entries = urlEntries(fs.readFileSync(path.join(dir, 'public/sitemap_www.xml'), 'utf-8'))
+      expect(entries.sort((a, b) => a.loc.localeCompare(b.loc))).toEqual(
+        [
+          '',
+          '/blog/example',
+          '/company',
+          '/evals',
+          '/events/example',
+          '/example',
+          '/guides/start',
+          '/reference/index',
+        ].map((route) => ({ loc: `https://supabase.com${route}`, lastmod: undefined }))
+      )
+    },
+    SPAWN_TIMEOUT_MS
+  )
+})
+
 describe('frontmatter dates in sitemap and blog JSON-LD', () => {
   it.each([
     ['2026-01-14T09:30:00', '2026-01-14'],
