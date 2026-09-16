@@ -20,6 +20,7 @@ describe('buildFilterProperties', () => {
       options: [{ label: 'Postgres', value: 'postgres' }],
     },
     { label: 'Event message', value: 'event_message', type: 'input' },
+    { label: 'Pathname', value: 'pathname', type: 'checkbox' },
   ]
 
   it('produces properties that all satisfy the FilterProperty schema', () => {
@@ -30,7 +31,7 @@ describe('buildFilterProperties', () => {
   it('drops timerange fields and appends the synthetic user property last', () => {
     const names = buildFilterProperties({ fields }).map((property) => property.name)
     expect(names).not.toContain('date')
-    expect(names).toEqual(['log_type', 'event_message', USER_PROPERTY])
+    expect(names).toEqual(['log_type', 'event_message', 'pathname', USER_PROPERTY])
   })
 
   it('gives the event_message column pattern (ILIKE) operators', () => {
@@ -50,6 +51,18 @@ describe('buildFilterProperties', () => {
     expect(logType?.operators).toEqual([
       { label: 'Equals', value: '=', group: 'comparison' },
       { label: 'Not equal', value: '<>', group: 'comparison' },
+    ])
+  })
+
+  it('gives pathname both comparison and pattern (ILIKE) operators', () => {
+    const pathname = buildFilterProperties({ fields }).find(
+      (property) => property.name === 'pathname'
+    )
+    expect(pathname?.operators).toEqual([
+      { label: 'Equals', value: '=', group: 'comparison' },
+      { label: 'Not equal', value: '<>', group: 'comparison' },
+      { label: 'iLike', value: '~~*', group: 'pattern' },
+      { label: 'Not iLike', value: '!~~*', group: 'pattern' },
     ])
   })
 

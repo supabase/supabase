@@ -31,6 +31,7 @@ import {
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -77,6 +78,7 @@ export const InviteMemberButton = () => {
   ])
 
   const [isOpen, setIsOpen] = useState(false)
+  const [pendingInvite, setPendingInvite] = useState<z.infer<typeof FormSchema>>()
   const [projectDropdownOpen, setProjectDropdownOpen] = useState(false)
 
   const { data: members } = useOrganizationMembersQuery({ slug })
@@ -157,6 +159,9 @@ export const InviteMemberButton = () => {
   })
 
   const emailCount = parseEmails(email ?? '').length
+  const getRoleName = (roleId?: string) =>
+    orgScopedRoles.find((role) => role.id.toString() === roleId)?.name
+  const pendingRoleName = getRoleName(pendingInvite?.role)
 
   const onInviteMember = async (values: z.infer<typeof FormSchema>) => {
     if (!slug) return console.error('Slug is required')
@@ -219,6 +224,18 @@ export const InviteMemberButton = () => {
     if (succeeded.length > 0) {
       closeInviteSheet()
     }
+  }
+
+  const handleInviteSubmit = (values: z.infer<typeof FormSchema>) => {
+    const roleName = getRoleName(values.role)
+    const needsConfirmation = roleName === 'Owner' || roleName === 'Administrator'
+    if (needsConfirmation) setPendingInvite(values)
+    else onInviteMember(values)
+  }
+
+  const handleConfirmInvite = async () => {
+    if (pendingInvite) await onInviteMember(pendingInvite)
+    setPendingInvite(undefined)
   }
 
   useEffect(() => {
@@ -315,7 +332,7 @@ export const InviteMemberButton = () => {
             <form
               id="organization-invitation"
               className="flex flex-col gap-y-4"
-              onSubmit={form.handleSubmit(onInviteMember)}
+              onSubmit={form.handleSubmit(handleInviteSubmit)}
             >
               <FormField
                 name="role"
@@ -353,13 +370,13 @@ export const InviteMemberButton = () => {
                                   value={role.id.toString()}
                                   disabled={disabled}
                                   label={role.name}
-                                  description={[
-                                    ROLE_DESCRIPTIONS[role.name] ??
-                                      'Permissions are based on the configured organization role.',
-                                    disabledReason,
-                                  ]
-                                    .filter(Boolean)
-                                    .join(' ')}
+                                  description={
+                                    <>
+                                      {ROLE_DESCRIPTIONS[role.name] ??
+                                        'Permissions are based on the configured organization role.'}
+                                      {disabledReason && ` ${disabledReason}`}
+                                    </>
+                                  }
                                 />
                               </FormControl>
                             </FormItem>
@@ -473,7 +490,7 @@ export const InviteMemberButton = () => {
           <Button onClick={confirmOnClose}>Cancel</Button>
           <Shortcut
             id={SHORTCUT_IDS.ORG_TEAM_INVITE_SUBMIT}
-            onTrigger={() => form.handleSubmit(onInviteMember)()}
+            onTrigger={() => form.handleSubmit(handleInviteSubmit)()}
             options={{ enabled: isOpen && !isInviting }}
             side="top"
           >
@@ -491,6 +508,17 @@ export const InviteMemberButton = () => {
       <DiscardChangesConfirmationDialog
         {...discardChangesModalProps}
         description="Are you sure you want to discard your changes? Your invitation will not be sent."
+      />
+      <ConfirmationModal
+        variant="warning"
+        visible={pendingInvite !== undefined}
+        loading={isInviting}
+        title={`Invite as ${pendingRoleName}?`}
+        description={pendingRoleName && ROLE_DESCRIPTIONS[pendingRoleName]}
+        confirmLabel="Send invitation"
+        confirmLabelLoading="Sending invitation..."
+        onCancel={() => setPendingInvite(undefined)}
+        onConfirm={handleConfirmInvite}
       />
     </Sheet>
   )
