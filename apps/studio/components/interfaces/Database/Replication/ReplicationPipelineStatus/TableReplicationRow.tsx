@@ -53,8 +53,8 @@ export const TableReplicationRow = ({
     isErrorState && 'reason' in table.state && !showDisabledState && !isRestarting
   // A table copying during the initial sync reports its own slot metrics. Shown as one line rather
   // than a grid, so the detail survives without a table cell turning into a dashboard.
-  const syncLag = table.table_sync_lag as SlotLagMetricsType | undefined
-  const syncLagParts = syncLag === undefined ? undefined : getTableSyncLagLabel(syncLag)
+  const syncLag = table.table_sync_lag as SlotLagMetricsType | null | undefined
+  const syncLagParts = syncLag == null ? undefined : getTableSyncLagLabel(syncLag)
   const syncLagLabel =
     syncLagParts !== undefined && syncLagParts.length > 0 ? syncLagParts.join(' · ') : undefined
   // Status column already names the state (Copying, Queued, …). Prefer the sync line when we have
@@ -91,16 +91,13 @@ export const TableReplicationRow = ({
           </p>
         ) : showDisabledState ? (
           <p className="text-sm text-foreground-lighter">{disabledStateMessage}</p>
+        ) : isErrorState ? (
+          <div className="flex flex-col gap-y-3 text-sm text-foreground-lighter">
+            <p>{statusConfig.description}.</p>
+            <ErroredTableDetails table={table} />
+          </div>
         ) : (
-          <p className="text-sm text-foreground-lighter">
-            {isErrorState ? (
-              <>
-                {statusConfig.description}. <ErroredTableDetails table={table} />
-              </>
-            ) : (
-              detailsLine
-            )}
-          </p>
+          <p className="text-sm text-foreground-lighter">{detailsLine}</p>
         )}
       </TableCell>
 
