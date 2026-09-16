@@ -166,7 +166,9 @@ The following changes are not applied automatically:
 
 New scalar columns are made nullable when ClickHouse needs a value for historical rows and the source default cannot be represented safely. Some Postgres defaults cannot be translated to ClickHouse and are skipped with a warning.
 
-Changing the publication's column list for an already tracked table is supported while the pipeline runs. A previously excluded scalar column is added as nullable without a default, so historical rows remain `NULL`. Publishing a previously excluded array column requires a new initial sync because ClickHouse cannot represent a nullable array. Removing a published column drops its destination values; adding it again does not restore them.
+Changing the publication's column list for an already tracked table is supported while the pipeline runs. A previously excluded scalar column is added as nullable without a default, so historical rows remain `NULL`. Removing a published column drops its destination values; adding it again does not restore them.
+
+Publishing a previously excluded array column requires a new initial sync because ClickHouse cannot represent a nullable array. Include the table in **Initial sync**, then open **View pipeline**, click the table's restart icon, and confirm **Restart replication**. This [table reset](/docs/guides/database/replication/pipelines-monitoring#table-errors) deletes destination data and repeats initial sync.
 
 For type changes, follow the shared [schema-change recovery guidance](/docs/guides/database/replication/pipelines#schema-change-support).
 

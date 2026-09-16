@@ -150,7 +150,7 @@ Removing a column from the publication also removes the BigQuery column and its 
 - **Data type changes:** Require a [table reset](/docs/guides/database/replication/pipelines#schema-change-support).
 - **Adding `NOT NULL`:** BigQuery doesn't support adding `NOT NULL` to an existing column, so BigQuery keeps the column nullable. Postgres still prevents new `NULL` values from being written.
 - **Primary-key changes:** Changing which columns make up the primary key, their names, or their order isn't supported. Pipelines rejects the schema change instead of applying it.
-- **Publishing an existing array column:** Adding a previously excluded array column to the publication requires a resynchronization. BigQuery arrays can't represent `NULL`, so adding the destination column would expose an empty array for historical rows whose values Pipelines doesn't know. This restriction applies even if the source table is empty. Adding a new array column in Postgres is allowed, but existing BigQuery rows expose an empty array until a later row change supplies the source value; Pipelines doesn't backfill them.
+- **Publishing an existing array column:** Adding a previously excluded array column to the publication requires a resynchronization. BigQuery arrays can't represent `NULL`, so adding the destination column would expose an empty array for historical rows whose values Pipelines doesn't know. This restriction applies even if the source table is empty. Include the table in **Initial sync**, then open **View pipeline**, click the table's restart icon, and confirm **Restart replication**. This [table reset](/docs/guides/database/replication/pipelines-monitoring#table-errors) deletes destination data and repeats initial sync. Adding a new array column in Postgres is allowed, but existing BigQuery rows expose an empty array until a later row change supplies the source value; Pipelines doesn't backfill them.
 - **Interrupted schema changes:** BigQuery DDL is not transactional. If an interruption leaves completion uncertain, Pipelines blocks further writes until you [reset the table](/docs/guides/database/replication/pipelines-monitoring#table-errors).
 
 ### Column defaults
@@ -161,7 +161,7 @@ Skipping a BigQuery default doesn't lose values from Postgres. Postgres evaluate
 
 ### Publication changes
 
-Column-list changes for tracked tables follow the [schema rules](#schema-change-support). For table membership, row filters, or partition behavior, follow [publication changes](/docs/guides/database/replication/pipelines#adding-or-removing-tables).
+Column-list changes for tracked tables follow the [schema rules](#schema-change-support). Follow the guidance for [table membership](/docs/guides/database/replication/pipelines#adding-or-removing-tables) or [other publication changes](/docs/guides/database/replication/pipelines#other-publication-changes), including row filters and partition behavior.
 
 ## Limitations
 
