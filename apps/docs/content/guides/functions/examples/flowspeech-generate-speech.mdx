@@ -1,0 +1,198 @@
+---
+title: Generate speech with FlowSpeech
+subtitle: Convert text to audio with FlowSpeech and return the audio from a Supabase Edge Function.
+---
+
+This guide explains how to call the [FlowSpeech](https://flowspeech.io/) text-to-speech API from a Supabase Edge Function and return audio that a browser or application can play.
+
+## Requirements
+
+- A FlowSpeech account and an [API key](https://flowspeech.io/settings/apikeys/create).
+- A [Supabase](https://supabase.com) project.
+- The [Supabase CLI](/docs/guides/local-development) installed on your machine.
+
+## Create the Edge Function
+
+Initialize a Supabase project if you do not already have one:
+
+```bash
+supabase init
+```
+
+Create a function named `flowspeech-tts`:
+
+```bash
+supabase functions new flowspeech-tts
+```
+
+Create `supabase/functions/.env` and add your FlowSpeech API key:
+
+```env supabase/functions/.env
+FLOWSPEECH_API_KEY=your_api_key
+```
+
+Do not commit this file. Supabase excludes function environment files from Git by default.
+
+Replace `supabase/functions/flowspeech-tts/index.ts` with the following code:
+
+```ts supabase/functions/flowspeech-tts/index.ts
+import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+
+interface SpeechRequest {
+  text?: string
+  voiceName?: string
+}
+
+interface FlowSpeechResponse {
+  code: number
+  message?: string
+  data?: {
+    audioBase64?: string
+    mimeType?: string
+  }
+}
+
+function decodeBase64(value: string): Uint8Array {
+  const binary = atob(value)
+  const bytes = new Uint8Array(binary.length)
+
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index)
+  }
+
+  return bytes
+}
+
+Deno.serve(async (request) => {
+  if (request.method !== 'POST') {
+    return Response.json({ error: 'Method not allowed' }, { status: 405 })
+  }
+
+  const apiKey = Deno.env.get('FLOWSPEECH_API_KEY')
+
+  if (!apiKey) {
+    return Response.json({ error: 'FLOWSPEECH_API_KEY is not configured' }, { status: 500 })
+  }
+
+  let body: SpeechRequest
+
+  try {
+    body = await request.json()
+  } catch {
+    return Response.json({ error: 'Request body must be JSON' }, { status: 400 })
+  }
+
+  const text = body.text?.trim()
+
+  if (!text) {
+    return Response.json({ error: 'text is required' }, { status: 400 })
+  }
+
+  // Keep this limit aligned with the input policy in your application.
+  if (text.length > 5_000) {
+    return Response.json({ error: 'text is too long' }, { status: 400 })
+  }
+
+  const response = await fetch('https://flowspeech.io/api/ai/text-to-speech', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      text,
+      originalText: text,
+      speakers: [{ voiceName: body.voiceName ?? 'Kore' }],
+    }),
+  })
+
+  let payload: FlowSpeechResponse
+
+  try {
+    payload = await response.json()
+  } catch {
+    return Response.json({ error: 'FlowSpeech returned an invalid response' }, { status: 502 })
+  }
+
+  if (!response.ok || payload.code !== 0 || !payload.data?.audioBase64) {
+    return Response.json(
+      { error: payload.message ?? 'Speech generation failed' },
+      { status: response.ok ? 502 : response.status },
+    )
+  }
+
+  const audio = decodeBase64(payload.data.audioBase64)
+
+  return new Response(audio, {
+    headers: {
+      'Content-Type': payload.data.mimeType ?? 'audio/wav',
+      'Cache-Control': 'no-store',
+    },
+  })
+})
+```
+
+The FlowSpeech API returns Base64-encoded audio. The function decodes that value and sends the audio bytes to the caller with the response MIME type.
+
+## Run locally
+
+Start the local Supabase stack:
+
+```bash
+supabase start
+```
+
+Serve the function with the local environment file:
+
+```bash
+supabase functions serve flowspeech-tts \
+  --env-file supabase/functions/.env
+```
+
+Get the local anon key from `supabase status`, then invoke the function:
+
+```bash
+export SUPABASE_ANON_KEY="your_local_anon_key"
+
+curl --fail --request POST \
+  'http://127.0.0.1:54321/functions/v1/flowspeech-tts' \
+  --header "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+  --header 'Content-Type: application/json' \
+  --data '{"text":"Hello from a Supabase Edge Function.","voiceName":"Kore"}' \
+  --output speech.wav
+```
+
+Open `speech.wav` in an audio player to verify the result.
+
+## Deploy
+
+Link the local project to your hosted Supabase project:
+
+```bash
+supabase link
+```
+
+Store the FlowSpeech API key as a project secret:
+
+```bash
+supabase secrets set FLOWSPEECH_API_KEY=your_api_key
+```
+
+Deploy the function:
+
+```bash
+supabase functions deploy flowspeech-tts
+```
+
+Call the deployed function with the same JSON body. Replace the URL and anon key with values from your Supabase project:
+
+```bash
+curl --fail --request POST \
+  'https://YOUR_PROJECT_REF.supabase.co/functions/v1/flowspeech-tts' \
+  --header "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+  --header 'Content-Type: application/json' \
+  --data '{"text":"Your deployed function is ready.","voiceName":"Kore"}' \
+  --output speech.wav
+```
+
+Keep the FlowSpeech API key in Supabase secrets. Never expose it in browser code or return it from the function.
