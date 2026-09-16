@@ -37,6 +37,7 @@ import {
   getTablePoliciesUrl,
 } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useIsTableRealtimeEnabled } from '@/data/database-publications/database-publications-query'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
@@ -356,7 +357,11 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   <p>
                     Foreign tables do not enforce RLS, which may allow unrestricted access. To
                     secure them, either move foreign tables to a private schema not exposed by
-                    PostgREST, or <a href="">disable PostgREST access</a> entirely.
+                    PostgREST, or{' '}
+                    <InlineLink href={`/project/${ref}/integrations/data_api/overview`}>
+                      disable PostgREST access
+                    </InlineLink>{' '}
+                    entirely.
                   </p>
 
                   <div className="mt-2">
