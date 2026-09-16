@@ -34,7 +34,7 @@ describe('withCalendarDate', () => {
   })
 
   it('lands on a real instant when the wall clock does not exist on the new date', () => {
-    // 02:30 does not exist in New York on 08 Mar 2026, the clocks jump 02:00 to 03:00
+    // When daylight saving time starts, New York's clock moves directly from 01:59:59 to 03:00:00, so 02:30 is not a valid local time
     const current = dayjs.tz('2026-03-20 02:30:00', 'America/New_York')
     const updated = withCalendarDate(current, new Date(2026, 2, 8), 'America/New_York')
 
