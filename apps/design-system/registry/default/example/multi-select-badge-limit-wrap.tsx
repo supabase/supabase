@@ -22,7 +22,8 @@ export default function MultiSelectDemo() {
         className="w-72"
         label="Select fruits"
         persistLabel
-        badgeLimit="wrap"
+        badgeLimit={3}
+        wrapBadges
         deletableBadge={false}
       />
       <MultiSelectorContent>
