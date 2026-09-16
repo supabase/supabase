@@ -1,5 +1,3 @@
-import { setupCommand } from '~/components/HomePageCover.constants'
-
 const monitoringCheckSections = ['health', 'security', 'performance', 'usage'] as const
 
 type MonitoringCheckSection = (typeof monitoringCheckSections)[number]
@@ -328,7 +326,6 @@ database.new and run the instruments table SQL. Then:
 
 REFERENCE
 https://supabase.com/docs/guides/getting-started/quickstarts/vue.md`,
-  'monitoring-and-debugging': `Read https://supabase.com/docs/guides/observability.md and help me select the right read-only investigation for my project. Use already-authorized access. Identify the project and symptom before querying.`,
   'monitoring-agent-health': createMonitoringPrompt('Health monitor', ['health']),
   'monitoring-agent-security': createMonitoringPrompt('Security monitor', ['security']),
   'monitoring-agent-performance': createMonitoringPrompt('Performance monitor', ['performance']),
