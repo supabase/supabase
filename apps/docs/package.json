@@ -132,7 +132,7 @@
     "unist-util-visit": "^4.1.2",
     "uuid": "^14.0.0",
     "valtio": "catalog:",
-    "yaml": "^2.8.1",
+    "yaml": "^2.9.1",
     "zod": "catalog:"
   },
   "devDependencies": {
