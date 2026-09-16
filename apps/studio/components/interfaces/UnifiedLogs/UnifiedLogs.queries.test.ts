@@ -126,6 +126,37 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toContain(`log_attributes['request.url'] NOT LIKE '%cdn.foo%'`)
     })
 
+    it('emits ILIKE for pathname `~~*`, case-insensitive unlike the `=` LIKE behavior', () => {
+      const sql = getUnifiedLogsQuery(withFilters('pathname:ilike:Customers'))
+      expect(sql).toContain(`log_attributes['request.path'] ILIKE '%Customers%'`)
+    })
+
+    it('emits NOT ILIKE for pathname `!~~*` so rows matching the term are excluded', () => {
+      const sql = getUnifiedLogsQuery(withFilters('pathname:notilike:health'))
+      expect(sql).toContain(`log_attributes['request.path'] NOT ILIKE '%health%'`)
+    })
+
+    it('joins multiple pathname NOT ILIKE values with AND (row must match none)', () => {
+      const sql = getUnifiedLogsQuery(
+        withFilters('pathname:notilike:health', 'pathname:notilike:metrics')
+      )
+      expect(sql).toMatch(
+        /log_attributes\['request\.path'\] NOT ILIKE '%health%' AND log_attributes\['request\.path'\] NOT ILIKE '%metrics%'/
+      )
+    })
+
+    it('passes through user-supplied `%` wildcards on pathname ILIKE without double-wrapping', () => {
+      const sql = getUnifiedLogsQuery(withFilters('pathname:ilike:foo%'))
+      expect(sql).toContain(`log_attributes['request.path'] ILIKE 'foo%'`)
+      expect(sql).not.toContain(`'%foo%%'`)
+    })
+
+    it('passes through user-supplied `_` wildcards on pathname ILIKE without wrapping', () => {
+      const sql = getUnifiedLogsQuery(withFilters('pathname:ilike:fo_bar'))
+      expect(sql).toContain(`log_attributes['request.path'] ILIKE 'fo_bar'`)
+      expect(sql).not.toContain(`'%fo_bar%'`)
+    })
+
     it('emits ILIKE with auto-wrapped `%…%` for event_message `~~*`', () => {
       const sql = getUnifiedLogsQuery(withFilters('event_message:ilike:Permission Denied'))
       expect(sql).toContain(`event_message ILIKE '%Permission Denied%'`)
@@ -149,6 +180,12 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       const sql = getUnifiedLogsQuery(withFilters('event_message:ilike:error%'))
       expect(sql).toContain(`event_message ILIKE 'error%'`)
       expect(sql).not.toContain(`'%error%%'`)
+    })
+
+    it('passes through user-supplied `_` wildcards on event_message ILIKE without wrapping', () => {
+      const sql = getUnifiedLogsQuery(withFilters('event_message:ilike:foo_bar'))
+      expect(sql).toContain(`event_message ILIKE 'foo_bar'`)
+      expect(sql).not.toContain(`'%foo_bar%'`)
     })
 
     it('excludes connection log messages when show_connection_logs=false', () => {
@@ -456,5 +493,48 @@ describe('UnifiedLogs.queries.bq', () => {
     const sql = getUnifiedLogsQueryBQ(withFilters('event_message:notilike:cron'))
     expect(sql).toContain("LOWER(`event_message`) NOT LIKE LOWER('%cron%')")
     expect(sql).not.toMatch(/\bILIKE\b/)
+  })
+
+  it('emulates ILIKE with LOWER()/LOWER() for pathname `~~*`', () => {
+    const sql = getUnifiedLogsQueryBQ(withFilters('pathname:ilike:Customers'))
+    expect(sql).toContain("LOWER(`pathname`) LIKE LOWER('%Customers%')")
+    expect(sql).not.toMatch(/\bILIKE\b/)
+  })
+
+  it('emulates NOT ILIKE with LOWER()/NOT LIKE/LOWER() for pathname `!~~*`', () => {
+    const sql = getUnifiedLogsQueryBQ(withFilters('pathname:notilike:health'))
+    expect(sql).toContain("LOWER(`pathname`) NOT LIKE LOWER('%health%')")
+    expect(sql).not.toMatch(/\bILIKE\b/)
+  })
+
+  it('passes through user-supplied `%` wildcards on pathname ILIKE without double-wrapping', () => {
+    const sql = getUnifiedLogsQueryBQ(withFilters('pathname:ilike:foo%'))
+    expect(sql).toContain("LOWER(`pathname`) LIKE LOWER('foo%')")
+    expect(sql).not.toContain("LOWER('%foo%%')")
+  })
+
+  it('passes through user-supplied `_` wildcards on pathname ILIKE without wrapping', () => {
+    const sql = getUnifiedLogsQueryBQ(withFilters('pathname:ilike:fo_bar'))
+    expect(sql).toContain("LOWER(`pathname`) LIKE LOWER('fo_bar')")
+    expect(sql).not.toContain("LOWER('%fo_bar%')")
+  })
+})
+
+describe('pathname ILIKE prefix matching (cross-builder)', () => {
+  // Both query builders must treat an explicit `%` the same way — a value
+  // like `foo%` is a prefix match, not a "contains" search with a stray
+  // trailing wildcard — otherwise switching the `otelUnifiedLogs` flag would
+  // silently change what a saved/shared filter matches.
+  it('produces equivalent prefix-matching patterns for `pathname:ilike:foo%` on both backends', () => {
+    const clickhouseSql = getUnifiedLogsQuery(withFilters('pathname:ilike:foo%'))
+    const bqSql = getUnifiedLogsQueryBQ(withFilters('pathname:ilike:foo%'))
+
+    expect(clickhouseSql).toContain(`log_attributes['request.path'] ILIKE 'foo%'`)
+    expect(bqSql).toContain("LOWER(`pathname`) LIKE LOWER('foo%')")
+
+    // Neither backend should have double-wrapped the wildcard into a
+    // "contains" pattern.
+    expect(clickhouseSql).not.toContain(`'%foo%%'`)
+    expect(bqSql).not.toContain("LOWER('%foo%%')")
   })
 })
