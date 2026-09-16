@@ -88,7 +88,7 @@ export const getHighAvailabilityRegionCode = (
   // Local dev stacks can run in any of the supported regions, so they're left unrestricted
   if (environment === 'prod') return 'us-east-1'
   if (environment === 'staging') return 'us-east-1'
-  if (environment === 'local') return 'eu-central-1'
+  if (environment === 'local') return 'us-east-1'
   return undefined
 }
 
