@@ -11,7 +11,7 @@ import { addAPIMock } from '@/tests/lib/msw'
 
 type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
 type ProjectStatus = ProjectDetailResponse['status']
-type DownloadableBackupsResponse = components['schemas']['DownloadableBackupsResponse']
+type DownloadableBackupsResponse = components['schemas']['DownloadableBackupsResponse_Output']
 
 const PROJECT_REF = 'default'
 

@@ -4,6 +4,7 @@ import meanBy from 'lodash/meanBy'
 import sumBy from 'lodash/sumBy'
 import type { ChartConfig } from 'ui'
 
+import { calculateBarClickTimeRange } from '@/components/interfaces/Settings/Logs/LogsBarChart.utils'
 import type { ChartIntervals } from '@/types'
 
 export type EdgeFunctionChartRawDatum = {
@@ -145,6 +146,27 @@ export const getRollingTimeRange = (
   return [start.toDate(), currentTime.toDate()]
 }
 
+export const getInvocationChartNavigationUrl = ({
+  projectRef,
+  functionSlug,
+  isUnifiedLogsEnabled,
+  rangeStart,
+  rangeEnd,
+  clickedTimestamp,
+}: {
+  projectRef: string
+  functionSlug: string
+  isUnifiedLogsEnabled: boolean
+  rangeStart: string
+  rangeEnd: string
+  clickedTimestamp: string
+}) => {
+  const { start, end } = calculateBarClickTimeRange(rangeStart, rangeEnd, clickedTimestamp)
+  const destination = isUnifiedLogsEnabled ? 'logs' : 'invocations'
+
+  return `/project/${projectRef}/functions/${functionSlug}/${destination}?its=${encodeURIComponent(start)}&ite=${encodeURIComponent(end)}`
+}
+
 export const formatChartTimestamp = (value: Date | string | number | undefined, format: string) => {
   return dayjs(value === undefined ? '' : value).format(format)
 }
@@ -224,12 +246,12 @@ export const getInvocationUpdateAnnotation = ({
   windowStart,
   windowEnd,
 }: {
-  updatedAt?: string
+  updatedAt?: number | string
   invocationChartData: InvocationChartDatum[]
   windowStart: Date
   windowEnd: Date
 }): InvocationUpdateAnnotation | undefined => {
-  if (!updatedAt || invocationChartData.length === 0) return undefined
+  if (updatedAt === undefined || invocationChartData.length === 0) return undefined
 
   const updatedAtDate = new Date(updatedAt)
   const updatedAtValue = updatedAtDate.valueOf()

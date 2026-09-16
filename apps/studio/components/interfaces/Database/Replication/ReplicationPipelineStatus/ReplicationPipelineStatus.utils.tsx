@@ -124,6 +124,27 @@ const formatLagDurationValue = (value?: number) => {
 export const getFormattedLagValue = (type: 'bytes' | 'duration', value?: number) =>
   type === 'bytes' ? formatLagBytesValue(value) : formatLagDurationValue(value)
 
+const COPYING_STATES: TableState['state']['name'][] = ['queued', 'copying_table', 'copied_table']
+
+/**
+ * How much of the initial copy is left. A pipeline can be caught up on its ongoing change stream
+ * while tables are still copying, so several surfaces need to know this to stay honest.
+ */
+export const getInitialSyncProgress = (
+  tableStatuses: { state: { name: TableState['state']['name'] } }[]
+) => {
+  const count = (name: TableState['state']['name']) =>
+    tableStatuses.filter((table) => table.state.name === name).length
+
+  return {
+    // Everything not yet streaming, whatever stage of the initial sync it is at
+    syncingCount: tableStatuses.filter((table) => COPYING_STATES.includes(table.state.name)).length,
+    copyingCount: count('copying_table'),
+    queuedCount: count('queued'),
+    totalCount: tableStatuses.length,
+  }
+}
+
 export type LagSeverity = 'normal' | 'warning' | 'critical'
 
 type SlotStatusBadgeVariant = 'success' | 'warning' | 'destructive' | 'default'
