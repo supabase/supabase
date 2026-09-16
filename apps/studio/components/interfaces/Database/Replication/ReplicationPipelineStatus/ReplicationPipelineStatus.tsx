@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { Activity, ChevronDown, Info, RotateCcw, Search, WifiOff, X } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   Button,
   Card,
@@ -64,7 +64,7 @@ export const ReplicationPipelineStatus = () => {
   const [restartingTableIds, setRestartingTableIds] = useState<Set<number>>(new Set())
 
   const pipelineId = Number(_pipelineId)
-  const { getRequestStatus, setTableResetting, updatePipelineStatus } = usePipelineRequestStatus()
+  const { getRequestStatus, setTableResetting } = usePipelineRequestStatus()
   const requestStatus = getRequestStatus(pipelineId)
 
   const {
@@ -156,10 +156,6 @@ export const ReplicationPipelineStatus = () => {
     STATUS_REFRESH_FREQUENCY_MS >= 1000
       ? `${Math.round(STATUS_REFRESH_FREQUENCY_MS / 1000)}s`
       : `${STATUS_REFRESH_FREQUENCY_MS}ms`
-
-  useEffect(() => {
-    updatePipelineStatus(pipelineId, statusName)
-  }, [pipelineId, statusName, updatePipelineStatus])
 
   return (
     <>
