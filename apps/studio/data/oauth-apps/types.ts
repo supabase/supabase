@@ -156,6 +156,56 @@ export type OAuthExistingGrant = {
   updated_at: string | null
 }
 
+/**
+ * PROVISIONAL — a row in the org settings "Authorized apps" table.
+ *
+ * No endpoint serves this yet. `GET /platform/organizations/{slug}/oauth/apps`
+ * with `type=authorized` returns identity and timestamps only — no status, no
+ * grant counts — so every field below the identity block is an RFC addition.
+ */
+export type OAuthAuthorizedApp = {
+  id: string
+  client_id: string
+  name: string
+  icon: string | null
+  status: OAuthAuthorizedAppStatus
+  member_grant_count: number
+  org_owned_compatibility_grant_count: number
+}
+
+/**
+ * PROVISIONAL — `legacy` is a grant authorized before project controls existed,
+ * i.e. backed by `OAuthGrantKind: 'compatibility'`. Revoked rows stay in the
+ * table, so this cannot be derived from a row's absence.
+ */
+export type OAuthAuthorizedAppStatus = 'active' | 'revoked' | 'legacy'
+
+/**
+ * PROVISIONAL — one member's grant for an app, as listed in the "Member grants"
+ * dialog. The live contract has no per-member view at all.
+ */
+export type OAuthAppMemberGrant = {
+  member_email: string
+  project_scope: OAuthGrantProjectScope
+  scope_groups: OAuthScopeGroup[]
+  created_at: string
+}
+
+/**
+ * The dialog's meta line counts individual scopes, not groups — a grant showing
+ * "14 permissions" may hold only two groups.
+ */
+export function getMemberGrantPermissionCount(grant: OAuthAppMemberGrant): number {
+  return grant.scope_groups.reduce((total, scopeGroup) => total + scopeGroup.scopes.length, 0)
+}
+
+export function getMemberGrantScopeGroupsByLevel(
+  grant: OAuthAppMemberGrant,
+  level: OAuthScopeLevel
+): OAuthScopeGroup[] {
+  return grant.scope_groups.filter((scopeGroup) => scopeGroup.level === level)
+}
+
 export type OAuthAppsAuthorizeRedirect =
   components['schemas']['ApproveAuthorizationResponse_Output']
 

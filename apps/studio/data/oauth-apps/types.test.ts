@@ -2,11 +2,18 @@ import { describe, expect, test } from 'vitest'
 
 import type {
   OAuthAppGrantConfig,
+  OAuthAppMemberGrant,
   OAuthAppRegistrationType,
   OAuthAppsAuthorizeOrganizationProject,
   OAuthExistingGrant,
 } from './types'
-import { getOAuthConsentModel, getPreselectedProjectRefs, getScopedProjectRefs } from './types'
+import {
+  getMemberGrantPermissionCount,
+  getMemberGrantScopeGroupsByLevel,
+  getOAuthConsentModel,
+  getPreselectedProjectRefs,
+  getScopedProjectRefs,
+} from './types'
 
 const config = (overrides: Partial<OAuthAppGrantConfig> = {}): OAuthAppGrantConfig => ({
   bind_to_authorizing_user: false,
@@ -147,5 +154,37 @@ describe('getPreselectedProjectRefs', () => {
         liveProjects: [],
       })
     ).toEqual([])
+  })
+})
+
+const memberGrant = (): OAuthAppMemberGrant => ({
+  member_email: 'admin@example.com',
+  project_scope: { target: 'selected_projects', project_refs: ['alpha', 'bravo'] },
+  scope_groups: [
+    { name: 'Project Settings, Logs', level: 'read_write', scopes: ['project_settings', 'logs'] },
+    { name: 'Database Webhooks', level: 'read', scopes: ['database_webhooks'] },
+  ],
+  created_at: '2026-08-18T09:12:00.000Z',
+})
+
+describe('getMemberGrantPermissionCount', () => {
+  test('counts individual scopes across every group', () => {
+    expect(getMemberGrantPermissionCount(memberGrant())).toBe(3)
+  })
+
+  test('counts nothing for a grant with no groups', () => {
+    expect(getMemberGrantPermissionCount({ ...memberGrant(), scope_groups: [] })).toBe(0)
+  })
+})
+
+describe('getMemberGrantScopeGroupsByLevel', () => {
+  test('returns only the groups at the requested level', () => {
+    expect(getMemberGrantScopeGroupsByLevel(memberGrant(), 'read_write')).toEqual([
+      { name: 'Project Settings, Logs', level: 'read_write', scopes: ['project_settings', 'logs'] },
+    ])
+  })
+
+  test('returns nothing for a level the grant does not hold, so the block can be skipped', () => {
+    expect(getMemberGrantScopeGroupsByLevel(memberGrant(), 'write')).toEqual([])
   })
 })

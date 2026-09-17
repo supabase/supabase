@@ -1,15 +1,18 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  getMockOAuthAppMemberGrants,
   getMockOAuthAppsAuthorizeApproveResult,
   getMockOAuthAppsAuthorizeIdentity,
   getMockOAuthAppsAuthorizeOrganizationProjects,
   getMockOAuthAppsAuthorizeRequest,
+  getMockOAuthAuthorizedApps,
   OAUTH_APPS_MOCK_SCENARIOS,
   USE_MOCKS,
 } from './mocks'
 import {
   getFailedProjects,
+  getMemberGrantPermissionCount,
   getOAuthConsentModel,
   getScopedProjectRefs,
   isRoleValidationFailure,
@@ -306,5 +309,62 @@ describe('oauth-apps mocks', () => {
           .sort()
       ).toEqual(readOnlyRefs().sort())
     })
+  })
+})
+
+describe('authorized apps fixtures', () => {
+  test('every status the table renders has a fixture', () => {
+    const statuses = new Set(getMockOAuthAuthorizedApps().map((app) => app.status))
+
+    expect(statuses).toEqual(new Set(['active', 'revoked', 'legacy']))
+  })
+
+  test('a singular and a plural grant count both have a fixture', () => {
+    const counts = getMockOAuthAuthorizedApps().map((app) => app.member_grant_count)
+
+    expect(counts).toContain(1)
+    expect(counts.some((count) => count > 1)).toBe(true)
+  })
+
+  test('the legacy app carries org-owned compatibility grants', () => {
+    const legacy = getMockOAuthAuthorizedApps().find((app) => app.status === 'legacy')
+
+    expect(legacy?.org_owned_compatibility_grant_count).toBeGreaterThan(0)
+  })
+
+  test('app ids are unique so the table can key rows on them', () => {
+    const apps = getMockOAuthAuthorizedApps()
+
+    expect(new Set(apps.map((app) => app.id)).size).toBe(apps.length)
+  })
+})
+
+describe('app member grants fixtures', () => {
+  test('every app in the table resolves a member grant list', () => {
+    getMockOAuthAuthorizedApps().forEach((app) => {
+      expect(Array.isArray(getMockOAuthAppMemberGrants(app.id))).toBe(true)
+    })
+  })
+
+  test('an unknown app id degrades to an empty list', () => {
+    expect(getMockOAuthAppMemberGrants('not-an-app')).toEqual([])
+  })
+
+  test('a member holding a single permission level has a fixture', () => {
+    const grants = getMockOAuthAuthorizedApps().flatMap((app) =>
+      getMockOAuthAppMemberGrants(app.id)
+    )
+    const levels = grants.map(
+      (grant) => new Set(grant.scope_groups.map((scopeGroup) => scopeGroup.level)).size
+    )
+
+    expect(levels).toContain(1)
+    expect(levels.some((count) => count > 1)).toBe(true)
+  })
+
+  test('the permission count sums scopes rather than groups', () => {
+    const grant = getMockOAuthAppMemberGrants('authorized-vercel')[0]
+
+    expect(grant.scope_groups.length).toBeLessThan(getMemberGrantPermissionCount(grant))
   })
 })
